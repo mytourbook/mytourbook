@@ -50,21 +50,16 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.ITreeViewerListener;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.StyledCellLabelProvider;
-import org.eclipse.jface.viewers.TreeExpansionEvent;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -74,10 +69,9 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
@@ -97,6 +91,11 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    private GraphColorItem              _selectedGraphColor;
    private List<TourBeverageContainer> _dbTourTypes;
 
+   /**
+    * This is the model of the tour type viewer.
+    */
+   private List<TourBeverageContainer> _beverageContainers;
+
    private boolean                     _isModified;
    private boolean                     _isLayoutModified;
 
@@ -107,13 +106,13 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    /*
     * UI controls
     */
-   private TreeViewer _tourBeverageContainerViewer;
+   private TableViewer _tourBeverageContainerViewer;
 
-   private Button     _btnAdd;
-   private Button     _btnDelete;
-   private Button     _btnEdit;
+   private Button      _btnAdd;
+   private Button      _btnDelete;
+   private Button      _btnEdit;
 
-   private class BeverageContainerContentProvider implements ITreeContentProvider {
+   private class BeverageContainerContentProvider implements IStructuredContentProvider {
 
       @Override
       public void dispose() {
@@ -121,32 +120,49 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       }
 
       @Override
-      public Object[] getChildren(final Object parentElement) {
-
-         return new Object[] {};
-      }
-
-      @Override
       public Object[] getElements(final Object inputElement) {
-         return new String[] {};
-      }
-
-      @Override
-      public Object getParent(final Object element) {
-         return null;
-      }
-
-      @Override
-      public boolean hasChildren(final Object element) {
-
-         return element instanceof ColorDefinition;
+         return _beverageContainers.toArray(new Object[_beverageContainers.size()]);
       }
 
       @Override
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
          // Nothing to do
       }
+   }
 
+   private class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
+
+      @Override
+      public Image getColumnImage(final Object obj, final int index) {
+
+         if (index == 0) {
+            return getImage(obj);
+         }
+         return null;
+      }
+
+      @Override
+      public String getColumnText(final Object obj, final int index) {
+
+         final TourBeverageContainer tourBeverageContainer = (TourBeverageContainer) obj;
+
+         switch (index) {
+         case 0:
+            return tourBeverageContainer.getName();
+
+         case 1:
+            return String.valueOf(tourBeverageContainer.getCapacity());
+
+         default:
+            return getText(obj);
+         }
+      }
+
+      @Override
+      public Image getImage(final Object obj) {
+
+         return null;
+      }
    }
 
    @Override
@@ -172,10 +188,16 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       // read tour types from the database
       _dbTourTypes = TourDatabase.getTourBeverageContainers();
 
+      /*
+       * create color definitions for all tour types
+       */
+      _beverageContainers = new ArrayList<>();
+
       if (_dbTourTypes != null) {
 
          for (final TourBeverageContainer tourType : _dbTourTypes) {
 
+            _beverageContainers.add(tourType);
          }
       }
 
@@ -234,41 +256,25 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    private void createUI_10_ColorViewer(final Composite parent) {
 
-      final Display display = parent.getDisplay();
-
       /*
-       * create tree layout
+       * table viewer: products
        */
-      final Composite layoutContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()
-            .grab(true, true)
-            .hint(400, 600)
-            .applyTo(layoutContainer);
+      final Table beverageContainersTable = new Table(parent, /* SWT.BORDER | */SWT.SINGLE | SWT.FULL_SELECTION);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(beverageContainersTable);
+      beverageContainersTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+      beverageContainersTable.setHeaderVisible(true);
 
-      final TreeColumnLayout treeLayout = new TreeColumnLayout();
-      layoutContainer.setLayout(treeLayout);
+      final String[] tableColumns = { "Name", "Capacity" };
 
-      /*
-       * create viewer
-       */
-      final Tree tree = new Tree(
-            layoutContainer,
-            SWT.H_SCROLL
-                  | SWT.V_SCROLL
-                  | SWT.BORDER
-                  | SWT.FULL_SELECTION);
-
-      tree.setHeaderVisible(false);
-      tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-
-      _tourBeverageContainerViewer = new TreeViewer(tree);
-      defineAllColumns(treeLayout, tree);
+      defineAllColumns(beverageContainersTable, tableColumns);
+      _tourBeverageContainerViewer = new TableViewer(beverageContainersTable);
 
       _tourBeverageContainerViewer.setContentProvider(new BeverageContainerContentProvider());
+      _tourBeverageContainerViewer.setLabelProvider(new ViewLabelProvider());
 
       _tourBeverageContainerViewer.setUseHashlookup(true);
 
-      _tourBeverageContainerViewer.getTree().addKeyListener(keyPressedAdapter(keyEvent -> {
+      _tourBeverageContainerViewer.getTable().addKeyListener(keyPressedAdapter(keyEvent -> {
 
          _isNavigationKeyPressed = false;
 
@@ -282,7 +288,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          case SWT.DEL:
 
             if (_btnDelete.isEnabled()) {
-               onTourType_Delete();
+               onTourBeverageContainer_Delete();
             }
 
             break;
@@ -309,75 +315,46 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
             _isNavigationKeyPressed = false;
 
-         } else {
-
-            // expand/collapse tree item
-
-            if (selection instanceof ColorDefinition) {
-
-               // expand/collapse current item
-               final ColorDefinition treeItem = (ColorDefinition) selection;
-
-               if (_tourBeverageContainerViewer.getExpandedState(treeItem)) {
-
-                  // item is expanded -> collapse
-
-                  _tourBeverageContainerViewer.collapseToLevel(treeItem, 1);
-
-               } else {
-
-                  // item is collapsed -> expand
-
-                  if (_expandedItem != null) {
-                     _tourBeverageContainerViewer.collapseToLevel(_expandedItem, 1);
-                  }
-                  _tourBeverageContainerViewer.expandToLevel(treeItem, 1);
-                  _expandedItem = treeItem;
-
-                  // expanding the triangle, the layout is correctly done but not with double click
-                  layoutContainer.layout(true, true);
-               }
-            }
          }
 
          onSelectColorInColorViewer(isNavigationKeyPressed);
          enableActions();
       });
 
-      _tourBeverageContainerViewer.addTreeListener(new ITreeViewerListener() {
-
-         @Override
-         public void treeCollapsed(final TreeExpansionEvent event) {
-
-            if (event.getElement() instanceof ColorDefinition) {
-               _expandedItem = null;
-            }
-         }
-
-         @Override
-         public void treeExpanded(final TreeExpansionEvent event) {
-
-            final Object element = event.getElement();
-
-            if (element instanceof ColorDefinition) {
-               final ColorDefinition treeItem = (ColorDefinition) element;
-
-               /*
-                * run not in the treeExpand method, this is blocked by the viewer with the message:
-                * Ignored reentrant call while viewer is busy
-                */
-               display.asyncExec(() -> {
-
-                  if (_expandedItem != null) {
-                     _tourBeverageContainerViewer.collapseToLevel(_expandedItem, 1);
-                  }
-
-                  _tourBeverageContainerViewer.expandToLevel(treeItem, 1);
-                  _expandedItem = treeItem;
-               });
-            }
-         }
-      });
+//      _tourBeverageContainerViewer.addTableListener(new ITreeViewerListener() {
+//
+//         @Override
+//         public void treeCollapsed(final TreeExpansionEvent event) {
+//
+//            if (event.getElement() instanceof ColorDefinition) {
+//               _expandedItem = null;
+//            }
+//         }
+//
+//         @Override
+//         public void treeExpanded(final TreeExpansionEvent event) {
+//
+//            final Object element = event.getElement();
+//
+//            if (element instanceof ColorDefinition) {
+//               final ColorDefinition treeItem = (ColorDefinition) element;
+//
+//               /*
+//                * run not in the treeExpand method, this is blocked by the viewer with the message:
+//                * Ignored reentrant call while viewer is busy
+//                */
+//               display.asyncExec(() -> {
+//
+//                  if (_expandedItem != null) {
+//                     _tourBeverageContainerViewer.collapseToLevel(_expandedItem, 1);
+//                  }
+//
+//                  _tourBeverageContainerViewer.expandToLevel(treeItem, 1);
+//                  _expandedItem = treeItem;
+//               });
+//            }
+//         }
+//      });
    }
 
    private void createUI_20_Actions(final Composite parent) {
@@ -414,7 +391,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
             _btnDelete = new Button(container, SWT.NONE);
             _btnDelete.setText(Messages.Pref_TourTypes_Button_delete);
             _btnDelete.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-               onTourType_Delete();
+               onTourBeverageContainer_Delete();
                enableActions();
             }));
             setButtonLayoutData(_btnDelete);
@@ -425,80 +402,25 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    /**
     * Create columns
     */
-   private void defineAllColumns(final TreeColumnLayout treeLayout, final Tree tree) {
+   private void defineAllColumns(final Table productsTable, final String[] tableColumns) {
 
-      defineColumn_10_TourTypeImage(treeLayout);
-      defineColumn_20_UpdatedTourTypeImage(treeLayout);
+      int index = 0;
+
+      // Column: Name
+      final TableColumn columnServings = new TableColumn(productsTable, SWT.LEFT);
+      columnServings.setText(tableColumns[index++]);
+      columnServings.setWidth(25);
+
+      // Column: Capacity
+      final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
+      columnName.setText(tableColumns[index++]);
+      columnName.setWidth(300);
    }
 
-   private void defineColumn_10_TourTypeImage(final TreeColumnLayout treeLayout) {
+   private boolean deleteTourBeverageContainer(final TourBeverageContainer tourBeverageContainer) {
 
-      final TreeViewerColumn tvc = new TreeViewerColumn(_tourBeverageContainerViewer, SWT.LEAD);
-      final TreeColumn tc = tvc.getColumn();
-      tvc.setLabelProvider(new StyledCellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            if (element instanceof TourTypeColorDefinition) {
-
-               cell.setText(((TourTypeColorDefinition) (element)).getVisibleName());
-
-               final TourType tourType = ((TourTypeColorDefinition) element).getTourType();
-               final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
-
-               cell.setImage(tourTypeImage);
-
-            } else if (element instanceof GraphColorItem) {
-
-               cell.setText(((GraphColorItem) (element)).getName());
-               cell.setImage(null);
-
-            } else {
-
-               cell.setText(UI.EMPTY_STRING);
-               cell.setImage(null);
-            }
-         }
-      });
-
-      treeLayout.setColumnData(tc, new ColumnWeightData(15, true));
-   }
-
-   /**
-    * Color definition with fully updated tour type image
-    */
-   private void defineColumn_20_UpdatedTourTypeImage(final TreeColumnLayout treeLayout) {
-
-      final TreeViewerColumn tvc = new TreeViewerColumn(_tourBeverageContainerViewer, SWT.LEAD);
-      final TreeColumn tc = tvc.getColumn();
-      tvc.setLabelProvider(new StyledCellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            if (element instanceof TourTypeColorDefinition) {
-
-               final TourType tourType = ((TourTypeColorDefinition) element).getTourType();
-               final Image tourTypeImage = TourTypeImage.getTourTypeImage_New(tourType.getTypeId());
-
-               cell.setImage(tourTypeImage);
-
-            } else {
-
-               cell.setImage(null);
-            }
-         }
-      });
-      treeLayout.setColumnData(tc, new ColumnWeightData(3, true));
-   }
-
-   private boolean deleteTourType(final TourType tourType) {
-
-      if (deleteTourType_10_FromTourData(tourType)) {
-         if (deleteTourType_20_FromDb(tourType)) {
+      if (deleteTourBeverageContainer_10_FromTourData(tourBeverageContainer)) {
+         if (deleteTourBeverageContainer_20_FromDb(tourBeverageContainer)) {
             return true;
          }
       }
@@ -506,7 +428,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       return false;
    }
 
-   private boolean deleteTourType_10_FromTourData(final TourType tourType) {
+   private boolean deleteTourBeverageContainer_10_FromTourData(final TourBeverageContainer tourBeverageContainer) {
 
       boolean returnResult = false;
 
@@ -518,7 +440,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
                + "SELECT tourData" //$NON-NLS-1$
                + " FROM TourData AS tourData" //$NON-NLS-1$
-               + " WHERE tourData.tourType.typeId=" + tourType.getTypeId()); //$NON-NLS-1$
+               + " WHERE tourData.tourType.typeId=" + tourBeverageContainer.getContainerId()); //$NON-NLS-1$
 
          final List<?> tourDataList = query.getResultList();
          if (tourDataList.size() > 0) {
@@ -559,7 +481,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       return returnResult;
    }
 
-   private boolean deleteTourType_20_FromDb(final TourType tourType) {
+   private boolean deleteTourBeverageContainer_20_FromDb(final TourBeverageContainer tourBeverageContainer) {
 
       boolean returnResult = false;
 
@@ -567,13 +489,13 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       final EntityTransaction ts = em.getTransaction();
 
       try {
-         final TourType tourTypeEntity = em.find(TourType.class, tourType.getTypeId());
+         final TourBeverageContainer tourBeverageContainerEntity = em.find(TourBeverageContainer.class, tourBeverageContainer.getContainerId());
 
-         if (tourTypeEntity != null) {
+         if (tourBeverageContainerEntity != null) {
 
             ts.begin();
 
-            em.remove(tourTypeEntity);
+            em.remove(tourBeverageContainerEntity);
 
             ts.commit();
          }
@@ -680,32 +602,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       return selectedColorDefinition;
    }
 
-   /**
-    * @return Returns the selected color definitions in the color viewer
-    */
-   private List<TourTypeColorDefinition> getSelectedColorDefinitions() {
-
-      final List<TourTypeColorDefinition> allSelectedColorDefinitions = new ArrayList<>();
-
-      final StructuredSelection allSelectedItems = (StructuredSelection) _tourBeverageContainerViewer.getSelection();
-
-      for (final Object selectedItem : allSelectedItems) {
-
-         if (selectedItem instanceof GraphColorItem) {
-
-            final GraphColorItem graphColor = (GraphColorItem) selectedItem;
-
-            allSelectedColorDefinitions.add((TourTypeColorDefinition) graphColor.getColorDefinition());
-
-         } else if (selectedItem instanceof TourTypeColorDefinition) {
-
-            allSelectedColorDefinitions.add((TourTypeColorDefinition) selectedItem);
-         }
-      }
-
-      return allSelectedColorDefinitions;
-   }
-
    @Override
    public void init(final IWorkbench workbench) {
 
@@ -750,7 +646,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
              * Run async that the UI do display the selected color in the color button when the
              * color dialog is opened
              */
-            _tourBeverageContainerViewer.getTree().getDisplay().asyncExec(() -> {
+            _tourBeverageContainerViewer.getTable().getDisplay().asyncExec(() -> {
 
                // open color selection dialog
 
@@ -802,16 +698,17 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 //
 //         createGraphColorItems(newColorDefinition);
 
+         // update model
+         _beverageContainers.add(savedTourBeverageContainer);
+
          // update internal tour type list
-         //_dbTourTypes.add(savedTourType);
+         _dbTourTypes.add(savedTourBeverageContainer);
+         //  Collections.sort(_dbTourTypes);
 
          // update UI
-         _tourBeverageContainerViewer.add(this, savedTourBeverageContainer);
+         //_tourBeverageContainerViewer.add(this, savedTourBeverageContainer);
 
          _tourBeverageContainerViewer.setSelection(new StructuredSelection(savedTourBeverageContainer), true);
-
-         _tourBeverageContainerViewer.collapseAll();
-         _tourBeverageContainerViewer.expandToLevel(savedTourBeverageContainer, 1);
 
          _isModified = true;
 
@@ -819,17 +716,13 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       }
    }
 
-   private void onTourType_Delete() {
+   private void onTourBeverageContainer_Delete() {
 
-      final List<TourTypeColorDefinition> allSelectedColorDefinitions = getSelectedColorDefinitions();
-      final List<TourType> allSelectedTourTypes = new ArrayList<>();
-
-      allSelectedColorDefinitions.stream()
-            .forEach(colorDefinition -> allSelectedTourTypes.add(colorDefinition.getTourType()));
+      final List<TourBeverageContainer> allSelectedColorDefinitions = _beverageContainers;
 
       final List<String> allTourTypeNames = new ArrayList<>();
 
-      allSelectedTourTypes.stream()
+      allSelectedColorDefinitions.stream()
             .forEach(tourType -> allTourTypeNames.add(tourType.getName()));
 
       final String allTourTypeNamesJoined = StringUtils
@@ -853,15 +746,13 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       BusyIndicator.showWhile(getShell().getDisplay(), () -> {
 
-         for (final TourTypeColorDefinition selectedColorDefinition : allSelectedColorDefinitions) {
-
-            final TourType selectedTourType = selectedColorDefinition.getTourType();
+         for (final TourBeverageContainer selectedColorDefinition : allSelectedColorDefinitions) {
 
             // remove entity from the db
-            if (deleteTourType(selectedTourType)) {
+            if (deleteTourBeverageContainer(selectedColorDefinition)) {
 
                // update model
-               _dbTourTypes.remove(selectedTourType);
+               _dbTourTypes.remove(selectedColorDefinition);
 
                // update UI
                _tourBeverageContainerViewer.remove(selectedColorDefinition);
@@ -925,15 +816,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       // update UI
       TourTypeImage.setTourTypeImagesDirty();
-
-      /*
-       * update the tree viewer, the color images will be recreated in the label provider
-       */
-      _tourBeverageContainerViewer.update(_selectedGraphColor, null);
-      _tourBeverageContainerViewer.update(selectedColorDef, null);
-
-      // without a repaint the color def image is not updated
-      _tourBeverageContainerViewer.getTree().redraw();
 
       _isModified = true;
    }
@@ -1036,6 +918,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    private void setFocusToViewer() {
 
       // set focus back to the tree
-      _tourBeverageContainerViewer.getTree().setFocus();
+      _tourBeverageContainerViewer.getTable().setFocus();
    }
 }
