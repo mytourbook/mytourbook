@@ -35,26 +35,25 @@ public class TourBeverageContainer {
    private String name;
 
    //todo fb in mL?
-   // float instead of double
-   private double capacity;
+   private float capacity;
 
    public TourBeverageContainer() {}
 
-   public TourBeverageContainer(final String name, final double capacity) {
+   public TourBeverageContainer(final String name, final float capacity) {
 
       this.name = name;
       this.capacity = capacity;
    }
 
-   public double getCapacity() {
+   public float getCapacity() {
       return capacity;
-   }
-
-   public String getName() {
-      return name;
    }
 
    public long getContainerId() {
       return containerId;
+   }
+
+   public String getName() {
+      return name;
    }
 }

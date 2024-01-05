@@ -37,7 +37,6 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -113,9 +112,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       @Override
       public Image getColumnImage(final Object obj, final int index) {
 
-         if (index == 0) {
-            return getImage(obj);
-         }
          return null;
       }
 
@@ -415,10 +411,9 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       final StructuredSelection selectedItems = (StructuredSelection) _tourBeverageContainerViewer.getSelection();
       final int numSelectedItems = selectedItems.size();
+      final boolean canDeleteContainer = selectedItems.size() > 0;
 
-      final boolean canDeleteColor = selectedItems.size() > 0;
-
-      _btnDelete.setEnabled(canDeleteColor);
+      _btnDelete.setEnabled(canDeleteContainer);
       _btnEdit.setEnabled(numSelectedItems == 1);
    }
 
@@ -456,23 +451,27 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    private void onTourBeverageContainer_Add() {
 
-      // ask for the tour type name
-      final InputDialog inputDialog = new InputDialog(
-            getShell(),
-            Messages.Pref_TourTypes_Dlg_new_tour_type_title,
-            Messages.Pref_TourTypes_Dlg_new_tour_type_msg,
-            UI.EMPTY_STRING,
-            null);
+      final DialogBeverageContainer dialogBeverageContainer = new DialogBeverageContainer(getShell());
 
-      if (inputDialog.open() != Window.OK) {
+      // get the new values from the dialog
+      if (dialogBeverageContainer.open() != Window.OK) {
+      // ask for the tour type name
+//      final InputDialog inputDialog = new InputDialog(
+//            getShell(),
+//            Messages.Pref_TourTypes_Dlg_new_tour_type_title,
+//            Messages.Pref_TourTypes_Dlg_new_tour_type_msg,
+//            UI.EMPTY_STRING,
+//            null);
+
          setFocusToViewer();
          return;
       }
 
-      final String tourTypeName = inputDialog.getValue();
+      final String name = dialogBeverageContainer.getName();
+      final float capacity = dialogBeverageContainer.getCapacity();
 
       // create new tour type
-      final TourBeverageContainer newTourBeverageContainer = new TourBeverageContainer(tourTypeName, 0);
+      final TourBeverageContainer newTourBeverageContainer = new TourBeverageContainer(name, capacity);
 
       // add new entity to db
       final TourBeverageContainer savedTourBeverageContainer = saveTourBeverageContainer(newTourBeverageContainer);
@@ -503,7 +502,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          //  Collections.sort(_dbTourTypes);
 
          // update UI
-         //_tourBeverageContainerViewer.add(this, savedTourBeverageContainer);
+         _tourBeverageContainerViewer.add(savedTourBeverageContainer);
 
          _tourBeverageContainerViewer.setSelection(new StructuredSelection(savedTourBeverageContainer), true);
 
@@ -565,6 +564,15 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    private void onTourBeverageContainer_Edit() {
 
+      final StructuredSelection structuredSelection = (StructuredSelection) _tourBeverageContainerViewer.getSelection();
+
+      final TourBeverageContainer selectedBeverageContainer = (TourBeverageContainer) structuredSelection.getFirstElement();
+
+
+      final DialogBeverageContainer dialogBeverageContainer = new DialogBeverageContainer(getShell());
+      dialogBeverageContainer.setName(selectedBeverageContainer.getName());
+      dialogBeverageContainer.setCapacity(selectedBeverageContainer.getCapacity());
+      dialogBeverageContainer.open();
       return;
 
 //      final TourType selectedTourType = selectedColorDefinition.getTourType();
