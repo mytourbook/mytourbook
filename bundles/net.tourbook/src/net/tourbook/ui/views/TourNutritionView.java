@@ -28,7 +28,9 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.database.TourDatabase;
@@ -88,8 +90,10 @@ import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 
 public class TourNutritionView extends ViewPart implements PropertyChangeListener {
 
-   //TODO FB
-   //https://fdc.nal.usda.gov/api-guide.html
+   //add the possibility to add custom products (i.e: water...)
+   public static final String  ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
+   private static final String STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
+   private static final String STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";             //$NON-NLS-1$
 
 //https://world.openfoodfacts.org/data
 
@@ -97,31 +101,27 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    // this will retrieve the updated (if any), info for each product)
    // display the previous total calories vs new total calories
 
-   //add the possibility to add custom products (i.e: water...)
-   public static final String            ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore           = TourbookPlugin.getPrefStore();
 
-   private static final String           STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
-
-   private static final IPreferenceStore _prefStore                      = TourbookPlugin.getPrefStore();
-   private static final int              _hintTextColumnWidth            = UI.IS_OSX ? 100 : 50;
-
-   private final IDialogSettings         _state                          = TourbookPlugin.getState(ID);
+   private static final int              _hintTextColumnWidth = UI.IS_OSX ? 100 : 50;
+   private final IDialogSettings         _state               = TourbookPlugin.getState(ID);
 
    private TourData                      _tourData;
    private TableViewer                   _productsViewer;
 
-   private List<String>                  _searchHistory                  = new ArrayList<>();
+   private ColumnManager                 _columnManager;
+   private List<String>                  _searchHistory       = new ArrayList<>();
+
    private IPropertyChangeListener       _prefChangeListener;
-   final NutritionQuery                  _nutritionQuery                 = new NutritionQuery();
+   final NutritionQuery                  _nutritionQuery      = new NutritionQuery();
+
    private ISelectionListener            _postSelectionListener;
-
    private ITourEventListener            _tourEventListener;
-
    private PostSelectionProvider         _postSelectionProvider;
+   private final RangeContent            _opacityRange        = new RangeContent(0.25, 10.0, 0.25, 100);
 
-   private final RangeContent            _opacityRange                   = new RangeContent(0.25, 10.0, 0.25, 100);
+   private final NumberFormat            _nf2                 = NumberFormat.getNumberInstance();
 
-   private final NumberFormat            _nf2                            = NumberFormat.getNumberInstance();
    {
       _nf2.setMinimumFractionDigits(2);
       _nf2.setMaximumFractionDigits(2);
@@ -131,25 +131,25 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
     * UI controls
     */
    private Image       _imageAdd;
+
    private Image       _imageDelete;
-
    private Button      _btnAddProduct;
-   private Button      _btnDeleteProduct;
 
+   private Button      _btnDeleteProduct;
    private PageBook    _pageBook;
+
    private Composite   _pageNoData;
    private Composite   _viewerContainer;
-   private boolean     _isInUpdate;
 
+   private boolean     _isInUpdate;
    private Text        _txtCalories_Average;
    private Text        _txtCalories_Total;
    private Text        _txtFluid_Average;
+
    private Text        _txtFluid_Total;
    private Text        _txtSodium_Average;
    private Text        _txtSodium_Total;
-
    private Combo       _cboSearchQuery;
-
    private Section     _sectionProductsList;
    private FormToolkit _tk;
 
@@ -510,7 +510,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       _tk = new FormToolkit(parent.getDisplay());
 
       _imageAdd = TourbookPlugin.getImageDescriptor(Images.App_Add).createImage();
-      _imageDelete = TourbookPlugin.getImageDescriptor(Images.App_Delete).createImage();
+      _imageDelete = TourbookPlugin.getImageDescriptor(Images.App_Remove).createImage();
 
       _viewerContainer = new Composite(_pageBook, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
@@ -712,10 +712,13 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    @Override
    public void dispose() {
 
-      _prefStore.removePropertyChangeListener(_prefChangeListener);
+      getSite().getPage().removeSelectionListener(_postSelectionListener);
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
+      _prefStore.removePropertyChangeListener(_prefChangeListener);
       _nutritionQuery.removePropertyChangeListener(this);
+
       UI.disposeResource(_imageAdd);
+      UI.disposeResource(_imageDelete);
 
       super.dispose();
    }
@@ -811,6 +814,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 //         }
 
          // refresh viewer
+         //todo fb fix java.lang.IllegalStateException: Need an underlying widget to be able to set the input.(Has the widget been disposed?)
+
          _productsViewer.setInput(new Object());
 
          _cboSearchQuery.setEnabled(true);
@@ -825,18 +830,24 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       if (stateSearchedQueries != null) {
          Stream.of(stateSearchedQueries).forEach(query -> _searchHistory.add(query));
       }
+
+      _sectionProductsList.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_PRODUCTS_LIST, true));
    }
 
    @PersistState
    private void saveState() {
 
       _state.put(STATE_SEARCHED_NUTRITIONQUERIES, _searchHistory.toArray(new String[_searchHistory.size()]));
+      _state.put(STATE_SECTION_PRODUCTS_LIST, _sectionProductsList.isExpanded());
    }
 
    @Override
    public void setFocus() {
 
    }
+
+   //TODO FB
+   //https://fdc.nal.usda.gov/api-guide.html
 
    private void updateUI_ProductViewer() {
 
