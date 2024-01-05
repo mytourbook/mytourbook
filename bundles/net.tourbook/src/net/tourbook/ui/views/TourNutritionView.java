@@ -19,6 +19,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -82,6 +83,9 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
+import cop.swt.widgets.viewers.table.celleditors.RangeContent;
+import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
+
 public class TourNutritionView extends ViewPart implements PropertyChangeListener {
 
    //TODO FB
@@ -114,6 +118,14 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private ITourEventListener            _tourEventListener;
 
    private PostSelectionProvider         _postSelectionProvider;
+
+   private final RangeContent            _opacityRange                   = new RangeContent(0.1, 10.0, 0.25, 100);
+
+   private final NumberFormat            _nf2                            = NumberFormat.getNumberInstance();
+   {
+      _nf2.setMinimumFractionDigits(2);
+      _nf2.setMaximumFractionDigits(2);
+   }
 
    /*
     * UI controls
@@ -157,6 +169,13 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
          final TourNutritionProduct task = (TourNutritionProduct) element;
 
+         final String[] tableColumns = { "Servings", "Name", "Calories", "Sodium", "Beverage", "Beverage Container", "Consumed Containers" };
+         if (property.equals("Servings")) {
+            return task.getServingsConsumed();
+         }
+         if (property.equals("Consumed Containers")) {
+            return 1;
+         }
          if (property.equals("Beverage")) {
             return Boolean.valueOf(task.isBeverage());
          }
@@ -184,9 +203,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             tourNutritionProduct.setTourBeverageContainer(toto.get(0));
          }
 
-         TourManager.saveModifiedTour(_tourData);
+         _tourData = TourManager.saveModifiedTour(_tourData);
 
-         //todo fb save tour
          _productsViewer.refresh();
       }
    }
@@ -399,12 +417,12 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       // Column: Quantity
       final TableColumn columnServings = new TableColumn(productsTable, SWT.LEFT);
       columnServings.setText(tableColumns[index++]);
-      columnServings.setWidth(25);
+      columnServings.setWidth(75);
 
       // Column: name
       final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
       columnName.setText(tableColumns[index++]);
-      columnName.setWidth(300);
+      columnName.setWidth(150);
 
       // Column: Calories
       final TableColumn columnCalories = new TableColumn(productsTable, SWT.LEFT);
@@ -524,15 +542,12 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       // Create the cell editors
       final CellEditor[] editors = new CellEditor[tableColumns.length];
-      final int index = 0;
-//      editors[index++] = new TextCellEditor(productsTable);
-//      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
-//      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
-//      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
+      // Servings
+      editors[0] = new SpinnerCellEditor(productsTable, _nf2, _opacityRange, SWT.NONE);
+      // Is Beverage
       editors[4] = new CheckboxCellEditor(productsTable);
-//      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
-//      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
-//      editors[index++] = new TextCellEditor(productsTable, SWT.READ_ONLY);
+      // Column: Consumed Containers
+      editors[6] = new SpinnerCellEditor(productsTable, _nf2, _opacityRange, SWT.NONE);
 
       final var toto = TourDatabase.getTourBeverageContainers();
       final String[] items = new String[toto.size()];

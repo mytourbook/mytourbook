@@ -320,10 +320,9 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    private boolean deleteTourBeverageContainer(final TourBeverageContainer tourBeverageContainer) {
 
-      if (deleteTourBeverageContainer_10_FromTourData(tourBeverageContainer)) {
-         if (deleteTourBeverageContainer_20_FromDb(tourBeverageContainer)) {
-            return true;
-         }
+      if (deleteTourBeverageContainer_10_FromTourData(tourBeverageContainer) &&
+            deleteTourBeverageContainer_20_FromDb(tourBeverageContainer)) {
+         return true;
       }
 
       return false;
@@ -352,12 +351,10 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
                ts.begin();
 
-               // remove tour type from all tour data
+               // remove tour beverage container from all tour nutrition products
                for (final Object listItem : tourDataList) {
 
-                  if (listItem instanceof TourData) {
-
-                     final TourData tourData = (TourData) listItem;
+                  if (listItem instanceof final TourData tourData) {
 
                      tourData.setTourType(null);
                      em.merge(tourData);
@@ -544,11 +541,9 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    private void onTourBeverageContainer_Delete() {
 
-      final List<TourBeverageContainer> allSelectedColorDefinitions = _beverageContainers;
-
       final List<String> allTourTypeNames = new ArrayList<>();
 
-      allSelectedColorDefinitions.stream()
+      _beverageContainers.stream()
             .forEach(tourType -> allTourTypeNames.add(tourType.getName()));
 
       final String allTourTypeNamesJoined = StringUtils
@@ -572,16 +567,16 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       BusyIndicator.showWhile(getShell().getDisplay(), () -> {
 
-         for (final TourBeverageContainer selectedColorDefinition : allSelectedColorDefinitions) {
+         for (final TourBeverageContainer selectedBeverageContainers : _beverageContainers) {
 
             // remove entity from the db
-            if (deleteTourBeverageContainer(selectedColorDefinition)) {
+            if (deleteTourBeverageContainer(selectedBeverageContainers)) {
 
                // update model
-               _dbTourTypes.remove(selectedColorDefinition);
+               _dbTourTypes.remove(selectedBeverageContainers);
 
                // update UI
-               _tourBeverageContainerViewer.remove(selectedColorDefinition);
+               _tourBeverageContainerViewer.remove(selectedBeverageContainers);
 
 // a tour type image cannot be deleted otherwise an image dispose exception can occur
 //             TourTypeImage.deleteTourTypeImage(selectedTourType.getTypeId());
