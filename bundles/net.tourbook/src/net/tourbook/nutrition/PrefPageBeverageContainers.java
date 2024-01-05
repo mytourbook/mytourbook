@@ -62,7 +62,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.PlatformUI;
 
 public class PrefPageBeverageContainers extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -194,28 +193,25 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       final Label label = new Label(parent, SWT.WRAP);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
-      label.setText(Messages.Pref_TourTypes_Title);
+      label.setText(Messages.PrefPage_TourBeverageContainers_Title);
 
-      // container
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
          createUI_10_BeverageContainersViewer(container);
          createUI_20_Actions(container);
       }
 
-      // must be set after the viewer is created
       return container;
    }
 
    private void createUI_10_BeverageContainersViewer(final Composite parent) {
 
       /*
-       * table viewer: products
+       * Table viewer: beverage containers
        */
-      final Table beverageContainersTable = new Table(parent, /* SWT.BORDER | */SWT.SINGLE | SWT.FULL_SELECTION);
+      final Table beverageContainersTable = new Table(parent, SWT.SINGLE | SWT.FULL_SELECTION);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(beverageContainersTable);
       beverageContainersTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       beverageContainersTable.setHeaderVisible(true);
@@ -252,10 +248,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          }
       }));
 
-      _tourBeverageContainerViewer.addSelectionChangedListener(selectionChangedEvent -> {
-
-         enableActions();
-      });
+      _tourBeverageContainerViewer.addSelectionChangedListener(selectionChangedEvent -> enableActions());
    }
 
    private void createUI_20_Actions(final Composite parent) {
@@ -269,7 +262,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
              * Add
              */
             _btnAdd = new Button(container, SWT.NONE);
-            _btnAdd.setText(Messages.Pref_TourTypes_Button_add);
+            _btnAdd.setText(Messages.PrefPage_TourBeverageContainers_Button_Add);
             _btnAdd.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
                onTourBeverageContainer_Add();
                enableActions();
@@ -281,7 +274,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
              * Edit
              */
             _btnEdit = new Button(container, SWT.NONE);
-            _btnEdit.setText(Messages.Pref_TourTypes_Button_rename);
+            _btnEdit.setText(Messages.PrefPage_TourBeverageContainers_Button_Edit);
             _btnEdit.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onTourBeverageContainer_Edit()));
             setButtonLayoutData(_btnEdit);
          }
@@ -290,7 +283,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
              * Delete
              */
             _btnDelete = new Button(container, SWT.NONE);
-            _btnDelete.setText(Messages.Pref_TourTypes_Button_delete);
+            _btnDelete.setText(Messages.PrefPage_TourBeverageContainers_Button_Delete);
             _btnDelete.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
                onTourBeverageContainer_Delete();
                enableActions();
@@ -439,25 +432,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
          // fire modify event
          _prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
-
-         if (_isLayoutModified) {
-
-            _isLayoutModified = false;
-
-            // show restart info
-            final MessageDialog messageDialog = new MessageDialog(
-                  getShell(),
-                  Messages.Pref_TourTypes_Dialog_Restart_Title,
-                  null,
-                  Messages.Pref_TourTypes_Dialog_Restart_Message_2,
-                  MessageDialog.INFORMATION,
-                  new String[] { Messages.App_Action_RestartApp, IDialogConstants.NO_LABEL },
-                  1);
-
-            if (messageDialog.open() == Window.OK) {
-               getShell().getDisplay().asyncExec(() -> PlatformUI.getWorkbench().restart());
-            }
-         }
       }
    }
 
