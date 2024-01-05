@@ -123,8 +123,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private final NumberFormat            _nf2                            = NumberFormat.getNumberInstance();
    {
-      _nf2.setMinimumFractionDigits(2);
-      _nf2.setMaximumFractionDigits(2);
+      _nf2.setMinimumFractionDigits(1);
+      _nf2.setMaximumFractionDigits(1);
    }
 
    /*
@@ -193,8 +193,16 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          }
          final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
 
+         if (property.equals("Servings")) {
+            tourNutritionProduct.setServingsConsumed(((Double) value).floatValue());
+         }
+         if (property.equals("Consumed Containers")) {
+            tourNutritionProduct.getContainersConsumed();
+         }
          if (property.equals("Beverage")) {
-            tourNutritionProduct.setIsBeverage(((Boolean) value).booleanValue());
+
+            final boolean booleanValue = ((Boolean) value).booleanValue();
+            tourNutritionProduct.setIsBeverage(booleanValue);
          }
 
          if (property.equals("Beverage Container")) {

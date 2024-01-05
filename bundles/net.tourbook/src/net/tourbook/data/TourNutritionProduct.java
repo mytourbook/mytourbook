@@ -63,6 +63,9 @@ public class TourNutritionProduct {
    @ManyToOne
    private TourBeverageContainer      tourBeverageContainer;
 
+   private float                      servingsConsumed;
+   private float                      containersConsumed;
+
    private String                     name;
 
    private int                        calories;
@@ -90,6 +93,8 @@ public class TourNutritionProduct {
             ? product.nutriScoreData().isBeverage()
             : false;
 
+      servingsConsumed = 1f;
+
       _createId = _createCounter.incrementAndGet();
    }
 
@@ -97,13 +102,16 @@ public class TourNutritionProduct {
       return calories;
    }
 
+   public float getContainersConsumed() {
+      return containersConsumed;
+   }
+
    public String getName() {
       return name;
    }
 
-   public int getServingsConsumed() {
-      //todo fb
-      return 1;
+   public float getServingsConsumed() {
+      return servingsConsumed;
    }
 
    public float getSodium() {
@@ -131,8 +139,20 @@ public class TourNutritionProduct {
       return isBeverage;
    }
 
+   public void setContainersConsumed(final float containersConsumed) {
+      this.containersConsumed = containersConsumed;
+   }
+
    public void setIsBeverage(final boolean isBeverage) {
       this.isBeverage = isBeverage;
+   }
+
+   public void setServingsConsumed(final float servingsConsumed) {
+      this.servingsConsumed = servingsConsumed;
+   }
+
+   public void setTourBeverageContainer(final TourBeverageContainer tourBeverageContainer) {
+      this.tourBeverageContainer = tourBeverageContainer;
    }
 
    public void setupDeepClone(final TourData tourDataFromClone) {
@@ -142,10 +162,6 @@ public class TourNutritionProduct {
       productCode = TourDatabase.ENTITY_IS_NOT_SAVED;
 
       tourData = tourDataFromClone;
-   }
-
-   public void setTourBeverageContainer(final TourBeverageContainer tourBeverageContainer) {
-      this.tourBeverageContainer = tourBeverageContainer;
    }
 
 }

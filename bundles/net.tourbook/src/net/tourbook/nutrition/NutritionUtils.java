@@ -73,7 +73,8 @@ public class NutritionUtils {
 
    public static int getTotalCalories(final Set<TourNutritionProduct> tourNutritionProducts) {
 
-      final int totalCalories = tourNutritionProducts.stream().mapToInt(product -> product.getCalories() * product.getServingsConsumed()).sum();
+      final int totalCalories = tourNutritionProducts.stream().mapToInt(product -> Math.round(product.getCalories() * product.getServingsConsumed()))
+            .sum();
 
       return totalCalories;
    }
