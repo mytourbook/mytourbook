@@ -119,20 +119,22 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private PostSelectionProvider         _postSelectionProvider;
 
-   private final RangeContent            _opacityRange                   = new RangeContent(0.1, 10.0, 0.25, 100);
+   private final RangeContent            _opacityRange                   = new RangeContent(0.25, 10.0, 0.25, 100);
 
    private final NumberFormat            _nf2                            = NumberFormat.getNumberInstance();
    {
-      _nf2.setMinimumFractionDigits(1);
-      _nf2.setMaximumFractionDigits(1);
+      _nf2.setMinimumFractionDigits(2);
+      _nf2.setMaximumFractionDigits(2);
    }
 
    /*
     * UI controls
     */
    private Image       _imageAdd;
+   private Image       _imageDelete;
 
    private Button      _btnAddProduct;
+   private Button      _btnDeleteProduct;
 
    private PageBook    _pageBook;
    private Composite   _pageNoData;
@@ -508,6 +510,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       _tk = new FormToolkit(parent.getDisplay());
 
       _imageAdd = TourbookPlugin.getImageDescriptor(Images.App_Add).createImage();
+      _imageDelete = TourbookPlugin.getImageDescriptor(Images.App_Delete).createImage();
 
       _viewerContainer = new Composite(_pageBook, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
@@ -519,17 +522,35 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private void createUI_210_Actions(final Composite parent) {
 
-      /*
-       * Add product button
-       */
-      _btnAddProduct = new Button(parent, SWT.NONE);
-      _btnAddProduct.setText("Messages.PrefPage_CloudConnectivity_Label_Cleanup");
-      //_btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
-      _btnAddProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-         new DialogSearchProduct(Display.getCurrent().getActiveShell(), _tourData.getTourId()).open();
-      }));
-      _btnAddProduct.setImage(_imageAdd);
-      GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).grab(true, true).applyTo(_btnAddProduct);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         /*
+          * Add product button
+          */
+         _btnAddProduct = new Button(container, SWT.NONE);
+         _btnAddProduct.setText("Messages.PrefPage_CloudConnectivity_Label_Cleanup");
+         //_btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
+         _btnAddProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            new DialogSearchProduct(Display.getCurrent().getActiveShell(), _tourData.getTourId()).open();
+         }));
+         _btnAddProduct.setImage(_imageAdd);
+         GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(_btnAddProduct);
+
+         /*
+          * Delete product button
+          */
+         _btnDeleteProduct = new Button(container, SWT.NONE);
+         _btnDeleteProduct.setText("&Delete");
+         //_btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
+         _btnDeleteProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            //TODO FB
+            // also only enable it if a product is selected in the table
+         }));
+         _btnDeleteProduct.setImage(_imageDelete);
+         GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(_btnDeleteProduct);
+      }
    }
 
    private void createUI_220_Viewer(final Composite parent) {

@@ -60,20 +60,19 @@ public class TourNutritionProduct {
    @ManyToOne(optional = false)
    private TourData                   tourData;
 
-   @ManyToOne
-   private TourBeverageContainer      tourBeverageContainer;
-
-   private float                      servingsConsumed;
-   private float                      containersConsumed;
-
    private String                     name;
 
    private int                        calories;
    private float                      sodium;
 
+   private float                      servingsConsumed;
+
    private boolean                    isBeverage;
 
-   // private double or float quantityBeverageContainerConsumed_Fraction;
+   @ManyToOne
+   private TourBeverageContainer      tourBeverageContainer;
+
+   private float                      containersConsumed;
 
    public TourNutritionProduct() {}
 
@@ -89,9 +88,8 @@ public class TourNutritionProduct {
          sodium = nutriments.getSodiumServing();
       }
 
-      isBeverage = product.nutriScoreData() != null
-            ? product.nutriScoreData().isBeverage()
-            : false;
+      isBeverage = product.nutriScoreData() != null &&
+            product.nutriScoreData().isBeverage();
 
       servingsConsumed = 1f;
 

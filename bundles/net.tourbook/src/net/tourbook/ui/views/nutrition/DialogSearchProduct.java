@@ -34,6 +34,7 @@ import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
+import net.tourbook.web.WEB;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -52,6 +53,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
@@ -60,15 +62,12 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 public class DialogSearchProduct extends Dialog implements PropertyChangeListener {
-
-   //todo fb
-   //put a link with "Not finding the product you used ? You can create it here"
-   //https://world.openfoodfacts.org/cgi/product.pl
 
    // set the default size
 
@@ -77,11 +76,14 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
    //todo fb
    //Sync error after adding a 2nd product
 
-   public static final String            ID                     = "net.tourbook.ui.views.nutrition.DialogSearchProduct";                         //$NON-NLS-1$
+   public static final String            ID                           = "net.tourbook.ui.views.nutrition.DialogSearchProduct"; //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore             = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings  _state                 = TourbookPlugin.getState("net.tourbook.ui.views.nutrition.DialogSearchProduct");//$NON-NLS-1$
-   private static final String           STATE_SEARCHED_QUERIES = "searched.queries";                                                            //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore                   = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _state                       = TourbookPlugin.getState(
+         "net.tourbook.ui.views.nutrition.DialogSearchProduct");                                                               //$NON-NLS-1$
+   private static final String           STATE_SEARCHED_QUERIES       = "searched.queries";                                    //$NON-NLS-1$
+
+   private static final String           HTTPS_OPENFOODFACTS_PRODUCTS = "https://world.openfoodfacts.org/cgi/product.pl";      //$NON-NLS-1$
 
    private TableViewer                   _productsViewer;
    private List<Product>                 _products;
@@ -284,6 +286,16 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
       {
          createUI_10_Header(container);
          createUI_20_Viewer(container);
+
+         /*
+          * Link/Info: How to add a product in the database
+          */
+         final Link link = new Link(container, SWT.NONE);
+         link.setText(NLS.bind("The product you are looking for doesn't exist ? You can add it here: <a href=\"{0}\">NASA EARTHDATA</a>",
+               HTTPS_OPENFOODFACTS_PRODUCTS));
+         link.setToolTipText(HTTPS_OPENFOODFACTS_PRODUCTS);
+         link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(HTTPS_OPENFOODFACTS_PRODUCTS)));
+
       }
    }
 
