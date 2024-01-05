@@ -35,6 +35,7 @@ public class TourBeverageContainer {
    private String name;
 
    //todo fb in mL?
+   // float instead of double
    private double capacity;
 
    public TourBeverageContainer() {}
