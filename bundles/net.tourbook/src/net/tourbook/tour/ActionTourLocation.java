@@ -17,9 +17,11 @@ package net.tourbook.tour;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -62,14 +64,20 @@ public class ActionTourLocation extends ContributionItem {
 
    private static IDialogSettings         _state;
 
+   /**
+    * This set is used to prevent duplicated action names
+    */
+   private static final Set<String>       _usedDisplayNames = new HashSet<>();
+
    private boolean                        _isStartLocation;
+
    private boolean                        _hasLocationData;
 
    private Action                         _actionProfileTitle;
-
    private ActionLocationPart             _actionLocationPart;
    private ActionSlideoutLocationProfiles _actionSlideoutLocationProfiles;
    private ActionRetrieveLocationAgain    _actionRetrieveLocationAgain;
+
    private SlideoutLocationProfiles       _slideoutLocationProfiles;
 
    private ITourLocationConsumer          _tourLocationConsumer;
@@ -495,6 +503,8 @@ public class ActionTourLocation extends ContributionItem {
                                            final List<TourLocationProfile> allProfiles,
                                            final TourLocationProfile defaultProfile) {
 
+      _usedDisplayNames.clear();
+
       // create actions for each profile
       for (final TourLocationProfile locationProfile : allProfiles) {
 
@@ -503,7 +513,12 @@ public class ActionTourLocation extends ContributionItem {
          final String locationName = createProfileDisplayName(locationProfile);
 
          // skip empty names
-         if (locationName.length() > 0) {
+         if (locationName.length() > 0
+
+               // skip duplicate names
+               && _usedDisplayNames.contains(locationName) == false) {
+
+            _usedDisplayNames.add(locationName);
 
             menuMgr.add(new ActionLocationProfile(locationProfile, locationName, isDefaultProfile));
          }
@@ -586,6 +601,8 @@ public class ActionTourLocation extends ContributionItem {
       String actionTooltip = null;
       boolean isCreateAction = true;
 
+      _usedDisplayNames.clear();
+
       for (final Entry<LocationPartID, PartItem> entry : allLocationParts.entrySet()) {
 
          final PartItem partItem = entry.getValue();
@@ -615,7 +632,15 @@ public class ActionTourLocation extends ContributionItem {
             }
          }
 
-         if (isCreateAction && locationLabel.length() > 0) {
+         if (isCreateAction
+
+               // skip empty names
+               && locationLabel.length() > 0
+
+               // skip duplicate names
+               && _usedDisplayNames.contains(locationLabel) == false) {
+
+            _usedDisplayNames.add(locationLabel);
 
             addActionToMenu(menu, new ActionSetLocationPart(locationLabel, actionTooltip));
          }

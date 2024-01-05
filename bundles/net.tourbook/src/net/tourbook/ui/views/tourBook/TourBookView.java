@@ -1922,13 +1922,7 @@ public class TourBookView extends ViewPart implements
       _tourLocationTooltip_NatTable = new TourLocationToolTip(this, true);
 
       // ensure that tooltips are hidden
-      _tourViewer_NatTable.addListener(SWT.MouseExit, event -> {
-
-// !!! this would disable the hovering of the tooltip !!!
-//         _tourInfoToolTip_NatTable.hide();
-
-         _tourLocationTooltip_NatTable.hide();
-      });
+      _tourViewer_NatTable.addListener(SWT.MouseExit, (event) -> hideTooltip());
 
       _natTable_DummyColumnViewer = new NatTable_DummyColumnViewer(this);
 
@@ -2060,7 +2054,6 @@ public class TourBookView extends ViewPart implements
          }
       }));
 
-
       /*
        * Center images horizontally
        */
@@ -2079,13 +2072,7 @@ public class TourBookView extends ViewPart implements
       _tourLocationTooltip_Tree = new TourLocationToolTip(this, false);
 
       // ensure that tooltips are hidden
-      tree.addListener(SWT.MouseExit, event -> {
-
-// !!! this would disable the hovering of the tooltip !!!
-//       _tourInfoToolTip_Tree.hide();
-
-         _tourLocationTooltip_Tree.hide();
-      });
+      tree.addListener(SWT.MouseExit, (event) -> hideTooltip());
    }
 
    private void createUI_40_Tree_ColumnImages(final Tree tree) {
@@ -2908,6 +2895,23 @@ public class TourBookView extends ViewPart implements
             allTourIds.add(tourItem.getTourId());
          }
       }
+   }
+
+   /**
+    * Hide the tooltip when mouse not hovering it and the mouse have exited the view
+    */
+   private void hideTooltip() {
+
+      _parent.getDisplay().timerExec(100, () -> {
+
+         if (_tourLocationTooltip_Tree.isMouseHovered() == false) {
+            _tourLocationTooltip_Tree.hide();
+         }
+
+         if (_tourLocationTooltip_NatTable.isMouseHovered() == false) {
+            _tourLocationTooltip_NatTable.hide();
+         }
+      });
    }
 
    private void initUI(final Composite parent) {

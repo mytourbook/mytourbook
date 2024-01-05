@@ -1741,15 +1741,18 @@ public class TourLocationManager {
     * Set location text into the tour start/end location fields for all tours which have the tour
     * location
     *
-    * @param locationLabel
+    * @param label
     * @param tourLocation
     */
-   public static void setLocationIntoTour(final String locationLabel, final TourLocation tourLocation) {
+   public static void setLocationIntoTour(final String label, final TourLocation tourLocation) {
 
+      final String locationLabel = validString(label);
       final long locationId = tourLocation.getLocationId();
+
 
       PreparedStatement stmtStart = null;
       PreparedStatement stmtEnd = null;
+      PreparedStatement stmtLocation = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
@@ -1771,15 +1774,37 @@ public class TourLocationManager {
                + "WHERE tourLocationEnd_LocationID = ?" + NL //         2  //$NON-NLS-1$
          ;
 
+         final String sqlLocation = UI.EMPTY_STRING
+
+               + "UPDATE " + TourDatabase.TABLE_TOUR_LOCATION + NL //      //$NON-NLS-1$
+
+               + "SET " //                                                 //$NON-NLS-1$
+               + " appliedName  = ?," + NL //                           1  //$NON-NLS-1$
+               + " lastModified = ?" + NL //                            2  //$NON-NLS-1$
+
+               + "WHERE LocationID = ?" + NL //                         3  //$NON-NLS-1$
+         ;
+
+// SET_FORMATTING_OFF
+
          stmtStart = conn.prepareStatement(sqlStartLocation);
-         stmtStart.setString(1, locationLabel);
-         stmtStart.setLong(2, locationId);
+         stmtStart.setString(          1, locationLabel);
+         stmtStart.setLong(            2, locationId);
          stmtStart.executeUpdate();
 
          stmtEnd = conn.prepareStatement(sqlEndLocation);
-         stmtEnd.setString(1, locationLabel);
-         stmtEnd.setLong(2, locationId);
+         stmtEnd.setString(            1, locationLabel);
+         stmtEnd.setLong(              2, locationId);
          stmtEnd.executeUpdate();
+
+         // log applied label
+         stmtLocation = conn.prepareStatement(sqlLocation);
+         stmtLocation.setString(       1, locationLabel);
+         stmtLocation.setLong(         2, System.currentTimeMillis());
+         stmtLocation.setLong(         3, locationId);
+         stmtLocation.executeUpdate();
+
+// SET_FORMATTING_ON
 
       } catch (final SQLException e) {
 
@@ -1789,6 +1814,7 @@ public class TourLocationManager {
 
          Util.closeSql(stmtStart);
          Util.closeSql(stmtEnd);
+         Util.closeSql(stmtLocation);
       }
    }
 

@@ -754,5 +754,4 @@ public class TourLocationToolTip extends ToolTip {
          }
       }
    }
-
 }

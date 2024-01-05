@@ -3161,6 +3161,8 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_ProfileTitle_All;
    public static String        Tour_Location_Action_ProfileTitle_End;
    public static String        Tour_Location_Action_ProfileTitle_Start;
+   public static String        Tour_Location_Action_ReapplyLocationIntoTour;
+   public static String        Tour_Location_Action_ReapplyLocationIntoTour_Tooltip;
    public static String        Tour_Location_Action_RelocateBoundingBox;
    public static String        Tour_Location_Action_RelocateBoundingBox_Short;
    public static String        Tour_Location_Action_RelocateBoundingBox_Tooltip;
@@ -3177,8 +3179,11 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_ResizeBoundingBox;
    public static String        Tour_Location_Action_SetLocation_End;
    public static String        Tour_Location_Action_SetLocation_Start;
+   public static String        Tour_Location_Action_SetLocationIntoTour_Default;
+   public static String        Tour_Location_Action_SetLocationIntoTour_Default_Tooltip;
    public static String        Tour_Location_Action_SetLocationIntoTour_Part;
    public static String        Tour_Location_Action_SetLocationIntoTour_Profile;
+   public static String        Tour_Location_Action_SetLocationIntoTour_Tooltip;
    public static String        Tour_Location_Action_SetLocationPart_All;
    public static String        Tour_Location_Action_SetLocationPart_End;
    public static String        Tour_Location_Action_SetLocationPart_Start;

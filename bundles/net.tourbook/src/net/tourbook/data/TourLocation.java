@@ -98,7 +98,7 @@ public class TourLocation implements Serializable {
    public static final int         DB_FIELD_LENGTH  = 1000;
 
    /**
-    * Fields which are not displayed as location part
+    * TourLocation fields which are not displayed as location part
     */
    public static final Set<String> IGNORED_FIELDS   = Stream.of(
 
@@ -106,6 +106,9 @@ public class TourLocation implements Serializable {
 
          "name",                                                                       //$NON-NLS-1$
          "display_name",                                                               //$NON-NLS-1$
+
+         "appliedName",                                                                //$NON-NLS-1$
+         "lastModified",                                                               //$NON-NLS-1$
 
          "latitudeMinE6_Normalized",                                                   //$NON-NLS-1$
          "latitudeMaxE6_Normalized",                                                   //$NON-NLS-1$
@@ -144,14 +147,14 @@ public class TourLocation implements Serializable {
     * <p>
     * <code>normalized = latitude + 90</code>
     */
-   public int latitudeE6_Normalized;
+   public int    latitudeE6_Normalized;
 
    /**
     * Contains the normalized longitude value of the requested location
     * <p>
     * normalized = longitude + 180
     */
-   public int longitudeE6_Normalized;
+   public int    longitudeE6_Normalized;
 
    /**
     * Contains the normalized latitude min value, it's the cardinal direction south.
@@ -160,7 +163,7 @@ public class TourLocation implements Serializable {
     * <p>
     * <code>normalized = latitude + 90</code>
     */
-   public int latitudeMinE6_Normalized;
+   public int    latitudeMinE6_Normalized;
 
    /**
     * Contains the normalized latitude max value, it's the cardinal direction north
@@ -169,7 +172,7 @@ public class TourLocation implements Serializable {
     * <p>
     * normalized = latitude + 90
     */
-   public int latitudeMaxE6_Normalized;
+   public int    latitudeMaxE6_Normalized;
 
    /**
     * Contains the normalized longitude min value, it's the cardinal direction west
@@ -178,7 +181,7 @@ public class TourLocation implements Serializable {
     * <p>
     * normalized = longitude + 180
     */
-   public int longitudeMinE6_Normalized;
+   public int    longitudeMinE6_Normalized;
 
    /**
     * Contains the normalized longitude max value, it's the cardinal direction east
@@ -187,7 +190,7 @@ public class TourLocation implements Serializable {
     * <p>
     * normalized = longitude + 180
     */
-   public int longitudeMaxE6_Normalized;
+   public int    longitudeMaxE6_Normalized;
 
    /**
     * Contains the resized normalized latitude min value, it's the cardinal direction south
@@ -196,7 +199,7 @@ public class TourLocation implements Serializable {
     * <p>
     * <code>normalized = latitude + 90</code>
     */
-   public int latitudeMinE6_Resized_Normalized;
+   public int    latitudeMinE6_Resized_Normalized;
 
    /**
     * Contains the resized normalized latitude max value, it's the cardinal direction north
@@ -205,7 +208,7 @@ public class TourLocation implements Serializable {
     * <p>
     * normalized = latitude + 90
     */
-   public int latitudeMaxE6_Resized_Normalized;
+   public int    latitudeMaxE6_Resized_Normalized;
 
    /**
     * Contains the resized normalized longitude min value, it's the cardinal direction west
@@ -214,7 +217,7 @@ public class TourLocation implements Serializable {
     * <p>
     * normalized = longitude + 180
     */
-   public int longitudeMinE6_Resized_Normalized;
+   public int    longitudeMinE6_Resized_Normalized;
 
    /**
     * Contains the resized normalized longitude max value, it's the cardinal direction east
@@ -223,7 +226,17 @@ public class TourLocation implements Serializable {
     * <p>
     * normalized = longitude + 180
     */
-   public int longitudeMaxE6_Resized_Normalized;
+   public int    longitudeMaxE6_Resized_Normalized;
+
+   /**
+    * Name which was applied last to the associated tours
+    */
+   public String appliedName;
+
+   /**
+    * Datetime when a names was applied last to the associated tours
+    */
+   public long   lastModified;
 
    /*
     * Fields from {@link OSMAddress}
