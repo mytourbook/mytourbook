@@ -26,9 +26,9 @@ import javax.persistence.Transient;
 
 import net.tourbook.common.UI;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.nutrition.openfoodfacts.Nutriments;
 import net.tourbook.nutrition.openfoodfacts.Product;
 
-import pl.coderion.model.Nutriments;
 
 @Entity
 public class TourNutritionProduct {
@@ -84,8 +84,8 @@ public class TourNutritionProduct {
       final Nutriments nutriments = product.nutriments();
       if (nutriments != null) {
 
-         calories = nutriments.getEnergyKcalServing();
-         sodium = nutriments.getSodiumServing();
+         calories = nutriments.energyKcalServing;
+         sodium = nutriments.sodiumServing;
       }
 
       isBeverage = product.nutriScoreData() != null &&

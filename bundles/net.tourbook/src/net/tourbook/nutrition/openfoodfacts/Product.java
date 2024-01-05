@@ -22,8 +22,6 @@ import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.viewers.ISelection;
 
-import pl.coderion.model.Nutriments;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record Product(@JsonProperty("product_name") String productName,
                       Nutriments nutriments,
