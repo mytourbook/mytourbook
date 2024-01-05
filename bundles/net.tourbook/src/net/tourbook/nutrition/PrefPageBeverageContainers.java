@@ -25,6 +25,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -83,6 +84,8 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    /*
     * UI controls
     */
+   private Image       _imageDelete;
+
    private TableViewer _tourBeverageContainerViewer;
 
    private Button      _btnAdd;
@@ -280,6 +283,9 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
              */
             _btnDelete = new Button(container, SWT.NONE);
             _btnDelete.setText(Messages.PrefPage_TourBeverageContainers_Button_Delete);
+
+            _imageDelete = TourbookPlugin.getImageDescriptor(Images.App_Trash).createImage();
+            _btnDelete.setImage(_imageDelete);
             _btnDelete.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
                onTourBeverageContainer_Delete();
                enableActions();
@@ -404,6 +410,8 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    @Override
    public void dispose() {
 
+      UI.disposeResource(_imageDelete);
+
       super.dispose();
    }
 
@@ -455,7 +463,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       // get the new values from the dialog
       if (dialogBeverageContainer.open() != Window.OK) {
-      // ask for the tour type name
+         // ask for the tour type name
 //      final InputDialog inputDialog = new InputDialog(
 //            getShell(),
 //            Messages.Pref_TourTypes_Dlg_new_tour_type_title,
@@ -567,7 +575,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       final StructuredSelection structuredSelection = (StructuredSelection) _tourBeverageContainerViewer.getSelection();
 
       final TourBeverageContainer selectedBeverageContainer = (TourBeverageContainer) structuredSelection.getFirstElement();
-
 
       final DialogBeverageContainer dialogBeverageContainer = new DialogBeverageContainer(getShell());
       dialogBeverageContainer.setName(selectedBeverageContainer.getName());

@@ -65,6 +65,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -131,8 +132,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
     * UI controls
     */
    private Image       _imageAdd;
-
    private Image       _imageDelete;
+
    private Button      _btnAddProduct;
 
    private Button      _btnDeleteProduct;
@@ -510,7 +511,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       _tk = new FormToolkit(parent.getDisplay());
 
       _imageAdd = TourbookPlugin.getImageDescriptor(Images.App_Add).createImage();
-      _imageDelete = TourbookPlugin.getImageDescriptor(Images.App_Remove).createImage();
+      _imageDelete = TourbookPlugin.getImageDescriptor(Images.App_Trash).createImage();
 
       _viewerContainer = new Composite(_pageBook, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
@@ -530,7 +531,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
           * Add product button
           */
          _btnAddProduct = new Button(container, SWT.NONE);
-         _btnAddProduct.setText("Messages.PrefPage_CloudConnectivity_Label_Cleanup");
+         _btnAddProduct.setText(Messages.Tour_Nutrition_Label_AddProduct);
          //_btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
          _btnAddProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
             new DialogSearchProduct(Display.getCurrent().getActiveShell(), _tourData.getTourId()).open();
@@ -543,6 +544,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
           */
          _btnDeleteProduct = new Button(container, SWT.NONE);
          _btnDeleteProduct.setText("&Delete");
+         _btnDeleteProduct.setEnabled(false);
          //_btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
          _btnDeleteProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
             //TODO FB
@@ -595,6 +597,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       _productsViewer.setContentProvider(new ViewContentProvider());
       _productsViewer.setLabelProvider(new ViewLabelProvider());
+
+      _productsViewer.addSelectionChangedListener(selectionChangedEvent -> onTableSelectionChanged(selectionChangedEvent));
    }
 
    private void createUI_Section_10_Summary(final Composite parent) {
@@ -799,6 +803,10 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       }
 
       updateUI_ProductViewer();
+   }
+
+   private void onTableSelectionChanged(final SelectionChangedEvent event) {
+      _btnDeleteProduct.setEnabled(true);
    }
 
    @Override
