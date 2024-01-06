@@ -494,7 +494,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
 // SET_FORMATTING_OFF
 
-         case TableColumnFactory.LOCATION_PART_Name_ID:              rc = compareText(location1.name, location2.name);              break;
+         case TableColumnFactory.LOCATION_PART_Name_ID:              rc = compareText(location1.name, location2.name);                    break;
+         case TableColumnFactory.LOCATION_DATA_APPLIED_NAME_ID:      rc = compareText(location1.appliedName, location2.appliedName);      break;
+         case TableColumnFactory.LOCATION_DATA_LAST_MODIFIED_ID:     rc = location1.lastModified - location2.lastModified;                break;
 
          case TableColumnFactory.LOCATION_TOUR_USAGE_ID:
 

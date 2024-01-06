@@ -775,6 +775,7 @@ public class TourLocationManager {
       }
 
       List<TourLocation> allDelReapplyLocations;
+      TourLocation oneActionLocation = null;
 
       if (isOneAction) {
 
@@ -788,6 +789,8 @@ public class TourLocationManager {
          // skip 1st location
 
          allDelReapplyLocations = allLocations.subList(1, numLocations);
+
+         oneActionLocation = allLocations.get(0);
 
       } else {
 
@@ -812,8 +815,8 @@ public class TourLocationManager {
             true, // is set start
             true, // is set end
 
-            true // isOneAction
-      );
+            true, // isOneAction
+            oneActionLocation);
 
       return true;
    }
@@ -1749,7 +1752,6 @@ public class TourLocationManager {
       final String locationLabel = validString(label);
       final long locationId = tourLocation.getLocationId();
 
-
       PreparedStatement stmtStart = null;
       PreparedStatement stmtEnd = null;
       PreparedStatement stmtLocation = null;
@@ -1976,14 +1978,20 @@ public class TourLocationManager {
     * @param isOneAction
     *           When <code>true</code> then existing locations are ignored and retrieved again from
     *           the DB or location provider
+    * @param oneActionLocation
     */
    public static void setTourLocations(final List<TourData> requestedTours,
                                        final TourLocationProfile locationProfile,
+
                                        final boolean isSetStartLocation,
                                        final boolean isSetEndLocation,
-                                       final boolean isOneAction) {
+
+                                       final boolean isOneAction,
+                                       final TourLocation oneActionLocation) {
 
       final ArrayList<TourData> savedTours = new ArrayList<>();
+
+      final boolean hasOneActionAppliedName = oneActionLocation != null && StringUtils.hasContent(oneActionLocation.appliedName);
 
       try {
 
@@ -2035,8 +2043,11 @@ public class TourLocationManager {
 
                      if (isOneAction) {
 
-                        // keep location text
-//                      tourData.setTourStartPlace(null);
+                        // overwrite location text, but only when an applied name is available
+                        if (hasOneActionAppliedName) {
+
+                           tourData.setTourStartPlace(oneActionLocation.appliedName);
+                        }
 
                         tourData.setTourLocationStart(null);
                      }
@@ -2084,8 +2095,11 @@ public class TourLocationManager {
 
                      if (isOneAction) {
 
-                        // keep location text
-//                      tourData.setTourEndPlace(null);
+                        // overwrite location text, but only when an applied name is available
+                        if (hasOneActionAppliedName) {
+
+                           tourData.setTourEndPlace(oneActionLocation.appliedName);
+                        }
 
                         tourData.setTourLocationEnd(null);
                      }

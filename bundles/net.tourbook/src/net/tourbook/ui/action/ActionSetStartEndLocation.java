@@ -675,7 +675,8 @@ public class ActionSetStartEndLocation extends SubMenu {
             isSetStartLocation,
             isSetEndLocation,
 
-            false // isOneAction
+            false, // isOneAction
+            null // oneActionLocation
       );
    }
 
