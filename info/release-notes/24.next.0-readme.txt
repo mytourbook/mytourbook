@@ -5,11 +5,9 @@ TODO's
 ======               
 
 * !!!!!!!! Update contributors !!!!!!!!!
-
   https://mytourbook.sourceforge.io/mytourbook/index.php/contributors
 
-* !!!!!!!! Update contributors !!!!!!!!!
-
+* Remove/replace "de.byteholder.geoclipse.map.UI.NEW_LINE"
 
 * Remove debug code in ColumnManager.java
    // TODO
