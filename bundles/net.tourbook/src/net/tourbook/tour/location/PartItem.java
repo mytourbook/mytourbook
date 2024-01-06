@@ -23,7 +23,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourLocation;
 
-public class PartItem {
+public class PartItem implements Comparable<Object> {
 
    public static final String ALLOWED_FIELDNAME_NAME         = "name";         //$NON-NLS-1$
    public static final String ALLOWED_FIELDNAME_DISPLAY_NAME = "display_name"; //$NON-NLS-1$
@@ -112,6 +112,29 @@ public class PartItem {
       }
 
       return allPartItems;
+   }
+
+   @Override
+   public int compareTo(final Object other) {
+
+      /*
+       * Set sorting
+       */
+
+      if (other instanceof final PartItem otherPartItem) {
+
+         if (otherPartItem.locationLabel_Start != null) {
+
+            return locationLabel_Start.compareTo(otherPartItem.locationLabel_Start);
+         }
+
+         if (otherPartItem.locationLabel_End != null) {
+
+            return locationLabel_End.compareTo(otherPartItem.locationLabel_End);
+         }
+      }
+
+      return 0;
    }
 
    @Override

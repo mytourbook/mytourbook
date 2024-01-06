@@ -2551,6 +2551,9 @@ public class Messages extends NLS {
    public static String        Slideout_TourLocation_Label_Zoomlevel;
    public static String        Slideout_TourLocation_Label_Zoomlevel_Tooltip;
 
+   public static String        Slideout_TourLocationFilter_Label_Country;
+   public static String        Slideout_TourLocationFilter_Label_Title;
+
    public static String        Slideout_TourLogOptions_Checkbox_Event_DeleteSomething;
    public static String        Slideout_TourLogOptions_Checkbox_Event_DownloadSomething;
    public static String        Slideout_TourLogOptions_Checkbox_Event_ImportTour;

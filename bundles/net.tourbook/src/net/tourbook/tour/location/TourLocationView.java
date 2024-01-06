@@ -22,6 +22,8 @@ import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,6 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -39,6 +42,8 @@ import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
@@ -83,6 +88,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyListener;
@@ -92,11 +98,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 public class TourLocationView extends ViewPart implements ITourViewer {
@@ -116,13 +121,12 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    /**
     * This set is used to prevent duplicated action names
     */
-   private static final Set<String>          _usedDisplayNames               = new HashSet<>();
+   private final Set<String>                 _usedDisplayNames               = new HashSet<>();
    //
    private final IPreferenceStore            _prefStore                      = TourbookPlugin.getPrefStore();
    private final IPreferenceStore            _prefStore_Common               = CommonActivator.getPrefStore();
    private final IDialogSettings             _state                          = TourbookPlugin.getState(ID);
    //
-   private IPartListener2                    _partListener;
    private ISelectionListener                _postSelectionListener;
    private IPropertyChangeListener           _prefChangeListener;
    private IPropertyChangeListener           _prefChangeListener_Common;
@@ -131,6 +135,10 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private TableViewer                       _locationViewer;
    private LocationComparator                _locationComparator             = new LocationComparator();
    private List<LocationItem>                _allLocationItems               = new ArrayList<>();
+   //
+   private List<String>                      _allLocationCountries;
+   private boolean                           _isFilterActive;
+   private String                            _locationFilter_Country;
    //
    private ColumnManager                     _columnManager;
    private SelectionAdapter                  _columnSortListener;
@@ -153,6 +161,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private ActionDeleteLocation              _actionDeleteLocation;
    private ActionIncludeGeoPosition          _actionIncludeGeoPosition;
    private ActionLinkWithOtherViews          _actionLinkWithOtherViews;
+   private ActionLocationFilter              _actionLocationFilter;
    private ActionOne                         _actionOne;
    private ActionReapplyLocationIntoTour     _actionReapplyLocationIntoTour;
    private ActionRelocateBoundingBox         _actionRelocateBoundingBox;
@@ -164,7 +173,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private final NumberFormat                _nf1                            = NumberFormat.getNumberInstance();
    private final NumberFormat                _nf3                            = NumberFormat.getNumberInstance();
    private final NumberFormat                _nf6                            = NumberFormat.getNumberInstance();
-
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -173,16 +181,18 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _nf6.setMinimumFractionDigits(6);
       _nf6.setMaximumFractionDigits(6);
    }
-
+   //
    private TourLocationToolTip _locationTooltip;
-
+   //
+   private PixelConverter      _pc;
+   //
    /*
     * UI controls
     */
-   private PixelConverter _pc;
-   private Composite      _viewerContainer;
+   private Composite _parent;
+   private Composite _viewerContainer;
 
-   private Menu           _tableContextMenu;
+   private Menu      _tableContextMenu;
 
    private class ActionBoundingBox_Reset extends Action {
 
@@ -288,6 +298,38 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       @Override
       public void run() {}
+   }
+
+   private class ActionLocationFilter extends ActionToolbarSlideout {
+
+      private SlideoutTourLocationFilter slideoutTourLocationFilter;
+
+      public ActionLocationFilter() {
+
+         super(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Collected_All),
+               TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Collected_All_Disabled));
+
+         isToggleAction = true;
+         isShowSlideoutAlways = true;
+      }
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         slideoutTourLocationFilter = new SlideoutTourLocationFilter(_parent, toolbar, TourLocationView.this);
+
+         return slideoutTourLocationFilter;
+      }
+
+      @Override
+      protected void onSelect() {
+
+         super.onSelect();
+
+         _isFilterActive = getSelection();
+
+         updateTourLocationFilter(_locationFilter_Country);
+      }
    }
 
    private class ActionOne extends Action {
@@ -932,6 +974,41 @@ public class TourLocationView extends ViewPart implements ITourViewer {
     */
    public abstract class TooltipLabelProvider extends CellLabelProvider {}
 
+   public class TourLocationFilter extends ViewerFilter {
+
+      @Override
+      public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
+
+         if (_isFilterActive == false) {
+
+            // filter is NOT active
+
+            return true;
+         }
+
+         // filter is active
+
+         if (_locationFilter_Country == null) {
+
+            // nothing is filtered
+
+            return true;
+         }
+
+         // locations are filtered
+
+         if (element instanceof final LocationItem locationItem) {
+
+            if (locationItem.tourLocation.country.equals(_locationFilter_Country)) {
+
+               return true;
+            }
+         }
+
+         return false;
+      }
+   }
+
    /**
     * Add an action to the provided menu
     *
@@ -941,38 +1018,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private void addActionToMenu(final Menu menu, final Action action) {
 
       new ActionContributionItem(action).fill(menu, -1);
-   }
-
-   private void addPartListener() {
-
-      _partListener = new IPartListener2() {
-
-         @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partClosed(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partHidden(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partVisible(final IWorkbenchPartReference partRef) {}
-      };
-
-      getViewSite().getPage().addPartListener(_partListener);
    }
 
    private void addPrefListener() {
@@ -1073,6 +1118,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _actionDeleteLocation               = new ActionDeleteLocation();
       _actionIncludeGeoPosition           = new ActionIncludeGeoPosition();
       _actionLinkWithOtherViews           = new ActionLinkWithOtherViews();
+      _actionLocationFilter               = new ActionLocationFilter();
       _actionOne                          = new ActionOne();
       _actionReapplyLocationIntoTour      = new ActionReapplyLocationIntoTour();
       _actionRelocateBoundingBox          = new ActionRelocateBoundingBox();
@@ -1107,7 +1153,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       createUI(parent);
 
       addPrefListener();
-      addPartListener();
       addSelectionListener();
       addTourEventListener();
 
@@ -1162,6 +1207,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _locationViewer.setUseHashlookup(true);
       _locationViewer.setContentProvider(new LocationContentProvider());
       _locationViewer.setComparator(_locationComparator);
+      _locationViewer.setFilters(new TourLocationFilter());
 
       _locationViewer.addSelectionChangedListener(selectionChangedEvent -> onSelectLocation());
       _locationViewer.addDoubleClickListener(doubleClickEvent -> onAction_BoundingBox_Resize());
@@ -2468,7 +2514,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    public void dispose() {
 
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
-      getViewSite().getPage().removePartListener(_partListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
       _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
@@ -2575,11 +2620,15 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final String[] allNames = osmDefaultNames.split(UI.SYMBOL_COMMA);
 
+      // remove leading/trailing spaces
+      final String[] allNamesTrimmed = Arrays.stream(allNames).map(String::trim).toArray(String[]::new);
+
+      // sort names
+      Arrays.sort(allNamesTrimmed);
+
       _usedDisplayNames.clear();
 
-      for (String locationLabel : allNames) {
-
-         locationLabel = locationLabel.trim();
+      for (final String locationLabel : allNamesTrimmed) {
 
          if (locationLabel.length() > 0
 
@@ -2612,9 +2661,12 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       _usedDisplayNames.clear();
 
-      for (final Entry<LocationPartID, PartItem> entry : allLocationParts.entrySet()) {
+      // sort by part name
+      final Collection<PartItem> allLocationsSet = allLocationParts.values();
+      final List<PartItem> allSortedLocations = new ArrayList<>(allLocationsSet);
+      Collections.sort(allSortedLocations);
 
-         final PartItem partItem = entry.getValue();
+      for (final PartItem partItem : allSortedLocations) {
 
          final String locationLabel = partItem.locationLabel_Start;
          final String actionTooltip = partItem.partLabel_Start;
@@ -2646,8 +2698,10 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final List<TourLocationProfile> allProfiles = TourLocationManager.getProfiles();
 
-      // sort profiles by name
-      Collections.sort(allProfiles);
+      /*
+       * Sort profiles by location name
+       */
+      final Map<String, TourLocationProfile> allUnsortedProfiles = new HashMap<>();
 
       _usedDisplayNames.clear();
 
@@ -2662,32 +2716,46 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             _usedDisplayNames.add(locationLabel);
 
-            final boolean isDefaultProfile = locationProfile.equals(defaultProfile);
-            final String defaultMarker = isDefaultProfile
-
-                  // show a marker for the default profile
-                  ? UI.SYMBOL_STAR + UI.SPACE
-
-                  : UI.EMPTY_STRING;
-
-            final String profileName = defaultMarker + PROFILE_NAME.formatted(locationProfile.getName(), locationProfile.getZoomlevel());
-
-            final String partText = Messages.Tour_Location_Action_Profile_Tooltip.formatted(
-
-                  TourLocationManager.createJoinedPartNames(locationProfile, UI.NEW_LINE1),
-                  locationProfile.getZoomlevel());
-
-            final String locationTooltip = profileName + UI.NEW_LINE2 + partText;
-
-            addActionToMenu(menu,
-
-                  new ActionSetLocationIntoTour(
-
-                        locationLabel,
-                        locationTooltip,
-
-                        tourLocation));
+            allUnsortedProfiles.put(locationLabel, locationProfile);
          }
+      }
+
+      final Map<String, TourLocationProfile> allSortedProfiles = new TreeMap<>(allUnsortedProfiles);
+
+      /*
+       * Create an action for each profile
+       */
+      for (final Entry<String, TourLocationProfile> entrySet : allSortedProfiles.entrySet()) {
+
+         final String locationLabel = entrySet.getKey();
+         final TourLocationProfile locationProfile = entrySet.getValue();
+
+         final boolean isDefaultProfile = locationProfile.equals(defaultProfile);
+
+         final String defaultMarker = isDefaultProfile
+
+               // show a marker for the default profile
+               ? UI.SYMBOL_STAR + UI.SPACE
+
+               : UI.EMPTY_STRING;
+
+         final String profileName = defaultMarker + PROFILE_NAME.formatted(locationProfile.getName(), locationProfile.getZoomlevel());
+
+         final String partText = Messages.Tour_Location_Action_Profile_Tooltip.formatted(
+
+               TourLocationManager.createJoinedPartNames(locationProfile, UI.NEW_LINE1),
+               locationProfile.getZoomlevel());
+
+         final String locationTooltip = profileName + UI.NEW_LINE2 + partText;
+
+         addActionToMenu(menu,
+
+               new ActionSetLocationIntoTour(
+
+                     locationLabel,
+                     locationTooltip,
+
+                     tourLocation));
       }
    }
 
@@ -2700,6 +2768,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
        */
       final IToolBarManager tbm = actionBars.getToolBarManager();
 
+      tbm.add(_actionLocationFilter);
       tbm.add(_actionShowLocationInfo);
       tbm.add(_actionLinkWithOtherViews);
    }
@@ -2743,6 +2812,16 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    @Override
    public ColumnManager getColumnManager() {
       return _columnManager;
+   }
+
+   List<String> getCountries() {
+
+      return _allLocationCountries;
+   }
+
+   String getLocationFilter_Country() {
+
+      return _locationFilter_Country;
    }
 
    TableViewer getLocationViewer() {
@@ -2812,6 +2891,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    private void initUI(final Composite parent) {
 
+      _parent = parent;
+
       _pc = new PixelConverter(parent);
 
       _columnSortListener = new SelectionAdapter() {
@@ -2837,6 +2918,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    }
 
    private void loadAllLocations_10_Locations() {
+
+      final Set<String> allCountries = new HashSet<>();
 
       PreparedStatement statement = null;
       ResultSet result = null;
@@ -3069,7 +3152,13 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
             _allLocationItems.add(locationItem);
             _locationItemsMap.put(locationID, locationItem);
+
+            allCountries.add(tourLocation.country);
          }
+
+         // create sorted country list
+         _allLocationCountries = new ArrayList<>(allCountries);
+         Collections.sort(_allLocationCountries);
 
       } catch (final SQLException e) {
          SQL.showException(e);
@@ -3573,6 +3662,17 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
+
+   public void updateTourLocationFilter(final String country) {
+
+      _locationFilter_Country = country;
+
+      // run async that the slideout UI is updated immediately
+      _parent.getDisplay().asyncExec(() -> {
+
+         _locationViewer.refresh();
+      });
+   }
 
    void updateUI(final TourLocation tourLocation) {
 
