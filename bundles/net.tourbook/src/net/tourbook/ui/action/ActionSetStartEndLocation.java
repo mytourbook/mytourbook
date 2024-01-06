@@ -17,11 +17,13 @@ package net.tourbook.ui.action;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -82,10 +84,10 @@ public class ActionSetStartEndLocation extends SubMenu {
    private static final String             ID                 = "net.tourbook.ui.action.ActionSetStartEndLocation"; //$NON-NLS-1$
 
    private static final String             LOCATION_SEPARATOR = "     ·     ";                                      //$NON-NLS-1$
+
    private static final String             PROFILE_NAME       = "%s - %d";                                          //$NON-NLS-1$
 
    private static final IDialogSettings    _state             = TourbookPlugin.getState(ID);
-
    /**
     * This set is used to prevent duplicated action names
     */
@@ -94,7 +96,9 @@ public class ActionSetStartEndLocation extends SubMenu {
    private ITourProvider                   _tourProvider;
 
    private Action                          _actionPartTitle_Append_All;
+
    private Action                          _actionPartTitle_Append_Start;
+
    private Action                          _actionPartTitle_Append_End;
    private Action                          _actionPartTitle_Set_All;
    private Action                          _actionPartTitle_Set_Start;
@@ -102,9 +106,9 @@ public class ActionSetStartEndLocation extends SubMenu {
    private Action                          _actionProfileTitle_All;
    private Action                          _actionProfileTitle_Start;
    private Action                          _actionProfileTitle_End;
-
    private ActionEditProfiles              _actionEditProfiles;
    private ActionLocationPart_Append_All   _actionLocationPart_Append_All;
+
    private ActionLocationPart_Append_Start _actionLocationPart_Append_Start;
    private ActionLocationPart_Append_End   _actionLocationPart_Append_End;
    private ActionLocationPart_Set_All      _actionLocationPart_Set_All;
@@ -118,9 +122,7 @@ public class ActionSetStartEndLocation extends SubMenu {
    private ActionRemoveLocation_End        _actionRemoveLocation_End_Complete;
    private ActionSetLocation_Start         _actionSetLocation_Start;
    private ActionSetLocation_End           _actionSetLocation_End;
-
    private SlideoutLocationProfiles        _slideoutLocationProfiles;
-
    private Control                         _ownerControl;
 
    private ArrayList<TourData>             _allSelectedTours;
@@ -172,6 +174,62 @@ public class ActionSetStartEndLocation extends SubMenu {
                _isSetEndLocation);
       }
 
+   }
+
+   public class ActionData_Part {
+
+      private String         actionText;
+      private String         actionTooltip;
+
+      private boolean        isSetStartLocation;
+      private boolean        isSetEndLocation;
+
+      private LocationPartID startPartID;
+      private LocationPartID endPartID;
+
+      public ActionData_Part(final String actionText,
+                           final String actionTooltip,
+                           final boolean isSetStartLocation,
+                           final boolean isSetEndLocation,
+                           final LocationPartID startPartID,
+                           final LocationPartID endPartID) {
+
+         this.actionText = actionText;
+         this.actionTooltip = actionTooltip;
+
+         this.isSetStartLocation = isSetStartLocation;
+         this.isSetEndLocation = isSetEndLocation;
+
+         this.startPartID = startPartID;
+         this.endPartID = endPartID;
+      }
+
+   }
+
+   public class ActionData_Profile {
+
+      private TourLocationProfile locationProfile;
+
+      private boolean             isSetStartLocation;
+      private boolean             isSetEndLocation;
+
+      private String              actionText;
+      private String              tooltipText;
+
+      public ActionData_Profile(final TourLocationProfile locationProfile,
+                              final boolean isSetStartLocation,
+                              final boolean isSetEndLocation,
+                              final String actionText,
+                              final String tooltipText) {
+
+         this.locationProfile = locationProfile;
+
+         this.isSetStartLocation = isSetStartLocation;
+         this.isSetEndLocation = isSetEndLocation;
+
+         this.actionText = actionText;
+         this.tooltipText = tooltipText;
+      }
    }
 
    private class ActionEditProfiles extends Action {
@@ -866,11 +924,11 @@ public class ActionSetStartEndLocation extends SubMenu {
       String actionTooltip = null;
       boolean isCreateAction = true;
 
+      final Map<String, ActionData_Part> allUnsortedParts = new HashMap<>();
+
       _usedDisplayNames.clear();
 
-      for (final Entry<LocationPartID, PartItem> entry : allLocationParts.entrySet()) {
-
-         final PartItem partItem = entry.getValue();
+      for (final PartItem partItem : allLocationParts.values()) {
 
          LocationPartID startPartID = null;
          LocationPartID endPartID = null;
@@ -944,42 +1002,62 @@ public class ActionSetStartEndLocation extends SubMenu {
 
             _usedDisplayNames.add(actionText);
 
-            if (isAppend) {
+            allUnsortedParts.put(actionText,
 
-               // append part
+                  new ActionData_Part(
 
-               addActionToMenu(menu,
+                        actionText,
+                        actionTooltip,
 
-                     new ActionAppendLocationPart(
+                        isSetStartLocation,
+                        isSetEndLocation,
 
-                           actionText,
-                           actionTooltip,
-
-                           isSetStartLocation,
-                           isSetEndLocation,
-
-                           startPartID,
-                           endPartID));
-
-            } else {
-
-               // replace part
-
-               addActionToMenu(menu,
-
-                     new ActionSetLocationPart(
-
-                           actionText,
-                           actionTooltip,
-
-                           isSetStartLocation,
-                           isSetEndLocation,
-
-                           startPartID,
-                           endPartID));
-            }
+                        startPartID,
+                        endPartID));
          }
       }
+
+      // sort parts by name
+      final Map<String, ActionData_Part> allSortedParts = new TreeMap<>(allUnsortedParts);
+
+      for (final ActionData_Part part : allSortedParts.values()) {
+
+         if (isAppend) {
+
+            // append part
+
+            addActionToMenu(menu,
+
+                  new ActionAppendLocationPart(
+
+                        part.actionText,
+                        part.actionTooltip,
+
+                        part.isSetStartLocation,
+                        part.isSetEndLocation,
+
+                        part.startPartID,
+                        part.endPartID));
+
+         } else {
+
+            // replace part
+
+            addActionToMenu(menu,
+
+                  new ActionSetLocationPart(
+
+                        part.actionText,
+                        part.actionTooltip,
+
+                        part.isSetStartLocation,
+                        part.isSetEndLocation,
+
+                        part.startPartID,
+                        part.endPartID));
+         }
+      }
+
    }
 
    /**
@@ -997,8 +1075,7 @@ public class ActionSetStartEndLocation extends SubMenu {
 
       final TourLocationProfile defaultProfile = TourLocationManager.getDefaultProfile();
 
-      // sort profiles by name
-      Collections.sort(allProfiles);
+      final Map<String, ActionData_Profile> allUnsortedProfiles = new HashMap<>();
 
       _usedDisplayNames.clear();
 
@@ -1141,9 +1218,9 @@ public class ActionSetStartEndLocation extends SubMenu {
             // indent action text to be better visible
             actionText = UI.SPACE8 + actionText;
 
-            addActionToMenu(menu,
+            allUnsortedProfiles.put(actionText,
 
-                  new ActionSetLocation(
+                  new ActionData_Profile(
 
                         locationProfile,
 
@@ -1153,6 +1230,24 @@ public class ActionSetStartEndLocation extends SubMenu {
                         actionText,
                         tooltipText));
          }
+      }
+
+      // sort profiles by actionText
+      final Map<String, ActionData_Profile> allSortedProfiles = new TreeMap<>(allUnsortedProfiles);
+
+      for (final ActionData_Profile sortItem : allSortedProfiles.values()) {
+
+         addActionToMenu(menu,
+
+               new ActionSetLocation(
+
+                     sortItem.locationProfile,
+
+                     sortItem.isSetStartLocation,
+                     sortItem.isSetEndLocation,
+
+                     sortItem.actionText,
+                     sortItem.tooltipText));
       }
    }
 

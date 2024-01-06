@@ -2661,12 +2661,12 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       _usedDisplayNames.clear();
 
-      // sort by part name
-      final Collection<PartItem> allLocationsSet = allLocationParts.values();
-      final List<PartItem> allSortedLocations = new ArrayList<>(allLocationsSet);
-      Collections.sort(allSortedLocations);
+      // sort parts by name
+      final Collection<PartItem> allUnsortedParts = allLocationParts.values();
+      final List<PartItem> allSortedParts = new ArrayList<>(allUnsortedParts);
+      Collections.sort(allSortedParts);
 
-      for (final PartItem partItem : allSortedLocations) {
+      for (final PartItem partItem : allSortedParts) {
 
          final String locationLabel = partItem.locationLabel_Start;
          final String actionTooltip = partItem.partLabel_Start;
