@@ -98,12 +98,17 @@ public class NutritionUtils {
       return totalSodium;
    }
 
-   public static List<Product> searchProduct(final String productName) {
+   public static List<Product> searchProduct(final String productName, final ProductSearchType productSearchType) {
+
+      //todo fb by code https://world.openfoodfacts.net/api/v3/product/021908509358?fields=product_name,nutriscore_data,nutriments
+
+      // todo fb no endpoint to search by product name except my "stolen" .pl endpoint ????
 
       final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(OPENFOODFACTS_SEARCH_URL + productName.replace(" ", "+")))
             .build();
+
 
       //todo fb We shouldn't allow to add a product that already exist
       // i.e.: if the barcode already exists, display an error message

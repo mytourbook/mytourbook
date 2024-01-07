@@ -27,10 +27,12 @@ import java.util.stream.Stream;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.nutrition.NutritionQuery;
+import net.tourbook.nutrition.ProductSearchType;
 import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
@@ -62,6 +64,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -100,6 +103,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
    private List<String>                  _searchHistory  = new ArrayList<>();
 
    private Combo                         _cboSearchQuery;
+   private Combo                         _cboSearchType;
    private ComboViewer                   _queryViewer;
    private final NutritionQuery          _nutritionQuery = new NutritionQuery();
 
@@ -151,10 +155,6 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
 
       @Override
       public Image getColumnImage(final Object obj, final int index) {
-
-         if (index == 0) {
-            return getImage(obj);
-         }
          return null;
       }
 
@@ -177,8 +177,6 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
 
       @Override
       public Image getImage(final Object obj) {
-
-         //todo fb display the image from the url ?
          return null;
       }
    }
@@ -285,7 +283,8 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
          createUI_10_Header(container);
-         createUI_20_Viewer(container);
+         createUI_20_Header_Options(container);
+         createUI_30_Viewer(container);
 
          /*
           * Link/Info: How to add a product in the database
@@ -346,7 +345,41 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
       _queryViewer.setComparator(new ViewerComparator());
    }
 
-   private void createUI_20_Viewer(final Composite parent) {
+   private void createUI_20_Header_Options(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            /*
+             * Label: POI
+             */
+            final Label label = UI.createLabel(container, "Search type");
+            //  label.setToolTipText(Messages.Poi_View_Label_POI_Tooltip);
+         }
+         {
+            /*
+             * combo: search type
+             */
+            _cboSearchType = new Combo(container, SWT.NONE);
+            _cboSearchType.setVisibleItemCount(2);
+            // todo fb ideally, validate the search type by code only contains numbers _cboSearchType.addModifyListener(event -> _btnSearch.getShell().setDefaultButton(_btnSearch));
+            GridDataFactory.fillDefaults()
+                  .align(SWT.LEFT, SWT.CENTER)
+                  .grab(true, false)
+                  .applyTo(_cboSearchType);
+            _cboSearchType.add("By name");
+            _cboSearchType.add("By code");
+         }
+      }
+
+      _queryViewer = new ComboViewer(_cboSearchQuery);
+      _queryViewer.setContentProvider(new SearchContentProvider());
+      _queryViewer.setComparator(new ViewerComparator());
+   }
+
+   private void createUI_30_Viewer(final Composite parent) {
 
       /*
        * table viewer: products
@@ -439,8 +472,8 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
       }
 
       // start product search
-
-      _nutritionQuery.asyncFind(searchText);
+//todo fb, pass the search type
+      _nutritionQuery.asyncFind(searchText, ProductSearchType.ByName);
    }
 
    @Override

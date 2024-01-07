@@ -33,7 +33,8 @@ public class NutritionQuery implements Runnable {
 
    private Exception             _exception;
 
-   private String                _query;
+   private String                _searchText;
+   private ProductSearchType     _productSearchType;
 
    private PropertyChangeSupport support;
 
@@ -45,9 +46,10 @@ public class NutritionQuery implements Runnable {
       support.addPropertyChangeListener(pcl);
    }
 
-   public void asyncFind(final String productName) {
+   public void asyncFind(final String searchText, final ProductSearchType productSearchType) {
 
-      _query = productName;
+      _searchText = searchText;
+      _productSearchType = productSearchType;
 
       final Job job = new Job("Messages.job_name_searchingPOI") {
 
@@ -83,7 +85,7 @@ public class NutritionQuery implements Runnable {
 
          _searchResult.clear();
 
-         final List<Product> searchProductResults = NutritionUtils.searchProduct(_query);
+         final List<Product> searchProductResults = NutritionUtils.searchProduct(_searchText, _productSearchType);
 
          if (searchProductResults.isEmpty()) {
             searchProductResults.add(new Product("Not found", null, null, "not found"));
