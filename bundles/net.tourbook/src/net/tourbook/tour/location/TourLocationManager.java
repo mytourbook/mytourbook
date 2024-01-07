@@ -2052,6 +2052,8 @@ public class TourLocationManager {
                         tourData.setTourLocationStart(null);
                      }
 
+                     String appliedName = null;
+
                      TourLocation tourLocationStart = tourData.getTourLocationStart();
                      if (tourLocationStart == null) {
 
@@ -2066,15 +2068,25 @@ public class TourLocationManager {
 
                            waitingTime = startLocationData.waitingTime;
                            tourLocationStart = startLocationData.tourLocation;
+
+                           appliedName = tourLocationStart.appliedName;
                         }
                      }
 
                      if (tourLocationStart != null) {
 
-                        final String startLocationText = createLocationDisplayName(tourLocationStart, locationProfile);
+                        // reapply name when available
+                        if (appliedName != null) {
 
-                        if (isOneAction == false) {
-                           tourData.setTourStartPlace(startLocationText);
+                           tourData.setTourStartPlace(appliedName);
+
+                        } else {
+
+                           final String startLocationText = createLocationDisplayName(tourLocationStart, locationProfile);
+
+                           if (isOneAction == false) {
+                              tourData.setTourStartPlace(startLocationText);
+                           }
                         }
 
                         tourData.setTourLocationStart(tourLocationStart);
@@ -2104,6 +2116,8 @@ public class TourLocationManager {
                         tourData.setTourLocationEnd(null);
                      }
 
+                     String appliedName = null;
+
                      TourLocation tourLocationEnd = tourData.getTourLocationEnd();
                      if (tourLocationEnd == null) {
 
@@ -2121,15 +2135,25 @@ public class TourLocationManager {
 
                            waitingTime = endLocationData.waitingTime;
                            tourLocationEnd = endLocationData.tourLocation;
+
+                           appliedName = tourLocationEnd.appliedName;
                         }
                      }
 
                      if (tourLocationEnd != null) {
 
-                        final String endLocationText = createLocationDisplayName(tourLocationEnd, locationProfile);
+                        // reapply name when available
+                        if (appliedName != null) {
 
-                        if (isOneAction == false) {
-                           tourData.setTourEndPlace(endLocationText);
+                           tourData.setTourEndPlace(appliedName);
+
+                        } else {
+
+                           final String endLocationText = createLocationDisplayName(tourLocationEnd, locationProfile);
+
+                           if (isOneAction == false) {
+                              tourData.setTourEndPlace(endLocationText);
+                           }
                         }
 
                         tourData.setTourLocationEnd(tourLocationEnd);
