@@ -301,6 +301,12 @@ public class TourDatabase {
    private static final String DERBY_URL_COMMAND_SHUTDOWN_TRUE            = ";shutdown=true";                     //$NON-NLS-1$
    private static final String DERBY_URL_COMMAND_UPGRADE_TRUE             = ";upgrade=true";                      //$NON-NLS-1$
    //
+   /**
+    * ERROR XCL13: The parameter position '13' is out of range. The number of parameters for
+    * this prepared statement is '12'.
+    */
+   public static final String  SQL_ERROR_XCL13                            = "XCL13";
+   //
    //
    private static volatile TourDatabase                   _instance;
 

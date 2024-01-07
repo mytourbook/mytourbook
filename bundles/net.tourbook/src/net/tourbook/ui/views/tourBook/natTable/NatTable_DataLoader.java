@@ -35,6 +35,7 @@ import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.SQLData;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
@@ -553,8 +554,6 @@ public class NatTable_DataLoader {
 
    private boolean fetchPagedTourItems(final LazyTourLoaderItem loaderItem) {
 
-//      final long start = System.nanoTime();
-
       final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.ANY_APP_FILTERS);
 
       /**
@@ -715,16 +714,38 @@ public class NatTable_DataLoader {
             prevTourId = result_TourId;
          }
 
-      } catch (final SQLException e) {
+      } catch (final SQLException sqlException) {
 
-         SQL.showException(e, sql);
+         final String sqlState = sqlException.getSQLState();
+
+         if (TourDatabase.SQL_ERROR_XCL13.equals(sqlState)) {
+
+            /**
+             * ERROR XCL13: The parameter position '13' is out of range. The number of
+             * parameters for this prepared statement is '12'.
+             * <p>
+             * net.tourbook.ui.views.tourBook.natTable.NatTable_DataLoader.fetchPagedTourItems(NatTable_DataLoader.java:648)
+             * <p>
+             * or
+             * <p>
+             * net.tourbook.ui.views.tourBook.natTable.NatTable_DataLoader.fetchPagedTourItems(NatTable_DataLoader.java:652)
+             * <p>
+             * This cannot be reproduced but it happend firstly, after fixing the tour collection
+             * filter in commit
+             * https://github.com/mytourbook/mytourbook/commit/b4c664f37caadfc45695e0ef806bad4c9a7fd4fc
+             * and it occcured already several times
+             * <p>
+             */
+
+            StatusUtil.log(sqlException);
+
+         } else {
+
+            SQL.showException(sqlException, sql);
+         }
 
          return false;
       }
-
-//      System.out.println((UI.timeStampNano() + " " + this.getClass().getName() + " \t")
-//            + (((float) (System.nanoTime() - start) / 1000000) + " ms"));
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
       return true;
    }
