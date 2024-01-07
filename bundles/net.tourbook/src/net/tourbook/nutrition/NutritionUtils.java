@@ -105,6 +105,8 @@ public class NutritionUtils {
             .uri(URI.create(OPENFOODFACTS_SEARCH_URL + productName.replace(" ", "+")))
             .build();
 
+      //todo fb We shouldn't allow to add a product that already exist
+      // i.e.: if the barcode already exists, display an error message
       List<Product> serializedProductsResults = new ArrayList<>();
 
       try {
@@ -113,7 +115,6 @@ public class NutritionUtils {
          if (response.statusCode() == HttpURLConnection.HTTP_OK && StringUtils.hasContent(response.body())) {
 
             final ObjectMapper mapper = new ObjectMapper();
-            final String toto = response.body();
             final String productsResults = mapper.readValue(response.body(), JsonNode.class)
                   .get("products") //$NON-NLS-1$
                   .toString();
@@ -122,11 +123,6 @@ public class NutritionUtils {
                   new TypeReference<List<Product>>() {});
             return serializedProductsResults;
 
-            //      final String titi = response.body();
-
-            // System.out.println(titi);
-//            final var toto = new ObjectMapper().readValue(response.body(), List<ProductResponse.class>);
-//            System.out.println(toto.getProduct().getProductName())
          } else {
             StatusUtil.logError(response.body());
          }

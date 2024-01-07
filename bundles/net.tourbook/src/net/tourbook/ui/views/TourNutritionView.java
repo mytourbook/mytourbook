@@ -179,6 +179,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          if (property.equals("Consumed Containers")) {
             return 1;
          }
+         if (property.equals("Sodium")) {
+            return task.getSodium();
+         }
          if (property.equals("Beverage")) {
             return Boolean.valueOf(task.isBeverage());
          }

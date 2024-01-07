@@ -29,7 +29,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.openfoodfacts.Nutriments;
 import net.tourbook.nutrition.openfoodfacts.Product;
 
-
 @Entity
 public class TourNutritionProduct {
 
@@ -62,7 +61,16 @@ public class TourNutritionProduct {
 
    private String                     name;
 
+   /**
+    * Calories per serving
+    * Unit: kcal
+    */
    private int                        calories;
+
+   /**
+    * Sodium amount per serving
+    * Unit: mg
+    */
    private float                      sodium;
 
    private float                      servingsConsumed;
@@ -112,8 +120,8 @@ public class TourNutritionProduct {
       return servingsConsumed;
    }
 
-   public float getSodium() {
-      return Math.round(sodium / 1000);
+   public int getSodium() {
+      return Math.round(sodium * 1000);
    }
 
    public TourBeverageContainer getTourBeverageContainer() {
