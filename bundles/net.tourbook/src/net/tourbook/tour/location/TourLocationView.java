@@ -2603,6 +2603,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       }
 
       menuMgr.add(new Separator());
+      menuMgr.add(_actionOne);
+
+      menuMgr.add(new Separator());
       menuMgr.add(_actionBoundingBox_Resize);
       menuMgr.add(_actionIncludeGeoPosition);
       menuMgr.add(_actionCombineBoundingBoxes);
@@ -2612,9 +2615,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       menuMgr.add(new Separator());
       menuMgr.add(_actionDeleteAndRetrieveAgain);
       menuMgr.add(_actionDeleteLocation);
-
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionOne);
 
       enableActions();
    }
