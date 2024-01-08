@@ -3834,7 +3834,14 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _locationFilter_Country = country;
 
       // run async that the slideout UI is updated immediately
-      _parent.getDisplay().asyncExec(() -> _locationViewer.refresh());
+      _parent.getDisplay().asyncExec(() -> {
+
+         _viewerContainer.setRedraw(false);
+         {
+            _locationViewer.refresh();
+         }
+         _viewerContainer.setRedraw(true);
+      });
    }
 
    void updateUI(final TourLocation tourLocation) {
