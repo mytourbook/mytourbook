@@ -2549,6 +2549,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final boolean isLocationSelected = numLocations > 0;
       final boolean isOneLocation = numLocations == 1;
+      final boolean isMultipleLocations = numLocations > 1;
 
       boolean hasAppliedName = false;
 
@@ -2563,11 +2564,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       _actionBoundingBox_Reset            .setEnabled(isLocationSelected);
       _actionBoundingBox_Resize           .setEnabled(isOneLocation);
-      _actionCombineBoundingBoxes         .setEnabled(numLocations > 1);
+      _actionCombineBoundingBoxes         .setEnabled(isMultipleLocations);
       _actionDeleteLocation               .setEnabled(isLocationSelected);
       _actionDeleteAndRetrieveAgain       .setEnabled(isLocationSelected);
       _actionIncludeGeoPosition           .setEnabled(isLocationSelected);
-      _actionOne                          .setEnabled(isLocationSelected);
+      _actionOne                          .setEnabled(isMultipleLocations);
       _actionReapplyLocationIntoTour      .setEnabled(isOneLocation && hasAppliedName);
       _actionRelocateBoundingBox          .setEnabled(isLocationSelected);
       _actionSetLocationIntoTour_Default  .setEnabled(isOneLocation);
@@ -2594,8 +2595,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
        * Fill menu
        */
 
-      menuMgr.add(_actionSetLocationIntoTour_Part);
       menuMgr.add(_actionSetLocationIntoTour_Profile);
+      menuMgr.add(_actionSetLocationIntoTour_Part);
       menuMgr.add(_actionSetLocationIntoTour_Default);
 
       if (isReapplyAvailable) {
