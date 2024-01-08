@@ -277,6 +277,10 @@ public class Messages extends NLS {
    public static String        ColumnFactory_InetAddress_Label;
    public static String        ColumnFactory_InetAddress_Url;
 
+   public static String        ColumnFactory_Location_Data_AppliedName_Header;
+   public static String        ColumnFactory_Location_Data_AppliedName_Label;
+   public static String        ColumnFactory_Location_Data_LastModified_Header;
+   public static String        ColumnFactory_Location_Data_LastModified_Label;
    public static String        ColumnFactory_Location_Data_LocationID_Header;
    public static String        ColumnFactory_Location_Data_LocationID_Label;
    public static String        ColumnFactory_Location_Geo_BoundingBox_Height_Header;

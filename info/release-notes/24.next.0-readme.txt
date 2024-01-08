@@ -4,6 +4,11 @@
 TODO's
 ======               
 
+* !!!!!!!! Update contributors !!!!!!!!!
+  https://mytourbook.sourceforge.io/mytourbook/index.php/contributors
+
+* Remove/replace "de.byteholder.geoclipse.map.UI.NEW_LINE"
+
 * Remove debug code in ColumnManager.java
    // TODO
       System.out.println("All columns in _allDefinedColumnDefinitions, number of entries: " + _allDefinedColumnDefinitions.size());
@@ -11,7 +16,7 @@ TODO's
 
 
 * Maybe replace "Display.getDefault()" with "PlatformUI.getWorkbench().getDisplay()"
-  Code should always ask the workbench for the display rather than rely on Display.getDefault()
+  "Code should always ask the workbench for the display rather than rely on Display.getDefault()"
   
 
 * Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
@@ -53,6 +58,12 @@ New
     - Tour info tooltip
     - Quick tour editor
     - Tour editor
+    
+  RECOMMENDATION how to use and speedup tour location retrieval to avoid hundreds or more duplicates
+  - Retrieve and set some locations where you often start/stop your tour, e.g. you at home
+  - Combine duplicated locations with the "One" action in the "Locations" view context menu
+  - Resize (increase) location bounding box (action in context menu) to include similar locations when they are looked up
+  - Retrieve all other locations
 
 * Fulltext search
   - Added action to rebuild a corrupted fulltext search index

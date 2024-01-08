@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,12 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionEditQuick extends Action {
 
+   /**
+    * Is <code>true</code> when start location is hovered, <code>false</code> when
+    * endlocation is hovered, <code>null</code> when a location is not hovered
+    */
+   private static Boolean      _tourLocationFocus;
+
    private final ITourProvider _tourProvider;
 
    public ActionEditQuick(final ITourProvider tourProvider) {
@@ -51,11 +57,29 @@ public class ActionEditQuick extends Action {
          return;
       }
 
-      if (new DialogQuickEdit(Display.getCurrent().getActiveShell(), selectedTours.get(0)).open() == Window.OK) {
+      final DialogQuickEdit dialogQuickEdit = new DialogQuickEdit(Display.getCurrent().getActiveShell(), selectedTours.get(0));
+
+      dialogQuickEdit.setTourLocationFocus(_tourLocationFocus);
+
+      // reset focus that the next quick edit dialog is ignoring it when it's not set
+      _tourLocationFocus = null;
+
+      if (dialogQuickEdit.open() == Window.OK) {
 
          // save all tours with the new tour type
          TourManager.saveModifiedTours(selectedTours);
       }
+   }
+
+   /**
+    * @param tourLocationFocus
+    *
+    *           Is <code>true</code> when start location is hovered, <code>false</code> when
+    *           endlocation is hovered, <code>null</code> when a location is not hovered
+    */
+   public static void setTourLocationFocus(final Boolean tourLocationFocus) {
+
+      _tourLocationFocus = tourLocationFocus;
    }
 
    @Override

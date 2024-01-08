@@ -359,66 +359,66 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    //
    // ----------- TOUR LOCATION ---------
    //
-   String colTourLocation_Start;        // tourStartPlace
-   String colTourLocation_End;          // tourEndPlace
-   Object colTourLocationID_Start;
-   Object colTourLocationID_End;
+   public String colTourLocation_Start;        // db name: tourStartPlace
+   public String colTourLocation_End;          // db name: tourEndPlace
+   Object        colTourLocationID_Start;
+   Object        colTourLocationID_End;
 
-   long   colPersonId;                  // tourPerson_personId
+   long          colPersonId;                  // tourPerson_personId
    //
-   long   colCounter;
+   long          colCounter;
    //
-   long   colCalories;
-   long   colTourDistance;
-   float  colBodyWeight;
-   int    colRestPulse;
+   long          colCalories;
+   long          colTourDistance;
+   float         colBodyWeight;
+   int           colRestPulse;
    //
-   long   colTourDeviceTime_Elapsed;
-   long   colTourDeviceTime_Recorded;
-   long   colTourComputedTime_Moving;
-   long   colTourDeviceTime_Paused;
-   long   colTourComputedTime_Break;
+   long          colTourDeviceTime_Elapsed;
+   long          colTourDeviceTime_Recorded;
+   long          colTourComputedTime_Moving;
+   long          colTourDeviceTime_Paused;
+   long          colTourComputedTime_Break;
    //
-   long   colAltitudeUp;
-   long   colAltitudeDown;
-   float  colAltitude_AvgChange;
+   long          colAltitudeUp;
+   long          colAltitudeDown;
+   float         colAltitude_AvgChange;
    //
-   float  colMaxSpeed;
-   long   colMaxAltitude;
-   long   colMaxPulse;
+   float         colMaxSpeed;
+   long          colMaxAltitude;
+   long          colMaxPulse;
    //
-   float  colAvgSpeed;
-   float  colAvgPace;
-   float  colAvgPulse;
-   float  colAvgCadence;
+   float         colAvgSpeed;
+   float         colAvgPace;
+   float         colAvgPulse;
+   float         colAvgCadence;
    //
-   float  colTemperature_Average;
-   float  colTemperature_Min;
-   float  colTemperature_Max;
-   float  colTemperature_Average_Device;
-   float  colTemperature_Min_Device;
-   float  colTemperature_Max_Device;
+   float         colTemperature_Average;
+   float         colTemperature_Min;
+   float         colTemperature_Max;
+   float         colTemperature_Average_Device;
+   float         colTemperature_Min_Device;
+   float         colTemperature_Max_Device;
    //
-   int    colWindSpeed;
-   int    colWindDirection;
-   String colClouds;
+   int           colWindSpeed;
+   int           colWindDirection;
+   String        colClouds;
    //
-   int    colWeekNo;
-   String colWeekDay;
-   int    colWeekYear;
+   int           colWeekNo;
+   String        colWeekDay;
+   int           colWeekYear;
    //
-   long   colNumberOfTimeSlices;
-   long   colNumberOfPhotos;
+   long          colNumberOfTimeSlices;
+   long          colNumberOfPhotos;
    //
-   int    colDPTolerance;
+   int           colDPTolerance;
    //
-   long   colFrontShiftCount;
-   long   colRearShiftCount;
+   long          colFrontShiftCount;
+   long          colRearShiftCount;
    //
-   float  colCadenceMultiplier;
-   String colSlowVsFastCadence;
+   float         colCadenceMultiplier;
+   String        colSlowVsFastCadence;
 
-   int    colCadenceZonesDelimiter;
+   int           colCadenceZonesDelimiter;
    //
    // ----------- Running Dynamics ---------
    //
@@ -482,9 +482,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    //
    // ----------- DEVICE ---------
    //
-   short  colBatterySoC_Start;
-   short  colBatterySoC_End;
-   String colDeviceName;
+   short   colBatterySoC_Start;
+   short   colBatterySoC_End;
+   String  colDeviceName;
    //
    boolean colHasGeoData;
 

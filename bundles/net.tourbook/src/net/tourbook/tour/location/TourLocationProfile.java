@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -102,6 +102,7 @@ public class TourLocationProfile implements Cloneable, Comparable<Object> {
    @Override
    public int compareTo(final Object obj) {
 
+      // the default sort is by name
       if (obj instanceof final TourLocationProfile otherProfile) {
          return name.compareTo(otherProfile.name);
       }
