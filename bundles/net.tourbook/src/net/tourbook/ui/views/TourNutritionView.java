@@ -97,6 +97,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private static final String STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
    private static final String STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";             //$NON-NLS-1$
 
+   public static final String  COLUMN_SERVINGS                 = "Servings";                                //Messages.DeviceManager_Selection_device_is_not_selected;
+
+
 //https://world.openfoodfacts.org/data
 
    // in the pref page, add a button to "Refresh product's information"
@@ -106,20 +109,27 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private static final IPreferenceStore _prefStore           = TourbookPlugin.getPrefStore();
 
    private static final int              _hintTextColumnWidth = UI.IS_OSX ? 100 : 50;
+   private static List<String> _tableColumns = new ArrayList<>();
+
+   //todo fb use those columns
+   {
+      _tableColumns.add(COLUMN_SERVINGS);
+   }
+
    private final IDialogSettings         _state               = TourbookPlugin.getState(ID);
-
    private TourData                      _tourData;
+
    private TableViewer                   _productsViewer;
-
    private ColumnManager                 _columnManager;
+
    private List<String>                  _searchHistory       = new ArrayList<>();
-
    private IPropertyChangeListener       _prefChangeListener;
-   final NutritionQuery                  _nutritionQuery      = new NutritionQuery();
 
+   final NutritionQuery                  _nutritionQuery      = new NutritionQuery();
    private ISelectionListener            _postSelectionListener;
    private ITourEventListener            _tourEventListener;
    private PostSelectionProvider         _postSelectionProvider;
+
    private final RangeContent            _opacityRange        = new RangeContent(0.25, 10.0, 0.25, 100);
 
    private final NumberFormat            _nf2                 = NumberFormat.getNumberInstance();
@@ -128,6 +138,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       _nf2.setMinimumFractionDigits(2);
       _nf2.setMaximumFractionDigits(2);
    }
+
+
 
    /*
     * UI controls
@@ -174,19 +186,16 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          final TourNutritionProduct task = (TourNutritionProduct) element;
 
          final String[] tableColumns = { "Servings", "Name", "Calories", "Sodium", "Beverage", "Beverage Container", "Consumed Containers" };
-         if (property.equals("Servings")) {
+         // {@link TourNutritionView#COLUMN_SERVINGS}
+         if (property.equals(COLUMN_SERVINGS)) {
             return task.getServingsConsumed();
-         }
-         if (property.equals("Sodium")) {
+         } else if (property.equals("Sodium")) {
             return task.getSodium();
-         }
-         if (property.equals("Beverage")) {
+         } else if (property.equals("Beverage")) {
             return Boolean.valueOf(task.isBeverage());
-         }
-         if (property.equals("Beverage Container")) {
+         } else if (property.equals("Beverage Container")) {
             return 1;// task.getTourBeverageContainerName();
-         }
-         if (property.equals("Consumed Containers")) {
+         } else if (property.equals("Consumed Containers")) {
             if (task.getTourBeverageContainer() != null) {
                return task.getTourBeverageContainer().getCapacity();
             }
@@ -204,17 +213,19 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
          if (property.equals("Servings")) {
             tourNutritionProduct.setServingsConsumed(((Double) value).floatValue());
-         }
-         if (property.equals("Consumed Containers")) {
+         } else if (property.equals("Consumed Containers")) {
             tourNutritionProduct.getContainersConsumed();
-         }
-         if (property.equals("Beverage")) {
+         } else if (property.equals("Beverage")) {
 
             final boolean booleanValue = ((Boolean) value).booleanValue();
             tourNutritionProduct.setIsBeverage(booleanValue);
+
+            if (!booleanValue) {
+               tourNutritionProduct.setTourBeverageContainer(null);
+            }
          }
 
-         if (property.equals("Beverage Container")) {
+         else if (property.equals("Beverage Container")) {
             final var toto = TourDatabase.getTourBeverageContainers();
 
             tourNutritionProduct.setTourBeverageContainer(toto.get(0));
@@ -288,6 +299,11 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
          case 5:
             return tourNutritionProduct.getTourBeverageContainerName();
+
+         case 6:
+            return tourNutritionProduct.getTourBeverageContainer() == null
+                  ? UI.EMPTY_STRING
+                  : String.valueOf(tourNutritionProduct.getTourBeverageContainer().getCapacity());
 
          case 4:
          default:
