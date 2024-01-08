@@ -170,4 +170,8 @@ public class TourNutritionProduct {
       tourData = tourDataFromClone;
    }
 
+   public long getProductCode() {
+      return productCode;
+   }
+
 }

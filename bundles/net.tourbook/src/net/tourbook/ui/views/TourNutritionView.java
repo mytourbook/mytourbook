@@ -22,6 +22,7 @@ import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import net.tourbook.Images;
@@ -536,9 +537,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          _btnAddProduct = new Button(container, SWT.NONE);
          _btnAddProduct.setText(Messages.Tour_Nutrition_Label_AddProduct);
          //_btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
-         _btnAddProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-            new DialogSearchProduct(Display.getCurrent().getActiveShell(), _tourData.getTourId()).open();
-         }));
+         _btnAddProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell(),
+               _tourData.getTourId()).open()));
          _btnAddProduct.setImage(_imageAdd);
          GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(_btnAddProduct);
 
@@ -552,6 +552,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          _btnDeleteProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
             //TODO FB
             // also only enable it if a product is selected in the table
+            onDeleteProducts();
          }));
          _btnDeleteProduct.setImage(_imageDelete);
          GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(_btnDeleteProduct);
@@ -735,6 +736,34 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       final boolean isTourSelected = _tourData != null;
 
       //_actionOpenSearchProduct.setEnabled(isTourSelected);
+   }
+
+   private List<TourNutritionProduct> getSelectedProducts() {
+
+      final StructuredSelection selection = (StructuredSelection) _productsViewer.getSelection();
+
+      final List<TourNutritionProduct> tourNutritionProducts = new ArrayList<>();
+
+      for (final Object object : selection.toList()) {
+
+         if (object instanceof final TourNutritionProduct tourNutritionProduct) {
+            tourNutritionProducts.add(tourNutritionProduct);
+         }
+      }
+
+      return tourNutritionProducts;
+   }
+
+   private void onDeleteProducts() {
+
+      final List<TourNutritionProduct> selectedProducts = getSelectedProducts();
+
+      final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
+      tourNutritionProducts.removeIf(tourNutritionProduct -> selectedProducts.stream().anyMatch(selectedProduct -> selectedProduct
+            .getProductCode() == tourNutritionProduct.getProductCode()));
+
+      _tourData.setTourNutritionProducts(tourNutritionProducts);
+      _tourData = TourManager.saveModifiedTour(_tourData);
    }
 
    private void onSelectionChanged(final ISelection selection) {

@@ -6386,7 +6386,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       final Set<TourNutritionProduct> tourNutritionProducts_Clone = new HashSet<>();
       tourNutritionProducts_Clone.addAll(tourData_DeepCopy.tourNutritionProducts);
-      tourData_DeepCopy.tourNutritionProducts = tourNutritionProducts_Clone;
+      tourData_DeepCopy.setTourNutritionProducts(tourNutritionProducts_Clone);
 
       final Set<TourMarker> tourMarkers_Clone = new HashSet<>();
       tourMarkers_Clone.addAll(tourData_DeepCopy.tourMarkers);
@@ -13694,5 +13694,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          pausedTime_Start[index] += startTimeOffset;
          pausedTime_End[index] += startTimeOffset;
       }
+   }
+
+   public void setTourNutritionProducts(final Set<TourNutritionProduct> tourNutritionProducts) {
+      this.tourNutritionProducts = tourNutritionProducts;
    }
 }

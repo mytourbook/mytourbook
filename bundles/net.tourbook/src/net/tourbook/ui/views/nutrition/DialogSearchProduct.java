@@ -377,6 +377,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
                   .applyTo(_cboSearchType);
             _cboSearchType.add("By name");
             _cboSearchType.add("By code");
+            _cboSearchQuery.select(0);
          }
       }
 
@@ -550,8 +551,15 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
          Stream.of(stateSearchedQueries).forEach(query -> _searchHistory.add(query));
       }
 
-      final int stateSearchType = _state.getInt(STATE_SEARCH_TYPE);
-      // _cboSearchType.
+      int stateSearchType;
+      try {
+
+         stateSearchType = _state.getInt(STATE_SEARCH_TYPE);
+
+      } catch (final NumberFormatException e) {
+         stateSearchType = 0;
+      }
+      _cboSearchType.select(stateSearchType);
 
       // update content in the comboviewer
       _queryViewer.setInput(new Object());
