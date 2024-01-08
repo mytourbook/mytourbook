@@ -37,19 +37,22 @@ import org.eclipse.swt.widgets.ToolBar;
 
 public class SlideoutTourLocationFilter extends ToolbarSlideout {
 
-   private TourLocationView  _tourLocationView;
+   private static int       _comboAllCountryOffset;
 
-   private SelectionListener _defaultSelectionListener;
-   private FocusListener     _keepOpenListener;
+   private TourLocationView _tourLocationView;
+
+   private FocusListener    _keepOpenListener;
+
+   private List<String>     _allCountries;
 
    /*
     * UI controls
     */
-   private Composite    _shellContainer;
+   private Composite _shellContainer;
 
-   private Combo        _comboCountry;
+   private Combo     _comboCountry;
 
-   private List<String> _allCountries;
+   private Label     _lblCountry;
 
    /**
     * @param ownerControl
@@ -75,6 +78,8 @@ public class SlideoutTourLocationFilter extends ToolbarSlideout {
       fillUI();
 
       restoreState();
+
+      enableControls();
 
       return ui;
    }
@@ -119,20 +124,29 @@ public class SlideoutTourLocationFilter extends ToolbarSlideout {
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
 
-         final Label label = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
-         label.setText(Messages.Slideout_TourLocationFilter_Label_Country);
+         _lblCountry = new Label(container, SWT.NONE);
+         _lblCountry.setText(Messages.Slideout_TourLocationFilter_Label_Country);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblCountry);
 
          _comboCountry = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-         _comboCountry.setVisibleItemCount(50);
-//       _comboCountry.setToolTipText(Messages.Tour_Tooltip_Combo_UIWidthSize_Tooltip);
+         _comboCountry.setVisibleItemCount(150);
          _comboCountry.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI()));
          _comboCountry.addFocusListener(_keepOpenListener);
       }
+   }
 
+   private void enableControls() {
+
+      final boolean isFilterActive = _tourLocationView.isLocationFilterActive();
+
+      _lblCountry.setEnabled(isFilterActive);
+      _comboCountry.setEnabled(isFilterActive);
    }
 
    private void fillUI() {
+
+      _comboAllCountryOffset = 1;
+      _comboCountry.add(Messages.Slideout_TourLocationFilter_Filter_AllCountries);
 
       _allCountries = _tourLocationView.getCountries();
 
@@ -142,8 +156,6 @@ public class SlideoutTourLocationFilter extends ToolbarSlideout {
    }
 
    private void initUI() {
-
-      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI());
 
       _keepOpenListener = new FocusListener() {
 
@@ -169,10 +181,13 @@ public class SlideoutTourLocationFilter extends ToolbarSlideout {
 
       final int selectionIndex = _comboCountry.getSelectionIndex();
 
-      final String selectedCountry = selectionIndex == -1
+      final String selectedCountry = selectionIndex < _comboAllCountryOffset
 
+            // all countries are selected
             ? null
-            : _allCountries.get(selectionIndex);
+
+            // get selected country
+            : _allCountries.get(selectionIndex - _comboAllCountryOffset);
 
       _tourLocationView.updateTourLocationFilter(selectedCountry);
    }
@@ -181,7 +196,23 @@ public class SlideoutTourLocationFilter extends ToolbarSlideout {
 
       final String selectedCountry = _tourLocationView.getLocationFilter_Country();
 
-      Util.selectTextInCombo(_comboCountry, _allCountries, selectedCountry);
+      if (selectedCountry != null) {
+
+         Util.selectTextInCombo(
+
+               _comboCountry,
+               _allCountries,
+               selectedCountry,
+
+               // offset, country names are starting by the second combo item
+               _comboAllCountryOffset);
+
+      } else {
+
+         // filter is not active
+
+         _comboCountry.select(0);
+      }
    }
 
 }

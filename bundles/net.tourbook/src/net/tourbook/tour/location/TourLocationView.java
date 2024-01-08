@@ -112,7 +112,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private static final char                 NL                              = UI.NEW_LINE;
    //
    private static final String               STATE_IS_LINK_WITH_OTHER_VIEWS  = "STATE_IS_LINK_WITH_OTHER_VIEWS";              //$NON-NLS-1$
+   private static final String               STATE_IS_LOCATION_FILTER_ACTIVE = "STATE_IS_LOCATION_FILTER_ACTIVE";             //$NON-NLS-1$
    private static final String               STATE_IS_SHOW_INFO_TOOLTIP      = "STATE_IS_SHOW_INFO_TOOLTIP";                  //$NON-NLS-1$
+   private static final String               STATE_LOCATION_FILTER_COUNTRY   = "STATE_LOCATION_FILTER_COUNTRY";               //$NON-NLS-1$
    private static final String               STATE_SELECTED_SENSOR_INDICES   = "STATE_SELECTED_SENSOR_INDICES";               //$NON-NLS-1$
    private static final String               STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";                 //$NON-NLS-1$
    private static final String               STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                        //$NON-NLS-1$
@@ -138,7 +140,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    private List<LocationItem>                _allLocationItems               = new ArrayList<>();
    //
    private List<String>                      _allLocationCountries;
-   private boolean                           _isFilterActive;
+   private boolean                           _isLocationFilterActive;
+   //
+   /**
+    * When <code>null</code> then nothing is filtered
+    */
    private String                            _locationFilter_Country;
    //
    private ColumnManager                     _columnManager;
@@ -327,7 +333,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
          super.onSelect();
 
-         _isFilterActive = getSelection();
+         _isLocationFilterActive = getSelection();
 
          updateTourLocationFilter(_locationFilter_Country);
       }
@@ -980,7 +986,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       @Override
       public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
 
-         if (_isFilterActive == false) {
+         if (_isLocationFilterActive == false) {
 
             // filter is NOT active
 
@@ -1164,13 +1170,20 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       createActions();
       fillToolbar();
 
-      BusyIndicator.showWhile(parent.getDisplay(), () -> {
+      /*
+       * Ensure that UI is created otherwise the restore do not work -> toolbar was not initialized
+       * and the state could not be set
+       */
+      parent.getDisplay().asyncExec(() -> {
 
-         loadAllLocations();
+         BusyIndicator.showWhile(parent.getDisplay(), () -> {
 
-         updateUI_SetViewerInput();
+            loadAllLocations();
 
-         restoreState_WithUI();
+            updateUI_SetViewerInput();
+
+            restoreState_WithUI();
+         });
       });
    }
 
@@ -2908,6 +2921,11 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       };
    }
 
+   boolean isLocationFilterActive() {
+
+      return _isLocationFilterActive;
+   }
+
    boolean isShowLocationTooltip() {
 
       return _actionShowLocationInfo.isChecked();
@@ -3682,6 +3700,10 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       // update comparator
       _locationComparator.__sortColumnId = sortColumnId;
       _locationComparator.__sortDirection = sortDirection;
+
+      // location filter
+      _isLocationFilterActive = Util.getStateBoolean(_state, STATE_IS_LOCATION_FILTER_ACTIVE, false);
+      _locationFilter_Country = Util.getStateString(_state, STATE_LOCATION_FILTER_COUNTRY, null);
    }
 
    private void restoreState_WithUI() {
@@ -3733,6 +3755,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       _actionLinkWithOtherViews.setChecked(Util.getStateBoolean(_state, STATE_IS_LINK_WITH_OTHER_VIEWS, false));
       _actionShowLocationInfo.setChecked(Util.getStateBoolean(_state, STATE_IS_SHOW_INFO_TOOLTIP, false));
 
+      // location filter
+      _actionLocationFilter.setSelection(_isLocationFilterActive);
+
       enableActions();
    }
 
@@ -3746,6 +3771,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       _state.put(STATE_IS_LINK_WITH_OTHER_VIEWS, _actionLinkWithOtherViews.isChecked());
       _state.put(STATE_IS_SHOW_INFO_TOOLTIP, _actionShowLocationInfo.isChecked());
+
+      _state.put(STATE_IS_LOCATION_FILTER_ACTIVE, _isLocationFilterActive);
+      _state.put(STATE_LOCATION_FILTER_COUNTRY, _locationFilter_Country);
 
       // keep selected tours
       Util.setState(_state, STATE_SELECTED_SENSOR_INDICES, _locationViewer.getTable().getSelectionIndices());
@@ -3800,15 +3828,13 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
 
-   public void updateTourLocationFilter(final String country) {
+   void updateTourLocationFilter(final String country) {
 
+      // update model
       _locationFilter_Country = country;
 
       // run async that the slideout UI is updated immediately
-      _parent.getDisplay().asyncExec(() -> {
-
-         _locationViewer.refresh();
-      });
+      _parent.getDisplay().asyncExec(() -> _locationViewer.refresh());
    }
 
    void updateUI(final TourLocation tourLocation) {
