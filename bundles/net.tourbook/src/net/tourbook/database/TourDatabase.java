@@ -10504,7 +10504,6 @@ public class TourDatabase {
 
       final Statement stmt = conn.createStatement();
       {
-
          // alter columns
 
 // SET_FORMATTING_OFF
