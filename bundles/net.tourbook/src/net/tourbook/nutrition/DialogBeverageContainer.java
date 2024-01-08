@@ -42,7 +42,8 @@ public class DialogBeverageContainer extends Dialog {
    // override method to use "Login" as label for the OK button
    @Override
    protected void createButtonsForButtonBar(final Composite parent) {
-      createButton(parent, IDialogConstants.OK_ID, "Login", true);
+
+      createButton(parent, IDialogConstants.OK_ID, "Name", true);
       createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
    }
 
@@ -78,7 +79,7 @@ public class DialogBeverageContainer extends Dialog {
       lblPassword.setLayoutData(gridDataPasswordLabel);
       lblPassword.setText("Password:");
 
-      _txtCapacity = new Text(container, SWT.BORDER | SWT.PASSWORD);
+      _txtCapacity = new Text(container, SWT.BORDER);
       _txtCapacity.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
       _txtCapacity.addModifyListener(e -> {
          final Text textWidget = (Text) e.getSource();

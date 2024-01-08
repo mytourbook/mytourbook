@@ -177,9 +177,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          if (property.equals("Servings")) {
             return task.getServingsConsumed();
          }
-         if (property.equals("Consumed Containers")) {
-            return 1;
-         }
          if (property.equals("Sodium")) {
             return task.getSodium();
          }
@@ -188,6 +185,11 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          }
          if (property.equals("Beverage Container")) {
             return 1;// task.getTourBeverageContainerName();
+         }
+         if (property.equals("Consumed Containers")) {
+            if (task.getTourBeverageContainer() != null) {
+               return task.getTourBeverageContainer().getCapacity();
+            }
          }
          return UI.EMPTY_STRING;
       }
@@ -758,6 +760,10 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       final List<TourNutritionProduct> selectedProducts = getSelectedProducts();
 
+      if (selectedProducts.isEmpty()) {
+         return;
+      }
+
       final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
       tourNutritionProducts.removeIf(tourNutritionProduct -> selectedProducts.stream().anyMatch(selectedProduct -> selectedProduct
             .getProductCode() == tourNutritionProduct.getProductCode()));
@@ -913,13 +919,15 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private void updateUI_SummaryFromModel() {
 
-      final int totalCalories = NutritionUtils.getTotalCalories(_tourData.getTourNutritionProducts());
+      final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
+
+      final int totalCalories = NutritionUtils.getTotalCalories(tourNutritionProducts);
       _txtCalories_Total.setText(String.valueOf(totalCalories));
 
-      final int totalFluid = (int) Math.round(NutritionUtils.getTotalFluids(_tourData.getTourNutritionProducts()));
+      final int totalFluid = Math.round(NutritionUtils.getTotalFluids(tourNutritionProducts));
       _txtFluid_Total.setText(String.valueOf(totalFluid));
 
-      final int totalSodium = (int) NutritionUtils.getTotalSodium(_tourData.getTourNutritionProducts());
+      final int totalSodium = (int) NutritionUtils.getTotalSodium(tourNutritionProducts);
       _txtSodium_Total.setText(String.valueOf(totalSodium));
 
       final long averageCaloriesPerHour = computeAveragePerHour(totalCalories);

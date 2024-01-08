@@ -34,6 +34,7 @@ import java.util.Set;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.nutrition.openfoodfacts.Product;
 
@@ -116,16 +117,20 @@ public class NutritionUtils {
       return totalCalories;
    }
 
-   public static double getTotalFluids(final Set<TourNutritionProduct> tourNutritionProducts) {
+   public static float getTotalFluids(final Set<TourNutritionProduct> tourNutritionProducts) {
 
-//      final double totalFluids = tourNutritionProducts.stream().mapToDouble(product -> {
-//
-//         product.isBeverage() ? 1.0 : 0.0
-//      });
+      float totalFluids = 0;
 
-//      return totalFluids;
+      for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
+         if (!tourNutritionProduct.isBeverage()) {
+            continue;
+         }
 
-      return 0;
+         final TourBeverageContainer tourBeverageContainer = tourNutritionProduct.getTourBeverageContainer();
+         totalFluids += tourBeverageContainer != null ? tourBeverageContainer.getCapacity() : 0; //todo fb find the property from openfoodfact that contains the liquid quantity
+      }
+
+      return totalFluids;
    }
 
    public static double getTotalSodium(final Set<TourNutritionProduct> tourNutritionProducts) {
