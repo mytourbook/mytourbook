@@ -55,6 +55,7 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
+import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -1033,6 +1034,10 @@ public class TourLocationView extends ViewPart implements ITourViewer {
                _locationViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
                _locationViewer.refresh();
+
+            } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+
+               reloadViewer();
             }
          }
       };
@@ -2917,112 +2922,172 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       loadAllLocations_20_NumberOfTours();
    }
 
+   private String loadAllLocations_05_AllFields() {
+
+      final String sql = UI.EMPTY_STRING
+
+            + "name," + NL //                      1  //$NON-NLS-1$
+            + "display_name," + NL //              2  //$NON-NLS-1$
+
+            + "continent," + NL //                 3  //$NON-NLS-1$
+            + "country," + NL //                   4  //$NON-NLS-1$
+            + "country_code," + NL //              5  //$NON-NLS-1$
+
+            + "region," + NL //                    6  //$NON-NLS-1$
+            + "state," + NL //                     7  //$NON-NLS-1$
+            + "state_district," + NL //            8  //$NON-NLS-1$
+            + "county," + NL //                    9  //$NON-NLS-1$
+
+            + "municipality," + NL //              10 //$NON-NLS-1$
+            + "city," + NL //                      11 //$NON-NLS-1$
+            + "town," + NL //                      12 //$NON-NLS-1$
+            + "village," + NL //                   13 //$NON-NLS-1$
+
+            + "city_district," + NL //             14 //$NON-NLS-1$
+            + "district," + NL //                  15 //$NON-NLS-1$
+            + "borough," + NL //                   16 //$NON-NLS-1$
+            + "suburb," + NL //                    17 //$NON-NLS-1$
+            + "subdivision," + NL //               18 //$NON-NLS-1$
+
+            + "hamlet," + NL //                    19 //$NON-NLS-1$
+            + "croft," + NL //                     20 //$NON-NLS-1$
+            + "isolated_dwelling," + NL //         21 //$NON-NLS-1$
+
+            + "neighbourhood," + NL //             22 //$NON-NLS-1$
+            + "allotments," + NL //                23 //$NON-NLS-1$
+            + "quarter," + NL //                   24 //$NON-NLS-1$
+
+            + "city_block," + NL //                25 //$NON-NLS-1$
+            + "residential," + NL //               26 //$NON-NLS-1$
+            + "farm," + NL //                      27 //$NON-NLS-1$
+            + "farmyard," + NL //                  28 //$NON-NLS-1$
+            + "industrial," + NL //                29 //$NON-NLS-1$
+            + "commercial," + NL //                30 //$NON-NLS-1$
+            + "retail," + NL //                    31 //$NON-NLS-1$
+
+            + "road," + NL //                      32 //$NON-NLS-1$
+
+            + "house_number," + NL //              33 //$NON-NLS-1$
+            + "house_name," + NL //                34 //$NON-NLS-1$
+
+            + "aerialway," + NL //                 35 //$NON-NLS-1$
+            + "aeroway," + NL //                   36 //$NON-NLS-1$
+            + "amenity," + NL //                   37 //$NON-NLS-1$
+            + "boundary," + NL //                  38 //$NON-NLS-1$
+            + "bridge," + NL //                    39 //$NON-NLS-1$
+            + "club," + NL //                      40 //$NON-NLS-1$
+            + "craft," + NL //                     41 //$NON-NLS-1$
+            + "emergency," + NL //                 42 //$NON-NLS-1$
+            + "historic," + NL //                  43 //$NON-NLS-1$
+            + "landuse," + NL //                   44 //$NON-NLS-1$
+            + "leisure," + NL //                   45 //$NON-NLS-1$
+            + "man_made," + NL //                  46 //$NON-NLS-1$
+            + "military," + NL //                  47 //$NON-NLS-1$
+            + "mountain_pass," + NL //             48 //$NON-NLS-1$
+            + "natural2," + NL //                  49 //$NON-NLS-1$
+            + "office," + NL //                    50 //$NON-NLS-1$
+            + "place," + NL //                     51 //$NON-NLS-1$
+            + "railway," + NL //                   52 //$NON-NLS-1$
+            + "shop," + NL //                      53 //$NON-NLS-1$
+            + "tourism," + NL //                   54 //$NON-NLS-1$
+            + "tunnel," + NL //                    55 //$NON-NLS-1$
+            + "waterway," + NL //                  56 //$NON-NLS-1$
+
+            + "postcode," + NL //                  57 //$NON-NLS-1$
+
+            + "latitudeE6_Normalized," + NL //                    58 //$NON-NLS-1$
+            + "longitudeE6_Normalized," + NL //                   59 //$NON-NLS-1$
+
+            + "latitudeMinE6_Normalized," + NL //                 60 //$NON-NLS-1$
+            + "latitudeMaxE6_Normalized," + NL //                 61 //$NON-NLS-1$
+            + "longitudeMinE6_Normalized," + NL //                62 //$NON-NLS-1$
+            + "longitudeMaxE6_Normalized," + NL //                63 //$NON-NLS-1$
+
+            + "latitudeMinE6_Resized_Normalized," + NL //         64 //$NON-NLS-1$
+            + "latitudeMaxE6_Resized_Normalized," + NL //         65 //$NON-NLS-1$
+            + "longitudeMinE6_Resized_Normalized," + NL //        66 //$NON-NLS-1$
+            + "longitudeMaxE6_Resized_Normalized," + NL //        67 //$NON-NLS-1$
+
+            + "zoomlevel," + NL //                                68 //$NON-NLS-1$
+
+            + "locationID," + NL //                               69 //$NON-NLS-1$
+
+            + "appliedName," + NL //                              70 //$NON-NLS-1$
+            + "lastModified" + NL //                              71 //$NON-NLS-1$
+      ;
+
+      return sql;
+   }
+
    private void loadAllLocations_10_Locations() {
 
       final Set<String> allCountries = new HashSet<>();
+
+      final String allLocationFields = loadAllLocations_05_AllFields();
+
+      String sql;
+
+      final TourPerson activePerson = TourbookPlugin.getActivePerson();
+
+      if (activePerson == null) {
+
+         // select all people
+
+         sql = UI.EMPTY_STRING
+
+               + "SELECT" + NL //                                       //$NON-NLS-1$
+
+               + allLocationFields
+
+               + "FROM " + TourDatabase.TABLE_TOUR_LOCATION + NL //     //$NON-NLS-1$
+         ;
+
+      } else {
+
+         // use person filter
+
+         sql = UI.EMPTY_STRING
+
+               + "SELECT" + NL //                                                               //$NON-NLS-1$
+
+               + allLocationFields + UI.SYMBOL_COMMA + NL
+               + "TourData.tourPerson_personId" + NL //                                         //$NON-NLS-1$
+
+               + "FROM TourLocation" + NL //                                                    //$NON-NLS-1$
+               + "LEFT JOIN TourData AS TourData" + NL //                                       //$NON-NLS-1$
+               + "ON TourLocation.LocationID = TourData.TourLocationStart_LocationID" + NL //   //$NON-NLS-1$
+               + "WHERE TourData.tourPerson_personId = ?" + NL //                               //$NON-NLS-1$
+
+               + "UNION" + NL //                                                                //$NON-NLS-1$
+
+               + "SELECT" + NL //                                                               //$NON-NLS-1$
+
+               + allLocationFields + UI.SYMBOL_COMMA + NL
+               + "TourData.tourPerson_personId" + NL //                                         //$NON-NLS-1$
+
+               + "FROM TourLocation" + NL //                                                    //$NON-NLS-1$
+               + "LEFT JOIN TourData AS TourData" + NL //                                       //$NON-NLS-1$
+               + "ON TourLocation.LocationID = TourData.TourLocationEnd_LocationID" + NL //     //$NON-NLS-1$
+               + "WHERE TourData.tourPerson_personId = ?" + NL //                               //$NON-NLS-1$
+         ;
+      }
 
       PreparedStatement statement = null;
       ResultSet result = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final String sql = UI.EMPTY_STRING
-
-               + "SELECT" + NL //                        //$NON-NLS-1$
-
-               + "name," + NL //                      1  //$NON-NLS-1$
-               + "display_name," + NL //              2  //$NON-NLS-1$
-
-               + "continent," + NL //                 3  //$NON-NLS-1$
-               + "country," + NL //                   4  //$NON-NLS-1$
-               + "country_code," + NL //              5  //$NON-NLS-1$
-
-               + "region," + NL //                    6  //$NON-NLS-1$
-               + "state," + NL //                     7  //$NON-NLS-1$
-               + "state_district," + NL //            8  //$NON-NLS-1$
-               + "county," + NL //                    9  //$NON-NLS-1$
-
-               + "municipality," + NL //              10 //$NON-NLS-1$
-               + "city," + NL //                      11 //$NON-NLS-1$
-               + "town," + NL //                      12 //$NON-NLS-1$
-               + "village," + NL //                   13 //$NON-NLS-1$
-
-               + "city_district," + NL //             14 //$NON-NLS-1$
-               + "district," + NL //                  15 //$NON-NLS-1$
-               + "borough," + NL //                   16 //$NON-NLS-1$
-               + "suburb," + NL //                    17 //$NON-NLS-1$
-               + "subdivision," + NL //               18 //$NON-NLS-1$
-
-               + "hamlet," + NL //                    19 //$NON-NLS-1$
-               + "croft," + NL //                     20 //$NON-NLS-1$
-               + "isolated_dwelling," + NL //         21 //$NON-NLS-1$
-
-               + "neighbourhood," + NL //             22 //$NON-NLS-1$
-               + "allotments," + NL //                23 //$NON-NLS-1$
-               + "quarter," + NL //                   24 //$NON-NLS-1$
-
-               + "city_block," + NL //                25 //$NON-NLS-1$
-               + "residential," + NL //               26 //$NON-NLS-1$
-               + "farm," + NL //                      27 //$NON-NLS-1$
-               + "farmyard," + NL //                  28 //$NON-NLS-1$
-               + "industrial," + NL //                29 //$NON-NLS-1$
-               + "commercial," + NL //                30 //$NON-NLS-1$
-               + "retail," + NL //                    31 //$NON-NLS-1$
-
-               + "road," + NL //                      32 //$NON-NLS-1$
-
-               + "house_number," + NL //              33 //$NON-NLS-1$
-               + "house_name," + NL //                34 //$NON-NLS-1$
-
-               + "aerialway," + NL //                 35 //$NON-NLS-1$
-               + "aeroway," + NL //                   36 //$NON-NLS-1$
-               + "amenity," + NL //                   37 //$NON-NLS-1$
-               + "boundary," + NL //                  38 //$NON-NLS-1$
-               + "bridge," + NL //                    39 //$NON-NLS-1$
-               + "club," + NL //                      40 //$NON-NLS-1$
-               + "craft," + NL //                     41 //$NON-NLS-1$
-               + "emergency," + NL //                 42 //$NON-NLS-1$
-               + "historic," + NL //                  43 //$NON-NLS-1$
-               + "landuse," + NL //                   44 //$NON-NLS-1$
-               + "leisure," + NL //                   45 //$NON-NLS-1$
-               + "man_made," + NL //                  46 //$NON-NLS-1$
-               + "military," + NL //                  47 //$NON-NLS-1$
-               + "mountain_pass," + NL //             48 //$NON-NLS-1$
-               + "natural2," + NL //                  49 //$NON-NLS-1$
-               + "office," + NL //                    50 //$NON-NLS-1$
-               + "place," + NL //                     51 //$NON-NLS-1$
-               + "railway," + NL //                   52 //$NON-NLS-1$
-               + "shop," + NL //                      53 //$NON-NLS-1$
-               + "tourism," + NL //                   54 //$NON-NLS-1$
-               + "tunnel," + NL //                    55 //$NON-NLS-1$
-               + "waterway," + NL //                  56 //$NON-NLS-1$
-
-               + "postcode," + NL //                  57 //$NON-NLS-1$
-
-               + "latitudeE6_Normalized," + NL //                 58 //$NON-NLS-1$
-               + "longitudeE6_Normalized," + NL //                59 //$NON-NLS-1$
-
-               + "latitudeMinE6_Normalized," + NL //              60 //$NON-NLS-1$
-               + "latitudeMaxE6_Normalized," + NL //              61 //$NON-NLS-1$
-               + "longitudeMinE6_Normalized," + NL //             62 //$NON-NLS-1$
-               + "longitudeMaxE6_Normalized," + NL //             63 //$NON-NLS-1$
-
-               + "latitudeMinE6_Resized_Normalized," + NL //      64 //$NON-NLS-1$
-               + "latitudeMaxE6_Resized_Normalized," + NL //      65 //$NON-NLS-1$
-               + "longitudeMinE6_Resized_Normalized," + NL //     66 //$NON-NLS-1$
-               + "longitudeMaxE6_Resized_Normalized," + NL //     67 //$NON-NLS-1$
-
-               + "zoomlevel," + NL //                             68 //$NON-NLS-1$
-
-               + "locationID," + NL //                            69 //$NON-NLS-1$
-
-               + "appliedName," + NL //                           70 //$NON-NLS-1$
-               + "lastModified" + NL //                           71 //$NON-NLS-1$
-
-               + "FROM " + TourDatabase.TABLE_TOUR_LOCATION + NL //  //$NON-NLS-1$
-         ;
-
          statement = conn.prepareStatement(sql);
+
+         // set person filter parameter
+         if (activePerson != null) {
+
+            final long personId = activePerson.getPersonId();
+
+            statement.setLong(1, personId);
+            statement.setLong(2, personId);
+         }
+
          result = statement.executeQuery();
 
          while (result.next()) {
@@ -3170,12 +3235,15 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    private void loadAllLocations_20_NumberOfTours() {
 
-      PreparedStatement statement = null;
-      ResultSet result = null;
+      String sql;
 
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+      final TourPerson activePerson = TourbookPlugin.getActivePerson();
 
-         final String sql = UI.EMPTY_STRING
+      if (activePerson == null) {
+
+         // select all people
+
+         sql = UI.EMPTY_STRING
 
                /*
                 * Start locations
@@ -3204,7 +3272,76 @@ public class TourLocationView extends ViewPart implements ITourViewer {
                + "   TourLocation.LocationID" + NL //                               //$NON-NLS-1$
          ;
 
+      } else {
+
+         // use person filter
+
+         sql = UI.EMPTY_STRING
+
+               /*
+                * Start locations
+                */
+               + "SELECT                                                            " + NL //$NON-NLS-1$
+               + "   TourLocation.LocationID,                                       " + NL //$NON-NLS-1$
+               + "   COUNT(TourDataStart.TourLocationSTART_LocationID),             " + NL //$NON-NLS-1$
+               + "   0                                                              " + NL //$NON-NLS-1$
+               + "FROM TourLocation                                                 " + NL //$NON-NLS-1$
+               + "LEFT JOIN                                                         " + NL //$NON-NLS-1$
+               + "   (                                                              " + NL //$NON-NLS-1$
+               + "      SELECT                                                      " + NL //$NON-NLS-1$
+               + "         TourLocationSTART_LocationID,                            " + NL //$NON-NLS-1$
+               + "         tourPerson_personId                                      " + NL //$NON-NLS-1$
+               + "      FROM TourData                                               " + NL //$NON-NLS-1$
+               + "      WHERE tourPerson_personId = ?                               " + NL //$NON-NLS-1$
+               + "            AND TourLocationSTART_LocationID IS NOT NULL          " + NL //$NON-NLS-1$
+               + "   )                                                              " + NL //$NON-NLS-1$
+               + "   AS TourDataStart                                               " + NL //$NON-NLS-1$
+               + "   ON TourLocation.LocationID = TourDataStart.TourLocationSTART_LocationID" + NL //$NON-NLS-1$
+               + "GROUP BY                                                          " + NL //$NON-NLS-1$
+               + "   TourLocation.LocationID                                        " + NL //$NON-NLS-1$
+
+               + "UNION                                                             " + NL //$NON-NLS-1$
+
+               /*
+                * Endlocations
+                */
+               + "SELECT                                                            " + NL //$NON-NLS-1$
+               + "   TourLocation.LocationID,                                       " + NL //$NON-NLS-1$
+               + "   0,                                                             " + NL //$NON-NLS-1$
+               + "   COUNT(TourDataEnd.TourLocationEND_LocationID)                  " + NL //$NON-NLS-1$
+               + "FROM TourLocation                                                 " + NL //$NON-NLS-1$
+               + "LEFT JOIN                                                         " + NL //$NON-NLS-1$
+               + "   (                                                              " + NL //$NON-NLS-1$
+               + "      SELECT                                                      " + NL //$NON-NLS-1$
+               + "         TourLocationEND_LocationID,                              " + NL //$NON-NLS-1$
+               + "         tourPerson_personId                                      " + NL //$NON-NLS-1$
+               + "      FROM TourData                                               " + NL //$NON-NLS-1$
+               + "      WHERE tourPerson_personId = ?                               " + NL //$NON-NLS-1$
+               + "            AND TourLocationEND_LocationID IS NOT NULL            " + NL //$NON-NLS-1$
+               + "   )                                                              " + NL //$NON-NLS-1$
+               + "   AS TourDataEnd                                                 " + NL //$NON-NLS-1$
+               + "   ON TourLocation.LocationID = TourDataEnd.TourLocationEND_LocationID" + NL //$NON-NLS-1$
+               + "GROUP BY                                                          " + NL //$NON-NLS-1$
+               + "   TourLocation.LocationID                                        " + NL //$NON-NLS-1$
+         ;
+      }
+
+      PreparedStatement statement = null;
+      ResultSet result = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
          statement = conn.prepareStatement(sql);
+
+         // set person filter parameter
+         if (activePerson != null) {
+
+            final long personId = activePerson.getPersonId();
+
+            statement.setLong(1, personId);
+            statement.setLong(2, personId);
+         }
+
          result = statement.executeQuery();
 
          while (result.next()) {
