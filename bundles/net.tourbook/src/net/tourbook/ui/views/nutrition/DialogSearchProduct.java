@@ -38,6 +38,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.web.WEB;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -85,6 +86,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
    private static final IDialogSettings  _state                       = TourbookPlugin.getState(
          "net.tourbook.ui.views.nutrition.DialogSearchProduct");                                                               //$NON-NLS-1$
    private static final String           STATE_SEARCHED_QUERIES       = "searched.queries";                                    //$NON-NLS-1$
+   private static final String           STATE_SEARCH_TYPE            = "STATE_SEARCH_TYPE";                                   //$NON-NLS-1$
 
    private static final String           HTTPS_OPENFOODFACTS_PRODUCTS = "https://world.openfoodfacts.org/cgi/product.pl";      //$NON-NLS-1$
 
@@ -315,7 +317,10 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
             _cboSearchQuery = new Combo(queryContainer, SWT.NONE);
             _cboSearchQuery.setVisibleItemCount(30);
             _cboSearchQuery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchProduct()));
-            _cboSearchQuery.addModifyListener(event -> _btnSearch.getShell().setDefaultButton(_btnSearch));
+            _cboSearchQuery.addModifyListener(event -> {
+               enableControls();
+               _btnSearch.getShell().setDefaultButton(_btnSearch);
+            });
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .grab(true, false)
@@ -364,6 +369,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
              */
             _cboSearchType = new Combo(container, SWT.NONE);
             _cboSearchType.setVisibleItemCount(2);
+            _cboSearchType.addSelectionListener(widgetSelectedAdapter(selectionEvent -> enableControls()));
             // todo fb ideally, validate the search type by code only contains numbers _cboSearchType.addModifyListener(event -> _btnSearch.getShell().setDefaultButton(_btnSearch));
             GridDataFactory.fillDefaults()
                   .align(SWT.LEFT, SWT.CENTER)
@@ -419,6 +425,15 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
 
       final ISelection selection = _productsViewer.getSelection();
       _btnAdd.setEnabled(!selection.isEmpty());
+
+      if (_cboSearchType.getSelectionIndex() == 1) {
+
+         // Search by product code is selected
+         final boolean isSearchQueryNumeric = StringUtils.isNumeric(_cboSearchQuery.getText());
+         _btnSearch.setEnabled(isSearchQueryNumeric);
+      }
+
+      //todo fb maybe go back to a dialogocntentarea to be able to display error messages like in the tag dialog when the image file is not found
    }
 
    @Override
@@ -426,6 +441,18 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
 
       // keep window size and position
       return _state;
+   }
+
+   private ProductSearchType getProductSearchType() {
+
+      switch (_cboSearchType.getSelectionIndex()) {
+      case 1:
+         return ProductSearchType.ByCode;
+
+      case 0:
+      default:
+         return ProductSearchType.ByName;
+      }
    }
 
    private void onAddProduct() {
@@ -473,7 +500,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
 
       // start product search
 //todo fb, pass the search type
-      _nutritionQuery.asyncFind(searchText, ProductSearchType.ByName);
+      _nutritionQuery.asyncFind(searchText, getProductSearchType());
    }
 
    @Override
@@ -523,13 +550,17 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
          Stream.of(stateSearchedQueries).forEach(query -> _searchHistory.add(query));
       }
 
+      final int stateSearchType = _state.getInt(STATE_SEARCH_TYPE);
+      // _cboSearchType.
+
       // update content in the comboviewer
       _queryViewer.setInput(new Object());
    }
 
    private void saveState() {
-      _state.put(STATE_SEARCHED_QUERIES, _searchHistory.toArray(new String[_searchHistory.size()]));
 
+      _state.put(STATE_SEARCHED_QUERIES, _searchHistory.toArray(new String[_searchHistory.size()]));
+      _state.put(STATE_SEARCH_TYPE, _cboSearchType.getSelectionIndex());
    }
 
    /**

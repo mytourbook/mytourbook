@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.nutrition;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,10 +39,12 @@ import net.tourbook.nutrition.openfoodfacts.Product;
 
 public class NutritionUtils {
 
-   private static final String OPENFOODFACTS_SEARCH_URL =
-         "https://world.openfoodfacts.org/cgi/search.pl?action=process&sort_by=unique_scans_n&page_size=20&json=true&search_terms="; //$NON-NLS-1$
+   private static final String OPENFOODFACTS_SEARCH_BY_NAME_URL =
+         "https://world.openfoodfacts.org/cgi/search.pl?action=process&sort_by=unique_scans_n&page_size=20&json=true&search_terms=";    //$NON-NLS-1$
+   private static final String OPENFOODFACTS_SEARCH_BY_CODE_URL =
+         "https://world.openfoodfacts.net/api/v3/product/%s?fields=code,product_name,nutriscore_data,nutriments";
 
-   private static HttpClient   _httpClient              = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
+   private static HttpClient   _httpClient                      = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
 
    public static String buildNutritionDataString(final Set<TourNutritionProduct> tourNutritionProducts) {
 
@@ -71,6 +74,40 @@ public class NutritionUtils {
       return stringBuilder.toString();
    }
 
+   private static List<Product> deserializeResponse(final String body, final ProductSearchType productSearchType) {
+
+      final ObjectMapper mapper = new ObjectMapper();
+
+      List<Product> deserializedProductsResults = new ArrayList<>();
+
+      try {
+
+         if (productSearchType == ProductSearchType.ByCode) {
+
+            String productResult;
+            productResult = mapper.readValue(body, JsonNode.class)
+                  .get("product") //$NON-NLS-1$
+                  .toString();
+            deserializedProductsResults.add(mapper.readValue(productResult,
+                  new TypeReference<Product>() {}));
+
+         } else if (productSearchType == ProductSearchType.ByName) {
+
+            final String productsResults = mapper.readValue(body, JsonNode.class)
+                  .get("products") //$NON-NLS-1$
+                  .toString();
+            deserializedProductsResults = mapper.readValue(productsResults,
+                  new TypeReference<List<Product>>() {});
+
+         }
+      } catch (final JsonProcessingException e) {
+         StatusUtil.log(e);
+      }
+
+      return deserializedProductsResults;
+
+   }
+
    public static int getTotalCalories(final Set<TourNutritionProduct> tourNutritionProducts) {
 
       final int totalCalories = tourNutritionProducts.stream().mapToInt(product -> Math.round(product.getCalories() * product.getServingsConsumed()))
@@ -98,35 +135,39 @@ public class NutritionUtils {
       return totalSodium;
    }
 
-   public static List<Product> searchProduct(final String productName, final ProductSearchType productSearchType) {
+   public static List<Product> searchProduct(final String searchText, final ProductSearchType productSearchType) {
 
       //todo fb by code https://world.openfoodfacts.net/api/v3/product/021908509358?fields=product_name,nutriscore_data,nutriments
 
       // todo fb no endpoint to search by product name except my "stolen" .pl endpoint ????
 
+      URI searchUri = URI.create(UI.EMPTY_STRING);
+
+      switch (productSearchType) {
+
+      case ByCode:
+         searchUri = URI.create(String.format(OPENFOODFACTS_SEARCH_BY_CODE_URL, searchText));
+         break;
+
+      case ByName:
+         searchUri = URI.create(OPENFOODFACTS_SEARCH_BY_NAME_URL + searchText.replace(" ", "+"));
+         break;
+      }
+
       final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(OPENFOODFACTS_SEARCH_URL + productName.replace(" ", "+")))
+            .uri(searchUri)
             .build();
-
 
       //todo fb We shouldn't allow to add a product that already exist
       // i.e.: if the barcode already exists, display an error message
-      List<Product> serializedProductsResults = new ArrayList<>();
 
       try {
          final HttpResponse<String> response = _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
          if (response.statusCode() == HttpURLConnection.HTTP_OK && StringUtils.hasContent(response.body())) {
 
-            final ObjectMapper mapper = new ObjectMapper();
-            final String productsResults = mapper.readValue(response.body(), JsonNode.class)
-                  .get("products") //$NON-NLS-1$
-                  .toString();
-
-            serializedProductsResults = mapper.readValue(productsResults,
-                  new TypeReference<List<Product>>() {});
-            return serializedProductsResults;
+            return deserializeResponse(response.body(), productSearchType);
 
          } else {
             StatusUtil.logError(response.body());
@@ -136,6 +177,6 @@ public class NutritionUtils {
          Thread.currentThread().interrupt();
       }
 
-      return serializedProductsResults;
+      return new ArrayList<>();
    }
 }
