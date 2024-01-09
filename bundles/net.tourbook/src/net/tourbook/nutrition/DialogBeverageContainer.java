@@ -56,8 +56,7 @@ public class DialogBeverageContainer extends Dialog {
       layout.marginLeft = 10;
       container.setLayout(layout);
 
-      final Label lblUser = new Label(container, SWT.NONE);
-      lblUser.setText("User:");
+      final Label lblUser = UI.createLabel(container, "User");
 
       _txtName = new Text(container, SWT.BORDER);
       _txtName.setLayoutData(new GridData(SWT.FILL,
@@ -73,11 +72,11 @@ public class DialogBeverageContainer extends Dialog {
          name = userText;
       });
 
-      final Label lblPassword = new Label(container, SWT.NONE);
+      final Label lblCapacity = UI.createLabel(container, "Capacity");
+
       final GridData gridDataPasswordLabel = new GridData(SWT.LEFT, SWT.CENTER, false, false);
       gridDataPasswordLabel.horizontalIndent = 1;
-      lblPassword.setLayoutData(gridDataPasswordLabel);
-      lblPassword.setText("Password:");
+      lblCapacity.setLayoutData(gridDataPasswordLabel);
 
       _txtCapacity = new Text(container, SWT.BORDER);
       _txtCapacity.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
