@@ -98,7 +98,12 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private static final String STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";             //$NON-NLS-1$
 
    public static final String  COLUMN_SERVINGS                 = "Servings";                                //Messages.DeviceManager_Selection_device_is_not_selected;
-
+   public static final String  COLUMN_NAME                     = "Name";                                    //Messages.DeviceManager_Selection_device_is_not_selected;
+   public static final String  COLUMN_CALORIES                 = "Calories";                                //Messages.DeviceManager_Selection_device_is_not_selected;
+   public static final String  COLUMN_SODIUM                   = "Sodium";                                  //Messages.DeviceManager_Selection_device_is_not_selected;
+   public static final String  COLUMN_ISBEVERAGE               = "Beverage";                                //Messages.DeviceManager_Selection_device_is_not_selected;
+   public static final String  COLUMN_BEVERAGE_CONTAINER       = "Beverage Container";                      //Messages.DeviceManager_Selection_device_is_not_selected;
+   public static final String  COLUMN_CONSUMED_CONTAINERS      = "Consumed Containers";                     //Messages.DeviceManager_Selection_device_is_not_selected;
 
 //https://world.openfoodfacts.org/data
 
@@ -109,37 +114,41 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private static final IPreferenceStore _prefStore           = TourbookPlugin.getPrefStore();
 
    private static final int              _hintTextColumnWidth = UI.IS_OSX ? 100 : 50;
-   private static List<String> _tableColumns = new ArrayList<>();
+   private static List<String>           _tableColumns        = new ArrayList<>();
 
    //todo fb use those columns
    {
       _tableColumns.add(COLUMN_SERVINGS);
+      _tableColumns.add(COLUMN_NAME);
+      _tableColumns.add(COLUMN_CALORIES);
+      _tableColumns.add(COLUMN_SODIUM);
+      _tableColumns.add(COLUMN_ISBEVERAGE);
+      _tableColumns.add(COLUMN_BEVERAGE_CONTAINER);
+      _tableColumns.add(COLUMN_CONSUMED_CONTAINERS);
    }
 
-   private final IDialogSettings         _state               = TourbookPlugin.getState(ID);
-   private TourData                      _tourData;
+   private final IDialogSettings   _state          = TourbookPlugin.getState(ID);
+   private TourData                _tourData;
 
-   private TableViewer                   _productsViewer;
-   private ColumnManager                 _columnManager;
+   private TableViewer             _productsViewer;
+   private ColumnManager           _columnManager;
 
-   private List<String>                  _searchHistory       = new ArrayList<>();
-   private IPropertyChangeListener       _prefChangeListener;
+   private List<String>            _searchHistory  = new ArrayList<>();
+   private IPropertyChangeListener _prefChangeListener;
 
-   final NutritionQuery                  _nutritionQuery      = new NutritionQuery();
-   private ISelectionListener            _postSelectionListener;
-   private ITourEventListener            _tourEventListener;
-   private PostSelectionProvider         _postSelectionProvider;
+   final NutritionQuery            _nutritionQuery = new NutritionQuery();
+   private ISelectionListener      _postSelectionListener;
+   private ITourEventListener      _tourEventListener;
+   private PostSelectionProvider   _postSelectionProvider;
 
-   private final RangeContent            _opacityRange        = new RangeContent(0.25, 10.0, 0.25, 100);
+   private final RangeContent      _opacityRange   = new RangeContent(0.25, 10.0, 0.25, 100);
 
-   private final NumberFormat            _nf2                 = NumberFormat.getNumberInstance();
+   private final NumberFormat      _nf2            = NumberFormat.getNumberInstance();
 
    {
       _nf2.setMinimumFractionDigits(2);
       _nf2.setMaximumFractionDigits(2);
    }
-
-
 
    /*
     * UI controls
@@ -185,20 +194,18 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
          final TourNutritionProduct task = (TourNutritionProduct) element;
 
-         final String[] tableColumns = { "Servings", "Name", "Calories", "Sodium", "Beverage", "Beverage Container", "Consumed Containers" };
-         // {@link TourNutritionView#COLUMN_SERVINGS}
+         // {@link #COLUMN_SERVINGS}
          if (property.equals(COLUMN_SERVINGS)) {
             return task.getServingsConsumed();
-         } else if (property.equals("Sodium")) {
+         } else if (property.equals(COLUMN_SODIUM)) {
             return task.getSodium();
-         } else if (property.equals("Beverage")) {
+         } else if (property.equals(COLUMN_ISBEVERAGE)) {
             return Boolean.valueOf(task.isBeverage());
-         } else if (property.equals("Beverage Container")) {
+         } else if (property.equals(COLUMN_BEVERAGE_CONTAINER)) {
             return 1;// task.getTourBeverageContainerName();
-         } else if (property.equals("Consumed Containers")) {
-            if (task.getTourBeverageContainer() != null) {
-               return task.getTourBeverageContainer().getCapacity();
-            }
+         } else if (property.equals(COLUMN_CONSUMED_CONTAINERS) &&
+               task.getTourBeverageContainer() != null) {
+            return task.getTourBeverageContainer().getCapacity();
          }
          return UI.EMPTY_STRING;
       }
@@ -211,11 +218,11 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          }
          final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
 
-         if (property.equals("Servings")) {
+         if (property.equals(COLUMN_SERVINGS)) {
             tourNutritionProduct.setServingsConsumed(((Double) value).floatValue());
-         } else if (property.equals("Consumed Containers")) {
+         } else if (property.equals(COLUMN_CONSUMED_CONTAINERS)) {
             tourNutritionProduct.getContainersConsumed();
-         } else if (property.equals("Beverage")) {
+         } else if (property.equals(COLUMN_ISBEVERAGE)) {
 
             final boolean booleanValue = ((Boolean) value).booleanValue();
             tourNutritionProduct.setIsBeverage(booleanValue);
@@ -225,7 +232,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             }
          }
 
-         else if (property.equals("Beverage Container")) {
+         else if (property.equals(COLUMN_BEVERAGE_CONTAINER)) {
             final var toto = TourDatabase.getTourBeverageContainers();
 
             tourNutritionProduct.setTourBeverageContainer(toto.get(0));
@@ -443,43 +450,43 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       return total * 60 / (tourDeviceTime_Recorded / 60);
    }
 
-   private void createColumns(final Table productsTable, final String[] tableColumns) {
+   private void createColumns(final Table productsTable, final List<String> tableColumns) {
 
       int index = 0;
 
       // Column: Quantity
       final TableColumn columnServings = new TableColumn(productsTable, SWT.LEFT);
-      columnServings.setText(tableColumns[index++]);
+      columnServings.setText(tableColumns.get(index++));
       columnServings.setWidth(75);
 
       // Column: name
       final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
-      columnName.setText(tableColumns[index++]);
+      columnName.setText(tableColumns.get(index++));
       columnName.setWidth(150);
 
       // Column: Calories
       final TableColumn columnCalories = new TableColumn(productsTable, SWT.LEFT);
-      columnCalories.setText(tableColumns[index++]);
+      columnCalories.setText(tableColumns.get(index++));
       columnCalories.setWidth(75);
 
       // Column: Sodium
       final TableColumn columnSodium = new TableColumn(productsTable, SWT.LEFT);
-      columnSodium.setText(tableColumns[index++]);
+      columnSodium.setText(tableColumns.get(index++));
       columnSodium.setWidth(75);
 
       // Column: Beverage
       final TableColumn columnFluid = new TableColumn(productsTable, SWT.LEFT);
-      columnFluid.setText(tableColumns[index++]);
+      columnFluid.setText(tableColumns.get(index++));
       columnFluid.setWidth(75);
 
       // Column: Beverage Container
       final TableColumn columnFluidContainerName = new TableColumn(productsTable, SWT.LEFT);
-      columnFluidContainerName.setText(tableColumns[index++]);
+      columnFluidContainerName.setText(tableColumns.get(index++));
       columnFluidContainerName.setWidth(75);
 
       // Column: Consumed Containers
       final TableColumn columnFluidContainersConsumed = new TableColumn(productsTable, SWT.LEFT);
-      columnFluidContainersConsumed.setText(tableColumns[index++]);
+      columnFluidContainersConsumed.setText(tableColumns.get(index++));
       columnFluidContainersConsumed.setWidth(75);
    }
 
@@ -587,14 +594,13 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
 
-      final String[] tableColumns = { "Servings", "Name", "Calories", "Sodium", "Beverage", "Beverage Container", "Consumed Containers" };
-      createColumns(productsTable, tableColumns);
+      createColumns(productsTable, _tableColumns);
 
       _productsViewer = new TableViewer(productsTable);
-      _productsViewer.setColumnProperties(tableColumns);
+      _productsViewer.setColumnProperties(_tableColumns.toArray(new String[0]));
 
       // Create the cell editors
-      final CellEditor[] editors = new CellEditor[tableColumns.length];
+      final CellEditor[] editors = new CellEditor[_tableColumns.size()];
       // Servings
       editors[0] = new SpinnerCellEditor(productsTable, _nf2, _opacityRange, SWT.NONE);
       // Is Beverage
@@ -644,7 +650,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             Label label = UI.createLabel(container, UI.EMPTY_STRING);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
 
-            label = UI.createLabel(container, "Calories");
+            label = UI.createLabel(container, COLUMN_CALORIES);
             label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
 
@@ -652,7 +658,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
             label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
 
-            label = UI.createLabel(container, "Sodium");
+            label = UI.createLabel(container, COLUMN_SODIUM);
             label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
          }
