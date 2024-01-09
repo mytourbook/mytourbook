@@ -291,7 +291,6 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Location_Geo_BoundingBox_Width_Tooltip;
    public static String        ColumnFactory_Location_Geo_IsResizedBoundingBox_Header;
    public static String        ColumnFactory_Location_Geo_IsResizedBoundingBox_Label;
-   public static String        ColumnFactory_Location_Geo_IsResizedBoundingBox_Tooltip;
    public static String        ColumnFactory_Location_Geo_Latitude;
    public static String        ColumnFactory_Location_Geo_Latitude_Tooltip;
    public static String        ColumnFactory_Location_Geo_LatitudeDiff_Header;
