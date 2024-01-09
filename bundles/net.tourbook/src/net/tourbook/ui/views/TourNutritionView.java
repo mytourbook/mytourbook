@@ -93,6 +93,9 @@ import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 public class TourNutritionView extends ViewPart implements PropertyChangeListener {
 
    //todo fb add the possibility to add custom products (i.e: water...)
+
+   //todo fb add the possibility to sort the rows by name etc....
+   // by default, sort by what ?
    public static final String  ID                              = "net.tourbook.ui.views.TourNutritionView";        //$NON-NLS-1$
    private static final String STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";                      //$NON-NLS-1$
    private static final String STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";                    //$NON-NLS-1$

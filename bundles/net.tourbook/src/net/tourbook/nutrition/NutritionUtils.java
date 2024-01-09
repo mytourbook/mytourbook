@@ -40,6 +40,10 @@ import net.tourbook.nutrition.openfoodfacts.Product;
 
 public class NutritionUtils {
 
+   /**
+    * Documentation:
+    * https://world.openfoodfacts.org/files/api-documentation.html#jump-SearchRequests-Searchingforproducts
+    */
    private static final String OPENFOODFACTS_SEARCH_BY_NAME_URL =
          "https://world.openfoodfacts.org/cgi/search.pl?action=process&sort_by=unique_scans_n&page_size=20&json=true&search_terms=";    //$NON-NLS-1$
    private static final String OPENFOODFACTS_SEARCH_BY_CODE_URL =
@@ -139,10 +143,6 @@ public class NutritionUtils {
    }
 
    public static List<Product> searchProduct(final String searchText, final ProductSearchType productSearchType) {
-
-      //todo fb by code https://world.openfoodfacts.net/api/v3/product/021908509358?fields=product_name,nutriscore_data,nutriments
-
-      // todo fb no endpoint to search by product name except my "stolen" .pl endpoint ????
 
       URI searchUri = URI.create(UI.EMPTY_STRING);
 
