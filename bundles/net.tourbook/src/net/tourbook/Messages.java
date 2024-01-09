@@ -3282,6 +3282,13 @@ public class Messages extends NLS {
    public static String        tour_merger_label_adjust_seconds;
    public static String        tour_merger_save_target_tour;
 
+   public static String        Tour_Nutrition_Column_Servings;
+   public static String        Tour_Nutrition_Column_Name;
+   public static String        Tour_Nutrition_Column_Calories;
+   public static String        Tour_Nutrition_Column_Sodium;
+   public static String        Tour_Nutrition_Column_IsBeverage;
+   public static String        Tour_Nutrition_Column_BeverageContainer;
+   public static String        Tour_Nutrition_Column_ConsumedContainers;
    public static String        Tour_Nutrition_Label_AddProduct;
    public static String        Tour_Nutrition_Label_AddProduct_Tooltip;
    public static String        Tour_Nutrition_Label_ReportCard;

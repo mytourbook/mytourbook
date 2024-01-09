@@ -93,17 +93,17 @@ import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 public class TourNutritionView extends ViewPart implements PropertyChangeListener {
 
    //todo fb add the possibility to add custom products (i.e: water...)
-   public static final String  ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
-   private static final String STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
-   private static final String STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";             //$NON-NLS-1$
+   public static final String  ID                              = "net.tourbook.ui.views.TourNutritionView";        //$NON-NLS-1$
+   private static final String STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";                      //$NON-NLS-1$
+   private static final String STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";                    //$NON-NLS-1$
 
-   public static final String  COLUMN_SERVINGS                 = "Servings";                                //Messages.DeviceManager_Selection_device_is_not_selected;
-   public static final String  COLUMN_NAME                     = "Name";                                    //Messages.DeviceManager_Selection_device_is_not_selected;
-   public static final String  COLUMN_CALORIES                 = "Calories";                                //Messages.DeviceManager_Selection_device_is_not_selected;
-   public static final String  COLUMN_SODIUM                   = "Sodium";                                  //Messages.DeviceManager_Selection_device_is_not_selected;
-   public static final String  COLUMN_ISBEVERAGE               = "Beverage";                                //Messages.DeviceManager_Selection_device_is_not_selected;
-   public static final String  COLUMN_BEVERAGE_CONTAINER       = "Beverage Container";                      //Messages.DeviceManager_Selection_device_is_not_selected;
-   public static final String  COLUMN_CONSUMED_CONTAINERS      = "Consumed Containers";                     //Messages.DeviceManager_Selection_device_is_not_selected;
+   public static final String  COLUMN_SERVINGS                 = Messages.Tour_Nutrition_Column_Servings;
+   public static final String  COLUMN_NAME                     = Messages.Tour_Nutrition_Column_Name;
+   public static final String  COLUMN_CALORIES                 = Messages.Tour_Nutrition_Column_Calories;
+   public static final String  COLUMN_SODIUM                   = Messages.Tour_Nutrition_Column_Sodium;
+   public static final String  COLUMN_ISBEVERAGE               = Messages.Tour_Nutrition_Column_IsBeverage;
+   public static final String  COLUMN_BEVERAGE_CONTAINER       = Messages.Tour_Nutrition_Column_BeverageContainer;
+   public static final String  COLUMN_CONSUMED_CONTAINERS      = Messages.Tour_Nutrition_Column_ConsumedContainers;
 
 //https://world.openfoodfacts.org/data
 
