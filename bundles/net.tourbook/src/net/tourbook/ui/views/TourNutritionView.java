@@ -29,9 +29,9 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.database.TourDatabase;
@@ -92,7 +92,7 @@ import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 
 public class TourNutritionView extends ViewPart implements PropertyChangeListener {
 
-   //add the possibility to add custom products (i.e: water...)
+   //todo fb add the possibility to add custom products (i.e: water...)
    public static final String  ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
    private static final String STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
    private static final String STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";             //$NON-NLS-1$
@@ -116,7 +116,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private static final int              _hintTextColumnWidth = UI.IS_OSX ? 100 : 50;
    private static List<String>           _tableColumns        = new ArrayList<>();
 
-   //todo fb use those columns
    {
       _tableColumns.add(COLUMN_SERVINGS);
       _tableColumns.add(COLUMN_NAME);
@@ -131,7 +130,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private TourData                _tourData;
 
    private TableViewer             _productsViewer;
-   private ColumnManager           _columnManager;
 
    private List<String>            _searchHistory  = new ArrayList<>();
    private IPropertyChangeListener _prefChangeListener;
@@ -194,19 +192,31 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
          final TourNutritionProduct task = (TourNutritionProduct) element;
 
-         // {@link #COLUMN_SERVINGS}
+         final TourBeverageContainer tourBeverageContainer = task.getTourBeverageContainer();
          if (property.equals(COLUMN_SERVINGS)) {
+
             return task.getServingsConsumed();
+
          } else if (property.equals(COLUMN_SODIUM)) {
+
             return task.getSodium();
+
          } else if (property.equals(COLUMN_ISBEVERAGE)) {
+
             return Boolean.valueOf(task.isBeverage());
-         } else if (property.equals(COLUMN_BEVERAGE_CONTAINER)) {
+
+         } else if (property.equals(COLUMN_BEVERAGE_CONTAINER) &&
+               tourBeverageContainer != null) {
+
             return 1;// task.getTourBeverageContainerName();
+
          } else if (property.equals(COLUMN_CONSUMED_CONTAINERS) &&
-               task.getTourBeverageContainer() != null) {
+               tourBeverageContainer != null) {
+
             return task.getTourBeverageContainer().getCapacity();
+
          }
+
          return UI.EMPTY_STRING;
       }
 
@@ -219,9 +229,13 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
 
          if (property.equals(COLUMN_SERVINGS)) {
+
             tourNutritionProduct.setServingsConsumed(((Double) value).floatValue());
+
          } else if (property.equals(COLUMN_CONSUMED_CONTAINERS)) {
+
             tourNutritionProduct.getContainersConsumed();
+
          } else if (property.equals(COLUMN_ISBEVERAGE)) {
 
             final boolean booleanValue = ((Boolean) value).booleanValue();
@@ -233,6 +247,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          }
 
          else if (property.equals(COLUMN_BEVERAGE_CONTAINER)) {
+
             final var toto = TourDatabase.getTourBeverageContainers();
 
             tourNutritionProduct.setTourBeverageContainer(toto.get(0));
@@ -363,7 +378,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
 
-         if (/* _isInUpdate || */ workbenchPart == TourNutritionView.this) {
+         if (_isInUpdate || workbenchPart == TourNutritionView.this) {
             return;
          }
 
@@ -454,37 +469,37 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       int index = 0;
 
-      // Column: Quantity
+      // Column: {@link #COLUMN_SERVINGS}
       final TableColumn columnServings = new TableColumn(productsTable, SWT.LEFT);
       columnServings.setText(tableColumns.get(index++));
       columnServings.setWidth(75);
 
-      // Column: name
+      // Column: {@link #COLUMN_NAME}
       final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
       columnName.setText(tableColumns.get(index++));
       columnName.setWidth(150);
 
-      // Column: Calories
+      // Column: {@link #COLUMN_CALORIES}
       final TableColumn columnCalories = new TableColumn(productsTable, SWT.LEFT);
       columnCalories.setText(tableColumns.get(index++));
       columnCalories.setWidth(75);
 
-      // Column: Sodium
+      // Column: {@link #COLUMN_SODIUM}
       final TableColumn columnSodium = new TableColumn(productsTable, SWT.LEFT);
       columnSodium.setText(tableColumns.get(index++));
       columnSodium.setWidth(75);
 
-      // Column: Beverage
+      // Column: {@link #COLUMN_ISBEVERAGE}
       final TableColumn columnFluid = new TableColumn(productsTable, SWT.LEFT);
       columnFluid.setText(tableColumns.get(index++));
       columnFluid.setWidth(75);
 
-      // Column: Beverage Container
+      // Column: {@link #COLUMN_BEVERAGE_CONTAINER}
       final TableColumn columnFluidContainerName = new TableColumn(productsTable, SWT.LEFT);
       columnFluidContainerName.setText(tableColumns.get(index++));
       columnFluidContainerName.setWidth(75);
 
-      // Column: Consumed Containers
+      // Column: {@link #COLUMN_CONSUMED_CONTAINERS}
       final TableColumn columnFluidContainersConsumed = new TableColumn(productsTable, SWT.LEFT);
       columnFluidContainersConsumed.setText(tableColumns.get(index++));
       columnFluidContainersConsumed.setWidth(75);
