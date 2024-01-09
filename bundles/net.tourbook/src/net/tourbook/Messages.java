@@ -2483,7 +2483,6 @@ public class Messages extends NLS {
    public static String        Slideout_TourFilter_Confirm_DeleteProperty_Title;
    public static String        Slideout_TourFilter_Label_ProfileName;
    public static String        Slideout_TourFilter_Label_Profiles;
-   public static String        Slideout_TourFilter_Label_Remarks;
    public static String        Slideout_TourFilter_Label_Title;
    public static String        Slideout_TourFilter_Link_TextSearchHint;
    public static String        Slideout_TourFilter_Link_TextSearchHint_Tooltip;
@@ -2545,6 +2544,7 @@ public class Messages extends NLS {
    public static String        Slideout_TourLocation_Column_Zoomlevel;
    public static String        Slideout_TourLocation_Label_EndLocation_Title;
    public static String        Slideout_TourLocation_Label_LocationParts;
+   public static String        Slideout_TourLocation_Label_Remarks;
    public static String        Slideout_TourLocation_Label_SelectedLocationParts;
    public static String        Slideout_TourLocation_Label_StartLocation_Title;
    public static String        Slideout_TourLocation_Label_Zoomlevel;

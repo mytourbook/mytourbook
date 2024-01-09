@@ -741,7 +741,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
           */
 
          final Label label = new Label(parent, SWT.WRAP);
-         label.setText(Messages.Slideout_TourFilter_Label_Remarks);
+         label.setText(Messages.Slideout_TourLocation_Label_Remarks);
       }
    }
 

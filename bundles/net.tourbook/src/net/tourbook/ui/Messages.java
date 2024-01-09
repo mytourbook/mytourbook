@@ -582,9 +582,6 @@ public class Messages extends NLS {
    public static String        Tour_Location_Dialog_DeleteLocation_Message;
    public static String        Tour_Location_Dialog_DeleteLocation_Title;
    public static String        Tour_Location_Dialog_DeleteLocations_Message;
-   public static String        Tour_Location_Label_Usage;
-   public static String        Tour_Location_Label_Usage_Tooltip;
-   public static String        Tour_Location_Label_Zoomlevel;
    public static String        Tour_Location_Log_LocationIsDeleted;
    public static String        Tour_Location_Part_Aerialway;
    public static String        Tour_Location_Part_Aeroway;
@@ -649,7 +646,10 @@ public class Messages extends NLS {
    public static String        Tour_Location_Task_RemovingTourLocations;
    public static String        Tour_Location_Task_RetrievingTourLocations;
    public static String        Tour_Location_Task_RetrievingTourLocations_Subtask;
-   public static String        Tour_Location_Title;
+   public static String        Tour_Location_Tooltip_Label_Usage;
+   public static String        Tour_Location_Tooltip_Label_Usage_Tooltip;
+   public static String        Tour_Location_Tooltip_Label_Zoomlevel;
+   public static String        Tour_Location_Tooltip_Title;
    public static String        Tour_Location_Zoomlevel_03_Country;
    public static String        Tour_Location_Zoomlevel_05_State;
    public static String        Tour_Location_Zoomlevel_08_County;

@@ -212,7 +212,7 @@ public class TourLocationToolTip extends ToolTip {
 
             } else {
 
-               locationTitle = Messages.Tour_Location_Title;
+               locationTitle = Messages.Tour_Location_Tooltip_Title;
             }
 
             // using text control that & is not displayed as mnemonic
@@ -358,14 +358,14 @@ public class TourLocationToolTip extends ToolTip {
                      _colLocationItem.numTourStartLocations,
                      _colLocationItem.numTourEndLocations);
 
-               UI.createLabel(container, Messages.Tour_Location_Label_Usage, Messages.Tour_Location_Label_Usage_Tooltip);
-               UI.createLabel(container, usage, Messages.Tour_Location_Label_Usage_Tooltip);
+               UI.createLabel(container, Messages.Tour_Location_Tooltip_Label_Usage, Messages.Tour_Location_Tooltip_Label_Usage_Tooltip);
+               UI.createLabel(container, usage, Messages.Tour_Location_Tooltip_Label_Usage_Tooltip);
             }
             {
                /*
                 * Zoomlevel
                 */
-               UI.createLabel(container, Messages.Tour_Location_Label_Zoomlevel);
+               UI.createLabel(container, Messages.Tour_Location_Tooltip_Label_Zoomlevel);
                UI.createLabel(container, Integer.toString(_tourLocation.zoomlevel));
             }
          }
