@@ -957,7 +957,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             final String fieldName = field.getName();
 
-            if ("colClouds".equals(fieldName)) {
+            if ("colClouds".equals(fieldName)) { //$NON-NLS-1$
 
                // skip cloud field otherwise the cloud icon is not displayed
                continue;

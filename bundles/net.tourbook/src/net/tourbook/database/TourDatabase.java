@@ -305,7 +305,7 @@ public class TourDatabase {
     * ERROR XCL13: The parameter position '13' is out of range. The number of parameters for
     * this prepared statement is '12'.
     */
-   public static final String  SQL_ERROR_XCL13                            = "XCL13";
+   public static final String  SQL_ERROR_XCL13                            = "XCL13"; //$NON-NLS-1$
    //
    //
    private static volatile TourDatabase                   _instance;
@@ -660,7 +660,7 @@ public class TourDatabase {
 
             // column do not exist -> this should not happen
 
-            throw new RuntimeException("Column do not exist: \"%s\"".formatted(columnName));
+            throw new RuntimeException("Column do not exist: \"%s\"".formatted(columnName)); //$NON-NLS-1$
          }
 
          exec(stmt, "ALTER TABLE " + table + " ALTER COLUMN " + columnName + " SET DATA TYPE VARCHAR(" + newWidth + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$

@@ -101,7 +101,7 @@ public class ActionTourLocation extends ContributionItem {
 
       public ActionLocationPart() {
 
-         super("&Set Location Part", AS_DROP_DOWN_MENU);
+         super(Messages.Tour_Location_Action_SetLocationPart, AS_DROP_DOWN_MENU);
       }
 
       @Override

@@ -142,18 +142,18 @@ public class PartItem implements Comparable<Object> {
 
       return UI.EMPTY_STRING
 
-            + "PartItem" + NL
+            + "PartItem" + NL //                                              //$NON-NLS-1$
 
-            + "   partID_Start         = " + partID_Start + NL
-            + "   partID_End           = " + partID_End + NL
+            + "   partID_Start         = " + partID_Start + NL //             //$NON-NLS-1$
+            + "   partID_End           = " + partID_End + NL //               //$NON-NLS-1$
 
-            + "   partLabel_Start      = " + partLabel_Start + NL
-            + "   partLabel_End        = " + partLabel_End + NL
+            + "   partLabel_Start      = " + partLabel_Start + NL //          //$NON-NLS-1$
+            + "   partLabel_End        = " + partLabel_End + NL //            //$NON-NLS-1$
 
             + NL
 
-            + "   locationLabel_Start  = " + locationLabel_Start + NL
-            + "   locationLabel_End    = " + locationLabel_End + NL
+            + "   locationLabel_Start  = " + locationLabel_Start + NL //      //$NON-NLS-1$
+            + "   locationLabel_End    = " + locationLabel_End + NL //        //$NON-NLS-1$
 
             + NL;
    }
