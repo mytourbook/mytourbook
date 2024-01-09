@@ -3289,8 +3289,10 @@ public class Messages extends NLS {
    public static String        Tour_Nutrition_Column_IsBeverage;
    public static String        Tour_Nutrition_Column_BeverageContainer;
    public static String        Tour_Nutrition_Column_ConsumedContainers;
-   public static String        Tour_Nutrition_Label_AddProduct;
-   public static String        Tour_Nutrition_Label_AddProduct_Tooltip;
+   public static String        Tour_Nutrition_Button_AddProduct;
+   public static String        Tour_Nutrition_Button_AddProduct_Tooltip;
+   public static String        Tour_Nutrition_Button_DeleteProduct;
+   public static String        Tour_Nutrition_Button_DeleteProduct_Tooltip;
    public static String        Tour_Nutrition_Label_ReportCard;
    public static String        Tour_Nutrition_Label_ReportCard_Tooltip;
 

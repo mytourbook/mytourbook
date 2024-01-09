@@ -575,8 +575,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
           * Add product button
           */
          _btnAddProduct = new Button(container, SWT.NONE);
-         _btnAddProduct.setText(Messages.Tour_Nutrition_Label_AddProduct);
-         //_btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
+         _btnAddProduct.setText(Messages.Tour_Nutrition_Button_AddProduct);
+         _btnAddProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddProduct_Tooltip);
          _btnAddProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell(),
                _tourData.getTourId()).open()));
          _btnAddProduct.setImage(_imageAdd);
@@ -586,9 +586,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
           * Delete product button
           */
          _btnDeleteProduct = new Button(container, SWT.NONE);
-         _btnDeleteProduct.setText("&Delete");
+         _btnDeleteProduct.setText(Messages.Tour_Nutrition_Button_DeleteProduct);
+         _btnDeleteProduct.setToolTipText(Messages.Tour_Nutrition_Button_DeleteProduct_Tooltip);
          _btnDeleteProduct.setEnabled(false);
-         //_btnCleanup.setToolTipText(Messages.PrefPage_CloudConnectivity_Label_Cleanup_Tooltip);
          _btnDeleteProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
             //TODO FB
             // also only enable it if a product is selected in the table
