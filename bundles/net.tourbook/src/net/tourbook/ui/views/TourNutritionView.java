@@ -460,6 +460,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       long tourDeviceTime_Recorded = _tourData.getTourDeviceTime_Recorded();
       if (tourDeviceTime_Recorded > 3600 /* && preference to remove first hour */) {
          tourDeviceTime_Recorded -= 3600;
+      } else if (tourDeviceTime_Recorded <= 3600 /* && preference to remove first hour */) {
+         return total;
       }
 
       return total * 60 / (tourDeviceTime_Recorded / 60);
@@ -623,6 +625,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       // Column: Consumed Containers
       editors[6] = new SpinnerCellEditor(productsTable, _nf2, _opacityRange, SWT.NONE);
 
+      //todo fb recreate when the preferences are changed and a container is added or removed or modified
       final var toto = TourDatabase.getTourBeverageContainers();
       final String[] items = new String[toto.size()];
       for (int index2 = 0; index2 < toto.size(); ++index2) {
@@ -632,7 +635,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       // example
       // Flask (0.5L)
       // bladder (1.5L)
-      // not the append of the capacity
+      // note the append of the capacity
 
       // Assign the cell editors to the viewer
       _productsViewer.setCellEditors(editors);
@@ -969,6 +972,9 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       final long averageCaloriesPerHour = computeAveragePerHour(totalCalories);
       _txtCalories_Average.setText(String.valueOf(averageCaloriesPerHour));
+
+      final long averageFluidPerHour = computeAveragePerHour(totalFluid);
+      _txtFluid_Average.setText(String.valueOf(averageFluidPerHour));
 
       final long averageSodiumPerHour = computeAveragePerHour(totalSodium);
       _txtSodium_Average.setText(String.valueOf(averageSodiumPerHour));

@@ -43,7 +43,7 @@ public class NutritionUtils {
    private static final String OPENFOODFACTS_SEARCH_BY_NAME_URL =
          "https://world.openfoodfacts.org/cgi/search.pl?action=process&sort_by=unique_scans_n&page_size=20&json=true&search_terms=";    //$NON-NLS-1$
    private static final String OPENFOODFACTS_SEARCH_BY_CODE_URL =
-         "https://world.openfoodfacts.net/api/v3/product/%s?fields=code,product_name,nutriscore_data,nutriments";
+         "https://world.openfoodfacts.net/api/v3/product/%s?fields=code,product_name,nutriscore_data,nutriments,quantity";
 
    private static HttpClient   _httpClient                      = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
 
@@ -55,8 +55,6 @@ public class NutritionUtils {
 
       final StringBuilder stringBuilder = new StringBuilder();
       tourNutritionProducts.stream().forEach(product -> {
-
-         //todo fb serving (eng), portion (french)
 
          if (product.isBeverage() && StringUtils.hasContent(product.getTourBeverageContainerName())) {
 

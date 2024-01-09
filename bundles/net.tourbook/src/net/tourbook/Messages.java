@@ -894,6 +894,10 @@ public class Messages extends NLS {
    public static String        Dialog_SearchProduct_Button_Add;
    public static String        Dialog_SearchProduct_Button_Add_Tooltip;
    public static String        Dialog_SearchProduct_Button_Search;
+   public static String        Dialog_SearchProduct_Combo_SearchType_ByName;
+   public static String        Dialog_SearchProduct_Combo_SearchType_ByCode;
+   public static String        Dialog_SearchProduct_Label_SearchType;
+   public static String        Dialog_SearchProduct_Link_ProductCreationRequest;
    public static String        Dialog_SearchProduct_TableHeader_Code;
    public static String        Dialog_SearchProduct_TableHeader_Name;
    public static String        Dialog_SearchProduct_Title;

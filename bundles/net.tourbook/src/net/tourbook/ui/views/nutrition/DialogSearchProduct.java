@@ -292,7 +292,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
           * Link/Info: How to add a product in the database
           */
          final Link link = new Link(container, SWT.NONE);
-         link.setText(NLS.bind("The product you are looking for doesn't exist ? You can add it here: <a href=\"{0}\">NASA EARTHDATA</a>",
+         link.setText(NLS.bind(Messages.Dialog_SearchProduct_Link_ProductCreationRequest,
                HTTPS_OPENFOODFACTS_PRODUCTS));
          link.setToolTipText(HTTPS_OPENFOODFACTS_PRODUCTS);
          link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(HTTPS_OPENFOODFACTS_PRODUCTS)));
@@ -360,14 +360,15 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
             /*
              * Label: POI
              */
-            final Label label = UI.createLabel(container, "Search type");
+            final Label label = UI.createLabel(container, Messages.Dialog_SearchProduct_Label_SearchType);
+            //todo fb
             //  label.setToolTipText(Messages.Poi_View_Label_POI_Tooltip);
          }
          {
             /*
              * combo: search type
              */
-            _cboSearchType = new Combo(container, SWT.NONE);
+            _cboSearchType = new Combo(container, SWT.READ_ONLY);
             _cboSearchType.setVisibleItemCount(2);
             _cboSearchType.addSelectionListener(widgetSelectedAdapter(selectionEvent -> enableControls()));
             // todo fb ideally, validate the search type by code only contains numbers _cboSearchType.addModifyListener(event -> _btnSearch.getShell().setDefaultButton(_btnSearch));
@@ -375,8 +376,8 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
                   .align(SWT.LEFT, SWT.CENTER)
                   .grab(true, false)
                   .applyTo(_cboSearchType);
-            _cboSearchType.add("By name");
-            _cboSearchType.add("By code");
+            _cboSearchType.add(Messages.Dialog_SearchProduct_Combo_SearchType_ByName);
+            _cboSearchType.add(Messages.Dialog_SearchProduct_Combo_SearchType_ByCode);
             _cboSearchQuery.select(0);
          }
       }
