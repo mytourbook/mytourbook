@@ -1810,6 +1810,13 @@ public class TourLocationManager {
    public static void restoreState() {
 
       xmlRead_Profiles();
+
+      if (_allLocationProfiles.size() == 0) {
+
+         // ensure that profiles are available
+
+         createDefaultProfiles();
+      }
    }
 
    public static void saveState() {
