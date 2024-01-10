@@ -802,7 +802,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       final Composite container = (Composite) _sectionProductsList.getClient();
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
-         // todo fb create buttons (remove item, add recent item, define container (flask...)
          createUI_210_Actions(container);
          createUI_220_Viewer(container);
       }

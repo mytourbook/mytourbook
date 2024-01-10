@@ -461,6 +461,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
          final TourData tourData = TourManager.getTour(_tourId);
          final TourNutritionProduct tfp = new TourNutritionProduct(tourData, selectedProduct);
+         //todo fb check that the product doesn't already exist, otherwise display an error message
          tourData.addNutritionProduct(tfp);
 
          TourManager.saveModifiedTour(tourData);
