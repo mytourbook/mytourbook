@@ -32,8 +32,8 @@ public class ActionOpenSearchProduct extends Action {
 
       setText(Messages.app_action_edit_adjust_altitude);
 
-      //todo fb display a plus symbol, easy to draw in inkscape
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Add));
+      //todo fb
       // for when a tour is not selected
       //   setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Add_Disabled));
    }
@@ -45,6 +45,5 @@ public class ActionOpenSearchProduct extends Action {
 
    public void setTourData(final TourData tourData) {
       _tourData = tourData;
-
    }
 }

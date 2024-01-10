@@ -18,8 +18,6 @@ package net.tourbook.ui.views;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +37,6 @@ import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -78,7 +75,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Item;
@@ -97,7 +93,7 @@ import org.eclipse.ui.part.ViewPart;
 import cop.swt.widgets.viewers.table.celleditors.RangeContent;
 import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 
-public class TourNutritionView extends ViewPart implements PropertyChangeListener, ITourViewer {
+public class TourNutritionView extends ViewPart implements ITourViewer {
 
    //todo fb add the possibility to add custom products (i.e: water...)
 
@@ -136,23 +132,22 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       _tableColumns.add(COLUMN_CONSUMED_CONTAINERS);
    }
 
-   private final IDialogSettings   _state          = TourbookPlugin.getState(ID);
+   private final IDialogSettings   _state         = TourbookPlugin.getState(ID);
    private TourData                _tourData;
 
    private TableViewer             _productsViewer;
 
-   private List<String>            _searchHistory  = new ArrayList<>();
+   private List<String>            _searchHistory = new ArrayList<>();
    private IPropertyChangeListener _prefChangeListener;
 
-   final NutritionQuery            _nutritionQuery = new NutritionQuery();
    private ISelectionListener      _postSelectionListener;
    private ITourEventListener      _tourEventListener;
    private IPartListener2          _partListener;
    private PostSelectionProvider   _postSelectionProvider;
 
-   private final RangeContent      _opacityRange   = new RangeContent(0.25, 10.0, 0.25, 100);
+   private final RangeContent      _opacityRange  = new RangeContent(0.25, 10.0, 0.25, 100);
 
-   private final NumberFormat      _nf2            = NumberFormat.getNumberInstance();
+   private final NumberFormat      _nf2           = NumberFormat.getNumberInstance();
 
    {
       _nf2.setMinimumFractionDigits(2);
@@ -181,7 +176,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private Text        _txtFluid_Total;
    private Text        _txtSodium_Average;
    private Text        _txtSodium_Total;
-   private Combo       _cboSearchQuery;
    private Section     _sectionProductsList;
    private FormToolkit _tk;
 
@@ -396,8 +390,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       };
 
       _prefStore.addPropertyChangeListener(_prefChangeListener);
-
-      _nutritionQuery.addPropertyChangeListener(this);
    }
 
    /**
@@ -641,8 +633,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
          _btnDeleteProduct.setToolTipText(Messages.Tour_Nutrition_Button_DeleteProduct_Tooltip);
          _btnDeleteProduct.setEnabled(false);
          _btnDeleteProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-            //TODO FB
-            // also only enable it if a product is selected in the table
             onDeleteProducts();
          }));
          _btnDeleteProduct.setImage(_imageDelete);
@@ -825,7 +815,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       getViewSite().getPage().removePartListener(_partListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
-      _nutritionQuery.removePropertyChangeListener(this);
 
       UI.disposeResource(_imageAdd);
       UI.disposeResource(_imageDelete);
@@ -956,28 +945,6 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    private void onTableSelectionChanged(final SelectionChangedEvent event) {
       _btnDeleteProduct.setEnabled(true);
-   }
-
-   @Override
-   public void propertyChange(final PropertyChangeEvent propertyChangeEvent) {
-
-      final List<String> searchResult = (List<String>) propertyChangeEvent.getNewValue();
-
-      Display.getDefault().asyncExec(() -> {
-
-         // check if view is closed
-//         if (_btnSearch.isDisposed()) {
-//            return;
-//         }
-
-         // refresh viewer
-         //todo fb fix java.lang.IllegalStateException: Need an underlying widget to be able to set the input.(Has the widget been disposed?)
-
-         _productsViewer.setInput(new Object());
-
-         _cboSearchQuery.setEnabled(true);
-      });
-
    }
 
    @Override

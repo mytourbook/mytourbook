@@ -368,7 +368,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
             _cboSearchType = new Combo(container, SWT.READ_ONLY);
             _cboSearchType.setVisibleItemCount(2);
             _cboSearchType.addSelectionListener(widgetSelectedAdapter(selectionEvent -> enableControls()));
-            // todo fb ideally, validate the search type by code only contains numbers _cboSearchType.addModifyListener(event -> _btnSearch.getShell().setDefaultButton(_btnSearch));
             GridDataFactory.fillDefaults()
                   .align(SWT.LEFT, SWT.CENTER)
                   .grab(true, false)
@@ -498,7 +497,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       }
 
       // start product search
-//todo fb, pass the search type
       _nutritionQuery.asyncFind(searchText, getProductSearchType());
    }
 
