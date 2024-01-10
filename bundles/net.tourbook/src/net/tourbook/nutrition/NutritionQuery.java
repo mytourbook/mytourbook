@@ -79,17 +79,12 @@ public class NutritionQuery implements Runnable {
    public void run() {
 
       final var oldValue = List.copyOf(_searchResult);
-      //todo fb
-      //if the current one only contains the not found product then oldvalue should be empty
       try {
 
          _searchResult.clear();
 
          final List<Product> searchProductResults = NutritionUtils.searchProduct(_searchText, _productSearchType);
 
-         if (searchProductResults.isEmpty()) {
-            searchProductResults.add(new Product("Not found", null, null, "not found"));
-         }
          _searchResult.addAll(searchProductResults);
 
       } catch (final Exception e) {

@@ -39,9 +39,9 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.web.WEB;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -71,7 +71,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
-public class DialogSearchProduct extends Dialog implements PropertyChangeListener {
+public class DialogSearchProduct extends TitleAreaDialog implements PropertyChangeListener {
 
    // set the default size
 
@@ -249,7 +249,6 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
       _isInUIInit = false;
 
       enableControls();
-
    }
 
    @Override
@@ -272,8 +271,6 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
 
       //todo fb
       // https://www.vogella.com/tutorials/EclipseJFaceTable/article.html
-
-      restoreState();
 
       return dlgContainer;
    }
@@ -484,6 +481,7 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
 
    private void onSearchProduct() {
 
+      _productsViewer.getTable().removeAll();
       // disable search controls
       _cboSearchQuery.setEnabled(false);
       _btnSearch.setEnabled(false);
@@ -512,11 +510,17 @@ public class DialogSearchProduct extends Dialog implements PropertyChangeListene
       final List<net.tourbook.nutrition.openfoodfacts.Product> searchResults =
             (List<net.tourbook.nutrition.openfoodfacts.Product>) propertyChangeEvent.getNewValue();
 
-      if (searchResults != null) {
-         _products = searchResults;
-      }
+
 
       Display.getDefault().asyncExec(() -> {
+
+         if (searchResults.isEmpty()) {
+            setErrorMessage("NOT FOUND");
+            return;
+         } else {
+            setErrorMessage(null);
+            _products = searchResults;
+         }
 
          // check if view is closed
          if (_btnSearch.isDisposed()) {

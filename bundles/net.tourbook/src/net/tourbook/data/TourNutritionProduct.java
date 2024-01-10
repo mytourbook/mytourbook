@@ -44,8 +44,7 @@ public class TourNutritionProduct {
 
    /**
     * Unique id for manually created markers because the {@link #productCode} is 0 when the marker
-    * is
-    * not persisted
+    * is not persisted
     */
    @Transient
    private long                       _createId      = 0;
@@ -116,6 +115,10 @@ public class TourNutritionProduct {
       return name;
    }
 
+   public long getProductCode() {
+      return productCode;
+   }
+
    public float getServingsConsumed() {
       return servingsConsumed;
    }
@@ -168,10 +171,6 @@ public class TourNutritionProduct {
       productCode = TourDatabase.ENTITY_IS_NOT_SAVED;
 
       tourData = tourDataFromClone;
-   }
-
-   public long getProductCode() {
-      return productCode;
    }
 
 }
