@@ -133,6 +133,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
    private Label               _lblProfileName;
    private Label               _lblProfiles;
    private Label               _lblSelectedLocationParts;
+   private Label               _lblZoomlevel;
 
    private Text                _txtProfileName;
    private Text                _txtSelectedLocationParts;
@@ -667,7 +668,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
          /*
           * Zoomlevel
           */
-         UI.createLabel(container,
+         _lblZoomlevel = UI.createLabel(container,
                Messages.Slideout_TourLocation_Label_Zoomlevel,
                Messages.Slideout_TourLocation_Label_Zoomlevel_Tooltip);
 
@@ -763,25 +764,32 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private void enableControls() {
 
-      final boolean isLocationConsumer = _tourLocationConsumer != null;
-      final boolean isProfileSelected = _selectedProfile != null;
-      final int numProfiles = _allProfiles.size();
+// SET_FORMATTING_OFF
 
-      _btnApplyAndClose.setEnabled(isProfileSelected && isLocationConsumer);
-      _btnCopyProfile.setEnabled(isProfileSelected);
-      _btnDefaultProfile.setEnabled(isProfileSelected);
-      _btnDeleteProfile.setEnabled(isProfileSelected);
+      final boolean isLocationConsumer    = _tourLocationConsumer != null;
+      final boolean isProfileSelected     = _selectedProfile != null;
+      final boolean hasProfiles           = _allProfiles.size() > 0;
 
-      _lblLocationParts.setEnabled(isProfileSelected);
-      _lblProfileName.setEnabled(isProfileSelected);
-      _lblSelectedLocationParts.setEnabled(isProfileSelected);
+      _btnApplyAndClose          .setEnabled(isProfileSelected && isLocationConsumer);
+      _btnCopyProfile            .setEnabled(isProfileSelected);
+      _btnDefaultProfile         .setEnabled(isProfileSelected);
+      _btnDeleteProfile          .setEnabled(isProfileSelected);
 
-      _txtProfileName.setEnabled(isProfileSelected);
+      _lblLocationParts          .setEnabled(isProfileSelected);
+      _lblProfileName            .setEnabled(isProfileSelected);
+      _lblSelectedLocationParts  .setEnabled(isProfileSelected);
+      _lblZoomlevel              .setEnabled(isProfileSelected);
 
-      _lblProfiles.setEnabled(numProfiles > 0);
-      _profileViewer.getTable().setEnabled(numProfiles > 0);
+      _comboZoomlevel            .setEnabled(isProfileSelected);
 
-      _listLocationParts.setEnabled(isProfileSelected);
+      _txtProfileName            .setEnabled(isProfileSelected);
+
+      _lblProfiles               .setEnabled(hasProfiles);
+      _profileViewer.getTable()  .setEnabled(hasProfiles);
+
+      _listLocationParts         .setEnabled(isProfileSelected);
+
+// SET_FORMATTING_ON
    }
 
    private void fillUI() {
