@@ -77,7 +77,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    private List<TourBeverageContainer> _beverageContainers;
 
    private boolean                     _isModified;
-   private boolean                     _isLayoutModified;
 
    private boolean                     _canModifyTourType = true;
 

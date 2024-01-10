@@ -170,7 +170,7 @@ public class TourNutritionProduct {
       this.tourBeverageContainer = tourBeverageContainer;
    }
 
-   public void setupDeepClone(final TourData tourDataFromClone) {
+   void setupDeepClone(final TourData tourDataFromClone) {
 
       _createId = _createCounter.incrementAndGet();
 

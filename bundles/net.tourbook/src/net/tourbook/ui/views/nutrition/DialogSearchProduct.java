@@ -505,8 +505,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    public void propertyChange(final PropertyChangeEvent propertyChangeEvent) {
 
       @SuppressWarnings("unchecked")
-      final List<net.tourbook.nutrition.openfoodfacts.Product> searchResults =
-            (List<net.tourbook.nutrition.openfoodfacts.Product>) propertyChangeEvent.getNewValue();
+      final List<Product> searchResults = (List<Product>) propertyChangeEvent.getNewValue();
 
       Display.getDefault().asyncExec(() -> {
 

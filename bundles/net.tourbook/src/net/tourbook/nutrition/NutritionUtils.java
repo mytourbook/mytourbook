@@ -142,7 +142,7 @@ public class NutritionUtils {
       return totalSodium;
    }
 
-   public static List<Product> searchProduct(final String searchText, final ProductSearchType productSearchType) {
+   static List<Product> searchProduct(final String searchText, final ProductSearchType productSearchType) {
 
       URI searchUri = URI.create(UI.EMPTY_STRING);
 

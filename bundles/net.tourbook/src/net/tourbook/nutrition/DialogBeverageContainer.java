@@ -28,14 +28,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class DialogBeverageContainer extends Dialog {
+class DialogBeverageContainer extends Dialog {
 
    private Text   _txtName;
    private Text   _txtCapacity;
    private String name = UI.EMPTY_STRING;
    private float  capacity;
 
-   public DialogBeverageContainer(final Shell parentShell) {
+   DialogBeverageContainer(final Shell parentShell) {
       super(parentShell);
    }
 
@@ -56,7 +56,7 @@ public class DialogBeverageContainer extends Dialog {
       layout.marginLeft = 10;
       container.setLayout(layout);
 
-      final Label lblUser = UI.createLabel(container, "User");
+      UI.createLabel(container, "User");
 
       _txtName = new Text(container, SWT.BORDER);
       _txtName.setLayoutData(new GridData(SWT.FILL,
