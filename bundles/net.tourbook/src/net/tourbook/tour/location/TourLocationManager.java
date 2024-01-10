@@ -476,8 +476,6 @@ public class TourLocationManager {
       };
 
       _allLocationProfiles.addAll(Arrays.asList(allProfiles));
-
-      _defaultProfile = allProfiles[6];
    }
 
    /**
@@ -1811,11 +1809,34 @@ public class TourLocationManager {
 
       xmlRead_Profiles();
 
-      if (_allLocationProfiles.size() == 0) {
+      int numProfiles = _allLocationProfiles.size();
+
+      if (numProfiles == 0) {
 
          // ensure that profiles are available
 
          createDefaultProfiles();
+
+         numProfiles = _allLocationProfiles.size();
+      }
+
+      for (int profileIndex = 0; profileIndex < numProfiles; profileIndex++) {
+
+         final TourLocationProfile profile = _allLocationProfiles.get(profileIndex);
+         final List<LocationPartID> allParts = profile.allParts;
+
+         // set default default profile
+         if (allParts.size() == 1 && allParts.get(0).equals(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER)) {
+
+            _defaultProfile = profile;
+            
+            break;
+         }
+      }
+
+      if (_defaultProfile == null && numProfiles > 0) {
+
+         _defaultProfile = _allLocationProfiles.get(0);
       }
    }
 
