@@ -102,6 +102,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    public static final String  ID                              = "net.tourbook.ui.views.TourNutritionView";        //$NON-NLS-1$
    private static final String STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";                      //$NON-NLS-1$
    private static final String STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";                    //$NON-NLS-1$
+   private static final String STATE_SECTION_SUMMARY           = "STATE_SECTION_SUMMARY";                          //$NON-NLS-1$
 
    public static final String  COLUMN_SERVINGS                 = Messages.Tour_Nutrition_Column_Servings;
    public static final String  COLUMN_NAME                     = Messages.Tour_Nutrition_Column_Name;
@@ -177,6 +178,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Text        _txtSodium_Average;
    private Text        _txtSodium_Total;
    private Section     _sectionProductsList;
+   private Section     _sectionSummary;
    private FormToolkit _tk;
 
    class TourNutritionProductCellModifier implements ICellModifier {
@@ -608,6 +610,94 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       }
    }
 
+   private void createUI_110_Report(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.BORDER);
+      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+      {
+         /*
+          * Columns headers
+          */
+         {
+            Label label = UI.createLabel(container, UI.EMPTY_STRING);
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+
+            label = UI.createLabel(container, COLUMN_CALORIES);
+            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+
+            label = UI.createLabel(container, "Fluid");
+            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+
+            label = UI.createLabel(container, COLUMN_SODIUM);
+            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+         }
+
+         /*
+          * Totals
+          */
+         {
+            final Label label = UI.createLabel(container, "Totals");
+            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+
+            _txtCalories_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
+            GridDataFactory.fillDefaults()//
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_txtCalories_Total);
+
+            _txtFluid_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
+            GridDataFactory.fillDefaults()//
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_txtFluid_Total);
+
+            _txtSodium_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
+            GridDataFactory.fillDefaults()//
+                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_txtSodium_Total);
+         }
+
+         /*
+          * Averages
+          */
+         {
+            final Label label = UI.createLabel(container, "Averages");
+            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+
+            _txtCalories_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
+            GridDataFactory.fillDefaults()//
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_txtCalories_Average);
+
+            _txtFluid_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
+            GridDataFactory.fillDefaults()//
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_txtFluid_Average);
+
+            _txtSodium_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
+            GridDataFactory.fillDefaults()//
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_txtSodium_Average);
+         }
+
+         /*
+          * Grades
+          */
+         {
+            /*
+             * Label: Grade
+             */
+            final Label label = UI.createLabel(container, "Grade");
+            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+         }
+      }
+   }
+
    private void createUI_210_Actions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -696,107 +786,19 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void createUI_Section_10_Summary(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.BORDER);
-      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+      _sectionSummary = createSection(parent, _tk, Messages.Tour_Nutrition_Section_Summary, true);
+      _sectionSummary.setToolTipText(Messages.Tour_Nutrition_Section_Summary_Tooltip);
+      final Composite container = (Composite) _sectionSummary.getClient();
+      GridLayoutFactory.fillDefaults().applyTo(container);
       {
-         /*
-          * Title: Summary report card
-          */
-         {
-            final Label label = UI.createLabel(container, Messages.Tour_Nutrition_Label_ReportCard);
-            label.setToolTipText(Messages.Tour_Nutrition_Label_ReportCard_Tooltip);
-            GridDataFactory.fillDefaults().span(4, 1).align(SWT.BEGINNING, SWT.FILL).applyTo(label);
-         }
-
-         /*
-          * Columns headers
-          */
-         {
-            Label label = UI.createLabel(container, UI.EMPTY_STRING);
-            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
-
-            label = UI.createLabel(container, COLUMN_CALORIES);
-            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
-            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
-
-            label = UI.createLabel(container, "Fluid");
-            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
-            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
-
-            label = UI.createLabel(container, COLUMN_SODIUM);
-            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
-            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
-         }
-
-         /*
-          * Totals
-          */
-         {
-            final Label label = UI.createLabel(container, "Totals");
-            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
-            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
-
-            _txtCalories_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
-            GridDataFactory.fillDefaults()//
-                  .align(SWT.END, SWT.FILL)
-                  .applyTo(_txtCalories_Total);
-
-            _txtFluid_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
-            GridDataFactory.fillDefaults()//
-                  .align(SWT.END, SWT.FILL)
-                  .applyTo(_txtFluid_Total);
-
-            _txtSodium_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
-            GridDataFactory.fillDefaults()//
-                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
-                  .align(SWT.END, SWT.FILL)
-                  .applyTo(_txtSodium_Total);
-         }
-
-         /*
-          * Averages
-          */
-         {
-            final Label label = UI.createLabel(container, "Averages");
-            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
-            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
-
-            _txtCalories_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
-            GridDataFactory.fillDefaults()//
-                  .align(SWT.END, SWT.FILL)
-                  .applyTo(_txtCalories_Average);
-
-            _txtFluid_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
-            GridDataFactory.fillDefaults()//
-                  .align(SWT.END, SWT.FILL)
-                  .applyTo(_txtFluid_Average);
-
-            _txtSodium_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
-            GridDataFactory.fillDefaults()//
-                  .align(SWT.END, SWT.FILL)
-                  .applyTo(_txtSodium_Average);
-         }
-
-         /*
-          * Grades
-          */
-         {
-            /*
-             * Label: Grade
-             */
-            final Label label = UI.createLabel(container, "Grade");
-            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
-            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
-         }
+         createUI_110_Report(container);
       }
    }
 
    private void createUI_Section_20_ProductsList(final Composite parent) {
 
-      _sectionProductsList = createSection(parent, _tk, "Products List" /*
-                                                                         * Messages.
-                                                                         * tour_editor_section_characteristics
-                                                                         */, true);
+      _sectionProductsList = createSection(parent, _tk, Messages.Tour_Nutrition_Section_ProductsList, true);
+      _sectionProductsList.setToolTipText(Messages.Tour_Nutrition_Section_ProductsList_Tooltip);
       final Composite container = (Composite) _sectionProductsList.getClient();
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
@@ -981,6 +983,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          Stream.of(stateSearchedQueries).forEach(query -> _searchHistory.add(query));
       }
 
+      _sectionSummary.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_SUMMARY, true));
       _sectionProductsList.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_PRODUCTS_LIST, true));
    }
 
@@ -988,6 +991,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void saveState() {
 
       _state.put(STATE_SEARCHED_NUTRITIONQUERIES, _searchHistory.toArray(new String[_searchHistory.size()]));
+      _state.put(STATE_SECTION_SUMMARY, _sectionSummary.isExpanded());
       _state.put(STATE_SECTION_PRODUCTS_LIST, _sectionProductsList.isExpanded());
    }
 
