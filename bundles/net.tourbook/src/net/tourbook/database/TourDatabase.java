@@ -312,7 +312,7 @@ public class TourDatabase {
     * ERROR XCL13: The parameter position '13' is out of range. The number of parameters for
     * this prepared statement is '12'.
     */
-   public static final String  SQL_ERROR_XCL13                            = "XCL13";
+   public static final String  SQL_ERROR_XCL13                            = "XCL13";                              //$NON-NLS-1$
    //
    //
    private static volatile TourDatabase                   _instance;
@@ -667,7 +667,7 @@ public class TourDatabase {
 
             // column do not exist -> this should not happen
 
-            throw new RuntimeException("Column do not exist: \"%s\"".formatted(columnName));
+            throw new RuntimeException("Column do not exist: \"%s\"".formatted(columnName)); //$NON-NLS-1$
          }
 
          exec(stmt, "ALTER TABLE " + table + " ALTER COLUMN " + columnName + " SET DATA TYPE VARCHAR(" + newWidth + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -10532,6 +10532,17 @@ public class TourDatabase {
       return newDbVersion;
    }
 
+   /**
+    * This db update was only needed during development but cannot be removed to have consistent
+    * data
+    *
+    * @param conn
+    * @param splashManager
+    *
+    * @return
+    *
+    * @throws SQLException
+    */
    private int updateDb_052_To_053(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 53;
@@ -10539,18 +10550,31 @@ public class TourDatabase {
       logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
-      final Statement stmt = conn.createStatement();
-      {
-         // add columns
+      /**
+       * This check is VERY IMPORTANT because db version 53 was used during development and this db
+       * update would cause an exception for a "normal" user because of the new database in db
+       * version 52.
+       * <p>
+       * !!! Checking only the column do not work :-( but we can check the table (this works :-)
+       * because it is created in db version 52 !!!
+       */
+      if (isTableAvailable(conn, TABLE_TOUR_LOCATION) == false) {
+
+         // table columns are not yet created
+
+         final Statement stmt = conn.createStatement();
+         {
+            // add columns
 
 // SET_FORMATTING_OFF
 
-         SQL.AddColumn_VarCar (stmt, TABLE_TOUR_LOCATION, "appliedName",   TourLocation.DB_FIELD_LENGTH);      //$NON-NLS-1$
-         SQL.AddColumn_BigInt (stmt, TABLE_TOUR_LOCATION, "lastModified",  null);                              //$NON-NLS-1$
+            SQL.AddColumn_VarCar (stmt, TABLE_TOUR_LOCATION, "appliedName",   TourLocation.DB_FIELD_LENGTH);      //$NON-NLS-1$
+            SQL.AddColumn_BigInt (stmt, TABLE_TOUR_LOCATION, "lastModified",  null);                              //$NON-NLS-1$
 
 // SET_FORMATTING_ON
+         }
+         stmt.close();
       }
-      stmt.close();
 
       logDbUpdate_End(newDbVersion);
 

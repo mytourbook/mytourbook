@@ -4,9 +4,6 @@
 TODO's
 ======               
 
-* !!!!!!!! Update contributors !!!!!!!!!
-  https://mytourbook.sourceforge.io/mytourbook/index.php/contributors
-
 * Remove/replace "de.byteholder.geoclipse.map.UI.NEW_LINE"
 
 * Remove debug code in ColumnManager.java
@@ -45,102 +42,25 @@ Experimental
 New
 ===
 
-* Splashscreen (Barbara / Frederic)
-  https://github.com/mytourbook/mytourbook/discussions/1215#discussioncomment-7961052
+* 
 
-* Start/End Location
-  - Import: Automatic completion of start and end location fields
-    https://github.com/mytourbook/mytourbook/issues/878
-  - Show/modify start/end location in
-    - Locations view and location tooltip
-    - Tour Book view location tooltip
-    - 2D Map
-    - Tour info tooltip
-    - Quick tour editor
-    - Tour editor
-    
-  RECOMMENDATION how to use and speedup tour location retrieval to avoid hundreds or more duplicates
-  - Retrieve and set some locations where you often start/stop your tour, e.g. you at home
-  - Combine duplicated locations with the "One" action in the "Locations" view context menu
-  - Resize (increase) location bounding box (action in context menu) to include similar locations when they are looked up
-  - Retrieve all other locations
-
-* Fulltext search
-  - Added action to rebuild a corrupted fulltext search index
-    https://github.com/mytourbook/mytourbook/issues/1232
-
-* All Tour Markers View (Frederic)
-  - Added the ability to delete markers
-
-* Tour Blog View (Frederic)
-  - Show tour tag images and information
-    https://github.com/mytourbook/mytourbook/issues/1026
 
 Improvements
 ============
 
-* 2D Map
-  - Sync map with tour locations
-
-* Quick Tour Editor
-  - Resize height of the weather description field
-    https://github.com/mytourbook/mytourbook/issues/1219
-
-* Tour Editor
-  - Make the use of the scroll wheel optional
-    https://github.com/mytourbook/mytourbook/issues/1200
-
-* Tour Info
-  - Show air quality value with its assigned color
-    https://github.com/mytourbook/mytourbook/issues/1223
-
-* Tour Log View
-  - Customize when this view is opened automatically, exceptions will always show this view
-    https://github.com/mytourbook/mytourbook/issues/1222 
-    https://github.com/mytourbook/mytourbook/discussions/1210
-
-* Fit Export (Frederic)
-  - Added the pause types
-
-* Tour Blog (Frederic)
-  -Improved the detection of http links in the tour description to make them clickable by using a third party library
-    https://github.com/URL-Detector/URL-Detector
-    https://github.com/mytourbook/mytourbook/issues/1102
-        
+*         
   
 
 Changes
 =======
 
-* Import
-  - "Open tour log view when starting a tour import" in the import preferences dialog is removed, now it can be set in the tour log view
-    https://github.com/mytourbook/mytourbook/issues/1222
-
-* Tour Search
-  - The options dialog can be opened only by clicking on its action button but not anymore when its hovered
-    https://github.com/mytourbook/mytourbook/issues/1224
-  
-* Tour Editor
-  - Tour save/restore actions are moved from the app toolbar into the tour editor toolbar
-    https://github.com/mytourbook/mytourbook/issues/1201
-
-* Tour Concatenation (Frederic)
-  - The weather data is deleted from the concatenated tour
+* 
 
 
 Bugfix
 ======
 
-* All Tour Markers
-  - Update view when tours are deleted
-
-* Air Quality (Frederic)
-  - The air quality texts were saved using the translated texts instead of a unique id.
-    https://github.com/mytourbook/mytourbook/issues/1193
-
-* Slideout Calendar Profiles (Frederic)
-  - Fixed a bug when creating new profiles (Linux only)
-    https://github.com/mytourbook/mytourbook/issues/1241
+* 
 
 
 Translation    

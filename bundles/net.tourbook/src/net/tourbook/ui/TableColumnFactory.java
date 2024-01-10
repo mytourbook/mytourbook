@@ -1704,7 +1704,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Location_Geo_IsResizedBoundingBox_Label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Geo_IsResizedBoundingBox_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_IsResizedBoundingBox_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_IsResizedBoundingBox_Label);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(4));
 

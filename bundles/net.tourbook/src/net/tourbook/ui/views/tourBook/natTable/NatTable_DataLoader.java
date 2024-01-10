@@ -917,7 +917,7 @@ public class NatTable_DataLoader {
        * DATA
        */
       case TableColumnFactory.DATA_DP_TOLERANCE_ID:                  return "dpTolerance";            //$NON-NLS-1$
-      case TableColumnFactory.DATA_HAS_GEO_DATA_ID:                  return "hasGeoData";
+      case TableColumnFactory.DATA_HAS_GEO_DATA_ID:                  return "hasGeoData";             //$NON-NLS-1$
 //    case TableColumnFactory.DATA_IMPORT_FILE_NAME_ID:              // see indexed fields
       case TableColumnFactory.DATA_IMPORT_FILE_PATH_ID:              return "tourImportFilePath";     //$NON-NLS-1$
       case TableColumnFactory.DATA_NUM_TIME_SLICES_ID:               return "numberOfTimeSlices";     //$NON-NLS-1$

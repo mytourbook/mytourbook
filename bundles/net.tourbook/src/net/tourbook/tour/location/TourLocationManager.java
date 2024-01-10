@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,6 +36,7 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -317,91 +318,173 @@ public class TourLocationManager {
 
 // SET_FORMATTING_OFF
 
-         new TourLocationProfile("1 : Name",   18,
-
-            LocationPartID.OSM_NAME),
-
-         new TourLocationProfile("2 : Street + House #",   18,
-
-            LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
-
-         new TourLocationProfile("3: Smallest Settlement",   18,
-
-            LocationPartID.settlementSmall),
-
-         new TourLocationProfile("4: Largest Settlement",   18,
-
-            LocationPartID.settlementLarge),
-
-         new TourLocationProfile("A : State",   18,
+         new TourLocationProfile("1 : State",   8,
 
             LocationPartID.state,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("B : City",   10,
+         new TourLocationProfile("2 : City",   10,
 
             LocationPartID.settlementLarge,
             LocationPartID.state,
-            LocationPartID.city,
-            LocationPartID.OSM_NAME),
+            LocationPartID.OSM_NAME,
+            LocationPartID.city),
 
-         new TourLocationProfile("C : Town / Borough",   12,
+         new TourLocationProfile("3 : Town / Borough",   12,
 
             LocationPartID.settlementLarge,
-            LocationPartID.town,
-            LocationPartID.OSM_NAME),
+            LocationPartID.OSM_NAME,
+            LocationPartID.town),
 
-         new TourLocationProfile("D : Village / Suburb",   13,
+         new TourLocationProfile("4 : Village / Suburb",   13,
 
             LocationPartID.settlementLarge,
             LocationPartID.suburb,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("E : Neighbourhood",   14,
+         new TourLocationProfile("5 : Neighbourhood",   14,
 
             LocationPartID.settlementLarge,
-            LocationPartID.neighbourhood,
-            LocationPartID.OSM_NAME),
+            LocationPartID.OSM_NAME,
+            LocationPartID.neighbourhood),
 
-         new TourLocationProfile("F : Settlement",   15,
-
-            LocationPartID.settlementLarge,
-            LocationPartID.settlementSmall,
-            LocationPartID.OSM_NAME),
-
-         new TourLocationProfile("G : Major Street",   16,
+         new TourLocationProfile("6 : Settlement",   15,
 
             LocationPartID.settlementLarge,
             LocationPartID.settlementSmall,
-            LocationPartID.road,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("H : Minor Street",   17,
+         new TourLocationProfile("7 : Major Street",   16,
 
             LocationPartID.settlementLarge,
             LocationPartID.settlementSmall,
             LocationPartID.road,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("I : Building",   18,
+         new TourLocationProfile("8 : Minor Street",   17,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.settlementSmall,
+            LocationPartID.road,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("9 : Building",   18,
 
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
             LocationPartID.settlementSmall,
-            LocationPartID.OSM_NAME)
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("Large",   18,
+
+            LocationPartID.settlementLarge),
+
+         new TourLocationProfile("Large, Name",   18,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("Large, Name, Town",   18,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.OSM_NAME,
+            LocationPartID.town),
+
+         new TourLocationProfile("Large, Small",   18,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.settlementSmall),
+
+         new TourLocationProfile("Large, Street",   18,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
+
+         new TourLocationProfile("Large, Suburb",   18,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.suburb),
+
+         new TourLocationProfile("Large, Village",   18,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.village),
+
+         new TourLocationProfile("Name",   18,
+
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("Small",   18,
+
+            LocationPartID.settlementSmall),
+
+         new TourLocationProfile("Small, Name",   18,
+
+            LocationPartID.settlementSmall,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("Small, Street",   18,
+
+            LocationPartID.settlementSmall,
+            LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
+
+         new TourLocationProfile("Small, Street, State",   18,
+
+            LocationPartID.settlementSmall,
+            LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
+            LocationPartID.state),
+
+         new TourLocationProfile("State, Large, Name",   18,
+
+            LocationPartID.state,
+            LocationPartID.settlementLarge,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("State, Large, Name, Suburb",   18,
+
+            LocationPartID.state,
+            LocationPartID.settlementLarge,
+            LocationPartID.suburb,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("State, Small, Name",   18,
+
+            LocationPartID.state,
+            LocationPartID.settlementSmall,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("Street + House #",   18,
+
+            LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
+
+         new TourLocationProfile("Street, Large",   18,
+
+            LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
+            LocationPartID.settlementLarge),
+
+         new TourLocationProfile("Street, Village",   18,
+
+            LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
+            LocationPartID.village),
+
+         new TourLocationProfile("Suburb, Neighbourhood",   18,
+
+            LocationPartID.suburb,
+            LocationPartID.neighbourhood)
 
 // SET_FORMATTING_ON
 
       };
 
       _allLocationProfiles.addAll(Arrays.asList(allProfiles));
-
-      _defaultProfile = allProfiles[6];
    }
 
    /**
     * Generate Java code to easily define the default profiles
     */
    public static void createDefaultProfiles_JavaCode() {
+
+      // sort profiles by name
+      Collections.sort(_allLocationProfiles);
 
       final StringBuilder sb = new StringBuilder();
 
@@ -1725,6 +1808,36 @@ public class TourLocationManager {
    public static void restoreState() {
 
       xmlRead_Profiles();
+
+      int numProfiles = _allLocationProfiles.size();
+
+      if (numProfiles == 0) {
+
+         // ensure that profiles are available
+
+         createDefaultProfiles();
+
+         numProfiles = _allLocationProfiles.size();
+      }
+
+      for (int profileIndex = 0; profileIndex < numProfiles; profileIndex++) {
+
+         final TourLocationProfile profile = _allLocationProfiles.get(profileIndex);
+         final List<LocationPartID> allParts = profile.allParts;
+
+         // set default default profile
+         if (allParts.size() == 1 && allParts.get(0).equals(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER)) {
+
+            _defaultProfile = profile;
+            
+            break;
+         }
+      }
+
+      if (_defaultProfile == null && numProfiles > 0) {
+
+         _defaultProfile = _allLocationProfiles.get(0);
+      }
    }
 
    public static void saveState() {
