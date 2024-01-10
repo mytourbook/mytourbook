@@ -17,11 +17,13 @@ package net.tourbook.tour;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -68,22 +70,20 @@ public class ActionTourLocation extends ContributionItem {
     * This set is used to prevent duplicated action names
     */
    private static final Set<String>       _usedDisplayNames = new HashSet<>();
-
+   //
    private boolean                        _isStartLocation;
-
    private boolean                        _hasLocationData;
-
+   //
    private Action                         _actionProfileTitle;
    private ActionLocationPart             _actionLocationPart;
    private ActionSlideoutLocationProfiles _actionSlideoutLocationProfiles;
-   private ActionRetrieveLocationAgain    _actionRetrieveLocationAgain;
-
+   //
    private SlideoutLocationProfiles       _slideoutLocationProfiles;
-
+   //
    private ITourLocationConsumer          _tourLocationConsumer;
-
+   //
    private TourData                       _tourData;
-
+   //
    /*
     * UI controls
     */
@@ -91,11 +91,29 @@ public class ActionTourLocation extends ContributionItem {
    private Image    _actionImage_Download_Disabled;
    private Image    _actionImage_Options;
    private Image    _actionImage_Options_Disabled;
-
+   //
    private Menu     _contextMenu;
-
+   //
    private ToolBar  _toolbar;
+   //
    private ToolItem _toolItem;
+
+   public class ActionData {
+
+      TourLocationProfile locationProfile;
+      String              locationName;
+      boolean             isDefaultProfile;
+
+      public ActionData(final TourLocationProfile locationProfile,
+                        final String locationName,
+                        final boolean isDefaultProfile) {
+
+         this.locationProfile = locationProfile;
+         this.locationName = locationName;
+         this.isDefaultProfile = isDefaultProfile;
+      }
+
+   }
 
    private class ActionLocationPart extends SubMenu {
 
@@ -147,22 +165,6 @@ public class ActionTourLocation extends ContributionItem {
       public void run() {
 
          actionSetTourLocation(_locationProfile);
-      }
-   }
-
-   private class ActionRetrieveLocationAgain extends Action {
-
-      public ActionRetrieveLocationAgain() {
-
-         super(Messages.Tour_Location_Action_DeleteAndReapply);
-
-         setToolTipText(Messages.Tour_Location_Action_DeleteAndReapply_Tooltip);
-      }
-
-      @Override
-      public void run() {
-
-         actionRetrieveLocationAgain();
       }
    }
 
@@ -264,23 +266,6 @@ public class ActionTourLocation extends ContributionItem {
       _slideoutLocationProfiles.open(false);
    }
 
-   private void actionRetrieveLocationAgain() {
-
-      // delete old location values
-      if (_isStartLocation) {
-
-         _tourData.tourLocationData_Start = null;
-         _tourData.setTourLocationStart(null);
-
-      } else {
-
-         _tourData.tourLocationData_End = null;
-         _tourData.setTourLocationEnd(null);
-      }
-
-      downloadAndSetLocationData();
-   }
-
    private void actionSetTourLocation(final String locationLabel) {
 
       if (_isStartLocation) {
@@ -375,7 +360,6 @@ public class ActionTourLocation extends ContributionItem {
 
       _actionLocationPart = new ActionLocationPart();
 
-      _actionRetrieveLocationAgain = new ActionRetrieveLocationAgain();
       _actionSlideoutLocationProfiles = new ActionSlideoutLocationProfiles();
    }
 
@@ -470,9 +454,6 @@ public class ActionTourLocation extends ContributionItem {
       fillMenu_AllProfileActions(menuMgr);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionRetrieveLocationAgain);
-
-      menuMgr.add(new Separator());
       menuMgr.add(_actionSlideoutLocationProfiles);
    }
 
@@ -504,6 +485,8 @@ public class ActionTourLocation extends ContributionItem {
                                            final List<TourLocationProfile> allProfiles,
                                            final TourLocationProfile defaultProfile) {
 
+      final Map<String, ActionData> allUnsortedActions = new HashMap<>();
+
       _usedDisplayNames.clear();
 
       // create actions for each profile
@@ -521,8 +504,20 @@ public class ActionTourLocation extends ContributionItem {
 
             _usedDisplayNames.add(locationName);
 
-            menuMgr.add(new ActionLocationProfile(locationProfile, locationName, isDefaultProfile));
+            allUnsortedActions.put(locationName, new ActionData(locationProfile, locationName, isDefaultProfile));
          }
+      }
+
+      // sort actions by name
+      final Map<String, ActionData> allSortedActions = new TreeMap<>(allUnsortedActions);
+
+      for (final ActionData actionData : allSortedActions.values()) {
+
+         menuMgr.add(new ActionLocationProfile(
+
+               actionData.locationProfile,
+               actionData.locationName,
+               actionData.isDefaultProfile));
       }
    }
 
