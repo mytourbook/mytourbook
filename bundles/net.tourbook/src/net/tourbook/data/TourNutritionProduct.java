@@ -32,10 +32,6 @@ import net.tourbook.nutrition.openfoodfacts.Product;
 @Entity
 public class TourNutritionProduct {
 
-   //todo fb implement swt.del on the table
-   // fluidContainerName
-   // fluidContainerCapacity
-   // fluidQuantityConsumed
    /**
     * manually created marker or imported marker create a unique id to identify them, saved marker
     * are compared with the marker id
@@ -58,22 +54,32 @@ public class TourNutritionProduct {
    @ManyToOne(optional = false)
    private TourData                   tourData;
 
+   /**
+    * The name of the product
+    */
    private String                     name;
 
    /**
-    * Calories per serving
+    * Calories per serving.
     * Unit: kcal
     */
    private int                        calories;
 
    /**
-    * Sodium amount per serving
+    * Sodium amount per serving.
     * Unit: mg
     */
    private float                      sodium;
 
+   /**
+    * The number of servings consumed of the product.
+    */
    private float                      servingsConsumed;
 
+   /**
+    * Indicates if the nutrition product is a beverage itself or used in a
+    * beverage.
+    */
    private boolean                    isBeverage;
 
    @ManyToOne

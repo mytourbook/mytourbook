@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.beans.PropertyChangeEvent;
@@ -693,6 +694,14 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       _productsViewer.setLabelProvider(new ViewLabelProvider());
 
       _productsViewer.addSelectionChangedListener(selectionChangedEvent -> onTableSelectionChanged(selectionChangedEvent));
+
+      _productsViewer.getTable().addKeyListener(keyPressedAdapter(keyEvent -> {
+
+         if (keyEvent.keyCode == SWT.DEL && _btnDeleteProduct.isEnabled()) {
+            onDeleteProducts();
+         }
+
+      }));
    }
 
    private void createUI_Section_10_Summary(final Composite parent) {
