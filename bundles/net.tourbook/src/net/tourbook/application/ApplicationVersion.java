@@ -27,8 +27,8 @@ public class ApplicationVersion {
    static final String SPLASH_COPYRIGHT_YEAR = "2024"; //$NON-NLS-1$
 
 // X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-   private static final String DEVELOPMENT_VERSION_TEXT = "DEV";          // UI.EMPTY_STRING;
-   private static final String DEV_WINDOW_TITLE         = "TITLE";        // UI.EMPTY_STRING;
+   private static final String DEVELOPMENT_VERSION_TEXT = "DEV";          //$NON-NLS-1$
+   private static final String DEV_WINDOW_TITLE         = UI.EMPTY_STRING;
    private static String       _subVersion              = UI.EMPTY_STRING;
 
 //// X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X

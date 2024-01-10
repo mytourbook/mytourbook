@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -6260,23 +6260,25 @@ public class TourManager {
    public void tourDoubleClickAction(final ITourProvider tourProvider,
                                      final TourDoubleClickState tourDoubleClickState) {
 
-      ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
-      if (selectedTours.isEmpty()) {
+      ArrayList<TourData> allSelectedTours = tourProvider.getSelectedTours();
+      if (allSelectedTours.isEmpty()) {
 
-         if (tourProvider instanceof ITourProviderAll) {
-            final ITourProviderAll allTourProvider = (ITourProviderAll) tourProvider;
-            selectedTours = allTourProvider.getAllSelectedTours();
+         if (tourProvider instanceof final ITourProviderAll allTourProvider) {
 
-            if (selectedTours.isEmpty()) {
+            allSelectedTours = allTourProvider.getAllSelectedTours();
+
+            if (allSelectedTours.isEmpty()) {
                return;
             }
+
          } else {
+
             return;
          }
       }
 
       final String action = _prefStore.getString(ITourbookPreferences.VIEW_DOUBLE_CLICK_ACTIONS);
-      final TourData firstTour = selectedTours.get(0);
+      final TourData firstTour = allSelectedTours.get(0);
 
       String actionInfo = null;
 
@@ -6330,7 +6332,11 @@ public class TourManager {
          // default is quick edit
 
          if (tourDoubleClickState.canQuickEditTour) {
+
+            ActionEditQuick.setTourLocationFocus(tourDoubleClickState.tourLocationFocus);
+
             ActionEditQuick.doAction(tourProvider);
+
          } else {
             actionInfo = Messages.PrefPage_ViewActions_Label_DoubleClick_QuickEdit;
          }

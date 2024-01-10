@@ -114,6 +114,10 @@ public abstract class TableColumnFactory {
 
    public static final TableColumnFactory LOCATION_DATA_ID;
    public static final String             LOCATION_DATA_ID_ID                                = "LOCATION_DATA_ID_ID";                             //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_DATA_APPLIED_NAME;
+   public static final String             LOCATION_DATA_APPLIED_NAME_ID                      = "LOCATION_DATA_APPLIED_NAME_ID";                   //$NON-NLS-1$
+   public static final TableColumnFactory LOCATION_DATA_LAST_MODIFIED;
+   public static final String             LOCATION_DATA_LAST_MODIFIED_ID                     = "LOCATION_DATA_LAST_MODIFIED_ID";                  //$NON-NLS-1$
    public static final TableColumnFactory LOCATION_GEO_BOUNDING_BOX_HEIGHT;
    public static final String             LOCATION_GEO_BOUNDING_BOX_HEIGHT_ID                = "LOCATION_GEO_BOUNDING_BOX_HEIGHT_ID";             //$NON-NLS-1$
    public static final TableColumnFactory LOCATION_GEO_BOUNDING_BOX_WIDTH;
@@ -1606,6 +1610,46 @@ public abstract class TableColumnFactory {
          }
       };
 
+      LOCATION_DATA_APPLIED_NAME = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_DATA_APPLIED_NAME_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_AddressName);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Data_AppliedName_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Data_AppliedName_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Data_AppliedName_Label);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      LOCATION_DATA_LAST_MODIFIED = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, LOCATION_DATA_LAST_MODIFIED_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Data);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Location_Data_LastModified_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Data_LastModified_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Data_LastModified_Label);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
       LOCATION_GEO_BOUNDING_BOX_WIDTH = new TableColumnFactory() {
 
          @Override
@@ -1660,7 +1704,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Location_Geo_IsResizedBoundingBox_Label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Location_Geo_IsResizedBoundingBox_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_IsResizedBoundingBox_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Location_Geo_IsResizedBoundingBox_Label);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(4));
 

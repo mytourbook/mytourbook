@@ -13,6 +13,8 @@ package net.tourbook.common.util;
 
 import java.util.HashMap;
 
+import net.tourbook.common.UI;
+
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
@@ -79,6 +81,8 @@ public abstract class ToolTip {
 
    private boolean                     _isHideOnMouseMove;
 
+   public boolean                      _isMouseHovered;
+
    private class TooltipHideListener implements Listener {
 
       @Override
@@ -88,6 +92,8 @@ public abstract class ToolTip {
 
             final Control c = (Control) event.widget;
             final Shell shell = c.getShell();
+
+            _isMouseHovered = true;
 
             switch (event.type) {
             case SWT.MouseMove:
@@ -117,19 +123,24 @@ public abstract class ToolTip {
                 * sometime not be poped up again and the i-icons is not deaktivated<br>
                 * wolfgang 2010-07-23
                 */
-               final Rectangle rect = shell.getBounds();
+               final Rectangle shellRectangle = shell.getBounds();
+               
 //					rect.x += 5;
 //					rect.y += 5;
 //					rect.width -= 10;
 //					rect.height -= 10;
+               
                final int margin = 1;
-               rect.x += margin;
-               rect.y += margin;
-               rect.width -= 2 * margin;
-               rect.height -= 2 * margin;
+               shellRectangle.x += margin;
+               shellRectangle.y += margin;
+               shellRectangle.width -= 2 * margin;
+               shellRectangle.height -= 2 * margin;
 
                final Point cursorLocation = c.getDisplay().getCursorLocation();
-               if (!rect.contains(cursorLocation)) {
+               if (shellRectangle.contains(cursorLocation) == false) {
+
+                  _isMouseHovered = false;
+
                   toolTipHide(shell, event);
                }
 
@@ -189,6 +200,7 @@ public abstract class ToolTip {
     *           style passed to control tooltip behavior
     * @param manualActivation
     *           <code>true</code> if the activation is done manually using {@link #show(Point)}
+    *
     * @see #RECREATE
     * @see #NO_RECREATE
     */
@@ -211,6 +223,7 @@ public abstract class ToolTip {
       });
 
       this.listener = new ToolTipOwnerControlListener();
+
       this.shellListener = new Listener() {
          @Override
          public void handleEvent(final Event event) {
@@ -221,20 +234,19 @@ public abstract class ToolTip {
                return;
             }
 
-            ttControl.getDisplay()
-                  .asyncExec(() -> {
+            ttControl.getDisplay().asyncExec(() -> {
 
-                     // check again, NPE has occured during debugging
+               // check again, NPE has occured during debugging
 
-                     if (ttControl == null || ttControl.isDisposed()) {
-                        return;
-                     }
+               if (ttControl == null || ttControl.isDisposed()) {
+                  return;
+               }
 
-                     // Check if the new active shell is the tooltip itself
-                     if (ttControl.getDisplay().getActiveShell() != _tooltipShell) {
-                        toolTipHide(_tooltipShell, event);
-                     }
-                  });
+               // Check if the new active shell is the tooltip itself
+               if (ttControl.getDisplay().getActiveShell() != _tooltipShell) {
+                  toolTipHide(_tooltipShell, event);
+               }
+            });
          }
       };
 
@@ -278,6 +290,7 @@ public abstract class ToolTip {
     *           the event that triggered the activation of the tooltip
     * @param parent
     *           the parent of the content area
+    *
     * @return the content area created
     */
    protected abstract Composite createToolTipContentArea(Event event, Composite parent);
@@ -346,6 +359,7 @@ public abstract class ToolTip {
     * @param tipSize
     * @param ttTopLeft
     *           Top/left location for the hovered area relativ to the display
+    *
     * @return
     */
    protected Point fixupDisplayBoundsWithMonitor(final Point tipSize, final Point ttTopLeft) {
@@ -404,6 +418,7 @@ public abstract class ToolTip {
     *
     * @param key
     *           the key
+    *
     * @return data or <code>null</code> if no entry is restored under the key
     */
    public Object getData(final String key) {
@@ -421,6 +436,7 @@ public abstract class ToolTip {
     *           the size of the tooltip to be shown
     * @param event
     *           the event triggered showing the tooltip
+    *
     * @return the absolute position on the display
     */
    public Point getLocation(final Point tipSize, final Event event) {
@@ -447,6 +463,7 @@ public abstract class ToolTip {
     *
     * @param event
     *           the event
+    *
     * @return the area responsible for the tooltip creation or <code>null</code> this could be any
     *         object describing the area (e.g. the {@link Control} onto which the tooltip is bound
     *         to, a part of this area e.g. for {@link ColumnViewer} this could be a
@@ -474,6 +491,14 @@ public abstract class ToolTip {
 
    public boolean isHideOnMouseMove() {
       return _isHideOnMouseMove;
+   }
+
+   /**
+    * @return Returns <code>true</code> when was hovered with the mouse
+    */
+   public boolean isMouseHovered() {
+
+      return _isMouseHovered;
    }
 
    /**
@@ -626,6 +651,7 @@ public abstract class ToolTip {
     *
     * @param event
     *           the event
+    *
     * @return <code>true</code> if tooltip should be displayed
     */
    protected boolean shouldCreateToolTip(final Event event) {
@@ -657,6 +683,7 @@ public abstract class ToolTip {
     *
     * @param event
     *           the event trying to hide the tooltip
+    *
     * @return <code>true</code> if the tooltip should be hidden
     */
    private boolean shouldHideToolTip(final Event event) {
@@ -678,7 +705,7 @@ public abstract class ToolTip {
 
          final boolean isInCurrentArea = tmp.equals(currentArea);
 
-         return !isInCurrentArea;
+         return isInCurrentArea == false;
       }
 
       return true;

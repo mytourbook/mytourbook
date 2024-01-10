@@ -1,0 +1,130 @@
+24.1.0                                                 ?. January 2024
+
+
+TODO's
+======               
+
+* !!!!!!!! Update contributors !!!!!!!!!
+  https://mytourbook.sourceforge.io/mytourbook/index.php/contributors
+
+
+New
+===
+
+* Splashscreen (Barbara / Frederic)
+  https://github.com/mytourbook/mytourbook/discussions/1215#discussioncomment-7961052
+
+* Start/End Location
+  - Import: Automatic completion of start and end location fields
+    https://github.com/mytourbook/mytourbook/issues/878
+  - Show/modify start/end location in
+    - Locations view and location tooltip
+    - Tour Book view location tooltip
+    - 2D Map
+    - Tour info tooltip
+    - Quick tour editor
+    - Tour editor
+    
+  RECOMMENDATION how to use and speedup tour location retrieval to avoid hundreds or more duplicates
+  - Retrieve and set some locations where you often start/stop your tour, e.g. you at home
+  - Combine duplicated locations with the "One" action in the "Locations" view context menu
+  - Resize (increase) location bounding box (action in context menu) to include similar locations when they are looked up
+  - Retrieve all other locations
+
+* All Tour Markers View (Frederic)
+  - Added the ability to delete markers
+
+* Fulltext search
+  - Added action to rebuild a corrupted fulltext search index
+    https://github.com/mytourbook/mytourbook/issues/1232
+
+* Tour Blog View (Frederic)
+  - Show tour tag images and information
+    https://github.com/mytourbook/mytourbook/issues/1026
+
+
+Improvements
+============
+
+* Fit Export (Frederic)
+  - Added the pause types
+
+* 2D Map
+  - Sync map with tour locations
+
+* Tour Blog (Frederic)
+  -Improved the detection of http links in the tour description to make them clickable by using a third party library
+    https://github.com/URL-Detector/URL-Detector
+    https://github.com/mytourbook/mytourbook/issues/1102
+
+* Tour Info
+  - Show air quality value with its assigned color
+    https://github.com/mytourbook/mytourbook/issues/1223
+
+* Quick Tour Editor
+  - Resize height of the weather description field
+    https://github.com/mytourbook/mytourbook/issues/1219
+
+* Tour Editor
+  - Make the use of the scroll wheel optional
+    https://github.com/mytourbook/mytourbook/issues/1200
+
+* Tour Log View
+  - Customize when this view is opened automatically, exceptions will always show this view
+    https://github.com/mytourbook/mytourbook/issues/1222 
+    https://github.com/mytourbook/mytourbook/discussions/1210
+        
+  
+Changes
+=======
+
+* Import
+  - "Open tour log view when starting a tour import" in the import preferences dialog is removed, now it can be set in the tour log view
+    https://github.com/mytourbook/mytourbook/issues/1222
+
+* Tour Search
+  - The options dialog can be opened only by clicking on its action button but not anymore when its hovered
+    https://github.com/mytourbook/mytourbook/issues/1224
+  
+* Tour Editor
+  - Tour save/restore actions are moved from the app toolbar into the tour editor toolbar
+    https://github.com/mytourbook/mytourbook/issues/1201
+
+* Tour Concatenation (Frederic)
+  - The weather data is deleted from the concatenated tour
+
+
+Bugfix
+======
+
+* All Tour Markers
+  - Update view when tours are deleted
+
+* Air Quality (Frederic)
+  - The air quality texts were saved using the translated texts instead of a unique id.
+    https://github.com/mytourbook/mytourbook/issues/1193
+
+* Slideout Calendar Profiles (Frederic)
+  - Fixed a bug when creating new profiles (Linux only)
+    https://github.com/mytourbook/mytourbook/issues/1241
+
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* MyTourbook Milestone 23.10  https://github.com/mytourbook/mytourbook/milestone/13?closed=1
+* Eclipse 2023-06 (4.28)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.28-202306050440/
+* NatTable 2.20               https://www.eclipse.org/nattable/download.php
+* Nebula Widgets              https://download.eclipse.org/nebula/releases/latest
+* FIT SDK 21.120.2            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
+* Java 17                     https://adoptium.net/temurin/releases/?version=17

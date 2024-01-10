@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,6 +36,7 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -287,88 +288,6 @@ public class TourLocationManager {
    }
 
    /**
-    * Append start/end part to the existing start/end places
-    *
-    * @param allTourData
-    * @param partID_Start
-    * @param partID_End
-    * @param isSetStartLocation
-    * @param isSetEndLocation
-    */
-   public static void appendLocationPart(final ArrayList<TourData> allTourData,
-                                         final LocationPartID partID_Start,
-                                         final LocationPartID partID_End,
-                                         final boolean isSetStartLocation,
-                                         final boolean isSetEndLocation) {
-
-      final ArrayList<TourData> modifiedTours = new ArrayList<>();
-
-      for (final TourData tourData : allTourData) {
-
-         final TourLocation tourLocationStart = tourData.getTourLocationStart();
-         final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
-
-         String startPart = null;
-         String endPart = null;
-
-         final boolean isStartLocationAvailable = tourLocationStart != null;
-         final boolean isEndLocationAvailable = tourLocationEnd != null;
-
-         if (isStartLocationAvailable) {
-            startPart = tourLocationStart.getPartValue(partID_Start);
-         }
-
-         if (isEndLocationAvailable) {
-            endPart = tourLocationEnd.getPartValue(partID_End);
-         }
-
-         boolean isModified = false;
-
-         if (isSetStartLocation && startPart != null) {
-
-            String tourStartPlace = tourData.getTourStartPlace();
-
-            if (tourStartPlace.length() > 0) {
-
-               tourStartPlace += UI.COMMA_SPACE;
-            }
-
-            tourStartPlace += startPart;
-
-            tourData.setTourStartPlace(tourStartPlace);
-
-            isModified = true;
-         }
-
-         if (isSetEndLocation && endPart != null) {
-
-            String tourEndPlace = tourData.getTourEndPlace();
-
-            if (tourEndPlace.length() > 0) {
-
-               tourEndPlace += UI.COMMA_SPACE;
-            }
-
-            tourEndPlace += endPart;
-
-            tourData.setTourEndPlace(tourEndPlace);
-
-            isModified = true;
-         }
-
-         if (isModified) {
-
-            modifiedTours.add(tourData);
-         }
-      }
-
-      if (modifiedTours.size() > 0) {
-
-         TourManager.saveModifiedTours(modifiedTours);
-      }
-   }
-
-   /**
     * Append text to the display name in {@link #_displayNameBuffer} but prevent duplicate part
     * labels
     *
@@ -399,83 +318,173 @@ public class TourLocationManager {
 
 // SET_FORMATTING_OFF
 
-         new TourLocationProfile("0 : Name",   18,
-
-            LocationPartID.OSM_NAME),
-
-         new TourLocationProfile("1 : Street + House #",   18,
-
-            LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
-
-         new TourLocationProfile("A : State",   18,
+         new TourLocationProfile("1 : State",   8,
 
             LocationPartID.state,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("B : City",   10,
+         new TourLocationProfile("2 : City",   10,
 
             LocationPartID.settlementLarge,
             LocationPartID.state,
-            LocationPartID.city,
-            LocationPartID.OSM_NAME),
+            LocationPartID.OSM_NAME,
+            LocationPartID.city),
 
-         new TourLocationProfile("C : Town / Borough",   12,
+         new TourLocationProfile("3 : Town / Borough",   12,
 
             LocationPartID.settlementLarge,
             LocationPartID.OSM_NAME,
             LocationPartID.town),
 
-         new TourLocationProfile("D : Village / Suburb",   13,
+         new TourLocationProfile("4 : Village / Suburb",   13,
 
             LocationPartID.settlementLarge,
             LocationPartID.suburb,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("E : Neighbourhood",   14,
+         new TourLocationProfile("5 : Neighbourhood",   14,
 
             LocationPartID.settlementLarge,
-            LocationPartID.neighbourhood,
-            LocationPartID.OSM_NAME),
+            LocationPartID.OSM_NAME,
+            LocationPartID.neighbourhood),
 
-         new TourLocationProfile("F : Settlement",   15,
-
-            LocationPartID.settlementLarge,
-            LocationPartID.settlementSmall,
-            LocationPartID.OSM_NAME),
-
-         new TourLocationProfile("G : Major Street",   16,
+         new TourLocationProfile("6 : Settlement",   15,
 
             LocationPartID.settlementLarge,
             LocationPartID.settlementSmall,
-            LocationPartID.road,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("H : Minor Street",   17,
+         new TourLocationProfile("7 : Major Street",   16,
 
             LocationPartID.settlementLarge,
             LocationPartID.settlementSmall,
             LocationPartID.road,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("I : Building",   18,
+         new TourLocationProfile("8 : Minor Street",   17,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.settlementSmall,
+            LocationPartID.road,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("9 : Building",   18,
 
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
             LocationPartID.settlementSmall,
-            LocationPartID.OSM_NAME)
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("Large",   18,
+
+            LocationPartID.settlementLarge),
+
+         new TourLocationProfile("Large, Name",   18,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("Large, Name, Town",   18,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.OSM_NAME,
+            LocationPartID.town),
+
+         new TourLocationProfile("Large, Small",   18,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.settlementSmall),
+
+         new TourLocationProfile("Large, Street",   18,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
+
+         new TourLocationProfile("Large, Suburb",   18,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.suburb),
+
+         new TourLocationProfile("Large, Village",   18,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.village),
+
+         new TourLocationProfile("Name",   18,
+
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("Small",   18,
+
+            LocationPartID.settlementSmall),
+
+         new TourLocationProfile("Small, Name",   18,
+
+            LocationPartID.settlementSmall,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("Small, Street",   18,
+
+            LocationPartID.settlementSmall,
+            LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
+
+         new TourLocationProfile("Small, Street, State",   18,
+
+            LocationPartID.settlementSmall,
+            LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
+            LocationPartID.state),
+
+         new TourLocationProfile("State, Large, Name",   18,
+
+            LocationPartID.state,
+            LocationPartID.settlementLarge,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("State, Large, Name, Suburb",   18,
+
+            LocationPartID.state,
+            LocationPartID.settlementLarge,
+            LocationPartID.suburb,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("State, Small, Name",   18,
+
+            LocationPartID.state,
+            LocationPartID.settlementSmall,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("Street + House #",   18,
+
+            LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
+
+         new TourLocationProfile("Street, Large",   18,
+
+            LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
+            LocationPartID.settlementLarge),
+
+         new TourLocationProfile("Street, Village",   18,
+
+            LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
+            LocationPartID.village),
+
+         new TourLocationProfile("Suburb, Neighbourhood",   18,
+
+            LocationPartID.suburb,
+            LocationPartID.neighbourhood)
 
 // SET_FORMATTING_ON
 
       };
 
       _allLocationProfiles.addAll(Arrays.asList(allProfiles));
-
-      _defaultProfile = allProfiles[4];
    }
 
    /**
     * Generate Java code to easily define the default profiles
     */
    public static void createDefaultProfiles_JavaCode() {
+
+      // sort profiles by name
+      Collections.sort(_allLocationProfiles);
 
       final StringBuilder sb = new StringBuilder();
 
@@ -831,12 +840,12 @@ public class TourLocationManager {
     * Firstly the locations are deleted and the contained tours are retrieved again
     *
     * @param allLocations
-    * @param isSkipFirstLocation
+    * @param isOneAction
     *
     * @return
     */
    public static boolean deleteAndReapply(final List<TourLocation> allLocations,
-                                          final boolean isSkipFirstLocation) {
+                                          final boolean isOneAction) {
 
       // ensure that a tour is NOT modified in the tour editor
       if (TourManager.isTourEditorModified()) {
@@ -849,8 +858,9 @@ public class TourLocationManager {
       }
 
       List<TourLocation> allDelReapplyLocations;
+      TourLocation oneActionLocation = null;
 
-      if (isSkipFirstLocation) {
+      if (isOneAction) {
 
          final int numLocations = allLocations.size();
 
@@ -863,6 +873,8 @@ public class TourLocationManager {
 
          allDelReapplyLocations = allLocations.subList(1, numLocations);
 
+         oneActionLocation = allLocations.get(0);
+
       } else {
 
          allDelReapplyLocations = allLocations;
@@ -871,7 +883,7 @@ public class TourLocationManager {
       // get all tour IDs before locations are deleted !!!
       final ArrayList<Long> allTourIds = getToursWithLocations(allDelReapplyLocations);
 
-      if (deleteTourLocations(allDelReapplyLocations) == false) {
+      if (deleteTourLocations(allDelReapplyLocations, isOneAction) == false) {
          return false;
       }
 
@@ -886,18 +898,19 @@ public class TourLocationManager {
             true, // is set start
             true, // is set end
 
-            true // isForceReloadLocation
-      );
+            true, // isOneAction
+            oneActionLocation);
 
       return true;
    }
 
    /**
     * @param allLocations
+    * @param isOneAction
     *
     * @return Returns <code>true</code> when tour locations were deleted
     */
-   public static boolean deleteTourLocations(final List<TourLocation> allLocations) {
+   public static boolean deleteTourLocations(final List<TourLocation> allLocations, final boolean isOneAction) {
 
       // ensure that a tour is NOT modified in the tour editor
       if (TourManager.isTourEditorModified()) {
@@ -955,7 +968,7 @@ public class TourLocationManager {
 
          BusyIndicator.showWhile(display, () -> {
 
-            if (deleteTourLocations_10(allLocations)) {
+            if (deleteTourLocations_10(allLocations, isOneAction)) {
 
                TourManager.getInstance().clearTourDataCache();
 
@@ -967,9 +980,22 @@ public class TourLocationManager {
       return returnValue[0];
    }
 
-   private static boolean deleteTourLocations_10(final List<TourLocation> allLocations) {
+   private static boolean deleteTourLocations_10(final List<TourLocation> allLocations, final boolean isOneAction) {
 
       boolean returnResult = false;
+
+      String sqlTourStartPlace = UI.EMPTY_STRING;
+      String sqlTourEndPlace = UI.EMPTY_STRING;
+
+      if (isOneAction) {
+
+         // don't remove start/end location text
+
+      } else {
+
+         sqlTourStartPlace = " tourStartPlace    = NULL,"; //$NON-NLS-1$
+         sqlTourEndPlace = " tourEndPlace       = NULL,"; //$NON-NLS-1$
+      }
 
       PreparedStatement prepStmt_TourData_Start = null;
       PreparedStatement prepStmt_TourData_End = null;
@@ -984,7 +1010,7 @@ public class TourLocationManager {
 
                + "SET" + NL //                                             //$NON-NLS-1$
 
-               + " tourStartPlace               = NULL," + NL //           //$NON-NLS-1$
+               + sqlTourStartPlace + NL //
                + " tourLocationStart_LocationID = NULL" + NL //            //$NON-NLS-1$
 
                + "WHERE tourLocationStart_LocationID = ?" + NL //       1  //$NON-NLS-1$
@@ -996,7 +1022,7 @@ public class TourLocationManager {
 
                + "SET" + NL //                                             //$NON-NLS-1$
 
-               + " tourEndPlace               = NULL," + NL //             //$NON-NLS-1$
+               + sqlTourEndPlace + NL //
                + " tourLocationEnd_LocationID = NULL" + NL //              //$NON-NLS-1$
 
                + "WHERE tourLocationEnd_LocationID = ?" + NL //         1  //$NON-NLS-1$
@@ -1530,6 +1556,152 @@ public class TourLocationManager {
       return false;
    }
 
+   /**
+    * Append start/end part to the existing start/end places
+    *
+    * @param allTourData
+    * @param partID_Start
+    * @param partID_End
+    * @param isSetStartLocation
+    * @param isSetEndLocation
+    */
+   public static void locationPart_Append(final ArrayList<TourData> allTourData,
+                                          final LocationPartID partID_Start,
+                                          final LocationPartID partID_End,
+                                          final boolean isSetStartLocation,
+                                          final boolean isSetEndLocation) {
+
+      final ArrayList<TourData> modifiedTours = new ArrayList<>();
+
+      for (final TourData tourData : allTourData) {
+
+         final TourLocation tourLocationStart = tourData.getTourLocationStart();
+         final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
+
+         String startPart = null;
+         String endPart = null;
+
+         final boolean isStartLocationAvailable = tourLocationStart != null;
+         final boolean isEndLocationAvailable = tourLocationEnd != null;
+
+         if (isStartLocationAvailable) {
+            startPart = tourLocationStart.getPartValue(partID_Start);
+         }
+
+         if (isEndLocationAvailable) {
+            endPart = tourLocationEnd.getPartValue(partID_End);
+         }
+
+         boolean isModified = false;
+
+         if (isSetStartLocation && startPart != null) {
+
+            String tourStartPlace = tourData.getTourStartPlace();
+
+            if (tourStartPlace.length() > 0) {
+
+               tourStartPlace += UI.COMMA_SPACE;
+            }
+
+            tourStartPlace += startPart;
+
+            tourData.setTourStartPlace(tourStartPlace);
+
+            isModified = true;
+         }
+
+         if (isSetEndLocation && endPart != null) {
+
+            String tourEndPlace = tourData.getTourEndPlace();
+
+            if (tourEndPlace.length() > 0) {
+
+               tourEndPlace += UI.COMMA_SPACE;
+            }
+
+            tourEndPlace += endPart;
+
+            tourData.setTourEndPlace(tourEndPlace);
+
+            isModified = true;
+         }
+
+         if (isModified) {
+
+            modifiedTours.add(tourData);
+         }
+      }
+
+      if (modifiedTours.size() > 0) {
+
+         TourManager.saveModifiedTours(modifiedTours);
+      }
+   }
+
+   /**
+    * Overwrite existing start/end tour locations
+    *
+    * @param allTourData
+    * @param partID_Start
+    * @param partID_End
+    * @param isSetStartLocation
+    * @param isSetEndLocation
+    */
+   public static void locationPart_Set(final ArrayList<TourData> allTourData,
+                                       final LocationPartID partID_Start,
+                                       final LocationPartID partID_End,
+                                       final boolean isSetStartLocation,
+                                       final boolean isSetEndLocation) {
+
+      final ArrayList<TourData> modifiedTours = new ArrayList<>();
+
+      for (final TourData tourData : allTourData) {
+
+         final TourLocation tourLocationStart = tourData.getTourLocationStart();
+         final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
+
+         String startPart = null;
+         String endPart = null;
+
+         final boolean isStartLocationAvailable = tourLocationStart != null;
+         final boolean isEndLocationAvailable = tourLocationEnd != null;
+
+         if (isStartLocationAvailable) {
+            startPart = tourLocationStart.getPartValue(partID_Start);
+         }
+
+         if (isEndLocationAvailable) {
+            endPart = tourLocationEnd.getPartValue(partID_End);
+         }
+
+         boolean isModified = false;
+
+         if (isSetStartLocation && startPart != null) {
+
+            tourData.setTourStartPlace(startPart);
+
+            isModified = true;
+         }
+
+         if (isSetEndLocation && endPart != null) {
+
+            tourData.setTourEndPlace(endPart);
+
+            isModified = true;
+         }
+
+         if (isModified) {
+
+            modifiedTours.add(tourData);
+         }
+      }
+
+      if (modifiedTours.size() > 0) {
+
+         TourManager.saveModifiedTours(modifiedTours);
+      }
+   }
+
    private static void logError(final String exceptionMessage) {
 
       TourLogManager.log_ERROR(NLS.bind(
@@ -1636,6 +1808,36 @@ public class TourLocationManager {
    public static void restoreState() {
 
       xmlRead_Profiles();
+
+      int numProfiles = _allLocationProfiles.size();
+
+      if (numProfiles == 0) {
+
+         // ensure that profiles are available
+
+         createDefaultProfiles();
+
+         numProfiles = _allLocationProfiles.size();
+      }
+
+      for (int profileIndex = 0; profileIndex < numProfiles; profileIndex++) {
+
+         final TourLocationProfile profile = _allLocationProfiles.get(profileIndex);
+         final List<LocationPartID> allParts = profile.allParts;
+
+         // set default default profile
+         if (allParts.size() == 1 && allParts.get(0).equals(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER)) {
+
+            _defaultProfile = profile;
+            
+            break;
+         }
+      }
+
+      if (_defaultProfile == null && numProfiles > 0) {
+
+         _defaultProfile = _allLocationProfiles.get(0);
+      }
    }
 
    public static void saveState() {
@@ -1649,6 +1851,86 @@ public class TourLocationManager {
    static void setDefaultProfile(final TourLocationProfile defaultProfile) {
 
       _defaultProfile = defaultProfile;
+   }
+
+   /**
+    * Set location text into the tour start/end location fields for all tours which have the tour
+    * location
+    *
+    * @param label
+    * @param tourLocation
+    */
+   public static void setLocationIntoTour(final String label, final TourLocation tourLocation) {
+
+      final String locationLabel = validString(label);
+      final long locationId = tourLocation.getLocationId();
+
+      PreparedStatement stmtStart = null;
+      PreparedStatement stmtEnd = null;
+      PreparedStatement stmtLocation = null;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final String sqlStartLocation = UI.EMPTY_STRING
+
+               + "UPDATE " + TourDatabase.TABLE_TOUR_DATA + NL //          //$NON-NLS-1$
+
+               + "SET tourStartPlace = ?" + NL //                       1  //$NON-NLS-1$
+
+               + "WHERE tourLocationStart_LocationID = ?" + NL //       2  //$NON-NLS-1$
+         ;
+
+         final String sqlEndLocation = UI.EMPTY_STRING
+
+               + "UPDATE " + TourDatabase.TABLE_TOUR_DATA + NL //          //$NON-NLS-1$
+
+               + "SET tourEndPlace = ?" + NL //                         1  //$NON-NLS-1$
+
+               + "WHERE tourLocationEnd_LocationID = ?" + NL //         2  //$NON-NLS-1$
+         ;
+
+         final String sqlLocation = UI.EMPTY_STRING
+
+               + "UPDATE " + TourDatabase.TABLE_TOUR_LOCATION + NL //      //$NON-NLS-1$
+
+               + "SET " //                                                 //$NON-NLS-1$
+               + " appliedName  = ?," + NL //                           1  //$NON-NLS-1$
+               + " lastModified = ?" + NL //                            2  //$NON-NLS-1$
+
+               + "WHERE LocationID = ?" + NL //                         3  //$NON-NLS-1$
+         ;
+
+// SET_FORMATTING_OFF
+
+         stmtStart = conn.prepareStatement(sqlStartLocation);
+         stmtStart.setString(          1, locationLabel);
+         stmtStart.setLong(            2, locationId);
+         stmtStart.executeUpdate();
+
+         stmtEnd = conn.prepareStatement(sqlEndLocation);
+         stmtEnd.setString(            1, locationLabel);
+         stmtEnd.setLong(              2, locationId);
+         stmtEnd.executeUpdate();
+
+         // log applied label
+         stmtLocation = conn.prepareStatement(sqlLocation);
+         stmtLocation.setString(       1, locationLabel);
+         stmtLocation.setLong(         2, System.currentTimeMillis());
+         stmtLocation.setLong(         3, locationId);
+         stmtLocation.executeUpdate();
+
+// SET_FORMATTING_ON
+
+      } catch (final SQLException e) {
+
+         UI.showSQLException(e);
+
+      } finally {
+
+         Util.closeSql(stmtStart);
+         Util.closeSql(stmtEnd);
+         Util.closeSql(stmtLocation);
+      }
    }
 
    /**
@@ -1806,17 +2088,23 @@ public class TourLocationManager {
     * @param locationProfile
     * @param isSetStartLocation
     * @param isSetEndLocation
-    * @param isForceReloadLocation
+    * @param isOneAction
     *           When <code>true</code> then existing locations are ignored and retrieved again from
     *           the DB or location provider
+    * @param oneActionLocation
     */
    public static void setTourLocations(final List<TourData> requestedTours,
                                        final TourLocationProfile locationProfile,
+
                                        final boolean isSetStartLocation,
                                        final boolean isSetEndLocation,
-                                       final boolean isForceReloadLocation) {
+
+                                       final boolean isOneAction,
+                                       final TourLocation oneActionLocation) {
 
       final ArrayList<TourData> savedTours = new ArrayList<>();
+
+      final boolean hasOneActionAppliedName = oneActionLocation != null && StringUtils.hasContent(oneActionLocation.appliedName);
 
       try {
 
@@ -1866,10 +2154,18 @@ public class TourLocationManager {
 
                      waitingTime = 0;
 
-                     if (isForceReloadLocation) {
-                        tourData.setTourStartPlace(null);
+                     if (isOneAction) {
+
+                        // overwrite location text, but only when an applied name is available
+                        if (hasOneActionAppliedName) {
+
+                           tourData.setTourStartPlace(oneActionLocation.appliedName);
+                        }
+
                         tourData.setTourLocationStart(null);
                      }
+
+                     String appliedName = null;
 
                      TourLocation tourLocationStart = tourData.getTourLocationStart();
                      if (tourLocationStart == null) {
@@ -1885,14 +2181,27 @@ public class TourLocationManager {
 
                            waitingTime = startLocationData.waitingTime;
                            tourLocationStart = startLocationData.tourLocation;
+
+                           appliedName = tourLocationStart.appliedName;
                         }
                      }
 
                      if (tourLocationStart != null) {
 
-                        final String startLocationText = createLocationDisplayName(tourLocationStart, locationProfile);
+                        // reapply name when available
+                        if (appliedName != null) {
 
-                        tourData.setTourStartPlace(startLocationText);
+                           tourData.setTourStartPlace(appliedName);
+
+                        } else {
+
+                           final String startLocationText = createLocationDisplayName(tourLocationStart, locationProfile);
+
+                           if (isOneAction == false) {
+                              tourData.setTourStartPlace(startLocationText);
+                           }
+                        }
+
                         tourData.setTourLocationStart(tourLocationStart);
 
                         isModified = true;
@@ -1909,10 +2218,18 @@ public class TourLocationManager {
 
                      waitingTime = 0;
 
-                     if (isForceReloadLocation) {
-                        tourData.setTourEndPlace(null);
+                     if (isOneAction) {
+
+                        // overwrite location text, but only when an applied name is available
+                        if (hasOneActionAppliedName) {
+
+                           tourData.setTourEndPlace(oneActionLocation.appliedName);
+                        }
+
                         tourData.setTourLocationEnd(null);
                      }
+
+                     String appliedName = null;
 
                      TourLocation tourLocationEnd = tourData.getTourLocationEnd();
                      if (tourLocationEnd == null) {
@@ -1931,14 +2248,27 @@ public class TourLocationManager {
 
                            waitingTime = endLocationData.waitingTime;
                            tourLocationEnd = endLocationData.tourLocation;
+
+                           appliedName = tourLocationEnd.appliedName;
                         }
                      }
 
                      if (tourLocationEnd != null) {
 
-                        final String endLocationText = createLocationDisplayName(tourLocationEnd, locationProfile);
+                        // reapply name when available
+                        if (appliedName != null) {
 
-                        tourData.setTourEndPlace(endLocationText);
+                           tourData.setTourEndPlace(appliedName);
+
+                        } else {
+
+                           final String endLocationText = createLocationDisplayName(tourLocationEnd, locationProfile);
+
+                           if (isOneAction == false) {
+                              tourData.setTourEndPlace(endLocationText);
+                           }
+                        }
+
                         tourData.setTourLocationEnd(tourLocationEnd);
 
                         isModified = true;

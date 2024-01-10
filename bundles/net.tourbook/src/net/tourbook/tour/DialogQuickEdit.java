@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -140,6 +140,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
    private AutocompleteComboInput _autocomplete_Location_Start;
    private AutocompleteComboInput _autocomplete_Title;
 
+   private Boolean                _tourLocation_HoverState;
+
    private class ActionSlideout_WeatherOptions extends ActionToolbarSlideout {
 
       @Override
@@ -272,6 +274,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
          enableControls();
 
          resoreState();
+
+         setFocus();
       });
 
       return uiContainer;
@@ -1208,10 +1212,40 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
             TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT);
    }
 
+   /**
+    * Set focus when dialog is opened
+    */
+   private void setFocus() {
+
+      if (_tourLocation_HoverState == null) {
+
+         _comboTitle.setFocus();
+
+      } else if (_tourLocation_HoverState) {
+
+         _comboLocation_Start.setFocus();
+
+      } else {
+
+         _comboLocation_End.setFocus();
+      }
+   }
+
    @Override
    public void setTourEndLocation(final String endLocation) {
 
       _comboLocation_End.setText(endLocation);
+   }
+
+   /**
+    * @param tourLocation_HoverState
+    *
+    *           Is <code>true</code> when start location is hovered, <code>false</code> when
+    *           endlocation is hovered, <code>null</code> when a location is not hovered
+    */
+   public void setTourLocationFocus(final Boolean tourLocation_HoverState) {
+
+      _tourLocation_HoverState = tourLocation_HoverState;
    }
 
    @Override

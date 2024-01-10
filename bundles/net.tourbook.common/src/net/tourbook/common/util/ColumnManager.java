@@ -2288,11 +2288,11 @@ public class ColumnManager {
       final ArrayList<String> allColumnIdsAndWidth = new ArrayList<>();
 
 // TODO
-      System.out.println("All columns in _allDefinedColumnDefinitions, number of entries: " + _allDefinedColumnDefinitions.size());
+      System.out.println("All columns in _allDefinedColumnDefinitions, number of entries: " + _allDefinedColumnDefinitions.size()); //$NON-NLS-1$
       System.out.println();
 
       for (final ColumnDefinition colDefLog : _allDefinedColumnDefinitions) {
-         System.out.println("  \"" + colDefLog.getColumnId() + "\"");
+         System.out.println("  \"" + colDefLog.getColumnId() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
       }
 
       System.out.println();

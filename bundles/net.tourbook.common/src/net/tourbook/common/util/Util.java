@@ -3045,15 +3045,23 @@ public class Util {
     * selected
     *
     * @param combo
-    * @param comboItems
+    * @param allItems
     * @param selectedItem
     *           Text which should be selected in the combo box
     */
-   public static void selectTextInCombo(final Combo combo, final String[] comboItems, final String selectedItem) {
+   public static void selectTextInCombo(final Combo combo,
+                                        final List<String> allItems,
+                                        final String selectedItem,
+                                        final int offset) {
+
+      if (selectedItem == null) {
+         return;
+      }
 
       int comboIndex = 0;
 
-      for (final String comboStateValue : comboItems) {
+      for (final String comboStateValue : allItems) {
+
          if (selectedItem.equals(comboStateValue)) {
             break;
          }
@@ -3061,7 +3069,7 @@ public class Util {
          comboIndex++;
       }
 
-      combo.select(comboIndex);
+      combo.select(offset + comboIndex);
    }
 
    /**

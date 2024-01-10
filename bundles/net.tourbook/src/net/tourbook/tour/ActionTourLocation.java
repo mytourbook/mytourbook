@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,22 +15,33 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
+import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.tour.location.ITourLocationConsumer;
+import net.tourbook.tour.location.LocationPartID;
+import net.tourbook.tour.location.PartItem;
 import net.tourbook.tour.location.SlideoutLocationProfiles;
 import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.location.TourLocationProfile;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -55,18 +66,24 @@ public class ActionTourLocation extends ContributionItem {
 
    private static IDialogSettings         _state;
 
+   /**
+    * This set is used to prevent duplicated action names
+    */
+   private static final Set<String>       _usedDisplayNames = new HashSet<>();
+   //
    private boolean                        _isStartLocation;
    private boolean                        _hasLocationData;
-
+   //
    private Action                         _actionProfileTitle;
+   private ActionLocationPart             _actionLocationPart;
    private ActionSlideoutLocationProfiles _actionSlideoutLocationProfiles;
-   private ActionRetrieveLocationAgain    _actionRetrieveLocationAgain;
+   //
    private SlideoutLocationProfiles       _slideoutLocationProfiles;
-
+   //
    private ITourLocationConsumer          _tourLocationConsumer;
-
+   //
    private TourData                       _tourData;
-
+   //
    /*
     * UI controls
     */
@@ -74,31 +91,70 @@ public class ActionTourLocation extends ContributionItem {
    private Image    _actionImage_Download_Disabled;
    private Image    _actionImage_Options;
    private Image    _actionImage_Options_Disabled;
-
+   //
    private Menu     _contextMenu;
-
+   //
    private ToolBar  _toolbar;
+   //
    private ToolItem _toolItem;
+
+   public class ActionData {
+
+      TourLocationProfile locationProfile;
+      String              locationName;
+      boolean             isDefaultProfile;
+
+      public ActionData(final TourLocationProfile locationProfile,
+                        final String locationName,
+                        final boolean isDefaultProfile) {
+
+         this.locationProfile = locationProfile;
+         this.locationName = locationName;
+         this.isDefaultProfile = isDefaultProfile;
+      }
+
+   }
+
+   private class ActionLocationPart extends SubMenu {
+
+      public ActionLocationPart() {
+
+         super(Messages.Tour_Location_Action_SetLocationPart, AS_DROP_DOWN_MENU);
+      }
+
+      @Override
+      public void enableActions() {}
+
+      @Override
+      public void fillMenu(final Menu menu) {
+
+         fillSubMenu_AllPartActions(menu);
+      }
+   }
 
    private class ActionLocationProfile extends Action {
 
       private TourLocationProfile _locationProfile;
 
-      public ActionLocationProfile(final TourLocationProfile locationProfile, final boolean isDefaultProfile) {
+      public ActionLocationProfile(final TourLocationProfile locationProfile,
+                                   String locationText,
+                                   final boolean isDefaultProfile) {
 
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
          _locationProfile = locationProfile;
 
-         String locationName = createProfileDisplayName(_locationProfile);
          final String joinedPartNames = TourLocationManager.createJoinedPartNames(locationProfile, UI.NEW_LINE1);
 
          if (isDefaultProfile) {
 
-            locationName = UI.SYMBOL_STAR + UI.SPACE + locationName;
+            locationText = UI.SYMBOL_STAR + UI.SPACE + locationText;
          }
 
-         setText(locationName);
+         // indent action label to be better visible
+         locationText = UI.SPACE8 + locationText;
+
+         setText(locationText);
          setToolTipText(Messages.Tour_Location_Action_Profile_Tooltip.formatted(
                joinedPartNames,
                locationProfile.getZoomlevel()));
@@ -112,19 +168,24 @@ public class ActionTourLocation extends ContributionItem {
       }
    }
 
-   private class ActionRetrieveLocationAgain extends Action {
+   private class ActionSetLocationPart extends Action {
 
-      public ActionRetrieveLocationAgain() {
+      private String _partLabel;
 
-         super(Messages.Tour_Location_Action_DeleteAndReapply);
+      public ActionSetLocationPart(final String partLabel,
+                                   final String actionTooltip) {
 
-         setToolTipText(Messages.Tour_Location_Action_DeleteAndReapply_Tooltip);
+         super(partLabel, AS_PUSH_BUTTON);
+
+         _partLabel = partLabel;
+
+         setToolTipText(actionTooltip);
       }
 
       @Override
       public void run() {
 
-         actionRetrieveLocationAgain();
+         actionSetTourLocation(_partLabel);
       }
    }
 
@@ -181,10 +242,15 @@ public class ActionTourLocation extends ContributionItem {
          itemBounds.x = itemDisplayPosition.x;
          itemBounds.y = itemDisplayPosition.y;
 
+         final TourLocation tourLocation = _isStartLocation
+               ? _tourData.getTourLocationStart()
+               : _tourData.getTourLocationEnd();
+
          _slideoutLocationProfiles = new SlideoutLocationProfiles(
 
                _tourLocationConsumer,
-               _tourData,
+               tourLocation,
+
                _toolbar,
                itemBounds,
                _state,
@@ -200,21 +266,16 @@ public class ActionTourLocation extends ContributionItem {
       _slideoutLocationProfiles.open(false);
    }
 
-   private void actionRetrieveLocationAgain() {
+   private void actionSetTourLocation(final String locationLabel) {
 
-      // delete old location values
       if (_isStartLocation) {
 
-         _tourData.tourLocationData_Start = null;
-         _tourData.setTourLocationStart(null);
+         _tourLocationConsumer.setTourStartLocation(locationLabel);
 
       } else {
 
-         _tourData.tourLocationData_End = null;
-         _tourData.setTourLocationEnd(null);
+         _tourLocationConsumer.setTourEndLocation(locationLabel);
       }
-
-      downloadAndSetLocationData();
    }
 
    /**
@@ -273,6 +334,17 @@ public class ActionTourLocation extends ContributionItem {
       }
    }
 
+   /**
+    * Add an action to the provided menu
+    *
+    * @param menu
+    * @param action
+    */
+   private void addActionToMenu(final Menu menu, final Action action) {
+
+      new ActionContributionItem(action).fill(menu, -1);
+   }
+
    public void closeSlideout() {
 
       if (_slideoutLocationProfiles != null) {
@@ -286,7 +358,8 @@ public class ActionTourLocation extends ContributionItem {
       _actionProfileTitle = new Action(Messages.Tour_Location_Action_ProfileTitle_All) {};
       _actionProfileTitle.setEnabled(false);
 
-      _actionRetrieveLocationAgain = new ActionRetrieveLocationAgain();
+      _actionLocationPart = new ActionLocationPart();
+
       _actionSlideoutLocationProfiles = new ActionSlideoutLocationProfiles();
    }
 
@@ -368,18 +441,20 @@ public class ActionTourLocation extends ContributionItem {
       final MenuManager menuMgr = new MenuManager();
 
       menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(manager -> fillContextMenu(menuMgr));
+      menuMgr.addMenuListener(manager -> fillMenu(menuMgr));
 
       // set context menu
       _contextMenu = menuMgr.createContextMenu(toolbar);
    }
 
-   private void fillContextMenu(final IMenuManager menuMgr) {
+   private void fillMenu(final IMenuManager menuMgr) {
 
-      fillContextMenu_AddProfileActions(menuMgr);
+      menuMgr.add(_actionLocationPart);
 
+      fillMenu_AllProfileActions(menuMgr);
+
+      menuMgr.add(new Separator());
       menuMgr.add(_actionSlideoutLocationProfiles);
-      menuMgr.add(_actionRetrieveLocationAgain);
    }
 
    /**
@@ -387,7 +462,7 @@ public class ActionTourLocation extends ContributionItem {
     *
     * @param menuMgr
     */
-   private void fillContextMenu_AddProfileActions(final IMenuManager menuMgr) {
+   private void fillMenu_AllProfileActions(final IMenuManager menuMgr) {
 
       final List<TourLocationProfile> allProfiles = TourLocationManager.getProfiles();
       final int numProfiles = allProfiles.size();
@@ -402,17 +477,170 @@ public class ActionTourLocation extends ContributionItem {
       Collections.sort(allProfiles);
 
       menuMgr.add(_actionProfileTitle);
-      menuMgr.add(new Separator());
+
+      fillMenu_AllProfileActions(menuMgr, allProfiles, defaultProfile);
+   }
+
+   private void fillMenu_AllProfileActions(final IMenuManager menuMgr,
+                                           final List<TourLocationProfile> allProfiles,
+                                           final TourLocationProfile defaultProfile) {
+
+      final Map<String, ActionData> allUnsortedActions = new HashMap<>();
+
+      _usedDisplayNames.clear();
 
       // create actions for each profile
       for (final TourLocationProfile locationProfile : allProfiles) {
 
          final boolean isDefaultProfile = locationProfile.equals(defaultProfile);
 
-         menuMgr.add(new ActionLocationProfile(locationProfile, isDefaultProfile));
+         final String locationName = createProfileDisplayName(locationProfile);
+
+         // skip empty names
+         if (locationName.length() > 0
+
+               // skip duplicate names
+               && _usedDisplayNames.contains(locationName) == false) {
+
+            _usedDisplayNames.add(locationName);
+
+            allUnsortedActions.put(locationName, new ActionData(locationProfile, locationName, isDefaultProfile));
+         }
       }
 
-      menuMgr.add(new Separator());
+      // sort actions by name
+      final Map<String, ActionData> allSortedActions = new TreeMap<>(allUnsortedActions);
+
+      for (final ActionData actionData : allSortedActions.values()) {
+
+         menuMgr.add(new ActionLocationProfile(
+
+               actionData.locationProfile,
+               actionData.locationName,
+               actionData.isDefaultProfile));
+      }
+   }
+
+   private void fillSubMenu_AllPartActions(final Menu menu) {
+
+      // create actions for each part
+
+      TourLocation tourLocationStart = null;
+      TourLocation tourLocationEnd = null;
+
+      tourLocationStart = _tourData.getTourLocationStart();
+      tourLocationEnd = _tourData.getTourLocationEnd();
+
+      final boolean isStartLocationAvailable = tourLocationStart != null;
+      final boolean isEndLocationAvailable = tourLocationEnd != null;
+
+      Map<LocationPartID, PartItem> allLocationParts = isStartLocationAvailable ? PartItem.getAllPartItems(tourLocationStart, true) : null;
+      Map<LocationPartID, PartItem> allEndLocationParts = isEndLocationAvailable ? PartItem.getAllPartItems(tourLocationEnd, false) : null;
+
+      if (isStartLocationAvailable && isEndLocationAvailable) {
+
+         // merge both part item maps into one map
+
+         for (final Entry<LocationPartID, PartItem> entry : allLocationParts.entrySet()) {
+
+            final LocationPartID partID = entry.getKey();
+            final PartItem partItem = entry.getValue();
+
+            final PartItem partItemEnd = allEndLocationParts.get(partID);
+
+            if (partItemEnd != null) {
+
+               // set end location
+               partItem.partID_End = partItemEnd.partID_End;
+               partItem.partLabel_End = partItemEnd.partLabel_End;
+               partItem.locationLabel_End = partItemEnd.locationLabel_End;
+
+               allEndLocationParts.remove(partID);
+            }
+         }
+
+         // add remaining end locations
+         allLocationParts.putAll(allEndLocationParts);
+
+         /*
+          * Sort by settlement size
+          */
+         final ArrayList<LocationPartID> allPartIDs = new ArrayList<>(allLocationParts.keySet());
+         Collections.sort(allPartIDs);
+
+         final List<PartItem> allSortedLocationParts = new ArrayList<>();
+
+         for (final LocationPartID locationPartID : allPartIDs) {
+            allSortedLocationParts.add(allLocationParts.get(locationPartID));
+         }
+
+      } else if (isStartLocationAvailable) {
+
+         // all parts are already in allLocationParts
+
+      } else if (isEndLocationAvailable) {
+
+         // move end parts into allLocationParts
+
+         allLocationParts = allEndLocationParts;
+         allEndLocationParts = null;
+      }
+
+      if (allLocationParts == null) {
+         return;
+      }
+
+      /*
+       * All parts are now in allLocationParts, when available
+       */
+      String locationLabel = null;
+      String actionTooltip = null;
+      boolean isCreateAction = true;
+
+      _usedDisplayNames.clear();
+
+      for (final Entry<LocationPartID, PartItem> entry : allLocationParts.entrySet()) {
+
+         final PartItem partItem = entry.getValue();
+
+         if (_isStartLocation) {
+
+            if (isStartLocationAvailable) {
+
+               locationLabel = partItem.locationLabel_Start;
+               actionTooltip = partItem.partLabel_Start;
+
+            } else {
+
+               isCreateAction = false;
+            }
+
+         } else {
+
+            if (isEndLocationAvailable) {
+
+               locationLabel = partItem.locationLabel_End;
+               actionTooltip = partItem.partLabel_End;
+
+            } else {
+
+               isCreateAction = false;
+            }
+         }
+
+         if (isCreateAction
+
+               // skip empty names
+               && locationLabel.length() > 0
+
+               // skip duplicate names
+               && _usedDisplayNames.contains(locationLabel) == false) {
+
+            _usedDisplayNames.add(locationLabel);
+
+            addActionToMenu(menu, new ActionSetLocationPart(locationLabel, actionTooltip));
+         }
+      }
    }
 
    private void onDispose() {

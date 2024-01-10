@@ -113,10 +113,11 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 52;
+   private static final int TOURBOOK_DB_VERSION = 53;
 
-//   private static final int TOURBOOK_DB_VERSION = 53; // 24.x ??????
+//   private static final int TOURBOOK_DB_VERSION = 54; // 24.x ??????
 
+//   private static final int TOURBOOK_DB_VERSION = 53; // 24.1
 //   private static final int TOURBOOK_DB_VERSION = 52; // 24.1
 //   private static final int TOURBOOK_DB_VERSION = 51; // 23.8
 //   private static final int TOURBOOK_DB_VERSION = 50; // 23.5
@@ -299,6 +300,12 @@ public class TourDatabase {
    private static final String DERBY_URL_COMMAND_CREATE_TRUE              = ";create=true";                       //$NON-NLS-1$
    private static final String DERBY_URL_COMMAND_SHUTDOWN_TRUE            = ";shutdown=true";                     //$NON-NLS-1$
    private static final String DERBY_URL_COMMAND_UPGRADE_TRUE             = ";upgrade=true";                      //$NON-NLS-1$
+   //
+   /**
+    * ERROR XCL13: The parameter position '13' is out of range. The number of parameters for
+    * this prepared statement is '12'.
+    */
+   public static final String  SQL_ERROR_XCL13                            = "XCL13";                              //$NON-NLS-1$
    //
    //
    private static volatile TourDatabase                   _instance;
@@ -653,7 +660,7 @@ public class TourDatabase {
 
             // column do not exist -> this should not happen
 
-            return;
+            throw new RuntimeException("Column do not exist: \"%s\"".formatted(columnName)); //$NON-NLS-1$
          }
 
          exec(stmt, "ALTER TABLE " + table + " ALTER COLUMN " + columnName + " SET DATA TYPE VARCHAR(" + newWidth + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -2595,16 +2602,17 @@ public class TourDatabase {
 //                  + (", " + result.getString("TABLE_TYPE"))
 //                  + (", " + result.getString("REMARKS")));
 //         }
-////            TABLE_CAT String => table catalog (may be null)
-////            TABLE_SCHEM String => table schema (may be null)
-////            TABLE_NAME String => table name
-////            TABLE_TYPE String => table type. Typical types are "TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY", "ALIAS", "SYNONYM".
-////            REMARKS String => explanatory comment on the table
-////            TYPE_CAT String => the types catalog (may be null)
-////            TYPE_SCHEM String => the types schema (may be null)
-////            TYPE_NAME String => type name (may be null)
-////            SELF_REFERENCING_COL_NAME String => name of the designated "identifier" column of a typed table (may be null)
-////            REF_GENERATION String => specifies how values in SELF_REFERENCING_COL_NAME are created. Values are "SYSTEM", "USER", "DERIVED". (may be null)
+//
+////       TABLE_CAT String                   => table catalog (may be null)
+////       TABLE_SCHEM String                 => table schema (may be null)
+////       TABLE_NAME String                  => table name
+////       TABLE_TYPE String                  => table type. Typical types are "TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY", "ALIAS", "SYNONYM".
+////       REMARKS String                     => explanatory comment on the table
+////       TYPE_CAT String                    => the types catalog (may be null)
+////       TYPE_SCHEM String                  => the types schema (may be null)
+////       TYPE_NAME String                   => type name (may be null)
+////       SELF_REFERENCING_COL_NAME String   => name of the designated "identifier" column of a typed table (may be null)
+////       REF_GENERATION String              => specifies how values in SELF_REFERENCING_COL_NAME are created. Values are "SYSTEM", "USER", "DERIVED". (may be null)
 
       } catch (final SQLException e) {
          UI.showSQLException(e);
@@ -4615,6 +4623,10 @@ public class TourDatabase {
             + "   longitudeMinE6_Resized_Normalized   INTEGER,                               " + NL //$NON-NLS-1$
             + "   longitudeMaxE6_Resized_Normalized   INTEGER,                               " + NL //$NON-NLS-1$
 
+            + "   lastModified                        BIGINT DEFAULT 0,                      " + NL //$NON-NLS-1$
+
+            + "   appliedName                VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
             /*
              * Address fields
              */
@@ -6441,9 +6453,14 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_050_To_051(conn, splashManager);
          }
 
-         // 51 -> 52    > 23.10
+         // 51 -> 52    24.1
          if (currentDbVersion == 51) {
             currentDbVersion = _dbDesignVersion_New = updateDb_051_To_052(conn, splashManager);
+         }
+
+         // 52 -> 53    24.1
+         if (currentDbVersion == 52) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_052_To_053(conn, splashManager);
          }
 
          // update db design version number
@@ -10406,6 +10423,55 @@ public class TourDatabase {
          }
       }
       stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   /**
+    * This db update was only needed during development but cannot be removed to have consistent
+    * data
+    *
+    * @param conn
+    * @param splashManager
+    *
+    * @return
+    *
+    * @throws SQLException
+    */
+   private int updateDb_052_To_053(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 53;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      /**
+       * This check is VERY IMPORTANT because db version 53 was used during development and this db
+       * update would cause an exception for a "normal" user because of the new database in db
+       * version 52.
+       * <p>
+       * !!! Checking only the column do not work :-( but we can check the table (this works :-)
+       * because it is created in db version 52 !!!
+       */
+      if (isTableAvailable(conn, TABLE_TOUR_LOCATION) == false) {
+
+         // table columns are not yet created
+
+         final Statement stmt = conn.createStatement();
+         {
+            // add columns
+
+// SET_FORMATTING_OFF
+
+            SQL.AddColumn_VarCar (stmt, TABLE_TOUR_LOCATION, "appliedName",   TourLocation.DB_FIELD_LENGTH);      //$NON-NLS-1$
+            SQL.AddColumn_BigInt (stmt, TABLE_TOUR_LOCATION, "lastModified",  null);                              //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+         }
+         stmt.close();
+      }
 
       logDbUpdate_End(newDbVersion);
 

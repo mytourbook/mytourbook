@@ -7488,7 +7488,7 @@ public class ChartComponentGraph extends Canvas {
          final float pointX = points[pathIndex];
          final float pointY = points[pathIndex + 1];
 
-         System.out.println(String.format("%5d  %7.0f  %7.0f", pathIndex / 2, pointX, pointY));
+         System.out.println(String.format("%5d  %7.0f  %7.0f", pathIndex / 2, pointX, pointY)); //$NON-NLS-1$
       }
    }
 

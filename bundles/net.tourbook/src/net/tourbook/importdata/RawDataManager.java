@@ -343,7 +343,6 @@ public class RawDataManager {
       TIME_SLICES__POWER_AND_SPEED, //
       TIME_SLICES__POWER_AND_PULSE, //
       TIME_SLICES__RUNNING_DYNAMICS, //
-      TIME_SLICES__START_END_LOCATION, //
       TIME_SLICES__SWIMMING, //
       TIME_SLICES__TEMPERATURE_FROMDEVICE, //
       TIME_SLICES__TRAINING, //
@@ -1589,11 +1588,6 @@ public class RawDataManager {
             dataToModifyDetails.add(Messages.Tour_Data_Text_SpeedValues);
          }
 
-         // Start/end location
-         if (isAllTimeSlices || tourValueType == TourValueType.TIME_SLICES__START_END_LOCATION) {
-            dataToModifyDetails.add(Messages.Tour_Data_Text_StartEndLocation);
-         }
-
          // Running Dynamics
          if (isAllTimeSlices || tourValueType == TourValueType.TIME_SLICES__RUNNING_DYNAMICS) {
             dataToModifyDetails.add(Messages.Tour_Data_Text_RunningDynamicsValues);
@@ -1830,13 +1824,6 @@ public class RawDataManager {
                tourData.setPowerSerie(null);
                tourData.setPower_Avg(0);
                tourData.setSpeedSerie(null);
-               break;
-
-            case TIME_SLICES__START_END_LOCATION:
-
-               tourData.setTourStartPlace(null);
-               tourData.setTourEndPlace(null);
-
                break;
 
             case TIME_SLICES__TEMPERATURE_FROMDEVICE:

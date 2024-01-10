@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -517,7 +517,7 @@ public class UI {
    public static String format_yyyymmdd_hhmmss(final TourData tourData) {
 
       if (tourData == null) {
-         return UI.EMPTY_STRING;
+         return EMPTY_STRING;
       }
 
       _formatterSB.setLength(0);
@@ -577,7 +577,7 @@ public class UI {
 
             // some short formats have only one M and d (e.g. ths US)
             if (oldPattern.indexOf("MM") == -1 && oldPattern.indexOf("dd") == -1) {//$NON-NLS-1$ //$NON-NLS-2$
-               String newPattern = UI.EMPTY_STRING;
+               String newPattern = EMPTY_STRING;
                for (int i = 0; i < oldPattern.length(); i++) {
                   if (oldPattern.charAt(i) == 'M') {
                      newPattern += "MM"; //$NON-NLS-1$
@@ -598,7 +598,7 @@ public class UI {
             // 4 digit year
             if (sdf.toPattern().indexOf("yyyy") == -1) { //$NON-NLS-1$
                oldPattern = sdf.toPattern();
-               String newPattern = UI.EMPTY_STRING;
+               String newPattern = EMPTY_STRING;
                for (int i = 0; i < oldPattern.length(); i++) {
                   if (oldPattern.charAt(i) == 'y') {
                      newPattern += "yy"; //$NON-NLS-1$
@@ -652,7 +652,7 @@ public class UI {
             // some short formats have only one h (e.g. ths US)
             if (oldPattern.indexOf("hh") == -1) {//$NON-NLS-1$
 
-               String newPattern = UI.EMPTY_STRING;
+               String newPattern = EMPTY_STRING;
 
                for (int i = 0; i < oldPattern.length(); i++) {
                   if (oldPattern.charAt(i) == 'h') {
@@ -805,7 +805,7 @@ public class UI {
          }
       }
 
-      return UI.EMPTY_STRING;
+      return EMPTY_STRING;
    }
 
    public static ImageData rotate(final ImageData srcData, final int direction) {
@@ -1160,11 +1160,11 @@ public class UI {
 
       // tour type
       if (tourType == null) {
-         lblTourType.setText(UI.EMPTY_STRING);
+         lblTourType.setText(EMPTY_STRING);
          lblTourType.setImage(TourTypeImage.getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
       } else {
          lblTourType.setImage(TourTypeImage.getTourTypeImage(tourType.getTypeId()));
-         lblTourType.setText(isTextDisplayed ? tourType.getName() : UI.EMPTY_STRING);
+         lblTourType.setText(isTextDisplayed ? tourType.getName() : EMPTY_STRING);
       }
 
       lblTourType.pack(true);
