@@ -431,8 +431,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          final boolean isSearchQueryNumeric = StringUtils.isNumeric(_cboSearchQuery.getText());
          _btnSearch.setEnabled(isSearchQueryNumeric);
       }
-
-      //todo fb maybe go back to a dialogocntentarea to be able to display error messages like in the tag dialog when the image file is not found
    }
 
    @Override
@@ -485,6 +483,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       // disable search controls
       _cboSearchQuery.setEnabled(false);
       _btnSearch.setEnabled(false);
+      _btnAdd.setEnabled(false);
 
       final String searchText = _cboSearchQuery.getText();
 
@@ -510,8 +509,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       final List<net.tourbook.nutrition.openfoodfacts.Product> searchResults =
             (List<net.tourbook.nutrition.openfoodfacts.Product>) propertyChangeEvent.getNewValue();
 
-
-
       Display.getDefault().asyncExec(() -> {
 
          if (searchResults.isEmpty()) {
@@ -520,25 +517,25 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          } else {
             setErrorMessage(null);
             _products = searchResults;
-         }
 
-         // check if view is closed
-         if (_btnSearch.isDisposed()) {
-            return;
-         }
+            // check if view is closed
+            if (_btnSearch.isDisposed()) {
+               return;
+            }
 
-         // refresh viewer
-         _productsViewer.setInput(new Object());
+            // refresh viewer
+            _productsViewer.setInput(new Object());
 
-         // select first entry, if there is one
-         final Table productsTable = _productsViewer.getTable();
-         if (productsTable.getItemCount() > 0) {
+            // select first entry, if there is one
+            final Table productsTable = _productsViewer.getTable();
+            if (productsTable.getItemCount() > 0) {
 
-            final Object firstData = productsTable.getItem(0).getData();
-            if (firstData instanceof Product) {
+               final Object firstData = productsTable.getItem(0).getData();
+               if (firstData instanceof Product) {
 
-               _productsViewer.setSelection(new StructuredSelection(firstData));
-               setViewerFocus();
+                  _productsViewer.setSelection(new StructuredSelection(firstData));
+                  setViewerFocus();
+               }
             }
          }
 
