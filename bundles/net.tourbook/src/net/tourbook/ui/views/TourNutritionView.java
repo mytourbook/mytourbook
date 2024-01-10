@@ -18,6 +18,8 @@ package net.tourbook.ui.views;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
+import de.byteholder.geoclipse.mapprovider.MP;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +74,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
@@ -82,6 +85,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -104,13 +108,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private static final String STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";                    //$NON-NLS-1$
    private static final String STATE_SECTION_SUMMARY           = "STATE_SECTION_SUMMARY";                          //$NON-NLS-1$
 
-   public static final String  COLUMN_SERVINGS                 = Messages.Tour_Nutrition_Column_Servings;
-   public static final String  COLUMN_NAME                     = Messages.Tour_Nutrition_Column_Name;
-   public static final String  COLUMN_CALORIES                 = Messages.Tour_Nutrition_Column_Calories;
-   public static final String  COLUMN_SODIUM                   = Messages.Tour_Nutrition_Column_Sodium;
-   public static final String  COLUMN_ISBEVERAGE               = Messages.Tour_Nutrition_Column_IsBeverage;
-   public static final String  COLUMN_BEVERAGE_CONTAINER       = Messages.Tour_Nutrition_Column_BeverageContainer;
-   public static final String  COLUMN_CONSUMED_CONTAINERS      = Messages.Tour_Nutrition_Column_ConsumedContainers;
+   private static final String COLUMN_SERVINGS                 = Messages.Tour_Nutrition_Column_Servings;
+   private static final String COLUMN_NAME                     = Messages.Tour_Nutrition_Column_Name;
+   private static final String COLUMN_CALORIES                 = Messages.Tour_Nutrition_Column_Calories;
+   private static final String COLUMN_SODIUM                   = Messages.Tour_Nutrition_Column_Sodium;
+   private static final String COLUMN_ISBEVERAGE               = Messages.Tour_Nutrition_Column_IsBeverage;
+   private static final String COLUMN_BEVERAGE_CONTAINER       = Messages.Tour_Nutrition_Column_BeverageContainer;
+   private static final String COLUMN_CONSUMED_CONTAINERS      = Messages.Tour_Nutrition_Column_ConsumedContainers;
 
 //https://world.openfoodfacts.org/data
 
@@ -132,22 +136,23 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _tableColumns.add(COLUMN_CONSUMED_CONTAINERS);
    }
 
-   private final IDialogSettings   _state         = TourbookPlugin.getState(ID);
-   private TourData                _tourData;
+   private final IDialogSettings          _state                          = TourbookPlugin.getState(ID);
+   private TourData                       _tourData;
 
-   private TableViewer             _productsViewer;
+   private TableViewer                    _productsViewer;
+   private TourNutritionProductComparator _tourNutritionProductComparator = new TourNutritionProductComparator();
 
-   private List<String>            _searchHistory = new ArrayList<>();
-   private IPropertyChangeListener _prefChangeListener;
+   private List<String>                   _searchHistory                  = new ArrayList<>();
+   private IPropertyChangeListener        _prefChangeListener;
 
-   private ISelectionListener      _postSelectionListener;
-   private ITourEventListener      _tourEventListener;
-   private IPartListener2          _partListener;
-   private PostSelectionProvider   _postSelectionProvider;
+   private ISelectionListener             _postSelectionListener;
+   private ITourEventListener             _tourEventListener;
+   private IPartListener2                 _partListener;
+   private PostSelectionProvider          _postSelectionProvider;
 
-   private final RangeContent      _opacityRange  = new RangeContent(0.25, 10.0, 0.25, 100);
+   private final RangeContent             _quantityRange                  = new RangeContent(0.25, 10.0, 0.25, 100);
 
-   private final NumberFormat      _nf2           = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf2                            = NumberFormat.getNumberInstance();
 
    {
       _nf2.setMinimumFractionDigits(2);
@@ -180,11 +185,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Section     _sectionSummary;
    private FormToolkit _tk;
 
-   class TourNutritionProductCellModifier implements ICellModifier {
+   private class TourNutritionProductCellModifier implements ICellModifier {
 
       private Viewer viewer;
 
-      public TourNutritionProductCellModifier(final Viewer viewer) {
+      private TourNutritionProductCellModifier(final Viewer viewer) {
          this.viewer = viewer;
       }
 
@@ -265,6 +270,106 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       }
    }
 
+   private class TourNutritionProductComparator extends ViewerComparator {
+
+      private static final int ASCENDING       = 0;
+      private static final int DESCENDING      = 1;
+
+      private String           __sortColumnId  = COLUMN_NAME;
+      private int              __sortDirection = ASCENDING;
+
+      @Override
+      public int compare(final Viewer viewer, final Object e1, final Object e2) {
+
+         final boolean isDescending = __sortDirection == DESCENDING;
+
+         final MP mp1 = (MP) e1;
+         final MP mp2 = (MP) e2;
+
+         long rc = 0;
+
+         // Determine which column and do the appropriate sort
+         switch (__sortColumnId) {
+
+         //todo fb
+         case "COLUMN_NAME":
+            rc = mp1.getCategory().compareTo(mp2.getCategory());
+            break;
+
+         default:
+            rc = mp1.getName().compareTo(mp2.getName());
+         }
+
+         if (rc == 0) {
+
+            // subsort 1 by category
+            rc = mp1.getCategory().compareTo(mp2.getCategory());
+
+            // subsort 2 by map provider
+            if (rc == 0) {
+               rc = mp1.getName().compareTo(mp2.getName());
+            }
+         }
+
+         // if descending order, flip the direction
+         if (isDescending) {
+            rc = -rc;
+         }
+
+         /*
+          * MUST return 1 or -1 otherwise long values are not sorted correctly.
+          */
+         return rc > 0 //
+               ? 1
+               : rc < 0 //
+                     ? -1
+                     : 0;
+
+      }
+
+      @Override
+      public boolean isSorterProperty(final Object element, final String property) {
+
+         // force resorting when a name is renamed
+         return true;
+      }
+
+      public void setSortColumn(final Widget widget) {
+
+         final ColumnDefinition columnDefinition = (ColumnDefinition) widget.getData();
+         final String columnId = columnDefinition.getColumnId();
+
+         if (columnId == null) {
+            return;
+         }
+
+         if (columnId.equals(__sortColumnId)) {
+
+            // Same column as last sort -> select next sorting
+
+            switch (__sortDirection) {
+            case ASCENDING:
+               __sortDirection = DESCENDING;
+               break;
+
+            case DESCENDING:
+            default:
+               __sortDirection = ASCENDING;
+               break;
+            }
+
+         } else {
+
+            // New column; do an ascent sorting
+
+            __sortColumnId = columnId;
+            __sortDirection = ASCENDING;
+         }
+
+         updateUI_SetSortDirection(__sortColumnId, __sortDirection);
+      }
+   }
+
    private class ViewContentProvider implements IStructuredContentProvider {
 
       @Override
@@ -286,7 +391,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       }
    }
 
-   class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
+   private class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 
       @Override
       public Image getColumnImage(final Object obj, final int index) {
@@ -747,11 +852,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       // Create the cell editors
       final CellEditor[] editors = new CellEditor[_tableColumns.size()];
       // Servings
-      editors[0] = new SpinnerCellEditor(productsTable, _nf2, _opacityRange, SWT.NONE);
+      editors[0] = new SpinnerCellEditor(productsTable, _nf2, _quantityRange, SWT.NONE);
       // Is Beverage
       editors[4] = new CheckboxCellEditor(productsTable);
       // Column: Consumed Containers
-      editors[6] = new SpinnerCellEditor(productsTable, _nf2, _opacityRange, SWT.NONE);
+      editors[6] = new SpinnerCellEditor(productsTable, _nf2, _quantityRange, SWT.NONE);
 
       //todo fb recreate when the preferences are changed and a container is added or removed or modified
       final var toto = TourDatabase.getTourBeverageContainers();
@@ -770,6 +875,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _productsViewer.setCellModifier(new TourNutritionProductCellModifier(_productsViewer));
 
       _productsViewer.setContentProvider(new ViewContentProvider());
+      _productsViewer.setComparator(_tourNutritionProductComparator);
       _productsViewer.setLabelProvider(new ViewLabelProvider());
 
       _productsViewer.addSelectionChangedListener(selectionChangedEvent -> onTableSelectionChanged(selectionChangedEvent));
@@ -848,6 +954,28 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       }
 
       return tourNutritionProducts;
+   }
+
+   /**
+    * @param sortColumnId
+    *
+    * @return Returns the column widget by its column id, when column id is not found then the
+    *         first column is returned.
+    */
+   private TableColumn getSortColumn(final String sortColumnId) {
+
+      final TableColumn[] allColumns = _productsViewer.getTable().getColumns();
+
+      for (final TableColumn column : allColumns) {
+
+         final String columnId = ((ColumnDefinition) column.getData()).getColumnId();
+
+         if (columnId != null && columnId.equals(sortColumnId)) {
+            return column;
+         }
+      }
+
+      return allColumns[0];
    }
 
    @Override
@@ -942,7 +1070,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    }
 
    private void onTableSelectionChanged(final SelectionChangedEvent event) {
-      _btnDeleteProduct.setEnabled(true);
+
+      final StructuredSelection selection = (StructuredSelection) _productsViewer.getSelection();
+
+      _btnDeleteProduct.setEnabled(selection.size() > 0);
    }
 
    @Override
@@ -968,9 +1099,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       updateUI_ProductViewer();
    }
 
-   //TODO FB
-   //https://fdc.nal.usda.gov/api-guide.html
-
    private void restoreState() {
 
       // restore old used queries
@@ -982,6 +1110,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _sectionSummary.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_SUMMARY, true));
       _sectionProductsList.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_PRODUCTS_LIST, true));
    }
+
+   //TODO FB
+   //https://fdc.nal.usda.gov/api-guide.html
 
    @PersistState
    private void saveState() {
@@ -1044,6 +1175,26 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       }
 
       enableControls();
+   }
+
+   /**
+    * Set the sort column direction indicator for a column
+    *
+    * @param sortColumnId
+    * @param isAscendingSort
+    */
+   private void updateUI_SetSortDirection(final String sortColumnId, final int sortDirection) {
+
+      final int direction =
+            sortDirection == TourNutritionProductComparator.ASCENDING ? SWT.UP
+                  : sortDirection == TourNutritionProductComparator.DESCENDING ? SWT.DOWN
+                        : SWT.NONE;
+
+      final Table table = _productsViewer.getTable();
+      final TableColumn tc = getSortColumn(sortColumnId);
+
+      table.setSortColumn(tc);
+      table.setSortDirection(direction);
    }
 
    private void updateUI_SummaryFromModel() {
