@@ -29,6 +29,9 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourBeverageContainer;
@@ -60,6 +63,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.ISelection;
@@ -81,7 +85,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.PageBook;
@@ -90,7 +96,7 @@ import org.eclipse.ui.part.ViewPart;
 import cop.swt.widgets.viewers.table.celleditors.RangeContent;
 import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 
-public class TourNutritionView extends ViewPart implements PropertyChangeListener {
+public class TourNutritionView extends ViewPart implements PropertyChangeListener, ITourViewer {
 
    //todo fb add the possibility to add custom products (i.e: water...)
 
@@ -140,6 +146,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    final NutritionQuery            _nutritionQuery = new NutritionQuery();
    private ISelectionListener      _postSelectionListener;
    private ITourEventListener      _tourEventListener;
+   private IPartListener2          _partListener;
    private PostSelectionProvider   _postSelectionProvider;
 
    private final RangeContent      _opacityRange   = new RangeContent(0.25, 10.0, 0.25, 100);
@@ -343,6 +350,37 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       }
    }
 
+   private void addPartListener() {
+
+      _partListener = new IPartListener2() {
+
+         @Override
+         public void partActivated(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partClosed(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partDeactivated(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partHidden(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partOpened(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partVisible(final IWorkbenchPartReference partRef) {}
+      };
+      getViewSite().getPage().addPartListener(_partListener);
+   }
+
    private void addPrefListener() {
 
       _prefChangeListener = propertyChangeEvent -> {
@@ -517,8 +555,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
       addSelectionListener();
       addTourEventListener();
-
       addPrefListener();
+      addPartListener();
 
       // this part is a selection provider
       _postSelectionProvider = new PostSelectionProvider(ID);
@@ -527,8 +565,15 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       // show default page
       _pageBook.showPage(_pageNoData);
 
+      // show nutrition info from last selection
+      onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
       enableControls();
       restoreState();
+
+      if (_tourData == null) {
+         showTourFromTourProvider();
+      }
    }
 
    private Section createSection(final Composite parent,
@@ -765,8 +810,11 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    @Override
    public void dispose() {
 
-      getSite().getPage().removeSelectionListener(_postSelectionListener);
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
+
+      getSite().getPage().removePostSelectionListener(_postSelectionListener);
+      getViewSite().getPage().removePartListener(_partListener);
+
       _prefStore.removePropertyChangeListener(_prefChangeListener);
       _nutritionQuery.removePropertyChangeListener(this);
 
@@ -783,6 +831,11 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       //_actionOpenSearchProduct.setEnabled(isTourSelected);
    }
 
+   @Override
+   public ColumnManager getColumnManager() {
+      return null;
+   }
+
    private List<TourNutritionProduct> getSelectedProducts() {
 
       final StructuredSelection selection = (StructuredSelection) _productsViewer.getSelection();
@@ -797,6 +850,12 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       }
 
       return tourNutritionProducts;
+   }
+
+   @Override
+   public ColumnViewer getViewer() {
+
+      return _productsViewer;
    }
 
    private void onDeleteProducts() {
@@ -912,6 +971,32 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    }
 
+   @Override
+   public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+
+      _viewerContainer.setRedraw(false);
+      {
+         _productsViewer.getTable().dispose();
+
+         createUI_220_Viewer(_viewerContainer);
+         _viewerContainer.layout();
+
+         // update the viewer
+         reloadViewer();
+      }
+      _viewerContainer.setRedraw(true);
+
+      return _productsViewer;
+   }
+
+   @Override
+   public void reloadViewer() {
+      updateUI_ProductViewer();
+   }
+
+   //TODO FB
+   //https://fdc.nal.usda.gov/api-guide.html
+
    private void restoreState() {
 
       // restore old used queries
@@ -935,8 +1020,33 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
 
    }
 
-   //TODO FB
-   //https://fdc.nal.usda.gov/api-guide.html
+   private void showTourFromTourProvider() {
+
+      _pageBook.showPage(_pageNoData);
+
+      // a tour is not displayed, find a tour provider which provides a tour
+      Display.getCurrent().asyncExec(() -> {
+
+         // validate widget
+         if (_pageBook.isDisposed()) {
+            return;
+         }
+
+         /*
+          * check if tour was set from a selection provider
+          */
+         if (_tourData != null) {
+            return;
+         }
+
+         onSelectionChanged(TourManager.getSelectedToursSelection());
+      });
+   }
+
+   @Override
+   public void updateColumnHeader(final ColumnDefinition colDef) {
+      //Nothing to do
+   }
 
    private void updateUI_ProductViewer() {
 
