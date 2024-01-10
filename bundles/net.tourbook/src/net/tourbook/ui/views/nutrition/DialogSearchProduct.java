@@ -249,7 +249,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       _isInUIInit = false;
 
       enableControls();
-
    }
 
    @Override
@@ -272,8 +271,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       //todo fb
       // https://www.vogella.com/tutorials/EclipseJFaceTable/article.html
-
-      restoreState();
 
       return dlgContainer;
    }
