@@ -399,7 +399,7 @@ public class TourLocationManager {
             LocationPartID.settlementLarge,
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
 
-         new TourLocationProfile("Large, Suburb",   13,
+         new TourLocationProfile("Large, Suburb",   18,
 
             LocationPartID.settlementLarge,
             LocationPartID.suburb),
@@ -461,7 +461,7 @@ public class TourLocationManager {
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
             LocationPartID.settlementLarge),
 
-         new TourLocationProfile("Street, Village",   13,
+         new TourLocationProfile("Street, Village",   18,
 
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
             LocationPartID.village),
