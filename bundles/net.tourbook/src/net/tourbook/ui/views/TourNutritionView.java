@@ -122,7 +122,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private static final int              _hintTextColumnWidth = UI.IS_OSX ? 100 : 50;
    private static List<String>           _tableColumns        = new ArrayList<>();
-
    {
       _tableColumns.add(COLUMN_SERVINGS);
       _tableColumns.add(COLUMN_NAME);
@@ -882,20 +881,18 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
       TourData tourData = null;
 
-      if (selection instanceof SelectionTourData) {
+      if (selection instanceof final SelectionTourData tourDataSelection) {
 
          // a tour was selected, get the chart and update the nutrition viewer
-
-         final SelectionTourData tourDataSelection = (SelectionTourData) selection;
          tourData = tourDataSelection.getTourData();
 
-      } else if (selection instanceof SelectionTourId) {
+      } else if (selection instanceof final SelectionTourId selectionTourId) {
 
-         tourId = ((SelectionTourId) selection).getTourId();
+         tourId = selectionTourId.getTourId();
 
-      } else if (selection instanceof SelectionTourIds) {
+      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final ArrayList<Long> tourIds = selectionTourIds.getTourIds();
 
          if (tourIds != null && tourIds.size() > 0) {
 
@@ -913,13 +910,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             tourId = refItem.getTourId();
          }
 
-      } else if (selection instanceof StructuredSelection) {
+      } else if (selection instanceof final StructuredSelection structuredSelection) {
 
-         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-         if (firstElement instanceof TVIRefTour_ComparedTour) {
-            tourId = ((TVIRefTour_ComparedTour) firstElement).getTourId();
-         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
-            tourId = ((TVIElevationCompareResult_ComparedTour) firstElement).getTourId();
+         final Object firstElement = structuredSelection.getFirstElement();
+         if (firstElement instanceof final TVIRefTour_ComparedTour tviRefTour_ComparedTour) {
+            tourId = tviRefTour_ComparedTour.getTourId();
+         } else if (firstElement instanceof final TVIElevationCompareResult_ComparedTour tviElevationCompareResult_ComparedTour) {
+            tourId = tviElevationCompareResult_ComparedTour.getTourId();
          }
 
       } else if (selection instanceof SelectionDeletedTours) {
