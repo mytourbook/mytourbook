@@ -65,8 +65,6 @@ import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -105,18 +103,19 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    //todo fb add the possibility to sort the rows by name etc....
    // by default, sort by what ?
-   public static final String  ID                              = "net.tourbook.ui.views.TourNutritionView";        //$NON-NLS-1$
-   private static final String STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";                      //$NON-NLS-1$
-   private static final String STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";                    //$NON-NLS-1$
-   private static final String STATE_SECTION_SUMMARY           = "STATE_SECTION_SUMMARY";                          //$NON-NLS-1$
+   public static final String  ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
+   private static final String STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
+   private static final String STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";             //$NON-NLS-1$
+   private static final String STATE_SECTION_SUMMARY           = "STATE_SECTION_SUMMARY";                   //$NON-NLS-1$
 
-   private static final String COLUMN_SERVINGS                 = "Servings";
+   private static final String COLUMN_CONSUMED_AMOUNT          = "ConsumedAmound";
    private static final String COLUMN_NAME                     = "Name";
-   private static final String COLUMN_CALORIES                 = Messages.Tour_Nutrition_Column_Calories;
-   private static final String COLUMN_SODIUM                   = Messages.Tour_Nutrition_Column_Sodium;
-   private static final String COLUMN_ISBEVERAGE               = Messages.Tour_Nutrition_Column_IsBeverage;
-   private static final String COLUMN_BEVERAGE_CONTAINER       = Messages.Tour_Nutrition_Column_BeverageContainer;
-   private static final String COLUMN_CONSUMED_CONTAINERS      = Messages.Tour_Nutrition_Column_ConsumedContainers;
+   private static final String COLUMN_CALORIES                 = "Calories";
+   private static final String COLUMN_SODIUM                   = "Sodium";
+   private static final String COLUMN_ISBEVERAGE               = "IsBeverage";
+   private static final String COLUMN_QUANTITYPERSERVING       = "QuantityPerServing";
+   private static final String COLUMN_BEVERAGE_CONTAINER       = "BeverageContainer";
+   private static final String COLUMN_CONSUMED_CONTAINERS      = "ConsumedContainers";
 
 //https://world.openfoodfacts.org/data
 
@@ -124,19 +123,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    // this will retrieve the updated (if any), info for each product)
    // display the previous total calories vs new total calories
 
-   private static final IPreferenceStore _prefStore           = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
 
-   private static final int              _hintTextColumnWidth = UI.IS_OSX ? 100 : 50;
-   private static List<String>           _tableColumns        = new ArrayList<>();
-   {
-      _tableColumns.add(COLUMN_SERVINGS);
-      _tableColumns.add(COLUMN_NAME);
-      _tableColumns.add(COLUMN_CALORIES);
-      _tableColumns.add(COLUMN_SODIUM);
-      _tableColumns.add(COLUMN_ISBEVERAGE);
-      _tableColumns.add(COLUMN_BEVERAGE_CONTAINER);
-      _tableColumns.add(COLUMN_CONSUMED_CONTAINERS);
-   }
+   private static final int               _hintTextColumnWidth            = UI.IS_OSX ? 100 : 50;
 
    private final IDialogSettings          _state                          = TourbookPlugin.getState(ID);
    private TourData                       _tourData;
@@ -210,11 +199,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          final TourNutritionProduct task = (TourNutritionProduct) element;
 
          final TourBeverageContainer tourBeverageContainer = task.getTourBeverageContainer();
-         if (property.equals(COLUMN_SERVINGS)) {
-
-            return task.getServingsConsumed();
-
-         } else if (property.equals(COLUMN_SODIUM)) {
+         if (property.equals(COLUMN_SODIUM)) {
 
             return task.getSodium();
 
@@ -245,11 +230,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          }
          final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
 
-         if (property.equals(COLUMN_SERVINGS)) {
-
-            tourNutritionProduct.setServingsConsumed(((Double) value).floatValue());
-
-         } else if (property.equals(COLUMN_CONSUMED_CONTAINERS)) {
+//         if (property.equals(COLUMN_SERVINGS)) {
+//
+//            tourNutritionProduct.setServingsConsumed(((Double) value).floatValue());
+//
+//         } else
+         if (property.equals(COLUMN_CONSUMED_CONTAINERS)) {
 
             tourNutritionProduct.getContainersConsumed();
 
@@ -284,8 +270,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       private String           __sortColumnId  = COLUMN_NAME;
       private int              __sortDirection = ASCENDING;
 
-      public TourNutritionProductComparator() {}
-
       @Override
       public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
@@ -303,6 +287,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             rc = tnp1.getName().compareTo(tnp2.getName());
             break;
 
+         case COLUMN_ISBEVERAGE:
+            //todo fb
+            break;
+
          default:
             rc = tnp1.getName().compareTo(tnp2.getName());
          }
@@ -311,11 +299,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             // subsort 1 by category
             rc = tnp1.getName().compareTo(tnp2.getName());
-
-            // subsort 2 by map provider
-            if (rc == 0) {
-               rc = tnp1.getName().compareTo(tnp2.getName());
-            }
          }
 
          // if descending order, flip the direction
@@ -395,66 +378,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       @Override
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
          // Nothing to do
-      }
-   }
-
-   private class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
-
-      @Override
-      public Image getColumnImage(final Object obj, final int index) {
-
-         final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) obj;
-
-         switch (index) {
-         case 4:
-
-            final String imageDescriptorPath = tourNutritionProduct.isBeverage()
-                  ? Images.Checkbox_Checked
-                  : Images.Checkbox_Uncheck;
-
-            return TourbookPlugin.getImageDescriptor(imageDescriptorPath).createImage();
-
-         default:
-            return null;
-         }
-      }
-
-      @Override
-      public String getColumnText(final Object obj, final int index) {
-
-         final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) obj;
-
-         switch (index) {
-         case 0:
-            return String.valueOf(tourNutritionProduct.getServingsConsumed());
-
-         case 1:
-            return tourNutritionProduct.getName();
-
-         case 2:
-            return String.valueOf(tourNutritionProduct.getCalories());
-
-         case 3:
-            return String.valueOf(tourNutritionProduct.getSodium());
-
-         case 5:
-            return tourNutritionProduct.getTourBeverageContainerName();
-
-         case 6:
-            return tourNutritionProduct.getTourBeverageContainer() == null
-                  ? UI.EMPTY_STRING
-                  : String.valueOf(tourNutritionProduct.getTourBeverageContainer().getCapacity());
-
-         case 4:
-         default:
-            return UI.EMPTY_STRING;
-         }
-      }
-
-      @Override
-      public Image getImage(final Object obj) {
-
-         return null;
       }
    }
 
@@ -612,47 +535,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       }
 
       return total * 60 / (tourDeviceTime_Recorded / 60);
-   }
-
-   private void createColumns(final Table productsTable, final List<String> tableColumns) {
-
-      final int index = 0;
-
-      //todo fb add the tooltiptexts
-      // Column: {@link #COLUMN_SERVINGS}
-      final TableColumn columnServings = new TableColumn(productsTable, SWT.LEFT);
-      columnServings.setText(Messages.Tour_Nutrition_Column_Servings);
-      columnServings.setWidth(75);
-
-      // Column: {@link #COLUMN_NAME}
-      final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
-      columnName.setText(Messages.Tour_Nutrition_Column_Name);
-      columnName.setWidth(150);
-
-      // Column: {@link #COLUMN_CALORIES}
-      final TableColumn columnCalories = new TableColumn(productsTable, SWT.LEFT);
-      columnCalories.setText(Messages.Tour_Nutrition_Column_Calories);
-      columnCalories.setWidth(75);
-
-      // Column: {@link #COLUMN_SODIUM}
-      final TableColumn columnSodium = new TableColumn(productsTable, SWT.LEFT);
-      columnSodium.setText(Messages.Tour_Nutrition_Column_Sodium);
-      columnSodium.setWidth(75);
-
-      // Column: {@link #COLUMN_ISBEVERAGE}
-      final TableColumn columnFluid = new TableColumn(productsTable, SWT.LEFT);
-      columnFluid.setText(Messages.Tour_Nutrition_Column_IsBeverage);
-      columnFluid.setWidth(75);
-
-      // Column: {@link #COLUMN_BEVERAGE_CONTAINER}
-      final TableColumn columnFluidContainerName = new TableColumn(productsTable, SWT.LEFT);
-      columnFluidContainerName.setText(Messages.Tour_Nutrition_Column_BeverageContainer);
-      columnFluidContainerName.setWidth(75);
-
-      // Column: {@link #COLUMN_CONSUMED_CONTAINERS}
-      final TableColumn columnFluidContainersConsumed = new TableColumn(productsTable, SWT.LEFT);
-      columnFluidContainersConsumed.setText(Messages.Tour_Nutrition_Column_ConsumedContainers);
-      columnFluidContainersConsumed.setWidth(75);
    }
 
    @Override
@@ -858,20 +740,18 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
 
-      //createColumns(productsTable, _tableColumns);
-
       _productsViewer = new TableViewer(productsTable);
       _columnManager.createColumns(_productsViewer);
       //_productsViewer.setColumnProperties(_tableColumns.toArray(new String[0]));
 
       // Create the cell editors
-      final CellEditor[] editors = new CellEditor[_tableColumns.size()];
-      // Servings
+      final CellEditor[] editors = new CellEditor[_productsViewer.getTable().getColumnCount()];
+      // Consumed amount
       editors[0] = new SpinnerCellEditor(productsTable, _nf2, _quantityRange, SWT.NONE);
       // Is Beverage
       editors[4] = new CheckboxCellEditor(productsTable);
       // Column: Consumed Containers
-      editors[6] = new SpinnerCellEditor(productsTable, _nf2, _quantityRange, SWT.NONE);
+      editors[7] = new SpinnerCellEditor(productsTable, _nf2, _quantityRange, SWT.NONE);
 
       //todo fb recreate when the preferences are changed and a container is added or removed or modified
       final var toto = TourDatabase.getTourBeverageContainers();
@@ -929,27 +809,49 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineAllColumns() {
 
-      defineColumn_10_Name();
-//  defineColumn_20_Zoomlevel();
-//      defineColumn_30_Scale();
-//      defineColumn_40_Bearing();
-//      defineColumn_50_Tilt();
-//      defineColumn_60_Latitude();
-//      defineColumn_70_Longitude();
+      defineColumn_10_ConsumedAmount();
+      defineColumn_20_Name();
+      defineColumn_30_Calories();
+      defineColumn_40_Sodium();
+      defineColumn_50_IsBeverage();
+      defineColumn_60_QuantityPerServing();
+      defineColumn_70_BeverageContainer();
+      defineColumn_80_ConsumedBeverageContainer();
    }
 
-   /**
-    * Column: Name
-    */
-   private void defineColumn_10_Name() {
+   private void defineColumn_10_ConsumedAmount() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_CONSUMED_AMOUNT, SWT.LEAD);
+
+      colDef.setColumnLabel("COnsumed amountMessages.Tour_Nutrition_Column_Name");
+      colDef.setColumnHeaderText("COnsumed amountMessages.Tour_Nutrition_Column_Name");
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(40));
+
+      colDef.setIsDefaultColumn();
+      colDef.setCanModifyVisibility(false);
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
+
+            cell.setText(String.valueOf(tourNutritionProduct.getServingsConsumed()));
+         }
+      });
+
+   }
+
+   private void defineColumn_20_Name() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_NAME, SWT.LEAD);
 
       colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Name);
       colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Name);
 
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(30));
-//      colDef.setColumnWeightData(new ColumnWeightData(30));
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(40));
 
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
@@ -962,6 +864,166 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
 
             cell.setText(tourNutritionProduct.getName());
+         }
+      });
+   }
+
+   private void defineColumn_30_Calories() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_CALORIES, SWT.LEAD);
+
+      colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Calories);
+      colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Calories);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
+
+      colDef.setIsDefaultColumn();
+      colDef.setCanModifyVisibility(false);
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
+
+            cell.setText(String.valueOf(tourNutritionProduct.getCalories()));
+         }
+      });
+   }
+
+   private void defineColumn_40_Sodium() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_SODIUM, SWT.LEAD);
+
+      colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Sodium);
+      colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Sodium);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
+
+      colDef.setIsDefaultColumn();
+      colDef.setCanModifyVisibility(false);
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
+
+            cell.setText(String.valueOf(tourNutritionProduct.getSodium()));
+         }
+      });
+   }
+
+   private void defineColumn_50_IsBeverage() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_ISBEVERAGE, SWT.LEAD);
+
+      colDef.setColumnLabel(Messages.Tour_Nutrition_Column_IsBeverage);
+      colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_IsBeverage);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
+
+      colDef.setIsDefaultColumn();
+      colDef.setCanModifyVisibility(false);
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
+
+            final String imageDescriptorPath = tourNutritionProduct.isBeverage()
+                  ? Images.Checkbox_Checked
+                  : Images.Checkbox_Uncheck;
+
+            final var imagetodispose = TourbookPlugin.getImageDescriptor(imageDescriptorPath).createImage();
+            cell.setImage(imagetodispose);
+         }
+      });
+   }
+
+   private void defineColumn_60_QuantityPerServing() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_QUANTITYPERSERVING, SWT.LEAD);
+
+      colDef.setColumnLabel("Messages.Tour_Nutrition_Column_IsBeverage");
+      // colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_IsBeverage);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
+
+      colDef.setIsDefaultColumn();
+      colDef.setCanModifyVisibility(false);
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
+
+            final String imageDescriptorPath = tourNutritionProduct.isBeverage()
+                  ? Images.Checkbox_Checked
+                  : Images.Checkbox_Uncheck;
+
+            final var imagetodispose = TourbookPlugin.getImageDescriptor(imageDescriptorPath).createImage();
+            cell.setImage(imagetodispose);
+         }
+      });
+   }
+
+   private void defineColumn_70_BeverageContainer() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_CONTAINER, SWT.LEAD);
+
+      colDef.setColumnLabel(Messages.Tour_Nutrition_Column_BeverageContainer);
+      colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageContainer);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
+
+      colDef.setIsDefaultColumn();
+      colDef.setCanModifyVisibility(false);
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
+
+            //final String tourBeverageContainer = tourNutritionProduct.getTourBeverageContainer();
+
+         }
+      });
+   }
+
+   private void defineColumn_80_ConsumedBeverageContainer() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_CONSUMED_CONTAINERS, SWT.LEAD);
+
+      colDef.setColumnLabel("Messages.Tour_Nutrition_Column_IsBeverage");
+      // colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_IsBeverage);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
+
+      colDef.setIsDefaultColumn();
+      colDef.setCanModifyVisibility(false);
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
+
+            final TourBeverageContainer tourBeverageContainer = tourNutritionProduct.getTourBeverageContainer();
+            if (tourBeverageContainer == null) {
+               return;
+            }
+
+            cell.setText(String.valueOf(tourBeverageContainer.getCapacity()));
          }
       });
    }
