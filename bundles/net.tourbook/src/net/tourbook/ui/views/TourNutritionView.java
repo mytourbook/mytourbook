@@ -59,9 +59,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -93,7 +93,6 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 import cop.swt.widgets.viewers.table.celleditors.RangeContent;
-import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 
 public class TourNutritionView extends ViewPart implements ITourViewer {
 
@@ -134,6 +133,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private TableViewer                    _productsViewer;
    private ColumnManager                  _columnManager;
+   private TableColumnDefinition          _colDef_BeverageContainer;
    private TourNutritionProductComparator _tourNutritionProductComparator = new TourNutritionProductComparator();
 
    private List<String>                   _searchHistory                  = new ArrayList<>();
@@ -742,31 +742,61 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _productsViewer = new TableViewer(productsTable);
       _columnManager.createColumns(_productsViewer);
-      //_productsViewer.setColumnProperties(_tableColumns.toArray(new String[0]));
+      //_productsViewer.setColumnProperties(_columnManager.getRearrangedColumns().toArray(new String[0]));
 
       // Create the cell editors
-      final CellEditor[] editors = new CellEditor[_productsViewer.getTable().getColumnCount()];
-      // Consumed amount
-      editors[0] = new SpinnerCellEditor(productsTable, _nf2, _quantityRange, SWT.NONE);
-      // Is Beverage
-      editors[4] = new CheckboxCellEditor(productsTable);
-      // Column: Consumed Containers
-      editors[7] = new SpinnerCellEditor(productsTable, _nf2, _quantityRange, SWT.NONE);
-
-      //todo fb recreate when the preferences are changed and a container is added or removed or modified
+//      final CellEditor[] editors = new CellEditor[_productsViewer.getTable().getColumnCount()];
+//      // Consumed amount
+//      editors[0] = new SpinnerCellEditor(productsTable, _nf2, _quantityRange, SWT.NONE);
+//      // Is Beverage
+//      editors[4] = new CheckboxCellEditor(productsTable);
+//      // Column: Consumed Containers
+//      editors[7] = new SpinnerCellEditor(productsTable, _nf2, _quantityRange, SWT.NONE);
+//
+//      //todo fb recreate when the preferences are changed and a container is added or removed or modified
       final var toto = TourDatabase.getTourBeverageContainers();
       final String[] items = new String[toto.size()];
       for (int index2 = 0; index2 < toto.size(); ++index2) {
          items[index2] = toto.get(index2).getName();
       }
-      editors[5] = new ComboBoxCellEditor(productsTable, items, SWT.READ_ONLY);
+//      editors[6] = new ComboBoxCellEditor(productsTable, items, SWT.READ_ONLY);
+
+      _colDef_BeverageContainer.setEditingSupport(new EditingSupport(_productsViewer) {
+
+         private ComboBoxCellEditor comboBoxCellEditor = new ComboBoxCellEditor(_productsViewer.getTable(), items, SWT.READ_ONLY);
+
+         @Override
+         protected boolean canEdit(final Object element) {
+
+            return true;
+         }
+
+         @Override
+         protected CellEditor getCellEditor(final Object element) {
+            return comboBoxCellEditor;
+         }
+
+         @Override
+         protected Object getValue(final Object element) {
+
+            return 1;// task.getTourBeverageContainerName();
+         }
+
+         @Override
+         protected void setValue(final Object element, final Object value) {
+
+            final boolean isChecked = ((Boolean) value);
+
+
+         }
+      });
       // example
       // Flask (0.5L)
       // bladder (1.5L)
       // note the append of the capacity
 
       // Assign the cell editors to the viewer
-      _productsViewer.setCellEditors(editors);
+      // _productsViewer.setCellEditors(editors);
       _productsViewer.setCellModifier(new TourNutritionProductCellModifier(_productsViewer));
 
       _productsViewer.setContentProvider(new ViewContentProvider());
@@ -823,10 +853,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_CONSUMED_AMOUNT, SWT.LEAD);
 
-      colDef.setColumnLabel("COnsumed amountMessages.Tour_Nutrition_Column_Name");
-      colDef.setColumnHeaderText("COnsumed amountMessages.Tour_Nutrition_Column_Name");
+      //todo fb
+      colDef.setColumnLabel("COnsumed amount");
+      colDef.setColumnHeaderText("COnsumed amount");
 
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(40));
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
@@ -841,7 +872,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             cell.setText(String.valueOf(tourNutritionProduct.getServingsConsumed()));
          }
       });
-
    }
 
    private void defineColumn_20_Name() {
@@ -875,7 +905,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Calories);
       colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Calories);
 
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
@@ -899,7 +929,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Sodium);
       colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Sodium);
 
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
@@ -923,7 +953,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       colDef.setColumnLabel(Messages.Tour_Nutrition_Column_IsBeverage);
       colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_IsBeverage);
 
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
@@ -949,10 +979,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_QUANTITYPERSERVING, SWT.LEAD);
 
-      colDef.setColumnLabel("Messages.Tour_Nutrition_Column_IsBeverage");
-      // colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_IsBeverage);
+      colDef.setColumnLabel("QuantityPerServing");
+      colDef.setColumnHeaderText("QuantityPerServing");
 
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
@@ -964,47 +994,45 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
 
-            final String imageDescriptorPath = tourNutritionProduct.isBeverage()
-                  ? Images.Checkbox_Checked
-                  : Images.Checkbox_Uncheck;
-
-            final var imagetodispose = TourbookPlugin.getImageDescriptor(imageDescriptorPath).createImage();
-            cell.setImage(imagetodispose);
+            cell.setText("todo fb");
          }
       });
    }
 
    private void defineColumn_70_BeverageContainer() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_CONTAINER, SWT.LEAD);
+      _colDef_BeverageContainer = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_CONTAINER, SWT.LEAD);
 
-      colDef.setColumnLabel(Messages.Tour_Nutrition_Column_BeverageContainer);
-      colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageContainer);
+      _colDef_BeverageContainer.setColumnLabel(Messages.Tour_Nutrition_Column_BeverageContainer);
+      _colDef_BeverageContainer.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageContainer);
 
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
+      _colDef_BeverageContainer.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
+      final var toto = TourDatabase.getTourBeverageContainers();
+      final String[] items = new String[toto.size()];
+      for (int index2 = 0; index2 < toto.size(); ++index2) {
+         items[index2] = toto.get(index2).getName();
+      }
 
-      colDef.setIsDefaultColumn();
-      colDef.setCanModifyVisibility(false);
-      colDef.setColumnSelectionListener(_columnSortListener);
+      _colDef_BeverageContainer.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
-
-            //final String tourBeverageContainer = tourNutritionProduct.getTourBeverageContainer();
-
-         }
-      });
+//      colDef.setLabelProvider(new CellLabelProvider() {
+//         @Override
+//         public void update(final ViewerCell cell) {
+//
+//            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
+//
+//            //final String tourBeverageContainer = tourNutritionProduct.getTourBeverageContainer();
+//
+//         }
+//      });
    }
 
    private void defineColumn_80_ConsumedBeverageContainer() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_CONSUMED_CONTAINERS, SWT.LEAD);
 
-      colDef.setColumnLabel("Messages.Tour_Nutrition_Column_IsBeverage");
-      // colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_IsBeverage);
+      colDef.setColumnLabel("ConsumedBeverageContainer");
+      colDef.setColumnHeaderText("ConsumedBeverageContainer");
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
 
