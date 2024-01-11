@@ -15,10 +15,13 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 import net.tourbook.database.TourDatabase;
 
@@ -26,13 +29,25 @@ import net.tourbook.database.TourDatabase;
 public class TourBeverageContainer {
 
    /**
+    * manually created marker or imported marker create a unique id to identify them, saved marker
+    * are compared with the marker id
+    */
+   private static final AtomicInteger _createCounter = new AtomicInteger();
+
+   /**
     * Unique id for the {@link TourBeverageContainer} entity
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long   containerId = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                       containerId    = TourDatabase.ENTITY_IS_NOT_SAVED;
+   /**
+    * unique id for manually created markers because the {@link #markerId} is 0 when the marker is
+    * not persisted
+    */
+   @Transient
+   private long                       _createId      = 0;
 
-   private String name;
+   private String                     name;
 
    //todo fb in mL?
    private float capacity;
@@ -40,6 +55,8 @@ public class TourBeverageContainer {
    public TourBeverageContainer() {}
 
    public TourBeverageContainer(final String name, final float capacity) {
+
+      _createId = _createCounter.incrementAndGet();
 
       this.name = name;
       this.capacity = capacity;

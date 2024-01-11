@@ -134,6 +134,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private TableViewer                    _productsViewer;
    private ColumnManager                  _columnManager;
    private TableColumnDefinition          _colDef_BeverageContainer;
+   private TableColumnDefinition          _colDef_Name;
+   private TableColumnDefinition          _colDef_Calories;
+   private TableColumnDefinition          _colDef_Sodium;
    private TourNutritionProductComparator _tourNutritionProductComparator = new TourNutritionProductComparator();
 
    private List<String>                   _searchHistory                  = new ArrayList<>();
@@ -179,6 +182,38 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Section     _sectionProductsList;
    private Section     _sectionSummary;
    private FormToolkit _tk;
+
+   //TODO FB
+   //https://fdc.nal.usda.gov/api-guide.html
+   private final class No_EditingSupport extends EditingSupport {
+
+      private No_EditingSupport() {
+
+         super(_productsViewer);
+      }
+
+      @Override
+      protected boolean canEdit(final Object element) {
+         return false;
+      }
+
+      @Override
+      protected CellEditor getCellEditor(final Object element) {
+         return null;
+      }
+
+      @Override
+      protected Object getValue(final Object element) {
+
+         return null;
+      }
+
+      @Override
+      protected void setValue(final Object element, final Object value) {
+
+         //Nothing to do
+      }
+   }
 
    private class TourNutritionProductCellModifier implements ICellModifier {
 
@@ -749,42 +784,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _productsViewer = new TableViewer(productsTable);
 
       // very important: the editing support must be set BEFORE the columns are created
-      final var toto = TourDatabase.getTourBeverageContainers();
-      final String[] items = new String[toto.size() + 1];
-      items[0] = UI.EMPTY_STRING;
-      for (int index2 = 0; index2 < toto.size(); ++index2) {
-         items[index2 + 1] = toto.get(index2).getName();
-      }
-      _colDef_BeverageContainer.setEditingSupport(new EditingSupport(_productsViewer) {
-
-         private ComboBoxCellEditor comboBoxCellEditor = new ComboBoxCellEditor(_productsViewer.getTable(), items, SWT.READ_ONLY);
-
-         @Override
-         protected boolean canEdit(final Object element) {
-
-            return true;
-         }
-
-         @Override
-         protected CellEditor getCellEditor(final Object element) {
-            return comboBoxCellEditor;
-         }
-
-         @Override
-         protected Object getValue(final Object element) {
-
-            return 0;// task.getTourBeverageContainerName();
-         }
-
-         @Override
-         protected void setValue(final Object element, final Object value) {
-
-            final Object toto = value;
-            final var titi = 1;
-            //  final boolean isChecked = ((Boolean) value);
-
-         }
-      });
+      setEditingSupport();
 
       _columnManager.createColumns(_productsViewer);
       // todo fb i think this creates that
@@ -821,7 +821,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _productsViewer.setContentProvider(new ViewContentProvider());
       _productsViewer.setComparator(_tourNutritionProductComparator);
-      //_productsViewer.setLabelProvider(new ViewLabelProvider());
 
       _productsViewer.addSelectionChangedListener(selectionChangedEvent -> onTableSelectionChanged(selectionChangedEvent));
 
@@ -896,18 +895,18 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineColumn_20_Name() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_NAME, SWT.LEAD);
+      _colDef_Name = new TableColumnDefinition(_columnManager, COLUMN_NAME, SWT.LEAD);
 
-      colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Name);
-      colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Name);
+      _colDef_Name.setColumnLabel(Messages.Tour_Nutrition_Column_Name);
+      _colDef_Name.setColumnHeaderText(Messages.Tour_Nutrition_Column_Name);
 
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(40));
+      _colDef_Name.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(40));
 
-      colDef.setIsDefaultColumn();
-      colDef.setCanModifyVisibility(false);
-      colDef.setColumnSelectionListener(_columnSortListener);
+      _colDef_Name.setIsDefaultColumn();
+      _colDef_Name.setCanModifyVisibility(false);
+      _colDef_Name.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      _colDef_Name.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -920,18 +919,18 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineColumn_30_Calories() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_CALORIES, SWT.LEAD);
+      _colDef_Calories = new TableColumnDefinition(_columnManager, COLUMN_CALORIES, SWT.LEAD);
 
-      colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Calories);
-      colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Calories);
+      _colDef_Calories.setColumnLabel(Messages.Tour_Nutrition_Column_Calories);
+      _colDef_Calories.setColumnHeaderText(Messages.Tour_Nutrition_Column_Calories);
 
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+      _colDef_Calories.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
-      colDef.setIsDefaultColumn();
-      colDef.setCanModifyVisibility(false);
-      colDef.setColumnSelectionListener(_columnSortListener);
+      _colDef_Calories.setIsDefaultColumn();
+      _colDef_Calories.setCanModifyVisibility(false);
+      _colDef_Calories.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      _colDef_Calories.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -944,18 +943,18 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineColumn_40_Sodium() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_SODIUM, SWT.LEAD);
+      _colDef_Sodium = new TableColumnDefinition(_columnManager, COLUMN_SODIUM, SWT.LEAD);
 
-      colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Sodium);
-      colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Sodium);
+      _colDef_Sodium.setColumnLabel(Messages.Tour_Nutrition_Column_Sodium);
+      _colDef_Sodium.setColumnHeaderText(Messages.Tour_Nutrition_Column_Sodium);
 
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+      _colDef_Sodium.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
-      colDef.setIsDefaultColumn();
-      colDef.setCanModifyVisibility(false);
-      colDef.setColumnSelectionListener(_columnSortListener);
+      _colDef_Sodium.setIsDefaultColumn();
+      _colDef_Sodium.setCanModifyVisibility(false);
+      _colDef_Sodium.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      _colDef_Sodium.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1037,7 +1036,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
-
+            cell.setText(tourNutritionProduct.getTourBeverageContainerName());
             //final String tourBeverageContainer = tourNutritionProduct.getTourBeverageContainer();
 
          }
@@ -1281,15 +1280,67 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _sectionProductsList.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_PRODUCTS_LIST, true));
    }
 
-   //TODO FB
-   //https://fdc.nal.usda.gov/api-guide.html
-
    @PersistState
    private void saveState() {
 
       _state.put(STATE_SEARCHED_NUTRITIONQUERIES, _searchHistory.toArray(new String[_searchHistory.size()]));
       _state.put(STATE_SECTION_SUMMARY, _sectionSummary.isExpanded());
       _state.put(STATE_SECTION_PRODUCTS_LIST, _sectionProductsList.isExpanded());
+   }
+
+   private void setEditingSupport() {
+
+      final var toto = TourDatabase.getTourBeverageContainers();
+      final String[] items = new String[toto.size() + 1];
+      items[0] = UI.EMPTY_STRING;
+      for (int index2 = 0; index2 < toto.size(); ++index2) {
+         items[index2 + 1] = toto.get(index2).getName();
+      }
+      // todo fb, put that in a class
+
+      _colDef_Name.setEditingSupport(new No_EditingSupport());
+      _colDef_Calories.setEditingSupport(new No_EditingSupport());
+      _colDef_Sodium.setEditingSupport(new No_EditingSupport());
+
+      _colDef_BeverageContainer.setEditingSupport(new EditingSupport(_productsViewer) {
+
+         private ComboBoxCellEditor comboBoxCellEditor = new ComboBoxCellEditor(_productsViewer.getTable(), items, SWT.READ_ONLY);
+
+         @Override
+         protected boolean canEdit(final Object element) {
+
+            return true;
+         }
+
+         @Override
+         protected CellEditor getCellEditor(final Object element) {
+            return comboBoxCellEditor;
+         }
+
+         @Override
+         protected Object getValue(final Object element) {
+
+            return 0;// task.getTourBeverageContainerName();
+         }
+
+         @Override
+         protected void setValue(final Object element, final Object value) {
+
+            final int beverageContainerIndex = (int) value;
+            final List<TourBeverageContainer> tourBeverageContainers = TourDatabase.getTourBeverageContainers();
+
+            final TourBeverageContainer selectedTourBeverageContainer = beverageContainerIndex == 0
+                  ? null
+                  : tourBeverageContainers.get(beverageContainerIndex - 1);
+
+            ((TourNutritionProduct) element).setTourBeverageContainer(selectedTourBeverageContainer);
+            _tourData = TourManager.saveModifiedTour(_tourData);
+
+            //tourNutritionProduct.setTourBeverageContainer(efrewfgrew.get(0));
+            //  final boolean isChecked = ((Boolean) value);
+
+         }
+      });
    }
 
    @Override
