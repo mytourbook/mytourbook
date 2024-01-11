@@ -38,7 +38,6 @@ import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -50,10 +49,6 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.nutrition.DialogSearchProduct;
-import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
-import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
-import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
-import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -79,6 +74,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -88,6 +85,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -100,6 +98,8 @@ import cop.swt.widgets.viewers.table.celleditors.RangeContent;
 import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 
 public class TourNutritionView extends ViewPart implements ITourViewer {
+
+   //todo fb the increment by 0.25 doesnt work on windows ???
 
    //todo fb add the possibility to add custom products (i.e: water...)
 
@@ -149,6 +149,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private List<String>                   _searchHistory                  = new ArrayList<>();
    private IPropertyChangeListener        _prefChangeListener;
+   private SelectionListener              _columnSortListener;
 
    private ISelectionListener             _postSelectionListener;
    private ITourEventListener             _tourEventListener;
@@ -274,6 +275,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          _productsViewer.refresh();
       }
    }
+
    private class TourNutritionProductComparator extends ViewerComparator {
 
       private static final int ASCENDING       = 0;
@@ -337,6 +339,41 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          // force resorting when a name is renamed
          return true;
+      }
+
+      public void setSortColumn(final Widget widget) {
+
+         final ColumnDefinition columnDefinition = (ColumnDefinition) widget.getData();
+         final String columnId = columnDefinition.getColumnId();
+
+         if (columnId == null) {
+            return;
+         }
+
+         if (columnId.equals(__sortColumnId)) {
+
+            // Same column as last sort -> select next sorting
+
+            switch (__sortDirection) {
+            case ASCENDING:
+               __sortDirection = DESCENDING;
+               break;
+
+            case DESCENDING:
+            default:
+               __sortDirection = ASCENDING;
+               break;
+            }
+
+         } else {
+
+            // New column; do an ascent sorting
+
+            __sortColumnId = columnId;
+            __sortDirection = ASCENDING;
+         }
+
+         updateUI_SetSortDirection(__sortColumnId, __sortDirection);
       }
    }
 
@@ -778,6 +815,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          }
       }
    }
+
    private void createUI_210_Actions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -853,7 +891,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _productsViewer.setContentProvider(new ViewContentProvider());
       _productsViewer.setComparator(_tourNutritionProductComparator);
-      _productsViewer.setLabelProvider(new ViewLabelProvider());
+      //_productsViewer.setLabelProvider(new ViewLabelProvider());
 
       _productsViewer.addSelectionChangedListener(selectionChangedEvent -> onTableSelectionChanged(selectionChangedEvent));
 
@@ -908,20 +946,22 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_NAME, SWT.LEAD);
 
       colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Name);
-      colDef.setColumnHeaderText("Messages.Map_Bookmark_Column_Name");
+      colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Name);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(30));
 //      colDef.setColumnWeightData(new ColumnWeightData(30));
 
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
-            final MapBookmark bookmark = (MapBookmark) cell.getElement();
 
-            cell.setText(bookmark.name);
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
+
+            cell.setText(tourNutritionProduct.getName());
          }
       });
    }
@@ -1001,6 +1041,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
+
+      _columnSortListener = widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
    }
 
    private void onDeleteProducts() {
@@ -1017,6 +1059,24 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _tourData.setTourNutritionProducts(tourNutritionProducts);
       _tourData = TourManager.saveModifiedTour(_tourData);
+   }
+
+   private void onSelect_SortColumn(final SelectionEvent e) {
+
+      _viewerContainer.setRedraw(false);
+      {
+         // keep selection
+         final ISelection selectionBackup = _productsViewer.getSelection();
+
+         // toggle sorting
+         _tourNutritionProductComparator.setSortColumn(e.widget);
+         _productsViewer.refresh();
+
+         // reselect selection
+         _productsViewer.setSelection(selectionBackup, true);
+         _productsViewer.getTable().showSelection();
+      }
+      _viewerContainer.setRedraw(true);
    }
 
    private void onSelectionChanged(final ISelection selection) {
@@ -1048,22 +1108,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             } else {
                tourData = TourManager.createJoinedTourData(tourIds);
             }
-         }
-
-      } else if (selection instanceof final SelectionReferenceTourView tourCatalogSelection) {
-
-         final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
-         if (refItem != null) {
-            tourId = refItem.getTourId();
-         }
-
-      } else if (selection instanceof final StructuredSelection structuredSelection) {
-
-         final Object firstElement = structuredSelection.getFirstElement();
-         if (firstElement instanceof final TVIRefTour_ComparedTour tviRefTour_ComparedTour) {
-            tourId = tviRefTour_ComparedTour.getTourId();
-         } else if (firstElement instanceof final TVIElevationCompareResult_ComparedTour tviElevationCompareResult_ComparedTour) {
-            tourId = tviElevationCompareResult_ComparedTour.getTourId();
          }
 
       } else if (selection instanceof SelectionDeletedTours) {
