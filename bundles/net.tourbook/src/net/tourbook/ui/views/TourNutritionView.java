@@ -742,6 +742,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _productsViewer = new TableViewer(productsTable);
       _columnManager.createColumns(_productsViewer);
+      // todo fb i think this creates that
+      // java.lang.NullPointerException: Cannot read the array length because "properties" is null
+
       //_productsViewer.setColumnProperties(_columnManager.getRearrangedColumns().toArray(new String[0]));
 
       // Create the cell editors
@@ -779,14 +782,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          @Override
          protected Object getValue(final Object element) {
 
-            return 1;// task.getTourBeverageContainerName();
+            return 0;// task.getTourBeverageContainerName();
          }
 
          @Override
          protected void setValue(final Object element, final Object value) {
 
             final boolean isChecked = ((Boolean) value);
-
 
          }
       });
@@ -1007,24 +1009,21 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_BeverageContainer.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageContainer);
 
       _colDef_BeverageContainer.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
-      final var toto = TourDatabase.getTourBeverageContainers();
-      final String[] items = new String[toto.size()];
-      for (int index2 = 0; index2 < toto.size(); ++index2) {
-         items[index2] = toto.get(index2).getName();
-      }
 
+      _colDef_BeverageContainer.setIsDefaultColumn();
+      _colDef_BeverageContainer.setCanModifyVisibility(false);
       _colDef_BeverageContainer.setColumnSelectionListener(_columnSortListener);
 
-//      colDef.setLabelProvider(new CellLabelProvider() {
-//         @Override
-//         public void update(final ViewerCell cell) {
-//
-//            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
-//
-//            //final String tourBeverageContainer = tourNutritionProduct.getTourBeverageContainer();
-//
-//         }
-//      });
+      _colDef_BeverageContainer.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
+
+            //final String tourBeverageContainer = tourNutritionProduct.getTourBeverageContainer();
+
+         }
+      });
    }
 
    private void defineColumn_80_ConsumedBeverageContainer() {
