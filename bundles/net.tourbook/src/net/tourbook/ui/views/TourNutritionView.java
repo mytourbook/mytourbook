@@ -18,8 +18,6 @@ package net.tourbook.ui.views;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import de.byteholder.geoclipse.mapprovider.MP;
-
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +32,13 @@ import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -59,9 +59,11 @@ import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
@@ -74,6 +76,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -85,7 +88,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -108,8 +110,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private static final String STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";                    //$NON-NLS-1$
    private static final String STATE_SECTION_SUMMARY           = "STATE_SECTION_SUMMARY";                          //$NON-NLS-1$
 
-   private static final String COLUMN_SERVINGS                 = Messages.Tour_Nutrition_Column_Servings;
-   private static final String COLUMN_NAME                     = Messages.Tour_Nutrition_Column_Name;
+   private static final String COLUMN_SERVINGS                 = "Servings";
+   private static final String COLUMN_NAME                     = "Name";
    private static final String COLUMN_CALORIES                 = Messages.Tour_Nutrition_Column_Calories;
    private static final String COLUMN_SODIUM                   = Messages.Tour_Nutrition_Column_Sodium;
    private static final String COLUMN_ISBEVERAGE               = Messages.Tour_Nutrition_Column_IsBeverage;
@@ -139,7 +141,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private final IDialogSettings          _state                          = TourbookPlugin.getState(ID);
    private TourData                       _tourData;
 
+   private PixelConverter                 _pc;
+
    private TableViewer                    _productsViewer;
+   private ColumnManager                  _columnManager;
    private TourNutritionProductComparator _tourNutritionProductComparator = new TourNutritionProductComparator();
 
    private List<String>                   _searchHistory                  = new ArrayList<>();
@@ -269,7 +274,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          _productsViewer.refresh();
       }
    }
-
    private class TourNutritionProductComparator extends ViewerComparator {
 
       private static final int ASCENDING       = 0;
@@ -278,36 +282,37 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       private String           __sortColumnId  = COLUMN_NAME;
       private int              __sortDirection = ASCENDING;
 
+      public TourNutritionProductComparator() {}
+
       @Override
       public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
          final boolean isDescending = __sortDirection == DESCENDING;
 
-         final MP mp1 = (MP) e1;
-         final MP mp2 = (MP) e2;
+         final TourNutritionProduct tnp1 = (TourNutritionProduct) e1;
+         final TourNutritionProduct tnp2 = (TourNutritionProduct) e2;
 
          long rc = 0;
 
          // Determine which column and do the appropriate sort
          switch (__sortColumnId) {
 
-         //todo fb
-         case "COLUMN_NAME":
-            rc = mp1.getCategory().compareTo(mp2.getCategory());
+         case COLUMN_NAME:
+            rc = tnp1.getName().compareTo(tnp2.getName());
             break;
 
          default:
-            rc = mp1.getName().compareTo(mp2.getName());
+            rc = tnp1.getName().compareTo(tnp2.getName());
          }
 
          if (rc == 0) {
 
             // subsort 1 by category
-            rc = mp1.getCategory().compareTo(mp2.getCategory());
+            rc = tnp1.getName().compareTo(tnp2.getName());
 
             // subsort 2 by map provider
             if (rc == 0) {
-               rc = mp1.getName().compareTo(mp2.getName());
+               rc = tnp1.getName().compareTo(tnp2.getName());
             }
          }
 
@@ -332,41 +337,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          // force resorting when a name is renamed
          return true;
-      }
-
-      public void setSortColumn(final Widget widget) {
-
-         final ColumnDefinition columnDefinition = (ColumnDefinition) widget.getData();
-         final String columnId = columnDefinition.getColumnId();
-
-         if (columnId == null) {
-            return;
-         }
-
-         if (columnId.equals(__sortColumnId)) {
-
-            // Same column as last sort -> select next sorting
-
-            switch (__sortDirection) {
-            case ASCENDING:
-               __sortDirection = DESCENDING;
-               break;
-
-            case DESCENDING:
-            default:
-               __sortDirection = ASCENDING;
-               break;
-            }
-
-         } else {
-
-            // New column; do an ascent sorting
-
-            __sortColumnId = columnId;
-            __sortDirection = ASCENDING;
-         }
-
-         updateUI_SetSortDirection(__sortColumnId, __sortDirection);
       }
    }
 
@@ -609,46 +579,53 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void createColumns(final Table productsTable, final List<String> tableColumns) {
 
-      int index = 0;
+      final int index = 0;
 
+      //todo fb add the tooltiptexts
       // Column: {@link #COLUMN_SERVINGS}
       final TableColumn columnServings = new TableColumn(productsTable, SWT.LEFT);
-      columnServings.setText(tableColumns.get(index++));
+      columnServings.setText(Messages.Tour_Nutrition_Column_Servings);
       columnServings.setWidth(75);
 
       // Column: {@link #COLUMN_NAME}
       final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
-      columnName.setText(tableColumns.get(index++));
+      columnName.setText(Messages.Tour_Nutrition_Column_Name);
       columnName.setWidth(150);
 
       // Column: {@link #COLUMN_CALORIES}
       final TableColumn columnCalories = new TableColumn(productsTable, SWT.LEFT);
-      columnCalories.setText(tableColumns.get(index++));
+      columnCalories.setText(Messages.Tour_Nutrition_Column_Calories);
       columnCalories.setWidth(75);
 
       // Column: {@link #COLUMN_SODIUM}
       final TableColumn columnSodium = new TableColumn(productsTable, SWT.LEFT);
-      columnSodium.setText(tableColumns.get(index++));
+      columnSodium.setText(Messages.Tour_Nutrition_Column_Sodium);
       columnSodium.setWidth(75);
 
       // Column: {@link #COLUMN_ISBEVERAGE}
       final TableColumn columnFluid = new TableColumn(productsTable, SWT.LEFT);
-      columnFluid.setText(tableColumns.get(index++));
+      columnFluid.setText(Messages.Tour_Nutrition_Column_IsBeverage);
       columnFluid.setWidth(75);
 
       // Column: {@link #COLUMN_BEVERAGE_CONTAINER}
       final TableColumn columnFluidContainerName = new TableColumn(productsTable, SWT.LEFT);
-      columnFluidContainerName.setText(tableColumns.get(index++));
+      columnFluidContainerName.setText(Messages.Tour_Nutrition_Column_BeverageContainer);
       columnFluidContainerName.setWidth(75);
 
       // Column: {@link #COLUMN_CONSUMED_CONTAINERS}
       final TableColumn columnFluidContainersConsumed = new TableColumn(productsTable, SWT.LEFT);
-      columnFluidContainersConsumed.setText(tableColumns.get(index++));
+      columnFluidContainersConsumed.setText(Messages.Tour_Nutrition_Column_ConsumedContainers);
       columnFluidContainersConsumed.setWidth(75);
    }
 
    @Override
    public void createPartControl(final Composite parent) {
+
+      initUI(parent);
+
+      // define all columns for the viewer
+      _columnManager = new ColumnManager(this, _state);
+      defineAllColumns();
 
       createUI(parent);
 
@@ -801,7 +778,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          }
       }
    }
-
    private void createUI_210_Actions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -844,10 +820,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
 
-      createColumns(productsTable, _tableColumns);
+      //createColumns(productsTable, _tableColumns);
 
       _productsViewer = new TableViewer(productsTable);
-      _productsViewer.setColumnProperties(_tableColumns.toArray(new String[0]));
+      _columnManager.createColumns(_productsViewer);
+      //_productsViewer.setColumnProperties(_tableColumns.toArray(new String[0]));
 
       // Create the cell editors
       final CellEditor[] editors = new CellEditor[_tableColumns.size()];
@@ -912,6 +889,43 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       }
    }
 
+   private void defineAllColumns() {
+
+      defineColumn_10_Name();
+//  defineColumn_20_Zoomlevel();
+//      defineColumn_30_Scale();
+//      defineColumn_40_Bearing();
+//      defineColumn_50_Tilt();
+//      defineColumn_60_Latitude();
+//      defineColumn_70_Longitude();
+   }
+
+   /**
+    * Column: Name
+    */
+   private void defineColumn_10_Name() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_NAME, SWT.LEAD);
+
+      colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Name);
+      colDef.setColumnHeaderText("Messages.Map_Bookmark_Column_Name");
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(30));
+//      colDef.setColumnWeightData(new ColumnWeightData(30));
+
+      colDef.setIsDefaultColumn();
+      colDef.setCanModifyVisibility(false);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final MapBookmark bookmark = (MapBookmark) cell.getElement();
+
+            cell.setText(bookmark.name);
+         }
+      });
+   }
+
    @Override
    public void dispose() {
 
@@ -937,7 +951,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    @Override
    public ColumnManager getColumnManager() {
-      return null;
+      return _columnManager;
    }
 
    private List<TourNutritionProduct> getSelectedProducts() {
@@ -982,6 +996,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    public ColumnViewer getViewer() {
 
       return _productsViewer;
+   }
+
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
    }
 
    private void onDeleteProducts() {
