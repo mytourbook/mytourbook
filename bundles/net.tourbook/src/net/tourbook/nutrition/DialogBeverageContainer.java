@@ -38,7 +38,7 @@ class DialogBeverageContainer extends Dialog {
    DialogBeverageContainer(final Shell parentShell) {
       super(parentShell);
    }
-
+//todo fb use user agent https://openfoodfacts.github.io/openfoodfacts-server/api/ref-v3/
    // override method to use "Login" as label for the OK button
    @Override
    protected void createButtonsForButtonBar(final Composite parent) {
