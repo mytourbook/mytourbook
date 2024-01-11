@@ -4701,7 +4701,6 @@ public class TourDatabase {
 
             + ")" //                                                                                //$NON-NLS-1$
       );
-
    }
 
    /**
@@ -6520,10 +6519,14 @@ public class TourDatabase {
          updateDb_041_To_042_DataUpdate(conn);
          updateDb_042_to_043_DataUpdate(conn, splashManager);
          updateDb_046_to_047_DataUpdate(conn, splashManager);
+
+         // ...... 47 to  48
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_047_to_048());
+
          updateDb_049_To_050_DataUpdate(conn, splashManager);
          updateDb_050_To_051_DataUpdate(conn, splashManager);
 
-         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_047_to_048());
+         // ...... 51 to  52
          updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_051_to_052());
 
       } catch (final SQLException e) {
@@ -10452,16 +10455,16 @@ public class TourDatabase {
        * update would cause an exception for a "normal" user because of the new database in db
        * version 52.
        * <p>
-       * !!! Checking only the column do not work :-( but we can check the table (this works :-)
-       * because it is created in db version 52 !!!
+       * Checking the column do not work when the database was just created, so the SQL exception is
+       * ignored
        */
-      if (isTableAvailable(conn, TABLE_TOUR_LOCATION) == false) {
+      try {
 
-         // table columns are not yet created
+         if (isColumnAvailable(conn, TABLE_TOUR_LOCATION, "appliedName") == false) {
 
-         final Statement stmt = conn.createStatement();
-         {
-            // add columns
+            final Statement stmt = conn.createStatement();
+            {
+               // add new columns in db version 53
 
 // SET_FORMATTING_OFF
 
@@ -10469,8 +10472,14 @@ public class TourDatabase {
             SQL.AddColumn_BigInt (stmt, TABLE_TOUR_LOCATION, "lastModified",  null);                              //$NON-NLS-1$
 
 // SET_FORMATTING_ON
+            }
+            stmt.close();
          }
-         stmt.close();
+      } catch (final SQLException e) {
+
+         // ignore
+
+         StatusUtil.log("V53 columns are already available, IGNORE THIS EXCEPTION", e); //$NON-NLS-1$
       }
 
       logDbUpdate_End(newDbVersion);
