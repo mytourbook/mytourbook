@@ -15,15 +15,13 @@ New
   https://github.com/mytourbook/mytourbook/discussions/1215#discussioncomment-7961052
 
 * Start/End Location
-  - Import: Automatic completion of start and end location fields
-    https://github.com/mytourbook/mytourbook/issues/878
-  - Show/modify start/end location in
+  - Show/modify start/end locations in
     - Locations view and location tooltip
     - Tour Book view location tooltip
     - 2D Map
     - Tour info tooltip
     - Quick tour editor
-    - Tour editor
+  https://github.com/mytourbook/mytourbook/issues/878
     
   RECOMMENDATION how to use and speedup tour location retrieval to avoid hundreds or more duplicates
   - Retrieve and set some locations where you often start/stop your tour, e.g. you at home
