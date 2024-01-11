@@ -80,11 +80,13 @@ public class DirectMappingPainter implements IDirectPainter {
    private boolean     _isMapBackgroundDark;
 
    /**
+    * @param map
     * @param state
     *
     */
-   public DirectMappingPainter(final IDialogSettings state) {
+   public DirectMappingPainter(final Map2 map, final IDialogSettings state) {
 
+      _map = map;
       _state = state;
 
       _imageLeftSlider = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderLeft).createImage();
@@ -792,8 +794,7 @@ public class DirectMappingPainter implements IDirectPainter {
     * @param sliderRelationPaintingData
     * @param allTourLocations
     */
-   public void setPaintContext(final Map2 map,
-                               final boolean isTourVisible,
+   public void setPaintContext(final boolean isTourVisible,
                                final TourData tourData,
 
                                final int leftSliderValuesIndex,
@@ -807,7 +808,6 @@ public class DirectMappingPainter implements IDirectPainter {
                                final SliderPathPaintingData sliderRelationPaintingData) {
 // SET_FORMATTING_OFF
 
-      _map                       = map;
       _isTourVisible             = isTourVisible;
       _tourData                  = tourData;
 
