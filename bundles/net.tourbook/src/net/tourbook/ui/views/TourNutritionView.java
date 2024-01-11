@@ -107,7 +107,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private static final String STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";             //$NON-NLS-1$
    private static final String STATE_SECTION_SUMMARY           = "STATE_SECTION_SUMMARY";                   //$NON-NLS-1$
 
-   private static final String COLUMN_CONSUMED_AMOUNT          = "ConsumedAmound";
+   private static final String COLUMN_CONSUMED_AMOUNT          = "ConsumedAmount";
    private static final String COLUMN_NAME                     = "Name";
    private static final String COLUMN_CALORIES                 = "Calories";
    private static final String COLUMN_SODIUM                   = "Sodium";
@@ -199,6 +199,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          final TourNutritionProduct task = (TourNutritionProduct) element;
 
          final TourBeverageContainer tourBeverageContainer = task.getTourBeverageContainer();
+
+         if (property.equals(COLUMN_CONSUMED_AMOUNT)) {
+
+            return task.getServingsConsumed();
+         }
+
          if (property.equals(COLUMN_SODIUM)) {
 
             return task.getSodium();
@@ -741,29 +747,14 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       productsTable.setHeaderVisible(true);
 
       _productsViewer = new TableViewer(productsTable);
-      _columnManager.createColumns(_productsViewer);
-      // todo fb i think this creates that
-      // java.lang.NullPointerException: Cannot read the array length because "properties" is null
 
-      //_productsViewer.setColumnProperties(_columnManager.getRearrangedColumns().toArray(new String[0]));
-
-      // Create the cell editors
-//      final CellEditor[] editors = new CellEditor[_productsViewer.getTable().getColumnCount()];
-//      // Consumed amount
-//      editors[0] = new SpinnerCellEditor(productsTable, _nf2, _quantityRange, SWT.NONE);
-//      // Is Beverage
-//      editors[4] = new CheckboxCellEditor(productsTable);
-//      // Column: Consumed Containers
-//      editors[7] = new SpinnerCellEditor(productsTable, _nf2, _quantityRange, SWT.NONE);
-//
-//      //todo fb recreate when the preferences are changed and a container is added or removed or modified
+      // very important: the editing support must be set BEFORE the columns are created
       final var toto = TourDatabase.getTourBeverageContainers();
-      final String[] items = new String[toto.size()];
+      final String[] items = new String[toto.size() + 1];
+      items[0] = UI.EMPTY_STRING;
       for (int index2 = 0; index2 < toto.size(); ++index2) {
-         items[index2] = toto.get(index2).getName();
+         items[index2 + 1] = toto.get(index2).getName();
       }
-//      editors[6] = new ComboBoxCellEditor(productsTable, items, SWT.READ_ONLY);
-
       _colDef_BeverageContainer.setEditingSupport(new EditingSupport(_productsViewer) {
 
          private ComboBoxCellEditor comboBoxCellEditor = new ComboBoxCellEditor(_productsViewer.getTable(), items, SWT.READ_ONLY);
@@ -788,10 +779,37 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          @Override
          protected void setValue(final Object element, final Object value) {
 
-            final boolean isChecked = ((Boolean) value);
+            final Object toto = value;
+            final var titi = 1;
+            //  final boolean isChecked = ((Boolean) value);
 
          }
       });
+
+      _columnManager.createColumns(_productsViewer);
+      // todo fb i think this creates that
+      // java.lang.NullPointerException: Cannot read the array length because "properties" is null
+
+      final String[] titi = new String[_columnManager.getVisibleAndSortedColumns().size()];
+      for (int index = 0; index < titi.length; index++) {
+         titi[index] = _columnManager.getVisibleAndSortedColumns().get(index).getColumnHeaderText(_columnManager);
+      }
+
+      _productsViewer.setColumnProperties(titi);
+
+      // Create the cell editors
+//      final CellEditor[] editors = new CellEditor[_productsViewer.getTable().getColumnCount()];
+//      // Consumed amount
+//      editors[0] = new SpinnerCellEditor(productsTable, _nf2, _quantityRange, SWT.NONE);
+//      // Is Beverage
+//      editors[4] = new CheckboxCellEditor(productsTable);
+//      // Column: Consumed Containers
+//      editors[7] = new SpinnerCellEditor(productsTable, _nf2, _quantityRange, SWT.NONE);
+//
+//      //todo fb recreate when the preferences are changed and a container is added or removed or modified
+
+      //   editors[6] = new ComboBoxCellEditor(productsTable, items, SWT.READ_ONLY);
+
       // example
       // Flask (0.5L)
       // bladder (1.5L)
@@ -856,7 +874,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_CONSUMED_AMOUNT, SWT.LEAD);
 
       //todo fb
-      colDef.setColumnLabel("COnsumed amount");
+      colDef.setColumnLabel(COLUMN_CONSUMED_AMOUNT);
       colDef.setColumnHeaderText("COnsumed amount");
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
