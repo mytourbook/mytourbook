@@ -93,6 +93,8 @@ public class NutritionQuery implements Runnable {
 
       // Sending an old and new value of null will trigger the firing.
       // Otherwise, empty values will not
+
+      //todo fb do the same for the poiview as its a bug
       if (oldValue.isEmpty() && _searchResult.isEmpty()) {
          support.firePropertyChange("_searchResult", null, null);
       }

@@ -22,6 +22,9 @@ import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.viewers.ISelection;
 
+/**
+ * Source: https://world.openfoodfacts.org/data
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Product implements ISelection {
 

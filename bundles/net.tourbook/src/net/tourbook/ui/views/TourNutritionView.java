@@ -99,9 +99,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    //todo fb the increment by 0.25 doesnt work on windows ???
 
    //todo fb add the possibility to add custom products (i.e: water...)
-
-   //todo fb add the possibility to sort the rows by name etc....
-   // by default, sort by what ?
+// => Manually with a dialog that asks the name, calories, sodium, is beverage (if yes, ungray the beverage qtty)
    public static final String  ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
    private static final String STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
    private static final String STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";             //$NON-NLS-1$
@@ -116,9 +114,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private static final String COLUMN_BEVERAGE_CONTAINER       = "BeverageContainer";
    private static final String COLUMN_CONSUMED_CONTAINERS      = "ConsumedContainers";
 
-//https://world.openfoodfacts.org/data
-
-   // in the pref page, add a button to "Refresh product's information"
+   // todo fb in the pref page, add a button to "Refresh product's information"
    // this will retrieve the updated (if any), info for each product)
    // display the previous total calories vs new total calories
 
