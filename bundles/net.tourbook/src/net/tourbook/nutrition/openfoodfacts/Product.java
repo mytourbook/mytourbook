@@ -23,10 +23,29 @@ import net.tourbook.common.util.StringUtils;
 import org.eclipse.jface.viewers.ISelection;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record Product(@JsonProperty("product_name") String productName,
-                      Nutriments nutriments,
-                      @JsonProperty("nutriscore_data") NutriScoreData nutriScoreData,
-                      String code) implements ISelection {
+public class Product implements ISelection {
+
+   public Nutriments     nutriments;
+
+   @JsonProperty("nutriscore_data")
+   public NutriScoreData nutriScoreData;
+
+   @JsonProperty("product_name")
+   public String         productName;
+
+   /*
+    * The size in g or ml for the whole product. It's a normalized version of the quantity field.
+    */
+   @JsonProperty("product_quantity")
+   public String productQuantity;
+
+   /*
+    * Quantity and Unit.
+    */
+   @JsonProperty("quantity")
+   public String quantity;
+
+   public String code;
 
    @Override
    public boolean isEmpty() {

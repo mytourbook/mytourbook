@@ -167,10 +167,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
          switch (index) {
          case 0:
-            return product.code();
+            return product.code;
 
          case 1:
-            return product.productName();
+            return product.productName;
 
          default:
             return getText(obj);

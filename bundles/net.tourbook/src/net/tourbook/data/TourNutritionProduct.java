@@ -82,6 +82,13 @@ public class TourNutritionProduct {
     */
    private boolean                    isBeverage;
 
+   /**
+    * product_quantity: string
+    *
+    * The size in g or ml for the whole product. It's a normalized version of the quantity field.
+    *
+    */
+
    @ManyToOne
    private TourBeverageContainer      tourBeverageContainer;
 
@@ -95,17 +102,17 @@ public class TourNutritionProduct {
    public TourNutritionProduct(final TourData tourData, final Product product) {
 
       this.tourData = tourData;
-      name = product.productName();
+      name = product.productName;
 
-      final Nutriments nutriments = product.nutriments();
+      final Nutriments nutriments = product.nutriments;
       if (nutriments != null) {
 
          calories = nutriments.energyKcal;
          sodium = nutriments.sodium;
       }
 
-      isBeverage = product.nutriScoreData() != null &&
-            product.nutriScoreData().isBeverage();
+      isBeverage = product.nutriScoreData != null &&
+            product.nutriScoreData.isBeverage();
 
       servingsConsumed = 1f;
 
