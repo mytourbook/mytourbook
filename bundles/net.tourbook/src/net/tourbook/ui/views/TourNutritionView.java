@@ -553,6 +553,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
+      _tourBeverageContainers = TourDatabase.getTourBeverageContainers();
+
       _pageNoData = net.tourbook.common.UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
       _tk = new FormToolkit(parent.getDisplay());
@@ -921,7 +923,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
 
-            cell.setText(String.valueOf(tourNutritionProduct.getBeverageQuantity()));
+            final String cellText = tourNutritionProduct.isBeverage()
+                  ? String.valueOf(tourNutritionProduct.getBeverageQuantity())
+                  : UI.EMPTY_STRING;
+
+            cell.setText(cellText);
          }
       });
    }
@@ -1247,7 +1253,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          @Override
          protected boolean canEdit(final Object element) {
-            return true;
+            return false;
          }
 
          @Override
@@ -1263,17 +1269,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          @Override
          protected void setValue(final Object element, final Object value) {
 
-            final boolean isBeverage = ((Boolean) value);
-
-            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
-            tourNutritionProduct.setIsBeverage(isBeverage);
-
-            if (!isBeverage) {
-               tourNutritionProduct.setContainersConsumed(0);
-               tourNutritionProduct.setTourBeverageContainer(null);
-            }
-
-            _tourData = TourManager.saveModifiedTour(_tourData);
+//            final boolean isBeverage = ((Boolean) value);
+//
+//            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
+//            tourNutritionProduct.setIsBeverage(isBeverage);
+//
+//            _tourData = TourManager.saveModifiedTour(_tourData);
          }
       });
 
@@ -1439,7 +1440,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final long averageSodiumPerHour = computeAveragePerHour(totalSodium);
       _txtSodium_Average.setText(String.valueOf(averageSodiumPerHour));
-
    }
 
 }

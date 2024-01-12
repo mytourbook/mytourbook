@@ -109,6 +109,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    private Button                        _btnSearch;
    private List<String>                  _searchHistory  = new ArrayList<>();
 
+   private Label                         _lblSearchType;
+
    private Combo                         _cboSearchQuery;
    private Combo                         _cboSearchType;
    private ComboViewer                   _queryViewer;
@@ -364,7 +366,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
             /*
              * Label: POI
              */
-            final Label label = UI.createLabel(container, Messages.Dialog_SearchProduct_Label_SearchType);
+            _lblSearchType = UI.createLabel(container, Messages.Dialog_SearchProduct_Label_SearchType);
             //todo fb
             //  label.setToolTipText(Messages.Poi_View_Label_POI_Tooltip);
          }
@@ -494,6 +496,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       _cboSearchQuery.setEnabled(false);
       _btnSearch.setEnabled(false);
       _btnAdd.setEnabled(false);
+      _cboSearchType.setEnabled(false);
+      _lblSearchType.setEnabled(false);
 
       final String searchText = _cboSearchQuery.getText();
 
@@ -519,10 +523,11 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       Display.getDefault().asyncExec(() -> {
 
-         if (searchResults.isEmpty()) {
+         if (searchResults == null) {
+
             setErrorMessage("NOT FOUND");
-            return;
          } else {
+
             setErrorMessage(null);
             _products = searchResults;
 
@@ -549,6 +554,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
          _cboSearchQuery.setEnabled(true);
          _btnSearch.setEnabled(true);
+         _cboSearchType.setEnabled(true);
+         _lblSearchType.setEnabled(true);
       });
 
    }
@@ -591,5 +598,4 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       table.setSelection(table.getSelectionIndex());
       table.setFocus();
    }
-
 }

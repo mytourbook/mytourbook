@@ -57,19 +57,24 @@ public class NutritionUtils {
          return UI.EMPTY_STRING;
       }
 
+      //todo fb split the products into 2 lists, the fluids and the foods
+      // BEVERAGES
+      // FOOD
+
       final StringBuilder stringBuilder = new StringBuilder();
       tourNutritionProducts.stream().forEach(product -> {
 
-         if (product.isBeverage() && StringUtils.hasContent(product.getTourBeverageContainerName())) {
+         if (product.getTourBeverageContainer() != null) {
 
             stringBuilder.append(UI.NEW_LINE);
-            stringBuilder.append(buildTourBeverageContainerName(product.getTourBeverageContainer()) +
+            stringBuilder.append(product.getContainersConsumed() + UI.SPACE1 +
+                  buildTourBeverageContainerName(product.getTourBeverageContainer()) +
                   " of "
                   + product.getName());
 
          } else {
             stringBuilder.append(UI.NEW_LINE);
-            stringBuilder.append(product.getProductsConsumed() + product.getName());
+            stringBuilder.append(product.getProductsConsumed() + UI.SPACE1 + product.getName());
          }
       });
 
@@ -78,7 +83,7 @@ public class NutritionUtils {
 
    public static String buildTourBeverageContainerName(final TourBeverageContainer tourBeverageContainer) {
 
-      return tourBeverageContainer.getName() + " (" + tourBeverageContainer.getCapacity() + ")";
+      return tourBeverageContainer.getName() + " (" + tourBeverageContainer.getCapacity() + " L)";
    }
 
    private static List<Product> deserializeResponse(final String body, final ProductSearchType productSearchType) {
@@ -128,12 +133,15 @@ public class NutritionUtils {
       float totalFluids = 0;
 
       for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
-         if (!tourNutritionProduct.isBeverage()) {
-            continue;
-         }
 
          final TourBeverageContainer tourBeverageContainer = tourNutritionProduct.getTourBeverageContainer();
-         totalFluids += tourBeverageContainer != null ? tourBeverageContainer.getCapacity() : 0; //todo fb find the property from openfoodfact that contains the liquid quantity
+         if (tourBeverageContainer != null) {
+            totalFluids += tourNutritionProduct.getContainersConsumed(); // multiply by the capacity
+            //todo fb find the property from openfoodfact that contains the liquid quantity
+         } else if (tourNutritionProduct.isBeverage()) {
+            totalFluids += tourNutritionProduct.getBeverageQuantity(); //todo fb multiply by the amount of consumed product
+         }
+
       }
 
       return totalFluids;

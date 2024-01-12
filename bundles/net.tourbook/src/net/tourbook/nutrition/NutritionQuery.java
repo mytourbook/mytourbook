@@ -91,6 +91,11 @@ public class NutritionQuery implements Runnable {
          _exception = e;
       }
 
+      // Sending an old and new value of null will trigger the firing.
+      // Otherwise, empty values will not
+      if (oldValue.isEmpty() && _searchResult.isEmpty()) {
+         support.firePropertyChange("_searchResult", null, null);
+      }
       support.firePropertyChange("_searchResult", oldValue, _searchResult);
    }
 }
