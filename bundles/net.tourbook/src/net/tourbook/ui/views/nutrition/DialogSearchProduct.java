@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
+import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -119,6 +120,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    private final HashMap<Integer, Image> _graphImages    = new HashMap<>();
 
    private IPropertyChangeListener       _prefChangeListener;
+
+   private AutocompleteComboInput        _autocompleteProductSearchHistory;
 
    private class SearchContentProvider implements IStructuredContentProvider {
 
@@ -378,7 +381,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
                   .applyTo(_cboSearchType);
             _cboSearchType.add(Messages.Dialog_SearchProduct_Combo_SearchType_ByName);
             _cboSearchType.add(Messages.Dialog_SearchProduct_Combo_SearchType_ByCode);
-            _cboSearchQuery.select(0);
+            _cboSearchType.select(0);
          }
       }
 
