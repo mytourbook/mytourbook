@@ -15,6 +15,8 @@
  *******************************************************************************/
 package views;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -35,17 +37,16 @@ public class TourNutritionViewTests extends UITest {
       Utils.showViewFromMenu(bot, Utils.TOUR, Utils.VIEW_NAME_TOURNUTRITION);
       final SWTBotView tourNutritionView = Utils.showView(bot, Utils.VIEW_NAME_TOURNUTRITION);
 
+      Utils.duplicateAndGetTour(bot);
+
+      tourNutritionView.show();
 
       final SWTBotTable productsTable = tourNutritionView.bot().table();
 
       // Assert initial state
-      //  int initialTableRowCount = tableMarkersTable.rowCount();
-      // Make sure that the table contains several markers
-      //  assertTrue(initialTableRowCount > 0);
-
-      Utils.duplicateAndGetTour(bot);
-
-      tourNutritionView.show();
+      final int initialTableRowCount = productsTable.rowCount();
+      // Make sure that the table doesn't contain any products
+      assertTrue(initialTableRowCount == 0);
 
       // Assert that there are 2 more markers
       // initialTableRowCount = initialTableRowCount + 2;
