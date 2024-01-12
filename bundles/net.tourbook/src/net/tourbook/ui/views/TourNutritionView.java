@@ -38,6 +38,7 @@ import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.nutrition.DialogTourNutritionProduct;
 import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -71,6 +72,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -165,6 +167,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Image       _imageDelete;
 
    private Button      _btnAddProduct;
+   private Button      _btnSearchProduct;
 
    private Button      _btnDeleteProduct;
    private PageBook    _pageBook;
@@ -657,17 +660,43 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void createUI_210_Actions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      GridDataFactory.fillDefaults().span(3, 1).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
+         /*
+          * Search product button
+          */
+         _btnSearchProduct = new Button(container, SWT.NONE);
+         _btnSearchProduct.setText(Messages.Tour_Nutrition_Button_AddProduct);
+         _btnSearchProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddProduct_Tooltip);
+         _btnSearchProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell(),
+               _tourData.getTourId()).open()));
+         _btnSearchProduct.setImage(_imageAdd);
+         GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(_btnSearchProduct);
          /*
           * Add product button
           */
          _btnAddProduct = new Button(container, SWT.NONE);
          _btnAddProduct.setText(Messages.Tour_Nutrition_Button_AddProduct);
          _btnAddProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddProduct_Tooltip);
-         _btnAddProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell(),
-               _tourData.getTourId()).open()));
+         _btnAddProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
+            final DialogTourNutritionProduct dialogTourNutritionProduct = new DialogTourNutritionProduct(Display.getCurrent().getActiveShell());
+
+            // get the new values from the dialog
+            if (dialogTourNutritionProduct.open() != Window.OK) {
+               // ask for the tour type name
+//            final InputDialog inputDialog = new InputDialog(
+//                  getShell(),
+//                  Messages.Pref_TourTypes_Dlg_new_tour_type_title,
+//                  Messages.Pref_TourTypes_Dlg_new_tour_type_msg,
+//                  UI.EMPTY_STRING,
+//                  null);
+
+               //  setFocusToViewer();
+               return;
+            }
+         }));
          _btnAddProduct.setImage(_imageAdd);
          GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(_btnAddProduct);
 
