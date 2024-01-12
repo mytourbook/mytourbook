@@ -95,6 +95,7 @@ public class GeoQuery implements Runnable {
 
          final SAXParser parser = XmlUtils.initializeParser();
          parser.parse(uri, new GeoQuerySAXHandler(_searchResult));
+         //todo fb here
          _propertyChangeSupport.firePropertyChange("_searchResult", oldValue, _searchResult); //$NON-NLS-1$
 
       } catch (final Exception e) {

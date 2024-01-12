@@ -136,9 +136,10 @@ public class NutritionUtils {
 
          final TourBeverageContainer tourBeverageContainer = tourNutritionProduct.getTourBeverageContainer();
          if (tourBeverageContainer != null) {
+
             totalFluids += tourNutritionProduct.getContainersConsumed(); // multiply by the capacity
-            //todo fb find the property from openfoodfact that contains the liquid quantity
          } else if (tourNutritionProduct.isBeverage()) {
+
             totalFluids += tourNutritionProduct.getBeverageQuantity(); //todo fb multiply by the amount of consumed product
          }
 
