@@ -33,7 +33,6 @@ public class PoiViewTests extends UITest {
    void testPoiSearch() {
 
       // Arrange
-
       bot.toolbarButtonWithTooltip("Search for places and show them on the map (Ctrl+L)").click(); //$NON-NLS-1$
       final SWTBotView searchPlacesView = bot.viewByTitle(Utils.VIEW_NAME_SEARCHPLACES);
       searchPlacesView.show();
