@@ -115,11 +115,12 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 54;
+   private static final int TOURBOOK_DB_VERSION = 55;
 
-//   private static final int TOURBOOK_DB_VERSION = 54; // 24.x ??????
+//   private static final int TOURBOOK_DB_VERSION = 55; // 24.x ??????
 
-//   private static final int TOURBOOK_DB_VERSION = 53; // 24.1
+//   private static final int TOURBOOK_DB_VERSION = 54; // 24.1 fixed db data update bug 47 -> 48
+//   private static final int TOURBOOK_DB_VERSION = 53; // 24.1 added new fields
 //   private static final int TOURBOOK_DB_VERSION = 52; // 24.1
 //   private static final int TOURBOOK_DB_VERSION = 51; // 23.8
 //   private static final int TOURBOOK_DB_VERSION = 50; // 23.5
@@ -172,7 +173,6 @@ public class TourDatabase {
 //   private static final String SQL_STATE_XJ004_DATABASE_NOT_FOUND         = "XJ004";                                                 //$NON-NLS-1$
 
    private static final String NL                                         = UI.NEW_LINE;
-   private static final String TIME_STAMP                                 = net.tourbook.common.UI.timeStamp();
 
    private static final int    MAX_TRIES_TO_PING_SERVER                   = 10;
 
@@ -2775,6 +2775,33 @@ public class TourDatabase {
       }
    }
 
+   static void logDbUpdate(final String info) {
+
+      System.out.println(net.tourbook.common.UI.timeStamp() + "[DB Update] " + info); //$NON-NLS-1$
+   }
+
+   private static void logDbUpdate_End(final int dbVersion) {
+
+      System.out.println(NLS.bind(Messages.Tour_Database_UpdateDone, dbVersion));
+      System.out.println();
+   }
+
+   private static void logDbUpdate_Start(final int dbVersion) {
+
+      System.out.println();
+      System.out.println(NLS.bind(Messages.Tour_Database_Update, dbVersion));
+   }
+
+   private static void logDerbyCommand(final String dbUrl) {
+
+      System.out.println(net.tourbook.common.UI.timeStamp() + "[Executing Derby command] " + dbUrl); //$NON-NLS-1$
+   }
+
+   private static void logDerbyInfo(final String info) {
+
+      System.out.println(net.tourbook.common.UI.timeStamp() + "[Derby] " + info); //$NON-NLS-1$
+   }
+
    /**
     * Persists an entity.
     * <p>
@@ -4139,13 +4166,13 @@ public class TourDatabase {
 
                   + SQL.CreateField_EntityId(ENTITY_ID_BEVERAGECONTAINER, true)
 
-                  // Version 54 - begin
+                  // Version 55 - begin
 
                   + "   name                VARCHAR(" + TourType.DB_LENGTH_NAME + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
                   + "   capacity            FLOAT                                                       " + NL //$NON-NLS-1$
 
-                  // Version 54 - end
+                  // Version 55 - end
 
                   + ")"); //$NON-NLS-1$
    }
@@ -4862,7 +4889,7 @@ public class TourDatabase {
             + "   " + KEY_TOUR + "           BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   " + KEY_BEVERAGE_CONTAINER + "  BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
-            // Version 54 - begin
+            // Version 55 - begin
 
             + "   productsConsumed    FLOAT,                                               " + NL //$NON-NLS-1$
             + "   name                VARCHAR(" + TourNutritionProduct.DB_LENGTH_NAME + ")," + NL //$NON-NLS-1$ //$NON-NLS-2$
@@ -4872,7 +4899,7 @@ public class TourDatabase {
             + "   beverageQuantity    INTEGER,                                             " + NL //$NON-NLS-1$
             + "   containersConsumed  FLOAT                                                " + NL //$NON-NLS-1$
 
-            // Version 54 - end
+            // Version 55 - end
 
             + ")"); //$NON-NLS-1$
    }
@@ -5441,33 +5468,6 @@ public class TourDatabase {
       return isColumnAvailable(conn, TABLE_TOUR_DATA, RENAMED__TOUR_RECORDING_TIME__FROM)
             ? RENAMED__TOUR_RECORDING_TIME__FROM
             : RENAMED__TOUR_RECORDING_TIME__INTO;
-   }
-
-   private void logDbUpdate(final String info) {
-
-      System.out.println(TIME_STAMP + "[DB Update] " + info); //$NON-NLS-1$
-   }
-
-   private void logDbUpdate_End(final int dbVersion) {
-
-      System.out.println(NLS.bind(Messages.Tour_Database_UpdateDone, dbVersion));
-      System.out.println();
-   }
-
-   private void logDbUpdate_Start(final int dbVersion) {
-
-      System.out.println();
-      System.out.println(NLS.bind(Messages.Tour_Database_Update, dbVersion));
-   }
-
-   private void logDerbyCommand(final String dbUrl) {
-
-      System.out.println(TIME_STAMP + "[Executing Derby command] " + dbUrl); //$NON-NLS-1$
-   }
-
-   private void logDerbyInfo(final String info) {
-
-      System.out.println(TIME_STAMP + "[Derby] " + info); //$NON-NLS-1$
    }
 
    private void modifyColumn_Type(final String table,
@@ -6561,9 +6561,14 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_052_To_053(conn, splashManager);
          }
 
-         // 53 -> 54 > 24.XX
+         // 53 -> 54    24.1
          if (currentDbVersion == 53) {
             currentDbVersion = _dbDesignVersion_New = updateDb_053_To_054(conn, splashManager);
+         }
+
+// 54 -> 55 > 24.XX
+         if (currentDbVersion == 54) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_054_To_055(conn, splashManager);
          }
 
          // update db design version number
@@ -6618,20 +6623,16 @@ public class TourDatabase {
          updateDb_028_To_029_DataUpdate(conn, splashManager);
          updateDb_031_To_032_DataUpdate(conn, splashManager);
          updateDb_033_To_034_DataUpdate(conn, splashManager);
-         updateDb_036_To_037_DataUpdate(conn, splashManager);
-         updateDb_039_To_040_DataUpdate(conn, splashManager);
-         updateDb_041_To_042_DataUpdate(conn);
-         updateDb_042_to_043_DataUpdate(conn, splashManager);
-         updateDb_046_to_047_DataUpdate(conn, splashManager);
-
-         // ...... 47 to  48
-         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_047_to_048());
-
-         updateDb_049_To_050_DataUpdate(conn, splashManager);
-         updateDb_050_To_051_DataUpdate(conn, splashManager);
-
-         // ...... 51 to  52
-         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_051_to_052());
+         updateDb_036_To_037_DataUpdate(conn, splashManager); //                                   37 - 19.2
+         updateDb_039_To_040_DataUpdate(conn, splashManager); //                                   40 - 19.10
+         updateDb_041_To_042_DataUpdate(conn); //                                                  42 - 20.11.1
+         updateDb_042_to_043_DataUpdate(conn, splashManager); //                                   43 - 21.3
+         updateDb_046_to_047_DataUpdate(conn, splashManager); //                                   47 - 22.3
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_047_to_048()); //     48 - 22.6
+         updateDb_049_To_050_DataUpdate(conn, splashManager); //                                   50 - 23.5
+         updateDb_050_To_051_DataUpdate(conn, splashManager); //                                   51 - 23.8
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_051_to_052()); //     52 - 24.1
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_053_to_054()); //     54 - 24.1
 
       } catch (final SQLException e) {
 
@@ -6653,7 +6654,9 @@ public class TourDatabase {
       final int dbDataVersion = tourDataUpdater.getDatabaseVersion();
 
       if (getDbVersion(connection, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+
          // data version is higher -> nothing to do
+
          return;
       }
 
@@ -10555,10 +10558,6 @@ public class TourDatabase {
       updateMonitor(splashManager, newDbVersion);
 
       /**
-       * This check is VERY IMPORTANT because db version 53 was used during development and this db
-       * update would cause an exception for a "normal" user because of the new database in db
-       * version 52.
-       * <p>
        * Checking the column do not work when the database was just created, so the SQL exception is
        * ignored
        */
@@ -10591,9 +10590,33 @@ public class TourDatabase {
       return newDbVersion;
    }
 
+   /**
+    * Dummy update that {@link net.tourbook.database.TourDataUpdate_053_to_054} works
+    *
+    * @param conn
+    * @param splashManager
+    *
+    * @return
+    *
+    * @throws SQLException
+    */
    private int updateDb_053_To_054(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 54;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      // this is a dummy db design update that the db data update works
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDb_054_To_055(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 55;
 
       logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
