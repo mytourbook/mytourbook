@@ -85,6 +85,9 @@ public class TourNutritionProduct {
    @ManyToOne
    private TourBeverageContainer      tourBeverageContainer;
 
+   /**
+    * The total number of beverage containers consumed
+    */
    private float                      containersConsumed;
 
    public TourNutritionProduct() {}
@@ -97,8 +100,8 @@ public class TourNutritionProduct {
       final Nutriments nutriments = product.nutriments();
       if (nutriments != null) {
 
-         calories = nutriments.energyKcalServing;
-         sodium = nutriments.sodiumServing;
+         calories = nutriments.energyKcal;
+         sodium = nutriments.sodium;
       }
 
       isBeverage = product.nutriScoreData() != null &&

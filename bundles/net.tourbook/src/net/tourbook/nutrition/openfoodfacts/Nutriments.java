@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Nutriments {
 
-   @JsonProperty("energy-kcal_serving")
-   public int   energyKcalServing;
+   @JsonProperty("energy-kcal")
+   public int   energyKcal;
 
-   @JsonProperty("sodium_serving")
-   public float sodiumServing;
+   @JsonProperty("sodium")
+   public float sodium;
 }
