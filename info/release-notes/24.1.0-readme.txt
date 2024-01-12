@@ -106,6 +106,9 @@ Bugfix
   - Fixed a bug when creating new profiles (Linux only)
     https://github.com/mytourbook/mytourbook/issues/1241
 
+* POI View (Frederic)
+  - Fixed a bug when the search results are empty and cause the POIView to wait infinitely.
+    https://github.com/mytourbook/mytourbook/issues/1252
 
 Translation    
 ===========
