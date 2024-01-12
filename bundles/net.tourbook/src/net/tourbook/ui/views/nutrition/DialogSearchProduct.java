@@ -421,8 +421,11 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private void enableControls() {
 
-      final ISelection selection = _productsViewer.getSelection();
-      _btnAdd.setEnabled(!selection.isEmpty());
+      if (_productsViewer != null) {
+
+         final ISelection selection = _productsViewer.getSelection();
+         _btnAdd.setEnabled(!selection.isEmpty());
+      }
 
       if (_cboSearchType.getSelectionIndex() == 1) {
 

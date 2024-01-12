@@ -63,7 +63,6 @@ import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
-import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -79,7 +78,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -217,94 +215,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       protected void setValue(final Object element, final Object value) {
 
          //Nothing to do
-      }
-   }
-
-   private class TourNutritionProductCellModifier implements ICellModifier {
-
-      private Viewer viewer;
-
-      private TourNutritionProductCellModifier(final Viewer viewer) {
-         this.viewer = viewer;
-      }
-
-      @Override
-      public boolean canModify(final Object element, final String property) {
-         return true;
-      }
-
-      @Override
-      public Object getValue(final Object element, final String property) {
-
-         final TourNutritionProduct task = (TourNutritionProduct) element;
-
-         final TourBeverageContainer tourBeverageContainer = task.getTourBeverageContainer();
-
-         if (property.equals(COLUMN_CONSUMED_AMOUNT)) {
-
-            return task.getServingsConsumed();
-         }
-
-         if (property.equals(COLUMN_SODIUM)) {
-
-            return task.getSodium();
-
-         } else if (property.equals(COLUMN_ISBEVERAGE)) {
-
-            return Boolean.valueOf(task.isBeverage());
-
-         } else if (property.equals(COLUMN_BEVERAGE_CONTAINER) &&
-               tourBeverageContainer != null) {
-
-            return 1;// task.getTourBeverageContainerName();
-
-         } else if (property.equals(COLUMN_CONSUMED_CONTAINERS) &&
-               tourBeverageContainer != null) {
-
-            return task.getTourBeverageContainer().getCapacity();
-
-         }
-
-         return UI.EMPTY_STRING;
-      }
-
-      @Override
-      public void modify(Object element, final String property, final Object value) {
-
-         if (element instanceof final Item elementItem) {
-            element = (elementItem).getData();
-         }
-         final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
-
-//         if (property.equals(COLUMN_SERVINGS)) {
-//
-//            tourNutritionProduct.setServingsConsumed(((Double) value).floatValue());
-//
-//         } else
-         if (property.equals(COLUMN_CONSUMED_CONTAINERS)) {
-
-            tourNutritionProduct.getContainersConsumed();
-
-         } else if (property.equals(COLUMN_ISBEVERAGE)) {
-
-            final boolean booleanValue = ((Boolean) value).booleanValue();
-            tourNutritionProduct.setIsBeverage(booleanValue);
-
-            if (!booleanValue) {
-               tourNutritionProduct.setTourBeverageContainer(null);
-            }
-         }
-
-         else if (property.equals(COLUMN_BEVERAGE_CONTAINER)) {
-
-            final var toto = TourDatabase.getTourBeverageContainers();
-
-            tourNutritionProduct.setTourBeverageContainer(toto.get(0));
-         }
-
-         _tourData = TourManager.saveModifiedTour(_tourData);
-
-         _productsViewer.refresh();
       }
    }
 
@@ -814,10 +724,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       // bladder (1.5L)
       // note the append of the capacity
 
-      // Assign the cell editors to the viewer
-      // _productsViewer.setCellEditors(editors);
-      _productsViewer.setCellModifier(new TourNutritionProductCellModifier(_productsViewer));
-
       _productsViewer.setContentProvider(new ViewContentProvider());
       _productsViewer.setComparator(_tourNutritionProductComparator);
 
@@ -1067,7 +973,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                return;
             }
 
-            cell.setText(String.valueOf(tourBeverageContainer.getCapacity()));
+            cell.setText(String.valueOf(tourNutritionProduct.getContainersConsumed()));
          }
       });
    }
@@ -1398,7 +1304,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                   ? null
                   : tourBeverageContainers.get(beverageContainerIndex - 1);
 
-            ((TourNutritionProduct) element).setTourBeverageContainer(selectedTourBeverageContainer);
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
+            tourNutritionProduct.setTourBeverageContainer(selectedTourBeverageContainer);
+            tourNutritionProduct.setContainersConsumed(1);
             _tourData = TourManager.saveModifiedTour(_tourData);
          }
       });
