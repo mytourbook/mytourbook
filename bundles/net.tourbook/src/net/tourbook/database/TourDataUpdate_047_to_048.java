@@ -30,6 +30,9 @@ public class TourDataUpdate_047_to_048 implements ITourDataUpdate {
    @Override
    public boolean updateTourData(final TourData tourData) {
 
+      // convert weather-showers-scatterd
+      //    into weather-showers-scattered
+
       if (tourData.getWeather_Clouds().equalsIgnoreCase("weather-showers-scatterd")) { //$NON-NLS-1$
 
          /**
