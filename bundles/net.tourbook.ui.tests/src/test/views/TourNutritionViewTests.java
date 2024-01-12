@@ -16,6 +16,7 @@
 package views;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +35,8 @@ public class TourNutritionViewTests extends UITest {
       Utils.showViewFromMenu(bot, Utils.TOUR, Utils.VIEW_NAME_TOURNUTRITION);
       final SWTBotView tourNutritionView = Utils.showView(bot, Utils.VIEW_NAME_TOURNUTRITION);
 
-      // final SWTBotTable tableMarkersTable = allTourMarkersView.bot().table();
+
+      final SWTBotTable productsTable = tourNutritionView.bot().table();
 
       // Assert initial state
       //  int initialTableRowCount = tableMarkersTable.rowCount();
