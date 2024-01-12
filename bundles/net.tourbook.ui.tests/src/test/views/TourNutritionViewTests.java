@@ -17,9 +17,13 @@ package views;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 import net.tourbook.Messages;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
@@ -54,27 +58,20 @@ public class TourNutritionViewTests extends UITest {
       bot.comboBox(0).setText("bobo"); //$NON-NLS-1$
 
       bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
+      bot.sleep(5000);
 
-      // Assert that there are 2 more markers
-      // initialTableRowCount = initialTableRowCount + 2;
-      //  assertEquals(initialTableRowCount, tableMarkersTable.rowCount());
+      bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
 
-      // Act: Delete the 2 markers
-//      int rowIndex = tableMarkersTable.searchText("1/1/09"); //$NON-NLS-1$
-//      assertTrue(rowIndex != -1);
-//      tableMarkersTable.select(rowIndex);
-//      tableMarkersTable.contextMenu(Messages.App_Action_DeleteTourMarker).click();
-//      Utils.clickYesButton(bot);
-//
-//      rowIndex = tableMarkersTable.searchText("1/1/09"); //$NON-NLS-1$
-//      assertTrue(rowIndex != -1);
-//      tableMarkersTable.select(rowIndex);
-//      tableMarkersTable.pressShortcut(KeyStroke.getInstance(0, SWT.DEL));
-//      bot.sleep(1000);
-//      Utils.clickYesButton(bot);
+      final SWTBotShell[] currentShells = bot.shells();
+      // The experimental dialog message only appears once
+      final Optional<SWTBotShell> dialogSearchProductShell = Arrays.stream(currentShells).filter(shell -> shell.getText().equals(
+            Messages.Dialog_SearchProduct_Title)).findFirst();
+      if (dialogSearchProductShell.isPresent()) {
+         dialogSearchProductShell.get().close();
+      }
 
-      // Make sure that the table contains 2 less marker
-      // assertEquals(initialTableRowCount - 2, tableMarkersTable.rowCount());
+      // Make sure that the table now contains 1 product
+      assertTrue(productsTable.rowCount() == 1);
 
       final SWTBotTreeItem tour = Utils.selectDuplicatedTour(bot);
       Utils.deleteTour(bot, tour);

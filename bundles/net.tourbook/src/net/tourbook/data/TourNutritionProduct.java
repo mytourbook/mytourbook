@@ -116,7 +116,7 @@ public class TourNutritionProduct {
       if (nutriments != null) {
 
          //todo fb what if product quantity is null
-         calories = Math.round((nutriments.energyKcal100g * Integer.valueOf(product.productQuantity)) / 100f);
+         calories = 12; // Math.round((nutriments.energyKcal100g * Integer.valueOf(product.productQuantity)) / 100f);
          sodium = Math.round(nutriments.sodium100g * 1000);
       }
 
