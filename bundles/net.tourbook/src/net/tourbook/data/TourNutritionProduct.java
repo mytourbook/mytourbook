@@ -165,6 +165,15 @@ public class TourNutritionProduct {
       return tourBeverageContainer;
    }
 
+   public String getTourBeverageContainerCapacity() {
+
+      if (tourBeverageContainer != null) {
+         return String.valueOf(tourBeverageContainer.getCapacity());
+      }
+
+      return UI.EMPTY_STRING;
+   }
+
    public String getTourBeverageContainerName() {
 
       if (tourBeverageContainer != null) {

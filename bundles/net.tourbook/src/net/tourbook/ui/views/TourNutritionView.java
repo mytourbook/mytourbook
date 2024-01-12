@@ -142,6 +142,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private TableColumnDefinition          _colDef_BeverageContainer;
    private TableColumnDefinition          _colDef_ConsumedBeverageContainers;
    private TourNutritionProductComparator _tourNutritionProductComparator = new TourNutritionProductComparator();
+   private List<TourBeverageContainer>    _tourBeverageContainers         = new ArrayList<>();
 
    private List<String>                   _searchHistory                  = new ArrayList<>();
    private IPropertyChangeListener        _prefChangeListener;
@@ -943,10 +944,14 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
-            cell.setText(tourNutritionProduct.getTourBeverageContainerName());
-            //final String tourBeverageContainer = tourNutritionProduct.getTourBeverageContainer();
 
+            final String cellText = tourNutritionProduct.getTourBeverageContainer() == null
+                  ? UI.EMPTY_STRING
+                  : NutritionUtils.buildTourBeverageContainerName(tourNutritionProduct.getTourBeverageContainer());
+
+            cell.setText(cellText);
          }
+
       });
    }
 
@@ -1197,11 +1202,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void setEditingSupport() {
 
-      final var toto = TourDatabase.getTourBeverageContainers();
-      final String[] items = new String[toto.size() + 1];
+      final String[] items = new String[_tourBeverageContainers.size() + 1];
       items[0] = UI.EMPTY_STRING;
-      for (int index2 = 0; index2 < toto.size(); ++index2) {
-         items[index2 + 1] = toto.get(index2).getName();
+      for (int index2 = 0; index2 < _tourBeverageContainers.size(); ++index2) {
+
+         items[index2 + 1] = NutritionUtils.buildTourBeverageContainerName(_tourBeverageContainers.get(index2));
       }
       // todo fb, put that in a class
 
@@ -1278,10 +1283,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          @Override
          protected boolean canEdit(final Object element) {
-
-            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
-
-            return tourNutritionProduct.isBeverage();
+            return _tourBeverageContainers.size() > 0;
          }
 
          @Override
@@ -1299,11 +1301,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          protected void setValue(final Object element, final Object value) {
 
             final int beverageContainerIndex = (int) value;
-            final List<TourBeverageContainer> tourBeverageContainers = TourDatabase.getTourBeverageContainers();
 
             final TourBeverageContainer selectedTourBeverageContainer = beverageContainerIndex == 0
                   ? null
-                  : tourBeverageContainers.get(beverageContainerIndex - 1);
+                  : _tourBeverageContainers.get(beverageContainerIndex - 1);
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
             tourNutritionProduct.setTourBeverageContainer(selectedTourBeverageContainer);
@@ -1318,7 +1319,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          @Override
          protected boolean canEdit(final Object element) {
-            return true;
+            return _tourBeverageContainers.size() > 0;
          }
 
          @Override

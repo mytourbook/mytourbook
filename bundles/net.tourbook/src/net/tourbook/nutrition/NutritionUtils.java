@@ -45,7 +45,7 @@ public class NutritionUtils {
     * https://world.openfoodfacts.org/files/api-documentation.html#jump-SearchRequests-Searchingforproducts
     */
    private static final String OPENFOODFACTS_SEARCH_BY_NAME_URL =
-         "https://world.openfoodfacts.org/cgi/search.pl?action=process&sort_by=unique_scans_n&page_size=20&json=true&search_terms=";    //$NON-NLS-1$
+         "https://world.openfoodfacts.org/cgi/search.pl?action=process&sort_by=unique_scans_n&page_size=20&json=true&search_terms=";       //$NON-NLS-1$
    private static final String OPENFOODFACTS_SEARCH_BY_CODE_URL =
          "https://world.openfoodfacts.net/api/v3/product/%s?fields=code,product_name,nutriscore_data,nutriments,quantity,product_quantity";
 
@@ -63,18 +63,22 @@ public class NutritionUtils {
          if (product.isBeverage() && StringUtils.hasContent(product.getTourBeverageContainerName())) {
 
             stringBuilder.append(UI.NEW_LINE);
-            stringBuilder.append(product.getTourBeverageContainerName() +
-                  " (" + product.getTourBeverageContainer().getCapacity() + " L)" +
+            stringBuilder.append(buildTourBeverageContainerName(product.getTourBeverageContainer()) +
                   " of "
                   + product.getName());
 
          } else {
             stringBuilder.append(UI.NEW_LINE);
-            stringBuilder.append(product.getProductsConsumed() + " serving of " + product.getName());
+            stringBuilder.append(product.getProductsConsumed() + product.getName());
          }
       });
 
       return stringBuilder.toString();
+   }
+
+   public static String buildTourBeverageContainerName(final TourBeverageContainer tourBeverageContainer) {
+
+      return tourBeverageContainer.getName() + " (" + tourBeverageContainer.getCapacity() + ")";
    }
 
    private static List<Product> deserializeResponse(final String body, final ProductSearchType productSearchType) {
