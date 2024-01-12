@@ -32,6 +32,8 @@ import net.tourbook.nutrition.openfoodfacts.Product;
 @Entity
 public class TourNutritionProduct {
 
+   public static final int            DB_LENGTH_NAME = 1024;
+
    /**
     * manually created marker or imported marker create a unique id to identify them, saved marker
     * are compared with the marker id
@@ -60,27 +62,33 @@ public class TourNutritionProduct {
    private String                     name;
 
    /**
-    * Calories per serving.
+    * Calories per product.
     * Unit: kcal
     */
    private int                        calories;
 
    /**
-    * Sodium amount per serving.
+    * Sodium amount per product.
     * Unit: mg
     */
-   private float                      sodium;
+   private int                        sodium;
 
    /**
-    * The number of servings consumed of the product.
+    * The number of products consumed.
     */
-   private float                      servingsConsumed;
+   private float                      productsConsumed;
 
    /**
     * Indicates if the nutrition product is a beverage itself or used in a
     * beverage.
     */
    private boolean                    isBeverage;
+
+   /**
+    * If the product is a beverage, the amount of liquid per product.
+    * Unit: mL
+    */
+   private float                      beverageQuantity;
 
    /**
     * product_quantity: string
@@ -107,16 +115,20 @@ public class TourNutritionProduct {
       final Nutriments nutriments = product.nutriments;
       if (nutriments != null) {
 
-         calories = nutriments.energyKcal;
-         sodium = nutriments.sodium;
+         calories = Math.round((nutriments.energyKcal100g * Integer.valueOf(product.productQuantity)) / 100f);
+         sodium = Math.round(nutriments.sodium100g * 1000);
       }
 
       isBeverage = product.nutriScoreData != null &&
             product.nutriScoreData.isBeverage();
 
-      servingsConsumed = 1f;
+      productsConsumed = 1f;
 
       _createId = _createCounter.incrementAndGet();
+   }
+
+   public float getBeverageQuantity() {
+      return beverageQuantity;
    }
 
    public int getCalories() {
@@ -135,12 +147,12 @@ public class TourNutritionProduct {
       return productCode;
    }
 
-   public float getServingsConsumed() {
-      return servingsConsumed;
+   public float getProductsConsumed() {
+      return productsConsumed;
    }
 
    public int getSodium() {
-      return Math.round(sodium * 1000);
+      return sodium;
    }
 
    public TourBeverageContainer getTourBeverageContainer() {
@@ -164,6 +176,10 @@ public class TourNutritionProduct {
       return isBeverage;
    }
 
+   public void setBeverageQuantity(final float beverageQuantity) {
+      this.beverageQuantity = beverageQuantity;
+   }
+
    public void setContainersConsumed(final float containersConsumed) {
       this.containersConsumed = containersConsumed;
    }
@@ -172,8 +188,8 @@ public class TourNutritionProduct {
       this.isBeverage = isBeverage;
    }
 
-   public void setServingsConsumed(final float servingsConsumed) {
-      this.servingsConsumed = servingsConsumed;
+   public void setProductsConsumed(final float servingsConsumed) {
+      this.productsConsumed = servingsConsumed;
    }
 
    public void setTourBeverageContainer(final TourBeverageContainer tourBeverageContainer) {

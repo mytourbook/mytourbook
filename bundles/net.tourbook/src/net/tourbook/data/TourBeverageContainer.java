@@ -29,7 +29,7 @@ import net.tourbook.database.TourDatabase;
 public class TourBeverageContainer {
 
    /**
-    * manually created marker or imported marker create a unique id to identify them, saved marker
+    * Created container create a unique id to identify them, saved containers
     * are compared with the marker id
     */
    private static final AtomicInteger _createCounter = new AtomicInteger();
@@ -40,8 +40,10 @@ public class TourBeverageContainer {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private long                       containerId    = TourDatabase.ENTITY_IS_NOT_SAVED;
+
    /**
-    * unique id for manually created markers because the {@link #markerId} is 0 when the marker is
+    * Unique id for created containers because the {@link #containerId} is 0 when the
+    * containerId is
     * not persisted
     */
    @Transient

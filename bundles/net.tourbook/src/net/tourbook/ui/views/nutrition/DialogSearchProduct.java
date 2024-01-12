@@ -80,6 +80,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    //todo fb
    //Sync error after adding a 2nd product
 
+   //limit the number of query history to 20
+   // if already present and more than 20, assign a "weight" to keep the most used
+   // in the future, add the possibility to change that limit of 20
+
    public static final String            ID                           = "net.tourbook.ui.views.nutrition.DialogSearchProduct"; //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore                   = TourbookPlugin.getPrefStore();

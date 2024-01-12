@@ -107,12 +107,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private static final String STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";             //$NON-NLS-1$
    private static final String STATE_SECTION_SUMMARY           = "STATE_SECTION_SUMMARY";                   //$NON-NLS-1$
 
-   private static final String COLUMN_CONSUMED_AMOUNT          = "ConsumedAmount";
+   private static final String COLUMN_PRODUCTS_CONSUMED        = "ProductsConsumed";
    private static final String COLUMN_NAME                     = "Name";
    private static final String COLUMN_CALORIES                 = "Calories";
    private static final String COLUMN_SODIUM                   = "Sodium";
    private static final String COLUMN_ISBEVERAGE               = "IsBeverage";
-   private static final String COLUMN_QUANTITYPERSERVING       = "QuantityPerServing";
+   private static final String COLUMN_BEVERAGEQUANTITY         = "BeverageQuantity";
    private static final String COLUMN_BEVERAGE_CONTAINER       = "BeverageContainer";
    private static final String COLUMN_CONSUMED_CONTAINERS      = "ConsumedContainers";
 
@@ -133,7 +133,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private TableViewer                    _productsViewer;
    private ColumnManager                  _columnManager;
-   private TableColumnDefinition          _colDef_ConsumedAmount;
+   private TableColumnDefinition          _colDef_ProductsConsumed;
    private TableColumnDefinition          _colDef_Name;
    private TableColumnDefinition          _colDef_Calories;
    private TableColumnDefinition          _colDef_Sodium;
@@ -763,38 +763,38 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineAllColumns() {
 
-      defineColumn_10_ConsumedAmount();
+      defineColumn_10_ProductsConsumed();
       defineColumn_20_Name();
       defineColumn_30_Calories();
       defineColumn_40_Sodium();
       defineColumn_50_IsBeverage();
-      defineColumn_60_QuantityPerServing();
+      defineColumn_60_BeverageQuantity();
       defineColumn_70_BeverageContainer();
       defineColumn_80_ConsumedBeverageContainers();
    }
 
-   private void defineColumn_10_ConsumedAmount() {
+   private void defineColumn_10_ProductsConsumed() {
 
-      _colDef_ConsumedAmount = new TableColumnDefinition(_columnManager, COLUMN_CONSUMED_AMOUNT, SWT.LEAD);
+      _colDef_ProductsConsumed = new TableColumnDefinition(_columnManager, COLUMN_PRODUCTS_CONSUMED, SWT.LEAD);
 
       //todo fb
-      _colDef_ConsumedAmount.setColumnLabel(COLUMN_CONSUMED_AMOUNT);
-      _colDef_ConsumedAmount.setColumnHeaderText("amount");
-      _colDef_ConsumedAmount.setColumnHeaderToolTipText("The total number of consumed product");
+      _colDef_ProductsConsumed.setColumnLabel(COLUMN_PRODUCTS_CONSUMED);
+      _colDef_ProductsConsumed.setColumnHeaderText("amount");
+      _colDef_ProductsConsumed.setColumnHeaderToolTipText("The total number of consumed product");
 
-      _colDef_ConsumedAmount.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+      _colDef_ProductsConsumed.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
-      _colDef_ConsumedAmount.setIsDefaultColumn();
-      _colDef_ConsumedAmount.setCanModifyVisibility(false);
-      _colDef_ConsumedAmount.setColumnSelectionListener(_columnSortListener);
+      _colDef_ProductsConsumed.setIsDefaultColumn();
+      _colDef_ProductsConsumed.setCanModifyVisibility(false);
+      _colDef_ProductsConsumed.setColumnSelectionListener(_columnSortListener);
 
-      _colDef_ConsumedAmount.setLabelProvider(new CellLabelProvider() {
+      _colDef_ProductsConsumed.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
 
-            cell.setText(String.valueOf(tourNutritionProduct.getServingsConsumed()));
+            cell.setText(String.valueOf(tourNutritionProduct.getProductsConsumed()));
          }
       });
    }
@@ -900,9 +900,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       });
    }
 
-   private void defineColumn_60_QuantityPerServing() {
+   private void defineColumn_60_BeverageQuantity() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_QUANTITYPERSERVING, SWT.LEAD);
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGEQUANTITY, SWT.LEAD);
 
       colDef.setColumnLabel("QuantityPerServing");
       colDef.setColumnHeaderText("QuantityPerServing");
@@ -1204,7 +1204,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       }
       // todo fb, put that in a class
 
-      _colDef_ConsumedAmount.setEditingSupport(new EditingSupport(_productsViewer) {
+      _colDef_ProductsConsumed.setEditingSupport(new EditingSupport(_productsViewer) {
 
          private SpinnerCellEditor spinnerCellEditor = new SpinnerCellEditor(_productsViewer.getTable(), _nf2, _quantityRange, SWT.NONE);
 
@@ -1220,7 +1220,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          @Override
          protected Object getValue(final Object element) {
-            return ((TourNutritionProduct) element).getServingsConsumed();
+            return ((TourNutritionProduct) element).getProductsConsumed();
          }
 
          @Override
@@ -1228,7 +1228,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             final float consumedAmount = ((Double) value).floatValue();
 
-            ((TourNutritionProduct) element).setServingsConsumed(consumedAmount);
+            ((TourNutritionProduct) element).setProductsConsumed(consumedAmount);
             _tourData = TourManager.saveModifiedTour(_tourData);
          }
       });

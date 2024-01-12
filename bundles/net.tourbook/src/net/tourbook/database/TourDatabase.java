@@ -4864,12 +4864,13 @@ public class TourDatabase {
 
             // Version 54 - begin
 
-            + "   name                VARCHAR(" + TourWayPoint.DB_LENGTH_NAME + "),        " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   productsConsumed    FLOAT,                                               " + NL //$NON-NLS-1$
+            + "   name                VARCHAR(" + TourNutritionProduct.DB_LENGTH_NAME + ")," + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   calories            INTEGER,                                             " + NL //$NON-NLS-1$
-            + "   sodium              FLOAT,                                               " + NL //$NON-NLS-1$
-            + "   servingsConsumed    FLOAT,                                               " + NL //$NON-NLS-1$
-            + "   containersConsumed  FLOAT,                                               " + NL //$NON-NLS-1$
-            + "   isBeverage          BOOLEAN DEFAULT FALSE                                " + NL //$NON-NLS-1$
+            + "   sodium              INTEGER,                                             " + NL //$NON-NLS-1$
+            + "   isBeverage          BOOLEAN DEFAULT FALSE,                               " + NL //$NON-NLS-1$
+            + "   beverageQuantity    INTEGER,                                             " + NL //$NON-NLS-1$
+            + "   containersConsumed  FLOAT                                                " + NL //$NON-NLS-1$
 
             // Version 54 - end
 

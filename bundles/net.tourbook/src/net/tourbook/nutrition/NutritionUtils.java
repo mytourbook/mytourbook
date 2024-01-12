@@ -47,7 +47,7 @@ public class NutritionUtils {
    private static final String OPENFOODFACTS_SEARCH_BY_NAME_URL =
          "https://world.openfoodfacts.org/cgi/search.pl?action=process&sort_by=unique_scans_n&page_size=20&json=true&search_terms=";    //$NON-NLS-1$
    private static final String OPENFOODFACTS_SEARCH_BY_CODE_URL =
-         "https://world.openfoodfacts.net/api/v3/product/%s?fields=code,product_name,nutriscore_data,nutriments,quantity";
+         "https://world.openfoodfacts.net/api/v3/product/%s?fields=code,product_name,nutriscore_data,nutriments,quantity,product_quantity";
 
    private static HttpClient   _httpClient                      = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
 
@@ -70,7 +70,7 @@ public class NutritionUtils {
 
          } else {
             stringBuilder.append(UI.NEW_LINE);
-            stringBuilder.append(product.getServingsConsumed() + " serving of " + product.getName());
+            stringBuilder.append(product.getProductsConsumed() + " serving of " + product.getName());
          }
       });
 
@@ -113,7 +113,7 @@ public class NutritionUtils {
 
    public static int getTotalCalories(final Set<TourNutritionProduct> tourNutritionProducts) {
 
-      final int totalCalories = tourNutritionProducts.stream().mapToInt(product -> Math.round(product.getCalories() * product.getServingsConsumed()))
+      final int totalCalories = tourNutritionProducts.stream().mapToInt(product -> Math.round(product.getCalories() * product.getProductsConsumed()))
             .sum();
 
       return totalCalories;
@@ -137,7 +137,7 @@ public class NutritionUtils {
 
    public static double getTotalSodium(final Set<TourNutritionProduct> tourNutritionProducts) {
 
-      final double totalSodium = tourNutritionProducts.stream().mapToDouble(i -> i.getSodium() * i.getServingsConsumed()).sum();
+      final double totalSodium = tourNutritionProducts.stream().mapToDouble(i -> i.getSodium() * i.getProductsConsumed()).sum();
 
       return totalSodium;
    }
