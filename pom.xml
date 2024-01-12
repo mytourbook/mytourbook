@@ -23,7 +23,7 @@
 
    <properties>
       <tycho.version>3.0.5</tycho.version>
-      <surefire.version>3.2.3</surefire.version>
+      <surefire.version>3.2.5</surefire.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
 
@@ -192,7 +192,7 @@
       
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>         <groupId>org.apache.maven.plugins</groupId>
-                                                               <version>3.12.0</version>
+                                                               <version>3.12.1</version>
          <executions>
             <execution>
                <id>compiletests</id>
