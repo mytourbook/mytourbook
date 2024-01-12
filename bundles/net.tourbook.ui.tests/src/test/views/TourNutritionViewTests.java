@@ -17,6 +17,8 @@ package views;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import net.tourbook.Messages;
+
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -47,6 +49,11 @@ public class TourNutritionViewTests extends UITest {
       final int initialTableRowCount = productsTable.rowCount();
       // Make sure that the table doesn't contain any products
       assertTrue(initialTableRowCount == 0);
+
+      bot.button(Messages.Tour_Nutrition_Button_AddProduct).click();
+      bot.comboBox(0).setText("bobo"); //$NON-NLS-1$
+
+      bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
 
       // Assert that there are 2 more markers
       // initialTableRowCount = initialTableRowCount + 2;
