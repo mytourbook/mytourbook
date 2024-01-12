@@ -112,7 +112,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private static final String COLUMN_CALORIES                 = "Calories";
    private static final String COLUMN_SODIUM                   = "Sodium";
    private static final String COLUMN_ISBEVERAGE               = "IsBeverage";
-   private static final String COLUMN_BEVERAGEQUANTITY         = "BeverageQuantity";
+   private static final String COLUMN_BEVERAGE_QUANTITY        = "BeverageQuantity";
    private static final String COLUMN_BEVERAGE_CONTAINER       = "BeverageContainer";
    private static final String COLUMN_CONSUMED_CONTAINERS      = "ConsumedContainers";
 
@@ -138,6 +138,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private TableColumnDefinition          _colDef_Calories;
    private TableColumnDefinition          _colDef_Sodium;
    private TableColumnDefinition          _colDef_IsBeverage;
+   private TableColumnDefinition          _colDef_BeverageQuantity;
    private TableColumnDefinition          _colDef_BeverageContainer;
    private TableColumnDefinition          _colDef_ConsumedBeverageContainers;
    private TourNutritionProductComparator _tourNutritionProductComparator = new TourNutritionProductComparator();
@@ -902,24 +903,24 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineColumn_60_BeverageQuantity() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGEQUANTITY, SWT.LEAD);
+      _colDef_BeverageQuantity = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_QUANTITY, SWT.LEAD);
 
-      colDef.setColumnLabel("QuantityPerServing");
-      colDef.setColumnHeaderText("QuantityPerServing");
+      _colDef_BeverageQuantity.setColumnLabel("QuantityPerServing");
+      _colDef_BeverageQuantity.setColumnHeaderText("QuantityPerServing");
 
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+      _colDef_BeverageQuantity.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
-      colDef.setIsDefaultColumn();
-      colDef.setCanModifyVisibility(false);
-      colDef.setColumnSelectionListener(_columnSortListener);
+      _colDef_BeverageQuantity.setIsDefaultColumn();
+      _colDef_BeverageQuantity.setCanModifyVisibility(false);
+      _colDef_BeverageQuantity.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      _colDef_BeverageQuantity.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
 
-            cell.setText("todo fb");
+            cell.setText(String.valueOf(tourNutritionProduct.getBeverageQuantity()));
          }
       });
    }

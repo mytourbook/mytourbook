@@ -88,7 +88,7 @@ public class TourNutritionProduct {
     * If the product is a beverage, the amount of liquid per product.
     * Unit: mL
     */
-   private float                      beverageQuantity;
+   private int                        beverageQuantity;
 
    /**
     * product_quantity: string
@@ -115,19 +115,25 @@ public class TourNutritionProduct {
       final Nutriments nutriments = product.nutriments;
       if (nutriments != null) {
 
+         //todo fb what if product quantity is null
          calories = Math.round((nutriments.energyKcal100g * Integer.valueOf(product.productQuantity)) / 100f);
          sodium = Math.round(nutriments.sodium100g * 1000);
       }
 
-      isBeverage = product.nutriScoreData != null &&
-            product.nutriScoreData.isBeverage();
+      if (product.nutriScoreData.isBeverage()) {
+
+         isBeverage = product.nutriScoreData != null;
+
+         //todo fb what if product quantity is null
+         beverageQuantity = Integer.valueOf(product.productQuantity);
+      }
 
       productsConsumed = 1f;
 
       _createId = _createCounter.incrementAndGet();
    }
 
-   public float getBeverageQuantity() {
+   public int getBeverageQuantity() {
       return beverageQuantity;
    }
 
@@ -176,7 +182,7 @@ public class TourNutritionProduct {
       return isBeverage;
    }
 
-   public void setBeverageQuantity(final float beverageQuantity) {
+   public void setBeverageQuantity(final int beverageQuantity) {
       this.beverageQuantity = beverageQuantity;
    }
 
