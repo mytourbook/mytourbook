@@ -43,6 +43,12 @@ public class Product implements ISelection {
    public String productQuantity;
 
    /*
+    * Normalized version of serving_size.
+    */
+   @JsonProperty("serving_quantity")
+   public String servingQuantity;
+
+   /*
     * Quantity and Unit.
     */
    @JsonProperty("quantity")

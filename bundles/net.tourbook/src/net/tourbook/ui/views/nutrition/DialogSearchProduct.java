@@ -74,6 +74,8 @@ import org.eclipse.swt.widgets.TableColumn;
 
 public class DialogSearchProduct extends TitleAreaDialog implements PropertyChangeListener {
 
+   // todo fb save the state of the search type. it doesn't seem to work ?
+
    // set the default size
 
    //todo fb
