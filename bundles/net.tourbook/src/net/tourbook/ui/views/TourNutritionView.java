@@ -696,6 +696,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                //  setFocusToViewer();
                return;
             }
+
+            final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
+            tourNutritionProducts.add(dialogTourNutritionProduct.getTourNutritionProduct(_tourData));
+            _tourData.setTourNutritionProducts(tourNutritionProducts);
+            _tourData = TourManager.saveModifiedTour(_tourData);
+            _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
+
          }));
          _btnAddProduct.setImage(_imageAdd);
          GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(_btnAddProduct);

@@ -16,6 +16,8 @@
 package net.tourbook.nutrition;
 
 import net.tourbook.common.UI;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourNutritionProduct;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -95,6 +97,14 @@ public class DialogTourNutritionProduct extends Dialog {
 
    public String getName() {
       return name;
+   }
+
+   public TourNutritionProduct getTourNutritionProduct(final TourData tourData)
+   {
+      final TourNutritionProduct product = new TourNutritionProduct(tourData);
+      product.setName(name);
+
+      return product;
    }
 
    @Override

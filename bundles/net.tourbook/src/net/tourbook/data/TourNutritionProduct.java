@@ -107,9 +107,15 @@ public class TourNutritionProduct {
 
    public TourNutritionProduct() {}
 
-   public TourNutritionProduct(final TourData tourData, final Product product) {
+   public TourNutritionProduct(final TourData tourData) {
 
       this.tourData = tourData;
+      _createId = _createCounter.incrementAndGet();
+   }
+
+   public TourNutritionProduct(final TourData tourData, final Product product) {
+
+      this(tourData);
       name = product.productName;
 
       final Nutriments nutriments = product.nutriments;
@@ -129,8 +135,6 @@ public class TourNutritionProduct {
       }
 
       productsConsumed = 1f;
-
-      _createId = _createCounter.incrementAndGet();
    }
 
    public int getBeverageQuantity() {
@@ -201,6 +205,11 @@ public class TourNutritionProduct {
 
    public void setIsBeverage(final boolean isBeverage) {
       this.isBeverage = isBeverage;
+   }
+
+   public void setName(final String name) {
+      this.name = name;
+
    }
 
    public void setProductsConsumed(final float servingsConsumed) {
