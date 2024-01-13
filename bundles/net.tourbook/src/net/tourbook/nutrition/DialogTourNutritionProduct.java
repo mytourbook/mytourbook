@@ -34,6 +34,10 @@ public class DialogTourNutritionProduct extends Dialog {
 
    private Text   _txtName;
    private Text   _txtCapacity;
+   // text calories
+   // text sodium
+   // checkbox is beverage
+   // text quantity
    private String name = UI.EMPTY_STRING;
    private float  capacity;
 
