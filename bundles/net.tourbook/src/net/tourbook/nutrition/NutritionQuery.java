@@ -51,7 +51,8 @@ public class NutritionQuery implements Runnable {
       _searchText = searchText;
       _productSearchType = productSearchType;
 
-      final Job job = new Job("Messages.job_name_searchingPOI") {
+      //todo fb
+      final Job job = new Job("Messages.job_name_searchingPOI") { //$NON-NLS-1$
 
          @Override
          protected IStatus run(final IProgressMonitor arg0) {
@@ -91,13 +92,13 @@ public class NutritionQuery implements Runnable {
          _exception = e;
       }
 
+      //todo fb take the comment from the poiview
       // Sending an old and new value of null will trigger the firing.
       // Otherwise, empty values will not
-
-      //todo fb do the same for the poiview as its a bug
+      final String searchResultName = "_searchResult";//$NON-NLS-1$
       if (oldValue.isEmpty() && _searchResult.isEmpty()) {
-         support.firePropertyChange("_searchResult", null, null);
+         support.firePropertyChange(searchResultName, null, null);
       }
-      support.firePropertyChange("_searchResult", oldValue, _searchResult);
+      support.firePropertyChange(searchResultName, oldValue, _searchResult);
    }
 }
