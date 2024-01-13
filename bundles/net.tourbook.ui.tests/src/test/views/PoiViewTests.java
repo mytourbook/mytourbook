@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,20 +32,35 @@ public class PoiViewTests extends UITest {
    @Test
    void testPoiSearch() {
 
-      //Open the POI view
+      // Arrange
       bot.toolbarButtonWithTooltip("Search for places and show them on the map (Ctrl+L)").click(); //$NON-NLS-1$
       final SWTBotView searchPlacesView = bot.viewByTitle(Utils.VIEW_NAME_SEARCHPLACES);
       searchPlacesView.show();
 
       final SWTBot poiViewBot = searchPlacesView.bot();
+      poiViewBot.comboBox(0).setText("dehfbjewgjhrhgrg"); //$NON-NLS-1$
 
-      poiViewBot.comboBox(0).setText("refuge"); //$NON-NLS-1$
+      // Act
       poiViewBot.button(Messages.Poi_View_Button_Search).click();
 
       bot.sleep(5000);
 
-      final SWTBotTable tablePois = poiViewBot.table();
+      SWTBotTable tablePois = poiViewBot.table();
 
+      // Assert
+      //Make sure that there are no POIs found
+      assertTrue(tablePois.rowCount() == 0);
+
+      poiViewBot.comboBox(0).setText("refuge"); //$NON-NLS-1$
+
+      // Act
+      poiViewBot.button(Messages.Poi_View_Button_Search).click();
+
+      bot.sleep(5000);
+
+      tablePois = poiViewBot.table();
+
+      // Assert
       //Make sure that there are POIs found
       assertTrue(tablePois.rowCount() > 0);
 

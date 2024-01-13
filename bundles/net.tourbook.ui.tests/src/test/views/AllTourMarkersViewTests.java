@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Frédéric Bard
+ * Copyright (C) 2023, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,10 +39,10 @@ public class AllTourMarkersViewTests extends UITest {
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.VIEW_NAME_ALLTOURMARKERS);
       final SWTBotView allTourMarkersView = Utils.showView(bot, Utils.VIEW_NAME_ALLTOURMARKERS);
 
-      final SWTBotTable tableMarkersTable = allTourMarkersView.bot().table();
+      final SWTBotTable allTourMarkersViewTable = allTourMarkersView.bot().table();
 
       // Assert initial state
-      int initialTableRowCount = tableMarkersTable.rowCount();
+      int initialTableRowCount = allTourMarkersViewTable.rowCount();
       // Make sure that the table contains several markers
       assertTrue(initialTableRowCount > 0);
 
@@ -52,24 +52,24 @@ public class AllTourMarkersViewTests extends UITest {
 
       // Assert that there are 2 more markers
       initialTableRowCount = initialTableRowCount + 2;
-      assertEquals(initialTableRowCount, tableMarkersTable.rowCount());
+      assertEquals(initialTableRowCount, allTourMarkersViewTable.rowCount());
 
       // Act: Delete the 2 markers
-      int rowIndex = tableMarkersTable.searchText("1/1/09"); //$NON-NLS-1$
+      int rowIndex = allTourMarkersViewTable.searchText("1/1/09"); //$NON-NLS-1$
       assertTrue(rowIndex != -1);
-      tableMarkersTable.select(rowIndex);
-      tableMarkersTable.contextMenu(Messages.App_Action_DeleteTourMarker).click();
+      allTourMarkersViewTable.select(rowIndex);
+      allTourMarkersViewTable.contextMenu(Messages.App_Action_DeleteTourMarker).click();
       Utils.clickYesButton(bot);
 
-      rowIndex = tableMarkersTable.searchText("1/1/09"); //$NON-NLS-1$
+      rowIndex = allTourMarkersViewTable.searchText("1/1/09"); //$NON-NLS-1$
       assertTrue(rowIndex != -1);
-      tableMarkersTable.select(rowIndex);
-      tableMarkersTable.pressShortcut(KeyStroke.getInstance(0, SWT.DEL));
+      allTourMarkersViewTable.select(rowIndex);
+      allTourMarkersViewTable.pressShortcut(KeyStroke.getInstance(0, SWT.DEL));
       bot.sleep(1000);
       Utils.clickYesButton(bot);
 
       // Make sure that the table contains 2 less marker
-      assertEquals(initialTableRowCount - 2, tableMarkersTable.rowCount());
+      assertEquals(initialTableRowCount - 2, allTourMarkersViewTable.rowCount());
 
       final SWTBotTreeItem tour = Utils.selectDuplicatedTour(bot);
       Utils.deleteTour(bot, tour);
