@@ -279,6 +279,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       _postSelectionProvider = new PostSelectionProvider(ID);
 
       //todo fb
+      // multi selection activated ?
       // https://www.vogella.com/tutorials/EclipseJFaceTable/article.html
 
       return dlgContainer;

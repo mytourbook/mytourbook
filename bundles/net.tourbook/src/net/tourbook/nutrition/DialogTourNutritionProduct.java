@@ -32,8 +32,8 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogTourNutritionProduct extends Dialog {
 
-   private Text   _txtName;
-   private Text   _txtCapacity;
+   private Text _txtName;
+   private Text _txtCapacity;
    // text calories
    // text sodium
    // checkbox is beverage
@@ -103,9 +103,8 @@ public class DialogTourNutritionProduct extends Dialog {
       return name;
    }
 
-   public TourNutritionProduct getTourNutritionProduct(final TourData tourData)
-   {
-      final TourNutritionProduct product = new TourNutritionProduct(tourData);
+   public TourNutritionProduct getTourNutritionProduct(final TourData tourData) {
+      final TourNutritionProduct product = new TourNutritionProduct(tourData, true);
       product.setName(name);
 
       return product;

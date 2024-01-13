@@ -32,26 +32,37 @@ import net.tourbook.nutrition.openfoodfacts.Product;
 @Entity
 public class TourNutritionProduct {
 
-   public static final int            DB_LENGTH_NAME = 1024;
-
+   public static final int            DB_LENGTH_CODE           = 50;
+   public static final int            DB_LENGTH_NAME           = 1024;
    /**
     * manually created marker or imported marker create a unique id to identify them, saved marker
     * are compared with the marker id
     */
-   private static final AtomicInteger _createCounter = new AtomicInteger();
+   private static final AtomicInteger _createCounter           = new AtomicInteger();
+
+   private static final String        CUSTOMPRODUCTCODE_PREFIX = "MTCUSTOMPRODUCT-";
 
    /**
     * Unique id for manually created markers because the {@link #productCode} is 0 when the marker
     * is not persisted
     */
    @Transient
-   private long                       _createId      = 0;
+   private long                       _createId                = 0;
+
    /**
     * Unique id for the {@link TourNutritionProduct} entity
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                       productCode    = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                       productId                = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+   /**
+    * The code identifying the product:
+    * - The bar code (https://en.wikipedia.org/wiki/Barcode)
+    * OR
+    * - A string following the below pattern if it's a user's custom product "MTCUSTOMPRODUCT-XX"
+    */
+   private String                     productCode;
 
    @ManyToOne(optional = false)
    private TourData                   tourData;
@@ -80,7 +91,7 @@ public class TourNutritionProduct {
 
    /**
     * Indicates if the nutrition product is a beverage itself or used in a
-    * beverage.
+    * beverage.c
     */
    private boolean                    isBeverage;
 
@@ -107,16 +118,18 @@ public class TourNutritionProduct {
 
    public TourNutritionProduct() {}
 
-   public TourNutritionProduct(final TourData tourData) {
+   public TourNutritionProduct(final TourData tourData, final boolean isCustomProduct) {
 
       this.tourData = tourData;
       _createId = _createCounter.incrementAndGet();
+      productCode = isCustomProduct ? CUSTOMPRODUCTCODE_PREFIX + _createId : UI.EMPTY_STRING;
    }
 
    public TourNutritionProduct(final TourData tourData, final Product product) {
 
-      this(tourData);
+      this(tourData, false);
       name = product.productName;
+      productCode = product.code;
 
       final Nutriments nutriments = product.nutriments;
       if (nutriments != null) {
@@ -154,7 +167,7 @@ public class TourNutritionProduct {
       return name;
    }
 
-   public long getProductCode() {
+   public String getProductCode() {
       return productCode;
    }
 
@@ -213,6 +226,10 @@ public class TourNutritionProduct {
 
    }
 
+   public void setProductCode(final String productCode) {
+      this.productCode = productCode;
+   }
+
    public void setProductsConsumed(final float servingsConsumed) {
       this.productsConsumed = servingsConsumed;
    }
@@ -225,7 +242,7 @@ public class TourNutritionProduct {
 
       _createId = _createCounter.incrementAndGet();
 
-      productCode = TourDatabase.ENTITY_IS_NOT_SAVED;
+      productId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
       tourData = tourDataFromClone;
    }

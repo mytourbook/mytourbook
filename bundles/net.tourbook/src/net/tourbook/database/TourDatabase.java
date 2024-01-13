@@ -241,7 +241,7 @@ public class TourDatabase {
    private static final String ENTITY_ID_HR_ZONE             = "HrZoneID";                                                        //$NON-NLS-1$
    private static final String ENTITY_ID_LOCATION            = "LocationID";                                                      //$NON-NLS-1$
    private static final String ENTITY_ID_MARKER              = "MarkerID";                                                        //$NON-NLS-1$
-   private static final String ENTITY_ID_NUTRITIONPRODUCT    = "ProductCode";                                                     //$NON-NLS-1$
+   private static final String ENTITY_ID_NUTRITIONPRODUCT    = "ProductID";                                                       //$NON-NLS-1$
    private static final String ENTITY_ID_PERSON              = "PersonID";                                                        //$NON-NLS-1$
    private static final String ENTITY_ID_PHOTO               = "PhotoID";                                                         //$NON-NLS-1$
    private static final String ENTITY_ID_REF                 = "RefID";                                                           //$NON-NLS-1$
@@ -4891,6 +4891,7 @@ public class TourDatabase {
 
             // Version 55 - begin
 
+            + "   productCode         VARCHAR(" + TourNutritionProduct.DB_LENGTH_CODE + ")," + NL //$NON-NLS-1$
             + "   productsConsumed    FLOAT,                                               " + NL //$NON-NLS-1$
             + "   name                VARCHAR(" + TourNutritionProduct.DB_LENGTH_NAME + ")," + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   calories            INTEGER,                                             " + NL //$NON-NLS-1$
