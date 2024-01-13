@@ -48,12 +48,6 @@ public class Product implements ISelection {
    @JsonProperty("serving_quantity")
    public String servingQuantity;
 
-   /*
-    * Quantity and Unit.
-    */
-//   @JsonProperty("quantity")
-//   public String quantity;
-
    public String code;
 
    @Override
