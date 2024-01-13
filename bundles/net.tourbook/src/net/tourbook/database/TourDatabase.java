@@ -2156,21 +2156,22 @@ public class TourDatabase {
    public static List<TourBeverageContainer> getTourBeverageContainers() {
 
       ArrayList<TourBeverageContainer> beverageContainersList = new ArrayList<>();
-      beverageContainersList.add(new TourBeverageContainer("", 0));
+      //Adding the first element being an empty entry so that the user can select between a beverage container or none.
+      beverageContainersList.add(new TourBeverageContainer(UI.EMPTY_STRING, 0));
 
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      final EntityManager entityManager = TourDatabase.getInstance().getEntityManager();
 
-      if (em != null) {
+      if (entityManager != null) {
 
-         final Query emQuery = em.createQuery(UI.EMPTY_STRING
+         final Query query = entityManager.createQuery(UI.EMPTY_STRING
 
                + "SELECT tourBeverageContainer" //$NON-NLS-1$
                + " FROM TourBeverageContainer AS tourBeverageContainer " //$NON-NLS-1$
                + " ORDER  BY tourBeverageContainer.name"); //$NON-NLS-1$
 
-         beverageContainersList = (ArrayList<TourBeverageContainer>) emQuery.getResultList();
+         beverageContainersList = (ArrayList<TourBeverageContainer>) query.getResultList();
 
-         em.close();
+         entityManager.close();
       }
 
       return beverageContainersList;
@@ -4891,7 +4892,7 @@ public class TourDatabase {
 
             // Version 55 - begin
 
-            + "   productCode         VARCHAR(" + TourNutritionProduct.DB_LENGTH_CODE + ")," + NL //$NON-NLS-1$
+            + "   productCode         VARCHAR(" + TourNutritionProduct.DB_LENGTH_CODE + ")," + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   productsConsumed    FLOAT,                                               " + NL //$NON-NLS-1$
             + "   name                VARCHAR(" + TourNutritionProduct.DB_LENGTH_NAME + ")," + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   calories            INTEGER,                                             " + NL //$NON-NLS-1$
@@ -10564,7 +10565,7 @@ public class TourDatabase {
        */
       try {
 
-         if (isColumnAvailable(conn, TABLE_TOUR_LOCATION, "appliedName") == false) {
+         if (isColumnAvailable(conn, TABLE_TOUR_LOCATION, "appliedName") == false) { //$NON-NLS-1$
 
             final Statement stmt = conn.createStatement();
             {
