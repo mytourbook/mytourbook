@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-public class GeoQuery implements Runnable {
+class GeoQuery implements Runnable {
 
 //	private final static String			URL				= "http://www.frankieandshadow.com/osm/search.xml?find="; //$NON-NLS-1$
 //	private final static String			SEARCH_URL		= "http://gazetteer.openstreetmap.org/namefinder/search.xml?find="; //$NON-NLS-1$
@@ -50,11 +50,11 @@ public class GeoQuery implements Runnable {
       _propertyChangeSupport = new PropertyChangeSupport(this);
    }
 
-   public void addPropertyChangeListener(final PropertyChangeListener propertyChangeListener) {
+   void addPropertyChangeListener(final PropertyChangeListener propertyChangeListener) {
       _propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
    }
 
-   public void asyncFind(final String query) {
+   void asyncFind(final String query) {
 
       _query = query;
 
@@ -78,14 +78,14 @@ public class GeoQuery implements Runnable {
       return _searchResult;
    }
 
-   public void removePropertyChangeListener(final PropertyChangeListener propertyChangeListener) {
+   void removePropertyChangeListener(final PropertyChangeListener propertyChangeListener) {
       _propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
    }
 
    @Override
    public void run() {
 
-      final List<PointOfInterest> oldValue = List.copyOf(_searchResult);
+      List<PointOfInterest> oldValue = List.copyOf(_searchResult);
 
       try {
 
@@ -95,6 +95,15 @@ public class GeoQuery implements Runnable {
 
          final SAXParser parser = XmlUtils.initializeParser();
          parser.parse(uri, new GeoQuerySAXHandler(_searchResult));
+
+         // Sending an old value of null will trigger the firing.
+         // Otherwise, empty values for both old and new values will not and as
+         // a consequence, will leave the POIView waiting for a response forever.
+         if (oldValue.isEmpty() && _searchResult.isEmpty()) {
+
+            oldValue = null;
+         }
+
          _propertyChangeSupport.firePropertyChange("_searchResult", oldValue, _searchResult); //$NON-NLS-1$
 
       } catch (final Exception e) {
