@@ -51,8 +51,8 @@ public class Product implements ISelection {
    /*
     * Quantity and Unit.
     */
-   @JsonProperty("quantity")
-   public String quantity;
+//   @JsonProperty("quantity")
+//   public String quantity;
 
    public String code;
 

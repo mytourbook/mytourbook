@@ -26,6 +26,7 @@ import javax.persistence.Transient;
 
 import net.tourbook.common.UI;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.nutrition.openfoodfacts.NutriScoreData;
 import net.tourbook.nutrition.openfoodfacts.Nutriments;
 import net.tourbook.nutrition.openfoodfacts.Product;
 
@@ -131,14 +132,6 @@ public class TourNutritionProduct {
       name = product.productName;
       productCode = product.code;
 
-      if (product.nutriScoreData.isBeverage()) {
-
-         isBeverage = product.nutriScoreData != null;
-
-         //todo fb what if product quantity is null
-         beverageQuantity = Integer.valueOf(product.productQuantity);
-      }
-
       computeNutrimentsPerProduct(product);
 
       productsConsumed = 1f;
@@ -161,29 +154,32 @@ public class TourNutritionProduct {
          return;
       }
 
+      final NutriScoreData nutriScoreData = product.nutriScoreData;
       final String productQuantity = product.productQuantity;
       final String servingQuantity = product.servingQuantity;
 
-      if (isBeverage) {
+      if (nutriScoreData != null && nutriScoreData.isBeverage()) {
+
+         isBeverage = product.nutriScoreData != null;
 
          if (productQuantity != null && servingQuantity != null) {
 
             final int numberOfServings = Math.round(Float.valueOf(productQuantity) / Float.valueOf(servingQuantity));
             calories = nutriments.energyKcalServing * numberOfServings;
             sodium = Math.round(nutriments.sodiumServing * numberOfServings * 1000);
+            beverageQuantity = Integer.valueOf(product.productQuantity);
          }
       } else {
 
          if (productQuantity != null) {
-         calories = Math.round((nutriments.energyKcal100g * Integer.valueOf(product.productQuantity)) / 100f);
-         sodium = Math.round(nutriments.sodium100g * 1000);
+            calories = Math.round((nutriments.energyKcal100g * Integer.valueOf(product.productQuantity)) / 100f);
+            sodium = Math.round(nutriments.sodium100g * 1000);
+         } else {
+            // In this case, we can only assume that the product only contains 1 serving
+            calories = nutriments.energyKcalServing;
+            sodium = Math.round(nutriments.sodiumServing * 1000);
+         }
       }
-      else {
-         // In this case, we can only assume that the product only contains 1 serving
-         calories = nutriments.energyKcalServing;
-         sodium = Math.round(nutriments.sodiumServing * 1000);
-      }
-   }
    }
 
    public int getBeverageQuantity() {
