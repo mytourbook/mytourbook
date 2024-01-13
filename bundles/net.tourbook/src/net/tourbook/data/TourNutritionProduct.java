@@ -41,7 +41,7 @@ public class TourNutritionProduct {
     */
    private static final AtomicInteger _createCounter           = new AtomicInteger();
 
-   private static final String        CUSTOMPRODUCTCODE_PREFIX = "MTCUSTOMPRODUCT-";
+   private static final String        CUSTOMPRODUCTCODE_PREFIX = "MTCUSTOMPRODUCT-";              //$NON-NLS-1$
 
    /**
     * Unique id for manually created markers because the {@link #productCode} is 0 when the marker

@@ -179,7 +179,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Text        _txtCalories_Average;
    private Text        _txtCalories_Total;
    private Text        _txtFluid_Average;
-
    private Text        _txtFluid_Total;
    private Text        _txtSodium_Average;
    private Text        _txtSodium_Total;
@@ -187,8 +186,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Section     _sectionSummary;
    private FormToolkit _tk;
 
-   //TODO FB
-   //https://fdc.nal.usda.gov/api-guide.html
    private final class No_EditingSupport extends EditingSupport {
 
       private No_EditingSupport() {
