@@ -185,6 +185,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Section     _sectionProductsList;
    private Section     _sectionSummary;
    private FormToolkit _tk;
+   private int         _hintValueFieldWidth;
 
    private final class No_EditingSupport extends EditingSupport {
 
@@ -625,19 +626,17 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
 
             _txtCalories_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
-            GridDataFactory.fillDefaults()//
-                  .align(SWT.END, SWT.FILL)
+            GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).align(SWT.END, SWT.FILL)
                   .applyTo(_txtCalories_Average);
 
             _txtFluid_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
-            GridDataFactory.fillDefaults()//
-                  .align(SWT.END, SWT.FILL)
+            GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).align(SWT.END, SWT.FILL)
                   .applyTo(_txtFluid_Average);
 
             _txtSodium_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
-            GridDataFactory.fillDefaults()//
-                  .align(SWT.END, SWT.FILL)
+            GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).align(SWT.END, SWT.FILL)
                   .applyTo(_txtSodium_Average);
+
          }
 
          /*
@@ -1094,6 +1093,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
+
+      _hintValueFieldWidth = _pc.convertWidthInCharsToPixels(10);
 
       _columnSortListener = widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
    }
