@@ -18,7 +18,6 @@ package net.tourbook.nutrition;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -37,14 +36,6 @@ class DialogBeverageContainer extends Dialog {
 
    DialogBeverageContainer(final Shell parentShell) {
       super(parentShell);
-   }
-//todo fb use user agent https://openfoodfacts.github.io/openfoodfacts-server/api/ref-v3/
-   // override method to use "Login" as label for the OK button
-   @Override
-   protected void createButtonsForButtonBar(final Composite parent) {
-
-      createButton(parent, IDialogConstants.OK_ID, "Name", true);
-      createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
    }
 
    @Override

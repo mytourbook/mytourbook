@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.application.ApplicationVersion;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -50,6 +51,7 @@ public class NutritionUtils {
          "https://world.openfoodfacts.org/api/v3/product/%s?fields=code,product_name,nutriscore_data,nutriments,product_quantity,serving_quantity"; //$NON-NLS-1$
 
    private static HttpClient   _httpClient                      = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
+   private static final String _userAgent                       = "MyTourbook/" + ApplicationVersion.getVersionSimple() + " ()";                    //$NON-NLS-1$
 
    public static String buildNutritionDataString(final Set<TourNutritionProduct> tourNutritionProducts) {
 
@@ -172,6 +174,7 @@ public class NutritionUtils {
 
       final HttpRequest request = HttpRequest.newBuilder()
             .GET()
+            // .header(WEB.HTTP_HEADER_USER_AGENT, _userAgent)
             .uri(searchUri)
             .build();
 
