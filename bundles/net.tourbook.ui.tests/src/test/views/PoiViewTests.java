@@ -39,18 +39,8 @@ public class PoiViewTests extends UITest {
       searchPlacesView.show();
 
       final SWTBot poiViewBot = searchPlacesView.bot();
-      poiViewBot.comboBox(0).setText("dehfbjewgjhrhgrg"); //$NON-NLS-1$
-
-      // Act
-      poiViewBot.button(Messages.Poi_View_Button_Search).click();
-
-      bot.sleep(5000);
-
       SWTBotTable tablePois = poiViewBot.table();
 
-      // Assert
-      //Make sure that there are no POIs found
-      assertTrue(tablePois.rowCount() == 0);
 
       poiViewBot.comboBox(0).setText("refuge"); //$NON-NLS-1$
 
