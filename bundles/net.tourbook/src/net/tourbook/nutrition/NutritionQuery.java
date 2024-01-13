@@ -92,9 +92,9 @@ public class NutritionQuery implements Runnable {
          _exception = e;
       }
 
-      //todo fb take the comment from the poiview
-      // Sending an old and new value of null will trigger the firing.
-      // Otherwise, empty values will not
+      // Sending an old value of null will trigger the firing.
+      // Otherwise, empty values for both old and new values will not and as
+      // a consequence, will leave the POIView waiting for a response forever.
       final String searchResultName = "_searchResult";//$NON-NLS-1$
       if (oldValue.isEmpty() && _searchResult.isEmpty()) {
          support.firePropertyChange(searchResultName, null, null);
