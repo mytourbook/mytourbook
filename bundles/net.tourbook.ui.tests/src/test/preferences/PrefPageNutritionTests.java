@@ -33,6 +33,8 @@ public class PrefPageNutritionTests extends UITest {
 
       nutritionTreeItem.getNode("Beverage Containers").select(); //$NON-NLS-1$
 
+      //todo fb add a beverage container
+
       Utils.clickApplyAndCloseButton(bot);
    }
 }

@@ -20,7 +20,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -33,25 +32,15 @@ import org.eclipse.swt.widgets.Text;
 public class DialogTourNutritionProduct extends Dialog {
 
    private Text _txtName;
-   private Text _txtCapacity;
-   // text calories
-   // text sodium
-   // checkbox is beverage
-   // text quantity
+   private Text _txtCalories;
+   private Text _txtSodium;
+   //checkbox isbeverage
+   //checkbox beverage quantity
    private String name = UI.EMPTY_STRING;
-   private float  capacity;
+   private int    beverageQuantity;
 
    public DialogTourNutritionProduct(final Shell parentShell) {
       super(parentShell);
-   }
-
-//todo fb use user agent https://openfoodfacts.github.io/openfoodfacts-server/api/ref-v3/
-   // override method to use "Login" as label for the OK button
-   @Override
-   protected void createButtonsForButtonBar(final Composite parent) {
-
-      createButton(parent, IDialogConstants.OK_ID, "Name", true);
-      createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
    }
 
    @Override
@@ -85,18 +74,17 @@ public class DialogTourNutritionProduct extends Dialog {
       gridDataPasswordLabel.horizontalIndent = 1;
       lblCapacity.setLayoutData(gridDataPasswordLabel);
 
-      _txtCapacity = new Text(container, SWT.BORDER);
-      _txtCapacity.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-      _txtCapacity.addModifyListener(e -> {
+      _txtCalories = new Text(container, SWT.BORDER);
+      _txtCalories.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+      _txtCalories.addModifyListener(e -> {
          final Text textWidget = (Text) e.getSource();
-         final String capacityText = textWidget.getText();
-         capacity = Float.parseFloat(capacityText);
+         //todo fb verify that it's a valid int
       });
       return container;
    }
 
-   public float getCapacity() {
-      return capacity;
+   public float getBeverageQuantity() {
+      return beverageQuantity;
    }
 
    public String getName() {
@@ -104,6 +92,7 @@ public class DialogTourNutritionProduct extends Dialog {
    }
 
    public TourNutritionProduct getTourNutritionProduct(final TourData tourData) {
+
       final TourNutritionProduct product = new TourNutritionProduct(tourData, true);
       product.setName(name);
 
@@ -112,17 +101,10 @@ public class DialogTourNutritionProduct extends Dialog {
 
    @Override
    protected void okPressed() {
+
       name = _txtName.getText();
-      capacity = Float.parseFloat(_txtCapacity.getText());
+      beverageQuantity = Integer.parseInt(_txtCalories.getText());
       super.okPressed();
-   }
-
-   public void setCapacity(final float capacity) {
-      this.capacity = capacity;
-   }
-
-   public void setName(final String name) {
-      this.name = name;
    }
 
 }
