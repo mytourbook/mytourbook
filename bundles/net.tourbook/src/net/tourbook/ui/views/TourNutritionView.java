@@ -1331,6 +1331,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             tourNutritionProduct.setQuantityType(QuantityType.values()[quantityTypeIndex]);
 
             //todo fb update the column with servings values or products values: calories, sodium
+            //  _productsViewer.editElement(element, 3);
+
+            getViewer().update(element, null);
 
             _tourData = TourManager.saveModifiedTour(_tourData);
          }
@@ -1361,13 +1364,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          @Override
          protected void setValue(final Object element, final Object value) {
-
-//            final boolean isBeverage = ((Boolean) value);
-//
-//            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
-//            tourNutritionProduct.setIsBeverage(isBeverage);
-//
-//            _tourData = TourManager.saveModifiedTour(_tourData);
+//            Nothing to do
          }
       });
 

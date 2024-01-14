@@ -92,15 +92,13 @@ public class TourNutritionProduct {
     * Calories per serving.
     * Unit: kcal
     */
-   //todo fb add in the DB
-   // private int                        caloriesServing;
+   private int                        caloriesServing;
 
    /**
     * Sodium amount per serving.
     * Unit: mg
     */
-   //todo fb add in the DB
-   // private int                        sodiumServing;
+   private int                        sodiumServing;
 
    /**
     * The quantity consumed, either in number of servings or products (see {@link #quantityType}).
@@ -191,7 +189,11 @@ public class TourNutritionProduct {
 
             final int numberOfServings = Math.round(Float.valueOf(productQuantity) / Float.valueOf(servingQuantity));
             calories = nutriments.energyKcalServing * numberOfServings;
+            caloriesServing = nutriments.energyKcalServing;
+
             sodium = Math.round(nutriments.sodiumServing * numberOfServings * 1000);
+            sodiumServing = Math.round(nutriments.sodiumServing * 1000);
+
             beverageQuantity = Integer.valueOf(product.productQuantity);
 
          }
@@ -200,14 +202,18 @@ public class TourNutritionProduct {
          if (productQuantity != null) {
 
             calories = Math.round((nutriments.energyKcal100g * Float.valueOf(product.productQuantity)) / 100f);
+            caloriesServing = nutriments.energyKcalServing;
+
             sodium = Math.round(nutriments.sodium100g * 1000);
+            sodiumServing = Math.round(nutriments.sodiumServing * 1000);
 
          } else {
 
             // In this case, we can only assume that the product only contains 1 serving
             calories = nutriments.energyKcalServing;
+            caloriesServing = nutriments.energyKcalServing;
             sodium = Math.round(nutriments.sodiumServing * 1000);
-
+            sodiumServing = Math.round(nutriments.sodiumServing * 1000);
          }
       }
    }

@@ -4897,7 +4897,9 @@ public class TourDatabase {
             + "   quantityType        VARCHAR(" + TourNutritionProduct.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   name                VARCHAR(" + TourNutritionProduct.DB_LENGTH_NAME + ")," + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   calories            INTEGER,                                             " + NL //$NON-NLS-1$
+            + "   caloriesServing     INTEGER,                                             " + NL //$NON-NLS-1$
             + "   sodium              INTEGER,                                             " + NL //$NON-NLS-1$
+            + "   sodiumServing       INTEGER,                                             " + NL //$NON-NLS-1$
             + "   isBeverage          BOOLEAN DEFAULT FALSE,                               " + NL //$NON-NLS-1$
             + "   beverageQuantity    INTEGER,                                             " + NL //$NON-NLS-1$
             + "   containersConsumed  FLOAT                                                " + NL //$NON-NLS-1$

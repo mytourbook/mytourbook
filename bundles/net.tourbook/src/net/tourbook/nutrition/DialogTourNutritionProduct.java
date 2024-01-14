@@ -79,6 +79,7 @@ public class DialogTourNutritionProduct extends Dialog {
       _txtCalories.addModifyListener(e -> {
          final Text textWidget = (Text) e.getSource();
          //todo fb verify that it's a valid int
+         //enableControls
       });
       return container;
    }
