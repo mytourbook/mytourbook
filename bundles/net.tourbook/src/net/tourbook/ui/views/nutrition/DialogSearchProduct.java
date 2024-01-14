@@ -405,12 +405,12 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       // column: category
       final TableColumn columnCategory = new TableColumn(productsTable, SWT.LEFT);
       columnCategory.setText(Messages.Dialog_SearchProduct_TableHeader_Code);
-      columnCategory.setWidth(_pc.convertWidthInCharsToPixels(15));
+      columnCategory.setWidth(_pc.convertWidthInCharsToPixels(20));
 
       // column: name
       final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
       columnName.setText(Messages.Dialog_SearchProduct_TableHeader_Name);
-      columnName.setWidth(_pc.convertWidthInCharsToPixels(100));
+      columnName.setWidth(_pc.convertWidthInCharsToPixels(75));
 
       _productsViewer = new TableViewer(productsTable);
 

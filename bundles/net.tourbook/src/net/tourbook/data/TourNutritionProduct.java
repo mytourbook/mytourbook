@@ -265,9 +265,10 @@ public class TourNutritionProduct {
    }
 
    public String getFullName() {
+
       return Stream.of(brand, name)
-            .filter(s -> StringUtils.hasContent(s))
-            .collect(Collectors.joining(UI.SPACE1));
+            .filter(string -> StringUtils.hasContent(string))
+            .collect(Collectors.joining(UI.DASH));
    }
 
    public String getName() {
