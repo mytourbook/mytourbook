@@ -76,14 +76,16 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    // todo fb set the default size
 
-   public static final String            ID                           = "net.tourbook.ui.views.nutrition.DialogSearchProduct"; //$NON-NLS-1$
+   private static final String           STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY";      //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore                   = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings  _state                       = TourbookPlugin.getState(ID);
-   private static final String           STATE_SEARCHED_QUERIES       = "searched.queries";                                    //$NON-NLS-1$
-   private static final String           STATE_SEARCH_TYPE            = "STATE_SEARCH_TYPE";                                   //$NON-NLS-1$
+   public static final String            ID                                             = "net.tourbook.ui.views.nutrition.DialogSearchProduct"; //$NON-NLS-1$
 
-   private static final String           HTTPS_OPENFOODFACTS_PRODUCTS = "https://world.openfoodfacts.org/cgi/product.pl";      //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore                                     = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _state                                         = TourbookPlugin.getState(ID);
+   private static final String           STATE_SEARCHED_QUERIES                         = "searched.queries";                                    //$NON-NLS-1$
+   private static final String           STATE_SEARCH_TYPE                              = "STATE_SEARCH_TYPE";                                   //$NON-NLS-1$
+
+   private static final String           HTTPS_OPENFOODFACTS_PRODUCTS                   = "https://world.openfoodfacts.org/cgi/product.pl";      //$NON-NLS-1$
 
    private TableViewer                   _productsViewer;
    private List<Product>                 _products;
@@ -101,8 +103,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private Label                         _lblSearchType;
 
-   private Combo                         _cboSearchQuery;
-   private Combo                         _cboSearchType;
+   private Combo                         _comboSearchQuery;
+   private Combo                         _comboSearchType;
    private ComboViewer                   _queryViewer;
    private final NutritionQuery          _nutritionQuery = new NutritionQuery();
 
@@ -266,12 +268,16 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       createUI(dlgContainer);
 
+      fillUI();
+
       // this part is a selection provider
       _postSelectionProvider = new PostSelectionProvider(ID);
 
       //todo fb
       // multi selection activated ?
       // https://www.vogella.com/tutorials/EclipseJFaceTable/article.html
+
+      restoreState_WithUI();
 
       return dlgContainer;
    }
@@ -312,17 +318,17 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
             /*
              * combo: search
              */
-            _cboSearchQuery = new Combo(queryContainer, SWT.NONE);
-            _cboSearchQuery.setVisibleItemCount(30);
-            _cboSearchQuery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchProduct()));
-            _cboSearchQuery.addModifyListener(event -> {
+            _comboSearchQuery = new Combo(queryContainer, SWT.NONE);
+            _comboSearchQuery.setVisibleItemCount(30);
+            _comboSearchQuery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchProduct()));
+            _comboSearchQuery.addModifyListener(event -> {
                validateFields();
                _btnSearch.getShell().setDefaultButton(_btnSearch);
             });
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .grab(true, false)
-                  .applyTo(_cboSearchQuery);
+                  .applyTo(_comboSearchQuery);
          }
          {
             /*
@@ -343,7 +349,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          }
       }
 
-      _queryViewer = new ComboViewer(_cboSearchQuery);
+      _queryViewer = new ComboViewer(_comboSearchQuery);
       _queryViewer.setContentProvider(new SearchContentProvider());
       _queryViewer.setComparator(new ViewerComparator());
    }
@@ -366,20 +372,17 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
             /*
              * combo: search type
              */
-            _cboSearchType = new Combo(container, SWT.READ_ONLY);
-            _cboSearchType.setVisibleItemCount(2);
-            _cboSearchType.addSelectionListener(widgetSelectedAdapter(selectionEvent -> validateFields()));
+            _comboSearchType = new Combo(container, SWT.READ_ONLY);
+            _comboSearchType.setVisibleItemCount(2);
+            _comboSearchType.addSelectionListener(widgetSelectedAdapter(selectionEvent -> validateFields()));
             GridDataFactory.fillDefaults()
                   .align(SWT.LEFT, SWT.CENTER)
                   .grab(true, false)
-                  .applyTo(_cboSearchType);
-            _cboSearchType.add(Messages.Dialog_SearchProduct_Combo_SearchType_ByName);
-            _cboSearchType.add(Messages.Dialog_SearchProduct_Combo_SearchType_ByCode);
-            _cboSearchType.select(0);
+                  .applyTo(_comboSearchType);
          }
       }
 
-      _queryViewer = new ComboViewer(_cboSearchQuery);
+      _queryViewer = new ComboViewer(_comboSearchQuery);
       _queryViewer.setContentProvider(new SearchContentProvider());
       _queryViewer.setComparator(new ViewerComparator());
    }
@@ -420,6 +423,18 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       });
    }
 
+   private void fillUI() {
+
+      /*
+       * Fill search type combo
+       */
+      _comboSearchType.add(Messages.Dialog_SearchProduct_Combo_SearchType_ByName);
+      _comboSearchType.add(Messages.Dialog_SearchProduct_Combo_SearchType_ByCode);
+      _comboSearchType.select(0);
+
+      _autocompleteProductSearchHistory = new AutocompleteComboInput(_comboSearchQuery);
+   }
+
    @Override
    protected IDialogSettings getDialogBoundsSettings() {
 
@@ -429,7 +444,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private ProductSearchType getProductSearchType() {
 
-      switch (_cboSearchType.getSelectionIndex()) {
+      switch (_comboSearchType.getSelectionIndex()) {
       case 1:
          return ProductSearchType.ByCode;
 
@@ -469,13 +484,13 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       _productsViewer.getTable().removeAll();
       // disable search controls
-      _cboSearchQuery.setEnabled(false);
+      _comboSearchQuery.setEnabled(false);
       _btnSearch.setEnabled(false);
       _btnAdd.setEnabled(false);
-      _cboSearchType.setEnabled(false);
+      _comboSearchType.setEnabled(false);
       _lblSearchType.setEnabled(false);
 
-      final String searchText = _cboSearchQuery.getText();
+      final String searchText = _comboSearchQuery.getText();
 
       // remove same search text
       if (_searchHistory.contains(searchText) == false) {
@@ -501,7 +516,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
          if (searchResults == null) {
 
-            setErrorMessage(String.format(Messages.Dialog_SearchProduct_Label_NotFound, _cboSearchQuery.getText()));
+            setErrorMessage(String.format(Messages.Dialog_SearchProduct_Label_NotFound, _comboSearchQuery.getText()));
          } else {
 
             setErrorMessage(null);
@@ -528,9 +543,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
             }
          }
 
-         _cboSearchQuery.setEnabled(true);
+         _comboSearchQuery.setEnabled(true);
          _btnSearch.setEnabled(true);
-         _cboSearchType.setEnabled(true);
+         _comboSearchType.setEnabled(true);
          _lblSearchType.setEnabled(true);
       });
 
@@ -552,16 +567,23 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       } catch (final NumberFormatException e) {
          stateSearchType = 0;
       }
-      _cboSearchType.select(stateSearchType);
+      _comboSearchType.select(stateSearchType);
 
       // update content in the comboviewer
       _queryViewer.setInput(new Object());
    }
 
+   private void restoreState_WithUI() {
+
+      _autocompleteProductSearchHistory.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY);
+   }
+
    private void saveState() {
 
       _state.put(STATE_SEARCHED_QUERIES, _searchHistory.toArray(new String[_searchHistory.size()]));
-      _state.put(STATE_SEARCH_TYPE, _cboSearchType.getSelectionIndex());
+      _state.put(STATE_SEARCH_TYPE, _comboSearchType.getSelectionIndex());
+
+      _autocompleteProductSearchHistory.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY);
    }
 
    /**
@@ -584,10 +606,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       final ISelection selection = _productsViewer.getSelection();
       _btnAdd.setEnabled(!selection.isEmpty());
 
-      if (_cboSearchType.getSelectionIndex() == 1) {
+      if (_comboSearchType.getSelectionIndex() == 1) {
 
          // Search by product code is selected
-         final boolean isSearchQueryNumeric = StringUtils.isNumeric(_cboSearchQuery.getText());
+         final boolean isSearchQueryNumeric = StringUtils.isNumeric(_comboSearchQuery.getText());
          _btnSearch.setEnabled(isSearchQueryNumeric);
       }
    }
