@@ -54,7 +54,7 @@ public class TourNutritionViewTests extends UITest {
       // Make sure that the table doesn't contain any products
       assertTrue(initialTableRowCount == 0);
 
-      bot.button(Messages.Tour_Nutrition_Button_AddProduct).click();
+      bot.button(Messages.Tour_Nutrition_Button_SearchProduct).click();
       bot.comboBox(0).setText("bobo"); //$NON-NLS-1$
 
       bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
