@@ -80,8 +80,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    //todo fb
    // enable the "add" button only if an element is selected in the table
-   //todo fb
-   //Sync error after adding a 2nd product
 
    //limit the number of query history to 20
    // if already present and more than 20, assign a "weight" to keep the most used
@@ -90,8 +88,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    public static final String            ID                           = "net.tourbook.ui.views.nutrition.DialogSearchProduct"; //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore                   = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings  _state                       = TourbookPlugin.getState(
-         "net.tourbook.ui.views.nutrition.DialogSearchProduct");                                                               //$NON-NLS-1$
+   private static final IDialogSettings  _state                       = TourbookPlugin.getState(ID);
    private static final String           STATE_SEARCHED_QUERIES       = "searched.queries";                                    //$NON-NLS-1$
    private static final String           STATE_SEARCH_TYPE            = "STATE_SEARCH_TYPE";                                   //$NON-NLS-1$
 
@@ -125,7 +122,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private IPropertyChangeListener       _prefChangeListener;
 
-   private AutocompleteComboInput        _autocompleteProductSearchHistory;
+   //todo fb
+   private AutocompleteComboInput _autocompleteProductSearchHistory;
 
    private class SearchContentProvider implements IStructuredContentProvider {
 
@@ -528,7 +526,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
          if (searchResults == null) {
 
-            setErrorMessage("NOT FOUND");
+            setErrorMessage(Messages.Dialog_SearchProduct_Label_NotFound);
          } else {
 
             setErrorMessage(null);

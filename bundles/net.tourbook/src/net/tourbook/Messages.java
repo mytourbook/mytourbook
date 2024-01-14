@@ -896,6 +896,7 @@ public class Messages extends NLS {
    public static String        Dialog_SearchProduct_Combo_SearchType_ByName;
    public static String        Dialog_SearchProduct_Combo_SearchType_ByCode;
    public static String        Dialog_SearchProduct_Label_SearchType;
+   public static String        Dialog_SearchProduct_Label_NotFound;
    public static String        Dialog_SearchProduct_Link_ProductCreationRequest;
    public static String        Dialog_SearchProduct_TableHeader_Code;
    public static String        Dialog_SearchProduct_TableHeader_Name;
@@ -3285,6 +3286,12 @@ public class Messages extends NLS {
    public static String        tour_merger_label_adjust_seconds;
    public static String        tour_merger_save_target_tour;
 
+   public static String        Tour_Nutrition_Button_AddProduct;
+   public static String        Tour_Nutrition_Button_AddProduct_Tooltip;
+   public static String        Tour_Nutrition_Button_DeleteProduct;
+   public static String        Tour_Nutrition_Button_DeleteProduct_Tooltip;
+   public static String        Tour_Nutrition_Button_SearchProduct;
+   public static String        Tour_Nutrition_Button_SearchProduct_Tooltip;
    public static String        Tour_Nutrition_Column_BeverageContainer;
    public static String        Tour_Nutrition_Column_BeverageQuantity;
    public static String        Tour_Nutrition_Column_BeverageQuantity_Tooltip;
@@ -3299,12 +3306,6 @@ public class Messages extends NLS {
    public static String        Tour_Nutrition_Column_Servings;
    public static String        Tour_Nutrition_Column_Sodium;
    public static String        Tour_Nutrition_Column_IsBeverage;
-   public static String        Tour_Nutrition_Button_AddProduct;
-   public static String        Tour_Nutrition_Button_AddProduct_Tooltip;
-   public static String        Tour_Nutrition_Button_DeleteProduct;
-   public static String        Tour_Nutrition_Button_DeleteProduct_Tooltip;
-   public static String        Tour_Nutrition_Button_SearchProduct;
-   public static String        Tour_Nutrition_Button_SearchProduct_Tooltip;
    public static String        Tour_Nutrition_Job_SearchingProducts;
    public static String        Tour_Nutrition_Label_Averages;
    public static String        Tour_Nutrition_Label_Averages_Tooltip;
