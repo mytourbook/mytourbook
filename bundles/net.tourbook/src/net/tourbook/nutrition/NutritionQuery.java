@@ -20,6 +20,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.Messages;
 import net.tourbook.nutrition.openfoodfacts.Product;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -51,8 +52,7 @@ public class NutritionQuery implements Runnable {
       _searchText = searchText;
       _productSearchType = productSearchType;
 
-      //todo fb
-      final Job job = new Job("Messages.job_name_searchingPOI") { //$NON-NLS-1$
+      final Job job = new Job(Messages.Tour_Nutrition_Job_SearchingProducts) {
 
          @Override
          protected IStatus run(final IProgressMonitor arg0) {

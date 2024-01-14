@@ -100,13 +100,13 @@ public class TourNutritionProduct {
     * Calories per serving.
     * Unit: kcal
     */
-   private int                        caloriesServing;
+   private int                        calories_Serving;
 
    /**
     * Sodium amount per serving.
     * Unit: mg
     */
-   private int                        sodiumServing;
+   private int                        sodium_Serving;
 
    /**
     * The quantity consumed, either in number of servings or products (see {@link #quantityType}).
@@ -132,6 +132,12 @@ public class TourNutritionProduct {
     * Unit: mL
     */
    private int                        beverageQuantity;
+
+   /**
+    * If the product is a beverage, the amount of liquid per serving.
+    * Unit: mL
+    */
+   private int                        beverageQuantity_Serving;
 
    /**
     * product_quantity: string
@@ -198,37 +204,44 @@ public class TourNutritionProduct {
 
             final int numberOfServings = Math.round(Float.valueOf(productQuantity) / Float.valueOf(servingQuantity));
             calories = nutriments.energyKcalServing * numberOfServings;
-            caloriesServing = nutriments.energyKcalServing;
+            calories_Serving = nutriments.energyKcalServing;
 
             sodium = Math.round(nutriments.sodiumServing * numberOfServings * 1000);
-            sodiumServing = Math.round(nutriments.sodiumServing * 1000);
+            sodium_Serving = Math.round(nutriments.sodiumServing * 1000);
 
-            beverageQuantity = Integer.valueOf(product.productQuantity);
+            //todo fb for the gatorade, it's a beverage but its given in g what to do ?
+            // 0055577400517
+            beverageQuantity = Integer.valueOf(productQuantity);
+            beverageQuantity_Serving = Integer.valueOf(servingQuantity);
 
          }
       } else {
 
          if (productQuantity != null) {
 
-            calories = Math.round((nutriments.energyKcal100g * Float.valueOf(product.productQuantity)) / 100f);
-            caloriesServing = nutriments.energyKcalServing;
+            calories = Math.round((nutriments.energyKcal100g * Float.valueOf(productQuantity)) / 100f);
+            calories_Serving = nutriments.energyKcalServing;
 
             sodium = Math.round(nutriments.sodium100g * 1000);
-            sodiumServing = Math.round(nutriments.sodiumServing * 1000);
+            sodium_Serving = Math.round(nutriments.sodiumServing * 1000);
 
          } else {
 
             // In this case, we can only assume that the product only contains 1 serving
             calories = nutriments.energyKcalServing;
-            caloriesServing = nutriments.energyKcalServing;
+            calories_Serving = nutriments.energyKcalServing;
             sodium = Math.round(nutriments.sodiumServing * 1000);
-            sodiumServing = Math.round(nutriments.sodiumServing * 1000);
+            sodium_Serving = Math.round(nutriments.sodiumServing * 1000);
          }
       }
    }
 
    public int getBeverageQuantity() {
       return beverageQuantity;
+   }
+
+   public int getBeverageQuantity_Serving() {
+      return beverageQuantity_Serving;
    }
 
    public String getBrand() {
@@ -239,8 +252,8 @@ public class TourNutritionProduct {
       return calories;
    }
 
-   public int getCaloriesServing() {
-      return caloriesServing;
+   public int getCalories_Serving() {
+      return calories_Serving;
    }
 
    public float getConsumedQuantity() {
@@ -273,8 +286,8 @@ public class TourNutritionProduct {
       return sodium;
    }
 
-   public int getSodiumServing() {
-      return sodiumServing;
+   public int getSodium_Serving() {
+      return sodium_Serving;
    }
 
    public TourBeverageContainer getTourBeverageContainer() {
