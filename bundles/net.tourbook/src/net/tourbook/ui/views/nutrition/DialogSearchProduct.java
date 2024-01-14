@@ -33,6 +33,7 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.nutrition.NutritionQuery;
+import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.nutrition.ProductSearchType;
 import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -122,7 +123,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    private IPropertyChangeListener       _prefChangeListener;
 
    //todo fb can we reduce the size of it ? lots of blank space !?
-   private AutocompleteComboInput        _autocompleteProductSearchHistory;
+   private AutocompleteComboInput _autocompleteProductSearchHistory;
 
    private class SearchContentProvider implements IStructuredContentProvider {
 
@@ -176,7 +177,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
             return product.code;
 
          case 1:
-            return product.brands + UI.SPACE1 + product.productName;
+            return NutritionUtils.getProductFullName(product.brands, product.productName);
 
          default:
             return getText(obj);
