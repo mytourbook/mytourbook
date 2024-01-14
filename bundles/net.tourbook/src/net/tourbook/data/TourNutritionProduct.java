@@ -92,13 +92,15 @@ public class TourNutritionProduct {
     * Calories per serving.
     * Unit: kcal
     */
-   private int                        caloriesServing;
+   //todo fb add in the DB
+   // private int                        caloriesServing;
 
    /**
     * Sodium amount per serving.
     * Unit: mg
     */
-   private int                        sodiumServing;
+   //todo fb add in the DB
+   // private int                        sodiumServing;
 
    /**
     * The quantity consumed, either in number of servings or products (see {@link #quantityType}).
