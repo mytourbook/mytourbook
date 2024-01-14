@@ -74,12 +74,7 @@ import org.eclipse.swt.widgets.TableColumn;
 
 public class DialogSearchProduct extends TitleAreaDialog implements PropertyChangeListener {
 
-   // todo fb save the state of the search type. it doesn't seem to work ?
-
-   // set the default size
-
-   //todo fb
-   // enable the "add" button only if an element is selected in the table
+   // todo fb set the default size
 
    public static final String            ID                           = "net.tourbook.ui.views.nutrition.DialogSearchProduct"; //$NON-NLS-1$
 
@@ -506,7 +501,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
          if (searchResults == null) {
 
-            setErrorMessage(Messages.Dialog_SearchProduct_Label_NotFound);
+            setErrorMessage(String.format(Messages.Dialog_SearchProduct_Label_NotFound, _cboSearchQuery.getText()));
          } else {
 
             setErrorMessage(null);
@@ -581,9 +576,11 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    }
 
    private void validateFields() {
+
       if (_isInUIInit) {
          return;
       }
+
       final ISelection selection = _productsViewer.getSelection();
       _btnAdd.setEnabled(!selection.isEmpty());
 
