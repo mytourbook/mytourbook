@@ -191,7 +191,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private final class No_EditingSupport extends EditingSupport {
 
       private No_EditingSupport() {
-
          super(_productsViewer);
       }
 
@@ -207,13 +206,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       @Override
       protected Object getValue(final Object element) {
-
          return null;
       }
 
       @Override
       protected void setValue(final Object element, final Object value) {
-
          //Nothing to do
       }
    }
@@ -725,7 +722,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       // very important: the editing support must be set BEFORE the columns are created
 //      //todo fb recreate the when the preferences are changed and a container is added or removed or modified
-      setEditingSupport();
+      setColumnsEditingSupport();
 
       _columnManager.createColumns(_productsViewer);
       // todo fb i think this creates that
@@ -1102,7 +1099,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
       tourNutritionProducts.removeIf(tourNutritionProduct -> selectedProducts.stream().anyMatch(selectedProduct -> selectedProduct
-            .getProductCode() == tourNutritionProduct.getProductCode()));
+            .getProductCode().equals(tourNutritionProduct.getProductCode())));
 
       _tourData.setTourNutritionProducts(tourNutritionProducts);
       _tourData = TourManager.saveModifiedTour(_tourData);
@@ -1229,15 +1226,14 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _state.put(STATE_SECTION_PRODUCTS_LIST, _sectionProductsList.isExpanded());
    }
 
-   private void setEditingSupport() {
+   private void setColumnsEditingSupport() {
 
       final String[] items = new String[_tourBeverageContainers.size() + 1];
       items[0] = UI.EMPTY_STRING;
-      for (int index2 = 0; index2 < _tourBeverageContainers.size(); ++index2) {
+      for (int index = 0; index < _tourBeverageContainers.size(); ++index) {
 
-         items[index2 + 1] = NutritionUtils.buildTourBeverageContainerName(_tourBeverageContainers.get(index2));
+         items[index + 1] = NutritionUtils.buildTourBeverageContainerName(_tourBeverageContainers.get(index));
       }
-      // todo fb, put that in a class
 
       _colDef_ProductsConsumed.setEditingSupport(new EditingSupport(_productsViewer) {
 
