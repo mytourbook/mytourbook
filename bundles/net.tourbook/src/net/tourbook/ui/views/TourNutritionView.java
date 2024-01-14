@@ -89,6 +89,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.PageBook;
@@ -103,7 +104,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    //todo fb add the possibility to add custom products (i.e: water...)
 // => Manually with a dialog that asks the name, calories, sodium, is beverage (if yes, ungray the beverage qtty)
-   public static final String             ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
+   static final String                    ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
    private static final String            STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
    private static final String            STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";             //$NON-NLS-1$
    private static final String            STATE_SECTION_SUMMARY           = "STATE_SECTION_SUMMARY";                   //$NON-NLS-1$
@@ -237,10 +238,15 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          // Determine which column and do the appropriate sort
          switch (__sortColumnId) {
 
+         case COLUMN_CONSUMED_QUANTITY:
+            rc = Math.round(tnp1.getConsumedQuantity() - tnp2.getConsumedQuantity());
+            break;
+
          case COLUMN_NAME:
          default:
             rc = tnp1.getName().compareTo(tnp2.getName());
             break;
+
          }
 
          if (rc == 0) {
@@ -263,6 +269,28 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                      ? -1
                      : 0;
 
+      }
+
+      /**
+       * @param sortColumnId
+       *
+       * @return Returns the column widget by its column id, when column id is not found then the
+       *         first column is returned.
+       */
+      private TableColumn getSortColumn(final String sortColumnId) {
+
+         final TableColumn[] allColumns = _productsViewer.getTable().getColumns();
+
+         for (final TableColumn column : allColumns) {
+
+            final String columnId = ((ColumnDefinition) column.getData()).getColumnId();
+
+            if (columnId != null && columnId.equals(sortColumnId)) {
+               return column;
+            }
+         }
+
+         return allColumns[0];
       }
 
       @Override
@@ -305,6 +333,26 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          }
 
          updateUI_SetSortDirection(__sortColumnId, __sortDirection);
+      }
+
+      /**
+       * Set the sort column direction indicator for a column
+       *
+       * @param sortColumnId
+       * @param isAscendingSort
+       */
+      private void updateUI_SetSortDirection(final String sortColumnId, final int sortDirection) {
+
+         final int direction =
+               sortDirection == TourNutritionProductComparator.ASCENDING ? SWT.UP
+                     : sortDirection == TourNutritionProductComparator.DESCENDING ? SWT.DOWN
+                           : SWT.NONE;
+
+         final Table table = _productsViewer.getTable();
+         final TableColumn tc = getSortColumn(sortColumnId);
+
+         table.setSortColumn(tc);
+         table.setSortDirection(direction);
       }
    }
 
@@ -423,16 +471,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                   // The view contains multiple tours
                   if (_tourData.isMultipleTours()) {
 
-                     final List<Long> tourIds = new ArrayList<>();
-
-                     modifiedTours.forEach(tour -> tourIds.add(tour.getTourId()));
-                     _tourData = TourManager.createJoinedTourData(tourIds);
-
-                     updateUI_ProductViewer();
-
-                     // removed old tour data from the selection provider
-                     _postSelectionProvider.clearSelection();
-
+                     showInvalidPage();
                   } else {
 
                      // The view contains a single tour
@@ -452,9 +491,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                         }
                      }
                   }
-
                }
-
             } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
                clearView();
@@ -507,12 +544,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       getSite().setSelectionProvider(_postSelectionProvider);
 
       // show default page
-      _pageBook.showPage(_pageNoData);
+      showInvalidPage();
 
       // show nutrition info from last selection
       onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
-      enableControls();
       restoreState();
 
       if (_tourData == null) {
@@ -526,8 +562,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                                  final boolean isExpandable) {
 
       final int style = isExpandable
-            ? Section.TWISTIE | Section.TITLE_BAR
-            : Section.TITLE_BAR;
+            ? ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR
+            : ExpandableComposite.TITLE_BAR;
 
       final Section section = tk.createSection(parent, style);
 
@@ -688,9 +724,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          _btnDeleteProduct.setText(Messages.Tour_Nutrition_Button_DeleteProduct);
          _btnDeleteProduct.setToolTipText(Messages.Tour_Nutrition_Button_DeleteProduct_Tooltip);
          _btnDeleteProduct.setEnabled(false);
-         _btnDeleteProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-            onDeleteProducts();
-         }));
+         _btnDeleteProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onDeleteProducts()));
          _btnDeleteProduct.setImage(_imageDelete);
          GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(_btnDeleteProduct);
       }
@@ -1024,13 +1058,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       super.dispose();
    }
 
-   private void enableControls() {
-
-      final boolean isTourSelected = _tourData != null;
-
-      //_actionOpenSearchProduct.setEnabled(isTourSelected);
-   }
-
    @Override
    public ColumnManager getColumnManager() {
       return _columnManager;
@@ -1050,28 +1077,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       }
 
       return tourNutritionProducts;
-   }
-
-   /**
-    * @param sortColumnId
-    *
-    * @return Returns the column widget by its column id, when column id is not found then the
-    *         first column is returned.
-    */
-   private TableColumn getSortColumn(final String sortColumnId) {
-
-      final TableColumn[] allColumns = _productsViewer.getTable().getColumns();
-
-      for (final TableColumn column : allColumns) {
-
-         final String columnId = ((ColumnDefinition) column.getData()).getColumnId();
-
-         if (columnId != null && columnId.equals(sortColumnId)) {
-            return column;
-         }
-      }
-
-      return allColumns[0];
    }
 
    @Override
@@ -1335,9 +1340,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          }
 
          @Override
-         protected void setValue(final Object element, final Object value) {
-//            Nothing to do
-         }
+         protected void setValue(final Object element, final Object value) {}
       });
 
       _colDef_BeverageContainer.setEditingSupport(new EditingSupport(_productsViewer) {
@@ -1357,6 +1360,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          @Override
          protected Object getValue(final Object element) {
 
+            //todo fb
             return 0;// task.getTourBeverageContainerName();
          }
 
@@ -1407,8 +1411,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    }
 
    @Override
-   public void setFocus() {
+   public void setFocus() {}
 
+   private void showInvalidPage() {
+
+      _pageBook.showPage(_pageNoData);
    }
 
    private void showTourFromTourProvider() {
@@ -1457,28 +1464,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          updateUI_SummaryFromModel();
       }
-
-      enableControls();
-   }
-
-   /**
-    * Set the sort column direction indicator for a column
-    *
-    * @param sortColumnId
-    * @param isAscendingSort
-    */
-   private void updateUI_SetSortDirection(final String sortColumnId, final int sortDirection) {
-
-      final int direction =
-            sortDirection == TourNutritionProductComparator.ASCENDING ? SWT.UP
-                  : sortDirection == TourNutritionProductComparator.DESCENDING ? SWT.DOWN
-                        : SWT.NONE;
-
-      final Table table = _productsViewer.getTable();
-      final TableColumn tc = getSortColumn(sortColumnId);
-
-      table.setSortColumn(tc);
-      table.setSortDirection(direction);
    }
 
    private void updateUI_SummaryFromModel() {
