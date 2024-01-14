@@ -585,15 +585,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
 
             label = UI.createLabel(container, Messages.Tour_Nutrition_Column_Calories);
-            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
 
             label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Fluids);
-            label.setToolTipText(Messages.Tour_Nutrition_Label_Fluids_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
 
-            label = UI.createLabel(container, COLUMN_SODIUM);
-            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+            label = UI.createLabel(container, Messages.Tour_Nutrition_Column_Sodium);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
          }
 
