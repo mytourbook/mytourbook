@@ -896,7 +896,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
 
-            cell.setText(String.valueOf(tourNutritionProduct.getCalories()));
+            final int caloriesValue = tourNutritionProduct.getQuantityType() == QuantityType.Products
+                  ? tourNutritionProduct.getCalories()
+                  : tourNutritionProduct.getCaloriesServing();
+            cell.setText(String.valueOf(caloriesValue));
          }
       });
    }
@@ -920,7 +923,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
 
-            cell.setText(String.valueOf(tourNutritionProduct.getSodium()));
+            final int sodiumValue = tourNutritionProduct.getQuantityType() == QuantityType.Products
+                  ? tourNutritionProduct.getSodium()
+                  : tourNutritionProduct.getSodiumServing();
+            cell.setText(String.valueOf(sodiumValue));
          }
       });
    }
@@ -1330,11 +1336,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
             tourNutritionProduct.setQuantityType(QuantityType.values()[quantityTypeIndex]);
 
-            //todo fb update the column with servings values or products values: calories, sodium
-            //  _productsViewer.editElement(element, 3);
+            //todo fb check that the value has changed otherwise it's useless to update the tour.
 
-            getViewer().update(element, null);
-
+            //Trigger the update of the calories and sodium values
+            _colDef_Calories.setColumnLabel(UI.EMPTY_STRING);
+            _colDef_Sodium.setColumnLabel(UI.EMPTY_STRING);
             _tourData = TourManager.saveModifiedTour(_tourData);
          }
       });

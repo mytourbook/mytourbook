@@ -226,6 +226,10 @@ public class TourNutritionProduct {
       return calories;
    }
 
+   public int getCaloriesServing() {
+      return caloriesServing;
+   }
+
    public float getConsumedQuantity() {
       return consumedQuantity;
    }
@@ -248,6 +252,10 @@ public class TourNutritionProduct {
 
    public int getSodium() {
       return sodium;
+   }
+
+   public int getSodiumServing() {
+      return sodiumServing;
    }
 
    public TourBeverageContainer getTourBeverageContainer() {
