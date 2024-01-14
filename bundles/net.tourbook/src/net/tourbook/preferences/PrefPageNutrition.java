@@ -28,14 +28,10 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageNutrition extends PreferencePage implements IWorkbenchPreferencePage {
-
 
    public static final String ID = "net.tourbook.preferences.PrefPageNutrition"; //$NON-NLS-1$
 
@@ -44,15 +40,13 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
    private int                _defaultSpinnerWidth;
    private MouseWheelListener _defaultMouseWheelListener;
 
-
    /*
     * UI controls
     */
-   private Spinner _spinnerCaloriesPerHourTarget;
    //todo fb Tooltip
    // p 109 Performance Nutrition for runners M. Fitzgerald
    // "Research has shown...."
-   private Button             _chkIgnoreFirstHour;
+   private Button _chkIgnoreFirstHour;
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -86,44 +80,11 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
                   .align(SWT.BEGINNING, SWT.FILL)
                   .applyTo(_chkIgnoreFirstHour);
          }
-         createUI_20_NutritionTargets(container);
       }
 
       return container;
    }
 
-   private void createUI_20_NutritionTargets(final Composite parent) {
-
-      final int verticalIndent = 20;
-
-      final Group group = new Group(parent, SWT.NONE);
-      group.setText("Messages.Pref_TourNutrition_Group_Targets");
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
-      {
-         /*
-          * label: cache size
-          */
-         final Label label = UI.createLabel(group, "Calories (kcal/hr) Messages.Pref_TourNutrition_Label_CaloriesTarget");
-         GridDataFactory.fillDefaults()
-               .indent(0, verticalIndent)
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(label);
-
-         // spinner: cache size
-         _spinnerCaloriesPerHourTarget = new Spinner(group, SWT.BORDER);
-
-         // cache size ==1 causes "java.lang.IllegalStateException: Queue full"
-         _spinnerCaloriesPerHourTarget.setMinimum(2);
-         _spinnerCaloriesPerHourTarget.setMaximum(100_000);
-         _spinnerCaloriesPerHourTarget.addMouseWheelListener(_defaultMouseWheelListener);
-         GridDataFactory.fillDefaults()
-               .indent(0, verticalIndent)
-               .hint(_defaultSpinnerWidth, SWT.DEFAULT)
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(_spinnerCaloriesPerHourTarget);
-      }
-   }
    @Override
    public void init(final IWorkbench workbench) {}
 
