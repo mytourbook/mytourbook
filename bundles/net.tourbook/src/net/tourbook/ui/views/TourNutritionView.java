@@ -104,8 +104,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    //todo fb add the possibility to add custom products (i.e: water...)
 // => Manually with a dialog that asks the name, calories, sodium, is beverage (if yes, ungray the beverage qtty)
+
+   //todo fb clear the view when mltiple tours are selected
    static final String                    ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
-   private static final String            STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
+   private static final String            STATE_PRODUCT_SEARCHES_HISTORY  = "products.searchesHistory";                //$NON-NLS-1$
    private static final String            STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";             //$NON-NLS-1$
    private static final String            STATE_SECTION_SUMMARY           = "STATE_SECTION_SUMMARY";                   //$NON-NLS-1$
 
@@ -171,10 +173,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private Button      _btnAddProduct;
    private Button      _btnSearchProduct;
-
    private Button      _btnDeleteProduct;
-   private PageBook    _pageBook;
 
+   private PageBook    _pageBook;
    private Composite   _pageNoData;
    private Composite   _viewerContainer;
 
@@ -1214,7 +1215,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void restoreState() {
 
       // restore old used queries
-      final String[] stateSearchedQueries = _state.getArray(STATE_SEARCHED_NUTRITIONQUERIES);
+      final String[] stateSearchedQueries = _state.getArray(STATE_PRODUCT_SEARCHES_HISTORY);
       if (stateSearchedQueries != null) {
          Stream.of(stateSearchedQueries).forEach(query -> _searchHistory.add(query));
       }
@@ -1226,7 +1227,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    @PersistState
    private void saveState() {
 
-      _state.put(STATE_SEARCHED_NUTRITIONQUERIES, _searchHistory.toArray(new String[_searchHistory.size()]));
+      _state.put(STATE_PRODUCT_SEARCHES_HISTORY, _searchHistory.toArray(new String[_searchHistory.size()]));
       _state.put(STATE_SECTION_SUMMARY, _sectionSummary.isExpanded());
       _state.put(STATE_SECTION_PRODUCTS_LIST, _sectionProductsList.isExpanded());
    }
@@ -1442,9 +1443,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    }
 
    @Override
-   public void updateColumnHeader(final ColumnDefinition colDef) {
-      //Nothing to do
-   }
+   public void updateColumnHeader(final ColumnDefinition colDef) {}
 
    private void updateUI_ProductViewer() {
 
