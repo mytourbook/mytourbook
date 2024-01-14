@@ -792,7 +792,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_ConsumedQuantity.setColumnHeaderText(Messages.Tour_Nutrition_Column_ConsumedQuantity);
       _colDef_ConsumedQuantity.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Column_ConsumedQuantity_Tooltip);
 
-      _colDef_ConsumedQuantity.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+      _colDef_ConsumedQuantity.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
 
       _colDef_ConsumedQuantity.setIsDefaultColumn();
       _colDef_ConsumedQuantity.setCanModifyVisibility(false);
@@ -817,7 +817,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_QuantityType.setColumnHeaderText(Messages.Tour_Nutrition_Column_QuantityType);
       _colDef_QuantityType.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Column_QuantityType_Tooltip);
 
-      _colDef_QuantityType.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+      _colDef_QuantityType.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(17));
 
       _colDef_QuantityType.setIsDefaultColumn();
       _colDef_QuantityType.setCanModifyVisibility(false);
@@ -842,7 +842,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_Name.setColumnLabel(COLUMN_NAME);
       _colDef_Name.setColumnHeaderText(Messages.Tour_Nutrition_Column_Name);
 
-      _colDef_Name.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(40));
+      _colDef_Name.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(50));
 
       _colDef_Name.setIsDefaultColumn();
       _colDef_Name.setCanModifyVisibility(false);
@@ -866,7 +866,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_Calories.setColumnLabel(COLUMN_CALORIES);
       _colDef_Calories.setColumnHeaderText(Messages.Tour_Nutrition_Column_Calories);
 
-      _colDef_Calories.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+      _colDef_Calories.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
 
       _colDef_Calories.setIsDefaultColumn();
       _colDef_Calories.setCanModifyVisibility(false);
@@ -893,7 +893,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_Sodium.setColumnLabel(COLUMN_SODIUM);
       _colDef_Sodium.setColumnHeaderText(Messages.Tour_Nutrition_Column_Sodium);
 
-      _colDef_Sodium.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+      _colDef_Sodium.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
 
       _colDef_Sodium.setIsDefaultColumn();
       _colDef_Sodium.setCanModifyVisibility(false);
@@ -920,7 +920,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_IsBeverage.setColumnLabel(COLUMN_ISBEVERAGE);
       _colDef_IsBeverage.setColumnHeaderText(Messages.Tour_Nutrition_Column_IsBeverage);
 
-      _colDef_IsBeverage.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+      _colDef_IsBeverage.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
 
       _colDef_IsBeverage.setIsDefaultColumn();
       _colDef_IsBeverage.setCanModifyVisibility(false);
@@ -950,7 +950,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_BeverageQuantity.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageQuantity);
       _colDef_BeverageQuantity.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Column_BeverageQuantity_Tooltip);
 
-      _colDef_BeverageQuantity.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+      _colDef_BeverageQuantity.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(22));
 
       _colDef_BeverageQuantity.setIsDefaultColumn();
       _colDef_BeverageQuantity.setCanModifyVisibility(false);
@@ -978,7 +978,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_BeverageContainer.setColumnLabel(COLUMN_BEVERAGE_CONTAINER);
       _colDef_BeverageContainer.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageContainer);
 
-      _colDef_BeverageContainer.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
+      _colDef_BeverageContainer.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(25));
 
       _colDef_BeverageContainer.setIsDefaultColumn();
       _colDef_BeverageContainer.setCanModifyVisibility(false);
@@ -1008,7 +1008,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_ConsumedBeverageContainers.setColumnHeaderText(Messages.Tour_Nutrition_Column_ConsumedContainers);
       _colDef_ConsumedBeverageContainers.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Column_ConsumedContainers_Tooltip);
 
-      _colDef_ConsumedBeverageContainers.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
+      _colDef_ConsumedBeverageContainers.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(27));
 
       _colDef_ConsumedBeverageContainers.setIsDefaultColumn();
       _colDef_ConsumedBeverageContainers.setCanModifyVisibility(false);
@@ -1319,9 +1319,14 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             final int quantityTypeIndex = (int) value;
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
-            tourNutritionProduct.setQuantityType(QuantityType.values()[quantityTypeIndex]);
+            final int currentQuantityTypeIndex = QuantityType.valueOf(String.valueOf(tourNutritionProduct.getQuantityType())).ordinal();
 
-            //todo fb check that the value has changed otherwise it's useless to update the tour.
+            if (currentQuantityTypeIndex == quantityTypeIndex) {
+               //No need to update the tour since the new value is the same as the current one.
+               return;
+            }
+
+            tourNutritionProduct.setQuantityType(QuantityType.values()[quantityTypeIndex]);
 
             //Trigger the update of the calories and sodium values
             _colDef_Calories.setColumnLabel(UI.EMPTY_STRING);
