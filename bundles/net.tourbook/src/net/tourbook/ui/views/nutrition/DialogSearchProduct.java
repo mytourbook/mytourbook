@@ -45,6 +45,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -95,6 +96,11 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    private boolean                       _isInUIInit;
 
    /*
+    * none UI
+    */
+   private PixelConverter _pc;
+
+   /*
     * UI controls
     */
    private Button                        _btnAdd;
@@ -130,9 +136,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       }
 
       @Override
-      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
-         // Nothing to do
-      }
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
    private class ViewContentProvider implements IStructuredContentProvider {
@@ -262,6 +266,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    @Override
    protected Control createDialogArea(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
 
       final Composite dlgContainer = (Composite) super.createDialogArea(parent);
 
@@ -399,12 +405,12 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       // column: category
       final TableColumn columnCategory = new TableColumn(productsTable, SWT.LEFT);
       columnCategory.setText(Messages.Dialog_SearchProduct_TableHeader_Code);
-      columnCategory.setWidth(75);
+      columnCategory.setWidth(_pc.convertWidthInCharsToPixels(15));
 
       // column: name
       final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
       columnName.setText(Messages.Dialog_SearchProduct_TableHeader_Name);
-      columnName.setWidth(300);
+      columnName.setWidth(_pc.convertWidthInCharsToPixels(100));
 
       _productsViewer = new TableViewer(productsTable);
 
@@ -610,6 +616,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          // Search by product code is selected
          final boolean isSearchQueryNumeric = StringUtils.isNumeric(_comboSearchQuery.getText());
          _btnSearch.setEnabled(isSearchQueryNumeric);
+      } else {
+         _btnSearch.setEnabled(true);
       }
+
    }
 }
