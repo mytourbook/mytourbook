@@ -601,22 +601,24 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
           * Totals
           */
          {
-            final Label label = UI.createLabel(container, "Totals");
-            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+            final Label label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Totals);
+            label.setToolTipText(Messages.Tour_Nutrition_Label_Totals_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
 
             _txtCalories_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
+                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtCalories_Total);
 
             _txtFluid_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
+                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtFluid_Total);
 
             _txtSodium_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .hint(_hintTextColumnWidth, SWT.DEFAULT)
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtSodium_Total);
@@ -642,18 +644,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).align(SWT.END, SWT.FILL)
                   .applyTo(_txtSodium_Average);
 
-         }
-
-         /*
-          * Grades
-          */
-         {
-            /*
-             * Label: Grade
-             */
-            final Label label = UI.createLabel(container, "Grade");
-            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
-            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
          }
       }
    }
