@@ -72,6 +72,8 @@ public class TourNutritionViewTests extends UITest {
       // Make sure that the table now contains 1 product
       assertTrue(productsTable.rowCount() == 1);
 
+      //todo fb add a manual product like water
+
       final SWTBotTreeItem tour = Utils.selectDuplicatedTour(bot);
       Utils.deleteTour(bot, tour);
    }

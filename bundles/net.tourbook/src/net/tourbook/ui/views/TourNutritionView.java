@@ -805,7 +805,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_QuantityType.setIsDefaultColumn();
       _colDef_QuantityType.setCanModifyVisibility(false);
-      _colDef_QuantityType.setColumnSelectionListener(_columnSortListener);
 
       _colDef_QuantityType.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -854,7 +853,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_Calories.setIsDefaultColumn();
       _colDef_Calories.setCanModifyVisibility(false);
-      _colDef_Calories.setColumnSelectionListener(_columnSortListener);
 
       _colDef_Calories.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -881,7 +879,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_Sodium.setIsDefaultColumn();
       _colDef_Sodium.setCanModifyVisibility(false);
-      _colDef_Sodium.setColumnSelectionListener(_columnSortListener);
 
       _colDef_Sodium.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -908,7 +905,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_IsBeverage.setIsDefaultColumn();
       _colDef_IsBeverage.setCanModifyVisibility(false);
-      _colDef_IsBeverage.setColumnSelectionListener(_columnSortListener);
 
       _colDef_IsBeverage.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -938,7 +934,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_BeverageQuantity.setIsDefaultColumn();
       _colDef_BeverageQuantity.setCanModifyVisibility(false);
-      _colDef_BeverageQuantity.setColumnSelectionListener(_columnSortListener);
 
       _colDef_BeverageQuantity.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -966,7 +961,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_BeverageContainer.setIsDefaultColumn();
       _colDef_BeverageContainer.setCanModifyVisibility(false);
-      _colDef_BeverageContainer.setColumnSelectionListener(_columnSortListener);
 
       _colDef_BeverageContainer.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -996,7 +990,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_ConsumedBeverageContainers.setIsDefaultColumn();
       _colDef_ConsumedBeverageContainers.setCanModifyVisibility(false);
-      _colDef_ConsumedBeverageContainers.setColumnSelectionListener(_columnSortListener);
 
       _colDef_ConsumedBeverageContainers.setLabelProvider(new CellLabelProvider() {
          @Override
