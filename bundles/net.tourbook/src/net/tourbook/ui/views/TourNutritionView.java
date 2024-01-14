@@ -165,6 +165,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
     * UI controls
     */
    private Image       _imageAdd;
+   private Image       _imageSearch;
    private Image       _imageDelete;
 
    private Button      _btnAddProduct;
@@ -187,11 +188,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Section     _sectionSummary;
    private FormToolkit _tk;
    private int         _hintValueFieldWidth;
-
-   //todo fb
-   // Amount consumed
-   //add a combo "Amount type": "Per product", "Per Serving". When switching to each combo, the calories, sodium, beverage quantity is updated
-   //
 
    private final class No_EditingSupport extends EditingSupport {
 
@@ -242,15 +238,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          switch (__sortColumnId) {
 
          case COLUMN_NAME:
-            rc = tnp1.getName().compareTo(tnp2.getName());
-            break;
-
-         case COLUMN_ISBEVERAGE:
-            //todo fb
-            break;
-
          default:
             rc = tnp1.getName().compareTo(tnp2.getName());
+            break;
          }
 
          if (rc == 0) {
@@ -376,6 +366,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          final String property = propertyChangeEvent.getProperty();
 
+         //todo fb if containerbeverage was changed
          if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
             _productsViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -560,6 +551,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _tk = new FormToolkit(parent.getDisplay());
 
       _imageAdd = TourbookPlugin.getImageDescriptor(Images.App_Add).createImage();
+      _imageSearch = TourbookPlugin.getImageDescriptor(Images.SearchExternal).createImage();
       _imageDelete = TourbookPlugin.getImageDescriptor(Images.App_Trash).createImage();
 
       _viewerContainer = new Composite(_pageBook, SWT.NONE);
@@ -658,12 +650,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
           * Search product button
           */
          _btnSearchProduct = new Button(container, SWT.NONE);
-         _btnSearchProduct.setText(Messages.Tour_Nutrition_Button_AddProduct);
-         _btnSearchProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddProduct_Tooltip);
+         _btnSearchProduct.setText(Messages.Tour_Nutrition_Button_SearchProduct);
+         _btnSearchProduct.setToolTipText(Messages.Tour_Nutrition_Button_SearchProduct_Tooltip);
          _btnSearchProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell(),
                _tourData.getTourId()).open()));
-         _btnSearchProduct.setImage(_imageAdd);
+         _btnSearchProduct.setImage(_imageSearch);
          GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(_btnSearchProduct);
+
          /*
           * Add product button
           */
@@ -674,17 +667,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             final DialogTourNutritionProduct dialogTourNutritionProduct = new DialogTourNutritionProduct(Display.getCurrent().getActiveShell());
 
-            // get the new values from the dialog
             if (dialogTourNutritionProduct.open() != Window.OK) {
-               // ask for the tour type name
-//            final InputDialog inputDialog = new InputDialog(
-//                  getShell(),
-//                  Messages.Pref_TourTypes_Dlg_new_tour_type_title,
-//                  Messages.Pref_TourTypes_Dlg_new_tour_type_msg,
-//                  UI.EMPTY_STRING,
-//                  null);
-
-               //  setFocusToViewer();
                return;
             }
 
@@ -806,8 +789,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_ConsumedQuantity = new TableColumnDefinition(_columnManager, COLUMN_CONSUMED_QUANTITY, SWT.LEAD);
 
       _colDef_ConsumedQuantity.setColumnLabel(COLUMN_CONSUMED_QUANTITY);
-      _colDef_ConsumedQuantity.setColumnHeaderText("amount");
-      _colDef_ConsumedQuantity.setColumnHeaderToolTipText("The total number of consumed product");
+      _colDef_ConsumedQuantity.setColumnHeaderText(Messages.Tour_Nutrition_Column_ConsumedQuantity);
+      _colDef_ConsumedQuantity.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Column_ConsumedQuantity_Tooltip);
 
       _colDef_ConsumedQuantity.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
@@ -832,8 +815,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       //todo fb
       _colDef_QuantityType.setColumnLabel(COLUMN_QUANTITY_TYPE);
-      _colDef_QuantityType.setColumnHeaderText("quantity type");
-      _colDef_QuantityType.setColumnHeaderToolTipText("The total number of consumed product");
+      _colDef_QuantityType.setColumnHeaderText(Messages.Tour_Nutrition_Column_QuantityType);
+      _colDef_QuantityType.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Column_QuantityType_Tooltip);
 
       _colDef_QuantityType.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
@@ -964,8 +947,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_BeverageQuantity = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_QUANTITY, SWT.LEAD);
 
-      _colDef_BeverageQuantity.setColumnLabel("QuantityPerServing");
-      _colDef_BeverageQuantity.setColumnHeaderText("QuantityPerServing");
+      _colDef_BeverageQuantity.setColumnLabel(Messages.Tour_Nutrition_Column_BeverageQuantity);
+      _colDef_BeverageQuantity.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageQuantity_Tooltip);
 
       _colDef_BeverageQuantity.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
@@ -1021,8 +1004,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_ConsumedBeverageContainers = new TableColumnDefinition(_columnManager, COLUMN_CONSUMED_CONTAINERS, SWT.LEAD);
 
-      _colDef_ConsumedBeverageContainers.setColumnLabel("ConsumedBeverageContainer");
-      _colDef_ConsumedBeverageContainers.setColumnHeaderText("ConsumedBeverageContainer");
+      _colDef_ConsumedBeverageContainers.setColumnLabel(Messages.Tour_Nutrition_Column_ConsumedContainers);
+      _colDef_ConsumedBeverageContainers.setColumnHeaderText(Messages.Tour_Nutrition_Column_ConsumedContainers_Tooltip);
 
       _colDef_ConsumedBeverageContainers.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
 
@@ -1057,6 +1040,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _prefStore.removePropertyChangeListener(_prefChangeListener);
 
       UI.disposeResource(_imageAdd);
+      UI.disposeResource(_imageSearch);
       UI.disposeResource(_imageDelete);
 
       super.dispose();
