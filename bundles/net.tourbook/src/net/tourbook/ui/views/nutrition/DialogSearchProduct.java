@@ -121,6 +121,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private IPropertyChangeListener       _prefChangeListener;
 
+   //todo fb can we reduce the size of it ? lots of blank space !?
    private AutocompleteComboInput        _autocompleteProductSearchHistory;
 
    private class SearchContentProvider implements IStructuredContentProvider {
