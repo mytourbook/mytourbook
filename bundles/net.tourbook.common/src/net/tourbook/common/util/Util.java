@@ -3059,17 +3059,28 @@ public class Util {
       }
 
       int comboIndex = 0;
+      boolean isIndexAvailable = false;
 
       for (final String comboStateValue : allItems) {
 
          if (selectedItem.equals(comboStateValue)) {
+
+            isIndexAvailable = true;
+
             break;
          }
 
          comboIndex++;
       }
 
-      combo.select(offset + comboIndex);
+      if (isIndexAvailable) {
+
+         combo.select(offset + comboIndex);
+
+      } else {
+
+         combo.select(0);
+      }
    }
 
    /**
