@@ -63,7 +63,6 @@ public class TourNutritionViewTests extends UITest {
       bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
 
       final SWTBotShell[] currentShells = bot.shells();
-      // The experimental dialog message only appears once
       final Optional<SWTBotShell> dialogSearchProductShell = Arrays.stream(currentShells).filter(shell -> shell.getText().equals(
             Messages.Dialog_SearchProduct_Title)).findFirst();
       if (dialogSearchProductShell.isPresent()) {
