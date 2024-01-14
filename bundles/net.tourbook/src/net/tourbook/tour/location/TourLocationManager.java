@@ -375,6 +375,17 @@ public class TourLocationManager {
             LocationPartID.settlementSmall,
             LocationPartID.OSM_NAME),
 
+         new TourLocationProfile("Country, Large",   18,
+
+            LocationPartID.country,
+            LocationPartID.settlementLarge),
+
+         new TourLocationProfile("Country, Large, Name",   18,
+
+            LocationPartID.country,
+            LocationPartID.settlementLarge,
+            LocationPartID.OSM_NAME),
+
          new TourLocationProfile("Large",   18,
 
             LocationPartID.settlementLarge),
