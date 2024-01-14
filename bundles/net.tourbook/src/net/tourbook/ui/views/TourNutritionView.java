@@ -872,7 +872,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
 
-            cell.setText(tourNutritionProduct.getName());
+            cell.setText(tourNutritionProduct.getFullName());
          }
       });
    }

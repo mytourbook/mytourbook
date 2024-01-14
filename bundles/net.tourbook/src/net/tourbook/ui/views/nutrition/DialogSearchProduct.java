@@ -181,7 +181,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
             return product.code;
 
          case 1:
-            return product.productName;
+            return product.brands + UI.SPACE1 + product.productName;
 
          default:
             return getText(obj);

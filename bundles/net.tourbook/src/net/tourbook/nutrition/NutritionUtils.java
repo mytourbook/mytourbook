@@ -48,7 +48,7 @@ public class NutritionUtils {
    private static final String OPENFOODFACTS_SEARCH_BY_NAME_URL =
          "https://world.openfoodfacts.org/cgi/search.pl?action=process&sort_by=unique_scans_n&page_size=20&json=true&search_terms=";                //$NON-NLS-1$
    private static final String OPENFOODFACTS_SEARCH_BY_CODE_URL =
-         "https://world.openfoodfacts.org/api/v3/product/%s?fields=code,product_name,nutriscore_data,nutriments,product_quantity,serving_quantity"; //$NON-NLS-1$
+         "https://world.openfoodfacts.org/api/v3/product/%s?fields=code,brands,product_name,nutriscore_data,nutriments,quantity,product_quantity,serving_quantity,serving_size"; //$NON-NLS-1$
 
    private static HttpClient   _httpClient                      = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
    private static final String _userAgent                       = "MyTourbook/" + ApplicationVersion.getVersionSimple() + " ()";                    //$NON-NLS-1$

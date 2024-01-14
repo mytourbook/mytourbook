@@ -4895,6 +4895,7 @@ public class TourDatabase {
             + "   productCode         VARCHAR(" + TourNutritionProduct.DB_LENGTH_CODE + ")," + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   consumedQuantity    FLOAT,                                               " + NL //$NON-NLS-1$
             + "   quantityType        VARCHAR(" + TourNutritionProduct.DB_LENGTH_NAME + "),            " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   brand               VARCHAR(" + TourNutritionProduct.DB_LENGTH_NAME + ")," + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   name                VARCHAR(" + TourNutritionProduct.DB_LENGTH_NAME + ")," + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   calories            INTEGER,                                             " + NL //$NON-NLS-1$
             + "   caloriesServing     INTEGER,                                             " + NL //$NON-NLS-1$

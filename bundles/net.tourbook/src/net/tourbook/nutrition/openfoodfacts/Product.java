@@ -33,6 +33,8 @@ public class Product implements ISelection {
    @JsonProperty("nutriscore_data")
    public NutriScoreData nutriScoreData;
 
+   public String         brands;
+
    @JsonProperty("product_name")
    public String         productName;
 

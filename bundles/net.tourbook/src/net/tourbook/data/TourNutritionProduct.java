@@ -16,6 +16,8 @@
 package net.tourbook.data;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -27,6 +29,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.QuantityType;
 import net.tourbook.nutrition.openfoodfacts.NutriScoreData;
@@ -70,6 +73,11 @@ public class TourNutritionProduct {
 
    @ManyToOne(optional = false)
    private TourData                   tourData;
+
+   /**
+    * The name of the product's brand
+    */
+   private String                     brand;
 
    /**
     * The name of the product
@@ -152,6 +160,7 @@ public class TourNutritionProduct {
    public TourNutritionProduct(final TourData tourData, final Product product) {
 
       this(tourData, false);
+      brand = product.brands;
       name = product.productName;
       productCode = product.code;
 
@@ -222,6 +231,10 @@ public class TourNutritionProduct {
       return beverageQuantity;
    }
 
+   public String getBrand() {
+      return brand;
+   }
+
    public int getCalories() {
       return calories;
    }
@@ -236,6 +249,12 @@ public class TourNutritionProduct {
 
    public float getContainersConsumed() {
       return containersConsumed;
+   }
+
+   public String getFullName() {
+      return Stream.of(brand, name)
+            .filter(s -> StringUtils.hasContent(s))
+            .collect(Collectors.joining(UI.SPACE1));
    }
 
    public String getName() {
