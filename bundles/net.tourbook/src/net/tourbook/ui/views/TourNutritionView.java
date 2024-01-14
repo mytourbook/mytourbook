@@ -187,6 +187,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private FormToolkit _tk;
    private int         _hintValueFieldWidth;
 
+   //todo fb
+   // Amount consumed
+   //add a combo "Amount type": "Per product", "Per Serving". When switching to each combo, the calories, sodium, beverage quantity is updated
+   //
+
    private final class No_EditingSupport extends EditingSupport {
 
       private No_EditingSupport() {
