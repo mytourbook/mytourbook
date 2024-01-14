@@ -366,7 +366,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          final String property = propertyChangeEvent.getProperty();
 
-         //todo fb if containerbeverage was changed
+//      //todo fb recreate the when the preferences are changed and a container is added or removed or modified
          if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
             _productsViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -701,7 +701,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       /*
        * table viewer: products
        */
-      final Table productsTable = new Table(parent, SWT.SINGLE | SWT.FULL_SELECTION);
+      final Table productsTable = new Table(parent, SWT.MULTI | SWT.FULL_SELECTION);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(productsTable);
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
@@ -709,30 +709,15 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _productsViewer = new TableViewer(productsTable);
 
       // very important: the editing support must be set BEFORE the columns are created
-//      //todo fb recreate the when the preferences are changed and a container is added or removed or modified
       setColumnsEditingSupport();
 
       _columnManager.createColumns(_productsViewer);
-      // todo fb i think this creates that
-      // java.lang.NullPointerException: Cannot read the array length because "properties" is null
 
-      final String[] titi = new String[_columnManager.getVisibleAndSortedColumns().size()];
-      for (int index = 0; index < titi.length; index++) {
-         titi[index] = _columnManager.getVisibleAndSortedColumns().get(index).getColumnHeaderText(_columnManager);
+      final String[] columnProperties = new String[_columnManager.getVisibleAndSortedColumns().size()];
+      for (int index = 0; index < columnProperties.length; index++) {
+         columnProperties[index] = _columnManager.getVisibleAndSortedColumns().get(index).getColumnHeaderText(_columnManager);
       }
-
-      _productsViewer.setColumnProperties(titi);
-
-//      // Is Beverage
-//      editors[4] = new CheckboxCellEditor(productsTable);
-//      // Column: Consumed Containers
-//      editors[7] = new SpinnerCellEditor(productsTable, _nf2, _quantityRange, SWT.NONE);
-//
-
-      // example
-      // Flask (0.5L)
-      // bladder (1.5L)
-      // note the append of the capacity
+      _productsViewer.setColumnProperties(columnProperties);
 
       _productsViewer.setContentProvider(new ViewContentProvider());
       _productsViewer.setComparator(_tourNutritionProductComparator);
@@ -744,7 +729,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          if (keyEvent.keyCode == SWT.DEL && _btnDeleteProduct.isEnabled()) {
             onDeleteProducts();
          }
-
       }));
    }
 
@@ -1288,9 +1272,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       });
 
       final String[] quantityTypeItems = new String[2];
-      //todo fb to translate
-      quantityTypeItems[0] = QuantityType.Servings.name();
-      quantityTypeItems[1] = QuantityType.Products.name();
+      quantityTypeItems[0] = Messages.Tour_Nutrition_Label_QuantityType_Servings;
+      quantityTypeItems[1] = Messages.Tour_Nutrition_Label_QuantityType_Products;
       _colDef_QuantityType.setEditingSupport(new EditingSupport(_productsViewer) {
 
          private ComboBoxCellEditor comboBoxCellEditor = new ComboBoxCellEditor(_productsViewer.getTable(), quantityTypeItems, SWT.READ_ONLY);
