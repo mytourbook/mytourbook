@@ -621,7 +621,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
           * Averages
           */
          {
-            final Label label = UI.createLabel(container, "Averages");
+            final Label label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Averages);
             label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
 
