@@ -102,23 +102,19 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    //todo fb add the possibility to add custom products (i.e: water...)
 // => Manually with a dialog that asks the name, calories, sodium, is beverage (if yes, ungray the beverage qtty)
-   public static final String  ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
-   private static final String STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
-   private static final String STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";             //$NON-NLS-1$
-   private static final String STATE_SECTION_SUMMARY           = "STATE_SECTION_SUMMARY";                   //$NON-NLS-1$
+   public static final String             ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
+   private static final String            STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";               //$NON-NLS-1$
+   private static final String            STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";             //$NON-NLS-1$
+   private static final String            STATE_SECTION_SUMMARY           = "STATE_SECTION_SUMMARY";                   //$NON-NLS-1$
 
-   private static final String COLUMN_PRODUCTS_CONSUMED        = "ProductsConsumed";
-   private static final String COLUMN_NAME                     = "Name";
-   private static final String COLUMN_CALORIES                 = "Calories";
-   private static final String COLUMN_SODIUM                   = "Sodium";
-   private static final String COLUMN_ISBEVERAGE               = "IsBeverage";
-   private static final String COLUMN_BEVERAGE_QUANTITY        = "BeverageQuantity";
-   private static final String COLUMN_BEVERAGE_CONTAINER       = "BeverageContainer";
-   private static final String COLUMN_CONSUMED_CONTAINERS      = "ConsumedContainers";
-
-   // todo fb in the pref page, add a button to "Refresh product's information"
-   // this will retrieve the updated (if any), info for each product)
-   // display the previous total calories vs new total calories
+   private static final String            COLUMN_PRODUCTS_CONSUMED        = "ProductsConsumed";                        //$NON-NLS-1$
+   private static final String            COLUMN_NAME                     = "Name";                                    //$NON-NLS-1$
+   private static final String            COLUMN_CALORIES                 = "Calories";                                //$NON-NLS-1$
+   private static final String            COLUMN_SODIUM                   = "Sodium";                                  //$NON-NLS-1$
+   private static final String            COLUMN_ISBEVERAGE               = "IsBeverage";                              //$NON-NLS-1$
+   private static final String            COLUMN_BEVERAGE_QUANTITY        = "BeverageQuantity";                        //$NON-NLS-1$
+   private static final String            COLUMN_BEVERAGE_CONTAINER       = "BeverageContainer";                       //$NON-NLS-1$
+   private static final String            COLUMN_CONSUMED_CONTAINERS      = "ConsumedContainers";                      //$NON-NLS-1$
 
    private static final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
 
@@ -603,18 +599,21 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
 
             _txtCalories_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
+            _txtCalories_Total.setEnabled(false);
             GridDataFactory.fillDefaults()
                   .hint(_hintTextColumnWidth, SWT.DEFAULT)
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtCalories_Total);
 
             _txtFluid_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
+            _txtFluid_Total.setEnabled(false);
             GridDataFactory.fillDefaults()
                   .hint(_hintTextColumnWidth, SWT.DEFAULT)
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtFluid_Total);
 
             _txtSodium_Total = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
+            _txtSodium_Total.setEnabled(false);
             GridDataFactory.fillDefaults()
                   .hint(_hintTextColumnWidth, SWT.DEFAULT)
                   .align(SWT.END, SWT.FILL)
@@ -626,18 +625,20 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
           */
          {
             final Label label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Averages);
-            label.setToolTipText("Messages.Poi_View_Label_POI_Tooltip");
+            label.setToolTipText(Messages.Tour_Nutrition_Label_Averages_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(label);
 
-            _txtCalories_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
+            _txtCalories_Average = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY | SWT.TRAIL);
             GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).align(SWT.END, SWT.FILL)
                   .applyTo(_txtCalories_Average);
 
             _txtFluid_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
+            _txtFluid_Average.setEnabled(false);
             GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).align(SWT.END, SWT.FILL)
                   .applyTo(_txtFluid_Average);
 
             _txtSodium_Average = new Text(container, SWT.READ_ONLY | SWT.TRAIL | SWT.BORDER);
+            _txtSodium_Average.setEnabled(false);
             GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).align(SWT.END, SWT.FILL)
                   .applyTo(_txtSodium_Average);
 

@@ -168,16 +168,21 @@ public class TourNutritionProduct {
             calories = nutriments.energyKcalServing * numberOfServings;
             sodium = Math.round(nutriments.sodiumServing * numberOfServings * 1000);
             beverageQuantity = Integer.valueOf(product.productQuantity);
+
          }
       } else {
 
          if (productQuantity != null) {
-            calories = Math.round((nutriments.energyKcal100g * Integer.valueOf(product.productQuantity)) / 100f);
+
+            calories = Math.round((nutriments.energyKcal100g * Float.valueOf(product.productQuantity)) / 100f);
             sodium = Math.round(nutriments.sodium100g * 1000);
+
          } else {
+
             // In this case, we can only assume that the product only contains 1 serving
             calories = nutriments.energyKcalServing;
             sodium = Math.round(nutriments.sodiumServing * 1000);
+
          }
       }
    }
