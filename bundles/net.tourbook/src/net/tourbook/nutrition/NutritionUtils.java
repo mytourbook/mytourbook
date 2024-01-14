@@ -76,7 +76,7 @@ public class NutritionUtils {
 
          } else {
             stringBuilder.append(UI.NEW_LINE);
-            stringBuilder.append(product.getProductsConsumed() + UI.SPACE1 + product.getName());
+            stringBuilder.append(product.getConsumedQuantity() + UI.SPACE1 + product.getName());
          }
       });
 
@@ -124,7 +124,7 @@ public class NutritionUtils {
 
    public static int getTotalCalories(final Set<TourNutritionProduct> tourNutritionProducts) {
 
-      final int totalCalories = tourNutritionProducts.stream().mapToInt(product -> Math.round(product.getCalories() * product.getProductsConsumed()))
+      final int totalCalories = tourNutritionProducts.stream().mapToInt(product -> Math.round(product.getCalories() * product.getConsumedQuantity()))
             .sum();
 
       return totalCalories;
@@ -152,7 +152,7 @@ public class NutritionUtils {
 
    public static double getTotalSodium(final Set<TourNutritionProduct> tourNutritionProducts) {
 
-      final double totalSodium = tourNutritionProducts.stream().mapToDouble(i -> i.getSodium() * i.getProductsConsumed()).sum();
+      final double totalSodium = tourNutritionProducts.stream().mapToDouble(i -> i.getSodium() * i.getConsumedQuantity()).sum();
 
       return totalSodium;
    }

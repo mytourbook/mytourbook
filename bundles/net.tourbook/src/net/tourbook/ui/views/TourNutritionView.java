@@ -40,6 +40,7 @@ import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.DialogTourNutritionProduct;
 import net.tourbook.nutrition.NutritionUtils;
+import net.tourbook.nutrition.QuantityType;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -804,7 +805,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_ConsumedQuantity = new TableColumnDefinition(_columnManager, COLUMN_CONSUMED_QUANTITY, SWT.LEAD);
 
-      //todo fb
       _colDef_ConsumedQuantity.setColumnLabel(COLUMN_CONSUMED_QUANTITY);
       _colDef_ConsumedQuantity.setColumnHeaderText("amount");
       _colDef_ConsumedQuantity.setColumnHeaderToolTipText("The total number of consumed product");
@@ -821,31 +821,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
 
-            cell.setText(String.valueOf(tourNutritionProduct.getProductsConsumed()));
-         }
-      });
-   }
-
-   private void defineColumn_30_Name() {
-
-      _colDef_Name = new TableColumnDefinition(_columnManager, COLUMN_NAME, SWT.LEAD);
-
-      _colDef_Name.setColumnLabel(Messages.Tour_Nutrition_Column_Name);
-      _colDef_Name.setColumnHeaderText(Messages.Tour_Nutrition_Column_Name);
-
-      _colDef_Name.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(40));
-
-      _colDef_Name.setIsDefaultColumn();
-      _colDef_Name.setCanModifyVisibility(false);
-      _colDef_Name.setColumnSelectionListener(_columnSortListener);
-
-      _colDef_Name.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
-
-            cell.setText(tourNutritionProduct.getName());
+            cell.setText(String.valueOf(tourNutritionProduct.getConsumedQuantity()));
          }
       });
    }
@@ -871,7 +847,32 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
 
-            cell.setText(String.valueOf(tourNutritionProduct.getProductsConsumed()));
+            final QuantityType quantityType = tourNutritionProduct.getQuantityType();
+            cell.setText(quantityType == null ? UI.EMPTY_STRING : quantityType.name());
+         }
+      });
+   }
+
+   private void defineColumn_30_Name() {
+
+      _colDef_Name = new TableColumnDefinition(_columnManager, COLUMN_NAME, SWT.LEAD);
+
+      _colDef_Name.setColumnLabel(Messages.Tour_Nutrition_Column_Name);
+      _colDef_Name.setColumnHeaderText(Messages.Tour_Nutrition_Column_Name);
+
+      _colDef_Name.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(40));
+
+      _colDef_Name.setIsDefaultColumn();
+      _colDef_Name.setCanModifyVisibility(false);
+      _colDef_Name.setColumnSelectionListener(_columnSortListener);
+
+      _colDef_Name.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
+
+            cell.setText(tourNutritionProduct.getName());
          }
       });
    }
@@ -1282,7 +1283,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          @Override
          protected Object getValue(final Object element) {
-            return ((TourNutritionProduct) element).getProductsConsumed();
+            return ((TourNutritionProduct) element).getConsumedQuantity();
          }
 
          @Override
@@ -1290,13 +1291,55 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             final float consumedAmount = ((Double) value).floatValue();
 
-            ((TourNutritionProduct) element).setProductsConsumed(consumedAmount);
+            ((TourNutritionProduct) element).setConsumedQuantity(consumedAmount);
             _tourData = TourManager.saveModifiedTour(_tourData);
          }
       });
+
+      final String[] quantityTypeItems = new String[2];
+      //todo fb to translate
+      quantityTypeItems[0] = QuantityType.Servings.name();
+      quantityTypeItems[1] = QuantityType.Products.name();
+      _colDef_QuantityType.setEditingSupport(new EditingSupport(_productsViewer) {
+
+         private ComboBoxCellEditor comboBoxCellEditor = new ComboBoxCellEditor(_productsViewer.getTable(), quantityTypeItems, SWT.READ_ONLY);
+
+         @Override
+         protected boolean canEdit(final Object element) {
+            return true;
+         }
+
+         @Override
+         protected CellEditor getCellEditor(final Object element) {
+            return comboBoxCellEditor;
+         }
+
+         @Override
+         protected Object getValue(final Object element) {
+
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
+            final QuantityType quantityType = tourNutritionProduct.getQuantityType();
+            return quantityType == null ? 0 : QuantityType.valueOf(String.valueOf(quantityType)).ordinal();
+         }
+
+         @Override
+         protected void setValue(final Object element, final Object value) {
+
+            final int quantityTypeIndex = (int) value;
+
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
+            tourNutritionProduct.setQuantityType(QuantityType.values()[quantityTypeIndex]);
+
+            //todo fb update the column with servings values or products values: calories, sodium
+
+            _tourData = TourManager.saveModifiedTour(_tourData);
+         }
+      });
+
       _colDef_Name.setEditingSupport(new No_EditingSupport());
       _colDef_Calories.setEditingSupport(new No_EditingSupport());
       _colDef_Sodium.setEditingSupport(new No_EditingSupport());
+
       _colDef_IsBeverage.setEditingSupport(new EditingSupport(_productsViewer) {
 
          private CheckboxCellEditor checkboxCellEditor = new CheckboxCellEditor(_productsViewer.getTable());

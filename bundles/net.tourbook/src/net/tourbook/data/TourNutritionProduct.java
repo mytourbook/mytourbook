@@ -18,6 +18,8 @@ package net.tourbook.data;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,6 +28,7 @@ import javax.persistence.Transient;
 
 import net.tourbook.common.UI;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.nutrition.QuantityType;
 import net.tourbook.nutrition.openfoodfacts.NutriScoreData;
 import net.tourbook.nutrition.openfoodfacts.Nutriments;
 import net.tourbook.nutrition.openfoodfacts.Product;
@@ -86,9 +89,29 @@ public class TourNutritionProduct {
    private int                        sodium;
 
    /**
-    * The number of products consumed.
+    * Calories per serving.
+    * Unit: kcal
     */
-   private float                      productsConsumed;
+   private int                        caloriesServing;
+
+   /**
+    * Sodium amount per serving.
+    * Unit: mg
+    */
+   private int                        sodiumServing;
+
+   /**
+    * The quantity consumed, either in number of servings or products (see {@link #quantityType}).
+    */
+   private float                      consumedQuantity;
+
+   /**
+    * The quantity type consumed:
+    * - Servings
+    * - Number of products.
+    */
+   @Enumerated(EnumType.STRING)
+   private QuantityType               quantityType             = QuantityType.Products;
 
    /**
     * Indicates if the nutrition product is a beverage itself or used in a
@@ -134,7 +157,7 @@ public class TourNutritionProduct {
 
       computeNutrimentsPerProduct(product);
 
-      productsConsumed = 1f;
+      consumedQuantity = 1f;
    }
 
    /**
@@ -195,6 +218,10 @@ public class TourNutritionProduct {
       return calories;
    }
 
+   public float getConsumedQuantity() {
+      return consumedQuantity;
+   }
+
    public float getContainersConsumed() {
       return containersConsumed;
    }
@@ -207,8 +234,8 @@ public class TourNutritionProduct {
       return productCode;
    }
 
-   public float getProductsConsumed() {
-      return productsConsumed;
+   public QuantityType getQuantityType() {
+      return quantityType;
    }
 
    public int getSodium() {
@@ -249,6 +276,10 @@ public class TourNutritionProduct {
       this.beverageQuantity = beverageQuantity;
    }
 
+   public void setConsumedQuantity(final float consumedQuantity) {
+      this.consumedQuantity = consumedQuantity;
+   }
+
    public void setContainersConsumed(final float containersConsumed) {
       this.containersConsumed = containersConsumed;
    }
@@ -266,8 +297,8 @@ public class TourNutritionProduct {
       this.productCode = productCode;
    }
 
-   public void setProductsConsumed(final float servingsConsumed) {
-      this.productsConsumed = servingsConsumed;
+   public void setQuantityType(final QuantityType quantityType) {
+      this.quantityType = quantityType;
    }
 
    public void setTourBeverageContainer(final TourBeverageContainer tourBeverageContainer) {
