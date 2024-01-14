@@ -81,10 +81,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    //todo fb
    // enable the "add" button only if an element is selected in the table
 
-   //limit the number of query history to 20
-   // if already present and more than 20, assign a "weight" to keep the most used
-   // in the future, add the possibility to change that limit of 20
-
    public static final String            ID                           = "net.tourbook.ui.views.nutrition.DialogSearchProduct"; //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore                   = TourbookPlugin.getPrefStore();
@@ -257,7 +253,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       }
       _isInUIInit = false;
 
-      enableControls();
+      validateFields();
    }
 
    @Override
@@ -325,7 +321,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
             _cboSearchQuery.setVisibleItemCount(30);
             _cboSearchQuery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchProduct()));
             _cboSearchQuery.addModifyListener(event -> {
-               enableControls();
+               validateFields();
                _btnSearch.getShell().setDefaultButton(_btnSearch);
             });
             GridDataFactory.fillDefaults()
@@ -377,7 +373,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
              */
             _cboSearchType = new Combo(container, SWT.READ_ONLY);
             _cboSearchType.setVisibleItemCount(2);
-            _cboSearchType.addSelectionListener(widgetSelectedAdapter(selectionEvent -> enableControls()));
+            _cboSearchType.addSelectionListener(widgetSelectedAdapter(selectionEvent -> validateFields()));
             GridDataFactory.fillDefaults()
                   .align(SWT.LEFT, SWT.CENTER)
                   .grab(true, false)
@@ -425,24 +421,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          final Product selectedProduct = (Product) firstElement;
 
          _postSelectionProvider.setSelection(selectedProduct);
-         enableControls();
+         validateFields();
       });
-   }
-
-   private void enableControls() {
-
-      if (_productsViewer != null) {
-
-         final ISelection selection = _productsViewer.getSelection();
-         _btnAdd.setEnabled(!selection.isEmpty());
-      }
-
-      if (_cboSearchType.getSelectionIndex() == 1) {
-
-         // Search by product code is selected
-         final boolean isSearchQueryNumeric = StringUtils.isNumeric(_cboSearchQuery.getText());
-         _btnSearch.setEnabled(isSearchQueryNumeric);
-      }
    }
 
    @Override
@@ -598,5 +578,20 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       table.setSelection(table.getSelectionIndex());
       table.setFocus();
+   }
+
+   private void validateFields() {
+      if (_isInUIInit) {
+         return;
+      }
+      final ISelection selection = _productsViewer.getSelection();
+      _btnAdd.setEnabled(!selection.isEmpty());
+
+      if (_cboSearchType.getSelectionIndex() == 1) {
+
+         // Search by product code is selected
+         final boolean isSearchQueryNumeric = StringUtils.isNumeric(_cboSearchQuery.getText());
+         _btnSearch.setEnabled(isSearchQueryNumeric);
+      }
    }
 }
