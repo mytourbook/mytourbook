@@ -115,8 +115,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private IPropertyChangeListener       _prefChangeListener;
 
-   //todo fb
-   private AutocompleteComboInput _autocompleteProductSearchHistory;
+   private AutocompleteComboInput        _autocompleteProductSearchHistory;
 
    private class SearchContentProvider implements IStructuredContentProvider {
 
