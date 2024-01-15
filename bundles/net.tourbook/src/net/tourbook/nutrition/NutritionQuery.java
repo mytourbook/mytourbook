@@ -19,7 +19,14 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
+//todo fb
+//when the user enters an invalid code bar, display aballoom tooltip
+// https://stackoverflow.com/questions/8517739/create-a-balloon-tool-tip-for-text-box
 
+// todo fb 
+// hintheight for the table viewer
+//https://stackoverflow.com/questions/29976690/swt-table-with-fixed-height
+//http://www.java2s.com/Tutorial/Java/0280__SWT/SizeHintswidthHintandheightHint.htm
 import net.tourbook.Messages;
 import net.tourbook.nutrition.openfoodfacts.Product;
 
