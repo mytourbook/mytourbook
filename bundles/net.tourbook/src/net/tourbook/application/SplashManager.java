@@ -51,7 +51,7 @@ public class SplashManager {
 
    private static SplashManager _instance;
 
-   private String               _splashFile = "splash.png"; //$NON-NLS-1$
+   private String               _splashFile = "splash-2.png"; //$NON-NLS-1$
 
    private Rectangle            _splashImageBounds;
 
