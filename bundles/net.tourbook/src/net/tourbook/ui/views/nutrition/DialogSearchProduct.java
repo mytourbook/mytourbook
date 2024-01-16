@@ -74,6 +74,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.ToolTip;
 
 public class DialogSearchProduct extends TitleAreaDialog implements PropertyChangeListener {
 
@@ -123,6 +124,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    //todo fb can we reduce the size of it ? lots of blank space !?
    private AutocompleteComboInput _autocompleteProductSearchHistory;
+
+   private ToolTip                _tooltipInvalidBarCode;
 
    private class SearchContentProvider implements IStructuredContentProvider {
 
@@ -308,6 +311,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(HTTPS_OPENFOODFACTS_PRODUCTS)));
 
       }
+
+      _tooltipInvalidBarCode = new ToolTip(parent.getDisplay().getActiveShell(), SWT.BALLOON);
+      _tooltipInvalidBarCode.setMessage(Messages.Dialog_SearchProduct_Tooltip_InvalidBarcode);
    }
 
    private void createUI_10_Header(final Composite parent) {
@@ -620,6 +626,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          // Search by product code is selected
          final boolean isSearchQueryNumeric = StringUtils.isNumeric(_comboSearchQuery.getText());
          _btnSearch.setEnabled(isSearchQueryNumeric);
+         _tooltipInvalidBarCode.setVisible(!isSearchQueryNumeric);
+
       } else {
          _btnSearch.setEnabled(true);
       }
