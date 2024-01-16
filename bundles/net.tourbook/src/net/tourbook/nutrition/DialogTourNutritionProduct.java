@@ -32,10 +32,11 @@ import org.eclipse.swt.widgets.Text;
 public class DialogTourNutritionProduct extends Dialog {
 
    private Text _txtName;
-   private Text _txtCalories;
-   private Text _txtSodium;
+   //Text number of servings
+   private Text _txtCalories_Serving;
+   private Text _txtSodium_Serving;
    //checkbox isbeverage
-   //checkbox beverage quantity
+   //Text beverage quantity
    private String name = UI.EMPTY_STRING;
    private int    beverageQuantity;
 
@@ -74,9 +75,9 @@ public class DialogTourNutritionProduct extends Dialog {
       gridDataPasswordLabel.horizontalIndent = 1;
       lblCapacity.setLayoutData(gridDataPasswordLabel);
 
-      _txtCalories = new Text(container, SWT.BORDER);
-      _txtCalories.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-      _txtCalories.addModifyListener(e -> {
+      _txtCalories_Serving = new Text(container, SWT.BORDER);
+      _txtCalories_Serving.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+      _txtCalories_Serving.addModifyListener(e -> {
          final Text textWidget = (Text) e.getSource();
          //todo fb verify that it's a valid int
          //enableControls
@@ -104,7 +105,7 @@ public class DialogTourNutritionProduct extends Dialog {
    protected void okPressed() {
 
       name = _txtName.getText();
-      beverageQuantity = Integer.parseInt(_txtCalories.getText());
+      beverageQuantity = Integer.parseInt(_txtCalories_Serving.getText());
       super.okPressed();
    }
 
