@@ -22,6 +22,7 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
@@ -123,6 +124,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    private IPropertyChangeListener       _prefChangeListener;
 
    //todo fb can we reduce the size of it ? lots of blank space !?
+   //ask wolfgang when i do the pr
    private AutocompleteComboInput _autocompleteProductSearchHistory;
 
    private ToolTip                _tooltipInvalidBarCode;
@@ -282,10 +284,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       // this part is a selection provider
       _postSelectionProvider = new PostSelectionProvider(ID);
 
-      //todo fb
-      // multi selection activated ?
-      // https://www.vogella.com/tutorials/EclipseJFaceTable/article.html
-
       restoreState_WithUI();
 
       return dlgContainer;
@@ -309,7 +307,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
                HTTPS_OPENFOODFACTS_PRODUCTS));
          link.setToolTipText(HTTPS_OPENFOODFACTS_PRODUCTS);
          link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(HTTPS_OPENFOODFACTS_PRODUCTS)));
-
       }
 
       _tooltipInvalidBarCode = new ToolTip(parent.getDisplay().getActiveShell(), SWT.BALLOON);
@@ -331,7 +328,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
              * combo: search
              */
             _comboSearchQuery = new Combo(queryContainer, SWT.NONE);
-            _comboSearchQuery.setVisibleItemCount(30);
             _comboSearchQuery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchProduct()));
             _comboSearchQuery.addModifyListener(event -> {
                validateFields();
@@ -377,8 +373,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
              * Label: POI
              */
             _lblSearchType = UI.createLabel(container, Messages.Dialog_SearchProduct_Label_SearchType);
-            //todo fb
-            //  label.setToolTipText(Messages.Poi_View_Label_POI_Tooltip);
          }
          {
             /*
@@ -478,9 +472,20 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          final Product selectedProduct = (Product) firstElement;
 
          final TourData tourData = TourManager.getTour(_tourId);
-         final TourNutritionProduct tfp = new TourNutritionProduct(tourData, selectedProduct);
-         //todo fb check that the product doesn't already exist, otherwise display an error message
-         tourData.addNutritionProduct(tfp);
+
+         final Set<TourNutritionProduct> tourNutritionProducts = tourData.getTourNutritionProducts();
+
+         // Before adding the selected product, we need to check if it doesn't already exist
+         if (tourNutritionProducts.stream().anyMatch(tourNutritionProduct -> tourNutritionProduct.getProductCode().equals(selectedProduct.code))) {
+
+            setErrorMessage(Messages.Dialog_SearchProduct_Label_AlreadyExists);
+            return;
+         }
+
+         setErrorMessage(null);
+
+         final TourNutritionProduct tourNutritionProduct = new TourNutritionProduct(tourData, selectedProduct);
+         tourData.addNutritionProduct(tourNutritionProduct);
 
          TourManager.saveModifiedTour(tourData);
       });
@@ -620,16 +625,24 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       final ISelection selection = _productsViewer.getSelection();
       _btnAdd.setEnabled(!selection.isEmpty());
+      final String searchQueryText = _comboSearchQuery.getText();
+
+      if (net.tourbook.common.util.StringUtils.isNullOrEmpty(searchQueryText)) {
+         _btnSearch.setEnabled(false);
+         _tooltipInvalidBarCode.setVisible(false);
+         return;
+      }
 
       if (_comboSearchType.getSelectionIndex() == 1) {
 
          // Search by product code is selected
-         final boolean isSearchQueryNumeric = StringUtils.isNumeric(_comboSearchQuery.getText());
+         final boolean isSearchQueryNumeric = StringUtils.isNumeric(searchQueryText);
          _btnSearch.setEnabled(isSearchQueryNumeric);
          _tooltipInvalidBarCode.setVisible(!isSearchQueryNumeric);
 
       } else {
          _btnSearch.setEnabled(true);
+         _tooltipInvalidBarCode.setVisible(false);
       }
 
    }
