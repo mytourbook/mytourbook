@@ -63,6 +63,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -75,8 +76,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 public class DialogSearchProduct extends TitleAreaDialog implements PropertyChangeListener {
-
-   // todo fb set the default size
 
    private static final String           STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY";      //$NON-NLS-1$
 
@@ -403,6 +402,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       GridDataFactory.fillDefaults().grab(true, true).applyTo(productsTable);
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
+
+      final GridData gdDescription = (GridData) productsTable.getLayoutData();
+      gdDescription.heightHint = _pc.convertHeightInCharsToPixels(15);
 
       // column: category
       final TableColumn columnCategory = new TableColumn(productsTable, SWT.LEFT);
