@@ -426,7 +426,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          else if (property.equals(ITourbookPreferences.PREF_BEVERAGECONTAINERS_HAS_CHANGED)) {
 
             //todo fb refresh the tour recreate the viewer ?
-            _productsViewer.refresh();
+            reloadViewer();
          }
 
       };
