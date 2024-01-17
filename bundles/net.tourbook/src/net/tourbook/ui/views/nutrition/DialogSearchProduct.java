@@ -308,9 +308,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          link.setToolTipText(HTTPS_OPENFOODFACTS_PRODUCTS);
          link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(HTTPS_OPENFOODFACTS_PRODUCTS)));
       }
-
-      _tooltipInvalidBarCode = new ToolTip(parent.getDisplay().getActiveShell(), SWT.BALLOON);
-      _tooltipInvalidBarCode.setMessage(Messages.Dialog_SearchProduct_Tooltip_InvalidBarcode);
    }
 
    private void createUI_10_Header(final Composite parent) {
@@ -337,6 +334,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
                   .align(SWT.FILL, SWT.CENTER)
                   .grab(true, false)
                   .applyTo(_comboSearchQuery);
+
+            _tooltipInvalidBarCode = new ToolTip(queryContainer.getShell(), SWT.BALLOON);
+            _tooltipInvalidBarCode.setMessage(Messages.Dialog_SearchProduct_Tooltip_InvalidBarcode);
          }
          {
             /*
