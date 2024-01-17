@@ -486,22 +486,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       if (savedTourBeverageContainer != null) {
 
-         /*
-          * Create a color definition WITH THE SAVED tour type, this fixes a VEEEEEEEEEEERY long
-          * existing bug that a new tour type is initially not displayed correctly in the color
-          * definition image.
-          */
-         // create the same color definition but with the correct id's
-//         final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(
-//               savedTourType,
-//               "tourType." + savedTourType.getTypeId(), //$NON-NLS-1$
-//               tourTypeName);
-//
-//         // overwrite tour type object
-//         newColorDefinition.setTourType(savedTourType);
-//
-//         createGraphColorItems(newColorDefinition);
-
          // update model
          _beverageContainers.add(savedTourBeverageContainer);
 
