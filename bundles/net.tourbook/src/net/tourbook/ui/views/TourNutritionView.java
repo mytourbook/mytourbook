@@ -1247,7 +1247,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_ConsumedQuantity.setEditingSupport(new EditingSupport(_productsViewer) {
 
-         private SpinnerCellEditor spinnerCellEditor = new SpinnerCellEditor(_productsViewer.getTable(), _nf2, _quantityRange, SWT.NONE);
+         private SpinnerCellEditor spinnerCellEditor = new SpinnerCellEditor(_productsViewer.getTable(),
+               _nf2,
+               new RangeContent(0, 0, 0),
+               SWT.NONE);
 
          @Override
          protected boolean canEdit(final Object element) {
@@ -1256,10 +1259,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          @Override
          protected CellEditor getCellEditor(final Object element) {
+
+            //todo fb
             spinnerCellEditor.getSpinner().setMinimum(25);
             spinnerCellEditor.getSpinner().setMaximum(10000);
             spinnerCellEditor.getSpinner().setIncrement(25);
-            spinnerCellEditor.getSpinner().setDigits(2);
+
             return spinnerCellEditor;
          }
 
