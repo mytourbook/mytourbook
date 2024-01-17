@@ -434,7 +434,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          TourManager.getInstance().clearTourDataCache();
 
          // fire modify event
-         _prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
+         _prefStore.setValue(ITourbookPreferences.PREF_BEVERAGECONTAINERS_HAS_CHANGED, Math.random());
       }
    }
 

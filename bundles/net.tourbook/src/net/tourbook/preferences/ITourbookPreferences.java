@@ -651,4 +651,8 @@ public interface ITourbookPreferences {
     */
    public static final String FULLTEXT_INDEX_DELETE = "FULLTEXT_INDEX_DELETE"; //$NON-NLS-1$
 
+   /*
+    * Tour nutrition view
+    */
+   public static final String PREF_BEVERAGECONTAINERS_HAS_CHANGED = "PREF_BEVERAGECONTAINERS_HAS_CHANGED"; //$NON-NLS-1$
 }
