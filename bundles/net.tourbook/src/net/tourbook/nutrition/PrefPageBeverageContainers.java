@@ -381,6 +381,9 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       final EntityManager em = TourDatabase.getInstance().getEntityManager();
       final EntityTransaction ts = em.getTransaction();
 
+      //todo fb remove the containers from the tours
+      // see PrefPageTags vate void onAction_DeleteTagOrCategory() {
+
       try {
          final TourBeverageContainer tourBeverageContainerEntity = em.find(TourBeverageContainer.class, tourBeverageContainer.getContainerId());
 
