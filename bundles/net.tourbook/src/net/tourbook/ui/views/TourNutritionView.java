@@ -422,10 +422,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             _productsViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
             _productsViewer.refresh();
+
          } else if (property.equals(ITourbookPreferences.PREF_BEVERAGECONTAINERS_HAS_CHANGED)) {
 
-            //todo fb refresh the tour recreate the viewer ?
-            reloadViewer();
+            //todo fb does it reload the tour data (aka, the ones that had containers assigned to them?)
+            _tourBeverageContainers = TourDatabase.getTourBeverageContainers();
+            recreateViewer(getViewer());
          }
       };
 
@@ -1243,13 +1245,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void setColumnsEditingSupport() {
 
-      final String[] items = new String[_tourBeverageContainers.size() + 1];
-      items[0] = UI.EMPTY_STRING;
-      for (int index = 0; index < _tourBeverageContainers.size(); ++index) {
-
-         items[index + 1] = NutritionUtils.buildTourBeverageContainerName(_tourBeverageContainers.get(index));
-      }
-
       _colDef_ConsumedQuantity.setEditingSupport(new EditingSupport(_productsViewer) {
 
          private SpinnerCellEditor spinnerCellEditor = new SpinnerCellEditor(_productsViewer.getTable(), _nf2, _quantityRange, SWT.NONE);
@@ -1353,9 +1348,17 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          protected void setValue(final Object element, final Object value) {}
       });
 
+      final String[] tourBeverageContainersItems = new String[_tourBeverageContainers.size() + 1];
+      tourBeverageContainersItems[0] = UI.EMPTY_STRING;
+      for (int index = 0; index < _tourBeverageContainers.size(); ++index) {
+
+         tourBeverageContainersItems[index + 1] = NutritionUtils.buildTourBeverageContainerName(_tourBeverageContainers.get(index));
+      }
       _colDef_BeverageContainer.setEditingSupport(new EditingSupport(_productsViewer) {
 
-         private ComboBoxCellEditor comboBoxCellEditor = new ComboBoxCellEditor(_productsViewer.getTable(), items, SWT.READ_ONLY);
+         private ComboBoxCellEditor comboBoxCellEditor = new ComboBoxCellEditor(_productsViewer.getTable(),
+               tourBeverageContainersItems,
+               SWT.READ_ONLY);
 
          @Override
          protected boolean canEdit(final Object element) {
