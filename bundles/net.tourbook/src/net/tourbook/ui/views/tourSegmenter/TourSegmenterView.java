@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -255,8 +255,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    //
    static final String         STATE_COLOR_TOTALS                             = "STATE_COLOR_TOTALS";                   //$NON-NLS-1$
    static final String         STATE_COLOR_TOTALS_DARK                        = "STATE_COLOR_TOTALS_DARK";              //$NON-NLS-1$
-   static final RGB            STATE_COLOR_TOTALS_DEFAULT                     = new RGB(255, 232, 144);
-   static final RGB            STATE_COLOR_TOTALS_DEFAULT_DARK                = new RGB(154, 120, 1);
+   static final RGB            STATE_COLOR_TOTALS_DEFAULT                     = new RGB(154, 120, 1);
+   static final RGB            STATE_COLOR_TOTALS_DEFAULT_DARK                = new RGB(255, 232, 144);
    //
    //
    private static final float                    SPEED_DIGIT_VALUE            = 10.0f;
@@ -1652,6 +1652,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     *
     * @param forcedIndices
     *           Is used when multiple tours are computed, otherwise it is <code>null</code>
+    *
     * @return
     */
    private int[] createSegmentsBy_DP_Elevation_Merged(final int[] forcedIndices) {
@@ -1773,6 +1774,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     *
     * @param forcedIndices
     *           Is used when multiple tours are computed, otherwise it is <code>null</code>
+    *
     * @return
     */
    private int[] createSegmentsBy_DP_FlatGainLoss(final int[] allForcedIndices) {
@@ -3546,6 +3548,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    /**
     * @param parent
+    *
     * @return
     */
    private Spinner createUI_DP_Tolerance(final Composite parent) {
@@ -3556,6 +3559,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    /**
     * @param parent
     * @param isSetMouseWheelListener
+    *
     * @return
     */
    private Spinner createUI_DP_Tolerance(final Composite parent, final boolean isSetMouseWheelListener) {
@@ -3602,6 +3606,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     *
     * @param surfingFilterType
     *           Surfing type for which the visible datapoints are created.
+    *
     * @return
     */
    private SurfingData createVisibleDataPoints(final SurfingFilterType surfingFilterType) {
@@ -5034,6 +5039,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    /**
     * @param tourId
+    *
     * @return Returns <code>true</code> when the tour is already displayed in the tour segmenter.
     */
    private boolean isTourDisplayed(final Long tourId) {
@@ -5648,9 +5654,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       case NotSurfing:
          bgColor = _colorCache.get(SEGMENTER_FILTER_2_BACKGROUND_HEADER);
          break;
+
       case Surfing:
          bgColor = _colorCache.get(SEGMENTER_FILTER_1_BACKGROUND_HEADER);
          break;
+
       case All:
          bgColor = ThemeUtil.getDefaultBackgroundColor_Combo();
          break;
@@ -6454,6 +6462,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    /**
     * @param sortColumnId
+    *
     * @return Returns the column widget by it's column id, when column id is not found then the
     *         first column is returned.
     */

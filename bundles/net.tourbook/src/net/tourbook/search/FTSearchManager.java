@@ -1901,6 +1901,7 @@ public class FTSearchManager {
          }
       }
 
+      // force to reload the suggester
       closeIndexReaderSuggester();
 
       final long end = System.nanoTime();

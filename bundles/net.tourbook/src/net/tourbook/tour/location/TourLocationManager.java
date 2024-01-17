@@ -54,6 +54,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.search.FTSearchManager;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
@@ -372,6 +373,17 @@ public class TourLocationManager {
 
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
             LocationPartID.settlementSmall,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile("Country, Large",   18,
+
+            LocationPartID.country,
+            LocationPartID.settlementLarge),
+
+         new TourLocationProfile("Country, Large, Name",   18,
+
+            LocationPartID.country,
+            LocationPartID.settlementLarge,
             LocationPartID.OSM_NAME),
 
          new TourLocationProfile("Large",   18,
@@ -950,7 +962,7 @@ public class TourLocationManager {
 
       final Display display = Display.getDefault();
 
-      // confirm deletion, show tag name and number of tours which contain a tag
+      // confirm deletion
       final MessageDialog dialog = new MessageDialog(
             display.getActiveShell(),
             Messages.Tour_Location_Dialog_DeleteLocation_Title,
@@ -971,6 +983,8 @@ public class TourLocationManager {
             if (deleteTourLocations_10(allLocations, isOneAction)) {
 
                TourManager.getInstance().clearTourDataCache();
+
+               FTSearchManager.updateIndex(allTourIds);
 
                returnValue[0] = true;
             }
@@ -1829,7 +1843,7 @@ public class TourLocationManager {
          if (allParts.size() == 1 && allParts.get(0).equals(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER)) {
 
             _defaultProfile = profile;
-            
+
             break;
          }
       }
@@ -1931,6 +1945,15 @@ public class TourLocationManager {
          Util.closeSql(stmtEnd);
          Util.closeSql(stmtLocation);
       }
+
+      /*
+       * Update FT index
+       */
+      final List<TourLocation> allLocations = new ArrayList<>();
+      allLocations.add(tourLocation);
+      final List<Long> allTourIDs = getToursWithLocations(allLocations);
+
+      FTSearchManager.updateIndex(allTourIDs);
    }
 
    /**
