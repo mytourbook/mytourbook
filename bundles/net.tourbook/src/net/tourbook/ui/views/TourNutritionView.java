@@ -1256,6 +1256,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          @Override
          protected CellEditor getCellEditor(final Object element) {
+            spinnerCellEditor.getSpinner().setMinimum(25);
+            spinnerCellEditor.getSpinner().setMaximum(10000);
+            spinnerCellEditor.getSpinner().setIncrement(25);
+            spinnerCellEditor.getSpinner().setDigits(2);
             return spinnerCellEditor;
          }
 
@@ -1404,6 +1408,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          @Override
          protected CellEditor getCellEditor(final Object element) {
+            //       spinnerCellEditor.getSpinner().setMinimum(columnAdvisor.getMinCount(element, columnIndex));
             return spinnerCellEditor;
          }
 
