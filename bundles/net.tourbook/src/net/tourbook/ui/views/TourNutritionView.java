@@ -422,13 +422,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             _productsViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
             _productsViewer.refresh();
-         }
-         else if (property.equals(ITourbookPreferences.PREF_BEVERAGECONTAINERS_HAS_CHANGED)) {
+         } else if (property.equals(ITourbookPreferences.PREF_BEVERAGECONTAINERS_HAS_CHANGED)) {
 
             //todo fb refresh the tour recreate the viewer ?
             reloadViewer();
          }
-
       };
 
       _prefStore.addPropertyChangeListener(_prefChangeListener);
