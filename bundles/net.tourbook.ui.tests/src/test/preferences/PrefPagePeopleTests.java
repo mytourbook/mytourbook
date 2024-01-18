@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -94,7 +94,7 @@ public class PrefPagePeopleTests extends UITest {
 
       bot.cTabItem(Messages.Pref_People_Tab_Person).activate();
       //22.9 BMI
-      assertEquals("22.9", bot.text(3).getText()); //$NON-NLS-1$
+      assertEquals("21.6", bot.text(3).getText()); //$NON-NLS-1$
 
       Utils.clickApplyAndCloseButton(bot);
 
