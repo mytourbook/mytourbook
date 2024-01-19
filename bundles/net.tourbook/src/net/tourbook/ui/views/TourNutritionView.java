@@ -191,7 +191,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Section     _sectionProductsList;
    private Section     _sectionSummary;
    private FormToolkit _tk;
-   private int         _hintValueFieldWidth;
 
    private final class No_EditingSupport extends EditingSupport {
 
@@ -610,7 +609,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void createUI_110_Report(final Composite parent) {
 
       final Composite container = _tk.createComposite(parent);
-      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(7).applyTo(container);
       {
          /*
           * Columns headers
@@ -620,13 +619,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
 
             label = UI.createLabel(container, Messages.Tour_Nutrition_Column_Calories);
-            GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
+            GridDataFactory.fillDefaults().span(2, 1).align(SWT.CENTER, SWT.FILL).applyTo(label);
 
             label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Fluids);
-            GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
+            GridDataFactory.fillDefaults().span(2, 1).align(SWT.CENTER, SWT.FILL).applyTo(label);
 
             label = UI.createLabel(container, Messages.Tour_Nutrition_Column_Sodium);
-            GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
+            GridDataFactory.fillDefaults().span(2, 1).align(SWT.CENTER, SWT.FILL).applyTo(label);
          }
 
          /*
@@ -644,6 +643,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtCalories_Total);
 
+            // Unit: kcal
+            UI.createLabel(container, net.tourbook.ui.Messages.Value_Unit_KCalories);
+
             _txtFluid_Total = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtFluid_Total.setEnabled(false);
             GridDataFactory.fillDefaults()
@@ -651,12 +653,18 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtFluid_Total);
 
+            // Unit: L
+            UI.createLabel(container, UI.UNIT_FLUIDS_L);
+
             _txtSodium_Total = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtSodium_Total.setEnabled(false);
             GridDataFactory.fillDefaults()
                   .hint(_hintTextColumnWidth, SWT.DEFAULT)
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtSodium_Total);
+
+            // Unit: mg
+            UI.createLabel(container, UI.UNIT_WEIGHT_MG);
          }
 
          /*
@@ -669,18 +677,27 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             _txtCalories_Average = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtCalories_Average.setEnabled(false);
-            GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).align(SWT.END, SWT.FILL)
+            GridDataFactory.fillDefaults().hint(_hintTextColumnWidth, SWT.DEFAULT).align(SWT.END, SWT.FILL)
                   .applyTo(_txtCalories_Average);
+
+            // Unit: kcal/h
+            UI.createLabel(container, net.tourbook.ui.Messages.Value_Unit_KCalories + UI.SLASH + UI.UNIT_LABEL_TIME);
 
             _txtFluid_Average = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtFluid_Average.setEnabled(false);
-            GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).align(SWT.END, SWT.FILL)
+            GridDataFactory.fillDefaults().hint(_hintTextColumnWidth, SWT.DEFAULT).align(SWT.END, SWT.FILL)
                   .applyTo(_txtFluid_Average);
+
+            // Unit: L/h
+            UI.createLabel(container, UI.UNIT_FLUIDS_L + UI.SLASH + UI.UNIT_LABEL_TIME);
 
             _txtSodium_Average = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtSodium_Average.setEnabled(false);
-            GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).align(SWT.END, SWT.FILL)
+            GridDataFactory.fillDefaults().hint(_hintTextColumnWidth, SWT.DEFAULT).align(SWT.END, SWT.FILL)
                   .applyTo(_txtSodium_Average);
+
+            // Unit: mg/h
+            UI.createLabel(container, UI.UNIT_WEIGHT_MG + UI.SLASH + UI.UNIT_LABEL_TIME);
          }
       }
    }
@@ -689,7 +706,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().span(3, 1).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(6).applyTo(container);
       {
          /*
           * Search product button
@@ -1100,8 +1117,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
-
-      _hintValueFieldWidth = _pc.convertWidthInCharsToPixels(10);
 
       _columnSortListener = widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
    }
