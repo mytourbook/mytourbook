@@ -566,14 +566,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private Section createSection(final Composite parent,
                                  final FormToolkit tk,
-                                 final String title,
-                                 final boolean isExpandable) {
+                                 final String title) {
 
-      final int style = isExpandable
-            ? ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR
-            : ExpandableComposite.TITLE_BAR;
-
-      final Section section = tk.createSection(parent, style);
+      final Section section = tk.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
 
       section.setText(title);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
@@ -634,7 +629,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          {
             final Label label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Totals);
             label.setToolTipText(Messages.Tour_Nutrition_Label_Totals_Tooltip);
-            GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
+            GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(label);
 
             _txtCalories_Total = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtCalories_Total.setEnabled(false);
@@ -673,7 +668,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          {
             final Label label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Averages);
             label.setToolTipText(Messages.Tour_Nutrition_Label_Averages_Tooltip);
-            GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
+            GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(label);
 
             _txtCalories_Average = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtCalories_Average.setEnabled(false);
@@ -794,7 +789,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void createUI_Section_10_Summary(final Composite parent) {
 
-      _sectionSummary = createSection(parent, _tk, Messages.Tour_Nutrition_Section_Summary, true);
+      _sectionSummary = createSection(parent, _tk, Messages.Tour_Nutrition_Section_Summary);
       _sectionSummary.setToolTipText(Messages.Tour_Nutrition_Section_Summary_Tooltip);
       final Composite container = (Composite) _sectionSummary.getClient();
       GridLayoutFactory.fillDefaults().applyTo(container);
@@ -805,7 +800,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void createUI_Section_20_ProductsList(final Composite parent) {
 
-      _sectionProductsList = createSection(parent, _tk, Messages.Tour_Nutrition_Section_ProductsList, true);
+      _sectionProductsList = createSection(parent, _tk, Messages.Tour_Nutrition_Section_ProductsList);
       _sectionProductsList.setToolTipText(Messages.Tour_Nutrition_Section_ProductsList_Tooltip);
       final Composite container = (Composite) _sectionProductsList.getClient();
       GridLayoutFactory.fillDefaults().applyTo(container);

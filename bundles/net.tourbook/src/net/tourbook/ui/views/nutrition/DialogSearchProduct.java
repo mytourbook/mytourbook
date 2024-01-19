@@ -277,7 +277,11 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       final Composite dlgContainer = (Composite) super.createDialogArea(parent);
 
-      createUI(dlgContainer);
+      _isInUIInit = true;
+      {
+         createUI(dlgContainer);
+      }
+      _isInUIInit = false;
 
       fillUI();
 
