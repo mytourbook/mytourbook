@@ -1271,6 +1271,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          protected CellEditor getCellEditor(final Object element) {
 
             //todo fb
+            //it works but it's when i use the mousewheel that it doesn't!?!? at least on windows, to test on linux !?
             spinnerCellEditor.getSpinner().setMinimum(25);
             spinnerCellEditor.getSpinner().setMaximum(10000);
             spinnerCellEditor.getSpinner().setIncrement(25);
