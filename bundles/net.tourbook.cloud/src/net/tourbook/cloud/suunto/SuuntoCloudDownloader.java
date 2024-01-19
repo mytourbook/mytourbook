@@ -67,8 +67,9 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
-   private static final String     LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
-   private static final String     LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
+   private static final String     LOG_CLOUDACTION_END           = Messages.Log_CloudAction_End;
+   private static final String     LOG_CLOUDACTION_INVALIDTOKENS = Messages.Log_CloudAction_InvalidTokens;
+   private static final String     APP_PEOPLE_ITEM_ALL           = net.tourbook.Messages.App_People_item_all;
 
    private static IPreferenceStore _prefStore                    = Activator.getDefault().getPreferenceStore();
    private int[]                   _numberOfAvailableTours;
@@ -146,7 +147,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
       final TourPerson activePerson = TourbookPlugin.getActivePerson();
       _personName = activePerson == null
-            ? net.tourbook.Messages.App_People_item_all
+            ? APP_PEOPLE_ITEM_ALL
             : activePerson.getName();
 
       _numberOfAvailableTours = new int[1];
