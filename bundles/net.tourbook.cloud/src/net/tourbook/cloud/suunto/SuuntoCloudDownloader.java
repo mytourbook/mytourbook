@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2023 Frédéric Bard
+ * Copyright (C) 2021, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -76,6 +76,8 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    private boolean                 _useActivePerson;
    private boolean                 _useAllPeople;
 
+   private String                  _personName;
+
    public SuuntoCloudDownloader() {
 
       super("SUUNTO", //$NON-NLS-1$
@@ -141,6 +143,11 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             return;
          }
       }
+
+      final TourPerson activePerson = TourbookPlugin.getActivePerson();
+      _personName = activePerson == null
+            ? net.tourbook.Messages.App_People_item_all
+            : activePerson.getName();
 
       _numberOfAvailableTours = new int[1];
       final String[] notificationText = new String[1];
@@ -446,7 +453,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       }
 
       final String customizedFileName =
-            CustomFileNameBuilder.buildCustomizedFileName(workoutPayload, suuntoFileName);
+            CustomFileNameBuilder.buildCustomizedFileName(workoutPayload, suuntoFileName, _personName);
 
       final Path filePath = Paths.get(
             getDownloadFolder(),
