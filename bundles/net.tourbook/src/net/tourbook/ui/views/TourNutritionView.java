@@ -82,6 +82,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
@@ -1272,9 +1273,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             //todo fb
             //it works but it's when i use the mousewheel that it doesn't!?!? at least on windows, to test on linux !?
-            spinnerCellEditor.getSpinner().setMinimum(25);
-            spinnerCellEditor.getSpinner().setMaximum(10000);
-            spinnerCellEditor.getSpinner().setIncrement(25);
+            final Spinner spinner = spinnerCellEditor.getSpinner();
+            spinner.setMinimum(25);
+            spinner.setMaximum(10000);
+            spinner.setIncrement(25);
+            spinner.addMouseWheelListener(mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent));
 
             return spinnerCellEditor;
          }
