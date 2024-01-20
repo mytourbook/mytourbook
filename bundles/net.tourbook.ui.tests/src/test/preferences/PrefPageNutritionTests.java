@@ -36,7 +36,7 @@ public class PrefPageNutritionTests extends UITest {
 
       nutritionTreeItem.getNode("Beverage Containers").select(); //$NON-NLS-1$
 
-      bot.button(Messages.PrefPage_TourBeverageContainers_Button_Add);
+      bot.button(Messages.PrefPage_TourBeverageContainers_Button_Add).click();
 
       // Act
 
