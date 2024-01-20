@@ -427,7 +427,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             //todo fb does it reload the tour data (aka, the ones that had containers assigned to them?)
             _tourBeverageContainers = TourDatabase.getTourBeverageContainers();
-            recreateViewer(getViewer());
+            // todo fb necessary ? recreateViewer(getViewer());
+
+            refreshTourData(_tourData = TourManager.getTour(_tourData.getTourId()));
          }
       };
 
@@ -487,13 +489,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                      for (final TourData tourData : modifiedTours) {
                         if (tourData.getTourId() == viewTourId) {
 
-                           // get modified tour
-                           _tourData = tourData;
-
-                           updateUI_ProductViewer();
-
-                           // removed old tour data from the selection provider
-                           _postSelectionProvider.clearSelection();
+                           refreshTourData(tourData);
 
                            // nothing more to do, the view contains only one tour
                            return;
@@ -1227,6 +1223,16 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _viewerContainer.setRedraw(true);
 
       return _productsViewer;
+   }
+
+   private void refreshTourData(final TourData tourData) {
+      // get modified tour
+      _tourData = tourData;
+
+      updateUI_ProductViewer();
+
+      // removed old tour data from the selection provider
+      _postSelectionProvider.clearSelection();
    }
 
    @Override
