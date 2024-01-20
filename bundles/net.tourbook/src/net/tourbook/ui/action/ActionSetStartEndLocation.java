@@ -792,6 +792,10 @@ public class ActionSetStartEndLocation extends SubMenu {
       // get tours which are needed in the menu actions
       _allSelectedTours = _tourProvider.getSelectedTours();
 
+      addActionToMenu(_actionEditProfiles);
+
+      addSeparatorToMenu();
+
       addActionToMenu(_actionLocationPart_Set_Start);
       addActionToMenu(_actionLocationPart_Set_End);
       addActionToMenu(_actionLocationPart_Set_All);
@@ -825,10 +829,6 @@ public class ActionSetStartEndLocation extends SubMenu {
       addActionToMenu(_actionRemoveLocation_Start_Complete);
       addActionToMenu(_actionRemoveLocation_End_Complete);
       addActionToMenu(_actionRemoveLocation_All_Complete);
-
-      addSeparatorToMenu();
-
-      addActionToMenu(_actionEditProfiles);
    }
 
    private void fillMenu_AddAll_PartActions(final Menu menu,
