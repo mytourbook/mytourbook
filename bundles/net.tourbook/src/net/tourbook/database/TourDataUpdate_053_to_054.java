@@ -19,12 +19,18 @@ import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 
-public class TourDataUpdate_047_to_048 implements ITourDataUpdate {
+/**
+ * This is the same data update as TourDataUpdate_047_to_048 but there was a bug in the update
+ * sequence that it is possible, that TourDataUpdate_047_to_048 never run.
+ * <p>
+ * Db design update {@link net.tourbook.database.TourDatabase.updateDb_053_To_054()}
+ */
+public class TourDataUpdate_053_to_054 implements ITourDataUpdate {
 
    @Override
    public int getDatabaseVersion() {
 
-      return 48;
+      return 54;
    }
 
    @Override
@@ -41,7 +47,7 @@ public class TourDataUpdate_047_to_048 implements ITourDataUpdate {
           */
          tourData.setWeather_Clouds(IWeather.WEATHER_ID_SCATTERED_SHOWERS);
 
-         TourDatabase.logDbUpdate("Converted weather field '%s' in %s".formatted( //$NON-NLS-1$
+         TourDatabase.logDbUpdate("Converted weather field '%s' in %s".formatted( // //$NON-NLS-1$
                IWeather.WEATHER_ID_SCATTERED_SHOWERS,
                TourManager.getTourDateTimeShort(tourData)));
 

@@ -366,7 +366,7 @@ public class Map2View extends ViewPart implements
    private final ITourToolTipProvider        _wayPointToolTipProvider    = new WayPointToolTipProvider();
    private ValuePoint_ToolTip_UI             _valuePointTooltipUI;
    //
-   private final DirectMappingPainter        _directMappingPainter       = new DirectMappingPainter(_state);
+   private DirectMappingPainter              _directMappingPainter;
    //
    private final MapInfoManager              _mapInfoManager             = MapInfoManager.getInstance();
    private final TourPainterConfiguration    _tourPainterConfig          = TourPainterConfiguration.getInstance();
@@ -1269,7 +1269,6 @@ public class Map2View extends ViewPart implements
       // repaint map
       _directMappingPainter.setPaintContext(
 
-            _map,
             _isShowTour,
             _allTourData.get(0),
 
@@ -1917,8 +1916,10 @@ public class Map2View extends ViewPart implements
       _map = new Map2(parent, SWT.NONE, _state);
       _map.setPainting(false);
 
+      _directMappingPainter = new DirectMappingPainter(_map, _state);
       _map.setDirectPainter(_directMappingPainter);
-//      _map.setLiveView(true);
+
+//    _map.setLiveView(true);
 
       _map.setLegend(_mapLegend);
       _map.setShowLegend(true);
@@ -1932,6 +1933,7 @@ public class Map2View extends ViewPart implements
       _map.setTourToolTip(_tourToolTip = new TourToolTip(_map));
       _tourInfoToolTipProvider.setActionsEnabled(true);
       _tourInfoToolTipProvider.setNoTourTooltip(OtherMessages.TOUR_TOOLTIP_LABEL_NO_GEO_TOUR);
+
 
       /*
        * Setup value point tooltip
@@ -2942,7 +2944,6 @@ public class Map2View extends ViewPart implements
          // repaint map
          _directMappingPainter.setPaintContext(
 
-               _map,
                _isShowTour,
                _allTourData.get(0),
 
@@ -3117,7 +3118,6 @@ public class Map2View extends ViewPart implements
             // repaint map
             _directMappingPainter.setPaintContext(
 
-                  _map,
                   _isShowTour,
                   _allTourData.get(0),
 
@@ -3998,7 +3998,6 @@ public class Map2View extends ViewPart implements
       // set the paint context (slider position) for the direct mapping painter
       _directMappingPainter.setPaintContext(
 
-            _map,
             _isShowTour,
             tourData,
 
@@ -4250,7 +4249,6 @@ public class Map2View extends ViewPart implements
 
       _directMappingPainter.setPaintContext(
 
-            _map,
             _isShowTour,
             tourData,
 
@@ -5079,7 +5077,6 @@ public class Map2View extends ViewPart implements
       // update direct painter to draw nothing
       _directMappingPainter.setPaintContext(
 
-            _map,
             false,
             null,
 
@@ -5385,7 +5382,6 @@ public class Map2View extends ViewPart implements
       // set the paint context  for the direct mapping painter
       _directMappingPainter.setPaintContext(
 
-            _map,
             _isShowTour,
             hoveredTourData,
 

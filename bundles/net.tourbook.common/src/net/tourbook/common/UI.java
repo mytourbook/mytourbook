@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1117,6 +1117,13 @@ public class UI {
       return averageElevationChange * UNIT_VALUE_DISTANCE / UNIT_VALUE_ELEVATION;
    }
 
+   /**
+    * Convert height from metric into inches
+    *
+    * @param height
+    *
+    * @return
+    */
    public static float convertBodyHeightFromMetric(final float height) {
 
       if (UNIT_IS_ELEVATION_METER) {
@@ -1126,13 +1133,16 @@ public class UI {
       return height * UNIT_METER_TO_INCHES;
    }
 
-   public static float convertBodyHeightToMetric(final float primaryHeight, final int subHeight) {
+   public static float convertBodyHeightToMetric(final float heightMeterOrFeet, final int heightInch) {
 
       if (UNIT_IS_ELEVATION_METER) {
-         return primaryHeight;
+         return heightMeterOrFeet;
       }
 
-      return 100 * (primaryHeight * 12 + subHeight) / UNIT_METER_TO_INCHES;
+      final float heightFeetToInch = heightMeterOrFeet * 12;
+      final float heightInchTotal = heightFeetToInch + heightInch;
+
+      return 100 * heightInchTotal / UNIT_METER_TO_INCHES;
    }
 
    /**

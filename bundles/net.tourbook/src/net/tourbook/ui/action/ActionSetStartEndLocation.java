@@ -816,15 +816,15 @@ public class ActionSetStartEndLocation extends SubMenu {
          addSeparatorToMenu();
       }
 
-      addActionToMenu(_actionRemoveLocation_All);
       addActionToMenu(_actionRemoveLocation_Start);
       addActionToMenu(_actionRemoveLocation_End);
+      addActionToMenu(_actionRemoveLocation_All);
 
       addSeparatorToMenu();
 
-      addActionToMenu(_actionRemoveLocation_All_Complete);
       addActionToMenu(_actionRemoveLocation_Start_Complete);
       addActionToMenu(_actionRemoveLocation_End_Complete);
+      addActionToMenu(_actionRemoveLocation_All_Complete);
 
       addSeparatorToMenu();
 

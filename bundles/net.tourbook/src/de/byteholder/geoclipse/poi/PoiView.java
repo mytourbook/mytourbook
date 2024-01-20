@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (C) 2008, 2022 Michael Kanis, Veit Edunjobi and others
+ *  Copyright (C) 2008, 2024 Michael Kanis, Veit Edunjobi and others
  *
  *  This file is part of Geoclipse.
  *
@@ -16,7 +16,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Geoclipse.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-
 package de.byteholder.geoclipse.poi;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
@@ -87,11 +86,10 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
    private static final IDialogSettings  _state                 = TourbookPlugin.getState("PoiView");    //$NON-NLS-1$
 
    private TableViewer                   _poiViewer;
-   private List<PointOfInterest>         _pois;
+   private List<PointOfInterest>         _allPOIs;
    private List<String>                  _searchHistory         = new ArrayList<>();
 
    private PostSelectionProvider         _postSelectionProvider;
-
    private IPropertyChangeListener       _prefChangeListener;
 
    private IWorkbenchHelpSystem          _wbHelpSystem;
@@ -103,7 +101,8 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
     */
    private Button      _btnSearch;
 
-   private Combo       _cboSearchQuery;
+   private Combo       _comboSearchQuery;
+   
    private ComboViewer _queryViewer;
 
    public class SearchContentProvider implements IStructuredContentProvider {
@@ -127,10 +126,10 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
 
       @Override
       public Object[] getElements(final Object parent) {
-         if (_pois == null) {
+         if (_allPOIs == null) {
             return new String[] {};
          } else {
-            return _pois.toArray();
+            return _allPOIs.toArray();
          }
       }
 
@@ -145,6 +144,7 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
          switch (index) {
          case 0:
             return getImage(obj);
+
          default:
             return null;
          }
@@ -158,6 +158,7 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
          switch (index) {
          case 0:
             return poi.getCategory();
+
          case 1:
 
             final StringBuilder sb = new StringBuilder(poi.getName());
@@ -183,6 +184,7 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
                sb.append(Messages.Poi_View_Label_NearestPlacesPart4);
             }
             return sb.toString();
+
          default:
             return getText(obj);
          }
@@ -201,21 +203,18 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
             final ImageRegistry imageRegistry = TourbookPlugin.getDefault().getImageRegistry();
             final String poiCategory = poi.getCategory();
 
-            if (poiCategory.equals("highway")) { //$NON-NLS-1$
-               img = imageRegistry.get(IMG_KEY_CAR);
-            } else if (poiCategory.equals("place")) { //$NON-NLS-1$
-               img = imageRegistry.get(IMG_KEY_HOUSE);
-            } else if (poiCategory.equals("waterway")) { //$NON-NLS-1$
-               img = imageRegistry.get(IMG_KEY_ANCHOR);
-            } else if (poiCategory.equals("amenity")) { //$NON-NLS-1$
-               img = imageRegistry.get(IMG_KEY_CART);
-            } else if (poiCategory.equals("leisure")) { //$NON-NLS-1$
-               img = imageRegistry.get(IMG_KEY_STAR);
-            } else if (poiCategory.equals("sport")) { //$NON-NLS-1$
-               img = imageRegistry.get(IMG_KEY_SOCCER);
-            } else {
-               img = imageRegistry.get(IMG_KEY_FLAG);
+// SET_FORMATTING_OFF
+
+            if (       poiCategory.equals("highway")) {  img = imageRegistry.get(IMG_KEY_CAR);     //$NON-NLS-1$
+            } else if (poiCategory.equals("place")) {    img = imageRegistry.get(IMG_KEY_HOUSE);   //$NON-NLS-1$
+            } else if (poiCategory.equals("waterway")) { img = imageRegistry.get(IMG_KEY_ANCHOR);  //$NON-NLS-1$
+            } else if (poiCategory.equals("amenity")) {  img = imageRegistry.get(IMG_KEY_CART);    //$NON-NLS-1$
+            } else if (poiCategory.equals("leisure")) {  img = imageRegistry.get(IMG_KEY_STAR);    //$NON-NLS-1$
+            } else if (poiCategory.equals("sport")) {    img = imageRegistry.get(IMG_KEY_SOCCER);  //$NON-NLS-1$
+            } else {                                     img = imageRegistry.get(IMG_KEY_FLAG);
             }
+
+// SET_FORMATTING_ON
 
             return img;
          } else {
@@ -227,7 +226,7 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
    public PoiView() {}
 
    public PoiView(final List<PointOfInterest> pois) {
-      _pois = pois;
+      _allPOIs = pois;
    }
 
    private void addPrefListener() {
@@ -304,16 +303,16 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
             /*
              * combo: search
              */
-            _cboSearchQuery = new Combo(queryContainer, SWT.NONE);
-            _cboSearchQuery.setVisibleItemCount(30);
-            _cboSearchQuery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            _comboSearchQuery = new Combo(queryContainer, SWT.NONE);
+            _comboSearchQuery.setVisibleItemCount(30);
+            _comboSearchQuery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
                // start searching when ENTER is pressed
                onSearchPoi();
             }));
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .grab(true, false)
-                  .applyTo(_cboSearchQuery);
+                  .applyTo(_comboSearchQuery);
          }
          {
             /*
@@ -325,7 +324,7 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
          }
       }
 
-      _queryViewer = new ComboViewer(_cboSearchQuery);
+      _queryViewer = new ComboViewer(_comboSearchQuery);
       _queryViewer.setContentProvider(new SearchContentProvider());
       _queryViewer.setComparator(new ViewerComparator());
 
@@ -385,25 +384,30 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
       final TourbookPlugin activator = TourbookPlugin.getDefault();
       final ImageRegistry imageRegistry = activator.getImageRegistry();
 
-      if (imageRegistry.get(Images.POI_Anchor) == null) {
+// SET_FORMATTING_OFF
 
-         imageRegistry.put(IMG_KEY_ANCHOR, TourbookPlugin.getImageDescriptor(Images.POI_Anchor));
-         imageRegistry.put(IMG_KEY_CAR, TourbookPlugin.getImageDescriptor(Images.POI_Car));
-         imageRegistry.put(IMG_KEY_CART, TourbookPlugin.getImageDescriptor(Images.POI_Cart));
-         imageRegistry.put(IMG_KEY_FLAG, TourbookPlugin.getImageDescriptor(Images.POI_Flag));
-         imageRegistry.put(IMG_KEY_HOUSE, TourbookPlugin.getImageDescriptor(Images.POI_House));
-         imageRegistry.put(IMG_KEY_SOCCER, TourbookPlugin.getImageDescriptor(Images.POI_Soccer));
-         imageRegistry.put(IMG_KEY_STAR, TourbookPlugin.getImageDescriptor(Images.POI_Star));
+      if (imageRegistry.get(IMG_KEY_ANCHOR) == null) {
+
+         imageRegistry.put(IMG_KEY_ANCHOR,   TourbookPlugin.getImageDescriptor(Images.POI_Anchor));
+         imageRegistry.put(IMG_KEY_CAR,      TourbookPlugin.getImageDescriptor(Images.POI_Car));
+         imageRegistry.put(IMG_KEY_CART,     TourbookPlugin.getImageDescriptor(Images.POI_Cart));
+         imageRegistry.put(IMG_KEY_FLAG,     TourbookPlugin.getImageDescriptor(Images.POI_Flag));
+         imageRegistry.put(IMG_KEY_HOUSE,    TourbookPlugin.getImageDescriptor(Images.POI_House));
+         imageRegistry.put(IMG_KEY_SOCCER,   TourbookPlugin.getImageDescriptor(Images.POI_Soccer));
+         imageRegistry.put(IMG_KEY_STAR,     TourbookPlugin.getImageDescriptor(Images.POI_Star));
       }
+
+// SET_FORMATTING_ON
+
    }
 
    private void onSearchPoi() {
 
       // disable search controls
-      _cboSearchQuery.setEnabled(false);
+      _comboSearchQuery.setEnabled(false);
       _btnSearch.setEnabled(false);
 
-      final String searchText = _cboSearchQuery.getText();
+      final String searchText = _comboSearchQuery.getText();
 
       // remove same search text
       if (_searchHistory.contains(searchText) == false) {
@@ -426,7 +430,7 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
       final List<PointOfInterest> searchResult = (List<PointOfInterest>) propertyChangeEvent.getNewValue();
 
       if (searchResult != null) {
-         _pois = searchResult;
+         _allPOIs = searchResult;
       }
 
       Display.getDefault().asyncExec(() -> {
@@ -451,7 +455,7 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
             }
          }
 
-         _cboSearchQuery.setEnabled(true);
+         _comboSearchQuery.setEnabled(true);
          _btnSearch.setEnabled(true);
       });
 
@@ -482,7 +486,7 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
       _btnSearch.getShell().setDefaultButton(_btnSearch);
 
       // set focus
-      _cboSearchQuery.setFocus();
+      _comboSearchQuery.setFocus();
    }
 
    /**

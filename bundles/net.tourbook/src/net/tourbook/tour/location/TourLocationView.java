@@ -3240,9 +3240,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             allCountries.add(tourLocation.country);
          }
 
-         // create sorted country list
-         _allLocationCountries = new ArrayList<>(allCountries);
-         Collections.sort(_allLocationCountries);
+         setupCountries(allCountries);
 
       } catch (final SQLException e) {
          SQL.showException(e);
@@ -3512,7 +3510,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final Table table = _locationViewer.getTable();
 
-      // get index for selected sensor
+      // get index for selected location
       final int lastLocationIndex = table.getSelectionIndex();
 
       // update model
@@ -3824,6 +3822,38 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    public void setFocus() {
 
       _locationViewer.getTable().setFocus();
+   }
+
+   private void setupCountries(final Set<String> allCountries) {
+
+      _allLocationCountries = new ArrayList<>(allCountries);
+
+      // create sorted country list
+      Collections.sort(_allLocationCountries);
+
+      if (_locationFilter_Country != null) {
+
+         // ensure that the filter country is available in all countries
+
+         boolean countryIsAvailable = false;
+
+         for (final String country : allCountries) {
+            
+            if (country.equals(_locationFilter_Country)) {
+
+               countryIsAvailable = true;
+
+               break;
+            }
+         }
+
+         if (countryIsAvailable == false) {
+
+            // filter is invalid -> reset to display all locations
+
+            _locationFilter_Country = null;
+         }
+      }
    }
 
    @Override

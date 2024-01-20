@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1139,11 +1139,9 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
             // checkbox
             _chkUseDraggedScrolling = new Button(container, SWT.CHECK);
             _chkUseDraggedScrolling.setText(Messages.Slideout_CalendarOptions_Checkbox_UseDraggedScrolling);
-            _chkUseDraggedScrolling.setToolTipText(
-                  Messages.Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip);
+            _chkUseDraggedScrolling.setToolTipText(Messages.Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip);
             _chkUseDraggedScrolling.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory
-                  .fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.BEGINNING)
                   .span(2, 1)
                   .applyTo(_chkUseDraggedScrolling);

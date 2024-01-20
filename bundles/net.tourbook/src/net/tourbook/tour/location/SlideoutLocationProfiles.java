@@ -577,7 +577,6 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
              */
             final Button button = new Button(container, SWT.PUSH);
             button.setText(Messages.Slideout_TourFilter_Action_AddProfile);
-            button.setToolTipText(Messages.Slideout_TourFilter_Action_AddProfile_Tooltip);
             button.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onProfile_Add()));
 
             // set button default width
