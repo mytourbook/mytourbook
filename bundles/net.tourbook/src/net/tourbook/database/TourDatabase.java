@@ -233,7 +233,7 @@ public class TourDatabase {
     */
    public static final int     ENTITY_IS_NOT_SAVED           = -1;
    //
-   private static final String ENTITY_ID_BEVERAGECONTAINER   = "ContainerID";                                                     //$NON-NLS-1$
+   public static final String  ENTITY_ID_BEVERAGECONTAINER   = "ContainerID";                                                     //$NON-NLS-1$
    private static final String ENTITY_ID_BIKE                = "BikeID";                                                          //$NON-NLS-1$
    private static final String ENTITY_ID_COMPARED            = "ComparedID";                                                      //$NON-NLS-1$
    private static final String ENTITY_ID_DEVICE_SENSOR       = "SensorId";                                                        //$NON-NLS-1$
@@ -251,7 +251,7 @@ public class TourDatabase {
    private static final String ENTITY_ID_TYPE                = "TypeID";                                                          //$NON-NLS-1$
    public static final String  ENTITY_ID_WAY_POINT           = "WayPointID";                                                      //$NON-NLS-1$
    //
-   private static final String KEY_BEVERAGE_CONTAINER        = TABLE_TOUR_BEVERAGE_CONTAINER + "_" + ENTITY_ID_BEVERAGECONTAINER; //$NON-NLS-1$
+   public static final String  KEY_BEVERAGE_CONTAINER        = TABLE_TOUR_BEVERAGE_CONTAINER + "_" + ENTITY_ID_BEVERAGECONTAINER; //$NON-NLS-1$
    private static final String KEY_BIKE                      = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                            //$NON-NLS-1$
    private static final String KEY_DEVICE_SENSOR             = TABLE_DEVICE_SENSOR + "_" + ENTITY_ID_DEVICE_SENSOR;               //$NON-NLS-1$
    private static final String KEY_PERSON                    = TABLE_TOUR_PERSON + "_" + ENTITY_ID_PERSON;                        //$NON-NLS-1$
@@ -4888,7 +4888,7 @@ public class TourDatabase {
             + SQL.CreateField_EntityId(ENTITY_ID_NUTRITIONPRODUCT, true)
 
             + "   " + KEY_TOUR + "           BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
-            + "   " + KEY_BEVERAGE_CONTAINER + "  BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_BEVERAGE_CONTAINER + "  BIGINT,                              " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // Version 55 - begin
 

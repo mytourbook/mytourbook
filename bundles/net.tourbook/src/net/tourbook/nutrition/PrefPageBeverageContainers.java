@@ -18,23 +18,22 @@ package net.tourbook.nutrition;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourBeverageContainer;
-import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -313,103 +312,78 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       columnName.setWidth(100);
    }
 
-   private boolean deleteTourBeverageContainer(final TourBeverageContainer tourBeverageContainer) {
-
-      if (deleteTourBeverageContainer_10_FromTourData(tourBeverageContainer) &&
-            deleteTourBeverageContainer_20_FromDb(tourBeverageContainer)) {
-         return true;
-      }
-
-      return false;
-   }
-
-   private boolean deleteTourBeverageContainer_10_FromTourData(final TourBeverageContainer tourBeverageContainer) {
+   private boolean deleteTourBeverageContainer(final List<TourBeverageContainer> tourBeverageContainers) {
 
       boolean returnResult = false;
 
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      String sql;
 
-      if (em != null) {
+      PreparedStatement prepStmt_TourData = null;
+      PreparedStatement prepStmt_TourTag = null;
 
-         final Query query = em.createQuery(UI.EMPTY_STRING
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-               + "SELECT tourData" //$NON-NLS-1$
-               + " FROM TourData AS tourData" //$NON-NLS-1$
-               + " WHERE tourData.tourType.typeId=" + tourBeverageContainer.getContainerId()); //$NON-NLS-1$
+         // remove container from TABLE_TOUR_BEVERAGE_CONTAINER
+         sql = "UPDATE " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //          //$NON-NLS-1$
+               + " SET " + TourDatabase.KEY_BEVERAGE_CONTAINER + "=null"
+               + " WHERE " + TourDatabase.KEY_BEVERAGE_CONTAINER + "=?"; //                      //$NON-NLS-1$ //$NON-NLS-2$
+         prepStmt_TourData = conn.prepareStatement(sql);
 
-         final List<?> tourDataList = query.getResultList();
-         if (tourDataList.size() > 0) {
+         // remove tag from TABLE_TOUR_BEVERAGE_CONTAINER
+         sql = "DELETE" //                                                       //$NON-NLS-1$
+               + " FROM " + TourDatabase.TABLE_TOUR_BEVERAGE_CONTAINER //                       //$NON-NLS-1$
+               + " WHERE " + TourDatabase.ENTITY_ID_BEVERAGECONTAINER + "=?"; //               //$NON-NLS-1$ //$NON-NLS-2$
+         prepStmt_TourTag = conn.prepareStatement(sql);
 
-            final EntityTransaction ts = em.getTransaction();
+         int[] returnValue_TourData;
+         int[] returnValue_TourTag;
 
-            try {
+         conn.setAutoCommit(false);
+         {
+            for (final TourBeverageContainer tourBeverageContainer : tourBeverageContainers) {
 
-               ts.begin();
+               final long containerId = tourBeverageContainer.getContainerId();
 
-               // remove tour beverage container from all tour nutrition products
-               for (final Object listItem : tourDataList) {
+               prepStmt_TourData.setLong(1, containerId);
+               prepStmt_TourData.addBatch();
 
-                  if (listItem instanceof final TourData tourData) {
-
-                     tourData.setTourType(null);
-                     em.merge(tourData);
-                  }
-               }
-
-               ts.commit();
-
-            } catch (final Exception e) {
-               StatusUtil.showStatus(e);
-            } finally {
-               if (ts.isActive()) {
-                  ts.rollback();
-               }
+               prepStmt_TourTag.setLong(1, containerId);
+               prepStmt_TourTag.addBatch();
             }
+
+            returnValue_TourData = prepStmt_TourData.executeBatch();
+            returnValue_TourTag = prepStmt_TourTag.executeBatch();
+         }
+         conn.commit();
+
+         // log result
+         TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
+
+         for (final TourBeverageContainer tourBeverageContainer : tourBeverageContainers) {
+
+//            TourLogManager.log_INFO(String.format(Messages.Tag_Manager_LogInfo_DeletedTags,
+//                  returnValue_TourData[tagIndex],
+//                  returnValue_TourTag[tagIndex],
+//                  tourBeverageContainers.get(tagIndex).getName()));
          }
 
          returnResult = true;
-         em.close();
-      }
 
-      return returnResult;
-   }
+      } catch (final SQLException e) {
 
-   private boolean deleteTourBeverageContainer_20_FromDb(final TourBeverageContainer tourBeverageContainer) {
+         net.tourbook.ui.UI.showSQLException(e);
 
-      boolean returnResult = false;
-
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
-      final EntityTransaction ts = em.getTransaction();
-
-      //todo fb remove the containers from the tours
-      // see PrefPageTags vate void onAction_DeleteTagOrCategory() {
-
-      try {
-         final TourBeverageContainer tourBeverageContainerEntity = em.find(TourBeverageContainer.class, tourBeverageContainer.getContainerId());
-
-         if (tourBeverageContainerEntity != null) {
-
-            ts.begin();
-
-            em.remove(tourBeverageContainerEntity);
-
-            ts.commit();
-         }
-
-      } catch (final Exception e) {
-         StatusUtil.showStatus(e);
       } finally {
-         if (ts.isActive()) {
-            ts.rollback();
-         } else {
-            returnResult = true;
-         }
-         em.close();
+
+         Util.closeSql(prepStmt_TourData);
+         Util.closeSql(prepStmt_TourTag);
       }
 
       return returnResult;
    }
 
+   //todo fb remove the containers from the tours
+   // see PrefPageTags  void onAction_DeleteTagOrCategory() {
    @Override
    public void dispose() {
 
@@ -509,20 +483,19 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    private void onTourBeverageContainer_Delete() {
 
-      final List<String> allTourTypeNames = new ArrayList<>();
+      final StructuredSelection selection = (StructuredSelection) _tourBeverageContainerViewer.getSelection();
 
-      _beverageContainers.stream()
-            .forEach(tourType -> allTourTypeNames.add(tourType.getName()));
-
-      final String allTourTypeNamesJoined = StringUtils
-            .join(allTourTypeNames.stream().toArray(String[]::new), UI.COMMA_SPACE);
+      final List<TourBeverageContainer> selectedTourBeverageContainers = new ArrayList<>();
+      selection.toList().forEach(s -> selectedTourBeverageContainers.add((TourBeverageContainer) s));
+//      final String allTourTypeNamesJoined = StringUtils
+//            .join(allTourTypeNames.stream().toArray(String[]::new), UI.COMMA_SPACE);
 
       // confirm deletion
       final MessageDialog dialog = new MessageDialog(
             getShell(),
             Messages.Pref_TourTypes_Dlg_delete_tour_type_title,
             null,
-            NLS.bind(Messages.Pref_TourTypes_Dlg_delete_tour_type_msg, allTourTypeNamesJoined),
+            NLS.bind(Messages.Pref_TourTypes_Dlg_delete_tour_type_msg, "toto"),
             MessageDialog.QUESTION,
             new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL },
             1);
@@ -535,22 +508,19 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       BusyIndicator.showWhile(getShell().getDisplay(), () -> {
 
-         for (final TourBeverageContainer selectedBeverageContainers : _beverageContainers) {
+         // remove entity from the db
+         if (deleteTourBeverageContainer(selectedTourBeverageContainers)) {
 
-            // remove entity from the db
-            if (deleteTourBeverageContainer(selectedBeverageContainers)) {
+            // update model
+            _dbTourTypes.removeAll(selectedTourBeverageContainers);
 
-               // update model
-               _dbTourTypes.remove(selectedBeverageContainers);
-
-               // update UI
-               _tourBeverageContainerViewer.remove(selectedBeverageContainers);
+            // update UI
+            _tourBeverageContainerViewer.remove(selectedTourBeverageContainers);
 
 // a tour type image cannot be deleted otherwise an image dispose exception can occur
 //             TourTypeImage.deleteTourTypeImage(selectedTourType.getTypeId());
 
-               _isModified = true;
-            }
+            _isModified = true;
          }
       });
 
