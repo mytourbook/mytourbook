@@ -15,6 +15,8 @@
  *******************************************************************************/
 package preferences;
 
+import net.tourbook.Messages;
+
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +28,7 @@ public class PrefPageNutritionTests extends UITest {
    @Test
    void openCloudPages() {
 
+      // Arrange
       Utils.openPreferences(bot);
       SWTBotTreeItem nutritionTreeItem = bot.tree().getTreeItem("Nutrition").select(); //$NON-NLS-1$
 
@@ -33,7 +36,19 @@ public class PrefPageNutritionTests extends UITest {
 
       nutritionTreeItem.getNode("Beverage Containers").select(); //$NON-NLS-1$
 
-      //todo fb add a beverage container
+      bot.button(Messages.PrefPage_TourBeverageContainers_Button_Add);
+
+      // Act
+
+      //Name
+      bot.text(0).setText("Salomon flask"); //$NON-NLS-1$
+      //Capacity
+      bot.text(1).setText("0.5"); //$NON-NLS-1$
+
+      Utils.clickOkButton(bot);
+
+      // Assert
+      // todo fb
 
       Utils.clickApplyAndCloseButton(bot);
    }

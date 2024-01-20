@@ -64,7 +64,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageBeverageContainers extends PreferencePage implements IWorkbenchPreferencePage {
 
-   //todo fb fire an event when beverage container(s) are created or deleted and recreate the nutrition view
    public static final String          ID                 = "net.tourbook.cloud.PrefPageBeverageContainers"; //$NON-NLS-1$
 
    private final IPreferenceStore      _prefStore         = TourbookPlugin.getPrefStore();
@@ -382,8 +381,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       return returnResult;
    }
 
-   //todo fb remove the containers from the tours
-   // see PrefPageTags  void onAction_DeleteTagOrCategory() {
    @Override
    public void dispose() {
 
