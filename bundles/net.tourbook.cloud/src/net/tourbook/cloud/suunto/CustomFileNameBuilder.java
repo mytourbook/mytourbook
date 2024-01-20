@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,19 +22,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.suunto.workouts.Payload;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.FileUtils;
-import net.tourbook.data.TourPerson;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
-public class CustomFileNameBuilder {
+class CustomFileNameBuilder {
 
    private static IPreferenceStore _prefStore =
          Activator.getDefault().getPreferenceStore();
@@ -48,10 +45,12 @@ public class CustomFileNameBuilder {
     *
     * @param workoutPayload
     * @param suuntoFileName
+    *
     * @return
     */
-   public static String buildCustomizedFileName(final Payload workoutPayload,
-                                                final String suuntoFileName) {
+   static String buildCustomizedFileName(final Payload workoutPayload,
+                                         final String suuntoFileName,
+                                         final String personName) {
 
       final String suuntoFilenameComponents =
             _prefStore.getString(Preferences.SUUNTO_FILENAME_COMPONENTS);
@@ -119,10 +118,6 @@ public class CustomFileNameBuilder {
 
          case USER_NAME:
 
-            final TourPerson activePerson = TourbookPlugin.getActivePerson();
-            final String personName = activePerson == null
-                  ? Messages.App_People_item_all
-                  : activePerson.getName();
             customizedFileName.append(personName);
             break;
 
@@ -142,7 +137,7 @@ public class CustomFileNameBuilder {
       return customizedFileName.toString();
    }
 
-   public static List<String> extractFileNameComponents(final String suuntoFilenameComponents) {
+   static List<String> extractFileNameComponents(final String suuntoFilenameComponents) {
 
       //This pattern looks for all the substrings in between '{' and '}'
       final Pattern pattern = Pattern.compile("\\{(.*?)\\}"); //$NON-NLS-1$
@@ -157,12 +152,13 @@ public class CustomFileNameBuilder {
       return fileNameComponents;
    }
 
-   public static PART_TYPE getPartTypeFromComponent(final String fileNameComponent) {
+   static PART_TYPE getPartTypeFromComponent(final String fileNameComponent) {
 
       final PART_TYPE partType = fileNameComponent.startsWith(
             PART_TYPE.USER_TEXT.toString())
                   ? PART_TYPE.USER_TEXT
                   : PART_TYPE.valueOf(fileNameComponent);
+
       return partType;
    }
 
