@@ -85,7 +85,8 @@ public class TourNutritionViewTests extends UITest {
       Utils.clickOkButton(bot);
 
       // Assert
-      // todo fb
+      // Make sure that the table now contains 1 product
+      assertTrue(productsTable.rowCount() == 2);
 
       final SWTBotTreeItem tour = Utils.selectDuplicatedTour(bot);
       Utils.deleteTour(bot, tour);
