@@ -1418,10 +1418,6 @@ public class UI {
 
    /**
     * Create a balloon tooltip
-    *
-    * @param title
-    * @param imageDescriptor
-    * @param text
     */
    public static ToolTip createBalloonTooltip(final Shell shell, final String message) {
 
