@@ -64,6 +64,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageBeverageContainers extends PreferencePage implements IWorkbenchPreferencePage {
 
+   //todo fb disable the add button if the field validation is not correct
+   // todo fb use balloon tooltip to validate the container capacity
+
    public static final String          ID                 = "net.tourbook.cloud.PrefPageBeverageContainers"; //$NON-NLS-1$
 
    private final IPreferenceStore      _prefStore         = TourbookPlugin.getPrefStore();
@@ -449,7 +452,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          return;
       }
 
-      final String name = dialogBeverageContainer.getName();
+      final String name = dialogBeverageContainer.getName().trim();
       final float capacity = dialogBeverageContainer.getCapacity();
 
       // create new tour type
