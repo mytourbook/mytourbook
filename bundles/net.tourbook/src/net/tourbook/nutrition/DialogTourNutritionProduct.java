@@ -39,7 +39,7 @@ public class DialogTourNutritionProduct extends Dialog {
    //checkbox isbeverage
    //Text beverage quantity
    private String name = UI.EMPTY_STRING;
-   private int    beverageQuantity;
+   private float  beverageQuantity;
 
    public DialogTourNutritionProduct(final Shell parentShell) {
       super(parentShell);
@@ -106,7 +106,7 @@ public class DialogTourNutritionProduct extends Dialog {
    protected void okPressed() {
 
       name = _txtName.getText();
-      beverageQuantity = Integer.parseInt(_txtCalories_Serving.getText());
+      beverageQuantity = Float.parseFloat(_txtCalories_Serving.getText());
       super.okPressed();
    }
 
