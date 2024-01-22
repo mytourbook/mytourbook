@@ -51,6 +51,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.nutrition.DialogSearchProduct;
+import net.tourbook.web.WEB;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -67,6 +68,7 @@ import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -108,20 +110,22 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    //todo fb on linux, there are a lot of space between the 2 sections even when NOT expanded ?
    //ask wolfgang when i do the pr
-   static final String                    ID                              = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
-   private static final String            STATE_PRODUCT_SEARCHES_HISTORY  = "products.searchesHistory";                //$NON-NLS-1$
-   private static final String            STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";             //$NON-NLS-1$
-   private static final String            STATE_SECTION_SUMMARY           = "STATE_SECTION_SUMMARY";                   //$NON-NLS-1$
+   static final String                    ID                              = "net.tourbook.ui.views.TourNutritionView";  //$NON-NLS-1$
+   private static final String            STATE_PRODUCT_SEARCHES_HISTORY  = "products.searchesHistory";                 //$NON-NLS-1$
+   private static final String            STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";              //$NON-NLS-1$
+   private static final String            STATE_SECTION_SUMMARY           = "STATE_SECTION_SUMMARY";                    //$NON-NLS-1$
 
-   private static final String            COLUMN_CONSUMED_QUANTITY        = "ConsumedQuantity";                        //$NON-NLS-1$
-   private static final String            COLUMN_QUANTITY_TYPE            = "QuantityType";                            //$NON-NLS-1$
-   private static final String            COLUMN_NAME                     = "Name";                                    //$NON-NLS-1$
-   private static final String            COLUMN_CALORIES                 = "Calories";                                //$NON-NLS-1$
-   private static final String            COLUMN_SODIUM                   = "Sodium";                                  //$NON-NLS-1$
-   private static final String            COLUMN_ISBEVERAGE               = "IsBeverage";                              //$NON-NLS-1$
-   private static final String            COLUMN_BEVERAGE_QUANTITY        = "BeverageQuantity";                        //$NON-NLS-1$
-   private static final String            COLUMN_BEVERAGE_CONTAINER       = "BeverageContainer";                       //$NON-NLS-1$
-   private static final String            COLUMN_CONSUMED_CONTAINERS      = "ConsumedContainers";                      //$NON-NLS-1$
+   private static final String            COLUMN_CONSUMED_QUANTITY        = "ConsumedQuantity";                         //$NON-NLS-1$
+   private static final String            COLUMN_QUANTITY_TYPE            = "QuantityType";                             //$NON-NLS-1$
+   private static final String            COLUMN_NAME                     = "Name";                                     //$NON-NLS-1$
+   private static final String            COLUMN_CALORIES                 = "Calories";                                 //$NON-NLS-1$
+   private static final String            COLUMN_SODIUM                   = "Sodium";                                   //$NON-NLS-1$
+   private static final String            COLUMN_ISBEVERAGE               = "IsBeverage";                               //$NON-NLS-1$
+   private static final String            COLUMN_BEVERAGE_QUANTITY        = "BeverageQuantity";                         //$NON-NLS-1$
+   private static final String            COLUMN_BEVERAGE_CONTAINER       = "BeverageContainer";                        //$NON-NLS-1$
+   private static final String            COLUMN_CONSUMED_CONTAINERS      = "ConsumedContainers";                       //$NON-NLS-1$
+
+   public static final String             OPENFOODFACTS_BASEPATH          = "https://world.openfoodfacts.org/product/"; //$NON-NLS-1$
 
    private static final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
 
@@ -772,6 +776,20 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _productsViewer.setContentProvider(new ViewContentProvider());
       _productsViewer.setComparator(_tourNutritionProductComparator);
+
+      _productsViewer.addDoubleClickListener(event -> {
+
+         final Object selectedItem = ((IStructuredSelection) _productsViewer.getSelection()).getFirstElement();
+         if (selectedItem == null) {
+            return;
+         }
+
+         final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) selectedItem;
+
+         //todo fb test on windows
+         WEB.openUrl(OPENFOODFACTS_BASEPATH + tourNutritionProduct.getProductCode());
+
+      });
 
       _productsViewer.addSelectionChangedListener(selectionChangedEvent -> onTableSelectionChanged(selectionChangedEvent));
 
