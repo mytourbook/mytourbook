@@ -53,6 +53,7 @@ public class NutritionUtils {
          "https://world.openfoodfacts.org/api/v3/product/%s?fields=code,brands,product_name,nutriscore_data,nutriments,quantity,product_quantity,serving_quantity,serving_size"; //$NON-NLS-1$
 
    private static HttpClient   _httpClient                      = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
+   // todo fb ask wolfgang how to do that. I don't mind putting my email but not in the public github repo
    private static final String _userAgent                       = "MyTourbook/" + ApplicationVersion.getVersionSimple() + " ()";                                                 //$NON-NLS-1$
 
    public static String buildNutritionDataString(final Set<TourNutritionProduct> tourNutritionProducts) {
