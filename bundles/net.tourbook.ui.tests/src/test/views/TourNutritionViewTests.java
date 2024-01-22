@@ -15,6 +15,7 @@
  *******************************************************************************/
 package views;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
@@ -70,7 +71,7 @@ public class TourNutritionViewTests extends UITest {
       }
 
       // Make sure that the table now contains 1 product
-      assertTrue(productsTable.rowCount() == 1);
+      assertEquals(initialTableRowCount + 1, productsTable.rowCount());
 
       // Add a manual product
       bot.button(Messages.Tour_Nutrition_Button_AddProduct).click();
@@ -86,7 +87,7 @@ public class TourNutritionViewTests extends UITest {
 
       // Assert
       // Make sure that the table now contains 1 product
-      assertTrue(productsTable.rowCount() == 2);
+      assertEquals(initialTableRowCount + 2, productsTable.rowCount());
 
       final SWTBotTreeItem tour = Utils.selectDuplicatedTour(bot);
       Utils.deleteTour(bot, tour);

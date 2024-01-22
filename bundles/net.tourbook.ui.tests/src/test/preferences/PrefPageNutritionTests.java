@@ -15,13 +15,18 @@
  *******************************************************************************/
 package preferences;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import net.tourbook.Messages;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
+
 //todo fb fire an event when container is modified, renamed....
 public class PrefPageNutritionTests extends UITest {
 
@@ -36,9 +41,14 @@ public class PrefPageNutritionTests extends UITest {
 
       nutritionTreeItem.getNode("Beverage Containers").select(); //$NON-NLS-1$
 
-      bot.button(Messages.PrefPage_TourBeverageContainers_Button_Add).click();
+      // Assert initial state
+      final SWTBotTable beverageContainersTable = bot.table();
+      final int initialTableRowCount = beverageContainersTable.rowCount();
+      // Make sure that the table doesn't contain any products
+      assertTrue(initialTableRowCount == 0);
 
       // Act
+      bot.button(Messages.PrefPage_TourBeverageContainers_Button_Add).click();
 
       //Name
       bot.text(0).setText("Salomon flask"); //$NON-NLS-1$
@@ -46,9 +56,9 @@ public class PrefPageNutritionTests extends UITest {
       bot.text(1).setText("0.5"); //$NON-NLS-1$
 
       Utils.clickOkButton(bot);
-
       // Assert
-      // todo fb
+      // Make sure that the table now contains 1 product
+      assertEquals(initialTableRowCount + 2, beverageContainersTable.rowCount());
 
       Utils.clickApplyAndCloseButton(bot);
    }
