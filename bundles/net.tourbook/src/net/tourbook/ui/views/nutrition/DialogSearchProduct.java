@@ -339,8 +339,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
                   .grab(true, false)
                   .applyTo(_comboSearchQuery);
 
-            _tooltipInvalidBarCode = new ToolTip(queryContainer.getShell(), SWT.BALLOON);
-            _tooltipInvalidBarCode.setMessage(Messages.Dialog_SearchProduct_Tooltip_InvalidBarcode);
+            _tooltipInvalidBarCode = UI.createBalloonTooltip(queryContainer.getShell(), Messages.Dialog_SearchProduct_Tooltip_InvalidBarcode);
          }
          {
             /*

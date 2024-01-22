@@ -116,6 +116,7 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolTip;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IMemento;
@@ -1413,6 +1414,21 @@ public class UI {
 
       // show info that data are copied "Data were copied into the clipboard"
       showStatusLineMessage(statusMessage);
+   }
+
+   /**
+    * Create a balloon tooltip
+    *
+    * @param title
+    * @param imageDescriptor
+    * @param text
+    */
+   public static ToolTip createBalloonTooltip(final Shell shell, final String message) {
+
+      final ToolTip balloonTooltip = new ToolTip(shell, SWT.BALLOON);
+      balloonTooltip.setMessage(message);
+
+      return balloonTooltip;
    }
 
    /**

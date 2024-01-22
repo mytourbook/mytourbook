@@ -53,6 +53,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.nutrition.DialogSearchProduct;
 import net.tourbook.web.WEB;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -787,8 +788,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) selectedItem;
 
          //todo fb test on windows
-         WEB.openUrl(OPENFOODFACTS_BASEPATH + tourNutritionProduct.getProductCode());
-
+         final String productCode = tourNutritionProduct.getProductCode();
+         if (StringUtils.isNumeric(productCode)) {
+            WEB.openUrl(OPENFOODFACTS_BASEPATH + productCode);
+         }
       });
 
       _productsViewer.addSelectionChangedListener(selectionChangedEvent -> onTableSelectionChanged(selectionChangedEvent));
