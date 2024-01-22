@@ -58,7 +58,7 @@ public class PrefPageNutritionTests extends UITest {
       Utils.clickOkButton(bot);
       // Assert
       // Make sure that the table now contains 1 product
-      assertEquals(initialTableRowCount + 2, beverageContainersTable.rowCount());
+      assertEquals(initialTableRowCount + 1, beverageContainersTable.rowCount());
 
       Utils.clickApplyAndCloseButton(bot);
    }
