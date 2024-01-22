@@ -123,8 +123,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private IPropertyChangeListener       _prefChangeListener;
 
-   //todo fb can we reduce the size of it ? lots of blank space !?
-   //ask wolfgang when i do the pr
+   //todo fb can we reduce the size of it ? lots of blank space !?ask wolfgang when i do the pr
    private AutocompleteComboInput _autocompleteProductSearchHistory;
 
    private ToolTip                _tooltipInvalidBarCode;

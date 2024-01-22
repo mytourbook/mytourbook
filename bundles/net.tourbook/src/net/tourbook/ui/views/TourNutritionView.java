@@ -787,7 +787,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) selectedItem;
 
-         //todo fb test on windows
          final String productCode = tourNutritionProduct.getProductCode();
          if (StringUtils.isNumeric(productCode)) {
             WEB.openUrl(OPENFOODFACTS_BASEPATH + productCode);
