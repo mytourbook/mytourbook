@@ -48,6 +48,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.NutritionUtils;
@@ -397,6 +398,62 @@ public class TourBlogView extends ViewPart {
       return "<p class='description'>" + WEB.convertHTML_LineBreaks(tourDescription) + "</p>" + NL; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
+   private String buildNutritionSection(final Set<TourNutritionProduct> tourNutritionProducts, final boolean addSpacer) {
+
+      final StringBuilder sb = new StringBuilder();
+
+      if (addSpacer) {
+         sb.append(SPACER);
+      }
+
+      sb.append("<div class='title'>" + Messages.Tour_Blog_Section_Nutrition + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append(UI.NEW_LINE);
+
+      // Split the tour nutrition products into 2 lists: beverages and foods
+      final List<TourNutritionProduct> beverages = new ArrayList<>();
+      final List<TourNutritionProduct> foods = new ArrayList<>();
+      for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
+         if (tourNutritionProduct.isBeverage() || tourNutritionProduct.getTourBeverageContainer() != null) {
+            beverages.add(tourNutritionProduct);
+         } else {
+            foods.add(tourNutritionProduct);
+         }
+      }
+
+      if (beverages.size() > 0) {
+         // BEVERAGES
+
+         sb.append("<b>" + Messages.Tour_Blog_Label_Beverages + "</b>"); //$NON-NLS-1$ //$NON-NLS-2$
+         beverages.stream().forEach(product -> {
+
+            sb.append(UI.NEW_LINE);
+            //todo fb cover the case where coca doesn't have a container but is still a beverage
+            sb.append(product.getContainersConsumed() + UI.SPACE1 +
+                  NutritionUtils.buildTourBeverageContainerName(product.getTourBeverageContainer()) +
+                  " of " //$NON-NLS-1$
+                  + product.getName());
+         });
+      }
+      if (foods.size() > 0) {
+         // FOODS
+
+         sb.append("<b>" + Messages.Tour_Blog_Label_Foods + "</b>"); //$NON-NLS-1$ //$NON-NLS-2$
+         foods.stream().forEach(product -> {
+
+            sb.append(UI.NEW_LINE);
+            sb.append(product.getConsumedQuantity() + UI.SPACE1 + product.getName());
+         });
+      }
+
+      String nutritionSectionString = WEB.convertHTML_LineBreaks(sb.toString());
+
+      if (UI.IS_SCRAMBLE_DATA) {
+         nutritionSectionString = UI.scrambleText(nutritionSectionString);
+      }
+
+      return nutritionSectionString;
+   }
+
    private String buildTagsSection(final Set<TourTag> tourTags, final boolean addSpacer) {
 
       final boolean showTourTags = Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_TAGS, TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT);
@@ -567,7 +624,7 @@ public class TourBlogView extends ViewPart {
 
       String tourTitle = _tourData.getTourTitle();
       final String tourDescription = _tourData.getTourDescription();
-      String tourNutrition = NutritionUtils.buildNutritionDataString(_tourData.getTourNutritionProducts());
+      final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
       final Set<TourTag> tourTags = _tourData.getTourTags();
       final String tourWeather = WeatherUtils.buildWeatherDataString(_tourData,
             true, // isdisplayMaximumMinimumTemperature
@@ -576,7 +633,7 @@ public class TourBlogView extends ViewPart {
       );
 
       final boolean isDescription = tourDescription.length() > 0;
-      final boolean isNutrition = tourNutrition.length() > 0;
+      final boolean isNutrition = tourNutritionProducts.size() > 0;
       final boolean isTitle = tourTitle.length() > 0;
       final boolean isTourTags = tourTags.size() > 0;
       final boolean isWeather = tourWeather.length() > 0;
@@ -636,29 +693,19 @@ public class TourBlogView extends ViewPart {
                }
 
                /*
-                * Tags
-                */
-               if (isTourTags) {
-
-                  sb.append(buildTagsSection(tourTags, isDescription || isWeather));
-               }
-
-               /*
                 * Nutrition
                 */
                if (isNutrition) {
 
-                  if (UI.IS_SCRAMBLE_DATA) {
-                     tourNutrition = UI.scrambleText(tourNutrition);
-                  }
+                  sb.append(buildNutritionSection(tourNutritionProducts, isDescription || isWeather));
+               }
 
-                  if (isDescription || isWeather) {
-                     // write spacer
-                     sb.append("<div>&nbsp;</div>");//$NON-NLS-1$
-                  }
+               /*
+                * Tags
+                */
+               if (isTourTags) {
 
-                  sb.append("<div class='title'>" + "Nutrition" + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
-                  sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourNutrition) + "</p>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+                  sb.append(buildTagsSection(tourTags, isDescription || isWeather || isNutrition));
                }
             }
             sb.append("</div>" + NL); //$NON-NLS-1$

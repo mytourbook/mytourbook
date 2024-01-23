@@ -56,36 +56,6 @@ public class NutritionUtils {
    // todo fb ask wolfgang how to do that. I don't mind putting my email but not in the public github repo
    private static final String _userAgent                       = "MyTourbook/" + ApplicationVersion.getVersionSimple() + " ()";                                                 //$NON-NLS-1$
 
-   public static String buildNutritionDataString(final Set<TourNutritionProduct> tourNutritionProducts) {
-
-      if (tourNutritionProducts.isEmpty()) {
-         return UI.EMPTY_STRING;
-      }
-
-      //todo fb split the products into 2 lists, the fluids and the foods
-      // BEVERAGES
-      // FOOD
-
-      final StringBuilder stringBuilder = new StringBuilder();
-      tourNutritionProducts.stream().forEach(product -> {
-
-         if (product.getTourBeverageContainer() != null) {
-
-            stringBuilder.append(UI.NEW_LINE);
-            stringBuilder.append(product.getContainersConsumed() + UI.SPACE1 +
-                  buildTourBeverageContainerName(product.getTourBeverageContainer()) +
-                  " of "
-                  + product.getName());
-
-         } else {
-            stringBuilder.append(UI.NEW_LINE);
-            stringBuilder.append(product.getConsumedQuantity() + UI.SPACE1 + product.getName());
-         }
-      });
-
-      return stringBuilder.toString();
-   }
-
    public static String buildTourBeverageContainerName(final TourBeverageContainer tourBeverageContainer) {
 
       return tourBeverageContainer.getName() + " (" + tourBeverageContainer.getCapacity() + " L)";
