@@ -31,7 +31,7 @@ import utils.Utils;
 public class PrefPageNutritionTests extends UITest {
 
    @Test
-   void openCloudPages() {
+   void createBeverageContainer() {
 
       // Arrange
       Utils.openPreferences(bot);
@@ -53,7 +53,7 @@ public class PrefPageNutritionTests extends UITest {
       //Name
       bot.text(0).setText("Salomon flask"); //$NON-NLS-1$
       //Capacity
-      bot.spinnerWithLabel("Capacity").setSelection(1);//todo fbtext(1).setText("0.5"); //$NON-NLS-1$
+      bot.spinnerWithLabel("Capacity").setSelection(100);//todo fbtext(1).setText("0.5"); //$NON-NLS-1$
 
       Utils.clickOkButton(bot);
       // Assert
