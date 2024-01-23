@@ -43,6 +43,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -312,14 +313,14 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       columnName.setWidth(100);
    }
 
-   private boolean deleteTourBeverageContainer(final List<TourBeverageContainer> tourBeverageContainers) {
+   private boolean deleteTourBeverageContainer(final TourBeverageContainer tourBeverageContainer) {
 
       boolean returnResult = false;
 
       String sql;
 
       PreparedStatement prepStmt_TourData = null;
-      PreparedStatement prepStmt_TourTag = null;
+      PreparedStatement prepStmt_TourBeverageContainer = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
@@ -333,39 +334,31 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          sql = "DELETE" //                                                       //$NON-NLS-1$
                + " FROM " + TourDatabase.TABLE_TOUR_BEVERAGE_CONTAINER //                       //$NON-NLS-1$
                + " WHERE " + TourDatabase.ENTITY_ID_BEVERAGECONTAINER + "=?"; //               //$NON-NLS-1$ //$NON-NLS-2$
-         prepStmt_TourTag = conn.prepareStatement(sql);
+         prepStmt_TourBeverageContainer = conn.prepareStatement(sql);
 
          int[] returnValue_TourData;
-         int[] returnValue_TourTag;
 
          conn.setAutoCommit(false);
          {
-            for (final TourBeverageContainer tourBeverageContainer : tourBeverageContainers) {
+            final long containerId = tourBeverageContainer.getContainerId();
 
-               final long containerId = tourBeverageContainer.getContainerId();
+            prepStmt_TourData.setLong(1, containerId);
+            prepStmt_TourData.addBatch();
 
-               prepStmt_TourData.setLong(1, containerId);
-               prepStmt_TourData.addBatch();
-
-               prepStmt_TourTag.setLong(1, containerId);
-               prepStmt_TourTag.addBatch();
-            }
+            prepStmt_TourBeverageContainer.setLong(1, containerId);
+            prepStmt_TourBeverageContainer.addBatch();
 
             returnValue_TourData = prepStmt_TourData.executeBatch();
-            returnValue_TourTag = prepStmt_TourTag.executeBatch();
+            prepStmt_TourBeverageContainer.executeBatch();
          }
          conn.commit();
 
          // log result
          TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
 
-         for (final TourBeverageContainer tourBeverageContainer : tourBeverageContainers) {
-
-//            TourLogManager.log_INFO(String.format(Messages.Tag_Manager_LogInfo_DeletedTags,
-//                  returnValue_TourData[tagIndex],
-//                  returnValue_TourTag[tagIndex],
-//                  tourBeverageContainers.get(tagIndex).getName()));
-         }
+         TourLogManager.log_INFO(String.format(Messages.PrefPage_TourBeverageContainers_LogInfo_DeletedContainer,
+               returnValue_TourData[0],
+               tourBeverageContainer.getName()));
 
          returnResult = true;
 
@@ -376,7 +369,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       } finally {
 
          Util.closeSql(prepStmt_TourData);
-         Util.closeSql(prepStmt_TourTag);
+         Util.closeSql(prepStmt_TourBeverageContainer);
       }
 
       return returnResult;
@@ -481,19 +474,19 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    private void onTourBeverageContainer_Delete() {
 
-      final StructuredSelection selection = (StructuredSelection) _tourBeverageContainerViewer.getSelection();
+      final Object selectedItem = ((IStructuredSelection) _tourBeverageContainerViewer.getSelection()).getFirstElement();
+      if (selectedItem == null) {
+         return;
+      }
 
-      final List<TourBeverageContainer> selectedTourBeverageContainers = new ArrayList<>();
-      selection.toList().forEach(s -> selectedTourBeverageContainers.add((TourBeverageContainer) s));
-//      final String allTourTypeNamesJoined = StringUtils
-//            .join(allTourTypeNames.stream().toArray(String[]::new), UI.COMMA_SPACE);
+      final TourBeverageContainer selectedTourBeverageContainer = (TourBeverageContainer) selectedItem;
 
       // confirm deletion
       final MessageDialog dialog = new MessageDialog(
             getShell(),
             Messages.Pref_TourTypes_Dlg_delete_tour_type_title,
             null,
-            NLS.bind(Messages.Pref_TourTypes_Dlg_delete_tour_type_msg, "toto"),
+            NLS.bind(Messages.PrefPage_TourBeverageContainers_Dialog_Delete_BeverageContainer_Title, selectedTourBeverageContainer.getName()),
             MessageDialog.QUESTION,
             new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL },
             1);
@@ -507,14 +500,13 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       BusyIndicator.showWhile(getShell().getDisplay(), () -> {
 
          // remove entity from the db
-         if (deleteTourBeverageContainer(selectedTourBeverageContainers)) {
+         if (deleteTourBeverageContainer(selectedTourBeverageContainer)) {
 
             // update model
-            _dbTourTypes.removeAll(selectedTourBeverageContainers);
+            _dbTourTypes.remove(selectedTourBeverageContainer);
 
             // update UI
-            selectedTourBeverageContainers.forEach(selectedTourBeverageContainer -> _tourBeverageContainerViewer.remove(
-                  selectedTourBeverageContainer));
+            _tourBeverageContainerViewer.remove(selectedTourBeverageContainer);
 
 // a tour type image cannot be deleted otherwise an image dispose exception can occur
 //             TourTypeImage.deleteTourTypeImage(selectedTourType.getTypeId());
@@ -622,7 +614,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    private void setFocusToViewer() {
 
-      // set focus back to the tree
+      // set focus back to the table
       _tourBeverageContainerViewer.getTable().setFocus();
    }
 }
