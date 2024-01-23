@@ -53,7 +53,7 @@ public class PrefPageNutritionTests extends UITest {
       //Name
       bot.text(0).setText("Salomon flask"); //$NON-NLS-1$
       //Capacity
-      bot.text(1).setText("0.5"); //$NON-NLS-1$
+      bot.spinnerWithLabel("Capacity").setSelection(1);//todo fbtext(1).setText("0.5"); //$NON-NLS-1$
 
       Utils.clickOkButton(bot);
       // Assert
