@@ -46,6 +46,7 @@ import net.tourbook.common.util.CSS;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourNutritionProduct;
@@ -103,7 +104,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourBlogView extends ViewPart {
 
-   public static final String  ID                                              = "net.tourbook.ui.views.TourBlogView";      //$NON-NLS-1$
+   static final String         ID                                              = "net.tourbook.ui.views.TourBlogView";      //$NON-NLS-1$
 
    private static final String NL                                              = UI.NEW_LINE1;
 
@@ -407,7 +408,6 @@ public class TourBlogView extends ViewPart {
       }
 
       sb.append("<div class='title'>" + Messages.Tour_Blog_Section_Nutrition + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
-      sb.append(UI.NEW_LINE);
 
       // Split the tour nutrition products into 2 lists: beverages and foods
       final List<TourNutritionProduct> beverages = new ArrayList<>();
@@ -423,27 +423,39 @@ public class TourBlogView extends ViewPart {
       if (beverages.size() > 0) {
          // BEVERAGES
 
-         sb.append("<b>" + Messages.Tour_Blog_Label_Beverages + "</b>"); //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append(UI.NEW_LINE + "<u>" + Messages.Tour_Blog_Label_Beverages + "</u>" + UI.NEW_LINE); //$NON-NLS-1$ //$NON-NLS-2$
          beverages.stream().forEach(product -> {
 
             sb.append(UI.NEW_LINE);
-            //todo fb cover the case where coca doesn't have a container but is still a beverage
-            sb.append(product.getContainersConsumed() + UI.SPACE1 +
-                  NutritionUtils.buildTourBeverageContainerName(product.getTourBeverageContainer()) +
-                  " of " //$NON-NLS-1$
-                  + product.getName());
+            final TourBeverageContainer tourBeverageContainer = product.getTourBeverageContainer();
+
+            if (tourBeverageContainer == null) {
+               final float totalConsumedBeverageQuantity = Math.round(product.getConsumedQuantity() * product.getBeverageQuantity());
+               sb.append(totalConsumedBeverageQuantity + UI.SPACE1 + product.getName());
+            } else {
+
+               sb.append(product.getContainersConsumed() + UI.SPACE1 + NutritionUtils.buildTourBeverageContainerName(tourBeverageContainer));
+            }
          });
+
+         sb.append(UI.NEW_LINE);
       }
       if (foods.size() > 0) {
          // FOODS
 
-         sb.append("<b>" + Messages.Tour_Blog_Label_Foods + "</b>"); //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append(UI.NEW_LINE);
+
+         sb.append(UI.NEW_LINE + "<u>" + Messages.Tour_Blog_Label_Foods + "</u>" + UI.NEW_LINE); //$NON-NLS-1$ //$NON-NLS-2$
          foods.stream().forEach(product -> {
 
             sb.append(UI.NEW_LINE);
             sb.append(product.getConsumedQuantity() + UI.SPACE1 + product.getName());
          });
+
+         sb.append(UI.NEW_LINE);
       }
+
+      //todo fb print a section for averages
 
       String nutritionSectionString = WEB.convertHTML_LineBreaks(sb.toString());
 
