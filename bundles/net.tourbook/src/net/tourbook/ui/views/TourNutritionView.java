@@ -1451,12 +1451,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          @Override
          protected boolean canEdit(final Object element) {
-            return _tourBeverageContainers.size() > 0;
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
+
+            return tourNutritionProduct.getTourBeverageContainer() != null;
          }
 
          @Override
          protected CellEditor getCellEditor(final Object element) {
-            //       spinnerCellEditor.getSpinner().setMinimum(columnAdvisor.getMinCount(element, columnIndex));
             return spinnerCellEditor;
          }
 
