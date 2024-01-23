@@ -452,8 +452,8 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          return;
       }
 
-      final String name = dialogBeverageContainer.getName().trim();
-      final float capacity = dialogBeverageContainer.getCapacity();
+      final String name = dialogBeverageContainer.get_name().trim();
+      final float capacity = dialogBeverageContainer.get_capacity();
 
       // create new tour type
       final TourBeverageContainer newTourBeverageContainer = new TourBeverageContainer(name, capacity);
@@ -535,8 +535,8 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       final TourBeverageContainer selectedBeverageContainer = (TourBeverageContainer) structuredSelection.getFirstElement();
 
       final DialogBeverageContainer dialogBeverageContainer = new DialogBeverageContainer(getShell());
-      dialogBeverageContainer.setName(selectedBeverageContainer.getName());
-      dialogBeverageContainer.setCapacity(selectedBeverageContainer.getCapacity());
+      dialogBeverageContainer.set_name(selectedBeverageContainer.getName());
+      dialogBeverageContainer.set_capacity(selectedBeverageContainer.getCapacity());
       dialogBeverageContainer.open();
       return;
 

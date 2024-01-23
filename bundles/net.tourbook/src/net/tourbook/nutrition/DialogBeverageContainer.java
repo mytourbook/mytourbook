@@ -15,91 +15,113 @@
  *******************************************************************************/
 package net.tourbook.nutrition;
 
+import net.tourbook.Messages;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 class DialogBeverageContainer extends Dialog {
 
-   private Text   _txtName;
-   private Text   _txtCapacity;
-   private String name = UI.EMPTY_STRING;
-   private float  capacity;
+   private static final int DEFAULT_TEXT_WIDTH = 10;
+
+   private Text             _txtName;
+   private Text             _txtCapacity;
+   private String           _name              = UI.EMPTY_STRING;
+   private float            _capacity;
+
+   private PixelConverter   _pc;
 
    DialogBeverageContainer(final Shell parentShell) {
       super(parentShell);
    }
 
    @Override
+   protected void configureShell(final Shell shell) {
+      super.configureShell(shell);
+      shell.setText(Messages.Dialog_BeverageContainer_Title);
+   }
+
+   @Override
    protected Control createDialogArea(final Composite parent) {
 
       final Composite container = (Composite) super.createDialogArea(parent);
-      final GridLayout layout = new GridLayout(2, false);
-      layout.marginRight = 5;
-      layout.marginLeft = 10;
-      container.setLayout(layout);
 
-      UI.createLabel(container, "User");
+      createUI(container);
 
-      _txtName = new Text(container, SWT.BORDER);
-      _txtName.setLayoutData(new GridData(SWT.FILL,
-            SWT.CENTER,
-            true,
-            false,
-            1,
-            1));
-      _txtName.setText(name);
-      _txtName.addModifyListener(e -> {
-         final Text textWidget = (Text) e.getSource();
-         final String userText = textWidget.getText();
-         name = userText;
-      });
-
-      final Label lblCapacity = UI.createLabel(container, "Capacity");
-
-      final GridData gridDataPasswordLabel = new GridData(SWT.LEFT, SWT.CENTER, false, false);
-      gridDataPasswordLabel.horizontalIndent = 1;
-      lblCapacity.setLayoutData(gridDataPasswordLabel);
-
-      _txtCapacity = new Text(container, SWT.BORDER);
-      _txtCapacity.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-      _txtCapacity.addModifyListener(e -> {
-         final Text textWidget = (Text) e.getSource();
-         final String capacityText = textWidget.getText();
-         capacity = Float.parseFloat(capacityText);
-      });
       return container;
    }
 
-   public float getCapacity() {
-      return capacity;
+   private void createUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
+      {
+         // Label: container name
+         UI.createLabel(container, Messages.Dialog_BeverageContainer_Label_Name);
+
+         // Text: container name
+         _txtName = new Text(container, SWT.BORDER);
+         _txtName.setText(_name);
+         GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(DEFAULT_TEXT_WIDTH), SWT.DEFAULT).align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_txtName);
+         _txtName.addModifyListener(e -> {
+
+            final Text textWidget = (Text) e.getSource();
+            final String userText = textWidget.getText();
+            _name = userText;
+         });
+
+         // Label: container name
+         UI.createLabel(container, Messages.Dialog_BeverageContainer_Label_Capacity);
+
+         // Text: container capacity in L
+         _txtCapacity = new Text(container, SWT.BORDER);
+         _txtCapacity.setText(String.valueOf(_capacity));
+         GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(DEFAULT_TEXT_WIDTH), SWT.DEFAULT).align(SWT.END, SWT.CENTER).applyTo(
+               _txtCapacity);
+         _txtCapacity.addModifyListener(e -> {
+
+            final Text textWidget = (Text) e.getSource();
+            final String capacityText = textWidget.getText();
+            _capacity = Float.parseFloat(capacityText);
+         });
+      }
    }
 
-   public String getName() {
-      return name;
+   public float get_capacity() {
+      return _capacity;
+   }
+
+   public String get_name() {
+      return _name;
    }
 
    @Override
    protected void okPressed() {
-      name = _txtName.getText();
-      capacity = Float.parseFloat(_txtCapacity.getText());
+
+      _name = _txtName.getText();
+      _capacity = Float.parseFloat(_txtCapacity.getText());
+
       super.okPressed();
    }
 
-   public void setCapacity(final float capacity) {
-      this.capacity = capacity;
+   public void set_capacity(final float capacity) {
+      _capacity = capacity;
    }
 
-   public void setName(final String name) {
-      this.name = name;
+   public void set_name(final String name) {
+      _name = name;
    }
 
 }

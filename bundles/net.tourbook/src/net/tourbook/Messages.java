@@ -501,6 +501,10 @@ public class Messages extends NLS {
    public static String        Dialog_AdjustTemperature_Label_Progress_Task;
    public static String        Dialog_AdjustTemperature_Label_TemperatureAdjustmentDuration;
 
+   public static String        Dialog_BeverageContainer_Label_Capacity;
+   public static String        Dialog_BeverageContainer_Label_Name;
+   public static String        Dialog_BeverageContainer_Title;
+
    public static String        Dialog_DatabaseAction_Confirmation_Message;
    public static String        Dialog_DatabaseAction_Confirmation_Title;
 
