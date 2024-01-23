@@ -31,7 +31,6 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogTourNutritionProduct extends Dialog {
    //todo fb disable the add button if the field validation is not correct
-   // todo fb use balloon tooltip to validate the container capacity
    private Text _txtName;
    //Text number of servings
    private Text _txtCalories_Serving;

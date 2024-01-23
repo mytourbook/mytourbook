@@ -51,7 +51,9 @@ public class TourBeverageContainer {
 
    private String                     name;
 
-   //todo fb in mL?
+   /**
+    * The container's capacity in L
+    */
    private float capacity;
 
    public TourBeverageContainer() {}
