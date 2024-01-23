@@ -76,9 +76,7 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
 
                //todo fb
             }));
-            GridDataFactory.fillDefaults()
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(_chkIgnoreFirstHour);
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_chkIgnoreFirstHour);
          }
       }
 

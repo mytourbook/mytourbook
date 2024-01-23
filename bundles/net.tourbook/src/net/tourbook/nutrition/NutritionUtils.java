@@ -188,9 +188,6 @@ public class NutritionUtils {
             .uri(searchUri)
             .build();
 
-      //todo fb We shouldn't allow to add a product that already exist
-      // i.e.: if the barcode already exists, display an error message
-
       try {
          final HttpResponse<String> response = _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
