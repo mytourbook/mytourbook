@@ -15,9 +15,12 @@
  *******************************************************************************/
 package net.tourbook.nutrition;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -29,23 +32,20 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
 class DialogBeverageContainer extends Dialog {
 
-   private static final int DEFAULT_TEXT_WIDTH = 20;
+   private String         _name     = UI.EMPTY_STRING;
+   private float          _capacity = 0.25f;
 
-   private String           _name              = UI.EMPTY_STRING;
-   private float            _capacity;
-
-   private PixelConverter   _pc;
+   private PixelConverter _pc;
 
    /*
     * UI controls
     */
-
-   private Text    _txtName;
-   private Text    _txtCapacity;
+   private Spinner _spinnerCapacity;
 
    private boolean _isInUIInit;
 
@@ -64,22 +64,17 @@ class DialogBeverageContainer extends Dialog {
    }
 
    @Override
-   protected final void createButtonsForButtonBar(final Composite parent) {
-
-      super.createButtonsForButtonBar(parent);
-
-      // set text for the OK button
-      getButton(IDialogConstants.OK_ID).setText(Messages.dialog_export_btn_export);
-   }
-
-   @Override
    protected Control createDialogArea(final Composite parent) {
 
       final Composite container = (Composite) super.createDialogArea(parent);
 
       _pc = new PixelConverter(container);
 
-      createUI(container);
+      _isInUIInit = true;
+      {
+         createUI(container);
+      }
+      _isInUIInit = false;
 
       return container;
    }
@@ -94,14 +89,14 @@ class DialogBeverageContainer extends Dialog {
          UI.createLabel(container, Messages.Dialog_BeverageContainer_Label_Name);
 
          // Text: container name
-         _txtName = new Text(container, SWT.BORDER);
-         _txtName.setText(_name);
+         final Text txtName = new Text(container, SWT.BORDER);
+         txtName.setText(_name);
          GridDataFactory.fillDefaults()
-               .hint(_pc.convertWidthInCharsToPixels(DEFAULT_TEXT_WIDTH), SWT.DEFAULT)
+               .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
                .span(2, 1)
                .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(_txtName);
-         _txtName.addModifyListener(e -> {
+               .applyTo(txtName);
+         txtName.addModifyListener(e -> {
 
             validateFields();
 
@@ -113,17 +108,31 @@ class DialogBeverageContainer extends Dialog {
          // Label: container name
          UI.createLabel(container, Messages.Dialog_BeverageContainer_Label_Capacity);
 
-         //todo fb use a spinner instead
          // Text: container capacity in L
-         _txtCapacity = new Text(container, SWT.BORDER);
-         _txtCapacity.setText(String.valueOf(_capacity));
-         GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(DEFAULT_TEXT_WIDTH), SWT.DEFAULT).align(SWT.END, SWT.CENTER).applyTo(
-               _txtCapacity);
-         _txtCapacity.addModifyListener(e -> {
-
-            final Text textWidget = (Text) e.getSource();
-            final String capacityText = textWidget.getText();
-            _capacity = Float.parseFloat(capacityText);
+         _spinnerCapacity = new Spinner(container, SWT.BORDER);
+         GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT).align(SWT.END, SWT.CENTER).applyTo(
+               _spinnerCapacity);
+         _spinnerCapacity.setMinimum(25);
+         _spinnerCapacity.setIncrement(25);
+         _spinnerCapacity.setMaximum(10000);
+         _spinnerCapacity.setDigits(2);
+         _spinnerCapacity.addMouseWheelListener(mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent));
+         _spinnerCapacity.setSelection(Math.round(_capacity * 100));
+         _spinnerCapacity.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            if (_isInUIInit) {
+               return;
+            }
+            onCapacityModified();
+         }));
+         _spinnerCapacity.addModifyListener(event -> {
+            if (_isInUIInit) {
+               return;
+            }
+            onCapacityModified();
+         });
+         _spinnerCapacity.addMouseWheelListener(mouseEvent -> {
+            Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+            onCapacityModified();
          });
 
          // Unit: L
@@ -147,13 +156,8 @@ class DialogBeverageContainer extends Dialog {
       return _name;
    }
 
-   @Override
-   protected void okPressed() {
-
-      _name = _txtName.getText();
-      _capacity = Float.parseFloat(_txtCapacity.getText());
-
-      super.okPressed();
+   private void onCapacityModified() {
+      _capacity = _spinnerCapacity.getSelection() / 100f;
    }
 
    public void set_capacity(final float capacity) {
@@ -170,8 +174,7 @@ class DialogBeverageContainer extends Dialog {
          return;
       }
 
-      final boolean isContainerValid = StringUtils.hasContent(_name);//todo fb && StringUtils.hasContent(_capacity);
+      final boolean isContainerValid = StringUtils.hasContent(_name);
       enableOK(isContainerValid);
-
    }
 }
