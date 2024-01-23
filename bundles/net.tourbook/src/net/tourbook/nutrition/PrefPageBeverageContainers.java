@@ -64,10 +64,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageBeverageContainers extends PreferencePage implements IWorkbenchPreferencePage {
 
-   //todo fb disable the add button if the field validation is not correct
-   // todo fb use balloon tooltip to validate the container capacity
-
-   //the edit doesn't seem to work !??!?
+   // todo fb the edit doesn't seem to work !??!?
    public static final String          ID                 = "net.tourbook.cloud.PrefPageBeverageContainers"; //$NON-NLS-1$
 
    private final IPreferenceStore      _prefStore         = TourbookPlugin.getPrefStore();
