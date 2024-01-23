@@ -65,7 +65,10 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageBeverageContainers extends PreferencePage implements IWorkbenchPreferencePage {
 
-   // todo fb the edit doesn't seem to work !??!?
+   // todo fb implement the container edit !??!?
+
+   //todo fb
+   // deleting or adding a beverage container doesn't update the drop downs for each product
    public static final String          ID                 = "net.tourbook.cloud.PrefPageBeverageContainers"; //$NON-NLS-1$
 
    private final IPreferenceStore      _prefStore         = TourbookPlugin.getPrefStore();
@@ -484,9 +487,9 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       // confirm deletion
       final MessageDialog dialog = new MessageDialog(
             getShell(),
-            Messages.Pref_TourTypes_Dlg_delete_tour_type_title,
+            Messages.PrefPage_TourBeverageContainers_Dialog_Delete_BeverageContainer_Title,
             null,
-            NLS.bind(Messages.PrefPage_TourBeverageContainers_Dialog_Delete_BeverageContainer_Title, selectedTourBeverageContainer.getName()),
+            NLS.bind(Messages.PrefPage_TourBeverageContainers_Dialog_Delete_BeverageContainer_Message, selectedTourBeverageContainer.getName()),
             MessageDialog.QUESTION,
             new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL },
             1);
