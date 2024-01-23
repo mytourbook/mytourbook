@@ -17,12 +17,15 @@ package net.tourbook.nutrition;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -30,29 +33,51 @@ import org.eclipse.swt.widgets.Text;
 
 class DialogBeverageContainer extends Dialog {
 
-   private static final int DEFAULT_TEXT_WIDTH = 10;
+   private static final int DEFAULT_TEXT_WIDTH = 20;
 
-   private Text             _txtName;
-   private Text             _txtCapacity;
    private String           _name              = UI.EMPTY_STRING;
    private float            _capacity;
 
    private PixelConverter   _pc;
+
+   /*
+    * UI controls
+    */
+
+   private Text    _txtName;
+   private Text    _txtCapacity;
+
+   private boolean _isInUIInit;
 
    DialogBeverageContainer(final Shell parentShell) {
       super(parentShell);
    }
 
    @Override
-   protected void configureShell(final Shell shell) {
-      super.configureShell(shell);
-      shell.setText(Messages.Dialog_BeverageContainer_Title);
+   public void create() {
+
+      super.create();
+
+      getShell().setText(Messages.Dialog_BeverageContainer_Title);
+
+      validateFields();
+   }
+
+   @Override
+   protected final void createButtonsForButtonBar(final Composite parent) {
+
+      super.createButtonsForButtonBar(parent);
+
+      // set text for the OK button
+      getButton(IDialogConstants.OK_ID).setText(Messages.dialog_export_btn_export);
    }
 
    @Override
    protected Control createDialogArea(final Composite parent) {
 
       final Composite container = (Composite) super.createDialogArea(parent);
+
+      _pc = new PixelConverter(container);
 
       createUI(container);
 
@@ -61,11 +86,9 @@ class DialogBeverageContainer extends Dialog {
 
    private void createUI(final Composite parent) {
 
-      _pc = new PixelConverter(parent);
-
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(container);
       {
          // Label: container name
          UI.createLabel(container, Messages.Dialog_BeverageContainer_Label_Name);
@@ -73,9 +96,14 @@ class DialogBeverageContainer extends Dialog {
          // Text: container name
          _txtName = new Text(container, SWT.BORDER);
          _txtName.setText(_name);
-         GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(DEFAULT_TEXT_WIDTH), SWT.DEFAULT).align(SWT.BEGINNING, SWT.CENTER)
+         GridDataFactory.fillDefaults()
+               .hint(_pc.convertWidthInCharsToPixels(DEFAULT_TEXT_WIDTH), SWT.DEFAULT)
+               .span(2, 1)
+               .align(SWT.BEGINNING, SWT.CENTER)
                .applyTo(_txtName);
          _txtName.addModifyListener(e -> {
+
+            validateFields();
 
             final Text textWidget = (Text) e.getSource();
             final String userText = textWidget.getText();
@@ -85,6 +113,7 @@ class DialogBeverageContainer extends Dialog {
          // Label: container name
          UI.createLabel(container, Messages.Dialog_BeverageContainer_Label_Capacity);
 
+         //todo fb use a spinner instead
          // Text: container capacity in L
          _txtCapacity = new Text(container, SWT.BORDER);
          _txtCapacity.setText(String.valueOf(_capacity));
@@ -96,6 +125,17 @@ class DialogBeverageContainer extends Dialog {
             final String capacityText = textWidget.getText();
             _capacity = Float.parseFloat(capacityText);
          });
+
+         // Unit: L
+         UI.createLabel(container, UI.UNIT_FLUIDS_L);
+      }
+   }
+
+   private void enableOK(final boolean isEnabled) {
+
+      final Button okButton = getButton(IDialogConstants.OK_ID);
+      if (okButton != null) {
+         okButton.setEnabled(isEnabled);
       }
    }
 
@@ -124,4 +164,14 @@ class DialogBeverageContainer extends Dialog {
       _name = name;
    }
 
+   private void validateFields() {
+
+      if (_isInUIInit) {
+         return;
+      }
+
+      final boolean isContainerValid = StringUtils.hasContent(_name);//todo fb && StringUtils.hasContent(_capacity);
+      enableOK(isContainerValid);
+
+   }
 }
