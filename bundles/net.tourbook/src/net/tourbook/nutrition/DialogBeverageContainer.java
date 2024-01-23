@@ -48,6 +48,7 @@ class DialogBeverageContainer extends Dialog {
    private Spinner _spinnerCapacity;
 
    private boolean _isInUIInit;
+   private Text    _txtName;
 
    DialogBeverageContainer(final Shell parentShell) {
       super(parentShell);
@@ -88,15 +89,14 @@ class DialogBeverageContainer extends Dialog {
          // Label: container name
          UI.createLabel(container, Messages.Dialog_BeverageContainer_Label_Name);
 
-         // Text: container name
-         final Text txtName = new Text(container, SWT.BORDER);
-         txtName.setText(_name);
+         _txtName = new Text(container, SWT.BORDER);
+         _txtName.setText(_name);
          GridDataFactory.fillDefaults()
                .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
                .span(2, 1)
                .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(txtName);
-         txtName.addModifyListener(e -> {
+               .applyTo(_txtName);
+         _txtName.addModifyListener(e -> {
 
             validateFields();
 
@@ -183,7 +183,7 @@ class DialogBeverageContainer extends Dialog {
          return;
       }
 
-      final boolean isContainerValid = StringUtils.hasContent(_name);
+      final boolean isContainerValid = StringUtils.hasContent(_txtName.getText());
       enableOK(isContainerValid);
    }
 }

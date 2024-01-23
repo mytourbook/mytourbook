@@ -430,7 +430,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             //todo fb does it reload the tour data (aka, the ones that had containers assigned to them?)
             _tourBeverageContainers = TourDatabase.getTourBeverageContainers();
-            // todo fb necessary ? recreateViewer(getViewer());
+            recreateViewer(getViewer());
 
             refreshTourData(_tourData = TourManager.getTour(_tourData.getTourId()));
          }
