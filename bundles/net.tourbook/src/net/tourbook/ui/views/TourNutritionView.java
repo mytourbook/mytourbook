@@ -81,10 +81,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -777,20 +779,31 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _productsViewer.setContentProvider(new ViewContentProvider());
       _productsViewer.setComparator(_tourNutritionProductComparator);
 
-      _productsViewer.addDoubleClickListener(event -> {
+      final Listener doubleClickListener = event -> {
 
-         final Object selectedItem = ((IStructuredSelection) _productsViewer.getSelection()).getFirstElement();
-         if (selectedItem == null) {
-            return;
+         if (event.type == SWT.MouseDoubleClick) {
+
+            final Point point = new Point(event.x, event.y);
+            final int columnIndex = _productsViewer.getCell(point).getColumnIndex();
+            if (columnIndex != 2) {
+               return;
+            }
+
+            final Object selectedItem = ((IStructuredSelection) _productsViewer.getSelection()).getFirstElement();
+            if (selectedItem == null) {
+               return;
+            }
+
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) selectedItem;
+
+            final String productCode = tourNutritionProduct.getProductCode();
+            if (StringUtils.isNumeric(productCode)) {
+               WEB.openUrl(OPENFOODFACTS_BASEPATH + productCode);
+            }
+
          }
-
-         final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) selectedItem;
-
-         final String productCode = tourNutritionProduct.getProductCode();
-         if (StringUtils.isNumeric(productCode)) {
-            WEB.openUrl(OPENFOODFACTS_BASEPATH + productCode);
-         }
-      });
+      };
+      _productsViewer.getTable().addListener(SWT.MouseDoubleClick, doubleClickListener);
 
       _productsViewer.addSelectionChangedListener(selectionChangedEvent -> onTableSelectionChanged(selectionChangedEvent));
 
