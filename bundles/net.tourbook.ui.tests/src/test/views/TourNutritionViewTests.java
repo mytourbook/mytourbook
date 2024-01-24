@@ -74,7 +74,7 @@ public class TourNutritionViewTests extends UITest {
       assertEquals(initialTableRowCount + 1, productsTable.rowCount());
 
       // Add a manual product
-      bot.button(Messages.Tour_Nutrition_Button_AddProduct).click();
+      bot.button(Messages.Tour_Nutrition_Button_AddCustomProduct).click();
 
       // Act
 

@@ -720,11 +720,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
           * Add product button
           */
          _btnAddCustomProduct = new Button(container, SWT.NONE);
-         _btnAddCustomProduct.setText(Messages.Tour_Nutrition_Button_AddProduct);
-         _btnAddCustomProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddProduct_Tooltip);
+         _btnAddCustomProduct.setText(Messages.Tour_Nutrition_Button_AddCustomProduct);
+         _btnAddCustomProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddCustomProduct_Tooltip);
          _btnAddCustomProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-            final DialogCustomTourNutritionProduct dialogTourNutritionProduct = new DialogCustomTourNutritionProduct(Display.getCurrent().getActiveShell());
+            final DialogCustomTourNutritionProduct dialogTourNutritionProduct = new DialogCustomTourNutritionProduct(Display.getCurrent()
+                  .getActiveShell());
 
             if (dialogTourNutritionProduct.open() != Window.OK) {
                return;
