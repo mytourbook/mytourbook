@@ -179,7 +179,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Image       _imageSearch;
    private Image       _imageDelete;
 
-   private Button      _btnAddProduct;
+   private Button      _btnAddCustomProduct;
    private Button      _btnSearchProduct;
    private Button      _btnDeleteProduct;
 
@@ -719,10 +719,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          /*
           * Add product button
           */
-         _btnAddProduct = new Button(container, SWT.NONE);
-         _btnAddProduct.setText(Messages.Tour_Nutrition_Button_AddProduct);
-         _btnAddProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddProduct_Tooltip);
-         _btnAddProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+         _btnAddCustomProduct = new Button(container, SWT.NONE);
+         _btnAddCustomProduct.setText(Messages.Tour_Nutrition_Button_AddProduct);
+         _btnAddCustomProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddProduct_Tooltip);
+         _btnAddCustomProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
             final DialogCustomTourNutritionProduct dialogTourNutritionProduct = new DialogCustomTourNutritionProduct(Display.getCurrent().getActiveShell());
 
@@ -737,8 +737,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
 
          }));
-         _btnAddProduct.setImage(_imageAdd);
-         GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(_btnAddProduct);
+         _btnAddCustomProduct.setImage(_imageAdd);
+         GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(_btnAddCustomProduct);
 
          /*
           * Delete product button
