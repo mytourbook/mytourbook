@@ -37,12 +37,12 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogCustomTourNutritionProduct extends Dialog {
 
-   private int    _calories;
+   private int     _calories;
    private boolean _isBeverage;
-   private int    _sodium;
-   private String _name = UI.EMPTY_STRING;
-   private int    _numServings;
-   private int    _beverageQuantity;
+   private int     _sodium;
+   private String  _name        = UI.EMPTY_STRING;
+   private int     _numServings = 1;
+   private int     _beverageQuantity;
 
    //todo fb add the possibility to add custom products (i.e: water...)
 // => Manually with a dialog that asks the name, calories, sodium, is beverage (if yes, ungray the beverage qtty)
@@ -239,7 +239,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       final QuantityType quantityType = _numServings == 1
             ? QuantityType.Servings
             : QuantityType.Products;
-
 
       product.setQuantityType(quantityType);
 
