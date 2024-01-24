@@ -65,7 +65,7 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
             .applyTo(container);
       {
          /*
-          * Ignore 1st hour
+          * Ignore the 1st hour for nutrition averages computation
           */
          {
             _chkIgnoreFirstHour = new Button(container, SWT.CHECK);

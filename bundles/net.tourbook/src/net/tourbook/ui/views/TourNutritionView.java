@@ -1308,13 +1308,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          @Override
          protected CellEditor getCellEditor(final Object element) {
 
-            //todo fb
+            //todo fb ask wolfgang in the PR and show this line where I configured the increment etc...
             //it works but it's when i use the mousewheel that it doesn't!?!? at least on windows, to test on linux !?
             //wow, it's all over the place as there are 3 possible ways
             //- mouse wheel on the number
             //- mouse wheel on the -/+ signs
             //- mouse wheel CLICK on the -/+ signs
-            //ask wolfgang in the PR and show this line where I configured the increment etc...
+            //
             final Spinner spinner = spinnerCellEditor.getSpinner();
             spinner.setMinimum(25);
             spinner.setMaximum(10000);
