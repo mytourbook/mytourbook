@@ -43,9 +43,6 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
    /*
     * UI controls
     */
-   //todo fb Tooltip
-   // p 109 Performance Nutrition for runners M. Fitzgerald
-   // "Research has shown...."
    private Button _chkIgnoreFirstHour;
 
    @Override
@@ -72,8 +69,8 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
          {
             _chkIgnoreFirstHour = new Button(container, SWT.CHECK);
             _chkIgnoreFirstHour.setText("Ignore 1st hour in nutrition averages computation");
+            //todo fb Tooltip
             _chkIgnoreFirstHour.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-
                //todo fb
             }));
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_chkIgnoreFirstHour);

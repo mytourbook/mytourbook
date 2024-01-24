@@ -104,8 +104,23 @@ public class NutritionUtils {
 
    public static int getTotalCalories(final Set<TourNutritionProduct> tourNutritionProducts) {
 
-      final int totalCalories = tourNutritionProducts.stream().mapToInt(product -> Math.round(product.getCalories() * product.getConsumedQuantity()))
-            .sum();
+      int totalCalories = 0;
+
+      for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
+
+         switch (tourNutritionProduct.getQuantityType()) {
+
+         case Servings:
+
+            totalCalories += tourNutritionProduct.getCalories_Serving() * tourNutritionProduct.getConsumedQuantity();
+            break;
+
+         case Products:
+
+            totalCalories += tourNutritionProduct.getCalories() * tourNutritionProduct.getConsumedQuantity();
+            break;
+         }
+      }
 
       return totalCalories;
    }
@@ -119,12 +134,15 @@ public class NutritionUtils {
          final TourBeverageContainer tourBeverageContainer = tourNutritionProduct.getTourBeverageContainer();
          if (tourBeverageContainer != null) {
 
-            totalFluids += tourNutritionProduct.getContainersConsumed(); // multiply by the capacity
+            totalFluids += tourNutritionProduct.getContainersConsumed()
+                  * tourBeverageContainer.getCapacity();
+
          } else if (tourNutritionProduct.isBeverage()) {
 
-            totalFluids += tourNutritionProduct.getBeverageQuantity(); //todo fb multiply by the amount of consumed product
-         }
+            totalFluids += tourNutritionProduct.getBeverageQuantity() / 1000f
+                  * tourNutritionProduct.getConsumedQuantity();
 
+         }
       }
 
       return totalFluids;

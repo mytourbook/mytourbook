@@ -168,7 +168,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private final NumberFormat             _nf2                            = NumberFormat.getNumberInstance();
 
    {
-      _nf2.setMinimumFractionDigits(2);
+      _nf2.setMinimumFractionDigits(0);
       _nf2.setMaximumFractionDigits(2);
    }
 
@@ -1551,8 +1551,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       final int totalCalories = NutritionUtils.getTotalCalories(tourNutritionProducts);
       _txtCalories_Total.setText(String.valueOf(totalCalories));
 
-      final int totalFluid = Math.round(NutritionUtils.getTotalFluids(tourNutritionProducts));
-      _txtFluid_Total.setText(String.valueOf(totalFluid));
+      final float totalFluid = NutritionUtils.getTotalFluids(tourNutritionProducts) * 100 / 100;
+      final String totalFluidFormatted = _nf2.format(totalFluid);
+      _txtFluid_Total.setText(totalFluidFormatted);
 
       final int totalSodium = (int) NutritionUtils.getTotalSodium(tourNutritionProducts);
       _txtSodium_Total.setText(String.valueOf(totalSodium));
@@ -1560,7 +1561,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       final long averageCaloriesPerHour = computeAveragePerHour(totalCalories);
       _txtCalories_Average.setText(String.valueOf(averageCaloriesPerHour));
 
-      final long averageFluidPerHour = computeAveragePerHour(totalFluid);
+      final long averageFluidPerHour = computeAveragePerHour(Math.round(totalFluid));
       _txtFluid_Average.setText(String.valueOf(averageFluidPerHour));
 
       final long averageSodiumPerHour = computeAveragePerHour(totalSodium);
