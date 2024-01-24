@@ -112,7 +112,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
             // Spinner: number of servings
             _spinnerNumServings = new Spinner(container, SWT.BORDER);
-            GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT).span(2, 1).align(SWT.END, SWT.CENTER).applyTo(
+            GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT).span(2, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(
                   _spinnerNumServings);
             _spinnerNumServings.setMinimum(25);
             _spinnerNumServings.setIncrement(25);
@@ -154,7 +154,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             _txtCalories.setText(String.valueOf(_calories));
             GridDataFactory.fillDefaults()
                   .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
-                  .span(2, 1)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_txtCalories);
             _txtCalories.addModifyListener(e -> {
@@ -177,10 +176,9 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_Sodium);
 
             _txtSodium = new Text(container, SWT.BORDER);
-            _txtSodium.setText(String.valueOf(_calories));
+            _txtSodium.setText(String.valueOf(_sodium));
             GridDataFactory.fillDefaults()
                   .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
-                  .span(2, 1)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_txtSodium);
             _txtSodium.addModifyListener(e -> {
@@ -196,20 +194,18 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             });
 
             // Unit: mg
-            // UI.createLabel(container, UI.UNIT_SO);
+            UI.createLabel(container, UI.UNIT_WEIGHT_MG);
          }
          {
             // Label: Is Beverage
             UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_IsBeverage);
 
             _checkIsBeverage = new Button(container, SWT.CHECK);
-            _checkIsBeverage.setText(String.valueOf(_calories));
             GridDataFactory.fillDefaults()
                   .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
                   .span(2, 1)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_checkIsBeverage);
-
          }
          {
             // Label: Beverage quantity
@@ -218,12 +214,11 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             _spinnerBeverageQuantity = new Spinner(container, SWT.BORDER);
             GridDataFactory.fillDefaults()
                   .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
-                  .span(2, 1)
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_checkIsBeverage);
-            // Unit:
-            //UI.createLabel(container, UI.UNIT_FLUIDS_L);
+                  .applyTo(_spinnerBeverageQuantity);
 
+            // Unit: L
+            UI.createLabel(container, UI.UNIT_FLUIDS_L);
          }
       }
    }
