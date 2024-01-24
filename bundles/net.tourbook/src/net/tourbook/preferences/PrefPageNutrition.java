@@ -17,6 +17,7 @@ package net.tourbook.preferences;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
+import net.tourbook.Messages;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -68,7 +69,8 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
           */
          {
             _chkIgnoreFirstHour = new Button(container, SWT.CHECK);
-            _chkIgnoreFirstHour.setText("Ignore 1st hour in nutrition averages computation");
+            _chkIgnoreFirstHour.setText(Messages.PrefPage_Nutrition_Checkbox_IgnoreFirstHour);
+            _chkIgnoreFirstHour.setToolTipText(Messages.PrefPage_Nutrition_Checkbox_IgnoreFirstHour_Tooltip);
             //todo fb Tooltip
             _chkIgnoreFirstHour.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
                //todo fb

@@ -1490,6 +1490,9 @@ public class Messages extends NLS {
    public static String        PrefPage_Import_Default_CadenceValue_Tooltip;
    public static String        PrefPage_Import_Label_Info;
 
+   public static String        PrefPage_Nutrition_Checkbox_IgnoreFirstHour;
+   public static String        PrefPage_Nutrition_Checkbox_IgnoreFirstHour_Tooltip;
+
    public static String        PrefPage_TourBeverageContainers_Button_Add;
    public static String        PrefPage_TourBeverageContainers_Button_Delete;
    public static String        PrefPage_TourBeverageContainers_Button_Edit;
