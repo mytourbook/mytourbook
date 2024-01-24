@@ -191,13 +191,14 @@ public class TourNutritionProduct {
 
       final NutriScoreData nutriScoreData = product.nutriScoreData;
       final String productQuantity = product.productQuantity;
+      final String quantity = product.quantity;
       final String servingQuantity = product.servingQuantity;
 
       if (nutriScoreData != null && nutriScoreData.isBeverage()) {
 
          isBeverage = product.nutriScoreData != null;
 
-         if (productQuantity != null && servingQuantity != null) {
+         if (quantity != null && productQuantity != null && servingQuantity != null) {
 
             final int numberOfServings = Math.round(Float.valueOf(productQuantity) / Float.valueOf(servingQuantity));
             calories = nutriments.energyKcalServing * numberOfServings;
@@ -206,10 +207,12 @@ public class TourNutritionProduct {
             sodium = Math.round(nutriments.sodiumServing * numberOfServings * 1000);
             sodium_Serving = Math.round(nutriments.sodiumServing * 1000);
 
-            //todo fb for the gatorade, it's a beverage but its given in g what to do ?
-            // 0055577400517
-            beverageQuantity = Integer.valueOf(productQuantity);
-            beverageQuantity_Serving = Integer.valueOf(servingQuantity);
+            // We store the quantity ONLY if the beverage if in liquid for (mL)
+            if (quantity.trim().toUpperCase().endsWith("L")) {
+
+               beverageQuantity = Integer.valueOf(productQuantity);
+               beverageQuantity_Serving = Integer.valueOf(servingQuantity.trim());
+            }
 
          }
       } else {

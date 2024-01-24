@@ -1027,7 +1027,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             final int beverageQuantityValue = tourNutritionProduct.getQuantityType() == QuantityType.Products
                   ? tourNutritionProduct.getBeverageQuantity()
                   : tourNutritionProduct.getBeverageQuantity_Serving();
-            final String cellText = tourNutritionProduct.isBeverage()
+            final String cellText = tourNutritionProduct.isBeverage() && beverageQuantityValue != 0
                   ? String.valueOf(beverageQuantityValue)
                   : UI.EMPTY_STRING;
 
