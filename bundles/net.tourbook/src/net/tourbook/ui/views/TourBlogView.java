@@ -557,7 +557,6 @@ public class TourBlogView extends ViewPart {
 
       sb.append("<div class='date'>" + date + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
       sb.append("<div class='time'>" + time + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
-      sb.append("<div style='clear: both;'></div>" + NL); //$NON-NLS-1$
    }
 
    private void create_24_Tour(final StringBuilder sb) {
