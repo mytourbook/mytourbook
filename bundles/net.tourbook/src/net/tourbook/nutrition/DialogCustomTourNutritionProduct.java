@@ -38,10 +38,11 @@ import org.eclipse.swt.widgets.Text;
 public class DialogCustomTourNutritionProduct extends Dialog {
 
    private int    _calories;
+   private boolean _isBeverage;
    private int    _sodium;
    private String _name = UI.EMPTY_STRING;
    private int    _numServings;
-   private float  beverageQuantity;
+   private int    _beverageQuantity;
 
    //todo fb add the possibility to add custom products (i.e: water...)
 // => Manually with a dialog that asks the name, calories, sodium, is beverage (if yes, ungray the beverage qtty)
@@ -223,8 +224,8 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       }
    }
 
-   public float getBeverageQuantity() {
-      return beverageQuantity;
+   public float get_beverageQuantity() {
+      return _beverageQuantity;
    }
 
    public String getName() {
@@ -235,6 +236,21 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
       final TourNutritionProduct product = new TourNutritionProduct(tourData, true);
       product.setName(_name.trim());
+      final QuantityType quantityType = _numServings == 1
+            ? QuantityType.Servings
+            : QuantityType.Products;
+
+
+      product.setQuantityType(quantityType);
+
+      product.setCalories(_calories);
+      product.setCalories_Serving(_calories / _numServings);
+
+      product.setSodium(_sodium);
+      product.setSodium_Serving(_sodium / _numServings);
+
+      product.setIsBeverage(_isBeverage);
+      product.setBeverageQuantity(_beverageQuantity);
 
       return product;
    }
@@ -243,7 +259,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
    protected void okPressed() {
 
       _name = _txtName.getText();
-      beverageQuantity = Float.parseFloat(_txtCalories.getText());
+      _beverageQuantity = _spinnerBeverageQuantity.getSelection();
       super.okPressed();
    }
 

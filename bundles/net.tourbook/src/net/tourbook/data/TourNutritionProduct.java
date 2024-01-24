@@ -201,11 +201,11 @@ public class TourNutritionProduct {
          if (quantity != null && productQuantity != null && servingQuantity != null) {
 
             final int numberOfServings = Math.round(Float.valueOf(productQuantity) / Float.valueOf(servingQuantity));
-            calories = nutriments.energyKcalServing * numberOfServings;
-            calories_Serving = nutriments.energyKcalServing;
+            setCalories(nutriments.energyKcalServing * numberOfServings);
+            setCalories_Serving(nutriments.energyKcalServing);
 
-            sodium = Math.round(nutriments.sodiumServing * numberOfServings * 1000);
-            sodium_Serving = Math.round(nutriments.sodiumServing * 1000);
+            setSodium(Math.round(nutriments.sodiumServing * numberOfServings * 1000));
+            setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
 
             // We store the quantity ONLY if the beverage if in liquid for (mL)
             if (quantity.trim().toUpperCase().endsWith("L")) {
@@ -219,19 +219,19 @@ public class TourNutritionProduct {
 
          if (productQuantity != null) {
 
-            calories = Math.round((nutriments.energyKcal100g * Float.valueOf(productQuantity)) / 100f);
-            calories_Serving = nutriments.energyKcalServing;
+            setCalories(Math.round((nutriments.energyKcal100g * Float.valueOf(productQuantity)) / 100f));
+            setCalories_Serving(nutriments.energyKcalServing);
 
-            sodium = Math.round(nutriments.sodium100g * 1000);
-            sodium_Serving = Math.round(nutriments.sodiumServing * 1000);
+            setSodium(Math.round(nutriments.sodium100g * 1000));
+            setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
 
          } else {
 
             // In this case, we can only assume that the product only contains 1 serving
-            calories = nutriments.energyKcalServing;
-            calories_Serving = nutriments.energyKcalServing;
-            sodium = Math.round(nutriments.sodiumServing * 1000);
-            sodium_Serving = Math.round(nutriments.sodiumServing * 1000);
+            setCalories(nutriments.energyKcalServing);
+            setCalories_Serving(nutriments.energyKcalServing);
+            setSodium(Math.round(nutriments.sodiumServing * 1000));
+            setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
          }
       }
    }
@@ -318,6 +318,10 @@ public class TourNutritionProduct {
       this.beverageQuantity = beverageQuantity;
    }
 
+   public void setCalories(final int calories) {
+      this.calories = calories;
+   }
+
    public void setConsumedQuantity(final float consumedQuantity) {
       this.consumedQuantity = consumedQuantity;
    }
@@ -332,7 +336,6 @@ public class TourNutritionProduct {
 
    public void setName(final String name) {
       this.name = name;
-
    }
 
    public void setProductCode(final String productCode) {
@@ -354,6 +357,18 @@ public class TourNutritionProduct {
       productId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
       tourData = tourDataFromClone;
+   }
+
+   public void setSodium(final int sodium) {
+      this.sodium = sodium;
+   }
+
+   public void setCalories_Serving(final int calories_Serving) {
+      this.calories_Serving = calories_Serving;
+   }
+
+   public void setSodium_Serving(final int sodium_Serving) {
+      this.sodium_Serving = sodium_Serving;
    }
 
 }
