@@ -429,12 +429,16 @@ public class TourBlogView extends ViewPart {
             sb.append(UI.NEW_LINE);
             final TourBeverageContainer tourBeverageContainer = product.getTourBeverageContainer();
 
+            //todo  fb use a number formatter to only display decimals when needed
             if (tourBeverageContainer == null) {
+
                final float totalConsumedBeverageQuantity = Math.round(product.getConsumedQuantity() * product.getBeverageQuantity());
-               sb.append(totalConsumedBeverageQuantity + UI.SPACE1 + product.getName());
+               sb.append(product.getConsumedQuantity() + UI.SPACE1 + product.getName() + "( " + product.getBeverageQuantity() + " mL)");
+
             } else {
 
                sb.append(product.getContainersConsumed() + UI.SPACE1 + NutritionUtils.buildTourBeverageContainerName(tourBeverageContainer));
+
             }
          });
 

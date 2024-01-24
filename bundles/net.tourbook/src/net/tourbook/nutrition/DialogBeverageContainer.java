@@ -37,18 +37,17 @@ import org.eclipse.swt.widgets.Text;
 
 class DialogBeverageContainer extends Dialog {
 
-   private String         _name     = UI.EMPTY_STRING;
-   private float          _capacity = 0.25f;
-
-   private PixelConverter _pc;
+   private String _name     = UI.EMPTY_STRING;
+   private float  _capacity = 0.25f;
 
    /*
     * UI controls
     */
-   private Spinner _spinnerCapacity;
+   private boolean        _isInUIInit;
+   private PixelConverter _pc;
 
-   private boolean _isInUIInit;
-   private Text    _txtName;
+   private Spinner        _spinnerCapacity;
+   private Text           _txtName;
 
    DialogBeverageContainer(final Shell parentShell) {
       super(parentShell);

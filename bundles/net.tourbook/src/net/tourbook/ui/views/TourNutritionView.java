@@ -106,12 +106,10 @@ import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 
 public class TourNutritionView extends ViewPart implements ITourViewer {
 
-   //todo fb add the possibility to add custom products (i.e: water...)
-// => Manually with a dialog that asks the name, calories, sodium, is beverage (if yes, ungray the beverage qtty)
-
    //todo fb clear the view when mltiple tours are selected
 
    //todo fb on linux, there are a lot of space between the 2 sections even when NOT expanded ?ask wolfgang when i do the pr
+   //todo fb when selecting a product from the autocompletion that is a string and the type is barcode, the search should not go through
    static final String                    ID                              = "net.tourbook.ui.views.TourNutritionView";  //$NON-NLS-1$
    private static final String            STATE_PRODUCT_SEARCHES_HISTORY  = "products.searchesHistory";                 //$NON-NLS-1$
    private static final String            STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";              //$NON-NLS-1$
