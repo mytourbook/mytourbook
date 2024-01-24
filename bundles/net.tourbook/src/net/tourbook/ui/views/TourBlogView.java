@@ -608,7 +608,7 @@ public class TourBlogView extends ViewPart {
                                  + "</a>") //                                       //$NON-NLS-1$
                            + "   </div>" + NL)); //                                   //$NON-NLS-1$
 
-               if (net.tourbook.common.util.StringUtils.hasContent(tourTitle)) {
+               if (isTitle) {
                   sb.append("<span class='blog-title'>" + tourTitle + "</span>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
                }
 
