@@ -38,7 +38,7 @@ import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.nutrition.DialogTourNutritionProduct;
+import net.tourbook.nutrition.DialogCustomTourNutritionProduct;
 import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.nutrition.QuantityType;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -724,7 +724,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          _btnAddProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddProduct_Tooltip);
          _btnAddProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-            final DialogTourNutritionProduct dialogTourNutritionProduct = new DialogTourNutritionProduct(Display.getCurrent().getActiveShell());
+            final DialogCustomTourNutritionProduct dialogTourNutritionProduct = new DialogCustomTourNutritionProduct(Display.getCurrent().getActiveShell());
 
             if (dialogTourNutritionProduct.open() != Window.OK) {
                return;

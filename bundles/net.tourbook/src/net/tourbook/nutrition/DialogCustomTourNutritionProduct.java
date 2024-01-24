@@ -29,7 +29,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class DialogTourNutritionProduct extends Dialog {
+public class DialogCustomTourNutritionProduct extends Dialog {
+
    //todo fb disable the add button if the field validation is not correct
    private Text _txtName;
    //Text number of servings
@@ -40,7 +41,7 @@ public class DialogTourNutritionProduct extends Dialog {
    private String name = UI.EMPTY_STRING;
    private float  beverageQuantity;
 
-   public DialogTourNutritionProduct(final Shell parentShell) {
+   public DialogCustomTourNutritionProduct(final Shell parentShell) {
       super(parentShell);
    }
 
