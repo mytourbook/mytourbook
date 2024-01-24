@@ -1438,8 +1438,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          @Override
          protected Object getValue(final Object element) {
 
-            //todo fb
-            return 0;// task.getTourBeverageContainerName();
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
+
+            final TourBeverageContainer tourBeverageContainer = tourNutritionProduct.getTourBeverageContainer();
+
+            return tourBeverageContainer == null
+                  ? 0
+                  : _tourBeverageContainers.indexOf(tourBeverageContainer) + 1;
          }
 
          @Override

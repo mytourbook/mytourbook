@@ -54,7 +54,7 @@ public class TourBeverageContainer {
    /**
     * The container's capacity in L
     */
-   private float capacity;
+   private float                      capacity;
 
    public TourBeverageContainer() {}
 
@@ -64,6 +64,25 @@ public class TourBeverageContainer {
 
       this.name = name;
       this.capacity = capacity;
+   }
+
+   @Override
+   public boolean equals(final Object obj) {
+
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (!(obj instanceof TourBeverageContainer)) {
+         return false;
+      }
+      final TourBeverageContainer other = (TourBeverageContainer) obj;
+      if (containerId != other.containerId) {
+         return false;
+      }
+      return true;
    }
 
    public float getCapacity() {
