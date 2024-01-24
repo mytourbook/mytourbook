@@ -67,18 +67,17 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
-   private static final String     LOG_CLOUDACTION_END           = Messages.Log_CloudAction_End;
-   private static final String     LOG_CLOUDACTION_INVALIDTOKENS = Messages.Log_CloudAction_InvalidTokens;
-   private static final String     APP_PEOPLE_ITEM_ALL           = net.tourbook.Messages.App_People_item_all;
+   private static final String LOG_CLOUDACTION_END           = Messages.Log_CloudAction_End;
+   private static final String LOG_CLOUDACTION_INVALIDTOKENS = Messages.Log_CloudAction_InvalidTokens;
+   private static final String APP_PEOPLE_ITEM_ALL           = net.tourbook.Messages.App_People_item_all;
 
-   private static IPreferenceStore _prefStore                    = Activator.getDefault().getPreferenceStore();
-   private int[]                   _numberOfAvailableTours;
+   private IPreferenceStore    _prefStore;
+   private int[]               _numberOfAvailableTours;
 
-   private boolean                 _useActivePerson;
-   private boolean                 _useAllPeople;
+   private boolean             _useActivePerson;
+   private boolean             _useAllPeople;
 
-   private String                  _personName;
-   private boolean                 _isInDownload;
+   private String              _personName;
 
    public SuuntoCloudDownloader() {
 
@@ -126,138 +125,132 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    @Override
    public void downloadTours() {
 
-      if (_isInDownload) {
-         return;
+      _prefStore = Activator.getDefault().getPreferenceStore();
+
+      _useActivePerson = SuuntoTokensRetrievalHandler.isDownloadReady_ActivePerson();
+
+      _useAllPeople = false;
+      if (!_useActivePerson) {
+         _useAllPeople = SuuntoTokensRetrievalHandler.isDownloadReady_AllPeople();
       }
 
-      _isInDownload = true;
-      {
-         _useActivePerson = SuuntoTokensRetrievalHandler.isDownloadReady_ActivePerson();
+      if (!_useActivePerson && !_useAllPeople) {
 
-         _useAllPeople = false;
-         if (!_useActivePerson) {
-            _useAllPeople = SuuntoTokensRetrievalHandler.isDownloadReady_AllPeople();
+         final int returnResult = PreferencesUtil.createPreferenceDialogOn(
+               Display.getCurrent().getActiveShell(),
+               PrefPageSuunto.ID,
+               null,
+               null).open();
+
+         if (returnResult != 0) {// The OK button was not clicked or if the configuration is still not ready
+            return;
          }
-
-         if (!_useActivePerson && !_useAllPeople) {
-
-            final int returnResult = PreferencesUtil.createPreferenceDialogOn(
-                  Display.getCurrent().getActiveShell(),
-                  PrefPageSuunto.ID,
-                  null,
-                  null).open();
-
-            if (returnResult != 0) {// The OK button was not clicked or if the configuration is still not ready
-               return;
-            }
-         }
-
-         final TourPerson activePerson = TourbookPlugin.getActivePerson();
-         _personName = activePerson == null
-               ? APP_PEOPLE_ITEM_ALL
-               : activePerson.getName();
-
-         _numberOfAvailableTours = new int[1];
-         final String[] notificationText = new String[1];
-         final int[] numberOfDownloadedTours = new int[1];
-
-         final Job job = new Job(Messages.Dialog_DownloadWorkoutsFromSuunto_Task) {
-
-            @Override
-            public IStatus run(final IProgressMonitor monitor) {
-
-               monitor.beginTask(UI.EMPTY_STRING, 3);
-
-               monitor.subTask(Messages.Dialog_ValidatingSuuntoTokens_SubTask);
-
-               if (!SuuntoTokensRetrievalHandler.getValidTokens(_useActivePerson, _useAllPeople)) {
-                  Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(LOG_CLOUDACTION_INVALIDTOKENS));
-                  notificationText[0] = LOG_CLOUDACTION_INVALIDTOKENS;
-                  return Status.CANCEL_STATUS;
-               }
-
-               monitor.subTask(NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_SubTask,
-                     new Object[] {
-                           UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND,
-                           UI.EMPTY_STRING,
-                           UI.EMPTY_STRING }));
-               monitor.worked(1);
-
-               //Get the list of workouts
-               final Workouts workouts = retrieveWorkoutsList();
-               if (workouts == null || workouts.payload().isEmpty()) {
-                  Display.getDefault().asyncExec(() -> TourLogManager.log_INFO(Messages.Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound));
-                  notificationText[0] = Messages.Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound;
-                  return Status.CANCEL_STATUS;
-               }
-
-               final List<Long> tourStartTimes = retrieveAllTourStartTimes();
-
-               //Identifying the workouts that have not yet been imported in the tour database
-               final List<Payload> newWorkouts = workouts.payload().stream()
-                     .filter(suuntoWorkout -> !tourStartTimes.contains(suuntoWorkout.startTime / 1000L * 1000L))
-                     .toList();
-
-               final int numNewWorkouts = newWorkouts.size();
-               if (numNewWorkouts == 0) {
-                  Display.getDefault().asyncExec(() -> TourLogManager.log_INFO(Messages.Log_DownloadWorkoutsFromSuunto_003_AllWorkoutsAlreadyExist));
-                  notificationText[0] = Messages.Log_DownloadWorkoutsFromSuunto_003_AllWorkoutsAlreadyExist;
-                  return Status.CANCEL_STATUS;
-               }
-
-               _numberOfAvailableTours[0] = numNewWorkouts;
-
-               monitor.worked(1);
-
-               monitor.subTask(NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_SubTask,
-                     new Object[] {
-                           UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
-                           _numberOfAvailableTours[0],
-                           UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND }));
-
-               numberOfDownloadedTours[0] = downloadFiles(newWorkouts, monitor);
-
-               monitor.worked(1);
-
-               monitor.done();
-
-               return Status.OK_STATUS;
-            }
-         };
-
-         final long start = System.currentTimeMillis();
-
-         TourLogManager.log_TITLE(Messages.Log_DownloadWorkoutsFromSuunto_001_Start);
-
-         job.setPriority(Job.INTERACTIVE);
-         job.schedule();
-
-         job.addJobChangeListener(new JobChangeAdapter() {
-            @Override
-            public void done(final IJobChangeEvent event) {
-
-               if (PlatformUI.isWorkbenchRunning()) {
-
-                  final String infoText = event.getResult().isOK()
-                        ? NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_Message,
-                              numberOfDownloadedTours[0],
-                              _numberOfAvailableTours[0] - numberOfDownloadedTours[0])
-                        : notificationText[0];
-
-                  PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
-
-                     TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
-
-                     UI.openNotificationPopup(
-                           Messages.Dialog_DownloadWorkoutsFromSuunto_Title,
-                           Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo_Small),
-                           infoText);
-                  });
-               }
-            }
-         });
       }
-      _isInDownload = false;
+
+      final TourPerson activePerson = TourbookPlugin.getActivePerson();
+      _personName = activePerson == null
+            ? APP_PEOPLE_ITEM_ALL
+            : activePerson.getName();
+
+      _numberOfAvailableTours = new int[1];
+      final String[] notificationText = new String[1];
+      final int[] numberOfDownloadedTours = new int[1];
+
+      final Job job = new Job(Messages.Dialog_DownloadWorkoutsFromSuunto_Task) {
+
+         @Override
+         public IStatus run(final IProgressMonitor monitor) {
+
+            monitor.beginTask(UI.EMPTY_STRING, 3);
+
+            monitor.subTask(Messages.Dialog_ValidatingSuuntoTokens_SubTask);
+
+            if (!SuuntoTokensRetrievalHandler.getValidTokens(_useActivePerson, _useAllPeople)) {
+               Display.getDefault().asyncExec(() -> TourLogManager.log_ERROR(LOG_CLOUDACTION_INVALIDTOKENS));
+               notificationText[0] = LOG_CLOUDACTION_INVALIDTOKENS;
+               return Status.CANCEL_STATUS;
+            }
+
+            monitor.subTask(NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_SubTask,
+                  new Object[] {
+                        UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND,
+                        UI.EMPTY_STRING,
+                        UI.EMPTY_STRING }));
+            monitor.worked(1);
+
+            //Get the list of workouts
+            final Workouts workouts = retrieveWorkoutsList();
+            if (workouts == null || workouts.payload().isEmpty()) {
+               Display.getDefault().asyncExec(() -> TourLogManager.log_INFO(Messages.Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound));
+               notificationText[0] = Messages.Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound;
+               return Status.CANCEL_STATUS;
+            }
+
+            final List<Long> tourStartTimes = retrieveAllTourStartTimes();
+
+            //Identifying the workouts that have not yet been imported in the tour database
+            final List<Payload> newWorkouts = workouts.payload().stream()
+                  .filter(suuntoWorkout -> !tourStartTimes.contains(suuntoWorkout.startTime / 1000L * 1000L))
+                  .toList();
+
+            final int numNewWorkouts = newWorkouts.size();
+            if (numNewWorkouts == 0) {
+               Display.getDefault().asyncExec(() -> TourLogManager.log_INFO(Messages.Log_DownloadWorkoutsFromSuunto_003_AllWorkoutsAlreadyExist));
+               notificationText[0] = Messages.Log_DownloadWorkoutsFromSuunto_003_AllWorkoutsAlreadyExist;
+               return Status.CANCEL_STATUS;
+            }
+
+            _numberOfAvailableTours[0] = numNewWorkouts;
+
+            monitor.worked(1);
+
+            monitor.subTask(NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_SubTask,
+                  new Object[] {
+                        UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
+                        _numberOfAvailableTours[0],
+                        UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND }));
+
+            numberOfDownloadedTours[0] = downloadFiles(newWorkouts, monitor);
+
+            monitor.worked(1);
+
+            monitor.done();
+
+            return Status.OK_STATUS;
+         }
+      };
+
+      final long start = System.currentTimeMillis();
+
+      TourLogManager.log_TITLE(Messages.Log_DownloadWorkoutsFromSuunto_001_Start);
+
+      job.setPriority(Job.INTERACTIVE);
+      job.schedule();
+
+      job.addJobChangeListener(new JobChangeAdapter() {
+         @Override
+         public void done(final IJobChangeEvent event) {
+
+            if (PlatformUI.isWorkbenchRunning()) {
+
+               final String infoText = event.getResult().isOK()
+                     ? NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_Message,
+                           numberOfDownloadedTours[0],
+                           _numberOfAvailableTours[0] - numberOfDownloadedTours[0])
+                     : notificationText[0];
+
+               PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+
+                  TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
+
+                  UI.openNotificationPopup(
+                        Messages.Dialog_DownloadWorkoutsFromSuunto_Title,
+                        Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo_Small),
+                        infoText);
+               });
+            }
+         }
+      });
    }
 
    private String getAccessToken() {
