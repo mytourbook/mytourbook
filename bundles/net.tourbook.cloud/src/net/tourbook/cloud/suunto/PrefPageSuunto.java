@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2023 Frédéric Bard
+ * Copyright (C) 2021, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -77,10 +77,10 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
    private static final String     DIALOG_EXPORT_DIR_DIALOG_TEXT    = net.tourbook.Messages.dialog_export_dir_dialog_text;
    private static final String     PARAMETER_TRAILING_CHAR          = "}";                                                   //$NON-NLS-1$
    private static final String     PARAMETER_LEADING_CHAR           = "{";                                                   //$NON-NLS-1$
-   private static final String     _suuntoApp_WebPage_Link          = "https://www.suunto.com/suunto-app/suunto-app/";       //$NON-NLS-1$
+   private static final String     SUUNTOAPP_WEBPAGE_LINK           = "https://www.suunto.com/suunto-app/suunto-app/";       //$NON-NLS-1$
    static final String             ID                               = "net.tourbook.cloud.PrefPageSuunto";                   //$NON-NLS-1$
 
-   private static final String     ClientId                         = "d8f3e53f-6c20-4d17-9a4e-a4930c8667e8";                //$NON-NLS-1$
+   private static final String     CLIENTID                         = "d8f3e53f-6c20-4d17-9a4e-a4930c8667e8";                //$NON-NLS-1$
 
    private static final int        CALLBACK_PORT                    = 4919;
 
@@ -349,10 +349,10 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             GridDataFactory.fillDefaults().applyTo(labelWebPage);
 
             final Link linkWebPage = new Link(_groupCloudAccount, SWT.NONE);
-            linkWebPage.setText(UI.LINK_TAG_START + _suuntoApp_WebPage_Link + UI.LINK_TAG_END);
+            linkWebPage.setText(UI.LINK_TAG_START + SUUNTOAPP_WEBPAGE_LINK + UI.LINK_TAG_END);
             linkWebPage.setEnabled(true);
             linkWebPage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
-                  _suuntoApp_WebPage_Link)));
+                  SUUNTOAPP_WEBPAGE_LINK)));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);
          }
          {
@@ -852,7 +852,7 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
 // SET_FORMATTING_OFF
 
       authorizeUrl.append(      OAuth2Constants.PARAM_RESPONSE_TYPE + "=" + OAuth2Constants.PARAM_CODE); //$NON-NLS-1$
-      authorizeUrl.append("&" + OAuth2Constants.PARAM_CLIENT_ID +     "=" + ClientId); //$NON-NLS-1$ //$NON-NLS-2$
+      authorizeUrl.append("&" + OAuth2Constants.PARAM_CLIENT_ID +     "=" + CLIENTID); //$NON-NLS-1$ //$NON-NLS-2$
       authorizeUrl.append("&" + OAuth2Constants.PARAM_REDIRECT_URI +  "=" + "http://localhost:" + CALLBACK_PORT); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 // SET_FORMATTING_ON

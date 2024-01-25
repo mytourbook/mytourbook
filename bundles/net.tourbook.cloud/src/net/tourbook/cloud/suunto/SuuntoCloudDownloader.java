@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2023 Frédéric Bard
+ * Copyright (C) 2021, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -67,14 +67,17 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
-   private static final String     LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
-   private static final String     LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
+   private static final String     LOG_CLOUDACTION_END           = Messages.Log_CloudAction_End;
+   private static final String     LOG_CLOUDACTION_INVALIDTOKENS = Messages.Log_CloudAction_InvalidTokens;
+   private static final String     APP_PEOPLE_ITEM_ALL           = net.tourbook.Messages.App_People_item_all;
 
    private static IPreferenceStore _prefStore                    = Activator.getDefault().getPreferenceStore();
    private int[]                   _numberOfAvailableTours;
 
    private boolean                 _useActivePerson;
    private boolean                 _useAllPeople;
+
+   private String                  _personName;
 
    public SuuntoCloudDownloader() {
 
@@ -141,6 +144,11 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             return;
          }
       }
+
+      final TourPerson activePerson = TourbookPlugin.getActivePerson();
+      _personName = activePerson == null
+            ? APP_PEOPLE_ITEM_ALL
+            : activePerson.getName();
 
       _numberOfAvailableTours = new int[1];
       final String[] notificationText = new String[1];
@@ -446,7 +454,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       }
 
       final String customizedFileName =
-            CustomFileNameBuilder.buildCustomizedFileName(workoutPayload, suuntoFileName);
+            CustomFileNameBuilder.buildCustomizedFileName(workoutPayload, suuntoFileName, _personName);
 
       final Path filePath = Paths.get(
             getDownloadFolder(),
