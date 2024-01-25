@@ -81,7 +81,7 @@ public class TourNutritionViewTests extends UITest {
       // Name
       bot.text(0).setText("Water"); //$NON-NLS-1$
       // ??
-      bot.text(1).setText("0.5"); //$NON-NLS-1$
+      bot.text(2).setText("0.5"); //$NON-NLS-1$
 
       Utils.clickOkButton(bot);
 
