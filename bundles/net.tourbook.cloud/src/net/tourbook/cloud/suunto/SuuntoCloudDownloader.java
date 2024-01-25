@@ -49,6 +49,7 @@ import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourPerson;
+import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.download.TourbookCloudDownloader;
 import net.tourbook.tour.TourLogManager;
@@ -67,17 +68,17 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
-   private static final String LOG_CLOUDACTION_END           = Messages.Log_CloudAction_End;
-   private static final String LOG_CLOUDACTION_INVALIDTOKENS = Messages.Log_CloudAction_InvalidTokens;
-   private static final String APP_PEOPLE_ITEM_ALL           = net.tourbook.Messages.App_People_item_all;
+   private static final String     LOG_CLOUDACTION_END           = Messages.Log_CloudAction_End;
+   private static final String     LOG_CLOUDACTION_INVALIDTOKENS = Messages.Log_CloudAction_InvalidTokens;
+   private static final String     APP_PEOPLE_ITEM_ALL           = net.tourbook.Messages.App_People_item_all;
 
-   private IPreferenceStore    _prefStore;
-   private int[]               _numberOfAvailableTours;
+   private static IPreferenceStore _prefStore                    = Activator.getDefault().getPreferenceStore();
+   private int[]                   _numberOfAvailableTours;
 
-   private boolean             _useActivePerson;
-   private boolean             _useAllPeople;
+   private boolean                 _useActivePerson;
+   private boolean                 _useAllPeople;
 
-   private String              _personName;
+   private String                  _personName;
 
    public SuuntoCloudDownloader() {
 
@@ -125,8 +126,6 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    @Override
    public void downloadTours() {
 
-      _prefStore = Activator.getDefault().getPreferenceStore();
-
       _useActivePerson = SuuntoTokensRetrievalHandler.isDownloadReady_ActivePerson();
 
       _useAllPeople = false;
@@ -146,6 +145,10 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             return;
          }
       }
+
+      // Disable the person selector's combo so that the user doesn't launch a concurrent
+      // download that could create issues by mixing different user's settings
+      PlatformUI.getWorkbench().getDisplay().asyncExec(() -> PersonManager.get_contributionItem_PersonSelector().setEnabled(false));
 
       final TourPerson activePerson = TourbookPlugin.getActivePerson();
       _personName = activePerson == null
@@ -249,6 +252,8 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                         infoText);
                });
             }
+
+            PlatformUI.getWorkbench().getDisplay().asyncExec(() -> PersonManager.get_contributionItem_PersonSelector().setEnabled(true));
          }
       });
    }
