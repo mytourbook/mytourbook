@@ -62,6 +62,7 @@ public class PrefPageNutritionTests extends UITest {
 
       // Act
       bot.button(Messages.PrefPage_TourBeverageContainers_Button_Delete).click();
+      Utils.clickOkButton(bot);
       // Assert
       // Make sure that the table doesn't contain any products
       assertTrue(beverageContainersTable.rowCount() == 0);
