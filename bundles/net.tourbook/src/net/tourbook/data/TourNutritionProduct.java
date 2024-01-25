@@ -158,6 +158,7 @@ public class TourNutritionProduct {
       this.tourData = tourData;
       _createId = _createCounter.incrementAndGet();
       productCode = isCustomProduct ? CUSTOMPRODUCTCODE_PREFIX + _createId : UI.EMPTY_STRING;
+      consumedQuantity = 1f;
    }
 
    public TourNutritionProduct(final TourData tourData, final Product product) {
@@ -168,8 +169,6 @@ public class TourNutritionProduct {
       productCode = product.code;
 
       computeNutrimentsPerProduct(product);
-
-      consumedQuantity = 1f;
    }
 
    /**
@@ -322,6 +321,10 @@ public class TourNutritionProduct {
       this.calories = calories;
    }
 
+   public void setCalories_Serving(final int calories_Serving) {
+      this.calories_Serving = calories_Serving;
+   }
+
    public void setConsumedQuantity(final float consumedQuantity) {
       this.consumedQuantity = consumedQuantity;
    }
@@ -346,6 +349,14 @@ public class TourNutritionProduct {
       this.quantityType = quantityType;
    }
 
+   public void setSodium(final int sodium) {
+      this.sodium = sodium;
+   }
+
+   public void setSodium_Serving(final int sodium_Serving) {
+      this.sodium_Serving = sodium_Serving;
+   }
+
    public void setTourBeverageContainer(final TourBeverageContainer tourBeverageContainer) {
       this.tourBeverageContainer = tourBeverageContainer;
    }
@@ -357,18 +368,6 @@ public class TourNutritionProduct {
       productId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
       tourData = tourDataFromClone;
-   }
-
-   public void setSodium(final int sodium) {
-      this.sodium = sodium;
-   }
-
-   public void setCalories_Serving(final int calories_Serving) {
-      this.calories_Serving = calories_Serving;
-   }
-
-   public void setSodium_Serving(final int sodium_Serving) {
-      this.sodium_Serving = sodium_Serving;
    }
 
 }
