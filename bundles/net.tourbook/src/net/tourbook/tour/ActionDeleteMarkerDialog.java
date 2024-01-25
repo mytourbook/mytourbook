@@ -84,6 +84,11 @@ public class ActionDeleteMarkerDialog extends Action {
 
    private void doAction() {
 
+      // check if the tour editor contains a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
       if (selectedTours == null || selectedTours.isEmpty() ||
