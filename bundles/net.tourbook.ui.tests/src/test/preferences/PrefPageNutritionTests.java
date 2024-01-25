@@ -60,6 +60,12 @@ public class PrefPageNutritionTests extends UITest {
       // Make sure that the table now contains 1 product
       assertEquals(initialTableRowCount + 1, beverageContainersTable.rowCount());
 
+      // Act
+      bot.button(Messages.PrefPage_TourBeverageContainers_Button_Delete).click();
+      // Assert
+      // Make sure that the table doesn't contain any products
+      assertTrue(beverageContainersTable.rowCount() == 0);
+
       Utils.clickApplyAndCloseButton(bot);
    }
 }
