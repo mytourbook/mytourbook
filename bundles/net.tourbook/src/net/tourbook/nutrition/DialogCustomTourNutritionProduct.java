@@ -37,15 +37,17 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogCustomTourNutritionProduct extends Dialog {
 
-   private int     _calories;
-   private boolean _isBeverage;
-   private int     _sodium;
-   private String  _name        = UI.EMPTY_STRING;
-   private int     _numServings = 1;
-   private int     _beverageQuantity;
+   private static final int _hintTextColumnWidth = UI.IS_OSX ? 100 : 50;
+   private int              _calories;
+   private boolean          _isBeverage;
+   private int              _sodium;
+   private String           _name                = UI.EMPTY_STRING;
+   private int              _numServings         = 1;
 
    //todo fb add the possibility to add custom products (i.e: water...)
 // => Manually with a dialog that asks the name, calories, sodium, is beverage (if yes, ungray the beverage qtty)
+
+   private int _beverageQuantity;
 
    /*
     * UI controls
@@ -154,7 +156,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             _txtCalories = new Text(container, SWT.BORDER);
             _txtCalories.setText(String.valueOf(_calories));
             GridDataFactory.fillDefaults()
-                  .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_txtCalories);
             _txtCalories.addModifyListener(e -> {
@@ -170,7 +172,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             });
 
             // Unit: kcal
-            UI.createLabel(container, UI.UNIT_FLUIDS_L);
+            UI.createLabel(container, net.tourbook.ui.Messages.Value_Unit_KCalories);
          }
          {
             // Label: sodium
@@ -179,7 +181,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             _txtSodium = new Text(container, SWT.BORDER);
             _txtSodium.setText(String.valueOf(_sodium));
             GridDataFactory.fillDefaults()
-                  .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_txtSodium);
             _txtSodium.addModifyListener(e -> {
@@ -203,7 +205,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
             _checkIsBeverage = new Button(container, SWT.CHECK);
             GridDataFactory.fillDefaults()
-                  .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
                   .span(2, 1)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_checkIsBeverage);
@@ -214,7 +215,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
             _spinnerBeverageQuantity = new Spinner(container, SWT.BORDER);
             GridDataFactory.fillDefaults()
-                  .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+                  .hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinnerBeverageQuantity);
 
