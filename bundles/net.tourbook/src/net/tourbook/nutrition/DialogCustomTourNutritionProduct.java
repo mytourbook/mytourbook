@@ -259,7 +259,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
       _name = _txtName.getText();
       _beverageQuantity = _spinnerBeverageQuantity.getSelection();
-      _numServings = _spinnerNumServings.getSelection();
+      _numServings = (int) Math.round(_spinnerNumServings.getSelection() / 100.0);
       _calories = Integer.valueOf(_txtCalories.getText());
       _sodium = Integer.valueOf(_txtSodium.getText());
       _isBeverage = _checkIsBeverage.getSelection();
