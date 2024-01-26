@@ -2413,8 +2413,8 @@ public class TourInfoUI {
       final float sumTime     = vertSpeed_TimeFlat       + vertSpeed_TimeGain       + vertSpeed_TimeLoss *1f;
       final float sumDistance = vertSpeed_DistanceFlat   + vertSpeed_DistanceGain   + vertSpeed_DistanceLoss;
 
-      final float altimeter_Gain = vertSpeed_ElevationGain / vertSpeed_TimeGain * 3600  / UI.UNIT_VALUE_ELEVATION;
-      final float altimeter_Loss = vertSpeed_ElevationLoss / vertSpeed_TimeLoss * 3600  / UI.UNIT_VALUE_ELEVATION;
+      final float altimeter_Gain = vertSpeed_ElevationGain / vertSpeed_TimeGain * 3600;
+      final float altimeter_Loss = vertSpeed_ElevationLoss / vertSpeed_TimeLoss * 3600;
 
       final float prefFlatGainLoss_DPTolerance  = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_DP_TOLERANCE);
       final float prefFlatGainLoss_FlatGradient = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_FLAT_GRADIENT);
