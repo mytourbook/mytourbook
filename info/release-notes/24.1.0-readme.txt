@@ -1,4 +1,4 @@
-24.1.0                                                 ?. January 2024
+24.1.0                                                  27. January 2024
 
 
 New
@@ -19,10 +19,12 @@ New
 
 RECOMMENDATION
 
-It is recommended to use this workflow to speedup tour location retrieval and to avoid hundreds or more duplicated locations
+It is recommended to use this workflow to speedup tour location retrieval 
+and to avoid hundreds or more duplicated locations
   - Retrieve and set some locations where you often start/stop your tour, e.g. you at home
   - Combine duplicated locations with the "One" action in the "Locations" view context menu
-  - Resize (increase) location bounding box (action in context menu) to include similar locations when they are looked up
+  - Resize (increase) location bounding box (action in context menu) to include 
+    similar locations when they are looked up
   - Retrieve all other locations
 
 * All Tour Markers View (Frederic)
@@ -47,7 +49,8 @@ Improvements
   - Sync map with tour locations
 
 * Tour Blog (Frederic)
-  -Improved the detection of http links in the tour description to make them clickable by using a third party library
+  - Improved the detection of http links in the tour description to make 
+    them clickable by using a third party library
     https://github.com/URL-Detector/URL-Detector
     https://github.com/mytourbook/mytourbook/issues/1102
 
@@ -64,7 +67,8 @@ Improvements
     https://github.com/mytourbook/mytourbook/issues/1200
 
 * Tour Log View
-  - Customize when this view is opened automatically, exceptions will always show this view
+  - Customize when this view is opened automatically, exceptions will 
+    always show this view
     https://github.com/mytourbook/mytourbook/issues/1222 
     https://github.com/mytourbook/mytourbook/discussions/1210
         
@@ -73,15 +77,18 @@ Changes
 =======
 
 * Import
-  - "Open tour log view when starting a tour import" in the import preferences dialog is removed, now it can be set in the tour log view
+  - "Open tour log view when starting a tour import" in the import 
+    preferences dialog is removed, now it can be set in the tour log view
     https://github.com/mytourbook/mytourbook/issues/1222
 
 * Tour Search
-  - The options dialog can be opened only by clicking on its action button but not anymore when its hovered
+  - The options dialog can be opened only by clicking on its action button 
+    but not anymore when its hovered
     https://github.com/mytourbook/mytourbook/issues/1224
   
 * Tour Editor
-  - Tour save/restore actions are moved from the app toolbar into the tour editor toolbar
+  - Tour save/restore actions are moved from the app toolbar into the 
+    tour editor toolbar
     https://github.com/mytourbook/mytourbook/issues/1201
 
 * Tour Concatenation (Frederic)
