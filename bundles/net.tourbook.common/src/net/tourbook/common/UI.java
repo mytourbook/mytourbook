@@ -44,6 +44,7 @@ import net.tourbook.common.measurement_system.Unit_Temperature;
 import net.tourbook.common.measurement_system.Unit_Weight;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 
@@ -2621,7 +2622,7 @@ public class UI {
 
    public static String scrambleText(final String text) {
 
-      if (text == null) {
+      if (StringUtils.isNullOrEmpty(text)) {
          return text;
       }
 
