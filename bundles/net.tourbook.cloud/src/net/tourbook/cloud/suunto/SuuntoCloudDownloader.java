@@ -148,7 +148,11 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
       // Disable the person selector's combo so that the user doesn't launch a concurrent
       // download that could create issues by mixing different user's settings
-      PlatformUI.getWorkbench().getDisplay().asyncExec(() -> PersonManager.getPersonSelector().setEnabled(false));
+      PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+         try {
+            PersonManager.getPersonSelector().setEnabled(false);
+         } finally {}
+      });
 
       final TourPerson activePerson = TourbookPlugin.getActivePerson();
       _personName = activePerson == null
@@ -253,7 +257,11 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                });
             }
 
-            PlatformUI.getWorkbench().getDisplay().asyncExec(() -> PersonManager.getPersonSelector().setEnabled(true));
+            PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+               try {
+                  PersonManager.getPersonSelector().setEnabled(true);
+               } finally {}
+            });
          }
       });
    }
