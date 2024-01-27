@@ -38,7 +38,7 @@ public class PersonManager {
 
    private static ContributionItem_Person _contributionItem_PersonSelector;
 
-   public static ContributionItem_Person get_contributionItem_PersonSelector() {
+   public static ContributionItem_Person getPersonSelector() {
       return _contributionItem_PersonSelector;
    }
 
