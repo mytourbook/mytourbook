@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -21,6 +21,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import net.tourbook.Messages;
+import net.tourbook.application.ContributionItem_Person;
 import net.tourbook.data.TourPerson;
 import net.tourbook.ui.UI;
 
@@ -29,117 +30,126 @@ import org.eclipse.swt.widgets.Display;
 
 public class PersonManager {
 
-	private static PersonManager			_instance;
+   private static PersonManager           _instance;
 
-	private static ArrayList<TourPerson>	_people	= null;
+   private static ArrayList<TourPerson>   _people = null;
 
-	private static final Object				LOCK	= new Object();
+   private static final Object            LOCK    = new Object();
 
-	public static PersonManager getInstance() {
+   private static ContributionItem_Person _contributionItem_PersonSelector;
 
-		if (_instance != null) {
-			return _instance;
-		}
+   public static ContributionItem_Person getPersonSelector() {
+      return _contributionItem_PersonSelector;
+   }
 
-		synchronized (LOCK) {
-			// check again
-			if (_instance == null) {
-				_instance = new PersonManager();
-			}
-		}
+   public static PersonManager getInstance() {
 
-		return _instance;
-	}
+      if (_instance != null) {
+         return _instance;
+      }
 
-	@SuppressWarnings("unchecked")
-	private static void getPeopleFromDb() {
+      synchronized (LOCK) {
+         // check again
+         if (_instance == null) {
+            _instance = new PersonManager();
+         }
+      }
 
-		if (_people != null) {
-			_people.clear();
-		}
+      return _instance;
+   }
 
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-		if (em != null) {
+   @SuppressWarnings("unchecked")
+   private static void getPeopleFromDb() {
 
-			final Query emQuery = em.createQuery(//
-					//
-					"SELECT TourPerson" //$NON-NLS-1$
-							//
-							+ (" FROM TourPerson AS TourPerson") //$NON-NLS-1$
-							+ (" ORDER BY TourPerson.lastName, TourPerson.firstName")); //$NON-NLS-1$
+      if (_people != null) {
+         _people.clear();
+      }
 
-			_people = (ArrayList<TourPerson>) emQuery.getResultList();
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      if (em != null) {
 
-			em.close();
-		}
-	}
+         final Query emQuery = em.createQuery(//
+               //
+               "SELECT TourPerson" //$NON-NLS-1$
+                     //
+                     + (" FROM TourPerson AS TourPerson") //$NON-NLS-1$
+                     + (" ORDER BY TourPerson.lastName, TourPerson.firstName")); //$NON-NLS-1$
 
-	/**
-	 * @param personId
-	 * @return Returns the person name (first + last) for the person id or an empty string when
-	 *         person is not available
-	 */
-	public static String getPersonName(final long personId) {
+         _people = (ArrayList<TourPerson>) emQuery.getResultList();
 
-		ArrayList<TourPerson> people = _people;
+         em.close();
+      }
+   }
 
-		if (people != null) {
-			people = getTourPeople();
-		}
+   /**
+    * @param personId
+    *
+    * @return Returns the person name (first + last) for the person id or an empty string when
+    *         person is not available
+    */
+   public static String getPersonName(final long personId) {
 
-		for (final TourPerson tourPerson : people) {
-			if (tourPerson.getPersonId() == personId) {
-				return tourPerson.getName();
-			}
-		}
+      ArrayList<TourPerson> people = _people;
 
-		return UI.EMPTY_STRING;
-	}
+      if (people != null) {
+         people = getTourPeople();
+      }
 
-	/**
-	 * @return Returns all tour people in the db sorted by last/first name
-	 */
-	public static ArrayList<TourPerson> getTourPeople() {
+      for (final TourPerson tourPerson : people) {
+         if (tourPerson.getPersonId() == personId) {
+            return tourPerson.getName();
+         }
+      }
 
-		if (_people != null) {
-			return _people;
-		}
+      return UI.EMPTY_STRING;
+   }
 
-		synchronized (LOCK) {
-			// check again
-			if (_people != null) {
-				return _people;
-			}
-			getPeopleFromDb();
-		}
+   /**
+    * @return Returns all tour people in the db sorted by last/first name
+    */
+   public static ArrayList<TourPerson> getTourPeople() {
 
-		return _people;
-	}
+      if (_people != null) {
+         return _people;
+      }
 
-	/**
-	 * Checks if a person is available in the application.
-	 * 
-	 * @return Returns <code>true</code> when a person is available in the applications. When a
-	 *         person is not available, an error message is displayed and <code>false</code> is
-	 *         returned.
-	 */
-	public static boolean isPersonAvailable() {
+      synchronized (LOCK) {
+         // check again
+         if (_people != null) {
+            return _people;
+         }
+         getPeopleFromDb();
+      }
 
-		final boolean isPersonAvailable = getTourPeople().size() > 0;
+      return _people;
+   }
 
-		if (isPersonAvailable == false) {
+   /**
+    * Checks if a person is available in the application.
+    *
+    * @return Returns <code>true</code> when a person is available in the applications. When a
+    *         person is not available, an error message is displayed and <code>false</code> is
+    *         returned.
+    */
+   public static boolean isPersonAvailable() {
 
-			MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
-					Messages.Dialog_PersonManager_PersonIsNotAvailable_Title,
-					Messages.Dialog_PersonManager_PersonIsNotAvailable_Message);
+      if (getTourPeople().isEmpty()) {
 
-			return false;
-		}
+         MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
+               Messages.Dialog_PersonManager_PersonIsNotAvailable_Title,
+               Messages.Dialog_PersonManager_PersonIsNotAvailable_Message);
 
-		return true;
-	}
+         return false;
+      }
 
-	public static void refreshPeople() {
-		getPeopleFromDb();
-	}
+      return true;
+   }
+
+   public static void refreshPeople() {
+      getPeopleFromDb();
+   }
+
+   public static void set_ContributionItem_PersonSelector(final ContributionItem_Person _contribItem_PersonSelector) {
+      PersonManager._contributionItem_PersonSelector = _contribItem_PersonSelector;
+   }
 }

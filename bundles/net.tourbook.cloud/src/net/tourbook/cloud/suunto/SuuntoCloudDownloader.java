@@ -49,6 +49,7 @@ import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourPerson;
+import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.download.TourbookCloudDownloader;
 import net.tourbook.tour.TourLogManager;
@@ -144,6 +145,14 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             return;
          }
       }
+
+      // Disable the person selector's combo so that the user doesn't launch a concurrent
+      // download that could create issues by mixing different user's settings
+      PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+         try {
+            PersonManager.getPersonSelector().setEnabled(false);
+         } finally {}
+      });
 
       final TourPerson activePerson = TourbookPlugin.getActivePerson();
       _personName = activePerson == null
@@ -247,6 +256,12 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                         infoText);
                });
             }
+
+            PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+               try {
+                  PersonManager.getPersonSelector().setEnabled(true);
+               } finally {}
+            });
          }
       });
    }

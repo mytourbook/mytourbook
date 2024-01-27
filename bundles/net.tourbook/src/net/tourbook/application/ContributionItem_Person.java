@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.application;
+
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 
@@ -30,12 +32,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -60,7 +57,7 @@ public class ContributionItem_Person extends CustomControlContribution {
       this(ID);
    }
 
-   protected ContributionItem_Person(final String id) {
+   private ContributionItem_Person(final String id) {
       super(id);
    }
 
@@ -69,27 +66,24 @@ public class ContributionItem_Person extends CustomControlContribution {
     */
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
 
-               // fill people combobox with modified people list
-               fillPeopleComboBox();
+            // fill people combobox with modified people list
+            fillPeopleComboBox();
 
-               final TourPerson currentPerson = TourbookPlugin.getActivePerson();
+            final TourPerson currentPerson = TourbookPlugin.getActivePerson();
 
-               // reselect the person which was selected before
-               if (currentPerson == null) {
-                  _cboPeople.select(0);
-               } else {
-                  // try to set and select the old person
-                  final long previousPersonId = currentPerson.getPersonId();
-                  reselectPerson(previousPersonId);
-               }
+            // reselect the person which was selected before
+            if (currentPerson == null) {
+               _cboPeople.select(0);
+            } else {
+               // try to set and select the old person
+               final long previousPersonId = currentPerson.getPersonId();
+               reselectPerson(previousPersonId);
             }
          }
       };
@@ -132,21 +126,13 @@ public class ContributionItem_Person extends CustomControlContribution {
       _cboPeople.setVisibleItemCount(20);
       _cboPeople.setToolTipText(Messages.App_People_tooltip);
 
-      _cboPeople.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            if (_prefChangeListener != null) {
-               _prefStore.removePropertyChangeListener(_prefChangeListener);
-            }
+      _cboPeople.addDisposeListener(disposeEvent -> {
+         if (_prefChangeListener != null) {
+            _prefStore.removePropertyChangeListener(_prefChangeListener);
          }
       });
 
-      _cboPeople.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSelectPerson();
-         }
-      });
+      _cboPeople.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectPerson()));
 
       fillPeopleComboBox();
 
@@ -274,6 +260,10 @@ public class ContributionItem_Person extends CustomControlContribution {
       if (peopleCount > 1) {
          _cboPeople.select(1);
       }
+   }
+
+   public void setEnabled(final boolean isEnabled) {
+      _cboPeople.setEnabled(isEnabled);
    }
 
 }
