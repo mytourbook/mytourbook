@@ -413,7 +413,7 @@ class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       _actionContribItem_Preferences = new ActionContributionItem(_actionPreferences);
       _actionContribItem_Preferences.setVisible(isOSX == false);
 
-      PersonManager.set_ContributionItem_PersonSelector(_contribItem_PersonSelector);
+      PersonManager.setPersonSelector(_contribItem_PersonSelector);
    }
 
 }

@@ -585,15 +585,14 @@ public class TourBlogView extends ViewPart {
 
             sb.append("<div class='blog-item'>"); //$NON-NLS-1$
             {
-               /*
-                * Tour title
-                */
                if (UI.IS_SCRAMBLE_DATA) {
                   tourTitle = UI.scrambleText(tourTitle);
                }
 
+               /*
+                * Edit action
+                */
                final String hoverEdit = WEB.escapeSingleQuote(NLS.bind(Messages.Tour_Blog_Action_EditTour_Tooltip, tourTitle));
-
                final String hrefEditTour = HTTP_DUMMY + HREF_EDIT_TOUR;
 
                sb.append(UI.EMPTY_STRING +
@@ -608,6 +607,9 @@ public class TourBlogView extends ViewPart {
                                  + "</a>") //                                       //$NON-NLS-1$
                            + "   </div>" + NL)); //                                   //$NON-NLS-1$
 
+               /*
+                * Tour title
+                */
                if (isTitle) {
                   sb.append("<span class='blog-title'>" + tourTitle + "</span>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
                }

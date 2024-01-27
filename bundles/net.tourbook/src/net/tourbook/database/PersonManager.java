@@ -32,15 +32,11 @@ public class PersonManager {
 
    private static PersonManager           _instance;
 
-   private static ArrayList<TourPerson>   _people = null;
+   private static ArrayList<TourPerson>   _people;
 
-   private static final Object            LOCK    = new Object();
+   private static final Object            LOCK = new Object();
 
-   private static ContributionItem_Person _contributionItem_PersonSelector;
-
-   public static ContributionItem_Person getPersonSelector() {
-      return _contributionItem_PersonSelector;
-   }
+   private static ContributionItem_Person _personSelector;
 
    public static PersonManager getInstance() {
 
@@ -104,6 +100,11 @@ public class PersonManager {
       return UI.EMPTY_STRING;
    }
 
+   public static ContributionItem_Person getPersonSelector() {
+
+      return _personSelector;
+   }
+
    /**
     * @return Returns all tour people in the db sorted by last/first name
     */
@@ -135,7 +136,7 @@ public class PersonManager {
 
       if (getTourPeople().isEmpty()) {
 
-         MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
+         MessageDialog.openInformation(Display.getDefault().getActiveShell(),
                Messages.Dialog_PersonManager_PersonIsNotAvailable_Title,
                Messages.Dialog_PersonManager_PersonIsNotAvailable_Message);
 
@@ -149,7 +150,8 @@ public class PersonManager {
       getPeopleFromDb();
    }
 
-   public static void set_ContributionItem_PersonSelector(final ContributionItem_Person _contribItem_PersonSelector) {
-      PersonManager._contributionItem_PersonSelector = _contribItem_PersonSelector;
+   public static void setPersonSelector(final ContributionItem_Person personSelector) {
+
+      _personSelector = personSelector;
    }
 }
