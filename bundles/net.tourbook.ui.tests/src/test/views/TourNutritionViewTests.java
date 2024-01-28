@@ -48,7 +48,7 @@ public class TourNutritionViewTests extends UITest {
 
       tourNutritionView.show();
 
-      final SWTBotTable productsTable = tourNutritionView.bot().table();
+      SWTBotTable productsTable = tourNutritionView.bot().table();
 
       // Assert initial state
       final int initialTableRowCount = productsTable.rowCount();
@@ -90,8 +90,10 @@ public class TourNutritionViewTests extends UITest {
       assertEquals(initialTableRowCount + 2, productsTable.rowCount());
 
       // Act
+      productsTable = tourNutritionView.bot().table();
       productsTable.select(0);
       bot.button(Messages.PrefPage_TourBeverageContainers_Button_Delete).click();
+      productsTable = tourNutritionView.bot().table();
       productsTable.select(0);
       bot.button(Messages.PrefPage_TourBeverageContainers_Button_Delete).click();
 
