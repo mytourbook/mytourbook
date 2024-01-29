@@ -431,6 +431,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       final DialogBeverageContainer dialogBeverageContainer = new DialogBeverageContainer(getShell());
 
       // get the new values from the dialog
+      //todo fb ?
       if (dialogBeverageContainer.open() != Window.OK) {
          // ask for the tour type name
 //      final InputDialog inputDialog = new InputDialog(
