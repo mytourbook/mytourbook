@@ -30,7 +30,7 @@ public class TourBeverageContainer {
 
    /**
     * Created container create a unique id to identify them, saved containers
-    * are compared with the marker id
+    * are compared with the containerId
     */
    private static final AtomicInteger _createCounter = new AtomicInteger();
 
@@ -43,8 +43,7 @@ public class TourBeverageContainer {
 
    /**
     * Unique id for created containers because the {@link #containerId} is 0 when the
-    * containerId is
-    * not persisted
+    * containerId is not persisted
     */
    @Transient
    private long                       _createId      = 0;
@@ -72,17 +71,12 @@ public class TourBeverageContainer {
       if (this == obj) {
          return true;
       }
-      if (obj == null) {
-         return false;
-      }
       if (!(obj instanceof TourBeverageContainer)) {
          return false;
       }
       final TourBeverageContainer other = (TourBeverageContainer) obj;
-      if (containerId != other.containerId) {
-         return false;
-      }
-      return true;
+
+      return containerId == other.containerId;
    }
 
    public float getCapacity() {
