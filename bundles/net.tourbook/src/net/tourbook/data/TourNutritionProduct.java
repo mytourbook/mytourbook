@@ -209,7 +209,7 @@ public class TourNutritionProduct {
             if (quantity.trim().toUpperCase().endsWith("L")) {
 
                beverageQuantity = Integer.valueOf(productQuantity);
-               beverageQuantity_Serving = Integer.valueOf(servingQuantity.trim());
+               setBeverageQuantity_Serving(Integer.valueOf(servingQuantity.trim()));
             }
 
          }
@@ -367,6 +367,10 @@ public class TourNutritionProduct {
       productId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
       tourData = tourDataFromClone;
+   }
+
+   public void setBeverageQuantity_Serving(final int beverageQuantity_Serving) {
+      this.beverageQuantity_Serving = beverageQuantity_Serving;
    }
 
 }
