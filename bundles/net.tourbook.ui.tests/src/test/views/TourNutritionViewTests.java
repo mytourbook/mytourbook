@@ -90,14 +90,13 @@ public class TourNutritionViewTests extends UITest {
       assertEquals(initialTableRowCount + 2, productsTable.rowCount());
 
       // Act
-      //todo fb to fix sync error
-      productsTable.select(0);
+      productsTable.click(0, 2);
       bot.button(Messages.Tour_Nutrition_Button_DeleteProduct).click();
-      productsTable.select(0);
+      productsTable.click(0, 2);
       bot.button(Messages.Tour_Nutrition_Button_DeleteProduct).click();
-//
-//      // Assert
-//      // Make sure that the table doesn't contain any products
+
+      // Assert
+      // Make sure that the table doesn't contain any products
       assertTrue(productsTable.rowCount() == 0);
 
       final SWTBotTreeItem tour = Utils.selectDuplicatedTour(bot);
