@@ -162,8 +162,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
       // data contains the folder index, this is set when the pref page is opened from a link
 
-      if (data instanceof Integer) {
-         _tabFolder.setSelection((Integer) data);
+      if (_tabFolder == null) {
+         return;
+      }
+
+      if (data instanceof final Integer intValue) {
+         _tabFolder.setSelection(intValue);
       }
    }
 
