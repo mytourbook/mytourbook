@@ -57,7 +57,7 @@ jobs:
           echo "artifactFileName=$FILENAME" | Out-File -FilePath $env:GITHUB_ENV -Append
       - name: Upload JaCoCo file
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.artifactFileName }}
           path: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
