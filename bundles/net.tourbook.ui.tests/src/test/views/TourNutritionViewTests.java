@@ -91,16 +91,14 @@ public class TourNutritionViewTests extends UITest {
 
       // Act
       //todo fb to fix sync error
-//      productsTable = tourNutritionView.bot().table();
-//      productsTable.select(0);
-//      bot.button(Messages.PrefPage_TourBeverageContainers_Button_Delete).click();
-//      productsTable = tourNutritionView.bot().table();
-//      productsTable.select(0);
-//      bot.button(Messages.PrefPage_TourBeverageContainers_Button_Delete).click();
+      productsTable.select(0);
+      bot.button(Messages.Tour_Nutrition_Button_DeleteProduct).click();
+      productsTable.select(0);
+      bot.button(Messages.Tour_Nutrition_Button_DeleteProduct).click();
 //
 //      // Assert
 //      // Make sure that the table doesn't contain any products
-//      assertTrue(productsTable.rowCount() == 0);
+      assertTrue(productsTable.rowCount() == 0);
 
       final SWTBotTreeItem tour = Utils.selectDuplicatedTour(bot);
       Utils.deleteTour(bot, tour);
