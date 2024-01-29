@@ -71,9 +71,9 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
             _chkIgnoreFirstHour = new Button(container, SWT.CHECK);
             _chkIgnoreFirstHour.setText(Messages.PrefPage_Nutrition_Checkbox_IgnoreFirstHour);
             _chkIgnoreFirstHour.setToolTipText(Messages.PrefPage_Nutrition_Checkbox_IgnoreFirstHour_Tooltip);
-            //todo fb Tooltip
             _chkIgnoreFirstHour.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
                //todo fb
+               //fire event to refresh the tour nutrition view
             }));
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_chkIgnoreFirstHour);
          }
