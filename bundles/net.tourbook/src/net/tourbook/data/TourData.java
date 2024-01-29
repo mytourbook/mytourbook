@@ -6356,7 +6356,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          tourPhoto.setupDeepClone(tourData_DeepCopy);
       }
 
-      //todo fb deepclone to also clone beverage containers
       for (final TourNutritionProduct tourNutritionProduct : tourData_DeepCopy.tourNutritionProducts) {
          tourNutritionProduct.setupDeepClone(tourData_DeepCopy);
       }
@@ -12690,6 +12689,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       resetSortedMarkers();
    }
 
+   public void setTourNutritionProducts(final Set<TourNutritionProduct> tourNutritionProducts) {
+      this.tourNutritionProducts = tourNutritionProducts;
+   }
+
    /**
     * Sets the {@link TourPerson} for the tour or <code>null</code> when the tour is not saved in
     * the database
@@ -13694,9 +13697,5 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          pausedTime_Start[index] += startTimeOffset;
          pausedTime_End[index] += startTimeOffset;
       }
-   }
-
-   public void setTourNutritionProducts(final Set<TourNutritionProduct> tourNutritionProducts) {
-      this.tourNutritionProducts = tourNutritionProducts;
    }
 }
