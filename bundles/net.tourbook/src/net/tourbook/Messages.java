@@ -511,6 +511,7 @@ public class Messages extends NLS {
    public static String        Dialog_CustomTourNutritionProduct_Label_Name;
    public static String        Dialog_CustomTourNutritionProduct_Label_NumberServings;
    public static String        Dialog_CustomTourNutritionProduct_Label_Sodium;
+   public static String        Dialog_CustomTourNutritionProduct_Title;
 
    public static String        Dialog_DatabaseAction_Confirmation_Message;
    public static String        Dialog_DatabaseAction_Confirmation_Title;

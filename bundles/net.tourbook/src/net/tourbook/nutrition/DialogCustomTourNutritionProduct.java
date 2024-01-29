@@ -19,11 +19,13 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -47,24 +49,33 @@ public class DialogCustomTourNutritionProduct extends Dialog {
    //todo fb add the possibility to add custom products (i.e: water...)
 // => Manually with a dialog that asks the name, calories, sodium, is beverage (if yes, ungray the beverage qtty)
 
-   private int _beverageQuantity;
-
+   private int            _beverageQuantity;
    /*
     * UI controls
     */
    private boolean        _isInUIInit;
    private PixelConverter _pc;
-
    //todo fb disable the add button if the field validation is not correct
-   private Button  _checkIsBeverage;
-   private Spinner _spinnerNumServings;
-   private Spinner _spinnerBeverageQuantity;
-   private Text    _txtCalories;
-   private Text    _txtName;
-   private Text    _txtSodium;
+   private Button         _checkIsBeverage;
+
+   private Spinner        _spinnerNumServings;
+   private Spinner        _spinnerBeverageQuantity;
+   private Text           _txtCalories;
+   private Text           _txtName;
+   private Text           _txtSodium;
 
    public DialogCustomTourNutritionProduct(final Shell parentShell) {
       super(parentShell);
+   }
+
+   @Override
+   public void create() {
+
+      super.create();
+
+      getShell().setText(Messages.Dialog_CustomTourNutritionProduct_Title);
+
+      validateFields();
    }
 
    @Override
@@ -102,7 +113,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .applyTo(_txtName);
             _txtName.addModifyListener(e -> {
 
-               // validateFields();
+               validateFields();
 
                final Text textWidget = (Text) e.getSource();
                final String userText = textWidget.getText();
@@ -129,7 +140,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   return;
                }
 
-//            validateFields();
+               validateFields();
 //            onCapacityModified();
             }));
             _spinnerNumServings.addModifyListener(event -> {
@@ -138,14 +149,14 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   return;
                }
 
-//            validateFields();
+               validateFields();
 //            onCapacityModified();
             });
             _spinnerNumServings.addMouseWheelListener(mouseEvent -> {
 
                Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
 
-//            validateFields();
+               validateFields();
 //            onCapacityModified();
             });
          }
@@ -161,7 +172,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .applyTo(_txtCalories);
             _txtCalories.addModifyListener(e -> {
 
-               // validateFields();
+               validateFields();
 
                final Text textWidget = (Text) e.getSource();
                final String userText = textWidget.getText();
@@ -186,7 +197,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .applyTo(_txtSodium);
             _txtSodium.addModifyListener(e -> {
 
-               // validateFields();
+               validateFields();
 
                final Text textWidget = (Text) e.getSource();
                final String userText = textWidget.getText();
@@ -204,6 +215,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_IsBeverage);
 
             _checkIsBeverage = new Button(container, SWT.CHECK);
+            _checkIsBeverage.setEnabled(false);
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .align(SWT.BEGINNING, SWT.CENTER)
@@ -214,6 +226,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_BeverageQuantity);
 
             _spinnerBeverageQuantity = new Spinner(container, SWT.BORDER);
+            _spinnerBeverageQuantity.setEnabled(false);
             GridDataFactory.fillDefaults()
                   .hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
@@ -222,6 +235,14 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             // Unit: L
             UI.createLabel(container, UI.UNIT_FLUIDS_L);
          }
+      }
+   }
+
+   private void enableOK(final boolean isEnabled) {
+
+      final Button okButton = getButton(IDialogConstants.OK_ID);
+      if (okButton != null) {
+         okButton.setEnabled(isEnabled);
       }
    }
 
@@ -259,14 +280,24 @@ public class DialogCustomTourNutritionProduct extends Dialog {
    protected void okPressed() {
 
       _name = _txtName.getText();
-      _beverageQuantity = _spinnerBeverageQuantity.getSelection();
       _numServings = (int) Math.round(_spinnerNumServings.getSelection() / 100.0);
       _calories = Integer.valueOf(_txtCalories.getText());
       _sodium = Integer.valueOf(_txtSodium.getText());
       _isBeverage = _checkIsBeverage.getSelection();
-      _beverageQuantity = Integer.valueOf(_spinnerBeverageQuantity.getText());
+      _beverageQuantity = _spinnerBeverageQuantity.getSelection();
 
       super.okPressed();
    }
 
+   private void validateFields() {
+
+      if (_isInUIInit) {
+         return;
+      }
+
+      final boolean isCustomTourNutritionProductValid = StringUtils.hasContent(_txtName.getText()) &&
+            _calories > 0 &&
+            _sodium > 0;
+      enableOK(isCustomTourNutritionProductValid);
+   }
 }

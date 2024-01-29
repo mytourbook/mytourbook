@@ -177,7 +177,6 @@ public class TourNutritionProduct {
     * number of servings per products.
     *
     * @param product
-    * @param nutriments
     *
     * @return
     */
