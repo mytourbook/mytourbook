@@ -97,11 +97,11 @@ class DialogBeverageContainer extends Dialog {
                .applyTo(_txtName);
          _txtName.addModifyListener(e -> {
 
-            validateFields();
-
             final Text textWidget = (Text) e.getSource();
             final String userText = textWidget.getText();
             _name = userText;
+
+            validateFields();
          });
 
          // Label: container capacity
@@ -117,29 +117,12 @@ class DialogBeverageContainer extends Dialog {
          _spinnerCapacity.setDigits(2);
          _spinnerCapacity.addMouseWheelListener(mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent));
          _spinnerCapacity.setSelection(Math.round(_capacity * 100));
-         _spinnerCapacity.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-
-            if (_isInUIInit) {
-               return;
-            }
-
-            validateFields();
-            onCapacityModified();
-         }));
-         _spinnerCapacity.addModifyListener(event -> {
-
-            if (_isInUIInit) {
-               return;
-            }
-
-            validateFields();
-            onCapacityModified();
-         });
+         _spinnerCapacity.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCapacityModified()));
+         _spinnerCapacity.addModifyListener(event -> validateFields());
          _spinnerCapacity.addMouseWheelListener(mouseEvent -> {
 
             Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
 
-            validateFields();
             onCapacityModified();
          });
 
@@ -165,7 +148,14 @@ class DialogBeverageContainer extends Dialog {
    }
 
    private void onCapacityModified() {
+
+      if (_isInUIInit) {
+         return;
+      }
+
       _capacity = _spinnerCapacity.getSelection() / 100f;
+
+      validateFields();
    }
 
    public void setCapacity(final float capacity) {

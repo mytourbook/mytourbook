@@ -132,30 +132,13 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             _spinnerNumServings.setDigits(2);
             _spinnerNumServings.addMouseWheelListener(mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent));
             _spinnerNumServings.setSelection(_numServings * 100);
-            _spinnerNumServings.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-
-               if (_isInUIInit) {
-                  return;
-               }
-
-               onCapacityModified();
-               validateFields();
-            }));
-            _spinnerNumServings.addModifyListener(event -> {
-
-               if (_isInUIInit) {
-                  return;
-               }
-
-               onCapacityModified();
-               validateFields();
-            });
+            _spinnerNumServings.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCapacityModified()));
+            _spinnerNumServings.addModifyListener(event -> onCapacityModified());
             _spinnerNumServings.addMouseWheelListener(mouseEvent -> {
 
                Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
 
                onCapacityModified();
-               validateFields();
             });
          }
          {
@@ -235,29 +218,12 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             _spinnerBeverageQuantity.setMaximum(10000);
             _spinnerBeverageQuantity.setDigits(2);
             _spinnerBeverageQuantity.setEnabled(false);
-            _spinnerBeverageQuantity.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-
-               if (_isInUIInit) {
-                  return;
-               }
-
-               validateFields();
-               onBeverageQuantityModified();
-            }));
-            _spinnerBeverageQuantity.addModifyListener(event -> {
-
-               if (_isInUIInit) {
-                  return;
-               }
-
-               validateFields();
-               onBeverageQuantityModified();
-            });
+            _spinnerBeverageQuantity.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onBeverageQuantityModified()));
+            _spinnerBeverageQuantity.addModifyListener(event -> onBeverageQuantityModified());
             _spinnerBeverageQuantity.addMouseWheelListener(mouseEvent -> {
 
                Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
 
-               validateFields();
                onBeverageQuantityModified();
             });
             GridDataFactory.fillDefaults()
@@ -277,10 +243,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       if (okButton != null) {
          okButton.setEnabled(isEnabled);
       }
-   }
-
-   public float get_beverageQuantity() {
-      return _beverageQuantity;
    }
 
    public String getName() {
@@ -326,11 +288,25 @@ public class DialogCustomTourNutritionProduct extends Dialog {
    }
 
    private void onBeverageQuantityModified() {
+
+      if (_isInUIInit) {
+         return;
+      }
+
       _beverageQuantity = _spinnerBeverageQuantity.getSelection();
+
+      validateFields();
    }
 
    private void onCapacityModified() {
+
+      if (_isInUIInit) {
+         return;
+      }
+
       _numServings = _spinnerNumServings.getSelection();
+
+      validateFields();
    }
 
    private void validateFields() {
