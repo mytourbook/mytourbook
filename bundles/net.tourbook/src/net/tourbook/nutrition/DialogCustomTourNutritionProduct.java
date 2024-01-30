@@ -317,10 +317,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       final boolean isBeverage = _checkIsBeverage.getSelection();
 
       final boolean isCustomTourNutritionProductValid = StringUtils.hasContent(_txtName.getText()) &&
-            _calories > 0 &&
-            _sodium > 0 &&
-            (!isBeverage ||
-                  _beverageQuantity > 0);
+            (!isBeverage || _beverageQuantity > 0);
       enableOK(isCustomTourNutritionProductValid);
    }
 }
