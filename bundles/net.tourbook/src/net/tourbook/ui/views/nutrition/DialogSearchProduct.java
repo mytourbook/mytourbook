@@ -514,7 +514,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       _comboSearchType.setEnabled(false);
       _lblSearchType.setEnabled(false);
 
-      final String searchText = _comboSearchQuery.getText();
+      String searchText = _comboSearchQuery.getText();
 
       // remove same search text
       if (_searchHistory.contains(searchText) == false) {
@@ -527,7 +527,12 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       }
 
       // start product search
-      _nutritionQuery.asyncFind(searchText, getProductSearchType());
+      final ProductSearchType productSearchType = getProductSearchType();
+      if (productSearchType == ProductSearchType.ByCode &&
+            searchText.length() < 12) {
+         searchText = StringUtils.leftPad(searchText, 12, '0');
+      }
+      _nutritionQuery.asyncFind(searchText, productSearchType);
    }
 
    @Override
