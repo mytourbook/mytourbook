@@ -138,8 +138,8 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   return;
                }
 
-               validateFields();
                onCapacityModified();
+               validateFields();
             }));
             _spinnerNumServings.addModifyListener(event -> {
 
@@ -147,15 +147,15 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   return;
                }
 
-               validateFields();
                onCapacityModified();
+               validateFields();
             });
             _spinnerNumServings.addMouseWheelListener(mouseEvent -> {
 
                Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
 
-               validateFields();
                onCapacityModified();
+               validateFields();
             });
          }
          {
@@ -170,14 +170,14 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .applyTo(_txtCalories);
             _txtCalories.addModifyListener(e -> {
 
-               validateFields();
-
                final Text textWidget = (Text) e.getSource();
                final String userText = textWidget.getText();
                if (UI.verifyIntegerValue(userText)) {
 
                   _calories = Integer.parseInt(userText);
                }
+
+               validateFields();
             });
 
             // Unit: kcal
@@ -195,14 +195,14 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .applyTo(_txtSodium);
             _txtSodium.addModifyListener(e -> {
 
-               validateFields();
-
                final Text textWidget = (Text) e.getSource();
                final String userText = textWidget.getText();
                if (UI.verifyIntegerValue(userText)) {
 
                   _sodium = Integer.parseInt(userText);
                }
+
+               validateFields();
             });
 
             // Unit: mg
