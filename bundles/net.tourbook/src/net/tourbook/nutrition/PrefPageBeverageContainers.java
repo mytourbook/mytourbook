@@ -21,7 +21,6 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.Images;
@@ -71,11 +70,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    private final IPreferenceStore      _prefStore         = TourbookPlugin.getPrefStore();
 
-   private List<TourBeverageContainer> _dbTourTypes;
-
-   /**
-    * This is the model of the tour type viewer.
-    */
    private List<TourBeverageContainer> _beverageContainers;
 
    private boolean                     _isModified;
@@ -163,21 +157,8 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       //fillUI();
 
-      // read tour types from the database
-      _dbTourTypes = TourDatabase.getTourBeverageContainers();
-
-      /*
-       * create color definitions for all tour types
-       */
-      _beverageContainers = new ArrayList<>();
-
-      if (_dbTourTypes != null) {
-
-         for (final TourBeverageContainer tourType : _dbTourTypes) {
-
-            _beverageContainers.add(tourType);
-         }
-      }
+      // read beverage containers from the database
+      _beverageContainers = TourDatabase.getTourBeverageContainers();
 
       enableActions();
 
@@ -459,10 +440,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          // update model
          _beverageContainers.add(savedTourBeverageContainer);
 
-         // update internal tour type list
-         _dbTourTypes.add(savedTourBeverageContainer);
-         //  Collections.sort(_dbTourTypes);
-
          // update UI
          _tourBeverageContainerViewer.add(savedTourBeverageContainer);
 
@@ -503,9 +480,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
          // remove entity from the db
          if (deleteTourBeverageContainer(selectedTourBeverageContainer)) {
-
-            // update model
-            _dbTourTypes.remove(selectedTourBeverageContainer);
 
             // update UI
             _tourBeverageContainerViewer.remove(selectedTourBeverageContainer);
