@@ -500,6 +500,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       _graphImages.values().forEach(image -> image.dispose());
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+
+      _nutritionQuery.removePropertyChangeListener(this);
    }
 
    private void onSearchProduct() {
