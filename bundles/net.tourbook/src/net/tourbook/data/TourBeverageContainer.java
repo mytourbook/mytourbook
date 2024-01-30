@@ -61,8 +61,8 @@ public class TourBeverageContainer {
 
       _createId = _createCounter.incrementAndGet();
 
-      this.name = name;
-      this.capacity = capacity;
+      this.setName(name);
+      this.setCapacity(capacity);
    }
 
    @Override
@@ -89,5 +89,13 @@ public class TourBeverageContainer {
 
    public String getName() {
       return name;
+   }
+
+   public void setName(final String name) {
+      this.name = name;
+   }
+
+   public void setCapacity(final float capacity) {
+      this.capacity = capacity;
    }
 }

@@ -418,8 +418,9 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       }
 
       // get the new values from the dialog
-      final String name = dialogBeverageContainer.get_name().trim();
-      final float capacity = dialogBeverageContainer.get_capacity();
+      //todo fb trim in the dialog class
+      final String name = dialogBeverageContainer.getName().trim();
+      final float capacity = dialogBeverageContainer.getCapacity();
 
       // create new tour type
       final TourBeverageContainer newTourBeverageContainer = new TourBeverageContainer(name, capacity);
@@ -434,7 +435,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
          // update UI
          _tourBeverageContainerViewer.add(savedTourBeverageContainer);
-
          _tourBeverageContainerViewer.setSelection(new StructuredSelection(savedTourBeverageContainer), true);
 
          _isModified = true;
@@ -490,51 +490,34 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       final TourBeverageContainer selectedBeverageContainer = (TourBeverageContainer) structuredSelection.getFirstElement();
 
       final DialogBeverageContainer dialogBeverageContainer = new DialogBeverageContainer(getShell());
-      dialogBeverageContainer.set_name(selectedBeverageContainer.getName());
-      dialogBeverageContainer.set_capacity(selectedBeverageContainer.getCapacity());
-      dialogBeverageContainer.open();
-      return;
+      dialogBeverageContainer.setName(selectedBeverageContainer.getName());
+      dialogBeverageContainer.setCapacity(selectedBeverageContainer.getCapacity());
 
-//      final TourType selectedTourType = selectedColorDefinition.getTourType();
-//
-//      // ask for the tour type name
-//      final InputDialog dialog = new InputDialog(
-//            getShell(),
-//            Messages.Pref_TourTypes_Dlg_rename_tour_type_title,
-//            NLS.bind(Messages.Pref_TourTypes_Dlg_rename_tour_type_msg, selectedTourType.getName()),
-//            selectedTourType.getName(),
-//            null);
-//
-//      if (dialog.open() != Window.OK) {
-//         setFocusToViewer();
-//         return;
-//      }
-//
-//      // update tour type name
-//      final String newTourTypeName = dialog.getValue();
-//
-//      selectedTourType.setName(newTourTypeName);
-//      selectedColorDefinition.setVisibleName(newTourTypeName);
-//
-//      // update entity in the db
-//      final TourBeverageContainer savedTourType;/// = saveTourBeverageContainer(selectedTourType);
+      if (dialogBeverageContainer.open() != Window.OK) {
+         setFocusToViewer();
+         return;
+      }
 
-//      if (savedTourType != null) {
-//
-//         // update model
-//         //   selectedColorDefinition.setTourType(savedTourType);
-//
-//         // replace tour type with new one
-//         _dbTourTypes.remove(selectedTourType);
-//         // _dbTourTypes.add(savedTourType);
-//
-//         // update viewer, resort types when necessary
-//         _tourBeverageContainerViewer.update(selectedColorDefinition, SORT_PROPERTY);
-//
-//         _isModified = true;
-//      }
+      // update tour beverage container
+      selectedBeverageContainer.setName(dialogBeverageContainer.getName());
+      selectedBeverageContainer.setCapacity(dialogBeverageContainer.getCapacity());
 
-      //  setFocusToViewer();
+      // update entity in the db
+      final TourBeverageContainer savedTourBeverageContainer = saveTourBeverageContainer(selectedBeverageContainer);
+
+      if (savedTourBeverageContainer != null) {
+
+         // update model
+         //   selectedColorDefinition.setTourType(savedTourType);
+
+         // replace tour type with new one
+         _beverageContainers.remove(selectedBeverageContainer);
+         _beverageContainers.add(savedTourBeverageContainer);
+
+         _isModified = true;
+      }
+
+      setFocusToViewer();
    }
 
    @Override

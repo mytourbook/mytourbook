@@ -156,11 +156,11 @@ class DialogBeverageContainer extends Dialog {
       }
    }
 
-   public float get_capacity() {
+   public float getCapacity() {
       return _capacity;
    }
 
-   public String get_name() {
+   public String getName() {
       return _name;
    }
 
@@ -168,11 +168,11 @@ class DialogBeverageContainer extends Dialog {
       _capacity = _spinnerCapacity.getSelection() / 100f;
    }
 
-   public void set_capacity(final float capacity) {
+   public void setCapacity(final float capacity) {
       _capacity = capacity;
    }
 
-   public void set_name(final String name) {
+   public void setName(final String name) {
       _name = name;
    }
 

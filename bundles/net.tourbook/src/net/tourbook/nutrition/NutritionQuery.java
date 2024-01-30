@@ -84,6 +84,7 @@ public class NutritionQuery implements Runnable {
 
          _searchResult.clear();
 
+         //todo fb is it possible to put a timeout incase the OFF server doesn't response. otherwise the UI is frozen
          final List<Product> searchProductResults = NutritionUtils.searchProduct(_searchText, _productSearchType);
 
          _searchResult.addAll(searchProductResults);
