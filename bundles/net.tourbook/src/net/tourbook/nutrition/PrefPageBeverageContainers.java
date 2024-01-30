@@ -198,6 +198,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       beverageContainersTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       beverageContainersTable.setHeaderVisible(true);
 
+      //todo fb
       final String[] tableColumns = { "Name", "Capacity" };
 
       defineAllColumns(beverageContainersTable, tableColumns);
