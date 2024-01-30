@@ -325,7 +325,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       {
          {
             /*
-             * combo: search
+             * combo: Text search
              */
             _comboSearchQuery = new Combo(queryContainer, SWT.NONE);
             _comboSearchQuery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchProduct()));
@@ -342,7 +342,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          }
          {
             /*
-             * button: search
+             * button: Search
              */
             _btnSearch = new Button(queryContainer, SWT.PUSH);
             _btnSearch.setText(Messages.Dialog_SearchProduct_Button_Search);
@@ -372,13 +372,13 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       {
          {
             /*
-             * Label: POI
+             * Label: Search Type
              */
             _lblSearchType = UI.createLabel(container, Messages.Dialog_SearchProduct_Label_SearchType);
          }
          {
             /*
-             * combo: search type
+             * combo: Search type
              */
             _comboSearchType = new Combo(container, SWT.READ_ONLY);
             _comboSearchType.setVisibleItemCount(2);
@@ -408,12 +408,12 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       final GridData gdDescription = (GridData) productsTable.getLayoutData();
       gdDescription.heightHint = _pc.convertHeightInCharsToPixels(15);
 
-      // column: category
+      // column: Barcode
       final TableColumn columnCategory = new TableColumn(productsTable, SWT.LEFT);
       columnCategory.setText(Messages.Dialog_SearchProduct_TableHeader_Code);
       columnCategory.setWidth(_pc.convertWidthInCharsToPixels(20));
 
-      // column: name
+      // column: Name
       final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
       columnName.setText(Messages.Dialog_SearchProduct_TableHeader_Name);
       columnName.setWidth(_pc.convertWidthInCharsToPixels(75));
