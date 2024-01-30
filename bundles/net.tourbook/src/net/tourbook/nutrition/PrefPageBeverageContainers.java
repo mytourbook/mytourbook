@@ -484,9 +484,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
             // update UI
             _tourBeverageContainerViewer.remove(selectedTourBeverageContainer);
 
-// a tour type image cannot be deleted otherwise an image dispose exception can occur
-//             TourTypeImage.deleteTourTypeImage(selectedTourType.getTypeId());
-
             _isModified = true;
          }
       });
