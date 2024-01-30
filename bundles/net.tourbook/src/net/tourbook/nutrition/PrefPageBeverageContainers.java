@@ -485,9 +485,12 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    private void onTourBeverageContainer_Edit() {
 
-      final StructuredSelection structuredSelection = (StructuredSelection) _tourBeverageContainerViewer.getSelection();
+      final Object selectedItem = ((IStructuredSelection) _tourBeverageContainerViewer.getSelection()).getFirstElement();
+      if (selectedItem == null) {
+         return;
+      }
 
-      final TourBeverageContainer selectedBeverageContainer = (TourBeverageContainer) structuredSelection.getFirstElement();
+      final TourBeverageContainer selectedBeverageContainer = (TourBeverageContainer) selectedItem;
 
       final DialogBeverageContainer dialogBeverageContainer = new DialogBeverageContainer(getShell());
       dialogBeverageContainer.setName(selectedBeverageContainer.getName());
@@ -508,11 +511,13 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       if (savedTourBeverageContainer != null) {
 
          // update model
-         //   selectedColorDefinition.setTourType(savedTourType);
-
-         // replace tour type with new one
          _beverageContainers.remove(selectedBeverageContainer);
          _beverageContainers.add(savedTourBeverageContainer);
+
+         // update UI
+         _tourBeverageContainerViewer.remove(selectedBeverageContainer);
+         _tourBeverageContainerViewer.add(savedTourBeverageContainer);
+         _tourBeverageContainerViewer.setSelection(new StructuredSelection(savedTourBeverageContainer), true);
 
          _isModified = true;
       }
