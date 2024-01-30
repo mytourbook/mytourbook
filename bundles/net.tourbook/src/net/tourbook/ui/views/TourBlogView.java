@@ -429,11 +429,13 @@ public class TourBlogView extends ViewPart {
             sb.append(UI.NEW_LINE);
             final TourBeverageContainer tourBeverageContainer = product.getTourBeverageContainer();
 
-            //todo  fb use a number formatter to only display decimals when needed
             if (tourBeverageContainer == null) {
 
-               sb.append(product.getConsumedQuantity() + UI.SPACE1 + product.getName() + "( " + product.getBeverageQuantity() + UI.SPACE1 //$NON-NLS-1$
-                     + UI.UNIT_FLUIDS_ML + ")"); //$NON-NLS-1$
+               sb.append(String.format("%s %s (%d %s)", //$NON-NLS-1$
+                     product.getConsumedQuantity(),
+                     product.getName(),
+                     product.getBeverageQuantity(),
+                     UI.UNIT_FLUIDS_ML));
 
             } else {
 
@@ -458,8 +460,6 @@ public class TourBlogView extends ViewPart {
 
          sb.append(UI.NEW_LINE);
       }
-
-      //todo fb print a section for averages
 
       String nutritionSectionString = WEB.convertHTML_LineBreaks(sb.toString());
 
