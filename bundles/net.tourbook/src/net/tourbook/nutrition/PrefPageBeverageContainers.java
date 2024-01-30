@@ -66,15 +66,15 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    // todo fb implement the container edit
 
-   public static final String          ID                 = "net.tourbook.cloud.PrefPageBeverageContainers"; //$NON-NLS-1$
+   public static final String          ID                              = "net.tourbook.cloud.PrefPageBeverageContainers"; //$NON-NLS-1$
 
-   private final IPreferenceStore      _prefStore         = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore      _prefStore                      = TourbookPlugin.getPrefStore();
 
    private List<TourBeverageContainer> _beverageContainers;
 
    private boolean                     _isModified;
 
-   private boolean                     _canModifyTourType = true;
+   private boolean                     _canModifyTourBeverageContainer = true;
 
    /*
     * UI controls
@@ -144,9 +144,10 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
        * Ensure that a tour is NOT modified because changing the tour type needs an app restart
        * because the tour type images are DISPOSED
        */
-      if (_canModifyTourType == false) {
+      if (_canModifyTourBeverageContainer == false) {
 
          final Label label = new Label(parent, SWT.WRAP);
+         //todo fb
          label.setText(Messages.Pref_TourTypes_Label_TourIsDirty);
          GridDataFactory.fillDefaults().applyTo(label);
 
@@ -399,7 +400,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    @Override
    public boolean okToLeave() {
 
-      if (_canModifyTourType) {
+      if (_canModifyTourBeverageContainer) {
 
          fireModifyEvent();
       }
@@ -422,7 +423,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       final String name = dialogBeverageContainer.getName().trim();
       final float capacity = dialogBeverageContainer.getCapacity();
 
-      // create new tour type
+      // create new tour beverage container
       final TourBeverageContainer newTourBeverageContainer = new TourBeverageContainer(name, capacity);
 
       // add new entity to db
@@ -528,7 +529,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    @Override
    public boolean performCancel() {
 
-      if (_canModifyTourType) {
+      if (_canModifyTourBeverageContainer) {
 
          fireModifyEvent();
       }
@@ -537,19 +538,9 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    }
 
    @Override
-   protected void performDefaults() {
-
-      if (_canModifyTourType) {
-
-      }
-
-      super.performDefaults();
-   }
-
-   @Override
    public boolean performOk() {
 
-      if (_canModifyTourType) {
+      if (_canModifyTourBeverageContainer) {
 
          fireModifyEvent();
       }
