@@ -136,13 +136,6 @@ public class TourNutritionProduct {
     */
    private int                        beverageQuantity_Serving;
 
-   /**
-    * product_quantity: string
-    *
-    * The size in g or ml for the whole product. It's a normalized version of the quantity field.
-    *
-    */
-
    @ManyToOne
    private TourBeverageContainer      tourBeverageContainer;
 
