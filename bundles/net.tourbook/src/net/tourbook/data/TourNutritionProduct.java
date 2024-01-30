@@ -39,16 +39,16 @@ public class TourNutritionProduct {
    public static final int            DB_LENGTH_CODE           = 50;
    public static final int            DB_LENGTH_NAME           = 1024;
    /**
-    * manually created marker or imported marker create a unique id to identify them, saved marker
-    * are compared with the marker id
+    * manually created product or imported product create a unique id to identify
+    * them, saved products are compared with the product id
     */
    private static final AtomicInteger _createCounter           = new AtomicInteger();
 
    private static final String        CUSTOMPRODUCTCODE_PREFIX = "MTCUSTOMPRODUCT-";              //$NON-NLS-1$
 
    /**
-    * Unique id for manually created markers because the {@link #productCode} is 0 when the marker
-    * is not persisted
+    * Unique id for manually created products because the {@link #productCode}
+    * is 0 when the product is not persisted
     */
    @Transient
    private long                       _createId                = 0;
@@ -166,7 +166,7 @@ public class TourNutritionProduct {
 
    /**
     * Sets the total amount of calories and sodium, if provided.
-    * Otherwise, computed the calories and sodium using the amount per serving along with the
+    * Otherwise, computes the calories and sodium using the amount per serving along with the
     * number of servings per products.
     *
     * @param product
@@ -199,7 +199,7 @@ public class TourNutritionProduct {
             setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
 
             // We store the quantity ONLY if the beverage is in liquid form (mL)
-            if (quantity.trim().toUpperCase().endsWith("L")) {
+            if (quantity.trim().toUpperCase().endsWith(UI.UNIT_FLUIDS_L)) {
 
                beverageQuantity = Integer.valueOf(productQuantity);
                setBeverageQuantity_Serving(Integer.valueOf(servingQuantity.trim()));
