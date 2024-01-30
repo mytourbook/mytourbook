@@ -64,8 +64,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageBeverageContainers extends PreferencePage implements IWorkbenchPreferencePage {
 
-   // todo fb implement the container edit
-
    public static final String          ID                              = "net.tourbook.cloud.PrefPageBeverageContainers"; //$NON-NLS-1$
 
    private final IPreferenceStore      _prefStore                      = TourbookPlugin.getPrefStore();
