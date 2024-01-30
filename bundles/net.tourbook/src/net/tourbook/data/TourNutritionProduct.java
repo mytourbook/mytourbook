@@ -205,7 +205,7 @@ public class TourNutritionProduct {
             setSodium(Math.round(nutriments.sodiumServing * numberOfServings * 1000));
             setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
 
-            // We store the quantity ONLY if the beverage if in liquid for (mL)
+            // We store the quantity ONLY if the beverage is in liquid form (mL)
             if (quantity.trim().toUpperCase().endsWith("L")) {
 
                beverageQuantity = Integer.valueOf(productQuantity);
@@ -316,6 +316,10 @@ public class TourNutritionProduct {
       this.beverageQuantity = beverageQuantity;
    }
 
+   public void setBeverageQuantity_Serving(final int beverageQuantity_Serving) {
+      this.beverageQuantity_Serving = beverageQuantity_Serving;
+   }
+
    public void setCalories(final int calories) {
       this.calories = calories;
    }
@@ -367,10 +371,6 @@ public class TourNutritionProduct {
       productId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
       tourData = tourDataFromClone;
-   }
-
-   public void setBeverageQuantity_Serving(final int beverageQuantity_Serving) {
-      this.beverageQuantity_Serving = beverageQuantity_Serving;
    }
 
 }
