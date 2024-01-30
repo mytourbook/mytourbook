@@ -40,6 +40,9 @@ public class TourNutritionViewTests extends UITest {
       /*
        * Arrange
        */
+      final SWTBotView tourBlogView = Utils.getTourBlogView(bot);
+      tourBlogView.show();
+
       // Open the Tour Nutrition View
       Utils.showViewFromMenu(bot, Utils.TOUR, Utils.VIEW_NAME_TOURNUTRITION);
       final SWTBotView tourNutritionView = Utils.showView(bot, Utils.VIEW_NAME_TOURNUTRITION);
@@ -80,8 +83,10 @@ public class TourNutritionViewTests extends UITest {
 
       // Name
       bot.text(0).setText("Water"); //$NON-NLS-1$
-      // ??
-      bot.text(2).setText("5"); //$NON-NLS-1$
+      // Calories
+      bot.text(2).setText("100"); //$NON-NLS-1$
+      // Sodium
+      bot.text(2).setText("150"); //$NON-NLS-1$
 
       Utils.clickOkButton(bot);
 

@@ -312,6 +312,12 @@ public class Utils {
       return tour;
    }
 
+   public static SWTBotView getTourBlogView(final SWTWorkbenchBot bot) {
+
+      Utils.showViewFromMenu(bot, Utils.TOUR, Utils.VIEW_NAME_TOURBLOG);
+      return Utils.showView(bot, Utils.VIEW_NAME_TOURBLOG);
+   }
+
    public static SWTBotTreeItem getTourWithPauses(final SWTWorkbenchBot bot) {
 
       importTour(bot, "ParkCity.fitlogEx"); //$NON-NLS-1$
