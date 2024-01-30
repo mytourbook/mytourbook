@@ -40,6 +40,7 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.nutrition.openfoodfacts.Product;
+import net.tourbook.web.WEB;
 
 public class NutritionUtils {
 
@@ -52,13 +53,19 @@ public class NutritionUtils {
    private static final String OPENFOODFACTS_SEARCH_BY_CODE_URL =
          "https://world.openfoodfacts.org/api/v3/product/%s?fields=code,brands,product_name,nutriscore_data,nutriments,quantity,product_quantity,serving_quantity,serving_size"; //$NON-NLS-1$
 
-   private static HttpClient   _httpClient                      = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
-   // todo fb ask wolfgang how to do that. I don't mind putting my email but not in the public github repo
-   private static final String _userAgent                       = "MyTourbook/" + ApplicationVersion.getVersionSimple() + " ()";                                                 //$NON-NLS-1$
+   private static HttpClient   _httpClient                      = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(1)).build();
+
+   // Official documentation:
+   // you have to add a User-Agent HTTP Header with the name of your app, the version, system and a url (if any), not to be blocked by mistake.
+   // For example: User-Agent: NameOfYourApp - Android - Version 1.0 - www.yourappwebsite.com
+   // Source: https://world.openfoodfacts.org/files/api-documentation.html
+   private static final String USER_AGENT = String.format("MyTourbook - %s - Version %s - https://mytourbook.sourceforge.io", //$NON-NLS-1$
+         System.getProperty("os.name"), //$NON-NLS-1$
+         ApplicationVersion.getVersionSimple());
 
    public static String buildTourBeverageContainerName(final TourBeverageContainer tourBeverageContainer) {
 
-      return tourBeverageContainer.getName() + " (" + tourBeverageContainer.getCapacity() + " L)";
+      return String.format("%s (%s)", tourBeverageContainer.getName(), tourBeverageContainer.getCapacity()); //$NON-NLS-1$
    }
 
    private static List<Product> deserializeResponse(final String body, final ProductSearchType productSearchType) {
@@ -166,13 +173,13 @@ public class NutritionUtils {
          break;
 
       case ByName:
-         searchUri = URI.create(OPENFOODFACTS_SEARCH_BY_NAME_URL + searchText.replace(" ", "+"));
+         searchUri = URI.create(OPENFOODFACTS_SEARCH_BY_NAME_URL + searchText.replace(UI.SPACE1, UI.SYMBOL_PLUS));
          break;
       }
 
       final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            // .header(WEB.HTTP_HEADER_USER_AGENT, _userAgent)
+            .header(WEB.HTTP_HEADER_USER_AGENT, USER_AGENT)
             .uri(searchUri)
             .build();
 
