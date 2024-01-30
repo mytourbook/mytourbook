@@ -432,8 +432,8 @@ public class TourBlogView extends ViewPart {
             //todo  fb use a number formatter to only display decimals when needed
             if (tourBeverageContainer == null) {
 
-               final float totalConsumedBeverageQuantity = Math.round(product.getConsumedQuantity() * product.getBeverageQuantity());
-               sb.append(product.getConsumedQuantity() + UI.SPACE1 + product.getName() + "( " + product.getBeverageQuantity() + " mL)");
+               sb.append(product.getConsumedQuantity() + UI.SPACE1 + product.getName() + "( " + product.getBeverageQuantity() + UI.SPACE1 //$NON-NLS-1$
+                     + UI.UNIT_FLUIDS_ML + ")"); //$NON-NLS-1$
 
             } else {
 

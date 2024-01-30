@@ -563,6 +563,7 @@ public class UI {
    public static final String          UNIT_DISTANCE_INCH         = "inch";                     //$NON-NLS-1$
    public static final String          UNIT_ELEVATION_M           = "m";                        //$NON-NLS-1$
    public static final String          UNIT_ELEVATION_FT          = "ft";                       //$NON-NLS-1$
+   public static final String          UNIT_FLUIDS_ML             = "mL";                       //$NON-NLS-1$
    public static final String          UNIT_FLUIDS_L              = "L";                        //$NON-NLS-1$
    public static final String          UNIT_HEIGHT_FT             = "ft";                       //$NON-NLS-1$
    public static final String          UNIT_HEIGHT_IN             = "in";                       //$NON-NLS-1$
