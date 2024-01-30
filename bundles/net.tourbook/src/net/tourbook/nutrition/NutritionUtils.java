@@ -132,6 +132,13 @@ public class NutritionUtils {
       return totalCalories;
    }
 
+   /**
+    * Computes the total amount of fluids consumed for a given list of {@link TourNutritionProduct}
+    *
+    * @param tourNutritionProducts
+    *
+    * @return
+    */
    public static float getTotalFluids(final Set<TourNutritionProduct> tourNutritionProducts) {
 
       float totalFluids = 0;
@@ -155,9 +162,32 @@ public class NutritionUtils {
       return totalFluids;
    }
 
-   public static double getTotalSodium(final Set<TourNutritionProduct> tourNutritionProducts) {
+   /**
+    * Computes the total amount of sodium consumed for a given list of {@link TourNutritionProduct}
+    *
+    * @param tourNutritionProducts
+    *
+    * @return
+    */
+   public static float getTotalSodium(final Set<TourNutritionProduct> tourNutritionProducts) {
 
-      final double totalSodium = tourNutritionProducts.stream().mapToDouble(i -> i.getSodium() * i.getConsumedQuantity()).sum();
+      int totalSodium = 0;
+
+      for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
+
+         switch (tourNutritionProduct.getQuantityType()) {
+
+         case Servings:
+
+            totalSodium += tourNutritionProduct.getSodium_Serving() * tourNutritionProduct.getConsumedQuantity();
+            break;
+
+         case Products:
+
+            totalSodium += tourNutritionProduct.getSodium() * tourNutritionProduct.getConsumedQuantity();
+            break;
+         }
+      }
 
       return totalSodium;
    }
