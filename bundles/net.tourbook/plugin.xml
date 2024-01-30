@@ -1750,7 +1750,6 @@
             icon        ="icons/tour-nutrition.png"
             name        ="%View_Name_TourNutrition"/>
 
-
          <!--
             <view
                category    ="net.tourbook.category.Tour_Properties"
