@@ -104,7 +104,7 @@ class DialogBeverageContainer extends Dialog {
             _name = userText;
          });
 
-         // Label: container name
+         // Label: container capacity
          UI.createLabel(container, Messages.Dialog_BeverageContainer_Label_Capacity);
 
          // Text: container capacity in L
