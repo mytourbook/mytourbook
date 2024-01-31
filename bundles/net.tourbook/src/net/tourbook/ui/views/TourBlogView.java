@@ -436,7 +436,7 @@ public class TourBlogView extends ViewPart {
 
             if (tourBeverageContainer == null) {
 
-               sb.append(String.format("%s %s (%d %s)", //$NON-NLS-1$
+               sb.append(String.format("%s %s (%s %s)", //$NON-NLS-1$
                      _nf2.format(product.getConsumedQuantity()),
                      product.getName(),
                      _nf2.format(product.getBeverageQuantity()),
