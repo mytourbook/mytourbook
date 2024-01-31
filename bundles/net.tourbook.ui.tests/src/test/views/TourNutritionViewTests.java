@@ -75,6 +75,7 @@ public class TourNutritionViewTests extends UITest {
 
       bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
 
+      // Close the {@link DialogSearchProduct}
       final SWTBotShell[] currentShells = bot.shells();
       final Optional<SWTBotShell> dialogSearchProductShell = Arrays.stream(currentShells).filter(shell -> shell.getText().equals(
             Messages.Dialog_SearchProduct_Title)).findFirst();
@@ -89,10 +90,6 @@ public class TourNutritionViewTests extends UITest {
       bot.button(Messages.Tour_Nutrition_Button_AddCustomProduct).click();
       // Name
       bot.text(0).setText("Water"); //$NON-NLS-1$
-      // Calories
-      bot.text(1).setText("100"); //$NON-NLS-1$
-      // Sodium
-      bot.text(2).setText("150"); //$NON-NLS-1$
 
       Utils.clickOkButton(bot);
 
@@ -101,6 +98,7 @@ public class TourNutritionViewTests extends UITest {
       assertEquals(initialTableRowCount + 3, productsTable.rowCount());
 
       // Sort the products by name
+      productsTable.header(Messages.Tour_Nutrition_Column_Name).click();
       productsTable.header(Messages.Tour_Nutrition_Column_Name).click();
 
       // Act - Delete all the products
