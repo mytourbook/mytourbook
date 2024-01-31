@@ -58,7 +58,6 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -131,35 +130,17 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    private class SearchContentProvider implements IStructuredContentProvider {
 
       @Override
-      public void dispose() {
-         //Nothing to do
-      }
-
-      @Override
       public Object[] getElements(final Object inputElement) {
          return _searchHistory.toArray(new String[_searchHistory.size()]);
       }
-
-      @Override
-      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
    private class ViewContentProvider implements IStructuredContentProvider {
 
       @Override
-      public void dispose() {
-         //Nothing to do
-      }
-
-      @Override
       public Object[] getElements(final Object parent) {
 
          return _products == null ? new String[] {} : _products.toArray();
-      }
-
-      @Override
-      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
-         // Nothing to do
       }
    }
 
@@ -185,11 +166,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          default:
             return getText(obj);
          }
-      }
-
-      @Override
-      public Image getImage(final Object obj) {
-         return null;
       }
    }
 

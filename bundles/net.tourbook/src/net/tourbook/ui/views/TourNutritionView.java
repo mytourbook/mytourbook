@@ -46,7 +46,6 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -363,9 +362,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    }
 
    private class ViewContentProvider implements IStructuredContentProvider {
-
-      @Override
-      public void dispose() {}
 
       @Override
       public Object[] getElements(final Object parent) {
@@ -1195,19 +1191,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          tourId = selectionTourId.getTourId();
 
-      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
-
-         final ArrayList<Long> tourIds = selectionTourIds.getTourIds();
-
-         if (tourIds != null && tourIds.size() > 0) {
-
-            if (tourIds.size() == 1) {
-               tourId = tourIds.get(0);
-            } else {
-               tourData = TourManager.createJoinedTourData(tourIds);
-            }
-         }
-
       } else if (selection instanceof SelectionDeletedTours) {
 
          clearView();
@@ -1409,7 +1392,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          }
 
          @Override
-         protected void setValue(final Object element, final Object value) {}
+         protected void setValue(final Object element, final Object value) {
+            // Nothing to do
+         }
       });
 
       final String[] tourBeverageContainersItems = new String[_tourBeverageContainers.size() + 1];
