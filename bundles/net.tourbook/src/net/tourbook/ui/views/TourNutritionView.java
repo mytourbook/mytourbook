@@ -69,7 +69,6 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -798,7 +797,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       };
       _productsViewer.getTable().addListener(SWT.MouseDoubleClick, doubleClickListener);
 
-      _productsViewer.addSelectionChangedListener(selectionChangedEvent -> onTableSelectionChanged(selectionChangedEvent));
+      _productsViewer.addSelectionChangedListener(selectionChangedEvent -> onTableSelectionChanged());
 
       _productsViewer.getTable().addKeyListener(keyPressedAdapter(keyEvent -> {
 
@@ -1211,7 +1210,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       updateUI_ProductViewer();
    }
 
-   private void onTableSelectionChanged(final SelectionChangedEvent event) {
+   private void onTableSelectionChanged() {
 
       final StructuredSelection selection = (StructuredSelection) _productsViewer.getSelection();
 
