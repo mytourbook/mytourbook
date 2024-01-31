@@ -58,12 +58,14 @@ public class TourNutritionViewTests extends UITest {
       // Make sure that the table doesn't contain any products
       assertTrue(initialTableRowCount == 0);
 
+      // Act - Search for a food in the OpenFoodFacts database
       bot.button(Messages.Tour_Nutrition_Button_SearchProduct).click();
       bot.comboBox(0).setText("bobo"); //$NON-NLS-1$
 
       bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
       bot.sleep(5000);
 
+      // Act - Search for a beverage in the OpenFoodFacts database
       bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
 
       bot.comboBox(0).setText("coca"); //$NON-NLS-1$
@@ -83,11 +85,8 @@ public class TourNutritionViewTests extends UITest {
       // Make sure that the table now contains 2 products
       assertEquals(initialTableRowCount + 2, productsTable.rowCount());
 
-      // Add a manual product
+      // Act - Add a manual product
       bot.button(Messages.Tour_Nutrition_Button_AddCustomProduct).click();
-
-      // Act
-
       // Name
       bot.text(0).setText("Water"); //$NON-NLS-1$
       // Calories
@@ -102,9 +101,9 @@ public class TourNutritionViewTests extends UITest {
       assertEquals(initialTableRowCount + 3, productsTable.rowCount());
 
       // Sort the products by name
-      productsTable.header("Name").click();
+      productsTable.header(Messages.Tour_Nutrition_Column_Name).click();
 
-      // Act
+      // Act - Delete all the products
       for (int index = 0; index < 3; ++index) {
 
          productsTable.click(0, 2);
