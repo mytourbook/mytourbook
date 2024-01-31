@@ -911,8 +911,6 @@ public class Messages extends NLS {
    public static String        Dialog_SearchProduct_Label_SearchType;
    public static String        Dialog_SearchProduct_Label_NotFound;
    public static String        Dialog_SearchProduct_Link_ProductCreationRequest;
-   public static String        Dialog_SearchProduct_TableHeader_Code;
-   public static String        Dialog_SearchProduct_TableHeader_Name;
    public static String        Dialog_SearchProduct_Title;
    public static String        Dialog_SearchProduct_Tooltip_InvalidBarcode;
 
@@ -3319,6 +3317,8 @@ public class Messages extends NLS {
    public static String        Tour_Nutrition_Column_BeverageQuantity;
    public static String        Tour_Nutrition_Column_BeverageQuantity_Tooltip;
    public static String        Tour_Nutrition_Column_Calories;
+   public static String        Tour_Nutrition_Column_Capacity;
+   public static String        Tour_Nutrition_Column_Code;
    public static String        Tour_Nutrition_Column_ConsumedContainers;
    public static String        Tour_Nutrition_Column_ConsumedContainers_Tooltip;
    public static String        Tour_Nutrition_Column_ConsumedQuantity;

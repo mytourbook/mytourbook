@@ -121,32 +121,13 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    @Override
    protected Control createContents(final Composite parent) {
 
-      /*
-       * Ensure that a tour is NOT modified because changing the tour type needs an app restart
-       * because the tour type images are DISPOSED
-       */
-      if (_canModifyTourBeverageContainer == false) {
-
-         final Label label = new Label(parent, SWT.WRAP);
-         //todo fb
-         label.setText(Messages.Pref_TourTypes_Label_TourIsDirty);
-         GridDataFactory.fillDefaults().applyTo(label);
-
-         return label;
-      }
-
       final Composite ui = createUI(parent);
-
-      //fillUI();
 
       // read beverage containers from the database
       _beverageContainers = TourDatabase.getTourBeverageContainers();
 
       enableActions();
 
-      /*
-       * MUST be run async otherwise the background color is NOT themed !!!
-       */
       parent.getDisplay().asyncExec(() -> _tourBeverageContainerViewer.setInput(this));
 
       return ui;
@@ -179,10 +160,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       beverageContainersTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       beverageContainersTable.setHeaderVisible(true);
 
-      //todo fb
-      final String[] tableColumns = { "Name", "Capacity" };
-
-      defineAllColumns(beverageContainersTable, tableColumns);
+      defineAllColumns(beverageContainersTable);
       _tourBeverageContainerViewer = new TableViewer(beverageContainersTable);
 
       _tourBeverageContainerViewer.setContentProvider(new BeverageContainerContentProvider());
@@ -263,18 +241,16 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    /**
     * Create columns
     */
-   private void defineAllColumns(final Table productsTable, final String[] tableColumns) {
-
-      int index = 0;
+   private void defineAllColumns(final Table productsTable) {
 
       // Column: Name
       final TableColumn columnServings = new TableColumn(productsTable, SWT.LEFT);
-      columnServings.setText(tableColumns[index++]);
+      columnServings.setText(Messages.Tour_Nutrition_Column_Code);
       columnServings.setWidth(300);
 
       // Column: Capacity
       final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
-      columnName.setText(tableColumns[index++]);
+      columnName.setText(Messages.Tour_Nutrition_Column_Capacity);
       columnName.setWidth(100);
    }
 
@@ -291,7 +267,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
          // remove container from TABLE_TOUR_BEVERAGE_CONTAINER
          sql = "UPDATE " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT //          //$NON-NLS-1$
-               + " SET " + TourDatabase.KEY_BEVERAGE_CONTAINER + "=null"
+               + " SET " + TourDatabase.KEY_BEVERAGE_CONTAINER + "=null" //$NON-NLS-1$ //$NON-NLS-2$
                + " WHERE " + TourDatabase.KEY_BEVERAGE_CONTAINER + "=?"; //                      //$NON-NLS-1$ //$NON-NLS-2$
          prepStmt_TourData = conn.prepareStatement(sql);
 
