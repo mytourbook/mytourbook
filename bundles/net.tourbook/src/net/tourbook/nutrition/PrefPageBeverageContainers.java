@@ -80,7 +80,6 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    private TableViewer _tourBeverageContainerViewer;
 
-   private Button      _btnAdd;
    private Button      _btnDelete;
    private Button      _btnEdit;
 
@@ -197,19 +196,19 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(false, true).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
       {
          {
             /*
              * Add
              */
-            _btnAdd = new Button(container, SWT.NONE);
-            _btnAdd.setText(Messages.PrefPage_TourBeverageContainers_Button_Add);
-            _btnAdd.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            final Button btnAdd = new Button(container, SWT.NONE);
+            btnAdd.setText(Messages.PrefPage_TourBeverageContainers_Button_Add);
+            btnAdd.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
                onTourBeverageContainer_Add();
                enableActions();
             }));
-            setButtonLayoutData(_btnAdd);
+            setButtonLayoutData(btnAdd);
          }
          {
             /*
