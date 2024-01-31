@@ -1295,7 +1295,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             //- mouse wheel on the -/+ signs
             //- mouse wheel CLICK on the -/+ signs
             //
-            final Spinner spinner = spinnerCellEditor.getSpinner();
+            final Spinner spinner = spinnerCellEditor.getControl();
             spinner.setMinimum(25);
             spinner.setMaximum(10000);
             spinner.setIncrement(25);
