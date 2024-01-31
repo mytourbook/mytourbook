@@ -162,7 +162,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private final RangeContent             _quantityRange                  = new RangeContent(0.25, 10.0, 0.25, 100);
 
    private final NumberFormat             _nf2                            = NumberFormat.getNumberInstance();
-
    {
       _nf2.setMinimumFractionDigits(0);
       _nf2.setMaximumFractionDigits(2);
