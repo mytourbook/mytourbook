@@ -175,8 +175,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Image       _imageSearch;
    private Image       _imageDelete;
 
-   private Button      _btnAddCustomProduct;
-   private Button      _btnSearchProduct;
    private Button      _btnDeleteProduct;
 
    private PageBook    _pageBook;
@@ -194,9 +192,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Section     _sectionSummary;
    private FormToolkit _tk;
 
-   private final class No_EditingSupport extends EditingSupport {
+   private final class NoEditingSupport extends EditingSupport {
 
-      private No_EditingSupport() {
+      private NoEditingSupport() {
          super(_productsViewer);
       }
 
@@ -703,21 +701,21 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          /*
           * Search product button
           */
-         _btnSearchProduct = new Button(container, SWT.NONE);
-         _btnSearchProduct.setText(Messages.Tour_Nutrition_Button_SearchProduct);
-         _btnSearchProduct.setToolTipText(Messages.Tour_Nutrition_Button_SearchProduct_Tooltip);
-         _btnSearchProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell(),
+         final Button btnSearchProduct = new Button(container, SWT.NONE);
+         btnSearchProduct.setText(Messages.Tour_Nutrition_Button_SearchProduct);
+         btnSearchProduct.setToolTipText(Messages.Tour_Nutrition_Button_SearchProduct_Tooltip);
+         btnSearchProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell(),
                _tourData.getTourId()).open()));
-         _btnSearchProduct.setImage(_imageSearch);
-         GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(_btnSearchProduct);
+         btnSearchProduct.setImage(_imageSearch);
+         GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(btnSearchProduct);
 
          /*
           * Add product button
           */
-         _btnAddCustomProduct = new Button(container, SWT.NONE);
-         _btnAddCustomProduct.setText(Messages.Tour_Nutrition_Button_AddCustomProduct);
-         _btnAddCustomProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddCustomProduct_Tooltip);
-         _btnAddCustomProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+         final Button btnAddCustomProduct = new Button(container, SWT.NONE);
+         btnAddCustomProduct.setText(Messages.Tour_Nutrition_Button_AddCustomProduct);
+         btnAddCustomProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddCustomProduct_Tooltip);
+         btnAddCustomProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
             final DialogCustomTourNutritionProduct dialogTourNutritionProduct = new DialogCustomTourNutritionProduct(Display.getCurrent()
                   .getActiveShell());
@@ -733,8 +731,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
 
          }));
-         _btnAddCustomProduct.setImage(_imageAdd);
-         GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(_btnAddCustomProduct);
+         btnAddCustomProduct.setImage(_imageAdd);
+         GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(btnAddCustomProduct);
 
          /*
           * Delete product button
@@ -1369,9 +1367,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          }
       });
 
-      _colDef_Name.setEditingSupport(new No_EditingSupport());
-      _colDef_Calories.setEditingSupport(new No_EditingSupport());
-      _colDef_Sodium.setEditingSupport(new No_EditingSupport());
+      _colDef_Name.setEditingSupport(new NoEditingSupport());
+      _colDef_Calories.setEditingSupport(new NoEditingSupport());
+      _colDef_Sodium.setEditingSupport(new NoEditingSupport());
 
       _colDef_IsBeverage.setEditingSupport(new EditingSupport(_productsViewer) {
 
