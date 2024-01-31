@@ -18,14 +18,11 @@ package net.tourbook.preferences;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
-import net.tourbook.common.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -34,12 +31,8 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageNutrition extends PreferencePage implements IWorkbenchPreferencePage {
 
+   //todo fb restore defaults, values of ignre first hour...
    public static final String ID = "net.tourbook.preferences.PrefPageNutrition"; //$NON-NLS-1$
-
-   private PixelConverter     _pixelConverter;
-   private int                _defaultInfoWidth;
-   private int                _defaultSpinnerWidth;
-   private MouseWheelListener _defaultMouseWheelListener;
 
    /*
     * UI controls
@@ -48,8 +41,6 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
 
    @Override
    protected Control createContents(final Composite parent) {
-
-      initUI(parent);
 
       final Composite container = createUI(parent);
 
@@ -83,15 +74,8 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
    }
 
    @Override
-   public void init(final IWorkbench workbench) {}
-
-   private void initUI(final Composite parent) {
-
-      _pixelConverter = new PixelConverter(parent);
-      _defaultInfoWidth = _pixelConverter.convertWidthInCharsToPixels(50);
-      _defaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pixelConverter.convertWidthInCharsToPixels(UI.IS_OSX ? 14 : 7);
-
-      _defaultMouseWheelListener = mouseEvent -> UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+   public void init(final IWorkbench workbench) {
+      // Nothing to do
    }
 
    @Override
