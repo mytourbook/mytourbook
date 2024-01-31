@@ -144,7 +144,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private TableColumnDefinition          _colDef_Calories;
    private TableColumnDefinition          _colDef_Sodium;
    private TableColumnDefinition          _colDef_IsBeverage;
-   private TableColumnDefinition          _colDef_BeverageQuantity;
    private TableColumnDefinition          _colDef_BeverageContainer;
    private TableColumnDefinition          _colDef_ConsumedBeverageContainers;
 
@@ -1006,18 +1005,18 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineColumn_70_BeverageQuantity() {
 
-      _colDef_BeverageQuantity = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_QUANTITY, SWT.LEAD);
+      final TableColumnDefinition colDef_BeverageQuantity = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_QUANTITY, SWT.LEAD);
 
-      _colDef_BeverageQuantity.setColumnLabel(COLUMN_BEVERAGE_QUANTITY);
-      _colDef_BeverageQuantity.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageQuantity);
-      _colDef_BeverageQuantity.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Column_BeverageQuantity_Tooltip);
+      colDef_BeverageQuantity.setColumnLabel(COLUMN_BEVERAGE_QUANTITY);
+      colDef_BeverageQuantity.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageQuantity);
+      colDef_BeverageQuantity.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Column_BeverageQuantity_Tooltip);
 
-      _colDef_BeverageQuantity.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(22));
+      colDef_BeverageQuantity.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(22));
 
-      _colDef_BeverageQuantity.setIsDefaultColumn();
-      _colDef_BeverageQuantity.setCanModifyVisibility(false);
+      colDef_BeverageQuantity.setIsDefaultColumn();
+      colDef_BeverageQuantity.setCanModifyVisibility(false);
 
-      _colDef_BeverageQuantity.setLabelProvider(new CellLabelProvider() {
+      colDef_BeverageQuantity.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
