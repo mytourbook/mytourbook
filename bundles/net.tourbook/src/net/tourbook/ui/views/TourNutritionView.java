@@ -1070,12 +1070,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
 
-            final TourBeverageContainer tourBeverageContainer = tourNutritionProduct.getTourBeverageContainer();
-            if (tourBeverageContainer == null) {
-               return;
-            }
+            final String text = tourNutritionProduct.getTourBeverageContainer() == null
+                  ? UI.EMPTY_STRING
+                  : String.valueOf(tourNutritionProduct.getContainersConsumed());
 
-            cell.setText(String.valueOf(tourNutritionProduct.getContainersConsumed()));
+            cell.setText(text);
          }
       });
    }
