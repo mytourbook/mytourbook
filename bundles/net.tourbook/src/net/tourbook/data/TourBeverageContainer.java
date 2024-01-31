@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
@@ -91,11 +92,17 @@ public class TourBeverageContainer {
       return name;
    }
 
-   public void setName(final String name) {
-      this.name = name;
+   @Override
+   public int hashCode() {
+
+      return Objects.hash(containerId, _createId);
    }
 
    public void setCapacity(final float capacity) {
       this.capacity = capacity;
+   }
+
+   public void setName(final String name) {
+      this.name = name;
    }
 }
