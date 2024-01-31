@@ -415,7 +415,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          final String property = propertyChangeEvent.getProperty();
 
-//      //todo fb recreate the when the preferences are changed and a container is added or removed or modified
          if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
             _productsViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -423,7 +422,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          } else if (property.equals(ITourbookPreferences.PREF_BEVERAGECONTAINERS_HAS_CHANGED)) {
 
-            //todo fb does it reload the tour data (aka, the ones that had containers assigned to them?)
             _tourBeverageContainers = TourDatabase.getTourBeverageContainers();
             recreateViewer(getViewer());
 

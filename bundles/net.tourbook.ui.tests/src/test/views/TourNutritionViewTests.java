@@ -101,6 +101,9 @@ public class TourNutritionViewTests extends UITest {
       // Make sure that the table now contains 3 products
       assertEquals(initialTableRowCount + 3, productsTable.rowCount());
 
+      // Sort the products by name
+      productsTable.header("Name").click();
+
       // Act
       for (int index = 0; index < 3; ++index) {
 
