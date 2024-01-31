@@ -367,11 +367,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          return _tourData.getTourNutritionProducts().toArray();
       }
-
-      @Override
-      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
-         // Nothing to do
-      }
    }
 
    private void addPartListener() {
