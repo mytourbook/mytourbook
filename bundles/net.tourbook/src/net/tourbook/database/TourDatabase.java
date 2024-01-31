@@ -6570,7 +6570,7 @@ public class TourDatabase {
 
          // 53 -> 54    24.1
          if (currentDbVersion == 53) {
-            currentDbVersion = _dbDesignVersion_New = updateDb_053_To_054(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_053_To_054(splashManager);
          }
 
 // 54 -> 55 > 24.XX
@@ -10607,7 +10607,7 @@ public class TourDatabase {
     *
     * @throws SQLException
     */
-   private int updateDb_053_To_054(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_053_To_054(final SplashManager splashManager) {
 
       final int newDbVersion = 54;
 
