@@ -63,15 +63,13 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageBeverageContainers extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String          ID                              = "net.tourbook.cloud.PrefPageBeverageContainers"; //$NON-NLS-1$
+   public static final String          ID         = "net.tourbook.cloud.PrefPageBeverageContainers"; //$NON-NLS-1$
 
-   private final IPreferenceStore      _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore      _prefStore = TourbookPlugin.getPrefStore();
 
    private List<TourBeverageContainer> _beverageContainers;
 
    private boolean                     _isModified;
-
-   private boolean                     _canModifyTourBeverageContainer = true;
 
    /*
     * UI controls
@@ -357,10 +355,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    @Override
    public boolean okToLeave() {
 
-      if (_canModifyTourBeverageContainer) {
-
-         fireModifyEvent();
-      }
+      fireModifyEvent();
 
       return super.okToLeave();
    }
@@ -486,10 +481,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    @Override
    public boolean performCancel() {
 
-      if (_canModifyTourBeverageContainer) {
-
-         fireModifyEvent();
-      }
+      fireModifyEvent();
 
       return super.performCancel();
    }
@@ -497,10 +489,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
    @Override
    public boolean performOk() {
 
-      if (_canModifyTourBeverageContainer) {
-
-         fireModifyEvent();
-      }
+      fireModifyEvent();
 
       return super.performOk();
    }
