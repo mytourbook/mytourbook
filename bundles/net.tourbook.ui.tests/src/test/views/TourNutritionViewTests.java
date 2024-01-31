@@ -66,6 +66,13 @@ public class TourNutritionViewTests extends UITest {
 
       bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
 
+      bot.comboBox(0).setText("coca"); //$NON-NLS-1$
+
+      bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
+      bot.sleep(5000);
+
+      bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
+
       final SWTBotShell[] currentShells = bot.shells();
       final Optional<SWTBotShell> dialogSearchProductShell = Arrays.stream(currentShells).filter(shell -> shell.getText().equals(
             Messages.Dialog_SearchProduct_Title)).findFirst();
@@ -73,8 +80,8 @@ public class TourNutritionViewTests extends UITest {
          dialogSearchProductShell.get().close();
       }
 
-      // Make sure that the table now contains 1 product
-      assertEquals(initialTableRowCount + 1, productsTable.rowCount());
+      // Make sure that the table now contains 2 products
+      assertEquals(initialTableRowCount + 2, productsTable.rowCount());
 
       // Add a manual product
       bot.button(Messages.Tour_Nutrition_Button_AddCustomProduct).click();
@@ -91,14 +98,15 @@ public class TourNutritionViewTests extends UITest {
       Utils.clickOkButton(bot);
 
       // Assert
-      // Make sure that the table now contains 1 product
-      assertEquals(initialTableRowCount + 2, productsTable.rowCount());
+      // Make sure that the table now contains 3 products
+      assertEquals(initialTableRowCount + 3, productsTable.rowCount());
 
       // Act
-      productsTable.click(0, 2);
-      bot.button(Messages.Tour_Nutrition_Button_DeleteProduct).click();
-      productsTable.click(0, 2);
-      bot.button(Messages.Tour_Nutrition_Button_DeleteProduct).click();
+      for (int index = 0; index < 3; ++index) {
+
+         productsTable.click(0, 2);
+         bot.button(Messages.Tour_Nutrition_Button_DeleteProduct).click();
+      }
 
       // Assert
       // Make sure that the table doesn't contain any products
