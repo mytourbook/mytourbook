@@ -429,6 +429,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             recreateViewer(getViewer());
 
             refreshTourData(_tourData = TourManager.getTour(_tourData.getTourId()));
+         } else if (property.equals(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR)) {
+
+            recreateViewer(getViewer());
          }
       };
 
@@ -518,9 +521,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private long computeAveragePerHour(final int total) {
 
       long tourDeviceTime_Recorded = _tourData.getTourDeviceTime_Recorded();
-      if (tourDeviceTime_Recorded > 3600 /* && preference to remove first hour */) {
+
+      if (tourDeviceTime_Recorded > 3600 && _prefStore.getBoolean(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR)) {
          tourDeviceTime_Recorded -= 3600;
-      } else if (tourDeviceTime_Recorded <= 3600 /* && preference to remove first hour */) {
+      } else if (tourDeviceTime_Recorded <= 3600) {
          return total;
       }
 

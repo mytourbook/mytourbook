@@ -15,12 +15,12 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
@@ -31,8 +31,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageNutrition extends PreferencePage implements IWorkbenchPreferencePage {
 
-   //todo fb restore defaults, values of ignre first hour...
-   public static final String ID = "net.tourbook.preferences.PrefPageNutrition"; //$NON-NLS-1$
+   public static final String     ID         = "net.tourbook.preferences.PrefPageNutrition"; //$NON-NLS-1$
+
+   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    /*
     * UI controls
@@ -43,6 +44,8 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
    protected Control createContents(final Composite parent) {
 
       final Composite container = createUI(parent);
+
+      restoreState();
 
       return container;
    }
@@ -62,10 +65,6 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
             _chkIgnoreFirstHour = new Button(container, SWT.CHECK);
             _chkIgnoreFirstHour.setText(Messages.PrefPage_Nutrition_Checkbox_IgnoreFirstHour);
             _chkIgnoreFirstHour.setToolTipText(Messages.PrefPage_Nutrition_Checkbox_IgnoreFirstHour_Tooltip);
-            _chkIgnoreFirstHour.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-               //todo fb
-               //fire event to refresh the tour nutrition view
-            }));
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_chkIgnoreFirstHour);
          }
       }
@@ -81,13 +80,27 @@ public class PrefPageNutrition extends PreferencePage implements IWorkbenchPrefe
    @Override
    protected void performDefaults() {
 
+      _chkIgnoreFirstHour.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR));
+
       super.performDefaults();
    }
 
    @Override
    public boolean performOk() {
 
-      return super.performOk();
+      final boolean isOK = super.performOk();
+
+      if (isOK) {
+
+         _prefStore.setValue(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR, _chkIgnoreFirstHour.getSelection());
+      }
+
+      return isOK;
+   }
+
+   private void restoreState() {
+
+      _chkIgnoreFirstHour.setSelection(_prefStore.getBoolean(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR));
    }
 
 }
