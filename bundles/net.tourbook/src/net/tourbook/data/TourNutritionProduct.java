@@ -213,7 +213,7 @@ public class TourNutritionProduct {
             setCalories(Math.round((nutriments.energyKcal100g * Float.valueOf(productQuantity)) / 100f));
             setCalories_Serving(nutriments.energyKcalServing);
 
-            setSodium(Math.round(nutriments.sodium100g * 1000));
+            setSodium(Math.round(nutriments.sodium100g * Float.valueOf(productQuantity) * 10));
             setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
 
          } else {
