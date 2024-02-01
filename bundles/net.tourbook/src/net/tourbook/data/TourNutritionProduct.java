@@ -160,6 +160,7 @@ public class TourNutritionProduct {
       brand = product.brands;
       name = product.productName;
       productCode = product.code;
+      isBeverage = product.nutriScoreData != null && product.nutriScoreData.isBeverage();
 
       computeNutrimentsPerProduct(product);
    }
