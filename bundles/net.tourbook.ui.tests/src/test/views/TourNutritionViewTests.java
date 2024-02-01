@@ -58,21 +58,25 @@ public class TourNutritionViewTests extends UITest {
       // Make sure that the table doesn't contain any products
       assertTrue(initialTableRowCount == 0);
 
-      // Act - Search for a food in the OpenFoodFacts database
       bot.button(Messages.Tour_Nutrition_Button_SearchProduct).click();
-      bot.comboBox(0).setText("bobo"); //$NON-NLS-1$
 
+      // Act - Search for a food in the OpenFoodFacts database
+      bot.comboBox(0).setText("bobo"); //$NON-NLS-1$
       bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
       bot.sleep(5000);
-
-      // Act - Search for a beverage in the OpenFoodFacts database
       bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
 
+      // Act - Search for a beverage in the OpenFoodFacts database
       bot.comboBox(0).setText("coca"); //$NON-NLS-1$
-
       bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
       bot.sleep(5000);
+      bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
 
+      // Act - Search for a food by code in the OpenFoodFacts database
+      bot.comboBox(1).setSelection(Messages.Dialog_SearchProduct_Combo_SearchType_ByCode);
+      bot.comboBox(0).setText("829262000333"); //$NON-NLS-1$
+      bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
+      bot.sleep(5000);
       bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
 
       // Close the {@link DialogSearchProduct}
