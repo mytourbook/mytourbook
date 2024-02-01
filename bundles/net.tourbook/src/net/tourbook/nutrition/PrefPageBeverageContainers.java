@@ -371,8 +371,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       }
 
       // get the new values from the dialog
-      //todo fb trim in the dialog class
-      final String name = dialogBeverageContainer.getName().trim();
+      final String name = dialogBeverageContainer.getName();
       final float capacity = dialogBeverageContainer.getCapacity();
 
       // create new tour beverage container

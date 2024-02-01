@@ -98,8 +98,7 @@ class DialogBeverageContainer extends Dialog {
          _txtName.addModifyListener(e -> {
 
             final Text textWidget = (Text) e.getSource();
-            final String userText = textWidget.getText();
-            _name = userText;
+            _name = textWidget.getText().trim();
 
             validateFields();
          });
