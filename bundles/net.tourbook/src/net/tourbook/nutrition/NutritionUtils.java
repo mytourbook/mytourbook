@@ -194,23 +194,23 @@ public class NutritionUtils {
 
    static List<Product> searchProduct(final String searchText, final ProductSearchType productSearchType) {
 
-      URI searchUri = URI.create(UI.EMPTY_STRING);
+      String searchUrl = UI.EMPTY_STRING;
 
       switch (productSearchType) {
 
       case ByCode:
-         searchUri = URI.create(String.format(OPENFOODFACTS_SEARCH_BY_CODE_URL, searchText));
+         searchUrl = String.format(OPENFOODFACTS_SEARCH_BY_CODE_URL, searchText);
          break;
 
       case ByName:
-         searchUri = URI.create(OPENFOODFACTS_SEARCH_BY_NAME_URL + searchText.replace(UI.SPACE1, UI.SYMBOL_PLUS));
+         searchUrl = OPENFOODFACTS_SEARCH_BY_NAME_URL + searchText.replace(UI.SPACE1, UI.SYMBOL_PLUS);
          break;
       }
 
       final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .header(WEB.HTTP_HEADER_USER_AGENT, USER_AGENT)
-            .uri(searchUri)
+            .uri(URI.create(searchUrl))
             .build();
 
       try {

@@ -28,6 +28,7 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -480,7 +481,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _postSelectionProvider.clearSelection();
    }
 
-   private long computeAveragePerHour(final int total) {
+   private float computeAveragePerHour(final float total) {
 
       long tourDeviceTime_Recorded = _tourData.getTourDeviceTime_Recorded();
 
@@ -490,7 +491,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          return total;
       }
 
-      return total * 60 / (tourDeviceTime_Recorded / 60);
+      return total * 60 / (tourDeviceTime_Recorded / 60f);
    }
 
    @Override
@@ -1503,23 +1504,28 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
 
       final int totalCalories = NutritionUtils.getTotalCalories(tourNutritionProducts);
-      _txtCalories_Total.setText(String.valueOf(totalCalories));
+      final String totalCaloriesFormatted = FormatManager.formatNumber_0(totalCalories);
+      _txtCalories_Total.setText(totalCaloriesFormatted);
 
       final float totalFluid = NutritionUtils.getTotalFluids(tourNutritionProducts) * 100 / 100;
       final String totalFluidFormatted = _nf2.format(totalFluid);
       _txtFluid_Total.setText(totalFluidFormatted);
 
       final int totalSodium = (int) NutritionUtils.getTotalSodium(tourNutritionProducts);
-      _txtSodium_Total.setText(String.valueOf(totalSodium));
+      final String totalSodiumFormatted = FormatManager.formatNumber_0(totalSodium);
+      _txtSodium_Total.setText(totalSodiumFormatted);
 
-      final long averageCaloriesPerHour = computeAveragePerHour(totalCalories);
-      _txtCalories_Average.setText(String.valueOf(averageCaloriesPerHour));
+      final float averageCaloriesPerHour = computeAveragePerHour(totalCalories);
+      final String averageCaloriesPerHourFormatted = FormatManager.formatNumber_0(averageCaloriesPerHour);
+      _txtCalories_Average.setText(averageCaloriesPerHourFormatted);
 
-      final long averageFluidPerHour = computeAveragePerHour(Math.round(totalFluid));
-      _txtFluid_Average.setText(String.valueOf(averageFluidPerHour));
+      final float averageFluidPerHour = computeAveragePerHour(totalFluid);
+      final String averageFluidPerHourFormatted = _nf2.format(averageFluidPerHour);
+      _txtFluid_Average.setText(averageFluidPerHourFormatted);
 
-      final long averageSodiumPerHour = computeAveragePerHour(totalSodium);
-      _txtSodium_Average.setText(String.valueOf(averageSodiumPerHour));
+      final float averageSodiumPerHour = computeAveragePerHour(totalSodium);
+      final String averageSodiumPerHourFormatted = FormatManager.formatNumber_0(averageSodiumPerHour);
+      _txtSodium_Average.setText(averageSodiumPerHourFormatted);
    }
 
 }
