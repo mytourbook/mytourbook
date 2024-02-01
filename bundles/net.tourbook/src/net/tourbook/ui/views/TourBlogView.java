@@ -431,7 +431,7 @@ public class TourBlogView extends ViewPart {
       if (beverages.size() > 0) {
          // BEVERAGES
 
-         sb.append(UI.NEW_LINE + "<u>" + Messages.Tour_Blog_Label_Beverages + "</u>" + UI.NEW_LINE); //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append(UI.NEW_LINE + "<u>" + Messages.Tour_Blog_Label_Nutrition_Beverages + "</u>" + UI.NEW_LINE); //$NON-NLS-1$ //$NON-NLS-2$
          beverages.stream().forEach(product -> {
 
             sb.append(UI.NEW_LINE);
@@ -460,7 +460,7 @@ public class TourBlogView extends ViewPart {
 
          sb.append(UI.NEW_LINE);
 
-         sb.append(UI.NEW_LINE + "<u>" + Messages.Tour_Blog_Label_Foods + "</u>" + UI.NEW_LINE); //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append(UI.NEW_LINE + "<u>" + Messages.Tour_Blog_Label_Nutrition_Foods + "</u>" + UI.NEW_LINE); //$NON-NLS-1$ //$NON-NLS-2$
          foods.stream().forEach(product -> {
 
             sb.append(UI.NEW_LINE);
