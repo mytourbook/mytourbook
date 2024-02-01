@@ -210,17 +210,23 @@ public class TourNutritionProduct {
          setCalories_Serving(nutriments.energyKcalServing);
          setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
 
+         final float servingQuantityFloat = Util.parseFloat(servingQuantity);
+         float productQuantityFloat = Util.parseFloat(productQuantity);
+
+         // In some cases, the product quantity is not provided, we can only
+         // assume that the product only contains 1 serving
+         if (productQuantityFloat == Float.MIN_VALUE) {
+            productQuantityFloat = servingQuantityFloat;
+         }
+
          // If the data is for 100g or 1 serving, the product calories and sodium
          // values computation are different
-         final float productQuantityFloat = Util.parseFloat(productQuantity);
          if (product.nutritionDataPer == NutritionDataPer.HUNDRED_GRAMS) {
 
             setCalories(Math.round((nutriments.energyKcal100g * productQuantityFloat) / 100f));
             setSodium(Math.round(nutriments.sodium100g * productQuantityFloat * 10));
 
          } else if (product.nutritionDataPer == NutritionDataPer.SERVING) {
-
-            final float servingQuantityFloat = Util.parseFloat(servingQuantity);
 
             final int numServingsPerProduct = servingQuantityFloat == 0
                   ? 0 : Math.round(productQuantityFloat / servingQuantityFloat);
