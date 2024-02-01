@@ -26,6 +26,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.text.NumberFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,13 +35,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.tourbook.application.ApplicationVersion;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourBeverageContainer;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.nutrition.openfoodfacts.Product;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.web.WEB;
+
+import org.eclipse.jface.preference.IPreferenceStore;
 
 public class NutritionUtils {
 
@@ -48,24 +54,72 @@ public class NutritionUtils {
     * Documentation:
     * https://world.openfoodfacts.org/files/api-documentation.html#jump-SearchRequests-Searchingforproducts
     */
-   private static final String OPENFOODFACTS_SEARCH_BY_NAME_URL =
+   private static final String           OPENFOODFACTS_SEARCH_BY_NAME_URL =
          "https://world.openfoodfacts.org/cgi/search.pl?action=process&sort_by=unique_scans_n&page_size=20&json=true&search_terms=";                                                                //$NON-NLS-1$
-   private static final String OPENFOODFACTS_SEARCH_BY_CODE_URL =
+   private static final String           OPENFOODFACTS_SEARCH_BY_CODE_URL =
          "https://world.openfoodfacts.org/api/v3/product/%s?fields=code,brands,product_name,nutriscore_data,nutrition_data_per,nutriments,quantity,product_quantity,serving_quantity,serving_size"; //$NON-NLS-1$
 
-   private static HttpClient   _httpClient                      = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(1)).build();
+   private static HttpClient             _httpClient                      = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(1)).build();
+
+   private static final IPreferenceStore _prefStore                       = TourbookPlugin.getPrefStore();
 
    // Official documentation:
    // you have to add a User-Agent HTTP Header with the name of your app, the version, system and a url (if any), not to be blocked by mistake.
    // For example: User-Agent: NameOfYourApp - Android - Version 1.0 - www.yourappwebsite.com
    // Source: https://world.openfoodfacts.org/files/api-documentation.html
-   private static final String USER_AGENT = String.format("MyTourbook - %s - Version %s - https://mytourbook.sourceforge.io", //$NON-NLS-1$
-         System.getProperty("os.name"), //$NON-NLS-1$
+   private static final String       USER_AGENT = String.format("MyTourbook - %s - Version %s - https://mytourbook.sourceforge.io",              //$NON-NLS-1$
+         System.getProperty("os.name"),                                                                                                          //$NON-NLS-1$
          ApplicationVersion.getVersionSimple());
+
+   public static final NumberFormat _nf2       = NumberFormat.getNumberInstance();
+   {
+      _nf2.setMinimumFractionDigits(0);
+      _nf2.setMaximumFractionDigits(2);
+   }
 
    public static String buildTourBeverageContainerName(final TourBeverageContainer tourBeverageContainer) {
 
       return String.format("%s (%s)", tourBeverageContainer.getName(), tourBeverageContainer.getCapacity()); //$NON-NLS-1$
+   }
+
+   public static String computeAverageCaloriesPerHour(final TourData tourData) {
+
+      final int totalCalories = NutritionUtils.getTotalCalories(tourData.getTourNutritionProducts());
+      final float averageCaloriesPerHour = NutritionUtils.computeAveragePerHour(tourData, totalCalories);
+      final String averageCaloriesPerHourFormatted = _nf2.format(averageCaloriesPerHour);
+
+      return averageCaloriesPerHourFormatted;
+   }
+
+   public static String computeAverageFluidsPerHour(final TourData tourData) {
+
+      final float totalFluid = NutritionUtils.getTotalFluids(tourData.getTourNutritionProducts()) * 100 / 100;
+      final float averageFluidPerHour = NutritionUtils.computeAveragePerHour(tourData, totalFluid);
+      final String averageFluidPerHourFormatted = _nf2.format(averageFluidPerHour);
+
+      return averageFluidPerHourFormatted;
+   }
+
+   private static float computeAveragePerHour(final TourData tourData, final float totalAmount) {
+
+      long tourDeviceTime_Recorded = tourData.getTourDeviceTime_Recorded();
+
+      if (tourDeviceTime_Recorded > 3600 && _prefStore.getBoolean(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR)) {
+         tourDeviceTime_Recorded -= 3600;
+      } else if (tourDeviceTime_Recorded <= 3600) {
+         return totalAmount;
+      }
+
+      return totalAmount * 60 / (tourDeviceTime_Recorded / 60f);
+   }
+
+   public static String computeAverageSodiumPerHour(final TourData tourData) {
+
+      final float totalSodium =  NutritionUtils.getTotalSodium(tourData.getTourNutritionProducts());
+      final float averageCaloriesPerHour = NutritionUtils.computeAveragePerHour(tourData, totalSodium);
+      final String averageCaloriesPerHourFormatted = _nf2.format(averageCaloriesPerHour);
+
+      return averageCaloriesPerHourFormatted;
    }
 
    private static List<Product> deserializeResponse(final String body, final ProductSearchType productSearchType) {

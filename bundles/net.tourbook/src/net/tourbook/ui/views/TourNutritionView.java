@@ -18,7 +18,6 @@ package net.tourbook.ui.views;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -120,7 +119,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private static final String            COLUMN_BEVERAGE_CONTAINER       = "BeverageContainer";                        //$NON-NLS-1$
    private static final String            COLUMN_CONSUMED_CONTAINERS      = "ConsumedContainers";                       //$NON-NLS-1$
 
-   public static final String             OPENFOODFACTS_BASEPATH          = "https://world.openfoodfacts.org/product/"; //$NON-NLS-1$
+   private static final String            OPENFOODFACTS_BASEPATH          = "https://world.openfoodfacts.org/product/"; //$NON-NLS-1$
 
    private static final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
 
@@ -156,12 +155,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private PostSelectionProvider          _postSelectionProvider;
 
    private final RangeContent             _quantityRange                  = new RangeContent(0.25, 10.0, 0.25, 100);
-
-   private final NumberFormat             _nf2                            = NumberFormat.getNumberInstance();
-   {
-      _nf2.setMinimumFractionDigits(0);
-      _nf2.setMaximumFractionDigits(2);
-   }
 
    /*
     * UI controls
@@ -478,19 +471,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _postSelectionProvider.clearSelection();
    }
 
-   private float computeAveragePerHour(final float total) {
-
-      long tourDeviceTime_Recorded = _tourData.getTourDeviceTime_Recorded();
-
-      if (tourDeviceTime_Recorded > 3600 && _prefStore.getBoolean(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR)) {
-         tourDeviceTime_Recorded -= 3600;
-      } else if (tourDeviceTime_Recorded <= 3600) {
-         return total;
-      }
-
-      return total * 60 / (tourDeviceTime_Recorded / 60f);
-   }
-
    @Override
    public void createPartControl(final Composite parent) {
 
@@ -573,13 +553,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             Label label = UI.createLabel(container, UI.EMPTY_STRING);
             GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
 
-            label = UI.createLabel(container, Messages.Tour_Nutrition_Column_Calories);
+            label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Calories);
             GridDataFactory.fillDefaults().span(2, 1).align(SWT.CENTER, SWT.FILL).applyTo(label);
 
             label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Fluids);
             GridDataFactory.fillDefaults().span(2, 1).align(SWT.CENTER, SWT.FILL).applyTo(label);
 
-            label = UI.createLabel(container, Messages.Tour_Nutrition_Column_Sodium);
+            label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Sodium);
             GridDataFactory.fillDefaults().span(2, 1).align(SWT.CENTER, SWT.FILL).applyTo(label);
          }
 
@@ -889,7 +869,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_Calories = new TableColumnDefinition(_columnManager, COLUMN_CALORIES, SWT.LEAD);
 
       _colDef_Calories.setColumnLabel(COLUMN_CALORIES);
-      _colDef_Calories.setColumnHeaderText(Messages.Tour_Nutrition_Column_Calories);
+      _colDef_Calories.setColumnHeaderText(Messages.Tour_Nutrition_Label_Calories);
 
       _colDef_Calories.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
 
@@ -915,7 +895,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_Sodium = new TableColumnDefinition(_columnManager, COLUMN_SODIUM, SWT.LEAD);
 
       _colDef_Sodium.setColumnLabel(COLUMN_SODIUM);
-      _colDef_Sodium.setColumnHeaderText(Messages.Tour_Nutrition_Column_Sodium);
+      _colDef_Sodium.setColumnHeaderText(Messages.Tour_Nutrition_Label_Sodium);
 
       _colDef_Sodium.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
 
@@ -1241,7 +1221,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_ConsumedQuantity.setEditingSupport(new EditingSupport(_productsViewer) {
 
          private SpinnerCellEditor spinnerCellEditor = new SpinnerCellEditor(_productsViewer.getTable(),
-               _nf2,
+               NutritionUtils._nf2,
                new RangeContent(0, 0, 0),
                SWT.NONE);
 
@@ -1412,7 +1392,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_ConsumedBeverageContainers.setEditingSupport(new EditingSupport(_productsViewer) {
 
-         private SpinnerCellEditor spinnerCellEditor = new SpinnerCellEditor(_productsViewer.getTable(), _nf2, _quantityRange, SWT.NONE);
+         private SpinnerCellEditor spinnerCellEditor = new SpinnerCellEditor(_productsViewer.getTable(),
+               NutritionUtils._nf2,
+               _quantityRange,
+               SWT.NONE);
 
          @Override
          protected boolean canEdit(final Object element) {
@@ -1505,24 +1488,21 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _txtCalories_Total.setText(totalCaloriesFormatted);
 
       final float totalFluid = NutritionUtils.getTotalFluids(tourNutritionProducts) * 100 / 100;
-      final String totalFluidFormatted = _nf2.format(totalFluid);
+      final String totalFluidFormatted = NutritionUtils._nf2.format(totalFluid);
       _txtFluid_Total.setText(totalFluidFormatted);
 
       final int totalSodium = (int) NutritionUtils.getTotalSodium(tourNutritionProducts);
       final String totalSodiumFormatted = FormatManager.formatNumber_0(totalSodium);
       _txtSodium_Total.setText(totalSodiumFormatted);
 
-      final float averageCaloriesPerHour = computeAveragePerHour(totalCalories);
-      final String averageCaloriesPerHourFormatted = FormatManager.formatNumber_0(averageCaloriesPerHour);
-      _txtCalories_Average.setText(averageCaloriesPerHourFormatted);
+      final String averageCaloriesPerHour = NutritionUtils.computeAverageCaloriesPerHour(_tourData);
+      _txtCalories_Average.setText(averageCaloriesPerHour);
 
-      final float averageFluidPerHour = computeAveragePerHour(totalFluid);
-      final String averageFluidPerHourFormatted = _nf2.format(averageFluidPerHour);
-      _txtFluid_Average.setText(averageFluidPerHourFormatted);
+      final String averageFluidsPerHour = NutritionUtils.computeAverageFluidsPerHour(_tourData);
+      _txtFluid_Average.setText(averageFluidsPerHour);
 
-      final float averageSodiumPerHour = computeAveragePerHour(totalSodium);
-      final String averageSodiumPerHourFormatted = FormatManager.formatNumber_0(averageSodiumPerHour);
-      _txtSodium_Average.setText(averageSodiumPerHourFormatted);
+      final String averageSodiumPerHour = NutritionUtils.computeAverageSodiumPerHour(_tourData);
+      _txtSodium_Average.setText(averageSodiumPerHour);
    }
 
 }

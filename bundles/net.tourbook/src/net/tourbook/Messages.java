@@ -3317,7 +3317,6 @@ public class Messages extends NLS {
    public static String        Tour_Nutrition_Column_BeverageContainer;
    public static String        Tour_Nutrition_Column_BeverageQuantity;
    public static String        Tour_Nutrition_Column_BeverageQuantity_Tooltip;
-   public static String        Tour_Nutrition_Column_Calories;
    public static String        Tour_Nutrition_Column_Capacity;
    public static String        Tour_Nutrition_Column_Code;
    public static String        Tour_Nutrition_Column_ConsumedContainers;
@@ -3328,14 +3327,15 @@ public class Messages extends NLS {
    public static String        Tour_Nutrition_Column_QuantityType;
    public static String        Tour_Nutrition_Column_QuantityType_Tooltip;
    public static String        Tour_Nutrition_Column_Servings;
-   public static String        Tour_Nutrition_Column_Sodium;
    public static String        Tour_Nutrition_Column_IsBeverage;
    public static String        Tour_Nutrition_Job_SearchingProducts;
    public static String        Tour_Nutrition_Label_Averages;
    public static String        Tour_Nutrition_Label_Averages_Tooltip;
+   public static String        Tour_Nutrition_Label_Calories;
    public static String        Tour_Nutrition_Label_Fluids;
    public static String        Tour_Nutrition_Label_QuantityType_Products;
    public static String        Tour_Nutrition_Label_QuantityType_Servings;
+   public static String        Tour_Nutrition_Label_Sodium;
    public static String        Tour_Nutrition_Label_Totals;
    public static String        Tour_Nutrition_Label_Totals_Tooltip;
    public static String        Tour_Nutrition_Section_ProductsList;

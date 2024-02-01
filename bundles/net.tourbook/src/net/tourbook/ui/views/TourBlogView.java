@@ -417,6 +417,24 @@ public class TourBlogView extends ViewPart {
       // AVERAGES
       sb.append(UI.NEW_LINE + "<u>" + Messages.Tour_Blog_Label_Nutrition_Averages + "</u>" + UI.NEW_LINE); //$NON-NLS-1$ //$NON-NLS-2$
 
+      sb.append("<table>"); //$NON-NLS-1$
+
+      // Average fluids per hour
+      final String averageFluidPerHour = NutritionUtils.computeAverageFluidsPerHour(_tourData);
+      sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Fluids, averageFluidPerHour, UI.UNIT_FLUIDS_L + UI.SLASH + UI.UNIT_LABEL_TIME));
+      // Average calories per hour
+      final String averageCaloriesPerHour = NutritionUtils.computeAverageCaloriesPerHour(_tourData);
+      sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Calories,
+            averageCaloriesPerHour,
+            net.tourbook.ui.Messages.Value_Unit_KCalories + UI.SLASH + UI.UNIT_LABEL_TIME));
+      // Average sodium per L
+      final String averageSodiumPerHour = NutritionUtils.computeAverageSodiumPerHour(_tourData);
+      sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Sodium,
+            averageSodiumPerHour,
+            UI.UNIT_WEIGHT_MG + UI.SLASH + UI.UNIT_FLUIDS_L));
+
+      sb.append("</table>"); //$NON-NLS-1$
+
       // Split the tour nutrition products into 2 lists: beverages and foods
       final List<TourNutritionProduct> beverages = new ArrayList<>();
       final List<TourNutritionProduct> foods = new ArrayList<>();
@@ -477,6 +495,19 @@ public class TourBlogView extends ViewPart {
       }
 
       return nutritionSectionString;
+   }
+
+   private String buildTableRow(final String label, final String average, final String unit) {
+
+      final StringBuilder sb = new StringBuilder();
+
+      sb.append("<tr>"); //$NON-NLS-1$
+      sb.append(String.format("<td>%s</td>", label)); //$NON-NLS-1$
+      sb.append("<td>&rarr;</td>"); //$NON-NLS-1$
+      sb.append(String.format("<td>%s %s</td>", average, unit)); //$NON-NLS-1$
+      sb.append("</tr>"); //$NON-NLS-1$
+
+      return sb.toString();
    }
 
    private String buildTagsSection(final Set<TourTag> tourTags, final boolean addSpacer) {
