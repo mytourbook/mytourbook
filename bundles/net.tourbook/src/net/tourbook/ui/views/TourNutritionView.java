@@ -124,7 +124,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private static final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
 
-   private static final int               _hintTextColumnWidth            = UI.IS_OSX ? 100 : 50;
+   private static final int               HINT_TEXT_COLUMN_WIDTH          = UI.IS_OSX ? 100 : 50;
 
    private final IDialogSettings          _state                          = TourbookPlugin.getState(ID);
    private TourData                       _tourData;
@@ -594,7 +594,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             _txtCalories_Total = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtCalories_Total.setEnabled(false);
             GridDataFactory.fillDefaults()
-                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
+                  .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtCalories_Total);
 
@@ -604,7 +604,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             _txtFluid_Total = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtFluid_Total.setEnabled(false);
             GridDataFactory.fillDefaults()
-                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
+                  .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtFluid_Total);
 
@@ -614,7 +614,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             _txtSodium_Total = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtSodium_Total.setEnabled(false);
             GridDataFactory.fillDefaults()
-                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
+                  .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_txtSodium_Total);
 
@@ -632,7 +632,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             _txtCalories_Average = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtCalories_Average.setEnabled(false);
-            GridDataFactory.fillDefaults().hint(_hintTextColumnWidth, SWT.DEFAULT).align(SWT.END, SWT.FILL)
+            GridDataFactory.fillDefaults().hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT).align(SWT.END, SWT.FILL)
                   .applyTo(_txtCalories_Average);
 
             // Unit: kcal/h
@@ -640,7 +640,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             _txtFluid_Average = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtFluid_Average.setEnabled(false);
-            GridDataFactory.fillDefaults().hint(_hintTextColumnWidth, SWT.DEFAULT).align(SWT.END, SWT.FILL)
+            GridDataFactory.fillDefaults().hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT).align(SWT.END, SWT.FILL)
                   .applyTo(_txtFluid_Average);
 
             // Unit: L/h
@@ -648,7 +648,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             _txtSodium_Average = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtSodium_Average.setEnabled(false);
-            GridDataFactory.fillDefaults().hint(_hintTextColumnWidth, SWT.DEFAULT).align(SWT.END, SWT.FILL)
+            GridDataFactory.fillDefaults().hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT).align(SWT.END, SWT.FILL)
                   .applyTo(_txtSodium_Average);
 
             // Unit: mg/h
