@@ -751,7 +751,6 @@
             label       ="%View_Name_TourData"
             mnemonic    ="%View_Name_TourData_Mnemonic"/>
             
-         <!-- Tour Nutrition TODO FB icons/tour-nutrition.png-->
          <command
             commandId   ="command.net.tourbook.views.TourNutritionView"
             icon        ="icons/tour-nutrition.png"
