@@ -414,6 +414,9 @@ public class TourBlogView extends ViewPart {
 
       sb.append("<div class='title'>" + Messages.Tour_Blog_Section_Nutrition + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
 
+      // AVERAGES
+      sb.append(UI.NEW_LINE + "<u>" + Messages.Tour_Blog_Label_Nutrition_Averages + "</u>" + UI.NEW_LINE); //$NON-NLS-1$ //$NON-NLS-2$
+
       // Split the tour nutrition products into 2 lists: beverages and foods
       final List<TourNutritionProduct> beverages = new ArrayList<>();
       final List<TourNutritionProduct> foods = new ArrayList<>();

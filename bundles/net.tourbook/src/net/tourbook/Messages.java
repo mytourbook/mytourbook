@@ -2879,6 +2879,7 @@ public class Messages extends NLS {
    public static String        Tour_Blog_Action_HideMarker_Tooltip;
    public static String        Tour_Blog_Action_OpenMarker_Tooltip;
    public static String        Tour_Blog_Action_ShowMarker_Tooltip;
+   public static String        Tour_Blog_Label_Nutrition_Averages;
    public static String        Tour_Blog_Label_Beverages;
    public static String        Tour_Blog_Label_Foods;
    public static String        Tour_Blog_Section_Nutrition;
