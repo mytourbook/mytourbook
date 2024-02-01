@@ -185,27 +185,23 @@ public class TourNutritionProduct {
       final String quantity = product.quantity;
       final String servingQuantity = product.servingQuantity;
 
-      if (nutriScoreData != null && nutriScoreData.isBeverage()) {
+      if (nutriScoreData != null && nutriScoreData.isBeverage() &&
+            quantity != null && productQuantity != null && servingQuantity != null) {
 
-         isBeverage = product.nutriScoreData != null;
+         final int numberOfServings = Math.round(Float.valueOf(productQuantity) / Float.valueOf(servingQuantity));
+         setCalories(nutriments.energyKcalServing * numberOfServings);
+         setCalories_Serving(nutriments.energyKcalServing);
 
-         if (quantity != null && productQuantity != null && servingQuantity != null) {
+         setSodium(Math.round(nutriments.sodiumServing * numberOfServings * 1000));
+         setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
 
-            final int numberOfServings = Math.round(Float.valueOf(productQuantity) / Float.valueOf(servingQuantity));
-            setCalories(nutriments.energyKcalServing * numberOfServings);
-            setCalories_Serving(nutriments.energyKcalServing);
+         // We store the quantity ONLY if the beverage is in liquid form (mL)
+         if (quantity.trim().toUpperCase().endsWith(UI.UNIT_FLUIDS_L)) {
 
-            setSodium(Math.round(nutriments.sodiumServing * numberOfServings * 1000));
-            setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
-
-            // We store the quantity ONLY if the beverage is in liquid form (mL)
-            if (quantity.trim().toUpperCase().endsWith(UI.UNIT_FLUIDS_L)) {
-
-               beverageQuantity = Integer.valueOf(productQuantity);
-               setBeverageQuantity_Serving(Integer.valueOf(servingQuantity.trim()));
-            }
-
+            beverageQuantity = Integer.valueOf(productQuantity);
+            setBeverageQuantity_Serving(Integer.valueOf(servingQuantity.trim()));
          }
+
       } else {
 
          if (productQuantity != null) {
