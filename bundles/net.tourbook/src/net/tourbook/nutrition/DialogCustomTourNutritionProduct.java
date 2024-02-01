@@ -111,11 +111,11 @@ public class DialogCustomTourNutritionProduct extends Dialog {
                   .applyTo(_txtName);
             _txtName.addModifyListener(e -> {
 
-               validateFields();
-
                final Text textWidget = (Text) e.getSource();
                final String userText = textWidget.getText();
                _name = userText;
+
+               validateFields();
             });
          }
          {

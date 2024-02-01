@@ -28,15 +28,18 @@ import org.eclipse.jface.viewers.ISelection;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Product implements ISelection {
 
-   public Nutriments     nutriments;
+   @JsonProperty("nutrition_data_per")
+   public NutritionDataPer nutritionDataPer;
+
+   public Nutriments       nutriments;
 
    @JsonProperty("nutriscore_data")
-   public NutriScoreData nutriScoreData;
+   public NutriScoreData   nutriScoreData;
 
-   public String         brands;
+   public String           brands;
 
    @JsonProperty("product_name")
-   public String         productName;
+   public String           productName;
 
    /*
     * The size in g or ml for the whole product. It's a normalized version of the quantity field.

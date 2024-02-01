@@ -27,10 +27,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.QuantityType;
 import net.tourbook.nutrition.openfoodfacts.NutriScoreData;
 import net.tourbook.nutrition.openfoodfacts.Nutriments;
+import net.tourbook.nutrition.openfoodfacts.NutritionDataPer;
 import net.tourbook.nutrition.openfoodfacts.Product;
 
 @Entity
@@ -205,21 +207,27 @@ public class TourNutritionProduct {
 
       } else {
 
-         if (productQuantity != null) {
+         setCalories_Serving(nutriments.energyKcalServing);
+         setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
 
-            setCalories(Math.round((nutriments.energyKcal100g * Float.valueOf(productQuantity)) / 100f));
-            setCalories_Serving(nutriments.energyKcalServing);
+         // If the data is for 100g or 1 serving, the product calories and sodium
+         // values computation are different
+         final float productQuantityFloat = Util.parseFloat(productQuantity);
+         if (product.nutritionDataPer == NutritionDataPer.HUNDRED_GRAMS) {
 
-            setSodium(Math.round(nutriments.sodium100g * Float.valueOf(productQuantity) * 10));
-            setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
+            setCalories(Math.round((nutriments.energyKcal100g * productQuantityFloat) / 100f));
+            setSodium(Math.round(nutriments.sodium100g * productQuantityFloat * 10));
 
-         } else {
+         } else if (product.nutritionDataPer == NutritionDataPer.SERVING) {
 
-            // In this case, we can only assume that the product only contains 1 serving
-            setCalories(nutriments.energyKcalServing);
-            setCalories_Serving(nutriments.energyKcalServing);
-            setSodium(Math.round(nutriments.sodiumServing * 1000));
-            setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
+            final float servingQuantityFloat = Util.parseFloat(servingQuantity);
+
+            final int numServingsPerProduct = servingQuantityFloat == 0
+                  ? 0 : Math.round(productQuantityFloat / servingQuantityFloat);
+
+            setCalories(getCalories_Serving() * numServingsPerProduct);
+            setSodium(getSodium_Serving() * numServingsPerProduct);
+
          }
       }
    }
