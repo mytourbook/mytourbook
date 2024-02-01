@@ -306,7 +306,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
             _comboSearchQuery = new Combo(queryContainer, SWT.NONE);
             _comboSearchQuery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchProduct()));
             _comboSearchQuery.addModifyListener(event -> {
+
                validateFields();
+
                _btnSearch.getShell().setDefaultButton(_btnSearch);
             });
             GridDataFactory.fillDefaults()
@@ -482,6 +484,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private void onSearchProduct() {
 
+      if (_btnSearch.isEnabled() == false) {
+         return;
+      }
+
       _productsViewer.getTable().removeAll();
       // disable search controls
       _comboSearchQuery.setEnabled(false);
@@ -613,6 +619,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       final String searchQueryText = _comboSearchQuery.getText();
 
       if (net.tourbook.common.util.StringUtils.isNullOrEmpty(searchQueryText)) {
+
          _btnSearch.setEnabled(false);
          _tooltipInvalidBarCode.setVisible(false);
          return;
@@ -626,6 +633,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          _tooltipInvalidBarCode.setVisible(!isSearchQueryNumeric);
 
       } else {
+
          _btnSearch.setEnabled(true);
          _tooltipInvalidBarCode.setVisible(false);
       }
