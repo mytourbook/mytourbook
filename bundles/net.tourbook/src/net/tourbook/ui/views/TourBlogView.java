@@ -23,7 +23,6 @@ import com.linkedin.urls.detection.UrlDetector;
 import com.linkedin.urls.detection.UrlDetectorOptions;
 
 import java.io.File;
-import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -150,43 +149,37 @@ public class TourBlogView extends ViewPart {
       HREF_OPEN_MARKER = HREF_TOKEN + ACTION_OPEN_MARKER + HREF_TOKEN;
       HREF_SHOW_MARKER = HREF_TOKEN + ACTION_SHOW_MARKER + HREF_TOKEN;
    }
-   private static final String           HREF_MARKER_ITEM  = "#MarkerItem";                   //$NON-NLS-1$
+   private static final String           HREF_MARKER_ITEM  = "#MarkerItem";                 //$NON-NLS-1$
    private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
    private static final IDialogSettings  _state            = TourbookPlugin.getState(ID);
    private static final IDialogSettings  _state_WEB        = WEB.getState();
 
-   private final NumberFormat            _nf2              = NumberFormat.getNumberInstance();
-   {
-      _nf2.setMinimumFractionDigits(0);
-      _nf2.setMaximumFractionDigits(2);
-   }
+   private PostSelectionProvider         _postSelectionProvider;
+   private ISelectionListener            _postSelectionListener;
+   private IPropertyChangeListener       _prefChangeListener;
+   private IPropertyChangeListener       _prefChangeListener_Common;
+   private ITourEventListener            _tourEventListener;
+   private IPartListener2                _partListener;
 
-   private PostSelectionProvider   _postSelectionProvider;
-   private ISelectionListener      _postSelectionListener;
-   private IPropertyChangeListener _prefChangeListener;
-   private IPropertyChangeListener _prefChangeListener_Common;
-   private ITourEventListener      _tourEventListener;
-   private IPartListener2          _partListener;
+   private TourData                      _tourData;
 
-   private TourData                _tourData;
+   private String                        _htmlCss;
 
-   private String                  _htmlCss;
+   private String                        _imageUrl_ActionEdit;
+   private String                        _imageUrl_ActionHideMarker;
+   private String                        _imageUrl_ActionShowMarker;
 
-   private String                  _imageUrl_ActionEdit;
-   private String                  _imageUrl_ActionHideMarker;
-   private String                  _imageUrl_ActionShowMarker;
+   private String                        _cssMarker_DefaultColor;
+   private String                        _cssMarker_DeviceColor;
+   private String                        _cssMarker_HiddenColor;
 
-   private String                  _cssMarker_DefaultColor;
-   private String                  _cssMarker_DeviceColor;
-   private String                  _cssMarker_HiddenColor;
+   private boolean                       _isDrawWithDefaultColor;
+   private boolean                       _isShowHiddenMarker;
 
-   private boolean                 _isDrawWithDefaultColor;
-   private boolean                 _isShowHiddenMarker;
+   private Long                          _reloadedTourMarkerId;
 
-   private Long                    _reloadedTourMarkerId;
-
-   private ActionTourBlogOptions   _actionTourBlogOptions;
+   private ActionTourBlogOptions         _actionTourBlogOptions;
 
    /*
     * UI controls
@@ -417,6 +410,7 @@ public class TourBlogView extends ViewPart {
       // AVERAGES
       sb.append(UI.NEW_LINE + "<u>" + Messages.Tour_Blog_Label_Nutrition_Averages + "</u>" + UI.NEW_LINE); //$NON-NLS-1$ //$NON-NLS-2$
 
+      sb.append(UI.NEW_LINE);
       sb.append("<table>"); //$NON-NLS-1$
 
       // Average fluids per hour
@@ -458,14 +452,14 @@ public class TourBlogView extends ViewPart {
             if (tourBeverageContainer == null) {
 
                sb.append(String.format("%s %s (%s %s)", //$NON-NLS-1$
-                     _nf2.format(product.getConsumedQuantity()),
+                     NutritionUtils._nf2.format(product.getConsumedQuantity()),
                      product.getName(),
-                     _nf2.format(product.getBeverageQuantity()),
+                     NutritionUtils._nf2.format(product.getBeverageQuantity()),
                      UI.UNIT_FLUIDS_ML));
 
             } else {
 
-               sb.append(_nf2.format(product.getContainersConsumed()) + UI.SPACE1 + NutritionUtils.buildTourBeverageContainerName(
+               sb.append(NutritionUtils._nf2.format(product.getContainersConsumed()) + UI.SPACE1 + NutritionUtils.buildTourBeverageContainerName(
                      tourBeverageContainer));
 
             }
@@ -482,7 +476,7 @@ public class TourBlogView extends ViewPart {
          foods.stream().forEach(product -> {
 
             sb.append(UI.NEW_LINE);
-            sb.append(_nf2.format(product.getConsumedQuantity()) + UI.SPACE1 + product.getName());
+            sb.append(NutritionUtils._nf2.format(product.getConsumedQuantity()) + UI.SPACE1 + product.getName());
          });
 
          sb.append(UI.NEW_LINE);

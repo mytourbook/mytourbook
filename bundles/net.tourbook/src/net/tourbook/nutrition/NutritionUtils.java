@@ -67,8 +67,8 @@ public class NutritionUtils {
    // you have to add a User-Agent HTTP Header with the name of your app, the version, system and a url (if any), not to be blocked by mistake.
    // For example: User-Agent: NameOfYourApp - Android - Version 1.0 - www.yourappwebsite.com
    // Source: https://world.openfoodfacts.org/files/api-documentation.html
-   private static final String       USER_AGENT = String.format("MyTourbook - %s - Version %s - https://mytourbook.sourceforge.io",              //$NON-NLS-1$
-         System.getProperty("os.name"),                                                                                                          //$NON-NLS-1$
+   private static final String      USER_AGENT = String.format("MyTourbook - %s - Version %s - https://mytourbook.sourceforge.io",              //$NON-NLS-1$
+         System.getProperty("os.name"),                                                                                                         //$NON-NLS-1$
          ApplicationVersion.getVersionSimple());
 
    public static final NumberFormat _nf2       = NumberFormat.getNumberInstance();
@@ -93,11 +93,11 @@ public class NutritionUtils {
 
    public static String computeAverageFluidsPerHour(final TourData tourData) {
 
-      final float totalFluid = NutritionUtils.getTotalFluids(tourData.getTourNutritionProducts()) * 100 / 100;
-      final float averageFluidPerHour = NutritionUtils.computeAveragePerHour(tourData, totalFluid);
-      final String averageFluidPerHourFormatted = _nf2.format(averageFluidPerHour);
+      final float totalFluids = NutritionUtils.getTotalFluids(tourData.getTourNutritionProducts()) * 100 / 100;
+      final float averageFluidsPerHour = NutritionUtils.computeAveragePerHour(tourData, totalFluids);
+      final String averageFluidsPerHourFormatted = _nf2.format(averageFluidsPerHour);
 
-      return averageFluidPerHourFormatted;
+      return averageFluidsPerHourFormatted;
    }
 
    private static float computeAveragePerHour(final TourData tourData, final float totalAmount) {
@@ -115,7 +115,7 @@ public class NutritionUtils {
 
    public static String computeAverageSodiumPerHour(final TourData tourData) {
 
-      final float totalSodium =  NutritionUtils.getTotalSodium(tourData.getTourNutritionProducts());
+      final float totalSodium = NutritionUtils.getTotalSodium(tourData.getTourNutritionProducts());
       final float averageCaloriesPerHour = NutritionUtils.computeAveragePerHour(tourData, totalSodium);
       final String averageCaloriesPerHourFormatted = _nf2.format(averageCaloriesPerHour);
 
