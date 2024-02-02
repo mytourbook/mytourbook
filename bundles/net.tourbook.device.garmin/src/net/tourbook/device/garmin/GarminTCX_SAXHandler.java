@@ -712,11 +712,11 @@ class GarminTCX_SAXHandler extends DefaultHandler {
          tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End, null);
          tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - tourData.getTourDeviceTime_Paused());
 
-         setTourDataPowerAvgMax(tourData);
-
          tourData.computeAltitudeUpDown();
          tourData.computeTourMovingTime();
          tourData.computeComputedValues();
+
+         setTourDataPowerAvgMax(tourData);
       }
 
       _importState_File.isFileImportedWithValidData = true;
