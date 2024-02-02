@@ -42,7 +42,9 @@ Experimental
 New
 ===
 
-* 
+* Tour Nutrition
+  Add the ability to assign food/fluids to any given tour.
+  https://github.com/mytourbook/mytourbook/issues/1280
 
 
 Improvements
