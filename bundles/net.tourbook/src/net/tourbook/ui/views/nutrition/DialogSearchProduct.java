@@ -80,7 +80,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private static final String           STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY";      //$NON-NLS-1$
 
-   public static final String            ID                                             = "net.tourbook.ui.views.nutrition.DialogSearchProduct"; //$NON-NLS-1$
+   private static final String           ID                                             = "net.tourbook.ui.views.nutrition.DialogSearchProduct"; //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore                                     = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _state                                         = TourbookPlugin.getState(ID);
