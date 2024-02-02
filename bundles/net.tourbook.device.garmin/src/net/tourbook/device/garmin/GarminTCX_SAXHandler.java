@@ -691,8 +691,6 @@ class GarminTCX_SAXHandler extends DefaultHandler {
       final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_TCX);
       final Long tourId = tourData.createTourId(uniqueId);
 
-      setTourDataPowerAvgMax(tourData);
-
       /*
        * The tour start time timezone is set from lat/lon in createTimeSeries()
        */
@@ -713,6 +711,8 @@ class GarminTCX_SAXHandler extends DefaultHandler {
          // create additional data
          tourData.finalizeTour_TimerPauses(_pausedTime_Start, _pausedTime_End, null);
          tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - tourData.getTourDeviceTime_Paused());
+
+         setTourDataPowerAvgMax(tourData);
 
          tourData.computeAltitudeUpDown();
          tourData.computeTourMovingTime();
@@ -1100,9 +1100,14 @@ class GarminTCX_SAXHandler extends DefaultHandler {
     */
    private void setTourDataPowerAvgMax(final TourData tourData) {
 
-      final float[] powerSerie = tourData.getPowerSerie();
-      if (powerSerie == null || powerSerie.length == 0) {
+      final boolean isPower = _allTimeData.stream().anyMatch(value -> value.power != Float.MIN_VALUE);
+      if (!isPower) {
          return;
+      }
+
+      final float[] powerSerie = new float[_allTimeData.size()];
+      for (int index = 0; index < _allTimeData.size(); ++index) {
+         powerSerie[index] = _allTimeData.get(index).power;
       }
 
       if (_isComputeAveragePower) {
