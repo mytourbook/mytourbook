@@ -61,7 +61,7 @@ Bugfix
 ======
 
 * TCX Import (Frederic)
-  - Fix for average power computation
+  - Fix for average and maximum power computation
 
 
 Translation    
