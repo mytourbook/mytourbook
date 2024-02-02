@@ -1101,7 +1101,11 @@ class GarminTCX_SAXHandler extends DefaultHandler {
    private void setTourDataPowerAvgMax(final TourData tourData) {
 
       final float[] powerSerie = tourData.getPowerSerie();
-      if (_isComputeAveragePower && powerSerie != null) {
+      if (powerSerie == null || powerSerie.length == 0) {
+         return;
+      }
+
+      if (_isComputeAveragePower) {
 
          tourData.setPower_Avg(tourData.computeAvg_FromValues(powerSerie, 0, powerSerie.length - 1));
 
@@ -1110,9 +1114,7 @@ class GarminTCX_SAXHandler extends DefaultHandler {
          tourData.setPower_Avg(_totalLapAverageWatts / _lapCounter);
       }
 
-      if (powerSerie != null) {
-         tourData.setPower_Max(Math.round(tourData.computeMax_FromValues(powerSerie, 0, powerSerie.length - 1)));
-      }
+      tourData.setPower_Max(Math.round(tourData.computeMax_FromValues(powerSerie, 0, powerSerie.length - 1)));
    }
 
    /**
