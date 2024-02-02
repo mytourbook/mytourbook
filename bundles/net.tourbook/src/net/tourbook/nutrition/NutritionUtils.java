@@ -161,7 +161,7 @@ public class NutritionUtils {
       return getProductFullName(product.brands, product.productName);
    }
 
-   public static String getProductFullName(final String brand, final String name) {
+   private static String getProductFullName(final String brand, final String name) {
 
       return Stream.of(brand, name)
             .filter(string -> StringUtils.hasContent(string))

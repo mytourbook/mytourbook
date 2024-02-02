@@ -160,7 +160,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
             return product.code;
 
          case 1:
-            return NutritionUtils.getProductFullName(product.brands, product.productName);
+            return NutritionUtils.getProductFullName(product);
 
          default:
             return getText(obj);
