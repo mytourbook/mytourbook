@@ -105,22 +105,24 @@ import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 public class TourNutritionView extends ViewPart implements ITourViewer {
 
    //todo fb on linux, there are a lot of space between the 2 sections even when NOT expanded ?ask wolfgang when i do the pr
-   static final String                   ID                             = "net.tourbook.ui.views.TourNutritionView";  //$NON-NLS-1$
-   private static final String           STATE_PRODUCT_SEARCHES_HISTORY = "products.searchesHistory";                 //$NON-NLS-1$
-   private static final String           STATE_SECTION_PRODUCTS_LIST    = "STATE_SECTION_PRODUCTS_LIST";              //$NON-NLS-1$
-   private static final String           STATE_SECTION_SUMMARY          = "STATE_SECTION_SUMMARY";                    //$NON-NLS-1$
+   static final String                   ID                             = "net.tourbook.ui.views.TourNutritionView";    //$NON-NLS-1$
+   private static final String           STATE_PRODUCT_SEARCHES_HISTORY = "products.searchesHistory";                   //$NON-NLS-1$
+   private static final String           STATE_SECTION_PRODUCTS_LIST    = "STATE_SECTION_PRODUCTS_LIST";                //$NON-NLS-1$
+   private static final String           STATE_SECTION_SUMMARY          = "STATE_SECTION_SUMMARY";                      //$NON-NLS-1$
 
-   private static final String           COLUMN_CONSUMED_QUANTITY       = "ConsumedQuantity";                         //$NON-NLS-1$
-   private static final String           COLUMN_QUANTITY_TYPE           = "QuantityType";                             //$NON-NLS-1$
-   private static final String           COLUMN_NAME                    = "Name";                                     //$NON-NLS-1$
-   private static final String           COLUMN_CALORIES                = "Calories";                                 //$NON-NLS-1$
-   private static final String           COLUMN_SODIUM                  = "Sodium";                                   //$NON-NLS-1$
-   private static final String           COLUMN_ISBEVERAGE              = "IsBeverage";                               //$NON-NLS-1$
-   private static final String           COLUMN_BEVERAGE_QUANTITY       = "BeverageQuantity";                         //$NON-NLS-1$
-   private static final String           COLUMN_BEVERAGE_CONTAINER      = "BeverageContainer";                        //$NON-NLS-1$
-   private static final String           COLUMN_CONSUMED_CONTAINERS     = "ConsumedContainers";                       //$NON-NLS-1$
+   private static final String           COLUMN_CONSUMED_QUANTITY       = "ConsumedQuantity";                           //$NON-NLS-1$
+   private static final String           COLUMN_QUANTITY_TYPE           = "QuantityType";                               //$NON-NLS-1$
+   private static final String           COLUMN_NAME                    = "Name";                                       //$NON-NLS-1$
+   private static final String           COLUMN_CALORIES                = "Calories";                                   //$NON-NLS-1$
+   private static final String           COLUMN_SODIUM                  = "Sodium";                                     //$NON-NLS-1$
+   private static final String           COLUMN_ISBEVERAGE              = "IsBeverage";                                 //$NON-NLS-1$
+   private static final String           COLUMN_BEVERAGE_QUANTITY       = "BeverageQuantity";                           //$NON-NLS-1$
+   private static final String           COLUMN_BEVERAGE_CONTAINER      = "BeverageContainer";                          //$NON-NLS-1$
+   private static final String           COLUMN_CONSUMED_CONTAINERS     = "ConsumedContainers";                         //$NON-NLS-1$
 
-   private static final String           OPENFOODFACTS_BASEPATH         = "https://world.openfoodfacts.org/product/"; //$NON-NLS-1$
+   private static final String           OPENFOODFACTS_BASEPATH         = "https://world.openfoodfacts.org/product/";   //$NON-NLS-1$
+
+   private static final String           VALUE_UNIT_KCALORIES           = net.tourbook.ui.Messages.Value_Unit_KCalories;
 
    private static final IPreferenceStore _prefStore                     = TourbookPlugin.getPrefStore();
 
@@ -586,7 +588,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                   .applyTo(_txtCalories_Total);
 
             // Unit: kcal
-            UI.createLabel(container, net.tourbook.ui.Messages.Value_Unit_KCalories);
+            UI.createLabel(container, VALUE_UNIT_KCALORIES);
 
             _txtFluid_Total = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtFluid_Total.setEnabled(false);
@@ -623,7 +625,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                   .applyTo(_txtCalories_Average);
 
             // Unit: kcal/h
-            UI.createLabel(container, net.tourbook.ui.Messages.Value_Unit_KCalories + UI.SLASH + UI.UNIT_LABEL_TIME);
+            UI.createLabel(container, VALUE_UNIT_KCALORIES + UI.SLASH + UI.UNIT_LABEL_TIME);
 
             _txtFluid_Average = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtFluid_Average.setEnabled(false);
