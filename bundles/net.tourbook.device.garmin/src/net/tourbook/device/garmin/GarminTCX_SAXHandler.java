@@ -1093,14 +1093,9 @@ class GarminTCX_SAXHandler extends DefaultHandler {
       _isComputeAveragePower = true;
    }
 
-   /**
-    * In the case where the power was retrieved from the trackpoint's
-    * extension field and the file didn't contain the average power value, we
-    * need to compute it ourselves.
-    */
    private void setTourDataPowerAvgMax(final TourData tourData) {
 
-      final boolean isPower = _allTimeData.stream().anyMatch(value -> value.power != Float.MIN_VALUE);
+      final boolean isPower = _allTimeData.stream().anyMatch(timeData -> timeData.power != Float.MIN_VALUE);
       if (!isPower) {
          return;
       }
@@ -1110,6 +1105,11 @@ class GarminTCX_SAXHandler extends DefaultHandler {
          powerSerie[index] = _allTimeData.get(index).power;
       }
 
+      /*
+       * In the case where the power was retrieved from the trackpoint's
+       * extension field and the file didn't contain the average power value, we
+       * need to compute it ourselves.
+       */
       if (_isComputeAveragePower) {
 
          tourData.setPower_Avg(tourData.computeAvg_FromValues(powerSerie, 0, powerSerie.length - 1));
