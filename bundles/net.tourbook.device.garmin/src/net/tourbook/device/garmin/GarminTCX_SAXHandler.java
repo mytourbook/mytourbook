@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,7 +45,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class GarminTCX_SAXHandler extends DefaultHandler {
+class GarminTCX_SAXHandler extends DefaultHandler {
 
    private static final String    TRAINING_CENTER_DATABASE_V1 = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v1"; //$NON-NLS-1$
    private static final String    TRAINING_CENTER_DATABASE_V2 = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"; //$NON-NLS-1$
@@ -206,12 +206,12 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
 
    }
 
-   public GarminTCX_SAXHandler(final TourbookDevice deviceDataReader,
-                               final String importFileName,
-                               final DeviceData deviceData,
-                               final Map<Long, TourData> alreadyImportedTours,
-                               final Map<Long, TourData> newlyImportedTours,
-                               final ImportState_File importState_File) {
+   GarminTCX_SAXHandler(final TourbookDevice deviceDataReader,
+                        final String importFileName,
+                        final DeviceData deviceData,
+                        final Map<Long, TourData> alreadyImportedTours,
+                        final Map<Long, TourData> newlyImportedTours,
+                        final ImportState_File importState_File) {
 
       _device = deviceDataReader;
       _importFilePath = importFileName;
@@ -685,6 +685,12 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
                               ? UI.EMPTY_STRING
                               : UI.SYMBOL_DOT + minorVersion));
 
+      tourData.createTimeSeries(_allTimeData, true);
+
+      // after all data are added, the tour id can be created
+      final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_TCX);
+      final Long tourId = tourData.createTourId(uniqueId);
+
       /*
        * In the case where the power was retrieved from the trackpoint's
        * extension field and the file didn't contain the average power value, we
@@ -700,12 +706,6 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
       } else if (_totalLapAverageWatts > 0 && _lapCounter > 0) {
          tourData.setPower_Avg(_totalLapAverageWatts / _lapCounter);
       }
-
-      tourData.createTimeSeries(_allTimeData, true);
-
-      // after all data are added, the tour id can be created
-      final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_TCX);
-      final Long tourId = tourData.createTourId(uniqueId);
 
       /*
        * The tour start time timezone is set from lat/lon in createTimeSeries()
