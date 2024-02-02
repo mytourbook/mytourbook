@@ -691,21 +691,7 @@ class GarminTCX_SAXHandler extends DefaultHandler {
       final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_TCX);
       final Long tourId = tourData.createTourId(uniqueId);
 
-      /*
-       * In the case where the power was retrieved from the trackpoint's
-       * extension field and the file didn't contain the average power value, we
-       * need to compute it ourselves.
-       */
-      if (_isComputeAveragePower) {
-
-         final float[] powerSerie = tourData.getPowerSerie();
-         if (powerSerie != null) {
-            tourData.setPower_Avg(tourData.computeAvg_FromValues(powerSerie, 0, powerSerie.length - 1));
-         }
-
-      } else if (_totalLapAverageWatts > 0 && _lapCounter > 0) {
-         tourData.setPower_Avg(_totalLapAverageWatts / _lapCounter);
-      }
+      setTourDataPowerAvgMax(tourData);
 
       /*
        * The tour start time timezone is set from lat/lon in createTimeSeries()
@@ -1105,6 +1091,28 @@ class GarminTCX_SAXHandler extends DefaultHandler {
       _pausedTime_End.clear();
 
       _isComputeAveragePower = true;
+   }
+
+   /**
+    * In the case where the power was retrieved from the trackpoint's
+    * extension field and the file didn't contain the average power value, we
+    * need to compute it ourselves.
+    */
+   private void setTourDataPowerAvgMax(final TourData tourData) {
+
+      final float[] powerSerie = tourData.getPowerSerie();
+      if (_isComputeAveragePower && powerSerie != null) {
+
+         tourData.setPower_Avg(tourData.computeAvg_FromValues(powerSerie, 0, powerSerie.length - 1));
+
+      } else if (_totalLapAverageWatts > 0 && _lapCounter > 0) {
+
+         tourData.setPower_Avg(_totalLapAverageWatts / _lapCounter);
+      }
+
+      if (powerSerie != null) {
+         tourData.setPower_Max(Math.round(tourData.computeMax_FromValues(powerSerie, 0, powerSerie.length - 1)));
+      }
    }
 
    /**
