@@ -104,7 +104,6 @@ import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 
 public class TourNutritionView extends ViewPart implements ITourViewer {
 
-   //todo fb on linux, there are a lot of space between the 2 sections even when NOT expanded ?ask wolfgang when i do the pr
    static final String                   ID                             = "net.tourbook.ui.views.TourNutritionView";    //$NON-NLS-1$
    private static final String           STATE_PRODUCT_SEARCHES_HISTORY = "products.searchesHistory";                   //$NON-NLS-1$
    private static final String           STATE_SECTION_PRODUCTS_LIST    = "STATE_SECTION_PRODUCTS_LIST";                //$NON-NLS-1$
@@ -1242,9 +1241,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          @Override
          protected CellEditor getCellEditor(final Object element) {
 
-            //todo fb ask wolfgang in the PR and show this line where I configured the increment etc...
-            //it works but it's when i use the mousewheel that it doesn't!?!? at least on windows, to test on linux !?
-            //wow, it's all over the place as there are 3 possible ways
+            //TODO FB it's all over the place as there are 3 possible ways
             //- mouse wheel on the number
             //- mouse wheel on the -/+ signs
             //- mouse wheel CLICK on the -/+ signs
