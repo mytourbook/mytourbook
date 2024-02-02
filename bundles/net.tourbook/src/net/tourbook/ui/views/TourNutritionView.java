@@ -18,6 +18,7 @@ package net.tourbook.ui.views;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -104,26 +105,32 @@ import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 public class TourNutritionView extends ViewPart implements ITourViewer {
 
    //todo fb on linux, there are a lot of space between the 2 sections even when NOT expanded ?ask wolfgang when i do the pr
-   static final String                    ID                              = "net.tourbook.ui.views.TourNutritionView";  //$NON-NLS-1$
-   private static final String            STATE_PRODUCT_SEARCHES_HISTORY  = "products.searchesHistory";                 //$NON-NLS-1$
-   private static final String            STATE_SECTION_PRODUCTS_LIST     = "STATE_SECTION_PRODUCTS_LIST";              //$NON-NLS-1$
-   private static final String            STATE_SECTION_SUMMARY           = "STATE_SECTION_SUMMARY";                    //$NON-NLS-1$
+   static final String                   ID                             = "net.tourbook.ui.views.TourNutritionView";  //$NON-NLS-1$
+   private static final String           STATE_PRODUCT_SEARCHES_HISTORY = "products.searchesHistory";                 //$NON-NLS-1$
+   private static final String           STATE_SECTION_PRODUCTS_LIST    = "STATE_SECTION_PRODUCTS_LIST";              //$NON-NLS-1$
+   private static final String           STATE_SECTION_SUMMARY          = "STATE_SECTION_SUMMARY";                    //$NON-NLS-1$
 
-   private static final String            COLUMN_CONSUMED_QUANTITY        = "ConsumedQuantity";                         //$NON-NLS-1$
-   private static final String            COLUMN_QUANTITY_TYPE            = "QuantityType";                             //$NON-NLS-1$
-   private static final String            COLUMN_NAME                     = "Name";                                     //$NON-NLS-1$
-   private static final String            COLUMN_CALORIES                 = "Calories";                                 //$NON-NLS-1$
-   private static final String            COLUMN_SODIUM                   = "Sodium";                                   //$NON-NLS-1$
-   private static final String            COLUMN_ISBEVERAGE               = "IsBeverage";                               //$NON-NLS-1$
-   private static final String            COLUMN_BEVERAGE_QUANTITY        = "BeverageQuantity";                         //$NON-NLS-1$
-   private static final String            COLUMN_BEVERAGE_CONTAINER       = "BeverageContainer";                        //$NON-NLS-1$
-   private static final String            COLUMN_CONSUMED_CONTAINERS      = "ConsumedContainers";                       //$NON-NLS-1$
+   private static final String           COLUMN_CONSUMED_QUANTITY       = "ConsumedQuantity";                         //$NON-NLS-1$
+   private static final String           COLUMN_QUANTITY_TYPE           = "QuantityType";                             //$NON-NLS-1$
+   private static final String           COLUMN_NAME                    = "Name";                                     //$NON-NLS-1$
+   private static final String           COLUMN_CALORIES                = "Calories";                                 //$NON-NLS-1$
+   private static final String           COLUMN_SODIUM                  = "Sodium";                                   //$NON-NLS-1$
+   private static final String           COLUMN_ISBEVERAGE              = "IsBeverage";                               //$NON-NLS-1$
+   private static final String           COLUMN_BEVERAGE_QUANTITY       = "BeverageQuantity";                         //$NON-NLS-1$
+   private static final String           COLUMN_BEVERAGE_CONTAINER      = "BeverageContainer";                        //$NON-NLS-1$
+   private static final String           COLUMN_CONSUMED_CONTAINERS     = "ConsumedContainers";                       //$NON-NLS-1$
 
-   private static final String            OPENFOODFACTS_BASEPATH          = "https://world.openfoodfacts.org/product/"; //$NON-NLS-1$
+   private static final String           OPENFOODFACTS_BASEPATH         = "https://world.openfoodfacts.org/product/"; //$NON-NLS-1$
 
-   private static final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore                     = TourbookPlugin.getPrefStore();
 
-   private static final int               HINT_TEXT_COLUMN_WIDTH          = UI.IS_OSX ? 100 : 50;
+   private static final int              HINT_TEXT_COLUMN_WIDTH         = UI.IS_OSX ? 100 : 50;
+
+   private final NumberFormat            _nf2                           = NumberFormat.getNumberInstance();
+   {
+      _nf2.setMinimumFractionDigits(0);
+      _nf2.setMaximumFractionDigits(2);
+   }
 
    private final IDialogSettings          _state                          = TourbookPlugin.getState(ID);
    private TourData                       _tourData;
@@ -1221,7 +1228,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_ConsumedQuantity.setEditingSupport(new EditingSupport(_productsViewer) {
 
          private SpinnerCellEditor spinnerCellEditor = new SpinnerCellEditor(_productsViewer.getTable(),
-               NutritionUtils._nf2,
+               _nf2,
                new RangeContent(0, 0, 0),
                SWT.NONE);
 
@@ -1393,7 +1400,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_ConsumedBeverageContainers.setEditingSupport(new EditingSupport(_productsViewer) {
 
          private SpinnerCellEditor spinnerCellEditor = new SpinnerCellEditor(_productsViewer.getTable(),
-               NutritionUtils._nf2,
+               _nf2,
                _quantityRange,
                SWT.NONE);
 
@@ -1488,7 +1495,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _txtCalories_Total.setText(totalCaloriesFormatted);
 
       final float totalFluid = NutritionUtils.getTotalFluids(tourNutritionProducts) * 100 / 100;
-      final String totalFluidFormatted = NutritionUtils._nf2.format(totalFluid);
+      final String totalFluidFormatted = _nf2.format(totalFluid);
       _txtFluid_Total.setText(totalFluidFormatted);
 
       final int totalSodium = (int) NutritionUtils.getTotalSodium(tourNutritionProducts);

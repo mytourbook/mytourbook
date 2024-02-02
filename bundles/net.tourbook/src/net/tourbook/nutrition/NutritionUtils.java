@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 import net.tourbook.application.ApplicationVersion;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourBeverageContainer;
@@ -67,15 +68,11 @@ public class NutritionUtils {
    // you have to add a User-Agent HTTP Header with the name of your app, the version, system and a url (if any), not to be blocked by mistake.
    // For example: User-Agent: NameOfYourApp - Android - Version 1.0 - www.yourappwebsite.com
    // Source: https://world.openfoodfacts.org/files/api-documentation.html
-   private static final String      USER_AGENT = String.format("MyTourbook - %s - Version %s - https://mytourbook.sourceforge.io",              //$NON-NLS-1$
-         System.getProperty("os.name"),                                                                                                         //$NON-NLS-1$
+   private static final String       USER_AGENT = String.format("MyTourbook - %s - Version %s - https://mytourbook.sourceforge.io",              //$NON-NLS-1$
+         System.getProperty("os.name"),                                                                                                          //$NON-NLS-1$
          ApplicationVersion.getVersionSimple());
 
-   public static final NumberFormat _nf2       = NumberFormat.getNumberInstance();
-   {
-      _nf2.setMinimumFractionDigits(0);
-      _nf2.setMaximumFractionDigits(2);
-   }
+   private static final NumberFormat _nf2       = NumberFormat.getNumberInstance();
 
    public static String buildTourBeverageContainerName(final TourBeverageContainer tourBeverageContainer) {
 
@@ -86,7 +83,7 @@ public class NutritionUtils {
 
       final int totalCalories = NutritionUtils.getTotalCalories(tourData.getTourNutritionProducts());
       final float averageCaloriesPerHour = NutritionUtils.computeAveragePerHour(tourData, totalCalories);
-      final String averageCaloriesPerHourFormatted = _nf2.format(averageCaloriesPerHour);
+      final String averageCaloriesPerHourFormatted = FormatManager.formatNumber_0(averageCaloriesPerHour);
 
       return averageCaloriesPerHourFormatted;
    }
@@ -95,6 +92,9 @@ public class NutritionUtils {
 
       final float totalFluids = NutritionUtils.getTotalFluids(tourData.getTourNutritionProducts()) * 100 / 100;
       final float averageFluidsPerHour = NutritionUtils.computeAveragePerHour(tourData, totalFluids);
+
+      _nf2.setMinimumFractionDigits(0);
+      _nf2.setMaximumFractionDigits(2);
       final String averageFluidsPerHourFormatted = _nf2.format(averageFluidsPerHour);
 
       return averageFluidsPerHourFormatted;
@@ -117,7 +117,7 @@ public class NutritionUtils {
 
       final float totalSodium = NutritionUtils.getTotalSodium(tourData.getTourNutritionProducts());
       final float averageCaloriesPerHour = NutritionUtils.computeAveragePerHour(tourData, totalSodium);
-      final String averageCaloriesPerHourFormatted = _nf2.format(averageCaloriesPerHour);
+      final String averageCaloriesPerHourFormatted = FormatManager.formatNumber_0(averageCaloriesPerHour);
 
       return averageCaloriesPerHourFormatted;
    }
