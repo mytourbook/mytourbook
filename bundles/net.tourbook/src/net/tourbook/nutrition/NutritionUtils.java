@@ -156,11 +156,21 @@ public class NutritionUtils {
 
    }
 
+   public static String getProductFullName(final Product product) {
+
+      return getProductFullName(product.brands, product.productName);
+   }
+
    public static String getProductFullName(final String brand, final String name) {
 
       return Stream.of(brand, name)
             .filter(string -> StringUtils.hasContent(string))
             .collect(Collectors.joining(UI.DASH_WITH_SPACE));
+   }
+
+   public static String getProductFullName(final TourNutritionProduct tourNutritionProduct) {
+
+      return getProductFullName(tourNutritionProduct.getBrand(), tourNutritionProduct.getName());
    }
 
    public static int getTotalCalories(final Set<TourNutritionProduct> tourNutritionProducts) {

@@ -156,7 +156,7 @@ public class TourBlogView extends ViewPart {
    private static final IDialogSettings  _state            = TourbookPlugin.getState(ID);
    private static final IDialogSettings  _state_WEB        = WEB.getState();
 
-   private final NumberFormat            _nf2              = NumberFormat.getNumberInstance();
+   private static final NumberFormat     _nf2              = NumberFormat.getNumberInstance();
    {
       _nf2.setMinimumFractionDigits(0);
       _nf2.setMaximumFractionDigits(2);
@@ -484,7 +484,7 @@ public class TourBlogView extends ViewPart {
          foods.stream().forEach(product -> {
 
             sb.append(UI.NEW_LINE);
-            sb.append(_nf2.format(product.getConsumedQuantity()) + UI.SPACE1 + product.getName());
+            sb.append(_nf2.format(product.getConsumedQuantity()) + UI.SPACE1 + NutritionUtils.getProductFullName(product));
          });
 
          sb.append(UI.NEW_LINE);

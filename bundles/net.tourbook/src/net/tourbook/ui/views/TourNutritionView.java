@@ -866,7 +866,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
 
-            cell.setText(NutritionUtils.getProductFullName(tourNutritionProduct.getBrand(), tourNutritionProduct.getName()));
+            cell.setText(NutritionUtils.getProductFullName(tourNutritionProduct));
          }
       });
    }
