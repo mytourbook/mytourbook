@@ -227,6 +227,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       // create UI widgets
       super.create();
 
+      setTitle(Messages.Dialog_SearchProduct_Title);
+
       _isInUIInit = true;
       {
          restoreState();
