@@ -30,6 +30,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -104,14 +105,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
             _txtName = new Text(container, SWT.BORDER);
             _txtName.setText(_name);
-            _txtName.addModifyListener(e -> {
-
-               final Text textWidget = (Text) e.getSource();
-               final String userText = textWidget.getText();
-               _name = userText;
-
-               validateFields();
-            });
+            _txtName.addModifyListener(event -> onModifyName(event));
             GridDataFactory.fillDefaults()
                   .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
                   .span(2, 1)
@@ -128,7 +122,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             _spinnerNumServings.setIncrement(25);
             _spinnerNumServings.setMaximum(10000);
             _spinnerNumServings.setDigits(2);
-            _spinnerNumServings.addMouseWheelListener(mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent));
             _spinnerNumServings.setSelection(_numServings * 100);
             _spinnerNumServings.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCapacityModified()));
             _spinnerNumServings.addModifyListener(event -> onCapacityModified());
@@ -147,17 +140,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
             _txtCalories = new Text(container, SWT.BORDER);
             _txtCalories.setText(String.valueOf(_calories));
-            _txtCalories.addModifyListener(e -> {
-
-               final Text textWidget = (Text) e.getSource();
-               final String userText = textWidget.getText();
-               if (UI.verifyIntegerValue(userText)) {
-
-                  _calories = Integer.parseInt(userText);
-               }
-
-               validateFields();
-            });
+            _txtCalories.addModifyListener(event -> onModifyCalories(event));
             GridDataFactory.fillDefaults()
                   .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
@@ -172,17 +155,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
             _txtSodium = new Text(container, SWT.BORDER);
             _txtSodium.setText(String.valueOf(_sodium));
-            _txtSodium.addModifyListener(e -> {
-
-               final Text textWidget = (Text) e.getSource();
-               final String userText = textWidget.getText();
-               if (UI.verifyIntegerValue(userText)) {
-
-                  _sodium = Integer.parseInt(userText);
-               }
-
-               validateFields();
-            });
+            _txtSodium.addModifyListener(event -> onModifySodium(event));
             GridDataFactory.fillDefaults()
                   .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
@@ -305,6 +278,39 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       }
 
       _numServings = _spinnerNumServings.getSelection();
+
+      validateFields();
+   }
+
+   private void onModifyCalories(final ModifyEvent event) {
+
+      final Text textWidget = (Text) event.getSource();
+      final String userText = textWidget.getText();
+      if (UI.verifyIntegerValue(userText)) {
+
+         _calories = Integer.parseInt(userText);
+      }
+
+      validateFields();
+   }
+
+   private void onModifySodium(final ModifyEvent event) {
+
+      final Text textWidget = (Text) event.getSource();
+      final String userText = textWidget.getText();
+      if (UI.verifyIntegerValue(userText)) {
+
+         _sodium = Integer.parseInt(userText);
+      }
+
+      validateFields();
+   }
+
+   private void onModifyName(final ModifyEvent event) {
+
+      final Text textWidget = (Text) event.getSource();
+      final String userText = textWidget.getText();
+      _name = userText;
 
       validateFields();
    }

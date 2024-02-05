@@ -28,6 +28,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -90,13 +91,7 @@ class DialogBeverageContainer extends Dialog {
 
          _txtName = new Text(container, SWT.BORDER);
          _txtName.setText(_name);
-         _txtName.addModifyListener(e -> {
-
-            final Text textWidget = (Text) e.getSource();
-            _name = textWidget.getText().trim();
-
-            validateFields();
-         });
+         _txtName.addModifyListener(event -> onModifyName(event));
          GridDataFactory.fillDefaults()
                .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
                .span(2, 1)
@@ -152,6 +147,13 @@ class DialogBeverageContainer extends Dialog {
       }
 
       _capacity = _spinnerCapacity.getSelection() / 100f;
+
+      validateFields();
+   }
+
+   private void onModifyName(final ModifyEvent e) {
+      final Text textWidget = (Text) e.getSource();
+      _name = textWidget.getText().trim();
 
       validateFields();
    }
