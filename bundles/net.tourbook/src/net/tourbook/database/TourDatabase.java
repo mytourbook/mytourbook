@@ -225,42 +225,42 @@ public class TourDatabase {
    private static final String JOINTABLE__TOURPERSON__TOURPERSON_HRZONE = TABLE_TOUR_PERSON + "_" + TABLE_TOUR_PERSON_HRZONE; //$NON-NLS-1$
 
    // never used tables, they are needed to drop them
-   private static final String TABLE_TOUR_CATEGORY           = "TourCategory";                                                    //$NON-NLS-1$
-   private static final String TABLE_TOURCATEGORY__TOURDATA  = TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA;                       //$NON-NLS-1$
+   private static final String TABLE_TOUR_CATEGORY           = "TourCategory";                              //$NON-NLS-1$
+   private static final String TABLE_TOURCATEGORY__TOURDATA  = TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA; //$NON-NLS-1$
 
    /**
     * Is <code>-1</code>, this is the id for a not saved entity
     */
    public static final int     ENTITY_IS_NOT_SAVED           = -1;
    //
-   public static final String  ENTITY_ID_BEVERAGECONTAINER   = "ContainerID";                                                     //$NON-NLS-1$
-   private static final String ENTITY_ID_BIKE                = "BikeID";                                                          //$NON-NLS-1$
-   private static final String ENTITY_ID_COMPARED            = "ComparedID";                                                      //$NON-NLS-1$
-   private static final String ENTITY_ID_DEVICE_SENSOR       = "SensorId";                                                        //$NON-NLS-1$
-   private static final String ENTITY_ID_DEVICE_SENSOR_VALUE = "SensorValueId";                                                   //$NON-NLS-1$
-   private static final String ENTITY_ID_HR_ZONE             = "HrZoneID";                                                        //$NON-NLS-1$
-   private static final String ENTITY_ID_LOCATION            = "LocationID";                                                      //$NON-NLS-1$
-   private static final String ENTITY_ID_MARKER              = "MarkerID";                                                        //$NON-NLS-1$
-   private static final String ENTITY_ID_NUTRITIONPRODUCT    = "ProductID";                                                       //$NON-NLS-1$
-   private static final String ENTITY_ID_PERSON              = "PersonID";                                                        //$NON-NLS-1$
-   private static final String ENTITY_ID_PHOTO               = "PhotoID";                                                         //$NON-NLS-1$
-   private static final String ENTITY_ID_REF                 = "RefID";                                                           //$NON-NLS-1$
-   public static final String  ENTITY_ID_TAG                 = "TagID";                                                           //$NON-NLS-1$
-   public static final String  ENTITY_ID_TAG_CATEGORY        = "TagCategoryID";                                                   //$NON-NLS-1$
-   private static final String ENTITY_ID_TOUR                = "TourID";                                                          //$NON-NLS-1$
-   private static final String ENTITY_ID_TYPE                = "TypeID";                                                          //$NON-NLS-1$
-   public static final String  ENTITY_ID_WAY_POINT           = "WayPointID";                                                      //$NON-NLS-1$
-   //
-   public static final String  KEY_BEVERAGE_CONTAINER        = TABLE_TOUR_BEVERAGE_CONTAINER + "_" + ENTITY_ID_BEVERAGECONTAINER; //$NON-NLS-1$
+   public static final String  ENTITY_ID_BEVERAGECONTAINER   = "ContainerID";                               //$NON-NLS-1$
+   private static final String ENTITY_ID_BIKE                = "BikeID";                                    //$NON-NLS-1$
+   private static final String ENTITY_ID_COMPARED            = "ComparedID";                                //$NON-NLS-1$
+   private static final String ENTITY_ID_DEVICE_SENSOR       = "SensorId";                                  //$NON-NLS-1$
+   private static final String ENTITY_ID_DEVICE_SENSOR_VALUE = "SensorValueId";                             //$NON-NLS-1$
+   private static final String ENTITY_ID_HR_ZONE             = "HrZoneID";                                  //$NON-NLS-1$
+   private static final String ENTITY_ID_LOCATION            = "LocationID";                                //$NON-NLS-1$
+   private static final String ENTITY_ID_MARKER              = "MarkerID";                                  //$NON-NLS-1$
+   private static final String ENTITY_ID_NUTRITIONPRODUCT    = "ProductID";                                 //$NON-NLS-1$
+   private static final String ENTITY_ID_PERSON              = "PersonID";                                  //$NON-NLS-1$
+   private static final String ENTITY_ID_PHOTO               = "PhotoID";                                   //$NON-NLS-1$
+   private static final String ENTITY_ID_REF                 = "RefID";                                     //$NON-NLS-1$
+   public static final String  ENTITY_ID_TAG                 = "TagID";                                     //$NON-NLS-1$
+   public static final String  ENTITY_ID_TAG_CATEGORY        = "TagCategoryID";                             //$NON-NLS-1$
+   private static final String ENTITY_ID_TOUR                = "TourID";                                    //$NON-NLS-1$
+   private static final String ENTITY_ID_TYPE                = "TypeID";                                    //$NON-NLS-1$
+   public static final String  ENTITY_ID_WAY_POINT           = "WayPointID";                                //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
+
+   public  static final String KEY_BEVERAGE_CONTAINER        = TABLE_TOUR_BEVERAGE_CONTAINER + "_" + ENTITY_ID_BEVERAGECONTAINER; //$NON-NLS-1$
    private static final String KEY_BIKE                      = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                            //$NON-NLS-1$
    private static final String KEY_DEVICE_SENSOR             = TABLE_DEVICE_SENSOR + "_" + ENTITY_ID_DEVICE_SENSOR;               //$NON-NLS-1$
    private static final String KEY_PERSON                    = TABLE_TOUR_PERSON + "_" + ENTITY_ID_PERSON;                        //$NON-NLS-1$
-   public static final String  KEY_TAG                       = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                              //$NON-NLS-1$
+   public  static final String KEY_TAG                       = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                              //$NON-NLS-1$
    private static final String KEY_TAG_CATEGORY              = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY;            //$NON-NLS-1$
-   public static final String  KEY_TOUR                      = TABLE_TOUR_DATA + "_" + ENTITY_ID_TOUR;                            //$NON-NLS-1$
+   public  static final String KEY_TOUR                      = TABLE_TOUR_DATA + "_" + ENTITY_ID_TOUR;                            //$NON-NLS-1$
    private static final String KEY_TYPE                      = TABLE_TOUR_TYPE + "_" + ENTITY_ID_TYPE;                            //$NON-NLS-1$
-
-// SET_FORMATTING_OFF
 
 // SET_FORMATTING_ON
 
