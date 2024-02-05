@@ -71,6 +71,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -398,6 +399,16 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       _productsViewer.setContentProvider(new ViewContentProvider());
       _productsViewer.setLabelProvider(new ViewLabelProvider());
+
+      final Listener doubleClickListener = event -> {
+
+         if (event.type == SWT.MouseDoubleClick) {
+
+            onAddProduct();
+
+         }
+      };
+      _productsViewer.getTable().addListener(SWT.MouseDoubleClick, doubleClickListener);
 
       _productsViewer.addPostSelectionChangedListener(selectionChangedEvent -> {
 
