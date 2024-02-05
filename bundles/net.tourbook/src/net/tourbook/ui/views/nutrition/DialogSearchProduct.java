@@ -99,32 +99,31 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    /*
     * none UI
     */
-   private PixelConverter _pc;
-
-   /*
-    * UI controls
-    */
-   private Button                        _btnAdd;
-   private Button                        _btnSearch;
+   private PixelConverter                _pc;
    private List<String>                  _searchHistory  = new ArrayList<>();
-
-   private Label                         _lblSearchType;
-
-   private Combo                         _comboSearchQuery;
-   private Combo                         _comboSearchType;
-   private ComboViewer                   _queryViewer;
    private final NutritionQuery          _nutritionQuery = new NutritionQuery();
-
    private PostSelectionProvider         _postSelectionProvider;
-
-   private final Image                   _iconPlaceholder;
    private final HashMap<Integer, Image> _graphImages    = new HashMap<>();
+   private final Image                   _iconPlaceholder;
 
    private IPropertyChangeListener       _prefChangeListener;
 
    private AutocompleteComboInput        _autocompleteProductSearchHistory;
 
    private ToolTip                       _tooltipInvalidBarCode;
+
+   private ComboViewer                   _queryViewer;
+
+   /*
+    * UI controls
+    */
+   private Button _btnAdd;
+   private Button _btnSearch;
+
+   private Label  _lblSearchType;
+
+   private Combo  _comboSearchQuery;
+   private Combo  _comboSearchType;
 
    private class SearchContentProvider implements IStructuredContentProvider {
 
