@@ -97,6 +97,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private boolean                       _isInUIInit;
 
+   private String                        _dlgDefaultMessage;
+
    /*
     * none UI
     */
@@ -228,6 +230,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       super.create();
 
       setTitle(Messages.Dialog_SearchProduct_Title);
+      setMessage(_dlgDefaultMessage);
 
       _isInUIInit = true;
       {
@@ -536,12 +539,16 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       Display.getDefault().asyncExec(() -> {
 
-         if (searchResults == null) {
+         String errorMessage = null;
+         String message = null;
+         if (searchResults == null || searchResults.isEmpty()) {
 
-            setErrorMessage(String.format(Messages.Dialog_SearchProduct_Label_NotFound, _comboSearchQuery.getText()));
+            errorMessage = String.format(Messages.Dialog_SearchProduct_Label_NotFound, _comboSearchQuery.getText());
+
          } else {
 
-            setErrorMessage(null);
+            message = String.format(Messages.Dialog_SearchProduct_Message, searchResults.size());
+
             _products = searchResults;
 
             // check if view is closed
@@ -564,6 +571,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
                }
             }
          }
+
+         setErrorMessage(errorMessage);
+         setMessage(message);
 
          _comboSearchQuery.setEnabled(true);
          _btnSearch.setEnabled(true);

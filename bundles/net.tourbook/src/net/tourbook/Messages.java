@@ -910,6 +910,7 @@ public class Messages extends NLS {
    public static String        Dialog_SearchProduct_Label_AlreadyExists;
    public static String        Dialog_SearchProduct_Label_SearchType;
    public static String        Dialog_SearchProduct_Label_NotFound;
+   public static String        Dialog_SearchProduct_Message;
    public static String        Dialog_SearchProduct_Link_ProductCreationRequest;
    public static String        Dialog_SearchProduct_Title;
    public static String        Dialog_SearchProduct_Tooltip_InvalidBarcode;
