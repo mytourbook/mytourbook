@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.database.PersonManager;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.tour.filter.TourFilterManager;
@@ -48,7 +49,7 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  * An action bar advisor is responsible for creating, adding, and disposing of the fGraphActions
  * added to a workbench window. Each window will be populated with new fGraphActions.
  */
-public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
+class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
    private static final String                MENU_CONTRIB_TOOLBAR_APP_FILTER = "mc_tb_AppFilter";             //$NON-NLS-1$
 
@@ -89,7 +90,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
    private ActionOtherViews                   _actionOtherViews;
 
-   public ApplicationActionBarAdvisor(final IActionBarConfigurer configurer) {
+   ApplicationActionBarAdvisor(final IActionBarConfigurer configurer) {
       super(configurer);
    }
 
@@ -411,6 +412,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       _actionContribItem_Preferences = new ActionContributionItem(_actionPreferences);
       _actionContribItem_Preferences.setVisible(isOSX == false);
+
+      PersonManager.setPersonSelector(_contribItem_PersonSelector);
    }
 
 }

@@ -580,27 +580,19 @@ public class TourBlogView extends ViewPart {
 
       if (isDescription || isTitle || isWeather || isTourTags) {
 
-         sb.append("<div class='action-hover-container' style='margin-top:30px; margin-bottom: 5px;'>" + NL); //$NON-NLS-1$
+         sb.append("<div class='action-hover-container' style='margin-top:15px; margin-bottom: 5px;'>" + NL); //$NON-NLS-1$
          {
 
             sb.append("<div class='blog-item'>"); //$NON-NLS-1$
             {
-               /*
-                * Tour title
-                */
-               if (isTitle == false) {
-
-                  tourTitle = "&nbsp;"; //$NON-NLS-1$
-
-               } else {
-
-                  if (UI.IS_SCRAMBLE_DATA) {
-                     tourTitle = UI.scrambleText(tourTitle);
-                  }
+               if (UI.IS_SCRAMBLE_DATA) {
+                  tourTitle = UI.scrambleText(tourTitle);
                }
 
+               /*
+                * Edit action
+                */
                final String hoverEdit = WEB.escapeSingleQuote(NLS.bind(Messages.Tour_Blog_Action_EditTour_Tooltip, tourTitle));
-
                final String hrefEditTour = HTTP_DUMMY + HREF_EDIT_TOUR;
 
                sb.append(UI.EMPTY_STRING +
@@ -613,8 +605,14 @@ public class TourBlogView extends ViewPart {
                                  + " title='" + hoverEdit + "'" //                  //$NON-NLS-1$ //$NON-NLS-2$
                                  + ">" //                                           //$NON-NLS-1$
                                  + "</a>") //                                       //$NON-NLS-1$
-                           + "   </div>" + NL) //                                   //$NON-NLS-1$
-                     + ("<span class='blog-title'>" + tourTitle + "</span>" + NL)); //$NON-NLS-1$ //$NON-NLS-2$
+                           + "   </div>" + NL)); //                                   //$NON-NLS-1$
+
+               /*
+                * Tour title
+                */
+               if (isTitle) {
+                  sb.append("<span class='blog-title'>" + tourTitle + "</span>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+               }
 
                /*
                 * Description

@@ -83,6 +83,9 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
    private int                 _currentDistance_Left;
    private int                 _currentDistance_Right;
 
+   private int                 _lastResizeTime;
+   private int                 _modifiedResizeValue;
+
    /*
     * UI controls
     */
@@ -524,11 +527,38 @@ public class DialogResizeTourLocation extends TitleAreaDialog {
 
       _pc = new PixelConverter(parent);
 
-      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onBoundingBox_Resize());
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> {
+
+         // Linux if fireing both events: mouse AND selection -> prevent second event
+
+         if (_lastResizeTime == selectionEvent.time) {
+
+            if (selectionEvent.widget instanceof final Spinner spinnerModified) {
+
+               // Linux is also setting the selection value -> reset to mouse wheel value
+
+               spinnerModified.setSelection(_modifiedResizeValue);
+            }
+
+            return;
+         }
+
+         onBoundingBox_Resize();
+      });
 
       _defaultMouseWheelListener = mouseEvent -> {
+
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent, _mouseWheelIncrementer);
          onBoundingBox_Resize();
+
+         // Linux if fireing both events: mouse AND selection -> prevent second event
+
+         _lastResizeTime = mouseEvent.time;
+
+         if (mouseEvent.widget instanceof final Spinner spinnerModified) {
+
+            _modifiedResizeValue = spinnerModified.getSelection();
+         }
       };
    }
 

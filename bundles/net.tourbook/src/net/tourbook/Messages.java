@@ -1981,8 +1981,8 @@ public class Messages extends NLS {
    public static String        Slideout_CalendarOptions_Checkbox_IsTruncateTourText;
    public static String        Slideout_CalendarOptions_Checkbox_IsUserDefaultProfile;
    public static String        Slideout_CalendarOptions_Checkbox_IsUserDefaultProfile_Tooltip;
-   public static String        Slideout_CalendarOptions_Checkbox_UseDraggedScrolling;
-   public static String        Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip;
+   public static String        Slideout_CalendarOptions_Checkbox_UseDraggedScrolling2;
+   public static String        Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip2;
    public static String        Slideout_CalendarOptions_ColumnHeader_DefaultId;
    public static String        Slideout_CalendarOptions_ColumnHeader_IsAppId;
    public static String        Slideout_CalendarOptions_ColumnHeader_IsAppId_Tooltip;

@@ -1834,22 +1834,28 @@ public class TourLocationManager {
          numProfiles = _allLocationProfiles.size();
       }
 
-      for (int profileIndex = 0; profileIndex < numProfiles; profileIndex++) {
-
-         final TourLocationProfile profile = _allLocationProfiles.get(profileIndex);
-         final List<LocationPartID> allParts = profile.allParts;
+      if (_defaultProfile == null) {
 
          // set default default profile
-         if (allParts.size() == 1 && allParts.get(0).equals(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER)) {
 
-            _defaultProfile = profile;
+         for (int profileIndex = 0; profileIndex < numProfiles; profileIndex++) {
 
-            break;
+            final TourLocationProfile profile = _allLocationProfiles.get(profileIndex);
+            final List<LocationPartID> allParts = profile.allParts;
+
+            if (allParts.size() == 1 && allParts.get(0).equals(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER)) {
+
+               _defaultProfile = profile;
+
+               break;
+            }
          }
       }
 
       if (_defaultProfile == null && numProfiles > 0) {
 
+         // set first profile as default
+         
          _defaultProfile = _allLocationProfiles.get(0);
       }
    }

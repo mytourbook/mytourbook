@@ -1138,8 +1138,8 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
 
             // checkbox
             _chkUseDraggedScrolling = new Button(container, SWT.CHECK);
-            _chkUseDraggedScrolling.setText(Messages.Slideout_CalendarOptions_Checkbox_UseDraggedScrolling);
-            _chkUseDraggedScrolling.setToolTipText(Messages.Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip);
+            _chkUseDraggedScrolling.setText(Messages.Slideout_CalendarOptions_Checkbox_UseDraggedScrolling2);
+            _chkUseDraggedScrolling.setToolTipText(Messages.Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip2);
             _chkUseDraggedScrolling.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.BEGINNING)
