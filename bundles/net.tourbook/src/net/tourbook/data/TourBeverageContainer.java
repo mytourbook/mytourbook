@@ -29,6 +29,8 @@ import net.tourbook.database.TourDatabase;
 @Entity
 public class TourBeverageContainer {
 
+   public static final int            DB_LENGTH_NAME = 1024;
+
    /**
     * Created container create a unique id to identify them, saved containers
     * are compared with the containerId

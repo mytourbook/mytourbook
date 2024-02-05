@@ -4169,7 +4169,7 @@ public class TourDatabase {
 
                   // Version 55 - begin
 
-                  + "   name                VARCHAR(" + TourType.DB_LENGTH_NAME + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   name                VARCHAR(" + TourBeverageContainer.DB_LENGTH_NAME + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
                   + "   capacity            FLOAT                                                       " + NL //$NON-NLS-1$
 

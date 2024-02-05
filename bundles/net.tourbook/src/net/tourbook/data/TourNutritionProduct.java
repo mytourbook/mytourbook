@@ -40,6 +40,7 @@ public class TourNutritionProduct {
 
    public static final int            DB_LENGTH_CODE           = 50;
    public static final int            DB_LENGTH_NAME           = 1024;
+
    /**
     * manually created product or imported product create a unique id to identify
     * them, saved products are compared with the product id
