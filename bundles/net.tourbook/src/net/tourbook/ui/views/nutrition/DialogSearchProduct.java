@@ -276,7 +276,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.fillDefaults().applyTo(container);
+      GridLayoutFactory.fillDefaults().margins(9, 0).applyTo(container);
       {
          createUI_10_Header(container);
          createUI_20_Header_Options(container);
@@ -297,11 +297,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       final Composite queryContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(queryContainer);
-      GridLayoutFactory.fillDefaults()
-            .extendedMargins(5, 5, 2, 2)
-            .spacing(5, 0)
-            .numColumns(3)
-            .applyTo(queryContainer);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(queryContainer);
       {
          {
             /*
@@ -359,6 +355,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
              * Label: Search Type
              */
             _lblSearchType = UI.createLabel(container, Messages.Dialog_SearchProduct_Label_SearchType);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.LEFT, SWT.CENTER)
+                  .applyTo(_lblSearchType);
          }
          {
             /*
