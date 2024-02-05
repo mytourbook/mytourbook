@@ -90,11 +90,6 @@ class DialogBeverageContainer extends Dialog {
 
          _txtName = new Text(container, SWT.BORDER);
          _txtName.setText(_name);
-         GridDataFactory.fillDefaults()
-               .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
-               .span(2, 1)
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(_txtName);
          _txtName.addModifyListener(e -> {
 
             final Text textWidget = (Text) e.getSource();
@@ -102,14 +97,17 @@ class DialogBeverageContainer extends Dialog {
 
             validateFields();
          });
+         GridDataFactory.fillDefaults()
+               .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+               .span(2, 1)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_txtName);
 
          // Label: container capacity
          UI.createLabel(container, Messages.Dialog_BeverageContainer_Label_Capacity);
 
          // Text: container capacity in L
          _spinnerCapacity = new Spinner(container, SWT.BORDER);
-         GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT).align(SWT.END, SWT.CENTER).applyTo(
-               _spinnerCapacity);
          _spinnerCapacity.setMinimum(25);
          _spinnerCapacity.setIncrement(25);
          _spinnerCapacity.setMaximum(10000);
@@ -123,6 +121,8 @@ class DialogBeverageContainer extends Dialog {
 
             onCapacityModified();
          });
+         GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT).align(SWT.END, SWT.CENTER).applyTo(
+               _spinnerCapacity);
 
          // Unit: L
          UI.createLabel(container, UI.UNIT_FLUIDS_L);

@@ -104,11 +104,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
             _txtName = new Text(container, SWT.BORDER);
             _txtName.setText(_name);
-            GridDataFactory.fillDefaults()
-                  .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
-                  .span(2, 1)
-                  .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_txtName);
             _txtName.addModifyListener(e -> {
 
                final Text textWidget = (Text) e.getSource();
@@ -117,6 +112,11 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
                validateFields();
             });
+            GridDataFactory.fillDefaults()
+                  .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+                  .span(2, 1)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_txtName);
          }
          {
             // Label: number of servings
@@ -124,8 +124,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
             // Spinner: number of servings
             _spinnerNumServings = new Spinner(container, SWT.BORDER);
-            GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT).span(2, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(
-                  _spinnerNumServings);
             _spinnerNumServings.setMinimum(25);
             _spinnerNumServings.setIncrement(25);
             _spinnerNumServings.setMaximum(10000);
@@ -140,6 +138,8 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
                onCapacityModified();
             });
+            GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT).span(2, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(
+                  _spinnerNumServings);
          }
          {
             // Label: calories
@@ -147,10 +147,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
             _txtCalories = new Text(container, SWT.BORDER);
             _txtCalories.setText(String.valueOf(_calories));
-            GridDataFactory.fillDefaults()
-                  .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
-                  .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_txtCalories);
             _txtCalories.addModifyListener(e -> {
 
                final Text textWidget = (Text) e.getSource();
@@ -162,6 +158,10 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
                validateFields();
             });
+            GridDataFactory.fillDefaults()
+                  .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_txtCalories);
 
             // Unit: kcal
             UI.createLabel(container, net.tourbook.ui.Messages.Value_Unit_KCalories);
@@ -172,10 +172,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
             _txtSodium = new Text(container, SWT.BORDER);
             _txtSodium.setText(String.valueOf(_sodium));
-            GridDataFactory.fillDefaults()
-                  .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
-                  .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_txtSodium);
             _txtSodium.addModifyListener(e -> {
 
                final Text textWidget = (Text) e.getSource();
@@ -187,6 +183,10 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
                validateFields();
             });
+            GridDataFactory.fillDefaults()
+                  .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_txtSodium);
 
             // Unit: mg
             UI.createLabel(container, UI.UNIT_WEIGHT_MG);
