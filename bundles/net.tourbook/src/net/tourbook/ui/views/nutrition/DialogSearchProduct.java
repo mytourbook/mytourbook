@@ -329,6 +329,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
             _btnSearch = new Button(queryContainer, SWT.PUSH);
             _btnSearch.setText(Messages.Dialog_SearchProduct_Button_Search);
             _btnSearch.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchProduct()));
+            setButtonLayoutData(_btnSearch);
          }
          {
             /*
@@ -338,6 +339,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
             _btnAdd.setText(Messages.Dialog_SearchProduct_Button_Add);
             _btnAdd.setToolTipText(Messages.Dialog_SearchProduct_Button_Add_Tooltip);
             _btnAdd.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAddProduct()));
+            setButtonLayoutData(_btnAdd);
          }
       }
 
