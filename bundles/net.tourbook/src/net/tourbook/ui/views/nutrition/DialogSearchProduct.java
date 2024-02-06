@@ -58,6 +58,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -127,6 +128,18 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private Combo  _comboSearchQuery;
    private Combo  _comboSearchType;
+
+   /**
+    * Sort the products by name
+    */
+   private class ProductsViewerComparator extends ViewerComparator {
+
+      @Override
+      public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
+
+         return NutritionUtils.getProductFullName((Product) (obj1)).compareToIgnoreCase(NutritionUtils.getProductFullName((Product) (obj2)));
+      }
+   }
 
    private class SearchContentProvider implements IStructuredContentProvider {
 
@@ -372,10 +385,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
                   .applyTo(_comboSearchType);
          }
       }
-
-      _queryViewer = new ComboViewer(_comboSearchQuery);
-      _queryViewer.setContentProvider(new SearchContentProvider());
-      _queryViewer.setComparator(new ViewerComparator());
    }
 
    private void createUI_30_Viewer(final Composite parent) {
@@ -425,6 +434,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          _postSelectionProvider.setSelection(selectedProduct);
          validateFields();
       });
+      _productsViewer.setComparator(new ProductsViewerComparator());
    }
 
    private void fillUI() {

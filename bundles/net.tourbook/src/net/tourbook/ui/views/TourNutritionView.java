@@ -242,7 +242,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          case COLUMN_NAME:
          default:
-            rc = tnp1.getName().compareTo(tnp2.getName());
+            rc = tnp1.getName().compareToIgnoreCase(tnp2.getName());
             break;
 
          }
@@ -250,7 +250,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          if (rc == 0) {
 
             // subsort 1 by category
-            rc = tnp1.getName().compareTo(tnp2.getName());
+            rc = tnp1.getName().compareToIgnoreCase(tnp2.getName());
          }
 
          // if descending order, flip the direction
