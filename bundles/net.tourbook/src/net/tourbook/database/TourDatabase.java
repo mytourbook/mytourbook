@@ -254,13 +254,13 @@ public class TourDatabase {
 // SET_FORMATTING_OFF
 
    public  static final String KEY_BEVERAGE_CONTAINER        = TABLE_TOUR_BEVERAGE_CONTAINER + "_" + ENTITY_ID_BEVERAGECONTAINER; //$NON-NLS-1$
-   private static final String KEY_BIKE                      = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                            //$NON-NLS-1$
-   private static final String KEY_DEVICE_SENSOR             = TABLE_DEVICE_SENSOR + "_" + ENTITY_ID_DEVICE_SENSOR;               //$NON-NLS-1$
-   private static final String KEY_PERSON                    = TABLE_TOUR_PERSON + "_" + ENTITY_ID_PERSON;                        //$NON-NLS-1$
-   public  static final String KEY_TAG                       = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                              //$NON-NLS-1$
-   private static final String KEY_TAG_CATEGORY              = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY;            //$NON-NLS-1$
-   public  static final String KEY_TOUR                      = TABLE_TOUR_DATA + "_" + ENTITY_ID_TOUR;                            //$NON-NLS-1$
-   private static final String KEY_TYPE                      = TABLE_TOUR_TYPE + "_" + ENTITY_ID_TYPE;                            //$NON-NLS-1$
+   private static final String KEY_BIKE                      = TABLE_TOUR_BIKE               + "_" + ENTITY_ID_BIKE;                            //$NON-NLS-1$
+   private static final String KEY_DEVICE_SENSOR             = TABLE_DEVICE_SENSOR           + "_" + ENTITY_ID_DEVICE_SENSOR;               //$NON-NLS-1$
+   private static final String KEY_PERSON                    = TABLE_TOUR_PERSON             + "_" + ENTITY_ID_PERSON;                        //$NON-NLS-1$
+   public  static final String KEY_TAG                       = TABLE_TOUR_TAG                + "_" + ENTITY_ID_TAG;                              //$NON-NLS-1$
+   private static final String KEY_TAG_CATEGORY              = TABLE_TOUR_TAG_CATEGORY       + "_" + ENTITY_ID_TAG_CATEGORY;            //$NON-NLS-1$
+   public  static final String KEY_TOUR                      = TABLE_TOUR_DATA               + "_" + ENTITY_ID_TOUR;                            //$NON-NLS-1$
+   private static final String KEY_TYPE                      = TABLE_TOUR_TYPE               + "_" + ENTITY_ID_TYPE;                            //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
