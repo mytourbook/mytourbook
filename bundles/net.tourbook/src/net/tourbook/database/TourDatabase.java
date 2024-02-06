@@ -1597,8 +1597,7 @@ public class TourDatabase {
             final List<?> resultList = emQuery.getResultList();
             for (final Object result : resultList) {
 
-               if (result instanceof TourTagCategory) {
-                  final TourTagCategory tourTagCategory = (TourTagCategory) result;
+               if (result instanceof final TourTagCategory tourTagCategory) {
                   _allTourTagCategories.put(tourTagCategory.getCategoryId(), tourTagCategory);
                }
             }
@@ -2681,9 +2680,7 @@ public class TourDatabase {
 
             for (final Object result : resultList) {
 
-               if (result instanceof DeviceSensor) {
-
-                  final DeviceSensor sensor = (DeviceSensor) result;
+               if (result instanceof final DeviceSensor sensor) {
 
                   allDbDeviceSensors_BySensorID.put(sensor.getSensorId(), sensor);
                   allDbDeviceSensors_BySerialNo.put(sensor.getSerialNumber().toUpperCase(), sensor);
@@ -3822,15 +3819,11 @@ public class TourDatabase {
                Messages.Tour_Database_Update_TourWeek,
                new Object[] { tourIdx++, tourList.size() });
 
-         if (progress instanceof IProgressMonitor) {
-
-            final IProgressMonitor monitor = (IProgressMonitor) progress;
+         if (progress instanceof final IProgressMonitor monitor) {
 
             monitor.subTask(msg);
 
-         } else if (progress instanceof SplashManager) {
-
-            final SplashManager splashManager = (SplashManager) progress;
+         } else if (progress instanceof final SplashManager splashManager) {
 
             splashManager.setMessage(msg);
          }
@@ -8352,9 +8345,7 @@ public class TourDatabase {
          // loop: all tours
          for (final Long tourId : allTourIds) {
 
-            if (progress instanceof SplashManager) {
-
-               final SplashManager splashManager = (SplashManager) progress;
+            if (progress instanceof final SplashManager splashManager) {
 
                final long currentTime = System.currentTimeMillis();
                final float timeDiff = currentTime - lastUpdateTime;
