@@ -188,6 +188,56 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Section     _sectionSummary;
    private FormToolkit _tk;
 
+   private final class ConsumedQuantityEditingSupport extends EditingSupport {
+
+      private SpinnerCellEditor spinnerCellEditor;
+
+      private ConsumedQuantityEditingSupport() {
+
+         super(_productsViewer);
+
+         spinnerCellEditor = new SpinnerCellEditor(_productsViewer.getTable(),
+               _nf2,
+               new RangeContent(0, 0, 0),
+               SWT.NONE);
+
+         //TODO FB it's all over the place as there are 3 possible ways
+         //- mouse wheel on the number
+         //- mouse wheel on the -/+ signs
+         //- mouse wheel CLICK on the -/+ signs
+         //
+         final Spinner spinner = spinnerCellEditor.getControl();
+         spinner.setMinimum(25);
+         spinner.setMaximum(10000);
+         spinner.setIncrement(25);
+         spinner.addMouseWheelListener(mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent));
+      }
+
+      @Override
+      protected boolean canEdit(final Object element) {
+         return true;
+      }
+
+      @Override
+      protected CellEditor getCellEditor(final Object element) {
+         return spinnerCellEditor;
+      }
+
+      @Override
+      protected Object getValue(final Object element) {
+         return ((TourNutritionProduct) element).getConsumedQuantity();
+      }
+
+      @Override
+      protected void setValue(final Object element, final Object value) {
+
+         final float consumedAmount = ((Double) value).floatValue();
+
+         ((TourNutritionProduct) element).setConsumedQuantity(consumedAmount);
+         _tourData = TourManager.saveModifiedTour(_tourData);
+      }
+   }
+
    private final class NoEditingSupport extends EditingSupport {
 
       private NoEditingSupport() {
@@ -1226,49 +1276,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void setColumnsEditingSupport() {
 
-      _colDef_ConsumedQuantity.setEditingSupport(new EditingSupport(_productsViewer) {
-
-         private SpinnerCellEditor spinnerCellEditor = new SpinnerCellEditor(_productsViewer.getTable(),
-               _nf2,
-               new RangeContent(0, 0, 0),
-               SWT.NONE);
-
-         @Override
-         protected boolean canEdit(final Object element) {
-            return true;
-         }
-
-         @Override
-         protected CellEditor getCellEditor(final Object element) {
-
-            //TODO FB it's all over the place as there are 3 possible ways
-            //- mouse wheel on the number
-            //- mouse wheel on the -/+ signs
-            //- mouse wheel CLICK on the -/+ signs
-            //
-            final Spinner spinner = spinnerCellEditor.getControl();
-            spinner.setMinimum(25);
-            spinner.setMaximum(10000);
-            spinner.setIncrement(25);
-            spinner.addMouseWheelListener(mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent));
-
-            return spinnerCellEditor;
-         }
-
-         @Override
-         protected Object getValue(final Object element) {
-            return ((TourNutritionProduct) element).getConsumedQuantity();
-         }
-
-         @Override
-         protected void setValue(final Object element, final Object value) {
-
-            final float consumedAmount = ((Double) value).floatValue();
-
-            ((TourNutritionProduct) element).setConsumedQuantity(consumedAmount);
-            _tourData = TourManager.saveModifiedTour(_tourData);
-         }
-      });
+      _colDef_ConsumedQuantity.setEditingSupport(new ConsumedQuantityEditingSupport());
 
       final String[] quantityTypeItems = new String[2];
       quantityTypeItems[0] = Messages.Tour_Nutrition_Label_QuantityType_Servings;
