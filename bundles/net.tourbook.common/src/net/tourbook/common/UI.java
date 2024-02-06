@@ -1561,8 +1561,11 @@ public class UI {
     * Creates a {@link Spinner} with minimum, maximum, increment, page increment, number of digits
     *
     * @param parent
-    * @param text
-    * @param style
+    * @param digits
+    * @param minimum
+    * @param maximum
+    * @param increment
+    * @param pageIncrement
     *
     * @return
     */
