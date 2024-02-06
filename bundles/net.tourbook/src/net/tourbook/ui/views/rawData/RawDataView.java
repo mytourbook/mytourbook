@@ -2667,8 +2667,8 @@ public class RawDataView extends ViewPart implements
                + "{" + NL //                                         //$NON-NLS-1$
                + "   font-family:   'Nunito-Bold';" + NL //          //$NON-NLS-1$
                + "   font-weight:   700;" + NL //                    //$NON-NLS-1$
-               + "   font-style:      bold;" + NL //                 //$NON-NLS-1$
-               + "   src:         url(data:font/truetype;charset=utf-8;base64," + base64Encoded + ") format('truetype');" //$NON-NLS-1$ //$NON-NLS-2$
+               + "   font-style:    bold;" + NL //                 //$NON-NLS-1$
+               + "   src:           url(data:font/truetype;charset=utf-8;base64," + base64Encoded + ") format('truetype');" //$NON-NLS-1$ //$NON-NLS-2$
                + "}" + NL //                                         //$NON-NLS-1$
 
                + "</style>" + NL //                                  //$NON-NLS-1$
