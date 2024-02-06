@@ -242,7 +242,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          case COLUMN_NAME:
          default:
-            rc = tnp1.getName().compareToIgnoreCase(tnp2.getName());
+            rc = NutritionUtils.getProductFullName(tnp1).compareToIgnoreCase(NutritionUtils.getProductFullName(tnp2));
             break;
 
          }
