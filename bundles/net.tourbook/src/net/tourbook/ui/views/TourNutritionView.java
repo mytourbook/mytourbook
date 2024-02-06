@@ -608,7 +608,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
           * Columns headers
           */
          {
-            Label label = UI.createLabel(container, UI.EMPTY_STRING);
+            Label label = UI.createLabel(container);
             GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
 
             label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Calories);
@@ -625,8 +625,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
           * Totals
           */
          {
-            final Label label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Totals);
-            label.setToolTipText(Messages.Tour_Nutrition_Label_Totals_Tooltip);
+            final Label label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Totals, Messages.Tour_Nutrition_Label_Totals_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(label);
 
             _txtCalories_Total = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
@@ -664,8 +663,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
           * Averages
           */
          {
-            final Label label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Averages);
-            label.setToolTipText(Messages.Tour_Nutrition_Label_Averages_Tooltip);
+            final Label label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Averages, Messages.Tour_Nutrition_Label_Averages_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(label);
 
             _txtCalories_Average = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);

@@ -132,9 +132,8 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    private Composite createUI(final Composite parent) {
 
-      final Label label = new Label(parent, SWT.WRAP);
+      final Label label = UI.createLabel(parent, Messages.PrefPage_TourBeverageContainers_Title, SWT.WRAP);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
-      label.setText(Messages.PrefPage_TourBeverageContainers_Title);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
