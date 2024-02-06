@@ -210,6 +210,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          spinner.setMinimum(25);
          spinner.setMaximum(10000);
          spinner.setIncrement(25);
+         spinner.setPageIncrement(100);
          spinner.addMouseWheelListener(mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent));
       }
 

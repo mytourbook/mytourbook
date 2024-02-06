@@ -102,11 +102,7 @@ class DialogBeverageContainer extends Dialog {
          UI.createLabel(container, Messages.Dialog_BeverageContainer_Label_Capacity);
 
          // Text: container capacity in L
-         _spinnerCapacity = new Spinner(container, SWT.BORDER);
-         _spinnerCapacity.setMinimum(25);
-         _spinnerCapacity.setIncrement(25);
-         _spinnerCapacity.setMaximum(10000);
-         _spinnerCapacity.setDigits(2);
+         _spinnerCapacity = UI.createSpinner(parent, 2, 25, 10000, 25, 100);
          _spinnerCapacity.setSelection(Math.round(_capacity * 100));
          _spinnerCapacity.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCapacityModified()));
          _spinnerCapacity.addModifyListener(event -> validateFields());
