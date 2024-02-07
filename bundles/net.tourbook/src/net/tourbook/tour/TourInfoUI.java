@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,9 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tour;
+
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
@@ -72,9 +75,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
@@ -1214,7 +1215,7 @@ public class TourInfoUI {
           */
          _linkBattery = createUI_Link(parent, Messages.Tour_Tooltip_Label_Battery);
          _linkBattery.setToolTipText(Messages.Tour_Tooltip_Label_Battery_Tooltip);
-         _linkBattery.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_Battery()));
+         _linkBattery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_Battery()));
 
          _lblBattery_Start = createUI_LabelValue(parent, SWT.TRAIL);
          _lblBattery_Start.setToolTipText(Messages.Tour_Tooltip_Label_Battery_Tooltip);
@@ -1583,7 +1584,7 @@ public class TourInfoUI {
          // sensor label/link
          final Link link = createUI_Link(parent, sensor.getLabel());
          link.setData(sensor);
-         link.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_Sensor(selectionEvent)));
+         link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_Sensor(selectionEvent)));
          _allSensorValue_Link.add(link);
 
          _allSensorValue_Level.add(createUI_LabelValue(parent, SWT.LEAD));
@@ -1669,7 +1670,7 @@ public class TourInfoUI {
                   _comboUIWidth_Size = new Combo(containerTextWidth, SWT.READ_ONLY | SWT.BORDER);
                   _comboUIWidth_Size.setVisibleItemCount(10);
                   _comboUIWidth_Size.setToolTipText(Messages.Tour_Tooltip_Combo_UIWidthSize_Tooltip);
-                  _comboUIWidth_Size.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_UIWidth_1_Size()));
+                  _comboUIWidth_Size.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_UIWidth_1_Size()));
 //                  _comboUIWidth_Size.addFocusListener(_keepOpenListener);
 
                   GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboUIWidth_Size);
@@ -1684,7 +1685,7 @@ public class TourInfoUI {
                   _spinnerUIWidth_Pixel.setIncrement(10);
                   _spinnerUIWidth_Pixel.setPageIncrement(50);
                   _spinnerUIWidth_Pixel.setToolTipText(Messages.Tour_Tooltip_Spinner_TextWidth_Tooltip);
-                  _spinnerUIWidth_Pixel.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_UIWidth_2_Value()));
+                  _spinnerUIWidth_Pixel.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_UIWidth_2_Value()));
                   _spinnerUIWidth_Pixel.addMouseWheelListener(mouseEvent -> {
 
                      UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
@@ -1886,7 +1887,7 @@ public class TourInfoUI {
 
       if (_isUIEmbedded) {
 
-         parent.addControlListener(ControlListener.controlResizedAdapter(controlEvent -> {
+         parent.addControlListener(controlResizedAdapter(controlEvent -> {
 
             _uiWidth_Pixel = getUIWidthFromParent(parent);
 
@@ -1927,14 +1928,14 @@ public class TourInfoUI {
    private void onSelect_Sensor(final SelectionEvent selectionEvent) {
 
       final Object linkData = selectionEvent.widget.getData();
-      if (linkData instanceof DeviceSensor) {
+      if (linkData instanceof final DeviceSensor deviceSensor) {
 
          Util.showView(SensorChartView.ID, false);
 
          TourManager.fireEventWithCustomData(
 
                TourEventId.SELECTION_SENSOR,
-               new SelectionSensor((DeviceSensor) linkData, _tourData.getTourId()),
+               new SelectionSensor(deviceSensor, _tourData.getTourId()),
                _part);
       }
    }
