@@ -2282,7 +2282,7 @@ public class TourInfoUI {
 
          final int colorIndex = airQualityTextIndex * 2;
 
-         // run asyc otherwise in the dark mode the colors are not displayed
+         // run async otherwise in the dark mode the colors are not displayed
          _parent.getDisplay().asyncExec(() -> {
 
             if (_parent.isDisposed()) {
