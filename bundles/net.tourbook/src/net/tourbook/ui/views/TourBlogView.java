@@ -463,14 +463,18 @@ public class TourBlogView extends ViewPart {
 
                sb.append(String.format("%s %s (%s %s)", //$NON-NLS-1$
                      _nf2.format(product.getConsumedQuantity()),
-                     product.getName(),
+                     NutritionUtils.getProductFullName(product),
                      _nf2.format(product.getBeverageQuantity()),
                      UI.UNIT_FLUIDS_ML));
 
             } else {
 
-               sb.append(_nf2.format(product.getContainersConsumed()) + UI.SPACE1 + NutritionUtils.buildTourBeverageContainerName(
-                     tourBeverageContainer));
+               sb.append(String.format("%s %s (%s %s)", //$NON-NLS-1$
+                     _nf2.format(product.getContainersConsumed()) + UI.SPACE1 + NutritionUtils.buildTourBeverageContainerName(
+                           tourBeverageContainer),
+                     NutritionUtils.getProductFullName(product),
+                     _nf2.format(product.getContainersConsumed() * tourBeverageContainer.getCapacity()),
+                     UI.UNIT_FLUIDS_L));
 
             }
          });
