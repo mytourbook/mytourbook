@@ -820,8 +820,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
          createUI_110_Report(container);
+
+         /*
+          * Empty label to put empty space between this section and the next one
+          */
+         UI.createLabel(container);
       }
-      UI.createLabel(container);
    }
 
    private void createUI_Section_20_ProductsList(final Composite parent) {
