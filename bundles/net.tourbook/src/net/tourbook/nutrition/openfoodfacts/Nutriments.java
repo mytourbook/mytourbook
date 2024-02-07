@@ -22,17 +22,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Nutriments {
 
    @JsonProperty("energy-kcal_100g")
-   public int   energyKcal100g;
+   public float  energyKcal100g;
 
    @JsonProperty("energy-kcal_serving")
-   public int   energyKcalServing;
+   public float  energyKcalServing;
 
    @JsonProperty("product_quantity")
-   public int   productQuantity;
+   public String productQuantity;
 
    @JsonProperty("sodium_100g")
-   public float sodium100g;
+   public float  sodium100g;
 
    @JsonProperty("sodium_serving")
-   public float sodiumServing;
+   public float  sodiumServing;
 }

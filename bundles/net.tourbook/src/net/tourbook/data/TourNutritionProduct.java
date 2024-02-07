@@ -193,8 +193,8 @@ public class TourNutritionProduct {
             quantity != null && productQuantity != null && servingQuantity != null) {
 
          final int numberOfServings = Math.round(Float.valueOf(productQuantity) / Float.valueOf(servingQuantity));
-         setCalories(nutriments.energyKcalServing * numberOfServings);
-         setCalories_Serving(nutriments.energyKcalServing);
+         setCalories(Math.round(nutriments.energyKcalServing * numberOfServings));
+         setCalories_Serving(Math.round(nutriments.energyKcalServing));
 
          setSodium(Math.round(nutriments.sodiumServing * numberOfServings * 1000));
          setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
@@ -208,7 +208,7 @@ public class TourNutritionProduct {
 
       } else {
 
-         setCalories_Serving(nutriments.energyKcalServing);
+         setCalories_Serving(Math.round(nutriments.energyKcalServing));
          setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
 
          final float servingQuantityFloat = Util.parseFloat(servingQuantity);
