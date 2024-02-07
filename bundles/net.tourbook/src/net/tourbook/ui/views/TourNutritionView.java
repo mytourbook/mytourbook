@@ -565,12 +565,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private Section createSection(final Composite parent,
                                  final FormToolkit tk,
-                                 final String title) {
+                                 final String title,
+                                 final boolean isGrabVertical) {
 
       final Section section = tk.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
 
       section.setText(title);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
+      GridDataFactory.fillDefaults().grab(true, isGrabVertical).applyTo(section);
 
       final Composite sectionContainer = tk.createComposite(section);
       section.setClient(sectionContainer);
@@ -813,18 +814,19 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void createUI_Section_10_Summary(final Composite parent) {
 
-      _sectionSummary = createSection(parent, _tk, Messages.Tour_Nutrition_Section_Summary);
+      _sectionSummary = createSection(parent, _tk, Messages.Tour_Nutrition_Section_Summary, false);
       _sectionSummary.setToolTipText(Messages.Tour_Nutrition_Section_Summary_Tooltip);
       final Composite container = (Composite) _sectionSummary.getClient();
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
          createUI_110_Report(container);
       }
+      UI.createLabel(container);
    }
 
    private void createUI_Section_20_ProductsList(final Composite parent) {
 
-      _sectionProductsList = createSection(parent, _tk, Messages.Tour_Nutrition_Section_ProductsList);
+      _sectionProductsList = createSection(parent, _tk, Messages.Tour_Nutrition_Section_ProductsList, true);
       _sectionProductsList.setToolTipText(Messages.Tour_Nutrition_Section_ProductsList_Tooltip);
       final Composite container = (Composite) _sectionProductsList.getClient();
       GridLayoutFactory.fillDefaults().applyTo(container);
