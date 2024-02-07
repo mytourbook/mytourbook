@@ -83,7 +83,7 @@ class DropboxClient {
     *
     * @return The local path of the downloaded file
     */
-   static final Path CopyLocally(String dropboxFilePath) {
+   static final Path copyLocally(String dropboxFilePath) {
 
       if (StringUtils.isNullOrEmpty(dropboxFilePath)) {
          return null;
