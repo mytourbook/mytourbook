@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -60,14 +60,10 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -97,7 +93,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    private final IPreferenceStore          _prefStore               = TourbookPlugin.getPrefStore();
    private final IDialogSettings           _state                   = TourbookPlugin.getState(ID);
 
-   private IPartListener2                  _partListener;
    private IPropertyChangeListener         _prefChangeListener;
    private ITourEventListener              _tourEventListener;
 
@@ -183,38 +178,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       }
    }
 
-   private void addPartListener() {
-
-      _partListener = new IPartListener2() {
-
-         @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partClosed(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partHidden(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partVisible(final IWorkbenchPartReference partRef) {}
-      };
-
-      getViewSite().getPage().addPartListener(_partListener);
-   }
-
    private void addPrefListener() {
 
       _prefChangeListener = propertyChangeEvent -> {
@@ -250,9 +213,9 @@ public class SensorChartView extends ViewPart implements ITourProvider {
             return;
          }
 
-         if (tourEventId == TourEventId.SELECTION_SENSOR && eventData instanceof SelectionSensor) {
+         if (tourEventId == TourEventId.SELECTION_SENSOR && eventData instanceof final SelectionSensor selectionSensor) {
 
-            onSelectionChanged((SelectionSensor) eventData);
+            onSelectionChanged(selectionSensor);
 
          } else if (tourEventId == TourEventId.TOUR_CHANGED) {
 
@@ -293,7 +256,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       createUI(parent);
       createActions();
 
-      addPartListener();
       addPrefListener();
       addTourEventListener();
 
@@ -358,12 +320,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          _tourInfoUI.setActionsEnabled(true);
       }
 
-      parent.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            _tourInfoUI.dispose();
-         }
-      });
+      parent.addDisposeListener(disposeEvent -> _tourInfoUI.dispose());
    }
 
    private void createUI(final Composite parent) {
@@ -439,8 +396,6 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
 
-      getViewSite().getPage().removePartListener(_partListener);
-
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       super.dispose();
@@ -506,9 +461,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
          return;
       }
 
-      if (selection instanceof SelectionSensor) {
-
-         final SelectionSensor sensorSelection = (SelectionSensor) selection;
+      if (selection instanceof final SelectionSensor sensorSelection) {
 
          _selectedSensor = sensorSelection.getSensor();
 
@@ -557,9 +510,9 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       if (_sensorData != null
             && _sensorData.allTourIds != null
             && _sensorData.allTourIds.length > 0
-            && selection instanceof SelectionBarChart) {
+            && selection instanceof final SelectionBarChart selectionBarChart) {
 
-         final long selectedTourId = _sensorData.allTourIds[((SelectionBarChart) selection).valueIndex];
+         final long selectedTourId = _sensorData.allTourIds[selectionBarChart.valueIndex];
 
          _state.put(STATE_SELECTED_TOUR_ID, Long.toString(selectedTourId));
       }
@@ -574,6 +527,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
    /**
     * @param tourId
     *           Tour ID to select, can also be an invalid value, then the first tour is selected
+    *
     * @return
     */
    private boolean selectTour(final Long tourId) {
@@ -630,13 +584,10 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
    private void setChartProviders(final ChartDataModel chartModel) {
 
-      final IChartInfoProvider chartInfoProvider = new IChartInfoProvider() {
-
-         @Override
-         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
-            SensorChartView.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
-         }
-      };
+      final IChartInfoProvider chartInfoProvider = (toolTipProvider, parent, serieIndex, valueIndex) -> createToolTipUI(toolTipProvider,
+            parent,
+            serieIndex,
+            valueIndex);
 
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, chartInfoProvider);
 
@@ -663,7 +614,7 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       final ArrayList<TourType> allTourTypes = TourDatabase.getAllTourTypes();
 
-      if (allTourTypes.size() == 0) {
+      if (allTourTypes.isEmpty()) {
 
          /**
           * Tour types are not available

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -125,9 +125,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 public class CollatedToursView extends ViewPart implements ITourProvider, ITourViewer3, ITourProviderByID, ITreeViewer {
@@ -150,7 +148,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    //
    private PostSelectionProvider   _postSelectionProvider;
    private ISelectionListener      _postSelectionListener;
-   private IPartListener2          _partListener;
    private ITourEventListener      _tourPropertyListener;
    private IPropertyChangeListener _prefChangeListener;
    private IPropertyChangeListener _prefChangeListener_Common;
@@ -331,36 +328,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
    }
 
-   private void addPartListener() {
-
-      _partListener = new IPartListener2() {
-         @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partClosed(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partHidden(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partVisible(final IWorkbenchPartReference partRef) {}
-      };
-      getViewSite().getPage().addPartListener(_partListener);
-   }
-
    private void addPrefListener() {
 
       _prefChangeListener = propertyChangeEvent -> {
@@ -497,7 +464,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
       _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       _viewerMenuManager.setRemoveAllWhenShown(true);
-      _viewerMenuManager.addMenuListener(this::fillContextMenu);
+      _viewerMenuManager.addMenuListener(manager -> fillContextMenu(manager));
    }
 
    @Override
@@ -515,7 +482,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       createActions();
 
       addSelectionListener();
-      addPartListener();
       addPrefListener();
       addTourEventListener();
 
@@ -572,7 +538,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       _tourViewer.setComparer(new ItemComparer());
       _tourViewer.setUseHashlookup(true);
 
-      _tourViewer.addSelectionChangedListener(this::onSelectTreeItem);
+      _tourViewer.addSelectionChangedListener(event -> onSelectTreeItem(event));
 
       _tourViewer.addDoubleClickListener(doubleClickEvent -> {
 
@@ -783,9 +749,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
                            .getZonedDateTime(tourItem.colTourStartTime)
                            .format(TimeTools.Formatter_Date_S));
 
-            } else if (element instanceof TVICollatedTour_Event) {
-
-               final TVICollatedTour_Event collatedEvent = (TVICollatedTour_Event) element;
+            } else if (element instanceof final TVICollatedTour_Event collatedEvent) {
 
                // collated event
 
@@ -986,9 +950,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          @Override
          public void update(final ViewerCell cell) {
             final Object element = cell.getElement();
-            if (element instanceof TVICollatedTour_Tour) {
+            if (element instanceof final TVICollatedTour_Tour tviCollatedTour_Tour) {
 
-               final long dbPersonId = ((TVICollatedTour_Tour) element).colPersonId;
+               final long dbPersonId = tviCollatedTour_Tour.colPersonId;
 
                cell.setText(PersonManager.getPersonName(dbPersonId));
             }
@@ -1081,9 +1045,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            if (element instanceof TVICollatedTour_Tour) {
+            if (element instanceof final TVICollatedTour_Tour tviCollatedTour_Tour) {
 
-               final short dbTimeInterval = ((TVICollatedTour_Tour) element).getColumnTimeInterval();
+               final short dbTimeInterval = tviCollatedTour_Tour.getColumnTimeInterval();
                if (dbTimeInterval == 0) {
                   cell.setText(UI.EMPTY_STRING);
                } else {
@@ -1108,9 +1072,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            if (element instanceof TVICollatedTour_Tour) {
+            if (element instanceof final TVICollatedTour_Tour tviCollatedTour_Tour) {
 
-               final long dbStartDistance = ((TVICollatedTour_Tour) element).getColumnStartDistance();
+               final long dbStartDistance = tviCollatedTour_Tour.getColumnStartDistance();
                final double value = dbStartDistance / UI.UNIT_VALUE_DISTANCE;
 
                colDef.printValue_0(cell, value);
@@ -1430,9 +1394,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          @Override
          public void update(final ViewerCell cell) {
             final Object element = cell.getElement();
-            if (element instanceof TVICollatedTour_Tour) {
+            if (element instanceof final TVICollatedTour_Tour tviCollatedTour_Tour) {
 
-               final long tourStartTime = ((TVICollatedTour_Tour) element).colTourStartTime;
+               final long tourStartTime = tviCollatedTour_Tour.colTourStartTime;
 
                cell.setText(TimeTools.getZonedDateTime(tourStartTime).format(TimeTools.Formatter_Date_S));
                setCellColor(cell, element);
@@ -1463,9 +1427,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          @Override
          public void update(final ViewerCell cell) {
             final Object element = cell.getElement();
-            if (element instanceof TVICollatedTour_Tour) {
+            if (element instanceof final TVICollatedTour_Tour tviCollatedTour_Tour) {
 
-               cell.setText(((TVICollatedTour_Tour) element).colWeekDay);
+               cell.setText(tviCollatedTour_Tour.colWeekDay);
                setCellColor(cell, element);
             }
          }
@@ -1534,9 +1498,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            if (element instanceof TVICollatedTour_Tour) {
+            if (element instanceof final TVICollatedTour_Tour tviCollatedTour_Tour) {
 
-               final ArrayList<Long> markerIds = ((TVICollatedTour_Tour) element).getMarkerIds();
+               final ArrayList<Long> markerIds = tviCollatedTour_Tour.getMarkerIds();
                if (markerIds == null) {
                   cell.setText(UI.EMPTY_STRING);
                } else {
@@ -1594,13 +1558,13 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
 
             List<Long> tagIds = null;
-            if (element instanceof TVICollatedTour_Tour) {
+            if (element instanceof final TVICollatedTour_Tour tviCollatedTour_Tour) {
 
-               tagIds = ((TVICollatedTour_Tour) element).getTagIds();
+               tagIds = tviCollatedTour_Tour.getTagIds();
 
-            } else if (element instanceof TVICollatedTour_Event) {
+            } else if (element instanceof final TVICollatedTour_Event tviCollatedTour_Event) {
 
-               tagIds = ((TVICollatedTour_Event) element).getTagIds();
+               tagIds = tviCollatedTour_Event.getTagIds();
             }
 
             if (tagIds != null) {
@@ -1658,7 +1622,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       _colDef_TourTypeImage.setLabelProvider(new CellLabelProvider() {
 
          // !!! When using cell.setImage() then it is not centered !!!
-         // !!! Set dummy label provider, otherwise an error occures !!!
+         // !!! Set dummy label provider, otherwise an error occurs !!!
          @Override
          public void update(final ViewerCell cell) {}
       });
@@ -1674,9 +1638,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          @Override
          public void update(final ViewerCell cell) {
             final Object element = cell.getElement();
-            if (element instanceof TVICollatedTour_Tour) {
+            if (element instanceof final TVICollatedTour_Tour tviCollatedTour_Tour) {
 
-               final long tourTypeId = ((TVICollatedTour_Tour) element).getTourTypeId();
+               final long tourTypeId = tviCollatedTour_Tour.getTourTypeId();
                cell.setText(net.tourbook.ui.UI.getTourTypeLabel(tourTypeId));
             }
          }
@@ -1693,7 +1657,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       _colDef_WeatherClouds.setLabelProvider(new CellLabelProvider() {
 
          // !!! When using cell.setImage() then it is not centered !!!
-         // !!! Set dummy label provider, otherwise an error occures !!!
+         // !!! Set dummy label provider, otherwise an error occurs !!!
          @Override
          public void update(final ViewerCell cell) {}
       });
@@ -1775,7 +1739,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    public void dispose() {
 
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
-      getViewSite().getPage().removePartListener(_partListener);
       TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
@@ -1797,20 +1760,20 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
       for (final Object treeItem : selection) {
 
-         if (treeItem instanceof TVICollatedTour) {
+         if (treeItem instanceof final TVICollatedTour tviCollatedTour) {
 
             boolean isDummyTour = false;
 
             // check if this is a dummy tour, the last tour is a dummy tour
-            if (treeItem instanceof TVICollatedTour_Event) {
+            if (treeItem instanceof final TVICollatedTour_Event tviCollatedTour_Event) {
 
-               if (((TVICollatedTour_Event) treeItem).isLastEvent) {
+               if (tviCollatedTour_Event.isLastEvent) {
                   isDummyTour = true;
                }
             }
 
             if (firstTour == null && !isDummyTour) {
-               firstTour = (TVICollatedTour) treeItem;
+               firstTour = tviCollatedTour;
             }
             tourItems++;
          }
@@ -1938,10 +1901,10 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
       final Object element = cell.getElement();
 
-      if (element instanceof TVICollatedTour_Tour) {
-         return ((TVICollatedTour_Tour) element).getTourId();
-      } else if (element instanceof TVICollatedTour_Event) {
-         return ((TVICollatedTour_Event) element).getTourId();
+      if (element instanceof final TVICollatedTour_Tour tviCollatedTour_Tour) {
+         return tviCollatedTour_Tour.getTourId();
+      } else if (element instanceof final TVICollatedTour_Event tviCollatedTour_Event) {
+         return tviCollatedTour_Event.getTourId();
       }
 
       return null;
@@ -1983,8 +1946,8 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
       for (final Object viewItem : selectedTours) {
 
-         if (viewItem instanceof TVICollatedTour) {
-            tourIds.add(((TVICollatedTour) viewItem).getTourId());
+         if (viewItem instanceof final TVICollatedTour tviCollatedTour) {
+            tourIds.add(tviCollatedTour.getTourId());
          }
       }
 
@@ -2064,9 +2027,8 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
       final Object itemData = event.item.getData();
 
-      if (itemData instanceof TVICollatedTour_Tour) {
+      if (itemData instanceof final TVICollatedTour_Tour collatedTour) {
 
-         final TVICollatedTour_Tour collatedTour = (TVICollatedTour_Tour) itemData;
          final long tourTypeId = collatedTour.getTourTypeId();
          final Image image = TourTypeImage.getTourTypeImage(tourTypeId);
 
@@ -2081,9 +2043,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
       final Object itemData = event.item.getData();
 
-      if (itemData instanceof TVICollatedTour) {
-
-         final TVICollatedTour collatedTour = (TVICollatedTour) itemData;
+      if (itemData instanceof final TVICollatedTour collatedTour) {
 
          final String weatherClouds = collatedTour.colClouds;
          if (weatherClouds == null) {
