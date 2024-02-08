@@ -99,7 +99,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
@@ -215,32 +214,7 @@ public class TourBlogView extends ViewPart {
 
    private void addPartListener() {
 
-      _partListener = new IPartListener2() {
-
-         @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partClosed(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partHidden(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partVisible(final IWorkbenchPartReference partRef) {}
-      };
+      _partListener = new IPartListener2() {};
       getViewSite().getPage().addPartListener(_partListener);
    }
 
@@ -251,6 +225,14 @@ public class TourBlogView extends ViewPart {
          final String property = propertyChangeEvent.getProperty();
 
          if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
+
+            updateUI();
+         } else if (property.equals(ITourbookPreferences.PREF_BEVERAGECONTAINERS_HAS_CHANGED)) {
+
+            reloadTourData();
+
+            // removed old tour data from the selection provider
+            _postSelectionProvider.clearSelection();
 
             updateUI();
          }
@@ -348,12 +330,7 @@ public class TourBlogView extends ViewPart {
          } else if (eventId == TourEventId.TAG_CONTENT_CHANGED ||
                eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
-            final Long tourId = _tourData.getTourId();
-            final TourManager tourManager = TourManager.getInstance();
-
-            tourManager.removeTourFromCache(tourId);
-
-            _tourData = tourManager.getTourDataFromDb(tourId);
+            reloadTourData();
 
             // removed old tour data from the selection provider
             _postSelectionProvider.clearSelection();
@@ -1361,6 +1338,16 @@ public class TourBlogView extends ViewPart {
       _reloadedTourMarkerId = tourMarker.getMarkerId();
 
       _browser.setRedraw(false);
+   }
+
+   private void reloadTourData() {
+
+      final Long tourId = _tourData.getTourId();
+      final TourManager tourManager = TourManager.getInstance();
+
+      tourManager.removeTourFromCache(tourId);
+
+      _tourData = tourManager.getTourDataFromDb(tourId);
    }
 
    private void saveModifiedTour() {
