@@ -4,6 +4,8 @@
 TODO's
 ======               
 
+* Obfuscate location view
+
 * Remove/replace "de.byteholder.geoclipse.map.UI.NEW_LINE"
 
 * Remove debug code in ColumnManager.java
@@ -41,6 +43,11 @@ Experimental
 
 New
 ===
+
+* Start/End Location
+  Retrieve, manage and show start/end locations in
+    - Tour editor
+  https://github.com/mytourbook/mytourbook/issues/878
 
 * 
 

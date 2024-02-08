@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -89,6 +89,7 @@ import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
+import net.tourbook.tour.ActionTourLocation;
 import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.DialogEditTimeSlicesValues;
 import net.tourbook.tour.ITourEventListener;
@@ -104,6 +105,9 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogManager.AutoOpenEvent;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.location.ITourLocationConsumer;
+import net.tourbook.tour.location.TourLocationData;
+import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ComboViewerCadence;
 import net.tourbook.ui.ITourProvider2;
@@ -129,10 +133,12 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -227,7 +233,12 @@ import org.eclipse.ui.progress.UIJob;
 /**
  * This editor can edit data of a tour
  */
-public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
+public class TourDataEditorView extends ViewPart implements
+
+      ISaveablePart,
+      ISaveAndRestorePart,
+      ITourProvider2,
+      ITourLocationConsumer {
 
    public static final String            ID                                               = "net.tourbook.views.TourDataEditorView";          //$NON-NLS-1$
    //
@@ -556,6 +567,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private ActionOpenMarkerDialog                     _actionOpenMarkerDialog;
    private ActionSetStartDistanceTo0                  _actionSetStartDistanceTo_0;
    private ActionSplitTour                            _actionSplitTour;
+   private ActionTourLocation                         _actionStartLocation;
+   private ActionTourLocation                         _actionEndLocation;
    private ActionToggleReadEditMode                   _actionToggleReadEditMode;
    private ActionToggleRowSelectMode                  _actionToggleRowSelectMode;
    private ActionViewSettings                         _actionViewSettings;
@@ -563,29 +576,34 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private ArrayList<Action_SetSwimStyle>             _allSwimStyleActions;
    //
    private TagMenuManager                             _tagMenuMgr;
-
+   //
    /**
     * Number of digits for the lat/lon columns.
     */
    private int                                        _latLonDigits;
-
+   //
    /** Number of lines for the tour's description text */
    private int                                        _numLines_TourDescription;
-
+   //
    /** Number of lines for the weather's description text */
    private int                                        _numLines_WeatherDescription;
-
+   //
    private final NumberFormat                         _nfLatLon                       = NumberFormat.getNumberInstance();
-
+   //
    private TourData                                   _tourData;
    private LocalDate                                  _lastDuplicateTourDateCheck;
-
+   //
    private Color                                      _foregroundColor_Default;
    private Color                                      _backgroundColor_Default;
    private Color                                      _foregroundColor_1stColumn_RefTour;
    private Color                                      _backgroundColor_1stColumn_RefTour;
    private Color                                      _foregroundColor_1stColumn_NoRefTour;
    private Color                                      _backgroundColor_1stColumn_NoRefTour;
+   //
+   private ToolBarManager                             _toolbarManager_StartLocation;
+   private ToolBarManager                             _toolbarManager_EndLocation;
+   //
+   private GridDataFactory                            _gridData_GrabHorizontal_CenterVertical;
 
    //
    // ################################################## UI controls ##################################################
@@ -595,7 +613,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private PageBook                 _pageBook;
    private Composite                _page_NoTourData;
    private Form                     _page_EditorForm;
-
+   //
    private PageBook                 _pageBook_Swim;
    private Composite                _pageSwim_NoData;
    private Composite                _pageSwim_Data;
@@ -641,9 +659,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Object[]                 _swimSlice_ViewerItems;
    private ColumnManager            _swimSlice_ColumnManager;
    private SwimSlice_TourViewer     _swimSlice_TourViewer         = new SwimSlice_TourViewer();
-
+   //
    private FormToolkit              _tk;
-
+   //
    /*
     * Tab: Tour
     */
@@ -2123,7 +2141,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _isTimeZoneManuallyModified = true;
 
       // update UI
-      _tourData = newTourData;
+      setupTourData(newTourData);
       _tourChart = null;
       updateUI_FromModel(newTourData, false, true);
 
@@ -2972,7 +2990,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if (net.tourbook.ui.UI.containsTourId(eventData, tourDataEditorTourId) != null) {
 
                   // reload tour data
-                  _tourData = TourManager.getInstance().getTourData(_tourData.getTourId());
+                  setupTourData(TourManager.getInstance().getTourData(_tourData.getTourId()));
 
                   updateUI_FromModel(_tourData, false, true);
                }
@@ -3070,7 +3088,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       } else {
 
-         _tourData = null;
+         setupTourData(null);
 
          // set slice viewer dirty
          _timeSlice_ViewerTourId = -1;
@@ -3081,6 +3099,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          setTourClean();
 
          _pageBook.showPage(_page_NoTourData);
+      }
+   }
+
+   @Override
+   public void closeOtherSlideouts(final ContributionItem requestForOpeningContribItem) {
+
+      if (requestForOpeningContribItem.equals(_actionEndLocation)) {
+
+         // close start location slideout
+
+         _actionStartLocation.closeSlideout();
+
+      } else {
+
+         // close end location slideout
+
+         _actionEndLocation.closeSlideout();
       }
    }
 
@@ -3148,6 +3183,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
       _action_RemoveSwimStyle = new Action_RemoveSwimStyle();
 
+   }
+
+   private void createActionsBeforeUI() {
+
+// SET_FORMATTING_OFF
+
+      _actionStartLocation    = new ActionTourLocation(this, true, ID);
+      _actionEndLocation      = new ActionTourLocation(this, false, ID);
+
+// SET_FORMATTING_ON
    }
 
    private void createFieldListener() {
@@ -3447,6 +3492,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       // must be set before the UI is created
       createFieldListener();
 
+      createActionsBeforeUI();
       createUI(parent);
       createMenus();
       createActions();
@@ -3574,19 +3620,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _sectionTitle = createSection(parent, _tk, Messages.tour_editor_section_tour, true, true);
 
-      final Composite container = (Composite) _sectionTitle.getClient();
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      final Composite sectionContainer = (Composite) _sectionTitle.getClient();
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(sectionContainer);
 //      container.setBackground(UI.SYS_COLOR_MAGENTA);
       {
          {
             /*
              * Title
              */
-            final Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_title);
+            final Label label = _tk.createLabel(sectionContainer, Messages.tour_editor_label_tour_title);
             _firstColumnControls.add(label);
 
             // combo: tour title with history
-            _comboTitle = new Combo(container, SWT.BORDER | SWT.FLAT);
+            _comboTitle = new Combo(sectionContainer, SWT.BORDER | SWT.FLAT);
             _comboTitle.setText(UI.EMPTY_STRING);
 
             _comboTitle.addListener(SWT.MouseWheel, _mouseWheelListener_ScrollField);
@@ -3628,12 +3674,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             /*
              * Description
              */
-            final Label label = _tk.createLabel(container, Messages.tour_editor_label_description);
+            final Label label = _tk.createLabel(sectionContainer, Messages.tour_editor_label_description);
             GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
             _firstColumnControls.add(label);
 
             _txtDescription = _tk.createText(
-                  container,
+                  sectionContainer,
                   UI.EMPTY_STRING,
                   SWT.BORDER
                         | SWT.WRAP
@@ -3658,75 +3704,131 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             /*
              * Start location
              */
-            final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Location_Start);
-            _firstColumnControls.add(label);
+            final Composite container = new Composite(sectionContainer, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(container);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//            container.setBackground(UI.SYS_COLOR_RED);
+            {
+               {
+                  // label
 
-            _comboLocation_Start = new Combo(container, SWT.BORDER | SWT.FLAT);
-            _comboLocation_Start.setText(UI.EMPTY_STRING);
+                  final Label label = new Label(container, SWT.NONE);
+                  label.setText(Messages.Tour_Editor_Label_Location_Start);
 
-            _comboLocation_Start.addListener(SWT.MouseWheel, _mouseWheelListener_ScrollField);
-            _comboLocation_Start.addFocusListener(_focusListener_ScrollField);
-            _comboLocation_Start.addModifyListener(modifyEvent -> {
-               if (_isSetField || _isSavingInProgress) {
-                  return;
+                  _tk.adapt(label, true, true);
+                  _gridData_GrabHorizontal_CenterVertical.applyTo(label);
                }
-               _isLocationStartModified = true;
-               setTourDirty();
-            });
+               {
+                  // download action
 
-            _tk.adapt(_comboLocation_Start, true, false);
+                  final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
 
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
-                  .applyTo(_comboLocation_Start);
+                  _toolbarManager_StartLocation = new ToolBarManager(toolbar);
+                  _toolbarManager_StartLocation.add(_actionStartLocation);
+                  _toolbarManager_StartLocation.update(true);
+               }
 
-            // fill combobox
-            final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourPlaceStarts();
-            for (final String string : arr) {
-               if (string != null) {
-                  _comboLocation_Start.add(string);
+               _firstColumnControls.add(container);
+
+               {
+                  // autocomplete combo
+
+                  _comboLocation_Start = new Combo(sectionContainer, SWT.BORDER | SWT.FLAT);
+                  _comboLocation_Start.setText(UI.EMPTY_STRING);
+
+                  _comboLocation_Start.addListener(SWT.MouseWheel, _mouseWheelListener_ScrollField);
+                  _comboLocation_Start.addFocusListener(_focusListener_ScrollField);
+                  _comboLocation_Start.addModifyListener(modifyEvent -> {
+                     if (_isSetField || _isSavingInProgress) {
+                        return;
+                     }
+                     _isLocationStartModified = true;
+                     setTourDirty();
+                  });
+
+                  _tk.adapt(_comboLocation_Start, true, false);
+
+                  GridDataFactory.fillDefaults()
+                        .grab(true, false)
+                        .hint(_hintTextColumnWidth, SWT.DEFAULT)
+                        .applyTo(_comboLocation_Start);
+
+                  // fill combobox
+                  final ConcurrentSkipListSet<String> allStartPlaces = TourDatabase.getCachedFields_AllTourPlaceStarts();
+                  for (final String startPlace : allStartPlaces) {
+                     if (startPlace != null) {
+                        _comboLocation_Start.add(startPlace);
+                     }
+                  }
+
+                  _autocomplete_Location_Start = new AutocompleteComboInput(_comboLocation_Start);
                }
             }
-
-            _autocomplete_Location_Start = new AutocompleteComboInput(_comboLocation_Start);
          }
          {
             /*
              * End location
              */
-            final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Location_End);
-            _firstColumnControls.add(label);
+            final Composite container = new Composite(sectionContainer, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(container);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//            container.setBackground(UI.SYS_COLOR_RED);
+            {
+               {
+                  // label
 
-            _comboLocation_End = new Combo(container, SWT.BORDER | SWT.FLAT);
-            _comboLocation_End.setText(UI.EMPTY_STRING);
+                  final Label label = new Label(container, SWT.NONE);
+                  label.setText(Messages.Tour_Editor_Label_Location_End);
 
-            _comboLocation_End.addListener(SWT.MouseWheel, _mouseWheelListener_ScrollField);
-            _comboLocation_End.addFocusListener(_focusListener_ScrollField);
-            _comboLocation_End.addModifyListener(modifyEvent -> {
-               if (_isSetField || _isSavingInProgress) {
-                  return;
+                  _tk.adapt(label, true, true);
+                  _gridData_GrabHorizontal_CenterVertical.applyTo(label);
                }
-               _isLocationEndModified = true;
-               setTourDirty();
-            });
+               {
+                  // download action
 
-            _tk.adapt(_comboLocation_End, true, false);
+                  final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
 
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .hint(_hintTextColumnWidth, SWT.DEFAULT)
-                  .applyTo(_comboLocation_End);
+                  _toolbarManager_EndLocation = new ToolBarManager(toolbar);
+                  _toolbarManager_EndLocation.add(_actionEndLocation);
+                  _toolbarManager_EndLocation.update(true);
+               }
 
-            // fill combobox
-            final ConcurrentSkipListSet<String> arr = TourDatabase.getCachedFields_AllTourPlaceEnds();
-            for (final String string : arr) {
-               if (string != null) {
-                  _comboLocation_End.add(string);
+               _firstColumnControls.add(container);
+
+               {
+                  // autocomplete combo
+
+                  _comboLocation_End = new Combo(sectionContainer, SWT.BORDER | SWT.FLAT);
+                  _comboLocation_End.setText(UI.EMPTY_STRING);
+
+                  _comboLocation_End.addListener(SWT.MouseWheel, _mouseWheelListener_ScrollField);
+                  _comboLocation_End.addFocusListener(_focusListener_ScrollField);
+                  _comboLocation_End.addModifyListener(modifyEvent -> {
+                     if (_isSetField || _isSavingInProgress) {
+                        return;
+                     }
+                     _isLocationEndModified = true;
+                     setTourDirty();
+                  });
+
+                  _tk.adapt(_comboLocation_End, true, false);
+
+                  GridDataFactory.fillDefaults()
+                        .grab(true, false)
+                        .hint(_hintTextColumnWidth, SWT.DEFAULT)
+                        .applyTo(_comboLocation_End);
+
+                  // fill combobox
+                  final ConcurrentSkipListSet<String> allEndPlaces = TourDatabase.getCachedFields_AllTourPlaceEnds();
+                  for (final String endPlace : allEndPlaces) {
+                     if (endPlace != null) {
+                        _comboLocation_End.add(endPlace);
+                     }
+                  }
+
+                  _autocomplete_Location_End = new AutocompleteComboInput(_comboLocation_End);
                }
             }
-
-            _autocomplete_Location_End = new AutocompleteComboInput(_comboLocation_End);
          }
       }
    }
@@ -5345,6 +5447,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       return tableContextMenu;
    }
 
+   @Override
+   public void defaultProfileIsUpdated() {
+
+      // update action tooltip which displays the current profile
+      _actionStartLocation.updateUI_ToolItem();
+      _actionEndLocation.updateUI_ToolItem();
+   }
+
    private void defineAllColumns_SwimSlices() {
 
       defineColumn_SwimSlice_Data_1_First();
@@ -6390,7 +6500,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _postSelectionProvider.clearSelection();
       _messageManager.removeAllMessages();
 
-      _tourData = reloadTourData();
+      setupTourData(reloadTourData());
 
       updateUI_FromModel(_tourData, true, true);
 
@@ -6569,6 +6679,74 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    @Override
    public void doSaveAs() {}
 
+   @Override
+   public void downloadAndSetTourEndLocation() {
+
+      TourLocationData endLocationData = _tourData.tourLocationData_End;
+
+      if (endLocationData == null) {
+
+         final int lastIndex = _tourData.latitudeSerie.length - 1;
+
+         final TourLocationData retrievedLocationData = TourLocationManager.getLocationData(
+               _tourData.latitudeSerie[lastIndex],
+               _tourData.longitudeSerie[lastIndex],
+               null,
+               TourLocationManager.getProfileZoomlevel());
+
+         if (retrievedLocationData == null) {
+            return;
+         }
+
+         _tourData.setTourLocationEnd(retrievedLocationData.tourLocation);
+         endLocationData = _tourData.tourLocationData_End = retrievedLocationData;
+
+         // show different action image
+         _actionEndLocation.setHasLocationData(true);
+         _toolbarManager_EndLocation.update(true);
+      }
+
+      _comboLocation_End.setText(TourLocationManager.createLocationDisplayName(endLocationData.tourLocation));
+
+      _isLocationEndModified = true;
+      setTourDirty();
+
+      enableControls();
+   }
+
+   @Override
+   public void downloadAndSetTourStartLocation() {
+
+      TourLocationData startLocationData = _tourData.tourLocationData_Start;
+
+      if (startLocationData == null) {
+
+         final TourLocationData retrievedLocationData = TourLocationManager.getLocationData(
+               _tourData.latitudeSerie[0],
+               _tourData.longitudeSerie[0],
+               null,
+               TourLocationManager.getProfileZoomlevel());
+
+         if (retrievedLocationData == null) {
+            return;
+         }
+
+         _tourData.setTourLocationStart(retrievedLocationData.tourLocation);
+         startLocationData = _tourData.tourLocationData_Start = retrievedLocationData;
+
+         // show different action image
+         _actionStartLocation.setHasLocationData(true);
+         _toolbarManager_StartLocation.update(true);
+      }
+
+      _comboLocation_Start.setText(TourLocationManager.createLocationDisplayName(startLocationData.tourLocation));
+
+      _isLocationStartModified = true;
+      setTourDirty();
+
+      enableControls();
+   }
+
    /**
     * Edit time slices values :
     * Altitude, Heartbeat, Temperature, Cadence
@@ -6723,20 +6901,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final CTabItem selectedTab = _tabFolder.getSelection();
       final boolean isTimeSlice_ViewerTab = selectedTab == _tab_20_TimeSlices;
       final boolean isSwimSlice_ViewerTab = selectedTab == _tab_30_SwimSlices;
-      final boolean isTourData = _tourData != null;
+      final boolean hasTourData = _tourData != null;
 
       final boolean canUseTool = _isEditMode && isTourValid && (_isManualTour == false);
 
       // at least 2 positions are necessary to compute the distance
-      final boolean isGeoAvailable = isTourData
+      final boolean hasGeoData = hasTourData
             && _tourData.latitudeSerie != null
             && _tourData.latitudeSerie.length >= 2;
 
-      final boolean isDistanceAvailable = isTourData //
+      final boolean isDistanceAvailable = hasTourData
             && _tourData.distanceSerie != null
             && _tourData.distanceSerie.length > 0;
 
-      final boolean isDistanceLargerThan0 = isTourData //
+      final boolean isDistanceLargerThan0 = hasTourData
             && isDistanceAvailable
             && _tourData.distanceSerie[0] > 0;
 
@@ -6752,9 +6930,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _actionSetStartDistanceTo_0.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isDistanceLargerThan0);
       _actionDeleteDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isDistanceAvailable);
-      _actionComputeDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isGeoAvailable);
+      _actionComputeDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && hasGeoData);
 
       _actionEditTimeSlicesValues.setEnabled(isCellEditorInactive && canEdit);
+
+      _actionStartLocation.setEnabled(hasGeoData && canEdit);
+      _actionEndLocation.setEnabled(hasGeoData && canEdit);
    }
 
    private void enableActions_SwimSlices() {
@@ -7545,6 +7726,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _hintValueFieldWidth = _pc.convertWidthInCharsToPixels(10);
 
+      _gridData_GrabHorizontal_CenterVertical = GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.CENTER);
+
       _columnSortListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
 
       _mouseWheelListener_ScrollField = new Listener() {
@@ -8106,7 +8289,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                   if (_tourData == null) {
 
-                     _tourData = tourData;
+                     setupTourData(tourData);
                      _tourChart = null;
                      updateUI_FromModel(tourData, false, true);
 
@@ -8115,7 +8298,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                      if (_tourData.getTourId().equals(tourData.getTourId())) {
 
                         // a new tour id is in the selection
-                        _tourData = tourData;
+                        setupTourData(tourData);
                         _tourChart = null;
                         updateUI_FromModel(tourData, false, true);
                      }
@@ -8606,7 +8789,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
           */
          _isTourDirty = false;
 
-         _tourData = TourDatabase.saveTour(_tourData, true);
+         setupTourData(TourDatabase.saveTour(_tourData, true));
 
          updateMarkerMap();
 
@@ -8975,7 +9158,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * sets the tour editor dirty, updates the save/undo actions and updates the part name
+    * Set the tour editor dirty, updates the save/undo actions and updates the part name
     */
    private void setTourDirty() {
 
@@ -9004,6 +9187,24 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       firePropertyChange(PROP_DIRTY);
    }
 
+   @Override
+   public void setTourEndLocation(final String endLocation) {
+
+      _comboLocation_End.setText(endLocation);
+
+      _isLocationEndModified = true;
+      setTourDirty();
+   }
+
+   @Override
+   public void setTourStartLocation(final String startLocation) {
+
+      _comboLocation_Start.setText(startLocation);
+
+      _isLocationStartModified = true;
+      setTourDirty();
+   }
+
    /**
     * Setup the geo position formatter.
     */
@@ -9011,6 +9212,24 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _nfLatLon.setMinimumFractionDigits(_latLonDigits);
       _nfLatLon.setMaximumFractionDigits(_latLonDigits);
+   }
+
+   /**
+    * Set {@link TourData} into the tour editor and setup dependencies
+    *
+    * @param tourData
+    */
+   private void setupTourData(final TourData tourData) {
+
+      _tourData = tourData;
+
+      if (tourData != null) {
+
+         // actions are disabled/hidden when there are no tour data
+
+         _actionStartLocation.setupTourData(_tourData);
+         _actionEndLocation.setupTourData(_tourData);
+      }
    }
 
    /**
@@ -9403,7 +9622,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        * set tour data because the TOUR_PROPERTIES_CHANGED event can occur before the runnable is
        * executed, this ensures that tour data is already set even if the ui is not yet updated
        */
-      _tourData = tourData;
+      setupTourData(tourData);
 
       // get manual/device mode
       _isManualTour = tourData.isManualTour();
@@ -9459,7 +9678,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _isSetField = _uiRunnableIsDirtyDisabled;
 
       // keep tour data
-      _tourData = _uiRunnableTourData;
+      setupTourData(_uiRunnableTourData);
       _isTourWithSwimData = _tourData.swim_Time != null;
 
       updateMarkerMap();
@@ -9565,18 +9784,29 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private void updateUI_Tab_1_Tour() {
 
       /*
-       * tour/event
+       * Tour/event
        */
       // title/description
       _comboTitle.setText(_tourData.getTourTitle());
       _txtDescription.setText(_tourData.getTourDescription());
 
-      // start/end location
+      /*
+       * Tour location
+       */
+      final boolean hasTourStartLocation = _tourData.getTourLocationStart() != null;
+      final boolean hasTourEndLocation = _tourData.getTourLocationEnd() != null;
+
       _comboLocation_Start.setText(_tourData.getTourStartPlace());
       _comboLocation_End.setText(_tourData.getTourEndPlace());
 
+      _actionStartLocation.setHasLocationData(hasTourStartLocation);
+      _actionEndLocation.setHasLocationData(hasTourEndLocation);
+
+      _toolbarManager_StartLocation.update(hasTourStartLocation);
+      _toolbarManager_EndLocation.update(hasTourEndLocation);
+
       /*
-       * personal details
+       * Personal details
        */
       final float bodyWeight = UI.convertBodyWeightFromMetric(_tourData.getBodyWeight());
       _spinPerson_BodyWeight.setSelection(Math.round(bodyWeight * 10));
