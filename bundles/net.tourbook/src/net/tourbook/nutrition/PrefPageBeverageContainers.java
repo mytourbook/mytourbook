@@ -361,7 +361,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    private void onTourBeverageContainer_Add() {
 
-      final DialogBeverageContainer dialogBeverageContainer = new DialogBeverageContainer(getShell());
+      final DialogBeverageContainer dialogBeverageContainer = new DialogBeverageContainer(getShell(), false);
 
       if (dialogBeverageContainer.open() != Window.OK) {
 
@@ -443,7 +443,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
       final TourBeverageContainer selectedBeverageContainer = (TourBeverageContainer) selectedItem;
 
-      final DialogBeverageContainer dialogBeverageContainer = new DialogBeverageContainer(getShell());
+      final DialogBeverageContainer dialogBeverageContainer = new DialogBeverageContainer(getShell(), true);
       dialogBeverageContainer.setName(selectedBeverageContainer.getName());
       dialogBeverageContainer.setCapacity(selectedBeverageContainer.getCapacity());
 

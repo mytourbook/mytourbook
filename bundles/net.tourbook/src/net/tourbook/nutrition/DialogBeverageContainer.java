@@ -54,7 +54,7 @@ class DialogBeverageContainer extends Dialog {
    DialogBeverageContainer(final Shell parentShell, final boolean isEdit) {
 
       super(parentShell);
-      _title = isEdit ? Messages.Dialog_BeverageContainer_Title_Create : Messages.Dialog_BeverageContainer_Title_Create;
+      _title = isEdit ? Messages.Dialog_BeverageContainer_Title_Edit : Messages.Dialog_BeverageContainer_Title_Create;
    }
 
    @Override
