@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -55,7 +55,9 @@ import org.eclipse.swt.graphics.Color;
 
 class TourBook_ColumnFactory {
 
-   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore         = TourbookPlugin.getPrefStore();
+
+   private static final String           LEFT_RIGHT_BALANCE = "%.2f - %.2f";                //$NON-NLS-1$
 
    private static final NumberFormat     _nf0;
    private static final NumberFormat     _nf1;
@@ -1703,9 +1705,14 @@ class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final int value = ((TVITourBookItem) element).colPower_PedalLeftRightBalance;
+            final int leftRightValue = ((TVITourBookItem) element).colPower_PedalLeftRightBalance;
 
-            return colDef_NatTable.printValue_0(value);
+            final int rightValue100 = leftRightValue - 0x8000;
+
+            final float rightValue = rightValue100 / 100.0f;
+            final float leftValue = 100 - rightValue;
+
+            return LEFT_RIGHT_BALANCE.formatted(leftValue, rightValue);
          }
       });
 

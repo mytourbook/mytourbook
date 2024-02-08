@@ -54,7 +54,9 @@ New
 Improvements
 ============
 
-*         
+* Tour Book
+  - Show powertrain L-R balance values separately
+    https://github.com/mytourbook/mytourbook/issues/1271
   
 
 Changes
