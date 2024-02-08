@@ -38,8 +38,9 @@ import org.eclipse.swt.widgets.Text;
 
 class DialogBeverageContainer extends Dialog {
 
-   private String _name     = UI.EMPTY_STRING;
    private float  _capacity = 0.25f;
+   private String _name     = UI.EMPTY_STRING;
+   private String _title    = UI.EMPTY_STRING;
 
    /*
     * UI controls
@@ -50,8 +51,10 @@ class DialogBeverageContainer extends Dialog {
    private Spinner        _spinnerCapacity;
    private Text           _txtName;
 
-   DialogBeverageContainer(final Shell parentShell) {
+   DialogBeverageContainer(final Shell parentShell, final boolean isEdit) {
+
       super(parentShell);
+      _title = isEdit ? Messages.Dialog_BeverageContainer_Title_Create : Messages.Dialog_BeverageContainer_Title_Create;
    }
 
    @Override
@@ -59,7 +62,7 @@ class DialogBeverageContainer extends Dialog {
 
       super.create();
 
-      getShell().setText(Messages.Dialog_BeverageContainer_Title);
+      getShell().setText(_title);
 
       validateFields();
    }
@@ -102,7 +105,7 @@ class DialogBeverageContainer extends Dialog {
          UI.createLabel(container, Messages.Dialog_BeverageContainer_Label_Capacity);
 
          // Text: container capacity in L
-         _spinnerCapacity = UI.createSpinner(parent, 2, 25, 10000, 25, 100);
+         _spinnerCapacity = UI.createSpinner(container, 2, 25, 10000, 25, 100);
          _spinnerCapacity.setSelection(Math.round(_capacity * 100));
          _spinnerCapacity.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCapacityModified()));
          _spinnerCapacity.addModifyListener(event -> validateFields());
