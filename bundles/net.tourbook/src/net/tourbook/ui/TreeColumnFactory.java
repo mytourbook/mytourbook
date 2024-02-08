@@ -1087,10 +1087,10 @@ public abstract class TreeColumnFactory {
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Powertrain);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Power_LeftRightBalance_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Power_LeftRightBalance_Header);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Power_LeftRightBalance_Header2);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Power_LeftRightBalance_Tooltip);
 
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
 
             return colDef;
          }

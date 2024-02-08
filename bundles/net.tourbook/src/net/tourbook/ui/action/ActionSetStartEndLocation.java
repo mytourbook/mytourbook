@@ -88,17 +88,16 @@ public class ActionSetStartEndLocation extends SubMenu {
    private static final String             PROFILE_NAME       = "%s - %d";                                          //$NON-NLS-1$
 
    private static final IDialogSettings    _state             = TourbookPlugin.getState(ID);
+
    /**
     * This set is used to prevent duplicated action names
     */
    private static final Set<String>        _usedDisplayNames  = new HashSet<>();
-
+   //
    private ITourProvider                   _tourProvider;
-
+   //
    private Action                          _actionPartTitle_Append_All;
-
    private Action                          _actionPartTitle_Append_Start;
-
    private Action                          _actionPartTitle_Append_End;
    private Action                          _actionPartTitle_Set_All;
    private Action                          _actionPartTitle_Set_Start;
@@ -108,7 +107,6 @@ public class ActionSetStartEndLocation extends SubMenu {
    private Action                          _actionProfileTitle_End;
    private ActionEditProfiles              _actionEditProfiles;
    private ActionLocationPart_Append_All   _actionLocationPart_Append_All;
-
    private ActionLocationPart_Append_Start _actionLocationPart_Append_Start;
    private ActionLocationPart_Append_End   _actionLocationPart_Append_End;
    private ActionLocationPart_Set_All      _actionLocationPart_Set_All;
@@ -122,15 +120,20 @@ public class ActionSetStartEndLocation extends SubMenu {
    private ActionRemoveLocation_End        _actionRemoveLocation_End_Complete;
    private ActionSetLocation_Start         _actionSetLocation_Start;
    private ActionSetLocation_End           _actionSetLocation_End;
+   //
    private SlideoutLocationProfiles        _slideoutLocationProfiles;
-   private Control                         _ownerControl;
-
+   //
    private ArrayList<TourData>             _allSelectedTours;
-
+   //
    /**
     * When <code>null</code> then a start or end location is not hovered
     */
    private Boolean                         _isStartLocationInContextMenu;
+   //
+   /*
+    * UI controls
+    */
+   private Control _ownerControl;
 
    private class ActionAppendLocationPart extends Action {
 

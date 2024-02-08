@@ -365,7 +365,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Power_IntensityFactor_Header;
    public static String        ColumnFactory_Power_IntensityFactor_Label;
    public static String        ColumnFactory_Power_IntensityFactor_Tooltip;
-   public static String        ColumnFactory_Power_LeftRightBalance_Header;
+   public static String        ColumnFactory_Power_LeftRightBalance_Header2;
    public static String        ColumnFactory_Power_LeftRightBalance_Label;
    public static String        ColumnFactory_Power_LeftRightBalance_Tooltip;
    public static String        ColumnFactory_Power_Max_Header;
