@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.tour.location;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -51,6 +54,7 @@ import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.SQL;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -3238,6 +3242,10 @@ public class TourLocationView extends ViewPart implements ITourViewer {
             _locationItemsMap.put(locationID, locationItem);
 
             allCountries.add(tourLocation.country);
+
+            if (UI.IS_SCRAMBLE_DATA) {
+               scrambleData(tourLocation);
+            }
          }
 
          setupCountries(allCountries);
@@ -3779,6 +3787,58 @@ public class TourLocationView extends ViewPart implements ITourViewer {
    }
 
    /**
+    * Scramble fields in the tour location
+    *
+    * @param tourLocation
+    */
+   private void scrambleData(final TourLocation tourLocation) {
+
+      try {
+
+         for (final Field field : TourLocation.class.getDeclaredFields()) {
+
+            final int modifiers = field.getModifiers();
+            final boolean isStatic = Modifier.isStatic(modifiers);
+            final boolean isPrivate = Modifier.isPrivate(modifiers);
+
+            if (isStatic || isPrivate) {
+               continue;
+            }
+
+            final String fieldName = field.getName();
+
+            if (false
+
+                  || "locationID".equals(fieldName) //$NON-NLS-1$
+                  || "boundingBoxKey".equals(fieldName) //$NON-NLS-1$
+                  || "country".equals(fieldName) //$NON-NLS-1$
+
+                  || fieldName.startsWith("lang") //$NON-NLS-1$
+                  || fieldName.startsWith("long") //$NON-NLS-1$
+
+            ) {
+
+               continue;
+            }
+
+            final Type fieldType = field.getGenericType();
+
+            if (String.class.equals(fieldType)) {
+
+               final String fieldValue = (String) field.get(tourLocation);
+               final String scrambledText = UI.scrambleText(fieldValue);
+
+               field.set(tourLocation, scrambledText);
+            }
+         }
+
+      } catch (IllegalArgumentException | IllegalAccessException e) {
+
+         StatusUtil.showStatus(e);
+      }
+   }
+
+   /**
     * Select and reveal tour location item
     *
     * @param selection
@@ -3838,7 +3898,7 @@ public class TourLocationView extends ViewPart implements ITourViewer {
          boolean countryIsAvailable = false;
 
          for (final String country : allCountries) {
-            
+
             if (country.equals(_locationFilter_Country)) {
 
                countryIsAvailable = true;

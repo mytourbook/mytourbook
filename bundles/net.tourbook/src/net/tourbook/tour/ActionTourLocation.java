@@ -210,18 +210,12 @@ public class ActionTourLocation extends ContributionItem {
     * @param stateId
     */
    public ActionTourLocation(final ITourLocationConsumer tourLocationConsumer,
-                             final TourData tourData,
                              final boolean isStartLocation,
                              final String stateId) {
 
       _tourLocationConsumer = tourLocationConsumer;
-      _tourData = tourData;
 
       _isStartLocation = isStartLocation;
-
-      _hasLocationData = isStartLocation
-            ? _tourData.tourLocationData_Start != null
-            : _tourData.tourLocationData_End != null;
 
       _state = isStartLocation
             ? TourbookPlugin.getState(stateId + ".StartLocation") //$NON-NLS-1$
@@ -658,6 +652,10 @@ public class ActionTourLocation extends ContributionItem {
 
    public void setEnabled(final boolean isEnabled) {
 
+      if (_toolItem == null) {
+         return;
+      }
+
       _toolItem.setEnabled(isEnabled);
    }
 
@@ -668,7 +666,16 @@ public class ActionTourLocation extends ContributionItem {
       updateUI_ToolItem();
    }
 
-   void updateUI_ToolItem() {
+   public void setupTourData(final TourData tourData) {
+
+      _tourData = tourData;
+
+      _hasLocationData = _isStartLocation
+            ? _tourData.tourLocationData_Start != null
+            : _tourData.tourLocationData_End != null;
+   }
+
+   public void updateUI_ToolItem() {
 
       if (_hasLocationData) {
 
