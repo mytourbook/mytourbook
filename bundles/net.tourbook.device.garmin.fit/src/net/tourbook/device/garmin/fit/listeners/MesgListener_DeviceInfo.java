@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,7 +45,9 @@ import org.joda.time.format.DateTimeFormatter;
 public class MesgListener_DeviceInfo extends AbstractMesgListener implements DeviceInfoMesgListener {
 
    private static final String            FORMAT_STRING_10      = " %10s";                                          //$NON-NLS-1$
-   private static final String            FORMAT_STRING_10_LEFT = " %-10s";                                         //$NON-NLS-1$
+   private static final String            FORMAT_STRING_20      = " %20s";                                          //$NON-NLS-1$
+   private static final String            FORMAT_STRING_10_LEFT = "%-10s ";                                         //$NON-NLS-1$
+   private static final String            FORMAT_STRING_20_LEFT = "%-20s ";                                         //$NON-NLS-1$
    private static final String            FORMAT_FLOAT_10_3     = "%10.3f";                                         //$NON-NLS-1$
    private static final String            LOG_SEPARATOR         = "\t";                                             //$NON-NLS-1$
 
@@ -125,39 +127,39 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
 // SET_FORMATTING_OFF
 
-      System.out.println(String.format(UI.EMPTY_STRING
+      System.out.println(String.format(UI.NEW_LINE1
 
-            + "date time"                 + LOG_SEPARATOR //$NON-NLS-1$
+            + "date time"                 + LOG_SEPARATOR + LOG_SEPARATOR + LOG_SEPARATOR + LOG_SEPARATOR //$NON-NLS-1$
 
             + "   prod:"                  + LOG_SEPARATOR //$NON-NLS-1$
-            + "manufacturer"              + LOG_SEPARATOR //$NON-NLS-1$
-            + "product"                   + LOG_SEPARATOR //$NON-NLS-1$
-            + "prduct name"               + LOG_SEPARATOR //$NON-NLS-1$
-            + "garmin product"            + LOG_SEPARATOR //$NON-NLS-1$
-            + "descriptor"                + LOG_SEPARATOR //$NON-NLS-1$
+            + "manufacture"               + LOG_SEPARATOR //$NON-NLS-1$
+            + "    product"               + LOG_SEPARATOR //$NON-NLS-1$
+            + "         product name"     + LOG_SEPARATOR //$NON-NLS-1$
+            + "garmin prod"               + LOG_SEPARATOR //$NON-NLS-1$
+            + " descriptor"               + LOG_SEPARATOR //$NON-NLS-1$
 
             + "   ser:"                   + LOG_SEPARATOR //$NON-NLS-1$
-            + "serial no"                 + LOG_SEPARATOR //$NON-NLS-1$
-            + "device index"              + LOG_SEPARATOR //$NON-NLS-1$
-            + "hardware version"          + LOG_SEPARATOR //$NON-NLS-1$
-            + "software version"          + LOG_SEPARATOR //$NON-NLS-1$
+            + "  serial no"               + LOG_SEPARATOR //$NON-NLS-1$
+            + " device idx"               + LOG_SEPARATOR //$NON-NLS-1$
+            + "hardwre vrs"               + LOG_SEPARATOR //$NON-NLS-1$
+            + "softwre vrs"               + LOG_SEPARATOR //$NON-NLS-1$
 
             + "   bat:"                   + LOG_SEPARATOR //$NON-NLS-1$
-            + "battery level"             + LOG_SEPARATOR //$NON-NLS-1$
-            + "battery status"            + LOG_SEPARATOR //$NON-NLS-1$
-            + "battery voltage"           + LOG_SEPARATOR //$NON-NLS-1$
-            + "cummulated operating time" + LOG_SEPARATOR //$NON-NLS-1$
+            + " batt level"               + LOG_SEPARATOR //$NON-NLS-1$
+            + "batt status"               + LOG_SEPARATOR //$NON-NLS-1$
+            + "batt voltag"               + LOG_SEPARATOR //$NON-NLS-1$
+            + "cum op time"               + LOG_SEPARATOR //$NON-NLS-1$
 
-            + "  ant:"                    + LOG_SEPARATOR //$NON-NLS-1$
+            + "   ant:"                   + LOG_SEPARATOR //$NON-NLS-1$
             + "source type"               + LOG_SEPARATOR //$NON-NLS-1$
-            + "ant network"               + LOG_SEPARATOR //$NON-NLS-1$
-            + "ant device type"           + LOG_SEPARATOR //$NON-NLS-1$
-            + "ant device nummer"         + LOG_SEPARATOR //$NON-NLS-1$
-            + "ant plus"                  + LOG_SEPARATOR //$NON-NLS-1$
-            + "ant transmision type"      + LOG_SEPARATOR //$NON-NLS-1$
+            + "network    "               + LOG_SEPARATOR //$NON-NLS-1$
+            + "device type"               + LOG_SEPARATOR //$NON-NLS-1$
+            + "device no  "               + LOG_SEPARATOR //$NON-NLS-1$
+            + "ant plus             "     + LOG_SEPARATOR //$NON-NLS-1$
+            + "trans type "               + LOG_SEPARATOR //$NON-NLS-1$
 
-            + "  ble:"                    + LOG_SEPARATOR //$NON-NLS-1$
-            + "ble device type"           + LOG_SEPARATOR //$NON-NLS-1$
+            + "   ble:"                   + LOG_SEPARATOR //$NON-NLS-1$
+            + "ble device type      "     + LOG_SEPARATOR //$NON-NLS-1$
 
             + "   src:"                   + LOG_SEPARATOR //$NON-NLS-1$
             + "sensor Position"           + LOG_SEPARATOR //$NON-NLS-1$
@@ -219,7 +221,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                + "   prod:" + LOG_SEPARATOR //                                         //$NON-NLS-1$
                + FORMAT_STRING_10 + LOG_SEPARATOR //     manufacturer
                + FORMAT_STRING_10 + LOG_SEPARATOR //     product
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     product name
+               + FORMAT_STRING_20 + LOG_SEPARATOR //     product name
                + FORMAT_STRING_10 + LOG_SEPARATOR //     garmin product
                + FORMAT_STRING_10 + LOG_SEPARATOR //     descriptor
 
@@ -235,19 +237,19 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                + FORMAT_STRING_10 + LOG_SEPARATOR //     battery voltage
                + FORMAT_STRING_10 + LOG_SEPARATOR //     accumulated operating time
 
-               + "  ant:" + LOG_SEPARATOR //                                           //$NON-NLS-1$
-               + FORMAT_STRING_10_LEFT + LOG_SEPARATOR // source type
-               + FORMAT_STRING_10_LEFT + LOG_SEPARATOR // ant network
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     ant device type
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     ant device number
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     ant plus
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     ant transmission type
+               + "   ant:" + LOG_SEPARATOR //                                           //$NON-NLS-1$
+               + FORMAT_STRING_10_LEFT + LOG_SEPARATOR //   source type
+               + FORMAT_STRING_10_LEFT + LOG_SEPARATOR //   ant network
+               + FORMAT_STRING_10 + LOG_SEPARATOR //        ant device type
+               + FORMAT_STRING_10 + LOG_SEPARATOR //        ant device number
+               + FORMAT_STRING_20_LEFT + LOG_SEPARATOR //   ant plus
+               + FORMAT_STRING_10 + LOG_SEPARATOR //        ant transmission type
 
-               + "  ble:" + LOG_SEPARATOR //                                           //$NON-NLS-1$
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     ble device type
+               + "   ble:" + LOG_SEPARATOR //                                           //$NON-NLS-1$
+               + FORMAT_STRING_20_LEFT + LOG_SEPARATOR //   ble device type
 
                + "   src:" //                                                          //$NON-NLS-1$
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     sensorPosition
+               + FORMAT_STRING_20_LEFT + LOG_SEPARATOR //   sensorPosition
 
                ,
 
@@ -273,7 +275,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                removeNull(cumOperatingTime),
 
                // ant
-               SourceType.getStringFromValue(sourceType),
+               sourceType == null ? UI.EMPTY_STRING : SourceType.getStringFromValue(sourceType),
                removeNull(antNetwork),
                removeNull(antDeviceType),
                removeNull(antDeviceNumber),
@@ -448,7 +450,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
             mesgProductName,
             mesgGarminProductNumber);
 
-      final List<DeviceSensorValue> allImportedSensorValues = fitData.getAllDeviceSensorValues();
+      final List<DeviceSensorValue> allImportedSensorValues = fitData.getDeviceSensorValues();
 
       /*
        * Get sensor value
