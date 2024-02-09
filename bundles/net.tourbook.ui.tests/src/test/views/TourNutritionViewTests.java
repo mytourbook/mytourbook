@@ -95,8 +95,8 @@ public class TourNutritionViewTests extends UITest {
          dialogSearchProductShell.get().close();
       }
 
-      // Make sure that the table now contains 3 products
-      assertEquals(initialTableRowCount + 3, productsTable.rowCount());
+      // Make sure that the table now contains 4 products
+      assertEquals(initialTableRowCount + 4, productsTable.rowCount());
 
       // Act - Add a manual product
       bot.button(Messages.Tour_Nutrition_Button_AddCustomProduct).click();
@@ -106,15 +106,15 @@ public class TourNutritionViewTests extends UITest {
       Utils.clickOkButton(bot);
 
       // Assert
-      // Make sure that the table now contains 4 products
-      assertEquals(initialTableRowCount + 4, productsTable.rowCount());
+      // Make sure that the table now contains 5 products
+      assertEquals(initialTableRowCount + 5, productsTable.rowCount());
 
       // Sort the products by name
       productsTable.header(Messages.Tour_Nutrition_Column_Name).click();
       productsTable.header(Messages.Tour_Nutrition_Column_Name).click();
 
       // Act - Delete all the products
-      for (int index = 0; index < 4; ++index) {
+      for (int index = 0; index < 5; ++index) {
 
          productsTable.click(0, 2);
          bot.button(Messages.Tour_Nutrition_Button_DeleteProduct).click();
