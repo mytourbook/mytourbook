@@ -125,6 +125,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    private Button _btnAdd;
    private Button _btnSearch;
 
+   private Label  _lblKeywords;
    private Label  _lblSearchType;
 
    private Combo  _comboSearchQuery;
@@ -318,8 +319,14 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       final Composite queryContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(queryContainer);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(queryContainer);
+      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(queryContainer);
       {
+         {
+            /*
+             * Label: Keywords
+             */
+            _lblKeywords = UI.createLabel(queryContainer, Messages.Dialog_SearchProduct_Label_Keywords);
+         }
          {
             /*
              * combo: Text search
@@ -523,6 +530,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       _productsViewer.getTable().removeAll();
       // disable search controls
+      _lblKeywords.setEnabled(false);
       _comboSearchQuery.setEnabled(false);
       _btnSearch.setEnabled(false);
       _btnAdd.setEnabled(false);
@@ -594,6 +602,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          setErrorMessage(errorMessage);
          setMessage(message);
 
+         _lblKeywords.setEnabled(true);
          _comboSearchQuery.setEnabled(true);
          _btnSearch.setEnabled(true);
          _comboSearchType.setEnabled(true);
