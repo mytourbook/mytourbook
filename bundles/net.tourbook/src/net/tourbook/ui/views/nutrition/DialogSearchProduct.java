@@ -71,6 +71,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
@@ -78,6 +79,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.ToolTip;
+import org.eclipse.swt.widgets.Widget;
 
 public class DialogSearchProduct extends TitleAreaDialog implements PropertyChangeListener {
 
@@ -89,11 +91,14 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    private static final IDialogSettings  _state                                         = TourbookPlugin.getState(ID);
    private static final String           STATE_SEARCHED_QUERIES                         = "searched.queries";                                    //$NON-NLS-1$
    private static final String           STATE_SEARCH_TYPE                              = "STATE_SEARCH_TYPE";                                   //$NON-NLS-1$
+   private static final String           COLUMN_CODE                                    = "Code";                                                //$NON-NLS-1$
+   private static final String           COLUMN_NAME                                    = "Name";                                                //$NON-NLS-1$
 
    private static final String           HTTPS_OPENFOODFACTS_PRODUCTS                   = "https://world.openfoodfacts.org/cgi/product.pl";      //$NON-NLS-1$
 
    private TableViewer                   _productsViewer;
    private List<Product>                 _products;
+   private ProductComparator             _productComparator                             = new ProductComparator();
 
    private long                          _tourId;
 
@@ -112,6 +117,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    private final Image                   _iconPlaceholder;
 
    private IPropertyChangeListener       _prefChangeListener;
+   private Listener                      _columnSortListener;
 
    private AutocompleteComboInput        _autocompleteProductSearchHistory;
 
@@ -122,24 +128,148 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    /*
     * UI controls
     */
-   private Button _btnAdd;
-   private Button _btnSearch;
+   private Button    _btnAdd;
+   private Button    _btnSearch;
 
-   private Label  _lblKeywords;
-   private Label  _lblSearchType;
+   private Label     _lblKeywords;
+   private Label     _lblSearchType;
 
-   private Combo  _comboSearchQuery;
-   private Combo  _comboSearchType;
+   private Combo     _comboSearchQuery;
+   private Combo     _comboSearchType;
 
-   /**
-    * Sort the products by name
-    */
-   private class ProductsViewerComparator extends ViewerComparator {
+   private Composite _viewerContainer;
+
+   private class ProductComparator extends ViewerComparator {
+
+      private static final int ASCENDING        = 0;
+      private static final int DESCENDING       = 1;
+
+      private String           __sortColumnName = COLUMN_NAME;
+      private int              __sortDirection  = ASCENDING;
 
       @Override
-      public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
+      public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
-         return NutritionUtils.getProductFullName((Product) (obj1)).compareToIgnoreCase(NutritionUtils.getProductFullName((Product) (obj2)));
+         final boolean isDescending = __sortDirection == DESCENDING;
+
+         final Product p1 = (Product) e1;
+         final Product p2 = (Product) e2;
+
+         long rc = 0;
+
+         // Determine which column and do the appropriate sort
+         switch (__sortColumnName) {
+
+         case COLUMN_CODE:
+            rc = p1.code.compareToIgnoreCase(p2.code);
+            break;
+
+         case COLUMN_NAME:
+         default:
+            rc = NutritionUtils.getProductFullName(p1).compareToIgnoreCase(NutritionUtils.getProductFullName(p2));
+            break;
+
+         }
+
+         if (rc == 0) {
+
+            // subsort 1 by category
+            rc = p1.productName.compareToIgnoreCase(p1.productName);
+         }
+
+         // if descending order, flip the direction
+         if (isDescending) {
+            rc = -rc;
+         }
+
+         /*
+          * MUST return 1 or -1 otherwise long values are not sorted correctly.
+          */
+         return rc > 0 //
+               ? 1
+               : rc < 0 //
+                     ? -1
+                     : 0;
+
+      }
+
+      /**
+       * @param sortColumnName
+       *
+       * @return Returns the column widget by its column name, when column name
+       *         is not found then the first column is returned.
+       */
+      private TableColumn getSortColumn(final String sortColumnName) {
+
+         final TableColumn[] allColumns = _productsViewer.getTable().getColumns();
+
+         for (final TableColumn column : allColumns) {
+
+            final String columnName = column.getText();
+
+            if (columnName != null && columnName.equals(sortColumnName)) {
+               return column;
+            }
+         }
+
+         return allColumns[0];
+      }
+
+      @Override
+      public boolean isSorterProperty(final Object element, final String property) {
+
+         // force resorting when a name is renamed
+         return true;
+      }
+
+      public void setSortColumn(final Widget widget) {
+
+         final TableColumn tableColumn = (TableColumn) widget;
+
+         if (tableColumn.getText().equals(__sortColumnName)) {
+
+            // Same column as last sort -> select next sorting
+
+            switch (__sortDirection) {
+            case ASCENDING:
+               __sortDirection = DESCENDING;
+               break;
+
+            case DESCENDING:
+            default:
+               __sortDirection = ASCENDING;
+               break;
+            }
+
+         } else {
+
+            // New column; do an ascent sorting
+
+            __sortColumnName = tableColumn.getText();
+            __sortDirection = ASCENDING;
+         }
+
+         updateUI_SetSortDirection(__sortColumnName, __sortDirection);
+      }
+
+      /**
+       * Set the sort column direction indicator for a column
+       *
+       * @param sortColumnName
+       * @param isAscendingSort
+       */
+      private void updateUI_SetSortDirection(final String sortColumnName, final int sortDirection) {
+
+         final int direction =
+               sortDirection == ProductComparator.ASCENDING ? SWT.UP
+                     : sortDirection == ProductComparator.DESCENDING ? SWT.DOWN
+                           : SWT.NONE;
+
+         final Table table = _productsViewer.getTable();
+         final TableColumn tc = getSortColumn(sortColumnName);
+
+         table.setSortColumn(tc);
+         table.setSortDirection(direction);
       }
    }
 
@@ -270,13 +400,13 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    @Override
    protected Control createDialogArea(final Composite parent) {
 
-      _pc = new PixelConverter(parent);
+      initUI(parent);
 
-      final Composite dlgContainer = (Composite) super.createDialogArea(parent);
+      _viewerContainer = (Composite) super.createDialogArea(parent);
 
       _isInUIInit = true;
       {
-         createUI(dlgContainer);
+         createUI(_viewerContainer);
       }
       _isInUIInit = false;
 
@@ -287,7 +417,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       restoreState_WithUI();
 
-      return dlgContainer;
+      return _viewerContainer;
    }
 
    private void createUI(final Composite parent) {
@@ -416,18 +546,20 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       gdDescription.heightHint = _pc.convertHeightInCharsToPixels(15);
 
       // column: Barcode
-      final TableColumn columnCategory = new TableColumn(productsTable, SWT.LEFT);
-      columnCategory.setText(Messages.Tour_Nutrition_Column_Code);
-      columnCategory.setWidth(_pc.convertWidthInCharsToPixels(20));
-
+      final TableColumn columnCode = new TableColumn(productsTable, SWT.LEFT);
+      columnCode.setText(Messages.Tour_Nutrition_Column_Code);
+      columnCode.setWidth(_pc.convertWidthInCharsToPixels(20));
+      columnCode.addListener(SWT.Selection, _columnSortListener);
       // column: Name
       final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
       columnName.setText(Messages.Tour_Nutrition_Column_Name);
       columnName.setWidth(_pc.convertWidthInCharsToPixels(75));
+      columnName.addListener(SWT.Selection, _columnSortListener);
 
       _productsViewer = new TableViewer(productsTable);
 
       _productsViewer.setContentProvider(new ViewContentProvider());
+      _productsViewer.setComparator(_productComparator);
       _productsViewer.setLabelProvider(new ViewLabelProvider());
 
       final Listener doubleClickListener = event -> {
@@ -449,7 +581,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          _postSelectionProvider.setSelection(selectedProduct);
          validateFields();
       });
-      _productsViewer.setComparator(new ProductsViewerComparator());
    }
 
    private void fillUI() {
@@ -481,6 +612,19 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       default:
          return ProductSearchType.ByName;
       }
+   }
+
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
+
+      //_columnSortListener = widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
+      _columnSortListener = new Listener() {
+         @Override
+         public void handleEvent(final Event e) {
+            onSelect_SortColumn(e);
+         }
+      };
    }
 
    private void onAddProduct() {
@@ -556,6 +700,24 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          searchText = StringUtils.leftPad(searchText, 12, '0');
       }
       _nutritionQuery.asyncFind(searchText, productSearchType);
+   }
+
+   private void onSelect_SortColumn(final Event e) {
+
+      _viewerContainer.setRedraw(false);
+      {
+         // keep selection
+         final ISelection selectionBackup = _productsViewer.getSelection();
+
+         // toggle sorting
+         _productComparator.setSortColumn(e.widget);
+         _productsViewer.refresh();
+
+         // reselect selection
+         _productsViewer.setSelection(selectionBackup, true);
+         _productsViewer.getTable().showSelection();
+      }
+      _viewerContainer.setRedraw(true);
    }
 
    @Override
