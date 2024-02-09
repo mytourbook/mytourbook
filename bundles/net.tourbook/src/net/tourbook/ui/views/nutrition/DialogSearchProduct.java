@@ -289,7 +289,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.fillDefaults().margins(9, 0).applyTo(container);
+      GridLayoutFactory.swtDefaults().margins(10, 5).applyTo(container);
       {
          createUI_10_Header(container);
          createUI_20_Header_Options(container);
@@ -303,6 +303,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
                HTTPS_OPENFOODFACTS_PRODUCTS));
          link.setToolTipText(HTTPS_OPENFOODFACTS_PRODUCTS);
          link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(HTTPS_OPENFOODFACTS_PRODUCTS)));
+         GridDataFactory.fillDefaults()
+               .align(SWT.LEFT, SWT.CENTER)
+               .grab(true, true)
+               .applyTo(link);
       }
    }
 
