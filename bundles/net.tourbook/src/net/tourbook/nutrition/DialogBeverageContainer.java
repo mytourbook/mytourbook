@@ -77,6 +77,7 @@ class DialogBeverageContainer extends Dialog {
       _isInUIInit = true;
       {
          createUI(container);
+         fillUI();
       }
       _isInUIInit = false;
 
@@ -93,7 +94,6 @@ class DialogBeverageContainer extends Dialog {
          UI.createLabel(container, Messages.Dialog_BeverageContainer_Label_Name);
 
          _txtName = new Text(container, SWT.BORDER);
-         _txtName.setText(_name);
          _txtName.addModifyListener(event -> onModifyName(event));
          GridDataFactory.fillDefaults()
                .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
@@ -106,7 +106,6 @@ class DialogBeverageContainer extends Dialog {
 
          // Text: container capacity in L
          _spinnerCapacity = UI.createSpinner(container, 2, 25, 10000, 25, 100);
-         _spinnerCapacity.setSelection(Math.round(_capacity * 100));
          _spinnerCapacity.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCapacityModified()));
          _spinnerCapacity.addModifyListener(event -> validateFields());
          _spinnerCapacity.addMouseWheelListener(mouseEvent -> {
@@ -129,6 +128,13 @@ class DialogBeverageContainer extends Dialog {
       if (okButton != null) {
          okButton.setEnabled(isEnabled);
       }
+   }
+
+   private void fillUI() {
+
+      _txtName.setText(_name);
+      _spinnerCapacity.setSelection(Math.round(_capacity * 100));
+
    }
 
    public float getCapacity() {
