@@ -420,7 +420,7 @@ public class TourBlogView extends ViewPart {
          sb.append("&#128207;" + UI.SPACE1); //$NON-NLS-1$
          final float distance = tourDistance / UI.UNIT_VALUE_DISTANCE;
          sb.append(FormatManager.formatDistance(distance / 1000.0));
-         sb.append(UI.SPACE1 + UI.UNIT_LABEL_DISTANCE + UI.SPACE2);
+         sb.append(UI.SPACE1 + UI.UNIT_LABEL_DISTANCE + UI.SPACE3);
       }
 
       // Time
@@ -428,7 +428,7 @@ public class TourBlogView extends ViewPart {
       if (tourRecordedTime > 0) {
          sb.append("&#9201;" + UI.SPACE1); //$NON-NLS-1$
          sb.append(FormatManager.formatRecordedTime(_tourData.getTourDeviceTime_Recorded()));
-         sb.append(UI.SPACE2);
+         sb.append(UI.SPACE3);
       }
 
       // Elevation gain
@@ -436,7 +436,7 @@ public class TourBlogView extends ViewPart {
       if (elevationGain > 0) {
          sb.append("&#8599;" + UI.SPACE1); //$NON-NLS-1$
          sb.append(FormatManager.formatElevation(elevationGain));
-         sb.append(UI.SPACE1 + UI.UNIT_LABEL_ELEVATION + UI.SPACE2);
+         sb.append(UI.SPACE1 + UI.UNIT_LABEL_ELEVATION + UI.SPACE3);
       }
 
       // Elevation loss
@@ -444,7 +444,7 @@ public class TourBlogView extends ViewPart {
       if (elevationLoss > 0) {
          sb.append("&#8600;" + UI.SPACE1); //$NON-NLS-1$
          sb.append(FormatManager.formatElevation(elevationLoss));
-         sb.append(UI.SPACE1 + UI.UNIT_LABEL_ELEVATION + UI.SPACE2);
+         sb.append(UI.SPACE1 + UI.UNIT_LABEL_ELEVATION + UI.SPACE3);
       }
 
       // Calories
@@ -452,7 +452,7 @@ public class TourBlogView extends ViewPart {
       if (calories > 0) {
          sb.append("&#128293;" + UI.SPACE1); //$NON-NLS-1$
          sb.append(new ValueFormatter_Number_1_0().printDouble(calories));
-         sb.append(UI.SPACE1 + VALUE_UNIT_KCALORIES + UI.SPACE2);
+         sb.append(UI.SPACE1 + VALUE_UNIT_KCALORIES + UI.SPACE3);
       }
 
       // Body weight
@@ -460,14 +460,14 @@ public class TourBlogView extends ViewPart {
       if (bodyWeight > 0) {
          sb.append("&#9878;" + UI.SPACE1); //$NON-NLS-1$
          sb.append(new ValueFormatter_Number_1_0().printDouble(bodyWeight));
-         sb.append(UI.SPACE1 + UI.UNIT_LABEL_WEIGHT + UI.SPACE2);
+         sb.append(UI.SPACE1 + UI.UNIT_LABEL_WEIGHT + UI.SPACE3);
       }
 
       // Body fat
       final float bodyFat = _tourData.getBodyFat();
       if (bodyFat > 0) {
          sb.append(new ValueFormatter_Number_1_0().printDouble(bodyFat));
-         sb.append(UI.SPACE1 + UI.SYMBOL_PERCENTAGE + UI.SPACE2);
+         sb.append(UI.SPACE1 + UI.SYMBOL_PERCENTAGE + UI.SPACE3);
       }
 
       return sb.toString();
