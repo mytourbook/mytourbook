@@ -420,7 +420,7 @@ public class TourBlogView extends ViewPart {
          sb.append("&#128207;" + UI.SPACE1); //$NON-NLS-1$
          final float distance = tourDistance / UI.UNIT_VALUE_DISTANCE;
          sb.append(FormatManager.formatDistance(distance / 1000.0));
-         sb.append(UI.UNIT_LABEL_DISTANCE + UI.SPACE2);
+         sb.append(UI.SPACE1 + UI.UNIT_LABEL_DISTANCE + UI.SPACE2);
       }
 
       // Time
@@ -456,7 +456,7 @@ public class TourBlogView extends ViewPart {
       }
 
       // Body weight
-      final float bodyWeight = _tourData.getBodyWeight();
+      final float bodyWeight = _tourData.getBodyWeight() * UI.UNIT_VALUE_WEIGHT;
       if (bodyWeight > 0) {
          sb.append("&#9878;" + UI.SPACE1); //$NON-NLS-1$
          sb.append(new ValueFormatter_Number_1_0().printDouble(bodyWeight));
