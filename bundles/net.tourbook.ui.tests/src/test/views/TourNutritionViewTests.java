@@ -102,6 +102,12 @@ public class TourNutritionViewTests extends UITest {
       bot.button(Messages.Tour_Nutrition_Button_AddCustomProduct).click();
       // Name
       bot.text(0).setText("Water"); //$NON-NLS-1$
+      // Calories
+      bot.text(1).setText("12"); //$NON-NLS-1$
+      // Sodium
+      bot.text(1).setText("13"); //$NON-NLS-1$
+      // Is Beverage
+      bot.checkBox(0).click();
 
       Utils.clickOkButton(bot);
 
