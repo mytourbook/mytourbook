@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,26 +57,19 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -115,8 +108,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
    private ModifyListener           _defaultSpinnerModifyListener;
    private MouseWheelListener       _defaultSpinnerMouseWheelListener;
-   private SelectionAdapter         _defaultSpinnerSelectionListener;
-   private IPartListener2           _partListener;
+   private SelectionListener        _defaultSpinnerSelectionListener;
    private ISelectionListener       _postSelectionListener;
    private IPropertyChangeListener  _prefChangeListener;
    private ITourEventListener       _tourEventListener;
@@ -237,66 +229,33 @@ public class HeartRateVariabilityView extends ViewPart {
       updateChart_50_CurrentTours(!_isSynchChartScaling);
    }
 
-   private void addPartListener() {
-
-      getViewSite().getPage().addPartListener(_partListener = new IPartListener2() {
-
-         @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partClosed(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partHidden(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partVisible(final IWorkbenchPartReference partRef) {}
-      });
-   }
-
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            /*
-             * set a new chart configuration when the preferences has changed
-             */
-            if (property.equals(GRID_HORIZONTAL_DISTANCE)
-                  || property.equals(GRID_VERTICAL_DISTANCE)
-                  || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-                  || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
-            //
-            ) {
+         /*
+          * set a new chart configuration when the preferences has changed
+          */
+         if (property.equals(GRID_HORIZONTAL_DISTANCE)
+               || property.equals(GRID_VERTICAL_DISTANCE)
+               || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+               || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+         //
+         ) {
 
-               // grid has changed
+            // grid has changed
 
-               UI.updateChartProperties(_chartHRV, GRID_PREF_PREFIX);
+            UI.updateChartProperties(_chartHRV, GRID_PREF_PREFIX);
 
-               updateChart_50_CurrentTours(true);
+            updateChart_50_CurrentTours(true);
 
-            } else if (property.equals(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR)
-                  | property.equals(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE)) {
+         } else if (property.equals(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR)
+               | property.equals(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE)) {
 
-               // hrv options has changed
-               updateChart_50_CurrentTours(true);
-            }
+            // hrv options has changed
+            updateChart_50_CurrentTours(true);
          }
       };
 
@@ -308,35 +267,28 @@ public class HeartRateVariabilityView extends ViewPart {
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+      _postSelectionListener = (part, selection) -> {
 
-            if (part == HeartRateVariabilityView.this) {
-               return;
-            }
-
-            onSelectionChanged(selection);
+         if (part == HeartRateVariabilityView.this) {
+            return;
          }
+
+         onSelectionChanged(selection);
       };
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
+      _tourEventListener = (part, eventId, eventData) -> {
 
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+         if (part == HeartRateVariabilityView.this) {
+            return;
+         }
 
-            if (part == HeartRateVariabilityView.this) {
-               return;
-            }
+         if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof final ISelection selection) {
 
-            if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
-
-               onSelectionChanged((ISelection) eventData);
-            }
+            onSelectionChanged(selection);
          }
       };
 
@@ -366,6 +318,7 @@ public class HeartRateVariabilityView extends ViewPart {
    /**
     * @param hrvTours
     *           contains all tours which are displayed in the chart, they can be valid or invalid
+    *
     * @return
     */
    private ChartDataModel createChartDataModel(final List<TourData> hrvTours) {
@@ -552,7 +505,6 @@ public class HeartRateVariabilityView extends ViewPart {
 
       restoreState();
 
-      addPartListener();
       addSelectionListener();
       addPrefListener();
       addTourEventListener();
@@ -683,7 +635,6 @@ public class HeartRateVariabilityView extends ViewPart {
    public void dispose() {
 
       getSite().getPage().removeSelectionListener(_postSelectionListener);
-      getViewSite().getPage().removePartListener(_partListener);
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
@@ -738,35 +689,26 @@ public class HeartRateVariabilityView extends ViewPart {
 
       _tk = new FormToolkit(parent.getDisplay());
 
-      _defaultSpinnerModifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            if (_isUpdateUI) {
-               return;
-            }
-            onModifyMinMaxTime();
+      _defaultSpinnerModifyListener = modifyEvent -> {
+         if (_isUpdateUI) {
+            return;
          }
+         onModifyMinMaxTime();
       };
 
-      _defaultSpinnerSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            if (_isUpdateUI) {
-               return;
-            }
-            onModifyMinMaxTime();
+      _defaultSpinnerSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> {
+         if (_isUpdateUI) {
+            return;
          }
-      };
+         onModifyMinMaxTime();
+      });
 
-      _defaultSpinnerMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            Util.adjustSpinnerValueOnMouseScroll(event);
-            if (_isUpdateUI) {
-               return;
-            }
-            onModifyMinMaxTime();
+      _defaultSpinnerMouseWheelListener = mouseEvent -> {
+         Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         if (_isUpdateUI) {
+            return;
          }
+         onModifyMinMaxTime();
       };
    }
 
@@ -804,24 +746,22 @@ public class HeartRateVariabilityView extends ViewPart {
          return;
       }
 
-      if (selection instanceof SelectionTourData) {
+      if (selection instanceof final SelectionTourData selectionTourData) {
 
-         final TourData tourData = ((SelectionTourData) selection).getTourData();
+         final TourData tourData = selectionTourData.getTourData();
          if (tourData != null) {
             updateChart_20(tourData);
          }
 
-      } else if (selection instanceof SelectionTourIds) {
+      } else if (selection instanceof final SelectionTourIds selectionTourId) {
 
-         final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
          final ArrayList<Long> tourIds = selectionTourId.getTourIds();
          if (tourIds != null && tourIds.size() > 0) {
             updateChart_12(tourIds);
          }
 
-      } else if (selection instanceof SelectionTourId) {
+      } else if (selection instanceof final SelectionTourId selectionTourId) {
 
-         final SelectionTourId selectionTourId = (SelectionTourId) selection;
          final Long tourId = selectionTourId.getTourId();
 
          updateChart_10(tourId);
@@ -889,26 +829,23 @@ public class HeartRateVariabilityView extends ViewPart {
    private void showTourFromTourProvider() {
 
       // a tour is not displayed, find a tour provider which provides a tour
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getCurrent().asyncExec(() -> {
 
-            // validate widget
-            if (_pageBook.isDisposed()) {
-               return;
-            }
+         // validate widget
+         if (_pageBook.isDisposed()) {
+            return;
+         }
 
-            /*
-             * check if tour was set from a selection provider
-             */
-            if (_hrvTours != null) {
-               return;
-            }
+         /*
+          * check if tour was set from a selection provider
+          */
+         if (_hrvTours != null) {
+            return;
+         }
 
-            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-            if (selectedTours != null && selectedTours.size() > 0) {
-               updateChart_22(selectedTours);
-            }
+         final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+         if (selectedTours != null && selectedTours.size() > 0) {
+            updateChart_22(selectedTours);
          }
       });
    }

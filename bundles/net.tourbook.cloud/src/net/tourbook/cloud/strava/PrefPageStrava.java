@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2023 Frédéric Bard
+ * Copyright (C) 2020, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -53,9 +53,9 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    public static final String      ID                      = "net.tourbook.cloud.PrefPageStrava";                                         //$NON-NLS-1$
    private static final int        CALLBACK_PORT           = 4918;
 
-   private static final String     ClientId                = "55536";                                                                     //$NON-NLS-1$
+   private static final String     CLIENT_ID               = "55536";                                                                     //$NON-NLS-1$
 
-   private static final String     _stravaApp_WebPage_Link = "https://www.strava.com";                                                    //$NON-NLS-1$
+   private static final String     STRAVA_APP_WEBPAGE_LINK = "https://www.strava.com";                                                    //$NON-NLS-1$
    private IPreferenceStore        _prefStore              = Activator.getDefault().getPreferenceStore();
    private IPropertyChangeListener _prefChangeListener;
 
@@ -195,28 +195,25 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
       {
          {
-            final Label labelWebPage = new Label(group, SWT.NONE);
-            labelWebPage.setText(Messages.PrefPage_CloudConnectivity_Label_WebPage);
+            final Label labelWebPage = UI.createLabel(group, Messages.PrefPage_CloudConnectivity_Label_WebPage);
             GridDataFactory.fillDefaults().applyTo(labelWebPage);
 
             final Link linkWebPage = new Link(group, SWT.NONE);
-            linkWebPage.setText(UI.LINK_TAG_START + _stravaApp_WebPage_Link + UI.LINK_TAG_END);
+            linkWebPage.setText(UI.LINK_TAG_START + STRAVA_APP_WEBPAGE_LINK + UI.LINK_TAG_END);
             linkWebPage.setEnabled(true);
             linkWebPage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
-                  _stravaApp_WebPage_Link)));
+                  STRAVA_APP_WEBPAGE_LINK)));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);
          }
          {
-            _labelAthleteName = new Label(group, SWT.NONE);
-            _labelAthleteName.setText(Messages.PrefPage_AccountInformation_Label_AthleteName);
+            _labelAthleteName = UI.createLabel(group, Messages.PrefPage_AccountInformation_Label_AthleteName);
             GridDataFactory.fillDefaults().applyTo(_labelAthleteName);
 
-            _labelAthleteName_Value = new Label(group, SWT.NONE);
+            _labelAthleteName_Value = UI.createLabel(group);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelAthleteName_Value);
          }
          {
-            _labelAthleteWebPage = new Label(group, SWT.NONE);
-            _labelAthleteWebPage.setText(Messages.PrefPage_AccountInformation_Label_AthleteWebPage);
+            _labelAthleteWebPage = UI.createLabel(group, Messages.PrefPage_AccountInformation_Label_AthleteWebPage);
             GridDataFactory.fillDefaults().applyTo(_labelAthleteWebPage);
 
             _linkAthleteWebPage = new Link(group, SWT.NONE);
@@ -226,16 +223,14 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_linkAthleteWebPage);
          }
          {
-            _labelAccessToken = new Label(group, SWT.NONE);
-            _labelAccessToken.setText(Messages.PrefPage_CloudConnectivity_Label_AccessToken);
+            _labelAccessToken = UI.createLabel(group, Messages.PrefPage_CloudConnectivity_Label_AccessToken);
             GridDataFactory.fillDefaults().applyTo(_labelAccessToken);
 
             _txtAccessToken_Value = new Text(group, SWT.PASSWORD | SWT.READ_ONLY);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtAccessToken_Value);
          }
          {
-            _labelRefreshToken = new Label(group, SWT.NONE);
-            _labelRefreshToken.setText(Messages.PrefPage_CloudConnectivity_Label_RefreshToken);
+            _labelRefreshToken = UI.createLabel(group, Messages.PrefPage_CloudConnectivity_Label_RefreshToken);
             GridDataFactory.fillDefaults().applyTo(_labelRefreshToken);
 
             _txtRefreshToken_Value = new Text(group, SWT.PASSWORD | SWT.READ_ONLY);
@@ -243,11 +238,10 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtRefreshToken_Value);
          }
          {
-            _labelExpiresAt = new Label(group, SWT.NONE);
-            _labelExpiresAt.setText(Messages.PrefPage_CloudConnectivity_Label_ExpiresAt);
+            _labelExpiresAt = UI.createLabel(group, Messages.PrefPage_CloudConnectivity_Label_ExpiresAt);
             GridDataFactory.fillDefaults().applyTo(_labelExpiresAt);
 
-            _labelExpiresAt_Value = new Label(group, SWT.NONE);
+            _labelExpiresAt_Value = UI.createLabel(group);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_labelExpiresAt_Value);
          }
          {
@@ -384,12 +378,12 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          return;
       }
 
-      final StringBuilder authorizeUrl = new StringBuilder(_stravaApp_WebPage_Link + "/oauth/authorize" + UI.SYMBOL_QUESTION_MARK); //$NON-NLS-1$
+      final StringBuilder authorizeUrl = new StringBuilder(STRAVA_APP_WEBPAGE_LINK + "/oauth/authorize" + UI.SYMBOL_QUESTION_MARK); //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
       authorizeUrl.append(      OAuth2Constants.PARAM_RESPONSE_TYPE + "=" + OAuth2Constants.PARAM_CODE); //$NON-NLS-1$
-      authorizeUrl.append("&" + OAuth2Constants.PARAM_CLIENT_ID +     "=" + ClientId); //$NON-NLS-1$ //$NON-NLS-2$
+      authorizeUrl.append("&" + OAuth2Constants.PARAM_CLIENT_ID +     "=" + CLIENT_ID); //$NON-NLS-1$ //$NON-NLS-2$
       authorizeUrl.append("&" + OAuth2Constants.PARAM_REDIRECT_URI +  "=" + "http://localhost:" + CALLBACK_PORT); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       authorizeUrl.append("&" + "scope" +                             "=" + "read,activity:write"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 

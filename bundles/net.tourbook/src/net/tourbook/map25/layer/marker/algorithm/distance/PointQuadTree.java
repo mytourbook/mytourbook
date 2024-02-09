@@ -10,7 +10,7 @@ import java.util.List;
 import org.oscim.core.Point;
 
 /**
- * A quad tree which tracks items with a Point geometry. See http://en.wikipedia.org/wiki/Quadtree
+ * A quad tree which tracks items with a Point geometry. See https://en.wikipedia.org/wiki/Quadtree
  * for details on the data structure. This class is not thread safe.
  */
 public class PointQuadTree<T extends PointQuadTree.Item> {
@@ -18,12 +18,12 @@ public class PointQuadTree<T extends PointQuadTree.Item> {
 	/**
 	 * Maximum number of elements to store in a quad before splitting.
 	 */
-	private final static int		MAX_ELEMENTS	= 50;
+   private static final int       MAX_ELEMENTS = 50;
 
 	/**
 	 * Maximum depth.
 	 */
-	private final static int		MAX_DEPTH		= 40;
+   private static final int       MAX_DEPTH    = 40;
 
 	/**
 	 * The bounds of this quad.
@@ -118,7 +118,7 @@ public class PointQuadTree<T extends PointQuadTree.Item> {
 		}
 
 		if (mItems == null) {
-			mItems = new ArrayList<T>();
+			mItems = new ArrayList<>();
 		}
 
 		mItems.add(item);
@@ -172,7 +172,7 @@ public class PointQuadTree<T extends PointQuadTree.Item> {
 	 */
 	public Collection<T> search(final Bounds searchBounds) {
 
-		final List<T> results = new ArrayList<T>();
+		final List<T> results = new ArrayList<>();
 		search(searchBounds, results);
 
 		return results;
@@ -206,11 +206,11 @@ public class PointQuadTree<T extends PointQuadTree.Item> {
 	 */
 	private void split() {
 
-		mChildren = new ArrayList<PointQuadTree<T>>(4);
-		mChildren.add(new PointQuadTree<T>(mBounds.minX, mBounds.midX, mBounds.minY, mBounds.midY, mDepth + 1));
-		mChildren.add(new PointQuadTree<T>(mBounds.midX, mBounds.maxX, mBounds.minY, mBounds.midY, mDepth + 1));
-		mChildren.add(new PointQuadTree<T>(mBounds.minX, mBounds.midX, mBounds.midY, mBounds.maxY, mDepth + 1));
-		mChildren.add(new PointQuadTree<T>(mBounds.midX, mBounds.maxX, mBounds.midY, mBounds.maxY, mDepth + 1));
+		mChildren = new ArrayList<>(4);
+		mChildren.add(new PointQuadTree<>(mBounds.minX, mBounds.midX, mBounds.minY, mBounds.midY, mDepth + 1));
+		mChildren.add(new PointQuadTree<>(mBounds.midX, mBounds.maxX, mBounds.minY, mBounds.midY, mDepth + 1));
+		mChildren.add(new PointQuadTree<>(mBounds.minX, mBounds.midX, mBounds.midY, mBounds.maxY, mDepth + 1));
+		mChildren.add(new PointQuadTree<>(mBounds.midX, mBounds.maxX, mBounds.midY, mBounds.maxY, mDepth + 1));
 
 		final List<T> items = mItems;
 		mItems = null;

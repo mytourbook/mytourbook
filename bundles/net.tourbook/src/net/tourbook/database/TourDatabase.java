@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -10459,7 +10459,7 @@ public class TourDatabase {
        */
       try {
 
-         if (isColumnAvailable(conn, TABLE_TOUR_LOCATION, "appliedName") == false) {
+         if (isColumnAvailable(conn, TABLE_TOUR_LOCATION, "appliedName") == false) { //$NON-NLS-1$
 
             final Statement stmt = conn.createStatement();
             {
@@ -10468,7 +10468,7 @@ public class TourDatabase {
 // SET_FORMATTING_OFF
 
             SQL.AddColumn_VarCar (stmt, TABLE_TOUR_LOCATION, "appliedName",   TourLocation.DB_FIELD_LENGTH);      //$NON-NLS-1$
-            SQL.AddColumn_BigInt (stmt, TABLE_TOUR_LOCATION, "lastModified",  "0");                               //$NON-NLS-1$
+            SQL.AddColumn_BigInt (stmt, TABLE_TOUR_LOCATION, "lastModified",  "0");                               //$NON-NLS-1$ //$NON-NLS-2$
 
 // SET_FORMATTING_ON
             }

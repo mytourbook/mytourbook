@@ -86,10 +86,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
@@ -108,7 +106,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    private IPropertyChangeListener  _prefChangeListener;
    private IPropertyChangeListener  _prefChangeListener_Common;
    private ITourEventListener       _tourEventListener;
-   private IPartListener2           _partListener;
 
    private MenuManager              _viewerMenuManager;
    private IContextMenuProvider     _tableViewerContextMenuProvider = new TableContextMenuProvider();
@@ -235,37 +232,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       super();
    }
 
-   private void addPartListener() {
-
-      _partListener = new IPartListener2() {
-
-         @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partClosed(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partHidden(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partVisible(final IWorkbenchPartReference partRef) {}
-      };
-      getViewSite().getPage().addPartListener(_partListener);
-   }
-
    private void addPrefListener() {
 
       _prefChangeListener = propertyChangeEvent -> {
@@ -325,9 +291,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
             return;
          }
 
-         if (tourEventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
+         if (tourEventId == TourEventId.TOUR_SELECTION && eventData instanceof final ISelection selection) {
 
-            onSelectionChanged((ISelection) eventData);
+            onSelectionChanged(selection);
 
          } else {
 
@@ -335,9 +301,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                return;
             }
 
-            if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+            if (tourEventId == TourEventId.TOUR_CHANGED && eventData instanceof final TourEvent tourEvent) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
                if (modifiedTours != null) {
 
                   // update modified tour
@@ -471,7 +437,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       addSelectionListener();
       addTourEventListener();
       addPrefListener();
-      addPartListener();
 
       createActions();
       fillToolbar();
@@ -941,9 +906,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
                final Object element = lastRow.getElement();
 
-               if (element instanceof TourMarker) {
-
-                  final TourMarker tourMarker = (TourMarker) element;
+               if (element instanceof final TourMarker tourMarker) {
 
                   lastTime = tourMarker.getTime();
                   lastSerieIndex = tourMarker.getSerieIndex();
@@ -1034,7 +997,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
-      getViewSite().getPage().removePartListener(_partListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
       _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
@@ -1143,8 +1105,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       int previousMarkerIndex = 0;
       if (null != lastRow) {
          final Object element = lastRow.getElement();
-         if (element instanceof TourMarker) {
-            previousMarkerIndex = ((TourMarker) element).getSerieIndex();
+         if (element instanceof final TourMarker tourMarker) {
+            previousMarkerIndex = tourMarker.getSerieIndex();
          }
       }
       return previousMarkerIndex;
@@ -1221,20 +1183,19 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
       TourData tourData = null;
 
-      if (selection instanceof SelectionTourData) {
+      if (selection instanceof final SelectionTourData tourDataSelection) {
 
          // a tour was selected, get the chart and update the marker viewer
 
-         final SelectionTourData tourDataSelection = (SelectionTourData) selection;
          tourData = tourDataSelection.getTourData();
 
-      } else if (selection instanceof SelectionTourId) {
+      } else if (selection instanceof final SelectionTourId selectionTourId) {
 
-         tourId = ((SelectionTourId) selection).getTourId();
+         tourId = selectionTourId.getTourId();
 
-      } else if (selection instanceof SelectionTourIds) {
+      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final ArrayList<Long> tourIds = selectionTourIds.getTourIds();
 
          if (tourIds != null && tourIds.size() > 0) {
 
@@ -1252,13 +1213,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
             tourId = refItem.getTourId();
          }
 
-      } else if (selection instanceof StructuredSelection) {
+      } else if (selection instanceof final StructuredSelection structuredSelection) {
 
-         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-         if (firstElement instanceof TVIRefTour_ComparedTour) {
-            tourId = ((TVIRefTour_ComparedTour) firstElement).getTourId();
-         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
-            tourId = ((TVIElevationCompareResult_ComparedTour) firstElement).getTourId();
+         final Object firstElement = structuredSelection.getFirstElement();
+         if (firstElement instanceof final TVIRefTour_ComparedTour tviRefTour_ComparedTour) {
+            tourId = tviRefTour_ComparedTour.getTourId();
+         } else if (firstElement instanceof final TVIElevationCompareResult_ComparedTour tviElevationCompareResult_ComparedTour) {
+            tourId = tviElevationCompareResult_ComparedTour.getTourId();
          }
 
       } else if (selection instanceof SelectionDeletedTours) {
@@ -1287,13 +1248,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private void onTourEvent_TourMarker(final Object eventData) {
 
-      if (eventData instanceof SelectionTourMarker) {
+      if (eventData instanceof final SelectionTourMarker selection) {
 
          /*
           * Select the tour marker in the view
           */
-         final SelectionTourMarker selection = (SelectionTourMarker) eventData;
-
          final TourData tourData = selection.getTourData();
          final ArrayList<TourMarker> tourMarker = selection.getSelectedTourMarker();
 

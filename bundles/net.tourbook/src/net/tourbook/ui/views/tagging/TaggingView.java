@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -123,9 +123,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 public class TaggingView extends ViewPart implements ITourProvider, ITourViewer, ITreeViewer {
@@ -200,7 +198,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private TVITaggingView_Root                 _rootItem;
    private ColumnManager                       _columnManager;
 
-   private IPartListener2                      _partListener;
    private ISelectionListener                  _postSelectionListener;
    private PostSelectionProvider               _postSelectionProvider;
    private IPropertyChangeListener             _prefChangeListener;
@@ -422,10 +419,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
             return true;
 
-         } else if (a instanceof TVITaggingView_Year && b instanceof TVITaggingView_Year) {
-
-            final TVITaggingView_Year yearItem1 = (TVITaggingView_Year) a;
-            final TVITaggingView_Year yearItem2 = (TVITaggingView_Year) b;
+         } else if (a instanceof final TVITaggingView_Year yearItem1 && b instanceof final TVITaggingView_Year yearItem2) {
 
             return yearItem1.getTagId() == yearItem2.getTagId() //
                   && yearItem1.getYear() == yearItem2.getYear();
@@ -553,37 +547,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          return _treeContextMenu;
       }
-   }
-
-   private void addPartListener() {
-
-      _partListener = new IPartListener2() {
-         @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partClosed(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partHidden(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partVisible(final IWorkbenchPartReference partRef) {}
-      };
-
-      getViewSite().getPage().addPartListener(_partListener);
    }
 
    private void addPrefListener() {
@@ -765,7 +728,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       addTourEventListener();
       addPrefListener();
-      addPartListener();
       addSelectionListener();
       restoreState();
 
@@ -1629,7 +1591,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    @Override
    public void dispose() {
 
-      getViewSite().getPage().removePartListener(_partListener);
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
@@ -2259,7 +2220,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    /**
     * This is not yet working thoroughly because the expanded position moves up or down and all
-    * expanded childrens are not visible (but they could) like when the triangle (+/-) icon in the
+    * expanded children are not visible (but they could) like when the triangle (+/-) icon in the
     * tree is clicked.
     *
     * @param treeSelection
@@ -2287,7 +2248,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             @Override
             public void run() {
 
-               // check if a newer expand event occured
+               // check if a newer expand event occurred
                if (__expandRunnableCounter != _expandRunnableCounter) {
                   return;
                }
@@ -2817,7 +2778,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       for (final TreePath expandedPath : expandedOpenedTreePaths) {
 
-         // start a new path, allways set it twice to have a even structure
+         // start a new path, always set it twice to have a even structure
          expandedItems.add(STATE_ITEM_TYPE_SEPARATOR);
          expandedItems.add(STATE_ITEM_TYPE_SEPARATOR);
 
@@ -2989,9 +2950,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       // loop: all children of the current parent item
       for (final Object object : children) {
 
-         if (object instanceof TVITaggingView_Tag) {
+         if (object instanceof final TVITaggingView_Tag tagItem) {
 
-            final TVITaggingView_Tag tagItem = (TVITaggingView_Tag) object;
             final long viewerTagId = tagItem.getTagId();
 
             final HashMap<Long, TourTag> modifiedTags = changedTags.getModifiedTags();
@@ -3030,10 +2990,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                return;
             }
 
-         } else {
-            if (object instanceof TreeViewerItem) {
-               updateViewerAfterTagStructureIsModified((TreeViewerItem) object, changedTags, isAddMode);
-            }
+         } else if (object instanceof final TreeViewerItem treeViewerItem) {
+            updateViewerAfterTagStructureIsModified(treeViewerItem, changedTags, isAddMode);
          }
       }
    }
@@ -3057,12 +3015,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       // loop: all tree children items
       for (final Object object : parentChildren) {
-         if (object instanceof TreeViewerItem) {
+         if (object instanceof final TreeViewerItem childItem) {
 
-            final TreeViewerItem childItem = (TreeViewerItem) object;
-            if (childItem instanceof TVITaggingView_Tour) {
+            if (childItem instanceof final TVITaggingView_Tour tourItem) {
 
-               final TVITaggingView_Tour tourItem = (TVITaggingView_Tour) childItem;
                final long tourItemId = tourItem.getTourId();
 
                // loop: all deleted tour id's
@@ -3111,12 +3067,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       // loop: all children
       for (final Object object : children) {
-         if (object instanceof TreeViewerItem) {
+         if (object instanceof final TreeViewerItem treeItem) {
 
-            final TreeViewerItem treeItem = (TreeViewerItem) object;
-            if (treeItem instanceof TVITaggingView_Tour) {
+            if (treeItem instanceof final TVITaggingView_Tour tourItem) {
 
-               final TVITaggingView_Tour tourItem = (TVITaggingView_Tour) treeItem;
                final long tourItemId = tourItem.getTourId();
 
                for (final TourData modifiedTourData : modifiedTours) {

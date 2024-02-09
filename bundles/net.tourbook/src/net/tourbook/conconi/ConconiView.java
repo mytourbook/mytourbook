@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -68,9 +68,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -105,7 +103,6 @@ public class ConconiView extends ViewPart {
    private final IPreferenceStore  _prefStore_Common       = CommonActivator.getPrefStore();
    private final IDialogSettings   _state                  = TourbookPlugin.getState(ID);
 
-   private IPartListener2          _partListener;
    private ISelectionListener      _postSelectionListener;
    private IPropertyChangeListener _prefChangeListener;
    private ITourEventListener      _tourEventListener;
@@ -159,37 +156,6 @@ public class ConconiView extends ViewPart {
       }
    }
 
-   private void addPartListener() {
-
-      _partListener = new IPartListener2() {
-
-         @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partClosed(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partHidden(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partVisible(final IWorkbenchPartReference partRef) {}
-      };
-      getViewSite().getPage().addPartListener(_partListener);
-   }
-
    private void addPrefListener() {
 
       _prefChangeListener = propertyChangeEvent -> {
@@ -238,9 +204,9 @@ public class ConconiView extends ViewPart {
             return;
          }
 
-         if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
+         if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof final ISelection selection) {
 
-            onSelectionChanged((ISelection) eventData);
+            onSelectionChanged(selection);
          }
       };
 
@@ -272,6 +238,7 @@ public class ConconiView extends ViewPart {
     * @param markedTour
     *           contains tour which should be marked in the chart, when <code>null</code> the first
     *           tour will be marked
+    *
     * @return
     */
    private ChartDataModel createChartDataModelConconiTest(final List<TourData> conconiTours, TourData markedTour) {
@@ -503,7 +470,7 @@ public class ConconiView extends ViewPart {
       }
 
       /*
-       * updata layer for regression lines
+       * update layer for regression lines
        */
       final ArrayList<IChartLayer> chartCustomLayers = new ArrayList<>();
       chartCustomLayers.add(_conconiLayer);
@@ -578,7 +545,6 @@ public class ConconiView extends ViewPart {
       addPrefListener();
       addTourEventListener();
       addSelectionListener();
-      addPartListener();
 
       // show conconi chart from selection service
       onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
@@ -791,7 +757,6 @@ public class ConconiView extends ViewPart {
    @Override
    public void dispose() {
 
-      getViewSite().getPage().removePartListener(_partListener);
       getSite().getPage().removeSelectionListener(_postSelectionListener);
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
       _prefStore.removePropertyChangeListener(_prefChangeListener);
@@ -849,24 +814,22 @@ public class ConconiView extends ViewPart {
          return;
       }
 
-      if (selection instanceof SelectionTourData) {
+      if (selection instanceof final SelectionTourData selectionTourData) {
 
-         final TourData tourData = ((SelectionTourData) selection).getTourData();
+         final TourData tourData = selectionTourData.getTourData();
          if (tourData != null) {
             updateChart_20(tourData);
          }
 
-      } else if (selection instanceof SelectionTourIds) {
+      } else if (selection instanceof final SelectionTourIds selectionTourId) {
 
-         final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
          final ArrayList<Long> tourIds = selectionTourId.getTourIds();
          if (tourIds != null && tourIds.size() > 0) {
             updateChart_12(tourIds);
          }
 
-      } else if (selection instanceof SelectionTourId) {
+      } else if (selection instanceof final SelectionTourId selectionTourId) {
 
-         final SelectionTourId selectionTourId = (SelectionTourId) selection;
          final Long tourId = selectionTourId.getTourId();
 
          updateChart_10(tourId);
@@ -1132,7 +1095,7 @@ public class ConconiView extends ViewPart {
          return;
       }
 
-      // deflation values
+      // deflection values
       final int scaleIndex = _scaleDeflection.getSelection();
       final int pulseValue = (int) _conconiDataForSelectedTour.maxYValues.get(scaleIndex);
       final int powerValue = (int) _conconiDataForSelectedTour.maxXValues.get(scaleIndex);

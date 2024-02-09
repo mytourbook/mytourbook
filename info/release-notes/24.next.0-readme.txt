@@ -70,6 +70,7 @@ Bugfix
 
 * TCX Import (Frederic)
   - Fix for average and maximum power computation
+    https://github.com/mytourbook/mytourbook/discussions/1268
 
 
 Translation    

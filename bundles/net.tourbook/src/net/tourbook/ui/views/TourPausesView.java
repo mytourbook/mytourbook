@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -81,9 +81,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
@@ -100,7 +98,6 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    private IPropertyChangeListener  _prefChangeListener;
    private IPropertyChangeListener  _prefChangeListener_Common;
    private ITourEventListener       _tourEventListener;
-   private IPartListener2           _partListener;
 
    private TourData                 _tourData;
 
@@ -216,37 +213,6 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
    public TourPausesView() {
       super();
-   }
-
-   private void addPartListener() {
-
-      _partListener = new IPartListener2() {
-
-         @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partClosed(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partHidden(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partVisible(final IWorkbenchPartReference partRef) {}
-      };
-      getViewSite().getPage().addPartListener(_partListener);
    }
 
    private void addPrefListener() {
@@ -397,7 +363,6 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       addSelectionListener();
       addTourEventListener();
       addPrefListener();
-      addPartListener();
 
       createActions();
 
@@ -718,7 +683,6 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
-      getViewSite().getPage().removePartListener(_partListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
       _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
