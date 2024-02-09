@@ -227,7 +227,7 @@ public class SensorView extends ViewPart implements ITourViewer {
 
             } else {
 
-               // secondly sord as string
+               // secondly sort as string
 
                rc = item1.sensor.getSerialNumber().compareTo(item2.sensor.getSerialNumber());
             }

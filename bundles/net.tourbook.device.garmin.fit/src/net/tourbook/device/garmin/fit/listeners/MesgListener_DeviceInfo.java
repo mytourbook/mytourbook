@@ -326,13 +326,14 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
          }
       }
 
-      /*
-       * Sensor data are set only for device sensors, when the serial number is available, otherwise
-       * they cannot be easily identified
-       */
       final Long serialNumber = mesg.getSerialNumber();
       if (serialNumber != null) {
-         setSensorData(mesg, serialNumber);
+
+         setSensorData_WithSerialNo(mesg, serialNumber);
+
+      } else {
+
+         setSensorData_WithName(mesg);
       }
 
       if (_isLogDeviceData) {
@@ -380,9 +381,109 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
             : String.format(FORMAT_FLOAT_10_3, value);
    }
 
-   private void setSensorData(final DeviceInfoMesg mesg, final Long serialNumber) {
+   private void setSensorData_WithName(final DeviceInfoMesg mesg) {
+      // TODO Auto-generated method stub
 
-      // SET_FORMATTING_OFF
+// SET_FORMATTING_OFF
+
+      final Integer        mesgManufacturerNumber     = mesg.getManufacturer();
+      final Integer        mesgProductNumber          = mesg.getProduct();
+      final String         mesgProductName            = mesg.getProductName();
+
+      final Short          mesgBatteryLevel           = mesg.getBatteryLevel();     // %
+      final Float          mesgBatteryVoltage         = mesg.getBatteryVoltage();   // Volt
+      final Short          mesgBatteryStatus          = mesg.getBatteryStatus();    // OK, ...
+
+// SET_FORMATTING_ON
+
+      /*
+       * Get sensor
+       */
+      final Map<Long, DeviceSensor> allDbSensors = TourDatabase.getAllDeviceSensors_BySensorID();
+
+      final String manufacturerName = getManufacturerName(mesgManufacturerNumber);
+      final String productName = getProductName(mesgProductNumber, mesgProductName, null);
+
+      DeviceSensor sensor = null;
+
+      for (final DeviceSensor dbSensor : allDbSensors.values()) {
+
+         final String dbManufacturerName = dbSensor.getManufacturerName();
+         final String dbProductName = dbSensor.getProductName();
+
+         if (dbManufacturerName != null && dbManufacturerName.equals(manufacturerName)
+               && dbProductName != null && dbProductName.equals(productName)) {
+
+            sensor = dbSensor;
+
+            break;
+         }
+      }
+
+      if (sensor == null) {
+
+         // create a new sensor
+
+         sensor = RawDataManager.createDeviceSensor(
+
+               mesgManufacturerNumber == null ? -1 : mesgManufacturerNumber,
+               manufacturerName,
+
+               mesgProductNumber == null ? -1 : mesgProductNumber,
+               productName,
+
+               null // serialNumber
+         );
+      }
+
+      /*
+       * Get sensor value
+       */
+      final List<DeviceSensorValue> allImportedSensorValues = fitData.getDeviceSensorValues();
+      DeviceSensorValue sensorValue = null;
+
+      for (final DeviceSensorValue importedSensorValue : allImportedSensorValues) {
+
+         final DeviceSensor importedSensor = importedSensorValue.getDeviceSensor();
+
+         final String dbManufacturerName = importedSensor.getManufacturerName();
+         final String dbProductName = importedSensor.getProductName();
+
+         if (dbManufacturerName != null && dbManufacturerName.equals(manufacturerName)
+               && dbProductName != null && dbProductName.equals(productName)) {
+
+//         if (importedSensor.getSerialNumber().equals(sensorSerialNumberKey)) {
+
+            // sensor found in sensor values
+
+            sensorValue = importedSensorValue;
+
+            sensorValue.setBattery_Level(mesgBatteryLevel);
+            sensorValue.setBattery_Status(mesgBatteryStatus);
+            sensorValue.setBattery_Voltage(mesgBatteryVoltage);
+
+            break;
+         }
+      }
+
+      if (sensorValue == null) {
+
+         // create new sensor value -> set start values
+
+         sensorValue = new DeviceSensorValue(sensor);
+
+         allImportedSensorValues.add(sensorValue);
+
+         sensorValue.setBattery_Level(mesgBatteryLevel);
+         sensorValue.setBattery_Status(mesgBatteryStatus);
+         sensorValue.setBattery_Voltage(mesgBatteryVoltage);
+      }
+
+   }
+
+   private void setSensorData_WithSerialNo(final DeviceInfoMesg mesg, final Long serialNumber) {
+
+// SET_FORMATTING_OFF
 
 //    final DateTime       timestamp                  = mesg.getTimestamp();
 
@@ -415,6 +516,9 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
        */
       final Short          mesgBatteryLevel           = mesg.getFieldShortValue(32, 0, Fit.SUBFIELD_INDEX_MAIN_FIELD);
 
+// this may also work without the early hack
+//    final Short          mesgBatteryLevel           = mesg.getBatteryLevel();
+
 // SET_FORMATTING_ON
 
       final String sensorSerialNumberKey = serialNumber.toString();
@@ -444,18 +548,22 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                sensorSerialNumberKey);
       }
 
-      updateSensorNames(sensor,
+      updateSensorNames(
+
+            sensor,
+
             mesgManufacturerNumber,
             mesgProductNumber,
             mesgProductName,
             mesgGarminProductNumber);
 
-      final List<DeviceSensorValue> allImportedSensorValues = fitData.getDeviceSensorValues();
 
       /*
        * Get sensor value
        */
+      final List<DeviceSensorValue> allImportedSensorValues = fitData.getDeviceSensorValues();
       DeviceSensorValue sensorValue = null;
+
       for (final DeviceSensorValue importedSensorValue : allImportedSensorValues) {
 
          final DeviceSensor importedSensor = importedSensorValue.getDeviceSensor();
