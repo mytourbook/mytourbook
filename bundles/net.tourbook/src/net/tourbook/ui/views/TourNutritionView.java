@@ -47,6 +47,7 @@ import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -1198,9 +1199,15 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          tourId = selectionTourId.getTourId();
 
+      } else if (selection instanceof SelectionTourIds) {
+
+         showInvalidPage();
+         return;
+
       } else if (selection instanceof SelectionDeletedTours) {
 
          clearView();
+         return;
       }
 
       if (tourData == null) {
