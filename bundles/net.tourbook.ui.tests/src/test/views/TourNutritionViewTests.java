@@ -59,12 +59,17 @@ public class TourNutritionViewTests extends UITest {
       assertTrue(initialTableRowCount == 0);
 
       bot.button(Messages.Tour_Nutrition_Button_SearchProduct).click();
+      final SWTBotTable productsSearchTable = bot.table();
 
       // Act - Search for a food in the OpenFoodFacts database
       bot.comboBox(0).setText("bobo"); //$NON-NLS-1$
       bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
       bot.sleep(5000);
       bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
+
+      // Sort the products by name
+      productsSearchTable.header(Messages.Tour_Nutrition_Column_Name).click();
+      productsSearchTable.header(Messages.Tour_Nutrition_Column_Name).click();
 
       // Act - Search for a beverage in the OpenFoodFacts database
       bot.comboBox(0).setText("coca"); //$NON-NLS-1$
