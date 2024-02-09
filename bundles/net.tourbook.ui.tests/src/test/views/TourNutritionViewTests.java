@@ -79,6 +79,14 @@ public class TourNutritionViewTests extends UITest {
       bot.sleep(5000);
       bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
 
+      // Act - Search for a food by code in the OpenFoodFacts database that
+      // has a {@link Product#nutritionDataPer} of {@link NutritionDataPer#SERVING}
+      bot.comboBox(1).setSelection(Messages.Dialog_SearchProduct_Combo_SearchType_ByCode);
+      bot.comboBox(0).setText("0055577400517"); //$NON-NLS-1$
+      bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
+      bot.sleep(5000);
+      bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
+
       // Close the {@link DialogSearchProduct}
       final SWTBotShell[] currentShells = bot.shells();
       final Optional<SWTBotShell> dialogSearchProductShell = Arrays.stream(currentShells).filter(shell -> shell.getText().equals(
