@@ -448,7 +448,7 @@ public class TourBlogView extends ViewPart {
       }
 
       // Calories
-      final float calories = _tourData.getCalories();
+      final float calories = _tourData.getCalories() / 1000f;
       if (calories > 0) {
          sb.append("&#128293;" + UI.SPACE1); //$NON-NLS-1$
          sb.append(new ValueFormatter_Number_1_0().printDouble(calories));
