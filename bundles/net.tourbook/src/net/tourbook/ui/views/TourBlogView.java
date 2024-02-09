@@ -308,9 +308,9 @@ public class TourBlogView extends ViewPart {
 
          } else if (eventId == TourEventId.MARKER_SELECTION) {
 
-            if (eventData instanceof SelectionTourMarker) {
+            if (eventData instanceof final SelectionTourMarker selectionTourMarker) {
 
-               final TourData tourData = ((SelectionTourMarker) eventData).getTourData();
+               final TourData tourData = selectionTourMarker.getTourData();
 
                if (tourData != _tourData) {
 
@@ -1247,11 +1247,10 @@ public class TourBlogView extends ViewPart {
 
       long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-      if (selection instanceof SelectionTourData) {
+      if (selection instanceof final SelectionTourData tourDataSelection) {
 
          // a tour was selected, get the chart and update the marker viewer
 
-         final SelectionTourData tourDataSelection = (SelectionTourData) selection;
          _tourData = tourDataSelection.getTourData();
 
          if (_tourData == null) {
@@ -1266,17 +1265,15 @@ public class TourBlogView extends ViewPart {
          _tourChart = null;
          tourId = selectionTourId.getTourId();
 
-      } else if (selection instanceof SelectionTourIds) {
+      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
 
-         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final List<Long> tourIds = selectionTourIds.getTourIds();
          if ((tourIds != null) && (tourIds.size() > 0)) {
             _tourChart = null;
             tourId = tourIds.get(0);
          }
 
-      } else if (selection instanceof SelectionReferenceTourView) {
-
-         final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
+      } else if (selection instanceof final SelectionReferenceTourView tourCatalogSelection) {
 
          final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
          if (refItem != null) {
@@ -1284,14 +1281,14 @@ public class TourBlogView extends ViewPart {
             tourId = refItem.getTourId();
          }
 
-      } else if (selection instanceof StructuredSelection) {
+      } else if (selection instanceof final StructuredSelection structuredSelection) {
 
          _tourChart = null;
-         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-         if (firstElement instanceof TVIRefTour_ComparedTour) {
-            tourId = ((TVIRefTour_ComparedTour) firstElement).getTourId();
-         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
-            tourId = ((TVIElevationCompareResult_ComparedTour) firstElement).getTourId();
+         final Object firstElement = structuredSelection.getFirstElement();
+         if (firstElement instanceof final TVIRefTour_ComparedTour tviRefTour_ComparedTour) {
+            tourId = tviRefTour_ComparedTour.getTourId();
+         } else if (firstElement instanceof final TVIElevationCompareResult_ComparedTour tviElevationCompareResult_ComparedTour) {
+            tourId = tviElevationCompareResult_ComparedTour.getTourId();
          }
 
       } else if (selection instanceof SelectionDeletedTours) {

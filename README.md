@@ -1,3 +1,5 @@
+<img src="https://mytourbook.sourceforge.io/mytourbook/images/mytb/start-page/2024/splash-2401.png" width="50%">
+
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 [![Downloads](https://img.shields.io/sourceforge/dt/mytourbook)](https://sourceforge.net/projects/mytourbook/files/latest/download)
 [![Downloads](https://img.shields.io/sourceforge/dm/mytourbook)](https://sourceforge.net/projects/mytourbook/files/latest/download)

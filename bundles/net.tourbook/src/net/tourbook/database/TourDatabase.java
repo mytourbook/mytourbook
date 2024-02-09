@@ -10570,7 +10570,7 @@ public class TourDatabase {
 // SET_FORMATTING_OFF
 
             SQL.AddColumn_VarCar (stmt, TABLE_TOUR_LOCATION, "appliedName",   TourLocation.DB_FIELD_LENGTH);      //$NON-NLS-1$
-            SQL.AddColumn_BigInt (stmt, TABLE_TOUR_LOCATION, "lastModified",  "0");                               //$NON-NLS-1$
+            SQL.AddColumn_BigInt (stmt, TABLE_TOUR_LOCATION, "lastModified",  "0");                               //$NON-NLS-1$ //$NON-NLS-2$
 
 // SET_FORMATTING_ON
             }

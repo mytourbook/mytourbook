@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -94,9 +94,8 @@ public class PrefPageTCX extends FieldEditorPreferencePage implements IWorkbench
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_groupNotesImport);
       {
          // label: description
-         final Label label = new Label(_groupNotesImport, SWT.NONE);
+         final Label label = UI.createLabel(_groupNotesImport, Messages.PrefPage_TCX_Label_ImportNotes);
          GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
-         label.setText(Messages.PrefPage_TCX_Label_ImportNotes);
 
          // check: import into title field
          _editBool_ImportIntoTitle = new BooleanFieldEditor2(
@@ -184,12 +183,11 @@ public class PrefPageTCX extends FieldEditorPreferencePage implements IWorkbench
       /*
        * Label: Info
        */
-      _lblIgnoreSpeed = new Label(parent, SWT.WRAP);
+      _lblIgnoreSpeed = UI.createLabel(parent, Messages.PrefPage_TCX_Label_IgnoreSpeedValues, SWT.WRAP);
       GridDataFactory.fillDefaults()//
             .indent(_pc.convertHorizontalDLUsToPixels(10), 0)
             .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
             .applyTo(_lblIgnoreSpeed);
-      _lblIgnoreSpeed.setText(Messages.PrefPage_TCX_Label_IgnoreSpeedValues);
    }
 
    private void enableFields() {

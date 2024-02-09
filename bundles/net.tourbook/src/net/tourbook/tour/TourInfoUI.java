@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1927,14 +1927,14 @@ public class TourInfoUI {
    private void onSelect_Sensor(final SelectionEvent selectionEvent) {
 
       final Object linkData = selectionEvent.widget.getData();
-      if (linkData instanceof DeviceSensor) {
+      if (linkData instanceof final DeviceSensor deviceSensor) {
 
          Util.showView(SensorChartView.ID, false);
 
          TourManager.fireEventWithCustomData(
 
                TourEventId.SELECTION_SENSOR,
-               new SelectionSensor((DeviceSensor) linkData, _tourData.getTourId()),
+               new SelectionSensor(deviceSensor, _tourData.getTourId()),
                _part);
       }
    }
@@ -2282,7 +2282,7 @@ public class TourInfoUI {
 
          final int colorIndex = airQualityTextIndex * 2;
 
-         // run asyc otherwise in the dark mode the colors are not displayed
+         // run async otherwise in the dark mode the colors are not displayed
          _parent.getDisplay().asyncExec(() -> {
 
             if (_parent.isDisposed()) {

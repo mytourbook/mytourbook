@@ -6999,7 +6999,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
                   if (srtm3Value == Float.MIN_VALUE) {
 
-                     // when srtm3 is also not availible, used the last good one
+                     // when srtm3 is also not available, used the last good one
 
                      srtmValue = lastValidSRTM;
 //                   usedCorrectedSrtmValues++;
@@ -7983,7 +7983,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       out.println("----------------------------------------------------"); //$NON-NLS-1$
       out.println("TOUR DATA"); //$NON-NLS-1$
       out.println("----------------------------------------------------"); //$NON-NLS-1$
-// out.println("Typ: " + getDeviceTourType()); //$NON-NLS-1$
+// out.println("Type: " + getDeviceTourType()); //$NON-NLS-1$
       out.println("Date:               " + startDay + UI.SYMBOL_DOT + startMonth + UI.SYMBOL_DOT + startYear); //$NON-NLS-1$
       out.println("Time:               " + startHour + UI.SYMBOL_COLON + startMinute); //$NON-NLS-1$
       out.println("Total distance:     " + getStartDistance()); //$NON-NLS-1$
@@ -8500,7 +8500,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       if (isSwimCadence) {
 
-         // cadence is computed from swim cadence, these cadence values are not saaved
+         // cadence is computed from swim cadence, these cadence values are not saved
 
          return getSwim_Cadence();
 
@@ -9443,7 +9443,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    /**
     * @return An array containing the end time of each pause (in milliseconds)A timer pause is a
-    *         device event, triggered by the user or automatically triggerd by the device.
+    *         device event, triggered by the user or automatically triggered by the device.
     */
    public long[] getPausedTime_End() {
       return pausedTime_End;
@@ -9451,7 +9451,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    /**
     * @return An array containing the start time of each pause (in milliseconds)A timer pause is a
-    *         device event, triggered by the user or automatically triggerd by the device.
+    *         device event, triggered by the user or automatically triggered by the device.
     */
    public long[] getPausedTime_Start() {
       return pausedTime_Start;
@@ -9813,7 +9813,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          } else if (rrIndex_Next < 0) {
 
-            // translation is currently diabled because I cannot remember when this case occur
+            // translation is currently disabled because I cannot remember when this case occur
             sb.append("Next: " + rrIndex_Next); //$NON-NLS-1$
 
          }

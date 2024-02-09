@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2023 Frédéric Bard
+ * Copyright (C) 2020, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,6 @@ import com.dropbox.core.v2.files.Metadata;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.cloud.Activator;
@@ -52,7 +51,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
@@ -163,6 +161,7 @@ class DialogDropboxFolderBrowser extends TitleAreaDialog {
     * @param parent
     * @param dropboxMessage
     *           The error message from Dropbox
+    *
     * @return
     */
    private Composite createErrorMessageUI(final Composite parent, final String dropboxMessage) {
@@ -174,8 +173,7 @@ class DialogDropboxFolderBrowser extends TitleAreaDialog {
          /*
           * Error message obtained when trying to retrieve the Dropbox folder content
           */
-         final Label labelErrorMessage = new Label(container, SWT.LEFT);
-         labelErrorMessage.setText(dropboxMessage);
+         UI.createLabel(container, dropboxMessage, SWT.LEFT);
       }
 
       return container;
@@ -248,8 +246,7 @@ class DialogDropboxFolderBrowser extends TitleAreaDialog {
       layouter.addColumnData(new ColumnWeightData(1));
 
       _contentViewer.setContentProvider((IStructuredContentProvider) inputElement -> {
-         final Object[] sortedElements = _folderList.stream().sorted((f1, f2) -> f1.getName().compareToIgnoreCase(f2.getName())).collect(Collectors
-               .toList()).toArray();
+         final Object[] sortedElements = _folderList.stream().sorted((f1, f2) -> f1.getName().compareToIgnoreCase(f2.getName())).toArray();
          return sortedElements;
       });
 

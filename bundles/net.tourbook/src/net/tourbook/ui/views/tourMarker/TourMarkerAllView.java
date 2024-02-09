@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -95,9 +95,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -142,7 +140,6 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
    //
    private PostSelectionProvider       _postSelectionProvider;
    //
-   private IPartListener2              _partListener;
    private ISelectionListener          _postSelectionListener;
    private IPropertyChangeListener     _prefChangeListener;
    private IPropertyChangeListener     _prefChangeListener_Common;
@@ -533,38 +530,6 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
       _markerViewer.getTable().setFocus();
    }
 
-   private void addPartListener() {
-
-      _partListener = new IPartListener2() {
-
-         @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partClosed(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partHidden(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partVisible(final IWorkbenchPartReference partRef) {}
-      };
-
-      getViewSite().getPage().addPartListener(_partListener);
-   }
-
    private void addPrefListener() {
 
       _prefChangeListener = propertyChangeEvent -> {
@@ -694,7 +659,6 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
       addTourEventListener();
       addPrefListener();
-      addPartListener();
       addSelectionListener();
 
       // set selection provider
@@ -1110,7 +1074,6 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-      getViewSite().getPage().removePartListener(_partListener);
       getViewSite().getPage().removePostSelectionListener(_postSelectionListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
@@ -1344,11 +1307,9 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
       for (final Object element : selection) {
 
-         if (element instanceof TourMarkerItem) {
+         if (element instanceof final TourMarkerItem tourMarkerItem) {
 
             // get TourData from the tour marker item
-
-            final TourMarkerItem tourMarkerItem = (TourMarkerItem) element;
 
             // get tour by id
             final TourData tourData = TourManager.getInstance().getTourData(tourMarkerItem.tourId);
@@ -1585,7 +1546,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
          final ArrayList<TourMarker> allTourMarker = selection.getSelectedTourMarker();
 
          // ensure that at least one marker is available
-         if (allTourMarker.size() == 0) {
+         if (allTourMarker.isEmpty()) {
             return;
          }
 
