@@ -65,6 +65,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -260,6 +261,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       super.createButtonsForButtonBar(parent);
       getButton(IDialogConstants.OK_ID).setVisible(false);
       getButton(IDialogConstants.CANCEL_ID).setVisible(false);
+
+      final GridLayout layout = (GridLayout) parent.getLayout();
+      layout.marginHeight = 0;
    }
 
    @Override
