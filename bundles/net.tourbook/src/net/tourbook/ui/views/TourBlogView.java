@@ -34,6 +34,7 @@ import java.util.Set;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
@@ -103,37 +104,35 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourBlogView extends ViewPart {
 
-   static final String         ID                                              = "net.tourbook.ui.views.TourBlogView";         //$NON-NLS-1$
+   static final String         ID                                              = "net.tourbook.ui.views.TourBlogView";      //$NON-NLS-1$
 
    private static final String NL                                              = UI.NEW_LINE1;
 
-   private static final String SPACER                                          = "<div>&nbsp;</div>";                          //$NON-NLS-1$
+   private static final String SPACER                                          = "<div>&nbsp;</div>";                       //$NON-NLS-1$
 
-   private static final String TOUR_BLOG_CSS                                   = "/tourbook/resources/tour-blog.css";          //$NON-NLS-1$
+   private static final String TOUR_BLOG_CSS                                   = "/tourbook/resources/tour-blog.css";       //$NON-NLS-1$
 
-   static final String         STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR         = "STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR";    //$NON-NLS-1$
+   static final String         STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR         = "STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR"; //$NON-NLS-1$
    static final boolean        STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT = false;
-   static final String         STATE_IS_SHOW_HIDDEN_MARKER                     = "STATE_IS_SHOW_HIDDEN_MARKER";                //$NON-NLS-1$
+   static final String         STATE_IS_SHOW_HIDDEN_MARKER                     = "STATE_IS_SHOW_HIDDEN_MARKER";             //$NON-NLS-1$
    static final boolean        STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT             = true;
-   static final String         STATE_IS_SHOW_TOUR_TAGS                         = "STATE_IS_SHOW_TOUR_TAGS";                    //$NON-NLS-1$
+   static final String         STATE_IS_SHOW_TOUR_TAGS                         = "STATE_IS_SHOW_TOUR_TAGS";                 //$NON-NLS-1$
    static final boolean        STATE_IS_SHOW_TOUR_TAGS_DEFAULT                 = true;
 
-   private static final String EXTERNAL_LINK_URL                               = "http";                                       //$NON-NLS-1$
-   private static final String HREF_TOKEN                                      = "#";                                          //$NON-NLS-1$
-   private static final String PAGE_ABOUT_BLANK                                = "about:blank";                                //$NON-NLS-1$
-
-   private static final String VALUE_UNIT_KCALORIES                            = net.tourbook.ui.Messages.Value_Unit_KCalories;
+   private static final String EXTERNAL_LINK_URL                               = "http";                                    //$NON-NLS-1$
+   private static final String HREF_TOKEN                                      = "#";                                       //$NON-NLS-1$
+   private static final String PAGE_ABOUT_BLANK                                = "about:blank";                             //$NON-NLS-1$
 
    /**
     * This is necessary otherwise XULrunner in Linux do not fire a location change event.
     */
-   private static final String HTTP_DUMMY                                      = "http://dummy";                               //$NON-NLS-1$
+   private static final String HTTP_DUMMY                                      = "http://dummy";                            //$NON-NLS-1$
 
-   private static final String ACTION_EDIT_TOUR                                = "EditTour";                                   //$NON-NLS-1$
-   private static final String ACTION_EDIT_MARKER                              = "EditMarker";                                 //$NON-NLS-1$
-   private static final String ACTION_HIDE_MARKER                              = "HideMarker";                                 //$NON-NLS-1$
-   private static final String ACTION_OPEN_MARKER                              = "OpenMarker";                                 //$NON-NLS-1$
-   private static final String ACTION_SHOW_MARKER                              = "ShowMarker";                                 //$NON-NLS-1$
+   private static final String ACTION_EDIT_TOUR                                = "EditTour";                                //$NON-NLS-1$
+   private static final String ACTION_EDIT_MARKER                              = "EditMarker";                              //$NON-NLS-1$
+   private static final String ACTION_HIDE_MARKER                              = "HideMarker";                              //$NON-NLS-1$
+   private static final String ACTION_OPEN_MARKER                              = "OpenMarker";                              //$NON-NLS-1$
+   private static final String ACTION_SHOW_MARKER                              = "ShowMarker";                              //$NON-NLS-1$
 
    private static String       HREF_EDIT_TOUR;
    private static String       HREF_EDIT_MARKER;
@@ -398,7 +397,7 @@ public class TourBlogView extends ViewPart {
       final String averageCaloriesPerHour = NutritionUtils.computeAverageCaloriesPerHour(_tourData);
       sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Calories,
             averageCaloriesPerHour,
-            VALUE_UNIT_KCALORIES + UI.SLASH + UI.UNIT_LABEL_TIME));
+            OtherMessages.VALUE_UNIT_K_CALORIES + UI.SLASH + UI.UNIT_LABEL_TIME));
       // Average sodium per L
       final String averageSodiumPerHour = NutritionUtils.computeAverageSodiumPerHour(_tourData);
       sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Sodium,
