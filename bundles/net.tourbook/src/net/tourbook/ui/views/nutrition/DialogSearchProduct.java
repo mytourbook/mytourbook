@@ -766,6 +766,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
          _lblKeywords.setEnabled(true);
          _comboSearchQuery.setEnabled(true);
+         if (net.tourbook.common.util.StringUtils.hasContent(errorMessage)) {
+            _comboSearchQuery.setFocus();
+         }
          _btnSearch.setEnabled(true);
          _comboSearchType.setEnabled(true);
          _lblSearchType.setEnabled(true);
