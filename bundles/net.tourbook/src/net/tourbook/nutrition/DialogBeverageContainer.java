@@ -77,7 +77,7 @@ class DialogBeverageContainer extends Dialog {
       _isInUIInit = true;
       {
          createUI(container);
-         fillUI();
+         updateUI();
       }
       _isInUIInit = false;
 
@@ -130,13 +130,6 @@ class DialogBeverageContainer extends Dialog {
       }
    }
 
-   private void fillUI() {
-
-      _txtName.setText(_name);
-      _spinnerCapacity.setSelection(Math.round(_capacity * 100));
-
-   }
-
    public float getCapacity() {
       return _capacity;
    }
@@ -169,6 +162,12 @@ class DialogBeverageContainer extends Dialog {
 
    public void setName(final String name) {
       _name = name;
+   }
+
+   private void updateUI() {
+
+      _txtName.setText(_name);
+      _spinnerCapacity.setSelection(Math.round(_capacity * 100));
    }
 
    private void validateFields() {
