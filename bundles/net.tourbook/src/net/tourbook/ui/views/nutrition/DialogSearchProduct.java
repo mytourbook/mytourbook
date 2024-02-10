@@ -566,8 +566,14 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
          if (event.type == SWT.MouseDoubleClick) {
 
-            onAddProduct();
+            final Object selectedItem = ((IStructuredSelection) _productsViewer.getSelection()).getFirstElement();
+            if (selectedItem == null) {
+               return;
+            }
 
+            final Product product = (Product) selectedItem;
+
+            NutritionUtils.openProductWebPage(product.code);
          }
       };
       _productsViewer.getTable().addListener(SWT.MouseDoubleClick, doubleClickListener);

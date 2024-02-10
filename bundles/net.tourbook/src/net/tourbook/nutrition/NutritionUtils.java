@@ -39,7 +39,6 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
@@ -47,6 +46,7 @@ import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.web.WEB;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 public class NutritionUtils {
@@ -60,6 +60,7 @@ public class NutritionUtils {
    private static final String           OPENFOODFACTS_SEARCH_BY_CODE_URL =
          "https://world.openfoodfacts.org/api/v3/product/%s?fields=code,brands,product_name,nutriscore_data,nutrition_data_per,nutriments,quantity,product_quantity,serving_quantity,serving_size"; //$NON-NLS-1$
 
+   public static final String            OPENFOODFACTS_BASEPATH           = "https://world.openfoodfacts.org/product/";                                                                             //$NON-NLS-1$
    private static HttpClient             _httpClient                      = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(1)).build();
 
    private static final IPreferenceStore _prefStore                       = TourbookPlugin.getPrefStore();
@@ -164,7 +165,7 @@ public class NutritionUtils {
    private static String getProductFullName(final String brand, final String name) {
 
       return Stream.of(brand, name)
-            .filter(string -> StringUtils.hasContent(string))
+            .filter(string -> net.tourbook.common.util.StringUtils.hasContent(string))
             .collect(Collectors.joining(UI.DASH_WITH_SPACE));
    }
 
@@ -256,6 +257,13 @@ public class NutritionUtils {
       return totalSodium;
    }
 
+   public static void openProductWebPage(final String productCode) {
+
+      if (StringUtils.isNumeric(productCode)) {
+         WEB.openUrl(OPENFOODFACTS_BASEPATH + productCode);
+      }
+   }
+
    static List<Product> searchProduct(final String searchText, final ProductSearchType productSearchType) {
 
       String searchUrl = UI.EMPTY_STRING;
@@ -280,7 +288,7 @@ public class NutritionUtils {
       try {
          final HttpResponse<String> response = _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-         if (response.statusCode() == HttpURLConnection.HTTP_OK && StringUtils.hasContent(response.body())) {
+         if (response.statusCode() == HttpURLConnection.HTTP_OK && net.tourbook.common.util.StringUtils.hasContent(response.body())) {
 
             return deserializeResponse(response.body(), productSearchType);
 
