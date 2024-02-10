@@ -949,7 +949,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             final int caloriesValue = tourNutritionProduct.getQuantityType() == QuantityType.Products
                   ? tourNutritionProduct.getCalories()
                   : tourNutritionProduct.getCalories_Serving();
-            cell.setText(String.valueOf(caloriesValue));
+
+            final String text = caloriesValue == 0
+                  ? UI.EMPTY_STRING
+                  : String.valueOf(caloriesValue);
+            cell.setText(text);
          }
       });
    }
@@ -975,7 +979,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             final int sodiumValue = tourNutritionProduct.getQuantityType() == QuantityType.Products
                   ? tourNutritionProduct.getSodium()
                   : tourNutritionProduct.getSodium_Serving();
-            cell.setText(String.valueOf(sodiumValue));
+
+            final String text = sodiumValue == 0
+                  ? UI.EMPTY_STRING
+                  : String.valueOf(sodiumValue);
+            cell.setText(text);
          }
       });
    }
