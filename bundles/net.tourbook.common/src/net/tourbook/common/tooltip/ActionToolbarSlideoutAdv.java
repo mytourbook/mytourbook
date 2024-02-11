@@ -161,6 +161,17 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
     * @return Returns <code>true</code> when the action is selected, otherwise <code>false</code>.
     */
    public boolean getSelection() {
+
+      if (_actionToolItem == null) {
+
+         /*
+          * This case happend when MT was shutting down
+          * https://github.com/mytourbook/mytourbook/issues/1290
+          */
+
+         return false;
+      }
+
       return _actionToolItem.getSelection();
    }
 

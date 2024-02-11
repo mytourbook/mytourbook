@@ -57,6 +57,9 @@ Improvements
 * Tour Book
   - Show powertrain L-R balance values separately
     https://github.com/mytourbook/mytourbook/issues/1271
+
+* Tour Blog (Frederic)
+  - Displaying the main numbers of the tour (distance, elevation gain/loss...)
   
 
 Changes
@@ -71,6 +74,9 @@ Bugfix
 * TCX Import (Frederic)
   - Fix for average and maximum power computation
     https://github.com/mytourbook/mytourbook/discussions/1268
+
+* Suunto XML/SML Import (Frederic)
+  - Fix for the calories import values
 
 
 Translation    
