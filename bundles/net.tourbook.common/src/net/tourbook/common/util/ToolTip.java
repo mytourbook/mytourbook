@@ -13,8 +13,6 @@ package net.tourbook.common.util;
 
 import java.util.HashMap;
 
-import net.tourbook.common.UI;
-
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
@@ -124,12 +122,12 @@ public abstract class ToolTip {
                 * wolfgang 2010-07-23
                 */
                final Rectangle shellRectangle = shell.getBounds();
-               
+
 //					rect.x += 5;
 //					rect.y += 5;
 //					rect.width -= 10;
 //					rect.height -= 10;
-               
+
                final int margin = 1;
                shellRectangle.x += margin;
                shellRectangle.y += margin;
@@ -575,12 +573,15 @@ public abstract class ToolTip {
          // Only change if value really changed
          if (hideOnMouseDown != this.isHideOnMouseDown) {
 
-            _control.getDisplay().syncExec(() -> {
+            if (_control.isDisposed() == false) {
 
-               if (_tooltipShell != null && _tooltipShell.isDisposed()) {
-                  toolTipHookByTypeRecursively(_tooltipShell, hideOnMouseDown, SWT.MouseDown);
-               }
-            });
+               _control.getDisplay().syncExec(() -> {
+
+                  if (_tooltipShell != null && _tooltipShell.isDisposed()) {
+                     toolTipHookByTypeRecursively(_tooltipShell, hideOnMouseDown, SWT.MouseDown);
+                  }
+               });
+            }
          }
       }
 

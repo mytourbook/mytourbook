@@ -435,11 +435,16 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Sensor_Description;
    public static String        ColumnFactory_Sensor_ManufacturerName;
    public static String        ColumnFactory_Sensor_ManufacturerNumber;
+   public static String        ColumnFactory_Sensor_ManufacturerNumber_Header;
    public static String        ColumnFactory_Sensor_Name;
    public static String        ColumnFactory_Sensor_Name_Tooltip;
+   public static String        ColumnFactory_Sensor_NameKey;
+   public static String        ColumnFactory_Sensor_NameKey_Tooltip;
    public static String        ColumnFactory_Sensor_ProductName;
    public static String        ColumnFactory_Sensor_ProductNumber;
+   public static String        ColumnFactory_Sensor_ProductNumber_Header;
    public static String        ColumnFactory_Sensor_SerialNumber;
+   public static String        ColumnFactory_Sensor_SerialNumber_Header;
    public static String        ColumnFactory_Sensor_Time_FirstUsed;
    public static String        ColumnFactory_Sensor_Time_LastUsed;
    public static String        ColumnFactory_Sensor_Type;

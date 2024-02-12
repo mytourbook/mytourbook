@@ -40,6 +40,8 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
@@ -531,6 +533,69 @@ public class TourBlogView extends ViewPart {
       return tagsSectionString;
    }
 
+   private String buildTourSummary() {
+
+      final StringBuilder sb = new StringBuilder();
+
+      // Distance
+      final float tourDistance = _tourData.getTourDistance();
+      if (tourDistance > 0) {
+         sb.append("&#128207;" + UI.SPACE1); //$NON-NLS-1$
+         final float distance = tourDistance / UI.UNIT_VALUE_DISTANCE;
+         sb.append(FormatManager.formatDistance(distance / 1000.0));
+         sb.append(UI.SPACE1 + UI.UNIT_LABEL_DISTANCE + UI.SPACE3);
+      }
+
+      // Time
+      final long tourRecordedTime = _tourData.getTourDeviceTime_Recorded();
+      if (tourRecordedTime > 0) {
+         sb.append("&#9201;" + UI.SPACE1); //$NON-NLS-1$
+         sb.append(FormatManager.formatRecordedTime(_tourData.getTourDeviceTime_Recorded()));
+         sb.append(UI.SPACE3);
+      }
+
+      // Elevation gain
+      final float elevationGain = _tourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION;
+      if (elevationGain > 0) {
+         sb.append("&#8599;" + UI.SPACE1); //$NON-NLS-1$
+         sb.append(FormatManager.formatElevation(elevationGain));
+         sb.append(UI.SPACE1 + UI.UNIT_LABEL_ELEVATION + UI.SPACE3);
+      }
+
+      // Elevation loss
+      final float elevationLoss = _tourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION;
+      if (elevationLoss > 0) {
+         sb.append("&#8600;" + UI.SPACE1); //$NON-NLS-1$
+         sb.append(FormatManager.formatElevation(elevationLoss));
+         sb.append(UI.SPACE1 + UI.UNIT_LABEL_ELEVATION + UI.SPACE3);
+      }
+
+      // Calories
+      final float calories = _tourData.getCalories() / 1000f;
+      if (calories > 0) {
+         sb.append("&#128293;" + UI.SPACE1); //$NON-NLS-1$
+         sb.append(new ValueFormatter_Number_1_0().printDouble(calories));
+         sb.append(UI.SPACE1 + OtherMessages.VALUE_UNIT_K_CALORIES + UI.SPACE3);
+      }
+
+      // Body weight
+      final float bodyWeight = _tourData.getBodyWeight() * UI.UNIT_VALUE_WEIGHT;
+      if (bodyWeight > 0) {
+         sb.append("&#9878;" + UI.SPACE1); //$NON-NLS-1$
+         sb.append(new ValueFormatter_Number_1_0().printDouble(bodyWeight));
+         sb.append(UI.SPACE1 + UI.UNIT_LABEL_WEIGHT + UI.SPACE3);
+      }
+
+      // Body fat
+      final float bodyFat = _tourData.getBodyFat();
+      if (bodyFat > 0) {
+         sb.append(new ValueFormatter_Number_1_0().printDouble(bodyFat));
+         sb.append(UI.SPACE1 + UI.SYMBOL_PERCENTAGE + UI.SPACE3);
+      }
+
+      return sb.toString();
+   }
+
    private String buildWeatherSection(String tourWeather, final boolean addSpacer) {
 
       final StringBuilder sb = new StringBuilder();
@@ -658,6 +723,7 @@ public class TourBlogView extends ViewPart {
       final String tourDescription = _tourData.getTourDescription();
       final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
       final Set<TourTag> tourTags = _tourData.getTourTags();
+      String tourSummary = buildTourSummary();
       final String tourWeather = WeatherUtils.buildWeatherDataString(_tourData,
             true, // isdisplayMaximumMinimumTemperature
             true, // isDisplayPressure
@@ -667,13 +733,19 @@ public class TourBlogView extends ViewPart {
       final boolean isDescription = tourDescription.length() > 0;
       final boolean isNutrition = tourNutritionProducts.size() > 0;
       final boolean isTitle = tourTitle.length() > 0;
+      final boolean isTourSummary = tourSummary.length() > 0;
       final boolean isTourTags = tourTags.size() > 0;
       final boolean isWeather = tourWeather.length() > 0;
 
-      if (isDescription || isTitle || isWeather || isTourTags || isNutrition) {
+      if (isDescription || isTourSummary || isTitle || isWeather || isTourTags || isNutrition) {
 
          sb.append("<div class='action-hover-container' style='margin-top:15px; margin-bottom: 5px;'>" + NL); //$NON-NLS-1$
          {
+
+            if (UI.IS_SCRAMBLE_DATA) {
+               tourSummary = UI.scrambleText(tourSummary);
+            }
+            sb.append(tourSummary);
 
             sb.append("<div class='blog-item'>"); //$NON-NLS-1$
             {

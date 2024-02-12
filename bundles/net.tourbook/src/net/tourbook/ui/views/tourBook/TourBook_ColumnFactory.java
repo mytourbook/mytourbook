@@ -1707,6 +1707,10 @@ class TourBook_ColumnFactory {
 
             final int leftRightValue = ((TVITourBookItem) element).colPower_PedalLeftRightBalance;
 
+            if (leftRightValue == 0) {
+               return UI.EMPTY_STRING;
+            }
+
             final int rightValue100 = leftRightValue - 0x8000;
 
             final float rightValue = rightValue100 / 100.0f;

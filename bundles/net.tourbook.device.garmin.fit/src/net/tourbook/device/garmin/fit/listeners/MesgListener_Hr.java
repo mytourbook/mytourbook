@@ -105,7 +105,7 @@ public class MesgListener_Hr extends AbstractMesgListener implements HrMesgListe
          return;
       }
 
-      final List<TimeData> allTimeData = fitData.getAllTimeData();
+      final List<TimeData> allTimeData = fitData.getTimeData();
 
       /*
        * Get time diff between tour and hr recording. It is complicated because it also contains the
