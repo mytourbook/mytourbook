@@ -1387,6 +1387,45 @@ public class TourLocationManager {
       return osmLocation;
    }
 
+   /**
+    * @param requestedLocationProfile
+    *
+    * @return Returns the index of the requested profile
+    */
+   public static int getProfileIndex(final TourLocationProfile requestedLocationProfile) {
+
+      final TourLocationProfile defaultProfile = getDefaultProfile();
+
+      if (requestedLocationProfile == null && defaultProfile != null) {
+
+         // return the index of the default profile
+
+         for (int profileIndex = 0; profileIndex < _allLocationProfiles.size(); profileIndex++) {
+
+            final TourLocationProfile locationProfile = _allLocationProfiles.get(profileIndex);
+
+            if (locationProfile == defaultProfile) {
+
+               return profileIndex;
+            }
+         }
+
+      } else {
+
+         for (int profileIndex = 0; profileIndex < _allLocationProfiles.size(); profileIndex++) {
+
+            final TourLocationProfile locationProfile = _allLocationProfiles.get(profileIndex);
+
+            if (locationProfile == requestedLocationProfile) {
+
+               return profileIndex;
+            }
+         }
+      }
+
+      return 0;
+   }
+
    public static List<TourLocationProfile> getProfiles() {
 
       return _allLocationProfiles;
@@ -1855,7 +1894,7 @@ public class TourLocationManager {
       if (_defaultProfile == null && numProfiles > 0) {
 
          // set first profile as default
-         
+
          _defaultProfile = _allLocationProfiles.get(0);
       }
    }
