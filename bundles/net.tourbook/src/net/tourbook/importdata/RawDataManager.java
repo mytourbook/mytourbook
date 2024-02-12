@@ -3137,7 +3137,7 @@ public class RawDataManager {
                                                          final ImportState_Process importState_Process,
                                                          final ReImportStatus reImportStatus) {
 
-      final Shell activeShell = Display.getDefault().getActiveShell();
+      final Shell activeShell = TourbookPlugin.getAppShell();
 
       // during initialization there is no active shell
       if (activeShell == null) {
