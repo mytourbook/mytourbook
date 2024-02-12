@@ -146,6 +146,7 @@ public class UI {
    public static final char         SYMBOL_BRACKET_RIGHT                 = ')';
 
    public static final String       COMMA_SPACE                          = ", ";                                        //$NON-NLS-1$
+   /** This is not a real dash it's the negative sign character */
    public static final String       DASH                                 = "-";                                         //$NON-NLS-1$
    public static final String       DASH_WITH_SPACE                      = " - ";                                       //$NON-NLS-1$
    public static final String       DASH_WITH_DOUBLE_SPACE               = "   -   ";                                   //$NON-NLS-1$
@@ -189,6 +190,7 @@ public class UI {
    public static final String       SYMBOL_BLACK_LARGE_CIRCLE            = "\u2B24";                                    //$NON-NLS-1$
    public static final String       SYMBOL_BOX                           = "\u25a0";                                    //$NON-NLS-1$
    public static final String       SYMBOL_BULLET                        = "\u2022";                                    //$NON-NLS-1$
+   /** This is the real dash and not the negative sign character */
    public static final String       SYMBOL_DASH                          = "\u2212";                                    //$NON-NLS-1$
    public static final String       SYMBOL_DEGREE                        = "\u00B0";                                    //$NON-NLS-1$
    public static final String       SYMBOL_DBL_ANGLE_QMARK_LEFT          = "\u00AB";                                    //$NON-NLS-1$

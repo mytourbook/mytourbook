@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.database.TourDatabase;
@@ -382,7 +383,6 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
    }
 
    private void setSensorData_WithName(final DeviceInfoMesg mesg) {
-      // TODO Auto-generated method stub
 
 // SET_FORMATTING_OFF
 
@@ -432,7 +432,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                mesgProductNumber == null ? -1 : mesgProductNumber,
                productName,
 
-               null // serialNumber
+               null // serialNumber is not available
          );
       }
 
@@ -451,8 +451,6 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
          if (dbManufacturerName != null && dbManufacturerName.equals(manufacturerName)
                && dbProductName != null && dbProductName.equals(productName)) {
-
-//         if (importedSensor.getSerialNumber().equals(sensorSerialNumberKey)) {
 
             // sensor found in sensor values
 
@@ -526,7 +524,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
       /*
        * Get sensor
        */
-      final Map<String, DeviceSensor> allDbSensors = TourDatabase.getAllDeviceSensors_BySerialNo();
+      final Map<String, DeviceSensor> allDbSensors = TourDatabase.getAllDeviceSensors_BySerialNum();
 
       DeviceSensor sensor = allDbSensors.get(sensorSerialNumberKey);
 
@@ -557,7 +555,6 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
             mesgProductName,
             mesgGarminProductNumber);
 
-
       /*
        * Get sensor value
        */
@@ -568,7 +565,10 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
          final DeviceSensor importedSensor = importedSensorValue.getDeviceSensor();
 
-         if (importedSensor.getSerialNumber().equals(sensorSerialNumberKey)) {
+         final String importedSerialNumber = importedSensor.getSerialNumber();
+
+         if (StringUtils.hasContent(importedSerialNumber)
+               && importedSerialNumber.equals(sensorSerialNumberKey)) {
 
             // sensor found in sensor values
 

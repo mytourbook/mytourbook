@@ -78,6 +78,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.search.FTSearchManager;
 import net.tourbook.tag.TagCollection;
+import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.SQLFilter;
@@ -350,9 +351,11 @@ public class TourDatabase {
    private static volatile Map<Long, DeviceSensor>        _allDbDeviceSensors_BySensorID;
 
    /**
+    * This collection contains <b>ONLY</b> sensors which have a serial number.
+    * <P>
     * Key is the serial number in UPPERCASE
     */
-   private static volatile Map<String, DeviceSensor>      _allDbDeviceSensors_BySerialNo;
+   private static volatile Map<String, DeviceSensor>      _allDbDeviceSensors_BySerialNum;
 
    /*
     * Cached distinct fields
@@ -875,12 +878,14 @@ public class TourDatabase {
     */
    public static synchronized void clearDeviceSensors() {
 
-      if (_allDbDeviceSensors_BySerialNo != null) {
-         _allDbDeviceSensors_BySerialNo.clear();
-         _allDbDeviceSensors_BySerialNo = null;
+      if (_allDbDeviceSensors_BySerialNum != null) {
+
+         _allDbDeviceSensors_BySerialNum.clear();
+         _allDbDeviceSensors_BySerialNum = null;
       }
 
       if (_allDbDeviceSensors_BySensorID != null) {
+
          _allDbDeviceSensors_BySensorID.clear();
          _allDbDeviceSensors_BySensorID = null;
       }
@@ -1431,18 +1436,18 @@ public class TourDatabase {
    }
 
    /**
-    * @return Returns a map with all {@link DeviceSensor} which are stored in the database, key is
-    *         the serial number in UPPERCASE
+    * @return Returns a map with all {@link DeviceSensor} which have a serial number and are stored
+    *         in the database, key is the serial number in UPPERCASE
     */
-   public static Map<String, DeviceSensor> getAllDeviceSensors_BySerialNo() {
+   public static Map<String, DeviceSensor> getAllDeviceSensors_BySerialNum() {
 
-      if (_allDbDeviceSensors_BySerialNo != null) {
-         return _allDbDeviceSensors_BySerialNo;
+      if (_allDbDeviceSensors_BySerialNum != null) {
+         return _allDbDeviceSensors_BySerialNum;
       }
 
       loadAllDeviceSensors();
 
-      return _allDbDeviceSensors_BySerialNo;
+      return _allDbDeviceSensors_BySerialNum;
    }
 
    /**
@@ -2626,7 +2631,7 @@ public class TourDatabase {
       synchronized (DB_LOCK) {
 
          // check again, field must be volatile to work correctly
-         if (_allDbDeviceSensors_BySerialNo != null) {
+         if (_allDbDeviceSensors_BySerialNum != null) {
             return;
          }
 
@@ -2651,7 +2656,13 @@ public class TourDatabase {
                   final DeviceSensor sensor = (DeviceSensor) result;
 
                   allDbDeviceSensors_BySensorID.put(sensor.getSensorId(), sensor);
-                  allDbDeviceSensors_BySerialNo.put(sensor.getSerialNumber().toUpperCase(), sensor);
+
+                  final String serialNumber = sensor.getSerialNumber();
+
+                  if (StringUtils.hasContent(serialNumber)) {
+
+                     allDbDeviceSensors_BySerialNo.put(serialNumber.toUpperCase(), sensor);
+                  }
                }
             }
 
@@ -2659,7 +2670,7 @@ public class TourDatabase {
          }
 
          _allDbDeviceSensors_BySensorID = allDbDeviceSensors_BySensorID;
-         _allDbDeviceSensors_BySerialNo = allDbDeviceSensors_BySerialNo;
+         _allDbDeviceSensors_BySerialNum = allDbDeviceSensors_BySerialNo;
       }
    }
 
@@ -3040,7 +3051,10 @@ public class TourDatabase {
 
          } catch (final Exception e) {
 
-            StatusUtil.logError("Exception in tour " + TourManager.getTourDateTimeShort(tourData));//$NON-NLS-1$
+            StatusUtil.logError("Exception in tour %s - ID: %s".formatted( //$NON-NLS-1$
+                  TourManager.getTourDateTimeFull(tourData),
+                  tourData.getTourId()));
+
             StatusUtil.showStatus(e);
 
          } finally {
@@ -3289,13 +3303,22 @@ public class TourDatabase {
     */
    private static void saveTransientInstances(final TourData tourData) {
 
-      saveTransientInstances_Tags(tourData);
-      saveTransientInstances_TourLocation(tourData);
-      saveTransientInstances_TourType(tourData);
-      saveTransientInstances_Sensors(tourData);
+      try {
+
+         saveTransientInstances_Tags(tourData);
+         saveTransientInstances_TourLocation(tourData);
+         saveTransientInstances_TourType(tourData);
+         saveTransientInstances_Sensors(tourData);
+
+      } catch (final Exception e) {
+
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
+      }
    }
 
    /**
+    * Save sensor instances which are not yet saved, they have to be saved before the tour is saved.
+    *
     * @param tourData
     */
    private static void saveTransientInstances_Sensors(final TourData tourData) {
@@ -3306,93 +3329,145 @@ public class TourDatabase {
          return;
       }
 
-      final ArrayList<DeviceSensor> allNotSavedSensors = new ArrayList<>();
+      final List<DeviceSensor> allNotSavedSensors = new ArrayList<>();
 
-      final HashMap<String, DeviceSensor> allDbSensors = new HashMap<>(getAllDeviceSensors_BySerialNo());
+      saveTransientInstances_Sensors_1_GetNotSaved(allTourData_SensorValues, allNotSavedSensors);
 
-      // loop: all sensor values in the tour -> find sensors which are not yet saved
+      if (allNotSavedSensors.size() > 0) {
+
+         // there are sensors which are not yet saved -> save new sensors
+
+         saveTransientInstances_Sensors_2_Save(allTourData_SensorValues, allNotSavedSensors);
+      }
+   }
+
+   /**
+    * Find sensors which are not yet saved, which are transient
+    *
+    * @param allTourData_SensorValues
+    * @param allNotSavedSensors
+    */
+   private static void saveTransientInstances_Sensors_1_GetNotSaved(final Set<DeviceSensorValue> allTourData_SensorValues,
+                                                                    final List<DeviceSensor> allNotSavedSensors) {
+
+      // loop: all sensor (values) in the tour -> find sensors which are not yet saved
+
       for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
 
          final DeviceSensor tourData_Sensor = tourData_SensorValue.getDeviceSensor();
 
          final long sensorId = tourData_Sensor.getSensorId();
 
-         if (sensorId != ENTITY_IS_NOT_SAVED) {
+         if (sensorId == ENTITY_IS_NOT_SAVED) {
 
-            // sensor is saved
-
-            continue;
-         }
-
-         // sensor is not yet saved
-         // 1. sensor can still be new
-         // 2. sensor is already created but not updated in the not yet saved tour
-
-         final DeviceSensor dbSensor = allDbSensors.get(tourData_Sensor.getSerialNumber().toUpperCase());
-
-         if (dbSensor == null) {
-
-            // sensor not available -> create a new sensor
+            // sensor is NOT yet saved
 
             allNotSavedSensors.add(tourData_Sensor);
          }
       }
+   }
 
-      boolean isNewSensorSaved = false;
+   private static void saveTransientInstances_Sensors_2_Save(final Set<DeviceSensorValue> allTourData_SensorValues,
+                                                             final List<DeviceSensor> allNotSavedSensors) {
 
-      if (allNotSavedSensors.size() > 0) {
+      synchronized (TRANSIENT_LOCK) {
 
-         // create new sensors
+         HashMap<Long, DeviceSensor> allDbSensors_BySensorID = new HashMap<>(getAllDeviceSensors_BySensorID());
+         HashMap<String, DeviceSensor> allDbSensors_BySerialNum = new HashMap<>(getAllDeviceSensors_BySerialNum());
 
-         synchronized (TRANSIENT_LOCK) {
+         for (final DeviceSensor notSavedSensor : allNotSavedSensors) {
 
-            HashMap<String, DeviceSensor> allDbSensors_InLock = new HashMap<>(getAllDeviceSensors_BySerialNo());
+            final String serialNumber = notSavedSensor.getSerialNumber();
 
-            for (final DeviceSensor newSensor : allNotSavedSensors) {
+            if (StringUtils.hasContent(serialNumber)) {
 
-               // check again, sensor list could be updated in another thread
-               final DeviceSensor dbSensor = allDbSensors_InLock.get(newSensor.getSerialNumber().toUpperCase());
+               // sensor WITH serial #
+
+               final DeviceSensor dbSensor = allDbSensors_BySerialNum.get(serialNumber.toUpperCase());
 
                if (dbSensor == null) {
 
                   // sensor is not yet in db -> create it
 
-                  saveEntity(
-                        newSensor,
-                        ENTITY_IS_NOT_SAVED,
-                        DeviceSensor.class);
-
-                  isNewSensorSaved = true;
+                  saveEntity(notSavedSensor, ENTITY_IS_NOT_SAVED, DeviceSensor.class);
                }
-            }
 
-            if (isNewSensorSaved) {
+            } else {
 
-               /*
-                * Replace sensor in sensor values
-                */
+               // sensor WITHOUT serial #
 
-               // force to reload db sensors
-               clearDeviceSensors();
-               TourManager.getInstance().clearTourDataCache();
+               final String tourData_SensorKey = notSavedSensor.getSensorKeyByName();
 
-               allDbSensors_InLock = new HashMap<>(getAllDeviceSensors_BySerialNo());
+               boolean isSensorInDb = false;
 
-               // loop: all sensor values in the tour -> find sensors which are not yet saved
-               for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
+               for (final DeviceSensor dbSensor : allDbSensors_BySensorID.values()) {
 
-                  final DeviceSensor tourData_Sensor = tourData_SensorValue.getDeviceSensor();
+                  if (dbSensor.getSensorKeyByName().equals(tourData_SensorKey)) {
 
-                  final String serialNumberKey = tourData_Sensor.getSerialNumber().toUpperCase();
+                     isSensorInDb = true;
 
-                  final DeviceSensor deviceSensor = allDbSensors_InLock.get(serialNumberKey);
+                     break;
+                  }
+               }
 
-                  tourData_SensorValue.setDeviceSensor(deviceSensor);
+               if (isSensorInDb == false) {
+
+                  // sensor is not yet in db -> create it
+
+                  saveEntity(notSavedSensor, ENTITY_IS_NOT_SAVED, DeviceSensor.class);
                }
             }
          }
-      }
 
+         /*
+          * Replace sensor in sensor values to ensure that all sensor values contain valid sensors
+          */
+
+         // force to reload db sensors
+         clearDeviceSensors();
+         TourManager.getInstance().clearTourDataCache();
+
+         // reload db sensors
+         allDbSensors_BySensorID = new HashMap<>(getAllDeviceSensors_BySensorID());
+         allDbSensors_BySerialNum = new HashMap<>(getAllDeviceSensors_BySerialNum());
+
+         // loop: all sensor values in a tour -> set sensor which is saved in the db
+         for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
+
+            final DeviceSensor tourData_Sensor = tourData_SensorValue.getDeviceSensor();
+
+            final String serialNumber = tourData_Sensor.getSerialNumber();
+
+            DeviceSensor dbSensor = null;
+
+            if (StringUtils.hasContent(serialNumber)) {
+
+               // sensor WITH serial #
+
+               final String serialNumberKey = serialNumber.toUpperCase();
+
+               dbSensor = allDbSensors_BySerialNum.get(serialNumberKey);
+
+            } else {
+
+               // sensor WITHOUT serial #
+
+               final String tourData_SensorKey = tourData_Sensor.getSensorKeyByName();
+
+               for (final DeviceSensor dbSensorByID : allDbSensors_BySensorID.values()) {
+
+                  if (dbSensorByID.getSensorKeyByName().equals(tourData_SensorKey)) {
+
+                     dbSensor = dbSensorByID;
+
+                     break;
+                  }
+               }
+            }
+
+            tourData_SensorValue.setDeviceSensor(dbSensor);
+         }
+      }
    }
 
    /**

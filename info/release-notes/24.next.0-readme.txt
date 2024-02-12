@@ -54,6 +54,11 @@ New
 Improvements
 ============
 
+* Fit Import
+  - Import device sensors which do not contain a serial number
+    https://github.com/mytourbook/mytourbook/issues/1287
+
+
 * Tour Book
   - Show powertrain L-R balance values separately
     https://github.com/mytourbook/mytourbook/issues/1271
@@ -65,6 +70,9 @@ Improvements
 Changes
 =======
 
+* Fit Import
+  - Device sensors are now imported which do not contain a serial number
+    -> Now there can be new sensors in the sensor view which were currently ignored !
 * 
 
 
