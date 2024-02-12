@@ -3536,7 +3536,7 @@ public abstract class TableColumnFactory {
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Sensor);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_ManufacturerNumber);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_ManufacturerNumber);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_ManufacturerNumber_Header);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_ManufacturerNumber);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
@@ -3575,7 +3575,7 @@ public abstract class TableColumnFactory {
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Sensor);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_ProductNumber);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_ProductNumber);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_ProductNumber_Header);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_ProductNumber);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
@@ -3595,7 +3595,8 @@ public abstract class TableColumnFactory {
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Sensor);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_SerialNumber);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_SerialNumber);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_SerialNumber_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_SerialNumber);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
