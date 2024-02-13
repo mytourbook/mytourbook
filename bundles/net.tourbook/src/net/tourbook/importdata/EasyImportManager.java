@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -56,6 +56,7 @@ import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogState;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -116,6 +117,7 @@ public class EasyImportManager {
    private static final String      ATTR_IL_IS_ADJUST_TEMPERATURE                      = "isAdjustTemperature";                               //$NON-NLS-1$
    private static final String      ATTR_IL_IS_REPLACE_ELEVATION_FROM_SRTM             = "isReplaceElevationFromSRTM";                        //$NON-NLS-1$
    private static final String      ATTR_IL_IS_REPLACE_FIRST_TIME_SLICE_ELEVATION      = "isReplaceFirstTimeSliceElevation";                  //$NON-NLS-1$
+   private static final String      ATTR_IL_IS_RETRIEVE_TOUR_LOCATIONS                 = "isRetrieveTourLocations";                           //$NON-NLS-1$
    private static final String      ATTR_IL_IS_RETRIEVE_WEATHER_DATA                   = "isRetrieveWeatherData";                             //$NON-NLS-1$
    private static final String      ATTR_IL_IS_SAVE_TOUR                               = "isSaveTour";                                        //$NON-NLS-1$
    private static final String      ATTR_IL_IS_SHOW_IN_DASHBOARD                       = "isShowInDashBoard";                                 //$NON-NLS-1$
@@ -125,6 +127,7 @@ public class EasyImportManager {
    private static final String      ATTR_IL_LAST_MARKER_DISTANCE                       = "lastMarkerDistance";                                //$NON-NLS-1$
    private static final String      ATTR_IL_TEMPERATURE_ADJUSTMENT_DURATION            = "temperatureAdjustmentDuration";                     //$NON-NLS-1$
    private static final String      ATTR_IL_TEMPERATURE_TOUR_AVG_TEMPERATURE           = "tourAverageTemperature";                            //$NON-NLS-1$
+   private static final String      ATTR_IL_TOUR_LOCATION_PROFILE_NAME                 = "tourLocationProfileName";                           //$NON-NLS-1$
    private static final String      ATTR_IL_TOUR_TYPE_CADENCE                          = "tourTypeCadence";                                   //$NON-NLS-1$
    //
    public static final String       LOG_EASY_IMPORT_000_IMPORT_START                   = Messages.Log_EasyImport_000_ImportStart;
@@ -139,6 +142,7 @@ public class EasyImportManager {
    public static final String       LOG_EASY_IMPORT_006_ADJUST_ELEVATION               = Messages.Log_EasyImport_006_AdjustElevation;
    public static final String       LOG_EASY_IMPORT_007_REPLACE_ELEVATION_FROM_SRTM    = Messages.Log_EasyImport_006_ReplaceElevationFromSRTM;
    public static final String       LOG_EASY_IMPORT_050_RETRIEVE_WEATHER_DATA          = Messages.Log_EasyImport_050_RetrieveWeatherData;
+   public static final String       LOG_EASY_IMPORT_051_RETRIEVE_TOUR_LOCATION         = Messages.Log_EasyImport_051_RetrieveTourLocation;
    public static final String       LOG_EASY_IMPORT_099_SAVE_TOUR                      = Messages.Log_EasyImport_099_SaveTour;
    public static final String       LOG_EASY_IMPORT_100_DELETE_TOUR_FILES              = Messages.Log_EasyImport_100_DeleteTourFiles;
    public static final String       LOG_EASY_IMPORT_101_TURN_WATCHING_OFF              = Messages.Log_EasyImport_101_TurnWatchingOff;
@@ -167,6 +171,7 @@ public class EasyImportManager {
     * @param isForceRetrieveFiles
     *           When <code>true</code> files will be retrieved even when the stores have not
     *           changed.
+    *
     * @return Returns <code>true</code> when import files have been retrieved, otherwise
     *         <code>false</code>.
     *         <p>
@@ -538,6 +543,7 @@ public class EasyImportManager {
 
    /**
     * @param osFolder
+    *
     * @return Returns the device OS path or <code>null</code> when this folder is not valid.
     */
    private Path getValidPath(final String osFolder) {
@@ -680,10 +686,6 @@ public class EasyImportManager {
       return easyConfig;
    }
 
-//   private void loadEasyConfig_10_Common(final XMLMemento xmlMemento, final EasyConfig dashConfig) {
-//
-//   }
-
    private void loadEasyConfig_20_Dash(final XMLMemento xmlMemento, final EasyConfig dashConfig) {
 
       dashConfig.animationCrazinessFactor = Util.getXmlInteger(xmlMemento,
@@ -822,6 +824,10 @@ public class EasyImportManager {
       // retrieve weather data
       importLauncher.isRetrieveWeatherData = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_RETRIEVE_WEATHER_DATA, false);
 
+      // retrieve tour locations
+      importLauncher.isRetrieveTourLocation = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_RETRIEVE_TOUR_LOCATIONS, false);
+      importLauncher.tourLocationProfile = TourLocationManager.getProfile(Util.getXmlString(xmlConfig, ATTR_IL_TOUR_LOCATION_PROFILE_NAME, null));
+
       // adjust elevation
       importLauncher.isReplaceFirstTimeSliceElevation = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_REPLACE_FIRST_TIME_SLICE_ELEVATION, false);
 
@@ -903,6 +909,7 @@ public class EasyImportManager {
    /**
     * @param importLauncher
     * @param importState_Process
+    *
     * @return Returns a state about the import
     */
    public ImportState_Easy runImport(final ImportLauncher importLauncher, final ImportState_Process importState_Process) {
@@ -1227,6 +1234,10 @@ public class EasyImportManager {
 
          // Retrieve weather data
          xmlConfig.putBoolean(ATTR_IL_IS_RETRIEVE_WEATHER_DATA,         importLauncher.isRetrieveWeatherData);
+
+         // retrieve tour locations
+         xmlConfig.putBoolean(ATTR_IL_IS_RETRIEVE_TOUR_LOCATIONS,       importLauncher.isRetrieveTourLocation);
+         xmlConfig.putString(ATTR_IL_TOUR_LOCATION_PROFILE_NAME,        importLauncher.tourLocationProfile.getName());
 
          // adjust elevation
          xmlConfig.putBoolean(ATTR_IL_IS_REPLACE_FIRST_TIME_SLICE_ELEVATION, importLauncher.isReplaceFirstTimeSliceElevation);

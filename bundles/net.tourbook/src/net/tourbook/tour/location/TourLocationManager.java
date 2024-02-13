@@ -911,7 +911,10 @@ public class TourLocationManager {
             true, // is set end
 
             true, // isOneAction
-            oneActionLocation);
+            oneActionLocation,
+
+            true // isSaveTour
+      );
 
       return true;
    }
@@ -1385,6 +1388,25 @@ public class TourLocationManager {
       }
 
       return osmLocation;
+   }
+
+   /**
+    * @param profileName
+    *
+    * @return Returns the location profile with the given name, when not available then the default
+    *         profile is returned
+    */
+   public static TourLocationProfile getProfile(final String profileName) {
+
+      for (final TourLocationProfile locationProfile : _allLocationProfiles) {
+
+         if (locationProfile.getName().equals(profileName)) {
+
+            return locationProfile;
+         }
+      }
+
+      return getDefaultProfile();
    }
 
    /**
@@ -2168,7 +2190,9 @@ public class TourLocationManager {
                                        final boolean isSetEndLocation,
 
                                        final boolean isOneAction,
-                                       final TourLocation oneActionLocation) {
+                                       final TourLocation oneActionLocation,
+
+                                       final boolean isSaveTour) {
 
       final ArrayList<TourData> savedTours = new ArrayList<>();
 
@@ -2179,14 +2203,17 @@ public class TourLocationManager {
          final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
             @Override
-            public void run(final IProgressMonitor monitor)
-                  throws InvocationTargetException, InterruptedException {
+            public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
                final int numTours = requestedTours.size();
                final int numRequests = numTours * (isSetStartLocation && isSetEndLocation ? 2 : 1);
                int numWorked = 0;
 
-               monitor.beginTask(Messages.Tour_Location_Task_RetrievingTourLocations.formatted(numRequests), numRequests);
+               final String taskMessage = isSaveTour
+                     ? Messages.Tour_Location_Task_RetrieveAndSaveTourLocations
+                     : Messages.Tour_Location_Task_RetrievingTourLocations;
+
+               monitor.beginTask(taskMessage.formatted(numRequests), numRequests);
 
                for (final TourData tourData : requestedTours) {
 
@@ -2346,7 +2373,7 @@ public class TourLocationManager {
                      monitor.subTask(SUB_TASK_RETRIEVE_LOCATIONS.formatted(++numWorked, numRequests, waitingTime));
                   }
 
-                  if (isModified) {
+                  if (isSaveTour && isModified) {
 
                      TourManager.saveModifiedTour(tourData, false);
 

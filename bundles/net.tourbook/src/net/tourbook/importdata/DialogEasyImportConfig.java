@@ -241,10 +241,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Button               _chkIL_AdjustTemperature;
    private Button               _chkIL_ReplaceElevationFromSRTM;
    private Button               _chkIL_ReplaceFirstTimeSliceElevation;
+   private Button               _chkIL_RetrieveTourLocation;
    private Button               _chkIL_RetrieveWeatherData;
    private Button               _chkIL_SaveTour;
    private Button               _chkIL_SetLastMarker;
-   private Button               _chkIL_SetTourLocation;
    private Button               _chkIL_SetTourType;
    private Button               _chkIL_ShowInDashboard;
    //
@@ -1779,7 +1779,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          createUI_600_IL_06_AdjustElevation(group);
          createUI_600_IL_07_SetElevationFromSRTM(group);
          createUI_600_IL_50_RetrieveWeatherData(group);
-         createUI_600_IL_51_SetTourLocations(group);
+         createUI_600_IL_51_RetrieveTourLocations(group);
          createUI_600_IL_99_Save(group);
       }
    }
@@ -2343,22 +2343,21 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    }
 
-   private void createUI_600_IL_51_SetTourLocations(final Composite parent) {
-      // TODO Auto-generated method stub
+   private void createUI_600_IL_51_RetrieveTourLocations(final Composite parent) {
 
       {
          /*
           * Checkbox: Set tour location
           */
 
-         _chkIL_SetTourLocation = new Button(parent, SWT.CHECK);
-         _chkIL_SetTourLocation.setText(Messages.Dialog_ImportConfig_Checkbox_SetTourLocation);
-         _chkIL_SetTourLocation.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_SetTourLocation_Tooltip);
-         _chkIL_SetTourLocation.addSelectionListener(_defaultModify_Listener);
+         _chkIL_RetrieveTourLocation = new Button(parent, SWT.CHECK);
+         _chkIL_RetrieveTourLocation.setText(Messages.Dialog_ImportConfig_Checkbox_RetrieveTourLocation);
+         _chkIL_RetrieveTourLocation.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_RetrieveTourLocation_Tooltip);
+         _chkIL_RetrieveTourLocation.addSelectionListener(_defaultModify_Listener);
          GridDataFactory.fillDefaults()
                .span(2, 1)
                .indent(0, 5)
-               .applyTo(_chkIL_SetTourLocation);
+               .applyTo(_chkIL_RetrieveTourLocation);
       }
       {
          /*
@@ -3036,10 +3035,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       final boolean isLauncherAvailable   = numLaunchers > 0;
 
       final boolean isILSelected                   = _selectedIL != null;
-      
+
       final boolean isAdjustTemperature            = isILSelected && _chkIL_AdjustTemperature.getSelection();
       final boolean isLastMarkerSelected           = isILSelected && _chkIL_SetLastMarker.getSelection();
-      final boolean isSetTourLocation              = isILSelected && _chkIL_SetTourLocation.getSelection();
+      final boolean isSetTourLocation              = isILSelected && _chkIL_RetrieveTourLocation.getSelection();
       final boolean isWeatherRetrievalActivated    = TourManager.isWeatherRetrievalActivated();
 
 // SET_FORMATTING_ON
@@ -3703,6 +3702,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _selectedIL.tourAvgTemperature                  = UI.convertTemperatureToMetric(_spinnerIL_AvgTemperature.getSelection());
 
       _selectedIL.isReplaceFirstTimeSliceElevation    = _chkIL_ReplaceFirstTimeSliceElevation.getSelection();
+      _selectedIL.isRetrieveTourLocation              = _chkIL_RetrieveTourLocation.getSelection();
       _selectedIL.isRetrieveWeatherData               = _chkIL_RetrieveWeatherData.getSelection();
       _selectedIL.isSaveTour                          = _chkIL_SaveTour.getSelection();
       _selectedIL.isReplaceElevationFromSRTM          = _chkIL_ReplaceElevationFromSRTM.getSelection();
@@ -4262,7 +4262,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _selectedIL.isSetTourType        = _chkIL_SetTourType.getSelection();
 
       // tour location
-      _selectedIL.isSetTourLocation    = _chkIL_SetTourLocation.getSelection();
+      _selectedIL.isRetrieveTourLocation    = _chkIL_RetrieveTourLocation.getSelection();
       _selectedIL.tourLocationProfile  = getSelectedTourLocation();
 
 // SET_FORMATTING_ON
@@ -4450,21 +4450,21 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _spinnerIL_TemperatureAdjustmentDuration.setSelection(_selectedIL.temperatureAdjustmentDuration);
          updateUI_TemperatureAdjustmentDuration();
 
-         // Retrieve Weather Data
-         _chkIL_RetrieveWeatherData.setSelection(_selectedIL.isRetrieveWeatherData);
-
          // adjust elevation
          _chkIL_ReplaceFirstTimeSliceElevation.setSelection(_selectedIL.isReplaceFirstTimeSliceElevation);
 
          // set elevation from SRTM data
          _chkIL_ReplaceElevationFromSRTM.setSelection(_selectedIL.isReplaceElevationFromSRTM);
 
+         // Retrieve Weather Data
+         _chkIL_RetrieveWeatherData.setSelection(_selectedIL.isRetrieveWeatherData);
+
+         // retrieve tour location
+         _chkIL_RetrieveTourLocation.setSelection(_selectedIL.isRetrieveTourLocation);
+         _comboIL_TourLocationProfiles.select(TourLocationManager.getProfileIndex(_selectedIL.tourLocationProfile));
+
          final Enum<TourTypeConfig> tourTypeConfig = _selectedIL.tourTypeConfig;
          final boolean isSetTourType = tourTypeConfig != null && _selectedIL.isSetTourType;
-
-         // tour location
-         _chkIL_SetTourLocation.setSelection(_selectedIL.isSetTourLocation);
-         _comboIL_TourLocationProfiles.select(TourLocationManager.getProfileIndex(_selectedIL.tourLocationProfile));
 
          // Set tour type
          _chkIL_SetTourType.setSelection(isSetTourType);

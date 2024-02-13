@@ -113,7 +113,7 @@ public class ImportLauncher implements Cloneable {
    /**
     * When <code>true</code> then tour start/end locations are retrieved and set into the tour
     */
-   public boolean                  isSetTourLocation;
+   public boolean                  isRetrieveTourLocation;
 
    /**
     * This tour location profile is used to set the tour location values
