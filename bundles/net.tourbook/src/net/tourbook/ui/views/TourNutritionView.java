@@ -168,6 +168,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Image       _imageAdd;
    private Image       _imageSearch;
    private Image       _imageDelete;
+   private Image       _imageCheck;
+   private Image       _imageUncheck;
    private Image       _imageYes;
 
    private Button      _btnDeleteProduct;
@@ -1002,7 +1004,17 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
 
-            final Image image = tourNutritionProduct.isBeverage() ? _imageYes : null;
+            Image image;
+
+            if (tourNutritionProduct.isBeverage()) {
+
+               image = UI.IS_DARK_THEME ? _imageYes : _imageCheck;
+
+            } else {
+
+               image = UI.IS_DARK_THEME ? null : _imageUncheck;
+
+            }
             cell.setImage(image);
          }
       });
@@ -1108,6 +1120,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       UI.disposeResource(_imageAdd);
       UI.disposeResource(_imageSearch);
       UI.disposeResource(_imageDelete);
+      UI.disposeResource(_imageCheck);
+      UI.disposeResource(_imageUncheck);
       UI.disposeResource(_imageYes);
 
       super.dispose();
@@ -1145,6 +1159,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _pc = new PixelConverter(parent);
 
       _columnSortListener = widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
+      _imageCheck = TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked).createImage();
+      _imageUncheck = TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck).createImage();
       _imageYes = CommonActivator.getImageDescriptor(CommonImages.App_Yes).createImage();
    }
 
