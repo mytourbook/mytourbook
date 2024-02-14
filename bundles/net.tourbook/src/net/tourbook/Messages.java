@@ -3327,6 +3327,7 @@ public class Messages extends NLS {
    public static String        Tour_Nutrition_Column_ConsumedQuantity;
    public static String        Tour_Nutrition_Column_ConsumedQuantity_Tooltip;
    public static String        Tour_Nutrition_Column_Name;
+   public static String        Tour_Nutrition_Column_Quantity;
    public static String        Tour_Nutrition_Column_QuantityType;
    public static String        Tour_Nutrition_Column_QuantityType_Tooltip;
    public static String        Tour_Nutrition_Column_Servings;

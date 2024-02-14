@@ -309,6 +309,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          case 1:
             return NutritionUtils.getProductFullName(product);
 
+         case 2:
+            return product.quantity;
+
          default:
             return getText(obj);
          }
@@ -544,8 +547,13 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       // column: Name
       final TableColumn columnName = new TableColumn(productsTable, SWT.TRAIL);
       columnName.setText(Messages.Tour_Nutrition_Column_Name);
-      columnName.setWidth(_pc.convertWidthInCharsToPixels(75));
+      columnName.setWidth(_pc.convertWidthInCharsToPixels(55));
       columnName.addListener(SWT.Selection, _columnSortListener);
+      // column: Quantity
+      final TableColumn columnQuantity = new TableColumn(productsTable, SWT.TRAIL);
+      columnQuantity.setText(Messages.Tour_Nutrition_Column_Quantity);
+      columnQuantity.setWidth(_pc.convertWidthInCharsToPixels(15));
+      columnQuantity.addListener(SWT.Selection, _columnSortListener);
 
       _productsViewer = new TableViewer(productsTable);
 
@@ -615,13 +623,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       _pc = new PixelConverter(parent);
 
-      //_columnSortListener = widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
-      _columnSortListener = new Listener() {
-         @Override
-         public void handleEvent(final Event e) {
-            onSelect_SortColumn(e);
-         }
-      };
+      _columnSortListener = event -> onSelect_SortColumn(event);
    }
 
    private void onAddProduct() {
