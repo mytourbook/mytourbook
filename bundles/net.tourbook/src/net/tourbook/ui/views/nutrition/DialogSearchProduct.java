@@ -427,8 +427,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       GridLayoutFactory.swtDefaults().margins(10, 5).applyTo(container);
       {
          createUI_10_Header(container);
-         createUI_20_Header_Options(container);
-         createUI_30_Viewer(container);
+
+         createUI_20_Viewer(container);
 
          /*
           * Link/Info: How to add a product in the database
@@ -447,21 +447,21 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    private void createUI_10_Header(final Composite parent) {
 
-      final Composite queryContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(queryContainer);
-      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(queryContainer);
+      final Composite headerContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(headerContainer);
+      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(headerContainer);
       {
          {
             /*
              * Label: Keywords
              */
-            _lblKeywords = UI.createLabel(queryContainer, Messages.Dialog_SearchProduct_Label_Keywords);
+            _lblKeywords = UI.createLabel(headerContainer, Messages.Dialog_SearchProduct_Label_Keywords);
          }
          {
             /*
              * combo: Text search
              */
-            _comboSearchQuery = new Combo(queryContainer, SWT.NONE);
+            _comboSearchQuery = new Combo(headerContainer, SWT.NONE);
             _comboSearchQuery.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchProduct()));
             _comboSearchQuery.addModifyListener(event -> {
 
@@ -474,13 +474,13 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
                   .grab(true, false)
                   .applyTo(_comboSearchQuery);
 
-            _tooltipInvalidBarCode = UI.createBalloonTooltip(queryContainer.getShell(), Messages.Dialog_SearchProduct_Tooltip_InvalidBarcode);
+            _tooltipInvalidBarCode = UI.createBalloonTooltip(headerContainer.getShell(), Messages.Dialog_SearchProduct_Tooltip_InvalidBarcode);
          }
          {
             /*
              * button: Search
              */
-            _btnSearch = new Button(queryContainer, SWT.PUSH);
+            _btnSearch = new Button(headerContainer, SWT.PUSH);
             _btnSearch.setText(Messages.Dialog_SearchProduct_Button_Search);
             _btnSearch.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSearchProduct()));
             setButtonLayoutData(_btnSearch);
@@ -489,30 +489,17 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
             /*
              * Button: Add
              */
-            _btnAdd = new Button(queryContainer, SWT.PUSH);
+            _btnAdd = new Button(headerContainer, SWT.PUSH);
             _btnAdd.setText(Messages.Dialog_SearchProduct_Button_Add);
             _btnAdd.setToolTipText(Messages.Dialog_SearchProduct_Button_Add_Tooltip);
             _btnAdd.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAddProduct()));
             setButtonLayoutData(_btnAdd);
          }
-      }
-
-      _queryViewer = new ComboViewer(_comboSearchQuery);
-      _queryViewer.setContentProvider(new SearchContentProvider());
-      _queryViewer.setComparator(new ViewerComparator());
-   }
-
-   private void createUI_20_Header_Options(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {
          {
             /*
              * Label: Search Type
              */
-            _lblSearchType = UI.createLabel(container, Messages.Dialog_SearchProduct_Label_SearchType);
+            _lblSearchType = UI.createLabel(headerContainer, Messages.Dialog_SearchProduct_Label_SearchType);
             GridDataFactory.fillDefaults()
                   .align(SWT.LEFT, SWT.CENTER)
                   .applyTo(_lblSearchType);
@@ -521,7 +508,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
             /*
              * combo: Search type
              */
-            _comboSearchType = new Combo(container, SWT.READ_ONLY);
+            _comboSearchType = new Combo(headerContainer, SWT.READ_ONLY);
             _comboSearchType.setVisibleItemCount(2);
             _comboSearchType.addSelectionListener(widgetSelectedAdapter(selectionEvent -> validateFields()));
             GridDataFactory.fillDefaults()
@@ -530,9 +517,13 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
                   .applyTo(_comboSearchType);
          }
       }
+
+      _queryViewer = new ComboViewer(_comboSearchQuery);
+      _queryViewer.setContentProvider(new SearchContentProvider());
+      _queryViewer.setComparator(new ViewerComparator());
    }
 
-   private void createUI_30_Viewer(final Composite parent) {
+   private void createUI_20_Viewer(final Composite parent) {
 
       /*
        * table viewer: products
