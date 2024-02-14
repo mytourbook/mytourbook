@@ -110,7 +110,7 @@ public class TourNutritionViewTests extends UITest {
       // Calories
       bot.text(1).setText("12"); //$NON-NLS-1$
       // Sodium
-      bot.text(1).setText("13"); //$NON-NLS-1$
+      bot.text(2).setText("13"); //$NON-NLS-1$
       // Is Beverage
       bot.checkBox(0).click();
 
