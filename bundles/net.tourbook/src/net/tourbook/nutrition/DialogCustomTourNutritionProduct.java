@@ -196,10 +196,6 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       }
    }
 
-   public String getName() {
-      return _name;
-   }
-
    public TourNutritionProduct getTourNutritionProduct(final TourData tourData) {
 
       final TourNutritionProduct product = new TourNutritionProduct(tourData, true);
