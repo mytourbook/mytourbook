@@ -537,12 +537,12 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       gdDescription.heightHint = _pc.convertHeightInCharsToPixels(15);
 
       // column: Barcode
-      final TableColumn columnCode = new TableColumn(productsTable, SWT.LEFT);
+      final TableColumn columnCode = new TableColumn(productsTable, SWT.TRAIL);
       columnCode.setText(Messages.Tour_Nutrition_Column_Code);
       columnCode.setWidth(_pc.convertWidthInCharsToPixels(20));
       columnCode.addListener(SWT.Selection, _columnSortListener);
       // column: Name
-      final TableColumn columnName = new TableColumn(productsTable, SWT.LEFT);
+      final TableColumn columnName = new TableColumn(productsTable, SWT.TRAIL);
       columnName.setText(Messages.Tour_Nutrition_Column_Name);
       columnName.setWidth(_pc.convertWidthInCharsToPixels(75));
       columnName.addListener(SWT.Selection, _columnSortListener);

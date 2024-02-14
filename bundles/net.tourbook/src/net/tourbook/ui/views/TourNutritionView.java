@@ -852,7 +852,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineColumn_10_ConsumedQuantity() {
 
-      _colDef_ConsumedQuantity = new TableColumnDefinition(_columnManager, COLUMN_CONSUMED_QUANTITY, SWT.LEAD);
+      _colDef_ConsumedQuantity = new TableColumnDefinition(_columnManager, COLUMN_CONSUMED_QUANTITY, SWT.TRAIL);
 
       _colDef_ConsumedQuantity.setColumnLabel(COLUMN_CONSUMED_QUANTITY);
       _colDef_ConsumedQuantity.setColumnHeaderText(Messages.Tour_Nutrition_Column_ConsumedQuantity);
@@ -877,7 +877,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineColumn_20_QuantityType() {
 
-      _colDef_QuantityType = new TableColumnDefinition(_columnManager, COLUMN_QUANTITY_TYPE, SWT.LEAD);
+      _colDef_QuantityType = new TableColumnDefinition(_columnManager, COLUMN_QUANTITY_TYPE, SWT.TRAIL);
 
       _colDef_QuantityType.setColumnLabel(COLUMN_QUANTITY_TYPE);
       _colDef_QuantityType.setColumnHeaderText(Messages.Tour_Nutrition_Column_QuantityType);
@@ -902,7 +902,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineColumn_30_Name() {
 
-      _colDef_Name = new TableColumnDefinition(_columnManager, COLUMN_NAME, SWT.LEAD);
+      _colDef_Name = new TableColumnDefinition(_columnManager, COLUMN_NAME, SWT.TRAIL);
 
       _colDef_Name.setColumnLabel(COLUMN_NAME);
       _colDef_Name.setColumnHeaderText(Messages.Tour_Nutrition_Column_Name);
@@ -926,7 +926,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineColumn_40_Calories() {
 
-      _colDef_Calories = new TableColumnDefinition(_columnManager, COLUMN_CALORIES, SWT.LEAD);
+      _colDef_Calories = new TableColumnDefinition(_columnManager, COLUMN_CALORIES, SWT.TRAIL);
 
       _colDef_Calories.setColumnLabel(COLUMN_CALORIES);
       _colDef_Calories.setColumnHeaderText(Messages.Tour_Nutrition_Label_Calories);
@@ -956,7 +956,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineColumn_50_Sodium() {
 
-      _colDef_Sodium = new TableColumnDefinition(_columnManager, COLUMN_SODIUM, SWT.LEAD);
+      _colDef_Sodium = new TableColumnDefinition(_columnManager, COLUMN_SODIUM, SWT.TRAIL);
 
       _colDef_Sodium.setColumnLabel(COLUMN_SODIUM);
       _colDef_Sodium.setColumnHeaderText(Messages.Tour_Nutrition_Label_Sodium);
@@ -986,7 +986,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineColumn_60_IsBeverage() {
 
-      _colDef_IsBeverage = new TableColumnDefinition(_columnManager, COLUMN_ISBEVERAGE, SWT.LEAD);
+      _colDef_IsBeverage = new TableColumnDefinition(_columnManager, COLUMN_ISBEVERAGE, SWT.CENTER);
 
       _colDef_IsBeverage.setColumnLabel(COLUMN_ISBEVERAGE);
       _colDef_IsBeverage.setColumnHeaderText(Messages.Tour_Nutrition_Column_IsBeverage);
@@ -1010,7 +1010,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineColumn_70_BeverageQuantity() {
 
-      final TableColumnDefinition colDef_BeverageQuantity = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_QUANTITY, SWT.LEAD);
+      final TableColumnDefinition colDef_BeverageQuantity = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_QUANTITY, SWT.TRAIL);
 
       colDef_BeverageQuantity.setColumnLabel(COLUMN_BEVERAGE_QUANTITY);
       colDef_BeverageQuantity.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageQuantity);
@@ -1041,7 +1041,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineColumn_80_BeverageContainer() {
 
-      _colDef_BeverageContainer = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_CONTAINER, SWT.LEAD);
+      _colDef_BeverageContainer = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_CONTAINER, SWT.TRAIL);
 
       _colDef_BeverageContainer.setColumnLabel(COLUMN_BEVERAGE_CONTAINER);
       _colDef_BeverageContainer.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageContainer);
@@ -1069,7 +1069,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineColumn_90_ConsumedBeverageContainers() {
 
-      _colDef_ConsumedBeverageContainers = new TableColumnDefinition(_columnManager, COLUMN_CONSUMED_CONTAINERS, SWT.LEAD);
+      _colDef_ConsumedBeverageContainers = new TableColumnDefinition(_columnManager, COLUMN_CONSUMED_CONTAINERS, SWT.TRAIL);
 
       _colDef_ConsumedBeverageContainers.setColumnLabel(COLUMN_CONSUMED_CONTAINERS);
       _colDef_ConsumedBeverageContainers.setColumnHeaderText(Messages.Tour_Nutrition_Column_ConsumedContainers);
