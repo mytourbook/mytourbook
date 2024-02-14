@@ -28,6 +28,8 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.util.ColumnDefinition;
@@ -166,6 +168,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Image       _imageAdd;
    private Image       _imageSearch;
    private Image       _imageDelete;
+   private Image       _imageYes;
 
    private Button      _btnDeleteProduct;
 
@@ -999,12 +1002,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
 
-            final String imageDescriptorPath = tourNutritionProduct.isBeverage()
-                  ? Images.Checkbox_Checked
-                  : Images.Checkbox_Uncheck;
-
-            final var imagetodispose = TourbookPlugin.getImageDescriptor(imageDescriptorPath).createImage();
-            cell.setImage(imagetodispose);
+            final Image image = tourNutritionProduct.isBeverage() ? _imageYes : null;
+            cell.setImage(image);
          }
       });
    }
@@ -1109,6 +1108,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       UI.disposeResource(_imageAdd);
       UI.disposeResource(_imageSearch);
       UI.disposeResource(_imageDelete);
+      UI.disposeResource(_imageYes);
 
       super.dispose();
    }
@@ -1145,6 +1145,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _pc = new PixelConverter(parent);
 
       _columnSortListener = widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
+      _imageYes = CommonActivator.getImageDescriptor(CommonImages.App_Yes).createImage();
    }
 
    private void onDeleteProducts() {
