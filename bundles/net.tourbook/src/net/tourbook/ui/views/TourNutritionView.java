@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
@@ -34,6 +35,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ColumnProfile;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.TableColumnDefinition;
@@ -83,14 +85,17 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
@@ -131,7 +136,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _nf2.setMaximumFractionDigits(2);
    }
 
-   private final IDialogSettings          _state                          = TourbookPlugin.getState(ID);
+   private final IDialogSettings          _state                            = TourbookPlugin.getState(ID);
    private TourData                       _tourData;
 
    private PixelConverter                 _pc;
@@ -145,13 +150,21 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private TableColumnDefinition          _colDef_Calories;
    private TableColumnDefinition          _colDef_Sodium;
    private TableColumnDefinition          _colDef_IsBeverage;
+   /**
+    * Index of the column with the image, index can be changed when the columns are reordered with
+    * the mouse or the column manager
+    */
+   private int                            _columnIndex_ForColumn_IsBeverage = -1;
+   private int                            _columnWidth_ForColumn_IsBeverage;
+
+   private TableColumnDefinition          _colDef_BeverageQuantity;
    private TableColumnDefinition          _colDef_BeverageContainer;
    private TableColumnDefinition          _colDef_ConsumedBeverageContainers;
 
-   private TourNutritionProductComparator _tourNutritionProductComparator = new TourNutritionProductComparator();
-   private List<TourBeverageContainer>    _tourBeverageContainers         = new ArrayList<>();
+   private TourNutritionProductComparator _tourNutritionProductComparator   = new TourNutritionProductComparator();
+   private List<TourBeverageContainer>    _tourBeverageContainers           = new ArrayList<>();
 
-   private List<String>                   _searchHistory                  = new ArrayList<>();
+   private List<String>                   _searchHistory                    = new ArrayList<>();
    private IPropertyChangeListener        _prefChangeListener;
    private SelectionListener              _columnSortListener;
 
@@ -160,7 +173,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private IPartListener2                 _partListener;
    private PostSelectionProvider          _postSelectionProvider;
 
-   private final RangeContent             _quantityRange                  = new RangeContent(0.25, 10.0, 0.25, 100);
+   private final RangeContent             _quantityRange                    = new RangeContent(0.25, 10.0, 0.25, 100);
 
    /*
     * UI controls
@@ -762,6 +775,17 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
 
+      final Listener paintListener = event -> {
+
+         if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
+            onPaint_Viewer(event);
+         }
+      };
+      productsTable.addListener(SWT.MeasureItem, paintListener);
+      productsTable.addListener(SWT.PaintItem, paintListener);
+
+      productsTable.addControlListener(controlResizedAdapter(controlEvent -> setWidth_ForColumn_IsBeverage()));
+
       _productsViewer = new TableViewer(productsTable);
 
       // very important: the editing support must be set BEFORE the columns are created
@@ -863,7 +887,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_ConsumedQuantity.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
 
       _colDef_ConsumedQuantity.setIsDefaultColumn();
-      _colDef_ConsumedQuantity.setCanModifyVisibility(false);
       _colDef_ConsumedQuantity.setColumnSelectionListener(_columnSortListener);
 
       _colDef_ConsumedQuantity.setLabelProvider(new CellLabelProvider() {
@@ -888,7 +911,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_QuantityType.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(17));
 
       _colDef_QuantityType.setIsDefaultColumn();
-      _colDef_QuantityType.setCanModifyVisibility(false);
 
       _colDef_QuantityType.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -912,7 +934,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_Name.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(50));
 
       _colDef_Name.setIsDefaultColumn();
-      _colDef_Name.setCanModifyVisibility(false);
       _colDef_Name.setColumnSelectionListener(_columnSortListener);
 
       _colDef_Name.setLabelProvider(new CellLabelProvider() {
@@ -936,7 +957,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_Calories.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
 
       _colDef_Calories.setIsDefaultColumn();
-      _colDef_Calories.setCanModifyVisibility(false);
 
       _colDef_Calories.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -966,7 +986,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_Sodium.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
 
       _colDef_Sodium.setIsDefaultColumn();
-      _colDef_Sodium.setCanModifyVisibility(false);
 
       _colDef_Sodium.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -996,44 +1015,31 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_IsBeverage.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
 
       _colDef_IsBeverage.setIsDefaultColumn();
-      _colDef_IsBeverage.setCanModifyVisibility(false);
 
       _colDef_IsBeverage.setLabelProvider(new CellLabelProvider() {
+
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
-
-            Image image;
-
-            if (tourNutritionProduct.isBeverage()) {
-
-               image = UI.IS_DARK_THEME ? _imageYes : _imageCheck;
-
-            } else {
-
-               image = UI.IS_DARK_THEME ? null : _imageUncheck;
-
-            }
-            cell.setImage(image);
+            // !!! When using cell.setImage() then it is not centered !!!
+            // !!! Set dummy label provider, otherwise an error occurs !!!
          }
       });
    }
 
    private void defineColumn_70_BeverageQuantity() {
 
-      final TableColumnDefinition colDef_BeverageQuantity = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_QUANTITY, SWT.TRAIL);
+      _colDef_BeverageQuantity = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_QUANTITY, SWT.TRAIL);
 
-      colDef_BeverageQuantity.setColumnLabel(COLUMN_BEVERAGE_QUANTITY);
-      colDef_BeverageQuantity.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageQuantity);
-      colDef_BeverageQuantity.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Column_BeverageQuantity_Tooltip);
+      _colDef_BeverageQuantity.setColumnLabel(COLUMN_BEVERAGE_QUANTITY);
+      _colDef_BeverageQuantity.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageQuantity);
+      _colDef_BeverageQuantity.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Column_BeverageQuantity_Tooltip);
 
-      colDef_BeverageQuantity.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(22));
+      _colDef_BeverageQuantity.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(22));
 
-      colDef_BeverageQuantity.setIsDefaultColumn();
-      colDef_BeverageQuantity.setCanModifyVisibility(false);
+      _colDef_BeverageQuantity.setIsDefaultColumn();
 
-      colDef_BeverageQuantity.setLabelProvider(new CellLabelProvider() {
+      _colDef_BeverageQuantity.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1061,7 +1067,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_BeverageContainer.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(25));
 
       _colDef_BeverageContainer.setIsDefaultColumn();
-      _colDef_BeverageContainer.setCanModifyVisibility(false);
 
       _colDef_BeverageContainer.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -1090,7 +1095,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _colDef_ConsumedBeverageContainers.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(27));
 
       _colDef_ConsumedBeverageContainers.setIsDefaultColumn();
-      _colDef_ConsumedBeverageContainers.setCanModifyVisibility(false);
 
       _colDef_ConsumedBeverageContainers.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -1180,6 +1184,56 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _tourData = TourManager.saveModifiedTour(_tourData);
    }
 
+   private void onPaint_Viewer(final Event event) {
+
+      // paint images at the correct column
+
+      final int columnIndex = event.index;
+
+      if (columnIndex == _columnIndex_ForColumn_IsBeverage) {
+
+         onPaint_Viewer_GraphImage(event);
+      }
+
+   }
+
+   private void onPaint_Viewer_GraphImage(final Event event) {
+
+      if (event.type == SWT.PaintItem) {
+
+         final TableItem item = (TableItem) event.item;
+         final Object itemData = item.getData();
+         final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) itemData;
+
+         final Image image;
+         if (tourNutritionProduct.isBeverage()) {
+
+            image = UI.IS_DARK_THEME ? _imageYes : _imageCheck;
+
+         } else {
+
+            image = UI.IS_DARK_THEME ? null : _imageUncheck;
+
+         }
+
+         if (image != null) {
+
+            final Rectangle imageRect = image.getBounds();
+
+            // center horizontal
+            final int xOffset = Math.max(0, (_columnWidth_ForColumn_IsBeverage - imageRect.width) / 2);
+
+            // center vertical
+            final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
+
+            final int devX = event.x + xOffset;
+            final int devY = event.y + yOffset;
+
+            event.gc.drawImage(image, devX, devY);
+         }
+      }
+   }
+
    private void onSelect_SortColumn(final SelectionEvent e) {
 
       _viewerContainer.setRedraw(false);
@@ -1258,6 +1312,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       {
          _productsViewer.getTable().dispose();
 
+         // update column index which is needed for repainting
+         final ColumnProfile activeProfile = _columnManager.getActiveProfile();
+         _columnIndex_ForColumn_IsBeverage = activeProfile.getColumnIndex(_colDef_IsBeverage.getColumnId());
+
          createUI_220_Viewer(_viewerContainer);
          _viewerContainer.layout();
 
@@ -1294,6 +1352,16 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _sectionSummary.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_SUMMARY, true));
       _sectionProductsList.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_PRODUCTS_LIST, true));
+
+      _columnManager.setColumnVisible(_colDef_ConsumedBeverageContainers, true);
+      _columnManager.setColumnVisible(_colDef_BeverageContainer, true);
+      _columnManager.setColumnVisible(_colDef_BeverageQuantity, true);
+      _columnManager.setColumnVisible(_colDef_IsBeverage, true);
+      _columnManager.setColumnVisible(_colDef_Sodium, true);
+      _columnManager.setColumnVisible(_colDef_Calories, true);
+      _columnManager.setColumnVisible(_colDef_Name, true);
+      _columnManager.setColumnVisible(_colDef_QuantityType, true);
+      _columnManager.setColumnVisible(_colDef_ConsumedQuantity, true);
    }
 
    @PersistState
@@ -1471,6 +1539,19 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    @Override
    public void setFocus() {}
+
+   private void setWidth_ForColumn_IsBeverage() {
+
+      if (_colDef_IsBeverage == null) {
+         return;
+      }
+
+      final TableColumn tableColumn = _colDef_IsBeverage.getTableColumn();
+
+      if (tableColumn != null && tableColumn.isDisposed() == false) {
+         _columnWidth_ForColumn_IsBeverage = tableColumn.getWidth();
+      }
+   }
 
    private void showInvalidPage() {
 
