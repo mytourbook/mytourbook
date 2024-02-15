@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Frédéric Bard
+ * Copyright (C) 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -542,7 +542,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                return;
             }
 
-            if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof final TourEvent tourEventData)) {
+            if (tourEventId == TourEventId.TOUR_CHANGED && eventData instanceof final TourEvent tourEventData) {
 
                final ArrayList<TourData> modifiedTours = tourEventData.getModifiedTours();
                if (modifiedTours != null) {
@@ -555,10 +555,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                   if (_tourData.isMultipleTours()) {
 
                      showInvalidPage();
+
                   } else {
 
                      // The view contains a single tour
                      for (final TourData tourData : modifiedTours) {
+
                         if (tourData.getTourId() == viewTourId) {
 
                            refreshTourData(tourData);
