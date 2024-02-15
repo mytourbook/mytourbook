@@ -588,6 +588,18 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       });
    }
 
+   private void enableControls(final boolean isFocusSearchQuery) {
+
+      _lblKeywords.setEnabled(true);
+      _comboSearchQuery.setEnabled(true);
+      if (isFocusSearchQuery) {
+         _comboSearchQuery.setFocus();
+      }
+      _btnSearch.setEnabled(true);
+      _comboSearchType.setEnabled(true);
+      _lblSearchType.setEnabled(true);
+   }
+
    private void fillUI() {
 
       /*
@@ -763,14 +775,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          setErrorMessage(errorMessage);
          setMessage(message);
 
-         _lblKeywords.setEnabled(true);
-         _comboSearchQuery.setEnabled(true);
-         if (net.tourbook.common.util.StringUtils.hasContent(errorMessage)) {
-            _comboSearchQuery.setFocus();
-         }
-         _btnSearch.setEnabled(true);
-         _comboSearchType.setEnabled(true);
-         _lblSearchType.setEnabled(true);
+         final boolean isFocusSearchQuery = net.tourbook.common.util.StringUtils.hasContent(errorMessage);
+         enableControls(isFocusSearchQuery);
       });
 
    }
