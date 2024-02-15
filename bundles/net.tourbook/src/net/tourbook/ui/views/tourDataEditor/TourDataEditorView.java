@@ -220,6 +220,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.forms.events.IExpansionListener;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -3517,18 +3518,12 @@ public class TourDataEditorView extends ViewPart implements
 
    private Section createSection(final Composite parent,
                                  final FormToolkit tk,
-                                 final String title,
-                                 final boolean isGrabVertical,
-                                 final boolean isExpandable) {
+                                 final String title) {
 
-      final int style = isExpandable
-            ? Section.TWISTIE | Section.TITLE_BAR
-            : Section.TITLE_BAR;
-
-      final Section section = tk.createSection(parent, style);
+      final Section section = tk.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
 
       section.setText(title);
-      GridDataFactory.fillDefaults().grab(true, isGrabVertical).applyTo(section);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(section);
 
       final Composite sectionContainer = tk.createComposite(section);
       section.setClient(sectionContainer);
@@ -3618,7 +3613,7 @@ public class TourDataEditorView extends ViewPart implements
 
    private void createUI_Section_110_Tour(final Composite parent) {
 
-      _sectionTitle = createSection(parent, _tk, Messages.tour_editor_section_tour, true, true);
+      _sectionTitle = createSection(parent, _tk, Messages.tour_editor_section_tour);
 
       final Composite sectionContainer = (Composite) _sectionTitle.getClient();
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(sectionContainer);
@@ -3835,7 +3830,7 @@ public class TourDataEditorView extends ViewPart implements
 
    private void createUI_Section_120_DateTime(final Composite parent) {
 
-      _sectionDateTime = createSection(parent, _tk, Messages.tour_editor_section_date_time, false, true);
+      _sectionDateTime = createSection(parent, _tk, Messages.tour_editor_section_date_time);
 
       final Composite container = (Composite) _sectionDateTime.getClient();
       GridLayoutFactory.fillDefaults()
@@ -4175,7 +4170,7 @@ public class TourDataEditorView extends ViewPart implements
 
    private void createUI_Section_130_Personal(final Composite parent) {
 
-      _sectionPersonal = createSection(parent, _tk, Messages.tour_editor_section_personal, false, true);
+      _sectionPersonal = createSection(parent, _tk, Messages.tour_editor_section_personal);
       final Composite container = (Composite) _sectionPersonal.getClient();
       GridLayoutFactory.fillDefaults()
             .numColumns(2)
@@ -4349,7 +4344,7 @@ public class TourDataEditorView extends ViewPart implements
 
    private void createUI_Section_140_Weather(final Composite parent) {
 
-      _sectionWeather = createSection(parent, _tk, Messages.tour_editor_section_weather, false, true);
+      _sectionWeather = createSection(parent, _tk, Messages.tour_editor_section_weather);
       final Composite container = (Composite) _sectionWeather.getClient();
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
@@ -5052,7 +5047,7 @@ public class TourDataEditorView extends ViewPart implements
 
    private void createUI_Section_150_Characteristics(final Composite parent) {
 
-      _sectionCharacteristics = createSection(parent, _tk, Messages.tour_editor_section_characteristics, false, true);
+      _sectionCharacteristics = createSection(parent, _tk, Messages.tour_editor_section_characteristics);
       final Composite container = (Composite) _sectionCharacteristics.getClient();
       GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 //    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
