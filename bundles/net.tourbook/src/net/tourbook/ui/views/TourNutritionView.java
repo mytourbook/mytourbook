@@ -202,6 +202,54 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Section     _sectionSummary;
    private FormToolkit _tk;
 
+   private final class ConsumedBeverageContainersEditingSupport extends EditingSupport {
+
+      private SpinnerCellEditor spinnerCellEditor;
+
+      private ConsumedBeverageContainersEditingSupport() {
+
+         super(_productsViewer);
+
+         spinnerCellEditor = new SpinnerCellEditor(_productsViewer.getTable(),
+               _nf2,
+               _quantityRange,
+               SWT.NONE);
+
+         final Spinner spinner = spinnerCellEditor.getControl();
+         spinner.setMinimum(25);
+         spinner.setMaximum(10000);
+         spinner.setIncrement(25);
+         spinner.setPageIncrement(100);
+         spinner.addMouseWheelListener(mouseEvent -> UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 24));
+      }
+
+      @Override
+      protected boolean canEdit(final Object element) {
+         final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
+
+         return tourNutritionProduct.getTourBeverageContainer() != null;
+      }
+
+      @Override
+      protected CellEditor getCellEditor(final Object element) {
+         return spinnerCellEditor;
+      }
+
+      @Override
+      protected Object getValue(final Object element) {
+         return ((TourNutritionProduct) element).getContainersConsumed();
+      }
+
+      @Override
+      protected void setValue(final Object element, final Object value) {
+
+         final float consumedAmount = ((Double) value).floatValue();
+
+         ((TourNutritionProduct) element).setContainersConsumed(consumedAmount);
+         _tourData = TourManager.saveModifiedTour(_tourData);
+      }
+   }
+
    private final class ConsumedQuantityEditingSupport extends EditingSupport {
 
       private SpinnerCellEditor spinnerCellEditor;
@@ -215,17 +263,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                new RangeContent(0, 0, 0),
                SWT.NONE);
 
-         //TODO FB it's all over the place as there are 3 possible ways
-         //- mouse wheel on the number
-         //- mouse wheel on the -/+ signs
-         //- mouse wheel CLICK on the -/+ signs
-         //
          final Spinner spinner = spinnerCellEditor.getControl();
          spinner.setMinimum(25);
          spinner.setMaximum(10000);
          spinner.setIncrement(25);
          spinner.setPageIncrement(100);
-         spinner.addMouseWheelListener(mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent));
+         spinner.addMouseWheelListener(mouseEvent -> UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 24));
       }
 
       @Override
@@ -1502,39 +1545,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          }
       });
 
-      _colDef_ConsumedBeverageContainers.setEditingSupport(new EditingSupport(_productsViewer) {
-
-         private SpinnerCellEditor spinnerCellEditor = new SpinnerCellEditor(_productsViewer.getTable(),
-               _nf2,
-               _quantityRange,
-               SWT.NONE);
-
-         @Override
-         protected boolean canEdit(final Object element) {
-            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
-
-            return tourNutritionProduct.getTourBeverageContainer() != null;
-         }
-
-         @Override
-         protected CellEditor getCellEditor(final Object element) {
-            return spinnerCellEditor;
-         }
-
-         @Override
-         protected Object getValue(final Object element) {
-            return ((TourNutritionProduct) element).getContainersConsumed();
-         }
-
-         @Override
-         protected void setValue(final Object element, final Object value) {
-
-            final float consumedAmount = ((Double) value).floatValue();
-
-            ((TourNutritionProduct) element).setContainersConsumed(consumedAmount);
-            _tourData = TourManager.saveModifiedTour(_tourData);
-         }
-      });
+      _colDef_ConsumedBeverageContainers.setEditingSupport(new ConsumedBeverageContainersEditingSupport());
    }
 
    @Override
