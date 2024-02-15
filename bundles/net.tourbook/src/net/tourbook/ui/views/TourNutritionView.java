@@ -1582,7 +1582,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    }
 
    @Override
-   public void updateColumnHeader(final ColumnDefinition colDef) {}
+   public void updateColumnHeader(final ColumnDefinition colDef) {
+      // Nothing to do
+   }
 
    private void updateModifiedTour(final ArrayList<TourData> modifiedTours) {
 
