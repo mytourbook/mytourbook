@@ -714,8 +714,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void createUI_210_Actions(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().span(3, 1).applyTo(container);
+      final Composite container = _tk.createComposite(parent);
+      GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(6).applyTo(container);
       {
          /*
