@@ -532,50 +532,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             return;
          }
 
-         if (tourEventId == TourEventId.TOUR_SELECTION && eventData instanceof final ISelection eventDataSelection) {
-
-            onSelectionChanged(eventDataSelection);
-
-         } else {
-
-            if (_tourData == null) {
-               return;
-            }
-
-            if (tourEventId == TourEventId.TOUR_CHANGED && eventData instanceof final TourEvent tourEventData) {
-
-               final ArrayList<TourData> modifiedTours = tourEventData.getModifiedTours();
-               if (modifiedTours != null) {
-
-                  // update modified tour
-
-                  final long viewTourId = _tourData.getTourId();
-
-                  // The view contains multiple tours
-                  if (_tourData.isMultipleTours()) {
-
-                     showInvalidPage();
-
-                  } else {
-
-                     // The view contains a single tour
-                     for (final TourData tourData : modifiedTours) {
-
-                        if (tourData.getTourId() == viewTourId) {
-
-                           refreshTourData(tourData);
-
-                           // nothing more to do, the view contains only one tour
-                           return;
-                        }
-                     }
-                  }
-               }
-            } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
-
-               clearView();
-            }
-         }
+         handleTourEvent(tourEventId, eventData);
       };
 
       TourManager.getInstance().addTourEventListener(_tourEventListener);
@@ -1185,22 +1142,50 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final StructuredSelection selection = (StructuredSelection) _productsViewer.getSelection();
 
-      final List<TourNutritionProduct> tourNutritionProducts = new ArrayList<>();
+      final List<TourNutritionProduct> selectedTourNutritionProducts = new ArrayList<>();
 
       for (final Object object : selection.toList()) {
 
          if (object instanceof final TourNutritionProduct tourNutritionProduct) {
-            tourNutritionProducts.add(tourNutritionProduct);
+            selectedTourNutritionProducts.add(tourNutritionProduct);
          }
       }
 
-      return tourNutritionProducts;
+      return selectedTourNutritionProducts;
    }
 
    @Override
    public ColumnViewer getViewer() {
 
       return _productsViewer;
+   }
+
+   private void handleTourEvent(final TourEventId tourEventId, final Object eventData) {
+
+      if (tourEventId == TourEventId.TOUR_SELECTION && eventData instanceof final ISelection eventDataSelection) {
+
+         onSelectionChanged(eventDataSelection);
+
+      } else {
+
+         if (_tourData == null) {
+            return;
+         }
+
+         if (tourEventId == TourEventId.TOUR_CHANGED && eventData instanceof final TourEvent tourEventData) {
+
+            final ArrayList<TourData> modifiedTours = tourEventData.getModifiedTours();
+            if (modifiedTours != null) {
+
+               // update modified tour
+
+               updateModifiedTour(modifiedTours);
+            }
+         } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+            clearView();
+         }
+      }
    }
 
    private void initUI(final Composite parent) {
@@ -1232,50 +1217,49 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void onPaint_Viewer(final Event event) {
 
       // paint images at the correct column
-
       final int columnIndex = event.index;
 
       if (columnIndex == _columnIndex_ForColumn_IsBeverage) {
 
          onPaint_Viewer_GraphImage(event);
       }
-
    }
 
    private void onPaint_Viewer_GraphImage(final Event event) {
 
-      if (event.type == SWT.PaintItem) {
+      if (event.type != SWT.PaintItem) {
+         return;
+      }
 
-         final TableItem item = (TableItem) event.item;
-         final Object itemData = item.getData();
-         final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) itemData;
+      final TableItem item = (TableItem) event.item;
+      final Object itemData = item.getData();
+      final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) itemData;
 
-         final Image image;
-         if (tourNutritionProduct.isBeverage()) {
+      final Image image;
+      if (tourNutritionProduct.isBeverage()) {
 
-            image = UI.IS_DARK_THEME ? _imageYes : _imageCheck;
+         image = UI.IS_DARK_THEME ? _imageYes : _imageCheck;
 
-         } else {
+      } else {
 
-            image = UI.IS_DARK_THEME ? null : _imageUncheck;
+         image = UI.IS_DARK_THEME ? null : _imageUncheck;
 
-         }
+      }
 
-         if (image != null) {
+      if (image != null) {
 
-            final Rectangle imageRect = image.getBounds();
+         final Rectangle imageRect = image.getBounds();
 
-            // center horizontal
-            final int xOffset = Math.max(0, (_columnWidth_ForColumn_IsBeverage - imageRect.width) / 2);
+         // center horizontal
+         final int xOffset = Math.max(0, (_columnWidth_ForColumn_IsBeverage - imageRect.width) / 2);
 
-            // center vertical
-            final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
+         // center vertical
+         final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
 
-            final int devX = event.x + xOffset;
-            final int devY = event.y + yOffset;
+         final int devX = event.x + xOffset;
+         final int devY = event.y + yOffset;
 
-            event.gc.drawImage(image, devX, devY);
-         }
+         event.gc.drawImage(image, devX, devY);
       }
    }
 
@@ -1373,6 +1357,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    }
 
    private void refreshTourData(final TourData tourData) {
+
       // get modified tour
       _tourData = tourData;
 
@@ -1421,9 +1406,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_ConsumedQuantity.setEditingSupport(new ConsumedQuantityEditingSupport());
 
-      final String[] quantityTypeItems = new String[2];
-      quantityTypeItems[0] = Messages.Tour_Nutrition_Label_QuantityType_Servings;
-      quantityTypeItems[1] = Messages.Tour_Nutrition_Label_QuantityType_Products;
+      final String[] quantityTypeItems = new String[] { Messages.Tour_Nutrition_Label_QuantityType_Servings,
+            Messages.Tour_Nutrition_Label_QuantityType_Products };
+
       _colDef_QuantityType.setEditingSupport(new EditingSupport(_productsViewer) {
 
          private ComboBoxCellEditor comboBoxCellEditor = new ComboBoxCellEditor(_productsViewer.getTable(), quantityTypeItems, SWT.READ_ONLY);
@@ -1551,7 +1536,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    }
 
    @Override
-   public void setFocus() {}
+   public void setFocus() {
+      _productsViewer.getTable().setFocus();
+   }
 
    private void setWidth_ForColumn_IsBeverage() {
 
@@ -1596,6 +1583,30 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
+
+   private void updateModifiedTour(final ArrayList<TourData> modifiedTours) {
+
+      final long viewTourId = _tourData.getTourId();
+      // The view contains multiple tours
+      if (_tourData.isMultipleTours()) {
+
+         showInvalidPage();
+
+      } else {
+
+         // The view contains a single tour
+         for (final TourData tourData : modifiedTours) {
+
+            if (tourData.getTourId() == viewTourId) {
+
+               refreshTourData(tourData);
+
+               // nothing more to do, the view contains only one tour
+               break;
+            }
+         }
+      }
+   }
 
    private void updateUI_ProductViewer() {
 
