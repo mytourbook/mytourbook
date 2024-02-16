@@ -77,7 +77,7 @@ public class NutritionUtils {
 
    public static String buildTourBeverageContainerName(final TourBeverageContainer tourBeverageContainer) {
 
-      return String.format("%s (%s %s)", tourBeverageContainer.getName(), tourBeverageContainer.getCapacity(), UI.UNIT_FLUIDS_ML); //$NON-NLS-1$
+      return String.format("%s (%s %s)", tourBeverageContainer.getName(), tourBeverageContainer.getCapacity(), UI.UNIT_FLUIDS_L); //$NON-NLS-1$
    }
 
    public static String computeAverageCaloriesPerHour(final TourData tourData) {
