@@ -384,12 +384,12 @@ public class TourBlogView extends ViewPart {
          sb.append(SPACER);
       }
 
-      sb.append("<div class='title'>" + Messages.Tour_Blog_Section_Nutrition + "</div>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("<div class='title'>" + Messages.Tour_Blog_Section_Nutrition + "</div>"); //$NON-NLS-1$ //$NON-NLS-2$
 
       // AVERAGES
-      sb.append(UI.NEW_LINE + "<u>" + Messages.Tour_Blog_Label_Nutrition_Averages + "</u>" + UI.NEW_LINE); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append(NL + "<u>" + Messages.Tour_Blog_Label_Nutrition_Averages + "</u>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
 
-      sb.append(UI.NEW_LINE);
+      sb.append(NL);
       sb.append("<table>"); //$NON-NLS-1$
 
       // Average fluids per hour
@@ -423,10 +423,12 @@ public class TourBlogView extends ViewPart {
       if (beverages.size() > 0) {
          // BEVERAGES
 
-         sb.append(UI.NEW_LINE + "<u>" + Messages.Tour_Blog_Label_Nutrition_Beverages + "</u>" + UI.NEW_LINE); //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append(NL);
+
+         sb.append(NL + "<u>" + Messages.Tour_Blog_Label_Nutrition_Beverages + "</u>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
          beverages.stream().forEach(product -> {
 
-            sb.append(UI.NEW_LINE);
+            sb.append(NL);
             final TourBeverageContainer tourBeverageContainer = product.getTourBeverageContainer();
 
             if (tourBeverageContainer == null) {
@@ -449,21 +451,21 @@ public class TourBlogView extends ViewPart {
             }
          });
 
-         sb.append(UI.NEW_LINE);
+         sb.append(NL);
       }
       if (foods.size() > 0) {
          // FOODS
 
-         sb.append(UI.NEW_LINE);
+         sb.append(NL);
 
-         sb.append(UI.NEW_LINE + "<u>" + Messages.Tour_Blog_Label_Nutrition_Foods + "</u>" + UI.NEW_LINE); //$NON-NLS-1$ //$NON-NLS-2$
+         sb.append(NL + "<u>" + Messages.Tour_Blog_Label_Nutrition_Foods + "</u>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
          foods.stream().forEach(product -> {
 
-            sb.append(UI.NEW_LINE);
+            sb.append(NL);
             sb.append(_nf2.format(product.getConsumedQuantity()) + UI.SPACE1 + NutritionUtils.getProductFullName(product));
          });
 
-         sb.append(UI.NEW_LINE);
+         sb.append(NL);
       }
 
       String nutritionSectionString = WEB.convertHTML_LineBreaks(sb.toString());
