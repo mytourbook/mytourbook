@@ -20,7 +20,6 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
 
@@ -121,7 +120,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             _spinnerNumServings.addModifyListener(event -> onCapacityModified());
             _spinnerNumServings.addMouseWheelListener(mouseEvent -> {
 
-               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 25);
 
                onCapacityModified();
             });
@@ -173,7 +172,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             _spinnerBeverageQuantity.addModifyListener(event -> onBeverageQuantityModified());
             _spinnerBeverageQuantity.addMouseWheelListener(mouseEvent -> {
 
-               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 25);
 
                onBeverageQuantityModified();
             });

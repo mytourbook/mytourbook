@@ -20,7 +20,6 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
-import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -110,7 +109,7 @@ class DialogBeverageContainer extends Dialog {
          _spinnerCapacity.addModifyListener(event -> validateFields());
          _spinnerCapacity.addMouseWheelListener(mouseEvent -> {
 
-            Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+            UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 25);
 
             onCapacityModified();
          });
