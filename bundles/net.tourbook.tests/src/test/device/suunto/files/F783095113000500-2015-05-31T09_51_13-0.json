@@ -11,7 +11,7 @@
   "cadenceZone_FastTime" : 14437,
   "cadenceZone_SlowTime" : 2387,
   "cadenceZones_DelimiterValue" : 70,
-  "calories" : 2016,
+  "calories" : 2016000,
   "deviceFirmwareVersion" : "2.0.9",
   "devicePluginName" : "Suunto Ambit2 S",
   "deviceTimeInterval" : -1,

@@ -42,18 +42,37 @@ Experimental
 New
 ===
 
+* Start/End Location
+  - Retrieve, manage and show start/end locations in
+    - Tour editor
+  - Scramble tour location view when requested
+  https://github.com/mytourbook/mytourbook/issues/878
+
 * 
 
 
 Improvements
 ============
 
-*         
+* Fit Import
+  - Import device sensors which do not contain a serial number
+    https://github.com/mytourbook/mytourbook/issues/1287
+
+
+* Tour Book
+  - Show powertrain L-R balance values separately
+    https://github.com/mytourbook/mytourbook/issues/1271
+
+* Tour Blog (Frederic)
+  - Displaying the main numbers of the tour (distance, elevation gain/loss...)
   
 
 Changes
 =======
 
+* Fit Import
+  - Device sensors are now imported which do not contain a serial number
+    -> Now there can be new sensors in the sensor view which were currently ignored !
 * 
 
 
@@ -62,6 +81,10 @@ Bugfix
 
 * TCX Import (Frederic)
   - Fix for average and maximum power computation
+    https://github.com/mytourbook/mytourbook/discussions/1268
+
+* Suunto XML/SML Import (Frederic)
+  - Fix for the calories import values
 
 
 Translation    

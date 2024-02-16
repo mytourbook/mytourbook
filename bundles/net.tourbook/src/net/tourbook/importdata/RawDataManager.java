@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -184,55 +184,61 @@ public class RawDataManager {
     * <p>
     * Only the KeySet is used
     */
-   private static final ConcurrentHashMap<String, Object>       _allInvalidFiles                         = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, Object>       _allInvalidFiles                          = new ConcurrentHashMap<>();
 
    /**
     * Contains alternative filepaths from previous re-imported tours, the key is the {@link IPath}.
     * <p>
     * Only the KeySet is used
     */
-   private static final ConcurrentHashMap<IPath, Object>        _allPreviousReimportFolders              = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<IPath, Object>        _allPreviousReimportFolders               = new ConcurrentHashMap<>();
 
    private static volatile IPath                                _previousReimportFolder;
 
    /**
     * Contains tours which are imported or received and displayed in the import view.
     */
-   private static final ConcurrentHashMap<Long, TourData>       _allImported_Tours                       = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<Long, TourData>       _allImported_Tours                        = new ConcurrentHashMap<>();
 
    /**
     * Contains the filenames for all imported files which are displayed in the import view
     */
-   private static final ConcurrentHashMap<String, String>       _allImported_FileNames                   = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, String>       _allImported_FileNames                    = new ConcurrentHashMap<>();
 
    /**
     * Contains filenames which are not directly imported but is imported from other imported files
     */
-   private static final ConcurrentHashMap<String, String>       _allImported_FileNamesChildren           = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, String>       _allImported_FileNamesChildren            = new ConcurrentHashMap<>();
 
    /**
     * Contains {@link TourType}'s which are imported and could be saved or not, key is the tour type
     * name in UPPERCASE
     */
-   private static final ConcurrentHashMap<String, TourType>     _allImported_NewTourTypes                = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, TourType>     _allImported_NewTourTypes                 = new ConcurrentHashMap<>();
 
    /**
     * Contains {@link TourTag}'s which are imported and could be saved or not, key is the tour tag
     * name in UPPERCASE
     */
-   private static final ConcurrentHashMap<String, TourTag>      _allImported_NewTourTags                 = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, TourTag>      _allImported_NewTourTags                  = new ConcurrentHashMap<>();
 
    /**
     * Contains {@link TourTag}'s which are imported and could be saved or not, key is the tour tag
     * name + contained id in notes, all is in UPPERCASE
     */
-   private static final ConcurrentHashMap<String, TourTag>      _allImported_NewTourTags_WithContainedId = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, TourTag>      _allImported_NewTourTags_WithContainedId  = new ConcurrentHashMap<>();
+
+   /**
+    * Contains {@link DeviceSensor}'s which are imported and could be saved or not, key is the
+    * device name in UPPERCASE
+    */
+   private static final ConcurrentHashMap<String, DeviceSensor> _allImported_NewDeviceSensors_ByName      = new ConcurrentHashMap<>();
 
    /**
     * Contains {@link DeviceSensor}'s which are imported and could be saved or not, key is the
     * serial number name in UPPERCASE
     */
-   private static final ConcurrentHashMap<String, DeviceSensor> _allImported_NewDeviceSensors            = new ConcurrentHashMap<>();
+   private static final ConcurrentHashMap<String, DeviceSensor> _allImported_NewDeviceSensors_BySerialNum = new ConcurrentHashMap<>();
 
    //
    /**
@@ -378,12 +384,15 @@ public class RawDataManager {
    }
 
    /**
-    * SYNCHRONIZED: Create new device sensor and keep it in {@link #_allImported_NewDeviceSensors}
-    * or uses an already created sensor
+    * SYNCHRONIZED: Create new device sensor and keep it in
+    * {@link #_allImported_NewDeviceSensors_BySerialNum} or
+    * {@value #_allImported_NewDeviceSensors_ByName} or use an already created sensor
     *
-    * @param sensorType
+    * @param manufacturerNumber
+    * @param manufacturerName
+    * @param productNumber
+    * @param productName
     * @param serialNumber
-    * @param sensorSerialNumberKey
     *
     * @return Returns the new device sensor
     */
@@ -395,21 +404,103 @@ public class RawDataManager {
 
                                                               final String serialNumber) {
 
-      final String serialNumberKey = serialNumber.toUpperCase();
+      if (serialNumber == null) {
+
+         final DeviceSensor newSensor = createDeviceSensor_ByName(
+
+               manufacturerNumber,
+               manufacturerName,
+               productNumber,
+               productName);
+
+         return newSensor;
+
+      } else {
+
+         return createDeviceSensor_BySerialNum(
+
+               manufacturerNumber,
+               manufacturerName,
+               productNumber,
+               productName,
+               serialNumber);
+      }
+   }
+
+   private static DeviceSensor createDeviceSensor_ByName(final int manufacturerNumber,
+                                                         final String manufacturerName,
+                                                         final int productNumber,
+                                                         final String productName) {
+
+      final String deviceKeyByName = DeviceSensor.createSensorKeyByName(
+            manufacturerName,
+            manufacturerNumber,
+            productNumber,
+            productName);
 
       /*
        * Check imported sensors
        */
-      final DeviceSensor importedSensor = _allImported_NewDeviceSensors.get(serialNumberKey);
+      final DeviceSensor importedSensor = _allImported_NewDeviceSensors_ByName.get(deviceKeyByName);
       if (importedSensor != null) {
+
          return importedSensor;
       }
 
       /*
        * Check if sensor is still unavailable in the database
        */
-      final DeviceSensor deviceSensor = TourDatabase.getAllDeviceSensors_BySerialNo().get(serialNumberKey);
+      final Collection<DeviceSensor> allDeviceSensor = TourDatabase.getAllDeviceSensors_BySensorID().values();
+      for (final DeviceSensor deviceSensor : allDeviceSensor) {
+
+         final String sensorNameKey = deviceSensor.getSensorKeyByName();
+
+         if (sensorNameKey.equals(deviceKeyByName)) {
+
+            return deviceSensor;
+         }
+      }
+
+      /*
+       * Sensor is for sure not available -> create it now
+       */
+      final DeviceSensor newSensor = new DeviceSensor(
+
+            manufacturerNumber,
+            manufacturerName,
+
+            productNumber,
+            productName,
+
+            null);
+
+      _allImported_NewDeviceSensors_ByName.put(deviceKeyByName, newSensor);
+
+      return newSensor;
+   }
+
+   private static DeviceSensor createDeviceSensor_BySerialNum(final int manufacturerNumber,
+                                                              final String manufacturerName,
+                                                              final int productNumber,
+                                                              final String productName,
+                                                              final String serialNumber) {
+      final String serialNumberKey = serialNumber.toUpperCase();
+
+      /*
+       * Check imported sensors
+       */
+      final DeviceSensor importedSensor = _allImported_NewDeviceSensors_ByName.get(serialNumberKey);
+      if (importedSensor != null) {
+
+         return importedSensor;
+      }
+
+      /*
+       * Check if sensor is still unavailable in the database
+       */
+      final DeviceSensor deviceSensor = TourDatabase.getAllDeviceSensors_BySerialNum().get(serialNumberKey);
       if (deviceSensor != null) {
+
          return deviceSensor;
       }
 
@@ -426,7 +517,7 @@ public class RawDataManager {
 
             serialNumber);
 
-      _allImported_NewDeviceSensors.put(serialNumberKey, newSensor);
+      _allImported_NewDeviceSensors_BySerialNum.put(serialNumberKey, newSensor);
 
       return newSensor;
    }
@@ -3046,7 +3137,7 @@ public class RawDataManager {
                                                          final ImportState_Process importState_Process,
                                                          final ReImportStatus reImportStatus) {
 
-      final Shell activeShell = Display.getDefault().getActiveShell();
+      final Shell activeShell = TourbookPlugin.getAppShell();
 
       // during initialization there is no active shell
       if (activeShell == null) {
@@ -3702,7 +3793,8 @@ public class RawDataManager {
       _allImported_NewTourTags_WithContainedId.clear();
       _allImported_NewTourTypes.clear();
 
-      _allImported_NewDeviceSensors.clear();
+      _allImported_NewDeviceSensors_ByName.clear();
+      _allImported_NewDeviceSensors_BySerialNum.clear();
    }
 
    public void removeTours(final TourData[] removedTours) {

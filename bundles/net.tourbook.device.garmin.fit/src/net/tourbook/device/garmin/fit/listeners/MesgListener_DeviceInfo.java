@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.database.TourDatabase;
@@ -45,7 +46,9 @@ import org.joda.time.format.DateTimeFormatter;
 public class MesgListener_DeviceInfo extends AbstractMesgListener implements DeviceInfoMesgListener {
 
    private static final String            FORMAT_STRING_10      = " %10s";                                          //$NON-NLS-1$
-   private static final String            FORMAT_STRING_10_LEFT = " %-10s";                                         //$NON-NLS-1$
+   private static final String            FORMAT_STRING_20      = " %20s";                                          //$NON-NLS-1$
+   private static final String            FORMAT_STRING_10_LEFT = "%-10s ";                                         //$NON-NLS-1$
+   private static final String            FORMAT_STRING_20_LEFT = "%-20s ";                                         //$NON-NLS-1$
    private static final String            FORMAT_FLOAT_10_3     = "%10.3f";                                         //$NON-NLS-1$
    private static final String            LOG_SEPARATOR         = "\t";                                             //$NON-NLS-1$
 
@@ -125,39 +128,39 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
 
 // SET_FORMATTING_OFF
 
-      System.out.println(String.format(UI.EMPTY_STRING
+      System.out.println(String.format(UI.NEW_LINE1
 
-            + "date time"                 + LOG_SEPARATOR //$NON-NLS-1$
+            + "date time"                 + LOG_SEPARATOR + LOG_SEPARATOR + LOG_SEPARATOR + LOG_SEPARATOR //$NON-NLS-1$
 
             + "   prod:"                  + LOG_SEPARATOR //$NON-NLS-1$
-            + "manufacturer"              + LOG_SEPARATOR //$NON-NLS-1$
-            + "product"                   + LOG_SEPARATOR //$NON-NLS-1$
-            + "prduct name"               + LOG_SEPARATOR //$NON-NLS-1$
-            + "garmin product"            + LOG_SEPARATOR //$NON-NLS-1$
-            + "descriptor"                + LOG_SEPARATOR //$NON-NLS-1$
+            + "manufacture"               + LOG_SEPARATOR //$NON-NLS-1$
+            + "    product"               + LOG_SEPARATOR //$NON-NLS-1$
+            + "         product name"     + LOG_SEPARATOR //$NON-NLS-1$
+            + "garmin prod"               + LOG_SEPARATOR //$NON-NLS-1$
+            + " descriptor"               + LOG_SEPARATOR //$NON-NLS-1$
 
             + "   ser:"                   + LOG_SEPARATOR //$NON-NLS-1$
-            + "serial no"                 + LOG_SEPARATOR //$NON-NLS-1$
-            + "device index"              + LOG_SEPARATOR //$NON-NLS-1$
-            + "hardware version"          + LOG_SEPARATOR //$NON-NLS-1$
-            + "software version"          + LOG_SEPARATOR //$NON-NLS-1$
+            + "  serial no"               + LOG_SEPARATOR //$NON-NLS-1$
+            + " device idx"               + LOG_SEPARATOR //$NON-NLS-1$
+            + "hardwre vrs"               + LOG_SEPARATOR //$NON-NLS-1$
+            + "softwre vrs"               + LOG_SEPARATOR //$NON-NLS-1$
 
             + "   bat:"                   + LOG_SEPARATOR //$NON-NLS-1$
-            + "battery level"             + LOG_SEPARATOR //$NON-NLS-1$
-            + "battery status"            + LOG_SEPARATOR //$NON-NLS-1$
-            + "battery voltage"           + LOG_SEPARATOR //$NON-NLS-1$
-            + "cummulated operating time" + LOG_SEPARATOR //$NON-NLS-1$
+            + " batt level"               + LOG_SEPARATOR //$NON-NLS-1$
+            + "batt status"               + LOG_SEPARATOR //$NON-NLS-1$
+            + "batt voltag"               + LOG_SEPARATOR //$NON-NLS-1$
+            + "cum op time"               + LOG_SEPARATOR //$NON-NLS-1$
 
-            + "  ant:"                    + LOG_SEPARATOR //$NON-NLS-1$
+            + "   ant:"                   + LOG_SEPARATOR //$NON-NLS-1$
             + "source type"               + LOG_SEPARATOR //$NON-NLS-1$
-            + "ant network"               + LOG_SEPARATOR //$NON-NLS-1$
-            + "ant device type"           + LOG_SEPARATOR //$NON-NLS-1$
-            + "ant device nummer"         + LOG_SEPARATOR //$NON-NLS-1$
-            + "ant plus"                  + LOG_SEPARATOR //$NON-NLS-1$
-            + "ant transmision type"      + LOG_SEPARATOR //$NON-NLS-1$
+            + "network    "               + LOG_SEPARATOR //$NON-NLS-1$
+            + "device type"               + LOG_SEPARATOR //$NON-NLS-1$
+            + "device no  "               + LOG_SEPARATOR //$NON-NLS-1$
+            + "ant plus             "     + LOG_SEPARATOR //$NON-NLS-1$
+            + "trans type "               + LOG_SEPARATOR //$NON-NLS-1$
 
-            + "  ble:"                    + LOG_SEPARATOR //$NON-NLS-1$
-            + "ble device type"           + LOG_SEPARATOR //$NON-NLS-1$
+            + "   ble:"                   + LOG_SEPARATOR //$NON-NLS-1$
+            + "ble device type      "     + LOG_SEPARATOR //$NON-NLS-1$
 
             + "   src:"                   + LOG_SEPARATOR //$NON-NLS-1$
             + "sensor Position"           + LOG_SEPARATOR //$NON-NLS-1$
@@ -219,7 +222,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                + "   prod:" + LOG_SEPARATOR //                                         //$NON-NLS-1$
                + FORMAT_STRING_10 + LOG_SEPARATOR //     manufacturer
                + FORMAT_STRING_10 + LOG_SEPARATOR //     product
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     product name
+               + FORMAT_STRING_20 + LOG_SEPARATOR //     product name
                + FORMAT_STRING_10 + LOG_SEPARATOR //     garmin product
                + FORMAT_STRING_10 + LOG_SEPARATOR //     descriptor
 
@@ -235,19 +238,19 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                + FORMAT_STRING_10 + LOG_SEPARATOR //     battery voltage
                + FORMAT_STRING_10 + LOG_SEPARATOR //     accumulated operating time
 
-               + "  ant:" + LOG_SEPARATOR //                                           //$NON-NLS-1$
-               + FORMAT_STRING_10_LEFT + LOG_SEPARATOR // source type
-               + FORMAT_STRING_10_LEFT + LOG_SEPARATOR // ant network
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     ant device type
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     ant device number
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     ant plus
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     ant transmission type
+               + "   ant:" + LOG_SEPARATOR //                                           //$NON-NLS-1$
+               + FORMAT_STRING_10_LEFT + LOG_SEPARATOR //   source type
+               + FORMAT_STRING_10_LEFT + LOG_SEPARATOR //   ant network
+               + FORMAT_STRING_10 + LOG_SEPARATOR //        ant device type
+               + FORMAT_STRING_10 + LOG_SEPARATOR //        ant device number
+               + FORMAT_STRING_20_LEFT + LOG_SEPARATOR //   ant plus
+               + FORMAT_STRING_10 + LOG_SEPARATOR //        ant transmission type
 
-               + "  ble:" + LOG_SEPARATOR //                                           //$NON-NLS-1$
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     ble device type
+               + "   ble:" + LOG_SEPARATOR //                                           //$NON-NLS-1$
+               + FORMAT_STRING_20_LEFT + LOG_SEPARATOR //   ble device type
 
                + "   src:" //                                                          //$NON-NLS-1$
-               + FORMAT_STRING_10 + LOG_SEPARATOR //     sensorPosition
+               + FORMAT_STRING_20_LEFT + LOG_SEPARATOR //   sensorPosition
 
                ,
 
@@ -273,7 +276,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                removeNull(cumOperatingTime),
 
                // ant
-               SourceType.getStringFromValue(sourceType),
+               sourceType == null ? UI.EMPTY_STRING : SourceType.getStringFromValue(sourceType),
                removeNull(antNetwork),
                removeNull(antDeviceType),
                removeNull(antDeviceNumber),
@@ -324,13 +327,14 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
          }
       }
 
-      /*
-       * Sensor data are set only for device sensors, when the serial number is available, otherwise
-       * they cannot be easily identified
-       */
       final Long serialNumber = mesg.getSerialNumber();
       if (serialNumber != null) {
-         setSensorData(mesg, serialNumber);
+
+         setSensorData_WithSerialNo(mesg, serialNumber);
+
+      } else {
+
+         setSensorData_WithName(mesg);
       }
 
       if (_isLogDeviceData) {
@@ -378,9 +382,106 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
             : String.format(FORMAT_FLOAT_10_3, value);
    }
 
-   private void setSensorData(final DeviceInfoMesg mesg, final Long serialNumber) {
+   private void setSensorData_WithName(final DeviceInfoMesg mesg) {
 
-      // SET_FORMATTING_OFF
+// SET_FORMATTING_OFF
+
+      final Integer        mesgManufacturerNumber     = mesg.getManufacturer();
+      final Integer        mesgProductNumber          = mesg.getProduct();
+      final String         mesgProductName            = mesg.getProductName();
+
+      final Short          mesgBatteryLevel           = mesg.getBatteryLevel();     // %
+      final Float          mesgBatteryVoltage         = mesg.getBatteryVoltage();   // Volt
+      final Short          mesgBatteryStatus          = mesg.getBatteryStatus();    // OK, ...
+
+// SET_FORMATTING_ON
+
+      /*
+       * Get sensor
+       */
+      final Map<Long, DeviceSensor> allDbSensors = TourDatabase.getAllDeviceSensors_BySensorID();
+
+      final String manufacturerName = getManufacturerName(mesgManufacturerNumber);
+      final String productName = getProductName(mesgProductNumber, mesgProductName, null);
+
+      DeviceSensor sensor = null;
+
+      for (final DeviceSensor dbSensor : allDbSensors.values()) {
+
+         final String dbManufacturerName = dbSensor.getManufacturerName();
+         final String dbProductName = dbSensor.getProductName();
+
+         if (dbManufacturerName != null && dbManufacturerName.equals(manufacturerName)
+               && dbProductName != null && dbProductName.equals(productName)) {
+
+            sensor = dbSensor;
+
+            break;
+         }
+      }
+
+      if (sensor == null) {
+
+         // create a new sensor
+
+         sensor = RawDataManager.createDeviceSensor(
+
+               mesgManufacturerNumber == null ? -1 : mesgManufacturerNumber,
+               manufacturerName,
+
+               mesgProductNumber == null ? -1 : mesgProductNumber,
+               productName,
+
+               null // serialNumber is not available
+         );
+      }
+
+      /*
+       * Get sensor value
+       */
+      final List<DeviceSensorValue> allImportedSensorValues = fitData.getDeviceSensorValues();
+      DeviceSensorValue sensorValue = null;
+
+      for (final DeviceSensorValue importedSensorValue : allImportedSensorValues) {
+
+         final DeviceSensor importedSensor = importedSensorValue.getDeviceSensor();
+
+         final String dbManufacturerName = importedSensor.getManufacturerName();
+         final String dbProductName = importedSensor.getProductName();
+
+         if (dbManufacturerName != null && dbManufacturerName.equals(manufacturerName)
+               && dbProductName != null && dbProductName.equals(productName)) {
+
+            // sensor found in sensor values
+
+            sensorValue = importedSensorValue;
+
+            sensorValue.setBattery_Level(mesgBatteryLevel);
+            sensorValue.setBattery_Status(mesgBatteryStatus);
+            sensorValue.setBattery_Voltage(mesgBatteryVoltage);
+
+            break;
+         }
+      }
+
+      if (sensorValue == null) {
+
+         // create new sensor value -> set start values
+
+         sensorValue = new DeviceSensorValue(sensor);
+
+         allImportedSensorValues.add(sensorValue);
+
+         sensorValue.setBattery_Level(mesgBatteryLevel);
+         sensorValue.setBattery_Status(mesgBatteryStatus);
+         sensorValue.setBattery_Voltage(mesgBatteryVoltage);
+      }
+
+   }
+
+   private void setSensorData_WithSerialNo(final DeviceInfoMesg mesg, final Long serialNumber) {
+
+// SET_FORMATTING_OFF
 
 //    final DateTime       timestamp                  = mesg.getTimestamp();
 
@@ -413,6 +514,9 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
        */
       final Short          mesgBatteryLevel           = mesg.getFieldShortValue(32, 0, Fit.SUBFIELD_INDEX_MAIN_FIELD);
 
+// this may also work without the early hack
+//    final Short          mesgBatteryLevel           = mesg.getBatteryLevel();
+
 // SET_FORMATTING_ON
 
       final String sensorSerialNumberKey = serialNumber.toString();
@@ -420,7 +524,7 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
       /*
        * Get sensor
        */
-      final Map<String, DeviceSensor> allDbSensors = TourDatabase.getAllDeviceSensors_BySerialNo();
+      final Map<String, DeviceSensor> allDbSensors = TourDatabase.getAllDeviceSensors_BySerialNum();
 
       DeviceSensor sensor = allDbSensors.get(sensorSerialNumberKey);
 
@@ -442,23 +546,29 @@ public class MesgListener_DeviceInfo extends AbstractMesgListener implements Dev
                sensorSerialNumberKey);
       }
 
-      updateSensorNames(sensor,
+      updateSensorNames(
+
+            sensor,
+
             mesgManufacturerNumber,
             mesgProductNumber,
             mesgProductName,
             mesgGarminProductNumber);
 
-      final List<DeviceSensorValue> allImportedSensorValues = fitData.getAllDeviceSensorValues();
-
       /*
        * Get sensor value
        */
+      final List<DeviceSensorValue> allImportedSensorValues = fitData.getDeviceSensorValues();
       DeviceSensorValue sensorValue = null;
+
       for (final DeviceSensorValue importedSensorValue : allImportedSensorValues) {
 
          final DeviceSensor importedSensor = importedSensorValue.getDeviceSensor();
 
-         if (importedSensor.getSerialNumber().equals(sensorSerialNumberKey)) {
+         final String importedSerialNumber = importedSensor.getSerialNumber();
+
+         if (StringUtils.hasContent(importedSerialNumber)
+               && importedSerialNumber.equals(sensorSerialNumberKey)) {
 
             // sensor found in sensor values
 

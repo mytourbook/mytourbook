@@ -33,11 +33,14 @@ import java.util.Set;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
@@ -93,9 +96,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
@@ -159,7 +160,6 @@ public class TourBlogView extends ViewPart {
    private IPropertyChangeListener       _prefChangeListener;
    private IPropertyChangeListener       _prefChangeListener_Common;
    private ITourEventListener            _tourEventListener;
-   private IPartListener2                _partListener;
 
    private TourData                      _tourData;
 
@@ -201,37 +201,6 @@ public class TourBlogView extends ViewPart {
 
          return new SlideoutTourBlogOptions(_parent, toolbar, TourBlogView.this, _state);
       }
-   }
-
-   private void addPartListener() {
-
-      _partListener = new IPartListener2() {
-
-         @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partClosed(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partHidden(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partVisible(final IWorkbenchPartReference partRef) {}
-      };
-      getViewSite().getPage().addPartListener(_partListener);
    }
 
    private void addPrefListener() {
@@ -324,9 +293,9 @@ public class TourBlogView extends ViewPart {
 
          } else if (eventId == TourEventId.MARKER_SELECTION) {
 
-            if (eventData instanceof SelectionTourMarker) {
+            if (eventData instanceof final SelectionTourMarker selectionTourMarker) {
 
-               final TourData tourData = ((SelectionTourMarker) eventData).getTourData();
+               final TourData tourData = selectionTourMarker.getTourData();
 
                if (tourData != _tourData) {
 
@@ -439,6 +408,69 @@ public class TourBlogView extends ViewPart {
       }
 
       return tagsSectionString;
+   }
+
+   private String buildTourSummary() {
+
+      final StringBuilder sb = new StringBuilder();
+
+      // Distance
+      final float tourDistance = _tourData.getTourDistance();
+      if (tourDistance > 0) {
+         sb.append("&#128207;" + UI.SPACE1); //$NON-NLS-1$
+         final float distance = tourDistance / UI.UNIT_VALUE_DISTANCE;
+         sb.append(FormatManager.formatDistance(distance / 1000.0));
+         sb.append(UI.SPACE1 + UI.UNIT_LABEL_DISTANCE + UI.SPACE3);
+      }
+
+      // Time
+      final long tourRecordedTime = _tourData.getTourDeviceTime_Recorded();
+      if (tourRecordedTime > 0) {
+         sb.append("&#9201;" + UI.SPACE1); //$NON-NLS-1$
+         sb.append(FormatManager.formatRecordedTime(_tourData.getTourDeviceTime_Recorded()));
+         sb.append(UI.SPACE3);
+      }
+
+      // Elevation gain
+      final float elevationGain = _tourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION;
+      if (elevationGain > 0) {
+         sb.append("&#8599;" + UI.SPACE1); //$NON-NLS-1$
+         sb.append(FormatManager.formatElevation(elevationGain));
+         sb.append(UI.SPACE1 + UI.UNIT_LABEL_ELEVATION + UI.SPACE3);
+      }
+
+      // Elevation loss
+      final float elevationLoss = _tourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION;
+      if (elevationLoss > 0) {
+         sb.append("&#8600;" + UI.SPACE1); //$NON-NLS-1$
+         sb.append(FormatManager.formatElevation(elevationLoss));
+         sb.append(UI.SPACE1 + UI.UNIT_LABEL_ELEVATION + UI.SPACE3);
+      }
+
+      // Calories
+      final float calories = _tourData.getCalories() / 1000f;
+      if (calories > 0) {
+         sb.append("&#128293;" + UI.SPACE1); //$NON-NLS-1$
+         sb.append(new ValueFormatter_Number_1_0().printDouble(calories));
+         sb.append(UI.SPACE1 + OtherMessages.VALUE_UNIT_K_CALORIES + UI.SPACE3);
+      }
+
+      // Body weight
+      final float bodyWeight = _tourData.getBodyWeight() * UI.UNIT_VALUE_WEIGHT;
+      if (bodyWeight > 0) {
+         sb.append("&#9878;" + UI.SPACE1); //$NON-NLS-1$
+         sb.append(new ValueFormatter_Number_1_0().printDouble(bodyWeight));
+         sb.append(UI.SPACE1 + UI.UNIT_LABEL_WEIGHT + UI.SPACE3);
+      }
+
+      // Body fat
+      final float bodyFat = _tourData.getBodyFat();
+      if (bodyFat > 0) {
+         sb.append(new ValueFormatter_Number_1_0().printDouble(bodyFat));
+         sb.append(UI.SPACE1 + UI.SYMBOL_PERCENTAGE + UI.SPACE3);
+      }
+
+      return sb.toString();
    }
 
    private String buildWeatherSection(String tourWeather, final boolean addSpacer) {
@@ -567,6 +599,7 @@ public class TourBlogView extends ViewPart {
       String tourTitle = _tourData.getTourTitle();
       final String tourDescription = _tourData.getTourDescription();
       final Set<TourTag> tourTags = _tourData.getTourTags();
+      String tourSummary = buildTourSummary();
       final String tourWeather = WeatherUtils.buildWeatherDataString(_tourData,
             true, // isdisplayMaximumMinimumTemperature
             true, // isDisplayPressure
@@ -575,13 +608,19 @@ public class TourBlogView extends ViewPart {
 
       final boolean isDescription = tourDescription.length() > 0;
       final boolean isTitle = tourTitle.length() > 0;
+      final boolean isTourSummary = tourSummary.length() > 0;
       final boolean isTourTags = tourTags.size() > 0;
       final boolean isWeather = tourWeather.length() > 0;
 
-      if (isDescription || isTitle || isWeather || isTourTags) {
+      if (isDescription || isTourSummary || isTitle || isWeather || isTourTags) {
 
          sb.append("<div class='action-hover-container' style='margin-top:15px; margin-bottom: 5px;'>" + NL); //$NON-NLS-1$
          {
+
+            if (UI.IS_SCRAMBLE_DATA) {
+               tourSummary = UI.scrambleText(tourSummary);
+            }
+            sb.append(tourSummary);
 
             sb.append("<div class='blog-item'>"); //$NON-NLS-1$
             {
@@ -806,7 +845,6 @@ public class TourBlogView extends ViewPart {
       addSelectionListener();
       addTourEventListener();
       addPrefListener();
-      addPartListener();
 
       showInvalidPage();
 
@@ -880,7 +918,6 @@ public class TourBlogView extends ViewPart {
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
-      getViewSite().getPage().removePartListener(_partListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
       _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
@@ -1148,11 +1185,10 @@ public class TourBlogView extends ViewPart {
 
       long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-      if (selection instanceof SelectionTourData) {
+      if (selection instanceof final SelectionTourData tourDataSelection) {
 
          // a tour was selected, get the chart and update the marker viewer
 
-         final SelectionTourData tourDataSelection = (SelectionTourData) selection;
          _tourData = tourDataSelection.getTourData();
 
          if (_tourData == null) {
@@ -1167,17 +1203,15 @@ public class TourBlogView extends ViewPart {
          _tourChart = null;
          tourId = selectionTourId.getTourId();
 
-      } else if (selection instanceof SelectionTourIds) {
+      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
 
-         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final List<Long> tourIds = selectionTourIds.getTourIds();
          if ((tourIds != null) && (tourIds.size() > 0)) {
             _tourChart = null;
             tourId = tourIds.get(0);
          }
 
-      } else if (selection instanceof SelectionReferenceTourView) {
-
-         final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
+      } else if (selection instanceof final SelectionReferenceTourView tourCatalogSelection) {
 
          final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
          if (refItem != null) {
@@ -1185,14 +1219,14 @@ public class TourBlogView extends ViewPart {
             tourId = refItem.getTourId();
          }
 
-      } else if (selection instanceof StructuredSelection) {
+      } else if (selection instanceof final StructuredSelection structuredSelection) {
 
          _tourChart = null;
-         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-         if (firstElement instanceof TVIRefTour_ComparedTour) {
-            tourId = ((TVIRefTour_ComparedTour) firstElement).getTourId();
-         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
-            tourId = ((TVIElevationCompareResult_ComparedTour) firstElement).getTourId();
+         final Object firstElement = structuredSelection.getFirstElement();
+         if (firstElement instanceof final TVIRefTour_ComparedTour tviRefTour_ComparedTour) {
+            tourId = tviRefTour_ComparedTour.getTourId();
+         } else if (firstElement instanceof final TVIElevationCompareResult_ComparedTour tviElevationCompareResult_ComparedTour) {
+            tourId = tviElevationCompareResult_ComparedTour.getTourId();
          }
 
       } else if (selection instanceof SelectionDeletedTours) {

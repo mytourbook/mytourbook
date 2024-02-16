@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2023 Frédéric Bard
+ * Copyright (C) 2020, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -53,10 +53,10 @@ class DropboxClient {
 
    private static DbxClientV2            _dropboxClient;
 
-   private static final String           DropboxApiBaseUrl  = "https://api.dropboxapi.com";                              //$NON-NLS-1$
-   static final String                   DropboxCallbackUrl = "http://localhost:" + PrefPageDropbox.CALLBACK_PORT + "/"; //$NON-NLS-1$ //$NON-NLS-2$
+   private static final String           DROPBOX_API_BASEURL  = "https://api.dropboxapi.com";                              //$NON-NLS-1$
+   static final String                   DROPBOX_CALLBACK_URL = "http://localhost:" + PrefPageDropbox.CALLBACK_PORT + "/"; //$NON-NLS-1$ //$NON-NLS-2$
 
-   private static final IPreferenceStore _prefStore         = Activator.getDefault().getPreferenceStore();
+   private static final IPreferenceStore _prefStore           = Activator.getDefault().getPreferenceStore();
 
    static {
 
@@ -80,9 +80,10 @@ class DropboxClient {
     *
     * @param dropboxFilePath
     *           The Dropbox path of the file
+    *
     * @return The local path of the downloaded file
     */
-   static final Path CopyLocally(String dropboxFilePath) {
+   static final Path copyLocally(String dropboxFilePath) {
 
       if (StringUtils.isNullOrEmpty(dropboxFilePath)) {
          return null;
@@ -133,6 +134,7 @@ class DropboxClient {
     * but has not saved it yet into the preferences but wants to access the Dropbox account already.
     *
     * @param accessToken
+    *
     * @return
     */
    private static final DbxClientV2 createDropboxClient(final String accessToken) {
@@ -151,6 +153,7 @@ class DropboxClient {
     * Otherwise, creates a temporary Dropbox client.
     *
     * @param accessToken
+    *
     * @return
     */
    static final DbxClientV2 getDefault(final String accessToken) {
@@ -168,7 +171,7 @@ class DropboxClient {
                                         final String codeVerifier) {
 
       final Map<String, String> data = new HashMap<>();
-      data.put(OAuth2Constants.PARAM_CLIENT_ID, PrefPageDropbox.ClientId);
+      data.put(OAuth2Constants.PARAM_CLIENT_ID, PrefPageDropbox.CLIENT_ID);
 
       String grantType;
       if (isRefreshToken) {
@@ -178,7 +181,7 @@ class DropboxClient {
          data.put("code_verifier", codeVerifier); //$NON-NLS-1$
          data.put(OAuth2Constants.PARAM_CODE, authorizationCode);
          grantType = OAuth2Constants.PARAM_AUTHORIZATION_CODE;
-         data.put(OAuth2Constants.PARAM_REDIRECT_URI, DropboxCallbackUrl);
+         data.put(OAuth2Constants.PARAM_REDIRECT_URI, DROPBOX_CALLBACK_URL);
       }
 
       data.put(OAuth2Constants.PARAM_GRANT_TYPE, grantType);
@@ -186,7 +189,7 @@ class DropboxClient {
       final HttpRequest request = HttpRequest.newBuilder()
             .header("Content-Type", "application/x-www-form-urlencoded") //$NON-NLS-1$ //$NON-NLS-2$
             .POST(ofFormData(data))
-            .uri(URI.create(DropboxApiBaseUrl + "/oauth2/token"))//$NON-NLS-1$
+            .uri(URI.create(DROPBOX_API_BASEURL + "/oauth2/token"))//$NON-NLS-1$
             .build();
 
       DropboxTokens token = new DropboxTokens();

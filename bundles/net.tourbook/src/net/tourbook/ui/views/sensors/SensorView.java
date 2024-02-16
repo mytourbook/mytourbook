@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -62,7 +62,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
@@ -84,8 +83,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Widget;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 public class SensorView extends ViewPart implements ITourViewer {
@@ -102,7 +99,6 @@ public class SensorView extends ViewPart implements ITourViewer {
    private final IPreferenceStore  _prefStore_Common               = CommonActivator.getPrefStore();
    private final IDialogSettings   _state                          = TourbookPlugin.getState(ID);
 
-   private IPartListener2          _partListener;
    private IPropertyChangeListener _prefChangeListener;
    private IPropertyChangeListener _prefChangeListener_Common;
    private ITourEventListener      _tourPropertyListener;
@@ -214,54 +210,137 @@ public class SensorView extends ViewPart implements ITourViewer {
             rc = item1.sensor.getManufacturerName().compareTo(item2.sensor.getManufacturerName());
             break;
 
-         case TableColumnFactory.SENSOR_PRODUCT_NAME_ID:
-            rc = item1.sensor.getProductName().compareTo(item2.sensor.getProductName());
-            break;
+         case TableColumnFactory.SENSOR_MANUFACTURER_NUMBER_ID:
 
-         case TableColumnFactory.SENSOR_SERIAL_NUMBER_ID:
+            rc = item1.sensor.getManufacturerNumber() - item2.sensor.getManufacturerNumber();
 
-            final long serialNumber1AsLong = item1.sensor.getSerialNumberAsLong();
-            final long serialNumber2AsLong = item2.sensor.getSerialNumberAsLong();
-
-            if (serialNumber1AsLong != Long.MIN_VALUE && serialNumber2AsLong != Long.MIN_VALUE) {
-
-               // first sort as number
-
-               rc = serialNumber1AsLong - serialNumber2AsLong;
-
-            } else {
-
-               // secondly sord as string
-
-               rc = item1.sensor.getSerialNumber().compareTo(item2.sensor.getSerialNumber());
+            if (rc == 0) {
+               rc = item1.sensor.getProductNumber() - item2.sensor.getProductNumber();
             }
 
             break;
 
-         case TableColumnFactory.SENSOR_STATE_BATTERY_LEVEL_ID:
+         case TableColumnFactory.SENSOR_PRODUCT_NAME_ID:
+            rc = item1.sensor.getProductName().compareTo(item2.sensor.getProductName());
+            break;
+
+         case TableColumnFactory.SENSOR_PRODUCT_NUMBER_ID:
+
+            rc = item1.sensor.getProductNumber() - item2.sensor.getProductNumber();
+
+            if (rc == 0) {
+               rc = item1.sensor.getManufacturerNumber() - item2.sensor.getManufacturerNumber();
+            }
+
+            break;
+
+         case TableColumnFactory.SENSOR_SERIAL_NUMBER_ID:
+
+            final DeviceSensor sensor1 = item1.sensor;
+            final DeviceSensor sensor2 = item2.sensor;
+
+            final long serialNumber1AsLong = sensor1.getSerialNumberAsLong();
+            final long serialNumber2AsLong = sensor2.getSerialNumberAsLong();
+
+            if (serialNumber1AsLong != Long.MIN_VALUE && serialNumber2AsLong != Long.MIN_VALUE) {
+
+               // firstly sort by serial number
+
+               rc = serialNumber1AsLong - serialNumber2AsLong;
+
+            } else if (serialNumber1AsLong != Long.MIN_VALUE) {
+
+               // must be set otherwise: java.lang.IllegalArgumentException: Comparison method violates its general contract!
+
+               rc = 1;
+
+            } else if (serialNumber2AsLong != Long.MIN_VALUE) {
+
+               // must be set otherwise: java.lang.IllegalArgumentException: Comparison method violates its general contract!
+
+               rc = -1;
+
+            } else {
+
+               // secondly sort by sensor key
+
+               rc = sensor1.getSensorKeyByName().compareTo(sensor2.getSensorKeyByName());
+            }
+
+            break;
+
+         case TableColumnFactory.SENSOR_STATE_BATTERY_LEVEL_ID: // %
 
             final int isBatteryLevelAvailable1 = item1.isBatteryLevelAvailable ? 1 : 0;
             final int isBatteryLevelAvailable2 = item2.isBatteryLevelAvailable ? 1 : 0;
 
             rc = isBatteryLevelAvailable1 - isBatteryLevelAvailable2;
 
+            if (rc == 0) {
+
+               final int isBatteryVoltageAvailable1 = item1.isBatteryVoltageAvailable ? 1 : 0;
+               final int isBatteryVoltageAvailable2 = item2.isBatteryVoltageAvailable ? 1 : 0;
+
+               rc = isBatteryVoltageAvailable1 - isBatteryVoltageAvailable2;
+            }
+
+            if (rc == 0) {
+
+               final int isBatteryStatusAvailable1 = item1.isBatteryStatusAvailable ? 1 : 0;
+               final int isBatteryStatusAvailable2 = item2.isBatteryStatusAvailable ? 1 : 0;
+
+               rc = isBatteryStatusAvailable1 - isBatteryStatusAvailable2;
+            }
+
             break;
 
-         case TableColumnFactory.SENSOR_STATE_BATTERY_STATUS_ID:
+         case TableColumnFactory.SENSOR_STATE_BATTERY_VOLTAGE_ID: // V
+
+            final int isBatteryVoltageAvailable1 = item1.isBatteryVoltageAvailable ? 1 : 0;
+            final int isBatteryVoltageAvailable2 = item2.isBatteryVoltageAvailable ? 1 : 0;
+
+            rc = isBatteryVoltageAvailable1 - isBatteryVoltageAvailable2;
+
+            if (rc == 0) {
+
+               final int isBatteryLevelAvailable1a = item1.isBatteryLevelAvailable ? 1 : 0;
+               final int isBatteryLevelAvailable2a = item2.isBatteryLevelAvailable ? 1 : 0;
+
+               rc = isBatteryLevelAvailable1a - isBatteryLevelAvailable2a;
+            }
+
+            if (rc == 0) {
+
+               final int isBatteryStatusAvailable1 = item1.isBatteryStatusAvailable ? 1 : 0;
+               final int isBatteryStatusAvailable2 = item2.isBatteryStatusAvailable ? 1 : 0;
+
+               rc = isBatteryStatusAvailable1 - isBatteryStatusAvailable2;
+            }
+
+            break;
+
+         case TableColumnFactory.SENSOR_STATE_BATTERY_STATUS_ID: // OK, Low, ...
 
             final int isBatteryStatusAvailable1 = item1.isBatteryStatusAvailable ? 1 : 0;
             final int isBatteryStatusAvailable2 = item2.isBatteryStatusAvailable ? 1 : 0;
 
             rc = isBatteryStatusAvailable1 - isBatteryStatusAvailable2;
 
-            break;
+            if (rc == 0) {
 
-         case TableColumnFactory.SENSOR_STATE_BATTERY_VOLTAGE_ID:
+               final int isBatteryLevelAvailable1a = item1.isBatteryLevelAvailable ? 1 : 0;
+               final int isBatteryLevelAvailable2a = item2.isBatteryLevelAvailable ? 1 : 0;
 
-            final int isBatteryVoltageAvailable1 = item1.isBatteryVoltageAvailable ? 1 : 0;
-            final int isBatteryVoltageAvailable2 = item2.isBatteryVoltageAvailable ? 1 : 0;
+               rc = isBatteryLevelAvailable1a - isBatteryLevelAvailable2a;
+            }
 
-            rc = isBatteryVoltageAvailable1 - isBatteryVoltageAvailable2;
+            if (rc == 0) {
+
+               final int isBatteryVoltageAvailable1a = item1.isBatteryVoltageAvailable ? 1 : 0;
+               final int isBatteryVoltageAvailable2a = item2.isBatteryVoltageAvailable ? 1 : 0;
+
+               rc = isBatteryVoltageAvailable1a - isBatteryVoltageAvailable2a;
+            }
 
             break;
 
@@ -284,6 +363,10 @@ public class SensorView extends ViewPart implements ITourViewer {
                rc = sensorTypeName1.compareToIgnoreCase(sensorTypeName2);
             }
 
+            break;
+
+         case TableColumnFactory.SENSOR_NAME_KEY_ID:
+            rc = item1.sensor.getSensorKeyByName().compareTo(item2.sensor.getSensorKeyByName());
             break;
 
          case TableColumnFactory.SENSOR_NAME_ID:
@@ -455,88 +538,50 @@ public class SensorView extends ViewPart implements ITourViewer {
 
    }
 
-   private void addPartListener() {
-
-      _partListener = new IPartListener2() {
-
-         @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partClosed(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partHidden(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partVisible(final IWorkbenchPartReference partRef) {}
-      };
-
-      getViewSite().getPage().addPartListener(_partListener);
-   }
-
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+         if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-               _sensorViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+            _sensorViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-               _sensorViewer.refresh();
+            _sensorViewer.refresh();
 
-               /*
-                * the tree must be redrawn because the styled text does not show with the new color
-                */
-               _sensorViewer.getTable().redraw();
+            /*
+             * the tree must be redrawn because the styled text does not show with the new color
+             */
+            _sensorViewer.getTable().redraw();
 
-            } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+         } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-               // reselect current sensor that the sensor chart (when opened) is reloaded
+            // reselect current sensor that the sensor chart (when opened) is reloaded
 
-               final StructuredSelection selection = getViewerSelection();
+            final StructuredSelection selection = getViewerSelection();
 
-               _sensorViewer.setSelection(selection, true);
+            _sensorViewer.setSelection(selection, true);
 
-               final Table table = _sensorViewer.getTable();
-               table.showSelection();
-            }
+            final Table table = _sensorViewer.getTable();
+            table.showSelection();
          }
       };
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-               // measurement system has changed
+            // measurement system has changed
 
-               _columnManager.saveState(_state);
-               _columnManager.clearColumns();
+            _columnManager.saveState(_state);
+            _columnManager.clearColumns();
 
-               defineAllColumns();
+            defineAllColumns();
 
-               _sensorViewer = (TableViewer) recreateViewer(_sensorViewer);
-            }
+            _sensorViewer = (TableViewer) recreateViewer(_sensorViewer);
          }
       };
 
@@ -593,7 +638,6 @@ public class SensorView extends ViewPart implements ITourViewer {
       createUI(parent);
 
       addPrefListener();
-      addPartListener();
       addTourEventListener();
 
       createActions();
@@ -692,6 +736,7 @@ public class SensorView extends ViewPart implements ITourViewer {
       defineColumn_SerialNumber();
       defineColumn_Time_FirstUsed();
       defineColumn_Time_LastUsed();
+      defineColumn_NameKey();
    }
 
    /**
@@ -787,12 +832,33 @@ public class SensorView extends ViewPart implements ITourViewer {
 
       final ColumnDefinition colDef = TableColumnFactory.SENSOR_MANUFACTURER_NUMBER.createColumn(_columnManager, _pc);
 
+      colDef.setColumnSelectionListener(_columnSortListener);
+
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
             final SensorItem sensorItem = (SensorItem) cell.getElement();
             cell.setText(Integer.toString(sensorItem.sensor.getManufacturerNumber()));
+         }
+      });
+   }
+
+   /**
+    * Column: Name key
+    */
+   private void defineColumn_NameKey() {
+
+      final ColumnDefinition colDef = TableColumnFactory.SENSOR_NAME_KEY.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final SensorItem sensorItem = (SensorItem) cell.getElement();
+            cell.setText(sensorItem.sensor.getSensorKeyByName());
          }
       });
    }
@@ -823,6 +889,8 @@ public class SensorView extends ViewPart implements ITourViewer {
    private void defineColumn_Product_Number() {
 
       final ColumnDefinition colDef = TableColumnFactory.SENSOR_PRODUCT_NUMBER.createColumn(_columnManager, _pc);
+
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -957,8 +1025,6 @@ public class SensorView extends ViewPart implements ITourViewer {
 
    @Override
    public void dispose() {
-
-      getViewSite().getPage().removePartListener(_partListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
       _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);

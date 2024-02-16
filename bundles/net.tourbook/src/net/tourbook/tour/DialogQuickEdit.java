@@ -194,7 +194,6 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
 
          _actionEndLocation.closeSlideout();
       }
-
    }
 
    @Override
@@ -223,8 +222,11 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
 
    private void createActions() {
 
-      _actionStartLocation = new ActionTourLocation(this, _tourData, true, STATE_ID);
-      _actionEndLocation = new ActionTourLocation(this, _tourData, false, STATE_ID);
+      _actionStartLocation = new ActionTourLocation(this, true, STATE_ID);
+      _actionEndLocation = new ActionTourLocation(this, false, STATE_ID);
+
+      _actionStartLocation.setupTourData(_tourData);
+      _actionEndLocation.setupTourData(_tourData);
 
       _actionSlideout_WeatherOptions = new ActionSlideout_WeatherOptions();
    }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -78,10 +78,6 @@ public class FitData {
    private String                        _profileName           = UI.EMPTY_STRING;
 
    private final List<TimeData>          _allTimeData           = new ArrayList<>();
-
-   private final List<GearData>          _allGearData           = new ArrayList<>();
-   private final List<SwimData>          _allSwimData           = new ArrayList<>();
-   private final List<TourMarker>        _allTourMarker         = new ArrayList<>();
    private final List<Long>              _pausedTime_Start      = new ArrayList<>();
    private final List<Long>              _pausedTime_End        = new ArrayList<>();
    private final List<Long>              _pausedTime_Data       = new ArrayList<>();
@@ -89,6 +85,9 @@ public class FitData {
    private final List<Long>              _allBatteryTime        = new ArrayList<>();
    private final List<Short>             _allBatteryPercentage  = new ArrayList<>();
    private final List<DeviceSensorValue> _allDeviceSensorValues = new ArrayList<>();
+   private final List<GearData>          _allGearData           = new ArrayList<>();
+   private final List<SwimData>          _allSwimData           = new ArrayList<>();
+   private final List<TourMarker>        _allTourMarker         = new ArrayList<>();
 
    private TimeData                      _current_TimeData;
    private TimeData                      _lastAdded_TimeData;
@@ -565,14 +564,6 @@ public class FitData {
       }
    }
 
-   public List<DeviceSensorValue> getAllDeviceSensorValues() {
-      return _allDeviceSensorValues;
-   }
-
-   public List<TimeData> getAllTimeData() {
-      return _allTimeData;
-   }
-
    public List<Short> getBattery_Percentage() {
       return _allBatteryPercentage;
    }
@@ -649,6 +640,10 @@ public class FitData {
 
    public List<SwimData> getSwimData() {
       return _allSwimData;
+   }
+
+   public List<TimeData> getTimeData() {
+      return _allTimeData;
    }
 
    public long getTimeDiffMS() {
