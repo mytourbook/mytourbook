@@ -1378,15 +1378,16 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _sectionSummary.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_SUMMARY, true));
       _sectionProductsList.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_PRODUCTS_LIST, true));
 
-      _columnManager.setColumnVisible(_colDef_ConsumedBeverageContainers, true);
-      _columnManager.setColumnVisible(_colDef_BeverageContainer, true);
-      _columnManager.setColumnVisible(_colDef_BeverageQuantity, true);
+      //TODO FB: This will remove the ability to collapse the section !?
+//      _columnManager.setColumnVisible(_colDef_ConsumedBeverageContainers, true);
+//      _columnManager.setColumnVisible(_colDef_BeverageContainer, true);
+//      _columnManager.setColumnVisible(_colDef_BeverageQuantity, true);
       _columnManager.setColumnVisible(_colDef_IsBeverage, true);
-      _columnManager.setColumnVisible(_colDef_Sodium, true);
-      _columnManager.setColumnVisible(_colDef_Calories, true);
-      _columnManager.setColumnVisible(_colDef_Name, true);
-      _columnManager.setColumnVisible(_colDef_QuantityType, true);
-      _columnManager.setColumnVisible(_colDef_ConsumedQuantity, true);
+//      _columnManager.setColumnVisible(_colDef_Sodium, true);
+//      _columnManager.setColumnVisible(_colDef_Calories, true);
+//      _columnManager.setColumnVisible(_colDef_Name, true);
+//      _columnManager.setColumnVisible(_colDef_QuantityType, true);
+//      _columnManager.setColumnVisible(_colDef_ConsumedQuantity, true);
    }
 
    @PersistState
