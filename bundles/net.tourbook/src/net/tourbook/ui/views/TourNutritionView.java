@@ -713,57 +713,52 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void createUI_210_Actions(final Composite parent) {
 
-      final Composite container = _tk.createComposite(parent);
-      GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-      {
-         /*
-          * Search product button
-          */
-         final Button btnSearchProduct = new Button(container, SWT.NONE);
-         btnSearchProduct.setText(Messages.Tour_Nutrition_Button_SearchProduct);
-         btnSearchProduct.setToolTipText(Messages.Tour_Nutrition_Button_SearchProduct_Tooltip);
-         btnSearchProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell(),
-               _tourData.getTourId()).open()));
-         btnSearchProduct.setImage(_imageSearch);
-         GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(btnSearchProduct);
+      /*
+       * Search product button
+       */
+      final Button btnSearchProduct = new Button(parent, SWT.NONE);
+      btnSearchProduct.setText(Messages.Tour_Nutrition_Button_SearchProduct);
+      btnSearchProduct.setToolTipText(Messages.Tour_Nutrition_Button_SearchProduct_Tooltip);
+      btnSearchProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell(),
+            _tourData.getTourId()).open()));
+      btnSearchProduct.setImage(_imageSearch);
+      GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).grab(true, false).applyTo(btnSearchProduct);
 
-         /*
-          * Add product button
-          */
-         final Button btnAddCustomProduct = new Button(container, SWT.NONE);
-         btnAddCustomProduct.setText(Messages.Tour_Nutrition_Button_AddCustomProduct);
-         btnAddCustomProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddCustomProduct_Tooltip);
-         btnAddCustomProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+      /*
+       * Add product button
+       */
+      final Button btnAddCustomProduct = new Button(parent, SWT.NONE);
+      btnAddCustomProduct.setText(Messages.Tour_Nutrition_Button_AddCustomProduct);
+      btnAddCustomProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddCustomProduct_Tooltip);
+      btnAddCustomProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-            final DialogCustomTourNutritionProduct dialogTourNutritionProduct = new DialogCustomTourNutritionProduct(Display.getCurrent()
-                  .getActiveShell());
+         final DialogCustomTourNutritionProduct dialogTourNutritionProduct = new DialogCustomTourNutritionProduct(Display.getCurrent()
+               .getActiveShell());
 
-            if (dialogTourNutritionProduct.open() != Window.OK) {
-               return;
-            }
+         if (dialogTourNutritionProduct.open() != Window.OK) {
+            return;
+         }
 
-            final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
-            tourNutritionProducts.add(dialogTourNutritionProduct.getTourNutritionProduct(_tourData));
-            _tourData.setTourNutritionProducts(tourNutritionProducts);
-            _tourData = TourManager.saveModifiedTour(_tourData);
-            _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
+         final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
+         tourNutritionProducts.add(dialogTourNutritionProduct.getTourNutritionProduct(_tourData));
+         _tourData.setTourNutritionProducts(tourNutritionProducts);
+         _tourData = TourManager.saveModifiedTour(_tourData);
+         _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
 
-         }));
-         btnAddCustomProduct.setImage(_imageAdd);
-         GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.CENTER).grab(true, false).applyTo(btnAddCustomProduct);
+      }));
+      btnAddCustomProduct.setImage(_imageAdd);
+      GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).grab(true, false).applyTo(btnAddCustomProduct);
 
-         /*
-          * Delete product button
-          */
-         _btnDeleteProduct = new Button(container, SWT.NONE);
-         _btnDeleteProduct.setText(Messages.Tour_Nutrition_Button_DeleteProduct);
-         _btnDeleteProduct.setToolTipText(Messages.Tour_Nutrition_Button_DeleteProduct_Tooltip);
-         _btnDeleteProduct.setEnabled(false);
-         _btnDeleteProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onDeleteProducts()));
-         _btnDeleteProduct.setImage(_imageDelete);
-         GridDataFactory.fillDefaults().align(SWT.RIGHT, SWT.CENTER).grab(true, false).applyTo(_btnDeleteProduct);
-      }
+      /*
+       * Delete product button
+       */
+      _btnDeleteProduct = new Button(parent, SWT.NONE);
+      _btnDeleteProduct.setText(Messages.Tour_Nutrition_Button_DeleteProduct);
+      _btnDeleteProduct.setToolTipText(Messages.Tour_Nutrition_Button_DeleteProduct_Tooltip);
+      _btnDeleteProduct.setEnabled(false);
+      _btnDeleteProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onDeleteProducts()));
+      _btnDeleteProduct.setImage(_imageDelete);
+      GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).grab(true, false).applyTo(_btnDeleteProduct);
    }
 
    private void createUI_220_Viewer(final Composite parent) {
@@ -772,7 +767,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
        * table viewer: products
        */
       final Table productsTable = new Table(parent, SWT.MULTI | SWT.FULL_SELECTION);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(productsTable);
+      GridDataFactory.fillDefaults().grab(true, true).span(3, 1).applyTo(productsTable);
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
 
@@ -857,7 +852,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _sectionProductsList = createSection(parent, _tk, Messages.Tour_Nutrition_Section_ProductsList);
       _sectionProductsList.setToolTipText(Messages.Tour_Nutrition_Section_ProductsList_Tooltip);
       final Composite container = (Composite) _sectionProductsList.getClient();
-      GridLayoutFactory.fillDefaults().applyTo(container);
+      GridDataFactory.fillDefaults().applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
          createUI_210_Actions(container);
          createUI_220_Viewer(container);
