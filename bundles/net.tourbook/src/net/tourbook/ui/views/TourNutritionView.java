@@ -35,7 +35,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ColumnProfile;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.TableColumnDefinition;
@@ -154,10 +153,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
     * Index of the column with the image, index can be changed when the columns are reordered with
     * the mouse or the column manager
     */
-   private int                            _columnIndex_ForColumn_IsBeverage = -1;
+   private int                            _columnIndex_ForColumn_IsBeverage = 5;
    private int                            _columnWidth_ForColumn_IsBeverage;
 
-   private TableColumnDefinition          _colDef_BeverageQuantity;
    private TableColumnDefinition          _colDef_BeverageContainer;
    private TableColumnDefinition          _colDef_ConsumedBeverageContainers;
 
@@ -773,8 +771,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final Listener paintListener = event -> {
 
-         if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
-            onPaint_Viewer(event);
+         // paint images at the correct column
+         final int columnIndex = event.index;
+         if (columnIndex == _columnIndex_ForColumn_IsBeverage &&
+               event.type == SWT.PaintItem) {
+
+            onPaint_Viewer_GraphImage(event);
          }
       };
       productsTable.addListener(SWT.MeasureItem, paintListener);
@@ -1026,17 +1028,17 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineColumn_70_BeverageQuantity() {
 
-      _colDef_BeverageQuantity = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_QUANTITY, SWT.TRAIL);
+      final TableColumnDefinition colDef_BeverageQuantity = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_QUANTITY, SWT.TRAIL);
 
-      _colDef_BeverageQuantity.setColumnLabel(COLUMN_BEVERAGE_QUANTITY);
-      _colDef_BeverageQuantity.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageQuantity);
-      _colDef_BeverageQuantity.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Column_BeverageQuantity_Tooltip);
+      colDef_BeverageQuantity.setColumnLabel(COLUMN_BEVERAGE_QUANTITY);
+      colDef_BeverageQuantity.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageQuantity);
+      colDef_BeverageQuantity.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Column_BeverageQuantity_Tooltip);
 
-      _colDef_BeverageQuantity.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(22));
+      colDef_BeverageQuantity.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(22));
 
-      _colDef_BeverageQuantity.setIsDefaultColumn();
+      colDef_BeverageQuantity.setIsDefaultColumn();
 
-      _colDef_BeverageQuantity.setLabelProvider(new CellLabelProvider() {
+      colDef_BeverageQuantity.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1209,22 +1211,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _tourData = TourManager.saveModifiedTour(_tourData);
    }
 
-   private void onPaint_Viewer(final Event event) {
-
-      // paint images at the correct column
-      final int columnIndex = event.index;
-
-      if (columnIndex == _columnIndex_ForColumn_IsBeverage) {
-
-         onPaint_Viewer_GraphImage(event);
-      }
-   }
-
    private void onPaint_Viewer_GraphImage(final Event event) {
-
-      if (event.type != SWT.PaintItem) {
-         return;
-      }
 
       final TableItem item = (TableItem) event.item;
       final Object itemData = item.getData();
@@ -1336,10 +1323,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       {
          _productsViewer.getTable().dispose();
 
-         // update column index which is needed for repainting
-         final ColumnProfile activeProfile = _columnManager.getActiveProfile();
-         _columnIndex_ForColumn_IsBeverage = activeProfile.getColumnIndex(_colDef_IsBeverage.getColumnId());
-
          createUI_220_Viewer(_viewerContainer);
          _viewerContainer.layout();
 
@@ -1377,17 +1360,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _sectionSummary.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_SUMMARY, true));
       _sectionProductsList.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_PRODUCTS_LIST, true));
-
-      //TODO FB: This will remove the ability to collapse the section !?
-//      _columnManager.setColumnVisible(_colDef_ConsumedBeverageContainers, true);
-//      _columnManager.setColumnVisible(_colDef_BeverageContainer, true);
-//      _columnManager.setColumnVisible(_colDef_BeverageQuantity, true);
-      _columnManager.setColumnVisible(_colDef_IsBeverage, true);
-//      _columnManager.setColumnVisible(_colDef_Sodium, true);
-//      _columnManager.setColumnVisible(_colDef_Calories, true);
-//      _columnManager.setColumnVisible(_colDef_Name, true);
-//      _columnManager.setColumnVisible(_colDef_QuantityType, true);
-//      _columnManager.setColumnVisible(_colDef_ConsumedQuantity, true);
    }
 
    @PersistState
