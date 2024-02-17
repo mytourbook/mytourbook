@@ -55,20 +55,8 @@ import org.xmlunit.diff.Diff;
 public class Comparison {
 
    private static final String JSON = ".json"; //$NON-NLS-1$
-   private static final ObjectMapper objectMapper = new ObjectMapper();
 
-   private Comparison() {
-
-      objectMapper.setSerializationInclusion(Include.NON_NULL);
-      objectMapper.setSerializationInclusion(Include.NON_EMPTY);
-      objectMapper.setConfig(objectMapper.getSerializationConfig()
-            .with(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY));
-      objectMapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
-      objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.NONE);
-      objectMapper.setVisibility(PropertyAccessor.GETTER, Visibility.NONE);
-      objectMapper.setVisibility(PropertyAccessor.IS_GETTER, Visibility.NONE);
-      objectMapper.setVisibility(PropertyAccessor.SETTER, Visibility.NONE);
-   }
+   private Comparison() {}
 
    public static void compareFitAgainstControl(final String controlTourFilePathFit,
                                                final String testTourFilePathFit) {
@@ -205,6 +193,17 @@ public class Comparison {
    }
 
    private static String convertTourDataToJson(TourData tourData) {
+
+      final ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.setSerializationInclusion(Include.NON_NULL);
+      objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+      objectMapper.setConfig(objectMapper.getSerializationConfig()
+            .with(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY));
+      objectMapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
+      objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.NONE);
+      objectMapper.setVisibility(PropertyAccessor.GETTER, Visibility.NONE);
+      objectMapper.setVisibility(PropertyAccessor.IS_GETTER, Visibility.NONE);
+      objectMapper.setVisibility(PropertyAccessor.SETTER, Visibility.NONE);
 
       String jsonString = UI.EMPTY_STRING;
       try {
