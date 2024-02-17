@@ -55,8 +55,20 @@ import org.xmlunit.diff.Diff;
 public class Comparison {
 
    private static final String JSON = ".json"; //$NON-NLS-1$
+   private static final ObjectMapper objectMapper = new ObjectMapper();
 
-   private Comparison() {}
+   private Comparison() {
+
+      objectMapper.setSerializationInclusion(Include.NON_NULL);
+      objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+      objectMapper.setConfig(objectMapper.getSerializationConfig()
+            .with(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY));
+      objectMapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
+      objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.NONE);
+      objectMapper.setVisibility(PropertyAccessor.GETTER, Visibility.NONE);
+      objectMapper.setVisibility(PropertyAccessor.IS_GETTER, Visibility.NONE);
+      objectMapper.setVisibility(PropertyAccessor.SETTER, Visibility.NONE);
+   }
 
    public static void compareFitAgainstControl(final String controlTourFilePathFit,
                                                final String testTourFilePathFit) {
@@ -192,22 +204,11 @@ public class Comparison {
       }
    }
 
-   private static String  convertTourDataToJson(TourData tourData) {
-
-      final ObjectMapper mapper = new ObjectMapper();
-      mapper.setSerializationInclusion(Include.NON_NULL);
-      mapper.setSerializationInclusion(Include.NON_EMPTY);
-      mapper.setConfig(mapper.getSerializationConfig()
-            .with(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY));
-      mapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
-      mapper.setVisibility(PropertyAccessor.FIELD, Visibility.NONE);
-      mapper.setVisibility(PropertyAccessor.GETTER, Visibility.NONE);
-      mapper.setVisibility(PropertyAccessor.IS_GETTER, Visibility.NONE);
-      mapper.setVisibility(PropertyAccessor.SETTER, Visibility.NONE);
+   private static String convertTourDataToJson(TourData tourData) {
 
       String jsonString = UI.EMPTY_STRING;
       try {
-         jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(tourData);
+         jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tourData);
       } catch (final JsonProcessingException e) {
          e.printStackTrace();
       }
