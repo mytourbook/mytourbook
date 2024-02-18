@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import net.tourbook.OtherMessages;
 import net.tourbook.application.ApplicationVersion;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -913,7 +914,8 @@ public class TourLocationManager {
             true, // isOneAction
             oneActionLocation,
 
-            true // isSaveTour
+            true, // isSaveTour
+            false // isLogLocation
       );
 
       return true;
@@ -2182,6 +2184,7 @@ public class TourLocationManager {
     *           When <code>true</code> then existing locations are ignored and retrieved again from
     *           the DB or location provider
     * @param oneActionLocation
+    * @param isLogLocation
     */
    public static void setTourLocations(final List<TourData> requestedTours,
                                        final TourLocationProfile locationProfile,
@@ -2192,7 +2195,8 @@ public class TourLocationManager {
                                        final boolean isOneAction,
                                        final TourLocation oneActionLocation,
 
-                                       final boolean isSaveTour) {
+                                       final boolean isSaveTour,
+                                       final boolean isLogLocation) {
 
       final ArrayList<TourData> savedTours = new ArrayList<>();
 
@@ -2373,12 +2377,29 @@ public class TourLocationManager {
                      monitor.subTask(SUB_TASK_RETRIEVE_LOCATIONS.formatted(++numWorked, numRequests, waitingTime));
                   }
 
-                  if (isSaveTour && isModified) {
+                  if (isModified) {
 
-                     TourManager.saveModifiedTour(tourData, false);
+                     if (isLogLocation) {
 
-                     savedTours.add(tourData);
+                        // %s - "%s"  . . .  "%s"
+                        TourLogManager.subLog_DEFAULT(
+
+                              OtherMessages.LOG_RETRIEVE_TOUR_LOCATION_TOUR.formatted(
+
+                                    TourManager.getTourDateTimeShort(tourData),
+                                    tourData.getTourStartPlace(),
+                                    tourData.getTourEndPlace()));
+
+                     }
+
+                     if (isSaveTour) {
+
+                        TourManager.saveModifiedTour(tourData, false);
+
+                        savedTours.add(tourData);
+                     }
                   }
+
                }
             }
          };

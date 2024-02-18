@@ -6,6 +6,8 @@ TODO's
 
 * Remove/replace "de.byteholder.geoclipse.map.UI.NEW_LINE"
 
+* [Column Manager] Customize column alignment
+
 * Remove debug code in ColumnManager.java
    // TODO
       System.out.println("All columns in _allDefinedColumnDefinitions, number of entries: " + _allDefinedColumnDefinitions.size());
@@ -43,6 +45,7 @@ New
 ===
 
 * Start/End Location
+  - Automatically retieve and set start/end locations in the easy import
   - Retrieve, manage and show start/end locations in
     - Tour editor
   - Scramble tour location view when requested

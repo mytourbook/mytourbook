@@ -740,7 +740,8 @@ public class ActionSetStartEndLocation extends SubMenu {
             false, // isOneAction
             null, // oneActionLocation
 
-            true // isSaveTour
+            true, // isSaveTour
+            false // isLogLocation
       );
    }
 

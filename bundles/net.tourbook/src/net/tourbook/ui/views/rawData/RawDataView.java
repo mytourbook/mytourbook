@@ -5898,11 +5898,13 @@ public class RawDataView extends ViewPart implements
          if (oldTourAvgTemperature > avgMinimumTemperature) {
 
             // "%s . . . %.2f > %.0f °C"
-            TourLogManager.subLog_DEFAULT(String.format(
-                  TourManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
-                  TourManager.getTourDateTimeShort(tourData),
-                  oldTourAvgTemperature,
-                  avgMinimumTemperature));
+            TourLogManager.subLog_DEFAULT(
+
+                  TourManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE.formatted(
+
+                        TourManager.getTourDateTimeShort(tourData),
+                        oldTourAvgTemperature,
+                        avgMinimumTemperature));
 
             continue;
          }
@@ -6020,6 +6022,8 @@ public class RawDataView extends ViewPart implements
       // 51. Retrieve tour locations
       TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_051_RETRIEVE_TOUR_LOCATION);
 
+      final long start = System.currentTimeMillis();
+
       TourLocationManager.setTourLocations(
 
             importedTours,
@@ -6031,8 +6035,15 @@ public class RawDataView extends ViewPart implements
             false, // isOneAction
             null, // oneActionLocation
 
-            false // isSaveTour
+            false, // isSaveTour
+            true // isLogLocation
       );
+
+      // location data retrieved in %.1f s
+      TourLogManager.subLog_DEFAULT(String.format(
+            Messages.Log_RetrieveTourLocation_End,
+            (System.currentTimeMillis() - start) / 1000.0));
+
    }
 
    private ArrayList<TourData> runEasyImport_099_SaveTour(final TourPerson person, final ArrayList<TourData> importedTours) {

@@ -179,6 +179,8 @@ public class OtherMessages {
    public static final String APP_UNIT_HHMMSS                             = net.tourbook.Messages.App_Unit_HHMMSS;
    public static final String APP_UNIT_SECONDS_SMALL                      = net.tourbook.Messages.App_Unit_Seconds_Small;
 
+   public static final String LOG_RETRIEVE_TOUR_LOCATION_TOUR             = net.tourbook.Messages.Log_RetrieveTourLocation_Tour;
+
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_DESCENT = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Descent;
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_ASCENT  = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Ascent;
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_FLAT    = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Flat;
@@ -192,6 +194,7 @@ public class OtherMessages {
    public static final String WEATHER_AIRQUAlITY_3_MODERATE               = net.tourbook.common.Messages.Weather_AirQuality_3_Moderate;
    public static final String WEATHER_AIRQUAlITY_4_POOR                   = net.tourbook.common.Messages.Weather_AirQuality_4_Poor;
    public static final String WEATHER_AIRQUAlITY_5_VERYPOOR               = net.tourbook.common.Messages.Weather_AirQuality_5_VeryPoor;
+
 
 // SET_FORMATTING_ON
 }
