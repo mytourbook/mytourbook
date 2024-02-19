@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map.player;
 
-import de.byteholder.geoclipse.map.UI;
+import net.tourbook.common.UI;
 
 import org.oscim.core.MercatorProjection;
 
@@ -24,43 +24,43 @@ import org.oscim.core.MercatorProjection;
  */
 public class ModelPlayerData {
 
-   private static final String NL = UI.NEW_LINE;
+   private static final char NL = UI.NEW_LINE;
 
    /**
     * Indices for all visible positions into the tour track data
     */
-   public int[]                allVisible_GeoLocationIndices;
+   public int[]              allVisible_GeoLocationIndices;
 
    /**
     * Projected points 0...1 for all geo positions for all selected tours
     * <p>
     * Is projected from -180°...180° ==> 0...1 by using the {@link MercatorProjection}
     */
-   public double[]             allProjectedPoints_NormalTrack;
+   public double[]           allProjectedPoints_NormalTrack;
 
    /**
     * Projected points 0...1 from the geo end point of the tour to the geo start point
     */
-   public double[]             allProjectedPoints_ReturnTrack;
+   public double[]           allProjectedPoints_ReturnTrack;
 
    /**
     * Contains indices into all geo positions for all selected tours. They are optimized for a
     * minimum distance, so they can be also outside of the clipper (visible) area -2048...2048
     */
-   public int[]                allNotClipped_GeoLocationIndices;
+   public int[]              allNotClipped_GeoLocationIndices;
 
    /**
     * Distance in pixel between the end and start point of the track for the current map scale
     */
-   public double               trackEnd2StartPixelDistance;
+   public double             trackEnd2StartPixelDistance;
 
    /**
     * Map scale when binding buffer data
     */
-   public double               mapScale;
+   public double             mapScale;
 
-   public int[]                allTimeSeries;
-   public float[]              allDistanceSeries;
+   public int[]              allTimeSeries;
+   public float[]            allDistanceSeries;
 
    @Override
    public String toString() {

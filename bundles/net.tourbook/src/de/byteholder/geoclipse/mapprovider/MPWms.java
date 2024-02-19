@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import de.byteholder.geoclipse.logging.GeoException;
 import de.byteholder.geoclipse.map.BoundingBoxEPSG4326;
 import de.byteholder.geoclipse.map.ITileLoader;
 import de.byteholder.geoclipse.map.Tile;
+import de.byteholder.geoclipse.map.MapUtils;
 import de.byteholder.geoclipse.util.Util;
 
 import java.io.IOException;
@@ -231,7 +232,7 @@ public class MPWms extends MP implements ITileLoader {
       }
 
       // remove invalid characters from the key
-      final String customTileKey = de.byteholder.geoclipse.map.UI.createIdFromName(sb.toString(), 150);
+      final String customTileKey = MapUtils.createIdFromName(sb.toString(), 150);
 
       return customTileKey;
    }

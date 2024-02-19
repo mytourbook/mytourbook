@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,57 +15,56 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.util.List;
 import java.util.UUID;
 
+import net.tourbook.common.UI;
 import net.tourbook.preferences.MapsforgeThemeStyle;
 
 import org.oscim.theme.VtmThemes;
 
 public class Map25Provider implements Cloneable {
 
-   private static final String NL                    = UI.NEW_LINE;
+   private static final char NL                    = UI.NEW_LINE;
 
-   private String              _id;
-   private UUID                _uuid;
+   private String            _id;
+   private UUID              _uuid;
 
-   public boolean              isEnabled;
-   public boolean              isDefault;
+   public boolean            isEnabled;
+   public boolean            isDefault;
 
-   public String               name                  = UI.EMPTY_STRING;
-   public String               description           = UI.EMPTY_STRING;
+   public String             name                  = UI.EMPTY_STRING;
+   public String             description           = UI.EMPTY_STRING;
 
-   public VtmThemes            vtmTheme;
+   public VtmThemes          vtmTheme;
 
    /**
     * When tile encoding is {@link TileEncoding#MF} then this is an offline map provider and
     * {@link #isOfflineMap} is <code>true</code>
     */
-   public TileEncoding         tileEncoding          = TileEncoding.MVT;
+   public TileEncoding       tileEncoding          = TileEncoding.MVT;
 
    /**
     * When <code>true</code> then the map provider is using the tile encoding
     * {@link TileEncoding#MF}
     */
-   public boolean              isOfflineMap;
+   public boolean            isOfflineMap;
 
    /**
     * Online map provider
     */
-   public String               online_url            = UI.EMPTY_STRING;
-   public String               online_TilePath       = UI.EMPTY_STRING;
-   public String               online_ApiKey         = UI.EMPTY_STRING;
+   public String             online_url            = UI.EMPTY_STRING;
+   public String             online_TilePath       = UI.EMPTY_STRING;
+   public String             online_ApiKey         = UI.EMPTY_STRING;
 
    /**
     * Requires that {@link #isOfflineMap} is <code>true</code> which is setting the theme filepath
     * {@link #offline_ThemeFilepath}
     */
-   public boolean              offline_IsThemeFromFile;
-   public String               offline_MapFilepath   = UI.EMPTY_STRING;
-   public String               offline_ThemeFilepath = UI.EMPTY_STRING;
-   public String               offline_ThemeStyle    = UI.EMPTY_STRING;
+   public boolean            offline_IsThemeFromFile;
+   public String             offline_MapFilepath   = UI.EMPTY_STRING;
+   public String             offline_ThemeFilepath = UI.EMPTY_STRING;
+   public String             offline_ThemeStyle    = UI.EMPTY_STRING;
 
    /*
     * Cached theme properties
@@ -150,6 +149,7 @@ public class Map25Provider implements Cloneable {
     * Is loading the theme styles when not yet loaded.
     *
     * @param isForceThemeStyleReload
+    *
     * @return Returns theme styles or <code>null</code> when not available.
     */
    public List<MapsforgeThemeStyle> getThemeStyles(final boolean isForceThemeStyleReload) {

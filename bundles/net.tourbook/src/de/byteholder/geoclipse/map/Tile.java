@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourWayPoint;
 
@@ -425,7 +426,7 @@ public class Tile {
             }
 
             final int tileSize = _mp.getTileSize();
-            final ImageData finalImageData = UI.createTransparentImageData(tileSize);
+            final ImageData finalImageData = MapUtils.createTransparentImageData(tileSize);
 
             // draw neighbor first
             if (neighborImageData != null) {

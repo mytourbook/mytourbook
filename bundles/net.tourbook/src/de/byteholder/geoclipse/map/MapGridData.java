@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 
@@ -69,6 +70,7 @@ public class MapGridData {
 
    @Override
    public String toString() {
+
       return UI.EMPTY_STRING
 
             + "MapGridData\n" //$NON-NLS-1$

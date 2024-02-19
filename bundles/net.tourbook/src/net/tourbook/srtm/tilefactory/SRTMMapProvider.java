@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,10 +17,10 @@ package net.tourbook.srtm.tilefactory;
 
 import de.byteholder.geoclipse.map.ITilePainter;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.mapprovider.MPPlugin;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ProfileImage;
 import net.tourbook.srtm.ElevationColor;
 import net.tourbook.srtm.ElevationLayer;

@@ -15,37 +15,11 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
-public class UI {
-
-   public static final String EMPTY_STRING    = "";              //$NON-NLS-1$
-   public static final String SPACE           = " ";             //$NON-NLS-1$
-   public static final char   DASH            = '-';
-   public static final String DASH_WITH_SPACE = " - ";           //$NON-NLS-1$
-   public static final String KOMMA           = ",";             //$NON-NLS-1$
-   public static final String NEW_LINE        = "\n";            //$NON-NLS-1$
-   public static final String DOTS            = "...";           //$NON-NLS-1$
-   public static final String MBYTES          = "MByte";         //$NON-NLS-1$
-
-   /**
-    * THIS IS COPIED FROM org.eclipse.jface.dialogs.Dialog <br>
-    * <br>
-    * The dialog settings key name for stored dialog width.
-    *
-    * @since 3.2
-    */
-   public static final String DIALOG_WIDTH    = "DIALOG_WIDTH";  //$NON-NLS-1$
-
-   /**
-    * THIS IS COPIED FROM org.eclipse.jface.dialogs.Dialog <br>
-    * <br>
-    * The dialog settings key name for stored dialog height.
-    *
-    * @since 3.2
-    */
-   public static final String DIALOG_HEIGHT   = "DIALOG_HEIGHT"; //$NON-NLS-1$
+public class MapUtils {
 
    /**
     * @param file
+    *
     * @return Returns <code>true</code> when the file should be overwritten, otherwise
     *         <code>false</code>
     */
@@ -69,6 +43,7 @@ public class UI {
    /**
     * @param name
     * @param maxLength
+    *
     * @return
     */
    public static String createIdFromName(String name, final int maxLength) {
@@ -94,7 +69,7 @@ public class UI {
             addedChars++;
 
          } else if (nameChar == ' '
-               || nameChar == DASH
+               || nameChar == '-'
                || nameChar == '_'
                || nameChar == '.'
                || nameChar == '/'
@@ -102,13 +77,13 @@ public class UI {
 
             // don't repeat dashes
 
-            if (lastChar != DASH) {
+            if (lastChar != '-') {
 
                // replace with a dash
-               sbId.append(DASH);
+               sbId.append('-');
                addedChars++;
 
-               lastChar = DASH;
+               lastChar = '-';
             }
          }
       }
@@ -128,7 +103,7 @@ public class UI {
          int currentWordLength = 0;
          int maxWordLength = 0;
          for (final char element : originalId) {
-            if (element == DASH) {
+            if (element == '-') {
                maxWordLength = (maxWordLength >= currentWordLength) ? maxWordLength : currentWordLength;
                currentWordLength = 0;
             } else {
@@ -160,14 +135,14 @@ public class UI {
 
             for (int charIndex = 0; charIndex < originalId.length; charIndex++) {
 
-               if (originalId[charIndex] == DASH) {
+               if (originalId[charIndex] == '-') {
 
                   // append dash for the subsequent words
                   if (isFirstWord) {
                      isFirstWord = false;
                   } else {
                      if (isLastCheck == false) {
-                        sbShorten.append(DASH);
+                        sbShorten.append('-');
                      }
                   }
 
@@ -215,6 +190,7 @@ public class UI {
     * Create a transparent image
     *
     * @param imageSize
+    *
     * @return
     */
    public static ImageData createTransparentImageData(final int imageSize) {

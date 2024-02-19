@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,13 +15,13 @@
  *******************************************************************************/
 package device.cm4xxm;
 
-import de.byteholder.geoclipse.map.UI;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import net.tourbook.common.UI;
 import net.tourbook.device.cm4xxm.CM4XXMDeviceReader;
 
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ public class CM4XXMDeviceReaderTests extends DeviceDataReaderTester {
       final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(FILES_PATH + "20060327-20060608_Touren.dat"); //$NON-NLS-1$
 
       String dosText = net.tourbook.common.util.FileUtils.readFileContentString(importFileAbsolutePath);
-      dosText = dosText.replace("\r\n", UI.NEW_LINE);//$NON-NLS-1$
+      dosText = dosText.replace("\r\n", UI.NEW_LINE1);//$NON-NLS-1$
       Files.writeString(Paths.get(importFileAbsolutePath), dosText, Charset.defaultCharset());
 
       testImportFile(deviceDataReader, FILES_PATH + "20060327-20060608_Touren", ".dat"); //$NON-NLS-1$ //$NON-NLS-2$
