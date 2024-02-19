@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import static net.tourbook.common.UI.EMPTY_STRING;
+
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 import java.io.File;
@@ -88,8 +90,6 @@ import org.eclipse.ui.menus.UIElement;
 public class UI {
 
    private static final String           ICONS_PATH                      = "/icons/";                         //$NON-NLS-1$
-
-   public static final String            EMPTY_STRING                    = "";                                //$NON-NLS-1$
 
    public static final String            IS_NOT_INITIALIZED              = "IS NOT INITIALIZED";              //$NON-NLS-1$
 

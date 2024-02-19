@@ -69,7 +69,7 @@ public class SQLFilter {
       ONLY_FAST_APP_FILTERS.add(SQLAppFilter.Photo);
    }
 
-   private String            _sqlWhereClause = UI.EMPTY_STRING;
+   private String            _sqlWhereClause = net.tourbook.common.UI.EMPTY_STRING;
    private ArrayList<Object> _parameters     = new ArrayList<>();
 
    private boolean           _isTagFilterActive;
