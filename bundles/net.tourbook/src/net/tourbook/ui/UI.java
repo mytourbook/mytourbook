@@ -96,15 +96,10 @@ public class UI {
    public static final String            EMPTY_STRING                    = "";                                //$NON-NLS-1$
    public static final String            SPACE                           = " ";                               //$NON-NLS-1$
    public static final String            SPACE2                          = "  ";                              //$NON-NLS-1$
-   public static final String            SPACE4                          = "    ";                            //$NON-NLS-1$
    public static final String            COLON_SPACE                     = ": ";                              //$NON-NLS-1$
    public static final String            COMMA_SPACE                     = ", ";                              //$NON-NLS-1$
-   public static final String            UNDERSCORE                      = "_";                               //$NON-NLS-1$
    public static final String            DASH                            = "-";                               //$NON-NLS-1$
-   public static final String            DASH_WITH_SPACE                 = " - ";                             //$NON-NLS-1$
    public static final String            DASH_WITH_DOUBLE_SPACE          = "   -   ";                         //$NON-NLS-1$
-   public static final String            SLASH_WITH_SPACE                = " / ";                             //$NON-NLS-1$
-   public static final String            EMPTY_STRING_FORMAT             = "%s";                              //$NON-NLS-1$
 
    /**
     * contains a new line
@@ -290,6 +285,7 @@ public class UI {
 
    /**
     * @param file
+    *
     * @return Returns <code>true</code> when the file should be overwritten, otherwise
     *         <code>false</code>
     */
@@ -385,6 +381,7 @@ public class UI {
     *
     * @param propertyData
     * @param checkedTourId
+    *
     * @return Returns the tour id when it is contained in the property data, otherwise it returns
     *         <code>null</code>
     */
@@ -430,6 +427,7 @@ public class UI {
     * Get text for the OK button.
     *
     * @param tourData
+    *
     * @return
     */
    public static String convertOKtoSaveUpdateButton(final TourData tourData) {
@@ -473,6 +471,7 @@ public class UI {
     * @param formToolkit
     * @param parent
     * @param labelText
+    *
     * @return
     */
    public static Composite createPage(final FormToolkit formToolkit, final Composite parent, final String labelText) {
@@ -674,6 +673,7 @@ public class UI {
 
    /**
     * @param graphId
+    *
     * @return Returns a graph image, this image <b>MUST</b> not be disposed.
     */
    public static Image getGraphImage(final MapGraphId graphId) {
@@ -683,6 +683,7 @@ public class UI {
 
    /**
     * @param graphId
+    *
     * @return Returns a graph image, this image <b>MUST</b> not be disposed.
     */
    public static Image getGraphImage_Disabled(final MapGraphId graphId) {
@@ -744,7 +745,9 @@ public class UI {
 
    /**
     * @param imageName
+    *
     * @return Returns the url for an icon image in the {@link TourbookPlugin} bundle.
+    *
     * @throws IOException
     */
    public static String getIconUrl(final String imageName) {
@@ -771,6 +774,7 @@ public class UI {
 
    /**
     * @param tourTypeId
+    *
     * @return Returns the {@link TourType} or <code>null</code>.
     */
    public static TourType getTourType(final long tourTypeId) {
@@ -786,6 +790,7 @@ public class UI {
 
    /**
     * @param tourTypeId
+    *
     * @return Returns the name of a {@link TourType}.
     */
    public static String getTourTypeLabel(final long tourTypeId) {
@@ -830,12 +835,14 @@ public class UI {
                width = srcData.height;
                height = srcData.width;
                break;
+
             case SWT.RIGHT: // right 90 degrees
                destX = srcData.height - srcY - 1;
                destY = srcX;
                width = srcData.height;
                height = srcData.width;
                break;
+
             case SWT.DOWN: // 180 degrees
                destX = srcData.width - srcX - 1;
                destY = srcData.height - srcY - 1;
