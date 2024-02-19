@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,7 @@ import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
  */
 public class SQLFilter {
 
-   private static final String            NL                    = UI.NEW_LINE;
+   private static final char              NL                    = net.tourbook.common.UI.NEW_LINE;
 
    /**
     * Contains any available app filters
@@ -277,7 +277,9 @@ public class SQLFilter {
     * @param statement
     * @param startIndex
     *           Sets the parameter start index, the first parameter is 1
+    *
     * @return Returns the last parameter index +1 which was used for setting parameters
+    *
     * @throws SQLException
     */
    public int setParameters(final PreparedStatement statement, final int startIndex) throws SQLException {

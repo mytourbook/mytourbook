@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import net.tourbook.ui.UI;
+import net.tourbook.common.UI;
 
 import org.osgi.framework.Version;
 

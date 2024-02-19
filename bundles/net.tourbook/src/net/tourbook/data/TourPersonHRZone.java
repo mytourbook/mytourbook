@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -24,10 +24,10 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.HSLColor;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.UI;
 
 import org.eclipse.swt.graphics.RGB;
 
@@ -41,6 +41,12 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 
    public static final int     DB_LENGTH_ZONE_NAME   = 255;
    public static final int     DB_LENGTH_DESCRIPTION = 2000;
+
+   /**
+    * manually created marker or imported marker create a unique id to identify them, saved marker
+    * are compared with the marker id
+    */
+   private static int          _createCounter        = 0;
 
    /**
     * Unique id for the {@link TourPersonHRZone} entity
@@ -103,12 +109,6 @@ public class TourPersonHRZone implements Cloneable, Comparable<TourPersonHRZone>
 
    @Transient
    private HSLColor            _hslColor             = new HSLColor();
-
-   /**
-    * manually created marker or imported marker create a unique id to identify them, saved marker
-    * are compared with the marker id
-    */
-   private static int          _createCounter        = 0;
 
    public TourPersonHRZone() {}
 

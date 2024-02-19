@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,12 +38,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.training.TrainingManager;
-import net.tourbook.ui.UI;
 
 import org.hibernate.annotations.Cascade;
 
@@ -191,6 +191,7 @@ public class TourPerson implements Comparable<Object>, Serializable {
 
    /**
     * @return Returns HR max depending on the HR max formula.
+    *
     * @param hrMaxFormulaKey
     * @param maxPulse
     * @param age
@@ -304,6 +305,7 @@ public class TourPerson implements Comparable<Object>, Serializable {
 
    /**
     * @param dateTime
+    *
     * @return Returns age for this person at a specific day
     */
    private int getAge(final ZonedDateTime zonedBirthDay, final ZonedDateTime dateTime) {
@@ -363,6 +365,7 @@ public class TourPerson implements Comparable<Object>, Serializable {
     * @param hrMaxPulse
     * @param dateTime
     *           Date when the HR zones should be computed, this is the tour date.
+    *
     * @return Returns HR zone min/max bpm values or <code>null</code> when hr zones are not
     *         defined.
     */
@@ -453,9 +456,10 @@ public class TourPerson implements Comparable<Object>, Serializable {
     * @return Return the person first name and the last name when available.
     */
    public String getName() {
-      return firstName + //
-            (StringUtils.isNullOrEmpty(lastName) ? //
-                  UI.EMPTY_STRING
+
+      return firstName +
+            (StringUtils.isNullOrEmpty(lastName)
+                  ? UI.EMPTY_STRING
                   : UI.SPACE + lastName);
    }
 

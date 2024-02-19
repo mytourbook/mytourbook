@@ -53,5 +53,6 @@ Import-Package: com.skedgo.converter,
  org.eclipse.collections.impl.list.mutable.primitive,
  org.eclipse.collections.impl.map.mutable.primitive,
  org.eclipse.e4.core.services.log,
- org.eclipse.jface.notifications
+ org.eclipse.jface.notifications,
+ org.eclipse.ui.forms.widgets
 Automatic-Module-Name: net.tourbook.common
