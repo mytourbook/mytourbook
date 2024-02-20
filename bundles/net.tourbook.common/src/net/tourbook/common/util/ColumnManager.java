@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -114,6 +114,7 @@ public class ColumnManager {
    private static final String ATTR_IS_SHOW_COLUMN_ANNOTATION_SORTING    = "isShowColumnAnnotation_Sorting";    //$NON-NLS-1$
    //
    private static final String ATTR_COLUMN_ID                            = "columnId";                          //$NON-NLS-1$
+   private static final String ATTR_COLUMN_ALIGNMENT                     = "alignment";                         //$NON-NLS-1$
    private static final String ATTR_COLUMN_FORMAT_CATEGORY               = "categoryFormat";                    //$NON-NLS-1$
    private static final String ATTR_COLUMN_FORMAT_DETAIL                 = "detailFormat";                      //$NON-NLS-1$
    private static final String ATTR_NAME                                 = "name";                              //$NON-NLS-1$
@@ -749,6 +750,7 @@ public class ColumnManager {
     *
     * @param composite
     * @param defaultContextMenuProvider
+    *
     * @return
     */
    private Menu createHCM_0_Menu(final Composite composite, final Shell shell, final IContextMenuProvider defaultContextMenuProvider) {
@@ -1432,6 +1434,7 @@ public class ColumnManager {
    /**
     * @param columnId
     *           column id
+    *
     * @return Returns the column definition for the column id, or <code>null</code> when the column
     *         for the column id is not available
     */
@@ -1450,6 +1453,7 @@ public class ColumnManager {
    /**
     * @param createIndex
     *           column create id
+    *
     * @return Returns the column definition for the column create index, or <code>null</code> when
     *         the column is not available
     */
@@ -1711,6 +1715,7 @@ public class ColumnManager {
     * @param isHeaderHit
     * @param headerContextMenu
     * @param defaultContextMenuProvider
+    *
     * @return
     */
    private Menu getContextMenu(final boolean isHeaderHit, final Menu headerContextMenu, final IContextMenuProvider defaultContextMenuProvider) {
@@ -1743,6 +1748,7 @@ public class ColumnManager {
     * @param mousePosition
     * @param isTableHeaderHit
     * @param columnHeaderLayer
+    *
     * @return Returns a column item or <code>null</code> when the header is not hit or the columns
     *         is not found
     */
@@ -1966,6 +1972,7 @@ public class ColumnManager {
     * Get a value formatter for a {@link ValueFormat}.
     *
     * @param valueFormat_Category
+    *
     * @return Returns the {@link IValueFormatter} or <code>null</code> when not available.
     */
    IValueFormatter getValueFormatter(final ValueFormat valueFormat) {
@@ -2193,8 +2200,8 @@ public class ColumnManager {
                               ATTR_COLUMN_FORMAT_DETAIL,
                               ValueFormat.DUMMY_VALUE);
 
-                        if (columnId != null //
-                              && (valueFormat_Category != ValueFormat.DUMMY_VALUE //
+                        if (columnId != null
+                              && (valueFormat_Category != ValueFormat.DUMMY_VALUE
                                     || valueFormat_Detail != ValueFormat.DUMMY_VALUE)) {
 
                            final ColumnProperties columnProperties = new ColumnProperties();

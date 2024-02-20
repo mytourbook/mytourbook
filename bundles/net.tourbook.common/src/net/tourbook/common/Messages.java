@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,10 @@ public class Messages extends NLS {
    public static String        App_Action_Rename_WithConfirm;
    public static String        App_Action_RestoreDefault;
    public static String        App_Action_RestoreDefault_Tooltip;
+
+   public static String        App_Alignment_Center;
+   public static String        App_Alignment_Left;
+   public static String        App_Alignment_Right;
 
    public static String        App_Error_NotSupportedValueFormatter;
 
@@ -95,6 +99,7 @@ public class Messages extends NLS {
    public static String        ColumnModifyDialog_Button_Sort_Tooltip;
    public static String        ColumnModifyDialog_Checkbox_ShowFormatAnnotations;
    public static String        ColumnModifyDialog_Checkbox_ShowSortingAnnotations;
+   public static String        ColumnModifyDialog_Column_Alignment;
    public static String        ColumnModifyDialog_Column_Category;
    public static String        ColumnModifyDialog_Column_FormatCategory;
    public static String        ColumnModifyDialog_Column_FormatTour;

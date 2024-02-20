@@ -2730,11 +2730,17 @@ public class UI {
          @Override
          protected boolean isEditorActivationEvent(final ColumnViewerEditorActivationEvent event) {
 
-            return (event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL)
-                  || (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION)
-                  || ((event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED)
+            final int eventType = event.eventType;
+
+            return eventType == ColumnViewerEditorActivationEvent.TRAVERSAL // 5
+                  || eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION // 2
+
+                  || ((eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED) // 1
                         && (event.keyCode == SWT.CR))
-                  || (event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC);
+
+                  || eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC // 4
+
+            ;
          }
       };
 

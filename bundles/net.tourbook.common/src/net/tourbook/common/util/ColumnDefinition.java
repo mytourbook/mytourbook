@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -62,7 +62,7 @@ public class ColumnDefinition implements Cloneable {
    private String                 _label;
 
    /**
-    * every column in a table must have a unique id
+    * Every column in a table must have a unique id
     */
    private String                 _columnId;
 
@@ -73,11 +73,19 @@ public class ColumnDefinition implements Cloneable {
    private boolean                _isColumnChecked;
 
    /**
-    * when <code>true</code> the visibility for this column can be changed
+    * When <code>true</code> then the visibility for this column can be changed
     */
    private boolean                _canModifyVisibility = true;
 
-   protected int                  _style;
+   /**
+    * Is a SWT.* style constant for the column alignment
+    */
+   private int                    _style;
+
+   /**
+    * Is the default SWT.* style constant for the column alignment
+    */
+   private int                    _defaultStyle;
 
    private CellLabelProvider      _cellLabelProvider;
    private NatTable_LabelProvider _natTable_LabelProvider;
@@ -99,7 +107,7 @@ public class ColumnDefinition implements Cloneable {
    private int                    _createIndex;
 
    /**
-    * when <code>true</code> this column will be checked in the modify dialog when the default
+    * When <code>true</code> this column will be checked in the modify dialog when the default
     * button is selected
     */
    private boolean                _isDefaultColumn;
@@ -149,7 +157,9 @@ public class ColumnDefinition implements Cloneable {
    ColumnDefinition(final String columnId, final int style) {
 
       _columnId = columnId;
+
       _style = style;
+      _defaultStyle = style;
    }
 
    /**
@@ -319,6 +329,9 @@ public class ColumnDefinition implements Cloneable {
       return _columnSelectionListener;
    }
 
+   /**
+    * @return Returns the SWT.* style constants for alignments
+    */
    public int getColumnStyle() {
       return _style;
    }
@@ -337,6 +350,10 @@ public class ColumnDefinition implements Cloneable {
 
    public int getCreateIndex() {
       return _createIndex;
+   }
+
+   public int getDefaultColumnStyle() {
+      return _defaultStyle;
    }
 
    public int getDefaultColumnWidth() {
@@ -759,6 +776,11 @@ public class ColumnDefinition implements Cloneable {
 
    public void setLabelProvider_NatTable(final NatTable_LabelProvider natTable_LabelProvider) {
       _natTable_LabelProvider = natTable_LabelProvider;
+   }
+
+   public void setStyle(final int style) {
+
+      _style = style;
    }
 
    /**
