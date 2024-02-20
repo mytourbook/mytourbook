@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,9 +24,8 @@
 
 package net.tourbook.proxy;
 
-import de.byteholder.geoclipse.map.UI;
-
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -38,12 +37,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
       final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-      prefStore.setDefault(IPreferences.PROXY_METHOD, IPreferences.NO_PROXY);
-      prefStore.setDefault(IPreferences.PROXY_SERVER_ADDRESS, UI.EMPTY_STRING);
-      prefStore.setDefault(IPreferences.PROXY_SERVER_PORT, "8080"); //$NON-NLS-1$
-      prefStore.setDefault(IPreferences.PROXY_USER, UI.EMPTY_STRING);
-      prefStore.setDefault(IPreferences.PROXY_PWD, UI.EMPTY_STRING);
-      prefStore.setDefault(IPreferences.SOCKS_PROXY_SERVER_ADDRESS, UI.EMPTY_STRING);
-      prefStore.setDefault(IPreferences.SOCKS_PROXY_SERVER_PORT, "8080"); //$NON-NLS-1$
+// SET_FORMATTING_OFF
+
+      prefStore.setDefault(IPreferences.PROXY_METHOD,                IPreferences.NO_PROXY);
+      prefStore.setDefault(IPreferences.PROXY_SERVER_ADDRESS,        UI.EMPTY_STRING);
+      prefStore.setDefault(IPreferences.PROXY_SERVER_PORT,           "8080");                      //$NON-NLS-1$
+      prefStore.setDefault(IPreferences.PROXY_USER,                  UI.EMPTY_STRING);
+      prefStore.setDefault(IPreferences.PROXY_PWD,                   UI.EMPTY_STRING);
+      prefStore.setDefault(IPreferences.SOCKS_PROXY_SERVER_ADDRESS,  UI.EMPTY_STRING);
+      prefStore.setDefault(IPreferences.SOCKS_PROXY_SERVER_PORT,     "8080");                      //$NON-NLS-1$
+
+// SET_FORMATTING_ON
    }
 }

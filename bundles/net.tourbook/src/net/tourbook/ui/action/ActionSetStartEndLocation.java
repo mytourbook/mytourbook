@@ -191,11 +191,11 @@ public class ActionSetStartEndLocation extends SubMenu {
       private LocationPartID endPartID;
 
       public ActionData_Part(final String actionText,
-                           final String actionTooltip,
-                           final boolean isSetStartLocation,
-                           final boolean isSetEndLocation,
-                           final LocationPartID startPartID,
-                           final LocationPartID endPartID) {
+                             final String actionTooltip,
+                             final boolean isSetStartLocation,
+                             final boolean isSetEndLocation,
+                             final LocationPartID startPartID,
+                             final LocationPartID endPartID) {
 
          this.actionText = actionText;
          this.actionTooltip = actionTooltip;
@@ -220,10 +220,10 @@ public class ActionSetStartEndLocation extends SubMenu {
       private String              tooltipText;
 
       public ActionData_Profile(final TourLocationProfile locationProfile,
-                              final boolean isSetStartLocation,
-                              final boolean isSetEndLocation,
-                              final String actionText,
-                              final String tooltipText) {
+                                final boolean isSetStartLocation,
+                                final boolean isSetEndLocation,
+                                final String actionText,
+                                final String tooltipText) {
 
          this.locationProfile = locationProfile;
 
@@ -733,11 +733,15 @@ public class ActionSetStartEndLocation extends SubMenu {
 
             _allSelectedTours,
             locationProfile,
+
             isSetStartLocation,
             isSetEndLocation,
 
             false, // isOneAction
-            null // oneActionLocation
+            null, // oneActionLocation
+
+            true, // isSaveTour
+            false // isLogLocation
       );
    }
 

@@ -1,6 +1,5 @@
 package de.byteholder.geoclipse.tests;
 
-import de.byteholder.geoclipse.map.UI;
 import de.byteholder.gpx.Document;
 import de.byteholder.gpx.Track;
 import de.byteholder.gpx.TrackSegment;
@@ -10,6 +9,7 @@ import java.io.File;
 
 import javax.xml.parsers.SAXParser;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.XmlUtils;
 

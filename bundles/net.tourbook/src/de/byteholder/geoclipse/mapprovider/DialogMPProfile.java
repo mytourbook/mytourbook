@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,6 @@ import static org.eclipse.ui.forms.events.IExpansionListener.expansionStateChang
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Tile;
-import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.map.event.ITileListener;
 import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers;
@@ -34,6 +33,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.Util;
 

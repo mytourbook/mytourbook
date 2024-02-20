@@ -6,6 +6,8 @@ TODO's
 
 * Remove/replace "de.byteholder.geoclipse.map.UI.NEW_LINE"
 
+* [Column Manager] Customize column alignment
+
 * Remove debug code in ColumnManager.java
    // TODO
       System.out.println("All columns in _allDefinedColumnDefinitions, number of entries: " + _allDefinedColumnDefinitions.size());
@@ -47,6 +49,7 @@ New
   https://github.com/mytourbook/mytourbook/issues/1280
 
 * Start/End Location
+  - Automatically retieve and set start/end locations in the easy import
   - Retrieve, manage and show start/end locations in
     - Tour editor
   - Scramble tour location view when requested
@@ -108,5 +111,5 @@ System
 * Eclipse 2023-06 (4.28)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.28-202306050440/
 * NatTable 2.20               https://www.eclipse.org/nattable/download.php
 * Nebula Widgets              https://download.eclipse.org/nebula/releases/latest
-* FIT SDK 21.126.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* FIT SDK 21.133.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
 * WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

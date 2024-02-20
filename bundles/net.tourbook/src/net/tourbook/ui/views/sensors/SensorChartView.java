@@ -327,8 +327,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      _pageNoData = net.tourbook.ui.UI.createPage(_tk, _pageBook, Messages.Sensor_Chart_Label_SensorIsNotSelected);
-      _pageNoBatteryData = net.tourbook.ui.UI.createPage(_tk, _pageBook, Messages.Sensor_Chart_Label_SensorWithBatteryValuesIsNotSelected);
+      _pageNoData = UI.createPage(_tk, _pageBook, Messages.Sensor_Chart_Label_SensorIsNotSelected);
+      _pageNoBatteryData = UI.createPage(_tk, _pageBook, Messages.Sensor_Chart_Label_SensorWithBatteryValuesIsNotSelected);
 
       _sensorChart = createUI_10_Chart();
 

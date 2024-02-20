@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2006, 2020  Wolfgang Schramm, Markus Stipp
+ * Copyright (C) 2006, 2024 Wolfgang Schramm, Markus Stipp
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
 
+import net.tourbook.common.UI;
 import net.tourbook.data.DataUtil;
-import net.tourbook.ui.UI;
 
 /**
  * Contains all data read from the device except the tour data
@@ -197,6 +197,7 @@ public class CM4XXMDeviceData {
 
    /**
     * @param fileRawData
+    *
     * @throws IOException
     * @throws NumberFormatException
     */

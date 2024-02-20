@@ -1,6 +1,5 @@
 package de.byteholder.geoclipse.tests;
 
-import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.util.GeoUtils;
 
 import java.io.File;
@@ -8,6 +7,7 @@ import java.util.ArrayList;
 
 import javax.xml.parsers.SAXParser;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.XmlUtils;
 

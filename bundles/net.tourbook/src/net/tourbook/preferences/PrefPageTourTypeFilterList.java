@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.TableLayoutComposite;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -28,7 +29,6 @@ import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -213,12 +213,12 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
             case TourTypeFilter.FILTER_TYPE_SYSTEM:
                filterName = filter.getSystemFilterName();
-               filterImage = UI.IMAGE_REGISTRY.get(UI.IMAGE_TOUR_TYPE_FILTER_SYSTEM);
+               filterImage = UI.IMAGE_REGISTRY.get(net.tourbook.ui.UI.IMAGE_TOUR_TYPE_FILTER_SYSTEM);
                break;
 
             case TourTypeFilter.FILTER_TYPE_TOURTYPE_SET:
                filterName = filter.getTourTypeSet().getName();
-               filterImage = UI.IMAGE_REGISTRY.get(UI.IMAGE_TOUR_TYPE_FILTER);
+               filterImage = UI.IMAGE_REGISTRY.get(net.tourbook.ui.UI.IMAGE_TOUR_TYPE_FILTER);
                break;
 
             default:

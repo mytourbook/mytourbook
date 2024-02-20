@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,10 +15,10 @@
  *******************************************************************************/
 package net.tourbook.commands;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.util.Collections;
 import java.util.Map;
+
+import net.tourbook.common.UI;
 
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.IPartListener2;

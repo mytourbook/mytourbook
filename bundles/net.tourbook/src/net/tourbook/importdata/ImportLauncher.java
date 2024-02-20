@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourType;
 import net.tourbook.tour.CadenceMultiplier;
+import net.tourbook.tour.location.TourLocationProfile;
 
 public class ImportLauncher implements Cloneable {
 
@@ -109,6 +110,16 @@ public class ImportLauncher implements Cloneable {
     */
    public boolean                  isReplaceElevationFromSRTM;
 
+   /**
+    * When <code>true</code> then tour start/end locations are retrieved and set into the tour
+    */
+   public boolean                  isRetrieveTourLocation;
+
+   /**
+    * This tour location profile is used to set the tour location values
+    */
+   public TourLocationProfile      tourLocationProfile;
+
    public ImportLauncher() {
 
       _id = ++_idCreator;
@@ -124,6 +135,7 @@ public class ImportLauncher implements Cloneable {
          clonedObject = (ImportLauncher) super.clone();
 
          clonedObject._id = ++_idCreator;
+
          clonedObject.speedTourTypes = new ArrayList<>();
 
          for (final SpeedTourType speedVertex : speedTourTypes) {

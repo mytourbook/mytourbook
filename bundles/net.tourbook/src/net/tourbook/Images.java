@@ -281,6 +281,7 @@ public class Images {
    public static final String State_MovedTour_View                       = "state-moved-tour-view.png";                           //$NON-NLS-1$
    public static final String State_NotSavedInTour                       = "state-not-saved-in-tour.png";                         //$NON-NLS-1$
    public static final String State_OK                                   = "state-ok.png";                                        //$NON-NLS-1$
+   public static final String State_RetrieveTourLocation                 = "state-tour-location.png";                             //$NON-NLS-1$
    public static final String State_RetrieveWeatherData                  = "state-weather.png";                                   //$NON-NLS-1$
    public static final String State_Save                                 = "state-save.png";                                      //$NON-NLS-1$
    public static final String State_SaveTour                             = "state-save-tour.png";                                 //$NON-NLS-1$

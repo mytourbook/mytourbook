@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2023 Frédéric Bard
+ * Copyright (C) 2020, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,13 @@ package utils;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -122,7 +129,7 @@ public class Comparison {
       final String controlDocument = readFileContent(controlFileName + JSON);
 
       testTourData.getTourMarkersSorted();
-      final String testJson = testTourData.toJson();
+      final String testJson = convertTourDataToJson(testTourData);
 
       final JSONCompareResult result = JSONCompare.compareJSON(controlDocument, testJson, customArrayValueComparator);
 
@@ -183,6 +190,28 @@ public class Comparison {
          Thread.currentThread().interrupt();
          StatusUtil.log(e);
       }
+   }
+
+   private static String convertTourDataToJson(TourData tourData) {
+
+      final ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.setSerializationInclusion(Include.NON_NULL);
+      objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+      objectMapper.setConfig(objectMapper.getSerializationConfig()
+            .with(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY));
+      objectMapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
+      objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.NONE);
+      objectMapper.setVisibility(PropertyAccessor.GETTER, Visibility.NONE);
+      objectMapper.setVisibility(PropertyAccessor.IS_GETTER, Visibility.NONE);
+      objectMapper.setVisibility(PropertyAccessor.SETTER, Visibility.NONE);
+
+      String jsonString = UI.EMPTY_STRING;
+      try {
+         jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tourData);
+      } catch (final JsonProcessingException e) {
+         e.printStackTrace();
+      }
+      return jsonString;
    }
 
    public static String readFileContent(final String controlDocumentFileName) {

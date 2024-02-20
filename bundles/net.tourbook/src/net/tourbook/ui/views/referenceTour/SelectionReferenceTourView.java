@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.referenceTour;
 
-import de.byteholder.geoclipse.map.UI;
-
+import net.tourbook.common.UI;
 import net.tourbook.data.TourCompared;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
@@ -28,7 +27,7 @@ import org.eclipse.jface.viewers.ISelection;
  */
 public class SelectionReferenceTourView implements ISelection {
 
-   private static final String    NL = UI.NEW_LINE;
+   private static final char      NL = UI.NEW_LINE;
 
    /**
     * Unique id for a reference tour in {@link TourReference} entity

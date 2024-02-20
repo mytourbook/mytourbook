@@ -17,9 +17,9 @@ package net.tourbook.preferences;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.map.MapColorProvider;
-import net.tourbook.ui.UI;
 
 public interface ITourbookPreferences {
 

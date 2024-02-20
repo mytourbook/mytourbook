@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,9 +27,9 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ISliderMoveListener;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.data.TourData;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -201,7 +201,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
                // check if this tour viewer contains a tour which must be updated
 
                // update editor
-               if (UI.containsTourId(eventData, _tourData.getTourId()) != null) {
+               if (net.tourbook.ui.UI.containsTourId(eventData, _tourData.getTourId()) != null) {
 
                   // reload tour data and update chart
                   updateChart(TourManager.getInstance().getTourData(_tourData.getTourId()));

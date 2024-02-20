@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,12 +15,12 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.poi;
 
-import de.byteholder.geoclipse.map.UI;
 import de.byteholder.gpx.PointOfInterest;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
 
 import org.xml.sax.Attributes;

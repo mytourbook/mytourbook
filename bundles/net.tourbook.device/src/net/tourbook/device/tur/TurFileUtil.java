@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,7 @@ package net.tourbook.device.tur;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.tourbook.ui.UI;
+import net.tourbook.common.UI;
 
 public class TurFileUtil {
 

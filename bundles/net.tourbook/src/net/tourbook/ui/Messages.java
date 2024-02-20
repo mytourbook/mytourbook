@@ -649,6 +649,7 @@ public class Messages extends NLS {
    public static String        Tour_Location_Part_SettlementSmall;
    public static String        Tour_Location_Part_Waterway;
    public static String        Tour_Location_Task_RemovingTourLocations;
+   public static String        Tour_Location_Task_RetrieveAndSaveTourLocations;
    public static String        Tour_Location_Task_RetrievingTourLocations;
    public static String        Tour_Location_Task_RetrievingTourLocations_Subtask;
    public static String        Tour_Location_Tooltip_Label_Usage;

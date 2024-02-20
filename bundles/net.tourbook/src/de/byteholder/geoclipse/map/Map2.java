@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -918,6 +918,7 @@ public class Map2 extends Canvas {
     *
     * @param overlay
     *           the map overlay to use
+    * 
     * @see org.jdesktop.swingx.painters.Painter
     */
    public void addOverlayPainter(final Map2Painter overlay) {
@@ -940,6 +941,7 @@ public class Map2 extends Canvas {
     *
     * @param newWidth
     * @param newHeight
+    * 
     * @return
     */
    private boolean canReuseImage(final Image image, final Rectangle clientArea) {
@@ -982,8 +984,7 @@ public class Map2 extends Canvas {
       }
 
       // create 9 part image/gc
-      final ImageData transparentImageData = de.byteholder.geoclipse.map.UI.createTransparentImageData(
-            partedTileSize);
+      final ImageData transparentImageData = MapUtils.createTransparentImageData(partedTileSize);
 
       _9PartImage = new Image(_display, transparentImageData);
       _9PartGC = new GC(_9PartImage);
@@ -993,6 +994,7 @@ public class Map2 extends Canvas {
     * Checks validation of a world pixel by using the current zoom level and map tile size.
     *
     * @param newWorldPixelCenter
+    * 
     * @return Returns adjusted world pixel when necessary.
     */
    private Point2D.Double checkWorldPixel(final Point2D newWorldPixelCenter) {
@@ -1096,6 +1098,7 @@ public class Map2 extends Canvas {
     * @param image
     *           image which will be disposed if the image is not null
     * @param clientArea
+    * 
     * @return returns a new created image
     */
    private Image createMapImage(final Display display, final Image image, final Rectangle clientArea) {
@@ -1300,6 +1303,7 @@ public class Map2 extends Canvas {
     * Parse bounding box string.
     *
     * @param boundingBox
+    * 
     * @return Returns a set with bounding box positions or <code>null</code> when boundingBox cannot
     *         be parsed.
     */
@@ -1375,6 +1379,7 @@ public class Map2 extends Canvas {
     * @param allPainted_HoveredRectangle
     * @param allPainted_HoveredTourId
     * @param allPainted_HoveredSerieIndices
+    * 
     * @return
     */
    private int getHoveredValuePointIndex(final Long hoveredTourId,
@@ -1485,6 +1490,7 @@ public class Map2 extends Canvas {
 
    /**
     * @param tileKey
+    * 
     * @return Returns the key to identify overlay images in the image cache
     */
    private String getOverlayKey(final Tile tile) {
@@ -1496,6 +1502,7 @@ public class Map2 extends Canvas {
     * @param xOffset
     * @param yOffset
     * @param projectionId
+    * 
     * @return
     */
    private String getOverlayKey(final Tile tile, final int xOffset, final int yOffset, final String projectionId) {
@@ -1513,6 +1520,7 @@ public class Map2 extends Canvas {
 
    /**
     * @param tourId
+    * 
     * @return Return dev X/Y position of the hovered tour or <code>null</code>
     */
    private int[] getReducesTourPositions(final long tourId) {
@@ -1610,6 +1618,7 @@ public class Map2 extends Canvas {
     *           Geo positions
     * @param zoom
     *           Requested zoom level
+    * 
     * @return Returns a rectangle in world positions which contains all geo positions for the given
     *         zoom level
     */
@@ -1654,6 +1663,7 @@ public class Map2 extends Canvas {
     * @param geo_Start
     * @param geo_End
     * @param mapGridData
+    * 
     * @return
     */
    private void grid_Convert_StartEnd_2_TopLeft(GeoPosition geo_Start,
@@ -2030,6 +2040,7 @@ public class Map2 extends Canvas {
 
    /**
     * @param mouseEvent
+    * 
     * @return Returns mouse position in the map border or <code>null</code> when the border is not
     *         hovered. The returned absolute values are higher when the mouse is closer to the
     *         border.
@@ -2218,6 +2229,7 @@ public class Map2 extends Canvas {
     * @param srcXStart
     * @param srcYStart
     * @param tileSize
+    * 
     * @return Returns <code>true</code> when a part is modified
     */
    private boolean isPartImageDataModified(final ImageData imageData9Parts,
@@ -2351,6 +2363,7 @@ public class Map2 extends Canvas {
     *
     * @param tilePosX
     * @param tilePosY
+    * 
     * @return
     */
    private boolean isTileOnMap(final int tilePosX, final int tilePosY) {
@@ -2606,6 +2619,7 @@ public class Map2 extends Canvas {
     *
     * @param worldPosX
     * @param worldPosY
+    * 
     * @return
     */
    private Point offline_GetDevGridGeoPosition(final int worldPosX, final int worldPosY) {
@@ -2822,12 +2836,15 @@ public class Map2 extends Canvas {
       case SWT.ARROW_LEFT:
          xDiff = _isInInverseKeyboardPanning ? -offset : offset;
          break;
+
       case SWT.ARROW_RIGHT:
          xDiff = _isInInverseKeyboardPanning ? offset : -offset;
          break;
+
       case SWT.ARROW_UP:
          yDiff = _isInInverseKeyboardPanning ? -offset : offset;
          break;
+
       case SWT.ARROW_DOWN:
          yDiff = _isInInverseKeyboardPanning ? offset : -offset;
          break;
@@ -2837,6 +2854,7 @@ public class Map2 extends Canvas {
       case '+':
          zoomIn(CenterMapBy.Map);
          break;
+
       case '-':
          zoomOut(CenterMapBy.Map);
          break;
@@ -4107,6 +4125,7 @@ public class Map2 extends Canvas {
     * @param isPaintLastGridSelection
     *           When <code>true</code>, the last selected grid is painted, otherwise the currently
     *           selecting grid
+    * 
     * @return Returns top/left box position in the viewport
     */
    private Point paint_GeoGrid_50_Outline(final GC gc,
@@ -5320,7 +5339,7 @@ public class Map2 extends Canvas {
       boolean isOverlayPainted = false;
 
       // create 1 part image/gc
-      final ImageData transparentImageData = de.byteholder.geoclipse.map.UI.createTransparentImageData(_tilePixelSize);
+      final ImageData transparentImageData = MapUtils.createTransparentImageData(_tilePixelSize);
 
       final Image overlayImage = new Image(_display, transparentImageData);
       final GC gc1Part = new GC(overlayImage);
@@ -5667,6 +5686,7 @@ public class Map2 extends Canvas {
     * @param fgColor
     * @param bgColor
     * @param isAdjustToMousePosition
+    * 
     * @return Returns outline of the painted text or <code>null</code> when text is not painted
     */
    private Rectangle paint_Text_Label(final GC gc,
@@ -6248,6 +6268,7 @@ public class Map2 extends Canvas {
 
    /**
     * @param text
+    * 
     * @return Returns <code>true</code> when POI could be identified and it's displayed in the map
     */
    private boolean parseAndDisplayPOIText(String text) {
@@ -6259,7 +6280,7 @@ public class Map2 extends Canvas {
       }
 
       // linux has 2 lines: 1: url, 2. text
-      final String[] dndText = text.split(de.byteholder.geoclipse.map.UI.NEW_LINE);
+      final String[] dndText = text.split(UI.NEW_LINE1);
       if (dndText.length == 0) {
          return false;
       }
@@ -7371,6 +7392,7 @@ public class Map2 extends Canvas {
 
    /**
     * @param boundingBox
+    * 
     * @return Returns zoom level or -1 when bounding box is <code>null</code>.
     */
    public int setZoomToBoundingBox(final String boundingBox) {

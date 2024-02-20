@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -132,6 +132,7 @@ import net.tourbook.tour.TourLogState;
 import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
+import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.ITourProviderByID;
@@ -506,6 +507,7 @@ public class RawDataView extends ViewPart implements
    private String                        _imageUrl_SerialPort_Configured;
    private String                        _imageUrl_SerialPort_Directly;
    private String                        _imageUrl_State_AdjustTemperature;
+   private String                        _imageUrl_State_RetrieveTourLocation;
    private String                        _imageUrl_State_RetrieveWeatherData;
    private String                        _imageUrl_State_Error;
    private String                        _imageUrl_State_OK;
@@ -2287,8 +2289,9 @@ public class RawDataView extends ViewPart implements
 
       sb.append(UI.NEW_LINE2);
 
-      // last marker
       {
+         // last marker
+
          final double distance = importLauncher.lastMarkerDistance / 1000.0 / UI.UNIT_VALUE_DISTANCE;
 
          final String distanceValue = _nf1.format(distance) + UI.SPACE1 + UI.UNIT_LABEL_DISTANCE;
@@ -2297,9 +2300,9 @@ public class RawDataView extends ViewPart implements
                ? NLS.bind(Messages.Import_Data_HTML_LastMarker_Yes, distanceValue, importLauncher.lastMarkerText)
                : Messages.Import_Data_HTML_LastMarker_No);
       }
-
-      // adjust temperature
       {
+         // adjust temperature
+
          sb.append(NL);
 
          if (importLauncher.isAdjustTemperature) {
@@ -2319,45 +2322,54 @@ public class RawDataView extends ViewPart implements
             sb.append(Messages.Import_Data_HTML_AdjustTemperature_No);
          }
       }
-
-      // adjust elevation
       {
+         // adjust elevation
+
          sb.append(NL);
 
          sb.append(importLauncher.isReplaceFirstTimeSliceElevation
                ? Messages.Import_Data_HTML_ReplaceFirstTimeSliceElevation_Yes
                : Messages.Import_Data_HTML_ReplaceFirstTimeSliceElevation_No);
       }
-
-      // set elevation from SRTM
       {
+         // set elevation from SRTM
+
          sb.append(NL);
 
          sb.append(importLauncher.isReplaceElevationFromSRTM
                ? Messages.Import_Data_HTML_ReplaceElevationFromSRTM_Yes
                : Messages.Import_Data_HTML_ReplaceElevationFromSRTM_No);
       }
-
-      // retrieve weather data
       {
+         // retrieve weather data
+
          sb.append(NL);
 
          sb.append(importLauncher.isRetrieveWeatherData
                ? Messages.Import_Data_HTML_RetrieveWeatherData_Yes
                : Messages.Import_Data_HTML_RetrieveWeatherData_No);
       }
-
-      // save tour
       {
+         // retrieve tour location
+
+         sb.append(NL);
+
+         sb.append(importLauncher.isRetrieveTourLocation
+               ? Messages.Import_Data_HTML_RetrieveTourLocation_Yes
+               : Messages.Import_Data_HTML_RetrieveTourLocation_No);
+      }
+      {
+         // save tour
+
          sb.append(NL);
 
          sb.append(importLauncher.isSaveTour
                ? Messages.Import_Data_HTML_SaveTour_Yes
                : Messages.Import_Data_HTML_SaveTour_No);
       }
-
-      // delete device files
       {
+         // delete device files
+
          sb.append(NL);
 
          sb.append(getEasyConfig().getActiveImportConfig().isDeleteDeviceFiles
@@ -2382,7 +2394,7 @@ public class RawDataView extends ViewPart implements
       }
 
       /*
-       * AdjustTemperature
+       * Adjust temperature
        */
       String htmlAdjustTemperature = UI.EMPTY_STRING;
       if (importTile.isAdjustTemperature) {
@@ -2401,6 +2413,17 @@ public class RawDataView extends ViewPart implements
          final String stateImage = createHTML_BgImage(_imageUrl_State_RetrieveWeatherData);
 
          htmlRetrieveWeatherData = createHTML_TileAnnotation(stateImage);
+      }
+
+      /*
+       * Retrieve tour location
+       */
+      String htmlRetrieveTourLocation = UI.EMPTY_STRING;
+      if (importTile.isRetrieveTourLocation) {
+
+         final String stateImage = createHTML_BgImage(_imageUrl_State_RetrieveTourLocation);
+
+         htmlRetrieveTourLocation = createHTML_TileAnnotation(stateImage);
       }
 
       /*
@@ -2430,8 +2453,9 @@ public class RawDataView extends ViewPart implements
       // order is reverted that it looks in the correct order
       sb.append(htmlDeleteFiles);
       sb.append(htmlSaveTour);
-      sb.append(htmlAdjustTemperature);
+      sb.append(htmlRetrieveTourLocation);
       sb.append(htmlRetrieveWeatherData);
+      sb.append(htmlAdjustTemperature);
       sb.append(htmlLastMarker);
 
       sb.append("<div style='float:left;'>" + importTile.name + "</div>"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -2703,26 +2727,27 @@ public class RawDataView extends ViewPart implements
          /*
           * Image urls
           */
-         _imageUrl_ImportFromFile            = getIconUrl(Images.Import_Files);
-         _imageUrl_SerialPort_Configured     = getIconUrl(Images.RawData_Transfer);
-         _imageUrl_SerialPort_Directly       = getIconUrl(Images.RawData_TransferDirect);
+         _imageUrl_ImportFromFile               = getIconUrl(Images.Import_Files);
+         _imageUrl_SerialPort_Configured        = getIconUrl(Images.RawData_Transfer);
+         _imageUrl_SerialPort_Directly          = getIconUrl(Images.RawData_TransferDirect);
 
-         _imageUrl_State_AdjustTemperature   = getIconUrl(Images.State_AdjustTemperature);
-         _imageUrl_State_RetrieveWeatherData = getIconUrl(Images.State_RetrieveWeatherData);
-         _imageUrl_State_Error               = getIconUrl(Images.State_Error);
-         _imageUrl_State_OK                  = getIconUrl(Images.State_OK);
-         _imageUrl_State_MovedFiles          = getIconUrl(Images.State_MovedTour);
-         _imageUrl_State_SaveTour            = getIconUrl(Images.State_SaveTour);
-         _imageUrl_State_TourMarker          = getIconUrl(Images.State_TourMarker);
+         _imageUrl_State_AdjustTemperature      = getIconUrl(Images.State_AdjustTemperature);
+         _imageUrl_State_RetrieveTourLocation   = getIconUrl(Images.State_RetrieveTourLocation);
+         _imageUrl_State_RetrieveWeatherData    = getIconUrl(Images.State_RetrieveWeatherData);
+         _imageUrl_State_Error                  = getIconUrl(Images.State_Error);
+         _imageUrl_State_OK                     = getIconUrl(Images.State_OK);
+         _imageUrl_State_MovedFiles             = getIconUrl(Images.State_MovedTour);
+         _imageUrl_State_SaveTour               = getIconUrl(Images.State_SaveTour);
+         _imageUrl_State_TourMarker             = getIconUrl(Images.State_TourMarker);
 
-         _imageUrl_Device_TurnOff            = getIconUrl(Images.RawData_Device_TurnOff);
-         _imageUrl_Device_TurnOn             = getIconUrl(Images.RawData_Device_TurnOn);
+         _imageUrl_Device_TurnOff               = getIconUrl(Images.RawData_Device_TurnOff);
+         _imageUrl_Device_TurnOn                = getIconUrl(Images.RawData_Device_TurnOn);
 
-         _imageUrl_DeviceFolder_OK           = getIconUrl(Images.RawData_DeviceFolder_OK);
-         _imageUrl_DeviceFolder_Off          = getIconUrl(Images.RawData_DeviceFolder_Off);
-         _imageUrl_DeviceFolder_Error        = getIconUrl(Images.RawData_DeviceFolder_Error);
-         _imageUrl_DeviceFolder_IsChecking   = getIconUrl(Images.RawData_DeviceFolder_IsChecking);
-         _imageUrl_DeviceFolder_NotSetup     = getIconUrl(Images.RawData_DeviceFolder_NotSetup);
+         _imageUrl_DeviceFolder_OK              = getIconUrl(Images.RawData_DeviceFolder_OK);
+         _imageUrl_DeviceFolder_Off             = getIconUrl(Images.RawData_DeviceFolder_Off);
+         _imageUrl_DeviceFolder_Error           = getIconUrl(Images.RawData_DeviceFolder_Error);
+         _imageUrl_DeviceFolder_IsChecking      = getIconUrl(Images.RawData_DeviceFolder_IsChecking);
+         _imageUrl_DeviceFolder_NotSetup        = getIconUrl(Images.RawData_DeviceFolder_NotSetup);
 
 // SET_FORMATTING_ON
 
@@ -5728,6 +5753,13 @@ public class RawDataView extends ViewPart implements
             runEasyImport_050_RetrieveWeatherData(importLauncher, importedTours);
          }
 
+         /*
+          * 51. Retrieve tour location
+          */
+         if (importLauncher.isRetrieveTourLocation) {
+            runEasyImport_051_RetrieveTourLocation(importLauncher, importedTours);
+         }
+
          ArrayList<TourData> importedAndSavedTours;
 
          /*
@@ -5866,11 +5898,13 @@ public class RawDataView extends ViewPart implements
          if (oldTourAvgTemperature > avgMinimumTemperature) {
 
             // "%s . . . %.2f > %.0f °C"
-            TourLogManager.subLog_DEFAULT(String.format(
-                  TourManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
-                  TourManager.getTourDateTimeShort(tourData),
-                  oldTourAvgTemperature,
-                  avgMinimumTemperature));
+            TourLogManager.subLog_DEFAULT(
+
+                  TourManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE.formatted(
+
+                        TourManager.getTourDateTimeShort(tourData),
+                        oldTourAvgTemperature,
+                        avgMinimumTemperature));
 
             continue;
          }
@@ -5972,6 +6006,7 @@ public class RawDataView extends ViewPart implements
                                                       final List<TourData> importedTours) {
 
       // "50. Retrieve Weather Data"
+
       TourLogManager.log_DEFAULT(NLS.bind(
             EasyImportManager.LOG_EASY_IMPORT_050_RETRIEVE_WEATHER_DATA,
             new Object[] {
@@ -5979,6 +6014,36 @@ public class RawDataView extends ViewPart implements
                   UI.UNIT_LABEL_TEMPERATURE }));
 
       TourManager.retrieveWeatherData(importedTours);
+   }
+
+   private void runEasyImport_051_RetrieveTourLocation(final ImportLauncher importLauncher,
+                                                       final ArrayList<TourData> importedTours) {
+
+      // 51. Retrieve tour locations
+      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_051_RETRIEVE_TOUR_LOCATION);
+
+      final long start = System.currentTimeMillis();
+
+      TourLocationManager.setTourLocations(
+
+            importedTours,
+            importLauncher.tourLocationProfile, // locationProfile
+
+            true, // isSetStartLocation
+            true, // isSetEndLocation
+
+            false, // isOneAction
+            null, // oneActionLocation
+
+            false, // isSaveTour
+            true // isLogLocation
+      );
+
+      // location data retrieved in %.1f s
+      TourLogManager.subLog_DEFAULT(String.format(
+            Messages.Log_RetrieveTourLocation_End,
+            (System.currentTimeMillis() - start) / 1000.0));
+
    }
 
    private ArrayList<TourData> runEasyImport_099_SaveTour(final TourPerson person, final ArrayList<TourData> importedTours) {

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import static net.tourbook.common.UI.EMPTY_STRING;
+
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 import java.io.File;
@@ -54,8 +56,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -80,41 +80,16 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.menus.UIElement;
 
 public class UI {
 
    private static final String           ICONS_PATH                      = "/icons/";                         //$NON-NLS-1$
-
-   public static final String            EMPTY_STRING                    = "";                                //$NON-NLS-1$
-   public static final String            SPACE                           = " ";                               //$NON-NLS-1$
-   public static final String            SPACE2                          = "  ";                              //$NON-NLS-1$
-   public static final String            SPACE4                          = "    ";                            //$NON-NLS-1$
-   public static final String            COLON_SPACE                     = ": ";                              //$NON-NLS-1$
-   public static final String            COMMA_SPACE                     = ", ";                              //$NON-NLS-1$
-   public static final String            UNDERSCORE                      = "_";                               //$NON-NLS-1$
-   public static final String            DASH                            = "-";                               //$NON-NLS-1$
-   public static final String            DASH_WITH_SPACE                 = " - ";                             //$NON-NLS-1$
-   public static final String            DASH_WITH_DOUBLE_SPACE          = "   -   ";                         //$NON-NLS-1$
-   public static final String            SLASH_WITH_SPACE                = " / ";                             //$NON-NLS-1$
-   public static final String            EMPTY_STRING_FORMAT             = "%s";                              //$NON-NLS-1$
-
-   /**
-    * contains a new line
-    */
-   public static final String            NEW_LINE                        = "\n";                              //$NON-NLS-1$
-
-   /**
-    * contains 2 new lines
-    */
-   public static final String            NEW_LINE2                       = "\n\n";                            //$NON-NLS-1$
 
    public static final String            IS_NOT_INITIALIZED              = "IS NOT INITIALIZED";              //$NON-NLS-1$
 
@@ -157,27 +132,6 @@ public class UI {
     * Color for totals or number of ...
     */
    public static final String            VIEW_COLOR_TOTAL                = "VIEW_COLOR_TOTAL";                //$NON-NLS-1$
-
-   public static final String            SYMBOL_AVERAGE                  = "\u00f8";                          //$NON-NLS-1$
-   public static final String            SYMBOL_AVERAGE_WITH_SPACE       = "\u00f8 ";                         //$NON-NLS-1$
-   public static final String            SYMBOL_DASH                     = "-";                               //$NON-NLS-1$
-   public static final String            SYMBOL_DOUBLE_HORIZONTAL        = "\u2550";                          //$NON-NLS-1$
-   public static final String            SYMBOL_DOUBLE_VERTICAL          = "\u2551";                          //$NON-NLS-1$
-   public static final String            SYMBOL_DEGREE                   = "\u00B0";                          //$NON-NLS-1$
-   public static final String            SYMBOL_INFINITY                 = "\u221E";                          //$NON-NLS-1$
-   public static final String            SYMBOL_SUM_WITH_SPACE           = "\u2211 ";                         //$NON-NLS-1$
-   public static final String            SYMBOL_TAU                      = "\u03c4";                          //$NON-NLS-1$
-
-   public static final String            SYMBOL_BRACKET_LEFT             = "(";                               //$NON-NLS-1$
-   public static final String            SYMBOL_BRACKET_RIGHT            = ")";                               //$NON-NLS-1$
-   public static final String            SYMBOL_COLON                    = ":";                               //$NON-NLS-1$
-   public static final String            SYMBOL_DOT                      = ".";                               //$NON-NLS-1$
-   public static final String            SYMBOL_EQUAL                    = "=";                               //$NON-NLS-1$
-   public static final String            SYMBOL_GREATER_THAN             = ">";                               //$NON-NLS-1$
-   public static final String            SYMBOL_LESS_THAN                = "<";                               //$NON-NLS-1$
-   public static final String            SYMBOL_PERCENTAGE               = "%";                               //$NON-NLS-1$
-   public static final String            SYMBOL_WIND_WITH_SPACE          = "W ";                              //$NON-NLS-1$
-   public static final String            SYMBOL_EXCLAMATION_POINT        = "!";                               //$NON-NLS-1$
 
    public static final ImageRegistry     IMAGE_REGISTRY;
 
@@ -290,6 +244,7 @@ public class UI {
 
    /**
     * @param file
+    *
     * @return Returns <code>true</code> when the file should be overwritten, otherwise
     *         <code>false</code>
     */
@@ -385,6 +340,7 @@ public class UI {
     *
     * @param propertyData
     * @param checkedTourId
+    *
     * @return Returns the tour id when it is contained in the property data, otherwise it returns
     *         <code>null</code>
     */
@@ -430,6 +386,7 @@ public class UI {
     * Get text for the OK button.
     *
     * @param tourData
+    *
     * @return
     */
    public static String convertOKtoSaveUpdateButton(final TourData tourData) {
@@ -465,27 +422,6 @@ public class UI {
       // create disabled image
       IMAGE_REGISTRY.put(createGraphImage_NameDisabled(graphId),
             TourbookPlugin.getThemedImageDescriptor(graphImageName_Disabled));
-   }
-
-   /**
-    * Creates a page with a static text by using a {@link FormToolkit}
-    *
-    * @param formToolkit
-    * @param parent
-    * @param labelText
-    * @return
-    */
-   public static Composite createPage(final FormToolkit formToolkit, final Composite parent, final String labelText) {
-
-      final Composite container = formToolkit.createComposite(parent);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
-      {
-         final Label label = formToolkit.createLabel(container, labelText, SWT.WRAP);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
-      }
-
-      return container;
    }
 
    /**
@@ -674,6 +610,7 @@ public class UI {
 
    /**
     * @param graphId
+    *
     * @return Returns a graph image, this image <b>MUST</b> not be disposed.
     */
    public static Image getGraphImage(final MapGraphId graphId) {
@@ -683,6 +620,7 @@ public class UI {
 
    /**
     * @param graphId
+    *
     * @return Returns a graph image, this image <b>MUST</b> not be disposed.
     */
    public static Image getGraphImage_Disabled(final MapGraphId graphId) {
@@ -744,7 +682,9 @@ public class UI {
 
    /**
     * @param imageName
+    *
     * @return Returns the url for an icon image in the {@link TourbookPlugin} bundle.
+    *
     * @throws IOException
     */
    public static String getIconUrl(final String imageName) {
@@ -771,6 +711,7 @@ public class UI {
 
    /**
     * @param tourTypeId
+    *
     * @return Returns the {@link TourType} or <code>null</code>.
     */
    public static TourType getTourType(final long tourTypeId) {
@@ -786,6 +727,7 @@ public class UI {
 
    /**
     * @param tourTypeId
+    *
     * @return Returns the name of a {@link TourType}.
     */
    public static String getTourTypeLabel(final long tourTypeId) {
@@ -830,12 +772,14 @@ public class UI {
                width = srcData.height;
                height = srcData.width;
                break;
+
             case SWT.RIGHT: // right 90 degrees
                destX = srcData.height - srcY - 1;
                destY = srcX;
                width = srcData.height;
                height = srcData.width;
                break;
+
             case SWT.DOWN: // 180 degrees
                destX = srcData.width - srcX - 1;
                destY = srcData.height - srcY - 1;

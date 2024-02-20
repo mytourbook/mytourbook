@@ -16,9 +16,6 @@
 package net.tourbook.common;
 
 import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
-import static org.eclipse.swt.events.MouseTrackListener.mouseEnterAdapter;
-import static org.eclipse.swt.events.MouseTrackListener.mouseExitAdapter;
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -83,7 +80,9 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
@@ -126,6 +125,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.menus.UIElement;
 import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
@@ -146,6 +146,7 @@ public class UI {
    public static final char         SYMBOL_BRACKET_LEFT                  = '(';
    public static final char         SYMBOL_BRACKET_RIGHT                 = ')';
 
+   public static final String       COLON_SPACE                          = ": ";                                        //$NON-NLS-1$
    public static final String       COMMA_SPACE                          = ", ";                                        //$NON-NLS-1$
    /** This is not a real dash it's the negative sign character */
    public static final String       DASH                                 = "-";                                         //$NON-NLS-1$
@@ -634,14 +635,14 @@ public class UI {
     *
     * @since 3.2
     */
-   private static final String DIALOG_WIDTH              = "DIALOG_WIDTH";                //$NON-NLS-1$
+   public static final String  DIALOG_WIDTH              = "DIALOG_WIDTH";                //$NON-NLS-1$
 
    /**
     * The dialog settings key name for stored dialog height.
     *
     * @since 3.2
     */
-   private static final String DIALOG_HEIGHT             = "DIALOG_HEIGHT";               //$NON-NLS-1$
+   public static final String  DIALOG_HEIGHT             = "DIALOG_HEIGHT";               //$NON-NLS-1$
 
    /**
     * The dialog settings key name for the font used when the dialog height and width was stored.
@@ -930,13 +931,13 @@ public class UI {
             ? ThemeUtil.getDefaultForegroundColor_Shell()
             : display.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
 
-      sash.addMouseTrackListener(mouseEnterAdapter(mouseEvent -> sash.setBackground(mouseEnterColor)));
-      sash.addMouseTrackListener(mouseExitAdapter(mouseEvent -> sash.setBackground(mouseExitColor)));
+      sash.addMouseTrackListener(MouseTrackListener.mouseEnterAdapter(mouseEvent -> sash.setBackground(mouseEnterColor)));
+      sash.addMouseTrackListener(MouseTrackListener.mouseExitAdapter(mouseEvent -> sash.setBackground(mouseExitColor)));
 
       // set color when sash is initially displayed
       sash.addControlListener(controlResizedAdapter(controlEvent -> sash.setBackground(mouseExitColor)));
 
-      sash.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+      sash.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
 
          // hide background when sash is dragged
 
@@ -1526,6 +1527,28 @@ public class UI {
       label.setToolTipText(tooltip);
 
       return label;
+   }
+
+   /**
+    * Creates a page with a static text by using a {@link FormToolkit}
+    *
+    * @param formToolkit
+    * @param parent
+    * @param labelText
+    *
+    * @return
+    */
+   public static Composite createPage(final FormToolkit formToolkit, final Composite parent, final String labelText) {
+
+      final Composite container = formToolkit.createComposite(parent);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = formToolkit.createLabel(container, labelText, SWT.WRAP);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+      }
+
+      return container;
    }
 
    /**
