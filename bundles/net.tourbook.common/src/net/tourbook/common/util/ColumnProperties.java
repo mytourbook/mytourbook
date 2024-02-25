@@ -18,6 +18,8 @@ package net.tourbook.common.util;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.ValueFormat;
 
+import org.eclipse.swt.SWT;
+
 /**
  * Contains customized table/tree column properties, a column is identified by the
  * {@link #columnId}.
@@ -35,6 +37,10 @@ public class ColumnProperties {
 
    /**
     * SWT.* constant for the column alignment
+    *
+    * <li>{@link SWT#LEAD} - 16384</li>
+    * <li>{@link SWT#CENTER} - 16777216</li>
+    * <li>{@link SWT#TRAIL} - 131072</li>
     */
    int                       alignment;
 
@@ -61,6 +67,18 @@ public class ColumnProperties {
       return true;
    }
 
+   private String getAlignmentText() {
+
+      return switch (alignment) {
+
+      case SWT.LEAD -> "Left"; //$NON-NLS-1$
+      case SWT.CENTER -> "Center"; //$NON-NLS-1$
+      case SWT.TRAIL -> "Right"; //$NON-NLS-1$
+
+      default -> throw new IllegalArgumentException("Unexpected value: " + alignment);
+      };
+   }
+
    @Override
    public int hashCode() {
 
@@ -81,7 +99,7 @@ public class ColumnProperties {
             + " columnId               = " + columnId + NL //                 //$NON-NLS-1$
             + " valueFormat_Category   = " + valueFormat_Category + NL //     //$NON-NLS-1$
             + " valueFormat_Detail     = " + valueFormat_Detail + NL //       //$NON-NLS-1$
-            + " alignment              = " + alignment + NL //                //$NON-NLS-1$
+            + " alignment              = " + getAlignmentText() + NL //       //$NON-NLS-1$
       ;
    }
 }

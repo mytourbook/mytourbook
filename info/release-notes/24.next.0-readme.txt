@@ -4,9 +4,14 @@
 TODO's
 ======               
 
-* Remove/replace "de.byteholder.geoclipse.map.UI.NEW_LINE"
-
 * [Column Manager] Customize column alignment
+
+* [Feature : Tour List] Please provide a column for the weather/air_quaility
+                        https://github.com/mytourbook/mytourbook/issues/1296
+
+
+* Update fulltext url https://lucene.apache.org/core/7_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Wildcard_Searches
+  in https://mytourbook.sourceforge.io/mytourbook/index.php/documentation/show-tours/search
 
 * Remove debug code in ColumnManager.java
    // TODO

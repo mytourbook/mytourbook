@@ -80,12 +80,12 @@ public class ColumnDefinition implements Cloneable {
    /**
     * Is a SWT.* style constant for the column alignment
     */
-   private int                    _style;
+   private int                    _style_Current;
 
    /**
     * Is the default SWT.* style constant for the column alignment
     */
-   private int                    _defaultStyle;
+   private int                    _style_Default;
 
    private CellLabelProvider      _cellLabelProvider;
    private NatTable_LabelProvider _natTable_LabelProvider;
@@ -158,8 +158,8 @@ public class ColumnDefinition implements Cloneable {
 
       _columnId = columnId;
 
-      _style = style;
-      _defaultStyle = style;
+      _style_Current = style;
+      _style_Default = style;
    }
 
    /**
@@ -301,7 +301,7 @@ public class ColumnDefinition implements Cloneable {
        * be set hidden, it looks just awful
        */
       if (columnManager.getColumnViewer() instanceof TreeViewer
-            && _style == SWT.TRAIL
+            && _style_Current == SWT.TRAIL
             && UI.isDarkTheme()) {
 
          sb.append(UI.SPACE2);
@@ -330,10 +330,14 @@ public class ColumnDefinition implements Cloneable {
    }
 
    /**
-    * @return Returns the SWT.* style constants for alignments
+    * <li>{@link SWT#LEAD} - 16384</li>
+    * <li>{@link SWT#CENTER} - 16777216</li>
+    * <li>{@link SWT#TRAIL} - 131072</li>
+    *
+    * @return Returns the current SWT.* style constant for the alignment
     */
    public int getColumnStyle() {
-      return _style;
+      return _style_Current;
    }
 
    public String getColumnUnit() {
@@ -353,7 +357,7 @@ public class ColumnDefinition implements Cloneable {
    }
 
    public int getDefaultColumnStyle() {
-      return _defaultStyle;
+      return _style_Default;
    }
 
    public int getDefaultColumnWidth() {
@@ -379,10 +383,16 @@ public class ColumnDefinition implements Cloneable {
       return _natTable_LabelProvider;
    }
 
+   /**
+    * @return Returns the current category format
+    */
    public ValueFormat getValueFormat_Category() {
       return _valueFormat_Category;
    }
 
+   /**
+    * @return Returns the current detail format
+    */
    public ValueFormat getValueFormat_Detail() {
       return _valueFormat_Detail;
    }
@@ -778,9 +788,14 @@ public class ColumnDefinition implements Cloneable {
       _natTable_LabelProvider = natTable_LabelProvider;
    }
 
+   /**
+    * Sets the current SWT.* alignment style
+    *
+    * @param style
+    */
    public void setStyle(final int style) {
 
-      _style = style;
+      _style_Current = style;
    }
 
    /**

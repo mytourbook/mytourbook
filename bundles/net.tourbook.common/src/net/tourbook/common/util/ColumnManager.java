@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
@@ -40,6 +41,7 @@ import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
 import net.tourbook.common.formatter.ValueFormatter_Time_SSS;
 import net.tourbook.common.tooltip.AdvancedSlideoutShell;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -571,7 +573,7 @@ public class ColumnManager {
 
       _columnViewer = columnViewer;
 
-      setupVisibleColDefs(_activeProfile);
+      setupZ_01_VisibleColDefs(_activeProfile);
 
       if (columnViewer instanceof TableViewer) {
 
@@ -590,7 +592,8 @@ public class ColumnManager {
          }
       }
 
-      setupValueFormatter(_activeProfile);
+      setupZ_02_ValueFormatter(_activeProfile);
+      setupZ_03_ColumnProperties(_activeProfile);
    }
 
    /**
@@ -2119,6 +2122,15 @@ public class ColumnManager {
             final Reader reader = new StringReader(stateValue);
             final XMLMemento xmlMemento = XMLMemento.createReadRoot(reader);
 
+            boolean isDumpXML = false;
+            isDumpXML = false;
+            isDumpXML = true;
+            if (isDumpXML) {
+               System.out.println();
+               System.out.println(StringEscapeUtils.unescapeHtml4(xmlMemento.toString()));
+               System.out.println();
+            }
+
             // get category column state
             final Boolean xmlIsShowCategory = xmlMemento.getBoolean(ATTR_IS_SHOW_CATEGORY);
             if (xmlIsShowCategory != null) {
@@ -2177,7 +2189,7 @@ public class ColumnManager {
                   }
 
                   /*
-                   * Column properties
+                   * Column properties, all properties are optional
                    */
                   final ArrayList<ColumnProperties> allColumnProperties = new ArrayList<>();
                   currentProfile.columnProperties = allColumnProperties;
@@ -2190,34 +2202,37 @@ public class ColumnManager {
 
                         final String columnId = xmlColumn.getString(ATTR_COLUMN_ID);
 
+                        if (columnId == null) {
+                           continue;
+                        }
+
+                        final ColumnProperties columnProperties = new ColumnProperties();
+
+                        columnProperties.columnId = columnId;
+
                         final Enum<ValueFormat> valueFormat_Category = Util.getXmlEnum(
                               xmlColumn,
                               ATTR_COLUMN_FORMAT_CATEGORY,
                               ValueFormat.DUMMY_VALUE);
-
                         final Enum<ValueFormat> valueFormat_Detail = Util.getXmlEnum(
                               xmlColumn,
                               ATTR_COLUMN_FORMAT_DETAIL,
                               ValueFormat.DUMMY_VALUE);
 
-                        if (columnId != null
-                              && (valueFormat_Category != ValueFormat.DUMMY_VALUE
-                                    || valueFormat_Detail != ValueFormat.DUMMY_VALUE)) {
-
-                           final ColumnProperties columnProperties = new ColumnProperties();
-
-                           columnProperties.columnId = columnId;
-
-                           if (valueFormat_Category != ValueFormat.DUMMY_VALUE) {
-                              columnProperties.valueFormat_Category = (ValueFormat) valueFormat_Category;
-                           }
-
-                           if (valueFormat_Detail != ValueFormat.DUMMY_VALUE) {
-                              columnProperties.valueFormat_Detail = (ValueFormat) valueFormat_Detail;
-                           }
-
-                           allColumnProperties.add(columnProperties);
+                        if (valueFormat_Category != ValueFormat.DUMMY_VALUE) {
+                           columnProperties.valueFormat_Category = (ValueFormat) valueFormat_Category;
                         }
+
+                        if (valueFormat_Detail != ValueFormat.DUMMY_VALUE) {
+                           columnProperties.valueFormat_Detail = (ValueFormat) valueFormat_Detail;
+                        }
+
+                        final Integer alignment = Util.getXmlInteger(xmlColumn, ATTR_COLUMN_ALIGNMENT, null);
+                        if (alignment != null) {
+                           columnProperties.alignment = alignment;
+                        }
+
+                        allColumnProperties.add(columnProperties);
                      }
                   }
 
@@ -2267,7 +2282,7 @@ public class ColumnManager {
          _activeProfile.setVisibleColumnIds(visibleColumnIds);
       }
 
-      // save columns width and keep it for internal use
+      // save columns width
       final String[] visibleColumnIdsAndWidth = getColumns_FromViewer_IdAndWidth();
       if (visibleColumnIdsAndWidth != null) {
          _activeProfile.visibleColumnIdsAndWidth = visibleColumnIdsAndWidth;
@@ -2426,6 +2441,11 @@ public class ColumnManager {
             if (columnFormat_Detail != null) {
                xmlColumn.putString(ATTR_COLUMN_FORMAT_DETAIL, columnFormat_Detail.name());
             }
+
+            final int alignment = columnProperty.alignment;
+            if (alignment != 0) {
+               xmlColumn.putInteger(ATTR_COLUMN_ALIGNMENT, alignment);
+            }
          }
       }
    }
@@ -2556,8 +2576,9 @@ public class ColumnManager {
 
       _natTablePropertiesProvider = natTablePropertiesProvider;
 
-      setupVisibleColDefs(_activeProfile);
-      setupValueFormatter(_activeProfile);
+      setupZ_01_VisibleColDefs(_activeProfile);
+      setupZ_02_ValueFormatter(_activeProfile);
+      setupZ_03_ColumnProperties(_activeProfile);
    }
 
    /**
@@ -2605,7 +2626,154 @@ public class ColumnManager {
       });
    }
 
-   private void setupValueFormatter(final ColumnProfile activeProfile) {
+   /**
+    * Sync column definitions in the {@link ColumnProfile} from the visible id's.
+    *
+    * @param columnProfile
+    */
+   void setupZ_01_VisibleColDefs(final ColumnProfile columnProfile) {
+
+      final List<ColumnDefinition> allVisibleColDefs = columnProfile.visibleColumnDefinitions;
+
+      allVisibleColDefs.clear();
+
+      final String[] visibleColumnIds = columnProfile.getVisibleColumnIds();
+      if (visibleColumnIds != null) {
+
+         // fill columns with the visible order
+
+         int createIndex = 0;
+
+         for (final String columnId : visibleColumnIds) {
+
+            final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
+            if (colDef != null) {
+
+               colDef.setCreateIndex(createIndex++);
+
+               allVisibleColDefs.add(colDef);
+            }
+         }
+      }
+
+      final String[] visibleColumnIdsAndWidth = columnProfile.visibleColumnIdsAndWidth;
+      if (visibleColumnIdsAndWidth != null) {
+
+         // set the width for all columns
+
+         for (int dataIdx = 0; dataIdx < visibleColumnIdsAndWidth.length; dataIdx++) {
+
+            final String columnId = visibleColumnIdsAndWidth[dataIdx++];
+            final int columnWidth = Integer.valueOf(visibleColumnIdsAndWidth[dataIdx]);
+
+            final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
+            if (colDef != null) {
+               colDef.setColumnWidth(columnWidth);
+            }
+         }
+      }
+
+      /*
+       * When no columns are visible (which is the first time), show only the default columns
+       * because every column reduces performance
+       */
+      if ((allVisibleColDefs.isEmpty()) && (_allDefinedColumnDefinitions.size() > 0)) {
+
+         final ArrayList<String> columnIds = new ArrayList<>();
+         int createIndex = 0;
+
+         for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
+            if (colDef.isDefaultColumn()) {
+
+               colDef.setCreateIndex(createIndex++);
+
+               allVisibleColDefs.add(colDef);
+               columnIds.add(colDef.getColumnId());
+            }
+         }
+
+         columnProfile.setVisibleColumnIds(columnIds.toArray(new String[columnIds.size()]));
+      }
+
+      /*
+       * When no default columns are set, use the first column
+       */
+      if ((allVisibleColDefs.isEmpty()) && (_allDefinedColumnDefinitions.size() > 0)) {
+
+         final ColumnDefinition firstColumn = _allDefinedColumnDefinitions.get(0);
+         firstColumn.setCreateIndex(0);
+
+         allVisibleColDefs.add(firstColumn);
+
+         columnProfile.setVisibleColumnIds(new String[1]);
+         visibleColumnIds[0] = firstColumn.getColumnId();
+      }
+
+      /*
+       * Ensure that all columns which must be visible, are also displayed. This case can happen
+       * when new columns are added.
+       */
+      final ArrayList<ColumnDefinition> notAddedColumns = new ArrayList<>();
+
+      for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
+
+         if (colDef.canModifyVisibility() == false) {
+
+            if (allVisibleColDefs.contains(colDef) == false) {
+               notAddedColumns.add(colDef);
+            }
+         }
+      }
+
+      if (notAddedColumns.size() > 0) {
+
+         allVisibleColDefs.addAll(notAddedColumns);
+
+         /*
+          * Set create index, otherwise save/restore do not work!!!
+          */
+         int createIndex = 0;
+         for (final ColumnDefinition colDef : allVisibleColDefs) {
+            colDef.setCreateIndex(createIndex++);
+         }
+
+         /*
+          * Set visible id's
+          */
+         final ArrayList<String> columnIds = new ArrayList<>();
+
+         for (final ColumnDefinition colDef : allVisibleColDefs) {
+            columnIds.add(colDef.getColumnId());
+         }
+
+         columnProfile.setVisibleColumnIds(columnIds.toArray(new String[columnIds.size()]));
+      }
+
+      /*
+       * Ensure that each visible column has also set it's column width
+       */
+      int numCheckedColumns = 0;
+      for (final ColumnDefinition colDef : allVisibleColDefs) {
+
+         if (colDef.getColumnWidth() == 0) {
+            colDef.setColumnWidth(colDef.getDefaultColumnWidth());
+         }
+
+         if (colDef.isColumnCheckedInContextMenu()) {
+            numCheckedColumns++;
+         }
+      }
+      if (numCheckedColumns == 0) {
+
+         // nothing is displayed -> show all columns
+
+         for (final ColumnDefinition colDef : allVisibleColDefs) {
+            colDef.setIsColumnChecked(true);
+         }
+      }
+   }
+
+   private void setupZ_02_ValueFormatter(final ColumnProfile activeProfile) {
 
       final ArrayList<ColumnProperties> profileColumnProperties = new ArrayList<>();
 
@@ -2665,10 +2833,10 @@ public class ColumnManager {
          colDef.setValueFormatter_Category(valueFormat_Category, valueFormatter_Category);
          colDef.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
-         // ensure all column properties are created
+         // ensure all column properties for all visible columns are created
          if (currentColumnProperties == null) {
 
-            // column properties are not defined
+            // column properties are not available
 
             final ColumnProperties columnProperties = new ColumnProperties();
 
@@ -2679,6 +2847,7 @@ public class ColumnManager {
             profileColumnProperties.add(columnProperties);
 
          } else {
+
             profileColumnProperties.add(currentColumnProperties);
          }
       }
@@ -2689,148 +2858,26 @@ public class ColumnManager {
    }
 
    /**
-    * Sync column definitions in the {@link ColumnProfile} from the visible id's.
+    * Setup column alignment for columns
     *
-    * @param columnProfile
+    * @param activeProfile
     */
-   void setupVisibleColDefs(final ColumnProfile columnProfile) {
+   private void setupZ_03_ColumnProperties(final ColumnProfile activeProfile) {
 
-      final ArrayList<ColumnDefinition> visibleColDefs = columnProfile.visibleColumnDefinitions;
-
-      visibleColDefs.clear();
-
-      final String[] visibleColumnIds = columnProfile.getVisibleColumnIds();
-      if (visibleColumnIds != null) {
-
-         // fill columns with the visible order
-
-         int createIndex = 0;
-
-         for (final String columnId : visibleColumnIds) {
-
-            final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
-            if (colDef != null) {
-
-               colDef.setCreateIndex(createIndex++);
-
-               visibleColDefs.add(colDef);
-            }
-         }
-      }
-
-      final String[] visibleColumnIdsAndWidth = columnProfile.visibleColumnIdsAndWidth;
-      if (visibleColumnIdsAndWidth != null) {
-
-         // set the width for all columns
-
-         for (int dataIdx = 0; dataIdx < visibleColumnIdsAndWidth.length; dataIdx++) {
-
-            final String columnId = visibleColumnIdsAndWidth[dataIdx++];
-            final int columnWidth = Integer.valueOf(visibleColumnIdsAndWidth[dataIdx]);
-
-            final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
-            if (colDef != null) {
-               colDef.setColumnWidth(columnWidth);
-            }
-         }
-      }
-
-      /*
-       * When no columns are visible (which is the first time), show only the default columns
-       * because every column reduces performance
-       */
-      if ((visibleColDefs.isEmpty()) && (_allDefinedColumnDefinitions.size() > 0)) {
-
-         final ArrayList<String> columnIds = new ArrayList<>();
-         int createIndex = 0;
-
-         for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
-            if (colDef.isDefaultColumn()) {
-
-               colDef.setCreateIndex(createIndex++);
-
-               visibleColDefs.add(colDef);
-               columnIds.add(colDef.getColumnId());
-            }
-         }
-
-         columnProfile.setVisibleColumnIds(columnIds.toArray(new String[columnIds.size()]));
-      }
-
-      /*
-       * When no default columns are set, use the first column
-       */
-      if ((visibleColDefs.isEmpty()) && (_allDefinedColumnDefinitions.size() > 0)) {
-
-         final ColumnDefinition firstColumn = _allDefinedColumnDefinitions.get(0);
-         firstColumn.setCreateIndex(0);
-
-         visibleColDefs.add(firstColumn);
-
-         columnProfile.setVisibleColumnIds(new String[1]);
-         visibleColumnIds[0] = firstColumn.getColumnId();
-      }
-
-      /*
-       * Ensure that all columns which must be visible, are also displayed. This case can happen
-       * when new columns are added.
-       */
-      final ArrayList<ColumnDefinition> notAddedColumns = new ArrayList<>();
+      final ArrayList<ColumnProperties> allProfileColumnProperties = activeProfile.columnProperties;
 
       for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
 
-         if (colDef.canModifyVisibility() == false) {
+         final String colDefID = colDef.getColumnId();
 
-            if (visibleColDefs.contains(colDef) == false) {
-               notAddedColumns.add(colDef);
+         for (final ColumnProperties profileColumnProperties : allProfileColumnProperties) {
+
+            if (profileColumnProperties.columnId.equals(colDefID) && profileColumnProperties.alignment != 0) {
+
+               colDef.setStyle(profileColumnProperties.alignment);
+
+               break;
             }
-         }
-      }
-
-      if (notAddedColumns.size() > 0) {
-
-         visibleColDefs.addAll(notAddedColumns);
-
-         /*
-          * Set create index, otherwise save/restore do not work!!!
-          */
-         int createIndex = 0;
-         for (final ColumnDefinition colDef : visibleColDefs) {
-            colDef.setCreateIndex(createIndex++);
-         }
-
-         /*
-          * Set visible id's
-          */
-         final ArrayList<String> columnIds = new ArrayList<>();
-
-         for (final ColumnDefinition colDef : visibleColDefs) {
-            columnIds.add(colDef.getColumnId());
-         }
-
-         columnProfile.setVisibleColumnIds(columnIds.toArray(new String[columnIds.size()]));
-      }
-
-      /*
-       * Ensure that each visible column has also set it's column width
-       */
-      int numCheckedColumns = 0;
-      for (final ColumnDefinition colDef : visibleColDefs) {
-
-         if (colDef.getColumnWidth() == 0) {
-            colDef.setColumnWidth(colDef.getDefaultColumnWidth());
-         }
-
-         if (colDef.isColumnCheckedInContextMenu()) {
-            numCheckedColumns++;
-         }
-      }
-      if (numCheckedColumns == 0) {
-
-         // nothing is displayed -> show all columns
-
-         for (final ColumnDefinition colDef : visibleColDefs) {
-            colDef.setIsColumnChecked(true);
          }
       }
    }
@@ -3079,7 +3126,7 @@ public class ColumnManager {
     *
     * @param columnViewerModel
     */
-   void setVisibleColumnIds_FromModel(final ColumnProfile profile, final ArrayList<ColumnDefinition> columnViewerModel) {
+   void setVisibleColumnIds_FromModel(final ColumnProfile profile, final List<ColumnDefinition> columnViewerModel) {
 
       final ArrayList<String> visibleColumnIds = new ArrayList<>();
       final ArrayList<String> columnIdsAndWidth = new ArrayList<>();

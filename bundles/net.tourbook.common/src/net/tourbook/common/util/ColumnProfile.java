@@ -46,7 +46,7 @@ public class ColumnProfile implements Cloneable {
    String[]                           visibleColumnIdsAndWidth;
 
    /**
-    * Contains a list with column properties for all columns.
+    * Contains a list with column properties for columns.
     *
     * @since 16.5
     */
