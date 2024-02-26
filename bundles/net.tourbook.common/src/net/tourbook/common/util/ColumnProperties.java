@@ -67,17 +67,7 @@ public class ColumnProperties {
       return true;
    }
 
-   private String getAlignmentText() {
 
-      return switch (alignment) {
-
-      case SWT.LEAD -> "Left"; //$NON-NLS-1$
-      case SWT.CENTER -> "Center"; //$NON-NLS-1$
-      case SWT.TRAIL -> "Right"; //$NON-NLS-1$
-
-      default -> throw new IllegalArgumentException("Unexpected value: " + alignment);
-      };
-   }
 
    @Override
    public int hashCode() {
@@ -99,7 +89,7 @@ public class ColumnProperties {
             + " columnId               = " + columnId + NL //                 //$NON-NLS-1$
             + " valueFormat_Category   = " + valueFormat_Category + NL //     //$NON-NLS-1$
             + " valueFormat_Detail     = " + valueFormat_Detail + NL //       //$NON-NLS-1$
-            + " alignment              = " + getAlignmentText() + NL //       //$NON-NLS-1$
+            + " alignment              = " + ColumnManager.getAlignmentText(alignment) + NL //       //$NON-NLS-1$
       ;
    }
 }

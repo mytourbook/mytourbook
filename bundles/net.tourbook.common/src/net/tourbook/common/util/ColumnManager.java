@@ -99,7 +99,7 @@ import org.eclipse.ui.XMLMemento;
 /**
  * Manages the columns for a tree/table-viewer
  * <p>
- * created: 2007-05-27 by Wolfgang Schramm
+ * Created: 2007-05-27 by Wolfgang Schramm
  */
 public class ColumnManager {
 
@@ -127,7 +127,11 @@ public class ColumnManager {
    //
    private static final String COLUMN_CATEGORY_SEPARATOR                 = "   \u00bb   ";                      //$NON-NLS-1$
    static final String         COLUMN_TEXT_SEPARATOR                     = "   \u00B7   ";                      //$NON-NLS-1$
-
+   //
+   private static final String ALIGNMENT_LEFT                            = "left";                              //$NON-NLS-1$
+   private static final String ALIGNMENT_CENTER                          = "center";                            //$NON-NLS-1$
+   private static final String ALIGNMENT_RIGHT                           = "right";                             //$NON-NLS-1$
+   //
    /**
     * Minimum column width, when the column width is 0, there was a bug that this happened.
     */
@@ -253,7 +257,36 @@ public class ColumnManager {
       restoreState(viewState);
    }
 
+   static String getAlignmentText(final int alignment) {
+
+// SET_FORMATTING_OFF
+
+      return switch (alignment) {
+
+      case SWT.CENTER   -> ALIGNMENT_CENTER;
+      case SWT.TRAIL    -> ALIGNMENT_RIGHT;
+      default           -> ALIGNMENT_LEFT;
+
+// SET_FORMATTING_ON
+      };
+   }
+
+   private static int getAlignmentValue(final String alignment) {
+
+// SET_FORMATTING_OFF
+
+      return switch (alignment) {
+
+      case ALIGNMENT_CENTER   -> SWT.CENTER;
+      case ALIGNMENT_RIGHT    -> SWT.TRAIL;
+      default                 -> SWT.LEAD;
+      };
+
+// SET_FORMATTING_ON
+   }
+
    static IValueFormatter getDefaultDefaultValueFormatter() {
+
       return _defaultDefaultValueFormatter;
    }
 
@@ -593,7 +626,7 @@ public class ColumnManager {
       }
 
       setupZ_02_ValueFormatter(_activeProfile);
-      setupZ_03_ColumnProperties(_activeProfile);
+      setupZ_03_ColumnAlignment(_activeProfile);
    }
 
    /**
@@ -2219,6 +2252,8 @@ public class ColumnManager {
                               ATTR_COLUMN_FORMAT_DETAIL,
                               ValueFormat.DUMMY_VALUE);
 
+                        final String alignment = Util.getXmlString(xmlColumn, ATTR_COLUMN_ALIGNMENT, null);
+
                         if (valueFormat_Category != ValueFormat.DUMMY_VALUE) {
                            columnProperties.valueFormat_Category = (ValueFormat) valueFormat_Category;
                         }
@@ -2227,10 +2262,9 @@ public class ColumnManager {
                            columnProperties.valueFormat_Detail = (ValueFormat) valueFormat_Detail;
                         }
 
-                        final Integer alignment = Util.getXmlInteger(xmlColumn, ATTR_COLUMN_ALIGNMENT, null);
-                        if (alignment != null) {
-                           columnProperties.alignment = alignment;
-                        }
+//                        if (alignment != null) {
+//                           columnProperties.alignment = getAlignmentValue(alignment);
+//                        }
 
                         allColumnProperties.add(columnProperties);
                      }
@@ -2443,9 +2477,12 @@ public class ColumnManager {
             }
 
             final int alignment = columnProperty.alignment;
-            if (alignment != 0) {
-               xmlColumn.putInteger(ATTR_COLUMN_ALIGNMENT, alignment);
-            }
+//            if (alignment != 0) {
+//
+//               final String alignmentText = getAlignmentText(alignment);
+//
+//               xmlColumn.putString(ATTR_COLUMN_ALIGNMENT, alignmentText);
+//            }
          }
       }
    }
@@ -2578,7 +2615,7 @@ public class ColumnManager {
 
       setupZ_01_VisibleColDefs(_activeProfile);
       setupZ_02_ValueFormatter(_activeProfile);
-      setupZ_03_ColumnProperties(_activeProfile);
+      setupZ_03_ColumnAlignment(_activeProfile);
    }
 
    /**
@@ -2858,27 +2895,41 @@ public class ColumnManager {
    }
 
    /**
-    * Setup column alignment for columns
+    * Setup alignment for columns
     *
     * @param activeProfile
     */
-   private void setupZ_03_ColumnProperties(final ColumnProfile activeProfile) {
+   private void setupZ_03_ColumnAlignment(final ColumnProfile activeProfile) {
 
       final ArrayList<ColumnProperties> allProfileColumnProperties = activeProfile.columnProperties;
 
+      // loop: all defined columns
       for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
 
          final String colDefID = colDef.getColumnId();
 
+         ColumnProperties colDefColumnProperties = null;
+
+         // loop: all column properties in a profile -> find column and it's properties
          for (final ColumnProperties profileColumnProperties : allProfileColumnProperties) {
 
-            if (profileColumnProperties.columnId.equals(colDefID) && profileColumnProperties.alignment != 0) {
+            if (profileColumnProperties.columnId.equals(colDefID)) {
 
-               colDef.setStyle(profileColumnProperties.alignment);
+               colDefColumnProperties = profileColumnProperties;
 
                break;
             }
          }
+
+//         final int columnStyle = colDef.getColumnStyle();
+//         final int columnStyle_Default = colDef.getDefaultColumnStyle();
+//
+//         if (colDefColumnProperties == null) {
+//
+//         }
+//
+////         profileColumnProperties.alignment != 0
+//         colDef.setStyle(profileColumnProperties.alignment);
       }
    }
 
