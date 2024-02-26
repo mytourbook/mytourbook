@@ -721,7 +721,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       btnSearchProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell(),
             _tourData.getTourId()).open()));
       btnSearchProduct.setImage(_imageSearch);
-      GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).grab(true, false).applyTo(btnSearchProduct);
+      GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(btnSearchProduct);
 
       /*
        * Add product button
@@ -746,7 +746,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       }));
       btnAddCustomProduct.setImage(_imageAdd);
-      GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).grab(true, false).applyTo(btnAddCustomProduct);
+      GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(btnAddCustomProduct);
 
       /*
        * Delete product button
@@ -757,7 +757,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _btnDeleteProduct.setEnabled(false);
       _btnDeleteProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onDeleteProducts()));
       _btnDeleteProduct.setImage(_imageDelete);
-      GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).grab(true, false).applyTo(_btnDeleteProduct);
+      GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(_btnDeleteProduct);
    }
 
    private void createUI_220_Viewer(final Composite parent) {
