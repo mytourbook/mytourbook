@@ -605,7 +605,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _tk = new FormToolkit(parent.getDisplay());
 
       _imageAdd = TourbookPlugin.getImageDescriptor(Images.App_Add).createImage();
-      _imageSearch = TourbookPlugin.getImageDescriptor(Images.SearchExternal).createImage();
+      _imageSearch = TourbookPlugin.getImageDescriptor(Images.SearchTours).createImage();
       _imageDelete = TourbookPlugin.getImageDescriptor(Images.App_Trash).createImage();
 
       _viewerContainer = new Composite(_pageBook, SWT.NONE);
