@@ -607,6 +607,7 @@ public class ColumnManager {
       _columnViewer = columnViewer;
 
       setupColumns_01_VisibleColDefs(_activeProfile);
+      setupColumns_02_ColumnAlignment(_activeProfile);
 
       if (columnViewer instanceof TableViewer) {
 
@@ -625,8 +626,7 @@ public class ColumnManager {
          }
       }
 
-      setupColumns_02_ValueFormatter(_activeProfile);
-      setupColumns_03_ColumnAlignment(_activeProfile);
+      setupColumns_03_ValueFormatter(_activeProfile);
    }
 
    /**
@@ -1380,6 +1380,7 @@ public class ColumnManager {
          final boolean isChecked = columnProfile == _activeProfile;
 
          String menuText = columnProfile.name
+
                + COLUMN_TEXT_SEPARATOR
 
                // show number of visible columns
@@ -2262,9 +2263,9 @@ public class ColumnManager {
                            columnProperties.valueFormat_Detail = (ValueFormat) valueFormat_Detail;
                         }
 
-//                        if (alignment != null) {
-//                           columnProperties.alignment = getAlignmentValue(alignment);
-//                        }
+                        if (alignment != null) {
+                           columnProperties.alignment = getAlignmentValue(alignment);
+                        }
 
                         allColumnProperties.add(columnProperties);
                      }
@@ -2477,12 +2478,12 @@ public class ColumnManager {
             }
 
             final int alignment = columnProperty.alignment;
-//            if (alignment != 0) {
-//
-//               final String alignmentText = getAlignmentText(alignment);
-//
-//               xmlColumn.putString(ATTR_COLUMN_ALIGNMENT, alignmentText);
-//            }
+            if (alignment != 0) {
+
+               final String alignmentText = getAlignmentText(alignment);
+
+               xmlColumn.putString(ATTR_COLUMN_ALIGNMENT, alignmentText);
+            }
          }
       }
    }
@@ -2756,7 +2757,45 @@ public class ColumnManager {
       }
    }
 
-   private void setupColumns_02_ValueFormatter(final ColumnProfile activeProfile) {
+   /**
+    * Setup alignment for newly created columns
+    *
+    * @param activeProfile
+    */
+   private void setupColumns_02_ColumnAlignment(final ColumnProfile activeProfile) {
+
+      final ArrayList<ColumnProperties> allProfileColumnProperties = activeProfile.columnProperties;
+
+      // loop: all defined columns
+      for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
+
+         final String colDefID = colDef.getColumnId();
+
+         /*
+          * Reset current style to the default style which will be overwritten when profile
+          * properties are available
+          */
+         colDef.setStyle(colDef.getDefaultColumnStyle());
+
+         // loop: all column properties in a profile -> find column and it's properties
+         for (final ColumnProperties profileColumnProperties : allProfileColumnProperties) {
+
+            if (colDefID.equals(profileColumnProperties.columnId)) {
+
+               // column properties are available
+
+               if (profileColumnProperties.alignment != 0) {
+
+                  colDef.setStyle(profileColumnProperties.alignment);
+               }
+
+               break;
+            }
+         }
+      }
+   }
+
+   private void setupColumns_03_ValueFormatter(final ColumnProfile activeProfile) {
 
       final ArrayList<ColumnProperties> profileColumnProperties = new ArrayList<>();
 
@@ -2840,52 +2879,13 @@ public class ColumnManager {
       activeProfile.columnProperties.addAll(profileColumnProperties);
    }
 
-   /**
-    * Setup alignment for columns
-    *
-    * @param activeProfile
-    */
-   private void setupColumns_03_ColumnAlignment(final ColumnProfile activeProfile) {
-
-      final ArrayList<ColumnProperties> allProfileColumnProperties = activeProfile.columnProperties;
-
-      // loop: all defined columns
-      for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
-
-         final String colDefID = colDef.getColumnId();
-
-         ColumnProperties colDefColumnProperties = null;
-
-         // loop: all column properties in a profile -> find column and it's properties
-         for (final ColumnProperties profileColumnProperties : allProfileColumnProperties) {
-
-            if (profileColumnProperties.columnId.equals(colDefID)) {
-
-               colDefColumnProperties = profileColumnProperties;
-
-               break;
-            }
-         }
-
-//         final int columnStyle = colDef.getColumnStyle();
-//         final int columnStyle_Default = colDef.getDefaultColumnStyle();
-//
-//         if (colDefColumnProperties == null) {
-//
-//         }
-//
-////         profileColumnProperties.alignment != 0
-//         colDef.setStyle(profileColumnProperties.alignment);
-      }
-   }
-
    public void setupNatTable(final INatTable_PropertiesProvider natTablePropertiesProvider) {
 
       _natTablePropertiesProvider = natTablePropertiesProvider;
 
       setupColumns_01_VisibleColDefs(_activeProfile);
-      setupColumns_02_ValueFormatter(_activeProfile);
-      setupColumns_03_ColumnAlignment(_activeProfile);
+      setupColumns_02_ColumnAlignment(_activeProfile);
+      setupColumns_03_ValueFormatter(_activeProfile);
    }
 
    /**

@@ -158,8 +158,8 @@ public class ColumnDefinition implements Cloneable {
 
       _columnId = columnId;
 
-      _style_Current = style;
       _style_Default = style;
+      _style_Current = style;
    }
 
    /**

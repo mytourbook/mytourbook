@@ -108,7 +108,7 @@ public class DialogModifyColumns extends TrayDialog {
 
    private ColumnManager                  _columnManager;
 
-   /** Model for the column viewer */
+   /** Model for the column viewer, contains all defined columns */
    private List<ColumnDefinition>         _columnViewerModel;
 
    private List<ColumnDefinition>         _allDefinedColumns;
@@ -222,10 +222,10 @@ public class DialogModifyColumns extends TrayDialog {
                && value instanceof final Integer alignmentIndex) {
 
             final ColumnAlignment columnAlignment = COLUMN_ALIGNMENTS[alignmentIndex];
-            final int newStyle = columnAlignment.style;
+            final int newColumnStyle = columnAlignment.style;
 
             // update model in ColumnDefinition
-            colDef.setStyle(newStyle);
+            colDef.setStyle(newColumnStyle);
 
             /*
              * Update model in column properties
@@ -234,13 +234,19 @@ public class DialogModifyColumns extends TrayDialog {
 
             final ArrayList<ColumnProperties> allColumnProperties = _selectedProfile.columnProperties;
 
+            final int defaultColumnStyle = colDef.getDefaultColumnStyle();
             boolean isAlignmentSet = false;
 
             for (final ColumnProperties columnProperties : allColumnProperties) {
 
                if (colDefColumnId.equals(columnProperties.columnId)) {
 
-                  columnProperties.alignment = newStyle;
+                  columnProperties.alignment = newColumnStyle == defaultColumnStyle
+
+                        // do not set the column alignment when it's value is the default value
+                        ? 0
+
+                        : newColumnStyle;
 
                   isAlignmentSet = true;
 
@@ -248,14 +254,17 @@ public class DialogModifyColumns extends TrayDialog {
                }
             }
 
-            if (isAlignmentSet == false) {
+            if (isAlignmentSet == false
 
-               // column property is not available -> create column property
+                  // do not set the column alignment when it's value is the default value
+                  && newColumnStyle != defaultColumnStyle) {
+
+               // column properties are not available -> create it
 
                final ColumnProperties columnProperties = new ColumnProperties();
 
                columnProperties.columnId = colDefColumnId;
-               columnProperties.alignment = newStyle;
+               columnProperties.alignment = newColumnStyle;
 
                allColumnProperties.add(columnProperties);
             }
@@ -704,7 +713,7 @@ public class DialogModifyColumns extends TrayDialog {
             ValueFormat valueFormat_Detail = null;
             IValueFormatter valueFormatter = null;
             IValueFormatter valueFormatter_Detail = null;
-            int alignment = 0;
+            int alignment = modelColDef.getColumnStyle();
 
             for (final ColumnProperties columnProperties : columnProfile.columnProperties) {
 
@@ -730,7 +739,6 @@ public class DialogModifyColumns extends TrayDialog {
             modelColDef.setValueFormatter_Category(valueFormat, valueFormatter);
             modelColDef.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
-
             allClonedAndSortedColumns.add(modelColDef);
 
             allClonedColDef.remove(colDef);
@@ -741,16 +749,33 @@ public class DialogModifyColumns extends TrayDialog {
           */
          for (final ColumnDefinition colDef : allClonedColDef) {
 
+            final String columnId = colDef.getColumnId();
+
             final ValueFormat valueFormat = colDef.getDefaultValueFormat_Category();
             final ValueFormat valueFormat_Detail = colDef.getDefaultValueFormat_Detail();
             final IValueFormatter valueFormatter = _columnManager.getValueFormatter(valueFormat);
             final IValueFormatter valueFormatter_Detail = _columnManager.getValueFormatter(valueFormat_Detail);
 
+            /*
+             * Get alignment from the properties, when available
+             */
+            int alignment = colDef.getDefaultColumnStyle();
+
+            for (final ColumnProperties columnProperties : columnProfile.columnProperties) {
+
+               if (columnId.equals(columnProperties.columnId)) {
+
+                  alignment = columnProperties.alignment;
+
+                  break;
+               }
+            }
+
             // set default values
             colDef.setIsColumnChecked(false);
 
             colDef.setColumnWidth(colDef.getDefaultColumnWidth());
-            colDef.setStyle(colDef.getDefaultColumnStyle());
+            colDef.setStyle(alignment);
 
             colDef.setValueFormatter_Category(valueFormat, valueFormatter);
             colDef.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
@@ -2052,11 +2077,21 @@ public class DialogModifyColumns extends TrayDialog {
 
             if (columnId.equals(columnProperties.columnId)) {
 
+               /*
+                * Do not set the column alignment when it's value is the default value
+                */
+               int columnStyle = colDef.getColumnStyle();
+               final int defaultColumnStyle = colDef.getDefaultColumnStyle();
+
+               if (columnStyle == defaultColumnStyle) {
+                  columnStyle = 0;
+               }
+
 // SET_FORMATTING_OFF
 
                columnProperties.valueFormat_Category  = colDef.getValueFormat_Category();
                columnProperties.valueFormat_Detail    = colDef.getValueFormat_Detail();
-               columnProperties.alignment             = colDef.getColumnStyle();
+               columnProperties.alignment             = columnStyle;
 
 // SET_FORMATTING_ON
 
