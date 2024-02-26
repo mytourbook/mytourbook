@@ -676,7 +676,7 @@ public class DialogModifyColumns extends TrayDialog {
    private ArrayList<ColumnDefinition> cloneAllColumns(final ColumnProfile columnProfile) {
 
       // set column definitions in the ColumnProfile from the visible id's.
-      _columnManager.setupZ_01_VisibleColDefs(columnProfile);
+      _columnManager.setupColumns_01_VisibleColDefs(columnProfile);
 
       final ArrayList<ColumnDefinition> allClonedAndSortedColumns = new ArrayList<>();
 

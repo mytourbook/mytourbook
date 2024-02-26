@@ -606,7 +606,7 @@ public class ColumnManager {
 
       _columnViewer = columnViewer;
 
-      setupZ_01_VisibleColDefs(_activeProfile);
+      setupColumns_01_VisibleColDefs(_activeProfile);
 
       if (columnViewer instanceof TableViewer) {
 
@@ -625,8 +625,8 @@ public class ColumnManager {
          }
       }
 
-      setupZ_02_ValueFormatter(_activeProfile);
-      setupZ_03_ColumnAlignment(_activeProfile);
+      setupColumns_02_ValueFormatter(_activeProfile);
+      setupColumns_03_ColumnAlignment(_activeProfile);
    }
 
    /**
@@ -2609,66 +2609,12 @@ public class ColumnManager {
       _slideoutShell = slideoutShell;
    }
 
-   public void setupNatTable(final INatTable_PropertiesProvider natTablePropertiesProvider) {
-
-      _natTablePropertiesProvider = natTablePropertiesProvider;
-
-      setupZ_01_VisibleColDefs(_activeProfile);
-      setupZ_02_ValueFormatter(_activeProfile);
-      setupZ_03_ColumnAlignment(_activeProfile);
-   }
-
-   /**
-    * Setup {@link NatTable} for autoresizing all columns after the table was created.
-    */
-   public void setupNatTable_PostCreate() {
-
-      final NatTable natTable = _natTablePropertiesProvider.getNatTable();
-
-      /**
-       * Found this solution in https://www.eclipse.org/nattable/documentation.php?page=faq
-       */
-      natTable.addOverlayPainter(new IOverlayPainter() {
-
-         @Override
-         public void paintOverlay(final GC gc, final ILayer layer) {
-
-            if (!_isDoAResizeForAllColumnsToFit) {
-               return;
-            }
-
-            // reset flag, resizing is done only once when the corresponding action is selected
-            _isDoAResizeForAllColumnsToFit = false;
-
-            final int numColumns = natTable.getColumnCount();
-
-            final IConfigRegistry configRegistry = natTable.getConfigRegistry();
-            final GCFactory gcFactory = new GCFactory(natTable);
-
-            for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
-
-               if (natTable.isColumnPositionResizable(columnIndex) == false) {
-                  continue;
-               }
-
-               final InitializeAutoResizeColumnsCommand columnCommand = new InitializeAutoResizeColumnsCommand(
-                     natTable,
-                     columnIndex,
-                     configRegistry,
-                     gcFactory);
-
-               natTable.doCommand(columnCommand);
-            }
-         }
-      });
-   }
-
    /**
     * Sync column definitions in the {@link ColumnProfile} from the visible id's.
     *
     * @param columnProfile
     */
-   void setupZ_01_VisibleColDefs(final ColumnProfile columnProfile) {
+   void setupColumns_01_VisibleColDefs(final ColumnProfile columnProfile) {
 
       final List<ColumnDefinition> allVisibleColDefs = columnProfile.visibleColumnDefinitions;
 
@@ -2810,7 +2756,7 @@ public class ColumnManager {
       }
    }
 
-   private void setupZ_02_ValueFormatter(final ColumnProfile activeProfile) {
+   private void setupColumns_02_ValueFormatter(final ColumnProfile activeProfile) {
 
       final ArrayList<ColumnProperties> profileColumnProperties = new ArrayList<>();
 
@@ -2899,7 +2845,7 @@ public class ColumnManager {
     *
     * @param activeProfile
     */
-   private void setupZ_03_ColumnAlignment(final ColumnProfile activeProfile) {
+   private void setupColumns_03_ColumnAlignment(final ColumnProfile activeProfile) {
 
       final ArrayList<ColumnProperties> allProfileColumnProperties = activeProfile.columnProperties;
 
@@ -2931,6 +2877,60 @@ public class ColumnManager {
 ////         profileColumnProperties.alignment != 0
 //         colDef.setStyle(profileColumnProperties.alignment);
       }
+   }
+
+   public void setupNatTable(final INatTable_PropertiesProvider natTablePropertiesProvider) {
+
+      _natTablePropertiesProvider = natTablePropertiesProvider;
+
+      setupColumns_01_VisibleColDefs(_activeProfile);
+      setupColumns_02_ValueFormatter(_activeProfile);
+      setupColumns_03_ColumnAlignment(_activeProfile);
+   }
+
+   /**
+    * Setup {@link NatTable} for autoresizing all columns after the table was created.
+    */
+   public void setupNatTable_PostCreate() {
+
+      final NatTable natTable = _natTablePropertiesProvider.getNatTable();
+
+      /**
+       * Found this solution in https://www.eclipse.org/nattable/documentation.php?page=faq
+       */
+      natTable.addOverlayPainter(new IOverlayPainter() {
+
+         @Override
+         public void paintOverlay(final GC gc, final ILayer layer) {
+
+            if (!_isDoAResizeForAllColumnsToFit) {
+               return;
+            }
+
+            // reset flag, resizing is done only once when the corresponding action is selected
+            _isDoAResizeForAllColumnsToFit = false;
+
+            final int numColumns = natTable.getColumnCount();
+
+            final IConfigRegistry configRegistry = natTable.getConfigRegistry();
+            final GCFactory gcFactory = new GCFactory(natTable);
+
+            for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
+
+               if (natTable.isColumnPositionResizable(columnIndex) == false) {
+                  continue;
+               }
+
+               final InitializeAutoResizeColumnsCommand columnCommand = new InitializeAutoResizeColumnsCommand(
+                     natTable,
+                     columnIndex,
+                     configRegistry,
+                     gcFactory);
+
+               natTable.doCommand(columnCommand);
+            }
+         }
+      });
    }
 
    private void setVisibleColumnIds_All() {
