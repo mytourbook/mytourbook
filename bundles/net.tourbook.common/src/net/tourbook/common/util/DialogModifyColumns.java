@@ -299,8 +299,8 @@ public class DialogModifyColumns extends TrayDialog {
 
                + "ColumnAlignment" + NL //      //$NON-NLS-1$
 
-               + " label = " + label + NL //      //$NON-NLS-1$
-               + " style = " + style + NL //      //$NON-NLS-1$
+               + " label = " + label + NL //    //$NON-NLS-1$
+               + " style = " + style + NL //    //$NON-NLS-1$
          ;
       }
    }

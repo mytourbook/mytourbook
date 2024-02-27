@@ -2425,20 +2425,55 @@ public class UI {
       notication.open();
    }
 
-   public static void paintImageCentered(final Event event, final Image image, final int availableWidth) {
+   /**
+    * @param event
+    * @param image
+    * @param availableWidth
+    * @param alignment
+    *           SWT.* alignment values
+    */
+   public static void paintImage(final Event event,
+                                 final Image image,
+                                 final int availableWidth,
+                                 final int alignment) {
 
       final Rectangle imageRect = image.getBounds();
+      final int imageWidth = imageRect.width;
+      final int imageWidth2 = imageWidth / 2;
 
-      // center horizontal
-      final int xOffset = (availableWidth - imageRect.width) / 2;
+      /*
+       * Horizontal alignment
+       */
+      int xOffset = 0;
 
-      // center vertical
+// SET_FORMATTING_OFF
+
+      switch (alignment) {
+
+      case SWT.CENTER   -> {  xOffset = (availableWidth - imageWidth2) / 2;   }
+      case SWT.RIGHT    -> {  xOffset = availableWidth - imageWidth;          }
+      default           -> {  xOffset = 2;                                    }  // == left alignment
+
+      }
+
+// SET_FORMATTING_ON
+
+      /*
+       * Vertical alignment: centered
+       */
       final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
 
       final int devX = event.x + xOffset;
       final int devY = event.y + yOffset;
 
       event.gc.drawImage(image, devX, devY);
+   }
+
+   public static void paintImageCentered(final Event event,
+                                         final Image image,
+                                         final int availableWidth) {
+
+      paintImage(event, image, availableWidth, SWT.CENTER);
    }
 
    public static String replaceHTML_BackSlash(final String filePath) {

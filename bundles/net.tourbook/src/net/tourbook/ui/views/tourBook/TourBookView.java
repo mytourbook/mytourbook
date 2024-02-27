@@ -2074,7 +2074,6 @@ public class TourBookView extends ViewPart implements
       _colDef_TourTypeImage_Tree = _columnFactory.getColDef_TourTypeImage_Tree();
       _colDef_WeatherClouds_Tree = _columnFactory.getColDef_WeatherClouds_Tree();
 
-      boolean isColumnVisible = false;
       final ControlListener controlResizedAdapter = ControlListener.controlResizedAdapter(controlEvent -> onResize_SetWidthForImageColumn());
 
       // update column index which is needed for repainting
@@ -2082,6 +2081,7 @@ public class TourBookView extends ViewPart implements
       _columnIndex_TourTypeImage = activeProfile.getColumnIndex(_colDef_TourTypeImage_Tree.getColumnId());
       _columnIndex_WeatherClouds = activeProfile.getColumnIndex(_colDef_WeatherClouds_Tree.getColumnId());
 
+      boolean isColumnVisible = false;
       final int numColumns = tree.getColumns().length;
 
       // add column resize listener
@@ -3219,7 +3219,9 @@ public class TourBookView extends ViewPart implements
          final Image image = TourTypeImage.getTourTypeImage(tourTypeId);
          if (image != null) {
 
-            UI.paintImageCentered(event, image, _columnWidth_TourTypeImage);
+            final int alignment = _colDef_TourTypeImage_Tree.getColumnStyle();
+
+            UI.paintImage(event, image, _columnWidth_TourTypeImage, alignment);
          }
       }
    }
@@ -3233,6 +3235,7 @@ public class TourBookView extends ViewPart implements
          final TVITourBookTour tviTourBookTour = (TVITourBookTour) itemData;
 
          final String weatherClouds = tviTourBookTour.colClouds;
+
          if (weatherClouds == null) {
 
             // paint nothing
@@ -3249,7 +3252,9 @@ public class TourBookView extends ViewPart implements
 
             } else {
 
-               UI.paintImageCentered(event, image, _columnWidth_WeatherClouds);
+               final int alignment = _colDef_WeatherClouds_Tree.getColumnStyle();
+
+               UI.paintImage(event, image, _columnWidth_WeatherClouds, alignment);
             }
          }
       }

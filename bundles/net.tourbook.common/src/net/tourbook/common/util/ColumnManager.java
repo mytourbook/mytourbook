@@ -2158,7 +2158,7 @@ public class ColumnManager {
 
             boolean isDumpXML = false;
             isDumpXML = false;
-            isDumpXML = true;
+//          isDumpXML = true;
             if (isDumpXML) {
                System.out.println();
                System.out.println(StringEscapeUtils.unescapeHtml4(xmlMemento.toString()));
@@ -2479,10 +2479,7 @@ public class ColumnManager {
 
             final int alignment = columnProperty.alignment;
             if (alignment != 0) {
-
-               final String alignmentText = getAlignmentText(alignment);
-
-               xmlColumn.putString(ATTR_COLUMN_ALIGNMENT, alignmentText);
+               xmlColumn.putString(ATTR_COLUMN_ALIGNMENT, getAlignmentText(alignment));
             }
          }
       }
