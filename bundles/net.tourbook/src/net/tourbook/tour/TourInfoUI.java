@@ -2278,7 +2278,7 @@ public class TourInfoUI {
       final int airQualityTextIndex = _tourData.getWeather_AirQuality_TextIndex();
       if (airQualityTextIndex > 0) {
 
-         _lblAirQuality.setText(IWeather.airQualityTexts[airQualityTextIndex]);
+         _lblAirQuality.setText(IWeather.AIR_QUALITY_TEXT[airQualityTextIndex]);
 
          final int colorIndex = airQualityTextIndex * 2;
 
@@ -2291,13 +2291,13 @@ public class TourInfoUI {
 
             if (UI.IS_DARK_THEME) {
 
-               _lblAirQuality.setForeground(IWeather.airQualityColors_DarkTheme[colorIndex]);
-               _lblAirQuality.setBackground(IWeather.airQualityColors_DarkTheme[colorIndex + 1]);
+               _lblAirQuality.setForeground(IWeather.AIR_QUALITY_COLORS_DARK_THEME[colorIndex]);
+               _lblAirQuality.setBackground(IWeather.AIR_QUALITY_COLORS_DARK_THEME[colorIndex + 1]);
 
             } else {
 
-               _lblAirQuality.setForeground(IWeather.airQualityColors_BrightTheme[colorIndex]);
-               _lblAirQuality.setBackground(IWeather.airQualityColors_BrightTheme[colorIndex + 1]);
+               _lblAirQuality.setForeground(IWeather.AIR_QUALITY_COLORS_BRIGHT_THEME[colorIndex]);
+               _lblAirQuality.setBackground(IWeather.AIR_QUALITY_COLORS_BRIGHT_THEME[colorIndex + 1]);
             }
          });
       }
@@ -2366,8 +2366,8 @@ public class TourInfoUI {
 
       // weather clouds
       final int weatherIndex = _tourData.getWeatherIndex();
-      final String cloudText = IWeather.cloudText[weatherIndex];
-      final String cloudImageName = IWeather.cloudIcon[weatherIndex];
+      final String cloudText = IWeather.CLOUD_TEXT[weatherIndex];
+      final String cloudImageName = IWeather.CLOUD_ICON[weatherIndex];
 
       _lblClouds.setImage(UI.IMAGE_REGISTRY.get(cloudImageName));
       _lblCloudsUnit.setText(cloudText.equals(IWeather.cloudIsNotDefined) ? UI.EMPTY_STRING : cloudText);

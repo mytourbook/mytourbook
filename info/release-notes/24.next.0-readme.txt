@@ -4,9 +4,9 @@
 TODO's
 ======               
 
-* Remove/replace "de.byteholder.geoclipse.map.UI.NEW_LINE"
 
-* [Column Manager] Customize column alignment
+* Update fulltext url https://lucene.apache.org/core/7_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Wildcard_Searches
+  in https://mytourbook.sourceforge.io/mytourbook/index.php/documentation/show-tours/search
 
 * Remove debug code in ColumnManager.java
    // TODO
@@ -49,30 +49,38 @@ New
   https://github.com/mytourbook/mytourbook/issues/1280
 
 * Start/End Location
-  - Automatically retieve and set start/end locations in the easy import
+  - Automatically retrieve and set start/end locations in the easy import
   - Retrieve, manage and show start/end locations in
     - Tour editor
   - Scramble tour location view when requested
   https://github.com/mytourbook/mytourbook/issues/878
 
-* 
-
 
 Improvements
 ============
 
+* View Columns
+  - Customize column alignment in all views which are using the column manager
+    https://github.com/mytourbook/mytourbook/issues/1300  
+
+* Start/End Location
+  - Automatically retieve and set start/end locations in the easy import
+  - Retrieve, manage and show start/end locations in tour editor
+  - Scramble tour location view
+    https://github.com/mytourbook/mytourbook/issues/878
+    
 * Fit Import
   - Import device sensors which do not contain a serial number
     https://github.com/mytourbook/mytourbook/issues/1287
 
-
 * Tour Book
   - Show powertrain L-R balance values separately
-    https://github.com/mytourbook/mytourbook/issues/1271
+    https://github.com/mytourbook/mytourbook/issues/1271    
+  - Show weather air quaility
+    https://github.com/mytourbook/mytourbook/issues/1296
 
 * Tour Blog (Frederic)
   - Displaying the main numbers of the tour (distance, elevation gain/loss...)
-  
 
 Changes
 =======

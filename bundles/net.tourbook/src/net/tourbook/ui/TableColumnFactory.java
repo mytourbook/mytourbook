@@ -518,6 +518,8 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory WAYPOINT_SYMBOL;
    public static final TableColumnFactory WAYPOINT_TIME;
 
+   public static final TableColumnFactory WEATHER_AIR_QUALITY;
+   public static final String             WEATHER_AIR_QUALITY_ID                             = "WEATHER_AIR_QUALITY";                             //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_CLOUDS;
    public static final String             WEATHER_CLOUDS_ID                                  = "WEATHER_CLOUDS";                                  //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_AVG;
@@ -5168,6 +5170,25 @@ public abstract class TableColumnFactory {
       /*
        * Weather
        */
+
+      WEATHER_AIR_QUALITY = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_AIR_QUALITY_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_AirQuality_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_AirQuality);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_AirQuality_Label);
+
+            colDef.setDefaultColumnWidth(       pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
 
       WEATHER_CLOUDS = new TableColumnFactory() {
          @Override

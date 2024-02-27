@@ -417,7 +417,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       final int airQualityIndexAverage = airPollutionResult.getAirQualityIndexAverage();
 
-      tour.setWeather_AirQuality(IWeather.airQualityIds[airQualityIndexAverage]);
+      tour.setWeather_AirQuality(IWeather.AIR_QUALITY_IDS[airQualityIndexAverage]);
    }
 
    private void setTourWeatherWithCurrentWeather(final Current currentWeather) {

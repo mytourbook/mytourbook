@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,7 +46,7 @@ public class ColumnProfile implements Cloneable {
    String[]                           visibleColumnIdsAndWidth;
 
    /**
-    * Contains a pair with column id/column format for all columns.
+    * Contains column properties but only for visible or customized columns.
     *
     * @since 16.5
     */
@@ -102,6 +102,7 @@ public class ColumnProfile implements Cloneable {
 
    /**
     * @param columnId
+    *
     * @return Returns the visual index of the column or -1 when column is not visible.
     */
    public int getColumnIndex(final String columnId) {

@@ -962,7 +962,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_comboWeather_Clouds);
 
             // fill combobox
-            for (final String cloudText : IWeather.cloudText) {
+            for (final String cloudText : IWeather.CLOUD_TEXT) {
                _comboWeather_Clouds.add(cloudText);
             }
 
@@ -1021,7 +1021,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
 
       final int selectionIndex = _comboWeather_Clouds.getSelectionIndex();
 
-      final String cloudKey = IWeather.cloudIcon[selectionIndex];
+      final String cloudKey = IWeather.CLOUD_ICON[selectionIndex];
       final Image cloudIcon = UI.IMAGE_REGISTRY.get(cloudKey);
 
       _lblWeather_CloudIcon.setImage(cloudIcon);
@@ -1289,7 +1289,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
       }
 
       final int cloudIndex = _comboWeather_Clouds.getSelectionIndex();
-      String cloudValue = IWeather.cloudIcon[cloudIndex];
+      String cloudValue = IWeather.CLOUD_ICON[cloudIndex];
       if (cloudValue.equals(UI.IMAGE_EMPTY_16)) {
          // replace invalid cloud key
          cloudValue = UI.EMPTY_STRING;

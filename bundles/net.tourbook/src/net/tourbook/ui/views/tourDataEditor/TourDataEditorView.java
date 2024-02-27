@@ -4451,7 +4451,7 @@ public class TourDataEditorView extends ViewPart implements
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboWeather_Clouds);
 
             // fill combobox
-            for (final String cloudText : IWeather.cloudText) {
+            for (final String cloudText : IWeather.CLOUD_TEXT) {
                _comboWeather_Clouds.add(cloudText);
             }
 
@@ -6511,7 +6511,7 @@ public class TourDataEditorView extends ViewPart implements
 
       final int selectionIndex = _comboWeather_Clouds.getSelectionIndex();
 
-      final String cloudKey = IWeather.cloudIcon[selectionIndex];
+      final String cloudKey = IWeather.CLOUD_ICON[selectionIndex];
       final Image cloudIcon = UI.IMAGE_REGISTRY.get(cloudKey);
 
       _lblCloudIcon.setImage(cloudIcon);
@@ -7149,7 +7149,7 @@ public class TourDataEditorView extends ViewPart implements
 
    private void fillAirQualityCombo() {
 
-      for (int index = 0; index < IWeather.airQualityTexts.length; index++) {
+      for (int index = 0; index < IWeather.AIR_QUALITY_TEXT.length; index++) {
 
          Color backgroundColor = null;
          Color foregroundColor = null;
@@ -7158,18 +7158,18 @@ public class TourDataEditorView extends ViewPart implements
 
          if (UI.IS_DARK_THEME) {
 
-            foregroundColor = IWeather.airQualityColors_DarkTheme[colorIndex];
-            backgroundColor = IWeather.airQualityColors_DarkTheme[colorIndex + 1];
+            foregroundColor = IWeather.AIR_QUALITY_COLORS_DARK_THEME[colorIndex];
+            backgroundColor = IWeather.AIR_QUALITY_COLORS_DARK_THEME[colorIndex + 1];
 
          } else {
 
-            foregroundColor = IWeather.airQualityColors_BrightTheme[colorIndex];
-            backgroundColor = IWeather.airQualityColors_BrightTheme[colorIndex + 1];
+            foregroundColor = IWeather.AIR_QUALITY_COLORS_BRIGHT_THEME[colorIndex];
+            backgroundColor = IWeather.AIR_QUALITY_COLORS_BRIGHT_THEME[colorIndex + 1];
          }
 
          final TableItem tableItem = new TableItem(_tableComboWeather_AirQuality.getTable(), SWT.READ_ONLY);
 
-         tableItem.setText(IWeather.airQualityTexts[index]); // set the column text
+         tableItem.setText(IWeather.AIR_QUALITY_TEXT[index]); // set the column text
          tableItem.setBackground(backgroundColor);
          tableItem.setForeground(foregroundColor);
       }
@@ -9341,7 +9341,7 @@ public class TourDataEditorView extends ViewPart implements
          }
 
          final int cloudIndex = _comboWeather_Clouds.getSelectionIndex();
-         String cloudValue = IWeather.cloudIcon[cloudIndex];
+         String cloudValue = IWeather.CLOUD_ICON[cloudIndex];
          if (cloudValue.equals(UI.IMAGE_EMPTY_16)) {
             // replace invalid cloud key
             cloudValue = UI.EMPTY_STRING;
@@ -9362,7 +9362,7 @@ public class TourDataEditorView extends ViewPart implements
          }
 
          final int airQualityIndex = _tableComboWeather_AirQuality.getSelectionIndex();
-         final String airQualityId = IWeather.airQualityIds[airQualityIndex];
+         final String airQualityId = IWeather.AIR_QUALITY_IDS[airQualityIndex];
          _tourData.setWeather_AirQuality(airQualityId);
 
          /*
