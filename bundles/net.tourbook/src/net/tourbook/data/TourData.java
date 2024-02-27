@@ -10948,7 +10948,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    /**
     * @return Returns the index for the air quality value in
-    *         {@link IWeather#airQualityTexts} or 0 when the air quality
+    *         {@link IWeather#AIR_QUALITY_TEXT} or 0 when the air quality
     *         index is not defined
     */
    public int getWeather_AirQuality_TextIndex() {
@@ -11035,8 +11035,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * @return Returns the index for the cloud values in {@link IWeather#cloudIcon} and
-    *         {@link IWeather#cloudText} or 0 when the clouds are not defined
+    * @return Returns the index for the cloud values in {@link IWeather#CLOUD_ICON} and
+    *         {@link IWeather#CLOUD_TEXT} or 0 when the clouds are not defined
     */
    public int getWeatherIndex() {
 

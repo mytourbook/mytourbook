@@ -34,6 +34,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.TourManager;
+import net.tourbook.weather.WeatherUtils;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -207,15 +208,18 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "Battery_Percentage_Start, " //                     89    //$NON-NLS-1$
             + "Battery_Percentage_End," //                        90    //$NON-NLS-1$
 
-            // -------- TEMPERATURES -----------
+            // -------- WEATHER -----------
             + "weather_Temperature_Average, " //                  91    //$NON-NLS-1$
             + "weather_Temperature_Max, " //                      92    //$NON-NLS-1$
             + "weather_Temperature_Min, " //                      93    //$NON-NLS-1$
+            + "weather_AirQuality, " //                           94    //$NON-NLS-1$
 
-            + "tourLocationStart_LocationID, " //                 94    //$NON-NLS-1$
-            + "tourLocationEnd_LocationID, " //                   95    //$NON-NLS-1$
+            + "tourLocationStart_LocationID, " //                 95    //$NON-NLS-1$
+            + "tourLocationEnd_LocationID, " //                   96    //$NON-NLS-1$
 
-            + "hasGeoData" //                                     96    //$NON-NLS-1$
+            + "hasGeoData" //                                     97    //$NON-NLS-1$
+
+      ;
 
       //////////////////////////////////////////////////////////////////////////////////////////
       //
@@ -226,9 +230,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       //
       //////////////////////////////////////////////////////////////////////////////////////////
 
-      ;
-
-      SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 97;
+      SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 98;
 
       /////////////////////////////////////////////////////////////////////////
       // -------- JOINT TABLES, they are added at the end --------------
@@ -402,6 +404,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    int           colWindSpeed;
    int           colWindDirection;
    String        colClouds;
+   int           colAirQualityIndex;
    //
    int           colWeekNo;
    String        colWeekDay;
@@ -661,36 +664,40 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourItem.colBatterySoC_Start                    = result.getShort(89);
       tourItem.colBatterySoC_End                      = result.getShort(90);
 
-      // -------- TEMPERATURES -----------
+      // -------- WEATHER -----------
 
-      final float dbAvgTemperature = result.getFloat(91);
-      tourItem.colTemperature_Max = result.getFloat(92);
-      tourItem.colTemperature_Min = result.getFloat(93);
+      final float dbAvgTemperature                    = result.getFloat(91);
+      tourItem.colTemperature_Max                     = result.getFloat(92);
+      tourItem.colTemperature_Min                     = result.getFloat(93);
+      final String dbAirQuality                       = result.getString(94);
 
       // -------- TOUR LOCATIONS -----------
 
-      tourItem.colTourLocationID_Start                = result.getObject(94);
-      tourItem.colTourLocationID_End                  = result.getObject(95);
+      tourItem.colTourLocationID_Start                = result.getObject(95);
+      tourItem.colTourLocationID_End                  = result.getObject(96);
 
       // -------- GEO DATA -----------
 
-      tourItem.colHasGeoData                          = result.getBoolean(96);
+      tourItem.colHasGeoData                          = result.getBoolean(97);
 
-// SET_FORMATTING_ON
 
       // -----------------------------------------------
 
-      tourItem.colBodyWeight = dbBodyWeight;
-      tourItem.colTraining_PowerToWeight = dbBodyWeight == 0 ? 0 : dbAvgPower / dbBodyWeight;
 
-      tourItem.colAvgCadence = dbAvgCadence * dbCadenceMultiplier;
-      tourItem.colCadenceMultiplier = dbCadenceMultiplier;
+      tourItem.colBodyWeight              = dbBodyWeight;
+      tourItem.colTraining_PowerToWeight  = dbBodyWeight == 0 ? 0 : dbAvgPower / dbBodyWeight;
 
-      tourItem.colSlowVsFastCadence = TourManager.generateCadenceZones_TimePercentages(cadenceZone_SlowTime, cadenceZone_FastTime);
+      tourItem.colAvgCadence              = dbAvgCadence * dbCadenceMultiplier;
+      tourItem.colCadenceMultiplier       = dbCadenceMultiplier;
 
-      tourItem.colTemperature_Average_Device = dbAvgTemperature_Device / dbTemperatureScale;
+      tourItem.colSlowVsFastCadence       = TourManager.generateCadenceZones_TimePercentages(cadenceZone_SlowTime, cadenceZone_FastTime);
 
-      tourItem.colTemperature_Average = dbAvgTemperature / dbTemperatureScale;
+      tourItem.colTemperature_Average_Device    = dbAvgTemperature_Device / dbTemperatureScale;
+      tourItem.colTemperature_Average           = dbAvgTemperature / dbTemperatureScale;
+
+      tourItem.colAirQualityIndex               = WeatherUtils.getWeather_AirQuality_TextIndex(dbAirQuality);
+
+// SET_FORMATTING_ON
 
       // -----------------------------------------------
 

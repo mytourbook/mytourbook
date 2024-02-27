@@ -267,7 +267,7 @@ public class WeatherUtils {
 
          weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality
                + UI.SPACE
-               + IWeather.airQualityTexts[airQualityTextIndex]);
+               + IWeather.AIR_QUALITY_TEXT[airQualityTextIndex]);
       }
 
       // Humidity
@@ -428,7 +428,7 @@ public class WeatherUtils {
 
    public static int getWeather_AirQuality_TextIndex(final String weather_AirQuality) {
 
-      final int Weather_AirQuality_TextIndex = Arrays.asList(IWeather.airQualityIds).indexOf(weather_AirQuality);
+      final int Weather_AirQuality_TextIndex = Arrays.asList(IWeather.AIR_QUALITY_IDS).indexOf(weather_AirQuality);
 
       return Weather_AirQuality_TextIndex < 0
             ? 0
@@ -449,7 +449,7 @@ public class WeatherUtils {
 
       String weatherIcon;
 
-      switch (IWeather.cloudIcon[weatherIndex]) {
+      switch (IWeather.CLOUD_ICON[weatherIndex]) {
 
       case IWeather.WEATHER_ID_CLEAR:
          //https://emojipedia.org/sun/
@@ -511,8 +511,8 @@ public class WeatherUtils {
 
       if (StringUtils.hasContent(weatherClouds)) {
          // binary search cannot be done because it requires sorting which we cannot...
-         for (int cloudIndex = 0; cloudIndex < IWeather.cloudIcon.length; ++cloudIndex) {
-            if (IWeather.cloudIcon[cloudIndex].equalsIgnoreCase(weatherClouds)) {
+         for (int cloudIndex = 0; cloudIndex < IWeather.CLOUD_ICON.length; ++cloudIndex) {
+            if (IWeather.CLOUD_ICON[cloudIndex].equalsIgnoreCase(weatherClouds)) {
                weatherCloudsIndex = cloudIndex;
                break;
             }

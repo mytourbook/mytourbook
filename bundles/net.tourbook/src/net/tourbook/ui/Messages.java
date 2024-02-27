@@ -21,6 +21,8 @@ public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.ui.messages";                    //$NON-NLS-1$
 
+   public static String        ColumnFactory_AirQuality;
+   public static String        ColumnFactory_AirQuality_Label;
    public static String        ColumnFactory_altitude_computed_difference_tooltip;
    public static String        ColumnFactory_altitude_difference_label;
    public static String        ColumnFactory_altitude_difference_tooltip;

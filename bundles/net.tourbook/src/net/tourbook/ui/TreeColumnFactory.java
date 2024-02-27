@@ -151,6 +151,8 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TRAINING_TRAINING_EFFECT_ANAEROB;
    public static final TreeColumnFactory TRAINING_TRAINING_PERFORMANCE;
 
+   public static final TreeColumnFactory WEATHER_AIR_QUALITY;
+   public static final String            WEATHER_AIR_QUALITY_ID           = "WEATHER_AIR_QUALITY";              //$NON-NLS-1$
    public static final TreeColumnFactory WEATHER_CLOUDS;
    public static final TreeColumnFactory WEATHER_TEMPERATURE_AVG;
    public static final TreeColumnFactory WEATHER_TEMPERATURE_AVG_COMBINED;
@@ -2526,6 +2528,24 @@ public abstract class TreeColumnFactory {
       /*
        * Weather
        */
+
+      WEATHER_AIR_QUALITY = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, WEATHER_AIR_QUALITY_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_AirQuality_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_AirQuality);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_AirQuality_Label);
+
+            colDef.setDefaultColumnWidth(       pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
 
       WEATHER_CLOUDS = new TreeColumnFactory() {
          @Override
