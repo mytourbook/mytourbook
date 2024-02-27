@@ -42,6 +42,8 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.web.WEB;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -75,6 +77,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -128,16 +131,32 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    /*
     * UI controls
     */
-   private Button    _btnAdd;
-   private Button    _btnSearch;
+   private Button           _btnAdd;
+   private Button           _btnSearch;
 
-   private Label     _lblKeywords;
-   private Label     _lblSearchType;
+   private Label            _lblKeywords;
+   private Label            _lblSearchType;
 
-   private Combo     _comboSearchQuery;
-   private Combo     _comboSearchType;
+   private Combo            _comboSearchQuery;
+   private Combo            _comboSearchType;
 
-   private Composite _viewerContainer;
+   private Composite        _viewerContainer;
+
+   private ActionAddProduct _actionAddProduct;
+
+   private class ActionAddProduct extends Action {
+
+      public ActionAddProduct() {
+
+         super(Messages.Dialog_SearchProduct_Button_Add, AS_PUSH_BUTTON);
+         setToolTipText(Messages.Dialog_SearchProduct_Button_Add_Tooltip);
+      }
+
+      @Override
+      public void run() {
+         onAddProduct();
+      }
+   }
 
    private class ProductComparator extends ViewerComparator {
 
@@ -389,6 +408,11 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       validateFields();
    }
 
+   private void createActions() {
+
+      _actionAddProduct = new ActionAddProduct();
+   }
+
    @Override
    protected final void createButtonsForButtonBar(final Composite parent) {
 
@@ -409,6 +433,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       _isInUIInit = true;
       {
+         createActions();
          createUI(_viewerContainer);
       }
       _isInUIInit = false;
@@ -443,7 +468,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(HTTPS_OPENFOODFACTS_PRODUCTS)));
          GridDataFactory.fillDefaults()
                .align(SWT.LEFT, SWT.CENTER)
-               .grab(true, true)
+               .grab(true, false)
                .applyTo(link);
       }
    }
@@ -535,6 +560,11 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       GridDataFactory.fillDefaults().grab(true, true).applyTo(productsTable);
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
+
+      final MenuManager menuManager = new MenuManager();
+      menuManager.add(_actionAddProduct);
+      final Menu contextMenu = menuManager.createContextMenu(productsTable);
+      productsTable.setMenu(contextMenu);
 
       final GridData gdDescription = (GridData) productsTable.getLayoutData();
       gdDescription.heightHint = _pc.convertHeightInCharsToPixels(15);
