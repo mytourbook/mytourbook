@@ -176,12 +176,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    /*
     * UI controls
     */
-   private Image       _imageAdd;
-   private Image       _imageSearch;
-   private Image       _imageDelete;
-   private Image       _imageCheck;
-   private Image       _imageUncheck;
-   private Image       _imageYes;
+   private Image       _imageAdd     = TourbookPlugin.getImageDescriptor(Images.App_Add).createImage();
+   private Image       _imageSearch  = TourbookPlugin.getImageDescriptor(Images.SearchTours).createImage();
+   private Image       _imageDelete  = TourbookPlugin.getImageDescriptor(Images.App_Trash).createImage();
+
+   private Image       _imageCheck   = TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked).createImage();
+   private Image       _imageUncheck = TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck).createImage();
+   private Image       _imageYes     = CommonActivator.getImageDescriptor(CommonImages.App_Yes).createImage();
 
    private Button      _btnDeleteProduct;
 
@@ -603,10 +604,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _pageNoData = net.tourbook.common.UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
       _tk = new FormToolkit(parent.getDisplay());
-
-      _imageAdd = TourbookPlugin.getImageDescriptor(Images.App_Add).createImage();
-      _imageSearch = TourbookPlugin.getImageDescriptor(Images.SearchTours).createImage();
-      _imageDelete = TourbookPlugin.getImageDescriptor(Images.App_Trash).createImage();
 
       _viewerContainer = new Composite(_pageBook, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
@@ -1191,9 +1188,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _pc = new PixelConverter(parent);
 
       _columnSortListener = widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
-      _imageCheck = TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked).createImage();
-      _imageUncheck = TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck).createImage();
-      _imageYes = CommonActivator.getImageDescriptor(CommonImages.App_Yes).createImage();
    }
 
    private void onDeleteProducts() {
