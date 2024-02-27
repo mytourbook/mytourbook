@@ -2438,6 +2438,7 @@ public class UI {
                                  final int alignment) {
 
       final Rectangle imageRect = image.getBounds();
+      
       final int imageWidth = imageRect.width;
       final int imageWidth2 = imageWidth / 2;
 
@@ -2467,13 +2468,6 @@ public class UI {
       final int devY = event.y + yOffset;
 
       event.gc.drawImage(image, devX, devY);
-   }
-
-   public static void paintImageCentered(final Event event,
-                                         final Image image,
-                                         final int availableWidth) {
-
-      paintImage(event, image, availableWidth, SWT.CENTER);
    }
 
    public static String replaceHTML_BackSlash(final String filePath) {
