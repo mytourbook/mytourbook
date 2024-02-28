@@ -581,7 +581,7 @@ public class NatTable_DataLoader {
          final String orderBy = createSql_Sorting_OrderBy();
 
          /*
-          * This synchonize may fix an issue, that number of sql parameter were wrong because of
+          * This synchronize may fix an issue, that number of sql parameter were wrong because of
           * concurrency
           */
          synchronized (_tourCollectionFilter) {
@@ -592,7 +592,8 @@ public class NatTable_DataLoader {
                   + " SELECT" //                                                                            //$NON-NLS-1$
                   + "    " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + "," + NL //                              //$NON-NLS-1$ //$NON-NLS-2$
                   + "    Tmarker.markerId," + NL //                                                         //$NON-NLS-1$
-                  + "    jTdataTtag.TourTag_tagId" + NL //                                                  //$NON-NLS-1$
+                  + "    jTdataTtag.TourTag_tagId," + NL //                                                 //$NON-NLS-1$
+                  + "    TNutritionProduct.productId" + NL //                                               //$NON-NLS-1$
 
                   + " FROM" + NL //                                                                         //$NON-NLS-1$
                   + " (" + NL //                                                                            //$NON-NLS-1$
@@ -641,8 +642,8 @@ public class NatTable_DataLoader {
                   + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                              //$NON-NLS-1$
 
                   // get nutrition product ids
-                  + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + " TNutritionProduct" //                  //$NON-NLS-1$ //$NON-NLS-2$
-                  + " ON TourData.tourId = TNutritionProduct.TourData_tourId" + NL //                              //$NON-NLS-1$
+                  + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + " TNutritionProduct" ////$NON-NLS-1$ //$NON-NLS-2$
+                  + " ON TourData.tourId = TNutritionProduct.TourData_tourId" + NL //                       //$NON-NLS-1$
 
                   + orderBy + NL;
 
@@ -1064,7 +1065,7 @@ public class NatTable_DataLoader {
       /*
        * WEATHER
        */
-      case TableColumnFactory.WEATHER_AIR_QUALITY_ID:                return "weather_AirQuality";
+      case TableColumnFactory.WEATHER_AIR_QUALITY_ID:                return "weather_AirQuality"; //$NON-NLS-1$
       case TableColumnFactory.WEATHER_CLOUDS_ID:                     return "weather_Clouds";   // an icon is displayed     //$NON-NLS-1$
       case TableColumnFactory.WEATHER_TEMPERATURE_AVG_ID:            return "(DOUBLE(weather_Temperature_Average) / temperatureScale)"; //$NON-NLS-1$
       case TableColumnFactory.WEATHER_TEMPERATURE_AVG_COMBINED_ID:   return FIELD_WITHOUT_SORTING;
