@@ -3326,6 +3326,7 @@ public class Messages extends NLS {
    public static String        Tour_Nutrition_Button_AddCustomProduct_Tooltip;
    public static String        Tour_Nutrition_Button_DeleteProduct;
    public static String        Tour_Nutrition_Button_DeleteProduct_Tooltip;
+   public static String        Tour_Nutrition_Button_OpenProductsWebsite;
    public static String        Tour_Nutrition_Button_SearchProduct;
    public static String        Tour_Nutrition_Button_SearchProduct_Tooltip;
    public static String        Tour_Nutrition_Column_BeverageContainer;

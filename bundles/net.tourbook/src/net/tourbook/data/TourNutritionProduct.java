@@ -317,6 +317,10 @@ public class TourNutritionProduct {
       return isBeverage;
    }
 
+   public boolean isCustomProduct() {
+      return productCode.startsWith(CUSTOMPRODUCTCODE_PREFIX);
+   }
+
    public void setBeverageQuantity(final int beverageQuantity) {
       this.beverageQuantity = beverageQuantity;
    }
