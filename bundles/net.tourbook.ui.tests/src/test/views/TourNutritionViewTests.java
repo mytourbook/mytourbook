@@ -128,7 +128,7 @@ public class TourNutritionViewTests extends UITest {
       for (int index = 0; index < 5; ++index) {
 
          productsTable.click(0, 2);
-         bot.button(Messages.Tour_Nutrition_Button_DeleteProduct).click();
+         productsTable.contextMenu(Messages.Tour_Nutrition_Button_DeleteProduct).click();
       }
 
       // Assert
