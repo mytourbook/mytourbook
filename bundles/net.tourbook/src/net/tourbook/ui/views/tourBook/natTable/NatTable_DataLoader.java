@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -640,6 +640,10 @@ public class NatTable_DataLoader {
                   + " LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //            //$NON-NLS-1$ //$NON-NLS-2$
                   + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                              //$NON-NLS-1$
 
+                  // get nutrition product ids
+                  + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + " TNutritionProduct" //                  //$NON-NLS-1$ //$NON-NLS-2$
+                  + " ON TourData.tourId = TNutritionProduct.TourData_tourId" + NL //                              //$NON-NLS-1$
+
                   + orderBy + NL;
 
             final PreparedStatement prepStmt = conn.prepareStatement(sql);
@@ -659,6 +663,7 @@ public class NatTable_DataLoader {
             long prevTourId = -1;
             HashSet<Long> tagIds = null;
             HashSet<Long> markerIds = null;
+            HashSet<Long> nutritionProductIds = null;
 
             final ResultSet result = prepStmt.executeQuery();
             while (result.next()) {
@@ -667,19 +672,25 @@ public class NatTable_DataLoader {
 
                final Object result_MarkerId = result.getObject(TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER);
                final Object result_TagId = result.getObject(TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1);
+               final Object result_NutritionProductId = result.getObject(TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 2);
 
                if (result_TourId == prevTourId) {
 
                   // these are additional result set's for the same tour
 
                   // get tags from left (outer) join
-                  if (result_TagId instanceof Long) {
-                     tagIds.add((Long) result_TagId);
+                  if (result_TagId instanceof final Long tagId) {
+                     tagIds.add(tagId);
                   }
 
                   // get markers from left (outer) join
-                  if (result_MarkerId instanceof Long) {
-                     markerIds.add((Long) result_MarkerId);
+                  if (result_MarkerId instanceof final Long markerId) {
+                     markerIds.add(markerId);
+                  }
+
+                  // get nutrition products from left (outer) join
+                  if (result_NutritionProductId instanceof final Long nutritionProductId) {
+                     nutritionProductIds.add(nutritionProductId);
                   }
 
                } else {
@@ -693,21 +704,30 @@ public class NatTable_DataLoader {
                   TVITourBookItem.getTourDataFields(result, tourItem);
 
                   // get first tag id
-                  if (result_TagId instanceof Long) {
+                  if (result_TagId instanceof final Long tagId) {
 
                      tagIds = new HashSet<>();
-                     tagIds.add((Long) result_TagId);
+                     tagIds.add(tagId);
 
                      tourItem.setTagIds(tagIds);
                   }
 
                   // get first marker id
-                  if (result_MarkerId instanceof Long) {
+                  if (result_MarkerId instanceof final Long markerId) {
 
                      markerIds = new HashSet<>();
-                     markerIds.add((Long) result_MarkerId);
+                     markerIds.add(markerId);
 
                      tourItem.setMarkerIds(markerIds);
+                  }
+
+                  // get first nutrition product id
+                  if (result_NutritionProductId instanceof Long) {
+
+                     nutritionProductIds = new HashSet<>();
+                     nutritionProductIds.add((Long) result_MarkerId);
+
+                     tourItem.setNutritionProductsIds(nutritionProductIds);
                   }
 
                   // keep tour item
@@ -737,10 +757,10 @@ public class NatTable_DataLoader {
              * <p>
              * net.tourbook.ui.views.tourBook.natTable.NatTable_DataLoader.fetchPagedTourItems(NatTable_DataLoader.java:652)
              * <p>
-             * This cannot be reproduced but it happend firstly, after fixing the tour collection
+             * This cannot be reproduced but it happened firstly, after fixing the tour collection
              * filter in commit
              * https://github.com/mytourbook/mytourbook/commit/b4c664f37caadfc45695e0ef806bad4c9a7fd4fc
-             * and it occcured already several times
+             * and it occurred already several times
              * <p>
              */
 
@@ -1222,7 +1242,7 @@ public class NatTable_DataLoader {
       }
    }
 
-   public void setTourCollectionFilter(final TourCollectionFilter tourCollectionFilter, final ArrayList<Long> allTourIds) {
+   public void setTourCollectionFilter(final TourCollectionFilter tourCollectionFilter, final List<Long> allTourIds) {
 
       final int numIDs = allTourIds.size();
 

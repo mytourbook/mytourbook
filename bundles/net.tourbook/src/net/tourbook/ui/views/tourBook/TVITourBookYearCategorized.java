@@ -87,6 +87,10 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
             + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //   //$NON-NLS-1$ //$NON-NLS-2$
             + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //               //$NON-NLS-1$
 
+            // get nutrition product ids
+            + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + " TNutritionProduct" //                  //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = TNutritionProduct.TourData_tourId" + NL //                              //$NON-NLS-1$
+
             + "WHERE  " + sumYear + "=?" + NL //                                    //$NON-NLS-1$ //$NON-NLS-2$
             + "   AND " + sumYearSub + "=?" + NL //                                 //$NON-NLS-1$ //$NON-NLS-2$
             + "   " + sqlAppFilter.getWhereClause() //$NON-NLS-1$
@@ -132,7 +136,6 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
       if (isShortInfo) {
 
          return "TVITourBookYearCategorized  tourYearSub = " + tourYearSub; //$NON-NLS-1$
-
 
       } else {
 

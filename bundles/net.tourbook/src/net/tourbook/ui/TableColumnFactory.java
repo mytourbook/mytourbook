@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -300,6 +300,9 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory MOTION_PACE;
    public static final TableColumnFactory MOTION_SPEED;
    public static final TableColumnFactory MOTION_SPEED_DIFF;
+
+   public static final TableColumnFactory NUTRITION_NUM_PRODUCTS;
+   public static final String             NUTRITION_NUM_PRODUCTS_ID                          = "NUTRITION_NUM_PRODUCTS";                          //$NON-NLS-1$
 
    public static final TableColumnFactory PHOTO_FILE_PATH;
    public static final TableColumnFactory PHOTO_NUMBER_OF_GPS_PHOTOS;
@@ -4690,6 +4693,25 @@ public abstract class TableColumnFactory {
             colDef.setColumnLabel(              Messages.ColumnFactory_tour_marker_label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_tour_marker_header);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_tour_marker_tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+
+            return colDef;
+         }
+      };
+
+      NUTRITION_NUM_PRODUCTS = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, NUTRITION_NUM_PRODUCTS_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Nutrition);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Nutrition_NumberOfProducts_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Nutrition_NumberOfProducts_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Nutrition_NumberOfProducts_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
