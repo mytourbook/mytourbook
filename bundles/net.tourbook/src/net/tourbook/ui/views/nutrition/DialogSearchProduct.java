@@ -453,8 +453,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
       initUI(parent);
 
-      _viewerContainer = (Composite) super.createDialogArea(parent);
-
       // define all columns for the viewer
       _columnManager = new ColumnManager(this, _state);
       defineAllColumns();
@@ -462,7 +460,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       _isInUIInit = true;
       {
          createActions();
-         createUI(_viewerContainer);
+         createUI(parent);
       }
       _isInUIInit = false;
 
@@ -487,11 +485,16 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.swtDefaults().margins(10, 5).applyTo(container);
+      GridLayoutFactory.fillDefaults().margins(10, 5).applyTo(container);
       {
          createUI_10_Header(container);
 
-         createUI_20_Viewer(container);
+         _viewerContainer = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
+         GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+         {
+            createUI_20_Viewer(_viewerContainer);
+         }
 
          /*
           * Link/Info: How to add a product in the database

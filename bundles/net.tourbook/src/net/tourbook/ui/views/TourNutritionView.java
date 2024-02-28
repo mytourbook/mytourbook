@@ -683,11 +683,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _tk = new FormToolkit(parent.getDisplay());
 
-      _viewerContainer = new Composite(_pageBook, SWT.NONE);
-      GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+      GridLayoutFactory.fillDefaults().applyTo(parent);
       {
-         createUI_Section_10_Summary(_viewerContainer);
-         createUI_Section_20_ProductsList(_viewerContainer);
+         createUI_Section_10_Summary(parent);
+         createUI_Section_20_ProductsList(parent);
       }
    }
 
@@ -787,41 +786,47 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void createUI_210_Actions(final Composite parent) {
 
-      /*
-       * Search product button
-       */
-      final Button btnSearchProduct = new Button(parent, SWT.NONE);
-      btnSearchProduct.setText(Messages.Tour_Nutrition_Button_SearchProduct);
-      btnSearchProduct.setToolTipText(Messages.Tour_Nutrition_Button_SearchProduct_Tooltip);
-      btnSearchProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell(),
-            _tourData.getTourId()).open()));
-      btnSearchProduct.setImage(_imageSearch);
-      GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(btnSearchProduct);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
 
-      /*
-       * Add product button
-       */
-      final Button btnAddCustomProduct = new Button(parent, SWT.NONE);
-      btnAddCustomProduct.setText(Messages.Tour_Nutrition_Button_AddCustomProduct);
-      btnAddCustomProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddCustomProduct_Tooltip);
-      btnAddCustomProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+         /*
+          * Search product button
+          */
+         final Button btnSearchProduct = new Button(container, SWT.NONE);
+         btnSearchProduct.setText(Messages.Tour_Nutrition_Button_SearchProduct);
+         btnSearchProduct.setToolTipText(Messages.Tour_Nutrition_Button_SearchProduct_Tooltip);
+         btnSearchProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> new DialogSearchProduct(Display.getCurrent().getActiveShell(),
+               _tourData.getTourId()).open()));
+         btnSearchProduct.setImage(_imageSearch);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(btnSearchProduct);
 
-         final DialogCustomTourNutritionProduct dialogTourNutritionProduct = new DialogCustomTourNutritionProduct(Display.getCurrent()
-               .getActiveShell());
+         /*
+          * Add product button
+          */
+         final Button btnAddCustomProduct = new Button(container, SWT.NONE);
+         btnAddCustomProduct.setText(Messages.Tour_Nutrition_Button_AddCustomProduct);
+         btnAddCustomProduct.setToolTipText(Messages.Tour_Nutrition_Button_AddCustomProduct_Tooltip);
+         btnAddCustomProduct.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-         if (dialogTourNutritionProduct.open() != Window.OK) {
-            return;
-         }
+            final DialogCustomTourNutritionProduct dialogTourNutritionProduct = new DialogCustomTourNutritionProduct(Display.getCurrent()
+                  .getActiveShell());
 
-         final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
-         tourNutritionProducts.add(dialogTourNutritionProduct.getTourNutritionProduct(_tourData));
-         _tourData.setTourNutritionProducts(tourNutritionProducts);
-         _tourData = TourManager.saveModifiedTour(_tourData);
-         _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
+            if (dialogTourNutritionProduct.open() != Window.OK) {
+               return;
+            }
 
-      }));
-      btnAddCustomProduct.setImage(_imageAdd);
-      GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(btnAddCustomProduct);
+            final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
+            tourNutritionProducts.add(dialogTourNutritionProduct.getTourNutritionProduct(_tourData));
+            _tourData.setTourNutritionProducts(tourNutritionProducts);
+            _tourData = TourManager.saveModifiedTour(_tourData);
+            _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
+
+         }));
+         btnAddCustomProduct.setImage(_imageAdd);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(btnAddCustomProduct);
+      }
    }
 
    private void createUI_220_Viewer(final Composite parent) {
@@ -830,7 +835,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
        * table viewer: products
        */
       final Table productsTable = new Table(parent, SWT.MULTI | SWT.FULL_SELECTION);
-      GridDataFactory.fillDefaults().grab(true, true).span(3, 1).applyTo(productsTable);
+      GridLayoutFactory.fillDefaults().applyTo(productsTable);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(productsTable);
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
 
@@ -932,10 +938,16 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _sectionProductsList.setToolTipText(Messages.Tour_Nutrition_Section_ProductsList_Tooltip);
       final Composite container = (Composite) _sectionProductsList.getClient();
       GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
       {
          createUI_210_Actions(container);
-         createUI_220_Viewer(container);
+
+         _viewerContainer = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
+         GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+         {
+            createUI_220_Viewer(_viewerContainer);
+         }
       }
    }
 
