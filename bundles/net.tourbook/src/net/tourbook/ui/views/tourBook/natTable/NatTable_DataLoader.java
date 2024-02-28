@@ -1044,6 +1044,7 @@ public class NatTable_DataLoader {
       /*
        * WEATHER
        */
+      case TableColumnFactory.WEATHER_AIR_QUALITY_ID:                return "weather_AirQuality";
       case TableColumnFactory.WEATHER_CLOUDS_ID:                     return "weather_Clouds";   // an icon is displayed     //$NON-NLS-1$
       case TableColumnFactory.WEATHER_TEMPERATURE_AVG_ID:            return "(DOUBLE(weather_Temperature_Average) / temperatureScale)"; //$NON-NLS-1$
       case TableColumnFactory.WEATHER_TEMPERATURE_AVG_COMBINED_ID:   return FIELD_WITHOUT_SORTING;

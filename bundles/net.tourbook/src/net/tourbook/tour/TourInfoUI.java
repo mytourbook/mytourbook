@@ -1202,8 +1202,11 @@ public class TourInfoUI {
        * Air Quality
        */
       createUI_Label(parent, Messages.Tour_Tooltip_Label_AirQuality);
+      UI.createSpacer_Horizontal(parent);
 
-      _lblAirQuality = createUI_LabelValue(parent, SWT.CENTER);
+      _lblAirQuality = createUI_LabelValue(parent, SWT.LEAD);
+      final GridData gd = (GridData) _lblAirQuality.getLayoutData();
+      gd.horizontalAlignment = SWT.BEGINNING; // do not fill the cell with the background color
    }
 
    private void createUI_48_Battery(final Composite parent) {
@@ -2278,7 +2281,7 @@ public class TourInfoUI {
       final int airQualityTextIndex = _tourData.getWeather_AirQuality_TextIndex();
       if (airQualityTextIndex > 0) {
 
-         _lblAirQuality.setText(IWeather.AIR_QUALITY_TEXT[airQualityTextIndex]);
+         _lblAirQuality.setText(UI.SPACE + IWeather.AIR_QUALITY_TEXT[airQualityTextIndex] + UI.SPACE);
 
          final int colorIndex = airQualityTextIndex * 2;
 
