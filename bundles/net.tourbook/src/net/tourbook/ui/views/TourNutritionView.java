@@ -160,7 +160,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
     * Index of the column with the image, index can be changed when the columns are reordered with
     * the mouse or the column manager
     */
-   private int                            _columnIndex_ForColumn_IsBeverage = 5;
+   private int                            _columnIndex_ForColumn_IsBeverage = 6;
    private int                            _columnWidth_ForColumn_IsBeverage;
 
    private TableColumnDefinition          _colDef_BeverageContainer;
