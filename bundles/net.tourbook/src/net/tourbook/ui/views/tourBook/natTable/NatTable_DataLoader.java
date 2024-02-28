@@ -725,7 +725,7 @@ public class NatTable_DataLoader {
                   if (result_NutritionProductId instanceof Long) {
 
                      nutritionProductIds = new HashSet<>();
-                     nutritionProductIds.add((Long) result_MarkerId);
+                     nutritionProductIds.add((Long) result_NutritionProductId);
 
                      tourItem.setNutritionProductsIds(nutritionProductIds);
                   }
