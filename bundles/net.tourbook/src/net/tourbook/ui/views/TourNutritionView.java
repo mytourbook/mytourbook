@@ -941,6 +941,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineAllColumns() {
 
+      defineColumn_Invisible();
+
       defineColumn_10_ConsumedQuantity();
       defineColumn_20_QuantityType();
       defineColumn_30_Name();
@@ -1183,6 +1185,28 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                   : String.valueOf(tourNutritionProduct.getContainersConsumed());
 
             cell.setText(text);
+         }
+      });
+   }
+
+   /**
+    * Column: This column is invisible and is a HACK
+    *
+    * In order for the first visible column to be right aligned, an empty invisible
+    * column must be created as the first column is ALWAYS left aligned.
+    */
+   private void defineColumn_Invisible() {
+
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, UI.EMPTY_STRING, SWT.TRAIL);
+
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(0);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(UI.EMPTY_STRING);
          }
       });
    }
