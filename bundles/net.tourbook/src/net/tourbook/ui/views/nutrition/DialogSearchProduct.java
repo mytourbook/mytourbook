@@ -30,7 +30,12 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.IContextMenuProvider;
+import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.nutrition.NutritionQuery;
@@ -43,6 +48,7 @@ import net.tourbook.web.WEB;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -52,19 +58,22 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -73,7 +82,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
@@ -84,7 +92,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.ToolTip;
 import org.eclipse.swt.widgets.Widget;
 
-public class DialogSearchProduct extends TitleAreaDialog implements PropertyChangeListener {
+public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer, PropertyChangeListener {
 
    private static final String           STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY";      //$NON-NLS-1$
 
@@ -96,6 +104,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    private static final String           STATE_SEARCH_TYPE                              = "STATE_SEARCH_TYPE";                                   //$NON-NLS-1$
    private static final String           COLUMN_CODE                                    = "Code";                                                //$NON-NLS-1$
    private static final String           COLUMN_NAME                                    = "Name";                                                //$NON-NLS-1$
+   private static final String           COLUMN_QUANTITY                                = "Quantity";                                            //$NON-NLS-1$
 
    private static final String           HTTPS_OPENFOODFACTS_PRODUCTS                   = "https://world.openfoodfacts.org/cgi/product.pl";      //$NON-NLS-1$
 
@@ -113,20 +122,24 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
     * none UI
     */
    private PixelConverter                _pc;
-   private List<String>                  _searchHistory  = new ArrayList<>();
-   private final NutritionQuery          _nutritionQuery = new NutritionQuery();
+   private List<String>                  _searchHistory                  = new ArrayList<>();
+   private final NutritionQuery          _nutritionQuery                 = new NutritionQuery();
    private PostSelectionProvider         _postSelectionProvider;
-   private final HashMap<Integer, Image> _graphImages    = new HashMap<>();
+   private final HashMap<Integer, Image> _graphImages                    = new HashMap<>();
    private final Image                   _iconPlaceholder;
 
    private IPropertyChangeListener       _prefChangeListener;
-   private Listener                      _columnSortListener;
+   private SelectionListener             _columnSortListener;
 
    private AutocompleteComboInput        _autocompleteProductSearchHistory;
 
    private ToolTip                       _tooltipInvalidBarCode;
 
    private ComboViewer                   _queryViewer;
+
+   private ColumnManager                 _columnManager;
+   private MenuManager                   _viewerMenuManager;
+   private IContextMenuProvider          _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
    /*
     * UI controls
@@ -143,6 +156,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
    private Composite        _viewerContainer;
 
    private ActionAddProduct _actionAddProduct;
+
+   private Menu             _tableContextMenu;
 
    private class ActionAddProduct extends Action {
 
@@ -181,6 +196,14 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
          case COLUMN_CODE:
             rc = p1.code.compareToIgnoreCase(p2.code);
+            break;
+
+         case COLUMN_QUANTITY:
+            final String quantity1 = net.tourbook.common.util.StringUtils.isNullOrEmpty(p1.quantity)
+                  ? UI.EMPTY_STRING : p1.quantity;
+            final String quantity2 = net.tourbook.common.util.StringUtils.isNullOrEmpty(p2.quantity)
+                  ? UI.EMPTY_STRING : p2.quantity;
+            rc = quantity1.compareToIgnoreCase(quantity2);
             break;
 
          case COLUMN_NAME:
@@ -300,40 +323,41 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       }
    }
 
+   private class TableContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_tableContextMenu != null) {
+            _tableContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+
+         return _productsViewer.getTable().getSelectionCount() > 0
+               ? _tableContextMenu : null;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _tableContextMenu = createUI_32_CreateViewerContextMenu();
+
+         return _tableContextMenu;
+      }
+
+   }
+
    private class ViewContentProvider implements IStructuredContentProvider {
 
       @Override
       public Object[] getElements(final Object parent) {
 
          return _products == null ? new String[] {} : _products.toArray();
-      }
-   }
-
-   private class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
-
-      @Override
-      public Image getColumnImage(final Object obj, final int index) {
-         return null;
-      }
-
-      @Override
-      public String getColumnText(final Object obj, final int index) {
-
-         final Product product = (Product) obj;
-
-         switch (index) {
-         case 0:
-            return product.code;
-
-         case 1:
-            return NutritionUtils.getProductFullName(product);
-
-         case 2:
-            return product.quantity;
-
-         default:
-            return getText(obj);
-         }
       }
    }
 
@@ -431,6 +455,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
       _viewerContainer = (Composite) super.createDialogArea(parent);
 
+      // define all columns for the viewer
+      _columnManager = new ColumnManager(this, _state);
+      defineAllColumns();
+
       _isInUIInit = true;
       {
          createActions();
@@ -446,6 +474,13 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       restoreState_WithUI();
 
       return _viewerContainer;
+   }
+
+   private void createMenuManager() {
+
+      _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      _viewerMenuManager.setRemoveAllWhenShown(true);
+      _viewerMenuManager.addMenuListener(manager -> fillContextMenu(manager));
    }
 
    private void createUI(final Composite parent) {
@@ -569,27 +604,12 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       final GridData gdDescription = (GridData) productsTable.getLayoutData();
       gdDescription.heightHint = _pc.convertHeightInCharsToPixels(15);
 
-      // column: Barcode
-      final TableColumn columnCode = new TableColumn(productsTable, SWT.TRAIL);
-      columnCode.setText(Messages.Tour_Nutrition_Column_Code);
-      columnCode.setWidth(_pc.convertWidthInCharsToPixels(20));
-      columnCode.addListener(SWT.Selection, _columnSortListener);
-      // column: Name
-      final TableColumn columnName = new TableColumn(productsTable, SWT.TRAIL);
-      columnName.setText(Messages.Tour_Nutrition_Column_Name);
-      columnName.setWidth(_pc.convertWidthInCharsToPixels(55));
-      columnName.addListener(SWT.Selection, _columnSortListener);
-      // column: Quantity
-      final TableColumn columnQuantity = new TableColumn(productsTable, SWT.TRAIL);
-      columnQuantity.setText(Messages.Tour_Nutrition_Column_Quantity);
-      columnQuantity.setWidth(_pc.convertWidthInCharsToPixels(15));
-      columnQuantity.addListener(SWT.Selection, _columnSortListener);
-
       _productsViewer = new TableViewer(productsTable);
+
+      _columnManager.createColumns(_productsViewer);
 
       _productsViewer.setContentProvider(new ViewContentProvider());
       _productsViewer.setComparator(_productComparator);
-      _productsViewer.setLabelProvider(new ViewLabelProvider());
 
       final Listener doubleClickListener = event -> {
 
@@ -616,6 +636,104 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          _postSelectionProvider.setSelection(selectedProduct);
          validateFields();
       });
+
+      createUI_30_ContextMenu();
+   }
+
+   /**
+    * create the views context menu
+    */
+   private void createUI_30_ContextMenu() {
+
+      _tableContextMenu = createUI_32_CreateViewerContextMenu();
+
+      final Table table = (Table) _productsViewer.getControl();
+
+      _columnManager.createHeaderContextMenu(table, _tableViewerContextMenuProvider);
+   }
+
+   private Menu createUI_32_CreateViewerContextMenu() {
+
+      final Table table = (Table) _productsViewer.getControl();
+      final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
+
+      return tableContextMenu;
+   }
+
+   private void defineAllColumns() {
+
+      defineColumn_10_Barcode();
+      defineColumn_20_Name();
+      defineColumn_30_Quantity();
+   }
+
+   private void defineColumn_10_Barcode() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_CODE, SWT.TRAIL);
+
+      colDef.setColumnLabel(COLUMN_CODE);
+      colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Code);
+
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Product product = (Product) cell.getElement();
+
+            cell.setText(product.code);
+         }
+      });
+   }
+
+   private void defineColumn_20_Name() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_NAME, SWT.TRAIL);
+
+      colDef.setColumnLabel(COLUMN_NAME);
+      colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Name);
+
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(55));
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Product product = (Product) cell.getElement();
+
+            cell.setText(NutritionUtils.getProductFullName(product));
+         }
+      });
+   }
+
+   private void defineColumn_30_Quantity() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_QUANTITY, SWT.TRAIL);
+
+      colDef.setColumnLabel(COLUMN_QUANTITY);
+      colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Quantity);
+
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Product product = (Product) cell.getElement();
+
+            cell.setText(product.quantity);
+         }
+      });
    }
 
    private void enableControls(final boolean isFocusSearchQuery) {
@@ -630,6 +748,11 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       _lblSearchType.setEnabled(true);
    }
 
+   private void fillContextMenu(final IMenuManager menuMgr) {
+
+      menuMgr.add(_actionAddProduct);
+   }
+
    private void fillUI() {
 
       /*
@@ -640,6 +763,11 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       _comboSearchType.select(0);
 
       _autocompleteProductSearchHistory = new AutocompleteComboInput(_comboSearchQuery);
+   }
+
+   @Override
+   public ColumnManager getColumnManager() {
+      return _columnManager;
    }
 
    @Override
@@ -661,11 +789,18 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       }
    }
 
+   @Override
+   public ColumnViewer getViewer() {
+      return _productsViewer;
+   }
+
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
 
-      _columnSortListener = event -> onSelect_SortColumn(event);
+      createMenuManager();
+
+      _columnSortListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
    }
 
    private void onAddProduct() {
@@ -743,7 +878,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       _nutritionQuery.asyncFind(searchText, productSearchType);
    }
 
-   private void onSelect_SortColumn(final Event e) {
+   private void onSelect_SortColumn(final SelectionEvent selectionEvent) {
 
       _viewerContainer.setRedraw(false);
       {
@@ -751,7 +886,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
          final ISelection selectionBackup = _productsViewer.getSelection();
 
          // toggle sorting
-         _productComparator.setSortColumn(e.widget);
+         _productComparator.setSortColumn(selectionEvent.widget);
          _productsViewer.refresh();
 
          // reselect selection
@@ -811,6 +946,27 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
 
    }
 
+   @Override
+   public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+
+      _viewerContainer.setRedraw(false);
+      {
+         _productsViewer.getTable().dispose();
+
+         createUI_20_Viewer(_viewerContainer);
+         _viewerContainer.layout();
+
+         // update the viewer
+         reloadViewer();
+      }
+      _viewerContainer.setRedraw(true);
+
+      return _productsViewer;
+   }
+
+   @Override
+   public void reloadViewer() {}
+
    private void restoreState() {
 
       // restore old used queries
@@ -856,6 +1012,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements PropertyChan
       table.setSelection(table.getSelectionIndex());
       table.setFocus();
    }
+
+   @Override
+   public void updateColumnHeader(final ColumnDefinition colDef) {}
 
    private void validateFields() {
 
