@@ -592,6 +592,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
        * table viewer: products
        */
       final Table productsTable = new Table(parent, SWT.SINGLE | SWT.FULL_SELECTION);
+      GridLayoutFactory.fillDefaults().margins(2, 2).applyTo(productsTable);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(productsTable);
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
