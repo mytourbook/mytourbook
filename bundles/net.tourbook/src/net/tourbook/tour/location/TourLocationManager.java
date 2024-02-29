@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import net.tourbook.OtherMessages;
 import net.tourbook.application.ApplicationVersion;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -911,7 +912,11 @@ public class TourLocationManager {
             true, // is set end
 
             true, // isOneAction
-            oneActionLocation);
+            oneActionLocation,
+
+            true, // isSaveTour
+            false // isLogLocation
+      );
 
       return true;
    }
@@ -1387,6 +1392,64 @@ public class TourLocationManager {
       return osmLocation;
    }
 
+   /**
+    * @param profileName
+    *
+    * @return Returns the location profile with the given name, when not available then the default
+    *         profile is returned
+    */
+   public static TourLocationProfile getProfile(final String profileName) {
+
+      for (final TourLocationProfile locationProfile : _allLocationProfiles) {
+
+         if (locationProfile.getName().equals(profileName)) {
+
+            return locationProfile;
+         }
+      }
+
+      return getDefaultProfile();
+   }
+
+   /**
+    * @param requestedLocationProfile
+    *
+    * @return Returns the index of the requested profile
+    */
+   public static int getProfileIndex(final TourLocationProfile requestedLocationProfile) {
+
+      final TourLocationProfile defaultProfile = getDefaultProfile();
+
+      if (requestedLocationProfile == null && defaultProfile != null) {
+
+         // return the index of the default profile
+
+         for (int profileIndex = 0; profileIndex < _allLocationProfiles.size(); profileIndex++) {
+
+            final TourLocationProfile locationProfile = _allLocationProfiles.get(profileIndex);
+
+            if (locationProfile == defaultProfile) {
+
+               return profileIndex;
+            }
+         }
+
+      } else {
+
+         for (int profileIndex = 0; profileIndex < _allLocationProfiles.size(); profileIndex++) {
+
+            final TourLocationProfile locationProfile = _allLocationProfiles.get(profileIndex);
+
+            if (locationProfile == requestedLocationProfile) {
+
+               return profileIndex;
+            }
+         }
+      }
+
+      return 0;
+   }
+
    public static List<TourLocationProfile> getProfiles() {
 
       return _allLocationProfiles;
@@ -1855,7 +1918,7 @@ public class TourLocationManager {
       if (_defaultProfile == null && numProfiles > 0) {
 
          // set first profile as default
-         
+
          _defaultProfile = _allLocationProfiles.get(0);
       }
    }
@@ -2121,6 +2184,7 @@ public class TourLocationManager {
     *           When <code>true</code> then existing locations are ignored and retrieved again from
     *           the DB or location provider
     * @param oneActionLocation
+    * @param isLogLocation
     */
    public static void setTourLocations(final List<TourData> requestedTours,
                                        final TourLocationProfile locationProfile,
@@ -2129,7 +2193,10 @@ public class TourLocationManager {
                                        final boolean isSetEndLocation,
 
                                        final boolean isOneAction,
-                                       final TourLocation oneActionLocation) {
+                                       final TourLocation oneActionLocation,
+
+                                       final boolean isSaveTour,
+                                       final boolean isLogLocation) {
 
       final ArrayList<TourData> savedTours = new ArrayList<>();
 
@@ -2140,14 +2207,17 @@ public class TourLocationManager {
          final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
             @Override
-            public void run(final IProgressMonitor monitor)
-                  throws InvocationTargetException, InterruptedException {
+            public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
                final int numTours = requestedTours.size();
                final int numRequests = numTours * (isSetStartLocation && isSetEndLocation ? 2 : 1);
                int numWorked = 0;
 
-               monitor.beginTask(Messages.Tour_Location_Task_RetrievingTourLocations.formatted(numRequests), numRequests);
+               final String taskMessage = isSaveTour
+                     ? Messages.Tour_Location_Task_RetrieveAndSaveTourLocations
+                     : Messages.Tour_Location_Task_RetrievingTourLocations;
+
+               monitor.beginTask(taskMessage.formatted(numRequests), numRequests);
 
                for (final TourData tourData : requestedTours) {
 
@@ -2309,10 +2379,27 @@ public class TourLocationManager {
 
                   if (isModified) {
 
-                     TourManager.saveModifiedTour(tourData, false);
+                     if (isLogLocation) {
 
-                     savedTours.add(tourData);
+                        // %s - "%s"  . . .  "%s"
+                        TourLogManager.subLog_DEFAULT(
+
+                              OtherMessages.LOG_RETRIEVE_TOUR_LOCATION_TOUR.formatted(
+
+                                    TourManager.getTourDateTimeShort(tourData),
+                                    tourData.getTourStartPlace(),
+                                    tourData.getTourEndPlace()));
+
+                     }
+
+                     if (isSaveTour) {
+
+                        TourManager.saveModifiedTour(tourData, false);
+
+                        savedTours.add(tourData);
+                     }
                   }
+
                }
             }
          };

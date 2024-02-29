@@ -16,9 +16,6 @@
 package net.tourbook.common;
 
 import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
-import static org.eclipse.swt.events.MouseTrackListener.mouseEnterAdapter;
-import static org.eclipse.swt.events.MouseTrackListener.mouseExitAdapter;
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -83,7 +80,9 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
@@ -125,6 +124,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.menus.UIElement;
 import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
@@ -145,6 +145,7 @@ public class UI {
    public static final char         SYMBOL_BRACKET_LEFT                  = '(';
    public static final char         SYMBOL_BRACKET_RIGHT                 = ')';
 
+   public static final String       COLON_SPACE                          = ": ";                                        //$NON-NLS-1$
    public static final String       COMMA_SPACE                          = ", ";                                        //$NON-NLS-1$
    /** This is not a real dash it's the negative sign character */
    public static final String       DASH                                 = "-";                                         //$NON-NLS-1$
@@ -630,14 +631,14 @@ public class UI {
     *
     * @since 3.2
     */
-   private static final String DIALOG_WIDTH              = "DIALOG_WIDTH";                //$NON-NLS-1$
+   public static final String  DIALOG_WIDTH              = "DIALOG_WIDTH";                //$NON-NLS-1$
 
    /**
     * The dialog settings key name for stored dialog height.
     *
     * @since 3.2
     */
-   private static final String DIALOG_HEIGHT             = "DIALOG_HEIGHT";               //$NON-NLS-1$
+   public static final String  DIALOG_HEIGHT             = "DIALOG_HEIGHT";               //$NON-NLS-1$
 
    /**
     * The dialog settings key name for the font used when the dialog height and width was stored.
@@ -926,13 +927,13 @@ public class UI {
             ? ThemeUtil.getDefaultForegroundColor_Shell()
             : display.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
 
-      sash.addMouseTrackListener(mouseEnterAdapter(mouseEvent -> sash.setBackground(mouseEnterColor)));
-      sash.addMouseTrackListener(mouseExitAdapter(mouseEvent -> sash.setBackground(mouseExitColor)));
+      sash.addMouseTrackListener(MouseTrackListener.mouseEnterAdapter(mouseEvent -> sash.setBackground(mouseEnterColor)));
+      sash.addMouseTrackListener(MouseTrackListener.mouseExitAdapter(mouseEvent -> sash.setBackground(mouseExitColor)));
 
       // set color when sash is initially displayed
       sash.addControlListener(controlResizedAdapter(controlEvent -> sash.setBackground(mouseExitColor)));
 
-      sash.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+      sash.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
 
          // hide background when sash is dragged
 
@@ -1511,6 +1512,28 @@ public class UI {
       label.setToolTipText(tooltip);
 
       return label;
+   }
+
+   /**
+    * Creates a page with a static text by using a {@link FormToolkit}
+    *
+    * @param formToolkit
+    * @param parent
+    * @param labelText
+    *
+    * @return
+    */
+   public static Composite createPage(final FormToolkit formToolkit, final Composite parent, final String labelText) {
+
+      final Composite container = formToolkit.createComposite(parent);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = formToolkit.createLabel(container, labelText, SWT.WRAP);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+      }
+
+      return container;
    }
 
    /**
@@ -2402,14 +2425,43 @@ public class UI {
       notication.open();
    }
 
-   public static void paintImageCentered(final Event event, final Image image, final int availableWidth) {
+   /**
+    * @param event
+    * @param image
+    * @param availableWidth
+    * @param alignment
+    *           SWT.* alignment values
+    */
+   public static void paintImage(final Event event,
+                                 final Image image,
+                                 final int availableWidth,
+                                 final int alignment) {
 
       final Rectangle imageRect = image.getBounds();
+      
+      final int imageWidth = imageRect.width;
+      final int imageWidth2 = imageWidth / 2;
 
-      // center horizontal
-      final int xOffset = (availableWidth - imageRect.width) / 2;
+      /*
+       * Horizontal alignment
+       */
+      int xOffset = 0;
 
-      // center vertical
+// SET_FORMATTING_OFF
+
+      switch (alignment) {
+
+      case SWT.CENTER   -> {  xOffset = (availableWidth - imageWidth2) / 2;   }
+      case SWT.RIGHT    -> {  xOffset = availableWidth - imageWidth;          }
+      default           -> {  xOffset = 2;                                    }  // == left alignment
+
+      }
+
+// SET_FORMATTING_ON
+
+      /*
+       * Vertical alignment: centered
+       */
       final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
 
       final int devX = event.x + xOffset;
@@ -2707,11 +2759,17 @@ public class UI {
          @Override
          protected boolean isEditorActivationEvent(final ColumnViewerEditorActivationEvent event) {
 
-            return (event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL)
-                  || (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION)
-                  || ((event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED)
+            final int eventType = event.eventType;
+
+            return eventType == ColumnViewerEditorActivationEvent.TRAVERSAL // 5
+                  || eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION // 2
+
+                  || ((eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED) // 1
                         && (event.keyCode == SWT.CR))
-                  || (event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC);
+
+                  || eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC // 4
+
+            ;
          }
       };
 

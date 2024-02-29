@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,11 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.importdata;
-
-import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
-import static org.eclipse.swt.events.FocusListener.focusLostAdapter;
-import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,6 +44,8 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.location.TourLocationManager;
+import net.tourbook.tour.location.TourLocationProfile;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ComboViewerCadence;
 import net.tourbook.ui.views.rawData.RawDataView;
@@ -87,6 +84,7 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
@@ -243,6 +241,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Button               _chkIL_AdjustTemperature;
    private Button               _chkIL_ReplaceElevationFromSRTM;
    private Button               _chkIL_ReplaceFirstTimeSliceElevation;
+   private Button               _chkIL_RetrieveTourLocation;
    private Button               _chkIL_RetrieveWeatherData;
    private Button               _chkIL_SaveTour;
    private Button               _chkIL_SetLastMarker;
@@ -269,6 +268,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Combo                _comboIC_DeviceFolder;
    private Combo                _comboIC_DeviceType;
    private Combo                _comboIL_TourType;
+   private Combo                _comboIL_TourLocationProfiles;
    private ComboViewerCadence   _comboIL_One_TourType_Cadence;
    private ComboViewerCadence[] _comboTT_Cadence;
    //
@@ -290,6 +290,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Label                _lblIL_One_TourTypeCadenceLabel;
    private Label                _lblIL_TemperatureAdjustmentDuration;
    private Label                _lblIL_TemperatureAdjustmentDuration_Unit;
+   private Label                _lblIL_TourLocationProfiles;
    private Label[]              _lblTT_Speed_SpeedUnit;
    private Label[]              _lblTT_Speed_TourTypeIcon;
    //
@@ -755,6 +756,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       createActions();
 
       createUI(ui);
+
+      fillUI();
       createMenus();
 
       addPrefListener();
@@ -772,7 +775,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
        */
       final MenuManager menuMgr = new MenuManager();
       menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(this::fillTourTypeMenu);
+      menuMgr.addMenuListener(menuManager -> fillTourTypeMenu(menuManager));
       final Menu ttContextMenu = menuMgr.createContextMenu(_linkTT_One_TourType);
       _linkTT_One_TourType.setMenu(ttContextMenu);
    }
@@ -1069,7 +1072,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
              */
             _btnIC_New = new Button(container, SWT.NONE);
             _btnIC_New.setText(Messages.App_Action_New);
-            _btnIC_New.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIC_Add(false)));
+            _btnIC_New.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onIC_Add(false)));
             setButtonLayoutData(_btnIC_New);
          }
 
@@ -1079,7 +1082,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
              */
             _btnIC_Duplicate = new Button(container, SWT.NONE);
             _btnIC_Duplicate.setText(Messages.App_Action_Duplicate);
-            _btnIC_Duplicate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIC_Add(true)));
+            _btnIC_Duplicate.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onIC_Add(true)));
             setButtonLayoutData(_btnIC_Duplicate);
          }
 
@@ -1089,7 +1092,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
              */
             _btnIC_Remove = new Button(container, SWT.NONE);
             _btnIC_Remove.setText(Messages.App_Action_Remove_Immediate);
-            _btnIC_Remove.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIC_Remove()));
+            _btnIC_Remove.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onIC_Remove()));
             setButtonLayoutData(_btnIC_Remove);
          }
 
@@ -1167,7 +1170,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _chkIC_CreateBackup.setText(Messages.Dialog_ImportConfig_Checkbox_CreateBackup);
          _chkIC_CreateBackup.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_CreateBackup_Tooltip);
          _chkIC_CreateBackup.addSelectionListener(_icSelectionListener);
-         _chkIC_CreateBackup.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+         _chkIC_CreateBackup.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
             if (_chkIC_CreateBackup.getSelection()) {
                _comboIC_BackupFolder.setFocus();
             }
@@ -1217,7 +1220,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           */
          _btnIC_SelectBackupFolder = new Button(container, SWT.PUSH);
          _btnIC_SelectBackupFolder.setText(Messages.app_btn_browse);
-         _btnIC_SelectBackupFolder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_IC_Folder_Backup()));
+         _btnIC_SelectBackupFolder.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_IC_Folder_Backup()));
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(_btnIC_SelectBackupFolder);
@@ -1288,15 +1291,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           */
          _comboIC_DeviceType = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
          _comboIC_DeviceType.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceType_Tooltip);
-         _comboIC_DeviceType.add(Messages.Dialog_ImportConfig_Combo_Device_LocalDevice);
          _comboIC_DeviceType.addModifyListener(deviceTypeListener);
 
          GridDataFactory.fillDefaults()
                .indent(CONTROL_DECORATION_WIDTH, 0)
                .align(SWT.LEFT, SWT.CENTER)
                .applyTo(_comboIC_DeviceType);
-
-         FileSystemManager.getFileSystemsIds().forEach(_comboIC_DeviceType::add);
       }
 
       {
@@ -1340,7 +1340,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _btnIC_SelectDeviceFolder = new Button(container, SWT.PUSH);
          _btnIC_SelectDeviceFolder.setText(Messages.app_btn_browse);
          _btnIC_SelectDeviceFolder.setData(_comboIC_DeviceFolder);
-         _btnIC_SelectDeviceFolder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_IC_Folder_Device()));
+         _btnIC_SelectDeviceFolder.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_IC_Folder_Device()));
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(_btnIC_SelectDeviceFolder);
@@ -1399,7 +1399,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       {
          _linkIC_ILActions = new Link(parent, SWT.NONE);
          _linkIC_ILActions.setText(Messages.Dialog_ImportConfig_Link_OtherActions);
-         _linkIC_ILActions.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_IC_LauncherActions()));
+         _linkIC_ILActions.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_IC_LauncherActions()));
          GridDataFactory.fillDefaults()
                .grab(true, false)
                .span(2, 1)
@@ -1479,7 +1479,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          createUI_530_IL_Actions(container);
          createUI_540_IL_Detail(container);
 
-         createUI_570_IL_DragDropHint(container);
+         createUI_699_IL_DragDropHint(container);
       }
 
       return container;
@@ -1718,7 +1718,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _btnIL_NewOne.setImage(TourTypeImage.getTourTypeImage(TourType.IMAGE_KEY_DIALOG_SELECTION));
          _btnIL_NewOne.setText(Messages.Dialog_ImportConfig_Action_NewOneTourType);
          _btnIL_NewOne.setToolTipText(Messages.Dialog_ImportConfig_Action_NewOneTourType_Tooltip);
-         _btnIL_NewOne.addSelectionListener(widgetSelectedAdapter(selectionEvent -> UI.openControlMenu(_btnIL_NewOne)));
+         _btnIL_NewOne.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> UI.openControlMenu(_btnIL_NewOne)));
          setButtonLayoutData(_btnIL_NewOne);
 
          /*
@@ -1726,7 +1726,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           */
          final MenuManager menuMgr = new MenuManager();
          menuMgr.setRemoveAllWhenShown(true);
-         menuMgr.addMenuListener(this::fillTourTypeOneMenu);
+         menuMgr.addMenuListener(menuManager -> fillTourTypeOneMenu(menuManager));
          final Menu ttContextMenu = menuMgr.createContextMenu(_btnIL_NewOne);
          _btnIL_NewOne.setMenu(ttContextMenu);
 
@@ -1735,7 +1735,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           */
          _btnIL_New = new Button(container, SWT.NONE);
          _btnIL_New.setText(Messages.App_Action_New);
-         _btnIL_New.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIL_Add(false)));
+         _btnIL_New.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onIL_Add(false)));
          setButtonLayoutData(_btnIL_New);
 
          /*
@@ -1743,7 +1743,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           */
          _btnIL_Duplicate = new Button(container, SWT.NONE);
          _btnIL_Duplicate.setText(Messages.App_Action_Duplicate);
-         _btnIL_Duplicate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIL_Add(true)));
+         _btnIL_Duplicate.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onIL_Add(true)));
          setButtonLayoutData(_btnIL_Duplicate);
 
          /*
@@ -1751,7 +1751,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           */
          _btnIL_Remove = new Button(container, SWT.NONE);
          _btnIL_Remove.setText(Messages.App_Action_Remove_Immediate);
-         _btnIL_Remove.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIL_Remove()));
+         _btnIL_Remove.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onIL_Remove()));
          setButtonLayoutData(_btnIL_Remove);
 
          // align to the end
@@ -1773,13 +1773,14 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 //      group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
       {
          createUI_542_IL_Name(group);
-         createUI_550_IL_TourType(group);
-         createUI_580_IL_LastMarker(group);
-         createUI_590_IL_AdjustTemperature(group);
-         createUI_591_IL_AdjustElevation(group);
-         createUI_592_IL_SetElevationFromSRTM(group);
-         createUI_595_IL_RetrieveWeatherData(group);
-         createUI_599_IL_Save(group);
+         createUI_550_IL_03_TourType(group);
+         createUI_600_IL_04_LastMarker(group);
+         createUI_600_IL_05_AdjustTemperature(group);
+         createUI_600_IL_06_AdjustElevation(group);
+         createUI_600_IL_07_SetElevationFromSRTM(group);
+         createUI_600_IL_50_RetrieveWeatherData(group);
+         createUI_600_IL_51_RetrieveTourLocations(group);
+         createUI_600_IL_99_Save(group);
       }
    }
 
@@ -1833,9 +1834,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private void createUI_550_IL_TourType(final Composite parent) {
+   private void createUI_550_IL_03_TourType(final Composite parent) {
 
-      final SelectionListener ttListener = widgetSelectedAdapter(selectionEvent -> onSelect_IL_TourType());
+      final SelectionListener ttListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_IL_TourType());
 
       /*
        * Checkbox: Set tour type
@@ -1861,11 +1862,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                .align(SWT.BEGINNING, SWT.FILL)
                .indent(_leftPadding, 0)
                .applyTo(_comboIL_TourType);
-
-         // fill combo
-         for (final ComboEnumEntry<?> tourTypeItem : RawDataManager.ALL_IMPORT_TOUR_TYPE_CONFIG) {
-            _comboIL_TourType.add(tourTypeItem.label);
-         }
 
          // options
          _pagebookTourType = new PageBook(parent, SWT.NONE);
@@ -1915,7 +1911,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           */
          _linkTT_One_TourType = new Link(container, SWT.NONE);
          _linkTT_One_TourType.setText(Messages.Dialog_ImportConfig_Link_TourType);
-         _linkTT_One_TourType.addSelectionListener(widgetSelectedAdapter(
+         _linkTT_One_TourType.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                selectionEvent -> net.tourbook.common.UI.openControlMenu(_linkTT_One_TourType)));
 
          GridDataFactory.fillDefaults().grab(true, false).applyTo(_linkTT_One_TourType);
@@ -2129,23 +2125,14 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             .applyTo(speedTTContainer);
 
       _speedTourType_ScrolledContainer.setContent(speedTTContainer);
-      _speedTourType_ScrolledContainer.addControlListener(controlResizedAdapter(
+      _speedTourType_ScrolledContainer.addControlListener(ControlListener.controlResizedAdapter(
             ControlEvent -> _speedTourType_ScrolledContainer.setMinSize(
                   speedTTContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT))));
 
       return speedTTContainer;
    }
 
-   private void createUI_570_IL_DragDropHint(final Composite parent) {
-
-      final Label label = new Label(parent, SWT.WRAP);
-      label.setText(Messages.Dialog_ImportConfig_Info_ConfigDragDrop);
-      GridDataFactory.fillDefaults()
-            .span(3, 1)
-            .applyTo(label);
-   }
-
-   private void createUI_580_IL_LastMarker(final Composite parent) {
+   private void createUI_600_IL_04_LastMarker(final Composite parent) {
 
       {
          /*
@@ -2160,7 +2147,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                .indent(0, 5)
                .applyTo(_chkIL_SetLastMarker);
       }
-
       {
          /*
           * Last marker distance
@@ -2193,7 +2179,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblIL_LastMarkerDistanceUnit);
          }
       }
-
       {
          /*
           * Marker text
@@ -2215,7 +2200,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private void createUI_590_IL_AdjustTemperature(final Composite parent) {
+   private void createUI_600_IL_05_AdjustTemperature(final Composite parent) {
 
       {
          /*
@@ -2263,7 +2248,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                updateUI_TemperatureAdjustmentDuration();
                onIL_Modified();
             });
-            _spinnerIL_TemperatureAdjustmentDuration.addSelectionListener(widgetSelectedAdapter(
+            _spinnerIL_TemperatureAdjustmentDuration.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> {
                      updateUI_TemperatureAdjustmentDuration();
                      onIL_Modified();
@@ -2313,7 +2298,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
    }
 
-   private void createUI_591_IL_AdjustElevation(final Composite parent) {
+   private void createUI_600_IL_06_AdjustElevation(final Composite parent) {
 
       /*
        * Checkbox: Adjust Elevation
@@ -2328,7 +2313,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             .applyTo(_chkIL_ReplaceFirstTimeSliceElevation);
    }
 
-   private void createUI_592_IL_SetElevationFromSRTM(final Composite parent) {
+   private void createUI_600_IL_07_SetElevationFromSRTM(final Composite parent) {
 
       /*
        * Checkbox: Set elevation up/down values from SRTM data
@@ -2342,7 +2327,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             .applyTo(_chkIL_ReplaceElevationFromSRTM);
    }
 
-   private void createUI_595_IL_RetrieveWeatherData(final Composite parent) {
+   private void createUI_600_IL_50_RetrieveWeatherData(final Composite parent) {
 
       /*
        * Checkbox: Retrieve Weather Data
@@ -2358,7 +2343,44 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    }
 
-   private void createUI_599_IL_Save(final Composite parent) {
+   private void createUI_600_IL_51_RetrieveTourLocations(final Composite parent) {
+
+      {
+         /*
+          * Checkbox: Set tour location
+          */
+
+         _chkIL_RetrieveTourLocation = new Button(parent, SWT.CHECK);
+         _chkIL_RetrieveTourLocation.setText(Messages.Dialog_ImportConfig_Checkbox_RetrieveTourLocation);
+         _chkIL_RetrieveTourLocation.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_RetrieveTourLocation_Tooltip);
+         _chkIL_RetrieveTourLocation.addSelectionListener(_defaultModify_Listener);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .indent(0, 5)
+               .applyTo(_chkIL_RetrieveTourLocation);
+      }
+      {
+         /*
+          * Location profile
+          */
+
+         // label
+         _lblIL_TourLocationProfiles = new Label(parent, SWT.NONE);
+         _lblIL_TourLocationProfiles.setText(Messages.Dialog_ImportConfig_Label_LocationProfile);
+         _lblIL_TourLocationProfiles.setToolTipText(Messages.Dialog_ImportConfig_Label_LocationProfile_Tooltip);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .indent(_leftPadding, 0)
+               .applyTo(_lblIL_TourLocationProfiles);
+
+         // combo
+         _comboIL_TourLocationProfiles = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
+         _comboIL_TourLocationProfiles.setVisibleItemCount(30);
+         _comboIL_TourLocationProfiles.addSelectionListener(_ilSelectionListener);
+      }
+   }
+
+   private void createUI_600_IL_99_Save(final Composite parent) {
 
       {
          /*
@@ -2386,6 +2408,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                .indent(0, convertVerticalDLUsToPixels(10))
                .applyTo(_chkIL_ShowInDashboard);
       }
+   }
+
+   private void createUI_699_IL_DragDropHint(final Composite parent) {
+
+      final Label label = new Label(parent, SWT.WRAP);
+      label.setText(Messages.Dialog_ImportConfig_Info_ConfigDragDrop);
+      GridDataFactory.fillDefaults()
+            .span(3, 1)
+            .applyTo(label);
    }
 
    private Composite createUI_900_Tab_Options(final Composite parent) {
@@ -2998,13 +3029,19 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    private void enable_IL_Controls() {
 
-      final int numLaunchers = _dialogEasyConfig.importLaunchers.size();
-      final boolean isLauncherAvailable = numLaunchers > 0;
+// SET_FORMATTING_OFF
 
-      final boolean isILSelected = _selectedIL != null;
-      final boolean isLastMarkerSelected = isILSelected && _chkIL_SetLastMarker.getSelection();
-      final boolean isAdjustTemperature = isILSelected && _chkIL_AdjustTemperature.getSelection();
-      final boolean isWeatherRetrievalActivated = TourManager.isWeatherRetrievalActivated();
+      final int numLaunchers              = _dialogEasyConfig.importLaunchers.size();
+      final boolean isLauncherAvailable   = numLaunchers > 0;
+
+      final boolean isILSelected                   = _selectedIL != null;
+
+      final boolean isAdjustTemperature            = isILSelected && _chkIL_AdjustTemperature.getSelection();
+      final boolean isLastMarkerSelected           = isILSelected && _chkIL_SetLastMarker.getSelection();
+      final boolean isSetTourLocation              = isILSelected && _chkIL_RetrieveTourLocation.getSelection();
+      final boolean isWeatherRetrievalActivated    = TourManager.isWeatherRetrievalActivated();
+
+// SET_FORMATTING_ON
 
       boolean isSetTourType = isILSelected && _chkIL_SetTourType.getSelection();
 
@@ -3105,6 +3142,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       // Retrieve weather data
       _chkIL_RetrieveWeatherData    .setEnabled(isWeatherRetrievalActivated);
 
+      // set tour location
+      _lblIL_TourLocationProfiles   .setEnabled(isSetTourLocation);
+      _comboIL_TourLocationProfiles .setEnabled(isSetTourLocation);
+
       _ilViewer.getTable()          .setEnabled(isLauncherAvailable);
 
 // SET_FORMATTING_ON
@@ -3178,6 +3219,23 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       menuMgr.add(_actionOpenTourTypePrefs);
    }
 
+   private void fillUI() {
+
+      // device types
+      _comboIC_DeviceType.add(Messages.Dialog_ImportConfig_Combo_Device_LocalDevice);
+      FileSystemManager.getFileSystemsIds().forEach(text -> _comboIC_DeviceType.add(text));
+
+      // tour types
+      for (final ComboEnumEntry<?> tourTypeItem : RawDataManager.ALL_IMPORT_TOUR_TYPE_CONFIG) {
+         _comboIL_TourType.add(tourTypeItem.label);
+      }
+
+      // location profiles
+      for (final TourLocationProfile profile : TourLocationManager.getProfiles()) {
+         _comboIL_TourLocationProfiles.add(profile.getName());
+      }
+   }
+
    @Override
    protected IDialogSettings getDialogBoundsSettings() {
 
@@ -3188,6 +3246,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    /**
     * @param importLauncher
+    *
     * @return Returns from the model the last marker distance value in the current measurment
     *         system.
     */
@@ -3210,6 +3269,18 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             * 100;
 
       return (int) lastMarkerDistance;
+   }
+
+   private TourLocationProfile getSelectedTourLocation() {
+
+      final int selectedLocationIndex = _comboIL_TourLocationProfiles.getSelectionIndex();
+
+      if (selectedLocationIndex >= 0) {
+
+         return TourLocationManager.getProfiles().get(selectedLocationIndex);
+      }
+
+      return TourLocationManager.getDefaultProfile();
    }
 
    /**
@@ -3272,7 +3343,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       /*
        * IC listener
        */
-      _icSelectionListener = widgetSelectedAdapter(selectionEvent -> {
+      _icSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> {
          onIC_Modified();
          enable_IC_Controls();
       });
@@ -3282,24 +3353,24 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       /*
        * Path listener
        */
-      _ic_FolderFocusListener = focusLostAdapter(this::onIC_Folder_FocusLost);
+      _ic_FolderFocusListener = FocusListener.focusLostAdapter(focusEvent -> onIC_Folder_FocusLost(focusEvent));
       _ic_FolderModifyListener = modifyEvent -> {
          onIC_Folder_Modified(modifyEvent);
          onIC_Modified();
       };
-      _ic_FolderKeyListener = keyPressedAdapter(this::onIC_Folder_KeyPressed);
+      _ic_FolderKeyListener = KeyListener.keyPressedAdapter(keyEvent -> onIC_Folder_KeyPressed(keyEvent));
 
       /*
        * IL listener
        */
       _ilModifyListener = modifyEvent -> onIL_Modified();
 
-      _ilSelectionListener = widgetSelectedAdapter(selectionEvent -> onIL_Modified());
+      _ilSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onIL_Modified());
 
       /*
        * Field listener
        */
-      _liveUpdateListener = widgetSelectedAdapter(selectionEvent -> doLiveUpdate());
+      _liveUpdateListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> doLiveUpdate());
       _liveUpdateMouseWheelListener = mouseEvent -> {
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
          doLiveUpdate();
@@ -3308,14 +3379,14 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       /*
        * Default mouse listener
        */
-      _defaultMouseWheelListener = UI::adjustSpinnerValueOnMouseScroll;
+      _defaultMouseWheelListener = mouseEvent -> UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
 
-      _speedTourTypeListener = widgetSelectedAdapter(selectionEvent -> UI.openControlMenu((Link) selectionEvent.widget));
+      _speedTourTypeListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> UI.openControlMenu((Link) selectionEvent.widget));
 
       /*
        * Default modify listener
        */
-      _defaultModify_Listener = widgetSelectedAdapter(selectionEvent -> {
+      _defaultModify_Listener = SelectionListener.widgetSelectedAdapter(selectionEvent -> {
          onIL_Modified();
          enable_IL_Controls();
       });
@@ -3631,6 +3702,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _selectedIL.tourAvgTemperature                  = UI.convertTemperatureToMetric(_spinnerIL_AvgTemperature.getSelection());
 
       _selectedIL.isReplaceFirstTimeSliceElevation    = _chkIL_ReplaceFirstTimeSliceElevation.getSelection();
+      _selectedIL.isRetrieveTourLocation              = _chkIL_RetrieveTourLocation.getSelection();
       _selectedIL.isRetrieveWeatherData               = _chkIL_RetrieveWeatherData.getSelection();
       _selectedIL.isSaveTour                          = _chkIL_SaveTour.getSelection();
       _selectedIL.isReplaceElevationFromSRTM          = _chkIL_ReplaceElevationFromSRTM.getSelection();
@@ -4189,6 +4261,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _selectedIL.tourTypeConfig       = selectedTourTypeConfig;
       _selectedIL.isSetTourType        = _chkIL_SetTourType.getSelection();
 
+      // tour location
+      _selectedIL.isRetrieveTourLocation    = _chkIL_RetrieveTourLocation.getSelection();
+      _selectedIL.tourLocationProfile  = getSelectedTourLocation();
+
 // SET_FORMATTING_ON
 
       /*
@@ -4374,14 +4450,18 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _spinnerIL_TemperatureAdjustmentDuration.setSelection(_selectedIL.temperatureAdjustmentDuration);
          updateUI_TemperatureAdjustmentDuration();
 
-         // Retrieve Weather Data
-         _chkIL_RetrieveWeatherData.setSelection(_selectedIL.isRetrieveWeatherData);
-
          // adjust elevation
          _chkIL_ReplaceFirstTimeSliceElevation.setSelection(_selectedIL.isReplaceFirstTimeSliceElevation);
 
          // set elevation from SRTM data
          _chkIL_ReplaceElevationFromSRTM.setSelection(_selectedIL.isReplaceElevationFromSRTM);
+
+         // Retrieve Weather Data
+         _chkIL_RetrieveWeatherData.setSelection(_selectedIL.isRetrieveWeatherData);
+
+         // retrieve tour location
+         _chkIL_RetrieveTourLocation.setSelection(_selectedIL.isRetrieveTourLocation);
+         _comboIL_TourLocationProfiles.select(TourLocationManager.getProfileIndex(_selectedIL.tourLocationProfile));
 
          final Enum<TourTypeConfig> tourTypeConfig = _selectedIL.tourTypeConfig;
          final boolean isSetTourType = tourTypeConfig != null && _selectedIL.isSetTourType;

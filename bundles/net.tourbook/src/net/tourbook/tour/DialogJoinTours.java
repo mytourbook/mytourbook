@@ -1320,7 +1320,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
                joinedDescription.append(UI.NEW_LINE2);
             }
 
-            joinedDescription.append(Messages.Dialog_JoinTours_Label_Tour + net.tourbook.ui.UI.COLON_SPACE);
+            joinedDescription.append(Messages.Dialog_JoinTours_Label_Tour + UI.COLON_SPACE);
             joinedDescription.append(TourManager.getTourTitleDetailed(tourData));
 
             final String tourDescription = tourData.getTourDescription();

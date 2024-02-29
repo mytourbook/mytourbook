@@ -21,6 +21,8 @@ public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.ui.messages";                    //$NON-NLS-1$
 
+   public static String        ColumnFactory_AirQuality;
+   public static String        ColumnFactory_AirQuality_Label;
    public static String        ColumnFactory_altitude_computed_difference_tooltip;
    public static String        ColumnFactory_altitude_difference_label;
    public static String        ColumnFactory_altitude_difference_tooltip;
@@ -649,6 +651,7 @@ public class Messages extends NLS {
    public static String        Tour_Location_Part_SettlementSmall;
    public static String        Tour_Location_Part_Waterway;
    public static String        Tour_Location_Task_RemovingTourLocations;
+   public static String        Tour_Location_Task_RetrieveAndSaveTourLocations;
    public static String        Tour_Location_Task_RetrievingTourLocations;
    public static String        Tour_Location_Task_RetrievingTourLocations_Subtask;
    public static String        Tour_Location_Tooltip_Label_Usage;

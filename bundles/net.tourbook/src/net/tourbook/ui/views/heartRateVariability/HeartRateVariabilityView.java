@@ -31,6 +31,7 @@ import net.tourbook.chart.ChartType;
 import net.tourbook.chart.MinMaxKeeper_XData;
 import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
@@ -45,7 +46,6 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
@@ -247,7 +247,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
             // grid has changed
 
-            UI.updateChartProperties(_chartHRV, GRID_PREF_PREFIX);
+            net.tourbook.ui.UI.updateChartProperties(_chartHRV, GRID_PREF_PREFIX);
 
             updateChart_50_CurrentTours(true);
 
@@ -625,7 +625,7 @@ public class HeartRateVariabilityView extends ViewPart {
       _chartHRV = new Chart(parent, SWT.FLAT);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartHRV);
 
-      UI.updateChartProperties(_chartHRV, GRID_PREF_PREFIX);
+      net.tourbook.ui.UI.updateChartProperties(_chartHRV, GRID_PREF_PREFIX);
 
       // Show title
       _chartHRV.getChartTitleSegmentConfig().isShowSegmentTitle = true;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 
 package net.tourbook.ui;
+
+import static net.tourbook.common.UI.EMPTY_STRING;
 
 import java.util.ArrayList;
 
@@ -239,14 +241,14 @@ public class TourTypeFilter {
     */
    public TourTypeSQLData getSQLData() {
 
-      String sqlWhereClause = UI.EMPTY_STRING;
+      String sqlWhereClause = EMPTY_STRING;
       final ArrayList<Long> sqlTourTypes = new ArrayList<>();
 
       switch (_filterType) {
       case FILTER_TYPE_SYSTEM:
          if (_systemFilterId == SYSTEM_FILTER_ID_ALL) {
             // select all tour types also not defined tour types
-            sqlWhereClause = UI.EMPTY_STRING;
+            sqlWhereClause = EMPTY_STRING;
          } else {
             // select tour types which are not defined
             sqlWhereClause = " AND TourData.tourType_typeId IS NULL\n"; //$NON-NLS-1$

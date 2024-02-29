@@ -18,15 +18,9 @@ package net.tourbook.data;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skedgo.converter.TimezoneMapper;
 
 import java.awt.Point;
@@ -10954,7 +10948,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    /**
     * @return Returns the index for the air quality value in
-    *         {@link IWeather#airQualityTexts} or 0 when the air quality
+    *         {@link IWeather#AIR_QUALITY_TEXT} or 0 when the air quality
     *         index is not defined
     */
    public int getWeather_AirQuality_TextIndex() {
@@ -11041,8 +11035,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * @return Returns the index for the cloud values in {@link IWeather#cloudIcon} and
-    *         {@link IWeather#cloudText} or 0 when the clouds are not defined
+    * @return Returns the index for the cloud values in {@link IWeather#CLOUD_ICON} and
+    *         {@link IWeather#CLOUD_TEXT} or 0 when the clouds are not defined
     */
    public int getWeatherIndex() {
 
@@ -13574,28 +13568,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                                          final int projectionHash) {
 
       _twpWorldPosition.put(projectionHash + zoomLevel, worldPositions);
-   }
-
-   public String toJson() {
-
-      final ObjectMapper mapper = new ObjectMapper();
-      mapper.setSerializationInclusion(Include.NON_NULL);
-      mapper.setSerializationInclusion(Include.NON_EMPTY);
-      mapper.setConfig(mapper.getSerializationConfig()
-            .with(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY));
-      mapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
-      mapper.setVisibility(PropertyAccessor.FIELD, Visibility.NONE);
-      mapper.setVisibility(PropertyAccessor.GETTER, Visibility.NONE);
-      mapper.setVisibility(PropertyAccessor.IS_GETTER, Visibility.NONE);
-      mapper.setVisibility(PropertyAccessor.SETTER, Visibility.NONE);
-
-      String jsonString = UI.EMPTY_STRING;
-      try {
-         jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
-      } catch (final JsonProcessingException e) {
-         e.printStackTrace();
-      }
-      return jsonString;
    }
 
    @Override

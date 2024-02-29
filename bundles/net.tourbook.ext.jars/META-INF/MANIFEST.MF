@@ -21,7 +21,7 @@ Bundle-ClassPath:
  jackson-core-2.16.0.jar,
  jackson-databind-2.16.0.jar,
  jackson-annotations-2.16.0.jar,
- fit-21.126.0.jar,
+ fit-21.133.0.jar,
  url-detector-0.1.23.jar
 Export-Package: com.fasterxml.jackson.annotation,
  com.fasterxml.jackson.core,

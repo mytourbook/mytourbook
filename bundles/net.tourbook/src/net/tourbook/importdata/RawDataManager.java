@@ -774,11 +774,11 @@ public class RawDataManager {
 
          final String oldAirQuality = oldTourData.getWeather_AirQuality_TextIndex() == 0
                ? UI.EMPTY_STRING
-               : IWeather.airQualityTexts[oldTourData.getWeather_AirQuality_TextIndex()];
+               : IWeather.AIR_QUALITY_TEXT[oldTourData.getWeather_AirQuality_TextIndex()];
 
          final String newAirQuality = newTourData.getWeather_AirQuality_TextIndex() == 0
                ? UI.EMPTY_STRING
-               : IWeather.airQualityTexts[newTourData.getWeather_AirQuality_TextIndex()];
+               : IWeather.AIR_QUALITY_TEXT[newTourData.getWeather_AirQuality_TextIndex()];
 
          previousData.add(UI.EMPTY_STRING
 

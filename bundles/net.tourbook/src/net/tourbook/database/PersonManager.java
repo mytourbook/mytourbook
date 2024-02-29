@@ -22,8 +22,8 @@ import javax.persistence.Query;
 
 import net.tourbook.Messages;
 import net.tourbook.application.ContributionItem_Person;
+import net.tourbook.common.UI;
 import net.tourbook.data.TourPerson;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;

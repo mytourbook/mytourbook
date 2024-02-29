@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
@@ -40,6 +41,7 @@ import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
 import net.tourbook.common.formatter.ValueFormatter_Time_SSS;
 import net.tourbook.common.tooltip.AdvancedSlideoutShell;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -97,7 +99,7 @@ import org.eclipse.ui.XMLMemento;
 /**
  * Manages the columns for a tree/table-viewer
  * <p>
- * created: 2007-05-27 by Wolfgang Schramm
+ * Created: 2007-05-27 by Wolfgang Schramm
  */
 public class ColumnManager {
 
@@ -114,6 +116,7 @@ public class ColumnManager {
    private static final String ATTR_IS_SHOW_COLUMN_ANNOTATION_SORTING    = "isShowColumnAnnotation_Sorting";    //$NON-NLS-1$
    //
    private static final String ATTR_COLUMN_ID                            = "columnId";                          //$NON-NLS-1$
+   private static final String ATTR_COLUMN_ALIGNMENT                     = "alignment";                         //$NON-NLS-1$
    private static final String ATTR_COLUMN_FORMAT_CATEGORY               = "categoryFormat";                    //$NON-NLS-1$
    private static final String ATTR_COLUMN_FORMAT_DETAIL                 = "detailFormat";                      //$NON-NLS-1$
    private static final String ATTR_NAME                                 = "name";                              //$NON-NLS-1$
@@ -124,7 +127,11 @@ public class ColumnManager {
    //
    private static final String COLUMN_CATEGORY_SEPARATOR                 = "   \u00bb   ";                      //$NON-NLS-1$
    static final String         COLUMN_TEXT_SEPARATOR                     = "   \u00B7   ";                      //$NON-NLS-1$
-
+   //
+   private static final String ALIGNMENT_LEFT                            = "left";                              //$NON-NLS-1$
+   private static final String ALIGNMENT_CENTER                          = "center";                            //$NON-NLS-1$
+   private static final String ALIGNMENT_RIGHT                           = "right";                             //$NON-NLS-1$
+   //
    /**
     * Minimum column width, when the column width is 0, there was a bug that this happened.
     */
@@ -250,7 +257,36 @@ public class ColumnManager {
       restoreState(viewState);
    }
 
+   static String getAlignmentText(final int alignment) {
+
+// SET_FORMATTING_OFF
+
+      return switch (alignment) {
+
+      case SWT.CENTER   -> ALIGNMENT_CENTER;
+      case SWT.TRAIL    -> ALIGNMENT_RIGHT;
+      default           -> ALIGNMENT_LEFT;
+
+// SET_FORMATTING_ON
+      };
+   }
+
+   private static int getAlignmentValue(final String alignment) {
+
+// SET_FORMATTING_OFF
+
+      return switch (alignment) {
+
+      case ALIGNMENT_CENTER   -> SWT.CENTER;
+      case ALIGNMENT_RIGHT    -> SWT.TRAIL;
+      default                 -> SWT.LEAD;
+      };
+
+// SET_FORMATTING_ON
+   }
+
    static IValueFormatter getDefaultDefaultValueFormatter() {
+
       return _defaultDefaultValueFormatter;
    }
 
@@ -570,7 +606,8 @@ public class ColumnManager {
 
       _columnViewer = columnViewer;
 
-      setupVisibleColDefs(_activeProfile);
+      setupColumns_01_VisibleColDefs(_activeProfile);
+      setupColumns_02_ColumnAlignment(_activeProfile);
 
       if (columnViewer instanceof TableViewer) {
 
@@ -589,7 +626,7 @@ public class ColumnManager {
          }
       }
 
-      setupValueFormatter(_activeProfile);
+      setupColumns_03_ValueFormatter(_activeProfile);
    }
 
    /**
@@ -749,6 +786,7 @@ public class ColumnManager {
     *
     * @param composite
     * @param defaultContextMenuProvider
+    *
     * @return
     */
    private Menu createHCM_0_Menu(final Composite composite, final Shell shell, final IContextMenuProvider defaultContextMenuProvider) {
@@ -1342,6 +1380,7 @@ public class ColumnManager {
          final boolean isChecked = columnProfile == _activeProfile;
 
          String menuText = columnProfile.name
+
                + COLUMN_TEXT_SEPARATOR
 
                // show number of visible columns
@@ -1432,6 +1471,7 @@ public class ColumnManager {
    /**
     * @param columnId
     *           column id
+    *
     * @return Returns the column definition for the column id, or <code>null</code> when the column
     *         for the column id is not available
     */
@@ -1450,6 +1490,7 @@ public class ColumnManager {
    /**
     * @param createIndex
     *           column create id
+    *
     * @return Returns the column definition for the column create index, or <code>null</code> when
     *         the column is not available
     */
@@ -1711,6 +1752,7 @@ public class ColumnManager {
     * @param isHeaderHit
     * @param headerContextMenu
     * @param defaultContextMenuProvider
+    *
     * @return
     */
    private Menu getContextMenu(final boolean isHeaderHit, final Menu headerContextMenu, final IContextMenuProvider defaultContextMenuProvider) {
@@ -1743,6 +1785,7 @@ public class ColumnManager {
     * @param mousePosition
     * @param isTableHeaderHit
     * @param columnHeaderLayer
+    *
     * @return Returns a column item or <code>null</code> when the header is not hit or the columns
     *         is not found
     */
@@ -1966,6 +2009,7 @@ public class ColumnManager {
     * Get a value formatter for a {@link ValueFormat}.
     *
     * @param valueFormat_Category
+    *
     * @return Returns the {@link IValueFormatter} or <code>null</code> when not available.
     */
    IValueFormatter getValueFormatter(final ValueFormat valueFormat) {
@@ -2112,6 +2156,15 @@ public class ColumnManager {
             final Reader reader = new StringReader(stateValue);
             final XMLMemento xmlMemento = XMLMemento.createReadRoot(reader);
 
+            boolean isDumpXML = false;
+            isDumpXML = false;
+//          isDumpXML = true;
+            if (isDumpXML) {
+               System.out.println();
+               System.out.println(StringEscapeUtils.unescapeHtml4(xmlMemento.toString()));
+               System.out.println();
+            }
+
             // get category column state
             final Boolean xmlIsShowCategory = xmlMemento.getBoolean(ATTR_IS_SHOW_CATEGORY);
             if (xmlIsShowCategory != null) {
@@ -2170,7 +2223,7 @@ public class ColumnManager {
                   }
 
                   /*
-                   * Column properties
+                   * Column properties, all properties are optional
                    */
                   final ArrayList<ColumnProperties> allColumnProperties = new ArrayList<>();
                   currentProfile.columnProperties = allColumnProperties;
@@ -2183,34 +2236,38 @@ public class ColumnManager {
 
                         final String columnId = xmlColumn.getString(ATTR_COLUMN_ID);
 
+                        if (columnId == null) {
+                           continue;
+                        }
+
+                        final ColumnProperties columnProperties = new ColumnProperties();
+
+                        columnProperties.columnId = columnId;
+
                         final Enum<ValueFormat> valueFormat_Category = Util.getXmlEnum(
                               xmlColumn,
                               ATTR_COLUMN_FORMAT_CATEGORY,
                               ValueFormat.DUMMY_VALUE);
-
                         final Enum<ValueFormat> valueFormat_Detail = Util.getXmlEnum(
                               xmlColumn,
                               ATTR_COLUMN_FORMAT_DETAIL,
                               ValueFormat.DUMMY_VALUE);
 
-                        if (columnId != null //
-                              && (valueFormat_Category != ValueFormat.DUMMY_VALUE //
-                                    || valueFormat_Detail != ValueFormat.DUMMY_VALUE)) {
+                        final String alignment = Util.getXmlString(xmlColumn, ATTR_COLUMN_ALIGNMENT, null);
 
-                           final ColumnProperties columnProperties = new ColumnProperties();
-
-                           columnProperties.columnId = columnId;
-
-                           if (valueFormat_Category != ValueFormat.DUMMY_VALUE) {
-                              columnProperties.valueFormat_Category = (ValueFormat) valueFormat_Category;
-                           }
-
-                           if (valueFormat_Detail != ValueFormat.DUMMY_VALUE) {
-                              columnProperties.valueFormat_Detail = (ValueFormat) valueFormat_Detail;
-                           }
-
-                           allColumnProperties.add(columnProperties);
+                        if (valueFormat_Category != ValueFormat.DUMMY_VALUE) {
+                           columnProperties.valueFormat_Category = (ValueFormat) valueFormat_Category;
                         }
+
+                        if (valueFormat_Detail != ValueFormat.DUMMY_VALUE) {
+                           columnProperties.valueFormat_Detail = (ValueFormat) valueFormat_Detail;
+                        }
+
+                        if (alignment != null) {
+                           columnProperties.alignment = getAlignmentValue(alignment);
+                        }
+
+                        allColumnProperties.add(columnProperties);
                      }
                   }
 
@@ -2260,7 +2317,7 @@ public class ColumnManager {
          _activeProfile.setVisibleColumnIds(visibleColumnIds);
       }
 
-      // save columns width and keep it for internal use
+      // save columns width
       final String[] visibleColumnIdsAndWidth = getColumns_FromViewer_IdAndWidth();
       if (visibleColumnIdsAndWidth != null) {
          _activeProfile.visibleColumnIdsAndWidth = visibleColumnIdsAndWidth;
@@ -2419,6 +2476,11 @@ public class ColumnManager {
             if (columnFormat_Detail != null) {
                xmlColumn.putString(ATTR_COLUMN_FORMAT_DETAIL, columnFormat_Detail.name());
             }
+
+            final int alignment = columnProperty.alignment;
+            if (alignment != 0) {
+               xmlColumn.putString(ATTR_COLUMN_ALIGNMENT, getAlignmentText(alignment));
+            }
          }
       }
    }
@@ -2545,60 +2607,192 @@ public class ColumnManager {
       _slideoutShell = slideoutShell;
    }
 
-   public void setupNatTable(final INatTable_PropertiesProvider natTablePropertiesProvider) {
+   /**
+    * Sync column definitions in the {@link ColumnProfile} from the visible id's.
+    *
+    * @param columnProfile
+    */
+   void setupColumns_01_VisibleColDefs(final ColumnProfile columnProfile) {
 
-      _natTablePropertiesProvider = natTablePropertiesProvider;
+      final List<ColumnDefinition> allVisibleColDefs = columnProfile.visibleColumnDefinitions;
 
-      setupVisibleColDefs(_activeProfile);
-      setupValueFormatter(_activeProfile);
+      allVisibleColDefs.clear();
+
+      final String[] visibleColumnIds = columnProfile.getVisibleColumnIds();
+      if (visibleColumnIds != null) {
+
+         // fill columns with the visible order
+
+         int createIndex = 0;
+
+         for (final String columnId : visibleColumnIds) {
+
+            final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
+            if (colDef != null) {
+
+               colDef.setCreateIndex(createIndex++);
+
+               allVisibleColDefs.add(colDef);
+            }
+         }
+      }
+
+      final String[] visibleColumnIdsAndWidth = columnProfile.visibleColumnIdsAndWidth;
+      if (visibleColumnIdsAndWidth != null) {
+
+         // set the width for all columns
+
+         for (int dataIdx = 0; dataIdx < visibleColumnIdsAndWidth.length; dataIdx++) {
+
+            final String columnId = visibleColumnIdsAndWidth[dataIdx++];
+            final int columnWidth = Integer.valueOf(visibleColumnIdsAndWidth[dataIdx]);
+
+            final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
+            if (colDef != null) {
+               colDef.setColumnWidth(columnWidth);
+            }
+         }
+      }
+
+      /*
+       * When no columns are visible (which is the first time), show only the default columns
+       * because every column reduces performance
+       */
+      if ((allVisibleColDefs.isEmpty()) && (_allDefinedColumnDefinitions.size() > 0)) {
+
+         final ArrayList<String> columnIds = new ArrayList<>();
+         int createIndex = 0;
+
+         for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
+            if (colDef.isDefaultColumn()) {
+
+               colDef.setCreateIndex(createIndex++);
+
+               allVisibleColDefs.add(colDef);
+               columnIds.add(colDef.getColumnId());
+            }
+         }
+
+         columnProfile.setVisibleColumnIds(columnIds.toArray(new String[columnIds.size()]));
+      }
+
+      /*
+       * When no default columns are set, use the first column
+       */
+      if ((allVisibleColDefs.isEmpty()) && (_allDefinedColumnDefinitions.size() > 0)) {
+
+         final ColumnDefinition firstColumn = _allDefinedColumnDefinitions.get(0);
+         firstColumn.setCreateIndex(0);
+
+         allVisibleColDefs.add(firstColumn);
+
+         columnProfile.setVisibleColumnIds(new String[1]);
+         visibleColumnIds[0] = firstColumn.getColumnId();
+      }
+
+      /*
+       * Ensure that all columns which must be visible, are also displayed. This case can happen
+       * when new columns are added.
+       */
+      final ArrayList<ColumnDefinition> notAddedColumns = new ArrayList<>();
+
+      for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
+
+         if (colDef.canModifyVisibility() == false) {
+
+            if (allVisibleColDefs.contains(colDef) == false) {
+               notAddedColumns.add(colDef);
+            }
+         }
+      }
+
+      if (notAddedColumns.size() > 0) {
+
+         allVisibleColDefs.addAll(notAddedColumns);
+
+         /*
+          * Set create index, otherwise save/restore do not work!!!
+          */
+         int createIndex = 0;
+         for (final ColumnDefinition colDef : allVisibleColDefs) {
+            colDef.setCreateIndex(createIndex++);
+         }
+
+         /*
+          * Set visible id's
+          */
+         final ArrayList<String> columnIds = new ArrayList<>();
+
+         for (final ColumnDefinition colDef : allVisibleColDefs) {
+            columnIds.add(colDef.getColumnId());
+         }
+
+         columnProfile.setVisibleColumnIds(columnIds.toArray(new String[columnIds.size()]));
+      }
+
+      /*
+       * Ensure that each visible column has also set it's column width
+       */
+      int numCheckedColumns = 0;
+      for (final ColumnDefinition colDef : allVisibleColDefs) {
+
+         if (colDef.getColumnWidth() == 0) {
+            colDef.setColumnWidth(colDef.getDefaultColumnWidth());
+         }
+
+         if (colDef.isColumnCheckedInContextMenu()) {
+            numCheckedColumns++;
+         }
+      }
+      if (numCheckedColumns == 0) {
+
+         // nothing is displayed -> show all columns
+
+         for (final ColumnDefinition colDef : allVisibleColDefs) {
+            colDef.setIsColumnChecked(true);
+         }
+      }
    }
 
    /**
-    * Setup {@link NatTable} for autoresizing all columns after the table was created.
+    * Setup alignment for newly created columns
+    *
+    * @param activeProfile
     */
-   public void setupNatTable_PostCreate() {
+   private void setupColumns_02_ColumnAlignment(final ColumnProfile activeProfile) {
 
-      final NatTable natTable = _natTablePropertiesProvider.getNatTable();
+      final ArrayList<ColumnProperties> allProfileColumnProperties = activeProfile.columnProperties;
 
-      /**
-       * Found this solution in https://www.eclipse.org/nattable/documentation.php?page=faq
-       */
-      natTable.addOverlayPainter(new IOverlayPainter() {
+      // loop: all defined columns
+      for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
 
-         @Override
-         public void paintOverlay(final GC gc, final ILayer layer) {
+         final String colDefID = colDef.getColumnId();
 
-            if (!_isDoAResizeForAllColumnsToFit) {
-               return;
-            }
+         /*
+          * Reset current style to the default style which will be overwritten when profile
+          * properties are available
+          */
+         colDef.setStyle(colDef.getDefaultColumnStyle());
 
-            // reset flag, resizing is done only once when the corresponding action is selected
-            _isDoAResizeForAllColumnsToFit = false;
+         // loop: all column properties in a profile -> find column and it's properties
+         for (final ColumnProperties profileColumnProperties : allProfileColumnProperties) {
 
-            final int numColumns = natTable.getColumnCount();
+            if (colDefID.equals(profileColumnProperties.columnId)) {
 
-            final IConfigRegistry configRegistry = natTable.getConfigRegistry();
-            final GCFactory gcFactory = new GCFactory(natTable);
+               // column properties are available
 
-            for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
+               if (profileColumnProperties.alignment != 0) {
 
-               if (natTable.isColumnPositionResizable(columnIndex) == false) {
-                  continue;
+                  colDef.setStyle(profileColumnProperties.alignment);
                }
 
-               final InitializeAutoResizeColumnsCommand columnCommand = new InitializeAutoResizeColumnsCommand(
-                     natTable,
-                     columnIndex,
-                     configRegistry,
-                     gcFactory);
-
-               natTable.doCommand(columnCommand);
+               break;
             }
          }
-      });
+      }
    }
 
-   private void setupValueFormatter(final ColumnProfile activeProfile) {
+   private void setupColumns_03_ValueFormatter(final ColumnProfile activeProfile) {
 
       final ArrayList<ColumnProperties> profileColumnProperties = new ArrayList<>();
 
@@ -2658,10 +2852,10 @@ public class ColumnManager {
          colDef.setValueFormatter_Category(valueFormat_Category, valueFormatter_Category);
          colDef.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
-         // ensure all column properties are created
+         // ensure all column properties for all visible columns are created
          if (currentColumnProperties == null) {
 
-            // column properties are not defined
+            // column properties are not available
 
             final ColumnProperties columnProperties = new ColumnProperties();
 
@@ -2672,6 +2866,7 @@ public class ColumnManager {
             profileColumnProperties.add(columnProperties);
 
          } else {
+
             profileColumnProperties.add(currentColumnProperties);
          }
       }
@@ -2681,151 +2876,58 @@ public class ColumnManager {
       activeProfile.columnProperties.addAll(profileColumnProperties);
    }
 
+   public void setupNatTable(final INatTable_PropertiesProvider natTablePropertiesProvider) {
+
+      _natTablePropertiesProvider = natTablePropertiesProvider;
+
+      setupColumns_01_VisibleColDefs(_activeProfile);
+      setupColumns_02_ColumnAlignment(_activeProfile);
+      setupColumns_03_ValueFormatter(_activeProfile);
+   }
+
    /**
-    * Sync column definitions in the {@link ColumnProfile} from the visible id's.
-    *
-    * @param columnProfile
+    * Setup {@link NatTable} for autoresizing all columns after the table was created.
     */
-   void setupVisibleColDefs(final ColumnProfile columnProfile) {
+   public void setupNatTable_PostCreate() {
 
-      final ArrayList<ColumnDefinition> visibleColDefs = columnProfile.visibleColumnDefinitions;
+      final NatTable natTable = _natTablePropertiesProvider.getNatTable();
 
-      visibleColDefs.clear();
+      /**
+       * Found this solution in https://www.eclipse.org/nattable/documentation.php?page=faq
+       */
+      natTable.addOverlayPainter(new IOverlayPainter() {
 
-      final String[] visibleColumnIds = columnProfile.getVisibleColumnIds();
-      if (visibleColumnIds != null) {
+         @Override
+         public void paintOverlay(final GC gc, final ILayer layer) {
 
-         // fill columns with the visible order
+            if (!_isDoAResizeForAllColumnsToFit) {
+               return;
+            }
 
-         int createIndex = 0;
+            // reset flag, resizing is done only once when the corresponding action is selected
+            _isDoAResizeForAllColumnsToFit = false;
 
-         for (final String columnId : visibleColumnIds) {
+            final int numColumns = natTable.getColumnCount();
 
-            final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
-            if (colDef != null) {
+            final IConfigRegistry configRegistry = natTable.getConfigRegistry();
+            final GCFactory gcFactory = new GCFactory(natTable);
 
-               colDef.setCreateIndex(createIndex++);
+            for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
 
-               visibleColDefs.add(colDef);
+               if (natTable.isColumnPositionResizable(columnIndex) == false) {
+                  continue;
+               }
+
+               final InitializeAutoResizeColumnsCommand columnCommand = new InitializeAutoResizeColumnsCommand(
+                     natTable,
+                     columnIndex,
+                     configRegistry,
+                     gcFactory);
+
+               natTable.doCommand(columnCommand);
             }
          }
-      }
-
-      final String[] visibleColumnIdsAndWidth = columnProfile.visibleColumnIdsAndWidth;
-      if (visibleColumnIdsAndWidth != null) {
-
-         // set the width for all columns
-
-         for (int dataIdx = 0; dataIdx < visibleColumnIdsAndWidth.length; dataIdx++) {
-
-            final String columnId = visibleColumnIdsAndWidth[dataIdx++];
-            final int columnWidth = Integer.valueOf(visibleColumnIdsAndWidth[dataIdx]);
-
-            final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
-            if (colDef != null) {
-               colDef.setColumnWidth(columnWidth);
-            }
-         }
-      }
-
-      /*
-       * When no columns are visible (which is the first time), show only the default columns
-       * because every column reduces performance
-       */
-      if ((visibleColDefs.isEmpty()) && (_allDefinedColumnDefinitions.size() > 0)) {
-
-         final ArrayList<String> columnIds = new ArrayList<>();
-         int createIndex = 0;
-
-         for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
-            if (colDef.isDefaultColumn()) {
-
-               colDef.setCreateIndex(createIndex++);
-
-               visibleColDefs.add(colDef);
-               columnIds.add(colDef.getColumnId());
-            }
-         }
-
-         columnProfile.setVisibleColumnIds(columnIds.toArray(new String[columnIds.size()]));
-      }
-
-      /*
-       * When no default columns are set, use the first column
-       */
-      if ((visibleColDefs.isEmpty()) && (_allDefinedColumnDefinitions.size() > 0)) {
-
-         final ColumnDefinition firstColumn = _allDefinedColumnDefinitions.get(0);
-         firstColumn.setCreateIndex(0);
-
-         visibleColDefs.add(firstColumn);
-
-         columnProfile.setVisibleColumnIds(new String[1]);
-         visibleColumnIds[0] = firstColumn.getColumnId();
-      }
-
-      /*
-       * Ensure that all columns which must be visible, are also displayed. This case can happen
-       * when new columns are added.
-       */
-      final ArrayList<ColumnDefinition> notAddedColumns = new ArrayList<>();
-
-      for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
-
-         if (colDef.canModifyVisibility() == false) {
-
-            if (visibleColDefs.contains(colDef) == false) {
-               notAddedColumns.add(colDef);
-            }
-         }
-      }
-
-      if (notAddedColumns.size() > 0) {
-
-         visibleColDefs.addAll(notAddedColumns);
-
-         /*
-          * Set create index, otherwise save/restore do not work!!!
-          */
-         int createIndex = 0;
-         for (final ColumnDefinition colDef : visibleColDefs) {
-            colDef.setCreateIndex(createIndex++);
-         }
-
-         /*
-          * Set visible id's
-          */
-         final ArrayList<String> columnIds = new ArrayList<>();
-
-         for (final ColumnDefinition colDef : visibleColDefs) {
-            columnIds.add(colDef.getColumnId());
-         }
-
-         columnProfile.setVisibleColumnIds(columnIds.toArray(new String[columnIds.size()]));
-      }
-
-      /*
-       * Ensure that each visible column has also set it's column width
-       */
-      int numCheckedColumns = 0;
-      for (final ColumnDefinition colDef : visibleColDefs) {
-
-         if (colDef.getColumnWidth() == 0) {
-            colDef.setColumnWidth(colDef.getDefaultColumnWidth());
-         }
-
-         if (colDef.isColumnCheckedInContextMenu()) {
-            numCheckedColumns++;
-         }
-      }
-      if (numCheckedColumns == 0) {
-
-         // nothing is displayed -> show all columns
-
-         for (final ColumnDefinition colDef : visibleColDefs) {
-            colDef.setIsColumnChecked(true);
-         }
-      }
+      });
    }
 
    private void setVisibleColumnIds_All() {
@@ -3072,7 +3174,7 @@ public class ColumnManager {
     *
     * @param columnViewerModel
     */
-   void setVisibleColumnIds_FromModel(final ColumnProfile profile, final ArrayList<ColumnDefinition> columnViewerModel) {
+   void setVisibleColumnIds_FromModel(final ColumnProfile profile, final List<ColumnDefinition> columnViewerModel) {
 
       final ArrayList<String> visibleColumnIds = new ArrayList<>();
       final ArrayList<String> columnIdsAndWidth = new ArrayList<>();

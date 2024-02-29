@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -53,12 +53,13 @@ public class EasyLauncherUtils {
       _pc = pc;
 
       defineColumn_10_LauncherName();
-      defineColumn_20_TourTypeImage();
-      defineColumn_30_LastMarkerDistance();
-      defineColumn_40_AdjustTemperature();
-      defineColumn_50_RetrieveWeatherData();
-      defineColumn_80_IsSaveTour();
-      defineColumn_82_IsAdjustElevation();
+      defineColumn_50_03_TourTypeImage();
+      defineColumn_50_04_LastMarkerDistance();
+      defineColumn_50_05_AdjustTemperature();
+      defineColumn_50_07_IsAdjustElevation();
+      defineColumn_50_50_RetrieveWeatherData();
+      defineColumn_50_51_RetrieveTourLocation();
+      defineColumn_50_99_IsSaveTour();
       defineColumn_90_IsShowInDashboard();
       defineColumn_99_Description();
    }
@@ -90,7 +91,7 @@ public class EasyLauncherUtils {
    /**
     * Column: Tour type
     */
-   private void defineColumn_20_TourTypeImage() {
+   private void defineColumn_50_03_TourTypeImage() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "colorImage", SWT.LEAD); //$NON-NLS-1$
       _colDef_TourTypeImage = colDef;
@@ -115,7 +116,7 @@ public class EasyLauncherUtils {
    /**
     * Column: Set last marker
     */
-   private void defineColumn_30_LastMarkerDistance() {
+   private void defineColumn_50_04_LastMarkerDistance() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "isSetLastMarker", SWT.TRAIL); //$NON-NLS-1$
 
@@ -151,7 +152,7 @@ public class EasyLauncherUtils {
    /**
     * Column: Adjust temperature
     */
-   private void defineColumn_40_AdjustTemperature() {
+   private void defineColumn_50_05_AdjustTemperature() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(
             _columnManager,
@@ -195,9 +196,36 @@ public class EasyLauncherUtils {
    }
 
    /**
+    * Column: Is adjust elevation
+    */
+   private void defineColumn_50_07_IsAdjustElevation() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "isAdjustElevation", SWT.CENTER); //$NON-NLS-1$
+
+      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_AdjustElevation_Label);
+      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_AdjustElevation_Header);
+      colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation_Tooltip);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
+      colDef.setColumnWeightData(new ColumnWeightData(7));
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((ImportLauncher) cell.getElement()).isReplaceFirstTimeSliceElevation
+                  ? Messages.App_Label_BooleanYes
+                  : UI.EMPTY_STRING);
+         }
+      });
+   }
+
+   /**
     * Column: Retrieve weather data
     */
-   private void defineColumn_50_RetrieveWeatherData() {
+   private void defineColumn_50_50_RetrieveWeatherData() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "isRetrieveWeatherData", SWT.CENTER); //$NON-NLS-1$
 
@@ -224,9 +252,38 @@ public class EasyLauncherUtils {
    }
 
    /**
+    * Column: Retrieve weather data
+    */
+   private void defineColumn_50_51_RetrieveTourLocation() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "isRetrieveTourLocation", SWT.CENTER); //$NON-NLS-1$
+
+      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_RetrieveTourLocation_Label);
+      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_RetrieveTourLocation_Header);
+      colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Checkbox_RetrieveTourLocation_Tooltip);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
+      colDef.setColumnWeightData(new ColumnWeightData(7));
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
+
+            cell.setText(importLauncher.isRetrieveTourLocation
+                  ? Messages.App_Label_BooleanYes
+                  : UI.EMPTY_STRING);
+         }
+      });
+   }
+
+   /**
     * Column: Is save tour
     */
-   private void defineColumn_80_IsSaveTour() {
+   private void defineColumn_50_99_IsSaveTour() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "isSaveTour", SWT.CENTER); //$NON-NLS-1$
 
@@ -246,33 +303,6 @@ public class EasyLauncherUtils {
             final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
 
             cell.setText(importLauncher.isSaveTour
-                  ? Messages.App_Label_BooleanYes
-                  : UI.EMPTY_STRING);
-         }
-      });
-   }
-
-   /**
-    * Column: Is adjust elevation
-    */
-   private void defineColumn_82_IsAdjustElevation() {
-
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "isAdjustElevation", SWT.CENTER); //$NON-NLS-1$
-
-      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_AdjustElevation_Label);
-      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_AdjustElevation_Header);
-      colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation_Tooltip);
-
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
-      colDef.setColumnWeightData(new ColumnWeightData(7));
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((ImportLauncher) cell.getElement()).isReplaceFirstTimeSliceElevation
                   ? Messages.App_Label_BooleanYes
                   : UI.EMPTY_STRING);
          }
@@ -333,6 +363,7 @@ public class EasyLauncherUtils {
 
    /**
     * @param importLauncher
+    *
     * @return Returns from the model the last marker distance value in the current measurment
     *         system.
     */

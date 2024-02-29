@@ -2034,7 +2034,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
          if (image != null) {
 
-            UI.paintImageCentered(event, image, _columnWidth_TourTypeImage);
+            final int alignment = _colDef_TourTypeImage.getColumnStyle();
+
+            UI.paintImage(event, image, _columnWidth_TourTypeImage, alignment);
          }
       }
    }
@@ -2062,7 +2064,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
             } else {
 
-               UI.paintImageCentered(event, image, _columnWidth_WeatherClouds);
+               final int alignment = _colDef_WeatherClouds.getColumnStyle();
+
+               UI.paintImage(event, image, _columnWidth_WeatherClouds, alignment);
             }
          }
       }

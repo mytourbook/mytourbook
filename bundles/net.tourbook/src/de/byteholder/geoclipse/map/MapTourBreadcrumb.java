@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import de.byteholder.geoclipse.Messages;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.data.TourData;
 
@@ -43,7 +44,7 @@ public class MapTourBreadcrumb {
    private static final Color         SYSTEM_COLOR_RED               = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
    private static final Color         SYSTEM_COLOR_WHITE             = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
 
-   private static final String        CRUMB_SEPARATOR                = UI.SPACE + net.tourbook.common.UI.SYMBOL_BULLET;
+   private static final String        CRUMB_SEPARATOR                = UI.SPACE + UI.SYMBOL_BULLET;
 
    private static final int           NOT_HOVERED_INDEX              = -1;
 
@@ -269,6 +270,7 @@ public class MapTourBreadcrumb {
 
    /**
     * @param devMousePosition
+    *
     * @return Returns <code>true</code> when a bread crumb is hit
     */
    public boolean onMouseDown(final Point devMousePosition) {
@@ -332,6 +334,7 @@ public class MapTourBreadcrumb {
 
    /**
     * @param devMousePosition
+    *
     * @return Returns <code>true</code> when a breadcrumb is hovered and the map must be repainted
     */
    public boolean onMouseMove(final Point devMousePosition) {

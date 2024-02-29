@@ -188,7 +188,7 @@ public interface IWeather {
    /**
     * Text for the weather
     */
-   public static final String[] cloudText                    = new String[] {
+   public static final String[] CLOUD_TEXT                      = new String[] {
 
          cloudIsNotDefined,
 
@@ -206,11 +206,11 @@ public interface IWeather {
    /**
     *
     * Texts for the weather's air quality, must be in sync with
-    * {@link #airQualityColors_BrightTheme} and {@link #airQualityColors_DarkTheme}
+    * {@link #AIR_QUALITY_COLORS_BRIGHT_THEME} and {@link #AIR_QUALITY_COLORS_DARK_THEME}
     *
     * Those texts are displayed in the UI.
     */
-   public static final String[] airQualityTexts              = new String[] {
+   public static final String[] AIR_QUALITY_TEXT                = new String[] {
 
          Messages.Weather_AirQuality_0_IsNotDefined,
 
@@ -225,7 +225,7 @@ public interface IWeather {
    /**
     * Ids for the weather's air quality. Those Ids are saved in the db.
     */
-   public static final String[] airQualityIds                = new String[] {
+   public static final String[] AIR_QUALITY_IDS                 = new String[] {
 
          UI.EMPTY_STRING,
 
@@ -239,9 +239,9 @@ public interface IWeather {
 
    /**
     * Foreground and background colors for the air quality, must be in sync with
-    * {@link #airQualityTexts}
+    * {@link #AIR_QUALITY_TEXT}
     */
-   public static final Color[]  airQualityColors_BrightTheme = new Color[] {
+   public static final Color[]  AIR_QUALITY_COLORS_BRIGHT_THEME = new Color[] {
 
          // not defined
          ThemeUtil.getDefaultForegroundColor_Combo(),
@@ -265,9 +265,9 @@ public interface IWeather {
 
    /**
     * Foreground and background colors for the air quality, must be in sync with
-    * {@link #airQualityTexts}
+    * {@link #AIR_QUALITY_TEXT}
     */
-   public static final Color[]  airQualityColors_DarkTheme   = new Color[] {
+   public static final Color[]  AIR_QUALITY_COLORS_DARK_THEME   = new Color[] {
 
          // not defined
 //         ThemeUtil.getDefaultForegroundColor_Combo(),
@@ -294,7 +294,7 @@ public interface IWeather {
    /**
     * Icons for the weather
     */
-   public static final String[] cloudIcon                    = new String[] {
+   public static final String[] CLOUD_ICON                      = new String[] {
 
          UI.IMAGE_EMPTY_16,
 

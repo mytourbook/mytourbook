@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import net.tourbook.ui.UI;
+import net.tourbook.common.UI;
 
 /**
  * Contains all data read from the device except the tour data
@@ -135,6 +135,7 @@ public class TurDeviceData {
 
    /**
     * @param fileRawData
+    *
     * @throws IOException
     * @throws NumberFormatException
     */

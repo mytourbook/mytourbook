@@ -35,6 +35,7 @@ import net.tourbook.common.util.NatTable_LabelProvider_WithTourTooltip;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.TreeColumnDefinition;
+import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
@@ -163,6 +164,7 @@ class TourBook_ColumnFactory {
       defineColumn_Elevation_AvgChange();
 
       // Weather
+      defineColumn_Weather_AirQuality();
       defineColumn_Weather_Clouds();
       defineColumn_Weather_Temperature_Avg();
       defineColumn_Weather_Temperature_Min();
@@ -3829,6 +3831,59 @@ class TourBook_ColumnFactory {
             final double value = ((TVITourBookItem) element).colTraining_TrainingPerformance;
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Weather - Air quality
+    */
+   private void defineColumn_Weather_AirQuality() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_AIR_QUALITY.createColumn(_columnManager_NatTable, _pc);
+
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final int airQualityTextIndex = ((TVITourBookItem) element).colAirQualityIndex;
+
+            if (airQualityTextIndex > 0) {
+
+               final String airQualityText = IWeather.AIR_QUALITY_TEXT[airQualityTextIndex];
+
+               return airQualityText;
+
+            } else {
+
+               return UI.EMPTY_STRING;
+            }
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_AIR_QUALITY.createColumn(_columnManager_Tree, _pc);
+
+      colDef_Tree.setLabelProvider(new SelectionCellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final int airQualityTextIndex = ((TVITourBookItem) element).colAirQualityIndex;
+
+            if (airQualityTextIndex > 0) {
+
+               final String airQualityText = IWeather.AIR_QUALITY_TEXT[airQualityTextIndex];
+
+               cell.setText(airQualityText);
+
+            } else {
+
+               cell.setText(UI.EMPTY_STRING);
+            }
 
             setCellColor(cell, element);
          }

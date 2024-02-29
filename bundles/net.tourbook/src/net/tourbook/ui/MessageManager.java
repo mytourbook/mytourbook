@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,8 +13,9 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.ui;
+
+import static net.tourbook.common.UI.EMPTY_STRING;
 
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -117,13 +118,13 @@ public class MessageManager implements IMessageManager {
 
       private void createPrefix() {
          if (prefixProvider == null) {
-            prefix = UI.EMPTY_STRING;
+            prefix = EMPTY_STRING;
             return;
          }
          prefix = prefixProvider.getPrefix(decoration.getControl());
          if (prefix == null) {
             // make a prefix anyway
-            prefix = UI.EMPTY_STRING;
+            prefix = EMPTY_STRING;
          }
       }
 
@@ -680,7 +681,7 @@ public class MessageManager implements IMessageManager {
          // show a summary message for the message
          // and list of errors for the details
          if (peers.size() > 1) {
-            messageText = Messages.bind(MULTIPLE_MESSAGE_SUMMARY_KEYS[maxType], new String[] { peers.size() + UI.EMPTY_STRING });
+            messageText = Messages.bind(MULTIPLE_MESSAGE_SUMMARY_KEYS[maxType], new String[] { peers.size() + EMPTY_STRING });
          } else {
             messageText = SINGLE_MESSAGE_SUMMARY_KEYS[maxType];
          }

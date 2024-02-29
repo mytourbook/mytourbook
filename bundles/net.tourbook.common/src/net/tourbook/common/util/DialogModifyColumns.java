@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.common.util;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
@@ -37,12 +38,15 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.util.LocalSelectionTransfer;
+import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -87,57 +91,69 @@ import org.eclipse.swt.widgets.Widget;
 
 public class DialogModifyColumns extends TrayDialog {
 
-   private Action                      _actionShowHideCategory;
+   private static final char              NL                = UI.NEW_LINE;
 
-   private ColumnManager               _columnManager;
+   private static final ColumnAlignment[] COLUMN_ALIGNMENTS = {
 
-   /** Model for the column viewer */
-   private ArrayList<ColumnDefinition> _columnViewerModel;
+// SET_FORMATTING_OFF
 
-   private ArrayList<ColumnDefinition> _allDefinedColumns;
-   //
-   private PixelConverter              _pc;
-   //
-   private long                        _dndDragStartViewerLeft;
-   private Object[]                    _dndCheckedElements;
-   //
-   private ColumnProfile               _selectedProfile;
-   private ArrayList<ColumnProfile>    _columnMgr_Profiles;
+         new ColumnAlignment(Messages.App_Alignment_Left,   SWT.LEAD),
+         new ColumnAlignment(Messages.App_Alignment_Center, SWT.CENTER),
+         new ColumnAlignment(Messages.App_Alignment_Right,  SWT.TRAIL),
 
-   private ArrayList<ColumnProfile>    _dialog_Profiles;
+// SET_FORMATTING_ON
+   };
+
+   private Action                         _actionShowHideCategory;
+
+   private ColumnManager                  _columnManager;
+
+   /** Model for the column viewer, contains all defined columns */
+   private List<ColumnDefinition>         _columnViewerModel;
+
+   private List<ColumnDefinition>         _allDefinedColumns;
+
    //
-   private boolean                     _isInUpdate;
-   private boolean                     _isShowColumnAnnotation_Formatting;
-   private boolean                     _isShowColumnAnnotation_Sorting;
+   private PixelConverter      _pc;
    //
-   private boolean                     _isShowCategory;
-   private boolean                     _isCategoryAvailable;
-   private int                         _categoryColumnWidth;
+   private long                _dndDragStartViewerLeft;
+   private Object[]            _dndCheckedElements;
    //
-   private ViewerComparator            _profileComparator = new ProfileComparator();
+   private ColumnProfile       _selectedProfile;
+   private List<ColumnProfile> _columnMgr_Profiles;
+   private List<ColumnProfile> _dialog_Profiles;
+   //
+   private boolean             _isInUpdate;
+   private boolean             _isShowColumnAnnotation_Formatting;
+   private boolean             _isShowColumnAnnotation_Sorting;
+   //
+   private boolean             _isShowCategory;
+   private boolean             _isCategoryAvailable;
+   private int                 _categoryColumnWidth;
+   //
+   private ViewerComparator    _profileComparator = new ProfileComparator();
    /*
     * UI controls
     */
-   private Button                      _btnColumn_MoveUp;
+   private Button              _btnColumn_MoveUp;
+   private Button              _btnColumn_MoveDown;
 
-   private Button                      _btnColumn_MoveDown;
-   private Button                      _btnColumn_SelectAll;
-   private Button                      _btnColumn_DeselectAll;
-   private Button                      _btnColumn_Default;
-   private Button                      _btnColumn_DefaultWidth;
-   private Button                      _btnProfile_New;
-   private Button                      _btnProfile_Remove;
-   private Button                      _btnProfile_Rename;
-   private Button                      _btnColumn_Sort;
+   private Button              _btnColumn_SelectAll;
+   private Button              _btnColumn_DeselectAll;
+   private Button              _btnColumn_Default;
+   private Button              _btnColumn_DefaultWidth;
+   private Button              _btnProfile_New;
+   private Button              _btnProfile_Remove;
+   private Button              _btnProfile_Rename;
+   private Button              _btnColumn_Sort;
    //
-   private Button                      _chkShowColumnAnnotation_Formatting;
-   private Button                      _chkShowColumnAnnotation_Sorting;
+   private Button              _chkShowColumnAnnotation_Formatting;
+   private Button              _chkShowColumnAnnotation_Sorting;
    //
-   private CheckboxTableViewer         _columnViewer;
-   private TableViewer                 _profileViewer;
-   private Composite                   _uiContainer;
-
-   private TableColumn                 _categoryColumn;
+   private CheckboxTableViewer _columnViewer;
+   private TableViewer         _profileViewer;
+   private Composite           _uiContainer;
+   private TableColumn         _categoryColumn;
 
    public class ActionCategoryColumn extends Action {
 
@@ -152,6 +168,140 @@ public class DialogModifyColumns extends TrayDialog {
       @Override
       public void run() {
          action_ShowHideCategory();
+      }
+   }
+
+   private final class AlignColumnEditingSupport extends EditingSupport {
+
+      private final ComboBoxCellEditor _cellEditor;
+
+      private AlignColumnEditingSupport(final TableViewer tableViewer) {
+
+         super(tableViewer);
+
+         _cellEditor = new ComboBoxCellEditor(tableViewer.getTable(),
+
+               new String[] {
+
+                     COLUMN_ALIGNMENTS[0].label, // Left
+                     COLUMN_ALIGNMENTS[1].label, // Center
+                     COLUMN_ALIGNMENTS[2].label, // Right
+               });
+      }
+
+      @Override
+      protected boolean canEdit(final Object element) {
+         return true;
+      }
+
+      @Override
+      protected CellEditor getCellEditor(final Object element) {
+
+         return _cellEditor;
+      }
+
+      @Override
+      protected Object getValue(final Object element) {
+
+         // convert col def style into an array index
+
+         if (element instanceof final ColumnDefinition colDef) {
+
+            final int columnSWTStyle = colDef.getColumnStyle();
+
+            return getAlignmentIndex(columnSWTStyle);
+         }
+
+         return 0;
+      }
+
+      @Override
+      protected void setValue(final Object element, final Object value) {
+
+         if (element instanceof final ColumnDefinition colDef
+               && value instanceof final Integer alignmentIndex) {
+
+            final ColumnAlignment columnAlignment = COLUMN_ALIGNMENTS[alignmentIndex];
+            final int newColumnStyle = columnAlignment.style;
+
+            // update model in ColumnDefinition
+            colDef.setStyle(newColumnStyle);
+
+            /*
+             * Update model in column properties
+             */
+            final String colDefColumnId = colDef.getColumnId();
+
+            final ArrayList<ColumnProperties> allColumnProperties = _selectedProfile.columnProperties;
+
+            final int defaultColumnStyle = colDef.getDefaultColumnStyle();
+            boolean isAlignmentSet = false;
+
+            for (final ColumnProperties columnProperties : allColumnProperties) {
+
+               if (colDefColumnId.equals(columnProperties.columnId)) {
+
+                  columnProperties.alignment = newColumnStyle == defaultColumnStyle
+
+                        // do not set the column alignment when it's value is the default value
+                        ? 0
+
+                        : newColumnStyle;
+
+                  isAlignmentSet = true;
+
+                  break;
+               }
+            }
+
+            if (isAlignmentSet == false
+
+                  // do not set the column alignment when it's value is the default value
+                  && newColumnStyle != defaultColumnStyle) {
+
+               // column properties are not available -> create it
+
+               final ColumnProperties columnProperties = new ColumnProperties();
+
+               columnProperties.columnId = colDefColumnId;
+               columnProperties.alignment = newColumnStyle;
+
+               allColumnProperties.add(columnProperties);
+            }
+
+            // update UI
+            _columnViewer.update(element, null);
+         }
+      }
+   }
+
+   private static class ColumnAlignment {
+
+      String label;
+
+      /**
+       * <li>{@link SWT#LEAD} - 16384</li>
+       * <li>{@link SWT#CENTER} - 16777216</li>
+       * <li>{@link SWT#TRAIL} - 131072</li>
+       */
+      int    style;
+
+      public ColumnAlignment(final String label, final int style) {
+
+         this.label = label;
+         this.style = style;
+      }
+
+      @Override
+      public String toString() {
+
+         return UI.EMPTY_STRING
+
+               + "ColumnAlignment" + NL //      //$NON-NLS-1$
+
+               + " label = " + label + NL //    //$NON-NLS-1$
+               + " style = " + style + NL //    //$NON-NLS-1$
+         ;
       }
    }
 
@@ -230,6 +380,7 @@ public class DialogModifyColumns extends TrayDialog {
    }
 
    private void actionOnColumn_Default_Width() {
+
       // set column width to the default width
 
       for (final ColumnDefinition colDef : _columnViewerModel) {
@@ -444,6 +595,7 @@ public class DialogModifyColumns extends TrayDialog {
     * @param isSetDefaults
     *           When <code>true</code> then column properties are set from the default settings
     *           otherwise they are copied from {@link #_columnViewerModel}
+    *
     * @return Returns all {@link ColumnDefinition}s in default order/selection.
     */
    private ArrayList<ColumnDefinition> cloneAllColumns(final boolean isSetDefaults) {
@@ -459,6 +611,8 @@ public class DialogModifyColumns extends TrayDialog {
 
             if (isSetDefaults) {
 
+               // clone with default values
+
                final ValueFormat valueFormat_Category = definedColDef.getDefaultValueFormat_Category();
                final ValueFormat valueFormat_Detail = definedColDef.getDefaultValueFormat_Detail();
 
@@ -469,6 +623,8 @@ public class DialogModifyColumns extends TrayDialog {
                colDefClone.setIsColumnChecked(definedColDef.isDefaultColumn());
 
                colDefClone.setColumnWidth(definedColDef.getDefaultColumnWidth());
+               colDefClone.setStyle(definedColDef.getDefaultColumnStyle());
+
                colDefClone.setValueFormatter_Category(valueFormat_Category, valueFormatter_Category);
                colDefClone.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
@@ -499,6 +655,8 @@ public class DialogModifyColumns extends TrayDialog {
                      colDefClone.setIsColumnChecked(currentColDef.isColumnCheckedInContextMenu());
 
                      colDefClone.setColumnWidth(currentColDef.getColumnWidth());
+                     colDefClone.setStyle(currentColDef.getColumnStyle());
+
                      colDefClone.setValueFormatter_Category(valueFormat, valueFormatter);
                      colDefClone.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
@@ -521,12 +679,13 @@ public class DialogModifyColumns extends TrayDialog {
     * Create model for the column viewer from a {@link ColumnProfile}.
     *
     * @param columnProfile
+    *
     * @return Returns ALL columns, first the visible then the hidden columns.
     */
    private ArrayList<ColumnDefinition> cloneAllColumns(final ColumnProfile columnProfile) {
 
       // set column definitions in the ColumnProfile from the visible id's.
-      _columnManager.setupVisibleColDefs(columnProfile);
+      _columnManager.setupColumns_01_VisibleColDefs(columnProfile);
 
       final ArrayList<ColumnDefinition> allClonedAndSortedColumns = new ArrayList<>();
 
@@ -554,8 +713,10 @@ public class DialogModifyColumns extends TrayDialog {
             ValueFormat valueFormat_Detail = null;
             IValueFormatter valueFormatter = null;
             IValueFormatter valueFormatter_Detail = null;
+            int alignment = modelColDef.getColumnStyle();
 
             for (final ColumnProperties columnProperties : columnProfile.columnProperties) {
+
                if (columnId.equals(columnProperties.columnId)) {
 
                   valueFormat = columnProperties.valueFormat_Category;
@@ -564,6 +725,8 @@ public class DialogModifyColumns extends TrayDialog {
                   valueFormat_Detail = columnProperties.valueFormat_Detail;
                   valueFormatter_Detail = _columnManager.getValueFormatter(valueFormat_Detail);
 
+                  alignment = columnProperties.alignment;
+
                   break;
                }
             }
@@ -571,6 +734,8 @@ public class DialogModifyColumns extends TrayDialog {
             modelColDef.setIsColumnChecked(true);
 
             modelColDef.setColumnWidth(colDef.getColumnWidth());
+            modelColDef.setStyle(alignment);
+
             modelColDef.setValueFormatter_Category(valueFormat, valueFormatter);
             modelColDef.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
@@ -584,15 +749,34 @@ public class DialogModifyColumns extends TrayDialog {
           */
          for (final ColumnDefinition colDef : allClonedColDef) {
 
+            final String columnId = colDef.getColumnId();
+
             final ValueFormat valueFormat = colDef.getDefaultValueFormat_Category();
             final ValueFormat valueFormat_Detail = colDef.getDefaultValueFormat_Detail();
             final IValueFormatter valueFormatter = _columnManager.getValueFormatter(valueFormat);
             final IValueFormatter valueFormatter_Detail = _columnManager.getValueFormatter(valueFormat_Detail);
 
+            /*
+             * Get alignment from the properties, when available
+             */
+            int alignment = colDef.getDefaultColumnStyle();
+
+            for (final ColumnProperties columnProperties : columnProfile.columnProperties) {
+
+               if (columnId.equals(columnProperties.columnId)) {
+
+                  alignment = columnProperties.alignment;
+
+                  break;
+               }
+            }
+
             // set default values
             colDef.setIsColumnChecked(false);
 
             colDef.setColumnWidth(colDef.getDefaultColumnWidth());
+            colDef.setStyle(alignment);
+
             colDef.setValueFormatter_Category(valueFormat, valueFormatter);
             colDef.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
@@ -964,7 +1148,7 @@ public class DialogModifyColumns extends TrayDialog {
       });
 
       /*
-       * set drag adapter
+       * Set drag adapter
        */
       _columnViewer.addDragSupport(
             DND.DROP_MOVE,
@@ -1005,7 +1189,7 @@ public class DialogModifyColumns extends TrayDialog {
             });
 
       /*
-       * set drop adapter
+       * Set drop adapter
        */
       final ViewerDropAdapter viewerDropAdapter = new ViewerDropAdapter(_columnViewer) {
 
@@ -1303,8 +1487,9 @@ public class DialogModifyColumns extends TrayDialog {
       defineColumn_10_ColumnName(tableLayout);
       defineColumn_20_ColumnHeaderText(tableLayout);
       defineColumn_30_Unit(tableLayout);
-      defineColumn_40_Format_Category(tableLayout);
-      defineColumn_50_Format_Tour(tableLayout);
+      defineColumn_40_Alignment(tableLayout);
+      defineColumn_50_Format_Category(tableLayout);
+      defineColumn_52_Format_Tour(tableLayout);
       defineColumn_60_Width(tableLayout);
 
       /**
@@ -1387,9 +1572,38 @@ public class DialogModifyColumns extends TrayDialog {
    }
 
    /**
+    * Column: Alignment
+    */
+   private void defineColumn_40_Alignment(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+
+      final TableColumn tc = tvc.getColumn();
+      tc.setMoveable(true);
+      tc.setText(Messages.ColumnModifyDialog_Column_Alignment);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+            final int swtStyle = colDef.getColumnStyle();
+
+            cell.setText(getAlignmentText(swtStyle));
+
+            setColor(cell, colDef);
+         }
+      });
+
+      tvc.setEditingSupport(new AlignColumnEditingSupport(_columnViewer));
+
+      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10), true));
+   }
+
+   /**
     * Column: Format
     */
-   private void defineColumn_40_Format_Category(final TableColumnLayout tableLayout) {
+   private void defineColumn_50_Format_Category(final TableColumnLayout tableLayout) {
 
       final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
 
@@ -1424,7 +1638,7 @@ public class DialogModifyColumns extends TrayDialog {
    /**
     * Column: Detail format
     */
-   private void defineColumn_50_Format_Tour(final TableColumnLayout tableLayout) {
+   private void defineColumn_52_Format_Tour(final TableColumnLayout tableLayout) {
 
       final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
 
@@ -1566,6 +1780,34 @@ public class DialogModifyColumns extends TrayDialog {
 
       _btnColumn_MoveUp.setEnabled(isUpEnabled);
       _btnColumn_MoveDown.setEnabled(isDownEnabled);
+   }
+
+   private int getAlignmentIndex(final int colDefStyle) {
+
+      for (int styleIndex = 0; styleIndex < COLUMN_ALIGNMENTS.length; styleIndex++) {
+
+         final int alignmentStyle = COLUMN_ALIGNMENTS[styleIndex].style;
+
+         if (false
+
+               || ((colDefStyle & SWT.LEAD) != 0 && (alignmentStyle == SWT.LEAD))
+               || ((colDefStyle & SWT.TRAIL) != 0 && (alignmentStyle == SWT.TRAIL))
+               || ((colDefStyle & SWT.CENTER) != 0 && (alignmentStyle == SWT.CENTER))
+
+         ) {
+
+            return styleIndex;
+         }
+      }
+
+      return 0;
+   }
+
+   private String getAlignmentText(final int colDefStyle) {
+
+      final int index = getAlignmentIndex(colDefStyle);
+
+      return COLUMN_ALIGNMENTS[index].label;
    }
 
    @Override
@@ -1806,39 +2048,27 @@ public class DialogModifyColumns extends TrayDialog {
     */
    private void updateProfileModel_From_ColumnViewer() {
 
+      final TableItem[] allTableItems = _columnViewer.getTable().getItems();
+
       // update profile
-      _columnManager.setVisibleColumnIds_FromModifyDialog(
-            _selectedProfile,
-            _columnViewer.getTable().getItems());
+      _columnManager.setVisibleColumnIds_FromModifyDialog(_selectedProfile, allTableItems);
 
-      /*
-       * Update value formats from the model
-       */
-      for (final ColumnDefinition colDef : _columnViewerModel) {
-
-         final String columnId = colDef.getColumnId();
-
-         for (final ColumnProperties columnProperties : _selectedProfile.columnProperties) {
-
-            if (columnId.equals(columnProperties.columnId)) {
-
-               columnProperties.valueFormat_Category = colDef.getValueFormat_Category();
-               columnProperties.valueFormat_Detail = colDef.getValueFormat_Detail();
-
-               break;
-            }
-         }
-      }
+      updateProfileModel_SetProperties();
    }
 
-   private void updateProfileModel_From_Model(final ArrayList<ColumnDefinition> columnViewerModel) {
+   private void updateProfileModel_From_Model(final List<ColumnDefinition> columnViewerModel) {
 
       // update profile
       _columnManager.setVisibleColumnIds_FromModel(_selectedProfile, columnViewerModel);
 
-      /*
-       * Update value formats from the model
-       */
+      updateProfileModel_SetProperties();
+   }
+
+   /**
+    * Update column properties from the model
+    */
+   private void updateProfileModel_SetProperties() {
+
       for (final ColumnDefinition colDef : _columnViewerModel) {
 
          final String columnId = colDef.getColumnId();
@@ -1847,8 +2077,23 @@ public class DialogModifyColumns extends TrayDialog {
 
             if (columnId.equals(columnProperties.columnId)) {
 
-               columnProperties.valueFormat_Category = colDef.getValueFormat_Category();
-               columnProperties.valueFormat_Detail = colDef.getValueFormat_Detail();
+               /*
+                * Do not set the column alignment when it's value is the default value
+                */
+               int columnStyle = colDef.getColumnStyle();
+               final int defaultColumnStyle = colDef.getDefaultColumnStyle();
+
+               if (columnStyle == defaultColumnStyle) {
+                  columnStyle = 0;
+               }
+
+// SET_FORMATTING_OFF
+
+               columnProperties.valueFormat_Category  = colDef.getValueFormat_Category();
+               columnProperties.valueFormat_Detail    = colDef.getValueFormat_Detail();
+               columnProperties.alignment             = columnStyle;
+
+// SET_FORMATTING_ON
 
                break;
             }
