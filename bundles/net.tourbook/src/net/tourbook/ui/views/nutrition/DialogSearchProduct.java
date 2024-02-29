@@ -34,6 +34,7 @@ import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.InvisibleTableColumnDefinition;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.data.TourData;
@@ -659,12 +660,12 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
    private Menu createUI_32_CreateViewerContextMenu() {
 
       final Table table = (Table) _productsViewer.getControl();
-      final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
-
-      return tableContextMenu;
+      return _viewerMenuManager.createContextMenu(table);
    }
 
    private void defineAllColumns() {
+
+      new InvisibleTableColumnDefinition(_columnManager);
 
       defineColumn_10_Barcode();
       defineColumn_20_Name();
