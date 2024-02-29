@@ -89,6 +89,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -192,6 +193,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private PageBook                 _pageBook;
    private Composite                _pageNoData;
+   private Composite                _pageContent;
    private Composite                _viewerContainer;
 
    private boolean                  _isInUpdate;
@@ -681,12 +683,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _pageNoData = net.tourbook.common.UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
-      _tk = new FormToolkit(parent.getDisplay());
+      _tk = new FormToolkit(_pageBook.getDisplay());
 
-      GridLayoutFactory.fillDefaults().applyTo(parent);
+      _pageContent = new Composite(_pageBook, SWT.NONE);
+      _pageContent.setLayout(new GridLayout());
       {
-         createUI_Section_10_Summary(parent);
-         createUI_Section_20_ProductsList(parent);
+         createUI_Section_10_Summary(_pageContent);
+         createUI_Section_20_ProductsList(_pageContent);
       }
    }
 
@@ -1730,7 +1733,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          }
          _isInUpdate = false;
 
-         _pageBook.showPage(_viewerContainer);
+         _pageBook.showPage(_pageContent);
 
          updateUI_SummaryFromModel();
       }
