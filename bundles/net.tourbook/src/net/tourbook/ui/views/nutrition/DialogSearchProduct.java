@@ -438,8 +438,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       getButton(IDialogConstants.OK_ID).setVisible(false);
       getButton(IDialogConstants.CANCEL_ID).setVisible(false);
 
-      final GridLayout layout = (GridLayout) parent.getLayout();
-      layout.marginHeight = 0;
+      ((GridLayout) parent.getLayout()).marginHeight = 0;
    }
 
    @Override
