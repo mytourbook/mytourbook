@@ -35,9 +35,12 @@ public class InvisibleTableColumnDefinition extends TableColumnDefinition {
     */
    public InvisibleTableColumnDefinition(final ColumnManager columnManager) {
 
-      super(columnManager, UI.EMPTY_STRING, SWT.DEFAULT);
+      super(columnManager, UI.EMPTY_STRING, SWT.TRAIL);
+
+      setIsDefaultColumn();
+      setDefaultColumnWidth(0);
+      setColumnLabel(UI.EMPTY_STRING);
       setColumnHeaderText(UI.EMPTY_STRING);
-      setHideColumn();
 
       setLabelProvider(new CellLabelProvider() {
          @Override
