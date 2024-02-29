@@ -114,7 +114,7 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 54;
+   private static final int TOURBOOK_DB_VERSION = 55;
 
 //   private static final int TOURBOOK_DB_VERSION = 55; // 24.x ??????
 
@@ -198,6 +198,7 @@ public class TourDatabase {
    public static final String  TABLE_TOUR_DATA                            = "TOURDATA";                                              //$NON-NLS-1$
    public static final String  TABLE_TOUR_GEO_PARTS                       = "TourGeoParts";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_LOCATION                        = "TourLocation";                                          //$NON-NLS-1$
+   public static final String  TABLE_TOUR_LOCATION_POINT                  = "TourLocationPoint";                                     //$NON-NLS-1$
    public static final String  TABLE_TOUR_MARKER                          = "TOURMARKER";                                            //$NON-NLS-1$
    public static final String  TABLE_TOUR_PERSON                          = "TOURPERSON";                                            //$NON-NLS-1$
    public static final String  TABLE_TOUR_PERSON_HRZONE                   = "TOURPERSONHRZONE";                                      //$NON-NLS-1$
@@ -236,6 +237,7 @@ public class TourDatabase {
    private static final String ENTITY_ID_DEVICE_SENSOR_VALUE = "SensorValueId";                             //$NON-NLS-1$
    private static final String ENTITY_ID_HR_ZONE             = "HrZoneID";                                  //$NON-NLS-1$
    private static final String ENTITY_ID_LOCATION            = "LocationID";                                //$NON-NLS-1$
+   private static final String ENTITY_ID_LOCATION_POINT      = "LocationPointID";                           //$NON-NLS-1$
    private static final String ENTITY_ID_MARKER              = "MarkerID";                                  //$NON-NLS-1$
    private static final String ENTITY_ID_PERSON              = "PersonID";                                  //$NON-NLS-1$
    private static final String ENTITY_ID_PHOTO               = "PhotoID";                                   //$NON-NLS-1$
@@ -248,13 +250,14 @@ public class TourDatabase {
 
 // SET_FORMATTING_OFF
 
-   private static final String KEY_BIKE            = TABLE_TOUR_BIKE         + "_" + ENTITY_ID_BIKE;             //$NON-NLS-1$
-   private static final String KEY_DEVICE_SENSOR   = TABLE_DEVICE_SENSOR     + "_" + ENTITY_ID_DEVICE_SENSOR;    //$NON-NLS-1$
-   private static final String KEY_PERSON          = TABLE_TOUR_PERSON       + "_" + ENTITY_ID_PERSON;           //$NON-NLS-1$
-   public static final String  KEY_TAG             = TABLE_TOUR_TAG          + "_" + ENTITY_ID_TAG;              //$NON-NLS-1$
-   private static final String KEY_TAG_CATEGORY    = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY;     //$NON-NLS-1$
-   public static final String  KEY_TOUR            = TABLE_TOUR_DATA         + "_" + ENTITY_ID_TOUR;             //$NON-NLS-1$
-   private static final String KEY_TYPE            = TABLE_TOUR_TYPE         + "_" + ENTITY_ID_TYPE;             //$NON-NLS-1$
+   private static final String KEY_BIKE            = TABLE_TOUR_BIKE          + "_" + ENTITY_ID_BIKE;             //$NON-NLS-1$
+   private static final String KEY_DEVICE_SENSOR   = TABLE_DEVICE_SENSOR      + "_" + ENTITY_ID_DEVICE_SENSOR;    //$NON-NLS-1$
+   private static final String KEY_PERSON          = TABLE_TOUR_PERSON        + "_" + ENTITY_ID_PERSON;           //$NON-NLS-1$
+   public static final String  KEY_TAG             = TABLE_TOUR_TAG           + "_" + ENTITY_ID_TAG;              //$NON-NLS-1$
+   private static final String KEY_TAG_CATEGORY    = TABLE_TOUR_TAG_CATEGORY  + "_" + ENTITY_ID_TAG_CATEGORY;     //$NON-NLS-1$
+   public static final String  KEY_TOUR            = TABLE_TOUR_DATA          + "_" + ENTITY_ID_TOUR;             //$NON-NLS-1$
+   public static final String  KEY_TOUR_LOCATION   = TABLE_TOUR_LOCATION      + "_" + ENTITY_ID_LOCATION;         //$NON-NLS-1$
+   private static final String KEY_TYPE            = TABLE_TOUR_TYPE          + "_" + ENTITY_ID_TYPE;             //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
@@ -4695,7 +4698,7 @@ public class TourDatabase {
    }
 
    /**
-    * Create table {@link #TABLE_DEVICE_SENSOR}
+    * Create table {@link #TABLE_TOUR_LOCATION}
     *
     * @param stmt
     *
@@ -4806,6 +4809,32 @@ public class TourDatabase {
    }
 
    /**
+    * Create table {@link #TABLE_TOUR_LOCATION_POINT}
+    *
+    * @param stmt
+    *
+    * @throws SQLException
+    */
+   private void createTable_TourLocationPoint(final Statement stmt) throws SQLException {
+
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_LOCATION_POINT + "   (                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+      //
+            + SQL.CreateField_EntityId(ENTITY_ID_LOCATION_POINT, true)
+
+            + "   TourData_TourID            BIGINT,                                   " + NL //$NON-NLS-1$
+            + "   TourLocation_LocationID    BIGINT,                                   " + NL //$NON-NLS-1$
+
+            + "   serieIndex                 INTEGER NOT NULL,                         " + NL //$NON-NLS-1$
+            + "   tourTime                   BIGINT NOT NULL,                          " + NL //$NON-NLS-1$
+
+            + "   latitudeE6                 INTEGER DEFAULT 0,                        " + NL //$NON-NLS-1$
+            + "   longitudeE6                INTEGER DEFAULT 0                         " + NL //$NON-NLS-1$
+
+            + ")" //                                                                         //$NON-NLS-1$
+      );
+   }
+
+   /**
     * Create table {@link #TABLE_TOUR_MARKER} for {@link TourMarker}.
     *
     * @param stmt
@@ -4879,7 +4908,8 @@ public class TourDatabase {
             + "   labelYOffset               INTEGER,                                  " + NL //$NON-NLS-1$
             + "   markerType                 BIGINT                                    " + NL //$NON-NLS-1$
 
-            + ")"); //$NON-NLS-1$
+            + ")" //$NON-NLS-1$
+      );
    }
 
    /**
@@ -5923,6 +5953,7 @@ public class TourDatabase {
             createTable_DeviceSensor(stmt);
             createTable_DeviceSensorValues(stmt);
             createTable_TourLocation(stmt);
+            createTable_TourLocationPoint(stmt);
 
             createTable_DbVersion_Design(stmt);
             createTable_DbVersion_Data(stmt, TOURBOOK_DB_VERSION);
@@ -6540,6 +6571,11 @@ public class TourDatabase {
          // 53 -> 54    24.1
          if (currentDbVersion == 53) {
             currentDbVersion = _dbDesignVersion_New = updateDb_053_To_054(conn, splashManager);
+         }
+
+         // 54 -> 55    24.x
+         if (currentDbVersion == 54) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_054_To_055(conn, splashManager);
          }
 
          // update db design version number
@@ -10579,6 +10615,27 @@ public class TourDatabase {
       updateMonitor(splashManager, newDbVersion);
 
       // this is a dummy db design update that the db data update works
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDb_054_To_055(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 55;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // double check if db already exists
+         if (isTableAvailable(conn, TABLE_TOUR_LOCATION_POINT) == false) {
+            createTable_TourLocationPoint(stmt);
+         }
+      }
+      stmt.close();
 
       logDbUpdate_End(newDbVersion);
 

@@ -979,7 +979,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private Set<TourPhoto>              tourPhotos                          = new HashSet<>();
 
    /**
-    * Tour marker
+    * Tour markers
     */
    @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
@@ -987,6 +987,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    @XmlElement(name = "TourMarker")
    @JsonProperty
    private Set<TourMarker>             tourMarkers                         = new HashSet<>();
+
+   /**
+    * Tour location points are wrapping {@link TourLocation}s with additional data
+    */
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
+   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+   @JsonProperty
+   private Set<TourLocationPoint>      tourLocationPoints                  = new HashSet<>();
 
    /**
     * Contains the tour way points
@@ -10791,6 +10799,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    public TourLocation getTourLocationEnd() {
       return tourLocationEnd;
+   }
+
+   public Set<TourLocationPoint> getTourLocationPoints() {
+      return tourLocationPoints;
    }
 
    public TourLocation getTourLocationStart() {
