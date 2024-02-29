@@ -117,8 +117,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
    private boolean                       _isInUIInit;
 
-   private String                        _dlgDefaultMessage;
-
    /*
     * none UI
     */
@@ -422,7 +420,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       super.create();
 
       setTitle(Messages.Dialog_SearchProduct_Title);
-      setMessage(_dlgDefaultMessage);
 
       _isInUIInit = true;
       {
