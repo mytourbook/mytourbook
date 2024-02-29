@@ -20,7 +20,6 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -54,6 +53,8 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -90,7 +91,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.ToolTip;
 import org.eclipse.swt.widgets.Widget;
 
 public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer, PropertyChangeListener {
@@ -122,25 +122,24 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
    /*
     * none UI
     */
-   private PixelConverter                _pc;
-   private List<String>                  _searchHistory                  = new ArrayList<>();
-   private final NutritionQuery          _nutritionQuery                 = new NutritionQuery();
-   private PostSelectionProvider         _postSelectionProvider;
-   private final HashMap<Integer, Image> _graphImages                    = new HashMap<>();
-   private final Image                   _iconPlaceholder;
+   private PixelConverter          _pc;
+   private List<String>            _searchHistory                  = new ArrayList<>();
+   private final NutritionQuery    _nutritionQuery                 = new NutritionQuery();
+   private PostSelectionProvider   _postSelectionProvider;
+   private final Image             _imageError;
 
-   private IPropertyChangeListener       _prefChangeListener;
-   private SelectionListener             _columnSortListener;
+   private IPropertyChangeListener _prefChangeListener;
+   private SelectionListener       _columnSortListener;
 
-   private AutocompleteComboInput        _autocompleteProductSearchHistory;
+   private AutocompleteComboInput  _autocompleteProductSearchHistory;
 
-   private ToolTip                       _tooltipInvalidBarCode;
+   private ControlDecoration       _decorator_InvalidBarCode;
 
-   private ComboViewer                   _queryViewer;
+   private ComboViewer             _queryViewer;
 
-   private ColumnManager                 _columnManager;
-   private MenuManager                   _viewerMenuManager;
-   private IContextMenuProvider          _tableViewerContextMenuProvider = new TableContextMenuProvider();
+   private ColumnManager           _columnManager;
+   private MenuManager             _viewerMenuManager;
+   private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
    /*
     * UI controls
@@ -373,8 +372,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       setDefaultImage(TourbookPlugin.getImageDescriptor(Images.TourNutrition).createImage());
 
       _tourId = tourId;
-      _iconPlaceholder = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
-
+      _imageError = FieldDecorationRegistry.getDefault()
+            .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR)
+            .getImage();
    }
 
    private void addPrefListener() {
@@ -541,7 +541,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
                   .grab(true, false)
                   .applyTo(_comboSearchQuery);
 
-            _tooltipInvalidBarCode = UI.createBalloonTooltip(headerContainer.getShell(), Messages.Dialog_SearchProduct_Tooltip_InvalidBarcode);
+            _decorator_InvalidBarCode = new ControlDecoration(_comboSearchQuery, SWT.TOP | SWT.LEFT);
+            _decorator_InvalidBarCode.setDescriptionText(Messages.Dialog_SearchProduct_Tooltip_InvalidBarcode);
+            _decorator_InvalidBarCode.setImage(_imageError);
          }
          {
             /*
@@ -838,9 +840,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
    private void onDispose() {
 
-      _iconPlaceholder.dispose();
-
-      _graphImages.values().forEach(image -> image.dispose());
+      _imageError.dispose();
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
 
@@ -1034,7 +1034,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       if (net.tourbook.common.util.StringUtils.isNullOrEmpty(searchQueryText)) {
 
          _btnSearch.setEnabled(false);
-         _tooltipInvalidBarCode.setVisible(false);
+         _decorator_InvalidBarCode.hide();
          return;
       }
 
@@ -1043,12 +1043,16 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
          // Search by product code is selected
          final boolean isSearchQueryNumeric = StringUtils.isNumeric(searchQueryText);
          _btnSearch.setEnabled(isSearchQueryNumeric);
-         _tooltipInvalidBarCode.setVisible(!isSearchQueryNumeric);
-
+         if (!isSearchQueryNumeric) {
+            _decorator_InvalidBarCode.show();
+            _decorator_InvalidBarCode.showHoverText(Messages.Dialog_SearchProduct_Tooltip_InvalidBarcode);
+         } else {
+            _decorator_InvalidBarCode.hide();
+         }
       } else {
 
          _btnSearch.setEnabled(true);
-         _tooltipInvalidBarCode.setVisible(false);
+         _decorator_InvalidBarCode.hide();
       }
 
    }

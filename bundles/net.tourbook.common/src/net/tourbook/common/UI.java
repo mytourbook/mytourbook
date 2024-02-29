@@ -116,7 +116,6 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolTip;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IMemento;
@@ -1422,17 +1421,6 @@ public class UI {
    }
 
    /**
-    * Create a balloon tooltip
-    */
-   public static ToolTip createBalloonTooltip(final Shell shell, final String message) {
-
-      final ToolTip balloonTooltip = new ToolTip(shell, SWT.BALLOON);
-      balloonTooltip.setMessage(message);
-
-      return balloonTooltip;
-   }
-
-   /**
     * Create a cursor resource from an image descriptor. Cursor must be disposed.
     *
     * @param imageName
@@ -2483,7 +2471,7 @@ public class UI {
                                  final int alignment) {
 
       final Rectangle imageRect = image.getBounds();
-      
+
       final int imageWidth = imageRect.width;
       final int imageWidth2 = imageWidth / 2;
 
