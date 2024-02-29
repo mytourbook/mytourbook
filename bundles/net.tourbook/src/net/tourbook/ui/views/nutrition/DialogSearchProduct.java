@@ -124,7 +124,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
    private List<String>            _searchHistory                  = new ArrayList<>();
    private final NutritionQuery    _nutritionQuery                 = new NutritionQuery();
    private PostSelectionProvider   _postSelectionProvider;
-   private final Image             _imageError;
 
    private IPropertyChangeListener _prefChangeListener;
    private SelectionListener       _columnSortListener;
@@ -370,9 +369,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       setDefaultImage(TourbookPlugin.getImageDescriptor(Images.TourNutrition).createImage());
 
       _tourId = tourId;
-      _imageError = FieldDecorationRegistry.getDefault()
-            .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR)
-            .getImage();
    }
 
    private void addPrefListener() {
@@ -540,7 +536,11 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
             _decorator_InvalidBarCode = new ControlDecoration(_comboSearchQuery, SWT.TOP | SWT.LEFT);
             _decorator_InvalidBarCode.setDescriptionText(Messages.Dialog_SearchProduct_Tooltip_InvalidBarcode);
-            _decorator_InvalidBarCode.setImage(_imageError);
+            final Image image = FieldDecorationRegistry
+                  .getDefault()
+                  .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR)
+                  .getImage();
+            _decorator_InvalidBarCode.setImage(image);
          }
          {
             /*
@@ -836,8 +836,6 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
    }
 
    private void onDispose() {
-
-      _imageError.dispose();
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
 
