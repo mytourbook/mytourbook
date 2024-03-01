@@ -141,20 +141,21 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
    /*
     * UI controls
     */
-   private Button           _btnAdd;
-   private Button           _btnSearch;
+   private Button                    _btnAdd;
+   private Button                    _btnSearch;
 
-   private Label            _lblKeywords;
-   private Label            _lblSearchType;
+   private Label                     _lblKeywords;
+   private Label                     _lblSearchType;
 
-   private Combo            _comboSearchQuery;
-   private Combo            _comboSearchType;
+   private Combo                     _comboSearchQuery;
+   private Combo                     _comboSearchType;
 
-   private Composite        _viewerContainer;
+   private Composite                 _viewerContainer;
 
-   private ActionAddProduct _actionAddProduct;
+   private ActionAddProduct          _actionAddProduct;
+   private ActionOpenProductsWebsite _actionOpenProductWebsite;
 
-   private Menu             _tableContextMenu;
+   private Menu                      _tableContextMenu;
 
    private class ActionAddProduct extends Action {
 
@@ -429,6 +430,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
    private void createActions() {
 
       _actionAddProduct = new ActionAddProduct();
+      _actionOpenProductWebsite = new ActionOpenProductsWebsite();
    }
 
    @Override
@@ -754,6 +756,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
    private void fillContextMenu(final IMenuManager menuMgr) {
 
       menuMgr.add(_actionAddProduct);
+
+      _actionOpenProductWebsite.setTourNutritionProducts(getSelectedProducts());
+      menuMgr.add(_actionOpenProductWebsite);
    }
 
    private void fillUI() {
@@ -790,6 +795,22 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       default:
          return ProductSearchType.ByName;
       }
+   }
+
+   private List<String> getSelectedProducts() {
+
+      final StructuredSelection selection = (StructuredSelection) _productsViewer.getSelection();
+
+      final List<String> productCodes = new ArrayList<>();
+
+      for (final Object object : selection.toList()) {
+
+         if (object instanceof final Product product) {
+            productCodes.add(product.code);
+         }
+      }
+
+      return productCodes;
    }
 
    @Override

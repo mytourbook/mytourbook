@@ -752,7 +752,7 @@
             mnemonic    ="%View_Name_TourData_Mnemonic"/>
             
          <command
-            commandId   ="command.net.tourbook.views.TourNutritionView"
+            commandId   ="command.net.tourbook.views.nutrition.TourNutritionView"
             icon        ="icons/tour-nutrition.png"
             label       ="%View_Name_TourNutrition"
             mnemonic    ="%View_Name_TourNutrition_Mnemonic"/>
@@ -1343,7 +1343,7 @@
       />
       
       <command
-         id             ="command.net.tourbook.views.TourNutritionView"
+         id             ="command.net.tourbook.views.nutrition.TourNutritionView"
          name           ="%View_Name_TourNutrition"
          defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourNutrition"
       />
@@ -1744,8 +1744,8 @@
 
          <view
             category    ="net.tourbook.category.Tour_Properties"
-            id          ="net.tourbook.ui.views.TourNutritionView"
-            class       ="net.tourbook.ui.views.TourNutritionView"
+            id          ="net.tourbook.ui.views.nutrition.TourNutritionView"
+            class       ="net.tourbook.ui.views.nutrition.TourNutritionView"
             icon        ="icons/tour-nutrition.png"
             name        ="%View_Name_TourNutrition"/>
 

@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views;
+package net.tourbook.ui.views.nutrition;
 
 import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
@@ -57,7 +57,6 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.views.nutrition.DialogSearchProduct;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
@@ -117,20 +116,20 @@ import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 
 public class TourNutritionView extends ViewPart implements ITourViewer {
 
-   static final String                   ID                             = "net.tourbook.ui.views.TourNutritionView"; //$NON-NLS-1$
-   private static final String           STATE_PRODUCT_SEARCHES_HISTORY = "products.searchesHistory";                //$NON-NLS-1$
-   private static final String           STATE_SECTION_PRODUCTS_LIST    = "STATE_SECTION_PRODUCTS_LIST";             //$NON-NLS-1$
-   private static final String           STATE_SECTION_SUMMARY          = "STATE_SECTION_SUMMARY";                   //$NON-NLS-1$
+   public static final String            ID                             = "net.tourbook.ui.views.nutrition.TourNutritionView"; //$NON-NLS-1$
+   private static final String           STATE_PRODUCT_SEARCHES_HISTORY = "products.searchesHistory";                          //$NON-NLS-1$
+   private static final String           STATE_SECTION_PRODUCTS_LIST    = "STATE_SECTION_PRODUCTS_LIST";                       //$NON-NLS-1$
+   private static final String           STATE_SECTION_SUMMARY          = "STATE_SECTION_SUMMARY";                             //$NON-NLS-1$
 
-   private static final String           COLUMN_CONSUMED_QUANTITY       = "ConsumedQuantity";                        //$NON-NLS-1$
-   private static final String           COLUMN_QUANTITY_TYPE           = "QuantityType";                            //$NON-NLS-1$
-   private static final String           COLUMN_NAME                    = "Name";                                    //$NON-NLS-1$
-   private static final String           COLUMN_CALORIES                = "Calories";                                //$NON-NLS-1$
-   private static final String           COLUMN_SODIUM                  = "Sodium";                                  //$NON-NLS-1$
-   private static final String           COLUMN_ISBEVERAGE              = "IsBeverage";                              //$NON-NLS-1$
-   private static final String           COLUMN_BEVERAGE_QUANTITY       = "BeverageQuantity";                        //$NON-NLS-1$
-   private static final String           COLUMN_BEVERAGE_CONTAINER      = "BeverageContainer";                       //$NON-NLS-1$
-   private static final String           COLUMN_CONSUMED_CONTAINERS     = "ConsumedContainers";                      //$NON-NLS-1$
+   private static final String           COLUMN_CONSUMED_QUANTITY       = "ConsumedQuantity";                                  //$NON-NLS-1$
+   private static final String           COLUMN_QUANTITY_TYPE           = "QuantityType";                                      //$NON-NLS-1$
+   private static final String           COLUMN_NAME                    = "Name";                                              //$NON-NLS-1$
+   private static final String           COLUMN_CALORIES                = "Calories";                                          //$NON-NLS-1$
+   private static final String           COLUMN_SODIUM                  = "Sodium";                                            //$NON-NLS-1$
+   private static final String           COLUMN_ISBEVERAGE              = "IsBeverage";                                        //$NON-NLS-1$
+   private static final String           COLUMN_BEVERAGE_QUANTITY       = "BeverageQuantity";                                  //$NON-NLS-1$
+   private static final String           COLUMN_BEVERAGE_CONTAINER      = "BeverageContainer";                                 //$NON-NLS-1$
+   private static final String           COLUMN_CONSUMED_CONTAINERS     = "ConsumedContainers";                                //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore                     = TourbookPlugin.getPrefStore();
 
@@ -223,19 +222,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       @Override
       public void run() {
          onDeleteProducts();
-      }
-   }
-
-   private class ActionOpenProductsWebsite extends Action {
-
-      public ActionOpenProductsWebsite() {
-
-         super(Messages.Tour_Nutrition_Button_OpenProductsWebsite, AS_PUSH_BUTTON);
-      }
-
-      @Override
-      public void run() {
-         onOpenProductsWebsite();
       }
    }
 
@@ -1226,20 +1212,17 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void enableActions() {
 
-      final Object selectedItem = ((IStructuredSelection) _productsViewer.getSelection()).getFirstElement();
-      if (selectedItem == null) {
-         return;
-      }
+      final List<String> selectedProductsCodes = getSelectedProductsCodes();
 
-      final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) selectedItem;
-
-      _actionOpenProductWebsite.setEnabled(!tourNutritionProduct.isCustomProduct());
+      _actionOpenProductWebsite.setEnabled(selectedProductsCodes.size() > 0);
 
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
+      _actionOpenProductWebsite.setTourNutritionProducts(getSelectedProductsCodes());
       menuMgr.add(_actionOpenProductWebsite);
+
       menuMgr.add(_actionDeleteProducts);
 
       enableActions();
@@ -1264,6 +1247,23 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       }
 
       return selectedTourNutritionProducts;
+   }
+
+   private List<String> getSelectedProductsCodes() {
+
+      final List<TourNutritionProduct> selectedTourNutritionProducts = getSelectedProducts();
+
+      final List<String> selectedTourNutritionProductsCodes = new ArrayList<>();
+
+      for (final TourNutritionProduct tourNutritionProduct : selectedTourNutritionProducts) {
+
+         if (tourNutritionProduct.isCustomProduct()) {
+            continue;
+         }
+         selectedTourNutritionProductsCodes.add(tourNutritionProduct.getProductCode());
+      }
+
+      return selectedTourNutritionProductsCodes;
    }
 
    @Override
