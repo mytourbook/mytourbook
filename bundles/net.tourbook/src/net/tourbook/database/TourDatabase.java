@@ -114,7 +114,7 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 55;
+   private static final int TOURBOOK_DB_VERSION = 56;
 
 //   private static final int TOURBOOK_DB_VERSION = 55; // 24.x ??????
 
@@ -6573,9 +6573,9 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_053_To_054(conn, splashManager);
          }
 
-         // 54 -> 55    24.x
+         // 54 -> 56    24.x
          if (currentDbVersion == 54) {
-            currentDbVersion = _dbDesignVersion_New = updateDb_054_To_055(conn, splashManager);
+            currentDbVersion = _dbDesignVersion_New = updateDb_054_To_056(conn, splashManager);
          }
 
          // update db design version number
@@ -10621,9 +10621,9 @@ public class TourDatabase {
       return newDbVersion;
    }
 
-   private int updateDb_054_To_055(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_054_To_056(final Connection conn, final SplashManager splashManager) throws SQLException {
 
-      final int newDbVersion = 55;
+      final int newDbVersion = 56;
 
       logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
