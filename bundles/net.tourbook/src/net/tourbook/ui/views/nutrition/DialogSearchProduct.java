@@ -964,7 +964,9 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
    }
 
    @Override
-   public void reloadViewer() {}
+   public void reloadViewer() {
+      _productsViewer.setInput(new Object[0]);
+   }
 
    private void restoreState() {
 
@@ -997,6 +999,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
       _state.put(STATE_SEARCHED_QUERIES, _searchHistory.toArray(new String[_searchHistory.size()]));
       _state.put(STATE_SEARCH_TYPE, _comboSearchType.getSelectionIndex());
+
+      _columnManager.saveState(_state);
 
       _autocompleteProductSearchHistory.saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_SEARCH_HISTORY);
    }

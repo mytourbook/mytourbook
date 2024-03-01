@@ -185,32 +185,32 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    /*
     * UI controls
     */
-   private Image                    _imageAdd     = TourbookPlugin.getImageDescriptor(Images.App_Add).createImage();
-   private Image                    _imageSearch  = TourbookPlugin.getImageDescriptor(Images.SearchTours).createImage();
+   private Image                     _imageAdd     = TourbookPlugin.getImageDescriptor(Images.App_Add).createImage();
+   private Image                     _imageSearch  = TourbookPlugin.getImageDescriptor(Images.SearchTours).createImage();
 
-   private Image                    _imageCheck   = TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked).createImage();
-   private Image                    _imageUncheck = TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck).createImage();
-   private Image                    _imageYes     = CommonActivator.getImageDescriptor(CommonImages.App_Yes).createImage();
+   private Image                     _imageCheck   = TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked).createImage();
+   private Image                     _imageUncheck = TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck).createImage();
+   private Image                     _imageYes     = CommonActivator.getImageDescriptor(CommonImages.App_Yes).createImage();
 
-   private PageBook                 _pageBook;
-   private Composite                _pageNoData;
-   private Composite                _pageContent;
-   private Composite                _viewerContainer;
+   private PageBook                  _pageBook;
+   private Composite                 _pageNoData;
+   private Composite                 _pageContent;
+   private Composite                 _viewerContainer;
 
-   private boolean                  _isInUpdate;
-   private Text                     _txtCalories_Average;
-   private Text                     _txtCalories_Total;
-   private Text                     _txtFluid_Average;
-   private Text                     _txtFluid_Total;
-   private Text                     _txtSodium_Average;
-   private Text                     _txtSodium_Total;
-   private Section                  _sectionProductsList;
-   private Section                  _sectionSummary;
-   private FormToolkit              _tk;
-   private Menu                     _tableContextMenu;
+   private boolean                   _isInUpdate;
+   private Text                      _txtCalories_Average;
+   private Text                      _txtCalories_Total;
+   private Text                      _txtFluid_Average;
+   private Text                      _txtFluid_Total;
+   private Text                      _txtSodium_Average;
+   private Text                      _txtSodium_Total;
+   private Section                   _sectionProductsList;
+   private Section                   _sectionSummary;
+   private FormToolkit               _tk;
+   private Menu                      _tableContextMenu;
 
-   private ActionDeleteProducts     _actionDeleteProducts;
-   private ActionOpenProductWebsite _actionOpenProductWebsite;
+   private ActionDeleteProducts      _actionDeleteProducts;
+   private ActionOpenProductsWebsite _actionOpenProductWebsite;
 
    private class ActionDeleteProducts extends Action {
 
@@ -226,16 +226,16 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       }
    }
 
-   private class ActionOpenProductWebsite extends Action {
+   private class ActionOpenProductsWebsite extends Action {
 
-      public ActionOpenProductWebsite() {
+      public ActionOpenProductsWebsite() {
 
          super(Messages.Tour_Nutrition_Button_OpenProductsWebsite, AS_PUSH_BUTTON);
       }
 
       @Override
       public void run() {
-         onOpenProductWebsite();
+         onOpenProductsWebsite();
       }
    }
 
@@ -616,7 +616,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void createActions() {
 
       _actionDeleteProducts = new ActionDeleteProducts();
-      _actionOpenProductWebsite = new ActionOpenProductWebsite();
+      _actionOpenProductWebsite = new ActionOpenProductsWebsite();
    }
 
    private void createMenuManager() {
@@ -885,7 +885,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                return;
             }
 
-            onOpenProductWebsite();
+            onOpenProductsWebsite();
          }
       };
       _productsViewer.getTable().addListener(SWT.MouseDoubleClick, doubleClickListener);
@@ -1325,17 +1325,22 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _tourData = TourManager.saveModifiedTour(_tourData);
    }
 
-   private void onOpenProductWebsite() {
+   private void onOpenProductsWebsite() {
 
       final Object selectedItem = ((IStructuredSelection) _productsViewer.getSelection()).getFirstElement();
       if (selectedItem == null) {
          return;
       }
 
-      final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) selectedItem;
+      final StructuredSelection selection = (StructuredSelection) _productsViewer.getSelection();
 
-      final String productCode = tourNutritionProduct.getProductCode();
-      NutritionUtils.openProductWebPage(productCode);
+      for (final Object object : selection.toList()) {
+
+         if (object instanceof final TourNutritionProduct tourNutritionProduct) {
+            final String productCode = tourNutritionProduct.getProductCode();
+            NutritionUtils.openProductWebPage(productCode);
+         }
+      }
    }
 
    private void onPaint_Viewer_GraphImage(final Event event) {
@@ -1488,6 +1493,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _state.put(STATE_PRODUCT_SEARCHES_HISTORY, _searchHistory.toArray(new String[_searchHistory.size()]));
       _state.put(STATE_SECTION_SUMMARY, _sectionSummary.isExpanded());
       _state.put(STATE_SECTION_PRODUCTS_LIST, _sectionProductsList.isExpanded());
+
+      _columnManager.saveState(_state);
    }
 
    private void setColumnsEditingSupport() {

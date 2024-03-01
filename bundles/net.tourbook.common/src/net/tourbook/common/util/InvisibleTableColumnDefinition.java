@@ -35,11 +35,11 @@ public class InvisibleTableColumnDefinition extends TableColumnDefinition {
     */
    public InvisibleTableColumnDefinition(final ColumnManager columnManager) {
 
-      super(columnManager, UI.EMPTY_STRING, SWT.TRAIL);
+      super(columnManager, "Invisible", SWT.TRAIL); //$NON-NLS-1$
 
       setIsDefaultColumn();
       setDefaultColumnWidth(0);
-      setColumnLabel(UI.EMPTY_STRING);
+      setColumnLabel("First column alignment hack"); //$NON-NLS-1$
       setColumnHeaderText(UI.EMPTY_STRING);
 
       setLabelProvider(new CellLabelProvider() {
