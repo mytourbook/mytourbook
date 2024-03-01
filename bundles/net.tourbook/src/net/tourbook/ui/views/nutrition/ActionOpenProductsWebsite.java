@@ -20,10 +20,7 @@ public class ActionOpenProductsWebsite extends Action {
    @Override
    public void run() {
 
-      for (final String productCode : _productCodes) {
-
-         NutritionUtils.openProductWebPage(productCode);
-      }
+      _productCodes.forEach(productCode -> NutritionUtils.openProductWebPage(productCode));
    }
 
    public void setTourNutritionProducts(final List<String> productCodes) {
