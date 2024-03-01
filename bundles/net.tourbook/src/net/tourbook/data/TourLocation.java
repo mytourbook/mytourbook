@@ -492,6 +492,31 @@ public class TourLocation implements Serializable {
       return Objects.hash(locationID);
    }
 
+   /**
+    * @param reqestedZoomlevel
+    * @param latitudeE6_Normalized
+    * @param longitudeE6_Normalized
+    *
+    * @return Returns <code>true</code> when the requested location is within this location
+    */
+   public boolean isInBoundingBox(final int reqestedZoomlevel,
+                                  final int latitudeE6_Normalized,
+                                  final int longitudeE6_Normalized) {
+
+      if (zoomlevel >= reqestedZoomlevel
+
+            && latitudeMinE6_Resized_Normalized <= latitudeE6_Normalized
+            && latitudeMaxE6_Resized_Normalized >= latitudeE6_Normalized
+
+            && longitudeMinE6_Resized_Normalized <= longitudeE6_Normalized
+            && longitudeMaxE6_Resized_Normalized >= longitudeE6_Normalized) {
+
+         return true;
+      }
+
+      return false;
+   }
+
    private String log(final String field, final double value) {
 
       return field + value + NL;

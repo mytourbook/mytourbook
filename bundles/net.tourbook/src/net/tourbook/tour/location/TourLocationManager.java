@@ -160,6 +160,8 @@ public class TourLocationManager {
 
    private static long                            _lastRetrievalTimeMS;
 
+   private static TourLocationCache               _locationCache              = new TourLocationCache(10);
+
 // SET_FORMATTING_OFF
 
    /**
@@ -752,7 +754,7 @@ public class TourLocationManager {
 
       final int[] boundingBoxE6 = Util.convertDoubleSeries_ToE6(boundingbox);
 
-      // convert possible negative values into positive values, it's easier to math it
+      // convert possible negative values into positive values, it's easier to math with them
       final int latitudeMinE6_Normalized = boundingBoxE6[0] + 90_000_000;
       final int latitudeMaxE6_Normalized = boundingBoxE6[1] + 90_000_000;
       final int longitudeMinE6_Normalized = boundingBoxE6[2] + 180_000_000;
@@ -1163,15 +1165,20 @@ public class TourLocationManager {
       return _defaultProfile;
    }
 
+   public static TourLocationCache getLocationCache() {
+      return _locationCache;
+   }
+
    /**
     * Retrieve location data when not yet available
     *
     * @param latitude
     * @param longitude
     * @param existingLocationData
+    *           Is checking this existing location and returns it when it fits.
     * @param zoomlevel
     *
-    * @return
+    * @return Returns {@link TourLocationData} or <code>null</code> when it could not be retrieved
     */
    public static TourLocationData getLocationData(final double latitude,
                                                   final double longitude,
@@ -1196,6 +1203,11 @@ public class TourLocationManager {
 
          return new TourLocationData(dbTourLocation);
       }
+
+      /*
+       * Check fifo cache
+       */
+//      _locationCache.get(latitude, longitude, zoomlevel);
 
       /*
        * Retrieve location
@@ -2384,7 +2396,7 @@ public class TourLocationManager {
                         // %s - "%s"  . . .  "%s"
                         TourLogManager.subLog_DEFAULT(
 
-                              OtherMessages.LOG_RETRIEVE_TOUR_LOCATION_TOUR.formatted(
+                              OtherMessages.LOG_TOUR_LOCATION_RETRIEVE_TOUR.formatted(
 
                                     TourManager.getTourDateTimeShort(tourData),
                                     tourData.getTourStartPlace(),

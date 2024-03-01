@@ -1280,11 +1280,11 @@ public class Map2 extends Canvas {
       }
    }
 
-   public GeoPosition get_mouseDown_GeoPosition() {
+   public GeoPosition getMouseDown_GeoPosition() {
       return _mouseDown_ContextMenu_GeoPosition;
    }
 
-   public GeoPosition get_mouseMove_GeoPosition() {
+   public GeoPosition getMouseMove_GeoPosition() {
       return _mouseMove_GeoPosition;
    }
 

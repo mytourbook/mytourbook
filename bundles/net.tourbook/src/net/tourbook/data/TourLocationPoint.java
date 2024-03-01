@@ -105,6 +105,10 @@ public class TourLocationPoint implements Serializable {
       return serieIndex;
    }
 
+   public TourLocation getTourLocation() {
+      return tourLocation;
+   }
+
    public long getTourTime() {
       return tourTime;
    }
@@ -115,12 +119,10 @@ public class TourLocationPoint implements Serializable {
       return Objects.hash(locationPointID);
    }
 
-   public void setLatitude(final int latitudeE6) {
-      this.latitudeE6 = latitudeE6;
-   }
+   public void setGeoPosition(final int latE6, final int lonE6) {
 
-   public void setLongitude(final int longitudeE6) {
-      this.longitudeE6 = longitudeE6;
+      latitudeE6 = latE6;
+      longitudeE6 = lonE6;
    }
 
    public void setSerieIndex(final int serieIndex) {

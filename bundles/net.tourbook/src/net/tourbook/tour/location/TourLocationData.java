@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,9 @@ import java.io.Serializable;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourLocation;
 
+/**
+ * Wrapper for {@link TourLocation} with additional data from the data retrieval.
+ */
 public class TourLocationData implements Serializable {
 
    private static final long serialVersionUID = 1L;
@@ -32,8 +35,6 @@ public class TourLocationData implements Serializable {
    long                      waitingTime;
 
    public TourLocation       tourLocation;
-
-   public TourLocationData() {}
 
    public TourLocationData(final String downloadedData, final long retrievalTime, final long waitingTime) {
 

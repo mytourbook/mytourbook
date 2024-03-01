@@ -1283,8 +1283,6 @@ public class Messages extends NLS {
    public static String        Log_Reimport_Tour_Skipped_OtherReasons;
    public static String        Log_ReplaceElevationUpDown_SRTMDataNotAvailable;
    public static String        Log_ReplaceElevationUpDown_ValuesAreReplaced;
-   public static String        Log_RetrieveTourLocation_End;
-   public static String        Log_RetrieveTourLocation_Tour;
    public static String        Log_RetrieveWeatherData_001_Start;
    public static String        Log_RetrieveWeatherData_002_End;
    public static String        Log_RetrieveWeatherData_003_NoWeatherData;
@@ -1324,6 +1322,9 @@ public class Messages extends NLS {
    public static String        Log_Tour_MoveTour;
    public static String        Log_Tour_SaveTours;
    public static String        Log_Tour_SaveTours_End;
+   public static String        Log_TourLocation_Retrieve_End;
+   public static String        Log_TourLocation_Retrieve_LocationPoint;
+   public static String        Log_TourLocation_Retrieve_Tour;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Humidity;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation;

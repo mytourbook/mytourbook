@@ -84,6 +84,7 @@ import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map2.Messages;
+import net.tourbook.map2.action.ActionCreateTourLocationFromMap;
 import net.tourbook.map2.action.ActionCreateTourMarkerFromMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
 import net.tourbook.map2.action.ActionMap2Color;
@@ -481,6 +482,7 @@ public class Map2View extends ViewPart implements
    private ActionTourColor                   _actionTourColor_RunDyn_StepLength;
    //
    private ActionCopyLocation                _actionCopyLocation;
+   private ActionCreateTourLocationFromMap   _actionCreateTourLocationFromMap;
    private ActionCreateTourMarkerFromMap     _actionCreateTourMarkerFromMap;
    private Action_ExportMap_SubMenu          _actionExportMap_SubMenu;
    private ActionGotoLocation                _actionGotoLocation;
@@ -972,7 +974,7 @@ public class Map2View extends ViewPart implements
 
    private void actionCopyLocationToClipboard() {
 
-      final GeoPosition mouseDown_GeoPosition = _map.get_mouseDown_GeoPosition();
+      final GeoPosition mouseDown_GeoPosition = _map.getMouseDown_GeoPosition();
 
       final String geoPosition = String.format(Messages.Clipboard_Content_MapLocation,
             mouseDown_GeoPosition.latitude,
@@ -987,7 +989,7 @@ public class Map2View extends ViewPart implements
 
    private void actionGotoLocation() {
 
-      final DialogGotoMapLocation dialogGotoMapLocation = new DialogGotoMapLocation(getMapPosition(), _map.get_mouseDown_GeoPosition());
+      final DialogGotoMapLocation dialogGotoMapLocation = new DialogGotoMapLocation(getMapPosition(), _map.getMouseDown_GeoPosition());
 
       dialogGotoMapLocation.open();
 
@@ -1797,6 +1799,7 @@ public class Map2View extends ViewPart implements
       _actionZoom_ShowEntireTour          = new ActionZoomShowEntireTour(this);
 
       _actionCopyLocation                 = new ActionCopyLocation();
+      _actionCreateTourLocationFromMap    = new ActionCreateTourLocationFromMap(this);
       _actionCreateTourMarkerFromMap      = new ActionCreateTourMarkerFromMap(this);
       _actionGotoLocation                 = new ActionGotoLocation();
       _actionManageMapProvider            = new ActionManageMapProviders(this);
@@ -1933,7 +1936,6 @@ public class Map2View extends ViewPart implements
       _map.setTourToolTip(_tourToolTip = new TourToolTip(_map));
       _tourInfoToolTipProvider.setActionsEnabled(true);
       _tourInfoToolTipProvider.setNoTourTooltip(OtherMessages.TOUR_TOOLTIP_LABEL_NO_GEO_TOUR);
-
 
       /*
        * Setup value point tooltip
@@ -2117,6 +2119,7 @@ public class Map2View extends ViewPart implements
 
       // update action because after closing the context menu, the hovered values are reset in the map paint event
       _actionCreateTourMarkerFromMap.setCurrentHoveredTourId(hoveredTourId);
+      _actionCreateTourLocationFromMap.setCurrentHoveredTourId(hoveredTourId);
 
 // SET_FORMATTING_OFF
 
@@ -2148,6 +2151,7 @@ public class Map2View extends ViewPart implements
       final boolean isOneTourDisplayed    = _isTourOrWayPointDisplayed && isMultipleTours == false && _isShowTour;
       final boolean isOneTourHovered      = hoveredTourId != null;
 
+      _actionCreateTourLocationFromMap    .setEnabled(isTourAvailable && isOneTourHovered);
       _actionCreateTourMarkerFromMap      .setEnabled(isTourAvailable && isOneTourHovered);
       _actionMap2Slideout_Color           .setEnabled(isTourAvailable);
       _actionShowLegendInMap              .setEnabled(_isTourOrWayPointDisplayed);
@@ -2272,6 +2276,7 @@ public class Map2View extends ViewPart implements
 
       menuMgr.add(_actionSearchTourByLocation);
       menuMgr.add(_actionCreateTourMarkerFromMap);
+      menuMgr.add(_actionCreateTourLocationFromMap);
 
       /*
        * Show tour features

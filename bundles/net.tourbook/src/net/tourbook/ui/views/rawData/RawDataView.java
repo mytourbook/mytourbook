@@ -6045,7 +6045,7 @@ public class RawDataView extends ViewPart implements
 
       // location data retrieved in %.1f s
       TourLogManager.subLog_DEFAULT(String.format(
-            Messages.Log_RetrieveTourLocation_End,
+            Messages.Log_TourLocation_Retrieve_End,
             (System.currentTimeMillis() - start) / 1000.0));
 
    }

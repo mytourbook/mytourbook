@@ -59,8 +59,8 @@ public class ActionCreateTourMarkerFromMap extends Action {
          return;
       }
 
-      final double clickedTourPointLatitude = this._mapView.getMap().get_mouseMove_GeoPosition().latitude;
-      final double clickedTourPointLongitude = this._mapView.getMap().get_mouseMove_GeoPosition().longitude;
+      final double clickedTourPointLatitude = this._mapView.getMap().getMouseMove_GeoPosition().latitude;
+      final double clickedTourPointLongitude = this._mapView.getMap().getMouseMove_GeoPosition().longitude;
 
       final LatLng clickedTourPoint = new LatLng(clickedTourPointLatitude, clickedTourPointLongitude);
       double closestDistance = Double.MAX_VALUE;

@@ -67,6 +67,7 @@ public class Messages extends NLS {
    public static String map_action_set_default_position;
 
    public static String Map_Action_CopyLocation;
+   public static String Map_Action_CreateTourLocationFromMap;
    public static String Map_Action_CreateTourMarkerFromMap;
    public static String Map_Action_Edit2DMapPreferences;
    public static String Map_Action_Export_Map_Clipboard_Copied_Info;
