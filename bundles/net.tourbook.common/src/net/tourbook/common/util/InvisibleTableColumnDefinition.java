@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -39,7 +40,7 @@ public class InvisibleTableColumnDefinition extends TableColumnDefinition {
 
       setIsDefaultColumn();
       setDefaultColumnWidth(0);
-      setColumnLabel("First column alignment hack"); //$NON-NLS-1$
+      setColumnLabel(Messages.Column_AlignmentHack_Label);
       setColumnHeaderText(UI.EMPTY_STRING);
 
       setLabelProvider(new CellLabelProvider() {

@@ -80,6 +80,7 @@ public class Messages extends NLS {
 
    public static String        Column_Annotation_Formatting;
    public static String        Column_Annotation_Sorting;
+   public static String        Column_AlignmentHack_Label;
 
    public static String        Column_Profile_Dialog_ShowAllColumns_Message;
    public static String        Column_Profile_Dialog_ShowDefaultColumns_Message;
