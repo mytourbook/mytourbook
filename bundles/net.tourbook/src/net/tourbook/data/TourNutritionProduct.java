@@ -50,13 +50,6 @@ public class TourNutritionProduct {
    private static final String        CUSTOMPRODUCTCODE_PREFIX = "MTCUSTOMPRODUCT-";              //$NON-NLS-1$
 
    /**
-    * Unique id for manually created products because the {@link #productCode}
-    * is 0 when the product is not persisted
-    */
-   @Transient
-   private long                       _createId                = 0;
-
-   /**
     * Unique id for the {@link TourNutritionProduct} entity
     */
    @Id
@@ -146,6 +139,13 @@ public class TourNutritionProduct {
     * The total number of beverage containers consumed
     */
    private float                      containersConsumed;
+
+   /**
+    * Unique id for manually created products because the {@link #productCode}
+    * is 0 when the product is not persisted
+    */
+   @Transient
+   private long                       _createId                = 0;
 
    public TourNutritionProduct() {}
 
