@@ -944,10 +944,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             }
 
             // get first nutrition product id
-            if (result_NutritionProductId instanceof Long) {
+            if (result_NutritionProductId instanceof final Long nutritionProductId) {
 
                nutritionProductIds = new HashSet<>();
-               nutritionProductIds.add((Long) result_NutritionProductId);
+               nutritionProductIds.add(nutritionProductId);
 
                tourItem.setNutritionProductsIds(nutritionProductIds);
             }
