@@ -37,6 +37,8 @@ import org.eclipse.swt.widgets.Tree;
 
 public class ColumnDefinition implements Cloneable {
 
+   private static final char         NL = UI.NEW_LINE;
+
    private final static NumberFormat _nf0;
    private final static NumberFormat _nf1;
    private final static NumberFormat _nf2;
@@ -855,21 +857,21 @@ public class ColumnDefinition implements Cloneable {
    @Override
    public String toString() {
 
-// SET_FORMATTING_OFF
-      return "ColumnDefinition [" //$NON-NLS-1$
+      return UI.EMPTY_STRING
 
-//				+ "_label="                + _label                + ", "   //$NON-NLS-1$ //$NON-NLS-2$
-            + "_isDefaultColumn="      + String.format("%-5s", Boolean.toString(_isDefaultColumn))    + ", "   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + "_isColumnChecked="      + String.format("%-5s", Boolean.toString(_isColumnChecked))    + ", "   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + "_columnId="             + String.format("%-40s", _columnId)                            + ", "   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-//          + "_valueFormat="          + _valueFormat_Category + ", "   //$NON-NLS-1$ //$NON-NLS-2$
-//          + "_valueFormat_Detail="   + _valueFormat_Detail   + ", "   //$NON-NLS-1$ //$NON-NLS-2$
-				+ "_columnWidth="          + _columnWidth          + ", "   //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "_defaultColumnWidth="   + _defaultColumnWidth            //$NON-NLS-1$
+            + "ColumnDefinition" + NL //                                                                 //$NON-NLS-1$
 
-            + "]\n"; //$NON-NLS-1$
+            + " _label              = " + _label + NL //                                                 //$NON-NLS-1$
+            + " _isDefaultColumn    = " + String.format("%-5s", Boolean.toString(_isDefaultColumn)) + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + " _isColumnChecked    = " + String.format("%-5s", Boolean.toString(_isColumnChecked)) + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + " _columnId           = " + String.format("%-40s", _columnId) + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
+            + " _valueFormat        = " + _valueFormat_Category + NL //                                  //$NON-NLS-1$
+            + " _valueFormat_Detail = " + _valueFormat_Detail + +NL //                                   //$NON-NLS-1$
+            + " _columnWidth        = " + _columnWidth + NL //                                           //$NON-NLS-1$
+            + " _defaultColumnWidth = " + _defaultColumnWidth + NL //                                    //$NON-NLS-1$
+            + " _style_Current      = " + ColumnManager.getAlignmentText(_style_Current) + NL //         //$NON-NLS-1$
 
-// SET_FORMATTING_ON
+      ;
    }
 
 }

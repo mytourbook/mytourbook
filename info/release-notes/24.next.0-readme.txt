@@ -50,8 +50,9 @@ New
 Improvements
 ============
 
-* View Columns
+* Viewer Columns
   - Customize column alignment in all views which are using the column manager
+  - Set column alignment in the viewer header context menu
     https://github.com/mytourbook/mytourbook/issues/1300  
 
 * Start/End Location

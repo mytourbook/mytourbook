@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class ColumnFormatSubMenu extends Action implements IMenuCreator {
 
-   private Menu             _menu;
+   private Menu             _contextMenu;
    private ColumnManager    _columnManager;
 
    private ColumnDefinition _colDef;
@@ -126,7 +126,7 @@ public class ColumnFormatSubMenu extends Action implements IMenuCreator {
 
    public ColumnFormatSubMenu(final Menu contextMenu, final ColumnDefinition colDef, final ColumnManager columnManager) {
 
-      _menu = contextMenu;
+      _contextMenu = contextMenu;
       _columnManager = columnManager;
 
       _colDef = colDef;
@@ -139,29 +139,29 @@ public class ColumnFormatSubMenu extends Action implements IMenuCreator {
          // only the detail (tour) can be formatted
 
          final String actionDetailText = NLS.bind(
-               Messages.Action_ColumnManager_ValueFormatter_Tour,
+               Messages.Action_ColumnManager_ValueFormatter_Tour2,
                FormatManager.getValueFormatterName(valueFormat_Detail));
 
-         addActionToMenu(_menu, new ActionAvailableFormats(actionDetailText, true));
+         addActionToMenu(_contextMenu, new ActionAvailableFormats(actionDetailText, true));
 
       } else {
 
          if (valueFormat_Category != null) {
 
             final String actionCategoryText = NLS.bind(
-                  Messages.Action_ColumnManager_ValueFormatter_Category,
+                  Messages.Action_ColumnManager_ValueFormatter_Category2,
                   FormatManager.getValueFormatterName(valueFormat_Category));
 
-            addActionToMenu(_menu, new ActionAvailableFormats(actionCategoryText, false));
+            addActionToMenu(_contextMenu, new ActionAvailableFormats(actionCategoryText, false));
          }
 
          if (valueFormat_Detail != null) {
 
             final String actionDetailText = NLS.bind(
-                  Messages.Action_ColumnManager_ValueFormatter_Detail,
+                  Messages.Action_ColumnManager_ValueFormatter_Detail2,
                   FormatManager.getValueFormatterName(valueFormat_Detail));
 
-            addActionToMenu(_menu, new ActionAvailableFormats(actionDetailText, true));
+            addActionToMenu(_contextMenu, new ActionAvailableFormats(actionDetailText, true));
          }
       }
    }
@@ -200,9 +200,9 @@ public class ColumnFormatSubMenu extends Action implements IMenuCreator {
    @Override
    public void dispose() {
 
-      if (_menu != null) {
-         _menu.dispose();
-         _menu = null;
+      if (_contextMenu != null) {
+         _contextMenu.dispose();
+         _contextMenu = null;
       }
    }
 
