@@ -38,7 +38,6 @@ public class InvisibleTableColumnDefinition extends TableColumnDefinition {
 
       super(columnManager, "Invisible", SWT.TRAIL); //$NON-NLS-1$
 
-      setIsDefaultColumn();
       setDefaultColumnWidth(0);
       setColumnLabel(Messages.Column_AlignmentHack_Label);
       setColumnHeaderText(UI.EMPTY_STRING);
