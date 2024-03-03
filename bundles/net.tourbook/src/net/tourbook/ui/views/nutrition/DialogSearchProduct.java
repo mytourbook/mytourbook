@@ -665,11 +665,11 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
    private void defineAllColumns() {
 
-      new InvisibleTableColumnDefinition(_columnManager);
-
       defineColumn_10_Barcode();
       defineColumn_20_Name();
       defineColumn_30_Quantity();
+
+      new InvisibleTableColumnDefinition(_columnManager);
    }
 
    private void defineColumn_10_Barcode() {

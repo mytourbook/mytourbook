@@ -943,8 +943,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void defineAllColumns() {
 
-      new InvisibleTableColumnDefinition(_columnManager);
-
       defineColumn_10_ConsumedQuantity();
       defineColumn_20_QuantityType();
       defineColumn_30_Name();
@@ -954,6 +952,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       defineColumn_70_BeverageQuantity();
       defineColumn_80_BeverageContainer();
       defineColumn_90_ConsumedBeverageContainers();
+
+      new InvisibleTableColumnDefinition(_columnManager);
    }
 
    private void defineColumn_10_ConsumedQuantity() {
