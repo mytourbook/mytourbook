@@ -120,42 +120,42 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
    /*
     * none UI
     */
-   private PixelConverter          _pc;
-   private List<String>            _searchHistory                  = new ArrayList<>();
-   private final NutritionQuery    _nutritionQuery                 = new NutritionQuery();
-   private PostSelectionProvider   _postSelectionProvider;
+   private PixelConverter            _pc;
+   private List<String>              _searchHistory                  = new ArrayList<>();
+   private final NutritionQuery      _nutritionQuery                 = new NutritionQuery();
+   private PostSelectionProvider     _postSelectionProvider;
 
-   private IPropertyChangeListener _prefChangeListener;
-   private SelectionListener       _columnSortListener;
+   private IPropertyChangeListener   _prefChangeListener;
+   private SelectionListener         _columnSortListener;
 
-   private AutocompleteComboInput  _autocompleteProductSearchHistory;
+   private AutocompleteComboInput    _autocompleteProductSearchHistory;
 
-   private ControlDecoration       _decorator_InvalidBarCode;
+   private ControlDecoration         _decorator_InvalidBarCode;
 
-   private ComboViewer             _queryViewer;
+   private ComboViewer               _queryViewer;
 
-   private ColumnManager           _columnManager;
-   private MenuManager             _viewerMenuManager;
-   private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
-
-   /*
-    * UI controls
-    */
-   private Button                    _btnAdd;
-   private Button                    _btnSearch;
-
-   private Label                     _lblKeywords;
-   private Label                     _lblSearchType;
-
-   private Combo                     _comboSearchQuery;
-   private Combo                     _comboSearchType;
-
-   private Composite                 _viewerContainer;
+   private ColumnManager             _columnManager;
+   private MenuManager               _viewerMenuManager;
+   private IContextMenuProvider      _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
    private ActionAddProduct          _actionAddProduct;
    private ActionOpenProductsWebsite _actionOpenProductWebsite;
 
-   private Menu                      _tableContextMenu;
+   /*
+    * UI controls
+    */
+   private Button    _btnAdd;
+   private Button    _btnSearch;
+
+   private Label     _lblKeywords;
+   private Label     _lblSearchType;
+
+   private Combo     _comboSearchQuery;
+   private Combo     _comboSearchType;
+
+   private Composite _viewerContainer;
+
+   private Menu      _tableContextMenu;
 
    private class ActionAddProduct extends Action {
 
