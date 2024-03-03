@@ -330,6 +330,11 @@ public class ColumnManager {
 
    }
 
+   void action_SetColumnAlignment(final ColumnDefinition _colDef, final int _style) {
+      // TODO Auto-generated method stub
+
+   }
+
    void action_SetValueFormatter(final ColumnDefinition colDef,
                                  final ValueFormat valueFormat,
                                  final boolean isDetailFormat) {
@@ -1217,7 +1222,12 @@ public class ColumnManager {
       final ValueFormat[] availableFormatter = colDef.getAvailableFormatter();
       final boolean isValueFormatterAvailable = availableFormatter != null && availableFormatter.length > 0;
 
-      if (!isValueFormatterAvailable && !canColumnBeSetToHidden) {
+      final int columnStyle = colDef.getColumnStyle();
+
+      if (isValueFormatterAvailable == false
+            && canColumnBeSetToHidden == false
+            && columnStyle == 0) {
+
          // nothing can be done
          return;
       }
@@ -1234,7 +1244,6 @@ public class ColumnManager {
          menuItem.setText(menuItemText);
          menuItem.setEnabled(false);
       }
-
       {
          /*
           * Action: Hide current column
@@ -1286,7 +1295,6 @@ public class ColumnManager {
             menuItem.setEnabled(areColumnFreezed());
          }
       }
-
       {
          /*
           * Actions: Value Formatter
@@ -1294,6 +1302,15 @@ public class ColumnManager {
          if (isValueFormatterAvailable) {
 
             new ColumnFormatSubMenu(contextMenu, colDef, this);
+         }
+      }
+      {
+         /*
+          * Actions: Column alignment
+          */
+         if (columnStyle != 0) {
+
+            new ColumnAlignmentSubMenu(colDef, this);
          }
       }
 
