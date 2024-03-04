@@ -217,15 +217,8 @@ public class TourBlogView extends ViewPart {
 
          final String property = propertyChangeEvent.getProperty();
 
-         if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
-
-            updateUI();
-         } else if (property.equals(ITourbookPreferences.PREF_BEVERAGECONTAINERS_HAS_CHANGED)) {
-
-            reloadTourData();
-
-            // removed old tour data from the selection provider
-            _postSelectionProvider.clearSelection();
+         if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED) ||
+               property.equals(ITourbookPreferences.PREF_BEVERAGECONTAINERS_HAS_CHANGED)) {
 
             updateUI();
          }
@@ -1459,6 +1452,11 @@ public class TourBlogView extends ViewPart {
     * Update the UI from {@link #_tourData}.
     */
    void updateUI() {
+
+      reloadTourData();
+
+      // removed old tour data from the selection provider
+      _postSelectionProvider.clearSelection();
 
       if (_tourData == null || _browser == null) {
          return;
