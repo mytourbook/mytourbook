@@ -32,6 +32,9 @@ public class PrefPageNutritionTests extends UITest {
    @Test
    void createBeverageContainer() {
 
+      // Open the Tour Nutrition View
+      Utils.getTourNutritionView(bot).show();
+
       // Arrange
       Utils.openPreferences(bot);
       SWTBotTreeItem nutritionTreeItem = bot.tree().getTreeItem("Nutrition").select(); //$NON-NLS-1$

@@ -44,8 +44,7 @@ public class TourNutritionViewTests extends UITest {
       tourBlogView.show();
 
       // Open the Tour Nutrition View
-      Utils.showViewFromMenu(bot, Utils.TOUR, Utils.VIEW_NAME_TOURNUTRITION);
-      final SWTBotView tourNutritionView = Utils.showView(bot, Utils.VIEW_NAME_TOURNUTRITION);
+      final SWTBotView tourNutritionView = Utils.getTourNutritionView(bot);
 
       Utils.duplicateAndGetTour(bot);
 

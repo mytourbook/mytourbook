@@ -248,8 +248,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       @Override
       protected boolean canEdit(final Object element) {
-         final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
 
+         final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
          return tourNutritionProduct.getTourBeverageContainer() != null;
       }
 
