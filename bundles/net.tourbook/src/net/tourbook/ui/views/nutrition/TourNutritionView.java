@@ -209,7 +209,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Menu                      _tableContextMenu;
 
    private ActionDeleteProducts      _actionDeleteProducts;
-   private ActionOpenProductsWebsite _actionOpenProductWebsite;
+   private ActionOpenProductsWebsite _actionOpenProductsWebsite;
 
    private class ActionDeleteProducts extends Action {
 
@@ -602,7 +602,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void createActions() {
 
       _actionDeleteProducts = new ActionDeleteProducts();
-      _actionOpenProductWebsite = new ActionOpenProductsWebsite();
+      _actionOpenProductsWebsite = new ActionOpenProductsWebsite();
    }
 
    private void createMenuManager() {
@@ -1214,14 +1214,14 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final List<String> selectedProductsCodes = getSelectedProductsCodes();
 
-      _actionOpenProductWebsite.setEnabled(selectedProductsCodes.size() > 0);
+      _actionOpenProductsWebsite.setEnabled(selectedProductsCodes.size() > 0);
 
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
-      _actionOpenProductWebsite.setTourNutritionProducts(getSelectedProductsCodes());
-      menuMgr.add(_actionOpenProductWebsite);
+      _actionOpenProductsWebsite.setTourNutritionProducts(getSelectedProductsCodes());
+      menuMgr.add(_actionOpenProductsWebsite);
 
       menuMgr.add(_actionDeleteProducts);
 
