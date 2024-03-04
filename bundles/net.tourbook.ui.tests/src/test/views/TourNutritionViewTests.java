@@ -75,6 +75,8 @@ public class TourNutritionViewTests extends UITest {
       bot.comboBox(0).setText("coca"); //$NON-NLS-1$
       bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
       bot.sleep(5000);
+      productsTable.click(0, 2);
+      productsTable.contextMenu(Messages.Tour_Nutrition_Button_OpenProductsWebsite).click();
       bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
 
       // Act - Search for a food by code in the OpenFoodFacts database
