@@ -65,8 +65,8 @@ public class TourNutritionViewTests extends UITest {
       bot.comboBox(0).setText("bobo"); //$NON-NLS-1$
       bot.button(Messages.Dialog_SearchProduct_Button_Search).click();
       bot.sleep(5000);
-      productsSearchTable.click(0, 1);
-      productsSearchTable.contextMenu(Messages.Tour_Nutrition_Button_OpenProductsWebsite).click();
+//      productsSearchTable.click(0, 1);
+//      productsSearchTable.contextMenu(Messages.Tour_Nutrition_Button_OpenProductsWebsite).click();
       bot.button(Messages.Dialog_SearchProduct_Button_Add).click();
 
       // Sort the products by name
