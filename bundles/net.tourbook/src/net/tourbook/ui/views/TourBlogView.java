@@ -217,10 +217,13 @@ public class TourBlogView extends ViewPart {
 
          final String property = propertyChangeEvent.getProperty();
 
-         if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED) ||
-               property.equals(ITourbookPreferences.NUTRITION_BEVERAGECONTAINERS_HAVE_CHANGED)) {
+         if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
 
             updateUI();
+         } else if (property.equals(ITourbookPreferences.NUTRITION_BEVERAGECONTAINERS_HAVE_CHANGED)) {
+
+            reloadTourData();
+
          }
       };
 
@@ -1401,6 +1404,11 @@ public class TourBlogView extends ViewPart {
       tourManager.removeTourFromCache(tourId);
 
       _tourData = tourManager.getTourDataFromDb(tourId);
+
+      // removed old tour data from the selection provider
+      _postSelectionProvider.clearSelection();
+
+      updateUI();
    }
 
    private void saveModifiedTour() {
@@ -1452,11 +1460,6 @@ public class TourBlogView extends ViewPart {
     * Update the UI from {@link #_tourData}.
     */
    void updateUI() {
-
-      reloadTourData();
-
-      // removed old tour data from the selection provider
-      _postSelectionProvider.clearSelection();
 
       if (_tourData == null || _browser == null) {
          return;
