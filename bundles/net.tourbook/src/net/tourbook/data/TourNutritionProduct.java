@@ -38,7 +38,7 @@ import net.tourbook.nutrition.openfoodfacts.Product;
 @Entity
 public class TourNutritionProduct {
 
-   public static final int            DB_LENGTH_CODE           = 50;
+   public static final int            DB_LENGTH_CODE           = 20;
    public static final int            DB_LENGTH_NAME           = 1024;
 
    /**
