@@ -1079,6 +1079,12 @@ public class NatTable_DataLoader {
       case TableColumnFactory.WEATHER_WIND_DIRECTION_ID:             return "weather_Wind_Direction";                              //$NON-NLS-1$
       case TableColumnFactory.WEATHER_WIND_SPEED_ID:                 return "weather_Wind_Speed";                              //$NON-NLS-1$
 
+      /*
+       * NUTRITION
+       */
+      case TableColumnFactory.NUTRITION_NUM_PRODUCTS_ID:             return FIELD_WITHOUT_SORTING;
+
+
       default:
 
          // ensure a valid field is returned, this case should not happen but it helps during development
