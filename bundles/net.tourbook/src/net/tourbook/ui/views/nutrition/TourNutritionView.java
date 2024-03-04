@@ -1684,7 +1684,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void updateModifiedTour(final ArrayList<TourData> modifiedTours) {
 
       final long viewTourId = _tourData.getTourId();
-      // The view contains multiple tours
+
       if (_tourData.isMultipleTours()) {
 
          showInvalidPage();
