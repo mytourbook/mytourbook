@@ -1339,14 +1339,12 @@
       <command
          id             ="command.net.tourbook.views.TourWaypointView"
          name           ="%View_Name_Waypoint"
-         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourWaypoint"
-      />
+         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourWaypoint"/>
       
       <command
          id             ="command.net.tourbook.views.nutrition.TourNutritionView"
          name           ="%View_Name_TourNutrition"
-         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourNutrition"
-      />
+         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourNutrition"/>
 
       <command
          id             ="command.net.tourbook.views.HeartRateVariabilityChart"
