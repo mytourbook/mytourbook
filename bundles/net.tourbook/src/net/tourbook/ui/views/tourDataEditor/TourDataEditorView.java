@@ -3523,12 +3523,12 @@ public class TourDataEditorView extends ViewPart implements
       final Section section = tk.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
 
       section.setText(title);
+      section.addExpansionListener(IExpansionListener.expansionStateChangedAdapter(expansionEvent -> onExpandSection()));
+
       GridDataFactory.fillDefaults().grab(true, false).applyTo(section);
 
-      final Composite sectionContainer = tk.createComposite(section);
-      section.setClient(sectionContainer);
-
-      section.addExpansionListener(IExpansionListener.expansionStateChangedAdapter(expansionEvent -> onExpandSection()));
+      final Composite sectionInnerContainer = tk.createComposite(section);
+      section.setClient(sectionInnerContainer);
 
       return section;
    }
@@ -7949,9 +7949,9 @@ public class TourDataEditorView extends ViewPart implements
 
    private void onExpandSection() {
 
-      onResize_Tab1();
+      updateUI_SectionExpansion();
 
-//    form.reflow(false);
+      onResize_Tab1();
    }
 
    /**
@@ -8633,6 +8633,8 @@ public class TourDataEditorView extends ViewPart implements
       _autocomplete_Location_End    .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END);
 
 // SET_FORMATTING_ON
+
+      updateUI_SectionExpansion();
    }
 
    @PersistState
@@ -9774,6 +9776,17 @@ public class TourDataEditorView extends ViewPart implements
 
          _refTourRange = null;
       }
+   }
+
+   /**
+    * Grab vertical space in the title section but only when it is expanded
+    */
+   private void updateUI_SectionExpansion() {
+
+      final boolean isTitleExpanded = _sectionTitle.isExpanded();
+      final GridData titleGridData = (GridData) _sectionTitle.getLayoutData();
+
+      titleGridData.grabExcessVerticalSpace = isTitleExpanded;
    }
 
    private void updateUI_Tab_1_Tour() {

@@ -4,6 +4,10 @@
 TODO's
 ======               
 
+* Support colomn width = 0
+
+* Support first column alignment in all views
+
 
 * Update fulltext url https://lucene.apache.org/core/7_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Wildcard_Searches
   in https://mytourbook.sourceforge.io/mytourbook/index.php/documentation/show-tours/search
