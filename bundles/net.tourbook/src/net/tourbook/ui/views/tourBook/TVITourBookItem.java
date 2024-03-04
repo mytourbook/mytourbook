@@ -238,8 +238,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       SQL_ALL_OTHER_FIELDS = UI.EMPTY_STRING
 
             + "jTdataTtag.TourTag_tagId, " //                     SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 0   //$NON-NLS-1$
-            + "Tmarker.markerId, " //                     SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1   //$NON-NLS-1$
-            + "TNutritionProduct.productId " //                              SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 2   //$NON-NLS-1$
+            + "Tmarker.markerId, " //                             SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1   //$NON-NLS-1$
+            + "TNutritionProduct.productId " //                   SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 2   //$NON-NLS-1$
       ;
 
       SQL_SUM_FIELDS = UI.EMPTY_STRING
