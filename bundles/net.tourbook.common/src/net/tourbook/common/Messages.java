@@ -81,9 +81,6 @@ public class Messages extends NLS {
 
    public static String        Column_Annotation_Formatting;
    public static String        Column_Annotation_Sorting;
-   public static String        FirstColumn_AlignmentHack_Label;
-   public static String        FirstColumn_AlignmentHack_Label_Tooltip;
-
    public static String        Column_Profile_Dialog_ShowAllColumns_Message;
    public static String        Column_Profile_Dialog_ShowDefaultColumns_Message;
    public static String        Column_Profile_Dialog_Title;
@@ -146,6 +143,9 @@ public class Messages extends NLS {
    public static String        Direction_ArrowDesign_Wings_MiddleFin;
    public static String        Direction_ArrowDesign_Wings_OuterFins;
    public static String        Direction_ArrowLayout_OuterFins;
+
+   public static String        FirstColumn_AlignmentHack_Label;
+   public static String        FirstColumn_AlignmentHack_Label_Tooltip;
 
    public static String        Font_Editor_Label_FontSize;
 
