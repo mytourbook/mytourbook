@@ -654,6 +654,6 @@ public interface ITourbookPreferences {
    /*
     * Tour nutrition view
     */
-   public static final String PREF_BEVERAGECONTAINERS_HAS_CHANGED = "PREF_BEVERAGECONTAINERS_HAS_CHANGED"; //$NON-NLS-1$
-   public static final String NUTRITION_IGNORE_FIRST_HOUR         = "NUTRITION_IGNORE_FIRST_HOUR";         //$NON-NLS-1$
+   public static final String NUTRITION_BEVERAGECONTAINERS_HAVE_CHANGED = "NUTRITION_BEVERAGECONTAINERS_HAVE_CHANGED"; //$NON-NLS-1$
+   public static final String NUTRITION_IGNORE_FIRST_HOUR               = "NUTRITION_IGNORE_FIRST_HOUR";               //$NON-NLS-1$
 }

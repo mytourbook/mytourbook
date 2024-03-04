@@ -218,7 +218,7 @@ public class TourBlogView extends ViewPart {
          final String property = propertyChangeEvent.getProperty();
 
          if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED) ||
-               property.equals(ITourbookPreferences.PREF_BEVERAGECONTAINERS_HAS_CHANGED)) {
+               property.equals(ITourbookPreferences.NUTRITION_BEVERAGECONTAINERS_HAVE_CHANGED)) {
 
             updateUI();
          }
