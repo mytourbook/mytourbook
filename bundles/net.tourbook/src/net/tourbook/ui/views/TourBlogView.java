@@ -220,7 +220,9 @@ public class TourBlogView extends ViewPart {
          if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
 
             updateUI();
-         } else if (property.equals(ITourbookPreferences.NUTRITION_BEVERAGECONTAINERS_HAVE_CHANGED)) {
+
+         } else if (property.equals(ITourbookPreferences.NUTRITION_BEVERAGECONTAINERS_HAVE_CHANGED) ||
+               property.equals(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR)) {
 
             reloadTourData();
 
