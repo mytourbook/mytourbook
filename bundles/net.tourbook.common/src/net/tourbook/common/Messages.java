@@ -61,12 +61,13 @@ public class Messages extends NLS {
    public static String        Action_ColumnManager_FreezeCurrentColumn_Tooltip;
    public static String        Action_ColumnManager_HideCurrentColumn;
    public static String        Action_ColumnManager_Profile_Info;
+   public static String        Action_ColumnManager_SetColumnAlignment;
    public static String        Action_ColumnManager_ShowAllColumns;
    public static String        Action_ColumnManager_ShowDefaultColumns;
    public static String        Action_ColumnManager_UnFreezeAllColumns;
-   public static String        Action_ColumnManager_ValueFormatter_Category;
-   public static String        Action_ColumnManager_ValueFormatter_Detail;
-   public static String        Action_ColumnManager_ValueFormatter_Tour;
+   public static String        Action_ColumnManager_ValueFormatter_Category2;
+   public static String        Action_ColumnManager_ValueFormatter_Detail2;
+   public static String        Action_ColumnManager_ValueFormatter_Tour2;
 
    public static String        Advanced_Menu_AnimationSymbol;
 

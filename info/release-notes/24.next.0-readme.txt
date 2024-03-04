@@ -7,6 +7,10 @@ TODO's
  * [Tour Location] Automatically create tour locations for longer pauses in a tour 
    https://github.com/mytourbook/mytourbook/issues/1306 
  
+* Support colomn width = 0
+
+* Support first column alignment in all views
+ 
 
 * Update fulltext url https://lucene.apache.org/core/7_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Wildcard_Searches
   in https://mytourbook.sourceforge.io/mytourbook/index.php/documentation/show-tours/search
@@ -53,8 +57,9 @@ New
 Improvements
 ============
 
-* View Columns
+* Viewer Columns
   - Customize column alignment in all views which are using the column manager
+  - Set column alignment in the viewer header context menu
     https://github.com/mytourbook/mytourbook/issues/1300  
 
 * Start/End Location
