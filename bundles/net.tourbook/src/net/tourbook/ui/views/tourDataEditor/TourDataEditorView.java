@@ -7954,9 +7954,15 @@ public class TourDataEditorView extends ViewPart implements
 
    private void onExpandSection() {
 
-      onResize_Tab1();
+      /*
+       * Grab vertical space when expanded
+       */
+      final boolean isTitleExpanded = _sectionTitle.isExpanded();
+      final GridData titleGridData = (GridData) _sectionTitle.getLayoutData();
 
-//    form.reflow(false);
+      titleGridData.grabExcessVerticalSpace = isTitleExpanded;
+
+      onResize_Tab1();
    }
 
    /**
