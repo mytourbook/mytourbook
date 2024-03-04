@@ -676,7 +676,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_CODE, SWT.TRAIL);
 
-      colDef.setColumnLabel(COLUMN_CODE);
+      colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Code);
       colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Code);
 
       colDef.setIsDefaultColumn();
@@ -699,7 +699,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_NAME, SWT.TRAIL);
 
-      colDef.setColumnLabel(COLUMN_NAME);
+      colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Name);
       colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Name);
 
       colDef.setIsDefaultColumn();
@@ -722,7 +722,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_QUANTITY, SWT.TRAIL);
 
-      colDef.setColumnLabel(COLUMN_QUANTITY);
+      colDef.setColumnLabel(Messages.Tour_Nutrition_Column_Quantity);
       colDef.setColumnHeaderText(Messages.Tour_Nutrition_Column_Quantity);
 
       colDef.setIsDefaultColumn();

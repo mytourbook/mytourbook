@@ -161,7 +161,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
     * Index of the column with the image, index can be changed when the columns are reordered with
     * the mouse or the column manager
     */
-   private int                            _columnIndex_ForColumn_IsBeverage = 6;
+   private int                            _columnIndex_ForColumn_IsBeverage = 5;
    private int                            _columnWidth_ForColumn_IsBeverage;
 
    private TableColumnDefinition          _colDef_BeverageContainer;
@@ -960,7 +960,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_ConsumedQuantity = new TableColumnDefinition(_columnManager, COLUMN_CONSUMED_QUANTITY, SWT.TRAIL);
 
-      _colDef_ConsumedQuantity.setColumnLabel(COLUMN_CONSUMED_QUANTITY);
+      _colDef_ConsumedQuantity.setColumnLabel(Messages.Tour_Nutrition_Column_ConsumedQuantity);
       _colDef_ConsumedQuantity.setColumnHeaderText(Messages.Tour_Nutrition_Column_ConsumedQuantity);
       _colDef_ConsumedQuantity.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Column_ConsumedQuantity_Tooltip);
 
@@ -984,7 +984,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_QuantityType = new TableColumnDefinition(_columnManager, COLUMN_QUANTITY_TYPE, SWT.TRAIL);
 
-      _colDef_QuantityType.setColumnLabel(COLUMN_QUANTITY_TYPE);
+      _colDef_QuantityType.setColumnLabel(Messages.Tour_Nutrition_Column_QuantityType);
       _colDef_QuantityType.setColumnHeaderText(Messages.Tour_Nutrition_Column_QuantityType);
       _colDef_QuantityType.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Column_QuantityType_Tooltip);
 
@@ -1008,7 +1008,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_Name = new TableColumnDefinition(_columnManager, COLUMN_NAME, SWT.TRAIL);
 
-      _colDef_Name.setColumnLabel(COLUMN_NAME);
+      _colDef_Name.setColumnLabel(Messages.Tour_Nutrition_Column_Name);
       _colDef_Name.setColumnHeaderText(Messages.Tour_Nutrition_Column_Name);
 
       _colDef_Name.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(50));
@@ -1031,7 +1031,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_Calories = new TableColumnDefinition(_columnManager, COLUMN_CALORIES, SWT.TRAIL);
 
-      _colDef_Calories.setColumnLabel(COLUMN_CALORIES);
+      _colDef_Calories.setColumnLabel(Messages.Tour_Nutrition_Label_Calories);
       _colDef_Calories.setColumnHeaderText(Messages.Tour_Nutrition_Label_Calories);
 
       _colDef_Calories.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
@@ -1060,7 +1060,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_Sodium = new TableColumnDefinition(_columnManager, COLUMN_SODIUM, SWT.TRAIL);
 
-      _colDef_Sodium.setColumnLabel(COLUMN_SODIUM);
+      _colDef_Sodium.setColumnLabel(Messages.Tour_Nutrition_Label_Sodium);
       _colDef_Sodium.setColumnHeaderText(Messages.Tour_Nutrition_Label_Sodium);
 
       _colDef_Sodium.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
@@ -1089,7 +1089,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_IsBeverage = new TableColumnDefinition(_columnManager, COLUMN_ISBEVERAGE, SWT.CENTER);
 
-      _colDef_IsBeverage.setColumnLabel(COLUMN_ISBEVERAGE);
+      _colDef_IsBeverage.setColumnLabel(Messages.Tour_Nutrition_Column_IsBeverage);
       _colDef_IsBeverage.setColumnHeaderText(Messages.Tour_Nutrition_Column_IsBeverage);
 
       _colDef_IsBeverage.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
@@ -1111,7 +1111,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final TableColumnDefinition colDef_BeverageQuantity = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_QUANTITY, SWT.TRAIL);
 
-      colDef_BeverageQuantity.setColumnLabel(COLUMN_BEVERAGE_QUANTITY);
+      colDef_BeverageQuantity.setColumnLabel(Messages.Tour_Nutrition_Column_BeverageQuantity);
       colDef_BeverageQuantity.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageQuantity);
       colDef_BeverageQuantity.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Column_BeverageQuantity_Tooltip);
 
@@ -1141,7 +1141,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_BeverageContainer = new TableColumnDefinition(_columnManager, COLUMN_BEVERAGE_CONTAINER, SWT.TRAIL);
 
-      _colDef_BeverageContainer.setColumnLabel(COLUMN_BEVERAGE_CONTAINER);
+      _colDef_BeverageContainer.setColumnLabel(Messages.Tour_Nutrition_Column_BeverageContainer);
       _colDef_BeverageContainer.setColumnHeaderText(Messages.Tour_Nutrition_Column_BeverageContainer);
 
       _colDef_BeverageContainer.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(25));
@@ -1168,7 +1168,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_ConsumedBeverageContainers = new TableColumnDefinition(_columnManager, COLUMN_CONSUMED_CONTAINERS, SWT.TRAIL);
 
-      _colDef_ConsumedBeverageContainers.setColumnLabel(COLUMN_CONSUMED_CONTAINERS);
+      _colDef_ConsumedBeverageContainers.setColumnLabel(Messages.Tour_Nutrition_Column_ConsumedContainers);
       _colDef_ConsumedBeverageContainers.setColumnHeaderText(Messages.Tour_Nutrition_Column_ConsumedContainers);
       _colDef_ConsumedBeverageContainers.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Column_ConsumedContainers_Tooltip);
 
