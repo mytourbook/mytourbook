@@ -79,7 +79,7 @@ public class NutritionQuery implements Runnable {
    @Override
    public void run() {
 
-      final var oldValue = List.copyOf(_searchResult);
+      final List<Product> oldValue = List.copyOf(_searchResult);
       try {
 
          _searchResult.clear();
