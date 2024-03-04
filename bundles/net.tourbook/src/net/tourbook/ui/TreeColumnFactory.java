@@ -649,7 +649,6 @@ public abstract class TreeColumnFactory {
          }
       };
 
-
       DEVICE_DISTANCE = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
