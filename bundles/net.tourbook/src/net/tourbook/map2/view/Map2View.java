@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -148,6 +148,7 @@ import net.tourbook.tour.filter.geo.GeoFilter_LoaderData;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
+import net.tourbook.tour.location.DialogSetTourLocationInMap;
 import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.photo.IMapWithPhotos;
 import net.tourbook.tour.photo.TourPhotoLink;
@@ -366,6 +367,7 @@ public class Map2View extends ViewPart implements
          TOUR_WEATHER_TOOLTIP_Y);
    private final ITourToolTipProvider        _wayPointToolTipProvider    = new WayPointToolTipProvider();
    private ValuePoint_ToolTip_UI             _valuePointTooltipUI;
+   private DialogSetTourLocationInMap        _tourLocationDialog         = new DialogSetTourLocationInMap();
    //
    private DirectMappingPainter              _directMappingPainter;
    //
@@ -1916,6 +1918,8 @@ public class Map2View extends ViewPart implements
 
       _mapLegend = new MapLegend();
 
+      initUI();
+
       _map = new Map2(parent, SWT.NONE, _state);
       _map.setPainting(false);
 
@@ -2082,6 +2086,7 @@ public class Map2View extends ViewPart implements
       _map.disposeOverlayImageCache();
 
       _valuePointTooltipUI.hide();
+      _tourLocationDialog.close();
 
       getViewSite().getPage().removePostSelectionListener(_postSelectionListener);
       getViewSite().getPage().removePartListener(_partListener);
@@ -2803,6 +2808,10 @@ public class Map2View extends ViewPart implements
       return new GeoPosition(latitudeCenter, longitudeCenter);
    }
 
+   public DialogSetTourLocationInMap getTourLocationDialog() {
+      return _tourLocationDialog;
+   }
+
    private List<TourLocation> getTourLocations(final TourData tourData) {
 
       final List<TourLocation> allTourLocations = new ArrayList<>();
@@ -2851,6 +2860,12 @@ public class Map2View extends ViewPart implements
    private void hideGeoGrid() {
 
       _map.showGeoSearchGrid(null);
+   }
+
+   private void initUI() {
+      // TODO Auto-generated method stub
+
+//      _tourLocationDialog = new DialogSetTourLocationInMap();
    }
 
    /**

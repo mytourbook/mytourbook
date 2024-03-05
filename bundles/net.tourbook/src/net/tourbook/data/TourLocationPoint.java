@@ -17,12 +17,14 @@ package net.tourbook.data;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 import net.tourbook.common.UI;
 import net.tourbook.database.TourDatabase;
@@ -33,48 +35,78 @@ import net.tourbook.database.TourDatabase;
 @Entity
 public class TourLocationPoint implements Serializable {
 
-   private static final long serialVersionUID = 1L;
+   private static final long          serialVersionUID = 1L;
 
-   private static final char NL               = UI.NEW_LINE;
+   private static final char          NL               = UI.NEW_LINE;
+
+   /**
+    * Manually created entities create a unique id to identify them, saved entities are compared
+    * with the ID
+    */
+   private static final AtomicInteger _createCounter   = new AtomicInteger();
 
    /**
     * Contains the entity id
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long              locationPointID  = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                       locationPointID  = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    @ManyToOne(optional = false)
-   private TourData          tourData;
+   private TourData                   tourData;
 
    @ManyToOne(optional = false)
-   private TourLocation      tourLocation;
+   private TourLocation               tourLocation;
 
    /**
     * Absolute time of the tour location in milliseconds since 1970-01-01T00:00:00Z.
     */
-   private long              tourTime;
+   private long                       tourTime;
 
    /**
     * Position of this tour location in the data serie
     */
-   private int               serieIndex;
+   private int                        serieIndex;
 
    /**
     * Optional latitude position
     */
-   private int               latitudeE6;
+   private int                        latitudeE6;
 
    /**
     * Optional longitude position
     */
-   private int               longitudeE6;
+   private int                        longitudeE6;
 
    /**
-    * Default constructor used also in ejb
+    * Unique ID for manually created entities because the {@link #locationPointIDId} is 0 when the
+    * entity is not yet persisted
+    */
+   @Transient
+   private long                       _createId        = 0;
+
+   /**
+    * Default constructor used in ejb
     */
    public TourLocationPoint() {}
 
+   public TourLocationPoint(final TourData tourData, final TourLocation tourLocation) {
+
+      this.tourData = tourData;
+      this.tourLocation = tourLocation;
+
+      _createId = _createCounter.incrementAndGet();
+   }
+
+   /**
+    * TourLocationPoint is compared with the {@link TourLocationPoint#locationPointID} or
+    * {@link TourLocationPoint#_createId}
+    * <p>
+    * <b> {@link #serieIndex} is not used for equals or hashcode because this is modified when
+    * location points are deleted</b>
+    *
+    * @see java.lang.Object#equals(java.lang.Object)
+    */
    @Override
    public boolean equals(final Object obj) {
 
@@ -84,13 +116,30 @@ public class TourLocationPoint implements Serializable {
       if (obj == null) {
          return false;
       }
-      if (getClass() != obj.getClass()) {
+      if (!(obj instanceof TourLocationPoint)) {
          return false;
       }
 
-      final TourLocationPoint other = (TourLocationPoint) obj;
+      final TourLocationPoint otherPoint = (TourLocationPoint) obj;
 
-      return locationPointID == other.locationPointID;
+      if (locationPointID == TourDatabase.ENTITY_IS_NOT_SAVED) {
+
+         // location point was create
+
+         if (_createId == otherPoint._createId) {
+            return true;
+         }
+
+      } else {
+
+         // location point is from the database
+
+         if (locationPointID == otherPoint.locationPointID) {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    public int getLatitude() {
@@ -138,9 +187,19 @@ public class TourLocationPoint implements Serializable {
 
       return UI.EMPTY_STRING
 
-            + "TourLocationPoint" + NL //                                       //$NON-NLS-1$
+            + "TourLocationPoint" + NL //                            //$NON-NLS-1$
 
-            + " locationID          = " + locationPointID + NL //               //$NON-NLS-1$
+            + " locationPointID  = " + locationPointID + NL //       //$NON-NLS-1$
+            + " _createId        = " + _createId + NL //             //$NON-NLS-1$
+
+            + " tourTime         = " + tourTime + NL //              //$NON-NLS-1$
+            + " serieIndex       = " + serieIndex + NL //            //$NON-NLS-1$
+            + " latitudeE6       = " + latitudeE6 + NL //            //$NON-NLS-1$
+            + " longitudeE6      = " + longitudeE6 + NL //           //$NON-NLS-1$
+            + NL
+            + " tourData         = " + tourData + NL //              //$NON-NLS-1$
+            + NL
+            + " tourLocation     = " + tourLocation + NL //          //$NON-NLS-1$
 
       ;
    }

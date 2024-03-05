@@ -13585,13 +13585,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    @Override
    public String toString() {
 
-      return "TourData [" + NL //                                                                     //$NON-NLS-1$
+      return "TourData [" + NL //                                                                        //$NON-NLS-1$
 
-            + "start          = " + startYear + UI.DASH + startMonth + UI.DASH + startDay + UI.SPACE //$NON-NLS-1$
+            + " start           = " + startYear + UI.DASH + startMonth + UI.DASH + startDay + UI.SPACE //$NON-NLS-1$
             + startHour + UI.SYMBOL_COLON + startMinute + UI.SYMBOL_COLON + startSecond + NL
 
-            + "tourId         = " + tourId + NL //                                                    //$NON-NLS-1$
-            + "isMultipleTours= " + isMultipleTours + NL //                                           //$NON-NLS-1$
+            + " tourId          = " + tourId + NL //                                                     //$NON-NLS-1$
+            + " isMultipleTours = " + isMultipleTours + NL //                                            //$NON-NLS-1$
 
 //            + "object   = " + super.toString() + NL //                                              //$NON-NLS-1$
 //            + "identityHashCode=" + System.identityHashCode(this) + NL //                           //$NON-NLS-1$

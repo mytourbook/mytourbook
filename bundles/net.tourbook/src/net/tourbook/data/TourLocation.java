@@ -750,25 +750,25 @@ public class TourLocation implements Serializable {
             + NL
 
             + log(" latitude                          = ", latitude) //                            //$NON-NLS-1$
-            + log(" latitudeE6                        = ", latitudeE6) //                          //$NON-NLS-1$
-            + log(" latitudeE6_Normalized             = ", latitudeE6_Normalized) //               //$NON-NLS-1$
-            + log(" latitudeMinE6_Normalized          = ", latitudeMinE6_Normalized) //            //$NON-NLS-1$
-            + log(" latitudeMinE6_Resized_Normalized  = ", latitudeMinE6_Resized_Normalized) //    //$NON-NLS-1$
-            + log(" latitudeMaxE6_Normalized          = ", latitudeMaxE6_Normalized) //            //$NON-NLS-1$
-            + log(" latitudeMaxE6_Resized_Normalized  = ", latitudeMaxE6_Resized_Normalized) //    //$NON-NLS-1$
+//            + log(" latitudeE6                        = ", latitudeE6) //                          //$NON-NLS-1$
+//            + log(" latitudeE6_Normalized             = ", latitudeE6_Normalized) //               //$NON-NLS-1$
+//            + log(" latitudeMinE6_Normalized          = ", latitudeMinE6_Normalized) //            //$NON-NLS-1$
+//            + log(" latitudeMinE6_Resized_Normalized  = ", latitudeMinE6_Resized_Normalized) //    //$NON-NLS-1$
+//            + log(" latitudeMaxE6_Normalized          = ", latitudeMaxE6_Normalized) //            //$NON-NLS-1$
+//            + log(" latitudeMaxE6_Resized_Normalized  = ", latitudeMaxE6_Resized_Normalized) //    //$NON-NLS-1$
 
             + log(" longitude                         = ", longitude) //                           //$NON-NLS-1$
-            + log(" longitudeE6                       = ", longitudeE6) //                         //$NON-NLS-1$
-            + log(" longitudeE6_Normalized            = ", longitudeE6_Normalized) //              //$NON-NLS-1$
-            + log(" longitudeMinE6_Normalized         = ", longitudeMinE6_Normalized) //           //$NON-NLS-1$
-            + log(" longitudeMinE6_Resized_Normalized = ", longitudeMinE6_Resized_Normalized) //   //$NON-NLS-1$
-            + log(" longitudeMaxE6_Normalized         = ", longitudeMaxE6_Normalized) //           //$NON-NLS-1$
-            + log(" longitudeMaxE6_Resized_Normalized = ", longitudeMaxE6_Resized_Normalized) //   //$NON-NLS-1$
+//            + log(" longitudeE6                       = ", longitudeE6) //                         //$NON-NLS-1$
+//            + log(" longitudeE6_Normalized            = ", longitudeE6_Normalized) //              //$NON-NLS-1$
+//            + log(" longitudeMinE6_Normalized         = ", longitudeMinE6_Normalized) //           //$NON-NLS-1$
+//            + log(" longitudeMinE6_Resized_Normalized = ", longitudeMinE6_Resized_Normalized) //   //$NON-NLS-1$
+//            + log(" longitudeMaxE6_Normalized         = ", longitudeMaxE6_Normalized) //           //$NON-NLS-1$
+//            + log(" longitudeMaxE6_Resized_Normalized = ", longitudeMaxE6_Resized_Normalized) //   //$NON-NLS-1$
 
             + log(" boundingBoxKey                    = ", boundingBoxKey) //                      //$NON-NLS-1$
 
-            + log(" latitudeDiff                      = ", getLatitudeDiff()) //                   //$NON-NLS-1$
-            + log(" longitudeDiff                     = ", getLongitudeDiff()) //                  //$NON-NLS-1$
+//            + log(" latitudeDiff                      = ", getLatitudeDiff()) //                   //$NON-NLS-1$
+//            + log(" longitudeDiff                     = ", getLongitudeDiff()) //                  //$NON-NLS-1$
       ;
    }
 }

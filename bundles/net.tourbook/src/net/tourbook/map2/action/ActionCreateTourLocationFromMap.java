@@ -40,7 +40,7 @@ import org.eclipse.jface.action.Action;
 
 public class ActionCreateTourLocationFromMap extends Action {
 
-   private Map2View _mapView;
+   private Map2View _map2View;
 
    private Long     _currentHoveredTourId;
 
@@ -48,7 +48,7 @@ public class ActionCreateTourLocationFromMap extends Action {
 
       super(Messages.Map_Action_CreateTourLocationFromMap, AS_PUSH_BUTTON);
 
-      _mapView = mapView;
+      _map2View = mapView;
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourLocationNew));
    }
@@ -66,7 +66,7 @@ public class ActionCreateTourLocationFromMap extends Action {
          return;
       }
 
-      final GeoPosition mouseMoveGeoPosition = _mapView.getMap().getMouseMove_GeoPosition();
+      final GeoPosition mouseMoveGeoPosition = _map2View.getMap().getMouseMove_GeoPosition();
 
       final double clickedTourPointLatitude = mouseMoveGeoPosition.latitude;
       final double clickedTourPointLongitude = mouseMoveGeoPosition.longitude;
@@ -154,20 +154,17 @@ public class ActionCreateTourLocationFromMap extends Action {
             return;
          }
 
-         tourLocation = locationData.tourLocation;
+         tourLocationPoint = new TourLocationPoint(tourData, locationData.tourLocation);
+
+         tourLocationPoint.setGeoPosition(latE6, lonE6);
+         tourLocationPoint.setSerieIndex(closestLatLonIndex);
+         tourLocationPoint.setTourTime(absoluteTourTime);
+
+         allTourLocationPoints.add(tourLocationPoint);
       }
 
-      if (tourLocation != null) {
+      _map2View.getTourLocationDialog().updateUI(tourLocationPoint);
 
-      }
-
-      tourLocationPoint = new TourLocationPoint();
-
-      tourLocationPoint.setGeoPosition(latE6, lonE6);
-      tourLocationPoint.setSerieIndex(closestLatLonIndex);
-      tourLocationPoint.setTourTime(absoluteTourTime);
-
-      allTourLocationPoints.add(tourLocationPoint);
    }
 
    public void setCurrentHoveredTourId(final Long hoveredTourId) {
