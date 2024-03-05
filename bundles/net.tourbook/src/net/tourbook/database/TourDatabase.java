@@ -4970,6 +4970,7 @@ public class TourDatabase {
             + "   sodium                   INTEGER,                                             " + NL //$NON-NLS-1$
             + "   sodium_Serving           INTEGER,                                             " + NL //$NON-NLS-1$
             + "   isBeverage               BOOLEAN DEFAULT FALSE,                               " + NL //$NON-NLS-1$
+            + "   isCustomProduct          BOOLEAN DEFAULT FALSE,                               " + NL //$NON-NLS-1$
             + "   beverageQuantity         INTEGER,                                             " + NL //$NON-NLS-1$
             + "   beverageQuantity_Serving INTEGER,                                             " + NL //$NON-NLS-1$
             + "   containersConsumed       FLOAT                                                " + NL //$NON-NLS-1$

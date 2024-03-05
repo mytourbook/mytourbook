@@ -38,23 +38,21 @@ import net.tourbook.nutrition.openfoodfacts.Product;
 @Entity
 public class TourNutritionProduct {
 
-   public static final int            DB_LENGTH_CODE           = 20;
-   public static final int            DB_LENGTH_NAME           = 1024;
+   public static final int            DB_LENGTH_CODE = 20;
+   public static final int            DB_LENGTH_NAME = 1024;
 
    /**
     * manually created product or imported product create a unique id to identify
     * them, saved products are compared with the product id
     */
-   private static final AtomicInteger _createCounter           = new AtomicInteger();
-
-   private static final String        CUSTOMPRODUCTCODE_PREFIX = "MTCUSTOMPRODUCT-";              //$NON-NLS-1$
+   private static final AtomicInteger _createCounter = new AtomicInteger();
 
    /**
     * Unique id for the {@link TourNutritionProduct} entity
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                       productId                = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                       productId      = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    /**
     * The code identifying the product:
@@ -112,13 +110,18 @@ public class TourNutritionProduct {
     * - Number of products.
     */
    @Enumerated(EnumType.STRING)
-   private QuantityType               quantityType             = QuantityType.Products;
+   private QuantityType               quantityType   = QuantityType.Products;
 
    /**
     * Indicates if the nutrition product is a beverage itself or used in a
-    * beverage.c
+    * beverage.
     */
    private boolean                    isBeverage;
+
+   /**
+    * Indicates if the product was created internally by the user.
+    */
+   private boolean                    isCustomProduct;
 
    /**
     * If the product is a beverage, the amount of liquid per product.
@@ -145,7 +148,7 @@ public class TourNutritionProduct {
     * is 0 when the product is not persisted
     */
    @Transient
-   private long                       _createId                = 0;
+   private long                       _createId      = 0;
 
    public TourNutritionProduct() {}
 
@@ -153,8 +156,9 @@ public class TourNutritionProduct {
 
       this.tourData = tourData;
       _createId = _createCounter.incrementAndGet();
-      productCode = isCustomProduct ? CUSTOMPRODUCTCODE_PREFIX + _createId : UI.EMPTY_STRING;
+      productCode = UI.EMPTY_STRING;
       consumedQuantity = 1f;
+      this.isCustomProduct = isCustomProduct;
    }
 
    public TourNutritionProduct(final TourData tourData, final Product product) {
@@ -234,7 +238,6 @@ public class TourNutritionProduct {
 
             setCalories(getCalories_Serving() * numServingsPerProduct);
             setSodium(getSodium_Serving() * numServingsPerProduct);
-
          }
       }
    }
@@ -318,7 +321,7 @@ public class TourNutritionProduct {
    }
 
    public boolean isCustomProduct() {
-      return productCode.startsWith(CUSTOMPRODUCTCODE_PREFIX);
+      return isCustomProduct;
    }
 
    public void setBeverageQuantity(final int beverageQuantity) {
