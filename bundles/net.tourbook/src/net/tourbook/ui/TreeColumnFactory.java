@@ -65,7 +65,7 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory MOTION_MAX_SPEED;
 
    public static final TreeColumnFactory NUTRITION_NUM_PRODUCTS;
-   public static final String            NUTRITION_NUM_PRODUCTS_ID        = "NUTRITION_NUM_PRODUCTS";           //$NON-NLS-1$
+   private static final String           NUTRITION_NUM_PRODUCTS_ID        = "NUTRITION_NUM_PRODUCTS";           //$NON-NLS-1$
 
    public static final TreeColumnFactory POWER_AVG;
    public static final TreeColumnFactory POWER_MAX;
