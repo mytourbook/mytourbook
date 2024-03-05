@@ -225,7 +225,6 @@ public class TourBlogView extends ViewPart {
                property.equals(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR)) {
 
             reloadTourData();
-
          }
       };
 
@@ -322,11 +321,6 @@ public class TourBlogView extends ViewPart {
                eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
             reloadTourData();
-
-            // removed old tour data from the selection provider
-            _postSelectionProvider.clearSelection();
-
-            updateUI();
          }
       };
 
