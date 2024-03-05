@@ -69,6 +69,12 @@ public class TourNutritionViewTests extends UITest {
       // Sort the products by name
       productsSearchTable.header(Messages.Tour_Nutrition_Column_Name).click();
       productsSearchTable.header(Messages.Tour_Nutrition_Column_Name).click();
+      // Sort the products by barcode
+      productsSearchTable.header(Messages.Tour_Nutrition_Column_Code).click();
+      productsSearchTable.header(Messages.Tour_Nutrition_Column_Code).click();
+      // Sort the products by quantity
+      productsSearchTable.header(Messages.Tour_Nutrition_Column_Quantity).click();
+      productsSearchTable.header(Messages.Tour_Nutrition_Column_Quantity).click();
 
       // Act - Search for a beverage in the OpenFoodFacts database
       bot.comboBox(0).setText("coca"); //$NON-NLS-1$
