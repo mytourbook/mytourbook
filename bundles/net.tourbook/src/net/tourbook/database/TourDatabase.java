@@ -2156,12 +2156,9 @@ public class TourDatabase {
    /**
     * @return Returns all tour beverage containers in the db sorted by name
     */
-   @SuppressWarnings("unchecked")
    public static List<TourBeverageContainer> getTourBeverageContainers() {
 
-      ArrayList<TourBeverageContainer> beverageContainersList = new ArrayList<>();
-      //Adding the first element being an empty entry so that the user can select between a beverage container or none.
-      beverageContainersList.add(new TourBeverageContainer(UI.EMPTY_STRING, 0));
+      final List<TourBeverageContainer> beverageContainersList = new ArrayList<>();
 
       final EntityManager entityManager = TourDatabase.getInstance().getEntityManager();
 
@@ -2173,7 +2170,12 @@ public class TourDatabase {
                + " FROM TourBeverageContainer AS tourBeverageContainer " //$NON-NLS-1$
                + " ORDER  BY tourBeverageContainer.name"); //$NON-NLS-1$
 
-         beverageContainersList = (ArrayList<TourBeverageContainer>) query.getResultList();
+         for (final Object element : query.getResultList()) {
+
+            if (element instanceof final TourBeverageContainer tourBeverageContainer) {
+               beverageContainersList.add(tourBeverageContainer);
+            }
+         }
 
          entityManager.close();
       }
