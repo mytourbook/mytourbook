@@ -24,6 +24,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.formatter.IValueFormatter;
 import net.tourbook.common.formatter.ValueFormat;
@@ -80,7 +81,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -132,6 +132,7 @@ public class DialogModifyColumns extends TrayDialog {
    private int                 _categoryColumnWidth;
    //
    private ViewerComparator    _profileComparator = new ProfileComparator();
+   //
    /*
     * UI controls
     */
@@ -1989,7 +1990,8 @@ public class DialogModifyColumns extends TrayDialog {
 
       // paint columns in a different color which can't be hidden
       if (colDef.canModifyVisibility() == false) {
-         cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+
+         cell.setForeground(ThemeUtil.getDefaultForegroundColor_LabelDisabled());
       }
    }
 

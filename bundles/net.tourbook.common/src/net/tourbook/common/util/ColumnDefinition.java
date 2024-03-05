@@ -278,7 +278,7 @@ public class ColumnDefinition implements Cloneable {
    public String getColumnHeaderText(final ColumnManager columnManager) {
 
       final StringBuilder sb = new StringBuilder();
-      sb.append(_columnHeaderText);
+      sb.append(_columnHeaderText == null ? UI.EMPTY_STRING : _columnHeaderText);
 
       // add annotations to this text
       if (columnManager.isShowColumnAnnotation_Formatting()
