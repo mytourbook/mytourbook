@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,6 +34,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.map2.Messages;
+import net.tourbook.tour.location.TourLocationLookUpManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
@@ -514,7 +515,7 @@ public class DirectMappingPainter implements IDirectPainter {
       gc.drawPolyline(devXY);
    }
 
-   private void drawTourLocation(final DirectPainterContext painterContext) {
+   private void drawTourLocation(final DirectPainterContext painterContext, final List<TourLocation> allTourLocations) {
 
       final MP mp = _map.getMapProvider();
       final int zoomLevel = _map.getZoom();
@@ -536,7 +537,7 @@ public class DirectMappingPainter implements IDirectPainter {
          _locationColors.clear();
       }
 
-      for (final TourLocation tourLocation : _allTourLocations) {
+      for (final TourLocation tourLocation : allTourLocations) {
 
          final Point requestedLocation = convertGeoPoint(mp, tourLocation.latitude, tourLocation.longitude, zoomLevel);
 
@@ -739,8 +740,12 @@ public class DirectMappingPainter implements IDirectPainter {
 
       if (_isShowTourLocation) {
 
-         // show tour locations
-         drawTourLocation(painterContext);
+         drawTourLocation(painterContext, _allTourLocations);
+
+         final List<TourLocation> allLocationLookUps = TourLocationLookUpManager.getTourLocationLookUps();
+
+         drawTourLocation(painterContext, allLocationLookUps);
+
       }
 
       if (_tourData == null
@@ -752,7 +757,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
       if (_sliderPathPaintingData.isShowSliderPath) {
 
-         // draw it even when the sliders are not visible but the tour can be visible !
+         // draw slider path even when the sliders are not visible but the tour can be visible !
 
          drawSliderPath(painterContext);
       }
@@ -829,23 +834,37 @@ public class DirectMappingPainter implements IDirectPainter {
                                      final boolean isShowTourLocations_BoundingBox,
                                      final boolean isMapBackgroundDark) {
 
+      final List<TourLocation> allLocationLookUps = TourLocationLookUpManager.getTourLocationLookUps();
+
 // SET_FORMATTING_OFF
 
-      _isShowTourLocation              = isShowTourLocations && _allTourLocations != null && _allTourLocations.size() > 0;
-      _isShowTourLocations_BoundingBox = isShowTourLocations_BoundingBox;
+      final boolean hasLocations          = _allTourLocations != null && _allTourLocations.size() > 0;
+      final boolean hasLocationLookUps    = allLocationLookUps != null && allLocationLookUps.size() > 0;
 
-      _isMapBackgroundDark             = isMapBackgroundDark;
+      _isShowTourLocation                 = isShowTourLocations && (hasLocations || hasLocationLookUps);
+      _isShowTourLocations_BoundingBox    = isShowTourLocations_BoundingBox;
+
+      _isMapBackgroundDark                = isMapBackgroundDark;
 
 // SET_FORMATTING_ON
    }
 
-   public void setTourLocations(final List<TourLocation> allTourLocations) {
+   public void setTourLocations(final List<TourLocation> allLocations) {
 
-      final boolean isShowLocations = Util.getStateBoolean(_state,
+      final boolean isShowTourLocations = Util.getStateBoolean(_state,
             Map2View.STATE_IS_SHOW_TOUR_LOCATIONS,
             Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT);
 
-      _isShowTourLocation = isShowLocations && allTourLocations != null && allTourLocations.size() > 0;
-      _allTourLocations = allTourLocations;
+      final List<TourLocation> allLocationLookUps = TourLocationLookUpManager.getTourLocationLookUps();
+
+// SET_FORMATTING_OFF
+
+      final boolean hasLocations       = allLocations != null && allLocations.size() > 0;
+      final boolean hasLocationLookUps = allLocationLookUps != null && allLocationLookUps.size() > 0;
+
+      _isShowTourLocation  = isShowTourLocations && (hasLocations || hasLocationLookUps);
+      _allTourLocations    = allLocations;
+
+// SET_FORMATTING_ON
    }
 }

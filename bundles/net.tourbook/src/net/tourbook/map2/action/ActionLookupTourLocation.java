@@ -32,25 +32,25 @@ import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.location.TourLocationCache;
 import net.tourbook.tour.location.TourLocationData;
+import net.tourbook.tour.location.TourLocationLookUpManager;
 import net.tourbook.tour.location.TourLocationManager;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionCreateTourLocationFromMap extends Action {
+public class ActionLookupTourLocation extends Action {
 
    private Map2View _map2View;
 
    private Long     _currentHoveredTourId;
 
-   public ActionCreateTourLocationFromMap(final Map2View mapView) {
+   public ActionLookupTourLocation(final Map2View mapView) {
 
-      super(Messages.Map_Action_CreateTourLocationFromMap, AS_PUSH_BUTTON);
+      super(Messages.Map_Action_LookUpTourLocation, AS_PUSH_BUTTON);
 
       _map2View = mapView;
 
-      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourLocationNew));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourLocation));
    }
 
    @Override
@@ -114,31 +114,31 @@ public class ActionCreateTourLocationFromMap extends Action {
       TourLocation tourLocation = null;
       TourLocationPoint tourLocationPoint = null;
 
-      /*
-       * Get location point from current tour
-       */
-      for (final TourLocationPoint tourLocationPointFromTourData : allTourLocationPoints) {
-
-         final TourLocation tourLocationFromPoint = tourLocationPointFromTourData.getTourLocation();
-
-         if (tourLocationFromPoint.isInBoundingBox(reqestedZoomlevel, latE6_Normalized, lonE6_Normalized)) {
-
-            tourLocation = tourLocationFromPoint;
-            tourLocationPoint = tourLocationPointFromTourData;
-
-            break;
-         }
-      }
-
-      /*
-       * Get tour location from cache
-       */
-      if (tourLocationPoint == null) {
-
-         final TourLocationCache locationCache = TourLocationManager.getLocationCache();
-
-         tourLocation = locationCache.get(latE6_Normalized, lonE6_Normalized, reqestedZoomlevel);
-      }
+//      /*
+//       * Get location point from current tour
+//       */
+//      for (final TourLocationPoint tourLocationPointFromTourData : allTourLocationPoints) {
+//
+//         final TourLocation tourLocationFromPoint = tourLocationPointFromTourData.getTourLocation();
+//
+//         if (tourLocationFromPoint.isInBoundingBox(reqestedZoomlevel, latE6_Normalized, lonE6_Normalized)) {
+//
+//            tourLocation = tourLocationFromPoint;
+//            tourLocationPoint = tourLocationPointFromTourData;
+//
+//            break;
+//         }
+//      }
+//
+//      /*
+//       * Get tour location from cache
+//       */
+//      if (tourLocationPoint == null) {
+//
+//         final TourLocationCache locationCache = TourLocationManager.getLocationCache();
+//
+//         tourLocation = locationCache.get(latE6_Normalized, lonE6_Normalized, reqestedZoomlevel);
+//      }
 
       if (tourLocation == null) {
 
@@ -154,13 +154,17 @@ public class ActionCreateTourLocationFromMap extends Action {
             return;
          }
 
-         tourLocationPoint = new TourLocationPoint(tourData, locationData.tourLocation);
+         tourLocation = locationData.tourLocation;
+
+         tourLocationPoint = new TourLocationPoint(tourData, tourLocation);
 
          tourLocationPoint.setGeoPosition(latE6, lonE6);
          tourLocationPoint.setSerieIndex(closestLatLonIndex);
          tourLocationPoint.setTourTime(absoluteTourTime);
 
          allTourLocationPoints.add(tourLocationPoint);
+
+         TourLocationLookUpManager.getTourLocationLookUps().add(tourLocation);
       }
 
       _map2View.getTourLocationDialog().updateUI(tourLocationPoint);

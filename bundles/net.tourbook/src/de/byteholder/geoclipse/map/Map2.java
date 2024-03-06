@@ -1280,14 +1280,6 @@ public class Map2 extends Canvas {
       }
    }
 
-   public GeoPosition getMouseDown_GeoPosition() {
-      return _mouseDown_ContextMenu_GeoPosition;
-   }
-
-   public GeoPosition getMouseMove_GeoPosition() {
-      return _mouseMove_GeoPosition;
-   }
-
    /**
     * Gets the current address location of the map. This property does not change when the user pans
     * the map. This property is bound.
@@ -1485,6 +1477,14 @@ public class Map2 extends Canvas {
     */
    public MP getMapProvider() {
       return _mp;
+   }
+
+   public GeoPosition getMouseDown_GeoPosition() {
+      return _mouseDown_ContextMenu_GeoPosition;
+   }
+
+   public GeoPosition getMouseMove_GeoPosition() {
+      return _mouseMove_GeoPosition;
    }
 
    /**
@@ -5832,7 +5832,7 @@ public class Map2 extends Canvas {
    }
 
    /**
-    * draw the tile map image
+    * Draw the tile map image
     */
    private void paint_Tile_10_Image(final GC gcMapImage, final Tile tile, final Rectangle devTileViewport) {
 
