@@ -1202,7 +1202,7 @@ public class TourInfoUI {
        * Air Quality
        */
       createUI_Label(parent, Messages.Tour_Tooltip_Label_AirQuality);
-      UI.createSpacer_Horizontal(parent);
+      createUI_Label(parent, UI.EMPTY_STRING);
 
       _lblAirQuality = createUI_LabelValue(parent, SWT.LEAD);
       final GridData gd = (GridData) _lblAirQuality.getLayoutData();

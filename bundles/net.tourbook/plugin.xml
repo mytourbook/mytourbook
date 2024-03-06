@@ -454,6 +454,22 @@
          class="net.tourbook.preferences.PrefPageWeather"
       />
 
+      <!--
+         Nutrition
+      -->
+      <page
+         name="%Pref_Page_Nutrition"
+         id="net.tourbook.preferences.PrefPageNutrition"
+         class="net.tourbook.preferences.PrefPageNutrition"
+      />
+      
+      <!-- Beverage containers -->
+       <page category    ="net.tourbook.preferences.PrefPageNutrition"
+            class="net.tourbook.nutrition.PrefPageBeverageContainers"
+            id="net.tourbook.nutrition.PrefPageBeverageContainers"
+            name="%Pref_Page_BeverageContainers">
+         </page>
+
    </extension>
 
 
@@ -734,6 +750,12 @@
             icon        ="icons/tour-data.png"
             label       ="%View_Name_TourData"
             mnemonic    ="%View_Name_TourData_Mnemonic"/>
+            
+         <command
+            commandId   ="command.net.tourbook.views.nutrition.TourNutritionView"
+            icon        ="icons/tour-nutrition.png"
+            label       ="%View_Name_TourNutrition"
+            mnemonic    ="%View_Name_TourNutrition_Mnemonic"/>
 
       </menuContribution>
 
@@ -1318,6 +1340,11 @@
          id             ="command.net.tourbook.views.TourWaypointView"
          name           ="%View_Name_Waypoint"
          defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourWaypoint"/>
+      
+      <command
+         id             ="command.net.tourbook.views.nutrition.TourNutritionView"
+         name           ="%View_Name_TourNutrition"
+         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourNutrition"/>
 
       <command
          id             ="command.net.tourbook.views.HeartRateVariabilityChart"
@@ -1712,6 +1739,13 @@
             class       ="net.tourbook.ui.views.TourDataView"
             icon        ="icons/tour-data.png"
             name        ="%View_Name_TourData"/>
+
+         <view
+            category    ="net.tourbook.category.Tour_Properties"
+            id          ="net.tourbook.ui.views.nutrition.TourNutritionView"
+            class       ="net.tourbook.ui.views.nutrition.TourNutritionView"
+            icon        ="icons/tour-nutrition.png"
+            name        ="%View_Name_TourNutrition"/>
 
          <!--
             <view
