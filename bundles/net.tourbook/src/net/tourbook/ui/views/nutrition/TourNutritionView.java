@@ -832,13 +832,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final Listener paintListener = event -> {
 
-         // paint images at the correct column
-         final int columnIndex = event.index;
-         if (columnIndex == _columnIndex_ForColumn_IsBeverage &&
-               event.type == SWT.PaintItem) {
-
-            onPaint_Viewer_GraphImage(event);
+         // paint images for the correct column
+         if (event.index != _columnIndex_ForColumn_IsBeverage ||
+               event.type != SWT.PaintItem) {
+            return;
          }
+
+         onPaint_Viewer_GraphImage(event);
       };
       productsTable.addListener(SWT.MeasureItem, paintListener);
       productsTable.addListener(SWT.PaintItem, paintListener);
