@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,7 @@ import java.io.Writer;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
@@ -1123,7 +1123,7 @@ public class CSVExport {
       { // HEADER_TOUR_NUMBER_OF_MARKER
 
          if (isTour) {
-            final ArrayList<Long> markerIds = tviTour.getMarkerIds();
+            final List<Long> markerIds = tviTour.getMarkerIds();
             if (markerIds != null) {
                sb.append(Integer.toString(markerIds.size()));
             }

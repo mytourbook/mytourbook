@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -98,6 +98,8 @@ public class ThemeUtil {
    private static Color        _defaultForegroundColor_Shell;
    private static Color        _defaultBackgroundColor_Shell;
 
+   private static Color        _defaultForegroundColor_LabelDisabled;
+
    /**
     * These are all Eclipse themes when using W10:
     *
@@ -148,19 +150,6 @@ public class ThemeUtil {
    }
 
    /**
-    * @return Returns themed color for displaying errors
-    */
-   public static Color getErrorColor() {
-
-      return UI.IS_DARK_THEME
-
-            // yellow is very bright in the dark theme compared with other colors
-            ? UI.SYS_COLOR_YELLOW
-
-            : UI.SYS_COLOR_RED;
-   }
-
-   /**
     * @return The tour chart do not show a dark background color when displayed in a dialog, it
     *         shows the background color from the shell.
     *         <p>
@@ -203,6 +192,10 @@ public class ThemeUtil {
       return _defaultForegroundColor_Combo;
    }
 
+   public static Color getDefaultForegroundColor_LabelDisabled() {
+      return _defaultForegroundColor_LabelDisabled;
+   }
+
    public static Color getDefaultForegroundColor_Shell() {
       return _defaultForegroundColor_Shell;
    }
@@ -221,6 +214,19 @@ public class ThemeUtil {
       return _defaultForegroundColor_TableHeader;
    }
 
+   /**
+    * @return Returns themed color for displaying errors
+    */
+   public static Color getErrorColor() {
+
+      return UI.IS_DARK_THEME
+
+            // yellow is very bright in the dark theme compared with other colors
+            ? UI.SYS_COLOR_YELLOW
+
+            : UI.SYS_COLOR_RED;
+   }
+
    public static String getThemedCss_DefaultBackground() {
 
       return UI.IS_DARK_THEME
@@ -237,6 +243,7 @@ public class ThemeUtil {
 
    /**
     * @param imageName
+    *
     * @return Returns the themed image name. The postfix {@value #DARK_THEME_POSTFIX} is
     *         appended to the image name when the dark theme image name is returned.
     */
@@ -314,7 +321,9 @@ public class ThemeUtil {
 
          // table header color: 38 3D 3F
          final Color table_HeaderLineColor         = new Color(0x50, 0x50, 0x50);
-         final Color label_DisabledForegroundColor = new Color(0x80, 0x80, 0x80);
+
+         // the disabled label color is used for both dark+light theme
+         _defaultForegroundColor_LabelDisabled     = new Color(0x80, 0x80, 0x80);
 
          display.setData("org.eclipse.swt.internal.win32.useDarkModeExplorerTheme",       isDarkTheme);                                         //$NON-NLS-1$
          display.setData("org.eclipse.swt.internal.win32.menuBarForegroundColor",         isDarkTheme ? menuBarForegroundColor : null);         //$NON-NLS-1$
@@ -326,7 +335,7 @@ public class ThemeUtil {
          display.setData("org.eclipse.swt.internal.win32.Text.use_WS_BORDER",             isDarkTheme);                                         //$NON-NLS-1$
          display.setData("org.eclipse.swt.internal.win32.Tree.use_WS_BORDER",             isDarkTheme);                                         //$NON-NLS-1$
          display.setData("org.eclipse.swt.internal.win32.Table.headerLineColor",          isDarkTheme ? table_HeaderLineColor         : null);  //$NON-NLS-1$
-         display.setData("org.eclipse.swt.internal.win32.Label.disabledForegroundColor",  isDarkTheme ? label_DisabledForegroundColor : null);  //$NON-NLS-1$
+         display.setData("org.eclipse.swt.internal.win32.Label.disabledForegroundColor",  isDarkTheme ? _defaultForegroundColor_LabelDisabled : null);  //$NON-NLS-1$
          display.setData("org.eclipse.swt.internal.win32.Combo.useDarkTheme",             isDarkTheme);                                         //$NON-NLS-1$
          display.setData("org.eclipse.swt.internal.win32.ProgressBar.useColors",          isDarkTheme);                                         //$NON-NLS-1$
 

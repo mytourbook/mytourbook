@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -63,6 +63,9 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory MOTION_AVG_SPEED;
    public static final TreeColumnFactory MOTION_DISTANCE;
    public static final TreeColumnFactory MOTION_MAX_SPEED;
+
+   public static final TreeColumnFactory NUTRITION_NUM_PRODUCTS;
+   private static final String           NUTRITION_NUM_PRODUCTS_ID        = "NUTRITION_NUM_PRODUCTS";           //$NON-NLS-1$
 
    public static final TreeColumnFactory POWER_AVG;
    public static final TreeColumnFactory POWER_MAX;
@@ -788,6 +791,29 @@ public abstract class TreeColumnFactory {
                   ValueFormat.NUMBER_1_1,
                   ValueFormat.NUMBER_1_1,
                   columnManager);
+
+            return colDef;
+         }
+      };
+
+      /*
+       * Nutrition
+       */
+
+      NUTRITION_NUM_PRODUCTS = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, NUTRITION_NUM_PRODUCTS_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Nutrition);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Nutrition_NumberOfProducts_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Nutrition_NumberOfProducts_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Nutrition_NumberOfProducts_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
 
             return colDef;
          }

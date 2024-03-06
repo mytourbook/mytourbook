@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,8 +40,6 @@ public class Messages extends NLS {
    public static String        ColumnFactory_altitude_up_h_tooltip;
    public static String        ColumnFactory_altitude_up_label;
    public static String        ColumnFactory_altitude_up_tooltip;
-   public static String        ColumnFactory_Elevation_AvgChange_Label;
-   public static String        ColumnFactory_Elevation_AvgChange_Tooltip;
    public static String        ColumnFactory_avg_cadence;
    public static String        ColumnFactory_avg_cadence_label;
    public static String        ColumnFactory_avg_cadence_tooltip;
@@ -212,6 +210,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Category_AddressState;
    public static String        ColumnFactory_Category_Marker;
    public static String        ColumnFactory_Category_Motion;
+   public static String        ColumnFactory_Category_Nutrition;
    public static String        ColumnFactory_Category_Photo;
    public static String        ColumnFactory_Category_Power;
    public static String        ColumnFactory_Category_Powertrain;
@@ -245,6 +244,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_DPTolerance_Label;
    public static String        ColumnFactory_DPTolerance_Tooltip;
 
+   public static String        ColumnFactory_Elevation_AvgChange_Label;
+   public static String        ColumnFactory_Elevation_AvgChange_Tooltip;
    public static String        ColumnFactory_Elevation_Diff_Tooltip;
    public static String        ColumnFactory_Elevation_Gain_Tooltip;
    public static String        ColumnFactory_Elevation_GainDiff_Tooltip;
@@ -328,6 +329,10 @@ public class Messages extends NLS {
    public static String        ColumnFactory_NumberOfTours_Header;
    public static String        ColumnFactory_NumberOfTours_Label;
    public static String        ColumnFactory_NumberOfTours_Tooltip;
+
+   public static String        ColumnFactory_Nutrition_NumberOfProducts_Header;
+   public static String        ColumnFactory_Nutrition_NumberOfProducts_Label;
+   public static String        ColumnFactory_Nutrition_NumberOfProducts_Tooltip;
 
    public static String        ColumnFactory_Photo_FilePath_Label;
    public static String        ColumnFactory_Photo_FilePath_Tooltip;

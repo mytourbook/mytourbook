@@ -501,6 +501,19 @@ public class Messages extends NLS {
    public static String        Dialog_AdjustTemperature_Label_Progress_Task;
    public static String        Dialog_AdjustTemperature_Label_TemperatureAdjustmentDuration;
 
+   public static String        Dialog_BeverageContainer_Label_Capacity;
+   public static String        Dialog_BeverageContainer_Label_Name;
+   public static String        Dialog_BeverageContainer_Title_Create;
+   public static String        Dialog_BeverageContainer_Title_Edit;
+
+   public static String        Dialog_CustomTourNutritionProduct_Label_BeverageQuantity;
+   public static String        Dialog_CustomTourNutritionProduct_Label_Calories;
+   public static String        Dialog_CustomTourNutritionProduct_Label_IsBeverage;
+   public static String        Dialog_CustomTourNutritionProduct_Label_Name;
+   public static String        Dialog_CustomTourNutritionProduct_Label_NumberServings;
+   public static String        Dialog_CustomTourNutritionProduct_Label_Sodium;
+   public static String        Dialog_CustomTourNutritionProduct_Title;
+
    public static String        Dialog_DatabaseAction_Confirmation_Message;
    public static String        Dialog_DatabaseAction_Confirmation_Title;
 
@@ -895,6 +908,20 @@ public class Messages extends NLS {
    public static String        Dialog_SaveTags_Radio_RemoveTags_Selected;
    public static String        Dialog_SaveTags_Radio_ReplaceTags;
    public static String        Dialog_SaveTags_Wizard_Title;
+
+   public static String        Dialog_SearchProduct_Button_Add;
+   public static String        Dialog_SearchProduct_Button_Add_Tooltip;
+   public static String        Dialog_SearchProduct_Button_Search;
+   public static String        Dialog_SearchProduct_Combo_SearchType_ByName;
+   public static String        Dialog_SearchProduct_Combo_SearchType_ByCode;
+   public static String        Dialog_SearchProduct_Label_AlreadyExists;
+   public static String        Dialog_SearchProduct_Label_Keywords;
+   public static String        Dialog_SearchProduct_Label_SearchType;
+   public static String        Dialog_SearchProduct_Label_NotFound;
+   public static String        Dialog_SearchProduct_Message;
+   public static String        Dialog_SearchProduct_Link_ProductCreationRequest;
+   public static String        Dialog_SearchProduct_Title;
+   public static String        Dialog_SearchProduct_Tooltip_InvalidBarcode;
 
    public static String        Dialog_Sensor_EditSensor_Title;
    public static String        Dialog_Sensor_Label_SensorType;
@@ -1483,6 +1510,17 @@ public class Messages extends NLS {
    public static String        PrefPage_Import_Default_Cadence;
    public static String        PrefPage_Import_Default_CadenceValue_Tooltip;
    public static String        PrefPage_Import_Label_Info;
+
+   public static String        PrefPage_Nutrition_Checkbox_IgnoreFirstHour;
+   public static String        PrefPage_Nutrition_Checkbox_IgnoreFirstHour_Tooltip;
+
+   public static String        PrefPage_TourBeverageContainers_Button_Add;
+   public static String        PrefPage_TourBeverageContainers_Button_Delete;
+   public static String        PrefPage_TourBeverageContainers_Button_Edit;
+   public static String        PrefPage_TourBeverageContainers_Dialog_Delete_BeverageContainer_Message;
+   public static String        PrefPage_TourBeverageContainers_Dialog_Delete_BeverageContainer_Title;
+   public static String        PrefPage_TourBeverageContainers_LogInfo_DeletedContainer;
+   public static String        PrefPage_TourBeverageContainers_Title;
 
    public static String        PrefPage_TourTag_Button_DuplicateTag;
    public static String        PrefPage_TourTag_Label_Duplicate;
@@ -2856,6 +2894,10 @@ public class Messages extends NLS {
    public static String        Tour_Blog_Action_HideMarker_Tooltip;
    public static String        Tour_Blog_Action_OpenMarker_Tooltip;
    public static String        Tour_Blog_Action_ShowMarker_Tooltip;
+   public static String        Tour_Blog_Label_Nutrition_Averages;
+   public static String        Tour_Blog_Label_Nutrition_Beverages;
+   public static String        Tour_Blog_Label_Nutrition_Foods;
+   public static String        Tour_Blog_Section_Nutrition;
    public static String        Tour_Blog_Section_Tags;
    public static String        Tour_Blog_Section_Weather;
 
@@ -3280,6 +3322,43 @@ public class Messages extends NLS {
    public static String        tour_merger_label_adjust_minutes;
    public static String        tour_merger_label_adjust_seconds;
    public static String        tour_merger_save_target_tour;
+
+   public static String        Tour_Nutrition_Button_AddCustomProduct;
+   public static String        Tour_Nutrition_Button_AddCustomProduct_Tooltip;
+   public static String        Tour_Nutrition_Button_DeleteProduct;
+   public static String        Tour_Nutrition_Button_DeleteProduct_Tooltip;
+   public static String        Tour_Nutrition_Button_OpenProductsWebsite;
+   public static String        Tour_Nutrition_Button_SearchProduct;
+   public static String        Tour_Nutrition_Button_SearchProduct_Tooltip;
+   public static String        Tour_Nutrition_Column_BeverageContainer;
+   public static String        Tour_Nutrition_Column_BeverageQuantity;
+   public static String        Tour_Nutrition_Column_BeverageQuantity_Tooltip;
+   public static String        Tour_Nutrition_Column_Capacity;
+   public static String        Tour_Nutrition_Column_Code;
+   public static String        Tour_Nutrition_Column_ConsumedContainers;
+   public static String        Tour_Nutrition_Column_ConsumedContainers_Tooltip;
+   public static String        Tour_Nutrition_Column_ConsumedQuantity;
+   public static String        Tour_Nutrition_Column_ConsumedQuantity_Tooltip;
+   public static String        Tour_Nutrition_Column_Name;
+   public static String        Tour_Nutrition_Column_Quantity;
+   public static String        Tour_Nutrition_Column_QuantityType;
+   public static String        Tour_Nutrition_Column_QuantityType_Tooltip;
+   public static String        Tour_Nutrition_Column_Servings;
+   public static String        Tour_Nutrition_Column_IsBeverage;
+   public static String        Tour_Nutrition_Job_SearchingProducts;
+   public static String        Tour_Nutrition_Label_Averages;
+   public static String        Tour_Nutrition_Label_Averages_Tooltip;
+   public static String        Tour_Nutrition_Label_Calories;
+   public static String        Tour_Nutrition_Label_Fluids;
+   public static String        Tour_Nutrition_Label_QuantityType_Products;
+   public static String        Tour_Nutrition_Label_QuantityType_Servings;
+   public static String        Tour_Nutrition_Label_Sodium;
+   public static String        Tour_Nutrition_Label_Totals;
+   public static String        Tour_Nutrition_Label_Totals_Tooltip;
+   public static String        Tour_Nutrition_Section_ProductsList;
+   public static String        Tour_Nutrition_Section_ProductsList_Tooltip;
+   public static String        Tour_Nutrition_Section_Summary;
+   public static String        Tour_Nutrition_Section_Summary_Tooltip;
 
    public static String        Tour_Pauses_Checkbox_Duration_Hours;
    public static String        Tour_Pauses_Checkbox_Duration_Minutes;

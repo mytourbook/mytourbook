@@ -1005,6 +1005,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private  Set<TourWayPoint>          tourWayPoints                       = new HashSet<>();
 
    /**
+    * Tour nutrition products
+    */
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
+   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+   @JsonProperty
+   private Set<TourNutritionProduct>             tourNutritionProducts                         = new HashSet<>();
+   
+   /**
     * Reference tours
     */
    @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
@@ -2060,6 +2068,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 // SET_FORMATTING_ON
 
    public TourData() {}
+
+   public void addNutritionProduct(final TourNutritionProduct nutritionProduct) {
+
+      tourNutritionProducts.add(nutritionProduct);
+   }
 
    /**
     * Add photos into this tour and save it.
@@ -6343,6 +6356,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          tourPhoto.setupDeepClone(tourData_DeepCopy);
       }
 
+      for (final TourNutritionProduct tourNutritionProduct : tourData_DeepCopy.tourNutritionProducts) {
+         tourNutritionProduct.setupDeepClone(tourData_DeepCopy);
+      }
+
       for (final TourMarker tourMarker : tourData_DeepCopy.tourMarkers) {
          tourMarker.setupDeepClone(tourData_DeepCopy);
       }
@@ -6365,6 +6382,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final Set<TourPhoto> tourPhotos_Clone = new HashSet<>();
       tourPhotos_Clone.addAll(tourData_DeepCopy.tourPhotos);
       tourData_DeepCopy.tourPhotos = tourPhotos_Clone;
+
+      final Set<TourNutritionProduct> tourNutritionProducts_Clone = new HashSet<>();
+      tourNutritionProducts_Clone.addAll(tourData_DeepCopy.tourNutritionProducts);
+      tourData_DeepCopy.setTourNutritionProducts(tourNutritionProducts_Clone);
 
       final Set<TourMarker> tourMarkers_Clone = new HashSet<>();
       tourMarkers_Clone.addAll(tourData_DeepCopy.tourMarkers);
@@ -10836,6 +10857,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return _sortedMarkers;
    }
 
+   public Set<TourNutritionProduct> getTourNutritionProducts() {
+      return tourNutritionProducts;
+   }
+
    /**
     * @return Returns the person for which the tour is saved or <code>null</code> when the tour is
     *         not saved in the database.
@@ -12666,6 +12691,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       this.tourMarkers = tourMarkers;
 
       resetSortedMarkers();
+   }
+
+   public void setTourNutritionProducts(final Set<TourNutritionProduct> tourNutritionProducts) {
+      this.tourNutritionProducts = tourNutritionProducts;
    }
 
    /**
