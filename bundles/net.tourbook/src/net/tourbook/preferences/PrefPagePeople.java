@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -333,6 +333,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
    /**
     * @param isCheckPeople
+    *
     * @return Returns <code>true</code> when all tours has been updated and the update process was
     *         not canceled.
     */
@@ -1570,13 +1571,23 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          @Override
          public void update(final ViewerCell cell) {
 
-            if (UI.UNIT_IS_ELEVATION_METER) {
-               final float height = ((TourPerson) cell.getElement()).getHeight();
-               cell.setText(_nf2.format(height));
-            } else {
-               final float bodyHeight = UI.convertBodyHeightFromMetric(((TourPerson) cell.getElement()).getHeight());
+            final TourPerson person = (TourPerson) cell.getElement();
+            
+            final float heightMetric = person.getHeight();
 
-               final String heightString = UI.EMPTY_STRING + (int) Math.floor(bodyHeight / 12) + "'" + (int) bodyHeight % 12 + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+            if (UI.UNIT_IS_ELEVATION_METER) {
+
+               cell.setText(_nf2.format(heightMetric));
+
+            } else {
+
+               final float heightInchRaw = Math.round(UI.convertBodyHeightFromMetric(heightMetric));
+               final float heightFeetRaw = heightInchRaw / 12;
+
+               final int heightFeet = (int) Math.floor(heightFeetRaw);
+               final int heightInch = (int) (heightInchRaw % 12);
+
+               final String heightString = UI.EMPTY_STRING + heightFeet + "'" + heightInch + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 
                cell.setText(heightString);
             }
@@ -2036,6 +2047,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    /**
     * @param isAskToSave
     * @param isRevert
+    *
     * @return Returns <code>false</code> when person is not saved, modifications will be reverted.
     */
    private boolean savePerson(final boolean isAskToSave, final boolean isRevert) {
@@ -2232,20 +2244,22 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          final float bodyWeight = UI.convertBodyWeightFromMetric(person.getWeight());
          _spinnerWeight.setSelection((int) (bodyWeight * 10));
 
-         final float bodyHeight = UI.convertBodyHeightFromMetric(person.getHeight());
+         final float heightMetric = person.getHeight();
 
          if (UI.UNIT_IS_ELEVATION_METER) {
 
-            _spinnerHeight_MeterOrFeet.setSelection(Math.round(bodyHeight * 100));
+            _spinnerHeight_MeterOrFeet.setSelection(Math.round(heightMetric * 100));
 
          } else {
 
-            final float heightFeetInches = bodyHeight / 12;
-            final int heightFeet = (int) Math.floor(heightFeetInches);
-            final int heightInches = (int) ((heightFeetInches - heightFeet) * 10);
+            final float heightInchRaw = Math.round(UI.convertBodyHeightFromMetric(heightMetric));
+            final float heightFeetRaw = heightInchRaw / 12;
+
+            final int heightFeet = (int) Math.floor(heightFeetRaw);
+            final int heightInch = (int) (heightInchRaw % 12);
 
             _spinnerHeight_MeterOrFeet.setSelection(heightFeet);
-            _spinnerHeight_Inches.setSelection(heightInches);
+            _spinnerHeight_Inches.setSelection(heightInch);
          }
 
          _rawDataPathEditor.setStringValue(person.getRawDataPath());

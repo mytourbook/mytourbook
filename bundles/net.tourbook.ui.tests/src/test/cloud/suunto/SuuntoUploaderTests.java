@@ -15,6 +15,7 @@
  *******************************************************************************/
 package cloud.suunto;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
@@ -98,9 +99,9 @@ public class SuuntoUploaderTests extends UITest {
             .withStatus(HttpURLConnection.HTTP_CREATED);
 
       // Act
-      // Select a tour
+      // Select a tour with GPS coordinates
       Utils.showTourBookView(bot);
-      final SWTBotTreeItem tour = Utils.getTour(bot);
+      SWTBotTreeItem tour = Utils.getTour(bot);
       tour.contextMenu(Messages.App_Action_Upload_Tour)
             .menu("S&uunto App (Routes)").click(); //$NON-NLS-1$
 
@@ -109,9 +110,25 @@ public class SuuntoUploaderTests extends UITest {
       // Assert
       httpClientMock.verify().post(OAuth2Utils.createOAuthPasseurUri("/suunto/route/import").toString()).called(); //$NON-NLS-1$
 
-      final List<?> logs = TourLogManager.getLogs();
+      List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
             "1/31/2021, 7:15 AM -> Uploaded Route Id: \"634f49bf87e35c5a61e64947\""))); //$NON-NLS-1$
+
+      // Act
+      // Select a tour without GPS coordinates
+      Utils.showTourBookView(bot);
+      tour = bot.tree().getTreeItem("2022   1").expand() //$NON-NLS-1$
+            .getNode("Feb   1").expand().select().getNode("3").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+      tour.contextMenu(Messages.App_Action_Upload_Tour)
+            .menu("S&uunto App (Routes)").click(); //$NON-NLS-1$
+
+      bot.sleep(5000);
+
+      // Assert
+      logs = TourLogManager.getLogs();
+      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
+            "2/3/2022, 1:51 AM -> GPS coordinates are missing"))); //$NON-NLS-1$
    }
 
    @Test

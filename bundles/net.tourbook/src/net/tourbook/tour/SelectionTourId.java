@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import net.tourbook.common.map.GeoPosition;
+
 import org.eclipse.jface.viewers.ISelection;
 
 /**
@@ -22,31 +24,51 @@ import org.eclipse.jface.viewers.ISelection;
  */
 public class SelectionTourId implements ISelection {
 
-   private Long    _tourId;
+   private Long        _tourId;
 
    /**
     * When <code>true</code> then this tour id is set into the map breadcrumb bar
     */
-   private boolean _isSetBreadcrumbOnly;
+   private boolean     _isSetBreadcrumbOnly;
+
+   private GeoPosition _hoveredTourLocation;
 
    public SelectionTourId(final Long tourId) {
       _tourId = tourId;
    }
 
+   /**
+    * @return Returns geo position of a hovered tour location or <code>null</code> when a location
+    *         is not hovered
+    */
+   public GeoPosition getHoveredTourLocation() {
+
+      return _hoveredTourLocation;
+   }
+
    public Long getTourId() {
+
       return _tourId;
    }
 
    @Override
    public boolean isEmpty() {
+
       return false;
    }
 
    public boolean isSetBreadcrumbOnly() {
+
       return _isSetBreadcrumbOnly;
    }
 
+   public void setHoveredTourLocation(final GeoPosition hoveredTourLocation) {
+
+      _hoveredTourLocation = hoveredTourLocation;
+   }
+
    public void setIsSetBreadcrumbOnly(final boolean isSetBreadcrumb) {
+
       _isSetBreadcrumbOnly = isSetBreadcrumb;
    }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1815,7 +1815,9 @@ public class ReferenceTourView extends ViewPart implements
          final Image image = TourTypeImage.getTourTypeImage(tourTypeId);
          if (image != null) {
 
-            UI.paintImageCentered(event, image, _columnWidth_TourTypeImage);
+            final int alignment = _colDef_TourTypeImage.getColumnStyle();
+
+            UI.paintImage(event, image, _columnWidth_TourTypeImage, alignment);
          }
       }
    }

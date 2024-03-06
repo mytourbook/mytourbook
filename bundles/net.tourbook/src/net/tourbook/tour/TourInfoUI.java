@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1202,8 +1202,11 @@ public class TourInfoUI {
        * Air Quality
        */
       createUI_Label(parent, Messages.Tour_Tooltip_Label_AirQuality);
+      createUI_Label(parent, UI.EMPTY_STRING);
 
-      _lblAirQuality = createUI_LabelValue(parent, SWT.CENTER);
+      _lblAirQuality = createUI_LabelValue(parent, SWT.LEAD);
+      final GridData gd = (GridData) _lblAirQuality.getLayoutData();
+      gd.horizontalAlignment = SWT.BEGINNING; // do not fill the cell with the background color
    }
 
    private void createUI_48_Battery(final Composite parent) {
@@ -1927,14 +1930,14 @@ public class TourInfoUI {
    private void onSelect_Sensor(final SelectionEvent selectionEvent) {
 
       final Object linkData = selectionEvent.widget.getData();
-      if (linkData instanceof DeviceSensor) {
+      if (linkData instanceof final DeviceSensor deviceSensor) {
 
          Util.showView(SensorChartView.ID, false);
 
          TourManager.fireEventWithCustomData(
 
                TourEventId.SELECTION_SENSOR,
-               new SelectionSensor((DeviceSensor) linkData, _tourData.getTourId()),
+               new SelectionSensor(deviceSensor, _tourData.getTourId()),
                _part);
       }
    }
@@ -2278,11 +2281,11 @@ public class TourInfoUI {
       final int airQualityTextIndex = _tourData.getWeather_AirQuality_TextIndex();
       if (airQualityTextIndex > 0) {
 
-         _lblAirQuality.setText(IWeather.airQualityTexts[airQualityTextIndex]);
+         _lblAirQuality.setText(UI.SPACE + IWeather.AIR_QUALITY_TEXT[airQualityTextIndex] + UI.SPACE);
 
          final int colorIndex = airQualityTextIndex * 2;
 
-         // run asyc otherwise in the dark mode the colors are not displayed
+         // run async otherwise in the dark mode the colors are not displayed
          _parent.getDisplay().asyncExec(() -> {
 
             if (_parent.isDisposed()) {
@@ -2291,13 +2294,13 @@ public class TourInfoUI {
 
             if (UI.IS_DARK_THEME) {
 
-               _lblAirQuality.setForeground(IWeather.airQualityColors_DarkTheme[colorIndex]);
-               _lblAirQuality.setBackground(IWeather.airQualityColors_DarkTheme[colorIndex + 1]);
+               _lblAirQuality.setForeground(IWeather.AIR_QUALITY_COLORS_DARK_THEME[colorIndex]);
+               _lblAirQuality.setBackground(IWeather.AIR_QUALITY_COLORS_DARK_THEME[colorIndex + 1]);
 
             } else {
 
-               _lblAirQuality.setForeground(IWeather.airQualityColors_BrightTheme[colorIndex]);
-               _lblAirQuality.setBackground(IWeather.airQualityColors_BrightTheme[colorIndex + 1]);
+               _lblAirQuality.setForeground(IWeather.AIR_QUALITY_COLORS_BRIGHT_THEME[colorIndex]);
+               _lblAirQuality.setBackground(IWeather.AIR_QUALITY_COLORS_BRIGHT_THEME[colorIndex + 1]);
             }
          });
       }
@@ -2366,8 +2369,8 @@ public class TourInfoUI {
 
       // weather clouds
       final int weatherIndex = _tourData.getWeatherIndex();
-      final String cloudText = IWeather.cloudText[weatherIndex];
-      final String cloudImageName = IWeather.cloudIcon[weatherIndex];
+      final String cloudText = IWeather.CLOUD_TEXT[weatherIndex];
+      final String cloudImageName = IWeather.CLOUD_ICON[weatherIndex];
 
       _lblClouds.setImage(UI.IMAGE_REGISTRY.get(cloudImageName));
       _lblCloudsUnit.setText(cloudText.equals(IWeather.cloudIsNotDefined) ? UI.EMPTY_STRING : cloudText);
@@ -2413,8 +2416,8 @@ public class TourInfoUI {
       final float sumTime     = vertSpeed_TimeFlat       + vertSpeed_TimeGain       + vertSpeed_TimeLoss *1f;
       final float sumDistance = vertSpeed_DistanceFlat   + vertSpeed_DistanceGain   + vertSpeed_DistanceLoss;
 
-      final float altimeter_Gain = vertSpeed_ElevationGain / vertSpeed_TimeGain * 3600  / UI.UNIT_VALUE_ELEVATION;
-      final float altimeter_Loss = vertSpeed_ElevationLoss / vertSpeed_TimeLoss * 3600  / UI.UNIT_VALUE_ELEVATION;
+      final float altimeter_Gain = vertSpeed_ElevationGain / vertSpeed_TimeGain * 3600;
+      final float altimeter_Loss = vertSpeed_ElevationLoss / vertSpeed_TimeLoss * 3600;
 
       final float prefFlatGainLoss_DPTolerance  = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_DP_TOLERANCE);
       final float prefFlatGainLoss_FlatGradient = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_FLAT_GRADIENT);

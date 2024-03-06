@@ -366,7 +366,7 @@ public class Map2View extends ViewPart implements
    private final ITourToolTipProvider        _wayPointToolTipProvider    = new WayPointToolTipProvider();
    private ValuePoint_ToolTip_UI             _valuePointTooltipUI;
    //
-   private final DirectMappingPainter        _directMappingPainter       = new DirectMappingPainter(_state);
+   private DirectMappingPainter              _directMappingPainter;
    //
    private final MapInfoManager              _mapInfoManager             = MapInfoManager.getInstance();
    private final TourPainterConfiguration    _tourPainterConfig          = TourPainterConfiguration.getInstance();
@@ -1269,7 +1269,6 @@ public class Map2View extends ViewPart implements
       // repaint map
       _directMappingPainter.setPaintContext(
 
-            _map,
             _isShowTour,
             _allTourData.get(0),
 
@@ -1553,9 +1552,9 @@ public class Map2View extends ViewPart implements
 
             resetMap();
 
-         } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof final TourEvent tourEvent)) {
 
-            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
             if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
 
                setTourData(modifiedTours);
@@ -1574,25 +1573,23 @@ public class Map2View extends ViewPart implements
                onSelection_TourMarker((SelectionTourMarker) eventData, false);
             }
 
-         } else if (eventId == TourEventId.PAUSE_SELECTION && eventData instanceof SelectionTourPause) {
+         } else if (eventId == TourEventId.PAUSE_SELECTION && eventData instanceof final SelectionTourPause selectionTourPause) {
 
-            onSelection_TourPause((SelectionTourPause) eventData, false);
+            onSelection_TourPause(selectionTourPause, false);
 
-         } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+         } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof final ISelection selection) {
 
-            onSelection((ISelection) eventData);
+            onSelection(selection);
 
-         } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+         } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof final ISelection selection) {
 
-            onSelection((ISelection) eventData);
+            onSelection(selection);
 
          } else if (eventId == TourEventId.MAP_SHOW_GEO_GRID) {
 
-            if (eventData instanceof TourGeoFilter) {
+            if (eventData instanceof final TourGeoFilter tourGeoFilter) {
 
                // show geo filter
-
-               final TourGeoFilter tourGeoFilter = (TourGeoFilter) eventData;
 
                // show geo search rectangle
                _map.showGeoSearchGrid(tourGeoFilter);
@@ -1919,8 +1916,10 @@ public class Map2View extends ViewPart implements
       _map = new Map2(parent, SWT.NONE, _state);
       _map.setPainting(false);
 
+      _directMappingPainter = new DirectMappingPainter(_map, _state);
       _map.setDirectPainter(_directMappingPainter);
-//      _map.setLiveView(true);
+
+//    _map.setLiveView(true);
 
       _map.setLegend(_mapLegend);
       _map.setShowLegend(true);
@@ -1934,6 +1933,7 @@ public class Map2View extends ViewPart implements
       _map.setTourToolTip(_tourToolTip = new TourToolTip(_map));
       _tourInfoToolTipProvider.setActionsEnabled(true);
       _tourInfoToolTipProvider.setNoTourTooltip(OtherMessages.TOUR_TOOLTIP_LABEL_NO_GEO_TOUR);
+
 
       /*
        * Setup value point tooltip
@@ -2944,7 +2944,6 @@ public class Map2View extends ViewPart implements
          // repaint map
          _directMappingPainter.setPaintContext(
 
-               _map,
                _isShowTour,
                _allTourData.get(0),
 
@@ -3119,7 +3118,6 @@ public class Map2View extends ViewPart implements
             // repaint map
             _directMappingPainter.setPaintContext(
 
-                  _map,
                   _isShowTour,
                   _allTourData.get(0),
 
@@ -3269,6 +3267,16 @@ public class Map2View extends ViewPart implements
             final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
             paintToursAndPhotos(tourData, selection);
+
+            // recenter map AFTER it was centered in the paint... method
+            if (_isMapSyncWith_TourLocation) {
+
+               final GeoPosition hoveredTourLocation = tourIdSelection.getHoveredTourLocation();
+
+               if (hoveredTourLocation != null) {
+                  _map.setMapCenter(hoveredTourLocation);
+               }
+            }
          }
 
       } else if (selection instanceof SelectionTourIds) {
@@ -3990,7 +3998,6 @@ public class Map2View extends ViewPart implements
       // set the paint context (slider position) for the direct mapping painter
       _directMappingPainter.setPaintContext(
 
-            _map,
             _isShowTour,
             tourData,
 
@@ -4242,7 +4249,6 @@ public class Map2View extends ViewPart implements
 
       _directMappingPainter.setPaintContext(
 
-            _map,
             _isShowTour,
             tourData,
 
@@ -5071,7 +5077,6 @@ public class Map2View extends ViewPart implements
       // update direct painter to draw nothing
       _directMappingPainter.setPaintContext(
 
-            _map,
             false,
             null,
 
@@ -5143,10 +5148,11 @@ public class Map2View extends ViewPart implements
             return;
          }
 
-         final ArrayList<TourData> tourDataList = TourManager.getSelectedTours();
-         if (tourDataList != null) {
+         final ArrayList<TourData> allSelectedTours = TourManager.getSelectedTours();
+         if (allSelectedTours != null) {
 
-            setTourData(tourDataList);
+            setTourData(allSelectedTours);
+
             _hash_AllTourData = _allTourData.hashCode();
 
             paintTours_10_All();
@@ -5376,7 +5382,6 @@ public class Map2View extends ViewPart implements
       // set the paint context  for the direct mapping painter
       _directMappingPainter.setPaintContext(
 
-            _map,
             _isShowTour,
             hoveredTourData,
 

@@ -459,7 +459,6 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
                   _spinnerLine_Opacity.addSelectionListener(_defaultSelectionListener);
                   _spinnerLine_Opacity.addMouseWheelListener(_defaultMouseWheelListener);
                }
-               {}
             }
          }
       }
@@ -1264,6 +1263,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       final int selectedIndex = _comboName.getSelectionIndex();
 
       _comboName.setItem(selectedIndex, _textConfigName.getText());
+      _comboName.select(selectedIndex);
 
       saveState();
    }

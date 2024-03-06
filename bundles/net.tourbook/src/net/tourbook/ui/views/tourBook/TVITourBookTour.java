@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,7 +16,8 @@
 package net.tourbook.ui.views.tourBook;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
@@ -37,8 +38,9 @@ public class TVITourBookTour extends TVITourBookItem implements Comparable<TVITo
    long                    colStartDistance;
    short                   colTimeInterval;
 
-   HashSet<Long>           sqlTagIds;
-   HashSet<Long>           sqlMarkerIds;
+   Set<Long>               sqlTagIds;
+   Set<Long>               sqlMarkerIds;
+   Set<Long>               sqlNutritionProductsIds;
 
    /**
     * Id's for the tags or <code>null</code> when tags are not available
@@ -49,6 +51,11 @@ public class TVITourBookTour extends TVITourBookItem implements Comparable<TVITo
     * Id's for the markers or <code>null</code> when markers are not available
     */
    private ArrayList<Long> _markerIds;
+
+   /**
+    * Id's for the nutrition products or <code>null</code> when nutrition products are not available
+    */
+   private ArrayList<Long> _nutritionProductsIds;
 
    /**
     * @param view
@@ -67,9 +74,11 @@ public class TVITourBookTour extends TVITourBookItem implements Comparable<TVITo
       // cleanup
       sqlTagIds = null;
       sqlMarkerIds = null;
+      sqlNutritionProductsIds = null;
 
       _tagIds = null;
       _markerIds = null;
+      _nutritionProductsIds = null;
 
       super.clearChildren();
    }
@@ -103,14 +112,22 @@ public class TVITourBookTour extends TVITourBookItem implements Comparable<TVITo
       return colTimeInterval;
    }
 
-   public ArrayList<Long> getMarkerIds() {
+   public List<Long> getMarkerIds() {
       if (sqlMarkerIds != null && _markerIds == null) {
          _markerIds = new ArrayList<>(sqlMarkerIds);
       }
       return _markerIds;
    }
 
-   public ArrayList<Long> getTagIds() {
+   public List<Long> getNutritionProductsIds() {
+
+      if (sqlNutritionProductsIds != null && _nutritionProductsIds == null) {
+         _nutritionProductsIds = new ArrayList<>(sqlNutritionProductsIds);
+      }
+      return _nutritionProductsIds;
+   }
+
+   public List<Long> getTagIds() {
       if (sqlTagIds != null && _tagIds == null) {
          _tagIds = new ArrayList<>(sqlTagIds);
       }
@@ -138,11 +155,15 @@ public class TVITourBookTour extends TVITourBookItem implements Comparable<TVITo
       return false;
    }
 
-   public void setMarkerIds(final HashSet<Long> markerIds) {
+   public void setMarkerIds(final Set<Long> markerIds) {
       sqlMarkerIds = markerIds;
    }
 
-   public void setTagIds(final HashSet<Long> tagIds) {
+   public void setNutritionProductsIds(final Set<Long> nutritionProductsIds) {
+      sqlNutritionProductsIds = nutritionProductsIds;
+   }
+
+   public void setTagIds(final Set<Long> tagIds) {
       sqlTagIds = tagIds;
    }
 

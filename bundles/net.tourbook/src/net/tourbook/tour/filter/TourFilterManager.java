@@ -1041,7 +1041,7 @@ public class TourFilterManager {
 
                getSQL__FieldOperators_Text(sqlWhere, fieldOperator, sql);
             } else {
-               final String text1 = IWeather.airQualityIds[selectedIndex];
+               final String text1 = IWeather.AIR_QUALITY_IDS[selectedIndex];
                getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
             }
             break;

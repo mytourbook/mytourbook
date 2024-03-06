@@ -64,10 +64,10 @@ public class SubMenu_SetWeatherConditions extends SubMenu {
 
       _tourProvider = tourProvider;
 
-      for (int index = 0; index < IWeather.cloudText.length; ++index) {
+      for (int index = 0; index < IWeather.CLOUD_TEXT.length; ++index) {
 
-         _actionsSetWeatherConditions.add(new ActionSetWeatherConditions(IWeather.cloudText[index],
-               IWeather.cloudIcon[index]));
+         _actionsSetWeatherConditions.add(new ActionSetWeatherConditions(IWeather.CLOUD_TEXT[index],
+               IWeather.CLOUD_ICON[index]));
       }
    }
 

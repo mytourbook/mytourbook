@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,8 @@ public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.ui.messages";                    //$NON-NLS-1$
 
+   public static String        ColumnFactory_AirQuality;
+   public static String        ColumnFactory_AirQuality_Label;
    public static String        ColumnFactory_altitude_computed_difference_tooltip;
    public static String        ColumnFactory_altitude_difference_label;
    public static String        ColumnFactory_altitude_difference_tooltip;
@@ -38,8 +40,6 @@ public class Messages extends NLS {
    public static String        ColumnFactory_altitude_up_h_tooltip;
    public static String        ColumnFactory_altitude_up_label;
    public static String        ColumnFactory_altitude_up_tooltip;
-   public static String        ColumnFactory_Elevation_AvgChange_Label;
-   public static String        ColumnFactory_Elevation_AvgChange_Tooltip;
    public static String        ColumnFactory_avg_cadence;
    public static String        ColumnFactory_avg_cadence_label;
    public static String        ColumnFactory_avg_cadence_tooltip;
@@ -210,6 +210,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Category_AddressState;
    public static String        ColumnFactory_Category_Marker;
    public static String        ColumnFactory_Category_Motion;
+   public static String        ColumnFactory_Category_Nutrition;
    public static String        ColumnFactory_Category_Photo;
    public static String        ColumnFactory_Category_Power;
    public static String        ColumnFactory_Category_Powertrain;
@@ -243,6 +244,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_DPTolerance_Label;
    public static String        ColumnFactory_DPTolerance_Tooltip;
 
+   public static String        ColumnFactory_Elevation_AvgChange_Label;
+   public static String        ColumnFactory_Elevation_AvgChange_Tooltip;
    public static String        ColumnFactory_Elevation_Diff_Tooltip;
    public static String        ColumnFactory_Elevation_Gain_Tooltip;
    public static String        ColumnFactory_Elevation_GainDiff_Tooltip;
@@ -277,6 +280,10 @@ public class Messages extends NLS {
    public static String        ColumnFactory_InetAddress_Label;
    public static String        ColumnFactory_InetAddress_Url;
 
+   public static String        ColumnFactory_Location_Data_AppliedName_Header;
+   public static String        ColumnFactory_Location_Data_AppliedName_Label;
+   public static String        ColumnFactory_Location_Data_LastModified_Header;
+   public static String        ColumnFactory_Location_Data_LastModified_Label;
    public static String        ColumnFactory_Location_Data_LocationID_Header;
    public static String        ColumnFactory_Location_Data_LocationID_Label;
    public static String        ColumnFactory_Location_Geo_BoundingBox_Height_Header;
@@ -287,7 +294,6 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Location_Geo_BoundingBox_Width_Tooltip;
    public static String        ColumnFactory_Location_Geo_IsResizedBoundingBox_Header;
    public static String        ColumnFactory_Location_Geo_IsResizedBoundingBox_Label;
-   public static String        ColumnFactory_Location_Geo_IsResizedBoundingBox_Tooltip;
    public static String        ColumnFactory_Location_Geo_Latitude;
    public static String        ColumnFactory_Location_Geo_Latitude_Tooltip;
    public static String        ColumnFactory_Location_Geo_LatitudeDiff_Header;
@@ -323,6 +329,10 @@ public class Messages extends NLS {
    public static String        ColumnFactory_NumberOfTours_Header;
    public static String        ColumnFactory_NumberOfTours_Label;
    public static String        ColumnFactory_NumberOfTours_Tooltip;
+
+   public static String        ColumnFactory_Nutrition_NumberOfProducts_Header;
+   public static String        ColumnFactory_Nutrition_NumberOfProducts_Label;
+   public static String        ColumnFactory_Nutrition_NumberOfProducts_Tooltip;
 
    public static String        ColumnFactory_Photo_FilePath_Label;
    public static String        ColumnFactory_Photo_FilePath_Tooltip;
@@ -362,7 +372,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Power_IntensityFactor_Header;
    public static String        ColumnFactory_Power_IntensityFactor_Label;
    public static String        ColumnFactory_Power_IntensityFactor_Tooltip;
-   public static String        ColumnFactory_Power_LeftRightBalance_Header;
+   public static String        ColumnFactory_Power_LeftRightBalance_Header2;
    public static String        ColumnFactory_Power_LeftRightBalance_Label;
    public static String        ColumnFactory_Power_LeftRightBalance_Tooltip;
    public static String        ColumnFactory_Power_Max_Header;
@@ -432,11 +442,16 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Sensor_Description;
    public static String        ColumnFactory_Sensor_ManufacturerName;
    public static String        ColumnFactory_Sensor_ManufacturerNumber;
+   public static String        ColumnFactory_Sensor_ManufacturerNumber_Header;
    public static String        ColumnFactory_Sensor_Name;
    public static String        ColumnFactory_Sensor_Name_Tooltip;
+   public static String        ColumnFactory_Sensor_NameKey;
+   public static String        ColumnFactory_Sensor_NameKey_Tooltip;
    public static String        ColumnFactory_Sensor_ProductName;
    public static String        ColumnFactory_Sensor_ProductNumber;
+   public static String        ColumnFactory_Sensor_ProductNumber_Header;
    public static String        ColumnFactory_Sensor_SerialNumber;
+   public static String        ColumnFactory_Sensor_SerialNumber_Header;
    public static String        ColumnFactory_Sensor_Time_FirstUsed;
    public static String        ColumnFactory_Sensor_Time_LastUsed;
    public static String        ColumnFactory_Sensor_Type;
@@ -579,9 +594,6 @@ public class Messages extends NLS {
    public static String        Tour_Location_Dialog_DeleteLocation_Message;
    public static String        Tour_Location_Dialog_DeleteLocation_Title;
    public static String        Tour_Location_Dialog_DeleteLocations_Message;
-   public static String        Tour_Location_Label_Usage;
-   public static String        Tour_Location_Label_Usage_Tooltip;
-   public static String        Tour_Location_Label_Zoomlevel;
    public static String        Tour_Location_Log_LocationIsDeleted;
    public static String        Tour_Location_Part_Aerialway;
    public static String        Tour_Location_Part_Aeroway;
@@ -644,9 +656,13 @@ public class Messages extends NLS {
    public static String        Tour_Location_Part_SettlementSmall;
    public static String        Tour_Location_Part_Waterway;
    public static String        Tour_Location_Task_RemovingTourLocations;
+   public static String        Tour_Location_Task_RetrieveAndSaveTourLocations;
    public static String        Tour_Location_Task_RetrievingTourLocations;
    public static String        Tour_Location_Task_RetrievingTourLocations_Subtask;
-   public static String        Tour_Location_Title;
+   public static String        Tour_Location_Tooltip_Label_Usage;
+   public static String        Tour_Location_Tooltip_Label_Usage_Tooltip;
+   public static String        Tour_Location_Tooltip_Label_Zoomlevel;
+   public static String        Tour_Location_Tooltip_Title;
    public static String        Tour_Location_Zoomlevel_03_Country;
    public static String        Tour_Location_Zoomlevel_05_State;
    public static String        Tour_Location_Zoomlevel_08_County;

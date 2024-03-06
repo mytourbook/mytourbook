@@ -66,7 +66,7 @@ public class TourWeatherToolTipProvider implements ITourToolTipProvider {
 
    private Image getCloudImage(final int weatherIndex) {
 
-      final String cloudKey = IWeather.cloudIcon[weatherIndex];
+      final String cloudKey = IWeather.CLOUD_ICON[weatherIndex];
       return UI.IMAGE_REGISTRY.get(cloudKey);
    }
 

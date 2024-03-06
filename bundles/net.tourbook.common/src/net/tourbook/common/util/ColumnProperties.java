@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,60 +15,81 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.formatter.ValueFormat;
 
+import org.eclipse.swt.SWT;
+
 /**
- * Contains customized table/tree column properties, a column is identified by the {@link #columnId}
- * .
- * 
+ * Contains customized table/tree column properties, a column is identified by the
+ * {@link #columnId}.
+ *
  * @since 16.5
  */
 public class ColumnProperties {
 
-	String		columnId;
+   private static final char NL = UI.NEW_LINE;
 
-	ValueFormat	valueFormat_Category;
-	ValueFormat	valueFormat_Detail;
+   String                    columnId;
 
-	@Override
-	public boolean equals(final Object obj) {
+   ValueFormat               valueFormat_Category;
+   ValueFormat               valueFormat_Detail;
 
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof ColumnProperties)) {
-			return false;
-		}
-		final ColumnProperties other = (ColumnProperties) obj;
-		if (columnId == null) {
-			if (other.columnId != null) {
-				return false;
-			}
-		} else if (!columnId.equals(other.columnId)) {
-			return false;
-		}
-		return true;
-	}
+   /**
+    * SWT.* constant for the column alignment
+    *
+    * <li>{@link SWT#LEAD} - 16384</li>
+    * <li>{@link SWT#CENTER} - 16777216</li>
+    * <li>{@link SWT#TRAIL} - 131072</li>
+    */
+   int                       alignment;
 
-	@Override
-	public int hashCode() {
+   @Override
+   public boolean equals(final Object obj) {
 
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((columnId == null) ? 0 : columnId.hashCode());
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (!(obj instanceof ColumnProperties)) {
+         return false;
+      }
+      final ColumnProperties other = (ColumnProperties) obj;
+      if (columnId == null) {
+         if (other.columnId != null) {
+            return false;
+         }
+      } else if (!columnId.equals(other.columnId)) {
+         return false;
+      }
+      return true;
+   }
 
-		return result;
-	}
 
-	@Override
-	public String toString() {
-		return "ColumnProperties [" // //$NON-NLS-1$
-				+ ("columnId=" + columnId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("valueFormat_Category=" + valueFormat_Category + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("valueFormat_Detail=" + valueFormat_Detail + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ "]"; //$NON-NLS-1$
-	}
+
+   @Override
+   public int hashCode() {
+
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((columnId == null) ? 0 : columnId.hashCode());
+
+      return result;
+   }
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "ColumnProperties" + NL //                                      //$NON-NLS-1$
+
+            + " columnId               = " + columnId + NL //                 //$NON-NLS-1$
+            + " valueFormat_Category   = " + valueFormat_Category + NL //     //$NON-NLS-1$
+            + " valueFormat_Detail     = " + valueFormat_Detail + NL //       //$NON-NLS-1$
+            + " alignment              = " + ColumnManager.getAlignmentText(alignment) + NL //       //$NON-NLS-1$
+      ;
+   }
 }

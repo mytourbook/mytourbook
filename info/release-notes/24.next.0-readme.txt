@@ -4,6 +4,14 @@
 TODO's
 ======               
 
+* Support colomn width = 0
+
+* Support first column alignment in all views
+
+
+* Update fulltext url https://lucene.apache.org/core/7_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Wildcard_Searches
+  in https://mytourbook.sourceforge.io/mytourbook/index.php/documentation/show-tours/search
+
 * Remove debug code in ColumnManager.java
    // TODO
       System.out.println("All columns in _allDefinedColumnDefinitions, number of entries: " + _allDefinedColumnDefinitions.size());
@@ -11,7 +19,7 @@ TODO's
 
 
 * Maybe replace "Display.getDefault()" with "PlatformUI.getWorkbench().getDisplay()"
-  Code should always ask the workbench for the display rather than rely on Display.getDefault()
+  "Code should always ask the workbench for the display rather than rely on Display.getDefault()"
   
 
 * Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
@@ -40,85 +48,63 @@ Experimental
 New
 ===
 
+* Tour Nutrition
+  Add the ability to assign food/fluids to any given tour.
+  https://github.com/mytourbook/mytourbook/issues/1280
+
 * Start/End Location
-  - Import: Automatic completion of start and end location fields
-    https://github.com/mytourbook/mytourbook/issues/878
-  - Show/modify start/end location in
-    - Locations view and location tooltip
-    - Tour Book view location tooltip
-    - 2D Map
-    - Tour info tooltip
-    - Quick tour editor
+  - Automatically retrieve and set start/end locations in the easy import
+  - Retrieve, manage and show start/end locations in
     - Tour editor
+  - Scramble tour location view when requested
+  https://github.com/mytourbook/mytourbook/issues/878
 
-* All Tour Markers View (Frederic)
-  - Added the ability to delete markers
-
-* Fulltext search
-  - Added action to rebuild a corrupted fulltext search index
-    https://github.com/mytourbook/mytourbook/issues/1232
 
 Improvements
 ============
 
-* 2D Map
-  - Sync map with tour locations
+* Viewer Columns
+  - Customize column alignment in all views which are using the column manager
+  - Set column alignment in the viewer header context menu
+    https://github.com/mytourbook/mytourbook/issues/1300  
 
-* Quick Tour Editor
-  - Resize height of the weather description field
-    https://github.com/mytourbook/mytourbook/issues/1219
+* Start/End Location
+  - Automatically retieve and set start/end locations in the easy import
+  - Retrieve, manage and show start/end locations in tour editor
+  - Scramble tour location view
+    https://github.com/mytourbook/mytourbook/issues/878
+    
+* Fit Import
+  - Import device sensors which do not contain a serial number
+    https://github.com/mytourbook/mytourbook/issues/1287
 
-* Tour Editor
-  - Make the use of the scroll wheel optional
-    https://github.com/mytourbook/mytourbook/issues/1200
-
-* Tour Info
-  - Show air quality value with its assigned color
-    https://github.com/mytourbook/mytourbook/issues/1223
-
-* Tour Log View
-  - Customize when this view is opened automatically, exceptions will always show this view
-    https://github.com/mytourbook/mytourbook/issues/1222 
-    https://github.com/mytourbook/mytourbook/discussions/1210
-
-* Fit Export (Frederic)
-  - Added the pause types
+* Tour Book
+  - Show powertrain L-R balance values separately
+    https://github.com/mytourbook/mytourbook/issues/1271    
+  - Show weather air quaility
+    https://github.com/mytourbook/mytourbook/issues/1296
 
 * Tour Blog (Frederic)
-  -Improved the detection of http links in the tour description to make them clickable by using a third party library
-    https://github.com/URL-Detector/URL-Detector
-    https://github.com/mytourbook/mytourbook/issues/1102
-        
-  
+  - Displaying the main numbers of the tour (distance, elevation gain/loss...)
 
 Changes
 =======
 
-* Import
-  - "Open tour log view when starting a tour import" in the import preferences dialog is removed, now it can be set in the tour log view
-    https://github.com/mytourbook/mytourbook/issues/1222
-
-* Tour Search
-  - The options dialog can be opened only by clicking on its action button but not anymore when its hovered
-    https://github.com/mytourbook/mytourbook/issues/1224
-  
-* Tour Editor
-  - Tour save/restore actions are moved from the app toolbar into the tour editor toolbar
-    https://github.com/mytourbook/mytourbook/issues/1201
-
-* Tour Concatenation (Frederic)
-  - The weather data is deleted from the concatenated tour
+* Fit Import
+  - Device sensors are now imported which do not contain a serial number
+    -> Now there can be new sensors in the sensor view which were currently ignored !
+* 
 
 
 Bugfix
 ======
 
-* All Tour Markers
-  - Update view when tours are deleted
+* TCX Import (Frederic)
+  - Fix for average and maximum power computation
+    https://github.com/mytourbook/mytourbook/discussions/1268
 
-* Air Quality (Frederic)
-  - The air quality texts were saved using the translated texts instead of a unique id.
-    https://github.com/mytourbook/mytourbook/issues/1193
+* Suunto XML/SML Import (Frederic)
+  - Fix for the calories import values
 
 
 Translation    
@@ -133,10 +119,10 @@ Translation
 System   
 ======
 
-* MyTourbook Milestone 23.10  https://github.com/mytourbook/mytourbook/milestone/12?closed=1
+* MyTourbook Milestone 24.1   https://github.com/mytourbook/mytourbook/milestone/13?closed=1
+* Java 17                     https://adoptium.net/temurin/releases/?version=17
 * Eclipse 2023-06 (4.28)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.28-202306050440/
 * NatTable 2.20               https://www.eclipse.org/nattable/download.php
 * Nebula Widgets              https://download.eclipse.org/nebula/releases/latest
-* FIT SDK 21.120.2            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* FIT SDK 21.133.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
 * WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
-* Java 17                     https://adoptium.net/temurin/releases/?version=17

@@ -265,7 +265,7 @@ public class TourLogManager {
 
       final AutoOpenWhen autoOpenWhen = getAutoOpenWhen();
 
-      if (autoOpenWhen.equals(AutoOpenWhen.NEVER)) {
+      if (autoOpenWhen.equals(AutoOpenWhen.NEVER) && autoOpenEvent.equals(AutoOpenEvent.EXCEPTION) == false) {
          return;
       }
 
@@ -277,7 +277,7 @@ public class TourLogManager {
             || autoOpenWhen.equals(AutoOpenWhen.SELECTED_EVENTS) && allAutoOpenEvents.contains(autoOpenEvent)
 
             // ensure that exceptions are always displayed
-            || autoOpenEvent == AutoOpenEvent.EXCEPTION) {
+            || autoOpenEvent.equals(AutoOpenEvent.EXCEPTION)) {
 
          _logView = (TourLogView) Util.showView(TourLogView.ID,
 

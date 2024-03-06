@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -16,7 +16,8 @@
 package net.tourbook.importdata;
 
 import gnu.io.SerialPort;
-import net.tourbook.ui.UI;
+
+import net.tourbook.common.UI;
 
 /**
  * A class that stores parameters for serial ports.
@@ -50,7 +51,7 @@ public class SerialParameters {
 
 	/**
 	 * Paramaterized constructer.
-	 * 
+	 *
 	 * @param portName
 	 *            The name of the port.
 	 * @param baudRate
@@ -86,7 +87,7 @@ public class SerialParameters {
 	/**
 	 * Converts an <code>int</code> describing a flow control type to a <code>String</code>
 	 * describing a flow control type.
-	 * 
+	 *
 	 * @param flowControl
 	 *            An <code>int</code> describing a flow control type.
 	 * @return A <code>String</code> describing a flow control type.
@@ -110,7 +111,7 @@ public class SerialParameters {
 
 	/**
 	 * Gets baud rate as an <code>int</code>.
-	 * 
+	 *
 	 * @return Current baud rate.
 	 */
 	public int getBaudRate() {
@@ -119,7 +120,7 @@ public class SerialParameters {
 
 	/**
 	 * Gets baud rate as a <code>String</code>.
-	 * 
+	 *
 	 * @return Current baud rate.
 	 */
 	public String getBaudRateString() {
@@ -128,7 +129,7 @@ public class SerialParameters {
 
 	/**
 	 * Gets data bits as an <code>int</code>.
-	 * 
+	 *
 	 * @return Current data bits setting.
 	 */
 	public int getDatabits() {
@@ -137,7 +138,7 @@ public class SerialParameters {
 
 	/**
 	 * Gets data bits as a <code>String</code>.
-	 * 
+	 *
 	 * @return Current data bits setting.
 	 */
 	public String getDatabitsString() {
@@ -157,7 +158,7 @@ public class SerialParameters {
 
 	/**
 	 * Gets flow control for reading as an <code>int</code>.
-	 * 
+	 *
 	 * @return Current flow control type.
 	 */
 	public int getFlowControlIn() {
@@ -166,7 +167,7 @@ public class SerialParameters {
 
 	/**
 	 * Gets flow control for reading as a <code>String</code>.
-	 * 
+	 *
 	 * @return Current flow control type.
 	 */
 	public String getFlowControlInString() {
@@ -175,7 +176,7 @@ public class SerialParameters {
 
 	/**
 	 * Gets flow control for writing as an <code>int</code>.
-	 * 
+	 *
 	 * @return Current flow control type.
 	 */
 	public int getFlowControlOut() {
@@ -184,7 +185,7 @@ public class SerialParameters {
 
 	/**
 	 * Gets flow control for writing as a <code>String</code>.
-	 * 
+	 *
 	 * @return Current flow control type.
 	 */
 	public String getFlowControlOutString() {
@@ -193,7 +194,7 @@ public class SerialParameters {
 
 	/**
 	 * Gets parity setting as an <code>int</code>.
-	 * 
+	 *
 	 * @return Current parity setting.
 	 */
 	public int getParity() {
@@ -202,7 +203,7 @@ public class SerialParameters {
 
 	/**
 	 * Gets parity setting as a <code>String</code>.
-	 * 
+	 *
 	 * @return Current parity setting.
 	 */
 	public String getParityString() {
@@ -220,7 +221,7 @@ public class SerialParameters {
 
 	/**
 	 * Gets port name.
-	 * 
+	 *
 	 * @return Current port name.
 	 */
 	public String getPortName() {
@@ -229,7 +230,7 @@ public class SerialParameters {
 
 	/**
 	 * Gets stop bits setting as an <code>int</code>.
-	 * 
+	 *
 	 * @return Current stop bits setting.
 	 */
 	public int getStopbits() {
@@ -238,7 +239,7 @@ public class SerialParameters {
 
 	/**
 	 * Gets stop bits setting as a <code>String</code>.
-	 * 
+	 *
 	 * @return Current stop bits setting.
 	 */
 	public String getStopbitsString() {
@@ -256,7 +257,7 @@ public class SerialParameters {
 
 	/**
 	 * Sets baud rate.
-	 * 
+	 *
 	 * @param baudRate
 	 *            New baud rate.
 	 */
@@ -266,7 +267,7 @@ public class SerialParameters {
 
 	/**
 	 * Sets baud rate.
-	 * 
+	 *
 	 * @param baudRate
 	 *            New baud rate.
 	 */
@@ -276,7 +277,7 @@ public class SerialParameters {
 
 	/**
 	 * Sets data bits.
-	 * 
+	 *
 	 * @param databits
 	 *            New data bits setting.
 	 */
@@ -286,7 +287,7 @@ public class SerialParameters {
 
 	/**
 	 * Sets data bits.
-	 * 
+	 *
 	 * @param databits
 	 *            New data bits setting.
 	 */
@@ -307,7 +308,7 @@ public class SerialParameters {
 
 	/**
 	 * Sets flow control for reading.
-	 * 
+	 *
 	 * @param flowControlIn
 	 *            New flow control for reading type.
 	 */
@@ -317,7 +318,7 @@ public class SerialParameters {
 
 	/**
 	 * Sets flow control for reading.
-	 * 
+	 *
 	 * @param flowControlIn
 	 *            New flow control for reading type.
 	 */
@@ -327,7 +328,7 @@ public class SerialParameters {
 
 	/**
 	 * Sets flow control for writing.
-	 * 
+	 *
 	 * @param flowControlIn
 	 *            New flow control for writing type.
 	 */
@@ -337,7 +338,7 @@ public class SerialParameters {
 
 	/**
 	 * Sets flow control for writing.
-	 * 
+	 *
 	 * @param flowControlIn
 	 *            New flow control for writing type.
 	 */
@@ -347,7 +348,7 @@ public class SerialParameters {
 
 	/**
 	 * Sets parity setting.
-	 * 
+	 *
 	 * @param parity
 	 *            New parity setting.
 	 */
@@ -357,7 +358,7 @@ public class SerialParameters {
 
 	/**
 	 * Sets parity setting.
-	 * 
+	 *
 	 * @param parity
 	 *            New parity setting.
 	 */
@@ -375,7 +376,7 @@ public class SerialParameters {
 
 	/**
 	 * Sets port name.
-	 * 
+	 *
 	 * @param portName
 	 *            New port name.
 	 */
@@ -385,7 +386,7 @@ public class SerialParameters {
 
 	/**
 	 * Sets stop bits.
-	 * 
+	 *
 	 * @param stopbits
 	 *            New stop bits setting.
 	 */
@@ -395,7 +396,7 @@ public class SerialParameters {
 
 	/**
 	 * Sets stop bits.
-	 * 
+	 *
 	 * @param stopbits
 	 *            New stop bits setting.
 	 */
@@ -414,7 +415,7 @@ public class SerialParameters {
 	/**
 	 * Converts a <code>String</code> describing a flow control type to an <code>int</code> type
 	 * defined in <code>SerialPort</code>.
-	 * 
+	 *
 	 * @param flowControl
 	 *            A <code>string</code> describing a flow control type.
 	 * @return An <code>int</code> describing a flow control type.

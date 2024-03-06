@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,15 +18,9 @@ package net.tourbook.data;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skedgo.converter.TimezoneMapper;
 
 import java.awt.Point;
@@ -993,6 +987,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    @XmlElement(name = "TourMarker")
    @JsonProperty
    private Set<TourMarker>             tourMarkers                         = new HashSet<>();
+
+   /**
+    * Tour nutrition products
+    */
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
+   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+   @JsonProperty
+   private Set<TourNutritionProduct>             tourNutritionProducts                         = new HashSet<>();
 
    /**
     * Contains the tour way points
@@ -2058,6 +2060,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 // SET_FORMATTING_ON
 
    public TourData() {}
+
+   public void addNutritionProduct(final TourNutritionProduct nutritionProduct) {
+
+      tourNutritionProducts.add(nutritionProduct);
+   }
 
    /**
     * Add photos into this tour and save it.
@@ -6084,12 +6091,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          return;
       }
 
-      final float[] altitudeSmoothedSerie = getAltitudeSmoothedSerie(false);
-
       final FlatGainLoss flatGainLoss = computeAltitudeUpDown_20_Algorithm_DP(
             -1,
             -1,
-            altitudeSmoothedSerie,
+            altitudeSerieSmoothed,
             prefDPTolerance,
             prefFlatGradient);
 
@@ -6343,6 +6348,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          tourPhoto.setupDeepClone(tourData_DeepCopy);
       }
 
+      for (final TourNutritionProduct tourNutritionProduct : tourData_DeepCopy.tourNutritionProducts) {
+         tourNutritionProduct.setupDeepClone(tourData_DeepCopy);
+      }
+
       for (final TourMarker tourMarker : tourData_DeepCopy.tourMarkers) {
          tourMarker.setupDeepClone(tourData_DeepCopy);
       }
@@ -6365,6 +6374,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final Set<TourPhoto> tourPhotos_Clone = new HashSet<>();
       tourPhotos_Clone.addAll(tourData_DeepCopy.tourPhotos);
       tourData_DeepCopy.tourPhotos = tourPhotos_Clone;
+
+      final Set<TourNutritionProduct> tourNutritionProducts_Clone = new HashSet<>();
+      tourNutritionProducts_Clone.addAll(tourData_DeepCopy.tourNutritionProducts);
+      tourData_DeepCopy.setTourNutritionProducts(tourNutritionProducts_Clone);
 
       final Set<TourMarker> tourMarkers_Clone = new HashSet<>();
       tourMarkers_Clone.addAll(tourData_DeepCopy.tourMarkers);
@@ -6980,7 +6993,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
                   if (srtm3Value == Float.MIN_VALUE) {
 
-                     // when srtm3 is also not availible, used the last good one
+                     // when srtm3 is also not available, used the last good one
 
                      srtmValue = lastValidSRTM;
 //                   usedCorrectedSrtmValues++;
@@ -7964,7 +7977,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       out.println("----------------------------------------------------"); //$NON-NLS-1$
       out.println("TOUR DATA"); //$NON-NLS-1$
       out.println("----------------------------------------------------"); //$NON-NLS-1$
-// out.println("Typ: " + getDeviceTourType()); //$NON-NLS-1$
+// out.println("Type: " + getDeviceTourType()); //$NON-NLS-1$
       out.println("Date:               " + startDay + UI.SYMBOL_DOT + startMonth + UI.SYMBOL_DOT + startYear); //$NON-NLS-1$
       out.println("Time:               " + startHour + UI.SYMBOL_COLON + startMinute); //$NON-NLS-1$
       out.println("Total distance:     " + getStartDistance()); //$NON-NLS-1$
@@ -8481,7 +8494,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       if (isSwimCadence) {
 
-         // cadence is computed from swim cadence, these cadence values are not saaved
+         // cadence is computed from swim cadence, these cadence values are not saved
 
          return getSwim_Cadence();
 
@@ -9424,7 +9437,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    /**
     * @return An array containing the end time of each pause (in milliseconds)A timer pause is a
-    *         device event, triggered by the user or automatically triggerd by the device.
+    *         device event, triggered by the user or automatically triggered by the device.
     */
    public long[] getPausedTime_End() {
       return pausedTime_End;
@@ -9432,7 +9445,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    /**
     * @return An array containing the start time of each pause (in milliseconds)A timer pause is a
-    *         device event, triggered by the user or automatically triggerd by the device.
+    *         device event, triggered by the user or automatically triggered by the device.
     */
    public long[] getPausedTime_Start() {
       return pausedTime_Start;
@@ -9794,7 +9807,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          } else if (rrIndex_Next < 0) {
 
-            // translation is currently diabled because I cannot remember when this case occur
+            // translation is currently disabled because I cannot remember when this case occur
             sb.append("Next: " + rrIndex_Next); //$NON-NLS-1$
 
          }
@@ -10832,6 +10845,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return _sortedMarkers;
    }
 
+   public Set<TourNutritionProduct> getTourNutritionProducts() {
+      return tourNutritionProducts;
+   }
+
    /**
     * @return Returns the person for which the tour is saved or <code>null</code> when the tour is
     *         not saved in the database.
@@ -10956,7 +10973,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    /**
     * @return Returns the index for the air quality value in
-    *         {@link IWeather#airQualityTexts} or 0 when the air quality
+    *         {@link IWeather#AIR_QUALITY_TEXT} or 0 when the air quality
     *         index is not defined
     */
    public int getWeather_AirQuality_TextIndex() {
@@ -11043,8 +11060,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * @return Returns the index for the cloud values in {@link IWeather#cloudIcon} and
-    *         {@link IWeather#cloudText} or 0 when the clouds are not defined
+    * @return Returns the index for the cloud values in {@link IWeather#CLOUD_ICON} and
+    *         {@link IWeather#CLOUD_TEXT} or 0 when the clouds are not defined
     */
    public int getWeatherIndex() {
 
@@ -12616,7 +12633,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    /**
     * @param tourEndPlace
-    *           the tourEndPlace to set
+    *           Set tour end location text
     */
    public void setTourEndPlace(final String tourEndPlace) {
       this.tourEndPlace = tourEndPlace;
@@ -12662,6 +12679,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       this.tourMarkers = tourMarkers;
 
       resetSortedMarkers();
+   }
+
+   public void setTourNutritionProducts(final Set<TourNutritionProduct> tourNutritionProducts) {
+      this.tourNutritionProducts = tourNutritionProducts;
    }
 
    /**
@@ -12741,7 +12762,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    /**
     * @param tourStartPlace
-    *           the tourStartPlace to set
+    *           Set tour start location text
     */
    public void setTourStartPlace(final String tourStartPlace) {
       this.tourStartPlace = tourStartPlace;
@@ -13576,28 +13597,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                                          final int projectionHash) {
 
       _twpWorldPosition.put(projectionHash + zoomLevel, worldPositions);
-   }
-
-   public String toJson() {
-
-      final ObjectMapper mapper = new ObjectMapper();
-      mapper.setSerializationInclusion(Include.NON_NULL);
-      mapper.setSerializationInclusion(Include.NON_EMPTY);
-      mapper.setConfig(mapper.getSerializationConfig()
-            .with(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY));
-      mapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
-      mapper.setVisibility(PropertyAccessor.FIELD, Visibility.NONE);
-      mapper.setVisibility(PropertyAccessor.GETTER, Visibility.NONE);
-      mapper.setVisibility(PropertyAccessor.IS_GETTER, Visibility.NONE);
-      mapper.setVisibility(PropertyAccessor.SETTER, Visibility.NONE);
-
-      String jsonString = UI.EMPTY_STRING;
-      try {
-         jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
-      } catch (final JsonProcessingException e) {
-         e.printStackTrace();
-      }
-      return jsonString;
    }
 
    @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryReferenceTimeline;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -27,7 +28,6 @@ import net.tourbook.data.TourReference;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.referenceTour.ReferenceTourView;
 

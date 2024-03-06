@@ -190,7 +190,7 @@ Messages //
 
             // show dialog when button is pressed with the keyboard
             onClick : function() {
-               app._searchInput.startSearch();
+               app._searchInput.startSearch(true);
             }
 
          }, 'domAction_StartSearch');

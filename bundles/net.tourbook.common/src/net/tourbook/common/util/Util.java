@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -43,10 +44,13 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
+
+import javax.imageio.ImageIO;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -58,6 +62,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.widgets.Combo;
@@ -2085,6 +2090,24 @@ public class Util {
       return year;
    }
 
+   public static String imageToBase64(final Image image) {
+
+      byte[] imageBytes = null;
+      final BufferedImage bufferedImage = ImageConverter.convertIntoAWT(image);
+
+      try (final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+
+         ImageIO.write(bufferedImage, "png", output); //$NON-NLS-1$
+         imageBytes = output.toByteArray();
+
+      } catch (final IOException e) {
+         StatusUtil.log(e);
+      }
+
+      final byte[] encoded = Base64.getEncoder().encode(imageBytes);
+      return new String(encoded);
+   }
+
    /**
     * @param event
     *
@@ -3022,23 +3045,42 @@ public class Util {
     * selected
     *
     * @param combo
-    * @param comboItems
+    * @param allItems
     * @param selectedItem
     *           Text which should be selected in the combo box
     */
-   public static void selectTextInCombo(final Combo combo, final String[] comboItems, final String selectedItem) {
+   public static void selectTextInCombo(final Combo combo,
+                                        final List<String> allItems,
+                                        final String selectedItem,
+                                        final int offset) {
+
+      if (selectedItem == null) {
+         return;
+      }
 
       int comboIndex = 0;
+      boolean isIndexAvailable = false;
 
-      for (final String comboStateValue : comboItems) {
+      for (final String comboStateValue : allItems) {
+
          if (selectedItem.equals(comboStateValue)) {
+
+            isIndexAvailable = true;
+
             break;
          }
 
          comboIndex++;
       }
 
-      combo.select(comboIndex);
+      if (isIndexAvailable) {
+
+         combo.select(offset + comboIndex);
+
+      } else {
+
+         combo.select(0);
+      }
    }
 
    /**

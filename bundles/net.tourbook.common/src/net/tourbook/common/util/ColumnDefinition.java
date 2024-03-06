@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,10 +37,11 @@ import org.eclipse.swt.widgets.Tree;
 
 public class ColumnDefinition implements Cloneable {
 
-   private final static NumberFormat _nf0;
-   private final static NumberFormat _nf1;
-   private final static NumberFormat _nf2;
+   private static final char         NL = UI.NEW_LINE;
 
+   private static final NumberFormat _nf0;
+   private static final NumberFormat _nf1;
+   private static final NumberFormat _nf2;
    static {
 
       _nf0 = NumberFormat.getNumberInstance();
@@ -62,7 +63,7 @@ public class ColumnDefinition implements Cloneable {
    private String                 _label;
 
    /**
-    * every column in a table must have a unique id
+    * Every column in a table must have a unique id
     */
    private String                 _columnId;
 
@@ -73,11 +74,19 @@ public class ColumnDefinition implements Cloneable {
    private boolean                _isColumnChecked;
 
    /**
-    * when <code>true</code> the visibility for this column can be changed
+    * When <code>true</code> then the visibility for this column can be changed
     */
    private boolean                _canModifyVisibility = true;
 
-   protected int                  _style;
+   /**
+    * Is a SWT.* style constant for the column alignment
+    */
+   private int                    _style_Current;
+
+   /**
+    * Is the default SWT.* style constant for the column alignment
+    */
+   private int                    _style_Default;
 
    private CellLabelProvider      _cellLabelProvider;
    private NatTable_LabelProvider _natTable_LabelProvider;
@@ -99,7 +108,7 @@ public class ColumnDefinition implements Cloneable {
    private int                    _createIndex;
 
    /**
-    * when <code>true</code> this column will be checked in the modify dialog when the default
+    * When <code>true</code> this column will be checked in the modify dialog when the default
     * button is selected
     */
    private boolean                _isDefaultColumn;
@@ -149,7 +158,9 @@ public class ColumnDefinition implements Cloneable {
    ColumnDefinition(final String columnId, final int style) {
 
       _columnId = columnId;
-      _style = style;
+
+      _style_Default = style;
+      _style_Current = style;
    }
 
    /**
@@ -171,7 +182,7 @@ public class ColumnDefinition implements Cloneable {
 
       final ColumnDefinition clone = (ColumnDefinition) super.clone();
 
-// this seems to be not necesary
+// this seems to be not necessary
 //
 //      clone._label = _label;
 //      clone._columnId = _columnId;
@@ -266,7 +277,7 @@ public class ColumnDefinition implements Cloneable {
    public String getColumnHeaderText(final ColumnManager columnManager) {
 
       final StringBuilder sb = new StringBuilder();
-      sb.append(_columnHeaderText);
+      sb.append(_columnHeaderText == null ? UI.EMPTY_STRING : _columnHeaderText);
 
       // add annotations to this text
       if (columnManager.isShowColumnAnnotation_Formatting()
@@ -291,7 +302,7 @@ public class ColumnDefinition implements Cloneable {
        * be set hidden, it looks just awful
        */
       if (columnManager.getColumnViewer() instanceof TreeViewer
-            && _style == SWT.TRAIL
+            && _style_Current == SWT.TRAIL
             && UI.isDarkTheme()) {
 
          sb.append(UI.SPACE2);
@@ -319,8 +330,15 @@ public class ColumnDefinition implements Cloneable {
       return _columnSelectionListener;
    }
 
+   /**
+    * <li>{@link SWT#LEAD} - 16384</li>
+    * <li>{@link SWT#CENTER} - 16777216</li>
+    * <li>{@link SWT#TRAIL} - 131072</li>
+    *
+    * @return Returns the current SWT.* style constant for the alignment
+    */
    public int getColumnStyle() {
-      return _style;
+      return _style_Current;
    }
 
    public String getColumnUnit() {
@@ -337,6 +355,10 @@ public class ColumnDefinition implements Cloneable {
 
    public int getCreateIndex() {
       return _createIndex;
+   }
+
+   public int getDefaultColumnStyle() {
+      return _style_Default;
    }
 
    public int getDefaultColumnWidth() {
@@ -362,10 +384,16 @@ public class ColumnDefinition implements Cloneable {
       return _natTable_LabelProvider;
    }
 
+   /**
+    * @return Returns the current category format
+    */
    public ValueFormat getValueFormat_Category() {
       return _valueFormat_Category;
    }
 
+   /**
+    * @return Returns the current detail format
+    */
    public ValueFormat getValueFormat_Detail() {
       return _valueFormat_Detail;
    }
@@ -413,7 +441,7 @@ public class ColumnDefinition implements Cloneable {
 
    /**
     * @return Returns <code>true</code> when it is displayed but the width is 0, this is necessary
-    *         that the first visiblecolumn can be right aligned in a {@link Table} or {@link Tree}.
+    *         that the first visible column can be right aligned in a {@link Table} or {@link Tree}.
     */
    public boolean isColumnHidden() {
       return _isColumnHidden;
@@ -689,9 +717,9 @@ public class ColumnDefinition implements Cloneable {
 
       _columnLayoutData = layoutData;
 
-      if (layoutData instanceof ColumnPixelData) {
+      if (layoutData instanceof final ColumnPixelData columnPixelData) {
          // keep the default width
-         _defaultColumnWidth = ((ColumnPixelData) layoutData).width;
+         _defaultColumnWidth = columnPixelData.width;
       }
    }
 
@@ -762,6 +790,16 @@ public class ColumnDefinition implements Cloneable {
    }
 
    /**
+    * Sets the current SWT.* alignment style
+    *
+    * @param style
+    */
+   public void setStyle(final int style) {
+
+      _style_Current = style;
+   }
+
+   /**
     * Set formats which are used to render the column.
     * <p>
     * <b>This must be called after {@link #setColumnHeaderText(String)} that annotations can be
@@ -818,21 +856,21 @@ public class ColumnDefinition implements Cloneable {
    @Override
    public String toString() {
 
-// SET_FORMATTING_OFF
-      return "ColumnDefinition [" //$NON-NLS-1$
+      return UI.EMPTY_STRING
 
-//				+ "_label="                + _label                + ", "   //$NON-NLS-1$ //$NON-NLS-2$
-            + "_isDefaultColumn="      + String.format("%-5s", Boolean.toString(_isDefaultColumn))    + ", "   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + "_isColumnChecked="      + String.format("%-5s", Boolean.toString(_isColumnChecked))    + ", "   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + "_columnId="             + String.format("%-40s", _columnId)                            + ", "   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-//          + "_valueFormat="          + _valueFormat_Category + ", "   //$NON-NLS-1$ //$NON-NLS-2$
-//          + "_valueFormat_Detail="   + _valueFormat_Detail   + ", "   //$NON-NLS-1$ //$NON-NLS-2$
-				+ "_columnWidth="          + _columnWidth          + ", "   //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "_defaultColumnWidth="   + _defaultColumnWidth            //$NON-NLS-1$
+            + "ColumnDefinition" + NL //                                                                 //$NON-NLS-1$
 
-            + "]\n"; //$NON-NLS-1$
+            + " _label              = " + _label + NL //                                                 //$NON-NLS-1$
+            + " _isDefaultColumn    = " + String.format("%-5s", Boolean.toString(_isDefaultColumn)) + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + " _isColumnChecked    = " + String.format("%-5s", Boolean.toString(_isColumnChecked)) + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + " _columnId           = " + String.format("%-40s", _columnId) + NL //                      //$NON-NLS-1$ //$NON-NLS-2$
+            + " _valueFormat        = " + _valueFormat_Category + NL //                                  //$NON-NLS-1$
+            + " _valueFormat_Detail = " + _valueFormat_Detail + +NL //                                   //$NON-NLS-1$
+            + " _columnWidth        = " + _columnWidth + NL //                                           //$NON-NLS-1$
+            + " _defaultColumnWidth = " + _defaultColumnWidth + NL //                                    //$NON-NLS-1$
+            + " _style_Current      = " + ColumnManager.getAlignmentText(_style_Current) + NL //         //$NON-NLS-1$
 
-// SET_FORMATTING_ON
+      ;
    }
 
 }

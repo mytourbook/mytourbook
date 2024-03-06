@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,11 +20,11 @@ import de.byteholder.geoclipse.map.ITileChildrenCreator;
 import de.byteholder.geoclipse.map.ParentImageStatus;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.TileCache;
-import de.byteholder.geoclipse.map.UI;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.core.runtime.IPath;

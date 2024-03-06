@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -519,13 +519,13 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
 
                // Color: Segmenter totals light
                _colorSegmenterTotals_Light = new ColorSelectorExtended(containerLeft);
-               _colorSegmenterTotals_Light.getButton().setToolTipText(OtherMessages.APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP);
+               _colorSegmenterTotals_Light.getButton().setToolTipText(OtherMessages.APP_THEME_FOREGROUND_COLOR_LIGHT_TOOLTIP);
                _colorSegmenterTotals_Light.addListener(_segmenterChangePropertyListener);
                _colorSegmenterTotals_Light.addOpenListener(this);
 
                // Color: Segmenter totals dark
                _colorSegmenterTotals_Dark = new ColorSelectorExtended(containerLeft);
-               _colorSegmenterTotals_Dark.getButton().setToolTipText(OtherMessages.APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP);
+               _colorSegmenterTotals_Dark.getButton().setToolTipText(OtherMessages.APP_THEME_FOREGROUND_COLOR_DARK_TOOLTIP);
                _colorSegmenterTotals_Dark.addListener(_segmenterChangePropertyListener);
                _colorSegmenterTotals_Dark.addOpenListener(this);
             }

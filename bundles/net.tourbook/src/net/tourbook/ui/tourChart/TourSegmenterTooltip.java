@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -742,7 +742,7 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
       /*
        * Elevation Gain
        */
-      _lblElevation_Diff.setText(_nf_1_1.format(tourSegment.altitude_Segment_Border_Diff));
+      _lblElevation_Diff.setText(_nf_1_1.format(tourSegment.altitude_Segment_Border_Diff / UI.UNIT_VALUE_ELEVATION));
       _lblElevation_Diff_Unit.setText(UI.UNIT_LABEL_ELEVATION);
 
       final float altiDown = (tourSegment.altitude_Segment_Down / UI.UNIT_VALUE_ELEVATION)
@@ -760,7 +760,7 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
       _lblGradient.setText(_nf_1_1.format(tourSegment.gradient));
 
       // distance
-      final double distance = tourSegment.distance_Diff / 1000.0;
+      final double distance = tourSegment.distance_Diff / 1000.0 / UI.UNIT_VALUE_DISTANCE;
       _lblDistance.setText(FormatManager.formatDistance(distance));
       _lblDistance_Unit.setText(UI.UNIT_LABEL_DISTANCE);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,9 +16,6 @@
 package net.tourbook.common;
 
 import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
-import static org.eclipse.swt.events.MouseTrackListener.mouseEnterAdapter;
-import static org.eclipse.swt.events.MouseTrackListener.mouseExitAdapter;
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -31,6 +28,7 @@ import java.util.Formatter;
 import java.util.Random;
 
 import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.measurement_system.MeasurementSystem;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 import net.tourbook.common.measurement_system.Unit_Distance;
@@ -43,6 +41,7 @@ import net.tourbook.common.measurement_system.Unit_Temperature;
 import net.tourbook.common.measurement_system.Unit_Weight;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 
@@ -81,7 +80,9 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
@@ -123,6 +124,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.menus.UIElement;
 import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
@@ -143,7 +145,9 @@ public class UI {
    public static final char         SYMBOL_BRACKET_LEFT                  = '(';
    public static final char         SYMBOL_BRACKET_RIGHT                 = ')';
 
+   public static final String       COLON_SPACE                          = ": ";                                        //$NON-NLS-1$
    public static final String       COMMA_SPACE                          = ", ";                                        //$NON-NLS-1$
+   /** This is not a real dash it's the negative sign character */
    public static final String       DASH                                 = "-";                                         //$NON-NLS-1$
    public static final String       DASH_WITH_SPACE                      = " - ";                                       //$NON-NLS-1$
    public static final String       DASH_WITH_DOUBLE_SPACE               = "   -   ";                                   //$NON-NLS-1$
@@ -187,6 +191,7 @@ public class UI {
    public static final String       SYMBOL_BLACK_LARGE_CIRCLE            = "\u2B24";                                    //$NON-NLS-1$
    public static final String       SYMBOL_BOX                           = "\u25a0";                                    //$NON-NLS-1$
    public static final String       SYMBOL_BULLET                        = "\u2022";                                    //$NON-NLS-1$
+   /** This is the real dash and not the negative sign character */
    public static final String       SYMBOL_DASH                          = "\u2212";                                    //$NON-NLS-1$
    public static final String       SYMBOL_DEGREE                        = "\u00B0";                                    //$NON-NLS-1$
    public static final String       SYMBOL_DBL_ANGLE_QMARK_LEFT          = "\u00AB";                                    //$NON-NLS-1$
@@ -262,6 +267,9 @@ public class UI {
    public static final String       INCREMENTER_1                        = "1";                                         //$NON-NLS-1$
    public static final String       INCREMENTER_10                       = "10";                                        //$NON-NLS-1$
    public static final String       INCREMENTER_100                      = "100";                                       //$NON-NLS-1$
+   public static final String       INCREMENTER_1_000                    = FormatManager.formatNumber_0(1_000);
+   public static final String       INCREMENTER_10_000                   = FormatManager.formatNumber_0(10_000);
+   public static final String       INCREMENTER_100_000                  = FormatManager.formatNumber_0(100_000);
 
    private static final char[]      INVALID_FILENAME_CHARS               = new char[] {
          '\\',
@@ -557,6 +565,8 @@ public class UI {
    public static final String          UNIT_DISTANCE_INCH         = "inch";                     //$NON-NLS-1$
    public static final String          UNIT_ELEVATION_M           = "m";                        //$NON-NLS-1$
    public static final String          UNIT_ELEVATION_FT          = "ft";                       //$NON-NLS-1$
+   public static final String          UNIT_FLUIDS_ML             = "mL";                       //$NON-NLS-1$
+   public static final String          UNIT_FLUIDS_L              = "L";                        //$NON-NLS-1$
    public static final String          UNIT_HEIGHT_FT             = "ft";                       //$NON-NLS-1$
    public static final String          UNIT_HEIGHT_IN             = "in";                       //$NON-NLS-1$
    public static final String          UNIT_JOULE                 = "J";                        //$NON-NLS-1$
@@ -584,6 +594,7 @@ public class UI {
    public static final String          UNIT_VOLTAGE               = "Volt";                     //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_KG             = "kg";                       //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_LBS            = "lbs";                      //$NON-NLS-1$
+   public static final String          UNIT_WEIGHT_MG             = "mg";                       //$NON-NLS-1$
 
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER;
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER_SHORT;
@@ -623,14 +634,14 @@ public class UI {
     *
     * @since 3.2
     */
-   private static final String DIALOG_WIDTH              = "DIALOG_WIDTH";                //$NON-NLS-1$
+   public static final String  DIALOG_WIDTH              = "DIALOG_WIDTH";                //$NON-NLS-1$
 
    /**
     * The dialog settings key name for stored dialog height.
     *
     * @since 3.2
     */
-   private static final String DIALOG_HEIGHT             = "DIALOG_HEIGHT";               //$NON-NLS-1$
+   public static final String  DIALOG_HEIGHT             = "DIALOG_HEIGHT";               //$NON-NLS-1$
 
    /**
     * The dialog settings key name for the font used when the dialog height and width was stored.
@@ -919,13 +930,13 @@ public class UI {
             ? ThemeUtil.getDefaultForegroundColor_Shell()
             : display.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
 
-      sash.addMouseTrackListener(mouseEnterAdapter(mouseEvent -> sash.setBackground(mouseEnterColor)));
-      sash.addMouseTrackListener(mouseExitAdapter(mouseEvent -> sash.setBackground(mouseExitColor)));
+      sash.addMouseTrackListener(MouseTrackListener.mouseEnterAdapter(mouseEvent -> sash.setBackground(mouseEnterColor)));
+      sash.addMouseTrackListener(MouseTrackListener.mouseExitAdapter(mouseEvent -> sash.setBackground(mouseExitColor)));
 
       // set color when sash is initially displayed
       sash.addControlListener(controlResizedAdapter(controlEvent -> sash.setBackground(mouseExitColor)));
 
-      sash.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+      sash.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
 
          // hide background when sash is dragged
 
@@ -1113,6 +1124,13 @@ public class UI {
       return averageElevationChange * UNIT_VALUE_DISTANCE / UNIT_VALUE_ELEVATION;
    }
 
+   /**
+    * Convert height from metric into inches
+    *
+    * @param height
+    *
+    * @return
+    */
    public static float convertBodyHeightFromMetric(final float height) {
 
       if (UNIT_IS_ELEVATION_METER) {
@@ -1122,13 +1140,16 @@ public class UI {
       return height * UNIT_METER_TO_INCHES;
    }
 
-   public static float convertBodyHeightToMetric(final float primaryHeight, final int subHeight) {
+   public static float convertBodyHeightToMetric(final float heightMeterOrFeet, final int heightInch) {
 
       if (UNIT_IS_ELEVATION_METER) {
-         return primaryHeight;
+         return heightMeterOrFeet;
       }
 
-      return 100 * (primaryHeight * 12 + subHeight) / UNIT_METER_TO_INCHES;
+      final float heightFeetToInch = heightMeterOrFeet * 12;
+      final float heightInchTotal = heightFeetToInch + heightInch;
+
+      return 100 * heightInchTotal / UNIT_METER_TO_INCHES;
    }
 
    /**
@@ -1497,6 +1518,28 @@ public class UI {
    }
 
    /**
+    * Creates a page with a static text by using a {@link FormToolkit}
+    *
+    * @param formToolkit
+    * @param parent
+    * @param labelText
+    *
+    * @return
+    */
+   public static Composite createPage(final FormToolkit formToolkit, final Composite parent, final String labelText) {
+
+      final Composite container = formToolkit.createComposite(parent);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = formToolkit.createLabel(container, labelText, SWT.WRAP);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+      }
+
+      return container;
+   }
+
+   /**
     * Create a spacer for one column
     *
     * @param parent
@@ -1525,6 +1568,36 @@ public class UI {
             .hint(SWT.DEFAULT, height)
             .span(spanHorizontal, 1)
             .applyTo(label);
+   }
+
+   /**
+    * Creates a {@link Spinner} with minimum, maximum, increment, page increment, number of digits
+    *
+    * @param parent
+    * @param digits
+    * @param minimum
+    * @param maximum
+    * @param increment
+    * @param pageIncrement
+    *
+    * @return
+    */
+   public static Spinner createSpinner(final Composite parent,
+                                       final int digits,
+                                       final int minimum,
+                                       final int maximum,
+                                       final int increment,
+                                       final int pageIncrement) {
+
+      final Spinner spinner = new Spinner(parent, SWT.BORDER);
+
+      spinner.setDigits(digits);
+      spinner.setMinimum(minimum);
+      spinner.setMaximum(maximum);
+      spinner.setIncrement(increment);
+      spinner.setPageIncrement(pageIncrement);
+
+      return spinner;
    }
 
    /**
@@ -2385,14 +2458,43 @@ public class UI {
       notication.open();
    }
 
-   public static void paintImageCentered(final Event event, final Image image, final int availableWidth) {
+   /**
+    * @param event
+    * @param image
+    * @param availableWidth
+    * @param alignment
+    *           SWT.* alignment values
+    */
+   public static void paintImage(final Event event,
+                                 final Image image,
+                                 final int availableWidth,
+                                 final int alignment) {
 
       final Rectangle imageRect = image.getBounds();
 
-      // center horizontal
-      final int xOffset = (availableWidth - imageRect.width) / 2;
+      final int imageWidth = imageRect.width;
+      final int imageWidth2 = imageWidth / 2;
 
-      // center vertical
+      /*
+       * Horizontal alignment
+       */
+      int xOffset = 0;
+
+// SET_FORMATTING_OFF
+
+      switch (alignment) {
+
+      case SWT.CENTER   -> {  xOffset = (availableWidth - imageWidth2) / 2;   }
+      case SWT.RIGHT    -> {  xOffset = availableWidth - imageWidth;          }
+      default           -> {  xOffset = 2;                                    }  // == left alignment
+
+      }
+
+// SET_FORMATTING_ON
+
+      /*
+       * Vertical alignment: centered
+       */
       final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
 
       final int devX = event.x + xOffset;
@@ -2607,7 +2709,7 @@ public class UI {
 
    public static String scrambleText(final String text) {
 
-      if (text == null) {
+      if (StringUtils.isNullOrEmpty(text)) {
          return text;
       }
 
@@ -2690,11 +2792,17 @@ public class UI {
          @Override
          protected boolean isEditorActivationEvent(final ColumnViewerEditorActivationEvent event) {
 
-            return (event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL)
-                  || (event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION)
-                  || ((event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED)
+            final int eventType = event.eventType;
+
+            return eventType == ColumnViewerEditorActivationEvent.TRAVERSAL // 5
+                  || eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION // 2
+
+                  || ((eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED) // 1
                         && (event.keyCode == SWT.CR))
-                  || (event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC);
+
+                  || eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC // 4
+
+            ;
          }
       };
 

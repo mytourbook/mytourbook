@@ -32,6 +32,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
@@ -1155,7 +1156,7 @@ public class TourBookView extends ViewPart implements
 
             final int[] lastRowPosition = { numRows - 1 };
 
-            selectTours_NatTable(lastRowPosition, true, true, true, true);
+            selectTours_NatTable(lastRowPosition, true, true, true);
          }
 
       } else {
@@ -1546,13 +1547,7 @@ public class TourBookView extends ViewPart implements
 
                   if (_isLayoutNatTable) {
 
-                     reselectTourViewer_NatTable(false,
-
-                           /*
-                            * Very important, otherwise the tourbook view is getting the focus
-                            * however the selection was fired from another view
-                            */
-                           false);
+                     reselectTourViewer_NatTable(false);
 
                   } else {
 
@@ -1844,15 +1839,22 @@ public class TourBookView extends ViewPart implements
       final UiBindingRegistry uiBindingRegistry = _tourViewer_NatTable.getUiBindingRegistry();
 
       // add mouse double click listener
-      final IMouseAction mouseDoubleClickAction = (natTable, mouseEvent) -> TourManager.getInstance()
-            .tourDoubleClickAction(TourBookView.this, _tourDoubleClickState);
+      final IMouseAction mouseDoubleClickAction = (natTable, mouseEvent) -> {
+
+         _tourDoubleClickState.tourLocationFocus = getTourLocation_HoverState();
+
+         TourManager.getInstance().tourDoubleClickAction(TourBookView.this, _tourDoubleClickState);
+      };
+
       uiBindingRegistry.registerDoubleClickBinding(MouseEventMatcher.bodyLeftClick(SWT.NONE), mouseDoubleClickAction);
 
       // setup selection listener for the nattable
       final ISelectionProvider selectionProvider = new RowSelectionProvider<>(
             _natTable_Body_SelectionLayer,
             _natTable_DataProvider,
-            false); // Provides rows where any cell in the row is selected
+            false, // Provides rows where any cell in the row is selected
+            true // handleSameRowSelection, this is activated that different tour locations of the same tour can fire a selection
+      );
 
       selectionProvider.addSelectionChangedListener(selectionChangedEvent -> onSelect_NatTableItem(selectionChangedEvent));
 
@@ -1913,6 +1915,9 @@ public class TourBookView extends ViewPart implements
       // set start/end location info tooltip provider
       _tourLocationTooltip_NatTable = new TourLocationToolTip(this, true);
 
+      // ensure that tooltips are hidden
+      _tourViewer_NatTable.addListener(SWT.MouseExit, (event) -> hideTooltip());
+
       _natTable_DummyColumnViewer = new NatTable_DummyColumnViewer(this);
 
       // this must be run async otherwise the dark theme is not yet initialized !!!
@@ -1966,13 +1971,12 @@ public class TourBookView extends ViewPart implements
             _tourLocationTooltip_NatTable.hide();
             _tourLocationTooltip_Tree.hide();
 
-            final Point displayCursorLocation = Display.getCurrent().getCursorLocation();
-
-            setupTourLocationContextMenu(displayCursorLocation);
+            // set true/false/null
+            _actionSetStartEndLocation.setIsStartLocation(getTourLocation_HoverState());
 
             _tagMenuManager.onShowMenu(menuEvent,
                   _tourViewer_NatTable,
-                  displayCursorLocation,
+                  Display.getCurrent().getCursorLocation(),
                   _tourInfoToolTip_NatTable);
          }
 
@@ -2007,6 +2011,8 @@ public class TourBookView extends ViewPart implements
          final Object selection = ((IStructuredSelection) _tourViewer_Tree.getSelection()).getFirstElement();
 
          if (selection instanceof TVITourBookTour) {
+
+            _tourDoubleClickState.tourLocationFocus = getTourLocation_HoverState();
 
             TourManager.getInstance().tourDoubleClickAction(TourBookView.this, _tourDoubleClickState);
 
@@ -2058,6 +2064,9 @@ public class TourBookView extends ViewPart implements
 
       // set start/end location info tooltip provider
       _tourLocationTooltip_Tree = new TourLocationToolTip(this, false);
+
+      // ensure that tooltips are hidden
+      tree.addListener(SWT.MouseExit, (event) -> hideTooltip());
    }
 
    private void createUI_40_Tree_ColumnImages(final Tree tree) {
@@ -2065,7 +2074,6 @@ public class TourBookView extends ViewPart implements
       _colDef_TourTypeImage_Tree = _columnFactory.getColDef_TourTypeImage_Tree();
       _colDef_WeatherClouds_Tree = _columnFactory.getColDef_WeatherClouds_Tree();
 
-      boolean isColumnVisible = false;
       final ControlListener controlResizedAdapter = ControlListener.controlResizedAdapter(controlEvent -> onResize_SetWidthForImageColumn());
 
       // update column index which is needed for repainting
@@ -2073,6 +2081,7 @@ public class TourBookView extends ViewPart implements
       _columnIndex_TourTypeImage = activeProfile.getColumnIndex(_colDef_TourTypeImage_Tree.getColumnId());
       _columnIndex_WeatherClouds = activeProfile.getColumnIndex(_colDef_WeatherClouds_Tree.getColumnId());
 
+      boolean isColumnVisible = false;
       final int numColumns = tree.getColumns().length;
 
       // add column resize listener
@@ -2157,7 +2166,7 @@ public class TourBookView extends ViewPart implements
       _prefStore_Common.removePropertyChangeListener(_prefChangeListener_Common);
 
       if (_natTable_DataLoader != null) {
-         _natTable_DataLoader.resetTourItems();
+         _natTable_DataLoader.resetTourItems(true);
          _natTable_DataLoader = null;
       }
       if (_rootItem_Tree != null) {
@@ -2466,6 +2475,8 @@ public class TourBookView extends ViewPart implements
       menuMgr.add(_actionSetOtherPerson);
       menuMgr.add(_actionDeleteTourMenu);
 
+      ActionEditQuick.setTourLocationFocus(getTourLocation_HoverState());
+
       enableActions();
    }
 
@@ -2490,10 +2501,28 @@ public class TourBookView extends ViewPart implements
          _selectedTourIds.clear();
          _selectedTourIds.addAll(tourIds);
 
-         selection = tourIds.size() == 1
-               ? new SelectionTourId(_selectedTourIds.get(0))
-               : new SelectionTourIds(_selectedTourIds);
+         final Boolean tourLocationHoverState = getTourLocation_HoverState();
 
+         final GeoPosition hoveredTourLocationPosition = tourLocationHoverState == null
+               ? null
+               : getTourLocation_Position(tourLocationHoverState, _selectedTourIds.get(0));
+
+         if (tourIds.size() == 1) {
+
+            final SelectionTourId selectionTourId = new SelectionTourId(_selectedTourIds.get(0));
+
+            selectionTourId.setHoveredTourLocation(hoveredTourLocationPosition);
+
+            selection = selectionTourId;
+
+         } else {
+
+            final SelectionTourIds selectionTourIds = new SelectionTourIds(_selectedTourIds);
+
+            selectionTourIds.setHoveredTourLocation(hoveredTourLocationPosition);
+
+            selection = selectionTourIds;
+         }
       }
 
       _isInFireSelection = true;
@@ -2741,6 +2770,78 @@ public class TourBookView extends ViewPart implements
    }
 
    /**
+    * @return Returns <code>true</code> when start location is hovered, <code>false</code> when end
+    *         location is hovered, <code>null</code> when a location is not hovered
+    */
+   private Boolean getTourLocation_HoverState() {
+
+      final NatTable natTable = getTourViewer_NatTable();
+
+      final Point controlCursorLocation = natTable.toControl(Display.getCurrent().getCursorLocation());
+
+      final int devXMouse = controlCursorLocation.x;
+      final int devYMouse = controlCursorLocation.y;
+
+      final int colPosByX = natTable.getColumnPositionByX(devXMouse);
+      final int rowPosByY = natTable.getRowPositionByY(devYMouse);
+
+      if (colPosByX <= 0 || rowPosByY <= 0) {
+
+         // first column or first row (this is the row number or table header) or an empty nattable (rowPosByY == -1)
+
+      } else {
+
+         // get hovered label provider from the column, this is needed to show the tour tooltip only for specific columns
+         final int hoveredColumnIndex = natTable.getColumnIndexByPosition(colPosByX);
+         if (hoveredColumnIndex > -1) {
+
+            final ArrayList<ColumnDefinition> visibleAndSortedColumns = _columnManager_NatTable.getVisibleAndSortedColumns();
+            final ColumnDefinition colDef = visibleAndSortedColumns.get(hoveredColumnIndex);
+
+            final NatTable_LabelProvider labelProvider = colDef.getNatTable_LabelProvider();
+            if (labelProvider instanceof final NatTable_LabelProvider_WithLocationTooltip locationTooltipLabelProvider) {
+
+               // return true or false
+               return locationTooltipLabelProvider.isStartLocation;
+            }
+         }
+      }
+
+      return null;
+   }
+
+   private GeoPosition getTourLocation_Position(final boolean hoveredTourLocation, final Long tourID) {
+
+      final TourData tourData = TourManager.getInstance().getTourData(tourID);
+
+      if (tourData == null) {
+         return null;
+      }
+
+      final double[] latitudeSerie = tourData.latitudeSerie;
+      final double[] longitudeSerie = tourData.longitudeSerie;
+
+      if (latitudeSerie == null || latitudeSerie.length == 0) {
+         return null;
+      }
+
+      if (hoveredTourLocation) {
+
+         // start location is hovered
+
+         return new GeoPosition(latitudeSerie[0], longitudeSerie[0]);
+
+      } else {
+
+         // end location is hovered
+
+         final int lastIndex = latitudeSerie.length - 1;
+
+         return new GeoPosition(latitudeSerie[lastIndex], longitudeSerie[lastIndex]);
+      }
+   }
+
+   /**
     * @return the {@link #_tourViewer_NatTable}
     */
    public NatTable getTourViewer_NatTable() {
@@ -2788,6 +2889,23 @@ public class TourBookView extends ViewPart implements
             allTourIds.add(tourItem.getTourId());
          }
       }
+   }
+
+   /**
+    * Hide the tooltip when mouse not hovering it and the mouse have exited the view
+    */
+   private void hideTooltip() {
+
+      _parent.getDisplay().timerExec(100, () -> {
+
+         if (_tourLocationTooltip_Tree.isMouseHovered() == false) {
+            _tourLocationTooltip_Tree.hide();
+         }
+
+         if (_tourLocationTooltip_NatTable.isMouseHovered() == false) {
+            _tourLocationTooltip_NatTable.hide();
+         }
+      });
    }
 
    private void initUI(final Composite parent) {
@@ -2916,7 +3034,7 @@ public class TourBookView extends ViewPart implements
 
          // mouse is not hovering a tour selection -> select tour
 
-         selectTours_NatTable(new int[] { hoveredRow }, true, false, false, true);
+         selectTours_NatTable(new int[] { hoveredRow }, true, false, false);
 
          // show context menu again
          _pageBook.getDisplay().timerExec(10, () -> {
@@ -3101,7 +3219,9 @@ public class TourBookView extends ViewPart implements
          final Image image = TourTypeImage.getTourTypeImage(tourTypeId);
          if (image != null) {
 
-            UI.paintImageCentered(event, image, _columnWidth_TourTypeImage);
+            final int alignment = _colDef_TourTypeImage_Tree.getColumnStyle();
+
+            UI.paintImage(event, image, _columnWidth_TourTypeImage, alignment);
          }
       }
    }
@@ -3115,6 +3235,7 @@ public class TourBookView extends ViewPart implements
          final TVITourBookTour tviTourBookTour = (TVITourBookTour) itemData;
 
          final String weatherClouds = tviTourBookTour.colClouds;
+
          if (weatherClouds == null) {
 
             // paint nothing
@@ -3131,7 +3252,9 @@ public class TourBookView extends ViewPart implements
 
             } else {
 
-               UI.paintImageCentered(event, image, _columnWidth_WeatherClouds);
+               final int alignment = _colDef_WeatherClouds_Tree.getColumnStyle();
+
+               UI.paintImage(event, image, _columnWidth_WeatherClouds, alignment);
             }
          }
       }
@@ -3375,7 +3498,7 @@ public class TourBookView extends ViewPart implements
             }
          }
 
-         if (!isSelectedTourHovered) {
+         if (isSelectedTourHovered == false) {
 
             // a selected tour is NOT hovered -> set one tour also to be hovered
 
@@ -3545,7 +3668,7 @@ public class TourBookView extends ViewPart implements
             _selectedTourIds.clear();
             _selectedTourIds.add(tourId);
 
-            reselectTourViewer(false, true);
+            reselectTourViewer(false);
 
          } else {
 
@@ -3559,7 +3682,7 @@ public class TourBookView extends ViewPart implements
          _selectedTourIds.clear();
          _selectedTourIds.addAll(selectionTourIds.getTourIds());
 
-         reselectTourViewer(false, true);
+         reselectTourViewer(false);
 
       } else if (selection instanceof StructuredSelection) {
 
@@ -3605,7 +3728,7 @@ public class TourBookView extends ViewPart implements
       final int[] allRowPositions = selectionModel.getFullySelectedRowPositions(0);
 
       // maybe prevent memory leaks
-      _natTable_DataLoader.resetTourItems();
+      _natTable_DataLoader.resetTourItems(true);
 
       _viewerContainer_NatTable.setRedraw(false);
       {
@@ -3620,7 +3743,7 @@ public class TourBookView extends ViewPart implements
       }
       _viewerContainer_NatTable.setRedraw(true);
 
-      selectTours_NatTable(allRowPositions, true, true, false, true);
+      selectTours_NatTable(allRowPositions, true, true, false);
 
       return null;
    }
@@ -3654,7 +3777,7 @@ public class TourBookView extends ViewPart implements
          return;
       }
 
-      _natTable_DataLoader.resetTourItems();
+      _natTable_DataLoader.resetTourItems(true);
 
       if (_isLayoutNatTable) {
 
@@ -3670,7 +3793,7 @@ public class TourBookView extends ViewPart implements
           * !!! Setting the focus is disabled because it would activate this view which is annoying
           * when another view has the focus !!!
           */
-         reselectTourViewer(false, false);
+         reselectTourViewer(false);
 
       } else {
 
@@ -3745,7 +3868,7 @@ public class TourBookView extends ViewPart implements
     */
    private void reselectTourViewer() {
 
-      reselectTourViewer(true, true);
+      reselectTourViewer(true);
    }
 
    /**
@@ -3754,13 +3877,13 @@ public class TourBookView extends ViewPart implements
     * @param isFireSelection
     * @param isSetFocus
     */
-   private void reselectTourViewer(final boolean isFireSelection, final boolean isSetFocus) {
+   private void reselectTourViewer(final boolean isFireSelection) {
 
       _postSelectionProvider.clearSelection();
 
       if (_isLayoutNatTable) {
 
-         reselectTourViewer_NatTable(isFireSelection, isSetFocus);
+         reselectTourViewer_NatTable(isFireSelection);
 
       } else {
 
@@ -3774,7 +3897,7 @@ public class TourBookView extends ViewPart implements
     * @param isFireSelection
     * @param isSetFocus
     */
-   private void reselectTourViewer_NatTable(final boolean isFireSelection, final boolean isSetFocus) {
+   private void reselectTourViewer_NatTable(final boolean isFireSelection) {
 
       final boolean isFilterActive = _actionTourCollectionFilter.getSelection();
 
@@ -3792,8 +3915,7 @@ public class TourBookView extends ViewPart implements
 
                   true, // isClearSelection
                   true, // isScrollIntoView
-                  isFireSelection,
-                  isSetFocus);
+                  isFireSelection);
          });
       }
    }
@@ -4191,8 +4313,7 @@ public class TourBookView extends ViewPart implements
    void selectTours_NatTable(final int[] allRowPositions,
                              final boolean isClearSelection,
                              final boolean isScrollIntoView,
-                             final boolean isFireSelection,
-                             final boolean isSetFocus) {
+                             final boolean isFireSelection) {
 
       // ensure there is something to be selected
       if (allRowPositions == null || allRowPositions.length == 0 || allRowPositions[0] == -1) {
@@ -4210,10 +4331,6 @@ public class TourBookView extends ViewPart implements
           * case the 2D map crumb to show the last part selection
           */
          _postSelectionProvider.clearSelection();
-
-         if (isSetFocus) {
-            _tourViewer_NatTable.setFocus();
-         }
 
          // sort rows ascending
          Arrays.sort(allRowPositions);
@@ -4275,6 +4392,10 @@ public class TourBookView extends ViewPart implements
 
       if (_isLayoutNatTable) {
 
+         if (_tourViewer_NatTable.isDisposed()) {
+            return;
+         }
+
 // this do not work, the workaround is to select a row:
 //
 //         _tourViewer_NatTable.doCommand(new SelectRowsCommand(_natTable_Grid_BodyLayer, 0, 80, false, false));
@@ -4303,51 +4424,6 @@ public class TourBookView extends ViewPart implements
    void setLinkAndCollapse(final boolean isCollapseOthers) {
 
       _isCollapseOthers = isCollapseOthers;
-   }
-
-   /**
-    * Check if start or end location is hovered
-    *
-    * @param displayCursorLocation
-    */
-   private void setupTourLocationContextMenu(final Point displayCursorLocation) {
-
-      Boolean isStartLocationInContextMenu = null;
-
-      final NatTable natTable = getTourViewer_NatTable();
-
-      final Point controlCursorLocation = natTable.toControl(displayCursorLocation);
-
-      final int devXMouse = controlCursorLocation.x;
-      final int devYMouse = controlCursorLocation.y;
-
-      final int colPosByX = natTable.getColumnPositionByX(devXMouse);
-      final int rowPosByY = natTable.getRowPositionByY(devYMouse);
-
-      if (colPosByX <= 0 || rowPosByY <= 0) {
-
-         // first column or first row (this is the row number or table header) or an empty nattable (rowPosByY == -1)
-
-      } else {
-
-         // get hovered label provider from the column, this is needed to show the tour tooltip only for specific columns
-         final int hoveredColumnIndex = natTable.getColumnIndexByPosition(colPosByX);
-         if (hoveredColumnIndex > -1) {
-
-            final ArrayList<ColumnDefinition> visibleAndSortedColumns = _columnManager_NatTable.getVisibleAndSortedColumns();
-            final ColumnDefinition colDef = visibleAndSortedColumns.get(hoveredColumnIndex);
-
-            final NatTable_LabelProvider labelProvider = colDef.getNatTable_LabelProvider();
-            if (labelProvider instanceof final NatTable_LabelProvider_WithLocationTooltip locationTooltipLabelProvider) {
-
-               // set true or false
-               isStartLocationInContextMenu = locationTooltipLabelProvider.isStartLocation;
-            }
-         }
-      }
-
-      // set true/false/null
-      _actionSetStartEndLocation.setIsStartLocation(isStartLocationInContextMenu);
    }
 
    private void setupTourViewerContent() {
@@ -4461,7 +4537,7 @@ public class TourBookView extends ViewPart implements
 
    private void updateUI_NatTable(final TourCollectionFilter tourSelectionFilterInDataLoader) {
 
-      _natTable_DataLoader.resetTourItems();
+      _natTable_DataLoader.resetTourItems(true);
 
       _natTable_DataLoader.setTourCollectionFilter(tourSelectionFilterInDataLoader, _selectedTourIds);
 

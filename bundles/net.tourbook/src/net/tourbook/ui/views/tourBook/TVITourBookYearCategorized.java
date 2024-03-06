@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,10 +19,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import net.tourbook.common.UI;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
-import net.tourbook.ui.UI;
 
 public class TVITourBookYearCategorized extends TVITourBookItem {
 
@@ -87,6 +87,10 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
             + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //   //$NON-NLS-1$ //$NON-NLS-2$
             + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //               //$NON-NLS-1$
 
+            // get nutrition product ids
+            + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_NUTRITION_PRODUCT + " TNutritionProduct" //                  //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = TNutritionProduct.TourData_tourId" + NL //                              //$NON-NLS-1$
+
             + "WHERE  " + sumYear + "=?" + NL //                                    //$NON-NLS-1$ //$NON-NLS-2$
             + "   AND " + sumYearSub + "=?" + NL //                                 //$NON-NLS-1$ //$NON-NLS-2$
             + "   " + sqlAppFilter.getWhereClause() //$NON-NLS-1$
@@ -132,7 +136,6 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
       if (isShortInfo) {
 
          return "TVITourBookYearCategorized  tourYearSub = " + tourYearSub; //$NON-NLS-1$
-
 
       } else {
 

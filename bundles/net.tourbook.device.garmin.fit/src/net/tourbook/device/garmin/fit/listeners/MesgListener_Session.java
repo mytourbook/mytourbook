@@ -132,7 +132,7 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
       // Looking if the power was retrieved from the developer fields
       if (mesg.getMaxPower() == null && mesg.getAvgPower() == null) {
          final ArrayList<Float> powerDataList = new ArrayList<>();
-         for (final TimeData timeData : fitData.getAllTimeData()) {
+         for (final TimeData timeData : fitData.getTimeData()) {
             if (timeData.power != Float.MIN_VALUE) {
                powerDataList.add(timeData.power);
             }

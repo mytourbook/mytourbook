@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,11 +21,6 @@ public enum LocationPartID {
 
    OSM_DEFAULT_NAME, //
    OSM_NAME, //
-
-//   CUSTOM_CITY_LARGEST, //
-//   CUSTOM_CITY_SMALLEST, //
-//   CUSTOM_CITY_WITH_ZIP_LARGEST, //
-//   CUSTOM_CITY_WITH_ZIP_SMALLEST, //
 
    CUSTOM_STREET_WITH_HOUSE_NUMBER, //
 

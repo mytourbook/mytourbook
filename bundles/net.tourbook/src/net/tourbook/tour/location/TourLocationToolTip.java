@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -82,6 +82,9 @@ public class TourLocationToolTip extends ToolTip {
 
    private TourLocation _tourLocation;
 
+   private String       _hoveredLocation_Start;
+   private String       _hoveredLocation_End;
+
    /*
     * UI controls
     */
@@ -116,6 +119,8 @@ public class TourLocationToolTip extends ToolTip {
       }
 
       setHideOnMouseDown(false);
+
+      setPopupDelay(20);
    }
 
    public TourLocationToolTip(final TourLocationView tourLocationView) {
@@ -132,6 +137,8 @@ public class TourLocationToolTip extends ToolTip {
       _columnViewer = locationViewer;
 
       setHideOnMouseDown(false);
+
+      setPopupDelay(20);
    }
 
    @Override
@@ -205,7 +212,7 @@ public class TourLocationToolTip extends ToolTip {
 
             } else {
 
-               locationTitle = Messages.Tour_Location_Title;
+               locationTitle = Messages.Tour_Location_Tooltip_Title;
             }
 
             // using text control that & is not displayed as mnemonic
@@ -214,6 +221,34 @@ public class TourLocationToolTip extends ToolTip {
             MTFont.setBannerFont(headerText);
 
             headerText.setText(locationTitle);
+         }
+
+         if (_isTourBookView) {
+
+            /*
+             * Show hovered start/end location because this text could be truncated, a normal
+             * tooltip would display a truncated text
+             */
+
+            final boolean isShowStartLocation = _isStartLocation
+                  && _hoveredLocation_Start != null
+                  && _hoveredLocation_Start.length() > 0;
+
+            final boolean isShowEndLocation = _isStartLocation == false
+                  && _hoveredLocation_End != null
+                  && _hoveredLocation_End.length() > 0;
+
+            if (isShowStartLocation || isShowEndLocation) {
+
+               UI.createSpacer_Vertical(container, 8, 2);
+
+               final Text text = new Text(container, SWT.READ_ONLY | SWT.WRAP);
+               headerIndent.applyTo(text);
+
+               text.setText(isShowStartLocation ? _hoveredLocation_Start : _hoveredLocation_End);
+
+               setMaxContentWidth(text);
+            }
          }
 
          UI.createSpacer_Vertical(container, 8, 2);
@@ -323,14 +358,14 @@ public class TourLocationToolTip extends ToolTip {
                      _colLocationItem.numTourStartLocations,
                      _colLocationItem.numTourEndLocations);
 
-               UI.createLabel(container, Messages.Tour_Location_Label_Usage, Messages.Tour_Location_Label_Usage_Tooltip);
-               UI.createLabel(container, usage, Messages.Tour_Location_Label_Usage_Tooltip);
+               UI.createLabel(container, Messages.Tour_Location_Tooltip_Label_Usage, Messages.Tour_Location_Tooltip_Label_Usage_Tooltip);
+               UI.createLabel(container, usage, Messages.Tour_Location_Tooltip_Label_Usage_Tooltip);
             }
             {
                /*
                 * Zoomlevel
                 */
-               UI.createLabel(container, Messages.Tour_Location_Label_Zoomlevel);
+               UI.createLabel(container, Messages.Tour_Location_Tooltip_Label_Zoomlevel);
                UI.createLabel(container, Integer.toString(_tourLocation.zoomlevel));
             }
          }
@@ -505,6 +540,9 @@ public class TourLocationToolTip extends ToolTip {
             if (cellElement instanceof final TVITourBookTour tourItem) {
 
                _tourLocation = getTourLocation(tourItem.tourId);
+
+               _hoveredLocation_Start = tourItem.colTourLocation_Start;
+               _hoveredLocation_End = tourItem.colTourLocation_End;
             }
 
          } else if (labelProvider instanceof TourLocationView.TooltipLabelProvider) {
@@ -589,6 +627,9 @@ public class TourLocationToolTip extends ToolTip {
          // get hovered tour id
          final TVITourBookTour hoveredTourItem = _tourBookView.getNatTable_DataProvider().getRowObject(hoveredRowPosition);
          _natHoveredTourId = hoveredTourItem.tourId;
+
+         _hoveredLocation_Start = hoveredTourItem.colTourLocation_Start;
+         _hoveredLocation_End = hoveredTourItem.colTourLocation_End;
 
          final int devX = _natNatTable.getStartXOfColumnPosition(colPosByX);
          final int devY = _natNatTable.getStartYOfRowPosition(rowPosByY);
@@ -713,5 +754,4 @@ public class TourLocationToolTip extends ToolTip {
          }
       }
    }
-
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.srtm.download;
 
-import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.map.event.TileEventId;
 import de.byteholder.geoclipse.tileinfo.TileInfoManager;
 
@@ -29,6 +28,7 @@ import java.net.URLConnection;
 import java.net.UnknownHostException;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.srtm.Messages;
 import net.tourbook.tour.TourLogManager;

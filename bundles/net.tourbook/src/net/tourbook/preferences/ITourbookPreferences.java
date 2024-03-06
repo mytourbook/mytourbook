@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,9 +17,9 @@ package net.tourbook.preferences;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.map.MapColorProvider;
-import net.tourbook.ui.UI;
 
 public interface ITourbookPreferences {
 
@@ -651,4 +651,9 @@ public interface ITourbookPreferences {
     */
    public static final String FULLTEXT_INDEX_DELETE = "FULLTEXT_INDEX_DELETE"; //$NON-NLS-1$
 
+   /*
+    * Tour nutrition view
+    */
+   public static final String NUTRITION_BEVERAGECONTAINERS_HAVE_CHANGED = "NUTRITION_BEVERAGECONTAINERS_HAVE_CHANGED"; //$NON-NLS-1$
+   public static final String NUTRITION_IGNORE_FIRST_HOUR               = "NUTRITION_IGNORE_FIRST_HOUR";               //$NON-NLS-1$
 }

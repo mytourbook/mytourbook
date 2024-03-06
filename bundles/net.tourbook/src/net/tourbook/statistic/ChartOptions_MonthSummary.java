@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,13 +15,10 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
-import de.byteholder.geoclipse.map.UI;
-
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataSerie;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 
@@ -274,7 +271,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
 
    private void initUI() {
 
-      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI());
    }
 
    private void onChangeUI() {

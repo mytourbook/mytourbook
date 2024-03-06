@@ -17,9 +17,9 @@ public abstract class AutocompleteWidget {
 	 * 		character array of trigger chars
 	 */
 	protected char[] getAutoactivationChars() {
-		String lowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
+		String lowercaseLetters = "abcdefghijklmnopqrstuvwxyz"; //$NON-NLS-1$
 		String uppercaseLetters = lowercaseLetters.toUpperCase();
-		String numbers = "0123456789";
+		String numbers = "0123456789"; //$NON-NLS-1$
 		//String delete = new String(new char[] {SWT.DEL});
 		// the event in {@link ContentProposalAdapter#addControlListener(Control control)}
 		// holds onto a character and when the DEL key is pressed that char

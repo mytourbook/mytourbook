@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -54,6 +54,7 @@ public class Utils {
    public static final String DIRECTORY                        = Messages.App_Action_Menu_Directory;
    public static final String SAVE_MODIFIED_TOUR               = "Save modified tour (Ctrl+S)";                                   //$NON-NLS-1$
    public static final String TOOLS                            = "Tools ";                                                        //$NON-NLS-1$
+   public static final String TOUR                             = "Tour";                                                          //$NON-NLS-1$
 
    public static final String VIEW_NAME_COLLATEDTOURS          = PluginProperties.getText("View_Name_CollatedTours");             //$NON-NLS-1$
    public static final String VIEW_NAME_ELEVATIONCOMPARE       = PluginProperties.getText("View_Name_Compare_ByElevation");       //$NON-NLS-1$
@@ -81,6 +82,7 @@ public class Utils {
    public static final String VIEW_NAME_TOURLOG                = PluginProperties.getText("View_Name_TourLog");                   //$NON-NLS-1$
    public static final String VIEW_NAME_TOURMAP25              = PluginProperties.getText("View_Name_TourMap25");                 //$NON-NLS-1$
    public static final String VIEW_NAME_TOURMAP3               = PluginProperties.getText("View_Name_TourMap3");                  //$NON-NLS-1$
+   public static final String VIEW_NAME_TOURNUTRITION          = PluginProperties.getText("View_Name_TourNutrition");             //$NON-NLS-1$
    public static final String VIEW_NAME_ALLTOURMARKERS         = PluginProperties.getText("View_Name_AllTourMarkers");            //$NON-NLS-1$
    public static final String VIEW_NAME_TOURMARKERS            = PluginProperties.getText("view_name_Marker");                    //$NON-NLS-1$
    public static final String VIEW_NAME_TOURPAUSES             = PluginProperties.getText("View_Name_TourPauses");                //$NON-NLS-1$
@@ -104,7 +106,7 @@ public class Utils {
          // empty string in the preferences.
          // As a result, we restore the default preferences for which metric is
          // the selected measurement system
-         Utils.clickButton("Restore Defaults", bot);
+         Utils.clickButton("Restore Defaults", bot); //$NON-NLS-1$
       }
       Utils.clickApplyAndCloseButton(bot);
    }
@@ -310,6 +312,18 @@ public class Utils {
       return tour;
    }
 
+   public static SWTBotView getTourBlogView(final SWTWorkbenchBot bot) {
+
+      Utils.showViewFromMenu(bot, Utils.TOUR, Utils.VIEW_NAME_TOURBLOG);
+      return Utils.showView(bot, Utils.VIEW_NAME_TOURBLOG);
+   }
+
+   public static SWTBotView getTourNutritionView(final SWTWorkbenchBot bot) {
+
+      Utils.showViewFromMenu(bot, Utils.TOUR, Utils.VIEW_NAME_TOURNUTRITION);
+      return Utils.showView(bot, Utils.VIEW_NAME_TOURNUTRITION);
+   }
+
    public static SWTBotTreeItem getTourWithPauses(final SWTWorkbenchBot bot) {
 
       importTour(bot, "ParkCity.fitlogEx"); //$NON-NLS-1$
@@ -332,6 +346,20 @@ public class Utils {
 
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
             .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      return tour;
+   }
+
+   /**
+    * Select a tour for which tags are assigned
+    */
+   public static SWTBotTreeItem getTourWithTags(final SWTWorkbenchBot bot) {
+
+      showTourBookView(bot);
+
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
       return tour;

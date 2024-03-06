@@ -31,7 +31,6 @@ import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.tour.location.TourLocationManager.Zoomlevel;
 
@@ -90,7 +89,6 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private PixelConverter                  _pc;
 
-   private TourData                        _tourData;
    private boolean                         _isStartLocation;
 
    private TableViewer                     _profileViewer;
@@ -105,6 +103,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private List<MT_DLItem>                 _allDualListItems = new ArrayList<>();
 
+   /**
+    * Can be <code>null</code>
+    */
    private ITourLocationConsumer           _tourLocationConsumer;
    private TourLocation                    _tourLocation;
 
@@ -132,6 +133,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
    private Label               _lblProfileName;
    private Label               _lblProfiles;
    private Label               _lblSelectedLocationParts;
+   private Label               _lblZoomlevel;
 
    private Text                _txtProfileName;
    private Text                _txtSelectedLocationParts;
@@ -251,7 +253,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
     * @param isStartLocation
     */
    public SlideoutLocationProfiles(final ITourLocationConsumer tourLocationConsumer,
-                                   final TourData tourData,
+                                   final TourLocation tourLocation,
                                    final Control ownerControl,
                                    final Rectangle ownerBounds,
                                    final IDialogSettings state,
@@ -262,12 +264,8 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
       _ownerBounds = ownerBounds;
 
       _tourLocationConsumer = tourLocationConsumer;
+      _tourLocation = tourLocation;
       _isStartLocation = isStartLocation;
-      _tourData = tourData;
-
-      _tourLocation = isStartLocation
-            ? _tourData.getTourLocationStart()
-            : _tourData.getTourLocationEnd();
 
       // prevent that the opened slideout is partly hidden
       setIsForceBoundsToBeInsideOfViewport(true);
@@ -579,7 +577,6 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
              */
             final Button button = new Button(container, SWT.PUSH);
             button.setText(Messages.Slideout_TourFilter_Action_AddProfile);
-            button.setToolTipText(Messages.Slideout_TourFilter_Action_AddProfile_Tooltip);
             button.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onProfile_Add()));
 
             // set button default width
@@ -670,7 +667,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
          /*
           * Zoomlevel
           */
-         UI.createLabel(container,
+         _lblZoomlevel = UI.createLabel(container,
                Messages.Slideout_TourLocation_Label_Zoomlevel,
                Messages.Slideout_TourLocation_Label_Zoomlevel_Tooltip);
 
@@ -744,7 +741,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
           */
 
          final Label label = new Label(parent, SWT.WRAP);
-         label.setText(Messages.Slideout_TourFilter_Label_Remarks);
+         label.setText(Messages.Slideout_TourLocation_Label_Remarks);
       }
    }
 
@@ -766,25 +763,32 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private void enableControls() {
 
-      final boolean isLocationConsumer = _tourLocationConsumer != null;
-      final boolean isProfileSelected = _selectedProfile != null;
-      final int numProfiles = _allProfiles.size();
+// SET_FORMATTING_OFF
 
-      _btnApplyAndClose.setEnabled(isProfileSelected && isLocationConsumer);
-      _btnCopyProfile.setEnabled(isProfileSelected);
-      _btnDefaultProfile.setEnabled(isProfileSelected);
-      _btnDeleteProfile.setEnabled(isProfileSelected);
+      final boolean isLocationConsumer    = _tourLocationConsumer != null;
+      final boolean isProfileSelected     = _selectedProfile != null;
+      final boolean hasProfiles           = _allProfiles.size() > 0;
 
-      _lblLocationParts.setEnabled(isProfileSelected);
-      _lblProfileName.setEnabled(isProfileSelected);
-      _lblSelectedLocationParts.setEnabled(isProfileSelected);
+      _btnApplyAndClose          .setEnabled(isProfileSelected && isLocationConsumer);
+      _btnCopyProfile            .setEnabled(isProfileSelected);
+      _btnDefaultProfile         .setEnabled(isProfileSelected);
+      _btnDeleteProfile          .setEnabled(isProfileSelected);
 
-      _txtProfileName.setEnabled(isProfileSelected);
+      _lblLocationParts          .setEnabled(isProfileSelected);
+      _lblProfileName            .setEnabled(isProfileSelected);
+      _lblSelectedLocationParts  .setEnabled(isProfileSelected);
+      _lblZoomlevel              .setEnabled(isProfileSelected);
 
-      _lblProfiles.setEnabled(numProfiles > 0);
-      _profileViewer.getTable().setEnabled(numProfiles > 0);
+      _comboZoomlevel            .setEnabled(isProfileSelected);
 
-      _listLocationParts.setEnabled(isProfileSelected);
+      _txtProfileName            .setEnabled(isProfileSelected);
+
+      _lblProfiles               .setEnabled(hasProfiles);
+      _profileViewer.getTable()  .setEnabled(hasProfiles);
+
+      _listLocationParts         .setEnabled(isProfileSelected);
+
+// SET_FORMATTING_ON
    }
 
    private void fillUI() {
@@ -1237,6 +1241,10 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
       // save slideout position/size
       super.saveState();
+
+// create Java code for the default profiles
+//
+//      TourLocationManager.createDefaultProfiles_JavaCode();
    }
 
    @Override

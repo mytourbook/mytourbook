@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -100,7 +100,10 @@ public class MtMath {
    private static final double HALBACHSE_A  = 6378.137;
    private static final double HALBACHSE_B  = 6356.7523142;
 
-   private static final double EARTH_RADIUS = 6371e3;
+   /**
+    * Earth radius in meter
+    */
+   private static final double EARTH_RADIUS = 6_371_000;
 
    // = 1/298.2572229328709613   1/298.257223563 // ca. (A-B)/A
    private static final double ABPLATTUNG_F = (HALBACHSE_A - HALBACHSE_B) / HALBACHSE_A;

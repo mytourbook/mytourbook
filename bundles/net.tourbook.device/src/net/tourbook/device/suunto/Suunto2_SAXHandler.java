@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -505,7 +505,8 @@ public class Suunto2_SAXHandler extends DefaultHandler {
       tourData.setDeviceTimeInterval((short) -1);
       tourData.setImportFilePath(_importFilePath);
 
-      tourData.setCalories(_tourCalories);
+      // convert kcal -> cal
+      tourData.setCalories(_tourCalories * 1000);
 
       tourData.setBattery_Percentage_Start(_tourBatteryPercentageStart);
       tourData.setBattery_Percentage_End(_tourBatteryPercentageEnd);

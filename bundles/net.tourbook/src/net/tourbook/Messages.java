@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -501,6 +501,19 @@ public class Messages extends NLS {
    public static String        Dialog_AdjustTemperature_Label_Progress_Task;
    public static String        Dialog_AdjustTemperature_Label_TemperatureAdjustmentDuration;
 
+   public static String        Dialog_BeverageContainer_Label_Capacity;
+   public static String        Dialog_BeverageContainer_Label_Name;
+   public static String        Dialog_BeverageContainer_Title_Create;
+   public static String        Dialog_BeverageContainer_Title_Edit;
+
+   public static String        Dialog_CustomTourNutritionProduct_Label_BeverageQuantity;
+   public static String        Dialog_CustomTourNutritionProduct_Label_Calories;
+   public static String        Dialog_CustomTourNutritionProduct_Label_IsBeverage;
+   public static String        Dialog_CustomTourNutritionProduct_Label_Name;
+   public static String        Dialog_CustomTourNutritionProduct_Label_NumberServings;
+   public static String        Dialog_CustomTourNutritionProduct_Label_Sodium;
+   public static String        Dialog_CustomTourNutritionProduct_Title;
+
    public static String        Dialog_DatabaseAction_Confirmation_Message;
    public static String        Dialog_DatabaseAction_Confirmation_Title;
 
@@ -661,6 +674,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_ReplaceElevationFromSRTM;
    public static String        Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation;
    public static String        Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation_Tooltip;
+   public static String        Dialog_ImportConfig_Checkbox_RetrieveTourLocation;
+   public static String        Dialog_ImportConfig_Checkbox_RetrieveTourLocation_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_RetrieveWeatherData;
    public static String        Dialog_ImportConfig_Checkbox_RetrieveWeatherData_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_SaveTour;
@@ -690,6 +705,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Column_LastMarker_Label;
    public static String        Dialog_ImportConfig_Column_LastMarker_Tooltip;
    public static String        Dialog_ImportConfig_Column_Name;
+   public static String        Dialog_ImportConfig_Column_RetrieveTourLocation_Header;
+   public static String        Dialog_ImportConfig_Column_RetrieveTourLocation_Label;
    public static String        Dialog_ImportConfig_Column_RetrieveWeatherData_Header;
    public static String        Dialog_ImportConfig_Column_RetrieveWeatherData_Label;
    public static String        Dialog_ImportConfig_Column_Save_Header;
@@ -742,6 +759,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_LastMarkerDistance;
    public static String        Dialog_ImportConfig_Label_LastMarkerDistance_Tooltip;
    public static String        Dialog_ImportConfig_Label_LastMarkerText;
+   public static String        Dialog_ImportConfig_Label_LocationProfile;
+   public static String        Dialog_ImportConfig_Label_LocationProfile_Tooltip;
    public static String        Dialog_ImportConfig_Label_ShowTheseTiles;
    public static String        Dialog_ImportConfig_Label_StateTooltipWidth;
    public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath;
@@ -821,7 +840,6 @@ public class Messages extends NLS {
    public static String        Dialog_ModifyTours_Checkbox_PowerAndPulseValues;
    public static String        Dialog_ModifyTours_Checkbox_PowerAndSpeedValues;
    public static String        Dialog_ModifyTours_Checkbox_RunningDynamicsValues;
-   public static String        Dialog_ModifyTours_Checkbox_StartEndLocation;
    public static String        Dialog_ModifyTours_Checkbox_SwimmingValues;
    public static String        Dialog_ModifyTours_Checkbox_WeatherValues;
    public static String        Dialog_ModifyTours_Checkbox_TemperatureValues_FromDevice;
@@ -865,6 +883,19 @@ public class Messages extends NLS {
    public static String        Dialog_ReplaceImportFilename_Radio_ReplaceThis;
    public static String        Dialog_ReplaceImportFilename_Title;
 
+   public static String        Dialog_ResizeTourLocation_Action_ResetValue_Tooltip;
+   public static String        Dialog_ResizeTourLocation_Checkbox_ResizeAllTogether;
+   public static String        Dialog_ResizeTourLocation_Label_BoundingBox_DefaultSize;
+   public static String        Dialog_ResizeTourLocation_Label_BoundingBox_ResizedSize;
+   public static String        Dialog_ResizeTourLocation_Label_IncrementDecrementValue;
+   public static String        Dialog_ResizeTourLocation_Label_Orientation_Bottom;
+   public static String        Dialog_ResizeTourLocation_Label_Orientation_Left;
+   public static String        Dialog_ResizeTourLocation_Label_Orientation_Right;
+   public static String        Dialog_ResizeTourLocation_Label_Orientation_Top;
+   public static String        Dialog_ResizeTourLocation_Label_PageValue_Tooltip;
+   public static String        Dialog_ResizeTourLocation_Message;
+   public static String        Dialog_ResizeTourLocation_Title;
+
    public static String        Dialog_RetrieveWeather_Dialog_Title;
 
    public static String        Dialog_SaveTags_Dialog_Title;
@@ -877,6 +908,20 @@ public class Messages extends NLS {
    public static String        Dialog_SaveTags_Radio_RemoveTags_Selected;
    public static String        Dialog_SaveTags_Radio_ReplaceTags;
    public static String        Dialog_SaveTags_Wizard_Title;
+
+   public static String        Dialog_SearchProduct_Button_Add;
+   public static String        Dialog_SearchProduct_Button_Add_Tooltip;
+   public static String        Dialog_SearchProduct_Button_Search;
+   public static String        Dialog_SearchProduct_Combo_SearchType_ByName;
+   public static String        Dialog_SearchProduct_Combo_SearchType_ByCode;
+   public static String        Dialog_SearchProduct_Label_AlreadyExists;
+   public static String        Dialog_SearchProduct_Label_Keywords;
+   public static String        Dialog_SearchProduct_Label_SearchType;
+   public static String        Dialog_SearchProduct_Label_NotFound;
+   public static String        Dialog_SearchProduct_Message;
+   public static String        Dialog_SearchProduct_Link_ProductCreationRequest;
+   public static String        Dialog_SearchProduct_Title;
+   public static String        Dialog_SearchProduct_Tooltip_InvalidBarcode;
 
    public static String        Dialog_Sensor_EditSensor_Title;
    public static String        Dialog_Sensor_Label_SensorType;
@@ -1157,6 +1202,8 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_ReplaceElevationFromSRTM_Yes;
    public static String        Import_Data_HTML_ReplaceFirstTimeSliceElevation_No;
    public static String        Import_Data_HTML_ReplaceFirstTimeSliceElevation_Yes;
+   public static String        Import_Data_HTML_RetrieveTourLocation_No;
+   public static String        Import_Data_HTML_RetrieveTourLocation_Yes;
    public static String        Import_Data_HTML_RetrieveWeatherData_No;
    public static String        Import_Data_HTML_RetrieveWeatherData_Yes;
    public static String        Import_Data_HTML_SaveTour_No;
@@ -1233,6 +1280,7 @@ public class Messages extends NLS {
    public static String        Log_EasyImport_006_AdjustElevation;
    public static String        Log_EasyImport_006_ReplaceElevationFromSRTM;
    public static String        Log_EasyImport_050_RetrieveWeatherData;
+   public static String        Log_EasyImport_051_RetrieveTourLocation;
    public static String        Log_EasyImport_099_SaveTour;
    public static String        Log_EasyImport_100_DeleteTourFiles;
    public static String        Log_EasyImport_101_TurnWatchingOff;
@@ -1262,6 +1310,8 @@ public class Messages extends NLS {
    public static String        Log_Reimport_Tour_Skipped_OtherReasons;
    public static String        Log_ReplaceElevationUpDown_SRTMDataNotAvailable;
    public static String        Log_ReplaceElevationUpDown_ValuesAreReplaced;
+   public static String        Log_RetrieveTourLocation_End;
+   public static String        Log_RetrieveTourLocation_Tour;
    public static String        Log_RetrieveWeatherData_001_Start;
    public static String        Log_RetrieveWeatherData_002_End;
    public static String        Log_RetrieveWeatherData_003_NoWeatherData;
@@ -1459,6 +1509,17 @@ public class Messages extends NLS {
    public static String        PrefPage_Import_Default_Cadence;
    public static String        PrefPage_Import_Default_CadenceValue_Tooltip;
    public static String        PrefPage_Import_Label_Info;
+
+   public static String        PrefPage_Nutrition_Checkbox_IgnoreFirstHour;
+   public static String        PrefPage_Nutrition_Checkbox_IgnoreFirstHour_Tooltip;
+
+   public static String        PrefPage_TourBeverageContainers_Button_Add;
+   public static String        PrefPage_TourBeverageContainers_Button_Delete;
+   public static String        PrefPage_TourBeverageContainers_Button_Edit;
+   public static String        PrefPage_TourBeverageContainers_Dialog_Delete_BeverageContainer_Message;
+   public static String        PrefPage_TourBeverageContainers_Dialog_Delete_BeverageContainer_Title;
+   public static String        PrefPage_TourBeverageContainers_LogInfo_DeletedContainer;
+   public static String        PrefPage_TourBeverageContainers_Title;
 
    public static String        PrefPage_TourTag_Button_DuplicateTag;
    public static String        PrefPage_TourTag_Label_Duplicate;
@@ -1969,8 +2030,8 @@ public class Messages extends NLS {
    public static String        Slideout_CalendarOptions_Checkbox_IsTruncateTourText;
    public static String        Slideout_CalendarOptions_Checkbox_IsUserDefaultProfile;
    public static String        Slideout_CalendarOptions_Checkbox_IsUserDefaultProfile_Tooltip;
-   public static String        Slideout_CalendarOptions_Checkbox_UseDraggedScrolling;
-   public static String        Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip;
+   public static String        Slideout_CalendarOptions_Checkbox_UseDraggedScrolling2;
+   public static String        Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip2;
    public static String        Slideout_CalendarOptions_ColumnHeader_DefaultId;
    public static String        Slideout_CalendarOptions_ColumnHeader_IsAppId;
    public static String        Slideout_CalendarOptions_ColumnHeader_IsAppId_Tooltip;
@@ -2374,7 +2435,10 @@ public class Messages extends NLS {
    public static String        Slideout_TMVOptions_Radio_MovingTime;
    public static String        Slideout_TMVOptions_Radio_RecordedTime;
 
+   public static String        Slideout_TourBlogOptions_Checkbox_ShowTourTags;
+   public static String        Slideout_TourBlogOptions_Checkbox_ShowTourTags_Tooltip;
    public static String        Slideout_TourBlogOptions_Label_Title;
+
    public static String        Slideout_TourBookOptions_Checkbox_ShowTotalRow;
    public static String        Slideout_TourBookOptions_Checkbox_ShowTotalRow_Tooltip;
    public static String        Slideout_TourBookOptions_Label_Title;
@@ -2468,7 +2532,6 @@ public class Messages extends NLS {
    public static String        Slideout_TourFilter_Confirm_DeleteProperty_Title;
    public static String        Slideout_TourFilter_Label_ProfileName;
    public static String        Slideout_TourFilter_Label_Profiles;
-   public static String        Slideout_TourFilter_Label_Remarks;
    public static String        Slideout_TourFilter_Label_Title;
    public static String        Slideout_TourFilter_Link_TextSearchHint;
    public static String        Slideout_TourFilter_Link_TextSearchHint_Tooltip;
@@ -2530,10 +2593,15 @@ public class Messages extends NLS {
    public static String        Slideout_TourLocation_Column_Zoomlevel;
    public static String        Slideout_TourLocation_Label_EndLocation_Title;
    public static String        Slideout_TourLocation_Label_LocationParts;
+   public static String        Slideout_TourLocation_Label_Remarks;
    public static String        Slideout_TourLocation_Label_SelectedLocationParts;
    public static String        Slideout_TourLocation_Label_StartLocation_Title;
    public static String        Slideout_TourLocation_Label_Zoomlevel;
    public static String        Slideout_TourLocation_Label_Zoomlevel_Tooltip;
+
+   public static String        Slideout_TourLocationFilter_Filter_AllCountries;
+   public static String        Slideout_TourLocationFilter_Label_Country;
+   public static String        Slideout_TourLocationFilter_Label_Title;
 
    public static String        Slideout_TourLogOptions_Checkbox_Event_DeleteSomething;
    public static String        Slideout_TourLogOptions_Checkbox_Event_DownloadSomething;
@@ -2825,6 +2893,12 @@ public class Messages extends NLS {
    public static String        Tour_Blog_Action_HideMarker_Tooltip;
    public static String        Tour_Blog_Action_OpenMarker_Tooltip;
    public static String        Tour_Blog_Action_ShowMarker_Tooltip;
+   public static String        Tour_Blog_Label_Nutrition_Averages;
+   public static String        Tour_Blog_Label_Nutrition_Beverages;
+   public static String        Tour_Blog_Label_Nutrition_Foods;
+   public static String        Tour_Blog_Section_Nutrition;
+   public static String        Tour_Blog_Section_Tags;
+   public static String        Tour_Blog_Section_Weather;
 
    public static String        Tour_Book_Action_DeleteSelectedTours_Monitor;
    public static String        Tour_Book_Action_DeleteSelectedTours_MonitorSubtask;
@@ -2914,7 +2988,6 @@ public class Messages extends NLS {
    public static String        Tour_Data_Text_PulseValues;
    public static String        Tour_Data_Text_RunningDynamicsValues;
    public static String        Tour_Data_Text_SpeedValues;
-   public static String        Tour_Data_Text_StartEndLocation;
    public static String        Tour_Data_Text_SwimmingValues;
    public static String        Tour_Data_Text_WeatherValues;
    public static String        Tour_Data_Text_TemperatureFromDeviceValues;
@@ -3116,8 +3189,6 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_AppendLocationPart_All;
    public static String        Tour_Location_Action_AppendLocationPart_End;
    public static String        Tour_Location_Action_AppendLocationPart_Start;
-   public static String        Tour_Location_Action_BoundingBox_Increase;
-   public static String        Tour_Location_Action_BoundingBox_Decrease;
    public static String        Tour_Location_Action_CombineBoundingBox;
    public static String        Tour_Location_Action_CombineBoundingBox_Tooltip;
    public static String        Tour_Location_Action_Customize_Start_Tooltip;
@@ -3130,18 +3201,25 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_Download_WithProfile_Start_Tooltip;
    public static String        Tour_Location_Action_Download_WithProfile_End_Tooltip;
    public static String        Tour_Location_Action_IncludeGeoPosition;
+   public static String        Tour_Location_Action_IncludeGeoPosition_Short;
    public static String        Tour_Location_Action_IncludeGeoPosition_Tooltip;
    public static String        Tour_Location_Action_One;
    public static String        Tour_Location_Action_One_Tooltip;
    public static String        Tour_Location_Action_OpenProfileEditor;
-   public static String        Tour_Location_Action_PartTitle_All;
-   public static String        Tour_Location_Action_PartTitle_End;
-   public static String        Tour_Location_Action_PartTitle_Start;
+   public static String        Tour_Location_Action_PartTitle_Append_All;
+   public static String        Tour_Location_Action_PartTitle_Append_End;
+   public static String        Tour_Location_Action_PartTitle_Append_Start;
+   public static String        Tour_Location_Action_PartTitle_Set_All;
+   public static String        Tour_Location_Action_PartTitle_Set_End;
+   public static String        Tour_Location_Action_PartTitle_Set_Start;
    public static String        Tour_Location_Action_Profile_Tooltip;
    public static String        Tour_Location_Action_ProfileTitle_All;
    public static String        Tour_Location_Action_ProfileTitle_End;
    public static String        Tour_Location_Action_ProfileTitle_Start;
+   public static String        Tour_Location_Action_ReapplyLocationIntoTour;
+   public static String        Tour_Location_Action_ReapplyLocationIntoTour_Tooltip;
    public static String        Tour_Location_Action_RelocateBoundingBox;
+   public static String        Tour_Location_Action_RelocateBoundingBox_Short;
    public static String        Tour_Location_Action_RelocateBoundingBox_Tooltip;
    public static String        Tour_Location_Action_RemoveLocation_All;
    public static String        Tour_Location_Action_RemoveLocation_All_Complete;
@@ -3151,9 +3229,20 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_RemoveLocation_Start_Complete;
    public static String        Tour_Location_Action_RemoveLocation_Tooltip;
    public static String        Tour_Location_Action_ResetBoundingBox;
+   public static String        Tour_Location_Action_ResetBoundingBox_Short;
    public static String        Tour_Location_Action_ResetBoundingBox_Tooltip;
+   public static String        Tour_Location_Action_ResizeBoundingBox;
    public static String        Tour_Location_Action_SetLocation_End;
    public static String        Tour_Location_Action_SetLocation_Start;
+   public static String        Tour_Location_Action_SetLocationIntoTour_Default;
+   public static String        Tour_Location_Action_SetLocationIntoTour_Default_Tooltip;
+   public static String        Tour_Location_Action_SetLocationIntoTour_Part;
+   public static String        Tour_Location_Action_SetLocationIntoTour_Profile;
+   public static String        Tour_Location_Action_SetLocationIntoTour_Tooltip;
+   public static String        Tour_Location_Action_SetLocationPart;
+   public static String        Tour_Location_Action_SetLocationPart_All;
+   public static String        Tour_Location_Action_SetLocationPart_End;
+   public static String        Tour_Location_Action_SetLocationPart_Start;
    public static String        Tour_Location_Action_ManageStartEndLocation;
    public static String        Tour_Location_Action_ManageStartEndLocation_Tooltip;
    public static String        Tour_Location_Action_ShowLocationInfo_Tooltip;
@@ -3232,6 +3321,43 @@ public class Messages extends NLS {
    public static String        tour_merger_label_adjust_minutes;
    public static String        tour_merger_label_adjust_seconds;
    public static String        tour_merger_save_target_tour;
+
+   public static String        Tour_Nutrition_Button_AddCustomProduct;
+   public static String        Tour_Nutrition_Button_AddCustomProduct_Tooltip;
+   public static String        Tour_Nutrition_Button_DeleteProduct;
+   public static String        Tour_Nutrition_Button_DeleteProduct_Tooltip;
+   public static String        Tour_Nutrition_Button_OpenProductsWebsite;
+   public static String        Tour_Nutrition_Button_SearchProduct;
+   public static String        Tour_Nutrition_Button_SearchProduct_Tooltip;
+   public static String        Tour_Nutrition_Column_BeverageContainer;
+   public static String        Tour_Nutrition_Column_BeverageQuantity;
+   public static String        Tour_Nutrition_Column_BeverageQuantity_Tooltip;
+   public static String        Tour_Nutrition_Column_Capacity;
+   public static String        Tour_Nutrition_Column_Code;
+   public static String        Tour_Nutrition_Column_ConsumedContainers;
+   public static String        Tour_Nutrition_Column_ConsumedContainers_Tooltip;
+   public static String        Tour_Nutrition_Column_ConsumedQuantity;
+   public static String        Tour_Nutrition_Column_ConsumedQuantity_Tooltip;
+   public static String        Tour_Nutrition_Column_Name;
+   public static String        Tour_Nutrition_Column_Quantity;
+   public static String        Tour_Nutrition_Column_QuantityType;
+   public static String        Tour_Nutrition_Column_QuantityType_Tooltip;
+   public static String        Tour_Nutrition_Column_Servings;
+   public static String        Tour_Nutrition_Column_IsBeverage;
+   public static String        Tour_Nutrition_Job_SearchingProducts;
+   public static String        Tour_Nutrition_Label_Averages;
+   public static String        Tour_Nutrition_Label_Averages_Tooltip;
+   public static String        Tour_Nutrition_Label_Calories;
+   public static String        Tour_Nutrition_Label_Fluids;
+   public static String        Tour_Nutrition_Label_QuantityType_Products;
+   public static String        Tour_Nutrition_Label_QuantityType_Servings;
+   public static String        Tour_Nutrition_Label_Sodium;
+   public static String        Tour_Nutrition_Label_Totals;
+   public static String        Tour_Nutrition_Label_Totals_Tooltip;
+   public static String        Tour_Nutrition_Section_ProductsList;
+   public static String        Tour_Nutrition_Section_ProductsList_Tooltip;
+   public static String        Tour_Nutrition_Section_Summary;
+   public static String        Tour_Nutrition_Section_Summary_Tooltip;
 
    public static String        Tour_Pauses_Checkbox_Duration_Hours;
    public static String        Tour_Pauses_Checkbox_Duration_Minutes;

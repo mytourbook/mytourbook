@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -140,6 +140,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
    private AutocompleteComboInput _autocomplete_Location_Start;
    private AutocompleteComboInput _autocomplete_Title;
 
+   private Boolean                _tourLocation_HoverState;
+
    private class ActionSlideout_WeatherOptions extends ActionToolbarSlideout {
 
       @Override
@@ -192,7 +194,6 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
 
          _actionEndLocation.closeSlideout();
       }
-
    }
 
    @Override
@@ -221,8 +222,11 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
 
    private void createActions() {
 
-      _actionStartLocation = new ActionTourLocation(this, _tourData, true, STATE_ID);
-      _actionEndLocation = new ActionTourLocation(this, _tourData, false, STATE_ID);
+      _actionStartLocation = new ActionTourLocation(this, true, STATE_ID);
+      _actionEndLocation = new ActionTourLocation(this, false, STATE_ID);
+
+      _actionStartLocation.setupTourData(_tourData);
+      _actionEndLocation.setupTourData(_tourData);
 
       _actionSlideout_WeatherOptions = new ActionSlideout_WeatherOptions();
    }
@@ -272,6 +276,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
          enableControls();
 
          resoreState();
+
+         setFocus();
       });
 
       return uiContainer;
@@ -956,7 +962,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_comboWeather_Clouds);
 
             // fill combobox
-            for (final String cloudText : IWeather.cloudText) {
+            for (final String cloudText : IWeather.CLOUD_TEXT) {
                _comboWeather_Clouds.add(cloudText);
             }
 
@@ -1015,7 +1021,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
 
       final int selectionIndex = _comboWeather_Clouds.getSelectionIndex();
 
-      final String cloudKey = IWeather.cloudIcon[selectionIndex];
+      final String cloudKey = IWeather.CLOUD_ICON[selectionIndex];
       final Image cloudIcon = UI.IMAGE_REGISTRY.get(cloudKey);
 
       _lblWeather_CloudIcon.setImage(cloudIcon);
@@ -1034,7 +1040,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
                _tourData.latitudeSerie[lastIndex],
                _tourData.longitudeSerie[lastIndex],
                null,
-               TourLocationManager.DEFAULT_ZOOM_LEVEL_VALUE);
+               TourLocationManager.getProfileZoomlevel());
 
          if (retrievedLocationData == null) {
             return;
@@ -1064,7 +1070,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
                _tourData.latitudeSerie[0],
                _tourData.longitudeSerie[0],
                null,
-               TourLocationManager.DEFAULT_ZOOM_LEVEL_VALUE);
+               TourLocationManager.getProfileZoomlevel());
 
          if (retrievedLocationData == null) {
             return;
@@ -1208,10 +1214,40 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
             TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT);
    }
 
+   /**
+    * Set focus when dialog is opened
+    */
+   private void setFocus() {
+
+      if (_tourLocation_HoverState == null) {
+
+         _comboTitle.setFocus();
+
+      } else if (_tourLocation_HoverState) {
+
+         _comboLocation_Start.setFocus();
+
+      } else {
+
+         _comboLocation_End.setFocus();
+      }
+   }
+
    @Override
    public void setTourEndLocation(final String endLocation) {
 
       _comboLocation_End.setText(endLocation);
+   }
+
+   /**
+    * @param tourLocation_HoverState
+    *
+    *           Is <code>true</code> when start location is hovered, <code>false</code> when
+    *           endlocation is hovered, <code>null</code> when a location is not hovered
+    */
+   public void setTourLocationFocus(final Boolean tourLocation_HoverState) {
+
+      _tourLocation_HoverState = tourLocation_HoverState;
    }
 
    @Override
@@ -1253,7 +1289,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
       }
 
       final int cloudIndex = _comboWeather_Clouds.getSelectionIndex();
-      String cloudValue = IWeather.cloudIcon[cloudIndex];
+      String cloudValue = IWeather.CLOUD_ICON[cloudIndex];
       if (cloudValue.equals(UI.IMAGE_EMPTY_16)) {
          // replace invalid cloud key
          cloudValue = UI.EMPTY_STRING;

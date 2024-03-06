@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,16 +57,19 @@ import net.tourbook.Messages;
 import net.tourbook.application.SplashManager;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.DeviceSensorValue;
+import net.tourbook.data.TourBeverageContainer;
 import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.data.TourPhoto;
@@ -78,12 +81,12 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.search.FTSearchManager;
 import net.tourbook.tag.TagCollection;
+import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TreeColumnFactory;
-import net.tourbook.ui.UI;
 
 import org.apache.derby.drda.NetworkServerControl;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -113,10 +116,12 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 52;
+   private static final int TOURBOOK_DB_VERSION = 55;
 
-//   private static final int TOURBOOK_DB_VERSION = 53; // 24.x ??????
+//   private static final int TOURBOOK_DB_VERSION = 55; // 24.x ??????
 
+//   private static final int TOURBOOK_DB_VERSION = 54; // 24.1 fixed db data update bug 47 -> 48
+//   private static final int TOURBOOK_DB_VERSION = 53; // 24.1 added new fields
 //   private static final int TOURBOOK_DB_VERSION = 52; // 24.1
 //   private static final int TOURBOOK_DB_VERSION = 51; // 23.8
 //   private static final int TOURBOOK_DB_VERSION = 50; // 23.5
@@ -168,8 +173,7 @@ public class TourDatabase {
 
 //   private static final String SQL_STATE_XJ004_DATABASE_NOT_FOUND         = "XJ004";                                                 //$NON-NLS-1$
 
-   private static final String NL                                         = UI.NEW_LINE;
-   private static final String TIME_STAMP                                 = net.tourbook.common.UI.timeStamp();
+   private static final char   NL                                         = UI.NEW_LINE;
 
    private static final int    MAX_TRIES_TO_PING_SERVER                   = 10;
 
@@ -191,9 +195,11 @@ public class TourDatabase {
 
    public static final String  TABLE_DEVICE_SENSOR                        = "DeviceSensor";                                          //$NON-NLS-1$
    public static final String  TABLE_DEVICE_SENSOR_VALUE                  = "DeviceSensorValue";                                     //$NON-NLS-1$
+   public static final String  TABLE_TOUR_BEVERAGE_CONTAINER              = "TOURBEVERAGECONTAINER";                                 //$NON-NLS-1$
    public static final String  TABLE_TOUR_BIKE                            = "TOURBIKE";                                              //$NON-NLS-1$
    public static final String  TABLE_TOUR_COMPARED                        = "TOURCOMPARED";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_DATA                            = "TOURDATA";                                              //$NON-NLS-1$
+   public static final String  TABLE_TOUR_NUTRITION_PRODUCT               = "TOURNUTRITIONPRODUCT";                                  //$NON-NLS-1$
    public static final String  TABLE_TOUR_GEO_PARTS                       = "TourGeoParts";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_LOCATION                        = "TourLocation";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_MARKER                          = "TOURMARKER";                                            //$NON-NLS-1$
@@ -228,6 +234,7 @@ public class TourDatabase {
     */
    public static final int     ENTITY_IS_NOT_SAVED           = -1;
    //
+   public static final String  ENTITY_ID_BEVERAGECONTAINER   = "ContainerID";                               //$NON-NLS-1$
    private static final String ENTITY_ID_BIKE                = "BikeID";                                    //$NON-NLS-1$
    private static final String ENTITY_ID_COMPARED            = "ComparedID";                                //$NON-NLS-1$
    private static final String ENTITY_ID_DEVICE_SENSOR       = "SensorId";                                  //$NON-NLS-1$
@@ -235,6 +242,7 @@ public class TourDatabase {
    private static final String ENTITY_ID_HR_ZONE             = "HrZoneID";                                  //$NON-NLS-1$
    private static final String ENTITY_ID_LOCATION            = "LocationID";                                //$NON-NLS-1$
    private static final String ENTITY_ID_MARKER              = "MarkerID";                                  //$NON-NLS-1$
+   private static final String ENTITY_ID_NUTRITIONPRODUCT    = "ProductID";                                 //$NON-NLS-1$
    private static final String ENTITY_ID_PERSON              = "PersonID";                                  //$NON-NLS-1$
    private static final String ENTITY_ID_PHOTO               = "PhotoID";                                   //$NON-NLS-1$
    private static final String ENTITY_ID_REF                 = "RefID";                                     //$NON-NLS-1$
@@ -246,13 +254,14 @@ public class TourDatabase {
 
 // SET_FORMATTING_OFF
 
-   private static final String KEY_BIKE            = TABLE_TOUR_BIKE         + "_" + ENTITY_ID_BIKE;             //$NON-NLS-1$
-   private static final String KEY_DEVICE_SENSOR   = TABLE_DEVICE_SENSOR     + "_" + ENTITY_ID_DEVICE_SENSOR;    //$NON-NLS-1$
-   private static final String KEY_PERSON          = TABLE_TOUR_PERSON       + "_" + ENTITY_ID_PERSON;           //$NON-NLS-1$
-   public static final String  KEY_TAG             = TABLE_TOUR_TAG          + "_" + ENTITY_ID_TAG;              //$NON-NLS-1$
-   private static final String KEY_TAG_CATEGORY    = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY;     //$NON-NLS-1$
-   public static final String  KEY_TOUR            = TABLE_TOUR_DATA         + "_" + ENTITY_ID_TOUR;             //$NON-NLS-1$
-   private static final String KEY_TYPE            = TABLE_TOUR_TYPE         + "_" + ENTITY_ID_TYPE;             //$NON-NLS-1$
+   public  static final String KEY_BEVERAGE_CONTAINER        = TABLE_TOUR_BEVERAGE_CONTAINER + "_" + ENTITY_ID_BEVERAGECONTAINER; //$NON-NLS-1$
+   private static final String KEY_BIKE                      = TABLE_TOUR_BIKE               + "_" + ENTITY_ID_BIKE;                            //$NON-NLS-1$
+   private static final String KEY_DEVICE_SENSOR             = TABLE_DEVICE_SENSOR           + "_" + ENTITY_ID_DEVICE_SENSOR;               //$NON-NLS-1$
+   private static final String KEY_PERSON                    = TABLE_TOUR_PERSON             + "_" + ENTITY_ID_PERSON;                        //$NON-NLS-1$
+   public  static final String KEY_TAG                       = TABLE_TOUR_TAG                + "_" + ENTITY_ID_TAG;                              //$NON-NLS-1$
+   private static final String KEY_TAG_CATEGORY              = TABLE_TOUR_TAG_CATEGORY       + "_" + ENTITY_ID_TAG_CATEGORY;            //$NON-NLS-1$
+   public  static final String KEY_TOUR                      = TABLE_TOUR_DATA               + "_" + ENTITY_ID_TOUR;                            //$NON-NLS-1$
+   private static final String KEY_TYPE                      = TABLE_TOUR_TYPE               + "_" + ENTITY_ID_TYPE;                            //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
@@ -300,6 +309,12 @@ public class TourDatabase {
    private static final String DERBY_URL_COMMAND_SHUTDOWN_TRUE            = ";shutdown=true";                     //$NON-NLS-1$
    private static final String DERBY_URL_COMMAND_UPGRADE_TRUE             = ";upgrade=true";                      //$NON-NLS-1$
    //
+   /**
+    * ERROR XCL13: The parameter position '13' is out of range. The number of parameters for
+    * this prepared statement is '12'.
+    */
+   public static final String  SQL_ERROR_XCL13                            = "XCL13";                              //$NON-NLS-1$
+   //
    //
    private static volatile TourDatabase                   _instance;
 
@@ -343,9 +358,11 @@ public class TourDatabase {
    private static volatile Map<Long, DeviceSensor>        _allDbDeviceSensors_BySensorID;
 
    /**
+    * This collection contains <b>ONLY</b> sensors which have a serial number.
+    * <P>
     * Key is the serial number in UPPERCASE
     */
-   private static volatile Map<String, DeviceSensor>      _allDbDeviceSensors_BySerialNo;
+   private static volatile Map<String, DeviceSensor>      _allDbDeviceSensors_BySerialNum;
 
    /*
     * Cached distinct fields
@@ -653,7 +670,7 @@ public class TourDatabase {
 
             // column do not exist -> this should not happen
 
-            return;
+            throw new RuntimeException("Column do not exist: \"%s\"".formatted(columnName)); //$NON-NLS-1$
          }
 
          exec(stmt, "ALTER TABLE " + table + " ALTER COLUMN " + columnName + " SET DATA TYPE VARCHAR(" + newWidth + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -868,12 +885,14 @@ public class TourDatabase {
     */
    public static synchronized void clearDeviceSensors() {
 
-      if (_allDbDeviceSensors_BySerialNo != null) {
-         _allDbDeviceSensors_BySerialNo.clear();
-         _allDbDeviceSensors_BySerialNo = null;
+      if (_allDbDeviceSensors_BySerialNum != null) {
+
+         _allDbDeviceSensors_BySerialNum.clear();
+         _allDbDeviceSensors_BySerialNum = null;
       }
 
       if (_allDbDeviceSensors_BySensorID != null) {
+
          _allDbDeviceSensors_BySensorID.clear();
          _allDbDeviceSensors_BySensorID = null;
       }
@@ -1424,18 +1443,18 @@ public class TourDatabase {
    }
 
    /**
-    * @return Returns a map with all {@link DeviceSensor} which are stored in the database, key is
-    *         the serial number in UPPERCASE
+    * @return Returns a map with all {@link DeviceSensor} which have a serial number and are stored
+    *         in the database, key is the serial number in UPPERCASE
     */
-   public static Map<String, DeviceSensor> getAllDeviceSensors_BySerialNo() {
+   public static Map<String, DeviceSensor> getAllDeviceSensors_BySerialNum() {
 
-      if (_allDbDeviceSensors_BySerialNo != null) {
-         return _allDbDeviceSensors_BySerialNo;
+      if (_allDbDeviceSensors_BySerialNum != null) {
+         return _allDbDeviceSensors_BySerialNum;
       }
 
       loadAllDeviceSensors();
 
-      return _allDbDeviceSensors_BySerialNo;
+      return _allDbDeviceSensors_BySerialNum;
    }
 
    /**
@@ -1583,8 +1602,7 @@ public class TourDatabase {
             final List<?> resultList = emQuery.getResultList();
             for (final Object result : resultList) {
 
-               if (result instanceof TourTagCategory) {
-                  final TourTagCategory tourTagCategory = (TourTagCategory) result;
+               if (result instanceof final TourTagCategory tourTagCategory) {
                   _allTourTagCategories.put(tourTagCategory.getCategoryId(), tourTagCategory);
                }
             }
@@ -2136,6 +2154,36 @@ public class TourDatabase {
    }
 
    /**
+    * @return Returns all tour beverage containers in the db sorted by name
+    */
+   public static List<TourBeverageContainer> getTourBeverageContainers() {
+
+      final List<TourBeverageContainer> beverageContainersList = new ArrayList<>();
+
+      final EntityManager entityManager = TourDatabase.getInstance().getEntityManager();
+
+      if (entityManager != null) {
+
+         final Query query = entityManager.createQuery(UI.EMPTY_STRING
+
+               + "SELECT tourBeverageContainer" //$NON-NLS-1$
+               + " FROM TourBeverageContainer AS tourBeverageContainer " //$NON-NLS-1$
+               + " ORDER  BY tourBeverageContainer.name"); //$NON-NLS-1$
+
+         for (final Object element : query.getResultList()) {
+
+            if (element instanceof final TourBeverageContainer tourBeverageContainer) {
+               beverageContainersList.add(tourBeverageContainer);
+            }
+         }
+
+         entityManager.close();
+      }
+
+      return beverageContainersList;
+   }
+
+   /**
     * @return Returns all tour types in the db sorted by name
     */
    @SuppressWarnings("unchecked")
@@ -2595,16 +2643,17 @@ public class TourDatabase {
 //                  + (", " + result.getString("TABLE_TYPE"))
 //                  + (", " + result.getString("REMARKS")));
 //         }
-////            TABLE_CAT String => table catalog (may be null)
-////            TABLE_SCHEM String => table schema (may be null)
-////            TABLE_NAME String => table name
-////            TABLE_TYPE String => table type. Typical types are "TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY", "ALIAS", "SYNONYM".
-////            REMARKS String => explanatory comment on the table
-////            TYPE_CAT String => the types catalog (may be null)
-////            TYPE_SCHEM String => the types schema (may be null)
-////            TYPE_NAME String => type name (may be null)
-////            SELF_REFERENCING_COL_NAME String => name of the designated "identifier" column of a typed table (may be null)
-////            REF_GENERATION String => specifies how values in SELF_REFERENCING_COL_NAME are created. Values are "SYSTEM", "USER", "DERIVED". (may be null)
+//
+////       TABLE_CAT String                   => table catalog (may be null)
+////       TABLE_SCHEM String                 => table schema (may be null)
+////       TABLE_NAME String                  => table name
+////       TABLE_TYPE String                  => table type. Typical types are "TABLE", "VIEW", "SYSTEM TABLE", "GLOBAL TEMPORARY", "LOCAL TEMPORARY", "ALIAS", "SYNONYM".
+////       REMARKS String                     => explanatory comment on the table
+////       TYPE_CAT String                    => the types catalog (may be null)
+////       TYPE_SCHEM String                  => the types schema (may be null)
+////       TYPE_NAME String                   => type name (may be null)
+////       SELF_REFERENCING_COL_NAME String   => name of the designated "identifier" column of a typed table (may be null)
+////       REF_GENERATION String              => specifies how values in SELF_REFERENCING_COL_NAME are created. Values are "SYSTEM", "USER", "DERIVED". (may be null)
 
       } catch (final SQLException e) {
          UI.showSQLException(e);
@@ -2618,7 +2667,7 @@ public class TourDatabase {
       synchronized (DB_LOCK) {
 
          // check again, field must be volatile to work correctly
-         if (_allDbDeviceSensors_BySerialNo != null) {
+         if (_allDbDeviceSensors_BySerialNum != null) {
             return;
          }
 
@@ -2638,12 +2687,16 @@ public class TourDatabase {
 
             for (final Object result : resultList) {
 
-               if (result instanceof DeviceSensor) {
-
-                  final DeviceSensor sensor = (DeviceSensor) result;
+               if (result instanceof final DeviceSensor sensor) {
 
                   allDbDeviceSensors_BySensorID.put(sensor.getSensorId(), sensor);
-                  allDbDeviceSensors_BySerialNo.put(sensor.getSerialNumber().toUpperCase(), sensor);
+
+                  final String serialNumber = sensor.getSerialNumber();
+
+                  if (StringUtils.hasContent(serialNumber)) {
+
+                     allDbDeviceSensors_BySerialNo.put(serialNumber.toUpperCase(), sensor);
+                  }
                }
             }
 
@@ -2651,7 +2704,7 @@ public class TourDatabase {
          }
 
          _allDbDeviceSensors_BySensorID = allDbDeviceSensors_BySensorID;
-         _allDbDeviceSensors_BySerialNo = allDbDeviceSensors_BySerialNo;
+         _allDbDeviceSensors_BySerialNum = allDbDeviceSensors_BySerialNo;
       }
    }
 
@@ -2731,6 +2784,33 @@ public class TourDatabase {
          _allDbTourTypes_ById = allDbTourTypes_ById;
          _allDbTourTypes_ByName = allDbTourTypes_ByName;
       }
+   }
+
+   static void logDbUpdate(final String info) {
+
+      System.out.println(net.tourbook.common.UI.timeStamp() + "[DB Update] " + info); //$NON-NLS-1$
+   }
+
+   private static void logDbUpdate_End(final int dbVersion) {
+
+      System.out.println(NLS.bind(Messages.Tour_Database_UpdateDone, dbVersion));
+      System.out.println();
+   }
+
+   private static void logDbUpdate_Start(final int dbVersion) {
+
+      System.out.println();
+      System.out.println(NLS.bind(Messages.Tour_Database_Update, dbVersion));
+   }
+
+   private static void logDerbyCommand(final String dbUrl) {
+
+      System.out.println(net.tourbook.common.UI.timeStamp() + "[Executing Derby command] " + dbUrl); //$NON-NLS-1$
+   }
+
+   private static void logDerbyInfo(final String info) {
+
+      System.out.println(net.tourbook.common.UI.timeStamp() + "[Derby] " + info); //$NON-NLS-1$
    }
 
    /**
@@ -3005,7 +3085,10 @@ public class TourDatabase {
 
          } catch (final Exception e) {
 
-            StatusUtil.logError("Exception in tour " + TourManager.getTourDateTimeShort(tourData));//$NON-NLS-1$
+            StatusUtil.logError("Exception in tour %s - ID: %s".formatted( //$NON-NLS-1$
+                  TourManager.getTourDateTimeFull(tourData),
+                  tourData.getTourId()));
+
             StatusUtil.showStatus(e);
 
          } finally {
@@ -3254,13 +3337,22 @@ public class TourDatabase {
     */
    private static void saveTransientInstances(final TourData tourData) {
 
-      saveTransientInstances_Tags(tourData);
-      saveTransientInstances_TourLocation(tourData);
-      saveTransientInstances_TourType(tourData);
-      saveTransientInstances_Sensors(tourData);
+      try {
+
+         saveTransientInstances_Tags(tourData);
+         saveTransientInstances_TourLocation(tourData);
+         saveTransientInstances_TourType(tourData);
+         saveTransientInstances_Sensors(tourData);
+
+      } catch (final Exception e) {
+
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
+      }
    }
 
    /**
+    * Save sensor instances which are not yet saved, they have to be saved before the tour is saved.
+    *
     * @param tourData
     */
    private static void saveTransientInstances_Sensors(final TourData tourData) {
@@ -3271,93 +3363,145 @@ public class TourDatabase {
          return;
       }
 
-      final ArrayList<DeviceSensor> allNotSavedSensors = new ArrayList<>();
+      final List<DeviceSensor> allNotSavedSensors = new ArrayList<>();
 
-      final HashMap<String, DeviceSensor> allDbSensors = new HashMap<>(getAllDeviceSensors_BySerialNo());
+      saveTransientInstances_Sensors_1_GetNotSaved(allTourData_SensorValues, allNotSavedSensors);
 
-      // loop: all sensor values in the tour -> find sensors which are not yet saved
+      if (allNotSavedSensors.size() > 0) {
+
+         // there are sensors which are not yet saved -> save new sensors
+
+         saveTransientInstances_Sensors_2_Save(allTourData_SensorValues, allNotSavedSensors);
+      }
+   }
+
+   /**
+    * Find sensors which are not yet saved, which are transient
+    *
+    * @param allTourData_SensorValues
+    * @param allNotSavedSensors
+    */
+   private static void saveTransientInstances_Sensors_1_GetNotSaved(final Set<DeviceSensorValue> allTourData_SensorValues,
+                                                                    final List<DeviceSensor> allNotSavedSensors) {
+
+      // loop: all sensor (values) in the tour -> find sensors which are not yet saved
+
       for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
 
          final DeviceSensor tourData_Sensor = tourData_SensorValue.getDeviceSensor();
 
          final long sensorId = tourData_Sensor.getSensorId();
 
-         if (sensorId != ENTITY_IS_NOT_SAVED) {
+         if (sensorId == ENTITY_IS_NOT_SAVED) {
 
-            // sensor is saved
-
-            continue;
-         }
-
-         // sensor is not yet saved
-         // 1. sensor can still be new
-         // 2. sensor is already created but not updated in the not yet saved tour
-
-         final DeviceSensor dbSensor = allDbSensors.get(tourData_Sensor.getSerialNumber().toUpperCase());
-
-         if (dbSensor == null) {
-
-            // sensor not available -> create a new sensor
+            // sensor is NOT yet saved
 
             allNotSavedSensors.add(tourData_Sensor);
          }
       }
+   }
 
-      boolean isNewSensorSaved = false;
+   private static void saveTransientInstances_Sensors_2_Save(final Set<DeviceSensorValue> allTourData_SensorValues,
+                                                             final List<DeviceSensor> allNotSavedSensors) {
 
-      if (allNotSavedSensors.size() > 0) {
+      synchronized (TRANSIENT_LOCK) {
 
-         // create new sensors
+         HashMap<Long, DeviceSensor> allDbSensors_BySensorID = new HashMap<>(getAllDeviceSensors_BySensorID());
+         HashMap<String, DeviceSensor> allDbSensors_BySerialNum = new HashMap<>(getAllDeviceSensors_BySerialNum());
 
-         synchronized (TRANSIENT_LOCK) {
+         for (final DeviceSensor notSavedSensor : allNotSavedSensors) {
 
-            HashMap<String, DeviceSensor> allDbSensors_InLock = new HashMap<>(getAllDeviceSensors_BySerialNo());
+            final String serialNumber = notSavedSensor.getSerialNumber();
 
-            for (final DeviceSensor newSensor : allNotSavedSensors) {
+            if (StringUtils.hasContent(serialNumber)) {
 
-               // check again, sensor list could be updated in another thread
-               final DeviceSensor dbSensor = allDbSensors_InLock.get(newSensor.getSerialNumber().toUpperCase());
+               // sensor WITH serial #
+
+               final DeviceSensor dbSensor = allDbSensors_BySerialNum.get(serialNumber.toUpperCase());
 
                if (dbSensor == null) {
 
                   // sensor is not yet in db -> create it
 
-                  saveEntity(
-                        newSensor,
-                        ENTITY_IS_NOT_SAVED,
-                        DeviceSensor.class);
-
-                  isNewSensorSaved = true;
+                  saveEntity(notSavedSensor, ENTITY_IS_NOT_SAVED, DeviceSensor.class);
                }
-            }
 
-            if (isNewSensorSaved) {
+            } else {
 
-               /*
-                * Replace sensor in sensor values
-                */
+               // sensor WITHOUT serial #
 
-               // force to reload db sensors
-               clearDeviceSensors();
-               TourManager.getInstance().clearTourDataCache();
+               final String tourData_SensorKey = notSavedSensor.getSensorKeyByName();
 
-               allDbSensors_InLock = new HashMap<>(getAllDeviceSensors_BySerialNo());
+               boolean isSensorInDb = false;
 
-               // loop: all sensor values in the tour -> find sensors which are not yet saved
-               for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
+               for (final DeviceSensor dbSensor : allDbSensors_BySensorID.values()) {
 
-                  final DeviceSensor tourData_Sensor = tourData_SensorValue.getDeviceSensor();
+                  if (dbSensor.getSensorKeyByName().equals(tourData_SensorKey)) {
 
-                  final String serialNumberKey = tourData_Sensor.getSerialNumber().toUpperCase();
+                     isSensorInDb = true;
 
-                  final DeviceSensor deviceSensor = allDbSensors_InLock.get(serialNumberKey);
+                     break;
+                  }
+               }
 
-                  tourData_SensorValue.setDeviceSensor(deviceSensor);
+               if (isSensorInDb == false) {
+
+                  // sensor is not yet in db -> create it
+
+                  saveEntity(notSavedSensor, ENTITY_IS_NOT_SAVED, DeviceSensor.class);
                }
             }
          }
-      }
 
+         /*
+          * Replace sensor in sensor values to ensure that all sensor values contain valid sensors
+          */
+
+         // force to reload db sensors
+         clearDeviceSensors();
+         TourManager.getInstance().clearTourDataCache();
+
+         // reload db sensors
+         allDbSensors_BySensorID = new HashMap<>(getAllDeviceSensors_BySensorID());
+         allDbSensors_BySerialNum = new HashMap<>(getAllDeviceSensors_BySerialNum());
+
+         // loop: all sensor values in a tour -> set sensor which is saved in the db
+         for (final DeviceSensorValue tourData_SensorValue : allTourData_SensorValues) {
+
+            final DeviceSensor tourData_Sensor = tourData_SensorValue.getDeviceSensor();
+
+            final String serialNumber = tourData_Sensor.getSerialNumber();
+
+            DeviceSensor dbSensor = null;
+
+            if (StringUtils.hasContent(serialNumber)) {
+
+               // sensor WITH serial #
+
+               final String serialNumberKey = serialNumber.toUpperCase();
+
+               dbSensor = allDbSensors_BySerialNum.get(serialNumberKey);
+
+            } else {
+
+               // sensor WITHOUT serial #
+
+               final String tourData_SensorKey = tourData_Sensor.getSensorKeyByName();
+
+               for (final DeviceSensor dbSensorByID : allDbSensors_BySensorID.values()) {
+
+                  if (dbSensorByID.getSensorKeyByName().equals(tourData_SensorKey)) {
+
+                     dbSensor = dbSensorByID;
+
+                     break;
+                  }
+               }
+            }
+
+            tourData_SensorValue.setDeviceSensor(dbSensor);
+         }
+      }
    }
 
    /**
@@ -3752,15 +3896,11 @@ public class TourDatabase {
                Messages.Tour_Database_Update_TourWeek,
                new Object[] { tourIdx++, tourList.size() });
 
-         if (progress instanceof IProgressMonitor) {
-
-            final IProgressMonitor monitor = (IProgressMonitor) progress;
+         if (progress instanceof final IProgressMonitor monitor) {
 
             monitor.subTask(msg);
 
-         } else if (progress instanceof SplashManager) {
-
-            final SplashManager splashManager = (SplashManager) progress;
+         } else if (progress instanceof final SplashManager splashManager) {
 
             splashManager.setMessage(msg);
          }
@@ -4077,6 +4217,35 @@ public class TourDatabase {
       );
 
       SQL.CreateIndex_Combined(stmt, TABLE_DEVICE_SENSOR_VALUE, "TourStartTime"); //$NON-NLS-1$
+   }
+
+   /**
+    * Create table {@link #TABLE_TOUR_BEVERAGE_CONTAINER} for {@link TourBeverageContainer}.
+    *
+    * @param stmt
+    *
+    * @throws SQLException
+    */
+   private void createTable_TourBeverageContainer(final Statement stmt) throws SQLException {
+
+      /*
+       * CREATE TABLE TourBeverageContainer
+       */
+
+      exec(stmt,
+            "CREATE TABLE " + TABLE_TOUR_BEVERAGE_CONTAINER + "   (                             " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+                  + SQL.CreateField_EntityId(ENTITY_ID_BEVERAGECONTAINER, true)
+
+                  // Version 55 - begin
+
+                  + "   name                VARCHAR(" + TourBeverageContainer.DB_LENGTH_NAME + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+                  + "   capacity            FLOAT                                                       " + NL //$NON-NLS-1$
+
+                  // Version 55 - end
+
+                  + ")"); //$NON-NLS-1$
    }
 
    /**
@@ -4615,6 +4784,10 @@ public class TourDatabase {
             + "   longitudeMinE6_Resized_Normalized   INTEGER,                               " + NL //$NON-NLS-1$
             + "   longitudeMaxE6_Resized_Normalized   INTEGER,                               " + NL //$NON-NLS-1$
 
+            + "   lastModified                        BIGINT DEFAULT 0,                      " + NL //$NON-NLS-1$
+
+            + "   appliedName                VARCHAR(" + TourLocation.DB_FIELD_LENGTH + "),  " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
             /*
              * Address fields
              */
@@ -4689,7 +4862,6 @@ public class TourDatabase {
 
             + ")" //                                                                                //$NON-NLS-1$
       );
-
    }
 
    /**
@@ -4765,6 +4937,47 @@ public class TourDatabase {
             + "   labelXOffset               INTEGER,                                  " + NL //$NON-NLS-1$
             + "   labelYOffset               INTEGER,                                  " + NL //$NON-NLS-1$
             + "   markerType                 BIGINT                                    " + NL //$NON-NLS-1$
+
+            + ")"); //$NON-NLS-1$
+   }
+
+   /**
+    * Create table {@link #TABLE_TOUR_NUTRITION_PRODUCT} for {@link TourNutritionProduct}.
+    *
+    * @param stmt
+    *
+    * @throws SQLException
+    */
+   private void createTable_TourNutritionProduct(final Statement stmt) throws SQLException {
+
+      /*
+       * CREATE TABLE TourNutritionProduct
+       */
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_NUTRITION_PRODUCT + "   (                           " + NL //$NON-NLS-1$ //$NON-NLS-2$
+      //
+            + SQL.CreateField_EntityId(ENTITY_ID_NUTRITIONPRODUCT, true)
+
+            + "   " + KEY_TOUR + "           BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_BEVERAGE_CONTAINER + "  BIGINT,                              " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            // Version 55 - begin
+
+            + "   productCode              VARCHAR(" + TourNutritionProduct.DB_LENGTH_CODE + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   consumedQuantity         FLOAT,                                                " + NL //$NON-NLS-1$
+            + "   quantityType             VARCHAR(" + TourNutritionProduct.DB_LENGTH_NAME + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   brand                    VARCHAR(" + TourNutritionProduct.DB_LENGTH_NAME + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   name                     VARCHAR(" + TourNutritionProduct.DB_LENGTH_NAME + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   calories                 INTEGER,                                              " + NL //$NON-NLS-1$
+            + "   calories_Serving         INTEGER,                                              " + NL //$NON-NLS-1$
+            + "   sodium                   INTEGER,                                              " + NL //$NON-NLS-1$
+            + "   sodium_Serving           INTEGER,                                              " + NL //$NON-NLS-1$
+            + "   isBeverage               BOOLEAN DEFAULT FALSE,                                " + NL //$NON-NLS-1$
+            + "   isCustomProduct          BOOLEAN DEFAULT FALSE,                                " + NL //$NON-NLS-1$
+            + "   beverageQuantity         INTEGER,                                              " + NL //$NON-NLS-1$
+            + "   beverageQuantity_Serving INTEGER,                                              " + NL //$NON-NLS-1$
+            + "   containersConsumed       FLOAT                                                 " + NL //$NON-NLS-1$
+
+            // Version 55 - end
 
             + ")"); //$NON-NLS-1$
    }
@@ -5335,33 +5548,6 @@ public class TourDatabase {
             : RENAMED__TOUR_RECORDING_TIME__INTO;
    }
 
-   private void logDbUpdate(final String info) {
-
-      System.out.println(TIME_STAMP + "[DB Update] " + info); //$NON-NLS-1$
-   }
-
-   private void logDbUpdate_End(final int dbVersion) {
-
-      System.out.println(NLS.bind(Messages.Tour_Database_UpdateDone, dbVersion));
-      System.out.println();
-   }
-
-   private void logDbUpdate_Start(final int dbVersion) {
-
-      System.out.println();
-      System.out.println(NLS.bind(Messages.Tour_Database_Update, dbVersion));
-   }
-
-   private void logDerbyCommand(final String dbUrl) {
-
-      System.out.println(TIME_STAMP + "[Executing Derby command] " + dbUrl); //$NON-NLS-1$
-   }
-
-   private void logDerbyInfo(final String info) {
-
-      System.out.println(TIME_STAMP + "[Derby] " + info); //$NON-NLS-1$
-   }
-
    private void modifyColumn_Type(final String table,
                                   final String fieldName,
                                   final String newFieldType,
@@ -5828,6 +6014,8 @@ public class TourDatabase {
             createTable_TourPerson(stmt);
             createTable_TourPersonHRZone(stmt);
             createTable_TourType(stmt);
+            createTable_TourBeverageContainer(stmt);
+            createTable_TourNutritionProduct(stmt);
             createTable_TourMarker(stmt);
             createTable_TourPhoto(stmt);
             createTable_TourReference(stmt);
@@ -6180,7 +6368,7 @@ public class TourDatabase {
       _dbDesignVersion_New = currentDbVersion;
       _dbDesignVersion_Old = currentDbVersion;
 
-      try (Connection conn = getConnection_Simple()) {
+      try (final Connection conn = getConnection_Simple()) {
 
          // 1 -> 2
          if (currentDbVersion == 1) {
@@ -6441,9 +6629,24 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_050_To_051(conn, splashManager);
          }
 
-         // 51 -> 52    > 23.10
+         // 51 -> 52    24.1
          if (currentDbVersion == 51) {
             currentDbVersion = _dbDesignVersion_New = updateDb_051_To_052(conn, splashManager);
+         }
+
+         // 52 -> 53    24.1
+         if (currentDbVersion == 52) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_052_To_053(conn, splashManager);
+         }
+
+         // 53 -> 54    24.1
+         if (currentDbVersion == 53) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_053_To_054(splashManager);
+         }
+
+// 54 -> 55 > 24.XX
+         if (currentDbVersion == 54) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_054_To_055(conn, splashManager);
          }
 
          // update db design version number
@@ -6498,16 +6701,16 @@ public class TourDatabase {
          updateDb_028_To_029_DataUpdate(conn, splashManager);
          updateDb_031_To_032_DataUpdate(conn, splashManager);
          updateDb_033_To_034_DataUpdate(conn, splashManager);
-         updateDb_036_To_037_DataUpdate(conn, splashManager);
-         updateDb_039_To_040_DataUpdate(conn, splashManager);
-         updateDb_041_To_042_DataUpdate(conn);
-         updateDb_042_to_043_DataUpdate(conn, splashManager);
-         updateDb_046_to_047_DataUpdate(conn, splashManager);
-         updateDb_049_To_050_DataUpdate(conn, splashManager);
-         updateDb_050_To_051_DataUpdate(conn, splashManager);
-
-         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_047_to_048());
-         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_051_to_052());
+         updateDb_036_To_037_DataUpdate(conn, splashManager); //                                   37 - 19.2
+         updateDb_039_To_040_DataUpdate(conn, splashManager); //                                   40 - 19.10
+         updateDb_041_To_042_DataUpdate(conn); //                                                  42 - 20.11.1
+         updateDb_042_to_043_DataUpdate(conn, splashManager); //                                   43 - 21.3
+         updateDb_046_to_047_DataUpdate(conn, splashManager); //                                   47 - 22.3
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_047_to_048()); //     48 - 22.6
+         updateDb_049_To_050_DataUpdate(conn, splashManager); //                                   50 - 23.5
+         updateDb_050_To_051_DataUpdate(conn, splashManager); //                                   51 - 23.8
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_051_to_052()); //     52 - 24.1
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_053_to_054()); //     54 - 24.1
 
       } catch (final SQLException e) {
 
@@ -6529,7 +6732,9 @@ public class TourDatabase {
       final int dbDataVersion = tourDataUpdater.getDatabaseVersion();
 
       if (getDbVersion(connection, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+
          // data version is higher -> nothing to do
+
          return;
       }
 
@@ -8218,9 +8423,7 @@ public class TourDatabase {
          // loop: all tours
          for (final Long tourId : allTourIds) {
 
-            if (progress instanceof SplashManager) {
-
-               final SplashManager splashManager = (SplashManager) progress;
+            if (progress instanceof final SplashManager splashManager) {
 
                final long currentTime = System.currentTimeMillis();
                final float timeDiff = currentTime - lastUpdateTime;
@@ -10403,6 +10606,104 @@ public class TourDatabase {
          // double check if db already exists
          if (isTableAvailable(conn, TABLE_TOUR_LOCATION) == false) {
             createTable_TourLocation(stmt);
+         }
+      }
+      stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   /**
+    * This db update was only needed during development but cannot be removed to have consistent
+    * data
+    *
+    * @param conn
+    * @param splashManager
+    *
+    * @return
+    *
+    * @throws SQLException
+    */
+   private int updateDb_052_To_053(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 53;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      /**
+       * Checking the column do not work when the database was just created, so the SQL exception is
+       * ignored
+       */
+      try {
+
+         if (isColumnAvailable(conn, TABLE_TOUR_LOCATION, "appliedName") == false) { //$NON-NLS-1$
+
+            final Statement stmt = conn.createStatement();
+            {
+               // add new columns in db version 53
+
+// SET_FORMATTING_OFF
+
+            SQL.AddColumn_VarCar (stmt, TABLE_TOUR_LOCATION, "appliedName",   TourLocation.DB_FIELD_LENGTH);      //$NON-NLS-1$
+            SQL.AddColumn_BigInt (stmt, TABLE_TOUR_LOCATION, "lastModified",  "0");                               //$NON-NLS-1$ //$NON-NLS-2$
+
+// SET_FORMATTING_ON
+            }
+            stmt.close();
+         }
+      } catch (final SQLException e) {
+
+         // ignore
+
+         StatusUtil.log("V53 columns are already available, IGNORE THIS EXCEPTION", e); //$NON-NLS-1$
+      }
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   /**
+    * Dummy update that {@link net.tourbook.database.TourDataUpdate_053_to_054} works
+    *
+    * @param conn
+    * @param splashManager
+    *
+    * @return
+    *
+    * @throws SQLException
+    */
+   private int updateDb_053_To_054(final SplashManager splashManager) {
+
+      final int newDbVersion = 54;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      // this is a dummy db design update that the db data update works
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDb_054_To_055(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 55;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // double check if db already exists
+         if (isTableAvailable(conn, TABLE_TOUR_NUTRITION_PRODUCT) == false) {
+
+            createTable_TourBeverageContainer(stmt);
+            createTable_TourNutritionProduct(stmt);
          }
       }
       stmt.close();

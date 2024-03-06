@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import net.tourbook.ui.UI;
+import net.tourbook.common.UI;
 
 import org.osgi.framework.Version;
 
@@ -24,10 +24,10 @@ public class ApplicationVersion {
    /**
     * Copyright year which is displayed in the splash screen.
     */
-   public static final String SPLASH_COPYRIGHT_YEAR = "2023"; //$NON-NLS-1$
+   static final String SPLASH_COPYRIGHT_YEAR = "2024"; //$NON-NLS-1$
 
 // X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-   private static final String DEVELOPMENT_VERSION_TEXT = UI.EMPTY_STRING;
+   private static final String DEVELOPMENT_VERSION_TEXT = "DEV";          //$NON-NLS-1$
    private static final String DEV_WINDOW_TITLE         = UI.EMPTY_STRING;
    private static String       _subVersion              = UI.EMPTY_STRING;
 

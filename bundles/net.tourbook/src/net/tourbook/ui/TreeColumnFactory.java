@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -63,6 +63,9 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory MOTION_AVG_SPEED;
    public static final TreeColumnFactory MOTION_DISTANCE;
    public static final TreeColumnFactory MOTION_MAX_SPEED;
+
+   public static final TreeColumnFactory NUTRITION_NUM_PRODUCTS;
+   private static final String           NUTRITION_NUM_PRODUCTS_ID        = "NUTRITION_NUM_PRODUCTS";           //$NON-NLS-1$
 
    public static final TreeColumnFactory POWER_AVG;
    public static final TreeColumnFactory POWER_MAX;
@@ -151,6 +154,8 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TRAINING_TRAINING_EFFECT_ANAEROB;
    public static final TreeColumnFactory TRAINING_TRAINING_PERFORMANCE;
 
+   public static final TreeColumnFactory WEATHER_AIR_QUALITY;
+   public static final String            WEATHER_AIR_QUALITY_ID           = "WEATHER_AIR_QUALITY";              //$NON-NLS-1$
    public static final TreeColumnFactory WEATHER_CLOUDS;
    public static final TreeColumnFactory WEATHER_TEMPERATURE_AVG;
    public static final TreeColumnFactory WEATHER_TEMPERATURE_AVG_COMBINED;
@@ -792,6 +797,29 @@ public abstract class TreeColumnFactory {
       };
 
       /*
+       * Nutrition
+       */
+
+      NUTRITION_NUM_PRODUCTS = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, NUTRITION_NUM_PRODUCTS_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Nutrition);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Nutrition_NumberOfProducts_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Nutrition_NumberOfProducts_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Nutrition_NumberOfProducts_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
+
+            return colDef;
+         }
+      };
+
+      /*
        * POWER
        */
 
@@ -1087,10 +1115,10 @@ public abstract class TreeColumnFactory {
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Powertrain);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Power_LeftRightBalance_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_Power_LeftRightBalance_Header);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Power_LeftRightBalance_Header2);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Power_LeftRightBalance_Tooltip);
 
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
 
             return colDef;
          }
@@ -2526,6 +2554,24 @@ public abstract class TreeColumnFactory {
       /*
        * Weather
        */
+
+      WEATHER_AIR_QUALITY = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, WEATHER_AIR_QUALITY_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_AirQuality_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_AirQuality);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_AirQuality_Label);
+
+            colDef.setDefaultColumnWidth(       pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
 
       WEATHER_CLOUDS = new TreeColumnFactory() {
          @Override

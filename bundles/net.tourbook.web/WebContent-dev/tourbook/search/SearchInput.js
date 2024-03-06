@@ -133,7 +133,7 @@ Messages //
 
 			// load results only with the <Enter> key
 			if (evt.keyCode === keys.ENTER) {
-				this.startSearch();
+				this.startSearch(true);
 			}
 		},
 

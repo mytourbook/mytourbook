@@ -69,10 +69,10 @@ public final class PluginProperties {
 
       String name = baseName;
       for (final String argument : arguments) {
-         name += "_" + argument;
+         name += "_" + argument; //$NON-NLS-1$
       }
 
-      return name + ".properties";
+      return name + ".properties"; //$NON-NLS-1$
    }
 
    private URL getLocalizedEntry(final String baseName, final Bundle bundle) {
@@ -123,10 +123,10 @@ public final class PluginProperties {
 
       } else {
 
-         translation = "!! " + key;
+         translation = "!! " + key; //$NON-NLS-1$
 
          if (!knownMissing.contains(key)) {
-            warn("Could not find any translation text for " + key, null);
+            warn("Could not find any translation text for " + key, null); //$NON-NLS-1$
             knownMissing.add(key);
          }
       }
@@ -150,10 +150,10 @@ public final class PluginProperties {
     */
    public void populate(final Bundle bundle) {
 
-      final String baseName = bundle.getHeaders().get("Bundle-Localization");
+      final String baseName = bundle.getHeaders().get("Bundle-Localization"); //$NON-NLS-1$
 
       populate(getLocalizedEntry(baseName, bundle));
-      populate(getLocalizedEntry("fragment", bundle));
+      populate(getLocalizedEntry("fragment", bundle)); //$NON-NLS-1$
    }
 
    private void populate(final URL resourceUrl) {
@@ -167,12 +167,12 @@ public final class PluginProperties {
             stream = resourceUrl.openStream();
             props.load(stream);
          } catch (final IOException e) {
-            warn("Could not open the resource file " + resourceUrl, e);
+            warn("Could not open the resource file " + resourceUrl, e); //$NON-NLS-1$
          } finally {
             try {
                stream.close();
             } catch (final IOException e) {
-               warn("Could not close stream for resource file " + resourceUrl, e);
+               warn("Could not close stream for resource file " + resourceUrl, e); //$NON-NLS-1$
             }
          }
 

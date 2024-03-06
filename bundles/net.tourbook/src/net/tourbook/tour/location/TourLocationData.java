@@ -15,24 +15,23 @@
  *******************************************************************************/
 package net.tourbook.tour.location;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.io.Serializable;
 
+import net.tourbook.common.UI;
 import net.tourbook.data.TourLocation;
 
 public class TourLocationData implements Serializable {
 
-   private static final long   serialVersionUID = 1L;
+   private static final long serialVersionUID = 1L;
 
-   private static final String NL               = UI.NEW_LINE;
+   private static final char NL               = UI.NEW_LINE;
 
-   String                      downloadedData;
+   String                    downloadedData;
 
-   long                        downloadTime;
-   long                        waitingTime;
+   long                      downloadTime;
+   long                      waitingTime;
 
-   public TourLocation         tourLocation;
+   public TourLocation       tourLocation;
 
    public TourLocationData() {}
 

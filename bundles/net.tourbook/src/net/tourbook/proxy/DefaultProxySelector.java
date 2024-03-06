@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,9 +34,9 @@ import java.util.Collections;
 import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -213,14 +213,17 @@ public class DefaultProxySelector extends ProxySelector {
          // delegate to the former proxy selector
          final List<Proxy> ret = delegate.select(uri);
          return ret;
+
       case NO_PROXY:
          return Collections.singletonList(Proxy.NO_PROXY);
+
       case USE_HTTP_PROXY:
          if (httpProxySocketAddress == null) {
             return Collections.singletonList(Proxy.NO_PROXY);
          }
          proxy = new Proxy(Type.HTTP, httpProxySocketAddress);
          return Collections.singletonList(proxy);
+
       case USE_SOCKS_PROXY:
          if (socksProxySocketAddress == null) {
             return Collections.singletonList(Proxy.NO_PROXY);
