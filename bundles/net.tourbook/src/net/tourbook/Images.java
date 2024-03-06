@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -373,6 +373,7 @@ public class Images {
    public static final String TourMarker_New                             = "tour-marker-new.png";                                 //$NON-NLS-1$
    public static final String TourMarker_New_Disabled                    = "tour-marker-new-disabled.png";                        //$NON-NLS-1$
    public static final String TourNew                                    = "tour-new.png";                                        //$NON-NLS-1$
+   public static final String TourNutrition                              = "tour-nutrition.png";                                  //$NON-NLS-1$
    public static final String TourPauses                                 = "tour-pauses.png";                                     //$NON-NLS-1$
    public static final String TourPauses_Disabled                        = "tour-pauses-disabled.png";                            //$NON-NLS-1$
    public static final String TourSegmenter                              = "tour-segmenter.png";                                  //$NON-NLS-1$

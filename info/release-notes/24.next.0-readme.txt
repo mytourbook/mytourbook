@@ -47,8 +47,17 @@ Experimental
 
 New
 ===
-  
-* 
+
+* Tour Nutrition
+  Add the ability to assign food/fluids to any given tour.
+  https://github.com/mytourbook/mytourbook/issues/1280
+
+* Start/End Location
+  - Automatically retrieve and set start/end locations in the easy import
+  - Retrieve, manage and show start/end locations in
+    - Tour editor
+  - Scramble tour location view when requested
+  https://github.com/mytourbook/mytourbook/issues/878
 
 
 Improvements

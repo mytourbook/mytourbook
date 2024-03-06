@@ -39,10 +39,9 @@ public class ColumnDefinition implements Cloneable {
 
    private static final char         NL = UI.NEW_LINE;
 
-   private final static NumberFormat _nf0;
-   private final static NumberFormat _nf1;
-   private final static NumberFormat _nf2;
-
+   private static final NumberFormat _nf0;
+   private static final NumberFormat _nf1;
+   private static final NumberFormat _nf2;
    static {
 
       _nf0 = NumberFormat.getNumberInstance();
@@ -183,7 +182,7 @@ public class ColumnDefinition implements Cloneable {
 
       final ColumnDefinition clone = (ColumnDefinition) super.clone();
 
-// this seems to be not necesary
+// this seems to be not necessary
 //
 //      clone._label = _label;
 //      clone._columnId = _columnId;
@@ -442,7 +441,7 @@ public class ColumnDefinition implements Cloneable {
 
    /**
     * @return Returns <code>true</code> when it is displayed but the width is 0, this is necessary
-    *         that the first visiblecolumn can be right aligned in a {@link Table} or {@link Tree}.
+    *         that the first visible column can be right aligned in a {@link Table} or {@link Tree}.
     */
    public boolean isColumnHidden() {
       return _isColumnHidden;
@@ -718,9 +717,9 @@ public class ColumnDefinition implements Cloneable {
 
       _columnLayoutData = layoutData;
 
-      if (layoutData instanceof ColumnPixelData) {
+      if (layoutData instanceof final ColumnPixelData columnPixelData) {
          // keep the default width
-         _defaultColumnWidth = ((ColumnPixelData) layoutData).width;
+         _defaultColumnWidth = columnPixelData.width;
       }
    }
 

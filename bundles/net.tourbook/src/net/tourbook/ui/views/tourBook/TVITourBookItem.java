@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -100,7 +100,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "weather_Clouds, " //                               26    //$NON-NLS-1$
             //
             + "restPulse, " //                                    27    //$NON-NLS-1$
-            + "calories, " //                                     28    //$NON-NLS-1$
+            + "TourData.calories, " //                                     28    //$NON-NLS-1$
             //
             + "tourPerson_personId, " //                          29    //$NON-NLS-1$
             //
@@ -238,7 +238,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       SQL_ALL_OTHER_FIELDS = UI.EMPTY_STRING
 
             + "jTdataTtag.TourTag_tagId, " //                     SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 0   //$NON-NLS-1$
-            + "Tmarker.markerId " //                              SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1   //$NON-NLS-1$
+            + "Tmarker.markerId, " //                             SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1   //$NON-NLS-1$
+            + "TNutritionProduct.productId " //                   SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 2   //$NON-NLS-1$
       ;
 
       SQL_SUM_FIELDS = UI.EMPTY_STRING
@@ -259,7 +260,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "CadenceMultiplier," + NL //                                 //$NON-NLS-1$
             + "TemperatureScale," + NL //                                  //$NON-NLS-1$
 
-            + "Calories," + NL //                                          //$NON-NLS-1$
+            + "TourData.Calories," + NL //                                          //$NON-NLS-1$
             + "RestPulse," + NL //                                         //$NON-NLS-1$
 
             + "Power_TotalWork," + NL //                                   //$NON-NLS-1$
@@ -845,12 +846,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
          return false;
       }
 
-      if (this instanceof TVITourBookTour && obj instanceof TVITourBookTour) {
+      if (this instanceof final TVITourBookTour tviTourBookTour && obj instanceof final TVITourBookTour objTviTourBookTour) {
 
          // cloned tours can have all the same data except the tour ID
 
-         final TVITourBookTour thisTour = (TVITourBookTour) this;
-         final TVITourBookTour otherTour = (TVITourBookTour) obj;
+         final TVITourBookTour thisTour = tviTourBookTour;
+         final TVITourBookTour otherTour = objTviTourBookTour;
 
          if (thisTour.tourId != otherTour.tourId) {
             return false;
@@ -877,6 +878,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       long prevTourId = -1;
       HashSet<Long> tagIds = null;
       HashSet<Long> markerIds = null;
+      HashSet<Long> nutritionProductIds = null;
 
       final ResultSet result = statement.executeQuery();
       while (result.next()) {
@@ -885,19 +887,25 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
          final Object result_TagId = result.getObject(SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER);
          final Object result_MarkerId = result.getObject(TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1);
+         final Object result_NutritionProductId = result.getObject(TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 2);
 
          if (result_TourId == prevTourId) {
 
             // these are additional result set's for the same tour
 
             // get tags from outer join
-            if (result_TagId instanceof Long) {
-               tagIds.add((Long) result_TagId);
+            if (result_TagId instanceof final Long tagId) {
+               tagIds.add(tagId);
             }
 
             // get markers from outer join
-            if (result_MarkerId instanceof Long) {
-               markerIds.add((Long) result_MarkerId);
+            if (result_MarkerId instanceof final Long markerId) {
+               markerIds.add(markerId);
+            }
+
+            // get nutrition products from outer join
+            if (result_NutritionProductId instanceof final Long nutritionProductId) {
+               nutritionProductIds.add(nutritionProductId);
             }
 
          } else {
@@ -918,21 +926,30 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             children.add(tourItem);
 
             // get first tag id
-            if (result_TagId instanceof Long) {
+            if (result_TagId instanceof final Long tagId) {
 
                tagIds = new HashSet<>();
-               tagIds.add((Long) result_TagId);
+               tagIds.add(tagId);
 
                tourItem.setTagIds(tagIds);
             }
 
             // get first marker id
-            if (result_MarkerId instanceof Long) {
+            if (result_MarkerId instanceof final Long markerId) {
 
                markerIds = new HashSet<>();
-               markerIds.add((Long) result_MarkerId);
+               markerIds.add(markerId);
 
                tourItem.setMarkerIds(markerIds);
+            }
+
+            // get first nutrition product id
+            if (result_NutritionProductId instanceof final Long nutritionProductId) {
+
+               nutritionProductIds = new HashSet<>();
+               nutritionProductIds.add(nutritionProductId);
+
+               tourItem.setNutritionProductsIds(nutritionProductIds);
             }
          }
 

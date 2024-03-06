@@ -82,6 +82,7 @@ public class Utils {
    public static final String VIEW_NAME_TOURLOG                = PluginProperties.getText("View_Name_TourLog");                   //$NON-NLS-1$
    public static final String VIEW_NAME_TOURMAP25              = PluginProperties.getText("View_Name_TourMap25");                 //$NON-NLS-1$
    public static final String VIEW_NAME_TOURMAP3               = PluginProperties.getText("View_Name_TourMap3");                  //$NON-NLS-1$
+   public static final String VIEW_NAME_TOURNUTRITION          = PluginProperties.getText("View_Name_TourNutrition");             //$NON-NLS-1$
    public static final String VIEW_NAME_ALLTOURMARKERS         = PluginProperties.getText("View_Name_AllTourMarkers");            //$NON-NLS-1$
    public static final String VIEW_NAME_TOURMARKERS            = PluginProperties.getText("view_name_Marker");                    //$NON-NLS-1$
    public static final String VIEW_NAME_TOURPAUSES             = PluginProperties.getText("View_Name_TourPauses");                //$NON-NLS-1$
@@ -309,6 +310,18 @@ public class Utils {
       assertNotNull(tour);
 
       return tour;
+   }
+
+   public static SWTBotView getTourBlogView(final SWTWorkbenchBot bot) {
+
+      Utils.showViewFromMenu(bot, Utils.TOUR, Utils.VIEW_NAME_TOURBLOG);
+      return Utils.showView(bot, Utils.VIEW_NAME_TOURBLOG);
+   }
+
+   public static SWTBotView getTourNutritionView(final SWTWorkbenchBot bot) {
+
+      Utils.showViewFromMenu(bot, Utils.TOUR, Utils.VIEW_NAME_TOURNUTRITION);
+      return Utils.showView(bot, Utils.VIEW_NAME_TOURNUTRITION);
    }
 
    public static SWTBotTreeItem getTourWithPauses(final SWTWorkbenchBot bot) {

@@ -48,18 +48,12 @@ public class TourBlogViewTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
    }
 
-   private SWTBotView getTourBlogView() {
-
-      Utils.showViewFromMenu(bot, Utils.TOUR, Utils.VIEW_NAME_TOURBLOG);
-      return Utils.showView(bot, Utils.VIEW_NAME_TOURBLOG);
-   }
-
    @Test
    void testBlogView_Basic() {
 
       Utils.getTour(bot);
 
-      final SWTBotView tourBlogView = getTourBlogView();
+      final SWTBotView tourBlogView = Utils.getTourBlogView(bot);
       tourBlogView.show();
 
       //Change the measurement system to imperial
@@ -108,7 +102,7 @@ public class TourBlogViewTests extends UITest {
 
       Utils.getTourWithTags(bot);
 
-      final SWTBotView tourBlogView = getTourBlogView();
+      final SWTBotView tourBlogView = Utils.getTourBlogView(bot);
       tourBlogView.show();
 
       final String currentTagName = "Shoes 2"; //$NON-NLS-1$
