@@ -35,6 +35,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ColumnProfile;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.InvisibleTableColumnDefinition;
@@ -160,7 +161,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
     * Index of the column with the image, index can be changed when the columns are reordered with
     * the mouse or the column manager
     */
-   private int                            _columnIndex_ForColumn_IsBeverage = 5;
+   private int                            _columnIndex_ForColumn_IsBeverage = -1;
    private int                            _columnWidth_ForColumn_IsBeverage;
 
    private TableColumnDefinition          _colDef_BeverageContainer;
@@ -851,6 +852,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _columnManager.createColumns(_productsViewer);
 
+      // set initial width
+      setWidth_ForColumn_IsBeverage();
+
+      _colDef_IsBeverage.setControlListener(controlResizedAdapter(controlEvent -> setWidth_ForColumn_IsBeverage()));
+
       final String[] columnProperties = new String[_columnManager.getVisibleAndSortedColumns().size()];
       for (int index = 0; index < columnProperties.length; index++) {
          columnProperties[index] = _columnManager.getVisibleAndSortedColumns().get(index).getColumnHeaderText(_columnManager);
@@ -1090,7 +1096,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_IsBeverage.setColumnLabel(Messages.Tour_Nutrition_Column_IsBeverage);
       _colDef_IsBeverage.setColumnHeaderText(Messages.Tour_Nutrition_Column_IsBeverage);
-
       _colDef_IsBeverage.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
 
       _colDef_IsBeverage.setIsDefaultColumn();
@@ -1445,6 +1450,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _viewerContainer.setRedraw(false);
       {
          _productsViewer.getTable().dispose();
+
+         // update column index which is needed for repainting
+         final ColumnProfile activeProfile = _columnManager.getActiveProfile();
+         _columnIndex_ForColumn_IsBeverage = activeProfile.getColumnIndex(_colDef_IsBeverage.getColumnId());
 
          createUI_220_Viewer(_viewerContainer);
          _viewerContainer.layout();
