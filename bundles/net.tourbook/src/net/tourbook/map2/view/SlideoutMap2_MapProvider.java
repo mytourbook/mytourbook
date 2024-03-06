@@ -1690,6 +1690,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
          final TableColumn tableColumn = _colDef_IsMPVisible.getTableColumn();
 
          if (tableColumn != null && tableColumn.isDisposed() == false) {
+            //todo fb ca se passe icic
             _columnWidth_ForColumn_IsVisible = tableColumn.getWidth();
          }
       }
@@ -1701,7 +1702,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
       if (mp == null) {
 
-         // this occured
+         // this occurred
 
          return;
       }

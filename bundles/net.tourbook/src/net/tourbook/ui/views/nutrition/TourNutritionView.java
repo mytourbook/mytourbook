@@ -100,7 +100,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
@@ -1345,8 +1344,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private void onPaint_Viewer_GraphImage(final Event event) {
 
-      final TableItem item = (TableItem) event.item;
-      final Object itemData = item.getData();
+      final Object itemData = event.item.getData();
       final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) itemData;
 
       final Image image;
