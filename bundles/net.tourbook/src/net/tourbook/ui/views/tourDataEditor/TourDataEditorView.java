@@ -911,11 +911,11 @@ public class TourDataEditorView extends ViewPart implements
       @Override
       protected void setValue(final Object element, final Object value) {
 
-         if (value instanceof String) {
+         if (value instanceof final String stringValue) {
 
             try {
 
-               final double enteredValue = Double.parseDouble((String) value);
+               final double enteredValue = Double.parseDouble(stringValue);
                final int serieIndex = ((TimeSlice) element).serieIndex;
 
                if (enteredValue != __dataSerie[serieIndex]) {
@@ -1015,14 +1015,14 @@ public class TourDataEditorView extends ViewPart implements
       @Override
       protected void setValue(final Object element, final Object value) {
 
-         if (value instanceof String) {
+         if (value instanceof final String stringValue) {
 
             try {
 
                /*
                 * convert entered value into metric value
                 */
-               final float enteredValue = Float.parseFloat((String) value);
+               final float enteredValue = Float.parseFloat(stringValue);
                float metricValue = enteredValue;
 
                if (__dataSerie == _serieAltitude) {
@@ -1108,11 +1108,11 @@ public class TourDataEditorView extends ViewPart implements
       @Override
       protected void setValue(final Object element, final Object value) {
 
-         if (value instanceof String) {
+         if (value instanceof final String stringValue) {
 
             try {
 
-               final short enteredValue = Short.parseShort((String) value);
+               final short enteredValue = Short.parseShort(stringValue);
 
                final int serieIndex = ((TimeSlice) element).serieIndex;
                if (enteredValue != __dataSerie[serieIndex]) {
@@ -1189,12 +1189,12 @@ public class TourDataEditorView extends ViewPart implements
       @Override
       protected void setValue(final Object element, final Object value) {
 
-         if (value instanceof Integer) {
+         if (value instanceof final Integer integerValue) {
 
             try {
 
                // convert int -> short
-               final short enteredValue = ((Integer) value).shortValue();
+               final short enteredValue = integerValue.shortValue();
 
                final int serieIndex = ((TimeSlice) element).serieIndex;
                if (enteredValue != __dataSerie[serieIndex]) {
@@ -2877,9 +2877,9 @@ public class TourDataEditorView extends ViewPart implements
             return;
          }
 
-         if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+         if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof final ISelection selection) {
 
-            onSelectionChanged((ISelection) eventData);
+            onSelectionChanged(selection);
 
          } else {
 
@@ -2889,9 +2889,8 @@ public class TourDataEditorView extends ViewPart implements
 
             final long tourDataEditorTourId = _tourData.getTourId();
 
-            if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+            if (tourEventId == TourEventId.TOUR_CHANGED && eventData instanceof final TourEvent tourEvent) {
 
-               final TourEvent tourEvent = (TourEvent) eventData;
                final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
 
                if (modifiedTours == null) {
@@ -2952,24 +2951,22 @@ public class TourDataEditorView extends ViewPart implements
 
                updateUI_TagContent();
 
-            } else if (tourEventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
+            } else if (tourEventId == TourEventId.MARKER_SELECTION && eventData instanceof final SelectionTourMarker tourMarkerSelection) {
 
                // ensure that the tour is displayed
                onSelectionChanged((ISelection) eventData);
-
-               final SelectionTourMarker tourMarkerSelection = (SelectionTourMarker) eventData;
 
                onSelectionChanged_TourMarker(tourMarkerSelection);
 
-            } else if (tourEventId == TourEventId.PAUSE_SELECTION && eventData instanceof SelectionTourPause) {
+            } else if (tourEventId == TourEventId.PAUSE_SELECTION && eventData instanceof final SelectionTourPause selectionTourPause) {
 
                // ensure that the tour is displayed
                onSelectionChanged((ISelection) eventData);
-               onSelectionChanged_TourPause((SelectionTourPause) eventData);
+               onSelectionChanged_TourPause(selectionTourPause);
 
-            } else if (tourEventId == TourEventId.MAP_SELECTION && eventData instanceof SelectionMapSelection) {
+            } else if (tourEventId == TourEventId.MAP_SELECTION && eventData instanceof final SelectionMapSelection selectionMapSelection) {
 
-               onSelectionChanged_MapSelection((SelectionMapSelection) eventData);
+               onSelectionChanged_MapSelection(selectionMapSelection);
 
             } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
@@ -2996,9 +2993,9 @@ public class TourDataEditorView extends ViewPart implements
                   updateUI_FromModel(_tourData, false, true);
                }
 
-            } else if (tourEventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+            } else if (tourEventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof final ISelection selection) {
 
-               onSelectionChanged((ISelection) eventData);
+               onSelectionChanged(selection);
             }
          }
 
@@ -7273,13 +7270,13 @@ public class TourDataEditorView extends ViewPart implements
 
          // One slice is selected
 
-         if (firstSelectedSlice instanceof SwimSlice) {
+         if (firstSelectedSlice instanceof final SwimSlice swimSlice) {
 
             /*
              * position slider at the beginning of the slice so that each slice borders has an
              * slider
              */
-            final int swimSerieIndex1 = ((SwimSlice) firstSelectedSlice).serieIndex;
+            final int swimSerieIndex1 = swimSlice.serieIndex;
             final int timeSerieIndex1 = getSerieIndexFromSwimTime(swimSerieIndex1);
 
             if (timeSerieIndex1 > 1) {
@@ -7300,9 +7297,9 @@ public class TourDataEditorView extends ViewPart implements
 
             serieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
 
-         } else if (firstSelectedSlice instanceof TimeSlice) {
+         } else if (firstSelectedSlice instanceof final TimeSlice timeSlice) {
 
-            final int sliceSerieIndex = ((TimeSlice) firstSelectedSlice).serieIndex;
+            final int sliceSerieIndex = timeSlice.serieIndex;
 
             serieIndex0 = sliceSerieIndex;
             serieIndex1 = sliceSerieIndex < numSlices - 1
@@ -7316,9 +7313,9 @@ public class TourDataEditorView extends ViewPart implements
 
          // Two or more slices are selected, set the 2 sliders to the first and last selected slices
 
-         if (firstSelectedSlice instanceof SwimSlice) {
+         if (firstSelectedSlice instanceof final SwimSlice swimSlice) {
 
-            final int swimSerieIndex1 = ((SwimSlice) firstSelectedSlice).serieIndex;
+            final int swimSerieIndex1 = swimSlice.serieIndex;
             final int swimSerieIndex2 = ((SwimSlice) selectedSlices[numSelectedSlices - 1]).serieIndex;
 
             final int timeSerieIndex2 = getSerieIndexFromSwimTime(swimSerieIndex2);
@@ -7341,9 +7338,9 @@ public class TourDataEditorView extends ViewPart implements
                   // adjust slider to the same stroke/swolf value as the left slider
                   : timeSerieIndex2 - 1;
 
-         } else if (firstSelectedSlice instanceof TimeSlice) {
+         } else if (firstSelectedSlice instanceof final TimeSlice timeSlice) {
 
-            final int serieIndexFirst = ((TimeSlice) firstSelectedSlice).serieIndex;
+            final int serieIndexFirst = timeSlice.serieIndex;
 
             /*
              * Position slider at the beginning of the first slice
@@ -7534,8 +7531,8 @@ public class TourDataEditorView extends ViewPart implements
       } else {
 
          final Object convertedValue = StringToNumberConverter.toFloat(true).convert(valueText);
-         if (convertedValue instanceof Float) {
-            return ((Float) convertedValue).floatValue();
+         if (convertedValue instanceof final Float floatValue) {
+            return floatValue.floatValue();
          }
       }
 
@@ -8233,9 +8230,8 @@ public class TourDataEditorView extends ViewPart implements
          showDefaultTitle();
       }
 
-      if (selection instanceof SelectionTourData) {
+      if (selection instanceof final SelectionTourData selectionTourData) {
 
-         final SelectionTourData selectionTourData = (SelectionTourData) selection;
          final TourData tourData = selectionTourData.getTourData();
          if (tourData == null) {
             _tourChart = null;
@@ -8247,39 +8243,37 @@ public class TourDataEditorView extends ViewPart implements
             updateUI_FromModel(tourData, false, true);
          }
 
-      } else if (selection instanceof SelectionTourId) {
+      } else if (selection instanceof final SelectionTourId selectionTourId) {
 
-         displayTour(((SelectionTourId) selection).getTourId());
+         displayTour(selectionTourId.getTourId());
 
-      } else if (selection instanceof SelectionTourIds) {
+      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final ArrayList<Long> tourIds = selectionTourIds.getTourIds();
          if ((tourIds != null) && (tourIds.size() > 0)) {
             displayTour(tourIds.get(0));
          }
 
-      } else if (selection instanceof SelectionTourMarker) {
+      } else if (selection instanceof final SelectionTourMarker selectionTourMarker) {
 
-         displayTour(((SelectionTourMarker) selection).getTourData());
+         displayTour(selectionTourMarker.getTourData());
 
-      } else if (selection instanceof SelectionReferenceTourView) {
-
-         final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
+      } else if (selection instanceof final SelectionReferenceTourView tourCatalogSelection) {
 
          final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
          if (refItem != null) {
             displayTour(refItem.getTourId());
          }
 
-      } else if (selection instanceof SelectionChartInfo) {
+      } else if (selection instanceof final SelectionChartInfo selectionChartInfo) {
 
-         final ChartDataModel chartDataModel = ((SelectionChartInfo) selection).chartDataModel;
+         final ChartDataModel chartDataModel = selectionChartInfo.chartDataModel;
          if (chartDataModel != null) {
 
             final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-            if (tourId instanceof Long) {
+            if (tourId instanceof final Long tourIdLong) {
 
-               final TourData tourData = getTourData((Long) tourId);
+               final TourData tourData = getTourData(tourIdLong);
                if (tourData != null) {
 
                   if (_tourData == null) {
@@ -8302,16 +8296,16 @@ public class TourDataEditorView extends ViewPart implements
             }
          }
 
-      } else if (selection instanceof StructuredSelection) {
+      } else if (selection instanceof final StructuredSelection structuredSelection) {
 
-         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-         if (firstElement instanceof TVIRefTour_ComparedTour) {
+         final Object firstElement = structuredSelection.getFirstElement();
+         if (firstElement instanceof final TVIRefTour_ComparedTour tviRefTour_ComparedTour) {
 
-            displayTour(((TVIRefTour_ComparedTour) firstElement).getTourId());
+            displayTour(tviRefTour_ComparedTour.getTourId());
 
-         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
+         } else if (firstElement instanceof final TVIElevationCompareResult_ComparedTour tviElevationCompareResult_ComparedTour) {
 
-            displayTour(((TVIElevationCompareResult_ComparedTour) firstElement).getTourId());
+            displayTour(tviElevationCompareResult_ComparedTour.getTourId());
          }
       }
    }
@@ -8335,9 +8329,9 @@ public class TourDataEditorView extends ViewPart implements
       TourData selectedTourData = null;
       final long currentTourId = _tourData.getTourId();
 
-      if (selection instanceof SelectionTourData) {
+      if (selection instanceof final SelectionTourData selectionTourData) {
 
-         final TourData tourData = ((SelectionTourData) selection).getTourData();
+         final TourData tourData = selectionTourData.getTourData();
          if (tourData == null) {
             return false;
          }
@@ -8349,17 +8343,17 @@ public class TourDataEditorView extends ViewPart implements
             selectedTourData = tourData;
          }
 
-      } else if (selection instanceof SelectionTourId) {
+      } else if (selection instanceof final SelectionTourId selectionTourId) {
 
-         _selectionTourId = ((SelectionTourId) selection).getTourId();
+         _selectionTourId = selectionTourId.getTourId();
 
          if (currentTourId == _selectionTourId) {
             isCurrentTourSelected = true;
          }
 
-      } else if (selection instanceof SelectionTourIds) {
+      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final ArrayList<Long> tourIds = selectionTourIds.getTourIds();
          if ((tourIds != null) && (tourIds.size() > 0)) {
 
             _selectionTourId = tourIds.get(0);
@@ -8369,9 +8363,9 @@ public class TourDataEditorView extends ViewPart implements
             }
          }
 
-      } else if (selection instanceof SelectionTourMarker) {
+      } else if (selection instanceof final SelectionTourMarker selectionTourMarker) {
 
-         final TourData tourData = ((SelectionTourMarker) selection).getTourData();
+         final TourData tourData = selectionTourMarker.getTourData();
          if (tourData == null) {
             return false;
          }
@@ -8437,9 +8431,8 @@ public class TourDataEditorView extends ViewPart implements
          } else {
 
             final Object customData = xSliderPosition.getCustomData();
-            if (customData instanceof SelectedTourSegmenterSegments) {
+            if (customData instanceof final SelectedTourSegmenterSegments selectedSegments) {
 
-               final SelectedTourSegmenterSegments selectedSegments = (SelectedTourSegmenterSegments) customData;
                final TourData tourData = selectedSegments.tourData;
 
                _selectionTourId = tourData.getTourId();
@@ -8454,19 +8447,19 @@ public class TourDataEditorView extends ViewPart implements
             }
          }
 
-      } else if (selection instanceof StructuredSelection) {
+      } else if (selection instanceof final StructuredSelection structuredSelection) {
 
-         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+         final Object firstElement = structuredSelection.getFirstElement();
 
-         if (firstElement instanceof TVIRefTour_ComparedTour) {
-            _selectionTourId = ((TVIRefTour_ComparedTour) firstElement).getTourId();
+         if (firstElement instanceof final TVIRefTour_ComparedTour tviRefTour_ComparedTour) {
+            _selectionTourId = tviRefTour_ComparedTour.getTourId();
             if (currentTourId == _selectionTourId) {
                isCurrentTourSelected = true;
             }
 
-         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
+         } else if (firstElement instanceof final TVIElevationCompareResult_ComparedTour tviElevationCompareResult_ComparedTour) {
 
-            final long comparedTourTourId = ((TVIElevationCompareResult_ComparedTour) firstElement).getTourId();
+            final long comparedTourTourId = tviElevationCompareResult_ComparedTour.getTourId();
 
             _selectionTourId = comparedTourTourId;
             if (currentTourId == _selectionTourId) {
@@ -9084,9 +9077,7 @@ public class TourDataEditorView extends ViewPart implements
 
       for (final Object listItem : selectionList) {
 
-         if (listItem instanceof SwimSlice) {
-
-            final SwimSlice swimSlice = (SwimSlice) listItem;
+         if (listItem instanceof final SwimSlice swimSlice) {
 
             _swimSerie_StrokeStyle[swimSlice.serieIndex] = strokeStyle == null
                   ? Short.MIN_VALUE
