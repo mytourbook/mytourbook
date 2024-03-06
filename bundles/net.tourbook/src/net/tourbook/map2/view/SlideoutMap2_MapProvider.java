@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -420,7 +420,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
       /**
        * Context menu must be set lately, otherwise an "Widget has the wrong parent" exception
-       * occures
+       * occurs
        */
       if (isVisible) {
          _columnManager.createHeaderContextMenu(_mpViewer.getTable(), null, getRRShellWithResize());
@@ -763,17 +763,13 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
          @Override
          public boolean performDrop(final Object data) {
 
-            if (data instanceof StructuredSelection) {
+            if (data instanceof final StructuredSelection selection) {
 
-               final StructuredSelection selection = (StructuredSelection) data;
-
-               if (selection.getFirstElement() instanceof MP) {
+               if (selection.getFirstElement() instanceof final MP droppedMapProvider) {
 
                   // prevent selection, this occurred and mapprovider was null
                   _isInUpdate = true;
                   {
-                     final MP droppedMapProvider = (MP) selection.getFirstElement();
-
                      final int location = getCurrentLocation();
                      final Table mpTable = _mpViewer.getTable();
 
@@ -877,8 +873,8 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
             // check if dragged item is the target item
             final ISelection selection = transferData.getSelection();
-            if (selection instanceof StructuredSelection) {
-               final Object dragMP = ((StructuredSelection) selection).getFirstElement();
+            if (selection instanceof final StructuredSelection structuredSelection) {
+               final Object dragMP = structuredSelection.getFirstElement();
                if (target == dragMP) {
                   return false;
                }
@@ -905,7 +901,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
    }
 
    /**
-    * Ceate the view context menus
+    * Create the view context menus
     */
    private void createUI_22_ContextMenu() {
 
@@ -979,7 +975,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
       _colDef_IsMPVisible.setLabelProvider(new CellLabelProvider() {
 
          // !!! When using cell.setImage() then it is not centered !!!
-         // !!! Set dummy label provider, otherwise an error occures !!!
+         // !!! Set dummy label provider, otherwise an error occurs !!!
          @Override
          public void update(final ViewerCell cell) {}
       });
@@ -1216,6 +1212,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
    /**
     * @param sortColumnId
+    *
     * @return Returns the column widget by it's column id, when column id is not found then the
     *         first column is returned.
     */
@@ -1372,7 +1369,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
       if (_mpViewer.getTable().isDisposed()) {
 
-         // this can occures when the action is pressed with the keyboard and the slideout is closed
+         // this can occurs when the action is pressed with the keyboard and the slideout is closed
 
          return;
       }
