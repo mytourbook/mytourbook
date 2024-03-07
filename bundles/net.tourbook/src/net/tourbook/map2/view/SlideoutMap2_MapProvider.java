@@ -1687,7 +1687,6 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
          final TableColumn tableColumn = _colDef_IsMPVisible.getTableColumn();
 
          if (tableColumn != null && tableColumn.isDisposed() == false) {
-            //todo fb ca se passe icic
             _columnWidth_ForColumn_IsVisible = tableColumn.getWidth();
          }
       }
