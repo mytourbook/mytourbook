@@ -2479,12 +2479,17 @@ public class UI {
        * Horizontal alignment
        */
       int xOffset = 0;
+      final int horizontalOSOffset = UI.IS_WIN
+
+            // W$ has a horizontal ident which prevents to be exactly centered
+            ? 4
+            : 0;
 
 // SET_FORMATTING_OFF
 
       switch (alignment) {
 
-      case SWT.CENTER   -> {  xOffset = (availableWidth - imageWidth2) / 2;   }
+      case SWT.CENTER   -> {  xOffset = ((availableWidth - imageWidth2) / 2) - horizontalOSOffset;   }
       case SWT.RIGHT    -> {  xOffset = availableWidth - imageWidth;          }
       default           -> {  xOffset = 2;                                    }  // == left alignment
 
@@ -2500,7 +2505,12 @@ public class UI {
       final int devX = event.x + xOffset;
       final int devY = event.y + yOffset;
 
-      event.gc.drawImage(image, devX, devY);
+      final GC gc = event.gc;
+
+//    gc.setBackground(UI.SYS_COLOR_YELLOW);
+//    gc.fillRectangle(event.x, devY, availableWidth, imageRect.height);
+
+      gc.drawImage(image, devX, devY);
    }
 
    public static String replaceHTML_BackSlash(final String filePath) {
