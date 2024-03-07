@@ -607,7 +607,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
        */
       final Listener paintListener = event -> {
 
-         if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
+         if (event.type == SWT.PaintItem) {
             onPaint_Viewer(event);
          }
       };
@@ -1302,37 +1302,24 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
    private void onPaint_Viewer_GraphImage(final Event event) {
 
-      switch (event.type) {
-      case SWT.MeasureItem:
+      final TableItem item = (TableItem) event.item;
+      final Object itemData = item.getData();
+      final MP mp = (MP) itemData;
+      final Image image = mp.isVisibleInUI() ? _imageYes : _imageNo;
+      if (image != null) {
 
-         break;
+         final Rectangle imageRect = image.getBounds();
 
-      case SWT.PaintItem:
+         // center horizontal
+         final int xOffset = Math.max(0, (_columnWidth_ForColumn_IsVisible - imageRect.width) / 2);
 
-         final TableItem item = (TableItem) event.item;
-         final Object itemData = item.getData();
+         // center vertical
+         final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
 
-         final MP mp = (MP) itemData;
+         final int devX = event.x + xOffset;
+         final int devY = event.y + yOffset;
 
-         final Image image = mp.isVisibleInUI() ? _imageYes : _imageNo;
-
-         if (image != null) {
-
-            final Rectangle imageRect = image.getBounds();
-
-            // center horizontal
-            final int xOffset = Math.max(0, (_columnWidth_ForColumn_IsVisible - imageRect.width) / 2);
-
-            // center vertical
-            final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
-
-            final int devX = event.x + xOffset;
-            final int devY = event.y + yOffset;
-
-            event.gc.drawImage(image, devX, devY);
-         }
-
-         break;
+         event.gc.drawImage(image, devX, devY);
       }
    }
 
