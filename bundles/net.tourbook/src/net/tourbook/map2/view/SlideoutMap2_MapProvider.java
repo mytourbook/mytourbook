@@ -611,7 +611,6 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
             onPaint_Viewer(event);
          }
       };
-      table.addListener(SWT.MeasureItem, paintListener);
       table.addListener(SWT.PaintItem, paintListener);
 
       table.addControlListener(controlResizedAdapter(controlEvent -> setWidth_ForColumn_IsVisible()));

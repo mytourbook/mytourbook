@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.nutrition;
 
-import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
@@ -85,11 +84,11 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -830,36 +829,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
 
-      // update column index which is needed for repainting
-      final ColumnProfile activeProfile = _columnManager.getActiveProfile();
-      _columnIndex_ForColumn_IsBeverage = activeProfile.getColumnIndex(_colDef_IsBeverage.getColumnId());
-
-      final Listener paintListener = event -> {
-
-         // paint images for the correct column
-         if (event.index != _columnIndex_ForColumn_IsBeverage ||
-               event.type != SWT.PaintItem) {
-            return;
-         }
-
-         onPaint_Viewer_GraphImage(event);
-      };
-      productsTable.addListener(SWT.MeasureItem, paintListener);
-      productsTable.addListener(SWT.PaintItem, paintListener);
-
-      productsTable.addControlListener(controlResizedAdapter(controlEvent -> setWidth_ForColumn_IsBeverage()));
-
       _productsViewer = new TableViewer(productsTable);
 
       // very important: the editing support must be set BEFORE the columns are created
       setColumnsEditingSupport();
 
       _columnManager.createColumns(_productsViewer);
-
-      // set initial width
-      setWidth_ForColumn_IsBeverage();
-
-      _colDef_IsBeverage.setControlListener(controlResizedAdapter(controlEvent -> setWidth_ForColumn_IsBeverage()));
 
       final String[] columnProperties = new String[_columnManager.getVisibleAndSortedColumns().size()];
       for (int index = 0; index < columnProperties.length; index++) {
@@ -892,7 +867,46 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          }
       }));
 
+      createUI_230_ColumnImages(productsTable);
+
       createUI_30_ContextMenu();
+   }
+
+   private void createUI_230_ColumnImages(final Table table) {
+
+      boolean isColumnVisible = false;
+      final ControlListener controlResizedAdapter = ControlListener.controlResizedAdapter(controlEvent -> setWidth_ForColumn_IsBeverage());
+
+      // update column index which is needed for repainting
+      final ColumnProfile activeProfile = _columnManager.getActiveProfile();
+      _columnIndex_ForColumn_IsBeverage = activeProfile.getColumnIndex(_colDef_IsBeverage.getColumnId());
+
+      final int numColumns = table.getColumns().length;
+
+      // add column resize listener
+      if (_columnIndex_ForColumn_IsBeverage >= 0 && _columnIndex_ForColumn_IsBeverage < numColumns) {
+
+         isColumnVisible = true;
+         table.getColumn(_columnIndex_ForColumn_IsBeverage).addControlListener(controlResizedAdapter);
+      }
+
+      // add table listener
+      if (isColumnVisible) {
+
+         final Listener paintListener = event -> {
+
+            // paint images for the correct column
+            if (event.index != _columnIndex_ForColumn_IsBeverage ||
+                  event.type != SWT.PaintItem) {
+               return;
+            }
+
+            onPaint_Viewer_GraphImage(event);
+         };
+
+         table.addControlListener(controlResizedAdapter);
+         table.addListener(SWT.PaintItem, paintListener);
+      }
    }
 
    /**
@@ -1368,18 +1382,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       if (image != null) {
 
-         final Rectangle imageRect = image.getBounds();
+         final int alignment = _colDef_IsBeverage.getColumnStyle();
 
-         // center horizontal
-         final int xOffset = Math.max(0, (_columnWidth_ForColumn_IsBeverage - imageRect.width) / 2);
-
-         // center vertical
-         final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
-
-         final int devX = event.x + xOffset;
-         final int devY = event.y + yOffset;
-
-         event.gc.drawImage(image, devX, devY);
+         UI.paintImage(event, image, _columnWidth_ForColumn_IsBeverage, alignment);
       }
    }
 
