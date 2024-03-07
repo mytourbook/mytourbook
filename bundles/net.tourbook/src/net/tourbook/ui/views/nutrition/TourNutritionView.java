@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.nutrition;
 
-import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
@@ -35,6 +34,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ColumnProfile;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.InvisibleTableColumnDefinition;
@@ -84,11 +84,11 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -100,7 +100,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
@@ -161,7 +160,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
     * Index of the column with the image, index can be changed when the columns are reordered with
     * the mouse or the column manager
     */
-   private int                            _columnIndex_ForColumn_IsBeverage = 5;
+   private int                            _columnIndex_ForColumn_IsBeverage = -1;
    private int                            _columnWidth_ForColumn_IsBeverage;
 
    private TableColumnDefinition          _colDef_BeverageContainer;
@@ -830,21 +829,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
 
-      final Listener paintListener = event -> {
-
-         // paint images at the correct column
-         final int columnIndex = event.index;
-         if (columnIndex == _columnIndex_ForColumn_IsBeverage &&
-               event.type == SWT.PaintItem) {
-
-            onPaint_Viewer_GraphImage(event);
-         }
-      };
-      productsTable.addListener(SWT.MeasureItem, paintListener);
-      productsTable.addListener(SWT.PaintItem, paintListener);
-
-      productsTable.addControlListener(controlResizedAdapter(controlEvent -> setWidth_ForColumn_IsBeverage()));
-
       _productsViewer = new TableViewer(productsTable);
 
       // very important: the editing support must be set BEFORE the columns are created
@@ -883,7 +867,46 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          }
       }));
 
+      createUI_230_ColumnImages(productsTable);
+
       createUI_30_ContextMenu();
+   }
+
+   private void createUI_230_ColumnImages(final Table table) {
+
+      boolean isColumnVisible = false;
+      final ControlListener controlResizedAdapter = ControlListener.controlResizedAdapter(controlEvent -> setWidth_ForColumn_IsBeverage());
+
+      // update column index which is needed for repainting
+      final ColumnProfile activeProfile = _columnManager.getActiveProfile();
+      _columnIndex_ForColumn_IsBeverage = activeProfile.getColumnIndex(_colDef_IsBeverage.getColumnId());
+
+      final int numColumns = table.getColumns().length;
+
+      // add column resize listener
+      if (_columnIndex_ForColumn_IsBeverage >= 0 && _columnIndex_ForColumn_IsBeverage < numColumns) {
+
+         isColumnVisible = true;
+         table.getColumn(_columnIndex_ForColumn_IsBeverage).addControlListener(controlResizedAdapter);
+      }
+
+      // add table listener
+      if (isColumnVisible) {
+
+         final Listener paintListener = event -> {
+
+            // paint images for the correct column
+            if (event.index != _columnIndex_ForColumn_IsBeverage ||
+                  event.type != SWT.PaintItem) {
+               return;
+            }
+
+            onPaint_Viewer_IsBeverageImage(event);
+         };
+
+         table.addControlListener(controlResizedAdapter);
+         table.addListener(SWT.PaintItem, paintListener);
+      }
    }
 
    /**
@@ -1091,7 +1114,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_IsBeverage.setColumnLabel(Messages.Tour_Nutrition_Column_IsBeverage);
       _colDef_IsBeverage.setColumnHeaderText(Messages.Tour_Nutrition_Column_IsBeverage);
-
       _colDef_IsBeverage.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
 
       _colDef_IsBeverage.setIsDefaultColumn();
@@ -1343,11 +1365,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       }
    }
 
-   private void onPaint_Viewer_GraphImage(final Event event) {
+   private void onPaint_Viewer_IsBeverageImage(final Event event) {
 
-      final TableItem item = (TableItem) event.item;
-      final Object itemData = item.getData();
-      final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) itemData;
+      final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) event.item.getData();
 
       final Image image;
       if (tourNutritionProduct.isBeverage()) {
@@ -1362,18 +1382,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       if (image != null) {
 
-         final Rectangle imageRect = image.getBounds();
+         final int alignment = _colDef_IsBeverage.getColumnStyle();
 
-         // center horizontal
-         final int xOffset = Math.max(0, (_columnWidth_ForColumn_IsBeverage - imageRect.width) / 2);
-
-         // center vertical
-         final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
-
-         final int devX = event.x + xOffset;
-         final int devY = event.y + yOffset;
-
-         event.gc.drawImage(image, devX, devY);
+         UI.paintImage(event, image, _columnWidth_ForColumn_IsBeverage, alignment);
       }
    }
 
