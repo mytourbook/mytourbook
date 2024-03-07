@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -420,7 +420,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
       /**
        * Context menu must be set lately, otherwise an "Widget has the wrong parent" exception
-       * occurs
+       * occures
        */
       if (isVisible) {
          _columnManager.createHeaderContextMenu(_mpViewer.getTable(), null, getRRShellWithResize());
@@ -607,10 +607,11 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
        */
       final Listener paintListener = event -> {
 
-         if (event.type == SWT.PaintItem) {
+         if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
             onPaint_Viewer(event);
          }
       };
+      table.addListener(SWT.MeasureItem, paintListener);
       table.addListener(SWT.PaintItem, paintListener);
 
       table.addControlListener(controlResizedAdapter(controlEvent -> setWidth_ForColumn_IsVisible()));
@@ -762,13 +763,17 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
          @Override
          public boolean performDrop(final Object data) {
 
-            if (data instanceof final StructuredSelection selection) {
+            if (data instanceof StructuredSelection) {
 
-               if (selection.getFirstElement() instanceof final MP droppedMapProvider) {
+               final StructuredSelection selection = (StructuredSelection) data;
+
+               if (selection.getFirstElement() instanceof MP) {
 
                   // prevent selection, this occurred and mapprovider was null
                   _isInUpdate = true;
                   {
+                     final MP droppedMapProvider = (MP) selection.getFirstElement();
+
                      final int location = getCurrentLocation();
                      final Table mpTable = _mpViewer.getTable();
 
@@ -872,8 +877,8 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
             // check if dragged item is the target item
             final ISelection selection = transferData.getSelection();
-            if (selection instanceof final StructuredSelection structuredSelection) {
-               final Object dragMP = structuredSelection.getFirstElement();
+            if (selection instanceof StructuredSelection) {
+               final Object dragMP = ((StructuredSelection) selection).getFirstElement();
                if (target == dragMP) {
                   return false;
                }
@@ -900,7 +905,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
    }
 
    /**
-    * Create the view context menus
+    * Ceate the view context menus
     */
    private void createUI_22_ContextMenu() {
 
@@ -974,7 +979,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
       _colDef_IsMPVisible.setLabelProvider(new CellLabelProvider() {
 
          // !!! When using cell.setImage() then it is not centered !!!
-         // !!! Set dummy label provider, otherwise an error occurs !!!
+         // !!! Set dummy label provider, otherwise an error occures !!!
          @Override
          public void update(final ViewerCell cell) {}
       });
@@ -1211,7 +1216,6 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
    /**
     * @param sortColumnId
-    *
     * @return Returns the column widget by it's column id, when column id is not found then the
     *         first column is returned.
     */
@@ -1301,24 +1305,37 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
    private void onPaint_Viewer_GraphImage(final Event event) {
 
-      final TableItem item = (TableItem) event.item;
-      final Object itemData = item.getData();
-      final MP mp = (MP) itemData;
-      final Image image = mp.isVisibleInUI() ? _imageYes : _imageNo;
-      if (image != null) {
+      switch (event.type) {
+      case SWT.MeasureItem:
 
-         final Rectangle imageRect = image.getBounds();
+         break;
 
-         // center horizontal
-         final int xOffset = Math.max(0, (_columnWidth_ForColumn_IsVisible - imageRect.width) / 2);
+      case SWT.PaintItem:
 
-         // center vertical
-         final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
+         final TableItem item = (TableItem) event.item;
+         final Object itemData = item.getData();
 
-         final int devX = event.x + xOffset;
-         final int devY = event.y + yOffset;
+         final MP mp = (MP) itemData;
 
-         event.gc.drawImage(image, devX, devY);
+         final Image image = mp.isVisibleInUI() ? _imageYes : _imageNo;
+
+         if (image != null) {
+
+            final Rectangle imageRect = image.getBounds();
+
+            // center horizontal
+            final int xOffset = Math.max(0, (_columnWidth_ForColumn_IsVisible - imageRect.width) / 2);
+
+            // center vertical
+            final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
+
+            final int devX = event.x + xOffset;
+            final int devY = event.y + yOffset;
+
+            event.gc.drawImage(image, devX, devY);
+         }
+
+         break;
       }
    }
 
@@ -1355,7 +1372,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
       if (_mpViewer.getTable().isDisposed()) {
 
-         // this can occurs when the action is pressed with the keyboard and the slideout is closed
+         // this can occures when the action is pressed with the keyboard and the slideout is closed
 
          return;
       }
@@ -1684,7 +1701,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
       if (mp == null) {
 
-         // this occurred
+         // this occured
 
          return;
       }
