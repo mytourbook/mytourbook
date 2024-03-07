@@ -33,7 +33,7 @@ import net.tourbook.map2.view.Map2View;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.location.TourLocationData;
-import net.tourbook.tour.location.TourLocationLookUpManager;
+import net.tourbook.tour.location.MapLocationManager;
 import net.tourbook.tour.location.TourLocationManager;
 
 import org.eclipse.jface.action.Action;
@@ -164,7 +164,7 @@ public class ActionLookupMapLocation extends Action {
 
          allTourLocationPoints.add(tourLocationPoint);
 
-         TourLocationLookUpManager.getTourLocationLookUps().add(tourLocation);
+         MapLocationManager.getMapLocations().add(tourLocation);
       }
 
       _map2View.getTourLocationDialog().updateUI(tourLocationPoint);

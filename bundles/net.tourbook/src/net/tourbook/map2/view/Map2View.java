@@ -58,9 +58,12 @@ import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
+import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
 import net.tourbook.common.tooltip.OpenDialogManager;
+import net.tourbook.common.tooltip.SlideoutLocation;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.TourToolTip;
@@ -173,6 +176,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -189,6 +193,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
@@ -352,6 +357,7 @@ public class Map2View extends ViewPart implements
    private static final IPreferenceStore _prefStore             = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common      = CommonActivator.getPrefStore();
    private static final IDialogSettings  _state                 = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _state_MapLocation     = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapLocation"); //$NON-NLS-1$
    private static final IDialogSettings  _state_MapProvider     = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapProvider"); //$NON-NLS-1$
    private static final IDialogSettings  _state_PhotoFilter     = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.PhotoFilter"); //$NON-NLS-1$
    //
@@ -487,10 +493,11 @@ public class Map2View extends ViewPart implements
    private ActionCreateTourMarkerFromMap     _actionCreateTourMarkerFromMap;
    private Action_ExportMap_SubMenu          _actionExportMap_SubMenu;
    private ActionGotoLocation                _actionGotoLocation;
-   private ActionLookupMapLocation          _actionLookupTourLocation;
+   private ActionLookupMapLocation           _actionLookupTourLocation;
    private ActionManageMapProviders          _actionManageMapProvider;
    private ActionMapBookmarks                _actionMap2Slideout_Bookmarks;
    private ActionMap2Color                   _actionMap2Slideout_Color;
+   private ActionMap2_MapLocation            _actionMap2Slideout_MapLocation;
    private ActionMap2_MapProvider            _actionMap2Slideout_MapProvider;
    private ActionMap2_Options                _actionMap2Slideout_Options;
    private ActionMap2_PhotoFilter            _actionMap2Slideout_PhotoFilter;
@@ -536,6 +543,8 @@ public class Map2View extends ViewPart implements
    private org.eclipse.swt.graphics.Point    _geoFilter_Loaded_BottomRight_E2;
    private GeoFilter_LoaderData              _geoFilter_PreviousGeoLoaderItem;
    private AtomicInteger                     _geoFilter_RunningId  = new AtomicInteger();
+   //
+   private SlideoutMap2_MapLocation          _slideoutMapLocation;
    //
    /*
     * UI controls
@@ -588,6 +597,30 @@ public class Map2View extends ViewPart implements
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
          return new SlideoutMap2_TourColors(_parent, toolbar, Map2View.this, _state);
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+   }
+
+   private class ActionMap2_MapLocation extends ActionToolbarSlideoutAdv {
+
+      private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getThemedImageDescriptor(Images.MapLocation);
+
+      public ActionMap2_MapLocation() {
+
+         super(_actionImageDescriptor, _actionImageDescriptor);
+      }
+
+      @Override
+      protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
+
+         _slideoutMapLocation = new SlideoutMap2_MapLocation(toolItem, _state_MapLocation, Map2View.this);
+         _slideoutMapLocation.setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
+
+         return _slideoutMapLocation;
       }
 
       @Override
@@ -1788,6 +1821,7 @@ public class Map2View extends ViewPart implements
       // map2 slideouts
       _actionMap2Slideout_Bookmarks       = new ActionMapBookmarks(this._parent, this);
       _actionMap2Slideout_Color           = new ActionMap2Color();
+      _actionMap2Slideout_MapLocation     = new ActionMap2_MapLocation();
       _actionMap2Slideout_MapProvider     = new ActionMap2_MapProvider(this, _state_MapProvider);
       _actionMap2Slideout_PhotoFilter     = new ActionMap2_PhotoFilter(this, _state_PhotoFilter);
       _actionMap2Slideout_Options         = new ActionMap2_Options();
@@ -1917,8 +1951,6 @@ public class Map2View extends ViewPart implements
       _parent = parent;
 
       _mapLegend = new MapLegend();
-
-      initUI();
 
       _map = new Map2(parent, SWT.NONE, _state);
       _map.setPainting(false);
@@ -2255,6 +2287,7 @@ public class Map2View extends ViewPart implements
       tbm.add(new Separator());
 
       tbm.add(_actionMap2Slideout_Bookmarks);
+      tbm.add(_actionMap2Slideout_MapLocation);
 
       tbm.add(new Separator());
 
@@ -2860,12 +2893,6 @@ public class Map2View extends ViewPart implements
    private void hideGeoGrid() {
 
       _map.showGeoSearchGrid(null);
-   }
-
-   private void initUI() {
-      // TODO Auto-generated method stub
-
-//      _tourLocationDialog = new DialogSetTourLocationInMap();
    }
 
    /**

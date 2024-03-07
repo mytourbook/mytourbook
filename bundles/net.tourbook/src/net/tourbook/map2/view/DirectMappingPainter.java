@@ -34,7 +34,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.map2.Messages;
-import net.tourbook.tour.location.TourLocationLookUpManager;
+import net.tourbook.tour.location.MapLocationManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
@@ -742,7 +742,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
          drawTourLocation(painterContext, _allTourLocations);
 
-         final List<TourLocation> allLocationLookUps = TourLocationLookUpManager.getTourLocationLookUps();
+         final List<TourLocation> allLocationLookUps = MapLocationManager.getMapLocations();
 
          drawTourLocation(painterContext, allLocationLookUps);
 
@@ -834,7 +834,7 @@ public class DirectMappingPainter implements IDirectPainter {
                                      final boolean isShowTourLocations_BoundingBox,
                                      final boolean isMapBackgroundDark) {
 
-      final List<TourLocation> allLocationLookUps = TourLocationLookUpManager.getTourLocationLookUps();
+      final List<TourLocation> allLocationLookUps = MapLocationManager.getMapLocations();
 
 // SET_FORMATTING_OFF
 
@@ -855,7 +855,7 @@ public class DirectMappingPainter implements IDirectPainter {
             Map2View.STATE_IS_SHOW_TOUR_LOCATIONS,
             Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT);
 
-      final List<TourLocation> allLocationLookUps = TourLocationLookUpManager.getTourLocationLookUps();
+      final List<TourLocation> allLocationLookUps = MapLocationManager.getMapLocations();
 
 // SET_FORMATTING_OFF
 

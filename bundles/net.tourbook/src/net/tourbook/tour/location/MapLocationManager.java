@@ -24,13 +24,13 @@ import net.tourbook.data.TourLocation;
 /**
  *
  */
-public class TourLocationLookUpManager {
+public class MapLocationManager {
 
    private static final char NL = UI.NEW_LINE;
 
-   private static final List<TourLocation> _allTourLocationLookUps = new ArrayList<>();
+   private static final List<TourLocation> _allMapLocations = new ArrayList<>();
 
-   public static List<TourLocation> getTourLocationLookUps() {
-      return _allTourLocationLookUps;
+   public static List<TourLocation> getMapLocations() {
+      return _allMapLocations;
    }
 }
