@@ -830,6 +830,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       productsTable.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       productsTable.setHeaderVisible(true);
 
+      // update column index which is needed for repainting
+      final ColumnProfile activeProfile = _columnManager.getActiveProfile();
+      _columnIndex_ForColumn_IsBeverage = activeProfile.getColumnIndex(_colDef_IsBeverage.getColumnId());
+
       final Listener paintListener = event -> {
 
          // paint images for the correct column
@@ -1450,10 +1454,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _viewerContainer.setRedraw(false);
       {
          _productsViewer.getTable().dispose();
-
-         // update column index which is needed for repainting
-         final ColumnProfile activeProfile = _columnManager.getActiveProfile();
-         _columnIndex_ForColumn_IsBeverage = activeProfile.getColumnIndex(_colDef_IsBeverage.getColumnId());
 
          createUI_220_Viewer(_viewerContainer);
          _viewerContainer.layout();
