@@ -901,7 +901,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                return;
             }
 
-            onPaint_Viewer_GraphImage(event);
+            onPaint_Viewer_IsBeverageImage(event);
          };
 
          table.addControlListener(controlResizedAdapter);
@@ -1365,7 +1365,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       }
    }
 
-   private void onPaint_Viewer_GraphImage(final Event event) {
+   private void onPaint_Viewer_IsBeverageImage(final Event event) {
 
       final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) event.item.getData();
 
