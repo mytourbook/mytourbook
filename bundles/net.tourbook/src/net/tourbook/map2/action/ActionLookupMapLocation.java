@@ -38,19 +38,19 @@ import net.tourbook.tour.location.TourLocationManager;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionLookupTourLocation extends Action {
+public class ActionLookupMapLocation extends Action {
 
    private Map2View _map2View;
 
    private Long     _currentHoveredTourId;
 
-   public ActionLookupTourLocation(final Map2View mapView) {
+   public ActionLookupMapLocation(final Map2View mapView) {
 
-      super(Messages.Map_Action_LookUpTourLocation, AS_PUSH_BUTTON);
+      super(Messages.Map_Action_LookUpMapLocation, AS_PUSH_BUTTON);
 
       _map2View = mapView;
 
-      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourLocation));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapLocation));
    }
 
    @Override

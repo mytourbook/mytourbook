@@ -185,6 +185,8 @@ public class Images {
    public static final String MapBookmark_New                            = "map-bookmark-new.png";                                //$NON-NLS-1$
    public static final String MapLayer                                   = "map-layer.png";                                       //$NON-NLS-1$
    public static final String MapLayer_Dark                              = "map-layer-dark.png";                                  //$NON-NLS-1$
+   public static final String MapLocation                                = "map-location.png";                                    //$NON-NLS-1$
+   public static final String MapLocation_New                            = "map-location-new.png";                                //$NON-NLS-1$
    public static final String MapModel                                   = "map-model.png";                                       //$NON-NLS-1$
    public static final String MapModel_Disabled                          = "map-model-disabled.png";                              //$NON-NLS-1$
    public static final String MapModelCursor                             = "map-model-cursor.png";                                //$NON-NLS-1$
@@ -363,8 +365,6 @@ public class Images {
    public static final String TourInfo                                   = "tour-info.png";                                       //$NON-NLS-1$
    public static final String TourInfo_Disabled                          = "tour-info-disabled.png";                              //$NON-NLS-1$
    public static final String TourInfo_Hovered                           = "tour-info-hovered.png";                               //$NON-NLS-1$
-   public static final String TourLocation                               = "tour-location.png";                                   //$NON-NLS-1$
-   public static final String TourLocationNew                            = "tour-location-new.png";                               //$NON-NLS-1$
    public static final String TourLocations                              = "tour-locations.png";                                  //$NON-NLS-1$
    public static final String TourLog                                    = "tour-log.png";                                        //$NON-NLS-1$
    public static final String TourLog_Layout_Color                       = "tour-log-layout-color.png";                           //$NON-NLS-1$
