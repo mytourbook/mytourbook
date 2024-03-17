@@ -37,7 +37,7 @@ import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ColumnProfile;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.InvisibleTableColumnDefinition;
+import net.tourbook.common.util.ColumnDefinitionFor1stVisibleAlignmentColumn;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
@@ -976,7 +976,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       defineColumn_80_BeverageContainer();
       defineColumn_90_ConsumedBeverageContainers();
 
-      new InvisibleTableColumnDefinition(_columnManager);
+      new ColumnDefinitionFor1stVisibleAlignmentColumn(_columnManager);
    }
 
    private void defineColumn_10_ConsumedQuantity() {
