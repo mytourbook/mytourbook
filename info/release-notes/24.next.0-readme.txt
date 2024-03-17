@@ -8,6 +8,7 @@ TODO's
    https://github.com/mytourbook/mytourbook/issues/1306 
  
 * Support colomn width = 0
+  This is now (17.3.2024) set but needs more testing
 
 * Support first column alignment in all views
  
