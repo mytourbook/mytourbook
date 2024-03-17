@@ -135,7 +135,7 @@ public class ColumnManager {
    /**
     * Minimum column width, when the column width is 0, there was a bug that this happened.
     */
-   private static final int    COLUMN_WIDTH_MINIMUM                      = 7;
+   private static final int    COLUMN_WIDTH_MINIMUM                      = 0;
 
    /**
     * There was a case when the column width in a NatTable was 393'515'928 which required a computer
