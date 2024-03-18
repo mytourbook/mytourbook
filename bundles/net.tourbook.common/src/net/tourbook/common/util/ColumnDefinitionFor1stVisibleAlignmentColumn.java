@@ -28,15 +28,15 @@ import org.eclipse.swt.SWT;
  * In order for the first visible column to be right aligned, an empty invisible
  * column must be created as the first column is ALWAYS left aligned.
  */
-public class InvisibleTableColumnDefinition extends TableColumnDefinition {
+public class ColumnDefinitionFor1stVisibleAlignmentColumn extends TableColumnDefinition {
 
    /**
     * @param columnManager
     *           Manager which managed the columns.
     */
-   public InvisibleTableColumnDefinition(final ColumnManager columnManager) {
+   public ColumnDefinitionFor1stVisibleAlignmentColumn(final ColumnManager columnManager) {
 
-      super(columnManager, "Invisible", SWT.TRAIL); //$NON-NLS-1$
+      super(columnManager, "1stVisibleColumnAlignment", SWT.TRAIL); //$NON-NLS-1$
 
       setDefaultColumnWidth(0);
       setColumnHeaderText(UI.EMPTY_STRING);
