@@ -259,6 +259,21 @@
          </executions>
       </plugin>
 
+      <!--
+      <plugin>
+          <groupId>com.github.spotbugs</groupId>
+          <artifactId>spotbugs-maven-plugin</artifactId>
+           <version>4.8.3.1</version>
+          <executions>
+              <execution>
+                    <phase>verify</phase>
+                    <goals>
+                        <goal>check</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+      -->
     </plugins>
   </build>
 
