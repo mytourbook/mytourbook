@@ -20,17 +20,42 @@ import java.util.List;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TourLocation;
+import net.tourbook.map.location.SlideoutMapLocation;
+
+import org.eclipse.ui.PlatformUI;
 
 /**
- *
+ * Manage MapLocation's
  */
 public class MapLocationManager {
 
-   private static final char NL = UI.NEW_LINE;
+   private static final char               NL               = UI.NEW_LINE;
 
    private static final List<TourLocation> _allMapLocations = new ArrayList<>();
 
+   private static SlideoutMapLocation      _mapLocationSlideout;
+
+   public static void addLocation(final TourLocation tourLocation) {
+
+      // update model
+      _allMapLocations.add(tourLocation);
+
+      // update UI
+      if (_mapLocationSlideout != null) {
+
+         _mapLocationSlideout.open(false);
+
+         // delay to be sure that the slideout is opened
+         PlatformUI.getWorkbench().getDisplay().asyncExec(() -> _mapLocationSlideout.updateUI(tourLocation));
+      }
+   }
+
    public static List<TourLocation> getMapLocations() {
       return _allMapLocations;
+   }
+
+   public static void setMapLocationSlideout(final SlideoutMapLocation mapLocationSlideout) {
+
+      _mapLocationSlideout = mapLocationSlideout;
    }
 }

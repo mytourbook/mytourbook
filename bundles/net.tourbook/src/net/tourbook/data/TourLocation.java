@@ -17,6 +17,7 @@ package net.tourbook.data;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -30,6 +31,7 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.location.LocationPartID;
@@ -372,6 +374,12 @@ public class TourLocation implements Serializable {
    @Transient
    public long   boundingBoxKey;
 
+   @Transient
+   private ZonedDateTime created;
+
+   @Transient
+   private long          createdMS;
+
    /**
     * Default constructor used also in ejb
     */
@@ -387,6 +395,9 @@ public class TourLocation implements Serializable {
 
       latitudeE6_Normalized = latitudeE6 + 90_000_000;
       longitudeE6_Normalized = longitudeE6 + 180_000_000;
+
+      created = TimeTools.now();
+      createdMS = TimeTools.toEpochMilli(created);
    }
 
    @Override
@@ -770,5 +781,17 @@ public class TourLocation implements Serializable {
 //            + log(" latitudeDiff                      = ", getLatitudeDiff()) //                   //$NON-NLS-1$
 //            + log(" longitudeDiff                     = ", getLongitudeDiff()) //                  //$NON-NLS-1$
       ;
+   }
+
+   public long getCreatedMS() {
+      return createdMS;
+   }
+
+   public void setCreatedMS(long createdMS) {
+      this.createdMS = createdMS;
+   }
+
+   public ZonedDateTime getCreated() {
+      return created;
    }
 }

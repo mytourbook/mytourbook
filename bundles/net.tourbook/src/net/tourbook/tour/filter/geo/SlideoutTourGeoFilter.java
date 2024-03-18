@@ -34,6 +34,7 @@ import net.tourbook.common.dialog.MessageDialogWithToggleState_Customized;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnDefinitionFor1stVisibleAlignmentColumn;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TableColumnDefinition;
@@ -827,6 +828,8 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
       defineColumn_60_Latitude2();
       defineColumn_62_Longitude2();
+
+      new ColumnDefinitionFor1stVisibleAlignmentColumn(_columnManager);
    }
 
    private void defineColumn_00_SequenceNumber() {

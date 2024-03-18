@@ -734,7 +734,7 @@ public class DirectMappingPainter implements IDirectPainter {
    @Override
    public void paint(final DirectPainterContext painterContext) {
 
-      if (_map == null) {
+      if (_map == null || _allTourLocations == null) {
          return;
       }
 

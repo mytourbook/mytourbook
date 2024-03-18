@@ -39,9 +39,12 @@ public class ColumnDefinitionFor1stVisibleAlignmentColumn extends TableColumnDef
       super(columnManager, "1stVisibleColumnAlignment", SWT.TRAIL); //$NON-NLS-1$
 
       setDefaultColumnWidth(0);
+
       setColumnHeaderText(UI.EMPTY_STRING);
       setColumnLabel(Messages.FirstColumn_AlignmentHack_Label);
       setColumnHeaderToolTipText(Messages.FirstColumn_AlignmentHack_Label_Tooltip);
+
+      setColumnCategory(Messages.ColumnFactory_Category_Quirky);
 
       setLabelProvider(new CellLabelProvider() {
          @Override

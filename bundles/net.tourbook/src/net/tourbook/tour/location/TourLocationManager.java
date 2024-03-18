@@ -1120,20 +1120,20 @@ public class TourLocationManager {
 
    static String getCombined_StreetWithHouseNumber(final TourLocation tourLocation) {
 
-      final String adrRoad = tourLocation.road;
-      final String adrHouseNumber = tourLocation.house_number;
+      final String locationRoad = tourLocation.road;
+      final String locationHouseNumber = tourLocation.house_number;
 
-      if (adrRoad == null && adrHouseNumber == null) {
+      if (locationRoad == null && locationHouseNumber == null) {
 
          return null;
 
-      } else if (adrRoad == null) {
+      } else if (locationRoad == null) {
 
-         return adrHouseNumber;
+         return locationHouseNumber;
 
-      } else if (adrHouseNumber == null) {
+      } else if (locationHouseNumber == null) {
 
-         return adrRoad;
+         return locationRoad;
       }
 
       // road and house number are available
@@ -1142,11 +1142,11 @@ public class TourLocationManager {
 
       if (COUNTRY_CODE_US.equals(countryCode)) {
 
-         return adrHouseNumber + UI.SPACE + adrRoad;
+         return locationHouseNumber + UI.SPACE + locationRoad;
 
       } else {
 
-         return adrRoad + UI.SPACE + adrHouseNumber;
+         return locationRoad + UI.SPACE + locationHouseNumber;
       }
    }
 

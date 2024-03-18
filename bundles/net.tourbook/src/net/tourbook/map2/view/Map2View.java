@@ -85,6 +85,7 @@ import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
+import net.tourbook.map.location.SlideoutMapLocation;
 import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.action.ActionCreateTourMarkerFromMap;
@@ -151,7 +152,6 @@ import net.tourbook.tour.filter.geo.GeoFilter_LoaderData;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
-import net.tourbook.tour.location.DialogSetTourLocationInMap;
 import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.photo.IMapWithPhotos;
 import net.tourbook.tour.photo.TourPhotoLink;
@@ -373,7 +373,6 @@ public class Map2View extends ViewPart implements
          TOUR_WEATHER_TOOLTIP_Y);
    private final ITourToolTipProvider        _wayPointToolTipProvider    = new WayPointToolTipProvider();
    private ValuePoint_ToolTip_UI             _valuePointTooltipUI;
-   private DialogSetTourLocationInMap        _tourLocationDialog         = new DialogSetTourLocationInMap();
    //
    private DirectMappingPainter              _directMappingPainter;
    //
@@ -544,7 +543,7 @@ public class Map2View extends ViewPart implements
    private GeoFilter_LoaderData              _geoFilter_PreviousGeoLoaderItem;
    private AtomicInteger                     _geoFilter_RunningId  = new AtomicInteger();
    //
-   private SlideoutMap2_MapLocation          _slideoutMapLocation;
+   private SlideoutMapLocation               _slideoutMapLocation;
    //
    /*
     * UI controls
@@ -617,7 +616,7 @@ public class Map2View extends ViewPart implements
       @Override
       protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-         _slideoutMapLocation = new SlideoutMap2_MapLocation(toolItem, _state_MapLocation, Map2View.this);
+         _slideoutMapLocation = new SlideoutMapLocation(toolItem, _state_MapLocation);
          _slideoutMapLocation.setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
 
          return _slideoutMapLocation;
@@ -2118,7 +2117,6 @@ public class Map2View extends ViewPart implements
       _map.disposeOverlayImageCache();
 
       _valuePointTooltipUI.hide();
-      _tourLocationDialog.close();
 
       getViewSite().getPage().removePostSelectionListener(_postSelectionListener);
       getViewSite().getPage().removePartListener(_partListener);
@@ -2839,10 +2837,6 @@ public class Map2View extends ViewPart implements
       final double longitudeCenter = longitudeMin + (longitudeMax - longitudeMin) / 2;
 
       return new GeoPosition(latitudeCenter, longitudeCenter);
-   }
-
-   public DialogSetTourLocationInMap getTourLocationDialog() {
-      return _tourLocationDialog;
    }
 
    private List<TourLocation> getTourLocations(final TourData tourData) {

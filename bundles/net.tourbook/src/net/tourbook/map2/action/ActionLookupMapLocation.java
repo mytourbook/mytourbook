@@ -19,8 +19,6 @@ import com.javadocmd.simplelatlng.LatLng;
 import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.util.LengthUnit;
 
-import java.util.Set;
-
 import net.tourbook.Images;
 import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
@@ -32,8 +30,8 @@ import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.location.TourLocationData;
 import net.tourbook.tour.location.MapLocationManager;
+import net.tourbook.tour.location.TourLocationData;
 import net.tourbook.tour.location.TourLocationManager;
 
 import org.eclipse.jface.action.Action;
@@ -56,13 +54,8 @@ public class ActionLookupMapLocation extends Action {
    @Override
    public void run() {
 
-      final TourData tourData = TourManager.getTour(_currentHoveredTourId);
-
-      if (tourData == null
-
-            // make sure the tour editor does not contain a modified tour
-            || TourManager.isTourEditorModified()) {
-
+      // make sure the tour editor does not contain a modified tour
+      if (TourManager.isTourEditorModified()) {
          return;
       }
 
@@ -71,104 +64,82 @@ public class ActionLookupMapLocation extends Action {
       final double clickedTourPointLatitude = mouseMoveGeoPosition.latitude;
       final double clickedTourPointLongitude = mouseMoveGeoPosition.longitude;
 
-      final LatLng clickedTourPoint = new LatLng(clickedTourPointLatitude, clickedTourPointLongitude);
+      double locationLatitude = clickedTourPointLatitude;
+      double locationLongitude = clickedTourPointLongitude;
 
-      final double[] latitudeSerie = tourData.latitudeSerie;
-      final double[] longitudeSerie = tourData.longitudeSerie;
+      // get hovered tour
+      final TourData tourData = TourManager.getTour(_currentHoveredTourId);
 
-      double closestDistance = Double.MAX_VALUE;
+      long absoluteTourTime = 0;
       int closestLatLonIndex = -1;
 
-      for (int index = 0; index < latitudeSerie.length; ++index) {
+      if (tourData != null) {
 
-         final LatLng currentLocation = new LatLng(latitudeSerie[index], longitudeSerie[index]);
-         final double currentDistanceToClickedTourPoint = LatLngTool.distance(clickedTourPoint, currentLocation, LengthUnit.METER);
+         // a tour is hovered, adjust location to a tour slice
 
-         if (currentDistanceToClickedTourPoint < closestDistance) {
+         final LatLng clickedTourPoint = new LatLng(clickedTourPointLatitude, clickedTourPointLongitude);
 
-            closestDistance = currentDistanceToClickedTourPoint;
-            closestLatLonIndex = index;
+         final double[] latitudeSerie = tourData.latitudeSerie;
+         final double[] longitudeSerie = tourData.longitudeSerie;
+
+         double closestDistance = Double.MAX_VALUE;
+
+         for (int index = 0; index < latitudeSerie.length; ++index) {
+
+            final LatLng currentLocation = new LatLng(latitudeSerie[index], longitudeSerie[index]);
+            final double currentDistanceToClickedTourPoint = LatLngTool.distance(clickedTourPoint, currentLocation, LengthUnit.METER);
+
+            if (currentDistanceToClickedTourPoint < closestDistance) {
+
+               closestDistance = currentDistanceToClickedTourPoint;
+               closestLatLonIndex = index;
+            }
          }
+
+         if (closestLatLonIndex != -1) {
+
+            final int relativeTourTime = tourData.timeSerie[closestLatLonIndex];
+            absoluteTourTime = tourData.getTourStartTimeMS() + (relativeTourTime * 1000);
+
+            locationLatitude = latitudeSerie[closestLatLonIndex];
+            locationLongitude = longitudeSerie[closestLatLonIndex];
+         }
+
       }
-
-      if (closestLatLonIndex == -1) {
-         return;
-      }
-
-      final int relativeTourTime = tourData.timeSerie[closestLatLonIndex];
-      final long absoluteTourTime = tourData.getTourStartTimeMS() + (relativeTourTime * 1000);
-
-      final double latitude = latitudeSerie[closestLatLonIndex];
-      final double longitude = longitudeSerie[closestLatLonIndex];
-
-      final int latE6 = (int) (latitude * 1E6);
-      final int lonE6 = (int) (longitude * 1E6);
-
-      final int latE6_Normalized = latE6 + 90_000_000;
-      final int lonE6_Normalized = lonE6 + 180_000_000;
 
       final int reqestedZoomlevel = 18;
 
-      final Set<TourLocationPoint> allTourLocationPoints = tourData.getTourLocationPoints();
+      /*
+       * Retrieve tour location
+       */
 
-      TourLocation tourLocation = null;
-      TourLocationPoint tourLocationPoint = null;
+      final TourLocationData locationData = TourLocationManager.getLocationData(locationLatitude, locationLongitude, null, reqestedZoomlevel);
 
-//      /*
-//       * Get location point from current tour
-//       */
-//      for (final TourLocationPoint tourLocationPointFromTourData : allTourLocationPoints) {
-//
-//         final TourLocation tourLocationFromPoint = tourLocationPointFromTourData.getTourLocation();
-//
-//         if (tourLocationFromPoint.isInBoundingBox(reqestedZoomlevel, latE6_Normalized, lonE6_Normalized)) {
-//
-//            tourLocation = tourLocationFromPoint;
-//            tourLocationPoint = tourLocationPointFromTourData;
-//
-//            break;
-//         }
-//      }
-//
-//      /*
-//       * Get tour location from cache
-//       */
-//      if (tourLocationPoint == null) {
-//
-//         final TourLocationCache locationCache = TourLocationManager.getLocationCache();
-//
-//         tourLocation = locationCache.get(latE6_Normalized, lonE6_Normalized, reqestedZoomlevel);
-//      }
+      if (locationData == null) {
 
-      if (tourLocation == null) {
+         // Could not retrieve location point with latitude: %.6f - longitude: %.6f
+         TourLogManager.log_DEFAULT(OtherMessages.LOG_TOUR_LOCATION_RETRIEVE_LOCATION_POINT.formatted(locationLatitude, locationLongitude));
 
-         // retrieve tour location
+         return;
+      }
 
-         final TourLocationData locationData = TourLocationManager.getLocationData(latitude, longitude, null, reqestedZoomlevel);
+      final TourLocation tourLocation = locationData.tourLocation;
 
-         if (locationData == null) {
+      if (tourData != null && closestLatLonIndex != -1) {
 
-            // Could not retrieve location point with latitude: %.6f - longitude: %.6f
-            TourLogManager.log_DEFAULT(OtherMessages.LOG_TOUR_LOCATION_RETRIEVE_LOCATION_POINT.formatted(latitude, longitude));
+         final int latE6 = (int) (locationLatitude * 1E6);
+         final int lonE6 = (int) (locationLongitude * 1E6);
 
-            return;
-         }
-
-         tourLocation = locationData.tourLocation;
-
-         tourLocationPoint = new TourLocationPoint(tourData, tourLocation);
+         final TourLocationPoint tourLocationPoint = new TourLocationPoint(tourData, tourLocation);
 
          tourLocationPoint.setGeoPosition(latE6, lonE6);
          tourLocationPoint.setSerieIndex(closestLatLonIndex);
          tourLocationPoint.setTourTime(absoluteTourTime);
 
-         allTourLocationPoints.add(tourLocationPoint);
-
-         MapLocationManager.getMapLocations().add(tourLocation);
+         tourData.getTourLocationPoints().add(tourLocationPoint);
       }
 
-      _map2View.getTourLocationDialog().updateUI(tourLocationPoint);
-
+      MapLocationManager.addLocation(tourLocation);
    }
 
    public void setCurrentHoveredTourId(final Long hoveredTourId) {
