@@ -21,15 +21,19 @@ import java.util.List;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnDefinitionFor1stVisibleAlignmentColumn;
 import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.ITourViewer2;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.data.TourLocation;
 import net.tourbook.tour.location.MapLocationManager;
+import net.tourbook.tour.location.TourLocationManager;
+import net.tourbook.tour.location.TourLocationManager.Zoomlevel;
+import net.tourbook.ui.TableColumnFactory;
 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -43,18 +47,23 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -68,11 +77,10 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * Map location slideout
  */
-public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer {
+public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer2 {
 
    private static final String           COLUMN_CREATED_DATE_TIME = "createdDateTime";                   //$NON-NLS-1$
-   private static final String           COLUMN_FILTER_NAME       = "filterName";                        //$NON-NLS-1$
-   private static final String           COLUMN_GEO_PARTS         = "geoParts";                          //$NON-NLS-1$
+   private static final String           COLUMN_LOCATION_NAME     = "LocationName";                      //$NON-NLS-1$
    private static final String           COLUMN_LATITUDE_1        = "latitude1";                         //$NON-NLS-1$
    private static final String           COLUMN_LATITUDE_2        = "latitude2";                         //$NON-NLS-1$
    private static final String           COLUMN_LONGITUDE_1       = "longitude1";                        //$NON-NLS-1$
@@ -86,9 +94,11 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
    private PixelConverter                _pc;
 
    private TableViewer                   _mapLocationViewer;
-   private CompareResultComparator       _mapLocationComparator   = new CompareResultComparator();
+   private MapLocationComparator         _mapLocationComparator   = new MapLocationComparator();
    private ColumnManager                 _columnManager;
    private SelectionAdapter              _columnSortListener;
+
+   private FocusListener                 _keepOpenListener;
 
    private ToolItem                      _toolItem;
 
@@ -99,7 +109,9 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
     */
    private Composite _viewerContainer;
 
-   private class CompareResultComparator extends ViewerComparator {
+   private Combo     _comboZoomlevel;
+
+   private class MapLocationComparator extends ViewerComparator {
 
       private static final int ASCENDING       = 0;
       private static final int DESCENDING      = 1;
@@ -119,10 +131,6 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
          // Determine which column and do the appropriate sort
          switch (__sortColumnId) {
 
-//         case COLUMN_GEO_PARTS:
-//            rc = location1.numGeoParts - location2.numGeoParts;
-//            break;
-//
 //         case COLUMN_LATITUDE_1:
 //            rc = location1.geoLocation_TopLeft.latitude - location2.geoLocation_TopLeft.latitude;
 //            break;
@@ -139,18 +147,18 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 //            rc = location1.geoLocation_BottomRight.longitude - location2.geoLocation_BottomRight.longitude;
 //            break;
 //
-//         case COLUMN_FILTER_NAME:
-//            rc = location1.filterName.compareTo(location2.filterName);
-//            break;
+         case COLUMN_LOCATION_NAME:
+            rc = location1.display_name.compareTo(location2.display_name);
+            break;
 
          case COLUMN_CREATED_DATE_TIME:
 
             // sorting by date is already set
             break;
 
-//         case COLUMN_ZOOM_LEVEL:
-//            rc = location1.mapZoomLevel - location2.mapZoomLevel;
-//            break;
+         case COLUMN_ZOOM_LEVEL:
+            rc = location1.zoomlevel - location2.zoomlevel;
+            break;
 
          default:
             _isSortByTime = true;
@@ -166,7 +174,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
          }
 
          /*
-          * MUST return 1 or -1 otherwise long values are not sorted correctly.
+          * MUST return 1 or -1 otherwise long values are not sorted correctly
           */
          return rc > 0 //
                ? 1
@@ -245,6 +253,8 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
       createUI(parent);
 
+      fillUI();
+
       // load viewer
       updateUI_Viewer();
 
@@ -265,13 +275,41 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       GridLayoutFactory.fillDefaults().applyTo(shellContainer);
 //      shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
       {
-         createUI_600_FilterViewer(shellContainer);
+         createUI_100_CustomizeLookup(shellContainer);
+         createUI_200_LocatitonViewer(shellContainer);
       }
 
       return shellContainer;
    }
 
-   private void createUI_600_FilterViewer(final Composite parent) {
+   private void createUI_100_CustomizeLookup(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            /*
+             * Zoomlevel
+             */
+
+            UI.createLabel(container,
+                  Messages.Slideout_MapLocation_Label_Zoomlevel,
+                  Messages.Slideout_TourLocation_Label_Zoomlevel_Tooltip);
+
+            _comboZoomlevel = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+            _comboZoomlevel.setVisibleItemCount(20);
+            _comboZoomlevel.setToolTipText(Messages.Slideout_TourLocation_Label_Zoomlevel_Tooltip);
+            _comboZoomlevel.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_Zoomlevel()));
+            _comboZoomlevel.addFocusListener(_keepOpenListener);
+
+            UI.createSpacer_Horizontal(container);
+         }
+      }
+
+   }
+
+   private void createUI_200_LocatitonViewer(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -286,7 +324,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
             GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
             GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
             {
-               createUI_610_FilterViewer_Table(_viewerContainer);
+               createUI_210_LocationViewer_Table(_viewerContainer);
             }
          }
 
@@ -294,7 +332,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       }
    }
 
-   private void createUI_610_FilterViewer_Table(final Composite parent) {
+   private void createUI_210_LocationViewer_Table(final Composite parent) {
 
       /*
        * Create table
@@ -338,7 +376,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       });
 
       /*
-       * create table viewer
+       * Create table viewer
        */
       _mapLocationViewer = new TableViewer(table);
 
@@ -354,20 +392,20 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       _mapLocationViewer.setContentProvider(new MapLocationContentProvider());
       _mapLocationViewer.setComparator(_mapLocationComparator);
 
-//      _geoFilterViewer.addSelectionChangedListener(selectionChangedEvent -> onGeoFilter_Select(selectionChangedEvent));
-//      _geoFilterViewer.addDoubleClickListener(doubleClickEvent -> onGeoFilter_ToggleReadEditMode());
+      _mapLocationViewer.addSelectionChangedListener(selectionChangedEvent -> onSelect_Location(selectionChangedEvent));
+//    _mapLocationViewer.addDoubleClickListener(doubleClickEvent -> onGeoFilter_ToggleReadEditMode());
 
       updateUI_SetSortDirection(
             _mapLocationComparator.__sortColumnId,
             _mapLocationComparator.__sortDirection);
 
-      createUI_620_ContextMenu();
+      createUI_220_LocationViewer_ContextMenu();
    }
 
    /**
     * Ceate the view context menus
     */
-   private void createUI_620_ContextMenu() {
+   private void createUI_220_LocationViewer_ContextMenu() {
 
       final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 
@@ -397,8 +435,12 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
    private void defineAllColumns() {
 
       defineColumn_00_SequenceNumber();
-      defineColumn_05_FilterName();
-      defineColumn_10_Created();
+      defineColumn_05_LocationName();
+      defineColumn_30_Zoomlevel();
+      defineColumn_40_BoundingBox_Width();
+      defineColumn_42_BoundingBox_Height();
+
+      defineColumn_99_Created();
 
       new ColumnDefinitionFor1stVisibleAlignmentColumn(_columnManager);
    }
@@ -412,6 +454,8 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       colDef.setColumnHeaderToolTipText(Messages.GeoCompare_View_Column_SequenceNumber_Label);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+
+      colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -428,9 +472,9 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
    /**
     * Column: Number of geo parts
     */
-   private void defineColumn_05_FilterName() {
+   private void defineColumn_05_LocationName() {
 
-      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_FILTER_NAME, SWT.LEAD);
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_LOCATION_NAME, SWT.LEAD);
 
       colDef.setColumnLabel(Messages.Slideout_TourGeoFilter_Column_FilterName_Label);
       colDef.setColumnHeaderText(Messages.Slideout_TourGeoFilter_Column_FilterName_Label);
@@ -460,9 +504,72 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
    }
 
    /**
+    * Column: Zoomlevel
+    */
+   private void defineColumn_30_Zoomlevel() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_ZOOM_LEVEL, SWT.TRAIL);
+
+      colDef.setColumnLabel(Messages.Map_Bookmark_Column_ZoomLevel2_Tooltip);
+      colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_ZoomLevel2);
+      colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_ZoomLevel2_Tooltip);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(5));
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourLocation item = (TourLocation) cell.getElement();
+
+            cell.setText(Integer.toString(item.zoomlevel + 0));
+         }
+      });
+   }
+
+   private void defineColumn_40_BoundingBox_Width() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BOUNDING_BOX_WIDTH.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourLocation tourLocation = (TourLocation) cell.getElement();
+
+            cell.setText(FormatManager.formatNumber_0(tourLocation.boundingBoxWidth));
+         }
+      });
+   }
+
+   private void defineColumn_42_BoundingBox_Height() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_BOUNDING_BOX_HEIGHT.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourLocation tourLocation = ((TourLocation) cell.getElement());
+
+            cell.setText(FormatManager.formatNumber_0(tourLocation.boundingBoxHeight));
+         }
+      });
+   }
+
+   /**
     * Column: Created
     */
-   private void defineColumn_10_Created() {
+   private void defineColumn_99_Created() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_CREATED_DATE_TIME, SWT.TRAIL);
 
@@ -481,13 +588,24 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
             final TourLocation item = (TourLocation) cell.getElement();
             final ZonedDateTime created = item.getCreated();
 
-            cell.setText(created.format(TimeTools.Formatter_DateTime_SM));
+            if (created != null) {
+
+               cell.setText(created.format(TimeTools.Formatter_DateTime_SM));
+            }
          }
       });
    }
 
    private void enableControls() {
 
+   }
+
+   private void fillUI() {
+
+      for (final Zoomlevel zoomlevel : TourLocationManager.ALL_ZOOM_LEVEL) {
+
+         _comboZoomlevel.add(TourLocationManager.ZOOM_LEVEL_ITEM.formatted(zoomlevel.zoomlevel, zoomlevel.label));
+      }
    }
 
    @Override
@@ -545,6 +663,42 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
             onSelect_SortColumn(e);
          }
       };
+
+      _keepOpenListener = new FocusListener() {
+
+         @Override
+         public void focusGained(final FocusEvent e) {
+
+            /*
+             * This will fix the problem that when the list of a combobox is displayed, then the
+             * slideout will disappear :-(((
+             */
+            setIsKeepOpenInternally(true);
+         }
+
+         @Override
+         public void focusLost(final FocusEvent e) {
+            setIsKeepOpenInternally(false);
+         }
+      };
+   }
+
+   @Override
+   public boolean isColumn0Visible(final ColumnViewer columnViewer) {
+
+      final TableColumn[] allColumns = _mapLocationViewer.getTable().getColumns();
+
+      if (allColumns.length > 0) {
+
+         final TableColumn column = allColumns[0];
+         final String columnId = ((ColumnDefinition) column.getData()).getColumnId();
+
+         if (ColumnDefinitionFor1stVisibleAlignmentColumn.COLUMN_ID.equals(columnId)) {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    @Override
@@ -558,6 +712,16 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
    @Override
    protected void onFocus() {
 
+   }
+
+   private void onSelect_Location(final SelectionChangedEvent selectionChangedEvent) {
+
+      final Object selectedItem = selectionChangedEvent.getStructuredSelection().getFirstElement();
+      final TourLocation selectedTourLocation = (TourLocation) selectedItem;
+
+      if (selectedTourLocation == null) {
+         return;
+      }
    }
 
    private void onSelect_SortColumn(final SelectionEvent e) {
@@ -577,6 +741,18 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       _viewerContainer.setRedraw(true);
    }
 
+   private void onSelect_Zoomlevel() {
+
+      int selectionIndex = _comboZoomlevel.getSelectionIndex();
+
+      if (selectionIndex < 0) {
+         selectionIndex = 0;
+      }
+
+      final int zoomlevel = TourLocationManager.ALL_ZOOM_LEVEL[selectionIndex].zoomlevel;
+      MapLocationManager.setLocationRequestZoomlevel(zoomlevel);
+   }
+
    @Override
    public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
@@ -584,7 +760,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       {
          _mapLocationViewer.getTable().dispose();
 
-         createUI_610_FilterViewer_Table(_viewerContainer);
+         createUI_210_LocationViewer_Table(_viewerContainer);
          _viewerContainer.layout();
 
          // update the viewer
@@ -602,6 +778,9 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
    }
 
    private void restoreState() {
+
+      // zoomlevel
+      _comboZoomlevel.select(TourLocationManager.getZoomlevelIndex(MapLocationManager.getLocationRequestZoomlevel()));
 
    }
 
@@ -672,7 +851,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       final TableColumn tc = getSortColumn(sortColumnId);
 
       table.setSortColumn(tc);
-      table.setSortDirection(sortDirection == CompareResultComparator.ASCENDING ? SWT.UP : SWT.DOWN);
+      table.setSortDirection(sortDirection == MapLocationComparator.ASCENDING ? SWT.UP : SWT.DOWN);
    }
 
    private void updateUI_Viewer() {

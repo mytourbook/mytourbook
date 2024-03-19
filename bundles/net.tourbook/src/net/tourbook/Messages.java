@@ -2340,6 +2340,7 @@ public class Messages extends NLS {
    public static String        Slideout_Map_TrackOptions_Label_Title_Tooltip;
 
    public static String        Slideout_MapLocation_Label_Title;
+   public static String        Slideout_MapLocation_Label_Zoomlevel;
 
    public static String        Slideout_MapModel_Column_Name;
    public static String        Slideout_MapModel_Dialog_DeleteModel_Message;

@@ -29,11 +29,13 @@ import org.eclipse.ui.PlatformUI;
  */
 public class MapLocationManager {
 
-   private static final char               NL               = UI.NEW_LINE;
+   private static final char               NL                        = UI.NEW_LINE;
 
-   private static final List<TourLocation> _allMapLocations = new ArrayList<>();
+   private static final List<TourLocation> _allMapLocations          = new ArrayList<>();
 
    private static SlideoutMapLocation      _mapLocationSlideout;
+
+   private static int                      _locationRequestZoomlevel = TourLocationManager.DEFAULT_ZOOM_LEVEL_VALUE;
 
    public static void addLocation(final TourLocation tourLocation) {
 
@@ -50,8 +52,17 @@ public class MapLocationManager {
       }
    }
 
+   public static int getLocationRequestZoomlevel() {
+      return _locationRequestZoomlevel;
+   }
+
    public static List<TourLocation> getMapLocations() {
       return _allMapLocations;
+   }
+
+   public static void setLocationRequestZoomlevel(final int locationRequestZoomlevel) {
+
+      _locationRequestZoomlevel = locationRequestZoomlevel;
    }
 
    public static void setMapLocationSlideout(final SlideoutMapLocation mapLocationSlideout) {

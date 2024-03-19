@@ -152,6 +152,7 @@ import net.tourbook.tour.filter.geo.GeoFilter_LoaderData;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
+import net.tourbook.tour.location.MapLocationManager;
 import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.photo.IMapWithPhotos;
 import net.tourbook.tour.photo.TourPhotoLink;
@@ -2307,6 +2308,9 @@ public class Map2View extends ViewPart implements
 
    @Override
    public void fillContextMenu(final IMenuManager menuMgr, final ActionManageOfflineImages actionManageOfflineImages) {
+
+      // update action UI
+      _actionLookupTourLocation.setText(Messages.Map_Action_LookupMapLocation.formatted(MapLocationManager.getLocationRequestZoomlevel()));
 
       enableActions();
 

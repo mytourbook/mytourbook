@@ -32,6 +32,7 @@ import javax.persistence.Transient;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.location.LocationPartID;
@@ -243,136 +244,144 @@ public class TourLocation implements Serializable {
    /*
     * Fields from {@link OSMAddress}
     */
-   public String continent;
+   public String         continent;
 
-   public String country;
-   public String country_code;
-   public String region;
+   public String         country;
+   public String         country_code;
+   public String         region;
 
-   public String state;
-   public String state_district;
-   public String county;
-   public String municipality;
+   public String         state;
+   public String         state_district;
+   public String         county;
+   public String         municipality;
 
-   public String city;
-   public String town;
-   public String village;
-   public String city_district;
+   public String         city;
+   public String         town;
+   public String         village;
+   public String         city_district;
 
-   public String district;
-   public String borough;
-   public String suburb;
-   public String subdivision;
-   public String hamlet;
+   public String         district;
+   public String         borough;
+   public String         suburb;
+   public String         subdivision;
+   public String         hamlet;
 
-   public String croft;
-   public String isolated_dwelling;
-   public String neighbourhood;
+   public String         croft;
+   public String         isolated_dwelling;
+   public String         neighbourhood;
 
-   public String allotments;
-   public String quarter;
-   public String city_block;
+   public String         allotments;
+   public String         quarter;
+   public String         city_block;
 
-   public String residential;
-   public String farm;
-   public String farmyard;
-   public String industrial;
-   public String commercial;
-   public String retail;
-   public String road;
+   public String         residential;
+   public String         farm;
+   public String         farmyard;
+   public String         industrial;
+   public String         commercial;
+   public String         retail;
+   public String         road;
    //
-   public String house_number;
-   public String house_name;
+   public String         house_number;
+   public String         house_name;
    //
-   public String aerialway;
-   public String aeroway;
-   public String amenity;
-   public String boundary;
-   public String bridge;
-   public String club;
-   public String craft;
-   public String emergency;
-   public String historic;
-   public String landuse;
-   public String leisure;
-   public String man_made;
-   public String military;
-   public String mountain_pass;
+   public String         aerialway;
+   public String         aeroway;
+   public String         amenity;
+   public String         boundary;
+   public String         bridge;
+   public String         club;
+   public String         craft;
+   public String         emergency;
+   public String         historic;
+   public String         landuse;
+   public String         leisure;
+   public String         man_made;
+   public String         military;
+   public String         mountain_pass;
 
    /**
     * "natural" seems to be a SQL name :-?
     * <p>
     * ERROR 42X01: Syntax error: Encountered "natural" at line 55, column 4.
     */
-   public String natural2;
+   public String         natural2;
 
-   public String office;
-   public String place;
-   public String railway;
-   public String shop;
-   public String tourism;
-   public String tunnel;
-   public String waterway;
-   public String postcode;
-
-   @Transient
-   public int    houseNumberValue = Integer.MIN_VALUE;
+   public String         office;
+   public String         place;
+   public String         railway;
+   public String         shop;
+   public String         tourism;
+   public String         tunnel;
+   public String         waterway;
+   public String         postcode;
 
    @Transient
-   public int    postcodeValue    = Integer.MIN_VALUE;
+   public int            houseNumberValue = Integer.MIN_VALUE;
 
    @Transient
-   public String settlementSmall;
-   @Transient
-   public String settlementLarge;
+   public int            postcodeValue    = Integer.MIN_VALUE;
 
    @Transient
-   public double latitude;
+   public String         settlementSmall;
    @Transient
-   public double longitude;
+   public String         settlementLarge;
 
    @Transient
-   public int    latitudeE6;
+   public double         latitude;
    @Transient
-   public int    longitudeE6;
+   public double         longitude;
 
-   /** Cardinal direction: South */
    @Transient
-   public double latitudeMin;
-
-   /** Cardinal direction: North */
+   public int            latitudeE6;
    @Transient
-   public double latitudeMax;
-
-   /** Cardinal direction: West */
-   @Transient
-   public double longitudeMin;
-
-   /** Cardinal direction: East */
-   @Transient
-   public double longitudeMax;
+   public int            longitudeE6;
 
    /** Cardinal direction: South */
    @Transient
-   public double latitudeMin_Resized;
+   public double         latitudeMin;
 
    /** Cardinal direction: North */
    @Transient
-   public double latitudeMax_Resized;
+   public double         latitudeMax;
 
    /** Cardinal direction: West */
    @Transient
-   public double longitudeMin_Resized;
+   public double         longitudeMin;
 
    /** Cardinal direction: East */
    @Transient
-   public double longitudeMax_Resized;
+   public double         longitudeMax;
+
+   /** Cardinal direction: South */
+   @Transient
+   public double         latitudeMin_Resized;
+
+   /** Cardinal direction: North */
+   @Transient
+   public double         latitudeMax_Resized;
+
+   /** Cardinal direction: West */
+   @Transient
+   public double         longitudeMin_Resized;
+
+   /** Cardinal direction: East */
+   @Transient
+   public double         longitudeMax_Resized;
 
    /**
     * Key for the <b>NOT</b> resized bounding box, is e.g. used to identify the location color
     */
    @Transient
-   public long   boundingBoxKey;
+   public long           boundingBoxKey;
+
+   /** Bounding box width in meters */
+   @Transient
+   public double         boundingBoxWidth;
+
+   /** Bounding box height in meters */
+   @Transient
+   public double         boundingBoxHeight;
 
    @Transient
    private ZonedDateTime created;
@@ -418,6 +427,14 @@ public class TourLocation implements Serializable {
       final TourLocation other = (TourLocation) obj;
 
       return locationID == other.locationID;
+   }
+
+   public ZonedDateTime getCreated() {
+      return created;
+   }
+
+   public long getCreatedMS() {
+      return createdMS;
    }
 
    public int getLatitudeDiff() {
@@ -588,23 +605,33 @@ public class TourLocation implements Serializable {
       final double dbLongitudeMin_Resized   = (longitudeMinE6_Resized_Normalized - 180_000_000) / 1E6;
       final double dbLongitudeMax_Resized   = (longitudeMaxE6_Resized_Normalized - 180_000_000) / 1E6;
 
-      latitude              = dbLatitude;
-      longitude             = dbLongitude;
+      latitude                = dbLatitude;
+      longitude               = dbLongitude;
 
-      latitudeMin           = dbLatitudeMin;
-      latitudeMax           = dbLatitudeMax;
-      longitudeMin          = dbLongitudeMin;
-      longitudeMax          = dbLongitudeMax;
+      latitudeMin             = dbLatitudeMin;
+      latitudeMax             = dbLatitudeMax;
+      longitudeMin            = dbLongitudeMin;
+      longitudeMax            = dbLongitudeMax;
 
-      latitudeMin_Resized   = dbLatitudeMin_Resized;
-      latitudeMax_Resized   = dbLatitudeMax_Resized;
-      longitudeMin_Resized  = dbLongitudeMin_Resized;
-      longitudeMax_Resized  = dbLongitudeMax_Resized;
+      latitudeMin_Resized     = dbLatitudeMin_Resized;
+      latitudeMax_Resized     = dbLatitudeMax_Resized;
+      longitudeMin_Resized    = dbLongitudeMin_Resized;
+      longitudeMax_Resized    = dbLongitudeMax_Resized;
 
-      boundingBoxKey        = latitudeMinE6_Normalized
-                            + latitudeMaxE6_Normalized
-                            + longitudeMinE6_Normalized
-                            + longitudeMaxE6_Normalized;
+      boundingBoxKey          = latitudeMinE6_Normalized
+                              + latitudeMaxE6_Normalized
+                              + longitudeMinE6_Normalized
+                              + longitudeMaxE6_Normalized;
+
+      boundingBoxHeight       = MtMath.distanceVincenty(
+
+                                    dbLatitudeMin_Resized,  dbLongitudeMin_Resized,
+                                    dbLatitudeMax_Resized,  dbLongitudeMin_Resized);
+
+      boundingBoxWidth        = MtMath.distanceVincenty(
+
+                                    dbLatitudeMin_Resized,  dbLongitudeMin_Resized,
+                                    dbLatitudeMin_Resized,  dbLongitudeMax_Resized);
 
 // SET_FORMATTING_ON
 
@@ -781,17 +808,5 @@ public class TourLocation implements Serializable {
 //            + log(" latitudeDiff                      = ", getLatitudeDiff()) //                   //$NON-NLS-1$
 //            + log(" longitudeDiff                     = ", getLongitudeDiff()) //                  //$NON-NLS-1$
       ;
-   }
-
-   public long getCreatedMS() {
-      return createdMS;
-   }
-
-   public void setCreatedMS(long createdMS) {
-      this.createdMS = createdMS;
-   }
-
-   public ZonedDateTime getCreated() {
-      return created;
    }
 }

@@ -30,13 +30,15 @@ import org.eclipse.swt.SWT;
  */
 public class ColumnDefinitionFor1stVisibleAlignmentColumn extends TableColumnDefinition {
 
+   public static final String COLUMN_ID = "1stVisibleColumnAlignment";
+
    /**
     * @param columnManager
     *           Manager which managed the columns.
     */
    public ColumnDefinitionFor1stVisibleAlignmentColumn(final ColumnManager columnManager) {
 
-      super(columnManager, "1stVisibleColumnAlignment", SWT.TRAIL); //$NON-NLS-1$
+      super(columnManager, COLUMN_ID, SWT.TRAIL);
 
       setDefaultColumnWidth(0);
 

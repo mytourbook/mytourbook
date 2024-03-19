@@ -81,8 +81,6 @@ public class SlideoutStartEndLocationProfiles extends AdvancedSlideout {
 
    private static final String             ID                = "net.tourbook.tour.location.SlideoutLocationProfiles"; //$NON-NLS-1$
 
-   private static final String             ZOOM_LEVEL_ITEM   = "%3d  %s";                                             //$NON-NLS-1$
-
    private static final String             STATE_SASH_HEIGHT = "STATE_SASH_HEIGHT";                                   //$NON-NLS-1$
 
    private static final IDialogSettings    _state            = TourbookPlugin.getState(ID);
@@ -253,11 +251,11 @@ public class SlideoutStartEndLocationProfiles extends AdvancedSlideout {
     * @param isStartLocation
     */
    public SlideoutStartEndLocationProfiles(final ITourLocationConsumer tourLocationConsumer,
-                                   final TourLocation tourLocation,
-                                   final Control ownerControl,
-                                   final Rectangle ownerBounds,
-                                   final IDialogSettings state,
-                                   final boolean isStartLocation) {
+                                           final TourLocation tourLocation,
+                                           final Control ownerControl,
+                                           final Rectangle ownerBounds,
+                                           final IDialogSettings state,
+                                           final boolean isStartLocation) {
 
       super(ownerControl, state, new int[] { 800, 800 });
 
@@ -795,7 +793,7 @@ public class SlideoutStartEndLocationProfiles extends AdvancedSlideout {
 
       for (final Zoomlevel zoomlevel : TourLocationManager.ALL_ZOOM_LEVEL) {
 
-         _comboZoomlevel.add(ZOOM_LEVEL_ITEM.formatted(zoomlevel.zoomlevel, zoomlevel.label));
+         _comboZoomlevel.add(TourLocationManager.ZOOM_LEVEL_ITEM.formatted(zoomlevel.zoomlevel, zoomlevel.label));
       }
    }
 

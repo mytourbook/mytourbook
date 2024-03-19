@@ -44,7 +44,10 @@ public class ActionLookupMapLocation extends Action {
 
    public ActionLookupMapLocation(final Map2View mapView) {
 
-      super(Messages.Map_Action_LookUpMapLocation, AS_PUSH_BUTTON);
+      super(Messages.Map_Action_LookupMapLocation.formatted(MapLocationManager.getLocationRequestZoomlevel()),
+            AS_PUSH_BUTTON);
+
+//      setToolTipText("tooltip");
 
       _map2View = mapView;
 
@@ -107,13 +110,19 @@ public class ActionLookupMapLocation extends Action {
 
       }
 
-      final int reqestedZoomlevel = 18;
+      final int reqestedZoomlevel = MapLocationManager.getLocationRequestZoomlevel();
 
       /*
        * Retrieve tour location
        */
 
-      final TourLocationData locationData = TourLocationManager.getLocationData(locationLatitude, locationLongitude, null, reqestedZoomlevel);
+      final TourLocationData locationData = TourLocationManager.getLocationData(
+
+            locationLatitude,
+            locationLongitude,
+            null,
+            reqestedZoomlevel,
+            false);
 
       if (locationData == null) {
 

@@ -179,7 +179,7 @@ public class TourLocationManager {
     * 17 major and minor streets
     * 18 building
     */
-   static Zoomlevel[]         ALL_ZOOM_LEVEL              = {
+   public static Zoomlevel[]         ALL_ZOOM_LEVEL              = {
 
          new Zoomlevel( 3, Messages.Tour_Location_Zoomlevel_03_Country), //            0
          new Zoomlevel( 5, Messages.Tour_Location_Zoomlevel_05_State), //              1
@@ -194,8 +194,10 @@ public class TourLocationManager {
          new Zoomlevel(18, Messages.Tour_Location_Zoomlevel_18_Building) //            10
    };
 
-   public static Zoomlevel    DEFAULT_ZOOM_LEVEL          = ALL_ZOOM_LEVEL[5];
-   public static int          DEFAULT_ZOOM_LEVEL_VALUE    = DEFAULT_ZOOM_LEVEL.zoomlevel;
+   public static Zoomlevel    DEFAULT_ZOOM_LEVEL         = ALL_ZOOM_LEVEL[5];
+   public static int          DEFAULT_ZOOM_LEVEL_VALUE   = DEFAULT_ZOOM_LEVEL.zoomlevel;
+
+   public static final String ZOOM_LEVEL_ITEM            = "%3d  %s";                                             //$NON-NLS-1$
 
    public static Map<LocationPartID, String> ALL_LOCATION_PART_AND_LABEL = Map.ofEntries(
 
@@ -279,10 +281,10 @@ public class TourLocationManager {
 
 // SET_FORMATTING_ON
 
-   static class Zoomlevel {
+   public static class Zoomlevel {
 
-      int    zoomlevel;
-      String label;
+      public int    zoomlevel;
+      public String label;
 
       public Zoomlevel(final int zoomlevel, final String label) {
 
@@ -1170,8 +1172,6 @@ public class TourLocationManager {
    }
 
    /**
-    * Retrieve location data when not yet available
-    *
     * @param latitude
     * @param longitude
     * @param existingLocationData
@@ -1185,6 +1185,34 @@ public class TourLocationManager {
                                                   final TourLocationData existingLocationData,
                                                   final int zoomlevel) {
 
+      return getLocationData(
+
+            latitude,
+            longitude,
+            existingLocationData,
+            zoomlevel,
+            true);
+   }
+
+   /**
+    * Retrieve location data when not yet available
+    *
+    * @param latitude
+    * @param longitude
+    * @param existingLocationData
+    *           Is checking this existing location and returns it when it fits.
+    * @param zoomlevel
+    * @param isUseSavedLocations
+    *           When <code>false</code> then the location is always retrieved
+    *
+    * @return Returns {@link TourLocationData} or <code>null</code> when it could not be retrieved
+    */
+   public static TourLocationData getLocationData(final double latitude,
+                                                  final double longitude,
+                                                  final TourLocationData existingLocationData,
+                                                  final int zoomlevel,
+                                                  final boolean isUseSavedLocations) {
+
 // enable logging when debugging
 //    _isLogging_AddressRetrieval = true;
 
@@ -1195,13 +1223,18 @@ public class TourLocationManager {
          return existingLocationData;
       }
 
-      /*
-       * Check if a tour location is already saved
-       */
-      final TourLocation dbTourLocation = TourDatabase.getTourLocation(latitude, longitude, zoomlevel);
-      if (dbTourLocation != null) {
+      if (isUseSavedLocations) {
 
-         return new TourLocationData(dbTourLocation);
+         // check if a tour location is already saved
+
+         final TourLocation dbTourLocation = TourDatabase.getTourLocation(latitude, longitude, zoomlevel);
+
+         if (dbTourLocation != null) {
+
+            // return saved location
+
+            return new TourLocationData(dbTourLocation);
+         }
       }
 
       /*
