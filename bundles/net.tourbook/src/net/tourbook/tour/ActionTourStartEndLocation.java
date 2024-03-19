@@ -36,7 +36,7 @@ import net.tourbook.data.TourLocation;
 import net.tourbook.tour.location.ITourLocationConsumer;
 import net.tourbook.tour.location.LocationPartID;
 import net.tourbook.tour.location.PartItem;
-import net.tourbook.tour.location.SlideoutLocationProfiles;
+import net.tourbook.tour.location.SlideoutStartEndLocationProfiles;
 import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.location.TourLocationProfile;
 
@@ -62,7 +62,7 @@ import org.eclipse.swt.widgets.ToolItem;
 /**
  * Action to download and set tour locations
  */
-public class ActionTourLocation extends ContributionItem {
+public class ActionTourStartEndLocation extends ContributionItem {
 
    private static IDialogSettings         _state;
 
@@ -78,7 +78,7 @@ public class ActionTourLocation extends ContributionItem {
    private ActionLocationPart             _actionLocationPart;
    private ActionSlideoutLocationProfiles _actionSlideoutLocationProfiles;
    //
-   private SlideoutLocationProfiles       _slideoutLocationProfiles;
+   private SlideoutStartEndLocationProfiles       _slideoutLocationProfiles;
    //
    private ITourLocationConsumer          _tourLocationConsumer;
    //
@@ -209,7 +209,7 @@ public class ActionTourLocation extends ContributionItem {
     * @param isStartLocation
     * @param stateId
     */
-   public ActionTourLocation(final ITourLocationConsumer tourLocationConsumer,
+   public ActionTourStartEndLocation(final ITourLocationConsumer tourLocationConsumer,
                              final boolean isStartLocation,
                              final String stateId) {
 
@@ -240,7 +240,7 @@ public class ActionTourLocation extends ContributionItem {
                ? _tourData.getTourLocationStart()
                : _tourData.getTourLocationEnd();
 
-         _slideoutLocationProfiles = new SlideoutLocationProfiles(
+         _slideoutLocationProfiles = new SlideoutStartEndLocationProfiles(
 
                _tourLocationConsumer,
                tourLocation,
@@ -255,7 +255,7 @@ public class ActionTourLocation extends ContributionItem {
        * Close other location slideout that only one slideout is open, otherwise they can
        * conflict because they are using the same model
        */
-      _tourLocationConsumer.closeOtherSlideouts(ActionTourLocation.this);
+      _tourLocationConsumer.closeOtherSlideouts(ActionTourStartEndLocation.this);
 
       _slideoutLocationProfiles.open(false);
    }

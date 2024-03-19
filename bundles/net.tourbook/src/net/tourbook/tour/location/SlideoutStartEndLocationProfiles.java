@@ -77,7 +77,7 @@ import org.eclipse.swt.widgets.Text;
 /**
  * Slideout for the start/end location
  */
-public class SlideoutLocationProfiles extends AdvancedSlideout {
+public class SlideoutStartEndLocationProfiles extends AdvancedSlideout {
 
    private static final String             ID                = "net.tourbook.tour.location.SlideoutLocationProfiles"; //$NON-NLS-1$
 
@@ -252,7 +252,7 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
     * @param state
     * @param isStartLocation
     */
-   public SlideoutLocationProfiles(final ITourLocationConsumer tourLocationConsumer,
+   public SlideoutStartEndLocationProfiles(final ITourLocationConsumer tourLocationConsumer,
                                    final TourLocation tourLocation,
                                    final Control ownerControl,
                                    final Rectangle ownerBounds,

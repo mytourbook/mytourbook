@@ -89,7 +89,7 @@ import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
-import net.tourbook.tour.ActionTourLocation;
+import net.tourbook.tour.ActionTourStartEndLocation;
 import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.DialogEditTimeSlicesValues;
 import net.tourbook.tour.ITourEventListener;
@@ -568,8 +568,8 @@ public class TourDataEditorView extends ViewPart implements
    private ActionOpenMarkerDialog                     _actionOpenMarkerDialog;
    private ActionSetStartDistanceTo0                  _actionSetStartDistanceTo_0;
    private ActionSplitTour                            _actionSplitTour;
-   private ActionTourLocation                         _actionStartLocation;
-   private ActionTourLocation                         _actionEndLocation;
+   private ActionTourStartEndLocation                 _actionStartLocation;
+   private ActionTourStartEndLocation                 _actionEndLocation;
    private ActionToggleReadEditMode                   _actionToggleReadEditMode;
    private ActionToggleRowSelectMode                  _actionToggleRowSelectMode;
    private ActionViewSettings                         _actionViewSettings;
@@ -3190,8 +3190,8 @@ public class TourDataEditorView extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-      _actionStartLocation    = new ActionTourLocation(this, true, ID);
-      _actionEndLocation      = new ActionTourLocation(this, false, ID);
+      _actionStartLocation    = new ActionTourStartEndLocation(this, true, ID);
+      _actionEndLocation      = new ActionTourStartEndLocation(this, false, ID);
 
 // SET_FORMATTING_ON
    }
