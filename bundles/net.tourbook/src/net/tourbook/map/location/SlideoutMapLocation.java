@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map.location;
 
+import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -83,10 +84,6 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
    private static final String           COLUMN_CREATED_DATE_TIME    = "createdDateTime";                   //$NON-NLS-1$
    private static final String           COLUMN_LOCATION_NAME        = "LocationName";                      //$NON-NLS-1$
-   private static final String           COLUMN_LATITUDE_1           = "latitude1";                         //$NON-NLS-1$
-   private static final String           COLUMN_LATITUDE_2           = "latitude2";                         //$NON-NLS-1$
-   private static final String           COLUMN_LONGITUDE_1          = "longitude1";                        //$NON-NLS-1$
-   private static final String           COLUMN_LONGITUDE_2          = "longitude2";                        //$NON-NLS-1$
    private static final String           COLUMN_SEQUENCE             = "sequence";                          //$NON-NLS-1$
    private static final String           COLUMN_ZOOM_LEVEL           = "zoomLevel";                         //$NON-NLS-1$
 
@@ -107,7 +104,13 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
    private ToolItem                      _toolItem;
 
-   List<TourLocation>                    _allMapLocations            = MapLocationManager.getMapLocations();
+   private List<TourLocation>            _allMapLocations            = MapLocationManager.getMapLocations();
+
+   private final NumberFormat            _nf6                        = NumberFormat.getNumberInstance();
+   {
+      _nf6.setMinimumFractionDigits(6);
+      _nf6.setMaximumFractionDigits(6);
+   }
 
    /*
     * UI controls
@@ -121,7 +124,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       private static final int ASCENDING       = 0;
       private static final int DESCENDING      = 1;
 
-      private String           __sortColumnId  = COLUMN_LATITUDE_1;
+      private String           __sortColumnId  = COLUMN_CREATED_DATE_TIME;
       private int              __sortDirection = ASCENDING;
 
       @Override
@@ -136,22 +139,6 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
          // Determine which column and do the appropriate sort
          switch (__sortColumnId) {
 
-//         case COLUMN_LATITUDE_1:
-//            rc = location1.geoLocation_TopLeft.latitude - location2.geoLocation_TopLeft.latitude;
-//            break;
-//
-//         case COLUMN_LONGITUDE_1:
-//            rc = location1.geoLocation_TopLeft.longitude - location2.geoLocation_TopLeft.longitude;
-//            break;
-//
-//         case COLUMN_LATITUDE_2:
-//            rc = location1.geoLocation_BottomRight.latitude - location2.geoLocation_BottomRight.latitude;
-//            break;
-//
-//         case COLUMN_LONGITUDE_2:
-//            rc = location1.geoLocation_BottomRight.longitude - location2.geoLocation_BottomRight.longitude;
-//            break;
-//
          case COLUMN_LOCATION_NAME:
             rc = location1.display_name.compareTo(location2.display_name);
             break;
@@ -163,6 +150,26 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
          case COLUMN_ZOOM_LEVEL:
             rc = location1.zoomlevel - location2.zoomlevel;
+            break;
+
+         case TableColumnFactory.LOCATION_GEO_LATITUDE_ID:
+
+            rc = location1.latitudeE6_Normalized - location2.latitudeE6_Normalized;
+
+            if (rc == 0) {
+               rc = location1.longitudeE6_Normalized - location2.longitudeE6_Normalized;
+            }
+
+            break;
+
+         case TableColumnFactory.LOCATION_GEO_LONGITUDE_ID:
+
+            rc = location1.longitudeE6_Normalized - location2.longitudeE6_Normalized;
+
+            if (rc == 0) {
+               rc = location1.latitudeE6_Normalized - location2.latitudeE6_Normalized;
+            }
+
             break;
 
          default:
@@ -327,7 +334,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       /*
        * Create table
        */
-      final Table table = new Table(parent, SWT.FULL_SELECTION);
+      final Table table = new Table(parent, SWT.FULL_SELECTION | SWT.MULTI);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
       table.setHeaderVisible(true);
@@ -452,6 +459,9 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       defineColumn_30_Zoomlevel();
       defineColumn_40_BoundingBox_Width();
       defineColumn_42_BoundingBox_Height();
+
+      defineColumn_Geo_20_Latitude();
+      defineColumn_Geo_22_Longitude();
 
       defineColumn_99_Created();
 
@@ -605,6 +615,38 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
                cell.setText(created.format(TimeTools.Formatter_DateTime_SM));
             }
+         }
+      });
+   }
+
+   private void defineColumn_Geo_20_Latitude() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LATITUDE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(_nf6.format(((TourLocation) cell.getElement()).latitude));
+         }
+      });
+   }
+
+   private void defineColumn_Geo_22_Longitude() {
+
+      final ColumnDefinition colDef = TableColumnFactory.LOCATION_GEO_LONGITUDE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(_nf6.format(((TourLocation) cell.getElement()).longitude));
          }
       });
    }

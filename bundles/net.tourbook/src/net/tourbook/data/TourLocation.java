@@ -245,7 +245,7 @@ public class TourLocation implements Serializable {
    public String appliedName;
 
    /**
-    * Datetime when a names was applied last to the associated tours
+    * Datetime when a name was applied last to the associated tours
     */
    public long   lastModified;
 
@@ -424,6 +424,20 @@ public class TourLocation implements Serializable {
       createdMS = TimeTools.toEpochMilli(created);
 
       _createId = _createCounter.incrementAndGet();
+   }
+
+   /**
+    * Constructor for imported locations
+    *
+    * @param zonedDateTime
+    *           Date/time when the location was created
+    */
+   public TourLocation(final ZonedDateTime zonedDateTime) {
+
+      _createId = _createCounter.incrementAndGet();
+
+      created = zonedDateTime;
+      createdMS = TimeTools.toEpochMilli(zonedDateTime);
    }
 
    @Override
