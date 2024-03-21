@@ -131,8 +131,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
       int adjustedRGB = Integer.MIN_VALUE;
 
-      final float brightnessClipValue = 0.3f;
-      final float darknessClipValue = 0.8f;
+      final float brightnessClipValue = 0.5f;
+      final float darknessClipValue = 0.6f;
 
       if (_isMapBackgroundDark) {
 
@@ -734,18 +734,23 @@ public class DirectMappingPainter implements IDirectPainter {
    @Override
    public void paint(final DirectPainterContext painterContext) {
 
-      if (_map == null || _allTourLocations == null) {
+      if (_map == null) {
          return;
       }
 
       if (_isShowTourLocation) {
 
-         drawTourLocation(painterContext, _allTourLocations);
+         if (_allTourLocations != null && _allTourLocations.size() > 0) {
 
-         final List<TourLocation> allLocationLookUps = MapLocationManager.getMapLocations();
+            drawTourLocation(painterContext, _allTourLocations);
+         }
 
-         drawTourLocation(painterContext, allLocationLookUps);
+         final List<TourLocation> allMapLocations = MapLocationManager.getMapLocations();
 
+         if (allMapLocations.size() > 0) {
+
+            drawTourLocation(painterContext, allMapLocations);
+         }
       }
 
       if (_tourData == null
@@ -826,23 +831,26 @@ public class DirectMappingPainter implements IDirectPainter {
 
       _sliderPathPaintingData    = sliderRelationPaintingData;
 
-
 // SET_FORMATTING_ON
    }
 
-   public void setPaintContextValues(final boolean isShowTourLocations,
-                                     final boolean isShowTourLocations_BoundingBox,
-                                     final boolean isMapBackgroundDark) {
+   public void setPaintContextValues(final boolean isMapBackgroundDark) {
 
-      final List<TourLocation> allLocationLookUps = MapLocationManager.getMapLocations();
+      final boolean isShowTourLocations = Util.getStateBoolean(_state,
+            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS,
+            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT);
+
+      final boolean isShowTourLocations_BBox = Util.getStateBoolean(_state,
+            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX,
+            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX_DEFAULT);
 
 // SET_FORMATTING_OFF
 
-      final boolean hasLocations          = _allTourLocations != null && _allTourLocations.size() > 0;
-      final boolean hasLocationLookUps    = allLocationLookUps != null && allLocationLookUps.size() > 0;
+      final boolean hasTourLocations      = _allTourLocations != null && _allTourLocations.size() > 0;
+      final boolean hasMapLocations       = MapLocationManager.getMapLocations().size() > 0;
 
-      _isShowTourLocation                 = isShowTourLocations && (hasLocations || hasLocationLookUps);
-      _isShowTourLocations_BoundingBox    = isShowTourLocations_BoundingBox;
+      _isShowTourLocation                 = isShowTourLocations && (hasTourLocations || hasMapLocations);
+      _isShowTourLocations_BoundingBox    = isShowTourLocations_BBox;
 
       _isMapBackgroundDark                = isMapBackgroundDark;
 
@@ -855,14 +863,9 @@ public class DirectMappingPainter implements IDirectPainter {
             Map2View.STATE_IS_SHOW_TOUR_LOCATIONS,
             Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT);
 
-      final List<TourLocation> allLocationLookUps = MapLocationManager.getMapLocations();
-
 // SET_FORMATTING_OFF
 
-      final boolean hasLocations       = allLocations != null && allLocations.size() > 0;
-      final boolean hasLocationLookUps = allLocationLookUps != null && allLocationLookUps.size() > 0;
-
-      _isShowTourLocation  = isShowTourLocations && (hasLocations || hasLocationLookUps);
+      _isShowTourLocation  = isShowTourLocations;
       _allTourLocations    = allLocations;
 
 // SET_FORMATTING_ON

@@ -291,7 +291,7 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
    @Override
    public void onChangeUI_External() {
 
-      _map2View.restoreState_Map2_Options();
+      _map2View.updateState_Map2_Options();
    }
 
    private void onChangeUI_UpdateMap() {
@@ -300,7 +300,7 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
 
       enableControls();
 
-      _map2View.restoreState_Map2_Options();
+      _map2View.updateState_Map2_Options();
    }
 
    @Override

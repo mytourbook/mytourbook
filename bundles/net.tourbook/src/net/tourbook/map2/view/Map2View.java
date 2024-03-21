@@ -1388,6 +1388,13 @@ public class Map2View extends ViewPart implements
       _map.setMapContextProvider(this);
    }
 
+   public void addMapLocation(final TourLocation tourLocation) {
+
+      _slideoutMapLocation.open(false);
+
+      MapLocationManager.addLocation(tourLocation);
+   }
+
    private void addPartListener() {
 
       _partListener = new IPartListener2() {
@@ -1675,7 +1682,7 @@ public class Map2View extends ViewPart implements
 
       final Rectangle positionRect = _map.getWorldPixelFromGeoPositions(positionBounds, zoom);
 
-      final Point center = new Point(//
+      final Point center = new Point(
             positionRect.x + positionRect.width / 2,
             positionRect.y + positionRect.height / 2);
 
@@ -2188,7 +2195,7 @@ public class Map2View extends ViewPart implements
       final boolean isOneTourHovered      = hoveredTourId != null;
 
       _actionCreateTourMarkerFromMap      .setEnabled(isTourAvailable && isOneTourHovered);
-      _actionLookupTourLocation           .setEnabled(isTourAvailable);
+      _actionLookupTourLocation           .setEnabled(true);
       _actionMap2Slideout_Color           .setEnabled(isTourAvailable);
       _actionShowLegendInMap              .setEnabled(_isTourOrWayPointDisplayed);
       _actionShowPOI                      .setEnabled(_poiPosition != null);
@@ -2308,9 +2315,6 @@ public class Map2View extends ViewPart implements
 
    @Override
    public void fillContextMenu(final IMenuManager menuMgr, final ActionManageOfflineImages actionManageOfflineImages) {
-
-      // update action UI
-      _actionLookupTourLocation.setText(Messages.Map_Action_LookupMapLocation.formatted(MapLocationManager.getLocationRequestZoomlevel()));
 
       enableActions();
 
@@ -2903,7 +2907,10 @@ public class Map2View extends ViewPart implements
 
       final float dimLevelPercent = mapDimValue / MAX_DIM_STEPS * 100;
 
-      return isMapDimmed && dimLevelPercent >= 30;
+      // background is dark when dim level > 20 %
+      final boolean isDark = isMapDimmed && dimLevelPercent > 20;
+
+      return isDark;
    }
 
    private boolean isShowTrackColor_InContextMenu() {
@@ -4587,147 +4594,11 @@ public class Map2View extends ViewPart implements
       final boolean isShowTileBorder = _prefStore.getBoolean(PREF_SHOW_TILE_BORDER);
 
       _map.setShowDebugInfo(isShowTileInfo, isShowTileBorder, isShowGeoGrid);
-      restoreState_Map2_TrackOptions(false);
-      restoreState_Map2_Options();
+      updateState_Map2_TrackOptions(false);
+      updateState_Map2_Options();
 
       // display the map with the default position
       actionSetDefaultPosition();
-   }
-
-   void restoreState_Map2_Options() {
-
-// SET_FORMATTING_OFF
-
-      /*
-       * Hovered/selected tour
-       */
-      final boolean isShowHoveredOrSelectedTour = Util.getStateBoolean(_state,   STATE_IS_SHOW_HOVERED_SELECTED_TOUR,                     STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
-      final boolean isShowBreadcrumbs           = Util.getStateBoolean(_state,   STATE_IS_SHOW_BREADCRUMBS,                               STATE_IS_SHOW_BREADCRUMBS_DEFAULT);
-
-      final int numVisibleBreadcrumbs           = Util.getStateInt(_state,       STATE_VISIBLE_BREADCRUMBS,                               STATE_VISIBLE_BREADCRUMBS_DEFAULT);
-      final int hoveredOpacity                  = Util.getStateInt(_state,       STATE_HOVERED_SELECTED__HOVERED_OPACITY,                 STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT);
-      final int hoveredAndSelectedOpacity       = Util.getStateInt(_state,       STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY,    STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY_DEFAULT);
-      final int selectedOpacity                 = Util.getStateInt(_state,       STATE_HOVERED_SELECTED__SELECTED_OPACITY,                STATE_HOVERED_SELECTED__SELECTED_OPACITY_DEFAULT);
-      final RGB hoveredRGB                      = Util.getStateRGB(_state,       STATE_HOVERED_SELECTED__HOVERED_RGB,                     STATE_HOVERED_SELECTED__HOVERED_RGB_DEFAULT);
-      final RGB hoveredAndSelectedRGB           = Util.getStateRGB(_state,       STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB,        STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB_DEFAULT);
-      final RGB selectedRGB                     = Util.getStateRGB(_state,       STATE_HOVERED_SELECTED__SELECTED_RGB,                    STATE_HOVERED_SELECTED__SELECTED_RGB_DEFAULT);
-
-      _map.setConfig_HoveredSelectedTour(
-
-            isShowHoveredOrSelectedTour,
-            isShowBreadcrumbs,
-
-            numVisibleBreadcrumbs,
-            hoveredRGB,
-            hoveredOpacity,
-            hoveredAndSelectedRGB,
-            hoveredAndSelectedOpacity,
-            selectedRGB,
-            selectedOpacity
-      );
-
-      _tourPainterConfig.isShowBreadcrumbs   = isShowBreadcrumbs;
-
-
-      /*
-       * Tour direction
-       */
-      final boolean isShowTourDirection         = Util.getStateBoolean(_state,      STATE_IS_SHOW_TOUR_DIRECTION,          STATE_IS_SHOW_TOUR_DIRECTION_DEFAULT);
-      final boolean isShowTourDirection_Always  = Util.getStateBoolean(_state,      STATE_IS_SHOW_TOUR_DIRECTION_ALWAYS,   STATE_IS_SHOW_TOUR_DIRECTION_ALWAYS_DEFAULT);
-      final int tourDirection_MarkerGap         = Util.getStateInt(_state,          STATE_TOUR_DIRECTION_MARKER_GAP,       STATE_TOUR_DIRECTION_MARKER_GAP_DEFAULT);
-      final int tourDirection_LineWidth         = Util.getStateInt(_state,          STATE_TOUR_DIRECTION_LINE_WIDTH,       STATE_TOUR_DIRECTION_LINE_WIDTH_DEFAULT);
-      final float tourDirection_SymbolSize      = Util.getStateInt(_state,          STATE_TOUR_DIRECTION_SYMBOL_SIZE,      STATE_TOUR_DIRECTION_SYMBOL_SIZE_DEFAULT);
-      final RGB tourDirection_RGB               = Util.getStateRGB(_state,          STATE_TOUR_DIRECTION_RGB,              STATE_TOUR_DIRECTION_RGB_DEFAULT);
-
-      _map.setConfig_TourDirection(
-            isShowTourDirection,
-            isShowTourDirection_Always,
-            tourDirection_MarkerGap,
-            tourDirection_LineWidth,
-            tourDirection_SymbolSize,
-            tourDirection_RGB);
-
-      _map.setIsInInverseKeyboardPanning(Util.getStateBoolean(_state,   STATE_IS_TOGGLE_KEYBOARD_PANNING,   STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
-
-      /*
-       * Set dim level/color after the map providers are set
-       */
-      final boolean isMapDimmed     = Util.getStateBoolean( _state, STATE_IS_MAP_DIMMED, STATE_IS_MAP_DIMMED_DEFAULT);
-      final int mapDimValue         = Util.getStateInt(     _state, STATE_DIM_MAP_VALUE, STATE_DIM_MAP_VALUE_DEFAULT);
-      final RGB mapDimColor         = Util.getStateRGB(     _state, STATE_DIM_MAP_COLOR, STATE_DIM_MAP_COLOR_DEFAULT);
-      final boolean isBackgroundDark = isBackgroundDark();
-
-      _map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, isBackgroundDark);
-
-      /*
-       * Painting
-       */
-      _tourPainterConfig.isBackgroundDark = isBackgroundDark;
-
-      /*
-       * Tour pauses
-       */
-      final boolean isFilterTourPauses    = Util.getStateBoolean( _state, TourPauseUI.STATE_IS_FILTER_TOUR_PAUSES,      TourPauseUI.STATE_IS_FILTER_TOUR_PAUSES_DEFAULT);
-      final boolean isFilterPauseDuration = Util.getStateBoolean( _state, TourPauseUI.STATE_IS_FILTER_PAUSE_DURATION,   TourPauseUI.STATE_IS_FILTER_PAUSE_DURATION_DEFAULT);
-
-      final boolean isShowAutoPauses      = Util.getStateBoolean( _state, TourPauseUI.STATE_IS_SHOW_AUTO_PAUSES,        TourPauseUI.STATE_IS_SHOW_AUTO_PAUSES_DEFAULT);
-      final boolean isShowUserPauses      = Util.getStateBoolean( _state, TourPauseUI.STATE_IS_SHOW_USER_PAUSES,        TourPauseUI.STATE_IS_SHOW_USER_PAUSES_DEFAULT);
-
-      final long pauseDuration            = Util.getStateLong(    _state, TourPauseUI.STATE_DURATION_FILTER_SUMMARIZED, 0);
-      final Enum<TourFilterFieldOperator> pauseDurationOperator = Util.getStateEnum(_state, TourPauseUI.STATE_DURATION_OPERATOR, TourPauseUI.STATE_DURATION_OPERATOR_DEFAULT);
-
-      _tourPainterConfig.isFilterTourPauses     = isFilterTourPauses;
-      _tourPainterConfig.isFilterPauseDuration  = isFilterPauseDuration;
-      _tourPainterConfig.isShowAutoPauses       = isShowAutoPauses;
-      _tourPainterConfig.isShowUserPauses       = isShowUserPauses;
-      _tourPainterConfig.pauseDuration          = pauseDuration;
-      _tourPainterConfig.pauseDurationOperator  = pauseDurationOperator;
-
-      /*
-       * Tour locations
-       */
-      final boolean isShowTourLocations         = Util.getStateBoolean( _state, STATE_IS_SHOW_TOUR_LOCATIONS,              STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT);
-      final boolean isShowTourLocations_BBox    = Util.getStateBoolean( _state, STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX, STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX_DEFAULT);
-
-// SET_FORMATTING_ON
-
-      _directMappingPainter.setPaintContextValues(
-
-            isShowTourLocations,
-            isShowTourLocations_BBox,
-
-            isBackgroundDark);
-
-      setIconPosition_TourInfo();
-      setIconPosition_TourWeather();
-
-      // create legend image after the dim level is modified
-      createLegendImage(_tourPainterConfig.getMapColorProvider());
-
-      _map.paint();
-   }
-
-   void restoreState_Map2_TrackOptions(final boolean isUpdateMapUI) {
-
-// SET_FORMATTING_OFF
-
-      _actionShowSliderInMap.setChecked(          Util.getStateBoolean(_state,   STATE_IS_SHOW_SLIDER_IN_MAP,  STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT));
-
-      _sliderPathPaintingData = new SliderPathPaintingData();
-
-      _sliderPathPaintingData.isShowSliderPath  = Util.getStateBoolean(_state,   STATE_IS_SHOW_SLIDER_PATH,    STATE_IS_SHOW_SLIDER_PATH_DEFAULT);
-      _sliderPathPaintingData.opacity           = Util.getStateInt(_state,       STATE_SLIDER_PATH_OPACITY,    STATE_SLIDER_PATH_OPACITY_DEFAULT);
-      _sliderPathPaintingData.segments          = Util.getStateInt(_state,       STATE_SLIDER_PATH_SEGMENTS,   STATE_SLIDER_PATH_SEGMENTS_DEFAULT);
-      _sliderPathPaintingData.lineWidth         = Util.getStateInt(_state,       STATE_SLIDER_PATH_LINE_WIDTH, STATE_SLIDER_PATH_LINE_WIDTH_DEFAULT);
-      _sliderPathPaintingData.color             = Util.getStateRGB(_state,       STATE_SLIDER_PATH_COLOR,      STATE_SLIDER_PATH_COLOR_DEFAULT);
-
-// SET_FORMATTING_ON
-
-      if (isUpdateMapUI) {
-
-         // update map UI
-         actionShowSlider();
-      }
    }
 
    /**
@@ -5366,6 +5237,135 @@ public class Map2View extends ViewPart implements
    public void updatePhotoFilter(final int filterRatingStars, final PhotoRatingStarOperator ratingStarOperatorsValues) {
 
       photoFilter_UpdateFromSlideout(filterRatingStars, ratingStarOperatorsValues);
+   }
+
+   void updateState_Map2_Options() {
+
+// SET_FORMATTING_OFF
+
+      /*
+       * Hovered/selected tour
+       */
+      final boolean isShowHoveredOrSelectedTour = Util.getStateBoolean(_state,   STATE_IS_SHOW_HOVERED_SELECTED_TOUR,                     STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
+      final boolean isShowBreadcrumbs           = Util.getStateBoolean(_state,   STATE_IS_SHOW_BREADCRUMBS,                               STATE_IS_SHOW_BREADCRUMBS_DEFAULT);
+
+      final int numVisibleBreadcrumbs           = Util.getStateInt(_state,       STATE_VISIBLE_BREADCRUMBS,                               STATE_VISIBLE_BREADCRUMBS_DEFAULT);
+      final int hoveredOpacity                  = Util.getStateInt(_state,       STATE_HOVERED_SELECTED__HOVERED_OPACITY,                 STATE_HOVERED_SELECTED__HOVERED_OPACITY_DEFAULT);
+      final int hoveredAndSelectedOpacity       = Util.getStateInt(_state,       STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY,    STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_OPACITY_DEFAULT);
+      final int selectedOpacity                 = Util.getStateInt(_state,       STATE_HOVERED_SELECTED__SELECTED_OPACITY,                STATE_HOVERED_SELECTED__SELECTED_OPACITY_DEFAULT);
+      final RGB hoveredRGB                      = Util.getStateRGB(_state,       STATE_HOVERED_SELECTED__HOVERED_RGB,                     STATE_HOVERED_SELECTED__HOVERED_RGB_DEFAULT);
+      final RGB hoveredAndSelectedRGB           = Util.getStateRGB(_state,       STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB,        STATE_HOVERED_SELECTED__HOVERED_AND_SELECTED_RGB_DEFAULT);
+      final RGB selectedRGB                     = Util.getStateRGB(_state,       STATE_HOVERED_SELECTED__SELECTED_RGB,                    STATE_HOVERED_SELECTED__SELECTED_RGB_DEFAULT);
+
+      _map.setConfig_HoveredSelectedTour(
+
+            isShowHoveredOrSelectedTour,
+            isShowBreadcrumbs,
+
+            numVisibleBreadcrumbs,
+            hoveredRGB,
+            hoveredOpacity,
+            hoveredAndSelectedRGB,
+            hoveredAndSelectedOpacity,
+            selectedRGB,
+            selectedOpacity
+      );
+
+      _tourPainterConfig.isShowBreadcrumbs   = isShowBreadcrumbs;
+
+
+      /*
+       * Tour direction
+       */
+      final boolean isShowTourDirection         = Util.getStateBoolean(_state,      STATE_IS_SHOW_TOUR_DIRECTION,          STATE_IS_SHOW_TOUR_DIRECTION_DEFAULT);
+      final boolean isShowTourDirection_Always  = Util.getStateBoolean(_state,      STATE_IS_SHOW_TOUR_DIRECTION_ALWAYS,   STATE_IS_SHOW_TOUR_DIRECTION_ALWAYS_DEFAULT);
+      final int tourDirection_MarkerGap         = Util.getStateInt(_state,          STATE_TOUR_DIRECTION_MARKER_GAP,       STATE_TOUR_DIRECTION_MARKER_GAP_DEFAULT);
+      final int tourDirection_LineWidth         = Util.getStateInt(_state,          STATE_TOUR_DIRECTION_LINE_WIDTH,       STATE_TOUR_DIRECTION_LINE_WIDTH_DEFAULT);
+      final float tourDirection_SymbolSize      = Util.getStateInt(_state,          STATE_TOUR_DIRECTION_SYMBOL_SIZE,      STATE_TOUR_DIRECTION_SYMBOL_SIZE_DEFAULT);
+      final RGB tourDirection_RGB               = Util.getStateRGB(_state,          STATE_TOUR_DIRECTION_RGB,              STATE_TOUR_DIRECTION_RGB_DEFAULT);
+
+      _map.setConfig_TourDirection(
+            isShowTourDirection,
+            isShowTourDirection_Always,
+            tourDirection_MarkerGap,
+            tourDirection_LineWidth,
+            tourDirection_SymbolSize,
+            tourDirection_RGB);
+
+      _map.setIsInInverseKeyboardPanning(Util.getStateBoolean(_state,   STATE_IS_TOGGLE_KEYBOARD_PANNING,   STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
+
+      /*
+       * Set dim level/color after the map providers are set
+       */
+      final boolean isMapDimmed        = Util.getStateBoolean( _state, STATE_IS_MAP_DIMMED, STATE_IS_MAP_DIMMED_DEFAULT);
+      final int mapDimValue            = Util.getStateInt(     _state, STATE_DIM_MAP_VALUE, STATE_DIM_MAP_VALUE_DEFAULT);
+      final RGB mapDimColor            = Util.getStateRGB(     _state, STATE_DIM_MAP_COLOR, STATE_DIM_MAP_COLOR_DEFAULT);
+      final boolean isBackgroundDark   = isBackgroundDark();
+
+      _map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, isBackgroundDark);
+
+      /*
+       * Painting
+       */
+      _tourPainterConfig.isBackgroundDark = isBackgroundDark;
+
+      /*
+       * Tour pauses
+       */
+      final boolean isFilterTourPauses    = Util.getStateBoolean( _state, TourPauseUI.STATE_IS_FILTER_TOUR_PAUSES,      TourPauseUI.STATE_IS_FILTER_TOUR_PAUSES_DEFAULT);
+      final boolean isFilterPauseDuration = Util.getStateBoolean( _state, TourPauseUI.STATE_IS_FILTER_PAUSE_DURATION,   TourPauseUI.STATE_IS_FILTER_PAUSE_DURATION_DEFAULT);
+
+      final boolean isShowAutoPauses      = Util.getStateBoolean( _state, TourPauseUI.STATE_IS_SHOW_AUTO_PAUSES,        TourPauseUI.STATE_IS_SHOW_AUTO_PAUSES_DEFAULT);
+      final boolean isShowUserPauses      = Util.getStateBoolean( _state, TourPauseUI.STATE_IS_SHOW_USER_PAUSES,        TourPauseUI.STATE_IS_SHOW_USER_PAUSES_DEFAULT);
+
+      final long pauseDuration            = Util.getStateLong(    _state, TourPauseUI.STATE_DURATION_FILTER_SUMMARIZED, 0);
+      final Enum<TourFilterFieldOperator> pauseDurationOperator = Util.getStateEnum(_state, TourPauseUI.STATE_DURATION_OPERATOR, TourPauseUI.STATE_DURATION_OPERATOR_DEFAULT);
+
+      _tourPainterConfig.isFilterTourPauses     = isFilterTourPauses;
+      _tourPainterConfig.isFilterPauseDuration  = isFilterPauseDuration;
+      _tourPainterConfig.isShowAutoPauses       = isShowAutoPauses;
+      _tourPainterConfig.isShowUserPauses       = isShowUserPauses;
+      _tourPainterConfig.pauseDuration          = pauseDuration;
+      _tourPainterConfig.pauseDurationOperator  = pauseDurationOperator;
+
+      /*
+       * Tour locations
+       */
+
+// SET_FORMATTING_ON
+
+      _directMappingPainter.setPaintContextValues(isBackgroundDark);
+
+      setIconPosition_TourInfo();
+      setIconPosition_TourWeather();
+
+      // create legend image after the dim level is modified
+      createLegendImage(_tourPainterConfig.getMapColorProvider());
+
+      _map.paint();
+   }
+
+   void updateState_Map2_TrackOptions(final boolean isUpdateMapUI) {
+
+// SET_FORMATTING_OFF
+
+      _actionShowSliderInMap.setChecked(          Util.getStateBoolean(_state,   STATE_IS_SHOW_SLIDER_IN_MAP,  STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT));
+
+      _sliderPathPaintingData = new SliderPathPaintingData();
+
+      _sliderPathPaintingData.isShowSliderPath  = Util.getStateBoolean(_state,   STATE_IS_SHOW_SLIDER_PATH,    STATE_IS_SHOW_SLIDER_PATH_DEFAULT);
+      _sliderPathPaintingData.opacity           = Util.getStateInt(_state,       STATE_SLIDER_PATH_OPACITY,    STATE_SLIDER_PATH_OPACITY_DEFAULT);
+      _sliderPathPaintingData.segments          = Util.getStateInt(_state,       STATE_SLIDER_PATH_SEGMENTS,   STATE_SLIDER_PATH_SEGMENTS_DEFAULT);
+      _sliderPathPaintingData.lineWidth         = Util.getStateInt(_state,       STATE_SLIDER_PATH_LINE_WIDTH, STATE_SLIDER_PATH_LINE_WIDTH_DEFAULT);
+      _sliderPathPaintingData.color             = Util.getStateRGB(_state,       STATE_SLIDER_PATH_COLOR,      STATE_SLIDER_PATH_COLOR_DEFAULT);
+
+// SET_FORMATTING_ON
+
+      if (isUpdateMapUI) {
+
+         // update map UI
+         actionShowSlider();
+      }
    }
 
    void updateTourColorsInToolbar() {

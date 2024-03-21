@@ -19,10 +19,16 @@ import com.javadocmd.simplelatlng.LatLng;
 import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.util.LengthUnit;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import net.tourbook.Images;
 import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourLocationPoint;
@@ -30,32 +36,73 @@ import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.location.MapLocationManager;
 import net.tourbook.tour.location.TourLocationData;
 import net.tourbook.tour.location.TourLocationManager;
+import net.tourbook.tour.location.TourLocationManager.ZoomLevel;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.swt.widgets.Menu;
 
-public class ActionLookupMapLocation extends Action {
+public class ActionLookupMapLocation extends SubMenu {
 
-   private Map2View _map2View;
+   private Map2View                _map2View;
 
-   private Long     _currentHoveredTourId;
+   private Long                    _currentHoveredTourId;
+
+   private List<ActionSetLocation> _allSubmenuActions = new ArrayList<>();
+
+   private class ActionSetLocation extends Action {
+
+      private ZoomLevel _zoomLevel;
+
+      public ActionSetLocation(final ZoomLevel zoomLevel) {
+
+         super(TourLocationManager.ZOOM_LEVEL_ITEM.formatted(zoomLevel.zoomlevel, zoomLevel.label), AS_PUSH_BUTTON);
+
+         _zoomLevel = zoomLevel;
+      }
+
+      @Override
+      public void run() {
+
+         lookupMapLocaction(_zoomLevel.zoomlevel);
+      }
+   }
 
    public ActionLookupMapLocation(final Map2View mapView) {
 
-      super(Messages.Map_Action_LookupMapLocation.formatted(MapLocationManager.getLocationRequestZoomlevel()),
-            AS_PUSH_BUTTON);
-
-//      setToolTipText("tooltip");
+      super(Messages.Map_Action_LookupMapLocation, AS_DROP_DOWN_MENU);
 
       _map2View = mapView;
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapLocation));
+
+      /*
+       * Create all sub menu actions
+       */
+
+      // show building zoomlevel at the top
+      final List<ZoomLevel> allZoomLevels = Arrays.asList(TourLocationManager.ALL_ZOOM_LEVEL);
+      final List<ZoomLevel> allZoomLevelsReverse = new ArrayList<>(allZoomLevels);
+      Collections.reverse(allZoomLevelsReverse);
+
+      for (final ZoomLevel zoomlevel : allZoomLevelsReverse) {
+         _allSubmenuActions.add(new ActionSetLocation(zoomlevel));
+      }
    }
 
    @Override
-   public void run() {
+   public void enableActions() {}
+
+   @Override
+   public void fillMenu(final Menu menu) {
+
+      for (final Action action : _allSubmenuActions) {
+         addActionToMenu(menu, action);
+      }
+   }
+
+   private void lookupMapLocaction(final int reqestZoomlevel) {
 
       // make sure the tour editor does not contain a modified tour
       if (TourManager.isTourEditorModified()) {
@@ -110,8 +157,6 @@ public class ActionLookupMapLocation extends Action {
 
       }
 
-      final int reqestedZoomlevel = MapLocationManager.getLocationRequestZoomlevel();
-
       /*
        * Retrieve tour location
        */
@@ -121,7 +166,7 @@ public class ActionLookupMapLocation extends Action {
             locationLatitude,
             locationLongitude,
             null,
-            reqestedZoomlevel,
+            reqestZoomlevel,
             false);
 
       if (locationData == null) {
@@ -148,7 +193,7 @@ public class ActionLookupMapLocation extends Action {
          tourData.getTourLocationPoints().add(tourLocationPoint);
       }
 
-      MapLocationManager.addLocation(tourLocation);
+      _map2View.addMapLocation(tourLocation);
    }
 
    public void setCurrentHoveredTourId(final Long hoveredTourId) {

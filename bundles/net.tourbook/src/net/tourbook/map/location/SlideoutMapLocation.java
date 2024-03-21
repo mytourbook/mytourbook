@@ -29,10 +29,11 @@ import net.tourbook.common.util.ColumnDefinitionFor1stVisibleAlignmentColumn;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer2;
 import net.tourbook.common.util.TableColumnDefinition;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourLocation;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.tour.location.MapLocationManager;
-import net.tourbook.tour.location.TourLocationManager;
-import net.tourbook.tour.location.TourLocationManager.Zoomlevel;
 import net.tourbook.ui.TableColumnFactory;
 
 import org.eclipse.jface.action.IMenuListener;
@@ -47,6 +48,7 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -63,7 +65,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -79,22 +81,25 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer2 {
 
-   private static final String           COLUMN_CREATED_DATE_TIME = "createdDateTime";                   //$NON-NLS-1$
-   private static final String           COLUMN_LOCATION_NAME     = "LocationName";                      //$NON-NLS-1$
-   private static final String           COLUMN_LATITUDE_1        = "latitude1";                         //$NON-NLS-1$
-   private static final String           COLUMN_LATITUDE_2        = "latitude2";                         //$NON-NLS-1$
-   private static final String           COLUMN_LONGITUDE_1       = "longitude1";                        //$NON-NLS-1$
-   private static final String           COLUMN_LONGITUDE_2       = "longitude2";                        //$NON-NLS-1$
-   private static final String           COLUMN_SEQUENCE          = "sequence";                          //$NON-NLS-1$
-   private static final String           COLUMN_ZOOM_LEVEL        = "zoomLevel";                         //$NON-NLS-1$
+   private static final String           COLUMN_CREATED_DATE_TIME    = "createdDateTime";                   //$NON-NLS-1$
+   private static final String           COLUMN_LOCATION_NAME        = "LocationName";                      //$NON-NLS-1$
+   private static final String           COLUMN_LATITUDE_1           = "latitude1";                         //$NON-NLS-1$
+   private static final String           COLUMN_LATITUDE_2           = "latitude2";                         //$NON-NLS-1$
+   private static final String           COLUMN_LONGITUDE_1          = "longitude1";                        //$NON-NLS-1$
+   private static final String           COLUMN_LONGITUDE_2          = "longitude2";                        //$NON-NLS-1$
+   private static final String           COLUMN_SEQUENCE             = "sequence";                          //$NON-NLS-1$
+   private static final String           COLUMN_ZOOM_LEVEL           = "zoomLevel";                         //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore               = TourbookPlugin.getPrefStore();
+   private static final String           STATE_SORT_COLUMN_DIRECTION = "STATE_SORT_COLUMN_DIRECTION";       //$NON-NLS-1$
+   private static final String           STATE_SORT_COLUMN_ID        = "STATE_SORT_COLUMN_ID";              //$NON-NLS-1$
+
+   private static final IPreferenceStore _prefStore                  = TourbookPlugin.getPrefStore();
    private IDialogSettings               _state;
 
    private PixelConverter                _pc;
 
    private TableViewer                   _mapLocationViewer;
-   private MapLocationComparator         _mapLocationComparator   = new MapLocationComparator();
+   private MapLocationComparator         _mapLocationComparator      = new MapLocationComparator();
    private ColumnManager                 _columnManager;
    private SelectionAdapter              _columnSortListener;
 
@@ -102,14 +107,14 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
    private ToolItem                      _toolItem;
 
-   List<TourLocation>                    _allMapLocations         = MapLocationManager.getMapLocations();
+   List<TourLocation>                    _allMapLocations            = MapLocationManager.getMapLocations();
 
    /*
     * UI controls
     */
    private Composite _viewerContainer;
 
-   private Combo     _comboZoomlevel;
+   private Button    _btnDelete;
 
    private class MapLocationComparator extends ViewerComparator {
 
@@ -247,6 +252,8 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
       initUI(parent);
 
+      restoreState_BeforeUI();
+
       // define all columns for the viewer
       _columnManager = new ColumnManager(this, _state);
       defineAllColumns();
@@ -275,41 +282,24 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       GridLayoutFactory.fillDefaults().applyTo(shellContainer);
 //      shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
       {
-         createUI_100_CustomizeLookup(shellContainer);
-         createUI_200_LocatitonViewer(shellContainer);
+         createUI_10_CustomizeLookup(shellContainer);
+         createUI_20_LocationViewer(shellContainer);
+         createUI_90_Actions(shellContainer);
       }
 
       return shellContainer;
    }
 
-   private void createUI_100_CustomizeLookup(final Composite parent) {
+   private void createUI_10_CustomizeLookup(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {
-         {
-            /*
-             * Zoomlevel
-             */
-
-            UI.createLabel(container,
-                  Messages.Slideout_MapLocation_Label_Zoomlevel,
-                  Messages.Slideout_TourLocation_Label_Zoomlevel_Tooltip);
-
-            _comboZoomlevel = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-            _comboZoomlevel.setVisibleItemCount(20);
-            _comboZoomlevel.setToolTipText(Messages.Slideout_TourLocation_Label_Zoomlevel_Tooltip);
-            _comboZoomlevel.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_Zoomlevel()));
-            _comboZoomlevel.addFocusListener(_keepOpenListener);
-
-            UI.createSpacer_Horizontal(container);
-         }
-      }
+      {}
 
    }
 
-   private void createUI_200_LocatitonViewer(final Composite parent) {
+   private void createUI_20_LocationViewer(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -324,7 +314,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
             GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
             GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
             {
-               createUI_210_LocationViewer_Table(_viewerContainer);
+               createUI_22_LocationViewer_Table(_viewerContainer);
             }
          }
 
@@ -332,7 +322,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       }
    }
 
-   private void createUI_210_LocationViewer_Table(final Composite parent) {
+   private void createUI_22_LocationViewer_Table(final Composite parent) {
 
       /*
        * Create table
@@ -363,7 +353,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
             switch (e.keyCode) {
 
             case SWT.DEL:
-//               onGeoFilter_Delete();
+               onLocation_Delete();
                break;
 
             default:
@@ -392,20 +382,20 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       _mapLocationViewer.setContentProvider(new MapLocationContentProvider());
       _mapLocationViewer.setComparator(_mapLocationComparator);
 
-      _mapLocationViewer.addSelectionChangedListener(selectionChangedEvent -> onSelect_Location(selectionChangedEvent));
+      _mapLocationViewer.addSelectionChangedListener(selectionChangedEvent -> onLocation_Select(selectionChangedEvent));
 //    _mapLocationViewer.addDoubleClickListener(doubleClickEvent -> onGeoFilter_ToggleReadEditMode());
 
       updateUI_SetSortDirection(
             _mapLocationComparator.__sortColumnId,
             _mapLocationComparator.__sortDirection);
 
-      createUI_220_LocationViewer_ContextMenu();
+      createUI_24_LocationViewer_ContextMenu();
    }
 
    /**
     * Ceate the view context menus
     */
-   private void createUI_220_LocationViewer_ContextMenu() {
+   private void createUI_24_LocationViewer_ContextMenu() {
 
       final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 
@@ -430,6 +420,29 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
        */
       _columnManager.createHeaderContextMenu(_mapLocationViewer.getTable(), null, getRRShellWithResize());
 
+   }
+
+   private void createUI_90_Actions(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .align(SWT.END, SWT.FILL)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         {
+            /*
+             * Button: Delete
+             */
+            _btnDelete = new Button(container, SWT.PUSH);
+            _btnDelete.setText(Messages.App_Action_Delete);
+            _btnDelete.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onLocation_Delete()));
+
+            // set button default width
+            UI.setButtonLayoutData(_btnDelete);
+         }
+      }
    }
 
    private void defineAllColumns() {
@@ -598,14 +611,15 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
    private void enableControls() {
 
+      final List<TourLocation> allSelectedLocations = getSelectedLocations();
+
+      final boolean isLocationSelected = allSelectedLocations.size() > 0;
+
+      _btnDelete.setEnabled(isLocationSelected);
    }
 
    private void fillUI() {
 
-      for (final Zoomlevel zoomlevel : TourLocationManager.ALL_ZOOM_LEVEL) {
-
-         _comboZoomlevel.add(TourLocationManager.ZOOM_LEVEL_ITEM.formatted(zoomlevel.zoomlevel, zoomlevel.label));
-      }
    }
 
    @Override
@@ -624,6 +638,14 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       itemBounds.y = itemDisplayPosition.y;
 
       return itemBounds;
+   }
+
+   private List<TourLocation> getSelectedLocations() {
+
+      @SuppressWarnings("unchecked")
+      final List<TourLocation> allSelectedLocations = _mapLocationViewer.getStructuredSelection().toList();
+
+      return allSelectedLocations;
    }
 
    /**
@@ -660,7 +682,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       _columnSortListener = new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            onSelect_SortColumn(e);
+            onSelectSortColumn(e);
          }
       };
 
@@ -714,17 +736,65 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
    }
 
-   private void onSelect_Location(final SelectionChangedEvent selectionChangedEvent) {
+   private void onLocation_Delete() {
 
-      final Object selectedItem = selectionChangedEvent.getStructuredSelection().getFirstElement();
-      final TourLocation selectedTourLocation = (TourLocation) selectedItem;
+      final List<TourLocation> allSelectedLocations = getSelectedLocations();
 
-      if (selectedTourLocation == null) {
+      // update model
+      if (MapLocationManager.deleteLocations(allSelectedLocations) == false) {
          return;
       }
+
+      /*
+       * Deletion was performed -> update viewer
+       */
+
+      final Table table = _mapLocationViewer.getTable();
+
+      // get index for selected location
+      final int lastLocationIndex = table.getSelectionIndex();
+
+      // reload viewer
+      reloadViewer();
+
+      // get next location
+      TourLocation nextLocationItem = (TourLocation) _mapLocationViewer.getElementAt(lastLocationIndex);
+
+      if (nextLocationItem == null) {
+         nextLocationItem = (TourLocation) _mapLocationViewer.getElementAt(lastLocationIndex - 1);
+      }
+
+      // select next location
+      if (nextLocationItem != null) {
+         _mapLocationViewer.setSelection(new StructuredSelection(nextLocationItem), true);
+      }
+
+      table.setFocus();
+
+      TourManager.fireEventWithCustomData(
+            TourEventId.TOUR_LOCATION_SELECTION,
+            null,
+            null);
    }
 
-   private void onSelect_SortColumn(final SelectionEvent e) {
+   private void onLocation_Select(final SelectionChangedEvent selectionChangedEvent) {
+
+      final IStructuredSelection selection = _mapLocationViewer.getStructuredSelection();
+
+      if (selection.isEmpty()) {
+         return;
+      }
+
+      enableControls();
+
+      // fire selection
+      TourManager.fireEventWithCustomData(
+            TourEventId.TOUR_LOCATION_SELECTION,
+            selection.toList(),
+            null);
+   }
+
+   private void onSelectSortColumn(final SelectionEvent e) {
 
       _viewerContainer.setRedraw(false);
       {
@@ -741,18 +811,6 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       _viewerContainer.setRedraw(true);
    }
 
-   private void onSelect_Zoomlevel() {
-
-      int selectionIndex = _comboZoomlevel.getSelectionIndex();
-
-      if (selectionIndex < 0) {
-         selectionIndex = 0;
-      }
-
-      final int zoomlevel = TourLocationManager.ALL_ZOOM_LEVEL[selectionIndex].zoomlevel;
-      MapLocationManager.setLocationRequestZoomlevel(zoomlevel);
-   }
-
    @Override
    public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
@@ -760,7 +818,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       {
          _mapLocationViewer.getTable().dispose();
 
-         createUI_210_LocationViewer_Table(_viewerContainer);
+         createUI_22_LocationViewer_Table(_viewerContainer);
          _viewerContainer.layout();
 
          // update the viewer
@@ -779,15 +837,26 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
    private void restoreState() {
 
-      // zoomlevel
-      _comboZoomlevel.select(TourLocationManager.getZoomlevelIndex(MapLocationManager.getLocationRequestZoomlevel()));
+   }
 
+   private void restoreState_BeforeUI() {
+
+      // sorting
+      final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, TableColumnFactory.SENSOR_NAME_ID);
+      final int sortDirection = Util.getStateInt(_state, STATE_SORT_COLUMN_DIRECTION, MapLocationComparator.ASCENDING);
+
+      // update comparator
+      _mapLocationComparator.__sortColumnId = sortColumnId;
+      _mapLocationComparator.__sortDirection = sortDirection;
    }
 
    @Override
    protected void saveState() {
 
       _columnManager.saveState(_state);
+
+      _state.put(STATE_SORT_COLUMN_ID, _mapLocationComparator.__sortColumnId);
+      _state.put(STATE_SORT_COLUMN_DIRECTION, _mapLocationComparator.__sortDirection);
 
       super.saveState();
    }

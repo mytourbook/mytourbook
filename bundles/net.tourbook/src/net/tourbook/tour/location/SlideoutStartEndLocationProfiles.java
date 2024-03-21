@@ -32,7 +32,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourLocation;
-import net.tourbook.tour.location.TourLocationManager.Zoomlevel;
+import net.tourbook.tour.location.TourLocationManager.ZoomLevel;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -791,7 +791,7 @@ public class SlideoutStartEndLocationProfiles extends AdvancedSlideout {
 
    private void fillUI() {
 
-      for (final Zoomlevel zoomlevel : TourLocationManager.ALL_ZOOM_LEVEL) {
+      for (final ZoomLevel zoomlevel : TourLocationManager.ALL_ZOOM_LEVEL) {
 
          _comboZoomlevel.add(TourLocationManager.ZOOM_LEVEL_ITEM.formatted(zoomlevel.zoomlevel, zoomlevel.label));
       }

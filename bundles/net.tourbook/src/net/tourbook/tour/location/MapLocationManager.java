@@ -18,7 +18,6 @@ package net.tourbook.tour.location;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.tourbook.common.UI;
 import net.tourbook.data.TourLocation;
 import net.tourbook.map.location.SlideoutMapLocation;
 
@@ -28,8 +27,6 @@ import org.eclipse.ui.PlatformUI;
  * Manage MapLocation's
  */
 public class MapLocationManager {
-
-   private static final char               NL                        = UI.NEW_LINE;
 
    private static final List<TourLocation> _allMapLocations          = new ArrayList<>();
 
@@ -50,6 +47,13 @@ public class MapLocationManager {
          // delay to be sure that the slideout is opened
          PlatformUI.getWorkbench().getDisplay().asyncExec(() -> _mapLocationSlideout.updateUI(tourLocation));
       }
+   }
+
+   public static boolean deleteLocations(final List<TourLocation> mapLocations) {
+
+      _allMapLocations.removeAll(mapLocations);
+
+      return true;
    }
 
    public static int getLocationRequestZoomlevel() {

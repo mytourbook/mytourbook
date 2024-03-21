@@ -179,22 +179,22 @@ public class TourLocationManager {
     * 17 major and minor streets
     * 18 building
     */
-   public static Zoomlevel[]         ALL_ZOOM_LEVEL              = {
+   public static ZoomLevel[]         ALL_ZOOM_LEVEL              = {
 
-         new Zoomlevel( 3, Messages.Tour_Location_Zoomlevel_03_Country), //            0
-         new Zoomlevel( 5, Messages.Tour_Location_Zoomlevel_05_State), //              1
-         new Zoomlevel( 8, Messages.Tour_Location_Zoomlevel_08_County), //             2
-         new Zoomlevel(10, Messages.Tour_Location_Zoomlevel_10_City), //               3
-         new Zoomlevel(12, Messages.Tour_Location_Zoomlevel_12_TownBorough), //        4
-         new Zoomlevel(13, Messages.Tour_Location_Zoomlevel_13_VillageSuburb), //      5 DEFAULT
-         new Zoomlevel(14, Messages.Tour_Location_Zoomlevel_14_Neighbourhood), //      6
-         new Zoomlevel(15, Messages.Tour_Location_Zoomlevel_15_AnySettlement), //      7
-         new Zoomlevel(16, Messages.Tour_Location_Zoomlevel_16_MajorStreets), //       8
-         new Zoomlevel(17, Messages.Tour_Location_Zoomlevel_17_MajorMinorStreets), //  9
-         new Zoomlevel(18, Messages.Tour_Location_Zoomlevel_18_Building) //            10
+         new ZoomLevel( 3, Messages.Tour_Location_Zoomlevel_03_Country), //            0
+         new ZoomLevel( 5, Messages.Tour_Location_Zoomlevel_05_State), //              1
+         new ZoomLevel( 8, Messages.Tour_Location_Zoomlevel_08_County), //             2
+         new ZoomLevel(10, Messages.Tour_Location_Zoomlevel_10_City), //               3
+         new ZoomLevel(12, Messages.Tour_Location_Zoomlevel_12_TownBorough), //        4
+         new ZoomLevel(13, Messages.Tour_Location_Zoomlevel_13_VillageSuburb), //      5 DEFAULT
+         new ZoomLevel(14, Messages.Tour_Location_Zoomlevel_14_Neighbourhood), //      6
+         new ZoomLevel(15, Messages.Tour_Location_Zoomlevel_15_AnySettlement), //      7
+         new ZoomLevel(16, Messages.Tour_Location_Zoomlevel_16_MajorStreets), //       8
+         new ZoomLevel(17, Messages.Tour_Location_Zoomlevel_17_MajorMinorStreets), //  9
+         new ZoomLevel(18, Messages.Tour_Location_Zoomlevel_18_Building) //            10
    };
 
-   public static Zoomlevel    DEFAULT_ZOOM_LEVEL         = ALL_ZOOM_LEVEL[5];
+   public static ZoomLevel    DEFAULT_ZOOM_LEVEL         = ALL_ZOOM_LEVEL[5];
    public static int          DEFAULT_ZOOM_LEVEL_VALUE   = DEFAULT_ZOOM_LEVEL.zoomlevel;
 
    public static final String ZOOM_LEVEL_ITEM            = "%3d  %s";                                             //$NON-NLS-1$
@@ -281,12 +281,12 @@ public class TourLocationManager {
 
 // SET_FORMATTING_ON
 
-   public static class Zoomlevel {
+   public static class ZoomLevel {
 
       public int    zoomlevel;
       public String label;
 
-      public Zoomlevel(final int zoomlevel, final String label) {
+      public ZoomLevel(final int zoomlevel, final String label) {
 
          this.zoomlevel = zoomlevel;
          this.label = label;
