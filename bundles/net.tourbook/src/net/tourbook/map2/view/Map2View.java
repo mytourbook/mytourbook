@@ -152,7 +152,7 @@ import net.tourbook.tour.filter.geo.GeoFilter_LoaderData;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
-import net.tourbook.tour.location.MapLocationManager;
+import net.tourbook.tour.location.AddressLocationManager;
 import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.photo.IMapWithPhotos;
 import net.tourbook.tour.photo.TourPhotoLink;
@@ -228,13 +228,8 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_IS_SHOW_LEGEND_IN_MAP                           = "STATE_IS_SHOW_LEGEND_IN_MAP";                         //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_PHOTO_IN_MAP                            = "STATE_IS_SHOW_PHOTO_IN_MAP";                          //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_IN_MAP                             = "STATE_IS_SHOW_TOUR_IN_MAP";                           //$NON-NLS-1$
-   public static final String    STATE_IS_SHOW_TOUR_LOCATIONS                          = "STATE_IS_SHOW_TOUR_LOCATIONS";                           //$NON-NLS-1$
-   static final boolean          STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT                  = true;
-   public static final String    STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX             = "STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX";                           //$NON-NLS-1$
-   public static final boolean   STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX_DEFAULT     = true;
    private static final String   STATE_IS_SHOW_VALUE_POINT                             = "STATE_IS_SHOW_VALUE_POINT";                           //$NON-NLS-1$
    private static final boolean  STATE_IS_SHOW_VALUE_POINT_DEFAULT                     = true;
-
    private static final String   STATE_IS_SHOW_SCALE_IN_MAP                            = "STATE_IS_SHOW_SCALE_IN_MAP";                          //$NON-NLS-1$
    static final String           STATE_IS_SHOW_SLIDER_IN_MAP                           = "STATE_IS_SHOW_SLIDER_IN_MAP";                         //$NON-NLS-1$
    static final boolean          STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT                   = true;
@@ -245,6 +240,16 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_IS_SHOW_TOUR_PAUSES                             = "STATE_IS_SHOW_TOUR_PAUSES";                           //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_WEATHER_IN_MAP                     = "STATE_IS_SHOW_TOUR_WEATHER_IN_MAP";                //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_WAY_POINTS                              = "STATE_IS_SHOW_WAY_POINTS";                            //$NON-NLS-1$
+
+   /** Map locations are including tour and address locations */
+   public static final String    STATE_IS_SHOW_MAP_LOCATIONS                           = "STATE_IS_SHOW_MAP_LOCATIONS";                           //$NON-NLS-1$
+   static final boolean          STATE_IS_SHOW_MAP_LOCATIONS_DEFAULT                   = true;
+   public static final String    STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX               = "STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX";                           //$NON-NLS-1$
+   public static final boolean   STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX_DEFAULT       = true;
+   public static final String    STATE_IS_SHOW_LOCATIONS_ADDRESS                       = "STATE_IS_SHOW_LOCATIONS_ADDRESS";                           //$NON-NLS-1$
+   public static final boolean   STATE_IS_SHOW_LOCATIONS_ADDRESS_DEFAULT               = true;
+   public static final String    STATE_IS_SHOW_LOCATIONS_TOUR                          = "STATE_IS_SHOW_LOCATIONS_TOUR";                           //$NON-NLS-1$
+   public static final boolean   STATE_IS_SHOW_LOCATIONS_TOUR_DEFAULT                  = true;
 
    public static final String    STATE_IS_SHOW_HOVERED_SELECTED_TOUR                            = "STATE_IS_SHOW_HOVERED_SELECTED_TOUR";                 //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT                    = true;
@@ -637,7 +642,7 @@ public class Map2View extends ViewPart implements
 
          super.onSelect(selectionEvent);
 
-         _state.put(Map2View.STATE_IS_SHOW_TOUR_LOCATIONS, getSelection());
+         _state.put(Map2View.STATE_IS_SHOW_MAP_LOCATIONS, getSelection());
 
          updateState_Map2_Options();
       }
@@ -1318,7 +1323,7 @@ public class Map2View extends ViewPart implements
       _state.put(Map2View.STATE_IS_SHOW_SLIDER_IN_MAP, isShowSliderInMap);
 
       // repaint map
-      _directMappingPainter.setPaintContext(
+      _directMappingPainter.setPaintingOptions(
 
             _isShowTour,
             _allTourData.get(0),
@@ -1406,7 +1411,7 @@ public class Map2View extends ViewPart implements
 
       _slideoutMapLocation.open(false);
 
-      MapLocationManager.addLocation(tourLocation);
+      AddressLocationManager.addLocation(tourLocation);
    }
 
    private void addPartListener() {
@@ -1976,7 +1981,7 @@ public class Map2View extends ViewPart implements
       _map = new Map2(parent, SWT.NONE, _state);
       _map.setPainting(false);
 
-      _directMappingPainter = new DirectMappingPainter(_map, _state);
+      _directMappingPainter = new DirectMappingPainter(_map);
       _map.setDirectPainter(_directMappingPainter);
 
 //    _map.setLiveView(true);
@@ -3008,7 +3013,7 @@ public class Map2View extends ViewPart implements
          _externalValuePointIndex = -1;
 
          // repaint map
-         _directMappingPainter.setPaintContext(
+         _directMappingPainter.setPaintingOptions(
 
                _isShowTour,
                _allTourData.get(0),
@@ -3182,7 +3187,7 @@ public class Map2View extends ViewPart implements
             _externalValuePointIndex = -1;
 
             // repaint map
-            _directMappingPainter.setPaintContext(
+            _directMappingPainter.setPaintingOptions(
 
                   _isShowTour,
                   _allTourData.get(0),
@@ -4062,7 +4067,7 @@ public class Map2View extends ViewPart implements
       _tourWeatherToolTipProvider.setTourDataList(_allTourData);
 
       // set the paint context (slider position) for the direct mapping painter
-      _directMappingPainter.setPaintContext(
+      _directMappingPainter.setPaintingOptions(
 
             _isShowTour,
             tourData,
@@ -4313,7 +4318,7 @@ public class Map2View extends ViewPart implements
       _currentSliderValueIndex_Right = rightSliderValuesIndex;
       _currentSliderValueIndex_Selected = selectedSliderIndex;
 
-      _directMappingPainter.setPaintContext(
+      _directMappingPainter.setPaintingOptions(
 
             _isShowTour,
             tourData,
@@ -4530,11 +4535,11 @@ public class Map2View extends ViewPart implements
             Util.getStateDouble(_state, STATE_DEFAULT_POSITION_LATITUDE, 46.303074),
             Util.getStateDouble(_state, STATE_DEFAULT_POSITION_LONGITUDE, 7.526386));
 
-      // map/tour locations
-      final boolean isShowTourLocations = Util.getStateBoolean(_state,
-            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS,
-            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT);
-      _actionMap2Slideout_MapLocation.setSelection(isShowTourLocations);
+      // map locations
+      final boolean isShowMapLocations = Util.getStateBoolean(_state,
+            Map2View.STATE_IS_SHOW_MAP_LOCATIONS,
+            Map2View.STATE_IS_SHOW_MAP_LOCATIONS_DEFAULT);
+      _actionMap2Slideout_MapLocation.setSelection(isShowMapLocations);
 
       // tour color
       try {
@@ -5011,7 +5016,7 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.resetTourData();
 
       // update direct painter to draw nothing
-      _directMappingPainter.setPaintContext(
+      _directMappingPainter.setPaintingOptions(
 
             false,
             null,
@@ -5348,9 +5353,36 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.pauseDuration          = pauseDuration;
       _tourPainterConfig.pauseDurationOperator  = pauseDurationOperator;
 
+      final boolean isShowMapLocations = Util.getStateBoolean(_state,
+            Map2View.STATE_IS_SHOW_MAP_LOCATIONS,
+            Map2View.STATE_IS_SHOW_MAP_LOCATIONS_DEFAULT);
+
+      final boolean isShowMapLocations_BBox = Util.getStateBoolean(_state,
+            Map2View.STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX,
+            Map2View.STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX_DEFAULT);
+
+      final boolean isShowAddressLocations = Util.getStateBoolean(_state,
+            Map2View.STATE_IS_SHOW_LOCATIONS_ADDRESS,
+            Map2View.STATE_IS_SHOW_LOCATIONS_ADDRESS_DEFAULT);
+
+      final boolean isShowTourLocations = Util.getStateBoolean(_state,
+            Map2View.STATE_IS_SHOW_LOCATIONS_TOUR,
+            Map2View.STATE_IS_SHOW_LOCATIONS_TOUR_DEFAULT);
+
 // SET_FORMATTING_ON
 
-      _directMappingPainter.setPaintContextValues(isBackgroundDark);
+      /*
+       * Update options for the map direct painter
+       */
+      _directMappingPainter.setPaintingOptions_2(
+
+            isShowMapLocations,
+            isShowMapLocations_BBox,
+
+            isShowAddressLocations,
+            isShowTourLocations,
+
+            isBackgroundDark);
 
       setIconPosition_TourInfo();
       setIconPosition_TourWeather();
@@ -5441,7 +5473,7 @@ public class Map2View extends ViewPart implements
       }
 
       // set the paint context  for the direct mapping painter
-      _directMappingPainter.setPaintContext(
+      _directMappingPainter.setPaintingOptions(
 
             _isShowTour,
             hoveredTourData,

@@ -39,9 +39,9 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 /**
- * Manage MapLocation's
+ * Manage address locations
  */
-public class MapLocationManager {
+public class AddressLocationManager {
 
    private static final String             CONFIG_FILE_NAME                         = "map-locations.xml";                         //$NON-NLS-1$
 
@@ -196,12 +196,12 @@ public class MapLocationManager {
       return true;
    }
 
-   public static int getLocationRequestZoomlevel() {
-      return _locationRequestZoomlevel;
+   public static List<TourLocation> getAddressLocations() {
+      return _allMapLocations;
    }
 
-   public static List<TourLocation> getMapLocations() {
-      return _allMapLocations;
+   public static int getLocationRequestZoomlevel() {
+      return _locationRequestZoomlevel;
    }
 
    private static File getXmlFile() {

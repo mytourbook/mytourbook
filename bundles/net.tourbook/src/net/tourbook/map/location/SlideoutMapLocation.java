@@ -34,7 +34,7 @@ import net.tourbook.data.TourLocation;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.location.MapLocationManager;
+import net.tourbook.tour.location.AddressLocationManager;
 import net.tourbook.ui.TableColumnFactory;
 
 import org.eclipse.jface.action.IMenuListener;
@@ -79,15 +79,18 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer2 {
 
-   private static final String   COLUMN_CREATED_DATE_TIME    = "createdDateTime";                   //$NON-NLS-1$
-   private static final String   COLUMN_LOCATION_NAME        = "LocationName";                      //$NON-NLS-1$
-   private static final String   COLUMN_SEQUENCE             = "sequence";                          //$NON-NLS-1$
-   private static final String   COLUMN_ZOOM_LEVEL           = "zoomLevel";                         //$NON-NLS-1$
+   private static final String   COLUMN_CREATED_DATE_TIME    = "createdDateTime";                           //$NON-NLS-1$
+   private static final String   COLUMN_LOCATION_NAME        = "LocationName";                              //$NON-NLS-1$
+   private static final String   COLUMN_SEQUENCE             = "sequence";                                  //$NON-NLS-1$
+   private static final String   COLUMN_ZOOM_LEVEL           = "zoomLevel";                                 //$NON-NLS-1$
 
-   private static final String   STATE_SORT_COLUMN_DIRECTION = "STATE_SORT_COLUMN_DIRECTION";       //$NON-NLS-1$
-   private static final String   STATE_SORT_COLUMN_ID        = "STATE_SORT_COLUMN_ID";              //$NON-NLS-1$
+   private static final String   STATE_SORT_COLUMN_DIRECTION = "STATE_SORT_COLUMN_DIRECTION";               //$NON-NLS-1$
+   private static final String   STATE_SORT_COLUMN_ID        = "STATE_SORT_COLUMN_ID";                      //$NON-NLS-1$
 
+   private IDialogSettings       _state_Map2;
    private IDialogSettings       _state_Slideout;
+
+   private Map2View              _map2View;
 
    private PixelConverter        _pc;
 
@@ -100,7 +103,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
    private ToolItem              _toolItem;
 
-   private List<TourLocation>    _allMapLocations            = MapLocationManager.getMapLocations();
+   private List<TourLocation>    _allMapLocations            = AddressLocationManager.getAddressLocations();
 
    private final NumberFormat    _nf6                        = NumberFormat.getNumberInstance();
    {
@@ -111,13 +114,13 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
    /*
     * UI controls
     */
-   private Composite       _viewerContainer;
+   private Composite _viewerContainer;
 
-   private Button          _btnDelete;
+   private Button    _btnDelete;
 
-   private Button          _chkIsShowTourLocations_BoundingBox;
-   private Map2View        _map2View;
-   private IDialogSettings _state_Map2;
+   private Button    _chkIsShowMapLocations_BoundingBox;
+   private Button    _chkIsShowTourLocations;
+   private Button    _chkIsShowAddressLocations;
 
    private class MapLocationComparator extends ViewerComparator {
 
@@ -280,7 +283,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       restoreState();
       enableControls();
 
-      MapLocationManager.setMapLocationSlideout(this);
+      AddressLocationManager.setMapLocationSlideout(this);
    }
 
    /**
@@ -305,14 +308,45 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
    private void createUI_10_Options(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
+         final Composite containerLeft = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(false, false).applyTo(containerLeft);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerLeft);
          {
-            _chkIsShowTourLocations_BoundingBox = new Button(container, SWT.CHECK);
-            _chkIsShowTourLocations_BoundingBox.setText(Messages.Slideout_MapLocation_Checkbox_ShowLocationBoundingBox);
-            _chkIsShowTourLocations_BoundingBox.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowTourLocations_BoundingBox);
+            {
+               /*
+                * Show address locations
+                */
+               _chkIsShowAddressLocations = new Button(containerLeft, SWT.CHECK);
+               _chkIsShowAddressLocations.setText(Messages.Slideout_MapLocation_Checkbox_ShowAddressLocations);
+               _chkIsShowAddressLocations.addSelectionListener(_defaultSelectionListener);
+               GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowAddressLocations);
+            }
+            {
+               /*
+                * Show tour locations
+                */
+               _chkIsShowTourLocations = new Button(containerLeft, SWT.CHECK);
+               _chkIsShowTourLocations.setText(Messages.Slideout_MapLocation_Checkbox_ShowTourLocations);
+               _chkIsShowTourLocations.addSelectionListener(_defaultSelectionListener);
+               GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowTourLocations);
+            }
+         }
+         final Composite containerRight = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(false, false).indent(30, 0).applyTo(containerRight);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerRight);
+         {
+            {
+               /*
+                * Show location bounding box
+                */
+               _chkIsShowMapLocations_BoundingBox = new Button(containerRight, SWT.CHECK);
+               _chkIsShowMapLocations_BoundingBox.setText(Messages.Slideout_MapLocation_Checkbox_ShowLocationBoundingBox);
+               _chkIsShowMapLocations_BoundingBox.addSelectionListener(_defaultSelectionListener);
+               GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowMapLocations_BoundingBox);
+            }
          }
       }
    }
@@ -325,7 +359,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       {
          {
             final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Slideout_MapLocation_Label_Locations);
+            label.setText(Messages.Slideout_MapLocation_Label_AddressLocations);
          }
          {
             _viewerContainer = new Composite(container, SWT.NONE);
@@ -667,8 +701,12 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       final List<TourLocation> allSelectedLocations = getSelectedLocations();
 
       final boolean isLocationSelected = allSelectedLocations.size() > 0;
+      final boolean isShowAddressLocations = _chkIsShowAddressLocations.getSelection();
+      final boolean isShowTourLocations = _chkIsShowTourLocations.getSelection();
 
       _btnDelete.setEnabled(isLocationSelected);
+
+      _chkIsShowMapLocations_BoundingBox.setEnabled(isShowAddressLocations || isShowTourLocations);
    }
 
    private void fillUI() {
@@ -762,15 +800,20 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
    private void onChangeUI() {
 
-      _state_Map2.put(Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX, _chkIsShowTourLocations_BoundingBox.getSelection());
+      _state_Map2.put(Map2View.STATE_IS_SHOW_LOCATIONS_ADDRESS, _chkIsShowAddressLocations.getSelection());
+      _state_Map2.put(Map2View.STATE_IS_SHOW_LOCATIONS_TOUR, _chkIsShowTourLocations.getSelection());
+
+      _state_Map2.put(Map2View.STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX, _chkIsShowMapLocations_BoundingBox.getSelection());
 
       _map2View.updateState_Map2_Options();
+
+      enableControls();
    }
 
    @Override
    protected void onDispose() {
 
-      MapLocationManager.setMapLocationSlideout(null);
+      AddressLocationManager.setMapLocationSlideout(null);
 
       super.onDispose();
    }
@@ -785,7 +828,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       final List<TourLocation> allSelectedLocations = getSelectedLocations();
 
       // update model
-      if (MapLocationManager.deleteLocations(allSelectedLocations) == false) {
+      if (AddressLocationManager.deleteLocations(allSelectedLocations) == false) {
          return;
       }
 
@@ -881,9 +924,17 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
    private void restoreState() {
 
-      _chkIsShowTourLocations_BoundingBox.setSelection(Util.getStateBoolean(_state_Map2,
-            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX,
-            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX_DEFAULT));
+      _chkIsShowAddressLocations.setSelection(Util.getStateBoolean(_state_Map2,
+            Map2View.STATE_IS_SHOW_LOCATIONS_ADDRESS,
+            Map2View.STATE_IS_SHOW_LOCATIONS_ADDRESS_DEFAULT));
+
+      _chkIsShowTourLocations.setSelection(Util.getStateBoolean(_state_Map2,
+            Map2View.STATE_IS_SHOW_LOCATIONS_TOUR,
+            Map2View.STATE_IS_SHOW_LOCATIONS_TOUR_DEFAULT));
+
+      _chkIsShowMapLocations_BoundingBox.setSelection(Util.getStateBoolean(_state_Map2,
+            Map2View.STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX,
+            Map2View.STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX_DEFAULT));
 
    }
 
