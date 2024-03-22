@@ -20,7 +20,6 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.time.TimeTools;
@@ -32,6 +31,7 @@ import net.tourbook.common.util.ITourViewer2;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourLocation;
+import net.tourbook.map2.view.Map2View;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.location.MapLocationManager;
@@ -44,7 +44,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
@@ -57,8 +56,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -82,31 +79,30 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer2 {
 
-   private static final String           COLUMN_CREATED_DATE_TIME    = "createdDateTime";                   //$NON-NLS-1$
-   private static final String           COLUMN_LOCATION_NAME        = "LocationName";                      //$NON-NLS-1$
-   private static final String           COLUMN_SEQUENCE             = "sequence";                          //$NON-NLS-1$
-   private static final String           COLUMN_ZOOM_LEVEL           = "zoomLevel";                         //$NON-NLS-1$
+   private static final String   COLUMN_CREATED_DATE_TIME    = "createdDateTime";                   //$NON-NLS-1$
+   private static final String   COLUMN_LOCATION_NAME        = "LocationName";                      //$NON-NLS-1$
+   private static final String   COLUMN_SEQUENCE             = "sequence";                          //$NON-NLS-1$
+   private static final String   COLUMN_ZOOM_LEVEL           = "zoomLevel";                         //$NON-NLS-1$
 
-   private static final String           STATE_SORT_COLUMN_DIRECTION = "STATE_SORT_COLUMN_DIRECTION";       //$NON-NLS-1$
-   private static final String           STATE_SORT_COLUMN_ID        = "STATE_SORT_COLUMN_ID";              //$NON-NLS-1$
+   private static final String   STATE_SORT_COLUMN_DIRECTION = "STATE_SORT_COLUMN_DIRECTION";       //$NON-NLS-1$
+   private static final String   STATE_SORT_COLUMN_ID        = "STATE_SORT_COLUMN_ID";              //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore                  = TourbookPlugin.getPrefStore();
-   private IDialogSettings               _state;
+   private IDialogSettings       _state_Slideout;
 
-   private PixelConverter                _pc;
+   private PixelConverter        _pc;
 
-   private TableViewer                   _mapLocationViewer;
-   private MapLocationComparator         _mapLocationComparator      = new MapLocationComparator();
-   private ColumnManager                 _columnManager;
-   private SelectionAdapter              _columnSortListener;
+   private TableViewer           _mapLocationViewer;
+   private MapLocationComparator _mapLocationComparator      = new MapLocationComparator();
+   private ColumnManager         _columnManager;
+   private SelectionAdapter      _columnSortListener;
 
-   private FocusListener                 _keepOpenListener;
+   private SelectionListener     _defaultSelectionListener;
 
-   private ToolItem                      _toolItem;
+   private ToolItem              _toolItem;
 
-   private List<TourLocation>            _allMapLocations            = MapLocationManager.getMapLocations();
+   private List<TourLocation>    _allMapLocations            = MapLocationManager.getMapLocations();
 
-   private final NumberFormat            _nf6                        = NumberFormat.getNumberInstance();
+   private final NumberFormat    _nf6                        = NumberFormat.getNumberInstance();
    {
       _nf6.setMinimumFractionDigits(6);
       _nf6.setMaximumFractionDigits(6);
@@ -115,9 +111,13 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
    /*
     * UI controls
     */
-   private Composite _viewerContainer;
+   private Composite       _viewerContainer;
 
-   private Button    _btnDelete;
+   private Button          _btnDelete;
+
+   private Button          _chkIsShowTourLocations_BoundingBox;
+   private Map2View        _map2View;
+   private IDialogSettings _state_Map2;
 
    private class MapLocationComparator extends ViewerComparator {
 
@@ -234,19 +234,24 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
    }
 
    /**
+    * @param map2State
+    * @param map2View
+    * @param map2View
     * @param ownerControl
     * @param toolBar
-    * @param map2View
-    * @param map2State
     */
    public SlideoutMapLocation(final ToolItem toolItem,
-                              final IDialogSettings state) {
+                              final IDialogSettings map2State,
+                              final IDialogSettings slideoutState,
+                              final Map2View map2View) {
 
-      super(toolItem.getParent(), state, new int[] { 325, 400, 325, 400 });
+      super(toolItem.getParent(), slideoutState, new int[] { 325, 400, 325, 400 });
 
       _toolItem = toolItem;
 
-      _state = state;
+      _state_Map2 = map2State;
+      _state_Slideout = slideoutState;
+      _map2View = map2View;
 
       setTitleText(Messages.Slideout_MapLocation_Label_Title);
 
@@ -262,7 +267,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       restoreState_BeforeUI();
 
       // define all columns for the viewer
-      _columnManager = new ColumnManager(this, _state);
+      _columnManager = new ColumnManager(this, _state_Slideout);
       defineAllColumns();
 
       createUI(parent);
@@ -289,24 +294,30 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       GridLayoutFactory.fillDefaults().applyTo(shellContainer);
 //      shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
       {
-         createUI_10_CustomizeLookup(shellContainer);
-         createUI_20_LocationViewer(shellContainer);
+         createUI_10_Options(shellContainer);
+         createUI_80_LocationViewer(shellContainer);
          createUI_90_Actions(shellContainer);
       }
 
       return shellContainer;
    }
 
-   private void createUI_10_CustomizeLookup(final Composite parent) {
+   private void createUI_10_Options(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {}
-
+      {
+         {
+            _chkIsShowTourLocations_BoundingBox = new Button(container, SWT.CHECK);
+            _chkIsShowTourLocations_BoundingBox.setText(Messages.Slideout_MapLocation_Checkbox_ShowLocationBoundingBox);
+            _chkIsShowTourLocations_BoundingBox.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowTourLocations_BoundingBox);
+         }
+      }
    }
 
-   private void createUI_20_LocationViewer(final Composite parent) {
+   private void createUI_80_LocationViewer(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -314,14 +325,14 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       {
          {
             final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Slideout_TourGeoFilter_Label_History);
+            label.setText(Messages.Slideout_MapLocation_Label_Locations);
          }
          {
             _viewerContainer = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
             GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
             {
-               createUI_22_LocationViewer_Table(_viewerContainer);
+               createUI_82_LocationViewer_Table(_viewerContainer);
             }
          }
 
@@ -329,7 +340,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       }
    }
 
-   private void createUI_22_LocationViewer_Table(final Composite parent) {
+   private void createUI_82_LocationViewer_Table(final Composite parent) {
 
       /*
        * Create table
@@ -396,13 +407,13 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
             _mapLocationComparator.__sortColumnId,
             _mapLocationComparator.__sortDirection);
 
-      createUI_24_LocationViewer_ContextMenu();
+      createUI_84_LocationViewer_ContextMenu();
    }
 
    /**
     * Ceate the view context menus
     */
-   private void createUI_24_LocationViewer_ContextMenu() {
+   private void createUI_84_LocationViewer_ContextMenu() {
 
       final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 
@@ -721,28 +732,12 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
       _pc = new PixelConverter(parent);
 
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI());
+
       _columnSortListener = new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
             onSelectSortColumn(e);
-         }
-      };
-
-      _keepOpenListener = new FocusListener() {
-
-         @Override
-         public void focusGained(final FocusEvent e) {
-
-            /*
-             * This will fix the problem that when the list of a combobox is displayed, then the
-             * slideout will disappear :-(((
-             */
-            setIsKeepOpenInternally(true);
-         }
-
-         @Override
-         public void focusLost(final FocusEvent e) {
-            setIsKeepOpenInternally(false);
          }
       };
    }
@@ -763,6 +758,13 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       }
 
       return false;
+   }
+
+   private void onChangeUI() {
+
+      _state_Map2.put(Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX, _chkIsShowTourLocations_BoundingBox.getSelection());
+
+      _map2View.updateState_Map2_Options();
    }
 
    @Override
@@ -860,7 +862,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       {
          _mapLocationViewer.getTable().dispose();
 
-         createUI_22_LocationViewer_Table(_viewerContainer);
+         createUI_82_LocationViewer_Table(_viewerContainer);
          _viewerContainer.layout();
 
          // update the viewer
@@ -879,13 +881,17 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
    private void restoreState() {
 
+      _chkIsShowTourLocations_BoundingBox.setSelection(Util.getStateBoolean(_state_Map2,
+            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX,
+            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX_DEFAULT));
+
    }
 
    private void restoreState_BeforeUI() {
 
       // sorting
-      final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, TableColumnFactory.SENSOR_NAME_ID);
-      final int sortDirection = Util.getStateInt(_state, STATE_SORT_COLUMN_DIRECTION, MapLocationComparator.ASCENDING);
+      final String sortColumnId = Util.getStateString(_state_Slideout, STATE_SORT_COLUMN_ID, TableColumnFactory.SENSOR_NAME_ID);
+      final int sortDirection = Util.getStateInt(_state_Slideout, STATE_SORT_COLUMN_DIRECTION, MapLocationComparator.ASCENDING);
 
       // update comparator
       _mapLocationComparator.__sortColumnId = sortColumnId;
@@ -895,17 +901,12 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
    @Override
    protected void saveState() {
 
-      _columnManager.saveState(_state);
+      _columnManager.saveState(_state_Slideout);
 
-      _state.put(STATE_SORT_COLUMN_ID, _mapLocationComparator.__sortColumnId);
-      _state.put(STATE_SORT_COLUMN_DIRECTION, _mapLocationComparator.__sortDirection);
+      _state_Slideout.put(STATE_SORT_COLUMN_ID, _mapLocationComparator.__sortColumnId);
+      _state_Slideout.put(STATE_SORT_COLUMN_DIRECTION, _mapLocationComparator.__sortDirection);
 
       super.saveState();
-   }
-
-   @Override
-   protected void saveState_BeforeDisposed() {
-
    }
 
    @Override

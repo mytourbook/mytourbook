@@ -185,6 +185,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -227,10 +228,10 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_IS_SHOW_LEGEND_IN_MAP                           = "STATE_IS_SHOW_LEGEND_IN_MAP";                         //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_PHOTO_IN_MAP                            = "STATE_IS_SHOW_PHOTO_IN_MAP";                          //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_IN_MAP                             = "STATE_IS_SHOW_TOUR_IN_MAP";                           //$NON-NLS-1$
-   static final String           STATE_IS_SHOW_TOUR_LOCATIONS                          = "STATE_IS_SHOW_TOUR_LOCATIONS";                           //$NON-NLS-1$
+   public static final String    STATE_IS_SHOW_TOUR_LOCATIONS                          = "STATE_IS_SHOW_TOUR_LOCATIONS";                           //$NON-NLS-1$
    static final boolean          STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT                  = true;
-   static final String           STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX             = "STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX";                           //$NON-NLS-1$
-   static final boolean          STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX_DEFAULT     = true;
+   public static final String    STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX             = "STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX";                           //$NON-NLS-1$
+   public static final boolean   STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX_DEFAULT     = true;
    private static final String   STATE_IS_SHOW_VALUE_POINT                             = "STATE_IS_SHOW_VALUE_POINT";                           //$NON-NLS-1$
    private static final boolean  STATE_IS_SHOW_VALUE_POINT_DEFAULT                     = true;
 
@@ -612,12 +613,15 @@ public class Map2View extends ViewPart implements
       public ActionMap2_MapLocation() {
 
          super(_actionImageDescriptor, _actionImageDescriptor);
+
+         isToggleAction = true;
+         notSelectedTooltip = Messages.Map_Action_MapLocations_Tooltip;
       }
 
       @Override
       protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-         _slideoutMapLocation = new SlideoutMapLocation(toolItem, _state_MapLocation);
+         _slideoutMapLocation = new SlideoutMapLocation(toolItem, _state, _state_MapLocation, Map2View.this);
          _slideoutMapLocation.setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
 
          return _slideoutMapLocation;
@@ -626,6 +630,16 @@ public class Map2View extends ViewPart implements
       @Override
       protected void onBeforeOpenSlideout() {
          closeOpenedDialogs(this);
+      }
+
+      @Override
+      protected void onSelect(final SelectionEvent selectionEvent) {
+
+         super.onSelect(selectionEvent);
+
+         _state.put(Map2View.STATE_IS_SHOW_TOUR_LOCATIONS, getSelection());
+
+         updateState_Map2_Options();
       }
    }
 
@@ -1825,7 +1839,7 @@ public class Map2View extends ViewPart implements
       _allTourColor_Actions.put(MapGraphId.HrZone,             _actionTourColor_HrZone);
       _allTourColor_Actions.put(MapGraphId.RunDyn_StepLength,  _actionTourColor_RunDyn_StepLength);
 
-      // map2 slideouts
+      // actions with slideouts
       _actionMap2Slideout_Bookmarks       = new ActionMapBookmarks(this._parent, this);
       _actionMap2Slideout_Color           = new ActionMap2Color();
       _actionMap2Slideout_MapLocation     = new ActionMap2_MapLocation();
@@ -4516,6 +4530,12 @@ public class Map2View extends ViewPart implements
             Util.getStateDouble(_state, STATE_DEFAULT_POSITION_LATITUDE, 46.303074),
             Util.getStateDouble(_state, STATE_DEFAULT_POSITION_LONGITUDE, 7.526386));
 
+      // map/tour locations
+      final boolean isShowTourLocations = Util.getStateBoolean(_state,
+            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS,
+            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT);
+      _actionMap2Slideout_MapLocation.setSelection(isShowTourLocations);
+
       // tour color
       try {
 
@@ -5239,7 +5259,7 @@ public class Map2View extends ViewPart implements
       photoFilter_UpdateFromSlideout(filterRatingStars, ratingStarOperatorsValues);
    }
 
-   void updateState_Map2_Options() {
+   public void updateState_Map2_Options() {
 
 // SET_FORMATTING_OFF
 
@@ -5327,10 +5347,6 @@ public class Map2View extends ViewPart implements
       _tourPainterConfig.isShowUserPauses       = isShowUserPauses;
       _tourPainterConfig.pauseDuration          = pauseDuration;
       _tourPainterConfig.pauseDurationOperator  = pauseDurationOperator;
-
-      /*
-       * Tour locations
-       */
 
 // SET_FORMATTING_ON
 
