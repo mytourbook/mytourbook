@@ -26,6 +26,7 @@ import net.tourbook.common.util.NatTable_LabelProvider_WithLocationTooltip;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
+import net.tourbook.map.location.SlideoutMapLocation;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.location.TourLocationView.LocationItem;
 import net.tourbook.ui.Messages;
@@ -89,6 +90,19 @@ public class TourLocationToolTip extends ToolTip {
     */
    private Composite _ttContainer;
 
+   public TourLocationToolTip(final SlideoutMapLocation slideoutMapLocation) {
+
+      super(slideoutMapLocation.getLocationViewer().getTable(), NO_RECREATE, false);
+
+      final TableViewer locationViewer = slideoutMapLocation.getLocationViewer();
+
+      _ttControl = locationViewer.getTable();
+      _columnViewer = locationViewer;
+
+      setHideOnMouseDown(false);
+      setPopupDelay(20);
+   }
+
    public TourLocationToolTip(final TourBookView tourBookView, final boolean isNatTable) {
 
       super(isNatTable
@@ -118,7 +132,6 @@ public class TourLocationToolTip extends ToolTip {
       }
 
       setHideOnMouseDown(false);
-
       setPopupDelay(20);
    }
 
@@ -136,7 +149,6 @@ public class TourLocationToolTip extends ToolTip {
       _columnViewer = locationViewer;
 
       setHideOnMouseDown(false);
-
       setPopupDelay(20);
    }
 
@@ -469,6 +481,17 @@ public class TourLocationToolTip extends ToolTip {
                _colLocationItem = locationItem;
 
                _tourLocation = locationItem.tourLocation;
+            }
+
+         } else if (labelProvider instanceof SlideoutMapLocation.TooltipLabelProvider) {
+
+            // slideout map location
+
+            final Object cellElement = _colViewerCell.getElement();
+
+            if (cellElement instanceof final TourLocation tourLocation) {
+
+               _tourLocation = tourLocation;
             }
 
          } else {

@@ -33,7 +33,6 @@ import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.map2.Messages;
-import net.tourbook.tour.location.AddressLocationManager;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -62,6 +61,7 @@ public class DirectMappingPainter implements IDirectPainter {
    private boolean                _isShowLocations_Address;
    private boolean                _isShowLocations_Tour;
 
+   private List<TourLocation>     _allAddressLocations;
    private List<TourLocation>     _allTourLocations;
 
    private SliderPathPaintingData _sliderPathPaintingData;
@@ -747,11 +747,9 @@ public class DirectMappingPainter implements IDirectPainter {
 
          if (_isShowLocations_Address) {
 
-            final List<TourLocation> allAddressLocations = AddressLocationManager.getAddressLocations();
+            if (_allAddressLocations != null && _allAddressLocations.size() > 0) {
 
-            if (allAddressLocations.size() > 0) {
-
-               drawMapLocation(painterContext, allAddressLocations);
+               drawMapLocation(painterContext, _allAddressLocations);
             }
          }
       }
@@ -788,6 +786,11 @@ public class DirectMappingPainter implements IDirectPainter {
       if (_isShowSliderInLegend) {
          drawValueMarkerInLegend(painterContext);
       }
+   }
+
+   public void setAddressLocations(final List<TourLocation> allLocations) {
+
+      _allAddressLocations = allLocations;
    }
 
    /**

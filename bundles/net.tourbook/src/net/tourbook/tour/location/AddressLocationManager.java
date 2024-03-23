@@ -43,7 +43,7 @@ import org.osgi.framework.Version;
  */
 public class AddressLocationManager {
 
-   private static final String             CONFIG_FILE_NAME                         = "map-locations.xml";                         //$NON-NLS-1$
+   private static final String             CONFIG_FILE_NAME                         = "address-locations.xml";                     //$NON-NLS-1$
 
    private static final Bundle             _bundle                                  = TourbookPlugin.getDefault().getBundle();
    private static final IPath              _stateLocation                           = Platform.getStateLocation(_bundle);
@@ -52,10 +52,9 @@ public class AddressLocationManager {
     * Version number is not yet used.
     */
    private static final int                CONFIG_VERSION                           = 1;
-   //
-   private static final String             TAG_ROOT                                 = "MapLocations";                              //$NON-NLS-1$
    private static final String             ATTR_CONFIG_VERSION                      = "configVersion";                             //$NON-NLS-1$
    //
+   private static final String             TAG_ROOT                                 = "AddressLocations";                          //$NON-NLS-1$
    private static final String             TAG_ALL_LOCATIONS                        = "AllLocations";                              //$NON-NLS-1$
    private static final String             TAG_LOCATION                             = "Location";                                  //$NON-NLS-1$
    //
@@ -254,74 +253,74 @@ public class AddressLocationManager {
 
 // SET_FORMATTING_OFF
 
-      tourLocation.name                      = parseString(xmlLocation,  ATTR_NAME_NAME);
-      tourLocation.display_name              = parseString(xmlLocation,  ATTR_NAME_DISPLAY_NAME);
+      tourLocation.name                = parseString(xmlLocation,  ATTR_NAME_NAME);
+      tourLocation.display_name        = parseString(xmlLocation,  ATTR_NAME_DISPLAY_NAME);
 
-      tourLocation.zoomlevel                 = Util.getXmlInteger(xmlLocation, ATTR_ZOOMLEVEL, TourLocationManager.DEFAULT_ZOOM_LEVEL_VALUE);
+      tourLocation.zoomlevel           = Util.getXmlInteger(xmlLocation, ATTR_ZOOMLEVEL, TourLocationManager.DEFAULT_ZOOM_LEVEL_VALUE);
 
-      tourLocation.country                   = parseString(xmlLocation,  ATTR_COUNTRY_COUNTRY);
-      tourLocation.country_code              = parseString(xmlLocation,  ATTR_COUNTRY__COUNTRY_CODE);
-      tourLocation.continent                 = parseString(xmlLocation,  ATTR_COUNTRY__CONTINENT);
+      tourLocation.country             = parseString(xmlLocation,  ATTR_COUNTRY_COUNTRY);
+      tourLocation.country_code        = parseString(xmlLocation,  ATTR_COUNTRY__COUNTRY_CODE);
+      tourLocation.continent           = parseString(xmlLocation,  ATTR_COUNTRY__CONTINENT);
 
-      tourLocation.region                    = parseString(xmlLocation,  ATTR_STATE_REGION);
-      tourLocation.state                     = parseString(xmlLocation,  ATTR_STATE_STATE);
-      tourLocation.state_district            = parseString(xmlLocation,  ATTR_STATE_STATE_DISTRICT);
-      tourLocation.county                    = parseString(xmlLocation,  ATTR_STATE_COUNTY);
+      tourLocation.region              = parseString(xmlLocation,  ATTR_STATE_REGION);
+      tourLocation.state               = parseString(xmlLocation,  ATTR_STATE_STATE);
+      tourLocation.state_district      = parseString(xmlLocation,  ATTR_STATE_STATE_DISTRICT);
+      tourLocation.county              = parseString(xmlLocation,  ATTR_STATE_COUNTY);
 
-      tourLocation.municipality              = parseString(xmlLocation,  ATTR_CITY_MUNICIPALITY);
-      tourLocation.city                      = parseString(xmlLocation,  ATTR_CITY_CITY);
-      tourLocation.town                      = parseString(xmlLocation,  ATTR_CITY_TOWN);
-      tourLocation.village                   = parseString(xmlLocation,  ATTR_CITY_VILLAGE);
-      tourLocation.postcode                  = parseString(xmlLocation,  ATTR_CITY_POSTCODE);
+      tourLocation.municipality        = parseString(xmlLocation,  ATTR_CITY_MUNICIPALITY);
+      tourLocation.city                = parseString(xmlLocation,  ATTR_CITY_CITY);
+      tourLocation.town                = parseString(xmlLocation,  ATTR_CITY_TOWN);
+      tourLocation.village             = parseString(xmlLocation,  ATTR_CITY_VILLAGE);
+      tourLocation.postcode            = parseString(xmlLocation,  ATTR_CITY_POSTCODE);
 
-      tourLocation.road                      = parseString(xmlLocation,  ATTR_ROAD_ROAD);
-      tourLocation.house_number              = parseString(xmlLocation,  ATTR_ROAD_HOUSE_NUMBER);
-      tourLocation.house_name                = parseString(xmlLocation,  ATTR_ROAD_HOUSE_NAME);
+      tourLocation.road                = parseString(xmlLocation,  ATTR_ROAD_ROAD);
+      tourLocation.house_number        = parseString(xmlLocation,  ATTR_ROAD_HOUSE_NUMBER);
+      tourLocation.house_name          = parseString(xmlLocation,  ATTR_ROAD_HOUSE_NAME);
 
-      tourLocation.city_district             = parseString(xmlLocation,  ATTR_AREA1_CITY_DISTRICT);
-      tourLocation.district                  = parseString(xmlLocation,  ATTR_AREA1_DISTRICT);
-      tourLocation.borough                   = parseString(xmlLocation,  ATTR_AREA1_BOROUGH);
-      tourLocation.suburb                    = parseString(xmlLocation,  ATTR_AREA1_SUBURB);
-      tourLocation.subdivision               = parseString(xmlLocation,  ATTR_AREA1_SUBDIVISION);
+      tourLocation.city_district       = parseString(xmlLocation,  ATTR_AREA1_CITY_DISTRICT);
+      tourLocation.district            = parseString(xmlLocation,  ATTR_AREA1_DISTRICT);
+      tourLocation.borough             = parseString(xmlLocation,  ATTR_AREA1_BOROUGH);
+      tourLocation.suburb              = parseString(xmlLocation,  ATTR_AREA1_SUBURB);
+      tourLocation.subdivision         = parseString(xmlLocation,  ATTR_AREA1_SUBDIVISION);
 
-      tourLocation.hamlet                    = parseString(xmlLocation,  ATTR_AREA2_HAMLET);
-      tourLocation.croft                     = parseString(xmlLocation,  ATTR_AREA2_CROFT);
-      tourLocation.isolated_dwelling         = parseString(xmlLocation,  ATTR_AREA2_ISOLATED_DWELLING);
+      tourLocation.hamlet              = parseString(xmlLocation,  ATTR_AREA2_HAMLET);
+      tourLocation.croft               = parseString(xmlLocation,  ATTR_AREA2_CROFT);
+      tourLocation.isolated_dwelling   = parseString(xmlLocation,  ATTR_AREA2_ISOLATED_DWELLING);
 
-      tourLocation.neighbourhood             = parseString(xmlLocation,  ATTR_AREA3_NEIGHBOURHOOD);
-      tourLocation.allotments                = parseString(xmlLocation,  ATTR_AREA3_ALLOTMENTS);
-      tourLocation.quarter                   = parseString(xmlLocation,  ATTR_AREA3_QUARTER);
+      tourLocation.neighbourhood       = parseString(xmlLocation,  ATTR_AREA3_NEIGHBOURHOOD);
+      tourLocation.allotments          = parseString(xmlLocation,  ATTR_AREA3_ALLOTMENTS);
+      tourLocation.quarter             = parseString(xmlLocation,  ATTR_AREA3_QUARTER);
 
-      tourLocation.city_block                = parseString(xmlLocation,  ATTR_AREA4_CITY_BLOCK);
-      tourLocation.residential               = parseString(xmlLocation,  ATTR_AREA4_RESIDETIAL);
-      tourLocation.farm                      = parseString(xmlLocation,  ATTR_AREA4_FARM);
-      tourLocation.farmyard                  = parseString(xmlLocation,  ATTR_AREA4_FARMYARD);
-      tourLocation.industrial                = parseString(xmlLocation,  ATTR_AREA4_INDUSTRIAL);
-      tourLocation.commercial                = parseString(xmlLocation,  ATTR_AREA4_COMMERCIAL);
-      tourLocation.retail                    = parseString(xmlLocation,  ATTR_AREA4_RETAIL);
+      tourLocation.city_block          = parseString(xmlLocation,  ATTR_AREA4_CITY_BLOCK);
+      tourLocation.residential         = parseString(xmlLocation,  ATTR_AREA4_RESIDETIAL);
+      tourLocation.farm                = parseString(xmlLocation,  ATTR_AREA4_FARM);
+      tourLocation.farmyard            = parseString(xmlLocation,  ATTR_AREA4_FARMYARD);
+      tourLocation.industrial          = parseString(xmlLocation,  ATTR_AREA4_INDUSTRIAL);
+      tourLocation.commercial          = parseString(xmlLocation,  ATTR_AREA4_COMMERCIAL);
+      tourLocation.retail              = parseString(xmlLocation,  ATTR_AREA4_RETAIL);
 
-      tourLocation.aerialway                 = parseString(xmlLocation,  ATTR_OTHER_AERIALWAY);
-      tourLocation.aeroway                   = parseString(xmlLocation,  ATTR_OTHER_AEROWAY);
-      tourLocation.amenity                   = parseString(xmlLocation,  ATTR_OTHER_AMENITY);
-      tourLocation.boundary                  = parseString(xmlLocation,  ATTR_OTHER_BOUNDARY);
-      tourLocation.bridge                    = parseString(xmlLocation,  ATTR_OTHER_BRIDGE);
-      tourLocation.club                      = parseString(xmlLocation,  ATTR_OTHER_CLUB);
-      tourLocation.craft                     = parseString(xmlLocation,  ATTR_OTHER_CRAFT);
-      tourLocation.emergency                 = parseString(xmlLocation,  ATTR_OTHER_EMERGENCY);
-      tourLocation.historic                  = parseString(xmlLocation,  ATTR_OTHER_HISTORIC);
-      tourLocation.landuse                   = parseString(xmlLocation,  ATTR_OTHER_LANDUSE);
-      tourLocation.leisure                   = parseString(xmlLocation,  ATTR_OTHER_LEISURE);
-      tourLocation.man_made                  = parseString(xmlLocation,  ATTR_OTHER_MAN_MADE);
-      tourLocation.military                  = parseString(xmlLocation,  ATTR_OTHER_MILITARY);
-      tourLocation.mountain_pass             = parseString(xmlLocation,  ATTR_OTHER_MOUNTAIN_PASS);
-      tourLocation.natural2                  = parseString(xmlLocation,  ATTR_OTHER_NATURAL2);
-      tourLocation.office                    = parseString(xmlLocation,  ATTR_OTHER_OFFICE);
-      tourLocation.place                     = parseString(xmlLocation,  ATTR_OTHER_PLACE);
-      tourLocation.railway                   = parseString(xmlLocation,  ATTR_OTHER_RAILWAY);
-      tourLocation.shop                      = parseString(xmlLocation,  ATTR_OTHER_SHOP);
-      tourLocation.tourism                   = parseString(xmlLocation,  ATTR_OTHER_TOURISM);
-      tourLocation.tunnel                    = parseString(xmlLocation,  ATTR_OTHER_TUNNEL);
-      tourLocation.waterway                  = parseString(xmlLocation,  ATTR_OTHER_WATERWAY);
+      tourLocation.aerialway           = parseString(xmlLocation,  ATTR_OTHER_AERIALWAY);
+      tourLocation.aeroway             = parseString(xmlLocation,  ATTR_OTHER_AEROWAY);
+      tourLocation.amenity             = parseString(xmlLocation,  ATTR_OTHER_AMENITY);
+      tourLocation.boundary            = parseString(xmlLocation,  ATTR_OTHER_BOUNDARY);
+      tourLocation.bridge              = parseString(xmlLocation,  ATTR_OTHER_BRIDGE);
+      tourLocation.club                = parseString(xmlLocation,  ATTR_OTHER_CLUB);
+      tourLocation.craft               = parseString(xmlLocation,  ATTR_OTHER_CRAFT);
+      tourLocation.emergency           = parseString(xmlLocation,  ATTR_OTHER_EMERGENCY);
+      tourLocation.historic            = parseString(xmlLocation,  ATTR_OTHER_HISTORIC);
+      tourLocation.landuse             = parseString(xmlLocation,  ATTR_OTHER_LANDUSE);
+      tourLocation.leisure             = parseString(xmlLocation,  ATTR_OTHER_LEISURE);
+      tourLocation.man_made            = parseString(xmlLocation,  ATTR_OTHER_MAN_MADE);
+      tourLocation.military            = parseString(xmlLocation,  ATTR_OTHER_MILITARY);
+      tourLocation.mountain_pass       = parseString(xmlLocation,  ATTR_OTHER_MOUNTAIN_PASS);
+      tourLocation.natural2            = parseString(xmlLocation,  ATTR_OTHER_NATURAL2);
+      tourLocation.office              = parseString(xmlLocation,  ATTR_OTHER_OFFICE);
+      tourLocation.place               = parseString(xmlLocation,  ATTR_OTHER_PLACE);
+      tourLocation.railway             = parseString(xmlLocation,  ATTR_OTHER_RAILWAY);
+      tourLocation.shop                = parseString(xmlLocation,  ATTR_OTHER_SHOP);
+      tourLocation.tourism             = parseString(xmlLocation,  ATTR_OTHER_TOURISM);
+      tourLocation.tunnel              = parseString(xmlLocation,  ATTR_OTHER_TUNNEL);
+      tourLocation.waterway            = parseString(xmlLocation,  ATTR_OTHER_WATERWAY);
 
       tourLocation.latitudeE6                            = parseInt(xmlLocation, ATTR_LATITUDE_E6);
       tourLocation.latitudeE6_Normalized                 = parseInt(xmlLocation, ATTR_LATITUDE_E6_NORMALIZED);

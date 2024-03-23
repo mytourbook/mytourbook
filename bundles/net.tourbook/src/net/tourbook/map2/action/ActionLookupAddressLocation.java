@@ -15,10 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
-import com.javadocmd.simplelatlng.LatLng;
-import com.javadocmd.simplelatlng.LatLngTool;
-import com.javadocmd.simplelatlng.util.LengthUnit;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,9 +25,7 @@ import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.ui.SubMenu;
-import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
-import net.tourbook.data.TourLocationPoint;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.tour.TourLogManager;
@@ -43,11 +37,11 @@ import net.tourbook.tour.location.TourLocationManager.ZoomLevel;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Menu;
 
-public class ActionLookupMapLocation extends SubMenu {
+public class ActionLookupAddressLocation extends SubMenu {
 
    private Map2View                _map2View;
 
-   private Long                    _currentHoveredTourId;
+//   private Long                    _currentHoveredTourId;
 
    private List<ActionSetLocation> _allSubmenuActions = new ArrayList<>();
 
@@ -69,9 +63,9 @@ public class ActionLookupMapLocation extends SubMenu {
       }
    }
 
-   public ActionLookupMapLocation(final Map2View mapView) {
+   public ActionLookupAddressLocation(final Map2View mapView) {
 
-      super(Messages.Map_Action_LookupMapLocation, AS_DROP_DOWN_MENU);
+      super(Messages.Map_Action_LookupAddressLocation, AS_DROP_DOWN_MENU);
 
       _map2View = mapView;
 
@@ -114,48 +108,47 @@ public class ActionLookupMapLocation extends SubMenu {
       final double clickedTourPointLatitude = mouseMoveGeoPosition.latitude;
       final double clickedTourPointLongitude = mouseMoveGeoPosition.longitude;
 
-      double locationLatitude = clickedTourPointLatitude;
-      double locationLongitude = clickedTourPointLongitude;
+      final double locationLatitude = clickedTourPointLatitude;
+      final double locationLongitude = clickedTourPointLongitude;
 
       // get hovered tour
-      final TourData tourData = TourManager.getTour(_currentHoveredTourId);
-
-      long absoluteTourTime = 0;
-      int closestLatLonIndex = -1;
-
-      if (tourData != null) {
-
-         // a tour is hovered, adjust location to a tour slice
-
-         final LatLng clickedTourPoint = new LatLng(clickedTourPointLatitude, clickedTourPointLongitude);
-
-         final double[] latitudeSerie = tourData.latitudeSerie;
-         final double[] longitudeSerie = tourData.longitudeSerie;
-
-         double closestDistance = Double.MAX_VALUE;
-
-         for (int index = 0; index < latitudeSerie.length; ++index) {
-
-            final LatLng currentLocation = new LatLng(latitudeSerie[index], longitudeSerie[index]);
-            final double currentDistanceToClickedTourPoint = LatLngTool.distance(clickedTourPoint, currentLocation, LengthUnit.METER);
-
-            if (currentDistanceToClickedTourPoint < closestDistance) {
-
-               closestDistance = currentDistanceToClickedTourPoint;
-               closestLatLonIndex = index;
-            }
-         }
-
-         if (closestLatLonIndex != -1) {
-
-            final int relativeTourTime = tourData.timeSerie[closestLatLonIndex];
-            absoluteTourTime = tourData.getTourStartTimeMS() + (relativeTourTime * 1000);
-
-            locationLatitude = latitudeSerie[closestLatLonIndex];
-            locationLongitude = longitudeSerie[closestLatLonIndex];
-         }
-
-      }
+//      final TourData tourData = TourManager.getTour(_currentHoveredTourId);
+//
+//      long absoluteTourTime = 0;
+//      int closestLatLonIndex = -1;
+//
+//      if (tourData != null) {
+//
+//         // a tour is hovered, adjust location to a tour slice
+//
+//         final double[] latitudeSerie = tourData.latitudeSerie;
+//         final double[] longitudeSerie = tourData.longitudeSerie;
+//
+//         double closestDistance = Double.MAX_VALUE;
+//
+//         for (int index = 0; index < latitudeSerie.length; ++index) {
+//
+//            final double currentDistanceToClickedTourPoint = MtMath.distanceVincenty(clickedTourPointLatitude,
+//                  clickedTourPointLongitude,
+//                  latitudeSerie[index],
+//                  longitudeSerie[index]);
+//
+//            if (currentDistanceToClickedTourPoint < closestDistance) {
+//
+//               closestDistance = currentDistanceToClickedTourPoint;
+//               closestLatLonIndex = index;
+//            }
+//         }
+//
+//         if (closestLatLonIndex != -1) {
+//
+//            final int relativeTourTime = tourData.timeSerie[closestLatLonIndex];
+//            absoluteTourTime = tourData.getTourStartTimeMS() + (relativeTourTime * 1000);
+//
+//            locationLatitude = latitudeSerie[closestLatLonIndex];
+//            locationLongitude = longitudeSerie[closestLatLonIndex];
+//         }
+//      }
 
       /*
        * Retrieve tour location
@@ -179,26 +172,26 @@ public class ActionLookupMapLocation extends SubMenu {
 
       final TourLocation tourLocation = locationData.tourLocation;
 
-      if (tourData != null && closestLatLonIndex != -1) {
+//      if (tourData != null && closestLatLonIndex != -1) {
+//
+//         final int latE6 = (int) (locationLatitude * 1E6);
+//         final int lonE6 = (int) (locationLongitude * 1E6);
+//
+//         final TourLocationPoint tourLocationPoint = new TourLocationPoint(tourData, tourLocation);
+//
+//         tourLocationPoint.setGeoPosition(latE6, lonE6);
+//         tourLocationPoint.setSerieIndex(closestLatLonIndex);
+//         tourLocationPoint.setTourTime(absoluteTourTime);
+//
+//         tourData.getTourLocationPoints().add(tourLocationPoint);
+//      }
 
-         final int latE6 = (int) (locationLatitude * 1E6);
-         final int lonE6 = (int) (locationLongitude * 1E6);
-
-         final TourLocationPoint tourLocationPoint = new TourLocationPoint(tourData, tourLocation);
-
-         tourLocationPoint.setGeoPosition(latE6, lonE6);
-         tourLocationPoint.setSerieIndex(closestLatLonIndex);
-         tourLocationPoint.setTourTime(absoluteTourTime);
-
-         tourData.getTourLocationPoints().add(tourLocationPoint);
-      }
-
-      _map2View.addMapLocation(tourLocation);
+      _map2View.addAddressLocation(tourLocation);
    }
 
    public void setCurrentHoveredTourId(final Long hoveredTourId) {
 
-      _currentHoveredTourId = hoveredTourId;
+//      _currentHoveredTourId = hoveredTourId;
    }
 
 }

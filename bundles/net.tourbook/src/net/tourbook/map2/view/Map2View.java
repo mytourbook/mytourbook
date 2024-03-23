@@ -89,7 +89,7 @@ import net.tourbook.map.location.SlideoutMapLocation;
 import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.action.ActionCreateTourMarkerFromMap;
-import net.tourbook.map2.action.ActionLookupMapLocation;
+import net.tourbook.map2.action.ActionLookupAddressLocation;
 import net.tourbook.map2.action.ActionManageMapProviders;
 import net.tourbook.map2.action.ActionMap2Color;
 import net.tourbook.map2.action.ActionMap2_MapProvider;
@@ -477,12 +477,12 @@ public class Map2View extends ViewPart implements
    private boolean                           _isInMapSync;
    private long                              _lastFiredMapSyncEventTime;
    //
+   private boolean                           _isMapSyncWith_MapLocation;
    private boolean                           _isMapSyncWith_OtherMap;
    private boolean                           _isMapSyncWith_Photo;
    private boolean                           _isMapSyncWith_Slider_Centered;
    private boolean                           _isMapSyncWith_Slider_One;
    private boolean                           _isMapSyncWith_Tour;
-   private boolean                           _isMapSyncWith_TourLocation;
    private boolean                           _isMapSyncWith_ValuePoint;
    //
    private EnumMap<MapGraphId, Action>       _allTourColor_Actions = new EnumMap<>(MapGraphId.class);
@@ -499,7 +499,7 @@ public class Map2View extends ViewPart implements
    private ActionCreateTourMarkerFromMap     _actionCreateTourMarkerFromMap;
    private Action_ExportMap_SubMenu          _actionExportMap_SubMenu;
    private ActionGotoLocation                _actionGotoLocation;
-   private ActionLookupMapLocation           _actionLookupTourLocation;
+   private ActionLookupAddressLocation       _actionLookupTourLocation;
    private ActionManageMapProviders          _actionManageMapProvider;
    private ActionMapBookmarks                _actionMap2Slideout_Bookmarks;
    private ActionMap2Color                   _actionMap2Slideout_Color;
@@ -986,10 +986,10 @@ public class Map2View extends ViewPart implements
 
    public void action_SyncWith_TourLocation() {
 
-      _isMapSyncWith_TourLocation = _actionSyncMapWith_TourLocation.isChecked();
+      _isMapSyncWith_MapLocation = _actionSyncMapWith_TourLocation.isChecked();
       _currentMapSyncMode = MapSyncMode.IsSyncWith_TourLocation;
 
-      if (_isMapSyncWith_TourLocation) {
+      if (_isMapSyncWith_MapLocation) {
 
          deactivateOtherSync(_actionSyncMapWith_TourLocation);
       }
@@ -1385,6 +1385,13 @@ public class Map2View extends ViewPart implements
       paintEntireTour();
    }
 
+   public void addAddressLocation(final TourLocation tourLocation) {
+
+      _slideoutMapLocation.open(false);
+
+      AddressLocationManager.addLocation(tourLocation);
+   }
+
    private void addMapListener() {
 
 // SET_FORMATTING_OFF
@@ -1405,13 +1412,6 @@ public class Map2View extends ViewPart implements
 // SET_FORMATTING_ON
 
       _map.setMapContextProvider(this);
-   }
-
-   public void addMapLocation(final TourLocation tourLocation) {
-
-      _slideoutMapLocation.open(false);
-
-      AddressLocationManager.addLocation(tourLocation);
    }
 
    private void addPartListener() {
@@ -1671,6 +1671,10 @@ public class Map2View extends ViewPart implements
 
             onSelection_HoveredValue((HoveredValueData) eventData);
 
+         } else if (eventId == TourEventId.ADDRESS_LOCATION_SELECTION) {
+
+            moveToAddressLocation(eventData);
+
          } else if (eventId == TourEventId.TOUR_LOCATION_SELECTION) {
 
             moveToTourLocation(eventData);
@@ -1863,7 +1867,7 @@ public class Map2View extends ViewPart implements
       _actionCopyLocation                 = new ActionCopyLocation();
       _actionCreateTourMarkerFromMap      = new ActionCreateTourMarkerFromMap(this);
       _actionGotoLocation                 = new ActionGotoLocation();
-      _actionLookupTourLocation           = new ActionLookupMapLocation(this);
+      _actionLookupTourLocation           = new ActionLookupAddressLocation(this);
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
@@ -2115,7 +2119,7 @@ public class Map2View extends ViewPart implements
 
       if (activeAction != _actionSyncMapWith_TourLocation) {
 
-         _isMapSyncWith_TourLocation = false;
+         _isMapSyncWith_MapLocation = false;
          _actionSyncMapWith_TourLocation.setChecked(false);
       }
 
@@ -2866,6 +2870,13 @@ public class Map2View extends ViewPart implements
       return new GeoPosition(latitudeCenter, longitudeCenter);
    }
 
+   /**
+    * Collect tour locations from a tour
+    *
+    * @param tourData
+    *
+    * @return
+    */
    private List<TourLocation> getTourLocations(final TourData tourData) {
 
       final List<TourLocation> allTourLocations = new ArrayList<>();
@@ -3231,6 +3242,41 @@ public class Map2View extends ViewPart implements
       _actionShowPOI.setChecked(true);
    }
 
+   @SuppressWarnings("unchecked")
+   private void moveToAddressLocation(final Object eventData) {
+
+      List<TourLocation> allTourLocations = null;
+
+      if (eventData instanceof final List allTourLocationsFromEvent) {
+         allTourLocations = allTourLocationsFromEvent;
+      }
+
+      if (eventData == null
+            || allTourLocations == null
+            || allTourLocations.size() == 0) {
+
+         // hide tour locations
+
+         _directMappingPainter.setAddressLocations(null);
+
+         _map.redraw();
+
+         return;
+      }
+
+      // repaint map
+      _directMappingPainter.setAddressLocations(allTourLocations);
+
+      _map.redraw();
+
+      if (_isMapSyncWith_MapLocation) {
+
+         final GeoPosition geoPosition = getTourLocationCenter(allTourLocations);
+
+         _map.setMapCenter(geoPosition);
+      }
+   }
+
    @Override
    public void moveToMapLocation(final MapBookmark mapBookmark) {
 
@@ -3271,7 +3317,7 @@ public class Map2View extends ViewPart implements
 
       _map.redraw();
 
-      if (_isMapSyncWith_TourLocation) {
+      if (_isMapSyncWith_MapLocation) {
 
          final GeoPosition geoPosition = getTourLocationCenter(allTourLocations);
 
@@ -3340,7 +3386,7 @@ public class Map2View extends ViewPart implements
             paintToursAndPhotos(tourData, selection);
 
             // recenter map AFTER it was centered in the paint... method
-            if (_isMapSyncWith_TourLocation) {
+            if (_isMapSyncWith_MapLocation) {
 
                final GeoPosition hoveredTourLocation = tourIdSelection.getHoveredTourLocation();
 
@@ -4127,7 +4173,7 @@ public class Map2View extends ViewPart implements
                   tourData.mapCenterPositionLongitude));
          }
 
-      } else if (_isMapSyncWith_TourLocation) {
+      } else if (_isMapSyncWith_MapLocation) {
 
          // center map to tour locations
 
