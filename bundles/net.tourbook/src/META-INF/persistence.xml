@@ -15,7 +15,6 @@
       <class>net.tourbook.data.TourCompared</class>
       <class>net.tourbook.data.TourData</class>
       <class>net.tourbook.data.TourLocation</class>
-      <class>net.tourbook.data.TourLocationPoint</class>
       <class>net.tourbook.data.TourMarker</class>
       <class>net.tourbook.data.TourNutritionProduct</class>
       <class>net.tourbook.data.TourPerson</class>
