@@ -826,7 +826,10 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
       AddressLocationManager.setMapLocationSlideout(null);
 
-      _prefStore.removePropertyChangeListener(_prefChangeListener);
+      if (_prefChangeListener != null) {
+
+         _prefStore.removePropertyChangeListener(_prefChangeListener);
+      }
 
       super.onDispose();
    }
