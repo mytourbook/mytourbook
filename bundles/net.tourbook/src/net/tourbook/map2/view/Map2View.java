@@ -642,9 +642,7 @@ public class Map2View extends ViewPart implements
 
          super.onSelect(selectionEvent);
 
-         _state.put(Map2View.STATE_IS_SHOW_MAP_LOCATIONS, getSelection());
-
-         updateState_Map2_Options();
+         updateUI_MapLocations(getSelection());
       }
    }
 
@@ -1387,9 +1385,18 @@ public class Map2View extends ViewPart implements
 
    public void addAddressLocation(final TourLocation tourLocation) {
 
-      _slideoutMapLocation.open(false);
-
+      // update model + UI
       AddressLocationManager.addLocation(tourLocation);
+
+      // update UI
+      if (_actionMap2Slideout_MapLocation.getSelection() == false) {
+
+         // location is not painted
+
+         _actionMap2Slideout_MapLocation.setSelection(true);
+
+         updateUI_MapLocations(true);
+      }
    }
 
    private void addMapListener() {
@@ -5539,6 +5546,13 @@ public class Map2View extends ViewPart implements
       if (_isMapSyncWith_ValuePoint) {
          positionMapTo_ValueIndex(hoveredTourData, hoveredSerieIndex);
       }
+   }
+
+   private void updateUI_MapLocations(final boolean isSelected) {
+
+      _state.put(Map2View.STATE_IS_SHOW_MAP_LOCATIONS, isSelected);
+
+      updateState_Map2_Options();
    }
 
    public void updateUI_Photos() {
