@@ -107,10 +107,10 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
    private PixelConverter          _pc;
 
-   private final NumberFormat      _nf6                        = NumberFormat.getNumberInstance();
+   private final NumberFormat      _nf3                        = NumberFormat.getNumberInstance();
    {
-      _nf6.setMinimumFractionDigits(6);
-      _nf6.setMaximumFractionDigits(6);
+      _nf3.setMinimumFractionDigits(3);
+      _nf3.setMaximumFractionDigits(3);
    }
 
    /*
@@ -155,6 +155,14 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
          case COLUMN_ZOOM_LEVEL:
             rc = location1.zoomlevel - location2.zoomlevel;
+            break;
+
+         case TableColumnFactory.LOCATION_GEO_BOUNDING_BOX_WIDTH_ID:
+            rc = location1.boundingBoxWidth - location2.boundingBoxWidth;
+            break;
+
+         case TableColumnFactory.LOCATION_GEO_BOUNDING_BOX_HEIGHT_ID:
+            rc = location1.boundingBoxHeight - location2.boundingBoxHeight;
             break;
 
          case TableColumnFactory.LOCATION_GEO_LATITUDE_ID:
@@ -553,11 +561,11 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
             if (UI.IS_SCRAMBLE_DATA) {
 
-               cell.setText(UI.scrambleText(item.display_name));
+               cell.setText(UI.scrambleText(item.name));
 
             } else {
 
-               cell.setText(item.display_name);
+               cell.setText(item.name);
             }
          }
       });
@@ -667,7 +675,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(_nf6.format(((TourLocation) cell.getElement()).latitude));
+            cell.setText(_nf3.format(((TourLocation) cell.getElement()).latitude));
          }
       });
    }
@@ -683,7 +691,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
          @Override
          public void update(final ViewerCell cell) {
 
-            cell.setText(_nf6.format(((TourLocation) cell.getElement()).longitude));
+            cell.setText(_nf3.format(((TourLocation) cell.getElement()).longitude));
          }
       });
    }
@@ -692,13 +700,14 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
       final List<TourLocation> allSelectedLocations = getSelectedLocations();
 
-      final boolean isLocationSelected = allSelectedLocations.size() > 0;
       final boolean isShowAddressLocations = _chkIsShowAddressLocations.getSelection();
       final boolean isShowTourLocations = _chkIsShowTourLocations.getSelection();
+      final boolean isAddressLocationSelected = isShowAddressLocations && allSelectedLocations.size() > 0;
 
-      _btnDelete.setEnabled(isLocationSelected);
+      _btnDelete.setEnabled(isAddressLocationSelected);
 
       _chkIsShowMapLocations_BoundingBox.setEnabled(isShowAddressLocations || isShowTourLocations);
+      _mapLocationViewer.getTable().setEnabled(isShowAddressLocations);
    }
 
    private void fillUI() {
