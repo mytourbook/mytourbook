@@ -65,6 +65,7 @@ New
 
 * Address Location
   - Lookup a map location from a location provider and use it like a map bookmark
+    https://github.com/mytourbook/mytourbook/issues/1315
 
 
 Improvements
