@@ -76,11 +76,12 @@ public class MesgListener_Lap extends AbstractMesgListener implements LapMesgLis
        */
       //todo fb ca  se passe ici
       //https://forums.garmin.com/developer/fit-sdk/b/news-announcements/posts/important-fit-activity-file-message-change
-      //todo fb final DateTime garminTime = lapMesg.getStartTime();
-      final DateTime garminTime = lapMesg.getTimestamp();
+      //    final DateTime garminTime = lapMesg.getTimestamp();
+      final DateTime garminTime = lapMesg.getStartTime();
+      //  garminNewTime.add(lapMesg.getTotalElapsedTime());
       if (garminTime != null) {
 
-         tourMarker.setDeviceLapTime(garminTime.getDate().getTime());
+         tourMarker.setDeviceLapTime(garminTime.getDate().getTime() + lapMesg.getTotalElapsedTime().longValue());
 
       } else {
 
