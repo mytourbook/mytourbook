@@ -259,30 +259,24 @@ public class ColumnManager {
 
    static String getAlignmentText(final int alignment) {
 
-// SET_FORMATTING_OFF
-
       return switch (alignment) {
 
-      case SWT.CENTER   -> ALIGNMENT_CENTER;
-      case SWT.TRAIL    -> ALIGNMENT_RIGHT;
-      default           -> ALIGNMENT_LEFT;
+      case SWT.CENTER -> ALIGNMENT_CENTER;
+      case SWT.TRAIL  -> ALIGNMENT_RIGHT;
+      default         -> ALIGNMENT_LEFT;
 
-// SET_FORMATTING_ON
       };
    }
 
    private static int getAlignmentValue(final String alignment) {
 
-// SET_FORMATTING_OFF
-
       return switch (alignment) {
 
-      case ALIGNMENT_CENTER   -> SWT.CENTER;
-      case ALIGNMENT_RIGHT    -> SWT.TRAIL;
-      default                 -> SWT.LEAD;
+      case ALIGNMENT_CENTER -> SWT.CENTER;
+      case ALIGNMENT_RIGHT  -> SWT.TRAIL;
+      default               -> SWT.LEAD;
+      
       };
-
-// SET_FORMATTING_ON
    }
 
    static IValueFormatter getDefaultDefaultValueFormatter() {

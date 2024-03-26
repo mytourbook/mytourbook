@@ -87,6 +87,8 @@ public class Messages extends NLS {
    public static String        Column_Profile_Dialog_Title;
    public static String        Column_Profile_Name_Default;
 
+   public static String        ColumnFactory_Category_Quirky;
+
    public static String        ColumnModifyDialog_Button_default;
    public static String        ColumnModifyDialog_Button_Default2_Tooltip;
    public static String        ColumnModifyDialog_Button_DefaultWidth;

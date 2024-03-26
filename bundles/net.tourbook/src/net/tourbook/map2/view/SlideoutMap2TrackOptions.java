@@ -1106,7 +1106,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
       saveState();
       enableControls();
 
-      _map2View.restoreState_Map2_Options();
+      _map2View.updateState_Map2_Options();
    }
 
    private void onChangeUI_UpdateMap_TrackOptions() {
@@ -1114,7 +1114,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
       saveState();
       enableControls();
 
-      _map2View.restoreState_Map2_TrackOptions(true);
+      _map2View.updateState_Map2_TrackOptions(true);
    }
 
 // SET_FORMATTING_OFF

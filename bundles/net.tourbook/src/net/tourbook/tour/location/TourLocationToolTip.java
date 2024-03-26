@@ -26,6 +26,7 @@ import net.tourbook.common.util.NatTable_LabelProvider_WithLocationTooltip;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
+import net.tourbook.map.location.SlideoutMapLocation;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.location.TourLocationView.LocationItem;
 import net.tourbook.ui.Messages;
@@ -48,7 +49,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 public class TourLocationToolTip extends ToolTip {
@@ -90,6 +90,19 @@ public class TourLocationToolTip extends ToolTip {
     */
    private Composite _ttContainer;
 
+   public TourLocationToolTip(final SlideoutMapLocation slideoutMapLocation) {
+
+      super(slideoutMapLocation.getLocationViewer().getTable(), NO_RECREATE, false);
+
+      final TableViewer locationViewer = slideoutMapLocation.getLocationViewer();
+
+      _ttControl = locationViewer.getTable();
+      _columnViewer = locationViewer;
+
+      setHideOnMouseDown(false);
+      setPopupDelay(20);
+   }
+
    public TourLocationToolTip(final TourBookView tourBookView, final boolean isNatTable) {
 
       super(isNatTable
@@ -119,7 +132,6 @@ public class TourLocationToolTip extends ToolTip {
       }
 
       setHideOnMouseDown(false);
-
       setPopupDelay(20);
    }
 
@@ -137,7 +149,6 @@ public class TourLocationToolTip extends ToolTip {
       _columnViewer = locationViewer;
 
       setHideOnMouseDown(false);
-
       setPopupDelay(20);
    }
 
@@ -273,75 +284,7 @@ public class TourLocationToolTip extends ToolTip {
 
          UI.createSpacer_Vertical(container, 16, 2);
 
-// SET_FORMATTING_OFF
-
-         createUI_Content(container,   _tourLocation.name,                  Messages.Tour_Location_Part_OsmName);
-
-         createUI_Content(container,   _tourLocation.country,               Messages.Tour_Location_Part_Country);
-         createUI_Content(container,   _tourLocation.country_code,          Messages.Tour_Location_Part_CountryCode);
-         createUI_Content(container,   _tourLocation.continent,             Messages.Tour_Location_Part_Continent);
-
-         createUI_Content(container,   _tourLocation.region,                Messages.Tour_Location_Part_Region);
-         createUI_Content(container,   _tourLocation.state,                 Messages.Tour_Location_Part_State);
-         createUI_Content(container,   _tourLocation.state_district,        Messages.Tour_Location_Part_StateDistrict);
-         createUI_Content(container,   _tourLocation.county,                Messages.Tour_Location_Part_County);
-
-         createUI_Content(container,   _tourLocation.municipality,          Messages.Tour_Location_Part_Municipality);
-         createUI_Content(container,   _tourLocation.city,                  Messages.Tour_Location_Part_City);
-         createUI_Content(container,   _tourLocation.town,                  Messages.Tour_Location_Part_Town);
-         createUI_Content(container,   _tourLocation.village,               Messages.Tour_Location_Part_Village);
-         createUI_Content(container,   _tourLocation.postcode,              Messages.Tour_Location_Part_Postcode);
-
-         createUI_Content(container,   _tourLocation.road,                  Messages.Tour_Location_Part_Road);
-         createUI_Content(container,   _tourLocation.house_number,          Messages.Tour_Location_Part_HouseNumber);
-         createUI_Content(container,   _tourLocation.house_name,            Messages.Tour_Location_Part_HouseName);
-
-         createUI_Content(container,   _tourLocation.city_district,         Messages.Tour_Location_Part_CityDistrict);
-         createUI_Content(container,   _tourLocation.district,              Messages.Tour_Location_Part_District);
-         createUI_Content(container,   _tourLocation.borough,               Messages.Tour_Location_Part_Borough);
-         createUI_Content(container,   _tourLocation.suburb,                Messages.Tour_Location_Part_Suburb);
-         createUI_Content(container,   _tourLocation.subdivision,           Messages.Tour_Location_Part_Subdivision);
-
-         createUI_Content(container,   _tourLocation.hamlet,                Messages.Tour_Location_Part_Hamlet);
-         createUI_Content(container,   _tourLocation.croft,                 Messages.Tour_Location_Part_Croft);
-         createUI_Content(container,   _tourLocation.isolated_dwelling,     Messages.Tour_Location_Part_IsolatedDwelling);
-
-         createUI_Content(container,   _tourLocation.neighbourhood,         Messages.Tour_Location_Part_Neighbourhood);
-         createUI_Content(container,   _tourLocation.allotments,            Messages.Tour_Location_Part_Allotments);
-         createUI_Content(container,   _tourLocation.quarter,               Messages.Tour_Location_Part_Quarter);
-
-         createUI_Content(container,   _tourLocation.city_block,            Messages.Tour_Location_Part_CityBlock);
-         createUI_Content(container,   _tourLocation.residential,           Messages.Tour_Location_Part_Residential);
-         createUI_Content(container,   _tourLocation.farm,                  Messages.Tour_Location_Part_Farm);
-         createUI_Content(container,   _tourLocation.farmyard,              Messages.Tour_Location_Part_Farmyard);
-         createUI_Content(container,   _tourLocation.industrial,            Messages.Tour_Location_Part_Industrial);
-         createUI_Content(container,   _tourLocation.commercial,            Messages.Tour_Location_Part_Commercial);
-         createUI_Content(container,   _tourLocation.retail,                Messages.Tour_Location_Part_Retail);
-
-         createUI_Content(container,   _tourLocation.aerialway,             Messages.Tour_Location_Part_Aerialway);
-         createUI_Content(container,   _tourLocation.aeroway,               Messages.Tour_Location_Part_Aeroway);
-         createUI_Content(container,   _tourLocation.amenity,               Messages.Tour_Location_Part_Amenity);
-         createUI_Content(container,   _tourLocation.boundary,              Messages.Tour_Location_Part_Boundary);
-         createUI_Content(container,   _tourLocation.bridge,                Messages.Tour_Location_Part_Bridge);
-         createUI_Content(container,   _tourLocation.club,                  Messages.Tour_Location_Part_Club);
-         createUI_Content(container,   _tourLocation.craft,                 Messages.Tour_Location_Part_Craft);
-         createUI_Content(container,   _tourLocation.emergency,             Messages.Tour_Location_Part_Emergency);
-         createUI_Content(container,   _tourLocation.historic,              Messages.Tour_Location_Part_Historic);
-         createUI_Content(container,   _tourLocation.landuse,               Messages.Tour_Location_Part_Landuse);
-         createUI_Content(container,   _tourLocation.leisure,               Messages.Tour_Location_Part_Leisure);
-         createUI_Content(container,   _tourLocation.man_made,              Messages.Tour_Location_Part_ManMade);
-         createUI_Content(container,   _tourLocation.military,              Messages.Tour_Location_Part_Military);
-         createUI_Content(container,   _tourLocation.mountain_pass,         Messages.Tour_Location_Part_MountainPass);
-         createUI_Content(container,   _tourLocation.natural2,              Messages.Tour_Location_Part_Natural);
-         createUI_Content(container,   _tourLocation.office,                Messages.Tour_Location_Part_Office);
-         createUI_Content(container,   _tourLocation.place,                 Messages.Tour_Location_Part_Place);
-         createUI_Content(container,   _tourLocation.railway,               Messages.Tour_Location_Part_Railway);
-         createUI_Content(container,   _tourLocation.shop,                  Messages.Tour_Location_Part_Shop);
-         createUI_Content(container,   _tourLocation.tourism,               Messages.Tour_Location_Part_Tourism);
-         createUI_Content(container,   _tourLocation.tunnel,                Messages.Tour_Location_Part_Tunnel);
-         createUI_Content(container,   _tourLocation.waterway,              Messages.Tour_Location_Part_Waterway);
-
-// SET_FORMATTING_ON
+         TourLocationUI.createUI(container, _tourLocation);
 
          if (_isLocationView) {
 
@@ -370,24 +313,6 @@ public class TourLocationToolTip extends ToolTip {
             }
          }
       }
-   }
-
-   private Text createUI_Content(final Composite parent, final String contentValue, final String contentLabel) {
-
-      if (contentValue == null || contentValue.length() == 0) {
-         return null;
-      }
-
-      // label
-      final Label label = new Label(parent, SWT.NONE);
-
-      // text
-      final Text text = new Text(parent, SWT.READ_ONLY | SWT.WRAP);
-
-      label.setText(contentLabel);
-      text.setText(contentValue);
-
-      return text;
    }
 
    @Override
@@ -556,6 +481,17 @@ public class TourLocationToolTip extends ToolTip {
                _colLocationItem = locationItem;
 
                _tourLocation = locationItem.tourLocation;
+            }
+
+         } else if (labelProvider instanceof SlideoutMapLocation.TooltipLabelProvider) {
+
+            // slideout map location
+
+            final Object cellElement = _colViewerCell.getElement();
+
+            if (cellElement instanceof final TourLocation tourLocation) {
+
+               _tourLocation = tourLocation;
             }
 
          } else {

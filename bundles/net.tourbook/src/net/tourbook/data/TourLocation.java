@@ -17,9 +17,11 @@ package net.tourbook.data;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -30,6 +32,8 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.location.LocationPartID;
@@ -91,45 +95,52 @@ import net.tourbook.tour.location.PartItem;
 @Entity
 public class TourLocation implements Serializable {
 
-   private static final long       serialVersionUID = 1L;
+   private static final long          serialVersionUID = 1L;
 
-   private static final char       NL               = UI.NEW_LINE;
+   private static final char          NL               = UI.NEW_LINE;
 
-   public static final int         DB_FIELD_LENGTH  = 1000;
+   public static final int            DB_FIELD_LENGTH  = 1000;
 
    /**
     * TourLocation fields which are not displayed as location part
     */
-   public static final Set<String> IGNORED_FIELDS   = Stream.of(
+   public static final Set<String>    IGNORED_FIELDS   = Stream.of(
 
-         "ISO3166_2_lvl4",                                                             //$NON-NLS-1$
+         "ISO3166_2_lvl4",                                                                //$NON-NLS-1$
 
-         "name",                                                                       //$NON-NLS-1$
-         "display_name",                                                               //$NON-NLS-1$
+         "name",                                                                          //$NON-NLS-1$
+         "display_name",                                                                  //$NON-NLS-1$
 
-         "appliedName",                                                                //$NON-NLS-1$
-         "lastModified",                                                               //$NON-NLS-1$
+         "appliedName",                                                                   //$NON-NLS-1$
+         "lastModified",                                                                  //$NON-NLS-1$
 
-         "latitudeMinE6_Normalized",                                                   //$NON-NLS-1$
-         "latitudeMaxE6_Normalized",                                                   //$NON-NLS-1$
-         "longitudeMinE6_Normalized",                                                  //$NON-NLS-1$
-         "longitudeMaxE6_Normalized",                                                  //$NON-NLS-1$
+         "latitudeMinE6_Normalized",                                                      //$NON-NLS-1$
+         "latitudeMaxE6_Normalized",                                                      //$NON-NLS-1$
+         "longitudeMinE6_Normalized",                                                     //$NON-NLS-1$
+         "longitudeMaxE6_Normalized",                                                     //$NON-NLS-1$
 
-         "latitudeMinE6_Resized_Normalized",                                           //$NON-NLS-1$
-         "latitudeMaxE6_Resized_Normalized",                                           //$NON-NLS-1$
-         "longitudeMinE6_Resized_Normalized",                                          //$NON-NLS-1$
-         "longitudeMaxE6_Resized_Normalized"                                           //$NON-NLS-1$
+         "latitudeMinE6_Resized_Normalized",                                              //$NON-NLS-1$
+         "latitudeMaxE6_Resized_Normalized",                                              //$NON-NLS-1$
+         "longitudeMinE6_Resized_Normalized",                                             //$NON-NLS-1$
+         "longitudeMaxE6_Resized_Normalized"                                              //$NON-NLS-1$
 
    ).collect(Collectors.toCollection(HashSet::new));
+
+   /**
+    * Manually created location or imported location create a unique id to identify them, saved
+    * location
+    * are compared with the location id
+    */
+   private static final AtomicInteger _createCounter   = new AtomicInteger();
 
    /**
     * Contains the entity id
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                    locationID       = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                       locationID       = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-   public int                      zoomlevel;
+   public int                         zoomlevel;
 
    /*
     * Fields from {@link OSMLocation}, the field names are kept from the downloaded location data
@@ -234,143 +245,164 @@ public class TourLocation implements Serializable {
    public String appliedName;
 
    /**
-    * Datetime when a names was applied last to the associated tours
+    * Datetime when a name was applied last to the associated tours
     */
    public long   lastModified;
 
    /*
     * Fields from {@link OSMAddress}
     */
-   public String continent;
+   public String         continent;
 
-   public String country;
-   public String country_code;
-   public String region;
+   public String         country;
+   public String         country_code;
+   public String         region;
 
-   public String state;
-   public String state_district;
-   public String county;
-   public String municipality;
+   public String         state;
+   public String         state_district;
+   public String         county;
+   public String         municipality;
 
-   public String city;
-   public String town;
-   public String village;
-   public String city_district;
+   public String         city;
+   public String         town;
+   public String         village;
+   public String         city_district;
 
-   public String district;
-   public String borough;
-   public String suburb;
-   public String subdivision;
-   public String hamlet;
+   public String         district;
+   public String         borough;
+   public String         suburb;
+   public String         subdivision;
+   public String         hamlet;
 
-   public String croft;
-   public String isolated_dwelling;
-   public String neighbourhood;
+   public String         croft;
+   public String         isolated_dwelling;
+   public String         neighbourhood;
 
-   public String allotments;
-   public String quarter;
-   public String city_block;
+   public String         allotments;
+   public String         quarter;
+   public String         city_block;
 
-   public String residential;
-   public String farm;
-   public String farmyard;
-   public String industrial;
-   public String commercial;
-   public String retail;
-   public String road;
+   public String         residential;
+   public String         farm;
+   public String         farmyard;
+   public String         industrial;
+   public String         commercial;
+   public String         retail;
+   public String         road;
    //
-   public String house_number;
-   public String house_name;
+   public String         house_number;
+   public String         house_name;
    //
-   public String aerialway;
-   public String aeroway;
-   public String amenity;
-   public String boundary;
-   public String bridge;
-   public String club;
-   public String craft;
-   public String emergency;
-   public String historic;
-   public String landuse;
-   public String leisure;
-   public String man_made;
-   public String military;
-   public String mountain_pass;
+   public String         aerialway;
+   public String         aeroway;
+   public String         amenity;
+   public String         boundary;
+   public String         bridge;
+   public String         club;
+   public String         craft;
+   public String         emergency;
+   public String         historic;
+   public String         landuse;
+   public String         leisure;
+   public String         man_made;
+   public String         military;
+   public String         mountain_pass;
 
    /**
     * "natural" seems to be a SQL name :-?
     * <p>
     * ERROR 42X01: Syntax error: Encountered "natural" at line 55, column 4.
     */
-   public String natural2;
+   public String         natural2;
 
-   public String office;
-   public String place;
-   public String railway;
-   public String shop;
-   public String tourism;
-   public String tunnel;
-   public String waterway;
-   public String postcode;
-
-   @Transient
-   public int    houseNumberValue = Integer.MIN_VALUE;
+   public String         office;
+   public String         place;
+   public String         railway;
+   public String         shop;
+   public String         tourism;
+   public String         tunnel;
+   public String         waterway;
+   public String         postcode;
 
    @Transient
-   public int    postcodeValue    = Integer.MIN_VALUE;
+   public int            houseNumberValue = Integer.MIN_VALUE;
 
    @Transient
-   public String settlementSmall;
-   @Transient
-   public String settlementLarge;
+   public int            postcodeValue    = Integer.MIN_VALUE;
 
    @Transient
-   public double latitude;
+   public String         settlementSmall;
    @Transient
-   public double longitude;
+   public String         settlementLarge;
 
    @Transient
-   public int    latitudeE6;
+   public double         latitude;
    @Transient
-   public int    longitudeE6;
+   public double         longitude;
 
-   /** Cardinal direction: South */
    @Transient
-   public double latitudeMin;
-
-   /** Cardinal direction: North */
+   public int            latitudeE6;
    @Transient
-   public double latitudeMax;
-
-   /** Cardinal direction: West */
-   @Transient
-   public double longitudeMin;
-
-   /** Cardinal direction: East */
-   @Transient
-   public double longitudeMax;
+   public int            longitudeE6;
 
    /** Cardinal direction: South */
    @Transient
-   public double latitudeMin_Resized;
+   public double         latitudeMin;
 
    /** Cardinal direction: North */
    @Transient
-   public double latitudeMax_Resized;
+   public double         latitudeMax;
 
    /** Cardinal direction: West */
    @Transient
-   public double longitudeMin_Resized;
+   public double         longitudeMin;
 
    /** Cardinal direction: East */
    @Transient
-   public double longitudeMax_Resized;
+   public double         longitudeMax;
+
+   /** Cardinal direction: South */
+   @Transient
+   public double         latitudeMin_Resized;
+
+   /** Cardinal direction: North */
+   @Transient
+   public double         latitudeMax_Resized;
+
+   /** Cardinal direction: West */
+   @Transient
+   public double         longitudeMin_Resized;
+
+   /** Cardinal direction: East */
+   @Transient
+   public double         longitudeMax_Resized;
 
    /**
     * Key for the <b>NOT</b> resized bounding box, is e.g. used to identify the location color
     */
    @Transient
-   public long   boundingBoxKey;
+   public long           boundingBoxKey;
+
+   /** Bounding box width in meters */
+   @Transient
+   public double         boundingBoxWidth;
+
+   /** Bounding box height in meters */
+   @Transient
+   public double         boundingBoxHeight;
+
+   @Transient
+   private ZonedDateTime created;
+
+   @Transient
+   private long          createdMS;
+
+   /**
+    * Unique id for manually created locations because the {@link #locationId} is 0 when the
+    * location is not persisted
+    */
+   @Transient
+   private long          _createId;
 
    /**
     * Default constructor used also in ejb
@@ -387,6 +419,25 @@ public class TourLocation implements Serializable {
 
       latitudeE6_Normalized = latitudeE6 + 90_000_000;
       longitudeE6_Normalized = longitudeE6 + 180_000_000;
+
+      created = TimeTools.now();
+      createdMS = TimeTools.toEpochMilli(created);
+
+      _createId = _createCounter.incrementAndGet();
+   }
+
+   /**
+    * Constructor for imported locations
+    *
+    * @param zonedDateTime
+    *           Date/time when the location was created
+    */
+   public TourLocation(final ZonedDateTime zonedDateTime) {
+
+      _createId = _createCounter.incrementAndGet();
+
+      created = zonedDateTime;
+      createdMS = TimeTools.toEpochMilli(zonedDateTime);
    }
 
    @Override
@@ -406,7 +457,32 @@ public class TourLocation implements Serializable {
 
       final TourLocation other = (TourLocation) obj;
 
-      return locationID == other.locationID;
+      if (locationID == TourDatabase.ENTITY_IS_NOT_SAVED) {
+
+         // location was create
+
+         if (_createId == other._createId) {
+            return true;
+         }
+
+      } else {
+
+         // location is from the database
+
+         if (locationID == other.locationID) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   public ZonedDateTime getCreated() {
+      return created;
+   }
+
+   public long getCreatedMS() {
+      return createdMS;
    }
 
    public int getLatitudeDiff() {
@@ -492,6 +568,31 @@ public class TourLocation implements Serializable {
       return Objects.hash(locationID);
    }
 
+   /**
+    * @param reqestedZoomlevel
+    * @param latitudeE6_Normalized
+    * @param longitudeE6_Normalized
+    *
+    * @return Returns <code>true</code> when the requested location is within this location
+    */
+   public boolean isInBoundingBox(final int reqestedZoomlevel,
+                                  final int latitudeE6_Normalized,
+                                  final int longitudeE6_Normalized) {
+
+      if (zoomlevel >= reqestedZoomlevel
+
+            && latitudeMinE6_Resized_Normalized <= latitudeE6_Normalized
+            && latitudeMaxE6_Resized_Normalized >= latitudeE6_Normalized
+
+            && longitudeMinE6_Resized_Normalized <= longitudeE6_Normalized
+            && longitudeMaxE6_Resized_Normalized >= longitudeE6_Normalized) {
+
+         return true;
+      }
+
+      return false;
+   }
+
    private String log(final String field, final double value) {
 
       return field + value + NL;
@@ -552,23 +653,33 @@ public class TourLocation implements Serializable {
       final double dbLongitudeMin_Resized   = (longitudeMinE6_Resized_Normalized - 180_000_000) / 1E6;
       final double dbLongitudeMax_Resized   = (longitudeMaxE6_Resized_Normalized - 180_000_000) / 1E6;
 
-      latitude              = dbLatitude;
-      longitude             = dbLongitude;
+      latitude                = dbLatitude;
+      longitude               = dbLongitude;
 
-      latitudeMin           = dbLatitudeMin;
-      latitudeMax           = dbLatitudeMax;
-      longitudeMin          = dbLongitudeMin;
-      longitudeMax          = dbLongitudeMax;
+      latitudeMin             = dbLatitudeMin;
+      latitudeMax             = dbLatitudeMax;
+      longitudeMin            = dbLongitudeMin;
+      longitudeMax            = dbLongitudeMax;
 
-      latitudeMin_Resized   = dbLatitudeMin_Resized;
-      latitudeMax_Resized   = dbLatitudeMax_Resized;
-      longitudeMin_Resized  = dbLongitudeMin_Resized;
-      longitudeMax_Resized  = dbLongitudeMax_Resized;
+      latitudeMin_Resized     = dbLatitudeMin_Resized;
+      latitudeMax_Resized     = dbLatitudeMax_Resized;
+      longitudeMin_Resized    = dbLongitudeMin_Resized;
+      longitudeMax_Resized    = dbLongitudeMax_Resized;
 
-      boundingBoxKey        = latitudeMinE6_Normalized
-                            + latitudeMaxE6_Normalized
-                            + longitudeMinE6_Normalized
-                            + longitudeMaxE6_Normalized;
+      boundingBoxKey          = latitudeMinE6_Normalized
+                              + latitudeMaxE6_Normalized
+                              + longitudeMinE6_Normalized
+                              + longitudeMaxE6_Normalized;
+
+      boundingBoxHeight       = MtMath.distanceVincenty(
+
+                                    dbLatitudeMin_Resized,  dbLongitudeMin_Resized,
+                                    dbLatitudeMax_Resized,  dbLongitudeMin_Resized);
+
+      boundingBoxWidth        = MtMath.distanceVincenty(
+
+                                    dbLatitudeMin_Resized,  dbLongitudeMin_Resized,
+                                    dbLatitudeMin_Resized,  dbLongitudeMax_Resized);
 
 // SET_FORMATTING_ON
 
@@ -725,25 +836,25 @@ public class TourLocation implements Serializable {
             + NL
 
             + log(" latitude                          = ", latitude) //                            //$NON-NLS-1$
-            + log(" latitudeE6                        = ", latitudeE6) //                          //$NON-NLS-1$
-            + log(" latitudeE6_Normalized             = ", latitudeE6_Normalized) //               //$NON-NLS-1$
-            + log(" latitudeMinE6_Normalized          = ", latitudeMinE6_Normalized) //            //$NON-NLS-1$
-            + log(" latitudeMinE6_Resized_Normalized  = ", latitudeMinE6_Resized_Normalized) //    //$NON-NLS-1$
-            + log(" latitudeMaxE6_Normalized          = ", latitudeMaxE6_Normalized) //            //$NON-NLS-1$
-            + log(" latitudeMaxE6_Resized_Normalized  = ", latitudeMaxE6_Resized_Normalized) //    //$NON-NLS-1$
+//            + log(" latitudeE6                        = ", latitudeE6) //                          //$NON-NLS-1$
+//            + log(" latitudeE6_Normalized             = ", latitudeE6_Normalized) //               //$NON-NLS-1$
+//            + log(" latitudeMinE6_Normalized          = ", latitudeMinE6_Normalized) //            //$NON-NLS-1$
+//            + log(" latitudeMinE6_Resized_Normalized  = ", latitudeMinE6_Resized_Normalized) //    //$NON-NLS-1$
+//            + log(" latitudeMaxE6_Normalized          = ", latitudeMaxE6_Normalized) //            //$NON-NLS-1$
+//            + log(" latitudeMaxE6_Resized_Normalized  = ", latitudeMaxE6_Resized_Normalized) //    //$NON-NLS-1$
 
             + log(" longitude                         = ", longitude) //                           //$NON-NLS-1$
-            + log(" longitudeE6                       = ", longitudeE6) //                         //$NON-NLS-1$
-            + log(" longitudeE6_Normalized            = ", longitudeE6_Normalized) //              //$NON-NLS-1$
-            + log(" longitudeMinE6_Normalized         = ", longitudeMinE6_Normalized) //           //$NON-NLS-1$
-            + log(" longitudeMinE6_Resized_Normalized = ", longitudeMinE6_Resized_Normalized) //   //$NON-NLS-1$
-            + log(" longitudeMaxE6_Normalized         = ", longitudeMaxE6_Normalized) //           //$NON-NLS-1$
-            + log(" longitudeMaxE6_Resized_Normalized = ", longitudeMaxE6_Resized_Normalized) //   //$NON-NLS-1$
+//            + log(" longitudeE6                       = ", longitudeE6) //                         //$NON-NLS-1$
+//            + log(" longitudeE6_Normalized            = ", longitudeE6_Normalized) //              //$NON-NLS-1$
+//            + log(" longitudeMinE6_Normalized         = ", longitudeMinE6_Normalized) //           //$NON-NLS-1$
+//            + log(" longitudeMinE6_Resized_Normalized = ", longitudeMinE6_Resized_Normalized) //   //$NON-NLS-1$
+//            + log(" longitudeMaxE6_Normalized         = ", longitudeMaxE6_Normalized) //           //$NON-NLS-1$
+//            + log(" longitudeMaxE6_Resized_Normalized = ", longitudeMaxE6_Resized_Normalized) //   //$NON-NLS-1$
 
             + log(" boundingBoxKey                    = ", boundingBoxKey) //                      //$NON-NLS-1$
 
-            + log(" latitudeDiff                      = ", getLatitudeDiff()) //                   //$NON-NLS-1$
-            + log(" longitudeDiff                     = ", getLongitudeDiff()) //                  //$NON-NLS-1$
+//            + log(" latitudeDiff                      = ", getLatitudeDiff()) //                   //$NON-NLS-1$
+//            + log(" longitudeDiff                     = ", getLongitudeDiff()) //                  //$NON-NLS-1$
       ;
    }
 }

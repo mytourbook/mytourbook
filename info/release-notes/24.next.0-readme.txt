@@ -4,10 +4,14 @@
 TODO's
 ======               
 
+ * [Tour Location] Automatically create tour locations for longer pauses in a tour 
+   https://github.com/mytourbook/mytourbook/issues/1306 
+ 
 * Support colomn width = 0
+  This is now (17.3.2024) set but needs more testing
 
 * Support first column alignment in all views
-
+ 
 
 * Update fulltext url https://lucene.apache.org/core/7_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Wildcard_Searches
   in https://mytourbook.sourceforge.io/mytourbook/index.php/documentation/show-tours/search
@@ -52,12 +56,16 @@ New
   Add the ability to assign food/fluids to any given tour.
   https://github.com/mytourbook/mytourbook/issues/1280
 
-* Start/End Location
+* Start/End Tour Location
   - Automatically retrieve and set start/end locations in the easy import
   - Retrieve, manage and show start/end locations in
     - Tour editor
   - Scramble tour location view when requested
   https://github.com/mytourbook/mytourbook/issues/878
+
+* Address Location
+  - Lookup a map location from a location provider and use it like a map bookmark
+    https://github.com/mytourbook/mytourbook/issues/1315
 
 
 Improvements
@@ -93,7 +101,10 @@ Changes
 * Fit Import
   - Device sensors are now imported which do not contain a serial number
     -> Now there can be new sensors in the sensor view which were currently ignored !
-* 
+
+* 2D Map Options
+  - Moved map location options into the new slideout for map locations
+  
 
 
 Bugfix

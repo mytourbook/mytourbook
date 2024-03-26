@@ -1310,8 +1310,6 @@ public class Messages extends NLS {
    public static String        Log_Reimport_Tour_Skipped_OtherReasons;
    public static String        Log_ReplaceElevationUpDown_SRTMDataNotAvailable;
    public static String        Log_ReplaceElevationUpDown_ValuesAreReplaced;
-   public static String        Log_RetrieveTourLocation_End;
-   public static String        Log_RetrieveTourLocation_Tour;
    public static String        Log_RetrieveWeatherData_001_Start;
    public static String        Log_RetrieveWeatherData_002_End;
    public static String        Log_RetrieveWeatherData_003_NoWeatherData;
@@ -1351,6 +1349,9 @@ public class Messages extends NLS {
    public static String        Log_Tour_MoveTour;
    public static String        Log_Tour_SaveTours;
    public static String        Log_Tour_SaveTours_End;
+   public static String        Log_TourLocation_Retrieve_End;
+   public static String        Log_TourLocation_Retrieve_LocationPoint;
+   public static String        Log_TourLocation_Retrieve_Tour;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Humidity;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation;
@@ -2297,8 +2298,6 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Checkbox_ShowTourDirection_Always;
    public static String        Slideout_Map_Options_Checkbox_ShowTourDirection_Always_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_ShowTourDirection_Tooltip;
-   public static String        Slideout_Map_Options_Checkbox_ShowTourLocations;
-   public static String        Slideout_Map_Options_Checkbox_ShowTourLocations_BoundingBox;
    public static String        Slideout_Map_Options_Checkbox_SliderPath;
    public static String        Slideout_Map_Options_Checkbox_SliderPath_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_ToggleKeyboardPanning;
@@ -2337,6 +2336,15 @@ public class Messages extends NLS {
    public static String        Slideout_Map_TourColors_Label_Title;
    public static String        Slideout_Map_TrackOptions_Label_Title;
    public static String        Slideout_Map_TrackOptions_Label_Title_Tooltip;
+
+   public static String        Slideout_MapLocation_Checkbox_ShowAddressLocations;
+   public static String        Slideout_MapLocation_Checkbox_ShowAddressLocations_Tooltip;
+   public static String        Slideout_MapLocation_Checkbox_ShowLocationBoundingBox;
+   public static String        Slideout_MapLocation_Checkbox_ShowTourLocations;
+   public static String        Slideout_MapLocation_Checkbox_ShowTourLocations_Tooltip;
+   public static String        Slideout_MapLocation_Label_AddressLocations;
+   public static String        Slideout_MapLocation_Label_Title;
+   public static String        Slideout_MapLocation_Label_Zoomlevel;
 
    public static String        Slideout_MapModel_Column_Name;
    public static String        Slideout_MapModel_Dialog_DeleteModel_Message;

@@ -32,7 +32,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourLocation;
-import net.tourbook.tour.location.TourLocationManager.Zoomlevel;
+import net.tourbook.tour.location.TourLocationManager.ZoomLevel;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -77,11 +77,9 @@ import org.eclipse.swt.widgets.Text;
 /**
  * Slideout for the start/end location
  */
-public class SlideoutLocationProfiles extends AdvancedSlideout {
+public class SlideoutStartEndLocationProfiles extends AdvancedSlideout {
 
    private static final String             ID                = "net.tourbook.tour.location.SlideoutLocationProfiles"; //$NON-NLS-1$
-
-   private static final String             ZOOM_LEVEL_ITEM   = "%3d  %s";                                             //$NON-NLS-1$
 
    private static final String             STATE_SASH_HEIGHT = "STATE_SASH_HEIGHT";                                   //$NON-NLS-1$
 
@@ -252,12 +250,12 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
     * @param state
     * @param isStartLocation
     */
-   public SlideoutLocationProfiles(final ITourLocationConsumer tourLocationConsumer,
-                                   final TourLocation tourLocation,
-                                   final Control ownerControl,
-                                   final Rectangle ownerBounds,
-                                   final IDialogSettings state,
-                                   final boolean isStartLocation) {
+   public SlideoutStartEndLocationProfiles(final ITourLocationConsumer tourLocationConsumer,
+                                           final TourLocation tourLocation,
+                                           final Control ownerControl,
+                                           final Rectangle ownerBounds,
+                                           final IDialogSettings state,
+                                           final boolean isStartLocation) {
 
       super(ownerControl, state, new int[] { 800, 800 });
 
@@ -793,9 +791,9 @@ public class SlideoutLocationProfiles extends AdvancedSlideout {
 
    private void fillUI() {
 
-      for (final Zoomlevel zoomlevel : TourLocationManager.ALL_ZOOM_LEVEL) {
+      for (final ZoomLevel zoomlevel : TourLocationManager.ALL_ZOOM_LEVEL) {
 
-         _comboZoomlevel.add(ZOOM_LEVEL_ITEM.formatted(zoomlevel.zoomlevel, zoomlevel.label));
+         _comboZoomlevel.add(TourLocationManager.ZOOM_LEVEL_ITEM.formatted(zoomlevel.zoomlevel, zoomlevel.label));
       }
    }
 

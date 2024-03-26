@@ -160,6 +160,8 @@ public class TourLocationManager {
 
    private static long                            _lastRetrievalTimeMS;
 
+   private static TourLocationCache               _locationCache              = new TourLocationCache(10);
+
 // SET_FORMATTING_OFF
 
    /**
@@ -177,23 +179,25 @@ public class TourLocationManager {
     * 17 major and minor streets
     * 18 building
     */
-   static Zoomlevel[]         ALL_ZOOM_LEVEL              = {
+   public static ZoomLevel[]         ALL_ZOOM_LEVEL              = {
 
-         new Zoomlevel( 3, Messages.Tour_Location_Zoomlevel_03_Country), //            0
-         new Zoomlevel( 5, Messages.Tour_Location_Zoomlevel_05_State), //              1
-         new Zoomlevel( 8, Messages.Tour_Location_Zoomlevel_08_County), //             2
-         new Zoomlevel(10, Messages.Tour_Location_Zoomlevel_10_City), //               3
-         new Zoomlevel(12, Messages.Tour_Location_Zoomlevel_12_TownBorough), //        4
-         new Zoomlevel(13, Messages.Tour_Location_Zoomlevel_13_VillageSuburb), //      5 DEFAULT
-         new Zoomlevel(14, Messages.Tour_Location_Zoomlevel_14_Neighbourhood), //      6
-         new Zoomlevel(15, Messages.Tour_Location_Zoomlevel_15_AnySettlement), //      7
-         new Zoomlevel(16, Messages.Tour_Location_Zoomlevel_16_MajorStreets), //       8
-         new Zoomlevel(17, Messages.Tour_Location_Zoomlevel_17_MajorMinorStreets), //  9
-         new Zoomlevel(18, Messages.Tour_Location_Zoomlevel_18_Building) //            10
+         new ZoomLevel( 3, Messages.Tour_Location_Zoomlevel_03_Country), //            0
+         new ZoomLevel( 5, Messages.Tour_Location_Zoomlevel_05_State), //              1
+         new ZoomLevel( 8, Messages.Tour_Location_Zoomlevel_08_County), //             2
+         new ZoomLevel(10, Messages.Tour_Location_Zoomlevel_10_City), //               3
+         new ZoomLevel(12, Messages.Tour_Location_Zoomlevel_12_TownBorough), //        4
+         new ZoomLevel(13, Messages.Tour_Location_Zoomlevel_13_VillageSuburb), //      5 DEFAULT
+         new ZoomLevel(14, Messages.Tour_Location_Zoomlevel_14_Neighbourhood), //      6
+         new ZoomLevel(15, Messages.Tour_Location_Zoomlevel_15_AnySettlement), //      7
+         new ZoomLevel(16, Messages.Tour_Location_Zoomlevel_16_MajorStreets), //       8
+         new ZoomLevel(17, Messages.Tour_Location_Zoomlevel_17_MajorMinorStreets), //  9
+         new ZoomLevel(18, Messages.Tour_Location_Zoomlevel_18_Building) //            10
    };
 
-   public static Zoomlevel    DEFAULT_ZOOM_LEVEL          = ALL_ZOOM_LEVEL[5];
-   public static int          DEFAULT_ZOOM_LEVEL_VALUE    = DEFAULT_ZOOM_LEVEL.zoomlevel;
+   public static ZoomLevel    DEFAULT_ZOOM_LEVEL         = ALL_ZOOM_LEVEL[5];
+   public static int          DEFAULT_ZOOM_LEVEL_VALUE   = DEFAULT_ZOOM_LEVEL.zoomlevel;
+
+   public static final String ZOOM_LEVEL_ITEM            = "%3d  %s";                                             //$NON-NLS-1$
 
    public static Map<LocationPartID, String> ALL_LOCATION_PART_AND_LABEL = Map.ofEntries(
 
@@ -277,12 +281,12 @@ public class TourLocationManager {
 
 // SET_FORMATTING_ON
 
-   static class Zoomlevel {
+   public static class ZoomLevel {
 
-      int    zoomlevel;
-      String label;
+      public int    zoomlevel;
+      public String label;
 
-      public Zoomlevel(final int zoomlevel, final String label) {
+      public ZoomLevel(final int zoomlevel, final String label) {
 
          this.zoomlevel = zoomlevel;
          this.label = label;
@@ -752,7 +756,7 @@ public class TourLocationManager {
 
       final int[] boundingBoxE6 = Util.convertDoubleSeries_ToE6(boundingbox);
 
-      // convert possible negative values into positive values, it's easier to math it
+      // convert possible negative values into positive values, it's easier to math with them
       final int latitudeMinE6_Normalized = boundingBoxE6[0] + 90_000_000;
       final int latitudeMaxE6_Normalized = boundingBoxE6[1] + 90_000_000;
       final int longitudeMinE6_Normalized = boundingBoxE6[2] + 180_000_000;
@@ -1118,20 +1122,20 @@ public class TourLocationManager {
 
    static String getCombined_StreetWithHouseNumber(final TourLocation tourLocation) {
 
-      final String adrRoad = tourLocation.road;
-      final String adrHouseNumber = tourLocation.house_number;
+      final String locationRoad = tourLocation.road;
+      final String locationHouseNumber = tourLocation.house_number;
 
-      if (adrRoad == null && adrHouseNumber == null) {
+      if (locationRoad == null && locationHouseNumber == null) {
 
          return null;
 
-      } else if (adrRoad == null) {
+      } else if (locationRoad == null) {
 
-         return adrHouseNumber;
+         return locationHouseNumber;
 
-      } else if (adrHouseNumber == null) {
+      } else if (locationHouseNumber == null) {
 
-         return adrRoad;
+         return locationRoad;
       }
 
       // road and house number are available
@@ -1140,11 +1144,11 @@ public class TourLocationManager {
 
       if (COUNTRY_CODE_US.equals(countryCode)) {
 
-         return adrHouseNumber + UI.SPACE + adrRoad;
+         return locationHouseNumber + UI.SPACE + locationRoad;
 
       } else {
 
-         return adrRoad + UI.SPACE + adrHouseNumber;
+         return locationRoad + UI.SPACE + locationHouseNumber;
       }
    }
 
@@ -1163,20 +1167,51 @@ public class TourLocationManager {
       return _defaultProfile;
    }
 
+   public static TourLocationCache getLocationCache() {
+      return _locationCache;
+   }
+
+   /**
+    * @param latitude
+    * @param longitude
+    * @param existingLocationData
+    *           Is checking this existing location and returns it when it fits.
+    * @param zoomlevel
+    *
+    * @return Returns {@link TourLocationData} or <code>null</code> when it could not be retrieved
+    */
+   public static TourLocationData getLocationData(final double latitude,
+                                                  final double longitude,
+                                                  final TourLocationData existingLocationData,
+                                                  final int zoomlevel) {
+
+      return getLocationData(
+
+            latitude,
+            longitude,
+            existingLocationData,
+            zoomlevel,
+            true);
+   }
+
    /**
     * Retrieve location data when not yet available
     *
     * @param latitude
     * @param longitude
     * @param existingLocationData
+    *           Is checking this existing location and returns it when it fits.
     * @param zoomlevel
+    * @param isUseSavedLocations
+    *           When <code>false</code> then the location is always retrieved
     *
-    * @return
+    * @return Returns {@link TourLocationData} or <code>null</code> when it could not be retrieved
     */
    public static TourLocationData getLocationData(final double latitude,
                                                   final double longitude,
                                                   final TourLocationData existingLocationData,
-                                                  final int zoomlevel) {
+                                                  final int zoomlevel,
+                                                  final boolean isUseSavedLocations) {
 
 // enable logging when debugging
 //    _isLogging_AddressRetrieval = true;
@@ -1188,14 +1223,24 @@ public class TourLocationManager {
          return existingLocationData;
       }
 
-      /*
-       * Check if a tour location is already saved
-       */
-      final TourLocation dbTourLocation = TourDatabase.getTourLocation(latitude, longitude, zoomlevel);
-      if (dbTourLocation != null) {
+      if (isUseSavedLocations) {
 
-         return new TourLocationData(dbTourLocation);
+         // check if a tour location is already saved
+
+         final TourLocation dbTourLocation = TourDatabase.getTourLocation(latitude, longitude, zoomlevel);
+
+         if (dbTourLocation != null) {
+
+            // return saved location
+
+            return new TourLocationData(dbTourLocation);
+         }
       }
+
+      /*
+       * Check fifo cache
+       */
+//      _locationCache.get(latitude, longitude, zoomlevel);
 
       /*
        * Retrieve location
@@ -2384,7 +2429,7 @@ public class TourLocationManager {
                         // %s - "%s"  . . .  "%s"
                         TourLogManager.subLog_DEFAULT(
 
-                              OtherMessages.LOG_RETRIEVE_TOUR_LOCATION_TOUR.formatted(
+                              OtherMessages.LOG_TOUR_LOCATION_RETRIEVE_TOUR.formatted(
 
                                     TourManager.getTourDateTimeShort(tourData),
                                     tourData.getTourStartPlace(),

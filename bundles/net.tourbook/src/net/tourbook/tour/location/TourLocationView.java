@@ -49,6 +49,7 @@ import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnDefinitionFor1stVisibleAlignmentColumn;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
@@ -1367,6 +1368,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       defineColumn_Data_10_ID();
       defineColumn_Data_30_LastModified();
+
+      new ColumnDefinitionFor1stVisibleAlignmentColumn(_columnManager);
    }
 
    private void defineColumn_Data_10_ID() {
@@ -3960,11 +3963,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       final double longitudeMin                    = tourLocation.longitudeMin;
       final double longitudeMax                    = tourLocation.longitudeMax;
 
-      final double latitudeMin_Resized             = tourLocation.latitudeMin_Resized;
-      final double latitudeMax_Resized             = tourLocation.latitudeMax_Resized;
-      final double longitudeMin_Resized            = tourLocation.longitudeMin_Resized;
-      final double longitudeMax_Resized            = tourLocation.longitudeMax_Resized;
-
       final int latitudeE6_Normalized              = tourLocation.latitudeE6_Normalized;
       final int longitudeE6_Normalized             = tourLocation.longitudeE6_Normalized;
 
@@ -3977,6 +3975,9 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       final int latitudeMaxE6_Resized_Normalized   = tourLocation.latitudeMaxE6_Resized_Normalized;
       final int longitudeMinE6_Resized_Normalized  = tourLocation.longitudeMinE6_Resized_Normalized;
       final int longitudeMaxE6_Resized_Normalized  = tourLocation.longitudeMaxE6_Resized_Normalized;
+
+      final double boundingBoxWidth                = tourLocation.boundingBoxWidth / UI.UNIT_VALUE_DISTANCE_SMALL;
+      final double boundingBoxHeight               = tourLocation.boundingBoxHeight / UI.UNIT_VALUE_DISTANCE_SMALL;
 
 // SET_FORMATTING_ON
 
@@ -4002,24 +4003,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final int latitudeHeight_Normalized = latitudeMaxE6_Resized_Normalized - latitudeMinE6_Resized_Normalized;
       final int longitudeWidth_Normalized = longitudeMaxE6_Resized_Normalized - longitudeMinE6_Resized_Normalized;
-
-      final double bboxHeight_Distance = MtMath.distanceVincenty(
-
-            latitudeMin_Resized,
-            longitudeMin_Resized,
-            latitudeMax_Resized,
-            longitudeMin_Resized
-
-      ) / UI.UNIT_VALUE_DISTANCE_SMALL;
-
-      final double bboxWidth_Distance = MtMath.distanceVincenty(
-
-            latitudeMin_Resized,
-            longitudeMin_Resized,
-            latitudeMin_Resized,
-            longitudeMax_Resized
-
-      ) / UI.UNIT_VALUE_DISTANCE_SMALL;
 
       final double latitudeDiff_Distance = MtMath.distanceVincenty(
 
@@ -4081,8 +4064,8 @@ public class TourLocationView extends ViewPart implements ITourViewer {
       locationItem.boundingBoxHeight_Value = latitudeHeight_Normalized;
       locationItem.boundingBoxWidth_Value = longitudeWidth_Normalized;
 
-      locationItem.boundingBoxHeight_Text = FormatManager.formatNumber_0(bboxHeight_Distance);
-      locationItem.boundingBoxWidth_Text = FormatManager.formatNumber_0(bboxWidth_Distance);
+      locationItem.boundingBoxHeight_Text = FormatManager.formatNumber_0(boundingBoxHeight);
+      locationItem.boundingBoxWidth_Text = FormatManager.formatNumber_0(boundingBoxWidth);
 
       locationItem.isResizedBoundingBox = isBBoxResized;
    }

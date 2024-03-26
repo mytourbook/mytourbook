@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,6 +34,7 @@ import net.tourbook.common.dialog.MessageDialogWithToggleState_Customized;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnDefinitionFor1stVisibleAlignmentColumn;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TableColumnDefinition;
@@ -60,11 +61,8 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.EditingSupport;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -224,6 +222,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          case COLUMN_LATITUDE_1:
             rc = geoFilter1.geoLocation_TopLeft.latitude - geoFilter2.geoLocation_TopLeft.latitude;
             break;
+
          case COLUMN_LONGITUDE_1:
             rc = geoFilter1.geoLocation_TopLeft.longitude - geoFilter2.geoLocation_TopLeft.longitude;
             break;
@@ -231,6 +230,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          case COLUMN_LATITUDE_2:
             rc = geoFilter1.geoLocation_BottomRight.latitude - geoFilter2.geoLocation_BottomRight.latitude;
             break;
+
          case COLUMN_LONGITUDE_2:
             rc = geoFilter1.geoLocation_BottomRight.longitude - geoFilter2.geoLocation_BottomRight.longitude;
             break;
@@ -728,23 +728,10 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
       _geoFilterViewer.setContentProvider(new GeoFilterProvider());
       _geoFilterViewer.setComparator(_geoPartComparator);
 
-      _geoFilterViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      _geoFilterViewer.addSelectionChangedListener(selectionChangedEvent -> onGeoFilter_Select(selectionChangedEvent));
+      _geoFilterViewer.addDoubleClickListener(doubleClickEvent -> onGeoFilter_ToggleReadEditMode());
 
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onGeoFilter_Select(event);
-         }
-      });
-
-      _geoFilterViewer.addDoubleClickListener(new IDoubleClickListener() {
-
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-//          onBookmark_Rename(true);
-         }
-      });
-
-      updateUI_SetSortDirection(//
+      updateUI_SetSortDirection(
             _geoPartComparator.__sortColumnId,
             _geoPartComparator.__sortDirection);
 
@@ -841,6 +828,8 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
       defineColumn_60_Latitude2();
       defineColumn_62_Longitude2();
+
+      new ColumnDefinitionFor1stVisibleAlignmentColumn(_columnManager);
    }
 
    private void defineColumn_00_SequenceNumber() {
@@ -1128,6 +1117,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
    /**
     * @param sortColumnId
+    *
     * @return Returns the column widget by it's column id, when column id is not found then the
     *         first column is returned.
     */
@@ -1407,6 +1397,15 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
       final TourGeoFilter selectedGeoFilter = (TourGeoFilter) selectedItem;
 
       onSelect_GeoFilter(selectedGeoFilter);
+   }
+
+   private void onGeoFilter_ToggleReadEditMode() {
+
+      // toggle action
+      _actionToggleReadEditMode.setChecked(!_actionToggleReadEditMode.isChecked());
+
+      // update state
+      actionToggleReadEditMode();
    }
 
    private void onResize_Options() {
