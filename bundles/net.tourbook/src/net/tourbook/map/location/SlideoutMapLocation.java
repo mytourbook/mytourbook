@@ -66,6 +66,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -342,48 +343,47 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
       {
-         final Composite containerLeft = new Composite(container, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(false, false).applyTo(containerLeft);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerLeft);
          {
-            {
-               /*
-                * Show address locations
-                */
-               _chkIsShowAddressLocations = new Button(containerLeft, SWT.CHECK);
-               _chkIsShowAddressLocations.setText(Messages.Slideout_MapLocation_Checkbox_ShowAddressLocations);
-               _chkIsShowAddressLocations.setToolTipText(Messages.Slideout_MapLocation_Checkbox_ShowAddressLocations_Tooltip);
-               _chkIsShowAddressLocations.addSelectionListener(_defaultSelectionListener);
-               GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowAddressLocations);
-            }
-            {
-               /*
-                * Show tour locations
-                */
-               _chkIsShowTourLocations = new Button(containerLeft, SWT.CHECK);
-               _chkIsShowTourLocations.setText(Messages.Slideout_MapLocation_Checkbox_ShowTourLocations);
-               _chkIsShowTourLocations.setToolTipText(Messages.Slideout_MapLocation_Checkbox_ShowTourLocations_Tooltip);
-               _chkIsShowTourLocations.addSelectionListener(_defaultSelectionListener);
-               GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowTourLocations);
-            }
+            /*
+             * Show tour locations
+             */
+            _chkIsShowTourLocations = new Button(container, SWT.CHECK);
+            _chkIsShowTourLocations.setText(Messages.Slideout_MapLocation_Checkbox_ShowTourLocations);
+            _chkIsShowTourLocations.setToolTipText(Messages.Slideout_MapLocation_Checkbox_ShowTourLocations_Tooltip);
+            _chkIsShowTourLocations.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowTourLocations);
          }
-         final Composite containerRight = new Composite(container, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(false, false).indent(30, 0).applyTo(containerRight);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerRight);
          {
-            {
-               /*
-                * Show location bounding box
-                */
-               _chkIsShowMapLocations_BoundingBox = new Button(containerRight, SWT.CHECK);
-               _chkIsShowMapLocations_BoundingBox.setText(Messages.Slideout_MapLocation_Checkbox_ShowLocationBoundingBox);
-               _chkIsShowMapLocations_BoundingBox.addSelectionListener(_defaultSelectionListener);
-               GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowMapLocations_BoundingBox);
-            }
+            /*
+             * Show location bounding box
+             */
+            _chkIsShowMapLocations_BoundingBox = new Button(container, SWT.CHECK);
+            _chkIsShowMapLocations_BoundingBox.setText(Messages.Slideout_MapLocation_Checkbox_ShowLocationBoundingBox);
+            _chkIsShowMapLocations_BoundingBox.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowMapLocations_BoundingBox);
+         }
+         {
+            /*
+             * Show address locations
+             */
+            _chkIsShowAddressLocations = new Button(container, SWT.CHECK);
+            _chkIsShowAddressLocations.setText(Messages.Slideout_MapLocation_Checkbox_ShowAddressLocations);
+            _chkIsShowAddressLocations.setToolTipText(Messages.Slideout_MapLocation_Checkbox_ShowAddressLocations_Tooltip);
+            _chkIsShowAddressLocations.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowAddressLocations);
          }
       }
+
+      // reorder tabbing
+      container.setTabList(new Control[] {
+
+            _chkIsShowAddressLocations,
+            _chkIsShowTourLocations,
+
+            _chkIsShowMapLocations_BoundingBox,
+      });
    }
 
    private void createUI_80_LocationViewer(final Composite parent) {
