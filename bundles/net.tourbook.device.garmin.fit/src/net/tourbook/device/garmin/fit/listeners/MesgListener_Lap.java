@@ -74,11 +74,7 @@ public class MesgListener_Lap extends AbstractMesgListener implements LapMesgLis
       /*
        * Set lap time, later the time slice position (serie index) will be set.
        */
-      //todo fb ca  se passe ici
-      //https://forums.garmin.com/developer/fit-sdk/b/news-announcements/posts/important-fit-activity-file-message-change
-      //    final DateTime garminTime = lapMesg.getTimestamp();
       final DateTime garminTime = lapMesg.getStartTime();
-      //  garminNewTime.add(lapMesg.getTotalElapsedTime());
       if (garminTime != null) {
 
          tourMarker.setDeviceLapTime(garminTime.getDate().getTime() + lapMesg.getTotalElapsedTime().longValue() * 1000);
