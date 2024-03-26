@@ -76,7 +76,8 @@ public class MesgListener_Lap extends AbstractMesgListener implements LapMesgLis
        */
       //todo fb ca  se passe ici
       //https://forums.garmin.com/developer/fit-sdk/b/news-announcements/posts/important-fit-activity-file-message-change
-      final DateTime garminTime = lapMesg.getStartTime();
+      //todo fb final DateTime garminTime = lapMesg.getStartTime();
+      final DateTime garminTime = lapMesg.getTimestamp();
       if (garminTime != null) {
 
          tourMarker.setDeviceLapTime(garminTime.getDate().getTime());
