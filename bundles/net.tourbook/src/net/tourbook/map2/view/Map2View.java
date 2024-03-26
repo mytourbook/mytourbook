@@ -643,6 +643,7 @@ public class Map2View extends ViewPart implements
          super.onSelect(selectionEvent);
 
          updateUI_MapLocations(getSelection());
+
       }
    }
 
