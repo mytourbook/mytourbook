@@ -81,7 +81,7 @@ public class MesgListener_Lap extends AbstractMesgListener implements LapMesgLis
       //  garminNewTime.add(lapMesg.getTotalElapsedTime());
       if (garminTime != null) {
 
-         tourMarker.setDeviceLapTime(garminTime.getDate().getTime() + lapMesg.getTotalElapsedTime().longValue());
+         tourMarker.setDeviceLapTime(garminTime.getDate().getTime() + lapMesg.getTotalElapsedTime().longValue() * 1000);
 
       } else {
 
