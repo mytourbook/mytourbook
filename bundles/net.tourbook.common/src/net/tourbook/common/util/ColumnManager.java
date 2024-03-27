@@ -275,7 +275,7 @@ public class ColumnManager {
       case ALIGNMENT_CENTER -> SWT.CENTER;
       case ALIGNMENT_RIGHT  -> SWT.TRAIL;
       default               -> SWT.LEAD;
-      
+
       };
    }
 
@@ -879,7 +879,7 @@ public class ColumnManager {
 
                   contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
-                  StatusUtil.logError("Table header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+                  StatusUtil.logInfo("Table header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
 
                } else if (defaultContextMenuProvider != null
                      && contextMenu == defaultContextMenuProvider.getContextMenu()
@@ -887,7 +887,7 @@ public class ColumnManager {
 
                   contextMenu = defaultContextMenuProvider.recreateContextMenu();
 
-                  StatusUtil.logError("Table context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+                  StatusUtil.logInfo("Table context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
                }
             }
 
@@ -1007,7 +1007,7 @@ public class ColumnManager {
 
                   contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
-                  StatusUtil.logError("Table header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+                  StatusUtil.logInfo("Table header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
 
                } else if (defaultContextMenuProvider != null
                      && contextMenu == defaultContextMenuProvider.getContextMenu()
@@ -1015,7 +1015,7 @@ public class ColumnManager {
 
                   contextMenu = defaultContextMenuProvider.recreateContextMenu();
 
-                  StatusUtil.logError("Table context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+                  StatusUtil.logInfo("Table context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
                }
             }
 
@@ -1132,7 +1132,7 @@ public class ColumnManager {
 
                contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
-               StatusUtil.logError("Tree header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+               StatusUtil.logInfo("Tree header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
 
             } else if (defaultContextMenuProvider != null
                   && contextMenu == defaultContextMenuProvider.getContextMenu()
@@ -1140,7 +1140,7 @@ public class ColumnManager {
 
                contextMenu = defaultContextMenuProvider.recreateContextMenu();
 
-               StatusUtil.logError("Tree context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+               StatusUtil.logInfo("Tree context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
             }
          }
 
