@@ -348,10 +348,10 @@ public class DirectMappingPainter implements IDirectPainter {
     *
     * @return Returns <code>true</code> when the marker is visible and painted
     */
-   private boolean drawMarker(final DirectPainterContext painterContext,
-                              final int sliderValueIndex,
-                              final Image markerImage,
-                              final boolean isYPosCenter) {
+   private boolean drawMarkerImage(final DirectPainterContext painterContext,
+                             final int sliderValueIndex,
+                             final Image markerImage,
+                             final boolean isYPosCenter) {
 
       final MP mp = _map.getMapProvider();
       final int zoomLevel = _map.getZoom();
@@ -769,18 +769,17 @@ public class DirectMappingPainter implements IDirectPainter {
       }
 
       if (_isShowSliderInMap) {
-         drawMarker(painterContext, _rightSliderValueIndex, _imageRightSlider, false);
-         drawMarker(painterContext, _leftSliderValueIndex, _imageLeftSlider, false);
+
+         drawMarkerImage(painterContext, _rightSliderValueIndex, _imageRightSlider, false);
+         drawMarkerImage(painterContext, _leftSliderValueIndex, _imageLeftSlider, false);
       }
 
       if (_isShowValuePoint
 
             // check if value point is valid -> do not show invalid point
-            && _externalValuePointIndex != -1
+            && _externalValuePointIndex != -1) {
 
-      ) {
-
-         drawMarker(painterContext, _externalValuePointIndex, _imageValuePoint, true);
+         drawMarkerImage(painterContext, _externalValuePointIndex, _imageValuePoint, true);
       }
 
       if (_isShowSliderInLegend) {
