@@ -97,7 +97,6 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
       final Event event = mesg.getEvent();
       final EventType eventType = mesg.getEventType();
       final long javaTime = mesg.getTimestamp().getDate().getTime();
-      //todo fb here too ??
 
       if (event != null && event == Event.TIMER && eventType != null) {
 
