@@ -3262,6 +3262,54 @@ public class Map2 extends Canvas {
          return;
       }
 
+      if (_directMapPainterContext.allPaintedMapLocations.size() > 0) {
+
+         // map locations are painted
+
+         final PaintedMapLocation oldHoveredMapLocation = _directMapPainterContext.hoveredMapLocation;
+         PaintedMapLocation newHoveredMapLocation = null;
+
+         _directMapPainterContext.hoveredMapLocation = null;
+
+         final List<PaintedMapLocation> allPaintedMapLocations = _directMapPainterContext.allPaintedMapLocations;
+
+         for (final PaintedMapLocation paintedLocation : allPaintedMapLocations) {
+
+            final Rectangle paintedRect = paintedLocation.locationRectangle;
+
+            if (true
+                  && (_mouseMove_DevPosition_X > paintedRect.x)
+                  && (_mouseMove_DevPosition_X < paintedRect.x + paintedRect.width)
+                  && (_mouseMove_DevPosition_Y > paintedRect.y)
+                  && (_mouseMove_DevPosition_Y < paintedRect.y + paintedRect.height)) {
+
+               // a map location is hovered
+
+               _directMapPainterContext.hoveredMapLocation = newHoveredMapLocation = paintedLocation;
+
+               break;
+            }
+         }
+
+         // repaint map when hovered state has changed
+         if (oldHoveredMapLocation == null && newHoveredMapLocation == null) {
+
+            // ignore
+
+         } else if (false
+
+               || oldHoveredMapLocation == null && newHoveredMapLocation != null
+               || oldHoveredMapLocation != null && newHoveredMapLocation == null
+
+               // now both should be NOT null
+               || oldHoveredMapLocation.tourLocation.equals(newHoveredMapLocation.tourLocation) == false) {
+
+            redraw();
+
+            return;
+         }
+      }
+
       if (_isLeftMouseButtonPressed) {
 
          // pan map

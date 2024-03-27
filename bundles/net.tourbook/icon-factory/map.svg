@@ -4080,9 +4080,9 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="91.1875"
-     inkscape:cx="298.6875"
-     inkscape:zoom="8"
+     inkscape:cy="291.83623"
+     inkscape:cx="283.26256"
+     inkscape:zoom="22.627417"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -6463,7 +6463,7 @@
        style="opacity:0.99;fill:none;stroke:none" />
     <path
        style="fill:#6bb0ff;fill-opacity:1;stroke:#004794;stroke-width:0.999995px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 258.05046,298.39199 C 256,290.83944 252.5,292.7894 252.5,288.82193 c 0,-3.96745 4.5299,-4.31605 5.55046,-4.31605 1.02055,0 5.44954,0.3486 5.44954,4.31605 0,3.96747 -2.5,2.01751 -5.44954,9.57006 z"
+       d="M 258.05046,298.40539 C 256,290.8423 252.5,292.79498 252.5,288.82197 c 0,-3.97299 4.5299,-4.32207 5.55046,-4.32207 1.02055,0 5.44954,0.34908 5.44954,4.32207 0,3.97301 -2.5,2.02033 -5.44954,9.58342 z"
        id="path1887"
        sodipodi:nodetypes="czzzc"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\show-poi.png"
@@ -7900,6 +7900,14 @@
        style="fill:#666666;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 168,214 -8,8 8,8 8,-8 z m 0,3 5,5 -5,5 -5,-5 z"
        inkscape:export-filename="..\icons\map-model-cursor-dark.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="display:inline;fill:#91c7ff;fill-opacity:1;stroke:#001f40;stroke-width:1;stroke-linecap:butt;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1"
+       d="m 295.54699,278.21194 -10.0471,21.57612 -10.04703,-21.57612"
+       id="path36423-3-9"
+       sodipodi:nodetypes="ccc"
+       inkscape:export-filename="..\icons\map-location-marker.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
   </g>
