@@ -62,7 +62,7 @@ jobs:
           name: ${{ env.artifactFileName }}
           path: |
             D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
-            D:\**\spotbugsXml.*
+            D:\a\mytourbook-BUILD-autocreated\core\**\spotbugsXml.*
           retention-days: 5
       - name: Test Report
         uses: dorny/test-reporter@v1
