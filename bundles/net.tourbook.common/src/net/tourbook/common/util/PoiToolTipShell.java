@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2010, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,11 +16,7 @@
 package net.tourbook.common.util;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -46,52 +42,15 @@ public abstract class PoiToolTipShell {
 
       _shell = new Shell(display, SWT.ON_TOP | SWT.TOOL);
 
-      _shell.addMouseListener(new MouseAdapter() {});
-      _shell.addMouseMoveListener(new MouseMoveListener() {
+      _shell.addMouseTrackListener(MouseTrackListener.mouseExitAdapter(mouseEvent -> _shell.setVisible(false)));
 
-         @Override
-         public void mouseMove(final MouseEvent e) {
+      _shell.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> {
 
-         }
-      });
-
-      _shell.addMouseTrackListener(new MouseTrackListener() {
-
-         @Override
-         public void mouseEnter(final MouseEvent e) {
-//            System.out.println("mouseEnter()");
-            // TODO remove SYSTEM.OUT.PRINTLN
-
-         }
-
-         @Override
-         public void mouseExit(final MouseEvent e) {
-//            System.out.println("mouseExit");
-            // TODO remove SYSTEM.OUT.PRINTLN
-
+         if (keyEvent.keyCode == SWT.ESC) {
             _shell.setVisible(false);
          }
+      }));
 
-         @Override
-         public void mouseHover(final MouseEvent e) {
-//            System.out.println("mouseHover");
-            // TODO remove SYSTEM.OUT.PRINTLN
-
-         }
-      });
-
-      _shell.addKeyListener(new KeyAdapter() {
-
-         @Override
-         public void keyPressed(final KeyEvent e) {
-            if (e.keyCode == SWT.ESC) {
-               _shell.setVisible(false);
-            }
-         }
-
-      });
-
-//      _shell.setRegion(region)
       _shell.setLayout(new FillLayout());
 
       _toolTipContent = setContent(_shell);
@@ -102,8 +61,6 @@ public abstract class PoiToolTipShell {
    }
 
    public void hide() {
-//      System.out.println("hide");
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
       _shell.setVisible(false);
    }
@@ -111,32 +68,6 @@ public abstract class PoiToolTipShell {
    public boolean isVisible() {
       return _shell.isVisible();
    }
-
-//   /**
-//    * Position the tooltip and ensure that it is not located off the screen.
-//    */
-//   private void setToolTipPosition() {
-//
-//      final Point cursorLocation = getDisplay().getCursorLocation();
-//
-//      // Assuming cursor is 21x21 because this is the size of
-//      // the arrow cursor on Windows
-//      final int cursorHeight = 21;
-//
-//      final Point tooltipSize = fToolTipShell.getSize();
-//      final Rectangle monitorRect = getMonitor().getBounds();
-//      final Point pt = new Point(cursorLocation.x, cursorLocation.y + cursorHeight + 2);
-//
-//      pt.x = Math.max(pt.x, monitorRect.x);
-//      if (pt.x + tooltipSize.x > monitorRect.x + monitorRect.width) {
-//         pt.x = monitorRect.x + monitorRect.width - tooltipSize.x;
-//      }
-//      if (pt.y + tooltipSize.y > monitorRect.y + monitorRect.height) {
-//         pt.y = cursorLocation.y - 2 - tooltipSize.y;
-//      }
-//
-//      fToolTipShell.setLocation(pt);
-//   }
 
    protected abstract Composite setContent(Shell shell);
 
@@ -192,9 +123,6 @@ public abstract class PoiToolTipShell {
       Point containerSize = _toolTipContent.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
       if (containerSize.x > MAX_TOOLTIP_WIDTH) {
 
-//         GridDataFactory.fillDefaults().hint(MAX_TOOLTIP_WIDTH, SWT.DEFAULT).applyTo(fToolTipLabel);
-//         fToolTipLabel.pack(true);
-
          containerSize = _toolTipContent.computeSize(MAX_TOOLTIP_WIDTH, SWT.DEFAULT, true);
       }
 
@@ -210,9 +138,6 @@ public abstract class PoiToolTipShell {
       _toolTipContent.setSize(shellArea.width, shellArea.height);
 
       setToolTipPosition(shellArea, noCoverX, noCoverY, noCoverWidth, noCoverHeight, noCoverYOffset);
-
-//      System.out.println("show");
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
       _shell.setVisible(true);
    }
