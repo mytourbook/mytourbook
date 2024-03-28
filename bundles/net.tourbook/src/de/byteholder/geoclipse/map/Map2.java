@@ -92,6 +92,7 @@ import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
+import net.tourbook.map.location.MapLocationToolTip;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.WayPointToolTipProvider;
@@ -499,6 +500,12 @@ public class Map2 extends Canvas {
    private TourToolTip        _tourTooltip;
    private HoveredAreaContext _tourTooltip_HoveredAreaContext;
 
+   /*
+    * Map locations
+    */
+   private MapLocationToolTip _mapLocation_Tooltip;
+   private PaintedMapLocation _mapLocation_Hovered;
+
    /**
     * Hovered/selected tour
     */
@@ -564,7 +571,7 @@ public class Map2 extends Canvas {
    private Point                     _offline_WorldMouse_End;
    private Point                     _offline_WorldMouse_Move;
 
-   private IMapContextProvider       _mapContextProvider;
+   private IMapContextMenuProvider   _mapContextMenuProvider;
 
    /**
     * Is <code>true</code> when the map context menu can be displayed
@@ -701,6 +708,8 @@ public class Map2 extends Canvas {
 // SET_FORMATTING_ON
 
       _transparentColor = new Color(MAP_TRANSPARENT_RGB);
+
+      _mapLocation_Tooltip = new MapLocationToolTip(this);
 
       _poiImage = TourbookPlugin.getImageDescriptor(Images.POI_InMap).createImage();
       _poiImageBounds = _poiImage.getBounds();
@@ -1078,8 +1087,8 @@ public class Map2 extends Canvas {
             return;
          }
 
-         if (_mapContextProvider != null) {
-            _mapContextProvider.fillContextMenu(menuManager, _actionManageOfflineImages);
+         if (_mapContextMenuProvider != null) {
+            _mapContextMenuProvider.fillContextMenu(menuManager, _actionManageOfflineImages);
          }
       });
 
@@ -1347,6 +1356,11 @@ public class Map2 extends Canvas {
       return _centerMapBy;
    }
 
+   public PaintedMapLocation getHoveredMapLocation() {
+
+      return _directMapPainterContext.hoveredMapLocation;
+   }
+
    /**
     * Retrieve, if any, the current tour hovered by the user.
     *
@@ -1464,6 +1478,11 @@ public class Map2 extends Canvas {
       }
 
       return _mp.pixelToGeo(_worldPixel_MapCenter, _mapZoomLevel);
+   }
+
+   public MapLocationToolTip getMapLocationTooltip() {
+
+      return _mapLocation_Tooltip;
    }
 
    /**
@@ -2959,7 +2978,14 @@ public class Map2 extends Canvas {
 
          redraw();
 
+//      } else if (_directMapPainterContext.hoveredMapLocation != null) {
+//
+//         // map location is hovered
+//
+//         _mapLocation_Hovered = _directMapPainterContext.hoveredMapLocation;
+
       } else if (_isShowHoveredOrSelectedTour
+
             && _isShowBreadcrumbs
 
             // check if breadcrumb is hit
@@ -6930,8 +6956,8 @@ public class Map2 extends Canvas {
     *
     * @param mapContextProvider
     */
-   public void setMapContextProvider(final IMapContextProvider mapContextProvider) {
-      _mapContextProvider = mapContextProvider;
+   public void setMapContextProvider(final IMapContextMenuProvider mapContextProvider) {
+      _mapContextMenuProvider = mapContextProvider;
    }
 
    /**

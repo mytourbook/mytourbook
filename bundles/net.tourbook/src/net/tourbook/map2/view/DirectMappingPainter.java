@@ -29,7 +29,6 @@ import java.util.Map;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
@@ -79,6 +78,7 @@ public class DirectMappingPainter implements IDirectPainter {
     * UI resources
     */
    private final Image _imageMapLocation;
+   private final Image _imageMapLocation_Hovered;
    private final Image _imageSlider_Left;
    private final Image _imageSlider_Right;
    private final Image _imageValuePoint;
@@ -92,10 +92,15 @@ public class DirectMappingPainter implements IDirectPainter {
 
       _map = map;
 
-      _imageMapLocation = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker).createImage();
-      _imageSlider_Left = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderLeft).createImage();
-      _imageSlider_Right = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderRight).createImage();
-      _imageValuePoint = TourbookPlugin.getImageDescriptor(Images.Map_ValuePoint).createImage();
+// SET_FORMATTING_OFF
+
+      _imageMapLocation          = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker).createImage();
+      _imageMapLocation_Hovered  = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Hovered).createImage();
+      _imageSlider_Left          = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderLeft).createImage();
+      _imageSlider_Right         = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderRight).createImage();
+      _imageValuePoint           = TourbookPlugin.getImageDescriptor(Images.Map_ValuePoint).createImage();
+
+// SET_FORMATTING_ON
 
       _imageMapLocationBounds = _imageMapLocation.getBounds();
    }
@@ -191,6 +196,7 @@ public class DirectMappingPainter implements IDirectPainter {
    public void dispose() {
 
       disposeImage(_imageMapLocation);
+      disposeImage(_imageMapLocation_Hovered);
       disposeImage(_imageSlider_Left);
       disposeImage(_imageSlider_Right);
       disposeImage(_imageValuePoint);
@@ -238,6 +244,8 @@ public class DirectMappingPainter implements IDirectPainter {
       final int imageWidth = _imageMapLocationBounds.width;
       final int imageHeight = _imageMapLocationBounds.height;
       final int imageWidth2 = imageWidth / 2;
+
+      Rectangle hoveredLocation = null;
 
       for (final TourLocation tourLocation : allTourLocations) {
 
@@ -366,8 +374,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
                // map location is hovered
 
-               gc.setForeground(UI.SYS_COLOR_RED);
-               gc.drawRectangle(hoveredMapLocation.locationRectangle);
+               hoveredLocation = paintedLocation;
             }
 
             // keep location for mouse actions
@@ -376,6 +383,12 @@ public class DirectMappingPainter implements IDirectPainter {
                allPaintedMapLocations.add(new PaintedMapLocation(tourLocation, paintedLocation));
             }
          }
+      }
+
+      // draw hovered location image
+      if (hoveredLocation != null) {
+
+         gc.drawImage(_imageMapLocation_Hovered, hoveredLocation.x, hoveredLocation.y);
       }
    }
 

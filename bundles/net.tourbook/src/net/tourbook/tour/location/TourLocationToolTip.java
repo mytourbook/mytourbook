@@ -55,8 +55,6 @@ public class TourLocationToolTip extends ToolTip {
 
    private static final String USAGE_VALUES = "%d   ∙   %d   ∙   %d"; //$NON-NLS-1$
 
-   private static final int    SHELL_MARGIN = 5;
-
    private Control             _ttControl;
 
    private ColumnViewer        _columnViewer;

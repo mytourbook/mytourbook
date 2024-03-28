@@ -4080,9 +4080,9 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="291.83623"
-     inkscape:cx="283.26256"
-     inkscape:zoom="22.627417"
+     inkscape:cy="327.625"
+     inkscape:cx="213.75"
+     inkscape:zoom="4"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -7908,6 +7908,14 @@
        id="path36423-3-9"
        sodipodi:nodetypes="ccc"
        inkscape:export-filename="..\icons\map-location-marker.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="display:inline;fill:#d0ec86;fill-opacity:1;stroke:#001f40;stroke-width:1;stroke-linecap:butt;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1"
+       d="M 295.5471,313.21107 285.5,334.78719 275.45297,313.21107"
+       id="path36423-3-9-5"
+       sodipodi:nodetypes="ccc"
+       inkscape:export-filename="..\icons\map-location-marker-hovered.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
   </g>

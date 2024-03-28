@@ -18,7 +18,7 @@ package net.tourbook.map2.view;
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.ActionManageOfflineImages;
 import de.byteholder.geoclipse.map.CenterMapBy;
-import de.byteholder.geoclipse.map.IMapContextProvider;
+import de.byteholder.geoclipse.map.IMapContextMenuProvider;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.MapGridData;
 import de.byteholder.geoclipse.map.MapLegend;
@@ -210,7 +210,7 @@ import org.oscim.core.MapPosition;
  */
 public class Map2View extends ViewPart implements
 
-      IMapContextProvider,
+      IMapContextMenuProvider,
       IMapBookmarks,
       IMapBookmarkListener,
       IMapSyncListener,
@@ -5426,6 +5426,13 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_ON
 
+      // enable/disable location tooltip
+      if (isShowMapLocations) {
+         _map.getMapLocationTooltip().activate();
+      } else {
+         _map.getMapLocationTooltip().deactivate();
+      }
+
       /*
        * Update options for the map direct painter
        */
@@ -5553,6 +5560,7 @@ public class Map2View extends ViewPart implements
    private void updateUI_MapLocations(final boolean isSelected) {
 
       _state.put(Map2View.STATE_IS_SHOW_MAP_LOCATIONS, isSelected);
+
 
       updateState_Map2_Options();
    }

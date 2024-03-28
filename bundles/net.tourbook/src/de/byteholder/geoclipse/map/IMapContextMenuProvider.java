@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,7 @@ import org.eclipse.jface.action.IMenuManager;
 /**
  * this interface will fill the context menus in the map
  */
-public interface IMapContextProvider {
+public interface IMapContextMenuProvider {
 
    /**
     * Fills context menu for the map
