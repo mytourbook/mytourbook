@@ -77,7 +77,7 @@ public class MesgListener_Lap extends AbstractMesgListener implements LapMesgLis
       final DateTime garminTime = lapMesg.getStartTime();
       if (garminTime != null) {
 
-         tourMarker.setDeviceLapTime(garminTime.getDate().getTime() + (long) (lapMesg.getTotalElapsedTime() * 1000));
+         tourMarker.setDeviceLapTime(garminTime.getDate().getTime() + lapMesg.getTotalElapsedTime().longValue() * 1000);
 
       } else {
 
