@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -84,7 +84,7 @@ public class TourGeoFilter_Loader {
     * @param useAppFilter
     * @param previousLoaderItem
     * @param geoPartView
-    * @return
+    *
     * @return
     */
    public static GeoFilter_LoaderData loadToursFromGeoParts(final Point geoParts_TopLeft_E2,
@@ -141,7 +141,7 @@ public class TourGeoFilter_Loader {
 
                } else {
 
-                  // update loading state - this should not occure but is helpfull for testing
+                  // update loading state - this should not occur but is helpful for testing
 
                   // show loading state
                   geoLoaderData.mapGridData.gridBox_Text = Messages.TourGeoFilter_Loader_LoadingError + UI.SPACE +
@@ -177,7 +177,7 @@ public class TourGeoFilter_Loader {
 
       if (selectTourIdsFromGeoParts == null) {
 
-         // this can occure when there are no geo parts, this would cause a sql exception
+         // this can occur when there are no geo parts, this would cause a sql exception
 
          return false;
       }
