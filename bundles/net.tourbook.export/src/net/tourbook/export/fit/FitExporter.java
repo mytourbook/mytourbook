@@ -264,13 +264,14 @@ public class FitExporter {
          }
       }
 
+      messages.addAll(eventMessages);
+
       final EventMesg eventMesgStop = new EventMesg();
       eventMesgStop.setTimestamp(finalTimestamp);
       eventMesgStop.setEvent(Event.TIMER);
       eventMesgStop.setEventType(EventType.STOP_ALL);
-      eventMessages.add(eventMesgStop);
 
-      messages.addAll(eventMessages);
+      messages.add(eventMesgStop);
    }
 
    private GearData createGearEvent(final List<Mesg> messages,
