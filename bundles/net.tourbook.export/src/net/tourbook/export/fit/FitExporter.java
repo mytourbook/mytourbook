@@ -156,6 +156,15 @@ public class FitExporter {
       messages.add(eventMesgStop);
    }
 
+   private void addStartEventMessage(final List<Mesg> messages, final DateTime startTime) {
+
+      final EventMesg eventMesgStart = new EventMesg();
+      eventMesgStart.setTimestamp(startTime);
+      eventMesgStart.setEvent(Event.TIMER);
+      eventMesgStart.setEventType(EventType.START);
+      messages.add(eventMesgStart);
+   }
+
    private int createBatteryEvent(final List<Mesg> messages,
                                   final DateTime timestamp,
                                   int batteryTimeIndex,
@@ -228,17 +237,9 @@ public class FitExporter {
       return deviceInfoMesg;
    }
 
-   private void createEventMessages(final List<Mesg> messages,
-                                    final DateTime startTime,
-                                    final DateTime finalTimestamp) {
+   private void createEventMessages(final List<Mesg> messages) {
 
       final List<EventMesg> eventMessages = new ArrayList<>();
-
-      EventMesg eventMesgStart = new EventMesg();
-      eventMesgStart.setTimestamp(startTime);
-      eventMesgStart.setEvent(Event.TIMER);
-      eventMesgStart.setEventType(EventType.START);
-      eventMessages.add(eventMesgStart);
 
       final long[] pausedTime_Start = _tourData.getPausedTime_Start();
       final long[] pausedTime_End = _tourData.getPausedTime_End();
@@ -265,19 +266,17 @@ public class FitExporter {
 
             eventMessages.add(eventMesgStop);
 
-            eventMesgStart = new EventMesg();
+            final EventMesg eventMesg = new EventMesg();
             final Date pausedTime_End_Date = Date.from(Instant.ofEpochMilli(pausedTime_End[index]));
-            eventMesgStart.setTimestamp(new DateTime(pausedTime_End_Date));
-            eventMesgStart.setEvent(Event.TIMER);
-            eventMesgStart.setEventType(EventType.START);
+            eventMesg.setTimestamp(new DateTime(pausedTime_End_Date));
+            eventMesg.setEvent(Event.TIMER);
+            eventMesg.setEventType(EventType.START);
 
-            eventMessages.add(eventMesgStart);
+            eventMessages.add(eventMesg);
          }
       }
 
       messages.addAll(eventMessages);
-
-      addFinalEventMessage(messages, finalTimestamp);
    }
 
    private GearData createGearEvent(final List<Mesg> messages,
@@ -460,7 +459,11 @@ public class FitExporter {
          }
       }
 
-      createEventMessages(messages, startTime, timestamp);
+      addStartEventMessage(messages, startTime);
+
+      createEventMessages(messages);
+
+      addFinalEventMessage(messages, timestamp);
 
       createLapMessages(messages, startTime);
 
