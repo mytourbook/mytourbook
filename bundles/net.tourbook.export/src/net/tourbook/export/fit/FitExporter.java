@@ -332,6 +332,7 @@ public class FitExporter {
       lapMessage.setMessageIndex(markerIndex);
 
       final Date timestamp = Date.from(Instant.ofEpochMilli(tourMarker.getDeviceLapTime()));
+      //todo fb
       lapMessage.setStartTime(new DateTime(timestamp));
       lapMessage.setTimestamp(new DateTime(timestamp));
 
