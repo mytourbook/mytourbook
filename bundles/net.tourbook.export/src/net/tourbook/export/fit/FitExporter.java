@@ -314,7 +314,7 @@ public class FitExporter {
       return pulseSerieIndex;
    }
 
-   private int createLapMessage(final List<Mesg> messages, final int markerIndex) {
+   private int createLapMessage(final List<Mesg> messages, int markerIndex) {
 
       // Every FIT ACTIVITY file MUST contain at least one Lap message
       final List<TourMarker> markers = _tourData.getTourMarkersSorted();
@@ -345,7 +345,7 @@ public class FitExporter {
 
       messages.add(lapMessage);
 
-      return markerIndex;
+      return ++markerIndex;
    }
 
    private int createPauseEvent(final List<Mesg> messages,
