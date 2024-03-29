@@ -21,8 +21,8 @@ import de.byteholder.geoclipse.map.PaintedMapLocation;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.util.ToolTip;
-import net.tourbook.data.TourLocation;
 import net.tourbook.tour.location.TourLocationUI;
+import net.tourbook.tour.location.TourLocationExtended;
 import net.tourbook.ui.Messages;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -78,7 +78,7 @@ public class MapLocationToolTip extends ToolTip {
 
    private void createUI(final Composite parent) {
 
-      final TourLocation _tourLocation = _hoveredItem.tourLocation;
+      final TourLocationExtended _tourLocationExtendes = _hoveredItem.tourLocationExtended;
 
       final GridDataFactory headerIndent = GridDataFactory.fillDefaults()
 
@@ -112,7 +112,7 @@ public class MapLocationToolTip extends ToolTip {
              * Display name
              */
 
-            final String displayName = _tourLocation.display_name;
+            final String displayName = _tourLocationExtendes.tourLocation.display_name;
 
             if (displayName != null && displayName.length() > 0) {
 
@@ -130,7 +130,7 @@ public class MapLocationToolTip extends ToolTip {
          /*
           * Location fields
           */
-         TourLocationUI.createUI(container, _tourLocation);
+         TourLocationUI.createUI(container, _tourLocationExtendes.tourLocation);
       }
    }
 

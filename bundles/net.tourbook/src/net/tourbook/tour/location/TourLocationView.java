@@ -3861,15 +3861,15 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
    private void selectTourLocations(final List<TourData> allTourData) {
 
-      final List<TourLocation> allTourLocations = TourLocationManager.getTourLocations(allTourData);
+      final List<TourLocationExtended> allTourLocations = TourLocationManager.getTourLocations(allTourData);
       final List<LocationItem> allLocationItems = new ArrayList<>();
 
       /*
        * Get viewer items from the provided tour locations
        */
-      for (final TourLocation tourLocation : allTourLocations) {
+      for (final TourLocationExtended tourLocationExtended : allTourLocations) {
 
-         final LocationItem locationItem = _locationItemsMap.get(tourLocation.getLocationId());
+         final LocationItem locationItem = _locationItemsMap.get(tourLocationExtended.tourLocation.getLocationId());
 
          if (locationItem != null) {
             allLocationItems.add(locationItem);

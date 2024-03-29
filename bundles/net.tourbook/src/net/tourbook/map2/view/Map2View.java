@@ -85,6 +85,7 @@ import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
+import net.tourbook.map.location.LocationType;
 import net.tourbook.map.location.SlideoutMapLocation;
 import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map2.Messages;
@@ -153,6 +154,7 @@ import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 import net.tourbook.tour.location.AddressLocationManager;
+import net.tourbook.tour.location.TourLocationExtended;
 import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.photo.IMapWithPhotos;
 import net.tourbook.tour.photo.TourPhotoLink;
@@ -2886,18 +2888,18 @@ public class Map2View extends ViewPart implements
     *
     * @return
     */
-   private List<TourLocation> getTourLocations(final TourData tourData) {
+   private List<TourLocationExtended> getTourLocations(final TourData tourData) {
 
-      final List<TourLocation> allTourLocations = new ArrayList<>();
+      final List<TourLocationExtended> allTourLocations = new ArrayList<>();
 
       final TourLocation tourLocationStart = tourData.getTourLocationStart();
       final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
 
       if (tourLocationStart != null) {
-         allTourLocations.add(tourLocationStart);
+         allTourLocations.add(new TourLocationExtended(tourLocationStart, LocationType.TourStart));
       }
       if (tourLocationEnd != null) {
-         allTourLocations.add(tourLocationEnd);
+         allTourLocations.add(new TourLocationExtended(tourLocationEnd, LocationType.TourEnd));
       }
 
       return allTourLocations;
@@ -3274,7 +3276,12 @@ public class Map2View extends ViewPart implements
       }
 
       // repaint map
-      _directMappingPainter.setAddressLocations(allTourLocations);
+      final List<TourLocationExtended> allAddressLocations = new ArrayList<>();
+      for (final TourLocation tourLocation : allTourLocations) {
+         allAddressLocations.add(new TourLocationExtended(tourLocation, LocationType.Address));
+      }
+
+      _directMappingPainter.setAddressLocations(allAddressLocations);
 
       _map.redraw();
 
@@ -3322,7 +3329,11 @@ public class Map2View extends ViewPart implements
       }
 
       // repaint map
-      _directMappingPainter.setTourLocations(allTourLocations);
+      final List<TourLocationExtended> allTourLocationsExtended = new ArrayList<>();
+      for (final TourLocation tourLocation : allTourLocations) {
+         allTourLocationsExtended.add(new TourLocationExtended(tourLocation, LocationType.Tour));
+      }
+      _directMappingPainter.setTourLocations(allTourLocationsExtended);
 
       _map.redraw();
 
@@ -4965,8 +4976,7 @@ public class Map2View extends ViewPart implements
       _allTourData.clear();
       _allTourData.add(tourData);
 
-      final List<TourLocation> allTourLocations = getTourLocations(tourData);
-      _directMappingPainter.setTourLocations(allTourLocations);
+      _directMappingPainter.setTourLocations(getTourLocations(tourData));
 
       setVisibleDataPoints(tourData);
 
@@ -5560,7 +5570,6 @@ public class Map2View extends ViewPart implements
    private void updateUI_MapLocations(final boolean isSelected) {
 
       _state.put(Map2View.STATE_IS_SHOW_MAP_LOCATIONS, isSelected);
-
 
       updateState_Map2_Options();
    }

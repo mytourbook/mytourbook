@@ -13,22 +13,19 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package de.byteholder.geoclipse.map;
+package net.tourbook.map.location;
 
-import net.tourbook.tour.location.TourLocationExtended;
+public enum LocationType {
 
-import org.eclipse.swt.graphics.Rectangle;
+   Address, //
 
-public class PaintedMapLocation {
+   /**
+    * This location type is not a start or end location
+    */
+   Tour, //
 
-   public TourLocationExtended tourLocationExtended;
+   TourStart, //
 
-   public Rectangle            locationRectangle;
+   TourEnd, //
 
-   public PaintedMapLocation(final TourLocationExtended tourLocationExtended,
-                             final Rectangle locationRectangle) {
-
-      this.tourLocationExtended = tourLocationExtended;
-      this.locationRectangle = locationRectangle;
-   }
 }

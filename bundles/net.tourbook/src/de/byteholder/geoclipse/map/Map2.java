@@ -3328,7 +3328,7 @@ public class Map2 extends Canvas {
                || oldHoveredMapLocation != null && newHoveredMapLocation == null
 
                // now both should be NOT null
-               || oldHoveredMapLocation.tourLocation.equals(newHoveredMapLocation.tourLocation) == false) {
+               || oldHoveredMapLocation.tourLocationExtended.equals(newHoveredMapLocation.tourLocationExtended) == false) {
 
             redraw();
 
