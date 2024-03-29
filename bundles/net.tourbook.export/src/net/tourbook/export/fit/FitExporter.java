@@ -237,48 +237,6 @@ public class FitExporter {
       return deviceInfoMesg;
    }
 
-   private void createEventMessagesForPauses(final List<Mesg> messages) {
-
-      final List<EventMesg> eventMessages = new ArrayList<>();
-
-      final long[] pausedTime_Start = _tourData.getPausedTime_Start();
-      final long[] pausedTime_End = _tourData.getPausedTime_End();
-      final long[] pausedTime_Data = _tourData.getPausedTime_Data();
-      final List<Long> listPausedTime_Data = pausedTime_Data == null
-            ? null
-            : Arrays.stream(pausedTime_Data).boxed().toList();
-
-      if (pausedTime_Start != null && pausedTime_Start.length > 0) {
-
-         for (int index = 0; index < pausedTime_Start.length; ++index) {
-
-            final EventMesg eventMesgStop = new EventMesg();
-            final Date pausedTime_Start_Date = Date.from(Instant.ofEpochMilli(pausedTime_Start[index]));
-            eventMesgStop.setTimestamp(new DateTime(pausedTime_Start_Date));
-            /**
-             * eventData == 0: user stop<br>
-             * eventData == 1: auto-stop
-             */
-            final Long pauseType = listPausedTime_Data == null ? 1L : listPausedTime_Data.get(index);
-            eventMesgStop.setData(pauseType);
-            eventMesgStop.setEvent(Event.TIMER);
-            eventMesgStop.setEventType(EventType.STOP);
-
-            eventMessages.add(eventMesgStop);
-
-            final EventMesg eventMesg = new EventMesg();
-            final Date pausedTime_End_Date = Date.from(Instant.ofEpochMilli(pausedTime_End[index]));
-            eventMesg.setTimestamp(new DateTime(pausedTime_End_Date));
-            eventMesg.setEvent(Event.TIMER);
-            eventMesg.setEventType(EventType.START);
-
-            eventMessages.add(eventMesg);
-         }
-      }
-
-      messages.addAll(eventMessages);
-   }
-
    private GearData createGearEvent(final List<Mesg> messages,
                                     final DateTime timestamp,
                                     GearData previousGearData,
@@ -391,6 +349,54 @@ public class FitExporter {
       messages.addAll(lapMessages);
    }
 
+   private int createPauseEvent(final List<Mesg> messages,
+                                int pauseTimeIndex,
+                                final int currentTimeSerieValue) {
+
+      final long[] pausedTime_Start = _tourData.getPausedTime_Start();
+      final long[] pausedTime_End = _tourData.getPausedTime_End();
+      final long[] pausedTime_Data = _tourData.getPausedTime_Data();
+      final List<Long> listPausedTime_Data = pausedTime_Data == null
+            ? null
+            : Arrays.stream(pausedTime_Data).boxed().toList();
+
+      if (pausedTime_Start == null || pausedTime_Start.length == 0 ||
+            pausedTime_Start.length == pauseTimeIndex) {
+         return pauseTimeIndex;
+      }
+
+      final long currentPauseTimeStart = pausedTime_Start[pauseTimeIndex];
+      final long currentTime = currentTimeSerieValue * 1000L + _tourData.getTourStartTimeMS();
+      // If the current time serie has not passed the next pause yet, we return.
+      if (currentTime < currentPauseTimeStart) {
+         return pauseTimeIndex;
+      }
+
+      final EventMesg eventMesgStop = new EventMesg();
+      final Date pausedTime_Start_Date = Date.from(Instant.ofEpochMilli(currentPauseTimeStart));
+      eventMesgStop.setTimestamp(new DateTime(pausedTime_Start_Date));
+      /**
+       * eventData == 0: user stop<br>
+       * eventData == 1: auto-stop
+       */
+      final Long pauseType = listPausedTime_Data == null ? 1L : listPausedTime_Data.get(pauseTimeIndex);
+      eventMesgStop.setData(pauseType);
+      eventMesgStop.setEvent(Event.TIMER);
+      eventMesgStop.setEventType(EventType.STOP);
+
+      messages.add(eventMesgStop);
+
+      final EventMesg eventMesg = new EventMesg();
+      final Date pausedTime_End_Date = Date.from(Instant.ofEpochMilli(pausedTime_End[pauseTimeIndex]));
+      eventMesg.setTimestamp(new DateTime(pausedTime_End_Date));
+      eventMesg.setEvent(Event.TIMER);
+      eventMesg.setEventType(EventType.START);
+
+      messages.add(eventMesg);
+
+      return ++pauseTimeIndex;
+   }
+
    // Official documentation: https://developer.garmin.com/fit/cookbook/
    public void export(final TourData tourData, final String exportFilePath) {
 
@@ -433,6 +439,7 @@ public class FitExporter {
          int previousTimeSerieValue = 0;
          int pulseSerieIndex = 0;
          int batteryTimeIndex = 0;
+         int pauseTimeIndex = 0;
          GearData previousGearData = null;
          for (int index = 0; index < timeSerie.length; ++index) {
 
@@ -455,13 +462,13 @@ public class FitExporter {
 
             batteryTimeIndex = createBatteryEvent(messages, timestamp, batteryTimeIndex, currentTimeSerieValue);
 
+            pauseTimeIndex = createPauseEvent(messages, pauseTimeIndex, currentTimeSerieValue);
+
             // Increment the timestamp by the number of seconds between the previous
             // timestamp and the current one
             previousTimeSerieValue = currentTimeSerieValue;
          }
       }
-
-      createEventMessagesForPauses(messages);
 
       addFinalEventMessage(messages, timestamp);
 
