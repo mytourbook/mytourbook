@@ -145,6 +145,17 @@ public class FitExporter {
       return userProfileMesg;
    }
 
+   private void addFinalEventMessage(final List<Mesg> messages,
+                                     final DateTime finalTimestamp) {
+
+      final EventMesg eventMesgStop = new EventMesg();
+      eventMesgStop.setTimestamp(finalTimestamp);
+      eventMesgStop.setEvent(Event.TIMER);
+      eventMesgStop.setEventType(EventType.STOP_ALL);
+
+      messages.add(eventMesgStop);
+   }
+
    private int createBatteryEvent(final List<Mesg> messages,
                                   final DateTime timestamp,
                                   int batteryTimeIndex,
@@ -266,12 +277,7 @@ public class FitExporter {
 
       messages.addAll(eventMessages);
 
-      final EventMesg eventMesgStop = new EventMesg();
-      eventMesgStop.setTimestamp(finalTimestamp);
-      eventMesgStop.setEvent(Event.TIMER);
-      eventMesgStop.setEventType(EventType.STOP_ALL);
-
-      messages.add(eventMesgStop);
+      addFinalEventMessage(messages, finalTimestamp);
    }
 
    private GearData createGearEvent(final List<Mesg> messages,
