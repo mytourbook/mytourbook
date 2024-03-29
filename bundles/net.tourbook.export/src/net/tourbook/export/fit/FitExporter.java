@@ -422,6 +422,8 @@ public class FitExporter {
       developerIdMesg.setApplicationVersion((long) (version * 100));
       messages.add(developerIdMesg);
 
+      addStartEventMessage(messages, startTime);
+
       // Every FIT ACTIVITY file MUST contain Record messages
 
       final DateTime timestamp = new DateTime(startTime);
@@ -458,8 +460,6 @@ public class FitExporter {
             previousTimeSerieValue = currentTimeSerieValue;
          }
       }
-
-      addStartEventMessage(messages, startTime);
 
       createEventMessages(messages);
 
