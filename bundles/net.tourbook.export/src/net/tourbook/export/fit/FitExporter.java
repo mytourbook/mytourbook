@@ -478,7 +478,7 @@ public class FitExporter {
       // Every FIT ACTIVITY file MUST contain EXACTLY one Activity message
       final ActivityMesg activityMesg = new ActivityMesg();
       activityMesg.setNumSessions(1);
-      activityMesg.setTimestamp(timestamp);
+      // activityMesg.setTimestamp(timestamp);
       messages.add(activityMesg);
 
       final Set<DeviceSensorValue> deviceSensorValues = _tourData.getDeviceSensorValues();
