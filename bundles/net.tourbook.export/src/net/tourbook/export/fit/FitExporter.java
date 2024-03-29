@@ -353,6 +353,7 @@ public class FitExporter {
                                 int pauseTimeIndex,
                                 final int currentTimeSerieValue) {
 
+      //todo fb set those variables as class properties for more efficiency
       final long[] pausedTime_Start = _tourData.getPausedTime_Start();
       final long[] pausedTime_End = _tourData.getPausedTime_End();
       final long[] pausedTime_Data = _tourData.getPausedTime_Data();
