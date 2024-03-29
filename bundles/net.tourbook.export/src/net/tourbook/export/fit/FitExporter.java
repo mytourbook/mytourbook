@@ -217,8 +217,9 @@ public class FitExporter {
       return deviceInfoMesg;
    }
 
-   private List<EventMesg> createEventMessages(final DateTime startTime,
-                                               final DateTime finalTimestamp) {
+   private void createEventMessages(final List<Mesg> messages,
+                                    final DateTime startTime,
+                                    final DateTime finalTimestamp) {
 
       final List<EventMesg> eventMessages = new ArrayList<>();
 
@@ -269,7 +270,7 @@ public class FitExporter {
       eventMesgStop.setEventType(EventType.STOP_ALL);
       eventMessages.add(eventMesgStop);
 
-      return eventMessages;
+      messages.addAll(eventMessages);
    }
 
    private GearData createGearEvent(final List<Mesg> messages,
@@ -349,7 +350,7 @@ public class FitExporter {
       return pulseSerieIndex;
    }
 
-   private List<LapMesg> createLapMessages(final DateTime startTime) {
+   private void createLapMessages(final List<Mesg> messages, final DateTime startTime) {
 
       final List<LapMesg> lapMessages = new ArrayList<>();
 
@@ -381,7 +382,7 @@ public class FitExporter {
          previousTotalDistance = tourMarker.getDistance();
       }
 
-      return lapMessages;
+      messages.addAll(lapMessages);
    }
 
    // Official documentation: https://developer.garmin.com/fit/cookbook/
@@ -452,11 +453,9 @@ public class FitExporter {
          }
       }
 
-      final List<EventMesg> eventMessages = createEventMessages(startTime, timestamp);
-      messages.addAll(eventMessages);
+      createEventMessages(messages, startTime, timestamp);
 
-      final List<LapMesg> lapMessages = createLapMessages(startTime);
-      messages.addAll(lapMessages);
+      createLapMessages(messages, startTime);
 
       // Every FIT ACTIVITY file MUST contain at least one Session message
       final SessionMesg sessionMesg = new SessionMesg();
@@ -472,7 +471,7 @@ public class FitExporter {
       // Every FIT ACTIVITY file MUST contain EXACTLY one Activity message
       final ActivityMesg activityMesg = new ActivityMesg();
       activityMesg.setNumSessions(1);
-      // activityMesg.setTimestamp(timestamp);
+      activityMesg.setTimestamp(timestamp);
       messages.add(activityMesg);
 
       final Set<DeviceSensorValue> deviceSensorValues = _tourData.getDeviceSensorValues();
