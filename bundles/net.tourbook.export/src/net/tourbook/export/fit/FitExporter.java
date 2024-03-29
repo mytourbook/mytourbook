@@ -237,7 +237,7 @@ public class FitExporter {
       return deviceInfoMesg;
    }
 
-   private void createEventMessages(final List<Mesg> messages) {
+   private void createEventMessagesForPauses(final List<Mesg> messages) {
 
       final List<EventMesg> eventMessages = new ArrayList<>();
 
@@ -461,7 +461,7 @@ public class FitExporter {
          }
       }
 
-      createEventMessages(messages);
+      createEventMessagesForPauses(messages);
 
       addFinalEventMessage(messages, timestamp);
 
