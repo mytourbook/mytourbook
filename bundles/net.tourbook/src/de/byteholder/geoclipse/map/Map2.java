@@ -7545,6 +7545,8 @@ public class Map2 extends Canvas {
          _geoGrid_Data_Selected = null;
          _geoGrid_TourGeoFilter = null;
 
+         _isFastMapPainting_Active = false;
+
          redraw();
 
       } else {
