@@ -325,20 +325,21 @@ public class FitExporter {
       final float previousTotalDistance = markerIndex == 0 ? 0 : markers.get(markerIndex - 1).getDistance();
       final TourMarker tourMarker = markers.get(markerIndex);
       final float lapDistance = tourMarker.getDistance() - previousTotalDistance;
+      final Date timestamp = Date.from(Instant.ofEpochMilli(tourMarker.getDeviceLapTime()));
+      final int pausedTime = _tourData.getPausedTime(0, tourMarker.getSerieIndex());
+      final float totalTimerTime = (float) tourMarker.getTime() - pausedTime;
+      final float totalElapsedTime = tourMarker.getTime();
 
       final LapMesg lapMessage = new LapMesg();
       lapMessage.setMessageIndex(markerIndex);
 
-      final Date timestamp = Date.from(Instant.ofEpochMilli(tourMarker.getDeviceLapTime()));
       lapMessage.setStartTime(new DateTime(timestamp));
       lapMessage.setTimestamp(new DateTime(timestamp));
 
       lapMessage.setTotalDistance(lapDistance);
 
-      final int pausedTime = _tourData.getPausedTime(0, tourMarker.getSerieIndex());
-      //this seemed to be the missing link
-      lapMessage.setTotalTimerTime((float) tourMarker.getTime() - pausedTime);
-      lapMessage.setTotalElapsedTime((float) tourMarker.getTime());
+      lapMessage.setTotalTimerTime(totalTimerTime);
+      lapMessage.setTotalElapsedTime(totalElapsedTime);
       lapMessage.setEvent(Event.LAP);
 
       _messages.add(lapMessage);
