@@ -342,6 +342,7 @@ public class FitExporter {
       final int pausedTime = _tourData.getPausedTime(0, tourMarker.getSerieIndex());
       //this seemed to be the missing link
       lapMessage.setTotalTimerTime((float) tourMarker.getTime() - pausedTime);
+      lapMessage.setTotalElapsedTime((float) tourMarker.getTime());
       lapMessage.setEvent(Event.LAP);
 
       messages.add(lapMessage);
