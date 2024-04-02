@@ -313,7 +313,7 @@ public class FitExporter {
       return pulseSerieIndex;
    }
 
-   private int createLapMessage(int markerIndex) {
+   private int createLapMessage(int markerIndex, final boolean isFinalTimeSerie) {
 
       // Every FIT ACTIVITY file MUST contain at least one Lap message
       final List<TourMarker> markers = _tourData.getTourMarkersSorted();
@@ -323,9 +323,8 @@ public class FitExporter {
       }
 
       final float previousTotalDistance = markerIndex == 0 ? 0 : markers.get(markerIndex - 1).getDistance();
-      float lapDistance = 0;
-
       final TourMarker tourMarker = markers.get(markerIndex);
+      final float lapDistance = tourMarker.getDistance() - previousTotalDistance;
 
       final LapMesg lapMessage = new LapMesg();
       lapMessage.setMessageIndex(markerIndex);
@@ -334,7 +333,6 @@ public class FitExporter {
       lapMessage.setStartTime(new DateTime(timestamp));
       lapMessage.setTimestamp(new DateTime(timestamp));
 
-      lapDistance = tourMarker.getDistance() - previousTotalDistance;
       lapMessage.setTotalDistance(lapDistance);
 
       final int pausedTime = _tourData.getPausedTime(0, tourMarker.getSerieIndex());
@@ -446,6 +444,7 @@ public class FitExporter {
          final int[] pauseTimeIndices = new int[2];
          int markerIndex = 0;
          GearData previousGearData = null;
+         boolean isFinalTimeSerie = false;
 
          for (int index = 0; index < timeSerie.length; ++index) {
 
@@ -470,7 +469,8 @@ public class FitExporter {
 
             createPauseEvent(pauseTimeIndices, currentTimeSerieValue);
 
-            markerIndex = createLapMessage(markerIndex);
+            isFinalTimeSerie = index == timeSerie.length - 1;
+            markerIndex = createLapMessage(markerIndex, isFinalTimeSerie);
 
             // Increment the timestamp by the number of seconds between the previous
             // timestamp and the current one
@@ -491,7 +491,7 @@ public class FitExporter {
       sessionMesg.setTotalElapsedTime((float) _tourData.getTourDeviceTime_Elapsed());
       sessionMesg.setTotalTimerTime((float) _tourData.getTourDeviceTime_Recorded());
       sessionMesg.setFirstLapIndex(0);
-      sessionMesg.setNumLaps(_tourData.getTourMarkers().size());
+      sessionMesg.setNumLaps(_tourData.getTourMarkers().isEmpty() ? 1 : _tourData.getTourMarkers().size());
       sessionMesg.setTimestamp(creationTime_Timestamp);
       setValues(sessionMesg);
       _messages.add(sessionMesg);
