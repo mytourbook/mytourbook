@@ -217,17 +217,17 @@ public class FitExporter {
          return;
       }
 
-      final UserProfileMesg userProfileMesg = createUserProfile();
-      if (userProfileMesg != null) {
-         fileEncoder.write(userProfileMesg);
-      }
-
       // Every FIT file MUST contain a File ID message
       final FileIdMesg fileIdMesg = new FileIdMesg();
       fileIdMesg.setType(File.ACTIVITY);
       fileIdMesg.setTimeCreated(startTime);
       fileEncoder.write(fileIdMesg);
       fileEncoder.write(deviceInfoMesg);
+
+      final UserProfileMesg userProfileMesg = createUserProfile();
+      if (userProfileMesg != null) {
+         fileEncoder.write(userProfileMesg);
+      }
 
       _messages.forEach(message -> fileEncoder.write(message));
 
@@ -501,6 +501,7 @@ public class FitExporter {
       activityMesg.setNumSessions(1);
       activityMesg.setTimestamp(creationTime_Timestamp);
       activityMesg.setLocalTimestamp(creationTime_LocalTimestamp.getTimestamp());
+      activityMesg.setTotalTimerTime((float) _tourData.getTourDeviceTime_Recorded());
       _messages.add(activityMesg);
 
       final Set<DeviceSensorValue> deviceSensorValues = _tourData.getDeviceSensorValues();
