@@ -313,9 +313,8 @@ public class FitExporter {
       return pulseSerieIndex;
    }
 
-   private int createLapMessage(int markerIndex, final boolean isFinalTimeSerie) {
+   private int createLapMessage(int markerIndex) {
 
-      // Every FIT ACTIVITY file MUST contain at least one Lap message
       final List<TourMarker> markers = _tourData.getTourMarkersSorted();
       if (markers == null || markers.isEmpty() ||
             markers.size() == markerIndex) {
@@ -325,23 +324,33 @@ public class FitExporter {
       final float previousTotalDistance = markerIndex == 0 ? 0 : markers.get(markerIndex - 1).getDistance();
       final TourMarker tourMarker = markers.get(markerIndex);
       final float lapDistance = tourMarker.getDistance() - previousTotalDistance;
-      final Date timestamp = Date.from(Instant.ofEpochMilli(tourMarker.getDeviceLapTime()));
+      final DateTime timestamp = new DateTime(Date.from(Instant.ofEpochMilli(tourMarker.getDeviceLapTime())));
       final int pausedTime = _tourData.getPausedTime(0, tourMarker.getSerieIndex());
       final float totalTimerTime = (float) tourMarker.getTime() - pausedTime;
       final float totalElapsedTime = tourMarker.getTime();
 
-      final LapMesg lapMessage = new LapMesg();
-      lapMessage.setMessageIndex(markerIndex);
-      lapMessage.setStartTime(new DateTime(timestamp));
-      lapMessage.setTimestamp(new DateTime(timestamp));
-      lapMessage.setTotalDistance(lapDistance);
-      lapMessage.setTotalTimerTime(totalTimerTime);
-      lapMessage.setTotalElapsedTime(totalElapsedTime);
-      lapMessage.setEvent(Event.LAP);
+      final LapMesg lapMessage = createLapMessage(markerIndex, lapDistance, timestamp, totalTimerTime, totalElapsedTime);
 
       _messages.add(lapMessage);
 
       return ++markerIndex;
+   }
+
+   private LapMesg createLapMessage(final int markerIndex,
+                                    final float lapDistance,
+                                    final DateTime startTime,
+                                    final float totalTimerTime,
+                                    final float totalElapsedTime) {
+
+      final LapMesg lapMessage = new LapMesg();
+      lapMessage.setMessageIndex(markerIndex);
+      lapMessage.setStartTime(startTime);
+      lapMessage.setTimestamp(startTime);
+      lapMessage.setTotalDistance(lapDistance);
+      lapMessage.setTotalTimerTime(totalTimerTime);
+      lapMessage.setTotalElapsedTime(totalElapsedTime);
+      lapMessage.setEvent(Event.LAP);
+      return lapMessage;
    }
 
    private void createPauseEvent(final int[] pauseTimeIndices,
@@ -442,7 +451,6 @@ public class FitExporter {
          final int[] pauseTimeIndices = new int[2];
          int markerIndex = 0;
          GearData previousGearData = null;
-         boolean isFinalTimeSerie = false;
 
          for (int index = 0; index < timeSerie.length; ++index) {
 
@@ -467,13 +475,25 @@ public class FitExporter {
 
             createPauseEvent(pauseTimeIndices, currentTimeSerieValue);
 
-            isFinalTimeSerie = index == timeSerie.length - 1;
-            markerIndex = createLapMessage(markerIndex, isFinalTimeSerie);
+            markerIndex = createLapMessage(markerIndex);
 
             // Increment the timestamp by the number of seconds between the previous
             // timestamp and the current one
             previousTimeSerieValue = currentTimeSerieValue;
          }
+      }
+
+      // Every FIT ACTIVITY file MUST contain at least one Lap message
+      final List<TourMarker> markers = _tourData.getTourMarkersSorted();
+      if (markers == null || markers.isEmpty()) {
+
+         final LapMesg lapMessage = createLapMessage(0,
+               _tourData.getTourDistance(),
+               startTime,
+               _tourData.getTourDeviceTime_Recorded(),
+               _tourData.getTourDeviceTime_Elapsed());
+
+         _messages.add(lapMessage);
       }
 
       addFinalEventMessage(timestamp);
