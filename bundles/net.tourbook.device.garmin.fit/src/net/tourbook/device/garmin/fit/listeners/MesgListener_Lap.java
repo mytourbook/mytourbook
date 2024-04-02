@@ -75,13 +75,17 @@ public class MesgListener_Lap extends AbstractMesgListener implements LapMesgLis
        * Set lap time, later the time slice position (serie index) will be set.
        */
       final DateTime garminTime = lapMesg.getStartTime();
-      if (garminTime != null) {
+      final Float totalElapsedTime = lapMesg.getTotalElapsedTime();
+      if (garminTime != null && totalElapsedTime != null) {
 
-         tourMarker.setDeviceLapTime(garminTime.getDate().getTime() + lapMesg.getTotalElapsedTime().longValue() * 1000);
+         tourMarker.setDeviceLapTime(garminTime.getDate().getTime() + totalElapsedTime.longValue() * 1000);
+
+      } else if (garminTime != null) {
+
+         tourMarker.setDeviceLapTime(garminTime.getDate().getTime());
 
       } else {
 
-         final Float totalElapsedTime = lapMesg.getTotalElapsedTime();
          if (totalElapsedTime != null) {
 
             int lapTime = -1;
