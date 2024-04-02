@@ -332,12 +332,9 @@ public class FitExporter {
 
       final LapMesg lapMessage = new LapMesg();
       lapMessage.setMessageIndex(markerIndex);
-
       lapMessage.setStartTime(new DateTime(timestamp));
       lapMessage.setTimestamp(new DateTime(timestamp));
-
       lapMessage.setTotalDistance(lapDistance);
-
       lapMessage.setTotalTimerTime(totalTimerTime);
       lapMessage.setTotalElapsedTime(totalElapsedTime);
       lapMessage.setEvent(Event.LAP);
