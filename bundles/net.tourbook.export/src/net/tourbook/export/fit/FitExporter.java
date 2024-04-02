@@ -33,6 +33,7 @@ import com.garmin.fit.FitRuntimeException;
 import com.garmin.fit.Gender;
 import com.garmin.fit.HrvMesg;
 import com.garmin.fit.LapMesg;
+import com.garmin.fit.LocalDateTime;
 import com.garmin.fit.Manufacturer;
 import com.garmin.fit.Mesg;
 import com.garmin.fit.RecordMesg;
@@ -68,7 +69,11 @@ import org.osgi.framework.Version;
 
 public class FitExporter {
 
-   private TourData _tourData;
+   private TourData   _tourData;
+   private long[]     _pausedTime_Start;
+   private long[]     _pausedTime_End;
+   private List<Long> _listPausedTime_Data;
+   private List<Mesg> _messages = new ArrayList<>();
 
    private static byte[] convertUUIDToBytes(final UUID uuid) {
 
@@ -76,53 +81,6 @@ public class FitExporter {
       byteBuffer.putLong(uuid.getMostSignificantBits());
       byteBuffer.putLong(uuid.getLeastSignificantBits());
       return byteBuffer.array();
-   }
-
-   private static void createFitFile(final List<Mesg> messages,
-                                     final String filename,
-                                     final DateTime startTime,
-                                     final Float version) {
-
-      // A Device Info message is a BEST PRACTICE for FIT ACTIVITY files
-      final DeviceInfoMesg deviceInfoMesg = new DeviceInfoMesg();
-      deviceInfoMesg.setDeviceIndex(DeviceIndex.CREATOR);
-      deviceInfoMesg.setManufacturer(Manufacturer.DEVELOPMENT);
-      deviceInfoMesg.setProductName("MyTourbook"); //$NON-NLS-1$
-      deviceInfoMesg.setSoftwareVersion(version);
-      deviceInfoMesg.setTimestamp(startTime);
-
-      // Create the output stream
-      FileEncoder fileEncoder;
-
-      try {
-         fileEncoder = new FileEncoder(
-               new java.io.File(filename),
-               Fit.ProtocolVersion.V2_0);
-      } catch (final FitRuntimeException e) {
-         StatusUtil.log(e);
-         return;
-      }
-
-      final UserProfileMesg userProfileMesg = createUserProfile();
-      if (userProfileMesg != null) {
-         fileEncoder.write(userProfileMesg);
-      }
-
-      // Every FIT file MUST contain a File ID message
-      final FileIdMesg fileIdMesg = new FileIdMesg();
-      fileIdMesg.setType(File.ACTIVITY);
-      fileIdMesg.setTimeCreated(startTime);
-      fileEncoder.write(fileIdMesg);
-      fileEncoder.write(deviceInfoMesg);
-
-      messages.forEach(message -> fileEncoder.write(message));
-
-      // Close the output stream
-      try {
-         fileEncoder.close();
-      } catch (final FitRuntimeException e) {
-         StatusUtil.log(e);
-      }
    }
 
    private static UserProfileMesg createUserProfile() {
@@ -145,28 +103,26 @@ public class FitExporter {
       return userProfileMesg;
    }
 
-   private void addFinalEventMessage(final List<Mesg> messages,
-                                     final DateTime finalTimestamp) {
+   private void addFinalEventMessage(final DateTime finalTimestamp) {
 
       final EventMesg eventMesgStop = new EventMesg();
       eventMesgStop.setTimestamp(finalTimestamp);
       eventMesgStop.setEvent(Event.TIMER);
       eventMesgStop.setEventType(EventType.STOP_ALL);
 
-      messages.add(eventMesgStop);
+      _messages.add(eventMesgStop);
    }
 
-   private void addStartEventMessage(final List<Mesg> messages, final DateTime startTime) {
+   private void addStartEventMessage(final DateTime startTime) {
 
       final EventMesg eventMesgStart = new EventMesg();
       eventMesgStart.setTimestamp(startTime);
       eventMesgStart.setEvent(Event.TIMER);
       eventMesgStart.setEventType(EventType.START);
-      messages.add(eventMesgStart);
+      _messages.add(eventMesgStart);
    }
 
-   private int createBatteryEvent(final List<Mesg> messages,
-                                  final DateTime timestamp,
+   private int createBatteryEvent(final DateTime timestamp,
                                   int batteryTimeIndex,
                                   final int timeSerieValue) {
 
@@ -188,7 +144,7 @@ public class FitExporter {
 
          mesg.setFieldValue(2, battery_Percentage[batteryTimeIndex]);
 
-         messages.add(mesg);
+         _messages.add(mesg);
 
          ++batteryTimeIndex;
       }
@@ -237,8 +193,53 @@ public class FitExporter {
       return deviceInfoMesg;
    }
 
-   private GearData createGearEvent(final List<Mesg> messages,
-                                    final DateTime timestamp,
+   private void createFitFile(final String filename,
+                              final DateTime startTime,
+                              final Float version) {
+
+      // A Device Info message is a BEST PRACTICE for FIT ACTIVITY files
+      final DeviceInfoMesg deviceInfoMesg = new DeviceInfoMesg();
+      deviceInfoMesg.setDeviceIndex(DeviceIndex.CREATOR);
+      deviceInfoMesg.setManufacturer(Manufacturer.DEVELOPMENT);
+      deviceInfoMesg.setProductName("MyTourbook"); //$NON-NLS-1$
+      deviceInfoMesg.setSoftwareVersion(version);
+      deviceInfoMesg.setTimestamp(startTime);
+
+      // Create the output stream
+      FileEncoder fileEncoder;
+
+      try {
+         fileEncoder = new FileEncoder(
+               new java.io.File(filename),
+               Fit.ProtocolVersion.V2_0);
+      } catch (final FitRuntimeException e) {
+         StatusUtil.log(e);
+         return;
+      }
+
+      final UserProfileMesg userProfileMesg = createUserProfile();
+      if (userProfileMesg != null) {
+         fileEncoder.write(userProfileMesg);
+      }
+
+      // Every FIT file MUST contain a File ID message
+      final FileIdMesg fileIdMesg = new FileIdMesg();
+      fileIdMesg.setType(File.ACTIVITY);
+      fileIdMesg.setTimeCreated(startTime);
+      fileEncoder.write(fileIdMesg);
+      fileEncoder.write(deviceInfoMesg);
+
+      _messages.forEach(message -> fileEncoder.write(message));
+
+      // Close the output stream
+      try {
+         fileEncoder.close();
+      } catch (final FitRuntimeException e) {
+         StatusUtil.log(e);
+      }
+   }
+
+   private GearData createGearEvent(final DateTime timestamp,
                                     GearData previousGearData,
                                     final int timeSerieIndex) {
 
@@ -265,7 +266,7 @@ public class FitExporter {
                      : Event.REAR_GEAR_CHANGE;
          gearEventMesg.setEvent(event);
 
-         messages.add(gearEventMesg);
+         _messages.add(gearEventMesg);
 
          previousGearData = gearData;
       }
@@ -278,14 +279,12 @@ public class FitExporter {
     * Source:
     * https://forums.garmin.com/developer/fit-sdk/f/discussion/255690/fit-file-hrv-data-array-interpretation
     *
-    * @param messages
     * @param pulseSerieIndex
     * @param timeSerieIndex
     *
     * @return
     */
-   private int createHrvMessage(final List<Mesg> messages,
-                                int pulseSerieIndex,
+   private int createHrvMessage(int pulseSerieIndex,
                                 final int timeSerieIndex) {
 
       final int[] pulseTime_Milliseconds = _tourData.pulseTime_Milliseconds;
@@ -307,14 +306,14 @@ public class FitExporter {
 
          final Float[] hrvMesgTime = hrvMesg.getTime();
          if (hrvMesgTime != null) {
-            messages.add(hrvMesg);
+            _messages.add(hrvMesg);
          }
       }
 
       return pulseSerieIndex;
    }
 
-   private int createLapMessage(final List<Mesg> messages, int markerIndex) {
+   private int createLapMessage(int markerIndex) {
 
       // Every FIT ACTIVITY file MUST contain at least one Lap message
       final List<TourMarker> markers = _tourData.getTourMarkersSorted();
@@ -332,7 +331,6 @@ public class FitExporter {
       lapMessage.setMessageIndex(markerIndex);
 
       final Date timestamp = Date.from(Instant.ofEpochMilli(tourMarker.getDeviceLapTime()));
-      //todo fb
       lapMessage.setStartTime(new DateTime(timestamp));
       lapMessage.setTimestamp(new DateTime(timestamp));
 
@@ -345,33 +343,24 @@ public class FitExporter {
       lapMessage.setTotalElapsedTime((float) tourMarker.getTime());
       lapMessage.setEvent(Event.LAP);
 
-      messages.add(lapMessage);
+      _messages.add(lapMessage);
 
       return ++markerIndex;
    }
 
-   private void createPauseEvent(final List<Mesg> messages,
-                                 final int[] pauseTimeIndices,
+   private void createPauseEvent(final int[] pauseTimeIndices,
                                  final int currentTimeSerieValue) {
 
-      //todo fb set those variables as class properties for more efficiency
-      final long[] pausedTime_Start = _tourData.getPausedTime_Start();
-      final long[] pausedTime_End = _tourData.getPausedTime_End();
-      final long[] pausedTime_Data = _tourData.getPausedTime_Data();
-      final List<Long> listPausedTime_Data = pausedTime_Data == null
-            ? null
-            : Arrays.stream(pausedTime_Data).boxed().toList();
-
-      if (pausedTime_Start == null || pausedTime_Start.length == 0 ||
-            pausedTime_End.length == pauseTimeIndices[1]) {
+      if (_pausedTime_Start == null || _pausedTime_Start.length == 0 ||
+            _pausedTime_End.length == pauseTimeIndices[1]) {
          return;
       }
 
       final long currentTime = currentTimeSerieValue * 1000L + _tourData.getTourStartTimeMS();
 
-      if (pausedTime_Start.length > pauseTimeIndices[0]) {
+      if (_pausedTime_Start.length > pauseTimeIndices[0]) {
 
-         final long currentPauseTimeStart = pausedTime_Start[pauseTimeIndices[0]];
+         final long currentPauseTimeStart = _pausedTime_Start[pauseTimeIndices[0]];
          // If the current time serie has not passed the next pause yet, we return.
          if (currentTime >= currentPauseTimeStart) {
 
@@ -382,12 +371,12 @@ public class FitExporter {
              * eventData == 0: user stop<br>
              * eventData == 1: auto-stop
              */
-            final Long pauseType = listPausedTime_Data == null ? 1L : listPausedTime_Data.get(pauseTimeIndices[0]);
+            final Long pauseType = _listPausedTime_Data == null ? 1L : _listPausedTime_Data.get(pauseTimeIndices[0]);
             eventMesgStop.setData(pauseType);
             eventMesgStop.setEvent(Event.TIMER);
             eventMesgStop.setEventType(EventType.STOP);
 
-            messages.add(eventMesgStop);
+            _messages.add(eventMesgStop);
 
             ++pauseTimeIndices[0];
 
@@ -395,7 +384,7 @@ public class FitExporter {
          }
       }
 
-      final long currentPauseTimeEnd = pausedTime_End[pauseTimeIndices[1]];
+      final long currentPauseTimeEnd = _pausedTime_End[pauseTimeIndices[1]];
       // If the current time serie has not passed the next pause yet, we return.
       if (currentTime >= currentPauseTimeEnd) {
 
@@ -405,7 +394,7 @@ public class FitExporter {
          eventMesgStart.setEvent(Event.TIMER);
          eventMesgStart.setEventType(EventType.START);
 
-         messages.add(eventMesgStart);
+         _messages.add(eventMesgStart);
 
          ++pauseTimeIndices[1];
       }
@@ -415,17 +404,20 @@ public class FitExporter {
    public void export(final TourData tourData, final String exportFilePath) {
 
       _tourData = tourData;
-      final List<Mesg> messages = new ArrayList<>();
+      _pausedTime_Start = _tourData.getPausedTime_Start();
+      _pausedTime_End = _tourData.getPausedTime_End();
+      final long[] pausedTime_Data = _tourData.getPausedTime_Data();
+      _listPausedTime_Data = pausedTime_Data == null
+            ? null
+            : Arrays.stream(pausedTime_Data).boxed().toList();
+
+      _messages.clear();
 
       // The starting timestamp for the activity
       final DateTime startTime = new DateTime(Date.from(_tourData.getTourStartTime().toInstant()));
 
       // Timer Events are a BEST PRACTICE for FIT ACTIVITY files
-      final EventMesg eventMesg = new EventMesg();
-      eventMesg.setTimestamp(startTime);
-      eventMesg.setEvent(Event.TIMER);
-      eventMesg.setEventType(EventType.START);
-      messages.add(eventMesg);
+      addStartEventMessage(startTime);
 
       // Create the Developer Id message for the developer data fields.
       final DeveloperDataIdMesg developerIdMesg = new DeveloperDataIdMesg();
@@ -440,10 +432,7 @@ public class FitExporter {
       final Version softwareVersion = Activator.getDefault().getVersion();
       final Float version = Float.valueOf(softwareVersion.getMajor() + UI.SYMBOL_DOT + softwareVersion.getMinor());
       developerIdMesg.setApplicationVersion((long) (version * 100));
-      messages.add(developerIdMesg);
-
-      //todo fb consolidate with line 429
-      addStartEventMessage(messages, startTime);
+      _messages.add(developerIdMesg);
 
       // Every FIT ACTIVITY file MUST contain Record messages
 
@@ -471,17 +460,17 @@ public class FitExporter {
             setDataSerieValue(index, recordMesg);
 
             // Write the Record message to the output stream
-            messages.add(recordMesg);
+            _messages.add(recordMesg);
 
-            pulseSerieIndex = createHrvMessage(messages, pulseSerieIndex, index);
+            pulseSerieIndex = createHrvMessage(pulseSerieIndex, index);
 
-            previousGearData = createGearEvent(messages, timestamp, previousGearData, index);
+            previousGearData = createGearEvent(timestamp, previousGearData, index);
 
-            batteryTimeIndex = createBatteryEvent(messages, timestamp, batteryTimeIndex, currentTimeSerieValue);
+            batteryTimeIndex = createBatteryEvent(timestamp, batteryTimeIndex, currentTimeSerieValue);
 
-            createPauseEvent(messages, pauseTimeIndices, currentTimeSerieValue);
+            createPauseEvent(pauseTimeIndices, currentTimeSerieValue);
 
-            markerIndex = createLapMessage(messages, markerIndex);
+            markerIndex = createLapMessage(markerIndex);
 
             // Increment the timestamp by the number of seconds between the previous
             // timestamp and the current one
@@ -489,7 +478,11 @@ public class FitExporter {
          }
       }
 
-      addFinalEventMessage(messages, timestamp);
+      addFinalEventMessage(timestamp);
+
+      final Date creationTime_Date = Date.from(Instant.now());
+      final DateTime creationTime_Timestamp = new DateTime(creationTime_Date);
+      final LocalDateTime creationTime_LocalTimestamp = new LocalDateTime(creationTime_Date);
 
       // Every FIT ACTIVITY file MUST contain at least one Session message
       final SessionMesg sessionMesg = new SessionMesg();
@@ -499,14 +492,16 @@ public class FitExporter {
       sessionMesg.setTotalTimerTime((float) _tourData.getTourDeviceTime_Recorded());
       sessionMesg.setFirstLapIndex(0);
       sessionMesg.setNumLaps(_tourData.getTourMarkers().size());
+      sessionMesg.setTimestamp(creationTime_Timestamp);
       setValues(sessionMesg);
-      messages.add(sessionMesg);
+      _messages.add(sessionMesg);
 
       // Every FIT ACTIVITY file MUST contain EXACTLY one Activity message
       final ActivityMesg activityMesg = new ActivityMesg();
       activityMesg.setNumSessions(1);
-      // activityMesg.setTimestamp(timestamp);
-      messages.add(activityMesg);
+      activityMesg.setTimestamp(creationTime_Timestamp);
+      activityMesg.setLocalTimestamp(creationTime_LocalTimestamp.getTimestamp());
+      _messages.add(activityMesg);
 
       final Set<DeviceSensorValue> deviceSensorValues = _tourData.getDeviceSensorValues();
       if (deviceSensorValues != null) {
@@ -514,14 +509,14 @@ public class FitExporter {
          for (final DeviceSensorValue deviceSensorValue : deviceSensorValues) {
 
             final DeviceInfoMesg deviceInfoMesgStart = createDeviceInfoMesgStart(startTime, deviceSensorValue);
-            messages.add(deviceInfoMesgStart);
+            _messages.add(deviceInfoMesgStart);
 
             final DeviceInfoMesg deviceInfoMesgEnd = createDeviceInfoMesgEnd(timestamp, deviceSensorValue);
-            messages.add(deviceInfoMesgEnd);
+            _messages.add(deviceInfoMesgEnd);
          }
       }
 
-      createFitFile(messages, exportFilePath, startTime, version);
+      createFitFile(exportFilePath, startTime, version);
    }
 
    private void setDataSerieValue(final int index, final RecordMesg recordMesg) {
