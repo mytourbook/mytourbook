@@ -349,9 +349,9 @@ public class FitExporter {
       return ++markerIndex;
    }
 
-   private int[] createPauseEvent(final List<Mesg> messages,
-                                  final int[] pauseTimeIndices,
-                                  final int currentTimeSerieValue) {
+   private void createPauseEvent(final List<Mesg> messages,
+                                 final int[] pauseTimeIndices,
+                                 final int currentTimeSerieValue) {
 
       //todo fb set those variables as class properties for more efficiency
       final long[] pausedTime_Start = _tourData.getPausedTime_Start();
@@ -363,7 +363,7 @@ public class FitExporter {
 
       if (pausedTime_Start == null || pausedTime_Start.length == 0 ||
             pausedTime_End.length == pauseTimeIndices[1]) {
-         return pauseTimeIndices;
+         return;
       }
 
       final long currentTime = currentTimeSerieValue * 1000L + _tourData.getTourStartTimeMS();
@@ -390,7 +390,7 @@ public class FitExporter {
 
             ++pauseTimeIndices[0];
 
-            return pauseTimeIndices;
+            return;
          }
       }
 
@@ -408,8 +408,6 @@ public class FitExporter {
 
          ++pauseTimeIndices[1];
       }
-
-      return pauseTimeIndices;
    }
 
    // Official documentation: https://developer.garmin.com/fit/cookbook/
@@ -443,6 +441,7 @@ public class FitExporter {
       developerIdMesg.setApplicationVersion((long) (version * 100));
       messages.add(developerIdMesg);
 
+      //todo fb consolidate with line 429
       addStartEventMessage(messages, startTime);
 
       // Every FIT ACTIVITY file MUST contain Record messages
