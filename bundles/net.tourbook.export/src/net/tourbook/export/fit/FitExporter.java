@@ -349,9 +349,9 @@ public class FitExporter {
       return ++markerIndex;
    }
 
-   private boolean createPauseEvent(final List<Mesg> messages,
-                                    final int pauseTimeIndex,
-                                    final int currentTimeSerieValue) {
+   private int[] createPauseEvent(final List<Mesg> messages,
+                                  final int[] pauseTimeIndices,
+                                  final int currentTimeSerieValue) {
 
       //todo fb set those variables as class properties for more efficiency
       final long[] pausedTime_Start = _tourData.getPausedTime_Start();
@@ -362,46 +362,54 @@ public class FitExporter {
             : Arrays.stream(pausedTime_Data).boxed().toList();
 
       if (pausedTime_Start == null || pausedTime_Start.length == 0 ||
-            pausedTime_Start.length == pauseTimeIndex) {
-         return false;
+            pausedTime_End.length == pauseTimeIndices[1]) {
+         return pauseTimeIndices;
       }
 
-      final long currentPauseTimeStart = pausedTime_Start[pauseTimeIndex];
       final long currentTime = currentTimeSerieValue * 1000L + _tourData.getTourStartTimeMS();
-      // If the current time serie has not passed the next pause yet, we return.
-      if (currentTime >= currentPauseTimeStart) {
 
-         final EventMesg eventMesgStop = new EventMesg();
-         final Date pausedTime_Start_Date = Date.from(Instant.ofEpochMilli(currentPauseTimeStart));
-         eventMesgStop.setTimestamp(new DateTime(pausedTime_Start_Date));
-         /**
-          * eventData == 0: user stop<br>
-          * eventData == 1: auto-stop
-          */
-         final Long pauseType = listPausedTime_Data == null ? 1L : listPausedTime_Data.get(pauseTimeIndex);
-         eventMesgStop.setData(pauseType);
-         eventMesgStop.setEvent(Event.TIMER);
-         eventMesgStop.setEventType(EventType.STOP);
+      if (pausedTime_Start.length > pauseTimeIndices[0]) {
 
-         messages.add(eventMesgStop);
-         return true;
+         final long currentPauseTimeStart = pausedTime_Start[pauseTimeIndices[0]];
+         // If the current time serie has not passed the next pause yet, we return.
+         if (currentTime >= currentPauseTimeStart) {
+
+            final EventMesg eventMesgStop = new EventMesg();
+            final Date pausedTime_Start_Date = Date.from(Instant.ofEpochMilli(currentPauseTimeStart));
+            eventMesgStop.setTimestamp(new DateTime(pausedTime_Start_Date));
+            /**
+             * eventData == 0: user stop<br>
+             * eventData == 1: auto-stop
+             */
+            final Long pauseType = listPausedTime_Data == null ? 1L : listPausedTime_Data.get(pauseTimeIndices[0]);
+            eventMesgStop.setData(pauseType);
+            eventMesgStop.setEvent(Event.TIMER);
+            eventMesgStop.setEventType(EventType.STOP);
+
+            messages.add(eventMesgStop);
+
+            ++pauseTimeIndices[0];
+
+            return pauseTimeIndices;
+         }
       }
 
-      final long currentPauseTimeEnd = pausedTime_End[pauseTimeIndex];
+      final long currentPauseTimeEnd = pausedTime_End[pauseTimeIndices[1]];
       // If the current time serie has not passed the next pause yet, we return.
       if (currentTime >= currentPauseTimeEnd) {
 
          final EventMesg eventMesgStart = new EventMesg();
-         final Date pausedTime_End_Date = Date.from(Instant.ofEpochMilli(pausedTime_End[pauseTimeIndex]));
+         final Date pausedTime_End_Date = Date.from(Instant.ofEpochMilli(currentPauseTimeEnd));
          eventMesgStart.setTimestamp(new DateTime(pausedTime_End_Date));
          eventMesgStart.setEvent(Event.TIMER);
          eventMesgStart.setEventType(EventType.START);
 
          messages.add(eventMesgStart);
 
-         return true;
+         ++pauseTimeIndices[1];
       }
-      return false;
+
+      return pauseTimeIndices;
    }
 
    // Official documentation: https://developer.garmin.com/fit/cookbook/
@@ -446,7 +454,7 @@ public class FitExporter {
          int previousTimeSerieValue = 0;
          int pulseSerieIndex = 0;
          int batteryTimeIndex = 0;
-         final int pauseTimeIndex = 0;
+         final int[] pauseTimeIndices = new int[2];
          int markerIndex = 0;
          GearData previousGearData = null;
 
@@ -471,7 +479,7 @@ public class FitExporter {
 
             batteryTimeIndex = createBatteryEvent(messages, timestamp, batteryTimeIndex, currentTimeSerieValue);
 
-            createPauseEvent(messages, pauseTimeIndex, currentTimeSerieValue);
+            createPauseEvent(messages, pauseTimeIndices, currentTimeSerieValue);
 
             markerIndex = createLapMessage(messages, markerIndex);
 
