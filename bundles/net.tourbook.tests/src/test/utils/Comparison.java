@@ -88,19 +88,50 @@ public class Comparison {
          testFileContentArray.replaceAll(line -> line.replaceFirst("application_version,\"\\d\\d\\d\\d\"", genericApplicationVersion)); //$NON-NLS-1$
 
          //todo fb refactor in its own function
-         //Modify the session/activity messages to ignore their creation timestamps since it will be different at every build
+         // Modify the session/activity messages to ignore their creation timestamps since it will be different at every build
+         String timeCreatedData = "Data,0,activity,num_sessions,";
+
+         List<String> timeCreatedLine = controlFileContentArray.stream().filter(s -> s.startsWith(timeCreatedData))
+               .toList();
+         String controlTimeCreatedValue = timeCreatedLine.get(0).split(",")[7];
+
          controlFileContentArray.replaceAll(line -> line = line.replace(
-               "Data,0,session,message_index,\"0\",,start_time,\"1027020911\",,total_elapsed_time,\"627.0\",s,total_timer_time,\"573.0\"", //$NON-NLS-1$
-               "Data,0,session,message_index,\"0\",,start_time,,,total_elapsed_time,\"627.0\",s,total_timer_time,\"573.0\""));
-         testFileContentArray.replaceAll(line -> line.replaceFirst(
-               "Data,0,session,message_index,\"0\",,start_time,\"\\s\",,total_elapsed_time,\"627.0\",s,total_timer_time,\"573.0\"", //$NON-NLS-1$
-               "Data,0,session,message_index,\"0\",,start_time,,,total_elapsed_time,\"627.0\",s,total_timer_time,\"573.0\""));
-         controlFileContentArray.replaceAll(line -> line = line.replace(
-               "Data,0,activity,num_sessions,\"1\",,timestamp,\"1081037010\",,local_timestamp,\"1081037010\",,total_timer_time,\"573.0\"", //$NON-NLS-1$
-               "Data,0,activity,num_sessions,\"1\",,timestamp,,,local_timestamp,,,total_timer_time,\"573.0\""));
-         testFileContentArray.replaceAll(line -> line.replaceFirst(
-               "Data,0,activity,num_sessions,\"1\",,timestamp,\"\\s\",,local_timestamp,\"\\s\",,total_timer_time,\"573.0\"", //$NON-NLS-1$
-               "Data,0,session,message_index,\"0\",,start_time,,,total_elapsed_time,\"627.0\",s,total_timer_time,\"573.0\""));
+               controlTimeCreatedValue, //$NON-NLS-1$
+               "")); //$NON-NLS-1$
+
+         timeCreatedLine = testFileContentArray.stream().filter(s -> s.startsWith(timeCreatedData)).toList();
+         String testTimeCreatedValue = timeCreatedLine.get(0).split(",")[7];
+
+         testFileContentArray.replaceAll(line -> line = line.replace(
+               testTimeCreatedValue, //$NON-NLS-1$
+               "")); //$NON-NLS-1$
+//
+//         newLine[0] = "Data,0,device_info,device_index,\"0\",,manufacturer,\"255\",,product_name,\"MyTourbook\",,software_version,,,timestamp,,s,";
+//         controlFileContentArray.replaceAll(line -> line.startsWith(
+//               "Data,0,device_info,device_index,\"0\",,manufacturer,\"255\"" //$NON-NLS-1$
+//         ) ? newLine[0] : line); //$NON-NLS-1$
+//         testFileContentArray.replaceAll(line -> line.startsWith(
+//               "Data,0,device_info,device_index,\"0\",,manufacturer,\"255\"" //$NON-NLS-1$
+//         ) ? newLine[0] : line); //$NON-NLS-1$
+//
+//         newLine[0] =
+//               "Data,0,session,message_index,\"0\",,start_time,\"1027020911\",,total_elapsed_time,\"627.0\",s,total_timer_time,\"573.0\",s,first_lap_index,\"0\",,num_laps,\"1\",,timestamp,,s,sport";
+//         controlFileContentArray.replaceAll(line -> line.startsWith(
+//               "Data,0,session,message_index,\"0\",,start_time,\"1027020911\"" //$NON-NLS-1$
+//         ) ? newLine[0] : line); //$NON-NLS-1$
+//         testFileContentArray.replaceAll(line -> line.startsWith(
+//               "Data,0,session,message_index,\"0\",,start_time,\"1027020911\"" //$NON-NLS-1$
+//         ) ? newLine[0] : line); //$NON-NLS-1$
+//
+//         controlFileContentArray.replaceAll(line -> line.replaceFirst(
+//               "Data,0,activity,num_sessions,\"1\",,timestamp,\"1081037010\",,local_timestamp,\"1081037010\",,total_timer_time,\"573.0\",s", //$NON-NLS-1$
+//               "Data,0,activity,num_sessions,\"1\",,timestamp,,,local_timestamp,,,total_timer_time,\"573.0\",s"));
+//         testFileContentArray.replaceAll(line -> line.replaceFirst(
+//               "Data,0,session,message_index,\"0\",,start_time,\"1027020911\",,total_elapsed_time,\"627.0\",s,total_timer_time,\"573.0\",s,first_lap_index,\"0\",,num_laps,\"1\",,timestamp,\"\\s\",s,sport", //$NON-NLS-1$
+//               "Data,0,session,message_index,\"0\",,start_time,\"1027020911\",,total_elapsed_time,\"627.0\",s,total_timer_time,\"573.0\",s,first_lap_index,\"0\",,num_laps,\"1\",,timestamp,,s,sport")); //$NON-NLS-1$
+//         testFileContentArray.replaceAll(line -> line.replaceFirst(
+//               "Data,0,activity,num_sessions,\"1\",,timestamp,\"\\s\",,local_timestamp,\"\\s\",,total_timer_time,\"573.0\",s", //$NON-NLS-1$
+//               "Data,0,activity,num_sessions,\"1\",,timestamp,,,local_timestamp,,,total_timer_time,\"573.0\",s"));
 
          //Compare with the control file
          if (!controlFileContentArray.equals(testFileContentArray)) {
