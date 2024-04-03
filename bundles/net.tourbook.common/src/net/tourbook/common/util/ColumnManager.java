@@ -998,7 +998,7 @@ public class ColumnManager {
                    * java.lang.IllegalArgumentException: Widget has the wrong parent
                    * <p>
                    * When a view is minimized, then the context menu is already created
-                   * but has the wrong parent when the view is displayed lateron.
+                   * but has the wrong parent when the view is displayed later on.
                    */
 
                   headerContextMenu[0].dispose();
@@ -1123,7 +1123,7 @@ public class ColumnManager {
                 * java.lang.IllegalArgumentException: Widget has the wrong parent
                 * <p>
                 * When a view is minimized, then the context menu is already created
-                * but has the wrong parent when the view is displayed lateron.
+                * but has the wrong parent when the view is displayed later on.
                 */
 
                headerContextMenu[0].dispose();
