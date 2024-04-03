@@ -81,11 +81,26 @@ public class Comparison {
          final String genericSoftwareVersion = "software_version,"; //$NON-NLS-1$
          final String genericApplicationVersion = "application_version,"; //$NON-NLS-1$
 
-         controlFileContentArray.replaceAll(line -> line = line.replace("software_version,\"23.3\"", genericSoftwareVersion)); //$NON-NLS-1$
-         controlFileContentArray.replaceAll(line -> line = line.replace("application_version,\"2330\"", genericApplicationVersion)); //$NON-NLS-1$
+         controlFileContentArray.replaceAll(line -> line = line.replace("software_version,\"24.1\"", genericSoftwareVersion)); //$NON-NLS-1$
+         controlFileContentArray.replaceAll(line -> line = line.replace("application_version,\"2410\"", genericApplicationVersion)); //$NON-NLS-1$
 
          testFileContentArray.replaceAll(line -> line.replaceFirst("software_version,\"\\d\\d\\.\\d\"", genericSoftwareVersion)); //$NON-NLS-1$
          testFileContentArray.replaceAll(line -> line.replaceFirst("application_version,\"\\d\\d\\d\\d\"", genericApplicationVersion)); //$NON-NLS-1$
+
+         //todo fb refactor in its own function
+         //Modify the session/activity messages to ignore their creation timestamps since it will be different at every build
+         controlFileContentArray.replaceAll(line -> line = line.replace(
+               "Data,0,session,message_index,\"0\",,start_time,\"1027020911\",,total_elapsed_time,\"627.0\",s,total_timer_time,\"573.0\"", //$NON-NLS-1$
+               "Data,0,session,message_index,\"0\",,start_time,,,total_elapsed_time,\"627.0\",s,total_timer_time,\"573.0\""));
+         testFileContentArray.replaceAll(line -> line.replaceFirst(
+               "Data,0,session,message_index,\"0\",,start_time,\"\\s\",,total_elapsed_time,\"627.0\",s,total_timer_time,\"573.0\"", //$NON-NLS-1$
+               "Data,0,session,message_index,\"0\",,start_time,,,total_elapsed_time,\"627.0\",s,total_timer_time,\"573.0\""));
+         controlFileContentArray.replaceAll(line -> line = line.replace(
+               "Data,0,activity,num_sessions,\"1\",,timestamp,\"1081037010\",,local_timestamp,\"1081037010\",,total_timer_time,\"573.0\"", //$NON-NLS-1$
+               "Data,0,activity,num_sessions,\"1\",,timestamp,,,local_timestamp,,,total_timer_time,\"573.0\""));
+         testFileContentArray.replaceAll(line -> line.replaceFirst(
+               "Data,0,activity,num_sessions,\"1\",,timestamp,\"\\s\",,local_timestamp,\"\\s\",,total_timer_time,\"573.0\"", //$NON-NLS-1$
+               "Data,0,session,message_index,\"0\",,start_time,,,total_elapsed_time,\"627.0\",s,total_timer_time,\"573.0\""));
 
          //Compare with the control file
          if (!controlFileContentArray.equals(testFileContentArray)) {
@@ -192,7 +207,7 @@ public class Comparison {
       }
    }
 
-   private static String convertTourDataToJson(TourData tourData) {
+   private static String convertTourDataToJson(final TourData tourData) {
 
       final ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.setSerializationInclusion(Include.NON_NULL);

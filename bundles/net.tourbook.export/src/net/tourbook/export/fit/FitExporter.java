@@ -535,7 +535,7 @@ public class FitExporter {
          }
       }
 
-      createFitFile(exportFilePath, startTime, version);
+      createFitFile(exportFilePath, creationTime_Timestamp, version);
    }
 
    private void setDataSerieValue(final int index, final RecordMesg recordMesg) {
