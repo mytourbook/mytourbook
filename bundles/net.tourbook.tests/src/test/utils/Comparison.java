@@ -98,7 +98,7 @@ public class Comparison {
          //Replace all the values by an empty string
          controlFileContentArray.replaceAll(line -> line = line.replace(
                controlTimeCreatedValue, //$NON-NLS-1$
-               "")); //$NON-NLS-1$
+               UI.EMPTY_STRING)); //$NON-NLS-1$
 
          timeCreatedLine = testFileContentArray.stream().filter(s -> s.startsWith(timeCreatedData)).toList();
          // Retrieve the value of "time_created"
@@ -106,7 +106,7 @@ public class Comparison {
          //Replace all the values by an empty string
          testFileContentArray.replaceAll(line -> line = line.replace(
                testTimeCreatedValue, //$NON-NLS-1$
-               "")); //$NON-NLS-1$
+               UI.EMPTY_STRING)); //$NON-NLS-1$
 
          //Compare with the control file
          if (!controlFileContentArray.equals(testFileContentArray)) {
