@@ -105,7 +105,7 @@ public class ActionDeleteMarkerDialog extends Action {
 
       for (final TourData tourData : selectedTours) {
 
-         final List<TourMarker> originalTourMarkers = tourData.getTourMarkers().stream().toList();
+         final Set<TourMarker> originalTourMarkers = tourData.getTourMarkers();
 
          for (final TourMarker selectedTourMarker : _tourMarkers) {
             originalTourMarkers.removeIf(m -> m.getMarkerId() == selectedTourMarker.getMarkerId());
