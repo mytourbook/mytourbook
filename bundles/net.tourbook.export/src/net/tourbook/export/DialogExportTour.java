@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -660,7 +660,7 @@ public class DialogExportTour extends TitleAreaDialog {
          _spinnerCamouflageSpeed.setPageIncrement(10);
          _spinnerCamouflageSpeed.setMinimum(1);
          _spinnerCamouflageSpeed.setMaximum(1000);
-         _spinnerCamouflageSpeed.addMouseWheelListener(Util::adjustSpinnerValueOnMouseScroll);
+         _spinnerCamouflageSpeed.addMouseWheelListener(mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent));
 
          // label: unit
          _lblCamouflageSpeedUnit = UI.createLabel(container, UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED);
@@ -1301,7 +1301,7 @@ public class DialogExportTour extends TitleAreaDialog {
    @Override
    protected void okPressed() {
 
-      BusyIndicator.showWhile(Display.getCurrent(), this::doExport);
+      BusyIndicator.showWhile(Display.getCurrent(), () -> doExport());
 
       if (_exportState_FileCollisionBehaviour.value == FileCollisionBehavior.DIALOG_IS_CANCELED) {
          getButton(IDialogConstants.OK_ID).setEnabled(true);
