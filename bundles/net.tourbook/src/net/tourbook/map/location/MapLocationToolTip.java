@@ -21,8 +21,8 @@ import de.byteholder.geoclipse.map.PaintedMapLocation;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.util.ToolTip;
-import net.tourbook.tour.location.TourLocationUI;
 import net.tourbook.tour.location.TourLocationExtended;
+import net.tourbook.tour.location.TourLocationUI;
 import net.tourbook.ui.Messages;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -78,7 +78,7 @@ public class MapLocationToolTip extends ToolTip {
 
    private void createUI(final Composite parent) {
 
-      final TourLocationExtended _tourLocationExtendes = _hoveredItem.tourLocationExtended;
+      final TourLocationExtended tourLocationExtended = _hoveredItem.tourLocationExtended;
 
       final GridDataFactory headerIndent = GridDataFactory.fillDefaults()
 
@@ -98,11 +98,20 @@ public class MapLocationToolTip extends ToolTip {
              */
 
             // using text control that & is not displayed as mnemonic
-            final Text headerText = new Text(container, SWT.READ_ONLY);
-            headerIndent.applyTo(headerText);
-            MTFont.setBannerFont(headerText);
+            final Text headerTitle = new Text(container, SWT.READ_ONLY);
+            headerIndent.applyTo(headerTitle);
+            MTFont.setBannerFont(headerTitle);
 
-            headerText.setText(Messages.Tour_Location_Tooltip_Title);
+            String headerText = UI.EMPTY_STRING;
+
+            switch (tourLocationExtended.locationType) {
+            case Address   -> headerText = Messages.Tour_Location_Label_AddressLocation;
+            case Tour      -> headerText = Messages.Tour_Location_Tooltip_Title;
+            case TourStart -> headerText = Messages.ColumnFactory_Tour_LocationStart_Title;
+            case TourEnd   -> headerText = Messages.ColumnFactory_Tour_LocationEnd_Title;
+            }
+
+            headerTitle.setText(headerText);
          }
 
          UI.createSpacer_Vertical(container, 8, 2);
@@ -112,7 +121,7 @@ public class MapLocationToolTip extends ToolTip {
              * Display name
              */
 
-            final String displayName = _tourLocationExtendes.tourLocation.display_name;
+            final String displayName = tourLocationExtended.tourLocation.display_name;
 
             if (displayName != null && displayName.length() > 0) {
 
@@ -130,7 +139,7 @@ public class MapLocationToolTip extends ToolTip {
          /*
           * Location fields
           */
-         TourLocationUI.createUI(container, _tourLocationExtendes.tourLocation);
+         TourLocationUI.createUI(container, tourLocationExtended.tourLocation);
       }
    }
 

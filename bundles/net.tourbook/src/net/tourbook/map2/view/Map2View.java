@@ -4102,7 +4102,13 @@ public class Map2View extends ViewPart implements
       // prevent loading the same tour
       if (forceRedraw == false && (_allTourData.size() == 1) && (_allTourData.get(0) == tourData)) {
 
-         return;
+         /**
+          * DISABLED
+          * <p>
+          * A reselected tour would not be visible
+          */
+
+//         return;
       }
 
       // force multiple tours to be repainted

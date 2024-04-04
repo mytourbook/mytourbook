@@ -17,15 +17,23 @@ package net.tourbook.map.location;
 
 public enum LocationType {
 
-   Address, //
+   /**
+    * Map location which is not associated with a tour
+    */
+   Address,
 
    /**
-    * This location type is not a start or end location
+    * Tour location with any tour position
     */
-   Tour, //
+   Tour,
 
-   TourStart, //
+   /**
+    * Tour location at the tour start
+    */
+   TourStart,
 
-   TourEnd, //
-
+   /**
+    * Tour location at the tour end
+    */
+   TourEnd,
 }

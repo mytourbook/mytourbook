@@ -19,6 +19,7 @@ import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -28,6 +29,7 @@ import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnDefinitionFor1stVisibleAlignmentColumn;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer2;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
@@ -40,6 +42,9 @@ import net.tourbook.tour.location.AddressLocationManager;
 import net.tourbook.tour.location.TourLocationToolTip;
 import net.tourbook.ui.TableColumnFactory;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -68,6 +73,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -79,15 +85,15 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer2 {
 
-   private static final String     COLUMN_CREATED_DATE_TIME    = "createdDateTime";                           //$NON-NLS-1$
-   private static final String     COLUMN_LOCATION_NAME        = "LocationName";                              //$NON-NLS-1$
-   private static final String     COLUMN_SEQUENCE             = "sequence";                                  //$NON-NLS-1$
-   private static final String     COLUMN_ZOOM_LEVEL           = "zoomLevel";                                 //$NON-NLS-1$
+   private static final String     COLUMN_CREATED_DATE_TIME        = "createdDateTime";                           //$NON-NLS-1$
+   private static final String     COLUMN_LOCATION_NAME            = "LocationName";                              //$NON-NLS-1$
+   private static final String     COLUMN_SEQUENCE                 = "sequence";                                  //$NON-NLS-1$
+   private static final String     COLUMN_ZOOM_LEVEL               = "zoomLevel";                                 //$NON-NLS-1$
 
-   private static final String     STATE_SORT_COLUMN_DIRECTION = "STATE_SORT_COLUMN_DIRECTION";               //$NON-NLS-1$
-   private static final String     STATE_SORT_COLUMN_ID        = "STATE_SORT_COLUMN_ID";                      //$NON-NLS-1$
+   private static final String     STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";               //$NON-NLS-1$
+   private static final String     STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                      //$NON-NLS-1$
 
-   private final IPreferenceStore  _prefStore                  = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
    private IDialogSettings         _state_Map2;
    private IDialogSettings         _state_Slideout;
 
@@ -95,20 +101,24 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
    private ToolItem                _toolItem;
 
    private TableViewer             _mapLocationViewer;
-   private MapLocationComparator   _mapLocationComparator      = new MapLocationComparator();
+   private MapLocationComparator   _mapLocationComparator          = new MapLocationComparator();
    private ColumnManager           _columnManager;
    private SelectionAdapter        _columnSortListener;
 
    private SelectionListener       _defaultSelectionListener;
    private IPropertyChangeListener _prefChangeListener;
 
-   private List<TourLocation>      _allMapLocations            = AddressLocationManager.getAddressLocations();
+   private MenuManager             _viewerMenuManager;
+   private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
+   private ActionDeleteLocation    _actionDeleteLocation;
+
+   private List<TourLocation>      _allMapLocations                = AddressLocationManager.getAddressLocations();
 
    private TourLocationToolTip     _locationTooltip;
 
    private PixelConverter          _pc;
 
-   private final NumberFormat      _nf3                        = NumberFormat.getNumberInstance();
+   private final NumberFormat      _nf3                            = NumberFormat.getNumberInstance();
    {
       _nf3.setMinimumFractionDigits(3);
       _nf3.setMaximumFractionDigits(3);
@@ -124,6 +134,25 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
    private Button    _chkIsShowMapLocations_BoundingBox;
    private Button    _chkIsShowTourLocations;
    private Button    _chkIsShowAddressLocations;
+
+   private Menu      _tableContextMenu;
+
+   private class ActionDeleteLocation extends Action {
+
+      public ActionDeleteLocation() {
+
+         setText(Messages.Tour_Location_Action_DeleteAddressLocation);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
+      }
+
+      @Override
+      public void run() {
+
+         onLocation_Delete();
+      }
+   }
 
    private class MapLocationComparator extends ViewerComparator {
 
@@ -247,6 +276,32 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       }
    }
 
+   public class TableContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_tableContextMenu != null) {
+            _tableContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+         return _tableContextMenu;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _tableContextMenu = createUI_85_CreateViewerContextMenu();
+
+         return _tableContextMenu;
+      }
+   }
+
    /**
     * This class is used to show a tooltip only when this cell is hovered
     */
@@ -294,10 +349,23 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
+   private void createActions() {
+
+      _actionDeleteLocation = new ActionDeleteLocation();
+   }
+
+   private void createMenuManager() {
+
+      _viewerMenuManager = new MenuManager();
+      _viewerMenuManager.setRemoveAllWhenShown(true);
+      _viewerMenuManager.addMenuListener(menuManager -> fillContextMenu(menuManager));
+   }
+
    @Override
    protected void createSlideoutContent(final Composite parent) {
 
       initUI(parent);
+      createMenuManager();
 
       restoreState_BeforeUI();
 
@@ -306,8 +374,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       defineAllColumns();
 
       createUI(parent);
-
-      fillUI();
+      createActions();
 
       addPrefListener();
 
@@ -461,17 +528,20 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
     */
    private void createUI_84_ContextMenu() {
 
-      /**
-       * ColumnManager context menu is set in {@link #beforeHideToolTip()} but this works only until
-       * the column manager is recreating the viewer.
-       * <p>
-       * The slideout must be reopened that the context menu is working again :-(
-       */
+      _tableContextMenu = createUI_85_CreateViewerContextMenu();
 
-      /*
-       * Set context menu after a viewer reload, even more complicated
-       */
-      _columnManager.createHeaderContextMenu(_mapLocationViewer.getTable(), null, getRRShellWithResize());
+      _columnManager.createHeaderContextMenu(
+
+            (Table) _mapLocationViewer.getControl(),
+            _tableViewerContextMenuProvider);
+   }
+
+   private Menu createUI_85_CreateViewerContextMenu() {
+
+      final Table table = (Table) _mapLocationViewer.getControl();
+      final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
+
+      return tableContextMenu;
    }
 
    private void createUI_90_Actions(final Composite parent) {
@@ -710,8 +780,11 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       _mapLocationViewer.getTable().setEnabled(isShowAddressLocations);
    }
 
-   private void fillUI() {
+   private void fillContextMenu(final IMenuManager menuMgr) {
 
+      menuMgr.add(_actionDeleteLocation);
+
+      enableControls();
    }
 
    @Override

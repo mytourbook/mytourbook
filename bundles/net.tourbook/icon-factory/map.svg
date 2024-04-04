@@ -16,6 +16,25 @@
    xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs2987">
+    <linearGradient
+       id="linearGradient24">
+      <stop
+         id="stop23"
+         offset="0"
+         style="stop-color:#ffffff;stop-opacity:1;" />
+      <stop
+         id="stop24"
+         offset="1"
+         style="stop-color:#ff10d6;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       id="swatch22"
+       inkscape:swatch="solid">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop22" />
+    </linearGradient>
     <pattern
        inkscape:collect="always"
        xlink:href="#pattern86556"
@@ -94,8 +113,7 @@
          style="stop-color:#525252;stop-opacity:0;" />
     </linearGradient>
     <linearGradient
-       id="linearGradient6402"
-       inkscape:swatch="gradient">
+       id="linearGradient6402">
       <stop
          id="stop6404"
          offset="0"
@@ -583,9 +601,9 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="288.3125"
-     inkscape:cx="350.84375"
-     inkscape:zoom="16"
+     inkscape:cy="294.37499"
+     inkscape:cx="303.62498"
+     inkscape:zoom="8.0000004"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -627,27 +645,45 @@
      inkscape:label="Layer 1">
     <path
        id="path1887-0"
-       style="fill:#b0df32;fill-opacity:1;stroke:#698712;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill-opacity:1;stroke:#a03367;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill:#ff8fc5"
        d="m 322.5,264.5 c -2.22669,0 -12,0.84805 -12,10.49609 0,9.64809 6.39003,5.04241 12,23.27149 5.38999,-18.22908 12,-13.6234 12,-23.27149 0,-9.64804 -9.77336,-10.49609 -12,-10.49609 z m 0,6 a 5,4.9999981 0 0 1 5,5 5,4.9999981 0 0 1 -5,5 5,4.9999981 0 0 1 -5,-5 5,4.9999981 0 0 1 5,-5 z"
        inkscape:export-filename="..\icons\map-location-marker-start.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
     <path
-       id="path1887-0-1"
-       style="fill:none;fill-opacity:1;stroke:#698712;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 357.5,264.49999 c -2.22669,0 -12,0.84798 -12,10.49507 0,9.64715 6.39003,5.04192 12,23.26922 5.38999,-18.2273 12,-13.62207 12,-23.26922 0,-9.64709 -9.77336,-10.49507 -12,-10.49507 z"
-       inkscape:export-filename="..\icons\map-location-marker-hovered.png"
+       id="path1887-0-9"
+       style="fill:#b0df32;fill-opacity:1;stroke:#698712;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 287.5,264.5 c -2.22669,0 -12,0.84805 -12,10.49609 0,9.64809 6.39003,5.04241 12,23.27149 5.38999,-18.22908 12,-13.6234 12,-23.27149 0,-9.64804 -9.77336,-10.49609 -12,-10.49609 z m 0,6 a 5,4.9999981 0 0 1 5,5 5,4.9999981 0 0 1 -5,5 5,4.9999981 0 0 1 -5,-5 5,4.9999981 0 0 1 5,-5 z"
+       inkscape:export-filename="..\icons\map-location-marker.png"
        inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96"
-       sodipodi:nodetypes="sscss" />
+       inkscape:export-ydpi="96" />
     <path
-       id="path1887-0-1-6"
-       style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.999997px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 357.5,265.50002 c -2.04109,0 -11.04021,0.74777 -11,9.25292 0.0442,9.34706 4.5,4.34706 11,20.51468 6.00145,-16.16762 11.04419,-11.25837 11,-20.51468 -0.0406,-8.50515 -8.95896,-9.25292 -11,-9.25292 z"
-       inkscape:export-filename="..\icons\map-location-marker-start.png"
+       id="path1887-0-4"
+       style="fill:#91c7ff;fill-opacity:1;stroke:#00438b;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 287.5,314.5 c -2.22669,0 -12,0.84805 -12,10.49609 0,9.64809 6.39003,5.04241 12,23.27149 5.38999,-18.22908 12,-13.6234 12,-23.27149 0,-9.64804 -9.77336,-10.49609 -12,-10.49609 z m 0,6 a 5,4.9999981 0 0 1 5,5 5,4.9999981 0 0 1 -5,5 5,4.9999981 0 0 1 -5,-5 5,4.9999981 0 0 1 5,-5 z"
+       inkscape:export-filename="..\icons\map-location-marker-address.png"
        inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96"
-       sodipodi:nodetypes="sscss" />
+       inkscape:export-ydpi="96" />
+    <g
+       id="g1"
+       transform="translate(30)">
+      <path
+         id="path1887-0-1"
+         style="fill:none;fill-opacity:1;stroke:#4d4d4d;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 362.5,264.49999 c -2.22669,0 -12,0.84798 -12,10.49507 0,9.64715 6.39003,5.04192 12,23.26922 5.38999,-18.2273 12,-13.62207 12,-23.26922 0,-9.64709 -9.77336,-10.49507 -12,-10.49507 z"
+         inkscape:export-filename="..\icons\map-location-marker-hovered.png"
+         inkscape:export-xdpi="96"
+         inkscape:export-ydpi="96"
+         sodipodi:nodetypes="sscss" />
+      <path
+         id="path1887-0-1-6"
+         style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.999997px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 362.5,265.50002 c -2.04109,0 -11.04021,0.74777 -11,9.25292 0.0442,9.34706 4.5,4.34706 11,20.51468 6.00145,-16.16762 11.04419,-11.25837 11,-20.51468 -0.0406,-8.50515 -8.95896,-9.25292 -11,-9.25292 z"
+         inkscape:export-filename="..\icons\map-location-marker-start.png"
+         inkscape:export-xdpi="96"
+         inkscape:export-ydpi="96"
+         sodipodi:nodetypes="sscss" />
+    </g>
     <path
        id="path1887-0-7-0"
        style="fill:url(#pattern27);fill-opacity:1;stroke:#698712;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -4438,22 +4474,6 @@
        style="fill:#666666;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 168,214 -8,8 8,8 8,-8 z m 0,3 5,5 -5,5 -5,-5 z"
        inkscape:export-filename="..\icons\map-model-cursor-dark.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
-    <path
-       style="display:inline;fill:#91c7ff;fill-opacity:1;stroke:#00438b;stroke-width:1;stroke-linecap:butt;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1"
-       d="m 299.52785,265.49898 -12.0265,34.28304 -12.02641,-34.28304 z"
-       id="path36423-3-9"
-       sodipodi:nodetypes="cccc"
-       inkscape:export-filename="..\icons\map-location-marker.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
-    <path
-       style="display:inline;fill:#d0ec86;fill-opacity:1;stroke:#577212;stroke-width:1;stroke-linecap:butt;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1"
-       d="M 299.56515,315.5 287.51837,349.75625 275.47168,315.5 Z"
-       id="path36423-3-9-5"
-       sodipodi:nodetypes="cccc"
-       inkscape:export-filename="..\icons\map-location-marker-address.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
     <path
