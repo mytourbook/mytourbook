@@ -1817,7 +1817,7 @@ public class RawDataManager {
             updateTourData_InImportView_FromDb(monitor);
 
             // reselect tours, run in UI thread
-            display.asyncExec(tourViewer::reloadViewer);
+            display.asyncExec(() -> tourViewer.reloadViewer());
          }
       };
 
@@ -2219,7 +2219,7 @@ public class RawDataManager {
          /*
           * Resort files by extension priority
           */
-         Collections.sort(allImportFilePaths, this::onSortFileExtensions);
+         Collections.sort(allImportFilePaths, (o1, o2) -> onSortFileExtensions(o1, o2));
 
          importTours_FromMultipleFiles_10(allImportFilePaths, importState_Process);
 
@@ -3991,7 +3991,7 @@ public class RawDataManager {
                new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
                      true, // fork
                      false, // cancelable
-                     this::updateTourData_InImportView_FromDb_Runnable);
+                     monitor1 -> updateTourData_InImportView_FromDb_Runnable(monitor1));
 
             } else {
 
@@ -4070,9 +4070,7 @@ public class RawDataManager {
       _loadingTour_CountDownLatch.await();
 
       TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(
-            allSavedTourIds
-                  .stream()
-                  .toList());
+            allSavedTourIds.stream().toList());
 
       // prevent async error
       Display.getDefault().syncExec(() -> TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null));
