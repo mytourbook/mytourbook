@@ -118,6 +118,8 @@ public class TourBlogView extends ViewPart {
    static final boolean        STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT = false;
    static final String         STATE_IS_SHOW_HIDDEN_MARKER                     = "STATE_IS_SHOW_HIDDEN_MARKER";             //$NON-NLS-1$
    static final boolean        STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT             = true;
+   static final String         STATE_IS_SHOW_TOUR_MARKERS                      = "STATE_IS_SHOW_TOUR_MARKERS";              //$NON-NLS-1$
+   static final boolean        STATE_IS_SHOW_TOUR_MARKERS_DEFAULT              = true;
    static final String         STATE_IS_SHOW_TOUR_TAGS                         = "STATE_IS_SHOW_TOUR_TAGS";                 //$NON-NLS-1$
    static final boolean        STATE_IS_SHOW_TOUR_TAGS_DEFAULT                 = true;
 
@@ -183,6 +185,7 @@ public class TourBlogView extends ViewPart {
 
    private boolean                 _isDrawWithDefaultColor;
    private boolean                 _isShowHiddenMarker;
+   private boolean                 _isShowTourMarkers;
 
    private Long                    _reloadedTourMarkerId;
 
@@ -661,28 +664,31 @@ public class TourBlogView extends ViewPart {
 
       final StringBuilder sb = new StringBuilder();
 
-      final Set<TourMarker> tourMarkers = _tourData.getTourMarkers();
-      final List<TourMarker> allMarker = new ArrayList<>(tourMarkers);
-      Collections.sort(allMarker);
-
       create_22_BlogHeader(sb);
       create_24_Tour(sb);
 
-      for (final TourMarker tourMarker : allMarker) {
+      if (_isShowTourMarkers) {
 
-         // check if marker is hidden and should not be displayed
-         if (tourMarker.isMarkerVisible() == false && _isShowHiddenMarker == false) {
-            continue;
-         }
+         final Set<TourMarker> tourMarkers = _tourData.getTourMarkers();
+         final List<TourMarker> allMarker = new ArrayList<>(tourMarkers);
+         Collections.sort(allMarker);
 
-         sb.append("<div class='blog-item'>"); //$NON-NLS-1$
-         sb.append("<div class='action-hover-container'>" + NL); //$NON-NLS-1$
-         {
-            create_30_Marker(sb, tourMarker);
-            create_32_MarkerUrl(sb, tourMarker);
+         for (final TourMarker tourMarker : allMarker) {
+
+            // check if marker is hidden and should not be displayed
+            if (tourMarker.isMarkerVisible() == false && _isShowHiddenMarker == false) {
+               continue;
+            }
+
+            sb.append("<div class='blog-item'>"); //$NON-NLS-1$
+            sb.append("<div class='action-hover-container'>" + NL); //$NON-NLS-1$
+            {
+               create_30_Marker(sb, tourMarker);
+               create_32_MarkerUrl(sb, tourMarker);
+            }
+            sb.append("</div>" + NL); //$NON-NLS-1$
+            sb.append("</div>" + NL); //$NON-NLS-1$
          }
-         sb.append("</div>" + NL); //$NON-NLS-1$
-         sb.append("</div>" + NL); //$NON-NLS-1$
       }
 
       return sb.toString();
@@ -1465,6 +1471,7 @@ public class TourBlogView extends ViewPart {
 
       _isDrawWithDefaultColor = _state.getBoolean(STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR);
       _isShowHiddenMarker = _state.getBoolean(STATE_IS_SHOW_HIDDEN_MARKER);
+      _isShowTourMarkers = _state.getBoolean(STATE_IS_SHOW_TOUR_MARKERS);
 
       final String graphMarker_ColorDefault = UI.IS_DARK_THEME
             ? ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT_DARK
