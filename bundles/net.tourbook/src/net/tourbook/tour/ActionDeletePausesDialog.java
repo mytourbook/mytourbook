@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Frédéric Bard
+ * Copyright (C) 2023, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,6 @@ package net.tourbook.tour;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -96,8 +95,8 @@ public class ActionDeletePausesDialog extends Action {
          return;
       }
 
-      final List<Long> listPausedTime_Start = Arrays.stream(tourData.getPausedTime_Start()).boxed().collect(Collectors.toList());
-      final List<Long> listPausedTime_End = Arrays.stream(tourData.getPausedTime_End()).boxed().collect(Collectors.toList());
+      final List<Long> listPausedTime_Start = Arrays.stream(tourData.getPausedTime_Start()).boxed().toList();
+      final List<Long> listPausedTime_End = Arrays.stream(tourData.getPausedTime_End()).boxed().toList();
       List<Long> listPausedTime_Data = null;
 
       for (int index = _tourPausesViewSelectedIndices.length - 1; index >= 0; index--) {
@@ -108,7 +107,7 @@ public class ActionDeletePausesDialog extends Action {
          final var pausedTime_Data = tourData.getPausedTime_Data();
          if (pausedTime_Data != null && pausedTime_Data.length > 0) {
 
-            listPausedTime_Data = Arrays.stream(tourData.getPausedTime_Data()).boxed().collect(Collectors.toList());
+            listPausedTime_Data = Arrays.stream(tourData.getPausedTime_Data()).boxed().toList();
 
             listPausedTime_Data.remove(index);
          }

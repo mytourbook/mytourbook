@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -76,8 +75,8 @@ public class ActionExport extends SubMenu {
 
          final ArrayList<TourData> selectedTours;
 
-         if (_tourProvider instanceof ITourProviderAll) {
-            selectedTours = ((ITourProviderAll) _tourProvider).getAllSelectedTours();
+         if (_tourProvider instanceof final ITourProviderAll tourProvider) {
+            selectedTours = tourProvider.getAllSelectedTours();
          } else {
             selectedTours = _tourProvider.getSelectedTours();
          }
@@ -141,7 +140,7 @@ public class ActionExport extends SubMenu {
 
       final List<ActionExportTour> sortedExportTourActions = _exportTourActions.stream()
             .sorted((o1, o2) -> o1.getExportTourExtension().getVisibleName().compareTo(o2.getExportTourExtension().getVisibleName()))
-            .collect(Collectors.toList());
+            .toList();
       sortedExportTourActions.forEach(action -> _exportTourContributionItems.add(new ActionContributionItem(action)));
       if (mtActionExportTour != null) {
 
@@ -195,9 +194,7 @@ public class ActionExport extends SubMenu {
             }
             try {
                final Object object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
-               if (object instanceof ExportTourExtension) {
-
-                  final ExportTourExtension exportTourItem = (ExportTourExtension) object;
+               if (object instanceof final ExportTourExtension exportTourItem) {
 
                   exportTourItem.setExportId(configElement.getAttribute("id")); //$NON-NLS-1$
                   exportTourItem.setVisibleName(configElement.getAttribute("name")); //$NON-NLS-1$
