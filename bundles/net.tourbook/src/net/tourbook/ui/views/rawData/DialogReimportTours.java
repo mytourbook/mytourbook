@@ -254,7 +254,7 @@ class DialogReimportTours extends TitleAreaDialog {
       createUI(dlgContainer);
 
       // must be run async because the dark theme is overwriting colors after calling createDialogArea()
-      _parent.getDisplay().asyncExec(this::updateUI_LockUnlockButtons);
+      _parent.getDisplay().asyncExec(() -> updateUI_LockUnlockButtons());
 
       return dlgContainer;
    }
@@ -890,7 +890,7 @@ class DialogReimportTours extends TitleAreaDialog {
          rawDataManager.updateTourData_InImportView_FromDb(null);
 
          // reselect tours, run in UI thread
-         Display.getDefault().asyncExec(_tourViewer::reloadViewer);
+         Display.getDefault().asyncExec(() -> _tourViewer.reloadViewer());
       }
 
       TourLogManager.log_DEFAULT(String.format(
