@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -219,7 +219,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
             _spinnerTemperatureAdjustment.setPageIncrement(10);
             _spinnerTemperatureAdjustment.setMinimum(-100); // - 10.0 �C
             _spinnerTemperatureAdjustment.setMaximum(100); // +10.0 �C
-            _spinnerTemperatureAdjustment.addMouseWheelListener(Util::adjustSpinnerValueOnMouseScroll);
+            _spinnerTemperatureAdjustment.addMouseWheelListener(mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent));
          }
 
          // label: �C
@@ -284,7 +284,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
             _spinnerIgnorLastMarker_TimeSlices.setMinimum(0);
             _spinnerIgnorLastMarker_TimeSlices.setMaximum(1000);
             _spinnerIgnorLastMarker_TimeSlices.setPageIncrement(10);
-            _spinnerIgnorLastMarker_TimeSlices.addMouseWheelListener(Util::adjustSpinnerValueOnMouseScroll);
+            _spinnerIgnorLastMarker_TimeSlices.addMouseWheelListener(mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent));
          }
       }
 
