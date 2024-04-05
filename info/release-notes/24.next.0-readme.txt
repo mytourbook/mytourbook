@@ -66,7 +66,11 @@ New
 * Address Location
   - Lookup a map location from a location provider and use it like a map bookmark
     https://github.com/mytourbook/mytourbook/issues/1315
-
+  - Slideout to manage address locations
+    
+* Map Locations
+  - Show location tooltip when hovered    
+  https://github.com/mytourbook/mytourbook/issues/1318
 
 Improvements
 ============
