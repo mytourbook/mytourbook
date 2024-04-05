@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,35 +13,27 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package de.byteholder.geoclipse.map;
+package net.tourbook.map.location;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Rectangle;
-
-public class DirectPainterContext {
+public enum LocationType {
 
    /**
-    * GC in the onPaint event
+    * Map location which is not associated with a tour
     */
-   public GC                       gc;
+   Address,
 
    /**
-    * Viewport for the current map image in world pixel
+    * Tour location with any tour position
     */
-   public Rectangle                viewport;
+   Tour,
 
    /**
-    * All map locations which are painted in the viewport
+    * Tour location at the tour start
     */
-   public List<PaintedMapLocation> allPaintedMapLocations = new ArrayList<>();
+   TourStart,
 
    /**
-    * {@link PaintedMapLocation} which is hovered with the mouse, can be <code>null</code> when it's
-    * not hovered
+    * Tour location at the tour end
     */
-   public PaintedMapLocation       hoveredMapLocation;
-
+   TourEnd,
 }

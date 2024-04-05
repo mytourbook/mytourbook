@@ -7,7 +7,7 @@ TODO's
  * [Tour Location] Automatically create tour locations for longer pauses in a tour 
    https://github.com/mytourbook/mytourbook/issues/1306 
  
-* Support colomn width = 0
+* Support column width = 0
   This is now (17.3.2024) set but needs more testing
 
 * Support first column alignment in all views
@@ -66,10 +66,14 @@ New
 * Address Location
   - Lookup a map location from a location provider and use it like a map bookmark
     https://github.com/mytourbook/mytourbook/issues/1315
+  - Slideout to manage address locations
+    
+* Map Locations
+  - Show location tooltip when hovered    
+  https://github.com/mytourbook/mytourbook/issues/1318
 
 * Tour Blog (Frederic)
   - Added the ability to display or hide the tour markers
-
 
 Improvements
 ============
@@ -80,7 +84,7 @@ Improvements
     https://github.com/mytourbook/mytourbook/issues/1300  
 
 * Start/End Location
-  - Automatically retieve and set start/end locations in the easy import
+  - Automatically retrieve and set start/end locations in the easy import
   - Retrieve, manage and show start/end locations in tour editor
   - Scramble tour location view
     https://github.com/mytourbook/mytourbook/issues/878

@@ -18,7 +18,7 @@ package net.tourbook.map2.view;
 import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.ActionManageOfflineImages;
 import de.byteholder.geoclipse.map.CenterMapBy;
-import de.byteholder.geoclipse.map.IMapContextProvider;
+import de.byteholder.geoclipse.map.IMapContextMenuProvider;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.MapGridData;
 import de.byteholder.geoclipse.map.MapLegend;
@@ -85,6 +85,7 @@ import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
+import net.tourbook.map.location.LocationType;
 import net.tourbook.map.location.SlideoutMapLocation;
 import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map2.Messages;
@@ -153,6 +154,7 @@ import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 import net.tourbook.tour.location.AddressLocationManager;
+import net.tourbook.tour.location.TourLocationExtended;
 import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.photo.IMapWithPhotos;
 import net.tourbook.tour.photo.TourPhotoLink;
@@ -210,7 +212,7 @@ import org.oscim.core.MapPosition;
  */
 public class Map2View extends ViewPart implements
 
-      IMapContextProvider,
+      IMapContextMenuProvider,
       IMapBookmarks,
       IMapBookmarkListener,
       IMapSyncListener,
@@ -424,15 +426,16 @@ public class Map2View extends ViewPart implements
    private GeoPosition                       _defaultPosition;
    //
    /**
-    * When <code>true</code> a tour is painted, <code>false</code> a point of interest is painted
+    * When <code>true</code> then a tour is painted, <code>false</code> a point of interest is
+    * painted
     */
-   private boolean                           _isTourOrWayPointDisplayed;
+   private boolean                           _isTourPainted;
    //
    /*
     * Tool tips
     */
    private TourToolTip _tourToolTip;
-
+   //
    private String      _poiName;
    private GeoPosition _poiPosition;
    private int         _poiZoomLevel;
@@ -459,7 +462,7 @@ public class Map2View extends ViewPart implements
    private int                               _hash_AllPhotos;
    //
    private final AtomicInteger               _asyncCounter         = new AtomicInteger();
-
+   //
    /**
     * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
     * save in a tour) is displayed.
@@ -1735,7 +1738,7 @@ public class Map2View extends ViewPart implements
 
       Set<GeoPosition> positionBounds = null;
 
-      if (_isTourOrWayPointDisplayed) {
+      if (_isTourPainted) {
 
          // tour or waypoint is painted
 
@@ -2180,7 +2183,7 @@ public class Map2View extends ViewPart implements
    private void enableActions(final boolean isForceTourColor) {
 
       // update legend action
-      if (_isTourOrWayPointDisplayed) {
+      if (_isTourPainted) {
 
          _map.setShowLegend(_isShowLegend);
 
@@ -2222,25 +2225,25 @@ public class Map2View extends ViewPart implements
       final int numTours                  = _allTourData.size();
       final boolean isTourAvailable       = numTours > 0;
       final boolean isMultipleTours       = numTours > 1 && _isShowTour;
-      final boolean isOneTourDisplayed    = _isTourOrWayPointDisplayed && isMultipleTours == false && _isShowTour;
+      final boolean isOneTourDisplayed    = _isTourPainted && isMultipleTours == false && _isShowTour;
       final boolean isOneTourHovered      = hoveredTourId != null;
 
       _actionCreateTourMarkerFromMap      .setEnabled(isTourAvailable && isOneTourHovered);
       _actionLookupTourLocation           .setEnabled(true);
       _actionMap2Slideout_Color           .setEnabled(isTourAvailable);
-      _actionShowLegendInMap              .setEnabled(_isTourOrWayPointDisplayed);
+      _actionShowLegendInMap              .setEnabled(_isTourPainted);
       _actionShowPOI                      .setEnabled(_poiPosition != null);
-      _actionShowSliderInLegend           .setEnabled(_isTourOrWayPointDisplayed && _isShowLegend);
-      _actionShowSliderInMap              .setEnabled(_isTourOrWayPointDisplayed);
+      _actionShowSliderInLegend           .setEnabled(_isTourPainted && _isShowLegend);
+      _actionShowSliderInMap              .setEnabled(_isTourPainted);
       _actionShowStartEndInMap            .setEnabled(isOneTourDisplayed);
       _actionShowTourInfoInMap            .setEnabled(isOneTourDisplayed);
-      _actionShowTour                     .setEnabled(_isTourOrWayPointDisplayed);
-      _actionShowTourMarker               .setEnabled(_isTourOrWayPointDisplayed);
-      _actionShowTourPauses               .setEnabled(_isTourOrWayPointDisplayed);
+      _actionShowTour                     .setEnabled(_isTourPainted);
+      _actionShowTourMarker               .setEnabled(_isTourPainted);
+      _actionShowTourPauses               .setEnabled(_isTourPainted);
       _actionShowTourWeatherInMap         .setEnabled(isTourAvailable);
-      _actionShowWayPoints                .setEnabled(_isTourOrWayPointDisplayed);
+      _actionShowWayPoints                .setEnabled(_isTourPainted);
       _actionZoom_CenterMapBy             .setEnabled(true);
-      _actionZoom_ShowEntireTour          .setEnabled(_isTourOrWayPointDisplayed && _isShowTour && isTourAvailable);
+      _actionZoom_ShowEntireTour          .setEnabled(_isTourPainted && _isShowTour && isTourAvailable);
       _actionZoomLevelAdjustment          .setEnabled(isTourAvailable);
 
       _actionSyncMapWith_Slider_One       .setEnabled(isTourAvailable);
@@ -2885,18 +2888,18 @@ public class Map2View extends ViewPart implements
     *
     * @return
     */
-   private List<TourLocation> getTourLocations(final TourData tourData) {
+   private List<TourLocationExtended> getTourLocations(final TourData tourData) {
 
-      final List<TourLocation> allTourLocations = new ArrayList<>();
+      final List<TourLocationExtended> allTourLocations = new ArrayList<>();
 
       final TourLocation tourLocationStart = tourData.getTourLocationStart();
       final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
 
       if (tourLocationStart != null) {
-         allTourLocations.add(tourLocationStart);
+         allTourLocations.add(new TourLocationExtended(tourLocationStart, LocationType.TourStart));
       }
       if (tourLocationEnd != null) {
-         allTourLocations.add(tourLocationEnd);
+         allTourLocations.add(new TourLocationExtended(tourLocationEnd, LocationType.TourEnd));
       }
 
       return allTourLocations;
@@ -2997,7 +3000,7 @@ public class Map2View extends ViewPart implements
          return;
       }
 
-      if (_isTourOrWayPointDisplayed == false
+      if (_isTourPainted == false
             || _isShowTour == false
             || _isShowLegend == false) {
 
@@ -3273,7 +3276,12 @@ public class Map2View extends ViewPart implements
       }
 
       // repaint map
-      _directMappingPainter.setAddressLocations(allTourLocations);
+      final List<TourLocationExtended> allAddressLocations = new ArrayList<>();
+      for (final TourLocation tourLocation : allTourLocations) {
+         allAddressLocations.add(new TourLocationExtended(tourLocation, LocationType.Address));
+      }
+
+      _directMappingPainter.setAddressLocations(allAddressLocations);
 
       _map.redraw();
 
@@ -3321,7 +3329,11 @@ public class Map2View extends ViewPart implements
       }
 
       // repaint map
-      _directMappingPainter.setTourLocations(allTourLocations);
+      final List<TourLocationExtended> allTourLocationsExtended = new ArrayList<>();
+      for (final TourLocation tourLocation : allTourLocations) {
+         allTourLocationsExtended.add(new TourLocationExtended(tourLocation, LocationType.Tour));
+      }
+      _directMappingPainter.setTourLocations(allTourLocationsExtended);
 
       _map.redraw();
 
@@ -3575,7 +3587,7 @@ public class Map2View extends ViewPart implements
 
       } else if (selection instanceof PointOfInterest) {
 
-         _isTourOrWayPointDisplayed = false;
+         _isTourPainted = false;
 
          clearView();
 
@@ -3973,7 +3985,7 @@ public class Map2View extends ViewPart implements
          return;
       }
 
-      _isTourOrWayPointDisplayed = true;
+      _isTourPainted = true;
 
       // force single tour to be repainted
       _previousTourData = null;
@@ -4078,7 +4090,7 @@ public class Map2View extends ViewPart implements
     */
    private void paintTours_20_One(final TourData tourData, final boolean forceRedraw) {
 
-      _isTourOrWayPointDisplayed = true;
+      _isTourPainted = true;
 
       if (TourManager.isLatLonAvailable(tourData) == false) {
 
@@ -4090,7 +4102,13 @@ public class Map2View extends ViewPart implements
       // prevent loading the same tour
       if (forceRedraw == false && (_allTourData.size() == 1) && (_allTourData.get(0) == tourData)) {
 
-         return;
+         /**
+          * DISABLED
+          * <p>
+          * A reselected tour would not be visible
+          */
+
+//         return;
       }
 
       // force multiple tours to be repainted
@@ -4239,7 +4257,7 @@ public class Map2View extends ViewPart implements
     */
    private void paintTours_30_Multiple() {
 
-      _isTourOrWayPointDisplayed = true;
+      _isTourPainted = true;
 
       // force single tour to be repainted
       _previousTourData = null;
@@ -4361,7 +4379,7 @@ public class Map2View extends ViewPart implements
                                             final int selectedSliderIndex,
                                             final Set<GeoPosition> geoPositions) {
 
-      _isTourOrWayPointDisplayed = true;
+      _isTourPainted = true;
 
       if (TourManager.isLatLonAvailable(tourData) == false) {
          showDefaultMap(_isShowPhoto);
@@ -4546,7 +4564,7 @@ public class Map2View extends ViewPart implements
       _actionShowTourPauses.setChecked(isShowPauses);
       _tourPainterConfig.isShowTourPauses = isShowPauses;
 
-      // checkbox: show way points
+      // show way points
       final boolean isShowWayPoints = Util.getStateBoolean(_state, STATE_IS_SHOW_WAY_POINTS, true);
       _actionShowWayPoints.setChecked(isShowWayPoints);
       _tourPainterConfig.isShowWayPoints = isShowWayPoints;
@@ -4964,8 +4982,7 @@ public class Map2View extends ViewPart implements
       _allTourData.clear();
       _allTourData.add(tourData);
 
-      final List<TourLocation> allTourLocations = getTourLocations(tourData);
-      _directMappingPainter.setTourLocations(allTourLocations);
+      _directMappingPainter.setTourLocations(getTourLocations(tourData));
 
       setVisibleDataPoints(tourData);
 
@@ -5062,7 +5079,7 @@ public class Map2View extends ViewPart implements
       _valuePointTooltipUI.setTourData(null);
 
       // disable tour actions in this view
-      _isTourOrWayPointDisplayed = false;
+      _isTourPainted = false;
 
       // disable tour data
       _allTourData.clear();
@@ -5424,6 +5441,13 @@ public class Map2View extends ViewPart implements
             Map2View.STATE_IS_SHOW_LOCATIONS_TOUR_DEFAULT);
 
 // SET_FORMATTING_ON
+
+      // enable/disable location tooltip
+      if (isShowMapLocations) {
+         _map.getMapLocationTooltip().activate();
+      } else {
+         _map.getMapLocationTooltip().deactivate();
+      }
 
       /*
        * Update options for the map direct painter

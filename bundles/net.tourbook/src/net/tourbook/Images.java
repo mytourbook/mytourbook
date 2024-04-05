@@ -186,6 +186,11 @@ public class Images {
    public static final String MapLayer                                   = "map-layer.png";                                       //$NON-NLS-1$
    public static final String MapLayer_Dark                              = "map-layer-dark.png";                                  //$NON-NLS-1$
    public static final String MapLocation                                = "map-location.png";                                    //$NON-NLS-1$
+   public static final String MapLocationMarker                          = "map-location-marker.png";                             //$NON-NLS-1$
+   public static final String MapLocationMarker_Address                  = "map-location-marker-address.png";                     //$NON-NLS-1$
+   public static final String MapLocationMarker_Start                    = "map-location-marker-start.png";                       //$NON-NLS-1$
+   public static final String MapLocationMarker_End                      = "map-location-marker-end.png";                         //$NON-NLS-1$
+   public static final String MapLocationMarker_Hovered                  = "map-location-marker-hovered.png";                     //$NON-NLS-1$
    public static final String MapModel                                   = "map-model.png";                                       //$NON-NLS-1$
    public static final String MapModel_Disabled                          = "map-model-disabled.png";                              //$NON-NLS-1$
    public static final String MapModelCursor                             = "map-model-cursor.png";                                //$NON-NLS-1$

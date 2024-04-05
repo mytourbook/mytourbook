@@ -20,6 +20,7 @@ import de.byteholder.geoclipse.map.IDirectPainter;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Map2Painter;
 import de.byteholder.geoclipse.map.MapLegend;
+import de.byteholder.geoclipse.map.PaintedMapLocation;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.map2.Messages;
+import net.tourbook.tour.location.TourLocationExtended;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -44,39 +46,46 @@ import org.eclipse.swt.widgets.Display;
 
 public class DirectMappingPainter implements IDirectPainter {
 
-   private Map2                   _map;
-   private TourData               _tourData;
+   private Map2                       _map;
+   private TourData                   _tourData;
 
-   private int                    _leftSliderValueIndex;
-   private int                    _rightSliderValueIndex;
-   private int                    _externalValuePointIndex;
+   private int                        _leftSliderValueIndex;
+   private int                        _rightSliderValueIndex;
+   private int                        _externalValuePointIndex;
 
-   private boolean                _isTourVisible;
-   private boolean                _isShowSliderInMap;
-   private boolean                _isShowSliderInLegend;
-   private boolean                _isShowValuePoint;
+   private boolean                    _isTourVisible;
+   private boolean                    _isShowSliderInMap;
+   private boolean                    _isShowSliderInLegend;
+   private boolean                    _isShowValuePoint;
 
-   private boolean                _isShowMapLocation;
-   private boolean                _isShowMapLocations_BoundingBox;
-   private boolean                _isShowLocations_Address;
-   private boolean                _isShowLocations_Tour;
+   private boolean                    _isShowMapLocation;
+   private boolean                    _isShowMapLocations_BoundingBox;
+   private boolean                    _isShowLocations_Address;
+   private boolean                    _isShowLocations_Tour;
 
-   private List<TourLocation>     _allAddressLocations;
-   private List<TourLocation>     _allTourLocations;
+   private List<TourLocationExtended> _allAddressLocations;
+   private List<TourLocationExtended> _allTourLocations;
 
-   private SliderPathPaintingData _sliderPathPaintingData;
+   private SliderPathPaintingData     _sliderPathPaintingData;
 
-   private Map<Long, Color>       _locationColors = new HashMap<>();
-   private int                    _colorSwitchCounter;
+   private Map<Long, Color>           _locationColors = new HashMap<>();
+   private int                        _colorSwitchCounter;
+
+   private boolean                    _isMapBackgroundDark;
+
+   private Rectangle                  _imageMapLocationBounds;
 
    /*
     * UI resources
     */
-   private final Image _imageLeftSlider;
-   private final Image _imageRightSlider;
+   private final Image _imageMapLocation;
+   private final Image _imageMapLocation_Address;
+   private final Image _imageMapLocation_Start;
+   private final Image _imageMapLocation_End;
+   private final Image _imageMapLocation_Hovered;
+   private final Image _imageSlider_Left;
+   private final Image _imageSlider_Right;
    private final Image _imageValuePoint;
-
-   private boolean     _isMapBackgroundDark;
 
    /**
     * @param map
@@ -87,9 +96,21 @@ public class DirectMappingPainter implements IDirectPainter {
 
       _map = map;
 
-      _imageLeftSlider = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderLeft).createImage();
-      _imageRightSlider = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderRight).createImage();
-      _imageValuePoint = TourbookPlugin.getImageDescriptor(Images.Map_ValuePoint).createImage();
+// SET_FORMATTING_OFF
+
+      _imageMapLocation          = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker).createImage();
+      _imageMapLocation_Address  = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Address).createImage();
+      _imageMapLocation_Start    = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Start).createImage();
+      _imageMapLocation_End      = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_End).createImage();
+      _imageMapLocation_Hovered  = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Hovered).createImage();
+
+      _imageSlider_Left          = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderLeft).createImage();
+      _imageSlider_Right         = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderRight).createImage();
+      _imageValuePoint           = TourbookPlugin.getImageDescriptor(Images.Map_ValuePoint).createImage();
+
+// SET_FORMATTING_ON
+
+      _imageMapLocationBounds = _imageMapLocation_Hovered.getBounds();
    }
 
    /**
@@ -182,8 +203,13 @@ public class DirectMappingPainter implements IDirectPainter {
    @Override
    public void dispose() {
 
-      disposeImage(_imageLeftSlider);
-      disposeImage(_imageRightSlider);
+      disposeImage(_imageMapLocation);
+      disposeImage(_imageMapLocation_Address);
+      disposeImage(_imageMapLocation_Start);
+      disposeImage(_imageMapLocation_End);
+      disposeImage(_imageMapLocation_Hovered);
+      disposeImage(_imageSlider_Left);
+      disposeImage(_imageSlider_Right);
       disposeImage(_imageValuePoint);
    }
 
@@ -194,7 +220,8 @@ public class DirectMappingPainter implements IDirectPainter {
       }
    }
 
-   private void drawMapLocation(final DirectPainterContext painterContext, final List<TourLocation> allTourLocations) {
+   private void drawMapLocation(final DirectPainterContext painterContext,
+                                final List<TourLocationExtended> allTourLocations) {
 
       final MP mp = _map.getMapProvider();
       final int zoomLevel = _map.getZoom();
@@ -204,19 +231,28 @@ public class DirectMappingPainter implements IDirectPainter {
       final int viewportX = viewport.x;
       final int viewportY = viewport.y;
 
-      final int arcSize = 20;
-      final int arcSize2 = arcSize / 2;
-
       gc.setAntialias(SWT.ON);
       gc.setLineWidth(2);
 
       // use different colors each time
       if (_colorSwitchCounter++ % 50 == 0) {
-
          _locationColors.clear();
       }
 
-      for (final TourLocation tourLocation : allTourLocations) {
+      /*
+       * Setup hovered map location
+       */
+      final PaintedMapLocation hoveredMapLocation = painterContext.hoveredMapLocation;
+
+      final int imageWidth = _imageMapLocationBounds.width;
+      final int imageHeight = _imageMapLocationBounds.height;
+      final int imageWidth2 = imageWidth / 2;
+
+      Rectangle hoveredLocation = null;
+
+      for (final TourLocationExtended tourLocationExtended : allTourLocations) {
+
+         final TourLocation tourLocation = tourLocationExtended.tourLocation;
 
          final Point requestedLocation = convertGeoPoint(mp, tourLocation.latitude, tourLocation.longitude, zoomLevel);
 
@@ -243,39 +279,27 @@ public class DirectMappingPainter implements IDirectPainter {
             // convert world position into device position
             final int requestedDevX = requestedLocation.x - viewportX;
             final int requestedDevY = requestedLocation.y - viewportY;
-            final int requestedDevXCenter = requestedDevX - arcSize2;
-            final int requestedDevYCenter = requestedDevY - arcSize2;
-
-            /*
-             * Paint each bbox with a different color but use the same color for the same bbox
-             */
-            final long bboxKey = tourLocation.boundingBoxKey;
-
-            Color locationColor = _locationColors.get(bboxKey);
-
-            if (locationColor == null) {
-
-               // create bbox color
-
-               locationColor = createBBoxColor();
-
-               _locationColors.put(bboxKey, locationColor);
-            }
-
-            gc.setForeground(locationColor);
-            gc.setBackground(locationColor);
-
-            // draw requested location
-            gc.fillArc(
-
-                  requestedDevXCenter,
-                  requestedDevYCenter,
-                  arcSize,
-                  arcSize,
-                  0,
-                  360);
 
             if (_isShowMapLocations_BoundingBox) {
+
+               /*
+                * Paint each bbox with a different color but use the same color for the same bbox
+                */
+               final long bboxKey = tourLocation.boundingBoxKey;
+
+               Color locationColor = _locationColors.get(bboxKey);
+
+               if (locationColor == null) {
+
+                  // create bbox color
+
+                  locationColor = createBBoxColor();
+
+                  _locationColors.put(bboxKey, locationColor);
+               }
+
+               gc.setForeground(locationColor);
+               gc.setBackground(locationColor);
 
                // draw original bbox
 
@@ -336,7 +360,44 @@ public class DirectMappingPainter implements IDirectPainter {
                   );
                }
             }
+
+            final int devX = requestedDevX - imageWidth2;
+            final int devY = requestedDevY - imageHeight;
+
+            final Rectangle paintedRectangle = new Rectangle(
+
+                  devX,
+                  devY,
+
+                  imageWidth,
+                  imageHeight);
+
+            // draw location image
+            switch (tourLocationExtended.locationType) {
+
+            case Address   -> gc.drawImage(_imageMapLocation_Address, devX, devY);
+            case TourStart -> gc.drawImage(_imageMapLocation_Start, devX, devY);
+            case TourEnd   -> gc.drawImage(_imageMapLocation_End, devX, devY);
+
+            default        -> gc.drawImage(_imageMapLocation, devX, devY);
+            }
+
+            if (hoveredMapLocation != null && paintedRectangle.equals(hoveredMapLocation.locationRectangle)) {
+
+               // map location is hovered
+
+               hoveredLocation = paintedRectangle;
+            }
+
+            // keep location for mouse actions
+            painterContext.allPaintedMapLocations.add(new PaintedMapLocation(tourLocationExtended, paintedRectangle));
          }
+      }
+
+      // draw hovered location image
+      if (hoveredLocation != null) {
+
+         gc.drawImage(_imageMapLocation_Hovered, hoveredLocation.x, hoveredLocation.y);
       }
    }
 
@@ -348,10 +409,10 @@ public class DirectMappingPainter implements IDirectPainter {
     *
     * @return Returns <code>true</code> when the marker is visible and painted
     */
-   private boolean drawMarker(final DirectPainterContext painterContext,
-                              final int sliderValueIndex,
-                              final Image markerImage,
-                              final boolean isYPosCenter) {
+   private boolean drawMarkerImage(final DirectPainterContext painterContext,
+                                   final int sliderValueIndex,
+                                   final Image markerImage,
+                                   final boolean isYPosCenter) {
 
       final MP mp = _map.getMapProvider();
       final int zoomLevel = _map.getZoom();
@@ -737,6 +798,9 @@ public class DirectMappingPainter implements IDirectPainter {
 
       if (_isShowMapLocation) {
 
+         painterContext.allPaintedMapLocations.clear();
+
+         // show tour locations
          if (_isShowLocations_Tour) {
 
             if (_allTourLocations != null && _allTourLocations.size() > 0) {
@@ -745,6 +809,7 @@ public class DirectMappingPainter implements IDirectPainter {
             }
          }
 
+         // show address locations
          if (_isShowLocations_Address) {
 
             if (_allAddressLocations != null && _allAddressLocations.size() > 0) {
@@ -769,18 +834,17 @@ public class DirectMappingPainter implements IDirectPainter {
       }
 
       if (_isShowSliderInMap) {
-         drawMarker(painterContext, _rightSliderValueIndex, _imageRightSlider, false);
-         drawMarker(painterContext, _leftSliderValueIndex, _imageLeftSlider, false);
+
+         drawMarkerImage(painterContext, _rightSliderValueIndex, _imageSlider_Right, false);
+         drawMarkerImage(painterContext, _leftSliderValueIndex, _imageSlider_Left, false);
       }
 
       if (_isShowValuePoint
 
             // check if value point is valid -> do not show invalid point
-            && _externalValuePointIndex != -1
+            && _externalValuePointIndex != -1) {
 
-      ) {
-
-         drawMarker(painterContext, _externalValuePointIndex, _imageValuePoint, true);
+         drawMarkerImage(painterContext, _externalValuePointIndex, _imageValuePoint, true);
       }
 
       if (_isShowSliderInLegend) {
@@ -788,9 +852,9 @@ public class DirectMappingPainter implements IDirectPainter {
       }
    }
 
-   public void setAddressLocations(final List<TourLocation> allLocations) {
+   public void setAddressLocations(final List<TourLocationExtended> allAddressLocations) {
 
-      _allAddressLocations = allLocations;
+      _allAddressLocations = allAddressLocations;
    }
 
    /**
@@ -859,7 +923,7 @@ public class DirectMappingPainter implements IDirectPainter {
 // SET_FORMATTING_ON
    }
 
-   public void setTourLocations(final List<TourLocation> allLocations) {
+   public void setTourLocations(final List<TourLocationExtended> allLocations) {
 
       _allTourLocations = allLocations;
    }

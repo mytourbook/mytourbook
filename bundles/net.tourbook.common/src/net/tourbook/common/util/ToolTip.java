@@ -38,6 +38,8 @@ import org.eclipse.swt.widgets.Shell;
  */
 public abstract class ToolTip {
 
+   public static final int             SHELL_MARGIN           = 5;
+
    /**
     * Recreate the tooltip on every mouse move
     */
@@ -248,7 +250,7 @@ public abstract class ToolTip {
          }
       };
 
-      if (!manualActivation) {
+      if (manualActivation == false) {
          activate();
       }
    }
@@ -661,6 +663,8 @@ public abstract class ToolTip {
 
       if (isNoReCreate) {
 
+         // do NOT recreate the tooltip
+
          final Object tmp = getToolTipArea(event);
 
          // No new area close the current tooltip
@@ -827,30 +831,30 @@ public abstract class ToolTip {
       }
    }
 
-   private void toolTipShow(final Shell tip, final Event event) {
+   private void toolTipShow(final Shell ttShell, final Event event) {
 
-      if (!tip.isDisposed()) {
+      if (!ttShell.isDisposed()) {
 
          currentArea = getToolTipArea(event);
 
-         final Composite contentArea = createToolTipContentArea(event, tip);
+         final Composite contentArea = createToolTipContentArea(event, ttShell);
          if (contentArea != null) {
 
             // don't show the tooltip when content area is not created
 
             if (isHideOnMouseDown()) {
-               toolTipHookBothRecursively(tip);
+               toolTipHookBothRecursively(ttShell);
             } else {
-               toolTipHookByTypeRecursively(tip, true, SWT.MouseExit);
+               toolTipHookByTypeRecursively(ttShell, true, SWT.MouseExit);
             }
 
-            tip.pack();
-            final Point size = tip.getSize();
+            ttShell.pack();
+            final Point size = ttShell.getSize();
             final Point location = fixupDisplayBounds(size, getLocation(size, event));
 
             // Need to adjust a bit more if the mouse cursor.y == tip.y and
             // the cursor.x is inside the tip
-            final Point cursorLocation = tip.getDisplay().getCursorLocation();
+            final Point cursorLocation = ttShell.getDisplay().getCursorLocation();
 
             if (cursorLocation.y == location.y
                   && location.x < cursorLocation.x
@@ -858,8 +862,8 @@ public abstract class ToolTip {
                location.y -= 2;
             }
 
-            tip.setLocation(location);
-            tip.setVisible(true);
+            ttShell.setLocation(location);
+            ttShell.setVisible(true);
          }
       }
    }

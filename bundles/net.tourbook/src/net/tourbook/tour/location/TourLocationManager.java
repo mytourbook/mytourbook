@@ -55,6 +55,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.map.location.LocationType;
 import net.tourbook.search.FTSearchManager;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
@@ -1520,9 +1521,9 @@ public class TourLocationManager {
     *
     * @return Returns all {@link TourLocation}s
     */
-   public static List<TourLocation> getTourLocations(final List<TourData> allTourData) {
+   public static List<TourLocationExtended> getTourLocations(final List<TourData> allTourData) {
 
-      final List<TourLocation> allTourLocations = new ArrayList<>();
+      final List<TourLocationExtended> allTourLocationsExtended = new ArrayList<>();
 
       for (final TourData tourData : allTourData) {
 
@@ -1530,15 +1531,15 @@ public class TourLocationManager {
          final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
 
          if (tourLocationStart != null) {
-            allTourLocations.add(tourLocationStart);
+            allTourLocationsExtended.add(new TourLocationExtended(tourLocationStart, LocationType.TourStart));
          }
 
          if (tourLocationEnd != null) {
-            allTourLocations.add(tourLocationEnd);
+            allTourLocationsExtended.add(new TourLocationExtended(tourLocationEnd, LocationType.TourEnd));
          }
       }
 
-      return allTourLocations;
+      return allTourLocationsExtended;
    }
 
    /**

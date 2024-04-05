@@ -92,6 +92,7 @@ import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
+import net.tourbook.map.location.MapLocationToolTip;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.WayPointToolTipProvider;
@@ -490,41 +491,52 @@ public class Map2 extends Canvas {
    /*
     * POI tooltip
     */
-   private PoiToolTip       _poi_Tooltip;
-   private final int        _poi_Tooltip_OffsetY               = 5;
-   private TourToolTip      _tour_ToolTip;
+   private PoiToolTip _poi_Tooltip;
+   private final int  _poi_Tooltip_OffsetY = 5;
+
+   /*
+    * Tour tooltip
+    */
+   private TourToolTip        _tourTooltip;
+   private HoveredAreaContext _tourTooltip_HoveredAreaContext;
+
+   /*
+    * Map locations
+    */
+   private MapLocationToolTip _mapLocation_Tooltip;
+   private PaintedMapLocation _mapLocation_Hovered;
 
    /**
     * Hovered/selected tour
     */
-   private boolean          _isShowHoveredOrSelectedTour       = Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT;
+   private boolean            _isShowHoveredOrSelectedTour       = Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT;
 
-   private ArrayList<Point> _allHoveredDevPoints               = new ArrayList<>();
-   private ArrayList<Long>  _allHoveredTourIds                 = new ArrayList<>();
-   private IntArrayList     _allHoveredSerieIndices            = new IntArrayList();
+   private ArrayList<Point>   _allHoveredDevPoints               = new ArrayList<>();
+   private ArrayList<Long>    _allHoveredTourIds                 = new ArrayList<>();
+   private IntArrayList       _allHoveredSerieIndices            = new IntArrayList();
 
-   private long             _hovered_SelectedTourId            = -1;
-   private int              _hovered_SelectedSerieIndex_Front  = -1;
-   private int              _hovered_SelectedSerieIndex_Behind = -1;
+   private long               _hovered_SelectedTourId            = -1;
+   private int                _hovered_SelectedSerieIndex_Front  = -1;
+   private int                _hovered_SelectedSerieIndex_Behind = -1;
 
    /**
     * When <code>true</code> then a tour can be selected, otherwise a trackpoint (including tour)
     * can be selected
     */
-   private boolean          _hoveredSelectedTour_CanSelectTour;
-   private int              _hoveredSelectedTour_Hovered_Opacity;
-   private Color            _hoveredSelectedTour_Hovered_Color;
-   private int              _hoveredSelectedTour_HoveredAndSelected_Opacity;
-   private Color            _hoveredSelectedTour_HoveredAndSelected_Color;
-   private int              _hoveredSelectedTour_Selected_Opacity;
-   private Color            _hoveredSelectedTour_Selected_Color;
+   private boolean            _hoveredSelectedTour_CanSelectTour;
+   private int                _hoveredSelectedTour_Hovered_Opacity;
+   private Color              _hoveredSelectedTour_Hovered_Color;
+   private int                _hoveredSelectedTour_HoveredAndSelected_Opacity;
+   private Color              _hoveredSelectedTour_HoveredAndSelected_Color;
+   private int                _hoveredSelectedTour_Selected_Opacity;
+   private Color              _hoveredSelectedTour_Selected_Color;
 
    /**
     * When <code>true</code> the loading... image is not displayed
     */
-   private boolean          _isLiveView;
+   private boolean            _isLiveView;
 
-   private long             _lastMapDrawTime;
+   private long               _lastMapDrawTime;
 
    /*
     * All painted tiles in the map are within these 4 tile positions
@@ -559,7 +571,7 @@ public class Map2 extends Canvas {
    private Point                     _offline_WorldMouse_End;
    private Point                     _offline_WorldMouse_Move;
 
-   private IMapContextProvider       _mapContextProvider;
+   private IMapContextMenuProvider   _mapContextMenuProvider;
 
    /**
     * Is <code>true</code> when the map context menu can be displayed
@@ -569,8 +581,6 @@ public class Map2 extends Canvas {
    private DropTarget                _dropTarget;
 
    private boolean                   _isRedrawEnabled           = true;
-
-   private HoveredAreaContext        _hoveredAreaContext;
 
    private int                       _overlayAlpha              = 0xff;
 
@@ -698,6 +708,8 @@ public class Map2 extends Canvas {
 // SET_FORMATTING_ON
 
       _transparentColor = new Color(MAP_TRANSPARENT_RGB);
+
+      _mapLocation_Tooltip = new MapLocationToolTip(this);
 
       _poiImage = TourbookPlugin.getImageDescriptor(Images.POI_InMap).createImage();
       _poiImageBounds = _poiImage.getBounds();
@@ -1075,8 +1087,8 @@ public class Map2 extends Canvas {
             return;
          }
 
-         if (_mapContextProvider != null) {
-            _mapContextProvider.fillContextMenu(menuManager, _actionManageOfflineImages);
+         if (_mapContextMenuProvider != null) {
+            _mapContextMenuProvider.fillContextMenu(menuManager, _actionManageOfflineImages);
          }
       });
 
@@ -1344,6 +1356,11 @@ public class Map2 extends Canvas {
       return _centerMapBy;
    }
 
+   public PaintedMapLocation getHoveredMapLocation() {
+
+      return _directMapPainterContext.hoveredMapLocation;
+   }
+
    /**
     * Retrieve, if any, the current tour hovered by the user.
     *
@@ -1461,6 +1478,11 @@ public class Map2 extends Canvas {
       }
 
       return _mp.pixelToGeo(_worldPixel_MapCenter, _mapZoomLevel);
+   }
+
+   public MapLocationToolTip getMapLocationTooltip() {
+
+      return _mapLocation_Tooltip;
    }
 
    /**
@@ -2180,17 +2202,17 @@ public class Map2 extends Canvas {
 
    private void hideTourTooltipHoveredArea() {
 
-      if (_tour_ToolTip == null) {
+      if (_tourTooltip == null) {
          return;
       }
 
       // update tool tip because it has it's own mouse move listener for the map
-      _tour_ToolTip.hideHoveredArea();
+      _tourTooltip.hideHoveredArea();
 
-      if (_hoveredAreaContext != null) {
+      if (_tourTooltip_HoveredAreaContext != null) {
 
          // hide hovered area
-         _hoveredAreaContext = null;
+         _tourTooltip_HoveredAreaContext = null;
 
          redraw();
       }
@@ -2956,7 +2978,14 @@ public class Map2 extends Canvas {
 
          redraw();
 
+//      } else if (_directMapPainterContext.hoveredMapLocation != null) {
+//
+//         // map location is hovered
+//
+//         _mapLocation_Hovered = _directMapPainterContext.hoveredMapLocation;
+
       } else if (_isShowHoveredOrSelectedTour
+
             && _isShowBreadcrumbs
 
             // check if breadcrumb is hit
@@ -3259,6 +3288,54 @@ public class Map2 extends Canvas {
          return;
       }
 
+      if (_directMapPainterContext.allPaintedMapLocations.size() > 0) {
+
+         // map locations are painted
+
+         final PaintedMapLocation oldHoveredMapLocation = _directMapPainterContext.hoveredMapLocation;
+         PaintedMapLocation newHoveredMapLocation = null;
+
+         _directMapPainterContext.hoveredMapLocation = null;
+
+         final List<PaintedMapLocation> allPaintedMapLocations = _directMapPainterContext.allPaintedMapLocations;
+
+         for (final PaintedMapLocation paintedLocation : allPaintedMapLocations) {
+
+            final Rectangle paintedRect = paintedLocation.locationRectangle;
+
+            if (true
+                  && (_mouseMove_DevPosition_X > paintedRect.x)
+                  && (_mouseMove_DevPosition_X < paintedRect.x + paintedRect.width)
+                  && (_mouseMove_DevPosition_Y > paintedRect.y)
+                  && (_mouseMove_DevPosition_Y < paintedRect.y + paintedRect.height)) {
+
+               // a map location is hovered
+
+               _directMapPainterContext.hoveredMapLocation = newHoveredMapLocation = paintedLocation;
+
+               break;
+            }
+         }
+
+         // repaint map when hovered state has changed
+         if (oldHoveredMapLocation == null && newHoveredMapLocation == null) {
+
+            // ignore
+
+         } else if (false
+
+               || oldHoveredMapLocation == null && newHoveredMapLocation != null
+               || oldHoveredMapLocation != null && newHoveredMapLocation == null
+
+               // now both should be NOT null
+               || oldHoveredMapLocation.tourLocationExtended.equals(newHoveredMapLocation.tourLocationExtended) == false) {
+
+            redraw();
+
+            return;
+         }
+      }
+
       if (_isLeftMouseButtonPressed) {
 
          // pan map
@@ -3270,21 +3347,21 @@ public class Map2 extends Canvas {
 
       // #######################################################################
 
-      if (_tour_ToolTip != null && _tour_ToolTip.isActive()) {
+      if (_tourTooltip != null && _tourTooltip.isActive()) {
 
          /*
           * check if the mouse is within a hovered area
           */
          boolean isContextValid = false;
-         if (_hoveredAreaContext != null) {
+         if (_tourTooltip_HoveredAreaContext != null) {
 
-            final int topLeftX = _hoveredAreaContext.hoveredTopLeftX;
-            final int topLeftY = _hoveredAreaContext.hoveredTopLeftY;
+            final int topLeftX = _tourTooltip_HoveredAreaContext.hoveredTopLeftX;
+            final int topLeftY = _tourTooltip_HoveredAreaContext.hoveredTopLeftY;
 
             if (_mouseMove_DevPosition_X >= topLeftX
-                  && _mouseMove_DevPosition_X < topLeftX + _hoveredAreaContext.hoveredWidth
+                  && _mouseMove_DevPosition_X < topLeftX + _tourTooltip_HoveredAreaContext.hoveredWidth
                   && _mouseMove_DevPosition_Y >= topLeftY
-                  && _mouseMove_DevPosition_Y < topLeftY + _hoveredAreaContext.hoveredHeight) {
+                  && _mouseMove_DevPosition_Y < topLeftY + _tourTooltip_HoveredAreaContext.hoveredHeight) {
 
                isContextValid = true;
             }
@@ -3560,13 +3637,13 @@ public class Map2 extends Canvas {
             _directMapPainter.paint(_directMapPainterContext);
          }
 
-         if (_hoveredAreaContext != null) {
-            final Image hoveredImage = _hoveredAreaContext.hoveredImage;
+         if (_tourTooltip_HoveredAreaContext != null) {
+            final Image hoveredImage = _tourTooltip_HoveredAreaContext.hoveredImage;
             if (hoveredImage != null) {
 
                gc.drawImage(hoveredImage,
-                     _hoveredAreaContext.hoveredTopLeftX,
-                     _hoveredAreaContext.hoveredTopLeftY);
+                     _tourTooltip_HoveredAreaContext.hoveredTopLeftX,
+                     _tourTooltip_HoveredAreaContext.hoveredTopLeftY);
             }
          }
 
@@ -3592,8 +3669,8 @@ public class Map2 extends Canvas {
          }
 
          // paint tooltip icon in the map
-         if (_tour_ToolTip != null) {
-            _tour_ToolTip.paint(gc, _clientArea);
+         if (_tourTooltip != null) {
+            _tourTooltip.paint(gc, _clientArea);
          }
 
          // paint info AFTER hovered/selected tour
@@ -6749,7 +6826,10 @@ public class Map2 extends Canvas {
     * @param isDimMap
     * @param isBackgroundDark
     */
-   public void setDimLevel(final boolean isDimMap, final int mapDimLevel, final RGB dimColor, final boolean isBackgroundDark) {
+   public void setDimLevel(final boolean isDimMap,
+                           final int mapDimLevel,
+                           final RGB dimColor,
+                           final boolean isBackgroundDark) {
 
       _isMapBackgroundDark = isBackgroundDark;
 
@@ -6876,8 +6956,8 @@ public class Map2 extends Canvas {
     *
     * @param mapContextProvider
     */
-   public void setMapContextProvider(final IMapContextProvider mapContextProvider) {
-      _mapContextProvider = mapContextProvider;
+   public void setMapContextProvider(final IMapContextMenuProvider mapContextProvider) {
+      _mapContextMenuProvider = mapContextProvider;
    }
 
    /**
@@ -7138,12 +7218,12 @@ public class Map2 extends Canvas {
             return;
          }
 
-         _hoveredAreaContext = hoveredContext;
+         _tourTooltip_HoveredAreaContext = hoveredContext;
 
          // update tool tip control
-         _tour_ToolTip.setHoveredContext(_hoveredAreaContext);
+         _tourTooltip.setHoveredContext(_tourTooltip_HoveredAreaContext);
 
-         _tour_ToolTip.show(new Point(_hoveredAreaContext.hoveredTopLeftX, _hoveredAreaContext.hoveredTopLeftY));
+         _tourTooltip.show(new Point(_tourTooltip_HoveredAreaContext.hoveredTopLeftX, _tourTooltip_HoveredAreaContext.hoveredTopLeftY));
 
          redraw();
       }
@@ -7251,12 +7331,12 @@ public class Map2 extends Canvas {
 
    public void setTourToolTip(final TourToolTip tourToolTip) {
 
-      _tour_ToolTip = tourToolTip;
+      _tourTooltip = tourToolTip;
 
       tourToolTip.addHideListener(event -> {
 
          // hide hovered area
-         _hoveredAreaContext = null;
+         _tourTooltip_HoveredAreaContext = null;
 
          redraw();
       });
@@ -7683,7 +7763,7 @@ public class Map2 extends Canvas {
     */
    private void updateTourToolTip() {
 
-      if (_mp != null && _tour_ToolTip != null && _tour_ToolTip.isActive()) {
+      if (_mp != null && _tourTooltip != null && _tourTooltip.isActive()) {
 
          /*
           * redraw must be forced because the hovered area can be the same but can be at a different
@@ -7691,7 +7771,7 @@ public class Map2 extends Canvas {
           */
          updateTourToolTip_HoveredArea();
 
-         _tour_ToolTip.update();
+         _tourTooltip.update();
       }
    }
 
@@ -7703,10 +7783,10 @@ public class Map2 extends Canvas {
     */
    private void updateTourToolTip_HoveredArea() {
 
-      final HoveredAreaContext oldHoveredContext = _hoveredAreaContext;
+      final HoveredAreaContext oldHoveredContext = _tourTooltip_HoveredAreaContext;
       HoveredAreaContext newHoveredContext = null;
 
-      final ArrayList<ITourToolTipProvider> toolTipProvider = _tour_ToolTip.getToolTipProvider();
+      final ArrayList<ITourToolTipProvider> toolTipProvider = _tourTooltip.getToolTipProvider();
 
       /*
        * check tour info tool tip provider as first
@@ -7753,12 +7833,12 @@ public class Map2 extends Canvas {
          }
       }
 
-      _hoveredAreaContext = newHoveredContext;
+      _tourTooltip_HoveredAreaContext = newHoveredContext;
 
       // update tool tip control
-      _tour_ToolTip.setHoveredContext(_hoveredAreaContext);
+      _tourTooltip.setHoveredContext(_tourTooltip_HoveredAreaContext);
 
-      if (_hoveredAreaContext != null) {
+      if (_tourTooltip_HoveredAreaContext != null) {
          redraw();
       }
 
@@ -7766,10 +7846,10 @@ public class Map2 extends Canvas {
        * Hide hovered area, this must be done because when a tile do not contain a way point, the
        * hovered area can sill be displayed when another position is set with setMapCenter()
        */
-      if (oldHoveredContext != null && _hoveredAreaContext == null) {
+      if (oldHoveredContext != null && _tourTooltip_HoveredAreaContext == null) {
 
          // update tool tip because it has it's own mouse move listener for the map
-         _tour_ToolTip.hideHoveredArea();
+         _tourTooltip.hideHoveredArea();
 
          redraw();
       }

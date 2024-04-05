@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class TourLocationUI {
 
-   private TourLocationUI() {}
+   public TourLocationUI() {}
 
    /**
     * Create a UI to list all available tour location fields

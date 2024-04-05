@@ -26,6 +26,7 @@ import net.tourbook.common.util.NatTable_LabelProvider_WithLocationTooltip;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
+import net.tourbook.map.location.LocationType;
 import net.tourbook.map.location.SlideoutMapLocation;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.location.TourLocationView.LocationItem;
@@ -55,8 +56,6 @@ public class TourLocationToolTip extends ToolTip {
 
    private static final String USAGE_VALUES = "%d   ∙   %d   ∙   %d"; //$NON-NLS-1$
 
-   private static final int    SHELL_MARGIN = 5;
-
    private Control             _ttControl;
 
    private ColumnViewer        _columnViewer;
@@ -81,6 +80,7 @@ public class TourLocationToolTip extends ToolTip {
    private Point        _natTooltipCellPos;
 
    private TourLocation _tourLocation;
+   private LocationType _locationType;
 
    private String       _hoveredLocation_Start;
    private String       _hoveredLocation_End;
@@ -214,16 +214,11 @@ public class TourLocationToolTip extends ToolTip {
 
             String locationTitle;
 
-            if (_isTourBookView) {
-
-               locationTitle = _isStartLocation
-
-                     ? Messages.Tour_Tooltip_Label_LocationStart
-                     : Messages.Tour_Tooltip_Label_LocationEnd;
-
-            } else {
-
-               locationTitle = Messages.Tour_Location_Tooltip_Title;
+            switch (_locationType) {
+            case Address   -> locationTitle = Messages.Tour_Location_Label_AddressLocation; //  Address Location
+            case TourStart -> locationTitle = Messages.Tour_Tooltip_Label_LocationStart; //     Start Location
+            case TourEnd   -> locationTitle = Messages.Tour_Tooltip_Label_LocationEnd; //       End Location
+            default        -> locationTitle = Messages.Tour_Location_Tooltip_Title; //          Tour Location
             }
 
             // using text control that & is not displayed as mnemonic
@@ -428,6 +423,8 @@ public class TourLocationToolTip extends ToolTip {
    @Override
    protected Object getToolTipArea(final Event event) {
 
+      _locationType = LocationType.Tour;
+
       Object ttArea;
 
       if (_isNatTableView) {
@@ -457,6 +454,8 @@ public class TourLocationToolTip extends ToolTip {
             // tourbook view
 
             _isStartLocation = tooltipLabelProvider.isStartLocation;
+
+            _locationType = _isStartLocation ? LocationType.TourStart : LocationType.TourEnd;
 
             _isShowTooltip = tooltipLabelProvider.isShowTooltip();
 
@@ -492,6 +491,8 @@ public class TourLocationToolTip extends ToolTip {
             if (cellElement instanceof final TourLocation tourLocation) {
 
                _tourLocation = tourLocation;
+
+               _locationType = LocationType.Address;
             }
 
          } else {
@@ -551,6 +552,8 @@ public class TourLocationToolTip extends ToolTip {
             }
 
             _isStartLocation = tooltipLabelProvider.isStartLocation;
+
+            _locationType = _isStartLocation ? LocationType.TourStart : LocationType.TourEnd;
 
          } else {
 
