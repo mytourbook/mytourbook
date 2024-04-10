@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2017, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,6 +32,11 @@ public class MTFont {
 
    private static Font        _bannerFont;
    private static Font        _headerFont;
+   private static Font        _titleFont;
+
+   private static int         _bannerFontHeight;
+   private static int         _headerFontHeight;
+   private static int         _titleFontHeight;
 
    static {
 
@@ -40,12 +45,9 @@ public class MTFont {
 
    private static void dispose() {
 
-      if (_bannerFont != null) {
-         _bannerFont.dispose();
-      }
-      if (_headerFont != null) {
-         _headerFont.dispose();
-      }
+      UI.disposeResource(_bannerFont);
+      UI.disposeResource(_headerFont);
+      UI.disposeResource(_titleFont);
    }
 
    /**
@@ -111,11 +113,45 @@ public class MTFont {
       System.out.println((UI.timeStampNano() + " [" + "] ") + ("\t" + Arrays.toString(fontData))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
    }
 
+   public static Font getBannerFont() {
+      return _bannerFont;
+   }
+
+   public static int getBannerFontHeight() {
+      return _bannerFontHeight;
+   }
+
+   public static Font getHeaderFont() {
+      return _headerFont;
+   }
+
+   public static int getHeaderFontHeight() {
+      return _headerFontHeight;
+   }
+
+   public static Font getTitleFont() {
+      return _titleFont;
+   }
+
+   public static int getTitleFontHeight() {
+      return _titleFontHeight;
+   }
+
+   /**
+    * The banner font height is 1.3 larger than the default font
+    *
+    * @param control
+    */
    public static void setBannerFont(final Control control) {
 
       control.setFont(_bannerFont);
    }
 
+   /**
+    * The header font height is 1.7 larger than the default font
+    *
+    * @param control
+    */
    public static void setHeaderFont(final Control control) {
 
       control.setFont(_headerFont);
@@ -134,13 +170,19 @@ public class MTFont {
          }
       });
 
-      final FontData[] allDefaultFontData = JFaceResources.getDefaultFontDescriptor().getFontData();
-      final FontData[] allBannerFontData = JFaceResources.getBannerFont().getFontData();
-      final FontData[] allHeaderFontData = JFaceResources.getHeaderFontDescriptor().getFontData();
+// SET_FORMATTING_OFF
 
-      final FontData defaultFontData = allDefaultFontData[0];
-      final FontData bannerFontData = allBannerFontData[0];
-      final FontData headerFontData = allHeaderFontData[0];
+      final FontData[] allDefaultFontData    = JFaceResources.getDefaultFontDescriptor().getFontData();
+      final FontData[] allTitleFontData      = JFaceResources.getDefaultFontDescriptor().getFontData();
+      final FontData[] allBannerFontData     = JFaceResources.getBannerFont().getFontData();
+      final FontData[] allHeaderFontData     = JFaceResources.getHeaderFontDescriptor().getFontData();
+
+      final FontData defaultFontData   = allDefaultFontData[0];
+      final FontData titleFontData     = allTitleFontData[0];
+      final FontData bannerFontData    = allBannerFontData[0];
+      final FontData headerFontData    = allHeaderFontData[0];
+
+// SET_FORMATTING_ON
 
       /*
        * Use the same font name, win10 is using MS Sans Serif for banner/header font which looks
@@ -149,12 +191,20 @@ public class MTFont {
       final String defaultName = defaultFontData.getName();
       final int defaultHeight = defaultFontData.getHeight();
 
+      _titleFontHeight = (int) (defaultHeight * 1.2);
+      _bannerFontHeight = (int) (defaultHeight * 1.3);
+      _headerFontHeight = (int) (defaultHeight * 1.7);
+
       bannerFontData.setName(defaultName);
-      bannerFontData.setHeight((int) (defaultHeight * 1.3));
+      bannerFontData.setHeight(_bannerFontHeight);
 
       headerFontData.setName(defaultName);
-      headerFontData.setHeight((int) (defaultHeight * 1.7));
+      headerFontData.setHeight(_headerFontHeight);
 
+      titleFontData.setName(defaultName);
+      titleFontData.setHeight(_titleFontHeight);
+
+      _titleFont = new Font(display, titleFontData);
       _bannerFont = new Font(display, bannerFontData);
       _headerFont = new Font(display, headerFontData);
    }

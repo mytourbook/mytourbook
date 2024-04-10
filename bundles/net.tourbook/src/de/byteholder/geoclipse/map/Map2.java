@@ -369,6 +369,7 @@ public class Map2 extends Canvas {
       _nfLatLon.setMinimumFractionDigits(4);
       _nfLatLon.setMaximumFractionDigits(4);
    }
+
    private final TextWrapPainter                      _textWrapper               = new TextWrapPainter();
 
    /**
@@ -504,7 +505,6 @@ public class Map2 extends Canvas {
     * Map locations
     */
    private MapLocationToolTip _mapLocation_Tooltip;
-   private PaintedMapLocation _mapLocation_Hovered;
 
    /**
     * Hovered/selected tour
@@ -2978,12 +2978,6 @@ public class Map2 extends Canvas {
 
          redraw();
 
-//      } else if (_directMapPainterContext.hoveredMapLocation != null) {
-//
-//         // map location is hovered
-//
-//         _mapLocation_Hovered = _directMapPainterContext.hoveredMapLocation;
-
       } else if (_isShowHoveredOrSelectedTour
 
             && _isShowBreadcrumbs
@@ -3621,63 +3615,75 @@ public class Map2 extends Canvas {
 
       // draw map image to the screen
 
-      if ((_mapImage != null) && !_mapImage.isDisposed()) {
+      if (_mapImage == null || _mapImage.isDisposed()) {
+         return;
+      }
 
-         final GC gc = event.gc;
 
-         gc.drawImage(_mapImage, 0, 0);
+      final GC gc = event.gc;
 
-         if (_directMapPainter != null) {
+//      final long start = System.nanoTime();
 
-            // is drawing sliders in map/legend
+      gc.drawImage(_mapImage, 0, 0);
 
-            _directMapPainterContext.gc = gc;
-            _directMapPainterContext.viewport = _worldPixel_TopLeft_Viewport;
 
-            _directMapPainter.paint(_directMapPainterContext);
-         }
+      if (_directMapPainter != null) {
 
-         if (_tourTooltip_HoveredAreaContext != null) {
-            final Image hoveredImage = _tourTooltip_HoveredAreaContext.hoveredImage;
-            if (hoveredImage != null) {
+         // is drawing sliders in map/legend
 
-               gc.drawImage(hoveredImage,
-                     _tourTooltip_HoveredAreaContext.hoveredTopLeftX,
-                     _tourTooltip_HoveredAreaContext.hoveredTopLeftY);
-            }
-         }
+         _directMapPainterContext.gc = gc;
+         _directMapPainterContext.mapViewport = _worldPixel_TopLeft_Viewport;
 
-         if (_isPoiVisible && _poi_Tooltip != null) {
-            if (_isPoiPositionInViewport = updatePoiImageDevPosition()) {
-               gc.drawImage(_poiImage, _poiImageDevPosition.x, _poiImageDevPosition.y);
-            }
-         }
+         _directMapPainter.paint(_directMapPainterContext);
+      }
 
-         if (_offline_IsPaintOfflineArea) {
-            paint_OfflineArea(gc);
-         }
+      if (_tourTooltip_HoveredAreaContext != null) {
+         final Image hoveredImage = _tourTooltip_HoveredAreaContext.hoveredImage;
+         if (hoveredImage != null) {
 
-         final boolean isPaintTourInfo = paint_HoveredTour(gc);
-
-         _geoGrid_Label_Outline = null;
-         _geoGrid_Action_Outline = null;
-         if (_geoGrid_Data_Selected != null) {
-            paint_GeoGrid_10_Selected(gc, _geoGrid_Data_Selected);
-         }
-         if (_geoGrid_Data_Hovered != null) {
-            paint_GeoGrid_20_Hovered(gc, _geoGrid_Data_Hovered);
-         }
-
-         // paint tooltip icon in the map
-         if (_tourTooltip != null) {
-            _tourTooltip.paint(gc, _clientArea);
-         }
-
-         // paint info AFTER hovered/selected tour
-         if (isPaintTourInfo) {
-            paint_HoveredTour_50_TourInfo(gc);
+            gc.drawImage(hoveredImage,
+                  _tourTooltip_HoveredAreaContext.hoveredTopLeftX,
+                  _tourTooltip_HoveredAreaContext.hoveredTopLeftY);
          }
       }
+
+      if (_isPoiVisible && _poi_Tooltip != null) {
+         if (_isPoiPositionInViewport = updatePoiImageDevPosition()) {
+            gc.drawImage(_poiImage, _poiImageDevPosition.x, _poiImageDevPosition.y);
+         }
+      }
+
+      if (_offline_IsPaintOfflineArea) {
+         paint_OfflineArea(gc);
+      }
+
+      final boolean isPaintTourInfo = paint_HoveredTour(gc);
+
+      _geoGrid_Label_Outline = null;
+      _geoGrid_Action_Outline = null;
+      if (_geoGrid_Data_Selected != null) {
+         paint_GeoGrid_10_Selected(gc, _geoGrid_Data_Selected);
+      }
+      if (_geoGrid_Data_Hovered != null) {
+         paint_GeoGrid_20_Hovered(gc, _geoGrid_Data_Hovered);
+      }
+
+      // paint tooltip icon in the map
+      if (_tourTooltip != null) {
+         _tourTooltip.paint(gc, _clientArea);
+      }
+
+      // paint info AFTER hovered/selected tour
+      if (isPaintTourInfo) {
+         paint_HoveredTour_50_TourInfo(gc);
+      }
+
+//      final long end = System.nanoTime();
+//
+//      System.out.println((UI.timeStampNano() + " " + this.getClass().getName() + " \t")
+//            + (((float) (end - start) / 1000000) + " ms")
+//            + " " + _mapImage.getBounds());
+//      // TODO remove SYSTEM.OUT.PRINTLN
    }
 
    private void onResize() {
@@ -3799,12 +3805,13 @@ public class Map2 extends Canvas {
 
       } catch (final Exception e) {
 
-         e.printStackTrace();
+         StatusUtil.log(e);
 
          // map image is corrupt
          _mapImage.dispose();
 
       } finally {
+
          if (gcMapImage != null) {
             gcMapImage.dispose();
          }

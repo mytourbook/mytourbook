@@ -148,11 +148,20 @@ public class MapLocationToolTip extends ToolTip {
 
       if (_hoveredItem != null) {
 
+         final Display display = _map2.getDisplay();
+
+         final int tipSizeWidth = tipSize.x;
+         final int tipSizeHeight = tipSize.y;
+
+         final Point devMouse = _map2.toControl(display.getCursorLocation());
+         final int devMouseX = devMouse.x;
+
          final Rectangle itemBounds = _hoveredItem.locationRectangle;
          final int itemWidth2 = itemBounds.width / 2;
          final int itemHeight = itemBounds.height;
 
-         final int devXDefault = itemBounds.x + itemWidth2;
+         // center horizontally to the mouse position
+         final int devXDefault = devMouseX - tipSizeWidth / 2;
          final int devY = itemBounds.y + itemHeight;
 
          /*
@@ -167,11 +176,9 @@ public class MapLocationToolTip extends ToolTip {
             isDevXAdjusted = true;
          }
 
-         final Rectangle displayBounds = _map2.getDisplay().getBounds();
+         final Rectangle displayBounds = display.getBounds();
 
          Point ttDisplayLocation = _map2.toDisplay(devX, devY);
-         final int tipSizeWidth = tipSize.x;
-         final int tipSizeHeight = tipSize.y;
 
          if (ttDisplayLocation.x + tipSizeWidth > displayBounds.width) {
 

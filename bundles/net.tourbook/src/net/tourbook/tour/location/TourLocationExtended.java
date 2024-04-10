@@ -15,20 +15,35 @@
  *******************************************************************************/
 package net.tourbook.tour.location;
 
+import java.util.List;
+
 import net.tourbook.common.UI;
+import net.tourbook.common.ui.FormattedWord;
 import net.tourbook.data.TourLocation;
 import net.tourbook.map.location.LocationType;
+
+import org.eclipse.swt.graphics.Point;
 
 /**
  * Wrapper for a {@link TourLocation} with additional data
  */
 public class TourLocationExtended {
 
-   private static final char NL = UI.NEW_LINE;
+   private static final char  NL = UI.NEW_LINE;
 
-   public TourLocation       tourLocation;
+   public TourLocation        tourLocation;
 
-   public LocationType       locationType;
+   public LocationType        locationType;
+
+   /**
+    * All words which are painted in the map for this location
+    */
+   public List<FormattedWord> allFormattedLocationNameWords;
+
+   /**
+    * Bounding box for {@link #allFormattedLocationNameWords}
+    */
+   public Point               locationNameBoundingBox;
 
    @SuppressWarnings("unused")
    private TourLocationExtended() {}

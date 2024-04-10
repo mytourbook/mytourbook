@@ -4,7 +4,9 @@
 TODO's
 ======               
 
- * [Tour Location] Automatically create tour locations for longer pauses in a tour 
+* 
+
+* [Tour Location] Automatically create tour locations for longer pauses in a tour 
    https://github.com/mytourbook/mytourbook/issues/1306 
  
 * Support colomn width = 0
@@ -36,7 +38,7 @@ TODO's
                   - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
                     mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
 
-
+				  - Do the data backup with a zip file which contains all db files
 Issues
 ======
 
@@ -79,12 +81,6 @@ Improvements
   - Customize column alignment in all views which are using the column manager
   - Set column alignment in the viewer header context menu
     https://github.com/mytourbook/mytourbook/issues/1300  
-
-* Start/End Location
-  - Automatically retieve and set start/end locations in the easy import
-  - Retrieve, manage and show start/end locations in tour editor
-  - Scramble tour location view
-    https://github.com/mytourbook/mytourbook/issues/878
     
 * Fit Import
   - Import device sensors which do not contain a serial number

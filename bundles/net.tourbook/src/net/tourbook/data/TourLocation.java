@@ -35,6 +35,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.location.LocationPartID;
 import net.tourbook.tour.location.PartItem;
@@ -405,6 +406,12 @@ public class TourLocation implements Serializable {
    private long          _createId;
 
    /**
+    * Name which is displayed in the map
+    */
+   @Transient
+   private String        _mapName;
+
+   /**
     * Default constructor used also in ejb
     */
    public TourLocation() {}
@@ -514,6 +521,25 @@ public class TourLocation implements Serializable {
                   : 0;
 
       return longitudeDiff;
+   }
+
+   /**
+    * @return Returns a name which is displayed in the map
+    *
+    */
+   public String getMapName() {
+
+      if (_mapName != null) {
+         return _mapName;
+      }
+
+      if (StringUtils.hasContent(name)) {
+         _mapName = name;
+      } else {
+         _mapName = settlementSmall;
+      }
+
+      return _mapName;
    }
 
    /**

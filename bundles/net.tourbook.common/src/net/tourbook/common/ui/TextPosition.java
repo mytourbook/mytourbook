@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,35 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package de.byteholder.geoclipse.map;
+package net.tourbook.common.ui;
 
-import java.util.ArrayList;
-import java.util.List;
+public enum TextPosition {
 
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Rectangle;
-
-public class DirectPainterContext {
-
-   /**
-    * GC in the onPaint event
-    */
-   public GC                       gc;
-
-   /**
-    * Viewport for the current map image in world pixel
-    */
-   public Rectangle                mapViewport;
-
-   /**
-    * All map locations which are painted in the viewport
-    */
-   public List<PaintedMapLocation> allPaintedMapLocations = new ArrayList<>();
-
-   /**
-    * {@link PaintedMapLocation} which is hovered with the mouse, can be <code>null</code> when it's
-    * not hovered
-    */
-   public PaintedMapLocation       hoveredMapLocation;
-
+   Top, //
+   Left, //
+   Right, //
+   Bottom, //
 }

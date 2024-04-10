@@ -29,8 +29,12 @@ import java.util.Map;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorProviderConfig;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.ui.FormattedWord;
+import net.tourbook.common.ui.TextWrapPainter;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.map2.Messages;
@@ -65,15 +69,25 @@ public class DirectMappingPainter implements IDirectPainter {
 
    private List<TourLocationExtended> _allAddressLocations;
    private List<TourLocationExtended> _allTourLocations;
+   private int                        _mapLocationLineHeight    = MTFont.getTitleFontHeight() + 3;
 
    private SliderPathPaintingData     _sliderPathPaintingData;
 
-   private Map<Long, Color>           _locationColors = new HashMap<>();
+   private Map<Long, Color>           _locationColors           = new HashMap<>();
    private int                        _colorSwitchCounter;
 
    private boolean                    _isMapBackgroundDark;
 
    private Rectangle                  _imageMapLocationBounds;
+
+   private TextWrapPainter            _textWrapPainter;
+
+   private Color                      _nameColor_Dark           = new Color(222, 255, 134);
+   private Color                      _nameColor_Dark_Shadow    = new Color(0, 0, 0);
+   private Color                      _nameColor_Dark_Hovered   = new Color(255, 255, 255);
+   private Color                      _nameColor_Bright         = new Color(41, 54, 0);
+   private Color                      _nameColor_Bright_Shadow  = new Color(255, 255, 255);
+   private Color                      _nameColor_Bright_Hovered = new Color(137, 173, 39);
 
    /*
     * UI resources
@@ -111,6 +125,8 @@ public class DirectMappingPainter implements IDirectPainter {
 // SET_FORMATTING_ON
 
       _imageMapLocationBounds = _imageMapLocation_Hovered.getBounds();
+
+      _textWrapPainter = new TextWrapPainter();
    }
 
    /**
@@ -227,28 +243,34 @@ public class DirectMappingPainter implements IDirectPainter {
       final int zoomLevel = _map.getZoom();
 
       final GC gc = painterContext.gc;
-      final Rectangle viewport = painterContext.viewport;
-      final int viewportX = viewport.x;
-      final int viewportY = viewport.y;
+      final Rectangle mapViewport = painterContext.mapViewport;
+      final int viewportX = mapViewport.x;
+      final int viewportY = mapViewport.y;
 
       gc.setAntialias(SWT.ON);
       gc.setLineWidth(2);
+      gc.setFont(MTFont.getTitleFont());
+
+      final Color textColor = _isMapBackgroundDark ? _nameColor_Dark : _nameColor_Bright;
+      final Color hoveredColor = _isMapBackgroundDark ? _nameColor_Dark_Hovered : _nameColor_Bright_Hovered;
+      final Color shadowColor = _isMapBackgroundDark ? _nameColor_Dark_Shadow : _nameColor_Bright_Shadow;
 
       // use different colors each time
       if (_colorSwitchCounter++ % 50 == 0) {
          _locationColors.clear();
       }
 
-      /*
-       * Setup hovered map location
-       */
+      // setup hovered map location
       final PaintedMapLocation hoveredMapLocation = painterContext.hoveredMapLocation;
+      Rectangle hoveredLocation = null;
+      Rectangle hoveredTextLocation = null;
+      List<FormattedWord> hoveredTexts = null;
+      int hoveredIconX = 0;
+      int hoveredIconY = 0;
 
       final int imageWidth = _imageMapLocationBounds.width;
       final int imageHeight = _imageMapLocationBounds.height;
       final int imageWidth2 = imageWidth / 2;
-
-      Rectangle hoveredLocation = null;
 
       for (final TourLocationExtended tourLocationExtended : allTourLocations) {
 
@@ -267,12 +289,12 @@ public class DirectMappingPainter implements IDirectPainter {
          final Point providedBBox_BottomRight_Resized = convertGeoPoint(mp, latitudeMax_Resized, longitudeMax_Resized, zoomLevel);
 
          // check if location is visible
-         if (viewport.contains(requestedLocation)
+         if (mapViewport.contains(requestedLocation)
 
-               || viewport.contains(providedBBox_TopLeft_Resized)
-               || viewport.contains(providedBBox_TopRight_Resized)
-               || viewport.contains(providedBBox_BottomLeft_Resized)
-               || viewport.contains(providedBBox_BottomRight_Resized)
+               || mapViewport.contains(providedBBox_TopLeft_Resized)
+               || mapViewport.contains(providedBBox_TopRight_Resized)
+               || mapViewport.contains(providedBBox_BottomLeft_Resized)
+               || mapViewport.contains(providedBBox_BottomRight_Resized)
 
          ) {
 
@@ -361,13 +383,13 @@ public class DirectMappingPainter implements IDirectPainter {
                }
             }
 
-            final int devX = requestedDevX - imageWidth2;
-            final int devY = requestedDevY - imageHeight;
+            final int iconDevX = requestedDevX - imageWidth2;
+            final int iconDevY = requestedDevY - imageHeight;
 
             final Rectangle paintedRectangle = new Rectangle(
 
-                  devX,
-                  devY,
+                  iconDevX,
+                  iconDevY,
 
                   imageWidth,
                   imageHeight);
@@ -375,29 +397,79 @@ public class DirectMappingPainter implements IDirectPainter {
             // draw location image
             switch (tourLocationExtended.locationType) {
 
-            case Address   -> gc.drawImage(_imageMapLocation_Address, devX, devY);
-            case TourStart -> gc.drawImage(_imageMapLocation_Start, devX, devY);
-            case TourEnd   -> gc.drawImage(_imageMapLocation_End, devX, devY);
+            case Address   -> gc.drawImage(_imageMapLocation_Address, iconDevX, iconDevY);
+            case TourStart -> gc.drawImage(_imageMapLocation_Start, iconDevX, iconDevY);
+            case TourEnd   -> gc.drawImage(_imageMapLocation_End, iconDevX, iconDevY);
 
-            default        -> gc.drawImage(_imageMapLocation, devX, devY);
+            default        -> gc.drawImage(_imageMapLocation, iconDevX, iconDevY);
             }
+
+            // check if location name is formatted
+            if (tourLocationExtended.allFormattedLocationNameWords == null) {
+
+               setupMapLocationName(gc, tourLocationExtended);
+
+               // reset clipping
+               gc.setClipping((Rectangle) null);
+            }
+
+            Rectangle paintedTopLeftPos = null;
+
+            final List<FormattedWord> allFormattedLocationNameWords = tourLocationExtended.allFormattedLocationNameWords;
+            if (allFormattedLocationNameWords.size() > 0) {
+
+               final Point locationNameBoundingBox = tourLocationExtended.locationNameBoundingBox;
+
+               paintedTopLeftPos = _textWrapPainter.drawPreformattedText(
+
+                     gc,
+
+                     iconDevX,
+                     iconDevY,
+
+                     tourLocationExtended.allFormattedLocationNameWords,
+                     locationNameBoundingBox,
+
+                     _imageMapLocationBounds,
+                     _mapLocationLineHeight,
+
+                     textColor,
+                     shadowColor
+
+               );
+
+               paintedRectangle.add(paintedTopLeftPos);
+            }
+
+            // keep location for mouse actions
+            painterContext.allPaintedMapLocations.add(new PaintedMapLocation(tourLocationExtended, paintedRectangle));
 
             if (hoveredMapLocation != null && paintedRectangle.equals(hoveredMapLocation.locationRectangle)) {
 
                // map location is hovered
 
                hoveredLocation = paintedRectangle;
+               hoveredTextLocation = paintedTopLeftPos;
+               hoveredIconX = iconDevX;
+               hoveredIconY = iconDevY;
+               hoveredTexts = tourLocationExtended.allFormattedLocationNameWords;
             }
-
-            // keep location for mouse actions
-            painterContext.allPaintedMapLocations.add(new PaintedMapLocation(tourLocationExtended, paintedRectangle));
          }
       }
 
-      // draw hovered location image
+      // draw hovered location icon + text
       if (hoveredLocation != null) {
 
-         gc.drawImage(_imageMapLocation_Hovered, hoveredLocation.x, hoveredLocation.y);
+         gc.drawImage(_imageMapLocation_Hovered, hoveredIconX, hoveredIconY);
+
+         if (hoveredTextLocation != null) {
+
+            _textWrapPainter.drawFormattedText(gc,
+                  hoveredTextLocation.x,
+                  hoveredTextLocation.y,
+                  hoveredTexts,
+                  hoveredColor);
+         }
       }
    }
 
@@ -437,7 +509,7 @@ public class DirectMappingPainter implements IDirectPainter {
       final Point worldPixelMarker = new Point(worldPixelMarkerAWT.x, worldPixelMarkerAWT.y);
 
       // check if slider is visible
-      final Rectangle viewport = painterContext.viewport;
+      final Rectangle viewport = painterContext.mapViewport;
       if (viewport.contains(worldPixelMarker)) {
 
          // convert world position into device position
@@ -532,7 +604,7 @@ public class DirectMappingPainter implements IDirectPainter {
          lastSliderValueIndex = rightSliderValueIndex;
       }
 
-      final Rectangle viewport = painterContext.viewport;
+      final Rectangle viewport = painterContext.mapViewport;
 
       final int numMaxSegments = _sliderPathPaintingData.segments;
 
@@ -670,7 +742,7 @@ public class DirectMappingPainter implements IDirectPainter {
       final float numSlices = lastValueIndex - firstValueIndex;
       final int numSegments = (int) Math.min(numMaxSegments, numSlices);
 
-      final Rectangle viewport = painterContext.viewport;
+      final Rectangle viewport = painterContext.mapViewport;
 
       // get world position for the slider coordinates
       final java.awt.Point wpLeftSliderAWT = mp.geoToPixel(new GeoPosition(
@@ -926,5 +998,104 @@ public class DirectMappingPainter implements IDirectPainter {
    public void setTourLocations(final List<TourLocationExtended> allLocations) {
 
       _allTourLocations = allLocations;
+   }
+
+   private void setupMapLocationName(final GC gc, final TourLocationExtended tourLocationExtended) {
+
+      final TourLocation tourLocation = tourLocationExtended.tourLocation;
+
+      final int numLines = 3;
+      final int maxLineWidth = 130;
+
+      final int viewportWidth = UI.IS_4K_DISPLAY ? maxLineWidth * 2 : maxLineWidth;
+      final int viewportHeight = _mapLocationLineHeight * numLines;
+
+      final List<FormattedWord> allFormattedWords = _textWrapPainter.formatText(
+
+            gc,
+            tourLocation.getMapName(),
+
+            viewportWidth,
+            viewportHeight,
+
+            _mapLocationLineHeight,
+            null, //             overlapRect
+
+            true, //             isTruncateText
+            numLines);
+
+      final int numWords = allFormattedWords.size();
+
+      if (numWords == 0) {
+
+         tourLocationExtended.allFormattedLocationNameWords = allFormattedWords;
+         tourLocationExtended.locationNameBoundingBox = null;
+
+         return;
+      }
+
+      int boundingBoxWidth = 0;
+      int boundingBoxHeight = 0;
+
+      /*
+       * Get bounding box for the location name words
+       */
+      for (final FormattedWord formattedWord : allFormattedWords) {
+
+         final int wordXRight = formattedWord.devX + formattedWord.wordWidth;
+         final int wordYBottom = formattedWord.devY + _mapLocationLineHeight;
+
+         if (wordXRight > boundingBoxWidth) {
+
+            boundingBoxWidth = wordXRight;
+         }
+
+         if (wordYBottom > boundingBoxHeight) {
+            boundingBoxHeight = wordYBottom;
+         }
+      }
+
+      /*
+       * Get line width for each line
+       */
+      final int maxLines = allFormattedWords.get(numWords - 1).line;
+      final int[] lineTextWidth = new int[maxLines + 1];
+
+      int currentLine = 0;
+      int formattedLineWidth = 0;
+
+      for (final FormattedWord formattedWord : allFormattedWords) {
+
+         if (currentLine == formattedWord.line) {
+
+            formattedLineWidth += formattedWord.wordWidth;
+
+         } else {
+
+            // setup next line
+            lineTextWidth[currentLine] = formattedLineWidth;
+
+            currentLine = formattedWord.line;
+
+            formattedLineWidth = formattedWord.wordWidth;
+         }
+      }
+
+      lineTextWidth[currentLine] = formattedLineWidth;
+
+      /*
+       * Set line offset into each word, this offset is used to paint the text right aligned
+       */
+      for (final FormattedWord formattedWord : allFormattedWords) {
+
+         currentLine = formattedWord.line;
+
+         final int lineOffset = boundingBoxWidth - lineTextWidth[currentLine];
+
+         formattedWord.lineHorizontalOffset = lineOffset;
+      }
+
+      tourLocationExtended.allFormattedLocationNameWords = allFormattedWords;
+      tourLocationExtended.locationNameBoundingBox = new Point(boundingBoxWidth, boundingBoxHeight);
    }
 }
