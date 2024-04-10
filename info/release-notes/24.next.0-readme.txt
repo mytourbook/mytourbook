@@ -98,7 +98,7 @@ Improvements
 * Tour Book
   - Show powertrain L-R balance values separately
     https://github.com/mytourbook/mytourbook/issues/1271    
-  - Show weather air quaility
+  - Show weather air quality
     https://github.com/mytourbook/mytourbook/issues/1296
 
 * Tour Blog (Frederic)
