@@ -23,6 +23,9 @@ public class PaintedMapLocation {
 
    public TourLocationExtended tourLocationExtended;
 
+   /**
+    * Map location rectangle with icon and text
+    */
    public Rectangle            locationRectangle;
 
    public PaintedMapLocation(final TourLocationExtended tourLocationExtended,

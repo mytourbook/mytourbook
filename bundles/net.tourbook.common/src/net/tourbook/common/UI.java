@@ -2485,17 +2485,13 @@ public class UI {
             ? 4
             : 0;
 
-// SET_FORMATTING_OFF
-
       switch (alignment) {
 
-      case SWT.CENTER   -> {  xOffset = ((availableWidth - imageWidth2) / 2) - horizontalOSOffset;   }
-      case SWT.RIGHT    -> {  xOffset = availableWidth - imageWidth;          }
-      default           -> {  xOffset = 2;                                    }  // == left alignment
+      case SWT.CENTER -> xOffset = ((availableWidth - imageWidth2) / 2) - horizontalOSOffset;
+      case SWT.RIGHT  -> xOffset = availableWidth - imageWidth;
+      default         -> xOffset = 2; // == left alignment
 
       }
-
-// SET_FORMATTING_ON
 
       /*
        * Vertical alignment: centered

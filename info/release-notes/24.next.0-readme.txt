@@ -4,7 +4,9 @@
 TODO's
 ======               
 
- * [Tour Location] Automatically create tour locations for longer pauses in a tour 
+* 
+
+* [Tour Location] Automatically create tour locations for longer pauses in a tour 
    https://github.com/mytourbook/mytourbook/issues/1306 
  
 * Support column width = 0
@@ -36,7 +38,7 @@ TODO's
                   - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
                     mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
 
-
+				  - Do the data backup with a zip file which contains all db files
 Issues
 ======
 
