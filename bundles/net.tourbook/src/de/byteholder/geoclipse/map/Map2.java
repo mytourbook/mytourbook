@@ -959,14 +959,14 @@ public class Map2 extends Canvas {
 
       // check if we could reuse the existing image
 
-      if ((image == null) || image.isDisposed()) {
+      if (image == null || image.isDisposed()) {
          return false;
       }
 
       // image exist, check image bounds
       final Rectangle oldBounds = image.getBounds();
 
-      if (!((oldBounds.width == clientArea.width) && (oldBounds.height == clientArea.height))) {
+      if (!(oldBounds.width == clientArea.width && oldBounds.height == clientArea.height)) {
          return false;
       }
 
@@ -3615,17 +3615,15 @@ public class Map2 extends Canvas {
 
       // draw map image to the screen
 
+      final long start = System.nanoTime();
+
       if (_mapImage == null || _mapImage.isDisposed()) {
          return;
       }
 
-
       final GC gc = event.gc;
 
-//      final long start = System.nanoTime();
-
       gc.drawImage(_mapImage, 0, 0);
-
 
       if (_directMapPainter != null) {
 
@@ -3678,12 +3676,11 @@ public class Map2 extends Canvas {
          paint_HoveredTour_50_TourInfo(gc);
       }
 
-//      final long end = System.nanoTime();
-//
-//      System.out.println((UI.timeStampNano() + " " + this.getClass().getName() + " \t")
-//            + (((float) (end - start) / 1000000) + " ms")
-//            + " " + _mapImage.getBounds());
-//      // TODO remove SYSTEM.OUT.PRINTLN
+      final long end = System.nanoTime();
+
+//      System.out.println(UI.timeStampNano() + " onPaint() - %7.3f ms".formatted((float) (end - start) / 1000000));
+      // TODO remove SYSTEM.OUT.PRINTLN
+
    }
 
    private void onResize() {
@@ -3768,9 +3765,12 @@ public class Map2 extends Canvas {
    }
 
    /**
-    * Draws map tiles/legend/scale into the map image which is displayed in the SWT paint event.
+    * Draws map tiles/legend/scale into the map image {@link #_mapImage} which is displayed in the
+    * SWT paint event.
     */
    private void paint_10_PaintMapImage() {
+
+      final long start = System.nanoTime();
 
       if (isDisposed()) {
          return;
@@ -3782,7 +3782,9 @@ public class Map2 extends Canvas {
 
          // check or create map image
          final Image image = _mapImage;
-         if ((image == null) || image.isDisposed() || (canReuseImage(image, _clientArea) == false)) {
+
+         if (image == null || image.isDisposed() || canReuseImage(image, _clientArea) == false) {
+
             _mapImage = createMapImage(_display, image, _clientArea);
          }
 
@@ -3820,6 +3822,12 @@ public class Map2 extends Canvas {
       redraw();
 
       _lastMapDrawTime = System.currentTimeMillis();
+
+      final long end = System.nanoTime();
+
+      System.out.println(UI.timeStampNano() + " paint_10_PaintMapImage()  - %7.3f ms".formatted((float) (end - start) / 1000000));
+// TODO remove SYSTEM.OUT.PRINTLN
+
    }
 
    /**
@@ -3828,6 +3836,10 @@ public class Map2 extends Canvas {
     * @param gcMapImage
     */
    private void paint_30_Tiles(final GC gcMapImage) {
+
+//      final long start = System.nanoTime();
+
+      int numTiles = 0;
 
       for (int tilePosX = _tilePos_MinX, tileIndexX = 0; tilePosX <= _tilePos_MaxX; tilePosX++, tileIndexX++) {
          for (int tilePosY = _tilePos_MinY, tileIndexY = 0; tilePosY <= _tilePos_MaxY; tilePosY++, tileIndexY++) {
@@ -3854,6 +3866,8 @@ public class Map2 extends Canvas {
 
                   _allPaintedTiles[tileIndexX][tileIndexY] = paintedTile;
 
+                  numTiles++;
+
                } else {
 
                   gcMapImage.setBackground(_defaultBackgroundColor);
@@ -3862,6 +3876,14 @@ public class Map2 extends Canvas {
             }
          }
       }
+
+      final long end = System.nanoTime();
+
+//      System.out.println(UI.timeStampNano() + " paint_30_Tiles - %7.3f ms - numTiles: %d".formatted(
+//            (float) (end - start) / 1000000,
+//            numTiles));
+      // TODO remove SYSTEM.OUT.PRINTLN
+
    }
 
    private void paint_40_Legend(final GC gc) {
@@ -5264,7 +5286,7 @@ public class Map2 extends Canvas {
 
       _overlayImageCache = new OverlayImageCache();
 
-      _overlayThread = new Thread("PaintOverlayImages") { //$NON-NLS-1$
+      _overlayThread = new Thread("Paint Overlay Images") { //$NON-NLS-1$
          @Override
          public void run() {
 
@@ -5293,7 +5315,7 @@ public class Map2 extends Canvas {
                } catch (final InterruptedException e) {
                   interrupt();
                } catch (final Exception e) {
-                  e.printStackTrace();
+                  StatusUtil.log(e);
                }
             }
          }
@@ -5331,10 +5353,19 @@ public class Map2 extends Canvas {
 
             try {
 
+//               final long start = System.nanoTime();
+
                paint_Overlay_20_Tiles();
 
+//               final long end = System.nanoTime();
+//
+//               System.out.println(UI.timeStampNano() + " paint_Overlay_20_Tiles - %7.3f ms".formatted((float) (end - start) / 1000000));
+//// TODO remove SYSTEM.OUT.PRINTLN
+
             } catch (final Exception e) {
-               e.printStackTrace();
+
+               StatusUtil.log(e);
+
             } finally {
                _isRunningDrawOverlay = false;
             }
@@ -5509,7 +5540,7 @@ public class Map2 extends Canvas {
 
          if (isOverlayPainted) {
 
-            tile.setOverlayImageState(OverlayImageState.IMAGE_IS_CREATED);
+            tile.setOverlayImageState(OverlayImageState.IMAGE_IS_BEING_CREATED);
 
             final ImageData imageData9Parts = _9PartImage.getImageData();
 
@@ -5991,27 +6022,27 @@ public class Map2 extends Canvas {
        * Priority 1: draw overlay image
        */
       final OverlayImageState imageState = tile.getOverlayImageState();
-      final int overlayContent = tile.getOverlayContent();
+      final int numOverlayContent = tile.getOverlayContent();
 
-      if ((imageState == OverlayImageState.IMAGE_IS_CREATED)
-            || ((imageState == OverlayImageState.NO_IMAGE) && (overlayContent == 0))) {
+      if ((imageState == OverlayImageState.IMAGE_IS_BEING_CREATED)
+            || ((imageState == OverlayImageState.NO_IMAGE) && (numOverlayContent == 0))) {
 
          // there is no image for the tile overlay or the image is currently being created
          return;
       }
 
-      Image drawingImage = null;
+      Image overlayCachedImage = null;
       Image partOverlayImage = null;
       Image tileOverlayImage = null;
 
-      if (overlayContent > 0) {
+      if (numOverlayContent > 0) {
 
          // tile has overlay content, check if an image is available
 
          final String overlayKey = getOverlayKey(tile);
 
          // get overlay image from the cache
-         drawingImage = partOverlayImage = _overlayImageCache.get(overlayKey);
+         overlayCachedImage = partOverlayImage = _overlayImageCache.get(overlayKey);
 
          if (partOverlayImage == null) {
 
@@ -6021,19 +6052,22 @@ public class Map2 extends Canvas {
              */
             tileOverlayImage = tile.getOverlayImage();
             if ((tileOverlayImage != null) && (tileOverlayImage.isDisposed() == false)) {
-               drawingImage = tileOverlayImage;
+               overlayCachedImage = tileOverlayImage;
             }
          }
       }
 
       // draw overlay image
-      if ((drawingImage != null) && (drawingImage.isDisposed() == false)) {
+      if (overlayCachedImage != null && overlayCachedImage.isDisposed() == false) {
+
          try {
-            gcMapImage.drawImage(drawingImage, devTileViewport.x, devTileViewport.y);
+
+            gcMapImage.drawImage(overlayCachedImage, devTileViewport.x, devTileViewport.y);
+
          } catch (final Exception e) {
 
             /*
-             * ignore, it's still possible that the image is disposed when the images are changing
+             * Ignore, it's still possible that the image is disposed when the images are changing
              * very often and the cache is small
              */
             partOverlayImage = null;
@@ -6062,7 +6096,7 @@ public class Map2 extends Canvas {
             // overlay image is NOT available
 
             // check if tile has overlay content
-            if (overlayContent == 0) {
+            if (numOverlayContent == 0) {
 
                /**
                 * tile has no overlay content -> set state that the drawing of the overlay is as
@@ -6102,7 +6136,7 @@ public class Map2 extends Canvas {
 
             if (imageState == OverlayImageState.NOT_SET) {
 
-               if (overlayContent == 0) {
+               if (numOverlayContent == 0) {
                   tile.setOverlayImageState(OverlayImageState.NO_IMAGE);
                } else {
                   // something is wrong
