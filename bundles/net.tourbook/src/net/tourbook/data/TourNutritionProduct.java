@@ -66,11 +66,6 @@ public class TourNutritionProduct {
    private TourData                   tourData;
 
    /**
-    * The name of the product's brand
-    */
-   private String                     brand;
-
-   /**
     * The name of the product
     */
    private String                     name;
@@ -164,7 +159,6 @@ public class TourNutritionProduct {
    public TourNutritionProduct(final TourData tourData, final Product product) {
 
       this(tourData, false);
-      brand = product.brands;
       name = product.productName;
       productCode = product.code;
       isBeverage = product.nutriScoreData != null && product.nutriScoreData.isBeverage();
@@ -254,10 +248,6 @@ public class TourNutritionProduct {
 
    public int getBeverageQuantity_Serving() {
       return beverageQuantity_Serving;
-   }
-
-   public String getBrand() {
-      return brand;
    }
 
    public int getCalories() {
