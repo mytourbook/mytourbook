@@ -44,7 +44,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import net.tourbook.OtherMessages;
 import net.tourbook.application.ApplicationVersion;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -205,7 +204,7 @@ public class TourLocationManager {
          Map.entry(LocationPartID.OSM_DEFAULT_NAME,                  Messages.Tour_Location_Part_OsmDefaultName),
          Map.entry(LocationPartID.OSM_NAME,                          Messages.Tour_Location_Part_OsmName),
 
-         Map.entry(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,   Messages.Tour_Location_Part_StreeWithHouseNumber),
+         Map.entry(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,   Messages.Tour_Location_Part_StreetWithHouseNumber),
 
          // this is a computed part
          Map.entry(LocationPartID.settlementSmall,                   UI.SYMBOL_STAR + UI.SPACE + Messages.Tour_Location_Part_SettlementSmall),
@@ -2427,10 +2426,9 @@ public class TourLocationManager {
 
                      if (isLogLocation) {
 
-                        // %s - "%s"  . . .  "%s"
                         TourLogManager.subLog_DEFAULT(
 
-                              OtherMessages.LOG_TOUR_LOCATION_RETRIEVE_TOUR.formatted(
+                              "%s - \"%s\"  . . .  \"%s\"".formatted( // //$NON-NLS-1$
 
                                     TourManager.getTourDateTimeShort(tourData),
                                     tourData.getTourStartPlace(),

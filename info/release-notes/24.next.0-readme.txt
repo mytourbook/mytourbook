@@ -117,6 +117,9 @@ Bugfix
 * Suunto XML/SML Import (Frederic)
   - Fix for the calories import values
 
+* Tour location profiles
+  The default location profiles were not translated in the last version. Now they are translated but the location names are saved in the configuraiton file C:\Users\<YOUR NAME>\mytourbook\.metadata\.plugins\net.tourbook\tour-location.xml and will not use the translated names. 
+  To use the translated names, this files needs to be deleted when MyTourbook is not running but this will also delete any customizations which you have already done !
 
 Translation    
 ===========
