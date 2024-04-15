@@ -1,4 +1,4 @@
-24.next.0                                                 ?. January 2024
+24.5.0                                                 ?. April/May 2024
 
 
 TODO's
@@ -54,25 +54,72 @@ Experimental
 New
 ===
 
-* 
+* Tour Nutrition
+  Add the ability to assign food/fluids to any given tour.
+  https://github.com/mytourbook/mytourbook/issues/1280
+
+* Start/End Tour Location
+  - Automatically retrieve and set start/end locations in the easy import
+  - Retrieve, manage and show start/end locations in
+    - Tour editor
+  - Scramble tour location view when requested
+  https://github.com/mytourbook/mytourbook/issues/878
+
+* Address Location
+  - Lookup a map location from a location provider and use it like a map bookmark
+    https://github.com/mytourbook/mytourbook/issues/1315
+  - Slideout to manage address locations
+    
+* Map Locations
+  - Show location tooltip when hovered    
+  https://github.com/mytourbook/mytourbook/issues/1318
 
 Improvements
 ============
 
-* 
+* Viewer Columns
+  - Customize column alignment in all views which are using the column manager
+  - Set column alignment in the viewer header context menu
+    https://github.com/mytourbook/mytourbook/issues/1300  
+    
+* Fit Import
+  - Import device sensors which do not contain a serial number
+    https://github.com/mytourbook/mytourbook/issues/1287
+
+* Tour Book
+  - Show powertrain L-R balance values separately
+    https://github.com/mytourbook/mytourbook/issues/1271    
+  - Show weather air quaility
+    https://github.com/mytourbook/mytourbook/issues/1296
+
+* Tour Blog (Frederic)
+  - Displaying the main numbers of the tour (distance, elevation gain/loss...)
 
 Changes
 =======
 
-* 
+* Fit Import
+  - Device sensors are now imported which do not contain a serial number
+    -> Now there can be new sensors in the sensor view which were currently ignored !
+
+* 2D Map Options
+  - Moved map location options into the new slideout for map locations
   
 
 
 Bugfix
 ======
 
-* 
+* TCX Import (Frederic)
+  - Fix for average and maximum power computation
+    https://github.com/mytourbook/mytourbook/discussions/1268
 
+* Suunto XML/SML Import (Frederic)
+  - Fix for the calories import values
+
+* Tour location profiles
+  The default location profiles were not translated in the last version. Now they are translated but the location names are saved in the configuraiton file C:\Users\<YOUR NAME>\mytourbook\.metadata\.plugins\net.tourbook\tour-location.xml and will not use the translated names. 
+  To use the translated names, this files needs to be deleted when MyTourbook is not running but this will also delete any customizations which you have already done !
 
 Translation    
 ===========
