@@ -44,7 +44,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import net.tourbook.OtherMessages;
 import net.tourbook.application.ApplicationVersion;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -205,7 +204,7 @@ public class TourLocationManager {
          Map.entry(LocationPartID.OSM_DEFAULT_NAME,                  Messages.Tour_Location_Part_OsmDefaultName),
          Map.entry(LocationPartID.OSM_NAME,                          Messages.Tour_Location_Part_OsmName),
 
-         Map.entry(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,   Messages.Tour_Location_Part_StreeWithHouseNumber),
+         Map.entry(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,   Messages.Tour_Location_Part_StreetWithHouseNumber),
 
          // this is a computed part
          Map.entry(LocationPartID.settlementSmall,                   UI.SYMBOL_STAR + UI.SPACE + Messages.Tour_Location_Part_SettlementSmall),
@@ -325,166 +324,166 @@ public class TourLocationManager {
 
 // SET_FORMATTING_OFF
 
-         new TourLocationProfile("1 : State",   8,
+         new TourLocationProfile(Messages.Tour_Location_Profile_1_State,   8,
 
             LocationPartID.state,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("2 : City",   10,
+         new TourLocationProfile(Messages.Tour_Location_Profile_2_City,   10,
 
             LocationPartID.settlementLarge,
             LocationPartID.state,
             LocationPartID.OSM_NAME,
             LocationPartID.city),
 
-         new TourLocationProfile("3 : Town / Borough",   12,
+         new TourLocationProfile(Messages.Tour_Location_Profile_3_Town,   12,
 
             LocationPartID.settlementLarge,
             LocationPartID.OSM_NAME,
             LocationPartID.town),
 
-         new TourLocationProfile("4 : Village / Suburb",   13,
+         new TourLocationProfile(Messages.Tour_Location_Profile_4_Village,   13,
 
             LocationPartID.settlementLarge,
             LocationPartID.suburb,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("5 : Neighbourhood",   14,
+         new TourLocationProfile(Messages.Tour_Location_Profile_5_Neighbourhood,   14,
 
             LocationPartID.settlementLarge,
             LocationPartID.OSM_NAME,
             LocationPartID.neighbourhood),
 
-         new TourLocationProfile("6 : Settlement",   15,
+         new TourLocationProfile(Messages.Tour_Location_Profile_6_Settlement,   15,
 
             LocationPartID.settlementLarge,
             LocationPartID.settlementSmall,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("7 : Major Street",   16,
-
-            LocationPartID.settlementLarge,
-            LocationPartID.settlementSmall,
-            LocationPartID.road,
-            LocationPartID.OSM_NAME),
-
-         new TourLocationProfile("8 : Minor Street",   17,
+         new TourLocationProfile(Messages.Tour_Location_Profile_7_MajorStreet,   16,
 
             LocationPartID.settlementLarge,
             LocationPartID.settlementSmall,
             LocationPartID.road,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("9 : Building",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_8_MinorStreet,   17,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.settlementSmall,
+            LocationPartID.road,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile(Messages.Tour_Location_Profile_9_Building,   18,
 
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
             LocationPartID.settlementSmall,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("Country, Large",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Country_Large,   18,
 
             LocationPartID.country,
             LocationPartID.settlementLarge),
 
-         new TourLocationProfile("Country, Large, Name",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Country_Large_Name,   18,
 
             LocationPartID.country,
             LocationPartID.settlementLarge,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("Large",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Large,   18,
 
             LocationPartID.settlementLarge),
 
-         new TourLocationProfile("Large, Name",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Large_Name,   18,
 
             LocationPartID.settlementLarge,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("Large, Name, Town",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Large_Name_Town,   18,
 
             LocationPartID.settlementLarge,
             LocationPartID.OSM_NAME,
             LocationPartID.town),
 
-         new TourLocationProfile("Large, Small",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Large_Small,   18,
 
             LocationPartID.settlementLarge,
             LocationPartID.settlementSmall),
 
-         new TourLocationProfile("Large, Street",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Large_Street,   18,
 
             LocationPartID.settlementLarge,
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
 
-         new TourLocationProfile("Large, Suburb",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Large_Suburb,   18,
 
             LocationPartID.settlementLarge,
             LocationPartID.suburb),
 
-         new TourLocationProfile("Large, Village",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Large_Village,   18,
 
             LocationPartID.settlementLarge,
             LocationPartID.village),
 
-         new TourLocationProfile("Name",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Name,   18,
 
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("Small",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Small,   18,
 
             LocationPartID.settlementSmall),
 
-         new TourLocationProfile("Small, Name",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Small_Name,   18,
 
             LocationPartID.settlementSmall,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("Small, Street",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Small_Street,   18,
 
             LocationPartID.settlementSmall,
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
 
-         new TourLocationProfile("Small, Street, State",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Small_Street_State,   18,
 
             LocationPartID.settlementSmall,
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
             LocationPartID.state),
 
-         new TourLocationProfile("State, Large, Name",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_State_Large_Name,   18,
 
             LocationPartID.state,
             LocationPartID.settlementLarge,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("State, Large, Name, Suburb",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_State_Large_Name_Suburb,   18,
 
             LocationPartID.state,
             LocationPartID.settlementLarge,
             LocationPartID.suburb,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("State, Small, Name",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_State_Small_Name,   18,
 
             LocationPartID.state,
             LocationPartID.settlementSmall,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("Street + House #",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Street_House,   18,
 
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
 
-         new TourLocationProfile("Street, Large",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Street_Large,   18,
 
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
             LocationPartID.settlementLarge),
 
-         new TourLocationProfile("Street, Village",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Street_Village,   18,
 
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
             LocationPartID.village),
 
-         new TourLocationProfile("Suburb, Neighbourhood",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Suburb_Neighbourhood,   18,
 
             LocationPartID.suburb,
             LocationPartID.neighbourhood)
@@ -2427,10 +2426,9 @@ public class TourLocationManager {
 
                      if (isLogLocation) {
 
-                        // %s - "%s"  . . .  "%s"
                         TourLogManager.subLog_DEFAULT(
 
-                              OtherMessages.LOG_TOUR_LOCATION_RETRIEVE_TOUR.formatted(
+                              "%s - \"%s\"  . . .  \"%s\"".formatted( // //$NON-NLS-1$
 
                                     TourManager.getTourDateTimeShort(tourData),
                                     tourData.getTourStartPlace(),

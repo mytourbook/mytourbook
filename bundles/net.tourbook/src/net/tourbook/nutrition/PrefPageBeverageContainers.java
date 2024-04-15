@@ -132,7 +132,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
 
    private Composite createUI(final Composite parent) {
 
-      final Label label = UI.createLabel(parent, Messages.PrefPage_TourBeverageContainers_Title, SWT.WRAP);
+      final Label label = UI.createLabel(parent, Messages.PrefPage_Nutrition_BeverageContainers_Title, SWT.WRAP);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -200,7 +200,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
              * Add
              */
             final Button btnAdd = new Button(container, SWT.NONE);
-            btnAdd.setText(Messages.PrefPage_TourBeverageContainers_Button_Add);
+            btnAdd.setText(Messages.App_Action_Add);
             btnAdd.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
                onTourBeverageContainer_Add();
                enableActions();
@@ -212,7 +212,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
              * Edit
              */
             _btnEdit = new Button(container, SWT.NONE);
-            _btnEdit.setText(Messages.PrefPage_TourBeverageContainers_Button_Edit);
+            _btnEdit.setText(Messages.App_Action_Edit);
             _btnEdit.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onTourBeverageContainer_Edit()));
             setButtonLayoutData(_btnEdit);
          }
@@ -221,7 +221,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
              * Delete
              */
             _btnDelete = new Button(container, SWT.NONE);
-            _btnDelete.setText(Messages.PrefPage_TourBeverageContainers_Button_Delete);
+            _btnDelete.setText(Messages.App_Action_Delete);
 
             _imageDelete = TourbookPlugin.getImageDescriptor(Images.App_Trash).createImage();
             _btnDelete.setImage(_imageDelete);
@@ -293,7 +293,7 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
          // log result
          TourLogManager.showLogView(AutoOpenEvent.DELETE_SOMETHING);
 
-         TourLogManager.log_INFO(String.format(Messages.PrefPage_TourBeverageContainers_LogInfo_DeletedContainer,
+         TourLogManager.log_INFO(String.format(Messages.PrefPage_Nutrition_BeverageContainers_LogInfo_DeletedContainer,
                returnValue_TourData[0],
                tourBeverageContainer.getName()));
 
@@ -406,9 +406,9 @@ public class PrefPageBeverageContainers extends PreferencePage implements IWorkb
       // confirm deletion
       final MessageDialog dialog = new MessageDialog(
             getShell(),
-            Messages.PrefPage_TourBeverageContainers_Dialog_Delete_BeverageContainer_Title,
+            Messages.PrefPage_Nutrition_BeverageContainers_Dialog_Delete_BeverageContainer_Title,
             null,
-            NLS.bind(Messages.PrefPage_TourBeverageContainers_Dialog_Delete_BeverageContainer_Message, selectedTourBeverageContainer.getName()),
+            NLS.bind(Messages.PrefPage_Nutrition_BeverageContainers_Dialog_Delete_BeverageContainer_Message, selectedTourBeverageContainer.getName()),
             MessageDialog.QUESTION,
             new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL },
             1);

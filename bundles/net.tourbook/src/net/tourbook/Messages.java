@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.messages";                                    //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.messages";                                        //$NON-NLS-1$
 
    public static String        Action_Cadence_Set;
    public static String        Action_Cadence_Set_None;
@@ -1351,7 +1351,6 @@ public class Messages extends NLS {
    public static String        Log_Tour_SaveTours_End;
    public static String        Log_TourLocation_Retrieve_End;
    public static String        Log_TourLocation_Retrieve_LocationPoint;
-   public static String        Log_TourLocation_Retrieve_Tour;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Humidity;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation;
@@ -1383,18 +1382,18 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Action_Bookmark_Rename;
    public static String        Map_Bookmark_Button_Add;
    public static String        Map_Bookmark_Button_Rename;
-   public static String        Map_Bookmark_Column_Bearing2;                                             //2, because of refactoring
-   public static String        Map_Bookmark_Column_Bearing2_Tooltip;                                     //2, because of refactoring
+   public static String        Map_Bookmark_Column_Bearing2;                                                 //2, because of refactoring
+   public static String        Map_Bookmark_Column_Bearing2_Tooltip;                                         //2, because of refactoring
    public static String        Map_Bookmark_Column_Latitude;
    public static String        Map_Bookmark_Column_Latitude_Tooltip2;
    public static String        Map_Bookmark_Column_Longitude;
    public static String        Map_Bookmark_Column_Longitude_Tooltip2;
    public static String        Map_Bookmark_Column_Name;
    public static String        Map_Bookmark_Column_Scale;
-   public static String        Map_Bookmark_Column_Tilt2;                                                //2, because of refactoring
-   public static String        Map_Bookmark_Column_Tilt2_Tooltip;                                        //2, because of refactoring
-   public static String        Map_Bookmark_Column_ZoomLevel2;                                           //2, because of refactoring
-   public static String        Map_Bookmark_Column_ZoomLevel2_Tooltip;                                   //2, because of refactoring
+   public static String        Map_Bookmark_Column_Tilt2;                                                    //2, because of refactoring
+   public static String        Map_Bookmark_Column_Tilt2_Tooltip;                                            //2, because of refactoring
+   public static String        Map_Bookmark_Column_ZoomLevel2;                                               //2, because of refactoring
+   public static String        Map_Bookmark_Column_ZoomLevel2_Tooltip;                                       //2, because of refactoring
    public static String        Map_Bookmark_Dialog_AddBookmark_Message;
    public static String        Map_Bookmark_Dialog_AddBookmark_Title;
    public static String        Map_Bookmark_Dialog_RenameBookmark_Message;
@@ -1513,14 +1512,10 @@ public class Messages extends NLS {
 
    public static String        PrefPage_Nutrition_Checkbox_IgnoreFirstHour;
    public static String        PrefPage_Nutrition_Checkbox_IgnoreFirstHour_Tooltip;
-
-   public static String        PrefPage_TourBeverageContainers_Button_Add;
-   public static String        PrefPage_TourBeverageContainers_Button_Delete;
-   public static String        PrefPage_TourBeverageContainers_Button_Edit;
-   public static String        PrefPage_TourBeverageContainers_Dialog_Delete_BeverageContainer_Message;
-   public static String        PrefPage_TourBeverageContainers_Dialog_Delete_BeverageContainer_Title;
-   public static String        PrefPage_TourBeverageContainers_LogInfo_DeletedContainer;
-   public static String        PrefPage_TourBeverageContainers_Title;
+   public static String        PrefPage_Nutrition_BeverageContainers_Dialog_Delete_BeverageContainer_Message;
+   public static String        PrefPage_Nutrition_BeverageContainers_Dialog_Delete_BeverageContainer_Title;
+   public static String        PrefPage_Nutrition_BeverageContainers_LogInfo_DeletedContainer;
+   public static String        PrefPage_Nutrition_BeverageContainers_Title;
 
    public static String        PrefPage_TourTag_Button_DuplicateTag;
    public static String        PrefPage_TourTag_Label_Duplicate;
@@ -2344,7 +2339,6 @@ public class Messages extends NLS {
    public static String        Slideout_MapLocation_Checkbox_ShowTourLocations_Tooltip;
    public static String        Slideout_MapLocation_Label_AddressLocations;
    public static String        Slideout_MapLocation_Label_Title;
-   public static String        Slideout_MapLocation_Label_Zoomlevel;
 
    public static String        Slideout_MapModel_Column_Name;
    public static String        Slideout_MapModel_Dialog_DeleteModel_Message;
