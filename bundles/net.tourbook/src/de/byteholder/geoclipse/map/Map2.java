@@ -69,6 +69,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -88,13 +92,16 @@ import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map.location.MapLocationToolTip;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.SelectionMapSelection;
+import net.tourbook.map2.view.TourPainterConfiguration;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.Map2_Appearance;
@@ -284,6 +291,13 @@ public class Map2 extends Canvas {
     */
    private Image                         _mapImage;
 
+   /**
+    * The {@link #_newOverlayExecutor} is drawing into this image. 2 images are necessary that the
+    * current image which is drawn is not displayed, only when drawing is done
+    */
+   private Image                         _newOverlayImage_Visible;
+   private Image                         _newOverlayImage_NotVisible;
+
    private Image                         _9PartImage;
    private GC                            _9PartGC;
 
@@ -342,14 +356,23 @@ public class Map2 extends Canvas {
    private GeoPosition                   _mouseMove_GeoPosition;
 
    private Thread                        _overlayThread;
-
    private long                          _nextOverlayRedrawTime;
 
-   private final NumberFormat            _nf0;
-   private final NumberFormat            _nf1;
-   private final NumberFormat            _nf2;
-   private final NumberFormat            _nf3;
-   private final NumberFormat            _nfLatLon;
+   /*
+    * New overlay
+    */
+   private final ExecutorService _newOverlayExecutor         = createOverlayExecuter();
+   private Future<?>             _newOverlayFuture;
+   private int                   _newOverlay_LastCounter;
+   private final AtomicInteger   _newOverlay_RunnableCounter = new AtomicInteger();
+   private Rectangle             _newOverlay_WorldPixel_TopLeft_Viewport_Visible;
+   private Rectangle             _newOverlay_WorldPixel_TopLeft_Viewport_NotVisible;
+
+   private final NumberFormat    _nf0;
+   private final NumberFormat    _nf1;
+   private final NumberFormat    _nf2;
+   private final NumberFormat    _nf3;
+   private final NumberFormat    _nfLatLon;
    {
       _nf0 = NumberFormat.getNumberInstance();
       _nf1 = NumberFormat.getNumberInstance();
@@ -458,6 +481,8 @@ public class Map2 extends Canvas {
     * of the map image
     */
    private Rectangle                                  _clientArea;
+
+   private Rectangle                                  _newOverlaySize;
 
    private final ListenerList<IBreadcrumbListener>    _allBreadcrumbListener     = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IHoveredTourListener>   _allHoveredTourListeners   = new ListenerList<>(ListenerList.IDENTITY);
@@ -955,7 +980,7 @@ public class Map2 extends Canvas {
     *
     * @return
     */
-   private boolean canReuseImage(final Image image, final Rectangle clientArea) {
+   private boolean canReuseImage(final Image image, final Rectangle newBounds) {
 
       // check if we could reuse the existing image
 
@@ -966,7 +991,7 @@ public class Map2 extends Canvas {
       // image exist, check image bounds
       final Rectangle oldBounds = image.getBounds();
 
-      if (!(oldBounds.width == clientArea.width && oldBounds.height == clientArea.height)) {
+      if (oldBounds.width != newBounds.width || oldBounds.height != newBounds.height) {
          return false;
       }
 
@@ -1106,40 +1131,76 @@ public class Map2 extends Canvas {
     * Creates a new image, old image is disposed
     *
     * @param display
-    * @param image
+    * @param oldImage
     *           image which will be disposed if the image is not null
-    * @param clientArea
+    * @param imageSize
+    * @param fillColor
     *
     * @return returns a new created image
     */
-   private Image createMapImage(final Display display, final Image image, final Rectangle clientArea) {
+   private Image createMapImage(final Display display,
+                                final Image oldImage,
+                                final Rectangle imageSize,
+                                final Color fillColor) {
 
-      if (image != null) {
-         image.dispose();
+      if (oldImage != null) {
+         oldImage.dispose();
       }
 
       // ensure the image has a width/height of 1, otherwise this causes troubles
-      final int width = Math.max(1, clientArea.width);
-      final int height = Math.max(1, clientArea.height);
+      final int width = Math.max(1, imageSize.width);
+      final int height = Math.max(1, imageSize.height);
 
       final Image mapImage = new Image(display, width, height);
 
-      if (UI.isDarkTheme()) {
-
-         /*
-          * It looks ugly when in the dark theme the default map background is white which occure
-          * before the map tile images are painted
-          */
+      if (fillColor != null) {
 
          final GC gc = new GC(mapImage);
          {
-            gc.setBackground(ThemeUtil.getDarkestBackgroundColor());
-            gc.fillRectangle(clientArea);
+            gc.setBackground(fillColor);
+            gc.fillRectangle(imageSize);
          }
          gc.dispose();
       }
 
       return mapImage;
+   }
+
+   private Image createNewOverlayImage() {
+
+      final ImageData transparentImageData = MapUtils.createTransparentImageData(
+
+            _newOverlaySize.width,
+            _newOverlaySize.height);
+
+      final Image transparentImage = new Image(_display, transparentImageData);
+
+      final GC gcImage = new GC(transparentImage);
+      {
+         /*
+          * Ubuntu 12.04 fails, when background is not filled, it draws a black background
+          */
+         gcImage.setBackground(_transparentColor);
+         gcImage.fillRectangle(transparentImage.getBounds());
+      }
+      gcImage.dispose();
+
+      return transparentImage;
+   }
+
+   private ExecutorService createOverlayExecuter() {
+
+      final ThreadFactory threadFactory = runnable -> {
+
+         final Thread thread = new Thread(runnable, "2D Map new Overlay Painter");//$NON-NLS-1$
+
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
+
+         return thread;
+      };
+
+      return Executors.newSingleThreadExecutor(threadFactory);
    }
 
    public void deleteFailedImageFiles() {
@@ -2390,21 +2451,27 @@ public class Map2 extends Canvas {
    private boolean isTileOnMap(final int tilePosX, final int tilePosY) {
 
       if (tilePosY < 0 || tilePosY >= _mapTileSize.height) {
+
          return false;
+
       } else {
 
          if (_mapZoomLevel < 5) {
 
             if (tilePosX < 0 || tilePosX >= _mapTileSize.width) {
+
                return false;
             }
+
          } else {
 
             // display one additional tile when the the map is zoomed enough
             if (tilePosX < -1 || tilePosX > _mapTileSize.width) {
+
                return false;
             }
          }
+
          return true;
       }
    }
@@ -2747,6 +2814,8 @@ public class Map2 extends Canvas {
       }
 
       UI.disposeResource(_mapImage);
+      UI.disposeResource(_newOverlayImage_Visible);
+      UI.disposeResource(_newOverlayImage_NotVisible);
       UI.disposeResource(_poiImage);
 
       UI.disposeResource(_9PartImage);
@@ -2783,6 +2852,8 @@ public class Map2 extends Canvas {
 
       // stop overlay thread
       _overlayThread.interrupt();
+
+      _newOverlayExecutor.shutdownNow();
    }
 
    private void onDropRunnable(final DropTargetEvent event) {
@@ -3615,8 +3686,6 @@ public class Map2 extends Canvas {
 
       // draw map image to the screen
 
-      final long start = System.nanoTime();
-
       if (_mapImage == null || _mapImage.isDisposed()) {
          return;
       }
@@ -3675,22 +3744,25 @@ public class Map2 extends Canvas {
       if (isPaintTourInfo) {
          paint_HoveredTour_50_TourInfo(gc);
       }
-
-      final long end = System.nanoTime();
-
-//      System.out.println(UI.timeStampNano() + " onPaint() - %7.3f ms".formatted((float) (end - start) / 1000000));
-      // TODO remove SYSTEM.OUT.PRINTLN
-
    }
 
    private void onResize() {
 
       /*
-       * the method getClientArea() is only correct in a dialog when it's called in the create()
+       * The method getClientArea() is only correct in a dialog when it's called in the create()
        * method after super.create();
        */
 
       _clientArea = getClientArea();
+
+      _newOverlaySize = new Rectangle(
+
+            0,
+            0,
+
+            _clientArea.width, // + 2 * MAP_OVERLAY_MARGIN,
+            _clientArea.height // + 2 * MAP_OVERLAY_MARGIN
+      );
 
       updateViewPortData();
 
@@ -3703,6 +3775,9 @@ public class Map2 extends Canvas {
    public void paint() {
 
       final int redrawCounter = _redrawMapCounter.incrementAndGet();
+
+      // repaint new overlay
+      _newOverlay_RunnableCounter.incrementAndGet();
 
       if (isDisposed() || _mp == null || _isRedrawEnabled == false) {
          return;
@@ -3776,21 +3851,34 @@ public class Map2 extends Canvas {
          return;
       }
 
-      // Draw the map
       GC gcMapImage = null;
+
       try {
 
          // check or create map image
-         final Image image = _mapImage;
+         final Image mapImage = _mapImage;
 
-         if (image == null || image.isDisposed() || canReuseImage(image, _clientArea) == false) {
+         if (mapImage == null
+               || mapImage.isDisposed()
+               || canReuseImage(mapImage, _clientArea) == false) {
 
-            _mapImage = createMapImage(_display, image, _clientArea);
+            final Color fillColor = UI.IS_DARK_THEME
+
+                  /*
+                   * It looks ugly when in the dark theme the default map background is white which
+                   * occur before the map tile images are painted
+                   */
+                  ? ThemeUtil.getDarkestBackgroundColor()
+                  : null;
+
+            _mapImage = createMapImage(_display, mapImage, _clientArea, fillColor);
          }
 
          gcMapImage = new GC(_mapImage);
          {
             paint_30_Tiles(gcMapImage);
+
+            paint_32_PaintNewOverlayImage(gcMapImage);
 
             if (_isLegendVisible && _mapLegend != null) {
                paint_40_Legend(gcMapImage);
@@ -3811,6 +3899,8 @@ public class Map2 extends Canvas {
 
          // map image is corrupt
          _mapImage.dispose();
+         _newOverlayImage_Visible.dispose();
+         _newOverlayImage_NotVisible.dispose();
 
       } finally {
 
@@ -3824,10 +3914,8 @@ public class Map2 extends Canvas {
       _lastMapDrawTime = System.currentTimeMillis();
 
       final long end = System.nanoTime();
-
-      System.out.println(UI.timeStampNano() + " paint_10_PaintMapImage()  - %7.3f ms".formatted((float) (end - start) / 1000000));
-// TODO remove SYSTEM.OUT.PRINTLN
-
+//      System.out.println(UI.timeStampNano() + " paint_10_PaintMapImage() - %7.3f ms".formatted((float) (end - start) / 1000000));
+      // TODO remove SYSTEM.OUT.PRINTLN
    }
 
    /**
@@ -3836,10 +3924,6 @@ public class Map2 extends Canvas {
     * @param gcMapImage
     */
    private void paint_30_Tiles(final GC gcMapImage) {
-
-//      final long start = System.nanoTime();
-
-      int numTiles = 0;
 
       for (int tilePosX = _tilePos_MinX, tileIndexX = 0; tilePosX <= _tilePos_MaxX; tilePosX++, tileIndexX++) {
          for (int tilePosY = _tilePos_MinY, tileIndexY = 0; tilePosY <= _tilePos_MaxY; tilePosY++, tileIndexY++) {
@@ -3866,8 +3950,6 @@ public class Map2 extends Canvas {
 
                   _allPaintedTiles[tileIndexX][tileIndexY] = paintedTile;
 
-                  numTiles++;
-
                } else {
 
                   gcMapImage.setBackground(_defaultBackgroundColor);
@@ -3876,14 +3958,99 @@ public class Map2 extends Canvas {
             }
          }
       }
+   }
 
-      final long end = System.nanoTime();
+   /**
+    * @param gcMapImage
+    */
+   private void paint_32_PaintNewOverlayImage(final GC gcMapImage) {
 
-//      System.out.println(UI.timeStampNano() + " paint_30_Tiles - %7.3f ms - numTiles: %d".formatted(
-//            (float) (end - start) / 1000000,
-//            numTiles));
-      // TODO remove SYSTEM.OUT.PRINTLN
+      try {
 
+         // check or create map overlay image
+         final Image image1 = _newOverlayImage_Visible;
+         final Image image2 = _newOverlayImage_NotVisible;
+
+         if (false
+               || image1 == null
+               || image2 == null
+               || image1.isDisposed()
+               || image2.isDisposed()
+               || canReuseImage(image1, _newOverlaySize) == false
+               || canReuseImage(image2, _newOverlaySize) == false
+
+         ) {
+
+            UI.disposeResource(_newOverlayImage_Visible);
+            UI.disposeResource(_newOverlayImage_NotVisible);
+
+            _newOverlayImage_Visible = createNewOverlayImage();
+            _newOverlayImage_NotVisible = createNewOverlayImage();
+         }
+
+         try {
+
+            /**
+             *
+             * This happened sometimes, maybe because of concurrency
+             *
+             * <code>
+             *
+             * !MESSAGE Cannot assign field "hNullBitmap" because "memGC.data" is null
+             * !STACK 0
+             * java.lang.NullPointerException: Cannot assign field "hNullBitmap" because "memGC.data" is null
+             * 	at org.eclipse.swt.graphics.GC.drawBitmap(GC.java:1233)
+             * 	at org.eclipse.swt.graphics.GC.drawImage(GC.java:1057)
+             * 	at org.eclipse.swt.graphics.GC.drawImageInPixels(GC.java:928)
+             * 	at org.eclipse.swt.graphics.GC.drawImage(GC.java:921)
+             * 	at de.byteholder.geoclipse.map.Map2.paint_32_PaintNewOverlayImage(Map2.java:3971)
+             * 	at de.byteholder.geoclipse.map.Map2.paint_10_PaintMapImage(Map2.java:3860)
+             * 	at de.byteholder.geoclipse.map.Map2$5.run(Map2.java:3807)
+             *
+             * </code>
+             */
+
+            // do micro adjustments
+            final Rectangle oldTopLeft_Viewport = _newOverlay_WorldPixel_TopLeft_Viewport_Visible;
+            final Rectangle currentTopLeft_Viewport = _worldPixel_TopLeft_Viewport;
+
+            int devX = oldTopLeft_Viewport.x - currentTopLeft_Viewport.x;
+            int devY = oldTopLeft_Viewport.y - currentTopLeft_Viewport.y;
+
+//            System.out.println(UI.timeStamp() + " x: %4d  -  y: %4d"
+////                  + " - %s"
+//                  .formatted(
+//                        devX,
+//                        devY
+//
+////                        oldTopLeft_Viewport
+//
+//                  ));
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+            devX = devX + 0;
+            devY = devY + 0;
+//            devX = 0;
+//            devY = 0;
+
+            gcMapImage.drawImage(_newOverlayImage_Visible, devX, devY);
+
+         } catch (final Exception e) {
+
+            // ignore
+         }
+
+         // do not know now when to start the overlay painting
+         paint_NewOverlay();
+
+      } catch (final Exception e) {
+
+         StatusUtil.log(e);
+
+         // new overlay image is corrupt
+         UI.disposeResource(_newOverlayImage_Visible);
+         UI.disposeResource(_newOverlayImage_NotVisible);
+      }
    }
 
    private void paint_40_Legend(final GC gc) {
@@ -5099,6 +5266,233 @@ public class Map2 extends Canvas {
       gc.setAntialias(SWT.OFF);
    }
 
+   private void paint_NewOverlay() {
+
+      final int currentOverlayCounter = _newOverlay_RunnableCounter.get();
+
+      if (_newOverlay_LastCounter >= currentOverlayCounter) {
+
+         // counter is not incremented -> nothing to do
+         return;
+      }
+
+      if (_newOverlayFuture != null) {
+
+         // an overlay task is currently running
+         return;
+      }
+
+      final Runnable overlayTask = () -> {
+
+         try {
+
+            paint_NewOverlay_10_Runnable();
+
+         } finally {
+
+            /**
+             * This counter is very tricky but with this setup it seems to work and is not
+             * reentering endlessly.
+             * <p>
+             * The next paint() will increment the counter but the paint() from this thread "should
+             * not" increment it, so it's decremented.
+             */
+            _newOverlay_LastCounter = _newOverlay_RunnableCounter.decrementAndGet() + 1;
+            _newOverlayFuture = null;
+         }
+
+         // redraw map image with updated overlay image
+         paint();
+      };
+
+      _newOverlayFuture = _newOverlayExecutor.submit(overlayTask);
+   }
+
+   private void paint_NewOverlay_10_Runnable() {
+
+      final long start = System.nanoTime();
+
+      _newOverlay_WorldPixel_TopLeft_Viewport_NotVisible = _worldPixel_TopLeft_Viewport;
+
+      try {
+
+         final Image gcImage = _newOverlayImage_NotVisible;
+         final GC gc = new GC(gcImage);
+         {
+            gc.setBackground(_transparentColor);
+            gc.fillRectangle(_newOverlaySize);
+
+            paint_NewOverlay_20_AllMarker(gc);
+         }
+         gc.dispose();
+
+         // swap images
+         final Image oldVisibleImage = _newOverlayImage_Visible;
+
+         _newOverlayImage_Visible = gcImage;
+         _newOverlayImage_NotVisible = oldVisibleImage;
+
+         _newOverlay_WorldPixel_TopLeft_Viewport_Visible = _newOverlay_WorldPixel_TopLeft_Viewport_NotVisible;
+
+      } catch (final Exception e) {
+
+         StatusUtil.log(e);
+
+         // this happened
+         UI.disposeResource(_newOverlayImage_NotVisible);
+      }
+
+      final long end = System.nanoTime();
+
+//      System.out.println(UI.timeStampNano() + " paint_NewOverlay_10_Runnable() - %7.3f ms".formatted((float) (end - start) / 1000000));
+   }
+
+   private void paint_NewOverlay_20_AllMarker(final GC gc) {
+
+      final ArrayList<TourData> allTourData = TourPainterConfiguration.getInstance().getTourData();
+
+      for (final TourData tourData : allTourData) {
+
+         if (tourData == null) {
+            continue;
+         }
+
+         // check if geo position is available
+         final double[] latitudeSerie = tourData.latitudeSerie;
+         final double[] longitudeSerie = tourData.longitudeSerie;
+
+         if (latitudeSerie == null || longitudeSerie == null) {
+            continue;
+         }
+
+         final ArrayList<TourMarker> sortedMarkers = tourData.getTourMarkersSorted();
+
+         // check if markers are available
+         if (sortedMarkers.size() > 0) {
+
+            // draw tour marker
+
+//            int numMarker = 0;
+
+            for (final TourMarker tourMarker : sortedMarkers) {
+
+               // skip marker when hidden or not set
+               if (tourMarker.isMarkerVisible() == false || StringUtils.isNullOrEmpty(tourMarker.getLabel())) {
+                  continue;
+               }
+
+               final int serieIndex = tourMarker.getSerieIndex();
+
+               /*
+                * Check bounds because when a tour is split, it can happen that the marker serie
+                * index is out of scope
+                */
+               if (serieIndex >= latitudeSerie.length) {
+                  continue;
+               }
+
+               // draw tour marker
+               if (paint_NewOverlay_22_OneMarker(gc,
+                     latitudeSerie[serieIndex],
+                     longitudeSerie[serieIndex],
+                     tourMarker)) {
+
+//                  numMarker++;
+               }
+            }
+
+//            isContentInTile = isContentInTile || numMarker > 0;
+         }
+      }
+
+   }
+
+   private boolean paint_NewOverlay_22_OneMarker(final GC gc,
+                                                 final double latitude,
+                                                 final double longitude,
+                                                 final TourMarker tourMarker) {
+
+      final int zoomLevel = _mapZoomLevel;
+      final Rectangle viewport = _newOverlay_WorldPixel_TopLeft_Viewport_NotVisible;
+
+      // get world viewport for the current tile
+      final int worldTileX = viewport.x;
+      final int worldTileY = viewport.y;
+
+      // convert lat/long into world pixels
+      final java.awt.Point worldMarkerPos = _mp.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
+
+      // convert world position into device position
+      final int devMarkerPosX = worldMarkerPos.x - worldTileX;
+      final int devMarkerPosY = worldMarkerPos.y - worldTileY;
+
+      final boolean isMarkerInViewport = viewport.contains(worldMarkerPos.x, worldMarkerPos.y);
+
+//      System.out.println(UI.timeStamp() + "%7s - x: %5d - y: %5d -  %s".formatted(
+//            isMarkerInViewport,
+//            devMarkerPosX,
+//            devMarkerPosY,
+//            tourMarker.getLabel()));
+
+//      gc.drawString(tourMarker.getLabel(), devMarkerPosX, devMarkerPosY);
+
+//      final String text = UI.scrambleText(tourMarker.getLabel());
+      final String text = tourMarker.getLabel();
+      final int devX = devMarkerPosX;
+      final int devY = devMarkerPosY;
+
+      gc.setForeground(UI.SYS_COLOR_GREEN);
+      gc.drawString(text, devX - 1, devY, true);
+      gc.drawString(text, devX + 1, devY, true);
+      gc.drawString(text, devX, devY - 1, true);
+      gc.drawString(text, devX, devY + 1, true);
+
+      gc.setForeground(UI.SYS_COLOR_BLACK);
+      gc.drawString(text, devX, devY, true);
+
+      return isMarkerInViewport;
+   }
+
+   private void paint_NewOverlay_99_Debug(final GC gc) {
+
+      final int colWidth = 300;
+      final int rowHeight = 20;
+
+      final float parts = 1.5f;
+      final int numCols = (int) (_newOverlaySize.width / colWidth / parts);
+      final int numRows = (int) (_newOverlaySize.height / rowHeight / parts);
+
+      final int offsetX = 10;
+      final int offsetY = 50;
+
+//      forLoop:
+
+      for (int rows = 0; rows < numRows; rows++) {
+
+         final int devY = offsetY + rows * rowHeight;
+
+         for (int cols = 0; cols < numCols; cols++) {
+
+            final int devX = offsetX + cols * colWidth;
+
+            final String text = "" + TimeTools.now();
+//            final String text = "" + TimeTools.nowInMilliseconds();
+//            final String text = "%1.5f ms".formatted((System.nanoTime() / 1_000_000_000.0));
+
+            gc.setForeground(UI.SYS_COLOR_GREEN);
+            gc.drawString(text, devX - 1, devY, true);
+            gc.drawString(text, devX + 1, devY, true);
+            gc.drawString(text, devX, devY - 1, true);
+            gc.drawString(text, devX, devY + 1, true);
+
+            gc.setForeground(UI.SYS_COLOR_BLACK);
+            gc.drawString(text, devX, devY, true);
+
+//            break forLoop;
+         }
+      }
+   }
+
    private void paint_OfflineArea(final GC gc) {
 
       gc.setLineWidth(2);
@@ -5353,14 +5747,7 @@ public class Map2 extends Canvas {
 
             try {
 
-//               final long start = System.nanoTime();
-
                paint_Overlay_20_Tiles();
-
-//               final long end = System.nanoTime();
-//
-//               System.out.println(UI.timeStampNano() + " paint_Overlay_20_Tiles - %7.3f ms".formatted((float) (end - start) / 1000000));
-//// TODO remove SYSTEM.OUT.PRINTLN
 
             } catch (final Exception e) {
 
@@ -5457,14 +5844,13 @@ public class Map2 extends Canvas {
 
       final Image overlayImage = new Image(_display, transparentImageData);
       final GC gc1Part = new GC(overlayImage);
-
-      /*
-       * Ubuntu 12.04 fails, when background is not filled, it draws a black background
-       */
-      gc1Part.setBackground(_transparentColor);
-      gc1Part.fillRectangle(overlayImage.getBounds());
-
       {
+         /*
+          * Ubuntu 12.04 fails, when background is not filled, it draws a black background
+          */
+         gc1Part.setBackground(_transparentColor);
+         gc1Part.fillRectangle(overlayImage.getBounds());
+
          // paint all overlays for the current tile
          for (final Map2Painter overlayPainter : _allMapPainter) {
 
@@ -6341,7 +6727,7 @@ public class Map2 extends Canvas {
                                         final int topMargin,
                                         final int leftMargin) {
 
-      final StringBuilder text = new StringBuilder()//
+      final StringBuilder text = new StringBuilder()
             .append(Messages.TileInfo_Position_Zoom)
             .append(tile.getZoom() + 1)
             .append(Messages.TileInfo_Position_X)
@@ -6349,7 +6735,9 @@ public class Map2 extends Canvas {
             .append(Messages.TileInfo_Position_Y)
             .append(tile.getY());
 
-      gc.drawString(text.toString(), devTileViewport.x + leftMargin, devTileViewport.y + topMargin);
+      gc.drawString(text.toString(),
+            devTileViewport.x + leftMargin,
+            devTileViewport.y + topMargin);
    }
 
    /**

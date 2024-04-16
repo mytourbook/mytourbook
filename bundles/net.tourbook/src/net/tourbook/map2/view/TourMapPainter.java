@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -203,6 +203,7 @@ public class TourMapPainter extends Map2Painter {
     * @param isDarkBackground
     * @param isDrawUnitShadow
     * @param isDrawLegendText
+    *
     * @return
     */
    public static Image createMap2_LegendImage_AWT(final IGradientColorProvider colorProvider,
@@ -734,10 +735,10 @@ public class TourMapPainter extends Map2Painter {
       return allLegendLabels;
    }
 
-// SET_FORMATTING_OFF
-
    private static void getTourPainterSettings() {
 
+// SET_FORMATTING_OFF
+      
       final String drawSymbol = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE);
 
 
@@ -763,9 +764,9 @@ public class TourMapPainter extends Map2Painter {
       _prefGeoCompare_LineWidth           = _prefStore.getInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH);
       _prefGeoCompare_RefTour_RGB         = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB);
       _prefGeoCompare_CompartTourPart_RGB = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB);
-   }
-
+      
 // SET_FORMATTING_ON
+   }
 
    private static void initPainter() {
 
@@ -2105,6 +2106,7 @@ public class TourMapPainter extends Map2Painter {
     * @param longitude
     * @param tourMarker
     * @param parts
+    *
     * @return Returns <code>true</code> when marker has been painted
     */
    private boolean drawTourMarker(final GC gcTile,
@@ -2181,6 +2183,7 @@ public class TourMapPainter extends Map2Painter {
     * @param device
     * @param markerLabel
     * @param markerBounds
+    *
     * @return
     */
    private Image drawTourMarkerImage(final Device device, final String markerLabel, final Rectangle markerBounds) {
@@ -2264,6 +2267,7 @@ public class TourMapPainter extends Map2Painter {
     * @param tourTimerPause
     * @param parts
     * @param isAutoPause
+    *
     * @return Returns <code>true</code> when pause duration has been painted
     */
    private boolean drawTourPauses(final GC gcTile,
@@ -2337,6 +2341,7 @@ public class TourMapPainter extends Map2Painter {
     * @param pauseDurationText
     * @param pauseBounds
     * @param isAutoPause
+    *
     * @return
     */
    private Image drawTourPauses_Image(final Device device,
@@ -2443,6 +2448,7 @@ public class TourMapPainter extends Map2Painter {
     * @param twp
     * @param twpWorldPixel
     * @param parts
+    *
     * @return Returns <code>true</code> when way point has been painted
     */
    private boolean drawTourWayPoint(final GC gcTile,
@@ -2506,6 +2512,7 @@ public class TourMapPainter extends Map2Painter {
     * @param config
     * @param legendBounds
     * @param valueIndex
+    *
     * @return Returns the position for the value according to the value index in the legend,
     *         {@link Integer#MIN_VALUE} when data are not initialized
     */
@@ -2572,6 +2579,7 @@ public class TourMapPainter extends Map2Painter {
     * @param photo
     * @param map
     * @param tile
+    *
     * @return Returns the photo image or <code>null</code> when image is not loaded.
     */
    private Image getPhotoImage(final Photo photo, final Map2 map, final Tile tile) {
@@ -2673,6 +2681,7 @@ public class TourMapPainter extends Map2Painter {
     *           y position for the image
     * @param tileSize
     *           width and height of the tile
+    *
     * @return Returns <code>true</code> when the image is visible in the tile
     */
    private boolean isInTile_Bounds(final Rectangle imageBounds,
@@ -2934,6 +2943,7 @@ public class TourMapPainter extends Map2Painter {
     *           When <code>true</code> an auto-pause happened otherwise it is an user pause
     * @param pauseDuration
     *           Pause duration in seconds
+    *
     * @return
     */
    private boolean isTourPauseVisible(final boolean isPauseAnAutoPause, final long pauseDuration) {
@@ -3049,6 +3059,7 @@ public class TourMapPainter extends Map2Painter {
     * @param latitudeSerie
     * @param longitudeSerie
     * @param projectionHash
+    *
     * @return
     */
    private IntHashSet setupTileHashes_Tour(final TourData tourData,
@@ -3095,6 +3106,7 @@ public class TourMapPainter extends Map2Painter {
     * @param mapZoomLevel
     * @param tourWayPoints
     * @param projectionHash
+    *
     * @return
     */
    private IntHashSet setupTileHashes_WayPoint(final TourData tourData,
@@ -3140,6 +3152,7 @@ public class TourMapPainter extends Map2Painter {
     * @param latitudeSerie
     * @param longitudeSerie
     * @param projectionHash
+    *
     * @return
     */
    private Point[] setupWorldPixel_Tour(final TourData tourData,
