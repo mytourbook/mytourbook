@@ -64,6 +64,7 @@ import java.net.URLDecoder;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -73,6 +74,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -103,6 +105,13 @@ import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.TourPainterConfiguration;
 import net.tourbook.map2.view.WayPointToolTipProvider;
+import net.tourbook.map25.layer.marker.MapMarker;
+import net.tourbook.map25.layer.marker.ScreenUtils;
+import net.tourbook.map25.layer.marker.algorithm.distance.Cluster;
+import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
+import net.tourbook.map25.layer.marker.algorithm.distance.DistanceClustering;
+import net.tourbook.map25.layer.marker.algorithm.distance.QuadItem;
+import net.tourbook.map25.layer.marker.algorithm.distance.StaticCluster;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.Map2_Appearance;
 import net.tourbook.tour.SelectionTourId;
@@ -160,6 +169,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.oscim.core.GeoPoint;
 
 public class Map2 extends Canvas {
 
@@ -361,18 +371,19 @@ public class Map2 extends Canvas {
    /*
     * New overlay
     */
-   private final ExecutorService _newOverlayExecutor         = createOverlayExecuter();
-   private Future<?>             _newOverlayFuture;
-   private int                   _newOverlay_LastCounter;
-   private final AtomicInteger   _newOverlay_RunnableCounter = new AtomicInteger();
-   private Rectangle             _newOverlay_WorldPixel_TopLeft_Viewport_Visible;
-   private Rectangle             _newOverlay_WorldPixel_TopLeft_Viewport_NotVisible;
+   private final ExecutorService           _newOverlayExecutor         = createOverlayExecuter();
+   private Future<?>                       _newOverlayFuture;
+   private int                             _newOverlay_LastCounter;
+   private final AtomicInteger             _newOverlay_RunnableCounter = new AtomicInteger();
+   private Rectangle                       _newOverlay_Viewport_Visible;
+   private Rectangle                       _newOverlay_Viewport_NotVisible;
+   private DistanceClustering<ClusterItem> _distanceClustering         = new DistanceClustering<>();
 
-   private final NumberFormat    _nf0;
-   private final NumberFormat    _nf1;
-   private final NumberFormat    _nf2;
-   private final NumberFormat    _nf3;
-   private final NumberFormat    _nfLatLon;
+   private final NumberFormat              _nf0;
+   private final NumberFormat              _nf1;
+   private final NumberFormat              _nf2;
+   private final NumberFormat              _nf3;
+   private final NumberFormat              _nfLatLon;
    {
       _nf0 = NumberFormat.getNumberInstance();
       _nf1 = NumberFormat.getNumberInstance();
@@ -1166,7 +1177,86 @@ public class Map2 extends Canvas {
       return mapImage;
    }
 
-   private Image createNewOverlayImage() {
+   private List<MapMarker> createMapMarkers(final ArrayList<TourData> allTourData) {
+
+      final Rectangle worldPixel_Viewport = _newOverlay_Viewport_NotVisible;
+
+      final List<MapMarker> allMarkerItems = new ArrayList<>();
+
+      for (final TourData tourData : allTourData) {
+
+         if (tourData == null) {
+            continue;
+         }
+
+         if (_newOverlayFuture.isCancelled()) {
+            break;
+         }
+
+         final Set<TourMarker> allTourMarkers = tourData.getTourMarkers();
+
+         if (allTourMarkers.isEmpty()) {
+            continue;
+         }
+
+         // check if geo position is available
+         final double[] latitudeSerie = tourData.latitudeSerie;
+         final double[] longitudeSerie = tourData.longitudeSerie;
+
+         if (latitudeSerie == null || longitudeSerie == null) {
+            continue;
+         }
+
+         for (final TourMarker tourMarker : allTourMarkers) {
+
+            // skip marker when hidden or not set
+            if (tourMarker.isMarkerVisible() == false || tourMarker.getLabel().length() == 0) {
+               continue;
+            }
+
+            final int serieIndex = tourMarker.getSerieIndex();
+
+            /*
+             * check bounds because when a tour is split, it can happen that the marker serie index
+             * is out of scope
+             */
+            if (serieIndex >= latitudeSerie.length) {
+               continue;
+            }
+
+            /*
+             * draw tour marker
+             */
+
+            final double latitude = latitudeSerie[serieIndex];
+            final double longitude = longitudeSerie[serieIndex];
+
+            // convert marker lat/long into world pixels
+            final java.awt.Point worldPixel_MarkerPos = _mp.geoToPixel(new GeoPosition(latitude, longitude), _mapZoomLevel);
+
+            final int worldPixel_MarkerPosX = worldPixel_MarkerPos.x;
+            final int worldPixel_MarkerPosY = worldPixel_MarkerPos.y;
+
+            final boolean isMarkerInViewport = worldPixel_Viewport.contains(worldPixel_MarkerPosX, worldPixel_MarkerPosY);
+
+            if (isMarkerInViewport) {
+
+               final MapMarker item = new MapMarker(
+
+                     tourMarker.getLabel(),
+                     tourMarker.getDescription(),
+
+                     new GeoPoint(latitude, longitude));
+
+               allMarkerItems.add(item);
+            }
+         }
+      }
+
+      return allMarkerItems;
+   }
+
+   private Image createNewOverlayImage(final Image oldImage) {
 
       final ImageData transparentImageData = MapUtils.createTransparentImageData(
 
@@ -1182,6 +1272,13 @@ public class Map2 extends Canvas {
           */
          gcImage.setBackground(_transparentColor);
          gcImage.fillRectangle(transparentImage.getBounds());
+
+         if (oldImage != null) {
+
+            // paint old image into the new image otherwise the screen is flickering
+            gcImage.drawImage(oldImage, 0, 0);
+         }
+
       }
       gcImage.dispose();
 
@@ -3686,6 +3783,8 @@ public class Map2 extends Canvas {
 
       // draw map image to the screen
 
+      final long start = System.nanoTime();
+
       if (_mapImage == null || _mapImage.isDisposed()) {
          return;
       }
@@ -3744,6 +3843,11 @@ public class Map2 extends Canvas {
       if (isPaintTourInfo) {
          paint_HoveredTour_50_TourInfo(gc);
       }
+
+      final long end = System.nanoTime();
+
+//      System.out.println(UI.timeStampNano() + " onPaint - %7.3f ms".formatted((float) (end - start) / 1000000));
+//       TODO remove SYSTEM.OUT.PRINTLN
    }
 
    private void onResize() {
@@ -3765,6 +3869,27 @@ public class Map2 extends Canvas {
       );
 
       updateViewPortData();
+
+      // stop painting thread
+      if (_newOverlayFuture != null) {
+
+         synchronized (_newOverlayFuture) {
+
+            _newOverlayFuture.cancel(true);
+
+            try {
+
+               // wait until the task is canceled
+               _newOverlayFuture.get(5000, TimeUnit.MILLISECONDS);
+
+            } catch (final Exception e) {
+
+               // ignore
+
+//               StatusUtil.log(e);
+            }
+         }
+      }
 
       paint();
    }
@@ -3915,7 +4040,6 @@ public class Map2 extends Canvas {
 
       final long end = System.nanoTime();
 //      System.out.println(UI.timeStampNano() + " paint_10_PaintMapImage() - %7.3f ms".formatted((float) (end - start) / 1000000));
-      // TODO remove SYSTEM.OUT.PRINTLN
    }
 
    /**
@@ -3981,11 +4105,14 @@ public class Map2 extends Canvas {
 
          ) {
 
-            UI.disposeResource(_newOverlayImage_Visible);
-            UI.disposeResource(_newOverlayImage_NotVisible);
+            final Image newOverlayImage_Visible = _newOverlayImage_Visible;
+            final Image newOverlayImage_NotVisible = _newOverlayImage_NotVisible;
 
-            _newOverlayImage_Visible = createNewOverlayImage();
-            _newOverlayImage_NotVisible = createNewOverlayImage();
+            _newOverlayImage_Visible = createNewOverlayImage(_newOverlayImage_Visible);
+            _newOverlayImage_NotVisible = createNewOverlayImage(null);
+
+            UI.disposeResource(newOverlayImage_Visible);
+            UI.disposeResource(newOverlayImage_NotVisible);
          }
 
          try {
@@ -4011,27 +4138,11 @@ public class Map2 extends Canvas {
              */
 
             // do micro adjustments
-            final Rectangle oldTopLeft_Viewport = _newOverlay_WorldPixel_TopLeft_Viewport_Visible;
+            final Rectangle oldTopLeft_Viewport = _newOverlay_Viewport_Visible;
             final Rectangle currentTopLeft_Viewport = _worldPixel_TopLeft_Viewport;
 
-            int devX = oldTopLeft_Viewport.x - currentTopLeft_Viewport.x;
-            int devY = oldTopLeft_Viewport.y - currentTopLeft_Viewport.y;
-
-//            System.out.println(UI.timeStamp() + " x: %4d  -  y: %4d"
-////                  + " - %s"
-//                  .formatted(
-//                        devX,
-//                        devY
-//
-////                        oldTopLeft_Viewport
-//
-//                  ));
-//// TODO remove SYSTEM.OUT.PRINTLN
-
-            devX = devX + 0;
-            devY = devY + 0;
-//            devX = 0;
-//            devY = 0;
+            final int devX = oldTopLeft_Viewport.x - currentTopLeft_Viewport.x;
+            final int devY = oldTopLeft_Viewport.y - currentTopLeft_Viewport.y;
 
             gcMapImage.drawImage(_newOverlayImage_Visible, devX, devY);
 
@@ -5310,9 +5421,9 @@ public class Map2 extends Canvas {
 
    private void paint_NewOverlay_10_Runnable() {
 
-      final long start = System.nanoTime();
+//      final long start = System.nanoTime();
 
-      _newOverlay_WorldPixel_TopLeft_Viewport_NotVisible = _worldPixel_TopLeft_Viewport;
+      _newOverlay_Viewport_NotVisible = _worldPixel_TopLeft_Viewport;
 
       try {
 
@@ -5322,7 +5433,8 @@ public class Map2 extends Canvas {
             gc.setBackground(_transparentColor);
             gc.fillRectangle(_newOverlaySize);
 
-            paint_NewOverlay_20_AllMarker(gc);
+//            paint_NewOverlay_20_AllMarker(gc);
+            paint_NewOverlay_30_ClusteredMarker(gc);
          }
          gc.dispose();
 
@@ -5332,7 +5444,7 @@ public class Map2 extends Canvas {
          _newOverlayImage_Visible = gcImage;
          _newOverlayImage_NotVisible = oldVisibleImage;
 
-         _newOverlay_WorldPixel_TopLeft_Viewport_Visible = _newOverlay_WorldPixel_TopLeft_Viewport_NotVisible;
+         _newOverlay_Viewport_Visible = _newOverlay_Viewport_NotVisible;
 
       } catch (final Exception e) {
 
@@ -5342,11 +5454,12 @@ public class Map2 extends Canvas {
          UI.disposeResource(_newOverlayImage_NotVisible);
       }
 
-      final long end = System.nanoTime();
-
+//      final long end = System.nanoTime();
+//
 //      System.out.println(UI.timeStampNano() + " paint_NewOverlay_10_Runnable() - %7.3f ms".formatted((float) (end - start) / 1000000));
    }
 
+   @SuppressWarnings("unused")
    private void paint_NewOverlay_20_AllMarker(final GC gc) {
 
       final ArrayList<TourData> allTourData = TourPainterConfiguration.getInstance().getTourData();
@@ -5355,6 +5468,10 @@ public class Map2 extends Canvas {
 
          if (tourData == null) {
             continue;
+         }
+
+         if (_newOverlayFuture.isCancelled()) {
+            return;
          }
 
          // check if geo position is available
@@ -5371,8 +5488,6 @@ public class Map2 extends Canvas {
          if (sortedMarkers.size() > 0) {
 
             // draw tour marker
-
-//            int numMarker = 0;
 
             for (final TourMarker tourMarker : sortedMarkers) {
 
@@ -5392,67 +5507,176 @@ public class Map2 extends Canvas {
                }
 
                // draw tour marker
-               if (paint_NewOverlay_22_OneMarker(gc,
+               if (paint_NewOverlay_50_OneMarker(gc,
                      latitudeSerie[serieIndex],
                      longitudeSerie[serieIndex],
-                     tourMarker)) {
+                     tourMarker.getLabel())) {}
+            }
+         }
+      }
+   }
 
-//                  numMarker++;
-               }
+   private void paint_NewOverlay_30_ClusteredMarker(final GC gc) {
+
+      final float _clusterGridSize = 30;
+
+      final ArrayList<TourData> allTourData = TourPainterConfiguration.getInstance().getTourData();
+
+      final List<MapMarker> allMarkers = createMapMarkers(allTourData);
+
+      final Collection<ClusterItem> allClusterItems = new ArrayList<>();
+
+      // convert MapMarker list into ClusterItem's
+      allClusterItems.addAll(allMarkers);
+
+      _distanceClustering.clearItems();
+      _distanceClustering.addItems(allClusterItems);
+
+      final int clusterGridSize = (int) ScreenUtils.getPixels(_clusterGridSize);
+
+      final Set<? extends Cluster<ClusterItem>> allMarkerClusters =
+
+            _distanceClustering.getClusters(_mapZoomLevel, clusterGridSize);
+
+//      System.out.println(UI.timeStamp() + " markerClusters.size() %d ".formatted(allMarkerClusters.size()));
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+      for (final Cluster<ClusterItem> item : allMarkerClusters) {
+
+         if (_newOverlayFuture.isCancelled()) {
+            return;
+         }
+
+         if (item instanceof final StaticCluster clusterItem) {
+
+            // item is a cluster
+
+            final int numClusterItems = clusterItem.getSize();
+
+            final GeoPoint geoPoint = clusterItem.getPosition();
+
+            paint_NewOverlay_60_OneCluster(gc,
+                  geoPoint.getLatitude(),
+                  geoPoint.getLongitude(),
+                  Integer.toString(numClusterItems));
+         }
+      }
+
+      for (final Cluster<ClusterItem> item : allMarkerClusters) {
+
+         if (_newOverlayFuture.isCancelled()) {
+            return;
+         }
+
+         if (item instanceof final QuadItem markerItem) {
+
+            // item is a marker
+
+            if (markerItem.mClusterItem instanceof final MapMarker mapMarker) {
+
+               paint_NewOverlay_50_OneMarker(gc,
+                     mapMarker.geoPoint.getLatitude(),
+                     mapMarker.geoPoint.getLongitude(),
+                     mapMarker.title);
             }
 
-//            isContentInTile = isContentInTile || numMarker > 0;
          }
       }
 
    }
 
-   private boolean paint_NewOverlay_22_OneMarker(final GC gc,
+   private boolean paint_NewOverlay_50_OneMarker(final GC gc,
                                                  final double latitude,
                                                  final double longitude,
-                                                 final TourMarker tourMarker) {
+                                                 final String markerLabel) {
 
-      final int zoomLevel = _mapZoomLevel;
-      final Rectangle viewport = _newOverlay_WorldPixel_TopLeft_Viewport_NotVisible;
+      final Rectangle worldPixel_Viewport = _newOverlay_Viewport_NotVisible;
 
-      // get world viewport for the current tile
-      final int worldTileX = viewport.x;
-      final int worldTileY = viewport.y;
+      // convert marker lat/long into world pixels
+      final java.awt.Point worldPixel_MarkerPos = _mp.geoToPixel(new GeoPosition(latitude, longitude), _mapZoomLevel);
 
-      // convert lat/long into world pixels
-      final java.awt.Point worldMarkerPos = _mp.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
+      final int worldPixel_MarkerPosX = worldPixel_MarkerPos.x;
+      final int worldPixel_MarkerPosY = worldPixel_MarkerPos.y;
 
-      // convert world position into device position
-      final int devMarkerPosX = worldMarkerPos.x - worldTileX;
-      final int devMarkerPosY = worldMarkerPos.y - worldTileY;
+      final boolean isMarkerInViewport = worldPixel_Viewport.contains(worldPixel_MarkerPosX, worldPixel_MarkerPosY);
 
-      final boolean isMarkerInViewport = viewport.contains(worldMarkerPos.x, worldMarkerPos.y);
+      if (isMarkerInViewport) {
 
-//      System.out.println(UI.timeStamp() + "%7s - x: %5d - y: %5d -  %s".formatted(
-//            isMarkerInViewport,
-//            devMarkerPosX,
-//            devMarkerPosY,
-//            tourMarker.getLabel()));
+         // convert world position into device position
+         final int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
+         final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
 
-//      gc.drawString(tourMarker.getLabel(), devMarkerPosX, devMarkerPosY);
+         final String text = UI.IS_SCRAMBLE_DATA
+               ? UI.scrambleText(markerLabel)
+               : markerLabel;
 
-//      final String text = UI.scrambleText(tourMarker.getLabel());
-      final String text = tourMarker.getLabel();
-      final int devX = devMarkerPosX;
-      final int devY = devMarkerPosY;
+         gc.setForeground(UI.SYS_COLOR_GREEN);
+         gc.drawString(text, devX - 1, devY, true);
+         gc.drawString(text, devX + 1, devY, true);
+         gc.drawString(text, devX, devY - 1, true);
+         gc.drawString(text, devX, devY + 1, true);
 
-      gc.setForeground(UI.SYS_COLOR_GREEN);
-      gc.drawString(text, devX - 1, devY, true);
-      gc.drawString(text, devX + 1, devY, true);
-      gc.drawString(text, devX, devY - 1, true);
-      gc.drawString(text, devX, devY + 1, true);
-
-      gc.setForeground(UI.SYS_COLOR_BLACK);
-      gc.drawString(text, devX, devY, true);
+         gc.setForeground(UI.SYS_COLOR_BLACK);
+         gc.drawString(text, devX, devY, true);
+      }
 
       return isMarkerInViewport;
    }
 
+   private boolean paint_NewOverlay_60_OneCluster(final GC gc,
+                                                  final double latitude,
+                                                  final double longitude,
+                                                  final String clusterLabel) {
+
+      final Rectangle worldPixel_Viewport = _newOverlay_Viewport_NotVisible;
+
+      // convert marker lat/long into world pixels
+      final java.awt.Point worldPixel_MarkerPos = _mp.geoToPixel(new GeoPosition(latitude, longitude), _mapZoomLevel);
+
+      final int worldPixel_MarkerPosX = worldPixel_MarkerPos.x;
+      final int worldPixel_MarkerPosY = worldPixel_MarkerPos.y;
+
+      final boolean isMarkerInViewport = worldPixel_Viewport.contains(worldPixel_MarkerPosX, worldPixel_MarkerPosY);
+
+      if (isMarkerInViewport) {
+
+         // convert world position into device position
+         final int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
+         final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
+
+         final String text = clusterLabel;
+
+         final Point textExtent = gc.stringExtent(text);
+
+         final int textWidth = textExtent.x;
+         final int textHeight = textExtent.y;
+         final int textWidth2 = textWidth / 2;
+         final int textHeight2 = textHeight / 2;
+
+         final int margin = 7;
+
+         final int ovalSize = textWidth + margin;
+         final int ovalSize2 = ovalSize / 2;
+
+         gc.setAntialias(SWT.ON);
+         gc.setBackground(UI.SYS_COLOR_YELLOW);
+
+         gc.fillOval(
+
+               devX - ovalSize2 + textWidth2,
+               devY - ovalSize2 + textHeight2 + 0,
+
+               ovalSize,
+               ovalSize);
+
+         gc.setForeground(UI.SYS_COLOR_BLACK);
+         gc.drawString(text, devX, devY, true);
+      }
+
+      return isMarkerInViewport;
+   }
+
+   @SuppressWarnings("unused")
    private void paint_NewOverlay_99_Debug(final GC gc) {
 
       final int colWidth = 300;
