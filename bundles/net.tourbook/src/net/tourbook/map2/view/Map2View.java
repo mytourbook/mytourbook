@@ -86,7 +86,7 @@ import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.location.LocationType;
-import net.tourbook.map.location.SlideoutMapLocation;
+import net.tourbook.map.location.SlideoutMapLocationAndMarker;
 import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.action.ActionCreateTourMarkerFromMap;
@@ -553,7 +553,7 @@ public class Map2View extends ViewPart implements
    private GeoFilter_LoaderData              _geoFilter_PreviousGeoLoaderItem;
    private AtomicInteger                     _geoFilter_RunningId  = new AtomicInteger();
    //
-   private SlideoutMapLocation               _slideoutMapLocation;
+   private SlideoutMapLocationAndMarker               _slideoutMapLocation;
    //
    /*
     * UI controls
@@ -629,7 +629,7 @@ public class Map2View extends ViewPart implements
       @Override
       protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-         _slideoutMapLocation = new SlideoutMapLocation(toolItem, _state, _state_MapLocation, Map2View.this);
+         _slideoutMapLocation = new SlideoutMapLocationAndMarker(toolItem, _state, _state_MapLocation, Map2View.this);
          _slideoutMapLocation.setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
 
          return _slideoutMapLocation;

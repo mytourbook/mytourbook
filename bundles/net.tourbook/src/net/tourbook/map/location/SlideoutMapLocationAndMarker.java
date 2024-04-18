@@ -83,7 +83,7 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * Slideout for all map locations and marker
  */
-public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer2 {
+public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements ITourViewer2 {
 
    private static final String     COLUMN_CREATED_DATE_TIME        = "createdDateTime";                           //$NON-NLS-1$
    private static final String     COLUMN_LOCATION_NAME            = "LocationName";                              //$NON-NLS-1$
@@ -314,7 +314,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
     * @param ownerControl
     * @param toolBar
     */
-   public SlideoutMapLocation(final ToolItem toolItem,
+   public SlideoutMapLocationAndMarker(final ToolItem toolItem,
                               final IDialogSettings map2State,
                               final IDialogSettings slideoutState,
                               final Map2View map2View) {

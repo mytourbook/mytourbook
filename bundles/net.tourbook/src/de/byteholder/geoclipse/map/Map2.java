@@ -5433,6 +5433,9 @@ public class Map2 extends Canvas {
             gc.setBackground(_transparentColor);
             gc.fillRectangle(_newOverlaySize);
 
+            gc.setAntialias(SWT.ON);
+            gc.setLineWidth(3);
+
 //            paint_NewOverlay_20_AllMarker(gc);
             paint_NewOverlay_30_ClusteredMarker(gc);
          }
@@ -5518,7 +5521,7 @@ public class Map2 extends Canvas {
 
    private void paint_NewOverlay_30_ClusteredMarker(final GC gc) {
 
-      final float _clusterGridSize = 30;
+      final float _clusterGridSize = 50;
 
       final ArrayList<TourData> allTourData = TourPainterConfiguration.getInstance().getTourData();
 
@@ -5602,13 +5605,17 @@ public class Map2 extends Canvas {
 
       if (isMarkerInViewport) {
 
-         // convert world position into device position
-         final int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
-         final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
-
          final String text = UI.IS_SCRAMBLE_DATA
                ? UI.scrambleText(markerLabel)
                : markerLabel;
+
+         final Point textExtent = gc.stringExtent(text);
+         final int textHeight = textExtent.y;
+         final int textHeight2 = textHeight / 2;
+
+         // convert world position into device position
+         final int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
+         final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y - textHeight2;
 
          gc.setForeground(UI.SYS_COLOR_GREEN);
          gc.drawString(text, devX - 1, devY, true);
@@ -5648,73 +5655,49 @@ public class Map2 extends Canvas {
 
          final Point textExtent = gc.stringExtent(text);
 
-         final int textWidth = textExtent.x;
+         final int textWidth = text.length() < 2 ? textExtent.x + 2 : textExtent.x;
+         final int textOffset = text.length() < 2 ? 1 : 0;
          final int textHeight = textExtent.y;
          final int textWidth2 = textWidth / 2;
          final int textHeight2 = textHeight / 2;
 
          final int margin = 7;
+         final int lineWidth = 1;
 
-         final int ovalSize = textWidth + margin;
-         final int ovalSize2 = ovalSize / 2;
+         final int circleSize = textWidth + margin;
+         final int circleSize2 = circleSize / 2;
 
-         gc.setAntialias(SWT.ON);
+         final int ovalDevX = devX - circleSize2 + textWidth2 - 1;
+         final int ovalDevY = devY - circleSize2 + textHeight2 - 1;
+
+         gc.setAntialias(SWT.OFF);
+         gc.setLineWidth(lineWidth);
+
          gc.setBackground(UI.SYS_COLOR_YELLOW);
 
          gc.fillOval(
 
-               devX - ovalSize2 + textWidth2,
-               devY - ovalSize2 + textHeight2 + 0,
+               ovalDevX,
+               ovalDevY,
 
-               ovalSize,
-               ovalSize);
+               circleSize,
+               circleSize);
+
+         gc.setAntialias(SWT.ON);
+         gc.setForeground(UI.SYS_COLOR_DARK_GREEN);
+         gc.drawOval(
+
+               ovalDevX,
+               ovalDevY,
+
+               circleSize,
+               circleSize);
 
          gc.setForeground(UI.SYS_COLOR_BLACK);
-         gc.drawString(text, devX, devY, true);
+         gc.drawString(text, devX + textOffset, devY, true);
       }
 
       return isMarkerInViewport;
-   }
-
-   @SuppressWarnings("unused")
-   private void paint_NewOverlay_99_Debug(final GC gc) {
-
-      final int colWidth = 300;
-      final int rowHeight = 20;
-
-      final float parts = 1.5f;
-      final int numCols = (int) (_newOverlaySize.width / colWidth / parts);
-      final int numRows = (int) (_newOverlaySize.height / rowHeight / parts);
-
-      final int offsetX = 10;
-      final int offsetY = 50;
-
-//      forLoop:
-
-      for (int rows = 0; rows < numRows; rows++) {
-
-         final int devY = offsetY + rows * rowHeight;
-
-         for (int cols = 0; cols < numCols; cols++) {
-
-            final int devX = offsetX + cols * colWidth;
-
-            final String text = "" + TimeTools.now();
-//            final String text = "" + TimeTools.nowInMilliseconds();
-//            final String text = "%1.5f ms".formatted((System.nanoTime() / 1_000_000_000.0));
-
-            gc.setForeground(UI.SYS_COLOR_GREEN);
-            gc.drawString(text, devX - 1, devY, true);
-            gc.drawString(text, devX + 1, devY, true);
-            gc.drawString(text, devX, devY - 1, true);
-            gc.drawString(text, devX, devY + 1, true);
-
-            gc.setForeground(UI.SYS_COLOR_BLACK);
-            gc.drawString(text, devX, devY, true);
-
-//            break forLoop;
-         }
-      }
    }
 
    private void paint_OfflineArea(final GC gc) {
