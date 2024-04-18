@@ -81,7 +81,7 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * Map location slideout
+ * Slideout for all map locations and marker
  */
 public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer2 {
 
