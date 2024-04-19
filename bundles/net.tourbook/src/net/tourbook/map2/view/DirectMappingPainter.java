@@ -397,7 +397,7 @@ public class DirectMappingPainter implements IDirectPainter {
             // draw location image
             switch (tourLocationExtended.locationType) {
 
-            case Address   -> gc.drawImage(_imageMapLocation_Address, iconDevX, iconDevY);
+            case Common   -> gc.drawImage(_imageMapLocation_Address, iconDevX, iconDevY);
             case TourStart -> gc.drawImage(_imageMapLocation_Start, iconDevX, iconDevY);
             case TourEnd   -> gc.drawImage(_imageMapLocation_End, iconDevX, iconDevY);
 

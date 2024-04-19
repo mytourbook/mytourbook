@@ -38,7 +38,7 @@ import net.tourbook.map2.view.Map2View;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.location.AddressLocationManager;
+import net.tourbook.tour.location.CommonLocationManager;
 import net.tourbook.tour.location.TourLocationToolTip;
 import net.tourbook.ui.TableColumnFactory;
 
@@ -115,7 +115,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
    private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
    private ActionDeleteLocation    _actionDeleteLocation;
 
-   private List<TourLocation>      _allMapLocations                = AddressLocationManager.getAddressLocations();
+   private List<TourLocation>      _allMapLocations                 = CommonLocationManager.getAddressLocations();
 
    private TourLocationToolTip     _locationTooltip;
 
@@ -146,7 +146,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
 
       public ActionDeleteLocation() {
 
-         setText(Messages.Tour_Location_Action_DeleteAddressLocation);
+         setText(Messages.Tour_Location_Action_DeleteCommonLocation);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
          setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete_Disabled));
@@ -389,7 +389,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       restoreState();
       enableControls();
 
-      AddressLocationManager.setMapLocationSlideout(this);
+      CommonLocationManager.setMapLocationSlideout(this);
    }
 
    /**
@@ -471,8 +471,8 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
              * Show address locations
              */
             _chkIsShowCommonLocations = new Button(container, SWT.CHECK);
-            _chkIsShowCommonLocations.setText(Messages.Slideout_MapLocation_Checkbox_ShowAddressLocations);
-            _chkIsShowCommonLocations.setToolTipText(Messages.Slideout_MapLocation_Checkbox_ShowAddressLocations_Tooltip);
+            _chkIsShowCommonLocations.setText(Messages.Slideout_MapLocation_Checkbox_ShowCommonLocations);
+            _chkIsShowCommonLocations.setToolTipText(Messages.Slideout_MapLocation_Checkbox_ShowCommonLocations_Tooltip);
             _chkIsShowCommonLocations.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowCommonLocations);
          }
@@ -509,7 +509,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       {
          {
             final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Slideout_MapLocation_Label_AddressLocations);
+            label.setText(Messages.Slideout_MapLocation_Label_CommonLocations);
          }
          {
             _viewerContainer = new Composite(container, SWT.NONE);
@@ -941,7 +941,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
 
    private void onChangeUI() {
 
-      _state_Map2.put(Map2View.STATE_IS_SHOW_LOCATIONS_ADDRESS, _chkIsShowCommonLocations.getSelection());
+      _state_Map2.put(Map2View.STATE_IS_SHOW_LOCATIONS_COMMON, _chkIsShowCommonLocations.getSelection());
       _state_Map2.put(Map2View.STATE_IS_SHOW_LOCATIONS_TOUR, _chkIsShowTourLocations.getSelection());
 
       _state_Map2.put(Map2View.STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX, _chkIsShowMapLocations_BoundingBox.getSelection());
@@ -954,14 +954,12 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
    @Override
    protected void onDispose() {
 
-      AddressLocationManager.setMapLocationSlideout(null);
+      CommonLocationManager.setMapLocationSlideout(null);
 
       if (_prefChangeListener != null) {
 
          _prefStore.removePropertyChangeListener(_prefChangeListener);
       }
-
-//      xsaveUIState();
 
       super.onDispose();
    }
@@ -976,7 +974,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       final List<TourLocation> allSelectedLocations = getSelectedLocations();
 
       // update model
-      if (AddressLocationManager.deleteLocations(allSelectedLocations) == false) {
+      if (CommonLocationManager.deleteLocations(allSelectedLocations) == false) {
          return;
       }
 
@@ -1007,7 +1005,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       table.setFocus();
 
       TourManager.fireEventWithCustomData(
-            TourEventId.ADDRESS_LOCATION_SELECTION,
+            TourEventId.COMMON_LOCATION_SELECTION,
             null,
             null);
    }
@@ -1024,7 +1022,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
 
       // fire selection
       TourManager.fireEventWithCustomData(
-            TourEventId.ADDRESS_LOCATION_SELECTION,
+            TourEventId.COMMON_LOCATION_SELECTION,
             selection.toList(),
             null);
    }
@@ -1075,8 +1073,8 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       _tabFolder.setSelection(Util.getStateInt(_state_Slideout, STATE_SELECTED_TAB, 0));
 
       _chkIsShowCommonLocations.setSelection(Util.getStateBoolean(_state_Map2,
-            Map2View.STATE_IS_SHOW_LOCATIONS_ADDRESS,
-            Map2View.STATE_IS_SHOW_LOCATIONS_ADDRESS_DEFAULT));
+            Map2View.STATE_IS_SHOW_LOCATIONS_COMMON,
+            Map2View.STATE_IS_SHOW_LOCATIONS_COMMON_DEFAULT));
 
       _chkIsShowTourLocations.setSelection(Util.getStateBoolean(_state_Map2,
             Map2View.STATE_IS_SHOW_LOCATIONS_TOUR,

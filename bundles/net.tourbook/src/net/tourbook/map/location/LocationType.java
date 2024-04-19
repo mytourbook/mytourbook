@@ -20,7 +20,7 @@ public enum LocationType {
    /**
     * Map location which is not associated with a tour
     */
-   Address,
+   Common,
 
    /**
     * Tour location with any tour position

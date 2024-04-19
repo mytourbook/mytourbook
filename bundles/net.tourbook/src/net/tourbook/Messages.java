@@ -2332,12 +2332,12 @@ public class Messages extends NLS {
    public static String        Slideout_Map_TrackOptions_Label_Title;
    public static String        Slideout_Map_TrackOptions_Label_Title_Tooltip;
 
-   public static String        Slideout_MapLocation_Checkbox_ShowAddressLocations;
-   public static String        Slideout_MapLocation_Checkbox_ShowAddressLocations_Tooltip;
+   public static String        Slideout_MapLocation_Checkbox_ShowCommonLocations;
+   public static String        Slideout_MapLocation_Checkbox_ShowCommonLocations_Tooltip;
    public static String        Slideout_MapLocation_Checkbox_ShowLocationBoundingBox;
    public static String        Slideout_MapLocation_Checkbox_ShowTourLocations;
    public static String        Slideout_MapLocation_Checkbox_ShowTourLocations_Tooltip;
-   public static String        Slideout_MapLocation_Label_AddressLocations;
+   public static String        Slideout_MapLocation_Label_CommonLocations;
    public static String        Slideout_MapLocation_Label_Title;
 
    public static String Slideout_MapLocation_Tab_CommonLocations;
@@ -3200,7 +3200,7 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_Customize_Start_Tooltip;
    public static String        Tour_Location_Action_Customize_End_Tooltip;
    public static String        Tour_Location_Action_DeleteLocation;
-   public static String        Tour_Location_Action_DeleteAddressLocation;
+   public static String        Tour_Location_Action_DeleteCommonLocation;
    public static String        Tour_Location_Action_DeleteAndReapply;
    public static String        Tour_Location_Action_DeleteAndReapply_Tooltip;
    public static String        Tour_Location_Action_Download_Start_Tooltip;

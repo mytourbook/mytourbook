@@ -215,7 +215,7 @@ public class TourLocationToolTip extends ToolTip {
             String locationTitle;
 
             switch (_locationType) {
-            case Address   -> locationTitle = Messages.Tour_Location_Label_AddressLocation; //  Address Location
+            case Common   -> locationTitle = Messages.Tour_Location_Label_CommonLocation; //  Address Location
             case TourStart -> locationTitle = Messages.Tour_Tooltip_Label_LocationStart; //     Start Location
             case TourEnd   -> locationTitle = Messages.Tour_Tooltip_Label_LocationEnd; //       End Location
             default        -> locationTitle = Messages.Tour_Location_Tooltip_Title; //          Tour Location
@@ -492,7 +492,7 @@ public class TourLocationToolTip extends ToolTip {
 
                _tourLocation = tourLocation;
 
-               _locationType = LocationType.Address;
+               _locationType = LocationType.Common;
             }
 
          } else {

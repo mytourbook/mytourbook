@@ -105,7 +105,7 @@ public class MapLocationToolTip extends ToolTip {
             String headerText = UI.EMPTY_STRING;
 
             switch (tourLocationExtended.locationType) {
-            case Address   -> headerText = Messages.Tour_Location_Label_AddressLocation;
+            case Common   -> headerText = Messages.Tour_Location_Label_CommonLocation;
             case Tour      -> headerText = Messages.Tour_Location_Tooltip_Title;
             case TourStart -> headerText = Messages.ColumnFactory_Tour_LocationStart_Title;
             case TourEnd   -> headerText = Messages.ColumnFactory_Tour_LocationEnd_Title;
