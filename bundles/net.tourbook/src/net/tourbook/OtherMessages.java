@@ -49,7 +49,6 @@ public class OtherMessages {
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_ASCENT   = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Ascent;
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_FLAT     = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Flat;
 
-
    //
    // net.tourbook.common.Messages
    //
@@ -158,6 +157,14 @@ public class OtherMessages {
    public static final String WEATHER_AIRQUAlITY_4_POOR                    = net.tourbook.common.Messages.Weather_AirQuality_4_Poor;
    public static final String WEATHER_AIRQUAlITY_5_VERYPOOR                = net.tourbook.common.Messages.Weather_AirQuality_5_VeryPoor;
    public static final String WEATHER_CLOUDS_SUNNY                         = net.tourbook.common.Messages.Weather_Clouds_Sunny;
+
+   //
+   // net.tourbook.map3.Messages
+   //
+
+   public static final String TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT_TOOLTIP = net.tourbook.map3.Messages.TourTrack_Properties_Button_Default_Tooltip;
+   public static final String TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT         = net.tourbook.map3.Messages.TourTrack_Properties_Button_Default;
+
 
    //
    // net.tourbook.ui.Messages

@@ -296,9 +296,7 @@ public class Map2 extends Canvas {
 
    private CenterMapBy                   _centerMapBy;
 
-   /**
-    * This image contains the map which is painted in the map viewport
-    */
+   /** This image contains the map which is painted in the map viewport */
    private Image                         _mapImage;
 
    /**
@@ -986,8 +984,8 @@ public class Map2 extends Canvas {
    /**
     * Checks if an image can be reused, this is true if the image exists and has the same size
     *
-    * @param newWidth
-    * @param newHeight
+    * @param image
+    * @param newBounds
     *
     * @return
     */
@@ -1002,11 +1000,11 @@ public class Map2 extends Canvas {
       // image exist, check image bounds
       final Rectangle oldBounds = image.getBounds();
 
-      if (oldBounds.width != newBounds.width || oldBounds.height != newBounds.height) {
-         return false;
+      if (oldBounds.width == newBounds.width && oldBounds.height == newBounds.height) {
+         return true;
       }
 
-      return true;
+      return false;
    }
 
    /**
@@ -4096,18 +4094,17 @@ public class Map2 extends Canvas {
          final Image image2 = _newOverlayImage_NotVisible;
 
          if (false
-               || image1 == null
-               || image2 == null
-               || image1.isDisposed()
-               || image2.isDisposed()
                || canReuseImage(image1, _newOverlaySize) == false
                || canReuseImage(image2, _newOverlaySize) == false
 
          ) {
 
+            // image need to be recreated
+
             final Image newOverlayImage_Visible = _newOverlayImage_Visible;
             final Image newOverlayImage_NotVisible = _newOverlayImage_NotVisible;
 
+            // paint old image into new image
             _newOverlayImage_Visible = createNewOverlayImage(_newOverlayImage_Visible);
             _newOverlayImage_NotVisible = createNewOverlayImage(null);
 
@@ -4137,7 +4134,7 @@ public class Map2 extends Canvas {
              * </code>
              */
 
-            // do micro adjustments
+            // do micro adjustments otherwise panning the map is NOT smooth
             final Rectangle oldTopLeft_Viewport = _newOverlay_Viewport_Visible;
             final Rectangle currentTopLeft_Viewport = _worldPixel_TopLeft_Viewport;
 
@@ -4728,7 +4725,6 @@ public class Map2 extends Canvas {
       if (_isShowTour
 
             && _isDrawTourDirection
-
             && _isDrawTourDirection_Always
 
             // currently only one tour is supported
@@ -5433,11 +5429,14 @@ public class Map2 extends Canvas {
             gc.setBackground(_transparentColor);
             gc.fillRectangle(_newOverlaySize);
 
-            gc.setAntialias(SWT.ON);
-            gc.setLineWidth(3);
+            if (TourPainterConfiguration.isShowLocationsAndMarkers) {
 
 //            paint_NewOverlay_20_AllMarker(gc);
-            paint_NewOverlay_30_ClusteredMarker(gc);
+
+               if (TourPainterConfiguration.isShowTourMarker) {
+                  paint_NewOverlay_30_ClusteredMarker(gc);
+               }
+            }
          }
          gc.dispose();
 
@@ -5465,7 +5464,7 @@ public class Map2 extends Canvas {
    @SuppressWarnings("unused")
    private void paint_NewOverlay_20_AllMarker(final GC gc) {
 
-      final ArrayList<TourData> allTourData = TourPainterConfiguration.getInstance().getTourData();
+      final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
 
       for (final TourData tourData : allTourData) {
 
@@ -5523,7 +5522,7 @@ public class Map2 extends Canvas {
 
       final float _clusterGridSize = 50;
 
-      final ArrayList<TourData> allTourData = TourPainterConfiguration.getInstance().getTourData();
+      final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
 
       final List<MapMarker> allMarkers = createMapMarkers(allTourData);
 
@@ -5537,13 +5536,9 @@ public class Map2 extends Canvas {
 
       final int clusterGridSize = (int) ScreenUtils.getPixels(_clusterGridSize);
 
-      final Set<? extends Cluster<ClusterItem>> allMarkerClusters =
+      final Set<? extends Cluster<ClusterItem>> allMarkerClusters = _distanceClustering.getClusters(_mapZoomLevel, clusterGridSize);
 
-            _distanceClustering.getClusters(_mapZoomLevel, clusterGridSize);
-
-//      System.out.println(UI.timeStamp() + " markerClusters.size() %d ".formatted(allMarkerClusters.size()));
-//// TODO remove SYSTEM.OUT.PRINTLN
-
+      // firstly paint the clusters
       for (final Cluster<ClusterItem> item : allMarkerClusters) {
 
          if (_newOverlayFuture.isCancelled()) {
@@ -5565,6 +5560,7 @@ public class Map2 extends Canvas {
          }
       }
 
+      // secondly paint the markers
       for (final Cluster<ClusterItem> item : allMarkerClusters) {
 
          if (_newOverlayFuture.isCancelled()) {
@@ -5582,10 +5578,8 @@ public class Map2 extends Canvas {
                      mapMarker.geoPoint.getLongitude(),
                      mapMarker.title);
             }
-
          }
       }
-
    }
 
    private boolean paint_NewOverlay_50_OneMarker(final GC gc,

@@ -62,9 +62,9 @@ public class DirectMappingPainter implements IDirectPainter {
    private boolean                    _isShowSliderInLegend;
    private boolean                    _isShowValuePoint;
 
-   private boolean                    _isShowMapLocation;
+   private boolean                    _isShowMapLocationsAndMarkers;
    private boolean                    _isShowMapLocations_BoundingBox;
-   private boolean                    _isShowLocations_Address;
+   private boolean                    _isShowLocations_Common;
    private boolean                    _isShowLocations_Tour;
 
    private List<TourLocationExtended> _allCommonLocations;
@@ -397,7 +397,7 @@ public class DirectMappingPainter implements IDirectPainter {
             // draw location image
             switch (tourLocationExtended.locationType) {
 
-            case Common   -> gc.drawImage(_imageMapLocation_Address, iconDevX, iconDevY);
+            case Common    -> gc.drawImage(_imageMapLocation_Address, iconDevX, iconDevY);
             case TourStart -> gc.drawImage(_imageMapLocation_Start, iconDevX, iconDevY);
             case TourEnd   -> gc.drawImage(_imageMapLocation_End, iconDevX, iconDevY);
 
@@ -868,7 +868,7 @@ public class DirectMappingPainter implements IDirectPainter {
          return;
       }
 
-      if (_isShowMapLocation) {
+      if (_isShowMapLocationsAndMarkers) {
 
          painterContext.allPaintedMapLocations.clear();
 
@@ -882,7 +882,7 @@ public class DirectMappingPainter implements IDirectPainter {
          }
 
          // show common locations
-         if (_isShowLocations_Address) {
+         if (_isShowLocations_Common) {
 
             if (_allCommonLocations != null && _allCommonLocations.size() > 0) {
 
@@ -975,7 +975,7 @@ public class DirectMappingPainter implements IDirectPainter {
 // SET_FORMATTING_ON
    }
 
-   public void setPaintingOptions_2(final boolean isShowMapLocations,
+   public void setPaintingOptions_2(final boolean isShowMapLocationsAndMarkers,
                                     final boolean isShowMapLocations_BBox,
 
                                     final boolean isShowCommonLocations,
@@ -984,10 +984,10 @@ public class DirectMappingPainter implements IDirectPainter {
                                     final boolean isMapBackgroundDark) {
 // SET_FORMATTING_OFF
 
-      _isShowMapLocation               = isShowMapLocations;
+      _isShowMapLocationsAndMarkers    = isShowMapLocationsAndMarkers;
       _isShowMapLocations_BoundingBox  = isShowMapLocations_BBox;
 
-      _isShowLocations_Address         = isShowCommonLocations;
+      _isShowLocations_Common          = isShowCommonLocations;
       _isShowLocations_Tour            = isShowTourLocations;
 
       _isMapBackgroundDark             = isMapBackgroundDark;

@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -52,7 +52,7 @@ public class ActionZoomLevelAdjustment extends Action implements IMenuCreator {
       @Override
       public void run() {
          _zoomLevel = _actionZoomLevel;
-         TourPainterConfiguration.getInstance().setZoomLevelAdjustment(_actionZoomLevel);
+         TourPainterConfiguration.setZoomLevelAdjustment(_actionZoomLevel);
       }
    }
 
@@ -112,7 +112,7 @@ public class ActionZoomLevelAdjustment extends Action implements IMenuCreator {
 
       _zoomLevel = zoomLevel;
 
-      TourPainterConfiguration.getInstance().setZoomLevelAdjustment(zoomLevel);
+      TourPainterConfiguration.setZoomLevelAdjustment(zoomLevel);
 
       _actionZoomLevel_0.setChecked(false);
       _actionZoomLevel_1.setChecked(false);

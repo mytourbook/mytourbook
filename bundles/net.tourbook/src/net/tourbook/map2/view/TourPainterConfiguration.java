@@ -29,78 +29,68 @@ import net.tourbook.tour.filter.TourFilterFieldOperator;
  */
 public class TourPainterConfiguration {
 
-   private static TourPainterConfiguration _instance;
-
-   private final ArrayList<TourData>       _allTourData = new ArrayList<>();
-   private final ArrayList<Photo>          _allPhotos   = new ArrayList<>();
+   private final static ArrayList<TourData> _allTourData = new ArrayList<>();
+   private final static ArrayList<Photo>    _allPhotos   = new ArrayList<>();
 
    /**
     * contains the upper left and lower right position for a tour
     */
-   private Set<GeoPosition>                _tourBounds;
+   private static Set<GeoPosition>          _tourBounds;
 
-   private int                             _zoomLevelAdjustment;
+   private static int                       _zoomLevelAdjustment;
 
-   private IMapColorProvider               _mapColorProvider;
+   private static IMapColorProvider         _mapColorProvider;
 
-   boolean                                 isBackgroundDark;
+   static boolean                           isBackgroundDark;
 
-   boolean                                 isShowStartEndInMap;
-   boolean                                 isShowTourMarker;
-   boolean                                 isShowTourPauses;
-   boolean                                 isShowWayPoints;
-   boolean                                 isPhotoVisible;
-   boolean                                 isTourVisible;
+   public static boolean                    isShowLocationsAndMarkers;
+   static boolean                           isShowPhotos;
+   static boolean                           isShowTours;
+   static public boolean                    isShowTourMarker;
+   static boolean                           isShowTourPauses;
+   static boolean                           isShowTourStartEnd;
+   static boolean                           isShowWayPoints;
 
    /**
     * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
     * save in a tour) is displayed.
     */
-   boolean                                 isLinkPhotoDisplayed;
+   static boolean                           isLinkPhotoDisplayed;
 
-   boolean                                 isFilterTourPauses;
-   boolean                                 isFilterPauseDuration;
-   boolean                                 isShowAutoPauses;
-   boolean                                 isShowUserPauses;
-   long                                    pauseDuration;
-   Enum<TourFilterFieldOperator>           pauseDurationOperator;
+   static boolean                           isFilterTourPauses;
+   static boolean                           isFilterPauseDuration;
+   static boolean                           isShowAutoPauses;
+   static boolean                           isShowUserPauses;
+   static long                              pauseDuration;
+   static Enum<TourFilterFieldOperator>     pauseDurationOperator;
 
-   boolean                                 isShowBreadcrumbs;
+   static boolean                           isShowBreadcrumbs;
 
    private TourPainterConfiguration() {}
 
-   public static TourPainterConfiguration getInstance() {
-
-      if (_instance == null) {
-         _instance = new TourPainterConfiguration();
-      }
-
-      return _instance;
-   }
-
-   public IMapColorProvider getMapColorProvider() {
+   public static IMapColorProvider getMapColorProvider() {
       return _mapColorProvider;
    }
 
-   public ArrayList<Photo> getPhotos() {
+   public static ArrayList<Photo> getPhotos() {
       return _allPhotos;
    }
 
    /**
     * @return Returns the tour bounds or <code>null</code> when a tour is not set
     */
-   public Set<GeoPosition> getTourBounds() {
+   public static Set<GeoPosition> getTourBounds() {
       return _tourBounds;
    }
 
    /**
     * @return Returns the current {@link TourData} which is selected in a view or editor
     */
-   public ArrayList<TourData> getTourData() {
+   public static ArrayList<TourData> getTourData() {
       return _allTourData;
    }
 
-   public int getZoomLevelAdjustment() {
+   public static int getZoomLevelAdjustment() {
       return _zoomLevelAdjustment;
    }
 
@@ -109,13 +99,13 @@ public class TourPainterConfiguration {
     *
     * @param tourData
     */
-   public void resetTourData() {
+   public static void resetTourData() {
 
       _allTourData.clear();
       _allTourData.add(null);
    }
 
-   public void setMapColorProvider(final IMapColorProvider mapColorProvider) {
+   public static void setMapColorProvider(final IMapColorProvider mapColorProvider) {
       if (mapColorProvider != null) {
          _mapColorProvider = mapColorProvider;
       }
@@ -126,7 +116,7 @@ public class TourPainterConfiguration {
     *           When <code>null</code>, photos are not displayed.
     * @param isShowPhoto
     */
-   public void setPhotos(final ArrayList<Photo> allPhotos, final boolean isShowPhoto, final boolean isLinkPhoto) {
+   public static void setPhotos(final ArrayList<Photo> allPhotos, final boolean isShowPhoto, final boolean isLinkPhoto) {
 
       _allPhotos.clear();
 
@@ -134,12 +124,12 @@ public class TourPainterConfiguration {
          _allPhotos.addAll(allPhotos);
       }
 
-      isPhotoVisible = isShowPhoto && _allPhotos.size() > 0;
+      isShowPhotos = isShowPhoto && _allPhotos.size() > 0;
 
       isLinkPhotoDisplayed = isLinkPhoto;
    }
 
-   public void setTourBounds(final Set<GeoPosition> mapPositions) {
+   public static void setTourBounds(final Set<GeoPosition> mapPositions) {
       _tourBounds = mapPositions;
    }
 
@@ -149,7 +139,7 @@ public class TourPainterConfiguration {
     * @param tourDataList
     * @param isShowTour
     */
-   public void setTourData(final ArrayList<TourData> tourDataList, final boolean isShowTour) {
+   public static void setTourData(final ArrayList<TourData> tourDataList, final boolean isShowTour) {
 
       _allTourData.clear();
 
@@ -157,7 +147,7 @@ public class TourPainterConfiguration {
          _allTourData.addAll(tourDataList);
       }
 
-      isTourVisible = isShowTour && _allTourData.size() > 0;
+      isShowTours = isShowTour && _allTourData.size() > 0;
    }
 
    /**
@@ -167,15 +157,15 @@ public class TourPainterConfiguration {
     * @param tourData
     * @param isShowTour
     */
-   public void setTourData(final TourData tourData, final boolean isShowTour) {
+   public static void setTourData(final TourData tourData, final boolean isShowTour) {
 
       _allTourData.clear();
       _allTourData.add(tourData);
 
-      isTourVisible = isShowTour && _allTourData.size() > 0;
+      isShowTours = isShowTour && _allTourData.size() > 0;
    }
 
-   public void setZoomLevelAdjustment(final int zoomLevel) {
+   public static void setZoomLevelAdjustment(final int zoomLevel) {
       _zoomLevelAdjustment = zoomLevel;
    }
 }

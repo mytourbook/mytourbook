@@ -65,7 +65,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
 
    private Map2View                       _map2View;
 
-   private final TourPainterConfiguration _tourPainterConfig = TourPainterConfiguration.getInstance();
 
    /*
     * UI controls
@@ -132,7 +131,7 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
          createUI_10_Header(shellContainer);
          createUI_20_MapOptions(shellContainer);
 
-         _tourPausesUI.createContent(shellContainer, _tourPainterConfig.isShowTourPauses);
+         _tourPausesUI.createContent(shellContainer, TourPainterConfiguration.isShowTourPauses);
       }
 
       return shellContainer;

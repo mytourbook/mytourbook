@@ -35,6 +35,7 @@ import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourLocation;
 import net.tourbook.map2.view.Map2View;
+import net.tourbook.map2.view.TourPainterConfiguration;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -87,14 +88,14 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements ITourViewer2 {
 
-   private static final String     COLUMN_CREATED_DATE_TIME        = "createdDateTime";                           //$NON-NLS-1$
-   private static final String     COLUMN_LOCATION_NAME            = "LocationName";                              //$NON-NLS-1$
-   private static final String     COLUMN_SEQUENCE                 = "sequence";                                  //$NON-NLS-1$
-   private static final String     COLUMN_ZOOM_LEVEL               = "zoomLevel";                                 //$NON-NLS-1$
+   private static final String     COLUMN_CREATED_DATE_TIME        = "createdDateTime";                         //$NON-NLS-1$
+   private static final String     COLUMN_LOCATION_NAME            = "LocationName";                            //$NON-NLS-1$
+   private static final String     COLUMN_SEQUENCE                 = "sequence";                                //$NON-NLS-1$
+   private static final String     COLUMN_ZOOM_LEVEL               = "zoomLevel";                               //$NON-NLS-1$
 
-   private static final String     STATE_SELECTED_TAB              = "STATE_SELECTED_TAB";                        //$NON-NLS-1$
-   private static final String     STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";               //$NON-NLS-1$
-   private static final String     STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                      //$NON-NLS-1$
+   private static final String     STATE_SELECTED_TAB              = "STATE_SELECTED_TAB";                      //$NON-NLS-1$
+   private static final String     STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";             //$NON-NLS-1$
+   private static final String     STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                    //$NON-NLS-1$
 
    private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
    private IDialogSettings         _state_Map2;
@@ -115,7 +116,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
    private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
    private ActionDeleteLocation    _actionDeleteLocation;
 
-   private List<TourLocation>      _allMapLocations                 = CommonLocationManager.getCommonLocations();
+   private List<TourLocation>      _allMapLocations                = CommonLocationManager.getCommonLocations();
 
    private TourLocationToolTip     _locationTooltip;
 
@@ -134,13 +135,17 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
 
    private Button     _btnDelete;
 
+   private Button     _chkIsShowCommonLocations;
    private Button     _chkIsShowMapLocations_BoundingBox;
    private Button     _chkIsShowTourLocations;
-   private Button     _chkIsShowCommonLocations;
-
-   private CTabFolder _tabFolder;
+   private Button     _chkIsShowTourMarker;
 
    private Menu       _tableContextMenu;
+
+   private CTabFolder _tabFolder;
+   private CTabItem   _tabOptions;
+   private CTabItem   _tabCommonLocations;
+   private CTabItem   _tabTourMarkers;
 
    private class ActionDeleteLocation extends Action {
 
@@ -404,7 +409,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
 //      shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
       {
          final Composite container = new Composite(shellContainer, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
          GridLayoutFactory.fillDefaults()
 //               .extendedMargins(5, 5, 0, 5)
                .applyTo(container);
@@ -414,13 +419,17 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
             GridLayoutFactory.fillDefaults().applyTo(_tabFolder);
 
             {
-               final CTabItem tabPainting = new CTabItem(_tabFolder, SWT.NONE);
-               tabPainting.setText(Messages.Slideout_MapLocation_Tab_Options);
-               tabPainting.setControl(createUI_100_Tab_Options(_tabFolder));
+               _tabOptions = new CTabItem(_tabFolder, SWT.NONE);
+               _tabOptions.setText(Messages.Slideout_MapLocation_Tab_Options);
+               _tabOptions.setControl(createUI_100_Tab_Options(_tabFolder));
 
-               final CTabItem tabSelection = new CTabItem(_tabFolder, SWT.NONE);
-               tabSelection.setText(Messages.Slideout_MapLocation_Tab_CommonLocations);
-               tabSelection.setControl(createUI_200_Tab_CommonLocations(_tabFolder));
+               _tabTourMarkers = new CTabItem(_tabFolder, SWT.NONE);
+               _tabTourMarkers.setText(Messages.Slideout_MapLocation_Tab_TourMarkers);
+               _tabTourMarkers.setControl(createUI_200_Tab_TourMarkers(_tabFolder));
+
+               _tabCommonLocations = new CTabItem(_tabFolder, SWT.NONE);
+               _tabCommonLocations.setText(Messages.Slideout_MapLocation_Tab_CommonLocations);
+               _tabCommonLocations.setControl(createUI_500_Tab_CommonLocations(_tabFolder));
             }
          }
       }
@@ -445,7 +454,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          {
             /*
@@ -466,62 +475,37 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
             _chkIsShowMapLocations_BoundingBox.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowMapLocations_BoundingBox);
          }
-         {
-            /*
-             * Show common locations
-             */
-            _chkIsShowCommonLocations = new Button(container, SWT.CHECK);
-            _chkIsShowCommonLocations.setText(Messages.Slideout_MapLocation_Checkbox_ShowCommonLocations);
-            _chkIsShowCommonLocations.setToolTipText(Messages.Slideout_MapLocation_Checkbox_ShowCommonLocations_Tooltip);
-            _chkIsShowCommonLocations.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowCommonLocations);
-         }
+
       }
 
       // reorder tabbing
-      container.setTabList(new Control[] {
-
-            _chkIsShowCommonLocations,
-            _chkIsShowTourLocations,
-
-            _chkIsShowMapLocations_BoundingBox,
-      });
+//      container.setTabList(new Control[] {
+//
+//            _chkIsShowCommonLocations,
+//            _chkIsShowTourLocations,
+//
+//            _chkIsShowMapLocations_BoundingBox,
+//      });
    }
 
-   private Control createUI_200_Tab_CommonLocations(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(1).applyTo(container);
-      {
-         createUI_210_LocationViewer(container);
-         createUI_220_Actions(container);
-      }
-
-      return container;
-   }
-
-   private void createUI_210_LocationViewer(final Composite parent) {
+   private Control createUI_200_Tab_TourMarkers(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.fillDefaults().applyTo(container);
+      GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(1).applyTo(container);
       {
          {
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Slideout_MapLocation_Label_CommonLocations);
+            /*
+             * Show tour marker
+             */
+            _chkIsShowTourMarker = new Button(container, SWT.CHECK);
+            _chkIsShowTourMarker.setText(Messages.Slideout_MapLocation_Checkbox_ShowTourMarkers);
+            _chkIsShowTourMarker.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().applyTo(_chkIsShowTourMarker);
          }
-         {
-            _viewerContainer = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
-            GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
-            {
-               createUI_222_Table(_viewerContainer);
-            }
-         }
-
-//         createUI_680_ViewerActions(container);
       }
+
+      return container;
    }
 
    private void createUI_220_Actions(final Composite parent) {
@@ -613,6 +597,52 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
 
       return tableContextMenu;
+   }
+
+   private Control createUI_500_Tab_CommonLocations(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(1).applyTo(container);
+      {
+         createUI_510_LocationViewer(container);
+         createUI_220_Actions(container);
+      }
+
+      return container;
+   }
+
+   private void createUI_510_LocationViewer(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
+      {
+         {
+            /*
+             * Show common locations
+             */
+            _chkIsShowCommonLocations = new Button(container, SWT.CHECK);
+            _chkIsShowCommonLocations.setText(Messages.Slideout_MapLocation_Checkbox_ShowCommonLocations);
+            _chkIsShowCommonLocations.setToolTipText(Messages.Slideout_MapLocation_Checkbox_ShowCommonLocations_Tooltip);
+            _chkIsShowCommonLocations.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().applyTo(_chkIsShowCommonLocations);
+         }
+         {
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Slideout_MapLocation_Label_CommonLocations);
+         }
+         {
+            _viewerContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
+            GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+            {
+               createUI_222_Table(_viewerContainer);
+            }
+         }
+
+//         createUI_680_ViewerActions(container);
+      }
    }
 
    private void defineAllColumns() {
@@ -819,13 +849,13 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       final List<TourLocation> allSelectedLocations = getSelectedLocations();
 
       final boolean isShowCommonLocations = _chkIsShowCommonLocations.getSelection();
-      final boolean isShowTourLocations = _chkIsShowTourLocations.getSelection();
       final boolean isCommonLocationSelected = isShowCommonLocations && allSelectedLocations.size() > 0;
 
       _btnDelete.setEnabled(isCommonLocationSelected);
 
-      _chkIsShowMapLocations_BoundingBox.setEnabled(isShowCommonLocations || isShowTourLocations);
       _mapLocationViewer.getTable().setEnabled(isShowCommonLocations);
+
+      updateUI_TabLabel();
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
@@ -941,12 +971,21 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
 
    private void onChangeUI() {
 
-      _state_Map2.put(Map2View.STATE_IS_SHOW_LOCATIONS_COMMON, _chkIsShowCommonLocations.getSelection());
-      _state_Map2.put(Map2View.STATE_IS_SHOW_LOCATIONS_TOUR, _chkIsShowTourLocations.getSelection());
+// SET_FORMATTING_OFF
 
-      _state_Map2.put(Map2View.STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX, _chkIsShowMapLocations_BoundingBox.getSelection());
+      final boolean isShowTourMarker = _chkIsShowTourMarker.getSelection();
 
-      _map2View.updateState_Map2_Options();
+      _state_Map2.put(Map2View.STATE_IS_SHOW_COMMON_LOCATIONS,             _chkIsShowCommonLocations.getSelection());
+      _state_Map2.put(Map2View.STATE_IS_SHOW_TOUR_LOCATIONS,               _chkIsShowTourLocations.getSelection());
+      _state_Map2.put(Map2View.STATE_IS_SHOW_TOUR_MARKER,                  isShowTourMarker);
+
+      _state_Map2.put(Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX,    _chkIsShowMapLocations_BoundingBox.getSelection());
+
+// SET_FORMATTING_ON
+
+      TourPainterConfiguration.isShowTourMarker = isShowTourMarker;
+
+      _map2View.getMap().paint();
 
       enableControls();
    }
@@ -1073,17 +1112,20 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       _tabFolder.setSelection(Util.getStateInt(_state_Slideout, STATE_SELECTED_TAB, 0));
 
       _chkIsShowCommonLocations.setSelection(Util.getStateBoolean(_state_Map2,
-            Map2View.STATE_IS_SHOW_LOCATIONS_COMMON,
-            Map2View.STATE_IS_SHOW_LOCATIONS_COMMON_DEFAULT));
-
-      _chkIsShowTourLocations.setSelection(Util.getStateBoolean(_state_Map2,
-            Map2View.STATE_IS_SHOW_LOCATIONS_TOUR,
-            Map2View.STATE_IS_SHOW_LOCATIONS_TOUR_DEFAULT));
+            Map2View.STATE_IS_SHOW_COMMON_LOCATIONS,
+            Map2View.STATE_IS_SHOW_COMMON_LOCATIONS_DEFAULT));
 
       _chkIsShowMapLocations_BoundingBox.setSelection(Util.getStateBoolean(_state_Map2,
-            Map2View.STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX,
-            Map2View.STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX_DEFAULT));
+            Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX,
+            Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX_DEFAULT));
 
+      _chkIsShowTourLocations.setSelection(Util.getStateBoolean(_state_Map2,
+            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS,
+            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT));
+
+      _chkIsShowTourMarker.setSelection(Util.getStateBoolean(_state_Map2,
+            Map2View.STATE_IS_SHOW_TOUR_MARKER,
+            Map2View.STATE_IS_SHOW_TOUR_MARKER_DEFAULT));
    }
 
    private void restoreState_BeforeUI() {
@@ -1165,6 +1207,22 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
 
       table.setSortColumn(tc);
       table.setSortDirection(sortDirection == MapLocationComparator.ASCENDING ? SWT.UP : SWT.DOWN);
+   }
+
+   private void updateUI_TabLabel() {
+
+      final boolean isShowCommonLocations = _chkIsShowCommonLocations.getSelection();
+      final boolean isShowTourMarker = _chkIsShowTourMarker.getSelection();
+
+      // show a flag in the tab label when content is enabled
+
+      _tabCommonLocations.setText(isShowCommonLocations
+            ? UI.SYMBOL_STAR + UI.SPACE + Messages.Slideout_MapLocation_Tab_CommonLocations
+            : Messages.Slideout_MapLocation_Tab_CommonLocations);
+
+      _tabTourMarkers.setText(isShowTourMarker
+            ? UI.SYMBOL_STAR + UI.SPACE + Messages.Slideout_MapLocation_Tab_TourMarkers
+            : Messages.Slideout_MapLocation_Tab_TourMarkers);
    }
 
    private void updateUI_Viewer() {
