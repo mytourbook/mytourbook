@@ -67,7 +67,7 @@ public class DirectMappingPainter implements IDirectPainter {
    private boolean                    _isShowLocations_Address;
    private boolean                    _isShowLocations_Tour;
 
-   private List<TourLocationExtended> _allAddressLocations;
+   private List<TourLocationExtended> _allCommonLocations;
    private List<TourLocationExtended> _allTourLocations;
    private int                        _mapLocationLineHeight    = MTFont.getTitleFontHeight() + 3;
 
@@ -881,12 +881,12 @@ public class DirectMappingPainter implements IDirectPainter {
             }
          }
 
-         // show address locations
+         // show common locations
          if (_isShowLocations_Address) {
 
-            if (_allAddressLocations != null && _allAddressLocations.size() > 0) {
+            if (_allCommonLocations != null && _allCommonLocations.size() > 0) {
 
-               drawMapLocation(painterContext, _allAddressLocations);
+               drawMapLocation(painterContext, _allCommonLocations);
             }
          }
       }
@@ -924,9 +924,9 @@ public class DirectMappingPainter implements IDirectPainter {
       }
    }
 
-   public void setAddressLocations(final List<TourLocationExtended> allAddressLocations) {
+   public void setCommonLocations(final List<TourLocationExtended> allCommonLocations) {
 
-      _allAddressLocations = allAddressLocations;
+      _allCommonLocations = allCommonLocations;
    }
 
    /**
@@ -978,7 +978,7 @@ public class DirectMappingPainter implements IDirectPainter {
    public void setPaintingOptions_2(final boolean isShowMapLocations,
                                     final boolean isShowMapLocations_BBox,
 
-                                    final boolean isShowAddressLocations,
+                                    final boolean isShowCommonLocations,
                                     final boolean isShowTourLocations,
 
                                     final boolean isMapBackgroundDark) {
@@ -987,7 +987,7 @@ public class DirectMappingPainter implements IDirectPainter {
       _isShowMapLocation               = isShowMapLocations;
       _isShowMapLocations_BoundingBox  = isShowMapLocations_BBox;
 
-      _isShowLocations_Address         = isShowAddressLocations;
+      _isShowLocations_Address         = isShowCommonLocations;
       _isShowLocations_Tour            = isShowTourLocations;
 
       _isMapBackgroundDark             = isMapBackgroundDark;

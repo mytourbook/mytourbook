@@ -243,7 +243,7 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_IS_SHOW_TOUR_WEATHER_IN_MAP                     = "STATE_IS_SHOW_TOUR_WEATHER_IN_MAP";                //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_WAY_POINTS                              = "STATE_IS_SHOW_WAY_POINTS";                            //$NON-NLS-1$
 
-   /** Map locations are including tour and address locations */
+   /** Map locations are including tour and common locations */
    public static final String    STATE_IS_SHOW_MAP_LOCATIONS                           = "STATE_IS_SHOW_MAP_LOCATIONS";                           //$NON-NLS-1$
    static final boolean          STATE_IS_SHOW_MAP_LOCATIONS_DEFAULT                   = true;
    public static final String    STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX               = "STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX";                           //$NON-NLS-1$
@@ -1387,7 +1387,7 @@ public class Map2View extends ViewPart implements
       paintEntireTour();
    }
 
-   public void addAddressLocation(final TourLocation tourLocation) {
+   public void addCommonLocation(final TourLocation tourLocation) {
 
       // update model + UI
       CommonLocationManager.addLocation(tourLocation);
@@ -1684,7 +1684,7 @@ public class Map2View extends ViewPart implements
 
          } else if (eventId == TourEventId.COMMON_LOCATION_SELECTION) {
 
-            moveToAddressLocation(eventData);
+            moveToCommonLocation(eventData);
 
          } else if (eventId == TourEventId.TOUR_LOCATION_SELECTION) {
 
@@ -3254,7 +3254,7 @@ public class Map2View extends ViewPart implements
    }
 
    @SuppressWarnings("unchecked")
-   private void moveToAddressLocation(final Object eventData) {
+   private void moveToCommonLocation(final Object eventData) {
 
       List<TourLocation> allTourLocations = null;
 
@@ -3268,7 +3268,7 @@ public class Map2View extends ViewPart implements
 
          // hide tour locations
 
-         _directMappingPainter.setAddressLocations(null);
+         _directMappingPainter.setCommonLocations(null);
 
          _map.redraw();
 
@@ -3276,12 +3276,12 @@ public class Map2View extends ViewPart implements
       }
 
       // repaint map
-      final List<TourLocationExtended> allAddressLocations = new ArrayList<>();
+      final List<TourLocationExtended> allCommonLocations = new ArrayList<>();
       for (final TourLocation tourLocation : allTourLocations) {
-         allAddressLocations.add(new TourLocationExtended(tourLocation, LocationType.Common));
+         allCommonLocations.add(new TourLocationExtended(tourLocation, LocationType.Common));
       }
 
-      _directMappingPainter.setAddressLocations(allAddressLocations);
+      _directMappingPainter.setCommonLocations(allCommonLocations);
 
       _map.redraw();
 
@@ -5432,7 +5432,7 @@ public class Map2View extends ViewPart implements
             Map2View.STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX,
             Map2View.STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX_DEFAULT);
 
-      final boolean isShowAddressLocations = Util.getStateBoolean(_state,
+      final boolean isShowCommonLocations = Util.getStateBoolean(_state,
             Map2View.STATE_IS_SHOW_LOCATIONS_COMMON,
             Map2View.STATE_IS_SHOW_LOCATIONS_COMMON_DEFAULT);
 
@@ -5457,7 +5457,7 @@ public class Map2View extends ViewPart implements
             isShowMapLocations,
             isShowMapLocations_BBox,
 
-            isShowAddressLocations,
+            isShowCommonLocations,
             isShowTourLocations,
 
             isBackgroundDark);

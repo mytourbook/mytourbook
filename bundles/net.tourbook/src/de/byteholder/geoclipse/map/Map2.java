@@ -329,10 +329,10 @@ public class Map2 extends Canvas {
     * The position in latitude/longitude of the "address" being mapped. This is a special coordinate
     * that, when moved, will cause the map to be moved as well. It is separate from "center" in that
     * "center" tracks the current center (in pixels) of the view port whereas this will not change
-    * when panning or zooming. Whenever the addressLocation is changed, however, the map will be
+    * when panning or zooming. Whenever the commonLocation is changed, however, the map will be
     * repositioned.
     */
-   private GeoPosition                   _addressLocation;
+   private GeoPosition                   _commonLocation;
 
    /**
     * The overlay to delegate to for painting the "foreground" of the map component. This would
@@ -1451,16 +1451,6 @@ public class Map2 extends Canvas {
    }
 
    /**
-    * Gets the current address location of the map. This property does not change when the user pans
-    * the map. This property is bound.
-    *
-    * @return the current map location (address)
-    */
-   public GeoPosition getAddressLocation() {
-      return _addressLocation;
-   }
-
-   /**
     * Parse bounding box string.
     *
     * @param boundingBox
@@ -1512,6 +1502,16 @@ public class Map2 extends Canvas {
 
    public CenterMapBy getCenterMapBy() {
       return _centerMapBy;
+   }
+
+   /**
+    * Gets the current common location of the map. This property does not change when the user pans
+    * the map. This property is bound.
+    *
+    * @return the current map location (address)
+    */
+   public GeoPosition getCommonLocation() {
+      return _commonLocation;
    }
 
    public PaintedMapLocation getHoveredMapLocation() {
@@ -7298,14 +7298,14 @@ public class Map2 extends Canvas {
    }
 
    /**
-    * Re-centers the map to have the current address location be at the center of the map,
+    * Re-centers the map to have the current common location be at the center of the map,
     * accounting for the map's width and height.
     *
-    * @see getAddressLocation
+    * @see getCommonLocation
     */
-   public void recenterToAddressLocation() {
+   public void recenterToCommonLocation() {
 
-      final java.awt.Point worldPixel = _mp.geoToPixel(getAddressLocation(), _mapZoomLevel);
+      final java.awt.Point worldPixel = _mp.geoToPixel(getCommonLocation(), _mapZoomLevel);
 
       setMapCenterInWorldPixel(worldPixel);
 

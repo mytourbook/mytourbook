@@ -195,7 +195,7 @@ public class CommonLocationManager {
       return true;
    }
 
-   public static List<TourLocation> getAddressLocations() {
+   public static List<TourLocation> getCommonLocations() {
       return _allMapLocations;
    }
 

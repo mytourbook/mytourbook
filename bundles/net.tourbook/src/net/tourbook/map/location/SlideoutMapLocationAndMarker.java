@@ -115,7 +115,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
    private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
    private ActionDeleteLocation    _actionDeleteLocation;
 
-   private List<TourLocation>      _allMapLocations                 = CommonLocationManager.getAddressLocations();
+   private List<TourLocation>      _allMapLocations                 = CommonLocationManager.getCommonLocations();
 
    private TourLocationToolTip     _locationTooltip;
 
@@ -468,7 +468,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
          }
          {
             /*
-             * Show address locations
+             * Show common locations
              */
             _chkIsShowCommonLocations = new Button(container, SWT.CHECK);
             _chkIsShowCommonLocations.setText(Messages.Slideout_MapLocation_Checkbox_ShowCommonLocations);
@@ -818,14 +818,14 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
 
       final List<TourLocation> allSelectedLocations = getSelectedLocations();
 
-      final boolean isShowAddressLocations = _chkIsShowCommonLocations.getSelection();
+      final boolean isShowCommonLocations = _chkIsShowCommonLocations.getSelection();
       final boolean isShowTourLocations = _chkIsShowTourLocations.getSelection();
-      final boolean isAddressLocationSelected = isShowAddressLocations && allSelectedLocations.size() > 0;
+      final boolean isCommonLocationSelected = isShowCommonLocations && allSelectedLocations.size() > 0;
 
-      _btnDelete.setEnabled(isAddressLocationSelected);
+      _btnDelete.setEnabled(isCommonLocationSelected);
 
-      _chkIsShowMapLocations_BoundingBox.setEnabled(isShowAddressLocations || isShowTourLocations);
-      _mapLocationViewer.getTable().setEnabled(isShowAddressLocations);
+      _chkIsShowMapLocations_BoundingBox.setEnabled(isShowCommonLocations || isShowTourLocations);
+      _mapLocationViewer.getTable().setEnabled(isShowCommonLocations);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
