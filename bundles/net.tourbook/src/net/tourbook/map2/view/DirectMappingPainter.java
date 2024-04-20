@@ -87,7 +87,7 @@ public class DirectMappingPainter implements IDirectPainter {
    private Color                      _nameColor_Dark_Hovered   = new Color(255, 255, 255);
    private Color                      _nameColor_Bright         = new Color(41, 54, 0);
    private Color                      _nameColor_Bright_Shadow  = new Color(255, 255, 255);
-   private Color                      _nameColor_Bright_Hovered = new Color(137, 173, 39);
+   private Color                      _nameColor_Bright_Hovered = new Color(23, 137, 255);
 
    /*
     * UI resources
