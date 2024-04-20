@@ -178,6 +178,7 @@ Copy/Merge app files to build folder
 
 Build Product
 --------------
+
    Open cmd
    
       - Select folder "C:\DAT\MT\mytourbook"

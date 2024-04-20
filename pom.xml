@@ -22,7 +22,7 @@
    </dependencies>	
 
    <properties>
-      <tycho.version>3.0.5</tycho.version>
+      <tycho.version>4.0.6</tycho.version>
       <surefire.version>3.2.5</surefire.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
@@ -39,28 +39,28 @@
    <profiles>
    
       <profile>
-         <id>build-release</id>
-         <modules>
-            <module>features</module>
-            <module>build</module>
-         </modules>
+         <id>build-release</id>              
+                                             <modules>
+                                                <module>features</module>
+                                                <module>build</module>
+                                             </modules>
       
       </profile>
 
       <profile>
-         <id>build-update-site</id>
-         <modules>
-            <module>features</module>
-            <module>build/build.update-site</module>
-         </modules>
+         <id>build-update-site</id>          
+                                             <modules>
+                                                <module>features</module>
+                                                <module>build/build.update-site</module>
+                                             </modules>
       </profile>
 
       <profile>
-         <id>build-update-site-no-nl</id>
-         <modules>
-            <module>features</module>
-            <module>build/build.update-site-no-NL</module>
-         </modules>
+         <id>build-update-site-no-nl</id>    
+                                             <modules>
+                                                <module>features</module>
+                                                <module>build/build.update-site-no-NL</module>
+                                             </modules>
       </profile>
       
    </profiles>
@@ -71,9 +71,9 @@
       <!-- Eclipse E4 web repository -->
       
       <repository>
-         <id>eclipse.platform.4.28</id>                                 <layout>p2</layout>
+         <id>eclipse.platform.4.31</id>                                 <layout>p2</layout>
          
-         <url>https://download.eclipse.org/releases/2023-06</url>
+         <url>https://download.eclipse.org/releases/2024-03</url>
          
 <!-- 
          <url>https://download.eclipse.org/eclipse/updates/4.24-I-builds/I20220525-1800/</url>
@@ -91,8 +91,31 @@
          <url>https://download.eclipse.org/nebula/releases/3.0.0/</url>
       </repository> 
       
-      <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build -->
+      <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build 
       <repository> <id>eclipse.4.23.nl</id> <layout>p2</layout> <url>file:build/build.eclipse.4.23.nl.repo</url> </repository>
+      -->
+
+      <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build 
+      
+         [ERROR] Cannot resolve dependencies of project net.tourbook:feature.net.tourbook.ext.eclipse.nl:eclipse-feature:4.23.0-SNAPSHOT
+         [ERROR]  with context {osgi.os=linux, osgi.ws=gtk, org.eclipse.update.install.features=true, osgi.arch=x86_64, org.eclipse.update.install.sources=true}
+         [ERROR]   Software being installed: feature.net.tourbook.ext.eclipse.nl.feature.group 4.23.0.qualifier
+         [ERROR]   Missing requirement: org.eclipse.equinox.p2.artifact.repository.nl_cs 4.26.0.v20230220105658 requires 'osgi.bundle; org.eclipse.equinox.p2.artifact.repository 0.0.0' but it could not be found
+         [ERROR]   Cannot satisfy dependency: feature.net.tourbook.ext.eclipse.nl.feature.group 4.23.0.qualifier depends on: org.eclipse.equinox.p2.iu; org.eclipse.equinox.p2.artifact.repository.nl_cs 0.0.0: See log for details      
+      
+      <repository>
+          <id>eclipse.nl.4.26</id>
+          <layout>p2</layout>
+          <url>https://download.eclipse.org/technology/babel/update-site/latest/</url>
+      </repository>
+      -->
+      
+      <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build 
+      
+         The Eclipse NL repo can be downloaded from https://www.eclipse.org/babel/downloads.php
+      
+      <repository> <id>eclipse.4.26.nl</id> <layout>p2</layout> <url>file:build/build.eclipse.nl.repo/2022-12/</url> </repository>
+      -->
 
    </repositories>
 
