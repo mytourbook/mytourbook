@@ -90,7 +90,7 @@ public class MapLocationToolTip extends ToolTip {
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).spacing(5, 3).applyTo(container);
-      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
          {
             /*
@@ -105,7 +105,7 @@ public class MapLocationToolTip extends ToolTip {
             String headerText = UI.EMPTY_STRING;
 
             switch (tourLocationExtended.locationType) {
-            case Common   -> headerText = Messages.Tour_Location_Label_CommonLocation;
+            case Common    -> headerText = Messages.Tour_Location_Label_CommonLocation;
             case Tour      -> headerText = Messages.Tour_Location_Tooltip_Title;
             case TourStart -> headerText = Messages.ColumnFactory_Tour_LocationStart_Title;
             case TourEnd   -> headerText = Messages.ColumnFactory_Tour_LocationEnd_Title;

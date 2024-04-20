@@ -205,7 +205,7 @@ public class TourLocationToolTip extends ToolTip {
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).spacing(5, 3).applyTo(container);
-      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
          {
             /*
@@ -215,7 +215,7 @@ public class TourLocationToolTip extends ToolTip {
             String locationTitle;
 
             switch (_locationType) {
-            case Common   -> locationTitle = Messages.Tour_Location_Label_CommonLocation; //  Address Location
+            case Common    -> locationTitle = Messages.Tour_Location_Label_CommonLocation; //   Common Location
             case TourStart -> locationTitle = Messages.Tour_Tooltip_Label_LocationStart; //     Start Location
             case TourEnd   -> locationTitle = Messages.Tour_Tooltip_Label_LocationEnd; //       End Location
             default        -> locationTitle = Messages.Tour_Location_Tooltip_Title; //          Tour Location
