@@ -43,7 +43,6 @@ public class TourPainterConfiguration {
 
    static boolean                           isBackgroundDark;
 
-   public static boolean                    isShowLocationsAndMarkers;
    static boolean                           isShowPhotos;
    static boolean                           isShowTours;
    static public boolean                    isShowTourMarker;

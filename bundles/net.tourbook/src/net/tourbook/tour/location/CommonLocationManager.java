@@ -143,7 +143,7 @@ public class CommonLocationManager {
    //
    private static final List<TourLocation>     _allMapLocations                         = new ArrayList<>();
 
-   private static SlideoutMapLocationAndMarker _mapLocationSlideout;
+   private static SlideoutMapLocationAndMarker _mapLocationAndMarkerSlideout;
 
    private static int                          _locationRequestZoomlevel                = TourLocationManager.DEFAULT_ZOOM_LEVEL_VALUE;
 
@@ -159,12 +159,12 @@ public class CommonLocationManager {
       _allMapLocations.add(tourLocation);
 
       // update UI
-      if (_mapLocationSlideout != null) {
+      if (_mapLocationAndMarkerSlideout != null) {
 
-         _mapLocationSlideout.open(false);
+         _mapLocationAndMarkerSlideout.open(false);
 
          // delay to be sure that the slideout is opened
-         PlatformUI.getWorkbench().getDisplay().asyncExec(() -> _mapLocationSlideout.updateUI(tourLocation));
+         PlatformUI.getWorkbench().getDisplay().asyncExec(() -> _mapLocationAndMarkerSlideout.updateUI(tourLocation));
       }
    }
 
@@ -525,6 +525,17 @@ public class CommonLocationManager {
 
    public static void setMapLocationSlideout(final SlideoutMapLocationAndMarker mapLocationSlideout) {
 
-      _mapLocationSlideout = mapLocationSlideout;
+      _mapLocationAndMarkerSlideout = mapLocationSlideout;
+   }
+
+   /**
+    * Update UI in the location + marker slideout
+    */
+   public static void updateMapLocationAndMarkerSlideout() {
+
+      if (_mapLocationAndMarkerSlideout != null) {
+
+         _mapLocationAndMarkerSlideout.updateUI();
+      }
    }
 }

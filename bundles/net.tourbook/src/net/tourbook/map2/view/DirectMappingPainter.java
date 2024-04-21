@@ -62,7 +62,6 @@ public class DirectMappingPainter implements IDirectPainter {
    private boolean                    _isShowSliderInLegend;
    private boolean                    _isShowValuePoint;
 
-   private boolean                    _isShowMapLocationsAndMarkers;
    private boolean                    _isShowMapLocations_BoundingBox;
    private boolean                    _isShowLocations_Common;
    private boolean                    _isShowLocations_Tour;
@@ -868,7 +867,7 @@ public class DirectMappingPainter implements IDirectPainter {
          return;
       }
 
-      if (_isShowMapLocationsAndMarkers) {
+      if (_isShowLocations_Tour || _isShowLocations_Common) {
 
          painterContext.allPaintedMapLocations.clear();
 
@@ -975,8 +974,7 @@ public class DirectMappingPainter implements IDirectPainter {
 // SET_FORMATTING_ON
    }
 
-   public void setPaintingOptions_2(final boolean isShowMapLocationsAndMarkers,
-                                    final boolean isShowMapLocations_BBox,
+   public void setPaintingOptions_2(final boolean isShowMapLocations_BBox,
 
                                     final boolean isShowCommonLocations,
                                     final boolean isShowTourLocations,
@@ -984,7 +982,6 @@ public class DirectMappingPainter implements IDirectPainter {
                                     final boolean isMapBackgroundDark) {
 // SET_FORMATTING_OFF
 
-      _isShowMapLocationsAndMarkers    = isShowMapLocationsAndMarkers;
       _isShowMapLocations_BoundingBox  = isShowMapLocations_BBox;
 
       _isShowLocations_Common          = isShowCommonLocations;

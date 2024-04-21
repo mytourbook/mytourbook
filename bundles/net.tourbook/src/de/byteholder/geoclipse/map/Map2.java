@@ -5429,13 +5429,10 @@ public class Map2 extends Canvas {
             gc.setBackground(_transparentColor);
             gc.fillRectangle(_newOverlaySize);
 
-            if (TourPainterConfiguration.isShowLocationsAndMarkers) {
-
 //            paint_NewOverlay_20_AllMarker(gc);
 
-               if (TourPainterConfiguration.isShowTourMarker) {
-                  paint_NewOverlay_30_ClusteredMarker(gc);
-               }
+            if (TourPainterConfiguration.isShowTourMarker) {
+               paint_NewOverlay_30_ClusteredMarker(gc);
             }
          }
          gc.dispose();

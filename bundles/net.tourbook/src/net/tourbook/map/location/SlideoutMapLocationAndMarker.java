@@ -92,56 +92,56 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
    private static final String     COLUMN_LOCATION_NAME            = "LocationName";                            //$NON-NLS-1$
    private static final String     COLUMN_SEQUENCE                 = "sequence";                                //$NON-NLS-1$
    private static final String     COLUMN_ZOOM_LEVEL               = "zoomLevel";                               //$NON-NLS-1$
-
+   //
    private static final String     STATE_SELECTED_TAB              = "STATE_SELECTED_TAB";                      //$NON-NLS-1$
    private static final String     STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";             //$NON-NLS-1$
    private static final String     STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                    //$NON-NLS-1$
-
+   //
    private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
    private IDialogSettings         _state_Map2;
    private IDialogSettings         _state_Slideout;
-
+   //
    private Map2View                _map2View;
    private ToolItem                _toolItem;
-
+   //
    private TableViewer             _mapLocationViewer;
    private MapLocationComparator   _mapLocationComparator          = new MapLocationComparator();
    private ColumnManager           _columnManager;
    private SelectionAdapter        _columnSortListener;
-
+   //
    private SelectionListener       _defaultSelectionListener;
    private IPropertyChangeListener _prefChangeListener;
-
+   //
    private MenuManager             _viewerMenuManager;
    private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
    private ActionDeleteLocation    _actionDeleteLocation;
-
+   //
    private List<TourLocation>      _allMapLocations                = CommonLocationManager.getCommonLocations();
-
+   //
    private TourLocationToolTip     _locationTooltip;
-
+   //
    private PixelConverter          _pc;
-
+   //
    private final NumberFormat      _nf3                            = NumberFormat.getNumberInstance();
    {
       _nf3.setMinimumFractionDigits(3);
       _nf3.setMaximumFractionDigits(3);
    }
-
+   //
    /*
     * UI controls
     */
    private Composite  _viewerContainer;
-
+   //
    private Button     _btnDelete;
-
+   //
    private Button     _chkIsShowCommonLocations;
    private Button     _chkIsShowMapLocations_BoundingBox;
    private Button     _chkIsShowTourLocations;
    private Button     _chkIsShowTourMarker;
-
+   //
    private Menu       _tableContextMenu;
-
+   //
    private CTabFolder _tabFolder;
    private CTabItem   _tabOptions;
    private CTabItem   _tabCommonLocations;
@@ -359,6 +359,14 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
+   @Override
+   public void close() {
+
+      CommonLocationManager.setMapLocationSlideout(null);
+
+      super.close();
+   }
+
    private void createActions() {
 
       _actionDeleteLocation = new ActionDeleteLocation();
@@ -391,7 +399,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       // load viewer
       updateUI_Viewer();
 
-      restoreState();
+      restoreState(false);
       enableControls();
 
       CommonLocationManager.setMapLocationSlideout(this);
@@ -993,8 +1001,6 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
    @Override
    protected void onDispose() {
 
-      CommonLocationManager.setMapLocationSlideout(null);
-
       if (_prefChangeListener != null) {
 
          _prefStore.removePropertyChangeListener(_prefChangeListener);
@@ -1107,9 +1113,16 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       updateUI_Viewer();
    }
 
-   private void restoreState() {
+   private void restoreState(final boolean isInUIUpdate) {
 
-      _tabFolder.setSelection(Util.getStateInt(_state_Slideout, STATE_SELECTED_TAB, 0));
+      if (isInUIUpdate) {
+
+         // keep currently selected tab
+
+      } else {
+
+         _tabFolder.setSelection(Util.getStateInt(_state_Slideout, STATE_SELECTED_TAB, 0));
+      }
 
       _chkIsShowCommonLocations.setSelection(Util.getStateBoolean(_state_Map2,
             Map2View.STATE_IS_SHOW_COMMON_LOCATIONS,
@@ -1126,6 +1139,8 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       _chkIsShowTourMarker.setSelection(Util.getStateBoolean(_state_Map2,
             Map2View.STATE_IS_SHOW_TOUR_MARKER,
             Map2View.STATE_IS_SHOW_TOUR_MARKER_DEFAULT));
+
+      updateUI_TabLabel();
    }
 
    private void restoreState_BeforeUI() {
@@ -1154,6 +1169,11 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
 
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
+
+   public void updateUI() {
+
+      restoreState(true);
+   }
 
    public void updateUI(final TourLocation tourLocation) {
 

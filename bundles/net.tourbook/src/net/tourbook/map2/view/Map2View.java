@@ -187,7 +187,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -225,28 +224,24 @@ public class Map2View extends ViewPart implements
 
    static final String           STATE_TRACK_OPTIONS_SELECTED_TAB                      = "STATE_TRACK_OPTIONS_SELECTED_TAB";                    //$NON-NLS-1$
 
-   static final String           STATE_IS_TOGGLE_KEYBOARD_PANNING                      = "STATE_IS_TOGGLE_KEYBOARD_PANNING";                    //$NON-NLS-1$
-   static final boolean          STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT              = true;
    private static final String   STATE_IS_SHOW_LEGEND_IN_MAP                           = "STATE_IS_SHOW_LEGEND_IN_MAP";                         //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_PHOTO_IN_MAP                            = "STATE_IS_SHOW_PHOTO_IN_MAP";                          //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_IN_MAP                             = "STATE_IS_SHOW_TOUR_IN_MAP";                           //$NON-NLS-1$
-   private static final String   STATE_IS_SHOW_VALUE_POINT                             = "STATE_IS_SHOW_VALUE_POINT";                           //$NON-NLS-1$
-   private static final boolean  STATE_IS_SHOW_VALUE_POINT_DEFAULT                     = true;
    private static final String   STATE_IS_SHOW_SCALE_IN_MAP                            = "STATE_IS_SHOW_SCALE_IN_MAP";                          //$NON-NLS-1$
    static final String           STATE_IS_SHOW_SLIDER_IN_MAP                           = "STATE_IS_SHOW_SLIDER_IN_MAP";                         //$NON-NLS-1$
    static final boolean          STATE_IS_SHOW_SLIDER_IN_MAP_DEFAULT                   = true;
    private static final String   STATE_IS_SHOW_SLIDER_IN_LEGEND                        = "STATE_IS_SHOW_SLIDER_IN_LEGEND";                      //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_START_END_IN_MAP                        = "STATE_IS_SHOW_START_END_IN_MAP";                      //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_INFO_IN_MAP                        = "STATE_IS_SHOW_TOUR_INFO_IN_MAP";                      //$NON-NLS-1$
-   public static final String    STATE_IS_SHOW_TOUR_MARKER                             = "STATE_IS_SHOW_TOUR_MARKER";                           //$NON-NLS-1$
-   public static final boolean   STATE_IS_SHOW_TOUR_MARKER_DEFAULT                     = true;
    private static final String   STATE_IS_SHOW_TOUR_PAUSES                             = "STATE_IS_SHOW_TOUR_PAUSES";                           //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_WEATHER_IN_MAP                     = "STATE_IS_SHOW_TOUR_WEATHER_IN_MAP";                //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_VALUE_POINT                             = "STATE_IS_SHOW_VALUE_POINT";                           //$NON-NLS-1$
+   private static final boolean  STATE_IS_SHOW_VALUE_POINT_DEFAULT                     = true;
    private static final String   STATE_IS_SHOW_WAY_POINTS                              = "STATE_IS_SHOW_WAY_POINTS";                            //$NON-NLS-1$
+   static final String           STATE_IS_TOGGLE_KEYBOARD_PANNING                      = "STATE_IS_TOGGLE_KEYBOARD_PANNING";                    //$NON-NLS-1$
+   static final boolean          STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT              = true;
 
-   /** Map locations are including tour and common locations and markers*/
-   public static final String    STATE_IS_SHOW_LOCATIONS_AND_MARKERS                   = "STATE_IS_SHOW_LOCATIONS_AND_MARKERS";                           //$NON-NLS-1$
-   static final boolean          STATE_IS_SHOW_LOCATIONS_AND_MARKERS_DEFAULT           = true;
+   // locations + marker
    public static final String    STATE_IS_SHOW_LOCATION_BOUNDING_BOX                   = "STATE_IS_SHOW_LOCATION_BOUNDING_BOX";                           //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_LOCATION_BOUNDING_BOX_DEFAULT           = true;
 
@@ -254,6 +249,8 @@ public class Map2View extends ViewPart implements
    public static final boolean   STATE_IS_SHOW_COMMON_LOCATIONS_DEFAULT                = true;
    public static final String    STATE_IS_SHOW_TOUR_LOCATIONS                          = "STATE_IS_SHOW_TOUR_LOCATIONS";                           //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT                  = true;
+   public static final String    STATE_IS_SHOW_TOUR_MARKER                             = "STATE_IS_SHOW_TOUR_MARKER";                           //$NON-NLS-1$
+   public static final boolean   STATE_IS_SHOW_TOUR_MARKER_DEFAULT                     = true;
 
    public static final String    STATE_IS_SHOW_HOVERED_SELECTED_TOUR                            = "STATE_IS_SHOW_HOVERED_SELECTED_TOUR";                 //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT                    = true;
@@ -507,7 +504,7 @@ public class Map2View extends ViewPart implements
    private ActionManageMapProviders          _actionManageMapProvider;
    private ActionMapBookmarks                _actionMap2Slideout_Bookmarks;
    private ActionMap2Color                   _actionMap2Slideout_Color;
-   private ActionMap2_MapLocation            _actionMap2Slideout_MapLocationsAndMarkers;
+   private ActionMap2_MapLocationAndMarker   _actionMap2Slideout_MapLocationsAndMarkers;
    private ActionMap2_MapProvider            _actionMap2Slideout_MapProvider;
    private ActionMap2_Options                _actionMap2Slideout_Options;
    private ActionMap2_PhotoFilter            _actionMap2Slideout_PhotoFilter;
@@ -615,16 +612,13 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   private class ActionMap2_MapLocation extends ActionToolbarSlideoutAdv {
+   private class ActionMap2_MapLocationAndMarker extends ActionToolbarSlideoutAdv {
 
       private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getThemedImageDescriptor(Images.MapLocation);
 
-      public ActionMap2_MapLocation() {
+      public ActionMap2_MapLocationAndMarker() {
 
          super(_actionImageDescriptor, _actionImageDescriptor);
-
-         isToggleAction = true;
-         notSelectedTooltip = Messages.Map_Action_MapLocations_Tooltip;
       }
 
       @Override
@@ -639,14 +633,6 @@ public class Map2View extends ViewPart implements
       @Override
       protected void onBeforeOpenSlideout() {
          closeOpenedDialogs(this);
-      }
-
-      @Override
-      protected void onSelect(final SelectionEvent selectionEvent) {
-
-         super.onSelect(selectionEvent);
-
-         updateUI_MapLocations(getSelection());
       }
    }
 
@@ -1152,16 +1138,11 @@ public class Map2View extends ViewPart implements
 
       final boolean isSelected = _actionShowTourMarker.isChecked();
 
+      _state.put(STATE_IS_SHOW_TOUR_MARKER, isSelected);
+
       TourPainterConfiguration.isShowTourMarker = isSelected;
 
-      if (isSelected && TourPainterConfiguration.isShowLocationsAndMarkers == false) {
-
-         // common location/marker state must be enabled
-
-         _actionMap2Slideout_MapLocationsAndMarkers.setSelection(true);
-
-         updateUI_MapLocations(true);
-      }
+      CommonLocationManager.updateMapLocationAndMarkerSlideout();
 
       _map.paint();
    }
@@ -1399,18 +1380,11 @@ public class Map2View extends ViewPart implements
 
    public void addCommonLocation(final TourLocation tourLocation) {
 
-      // update model + UI
+      // update model + slideout UI
       CommonLocationManager.addLocation(tourLocation);
 
-      // update UI
-      if (_actionMap2Slideout_MapLocationsAndMarkers.getSelection() == false) {
-
-         // location is not painted
-
-         _actionMap2Slideout_MapLocationsAndMarkers.setSelection(true);
-
-         updateUI_MapLocations(true);
-      }
+      // update map UI
+      _map.paint();
    }
 
    private void addMapListener() {
@@ -1870,14 +1844,14 @@ public class Map2View extends ViewPart implements
       _allTourColor_Actions.put(MapGraphId.RunDyn_StepLength,  _actionTourColor_RunDyn_StepLength);
 
       // actions with slideouts
-      _actionMap2Slideout_Bookmarks       = new ActionMapBookmarks(this._parent, this);
-      _actionMap2Slideout_Color           = new ActionMap2Color();
-      _actionMap2Slideout_MapLocationsAndMarkers     = new ActionMap2_MapLocation();
-      _actionMap2Slideout_MapProvider     = new ActionMap2_MapProvider(this, _state_MapProvider);
-      _actionMap2Slideout_PhotoFilter     = new ActionMap2_PhotoFilter(this, _state_PhotoFilter);
-      _actionMap2Slideout_Options         = new ActionMap2_Options();
-      _actionMap2Slideout_SyncMap         = new ActionSyncMap();
-      _actionMap2Slideout_TourColors      = new ActionMap2_Graphs();
+      _actionMap2Slideout_Bookmarks                = new ActionMapBookmarks(this._parent, this);
+      _actionMap2Slideout_Color                    = new ActionMap2Color();
+      _actionMap2Slideout_MapLocationsAndMarkers   = new ActionMap2_MapLocationAndMarker();
+      _actionMap2Slideout_MapProvider              = new ActionMap2_MapProvider(this, _state_MapProvider);
+      _actionMap2Slideout_PhotoFilter              = new ActionMap2_PhotoFilter(this, _state_PhotoFilter);
+      _actionMap2Slideout_Options                  = new ActionMap2_Options();
+      _actionMap2Slideout_SyncMap                  = new ActionSyncMap();
+      _actionMap2Slideout_TourColors               = new ActionMap2_Graphs();
 
       _actionZoom_CenterMapBy             = new ActionZoomCenterBy(this);
       _actionZoom_In                      = new ActionZoomIn(this);
@@ -2336,8 +2310,8 @@ public class Map2View extends ViewPart implements
 
       tbm.add(new Separator());
 
-      tbm.add(_actionMap2Slideout_Bookmarks);
       tbm.add(_actionMap2Slideout_MapLocationsAndMarkers);
+      tbm.add(_actionMap2Slideout_Bookmarks);
 
       tbm.add(new Separator());
 
@@ -4617,12 +4591,6 @@ public class Map2View extends ViewPart implements
             Util.getStateDouble(_state, STATE_DEFAULT_POSITION_LATITUDE, 46.303074),
             Util.getStateDouble(_state, STATE_DEFAULT_POSITION_LONGITUDE, 7.526386));
 
-      // map locations and markers
-      final boolean isShowMapLocations = Util.getStateBoolean(_state,
-            Map2View.STATE_IS_SHOW_LOCATIONS_AND_MARKERS,
-            Map2View.STATE_IS_SHOW_LOCATIONS_AND_MARKERS_DEFAULT);
-      _actionMap2Slideout_MapLocationsAndMarkers.setSelection(isShowMapLocations);
-
       // tour color
       try {
 
@@ -5437,10 +5405,6 @@ public class Map2View extends ViewPart implements
       /*
        * Location/marker
        */
-      final boolean isShowMapLocationsAndMarkers = Util.getStateBoolean(_state,
-            Map2View.STATE_IS_SHOW_LOCATIONS_AND_MARKERS,
-            Map2View.STATE_IS_SHOW_LOCATIONS_AND_MARKERS_DEFAULT);
-
       final boolean isShowMapLocations_BBox = Util.getStateBoolean(_state,
             Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX,
             Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX_DEFAULT);
@@ -5456,18 +5420,17 @@ public class Map2View extends ViewPart implements
 // SET_FORMATTING_ON
 
       // enable/disable location tooltip
-      if (isShowMapLocationsAndMarkers) {
-         _map.getMapLocationTooltip().activate();
-      } else {
-         _map.getMapLocationTooltip().deactivate();
-      }
+//      if (isShowMapLocationsAndMarkers) {
+//         _map.getMapLocationTooltip().activate();
+//      } else {
+//         _map.getMapLocationTooltip().deactivate();
+//      }
 
       /*
        * Update options for the map direct painter
        */
       _directMappingPainter.setPaintingOptions_2(
 
-            isShowMapLocationsAndMarkers,
             isShowMapLocations_BBox,
 
             isShowCommonLocations,
@@ -5584,15 +5547,6 @@ public class Map2View extends ViewPart implements
       if (_isMapSyncWith_ValuePoint) {
          positionMapTo_ValueIndex(hoveredTourData, hoveredSerieIndex);
       }
-   }
-
-   private void updateUI_MapLocations(final boolean isSelected) {
-
-      _state.put(Map2View.STATE_IS_SHOW_LOCATIONS_AND_MARKERS, isSelected);
-
-      TourPainterConfiguration.isShowLocationsAndMarkers = isSelected;
-
-      _map.paint();
    }
 
    public void updateUI_Photos() {
