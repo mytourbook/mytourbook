@@ -2337,7 +2337,6 @@ public class Messages extends NLS {
    public static String        Slideout_MapLocation_Checkbox_ShowLocationBoundingBox;
    public static String        Slideout_MapLocation_Checkbox_ShowTourLocations;
    public static String        Slideout_MapLocation_Checkbox_ShowTourLocations_Tooltip;
-   public static String        Slideout_MapLocation_Checkbox_ShowTourMarkers;
    public static String        Slideout_MapLocation_Label_CommonLocations;
    public static String        Slideout_MapLocation_Label_Title;
    public static String        Slideout_MapLocation_Tab_CommonLocations;

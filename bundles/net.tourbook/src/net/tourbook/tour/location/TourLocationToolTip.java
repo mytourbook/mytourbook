@@ -27,7 +27,7 @@ import net.tourbook.common.util.ToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.map.location.LocationType;
-import net.tourbook.map.location.SlideoutMapLocationAndMarker;
+import net.tourbook.map2.view.SlideoutMap2_LocationAndMarker;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.location.TourLocationView.LocationItem;
 import net.tourbook.ui.Messages;
@@ -90,7 +90,7 @@ public class TourLocationToolTip extends ToolTip {
     */
    private Composite _ttContainer;
 
-   public TourLocationToolTip(final SlideoutMapLocationAndMarker slideoutMapLocation) {
+   public TourLocationToolTip(final SlideoutMap2_LocationAndMarker slideoutMapLocation) {
 
       super(slideoutMapLocation.getLocationViewer().getTable(), NO_RECREATE, false);
 
@@ -482,7 +482,7 @@ public class TourLocationToolTip extends ToolTip {
                _tourLocation = locationItem.tourLocation;
             }
 
-         } else if (labelProvider instanceof SlideoutMapLocationAndMarker.TooltipLabelProvider) {
+         } else if (labelProvider instanceof SlideoutMap2_LocationAndMarker.TooltipLabelProvider) {
 
             // slideout map location
 

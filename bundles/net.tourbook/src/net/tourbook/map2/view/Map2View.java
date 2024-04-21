@@ -86,7 +86,6 @@ import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.location.LocationType;
-import net.tourbook.map.location.SlideoutMapLocationAndMarker;
 import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.action.ActionCreateTourMarkerFromMap;
@@ -551,7 +550,7 @@ public class Map2View extends ViewPart implements
    private GeoFilter_LoaderData              _geoFilter_PreviousGeoLoaderItem;
    private AtomicInteger                     _geoFilter_RunningId  = new AtomicInteger();
    //
-   private SlideoutMapLocationAndMarker      _slideoutMapLocation;
+   private SlideoutMap2_LocationAndMarker      _slideoutMapLocation;
    //
    /*
     * UI controls
@@ -624,7 +623,7 @@ public class Map2View extends ViewPart implements
       @Override
       protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-         _slideoutMapLocation = new SlideoutMapLocationAndMarker(toolItem, _state, _state_MapLocation, Map2View.this);
+         _slideoutMapLocation = new SlideoutMap2_LocationAndMarker(toolItem, _state, _state_MapLocation, Map2View.this);
          _slideoutMapLocation.setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
 
          return _slideoutMapLocation;
@@ -716,7 +715,7 @@ public class Map2View extends ViewPart implements
 
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-         return new SlideoutMap2TrackOptions(_parent, toolbar, Map2View.this, _state);
+         return new SlideoutMap2_TrackOptions(_parent, toolbar, Map2View.this, _state);
       }
 
       @Override

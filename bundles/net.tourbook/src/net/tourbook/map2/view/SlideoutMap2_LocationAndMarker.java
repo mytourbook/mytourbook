@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map.location;
+package net.tourbook.map2.view;
 
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
@@ -23,6 +23,8 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorSelectorExtended;
+import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AdvancedSlideout;
@@ -34,8 +36,7 @@ import net.tourbook.common.util.ITourViewer2;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourLocation;
-import net.tourbook.map2.view.Map2View;
-import net.tourbook.map2.view.TourPainterConfiguration;
+import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -63,10 +64,14 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -75,8 +80,10 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -84,9 +91,9 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * Slideout for all map locations and marker
+ * Slideout for all 2D map locations and marker
  */
-public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements ITourViewer2 {
+public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements ITourViewer2, IColorSelectorListener {
 
    private static final String     COLUMN_CREATED_DATE_TIME        = "createdDateTime";                         //$NON-NLS-1$
    private static final String     COLUMN_LOCATION_NAME            = "LocationName";                            //$NON-NLS-1$
@@ -110,6 +117,10 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
    private SelectionAdapter        _columnSortListener;
    //
    private SelectionListener       _defaultSelectionListener;
+   private SelectionListener       _markerSelectionListener;
+   private IPropertyChangeListener _markerPropertyChangeListener;
+   private MouseWheelListener      _markerMouseWheelListener;
+   private FocusListener           _keepOpenListener;
    private IPropertyChangeListener _prefChangeListener;
    //
    private MenuManager             _viewerMenuManager;
@@ -128,24 +139,39 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       _nf3.setMaximumFractionDigits(3);
    }
    //
+   private GridDataFactory _spinnerGridData;
+   //
    /*
     * UI controls
     */
-   private Composite  _viewerContainer;
+   private Composite             _viewerContainer;
    //
-   private Button     _btnDelete;
+   private Menu                  _tableContextMenu;
    //
-   private Button     _chkIsShowCommonLocations;
-   private Button     _chkIsShowMapLocations_BoundingBox;
-   private Button     _chkIsShowTourLocations;
-   private Button     _chkIsShowTourMarker;
+   private CTabFolder            _tabFolder;
+   private CTabItem              _tabOptions;
+   private CTabItem              _tabCommonLocations;
+   private CTabItem              _tabTourMarkers;
    //
-   private Menu       _tableContextMenu;
+   private Button                _btnDelete;
+   private Button                _btnSwapMarkerColor;
    //
-   private CTabFolder _tabFolder;
-   private CTabItem   _tabOptions;
-   private CTabItem   _tabCommonLocations;
-   private CTabItem   _tabTourMarkers;
+   private Button                _chkIsShowCommonLocations;
+   private Button                _chkIsShowMapLocations_BoundingBox;
+   private Button                _chkIsShowTourLocations;
+   private Button                _chkIsShowTourMarker;
+
+   private Label                 _lblMarkerColor;
+   private Label                 _lblMarkerOpacity;
+   private Label                 _lblMarkerSize;
+
+   private Spinner               _spinnerMarkerOutline_Opacity;
+   private Spinner               _spinnerMarkerFill_Opacity;
+   private Spinner               _spinnerMarkerOutline_Size;
+   private Spinner               _spinnerMarkerSymbol_Size;
+
+   private ColorSelectorExtended _colorMarkerSymbol_Outline;
+   private ColorSelectorExtended _colorMarkerSymbol_Fill;
 
    private class ActionDeleteLocation extends Action {
 
@@ -306,7 +332,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
 
          disposeContextMenu();
 
-         _tableContextMenu = createUI_225_CreateViewerContextMenu();
+         _tableContextMenu = createUI_525_CreateViewerContextMenu();
 
          return _tableContextMenu;
       }
@@ -324,7 +350,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
     * @param ownerControl
     * @param toolBar
     */
-   public SlideoutMapLocationAndMarker(final ToolItem toolItem,
+   public SlideoutMap2_LocationAndMarker(final ToolItem toolItem,
                                        final IDialogSettings map2State,
                                        final IDialogSettings slideoutState,
                                        final Map2View map2View) {
@@ -365,6 +391,12 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       CommonLocationManager.setMapLocationSlideout(null);
 
       super.close();
+   }
+
+   @Override
+   public void colorDialogOpened(final boolean isDialogOpened) {
+
+      setIsAnotherDialogOpened(isDialogOpened);
    }
 
    private void createActions() {
@@ -433,7 +465,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
 
                _tabTourMarkers = new CTabItem(_tabFolder, SWT.NONE);
                _tabTourMarkers.setText(Messages.Slideout_MapLocation_Tab_TourMarkers);
-               _tabTourMarkers.setControl(createUI_200_Tab_TourMarkers(_tabFolder));
+               _tabTourMarkers.setControl(createUI_200_Tab_TourMarker(_tabFolder));
 
                _tabCommonLocations = new CTabItem(_tabFolder, SWT.NONE);
                _tabCommonLocations.setText(Messages.Slideout_MapLocation_Tab_CommonLocations);
@@ -496,7 +528,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
 //      });
    }
 
-   private Control createUI_200_Tab_TourMarkers(final Composite parent) {
+   private Control createUI_200_Tab_TourMarker(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -507,16 +539,365 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
              * Show tour marker
              */
             _chkIsShowTourMarker = new Button(container, SWT.CHECK);
-            _chkIsShowTourMarker.setText(Messages.Slideout_MapLocation_Checkbox_ShowTourMarkers);
-            _chkIsShowTourMarker.addSelectionListener(_defaultSelectionListener);
+            _chkIsShowTourMarker.setText(Messages.Slideout_Map25MarkerOptions_Checkbox_IsShowTourMarker);
+            _chkIsShowTourMarker.addSelectionListener(_markerSelectionListener);
             GridDataFactory.fillDefaults().applyTo(_chkIsShowTourMarker);
+         }
+
+         final Group group = new Group(container, SWT.NONE);
+         group.setText(Messages.Slideout_Map25MarkerOptions_Group_MarkerLayout);
+         GridDataFactory.fillDefaults().applyTo(group);
+         GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+         {
+            createUI_220_Marker_Point(group);
+            createUI_230_Marker_Cluster(group);
          }
       }
 
       return container;
    }
 
-   private void createUI_220_Actions(final Composite parent) {
+   private void createUI_220_Marker_Point(final Composite parent) {
+
+      {
+         // label: symbol
+         _lblMarkerColor = new Label(parent, SWT.NONE);
+         _lblMarkerColor.setText(Messages.Slideout_Map25MarkerOptions_Label_MarkerColor);
+         _lblMarkerColor.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_MarkerColor_Tooltip);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_lblMarkerColor);
+
+         final Composite container = new Composite(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+         {
+            // outline color
+            _colorMarkerSymbol_Outline = new ColorSelectorExtended(container);
+            _colorMarkerSymbol_Outline.addListener(_markerPropertyChangeListener);
+            _colorMarkerSymbol_Outline.addOpenListener(this);
+
+            // fill color
+            _colorMarkerSymbol_Fill = new ColorSelectorExtended(container);
+            _colorMarkerSymbol_Fill.addListener(_markerPropertyChangeListener);
+            _colorMarkerSymbol_Fill.addOpenListener(this);
+
+            // button: swap color
+            _btnSwapMarkerColor = new Button(container, SWT.PUSH);
+            _btnSwapMarkerColor.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
+            _btnSwapMarkerColor.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
+            _btnSwapMarkerColor.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSwapMarkerColor()));
+         }
+      }
+      {
+         /*
+          * Opacity
+          */
+         // label
+         _lblMarkerOpacity = new Label(parent, SWT.NONE);
+         _lblMarkerOpacity.setText(Messages.Slideout_Map25MarkerOptions_Label_MarkerOpacity);
+         _lblMarkerOpacity.setToolTipText(NLS.bind(Messages.Slideout_Map25MarkerOptions_Label_MarkerOpacity_Tooltip, UI.TRANSFORM_OPACITY_MAX));
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_lblMarkerOpacity);
+
+         /*
+          * Symbol
+          */
+         final Composite container = new Composite(parent, SWT.NONE);
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+         {
+            {
+               // spinner: outline
+               _spinnerMarkerOutline_Opacity = new Spinner(container, SWT.BORDER);
+               _spinnerMarkerOutline_Opacity.setMinimum(0);
+               _spinnerMarkerOutline_Opacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
+               _spinnerMarkerOutline_Opacity.setIncrement(1);
+               _spinnerMarkerOutline_Opacity.setPageIncrement(10);
+               _spinnerMarkerOutline_Opacity.addSelectionListener(_markerSelectionListener);
+               _spinnerMarkerOutline_Opacity.addMouseWheelListener(_markerMouseWheelListener);
+               _spinnerGridData.applyTo(_spinnerMarkerOutline_Opacity);
+            }
+            {
+               // spinner: fill
+               _spinnerMarkerFill_Opacity = new Spinner(container, SWT.BORDER);
+               _spinnerMarkerFill_Opacity.setMinimum(0);
+               _spinnerMarkerFill_Opacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
+               _spinnerMarkerFill_Opacity.setIncrement(1);
+               _spinnerMarkerFill_Opacity.setPageIncrement(10);
+               _spinnerMarkerFill_Opacity.addSelectionListener(_markerSelectionListener);
+               _spinnerMarkerFill_Opacity.addMouseWheelListener(_markerMouseWheelListener);
+               _spinnerGridData.applyTo(_spinnerMarkerFill_Opacity);
+            }
+         }
+      }
+      {
+         /*
+          * Size
+          */
+
+         // label: size
+         _lblMarkerSize = new Label(parent, SWT.NONE);
+         _lblMarkerSize.setText(Messages.Slideout_Map25MarkerOptions_Label_MarkerSize);
+         _lblMarkerSize.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_MarkerSize_Tooltip);
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_lblMarkerSize);
+
+         final Composite container = new Composite(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+         {
+            // outline size
+            _spinnerMarkerOutline_Size = new Spinner(container, SWT.BORDER);
+            _spinnerMarkerOutline_Size.setMinimum((int) Map25ConfigManager.MARKER_OUTLINE_SIZE_MIN);
+            _spinnerMarkerOutline_Size.setMaximum((int) Map25ConfigManager.MARKER_OUTLINE_SIZE_MAX);
+            _spinnerMarkerOutline_Size.setIncrement(1);
+            _spinnerMarkerOutline_Size.setPageIncrement(10);
+            _spinnerMarkerOutline_Size.addSelectionListener(_markerSelectionListener);
+            _spinnerMarkerOutline_Size.addMouseWheelListener(_markerMouseWheelListener);
+            _spinnerGridData.applyTo(_spinnerMarkerOutline_Size);
+
+            // symbol size
+            _spinnerMarkerSymbol_Size = new Spinner(container, SWT.BORDER);
+            _spinnerMarkerSymbol_Size.setMinimum(Map25ConfigManager.MARKER_SYMBOL_SIZE_MIN);
+            _spinnerMarkerSymbol_Size.setMaximum(Map25ConfigManager.MARKER_SYMBOL_SIZE_MAX);
+            _spinnerMarkerSymbol_Size.setIncrement(1);
+            _spinnerMarkerSymbol_Size.setPageIncrement(10);
+            _spinnerMarkerSymbol_Size.addSelectionListener(_markerSelectionListener);
+            _spinnerMarkerSymbol_Size.addMouseWheelListener(_markerMouseWheelListener);
+            _spinnerGridData.applyTo(_spinnerMarkerSymbol_Size);
+         }
+      }
+   }
+
+   private void createUI_230_Marker_Cluster(final Composite parent) {
+
+//      final int clusterIndent = UI.FORM_FIRST_COLUMN_INDENT;
+//
+//      {
+//         /*
+//          * Cluster
+//          */
+//
+//         // checkbox: Is clustering
+//         _chkIsMarkerClustering = new Button(parent, SWT.CHECK);
+//         _chkIsMarkerClustering.setText(Messages.Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering);
+//         _chkIsMarkerClustering.addSelectionListener(_markerSelectionListener);
+//         GridDataFactory.fillDefaults()
+//               .span(2, 1)
+//               .indent(0, 10)
+//               .applyTo(_chkIsMarkerClustering);
+//      }
+//      {
+//         /*
+//          * Symbol color
+//          */
+//         {
+//            // label
+//            _lblClusterSymbol = new Label(parent, SWT.NONE);
+//            _lblClusterSymbol.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterSymbolColor);
+//            _lblClusterSymbol.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_ClusterSymbolColor_Tooltip);
+//            GridDataFactory.fillDefaults()
+//                  .align(SWT.FILL, SWT.CENTER)
+//                  .indent(clusterIndent, 0)
+//                  .applyTo(_lblClusterSymbol);
+//         }
+//
+//         {
+//            final Composite container = new Composite(parent, SWT.NONE);
+//            GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+//            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+//
+//            // foreground color
+//            _colorClusterSymbol_Outline = new ColorSelectorExtended(container);
+//            _colorClusterSymbol_Outline.addListener(_defaultPropertyChangeListener);
+//            _colorClusterSymbol_Outline.addOpenListener(this);
+//
+//            // foreground color
+//            _colorClusterSymbol_Fill = new ColorSelectorExtended(container);
+//            _colorClusterSymbol_Fill.addListener(_defaultPropertyChangeListener);
+//            _colorClusterSymbol_Fill.addOpenListener(this);
+//
+//            // button: swap color
+//            _btnSwapClusterSymbolColor = new Button(container, SWT.PUSH);
+//            _btnSwapClusterSymbolColor.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
+//            _btnSwapClusterSymbolColor.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
+//            _btnSwapClusterSymbolColor.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSwapClusterColor()));
+//         }
+//      }
+//      {
+//         /*
+//          * Opacity
+//          */
+//         // label
+//         _lblClusterOpacity = new Label(parent, SWT.NONE);
+//         _lblClusterOpacity.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterOpacity);
+//         _lblClusterOpacity.setToolTipText(NLS.bind(Messages.Slideout_Map25MarkerOptions_Label_ClusterOpacity_Tooltip, UI.TRANSFORM_OPACITY_MAX));
+//         GridDataFactory.fillDefaults()
+//               .indent(clusterIndent, 0)
+//               .align(SWT.FILL, SWT.CENTER)
+//               .applyTo(_lblClusterOpacity);
+//
+//         /*
+//          * Symbol
+//          */
+//         final Composite container = new Composite(parent, SWT.NONE);
+//         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+//         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//         {
+//            {
+//               // spinner: outline
+//               _spinnerClusterOutline_Opacity = new Spinner(container, SWT.BORDER);
+//               _spinnerClusterOutline_Opacity.setMinimum(0);
+//               _spinnerClusterOutline_Opacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
+//               _spinnerClusterOutline_Opacity.setIncrement(1);
+//               _spinnerClusterOutline_Opacity.setPageIncrement(10);
+//               _spinnerClusterOutline_Opacity.addSelectionListener(_markerSelectionListener);
+//               _spinnerClusterOutline_Opacity.addMouseWheelListener(_defaultMouseWheelListener);
+//               _spinnerGridData.applyTo(_spinnerClusterOutline_Opacity);
+//            }
+//            {
+//               // spinner: fill
+//               _spinnerClusterFill_Opacity = new Spinner(container, SWT.BORDER);
+//               _spinnerClusterFill_Opacity.setMinimum(0);
+//               _spinnerClusterFill_Opacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
+//               _spinnerClusterFill_Opacity.setIncrement(1);
+//               _spinnerClusterFill_Opacity.setPageIncrement(10);
+//               _spinnerClusterFill_Opacity.addSelectionListener(_markerSelectionListener);
+//               _spinnerClusterFill_Opacity.addMouseWheelListener(_defaultMouseWheelListener);
+//               _spinnerGridData.applyTo(_spinnerClusterFill_Opacity);
+//            }
+//         }
+//      }
+//      {
+//         /*
+//          * Size
+//          */
+//         {
+//            // label
+//            _lblClusterSymbolSize = new Label(parent, SWT.NONE);
+//            _lblClusterSymbolSize.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterSize);
+//            _lblClusterSymbolSize.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_ClusterSize_Tooltip);
+//            GridDataFactory.fillDefaults()
+//                  .align(SWT.FILL, SWT.CENTER)
+//                  .indent(clusterIndent, 0)
+//                  .applyTo(_lblClusterSymbolSize);
+//         }
+//
+//         {
+//            final Composite container = new Composite(parent, SWT.NONE);
+//            GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+//            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+//            {
+//
+//               // outline size
+//               _spinnerClusterOutline_Size = new Spinner(container, SWT.BORDER);
+//               _spinnerClusterOutline_Size.setMinimum(Map25ConfigManager.CLUSTER_OUTLINE_SIZE_MIN);
+//               _spinnerClusterOutline_Size.setMaximum(Map25ConfigManager.CLUSTER_OUTLINE_SIZE_MAX);
+//               _spinnerClusterOutline_Size.setIncrement(1);
+//               _spinnerClusterOutline_Size.setPageIncrement(10);
+//               _spinnerClusterOutline_Size.addSelectionListener(_markerSelectionListener);
+//               _spinnerClusterOutline_Size.addMouseWheelListener(_defaultMouseWheelListener);
+//               _spinnerGridData.applyTo(_spinnerClusterOutline_Size);
+//
+//               // spinner: symbol size
+//               _spinnerClusterSymbol_Size = new Spinner(container, SWT.BORDER);
+//               _spinnerClusterSymbol_Size.setMinimum(Map25ConfigManager.CLUSTER_SYMBOL_SIZE_MIN);
+//               _spinnerClusterSymbol_Size.setMaximum(Map25ConfigManager.CLUSTER_SYMBOL_SIZE_MAX);
+//               _spinnerClusterSymbol_Size.setIncrement(1);
+//               _spinnerClusterSymbol_Size.setPageIncrement(10);
+//               _spinnerClusterSymbol_Size.addSelectionListener(_markerSelectionListener);
+//               _spinnerClusterSymbol_Size.addMouseWheelListener(_defaultMouseWheelListener);
+//               _spinnerGridData.applyTo(_spinnerClusterSymbol_Size);
+//
+//               // spinner: symbol size weight
+//               _spinnerClusterSymbol_Weight = new Spinner(container, SWT.BORDER);
+//               _spinnerClusterSymbol_Weight.setMinimum(Map25ConfigManager.CLUSTER_SYMBOL_WEIGHT_MIN);
+//               _spinnerClusterSymbol_Weight.setMaximum(Map25ConfigManager.CLUSTER_SYMBOL_WEIGHT_MAX);
+//               _spinnerClusterSymbol_Weight.setIncrement(1);
+//               _spinnerClusterSymbol_Weight.setPageIncrement(10);
+//               _spinnerClusterSymbol_Weight.addSelectionListener(_markerSelectionListener);
+//               _spinnerClusterSymbol_Weight.addMouseWheelListener(_defaultMouseWheelListener);
+//               _spinnerGridData.applyTo(_spinnerClusterSymbol_Weight);
+//            }
+//         }
+//      }
+//      {
+//         /*
+//          * Cluster size
+//          */
+//         {
+//            // label
+//            _lblClusterGridSize = new Label(parent, SWT.NONE);
+//            _lblClusterGridSize.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterGridSize);
+//            GridDataFactory.fillDefaults()
+//                  .align(SWT.FILL, SWT.CENTER)
+//                  .indent(clusterIndent, 0)
+//                  .applyTo(_lblClusterGridSize);
+//
+//            // spinner
+//            _spinnerClusterGrid_Size = new Spinner(parent, SWT.BORDER);
+//            _spinnerClusterGrid_Size.setMinimum(Map25ConfigManager.CLUSTER_GRID_MIN_SIZE);
+//            _spinnerClusterGrid_Size.setMaximum(Map25ConfigManager.CLUSTER_GRID_MAX_SIZE);
+//            _spinnerClusterGrid_Size.setIncrement(1);
+//            _spinnerClusterGrid_Size.setPageIncrement(10);
+//            _spinnerClusterGrid_Size.addSelectionListener(_markerSelectionListener);
+//            _spinnerClusterGrid_Size.addMouseWheelListener(_defaultMouseWheelListener);
+//         }
+//      }
+   }
+
+   private Control createUI_500_Tab_CommonLocations(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(1).applyTo(container);
+      {
+         createUI_510_LocationViewer(container);
+         createUI_520_Actions(container);
+      }
+
+      return container;
+   }
+
+   private void createUI_510_LocationViewer(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
+      {
+         {
+            /*
+             * Show common locations
+             */
+            _chkIsShowCommonLocations = new Button(container, SWT.CHECK);
+            _chkIsShowCommonLocations.setText(Messages.Slideout_MapLocation_Checkbox_ShowCommonLocations);
+            _chkIsShowCommonLocations.setToolTipText(Messages.Slideout_MapLocation_Checkbox_ShowCommonLocations_Tooltip);
+            _chkIsShowCommonLocations.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().applyTo(_chkIsShowCommonLocations);
+         }
+         {
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Slideout_MapLocation_Label_CommonLocations);
+         }
+         {
+            _viewerContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
+            GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+            {
+               createUI_522_Table(_viewerContainer);
+            }
+         }
+
+//         createUI_680_ViewerActions(container);
+      }
+   }
+
+   private void createUI_520_Actions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -539,7 +920,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       }
    }
 
-   private void createUI_222_Table(final Composite parent) {
+   private void createUI_522_Table(final Composite parent) {
 
       /*
        * Create table
@@ -583,15 +964,15 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       // ensure that tooltips are hidden
       table.addListener(SWT.MouseExit, (event) -> hideTooltip());
 
-      createUI_224_ContextMenu();
+      createUI_524_ContextMenu();
    }
 
    /**
     * Ceate the view context menus
     */
-   private void createUI_224_ContextMenu() {
+   private void createUI_524_ContextMenu() {
 
-      _tableContextMenu = createUI_225_CreateViewerContextMenu();
+      _tableContextMenu = createUI_525_CreateViewerContextMenu();
 
       _columnManager.createHeaderContextMenu(
 
@@ -599,58 +980,12 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
             _tableViewerContextMenuProvider);
    }
 
-   private Menu createUI_225_CreateViewerContextMenu() {
+   private Menu createUI_525_CreateViewerContextMenu() {
 
       final Table table = (Table) _mapLocationViewer.getControl();
       final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
 
       return tableContextMenu;
-   }
-
-   private Control createUI_500_Tab_CommonLocations(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(1).applyTo(container);
-      {
-         createUI_510_LocationViewer(container);
-         createUI_220_Actions(container);
-      }
-
-      return container;
-   }
-
-   private void createUI_510_LocationViewer(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.fillDefaults().applyTo(container);
-      {
-         {
-            /*
-             * Show common locations
-             */
-            _chkIsShowCommonLocations = new Button(container, SWT.CHECK);
-            _chkIsShowCommonLocations.setText(Messages.Slideout_MapLocation_Checkbox_ShowCommonLocations);
-            _chkIsShowCommonLocations.setToolTipText(Messages.Slideout_MapLocation_Checkbox_ShowCommonLocations_Tooltip);
-            _chkIsShowCommonLocations.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().applyTo(_chkIsShowCommonLocations);
-         }
-         {
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Slideout_MapLocation_Label_CommonLocations);
-         }
-         {
-            _viewerContainer = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
-            GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
-            {
-               createUI_222_Table(_viewerContainer);
-            }
-         }
-
-//         createUI_680_ViewerActions(container);
-      }
    }
 
    private void defineAllColumns() {
@@ -949,12 +1284,40 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
 
       _pc = new PixelConverter(parent);
 
+      // force spinner controls to have the same width
+      _spinnerGridData = GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(3), SWT.DEFAULT);
+
       _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI());
 
       _columnSortListener = new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
             onSelectSortColumn(e);
+         }
+      };
+
+      _markerSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyMarkerConfig());
+      _markerPropertyChangeListener = propertyChangeEvent -> onModifyMarkerConfig();
+      _markerMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onModifyMarkerConfig();
+      };
+
+      _keepOpenListener = new FocusListener() {
+
+         @Override
+         public void focusGained(final FocusEvent e) {
+
+            /*
+             * This will fix the problem that when the list of a combobox is displayed, then the
+             * slideout will disappear :-(((
+             */
+            setIsAnotherDialogOpened(true);
+         }
+
+         @Override
+         public void focusLost(final FocusEvent e) {
+            setIsAnotherDialogOpened(false);
          }
       };
    }
@@ -993,6 +1356,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
 
       TourPainterConfiguration.isShowTourMarker = isShowTourMarker;
 
+      // repaint map
       _map2View.getMap().paint();
 
       enableControls();
@@ -1072,6 +1436,16 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
             null);
    }
 
+   private void onModifyMarkerConfig() {
+
+      saveMarkerConfig();
+
+      enableControls();
+
+      // repaint map
+      _map2View.getMap().paint();
+   }
+
    private void onSelectSortColumn(final SelectionEvent e) {
 
       _viewerContainer.setRedraw(false);
@@ -1089,6 +1463,20 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       _viewerContainer.setRedraw(true);
    }
 
+   private void onSwapMarkerColor() {
+
+//      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+//
+//      final RGB fgColor = config.markerOutline_Color;
+//      final RGB bgColor = config.markerFill_Color;
+//
+//      config.markerOutline_Color = bgColor;
+//      config.markerFill_Color = fgColor;
+//
+//      restoreState();
+//      onModifyMarkerConfig();
+   }
+
    @Override
    public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
@@ -1096,7 +1484,7 @@ public class SlideoutMapLocationAndMarker extends AdvancedSlideout implements IT
       {
          _mapLocationViewer.getTable().dispose();
 
-         createUI_222_Table(_viewerContainer);
+         createUI_522_Table(_viewerContainer);
          _viewerContainer.layout();
 
          // update the viewer
