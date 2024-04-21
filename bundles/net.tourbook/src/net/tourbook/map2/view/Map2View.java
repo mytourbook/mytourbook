@@ -248,8 +248,6 @@ public class Map2View extends ViewPart implements
    public static final boolean   STATE_IS_SHOW_COMMON_LOCATIONS_DEFAULT                = true;
    public static final String    STATE_IS_SHOW_TOUR_LOCATIONS                          = "STATE_IS_SHOW_TOUR_LOCATIONS";                           //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT                  = true;
-   public static final String    STATE_IS_SHOW_TOUR_MARKER                             = "STATE_IS_SHOW_TOUR_MARKER";                           //$NON-NLS-1$
-   public static final boolean   STATE_IS_SHOW_TOUR_MARKER_DEFAULT                     = true;
 
    public static final String    STATE_IS_SHOW_HOVERED_SELECTED_TOUR                            = "STATE_IS_SHOW_HOVERED_SELECTED_TOUR";                 //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT                    = true;
@@ -550,7 +548,7 @@ public class Map2View extends ViewPart implements
    private GeoFilter_LoaderData              _geoFilter_PreviousGeoLoaderItem;
    private AtomicInteger                     _geoFilter_RunningId  = new AtomicInteger();
    //
-   private SlideoutMap2_LocationAndMarker      _slideoutMapLocation;
+   private SlideoutMap2_LocationAndMarker    _slideoutMapLocation;
    //
    /*
     * UI controls
@@ -1137,9 +1135,7 @@ public class Map2View extends ViewPart implements
 
       final boolean isSelected = _actionShowTourMarker.isChecked();
 
-      _state.put(STATE_IS_SHOW_TOUR_MARKER, isSelected);
-
-      TourPainterConfiguration.isShowTourMarker = isSelected;
+      Map2ConfigManager.getActiveMarkerConfig().isShowTourMarker = isSelected;
 
       CommonLocationManager.updateMapLocationAndMarkerSlideout();
 
@@ -2160,6 +2156,7 @@ public class Map2View extends ViewPart implements
    }
 
    private void enableActions() {
+
       enableActions(false);
    }
 
@@ -2180,6 +2177,8 @@ public class Map2View extends ViewPart implements
       // update action because after closing the context menu, the hovered values are reset in the map paint event
       _actionCreateTourMarkerFromMap.setCurrentHoveredTourId(hoveredTourId);
       _actionLookupTourLocation.setCurrentHoveredTourId(hoveredTourId);
+
+      _actionShowTourMarker.setChecked(Map2ConfigManager.getActiveMarkerConfig().isShowTourMarker);
 
 // SET_FORMATTING_OFF
 
@@ -4538,9 +4537,7 @@ public class Map2View extends ViewPart implements
       TourPainterConfiguration.isShowTourStartEnd = _actionShowStartEndInMap.isChecked();
 
       // show tour marker
-      final boolean isShowMarker = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_MARKER, STATE_IS_SHOW_TOUR_MARKER_DEFAULT);
-      _actionShowTourMarker.setChecked(isShowMarker);
-      TourPainterConfiguration.isShowTourMarker = isShowMarker;
+      _actionShowTourMarker.setChecked(Map2ConfigManager.getActiveMarkerConfig().isShowTourMarker);
 
       // show tour pauses
       final boolean isShowPauses = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_PAUSES, true);
@@ -4746,7 +4743,6 @@ public class Map2View extends ViewPart implements
       _state.put(STATE_IS_SHOW_SLIDER_IN_MAP,                     _actionShowSliderInMap.isChecked());
       _state.put(STATE_IS_SHOW_SLIDER_IN_LEGEND,                  _actionShowSliderInLegend.isChecked());
       _state.put(STATE_IS_SHOW_TOUR_INFO_IN_MAP,                  _actionShowTourInfoInMap.isChecked());
-      _state.put(STATE_IS_SHOW_TOUR_MARKER,                       _actionShowTourMarker.isChecked());
       _state.put(STATE_IS_SHOW_TOUR_PAUSES,                       _actionShowTourPauses.isChecked());
       _state.put(STATE_IS_SHOW_TOUR_WEATHER_IN_MAP,               _actionShowTourWeatherInMap.isChecked());
       _state.put(STATE_IS_SHOW_WAY_POINTS,                        _actionShowWayPoints.isChecked());
@@ -4819,6 +4815,8 @@ public class Map2View extends ViewPart implements
 
       // value point tooltip
       _valuePointTooltipUI.saveState();
+
+      Map2ConfigManager.saveState();
    }
 
    private void selectTourSegments(final SelectedTourSegmenterSegments selectedSegmenterConfig) {

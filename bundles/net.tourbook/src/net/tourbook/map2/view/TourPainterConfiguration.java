@@ -45,7 +45,6 @@ public class TourPainterConfiguration {
 
    static boolean                           isShowPhotos;
    static boolean                           isShowTours;
-   static public boolean                    isShowTourMarker;
    static boolean                           isShowTourPauses;
    static boolean                           isShowTourStartEnd;
    static boolean                           isShowWayPoints;

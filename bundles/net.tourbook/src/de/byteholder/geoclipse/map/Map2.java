@@ -65,6 +65,7 @@ import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -101,6 +102,8 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map.location.MapLocationToolTip;
+import net.tourbook.map2.view.Map2ConfigManager;
+import net.tourbook.map2.view.Map2MarkerConfig;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.TourPainterConfiguration;
@@ -5423,16 +5426,26 @@ public class Map2 extends Canvas {
 
       try {
 
+         final Map2MarkerConfig map2Config = Map2ConfigManager.getActiveMarkerConfig();
+
          final Image gcImage = _newOverlayImage_NotVisible;
          final GC gc = new GC(gcImage);
          {
             gc.setBackground(_transparentColor);
             gc.fillRectangle(_newOverlaySize);
 
-//            paint_NewOverlay_20_AllMarker(gc);
+            if (map2Config.isShowTourMarker) {
 
-            if (TourPainterConfiguration.isShowTourMarker) {
-               paint_NewOverlay_30_ClusteredMarker(gc);
+               gc.setAntialias(map2Config.isMarkerAntialiasPainting ? SWT.ON : SWT.OFF);
+
+               if (map2Config.isMarkerClustered) {
+
+                  paint_NewOverlay_30_ClusteredMarker(gc);
+
+               } else {
+
+                  paint_NewOverlay_20_AllMarker(gc);
+               }
             }
          }
          gc.dispose();
@@ -5445,6 +5458,7 @@ public class Map2 extends Canvas {
 
          _newOverlay_Viewport_Visible = _newOverlay_Viewport_NotVisible;
 
+//    } catch (final SWTException e) {
       } catch (final Exception e) {
 
          StatusUtil.log(e);
@@ -5458,7 +5472,6 @@ public class Map2 extends Canvas {
 //      System.out.println(UI.timeStampNano() + " paint_NewOverlay_10_Runnable() - %7.3f ms".formatted((float) (end - start) / 1000000));
    }
 
-   @SuppressWarnings("unused")
    private void paint_NewOverlay_20_AllMarker(final GC gc) {
 
       final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
@@ -5481,14 +5494,14 @@ public class Map2 extends Canvas {
             continue;
          }
 
-         final ArrayList<TourMarker> sortedMarkers = tourData.getTourMarkersSorted();
+         final Set<TourMarker> allTourMarkers = tourData.getTourMarkers();
 
          // check if markers are available
-         if (sortedMarkers.size() > 0) {
+         if (allTourMarkers.size() > 0) {
 
             // draw tour marker
 
-            for (final TourMarker tourMarker : sortedMarkers) {
+            for (final TourMarker tourMarker : allTourMarkers) {
 
                // skip marker when hidden or not set
                if (tourMarker.isMarkerVisible() == false || StringUtils.isNullOrEmpty(tourMarker.getLabel())) {
@@ -5517,7 +5530,7 @@ public class Map2 extends Canvas {
 
    private void paint_NewOverlay_30_ClusteredMarker(final GC gc) {
 
-      final float _clusterGridSize = 50;
+      final int clusterGridSize = (int) ScreenUtils.getPixels(Map2ConfigManager.getActiveMarkerConfig().clusterGridSize);
 
       final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
 
@@ -5531,9 +5544,8 @@ public class Map2 extends Canvas {
       _distanceClustering.clearItems();
       _distanceClustering.addItems(allClusterItems);
 
-      final int clusterGridSize = (int) ScreenUtils.getPixels(_clusterGridSize);
-
       final Set<? extends Cluster<ClusterItem>> allMarkerClusters = _distanceClustering.getClusters(_mapZoomLevel, clusterGridSize);
+      final List<MapMarker> allMarkersOnly = new ArrayList<>();
 
       // firstly paint the clusters
       for (final Cluster<ClusterItem> item : allMarkerClusters) {
@@ -5554,28 +5566,34 @@ public class Map2 extends Canvas {
                   geoPoint.getLatitude(),
                   geoPoint.getLongitude(),
                   Integer.toString(numClusterItems));
-         }
-      }
 
-      // secondly paint the markers
-      for (final Cluster<ClusterItem> item : allMarkerClusters) {
-
-         if (_newOverlayFuture.isCancelled()) {
-            return;
-         }
-
-         if (item instanceof final QuadItem markerItem) {
+         } else if (item instanceof final QuadItem markerItem) {
 
             // item is a marker
 
             if (markerItem.mClusterItem instanceof final MapMarker mapMarker) {
 
-               paint_NewOverlay_50_OneMarker(gc,
-                     mapMarker.geoPoint.getLatitude(),
-                     mapMarker.geoPoint.getLongitude(),
-                     mapMarker.title);
+               allMarkersOnly.add(mapMarker);
             }
          }
+      }
+
+      // markers MUST be sorted otherwise they are flickering when the sequence is randomly
+      Collections.sort(
+            allMarkersOnly,
+            (tourMarker1, tourMarker2) -> tourMarker1.title.compareTo(tourMarker2.title));
+
+      // secondly paint the markers
+      for (final MapMarker mapMarker : allMarkersOnly) {
+
+         if (_newOverlayFuture.isCancelled()) {
+            return;
+         }
+
+         paint_NewOverlay_50_OneMarker(gc,
+               mapMarker.geoPoint.getLatitude(),
+               mapMarker.geoPoint.getLongitude(),
+               mapMarker.title);
       }
    }
 
@@ -5638,6 +5656,8 @@ public class Map2 extends Canvas {
 
       if (isMarkerInViewport) {
 
+         final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+
          // convert world position into device position
          final int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
          final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
@@ -5652,17 +5672,13 @@ public class Map2 extends Canvas {
          final int textWidth2 = textWidth / 2;
          final int textHeight2 = textHeight / 2;
 
-         final int margin = 7;
-         final int lineWidth = 1;
+         final int margin = markerConfig.clusterSymbol_Size;
 
          final int circleSize = textWidth + margin;
          final int circleSize2 = circleSize / 2;
 
          final int ovalDevX = devX - circleSize2 + textWidth2 - 1;
          final int ovalDevY = devY - circleSize2 + textHeight2 - 1;
-
-         gc.setAntialias(SWT.OFF);
-         gc.setLineWidth(lineWidth);
 
          gc.setBackground(UI.SYS_COLOR_YELLOW);
 
@@ -5674,15 +5690,19 @@ public class Map2 extends Canvas {
                circleSize,
                circleSize);
 
-         gc.setAntialias(SWT.ON);
-         gc.setForeground(UI.SYS_COLOR_DARK_GREEN);
-         gc.drawOval(
+         final int outlineWidth = markerConfig.clusterOutline_Width;
+         if (outlineWidth > 0) {
 
-               ovalDevX,
-               ovalDevY,
+            gc.setLineWidth(outlineWidth);
+            gc.setForeground(UI.SYS_COLOR_DARK_GREEN);
+            gc.drawOval(
 
-               circleSize,
-               circleSize);
+                  ovalDevX,
+                  ovalDevY,
+
+                  circleSize,
+                  circleSize);
+         }
 
          gc.setForeground(UI.SYS_COLOR_BLACK);
          gc.drawString(text, devX + textOffset, devY, true);

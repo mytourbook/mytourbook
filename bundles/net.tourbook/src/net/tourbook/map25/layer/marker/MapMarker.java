@@ -48,10 +48,10 @@ public class MapMarker implements ClusterItem {
             + " geoPoint =" + geoPoint + ", " //$NON-NLS-1$ //$NON-NLS-2$
             + " title = " + title //$NON-NLS-1$
 
-      //				+ "description=" + description + ", "
-      //				+ "markerSymbol=" + markerSymbol
+            //				+ "description=" + description + ", "
+            //				+ "markerSymbol=" + markerSymbol
 
-      ;
+            + UI.NEW_LINE;
    }
 
 }
