@@ -54,33 +54,12 @@ Experimental
 New
 ===
 
-* Tour Nutrition
-  Add the ability to assign food/fluids to any given tour.
-  https://github.com/mytourbook/mytourbook/issues/1280
-
-* Tour Blog (Frederic)
-  - Added the ability to display or hide the tour markers
+* 
 
 Improvements
 ============
 
-* Viewer Columns
-  - Customize column alignment in all views which are using the column manager
-  - Set column alignment in the viewer header context menu
-    https://github.com/mytourbook/mytourbook/issues/1300  
-
-* Fit Import
-  - Import device sensors which do not contain a serial number
-    https://github.com/mytourbook/mytourbook/issues/1287
-
-* Tour Book
-  - Show powertrain L-R balance values separately
-    https://github.com/mytourbook/mytourbook/issues/1271    
-  - Show weather air quality
-    https://github.com/mytourbook/mytourbook/issues/1296
-
-* Tour Blog (Frederic)
-  - Displaying the main numbers of the tour (distance, elevation gain/loss...)
+*
 
 Changes
 =======
