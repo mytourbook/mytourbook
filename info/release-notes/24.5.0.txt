@@ -98,6 +98,16 @@ Improvements
 * Tour Blog (Frederic)
   - Displaying the main numbers of the tour (distance, elevation gain/loss...)
 
+* Fit Export (Frederic)
+  - Improvements per the 'FitTestTool'
+    https://github.com/mytourbook/mytourbook/discussions/1194
+
+* Fit Import (Frederic)
+  - Code changes to support the upcoming Garmin Activity File Message Change
+    https://forums.garmin.com/developer/fit-sdk/b/news-announcements/posts/important-fit-activity-file-message-change
+    https://github.com/mytourbook/mytourbook/discussions/1279
+
+
 Changes
 =======
 
@@ -112,6 +122,10 @@ Changes
 
 Bugfix
 ======
+
+* Fit Export (Frederic)
+  - Fix for the Suunto App replay issue
+    https://github.com/mytourbook/mytourbook/discussions/1194
 
 * TCX Import (Frederic)
   - Fix for average and maximum power computation
