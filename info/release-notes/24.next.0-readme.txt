@@ -59,7 +59,7 @@ New
 Improvements
 ============
 
-*
+* 
 
 Changes
 =======
