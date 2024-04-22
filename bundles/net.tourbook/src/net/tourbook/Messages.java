@@ -2332,11 +2332,14 @@ public class Messages extends NLS {
    public static String        Slideout_Map_TrackOptions_Label_Title;
    public static String        Slideout_Map_TrackOptions_Label_Title_Tooltip;
 
+   public static String        Slideout_MapLocation_Checkbox_FillClusterSymbol;
    public static String        Slideout_MapLocation_Checkbox_ShowCommonLocations;
    public static String        Slideout_MapLocation_Checkbox_ShowCommonLocations_Tooltip;
    public static String        Slideout_MapLocation_Checkbox_ShowLocationBoundingBox;
    public static String        Slideout_MapLocation_Checkbox_ShowTourLocations;
    public static String        Slideout_MapLocation_Checkbox_ShowTourLocations_Tooltip;
+   public static String        Slideout_MapLocation_Label_ClusterSize_Tooltip;
+   public static String        Slideout_MapLocation_Label_ClusterSymbolSize;
    public static String        Slideout_MapLocation_Label_CommonLocations;
    public static String        Slideout_MapLocation_Label_Title;
    public static String        Slideout_MapLocation_Tab_CommonLocations;

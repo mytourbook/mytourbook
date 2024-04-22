@@ -63,7 +63,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -75,6 +74,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -156,26 +156,25 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    private Button                _btnSwapClusterSymbolColor;
    private Button                _btnSwapMarkerColor;
    //
-   private Button                _chkIsAntialiasPainting;
+   private Button                _chkIsClusterSymbolAntialiased;
+   private Button                _chkIsClusterTextAntialiased;
+   private Button                _chkIsFillClusterSymbol;
    private Button                _chkIsMarkerClustered;
    private Button                _chkIsShowCommonLocations;
    private Button                _chkIsShowMapLocations_BoundingBox;
    private Button                _chkIsShowTourLocations;
    private Button                _chkIsShowTourMarker;
    //
-   private Label                 _lblClusterGridSize;
+   private Label                 _lblClusterGrid_Size;
    private Label                 _lblClusterSymbol;
-   private Label                 _lblClusterOpacity;
-   private Label                 _lblClusterSymbolSize;
+   private Label                 _lblClusterSymbol_Size;
    private Label                 _lblMarkerColor;
    private Label                 _lblMarkerOpacity;
    private Label                 _lblMarkerSize;
    //
-   private Spinner               _spinnerClusterGridSize;
-   private Spinner               _spinnerClusterOutline_Opacity;
-   private Spinner               _spinnerClusterFill_Opacity;
-   private Spinner               _spinnerCluster_OutlineWidth;
-   private Spinner               _spinnerCluster_SymbolSize;
+   private Spinner               _spinnerClusterGrid_Size;
+   private Spinner               _spinnerClusterOutline_Width;
+   private Spinner               _spinnerClusterSymbol_Size;
    private Spinner               _spinnerMarkerOutline_Opacity;
    private Spinner               _spinnerMarkerFill_Opacity;
    private Spinner               _spinnerMarkerOutline_Size;
@@ -444,7 +443,9 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       // load viewer
       updateUI_Viewer();
 
-      restoreState(false);
+      restoreState();
+      restoreTabFolder();
+
       enableControls();
 
       CommonLocationManager.setMapLocationSlideout(this);
@@ -557,13 +558,21 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          }
          {
             /*
-             * Antialias painting
+             * Antialias text
              */
-            _chkIsAntialiasPainting = new Button(container, SWT.CHECK);
-            _chkIsAntialiasPainting.setText(Messages.Slideout_Map_Options_Checkbox_AntialiasPainting);
-            _chkIsAntialiasPainting.setToolTipText(Messages.Slideout_Map_Options_Checkbox_AntialiasPainting_Tooltip);
-            _chkIsAntialiasPainting.addSelectionListener(_markerSelectionListener);
+            _chkIsClusterTextAntialiased = new Button(container, SWT.CHECK);
+            _chkIsClusterTextAntialiased.setText("Antialias text painting");
+            _chkIsClusterTextAntialiased.addSelectionListener(_markerSelectionListener);
          }
+         {
+            /*
+             * Antialias symbol
+             */
+            _chkIsClusterSymbolAntialiased = new Button(container, SWT.CHECK);
+            _chkIsClusterSymbolAntialiased.setText("Antialias symbol painting");
+            _chkIsClusterSymbolAntialiased.addSelectionListener(_markerSelectionListener);
+         }
+
          final Group group = new Group(container, SWT.NONE);
          group.setText(Messages.Slideout_Map25MarkerOptions_Group_MarkerLayout);
          GridDataFactory.fillDefaults().grab(true, true).applyTo(group);
@@ -714,6 +723,72 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       }
       {
          /*
+          * Cluster size
+          */
+         {
+            // label
+            _lblClusterGrid_Size = new Label(parent, SWT.NONE);
+            _lblClusterGrid_Size.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterGridSize);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .indent(clusterIndent, 0)
+                  .applyTo(_lblClusterGrid_Size);
+
+            // spinner
+            _spinnerClusterGrid_Size = new Spinner(parent, SWT.BORDER);
+            _spinnerClusterGrid_Size.setMinimum(0);
+            _spinnerClusterGrid_Size.setMaximum(Map2ConfigManager.CLUSTER_GRID_MAX_SIZE);
+            _spinnerClusterGrid_Size.setIncrement(1);
+            _spinnerClusterGrid_Size.setPageIncrement(10);
+            _spinnerClusterGrid_Size.addSelectionListener(_markerSelectionListener);
+            _spinnerClusterGrid_Size.addMouseWheelListener(_markerMouseWheelListener);
+         }
+      }
+      {
+         /*
+          * Cluster symbol size
+          */
+         {
+            // label
+            _lblClusterSymbol_Size = new Label(parent, SWT.NONE);
+            _lblClusterSymbol_Size.setText(Messages.Slideout_MapLocation_Label_ClusterSymbolSize);
+            _lblClusterSymbol_Size.setToolTipText(Messages.Slideout_MapLocation_Label_ClusterSize_Tooltip);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .indent(clusterIndent, 0)
+                  .applyTo(_lblClusterSymbol_Size);
+         }
+         {
+            final Composite container = new Composite(parent, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+            {
+               // spinner: symbol size
+               _spinnerClusterSymbol_Size = new Spinner(container, SWT.BORDER);
+               _spinnerClusterSymbol_Size.setToolTipText(Messages.Slideout_MapLocation_Label_ClusterSize_Tooltip);
+               _spinnerClusterSymbol_Size.setMinimum(1);
+               _spinnerClusterSymbol_Size.setMaximum(Map2ConfigManager.CLUSTER_SYMBOL_SIZE_MAX);
+               _spinnerClusterSymbol_Size.setIncrement(1);
+               _spinnerClusterSymbol_Size.setPageIncrement(10);
+               _spinnerClusterSymbol_Size.addSelectionListener(_markerSelectionListener);
+               _spinnerClusterSymbol_Size.addMouseWheelListener(_markerMouseWheelListener);
+               _spinnerGridData.applyTo(_spinnerClusterSymbol_Size);
+
+               // outline width
+               _spinnerClusterOutline_Width = new Spinner(container, SWT.BORDER);
+               _spinnerClusterOutline_Width.setToolTipText(Messages.Slideout_MapLocation_Label_ClusterSize_Tooltip);
+               _spinnerClusterOutline_Width.setMinimum(Map2ConfigManager.CLUSTER_OUTLINE_WIDTH_MIN);
+               _spinnerClusterOutline_Width.setMaximum(Map2ConfigManager.CLUSTER_OUTLINE_WIDTH_MAX);
+               _spinnerClusterOutline_Width.setIncrement(1);
+               _spinnerClusterOutline_Width.setPageIncrement(10);
+               _spinnerClusterOutline_Width.addSelectionListener(_markerSelectionListener);
+               _spinnerClusterOutline_Width.addMouseWheelListener(_markerMouseWheelListener);
+               _spinnerGridData.applyTo(_spinnerClusterOutline_Width);
+            }
+         }
+      }
+      {
+         /*
           * Symbol color
           */
          {
@@ -736,127 +811,34 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
             _colorClusterSymbol_Outline = new ColorSelectorExtended(container);
             _colorClusterSymbol_Outline.addListener(_markerPropertyChangeListener);
             _colorClusterSymbol_Outline.addOpenListener(this);
+            _colorClusterSymbol_Outline.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_ClusterSymbolColor_Tooltip);
 
             // foreground color
             _colorClusterSymbol_Fill = new ColorSelectorExtended(container);
             _colorClusterSymbol_Fill.addListener(_markerPropertyChangeListener);
             _colorClusterSymbol_Fill.addOpenListener(this);
+            _colorClusterSymbol_Fill.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_ClusterSymbolColor_Tooltip);
 
             // button: swap color
             _btnSwapClusterSymbolColor = new Button(container, SWT.PUSH);
             _btnSwapClusterSymbolColor.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
             _btnSwapClusterSymbolColor.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
-            _btnSwapClusterSymbolColor.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSwapMarkerColor()));
+            _btnSwapClusterSymbolColor.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSwapClusterColor()));
          }
       }
       {
          /*
-          * Opacity
-          */
-         // label
-         _lblClusterOpacity = new Label(parent, SWT.NONE);
-         _lblClusterOpacity.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterOpacity);
-         _lblClusterOpacity.setToolTipText(NLS.bind(Messages.Slideout_Map25MarkerOptions_Label_ClusterOpacity_Tooltip, UI.TRANSFORM_OPACITY_MAX));
-         GridDataFactory.fillDefaults()
-               .indent(clusterIndent, 0)
-               .align(SWT.FILL, SWT.CENTER)
-               .applyTo(_lblClusterOpacity);
-
-         /*
-          * Symbol
-          */
-         final Composite container = new Composite(parent, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-         {
-            {
-               // spinner: outline
-               _spinnerClusterOutline_Opacity = new Spinner(container, SWT.BORDER);
-               _spinnerClusterOutline_Opacity.setMinimum(0);
-               _spinnerClusterOutline_Opacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
-               _spinnerClusterOutline_Opacity.setIncrement(1);
-               _spinnerClusterOutline_Opacity.setPageIncrement(10);
-               _spinnerClusterOutline_Opacity.addSelectionListener(_markerSelectionListener);
-               _spinnerClusterOutline_Opacity.addMouseWheelListener(_markerMouseWheelListener);
-               _spinnerGridData.applyTo(_spinnerClusterOutline_Opacity);
-            }
-            {
-               // spinner: fill
-               _spinnerClusterFill_Opacity = new Spinner(container, SWT.BORDER);
-               _spinnerClusterFill_Opacity.setMinimum(0);
-               _spinnerClusterFill_Opacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
-               _spinnerClusterFill_Opacity.setIncrement(1);
-               _spinnerClusterFill_Opacity.setPageIncrement(10);
-               _spinnerClusterFill_Opacity.addSelectionListener(_markerSelectionListener);
-               _spinnerClusterFill_Opacity.addMouseWheelListener(_markerMouseWheelListener);
-               _spinnerGridData.applyTo(_spinnerClusterFill_Opacity);
-            }
-         }
-      }
-      {
-         /*
-          * Cluster symbol size
+          * Fill symbol
           */
          {
-            // label
-            _lblClusterSymbolSize = new Label(parent, SWT.NONE);
-            _lblClusterSymbolSize.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterSize);
-            _lblClusterSymbolSize.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_ClusterSize_Tooltip);
+            // checkbox: fill cluster symbol
+            _chkIsFillClusterSymbol = new Button(parent, SWT.CHECK);
+            _chkIsFillClusterSymbol.setText(Messages.Slideout_MapLocation_Checkbox_FillClusterSymbol);
+            _chkIsFillClusterSymbol.addSelectionListener(_markerSelectionListener);
             GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.CENTER)
+                  .span(2, 1)
                   .indent(clusterIndent, 0)
-                  .applyTo(_lblClusterSymbolSize);
-         }
-
-         {
-            final Composite container = new Composite(parent, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-            {
-
-               // outline width
-               _spinnerCluster_OutlineWidth = new Spinner(container, SWT.BORDER);
-               _spinnerCluster_OutlineWidth.setMinimum(Map2ConfigManager.CLUSTER_OUTLINE_WIDTH_MIN);
-               _spinnerCluster_OutlineWidth.setMaximum(Map2ConfigManager.CLUSTER_OUTLINE_WIDTH_MAX);
-               _spinnerCluster_OutlineWidth.setIncrement(1);
-               _spinnerCluster_OutlineWidth.setPageIncrement(10);
-               _spinnerCluster_OutlineWidth.addSelectionListener(_markerSelectionListener);
-               _spinnerCluster_OutlineWidth.addMouseWheelListener(_markerMouseWheelListener);
-               _spinnerGridData.applyTo(_spinnerCluster_OutlineWidth);
-
-               // spinner: symbol size
-               _spinnerCluster_SymbolSize = new Spinner(container, SWT.BORDER);
-               _spinnerCluster_SymbolSize.setMinimum(Map2ConfigManager.CLUSTER_SYMBOL_SIZE_MIN);
-               _spinnerCluster_SymbolSize.setMaximum(Map2ConfigManager.CLUSTER_SYMBOL_SIZE_MAX);
-               _spinnerCluster_SymbolSize.setIncrement(1);
-               _spinnerCluster_SymbolSize.setPageIncrement(10);
-               _spinnerCluster_SymbolSize.addSelectionListener(_markerSelectionListener);
-               _spinnerCluster_SymbolSize.addMouseWheelListener(_markerMouseWheelListener);
-               _spinnerGridData.applyTo(_spinnerCluster_SymbolSize);
-            }
-         }
-      }
-      {
-         /*
-          * Cluster size
-          */
-         {
-            // label
-            _lblClusterGridSize = new Label(parent, SWT.NONE);
-            _lblClusterGridSize.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterGridSize);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.CENTER)
-                  .indent(clusterIndent, 0)
-                  .applyTo(_lblClusterGridSize);
-
-            // spinner
-            _spinnerClusterGridSize = new Spinner(parent, SWT.BORDER);
-            _spinnerClusterGridSize.setMinimum(0);
-            _spinnerClusterGridSize.setMaximum(Map2ConfigManager.CLUSTER_GRID_MAX_SIZE);
-            _spinnerClusterGridSize.setIncrement(1);
-            _spinnerClusterGridSize.setPageIncrement(10);
-            _spinnerClusterGridSize.addSelectionListener(_markerSelectionListener);
-            _spinnerClusterGridSize.addMouseWheelListener(_markerMouseWheelListener);
+                  .applyTo(_chkIsFillClusterSymbol);
          }
       }
    }
@@ -1210,13 +1192,23 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
       final boolean isShowClusteredMarker = isShowTourMarker && isMarkerClustered;
 
-      _chkIsAntialiasPainting    .setEnabled(isShowTourMarker);
-      _chkIsMarkerClustered      .setEnabled(isShowTourMarker);
+      _btnSwapClusterSymbolColor       .setEnabled(isShowClusteredMarker);
 
-      _lblClusterGridSize        .setEnabled(isShowClusteredMarker);
-      _spinnerClusterGridSize    .setEnabled(isShowClusteredMarker);
+      _chkIsClusterSymbolAntialiased   .setEnabled(isShowTourMarker);
+      _chkIsClusterTextAntialiased     .setEnabled(isShowTourMarker);
+      _chkIsMarkerClustered            .setEnabled(isShowTourMarker);
+      _chkIsFillClusterSymbol          .setEnabled(isShowClusteredMarker);
 
+      _lblClusterGrid_Size             .setEnabled(isShowClusteredMarker);
+      _lblClusterSymbol                .setEnabled(isShowClusteredMarker);
+      _lblClusterSymbol_Size           .setEnabled(isShowClusteredMarker);
 
+      _spinnerClusterGrid_Size         .setEnabled(isShowClusteredMarker);
+      _spinnerClusterSymbol_Size       .setEnabled(isShowClusteredMarker);
+      _spinnerClusterOutline_Width     .setEnabled(isShowClusteredMarker);
+
+      _colorClusterSymbol_Fill         .setEnabled(isShowClusteredMarker);
+      _colorClusterSymbol_Outline      .setEnabled(isShowClusteredMarker);
 
       /*
        * Common locations
@@ -1387,8 +1379,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
 // SET_FORMATTING_ON
 
-      // repaint map
-      _map2View.getMap().paint();
+      repaintMap();
 
       enableControls();
    }
@@ -1473,8 +1464,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
       enableControls();
 
-      // repaint map
-      _map2View.getMap().paint();
+      repaintMap();
    }
 
    private void onSelectSortColumn(final SelectionEvent e) {
@@ -1494,9 +1484,25 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _viewerContainer.setRedraw(true);
    }
 
+   private void onSwapClusterColor() {
+
+      final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
+
+      final RGB fgColor = config.clusterOutline_RGB;
+      final RGB bgColor = config.clusterFill_RGB;
+
+      config.clusterOutline_RGB = bgColor;
+      config.clusterFill_RGB = fgColor;
+
+      config.setupColors();
+
+      restoreState();
+      repaintMap();
+   }
+
    private void onSwapMarkerColor() {
 
-//      final MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
+//      final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
 //
 //      final RGB fgColor = config.markerOutline_Color;
 //      final RGB bgColor = config.markerFill_Color;
@@ -1532,16 +1538,12 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       updateUI_Viewer();
    }
 
-   private void restoreState(final boolean isInUIUpdate) {
+   private void repaintMap() {
 
-      if (isInUIUpdate) {
+      _map2View.getMap().paint();
+   }
 
-         // keep currently selected tab
-
-      } else {
-
-         _tabFolder.setSelection(Util.getStateInt(_state_Slideout, STATE_SELECTED_TAB, 0));
-      }
+   private void restoreState() {
 
       _chkIsShowCommonLocations.setSelection(Util.getStateBoolean(_state_Map2,
             Map2View.STATE_IS_SHOW_COMMON_LOCATIONS,
@@ -1560,15 +1562,24 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       /*
        * Tour marker
        */
-      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
 
 // SET_FORMATTING_OFF
 
-      _chkIsAntialiasPainting    .setSelection( markerConfig.isMarkerAntialiasPainting);
-      _chkIsShowTourMarker       .setSelection( markerConfig.isShowTourMarker);
-      _chkIsMarkerClustered      .setSelection( markerConfig.isMarkerClustered);
+      _chkIsShowTourMarker             .setSelection( config.isShowTourMarker);
 
-      _spinnerClusterGridSize    .setSelection( markerConfig.clusterGridSize);
+
+      _chkIsMarkerClustered            .setSelection( config.isMarkerClustered);
+      _chkIsClusterSymbolAntialiased   .setSelection( config.isClusterSymbolAntialiased);
+      _chkIsClusterTextAntialiased     .setSelection( config.isClusterTextAntialiased);
+      _chkIsFillClusterSymbol          .setSelection( config.isFillClusterSymbol);
+
+      _spinnerClusterGrid_Size         .setSelection( config.clusterGridSize);
+      _spinnerClusterOutline_Width     .setSelection( config.clusterOutline_Width);
+      _spinnerClusterSymbol_Size       .setSelection( config.clusterSymbol_Size);
+
+      _colorClusterSymbol_Fill         .setColorValue(config.clusterFill_RGB);
+      _colorClusterSymbol_Outline      .setColorValue(config.clusterOutline_RGB);
 
 // SET_FORMATTING_ON
    }
@@ -1584,22 +1595,34 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _mapLocationComparator.__sortDirection = sortDirection;
    }
 
+   private void restoreTabFolder() {
+
+      _tabFolder.setSelection(Util.getStateInt(_state_Slideout, STATE_SELECTED_TAB, 0));
+   }
+
    private void saveMarkerConfig() {
 
-      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
 
 // SET_FORMATTING_OFF
 
-      markerConfig.isMarkerAntialiasPainting    = _chkIsAntialiasPainting        .getSelection();
-      markerConfig.isShowTourMarker             = _chkIsShowTourMarker           .getSelection();
-      markerConfig.isMarkerClustered            = _chkIsMarkerClustered          .getSelection();
+      config.isShowTourMarker             = _chkIsShowTourMarker           .getSelection();
 
-      markerConfig.clusterGridSize              = _spinnerClusterGridSize        .getSelection();
 
-      markerConfig.clusterOutline_Width         = _spinnerCluster_OutlineWidth   .getSelection();
-      markerConfig.clusterSymbol_Size           = _spinnerCluster_SymbolSize     .getSelection();
+      config.isMarkerClustered            = _chkIsMarkerClustered          .getSelection();
+      config.isClusterSymbolAntialiased   = _chkIsClusterSymbolAntialiased .getSelection();
+      config.isClusterTextAntialiased     = _chkIsClusterTextAntialiased   .getSelection();
+      config.isFillClusterSymbol          = _chkIsFillClusterSymbol        .getSelection();
+
+      config.clusterGridSize              = _spinnerClusterGrid_Size       .getSelection();
+      config.clusterOutline_Width         = _spinnerClusterOutline_Width   .getSelection();
+      config.clusterSymbol_Size           = _spinnerClusterSymbol_Size     .getSelection();
+      config.clusterFill_RGB              = _colorClusterSymbol_Fill       .getColorValue();
+      config.clusterOutline_RGB           = _colorClusterSymbol_Outline    .getColorValue();
 
 // SET_FORMATTING_ON
+
+      config.setupColors();
    }
 
    @Override
@@ -1620,7 +1643,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
    public void updateUI() {
 
-      restoreState(true);
+      restoreState();
    }
 
    public void updateUI(final TourLocation tourLocation) {

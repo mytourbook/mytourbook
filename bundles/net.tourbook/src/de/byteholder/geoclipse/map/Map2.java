@@ -160,6 +160,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -675,6 +676,8 @@ public class Map2 extends Canvas {
    private boolean           _isShowBreadcrumbs = Map2View.STATE_IS_SHOW_BREADCRUMBS_DEFAULT;
 
    private Font              _boldFont          = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   private Font              _clusterFont;
+   private int               _clusterFontSize;
 
    private int               _prefOptions_BorderWidth;
    private boolean           _prefOptions_isCutOffLinesInPauses;
@@ -2927,6 +2930,8 @@ public class Map2 extends Canvas {
       UI.disposeResource(_cursorSearchTour_Scroll);
       UI.disposeResource(_cursorSelect);
 
+      UI.disposeResource(_clusterFont);
+
       // dispose resources in the overlay plugins
       for (final Map2Painter overlay : _allMapPainter) {
          overlay.dispose();
@@ -4979,7 +4984,7 @@ public class Map2 extends Canvas {
                                              final TourData tourData,
                                              final int hoveredSerieIndex) {
 
-      final Font normalFont = gc.getFont();
+      final Font gcFontBackup = gc.getFont();
 
       final String text_TourDateTime = TourManager.getTourDateTimeFull(tourData);
       final String text_TourTitle = tourData.getTourTitle();
@@ -5100,7 +5105,7 @@ public class Map2 extends Canvas {
          devY -= lineHeight;
       }
 
-      gc.setFont(normalFont);
+      gc.setFont(gcFontBackup);
       gc.drawText(sb.toString(), devX, devY);
    }
 
@@ -5436,8 +5441,6 @@ public class Map2 extends Canvas {
 
             if (map2Config.isShowTourMarker) {
 
-               gc.setAntialias(map2Config.isMarkerAntialiasPainting ? SWT.ON : SWT.OFF);
-
                if (map2Config.isMarkerClustered) {
 
                   paint_NewOverlay_30_ClusteredMarker(gc);
@@ -5519,10 +5522,13 @@ public class Map2 extends Canvas {
                }
 
                // draw tour marker
-               if (paint_NewOverlay_50_OneMarker(gc,
+               if (paint_NewOverlay_50_OneMarker(
+                     gc,
                      latitudeSerie[serieIndex],
                      longitudeSerie[serieIndex],
-                     tourMarker.getLabel())) {}
+                     tourMarker.getLabel())) {
+
+               }
             }
          }
       }
@@ -5530,7 +5536,20 @@ public class Map2 extends Canvas {
 
    private void paint_NewOverlay_30_ClusteredMarker(final GC gc) {
 
-      final int clusterGridSize = (int) ScreenUtils.getPixels(Map2ConfigManager.getActiveMarkerConfig().clusterGridSize);
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+
+      final int clusterGridSize = (int) ScreenUtils.getPixels(markerConfig.clusterGridSize);
+
+      final int clusterFontSize = (int) (markerConfig.clusterSymbol_Size * 2.0f);
+      if (_clusterFontSize != clusterFontSize) {
+         setupClusterFont(gc, clusterFontSize);
+      }
+
+      final Font gcFontBackup = gc.getFont();
+      gc.setFont(_clusterFont);
+
+      gc.setAntialias(markerConfig.isClusterSymbolAntialiased ? SWT.ON : SWT.OFF);
+      gc.setTextAntialias(markerConfig.isClusterTextAntialiased ? SWT.ON : SWT.OFF);
 
       final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
 
@@ -5562,10 +5581,13 @@ public class Map2 extends Canvas {
 
             final GeoPoint geoPoint = clusterItem.getPosition();
 
-            paint_NewOverlay_60_OneCluster(gc,
+            if (paint_NewOverlay_60_OneCluster(
+                  gc,
                   geoPoint.getLatitude(),
                   geoPoint.getLongitude(),
-                  Integer.toString(numClusterItems));
+                  Integer.toString(numClusterItems))) {
+
+            }
 
          } else if (item instanceof final QuadItem markerItem) {
 
@@ -5577,6 +5599,8 @@ public class Map2 extends Canvas {
             }
          }
       }
+
+      gc.setFont(gcFontBackup);
 
       // markers MUST be sorted otherwise they are flickering when the sequence is randomly
       Collections.sort(
@@ -5590,7 +5614,8 @@ public class Map2 extends Canvas {
             return;
          }
 
-         paint_NewOverlay_50_OneMarker(gc,
+         paint_NewOverlay_50_OneMarker(
+               gc,
                mapMarker.geoPoint.getLatitude(),
                mapMarker.geoPoint.getLongitude(),
                mapMarker.title);
@@ -5652,22 +5677,60 @@ public class Map2 extends Canvas {
       final int worldPixel_MarkerPosX = worldPixel_MarkerPos.x;
       final int worldPixel_MarkerPosY = worldPixel_MarkerPos.y;
 
-      final boolean isMarkerInViewport = worldPixel_Viewport.contains(worldPixel_MarkerPosX, worldPixel_MarkerPosY);
+      final boolean isClusterInViewport = worldPixel_Viewport.contains(worldPixel_MarkerPosX, worldPixel_MarkerPosY);
 
-      if (isMarkerInViewport) {
+      if (isClusterInViewport) {
 
          final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
 
          // convert world position into device position
-         final int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
-         final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
+         int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
+         int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
 
          final String text = clusterLabel;
+         final int textLength = text.length();
 
          final Point textExtent = gc.stringExtent(text);
 
-         final int textWidth = text.length() < 2 ? textExtent.x + 2 : textExtent.x;
-         final int textOffset = text.length() < 2 ? 1 : 0;
+         final int offsetX;
+         final int offsetY;
+
+// SET_FORMATTING_OFF
+
+         if (        _clusterFontSize > 19) {   offsetX = textLength == 1 ? 0 : -1;
+         } else if ( _clusterFontSize > 17) {   offsetX = textLength == 1 ? -1 : -1;
+         } else if ( _clusterFontSize > 15) {   offsetX = textLength == 1 ? 0 : -1;
+         } else if ( _clusterFontSize > 13) {   offsetX = textLength == 1 ? 0 : -1;
+         } else if ( _clusterFontSize > 11) {   offsetX = textLength == 1 ? 0 : -1;
+         } else if ( _clusterFontSize >  9) {   offsetX = textLength == 1 ? 1 : 0;
+         } else if ( _clusterFontSize >  7) {   offsetX = textLength == 1 ? 0 : -1;
+         } else if ( _clusterFontSize >  5) {   offsetX = textLength == 1 ? 0 : -1;
+         } else if ( _clusterFontSize >  3) {   offsetX = textLength == 1 ? 0 : -1;
+         } else {                               offsetX = textLength == 1 ? 1 : -1;
+         }
+
+         if (        _clusterFontSize > 19) {   offsetY = textLength == 1 ? 0 : 0;
+         } else if ( _clusterFontSize > 17) {   offsetY = textLength == 1 ? 1 : 1;
+         } else if ( _clusterFontSize > 15) {   offsetY = textLength == 1 ? 0 : 0;
+         } else if ( _clusterFontSize > 13) {   offsetY = textLength == 1 ? 2 : 2;
+         } else if ( _clusterFontSize > 11) {   offsetY = 2;
+         } else if ( _clusterFontSize >  9) {   offsetY = textLength == 1 ? 3 : 2;
+         } else if ( _clusterFontSize >  7) {   offsetY = textLength == 1 ? 3 : 3;
+         } else if ( _clusterFontSize >  5) {   offsetY = 2;
+         } else {                               offsetY = 3;
+         }
+
+// SET_FORMATTING_ON
+
+//         final FontData fontDataNew = _clusterFont.getFontData()[0];
+//
+//         System.out.println(UI.timeStamp()
+//               + " _clusterFontSize: " + _clusterFontSize
+////               + " - new: " + fontDataNew.height
+//               + "  x: " + offsetX
+//               + "  y: " + offsetY);
+
+         final int textWidth = textLength < 2 ? textExtent.x + 2 : textExtent.x;
          final int textHeight = textExtent.y;
          final int textWidth2 = textWidth / 2;
          final int textHeight2 = textHeight / 2;
@@ -5677,24 +5740,31 @@ public class Map2 extends Canvas {
          final int circleSize = textWidth + margin;
          final int circleSize2 = circleSize / 2;
 
-         final int ovalDevX = devX - circleSize2 + textWidth2 - 1;
-         final int ovalDevY = devY - circleSize2 + textHeight2 - 1;
+         devX = devX - circleSize2;
+         devY = devY - circleSize2;
 
-         gc.setBackground(UI.SYS_COLOR_YELLOW);
+         final int ovalDevX = devX - circleSize2 + textWidth2 - 2;
+         final int ovalDevY = devY - circleSize2 + textHeight2 + 2;
 
-         gc.fillOval(
+         if (markerConfig.isFillClusterSymbol) {
 
-               ovalDevX,
-               ovalDevY,
+            gc.setBackground(markerConfig.clusterFill_Color);
+            gc.fillOval(
 
-               circleSize,
-               circleSize);
+                  ovalDevX,
+                  ovalDevY,
+
+                  circleSize,
+                  circleSize);
+         }
+
+         gc.setForeground(markerConfig.clusterOutline_Color);
 
          final int outlineWidth = markerConfig.clusterOutline_Width;
+
          if (outlineWidth > 0) {
 
             gc.setLineWidth(outlineWidth);
-            gc.setForeground(UI.SYS_COLOR_DARK_GREEN);
             gc.drawOval(
 
                   ovalDevX,
@@ -5704,11 +5774,22 @@ public class Map2 extends Canvas {
                   circleSize);
          }
 
-         gc.setForeground(UI.SYS_COLOR_BLACK);
-         gc.drawString(text, devX + textOffset, devY, true);
+         gc.drawString(
+               text,
+               devX + offsetX,
+               devY + offsetY,
+               true);
+
+//         gc.drawRectangle(
+//               devX,
+//               devY,
+//               textWidth,
+//               textHeight);
+
+         gc.setAlpha(0xff);
       }
 
-      return isMarkerInViewport;
+      return isClusterInViewport;
    }
 
    private void paint_OfflineArea(final GC gc) {
@@ -7987,6 +8068,31 @@ public class Map2 extends Canvas {
 
          redraw();
       });
+   }
+
+   private void setupClusterFont(final GC gc, final int newClusterFontSize) {
+
+      final Font gcFont = gc.getFont();
+      final FontData fontData = gcFont.getFontData()[0];
+
+      final int fontHeight_OLD = fontData.getHeight();
+
+      final int fontHeight_NEW = newClusterFontSize;
+
+//      fontHeight_NEW = Math.max(1, Math.min(fontHeight_NEW, 200));
+
+      if (fontHeight_OLD != fontHeight_NEW) {
+
+         // fontsize has changed
+
+         fontData.setHeight(fontHeight_NEW);
+
+         // dispose old font
+         UI.disposeResource(_clusterFont);
+
+         _clusterFont = new Font(getDisplay(), fontData);
+         _clusterFontSize = newClusterFontSize;
+      }
    }
 
    /**

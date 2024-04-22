@@ -17,6 +17,7 @@ package net.tourbook.map2.view;
 
 import net.tourbook.common.UI;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
 /**
@@ -31,38 +32,46 @@ public class Map2MarkerConfig {
     * set when an xml tag is not available.
     */
 
-   public String  id        = Long.toString(System.nanoTime());
-   public String  defaultId = Map2ConfigManager.CONFIG_DEFAULT_ID_1;
-   public String  name      = Map2ConfigManager.CONFIG_DEFAULT_ID_1;
-
-   public boolean isMarkerAntialiasPainting;
+   public String id        = Long.toString(System.nanoTime());
+   public String defaultId = Map2ConfigManager.CONFIG_DEFAULT_ID_1;
+   public String name      = Map2ConfigManager.CONFIG_DEFAULT_ID_1;
 
    /*
     * Marker
     */
-   public boolean isShowTourMarker      = true;
+   public boolean isShowTourMarker          = true;
+   public boolean isMarkerSymbolAntialiased = true;
+   public boolean isMarkerTextAntialiased   = true;
 
-   public RGB     markerFill_Color      = Map2ConfigManager.DEFAULT_MARKER_FILL_COLOR;
-   public int     markerFill_Opacity    = Map2ConfigManager.DEFAULT_MARKER_FILL_OPACITY;
-   public RGB     markerOutline_Color   = Map2ConfigManager.DEFAULT_MARKER_OUTLINE_COLOR;
-   public int     markerOutline_Opacity = Map2ConfigManager.DEFAULT_MARKER_OUTLINE_OPACITY;
-   public float   markerOutline_Size    = Map2ConfigManager.DEFAULT_MARKER_OUTLINE_SIZE;
-   public int     markerSymbol_Size     = Map2ConfigManager.DEFAULT_MARKER_SYMBOL_SIZE;
+   public RGB     markerFill_RGB            = Map2ConfigManager.DEFAULT_MARKER_FILL_RGB;
+   public int     markerFill_Opacity        = Map2ConfigManager.DEFAULT_MARKER_FILL_OPACITY;
+   public RGB     markerOutline_RGB         = Map2ConfigManager.DEFAULT_MARKER_OUTLINE_RGB;
+   public int     markerOutline_Opacity     = Map2ConfigManager.DEFAULT_MARKER_OUTLINE_OPACITY;
+   public float   markerOutline_Size        = Map2ConfigManager.DEFAULT_MARKER_OUTLINE_SIZE;
+   public int     markerSymbol_Size         = Map2ConfigManager.DEFAULT_MARKER_SYMBOL_SIZE;
 
    /*
     * Cluster
     */
-   public boolean isMarkerClustered      = true;
+   public boolean isMarkerClustered          = true;
+   public boolean isClusterSymbolAntialiased = true;
+   public boolean isClusterTextAntialiased   = true;
 
-   public int     clusterGridSize        = Map2ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
-   public RGB     clusterFill_Color      = Map2ConfigManager.DEFAULT_CLUSTER_FILL_COLOR;
-   public int     clusterFill_Opacity    = Map2ConfigManager.DEFAULT_CLUSTER_FILL_OPACITY;
+   public boolean isFillClusterSymbol        = Map2ConfigManager.DEFAULT_IS_FILL_CLUSTER_SYMBOL;
+   public int     clusterGridSize            = Map2ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
+   public RGB     clusterFill_RGB            = Map2ConfigManager.DEFAULT_CLUSTER_FILL_RGB;
+   public RGB     clusterOutline_RGB         = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_RGB;
+   public int     clusterOutline_Width       = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_WIDTH;
+   public int     clusterSymbol_Size         = Map2ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
 
-   public RGB     clusterOutline_Color   = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_COLOR;
-   public int     clusterOutline_Opacity = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_OPACITY;
+   public Color   clusterFill_Color;
+   public Color   clusterOutline_Color;
 
-   public int     clusterOutline_Width   = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_WIDTH;
-   public int     clusterSymbol_Size     = Map2ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
+   public void setupColors() {
+
+      clusterFill_Color = new Color(clusterFill_RGB);
+      clusterOutline_Color = new Color(clusterOutline_RGB);
+   }
 
    @Override
    public String toString() {
@@ -71,28 +80,27 @@ public class Map2MarkerConfig {
 
             + "Map2MarkerConfig" + NL //                                            //$NON-NLS-1$
 
-            + " name                       = " + name + NL //                       //$NON-NLS-1$
-            + " defaultId                  = " + defaultId + NL //                  //$NON-NLS-1$
-            + " id                         = " + id + NL //                         //$NON-NLS-1$
+            + " name                      = " + name + NL //                        //$NON-NLS-1$
+            + " defaultId                 = " + defaultId + NL //                   //$NON-NLS-1$
+            + " id                        = " + id + NL //                          //$NON-NLS-1$
 
-            + " isShowTourMarker           = " + isShowTourMarker + NL //           //$NON-NLS-1$
-            + " isMarkerClustered          = " + isMarkerClustered + NL //          //$NON-NLS-1$
-            + " isMarkerAntialiasPainting  = " + isMarkerAntialiasPainting + NL //  //$NON-NLS-1$
+            + " isShowTourMarker          = " + isShowTourMarker + NL //            //$NON-NLS-1$
+            + " markerSymbol_Size         = " + markerSymbol_Size + NL //           //$NON-NLS-1$
+            + " markerOutline_Opacity     = " + markerOutline_Opacity + NL //       //$NON-NLS-1$
+            + " markerOutline_RGB         = " + markerOutline_RGB + NL //           //$NON-NLS-1$
+            + " markerOutline_Size        = " + markerOutline_Size + NL //          //$NON-NLS-1$
+            + " markerFill_RGB            = " + markerFill_RGB + NL //              //$NON-NLS-1$
+            + " markerFill_Opacity        = " + markerFill_Opacity + NL //          //$NON-NLS-1$
 
-            + " markerSymbol_Size          = " + markerSymbol_Size + NL //          //$NON-NLS-1$
-            + " markerOutline_Opacity      = " + markerOutline_Opacity + NL //      //$NON-NLS-1$
-            + " markerOutline_Size         = " + markerOutline_Size + NL //         //$NON-NLS-1$
-            + " markerOutline_Color        = " + markerOutline_Color + NL //        //$NON-NLS-1$
-            + " markerFill_Color           = " + markerFill_Color + NL //           //$NON-NLS-1$
-            + " markerFill_Opacity         = " + markerFill_Opacity + NL //         //$NON-NLS-1$
-
-            + " clusterGridSize            = " + clusterGridSize + NL //            //$NON-NLS-1$
-            + " clusterSymbol_Size         = " + clusterSymbol_Size + NL //         //$NON-NLS-1$
-            + " clusterOutline_Width       = " + clusterOutline_Width + NL //       //$NON-NLS-1$
-            + " clusterOutline_Color       = " + clusterOutline_Color + NL //       //$NON-NLS-1$
-            + " clusterOutline_Opacity     = " + clusterOutline_Opacity + NL //     //$NON-NLS-1$
-            + " clusterFill_Color          = " + clusterFill_Color + NL //          //$NON-NLS-1$
-            + " clusterFill_Opacity        = " + clusterFill_Opacity + NL //        //$NON-NLS-1$
+            + " isMarkerClustered            = " + isMarkerClustered + NL //           //$NON-NLS-1$
+            + " isClusterSymbolAntialiased   = " + isClusterSymbolAntialiased + NL //  //$NON-NLS-1$
+            + " isClusterTextAntialiased     = " + isClusterTextAntialiased + NL //    //$NON-NLS-1$
+            + " isFillClusterSymbol          = " + isFillClusterSymbol + NL //         //$NON-NLS-1$
+            + " clusterGridSize              = " + clusterGridSize + NL //             //$NON-NLS-1$
+            + " clusterSymbol_Size           = " + clusterSymbol_Size + NL //          //$NON-NLS-1$
+            + " clusterOutline_Width         = " + clusterOutline_Width + NL //        //$NON-NLS-1$
+            + " clusterOutline_RGB           = " + clusterOutline_RGB + NL //          //$NON-NLS-1$
+            + " clusterFill_RGB              = " + clusterFill_RGB + NL //             //$NON-NLS-1$
 
       ;
    }

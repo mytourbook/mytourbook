@@ -74,8 +74,7 @@ public class Map2ConfigManager {
    /*
     * Tour options
     */
-   private static final String TAG_OPTIONS                     = "Options";                      //$NON-NLS-1$
-   private static final String ATTR_USE_DRAGGED_KEY_NAVIGATION = "useDraggedKeyboardNavigation"; //$NON-NLS-1$
+   private static final String TAG_OPTIONS = "Options"; //$NON-NLS-1$
    //
    /*
     * Tour marker, map bookmarks, photos
@@ -84,29 +83,28 @@ public class Map2ConfigManager {
    private static final String TAG_MARKER       = "Marker";      //$NON-NLS-1$
    //
    // marker
-   private static final String TAG_MARKER_FILL_COLOR       = "MarkerFillColor";      //$NON-NLS-1$
-   private static final String TAG_MARKER_OUTLINE_COLOR    = "MarkerOutlineColor";   //$NON-NLS-1$
    private static final String ATTR_IS_SHOW_TOUR_MARKER    = "isShowTourMarker";     //$NON-NLS-1$
-   private static final String ATTR_IS_SHOW_MAP_BOOKMARK   = "isShowMapBookmark";    //$NON-NLS-1$
-   private static final String ATTR_MARKER_ORIENTATION     = "markerOrientation";    //$NON-NLS-1$
    //
    private static final String ATTR_MARKER_FILL_OPACITY    = "markerFillOpacity";    //$NON-NLS-1$
    private static final String ATTR_MARKER_OUTLINE_OPACITY = "markerOutlineOpacity"; //$NON-NLS-1$
    private static final String ATTR_MARKER_OUTLINE_SIZE    = "markerOutlineSize";    //$NON-NLS-1$
    private static final String ATTR_MARKER_SYMBOL_SIZE     = "markerSymbolSize";     //$NON-NLS-1$
    //
-   // cluster
-   private static final String TAG_CLUSTER_FILL_COLOR       = "ClusterFillColor";     //$NON-NLS-1$
-   private static final String TAG_CLUSTER_OUTLINE_COLOR    = "ClusterOutlineColor";  //$NON-NLS-1$
-   private static final String ATTR_CLUSTER_ALGORITHM       = "clusterAlgorithm";     //$NON-NLS-1$
-   private static final String ATTR_CLUSTER_ORIENTATION     = "clusterOrientation";   //$NON-NLS-1$
-   private static final String ATTR_CLUSTER_GRID_SIZE       = "clusterGridSize";      //$NON-NLS-1$
-   private static final String ATTR_IS_MARKER_CLUSTERED     = "isMarkerClustered";    //$NON-NLS-1$
+   private static final String TAG_MARKER_FILL_COLOR       = "MarkerFillColor";      //$NON-NLS-1$
+   private static final String TAG_MARKER_OUTLINE_COLOR    = "MarkerOutlineColor";   //$NON-NLS-1$
    //
-   private static final String ATTR_CLUSTER_FILL_OPACITY    = "clusterFillOpacity";   //$NON-NLS-1$
-   private static final String ATTR_CLUSTER_OUTLINE_OPACITY = "cluserOutlineOpacity"; //$NON-NLS-1$
-   private static final String ATTR_CLUSTER_OUTLINE_WIDTH   = "clusterOutlineWidth";  //$NON-NLS-1$
-   private static final String ATTR_CLUSTER_SYMBOL_SIZE     = "clusterSymbolSize";    //$NON-NLS-1$
+   // cluster
+   private static final String ATTR_IS_MARKER_CLUSTERED           = "isMarkerClustered";          //$NON-NLS-1$
+   private static final String ATTR_IS_CLUSTER_SYMBOL_ANTIALIASED = "isClusterSymbolAntialiased"; //$NON-NLS-1$
+   private static final String ATTR_IS_CLUSTER_TEXT_ANTIALIASED   = "isClusterTextAntialiaed";    //$NON-NLS-1$
+   private static final String ATTR_IS_CLUSTER_FILL_OPACITY       = "isClusterFillOpacity";       //$NON-NLS-1$
+   //
+   private static final String ATTR_CLUSTER_GRID_SIZE             = "clusterGridSize";            //$NON-NLS-1$
+   private static final String ATTR_CLUSTER_OUTLINE_WIDTH         = "clusterOutlineWidth";        //$NON-NLS-1$
+   private static final String ATTR_CLUSTER_SYMBOL_SIZE           = "clusterSymbolSize";          //$NON-NLS-1$
+   //
+   private static final String TAG_CLUSTER_FILL_COLOR             = "ClusterFillColor";           //$NON-NLS-1$
+   private static final String TAG_CLUSTER_OUTLINE_COLOR          = "ClusterOutlineColor";        //$NON-NLS-1$
    //
    /*
     * Defaults, min/max
@@ -121,26 +119,25 @@ public class Map2ConfigManager {
    public static final int   MARKER_SYMBOL_SIZE_MAX      = 200;
    //
    // CLUSTER
-   public static final int DEFAULT_CLUSTER_GRID_SIZE     = 60;
-   public static final int DEFAULT_CLUSTER_SYMBOL_SIZE   = 10;
-   public static final int DEFAULT_CLUSTER_OUTLINE_WIDTH = 0;
-   public static final int CLUSTER_GRID_MIN_SIZE         = 1;
-   public static final int CLUSTER_GRID_MAX_SIZE         = 10000;
-   public static final int CLUSTER_OUTLINE_WIDTH_MIN     = 0;
-   public static final int CLUSTER_OUTLINE_WIDTH_MAX     = 10;
-   public static final int CLUSTER_SYMBOL_SIZE_MIN       = 5;
-   public static final int CLUSTER_SYMBOL_SIZE_MAX       = 200;
+   public static final boolean DEFAULT_IS_FILL_CLUSTER_SYMBOL = true;
+   public static final int     DEFAULT_CLUSTER_GRID_SIZE      = 60;
+   public static final int     DEFAULT_CLUSTER_SYMBOL_SIZE    = 10;
+   public static final int     DEFAULT_CLUSTER_OUTLINE_WIDTH  = 0;
+   public static final int     CLUSTER_GRID_MIN_SIZE          = 1;
+   public static final int     CLUSTER_GRID_MAX_SIZE          = 10000;
+   public static final int     CLUSTER_OUTLINE_WIDTH_MIN      = 0;
+   public static final int     CLUSTER_OUTLINE_WIDTH_MAX      = 10;
+   public static final int     CLUSTER_SYMBOL_SIZE_MIN        = 5;
+   public static final int     CLUSTER_SYMBOL_SIZE_MAX        = 200;
    //
    // colors
-   public static final RGB   DEFAULT_CLUSTER_FILL_COLOR      = new RGB(0xFC, 0x67, 0x00);
-   public static final int   DEFAULT_CLUSTER_FILL_OPACITY    = 200;                      // 80%;
-   public static final RGB   DEFAULT_CLUSTER_OUTLINE_COLOR   = new RGB(0xff, 0xff, 0xff);
-   public static final int   DEFAULT_CLUSTER_OUTLINE_OPACITY = 200;                      // 80%;
-   public static final float DEFAULT_CLUSTER_OUTLINE_SIZE    = 2.0f;
-   public static final RGB   DEFAULT_MARKER_FILL_COLOR       = new RGB(0xFF, 0xFF, 0x00);
-   public static final int   DEFAULT_MARKER_FILL_OPACITY     = 200;                      // 80%;
-   public static final RGB   DEFAULT_MARKER_OUTLINE_COLOR    = new RGB(0, 0, 0);
-   public static final int   DEFAULT_MARKER_OUTLINE_OPACITY  = 200;                      // 80%;
+   public static final RGB   DEFAULT_CLUSTER_FILL_RGB       = new RGB(0xFC, 0x67, 0x00);
+   public static final RGB   DEFAULT_CLUSTER_OUTLINE_RGB    = new RGB(0xff, 0xff, 0xff);
+   public static final float DEFAULT_CLUSTER_OUTLINE_SIZE   = 2.0f;
+   public static final RGB   DEFAULT_MARKER_FILL_RGB        = new RGB(0xFF, 0xFF, 0x00);
+   public static final int   DEFAULT_MARKER_FILL_OPACITY    = 200;                      // 80%;
+   public static final RGB   DEFAULT_MARKER_OUTLINE_RGB     = new RGB(0, 0, 0);
+   public static final int   DEFAULT_MARKER_OUTLINE_OPACITY = 200;                      // 80%;
    //
    //
    /**
@@ -203,76 +200,78 @@ public class Map2ConfigManager {
 
 // SET_FORMATTING_OFF
 
-      config.markerOutline_Color    = fgBlack;
-      config.markerFill_Color       = fgWhite;
+      config.markerOutline_RGB    = fgBlack;
+      config.markerFill_RGB       = fgWhite;
       config.isShowTourMarker       = true;
 
       switch (configIndex) {
 
       case 1:
          config.name                   = config.defaultId = CONFIG_DEFAULT_ID_1;
-         config.clusterOutline_Color   = fgBlack;
-         config.clusterFill_Color      = bg1;
-         config.markerOutline_Color    = fgBlack;
-         config.markerFill_Color       = bg5;
+         config.clusterOutline_RGB   = fgBlack;
+         config.clusterFill_RGB      = bg1;
+         config.markerOutline_RGB    = fgBlack;
+         config.markerFill_RGB       = bg5;
          break;
 
       case 2:
          config.name                   = config.defaultId = CONFIG_DEFAULT_ID_2;
-         config.clusterOutline_Color   = fgWhite;
-         config.clusterFill_Color      = bg1;
+         config.clusterOutline_RGB   = fgWhite;
+         config.clusterFill_RGB      = bg1;
          break;
 
       case 3:
          config.name                   = config.defaultId = CONFIG_DEFAULT_ID_3;
-         config.clusterOutline_Color   = fgBlack;
-         config.clusterFill_Color      = bg2;
+         config.clusterOutline_RGB   = fgBlack;
+         config.clusterFill_RGB      = bg2;
          break;
 
       case 4:
          config.name                   = config.defaultId = CONFIG_DEFAULT_ID_4;
-         config.clusterOutline_Color   = fgWhite;
-         config.clusterFill_Color      = bg2;
+         config.clusterOutline_RGB   = fgWhite;
+         config.clusterFill_RGB      = bg2;
          break;
 
       case 5:
          config.name                   = config.defaultId = CONFIG_DEFAULT_ID_5;
-         config.clusterOutline_Color   = fgBlack;
-         config.clusterFill_Color      = bg3;
+         config.clusterOutline_RGB   = fgBlack;
+         config.clusterFill_RGB      = bg3;
          break;
 
       case 6:
          config.name                   = config.defaultId = CONFIG_DEFAULT_ID_6;
-         config.clusterOutline_Color   = fgWhite;
-         config.clusterFill_Color      = bg3;
+         config.clusterOutline_RGB   = fgWhite;
+         config.clusterFill_RGB      = bg3;
          break;
 
       case 7:
          config.name                   = config.defaultId = CONFIG_DEFAULT_ID_7;
-         config.clusterOutline_Color   = fgBlack;
-         config.clusterFill_Color      = bg4;
+         config.clusterOutline_RGB   = fgBlack;
+         config.clusterFill_RGB      = bg4;
          break;
 
       case 8:
          config.name                   = config.defaultId = CONFIG_DEFAULT_ID_8;
-         config.clusterOutline_Color   = fgWhite;
-         config.clusterFill_Color      = bg4;
+         config.clusterOutline_RGB   = fgWhite;
+         config.clusterFill_RGB      = bg4;
          break;
 
       case 9:
          config.name                   = config.defaultId = CONFIG_DEFAULT_ID_9;
-         config.clusterOutline_Color   = fgBlack;
-         config.clusterFill_Color      = bg5;
+         config.clusterOutline_RGB   = fgBlack;
+         config.clusterFill_RGB      = bg5;
          break;
 
       case 10:
          config.name                   = config.defaultId = CONFIG_DEFAULT_ID_10;
-         config.clusterOutline_Color   = fgWhite;
-         config.clusterFill_Color      = bg5;
+         config.clusterOutline_RGB   = fgWhite;
+         config.clusterFill_RGB      = bg5;
          break;
       }
 
 // SET_FORMATTING_ON
+
+      config.setupColors();
 
       return config;
    }
@@ -290,32 +289,32 @@ public class Map2ConfigManager {
          /*
           * Marker
           */
-         xmlConfig.putBoolean(      ATTR_IS_SHOW_TOUR_MARKER,     config.isShowTourMarker);
+         xmlConfig.putBoolean(      ATTR_IS_SHOW_TOUR_MARKER,           config.isShowTourMarker);
 
-         xmlConfig.putInteger(      ATTR_MARKER_FILL_OPACITY,     config.markerFill_Opacity);
-         xmlConfig.putInteger(      ATTR_MARKER_OUTLINE_OPACITY,  config.markerOutline_Opacity);
-         xmlConfig.putFloat(        ATTR_MARKER_OUTLINE_SIZE,     config.markerOutline_Size);
-         xmlConfig.putInteger(      ATTR_MARKER_SYMBOL_SIZE,      config.markerSymbol_Size);
-
-         Util.setXmlRgb(xmlConfig,  TAG_MARKER_OUTLINE_COLOR,     config.markerOutline_Color);
-         Util.setXmlRgb(xmlConfig,  TAG_MARKER_FILL_COLOR,        config.markerFill_Color);
+         xmlConfig.putInteger(      ATTR_MARKER_FILL_OPACITY,           config.markerFill_Opacity);
+         xmlConfig.putInteger(      ATTR_MARKER_OUTLINE_OPACITY,        config.markerOutline_Opacity);
+         xmlConfig.putFloat(        ATTR_MARKER_OUTLINE_SIZE,           config.markerOutline_Size);
+         xmlConfig.putInteger(      ATTR_MARKER_SYMBOL_SIZE,            config.markerSymbol_Size);
+         Util.setXmlRgb(xmlConfig,  TAG_MARKER_OUTLINE_COLOR,           config.markerOutline_RGB);
+         Util.setXmlRgb(xmlConfig,  TAG_MARKER_FILL_COLOR,              config.markerFill_RGB);
 
          /*
           * Cluster
           */
-         xmlConfig.putBoolean(      ATTR_IS_MARKER_CLUSTERED,     config.isMarkerClustered);
+         xmlConfig.putBoolean(      ATTR_IS_MARKER_CLUSTERED,           config.isMarkerClustered);
+         xmlConfig.putBoolean(      ATTR_IS_CLUSTER_SYMBOL_ANTIALIASED, config.isClusterSymbolAntialiased);
+         xmlConfig.putBoolean(      ATTR_IS_CLUSTER_TEXT_ANTIALIASED,   config.isClusterTextAntialiased);
 
-         xmlConfig.putInteger(      ATTR_CLUSTER_GRID_SIZE,       config.clusterGridSize);
-         xmlConfig.putInteger(      ATTR_CLUSTER_FILL_OPACITY,    config.clusterFill_Opacity);
-         xmlConfig.putInteger(      ATTR_CLUSTER_OUTLINE_OPACITY, config.clusterOutline_Opacity);
-         xmlConfig.putInteger(      ATTR_CLUSTER_OUTLINE_WIDTH,   config.clusterOutline_Width);
-         xmlConfig.putInteger(      ATTR_CLUSTER_SYMBOL_SIZE,     config.clusterSymbol_Size);
-
-         Util.setXmlRgb(xmlConfig,  TAG_CLUSTER_OUTLINE_COLOR,    config.clusterOutline_Color);
-         Util.setXmlRgb(xmlConfig,  TAG_CLUSTER_FILL_COLOR,       config.clusterFill_Color);
+         xmlConfig.putBoolean(      ATTR_IS_CLUSTER_FILL_OPACITY,       config.isFillClusterSymbol);
+         xmlConfig.putInteger(      ATTR_CLUSTER_GRID_SIZE,             config.clusterGridSize);
+         xmlConfig.putInteger(      ATTR_CLUSTER_OUTLINE_WIDTH,         config.clusterOutline_Width);
+         xmlConfig.putInteger(      ATTR_CLUSTER_SYMBOL_SIZE,           config.clusterSymbol_Size);
+         Util.setXmlRgb(xmlConfig,  TAG_CLUSTER_FILL_COLOR,             config.clusterFill_RGB);
+         Util.setXmlRgb(xmlConfig,  TAG_CLUSTER_OUTLINE_COLOR,          config.clusterOutline_RGB);
       }
 
 // SET_FORMATTING_ON
+
    }
 
    public static Map2MarkerConfig getActiveMarkerConfig() {
@@ -397,33 +396,33 @@ public class Map2ConfigManager {
       return layerFile;
    }
 
-   private static void parse_210_MarkerConfig(final XMLMemento xmlConfig, final Map2MarkerConfig config) {
+   private static void parse_210_MarkerConfig(final XMLMemento xmlConfig,
+                                              final Map2MarkerConfig config) {
 
 // SET_FORMATTING_OFF
 
-      config.id                     = Util.getXmlString(xmlConfig,      ATTR_ID,                      Long.toString(System.nanoTime()));
-      config.name                   = Util.getXmlString(xmlConfig,      ATTR_CONFIG_NAME,             UI.EMPTY_STRING);
+      config.id                           = Util.getXmlString(xmlConfig,      ATTR_ID,                            Long.toString(System.nanoTime()));
+      config.name                         = Util.getXmlString(xmlConfig,      ATTR_CONFIG_NAME,                   UI.EMPTY_STRING);
 
-      config.isShowTourMarker       = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_MARKER,     true);
 
-      config.markerFill_Opacity     = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_FILL_OPACITY,     Map25ConfigManager.DEFAULT_MARKER_FILL_OPACITY);
-      config.markerOutline_Opacity  = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_OUTLINE_OPACITY,  Map25ConfigManager.DEFAULT_MARKER_FILL_OPACITY);
-      config.markerOutline_Size     = Util.getXmlFloatFloat(xmlConfig,  ATTR_MARKER_OUTLINE_SIZE,     DEFAULT_MARKER_OUTLINE_SIZE,     MARKER_OUTLINE_SIZE_MIN,   MARKER_OUTLINE_SIZE_MAX);
-      config.markerSymbol_Size      = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_SYMBOL_SIZE,      DEFAULT_MARKER_SYMBOL_SIZE,      MARKER_SYMBOL_SIZE_MIN,    MARKER_SYMBOL_SIZE_MAX);
+      config.isShowTourMarker             = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_MARKER,           true);
+      config.markerFill_Opacity           = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_FILL_OPACITY,           Map25ConfigManager.DEFAULT_MARKER_FILL_OPACITY);
+      config.markerOutline_Opacity        = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_OUTLINE_OPACITY,        Map25ConfigManager.DEFAULT_MARKER_FILL_OPACITY);
+      config.markerOutline_Size           = Util.getXmlFloatFloat(xmlConfig,  ATTR_MARKER_OUTLINE_SIZE,           DEFAULT_MARKER_OUTLINE_SIZE,     MARKER_OUTLINE_SIZE_MIN,   MARKER_OUTLINE_SIZE_MAX);
+      config.markerSymbol_Size            = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_SYMBOL_SIZE,            DEFAULT_MARKER_SYMBOL_SIZE,      MARKER_SYMBOL_SIZE_MIN,    MARKER_SYMBOL_SIZE_MAX);
 
-      config.isMarkerClustered      = Util.getXmlBoolean(xmlConfig,     ATTR_IS_MARKER_CLUSTERED,     true);
-
-      config.clusterGridSize        = Util.getXmlInteger(xmlConfig,     ATTR_CLUSTER_GRID_SIZE,       DEFAULT_CLUSTER_GRID_SIZE,       CLUSTER_GRID_MIN_SIZE,     CLUSTER_GRID_MAX_SIZE);
-      config.clusterFill_Opacity    = Util.getXmlInteger(xmlConfig,     ATTR_CLUSTER_FILL_OPACITY,    DEFAULT_CLUSTER_FILL_OPACITY);
-      config.clusterOutline_Opacity = Util.getXmlInteger(xmlConfig,     ATTR_CLUSTER_OUTLINE_OPACITY, DEFAULT_CLUSTER_OUTLINE_OPACITY);
-
-      config.clusterOutline_Width   = Util.getXmlInteger(xmlConfig,     ATTR_CLUSTER_OUTLINE_WIDTH,   DEFAULT_CLUSTER_OUTLINE_WIDTH,   CLUSTER_OUTLINE_WIDTH_MIN, CLUSTER_OUTLINE_WIDTH_MAX);
-      config.clusterSymbol_Size     = Util.getXmlInteger(xmlConfig,     ATTR_CLUSTER_SYMBOL_SIZE,     DEFAULT_CLUSTER_SYMBOL_SIZE,     CLUSTER_SYMBOL_SIZE_MIN,   CLUSTER_SYMBOL_SIZE_MAX);
+      config.isMarkerClustered            = Util.getXmlBoolean(xmlConfig,     ATTR_IS_MARKER_CLUSTERED,           true);
+      config.isClusterSymbolAntialiased   = Util.getXmlBoolean(xmlConfig,     ATTR_IS_CLUSTER_SYMBOL_ANTIALIASED, true);
+      config.isClusterTextAntialiased     = Util.getXmlBoolean(xmlConfig,     ATTR_IS_CLUSTER_TEXT_ANTIALIASED,   true);
+      config.isFillClusterSymbol          = Util.getXmlBoolean(xmlConfig,     ATTR_IS_CLUSTER_FILL_OPACITY,       DEFAULT_IS_FILL_CLUSTER_SYMBOL);
+      config.clusterGridSize              = Util.getXmlInteger(xmlConfig,     ATTR_CLUSTER_GRID_SIZE,             DEFAULT_CLUSTER_GRID_SIZE,       CLUSTER_GRID_MIN_SIZE,     CLUSTER_GRID_MAX_SIZE);
+      config.clusterOutline_Width         = Util.getXmlInteger(xmlConfig,     ATTR_CLUSTER_OUTLINE_WIDTH,         DEFAULT_CLUSTER_OUTLINE_WIDTH,   CLUSTER_OUTLINE_WIDTH_MIN, CLUSTER_OUTLINE_WIDTH_MAX);
+      config.clusterSymbol_Size           = Util.getXmlInteger(xmlConfig,     ATTR_CLUSTER_SYMBOL_SIZE,           DEFAULT_CLUSTER_SYMBOL_SIZE,     CLUSTER_SYMBOL_SIZE_MIN,   CLUSTER_SYMBOL_SIZE_MAX);
 
 // SET_FORMATTING_ON
 
       /*
-       * Each color has a seaparate tag
+       * Each color is in it's own tag
        */
       for (final IMemento mementoConfigChild : xmlConfig.getChildren()) {
 
@@ -433,22 +432,24 @@ public class Map2ConfigManager {
          switch (configTag) {
 
          case TAG_CLUSTER_OUTLINE_COLOR:
-            config.clusterOutline_Color = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_OUTLINE_COLOR);
+            config.clusterOutline_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_OUTLINE_RGB);
             break;
 
          case TAG_CLUSTER_FILL_COLOR:
-            config.clusterFill_Color = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_FILL_COLOR);
+            config.clusterFill_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_FILL_RGB);
             break;
 
          case TAG_MARKER_OUTLINE_COLOR:
-            config.markerOutline_Color = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_OUTLINE_COLOR);
+            config.markerOutline_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_OUTLINE_RGB);
             break;
 
          case TAG_MARKER_FILL_COLOR:
-            config.markerFill_Color = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_FILL_COLOR);
+            config.markerFill_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_FILL_RGB);
             break;
          }
       }
+
+      config.setupColors();
    }
 
    /**
