@@ -90,7 +90,7 @@ import net.tourbook.map.location.SlideoutMapLocation;
 import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.action.ActionCreateTourMarkerFromMap;
-import net.tourbook.map2.action.ActionLookupAddressLocation;
+import net.tourbook.map2.action.ActionLookupCommonLocation;
 import net.tourbook.map2.action.ActionManageMapProviders;
 import net.tourbook.map2.action.ActionMap2Color;
 import net.tourbook.map2.action.ActionMap2_MapProvider;
@@ -153,7 +153,7 @@ import net.tourbook.tour.filter.geo.GeoFilter_LoaderData;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
-import net.tourbook.tour.location.AddressLocationManager;
+import net.tourbook.tour.location.CommonLocationManager;
 import net.tourbook.tour.location.TourLocationExtended;
 import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.photo.IMapWithPhotos;
@@ -248,8 +248,8 @@ public class Map2View extends ViewPart implements
    static final boolean          STATE_IS_SHOW_MAP_LOCATIONS_DEFAULT                   = true;
    public static final String    STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX               = "STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX";                           //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX_DEFAULT       = true;
-   public static final String    STATE_IS_SHOW_LOCATIONS_ADDRESS                       = "STATE_IS_SHOW_LOCATIONS_ADDRESS";                           //$NON-NLS-1$
-   public static final boolean   STATE_IS_SHOW_LOCATIONS_ADDRESS_DEFAULT               = true;
+   public static final String    STATE_IS_SHOW_LOCATIONS_COMMON                        = "STATE_IS_SHOW_LOCATIONS_COMMON";                           //$NON-NLS-1$
+   public static final boolean   STATE_IS_SHOW_LOCATIONS_COMMON_DEFAULT                = true;
    public static final String    STATE_IS_SHOW_LOCATIONS_TOUR                          = "STATE_IS_SHOW_LOCATIONS_TOUR";                           //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_LOCATIONS_TOUR_DEFAULT                  = true;
 
@@ -502,7 +502,7 @@ public class Map2View extends ViewPart implements
    private ActionCreateTourMarkerFromMap     _actionCreateTourMarkerFromMap;
    private Action_ExportMap_SubMenu          _actionExportMap_SubMenu;
    private ActionGotoLocation                _actionGotoLocation;
-   private ActionLookupAddressLocation       _actionLookupTourLocation;
+   private ActionLookupCommonLocation       _actionLookupTourLocation;
    private ActionManageMapProviders          _actionManageMapProvider;
    private ActionMapBookmarks                _actionMap2Slideout_Bookmarks;
    private ActionMap2Color                   _actionMap2Slideout_Color;
@@ -1390,7 +1390,7 @@ public class Map2View extends ViewPart implements
    public void addAddressLocation(final TourLocation tourLocation) {
 
       // update model + UI
-      AddressLocationManager.addLocation(tourLocation);
+      CommonLocationManager.addLocation(tourLocation);
 
       // update UI
       if (_actionMap2Slideout_MapLocation.getSelection() == false) {
@@ -1682,7 +1682,7 @@ public class Map2View extends ViewPart implements
 
             onSelection_HoveredValue((HoveredValueData) eventData);
 
-         } else if (eventId == TourEventId.ADDRESS_LOCATION_SELECTION) {
+         } else if (eventId == TourEventId.COMMON_LOCATION_SELECTION) {
 
             moveToAddressLocation(eventData);
 
@@ -1878,7 +1878,7 @@ public class Map2View extends ViewPart implements
       _actionCopyLocation                 = new ActionCopyLocation();
       _actionCreateTourMarkerFromMap      = new ActionCreateTourMarkerFromMap(this);
       _actionGotoLocation                 = new ActionGotoLocation();
-      _actionLookupTourLocation           = new ActionLookupAddressLocation(this);
+      _actionLookupTourLocation           = new ActionLookupCommonLocation(this);
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
@@ -3278,7 +3278,7 @@ public class Map2View extends ViewPart implements
       // repaint map
       final List<TourLocationExtended> allAddressLocations = new ArrayList<>();
       for (final TourLocation tourLocation : allTourLocations) {
-         allAddressLocations.add(new TourLocationExtended(tourLocation, LocationType.Address));
+         allAddressLocations.add(new TourLocationExtended(tourLocation, LocationType.Common));
       }
 
       _directMappingPainter.setAddressLocations(allAddressLocations);
@@ -5433,8 +5433,8 @@ public class Map2View extends ViewPart implements
             Map2View.STATE_IS_SHOW_MAP_LOCATION_BOUNDING_BOX_DEFAULT);
 
       final boolean isShowAddressLocations = Util.getStateBoolean(_state,
-            Map2View.STATE_IS_SHOW_LOCATIONS_ADDRESS,
-            Map2View.STATE_IS_SHOW_LOCATIONS_ADDRESS_DEFAULT);
+            Map2View.STATE_IS_SHOW_LOCATIONS_COMMON,
+            Map2View.STATE_IS_SHOW_LOCATIONS_COMMON_DEFAULT);
 
       final boolean isShowTourLocations = Util.getStateBoolean(_state,
             Map2View.STATE_IS_SHOW_LOCATIONS_TOUR,

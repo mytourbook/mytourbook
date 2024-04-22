@@ -37,7 +37,7 @@ import net.tourbook.tour.location.TourLocationManager.ZoomLevel;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Menu;
 
-public class ActionLookupAddressLocation extends SubMenu {
+public class ActionLookupCommonLocation extends SubMenu {
 
    private Map2View                _map2View;
 
@@ -63,9 +63,9 @@ public class ActionLookupAddressLocation extends SubMenu {
       }
    }
 
-   public ActionLookupAddressLocation(final Map2View mapView) {
+   public ActionLookupCommonLocation(final Map2View mapView) {
 
-      super(Messages.Map_Action_LookupAddressLocation, AS_DROP_DOWN_MENU);
+      super(Messages.Map_Action_LookupCommonLocation, AS_DROP_DOWN_MENU);
 
       _map2View = mapView;
 

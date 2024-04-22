@@ -39,11 +39,11 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 /**
- * Manage address locations
+ * Manage common locations
  */
-public class AddressLocationManager {
+public class CommonLocationManager {
 
-   private static final String             CONFIG_FILE_NAME                         = "address-locations.xml";                     //$NON-NLS-1$
+   private static final String             CONFIG_FILE_NAME                         = "common-locations.xml";                      //$NON-NLS-1$
 
    private static final Bundle             _bundle                                  = TourbookPlugin.getDefault().getBundle();
    private static final IPath              _stateLocation                           = Platform.getStateLocation(_bundle);
@@ -54,7 +54,7 @@ public class AddressLocationManager {
    private static final int                CONFIG_VERSION                           = 1;
    private static final String             ATTR_CONFIG_VERSION                      = "configVersion";                             //$NON-NLS-1$
    //
-   private static final String             TAG_ROOT                                 = "AddressLocations";                          //$NON-NLS-1$
+   private static final String             TAG_ROOT                                 = "CommonLocations";                           //$NON-NLS-1$
    private static final String             TAG_ALL_LOCATIONS                        = "AllLocations";                              //$NON-NLS-1$
    private static final String             TAG_LOCATION                             = "Location";                                  //$NON-NLS-1$
    //

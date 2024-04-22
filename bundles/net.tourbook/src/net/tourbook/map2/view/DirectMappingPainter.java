@@ -87,7 +87,7 @@ public class DirectMappingPainter implements IDirectPainter {
    private Color                      _nameColor_Dark_Hovered   = new Color(255, 255, 255);
    private Color                      _nameColor_Bright         = new Color(41, 54, 0);
    private Color                      _nameColor_Bright_Shadow  = new Color(255, 255, 255);
-   private Color                      _nameColor_Bright_Hovered = new Color(137, 173, 39);
+   private Color                      _nameColor_Bright_Hovered = new Color(23, 137, 255);
 
    /*
     * UI resources
@@ -397,7 +397,7 @@ public class DirectMappingPainter implements IDirectPainter {
             // draw location image
             switch (tourLocationExtended.locationType) {
 
-            case Address   -> gc.drawImage(_imageMapLocation_Address, iconDevX, iconDevY);
+            case Common   -> gc.drawImage(_imageMapLocation_Address, iconDevX, iconDevY);
             case TourStart -> gc.drawImage(_imageMapLocation_Start, iconDevX, iconDevY);
             case TourEnd   -> gc.drawImage(_imageMapLocation_End, iconDevX, iconDevY);
 

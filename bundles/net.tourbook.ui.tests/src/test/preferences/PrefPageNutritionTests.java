@@ -50,7 +50,7 @@ public class PrefPageNutritionTests extends UITest {
       assertTrue(initialTableRowCount == 0);
 
       // Act
-      bot.button(Messages.PrefPage_TourBeverageContainers_Button_Add).click();
+      bot.button(Messages.App_Action_Add).click();
 
       //Name
       bot.text(0).setText("Salomon flas"); //$NON-NLS-1$
@@ -63,7 +63,7 @@ public class PrefPageNutritionTests extends UITest {
       assertEquals(initialTableRowCount + 1, beverageContainersTable.rowCount());
 
       // Act - Rename the beverage container
-      bot.button(Messages.PrefPage_TourBeverageContainers_Button_Edit).click();
+      bot.button(Messages.App_Action_Edit).click();
 
       //Name
       bot.text(0).setText("Salomon flask"); //$NON-NLS-1$
@@ -71,7 +71,7 @@ public class PrefPageNutritionTests extends UITest {
       Utils.clickOkButton(bot);
 
       // Act
-      bot.button(Messages.PrefPage_TourBeverageContainers_Button_Delete).click();
+      bot.button(Messages.App_Action_Delete).click();
       Utils.clickOkButton(bot);
       // Assert
       // Make sure that the table doesn't contain any products
@@ -80,3 +80,4 @@ public class PrefPageNutritionTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
    }
 }
+

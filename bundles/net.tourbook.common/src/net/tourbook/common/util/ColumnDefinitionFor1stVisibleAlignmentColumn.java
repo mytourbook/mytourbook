@@ -30,7 +30,7 @@ import org.eclipse.swt.SWT;
  */
 public class ColumnDefinitionFor1stVisibleAlignmentColumn extends TableColumnDefinition {
 
-   public static final String COLUMN_ID = "1stVisibleColumnAlignment";
+   public static final String COLUMN_ID = "1stVisibleColumnAlignment"; //$NON-NLS-1$
 
    /**
     * @param columnManager
