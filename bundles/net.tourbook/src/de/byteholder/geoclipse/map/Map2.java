@@ -3619,13 +3619,11 @@ public class Map2 extends Canvas {
          return;
       }
 
-
       final GC gc = event.gc;
 
 //      final long start = System.nanoTime();
 
       gc.drawImage(_mapImage, 0, 0);
-
 
       if (_directMapPainter != null) {
 
