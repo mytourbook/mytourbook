@@ -52,4 +52,20 @@ public record WeatherData(int dt,
    public double getWind_speedKmph() {
       return wind_speed * 3.6;
    }
+
+   @Override
+   public boolean equals(final Object obj) {
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (!(obj instanceof WeatherData)) {
+         return false;
+      }
+
+      final WeatherData other = (WeatherData) obj;
+      return dt == other.dt;
+   }
 }
