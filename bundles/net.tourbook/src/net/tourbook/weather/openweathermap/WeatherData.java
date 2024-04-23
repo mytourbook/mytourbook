@@ -55,6 +55,7 @@ public record WeatherData(int dt,
 
    @Override
    public boolean equals(final Object obj) {
+
       if (this == obj) {
          return true;
       }
