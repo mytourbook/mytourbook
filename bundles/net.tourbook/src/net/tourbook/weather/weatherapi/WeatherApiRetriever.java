@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -135,23 +135,23 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       for (final Hour hour : historyResult.getHourList()) {
 
          final TourDateTime tourDateTime = TimeTools.createTourDateTime(
-               hour.getTime_epoch() * 1000L,
+               hour.time_epoch() * 1000L,
                tour.getTimeZoneId());
 
          final boolean isDisplayEmptyValues = !isCompressed;
          String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
-               (float) hour.getTemp_c(),
+               (float) hour.temp_c(),
                WeatherUtils.getWeatherIcon(
                      WeatherUtils.getWeatherIndex(
                            convertWeatherCodeToMTWeatherClouds(
-                                 hour.getCondition().getCode()))),
-               hour.getCondition().getText(),
-               (float) hour.getFeelslike_c(),
-               (float) hour.getWind_kph(),
-               hour.getWind_degree(),
-               hour.getHumidity(),
-               (int) hour.getPressure_mb(),
-               (float) hour.getPrecip_mm(),
+                                 hour.condition().code()))),
+               hour.condition().text(),
+               (float) hour.feelslike_c(),
+               (float) hour.wind_kph(),
+               hour.wind_degree(),
+               hour.humidity(),
+               (int) hour.pressure_mb(),
+               (float) hour.precip_mm(),
                0,
                0,
                tourDateTime,
@@ -240,9 +240,9 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
          historyResult.addHourList(newHistoryResult.getForecastdayHourList());
          final List<Hour> hourList = historyResult.getHourList();
 
-         final int lastWeatherDataHour = hourList.get(hourList.size() - 1).getTime_epoch();
+         final int lastWeatherDataHour = hourList.get(hourList.size() - 1).time_epoch();
          if (WeatherUtils.isTourWeatherDataComplete(
-               hourList.get(0).getTime_epoch(),
+               hourList.get(0).time_epoch(),
                lastWeatherDataHour,
                tourStartTime,
                tourEndTime)) {

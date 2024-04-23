@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2023 Frédéric Bard
+ * Copyright (C) 2019, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -187,12 +187,12 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                WeatherUtils.getWeatherIcon(
                      WeatherUtils.getWeatherIndex(
                            convertWeatherCodeToMTWeatherClouds(
-                                 hourly.getWeatherCode()))),
+                                 hourly.weatherCode()))),
                hourly.getWeatherDescription(),
                hourly.getFeelsLikeC(),
                hourly.getWindspeedKmph(),
                hourly.getWinddirDegree(),
-               hourly.getHumidity(),
+               hourly.humidity(),
                hourly.getPressure(),
                hourly.getPrecipMM(),
                0,
@@ -216,13 +216,13 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
             final NearestArea firstNearestArea = nearestArea.get(0);
 
             String weatherStationName = UI.EMPTY_STRING;
-            if (firstNearestArea.getAreaName() != null && firstNearestArea.getAreaName().size() > 0) {
-               weatherStationName = firstNearestArea.getAreaName().get(0).getValue();
+            if (firstNearestArea.areaName() != null && firstNearestArea.areaName().size() > 0) {
+               weatherStationName = firstNearestArea.areaName().get(0).value();
             }
 
             final LatLng weatherStationCoordinates = new LatLng(
-                  Double.valueOf(firstNearestArea.getLatitude()),
-                  Double.valueOf(firstNearestArea.getLongitude()));
+                  Double.valueOf(firstNearestArea.latitude()),
+                  Double.valueOf(firstNearestArea.longitude()));
 
             final float distanceFromTour = Math.round(
                   LatLngTool.distance(
@@ -232,8 +232,8 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                         / UI.UNIT_VALUE_DISTANCE / 1000);
 
             String weatherStationLink = UI.EMPTY_STRING;
-            if (firstNearestArea.getWeatherUrl() != null && firstNearestArea.getWeatherUrl().size() > 0) {
-               weatherStationLink = firstNearestArea.getWeatherUrl().get(0).getValue();
+            if (firstNearestArea.weatherUrl() != null && firstNearestArea.weatherUrl().size() > 0) {
+               weatherStationLink = firstNearestArea.weatherUrl().get(0).value();
             }
 
             fullWeatherDataList.add(NLS.bind(
@@ -348,8 +348,8 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       final List<Weather> weather = weatherData.getWeather();
       if (weather == null ||
             weather.isEmpty() ||
-            weather.get(0).getHourly() == null ||
-            weather.get(0).getHourly().isEmpty()) {
+            weather.get(0).hourly() == null ||
+            weather.get(0).hourly().isEmpty()) {
          return false;
       }
 

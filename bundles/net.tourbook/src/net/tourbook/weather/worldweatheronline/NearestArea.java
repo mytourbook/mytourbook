@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,26 +20,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class NearestArea {
-
-   private List<ValueResult> areaName;
-   private String            latitude;
-   private String            longitude;
-   private List<ValueResult> weatherUrl;
-
-   public List<ValueResult> getAreaName() {
-      return areaName;
-   }
-
-   public String getLatitude() {
-      return latitude;
-   }
-
-   public String getLongitude() {
-      return longitude;
-   }
-
-   public List<ValueResult> getWeatherUrl() {
-      return weatherUrl;
-   }
-}
+public record NearestArea(
+                          List<ValueResult> areaName,
+                          String latitude,
+                          String longitude,
+                          List<ValueResult> weatherUrl) {}

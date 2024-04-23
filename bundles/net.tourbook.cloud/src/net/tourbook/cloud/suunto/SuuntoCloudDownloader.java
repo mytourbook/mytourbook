@@ -91,7 +91,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    private CompletableFuture<WorkoutDownload> downloadFile(final Payload workoutPayload) {
 
       final HttpRequest request = HttpRequest.newBuilder()
-            .uri(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=" + workoutPayload.workoutKey))//$NON-NLS-1$
+            .uri(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=" + workoutPayload.workoutKey()))//$NON-NLS-1$
             .header(OAuth2Constants.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
             .GET()
             .build();
@@ -195,7 +195,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             //Identifying the workouts that have not yet been imported in the tour database
             final List<Payload> newWorkouts = workouts.payload().stream()
-                  .filter(suuntoWorkout -> !tourStartTimes.contains(suuntoWorkout.startTime / 1000L * 1000L))
+                  .filter(suuntoWorkout -> !tourStartTimes.contains(suuntoWorkout.startTime() / 1000L * 1000L))
                   .toList();
 
             final int numNewWorkouts = newWorkouts.size();
@@ -233,6 +233,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
       job.schedule();
 
       job.addJobChangeListener(new JobChangeAdapter() {
+
          @Override
          public void done(final IJobChangeEvent event) {
 
@@ -258,6 +259,12 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
                   PersonManager.getPersonSelector().setEnabled(true);
                });
             }
+         }
+
+         @Override
+         public void running(final IJobChangeEvent event) {
+            // todo fb detect if no new files to be downloaded but how ?
+
          }
       });
    }
@@ -438,7 +445,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
             OAuth2Utils.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream())
                   .thenApply(response -> writeFileToFolder(workoutPayload, response))
                   .exceptionally(e -> {
-                     final WorkoutDownload erroneousDownload = new WorkoutDownload(workoutPayload.workoutKey);
+                     final WorkoutDownload erroneousDownload = new WorkoutDownload(workoutPayload.workoutKey());
                      erroneousDownload.setError(NLS.bind(Messages.Log_DownloadWorkoutsFromSuunto_007_Error,
                            erroneousDownload.getWorkoutKey(),
                            e.getMessage()));
@@ -452,7 +459,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    private WorkoutDownload writeFileToFolder(final Payload workoutPayload,
                                              final HttpResponse<InputStream> response) {
 
-      final WorkoutDownload workoutDownload = new WorkoutDownload(workoutPayload.workoutKey);
+      final WorkoutDownload workoutDownload = new WorkoutDownload(workoutPayload.workoutKey());
 
       final Optional<String> contentDisposition =
             response.headers().firstValue("Content-Disposition"); //$NON-NLS-1$

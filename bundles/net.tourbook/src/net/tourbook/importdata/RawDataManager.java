@@ -44,7 +44,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -1818,7 +1817,7 @@ public class RawDataManager {
             updateTourData_InImportView_FromDb(monitor);
 
             // reselect tours, run in UI thread
-            display.asyncExec(tourViewer::reloadViewer);
+            display.asyncExec(() -> tourViewer.reloadViewer());
          }
       };
 
@@ -2220,7 +2219,7 @@ public class RawDataManager {
          /*
           * Resort files by extension priority
           */
-         Collections.sort(allImportFilePaths, this::onSortFileExtensions);
+         Collections.sort(allImportFilePaths, (o1, o2) -> onSortFileExtensions(o1, o2));
 
          importTours_FromMultipleFiles_10(allImportFilePaths, importState_Process);
 
@@ -3738,13 +3737,13 @@ public class RawDataManager {
          final long[] pausedTime_Start = reimportedTourData.getPausedTime_Start();
          if (pausedTime_Start != null && pausedTime_Start.length > 0) {
 
-            final List<Long> listPausedTime_Start = Arrays.stream(pausedTime_Start).boxed().collect(Collectors.toList());
-            final List<Long> listPausedTime_End = Arrays.stream(reimportedTourData.getPausedTime_End()).boxed().collect(Collectors.toList());
+            final List<Long> listPausedTime_Start = Arrays.stream(pausedTime_Start).boxed().toList();
+            final List<Long> listPausedTime_End = Arrays.stream(reimportedTourData.getPausedTime_End()).boxed().toList();
 
             final long[] pausedTime_Data = reimportedTourData.getPausedTime_Data();
             final List<Long> listPausedTime_Data = pausedTime_Data == null
                   ? null
-                  : Arrays.stream(pausedTime_Data).boxed().collect(Collectors.toList());
+                  : Arrays.stream(pausedTime_Data).boxed().toList();
 
             oldTourData.finalizeTour_TimerPauses(
                   listPausedTime_Start,
@@ -3992,7 +3991,7 @@ public class RawDataManager {
                new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
                      true, // fork
                      false, // cancelable
-                     this::updateTourData_InImportView_FromDb_Runnable);
+                     monitor1 -> updateTourData_InImportView_FromDb_Runnable(monitor1));
 
             } else {
 
@@ -4071,9 +4070,7 @@ public class RawDataManager {
       _loadingTour_CountDownLatch.await();
 
       TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(
-            allSavedTourIds
-                  .stream()
-                  .collect(Collectors.toList()));
+            allSavedTourIds.stream().toList());
 
       // prevent async error
       Display.getDefault().syncExec(() -> TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null));

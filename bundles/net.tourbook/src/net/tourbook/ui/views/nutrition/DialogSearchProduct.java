@@ -30,10 +30,10 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnDefinitionFor1stVisibleAlignmentColumn;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.ColumnDefinitionFor1stVisibleAlignmentColumn;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.data.TourData;
@@ -206,7 +206,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
          case COLUMN_NAME:
          default:
-            rc = NutritionUtils.getProductFullName(p1).compareToIgnoreCase(NutritionUtils.getProductFullName(p2));
+            rc = p1.productName.compareToIgnoreCase(p2.productName);
             break;
 
          }
@@ -713,7 +713,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
             final Product product = (Product) cell.getElement();
 
-            cell.setText(NutritionUtils.getProductFullName(product));
+            cell.setText(product.productName);
          }
       });
    }

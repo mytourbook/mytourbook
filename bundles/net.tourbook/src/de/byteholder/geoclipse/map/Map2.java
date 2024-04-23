@@ -1127,7 +1127,7 @@ public class Map2 extends Canvas {
       if (UI.isDarkTheme()) {
 
          /*
-          * It looks ugly when in the dark theme the default map background is white which occure
+          * It looks ugly when in the dark theme the default map background is white which occur
           * before the map tile images are painted
           */
 
@@ -3008,7 +3008,7 @@ public class Map2 extends Canvas {
 
          } else {
 
-            // show bread crum tours in the map
+            // show bread crumb tours in the map
 
             final ArrayList<Long> crumbTourIds = _tourBreadcrumb.getHoveredCrumbedTours_WithReset();
 
@@ -3619,13 +3619,11 @@ public class Map2 extends Canvas {
          return;
       }
 
-
       final GC gc = event.gc;
 
 //      final long start = System.nanoTime();
 
       gc.drawImage(_mapImage, 0, 0);
-
 
       if (_directMapPainter != null) {
 
@@ -5966,7 +5964,7 @@ public class Map2 extends Canvas {
          } else {
 
             /*
-             * offline image is not availabe, show loading... message
+             * offline image is not available, show loading... message
              */
 
             gcMapImage.drawImage(_mp.getLoadingImage(), devTileViewport.x, devTileViewport.y);

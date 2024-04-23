@@ -2437,6 +2437,7 @@ public class Messages extends NLS {
    public static String        Slideout_TMVOptions_Radio_MovingTime;
    public static String        Slideout_TMVOptions_Radio_RecordedTime;
 
+   public static String        Slideout_TourBlogOptions_Checkbox_ShowTourMarkers;
    public static String        Slideout_TourBlogOptions_Checkbox_ShowTourTags;
    public static String        Slideout_TourBlogOptions_Checkbox_ShowTourTags_Tooltip;
    public static String        Slideout_TourBlogOptions_Label_Title;

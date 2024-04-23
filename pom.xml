@@ -192,7 +192,7 @@
       
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>         <groupId>org.apache.maven.plugins</groupId>
-                                                               <version>3.12.1</version>
+                                                               <version>3.13.0</version>
          <executions>
             <execution>
                <id>compiletests</id>
@@ -209,7 +209,7 @@
       
       <plugin>
          <artifactId>jacoco-maven-plugin</artifactId>          <groupId>org.jacoco</groupId>
-                                                               <version>0.8.11</version>
+                                                               <version>0.8.12</version>
          <executions>
          
             <execution>

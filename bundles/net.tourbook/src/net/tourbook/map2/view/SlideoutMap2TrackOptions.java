@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -78,8 +78,8 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
    private PixelConverter                _pc;
    private int                           _firstColumnIndent;
    //
-   private GridDataFactory               _firstColoumLayoutData;
-   private GridDataFactory               _secondColoumLayoutData;
+   private GridDataFactory               _firstColumnLayoutData;
+   private GridDataFactory               _secondColumnLayoutData;
    private GridDataFactory               _spinnerLayoutData;
    //
    private Map2View                      _map2View;
@@ -413,7 +413,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
          // label
          _lblBorder_Width = new Label(parent, SWT.NONE);
          _lblBorder_Width.setText(Messages.pref_map_layout_BorderWidth);
-         _firstColoumLayoutData.applyTo(_lblBorder_Width);
+         _firstColumnLayoutData.applyTo(_lblBorder_Width);
 
          // spinner
          _spinnerBorder_Width = new Spinner(parent, SWT.BORDER);
@@ -432,7 +432,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
          // label
          _lblBorder_Color = new Label(parent, SWT.NONE);
          _lblBorder_Color.setText(Messages.Pref_MapLayout_Label_BorderColor);
-         _firstColoumLayoutData
+         _firstColumnLayoutData
                .align(SWT.FILL, SWT.BEGINNING)
                .applyTo(_lblBorder_Color);
 
@@ -548,7 +548,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
          _lblHoveredSelected_HoveredColor = new Label(parent, SWT.NONE);
          _lblHoveredSelected_HoveredColor.setText(Messages.Slideout_Map_Options_Label_HoveredColor);
          _lblHoveredSelected_HoveredColor.setToolTipText(tooltipText);
-         _firstColoumLayoutData.span(1, 1).applyTo(_lblHoveredSelected_HoveredColor);
+         _firstColumnLayoutData.span(1, 1).applyTo(_lblHoveredSelected_HoveredColor);
 
          final Composite colorContainer = new Composite(parent, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(colorContainer);
@@ -582,7 +582,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
          _lblHoveredSelected_SelectedColor = new Label(parent, SWT.NONE);
          _lblHoveredSelected_SelectedColor.setText(Messages.Slideout_Map_Options_Label_SelectedColor);
          _lblHoveredSelected_SelectedColor.setToolTipText(tooltipText);
-         _firstColoumLayoutData.span(1, 1).applyTo(_lblHoveredSelected_SelectedColor);
+         _firstColumnLayoutData.span(1, 1).applyTo(_lblHoveredSelected_SelectedColor);
 
          final Composite colorContainer = new Composite(parent, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(colorContainer);
@@ -616,7 +616,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
          _lblHoveredSelected_HoveredAndSelectedColor = new Label(parent, SWT.NONE);
          _lblHoveredSelected_HoveredAndSelectedColor.setText(Messages.Slideout_Map_Options_Label_HoveredAndSelectedColor);
          _lblHoveredSelected_HoveredAndSelectedColor.setToolTipText(tooltipText);
-         _firstColoumLayoutData.span(1, 1).applyTo(_lblHoveredSelected_HoveredAndSelectedColor);
+         _firstColumnLayoutData.span(1, 1).applyTo(_lblHoveredSelected_HoveredAndSelectedColor);
 
          final Composite colorContainer = new Composite(parent, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(colorContainer);
@@ -654,7 +654,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
          _chkShowBreadcrumbs.setText(Messages.Slideout_Map_Options_Checkbox_ShowBreadcrumbs);
          _chkShowBreadcrumbs.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowBreadcrumbs_Tooltip);
          _chkShowBreadcrumbs.addSelectionListener(_defaultMapOptions_SelectionListener);
-         _firstColoumLayoutData.span(2, 1).applyTo(_chkShowBreadcrumbs);
+         _firstColumnLayoutData.span(2, 1).applyTo(_chkShowBreadcrumbs);
       }
       {
          /*
@@ -665,7 +665,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
          _lblBreadcrumbItems = new Label(parent, SWT.NONE);
          _lblBreadcrumbItems.setText(Messages.Slideout_Map_Options_Label_BreadcrumbItems);
          _lblBreadcrumbItems.setToolTipText(Messages.Slideout_Map_Options_Label_BreadcrumbItems_Tooltip);
-         _secondColoumLayoutData.span(1, 1).applyTo(_lblBreadcrumbItems);
+         _secondColumnLayoutData.span(1, 1).applyTo(_lblBreadcrumbItems);
 
          // number of crumbs
          _spinnerBreadcrumbItems = new Spinner(parent, SWT.BORDER);
@@ -688,7 +688,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
          _chkShowTourDirections.setText(Messages.Slideout_Map_Options_Checkbox_ShowTourDirection);
          _chkShowTourDirections.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowTourDirection_Tooltip);
          _chkShowTourDirections.addSelectionListener(_defaultMapOptions_SelectionListener);
-         _firstColoumLayoutData.span(2, 1).applyTo(_chkShowTourDirections);
+         _firstColumnLayoutData.span(2, 1).applyTo(_chkShowTourDirections);
       }
       {
          /*
@@ -698,7 +698,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
          _chkShowTourDirectionsAlways.setText(Messages.Slideout_Map_Options_Checkbox_ShowTourDirection_Always);
          _chkShowTourDirectionsAlways.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowTourDirection_Always_Tooltip);
          _chkShowTourDirectionsAlways.addSelectionListener(_defaultMapOptions_SelectionListener);
-         _secondColoumLayoutData.span(2, 1).applyTo(_chkShowTourDirectionsAlways);
+         _secondColumnLayoutData.span(2, 1).applyTo(_chkShowTourDirectionsAlways);
       }
 
       {
@@ -709,7 +709,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
          // label
          _lblTourDirection_SymbolSize = new Label(parent, SWT.NONE);
          _lblTourDirection_SymbolSize.setText(Messages.Slideout_Map_Options_Label_TourDirection_SymbolSize);
-         _secondColoumLayoutData.span(1, 1).applyTo(_lblTourDirection_SymbolSize);
+         _secondColumnLayoutData.span(1, 1).applyTo(_lblTourDirection_SymbolSize);
 
          // spinner
          _spinnerTourDirection_SymbolSize = new Spinner(parent, SWT.BORDER);
@@ -728,7 +728,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
          // label
          _lblTourDirection_LineWidth = new Label(parent, SWT.NONE);
          _lblTourDirection_LineWidth.setText(Messages.Slideout_Map_Options_Label_TourDirection_LineWidth);
-         _secondColoumLayoutData.span(1, 1).applyTo(_lblTourDirection_LineWidth);
+         _secondColumnLayoutData.span(1, 1).applyTo(_lblTourDirection_LineWidth);
 
          // spinner
          _spinnerTourDirection_LineWidth = new Spinner(parent, SWT.BORDER);
@@ -747,7 +747,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
          // label
          _lblTourDirection_DistanceBetweenMarkers = new Label(parent, SWT.NONE);
          _lblTourDirection_DistanceBetweenMarkers.setText(Messages.Slideout_Map_Options_Label_TourDirection_DistanceBetweenMarkers);
-         _secondColoumLayoutData.span(1, 1).applyTo(_lblTourDirection_DistanceBetweenMarkers);
+         _secondColumnLayoutData.span(1, 1).applyTo(_lblTourDirection_DistanceBetweenMarkers);
 
          // spinner
          _spinnerTourDirection_MarkerGap = new Spinner(parent, SWT.BORDER);
@@ -766,7 +766,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
          // label
          _lblTourDirection_SymbolColor = new Label(parent, SWT.NONE);
          _lblTourDirection_SymbolColor.setText(Messages.Slideout_Map_Options_Label_TourDirection_SymbolColor);
-         _secondColoumLayoutData.span(1, 1).applyTo(_lblTourDirection_SymbolColor);
+         _secondColumnLayoutData.span(1, 1).applyTo(_lblTourDirection_SymbolColor);
 
          // color
          _colorTourDirection_SymbolColor = new ColorSelectorExtended(parent);
@@ -812,7 +812,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
             // label
             _lblSliderPath_Segments = new Label(container, SWT.NONE);
             _lblSliderPath_Segments.setText(Messages.Slideout_Map_Options_Label_SliderPath_Segments);
-            _firstColoumLayoutData.span(1, 1).applyTo(_lblSliderPath_Segments);
+            _firstColumnLayoutData.span(1, 1).applyTo(_lblSliderPath_Segments);
 
             // spinner
             _spinnerSliderPath_Segments = new Spinner(container, SWT.BORDER);
@@ -831,7 +831,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
             // label
             _lblSliderPath_Width = new Label(container, SWT.NONE);
             _lblSliderPath_Width.setText(Messages.Slideout_Map_Options_Label_SliderPath_Width);
-            _firstColoumLayoutData.applyTo(_lblSliderPath_Width);
+            _firstColumnLayoutData.applyTo(_lblSliderPath_Width);
 
             // spinner
             _spinnerSliderPath_LineWidth = new Spinner(container, SWT.BORDER);
@@ -855,7 +855,7 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
             // label
             _lblSliderPath_Color = new Label(container, SWT.NONE);
             _lblSliderPath_Color.setText(Messages.Slideout_Map_Options_Label_SliderPath_Color);
-            _firstColoumLayoutData.applyTo(_lblSliderPath_Color);
+            _firstColumnLayoutData.applyTo(_lblSliderPath_Color);
 
             final Composite colorContainer = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(colorContainer);
@@ -999,11 +999,11 @@ class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelector
 
       _firstColumnIndent = _pc.convertWidthInCharsToPixels(3);
 
-      _firstColoumLayoutData = GridDataFactory.fillDefaults()
+      _firstColumnLayoutData = GridDataFactory.fillDefaults()
             .indent(_firstColumnIndent, 0)
             .align(SWT.FILL, SWT.CENTER);
 
-      _secondColoumLayoutData = GridDataFactory.fillDefaults()
+      _secondColumnLayoutData = GridDataFactory.fillDefaults()
             .indent(2 * _firstColumnIndent, 0)
             .align(SWT.FILL, SWT.CENTER);
 

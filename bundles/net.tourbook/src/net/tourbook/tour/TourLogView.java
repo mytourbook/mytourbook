@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -265,7 +264,7 @@ public class TourLogView extends ViewPart {
             return;
          }
 
-         allLogItems = _tourLog_Queue.stream().collect(Collectors.toList());
+         allLogItems = _tourLog_Queue.stream().toList();
          _tourLog_Queue.clear();
       }
 

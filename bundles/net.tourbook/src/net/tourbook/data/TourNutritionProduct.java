@@ -66,11 +66,6 @@ public class TourNutritionProduct {
    private TourData                   tourData;
 
    /**
-    * The name of the product's brand
-    */
-   private String                     brand;
-
-   /**
     * The name of the product
     */
    private String                     name;
@@ -164,7 +159,6 @@ public class TourNutritionProduct {
    public TourNutritionProduct(final TourData tourData, final Product product) {
 
       this(tourData, false);
-      brand = product.brands;
       name = product.productName;
       productCode = product.code;
       isBeverage = product.nutriScoreData != null && product.nutriScoreData.isBeverage();
@@ -189,14 +183,15 @@ public class TourNutritionProduct {
       }
 
       final NutriScoreData nutriScoreData = product.nutriScoreData;
-      final String productQuantity = product.productQuantity;
+      float productQuantity = Util.parseFloat(product.productQuantity);
       final String quantity = product.quantity;
-      final String servingQuantity = product.servingQuantity;
+      float servingQuantity = Util.parseFloat(product.servingQuantity);
 
       if (nutriScoreData != null && nutriScoreData.isBeverage() &&
-            quantity != null && productQuantity != null && servingQuantity != null) {
+            quantity != null && productQuantity != Float.MIN_VALUE &&
+            servingQuantity != Float.MIN_VALUE) {
 
-         final int numberOfServings = Math.round(Float.valueOf(productQuantity) / Float.valueOf(servingQuantity));
+         final int numberOfServings = Math.round(productQuantity / servingQuantity);
          setCalories(Math.round(nutriments.energyKcalServing * numberOfServings));
          setCalories_Serving(Math.round(nutriments.energyKcalServing));
 
@@ -206,8 +201,8 @@ public class TourNutritionProduct {
          // We store the quantity ONLY if the beverage is in liquid form (mL)
          if (quantity.trim().toUpperCase().endsWith(UI.UNIT_FLUIDS_L)) {
 
-            beverageQuantity = Integer.valueOf(productQuantity);
-            setBeverageQuantity_Serving(Integer.valueOf(servingQuantity.trim()));
+            beverageQuantity = Math.round(productQuantity);
+            setBeverageQuantity_Serving(Math.round(servingQuantity));
          }
 
       } else {
@@ -215,26 +210,31 @@ public class TourNutritionProduct {
          setCalories_Serving(Math.round(nutriments.energyKcalServing));
          setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
 
-         final float servingQuantityFloat = Util.parseFloat(servingQuantity);
-         float productQuantityFloat = Util.parseFloat(productQuantity);
-
          // In some cases, the product quantity is not provided, we can only
-         // assume that the product only contains 1 serving
-         if (productQuantityFloat == Float.MIN_VALUE) {
-            productQuantityFloat = servingQuantityFloat;
+         // assume that the product only contains 1 serving.
+         // When the serving quantity is not provided, we can only assume that
+         // the serving contains 1 product.
+         if (productQuantity == Float.MIN_VALUE) {
+
+            productQuantity = servingQuantity;
+
+         } else if (servingQuantity == Float.MIN_VALUE) {
+
+            servingQuantity = productQuantity;
+
          }
 
          // If the data is for 100g or 1 serving, the product calories and sodium
          // values computation are different
          if (product.nutritionDataPer == NutritionDataPer.HUNDRED_GRAMS) {
 
-            setCalories(Math.round((nutriments.energyKcal100g * productQuantityFloat) / 100f));
-            setSodium(Math.round(nutriments.sodium100g * productQuantityFloat * 10));
+            setCalories(Math.round((nutriments.energyKcal100g * productQuantity) / 100f));
+            setSodium(Math.round(nutriments.sodium100g * productQuantity * 10));
 
          } else if (product.nutritionDataPer == NutritionDataPer.SERVING) {
 
-            final int numServingsPerProduct = servingQuantityFloat == 0
-                  ? 0 : Math.round(productQuantityFloat / servingQuantityFloat);
+            final int numServingsPerProduct = servingQuantity == 0
+                  ? 0 : Math.round(productQuantity / servingQuantity);
 
             setCalories(getCalories_Serving() * numServingsPerProduct);
             setSodium(getSodium_Serving() * numServingsPerProduct);
@@ -248,10 +248,6 @@ public class TourNutritionProduct {
 
    public int getBeverageQuantity_Serving() {
       return beverageQuantity_Serving;
-   }
-
-   public String getBrand() {
-      return brand;
    }
 
    public int getCalories() {

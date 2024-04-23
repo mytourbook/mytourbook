@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,7 +48,7 @@ public class TourGeoFilter_Loader {
 
    private static final char                                      NL                         = UI.NEW_LINE;
 
-   private final static IDialogSettings                           _state                     = TourGeoFilter_Manager.getState();
+   private static final IDialogSettings                           _state                     = TourGeoFilter_Manager.getState();
 
    private static final AtomicLong                                _loaderExecuterId          = new AtomicLong();
    private static final LinkedBlockingDeque<GeoFilter_LoaderData> _loaderWaitingQueue        = new LinkedBlockingDeque<>();
@@ -56,18 +56,14 @@ public class TourGeoFilter_Loader {
 
    static {
 
-      final ThreadFactory threadFactory = new ThreadFactory() {
+      final ThreadFactory threadFactory = runnable -> {
 
-         @Override
-         public Thread newThread(final Runnable r) {
+         final Thread thread = new Thread(runnable, "Loading tours for geo parts");//$NON-NLS-1$
 
-            final Thread thread = new Thread(r, "Loading tours for geo parts");//$NON-NLS-1$
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
 
-            thread.setPriority(Thread.MIN_PRIORITY);
-            thread.setDaemon(true);
-
-            return thread;
-         }
+         return thread;
       };
 
       _loadingExecutor = Executors.newSingleThreadExecutor(threadFactory);
@@ -84,7 +80,7 @@ public class TourGeoFilter_Loader {
     * @param useAppFilter
     * @param previousLoaderItem
     * @param geoPartView
-    * @return
+    *
     * @return
     */
    public static GeoFilter_LoaderData loadToursFromGeoParts(final Point geoParts_TopLeft_E2,
@@ -108,50 +104,47 @@ public class TourGeoFilter_Loader {
 
       _loaderWaitingQueue.add(loaderItem);
 
-      final Runnable executorTask = new Runnable() {
-         @Override
-         public void run() {
+      final Runnable executorTask = () -> {
 
-            try {
+         try {
 
-               // get last added loader item
-               final GeoFilter_LoaderData geoLoaderData = _loaderWaitingQueue.pollFirst();
+            // get last added loader item
+            final GeoFilter_LoaderData geoLoaderData = _loaderWaitingQueue.pollFirst();
 
-               if (geoLoaderData == null) {
-                  return;
-               }
+            if (geoLoaderData == null) {
+               return;
+            }
 
-               // show loading state
-               final String loadingMessage;
-               if (mapGridData == null || mapGridData.numWidth == -1) {
-                  loadingMessage = Messages.TourGeoFilter_Loader_Loading;
-               } else {
-                  final int numParts = mapGridData.numWidth * mapGridData.numHeight;
-                  loadingMessage = MessageFormat.format(Messages.TourGeoFilter_Loader_LoadingParts, numParts);
-               }
-               geoLoaderData.mapGridData.gridBox_Text = loadingMessage;
+            // show loading state
+            final String loadingMessage;
+            if (mapGridData == null || mapGridData.numWidth == -1) {
+               loadingMessage = Messages.TourGeoFilter_Loader_Loading;
+            } else {
+               final int numParts = mapGridData.numWidth * mapGridData.numHeight;
+               loadingMessage = MessageFormat.format(Messages.TourGeoFilter_Loader_LoadingParts, numParts);
+            }
+            geoLoaderData.mapGridData.gridBox_Text = loadingMessage;
+            map2View.redrawMap();
+
+            if (loadToursFromGeoParts_FromDB(geoLoaderData, tourGeoFilter)) {
+
+               map2View.geoFilter_20_ShowLoadedTours(geoLoaderData, tourGeoFilter);
+
+               // sometimes the loading state is not updated
                map2View.redrawMap();
 
-               if (loadToursFromGeoParts_FromDB(geoLoaderData, tourGeoFilter)) {
+            } else {
 
-                  map2View.geoFilter_20_ShowLoadedTours(geoLoaderData, tourGeoFilter);
+               // update loading state - this should not occur but is helpful for testing
 
-                  // sometimes the loading state is not updated
-                  map2View.redrawMap();
-
-               } else {
-
-                  // update loading state - this should not occure but is helpfull for testing
-
-                  // show loading state
-                  geoLoaderData.mapGridData.gridBox_Text = Messages.TourGeoFilter_Loader_LoadingError + UI.SPACE +
-                        TimeTools.Formatter_DateTime_SM.format(LocalDateTime.now());
-                  map2View.redrawMap();
-               }
-
-            } catch (final Exception e) {
-               StatusUtil.log(e);
+               // show loading state
+               geoLoaderData.mapGridData.gridBox_Text = Messages.TourGeoFilter_Loader_LoadingError + UI.SPACE +
+                     TimeTools.Formatter_DateTime_SM.format(LocalDateTime.now());
+               map2View.redrawMap();
             }
+
+         } catch (final Exception e) {
+            StatusUtil.log(e);
          }
       };
 
@@ -177,7 +170,7 @@ public class TourGeoFilter_Loader {
 
       if (selectTourIdsFromGeoParts == null) {
 
-         // this can occure when there are no geo parts, this would cause a sql exception
+         // this can occur when there are no geo parts, this would cause a sql exception
 
          return false;
       }
@@ -240,9 +233,8 @@ public class TourGeoFilter_Loader {
 
       final ArrayList<Long> allTourIds = new ArrayList<>();
 
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-         final PreparedStatement stmtSelect = conn.prepareStatement(sqlSelect);
+      try (Connection conn = TourDatabase.getInstance().getConnection();
+            final PreparedStatement stmtSelect = conn.prepareStatement(sqlSelect)) {
 
          /*
           * Fillup parameters
