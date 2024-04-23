@@ -282,15 +282,12 @@ public class Map2 extends Canvas {
    private static final ColorCacheSWT    _colorCache                           = new ColorCacheSWT();
 
    // [181,208,208] is the color of water in the standard OSM material
-   public static final RGB  OSM_BACKGROUND_RGB         = new RGB(181, 208, 208);
-   private static final RGB MAP_DEFAULT_BACKGROUND_RGB = new RGB(0x40, 0x40, 0x40);
+   public static final RGB               OSM_BACKGROUND_RGB         = new RGB(181, 208, 208);
+   private static final RGB              MAP_DEFAULT_BACKGROUND_RGB = new RGB(0x40, 0x40, 0x40);
+   private static RGB                    MAP_TRANSPARENT_RGB;
 
-   private static RGB       MAP_TRANSPARENT_RGB;
-   {
-      MAP_TRANSPARENT_RGB = UI.IS_OSX
-            ? new RGB(0xfe, 0xfe, 0xfe)
-            : new RGB(0xfe, 0xfe, 0xfe);
-   }
+   private Color                         _defaultBackgroundColor;
+   private Color                         _transparentColor;
 
    /**
     * Map zoom level which is currently be used to display tiles. Normally a value between around 0
@@ -340,9 +337,9 @@ public class Map2 extends Canvas {
     * The overlay to delegate to for painting the "foreground" of the map component. This would
     * include painting waypoints, day/night, etc. also receives mouse events.
     */
-   private final List<Map2Painter>       _allMapPainter           = new ArrayList<>();
+   private final List<Map2Painter>       _allMapPainter             = new ArrayList<>();
 
-   private final TileImageLoaderCallback _tileImageLoaderCallback = new TileImageLoaderCallback_ForTileImages();
+   private final TileImageLoaderCallback _tileImageLoaderCallback   = new TileImageLoaderCallback_ForTileImages();
 
    private Cursor                        _currentCursor;
    private final Cursor                  _cursorCross;
@@ -353,16 +350,16 @@ public class Map2 extends Canvas {
    private final Cursor                  _cursorSearchTour_Scroll;
    private final Cursor                  _cursorSelect;
 
-   private final AtomicInteger           _redrawMapCounter        = new AtomicInteger();
-   private final AtomicInteger           _overlayRunnableCounter  = new AtomicInteger();
+   private final AtomicInteger           _redrawMapCounter          = new AtomicInteger();
+   private final AtomicInteger           _overlayRunnableCounter    = new AtomicInteger();
 
    private boolean                       _isLeftMouseButtonPressed;
    private boolean                       _isMapPanned;
 
    private Point                         _mouseDownPosition;
    private GeoPosition                   _mouseDown_ContextMenu_GeoPosition;
-   private int                           _mouseMove_DevPosition_X = Integer.MIN_VALUE;
-   private int                           _mouseMove_DevPosition_Y = Integer.MIN_VALUE;
+   private int                           _mouseMove_DevPosition_X   = Integer.MIN_VALUE;
+   private int                           _mouseMove_DevPosition_Y   = Integer.MIN_VALUE;
    private int                           _mouseMove_DevPosition_X_Last;
    private int                           _mouseMove_DevPosition_Y_Last;
    private GeoPosition                   _mouseMove_GeoPosition;
@@ -508,14 +505,11 @@ public class Map2 extends Canvas {
    private final ListenerList<ITourSelectionListener> _allTourSelectionListener  = new ListenerList<>(ListenerList.IDENTITY);
 
    // measurement system
-   private float       _distanceUnitValue = 1;
-   private String      _distanceUnitLabel = UI.EMPTY_STRING;
+   private float   _distanceUnitValue = 1;
+   private String  _distanceUnitLabel = UI.EMPTY_STRING;
 
-   private boolean     _isScaleVisible;
-   private boolean     _isShowTour;
-
-   private final Color _transparentColor;
-   private Color       _defaultBackgroundColor;
+   private boolean _isScaleVisible;
+   private boolean _isShowTour;
 
    /*
     * POI image
@@ -747,8 +741,6 @@ public class Map2 extends Canvas {
 
 // SET_FORMATTING_ON
 
-      _transparentColor = new Color(MAP_TRANSPARENT_RGB);
-
       _mapLocation_Tooltip = new MapLocationToolTip(this);
 
       _poiImage = TourbookPlugin.getImageDescriptor(Images.POI_InMap).createImage();
@@ -772,6 +764,7 @@ public class Map2 extends Canvas {
     * @return Returns rgb values for the color which is used as transparent color in the map.
     */
    public static RGB getTransparentRGB() {
+
       return MAP_TRANSPARENT_RGB;
    }
 
@@ -1277,7 +1270,7 @@ public class Map2 extends Canvas {
          gcImage.setBackground(_transparentColor);
          gcImage.fillRectangle(transparentImage.getBounds());
 
-         if (oldImage != null) {
+         if (oldImage != null && oldImage.isDisposed() == false) {
 
             // paint old image into the new image otherwise the screen is flickering
             gcImage.drawImage(oldImage, 0, 0);
@@ -1306,16 +1299,6 @@ public class Map2 extends Canvas {
 
    public void deleteFailedImageFiles() {
       MapProviderManager.deleteOfflineMap(_mp, true);
-   }
-
-   public synchronized void dimMap(final boolean isDimMap, final int dimLevel, final RGB dimColor) {
-
-      _mp.setDimLevel(isDimMap, dimLevel, dimColor);
-
-      // remove all cached map images
-      _mp.disposeTileImages();
-
-      resetAll();
    }
 
    /**
@@ -5464,9 +5447,9 @@ public class Map2 extends Canvas {
 //    } catch (final SWTException e) {
       } catch (final Exception e) {
 
-         StatusUtil.log(e);
+//         StatusUtil.log(e);
 
-         // this happened
+         // this happens, e.g. when dimming the map
          UI.disposeResource(_newOverlayImage_NotVisible);
       }
 
@@ -7549,20 +7532,20 @@ public class Map2 extends Canvas {
    /**
     * Set map dimming level for the current map factory, this will dim the map images
     *
-    * @param mapDimLevel
+    * @param dimLevel
     * @param dimColor
     * @param isDimMap
     * @param isBackgroundDark
     */
    public void setDimLevel(final boolean isDimMap,
-                           final int mapDimLevel,
+                           final int dimLevel,
                            final RGB dimColor,
                            final boolean isBackgroundDark) {
 
       _isMapBackgroundDark = isBackgroundDark;
 
       if (_mp != null) {
-         _mp.setDimLevel(isDimMap, mapDimLevel, dimColor);
+         _mp.setDimLevel(isDimMap, dimLevel, dimColor);
       }
    }
 
@@ -8068,6 +8051,39 @@ public class Map2 extends Canvas {
 
          redraw();
       });
+   }
+
+   public void setTransparencyColor(final RGB transparentRGB) {
+
+      int red = transparentRGB.red;
+      final int green = transparentRGB.green;
+      final int blue = transparentRGB.blue;
+
+      /*
+       * Ensure that the transparent color is not an exact color which may be used very likely
+       */
+      if (red == 0) {
+
+         red = 1;
+
+      } else if (red == 255) {
+
+         red = 254;
+
+      } else {
+
+         red = red - 1;
+      }
+
+      final RGB transColorAdjusted = new RGB(red, green, blue);
+
+      MAP_TRANSPARENT_RGB = transColorAdjusted;
+      _transparentColor = new Color(MAP_TRANSPARENT_RGB);
+
+      UI.disposeResource(_newOverlayImage_Visible);
+      UI.disposeResource(_newOverlayImage_NotVisible);
+
+      disposeOverlayImageCache();
    }
 
    private void setupClusterFont(final GC gc, final int newClusterFontSize) {

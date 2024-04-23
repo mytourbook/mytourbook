@@ -2307,6 +2307,8 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Label_HoveredAndSelectedColor_Tooltip;
    public static String        Slideout_Map_Options_Label_HoveredColor;
    public static String        Slideout_Map_Options_Label_HoveredColor_Tooltip;
+   public static String        Slideout_Map_Options_Label_MapTransparencyColor;
+   public static String        Slideout_Map_Options_Label_MapTransparencyColor_Tooltip;
    public static String        Slideout_Map_Options_Label_SelectedColor;
    public static String        Slideout_Map_Options_Label_SelectedColor_Tooltip;
    public static String        Slideout_Map_Options_Label_SliderLocation_Color;

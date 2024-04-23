@@ -328,12 +328,15 @@ public class Map2View extends ViewPart implements
    public static final String    STATE_DIM_MAP_VALUE                                   = "STATE_DIM_MAP_VALUE";                                 //$NON-NLS-1$
    public static final int       STATE_DIM_MAP_VALUE_DEFAULT                           = MAX_DIM_STEPS / 2;
 
+
    private static final String      GRAPH_CONTRIBUTION_ID_SLIDEOUT                     = "GRAPH_CONTRIBUTION_ID_SLIDEOUT";                      //$NON-NLS-1$
 
    private static final String      STATE_CENTER_MAP_BY                                = "STATE_CENTER_MAP_BY";                                 //$NON-NLS-1$
    private static final CenterMapBy STATE_CENTER_MAP_BY_DEFAULT                        = CenterMapBy.Mouse;
    private static final String      STATE_MAP_SYNC_MODE                                = "STATE_MAP_SYNC_MODE";                                 //$NON-NLS-1$
    private static final String      STATE_MAP_SYNC_MODE_IS_ACTIVE                      = "STATE_MAP_SYNC_MODE_IS_ACTIVE";                       //$NON-NLS-1$
+   public static final String       STATE_MAP_TRANSPARENCY_COLOR                       = "STATE_MAP_TRANSPARENCY_COLOR";                                 //$NON-NLS-1$
+   public static final RGB          STATE_MAP_TRANSPARENCY_COLOR_DEFAULT               = new RGB(0xfe, 0xfe, 0xfe);
 
    private static final String      STATE_ZOOM_LEVEL_ADJUSTMENT                        = "STATE_ZOOM_LEVEL_ADJUSTMENT";                         //$NON-NLS-1$
    private static final String      STATE_SELECTED_MAP_PROVIDER_ID                     = "selected.map-provider-id";                            //$NON-NLS-1$
@@ -5311,6 +5314,8 @@ public class Map2View extends ViewPart implements
    }
 
    public void updateState_Map2_Options() {
+
+      _map.setTransparencyColor(Util.getStateRGB(_state, STATE_MAP_TRANSPARENCY_COLOR, STATE_MAP_TRANSPARENCY_COLOR_DEFAULT));
 
 // SET_FORMATTING_OFF
 

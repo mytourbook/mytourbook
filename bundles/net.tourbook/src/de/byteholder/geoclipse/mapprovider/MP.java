@@ -544,6 +544,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     *           a coordinate
     * @param zoomLevel
     *           the current zoom level
+    *
     * @return a pixel location in the world bitmap
     */
    @Override
@@ -711,6 +712,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    /**
     * @param zoom
+    *
     * @return
     */
    public double getLongitudeDegreeWidthInPixels(final int zoom) {
@@ -719,6 +721,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    /**
     * @param zoom
+    *
     * @return
     */
    public double getLongitudeRadianWidthInPixels(final int zoom) {
@@ -727,6 +730,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    /**
     * @param zoom
+    *
     * @return Return an array of coordinates in pixels that indicates the center in the world map
     *         for the given zoom level.
     */
@@ -736,6 +740,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    /**
     * @param zoom
+    *
     * @return
     */
    private int getMapSizeInTiles(int zoom) {
@@ -838,6 +843,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     *
     * @param tilePoint
     * @param zoom
+    *
     * @return
     */
    public Tile getTile(int tilePositionX, final int tilePositionY, final int zoom) {
@@ -981,6 +987,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     * @param fullPath
     *           File system path on the local file system where the tile path is appended
     * @param tile
+    *
     * @return Returns the path for a tile when it's saved in the file system or <code>null</code>
     *         when this features is not supported
     */
@@ -1028,6 +1035,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     * This method will be ignored when the map provider is an instance of {@link ITileLoader}. <br>
     *
     * @param tile
+    *
     * @return a valid url to load the tile
     */
    public String getTileUrl(final Tile tile) {
@@ -1038,8 +1046,11 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     * Gets the URL of a tile.
     *
     * @param tile
+    *
     * @throws java.net.URISyntaxException
+    *
     * @return
+    *
     * @throws Exception
     */
    public URL getTileURLEncoded(final Tile tile) throws Exception {
@@ -1143,6 +1154,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    /**
     * @see #_isIncludesHillshading
+    *
     * @return
     */
    public boolean isIncludesHillshading() {
@@ -1193,6 +1205,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    /**
     * @see #_isTransparentLayer
+    *
     * @return
     */
    public boolean isTransparentLayer() {
@@ -1214,6 +1227,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     *           a Point2D representing a pixel in the world bitmap
     * @param zoom
     *           the zoom level of the world bitmap
+    *
     * @return the converted GeoPosition
     */
    public GeoPosition pixelToGeo(final Point2D pixelCoordinate, final int zoom) {
@@ -1225,6 +1239,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     *
     * @param tile
     * @param isFiFo
+    *
     * @throws InterruptedException
     */
    private void putOneTileInWaitingQueue(final Tile tile, final boolean isFiFo) {
@@ -1385,7 +1400,9 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       final int dimAlphaValue = 255 - dimLevel * 255 / Map2View.MAX_DIM_STEPS;
 
       // check if the dimming value is modified
-      if (_isDimMap == isDimMap && _dimmingAlphaValue == dimAlphaValue && dimColor.equals(_dimmingColor)) {
+      if (_isDimMap == isDimMap
+            && _dimmingAlphaValue == dimAlphaValue
+            && dimColor.equals(_dimmingColor)) {
 
          // dimming value is not modified
          return;
