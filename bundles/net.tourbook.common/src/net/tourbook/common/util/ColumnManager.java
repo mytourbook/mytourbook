@@ -3114,6 +3114,7 @@ public class ColumnManager {
 
          final Object itemData = menuItem.getData();
 
+         // data in the table item contains the input items for the viewer
          if (itemData instanceof final ColumnDefinition colDef) {
 
             final boolean isChecked = menuItem.getSelection();
