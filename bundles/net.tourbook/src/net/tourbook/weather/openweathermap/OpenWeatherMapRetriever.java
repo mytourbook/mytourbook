@@ -126,11 +126,11 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       final List<String> fullWeatherDataList = new ArrayList<>();
 
-      final List<Hourly> hourlyList = timeMachineResult.getHourly();
+      final List<WeatherData> hourlyList = timeMachineResult.getData();
 
       if (hourlyList.size() > 0) {
 
-         for (final Hourly hourly : hourlyList) {
+         for (final WeatherData hourly : hourlyList) {
 
             final int hourlyDateTime = hourly.dt();
 
@@ -355,8 +355,8 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
             return true;
          }
 
-         timeMachineResult.addAllHourly(newTimeMachineResult.getHourly());
-         final List<Hourly> hourly = timeMachineResult.getHourly();
+         timeMachineResult.addAllData(newTimeMachineResult.getData());
+         final List<WeatherData> hourly = timeMachineResult.getData();
 
          final int lastWeatherDataHour = hourly.get(hourly.size() - 1).dt();
          if (WeatherUtils.isTourWeatherDataComplete(
@@ -381,7 +381,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          }
       }
 
-      final boolean hourlyDataExists = timeMachineResult.filterHourlyData(tourStartTime, tourEndTime);
+      final boolean hourlyDataExists = timeMachineResult.filterWeatherData(tourStartTime, tourEndTime);
       if (!hourlyDataExists) {
          return false;
       }
@@ -443,7 +443,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 // SET_FORMATTING_OFF
 
       //We look for the weather data in the middle of the tour to populate the weather conditions
-      timeMachineResult.findMiddleHourly(    tourMiddleTime);
+      timeMachineResult.findMiddleWeatherData(    tourMiddleTime);
       tour.appendOrReplaceWeather(           timeMachineResult.getWeatherDescription());
       tour.setWeather_Clouds(                timeMachineResult.getWeatherClouds());
 

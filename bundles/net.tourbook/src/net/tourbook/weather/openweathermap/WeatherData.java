@@ -20,16 +20,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record Hourly(int dt,
-                     double temp,
-                     double feels_like,
-                     int pressure,
-                     int humidity,
-                     List<Weather> weather,
-                     double wind_speed,
-                     int wind_deg,
-                     Volume rain,
-                     Volume snow) {
+public record WeatherData(int dt,
+                          double temp,
+                          double feels_like,
+                          int pressure,
+                          int humidity,
+                          List<Weather> weather,
+                          double wind_speed,
+                          int wind_deg,
+                          Volume rain,
+                          Volume snow) {
 
    public float getRain() {
 
