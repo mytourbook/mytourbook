@@ -54,6 +54,10 @@ Experimental
 New
 ===
 
+* Tour Weather (Frederic)
+  - OpenWeatherMap: Migration to the One Call 3.0 API per the recent announcement
+    https://openweathermap.org/api/one-call-api
+
 * Tour Nutrition (Frederic)
   Add the ability to assign food/fluids to any given tour.
   https://github.com/mytourbook/mytourbook/issues/1280
