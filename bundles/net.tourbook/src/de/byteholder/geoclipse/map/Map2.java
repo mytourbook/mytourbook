@@ -3182,7 +3182,7 @@ public class Map2 extends Canvas {
 
          } else {
 
-            // show bread crum tours in the map
+            // show bread crumb tours in the map
 
             final ArrayList<Long> crumbTourIds = _tourBreadcrumb.getHoveredCrumbedTours_WithReset();
 
@@ -6682,7 +6682,7 @@ public class Map2 extends Canvas {
          } else {
 
             /*
-             * offline image is not availabe, show loading... message
+             * offline image is not available, show loading... message
              */
 
             gcMapImage.drawImage(_mp.getLoadingImage(), devTileViewport.x, devTileViewport.y);

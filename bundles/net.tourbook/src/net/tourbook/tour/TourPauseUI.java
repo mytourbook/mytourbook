@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -103,8 +103,8 @@ public class TourPauseUI implements IColorSelectorListener {
    private FocusListener                       _keepOpenListener;
 
    private int                                 _firstColumnIndent;
-   private GridDataFactory                     _firstColoumLayoutData;
-   private GridDataFactory                     _secondColoumLayoutData;
+   private GridDataFactory                     _firstColumnLayoutData;
+   private GridDataFactory                     _secondColumnLayoutData;
 
    private Action_ResetValue                   _actionResetValue_Hours;
    private Action_ResetValue                   _actionResetValue_Minutes;
@@ -236,7 +236,7 @@ public class TourPauseUI implements IColorSelectorListener {
             _chkIsShow_AutoPauses = new Button(container, SWT.CHECK);
             _chkIsShow_AutoPauses.setText(Messages.Tour_Pauses_Checkbox_ShowAutoPauses);
             _chkIsShow_AutoPauses.addSelectionListener(_defaultSelectionListener);
-            _firstColoumLayoutData.span(2, 1).applyTo(_chkIsShow_AutoPauses);
+            _firstColumnLayoutData.span(2, 1).applyTo(_chkIsShow_AutoPauses);
          }
          {
             /*
@@ -246,7 +246,7 @@ public class TourPauseUI implements IColorSelectorListener {
             _chkIsShow_UserPauses.setText(Messages.Tour_Pauses_Checkbox_ShowUserPauses);
             _chkIsShow_UserPauses.setToolTipText(Messages.Tour_Pauses_Checkbox_ShowUserPauses_Tooltip);
             _chkIsShow_UserPauses.addSelectionListener(_defaultSelectionListener);
-            _firstColoumLayoutData.span(2, 1).applyTo(_chkIsShow_UserPauses);
+            _firstColumnLayoutData.span(2, 1).applyTo(_chkIsShow_UserPauses);
          }
          {
             /*
@@ -255,7 +255,7 @@ public class TourPauseUI implements IColorSelectorListener {
             _chkIsFilter_PauseDuration = new Button(container, SWT.CHECK);
             _chkIsFilter_PauseDuration.setText(Messages.Tour_Pauses_Checkbox_PauseDurationFilter);
             _chkIsFilter_PauseDuration.addSelectionListener(_defaultSelectionListener);
-            _firstColoumLayoutData.applyTo(_chkIsFilter_PauseDuration);
+            _firstColumnLayoutData.applyTo(_chkIsFilter_PauseDuration);
 
             final Composite containerDuration = new Composite(parent, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(containerDuration);
@@ -266,7 +266,7 @@ public class TourPauseUI implements IColorSelectorListener {
                _comboPauseFilter_Duration.setVisibleItemCount(5);
                _comboPauseFilter_Duration.addSelectionListener(_defaultSelectionListener);
                _comboPauseFilter_Duration.addFocusListener(_keepOpenListener);
-               _secondColoumLayoutData.applyTo(_comboPauseFilter_Duration);
+               _secondColumnLayoutData.applyTo(_comboPauseFilter_Duration);
 
                // label: Show time in hh:mm:ss
                _lblPauseDuration = new Label(containerDuration, SWT.NONE);
@@ -294,7 +294,7 @@ public class TourPauseUI implements IColorSelectorListener {
             _chkUseDurationFilter_Seconds = new Button(container, SWT.CHECK);
             _chkUseDurationFilter_Seconds.setText(Messages.Tour_Pauses_Checkbox_Duration_Seconds);
             _chkUseDurationFilter_Seconds.addSelectionListener(_defaultSelectionListener);
-            _secondColoumLayoutData.applyTo(_chkUseDurationFilter_Seconds);
+            _secondColumnLayoutData.applyTo(_chkUseDurationFilter_Seconds);
 
             // spinner
             _spinnerSeconds = new Spinner(container, SWT.BORDER);
@@ -315,7 +315,7 @@ public class TourPauseUI implements IColorSelectorListener {
             _chkUseDurationFilter_Minutes = new Button(container, SWT.CHECK);
             _chkUseDurationFilter_Minutes.setText(Messages.Tour_Pauses_Checkbox_Duration_Minutes);
             _chkUseDurationFilter_Minutes.addSelectionListener(_defaultSelectionListener);
-            _secondColoumLayoutData.applyTo(_chkUseDurationFilter_Minutes);
+            _secondColumnLayoutData.applyTo(_chkUseDurationFilter_Minutes);
 
             // spinner
             _spinnerMinutes = new Spinner(container, SWT.BORDER);
@@ -336,7 +336,7 @@ public class TourPauseUI implements IColorSelectorListener {
             _chkUseDurationFilter_Hours = new Button(container, SWT.CHECK);
             _chkUseDurationFilter_Hours.setText(Messages.Tour_Pauses_Checkbox_Duration_Hours);
             _chkUseDurationFilter_Hours.addSelectionListener(_defaultSelectionListener);
-            _secondColoumLayoutData.applyTo(_chkUseDurationFilter_Hours);
+            _secondColumnLayoutData.applyTo(_chkUseDurationFilter_Hours);
 
             // spinner
             _spinnerHours = new Spinner(container, SWT.BORDER);
@@ -467,11 +467,11 @@ public class TourPauseUI implements IColorSelectorListener {
 
       _firstColumnIndent = _pc.convertWidthInCharsToPixels(3);
 
-      _firstColoumLayoutData = GridDataFactory.fillDefaults()
+      _firstColumnLayoutData = GridDataFactory.fillDefaults()
             .indent(_firstColumnIndent, 0)
             .align(SWT.FILL, SWT.CENTER);
 
-      _secondColoumLayoutData = GridDataFactory.fillDefaults()
+      _secondColumnLayoutData = GridDataFactory.fillDefaults()
             .indent(2 * _firstColumnIndent, 0)
             .align(SWT.FILL, SWT.CENTER);
    }

@@ -9,7 +9,7 @@ TODO's
 * [Tour Location] Automatically create tour locations for longer pauses in a tour 
    https://github.com/mytourbook/mytourbook/issues/1306 
  
-* Support colomn width = 0
+* Support column width = 0
   This is now (17.3.2024) set but needs more testing
 
 * Support first column alignment in all views
@@ -54,7 +54,7 @@ Experimental
 New
 ===
 
-* Tour Nutrition
+* Tour Nutrition (Frederic)
   Add the ability to assign food/fluids to any given tour.
   https://github.com/mytourbook/mytourbook/issues/1280
 
@@ -64,6 +64,9 @@ New
     - Tour editor
   - Scramble tour location view when requested
   https://github.com/mytourbook/mytourbook/issues/878
+  
+* Tour Blog (Frederic)
+  - Added the ability to display or hide the tour markers
 
 * Address Location
   - Lookup a map location from a location provider and use it like a map bookmark
@@ -89,11 +92,21 @@ Improvements
 * Tour Book
   - Show powertrain L-R balance values separately
     https://github.com/mytourbook/mytourbook/issues/1271    
-  - Show weather air quaility
+  - Show weather air quality
     https://github.com/mytourbook/mytourbook/issues/1296
 
 * Tour Blog (Frederic)
   - Displaying the main numbers of the tour (distance, elevation gain/loss...)
+
+* Fit Export (Frederic)
+  - Improvements per the 'FitTestTool'
+    https://github.com/mytourbook/mytourbook/discussions/1194
+
+* Fit Import (Frederic)
+  - Code changes to support the upcoming Garmin Activity File Message Change
+    https://forums.garmin.com/developer/fit-sdk/b/news-announcements/posts/important-fit-activity-file-message-change
+    https://github.com/mytourbook/mytourbook/discussions/1279
+
 
 Changes
 =======
@@ -109,6 +122,10 @@ Changes
 
 Bugfix
 ======
+
+* Fit Export (Frederic)
+  - Fix for the Suunto App replay issue
+    https://github.com/mytourbook/mytourbook/discussions/1194
 
 * TCX Import (Frederic)
   - Fix for average and maximum power computation

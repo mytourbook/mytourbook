@@ -201,7 +201,8 @@ public class WeatherUtils {
          final float averageTemperature = tourData.getWeather_Temperature_Average();
          if (averageTemperature != Float.MIN_VALUE) {
 
-            //TODO When using a JDK version that supports Unicode 11.0 (JDK >= 12)
+            //TODO fb When using a JDK version that supports Unicode 11.0 (JDK >= 12)
+            //better weather emoji now that MT uses Java 17? the overcast one looks very basic
 //            if (averageTemperature < 0) {
 //
 //               // Cold face 🥶

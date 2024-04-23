@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -132,33 +132,33 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
          for (final Hourly hourly : hourlyList) {
 
-            final int hourlyDateTime = hourly.getDt();
+            final int hourlyDateTime = hourly.dt();
 
             final TourDateTime tourDateTime = TimeTools.createTourDateTime(
                   hourlyDateTime * 1000L,
                   tour.getTimeZoneId());
 
-            final net.tourbook.weather.openweathermap.List currentAirPollutionResult = airPollutionResult.getList().stream()
-                  .filter(list -> list.getDt() == hourlyDateTime)
+            final net.tourbook.weather.openweathermap.List currentAirPollutionResult = airPollutionResult.list().stream()
+                  .filter(list -> list.dt() == hourlyDateTime)
                   .findAny()
                   .orElse(null);
 
             final int airQualityIndex = currentAirPollutionResult == null
-                  ? 0 : currentAirPollutionResult.getMain().getAqi();
+                  ? 0 : currentAirPollutionResult.main().aqi();
 
             final boolean isDisplayEmptyValues = !isCompressed;
             String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
-                  (float) hourly.getTemp(),
+                  (float) hourly.temp(),
                   WeatherUtils.getWeatherIcon(
                         WeatherUtils.getWeatherIndex(
                               convertWeatherIconToMTWeatherClouds(
-                                    hourly.getWeather().get(0).getIcon()))),
-                  hourly.getWeather().get(0).getDescription(),
-                  (float) hourly.getFeels_like(),
+                                    hourly.weather().get(0).icon()))),
+                  hourly.weather().get(0).description(),
+                  (float) hourly.feels_like(),
                   (float) hourly.getWind_speedKmph(),
-                  hourly.getWind_deg(),
-                  hourly.getHumidity(),
-                  hourly.getPressure(),
+                  hourly.wind_deg(),
+                  hourly.humidity(),
+                  hourly.pressure(),
                   hourly.getRain(),
                   hourly.getSnow(),
                   airQualityIndex,
@@ -173,12 +173,12 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          }
       } else if (airPollutionResult.getAirQualityIndexAverage() != 0) {
 
-         for (final net.tourbook.weather.openweathermap.List currentAirPollutionResult : airPollutionResult.getList()) {
+         for (final net.tourbook.weather.openweathermap.List currentAirPollutionResult : airPollutionResult.list()) {
 
-            final int airQualityIndex = currentAirPollutionResult.getMain().getAqi();
+            final int airQualityIndex = currentAirPollutionResult.main().aqi();
 
             final TourDateTime tourDateTime = TimeTools.createTourDateTime(
-                  currentAirPollutionResult.getDt() * 1000L,
+                  currentAirPollutionResult.dt() * 1000L,
                   tour.getTimeZoneId());
 
             final boolean isDisplayEmptyValues = !isCompressed;
@@ -358,9 +358,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          timeMachineResult.addAllHourly(newTimeMachineResult.getHourly());
          final List<Hourly> hourly = timeMachineResult.getHourly();
 
-         final int lastWeatherDataHour = hourly.get(hourly.size() - 1).getDt();
+         final int lastWeatherDataHour = hourly.get(hourly.size() - 1).dt();
          if (WeatherUtils.isTourWeatherDataComplete(
-               hourly.get(0).getDt(),
+               hourly.get(0).dt(),
                lastWeatherDataHour,
                tourStartTime,
                tourEndTime)) {
@@ -426,14 +426,14 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       tour.appendOrReplaceWeather(           currentWeather.getWeatherDescription());
       tour.setWeather_Clouds(                currentWeather.getWeatherClouds());
-      tour.setWeather_Temperature_Average(   currentWeather.getTemp());
-      tour.setWeather_Humidity((short)       currentWeather.getHumidity());
+      tour.setWeather_Temperature_Average(   currentWeather.temp());
+      tour.setWeather_Humidity((short)       currentWeather.humidity());
       tour.setWeather_Precipitation(         currentWeather.getPrecipitation());
-      tour.setWeather_Pressure((short)       currentWeather.getPressure());
+      tour.setWeather_Pressure((short)       currentWeather.pressure());
       tour.setWeather_Snowfall(              currentWeather.getSnowfall());
-      tour.setWeather_Temperature_WindChill( currentWeather.getFeels_like());
+      tour.setWeather_Temperature_WindChill( currentWeather.feels_like());
       tour.setWeather_Wind_Speed(            currentWeather.getWind_speed());
-      tour.setWeather_Wind_Direction(        currentWeather.getWind_deg());
+      tour.setWeather_Wind_Direction(        currentWeather.wind_deg());
 
 // SET_FORMATTING_ON
    }

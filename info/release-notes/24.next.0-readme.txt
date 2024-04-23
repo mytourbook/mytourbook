@@ -9,7 +9,7 @@ TODO's
 * [Tour Location] Automatically create tour locations for longer pauses in a tour 
    https://github.com/mytourbook/mytourbook/issues/1306 
  
-* Support colomn width = 0
+* Support column width = 0
   This is now (17.3.2024) set but needs more testing
 
 * Support first column alignment in all views

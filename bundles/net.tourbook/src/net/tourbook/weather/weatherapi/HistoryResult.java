@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,12 +47,12 @@ public class HistoryResult {
 
       final double[] windSpeeds = hourList
             .stream()
-            .mapToDouble(Hour::getWind_kph)
+            .mapToDouble(hour -> hour.wind_kph())
             .toArray();
 
       final int[] windDirections = hourList
             .stream()
-            .mapToInt(Hour::getWind_degree)
+            .mapToInt(hour -> hour.wind_degree())
             .toArray();
 
       final int[] averageWindSpeedAndDirection =
@@ -78,8 +78,8 @@ public class HistoryResult {
          // OR
          // - more than 30 mins after the tour end time
 
-         if (currentHour.getTime_epoch() < tourStartTime - WeatherUtils.SECONDS_PER_THIRTY_MINUTE ||
-               currentHour.getTime_epoch() > tourEndTime + WeatherUtils.SECONDS_PER_THIRTY_MINUTE) {
+         if (currentHour.time_epoch() < tourStartTime - WeatherUtils.SECONDS_PER_THIRTY_MINUTE ||
+               currentHour.time_epoch() > tourEndTime + WeatherUtils.SECONDS_PER_THIRTY_MINUTE) {
             continue;
          }
 
@@ -102,7 +102,7 @@ public class HistoryResult {
       long timeDifference = Long.MAX_VALUE;
       for (final Hour currentHour : hourList) {
 
-         final long currentTimeDifference = Math.abs(currentHour.getTime_epoch() - tourMiddleTime);
+         final long currentTimeDifference = Math.abs(currentHour.time_epoch() - tourMiddleTime);
          if (currentTimeDifference < timeDifference) {
             middleHourData = currentHour;
             timeDifference = currentTimeDifference;
@@ -113,7 +113,7 @@ public class HistoryResult {
    public float getAverageHumidity() {
 
       final OptionalDouble averageHumidity =
-            hourList.stream().mapToDouble(Hour::getHumidity).average();
+            hourList.stream().mapToDouble(hour -> hour.humidity()).average();
 
       if (averageHumidity.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averageHumidity.getAsDouble());
@@ -125,7 +125,7 @@ public class HistoryResult {
    public float getAveragePressure() {
 
       final OptionalDouble averagePressure =
-            hourList.stream().mapToDouble(Hour::getPressure_mb).average();
+            hourList.stream().mapToDouble(hour -> hour.pressure_mb()).average();
 
       if (averagePressure.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averagePressure.getAsDouble());
@@ -137,7 +137,7 @@ public class HistoryResult {
    public float getAverageWindChill() {
 
       final OptionalDouble averageWindChill =
-            hourList.stream().mapToDouble(Hour::getFeelslike_c).average();
+            hourList.stream().mapToDouble(hour -> hour.feelslike_c()).average();
 
       if (averageWindChill.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averageWindChill.getAsDouble());
@@ -162,9 +162,9 @@ public class HistoryResult {
 
    public List<Hour> getForecastdayHourList() {
 
-      if (getForecast() != null && getForecast().getForecastday() != null &&
-            getForecast().getForecastday().size() > 0) {
-         return getForecast().getForecastday().get(0).getHour();
+      if (getForecast() != null && getForecast().forecastday() != null &&
+            getForecast().forecastday().size() > 0) {
+         return getForecast().forecastday().get(0).hour();
       }
 
       return new ArrayList<>();
@@ -183,7 +183,7 @@ public class HistoryResult {
    public float getTemperatureAverage() {
 
       final OptionalDouble averageTemperature =
-            hourList.stream().mapToDouble(Hour::getTemp_c).average();
+            hourList.stream().mapToDouble(hour -> hour.temp_c()).average();
 
       if (averageTemperature.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averageTemperature.getAsDouble());
@@ -195,7 +195,7 @@ public class HistoryResult {
    public float getTemperatureMax() {
 
       final OptionalDouble maxTemperature =
-            hourList.stream().mapToDouble(Hour::getTemp_c).max();
+            hourList.stream().mapToDouble(hour -> hour.temp_c()).max();
 
       if (maxTemperature.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(maxTemperature.getAsDouble());
@@ -207,7 +207,7 @@ public class HistoryResult {
    public float getTemperatureMin() {
 
       final OptionalDouble minTemperature =
-            hourList.stream().mapToDouble(Hour::getTemp_c).min();
+            hourList.stream().mapToDouble(hour -> hour.temp_c()).min();
 
       if (minTemperature.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(minTemperature.getAsDouble());
@@ -218,7 +218,7 @@ public class HistoryResult {
 
    public float getTotalPrecipitation() {
 
-      return WeatherUtils.roundDoubleToFloat(hourList.stream().mapToDouble(Hour::getPrecip_mm).sum());
+      return WeatherUtils.roundDoubleToFloat(hourList.stream().mapToDouble(hour -> hour.precip_mm()).sum());
    }
 
    public String getWeatherDescription() {
@@ -230,7 +230,7 @@ public class HistoryResult {
          return weatherDescription;
       }
 
-      return middleHour.getCondition().getText();
+      return middleHour.condition().text();
    }
 
    public String getWeatherType() {
@@ -239,6 +239,6 @@ public class HistoryResult {
          return UI.EMPTY_STRING;
       }
 
-      return WeatherApiRetriever.convertWeatherCodeToMTWeatherClouds(middleHourData.getCondition().getCode());
+      return WeatherApiRetriever.convertWeatherCodeToMTWeatherClouds(middleHourData.condition().code());
    }
 }

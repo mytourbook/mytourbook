@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2023 Frédéric Bard
+ * Copyright (C) 2019, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,11 +18,4 @@ package net.tourbook.weather.worldweatheronline;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class ValueResult {
-
-   private String value;
-
-   public String getValue() {
-      return value;
-   }
-}
+public record ValueResult(String value) {}

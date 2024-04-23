@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Frédéric Bard
+ * Copyright (C) 2023, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,16 +18,4 @@ package net.tourbook.weather.openweathermap;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class List {
-
-   private int  dt;
-   private Main main;
-
-   public int getDt() {
-      return dt;
-   }
-
-   public Main getMain() {
-      return main;
-   }
-}
+public record List(int dt, Main main) {}

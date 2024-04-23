@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,6 +29,7 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
@@ -57,11 +58,16 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
    private MouseWheelListener           _defaultMouseWheelListener;
    private SelectionListener            _defaultSelectionListener;
 
+   private GridDataFactory              _firstColumnLayoutData;
+
+   private PixelConverter               _pc;
+
    /*
     * UI controls
     */
    private Button  _chkDrawMarkerWithDefaultColor;
    private Button  _chkShowHiddenMarker;
+   private Button  _chkShowTourMarkers;
    private Button  _chkShowTourTags;
 
    private Spinner _spinnerFontSize;
@@ -91,7 +97,7 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
    @Override
    protected Composite createToolTipContentArea(final Composite parent) {
 
-      initUI();
+      initUI(parent);
 
       createActions();
 
@@ -159,13 +165,23 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
       {
          {
             /*
+             * Display the tour markers
+             */
+
+            _chkShowTourMarkers = new Button(container, SWT.CHECK);
+            _chkShowTourMarkers.setText(Messages.Slideout_TourBlogOptions_Checkbox_ShowTourMarkers);
+            _chkShowTourMarkers.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkShowTourMarkers);
+         }
+         {
+            /*
              * Show hidden marker
              */
 
             _chkShowHiddenMarker = new Button(container, SWT.CHECK);
             _chkShowHiddenMarker.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker);
             _chkShowHiddenMarker.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkShowHiddenMarker);
+            _firstColumnLayoutData.span(3, 1).applyTo(_chkShowHiddenMarker);
          }
          {
             /*
@@ -176,7 +192,7 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
             _chkDrawMarkerWithDefaultColor.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor);
             _chkDrawMarkerWithDefaultColor.setToolTipText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerWithDefaultColor_Tooltip);
             _chkDrawMarkerWithDefaultColor.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkDrawMarkerWithDefaultColor);
+            _firstColumnLayoutData.span(3, 1).applyTo(_chkDrawMarkerWithDefaultColor);
 
          }
          {
@@ -219,7 +235,17 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
       }
    }
 
-   private void initUI() {
+   public void enableControls() {
+
+      final boolean isShowTourMarkers = _chkShowTourMarkers.getSelection();
+
+      _chkDrawMarkerWithDefaultColor.setEnabled(isShowTourMarkers);
+      _chkShowHiddenMarker.setEnabled(isShowTourMarkers);
+   }
+
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
 
       _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
 
@@ -227,11 +253,19 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
          net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
          onChangeUI();
       };
+
+      final int firstColumnIndent = _pc.convertWidthInCharsToPixels(3);
+
+      _firstColumnLayoutData = GridDataFactory.fillDefaults()
+            .indent(firstColumnIndent, 0)
+            .align(SWT.FILL, SWT.CENTER);
    }
 
    private void onChangeUI() {
 
       saveState();
+
+      enableControls();
 
       _tourBlogView.updateUI();
    }
@@ -243,6 +277,7 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 
       _chkDrawMarkerWithDefaultColor.setSelection(    TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT);
       _chkShowHiddenMarker.setSelection(              TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT);
+      _chkShowTourMarkers.setSelection(               TourBlogView.STATE_IS_SHOW_TOUR_MARKERS_DEFAULT);
       _chkShowTourTags.setSelection(                  TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT);
 
       _spinnerFontSize.setSelection(                  WEB.STATE_BODY_FONT_SIZE_DEFAULT);
@@ -250,6 +285,8 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 // SET_FORMATTING_ON
 
       onChangeUI();
+
+      enableControls();
    }
 
    private void restoreState() {
@@ -258,6 +295,7 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 
       _chkDrawMarkerWithDefaultColor.setSelection(    Util.getStateBoolean(_state, TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT));
       _chkShowHiddenMarker.setSelection(              Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,              TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT));
+      _chkShowTourMarkers.setSelection(               Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_MARKERS,               TourBlogView.STATE_IS_SHOW_TOUR_MARKERS_DEFAULT));
       _chkShowTourTags.setSelection(                  Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_TAGS,                  TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT));
 
       _spinnerFontSize.setSelection(                  Util.getStateInt(_state_WEB, WEB.STATE_BODY_FONT_SIZE, WEB.STATE_BODY_FONT_SIZE_DEFAULT));
@@ -265,6 +303,8 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 // SET_FORMATTING_ON
 
       onChangeUI();
+
+      enableControls();
    }
 
    private void saveState() {
@@ -274,6 +314,7 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 
       _state.put(TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  _chkDrawMarkerWithDefaultColor.getSelection());
       _state.put(TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,              _chkShowHiddenMarker.getSelection());
+      _state.put(TourBlogView.STATE_IS_SHOW_TOUR_MARKERS,               _chkShowTourMarkers.getSelection());
       _state.put(TourBlogView.STATE_IS_SHOW_TOUR_TAGS,                  _chkShowTourTags.getSelection());
 
       _state_WEB.put(WEB.STATE_BODY_FONT_SIZE,                          _spinnerFontSize.getSelection());

@@ -31,8 +31,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import net.tourbook.application.ApplicationVersion;
 import net.tourbook.application.TourbookPlugin;
@@ -155,23 +153,6 @@ public class NutritionUtils {
 
       return deserializedProductsResults;
 
-   }
-
-   public static String getProductFullName(final Product product) {
-
-      return getProductFullName(product.brands, product.productName);
-   }
-
-   private static String getProductFullName(final String brand, final String name) {
-
-      return Stream.of(brand, name)
-            .filter(string -> net.tourbook.common.util.StringUtils.hasContent(string))
-            .collect(Collectors.joining(UI.DASH_WITH_SPACE));
-   }
-
-   public static String getProductFullName(final TourNutritionProduct tourNutritionProduct) {
-
-      return getProductFullName(tourNutritionProduct.getBrand(), tourNutritionProduct.getName());
    }
 
    public static int getTotalCalories(final Set<TourNutritionProduct> tourNutritionProducts) {

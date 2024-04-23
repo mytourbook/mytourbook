@@ -78,7 +78,7 @@ class CustomFileNameBuilder {
 
          case WORKOUT_ID:
 
-            customizedFileName.append(workoutPayload.workoutKey);
+            customizedFileName.append(workoutPayload.workoutKey());
             break;
 
          case ACTIVITY_TYPE:
@@ -165,11 +165,11 @@ class CustomFileNameBuilder {
    private static OffsetDateTime getWorkoutOffsetDateTime(final Payload workoutPayload) {
 
       final OffsetDateTime offsetDateTime = TimeTools
-            .getZonedDateTimeWithUTC(workoutPayload.startTime)
+            .getZonedDateTimeWithUTC(workoutPayload.startTime())
             .toOffsetDateTime();
 
       final ZoneOffset zoneOffset =
-            ZoneOffset.ofTotalSeconds(workoutPayload.timeOffsetInMinutes * 60);
+            ZoneOffset.ofTotalSeconds(workoutPayload.timeOffsetInMinutes() * 60);
 
       final OffsetDateTime offsetTime =
             offsetDateTime.withOffsetSameInstant(zoneOffset);
