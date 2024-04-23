@@ -27,14 +27,17 @@ import net.tourbook.weather.WeatherUtils;
 @JsonIgnoreProperties(ignoreUnknown = true)
 class TimeMachineResult {
 
-   private Current           current;
-
+   /*
+    * Datapoints coming from the API response
+    */
    private List<WeatherData> data;
 
-   private WeatherData       middleWeatherData;
-
-   private int               averageWindSpeed;
-   private int               averageWindDirection;
+   /*
+    * Internal properties
+    */
+   private int         averageWindSpeed;
+   private int         averageWindDirection;
+   private WeatherData middleWeatherData;
 
    public TimeMachineResult() {
       data = new ArrayList<>();
@@ -167,10 +170,6 @@ class TimeMachineResult {
    public int getAverageWindSpeed() {
 
       return averageWindSpeed;
-   }
-
-   public Current getCurrent() {
-      return current;
    }
 
    public List<WeatherData> getData() {
