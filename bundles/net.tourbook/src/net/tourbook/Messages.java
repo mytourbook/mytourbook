@@ -1913,7 +1913,7 @@ public class Messages extends NLS {
    public static String        Pref_Weather_CheckHTTPConnection_Message;
    public static String        Pref_Weather_CheckHTTPConnection_OK_Message;
    public static String        Pref_Weather_Label_ApiKey;
-   public static String        Pref_Weather_Label_OpenWeatherMap_FiveDaysLimit;
+   public static String        Pref_Weather_Label_OpenWeatherMap_TimeRangeLimit;
    public static String        Pref_Weather_Label_WeatherProvider;
    public static String        Pref_Weather_Label_WeatherApi_SevenDaysLimit;
    public static String        Pref_Weather_Label_WorldWeatherOnline_ApiKey_Tooltip;

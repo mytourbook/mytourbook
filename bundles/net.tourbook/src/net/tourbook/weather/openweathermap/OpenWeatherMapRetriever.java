@@ -46,7 +46,7 @@ import org.apache.commons.lang3.time.DateUtils;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
-   private static final String BASE_TIME_MACHINE_API_URL = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/timemachine"; //$NON-NLS-1$
+   private static final String BASE_TIME_MACHINE_API_URL = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/3.0/timemachine"; //$NON-NLS-1$
 
    // https://openweathermap.org/api/air-pollution
    private static final String BASE_AIR_POLLUTION_API_URL = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/air_pollution"; //$NON-NLS-1$
