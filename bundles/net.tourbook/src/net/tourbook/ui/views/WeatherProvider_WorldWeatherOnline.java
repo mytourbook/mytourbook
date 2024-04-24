@@ -78,7 +78,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
                   .applyTo(labelApiKey);
 
             // text
-            _textApiKey_Value = new Text(container, SWT.PASSWORD | SWT.BORDER | SWT.WRAP);
+            _textApiKey_Value = new Text(container, SWT.PASSWORD | SWT.BORDER);
             _textApiKey_Value.setToolTipText(Messages.Pref_Weather_Label_WorldWeatherOnline_ApiKey_Tooltip);
             _textApiKey_Value.addModifyListener(event -> onModifyApiKey());
             GridDataFactory.fillDefaults()
