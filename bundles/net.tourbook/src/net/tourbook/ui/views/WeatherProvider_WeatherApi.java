@@ -92,7 +92,7 @@ public class WeatherProvider_WeatherApi implements IWeatherProvider {
          /*
           * Label:
           */
-         final Label note = UI.createLabel(container, Messages.Pref_Weather_Label_WeatherApi_SevenDaysLimit, SWT.WRAP | SWT.READ_ONLY);
+         final Label note = UI.createLabel(container, Messages.Pref_Weather_Label_WeatherApi_SevenDaysLimit, SWT.WRAP);
          GridDataFactory.fillDefaults()
                .grab(true, false)
                .indent(DEFAULT_H_INDENT, 0)
