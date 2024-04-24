@@ -711,9 +711,6 @@ public class TileImageCache {
             ? tileOfflineImage
             : new Image(_display, loadedImageData);
 
-      // cache tile image
-      putIntoImageCache(tileKey, tileImage);
-
       final MP mp = tile.getMP();
 
       if (mp.isDimMap()) {
@@ -730,43 +727,65 @@ public class TileImageCache {
 
             // tile image is dimmed
 
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            //
-            // run in the UI thread
-            //
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            /**
+             * !!! THIS MUST BE RUN IN THE UI THREAD OTHERWISE IT WILL CRASH THE APP VERY OFTEN WHEN
+             * PAINTING MARKER/CLUSTER !!!
+             *
+             * <code>
+             *
+             * C:\E\e-431\eclipse\hs_err_pid2256  - org.eclipse.swt.internal.gdip.Gdip.Graphics_FillEllipse.log
+             * C:\E\e-431\eclipse\hs_err_pid11404 - org.eclipse.swt.internal.gdip.Gdip.Graphics_DrawEllipse.log
+             * C:\E\e-431\eclipse\hs_err_pid14104 - org.eclipse.swt.internal.gdip.Gdip.Graphics_FillEllipse.log
+             * C:\E\e-431\eclipse\hs_err_pid15280 - org.eclipse.swt.internal.gdip.Gdip.Graphics_DrawEllipse.log
+             * C:\E\e-431\eclipse\hs_err_pid14944 - org.eclipse.swt.internal.gdip.Gdip.SolidBrush_delete.log
+             *
+             * </code>
+             */
+
             _display.asyncExec(() -> {
 
-               if (tileImage == null || tileImage.isDisposed()) {
-                  return;
-               }
-
-               // create dimmed image
-               final Rectangle imageBounds = tileImage.getBounds();
-               final Image dimmedImage = new Image(_display, imageBounds);
-
-               final GC gcDimmedImage = new GC(dimmedImage);
-               {
-                  gcDimmedImage.setBackground(new Color(mp.getDimColor()));
-                  gcDimmedImage.fillRectangle(imageBounds);
-
-                  gcDimmedImage.setAlpha(dimmingAlphaValue);
-                  {
-                     gcDimmedImage.drawImage(tileImage, 0, 0);
-                  }
-                  gcDimmedImage.setAlpha(0xff);
-               }
-               gcDimmedImage.dispose();
-
-               tileImage.dispose();
-
-               // replace tile image with the dimmed image
-               putIntoImageCache(tileKey, dimmedImage);
+               setupImageInternal_DimImage(tileKey, tileImage, mp, dimmingAlphaValue);
             });
          }
       }
 
+      // cache tile image
+      putIntoImageCache(tileKey, tileImage);
+
       return tileImage;
+   }
+
+   private void setupImageInternal_DimImage(final String tileKey, final Image tileImage, final MP mp, final int dimmingAlphaValue) {
+
+      if (tileImage == null || tileImage.isDisposed()) {
+         return;
+      }
+
+      // create dimmed image
+      final Rectangle imageBounds = tileImage.getBounds();
+      final Image dimmedImage = new Image(_display, imageBounds);
+
+      final GC gcDimmedImage = new GC(dimmedImage);
+      {
+         gcDimmedImage.setBackground(new Color(mp.getDimColor()));
+         gcDimmedImage.fillRectangle(imageBounds);
+
+         gcDimmedImage.setAlpha(dimmingAlphaValue);
+         {
+            // this happened concurrently
+            if (tileImage.isDisposed() == false) {
+
+               gcDimmedImage.drawImage(tileImage, 0, 0);
+            }
+         }
+         gcDimmedImage.setAlpha(0xff);
+      }
+      gcDimmedImage.dispose();
+
+      tileImage.dispose();
+
+      // replace tile image with the dimmed image
+      putIntoImageCache(tileKey, dimmedImage);
    }
 
 }

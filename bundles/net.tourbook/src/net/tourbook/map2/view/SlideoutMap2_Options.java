@@ -72,6 +72,7 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
    private Button                _chkIsToggleKeyboardPanning;
    private Button                _chkSelectInbetweenTimeSlices;
    private Button                _chkShowValuePointTooltip;
+   private Button                _chkUseMapDimColor;
 
    private Spinner               _spinnerDimValue;
 
@@ -131,6 +132,8 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
       {
          createUI_10_Header(shellContainer);
          createUI_20_MapOptions(shellContainer);
+
+         UI.createSpacer_Vertical(shellContainer, 4, 1);
 
          _tourPausesUI.createContent(shellContainer, TourPainterConfiguration.isShowTourPauses);
       }
@@ -217,15 +220,15 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
             /*
              * Dim map
              */
-            // checkbox
-            _chkIsDimMap = new Button(container, SWT.CHECK);
-            _chkIsDimMap.setText(Messages.Slideout_Map_Options_Checkbox_DimMap);
-            _chkIsDimMap.addSelectionListener(_defaultSelectionListener);
-
             final Composite dimContainer = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(dimContainer);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(dimContainer);
             {
+               // checkbox
+               _chkIsDimMap = new Button(dimContainer, SWT.CHECK);
+               _chkIsDimMap.setText(Messages.Slideout_Map_Options_Checkbox_DimMap);
+               _chkIsDimMap.addSelectionListener(_defaultSelectionListener);
+
                // spinner
                _spinnerDimValue = new Spinner(dimContainer, SWT.BORDER);
                _spinnerDimValue.setToolTipText(Messages.Slideout_Map_Options_Spinner_DimValue_Tooltip);
@@ -235,29 +238,41 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
                _spinnerDimValue.setPageIncrement(4);
                _spinnerDimValue.addSelectionListener(_defaultSelectionListener);
                _spinnerDimValue.addMouseWheelListener(_defaultMouseWheelListener);
-
-               // dimming color
-               _colorMapDimColor = new ColorSelectorExtended(dimContainer);
-               _colorMapDimColor.setToolTipText(Messages.Slideout_Map_Options_Color_DimColor_Tooltip);
-               _colorMapDimColor.addListener(_defaultChangePropertyListener);
-               _colorMapDimColor.addOpenListener(this);
+               GridDataFactory.fillDefaults().indent(10, 0).applyTo(_spinnerDimValue);
             }
+
+            // dimming color
+            _colorMapDimColor = new ColorSelectorExtended(container);
+            _colorMapDimColor.setToolTipText(Messages.Slideout_Map_Options_Color_DimColor_Tooltip);
+            _colorMapDimColor.addListener(_defaultChangePropertyListener);
+            _colorMapDimColor.addOpenListener(this);
          }
          {
             /*
              * Map transparency color
              */
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Slideout_Map_Options_Label_MapTransparencyColor);
-            label.setToolTipText(Messages.Slideout_Map_Options_Label_MapTransparencyColor_Tooltip);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(label);
+            {
+               final Label label = new Label(container, SWT.NONE);
+               label.setText(Messages.Slideout_Map_Options_Label_MapTransparencyColor);
+               label.setToolTipText(Messages.Slideout_Map_Options_Label_MapTransparencyColor_Tooltip);
+               GridDataFactory.fillDefaults()
+                     .align(SWT.BEGINNING, SWT.CENTER)
+                     .applyTo(label);
 
-            _colorMapTransparencyColor = new ColorSelectorExtended(container);
-            _colorMapTransparencyColor.setToolTipText(Messages.Slideout_Map_Options_Label_MapTransparencyColor_Tooltip);
-            _colorMapTransparencyColor.addListener(_defaultChangePropertyListener);
-            _colorMapTransparencyColor.addOpenListener(this);
+               _colorMapTransparencyColor = new ColorSelectorExtended(container);
+               _colorMapTransparencyColor.setToolTipText(Messages.Slideout_Map_Options_Label_MapTransparencyColor_Tooltip);
+               _colorMapTransparencyColor.addListener(_defaultChangePropertyListener);
+               _colorMapTransparencyColor.addOpenListener(this);
+            }
+            {
+               /*
+                * Use map dim color
+                */
+               _chkUseMapDimColor = new Button(container, SWT.CHECK);
+               _chkUseMapDimColor.setText(Messages.Slideout_Map_Options_Checkbox_UseMapDimColor);
+               _chkUseMapDimColor.addSelectionListener(_defaultSelectionListener);
+               gdSpan2.indent(16, 0).applyTo(_chkUseMapDimColor);
+            }
          }
       }
    }
@@ -265,9 +280,14 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
    private void enableControls() {
 
       final boolean isDimMap = _chkIsDimMap.getSelection();
+      final boolean isUseMapDimColor = _chkUseMapDimColor.getSelection();
+      final boolean isUseTransparencyColor = isUseMapDimColor == false;
 
+      _chkUseMapDimColor.setEnabled(isDimMap);
       _colorMapDimColor.setEnabled(isDimMap);
       _spinnerDimValue.setEnabled(isDimMap);
+
+      _colorMapTransparencyColor.setEnabled(isDimMap == false || isUseTransparencyColor);
 
       _tourPausesUI.enableControls();
    }
@@ -329,6 +349,10 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
 
       _tourPausesUI.resetToDefaults();
 
+      /*
+       * Map transparency
+       */
+      _chkUseMapDimColor.setSelection(Map2View.STATE_MAP_TRANSPARENCY_USE_MAP_DIM_COLOR_DEFAULT);
       _colorMapTransparencyColor.setColorValue(Map2View.STATE_MAP_TRANSPARENCY_COLOR_DEFAULT);
 
       onChangeUI_UpdateMap();
@@ -340,6 +364,7 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
 
       _chkIsToggleKeyboardPanning   .setSelection( Util.getStateBoolean(_state,  Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,      Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
       _chkSelectInbetweenTimeSlices .setSelection( _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
+      _chkShowValuePointTooltip     .setSelection( _prefStore.getBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2));
 
       /*
        * Map dimming
@@ -348,8 +373,10 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
       _spinnerDimValue           .setSelection(    Util.getStateInt(    _state,  Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT));
       _colorMapDimColor          .setColorValue(   Util.getStateRGB(    _state,  Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT));
 
-      _chkShowValuePointTooltip  .setSelection(    _prefStore.getBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2));
-
+      /*
+       * Map transparency
+       */
+      _chkUseMapDimColor         .setSelection(    Util.getStateBoolean(_state,  Map2View.STATE_MAP_TRANSPARENCY_USE_MAP_DIM_COLOR, Map2View.STATE_MAP_TRANSPARENCY_USE_MAP_DIM_COLOR_DEFAULT));
       _colorMapTransparencyColor .setColorValue(   Util.getStateRGB(    _state,  Map2View.STATE_MAP_TRANSPARENCY_COLOR, Map2View.STATE_MAP_TRANSPARENCY_COLOR_DEFAULT));
 
 // SET_FORMATTING_ON
@@ -365,7 +392,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES, _chkSelectInbetweenTimeSlices.getSelection());
 
-      Util.setState(_state,Map2View.STATE_MAP_TRANSPARENCY_COLOR, _colorMapTransparencyColor.getColorValue());
 
       /*
        * Map dimming
@@ -373,6 +399,12 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
       _state.put(Map2View.STATE_IS_MAP_DIMMED,                    _chkIsDimMap.getSelection());
       _state.put(Map2View.STATE_DIM_MAP_VALUE,                    _spinnerDimValue.getSelection());
       Util.setState(_state, Map2View.STATE_DIM_MAP_COLOR,         _colorMapDimColor.getColorValue());
+
+      /*
+       * Map transparency
+       */
+      _state.put(Map2View.STATE_MAP_TRANSPARENCY_USE_MAP_DIM_COLOR,  _chkUseMapDimColor.getSelection());
+      Util.setState(_state,Map2View.STATE_MAP_TRANSPARENCY_COLOR,    _colorMapTransparencyColor.getColorValue());
 
 // SET_FORMATTING_ON
 

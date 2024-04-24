@@ -337,6 +337,8 @@ public class Map2View extends ViewPart implements
    private static final String      STATE_MAP_SYNC_MODE_IS_ACTIVE                      = "STATE_MAP_SYNC_MODE_IS_ACTIVE";                       //$NON-NLS-1$
    public static final String       STATE_MAP_TRANSPARENCY_COLOR                       = "STATE_MAP_TRANSPARENCY_COLOR";                                 //$NON-NLS-1$
    public static final RGB          STATE_MAP_TRANSPARENCY_COLOR_DEFAULT               = new RGB(0xfe, 0xfe, 0xfe);
+   public static final String       STATE_MAP_TRANSPARENCY_USE_MAP_DIM_COLOR           = "STATE_MAP_TRANSPARENCY_USE_MAP_DIM_COLOR";                                 //$NON-NLS-1$
+   public static final boolean      STATE_MAP_TRANSPARENCY_USE_MAP_DIM_COLOR_DEFAULT   = true;
 
    private static final String      STATE_ZOOM_LEVEL_ADJUSTMENT                        = "STATE_ZOOM_LEVEL_ADJUSTMENT";                         //$NON-NLS-1$
    private static final String      STATE_SELECTED_MAP_PROVIDER_ID                     = "selected.map-provider-id";                            //$NON-NLS-1$
@@ -4997,6 +4999,22 @@ public class Map2View extends ViewPart implements
       TourPainterConfiguration.setMapColorProvider(mapColorProvider);
    }
 
+   void setupMapDimLevel() {
+
+// SET_FORMATTING_OFF
+
+      final boolean  isMapDimmed       = Util.getStateBoolean( _state, STATE_IS_MAP_DIMMED,                       STATE_IS_MAP_DIMMED_DEFAULT);
+      final boolean  isUseMapDimColor  = Util.getStateBoolean( _state, STATE_MAP_TRANSPARENCY_USE_MAP_DIM_COLOR,  STATE_MAP_TRANSPARENCY_USE_MAP_DIM_COLOR_DEFAULT);
+      final int      mapDimValue       = Util.getStateInt(     _state, STATE_DIM_MAP_VALUE,                       STATE_DIM_MAP_VALUE_DEFAULT);
+      final RGB      mapDimColor       = Util.getStateRGB(     _state, STATE_DIM_MAP_COLOR,                       STATE_DIM_MAP_COLOR_DEFAULT);
+
+// SET_FORMATTING_ON
+
+      final boolean isBackgroundDark = isBackgroundDark();
+
+      _map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, isBackgroundDark, isUseMapDimColor);
+   }
+
    private void setVisibleDataPoints(final TourData tourData) {
 
       if (tourData == null) {
@@ -5315,8 +5333,6 @@ public class Map2View extends ViewPart implements
 
    public void updateState_Map2_Options() {
 
-      _map.setTransparencyColor(Util.getStateRGB(_state, STATE_MAP_TRANSPARENCY_COLOR, STATE_MAP_TRANSPARENCY_COLOR_DEFAULT));
-
 // SET_FORMATTING_OFF
 
       /*
@@ -5347,6 +5363,7 @@ public class Map2View extends ViewPart implements
             selectedOpacity
       );
 
+
       TourPainterConfiguration.isShowBreadcrumbs   = isShowBreadcrumbs;
 
 
@@ -5373,16 +5390,13 @@ public class Map2View extends ViewPart implements
       /*
        * Set dim level/color after the map providers are set
        */
-      final boolean isMapDimmed        = Util.getStateBoolean( _state, STATE_IS_MAP_DIMMED, STATE_IS_MAP_DIMMED_DEFAULT);
-      final int mapDimValue            = Util.getStateInt(     _state, STATE_DIM_MAP_VALUE, STATE_DIM_MAP_VALUE_DEFAULT);
-      final RGB mapDimColor            = Util.getStateRGB(     _state, STATE_DIM_MAP_COLOR, STATE_DIM_MAP_COLOR_DEFAULT);
-      final boolean isBackgroundDark   = isBackgroundDark();
-
-      _map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, isBackgroundDark);
+      _map.setTransparencyColor(Util.getStateRGB(_state, STATE_MAP_TRANSPARENCY_COLOR, STATE_MAP_TRANSPARENCY_COLOR_DEFAULT));
+      setupMapDimLevel();
 
       /*
        * Painting
        */
+      final boolean isBackgroundDark   = isBackgroundDark();
       TourPainterConfiguration.isBackgroundDark = isBackgroundDark;
 
       /*

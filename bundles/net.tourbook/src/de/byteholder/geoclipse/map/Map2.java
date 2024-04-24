@@ -284,10 +284,12 @@ public class Map2 extends Canvas {
    // [181,208,208] is the color of water in the standard OSM material
    public static final RGB               OSM_BACKGROUND_RGB         = new RGB(181, 208, 208);
    private static final RGB              MAP_DEFAULT_BACKGROUND_RGB = new RGB(0x40, 0x40, 0x40);
-   private static RGB                    MAP_TRANSPARENT_RGB;
+
+   private static RGB                    _mapTransparentRGB;
+   private static RGB                    _newTransparentRGB;
+   private Color                         _mapTransparentColor;
 
    private Color                         _defaultBackgroundColor;
-   private Color                         _transparentColor;
 
    /**
     * Map zoom level which is currently be used to display tiles. Normally a value between around 0
@@ -765,7 +767,7 @@ public class Map2 extends Canvas {
     */
    public static RGB getTransparentRGB() {
 
-      return MAP_TRANSPARENT_RGB;
+      return _mapTransparentRGB;
    }
 
    public void actionManageOfflineImages(final Event event) {
@@ -1267,7 +1269,7 @@ public class Map2 extends Canvas {
          /*
           * Ubuntu 12.04 fails, when background is not filled, it draws a black background
           */
-         gcImage.setBackground(_transparentColor);
+         gcImage.setBackground(_mapTransparentColor);
          gcImage.fillRectangle(transparentImage.getBounds());
 
          if (oldImage != null && oldImage.isDisposed() == false) {
@@ -2403,9 +2405,9 @@ public class Map2 extends Canvas {
                                            final int srcYStart,
                                            final int tileSize) {
 
-      final int transRed = MAP_TRANSPARENT_RGB.red;
-      final int transGreen = MAP_TRANSPARENT_RGB.green;
-      final int transBlue = MAP_TRANSPARENT_RGB.blue;
+      final int transRed = _mapTransparentRGB.red;
+      final int transGreen = _mapTransparentRGB.green;
+      final int transBlue = _mapTransparentRGB.blue;
 
       final byte[] srcData = imageData9Parts.data;
       final int srcBytesPerLine = imageData9Parts.bytesPerLine;
@@ -4084,13 +4086,15 @@ public class Map2 extends Canvas {
          final Image image1 = _newOverlayImage_Visible;
          final Image image2 = _newOverlayImage_NotVisible;
 
-         if (false
+         if (_newTransparentRGB != null
                || canReuseImage(image1, _newOverlaySize) == false
                || canReuseImage(image2, _newOverlaySize) == false
 
          ) {
 
-            // image need to be recreated
+            // image needs to be recreated
+
+            _newTransparentRGB = null;
 
             final Image newOverlayImage_Visible = _newOverlayImage_Visible;
             final Image newOverlayImage_NotVisible = _newOverlayImage_NotVisible;
@@ -5419,7 +5423,7 @@ public class Map2 extends Canvas {
          final Image gcImage = _newOverlayImage_NotVisible;
          final GC gc = new GC(gcImage);
          {
-            gc.setBackground(_transparentColor);
+            gc.setBackground(_mapTransparentColor);
             gc.fillRectangle(_newOverlaySize);
 
             if (map2Config.isShowTourMarker) {
@@ -5444,10 +5448,9 @@ public class Map2 extends Canvas {
 
          _newOverlay_Viewport_Visible = _newOverlay_Viewport_NotVisible;
 
-//    } catch (final SWTException e) {
       } catch (final Exception e) {
 
-//         StatusUtil.log(e);
+         StatusUtil.log(e);
 
          // this happens, e.g. when dimming the map
          UI.disposeResource(_newOverlayImage_NotVisible);
@@ -5673,32 +5676,34 @@ public class Map2 extends Canvas {
          final String text = clusterLabel;
          final int textLength = text.length();
 
-         final Point textExtent = gc.stringExtent(text);
-
+         /*
+          * Do fine adjustment to center the number within the circle
+          */
          final int offsetX;
          final int offsetY;
+         final boolean isOneDigit = textLength == 1;
 
 // SET_FORMATTING_OFF
 
-         if (        _clusterFontSize > 19) {   offsetX = textLength == 1 ? 0 : -1;
-         } else if ( _clusterFontSize > 17) {   offsetX = textLength == 1 ? -1 : -1;
-         } else if ( _clusterFontSize > 15) {   offsetX = textLength == 1 ? 0 : -1;
-         } else if ( _clusterFontSize > 13) {   offsetX = textLength == 1 ? 0 : -1;
-         } else if ( _clusterFontSize > 11) {   offsetX = textLength == 1 ? 0 : -1;
-         } else if ( _clusterFontSize >  9) {   offsetX = textLength == 1 ? 1 : 0;
-         } else if ( _clusterFontSize >  7) {   offsetX = textLength == 1 ? 0 : -1;
-         } else if ( _clusterFontSize >  5) {   offsetX = textLength == 1 ? 0 : -1;
-         } else if ( _clusterFontSize >  3) {   offsetX = textLength == 1 ? 0 : -1;
-         } else {                               offsetX = textLength == 1 ? 1 : -1;
+         if (        _clusterFontSize > 19) {   offsetX = isOneDigit ? 0 : -1;
+         } else if ( _clusterFontSize > 17) {   offsetX = isOneDigit ? -1 : -1;
+         } else if ( _clusterFontSize > 15) {   offsetX = isOneDigit ? 0 : -1;
+         } else if ( _clusterFontSize > 13) {   offsetX = isOneDigit ? 0 : -1;
+         } else if ( _clusterFontSize > 11) {   offsetX = isOneDigit ? 0 : -1;
+         } else if ( _clusterFontSize >  9) {   offsetX = isOneDigit ? 1 : -1;
+         } else if ( _clusterFontSize >  7) {   offsetX = isOneDigit ? 0 : -1;
+         } else if ( _clusterFontSize >  5) {   offsetX = isOneDigit ? 0 : -1;
+         } else if ( _clusterFontSize >  3) {   offsetX = isOneDigit ? 0 : -1;
+         } else {                               offsetX = isOneDigit ? 1 : -1;
          }
 
-         if (        _clusterFontSize > 19) {   offsetY = textLength == 1 ? 0 : 0;
-         } else if ( _clusterFontSize > 17) {   offsetY = textLength == 1 ? 1 : 1;
-         } else if ( _clusterFontSize > 15) {   offsetY = textLength == 1 ? 0 : 0;
-         } else if ( _clusterFontSize > 13) {   offsetY = textLength == 1 ? 2 : 2;
+         if (        _clusterFontSize > 19) {   offsetY = isOneDigit ? 0 : 0;
+         } else if ( _clusterFontSize > 17) {   offsetY = isOneDigit ? 1 : 1;
+         } else if ( _clusterFontSize > 15) {   offsetY = isOneDigit ? 0 : 0;
+         } else if ( _clusterFontSize > 13) {   offsetY = isOneDigit ? 2 : 2;
          } else if ( _clusterFontSize > 11) {   offsetY = 2;
-         } else if ( _clusterFontSize >  9) {   offsetY = textLength == 1 ? 3 : 2;
-         } else if ( _clusterFontSize >  7) {   offsetY = textLength == 1 ? 3 : 3;
+         } else if ( _clusterFontSize >  9) {   offsetY = isOneDigit ? 2 : 2;
+         } else if ( _clusterFontSize >  7) {   offsetY = isOneDigit ? 3 : 3;
          } else if ( _clusterFontSize >  5) {   offsetY = 2;
          } else {                               offsetY = 3;
          }
@@ -5712,6 +5717,8 @@ public class Map2 extends Canvas {
 ////               + " - new: " + fontDataNew.height
 //               + "  x: " + offsetX
 //               + "  y: " + offsetY);
+
+         final Point textExtent = gc.stringExtent(text);
 
          final int textWidth = textLength < 2 ? textExtent.x + 2 : textExtent.x;
          final int textHeight = textExtent.y;
@@ -5739,6 +5746,14 @@ public class Map2 extends Canvas {
 
                   circleSize,
                   circleSize);
+
+//            gc.fillRectangle(
+//
+//                  ovalDevX,
+//                  ovalDevY,
+//
+//                  circleSize,
+//                  circleSize);
          }
 
          gc.setForeground(markerConfig.clusterOutline_Color);
@@ -5755,6 +5770,14 @@ public class Map2 extends Canvas {
 
                   circleSize,
                   circleSize);
+
+//            gc.drawRectangle(
+//
+//                  ovalDevX,
+//                  ovalDevY,
+//
+//                  circleSize,
+//                  circleSize);
          }
 
          gc.drawString(
@@ -6130,7 +6153,7 @@ public class Map2 extends Canvas {
          /*
           * Ubuntu 12.04 fails, when background is not filled, it draws a black background
           */
-         gc1Part.setBackground(_transparentColor);
+         gc1Part.setBackground(_mapTransparentColor);
          gc1Part.fillRectangle(overlayImage.getBounds());
 
          // paint all overlays for the current tile
@@ -6189,7 +6212,7 @@ public class Map2 extends Canvas {
 
       {
          // clear 9 part image
-         _9PartGC.setBackground(_transparentColor);
+         _9PartGC.setBackground(_mapTransparentColor);
          _9PartGC.fillRectangle(_9PartImage.getBounds());
 
          // paint all overlays for the current tile
@@ -7492,9 +7515,9 @@ public class Map2 extends Canvas {
 
       resetTours_HoveredData();
 
-      disposeOverlayImageCache();
-
-      paint();
+//      disposeOverlayImageCache();
+//
+//      paint();
    }
 
    public void setConfig_TourDirection(final boolean isShowTourDirection,
@@ -7536,20 +7559,38 @@ public class Map2 extends Canvas {
     * @param dimColor
     * @param isDimMap
     * @param isBackgroundDark
+    * @param isUseMapDimColor
     */
    public void setDimLevel(final boolean isDimMap,
                            final int dimLevel,
                            final RGB dimColor,
-                           final boolean isBackgroundDark) {
+                           final boolean isBackgroundDark,
+                           final boolean isUseMapDimColor) {
 
       _isMapBackgroundDark = isBackgroundDark;
 
       if (_mp != null) {
          _mp.setDimLevel(isDimMap, dimLevel, dimColor);
       }
+
+      if (isDimMap && isUseMapDimColor) {
+
+         final float dimFactor = dimLevel == 0
+               ? 1
+               : (10f - dimLevel) / 10f;
+
+         final RGB transColor = new RGB(
+
+               (int) (dimColor.red * dimFactor),
+               (int) (dimColor.green * dimFactor),
+               (int) (dimColor.blue * dimFactor));
+
+         setTransparencyColor(transColor);
+      }
    }
 
    public void setDirectPainter(final IDirectPainter directPainter) {
+
       _directMapPainter = directPainter;
    }
 
@@ -7568,14 +7609,17 @@ public class Map2 extends Canvas {
    }
 
    public void setIsInInverseKeyboardPanning(final boolean isInInverseKeyboardPanning) {
+
       _isInInverseKeyboardPanning = isInInverseKeyboardPanning;
    }
 
    public void setIsMultipleTours(final boolean isMultipleTours) {
+
       _hoveredSelectedTour_CanSelectTour = isMultipleTours;
    }
 
    public void setIsShowTour(final boolean isShowTour) {
+
       _isShowTour = isShowTour;
    }
 
@@ -8077,13 +8121,10 @@ public class Map2 extends Canvas {
 
       final RGB transColorAdjusted = new RGB(red, green, blue);
 
-      MAP_TRANSPARENT_RGB = transColorAdjusted;
-      _transparentColor = new Color(MAP_TRANSPARENT_RGB);
+      _mapTransparentRGB = transColorAdjusted;
+      _mapTransparentColor = new Color(transColorAdjusted);
 
-      UI.disposeResource(_newOverlayImage_Visible);
-      UI.disposeResource(_newOverlayImage_NotVisible);
-
-      disposeOverlayImageCache();
+      _newTransparentRGB = transColorAdjusted;
    }
 
    private void setupClusterFont(final GC gc, final int newClusterFontSize) {
