@@ -371,24 +371,24 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       timeMachineResult = new TimeMachineResult();
       long requestedTime = tourStartTime;
 
-      while (true) {
+      final boolean isTourStartWithinTheCurrentHour = isTourStartTimeCurrent(
+            tourStartTime,
+            tour.getTimeZoneId());
 
-         final boolean isTourStartWithinTheCurrentHour = isTourStartTimeCurrent(
-               tourStartTime,
-               tour.getTimeZoneId());
+      // If the tour start time is within the current hour, we use the
+      // current weather data instead of the historical one.
+      if (isTourStartWithinTheCurrentHour) {
 
-         // If the tour start time is within the current hour, we use the
-         // current weather data instead of the historical one.
-         if (isTourStartWithinTheCurrentHour) {
+         final CurrentResult currentResult = retrieveCurrentWeatherData(requestedTime);
+         if (currentResult != null) {
 
-            final CurrentResult currentResult = retrieveCurrentWeatherData(requestedTime);
-            if (currentResult != null) {
+            setTourWeatherWithCurrentWeather(currentResult.current());
 
-               setTourWeatherWithCurrentWeather(currentResult.current());
-
-               return true;
-            }
+            return true;
          }
+      }
+
+      while (true) {
 
          //Send an API request as long as we don't have the results covering the entire duration of the tour
          final TimeMachineResult newTimeMachineResult = retrieveHistoricalWeatherData(requestedTime);
