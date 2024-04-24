@@ -110,7 +110,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
              */
 
             // Link - see http(s)://www.worldweatheronline.com/developer/signup.aspx
-            final Link linkApiSignup = new Link(container, SWT.PUSH | SWT.WRAP);
+            final Link linkApiSignup = new Link(container, SWT.PUSH);
             linkApiSignup.setText(Messages.Pref_Weather_Link_ApiSignup);
             linkApiSignup.setEnabled(true);
             linkApiSignup.addListener(
