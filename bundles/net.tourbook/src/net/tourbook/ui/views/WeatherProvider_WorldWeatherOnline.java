@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,7 @@ import net.tourbook.web.WEB;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
@@ -40,6 +41,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
 
    private final IPreferenceStore _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+
+   private PixelConverter         _pc;
 
    /*
     * UI controls
@@ -55,7 +58,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
                              final Composite parent,
                              final FormToolkit formToolkit) {
 
-      final int defaultHIndent = 16;
+      _pc = new PixelConverter(parent);
 
       final Composite container = formToolkit.createComposite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -68,15 +71,14 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
 
             // label
             final Label labelApiKey = formToolkit.createLabel(container,
-                  Messages.Pref_Weather_Label_ApiKey,
-                  SWT.WRAP);
+                  Messages.Pref_Weather_Label_ApiKey);
             GridDataFactory.fillDefaults()
-                  .indent(defaultHIndent, 0)
+                  .indent(DEFAULT_H_INDENT, 0)
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(labelApiKey);
 
             // text
-            _textApiKey_Value = new Text(container, SWT.PASSWORD | SWT.BORDER);
+            _textApiKey_Value = new Text(container, SWT.PASSWORD | SWT.BORDER | SWT.WRAP);
             _textApiKey_Value.setToolTipText(Messages.Pref_Weather_Label_WorldWeatherOnline_ApiKey_Tooltip);
             _textApiKey_Value.addModifyListener(event -> onModifyApiKey());
             GridDataFactory.fillDefaults()
@@ -99,7 +101,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
                         _textApiKey_Value,
                         chkShowHideApiKey.getSelection())));
             GridDataFactory.fillDefaults()
-                  .indent(defaultHIndent, 0)
+                  .indent(DEFAULT_H_INDENT, 0)
                   .applyTo(chkShowHideApiKey);
          }
          {
@@ -108,7 +110,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
              */
 
             // Link - see http(s)://www.worldweatheronline.com/developer/signup.aspx
-            final Link linkApiSignup = new Link(container, SWT.PUSH);
+            final Link linkApiSignup = new Link(container, SWT.PUSH | SWT.WRAP);
             linkApiSignup.setText(Messages.Pref_Weather_Link_ApiSignup);
             linkApiSignup.setEnabled(true);
             linkApiSignup.addListener(
@@ -116,7 +118,8 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
                   event -> WEB.openUrl("https://www.worldweatheronline.com/developer/signup.aspx")); //$NON-NLS-1$
             GridDataFactory.fillDefaults()
                   .span(2, 1)
-                  .indent(defaultHIndent, 0)
+                  .indent(DEFAULT_H_INDENT, 0)
+                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
                   .applyTo(linkApiSignup);
          }
          {
@@ -132,7 +135,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
                         WorldWeatherOnlineRetriever.getApiUrl() + _textApiKey_Value.getText(),
                         IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_NAME)));
             GridDataFactory.fillDefaults()
-                  .indent(defaultHIndent, 0)
+                  .indent(DEFAULT_H_INDENT, 0)
                   .align(SWT.BEGINNING, SWT.FILL)
                   .span(2, 1)
                   .applyTo(_btnTestConnection);
