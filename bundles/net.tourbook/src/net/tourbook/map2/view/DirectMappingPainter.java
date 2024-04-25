@@ -21,6 +21,7 @@ import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Map2Painter;
 import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.PaintedMapLocation;
+import de.byteholder.geoclipse.map.PaintedMarkerCluster;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import net.tourbook.tour.location.TourLocationExtended;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -50,7 +52,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class DirectMappingPainter implements IDirectPainter {
 
-   private Map2                       _map;
+   private Map2                       _map2;
    private TourData                   _tourData;
 
    private int                        _leftSliderValueIndex;
@@ -62,9 +64,9 @@ public class DirectMappingPainter implements IDirectPainter {
    private boolean                    _isShowSliderInLegend;
    private boolean                    _isShowValuePoint;
 
-   private boolean                    _isShowMapLocations_BoundingBox;
    private boolean                    _isShowLocations_Common;
    private boolean                    _isShowLocations_Tour;
+   private boolean                    _isShowMapLocations_BoundingBox;
 
    private List<TourLocationExtended> _allCommonLocations;
    private List<TourLocationExtended> _allTourLocations;
@@ -101,13 +103,13 @@ public class DirectMappingPainter implements IDirectPainter {
    private final Image _imageValuePoint;
 
    /**
-    * @param map
+    * @param map2
     * @param state
     *
     */
-   public DirectMappingPainter(final Map2 map) {
+   public DirectMappingPainter(final Map2 map2) {
 
-      _map = map;
+      _map2 = map2;
 
 // SET_FORMATTING_OFF
 
@@ -235,11 +237,48 @@ public class DirectMappingPainter implements IDirectPainter {
       }
    }
 
+   private void drawClusterMarker(final DirectPainterContext painterContext,
+                                  final PaintedMarkerCluster hoveredClusterMarker) {
+
+      final GC gc = painterContext.gc;
+
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+
+      final Rectangle clusterRectangle = hoveredClusterMarker.clusterRectangle;
+
+      gc.setAntialias(markerConfig.isClusterSymbolAntialiased ? SWT.ON : SWT.OFF);
+      gc.setTextAntialias(markerConfig.isClusterTextAntialiased ? SWT.ON : SWT.OFF);
+
+      gc.setForeground(UI.SYS_COLOR_RED);
+
+      // draw outline
+      gc.setLineWidth(1);
+      gc.drawOval(
+
+            clusterRectangle.x,
+            clusterRectangle.y,
+
+            clusterRectangle.width,
+            clusterRectangle.height);
+
+      // draw label
+      final Font gcFontBackup = gc.getFont();
+      gc.setFont(_map2.getClusterFont());
+
+      gc.drawString(
+            hoveredClusterMarker.clusterLabel,
+            hoveredClusterMarker.clusterLabelDevX,
+            hoveredClusterMarker.clusterLabelDevY,
+            true);
+
+      gc.setFont(gcFontBackup);
+   }
+
    private void drawMapLocation(final DirectPainterContext painterContext,
                                 final List<TourLocationExtended> allTourLocations) {
 
-      final MP mp = _map.getMapProvider();
-      final int zoomLevel = _map.getZoom();
+      final MP mp = _map2.getMapProvider();
+      final int zoomLevel = _map2.getZoom();
 
       final GC gc = painterContext.gc;
       final Rectangle mapViewport = painterContext.mapViewport;
@@ -385,6 +424,7 @@ public class DirectMappingPainter implements IDirectPainter {
             final int iconDevX = requestedDevX - imageWidth2;
             final int iconDevY = requestedDevY - imageHeight;
 
+            // set rectangle from the icon image
             final Rectangle paintedRectangle = new Rectangle(
 
                   iconDevX,
@@ -412,14 +452,14 @@ public class DirectMappingPainter implements IDirectPainter {
                gc.setClipping((Rectangle) null);
             }
 
-            Rectangle paintedTopLeftPos = null;
+            Rectangle paintedTextRectangle = null;
 
             final List<FormattedWord> allFormattedLocationNameWords = tourLocationExtended.allFormattedLocationNameWords;
             if (allFormattedLocationNameWords.size() > 0) {
 
                final Point locationNameBoundingBox = tourLocationExtended.locationNameBoundingBox;
 
-               paintedTopLeftPos = _textWrapPainter.drawPreformattedText(
+               paintedTextRectangle = _textWrapPainter.drawPreformattedText(
 
                      gc,
 
@@ -437,7 +477,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
                );
 
-               paintedRectangle.add(paintedTopLeftPos);
+               // extend rectangle with the painted text
+               paintedRectangle.add(paintedTextRectangle);
             }
 
             // keep location for mouse actions
@@ -448,7 +489,7 @@ public class DirectMappingPainter implements IDirectPainter {
                // map location is hovered
 
                hoveredLocation = paintedRectangle;
-               hoveredTextLocation = paintedTopLeftPos;
+               hoveredTextLocation = paintedTextRectangle;
                hoveredIconX = iconDevX;
                hoveredIconY = iconDevY;
                hoveredTexts = tourLocationExtended.allFormattedLocationNameWords;
@@ -485,8 +526,8 @@ public class DirectMappingPainter implements IDirectPainter {
                                    final Image markerImage,
                                    final boolean isYPosCenter) {
 
-      final MP mp = _map.getMapProvider();
-      final int zoomLevel = _map.getZoom();
+      final MP mp = _map2.getMapProvider();
+      final int zoomLevel = _map2.getZoom();
 
       final double[] latitudeSerie = _tourData.latitudeSerie;
       final double[] longitudeSerie = _tourData.longitudeSerie;
@@ -579,8 +620,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
    private void drawSliderPath_Multiple(final GC gc, final DirectPainterContext painterContext) {
 
-      final MP mp = _map.getMapProvider();
-      final int zoomLevel = _map.getZoom();
+      final MP mp = _map2.getMapProvider();
+      final int zoomLevel = _map2.getZoom();
 
       final double[] latitudeSerie = _tourData.latitudeSerie;
       final double[] longitudeSerie = _tourData.longitudeSerie;
@@ -711,8 +752,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
    private void drawSliderPath_One(final GC gc, final DirectPainterContext painterContext) {
 
-      final MP mp = _map.getMapProvider();
-      final int zoomLevel = _map.getZoom();
+      final MP mp = _map2.getMapProvider();
+      final int zoomLevel = _map2.getZoom();
 
       final double[] latitudeSerie = _tourData.latitudeSerie;
       final double[] longitudeSerie = _tourData.longitudeSerie;
@@ -792,7 +833,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
    private void drawValueMarkerInLegend(final DirectPainterContext painterContext) {
 
-      final MapLegend mapLegend = _map.getLegend();
+      final MapLegend mapLegend = _map2.getLegend();
 
       if (mapLegend == null) {
          return;
@@ -803,7 +844,7 @@ public class DirectMappingPainter implements IDirectPainter {
          return;
       }
 
-      final List<Map2Painter> allMapPainter = _map.getMapPainter();
+      final List<Map2Painter> allMapPainter = _map2.getMapPainter();
       if (allMapPainter == null || allMapPainter.isEmpty()) {
          return;
       }
@@ -863,8 +904,14 @@ public class DirectMappingPainter implements IDirectPainter {
    @Override
    public void paint(final DirectPainterContext painterContext) {
 
-      if (_map == null) {
+      if (_map2 == null) {
          return;
+      }
+
+      final PaintedMarkerCluster hoveredClusterMarker = _map2.getHoveredClusterMarker();
+      if (hoveredClusterMarker != null) {
+
+         drawClusterMarker(painterContext, hoveredClusterMarker);
       }
 
       if (_isShowLocations_Tour || _isShowLocations_Common) {

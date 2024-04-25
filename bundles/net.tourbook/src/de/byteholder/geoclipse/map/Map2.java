@@ -96,6 +96,7 @@ import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.ToolTip;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -105,6 +106,7 @@ import net.tourbook.map.location.MapLocationToolTip;
 import net.tourbook.map2.view.Map2ConfigManager;
 import net.tourbook.map2.view.Map2MarkerConfig;
 import net.tourbook.map2.view.Map2View;
+import net.tourbook.map2.view.MarkerClusterToolTip;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.TourPainterConfiguration;
 import net.tourbook.map2.view.WayPointToolTipProvider;
@@ -378,7 +380,11 @@ public class Map2 extends Canvas {
    private final AtomicInteger             _newOverlay_RunnableCounter = new AtomicInteger();
    private Rectangle                       _newOverlay_Viewport_Visible;
    private Rectangle                       _newOverlay_Viewport_NotVisible;
+
    private DistanceClustering<ClusterItem> _distanceClustering         = new DistanceClustering<>();
+   private List<PaintedMarkerCluster>      _allPaintedMarkerClusters   = new ArrayList<>();
+   private PaintedMarkerCluster            _hoveredMarkerCluster;
+   private MarkerClusterToolTip            _markerCluster_Tooltip;
 
    private final NumberFormat              _nf0;
    private final NumberFormat              _nf1;
@@ -744,6 +750,7 @@ public class Map2 extends Canvas {
 // SET_FORMATTING_ON
 
       _mapLocation_Tooltip = new MapLocationToolTip(this);
+      _markerCluster_Tooltip = new MarkerClusterToolTip(this);
 
       _poiImage = TourbookPlugin.getImageDescriptor(Images.POI_InMap).createImage();
       _poiImageBounds = _poiImage.getBounds();
@@ -1493,6 +1500,10 @@ public class Map2 extends Canvas {
       return _centerMapBy;
    }
 
+   public Font getClusterFont() {
+      return _clusterFont;
+   }
+
    /**
     * Gets the current common location of the map. This property does not change when the user pans
     * the map. This property is bound.
@@ -1501,6 +1512,11 @@ public class Map2 extends Canvas {
     */
    public GeoPosition getCommonLocation() {
       return _commonLocation;
+   }
+
+   public PaintedMarkerCluster getHoveredClusterMarker() {
+
+      return _hoveredMarkerCluster;
    }
 
    public PaintedMapLocation getHoveredMapLocation() {
@@ -1646,6 +1662,16 @@ public class Map2 extends Canvas {
     */
    public MP getMapProvider() {
       return _mp;
+   }
+
+   /**
+    * Is used to activate/deactivate the tooltip
+    *
+    * @return
+    */
+   public ToolTip getMarkerClusterTooltip() {
+
+      return _markerCluster_Tooltip;
    }
 
    public GeoPosition getMouseDown_GeoPosition() {
@@ -3439,6 +3465,52 @@ public class Map2 extends Canvas {
          fireEvent_MapGrid(false, _geoGrid_Data_Hovered);
 
          return;
+      }
+
+      if (_allPaintedMarkerClusters.size() > 0) {
+
+         // marker clusters are painted
+
+         final PaintedMarkerCluster oldHoveredCluster = _hoveredMarkerCluster;
+         PaintedMarkerCluster newHoveredCluster = null;
+
+         _hoveredMarkerCluster = null;
+
+         for (final PaintedMarkerCluster paintedCluster : _allPaintedMarkerClusters) {
+
+            final Rectangle paintedRect = paintedCluster.clusterRectangle;
+
+            if (true
+                  && (_mouseMove_DevPosition_X > paintedRect.x)
+                  && (_mouseMove_DevPosition_X < paintedRect.x + paintedRect.width)
+                  && (_mouseMove_DevPosition_Y > paintedRect.y)
+                  && (_mouseMove_DevPosition_Y < paintedRect.y + paintedRect.height)) {
+
+               // a map location is hovered
+
+               _hoveredMarkerCluster = newHoveredCluster = paintedCluster;
+
+               break;
+            }
+         }
+
+         // repaint map when hovered state has changed
+         if (oldHoveredCluster == null && newHoveredCluster == null) {
+
+            // ignore
+
+         } else if (false
+
+               || oldHoveredCluster == null && newHoveredCluster != null
+               || oldHoveredCluster != null && newHoveredCluster == null
+
+               // now both should be NOT null
+               || oldHoveredCluster.clusterRectangle.equals(newHoveredCluster.clusterRectangle) == false) {
+
+            redraw();
+
+            return;
+         }
       }
 
       if (_directMapPainterContext.allPaintedMapLocations.size() > 0) {
@@ -5416,6 +5488,8 @@ public class Map2 extends Canvas {
 
       _newOverlay_Viewport_NotVisible = _worldPixel_TopLeft_Viewport;
 
+      final List<PaintedMarkerCluster> allPaintedClusters = new ArrayList<>();
+
       try {
 
          final Map2MarkerConfig map2Config = Map2ConfigManager.getActiveMarkerConfig();
@@ -5430,7 +5504,7 @@ public class Map2 extends Canvas {
 
                if (map2Config.isMarkerClustered) {
 
-                  paint_NewOverlay_30_ClusteredMarker(gc);
+                  paint_NewOverlay_30_AllClusterAndMarker(gc, allPaintedClusters);
 
                } else {
 
@@ -5447,6 +5521,8 @@ public class Map2 extends Canvas {
          _newOverlayImage_NotVisible = oldVisibleImage;
 
          _newOverlay_Viewport_Visible = _newOverlay_Viewport_NotVisible;
+
+         _allPaintedMarkerClusters = allPaintedClusters;
 
       } catch (final Exception e) {
 
@@ -5520,7 +5596,8 @@ public class Map2 extends Canvas {
       }
    }
 
-   private void paint_NewOverlay_30_ClusteredMarker(final GC gc) {
+   private void paint_NewOverlay_30_AllClusterAndMarker(final GC gc,
+                                                        final List<PaintedMarkerCluster> allPaintedClusters) {
 
       final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
 
@@ -5571,7 +5648,9 @@ public class Map2 extends Canvas {
                   gc,
                   geoPoint.getLatitude(),
                   geoPoint.getLongitude(),
-                  Integer.toString(numClusterItems))) {
+                  Integer.toString(numClusterItems),
+                  allPaintedClusters,
+                  clusterItem)) {
 
             }
 
@@ -5653,7 +5732,9 @@ public class Map2 extends Canvas {
    private boolean paint_NewOverlay_60_OneCluster(final GC gc,
                                                   final double latitude,
                                                   final double longitude,
-                                                  final String clusterLabel) {
+                                                  final String clusterLabel,
+                                                  final List<PaintedMarkerCluster> allPaintedClusters,
+                                                  final StaticCluster<?> staticCluster) {
 
       final Rectangle worldPixel_Viewport = _newOverlay_Viewport_NotVisible;
 
@@ -5746,14 +5827,6 @@ public class Map2 extends Canvas {
 
                   circleSize,
                   circleSize);
-
-//            gc.fillRectangle(
-//
-//                  ovalDevX,
-//                  ovalDevY,
-//
-//                  circleSize,
-//                  circleSize);
          }
 
          gc.setForeground(markerConfig.clusterOutline_Color);
@@ -5770,29 +5843,33 @@ public class Map2 extends Canvas {
 
                   circleSize,
                   circleSize);
-
-//            gc.drawRectangle(
-//
-//                  ovalDevX,
-//                  ovalDevY,
-//
-//                  circleSize,
-//                  circleSize);
          }
+
+         final int clusterLabelDevX = devX + offsetX;
+         final int clusterLabelDevY = devY + offsetY;
 
          gc.drawString(
                text,
-               devX + offsetX,
-               devY + offsetY,
+               clusterLabelDevX,
+               clusterLabelDevY,
                true);
 
-//         gc.drawRectangle(
-//               devX,
-//               devY,
-//               textWidth,
-//               textHeight);
+         final Rectangle paintedClusterRectangle = new Rectangle(
 
-         gc.setAlpha(0xff);
+               ovalDevX,
+               ovalDevY,
+
+               circleSize,
+               circleSize);
+
+         allPaintedClusters.add(new PaintedMarkerCluster(
+
+               staticCluster,
+               paintedClusterRectangle,
+
+               clusterLabel,
+               clusterLabelDevX,
+               clusterLabelDevY));
       }
 
       return isClusterInViewport;
@@ -8768,6 +8845,8 @@ public class Map2 extends Canvas {
       _devGridPixelSize_Y = Math.abs(worldGrid2.y - worldGrid1.y);
 
       grid_UpdateGeoGridData();
+
+      _hoveredMarkerCluster = null;
    }
 
    public void zoomIn(final CenterMapBy centerMapBy) {
