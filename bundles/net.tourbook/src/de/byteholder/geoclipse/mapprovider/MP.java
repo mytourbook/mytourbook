@@ -572,6 +572,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     *         date/time is not available
     */
    public ZonedDateTime getDateTimeModified() {
+
       return _dateTimeModified;
    }
 
@@ -589,29 +590,34 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    }
 
    public int getDefaultZoomLevel() {
+
       return _defaultZoomLevel;
    }
 
    public String getDescription() {
-      return _description;
-   }
 
-   /**
-    * @return Returns the color which is used to dim the map images
-    */
-   public RGB getDimColor() {
-      return _dimmingColor;
+      return _description;
    }
 
    /**
     * @return Returns the alpha value which is used to dim the map images, default value is not to
     *         dim the map.
     */
-   public int getDimLevel() {
+   public int getDimAlpha() {
+
       return _dimmingAlphaValue;
    }
 
+   /**
+    * @return Returns the color which is used to dim the map images
+    */
+   public RGB getDimColor() {
+
+      return _dimmingColor;
+   }
+
    public double getDistance(final GeoPosition position1, final GeoPosition position2, final int zoom) {
+
       return _projection.getHorizontalDistance(position1, position2, zoom, this);
    }
 
@@ -648,12 +654,12 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
             final ThreadFactory threadFactory = new ThreadFactory() {
 
-               private int fCount = 0;
+               private int _threadNumber = 1;
 
                @Override
                public Thread newThread(final Runnable r) {
 
-                  final String threadName = "tile-pool-" + fCount++; //$NON-NLS-1$
+                  final String threadName = "2D Map - Image Downloader " + _threadNumber++; //$NON-NLS-1$
 
                   final Thread thread = new Thread(r, threadName);
 

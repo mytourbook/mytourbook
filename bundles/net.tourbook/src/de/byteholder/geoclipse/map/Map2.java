@@ -1288,7 +1288,7 @@ public class Map2 extends Canvas {
 
       final ThreadFactory threadFactory = runnable -> {
 
-         final Thread thread = new Thread(runnable, "2D Map new Overlay Painter");//$NON-NLS-1$
+         final Thread thread = new Thread(runnable, "2D Map - NEW Overlay Painter");//$NON-NLS-1$
 
          thread.setPriority(Thread.MIN_PRIORITY);
          thread.setDaemon(true);
@@ -5985,7 +5985,7 @@ public class Map2 extends Canvas {
 
       _overlayImageCache = new OverlayImageCache();
 
-      _overlayThread = new Thread("Paint Overlay Images") { //$NON-NLS-1$
+      _overlayThread = new Thread("2D Map - Paint Overlay Images") { //$NON-NLS-1$
          @Override
          public void run() {
 
@@ -6610,14 +6610,24 @@ public class Map2 extends Canvas {
       // get tile from the map provider, this also starts the loading of the tile image
       final Tile tile = _mp.getTile(tilePositionX, tilePositionY, _mapZoomLevel);
 
-      final Image tileImage = tile.getCheckedMapImage();
+      Image tileImage = tile.getCheckedMapImage();
       if (tileImage != null) {
 
          // tile map image is available and valid
 
+         // paint tile dimming when not yet done
+         if (tile.dimImage_TileKey != null) {
+
+            tileImage = paint_Tile_40_Dimming(tileImage, tile);
+
+            // reset state AFTER tile key is used
+            tile.dimImage_TileKey = null;
+         }
+
          gcMapImage.drawImage(tileImage, devTileViewport.x, devTileViewport.y);
 
       } else {
+
          paint_Tile_10_Image(gcMapImage, tile, devTileViewport);
       }
 
@@ -6897,6 +6907,34 @@ public class Map2 extends Canvas {
                devTileViewport.y + 80,
                devTileViewport.width - 20);
       }
+   }
+
+   private Image paint_Tile_40_Dimming(final Image tileImage, final Tile tile) {
+
+      if (tileImage == null || tileImage.isDisposed()) {
+         return null;
+      }
+
+      // create dimmed image
+      final Rectangle imageBounds = tileImage.getBounds();
+      final Image dimmedImage = new Image(_display, imageBounds);
+
+      final GC gcDimmedImage = new GC(dimmedImage);
+      {
+         gcDimmedImage.setBackground(new Color(_mp.getDimColor()));
+         gcDimmedImage.fillRectangle(imageBounds);
+
+         gcDimmedImage.setAlpha(_mp.getDimAlpha());
+         gcDimmedImage.drawImage(tileImage, 0, 0);
+      }
+      gcDimmedImage.dispose();
+
+      tileImage.dispose();
+
+      // replace tile image with the dimmed image
+      _mp.getTileImageCache().putIntoImageCache(tile.dimImage_TileKey, dimmedImage);
+
+      return dimmedImage;
    }
 
    private void paint_TileInfo_Error(final GC gc, final Rectangle devTileViewport, final Tile tile) {

@@ -2,9 +2,6 @@
  * Tile.java
  *
  * Created on March 14, 2006, 4:53 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 package de.byteholder.geoclipse.map;
 
@@ -208,6 +205,11 @@ public class Tile {
    public IntHashSet                       allPainted_Hash              = new IntHashSet();
 
    private TileImageLoaderCallback         _tileImageLoaderCallback;
+
+   /**
+    * Set map dimming when this tile image is painted the first time
+    */
+   public String                           dimImage_TileKey;
 
    /**
     * Create a new Tile at the specified tile point and zoom level
