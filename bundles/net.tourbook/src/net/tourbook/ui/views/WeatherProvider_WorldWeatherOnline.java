@@ -42,8 +42,6 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
 
    private final IPreferenceStore _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
-   private PixelConverter         _pc;
-
    /*
     * UI controls
     */
@@ -58,7 +56,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
                              final Composite parent,
                              final FormToolkit formToolkit) {
 
-      _pc = new PixelConverter(parent);
+      final PixelConverter _pc = new PixelConverter(parent);
 
       final Composite container = formToolkit.createComposite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
