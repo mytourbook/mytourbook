@@ -19,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.pgssoft.httpclient.HttpClientMock;
+
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -26,10 +28,12 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
+import net.tourbook.weather.WeatherUtils;
 import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
 
 import org.junit.jupiter.api.Test;
 
+import utils.FilesUtils;
 import utils.Initializer;
 
 /**
@@ -37,6 +41,13 @@ import utils.Initializer;
  */
 public class OpenWeatherMapRetrieverTests {
 
+   private static final String OPENWEATHERMAP_BASE_URL = WeatherUtils.OAUTH_PASSEUR_APP_URL
+         + "/openweathermap/3.0/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
+
+   private static final String OPENWEATHERMAP_FILE_PATH =
+         FilesUtils.rootPath + "data/weather/openweathermap/files/";                                         //$NON-NLS-1$
+
+   static HttpClientMock       httpClientMock;
    OpenWeatherMapRetriever openWeatherMapRetriever;
 
    @Test
