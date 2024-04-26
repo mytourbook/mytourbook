@@ -77,19 +77,19 @@ public class OpenWeatherMapRetrieverTests {
    @Test
    void testWeatherRetrieval_JulySecond2022() {
 
-      final List<String> timeStamps = Arrays.asList("1656720000",
-            "1656723600",
-            "1656727200",
-            "1656730800",
-            "1656734400",
-            "1656738000",
-            "1656741600",
-            "1656745200",
-            "1656748800",
-            "1656752400",
-            "1656756000",
-            "1656759600",
-            "1656763200");
+      final List<String> timeStamps = Arrays.asList("1656720000", //$NON-NLS-1$
+            "1656723600", //$NON-NLS-1$
+            "1656727200", //$NON-NLS-1$
+            "1656730800", //$NON-NLS-1$
+            "1656734400", //$NON-NLS-1$
+            "1656738000", //$NON-NLS-1$
+            "1656741600", //$NON-NLS-1$
+            "1656745200", //$NON-NLS-1$
+            "1656748800", //$NON-NLS-1$
+            "1656752400", //$NON-NLS-1$
+            "1656756000", //$NON-NLS-1$
+            "1656759600", //$NON-NLS-1$
+            "1656763200"); //$NON-NLS-1$
       final List<String> urls = new ArrayList<>();
 
       timeStamps.forEach(timeStamp -> {
