@@ -1,0 +1,29 @@
+{
+    "lat": 40.264,
+    "lon": -105.5885,
+    "timezone": "America/Denver",
+    "timezone_offset": -21600,
+    "data": [
+        {
+            "dt": 1656720000,
+            "sunrise": 1656675379,
+            "sunset": 1656729351,
+            "temp": 14.04,
+            "feels_like": 12.83,
+            "pressure": 1008,
+            "humidity": 51,
+            "dew_point": 4.07,
+            "clouds": 91,
+            "wind_speed": 2.68,
+            "wind_deg": 140,
+            "weather": [
+                {
+                    "id": 804,
+                    "main": "Clouds",
+                    "description": "overcast clouds",
+                    "icon": "04d"
+                }
+            ]
+        }
+    ]
+}
