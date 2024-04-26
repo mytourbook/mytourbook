@@ -20,6 +20,7 @@ import de.byteholder.geoclipse.map.PaintedMarkerCluster;
 
 import java.util.Collection;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.algorithm.distance.StaticCluster;
@@ -80,13 +81,6 @@ public class MarkerClusterToolTip extends ToolTip {
       final StaticCluster<?> markerCluster = _hoveredItem.markerCluster;
       final Collection<?> allClusterItems = markerCluster.getItems();
 
-      final GridDataFactory headerIndent = GridDataFactory.fillDefaults()
-
-            .span(2, 1)
-
-            // indent to the left that this text is aligned with the labels
-            .indent(-4, 0);
-
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).spacing(5, 3).applyTo(container);
@@ -107,8 +101,13 @@ public class MarkerClusterToolTip extends ToolTip {
 
                } else {
 
+                  String title = mapMarker.title;
+                  if (UI.IS_SCRAMBLE_DATA) {
+                     title = UI.scrambleText(title);
+                  }
+
                   final Label label = new Label(container, SWT.NONE);
-                  label.setText(mapMarker.title);
+                  label.setText(title);
                }
             }
          }
@@ -127,23 +126,54 @@ public class MarkerClusterToolTip extends ToolTip {
 
          final Point devMouse = _map2.toControl(display.getCursorLocation());
          final int devMouseX = devMouse.x;
+         final int devMouseY = devMouse.y;
 
-         final Rectangle itemBounds = _hoveredItem.clusterRectangle;
-         final int itemWidth2 = itemBounds.width / 2;
-         final int itemHeight = itemBounds.height;
+         final Rectangle clusterBounds = _hoveredItem.clusterRectangle;
+         final int clusterWidth = clusterBounds.width;
+         final int clusterWidth2 = clusterWidth / 2;
+         final int clusterHeight = clusterBounds.height;
+         final int clusterHeight2 = clusterBounds.height / 2;
 
          // center horizontally to the mouse position
-         final int devXDefault = devMouseX - tipSizeWidth / 2;
-         final int devY = itemBounds.y + itemHeight;
+         int devX = devMouseX - tipSizeWidth / 2;
+         int devY = clusterBounds.y + clusterHeight;
+
+         // offset that the tooltip can be hovered with the mouse
+         final int grabOffset = Math.min(10, clusterWidth2);
+
+         /*
+          * Set x/y depending on the mouse position, that the tooltip do not cover the side from
+          * where the cluster is hovered
+          */
+         if (devMouseX < clusterBounds.x + clusterWidth2) {
+
+            // show on the right side
+            devX = clusterBounds.x + clusterWidth - grabOffset;
+
+         } else if (devMouseX > clusterBounds.x + clusterWidth2) {
+
+            // show on the left side
+            devX = clusterBounds.x - tipSizeWidth + grabOffset;
+         }
+
+         if (devMouseY < clusterBounds.y + clusterHeight2) {
+
+            // show on the right side
+            devY = clusterBounds.y + clusterHeight - grabOffset;
+
+         } else if (devMouseY > clusterBounds.y + clusterHeight2) {
+
+            // show on the left side
+            devY = clusterBounds.y - tipSizeHeight + grabOffset;
+         }
 
          /*
           * Check if the tooltip is outside of the parent
           */
          final Rectangle mapBounds = _map2.getBounds();
          boolean isDevXAdjusted = false;
-         int devX = devXDefault;
 
-         if (devXDefault >= mapBounds.width) {
+         if (devX >= mapBounds.width) {
             devX = mapBounds.width - 40;
             isDevXAdjusted = true;
          }
@@ -161,7 +191,7 @@ public class MarkerClusterToolTip extends ToolTip {
 
             if (isDevXAdjusted) {
 
-               ttDisplayLocation = _map2.toDisplay(devXDefault - itemWidth2 + 20 - tipSizeWidth, devY);
+               ttDisplayLocation = _map2.toDisplay(devMouseX - tipSizeWidth / 2 - clusterWidth2 + 20 - tipSizeWidth, devY);
 
             } else {
 
@@ -176,7 +206,7 @@ public class MarkerClusterToolTip extends ToolTip {
              * repositioning
              */
 
-            ttDisplayLocation.y = ttDisplayLocation.y - tipSizeHeight - itemHeight;
+            ttDisplayLocation.y = ttDisplayLocation.y - tipSizeHeight - clusterHeight;
          }
 
          return fixupDisplayBoundsWithMonitor(tipSize, ttDisplayLocation);

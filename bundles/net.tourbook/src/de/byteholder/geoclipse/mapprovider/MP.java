@@ -1400,6 +1400,11 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       this._description = fDescription;
    }
 
+   /**
+    * @param isDimMap
+    * @param dimLevel
+    * @param dimColor
+    */
    public void setDimLevel(final boolean isDimMap, final int dimLevel, final RGB dimColor) {
 
       // convert dimLevel 0...10 into alpha value 0...255

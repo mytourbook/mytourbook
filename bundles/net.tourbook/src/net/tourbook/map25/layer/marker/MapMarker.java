@@ -20,12 +20,21 @@ public class MapMarker implements ClusterItem {
    public MarkerSymbol markerSymbol;
 
    /**
+    * Device position for the marker which is within a cluster, this is used to visualize the
+    * markers in a cluster
+    */
+   public int          devX;
+   public int          devY;
+
+   /**
     * @param title
     *           this should be <b>singleLine</b> (no <code>'\n'</code> )
     * @param description
     *           a <b>multiLine</b> description ( <code>'\n'</code> possible)
     */
-   public MapMarker(final String title, final String description, final GeoPoint geoPoint) {
+   public MapMarker(final String title,
+                    final String description,
+                    final GeoPoint geoPoint) {
 
       this.title = title;
       this.description = description;

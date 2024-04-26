@@ -24,6 +24,7 @@ import de.byteholder.geoclipse.map.PaintedMapLocation;
 import de.byteholder.geoclipse.map.PaintedMarkerCluster;
 import de.byteholder.geoclipse.mapprovider.MP;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ import net.tourbook.common.ui.TextWrapPainter;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.map2.Messages;
+import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.tour.location.TourLocationExtended;
 
 import org.eclipse.swt.SWT;
@@ -46,6 +48,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
@@ -237,6 +240,12 @@ public class DirectMappingPainter implements IDirectPainter {
       }
    }
 
+   /**
+    * Highligh the cluster and its markers
+    *
+    * @param painterContext
+    * @param hoveredClusterMarker
+    */
    private void drawClusterMarker(final DirectPainterContext painterContext,
                                   final PaintedMarkerCluster hoveredClusterMarker) {
 
@@ -249,7 +258,54 @@ public class DirectMappingPainter implements IDirectPainter {
       gc.setAntialias(markerConfig.isClusterSymbolAntialiased ? SWT.ON : SWT.OFF);
       gc.setTextAntialias(markerConfig.isClusterTextAntialiased ? SWT.ON : SWT.OFF);
 
-      gc.setForeground(UI.SYS_COLOR_RED);
+      /*
+       * Draw all markers in the cluster
+       */
+      if (markerConfig.isShowClusterMarker) {
+
+         final Collection<?> allClusterItems = hoveredClusterMarker.markerCluster.getItems();
+
+         if (allClusterItems.size() > 0) {
+
+            final float markerSize = 6;
+
+            final Path path = new Path(gc.getDevice());
+            {
+               for (final Object clusterItem : allClusterItems) {
+
+                  if (clusterItem instanceof final MapMarker mapMarker) {
+
+                     path.addRectangle(
+                           mapMarker.devX,
+                           mapMarker.devY,
+                           markerSize,
+                           markerSize);
+                  }
+               }
+
+               gc.setForeground(markerConfig.clusterFill_Color);
+               gc.drawPath(path);
+            }
+
+            path.dispose();
+         }
+      }
+
+
+      // fill background
+      if (markerConfig.isFillClusterSymbol) {
+
+         gc.setBackground(markerConfig.clusterOutline_Color);
+         gc.fillOval(
+
+               clusterRectangle.x,
+               clusterRectangle.y,
+
+               clusterRectangle.width,
+               clusterRectangle.height);
+      }
+
+      gc.setForeground(markerConfig.clusterFill_Color);
 
       // draw outline
       gc.setLineWidth(1);

@@ -56,6 +56,7 @@ public class Map2MarkerConfig {
    public boolean isMarkerClustered          = true;
    public boolean isClusterSymbolAntialiased = true;
    public boolean isClusterTextAntialiased   = true;
+   public boolean isShowClusterMarker        = true;
 
    public boolean isFillClusterSymbol        = Map2ConfigManager.DEFAULT_IS_FILL_CLUSTER_SYMBOL;
    public int     clusterGridSize            = Map2ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
