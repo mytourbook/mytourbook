@@ -47,6 +47,8 @@ import utils.Initializer;
  */
 public class OpenWeatherMapRetrieverTests {
 
+   private static final String OPENWEATHERMAP_CURRENT_BASE_URL                     = WeatherUtils.OAUTH_PASSEUR_APP_URL
+         + "/openweathermap/3.0/current?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt=";               //$NON-NLS-1$
    private static final String OPENWEATHERMAP_TIMEMACHINE_BASE_URL                 = WeatherUtils.OAUTH_PASSEUR_APP_URL
          + "/openweathermap/3.0/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt=";           //$NON-NLS-1$
    private static final String OPENWEATHERMAP_AIRPOLLUTION_BASE_URL                = WeatherUtils.OAUTH_PASSEUR_APP_URL
@@ -57,6 +59,8 @@ public class OpenWeatherMapRetrieverTests {
 
    private static final String OPENWEATHERMAP_RESPONSE_BASE_FILE_PATH              =
          OPENWEATHERMAP_FILE_PATH + "LongsPeak-Manual-OpenWeatherMapResponse-%s.json";                                 //$NON-NLS-1$
+   private static final String OPENWEATHERMAP_CURRENT_RESPONSE_BASE_FILE_PATH      =
+         OPENWEATHERMAP_FILE_PATH + "LongsPeak-Manual-OpenWeatherMapCurrentResponse-%s.json";                          //$NON-NLS-1$
    private static final String OPENWEATHERMAP_AIRPOLLUTION_RESPONSE_BASE_FILE_PATH =
          OPENWEATHERMAP_FILE_PATH + "LongsPeak-Manual-OpenWeatherMapPollutionResponse-%sto%s.json";                    //$NON-NLS-1$
 
@@ -303,6 +307,8 @@ public class OpenWeatherMapRetrieverTests {
    @Test
    void weatherData_CurrentWeather() {
 
+      final String openWeatherMapResponse = Comparison.readFileContent(String.format(OPENWEATHERMAP_CURRENT_RESPONSE_BASE_FILE_PATH, 1656720000));
+
       final TourData tour = Initializer.importTour();
       //Set the tour start time to be within the current hour
       final ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.systemDefault());
@@ -311,9 +317,23 @@ public class OpenWeatherMapRetrieverTests {
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 
+      final String currentUrl = OPENWEATHERMAP_CURRENT_BASE_URL + tour.getTourStartTimeMS() / 1000;
+      httpClientMock.onGet(currentUrl).doReturn(openWeatherMapResponse);
+      final List<String> urls = new ArrayList<>();
+      urls.add(currentUrl);
+      final String openWeatherMapAirPollutionResponse = Comparison.readFileContent(String.format(OPENWEATHERMAP_AIRPOLLUTION_RESPONSE_BASE_FILE_PATH,
+            1714150800,
+            1714190400));
+      final String airPollutionUrl = String.format(OPENWEATHERMAP_AIRPOLLUTION_BASE_URL,
+            tour.getTourStartTimeMS() / 1000,
+            tour.getTourEndTimeMS() / 1000);
+      urls.add(airPollutionUrl);
+      httpClientMock.onGet(airPollutionUrl).doReturn(openWeatherMapAirPollutionResponse);
+
       openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
 
       assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData(), "The weather should have been retrieved"); //$NON-NLS-1$
+      urls.forEach(url -> httpClientMock.verify().get(url).called());
    }
 
    @Test
