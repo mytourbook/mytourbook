@@ -24,8 +24,11 @@ import com.pgssoft.httpclient.HttpClientMock;
 import java.lang.reflect.Field;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import net.tourbook.common.UI;
@@ -35,6 +38,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.weather.WeatherUtils;
 import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -324,9 +328,13 @@ public class OpenWeatherMapRetrieverTests {
       final String openWeatherMapAirPollutionResponse = Comparison.readFileContent(String.format(OPENWEATHERMAP_AIRPOLLUTION_RESPONSE_BASE_FILE_PATH,
             1714150800,
             1714190400));
+      final long tourStart = DateUtils.round(Date.from(tour.getTourStartTime().toInstant()), Calendar.HOUR).toInstant().getEpochSecond();
+      final long tourEnd = DateUtils.round(Date.from(tour.getTourStartTime().plus(tour.getTourDeviceTime_Elapsed(), ChronoUnit.SECONDS).toInstant()),
+            Calendar.HOUR)
+            .toInstant().getEpochSecond();
       final String airPollutionUrl = String.format(OPENWEATHERMAP_AIRPOLLUTION_BASE_URL,
-            tour.getTourStartTimeMS() / 1000,
-            tour.getTourEndTimeMS() / 1000);
+            tourStart,
+            tourEnd);
       urls.add(airPollutionUrl);
       httpClientMock.onGet(airPollutionUrl).doReturn(openWeatherMapAirPollutionResponse);
 
