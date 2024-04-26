@@ -21,8 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
 
+import java.lang.reflect.Field;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -31,8 +35,10 @@ import net.tourbook.data.TourData;
 import net.tourbook.weather.WeatherUtils;
 import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import utils.Comparison;
 import utils.FilesUtils;
 import utils.Initializer;
 
@@ -41,17 +47,43 @@ import utils.Initializer;
  */
 public class OpenWeatherMapRetrieverTests {
 
-   private static final String OPENWEATHERMAP_BASE_URL = WeatherUtils.OAUTH_PASSEUR_APP_URL
+   private static final String OPENWEATHERMAP_BASE_URL                = WeatherUtils.OAUTH_PASSEUR_APP_URL
          + "/openweathermap/3.0/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
 
-   private static final String OPENWEATHERMAP_FILE_PATH =
+   private static final String OPENWEATHERMAP_FILE_PATH               =
          FilesUtils.rootPath + "data/weather/openweathermap/files/";                                         //$NON-NLS-1$
 
+   private static final String OPENWEATHERMAP_RESPONSE_BASE_FILE_PATH =
+         OPENWEATHERMAP_FILE_PATH + "LongsPeak-Manual-OpenWeatherMapResponse-%s.json";                       //$NON-NLS-1$
+
    static HttpClientMock       httpClientMock;
-   OpenWeatherMapRetriever openWeatherMapRetriever;
+   OpenWeatherMapRetriever     openWeatherMapRetriever;
+
+   @BeforeAll
+   static void initAll() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+
+      httpClientMock = new HttpClientMock();
+      final Field field = OpenWeatherMapRetriever.class
+            .getSuperclass()
+            .getDeclaredField("httpClient"); //$NON-NLS-1$
+      field.setAccessible(true);
+      field.set(null, httpClientMock);
+   }
 
    @Test
    void testWeatherRetrieval_JulySecond2022() {
+
+      final List<String> timeStamps = Arrays.asList("1656720000");
+      final List<String> urls = new ArrayList<>();
+
+      timeStamps.forEach(timeStamp -> {
+
+         final String openWeatherMapResponse = Comparison.readFileContent(String.format(OPENWEATHERMAP_RESPONSE_BASE_FILE_PATH, timeStamp));
+
+         final String url = OPENWEATHERMAP_BASE_URL + "1656720000"; //$NON-NLS-1$
+         urls.add(url);
+         httpClientMock.onGet(url).doReturn(openWeatherMapResponse);
+      });
 
       final TourData tour = Initializer.importTour();
       //Tuesday, July 2, 2022 12:00:00 AM
@@ -71,6 +103,8 @@ public class OpenWeatherMapRetrieverTests {
       openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
 
       assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData(), "The weather was retrieved"); //$NON-NLS-1$
+
+      urls.forEach(url -> httpClientMock.verify().get(url).called());
 
 // SET_FORMATTING_OFF
 

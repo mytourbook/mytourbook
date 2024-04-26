@@ -19,6 +19,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -448,6 +452,16 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       final String weatherRequestWithParameters = buildWeatherApiRequest(requestedTime, BASE_TIME_MACHINE_API_URL);
 
       final String rawWeatherData = sendWeatherApiRequest(weatherRequestWithParameters);
+      try {
+         Files.writeString(Paths.get(
+               "C:\\Users\\frederic\\git\\MT\\mytourbook\\bundles\\net.tourbook.tests\\src\\test\\data\\weather\\openweathermap\\files\\LongsPeak-Manual-OpenWeatherMapResponse-"
+                     + requestedTime + ".json"),
+               rawWeatherData,
+               StandardOpenOption.CREATE_NEW);
+      } catch (final IOException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
       if (StringUtils.isNullOrEmpty(rawWeatherData)) {
          return null;
       }
