@@ -82,22 +82,8 @@ public class OpenWeatherMapRetrieverTests {
       field.set(null, httpClientMock);
    }
 
-   @Test
-   void testWeatherRetrieval_JulySecond2022() {
+   private List<String> arrangeUrls(final List<String> timeStamps) {
 
-      final List<String> timeStamps = Arrays.asList("1656720000", //$NON-NLS-1$
-            "1656723600", //$NON-NLS-1$
-            "1656727200", //$NON-NLS-1$
-            "1656730800", //$NON-NLS-1$
-            "1656734400", //$NON-NLS-1$
-            "1656738000", //$NON-NLS-1$
-            "1656741600", //$NON-NLS-1$
-            "1656745200", //$NON-NLS-1$
-            "1656748800", //$NON-NLS-1$
-            "1656752400", //$NON-NLS-1$
-            "1656756000", //$NON-NLS-1$
-            "1656759600", //$NON-NLS-1$
-            "1656763200"); //$NON-NLS-1$
       final List<String> urls = new ArrayList<>();
 
       timeStamps.forEach(timeStamp -> {
@@ -115,6 +101,28 @@ public class OpenWeatherMapRetrieverTests {
       final String airPollutionUrl = String.format(OPENWEATHERMAP_AIRPOLLUTION_BASE_URL, timeStamps.get(0), timeStamps.get(timeStamps.size() - 1));
       urls.add(airPollutionUrl);
       httpClientMock.onGet(airPollutionUrl).doReturn(openWeatherMapAirPollutionResponse);
+
+      return urls;
+   }
+
+   @Test
+   void testWeatherRetrieval_JulySecond2022() {
+
+      final List<String> timeStamps = Arrays.asList("1656720000", //$NON-NLS-1$
+            "1656723600", //$NON-NLS-1$
+            "1656727200", //$NON-NLS-1$
+            "1656730800", //$NON-NLS-1$
+            "1656734400", //$NON-NLS-1$
+            "1656738000", //$NON-NLS-1$
+            "1656741600", //$NON-NLS-1$
+            "1656745200", //$NON-NLS-1$
+            "1656748800", //$NON-NLS-1$
+            "1656752400", //$NON-NLS-1$
+            "1656756000", //$NON-NLS-1$
+            "1656759600", //$NON-NLS-1$
+            "1656763200"); //$NON-NLS-1$
+
+      final List<String> urls = arrangeUrls(timeStamps);
 
       final TourData tour = Initializer.importTour();
       //Tuesday, July 2, 2022 12:00:00 AM
@@ -173,25 +181,8 @@ public class OpenWeatherMapRetrieverTests {
             "1657101600", //$NON-NLS-1$
             "1657105200", //$NON-NLS-1$
             "1657108800"//$NON-NLS-1$
-
       );
-      final List<String> urls = new ArrayList<>();
-
-      timeStamps.forEach(timeStamp -> {
-
-         final String openWeatherMapResponse = Comparison.readFileContent(String.format(OPENWEATHERMAP_RESPONSE_BASE_FILE_PATH, timeStamp));
-
-         final String timeMachineUrl = OPENWEATHERMAP_TIMEMACHINE_BASE_URL + timeStamp;
-         urls.add(timeMachineUrl);
-         httpClientMock.onGet(timeMachineUrl).doReturn(openWeatherMapResponse);
-      });
-
-      final String openWeatherMapAirPollutionResponse = Comparison.readFileContent(String.format(OPENWEATHERMAP_AIRPOLLUTION_RESPONSE_BASE_FILE_PATH,
-            timeStamps.get(0),
-            timeStamps.get(timeStamps.size() - 1)));
-      final String airPollutionUrl = String.format(OPENWEATHERMAP_AIRPOLLUTION_BASE_URL, timeStamps.get(0), timeStamps.get(timeStamps.size() - 1));
-      urls.add(airPollutionUrl);
-      httpClientMock.onGet(airPollutionUrl).doReturn(openWeatherMapAirPollutionResponse);
+      final List<String> urls = arrangeUrls(timeStamps);
 
       final TourData tour = Initializer.importTour();
       //Tuesday, July 6, 2022 12:00:00 AM
@@ -250,25 +241,8 @@ public class OpenWeatherMapRetrieverTests {
             "1647122400", //$NON-NLS-1$
             "1647126000", //$NON-NLS-1$
             "1647129600"//$NON-NLS-1$
-
       );
-      final List<String> urls = new ArrayList<>();
-
-      timeStamps.forEach(timeStamp -> {
-
-         final String openWeatherMapResponse = Comparison.readFileContent(String.format(OPENWEATHERMAP_RESPONSE_BASE_FILE_PATH, timeStamp));
-
-         final String timeMachineUrl = OPENWEATHERMAP_TIMEMACHINE_BASE_URL + timeStamp;
-         urls.add(timeMachineUrl);
-         httpClientMock.onGet(timeMachineUrl).doReturn(openWeatherMapResponse);
-      });
-
-      final String openWeatherMapAirPollutionResponse = Comparison.readFileContent(String.format(OPENWEATHERMAP_AIRPOLLUTION_RESPONSE_BASE_FILE_PATH,
-            timeStamps.get(0),
-            timeStamps.get(timeStamps.size() - 1)));
-      final String airPollutionUrl = String.format(OPENWEATHERMAP_AIRPOLLUTION_BASE_URL, timeStamps.get(0), timeStamps.get(timeStamps.size() - 1));
-      urls.add(airPollutionUrl);
-      httpClientMock.onGet(airPollutionUrl).doReturn(openWeatherMapAirPollutionResponse);
+      final List<String> urls = arrangeUrls(timeStamps);
 
       final TourData tour = Initializer.importTour();
       //Tuesday, March 12, 2022 12:00:00 PM
