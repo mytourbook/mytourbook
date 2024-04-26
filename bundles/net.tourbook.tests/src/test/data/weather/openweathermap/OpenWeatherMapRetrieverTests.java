@@ -227,6 +227,39 @@ public class OpenWeatherMapRetrieverTests {
    @Test
    void testWeatherRetrieval_March2022() {
 
+      final List<String> timeStamps = Arrays.asList("1647086400", //$NON-NLS-1$
+            "1647090000", //$NON-NLS-1$
+            "1647093600", //$NON-NLS-1$
+            "1647097200", //$NON-NLS-1$
+            "1647100800", //$NON-NLS-1$
+            "1647104400", //$NON-NLS-1$
+            "1647108000", //$NON-NLS-1$
+            "1647111600", //$NON-NLS-1$
+            "1647115200", //$NON-NLS-1$
+            "1647118800", //$NON-NLS-1$
+            "1647122400", //$NON-NLS-1$
+            "1647126000", //$NON-NLS-1$
+            "1647129600"//$NON-NLS-1$
+
+      );
+      final List<String> urls = new ArrayList<>();
+
+      timeStamps.forEach(timeStamp -> {
+
+         final String openWeatherMapResponse = Comparison.readFileContent(String.format(OPENWEATHERMAP_RESPONSE_BASE_FILE_PATH, timeStamp));
+
+         final String timeMachineUrl = OPENWEATHERMAP_TIMEMACHINE_BASE_URL + timeStamp;
+         urls.add(timeMachineUrl);
+         httpClientMock.onGet(timeMachineUrl).doReturn(openWeatherMapResponse);
+      });
+
+      final String openWeatherMapAirPollutionResponse = Comparison.readFileContent(String.format(OPENWEATHERMAP_AIRPOLLUTION_RESPONSE_BASE_FILE_PATH,
+            timeStamps.get(0),
+            timeStamps.get(timeStamps.size() - 1)));
+      final String airPollutionUrl = String.format(OPENWEATHERMAP_AIRPOLLUTION_BASE_URL, timeStamps.get(0), timeStamps.get(timeStamps.size() - 1));
+      urls.add(airPollutionUrl);
+      httpClientMock.onGet(airPollutionUrl).doReturn(openWeatherMapAirPollutionResponse);
+
       final TourData tour = Initializer.importTour();
       //Tuesday, March 12, 2022 12:00:00 PM
       final ZonedDateTime zonedDateTime = ZonedDateTime.of(
@@ -245,6 +278,8 @@ public class OpenWeatherMapRetrieverTests {
       openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
 
       assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
+
+      urls.forEach(url -> httpClientMock.verify().get(url).called());
 
 // SET_FORMATTING_OFF
 
