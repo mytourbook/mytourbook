@@ -151,7 +151,8 @@ public class OpenWeatherMapRetrieverTests {
             () ->  assertEquals(1007,                            tour.getWeather_Pressure()),
             () ->  assertEquals(14.04f,                          tour.getWeather_Temperature_Max()),
             () ->  assertEquals(2.84f,                           tour.getWeather_Temperature_Min()),
-            () ->  assertEquals(6.57f,                           tour.getWeather_Temperature_WindChill()));
+            () ->  assertEquals(6.57f,                           tour.getWeather_Temperature_WindChill()),
+            () ->  assertEquals(IWeather.AIRQUALITY_ID_GOOD,     tour.getWeather_AirQuality()));
 
 // SET_FORMATTING_ON
    }
@@ -216,18 +217,19 @@ public class OpenWeatherMapRetrieverTests {
 // SET_FORMATTING_OFF
 
       assertAll(
-            () ->  assertEquals("light rain",             tour.getWeather()), //$NON-NLS-1$
-            () ->  assertEquals(IWeather.WEATHER_ID_RAIN, tour.getWeather_Clouds()),
-            () ->  assertEquals(7.92f,                    tour.getWeather_Temperature_Average()),
-            () ->  assertEquals(2,                        tour.getWeather_Wind_Speed()),
-            () ->  assertEquals(295,                      tour.getWeather_Wind_Direction()),
-            () ->  assertEquals(78,                       tour.getWeather_Humidity()),
-            () ->  assertEquals(2.45f,                    tour.getWeather_Precipitation()),
-            () ->  assertEquals(0,                        tour.getWeather_Snowfall()),
-            () ->  assertEquals(1007,                     tour.getWeather_Pressure()),
-            () ->  assertEquals(11.79f,                   tour.getWeather_Temperature_Max()),
-            () ->  assertEquals(5.89f,                    tour.getWeather_Temperature_Min()),
-            () ->  assertEquals(7.75f,                    tour.getWeather_Temperature_WindChill()));
+            () ->  assertEquals("light rain",                tour.getWeather()), //$NON-NLS-1$
+            () ->  assertEquals(IWeather.WEATHER_ID_RAIN,    tour.getWeather_Clouds()),
+            () ->  assertEquals(7.92f,                       tour.getWeather_Temperature_Average()),
+            () ->  assertEquals(2,                           tour.getWeather_Wind_Speed()),
+            () ->  assertEquals(295,                         tour.getWeather_Wind_Direction()),
+            () ->  assertEquals(78,                          tour.getWeather_Humidity()),
+            () ->  assertEquals(2.45f,                       tour.getWeather_Precipitation()),
+            () ->  assertEquals(0,                           tour.getWeather_Snowfall()),
+            () ->  assertEquals(1007,                        tour.getWeather_Pressure()),
+            () ->  assertEquals(11.79f,                      tour.getWeather_Temperature_Max()),
+            () ->  assertEquals(5.89f,                       tour.getWeather_Temperature_Min()),
+            () ->  assertEquals(7.75f,                       tour.getWeather_Temperature_WindChill()),
+            () ->  assertEquals(IWeather.AIRQUALITY_ID_GOOD, tour.getWeather_AirQuality()));
 
 // SET_FORMATTING_ON
    }
@@ -303,7 +305,8 @@ public class OpenWeatherMapRetrieverTests {
             () ->  assertEquals(1023,                            tour.getWeather_Pressure()),
             () ->  assertEquals(-0.36f,                          tour.getWeather_Temperature_Max()),
             () ->  assertEquals(-10.77f,                         tour.getWeather_Temperature_Min()),
-            () ->  assertEquals(-9.96f,                          tour.getWeather_Temperature_WindChill()));
+            () ->  assertEquals(-9.96f,                          tour.getWeather_Temperature_WindChill()),
+            () ->  assertEquals(IWeather.AIRQUALITY_ID_FAIR,     tour.getWeather_AirQuality()));
 
 // SET_FORMATTING_ON
    }
