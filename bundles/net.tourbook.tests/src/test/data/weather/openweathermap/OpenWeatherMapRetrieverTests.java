@@ -47,14 +47,18 @@ import utils.Initializer;
  */
 public class OpenWeatherMapRetrieverTests {
 
-   private static final String OPENWEATHERMAP_BASE_URL                = WeatherUtils.OAUTH_PASSEUR_APP_URL
-         + "/openweathermap/3.0/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
+   private static final String OPENWEATHERMAP_TIMEMACHINE_BASE_URL                 = WeatherUtils.OAUTH_PASSEUR_APP_URL
+         + "/openweathermap/3.0/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt=";           //$NON-NLS-1$
+   private static final String OPENWEATHERMAP_AIRPOLLUTION_BASE_URL                = WeatherUtils.OAUTH_PASSEUR_APP_URL
+         + "/openweathermap/air_pollution?lat=40.263996&lon=-105.58854099999999&start=%s&end=%s";                      //$NON-NLS-1$
 
-   private static final String OPENWEATHERMAP_FILE_PATH               =
-         FilesUtils.rootPath + "data/weather/openweathermap/files/";                                         //$NON-NLS-1$
+   private static final String OPENWEATHERMAP_FILE_PATH                            =
+         FilesUtils.rootPath + "data/weather/openweathermap/files/";                                                   //$NON-NLS-1$
 
-   private static final String OPENWEATHERMAP_RESPONSE_BASE_FILE_PATH =
-         OPENWEATHERMAP_FILE_PATH + "LongsPeak-Manual-OpenWeatherMapResponse-%s.json";                       //$NON-NLS-1$
+   private static final String OPENWEATHERMAP_RESPONSE_BASE_FILE_PATH              =
+         OPENWEATHERMAP_FILE_PATH + "LongsPeak-Manual-OpenWeatherMapResponse-%s.json";                                 //$NON-NLS-1$
+   private static final String OPENWEATHERMAP_AIRPOLLUTION_RESPONSE_BASE_FILE_PATH =
+         OPENWEATHERMAP_FILE_PATH + "LongsPeak-Manual-OpenWeatherMapPollutionResponse-%sto%s.json";                    //$NON-NLS-1$
 
    static HttpClientMock       httpClientMock;
    OpenWeatherMapRetriever     openWeatherMapRetriever;
@@ -73,17 +77,36 @@ public class OpenWeatherMapRetrieverTests {
    @Test
    void testWeatherRetrieval_JulySecond2022() {
 
-      final List<String> timeStamps = Arrays.asList("1656720000");
+      final List<String> timeStamps = Arrays.asList("1656720000",
+            "1656723600",
+            "1656727200",
+            "1656730800",
+            "1656734400",
+            "1656738000",
+            "1656741600",
+            "1656745200",
+            "1656748800",
+            "1656752400",
+            "1656756000",
+            "1656759600",
+            "1656763200");
       final List<String> urls = new ArrayList<>();
 
       timeStamps.forEach(timeStamp -> {
 
          final String openWeatherMapResponse = Comparison.readFileContent(String.format(OPENWEATHERMAP_RESPONSE_BASE_FILE_PATH, timeStamp));
 
-         final String url = OPENWEATHERMAP_BASE_URL + "1656720000"; //$NON-NLS-1$
-         urls.add(url);
-         httpClientMock.onGet(url).doReturn(openWeatherMapResponse);
+         final String timeMachineUrl = OPENWEATHERMAP_TIMEMACHINE_BASE_URL + timeStamp;
+         urls.add(timeMachineUrl);
+         httpClientMock.onGet(timeMachineUrl).doReturn(openWeatherMapResponse);
       });
+
+      final String openWeatherMapAirPollutionResponse = Comparison.readFileContent(String.format(OPENWEATHERMAP_AIRPOLLUTION_RESPONSE_BASE_FILE_PATH,
+            timeStamps.get(0),
+            timeStamps.get(timeStamps.size() - 1)));
+      final String airPollutionUrl = String.format(OPENWEATHERMAP_AIRPOLLUTION_BASE_URL, timeStamps.get(0), timeStamps.get(timeStamps.size() - 1));
+      urls.add(airPollutionUrl);
+      httpClientMock.onGet(airPollutionUrl).doReturn(openWeatherMapAirPollutionResponse);
 
       final TourData tour = Initializer.importTour();
       //Tuesday, July 2, 2022 12:00:00 AM
