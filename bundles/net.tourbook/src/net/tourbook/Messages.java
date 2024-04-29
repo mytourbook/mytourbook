@@ -1362,6 +1362,7 @@ public class Messages extends NLS {
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_WeatherStation_Link;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection;
    public static String        Log_HistoricalWeatherRetriever_002_RetrievalError;
+   public static String        Log_HistoricalWeatherRetriever_003_RetrievalLimitReached;
 
    public static String        Map25_Config_ClusterAlgorithm_FirstMarker_Distance;
    public static String        Map25_Config_ClusterAlgorithm_FirstMarker_Grid;

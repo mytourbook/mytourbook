@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -32,6 +33,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
@@ -39,12 +41,18 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
+import net.tourbook.tour.TourLogManager;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WeatherUtils;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.eclipse.jface.dialogs.IDialogSettings;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
+
+   private static final int    MAX_REQUESTS_PER_DAY     = 50;
+   private static final String STATE_LAST_REQUEST_DAY   = "lastRequestDay";      //$NON-NLS-1$
+   private static final String STATE_REQUEST_COUNT      = "requestCount";        //$NON-NLS-1$
 
    private static final String OPENWEATHERMAP3_BASEPATH = "/openweathermap/3.0"; //$NON-NLS-1$
 
@@ -53,10 +61,12 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    private static final String BASE_CURRENT_API_URL      = WeatherUtils.OAUTH_PASSEUR_APP_URL + OPENWEATHERMAP3_BASEPATH + "/current";     //$NON-NLS-1$
 
    // https://openweathermap.org/api/air-pollution
-   private static final String BASE_AIR_POLLUTION_API_URL = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/air_pollution"; //$NON-NLS-1$
+   private static final String          BASE_AIR_POLLUTION_API_URL = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/air_pollution"; //$NON-NLS-1$
 
-   private TimeMachineResult   timeMachineResult          = null;
-   private AirPollutionResult  airPollutionResult         = null;
+   private static final IDialogSettings _state                     = TourbookPlugin.getState("OpenWeatherMapRetriever");                   //$NON-NLS-1$
+   private TimeMachineResult            timeMachineResult          = null;
+
+   private AirPollutionResult           airPollutionResult         = null;
 
    public OpenWeatherMapRetriever(final TourData tourData) {
 
@@ -230,6 +240,24 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       return weatherRequestWithParameters.toString();
    }
 
+   private boolean canMakeRequest() {
+
+      final String lastRequestDayString = _state.get(STATE_LAST_REQUEST_DAY);
+      final LocalDate lastRequestDay = lastRequestDayString != null ? LocalDate.parse(lastRequestDayString) : LocalDate.of(2000, 1, 1);
+      int requestCount = getRequestCount();
+
+      if (!LocalDate.now().equals(lastRequestDay)) {
+         _state.put(STATE_LAST_REQUEST_DAY, LocalDate.now().toString());
+         requestCount = 0;
+      }
+
+      if (requestCount >= MAX_REQUESTS_PER_DAY) {
+         return false;
+      }
+
+      return true;
+   }
+
    private AirPollutionResult deserializeAirPollutionData(final String airPollutionDataResponse) {
 
       airPollutionResult = null;
@@ -303,6 +331,19 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       }
 
       return newTimeMachineResult;
+   }
+
+   private int getRequestCount() {
+
+      int requestCount;
+      try {
+
+         requestCount = _state.getInt(STATE_REQUEST_COUNT);
+
+      } catch (final NumberFormatException e) {
+         requestCount = 0;
+      }
+      return requestCount;
    }
 
    /**
@@ -399,6 +440,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
             return false;
          }
 
+         final int requestCount = getRequestCount();
+         _state.put(STATE_REQUEST_COUNT, requestCount + 1);
+
          timeMachineResult.addAllData(newTimeMachineResult.getData());
          final List<WeatherData> hourly = timeMachineResult.getData();
 
@@ -437,6 +481,14 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
    @Override
    public boolean retrieveHistoricalWeatherData() {
+
+      // If the user has reached the maximum number of requests per day, we notify
+      // them and abort the retrieval
+      if (!canMakeRequest()) {
+
+         TourLogManager.log_ERROR(Messages.Log_HistoricalWeatherRetriever_003_RetrievalLimitReached);
+         return false;
+      }
 
       final boolean isHistoricalWeatherRetrieved = retrieveHistoricalWeather();
 
