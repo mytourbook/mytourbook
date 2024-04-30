@@ -2842,7 +2842,12 @@ public class TourManager {
 
       final int numTours = allTourData.size();
 
-      if (numTours < 2) {
+      final String weatherRetrievalFailureLogMessage = TourWeatherRetriever.getWeatherRetrievalFailureLogMessage(weatherProvider);
+      if (!TourWeatherRetriever.canRetrieveWeather(weatherProvider)) {
+
+         TourLogManager.log_ERROR(weatherRetrievalFailureLogMessage);
+
+      } else if (numTours < 2) {
 
          BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
@@ -2869,6 +2874,11 @@ public class TourManager {
                         numTours));
 
                   if (monitor.isCanceled()) {
+                     break;
+                  }
+
+                  if (!TourWeatherRetriever.canRetrieveWeather(weatherProvider)) {
+                     TourLogManager.log_ERROR(weatherRetrievalFailureLogMessage);
                      break;
                   }
 

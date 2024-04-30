@@ -63,28 +63,14 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                "Weather data is logged"); //$NON-NLS-1$
       }
    }
-
-   private static final String    baseApiUrl   = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
-   private static final String    keyParameter = "?key=";                                                          //$NON-NLS-1$
-
+   private static final String    BASE_API_URL  = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
+   private static final String    KEY_PARAMETER = "?key=";                                                          //$NON-NLS-1$
    private String                 endDate;
+
    private String                 startDate;
+   private final IPreferenceStore prefStore     = TourbookPlugin.getPrefStore();
 
-   private final IPreferenceStore prefStore    = TourbookPlugin.getPrefStore();
-   private Data                   weatherData  = null;
-
-   /*
-    * @param tour
-    * The tour for which we need to retrieve the weather data.
-    */
-   public WorldWeatherOnlineRetriever(final TourData tourData) {
-
-      super(tourData);
-
-      startDate = TimeTools.Formatter_YearMonthDay.format(tour.getTourStartTime());
-      endDate = TimeTools.Formatter_YearMonthDay.format(tour.getTourStartTime()
-            .plusSeconds(tour.getTourDeviceTime_Elapsed()));
-   }
+   private Data                   weatherData   = null;
 
    public static String convertWeatherCodeToMTWeatherClouds(final String weatherCode) {
 
@@ -174,7 +160,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    }
 
    public static String getApiUrl() {
-      return baseApiUrl + keyParameter;
+      return BASE_API_URL + KEY_PARAMETER;
    }
 
    @Override
@@ -261,7 +247,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
    private String buildWeatherApiRequest() {
 
-      final StringBuilder weatherRequestWithParameters = new StringBuilder(baseApiUrl + UI.SYMBOL_QUESTION_MARK);
+      final StringBuilder weatherRequestWithParameters = new StringBuilder(BASE_API_URL + UI.SYMBOL_QUESTION_MARK);
 
    // SET_FORMATTING_OFF
 
@@ -345,6 +331,11 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    }
 
    @Override
+   protected String getWeatherRetrievalFailureLogMessage() {
+      return UI.EMPTY_STRING;
+   }
+
+   @Override
    public boolean retrieveHistoricalWeatherData() {
 
       final String weatherRequestWithParameters = buildWeatherApiRequest();
@@ -395,6 +386,16 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 // SET_FORMATTING_ON
 
       return true;
+   }
+
+   @Override
+   public void setTourData(final TourData tourData) {
+
+      super.setTourData(tourData);
+
+      startDate = TimeTools.Formatter_YearMonthDay.format(tour.getTourStartTime());
+      endDate = TimeTools.Formatter_YearMonthDay.format(tour.getTourStartTime()
+            .plusSeconds(tour.getTourDeviceTime_Elapsed()));
    }
 
 }

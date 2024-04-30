@@ -41,7 +41,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
-import net.tourbook.data.TourData;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WeatherUtils;
 
@@ -67,11 +66,6 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    private TimeMachineResult            timeMachineResult          = null;
 
    private AirPollutionResult           airPollutionResult         = null;
-
-   public OpenWeatherMapRetriever(final TourData tourData) {
-
-      super(tourData);
-   }
 
    /**
     * Codes : https://openweathermap.org/weather-conditions#Icon-list
@@ -339,6 +333,11 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    private int getRequestCount() {
 
       return Util.getStateInt(_state, STATE_REQUEST_COUNT, 0);
+   }
+
+   @Override
+   protected String getWeatherRetrievalFailureLogMessage() {
+      return Messages.Log_HistoricalWeatherRetriever_003_RetrievalLimitReached;
    }
 
    /**

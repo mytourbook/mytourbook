@@ -30,7 +30,6 @@ import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.weather.IWeather;
-import net.tourbook.data.TourData;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WeatherUtils;
 
@@ -39,11 +38,6 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
    private static final String baseApiUrl    = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/weatherapi"; //$NON-NLS-1$
 
    private HistoryResult       historyResult = null;
-
-   public WeatherApiRetriever(final TourData tourData) {
-
-      super(tourData);
-   }
 
    public static String convertWeatherCodeToMTWeatherClouds(final int weatherCode) {
 
@@ -223,6 +217,11 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       }
 
       return newHistoryResult;
+   }
+
+   @Override
+   protected String getWeatherRetrievalFailureLogMessage() {
+      return UI.EMPTY_STRING;
    }
 
    @Override

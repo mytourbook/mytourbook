@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2022 Frédéric Bard
+ * Copyright (C) 2019, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,15 +47,7 @@ public abstract class HistoricalWeatherRetriever {
    public long               tourMiddleTime;
    public long               tourStartTime;
 
-   protected HistoricalWeatherRetriever(final TourData tourData) {
-      tour = tourData;
-
-      searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(tour);
-
-      tourStartTime = tour.getTourStartTimeMS() / 1000;
-      tourEndTime = tour.getTourEndTimeMS() / 1000;
-      tourMiddleTime = tourStartTime + ((tourEndTime - tourStartTime) / 2);
-   }
+   protected HistoricalWeatherRetriever() {}
 
    /**
     * This method ensures the connection to the API can be made successfully.
@@ -114,6 +106,8 @@ public abstract class HistoricalWeatherRetriever {
 
    protected abstract boolean canMakeRequest();
 
+   protected abstract String getWeatherRetrievalFailureLogMessage();
+
    private void logVendorError(final String exceptionMessage) {
 
       TourLogManager.subLog_ERROR(NLS.bind(
@@ -155,5 +149,20 @@ public abstract class HistoricalWeatherRetriever {
       }
 
       return weatherHistoryData;
+   }
+
+   /**
+    * @param tour
+    *           The tour for which we need to retrieve the weather data.
+    */
+   public void setTourData(final TourData tourData) {
+
+      tour = tourData;
+
+      searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(tour);
+
+      tourStartTime = tour.getTourStartTimeMS() / 1000;
+      tourEndTime = tour.getTourEndTimeMS() / 1000;
+      tourMiddleTime = tourStartTime + ((tourEndTime - tourStartTime) / 2);
    }
 }
