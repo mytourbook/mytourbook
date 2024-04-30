@@ -244,7 +244,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    protected boolean canMakeRequest() {
 
       final String lastRequestDayString = Util.getStateString(_state, STATE_LAST_REQUEST_DAY, UI.EMPTY_STRING);
-      final LocalDate lastRequestDay = lastRequestDayString != null ? LocalDate.parse(lastRequestDayString) : LocalDate.of(2000, 1, 1);
+      final LocalDate lastRequestDay = StringUtils.hasContent(lastRequestDayString)
+            ? LocalDate.parse(lastRequestDayString)
+            : LocalDate.of(2000, 1, 1);
       int requestCount = getRequestCount();
 
       if (!LocalDate.now().equals(lastRequestDay)) {
