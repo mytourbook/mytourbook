@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -58,6 +58,15 @@ public final class TourWeatherRetriever {
 
       case IWeatherProvider.Pref_Weather_Provider_None:
       default:
+         return false;
+      }
+
+      // Check if the weather retrieval can be performed.
+      // For example: the user could have reached the maximum number of requests
+      // per day. In this case, we notify them and abort the retrieval
+      if (!historicalWeatherRetriever.canMakeRequest()) {
+
+         TourLogManager.log_ERROR(Messages.Log_HistoricalWeatherRetriever_003_RetrievalLimitReached);
          return false;
       }
 

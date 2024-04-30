@@ -112,6 +112,8 @@ public abstract class HistoricalWeatherRetriever {
     */
    protected abstract String buildDetailedWeatherLog(final boolean isCompressed);
 
+   protected abstract boolean canMakeRequest();
+
    private void logVendorError(final String exceptionMessage) {
 
       TourLogManager.subLog_ERROR(NLS.bind(
@@ -120,7 +122,7 @@ public abstract class HistoricalWeatherRetriever {
             exceptionMessage));
    }
 
-   public abstract boolean retrieveHistoricalWeatherData();
+   protected abstract boolean retrieveHistoricalWeatherData();
 
    public String sendWeatherApiRequest(final String weatherRequestWithParameters) {
 

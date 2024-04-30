@@ -99,13 +99,16 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       case "248": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_OVERCAST;
          break;
+
       case "113": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_CLEAR;
          break;
+
       case "116": //$NON-NLS-1$
       case "260": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
          break;
+
       case "299": //$NON-NLS-1$
       case "302": //$NON-NLS-1$
       case "305": //$NON-NLS-1$
@@ -118,6 +121,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       case "389": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_RAIN;
          break;
+
       case "332": //$NON-NLS-1$
       case "335": //$NON-NLS-1$
       case "338": //$NON-NLS-1$
@@ -134,9 +138,11 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       case "395": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_SNOW;
          break;
+
       case "200": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
          break;
+
       case "374": //$NON-NLS-1$
       case "362": //$NON-NLS-1$
       case "350": //$NON-NLS-1$
@@ -146,6 +152,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       case "386": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
          break;
+
       case "311": //$NON-NLS-1$
       case "353": //$NON-NLS-1$
       case "185": //$NON-NLS-1$
@@ -157,6 +164,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       case "296": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_DRIZZLE;
          break;
+
       default:
          weatherType = UI.EMPTY_STRING;
          break;
@@ -277,11 +285,17 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       return weatherRequestWithParameters.toString();
    }
 
+   @Override
+   protected boolean canMakeRequest() {
+      return true;
+   }
+
    /**
     * Deserialize a JSON weather data object into a WeatherData object.
     *
     * @param weatherDataResponse
     *           A string containing a historical weather data JSON object.
+    *
     * @return The serialized weather data.
     */
    private Data deserializeWeatherData(final String weatherDataResponse) {

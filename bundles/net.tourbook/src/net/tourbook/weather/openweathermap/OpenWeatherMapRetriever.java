@@ -42,7 +42,6 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
-import net.tourbook.tour.TourLogManager;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WeatherUtils;
 
@@ -241,7 +240,8 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       return weatherRequestWithParameters.toString();
    }
 
-   private boolean canMakeRequest() {
+   @Override
+   protected boolean canMakeRequest() {
 
       final String lastRequestDayString = Util.getStateString(_state, STATE_LAST_REQUEST_DAY, UI.EMPTY_STRING);
       final LocalDate lastRequestDay = lastRequestDayString != null ? LocalDate.parse(lastRequestDayString) : LocalDate.of(2000, 1, 1);
@@ -474,14 +474,6 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
    @Override
    public boolean retrieveHistoricalWeatherData() {
-
-      // If the user has reached the maximum number of requests per day, we notify
-      // them and abort the retrieval
-      if (!canMakeRequest()) {
-
-         TourLogManager.log_ERROR(Messages.Log_HistoricalWeatherRetriever_003_RetrievalLimitReached);
-         return false;
-      }
 
       final boolean isHistoricalWeatherRetrieved = retrieveHistoricalWeather();
 

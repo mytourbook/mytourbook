@@ -58,15 +58,19 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       case 1147:
          weatherType = IWeather.WEATHER_ID_OVERCAST;
          break;
+
       case 1000:
          weatherType = IWeather.WEATHER_ID_CLEAR;
          break;
+
       case 1003:
          weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
          break;
+
       case 1087:
          weatherType = IWeather.WEATHER_ID_LIGHTNING;
          break;
+
       case 1192:
       case 1195:
       case 1201:
@@ -77,6 +81,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       case 1276:
          weatherType = IWeather.WEATHER_ID_RAIN;
          break;
+
       case 1066:
       case 1069:
       case 1114:
@@ -96,6 +101,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       case 1282:
          weatherType = IWeather.WEATHER_ID_SNOW;
          break;
+
       case 1063:
       case 1186:
       case 1189:
@@ -105,6 +111,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       case 1273:
          weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
          break;
+
       case 1072:
       case 1150:
       case 1153:
@@ -115,6 +122,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       case 1198:
          weatherType = IWeather.WEATHER_ID_DRIZZLE;
          break;
+
       default:
          weatherType = UI.EMPTY_STRING;
          break;
@@ -185,6 +193,11 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 // SET_FORMATTING_ON
 
       return weatherRequestWithParameters.toString();
+   }
+
+   @Override
+   protected boolean canMakeRequest() {
+      return true;
    }
 
    private HistoryResult deserializeWeatherData(final String weatherDataResponse) {
