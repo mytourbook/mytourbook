@@ -39,6 +39,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourLogManager;
@@ -242,7 +243,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
    private boolean canMakeRequest() {
 
-      final String lastRequestDayString = _state.get(STATE_LAST_REQUEST_DAY);
+      final String lastRequestDayString = Util.getStateString(_state, STATE_LAST_REQUEST_DAY, UI.EMPTY_STRING);
       final LocalDate lastRequestDay = lastRequestDayString != null ? LocalDate.parse(lastRequestDayString) : LocalDate.of(2000, 1, 1);
       int requestCount = getRequestCount();
 
@@ -335,15 +336,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
    private int getRequestCount() {
 
-      int requestCount;
-      try {
-
-         requestCount = _state.getInt(STATE_REQUEST_COUNT);
-
-      } catch (final NumberFormatException e) {
-         requestCount = 0;
-      }
-      return requestCount;
+      return Util.getStateInt(_state, STATE_REQUEST_COUNT, 0);
    }
 
    /**
