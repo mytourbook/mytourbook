@@ -139,7 +139,8 @@ public class OpenWeatherMapRetrieverTests {
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 
-      openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
+      openWeatherMapRetriever = new OpenWeatherMapRetriever();
+      openWeatherMapRetriever.setTourData(tour);
 
       assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData(), "The weather was retrieved"); //$NON-NLS-1$
 
@@ -199,8 +200,8 @@ public class OpenWeatherMapRetrieverTests {
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 
-      openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
-
+      openWeatherMapRetriever = new OpenWeatherMapRetriever();
+      openWeatherMapRetriever.setTourData(tour);
       assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
 
       urls.forEach(url -> httpClientMock.verify().get(url).called());
@@ -259,8 +260,8 @@ public class OpenWeatherMapRetrieverTests {
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 
-      openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
-
+      openWeatherMapRetriever = new OpenWeatherMapRetriever();
+      openWeatherMapRetriever.setTourData(tour);
       assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
 
       urls.forEach(url -> httpClientMock.verify().get(url).called());
@@ -315,8 +316,8 @@ public class OpenWeatherMapRetrieverTests {
       urls.add(airPollutionUrl);
       httpClientMock.onGet(airPollutionUrl).doReturn(openWeatherMapAirPollutionResponse);
 
-      openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
-
+      openWeatherMapRetriever = new OpenWeatherMapRetriever();
+      openWeatherMapRetriever.setTourData(tour);
       assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData(), "The weather should have been retrieved"); //$NON-NLS-1$
       urls.forEach(url -> httpClientMock.verify().get(url).called());
    }
