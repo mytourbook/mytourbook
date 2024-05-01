@@ -190,7 +190,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
    }
 
    @Override
-   protected boolean canMakeRequest() {
+   public boolean canMakeRequest() {
       return true;
    }
 
@@ -225,7 +225,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
    }
 
    @Override
-   protected boolean retrieveHistoricalWeatherData() {
+   public boolean retrieveHistoricalWeatherData() {
 
       historyResult = new HistoryResult();
 

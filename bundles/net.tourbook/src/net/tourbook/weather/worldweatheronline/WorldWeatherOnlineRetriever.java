@@ -272,7 +272,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    }
 
    @Override
-   protected boolean canMakeRequest() {
+   public boolean canMakeRequest() {
       return true;
    }
 
@@ -336,7 +336,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    }
 
    @Override
-   protected boolean retrieveHistoricalWeatherData() {
+   public boolean retrieveHistoricalWeatherData() {
 
       final String weatherRequestWithParameters = buildWeatherApiRequest();
 

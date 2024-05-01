@@ -474,7 +474,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    }
 
    @Override
-   protected boolean retrieveHistoricalWeatherData() {
+   public boolean retrieveHistoricalWeatherData() {
 
       final boolean isHistoricalWeatherRetrieved = retrieveHistoricalWeather();
 

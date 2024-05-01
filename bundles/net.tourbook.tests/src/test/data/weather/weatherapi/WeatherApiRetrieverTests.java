@@ -72,6 +72,7 @@ public class WeatherApiRetrieverTests {
       weatherApiRetriever.setTourData(tour);
 
       assertTrue(weatherApiRetriever.retrieveHistoricalWeatherData());
+      assertTrue(weatherApiRetriever.canMakeRequest());
       httpClientMock.verify().get(url).called();
    }
 

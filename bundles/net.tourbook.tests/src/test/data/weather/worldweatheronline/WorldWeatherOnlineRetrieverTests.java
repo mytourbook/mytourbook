@@ -75,6 +75,7 @@ public class WorldWeatherOnlineRetrieverTests {
       historicalWeatherRetriever.setTourData(tour);
 
       assertTrue(historicalWeatherRetriever.retrieveHistoricalWeatherData());
+      assertTrue(historicalWeatherRetriever.canMakeRequest());
       httpClientMock.verify().get(url).called();
 
 // SET_FORMATTING_OFF
