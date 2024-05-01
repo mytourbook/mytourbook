@@ -237,10 +237,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    @Override
    protected boolean canMakeRequest() {
 
-      final String lastRequestDayString = Util.getStateString(_state, STATE_LAST_REQUEST_DAY, UI.EMPTY_STRING);
-      final LocalDate lastRequestDay = StringUtils.hasContent(lastRequestDayString)
-            ? LocalDate.parse(lastRequestDayString)
-            : LocalDate.of(2000, 1, 1);
+      final LocalDate lastRequestDay = Util.getStateDate(_state, STATE_LAST_REQUEST_DAY, LocalDate.of(2000, 1, 1));
       int requestCount = getRequestCount();
 
       if (!LocalDate.now().equals(lastRequestDay)) {
@@ -248,11 +245,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          requestCount = 0;
       }
 
-      if (requestCount >= MAX_REQUESTS_PER_DAY) {
-         return false;
-      }
-
-      return true;
+      return requestCount < MAX_REQUESTS_PER_DAY;
    }
 
    private AirPollutionResult deserializeAirPollutionData(final String airPollutionDataResponse) {
