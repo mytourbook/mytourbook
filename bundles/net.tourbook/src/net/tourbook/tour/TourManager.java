@@ -1827,17 +1827,17 @@ public class TourManager {
 
       Object[] selectedItems = null;
 
-      if (tourViewer instanceof TourBookView) {
+      if (tourViewer instanceof final TourBookView tourBookView) {
 
-         selectedItems = (((TourBookView) tourViewer).getSelectedTourIDs()).toArray();
+         selectedItems = tourBookView.getSelectedTourIDs().toArray();
 
-      } else if (tourViewer instanceof CollatedToursView) {
+      } else if (tourViewer instanceof final CollatedToursView collatedToursView) {
 
-         selectedItems = (((CollatedToursView) tourViewer).getSelectedTourIDs()).toArray();
+         selectedItems = collatedToursView.getSelectedTourIDs().toArray();
 
-      } else if (tourViewer instanceof RawDataView) {
+      } else if (tourViewer instanceof final RawDataView rawDataView) {
 
-         selectedItems = (((RawDataView) tourViewer).getSelectedTourIDs()).toArray();
+         selectedItems = rawDataView.getSelectedTourIDs().toArray();
       }
 
       return selectedItems;
@@ -2975,7 +2975,7 @@ public class TourManager {
     * Saves tours which have been modified and updates the tour data editor, fires a
     * {@link TourEventId#TOUR_CHANGED} event.<br>
     * <br>
-    * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
+    * If a tour is opened in the {@link TourDataEditorView}, the tour will be saved only when the
     * tour is not dirty, if the tour is dirty, saving is not done. The change event is always fired.
     *
     * @param modifiedTours
@@ -2991,7 +2991,7 @@ public class TourManager {
     * Saves tours which have been modified and updates the tour data editor, fires a
     * {@link TourEventId#TOUR_CHANGED} event.<br>
     * <br>
-    * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
+    * If a tour is opened in the {@link TourDataEditorView}, the tour will be saved only when the
     * tour is not dirty, if the tour is dirty, saving is not done.
     *
     * @param modifiedTours
@@ -4467,7 +4467,7 @@ public class TourManager {
    }
 
    /**
-    * 0 values will be ignored when computing min/maxvalues.
+    * 0 values will be ignored when computing min/max values.
     *
     * @param dataSerie
     * @param chartType
@@ -4479,7 +4479,7 @@ public class TourManager {
    }
 
    /**
-    * 0 values will be ignored when computing min/maxvalues.
+    * 0 values will be ignored when computing min/max values.
     *
     * @param dataSerie
     * @param chartType

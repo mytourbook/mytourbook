@@ -40,8 +40,6 @@ public class WeatherProvider_WeatherApi implements IWeatherProvider {
 
    private static final String URL_WEATHERAPI_COM = "https://www.weatherapi.com/";//$NON-NLS-1$
 
-   private PixelConverter      _pc;
-
    public WeatherProvider_WeatherApi() {}
 
    @Override
@@ -49,7 +47,7 @@ public class WeatherProvider_WeatherApi implements IWeatherProvider {
                              final Composite parent,
                              final FormToolkit formToolkit) {
 
-      _pc = new PixelConverter(parent);
+      final PixelConverter _pc = new PixelConverter(parent);
 
       final Composite container = formToolkit.createComposite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
