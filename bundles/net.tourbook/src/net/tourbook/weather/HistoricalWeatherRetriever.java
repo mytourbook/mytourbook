@@ -118,7 +118,7 @@ public abstract class HistoricalWeatherRetriever {
 
    protected abstract boolean retrieveHistoricalWeatherData();
 
-   public String sendWeatherApiRequest(final String weatherRequestWithParameters) {
+   protected String sendWeatherApiRequest(final String weatherRequestWithParameters) {
 
       String weatherHistoryData = UI.EMPTY_STRING;
 

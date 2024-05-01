@@ -336,7 +336,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    }
 
    @Override
-   public boolean retrieveHistoricalWeatherData() {
+   protected boolean retrieveHistoricalWeatherData() {
 
       final String weatherRequestWithParameters = buildWeatherApiRequest();
 

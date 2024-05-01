@@ -35,7 +35,7 @@ import net.tourbook.weather.WeatherUtils;
 
 public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 
-   private static final String baseApiUrl    = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/weatherapi"; //$NON-NLS-1$
+   private static final String BASE_API_URL    = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/weatherapi"; //$NON-NLS-1$
 
    private HistoryResult       historyResult = null;
 
@@ -126,7 +126,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
    }
 
    public static String getBaseApiUrl() {
-      return baseApiUrl;
+      return BASE_API_URL;
    }
 
    @Override
@@ -175,7 +175,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 
    private String buildWeatherApiRequest(final LocalDate requestedDate) {
 
-      final StringBuilder weatherRequestWithParameters = new StringBuilder(baseApiUrl + UI.SYMBOL_QUESTION_MARK);
+      final StringBuilder weatherRequestWithParameters = new StringBuilder(BASE_API_URL + UI.SYMBOL_QUESTION_MARK);
 
 // SET_FORMATTING_OFF
 
@@ -225,7 +225,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
    }
 
    @Override
-   public boolean retrieveHistoricalWeatherData() {
+   protected boolean retrieveHistoricalWeatherData() {
 
       historyResult = new HistoryResult();
 
