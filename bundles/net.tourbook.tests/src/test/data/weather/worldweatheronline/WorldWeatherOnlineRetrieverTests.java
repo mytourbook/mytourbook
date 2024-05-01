@@ -71,8 +71,9 @@ public class WorldWeatherOnlineRetrieverTests {
             .doReturn(worldWeatherOnlineResponse);
 
       final TourData tour = Initializer.importTour();
-      historicalWeatherRetriever = new WorldWeatherOnlineRetriever(tour);
-
+      historicalWeatherRetriever = new WorldWeatherOnlineRetriever();
+historicalWeatherRetriever.setTourData(tour);
+      
       assertTrue(historicalWeatherRetriever.retrieveHistoricalWeatherData());
       httpClientMock.verify().get(url).called();
 
@@ -121,8 +122,9 @@ public class WorldWeatherOnlineRetrieverTests {
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 
-      historicalWeatherRetriever = new WorldWeatherOnlineRetriever(tour);
-
+      historicalWeatherRetriever = new WorldWeatherOnlineRetriever();
+historicalWeatherRetriever.setTourData(tour);
+      
       assertTrue(historicalWeatherRetriever.retrieveHistoricalWeatherData());
       httpClientMock.verify().get(url).called();
 
