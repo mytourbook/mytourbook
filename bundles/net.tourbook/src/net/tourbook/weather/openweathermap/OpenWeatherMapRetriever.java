@@ -241,6 +241,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       int requestCount = getRequestCount();
 
       if (!LocalDate.now().equals(lastRequestDay)) {
+
          _state.put(STATE_LAST_REQUEST_DAY, LocalDate.now().toString());
          requestCount = 0;
       }
