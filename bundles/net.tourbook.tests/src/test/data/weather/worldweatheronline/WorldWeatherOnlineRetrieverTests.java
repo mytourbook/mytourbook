@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2023 Frédéric Bard
+ * Copyright (C) 2020, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -72,8 +72,8 @@ public class WorldWeatherOnlineRetrieverTests {
 
       final TourData tour = Initializer.importTour();
       historicalWeatherRetriever = new WorldWeatherOnlineRetriever();
-historicalWeatherRetriever.setTourData(tour);
-      
+      historicalWeatherRetriever.setTourData(tour);
+
       assertTrue(historicalWeatherRetriever.retrieveHistoricalWeatherData());
       httpClientMock.verify().get(url).called();
 
@@ -123,8 +123,8 @@ historicalWeatherRetriever.setTourData(tour);
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 
       historicalWeatherRetriever = new WorldWeatherOnlineRetriever();
-historicalWeatherRetriever.setTourData(tour);
-      
+      historicalWeatherRetriever.setTourData(tour);
+
       assertTrue(historicalWeatherRetriever.retrieveHistoricalWeatherData());
       httpClientMock.verify().get(url).called();
 

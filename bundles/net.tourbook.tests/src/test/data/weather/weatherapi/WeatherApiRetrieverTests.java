@@ -69,7 +69,8 @@ public class WeatherApiRetrieverTests {
       httpClientMock.onGet(url).doReturn(weatherApiResponse);
 
       weatherApiRetriever = new WeatherApiRetriever();
-weatherApiRetriever.setTourData(tour);
+      weatherApiRetriever.setTourData(tour);
+
       assertTrue(weatherApiRetriever.retrieveHistoricalWeatherData());
       httpClientMock.verify().get(url).called();
    }
