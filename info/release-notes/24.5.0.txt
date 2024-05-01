@@ -56,6 +56,10 @@ New
 
 * Tour Weather (Frederic)
   - OpenWeatherMap: Migration to the One Call 3.0 API per the recent announcement
+    Note: While the weather retrieval for this vendor remains free and the historical 
+          weather data can be retrieved for the last 40+ years (from January 1st 1979),
+          the total number of requests per day is limited to 1000. Because of this, 
+          no more than 50 requests per day can be performed by each user.
     https://openweathermap.org/api/one-call-api
 
 * Tour Nutrition (Frederic)
