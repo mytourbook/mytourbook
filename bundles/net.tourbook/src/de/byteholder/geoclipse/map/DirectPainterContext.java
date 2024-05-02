@@ -29,6 +29,13 @@ public class DirectPainterContext {
    public GC                       gc;
 
    /**
+    * Contains the client area of the map without trimmings, this rectangle has the width and
+    * height of the map image
+    *
+    */
+   public Rectangle                clientArea;
+
+   /**
     * Viewport for the current map image in world pixel
     */
    public Rectangle                mapViewport;
@@ -43,5 +50,4 @@ public class DirectPainterContext {
     * not hovered
     */
    public PaintedMapLocation       hoveredMapLocation;
-
 }

@@ -27,6 +27,7 @@ import de.byteholder.geoclipse.mapprovider.MP;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
@@ -51,6 +52,9 @@ import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
+
+import particlelabeling.PointFeature;
+import particlelabeling.PointFeatureLabeler;
 
 public class DirectMappingPainter implements IDirectPainter {
 
@@ -300,7 +304,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
       // draw hovered cluster marker
       if (markerConfig.isShowClusterMarker) {
-         paintHoveredClusterMarkers(gc, hoveredClusterMarker);
+         paintHoveredClusterMarkers_NEW(painterContext, hoveredClusterMarker);
       }
 
    }
@@ -1083,6 +1087,124 @@ public class DirectMappingPainter implements IDirectPainter {
             gc.drawString(text, devX, devY, true);
 
          }
+      }
+   }
+
+   private void paintHoveredClusterMarkers_NEW(final DirectPainterContext painterContext, final PaintedMarkerCluster hoveredClusterMarker) {
+
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+
+      final float markerSize = 6;
+      final int maxVisibleHoveredMarker = 2000;
+
+      final Object[] allClusterItemsAsArray = hoveredClusterMarker.allClusterItemsAsArray;
+      final int numMarkers = allClusterItemsAsArray.length;
+
+      if (numMarkers == 0) {
+         return;
+      }
+
+      final GC gc = painterContext.gc;
+      final Rectangle clientArea = painterContext.clientArea;
+
+      final int mapWidth = clientArea.width;
+      final int mapHeight = clientArea.height;
+
+      // draw something to respect later
+
+      final Vector<PointFeature> allPointfeatures = new Vector<>();
+
+      for (int itemIndex = 0; itemIndex < numMarkers; itemIndex++) {
+
+         final Object clusterItem = allClusterItemsAsArray[itemIndex];
+
+         if (clusterItem instanceof final MapMarker mapMarker) {
+
+            String text = mapMarker.title;
+
+            if (UI.IS_SCRAMBLE_DATA) {
+               text = UI.scrambleText(text);
+            }
+
+            final int devX = mapMarker.devX;
+            final int devY = mapMarker.devY;
+
+            final Point textExtent = gc.textExtent(text);
+
+            final int textWidth = textExtent.x;
+            final int textHeight = textExtent.y;
+
+            allPointfeatures.add(new PointFeature(
+
+                  text,
+                  -1,
+
+                  devX,
+                  devY,
+
+                  textWidth,
+                  textHeight));
+         }
+      }
+
+      // generate the point-features to label and calculate their label-sizes
+
+      final PointFeatureLabeler labeler = new PointFeatureLabeler();
+
+      labeler.loadDataStandard(
+
+            allPointfeatures,
+
+            0,
+            mapWidth,
+            0,
+            mapHeight);
+
+//      final BufferedImage conflictMap = new BufferedImage(800, 600, BufferedImage.TYPE_INT_ARGB);
+//      labeler.respectMap(conflictMap);
+
+      labeler.label_StandardPipelineAll();
+
+      // all labeling is done now, the resulting label positions are stored within the point-features
+
+      for (int itemIndex = 0; itemIndex < numMarkers; itemIndex++) {
+
+         final PointFeature pointFeature = allPointfeatures.get(itemIndex);
+
+         if (pointFeature.labeled == false) {
+            continue;
+         }
+
+         String text = pointFeature.label;
+
+         if (UI.IS_SCRAMBLE_DATA) {
+            text = UI.scrambleText(text);
+         }
+
+         final int devX = (int) pointFeature.labelBoxL;
+         final int devY = (int) pointFeature.labelBoxT;
+
+         final Point textExtent = gc.textExtent(text);
+
+         final int textWidth = textExtent.x;
+         final int textHeight = textExtent.y;
+
+         gc.setBackground(UI.SYS_COLOR_WHITE);
+         gc.fillRectangle(
+               devX,
+               devY,
+               textWidth,
+               textHeight);
+
+         gc.setForeground(UI.SYS_COLOR_GRAY);
+         gc.drawRectangle(
+               devX,
+               devY,
+               textWidth,
+               textHeight);
+
+         gc.setForeground(UI.SYS_COLOR_BLACK);
+         gc.drawString(text, devX, devY, true);
       }
    }
 

@@ -29,7 +29,8 @@ Export-Package: cop.swt.widgets.viewers.table.celleditors,
  net.tourbook.common.weather,
  net.tourbook.common.widgets,
  net.tourbook.opengl,
- org.eclipse.nebula.widgets.opal.duallist.mt
+ org.eclipse.nebula.widgets.opal.duallist.mt,
+ particlelabeling
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.e4.core.contexts,

@@ -3867,6 +3867,7 @@ public class Map2 extends Canvas {
          // is drawing sliders in map/legend
 
          _directMapPainterContext.gc = gc;
+         _directMapPainterContext.clientArea = _clientArea;
          _directMapPainterContext.mapViewport = _worldPixel_TopLeft_Viewport;
 
          _directMapPainter.paint(_directMapPainterContext);

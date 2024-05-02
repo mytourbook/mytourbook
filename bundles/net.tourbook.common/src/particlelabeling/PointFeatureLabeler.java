@@ -248,8 +248,26 @@ public class PointFeatureLabeler extends Object {
     * @see #loadDataStandard(java.util.Vector, int, int, int, int)
     * @see #loadDataStandard(java.util.Vector, int, int, int, int, float, float, float, float)
     */
-   public void loadDataPriority(Vector<Vector<PointFeature>> pointfeatures, int labelAreaL, int labelAreaR, int labelAreaT, int labelAreaB) {
-      loadDataPriority(pointfeatures, labelAreaL, labelAreaR, labelAreaT, labelAreaB, 0, 0, 0, 0);
+   public void loadDataPriority(Vector<Vector<PointFeature>> pointfeatures,
+
+                                int labelAreaL,
+                                int labelAreaR,
+                                int labelAreaT,
+                                int labelAreaB) {
+
+      loadDataPriority(
+
+            pointfeatures,
+
+            labelAreaL,
+            labelAreaR,
+            labelAreaT,
+            labelAreaB,
+
+            0,
+            0,
+            0,
+            0);
    }
 
    /**
@@ -284,10 +302,12 @@ public class PointFeatureLabeler extends Object {
     * @see #loadDataStandard(java.util.Vector, int, int, int, int, float, float, float, float)
     */
    public void loadDataPriority(Vector<Vector<PointFeature>> pointfeatures,
+
                                 int labelAreaL,
                                 int labelAreaR,
                                 int labelAreaT,
                                 int labelAreaB,
+
                                 float minLabelWidth,
                                 float minLabelHeight,
                                 float maxLabelWidth,
@@ -384,15 +404,20 @@ public class PointFeatureLabeler extends Object {
     * @see #loadDataPriority(java.util.Vector, int, int, int, int, float, float, float, float)
     * @see #loadDataStandard(java.util.Vector, int, int, int, int, float, float, float, float)
     */
-   public void loadDataStandard(Vector<PointFeature> pointfeatures, int labelAreaL, int labelAreaR, int labelAreaT, int labelAreaB) {
+   public void loadDataStandard(Vector<PointFeature> pointfeatures,
+                                int labelAreaL,
+                                int labelAreaR,
+                                int labelAreaT,
+                                int labelAreaB) {
 
       if (pointfeatures != null) {
+
          Vector<Vector<PointFeature>> nLabels = new Vector<Vector<PointFeature>>();
+
          nLabels.add(pointfeatures);
 
          loadDataPriority(nLabels, labelAreaL, labelAreaR, labelAreaT, labelAreaB, 0, 0, 0, 0);
       }
-
    }
 
    /**
@@ -426,20 +451,36 @@ public class PointFeatureLabeler extends Object {
     * @see #loadDataStandard(java.util.Vector, int, int, int, int)
     */
    public void loadDataStandard(Vector<PointFeature> pointfeatures,
+                                
                                 int labelAreaL,
                                 int labelAreaR,
                                 int labelAreaT,
                                 int labelAreaB,
+                                
                                 float minLabelWidth,
                                 float minLabelHeight,
                                 float maxLabelWidth,
                                 float maxLabelHeight) {
 
       if (pointfeatures != null) {
+         
          Vector<Vector<PointFeature>> nLabels = new Vector<Vector<PointFeature>>();
+         
          nLabels.add(pointfeatures);
 
-         loadDataPriority(nLabels, labelAreaL, labelAreaR, labelAreaT, labelAreaB, minLabelWidth, minLabelHeight, maxLabelWidth, maxLabelHeight);
+         loadDataPriority(
+
+               nLabels,
+
+               labelAreaL,
+               labelAreaR,
+               labelAreaT,
+               labelAreaB,
+
+               minLabelWidth,
+               minLabelHeight,
+               maxLabelWidth,
+               maxLabelHeight);
       }
 
    }
@@ -452,6 +493,7 @@ public class PointFeatureLabeler extends Object {
     *           maxium label dimensions.
     */
    private void findMinMaxLabelDimensions(Vector<Vector<PointFeature>> pfs) {
+      
       float lw;
       float lh;
 
@@ -462,8 +504,10 @@ public class PointFeatureLabeler extends Object {
 
       for (Vector<PointFeature> priorityLevel : pfs) {
          for (PointFeature p : priorityLevel) {
+            
             lw = p.labelBoxW;
             lh = p.labelBoxH;
+            
             this.maxLabelW = Math.max(this.maxLabelW, lw);
             this.minLabelW = Math.min(this.minLabelW, lw);
             this.maxLabelH = Math.max(this.maxLabelH, lh);
@@ -489,6 +533,7 @@ public class PointFeatureLabeler extends Object {
     * @see #respectMap(java.awt.image.BufferedImage, java.awt.Color, int)
     */
    public void respectMap(BufferedImage map) {
+      
       respectMap(map, Color.white, 1);
    }
 
@@ -505,6 +550,7 @@ public class PointFeatureLabeler extends Object {
     * @see #respectMap(java.awt.image.BufferedImage, java.awt.Color, int)
     */
    public void respectMap(BufferedImage map, Color emptySpaceColor) {
+      
       respectMap(map, emptySpaceColor, 1);
    }
 
@@ -523,13 +569,19 @@ public class PointFeatureLabeler extends Object {
     *           the maximum distance of particles within the map
     */
    public void respectMap(BufferedImage map, Color emptySpaceColor, int resolution) {
+      
       if (dataLoaded) {
+         
          gl_rM_maxX = Math.min(this.laW, map.getWidth());
          gl_rM_maxY = Math.min(this.laH, map.getHeight());
+         
          gl_rM_color = emptySpaceColor.getRGB();
+         
          for (gl_rM_y = 0; gl_rM_y < gl_rM_maxY; gl_rM_y += resolution) {
             for (gl_rM_x = 0; gl_rM_x < gl_rM_maxX; gl_rM_x += resolution) {
+               
                if (map.getRGB(gl_rM_x, gl_rM_y) != gl_rM_color) {
+                  
                   this.particleStorage.addParticle(gl_rM_x, gl_rM_y);
                }
             }
@@ -769,8 +821,11 @@ public class PointFeatureLabeler extends Object {
     *           at [pt][1]
     */
    public void respectPoints(float[][] pts) {
+      
       gl_rP_length = pts.length;
+      
       for (gl_rP_i = 0; gl_rP_i < gl_rP_length; gl_rP_i++) {
+         
          this.particleStorage.addParticle(pts[gl_rP_i][0], pts[gl_rP_i][1]);
       }
    }
@@ -2423,7 +2478,11 @@ public class PointFeatureLabeler extends Object {
       //done one after the other
 
       if (!dataLoaded) return 0;
-      return label_greedy1_4(prio) + label_greedy5_8(prio) + label_greedySlider(prio) + label_greedySpiral(prio);
+
+      return label_greedy1_4(prio)
+            + label_greedy5_8(prio) 
+            + label_greedySlider(prio) 
+            + label_greedySpiral(prio);
 
    }
 
@@ -2568,4 +2627,5 @@ public class PointFeatureLabeler extends Object {
          }
       }
    }
+
 }

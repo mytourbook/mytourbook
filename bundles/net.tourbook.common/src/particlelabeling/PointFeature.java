@@ -162,8 +162,7 @@ public class PointFeature {
 
    /**
     * Green light of the point-feature to be labeled by {@link PointFeatureLabeler}. For that it has
-    * to be inside
-    * the labeling area defined in {@link PointFeatureLabeler}.
+    * to be inside the labeling area defined in {@link PointFeatureLabeler}.
     */
    public boolean  enabledForLabeling   = false;
 
@@ -220,14 +219,25 @@ public class PointFeature {
     * @param vExtend
     *           the vertical graphical extend of this point-feature, can be 0.
     */
-   public PointFeature(String label, int id, float xPos, float yPos, float labelwidth, float labelheight, float hExtend, float vExtend) {
+   public PointFeature(String label,
+                       int id,
+                       float xPos,
+                       float yPos,
+                       float labelwidth,
+                       float labelheight,
+                       float hExtend,
+                       float vExtend) {
+
       this.label = label;
       this.id = id;
       this.pos = new float[] { xPos, yPos };
+
       this.labelBoxW = labelwidth;
       this.labelBoxH = labelheight;
+
       this.rectangularExtendW = hExtend;
       this.rectangularExtendH = vExtend;
+
       this.radialExtendRadius = Math.max(vExtend, hExtend);
    }
 
@@ -250,8 +260,24 @@ public class PointFeature {
     * 
     * @see #PointFeature(java.lang.String, int, float, float, float, float, float, float)
     */
-   public PointFeature(String label, int id, float xPos, float yPos, float labelwidth, float labelheight) {
-      this(label, id, xPos, yPos, labelwidth, labelheight, 0, 0);
+   public PointFeature(String label,
+                       int id,
+                       float xPos,
+                       float yPos,
+                       float labelwidth,
+                       float labelheight) {
+
+      this(label,
+            id,
+
+            xPos,
+            yPos,
+
+            labelwidth,
+            labelheight,
+
+            0,
+            0);
    }
 
    /**
@@ -271,8 +297,22 @@ public class PointFeature {
     * 
     * @see #PointFeature(java.lang.String, int, float, float, float, float, float, float)
     */
-   public PointFeature(String label, int id, float xPos, float yPos) {
-      this(label, id, xPos, yPos, 0, 0, 0, 0);
+   public PointFeature(String label,
+                       int id,
+
+                       float xPos,
+                       float yPos) {
+
+      this(label,
+            id,
+
+            xPos,
+            yPos,
+
+            0,
+            0,
+            0,
+            0);
    }
 
    /**
