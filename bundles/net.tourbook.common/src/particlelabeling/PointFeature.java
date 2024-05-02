@@ -29,7 +29,6 @@
  *
  * Have fun with this labeling approach =)
  */
-
 package particlelabeling;
 
 /**
@@ -199,8 +198,10 @@ public class PointFeature {
    private int     id;
 
    /**
-    * Generates a new point-feature, defined by its label, id, position, label-dimensions and
-    * graphical rectangular extend.
+    * Generates a new point-feature, defined by its label, id and position. The label-box dimensions
+    * and
+    * the graphical rectangular extend are 0. The label-box dimension have to be set separately
+    * before labeling!
     * 
     * @param label
     *           the label of the point-feature, can be null.
@@ -210,35 +211,25 @@ public class PointFeature {
     *           the x-coordinate of this point-feature.
     * @param yPos
     *           the y-coordinate of this point-feature.
-    * @param labelwidth
-    *           the width of the corresponding labelbox to be placed, should be > 0.
-    * @param labelheight
-    *           the height of the corresponding labelbox to be placed, should be > 0.
-    * @param hExtend
-    *           the horizontal graphical extend of this point-feature, can be 0.
-    * @param vExtend
-    *           the vertical graphical extend of this point-feature, can be 0.
+    * 
+    * @see #PointFeature(java.lang.String, int, float, float, float, float, float, float)
     */
-   public PointFeature(String label,
-                       int id,
-                       float xPos,
-                       float yPos,
-                       float labelwidth,
-                       float labelheight,
-                       float hExtend,
-                       float vExtend) {
+   public PointFeature(final String label,
+                       final int id,
 
-      this.label = label;
-      this.id = id;
-      this.pos = new float[] { xPos, yPos };
+                       final float xPos,
+                       final float yPos) {
 
-      this.labelBoxW = labelwidth;
-      this.labelBoxH = labelheight;
+      this(label,
+            id,
 
-      this.rectangularExtendW = hExtend;
-      this.rectangularExtendH = vExtend;
+            xPos,
+            yPos,
 
-      this.radialExtendRadius = Math.max(vExtend, hExtend);
+            0,
+            0,
+            0,
+            0);
    }
 
    /**
@@ -260,12 +251,12 @@ public class PointFeature {
     * 
     * @see #PointFeature(java.lang.String, int, float, float, float, float, float, float)
     */
-   public PointFeature(String label,
-                       int id,
-                       float xPos,
-                       float yPos,
-                       float labelwidth,
-                       float labelheight) {
+   public PointFeature(final String label,
+                       final int id,
+                       final float xPos,
+                       final float yPos,
+                       final float labelwidth,
+                       final float labelheight) {
 
       this(label,
             id,
@@ -281,10 +272,8 @@ public class PointFeature {
    }
 
    /**
-    * Generates a new point-feature, defined by its label, id and position. The label-box dimensions
-    * and
-    * the graphical rectangular extend are 0. The label-box dimension have to be set separately
-    * before labeling!
+    * Generates a new point-feature, defined by its label, id, position, label-dimensions and
+    * graphical rectangular extend.
     * 
     * @param label
     *           the label of the point-feature, can be null.
@@ -294,25 +283,35 @@ public class PointFeature {
     *           the x-coordinate of this point-feature.
     * @param yPos
     *           the y-coordinate of this point-feature.
-    * 
-    * @see #PointFeature(java.lang.String, int, float, float, float, float, float, float)
+    * @param labelwidth
+    *           the width of the corresponding labelbox to be placed, should be > 0.
+    * @param labelheight
+    *           the height of the corresponding labelbox to be placed, should be > 0.
+    * @param hExtend
+    *           the horizontal graphical extend of this point-feature, can be 0.
+    * @param vExtend
+    *           the vertical graphical extend of this point-feature, can be 0.
     */
-   public PointFeature(String label,
-                       int id,
+   public PointFeature(final String label,
+                       final int id,
+                       final float xPos,
+                       final float yPos,
+                       final float labelwidth,
+                       final float labelheight,
+                       final float hExtend,
+                       final float vExtend) {
 
-                       float xPos,
-                       float yPos) {
+      this.label = label;
+      this.id = id;
+      this.pos = new float[] { xPos, yPos };
 
-      this(label,
-            id,
+      this.labelBoxW = labelwidth;
+      this.labelBoxH = labelheight;
 
-            xPos,
-            yPos,
+      this.rectangularExtendW = hExtend;
+      this.rectangularExtendH = vExtend;
 
-            0,
-            0,
-            0,
-            0);
+      this.radialExtendRadius = Math.max(vExtend, hExtend);
    }
 
    /**

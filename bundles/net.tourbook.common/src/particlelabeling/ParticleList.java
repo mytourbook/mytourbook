@@ -29,7 +29,6 @@
  *
  * Have fun with this labeling approach =)
  */
-
 package particlelabeling;
 
 /**
@@ -102,7 +101,7 @@ public class ParticleList {
     * @param psize
     *           the initial capacity for storing particles.
     */
-   public ParticleList(int psize) {
+   public ParticleList(final int psize) {
       this.registeredParticles = new int[psize];
       this.size = 0;
       this.maxLength = this.registeredParticles.length;
@@ -116,14 +115,14 @@ public class ParticleList {
     * @param id
     *           the id of the particle to register within this cell.
     */
-   public void add(int id) {
+   public void add(final int id) {
 
       //allocating new memory
       if (size == this.maxLength) {
 
          System.out.println("ALLOCAING NEW GRIDCELL-SPACE - SPACE FOR " + maxLength + " PARTICLES");
 
-         int[] newRegPart = new int[this.maxLength * 2];
+         final int[] newRegPart = new int[this.maxLength * 2];
 
          for (i = 0; i < maxLength; i++) {
             newRegPart[i] = this.registeredParticles[i];
