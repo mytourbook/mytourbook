@@ -157,6 +157,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
    private Menu      _tableContextMenu;
 
+   private Image     _imageDialog;
+
    private class ActionAddProduct extends Action {
 
       public ActionAddProduct() {
@@ -367,7 +369,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 
       // set icon for the window
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.TourNutrition).createImage());
+      _imageDialog = TourbookPlugin.getImageDescriptor(Images.TourNutrition).createImage();
+      setDefaultImage(_imageDialog);
 
       _tourId = tourId;
    }
@@ -857,6 +860,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
    private void onDispose() {
 
+      UI.disposeResource(_imageDialog);
       _prefStore.removePropertyChangeListener(_prefChangeListener);
 
       _nutritionQuery.removePropertyChangeListener(this);

@@ -746,6 +746,7 @@ public class TourBlogView extends ViewPart {
                tourSummary = UI.scrambleText(tourSummary);
             }
             sb.append(tourSummary);
+            sb.append(SPACER);
 
             sb.append("<div class='blog-item'>"); //$NON-NLS-1$
             {
@@ -775,6 +776,7 @@ public class TourBlogView extends ViewPart {
                 * Tour title
                 */
                if (isTitle) {
+
                   sb.append("<span class='blog-title'>" + tourTitle + "</span>" + NL); //$NON-NLS-1$ //$NON-NLS-2$
                }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,32 +34,66 @@ public final class TourWeatherRetriever {
 
    private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
-   public static boolean retrieveWeatherData(final TourData tourData,
-                                             final String weatherProvider) {
+   /**
+    * Check if the weather retrieval can be performed.
+    * For example: the user could have reached the maximum number of requests
+    * per day. In this case, we notify them and abort the retrieval
+    *
+    */
+   public static boolean canRetrieveWeather(final String weatherProvider) {
+
+      final HistoricalWeatherRetriever historicalWeatherRetriever = getHistoricalWeatherRetriever(weatherProvider);
+
+      return historicalWeatherRetriever != null && historicalWeatherRetriever.canMakeRequest();
+   }
+
+   private static HistoricalWeatherRetriever getHistoricalWeatherRetriever(final String weatherProvider) {
 
       HistoricalWeatherRetriever historicalWeatherRetriever = null;
-
       switch (weatherProvider) {
 
       case IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP_ID:
 
-         historicalWeatherRetriever = new OpenWeatherMapRetriever(tourData);
+         historicalWeatherRetriever = new OpenWeatherMapRetriever();
          break;
 
       case IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI_ID:
 
-         historicalWeatherRetriever = new WeatherApiRetriever(tourData);
+         historicalWeatherRetriever = new WeatherApiRetriever();
          break;
 
       case IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_ID:
 
-         historicalWeatherRetriever = new WorldWeatherOnlineRetriever(tourData);
+         historicalWeatherRetriever = new WorldWeatherOnlineRetriever();
          break;
+      }
 
-      case IWeatherProvider.Pref_Weather_Provider_None:
-      default:
+      return historicalWeatherRetriever;
+   }
+
+   /**
+    * Retrieves, for each weather vendor, a log message explaining why a weather
+    * request can't be made at this time.
+    *
+    * @param weatherProvider
+    */
+   public static String getWeatherRetrievalFailureLogMessage(final String weatherProvider) {
+
+      final HistoricalWeatherRetriever historicalWeatherRetriever = getHistoricalWeatherRetriever(weatherProvider);
+
+      return historicalWeatherRetriever != null
+            ? historicalWeatherRetriever.getWeatherRetrievalFailureLogMessage()
+            : UI.EMPTY_STRING;
+   }
+
+   public static boolean retrieveWeatherData(final TourData tourData,
+                                             final String weatherProvider) {
+
+      final HistoricalWeatherRetriever historicalWeatherRetriever = getHistoricalWeatherRetriever(weatherProvider);
+      if (historicalWeatherRetriever == null) {
          return false;
       }
+      historicalWeatherRetriever.setTourData(tourData);
 
       final boolean isWeatherRetrieved = historicalWeatherRetriever.retrieveHistoricalWeatherData();
       if (isWeatherRetrieved) {

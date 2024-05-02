@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -115,7 +115,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
       }
 
       /**
-       * Ensure the derby database is shutted down to fix
+       * Ensure the derby database is shut down to fix
        * https://github.com/mytourbook/mytourbook/pull/1091#issuecomment-1559732337
        */
       TourDatabase.getInstance().shutdownDatabaseServer();

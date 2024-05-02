@@ -233,11 +233,11 @@ public class TourNutritionProduct {
 
          } else if (product.nutritionDataPer == NutritionDataPer.SERVING) {
 
-            final int numServingsPerProduct = servingQuantity == 0
-                  ? 0 : Math.round(productQuantity / servingQuantity);
+            final float numServingsPerProduct = servingQuantity == 0
+                  ? 0 : productQuantity / servingQuantity;
 
-            setCalories(getCalories_Serving() * numServingsPerProduct);
-            setSodium(getSodium_Serving() * numServingsPerProduct);
+            setCalories(Math.round(getCalories_Serving() * numServingsPerProduct));
+            setSodium(Math.round(getSodium_Serving() * numServingsPerProduct));
          }
       }
    }

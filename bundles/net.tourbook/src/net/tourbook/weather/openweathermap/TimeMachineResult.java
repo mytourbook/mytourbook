@@ -27,42 +27,45 @@ import net.tourbook.weather.WeatherUtils;
 @JsonIgnoreProperties(ignoreUnknown = true)
 class TimeMachineResult {
 
-   private Current      current;
+   /*
+    * Datapoints coming from the API response
+    */
+   private List<WeatherData> data;
 
-   private List<Hourly> hourly;
-
-   private Hourly       middleHourly;
-
-   private int          averageWindSpeed;
-   private int          averageWindDirection;
+   /*
+    * Internal properties
+    */
+   private int         averageWindSpeed;
+   private int         averageWindDirection;
+   private WeatherData middleWeatherData;
 
    public TimeMachineResult() {
-      hourly = new ArrayList<>();
+      data = new ArrayList<>();
    }
 
    /**
-    * This adds new hourly data manually to ensure only new data is added to the
+    * This adds new data manually to ensure only new data is added to the
     * current dataset.
     *
-    * @param newHourly
+    * @param newData
     */
-   void addAllHourly(final List<Hourly> newHourly) {
+   void addAllData(final List<WeatherData> newData) {
 
-      for (final Hourly currentHourly : newHourly) {
-         if (!hourly.contains(currentHourly)) {
-            hourly.add(currentHourly);
+      for (final WeatherData currentData : newData) {
+         if (!data.contains(currentData)) {
+            data.add(currentData);
          }
       }
    }
 
    void computeAverageWindSpeedAndDirection() {
 
-      final double[] windSpeeds = hourly
+      final double[] windSpeeds = data
             .stream()
             .mapToDouble(h -> h.getWind_speedKmph())
             .toArray();
 
-      final int[] windDirections = hourly
+      final int[] windDirections = data
             .stream()
             .mapToInt(h -> h.wind_deg())
             .toArray();
@@ -79,44 +82,44 @@ class TimeMachineResult {
     *
     * @return
     */
-   boolean filterHourlyData(final long tourStartTime, final long tourEndTime) {
+   boolean filterWeatherData(final long tourStartTime, final long tourEndTime) {
 
-      final List<Hourly> filteredHourlyData = new ArrayList<>();
+      final List<WeatherData> filteredWeatherData = new ArrayList<>();
 
-      for (final Hourly currentHourly : hourly) {
+      for (final WeatherData currentData : data) {
 
          //The current data is not kept if its measured time is:
          // - more than 30 mins before the tour start time
          // OR
          // - more than 30 mins after the tour end time
 
-         if (currentHourly.dt() < tourStartTime - WeatherUtils.SECONDS_PER_THIRTY_MINUTE ||
-               currentHourly.dt() > tourEndTime + WeatherUtils.SECONDS_PER_THIRTY_MINUTE) {
+         if (currentData.dt() < tourStartTime - WeatherUtils.SECONDS_PER_THIRTY_MINUTE ||
+               currentData.dt() > tourEndTime + WeatherUtils.SECONDS_PER_THIRTY_MINUTE) {
             continue;
          }
 
-         filteredHourlyData.add(currentHourly);
+         filteredWeatherData.add(currentData);
       }
 
-      hourly = filteredHourlyData;
+      data = filteredWeatherData;
 
-      return hourly.size() > 0;
+      return data.size() > 0;
    }
 
    /**
-    * Finds the hourly that is closest to the middle of the tour. This will be used
+    * Finds the data that is closest to the middle of the tour. This will be used
     * to determine the weather description of the tour.
     */
-   void findMiddleHourly(final long tourMiddleTime) {
+   void findMiddleWeatherData(final long tourMiddleTime) {
 
-      middleHourly = null;
+      middleWeatherData = null;
 
       long timeDifference = Long.MAX_VALUE;
-      for (final Hourly currentHourly : hourly) {
+      for (final WeatherData currentData : data) {
 
-         final long currentTimeDifference = Math.abs(currentHourly.dt() - tourMiddleTime);
+         final long currentTimeDifference = Math.abs(currentData.dt() - tourMiddleTime);
          if (currentTimeDifference < timeDifference) {
-            middleHourly = currentHourly;
+            middleWeatherData = currentData;
             timeDifference = currentTimeDifference;
          }
       }
@@ -126,7 +129,7 @@ class TimeMachineResult {
    public float getAverageHumidity() {
 
       final OptionalDouble averageHumidity =
-            hourly.stream().mapToDouble(h -> h.humidity()).average();
+            data.stream().mapToDouble(h -> h.humidity()).average();
 
       if (averageHumidity.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averageHumidity.getAsDouble());
@@ -138,7 +141,7 @@ class TimeMachineResult {
    public float getAveragePressure() {
 
       final OptionalDouble averagePressure =
-            hourly.stream().mapToDouble(h -> h.pressure()).average();
+            data.stream().mapToDouble(h -> h.pressure()).average();
 
       if (averagePressure.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averagePressure.getAsDouble());
@@ -150,7 +153,7 @@ class TimeMachineResult {
    public float getAverageWindChill() {
 
       final OptionalDouble averageWindChill =
-            hourly.stream().mapToDouble(h -> h.feels_like()).average();
+            data.stream().mapToDouble(h -> h.feels_like()).average();
 
       if (averageWindChill.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averageWindChill.getAsDouble());
@@ -169,28 +172,24 @@ class TimeMachineResult {
       return averageWindSpeed;
    }
 
-   public Current getCurrent() {
-      return current;
+   public List<WeatherData> getData() {
+      return data;
    }
 
-   public List<Hourly> getHourly() {
-      return hourly;
-   }
+   private Weather getMiddleWeatherData() {
 
-   private Weather getMiddleHourlyWeather() {
-
-      final List<Weather> middleHourlyWeather = middleHourly.weather();
-      if (middleHourlyWeather == null || middleHourlyWeather.isEmpty()) {
+      final List<Weather> middleWeather = middleWeatherData.weather();
+      if (middleWeather == null || middleWeather.isEmpty()) {
          return null;
       }
 
-      return middleHourlyWeather.get(0);
+      return middleWeather.get(0);
    }
 
    public float getTemperatureAverage() {
 
       final OptionalDouble averageTemperature =
-            hourly.stream().mapToDouble(h -> h.temp()).average();
+            data.stream().mapToDouble(h -> h.temp()).average();
 
       if (averageTemperature.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averageTemperature.getAsDouble());
@@ -202,7 +201,7 @@ class TimeMachineResult {
    public float getTemperatureMax() {
 
       final OptionalDouble maxTemperature =
-            hourly.stream().mapToDouble(h -> h.temp()).max();
+            data.stream().mapToDouble(h -> h.temp()).max();
 
       if (maxTemperature.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(maxTemperature.getAsDouble());
@@ -214,7 +213,7 @@ class TimeMachineResult {
    public float getTemperatureMin() {
 
       final OptionalDouble minTemperature =
-            hourly.stream().mapToDouble(h -> h.temp()).min();
+            data.stream().mapToDouble(h -> h.temp()).min();
 
       if (minTemperature.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(minTemperature.getAsDouble());
@@ -225,35 +224,35 @@ class TimeMachineResult {
 
    public float getTotalPrecipitation() {
 
-      return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(h -> h.getRain()).sum());
+      return WeatherUtils.roundDoubleToFloat(data.stream().mapToDouble(h -> h.getRain()).sum());
    }
 
    public float getTotalSnowfall() {
 
-      return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(h -> h.getSnow()).sum());
+      return WeatherUtils.roundDoubleToFloat(data.stream().mapToDouble(h -> h.getSnow()).sum());
    }
 
    public String getWeatherClouds() {
 
       final String weatherType = UI.EMPTY_STRING;
 
-      final Weather middleHourlyWeather = getMiddleHourlyWeather();
-      if (middleHourlyWeather == null) {
+      final Weather middleWeather = getMiddleWeatherData();
+      if (middleWeather == null) {
          return weatherType;
       }
 
-      return OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds(middleHourlyWeather.icon());
+      return OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds(middleWeather.icon());
    }
 
    public String getWeatherDescription() {
 
       final String weatherDescription = UI.EMPTY_STRING;
 
-      final Weather middleHourlyWeather = getMiddleHourlyWeather();
-      if (middleHourlyWeather == null) {
+      final Weather middleWeather = getMiddleWeatherData();
+      if (middleWeather == null) {
          return weatherDescription;
       }
 
-      return middleHourlyWeather.description();
+      return middleWeather.description();
    }
 }

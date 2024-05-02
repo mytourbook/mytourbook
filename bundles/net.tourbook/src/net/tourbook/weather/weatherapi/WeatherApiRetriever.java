@@ -30,20 +30,14 @@ import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.weather.IWeather;
-import net.tourbook.data.TourData;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WeatherUtils;
 
 public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 
-   private static final String baseApiUrl    = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/weatherapi"; //$NON-NLS-1$
+   private static final String BASE_API_URL    = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/weatherapi"; //$NON-NLS-1$
 
    private HistoryResult       historyResult = null;
-
-   public WeatherApiRetriever(final TourData tourData) {
-
-      super(tourData);
-   }
 
    public static String convertWeatherCodeToMTWeatherClouds(final int weatherCode) {
 
@@ -58,15 +52,19 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       case 1147:
          weatherType = IWeather.WEATHER_ID_OVERCAST;
          break;
+
       case 1000:
          weatherType = IWeather.WEATHER_ID_CLEAR;
          break;
+
       case 1003:
          weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
          break;
+
       case 1087:
          weatherType = IWeather.WEATHER_ID_LIGHTNING;
          break;
+
       case 1192:
       case 1195:
       case 1201:
@@ -77,6 +75,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       case 1276:
          weatherType = IWeather.WEATHER_ID_RAIN;
          break;
+
       case 1066:
       case 1069:
       case 1114:
@@ -96,6 +95,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       case 1282:
          weatherType = IWeather.WEATHER_ID_SNOW;
          break;
+
       case 1063:
       case 1186:
       case 1189:
@@ -105,6 +105,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       case 1273:
          weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
          break;
+
       case 1072:
       case 1150:
       case 1153:
@@ -115,6 +116,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       case 1198:
          weatherType = IWeather.WEATHER_ID_DRIZZLE;
          break;
+
       default:
          weatherType = UI.EMPTY_STRING;
          break;
@@ -124,7 +126,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
    }
 
    public static String getBaseApiUrl() {
-      return baseApiUrl;
+      return BASE_API_URL;
    }
 
    @Override
@@ -173,7 +175,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 
    private String buildWeatherApiRequest(final LocalDate requestedDate) {
 
-      final StringBuilder weatherRequestWithParameters = new StringBuilder(baseApiUrl + UI.SYMBOL_QUESTION_MARK);
+      final StringBuilder weatherRequestWithParameters = new StringBuilder(BASE_API_URL + UI.SYMBOL_QUESTION_MARK);
 
 // SET_FORMATTING_OFF
 
@@ -185,6 +187,11 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 // SET_FORMATTING_ON
 
       return weatherRequestWithParameters.toString();
+   }
+
+   @Override
+   public boolean canMakeRequest() {
+      return true;
    }
 
    private HistoryResult deserializeWeatherData(final String weatherDataResponse) {
@@ -210,6 +217,11 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       }
 
       return newHistoryResult;
+   }
+
+   @Override
+   protected String getWeatherRetrievalFailureLogMessage() {
+      return UI.EMPTY_STRING;
    }
 
    @Override
