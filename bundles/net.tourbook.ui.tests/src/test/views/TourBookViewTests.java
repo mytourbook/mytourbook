@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -71,9 +71,11 @@ public class TourBookViewTests extends UITest {
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
-            "1/31/2021, 7:15 AM -> Error while retrieving the weather data: \"{\"cod\":\"400\",\"message\":\"requested time is out of allowed range of 5 days back\"}\"")));//$NON-NLS-1$
+            "Data retrieved in ")));//$NON-NLS-1$
       assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
-            "1/31/2021, 7:15 AM: , ø 0°C, min. 0°C, max. 0°C, feels like 0°C, air quality Fair")));//$NON-NLS-1$
+            "1/31/2021, 7:15 AM:")));//$NON-NLS-1$
+      assertTrue(logs.stream().map(log -> log.toString()).anyMatch(log -> log.contains(
+            "air quality Fair")));//$NON-NLS-1$
    }
 
    @Test

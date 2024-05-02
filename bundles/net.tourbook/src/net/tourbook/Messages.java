@@ -1362,6 +1362,7 @@ public class Messages extends NLS {
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_WeatherStation_Link;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection;
    public static String        Log_HistoricalWeatherRetriever_002_RetrievalError;
+   public static String        Log_HistoricalWeatherRetriever_003_RetrievalLimitReached;
 
    public static String        Map25_Config_ClusterAlgorithm_FirstMarker_Distance;
    public static String        Map25_Config_ClusterAlgorithm_FirstMarker_Grid;
@@ -1913,7 +1914,7 @@ public class Messages extends NLS {
    public static String        Pref_Weather_CheckHTTPConnection_Message;
    public static String        Pref_Weather_CheckHTTPConnection_OK_Message;
    public static String        Pref_Weather_Label_ApiKey;
-   public static String        Pref_Weather_Label_OpenWeatherMap_FiveDaysLimit;
+   public static String        Pref_Weather_Label_OpenWeatherMap_TimeRangeLimit;
    public static String        Pref_Weather_Label_WeatherProvider;
    public static String        Pref_Weather_Label_WeatherApi_SevenDaysLimit;
    public static String        Pref_Weather_Label_WorldWeatherOnline_ApiKey_Tooltip;

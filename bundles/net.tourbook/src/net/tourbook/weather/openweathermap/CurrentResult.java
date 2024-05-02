@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2024 Frédéric Bard
+ * Copyright (C) 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,39 +17,5 @@ package net.tourbook.weather.openweathermap;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.util.List;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record Hourly(int dt,
-                     double temp,
-                     double feels_like,
-                     int pressure,
-                     int humidity,
-                     List<Weather> weather,
-                     double wind_speed,
-                     int wind_deg,
-                     Volume rain,
-                     Volume snow) {
-
-   public float getRain() {
-
-      if (rain == null) {
-         return 0f;
-      }
-
-      return (float) rain.oneHour();
-   }
-
-   public float getSnow() {
-
-      if (snow == null) {
-         return 0f;
-      }
-
-      return (float) snow.oneHour();
-   }
-
-   public double getWind_speedKmph() {
-      return wind_speed * 3.6;
-   }
-}
+public record CurrentResult(Current current) {}

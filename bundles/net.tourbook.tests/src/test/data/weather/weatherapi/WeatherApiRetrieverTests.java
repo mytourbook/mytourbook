@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -68,9 +68,11 @@ public class WeatherApiRetrieverTests {
       final String url = WeatherUtils.OAUTH_PASSEUR_APP_URL + expectedRequestParameters;
       httpClientMock.onGet(url).doReturn(weatherApiResponse);
 
-      weatherApiRetriever = new WeatherApiRetriever(tour);
+      weatherApiRetriever = new WeatherApiRetriever();
+      weatherApiRetriever.setTourData(tour);
 
       assertTrue(weatherApiRetriever.retrieveHistoricalWeatherData());
+      assertTrue(weatherApiRetriever.canMakeRequest());
       httpClientMock.verify().get(url).called();
    }
 

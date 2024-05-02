@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -32,32 +33,39 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
-import net.tourbook.data.TourData;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WeatherUtils;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.eclipse.jface.dialogs.IDialogSettings;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
-   private static final String BASE_TIME_MACHINE_API_URL = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/timemachine"; //$NON-NLS-1$
+   private static final int    MAX_REQUESTS_PER_DAY     = 50;
+   private static final String STATE_LAST_REQUEST_DAY   = "lastRequestDay";      //$NON-NLS-1$
+   private static final String STATE_REQUEST_COUNT      = "requestCount";        //$NON-NLS-1$
+
+   private static final String OPENWEATHERMAP3_BASEPATH = "/openweathermap/3.0"; //$NON-NLS-1$
+
+   //https://openweathermap.org/api/one-call-3
+   private static final String BASE_TIME_MACHINE_API_URL = WeatherUtils.OAUTH_PASSEUR_APP_URL + OPENWEATHERMAP3_BASEPATH + "/timemachine"; //$NON-NLS-1$
+   private static final String BASE_CURRENT_API_URL      = WeatherUtils.OAUTH_PASSEUR_APP_URL + OPENWEATHERMAP3_BASEPATH + "/current";     //$NON-NLS-1$
 
    // https://openweathermap.org/api/air-pollution
-   private static final String BASE_AIR_POLLUTION_API_URL = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/air_pollution"; //$NON-NLS-1$
+   private static final String          BASE_AIR_POLLUTION_API_URL = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/air_pollution"; //$NON-NLS-1$
 
-   private TimeMachineResult   timeMachineResult          = null;
-   private AirPollutionResult  airPollutionResult         = null;
+   private static final IDialogSettings _state                     = TourbookPlugin.getState("OpenWeatherMapRetriever");                   //$NON-NLS-1$
+   private TimeMachineResult            timeMachineResult          = null;
 
-   public OpenWeatherMapRetriever(final TourData tourData) {
-
-      super(tourData);
-   }
+   private AirPollutionResult           airPollutionResult         = null;
 
    /**
     * Codes : https://openweathermap.org/weather-conditions#Icon-list
@@ -126,11 +134,11 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       final List<String> fullWeatherDataList = new ArrayList<>();
 
-      final List<Hourly> hourlyList = timeMachineResult.getHourly();
+      final List<WeatherData> hourlyList = timeMachineResult.getData();
 
       if (hourlyList.size() > 0) {
 
-         for (final Hourly hourly : hourlyList) {
+         for (final WeatherData hourly : hourlyList) {
 
             final int hourlyDateTime = hourly.dt();
 
@@ -209,9 +217,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       return fullWeatherData;
    }
 
-   private String buildWeatherApiRequest(final long date) {
+   private String buildWeatherApiRequest(final long date, final String baseUrl) {
 
-      final StringBuilder weatherRequestWithParameters = new StringBuilder(BASE_TIME_MACHINE_API_URL + UI.SYMBOL_QUESTION_MARK);
+      final StringBuilder weatherRequestWithParameters = new StringBuilder(baseUrl + UI.SYMBOL_QUESTION_MARK);
 
 // SET_FORMATTING_OFF
 
@@ -224,6 +232,22 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 // SET_FORMATTING_ON
 
       return weatherRequestWithParameters.toString();
+   }
+
+   @Override
+   protected boolean canMakeRequest() {
+
+      final LocalDate lastRequestDay = Util.getStateDate(_state, STATE_LAST_REQUEST_DAY, LocalDate.of(2000, 1, 1));
+      int requestCount = getRequestCount();
+
+      if (!LocalDate.now().equals(lastRequestDay)) {
+
+         _state.put(STATE_LAST_REQUEST_DAY, LocalDate.now().toString());
+         requestCount = 0;
+         _state.put(STATE_REQUEST_COUNT, requestCount);
+      }
+
+      return requestCount < MAX_REQUESTS_PER_DAY;
    }
 
    private AirPollutionResult deserializeAirPollutionData(final String airPollutionDataResponse) {
@@ -251,7 +275,32 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       return airPollutionResult;
    }
 
-   private TimeMachineResult deserializeWeatherData(final String weatherDataResponse) {
+   private CurrentResult deserializeCurrentWeatherData(final String weatherDataResponse) {
+
+      CurrentResult currentResult = null;
+      try {
+
+         final ObjectMapper mapper = new ObjectMapper();
+         final String weatherResults = mapper
+               .readValue(weatherDataResponse, JsonNode.class)
+               .toString();
+
+         currentResult = mapper.readValue(
+               weatherResults,
+               new TypeReference<CurrentResult>() {});
+
+      } catch (final Exception e) {
+
+         StatusUtil.logError(
+               "OpenWeatherMapRetriever.deserializeCurrentWeatherData : Error while " + //$NON-NLS-1$
+                     "deserializing the historical weather JSON object :" //$NON-NLS-1$
+                     + weatherDataResponse + UI.SYSTEM_NEW_LINE + e.getMessage());
+      }
+
+      return currentResult;
+   }
+
+   private TimeMachineResult deserializeHistoricalWeatherData(final String weatherDataResponse) {
 
       TimeMachineResult newTimeMachineResult = null;
       try {
@@ -268,12 +317,22 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       } catch (final Exception e) {
 
          StatusUtil.logError(
-               "OpenWeatherMapRetriever.deserializeWeatherData : Error while " + //$NON-NLS-1$
+               "OpenWeatherMapRetriever.deserializeHistoricalWeatherData : Error while " + //$NON-NLS-1$
                      "deserializing the historical weather JSON object :" //$NON-NLS-1$
                      + weatherDataResponse + UI.SYSTEM_NEW_LINE + e.getMessage());
       }
 
       return newTimeMachineResult;
+   }
+
+   private int getRequestCount() {
+
+      return Util.getStateInt(_state, STATE_REQUEST_COUNT, 0);
+   }
+
+   @Override
+   protected String getWeatherRetrievalFailureLogMessage() {
+      return Messages.Log_HistoricalWeatherRetriever_003_RetrievalLimitReached;
    }
 
    /**
@@ -328,35 +387,53 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       return true;
    }
 
+   private CurrentResult retrieveCurrentWeatherData(final long requestedTime) {
+
+      final String weatherRequestWithParameters = buildWeatherApiRequest(requestedTime, BASE_CURRENT_API_URL);
+
+      final String rawWeatherData = sendWeatherApiRequest(weatherRequestWithParameters);
+      if (StringUtils.isNullOrEmpty(rawWeatherData)) {
+         return null;
+      }
+
+      return deserializeCurrentWeatherData(rawWeatherData);
+   }
+
    private boolean retrieveHistoricalWeather() {
 
       timeMachineResult = new TimeMachineResult();
       long requestedTime = tourStartTime;
 
+      final boolean isTourStartWithinTheCurrentHour = isTourStartTimeCurrent(
+            tourStartTime,
+            tour.getTimeZoneId());
+
+      // If the tour start time is within the current hour, we use the
+      // current weather data instead of the historical one.
+      if (isTourStartWithinTheCurrentHour) {
+
+         final CurrentResult currentResult = retrieveCurrentWeatherData(requestedTime);
+         if (currentResult != null) {
+
+            setTourWeatherWithCurrentWeather(currentResult.current());
+
+            return true;
+         }
+      }
+
       while (true) {
 
          //Send an API request as long as we don't have the results covering the entire duration of the tour
-         final TimeMachineResult newTimeMachineResult = retrieveWeatherData(requestedTime);
+         final TimeMachineResult newTimeMachineResult = retrieveHistoricalWeatherData(requestedTime);
          if (newTimeMachineResult == null) {
             return false;
          }
 
-         final boolean isTourStartWithinTheCurrentHour = isTourStartTimeCurrent(
-               tourStartTime,
-               tour.getTimeZoneId());
+         final int requestCount = getRequestCount();
+         _state.put(STATE_REQUEST_COUNT, requestCount + 1);
 
-         // If the tour start time is within the current hour, we use the
-         // current weather data instead of the historical one.
-         final Current currentWeather = newTimeMachineResult.getCurrent();
-         if (isTourStartWithinTheCurrentHour && currentWeather != null) {
-
-            setTourWeatherWithCurrentWeather(currentWeather);
-
-            return true;
-         }
-
-         timeMachineResult.addAllHourly(newTimeMachineResult.getHourly());
-         final List<Hourly> hourly = timeMachineResult.getHourly();
+         timeMachineResult.addAllData(newTimeMachineResult.getData());
+         final List<WeatherData> hourly = timeMachineResult.getData();
 
          final int lastWeatherDataHour = hourly.get(hourly.size() - 1).dt();
          if (WeatherUtils.isTourWeatherDataComplete(
@@ -381,7 +458,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          }
       }
 
-      final boolean hourlyDataExists = timeMachineResult.filterHourlyData(tourStartTime, tourEndTime);
+      final boolean hourlyDataExists = timeMachineResult.filterWeatherData(tourStartTime, tourEndTime);
       if (!hourlyDataExists) {
          return false;
       }
@@ -401,16 +478,16 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       return isHistoricalWeatherRetrieved || isAirQualityRetrieved;
    }
 
-   private TimeMachineResult retrieveWeatherData(final long requestedTime) {
+   private TimeMachineResult retrieveHistoricalWeatherData(final long requestedTime) {
 
-      final String weatherRequestWithParameters = buildWeatherApiRequest(requestedTime);
+      final String weatherRequestWithParameters = buildWeatherApiRequest(requestedTime, BASE_TIME_MACHINE_API_URL);
 
       final String rawWeatherData = sendWeatherApiRequest(weatherRequestWithParameters);
       if (StringUtils.isNullOrEmpty(rawWeatherData)) {
          return null;
       }
 
-      return deserializeWeatherData(rawWeatherData);
+      return deserializeHistoricalWeatherData(rawWeatherData);
    }
 
    private void setTourWeatherAirQuality() {
@@ -427,6 +504,8 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       tour.appendOrReplaceWeather(           currentWeather.getWeatherDescription());
       tour.setWeather_Clouds(                currentWeather.getWeatherClouds());
       tour.setWeather_Temperature_Average(   currentWeather.temp());
+      tour.setWeather_Temperature_Max(       currentWeather.temp());
+      tour.setWeather_Temperature_Min(       currentWeather.temp());
       tour.setWeather_Humidity((short)       currentWeather.humidity());
       tour.setWeather_Precipitation(         currentWeather.getPrecipitation());
       tour.setWeather_Pressure((short)       currentWeather.pressure());
@@ -443,7 +522,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 // SET_FORMATTING_OFF
 
       //We look for the weather data in the middle of the tour to populate the weather conditions
-      timeMachineResult.findMiddleHourly(    tourMiddleTime);
+      timeMachineResult.findMiddleWeatherData(    tourMiddleTime);
       tour.appendOrReplaceWeather(           timeMachineResult.getWeatherDescription());
       tour.setWeather_Clouds(                timeMachineResult.getWeatherClouds());
 

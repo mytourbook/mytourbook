@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,7 @@ import net.tourbook.web.WEB;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -39,11 +40,6 @@ public class WeatherProvider_WeatherApi implements IWeatherProvider {
 
    private static final String URL_WEATHERAPI_COM = "https://www.weatherapi.com/";//$NON-NLS-1$
 
-   /*
-    * UI controls
-    */
-   private Button _btnTestConnection;
-
    public WeatherProvider_WeatherApi() {}
 
    @Override
@@ -51,7 +47,7 @@ public class WeatherProvider_WeatherApi implements IWeatherProvider {
                              final Composite parent,
                              final FormToolkit formToolkit) {
 
-      final int defaultHIndent = 16;
+      final PixelConverter pc = new PixelConverter(parent);
 
       final Composite container = formToolkit.createComposite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -66,17 +62,16 @@ public class WeatherProvider_WeatherApi implements IWeatherProvider {
          linkApiSignup.addListener(SWT.Selection, event -> WEB.openUrl(URL_WEATHERAPI_COM));
 
          GridDataFactory.fillDefaults()
-               .span(2, 1)
-               .indent(defaultHIndent, 0)
+               .indent(DEFAULT_H_INDENT, 0)
                .applyTo(linkApiSignup);
       }
       {
          /*
           * Button: test connection
           */
-         _btnTestConnection = new Button(container, SWT.NONE);
-         _btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
-         _btnTestConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+         final Button btnTestConnection = new Button(container, SWT.NONE);
+         btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
+         btnTestConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
             HistoricalWeatherRetriever.checkVendorConnection(
                   WeatherApiRetriever.getBaseApiUrl() +
@@ -86,21 +81,20 @@ public class WeatherProvider_WeatherApi implements IWeatherProvider {
          }));
 
          GridDataFactory.fillDefaults()
-               .indent(defaultHIndent, 0)
+               .indent(DEFAULT_H_INDENT, 0)
                .align(SWT.BEGINNING, SWT.FILL)
-               .span(2, 1)
-               .applyTo(_btnTestConnection);
+               .applyTo(btnTestConnection);
       }
 
       {
          /*
           * Label:
           */
-         final Label note = UI.createLabel(container, Messages.Pref_Weather_Label_WeatherApi_SevenDaysLimit);
+         final Label note = UI.createLabel(container, Messages.Pref_Weather_Label_WeatherApi_SevenDaysLimit, SWT.WRAP);
          GridDataFactory.fillDefaults()
-               .indent(defaultHIndent, 0)
-               .align(SWT.BEGINNING, SWT.FILL)
-               .span(2, 1)
+               .grab(true, false)
+               .indent(DEFAULT_H_INDENT, 0)
+               .hint(pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
                .applyTo(note);
       }
       return container;

@@ -38,6 +38,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.importdata.DialogEasyImportConfig;
@@ -1021,12 +1022,10 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
          _prefStore.setValue(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(personId), downloadFolder);
          if (StringUtils.hasContent(downloadFolder)) {
 
-            final String[] currentDeviceFolderHistoryItems = _state.getArray(
-                  DialogEasyImportConfig.STATE_DEVICE_FOLDER_HISTORY_ITEMS);
-            final List<String> stateDeviceFolderHistoryItems =
-                  currentDeviceFolderHistoryItems != null
-                        ? new ArrayList<>(Arrays.asList(currentDeviceFolderHistoryItems))
-                        : new ArrayList<>();
+            final String[] currentDeviceFolderHistoryItems = Util.getStateStringArray(_state,
+                  DialogEasyImportConfig.STATE_DEVICE_FOLDER_HISTORY_ITEMS,
+                  new String[0]);
+            final List<String> stateDeviceFolderHistoryItems = Arrays.asList(currentDeviceFolderHistoryItems);
 
             if (!stateDeviceFolderHistoryItems.contains(downloadFolder)) {
                stateDeviceFolderHistoryItems.add(downloadFolder);
