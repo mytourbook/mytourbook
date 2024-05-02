@@ -36,12 +36,15 @@ package particlelabeling;
  * <p>
  * This class stores particle-ids of particles laying within the gridcell backuped
  * by this list. Registering particles is
- * of constant time in case, that no new memory has to be allocated. Retrieving particle information is
+ * of constant time in case, that no new memory has to be allocated. Retrieving particle information
+ * is
  * via public variables.
  * </p>
  * <p>
  * 
- * The accompanying source or binary forms are published under the terms of the <b>New BSD License</b>:<br><br>
+ * The accompanying source or binary forms are published under the terms of the <b>New BSD
+ * License</b>:<br>
+ * <br>
  * Copyright (c) 2010, Martin Luboschik, Hilko Cords<br>
  * All rights reserved.
  * </p>
@@ -50,13 +53,13 @@ package particlelabeling;
  * modification, are permitted provided that the following conditions are met:
  * <ul>
  * <li>Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
+ * notice, this list of conditions and the following disclaimer.
  * <li>Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
  * <li>Neither the name of the University of Rostock (Germany) nor the
- *     names of its contributors may be used to endorse or promote products
- *     derived from this software without specific prior written permission.
+ * names of its contributors may be used to endorse or promote products
+ * derived from this software without specific prior written permission.
  * </ul>
  * </p>
  * <p>
@@ -67,64 +70,72 @@ package particlelabeling;
  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
  * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * </p>
+ * 
  * @author M. Luboschik
+ * 
  * @version 1.0
+ * 
  * @see PointFeature
  */
 public class ParticleList {
 
-    /**
-     * The ids of particles laying within the cell, backuped by this list.
-     */
-    public int[] registeredParticles;
-    
-    /**
-     * The number of particles laying within the cell, backuped by this list. 
-     */
-    public int size;
+   /**
+    * The ids of particles laying within the cell, backuped by this list.
+    */
+   public int[] registeredParticles;
 
-    private int maxLength;
-    private int i;
+   /**
+    * The number of particles laying within the cell, backuped by this list.
+    */
+   public int   size;
 
-    /**
-     * Builds a new ParticleList with capacity to store <code>psize</code> particles.
-     * @param psize the initial capacity for storing particles.
-     */
-    public ParticleList(int psize) {
-        this.registeredParticles = new int[psize];
-        this.size = 0;
-        this.maxLength = this.registeredParticles.length;
-    }
+   private int  maxLength;
+   private int  i;
 
-    /**
-     * Adds an particle to the gridcell backuped by this ParticleList. Only needs the id of the particle to register since
-     * the position is stored inside {@link ParticleStore}.
-     * @param id the id of the particle to register within this cell.
-     */
-    public void add(int id) {
+   /**
+    * Builds a new ParticleList with capacity to store <code>psize</code> particles.
+    * 
+    * @param psize
+    *           the initial capacity for storing particles.
+    */
+   public ParticleList(int psize) {
+      this.registeredParticles = new int[psize];
+      this.size = 0;
+      this.maxLength = this.registeredParticles.length;
+   }
 
-        //allocating new memory
-        if (size == this.maxLength) {
+   /**
+    * Adds an particle to the gridcell backuped by this ParticleList. Only needs the id of the
+    * particle to register since
+    * the position is stored inside {@link ParticleStore}.
+    * 
+    * @param id
+    *           the id of the particle to register within this cell.
+    */
+   public void add(int id) {
 
-            System.out.println("ALLOCAING NEW GRIDCELL-SPACE - SPACE FOR " + maxLength + " PARTICLES");
+      //allocating new memory
+      if (size == this.maxLength) {
 
-            int[] newRegPart = new int[this.maxLength * 2];
+         System.out.println("ALLOCAING NEW GRIDCELL-SPACE - SPACE FOR " + maxLength + " PARTICLES");
 
-            for (i = 0; i < maxLength; i++) {
-                newRegPart[i] = this.registeredParticles[i];
-            }
+         int[] newRegPart = new int[this.maxLength * 2];
 
-            this.maxLength *= 2;
-            this.registeredParticles = newRegPart;
+         for (i = 0; i < maxLength; i++) {
+            newRegPart[i] = this.registeredParticles[i];
+         }
 
-        }
+         this.maxLength *= 2;
+         this.registeredParticles = newRegPart;
 
-        //registering the particle
-        this.registeredParticles[this.size++] = id;
+      }
 
-    }
+      //registering the particle
+      this.registeredParticles[this.size++] = id;
+
+   }
 }
