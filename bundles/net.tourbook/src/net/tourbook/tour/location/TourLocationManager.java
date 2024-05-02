@@ -44,7 +44,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import net.tourbook.OtherMessages;
 import net.tourbook.application.ApplicationVersion;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -55,6 +54,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.map.location.LocationType;
 import net.tourbook.search.FTSearchManager;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
@@ -160,6 +160,8 @@ public class TourLocationManager {
 
    private static long                            _lastRetrievalTimeMS;
 
+   private static TourLocationCache               _locationCache              = new TourLocationCache(10);
+
 // SET_FORMATTING_OFF
 
    /**
@@ -177,30 +179,32 @@ public class TourLocationManager {
     * 17 major and minor streets
     * 18 building
     */
-   static Zoomlevel[]         ALL_ZOOM_LEVEL              = {
+   public static ZoomLevel[]         ALL_ZOOM_LEVEL              = {
 
-         new Zoomlevel( 3, Messages.Tour_Location_Zoomlevel_03_Country), //            0
-         new Zoomlevel( 5, Messages.Tour_Location_Zoomlevel_05_State), //              1
-         new Zoomlevel( 8, Messages.Tour_Location_Zoomlevel_08_County), //             2
-         new Zoomlevel(10, Messages.Tour_Location_Zoomlevel_10_City), //               3
-         new Zoomlevel(12, Messages.Tour_Location_Zoomlevel_12_TownBorough), //        4
-         new Zoomlevel(13, Messages.Tour_Location_Zoomlevel_13_VillageSuburb), //      5 DEFAULT
-         new Zoomlevel(14, Messages.Tour_Location_Zoomlevel_14_Neighbourhood), //      6
-         new Zoomlevel(15, Messages.Tour_Location_Zoomlevel_15_AnySettlement), //      7
-         new Zoomlevel(16, Messages.Tour_Location_Zoomlevel_16_MajorStreets), //       8
-         new Zoomlevel(17, Messages.Tour_Location_Zoomlevel_17_MajorMinorStreets), //  9
-         new Zoomlevel(18, Messages.Tour_Location_Zoomlevel_18_Building) //            10
+         new ZoomLevel( 3, Messages.Tour_Location_Zoomlevel_03_Country), //            0
+         new ZoomLevel( 5, Messages.Tour_Location_Zoomlevel_05_State), //              1
+         new ZoomLevel( 8, Messages.Tour_Location_Zoomlevel_08_County), //             2
+         new ZoomLevel(10, Messages.Tour_Location_Zoomlevel_10_City), //               3
+         new ZoomLevel(12, Messages.Tour_Location_Zoomlevel_12_TownBorough), //        4
+         new ZoomLevel(13, Messages.Tour_Location_Zoomlevel_13_VillageSuburb), //      5 DEFAULT
+         new ZoomLevel(14, Messages.Tour_Location_Zoomlevel_14_Neighbourhood), //      6
+         new ZoomLevel(15, Messages.Tour_Location_Zoomlevel_15_AnySettlement), //      7
+         new ZoomLevel(16, Messages.Tour_Location_Zoomlevel_16_MajorStreets), //       8
+         new ZoomLevel(17, Messages.Tour_Location_Zoomlevel_17_MajorMinorStreets), //  9
+         new ZoomLevel(18, Messages.Tour_Location_Zoomlevel_18_Building) //            10
    };
 
-   public static Zoomlevel    DEFAULT_ZOOM_LEVEL          = ALL_ZOOM_LEVEL[5];
-   public static int          DEFAULT_ZOOM_LEVEL_VALUE    = DEFAULT_ZOOM_LEVEL.zoomlevel;
+   public static ZoomLevel    DEFAULT_ZOOM_LEVEL         = ALL_ZOOM_LEVEL[5];
+   public static int          DEFAULT_ZOOM_LEVEL_VALUE   = DEFAULT_ZOOM_LEVEL.zoomlevel;
+
+   public static final String ZOOM_LEVEL_ITEM            = "%3d  %s";                                             //$NON-NLS-1$
 
    public static Map<LocationPartID, String> ALL_LOCATION_PART_AND_LABEL = Map.ofEntries(
 
          Map.entry(LocationPartID.OSM_DEFAULT_NAME,                  Messages.Tour_Location_Part_OsmDefaultName),
          Map.entry(LocationPartID.OSM_NAME,                          Messages.Tour_Location_Part_OsmName),
 
-         Map.entry(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,   Messages.Tour_Location_Part_StreeWithHouseNumber),
+         Map.entry(LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,   Messages.Tour_Location_Part_StreetWithHouseNumber),
 
          // this is a computed part
          Map.entry(LocationPartID.settlementSmall,                   UI.SYMBOL_STAR + UI.SPACE + Messages.Tour_Location_Part_SettlementSmall),
@@ -277,12 +281,12 @@ public class TourLocationManager {
 
 // SET_FORMATTING_ON
 
-   static class Zoomlevel {
+   public static class ZoomLevel {
 
-      int    zoomlevel;
-      String label;
+      public int    zoomlevel;
+      public String label;
 
-      public Zoomlevel(final int zoomlevel, final String label) {
+      public ZoomLevel(final int zoomlevel, final String label) {
 
          this.zoomlevel = zoomlevel;
          this.label = label;
@@ -320,166 +324,166 @@ public class TourLocationManager {
 
 // SET_FORMATTING_OFF
 
-         new TourLocationProfile("1 : State",   8,
+         new TourLocationProfile(Messages.Tour_Location_Profile_1_State,   8,
 
             LocationPartID.state,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("2 : City",   10,
+         new TourLocationProfile(Messages.Tour_Location_Profile_2_City,   10,
 
             LocationPartID.settlementLarge,
             LocationPartID.state,
             LocationPartID.OSM_NAME,
             LocationPartID.city),
 
-         new TourLocationProfile("3 : Town / Borough",   12,
+         new TourLocationProfile(Messages.Tour_Location_Profile_3_Town,   12,
 
             LocationPartID.settlementLarge,
             LocationPartID.OSM_NAME,
             LocationPartID.town),
 
-         new TourLocationProfile("4 : Village / Suburb",   13,
+         new TourLocationProfile(Messages.Tour_Location_Profile_4_Village,   13,
 
             LocationPartID.settlementLarge,
             LocationPartID.suburb,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("5 : Neighbourhood",   14,
+         new TourLocationProfile(Messages.Tour_Location_Profile_5_Neighbourhood,   14,
 
             LocationPartID.settlementLarge,
             LocationPartID.OSM_NAME,
             LocationPartID.neighbourhood),
 
-         new TourLocationProfile("6 : Settlement",   15,
+         new TourLocationProfile(Messages.Tour_Location_Profile_6_Settlement,   15,
 
             LocationPartID.settlementLarge,
             LocationPartID.settlementSmall,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("7 : Major Street",   16,
-
-            LocationPartID.settlementLarge,
-            LocationPartID.settlementSmall,
-            LocationPartID.road,
-            LocationPartID.OSM_NAME),
-
-         new TourLocationProfile("8 : Minor Street",   17,
+         new TourLocationProfile(Messages.Tour_Location_Profile_7_MajorStreet,   16,
 
             LocationPartID.settlementLarge,
             LocationPartID.settlementSmall,
             LocationPartID.road,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("9 : Building",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_8_MinorStreet,   17,
+
+            LocationPartID.settlementLarge,
+            LocationPartID.settlementSmall,
+            LocationPartID.road,
+            LocationPartID.OSM_NAME),
+
+         new TourLocationProfile(Messages.Tour_Location_Profile_9_Building,   18,
 
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
             LocationPartID.settlementSmall,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("Country, Large",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Country_Large,   18,
 
             LocationPartID.country,
             LocationPartID.settlementLarge),
 
-         new TourLocationProfile("Country, Large, Name",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Country_Large_Name,   18,
 
             LocationPartID.country,
             LocationPartID.settlementLarge,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("Large",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Large,   18,
 
             LocationPartID.settlementLarge),
 
-         new TourLocationProfile("Large, Name",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Large_Name,   18,
 
             LocationPartID.settlementLarge,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("Large, Name, Town",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Large_Name_Town,   18,
 
             LocationPartID.settlementLarge,
             LocationPartID.OSM_NAME,
             LocationPartID.town),
 
-         new TourLocationProfile("Large, Small",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Large_Small,   18,
 
             LocationPartID.settlementLarge,
             LocationPartID.settlementSmall),
 
-         new TourLocationProfile("Large, Street",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Large_Street,   18,
 
             LocationPartID.settlementLarge,
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
 
-         new TourLocationProfile("Large, Suburb",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Large_Suburb,   18,
 
             LocationPartID.settlementLarge,
             LocationPartID.suburb),
 
-         new TourLocationProfile("Large, Village",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Large_Village,   18,
 
             LocationPartID.settlementLarge,
             LocationPartID.village),
 
-         new TourLocationProfile("Name",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Name,   18,
 
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("Small",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Small,   18,
 
             LocationPartID.settlementSmall),
 
-         new TourLocationProfile("Small, Name",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Small_Name,   18,
 
             LocationPartID.settlementSmall,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("Small, Street",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Small_Street,   18,
 
             LocationPartID.settlementSmall,
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
 
-         new TourLocationProfile("Small, Street, State",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Small_Street_State,   18,
 
             LocationPartID.settlementSmall,
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
             LocationPartID.state),
 
-         new TourLocationProfile("State, Large, Name",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_State_Large_Name,   18,
 
             LocationPartID.state,
             LocationPartID.settlementLarge,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("State, Large, Name, Suburb",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_State_Large_Name_Suburb,   18,
 
             LocationPartID.state,
             LocationPartID.settlementLarge,
             LocationPartID.suburb,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("State, Small, Name",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_State_Small_Name,   18,
 
             LocationPartID.state,
             LocationPartID.settlementSmall,
             LocationPartID.OSM_NAME),
 
-         new TourLocationProfile("Street + House #",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Street_House,   18,
 
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER),
 
-         new TourLocationProfile("Street, Large",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Street_Large,   18,
 
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
             LocationPartID.settlementLarge),
 
-         new TourLocationProfile("Street, Village",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Street_Village,   18,
 
             LocationPartID.CUSTOM_STREET_WITH_HOUSE_NUMBER,
             LocationPartID.village),
 
-         new TourLocationProfile("Suburb, Neighbourhood",   18,
+         new TourLocationProfile(Messages.Tour_Location_Profile_Suburb_Neighbourhood,   18,
 
             LocationPartID.suburb,
             LocationPartID.neighbourhood)
@@ -752,7 +756,7 @@ public class TourLocationManager {
 
       final int[] boundingBoxE6 = Util.convertDoubleSeries_ToE6(boundingbox);
 
-      // convert possible negative values into positive values, it's easier to math it
+      // convert possible negative values into positive values, it's easier to math with them
       final int latitudeMinE6_Normalized = boundingBoxE6[0] + 90_000_000;
       final int latitudeMaxE6_Normalized = boundingBoxE6[1] + 90_000_000;
       final int longitudeMinE6_Normalized = boundingBoxE6[2] + 180_000_000;
@@ -1118,20 +1122,20 @@ public class TourLocationManager {
 
    static String getCombined_StreetWithHouseNumber(final TourLocation tourLocation) {
 
-      final String adrRoad = tourLocation.road;
-      final String adrHouseNumber = tourLocation.house_number;
+      final String locationRoad = tourLocation.road;
+      final String locationHouseNumber = tourLocation.house_number;
 
-      if (adrRoad == null && adrHouseNumber == null) {
+      if (locationRoad == null && locationHouseNumber == null) {
 
          return null;
 
-      } else if (adrRoad == null) {
+      } else if (locationRoad == null) {
 
-         return adrHouseNumber;
+         return locationHouseNumber;
 
-      } else if (adrHouseNumber == null) {
+      } else if (locationHouseNumber == null) {
 
-         return adrRoad;
+         return locationRoad;
       }
 
       // road and house number are available
@@ -1140,11 +1144,11 @@ public class TourLocationManager {
 
       if (COUNTRY_CODE_US.equals(countryCode)) {
 
-         return adrHouseNumber + UI.SPACE + adrRoad;
+         return locationHouseNumber + UI.SPACE + locationRoad;
 
       } else {
 
-         return adrRoad + UI.SPACE + adrHouseNumber;
+         return locationRoad + UI.SPACE + locationHouseNumber;
       }
    }
 
@@ -1163,20 +1167,51 @@ public class TourLocationManager {
       return _defaultProfile;
    }
 
+   public static TourLocationCache getLocationCache() {
+      return _locationCache;
+   }
+
+   /**
+    * @param latitude
+    * @param longitude
+    * @param existingLocationData
+    *           Is checking this existing location and returns it when it fits.
+    * @param zoomlevel
+    *
+    * @return Returns {@link TourLocationData} or <code>null</code> when it could not be retrieved
+    */
+   public static TourLocationData getLocationData(final double latitude,
+                                                  final double longitude,
+                                                  final TourLocationData existingLocationData,
+                                                  final int zoomlevel) {
+
+      return getLocationData(
+
+            latitude,
+            longitude,
+            existingLocationData,
+            zoomlevel,
+            true);
+   }
+
    /**
     * Retrieve location data when not yet available
     *
     * @param latitude
     * @param longitude
     * @param existingLocationData
+    *           Is checking this existing location and returns it when it fits.
     * @param zoomlevel
+    * @param isUseSavedLocations
+    *           When <code>false</code> then the location is always retrieved
     *
-    * @return
+    * @return Returns {@link TourLocationData} or <code>null</code> when it could not be retrieved
     */
    public static TourLocationData getLocationData(final double latitude,
                                                   final double longitude,
                                                   final TourLocationData existingLocationData,
-                                                  final int zoomlevel) {
+                                                  final int zoomlevel,
+                                                  final boolean isUseSavedLocations) {
 
 // enable logging when debugging
 //    _isLogging_AddressRetrieval = true;
@@ -1188,14 +1223,24 @@ public class TourLocationManager {
          return existingLocationData;
       }
 
-      /*
-       * Check if a tour location is already saved
-       */
-      final TourLocation dbTourLocation = TourDatabase.getTourLocation(latitude, longitude, zoomlevel);
-      if (dbTourLocation != null) {
+      if (isUseSavedLocations) {
 
-         return new TourLocationData(dbTourLocation);
+         // check if a tour location is already saved
+
+         final TourLocation dbTourLocation = TourDatabase.getTourLocation(latitude, longitude, zoomlevel);
+
+         if (dbTourLocation != null) {
+
+            // return saved location
+
+            return new TourLocationData(dbTourLocation);
+         }
       }
+
+      /*
+       * Check fifo cache
+       */
+//      _locationCache.get(latitude, longitude, zoomlevel);
 
       /*
        * Retrieve location
@@ -1475,9 +1520,9 @@ public class TourLocationManager {
     *
     * @return Returns all {@link TourLocation}s
     */
-   public static List<TourLocation> getTourLocations(final List<TourData> allTourData) {
+   public static List<TourLocationExtended> getTourLocations(final List<TourData> allTourData) {
 
-      final List<TourLocation> allTourLocations = new ArrayList<>();
+      final List<TourLocationExtended> allTourLocationsExtended = new ArrayList<>();
 
       for (final TourData tourData : allTourData) {
 
@@ -1485,15 +1530,15 @@ public class TourLocationManager {
          final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
 
          if (tourLocationStart != null) {
-            allTourLocations.add(tourLocationStart);
+            allTourLocationsExtended.add(new TourLocationExtended(tourLocationStart, LocationType.TourStart));
          }
 
          if (tourLocationEnd != null) {
-            allTourLocations.add(tourLocationEnd);
+            allTourLocationsExtended.add(new TourLocationExtended(tourLocationEnd, LocationType.TourEnd));
          }
       }
 
-      return allTourLocations;
+      return allTourLocationsExtended;
    }
 
    /**
@@ -2381,10 +2426,9 @@ public class TourLocationManager {
 
                      if (isLogLocation) {
 
-                        // %s - "%s"  . . .  "%s"
                         TourLogManager.subLog_DEFAULT(
 
-                              OtherMessages.LOG_RETRIEVE_TOUR_LOCATION_TOUR.formatted(
+                              "%s - \"%s\"  . . .  \"%s\"".formatted( // //$NON-NLS-1$
 
                                     TourManager.getTourDateTimeShort(tourData),
                                     tourData.getTourStartPlace(),

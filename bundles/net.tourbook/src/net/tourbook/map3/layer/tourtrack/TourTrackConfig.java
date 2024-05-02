@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -157,7 +157,7 @@ public class TourTrackConfig implements Cloneable {
    public boolean isAltitudeOffset               = TourTrackConfigManager.IS_ALTITUDE_OFFSET_DEFAULT;
 
    /**
-    * When <code>true</code> the altitude offset value will be multiplied with the random number
+    * When <code>true</code> the altitude offset value will be multiplied with a random number
     * 0.1...1.0
     */
    public boolean isAltitudeOffsetRandom         = TourTrackConfigManager.IS_ALTITUDE_OFFSET_RANDOM_DEFAULT;

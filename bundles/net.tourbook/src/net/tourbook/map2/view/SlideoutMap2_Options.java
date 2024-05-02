@@ -71,8 +71,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
     * UI controls
     */
    private Button                _chkIsDimMap;
-   private Button                _chkIsShowTourLocations;
-   private Button                _chkIsShowTourLocations_BoundingBox;
    private Button                _chkIsToggleKeyboardPanning;
    private Button                _chkSelectInbetweenTimeSlices;
    private Button                _chkShowValuePointTooltip;
@@ -188,20 +186,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
       {
          {
             /*
-             * Show tour locations
-             */
-            _chkIsShowTourLocations = new Button(container, SWT.CHECK);
-            _chkIsShowTourLocations.setText(Messages.Slideout_Map_Options_Checkbox_ShowTourLocations);
-            _chkIsShowTourLocations.addSelectionListener(_defaultSelectionListener);
-            gdSpan2.applyTo(_chkIsShowTourLocations);
-
-            _chkIsShowTourLocations_BoundingBox = new Button(container, SWT.CHECK);
-            _chkIsShowTourLocations_BoundingBox.setText(Messages.Slideout_Map_Options_Checkbox_ShowTourLocations_BoundingBox);
-            _chkIsShowTourLocations_BoundingBox.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(2, 1).indent(16, 0).applyTo(_chkIsShowTourLocations_BoundingBox);
-         }
-         {
-            /*
              * Show value point tooltip
              */
             _chkShowValuePointTooltip = new Button(container, SWT.CHECK);
@@ -266,9 +250,7 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
    private void enableControls() {
 
       final boolean isDimMap = _chkIsDimMap.getSelection();
-      final boolean isShowTouLocations = _chkIsShowTourLocations.getSelection();
 
-      _chkIsShowTourLocations_BoundingBox.setEnabled(isShowTouLocations);
       _colorMapDimmColor.setEnabled(isDimMap);
       _spinnerDimValue.setEnabled(isDimMap);
 
@@ -291,7 +273,7 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
    @Override
    public void onChangeUI_External() {
 
-      _map2View.restoreState_Map2_Options();
+      _map2View.updateState_Map2_Options();
    }
 
    private void onChangeUI_UpdateMap() {
@@ -300,7 +282,7 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
 
       enableControls();
 
-      _map2View.restoreState_Map2_Options();
+      _map2View.updateState_Map2_Options();
    }
 
    @Override
@@ -311,12 +293,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
       _chkIsToggleKeyboardPanning.setSelection(    Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT);
 
       _chkSelectInbetweenTimeSlices.setSelection(  _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
-
-      /*
-       * Tour locations
-       */
-      _chkIsShowTourLocations.setSelection(              Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT);
-      _chkIsShowTourLocations_BoundingBox.setSelection(  Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX_DEFAULT);
 
       /*
        * Map dimming
@@ -349,11 +325,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
 
       _chkSelectInbetweenTimeSlices.setSelection(  _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
 
-      /*
-       * Tour locations
-       */
-      _chkIsShowTourLocations.setSelection(              Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_TOUR_LOCATIONS,                Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT));
-      _chkIsShowTourLocations_BoundingBox.setSelection(  Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX,   Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX_DEFAULT));
 
       /*
        * Map dimming
@@ -376,12 +347,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
       _state.put(Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,    _chkIsToggleKeyboardPanning.getSelection());
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES, _chkSelectInbetweenTimeSlices.getSelection());
-
-      /*
-       * Tour locations
-       */
-      _state.put(Map2View.STATE_IS_SHOW_TOUR_LOCATIONS,              _chkIsShowTourLocations.getSelection());
-      _state.put(Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_BOUNDING_BOX, _chkIsShowTourLocations_BoundingBox.getSelection());
 
       /*
        * Map dimming

@@ -1,34 +1,47 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
 
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
- 
+
 public class DirectPainterContext {
 
-	/**
-	 * GC in the onPaint event
-	 */
-	public GC			gc;
+   /**
+    * GC in the onPaint event
+    */
+   public GC                       gc;
 
-	/**
-	 * Viewport for the current map image in world pixel
-	 */
-	public Rectangle	viewport;
+   /**
+    * Viewport for the current map image in world pixel
+    */
+   public Rectangle                mapViewport;
+
+   /**
+    * All map locations which are painted in the viewport
+    */
+   public List<PaintedMapLocation> allPaintedMapLocations = new ArrayList<>();
+
+   /**
+    * {@link PaintedMapLocation} which is hovered with the mouse, can be <code>null</code> when it's
+    * not hovered
+    */
+   public PaintedMapLocation       hoveredMapLocation;
 
 }

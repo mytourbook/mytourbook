@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,41 +22,23 @@ import java.util.List;
 import net.tourbook.common.UI;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Current {
-
-   private float         temp;
-   private float         feels_like;
-   private int           pressure;
-   private int           humidity;
-   private float         wind_speed;
-   private int           wind_deg;
-   private Volume        rain;
-   private Volume        snow;
-   private List<Weather> weather;
-
-   public float getFeels_like() {
-      return feels_like;
-   }
-
-   public int getHumidity() {
-      return humidity;
-   }
+public record Current(float temp,
+                      float feels_like,
+                      int pressure,
+                      int humidity,
+                      float wind_speed,
+                      int wind_deg,
+                      Volume rain,
+                      Volume snow,
+                      List<Weather> weather) {
 
    public float getPrecipitation() {
 
-      if (getRain() == null) {
+      if (rain() == null) {
          return 0;
       }
 
-      return (float) getRain().getOneHour();
-   }
-
-   public int getPressure() {
-      return pressure;
-   }
-
-   public Volume getRain() {
-      return rain;
+      return (float) rain().oneHour();
    }
 
    public float getSnowfall() {
@@ -65,37 +47,25 @@ class Current {
          return 0;
       }
 
-      return (float) snow.getOneHour();
-   }
-
-   public float getTemp() {
-      return temp;
-   }
-
-   public List<Weather> getWeather() {
-      return weather;
+      return (float) snow.oneHour();
    }
 
    public String getWeatherClouds() {
 
-      if (getWeather() == null || getWeather().isEmpty()) {
+      if (weather() == null || weather().isEmpty()) {
          return UI.EMPTY_STRING;
       }
 
-      return OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds(getWeather().get(0).getIcon());
+      return OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds(weather().get(0).icon());
    }
 
    public String getWeatherDescription() {
 
-      if (getWeather() == null || getWeather().isEmpty()) {
+      if (weather() == null || weather().isEmpty()) {
          return UI.EMPTY_STRING;
       }
 
-      return getWeather().get(0).getDescription();
-   }
-
-   public int getWind_deg() {
-      return wind_deg;
+      return weather().get(0).description();
    }
 
    public int getWind_speed() {

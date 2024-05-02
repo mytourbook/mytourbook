@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -106,7 +105,7 @@ public class ActionDeleteMarkerDialog extends Action {
 
       for (final TourData tourData : selectedTours) {
 
-         final List<TourMarker> originalTourMarkers = tourData.getTourMarkers().stream().collect(Collectors.toList());
+         final Set<TourMarker> originalTourMarkers = tourData.getTourMarkers();
 
          for (final TourMarker selectedTourMarker : _tourMarkers) {
             originalTourMarkers.removeIf(m -> m.getMarkerId() == selectedTourMarker.getMarkerId());

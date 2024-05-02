@@ -92,8 +92,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
    private int[]                         _unitValueWindSpeed;
    private float                         _unitValueDistance;
 
-   private ActionTourLocation            _actionStartLocation;
-   private ActionTourLocation            _actionEndLocation;
+   private ActionTourStartEndLocation    _actionStartLocation;
+   private ActionTourStartEndLocation    _actionEndLocation;
    private ActionSlideout_WeatherOptions _actionSlideout_WeatherOptions;
 
    private MouseWheelListener            _mouseWheelListener;
@@ -222,8 +222,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
 
    private void createActions() {
 
-      _actionStartLocation = new ActionTourLocation(this, true, STATE_ID);
-      _actionEndLocation = new ActionTourLocation(this, false, STATE_ID);
+      _actionStartLocation = new ActionTourStartEndLocation(this, true, STATE_ID);
+      _actionEndLocation = new ActionTourStartEndLocation(this, false, STATE_ID);
 
       _actionStartLocation.setupTourData(_tourData);
       _actionEndLocation.setupTourData(_tourData);

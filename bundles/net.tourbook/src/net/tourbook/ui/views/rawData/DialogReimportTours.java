@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2023 Frédéric Bard
+ * Copyright (C) 2020, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,7 +28,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -255,7 +254,7 @@ class DialogReimportTours extends TitleAreaDialog {
       createUI(dlgContainer);
 
       // must be run async because the dark theme is overwriting colors after calling createDialogArea()
-      _parent.getDisplay().asyncExec(this::updateUI_LockUnlockButtons);
+      _parent.getDisplay().asyncExec(() -> updateUI_LockUnlockButtons());
 
       return dlgContainer;
    }
@@ -883,7 +882,7 @@ class DialogReimportTours extends TitleAreaDialog {
          TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(
                allReimportedTourIds
                      .stream()
-                     .collect(Collectors.toList()));
+                     .toList());
       }
 
       if (reImportStatus.isAnyTourReImported.get()) {
@@ -891,7 +890,7 @@ class DialogReimportTours extends TitleAreaDialog {
          rawDataManager.updateTourData_InImportView_FromDb(null);
 
          // reselect tours, run in UI thread
-         Display.getDefault().asyncExec(_tourViewer::reloadViewer);
+         Display.getDefault().asyncExec(() -> _tourViewer.reloadViewer());
       }
 
       TourLogManager.log_DEFAULT(String.format(

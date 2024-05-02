@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2023 Frédéric Bard
+ * Copyright (C) 2020, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -71,9 +71,11 @@ public class WorldWeatherOnlineRetrieverTests {
             .doReturn(worldWeatherOnlineResponse);
 
       final TourData tour = Initializer.importTour();
-      historicalWeatherRetriever = new WorldWeatherOnlineRetriever(tour);
+      historicalWeatherRetriever = new WorldWeatherOnlineRetriever();
+      historicalWeatherRetriever.setTourData(tour);
 
       assertTrue(historicalWeatherRetriever.retrieveHistoricalWeatherData());
+      assertTrue(historicalWeatherRetriever.canMakeRequest());
       httpClientMock.verify().get(url).called();
 
 // SET_FORMATTING_OFF
@@ -121,7 +123,8 @@ public class WorldWeatherOnlineRetrieverTests {
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 
-      historicalWeatherRetriever = new WorldWeatherOnlineRetriever(tour);
+      historicalWeatherRetriever = new WorldWeatherOnlineRetriever();
+      historicalWeatherRetriever.setTourData(tour);
 
       assertTrue(historicalWeatherRetriever.retrieveHistoricalWeatherData());
       httpClientMock.verify().get(url).called();

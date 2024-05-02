@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import de.byteholder.geoclipse.map.IDirectPainter;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Map2Painter;
 import de.byteholder.geoclipse.map.MapLegend;
+import de.byteholder.geoclipse.map.PaintedMapLocation;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 import java.util.HashMap;
@@ -28,14 +29,17 @@ import java.util.Map;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorProviderConfig;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.map.GeoPosition;
-import net.tourbook.common.util.Util;
+import net.tourbook.common.ui.FormattedWord;
+import net.tourbook.common.ui.TextWrapPainter;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.map2.Messages;
+import net.tourbook.tour.location.TourLocationExtended;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -46,52 +50,83 @@ import org.eclipse.swt.widgets.Display;
 
 public class DirectMappingPainter implements IDirectPainter {
 
-   private IDialogSettings        _state;
+   private Map2                       _map;
+   private TourData                   _tourData;
 
-   private Map2                   _map;
-   private TourData               _tourData;
+   private int                        _leftSliderValueIndex;
+   private int                        _rightSliderValueIndex;
+   private int                        _externalValuePointIndex;
 
-   private int                    _leftSliderValueIndex;
-   private int                    _rightSliderValueIndex;
-   private int                    _externalValuePointIndex;
+   private boolean                    _isTourVisible;
+   private boolean                    _isShowSliderInMap;
+   private boolean                    _isShowSliderInLegend;
+   private boolean                    _isShowValuePoint;
 
-   private boolean                _isTourVisible;
-   private boolean                _isShowSliderInMap;
-   private boolean                _isShowSliderInLegend;
-   private boolean                _isShowTourLocation;
-   private boolean                _isShowValuePoint;
+   private boolean                    _isShowMapLocation;
+   private boolean                    _isShowMapLocations_BoundingBox;
+   private boolean                    _isShowLocations_Address;
+   private boolean                    _isShowLocations_Tour;
 
-   private List<TourLocation>     _allTourLocations;
+   private List<TourLocationExtended> _allAddressLocations;
+   private List<TourLocationExtended> _allTourLocations;
+   private int                        _mapLocationLineHeight    = MTFont.getTitleFontHeight() + 3;
 
-   private SliderPathPaintingData _sliderPathPaintingData;
+   private SliderPathPaintingData     _sliderPathPaintingData;
 
-   private Map<Long, Color>       _locationColors = new HashMap<>();
-   private int                    _colorSwitchCounter;
+   private Map<Long, Color>           _locationColors           = new HashMap<>();
+   private int                        _colorSwitchCounter;
+
+   private boolean                    _isMapBackgroundDark;
+
+   private Rectangle                  _imageMapLocationBounds;
+
+   private TextWrapPainter            _textWrapPainter;
+
+   private Color                      _nameColor_Dark           = new Color(222, 255, 134);
+   private Color                      _nameColor_Dark_Shadow    = new Color(0, 0, 0);
+   private Color                      _nameColor_Dark_Hovered   = new Color(255, 255, 255);
+   private Color                      _nameColor_Bright         = new Color(41, 54, 0);
+   private Color                      _nameColor_Bright_Shadow  = new Color(255, 255, 255);
+   private Color                      _nameColor_Bright_Hovered = new Color(23, 137, 255);
 
    /*
     * UI resources
     */
-   private final Image _imageLeftSlider;
-   private final Image _imageRightSlider;
+   private final Image _imageMapLocation;
+   private final Image _imageMapLocation_Address;
+   private final Image _imageMapLocation_Start;
+   private final Image _imageMapLocation_End;
+   private final Image _imageMapLocation_Hovered;
+   private final Image _imageSlider_Left;
+   private final Image _imageSlider_Right;
    private final Image _imageValuePoint;
-
-   private boolean     _isShowTourLocations_BoundingBox;
-
-   private boolean     _isMapBackgroundDark;
 
    /**
     * @param map
     * @param state
     *
     */
-   public DirectMappingPainter(final Map2 map, final IDialogSettings state) {
+   public DirectMappingPainter(final Map2 map) {
 
       _map = map;
-      _state = state;
 
-      _imageLeftSlider = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderLeft).createImage();
-      _imageRightSlider = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderRight).createImage();
-      _imageValuePoint = TourbookPlugin.getImageDescriptor(Images.Map_ValuePoint).createImage();
+// SET_FORMATTING_OFF
+
+      _imageMapLocation          = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker).createImage();
+      _imageMapLocation_Address  = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Address).createImage();
+      _imageMapLocation_Start    = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Start).createImage();
+      _imageMapLocation_End      = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_End).createImage();
+      _imageMapLocation_Hovered  = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Hovered).createImage();
+
+      _imageSlider_Left          = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderLeft).createImage();
+      _imageSlider_Right         = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderRight).createImage();
+      _imageValuePoint           = TourbookPlugin.getImageDescriptor(Images.Map_ValuePoint).createImage();
+
+// SET_FORMATTING_ON
+
+      _imageMapLocationBounds = _imageMapLocation_Hovered.getBounds();
+
+      _textWrapPainter = new TextWrapPainter();
    }
 
    /**
@@ -130,8 +165,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
       int adjustedRGB = Integer.MIN_VALUE;
 
-      final float brightnessClipValue = 0.3f;
-      final float darknessClipValue = 0.8f;
+      final float brightnessClipValue = 0.5f;
+      final float darknessClipValue = 0.6f;
 
       if (_isMapBackgroundDark) {
 
@@ -184,8 +219,13 @@ public class DirectMappingPainter implements IDirectPainter {
    @Override
    public void dispose() {
 
-      disposeImage(_imageLeftSlider);
-      disposeImage(_imageRightSlider);
+      disposeImage(_imageMapLocation);
+      disposeImage(_imageMapLocation_Address);
+      disposeImage(_imageMapLocation_Start);
+      disposeImage(_imageMapLocation_End);
+      disposeImage(_imageMapLocation_Hovered);
+      disposeImage(_imageSlider_Left);
+      disposeImage(_imageSlider_Right);
       disposeImage(_imageValuePoint);
    }
 
@@ -193,6 +233,243 @@ public class DirectMappingPainter implements IDirectPainter {
 
       if ((image != null) && !image.isDisposed()) {
          image.dispose();
+      }
+   }
+
+   private void drawMapLocation(final DirectPainterContext painterContext,
+                                final List<TourLocationExtended> allTourLocations) {
+
+      final MP mp = _map.getMapProvider();
+      final int zoomLevel = _map.getZoom();
+
+      final GC gc = painterContext.gc;
+      final Rectangle mapViewport = painterContext.mapViewport;
+      final int viewportX = mapViewport.x;
+      final int viewportY = mapViewport.y;
+
+      gc.setAntialias(SWT.ON);
+      gc.setLineWidth(2);
+      gc.setFont(MTFont.getTitleFont());
+
+      final Color textColor = _isMapBackgroundDark ? _nameColor_Dark : _nameColor_Bright;
+      final Color hoveredColor = _isMapBackgroundDark ? _nameColor_Dark_Hovered : _nameColor_Bright_Hovered;
+      final Color shadowColor = _isMapBackgroundDark ? _nameColor_Dark_Shadow : _nameColor_Bright_Shadow;
+
+      // use different colors each time
+      if (_colorSwitchCounter++ % 50 == 0) {
+         _locationColors.clear();
+      }
+
+      // setup hovered map location
+      final PaintedMapLocation hoveredMapLocation = painterContext.hoveredMapLocation;
+      Rectangle hoveredLocation = null;
+      Rectangle hoveredTextLocation = null;
+      List<FormattedWord> hoveredTexts = null;
+      int hoveredIconX = 0;
+      int hoveredIconY = 0;
+
+      final int imageWidth = _imageMapLocationBounds.width;
+      final int imageHeight = _imageMapLocationBounds.height;
+      final int imageWidth2 = imageWidth / 2;
+
+      for (final TourLocationExtended tourLocationExtended : allTourLocations) {
+
+         final TourLocation tourLocation = tourLocationExtended.tourLocation;
+
+         final Point requestedLocation = convertGeoPoint(mp, tourLocation.latitude, tourLocation.longitude, zoomLevel);
+
+         final double latitudeMin_Resized = tourLocation.latitudeMin_Resized;
+         final double latitudeMax_Resized = tourLocation.latitudeMax_Resized;
+         final double longitudeMin_Resized = tourLocation.longitudeMin_Resized;
+         final double longitudeMax_Resized = tourLocation.longitudeMax_Resized;
+
+         final Point providedBBox_TopLeft_Resized = convertGeoPoint(mp, latitudeMin_Resized, longitudeMin_Resized, zoomLevel);
+         final Point providedBBox_TopRight_Resized = convertGeoPoint(mp, latitudeMin_Resized, longitudeMax_Resized, zoomLevel);
+         final Point providedBBox_BottomLeft_Resized = convertGeoPoint(mp, latitudeMax_Resized, longitudeMin_Resized, zoomLevel);
+         final Point providedBBox_BottomRight_Resized = convertGeoPoint(mp, latitudeMax_Resized, longitudeMax_Resized, zoomLevel);
+
+         // check if location is visible
+         if (mapViewport.contains(requestedLocation)
+
+               || mapViewport.contains(providedBBox_TopLeft_Resized)
+               || mapViewport.contains(providedBBox_TopRight_Resized)
+               || mapViewport.contains(providedBBox_BottomLeft_Resized)
+               || mapViewport.contains(providedBBox_BottomRight_Resized)
+
+         ) {
+
+            // convert world position into device position
+            final int requestedDevX = requestedLocation.x - viewportX;
+            final int requestedDevY = requestedLocation.y - viewportY;
+
+            if (_isShowMapLocations_BoundingBox) {
+
+               /*
+                * Paint each bbox with a different color but use the same color for the same bbox
+                */
+               final long bboxKey = tourLocation.boundingBoxKey;
+
+               Color locationColor = _locationColors.get(bboxKey);
+
+               if (locationColor == null) {
+
+                  // create bbox color
+
+                  locationColor = createBBoxColor();
+
+                  _locationColors.put(bboxKey, locationColor);
+               }
+
+               gc.setForeground(locationColor);
+               gc.setBackground(locationColor);
+
+               // draw original bbox
+
+               final double latitudeMin = tourLocation.latitudeMin;
+               final double latitudeMax = tourLocation.latitudeMax;
+               final double longitudeMin = tourLocation.longitudeMin;
+               final double longitudeMax = tourLocation.longitudeMax;
+
+               final Point providedBBox_TopLeft = convertGeoPoint(mp, latitudeMin, longitudeMin, zoomLevel);
+               final Point providedBBox_TopRight = convertGeoPoint(mp, latitudeMin, longitudeMax, zoomLevel);
+               final Point providedBBox_BottomLeft = convertGeoPoint(mp, latitudeMax, longitudeMin, zoomLevel);
+
+               final int bboxTopLeft_DevX = providedBBox_TopLeft.x - viewportX;
+               final int bboxTopRight_DevX = providedBBox_TopRight.x - viewportX;
+
+               final int bboxTopLeft_DevY = providedBBox_TopLeft.y - viewportY;
+               final int bboxBottomLeft_DevY = providedBBox_BottomLeft.y - viewportY;
+
+               final int bboxWidth = bboxTopRight_DevX - bboxTopLeft_DevX;
+               final int bboxHeight = bboxBottomLeft_DevY - bboxTopLeft_DevY;
+
+               gc.drawRectangle(
+
+                     bboxTopLeft_DevX,
+                     bboxTopLeft_DevY,
+                     bboxWidth,
+                     bboxHeight
+
+               );
+
+               final boolean isBBoxResized = false
+
+                     || latitudeMin != latitudeMin_Resized
+                     || latitudeMax != latitudeMax_Resized
+
+                     || longitudeMin != longitudeMin_Resized
+                     || longitudeMax != longitudeMax_Resized;
+
+               if (isBBoxResized) {
+
+                  // draw resized bbox
+
+                  final int bboxTopLeft_DevX_Resized = providedBBox_TopLeft_Resized.x - viewportX;
+                  final int bboxTopRight_DevX_Resized = providedBBox_TopRight_Resized.x - viewportX;
+                  final int bboxTopLeft_DevY_Resized = providedBBox_TopLeft_Resized.y - viewportY;
+                  final int bboxBottomLeft_DevY_Resized = providedBBox_BottomLeft_Resized.y - viewportY;
+
+                  final int bboxWidth_Resized = bboxTopRight_DevX_Resized - bboxTopLeft_DevX_Resized;
+                  final int bboxHeight_Resized = bboxBottomLeft_DevY_Resized - bboxTopLeft_DevY_Resized;
+
+                  gc.drawRectangle(
+
+                        bboxTopLeft_DevX_Resized,
+                        bboxTopLeft_DevY_Resized,
+                        bboxWidth_Resized,
+                        bboxHeight_Resized
+
+                  );
+               }
+            }
+
+            final int iconDevX = requestedDevX - imageWidth2;
+            final int iconDevY = requestedDevY - imageHeight;
+
+            final Rectangle paintedRectangle = new Rectangle(
+
+                  iconDevX,
+                  iconDevY,
+
+                  imageWidth,
+                  imageHeight);
+
+            // draw location image
+            switch (tourLocationExtended.locationType) {
+
+            case Common   -> gc.drawImage(_imageMapLocation_Address, iconDevX, iconDevY);
+            case TourStart -> gc.drawImage(_imageMapLocation_Start, iconDevX, iconDevY);
+            case TourEnd   -> gc.drawImage(_imageMapLocation_End, iconDevX, iconDevY);
+
+            default        -> gc.drawImage(_imageMapLocation, iconDevX, iconDevY);
+            }
+
+            // check if location name is formatted
+            if (tourLocationExtended.allFormattedLocationNameWords == null) {
+
+               setupMapLocationName(gc, tourLocationExtended);
+
+               // reset clipping
+               gc.setClipping((Rectangle) null);
+            }
+
+            Rectangle paintedTopLeftPos = null;
+
+            final List<FormattedWord> allFormattedLocationNameWords = tourLocationExtended.allFormattedLocationNameWords;
+            if (allFormattedLocationNameWords.size() > 0) {
+
+               final Point locationNameBoundingBox = tourLocationExtended.locationNameBoundingBox;
+
+               paintedTopLeftPos = _textWrapPainter.drawPreformattedText(
+
+                     gc,
+
+                     iconDevX,
+                     iconDevY,
+
+                     tourLocationExtended.allFormattedLocationNameWords,
+                     locationNameBoundingBox,
+
+                     _imageMapLocationBounds,
+                     _mapLocationLineHeight,
+
+                     textColor,
+                     shadowColor
+
+               );
+
+               paintedRectangle.add(paintedTopLeftPos);
+            }
+
+            // keep location for mouse actions
+            painterContext.allPaintedMapLocations.add(new PaintedMapLocation(tourLocationExtended, paintedRectangle));
+
+            if (hoveredMapLocation != null && paintedRectangle.equals(hoveredMapLocation.locationRectangle)) {
+
+               // map location is hovered
+
+               hoveredLocation = paintedRectangle;
+               hoveredTextLocation = paintedTopLeftPos;
+               hoveredIconX = iconDevX;
+               hoveredIconY = iconDevY;
+               hoveredTexts = tourLocationExtended.allFormattedLocationNameWords;
+            }
+         }
+      }
+
+      // draw hovered location icon + text
+      if (hoveredLocation != null) {
+
+         gc.drawImage(_imageMapLocation_Hovered, hoveredIconX, hoveredIconY);
+
+         if (hoveredTextLocation != null) {
+
+            _textWrapPainter.drawFormattedText(gc,
+                  hoveredTextLocation.x,
+                  hoveredTextLocation.y,
+                  hoveredTexts,
+                  hoveredColor);
+         }
       }
    }
 
@@ -204,10 +481,10 @@ public class DirectMappingPainter implements IDirectPainter {
     *
     * @return Returns <code>true</code> when the marker is visible and painted
     */
-   private boolean drawMarker(final DirectPainterContext painterContext,
-                              final int sliderValueIndex,
-                              final Image markerImage,
-                              final boolean isYPosCenter) {
+   private boolean drawMarkerImage(final DirectPainterContext painterContext,
+                                   final int sliderValueIndex,
+                                   final Image markerImage,
+                                   final boolean isYPosCenter) {
 
       final MP mp = _map.getMapProvider();
       final int zoomLevel = _map.getZoom();
@@ -232,7 +509,7 @@ public class DirectMappingPainter implements IDirectPainter {
       final Point worldPixelMarker = new Point(worldPixelMarkerAWT.x, worldPixelMarkerAWT.y);
 
       // check if slider is visible
-      final Rectangle viewport = painterContext.viewport;
+      final Rectangle viewport = painterContext.mapViewport;
       if (viewport.contains(worldPixelMarker)) {
 
          // convert world position into device position
@@ -327,7 +604,7 @@ public class DirectMappingPainter implements IDirectPainter {
          lastSliderValueIndex = rightSliderValueIndex;
       }
 
-      final Rectangle viewport = painterContext.viewport;
+      final Rectangle viewport = painterContext.mapViewport;
 
       final int numMaxSegments = _sliderPathPaintingData.segments;
 
@@ -465,7 +742,7 @@ public class DirectMappingPainter implements IDirectPainter {
       final float numSlices = lastValueIndex - firstValueIndex;
       final int numSegments = (int) Math.min(numMaxSegments, numSlices);
 
-      final Rectangle viewport = painterContext.viewport;
+      final Rectangle viewport = painterContext.mapViewport;
 
       // get world position for the slider coordinates
       final java.awt.Point wpLeftSliderAWT = mp.geoToPixel(new GeoPosition(
@@ -512,152 +789,6 @@ public class DirectMappingPainter implements IDirectPainter {
       }
 
       gc.drawPolyline(devXY);
-   }
-
-   private void drawTourLocation(final DirectPainterContext painterContext) {
-
-      final MP mp = _map.getMapProvider();
-      final int zoomLevel = _map.getZoom();
-
-      final GC gc = painterContext.gc;
-      final Rectangle viewport = painterContext.viewport;
-      final int viewportX = viewport.x;
-      final int viewportY = viewport.y;
-
-      final int arcSize = 20;
-      final int arcSize2 = arcSize / 2;
-
-      gc.setAntialias(SWT.ON);
-      gc.setLineWidth(2);
-
-      // use different colors each time
-      if (_colorSwitchCounter++ % 50 == 0) {
-
-         _locationColors.clear();
-      }
-
-      for (final TourLocation tourLocation : _allTourLocations) {
-
-         final Point requestedLocation = convertGeoPoint(mp, tourLocation.latitude, tourLocation.longitude, zoomLevel);
-
-         final double latitudeMin_Resized = tourLocation.latitudeMin_Resized;
-         final double latitudeMax_Resized = tourLocation.latitudeMax_Resized;
-         final double longitudeMin_Resized = tourLocation.longitudeMin_Resized;
-         final double longitudeMax_Resized = tourLocation.longitudeMax_Resized;
-
-         final Point providedBBox_TopLeft_Resized = convertGeoPoint(mp, latitudeMin_Resized, longitudeMin_Resized, zoomLevel);
-         final Point providedBBox_TopRight_Resized = convertGeoPoint(mp, latitudeMin_Resized, longitudeMax_Resized, zoomLevel);
-         final Point providedBBox_BottomLeft_Resized = convertGeoPoint(mp, latitudeMax_Resized, longitudeMin_Resized, zoomLevel);
-         final Point providedBBox_BottomRight_Resized = convertGeoPoint(mp, latitudeMax_Resized, longitudeMax_Resized, zoomLevel);
-
-         // check if location is visible
-         if (viewport.contains(requestedLocation)
-
-               || viewport.contains(providedBBox_TopLeft_Resized)
-               || viewport.contains(providedBBox_TopRight_Resized)
-               || viewport.contains(providedBBox_BottomLeft_Resized)
-               || viewport.contains(providedBBox_BottomRight_Resized)
-
-         ) {
-
-            // convert world position into device position
-            final int requestedDevX = requestedLocation.x - viewportX;
-            final int requestedDevY = requestedLocation.y - viewportY;
-            final int requestedDevXCenter = requestedDevX - arcSize2;
-            final int requestedDevYCenter = requestedDevY - arcSize2;
-
-            /*
-             * Paint each bbox with a different color but use the same color for the same bbox
-             */
-            final long bboxKey = tourLocation.boundingBoxKey;
-
-            Color locationColor = _locationColors.get(bboxKey);
-
-            if (locationColor == null) {
-
-               // create bbox color
-
-               locationColor = createBBoxColor();
-
-               _locationColors.put(bboxKey, locationColor);
-            }
-
-            gc.setForeground(locationColor);
-            gc.setBackground(locationColor);
-
-            // draw requested location
-            gc.fillArc(
-
-                  requestedDevXCenter,
-                  requestedDevYCenter,
-                  arcSize,
-                  arcSize,
-                  0,
-                  360);
-
-            if (_isShowTourLocations_BoundingBox) {
-
-               // draw original bbox
-
-               final double latitudeMin = tourLocation.latitudeMin;
-               final double latitudeMax = tourLocation.latitudeMax;
-               final double longitudeMin = tourLocation.longitudeMin;
-               final double longitudeMax = tourLocation.longitudeMax;
-
-               final Point providedBBox_TopLeft = convertGeoPoint(mp, latitudeMin, longitudeMin, zoomLevel);
-               final Point providedBBox_TopRight = convertGeoPoint(mp, latitudeMin, longitudeMax, zoomLevel);
-               final Point providedBBox_BottomLeft = convertGeoPoint(mp, latitudeMax, longitudeMin, zoomLevel);
-
-               final int bboxTopLeft_DevX = providedBBox_TopLeft.x - viewportX;
-               final int bboxTopRight_DevX = providedBBox_TopRight.x - viewportX;
-
-               final int bboxTopLeft_DevY = providedBBox_TopLeft.y - viewportY;
-               final int bboxBottomLeft_DevY = providedBBox_BottomLeft.y - viewportY;
-
-               final int bboxWidth = bboxTopRight_DevX - bboxTopLeft_DevX;
-               final int bboxHeight = bboxBottomLeft_DevY - bboxTopLeft_DevY;
-
-               gc.drawRectangle(
-
-                     bboxTopLeft_DevX,
-                     bboxTopLeft_DevY,
-                     bboxWidth,
-                     bboxHeight
-
-               );
-
-               final boolean isBBoxResized = false
-
-                     || latitudeMin != latitudeMin_Resized
-                     || latitudeMax != latitudeMax_Resized
-
-                     || longitudeMin != longitudeMin_Resized
-                     || longitudeMax != longitudeMax_Resized;
-
-               if (isBBoxResized) {
-
-                  // draw resized bbox
-
-                  final int bboxTopLeft_DevX_Resized = providedBBox_TopLeft_Resized.x - viewportX;
-                  final int bboxTopRight_DevX_Resized = providedBBox_TopRight_Resized.x - viewportX;
-                  final int bboxTopLeft_DevY_Resized = providedBBox_TopLeft_Resized.y - viewportY;
-                  final int bboxBottomLeft_DevY_Resized = providedBBox_BottomLeft_Resized.y - viewportY;
-
-                  final int bboxWidth_Resized = bboxTopRight_DevX_Resized - bboxTopLeft_DevX_Resized;
-                  final int bboxHeight_Resized = bboxBottomLeft_DevY_Resized - bboxTopLeft_DevY_Resized;
-
-                  gc.drawRectangle(
-
-                        bboxTopLeft_DevX_Resized,
-                        bboxTopLeft_DevY_Resized,
-                        bboxWidth_Resized,
-                        bboxHeight_Resized
-
-                  );
-               }
-            }
-         }
-      }
    }
 
    private void drawValueMarkerInLegend(final DirectPainterContext painterContext) {
@@ -737,10 +868,27 @@ public class DirectMappingPainter implements IDirectPainter {
          return;
       }
 
-      if (_isShowTourLocation) {
+      if (_isShowMapLocation) {
+
+         painterContext.allPaintedMapLocations.clear();
 
          // show tour locations
-         drawTourLocation(painterContext);
+         if (_isShowLocations_Tour) {
+
+            if (_allTourLocations != null && _allTourLocations.size() > 0) {
+
+               drawMapLocation(painterContext, _allTourLocations);
+            }
+         }
+
+         // show address locations
+         if (_isShowLocations_Address) {
+
+            if (_allAddressLocations != null && _allAddressLocations.size() > 0) {
+
+               drawMapLocation(painterContext, _allAddressLocations);
+            }
+         }
       }
 
       if (_tourData == null
@@ -752,29 +900,33 @@ public class DirectMappingPainter implements IDirectPainter {
 
       if (_sliderPathPaintingData.isShowSliderPath) {
 
-         // draw it even when the sliders are not visible but the tour can be visible !
+         // draw slider path even when the sliders are not visible but the tour can be visible !
 
          drawSliderPath(painterContext);
       }
 
       if (_isShowSliderInMap) {
-         drawMarker(painterContext, _rightSliderValueIndex, _imageRightSlider, false);
-         drawMarker(painterContext, _leftSliderValueIndex, _imageLeftSlider, false);
+
+         drawMarkerImage(painterContext, _rightSliderValueIndex, _imageSlider_Right, false);
+         drawMarkerImage(painterContext, _leftSliderValueIndex, _imageSlider_Left, false);
       }
 
       if (_isShowValuePoint
 
             // check if value point is valid -> do not show invalid point
-            && _externalValuePointIndex != -1
+            && _externalValuePointIndex != -1) {
 
-      ) {
-
-         drawMarker(painterContext, _externalValuePointIndex, _imageValuePoint, true);
+         drawMarkerImage(painterContext, _externalValuePointIndex, _imageValuePoint, true);
       }
 
       if (_isShowSliderInLegend) {
          drawValueMarkerInLegend(painterContext);
       }
+   }
+
+   public void setAddressLocations(final List<TourLocationExtended> allAddressLocations) {
+
+      _allAddressLocations = allAddressLocations;
    }
 
    /**
@@ -792,20 +944,19 @@ public class DirectMappingPainter implements IDirectPainter {
     * @param isShowSliderInLegend
     * @param isShowValuePoint
     * @param sliderRelationPaintingData
-    * @param allTourLocations
     */
-   public void setPaintContext(final boolean isTourVisible,
-                               final TourData tourData,
+   public void setPaintingOptions(final boolean isTourVisible,
+                                  final TourData tourData,
 
-                               final int leftSliderValuesIndex,
-                               final int rightSliderValuesIndex,
-                               final int externalValuePointIndex,
+                                  final int leftSliderValuesIndex,
+                                  final int rightSliderValuesIndex,
+                                  final int externalValuePointIndex,
 
-                               final boolean isShowSliderInMap,
-                               final boolean isShowSliderInLegend,
-                               final boolean isShowValuePoint,
+                                  final boolean isShowSliderInMap,
+                                  final boolean isShowSliderInLegend,
+                                  final boolean isShowValuePoint,
 
-                               final SliderPathPaintingData sliderRelationPaintingData) {
+                                  final SliderPathPaintingData sliderRelationPaintingData) {
 // SET_FORMATTING_OFF
 
       _isTourVisible             = isTourVisible;
@@ -821,31 +972,130 @@ public class DirectMappingPainter implements IDirectPainter {
 
       _sliderPathPaintingData    = sliderRelationPaintingData;
 
-
 // SET_FORMATTING_ON
    }
 
-   public void setPaintContextValues(final boolean isShowTourLocations,
-                                     final boolean isShowTourLocations_BoundingBox,
-                                     final boolean isMapBackgroundDark) {
+   public void setPaintingOptions_2(final boolean isShowMapLocations,
+                                    final boolean isShowMapLocations_BBox,
 
+                                    final boolean isShowAddressLocations,
+                                    final boolean isShowTourLocations,
+
+                                    final boolean isMapBackgroundDark) {
 // SET_FORMATTING_OFF
 
-      _isShowTourLocation              = isShowTourLocations && _allTourLocations != null && _allTourLocations.size() > 0;
-      _isShowTourLocations_BoundingBox = isShowTourLocations_BoundingBox;
+      _isShowMapLocation               = isShowMapLocations;
+      _isShowMapLocations_BoundingBox  = isShowMapLocations_BBox;
+
+      _isShowLocations_Address         = isShowAddressLocations;
+      _isShowLocations_Tour            = isShowTourLocations;
 
       _isMapBackgroundDark             = isMapBackgroundDark;
 
 // SET_FORMATTING_ON
    }
 
-   public void setTourLocations(final List<TourLocation> allTourLocations) {
+   public void setTourLocations(final List<TourLocationExtended> allLocations) {
 
-      final boolean isShowLocations = Util.getStateBoolean(_state,
-            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS,
-            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT);
+      _allTourLocations = allLocations;
+   }
 
-      _isShowTourLocation = isShowLocations && allTourLocations != null && allTourLocations.size() > 0;
-      _allTourLocations = allTourLocations;
+   private void setupMapLocationName(final GC gc, final TourLocationExtended tourLocationExtended) {
+
+      final TourLocation tourLocation = tourLocationExtended.tourLocation;
+
+      final int numLines = 3;
+      final int maxLineWidth = 130;
+
+      final int viewportWidth = UI.IS_4K_DISPLAY ? maxLineWidth * 2 : maxLineWidth;
+      final int viewportHeight = _mapLocationLineHeight * numLines;
+
+      final List<FormattedWord> allFormattedWords = _textWrapPainter.formatText(
+
+            gc,
+            tourLocation.getMapName(),
+
+            viewportWidth,
+            viewportHeight,
+
+            _mapLocationLineHeight,
+            null, //             overlapRect
+
+            true, //             isTruncateText
+            numLines);
+
+      final int numWords = allFormattedWords.size();
+
+      if (numWords == 0) {
+
+         tourLocationExtended.allFormattedLocationNameWords = allFormattedWords;
+         tourLocationExtended.locationNameBoundingBox = null;
+
+         return;
+      }
+
+      int boundingBoxWidth = 0;
+      int boundingBoxHeight = 0;
+
+      /*
+       * Get bounding box for the location name words
+       */
+      for (final FormattedWord formattedWord : allFormattedWords) {
+
+         final int wordXRight = formattedWord.devX + formattedWord.wordWidth;
+         final int wordYBottom = formattedWord.devY + _mapLocationLineHeight;
+
+         if (wordXRight > boundingBoxWidth) {
+
+            boundingBoxWidth = wordXRight;
+         }
+
+         if (wordYBottom > boundingBoxHeight) {
+            boundingBoxHeight = wordYBottom;
+         }
+      }
+
+      /*
+       * Get line width for each line
+       */
+      final int maxLines = allFormattedWords.get(numWords - 1).line;
+      final int[] lineTextWidth = new int[maxLines + 1];
+
+      int currentLine = 0;
+      int formattedLineWidth = 0;
+
+      for (final FormattedWord formattedWord : allFormattedWords) {
+
+         if (currentLine == formattedWord.line) {
+
+            formattedLineWidth += formattedWord.wordWidth;
+
+         } else {
+
+            // setup next line
+            lineTextWidth[currentLine] = formattedLineWidth;
+
+            currentLine = formattedWord.line;
+
+            formattedLineWidth = formattedWord.wordWidth;
+         }
+      }
+
+      lineTextWidth[currentLine] = formattedLineWidth;
+
+      /*
+       * Set line offset into each word, this offset is used to paint the text right aligned
+       */
+      for (final FormattedWord formattedWord : allFormattedWords) {
+
+         currentLine = formattedWord.line;
+
+         final int lineOffset = boundingBoxWidth - lineTextWidth[currentLine];
+
+         formattedWord.lineHorizontalOffset = lineOffset;
+      }
+
+      tourLocationExtended.allFormattedLocationNameWords = allFormattedWords;
+      tourLocationExtended.locationNameBoundingBox = new Point(boundingBoxWidth, boundingBoxHeight);
    }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,12 +21,12 @@ public interface ITourEventListener {
 
    /**
     * @param workbenchPart
-    *           Part where the property was fired, can be <code>null</code> when the part is not
-    *           set.
+    *           Part where the property was fired, can be <code>null</code> when a part is not
+    *           available
     * @param tourEventId
-    *           Id is required.
+    *           Id is required
     * @param eventData
-    *           Can be <code>null</code>.
+    *           Can be <code>null</code>
     */
    public void tourChanged(final IWorkbenchPart workbenchPart, TourEventId tourEventId, Object eventData);
 

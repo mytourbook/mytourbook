@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -80,7 +79,6 @@ import net.tourbook.ui.views.referenceTour.TourCompareType;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -888,17 +886,17 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             return;
          }
 
-         if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+         if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof final ISelection selection) {
 
-            onSelectionChanged((ISelection) eventData);
+            onSelectionChanged(selection);
 
-         } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+         } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof final ISelection selection) {
 
-            onSelectionChanged((ISelection) eventData);
+            onSelectionChanged(selection);
 
-         } else if (eventId == TourEventId.MAP_SELECTION && eventData instanceof SelectionMapSelection) {
+         } else if (eventId == TourEventId.MAP_SELECTION && eventData instanceof final SelectionMapSelection selection) {
 
-            onSelection_MapSelection((SelectionMapSelection) eventData);
+            onSelection_MapSelection(selection);
          }
       };
 
@@ -997,7 +995,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
          /*
           * Ensure that the compare result is displayed otherwise it would be hidden when a
-          * none geo tour was seleced before
+          * none geo tour was selected before
           */
          _pageBook.showPage(_pageCompareResult);
 
@@ -1864,12 +1862,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       _viewerMenuManager = new MenuManager();
       _viewerMenuManager.setRemoveAllWhenShown(true);
-      _viewerMenuManager.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-            fillContextMenu(manager);
-         }
-      });
+      _viewerMenuManager.addMenuListener(manager -> fillContextMenu(manager));
 
       final Table table = _geoCompareViewer.getTable();
       final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
@@ -2070,7 +2063,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
    }
 
    /**
-    * Column: Elevation loss differencce
+    * Column: Elevation loss difference
     */
    private void defineColumn_Elevation_ElevationLossDiff() {
 
@@ -2399,7 +2392,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
       _colDef_TourTypeImage.setLabelProvider(new SelectionCellLabelProvider() {
 
          // !!! When using cell.setImage() then it is not centered !!!
-         // !!! Set dummy label provider, otherwise an error occures !!!
+         // !!! Set dummy label provider, otherwise an error occurs !!!
          @Override
          public void update(final ViewerCell cell) {}
       });
@@ -2531,7 +2524,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                _allGeoComparedTours
                      .stream()
                      .filter(geoComparedTour -> isInFilter_GeoDiff(geoComparedTour.minDiffValue))
-                     .collect(Collectors.toList())
+                     .toList()
 
          );
 
@@ -2546,7 +2539,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                _allGeoComparedTours
                      .stream()
                      .filter(geoComparedTour -> isInFilter_ElevationDiff(geoComparedTour))
-                     .collect(Collectors.toList())
+                     .toList()
 
          );
 
@@ -2657,6 +2650,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
    /**
     * @param sortColumnId
+    *
     * @return Returns the column widget by it's column id, when column id is not found then the
     *         first column is returned.
     */
@@ -2736,9 +2730,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
        */
       if (part instanceof ComparedTourChartView) {
 
-         if (selection instanceof StructuredSelection) {
+         if (selection instanceof final StructuredSelection structuredSelection) {
 
-            final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+            final Object firstElement = structuredSelection.getFirstElement();
             if (firstElement instanceof GeoComparedTour) {
 
                return false;
@@ -2764,6 +2758,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
     *
     * @param minDiffValue
     *           A given value
+    *
     * @return true if the minDiffValue is between 0 and the current geo
     *         relative difference filter value, false otherwise.
     */
@@ -2985,9 +2980,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
       final Object itemData = event.item.getData();
 
-      if (itemData instanceof GeoComparedTour) {
+      if (itemData instanceof final GeoComparedTour compareItem) {
 
-         final GeoComparedTour compareItem = (GeoComparedTour) itemData;
          final TourType tourType = compareItem.tourType;
 
          if (tourType != null) {
@@ -3293,9 +3287,7 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 //
 //      _lastSelectionHash = selectionHash;
 
-      if (selection instanceof SelectionChartInfo) {
-
-         final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+      if (selection instanceof final SelectionChartInfo chartInfo) {
 
          if (GeoCompareManager.isGeoComparingOn() == false) {
             return;
@@ -3304,9 +3296,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          TourData tourData = null;
 
          final Chart chart = chartInfo.getChart();
-         if (chart instanceof TourChart) {
+         if (chart instanceof final TourChart tourChart) {
 
-            final TourChart tourChart = (TourChart) chart;
             tourData = tourChart.getTourData();
          }
 
@@ -3322,9 +3313,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             if (chartDataModel != null) {
 
                final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-               if (tourId instanceof Long) {
+               if (tourId instanceof final Long tourIdLong) {
 
-                  tourData = TourManager.getInstance().getTourData((Long) tourId);
+                  tourData = TourManager.getInstance().getTourData(tourIdLong);
                   if (tourData == null) {
 
                      // tour is not in the database, try to get it from the raw data manager
@@ -3374,9 +3365,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             }
          }
 
-      } else if (selection instanceof SelectionChartXSliderPosition) {
+      } else if (selection instanceof final SelectionChartXSliderPosition xSliderPos) {
 
-         final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
          final Chart chart = xSliderPos.getChart();
          if (chart == null) {
             return;
@@ -3385,9 +3375,9 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
          final ChartDataModel chartDataModel = chart.getChartDataModel();
 
          final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-         if (tourId instanceof Long) {
+         if (tourId instanceof final Long tourIdLong) {
 
-            final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+            final TourData tourData = TourManager.getInstance().getTourData(tourIdLong);
             if (tourData != null) {
 
                if (tourData.isMultipleTours()) {
@@ -3422,9 +3412,8 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             }
          }
 
-      } else if (selection instanceof SelectionReferenceTourView) {
+      } else if (selection instanceof final SelectionReferenceTourView selectionReferenceTourView) {
 
-         final SelectionReferenceTourView selectionReferenceTourView = (SelectionReferenceTourView) selection;
          final Long refId = selectionReferenceTourView.getRefId();
 
          if (_isComparedTourPinned
@@ -3439,13 +3428,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
             compareNativeRefTour(refId);
          }
 
-      } else if (selection instanceof StructuredSelection) {
+      } else if (selection instanceof final StructuredSelection structuredSelection) {
 
-         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+         final Object firstElement = structuredSelection.getFirstElement();
 
-         if (firstElement instanceof TVIRefTour_ComparedTour) {
+         if (firstElement instanceof final TVIRefTour_ComparedTour comparedTour) {
 
-            final TVIRefTour_ComparedTour comparedTour = (TVIRefTour_ComparedTour) firstElement;
             final GeoComparedTour geoCompareTour = comparedTour.getGeoCompareTour();
 
             if (geoCompareTour != null) {
@@ -3457,15 +3445,13 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
                compareNativeRefTour(comparedTour.getRefId());
             }
 
-         } else if (firstElement instanceof GeoComparedTour) {
-
-            final GeoComparedTour geoCompareTour = (GeoComparedTour) firstElement;
+         } else if (firstElement instanceof final GeoComparedTour geoCompareTour) {
 
             selectGeoComparedTour(geoCompareTour);
 
-         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
+         } else if (firstElement instanceof final TVIElevationCompareResult_ComparedTour comparedTour) {
 
-            compareNativeRefTour(((TVIElevationCompareResult_ComparedTour) firstElement).refTour.refId);
+            compareNativeRefTour(comparedTour.refTour.refId);
          }
 
       } else if (selection instanceof SelectionDeletedTours) {

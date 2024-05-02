@@ -71,7 +71,7 @@ public class Data {
       //If the returned data is for more than 1 day, we combine the multiple hourly
       //lists into 1
       final List<Hourly> combinedHourly = new ArrayList<>();
-      weather.forEach(currentWeather -> combinedHourly.addAll(currentWeather.getHourly()));
+      weather.forEach(currentWeather -> combinedHourly.addAll(currentWeather.hourly()));
 
       filteredHourly = new ArrayList<>();
       for (final Hourly currentHourly : combinedHourly) {
@@ -123,7 +123,7 @@ public class Data {
    public short getAverageHumidity() {
 
       final OptionalDouble averageHumidity =
-            filteredHourly.stream().mapToDouble(Hourly::getHumidity).average();
+            filteredHourly.stream().mapToDouble(hourly -> hourly.humidity()).average();
 
       if (averageHumidity.isPresent()) {
          return (short) (averageHumidity.getAsDouble());
@@ -230,7 +230,7 @@ public class Data {
          return UI.EMPTY_STRING;
       }
 
-      return WorldWeatherOnlineRetriever.convertWeatherCodeToMTWeatherClouds(middleHourly.getWeatherCode());
+      return WorldWeatherOnlineRetriever.convertWeatherCodeToMTWeatherClouds(middleHourly.weatherCode());
    }
 
 }

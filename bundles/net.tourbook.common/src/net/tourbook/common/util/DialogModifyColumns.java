@@ -44,6 +44,7 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnPixelData;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -304,6 +305,35 @@ public class DialogModifyColumns extends TrayDialog {
                + " style = " + style + NL //    //$NON-NLS-1$
          ;
       }
+   }
+
+   /**
+    * Provide customized tooltips which are enabled with
+    * <p>
+    * <code>
+    *
+    *       ColumnViewerToolTipSupport.enableFor(_columnViewer);
+    *
+    * </code>
+    */
+   private abstract class ColumnCellLabelProvider extends CellLabelProvider {
+
+      @Override
+      public String getToolTipText(final Object element) {
+
+         final ColumnDefinition colDef = (ColumnDefinition) element;
+
+         // show header tooltip for the hovered column
+
+         return colDef.getColumnHeaderToolTipText();
+      }
+
+      @Override
+      public int getToolTipTimeDisplayed(final Object object) {
+
+         return 15_000;
+      }
+
    }
 
    public class ProfileComparator extends ViewerComparator {
@@ -1085,6 +1115,8 @@ public class DialogModifyColumns extends TrayDialog {
       defineAllColumns(tableLayout);
       reorderColumns(table);
 
+      ColumnViewerToolTipSupport.enableFor(_columnViewer);
+
       _columnViewer.setContentProvider(new IStructuredContentProvider() {
 
          @Override
@@ -1511,7 +1543,8 @@ public class DialogModifyColumns extends TrayDialog {
       tc.setMoveable(true);
       tc.setText(Messages.ColumnModifyDialog_column_column);
 
-      tvc.setLabelProvider(new CellLabelProvider() {
+      tvc.setLabelProvider(new ColumnCellLabelProvider() {
+
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1535,7 +1568,8 @@ public class DialogModifyColumns extends TrayDialog {
       tc.setMoveable(true);
       tc.setText(Messages.ColumnModifyDialog_Column_HeaderText);
 
-      tvc.setLabelProvider(new CellLabelProvider() {
+      tvc.setLabelProvider(new ColumnCellLabelProvider() {
+
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1545,6 +1579,7 @@ public class DialogModifyColumns extends TrayDialog {
             setColor(cell, colDef);
          }
       });
+
       tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(16), true));
    }
 
@@ -1559,7 +1594,7 @@ public class DialogModifyColumns extends TrayDialog {
       tc.setText(Messages.ColumnModifyDialog_column_unit);
       tc.setMoveable(true);
 
-      tvc.setLabelProvider(new CellLabelProvider() {
+      tvc.setLabelProvider(new ColumnCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1583,7 +1618,7 @@ public class DialogModifyColumns extends TrayDialog {
       tc.setMoveable(true);
       tc.setText(Messages.ColumnModifyDialog_Column_Alignment);
 
-      tvc.setLabelProvider(new CellLabelProvider() {
+      tvc.setLabelProvider(new ColumnCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1612,7 +1647,7 @@ public class DialogModifyColumns extends TrayDialog {
       tc.setMoveable(true);
       tc.setText(Messages.ColumnModifyDialog_Column_FormatCategory);
 
-      tvc.setLabelProvider(new CellLabelProvider() {
+      tvc.setLabelProvider(new ColumnCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1647,7 +1682,7 @@ public class DialogModifyColumns extends TrayDialog {
       tc.setMoveable(true);
       tc.setText(Messages.ColumnModifyDialog_Column_FormatTour);
 
-      tvc.setLabelProvider(new CellLabelProvider() {
+      tvc.setLabelProvider(new ColumnCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1682,7 +1717,7 @@ public class DialogModifyColumns extends TrayDialog {
       tc.setMoveable(true);
       tc.setText(Messages.ColumnModifyDialog_column_width);
 
-      tvc.setLabelProvider(new CellLabelProvider() {
+      tvc.setLabelProvider(new ColumnCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1708,7 +1743,7 @@ public class DialogModifyColumns extends TrayDialog {
          tc.setMoveable(true);
          tc.setText(Messages.ColumnModifyDialog_Column_Category);
 
-         tvc.setLabelProvider(new CellLabelProvider() {
+         tvc.setLabelProvider(new ColumnCellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
 

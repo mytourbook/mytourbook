@@ -1,0 +1,1 @@
+{"lat":40.264,"lon":-105.5885,"timezone":"America/Denver","timezone_offset":-21600,"data":[{"dt":1657080000,"sunrise":1657021106,"sunset":1657074907,"temp":8.45,"feels_like":8.45,"pressure":1001,"humidity":69,"dew_point":3.1,"clouds":99,"wind_speed":0.72,"wind_deg":272,"weather":[{"id":500,"main":"Rain","description":"light rain","icon":"10n"}],"rain":{"1h":0.38}}]}

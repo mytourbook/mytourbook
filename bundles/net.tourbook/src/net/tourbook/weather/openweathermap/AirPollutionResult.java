@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Frédéric Bard
+ * Copyright (C) 2023, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,17 +22,15 @@ import java.util.OptionalDouble;
 import java.util.function.ToDoubleFunction;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class AirPollutionResult {
-
-   private List<net.tourbook.weather.openweathermap.List> list;
+public record AirPollutionResult(List<net.tourbook.weather.openweathermap.List> list) {
 
    public int getAirQualityIndexAverage() {
 
       final ToDoubleFunction<net.tourbook.weather.openweathermap.List> listFunction =
-            listElement -> listElement.getMain().getAqi();
+            listElement -> listElement.main().aqi();
 
       final OptionalDouble averageAirQualityIndex =
-            getList().stream().mapToDouble(listFunction).average();
+            list().stream().mapToDouble(listFunction).average();
 
       if (averageAirQualityIndex.isPresent()) {
          return (int) Math.round(averageAirQualityIndex.getAsDouble());
@@ -41,7 +39,4 @@ class AirPollutionResult {
       return 0;
    }
 
-   public List<net.tourbook.weather.openweathermap.List> getList() {
-      return list;
-   }
 }

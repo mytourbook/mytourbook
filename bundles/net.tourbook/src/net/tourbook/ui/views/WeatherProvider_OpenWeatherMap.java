@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,7 @@ import net.tourbook.web.WEB;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -39,6 +40,8 @@ class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
 
    private static final String URL_OPENWEATHERMAP_ORG = "https://openweathermap.org/";//$NON-NLS-1$
 
+   private PixelConverter      _pc;
+
    public WeatherProvider_OpenWeatherMap() {}
 
    @Override
@@ -46,7 +49,7 @@ class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
                              final Composite parent,
                              final FormToolkit formToolkit) {
 
-      final int defaultHIndent = 16;
+      _pc = new PixelConverter(parent);
 
       final Composite container = formToolkit.createComposite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -61,8 +64,7 @@ class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
          linkApiSignup.addListener(SWT.Selection, event -> WEB.openUrl(URL_OPENWEATHERMAP_ORG));
 
          GridDataFactory.fillDefaults()
-               .span(2, 1)
-               .indent(defaultHIndent, 0)
+               .indent(DEFAULT_H_INDENT, 0)
                .applyTo(linkApiSignup);
       }
       {
@@ -86,9 +88,8 @@ class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
          }));
 
          GridDataFactory.fillDefaults()
-               .indent(defaultHIndent, 0)
+               .indent(DEFAULT_H_INDENT, 0)
                .align(SWT.BEGINNING, SWT.FILL)
-               .span(2, 1)
                .applyTo(btnTestConnection);
       }
 
@@ -96,11 +97,11 @@ class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
          /*
           * Label:
           */
-         final Label note = UI.createLabel(container, Messages.Pref_Weather_Label_OpenWeatherMap_FiveDaysLimit);
+         final Label note = UI.createLabel(container, Messages.Pref_Weather_Label_OpenWeatherMap_TimeRangeLimit, SWT.WRAP);
          GridDataFactory.fillDefaults()
-               .indent(defaultHIndent, 0)
-               .align(SWT.BEGINNING, SWT.FILL)
-               .span(2, 1)
+               .grab(true, false)
+               .indent(DEFAULT_H_INDENT, 0)
+               .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
                .applyTo(note);
       }
       return container;

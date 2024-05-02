@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,16 +18,4 @@ package net.tourbook.weather.weatherapi;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Condition {
-
-   private String text;
-   private int    code;
-
-   public int getCode() {
-      return code;
-   }
-
-   public String getText() {
-      return text;
-   }
-}
+public record Condition(String text, int code) {}

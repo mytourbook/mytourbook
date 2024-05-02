@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2023 Frédéric Bard
+ * Copyright (C) 2019, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,47 +31,32 @@ import net.tourbook.common.util.StringUtils;
  * A Java representation of a World Weather Online query result "hourly" element.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Hourly {
-
-   @JsonProperty("UTCdate")
-   private String            utcDate;
-
-   @JsonProperty("UTCtime")
-   private String            utcTime;
-
-   private String            windspeedKmph;
-
-   private String            winddirDegree;
-
-   private List<ValueResult> weatherDesc;
-
-   private String            weatherCode;
-
-   /**
-    * Feels like temperature in degrees Celsius (windchill)
-    */
-   @JsonProperty("FeelsLikeC")
-   private String            feelsLikeC;
-
-   /**
-    * Temperature in degrees Celsius
-    */
-   private String            tempC;
-
-   /**
-    * Atmospheric pressure in millibars (mb)
-    */
-   private String            pressure;
-
-   /**
-    * Humidity in percentage (%)
-    */
-   private int               humidity;
-
-   /**
-    * Precipitation in millimeters
-    */
-   private String            precipMM;
+public record Hourly(@JsonProperty("UTCdate") String utcDate,
+                     @JsonProperty("UTCtime") String utcTime,
+                     String windspeedKmph,
+                     String winddirDegree,
+                     List<ValueResult> weatherDesc,
+                     String weatherCode,
+                     /**
+                      * Feels like temperature in degrees Celsius (windchill)
+                      */
+                     @JsonProperty("FeelsLikeC") String feelsLikeC,
+                     /**
+                      * Temperature in degrees Celsius
+                      */
+                     String tempC,
+                     /**
+                      * Atmospheric pressure in millibars (mb)
+                      */
+                     String pressure,
+                     /**
+                      * Humidity in percentage (%)
+                      */
+                     int humidity,
+                     /**
+                      * Precipitation in millimeters
+                      */
+                     String precipMM) {
 
    public long getEpochSeconds() {
 
@@ -101,10 +86,6 @@ class Hourly {
       return Integer.parseInt(feelsLikeC);
    }
 
-   public int getHumidity() {
-      return humidity;
-   }
-
    public float getPrecipMM() {
       return Float.parseFloat(precipMM);
    }
@@ -117,24 +98,8 @@ class Hourly {
       return Integer.parseInt(tempC);
    }
 
-   public String getUtcDate() {
-      return utcDate;
-   }
-
-   public String getUtcTime() {
-      return utcTime;
-   }
-
-   public String getWeatherCode() {
-      return weatherCode;
-   }
-
-   public List<ValueResult> getWeatherDesc() {
-      return weatherDesc;
-   }
-
    public String getWeatherDescription() {
-      return getWeatherDesc().get(0).getValue();
+      return weatherDesc().get(0).value();
    }
 
    public int getWinddirDegree() {

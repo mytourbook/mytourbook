@@ -41,6 +41,10 @@ _This document will not repeat already written text in the documentation._
 
 ## Commandline arguments
 
+When a command line argument is used, then the first argument has to be prefixed with `-vmargs`
+
+e.g. `-vmargs -DlogFitData -DcreateRandomTourId`
+
 ### Logging
 
 **Log map 2.5 http traffic** 

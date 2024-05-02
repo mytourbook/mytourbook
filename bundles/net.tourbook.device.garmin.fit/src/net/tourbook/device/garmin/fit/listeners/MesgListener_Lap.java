@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -74,27 +74,31 @@ public class MesgListener_Lap extends AbstractMesgListener implements LapMesgLis
       /*
        * Set lap time, later the time slice position (serie index) will be set.
        */
-      final DateTime garminTime = lapMesg.getTimestamp();
+      final DateTime garminTime = lapMesg.getStartTime();
+      final Float totalElapsedTime = lapMesg.getTotalElapsedTime();
       if (garminTime != null) {
 
-         tourMarker.setDeviceLapTime(garminTime.getDate().getTime());
-
-      } else {
-
-         final Float totalElapsedTime = lapMesg.getTotalElapsedTime();
          if (totalElapsedTime != null) {
 
-            int lapTime = -1;
+            tourMarker.setDeviceLapTime(garminTime.getDate().getTime() + totalElapsedTime.longValue() * 1000);
 
-            lapTime = _lapTime;
+         } else {
+
+            tourMarker.setDeviceLapTime(garminTime.getDate().getTime());
+
+         }
+      } else if (totalElapsedTime != null) {
+
+         int lapTime = -1;
+
+         lapTime = _lapTime;
 //          lapTime += Math.round(totalElapsedTime);
-            lapTime += totalElapsedTime;
+         lapTime += totalElapsedTime;
 
-            _lapTime = lapTime;
+         _lapTime = lapTime;
 //
 //         // the correct absolute time will be set later
-            tourMarker.setTime(lapTime, Long.MIN_VALUE);
-         }
+         tourMarker.setTime(lapTime, Long.MIN_VALUE);
       }
    }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,21 +21,21 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import net.tourbook.data.TourLocation;
 
 /**
- * Cache for {@link TourLocation}
+ * Cache for {@link TourLocation}s
  */
 public class TourLocationCache {
 
-   private final int                                     _maxLocations;
+   private final int                                   _maxLocations;
 
-   private final ConcurrentHashMap<String, TourLocation> _locationCache     = new ConcurrentHashMap<>();
-   private final ConcurrentLinkedQueue<String>           _locationCacheFifo = new ConcurrentLinkedQueue<>();
+   private final ConcurrentHashMap<Long, TourLocation> _locationCache     = new ConcurrentHashMap<>();
+   private final ConcurrentLinkedQueue<Long>           _locationCacheFifo = new ConcurrentLinkedQueue<>();
 
    public TourLocationCache(final int maxLocations) {
 
       _maxLocations = maxLocations;
    }
 
-   public void add(final String locationKey, final TourLocation location) {
+   public void add(final Long locationKey, final TourLocation tourLocation) {
 
       // check if space is available in the cache
       final int cacheSize = _locationCacheFifo.size();
@@ -48,16 +48,24 @@ public class TourLocationCache {
          }
       }
 
-      _locationCache.put(locationKey, location);
+      _locationCache.put(locationKey, tourLocation);
       _locationCacheFifo.add(locationKey);
    }
 
-   public TourLocation get(final String locationKey) {
+   public TourLocation get(final int latitudeE6_Normalized, final int longitudeE6_Normalized, final int zoomlevel) {
 
-      return _locationCache.get(locationKey);
+      for (final TourLocation tourLocation : _locationCache.values()) {
+
+         if (tourLocation.isInBoundingBox(zoomlevel, latitudeE6_Normalized, longitudeE6_Normalized)) {
+
+            return tourLocation;
+         }
+      }
+
+      return null;
    }
 
-   public void remove(final String locationKey) {
+   public void remove(final Long locationKey) {
 
       _locationCacheFifo.remove(locationKey);
 
@@ -73,7 +81,7 @@ public class TourLocationCache {
       _locationCacheFifo.clear();
    }
 
-   private void removeLocation(final String locationKey) {
+   private void removeLocation(final Long locationKey) {
 
       _locationCache.remove(locationKey);
    }

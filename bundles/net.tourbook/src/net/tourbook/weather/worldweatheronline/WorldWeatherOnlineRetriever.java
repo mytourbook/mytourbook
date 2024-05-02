@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2023 Frédéric Bard
+ * Copyright (C) 2019, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -63,28 +63,14 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                "Weather data is logged"); //$NON-NLS-1$
       }
    }
-
-   private static final String    baseApiUrl   = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
-   private static final String    keyParameter = "?key=";                                                          //$NON-NLS-1$
-
+   private static final String    BASE_API_URL  = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
+   private static final String    KEY_PARAMETER = "?key=";                                                          //$NON-NLS-1$
    private String                 endDate;
+
    private String                 startDate;
+   private final IPreferenceStore prefStore     = TourbookPlugin.getPrefStore();
 
-   private final IPreferenceStore prefStore    = TourbookPlugin.getPrefStore();
-   private Data                   weatherData  = null;
-
-   /*
-    * @param tour
-    * The tour for which we need to retrieve the weather data.
-    */
-   public WorldWeatherOnlineRetriever(final TourData tourData) {
-
-      super(tourData);
-
-      startDate = TimeTools.Formatter_YearMonthDay.format(tour.getTourStartTime());
-      endDate = TimeTools.Formatter_YearMonthDay.format(tour.getTourStartTime()
-            .plusSeconds(tour.getTourDeviceTime_Elapsed()));
-   }
+   private Data                   weatherData   = null;
 
    public static String convertWeatherCodeToMTWeatherClouds(final String weatherCode) {
 
@@ -99,13 +85,16 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       case "248": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_OVERCAST;
          break;
+
       case "113": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_CLEAR;
          break;
+
       case "116": //$NON-NLS-1$
       case "260": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
          break;
+
       case "299": //$NON-NLS-1$
       case "302": //$NON-NLS-1$
       case "305": //$NON-NLS-1$
@@ -118,6 +107,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       case "389": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_RAIN;
          break;
+
       case "332": //$NON-NLS-1$
       case "335": //$NON-NLS-1$
       case "338": //$NON-NLS-1$
@@ -134,9 +124,11 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       case "395": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_SNOW;
          break;
+
       case "200": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
          break;
+
       case "374": //$NON-NLS-1$
       case "362": //$NON-NLS-1$
       case "350": //$NON-NLS-1$
@@ -146,6 +138,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       case "386": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
          break;
+
       case "311": //$NON-NLS-1$
       case "353": //$NON-NLS-1$
       case "185": //$NON-NLS-1$
@@ -157,6 +150,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       case "296": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_DRIZZLE;
          break;
+
       default:
          weatherType = UI.EMPTY_STRING;
          break;
@@ -166,7 +160,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    }
 
    public static String getApiUrl() {
-      return baseApiUrl + keyParameter;
+      return BASE_API_URL + KEY_PARAMETER;
    }
 
    @Override
@@ -187,12 +181,12 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                WeatherUtils.getWeatherIcon(
                      WeatherUtils.getWeatherIndex(
                            convertWeatherCodeToMTWeatherClouds(
-                                 hourly.getWeatherCode()))),
+                                 hourly.weatherCode()))),
                hourly.getWeatherDescription(),
                hourly.getFeelsLikeC(),
                hourly.getWindspeedKmph(),
                hourly.getWinddirDegree(),
-               hourly.getHumidity(),
+               hourly.humidity(),
                hourly.getPressure(),
                hourly.getPrecipMM(),
                0,
@@ -216,13 +210,13 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
             final NearestArea firstNearestArea = nearestArea.get(0);
 
             String weatherStationName = UI.EMPTY_STRING;
-            if (firstNearestArea.getAreaName() != null && firstNearestArea.getAreaName().size() > 0) {
-               weatherStationName = firstNearestArea.getAreaName().get(0).getValue();
+            if (firstNearestArea.areaName() != null && firstNearestArea.areaName().size() > 0) {
+               weatherStationName = firstNearestArea.areaName().get(0).value();
             }
 
             final LatLng weatherStationCoordinates = new LatLng(
-                  Double.valueOf(firstNearestArea.getLatitude()),
-                  Double.valueOf(firstNearestArea.getLongitude()));
+                  Double.valueOf(firstNearestArea.latitude()),
+                  Double.valueOf(firstNearestArea.longitude()));
 
             final float distanceFromTour = Math.round(
                   LatLngTool.distance(
@@ -232,8 +226,8 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                         / UI.UNIT_VALUE_DISTANCE / 1000);
 
             String weatherStationLink = UI.EMPTY_STRING;
-            if (firstNearestArea.getWeatherUrl() != null && firstNearestArea.getWeatherUrl().size() > 0) {
-               weatherStationLink = firstNearestArea.getWeatherUrl().get(0).getValue();
+            if (firstNearestArea.weatherUrl() != null && firstNearestArea.weatherUrl().size() > 0) {
+               weatherStationLink = firstNearestArea.weatherUrl().get(0).value();
             }
 
             fullWeatherDataList.add(NLS.bind(
@@ -253,7 +247,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
    private String buildWeatherApiRequest() {
 
-      final StringBuilder weatherRequestWithParameters = new StringBuilder(baseApiUrl + UI.SYMBOL_QUESTION_MARK);
+      final StringBuilder weatherRequestWithParameters = new StringBuilder(BASE_API_URL + UI.SYMBOL_QUESTION_MARK);
 
    // SET_FORMATTING_OFF
 
@@ -277,11 +271,17 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       return weatherRequestWithParameters.toString();
    }
 
+   @Override
+   public boolean canMakeRequest() {
+      return true;
+   }
+
    /**
     * Deserialize a JSON weather data object into a WeatherData object.
     *
     * @param weatherDataResponse
     *           A string containing a historical weather data JSON object.
+    *
     * @return The serialized weather data.
     */
    private Data deserializeWeatherData(final String weatherDataResponse) {
@@ -331,6 +331,11 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    }
 
    @Override
+   protected String getWeatherRetrievalFailureLogMessage() {
+      return UI.EMPTY_STRING;
+   }
+
+   @Override
    public boolean retrieveHistoricalWeatherData() {
 
       final String weatherRequestWithParameters = buildWeatherApiRequest();
@@ -348,8 +353,8 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       final List<Weather> weather = weatherData.getWeather();
       if (weather == null ||
             weather.isEmpty() ||
-            weather.get(0).getHourly() == null ||
-            weather.get(0).getHourly().isEmpty()) {
+            weather.get(0).hourly() == null ||
+            weather.get(0).hourly().isEmpty()) {
          return false;
       }
 
@@ -381,6 +386,16 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 // SET_FORMATTING_ON
 
       return true;
+   }
+
+   @Override
+   public void setTourData(final TourData tourData) {
+
+      super.setTourData(tourData);
+
+      startDate = TimeTools.Formatter_YearMonthDay.format(tour.getTourStartTime());
+      endDate = TimeTools.Formatter_YearMonthDay.format(tour.getTourStartTime()
+            .plusSeconds(tour.getTourDeviceTime_Elapsed()));
    }
 
 }

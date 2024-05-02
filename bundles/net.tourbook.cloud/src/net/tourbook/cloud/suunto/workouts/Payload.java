@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2022 Frédéric Bard
+ * Copyright (C) 2021, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,12 +18,10 @@ package net.tourbook.cloud.suunto.workouts;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Payload {
-
-   public int    activityId;
-   public long   startTime;
-   public int    timeOffsetInMinutes;
-   public String workoutKey;
+public record Payload(int activityId,
+                      long startTime,
+                      int timeOffsetInMinutes,
+                      String workoutKey) {
 
    /**
     * Gets a sport name from an activity Id.
@@ -34,307 +32,301 @@ public class Payload {
     */
    public String getSportNameFromActivityId() {
 
-      String sportName;
-
       switch (activityId) {
 
       case 80:
-         sportName = "adventure racing";//$NON-NLS-1$
-         break;
+         return "adventure racing";//$NON-NLS-1$
+
       case 69:
-         sportName = "aerobics";//$NON-NLS-1$
-         break;
+         return "aerobics";//$NON-NLS-1$
+
       case 13:
-         sportName = "downhill skiing";//$NON-NLS-1$
-         break;
+         return "downhill skiing";//$NON-NLS-1$
+
       case 94:
-         sportName = "aquathlon";//$NON-NLS-1$
-         break;
+         return "aquathlon";//$NON-NLS-1$
+
       case 36:
-         sportName = "badminton";//$NON-NLS-1$
-         break;
+         return "badminton";//$NON-NLS-1$
+
       case 37:
-         sportName = "baseball";//$NON-NLS-1$
-         break;
+         return "baseball";//$NON-NLS-1$
+
       case 35:
-         sportName = "basketball";//$NON-NLS-1$
-         break;
+         return "basketball";//$NON-NLS-1$
+
       case 46:
-         sportName = "bowling";//$NON-NLS-1$
-         break;
+         return "bowling";//$NON-NLS-1$
+
       case 77:
-         sportName = "boxing";//$NON-NLS-1$
-         break;
+         return "boxing";//$NON-NLS-1$
+
       case 82:
-         sportName = "canoeing";//$NON-NLS-1$
-         break;
+         return "canoeing";//$NON-NLS-1$
+
       case 76:
-         sportName = "cheerleading";//$NON-NLS-1$
-         break;
+         return "cheerleading";//$NON-NLS-1$
+
       case 73:
-         sportName = "circuit training";//$NON-NLS-1$
-         break;
+         return "circuit training";//$NON-NLS-1$
+
       case 29:
-         sportName = "climbing";//$NON-NLS-1$
-         break;
+         return "climbing";//$NON-NLS-1$
+
       case 62:
-         sportName = "combat sport";//$NON-NLS-1$
-         break;
+         return "combat sport";//$NON-NLS-1$
+
       case 47:
-         sportName = "cricket";//$NON-NLS-1$
-         break;
+         return "cricket";//$NON-NLS-1$
+
       case 54:
-         sportName = "crossfit";//$NON-NLS-1$
-         break;
+         return "crossfit";//$NON-NLS-1$
+
       case 3:
-         sportName = "cross country skiing";//$NON-NLS-1$
-         break;
+         return "cross country skiing";//$NON-NLS-1$
+
       case 55:
-         sportName = "crosstrainer";//$NON-NLS-1$
-         break;
+         return "crosstrainer";//$NON-NLS-1$
+
       case 2:
-         sportName = "cycling";//$NON-NLS-1$
-         break;
+         return "cycling";//$NON-NLS-1$
+
       case 64:
-         sportName = "dancing";//$NON-NLS-1$
-         break;
+         return "dancing";//$NON-NLS-1$
+
       case 93:
-         sportName = "duathlon";//$NON-NLS-1$
-         break;
+         return "duathlon";//$NON-NLS-1$
+
       case 96:
-         sportName = "fishing";//$NON-NLS-1$
-         break;
+         return "fishing";//$NON-NLS-1$
+
       case 43:
-         sportName = "floorball";//$NON-NLS-1$
-         break;
+         return "floorball";//$NON-NLS-1$
+
       case 39:
-         sportName = "american football";//$NON-NLS-1$
-         break;
+         return "american football";//$NON-NLS-1$
+
       case 79:
-         sportName = "freediving";//$NON-NLS-1$
-         break;
+         return "freediving";//$NON-NLS-1$
+
       case 66:
-         sportName = "frisbee golf";//$NON-NLS-1$
-         break;
+         return "frisbee golf";//$NON-NLS-1$
+
       case 16:
-         sportName = "golf";//$NON-NLS-1$
-         break;
+         return "golf";//$NON-NLS-1$
+
       case 81:
-         sportName = "gymnastics";//$NON-NLS-1$
-         break;
+         return "gymnastics";//$NON-NLS-1$
+
       case 44:
-         sportName = "handball";//$NON-NLS-1$
-         break;
+         return "handball";//$NON-NLS-1$
+
       case 11:
-         sportName = "hiking";//$NON-NLS-1$
-         break;
+         return "hiking";//$NON-NLS-1$
+
       case 25:
-         sportName = "horseback riding";//$NON-NLS-1$
-         break;
+         return "horseback riding";//$NON-NLS-1$
+
       case 97:
-         sportName = "hunting";//$NON-NLS-1$
-         break;
+         return "hunting";//$NON-NLS-1$
+
       case 50:
-         sportName = "ice hockey";//$NON-NLS-1$
-         break;
+         return "ice hockey";//$NON-NLS-1$
+
       case 49:
-         sportName = "ice skating";//$NON-NLS-1$
-         break;
+         return "ice skating";//$NON-NLS-1$
+
       case 57:
-         sportName = "indoor rowing";//$NON-NLS-1$
-         break;
+         return "indoor rowing";//$NON-NLS-1$
+
       case 17:
-         sportName = "indoor";//$NON-NLS-1$
-         break;
+         return "indoor";//$NON-NLS-1$
+
       case 52:
-         sportName = "indoor cycling";//$NON-NLS-1$
-         break;
+         return "indoor cycling";//$NON-NLS-1$
+
       case 72:
-         sportName = "kayaking";//$NON-NLS-1$
-         break;
+         return "kayaking";//$NON-NLS-1$
+
       case 63:
-         sportName = "kettlebell";//$NON-NLS-1$
-         break;
+         return "kettlebell";//$NON-NLS-1$
+
       case 87:
-         sportName = "kitesurfing kiting";//$NON-NLS-1$
-         break;
+         return "kitesurfing kiting";//$NON-NLS-1$
+
       case 26:
-         sportName = "motorsports";//$NON-NLS-1$
-         break;
+         return "motorsports";//$NON-NLS-1$
+
       case 10:
-         sportName = "mountain biking";//$NON-NLS-1$
-         break;
+         return "mountain biking";//$NON-NLS-1$
+
       case 83:
-         sportName = "mountaineering";//$NON-NLS-1$
-         break;
+         return "mountaineering";//$NON-NLS-1$
+
       case 68:
-         sportName = "multisport";//$NON-NLS-1$
-         break;
+         return "multisport";//$NON-NLS-1$
+
       case 24:
-         sportName = "nordic walking";//$NON-NLS-1$
-         break;
+         return "nordic walking";//$NON-NLS-1$
+
       case 4:
-         sportName = "other 1";//$NON-NLS-1$
-         break;
+         return "other 1";//$NON-NLS-1$
+
       case 95:
-         sportName = "obstacle racing";//$NON-NLS-1$
-         break;
+         return "obstacle racing";//$NON-NLS-1$
+
       case 85:
-         sportName = "openwater swimming";//$NON-NLS-1$
-         break;
+         return "openwater swimming";//$NON-NLS-1$
+
       case 60:
-         sportName = "orienteering";//$NON-NLS-1$
-         break;
+         return "orienteering";//$NON-NLS-1$
+
       case 88:
-         sportName = "paragliding";//$NON-NLS-1$
-         break;
+         return "paragliding";//$NON-NLS-1$
+
       case 41:
-         sportName = "racquet ball";//$NON-NLS-1$
-         break;
+         return "racquet ball";//$NON-NLS-1$
+
       case 56:
-         sportName = "roller skiing";//$NON-NLS-1$
-         break;
+         return "roller skiing";//$NON-NLS-1$
+
       case 15:
-         sportName = "rowing";//$NON-NLS-1$
-         break;
+         return "rowing";//$NON-NLS-1$
+
       case 48:
-         sportName = "rugby";//$NON-NLS-1$
-         break;
+         return "rugby";//$NON-NLS-1$
+
       case 1:
-         sportName = "running";//$NON-NLS-1$
-         break;
+         return "running";//$NON-NLS-1$
+
       case 71:
-         sportName = "sailing";//$NON-NLS-1$
-         break;
+         return "sailing";//$NON-NLS-1$
+
       case 78:
-         sportName = "scubadiving";//$NON-NLS-1$
-         break;
+         return "scubadiving";//$NON-NLS-1$
+
       case 12:
-         sportName = "roller skating";//$NON-NLS-1$
-         break;
+         return "roller skating";//$NON-NLS-1$
+
       case 31:
-         sportName = "ski touring";//$NON-NLS-1$
-         break;
+         return "ski touring";//$NON-NLS-1$
+
       case 90:
-         sportName = "snorkeling";//$NON-NLS-1$
-         break;
+         return "snorkeling";//$NON-NLS-1$
+
       case 65:
-         sportName = "snow shoeing";//$NON-NLS-1$
-         break;
+         return "snow shoeing";//$NON-NLS-1$
+
       case 30:
-         sportName = "snowboarding";//$NON-NLS-1$
-         break;
+         return "snowboarding";//$NON-NLS-1$
+
       case 33:
-         sportName = "soccer";//$NON-NLS-1$
-         break;
+         return "soccer";//$NON-NLS-1$
+
       case 45:
-         sportName = "softball";//$NON-NLS-1$
-         break;
+         return "softball";//$NON-NLS-1$
+
       case 42:
-         sportName = "squash";//$NON-NLS-1$
-         break;
+         return "squash";//$NON-NLS-1$
+
       case 61:
-         sportName = "standup paddling";//$NON-NLS-1$
-         break;
+         return "standup paddling";//$NON-NLS-1$
+
       case 58:
-         sportName = "stretching";//$NON-NLS-1$
-         break;
+         return "stretching";//$NON-NLS-1$
+
       case 91:
-         sportName = "surfing";//$NON-NLS-1$
-         break;
+         return "surfing";//$NON-NLS-1$
+
       case 21:
-         sportName = "swimming";//$NON-NLS-1$
-         break;
+         return "swimming";//$NON-NLS-1$
+
       case 92:
-         sportName = "swimrun";//$NON-NLS-1$
-         break;
+         return "swimrun";//$NON-NLS-1$
+
       case 40:
-         sportName = "table tennis";//$NON-NLS-1$
-         break;
+         return "table tennis";//$NON-NLS-1$
+
       case 84:
-         sportName = "telemarkskiing";//$NON-NLS-1$
-         break;
+         return "telemarkskiing";//$NON-NLS-1$
+
       case 34:
-         sportName = "tennis";//$NON-NLS-1$
-         break;
+         return "tennis";//$NON-NLS-1$
+
       case 59:
-         sportName = "track and field";//$NON-NLS-1$
-         break;
+         return "track and field";//$NON-NLS-1$
+
       case 22:
-         sportName = "trail running";//$NON-NLS-1$
-         break;
+         return "trail running";//$NON-NLS-1$
+
       case 98:
-         sportName = "transition";//$NON-NLS-1$
-         break;
+         return "transition";//$NON-NLS-1$
+
       case 53:
-         sportName = "treadmill";//$NON-NLS-1$
-         break;
+         return "treadmill";//$NON-NLS-1$
+
       case 70:
-         sportName = "trekking";//$NON-NLS-1$
-         break;
+         return "trekking";//$NON-NLS-1$
+
       case 74:
-         sportName = "triathlon";//$NON-NLS-1$
-         break;
+         return "triathlon";//$NON-NLS-1$
+
       case 38:
-         sportName = "volleyball";//$NON-NLS-1$
-         break;
+         return "volleyball";//$NON-NLS-1$
+
       case 0:
-         sportName = "walking";//$NON-NLS-1$
-         break;
+         return "walking";//$NON-NLS-1$
+
       case 23:
-         sportName = "gym";//$NON-NLS-1$
-         break;
+         return "gym";//$NON-NLS-1$
+
       case 86:
-         sportName = "windsurfing";//$NON-NLS-1$
-         break;
+         return "windsurfing";//$NON-NLS-1$
+
       case 51:
-         sportName = "yoga";//$NON-NLS-1$
-         break;
+         return "yoga";//$NON-NLS-1$
+
       case 19:
-         sportName = "ball games";//$NON-NLS-1$
-         break;
+         return "ball games";//$NON-NLS-1$
+
       case 32:
-         sportName = "fitness class";//$NON-NLS-1$
-         break;
+         return "fitness class";//$NON-NLS-1$
+
       case 67:
-         sportName = "futsal";//$NON-NLS-1$
-         break;
+         return "futsal";//$NON-NLS-1$
+
       case 5:
-         sportName = "other 2";//$NON-NLS-1$
-         break;
+         return "other 2";//$NON-NLS-1$
+
       case 6:
-         sportName = "other 3";//$NON-NLS-1$
-         break;
+         return "other 3";//$NON-NLS-1$
+
       case 7:
-         sportName = "other 4";//$NON-NLS-1$
-         break;
+         return "other 4";//$NON-NLS-1$
+
       case 8:
-         sportName = "other 5";//$NON-NLS-1$
-         break;
+         return "other 5";//$NON-NLS-1$
+
       case 9:
-         sportName = "other 6";//$NON-NLS-1$
-         break;
+         return "other 6";//$NON-NLS-1$
+
       case 20:
-         sportName = "outdoor gym";//$NON-NLS-1$
-         break;
+         return "outdoor gym";//$NON-NLS-1$
+
       case 14:
-         sportName = "paddling";//$NON-NLS-1$
-         break;
+         return "paddling";//$NON-NLS-1$
+
       case 18:
-         sportName = "parkour";//$NON-NLS-1$
-         break;
+         return "parkour";//$NON-NLS-1$
+
       case 27:
-         sportName = "skateboarding";//$NON-NLS-1$
-         break;
+         return "skateboarding";//$NON-NLS-1$
+
       case 28:
-         sportName = "water sports";//$NON-NLS-1$
-         break;
+         return "water sports";//$NON-NLS-1$
 
       default:
-         sportName = String.valueOf(activityId);
-         break;
+         return String.valueOf(activityId);
       }
-
-      return sportName;
    }
 }

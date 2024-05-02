@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1153,20 +1153,24 @@ public class Util {
 
    public static LocalDate getStateDate(final IDialogSettings state,
                                         final String stateKey,
-                                        final LocalDate defaultValue,
-                                        final DateTime dateTimeControl) {
-
-      final String value = state.get(stateKey);
-      LocalDate parsedValue;
+                                        final LocalDate defaultValue) {
 
       try {
 
-         parsedValue = LocalDate.parse(value);
+         return LocalDate.parse(state.get(stateKey));
 
       } catch (final Exception e) {
 
-         parsedValue = defaultValue;
+         return defaultValue;
       }
+   }
+
+   public static LocalDate getStateDate(final IDialogSettings state,
+                                        final String stateKey,
+                                        final LocalDate defaultValue,
+                                        final DateTime dateTimeControl) {
+
+      final LocalDate parsedValue = getStateDate(state, stateKey, defaultValue);
 
       dateTimeControl.setYear(parsedValue.getYear());
       dateTimeControl.setMonth(parsedValue.getMonthValue() - 1);

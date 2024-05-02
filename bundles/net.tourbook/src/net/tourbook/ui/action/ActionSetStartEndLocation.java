@@ -34,7 +34,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.tour.location.LocationPartID;
 import net.tourbook.tour.location.PartItem;
-import net.tourbook.tour.location.SlideoutLocationProfiles;
+import net.tourbook.tour.location.SlideoutStartEndLocationProfiles;
 import net.tourbook.tour.location.TourLocationData;
 import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.location.TourLocationProfile;
@@ -81,54 +81,54 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class ActionSetStartEndLocation extends SubMenu {
 
-   private static final String             ID                 = "net.tourbook.ui.action.ActionSetStartEndLocation"; //$NON-NLS-1$
+   private static final String              ID                 = "net.tourbook.ui.action.ActionSetStartEndLocation"; //$NON-NLS-1$
 
-   private static final String             LOCATION_SEPARATOR = "     ·     ";                                      //$NON-NLS-1$
+   private static final String              LOCATION_SEPARATOR = "     ·     ";                                      //$NON-NLS-1$
 
-   private static final String             PROFILE_NAME       = "%s - %d";                                          //$NON-NLS-1$
+   private static final String              PROFILE_NAME       = "%s - %d";                                          //$NON-NLS-1$
 
-   private static final IDialogSettings    _state             = TourbookPlugin.getState(ID);
+   private static final IDialogSettings     _state             = TourbookPlugin.getState(ID);
 
    /**
     * This set is used to prevent duplicated action names
     */
-   private static final Set<String>        _usedDisplayNames  = new HashSet<>();
+   private static final Set<String>         _usedDisplayNames  = new HashSet<>();
    //
-   private ITourProvider                   _tourProvider;
+   private ITourProvider                    _tourProvider;
    //
-   private Action                          _actionPartTitle_Append_All;
-   private Action                          _actionPartTitle_Append_Start;
-   private Action                          _actionPartTitle_Append_End;
-   private Action                          _actionPartTitle_Set_All;
-   private Action                          _actionPartTitle_Set_Start;
-   private Action                          _actionPartTitle_Set_End;
-   private Action                          _actionProfileTitle_All;
-   private Action                          _actionProfileTitle_Start;
-   private Action                          _actionProfileTitle_End;
-   private ActionEditProfiles              _actionEditProfiles;
-   private ActionLocationPart_Append_All   _actionLocationPart_Append_All;
-   private ActionLocationPart_Append_Start _actionLocationPart_Append_Start;
-   private ActionLocationPart_Append_End   _actionLocationPart_Append_End;
-   private ActionLocationPart_Set_All      _actionLocationPart_Set_All;
-   private ActionLocationPart_Set_Start    _actionLocationPart_Set_Start;
-   private ActionLocationPart_Set_End      _actionLocationPart_Set_End;
-   private ActionRemoveLocation_All        _actionRemoveLocation_All;
-   private ActionRemoveLocation_All        _actionRemoveLocation_All_Complete;
-   private ActionRemoveLocation_Start      _actionRemoveLocation_Start;
-   private ActionRemoveLocation_Start      _actionRemoveLocation_Start_Complete;
-   private ActionRemoveLocation_End        _actionRemoveLocation_End;
-   private ActionRemoveLocation_End        _actionRemoveLocation_End_Complete;
-   private ActionSetLocation_Start         _actionSetLocation_Start;
-   private ActionSetLocation_End           _actionSetLocation_End;
+   private Action                           _actionPartTitle_Append_All;
+   private Action                           _actionPartTitle_Append_Start;
+   private Action                           _actionPartTitle_Append_End;
+   private Action                           _actionPartTitle_Set_All;
+   private Action                           _actionPartTitle_Set_Start;
+   private Action                           _actionPartTitle_Set_End;
+   private Action                           _actionProfileTitle_All;
+   private Action                           _actionProfileTitle_Start;
+   private Action                           _actionProfileTitle_End;
+   private ActionEditProfiles               _actionEditProfiles;
+   private ActionLocationPart_Append_All    _actionLocationPart_Append_All;
+   private ActionLocationPart_Append_Start  _actionLocationPart_Append_Start;
+   private ActionLocationPart_Append_End    _actionLocationPart_Append_End;
+   private ActionLocationPart_Set_All       _actionLocationPart_Set_All;
+   private ActionLocationPart_Set_Start     _actionLocationPart_Set_Start;
+   private ActionLocationPart_Set_End       _actionLocationPart_Set_End;
+   private ActionRemoveLocation_All         _actionRemoveLocation_All;
+   private ActionRemoveLocation_All         _actionRemoveLocation_All_Complete;
+   private ActionRemoveLocation_Start       _actionRemoveLocation_Start;
+   private ActionRemoveLocation_Start       _actionRemoveLocation_Start_Complete;
+   private ActionRemoveLocation_End         _actionRemoveLocation_End;
+   private ActionRemoveLocation_End         _actionRemoveLocation_End_Complete;
+   private ActionSetLocation_Start          _actionSetLocation_Start;
+   private ActionSetLocation_End            _actionSetLocation_End;
    //
-   private SlideoutLocationProfiles        _slideoutLocationProfiles;
+   private SlideoutStartEndLocationProfiles _slideoutLocationProfiles;
    //
-   private ArrayList<TourData>             _allSelectedTours;
+   private ArrayList<TourData>              _allSelectedTours;
    //
    /**
     * When <code>null</code> then a start or end location is not hovered
     */
-   private Boolean                         _isStartLocationInContextMenu;
+   private Boolean                          _isStartLocationInContextMenu;
    //
    /*
     * UI controls
@@ -699,7 +699,7 @@ public class ActionSetStartEndLocation extends SubMenu {
       final Rectangle ownerBounds = new Rectangle(cursorLocation.x, cursorLocation.y, 0, 0);
 
       // !!! must be created lately otherwise the UI is not fully setup !!!
-      _slideoutLocationProfiles = new SlideoutLocationProfiles(
+      _slideoutLocationProfiles = new SlideoutStartEndLocationProfiles(
 
             null,
             tourLocation,
