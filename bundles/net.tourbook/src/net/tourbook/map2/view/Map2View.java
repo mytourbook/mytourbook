@@ -5012,7 +5012,7 @@ public class Map2View extends ViewPart implements
 
       final boolean isBackgroundDark = isBackgroundDark();
 
-      _map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, isBackgroundDark, isUseMapDimColor);
+      _map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, isUseMapDimColor, isBackgroundDark);
    }
 
    private void setVisibleDataPoints(final TourData tourData) {
@@ -5436,12 +5436,12 @@ public class Map2View extends ViewPart implements
 // SET_FORMATTING_ON
 
       // enable/disable cluster/marker tooltip
-      final boolean isShowTourMarker = Map2ConfigManager.getActiveMarkerConfig().isShowTourMarker;
-      if (isShowTourMarker) {
-         _map.getMarkerClusterTooltip().activate();
-      } else {
-         _map.getMarkerClusterTooltip().deactivate();
-      }
+//      final boolean isShowTourMarker = Map2ConfigManager.getActiveMarkerConfig().isShowTourMarker;
+//      if (isShowTourMarker) {
+//         _map.getMarkerClusterTooltip().activate();
+//      } else {
+//         _map.getMarkerClusterTooltip().deactivate();
+//      }
 
       /*
        * Update options for the map direct painter

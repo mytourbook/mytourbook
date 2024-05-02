@@ -24,7 +24,6 @@ import de.byteholder.geoclipse.map.PaintedMapLocation;
 import de.byteholder.geoclipse.map.PaintedMarkerCluster;
 import de.byteholder.geoclipse.mapprovider.MP;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -261,36 +260,6 @@ public class DirectMappingPainter implements IDirectPainter {
       /*
        * Draw all markers in the cluster
        */
-      if (markerConfig.isShowClusterMarker) {
-
-         final Collection<?> allClusterItems = hoveredClusterMarker.markerCluster.getItems();
-
-         if (allClusterItems.size() > 0) {
-
-            final float markerSize = 6;
-
-            final Path path = new Path(gc.getDevice());
-            {
-               for (final Object clusterItem : allClusterItems) {
-
-                  if (clusterItem instanceof final MapMarker mapMarker) {
-
-                     path.addRectangle(
-                           mapMarker.devX,
-                           mapMarker.devY,
-                           markerSize,
-                           markerSize);
-                  }
-               }
-
-               gc.setForeground(markerConfig.clusterFill_Color);
-               gc.drawPath(path);
-            }
-
-            path.dispose();
-         }
-      }
-
 
       // fill background
       if (markerConfig.isFillClusterSymbol) {
@@ -308,14 +277,14 @@ public class DirectMappingPainter implements IDirectPainter {
       gc.setForeground(markerConfig.clusterFill_Color);
 
       // draw outline
-      gc.setLineWidth(1);
-      gc.drawOval(
-
-            clusterRectangle.x,
-            clusterRectangle.y,
-
-            clusterRectangle.width,
-            clusterRectangle.height);
+//      gc.setLineWidth(1);
+//      gc.drawOval(
+//
+//            clusterRectangle.x,
+//            clusterRectangle.y,
+//
+//            clusterRectangle.width,
+//            clusterRectangle.height);
 
       // draw label
       final Font gcFontBackup = gc.getFont();
@@ -328,6 +297,12 @@ public class DirectMappingPainter implements IDirectPainter {
             true);
 
       gc.setFont(gcFontBackup);
+
+      // draw hovered cluster marker
+      if (markerConfig.isShowClusterMarker) {
+         paintHoveredClusterMarkers(gc, hoveredClusterMarker);
+      }
+
    }
 
    private void drawMapLocation(final DirectPainterContext painterContext,
@@ -1023,6 +998,91 @@ public class DirectMappingPainter implements IDirectPainter {
 
       if (_isShowSliderInLegend) {
          drawValueMarkerInLegend(painterContext);
+      }
+   }
+
+   private void paintHoveredClusterMarkers(final GC gc, final PaintedMarkerCluster hoveredClusterMarker) {
+
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+
+      final float markerSize = 6;
+      final int maxVisibleHoveredMarker = 2000;
+
+      final Object[] allClusterItemsAsArray = hoveredClusterMarker.allClusterItemsAsArray;
+      final int numMarkers = allClusterItemsAsArray.length;
+
+      if (numMarkers == 0) {
+         return;
+      }
+
+      /*
+       * Paint symbol for each marker
+       */
+      if (numMarkers < maxVisibleHoveredMarker) {
+
+         final Path path = new Path(gc.getDevice());
+         {
+            for (int itemIndex = 0; itemIndex < numMarkers; itemIndex++) {
+
+               final Object clusterItem = allClusterItemsAsArray[itemIndex];
+
+               if (clusterItem instanceof final MapMarker mapMarker) {
+
+                  path.addRectangle(
+                        mapMarker.devX,
+                        mapMarker.devY,
+                        markerSize,
+                        markerSize);
+               }
+            }
+
+            gc.setForeground(markerConfig.clusterFill_Color);
+            gc.drawPath(path);
+         }
+         path.dispose();
+      }
+
+      /*
+       * Paint marker labels
+       */
+      for (int itemIndex = 0; itemIndex < numMarkers; itemIndex++) {
+
+         final Object clusterItem = allClusterItemsAsArray[itemIndex];
+
+         if (clusterItem instanceof final MapMarker mapMarker) {
+
+            String text = mapMarker.title;
+
+            if (UI.IS_SCRAMBLE_DATA) {
+               text = UI.scrambleText(text);
+            }
+
+            final int devX = mapMarker.devX;
+            final int devY = mapMarker.devY;
+
+            final Point textExtent = gc.textExtent(text);
+
+            final int textWidth = textExtent.x;
+            final int textHeight = textExtent.y;
+
+            gc.setBackground(UI.SYS_COLOR_WHITE);
+            gc.fillRectangle(
+                  devX,
+                  devY,
+                  textWidth,
+                  textHeight);
+
+            gc.setForeground(UI.SYS_COLOR_GRAY);
+            gc.drawRectangle(
+                  devX,
+                  devY,
+                  textWidth,
+                  textHeight);
+
+            gc.setForeground(UI.SYS_COLOR_BLACK);
+            gc.drawString(text, devX, devY, true);
+
+         }
       }
    }
 

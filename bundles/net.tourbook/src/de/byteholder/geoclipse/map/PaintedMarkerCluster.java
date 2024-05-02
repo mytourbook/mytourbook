@@ -15,6 +15,8 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
 
+import java.util.Collection;
+
 import net.tourbook.map25.layer.marker.algorithm.distance.StaticCluster;
 
 import org.eclipse.swt.graphics.Rectangle;
@@ -22,6 +24,7 @@ import org.eclipse.swt.graphics.Rectangle;
 public class PaintedMarkerCluster {
 
    public StaticCluster<?> markerCluster;
+   public Object[]         allClusterItemsAsArray;
 
    public Rectangle        clusterRectangle;
 
@@ -31,6 +34,7 @@ public class PaintedMarkerCluster {
 
    public PaintedMarkerCluster(final StaticCluster<?> staticCluster,
                                final Rectangle locationRectangle,
+
                                final String clusterLabel,
                                final int clusterLabelDevX,
                                final int clusterLabelDevY) {
@@ -41,5 +45,11 @@ public class PaintedMarkerCluster {
       this.clusterLabel = clusterLabel;
       this.clusterLabelDevX = clusterLabelDevX;
       this.clusterLabelDevY = clusterLabelDevY;
+
+      // speedup access to the cluster items
+      final Collection<?> allItems = markerCluster.getItems();
+      final Object[] allItemsAsArray = allItems.toArray(new Object[allItems.size()]);
+
+      allClusterItemsAsArray = allItemsAsArray;
    }
 }

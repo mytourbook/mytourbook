@@ -95,7 +95,6 @@ import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
-import net.tourbook.common.util.ToolTip;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -105,7 +104,6 @@ import net.tourbook.map.location.MapLocationToolTip;
 import net.tourbook.map2.view.Map2ConfigManager;
 import net.tourbook.map2.view.Map2MarkerConfig;
 import net.tourbook.map2.view.Map2View;
-import net.tourbook.map2.view.MarkerClusterToolTip;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.TourPainterConfiguration;
 import net.tourbook.map2.view.WayPointToolTipProvider;
@@ -383,13 +381,13 @@ public class Map2 extends Canvas {
    private DistanceClustering<ClusterItem> _distanceClustering         = new DistanceClustering<>();
    private List<PaintedMarkerCluster>      _allPaintedMarkerClusters   = new ArrayList<>();
    private PaintedMarkerCluster            _hoveredMarkerCluster;
-   private MarkerClusterToolTip            _markerCluster_Tooltip;
+//   private MarkerClusterToolTip            _markerCluster_Tooltip;
 
-   private final NumberFormat              _nf0;
-   private final NumberFormat              _nf1;
-   private final NumberFormat              _nf2;
-   private final NumberFormat              _nf3;
-   private final NumberFormat              _nfLatLon;
+   private final NumberFormat _nf0;
+   private final NumberFormat _nf1;
+   private final NumberFormat _nf2;
+   private final NumberFormat _nf3;
+   private final NumberFormat _nfLatLon;
    {
       _nf0 = NumberFormat.getNumberInstance();
       _nf1 = NumberFormat.getNumberInstance();
@@ -749,7 +747,7 @@ public class Map2 extends Canvas {
 // SET_FORMATTING_ON
 
       _mapLocation_Tooltip = new MapLocationToolTip(this);
-      _markerCluster_Tooltip = new MarkerClusterToolTip(this);
+//      _markerCluster_Tooltip = new MarkerClusterToolTip(this);
 
       _poiImage = TourbookPlugin.getImageDescriptor(Images.POI_InMap).createImage();
       _poiImageBounds = _poiImage.getBounds();
@@ -1674,11 +1672,14 @@ public class Map2 extends Canvas {
     *
     * @return
     */
-   public ToolTip getMarkerClusterTooltip() {
+//   public ToolTip getMarkerClusterTooltip() {
+//
+//      return _markerCluster_Tooltip;
+//   }
 
-      return _markerCluster_Tooltip;
-   }
-
+   /**
+    * @return
+    */
    public GeoPosition getMouseDown_GeoPosition() {
       return _mouseDown_ContextMenu_GeoPosition;
    }
@@ -5621,6 +5622,7 @@ public class Map2 extends Canvas {
       // convert MapMarker's into ClusterItem's
       final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
       final List<MapMarker> allMarkers = createMapMarkers(allTourData);
+
       final List<ClusterItem> allClusterItems = new ArrayList<>();
       allClusterItems.addAll(allMarkers);
 
@@ -5629,7 +5631,7 @@ public class Map2 extends Canvas {
 
       final Set<? extends Cluster<ClusterItem>> allMarkerClusters = _distanceClustering.getClusters(_mapZoomLevel, clusterGridSize);
 
-      final List<Cluster<?>> allClusterOnly = new ArrayList<>();
+//      final List<Cluster<?>> allClusterOnly = new ArrayList<>();
       final List<MapMarker> allMarkersOnly = new ArrayList<>();
 
       // firstly paint the clusters
@@ -5651,7 +5653,7 @@ public class Map2 extends Canvas {
                   Integer.toString(numClusterItems),
                   allPaintedClusters)) {
 
-               allClusterOnly.add(staticCluster);
+//               allClusterOnly.add(staticCluster);
             }
 
          } else if (item instanceof final QuadItem markerItem) {
@@ -7674,17 +7676,17 @@ public class Map2 extends Canvas {
    /**
     * Set map dimming level for the current map factory, this will dim the map images
     *
+    * @param isDimMap
     * @param dimLevel
     * @param dimColor
-    * @param isDimMap
-    * @param isBackgroundDark
     * @param isUseMapDimColor
+    * @param isBackgroundDark
     */
    public void setDimLevel(final boolean isDimMap,
                            final int dimLevel,
                            final RGB dimColor,
-                           final boolean isBackgroundDark,
-                           final boolean isUseMapDimColor) {
+                           final boolean isUseMapDimColor,
+                           final boolean isBackgroundDark) {
 
       _isMapBackgroundDark = isBackgroundDark;
 
