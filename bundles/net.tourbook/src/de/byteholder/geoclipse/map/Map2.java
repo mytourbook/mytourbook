@@ -8255,10 +8255,7 @@ public class Map2 extends Canvas {
       final FontData fontData = gcFont.getFontData()[0];
 
       final int fontHeight_OLD = fontData.getHeight();
-
       final int fontHeight_NEW = newClusterFontSize;
-
-//      fontHeight_NEW = Math.max(1, Math.min(fontHeight_NEW, 200));
 
       if (fontHeight_OLD != fontHeight_NEW) {
 

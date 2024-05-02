@@ -24,10 +24,10 @@ import de.byteholder.geoclipse.map.PaintedMapLocation;
 import de.byteholder.geoclipse.map.PaintedMarkerCluster;
 import de.byteholder.geoclipse.mapprovider.MP;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
@@ -278,35 +278,10 @@ public class DirectMappingPainter implements IDirectPainter {
                clusterRectangle.height);
       }
 
-      gc.setForeground(markerConfig.clusterFill_Color);
-
-      // draw outline
-//      gc.setLineWidth(1);
-//      gc.drawOval(
-//
-//            clusterRectangle.x,
-//            clusterRectangle.y,
-//
-//            clusterRectangle.width,
-//            clusterRectangle.height);
-
-      // draw label
-      final Font gcFontBackup = gc.getFont();
-      gc.setFont(_map2.getClusterFont());
-
-      gc.drawString(
-            hoveredClusterMarker.clusterLabel,
-            hoveredClusterMarker.clusterLabelDevX,
-            hoveredClusterMarker.clusterLabelDevY,
-            true);
-
-      gc.setFont(gcFontBackup);
-
       // draw hovered cluster marker
       if (markerConfig.isShowClusterMarker) {
          paintHoveredClusterMarkers_NEW(painterContext, hoveredClusterMarker);
       }
-
    }
 
    private void drawMapLocation(final DirectPainterContext painterContext,
@@ -1090,7 +1065,8 @@ public class DirectMappingPainter implements IDirectPainter {
       }
    }
 
-   private void paintHoveredClusterMarkers_NEW(final DirectPainterContext painterContext, final PaintedMarkerCluster hoveredClusterMarker) {
+   private void paintHoveredClusterMarkers_NEW(final DirectPainterContext painterContext,
+                                               final PaintedMarkerCluster hoveredClusterMarker) {
 
       final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
 
@@ -1112,7 +1088,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
       // draw something to respect later
 
-      final Vector<PointFeature> allPointfeatures = new Vector<>();
+      final List<PointFeature> allPointfeatures = new ArrayList<>(numMarkers);
 
       for (int itemIndex = 0; itemIndex < numMarkers; itemIndex++) {
 
@@ -1147,11 +1123,13 @@ public class DirectMappingPainter implements IDirectPainter {
          }
       }
 
+      final Rectangle clusterRectangle = hoveredClusterMarker.clusterRectangle;
+
       // generate the point-features to label and calculate their label-sizes
 
-      final PointFeatureLabeler labeler = new PointFeatureLabeler();
+      final PointFeatureLabeler pfLabeler = new PointFeatureLabeler();
 
-      labeler.loadDataStandard(
+      pfLabeler.loadDataStandard(
 
             allPointfeatures,
 
@@ -1160,10 +1138,15 @@ public class DirectMappingPainter implements IDirectPainter {
             0,
             mapHeight);
 
-//      final BufferedImage conflictMap = new BufferedImage(800, 600, BufferedImage.TYPE_INT_ARGB);
-//      labeler.respectMap(conflictMap);
+      final float circleRadius = clusterRectangle.width + 10;
+      final float circleRadius2 = circleRadius / 2;
 
-      labeler.label_StandardPipelineAll();
+      pfLabeler.respectCircle(
+            clusterRectangle.x + circleRadius2,
+            clusterRectangle.y + circleRadius2,
+            circleRadius);
+
+      final int numPlacedLabels = pfLabeler.label_StandardPipelineAll();
 
       // all labeling is done now, the resulting label positions are stored within the point-features
 
@@ -1171,7 +1154,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
          final PointFeature pointFeature = allPointfeatures.get(itemIndex);
 
-         if (pointFeature.labeled == false) {
+         if (pointFeature.isLabeled == false) {
             continue;
          }
 
@@ -1206,6 +1189,30 @@ public class DirectMappingPainter implements IDirectPainter {
          gc.setForeground(UI.SYS_COLOR_BLACK);
          gc.drawString(text, devX, devY, true);
       }
+
+      /*
+       * Draw number of painted labels
+       */
+      gc.setBackground(markerConfig.clusterOutline_Color);
+      gc.fillOval(
+
+            clusterRectangle.x,
+            clusterRectangle.y,
+
+            clusterRectangle.width,
+            clusterRectangle.height);
+
+      final Font gcFontBackup = gc.getFont();
+      gc.setFont(_map2.getClusterFont());
+
+      gc.drawString(
+            Integer.toString(numPlacedLabels),
+            hoveredClusterMarker.clusterLabelDevX,
+            hoveredClusterMarker.clusterLabelDevY,
+            true);
+
+      gc.setFont(gcFontBackup);
+
    }
 
    public void setCommonLocations(final List<TourLocationExtended> allCommonLocations) {

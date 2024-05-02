@@ -40,7 +40,7 @@ package particlelabeling;
  * via public variables.
  * </p>
  * <p>
- * 
+ *
  * The accompanying source or binary forms are published under the terms of the <b>New BSD
  * License</b>:<br>
  * <br>
@@ -73,11 +73,11 @@ package particlelabeling;
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * </p>
- * 
+ *
  * @author M. Luboschik
- * 
+ *
  * @version 1.0
- * 
+ *
  * @see PointFeature
  */
 public class ParticleList {
@@ -90,51 +90,52 @@ public class ParticleList {
    /**
     * The number of particles laying within the cell, backuped by this list.
     */
-   public int   size;
+   public int   numParticlesWithinCell;
 
-   private int  maxLength;
-   private int  i;
+   private int  _maxLength;
 
    /**
     * Builds a new ParticleList with capacity to store <code>psize</code> particles.
-    * 
+    *
     * @param psize
     *           the initial capacity for storing particles.
     */
    public ParticleList(final int psize) {
-      this.registeredParticles = new int[psize];
-      this.size = 0;
-      this.maxLength = this.registeredParticles.length;
+
+      registeredParticles = new int[psize];
+      this.numParticlesWithinCell = 0;
+
+      _maxLength = registeredParticles.length;
    }
 
    /**
     * Adds an particle to the gridcell backuped by this ParticleList. Only needs the id of the
     * particle to register since
     * the position is stored inside {@link ParticleStore}.
-    * 
+    *
     * @param id
     *           the id of the particle to register within this cell.
     */
    public void add(final int id) {
 
       //allocating new memory
-      if (size == this.maxLength) {
+      if (numParticlesWithinCell == this._maxLength) {
 
-         System.out.println("ALLOCAING NEW GRIDCELL-SPACE - SPACE FOR " + maxLength + " PARTICLES");
+         System.out.println("ALLOCAING NEW GRIDCELL-SPACE - SPACE FOR " + _maxLength + " PARTICLES");
 
-         final int[] newRegPart = new int[this.maxLength * 2];
+         final int[] newRegPart = new int[this._maxLength * 2];
 
-         for (i = 0; i < maxLength; i++) {
-            newRegPart[i] = this.registeredParticles[i];
+         for (int i = 0; i < _maxLength; i++) {
+            newRegPart[i] = registeredParticles[i];
          }
 
-         this.maxLength *= 2;
-         this.registeredParticles = newRegPart;
+         _maxLength *= 2;
+         registeredParticles = newRegPart;
 
       }
 
       //registering the particle
-      this.registeredParticles[this.size++] = id;
+      registeredParticles[this.numParticlesWithinCell++] = id;
 
    }
 }

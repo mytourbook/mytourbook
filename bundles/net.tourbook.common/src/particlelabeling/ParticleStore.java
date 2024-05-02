@@ -40,7 +40,7 @@ package particlelabeling;
  * on how many particles are in the result set.
  * </p>
  * <p>
- * 
+ *
  * The accompanying source or binary forms are published under the terms of the <b>New BSD
  * License</b>:<br>
  * <br>
@@ -73,37 +73,29 @@ package particlelabeling;
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * </p>
- * 
+ *
  * @author M. Luboschik
- * 
+ *
  * @version 1.0
- * 
+ *
  * @see PointFeature
  */
 public class ParticleStore {
 
    // the initial size of the particle store
-   private int              maximumNrOfParticles = 1000000;
+   private int              _maximumNrOfParticles = 1_000_000;
 
-   private ParticleList[][] particleGrid;
-   private float[][]        particleData         = new float[maximumNrOfParticles][3];
-   private int              lastParticleId       = -1;
+   private ParticleList[][] _particleGrid;
+   private float[][]        _particleData         = new float[_maximumNrOfParticles][3];
+   private int              _lastParticleId       = -1;
 
-   private int              maxX, maxY;                                               // size of the grid
-   private int              cellW, cellH;                                             // width and height of one gridcell
-
-   //locally used variables made global for faster performance
-   private int       cellX, cellY;
-   private int       rx1, rx2, ry1, ry2;
-   private int       size;
-   private int       i, j, k, l;
-   private float[][] output;
-   private float[]   particle;
+   private int              _maxX, _maxY;                                               // size of the grid
+   private int              _cellW, _cellH;                                             // width and height of one gridcell
 
    /**
     * Generates a new grid-storage for particles inside a rectangular area. This area is
     * located at (0,0) and is of provied width and height.
-    * 
+    *
     * @param width
     *           the width of the area covered by the grid.
     * @param height
@@ -116,17 +108,18 @@ public class ParticleStore {
    public ParticleStore(final int width, final int height, final int cellWidth, final int cellHeight) {
 
       //subdividing the space into discrete cells
-      this.maxX = (int) Math.ceil((double) width / (double) cellWidth);
-      this.maxY = (int) Math.ceil((double) height / (double) cellHeight);
-      this.particleGrid = new ParticleList[this.maxX + 1][this.maxY + 1];
+      _maxX = (int) Math.ceil((double) width / (double) cellWidth);
+      _maxY = (int) Math.ceil((double) height / (double) cellHeight);
+      _particleGrid = new ParticleList[_maxX + 1][_maxY + 1];
 
-      this.cellW = cellWidth;
-      this.cellH = cellHeight;
+      _cellW = cellWidth;
+      _cellH = cellHeight;
 
-      for (i = 0; i <= maxX; i++) {
-         for (j = 0; j <= maxY; j++) {
+      for (int i = 0; i <= _maxX; i++) {
+         for (int j = 0; j <= _maxY; j++) {
+
             //generating the single cells
-            this.particleGrid[i][j] = new ParticleList(cellWidth * cellHeight * 3);
+            _particleGrid[i][j] = new ParticleList(cellWidth * cellHeight * 3);
          }
       }
    }
@@ -134,72 +127,73 @@ public class ParticleStore {
    /**
     * Adds a particle given by its position to this storage and returns the storage
     * internal id.
-    * 
+    *
     * @param x
     *           the x-coordinate of the particle.
     * @param y
     *           the y-coordinate of the particle.
-    * 
+    *
     * @return the internal id of the particle
     */
    public int addParticle(final float x, final float y) {
 
       //which gridcell?
-      cellX = (int) x / cellW;
-      cellY = (int) y / cellH;
+      final int cellX = (int) x / _cellW;
+      final int cellY = (int) y / _cellH;
 
       //gridcell defined?
-      if (cellX > -1 && cellX <= maxX && cellY > -1 && cellY <= maxY) {
+      if (cellX > -1 && cellX <= _maxX && cellY > -1 && cellY <= _maxY) {
 
          //registering the particle to the cell
-         particleGrid[cellX][cellY].add(++lastParticleId);
+         _particleGrid[cellX][cellY].add(++_lastParticleId);
 
          //allocating new memory if storage is to small
-         if (lastParticleId == maximumNrOfParticles) {
+         if (_lastParticleId == _maximumNrOfParticles) {
 
             //ARRAY VERGROESZERN UND UMKOPIEREN
 
-            final float[][] newPData = new float[maximumNrOfParticles * 2][3];
+            final float[][] newPData = new float[_maximumNrOfParticles * 2][3];
 
-            for (i = 0; i < maximumNrOfParticles; i++) {
-               for (j = 0; j < 3; j++) {
-                  newPData[i][j] = particleData[i][j];
+            for (int i = 0; i < _maximumNrOfParticles; i++) {
+               for (int j = 0; j < 3; j++) {
+                  newPData[i][j] = _particleData[i][j];
                }
             }
 
-            maximumNrOfParticles *= 2;
+            _maximumNrOfParticles *= 2;
 
-            System.out.println("ALLOCATING PARTICLE-DATA-SPACE - SPACE FOR " + (maximumNrOfParticles) + " PARTICLES");
+            System.out.println("ALLOCATING PARTICLE-DATA-SPACE - SPACE FOR " + (_maximumNrOfParticles) + " PARTICLES");
 
-            this.particleData = newPData;
+            _particleData = newPData;
 
          }
 
          //storing the particles information
-         particle = this.particleData[lastParticleId];
-         particle[0] = lastParticleId; //id
+         final float[] particle = _particleData[_lastParticleId];
+         particle[0] = _lastParticleId; //id
          particle[1] = x; //x
          particle[2] = y; //y
 
-         return lastParticleId;
+         return _lastParticleId;
       }
+
       return -1;
    }
 
    /**
     * Returns the number of columns of the grid.
-    * 
+    *
     * @return the nr. of columns.
     */
    public int getColumns() {
-      return maxX;
+      return _maxX;
    }
 
    /**
     * Returns particles that are registered in gridcells, which are in contact to the
     * specified rectangle. The rectangle is given by its top-left and bottom-right coordinates and
     * every gridcell intersecting this area is involved.
-    * 
+    *
     * @param x1
     *           the left coordinate.
     * @param y1
@@ -208,36 +202,42 @@ public class ParticleStore {
     *           the right coordinate.
     * @param y2
     *           the bottom coordinate.
-    * 
+    *
     * @return i particles whose information are given in an array: [i][0] is the particle-id,
     *         [i][1] is the x-coordinate and [i][2] is the y-coordinate.
     */
    public float[][] getInvolvedParticles(final float x1, final float y1, final float x2, final float y2) {
 
-      //spanning wich cells in hor. and vert. direction?
-      rx1 = Math.max((int) x1 / cellW, 0);
-      rx2 = Math.min((int) x2 / cellW, maxX);
-      ry1 = Math.max((int) y1 / cellH, 0);
-      ry2 = Math.min((int) y2 / cellH, maxY);
+      //spanning which cells in hor. and vert. direction?
+      final int rx1 = Math.max((int) x1 / _cellW, 0);
+      final int rx2 = Math.min((int) x2 / _cellW, _maxX);
+      final int ry1 = Math.max((int) y1 / _cellH, 0);
+      final int ry2 = Math.min((int) y2 / _cellH, _maxY);
 
-      size = 0;
+      int numParticlesWithinCell = 0;
 
-      //calculating the concrete size of the result
-      for (i = rx1; i <= rx2; i++) {
-         for (j = ry1; j <= ry2; j++) {
-            size += particleGrid[i][j].size;
+      int indexX;
+      int indexY;
+
+      // calculating the concrete size of the result
+      for (indexX = rx1; indexX <= rx2; indexX++) {
+         for (indexY = ry1; indexY <= ry2; indexY++) {
+
+            numParticlesWithinCell += _particleGrid[indexX][indexY].numParticlesWithinCell;
          }
       }
 
-      output = new float[size][];
-      l = 0;
+      final float[][] output = new float[numParticlesWithinCell][];
+      int l = 0;
 
-      //storing the particles into the output array
-      for (i = rx1; i <= rx2; i++) {
-         for (j = ry1; j <= ry2; j++) {
-            size = particleGrid[i][j].size;
-            for (k = 0; k < size; k++) {
-               output[l++] = this.particleData[particleGrid[i][j].registeredParticles[k]];
+      // storing the particles into the output array
+      for (indexX = rx1; indexX <= rx2; indexX++) {
+         for (indexY = ry1; indexY <= ry2; indexY++) {
+
+            numParticlesWithinCell = _particleGrid[indexX][indexY].numParticlesWithinCell;
+
+            for (int k = 0; k < numParticlesWithinCell; k++) {
+               output[l++] = _particleData[_particleGrid[indexX][indexY].registeredParticles[k]];
             }
          }
       }
@@ -247,34 +247,41 @@ public class ParticleStore {
 
    /**
     * Returns the particles that are registered within the specified gridcell.
-    * 
+    *
     * @param cellX
     *           column of the gridcell.
     * @param cellY
     *           row of the gridcell.
-    * 
+    *
     * @return i particles whose information are given in an array: [i][0] is the particle-id,
     *         [i][1] is the x-coordinate and [i][2] is the y-coordinate.
     */
    public float[][] getParticlesOfCell(final int cellX, final int cellY) {
-      if ((cellX > -1) && (cellX <= maxX) && (cellY > -1) && (cellY <= maxY)) {
-         size = particleGrid[cellX][cellY].size;
-         output = new float[size][];
-         for (k = 0; k < size; k++) {
-            output[k] = this.particleData[particleGrid[cellX][cellY].registeredParticles[k]];
+
+      if ((cellX > -1) && (cellX <= _maxX) && (cellY > -1) && (cellY <= _maxY)) {
+
+         final int numParticlesWithinCell = _particleGrid[cellX][cellY].numParticlesWithinCell;
+
+         final float[][] output = new float[numParticlesWithinCell][];
+
+         for (int k = 0; k < numParticlesWithinCell; k++) {
+            output[k] = _particleData[_particleGrid[cellX][cellY].registeredParticles[k]];
          }
+
          return output;
       }
+
       return null;
    }
 
    /**
     * Returns the number of rows of the grid.
-    * 
+    *
     * @return the nr. of rows.
     */
    public int getRows() {
-      return maxY;
+
+      return _maxY;
    }
 
    /**
@@ -282,11 +289,14 @@ public class ParticleStore {
     * counters are reset.
     */
    public void reset() {
-      for (i = 0; i <= maxX; i++) {
-         for (j = 0; j <= maxY; j++) {
-            this.particleGrid[i][j].size = 0;
+
+      for (int indexX = 0; indexX <= _maxX; indexX++) {
+         for (int indexY = 0; indexY <= _maxY; indexY++) {
+
+            _particleGrid[indexX][indexY].numParticlesWithinCell = 0;
          }
       }
-      lastParticleId = -1;
+
+      _lastParticleId = -1;
    }
 }

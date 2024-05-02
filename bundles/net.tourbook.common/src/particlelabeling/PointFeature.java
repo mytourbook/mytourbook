@@ -34,23 +34,21 @@ package particlelabeling;
 /**
  * <p>
  * This class encapsulates all information, that are necessary for the particle-based labeling
- * approach. Moreover,
- * the labeling results (final position of the labeling box) and the labeling state are stored
- * within the point-feature.
+ * approach. Moreover, the labeling results (final position of the labeling box) and the labeling
+ * state are stored within the point-feature.
  * </p>
  * <p>
  * As labeling speed is most important, internal variables are made public to avoid 'slow' Getter-
- * and Setter-methods. Hence,
- * those variables should not be manipulated or read during labeling, due to changes caused by the
- * labeling.
+ * and Setter-methods. Hence, those variables should not be manipulated or read during labeling, due
+ * to changes caused by the labeling.
  * </p>
  * <p>
  * Note that labelwidth and -height of all point-features have to be set before labling starts,
- * since the labling depends
- * on the minimum labelwidh and -height - their values have to be bigger than 0 !!!
+ * since the labling depends on the minimum labelwidh and -height - their values have to be bigger
+ * than 0 !!!
  * </p>
  * <p>
- * 
+ *
  * The accompanying source or binary forms are published under the terms of the <b>New BSD
  * License</b>:<br>
  * <br>
@@ -83,11 +81,11 @@ package particlelabeling;
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * </p>
- * 
+ *
  * @author M. Luboschik
- * 
+ *
  * @version 1.0
- * 
+ *
  * @see PointFeature
  */
 public class PointFeature {
@@ -95,64 +93,64 @@ public class PointFeature {
    /**
     * ID of the particle stored in {@link ParticleStore}, representing this point-feature.
     */
-   public int      particleId           = -1;
+   public int      particleId = -1;
 
    /**
     * Width of the corresponding label box. Should be set to values >0 before labeling, as
     * zero widths or heights are blocking the labeling.
     */
-   public float    labelBoxW            = 0;
+   public float    labelBoxW;
 
    /**
     * Height of the corresponding label box. Should be set to values >0 before labeling, as
     * zero widths or heights are blocking the labeling.
     */
-   public float    labelBoxH            = 0;
+   public float    labelBoxH;
 
    /**
     * Left coordinate of the finally placed corresponding label box. Is set during labeling by
     * {@link PointFeatureLabeler}.
     */
-   public float    labelBoxL            = 0;
+   public float    labelBoxL;
 
    /**
     * Bottom coordinate of the finally placed corresponding label box. Is set during labeling by
     * {@link PointFeatureLabeler}.
     */
-   public float    labelBoxB            = 0;
+   public float    labelBoxB;
 
    /**
     * Top coordinate of the finally placed corresponding label box. Is set during labeling by
     * {@link PointFeatureLabeler}.
     */
-   public float    labelBoxT            = 0;
+   public float    labelBoxT;
 
    /**
     * Right coordinate of the finally placed corresponding label box. Is set during labeling by
     * {@link PointFeatureLabeler}.
     */
-   public float    labelBoxR            = 0;
+   public float    labelBoxR;
 
    /**
     * Width of a box enclosing this point-feature if the point-feature is not of "zero"-size.
     * Is considered during labeling by {@link PointFeatureLabeler} to calculate candidate label
     * positions.
     */
-   public float    rectangularExtendW   = 0;
+   public float    rectangularExtendW;
 
    /**
     * Height of a box enclosing this point-feature if the point-feature is not of "zero"-size.
     * Is considered during labeling by {@link PointFeatureLabeler} to calculate candidate label
     * positions.
     */
-   public float    rectangularExtendH   = 0;
+   public float    rectangularExtendH;
 
    /**
     * Radius of a circle enclosing this point-feature if the point-feature is not of "zero"-size.
     * Is (currently not) considered during labeling by {@link PointFeatureLabeler} to calculate
     * candidate label positions.
     */
-   public float    radialExtendRadius   = 0;
+   public float    radialExtendRadius;
 
    /**
     * Label of this point-feature.
@@ -163,36 +161,36 @@ public class PointFeature {
     * Green light of the point-feature to be labeled by {@link PointFeatureLabeler}. For that it has
     * to be inside the labeling area defined in {@link PointFeatureLabeler}.
     */
-   public boolean  enabledForLabeling   = false;
+   public boolean  isEnabledForLabeling;
 
    /**
     * Tells if the point-feature is successfully labeled by {@link PointFeatureLabeler}.
     */
-   public boolean  labeled              = false;
+   public boolean  isLabeled;
 
    /**
     * Tells if the point-feature is labeled by the first pipeline step of the
     * {@link PointFeatureLabeler}.
     */
-   public boolean  labeled_greedy1_4    = false;
+   public boolean  isLabeled_greedy1_4;
 
    /**
     * Tells if the point-feature is labeled by the second pipeline step of the
     * {@link PointFeatureLabeler}.
     */
-   public boolean  labeled_greedy5_8    = false;
+   public boolean  isLabeled_greedy5_8;
 
    /**
     * Tells if the point-feature is labeled by the third pipeline step of the
     * {@link PointFeatureLabeler}.
     */
-   public boolean  labeled_greedySlider = false;
+   public boolean  isLabeled_greedySlider;
 
    /**
     * Tells if the point-feature is labeled by the fourth pipeline step of the
     * {@link PointFeatureLabeler}.
     */
-   public boolean  labeled_greedySpiral = false;
+   public boolean  isLabeled_greedySpiral;
 
    private float[] pos;
    private int     id;
@@ -202,7 +200,7 @@ public class PointFeature {
     * and
     * the graphical rectangular extend are 0. The label-box dimension have to be set separately
     * before labeling!
-    * 
+    *
     * @param label
     *           the label of the point-feature, can be null.
     * @param id
@@ -211,7 +209,7 @@ public class PointFeature {
     *           the x-coordinate of this point-feature.
     * @param yPos
     *           the y-coordinate of this point-feature.
-    * 
+    *
     * @see #PointFeature(java.lang.String, int, float, float, float, float, float, float)
     */
    public PointFeature(final String label,
@@ -235,7 +233,7 @@ public class PointFeature {
    /**
     * Generates a new point-feature, defined by its label, id, position and label-dimensions. The
     * graphical rectangular extend is 0.
-    * 
+    *
     * @param label
     *           the label of the point-feature, can be null.
     * @param id
@@ -248,7 +246,7 @@ public class PointFeature {
     *           the width of the corresponding labelbox to be placed, should be > 0.
     * @param labelheight
     *           the height of the corresponding labelbox to be placed, should be > 0.
-    * 
+    *
     * @see #PointFeature(java.lang.String, int, float, float, float, float, float, float)
     */
    public PointFeature(final String label,
@@ -274,7 +272,7 @@ public class PointFeature {
    /**
     * Generates a new point-feature, defined by its label, id, position, label-dimensions and
     * graphical rectangular extend.
-    * 
+    *
     * @param label
     *           the label of the point-feature, can be null.
     * @param id
@@ -294,15 +292,19 @@ public class PointFeature {
     */
    public PointFeature(final String label,
                        final int id,
+
                        final float xPos,
                        final float yPos,
+
                        final float labelwidth,
                        final float labelheight,
+
                        final float hExtend,
                        final float vExtend) {
 
       this.label = label;
       this.id = id;
+
       this.pos = new float[] { xPos, yPos };
 
       this.labelBoxW = labelwidth;
@@ -316,7 +318,7 @@ public class PointFeature {
 
    /**
     * Returns the id of this point-feature.
-    * 
+    *
     * @return the id.
     */
    public int getID() {
@@ -325,7 +327,7 @@ public class PointFeature {
 
    /**
     * Returns the x-coordinate of this point-feature.
-    * 
+    *
     * @return the x-coordinate.
     */
    public float getX() {
@@ -334,7 +336,7 @@ public class PointFeature {
 
    /**
     * Returns the y-coordinate of this point-feature.
-    * 
+    *
     * @return the y-coordinate.
     */
    public float getY() {
