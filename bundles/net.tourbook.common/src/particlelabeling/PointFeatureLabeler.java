@@ -32,13 +32,15 @@
 package particlelabeling;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.common.UI;
+
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.swt.graphics.GC;
 
 /**
  * <p>
@@ -127,17 +129,20 @@ public class PointFeatureLabeler extends Object {
 
    static {
 
-      final float r = 150;
+      final float radius = 300;
       final float u = 20;
       float n;
 
       for (int i = 1; i < _spiralN; i++) {
+
          n = (float) i / (float) _spiralN;
-         _spiral[i][0] = -(float) Math.cos(2 * Math.PI * Math.sqrt(n) * u) * n * r;
-         _spiral[i][1] = (float) Math.sin(2 * Math.PI * Math.sqrt(n) * u) * n * r;
+
+         _spiral[i][0] = -(float) Math.cos(2 * Math.PI * Math.sqrt(n) * u) * n * radius;
+         _spiral[i][1] = (float) Math.sin(2 * Math.PI * Math.sqrt(n) * u) * n * radius;
       }
 
       for (int i = 0; i < 360 * _angleSubDivision; i++) {
+
          _sin[i] = (float) Math.sin(((double) i / (double) _angleSubDivision) * _deg_to_rad);
          _cos[i] = (float) Math.cos(((double) i / (double) _angleSubDivision) * _deg_to_rad);
       }
@@ -608,33 +613,37 @@ public class PointFeatureLabeler extends Object {
     * <li>d = -1
     * </ul>
     *
-    * @param n
+    * @param numSamplePoints
     *           the number of sample points along the spiral
-    * @param r
+    * @param radius
     *           the radius of the spiral
-    * @param u
+    * @param numWindings
     *           the number of windings till the maximum radius
-    * @param d
+    * @param spiralDirection
     *           the direction of the spiral (-1 or 1)
     */
-   public static void setSpiralParameters(final int n, final float r, final float u, final float d) {
+   public static void setSpiralParameters(final int numSamplePoints,
+                                          final float radius,
+                                          final float numWindings,
+                                          final float spiralDirection) {
 
-      _spiralN = n;
-      _spiral = new float[n][2];
+      _spiralN = numSamplePoints;
+      _spiral = new float[numSamplePoints][2];
 
-      float m;
-      float rotDir;
+      float rotationDirection;
 
-      if (d >= 0) {
-         rotDir = 1f;
+      if (spiralDirection >= 0) {
+         rotationDirection = 1f;
       } else {
-         rotDir = -1f;
+         rotationDirection = -1f;
       }
 
       for (int i = 1; i < _spiralN; i++) {
-         m = (float) i / (float) _spiralN;
-         _spiral[i][0] = rotDir * (float) Math.cos(2 * Math.PI * Math.sqrt(m) * u) * m * r;
-         _spiral[i][1] = (float) Math.sin(2 * Math.PI * Math.sqrt(m) * u) * m * r;
+
+         final float m = (float) i / (float) _spiralN;
+
+         _spiral[i][0] = rotationDirection * (float) Math.cos(2 * Math.PI * Math.sqrt(m) * numWindings) * m * radius;
+         _spiral[i][1] = (float) Math.sin(2 * Math.PI * Math.sqrt(m) * numWindings) * m * radius;
       }
    }
 
@@ -642,20 +651,34 @@ public class PointFeatureLabeler extends Object {
     * Draws the internally used particles at the given graphic context for debugging purposes. The
     * particles are drawn with blue pixels.
     *
-    * @param g
+    * @param gc
     *           the graphic context to be drawn at.
     */
-   public void drawParticles(final Graphics2D g) {
-      if (_isDataLoaded) {
-         final int maxX = _particleStorage.getColumns();
-         final int maxY = _particleStorage.getRows();
-         for (int i = 0; i < maxX; i++) {
-            for (int j = 0; j < maxY; j++) {
-               final float[][] part = _particleStorage.getParticlesOfCell(i, j);
-               for (final float[] element : part) {
-                  g.setColor(Color.blue);
-                  g.fillRect((int) (element[1]), (int) (element[2]), 1, 1);
-               }
+   public void drawParticles(final GC gc) {
+
+      if (_isDataLoaded == false) {
+         return;
+      }
+
+      gc.setBackground(UI.SYS_COLOR_GREEN);
+
+      final int maxX = _particleStorage.getColumns();
+      final int maxY = _particleStorage.getRows();
+
+      for (int i = 0; i < maxX; i++) {
+         for (int j = 0; j < maxY; j++) {
+
+            final float[][] part = _particleStorage.getParticlesOfCell(i, j);
+
+            for (final float[] element : part) {
+
+               gc.fillRectangle(
+
+                     (int) (element[1]),
+                     (int) (element[2]),
+
+                     1,
+                     1);
             }
          }
       }
@@ -665,17 +688,26 @@ public class PointFeatureLabeler extends Object {
     * Draws the internally used spiral at the given graphic context for debugging purposes. The
     * spiral is drawn with red pixels.
     *
+    * @param gc
+    *           the graphic context to be draw at.
     * @param x
     *           the x coordinate of the center of the spiral to be drawn.
     * @param y
     *           the y coordinate of the center of the spiral to be drawn.
-    * @param g
-    *           the graphic context to be draw at.
     */
-   public void drawSpiral(final int x, final int y, final Graphics2D g) {
+   public void drawSpiral(final GC gc, final int x, final int y) {
+
+      gc.setBackground(UI.SYS_COLOR_WHITE);
+
       for (int i = 0; i < _spiralN; i++) {
-         g.setColor(Color.red);
-         g.fillRect((int) (x + _spiral[i][0]), (int) (y + _spiral[i][1]), 1, 1);
+
+         gc.fillRectangle(
+
+               (int) (x + _spiral[i][0]),
+               (int) (y + _spiral[i][1]),
+
+               1,
+               1);
       }
    }
 
@@ -732,7 +764,7 @@ public class PointFeatureLabeler extends Object {
 
          float[][] conflictParticles;
 
-         boolean allowed = true;
+         boolean isAllowed = true;
 
          float l = 0f;
          float r = 0f;
@@ -747,10 +779,10 @@ public class PointFeatureLabeler extends Object {
          float hGapDueToExtend = 0f;
          float vGapDueToExtend = 0f;
 
-         int size = 0;
+         int numLabels = 0;
+         int numConflictingParticles = 0;
          int i = 0;
          int particleID = 0;
-         int labelCount = 0;
 
          float[] testParticle;
          float testParticleX;
@@ -758,7 +790,7 @@ public class PointFeatureLabeler extends Object {
 
          for (final PointFeature pf : pointFeaturesToLabel) {
 
-            if (pf.isEnabledForLabeling && !pf.isLabeled) {
+            if (pf.isEnabledForLabeling && pf.isLabeled == false) {
 
                lw = pf.labelBoxW;
                lh = pf.labelBoxH;
@@ -779,21 +811,22 @@ public class PointFeatureLabeler extends Object {
 
                //getting the particles to test with
                conflictParticles = _particleStorage.getInvolvedParticles(
+
                      px - hGapDueToExtend - lw,
                      t,
                      r,
                      py + vGapDueToExtend + lh);
 
-               size = conflictParticles.length;
+               numConflictingParticles = conflictParticles.length;
 
                if ((r > this.laR) || (t < this.laT)) {
 
                   //labelarea outside viewport?
-                  allowed = false;
+                  isAllowed = false;
 
                } else {
 
-                  allowed = true;
+                  isAllowed = true;
 
                   i = 0;
 
@@ -802,7 +835,7 @@ public class PointFeatureLabeler extends Object {
                   //with the current label area. this would prohibit the
                   //current label position.
 
-                  while (allowed && i < size) {
+                  while (isAllowed && i < numConflictingParticles) {
 
                      testParticle = conflictParticles[i++];
                      testParticleX = testParticle[1];
@@ -814,16 +847,16 @@ public class PointFeatureLabeler extends Object {
                            (testParticleY <= b) &&
                            (testParticleY >= t)) {
 
-                        allowed = false;
+                        isAllowed = false;
                      }
                   }
                }
 
-               if (allowed) {
+               if (isAllowed) {
 
                   //labelposition found
 
-                  labelCount++;
+                  numLabels++;
 
                   pf.isLabeled = true;
                   pf.isLabeled_greedy1_4 = true;
@@ -859,11 +892,11 @@ public class PointFeatureLabeler extends Object {
                   if ((l < this.laL) || (t < this.laT)) {
 
                      //labelarea outside viewport?
-                     allowed = false;
+                     isAllowed = false;
 
                   } else {
 
-                     allowed = true;
+                     isAllowed = true;
 
                      i = 0;
 
@@ -872,25 +905,29 @@ public class PointFeatureLabeler extends Object {
                      //with the current label area. this would prohibit the
                      //current label position.
 
-                     while ((allowed) && (i < size)) {
+                     while (isAllowed && (i < numConflictingParticles)) {
+
                         testParticle = conflictParticles[i++];
+
                         testParticleX = testParticle[1];
                         testParticleY = testParticle[2];
+
                         if ((testParticle[0] != particleID) &&
                               (testParticleX >= l) &&
                               (testParticleX <= r) &&
                               (testParticleY <= b) &&
                               (testParticleY >= t)) {
-                           allowed = false;
+
+                           isAllowed = false;
                         }
                      }
                   }
 
-                  if (allowed) {
+                  if (isAllowed) {
 
                      //labelposition found
 
-                     labelCount++;
+                     numLabels++;
 
                      pf.isLabeled = true;
                      pf.isLabeled_greedy1_4 = true;
@@ -926,11 +963,11 @@ public class PointFeatureLabeler extends Object {
                      if ((l < this.laL) || (b > this.laB)) {
 
                         //labelarea outside viewport?
-                        allowed = false;
+                        isAllowed = false;
 
                      } else {
 
-                        allowed = true;
+                        isAllowed = true;
 
                         i = 0;
 
@@ -939,7 +976,7 @@ public class PointFeatureLabeler extends Object {
                         //with the current label area. this would prohibit the
                         //current label position.
 
-                        while ((allowed) && (i < size)) {
+                        while ((isAllowed) && (i < numConflictingParticles)) {
                            testParticle = conflictParticles[i++];
                            testParticleX = testParticle[1];
                            testParticleY = testParticle[2];
@@ -948,16 +985,16 @@ public class PointFeatureLabeler extends Object {
                                  (testParticleX <= r) &&
                                  (testParticleY <= b) &&
                                  (testParticleY >= t)) {
-                              allowed = false;
+                              isAllowed = false;
                            }
                         }
                      }
 
-                     if (allowed) {
+                     if (isAllowed) {
 
                         //labelposition found
 
-                        labelCount++;
+                        numLabels++;
 
                         pf.isLabeled = true;
                         pf.isLabeled_greedy1_4 = true;
@@ -993,11 +1030,11 @@ public class PointFeatureLabeler extends Object {
                         if ((r > this.laR) || (b > this.laB)) {
 
                            //labelarea outside viewport?
-                           allowed = false;
+                           isAllowed = false;
 
                         } else {
 
-                           allowed = true;
+                           isAllowed = true;
 
                            i = 0;
 
@@ -1006,7 +1043,7 @@ public class PointFeatureLabeler extends Object {
                            //with the current label area. this would prohibit the
                            //current label position.
 
-                           while ((allowed) && (i < size)) {
+                           while ((isAllowed) && (i < numConflictingParticles)) {
                               testParticle = conflictParticles[i++];
                               testParticleX = testParticle[1];
                               testParticleY = testParticle[2];
@@ -1015,16 +1052,16 @@ public class PointFeatureLabeler extends Object {
                                     (testParticleX <= r) &&
                                     (testParticleY <= b) &&
                                     (testParticleY >= t)) {
-                                 allowed = false;
+                                 isAllowed = false;
                               }
                            }
                         }
 
-                        if (allowed) {
+                        if (isAllowed) {
 
                            //labelposition found
 
-                           labelCount++;
+                           numLabels++;
 
                            pf.isLabeled = true;
                            pf.isLabeled_greedy1_4 = true;
@@ -1056,7 +1093,7 @@ public class PointFeatureLabeler extends Object {
             }
          }
 
-         return labelCount;
+         return numLabels;
       }
 
       return 0;
@@ -2153,76 +2190,87 @@ public class PointFeatureLabeler extends Object {
                                 final float maxLabelWidth,
                                 final float maxLabelHeight) {
 
-      this._isDataLoaded = false;
+      _isDataLoaded = false;
 
-      if (pointfeatures != null) {
+      if (pointfeatures == null) {
+         return;
+      }
 
-         _pointFeatures = pointfeatures;
+      _pointFeatures = pointfeatures;
 
-         if (minLabelWidth <= 0 || minLabelHeight <= 0 || maxLabelWidth <= 0 || maxLabelHeight <= 0) {
+      if (minLabelWidth <= 0 || minLabelHeight <= 0 || maxLabelWidth <= 0 || maxLabelHeight <= 0) {
 
-            findMinMaxLabelDimensions(pointfeatures);
+         findMinMaxLabelDimensions(pointfeatures);
+
+      } else {
+
+         this.maxLabelW = Math.max(maxLabelWidth, minLabelWidth);
+         this.minLabelW = Math.min(maxLabelWidth, minLabelWidth);
+         this.maxLabelH = Math.max(maxLabelHeight, minLabelHeight);
+         this.minLabelH = Math.min(maxLabelHeight, minLabelHeight);
+      }
+
+      if (maxLabelW > 0 &&
+            maxLabelH > 0 &&
+            minLabelW > 0 &&
+            minLabelH > 0) {
+
+         final int labelAreaWidth = Math.abs(labelAreaR - labelAreaL);
+         final int labelAreaHeight = Math.abs(labelAreaB - labelAreaT);
+
+         if ((labelAreaWidth != laW) || (labelAreaHeight != laH) || (labelAreaL != laL) || (labelAreaT != laT) || (_particleStorage == null)) {
+
+            this.laW = labelAreaWidth;
+            this.laH = labelAreaHeight;
+            this.laL = Math.min(labelAreaL, labelAreaR);
+            this.laR = this.laL + this.laW;
+            this.laT = Math.min(labelAreaT, labelAreaB);
+            this.laB = this.laT + this.laH;
+
+            _particleStorage = new ParticleStore(
+
+                  this.laW,
+                  this.laH,
+
+                  (int) this.maxLabelW,
+                  (int) this.maxLabelH);
 
          } else {
 
-            this.maxLabelW = Math.max(maxLabelWidth, minLabelWidth);
-            this.minLabelW = Math.min(maxLabelWidth, minLabelWidth);
-            this.maxLabelH = Math.max(maxLabelHeight, minLabelHeight);
-            this.minLabelH = Math.min(maxLabelHeight, minLabelHeight);
+            _particleStorage.reset();
+
          }
 
-         if (maxLabelW > 0 &&
-               maxLabelH > 0 &&
-               minLabelW > 0 &&
-               minLabelH > 0) {
+         _numPriorityLevels = _pointFeatures.size();
 
-            final int w = Math.abs(labelAreaR - labelAreaL);
-            final int h = Math.abs(labelAreaB - labelAreaT);
+         float px, py;
 
-            if ((w != laW) || (h != laH) || (labelAreaL != laL) || (labelAreaT != laT) || (_particleStorage == null)) {
+         for (final List<PointFeature> priorityLevel : _pointFeatures) {
+            for (final PointFeature p : priorityLevel) {
 
-               this.laW = w;
-               this.laH = h;
-               this.laL = Math.min(labelAreaL, labelAreaR);
-               this.laR = this.laL + this.laW;
-               this.laT = Math.min(labelAreaT, labelAreaB);
-               this.laB = this.laT + this.laH;
+               px = p.getX();
+               py = p.getY();
 
-               _particleStorage = new ParticleStore(this.laW, this.laH, (int) this.maxLabelW, (int) this.maxLabelH);
+               if (px >= this.laL && px <= this.laR && py >= this.laT && py <= this.laB) {
 
-            } else {
+                  p.isEnabledForLabeling = true;
 
-               _particleStorage.reset();
+                  //Generating a corresponding particle and keeping its id
+                  p.particleId = _particleStorage.addParticle(px, py);
 
-            }
+               } else {
 
-            _numPriorityLevels = _pointFeatures.size();
-
-            float px, py;
-
-            for (final List<PointFeature> priorityLevel : _pointFeatures) {
-               for (final PointFeature p : priorityLevel) {
-
-                  px = p.getX();
-                  py = p.getY();
-
-                  if (px >= this.laL && px <= this.laR && py >= this.laT && py <= this.laB) {
-                     p.isEnabledForLabeling = true;
-                     //Generating a corresponding particle and keeping its id
-                     p.particleId = _particleStorage.addParticle(px, py);
-                  } else {
-                     p.isEnabledForLabeling = false;
-                  }
+                  p.isEnabledForLabeling = false;
                }
             }
-
-            //Results till now:
-            //PointFeatures in 2DIM "array"
-            //Corresponding particles saved to grid
-            //Link between pointfeatures and particles set
-
-            this._isDataLoaded = true;
          }
+
+         // Results till now:
+         // PointFeatures in 2DIM "array"
+         // Corresponding particles saved to grid
+         // Link between pointfeatures and particles set
+
+         _isDataLoaded = true;
       }
    }
 
@@ -2428,12 +2476,14 @@ public class PointFeatureLabeler extends Object {
       gl_rC_newRound = true;
 
       //adding the center-particle
-      this._particleStorage.addParticle(centerX, centerY);
+      _particleStorage.addParticle(centerX, centerY);
 
       //adding the border-particles
       //angle delta (0.5d) could be calculated to hit each pixel only once !!!
       for (gl_rC_angle = 0; gl_rC_angle < 360; gl_rC_angle += 0.5d) {
-         this._particleStorage.addParticle(centerX + _cos[(int) (gl_rC_angle * _angleSubDivision)] * circleRadius,
+
+         _particleStorage.addParticle(
+               centerX + _cos[(int) (gl_rC_angle * _angleSubDivision)] * circleRadius,
                centerY + _sin[(int) (gl_rC_angle * _angleSubDivision)] * circleRadius);
       }
 
@@ -2480,13 +2530,15 @@ public class PointFeatureLabeler extends Object {
                //placing the first particle of beam
                gl_rC_newParticleX = centerX + gl_rC_sRadiusIndex * gl_rC_deltaX;
                gl_rC_newParticleY = centerY + gl_rC_sRadiusIndex * gl_rC_deltaY;
-               this._particleStorage.addParticle(gl_rC_newParticleX, gl_rC_newParticleY);
+               _particleStorage.addParticle(gl_rC_newParticleX, gl_rC_newParticleY);
 
                //iterating the beam from center to border
                for (gl_rC_i = gl_rC_sRadiusIndex; gl_rC_i < gl_rC_eRadiusIndex; gl_rC_i++) {
+
                   gl_rC_newParticleX += gl_rC_deltaX;
                   gl_rC_newParticleY += gl_rC_deltaY;
-                  this._particleStorage.addParticle(gl_rC_newParticleX, gl_rC_newParticleY);
+
+                  _particleStorage.addParticle(gl_rC_newParticleX, gl_rC_newParticleY);
                }
             }
             gl_rC_newRound = false;

@@ -1071,13 +1071,19 @@ public class DirectMappingPainter implements IDirectPainter {
       final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
 
       final float markerSize = 6;
-      final int maxVisibleHoveredMarker = 2000;
+      final int maxVisibleHoveredMarker = 500;
 
       final Object[] allClusterItemsAsArray = hoveredClusterMarker.allClusterItemsAsArray;
       final int numMarkers = allClusterItemsAsArray.length;
+      int numVisibleMarkers = numMarkers;
 
       if (numMarkers == 0) {
          return;
+      }
+
+      // limit markers
+      if (numMarkers > maxVisibleHoveredMarker) {
+         numVisibleMarkers = maxVisibleHoveredMarker;
       }
 
       final GC gc = painterContext.gc;
@@ -1088,9 +1094,9 @@ public class DirectMappingPainter implements IDirectPainter {
 
       // draw something to respect later
 
-      final List<PointFeature> allPointfeatures = new ArrayList<>(numMarkers);
+      final List<PointFeature> allPointfeatures = new ArrayList<>(numVisibleMarkers);
 
-      for (int itemIndex = 0; itemIndex < numMarkers; itemIndex++) {
+      for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
 
          final Object clusterItem = allClusterItemsAsArray[itemIndex];
 
@@ -1136,21 +1142,34 @@ public class DirectMappingPainter implements IDirectPainter {
             0,
             mapWidth,
             0,
-            mapHeight);
+            mapHeight
+
+            ,
+
+            5, // minLabelWidth the global minimum label width
+            5, // minLabelHeight the global minimum label height
+
+            50, // maxLabelWidth the global maximum label width
+            8 //  maxLabelHeight the global maximum label height
+
+      );
 
       final float circleRadius = clusterRectangle.width + 10;
       final float circleRadius2 = circleRadius / 2;
 
+      final float circleX = clusterRectangle.x + circleRadius2;
+      final float circleY = clusterRectangle.y + circleRadius2;
+
       pfLabeler.respectCircle(
-            clusterRectangle.x + circleRadius2,
-            clusterRectangle.y + circleRadius2,
+            circleX,
+            circleY,
             circleRadius);
 
       final int numPlacedLabels = pfLabeler.label_StandardPipelineAll();
 
       // all labeling is done now, the resulting label positions are stored within the point-features
 
-      for (int itemIndex = 0; itemIndex < numMarkers; itemIndex++) {
+      for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
 
          final PointFeature pointFeature = allPointfeatures.get(itemIndex);
 
@@ -1188,6 +1207,9 @@ public class DirectMappingPainter implements IDirectPainter {
 
          gc.setForeground(UI.SYS_COLOR_BLACK);
          gc.drawString(text, devX, devY, true);
+
+//         pfLabeler.drawParticles(gc);
+//         pfLabeler.drawSpiral(gc, (int) circleX, (int) circleY);
       }
 
       /*

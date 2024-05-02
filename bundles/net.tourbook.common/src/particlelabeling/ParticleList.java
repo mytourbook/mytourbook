@@ -103,15 +103,14 @@ public class ParticleList {
    public ParticleList(final int psize) {
 
       registeredParticles = new int[psize];
-      this.numParticlesWithinCell = 0;
+      numParticlesWithinCell = 0;
 
       _maxLength = registeredParticles.length;
    }
 
    /**
     * Adds an particle to the gridcell backuped by this ParticleList. Only needs the id of the
-    * particle to register since
-    * the position is stored inside {@link ParticleStore}.
+    * particle to register since the position is stored inside {@link ParticleStore}.
     *
     * @param id
     *           the id of the particle to register within this cell.
@@ -119,7 +118,7 @@ public class ParticleList {
    public void add(final int id) {
 
       //allocating new memory
-      if (numParticlesWithinCell == this._maxLength) {
+      if (numParticlesWithinCell == _maxLength) {
 
          System.out.println("ALLOCAING NEW GRIDCELL-SPACE - SPACE FOR " + _maxLength + " PARTICLES");
 
@@ -135,7 +134,7 @@ public class ParticleList {
       }
 
       //registering the particle
-      registeredParticles[this.numParticlesWithinCell++] = id;
+      registeredParticles[numParticlesWithinCell++] = id;
 
    }
 }
