@@ -71,6 +71,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
     */
    private Button                  _btnCleanup;
    private Button                  _chkShowHideTokens;
+   private Button                  _chkIsEnabled;
    private Group                   _group;
    private Label                   _labelAccessToken;
    private Label                   _labelExpiresAt;
@@ -121,11 +122,28 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       final Composite parent = getFieldEditorParent();
       GridLayoutFactory.fillDefaults().applyTo(parent);
 
+      createUI_01_Enable(parent);
       createUI_10_Authorize(parent);
       createUI_20_TokensInformation(parent);
       createUI_100_AccountCleanup(parent);
 
       return parent;
+   }
+
+   private void createUI_01_Enable(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
+      {
+         _chkIsEnabled = new Button(container, SWT.CHECK);
+         _chkIsEnabled.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens);
+         _chkIsEnabled.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip);
+         _chkIsEnabled.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHideTokens
+               .getSelection())));
+         GridDataFactory.fillDefaults().applyTo(_chkIsEnabled);
+      }
+
    }
 
    private void createUI_10_Authorize(final Composite parent) {
@@ -234,12 +252,14 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       final boolean isAuthorized = StringUtils.hasContent(_txtAccessToken_Value.getText()) &&
             StringUtils.hasContent(_txtRefreshToken_Value.getText());
 
-      _labelRefreshToken.setEnabled(isAuthorized);
-      _labelExpiresAt.setEnabled(isAuthorized);
-      _labelAccessToken.setEnabled(isAuthorized);
-      _chkShowHideTokens.setEnabled(isAuthorized);
-      _linkRevokeAccess.setEnabled(isAuthorized);
-      _btnCleanup.setEnabled(isAuthorized);
+      final boolean isEnabled = _chkIsEnabled.getSelection() && isAuthorized;
+
+      _labelRefreshToken.setEnabled(isEnabled);
+      _labelExpiresAt.setEnabled(isEnabled);
+      _labelAccessToken.setEnabled(isEnabled);
+      _chkShowHideTokens.setEnabled(isEnabled);
+      _linkRevokeAccess.setEnabled(isEnabled);
+      _btnCleanup.setEnabled(isEnabled);
    }
 
    private String generateCodeChallenge(final String codeVerifier) {
@@ -338,6 +358,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    @Override
    protected void performDefaults() {
 
+      _chkIsEnabled.setSelection(_prefStore.getDefaultBoolean(Preferences.DROPBOX_IS_ENABLED));
       _txtAccessToken_Value.setText(
             _prefStore.getDefaultString(Preferences.DROPBOX_ACCESSTOKEN));
       _labelExpiresAt_Value.setText(UI.EMPTY_STRING);
@@ -355,6 +376,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       final boolean isOK = super.performOk();
 
       if (isOK) {
+         _prefStore.setValue(Preferences.DROPBOX_IS_ENABLED, _chkIsEnabled.getSelection());
          _prefStore.setValue(Preferences.DROPBOX_ACCESSTOKEN, _txtAccessToken_Value.getText());
          _prefStore.setValue(Preferences.DROPBOX_REFRESHTOKEN, _txtRefreshToken_Value.getText());
 
@@ -374,6 +396,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
    private void restoreState() {
 
+      _chkIsEnabled.setSelection(_prefStore.getBoolean(Preferences.DROPBOX_IS_ENABLED));
       _txtAccessToken_Value.setText(_prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN));
       _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
             _prefStore.getLong(Preferences.DROPBOX_ACCESSTOKEN_ISSUE_DATETIME),
