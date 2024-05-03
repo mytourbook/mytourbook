@@ -25,8 +25,11 @@ public class Messages extends NLS {
    public static String        Log_CloudAction_End;
    public static String        Log_CloudAction_InvalidTokens;
 
+   public static String        PrefPage_FileSystem_Button_Enable;
+   public static String        PrefPage_FileSystem_Button_Enable_Tooltip;
    public static String        Pref_FileSystem_Dialog_Restart_Title;
    public static String        Pref_FileSystem_Dialog_Restart_Message;
+
    public static String        PrefPage_CloudConnectivity_Button_Authorize;
    public static String        PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens;
    public static String        PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip;

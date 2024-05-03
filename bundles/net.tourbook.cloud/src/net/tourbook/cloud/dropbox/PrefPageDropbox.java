@@ -72,6 +72,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
     * UI controls
     */
    private Button                  _btnCleanup;
+   private Button                  _btnAuthorizeConnection;
    private Button                  _chkShowHideTokens;
    private Button                  _chkIsEnabled;
    private Group                   _group;
@@ -139,8 +140,8 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
          _chkIsEnabled = new Button(container, SWT.CHECK);
-         _chkIsEnabled.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens);
-         _chkIsEnabled.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip);
+         _chkIsEnabled.setText(Messages.PrefPage_FileSystem_Button_Enable);
+         _chkIsEnabled.setToolTipText(Messages.PrefPage_FileSystem_Button_Enable_Tooltip);
          _chkIsEnabled.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCheckIsEnabled()));
          GridDataFactory.fillDefaults().applyTo(_chkIsEnabled);
       }
@@ -156,11 +157,11 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
          /*
           * Authorize button
           */
-         final Button btnAuthorizeConnection = new Button(container, SWT.NONE);
-         setButtonLayoutData(btnAuthorizeConnection);
-         btnAuthorizeConnection.setText(Messages.PrefPage_CloudConnectivity_Button_Authorize);
-         btnAuthorizeConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onClickAuthorize()));
-         GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).grab(true, true).applyTo(btnAuthorizeConnection);
+         _btnAuthorizeConnection = new Button(container, SWT.NONE);
+         setButtonLayoutData(_btnAuthorizeConnection);
+         _btnAuthorizeConnection.setText(Messages.PrefPage_CloudConnectivity_Button_Authorize);
+         _btnAuthorizeConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onClickAuthorize()));
+         GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).grab(true, true).applyTo(_btnAuthorizeConnection);
       }
    }
 
@@ -261,6 +262,14 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       _chkShowHideTokens.setEnabled(isEnabled);
       _linkRevokeAccess.setEnabled(isEnabled);
       _btnCleanup.setEnabled(isEnabled);
+
+      _group.setEnabled(isEnabled);
+      _btnAuthorizeConnection.setEnabled(isEnabled);
+      _labelExpiresAt_Value.setEnabled(isEnabled);
+      _labelRefreshToken.setEnabled(isEnabled);
+      _linkRevokeAccess.setEnabled(isEnabled);
+      _txtAccessToken_Value.setEnabled(isEnabled);
+      _txtRefreshToken_Value.setEnabled(isEnabled);
    }
 
    private String generateCodeChallenge(final String codeVerifier) {
