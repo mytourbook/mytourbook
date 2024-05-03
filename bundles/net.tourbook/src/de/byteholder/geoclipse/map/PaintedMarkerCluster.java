@@ -17,30 +17,33 @@ package de.byteholder.geoclipse.map;
 
 import java.util.Collection;
 
+import net.tourbook.common.UI;
 import net.tourbook.map25.layer.marker.algorithm.distance.StaticCluster;
 
 import org.eclipse.swt.graphics.Rectangle;
 
 public class PaintedMarkerCluster {
 
-   public StaticCluster<?> markerCluster;
-   public Object[]         allClusterItemsAsArray;
+   private static final char NL = UI.NEW_LINE;
 
-   public Rectangle        clusterRectangle;
+   public StaticCluster<?>   markerCluster;
+   public Object[]           allClusterItemsAsArray;
 
-   public String           clusterLabel;
-   public int              clusterLabelDevX;
-   public int              clusterLabelDevY;
+   public Rectangle          clusterRectangle;
+
+   public String             clusterLabel;
+   public int                clusterLabelDevX;
+   public int                clusterLabelDevY;
 
    public PaintedMarkerCluster(final StaticCluster<?> staticCluster,
-                               final Rectangle locationRectangle,
+                               final Rectangle clusterRectangle,
 
                                final String clusterLabel,
                                final int clusterLabelDevX,
                                final int clusterLabelDevY) {
 
       this.markerCluster = staticCluster;
-      this.clusterRectangle = locationRectangle;
+      this.clusterRectangle = clusterRectangle;
 
       this.clusterLabel = clusterLabel;
       this.clusterLabelDevX = clusterLabelDevX;
@@ -51,5 +54,28 @@ public class PaintedMarkerCluster {
       final Object[] allItemsAsArray = allItems.toArray(new Object[allItems.size()]);
 
       allClusterItemsAsArray = allItemsAsArray;
+   }
+
+   @Override
+   public String toString() {
+
+//    final int maxLen = 5;
+
+      return UI.EMPTY_STRING
+
+            + "PaintedMarkerCluster" + NL //                         //$NON-NLS-1$
+
+            + " clusterLabel     = " + clusterLabel + NL //           //$NON-NLS-1$
+            + " clusterLabelDevX = " + clusterLabelDevX + NL //       //$NON-NLS-1$
+            + " clusterLabelDevY = " + clusterLabelDevY + NL //       //$NON-NLS-1$
+            + " clusterRectangle = " + clusterRectangle + NL //       //$NON-NLS-1$
+
+//            + " markerCluster    = " + markerCluster + NL //          //$NON-NLS-1$
+
+//            + " allClusterItemsAsArray=" + (allClusterItemsAsArray != null
+//                  ? Arrays.asList(allClusterItemsAsArray).subList(0, Math.min(allClusterItemsAsArray.length, maxLen))
+//                  : null) + UI.NEW_LINE //
+
+      ;
    }
 }

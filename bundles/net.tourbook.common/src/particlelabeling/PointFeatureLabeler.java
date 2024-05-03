@@ -1169,10 +1169,12 @@ public class PointFeatureLabeler extends Object {
                   t = py - lh2;
                   b = py + lh2;
 
-                  conflictParticles = _particleStorage.getInvolvedParticles(px - hGapDueToExtend - lw,
+                  conflictParticles = _particleStorage.getInvolvedParticles(
+                        px - hGapDueToExtend - lw,
                         py - vGapDueToExtend - lh,
                         r,
                         py + vGapDueToExtend + lh);
+
                   size = conflictParticles.length;
 
                   if ((r > this.laR) || (b > this.laB) || t < this.laT) {
@@ -1304,14 +1306,17 @@ public class PointFeatureLabeler extends Object {
                            i = 0;
 
                            while ((allowed) && (i < size)) {
+
                               testParticle = conflictParticles[i++];
                               testParticleX = testParticle[1];
                               testParticleY = testParticle[2];
+
                               if ((testParticle[0] != particleID) &&
                                     (testParticleX >= l) &&
                                     (testParticleX <= r) &&
                                     (testParticleY <= b) &&
                                     (testParticleY >= t)) {
+
                                  allowed = false;
                               }
                            }

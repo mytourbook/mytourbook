@@ -285,8 +285,8 @@ public class Map2 extends Canvas {
    private static final RGB              MAP_DEFAULT_BACKGROUND_RGB = new RGB(0x40, 0x40, 0x40);
 
    private static RGB                    _mapTransparentRGB;
-   private static RGB                    _newTransparentRGB;
    private Color                         _mapTransparentColor;
+   private boolean                       _isTransparentColorModified;
 
    private Color                         _defaultBackgroundColor;
 
@@ -300,13 +300,6 @@ public class Map2 extends Canvas {
 
    /** This image contains the map which is painted in the map viewport */
    private Image                         _mapImage;
-
-   /**
-    * The {@link #_newOverlayExecutor} is drawing into this image. 2 images are necessary that the
-    * current image which is drawn is not displayed, only when drawing is done
-    */
-   private Image                         _newOverlayImage_Visible;
-   private Image                         _newOverlayImage_NotVisible;
 
    private Image                         _9PartImage;
    private GC                            _9PartGC;
@@ -371,17 +364,26 @@ public class Map2 extends Canvas {
    /*
     * New overlay
     */
-   private final ExecutorService           _newOverlayExecutor         = createOverlayExecuter();
-   private Future<?>                       _newOverlayFuture;
-   private int                             _newOverlay_LastCounter;
-   private final AtomicInteger             _newOverlay_RunnableCounter = new AtomicInteger();
-   private Rectangle                       _newOverlay_Viewport_Visible;
-   private Rectangle                       _newOverlay_Viewport_NotVisible;
+   private final ExecutorService           _backgroundPainterExecutor         = createBackgroundPainterThread();
+   private Future<?>                       _backgroundPainterFuture;
 
-   private DistanceClustering<ClusterItem> _distanceClustering         = new DistanceClustering<>();
-   private List<PaintedMarkerCluster>      _allPaintedMarkerClusters   = new ArrayList<>();
+   /**
+    * The {@link #_backgroundPainterExecutor} is drawing into this image. 2 images are necessary
+    * that the
+    * current image which is drawn is not displayed, only when drawing is done
+    */
+   private Image                           _backgroundPainterImage_WhichIsDisplayed;
+   private Image                           _backgroundPainterImage_WhichIsPainted;
+
+   private int                             _backgroundPainter_LastCounter;
+   private final AtomicInteger             _backgroundPainter_RunnableCounter = new AtomicInteger();
+   private Rectangle                       _backgroundPainter_Viewport_WhenPainted;
+   private Rectangle                       _backgroundPainter_Viewport_DuringPainting;
+
+   private DistanceClustering<ClusterItem> _distanceClustering                = new DistanceClustering<>();
+   private List<PaintedMarkerCluster>      _allPaintedMarkerClusters          = new ArrayList<>();
    private PaintedMarkerCluster            _hoveredMarkerCluster;
-//   private MarkerClusterToolTip            _markerCluster_Tooltip;
+// private MarkerClusterToolTip            _markerCluster_Tooltip;
 
    private final NumberFormat _nf0;
    private final NumberFormat _nf1;
@@ -1111,6 +1113,21 @@ public class Map2 extends Canvas {
       _actionManageOfflineImages = new ActionManageOfflineImages(Map2.this);
    }
 
+   private ExecutorService createBackgroundPainterThread() {
+
+      final ThreadFactory threadFactory = runnable -> {
+
+         final Thread thread = new Thread(runnable, "2D Map - Background Image Painter");//$NON-NLS-1$
+
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
+
+         return thread;
+      };
+
+      return Executors.newSingleThreadExecutor(threadFactory);
+   }
+
    /**
     * create the context menu
     */
@@ -1182,7 +1199,7 @@ public class Map2 extends Canvas {
 
    private List<MapMarker> createMapMarkers(final ArrayList<TourData> allTourData) {
 
-      final Rectangle worldPixel_Viewport = _newOverlay_Viewport_NotVisible;
+      final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
 
       final List<MapMarker> allMapMarkers = new ArrayList<>();
 
@@ -1192,7 +1209,7 @@ public class Map2 extends Canvas {
             continue;
          }
 
-         if (_newOverlayFuture.isCancelled()) {
+         if (_backgroundPainterFuture.isCancelled()) {
             break;
          }
 
@@ -1292,21 +1309,6 @@ public class Map2 extends Canvas {
       gcImage.dispose();
 
       return transparentImage;
-   }
-
-   private ExecutorService createOverlayExecuter() {
-
-      final ThreadFactory threadFactory = runnable -> {
-
-         final Thread thread = new Thread(runnable, "2D Map - NEW Overlay Painter");//$NON-NLS-1$
-
-         thread.setPriority(Thread.MIN_PRIORITY);
-         thread.setDaemon(true);
-
-         return thread;
-      };
-
-      return Executors.newSingleThreadExecutor(threadFactory);
    }
 
    public void deleteFailedImageFiles() {
@@ -2932,8 +2934,8 @@ public class Map2 extends Canvas {
       }
 
       UI.disposeResource(_mapImage);
-      UI.disposeResource(_newOverlayImage_Visible);
-      UI.disposeResource(_newOverlayImage_NotVisible);
+      UI.disposeResource(_backgroundPainterImage_WhichIsDisplayed);
+      UI.disposeResource(_backgroundPainterImage_WhichIsPainted);
       UI.disposeResource(_poiImage);
 
       UI.disposeResource(_9PartImage);
@@ -2973,7 +2975,7 @@ public class Map2 extends Canvas {
       // stop overlay thread
       _overlayThread.interrupt();
 
-      _newOverlayExecutor.shutdownNow();
+      _backgroundPainterExecutor.shutdownNow();
    }
 
    private void onDropRunnable(final DropTargetEvent event) {
@@ -3392,8 +3394,9 @@ public class Map2 extends Canvas {
 
       // stop grid autoscrolling
       _geoGrid_IsGridAutoScroll = false;
-
       _geoGrid_Label_IsHovered = false;
+
+      _hoveredMarkerCluster = null;
 
       if (_isShowHoveredOrSelectedTour) {
 
@@ -3486,15 +3489,20 @@ public class Map2 extends Canvas {
 
             final Rectangle paintedRect = paintedCluster.clusterRectangle;
 
+            // increase hovered rectangle to prevent flickering when moving too fast
+            final int hoveredOffset = 10;
+
             if (true
-                  && (_mouseMove_DevPosition_X > paintedRect.x)
-                  && (_mouseMove_DevPosition_X < paintedRect.x + paintedRect.width)
-                  && (_mouseMove_DevPosition_Y > paintedRect.y)
-                  && (_mouseMove_DevPosition_Y < paintedRect.y + paintedRect.height)) {
+                  && (_mouseMove_DevPosition_X > paintedRect.x - hoveredOffset)
+                  && (_mouseMove_DevPosition_X < paintedRect.x + paintedRect.width + hoveredOffset)
+                  && (_mouseMove_DevPosition_Y > paintedRect.y - hoveredOffset)
+                  && (_mouseMove_DevPosition_Y < paintedRect.y + paintedRect.height + hoveredOffset)) {
 
                // a cluster is hovered
 
                _hoveredMarkerCluster = newHoveredCluster = paintedCluster;
+
+               updateBackgroundImageHoverPosition();
 
                break;
             }
@@ -3852,7 +3860,7 @@ public class Map2 extends Canvas {
 
       // draw map image to the screen
 
-//      final long start = System.nanoTime();
+      final long start = System.nanoTime();
 
       if (_mapImage == null || _mapImage.isDisposed()) {
          return;
@@ -3915,7 +3923,6 @@ public class Map2 extends Canvas {
       }
 
 //      final long end = System.nanoTime();
-
 //      System.out.println(UI.timeStampNano() + " onPaint - %7.3f ms".formatted((float) (end - start) / 1000000));
    }
 
@@ -3940,16 +3947,16 @@ public class Map2 extends Canvas {
       updateViewPortData();
 
       // stop painting thread
-      if (_newOverlayFuture != null) {
+      if (_backgroundPainterFuture != null) {
 
-         synchronized (_newOverlayFuture) {
+         synchronized (_backgroundPainterFuture) {
 
-            _newOverlayFuture.cancel(true);
+            _backgroundPainterFuture.cancel(true);
 
             try {
 
                // wait until the task is canceled
-               _newOverlayFuture.get(5000, TimeUnit.MILLISECONDS);
+               _backgroundPainterFuture.get(5000, TimeUnit.MILLISECONDS);
 
             } catch (final Exception e) {
 
@@ -3970,8 +3977,8 @@ public class Map2 extends Canvas {
 
       final int redrawCounter = _redrawMapCounter.incrementAndGet();
 
-      // repaint new overlay
-      _newOverlay_RunnableCounter.incrementAndGet();
+      // repaint the background image
+      _backgroundPainter_RunnableCounter.incrementAndGet();
 
       if (isDisposed() || _mp == null || _isRedrawEnabled == false) {
          return;
@@ -4072,7 +4079,7 @@ public class Map2 extends Canvas {
          {
             paint_30_Tiles(gcMapImage);
 
-            paint_32_PaintNewOverlayImage(gcMapImage);
+            paint_32_PaintBackgroundImage(gcMapImage);
 
             if (_isLegendVisible && _mapLegend != null) {
                paint_40_Legend(gcMapImage);
@@ -4093,8 +4100,8 @@ public class Map2 extends Canvas {
 
          // map image is corrupt
          _mapImage.dispose();
-         _newOverlayImage_Visible.dispose();
-         _newOverlayImage_NotVisible.dispose();
+         _backgroundPainterImage_WhichIsDisplayed.dispose();
+         _backgroundPainterImage_WhichIsPainted.dispose();
 
       } finally {
 
@@ -4156,15 +4163,15 @@ public class Map2 extends Canvas {
    /**
     * @param gcMapImage
     */
-   private void paint_32_PaintNewOverlayImage(final GC gcMapImage) {
+   private void paint_32_PaintBackgroundImage(final GC gcMapImage) {
 
       try {
 
-         // check or create map overlay image
-         final Image image1 = _newOverlayImage_Visible;
-         final Image image2 = _newOverlayImage_NotVisible;
+         // check or create map background image
+         final Image image1 = _backgroundPainterImage_WhichIsDisplayed;
+         final Image image2 = _backgroundPainterImage_WhichIsPainted;
 
-         if (_newTransparentRGB != null
+         if (_isTransparentColorModified
                || canReuseImage(image1, _newOverlaySize) == false
                || canReuseImage(image2, _newOverlaySize) == false
 
@@ -4172,14 +4179,14 @@ public class Map2 extends Canvas {
 
             // image needs to be recreated
 
-            _newTransparentRGB = null;
+            _isTransparentColorModified = false;
 
-            final Image newOverlayImage_Visible = _newOverlayImage_Visible;
-            final Image newOverlayImage_NotVisible = _newOverlayImage_NotVisible;
+            final Image newOverlayImage_Visible = _backgroundPainterImage_WhichIsDisplayed;
+            final Image newOverlayImage_NotVisible = _backgroundPainterImage_WhichIsPainted;
 
-            // paint old image into new image
-            _newOverlayImage_Visible = createNewOverlayImage(_newOverlayImage_Visible);
-            _newOverlayImage_NotVisible = createNewOverlayImage(null);
+            // create new image but paint old image into new image to prevent flickering
+            _backgroundPainterImage_WhichIsDisplayed = createNewOverlayImage(_backgroundPainterImage_WhichIsDisplayed);
+            _backgroundPainterImage_WhichIsPainted = createNewOverlayImage(null);
 
             UI.disposeResource(newOverlayImage_Visible);
             UI.disposeResource(newOverlayImage_NotVisible);
@@ -4187,50 +4194,30 @@ public class Map2 extends Canvas {
 
          try {
 
-            /**
-             *
-             * This happened sometimes, maybe because of concurrency
-             *
-             * <code>
-             *
-             * !MESSAGE Cannot assign field "hNullBitmap" because "memGC.data" is null
-             * !STACK 0
-             * java.lang.NullPointerException: Cannot assign field "hNullBitmap" because "memGC.data" is null
-             * 	at org.eclipse.swt.graphics.GC.drawBitmap(GC.java:1233)
-             * 	at org.eclipse.swt.graphics.GC.drawImage(GC.java:1057)
-             * 	at org.eclipse.swt.graphics.GC.drawImageInPixels(GC.java:928)
-             * 	at org.eclipse.swt.graphics.GC.drawImage(GC.java:921)
-             * 	at de.byteholder.geoclipse.map.Map2.paint_32_PaintNewOverlayImage(Map2.java:3971)
-             * 	at de.byteholder.geoclipse.map.Map2.paint_10_PaintMapImage(Map2.java:3860)
-             * 	at de.byteholder.geoclipse.map.Map2$5.run(Map2.java:3807)
-             *
-             * </code>
-             */
-
             // do micro adjustments otherwise panning the map is NOT smooth
-            final Rectangle oldTopLeft_Viewport = _newOverlay_Viewport_Visible;
-            final Rectangle currentTopLeft_Viewport = _worldPixel_TopLeft_Viewport;
+            final Rectangle topLeft_Viewport_WhenPainted = _backgroundPainter_Viewport_WhenPainted;
+            final Rectangle topLeft_Viewport_Current = _worldPixel_TopLeft_Viewport;
 
-            final int devX = oldTopLeft_Viewport.x - currentTopLeft_Viewport.x;
-            final int devY = oldTopLeft_Viewport.y - currentTopLeft_Viewport.y;
+            final int devX = topLeft_Viewport_WhenPainted.x - topLeft_Viewport_Current.x;
+            final int devY = topLeft_Viewport_WhenPainted.y - topLeft_Viewport_Current.y;
 
-            gcMapImage.drawImage(_newOverlayImage_Visible, devX, devY);
+            gcMapImage.drawImage(_backgroundPainterImage_WhichIsDisplayed, devX, devY);
 
          } catch (final Exception e) {
 
             // ignore
          }
 
-         // do not know now when to start the overlay painting
-         paint_NewOverlay();
+         // do not know, when to start the background painting
+         paint_BackgroundImage();
 
       } catch (final Exception e) {
 
          StatusUtil.log(e);
 
          // new overlay image is corrupt
-         UI.disposeResource(_newOverlayImage_Visible);
-         UI.disposeResource(_newOverlayImage_NotVisible);
+         UI.disposeResource(_backgroundPainterImage_WhichIsDisplayed);
+         UI.disposeResource(_backgroundPainterImage_WhichIsPainted);
       }
    }
 
@@ -4354,6 +4341,441 @@ public class Map2 extends Canvas {
       // draw text
       gc.setForeground(textColor);
       gc.drawText(scaleText, devXText, devYText, true);
+   }
+
+   private void paint_BackgroundImage() {
+
+      final int currentBackgroundImageCounter = _backgroundPainter_RunnableCounter.get();
+
+      if (_backgroundPainter_LastCounter >= currentBackgroundImageCounter) {
+
+         // counter is not incremented -> nothing to do
+         return;
+      }
+
+      if (_backgroundPainterFuture != null) {
+
+         // an overlay task is currently running
+         return;
+      }
+
+      final Runnable backgroundTask = () -> {
+
+         try {
+
+            paint_BackgroundImage_10_Runnable();
+
+         } finally {
+
+            /**
+             * This counter is very tricky but with this setup it seems to work and is not
+             * reentering endlessly.
+             * <p>
+             * The next paint() will increment the counter but the paint() from this thread "should
+             * not" increment it, so it's decremented.
+             */
+            _backgroundPainter_LastCounter = _backgroundPainter_RunnableCounter.decrementAndGet() + 1;
+            _backgroundPainterFuture = null;
+         }
+
+         // redraw map image with updated background image
+         paint();
+      };
+
+      _backgroundPainterFuture = _backgroundPainterExecutor.submit(backgroundTask);
+   }
+
+   private void paint_BackgroundImage_10_Runnable() {
+
+//      final long start = System.nanoTime();
+
+      _backgroundPainter_Viewport_DuringPainting = _worldPixel_TopLeft_Viewport;
+
+      final List<PaintedMarkerCluster> allPaintedClusters = new ArrayList<>();
+
+      try {
+
+         final Map2MarkerConfig map2Config = Map2ConfigManager.getActiveMarkerConfig();
+
+         final Image canvasImage = _backgroundPainterImage_WhichIsPainted;
+         final GC gcCanvas = new GC(canvasImage);
+         {
+            gcCanvas.setBackground(_mapTransparentColor);
+            gcCanvas.fillRectangle(_newOverlaySize);
+
+            if (map2Config.isShowTourMarker) {
+
+               if (map2Config.isMarkerClustered) {
+
+                  paint_BackgroundImage_30_AllClusterAndMarker(gcCanvas, allPaintedClusters);
+
+               } else {
+
+                  paint_BackgroundImage_20_AllMarker(gcCanvas);
+               }
+            }
+         }
+         gcCanvas.dispose();
+
+         // swap images
+         final Image oldVisibleImage = _backgroundPainterImage_WhichIsDisplayed;
+
+         _backgroundPainterImage_WhichIsDisplayed = canvasImage;
+         _backgroundPainterImage_WhichIsPainted = oldVisibleImage;
+
+         _backgroundPainter_Viewport_WhenPainted = _backgroundPainter_Viewport_DuringPainting;
+
+         _allPaintedMarkerClusters = allPaintedClusters;
+
+      } catch (final Exception e) {
+
+         StatusUtil.log(e);
+      }
+
+//      final long end = System.nanoTime();
+//
+//      System.out.println(UI.timeStampNano() + " paint_BackgroundImage_10_Runnable() - %7.3f ms".formatted((float) (end - start) / 1000000));
+   }
+
+   private void paint_BackgroundImage_20_AllMarker(final GC gc) {
+
+      final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
+
+      for (final TourData tourData : allTourData) {
+
+         if (tourData == null) {
+            continue;
+         }
+
+         if (_backgroundPainterFuture.isCancelled()) {
+            return;
+         }
+
+         // check if geo position is available
+         final double[] latitudeSerie = tourData.latitudeSerie;
+         final double[] longitudeSerie = tourData.longitudeSerie;
+
+         if (latitudeSerie == null || longitudeSerie == null) {
+            continue;
+         }
+
+         final Set<TourMarker> allTourMarkers = tourData.getTourMarkers();
+
+         // check if markers are available
+         if (allTourMarkers.size() > 0) {
+
+            // draw tour marker
+
+            for (final TourMarker tourMarker : allTourMarkers) {
+
+               // skip marker when hidden or not set
+               if (tourMarker.isMarkerVisible() == false || StringUtils.isNullOrEmpty(tourMarker.getLabel())) {
+                  continue;
+               }
+
+               final int serieIndex = tourMarker.getSerieIndex();
+
+               /*
+                * Check bounds because when a tour is split, it can happen that the marker serie
+                * index is out of scope
+                */
+               if (serieIndex >= latitudeSerie.length) {
+                  continue;
+               }
+
+               // draw tour marker
+               if (paint_BackgroundImage_50_OneMarker(
+                     gc,
+                     latitudeSerie[serieIndex],
+                     longitudeSerie[serieIndex],
+                     tourMarker.getLabel())) {
+
+               }
+            }
+         }
+      }
+   }
+
+   private void paint_BackgroundImage_30_AllClusterAndMarker(final GC gc,
+                                                             final List<PaintedMarkerCluster> allPaintedClusters) {
+
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+
+      final int clusterGridSize = (int) ScreenUtils.getPixels(markerConfig.clusterGridSize);
+
+      final int clusterFontSize = (int) (markerConfig.clusterSymbol_Size * 2.0f);
+      if (_clusterFontSize != clusterFontSize) {
+         setupClusterFont(gc, clusterFontSize);
+      }
+
+      final Font gcFontBackup = gc.getFont();
+      gc.setFont(_clusterFont);
+
+      gc.setAntialias(markerConfig.isClusterSymbolAntialiased ? SWT.ON : SWT.OFF);
+      gc.setTextAntialias(markerConfig.isClusterTextAntialiased ? SWT.ON : SWT.OFF);
+
+      // convert MapMarker's into ClusterItem's
+      final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
+      final List<MapMarker> allMarkers = createMapMarkers(allTourData);
+
+      final List<ClusterItem> allClusterItems = new ArrayList<>();
+      allClusterItems.addAll(allMarkers);
+
+      _distanceClustering.clearItems();
+      _distanceClustering.addItems(allClusterItems);
+
+      final Set<? extends Cluster<ClusterItem>> allMarkerClusters = _distanceClustering.getClusters(_mapZoomLevel, clusterGridSize);
+
+//      final List<Cluster<?>> allClusterOnly = new ArrayList<>();
+      final List<MapMarker> allMarkersOnly = new ArrayList<>();
+
+      // firstly paint the clusters
+      for (final Cluster<ClusterItem> item : allMarkerClusters) {
+
+         if (_backgroundPainterFuture.isCancelled()) {
+            return;
+         }
+
+         if (item instanceof final StaticCluster staticCluster) {
+
+            // item is a cluster
+
+            final int numClusterItems = staticCluster.getSize();
+
+            if (paint_BackgroundImage_60_OneCluster(
+                  gc,
+                  staticCluster,
+                  Integer.toString(numClusterItems),
+                  allPaintedClusters)) {
+
+//               allClusterOnly.add(staticCluster);
+            }
+
+         } else if (item instanceof final QuadItem markerItem) {
+
+            // item is a marker
+
+            if (markerItem.mClusterItem instanceof final MapMarker mapMarker) {
+
+               allMarkersOnly.add(mapMarker);
+            }
+         }
+      }
+
+      gc.setFont(gcFontBackup);
+
+      // markers MUST be sorted otherwise they are flickering when the sequence is randomly
+      Collections.sort(
+            allMarkersOnly,
+            (tourMarker1, tourMarker2) -> tourMarker1.title.compareTo(tourMarker2.title));
+
+      // secondly paint the markers
+      for (final MapMarker mapMarker : allMarkersOnly) {
+
+         if (_backgroundPainterFuture.isCancelled()) {
+            return;
+         }
+
+         paint_BackgroundImage_50_OneMarker(
+               gc,
+               mapMarker.geoPoint.getLatitude(),
+               mapMarker.geoPoint.getLongitude(),
+               mapMarker.title);
+      }
+   }
+
+   private boolean paint_BackgroundImage_50_OneMarker(final GC gc,
+                                                      final double latitude,
+                                                      final double longitude,
+                                                      final String markerLabel) {
+
+      final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
+
+      // convert marker lat/long into world pixels
+      final java.awt.Point worldPixel_MarkerPos = _mp.geoToPixel(new GeoPosition(latitude, longitude), _mapZoomLevel);
+
+      final int worldPixel_MarkerPosX = worldPixel_MarkerPos.x;
+      final int worldPixel_MarkerPosY = worldPixel_MarkerPos.y;
+
+      final boolean isMarkerInViewport = worldPixel_Viewport.contains(worldPixel_MarkerPosX, worldPixel_MarkerPosY);
+
+      if (isMarkerInViewport) {
+
+         final String text = UI.IS_SCRAMBLE_DATA
+               ? UI.scrambleText(markerLabel)
+               : markerLabel;
+
+         final Point textExtent = gc.stringExtent(text);
+         final int textHeight = textExtent.y;
+         final int textHeight2 = textHeight / 2;
+
+         // convert world position into device position
+         final int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
+         final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y - textHeight2;
+
+         gc.setForeground(UI.SYS_COLOR_GREEN);
+         gc.drawString(text, devX - 1, devY, true);
+         gc.drawString(text, devX + 1, devY, true);
+         gc.drawString(text, devX, devY - 1, true);
+         gc.drawString(text, devX, devY + 1, true);
+
+         gc.setForeground(UI.SYS_COLOR_BLACK);
+         gc.drawString(text, devX, devY, true);
+      }
+
+      return isMarkerInViewport;
+   }
+
+   private boolean paint_BackgroundImage_60_OneCluster(final GC gc,
+                                                       final StaticCluster<?> markerCluster,
+                                                       final String clusterLabel,
+                                                       final List<PaintedMarkerCluster> allPaintedClusters) {
+
+      // convert marker lat/long into world pixels
+
+      final GeoPoint geoPoint = markerCluster.getPosition();
+      final GeoPosition geoPosition = new GeoPosition(geoPoint.getLatitude(), geoPoint.getLongitude());
+
+      final java.awt.Point worldPixel_MarkerPos = _mp.geoToPixel(geoPosition, _mapZoomLevel);
+
+      final int worldPixel_MarkerPosX = worldPixel_MarkerPos.x;
+      final int worldPixel_MarkerPosY = worldPixel_MarkerPos.y;
+
+      final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
+
+      final boolean isClusterInViewport = worldPixel_Viewport.contains(worldPixel_MarkerPosX, worldPixel_MarkerPosY);
+
+      if (isClusterInViewport == false) {
+         return false;
+      }
+
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+
+      // convert world position into device position
+      int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
+      int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
+
+      final String text = clusterLabel;
+      final int textLength = text.length();
+
+      /*
+       * Do fine adjustment to center the number within the circle
+       */
+      final int offsetX;
+      final int offsetY;
+      final boolean isOneDigit = textLength == 1;
+
+// SET_FORMATTING_OFF
+
+      if (        _clusterFontSize > 19) {   offsetX = isOneDigit ? 0 : -1;
+      } else if ( _clusterFontSize > 17) {   offsetX = isOneDigit ? -1 : -1;
+      } else if ( _clusterFontSize > 15) {   offsetX = isOneDigit ? 0 : -1;
+      } else if ( _clusterFontSize > 13) {   offsetX = isOneDigit ? 0 : -1;
+      } else if ( _clusterFontSize > 11) {   offsetX = isOneDigit ? 0 : -1;
+      } else if ( _clusterFontSize >  9) {   offsetX = isOneDigit ? 1 : -1;
+      } else if ( _clusterFontSize >  7) {   offsetX = isOneDigit ? 0 : -1;
+      } else if ( _clusterFontSize >  5) {   offsetX = isOneDigit ? 0 : -1;
+      } else if ( _clusterFontSize >  3) {   offsetX = isOneDigit ? 0 : -1;
+      } else {                               offsetX = isOneDigit ? 1 : -1;
+      }
+
+      if (        _clusterFontSize > 19) {   offsetY = isOneDigit ? 0 : 0;
+      } else if ( _clusterFontSize > 17) {   offsetY = isOneDigit ? 1 : 1;
+      } else if ( _clusterFontSize > 15) {   offsetY = isOneDigit ? 0 : 0;
+      } else if ( _clusterFontSize > 13) {   offsetY = isOneDigit ? 2 : 2;
+      } else if ( _clusterFontSize > 11) {   offsetY = 2;
+      } else if ( _clusterFontSize >  9) {   offsetY = isOneDigit ? 2 : 2;
+      } else if ( _clusterFontSize >  7) {   offsetY = isOneDigit ? 3 : 3;
+      } else if ( _clusterFontSize >  5) {   offsetY = 2;
+      } else {                               offsetY = 3;
+      }
+
+// SET_FORMATTING_ON
+
+//         final FontData fontDataNew = _clusterFont.getFontData()[0];
+//
+//         System.out.println(UI.timeStamp()
+//               + " _clusterFontSize: " + _clusterFontSize
+////               + " - new: " + fontDataNew.height
+//               + "  x: " + offsetX
+//               + "  y: " + offsetY);
+
+      final Point textExtent = gc.stringExtent(text);
+
+      final int textWidth = textLength < 2 ? textExtent.x + 2 : textExtent.x;
+      final int textHeight = textExtent.y;
+      final int textWidth2 = textWidth / 2;
+      final int textHeight2 = textHeight / 2;
+
+      final int margin = markerConfig.clusterSymbol_Size;
+
+      final int circleSize = textWidth + margin;
+      final int circleSize2 = circleSize / 2;
+
+      devX = devX - circleSize2;
+      devY = devY - circleSize2;
+
+      final int ovalDevX = devX - circleSize2 + textWidth2 - 2;
+      final int ovalDevY = devY - circleSize2 + textHeight2 + 2;
+
+      if (markerConfig.isFillClusterSymbol) {
+
+//       gc.setBackground(markerConfig.clusterFill_Color);
+         gc.setBackground(UI.SYS_COLOR_RED);
+         gc.fillOval(
+
+               ovalDevX,
+               ovalDevY,
+
+               circleSize,
+               circleSize);
+      }
+
+//    gc.setForeground(markerConfig.clusterOutline_Color);
+      gc.setForeground(UI.SYS_COLOR_WHITE);
+
+      final int outlineWidth = markerConfig.clusterOutline_Width;
+
+      if (outlineWidth > 0) {
+
+         gc.setLineWidth(outlineWidth);
+         gc.drawOval(
+
+               ovalDevX,
+               ovalDevY,
+
+               circleSize,
+               circleSize);
+      }
+
+      final int clusterLabelDevX = devX + offsetX;
+      final int clusterLabelDevY = devY + offsetY;
+
+      gc.drawString(
+            text,
+            clusterLabelDevX,
+            clusterLabelDevY,
+            true);
+
+      final Rectangle paintedClusterRectangle = new Rectangle(
+
+            ovalDevX,
+            ovalDevY,
+
+            circleSize,
+            circleSize);
+
+      // keep cluster painting data
+      allPaintedClusters.add(new PaintedMarkerCluster(
+
+            markerCluster,
+            paintedClusterRectangle,
+
+            clusterLabel,
+            clusterLabelDevX,
+            clusterLabelDevY));
+
+      return isClusterInViewport;
    }
 
    private void paint_Debug_GeoGrid(final GC gc) {
@@ -5444,442 +5866,6 @@ public class Map2 extends Canvas {
       }
 
       gc.setAntialias(SWT.OFF);
-   }
-
-   private void paint_NewOverlay() {
-
-      final int currentOverlayCounter = _newOverlay_RunnableCounter.get();
-
-      if (_newOverlay_LastCounter >= currentOverlayCounter) {
-
-         // counter is not incremented -> nothing to do
-         return;
-      }
-
-      if (_newOverlayFuture != null) {
-
-         // an overlay task is currently running
-         return;
-      }
-
-      final Runnable overlayTask = () -> {
-
-         try {
-
-            paint_NewOverlay_10_Runnable();
-
-         } finally {
-
-            /**
-             * This counter is very tricky but with this setup it seems to work and is not
-             * reentering endlessly.
-             * <p>
-             * The next paint() will increment the counter but the paint() from this thread "should
-             * not" increment it, so it's decremented.
-             */
-            _newOverlay_LastCounter = _newOverlay_RunnableCounter.decrementAndGet() + 1;
-            _newOverlayFuture = null;
-         }
-
-         // redraw map image with updated overlay image
-         paint();
-      };
-
-      _newOverlayFuture = _newOverlayExecutor.submit(overlayTask);
-   }
-
-   private void paint_NewOverlay_10_Runnable() {
-
-//      final long start = System.nanoTime();
-
-      _newOverlay_Viewport_NotVisible = _worldPixel_TopLeft_Viewport;
-
-      final List<PaintedMarkerCluster> allPaintedClusters = new ArrayList<>();
-
-      try {
-
-         final Map2MarkerConfig map2Config = Map2ConfigManager.getActiveMarkerConfig();
-
-         final Image gcImage = _newOverlayImage_NotVisible;
-         final GC gc = new GC(gcImage);
-         {
-            gc.setBackground(_mapTransparentColor);
-            gc.fillRectangle(_newOverlaySize);
-
-            if (map2Config.isShowTourMarker) {
-
-               if (map2Config.isMarkerClustered) {
-
-                  paint_NewOverlay_30_AllClusterAndMarker(gc, allPaintedClusters);
-
-               } else {
-
-                  paint_NewOverlay_20_AllMarker(gc);
-               }
-            }
-         }
-         gc.dispose();
-
-         // swap images
-         final Image oldVisibleImage = _newOverlayImage_Visible;
-
-         _newOverlayImage_Visible = gcImage;
-         _newOverlayImage_NotVisible = oldVisibleImage;
-
-         _newOverlay_Viewport_Visible = _newOverlay_Viewport_NotVisible;
-
-         _allPaintedMarkerClusters = allPaintedClusters;
-
-      } catch (final Exception e) {
-
-         StatusUtil.log(e);
-
-         // this happens, e.g. when dimming the map
-//         UI.disposeResource(_newOverlayImage_NotVisible);
-      }
-
-//      final long end = System.nanoTime();
-//
-//      System.out.println(UI.timeStampNano() + " paint_NewOverlay_10_Runnable() - %7.3f ms".formatted((float) (end - start) / 1000000));
-   }
-
-   private void paint_NewOverlay_20_AllMarker(final GC gc) {
-
-      final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
-
-      for (final TourData tourData : allTourData) {
-
-         if (tourData == null) {
-            continue;
-         }
-
-         if (_newOverlayFuture.isCancelled()) {
-            return;
-         }
-
-         // check if geo position is available
-         final double[] latitudeSerie = tourData.latitudeSerie;
-         final double[] longitudeSerie = tourData.longitudeSerie;
-
-         if (latitudeSerie == null || longitudeSerie == null) {
-            continue;
-         }
-
-         final Set<TourMarker> allTourMarkers = tourData.getTourMarkers();
-
-         // check if markers are available
-         if (allTourMarkers.size() > 0) {
-
-            // draw tour marker
-
-            for (final TourMarker tourMarker : allTourMarkers) {
-
-               // skip marker when hidden or not set
-               if (tourMarker.isMarkerVisible() == false || StringUtils.isNullOrEmpty(tourMarker.getLabel())) {
-                  continue;
-               }
-
-               final int serieIndex = tourMarker.getSerieIndex();
-
-               /*
-                * Check bounds because when a tour is split, it can happen that the marker serie
-                * index is out of scope
-                */
-               if (serieIndex >= latitudeSerie.length) {
-                  continue;
-               }
-
-               // draw tour marker
-               if (paint_NewOverlay_50_OneMarker(
-                     gc,
-                     latitudeSerie[serieIndex],
-                     longitudeSerie[serieIndex],
-                     tourMarker.getLabel())) {
-
-               }
-            }
-         }
-      }
-   }
-
-   private void paint_NewOverlay_30_AllClusterAndMarker(final GC gc,
-                                                        final List<PaintedMarkerCluster> allPaintedClusters) {
-
-      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
-
-      final int clusterGridSize = (int) ScreenUtils.getPixels(markerConfig.clusterGridSize);
-
-      final int clusterFontSize = (int) (markerConfig.clusterSymbol_Size * 2.0f);
-      if (_clusterFontSize != clusterFontSize) {
-         setupClusterFont(gc, clusterFontSize);
-      }
-
-      final Font gcFontBackup = gc.getFont();
-      gc.setFont(_clusterFont);
-
-      gc.setAntialias(markerConfig.isClusterSymbolAntialiased ? SWT.ON : SWT.OFF);
-      gc.setTextAntialias(markerConfig.isClusterTextAntialiased ? SWT.ON : SWT.OFF);
-
-      // convert MapMarker's into ClusterItem's
-      final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
-      final List<MapMarker> allMarkers = createMapMarkers(allTourData);
-
-      final List<ClusterItem> allClusterItems = new ArrayList<>();
-      allClusterItems.addAll(allMarkers);
-
-      _distanceClustering.clearItems();
-      _distanceClustering.addItems(allClusterItems);
-
-      final Set<? extends Cluster<ClusterItem>> allMarkerClusters = _distanceClustering.getClusters(_mapZoomLevel, clusterGridSize);
-
-//      final List<Cluster<?>> allClusterOnly = new ArrayList<>();
-      final List<MapMarker> allMarkersOnly = new ArrayList<>();
-
-      // firstly paint the clusters
-      for (final Cluster<ClusterItem> item : allMarkerClusters) {
-
-         if (_newOverlayFuture.isCancelled()) {
-            return;
-         }
-
-         if (item instanceof final StaticCluster staticCluster) {
-
-            // item is a cluster
-
-            final int numClusterItems = staticCluster.getSize();
-
-            if (paint_NewOverlay_60_OneCluster(
-                  gc,
-                  staticCluster,
-                  Integer.toString(numClusterItems),
-                  allPaintedClusters)) {
-
-//               allClusterOnly.add(staticCluster);
-            }
-
-         } else if (item instanceof final QuadItem markerItem) {
-
-            // item is a marker
-
-            if (markerItem.mClusterItem instanceof final MapMarker mapMarker) {
-
-               allMarkersOnly.add(mapMarker);
-            }
-         }
-      }
-
-      gc.setFont(gcFontBackup);
-
-      // markers MUST be sorted otherwise they are flickering when the sequence is randomly
-      Collections.sort(
-            allMarkersOnly,
-            (tourMarker1, tourMarker2) -> tourMarker1.title.compareTo(tourMarker2.title));
-
-      // secondly paint the markers
-      for (final MapMarker mapMarker : allMarkersOnly) {
-
-         if (_newOverlayFuture.isCancelled()) {
-            return;
-         }
-
-         paint_NewOverlay_50_OneMarker(
-               gc,
-               mapMarker.geoPoint.getLatitude(),
-               mapMarker.geoPoint.getLongitude(),
-               mapMarker.title);
-      }
-   }
-
-   private boolean paint_NewOverlay_50_OneMarker(final GC gc,
-                                                 final double latitude,
-                                                 final double longitude,
-                                                 final String markerLabel) {
-
-      final Rectangle worldPixel_Viewport = _newOverlay_Viewport_NotVisible;
-
-      // convert marker lat/long into world pixels
-      final java.awt.Point worldPixel_MarkerPos = _mp.geoToPixel(new GeoPosition(latitude, longitude), _mapZoomLevel);
-
-      final int worldPixel_MarkerPosX = worldPixel_MarkerPos.x;
-      final int worldPixel_MarkerPosY = worldPixel_MarkerPos.y;
-
-      final boolean isMarkerInViewport = worldPixel_Viewport.contains(worldPixel_MarkerPosX, worldPixel_MarkerPosY);
-
-      if (isMarkerInViewport) {
-
-         final String text = UI.IS_SCRAMBLE_DATA
-               ? UI.scrambleText(markerLabel)
-               : markerLabel;
-
-         final Point textExtent = gc.stringExtent(text);
-         final int textHeight = textExtent.y;
-         final int textHeight2 = textHeight / 2;
-
-         // convert world position into device position
-         final int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
-         final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y - textHeight2;
-
-         gc.setForeground(UI.SYS_COLOR_GREEN);
-         gc.drawString(text, devX - 1, devY, true);
-         gc.drawString(text, devX + 1, devY, true);
-         gc.drawString(text, devX, devY - 1, true);
-         gc.drawString(text, devX, devY + 1, true);
-
-         gc.setForeground(UI.SYS_COLOR_BLACK);
-         gc.drawString(text, devX, devY, true);
-      }
-
-      return isMarkerInViewport;
-   }
-
-   private boolean paint_NewOverlay_60_OneCluster(final GC gc,
-                                                  final StaticCluster<?> markerCluster,
-                                                  final String clusterLabel,
-                                                  final List<PaintedMarkerCluster> allPaintedClusters) {
-
-      // convert marker lat/long into world pixels
-
-      final GeoPoint geoPoint = markerCluster.getPosition();
-      final GeoPosition geoPosition = new GeoPosition(geoPoint.getLatitude(), geoPoint.getLongitude());
-
-      final java.awt.Point worldPixel_MarkerPos = _mp.geoToPixel(geoPosition, _mapZoomLevel);
-
-      final int worldPixel_MarkerPosX = worldPixel_MarkerPos.x;
-      final int worldPixel_MarkerPosY = worldPixel_MarkerPos.y;
-
-      final Rectangle worldPixel_Viewport = _newOverlay_Viewport_NotVisible;
-
-      final boolean isClusterInViewport = worldPixel_Viewport.contains(worldPixel_MarkerPosX, worldPixel_MarkerPosY);
-
-      if (isClusterInViewport == false) {
-         return false;
-      }
-
-      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
-
-      // convert world position into device position
-      int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
-      int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
-
-      final String text = clusterLabel;
-      final int textLength = text.length();
-
-      /*
-       * Do fine adjustment to center the number within the circle
-       */
-      final int offsetX;
-      final int offsetY;
-      final boolean isOneDigit = textLength == 1;
-
-// SET_FORMATTING_OFF
-
-      if (        _clusterFontSize > 19) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize > 17) {   offsetX = isOneDigit ? -1 : -1;
-      } else if ( _clusterFontSize > 15) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize > 13) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize > 11) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize >  9) {   offsetX = isOneDigit ? 1 : -1;
-      } else if ( _clusterFontSize >  7) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize >  5) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize >  3) {   offsetX = isOneDigit ? 0 : -1;
-      } else {                               offsetX = isOneDigit ? 1 : -1;
-      }
-
-      if (        _clusterFontSize > 19) {   offsetY = isOneDigit ? 0 : 0;
-      } else if ( _clusterFontSize > 17) {   offsetY = isOneDigit ? 1 : 1;
-      } else if ( _clusterFontSize > 15) {   offsetY = isOneDigit ? 0 : 0;
-      } else if ( _clusterFontSize > 13) {   offsetY = isOneDigit ? 2 : 2;
-      } else if ( _clusterFontSize > 11) {   offsetY = 2;
-      } else if ( _clusterFontSize >  9) {   offsetY = isOneDigit ? 2 : 2;
-      } else if ( _clusterFontSize >  7) {   offsetY = isOneDigit ? 3 : 3;
-      } else if ( _clusterFontSize >  5) {   offsetY = 2;
-      } else {                               offsetY = 3;
-      }
-
-// SET_FORMATTING_ON
-
-//         final FontData fontDataNew = _clusterFont.getFontData()[0];
-//
-//         System.out.println(UI.timeStamp()
-//               + " _clusterFontSize: " + _clusterFontSize
-////               + " - new: " + fontDataNew.height
-//               + "  x: " + offsetX
-//               + "  y: " + offsetY);
-
-      final Point textExtent = gc.stringExtent(text);
-
-      final int textWidth = textLength < 2 ? textExtent.x + 2 : textExtent.x;
-      final int textHeight = textExtent.y;
-      final int textWidth2 = textWidth / 2;
-      final int textHeight2 = textHeight / 2;
-
-      final int margin = markerConfig.clusterSymbol_Size;
-
-      final int circleSize = textWidth + margin;
-      final int circleSize2 = circleSize / 2;
-
-      devX = devX - circleSize2;
-      devY = devY - circleSize2;
-
-      final int ovalDevX = devX - circleSize2 + textWidth2 - 2;
-      final int ovalDevY = devY - circleSize2 + textHeight2 + 2;
-
-      if (markerConfig.isFillClusterSymbol) {
-
-         gc.setBackground(markerConfig.clusterFill_Color);
-         gc.fillOval(
-
-               ovalDevX,
-               ovalDevY,
-
-               circleSize,
-               circleSize);
-      }
-
-      gc.setForeground(markerConfig.clusterOutline_Color);
-
-      final int outlineWidth = markerConfig.clusterOutline_Width;
-
-      if (outlineWidth > 0) {
-
-         gc.setLineWidth(outlineWidth);
-         gc.drawOval(
-
-               ovalDevX,
-               ovalDevY,
-
-               circleSize,
-               circleSize);
-      }
-
-      final int clusterLabelDevX = devX + offsetX;
-      final int clusterLabelDevY = devY + offsetY;
-
-      gc.drawString(
-            text,
-            clusterLabelDevX,
-            clusterLabelDevY,
-            true);
-
-      final Rectangle paintedClusterRectangle = new Rectangle(
-
-            ovalDevX,
-            ovalDevY,
-
-            circleSize,
-            circleSize);
-
-      // keep cluster painting data
-      allPaintedClusters.add(new PaintedMarkerCluster(
-
-            markerCluster,
-            paintedClusterRectangle,
-
-            clusterLabel,
-            clusterLabelDevX,
-            clusterLabelDevY));
-
-      return isClusterInViewport;
    }
 
    private void paint_OfflineArea(final GC gc) {
@@ -8241,12 +8227,12 @@ public class Map2 extends Canvas {
          red = red - 1;
       }
 
-      final RGB transColorAdjusted = new RGB(red, green, blue);
+      final RGB transparentColorAdjusted = new RGB(red, green, blue);
 
-      _mapTransparentRGB = transColorAdjusted;
-      _mapTransparentColor = new Color(transColorAdjusted);
+      _mapTransparentRGB = transparentColorAdjusted;
+      _mapTransparentColor = new Color(transparentColorAdjusted);
 
-      _newTransparentRGB = transColorAdjusted;
+      _isTransparentColorModified = true;
    }
 
    private void setupClusterFont(final GC gc, final int newClusterFontSize) {
@@ -8388,6 +8374,8 @@ public class Map2 extends Canvas {
       updateViewPortData();
       updateTourToolTip();
 //    updatePoiVisibility();
+
+      _hoveredMarkerCluster = null;
 
       isTourHovered();
       paint();
@@ -8586,6 +8574,25 @@ public class Map2 extends Canvas {
       return _tourBreadcrumb;
    }
 
+   /**
+    * Do micro adjustments otherwise panning the cluster is NOT smooth
+    */
+   private void updateBackgroundImageHoverPosition() {
+
+      final Rectangle oldTopLeft_Viewport = _backgroundPainter_Viewport_WhenPainted;
+      final Rectangle currentTopLeft_Viewport = _worldPixel_TopLeft_Viewport;
+
+      if (oldTopLeft_Viewport == null) {
+         return;
+      }
+
+      final int devX = oldTopLeft_Viewport.x - currentTopLeft_Viewport.x;
+      final int devY = oldTopLeft_Viewport.y - currentTopLeft_Viewport.y;
+
+      _directMapPainterContext.hoveredDiffX = devX;
+      _directMapPainterContext.hoveredDiffY = devY;
+   }
+
    public void updateGraphColors() {
 
       _overlayAlpha = _prefStore.getBoolean(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY)
@@ -8782,7 +8789,6 @@ public class Map2 extends Canvas {
 
          redraw();
       }
-
    }
 
    /**
@@ -8849,8 +8855,6 @@ public class Map2 extends Canvas {
       _devGridPixelSize_Y = Math.abs(worldGrid2.y - worldGrid1.y);
 
       grid_UpdateGeoGridData();
-
-      _hoveredMarkerCluster = null;
    }
 
    public void zoomIn(final CenterMapBy centerMapBy) {
