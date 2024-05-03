@@ -57,6 +57,8 @@ import org.eclipse.ui.PlatformUI;
 
 public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
+   private static final String     DROPBOX              = "Dropbox";
+
    static final String             ID                   = "net.tourbook.cloud.PrefPageDropbox";       //$NON-NLS-1$
 
    static final String             CLIENT_ID            = "vye6ci8xzzsuiao";                          //$NON-NLS-1$
@@ -141,7 +143,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       {
          _chkIsEnabled = new Button(container, SWT.CHECK);
          _chkIsEnabled.setText(Messages.Pref_FileSystem_Button_Enable);
-         _chkIsEnabled.setToolTipText(Messages.Pref_FileSystem_Button_Enable_Tooltip);
+         _chkIsEnabled.setToolTipText(String.format(Messages.Pref_FileSystem_Button_Enable_Tooltip, DROPBOX));
          _chkIsEnabled.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCheckIsEnabled()));
          GridDataFactory.fillDefaults().applyTo(_chkIsEnabled);
       }
@@ -322,7 +324,9 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       if (MessageDialog.openQuestion(
             Display.getDefault().getActiveShell(),
             Messages.Pref_FileSystem_Dialog_Restart_Title,
-            Messages.Pref_FileSystem_Dialog_Restart_Message)) {
+            String.format(Messages.Pref_FileSystem_Dialog_Restart_Message, DROPBOX))) {
+
+         performOk();
 
          Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
       }
@@ -343,7 +347,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       final String codeChallenge = generateCodeChallenge(codeVerifier);
 
       final DropboxTokensRetrievalHandler tokensRetrievalHandler = new DropboxTokensRetrievalHandler(codeVerifier);
-      _server = new LocalHostServer(CALLBACK_PORT, "Dropbox", _prefChangeListener); //$NON-NLS-1$
+      _server = new LocalHostServer(CALLBACK_PORT, DROPBOX, _prefChangeListener);
       final boolean isServerCreated = _server.createCallBackServer(tokensRetrievalHandler);
 
       if (!isServerCreated) {
@@ -387,6 +391,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       final boolean isOK = super.performOk();
 
       if (isOK) {
+
          _prefStore.setValue(Preferences.DROPBOX_IS_ENABLED, _chkIsEnabled.getSelection());
          _prefStore.setValue(Preferences.DROPBOX_ACCESSTOKEN, _txtAccessToken_Value.getText());
          _prefStore.setValue(Preferences.DROPBOX_REFRESHTOKEN, _txtRefreshToken_Value.getText());
