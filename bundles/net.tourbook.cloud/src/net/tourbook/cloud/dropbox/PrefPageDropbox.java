@@ -140,8 +140,8 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
          _chkIsEnabled = new Button(container, SWT.CHECK);
-         _chkIsEnabled.setText(Messages.PrefPage_FileSystem_Button_Enable);
-         _chkIsEnabled.setToolTipText(Messages.PrefPage_FileSystem_Button_Enable_Tooltip);
+         _chkIsEnabled.setText(Messages.Pref_FileSystem_Button_Enable);
+         _chkIsEnabled.setToolTipText(Messages.Pref_FileSystem_Button_Enable_Tooltip);
          _chkIsEnabled.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCheckIsEnabled()));
          GridDataFactory.fillDefaults().applyTo(_chkIsEnabled);
       }
