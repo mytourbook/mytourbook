@@ -36,6 +36,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.web.WEB;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -52,6 +53,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.PlatformUI;
 
 public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -139,8 +141,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
          _chkIsEnabled = new Button(container, SWT.CHECK);
          _chkIsEnabled.setText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens);
          _chkIsEnabled.setToolTipText(Messages.PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip);
-         _chkIsEnabled.addSelectionListener(widgetSelectedAdapter(selectionEvent -> showOrHideAllPasswords(_chkShowHideTokens
-               .getSelection())));
+         _chkIsEnabled.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCheckIsEnabled()));
          GridDataFactory.fillDefaults().applyTo(_chkIsEnabled);
       }
 
@@ -303,6 +304,19 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       }
 
       return super.okToLeave();
+   }
+
+   private void onCheckIsEnabled() {
+
+      enableControls();
+
+      if (MessageDialog.openQuestion(
+            Display.getDefault().getActiveShell(),
+            Messages.Pref_FileSystem_Dialog_Restart_Title,
+            Messages.Pref_FileSystem_Dialog_Restart_Message)) {
+
+         Display.getCurrent().asyncExec(() -> PlatformUI.getWorkbench().restart());
+      }
    }
 
    /**

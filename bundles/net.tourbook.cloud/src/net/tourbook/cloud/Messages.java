@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2023 Frédéric Bard
+ * Copyright (C) 2020, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,8 @@ public class Messages extends NLS {
    public static String        Log_CloudAction_End;
    public static String        Log_CloudAction_InvalidTokens;
 
+   public static String        Pref_FileSystem_Dialog_Restart_Title;
+   public static String        Pref_FileSystem_Dialog_Restart_Message;
    public static String        PrefPage_CloudConnectivity_Button_Authorize;
    public static String        PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens;
    public static String        PrefPage_CloudConnectivity_Checkbox_ShowOrHideTokens_Tooltip;
