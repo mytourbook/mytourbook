@@ -86,6 +86,10 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    private Text                    _txtAccessToken_Value;
    private Text                    _txtRefreshToken_Value;
 
+   private Label                   _labelWebPage;
+
+   private Link                    _linkWebPage;
+
    @Override
    protected void createFieldEditors() {
 
@@ -194,17 +198,17 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_group);
       {
          {
-            final Label labelWebPage = UI.createLabel(_group, Messages.PrefPage_CloudConnectivity_Label_WebPage);
-            GridDataFactory.fillDefaults().applyTo(labelWebPage);
+            _labelWebPage = UI.createLabel(_group, Messages.PrefPage_CloudConnectivity_Label_WebPage);
+            GridDataFactory.fillDefaults().applyTo(_labelWebPage);
 
-            final Link linkWebPage = new Link(_group, SWT.NONE);
-            linkWebPage.setText(UI.LINK_TAG_START +
+            _linkWebPage = new Link(_group, SWT.NONE);
+            _linkWebPage.setText(UI.LINK_TAG_START +
                   DROPBOX_WEBPAGE_LINK +
                   UI.LINK_TAG_END);
-            linkWebPage.setEnabled(true);
-            linkWebPage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
+            _linkWebPage.setEnabled(true);
+            _linkWebPage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
                   DROPBOX_WEBPAGE_LINK)));
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_linkWebPage);
          }
          {
             _labelAccessToken = UI.createLabel(_group,
@@ -256,22 +260,25 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       final boolean isAuthorized = StringUtils.hasContent(_txtAccessToken_Value.getText()) &&
             StringUtils.hasContent(_txtRefreshToken_Value.getText());
 
-      final boolean isEnabled = _chkIsEnabled.getSelection() && isAuthorized;
+      final boolean isEnabled = _chkIsEnabled.getSelection();
 
-      _labelRefreshToken.setEnabled(isEnabled);
-      _labelExpiresAt.setEnabled(isEnabled);
-      _labelAccessToken.setEnabled(isEnabled);
-      _chkShowHideTokens.setEnabled(isEnabled);
-      _linkRevokeAccess.setEnabled(isEnabled);
-      _btnCleanup.setEnabled(isEnabled);
+      final boolean enabledAndAuthorized = isEnabled && isAuthorized;
+      _labelRefreshToken.setEnabled(enabledAndAuthorized);
+      _labelExpiresAt.setEnabled(enabledAndAuthorized);
+      _labelAccessToken.setEnabled(enabledAndAuthorized);
+      _chkShowHideTokens.setEnabled(enabledAndAuthorized);
+      _linkRevokeAccess.setEnabled(enabledAndAuthorized);
+      _btnCleanup.setEnabled(enabledAndAuthorized);
+      _labelExpiresAt_Value.setEnabled(enabledAndAuthorized);
+      _labelRefreshToken.setEnabled(enabledAndAuthorized);
+      _txtAccessToken_Value.setEnabled(enabledAndAuthorized);
+      _txtRefreshToken_Value.setEnabled(enabledAndAuthorized);
 
-      _group.setEnabled(isEnabled);
       _btnAuthorizeConnection.setEnabled(isEnabled);
-      _labelExpiresAt_Value.setEnabled(isEnabled);
-      _labelRefreshToken.setEnabled(isEnabled);
       _linkRevokeAccess.setEnabled(isEnabled);
-      _txtAccessToken_Value.setEnabled(isEnabled);
-      _txtRefreshToken_Value.setEnabled(isEnabled);
+      _group.setEnabled(isEnabled);
+      _labelAccessToken.setEnabled(isEnabled);
+      _linkWebPage.setEnabled(isEnabled);
    }
 
    private String generateCodeChallenge(final String codeVerifier) {
@@ -412,7 +419,6 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
    private void restoreState() {
 
-      final var toto = _prefStore.getDefaultBoolean(Preferences.DROPBOX_IS_ENABLED);
       _chkIsEnabled.setSelection(_prefStore.getBoolean(Preferences.DROPBOX_IS_ENABLED));
       _txtAccessToken_Value.setText(_prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN));
       _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
