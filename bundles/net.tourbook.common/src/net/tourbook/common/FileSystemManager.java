@@ -218,7 +218,8 @@ public class FileSystemManager {
 
                   object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
 
-                  if (object instanceof final TourbookFileSystem fileSystem) {
+                  if (object instanceof final TourbookFileSystem fileSystem &&
+                        fileSystem.isEnabled()) {
 
                      fileSystemsList.add(fileSystem);
                   }

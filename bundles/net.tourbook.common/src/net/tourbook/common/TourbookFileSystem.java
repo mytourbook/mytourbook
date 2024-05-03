@@ -115,6 +115,8 @@ public abstract class TourbookFileSystem {
     */
    public abstract String getPreferencePageId();
 
+   protected abstract boolean isEnabled();
+
    /**
     * Provides a way, for the user, to select a specific folder to be used in this file system.
     * The chosen folder path needs to be saved in {@link #FILE_SYSTEM_FOLDER}
