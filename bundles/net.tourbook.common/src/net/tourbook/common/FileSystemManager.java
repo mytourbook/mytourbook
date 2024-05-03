@@ -54,7 +54,7 @@ public class FileSystemManager {
     *
     * @return
     */
-   public static File CopyLocally(final String absolutefilePath) {
+   public static File copyLocally(final String absolutefilePath) {
 
       final TourbookFileSystem tourbookFileSystem = getTourbookFileSystem(absolutefilePath);
 
