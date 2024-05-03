@@ -263,6 +263,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       final boolean isEnabled = _chkIsEnabled.getSelection();
 
       final boolean enabledAndAuthorized = isEnabled && isAuthorized;
+      _labelAccessToken.setEnabled(enabledAndAuthorized);
       _labelRefreshToken.setEnabled(enabledAndAuthorized);
       _labelExpiresAt.setEnabled(enabledAndAuthorized);
       _labelAccessToken.setEnabled(enabledAndAuthorized);
@@ -277,7 +278,6 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       _btnAuthorizeConnection.setEnabled(isEnabled);
       _linkRevokeAccess.setEnabled(isEnabled);
       _group.setEnabled(isEnabled);
-      _labelAccessToken.setEnabled(isEnabled);
       _linkWebPage.setEnabled(isEnabled);
    }
 
