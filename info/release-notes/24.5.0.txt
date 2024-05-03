@@ -131,6 +131,10 @@ Changes
 Bugfix
 ======
 
+* EasyImport (Frederic)
+  - Added the ability to disable a cloud file system
+    https://github.com/mytourbook/mytourbook/issues/1293
+
 * Fit Export (Frederic)
   - Fix for the Suunto App replay issue
     https://github.com/mytourbook/mytourbook/discussions/1194

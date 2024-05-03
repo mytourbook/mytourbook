@@ -57,7 +57,7 @@ import org.eclipse.ui.PlatformUI;
 
 public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   private static final String     DROPBOX              = "Dropbox";
+   private static final String     DROPBOX              = "Dropbox";                                  //$NON-NLS-1$
 
    static final String             ID                   = "net.tourbook.cloud.PrefPageDropbox";       //$NON-NLS-1$
 
@@ -390,7 +390,18 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    }
 
    @Override
-   protected void performDefaults() {}
+   protected void performDefaults() {
+
+      _txtAccessToken_Value.setText(
+            _prefStore.getDefaultString(Preferences.DROPBOX_ACCESSTOKEN));
+      _labelExpiresAt_Value.setText(UI.EMPTY_STRING);
+      _txtRefreshToken_Value.setText(
+            _prefStore.getDefaultString(Preferences.DROPBOX_REFRESHTOKEN));
+
+      enableControls();
+
+      super.performDefaults();
+   }
 
    @Override
    public boolean performOk() {
