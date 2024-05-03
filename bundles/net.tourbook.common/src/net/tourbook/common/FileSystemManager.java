@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.core.runtime.CoreException;
@@ -32,8 +33,6 @@ import org.eclipse.core.runtime.Platform;
 
 /**
  * Class that manages virtual file systems.
- *
- * @author Frédéric Bard
  */
 public class FileSystemManager {
 
@@ -225,7 +224,7 @@ public class FileSystemManager {
                   }
 
                } catch (final CoreException e) {
-                  e.printStackTrace();
+                  StatusUtil.log(e);
                }
             }
          }
