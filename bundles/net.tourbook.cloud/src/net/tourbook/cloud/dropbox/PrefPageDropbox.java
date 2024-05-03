@@ -397,6 +397,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       _labelExpiresAt_Value.setText(UI.EMPTY_STRING);
       _txtRefreshToken_Value.setText(
             _prefStore.getDefaultString(Preferences.DROPBOX_REFRESHTOKEN));
+      _chkIsEnabled.setSelection(_prefStore.getDefaultBoolean(Preferences.DROPBOX_IS_ENABLED));
 
       enableControls();
 
