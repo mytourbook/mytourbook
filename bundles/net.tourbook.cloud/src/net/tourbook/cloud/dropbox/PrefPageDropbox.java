@@ -379,19 +379,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    }
 
    @Override
-   protected void performDefaults() {
-
-      _chkIsEnabled.setSelection(_prefStore.getDefaultBoolean(Preferences.DROPBOX_IS_ENABLED));
-      _txtAccessToken_Value.setText(
-            _prefStore.getDefaultString(Preferences.DROPBOX_ACCESSTOKEN));
-      _labelExpiresAt_Value.setText(UI.EMPTY_STRING);
-      _txtRefreshToken_Value.setText(
-            _prefStore.getDefaultString(Preferences.DROPBOX_REFRESHTOKEN));
-
-      enableControls();
-
-      super.performDefaults();
-   }
+   protected void performDefaults() {}
 
    @Override
    public boolean performOk() {
@@ -419,6 +407,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
    private void restoreState() {
 
+      final var toto = _prefStore.getDefaultBoolean(Preferences.DROPBOX_IS_ENABLED);
       _chkIsEnabled.setSelection(_prefStore.getBoolean(Preferences.DROPBOX_IS_ENABLED));
       _txtAccessToken_Value.setText(_prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN));
       _labelExpiresAt_Value.setText(OAuth2Utils.computeAccessTokenExpirationDate(
