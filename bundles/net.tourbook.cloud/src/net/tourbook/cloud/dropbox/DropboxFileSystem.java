@@ -195,8 +195,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
    @Override
    protected boolean isEnabled() {
 
-      boolean boolean1 = _prefStore.getBoolean(Preferences.DROPBOX_IS_ENABLED);
-      return boolean1;
+      return _prefStore.getBoolean(Preferences.DROPBOX_IS_ENABLED);
    }
 
    /**
