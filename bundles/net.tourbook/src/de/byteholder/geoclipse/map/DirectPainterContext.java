@@ -51,7 +51,4 @@ public class DirectPainterContext {
     */
    public PaintedMapLocation       hoveredMapLocation;
 
-   public int                      hoveredDiffX;
-   public int                      hoveredDiffY;
-
 }

@@ -21,10 +21,8 @@ import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Map2Painter;
 import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.PaintedMapLocation;
-import de.byteholder.geoclipse.map.PaintedMarkerCluster;
 import de.byteholder.geoclipse.mapprovider.MP;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,20 +38,15 @@ import net.tourbook.common.ui.TextWrapPainter;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.map2.Messages;
-import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.tour.location.TourLocationExtended;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
-
-import particlelabeling.PointFeature;
-import particlelabeling.PointFeatureLabeler;
 
 public class DirectMappingPainter implements IDirectPainter {
 
@@ -240,206 +233,6 @@ public class DirectMappingPainter implements IDirectPainter {
       if ((image != null) && !image.isDisposed()) {
          image.dispose();
       }
-   }
-
-   /**
-    * Highligh the cluster and its markers
-    *
-    * @param painterContext
-    * @param hoveredClusterMarker
-    */
-   private void drawClusterMarker(final DirectPainterContext painterContext,
-                                  final PaintedMarkerCluster hoveredClusterMarker) {
-
-      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
-
-      // draw hovered cluster marker
-      if (markerConfig.isShowClusterMarker == false) {
-         return;
-      }
-
-
-      final GC gc = painterContext.gc;
-
-      gc.setAntialias(markerConfig.isClusterSymbolAntialiased ? SWT.ON : SWT.OFF);
-      gc.setTextAntialias(markerConfig.isClusterTextAntialiased ? SWT.ON : SWT.OFF);
-
-      final float markerSize = 6;
-      final int maxVisibleHoveredMarker = 500;
-
-      final Object[] allClusterItemsAsArray = hoveredClusterMarker.allClusterItemsAsArray;
-      final int numMarkers = allClusterItemsAsArray.length;
-      int numVisibleMarkers = numMarkers;
-
-      if (numMarkers == 0) {
-         return;
-      }
-
-      // do micro adjustments otherwise panning the map is NOT smooth
-      int hoveredDiffX = painterContext.hoveredDiffX;
-      int hoveredDiffY = painterContext.hoveredDiffY;
-
-      System.out.println(UI.timeStamp() + " hov diff: " + hoveredDiffX + "  " + hoveredDiffY);
-// TODO remove SYSTEM.OUT.PRINTLN
-
-//      hoveredDiffX = 0;
-//      hoveredDiffY = 0;
-
-      hoveredDiffX = hoveredDiffX;
-      hoveredDiffY = hoveredDiffY;
-
-      // limit markers
-      if (numMarkers > maxVisibleHoveredMarker) {
-         numVisibleMarkers = maxVisibleHoveredMarker;
-      }
-
-      final Rectangle clientArea = painterContext.clientArea;
-
-      final int mapWidth = clientArea.width;
-      final int mapHeight = clientArea.height;
-
-      // draw something to respect later
-
-      final List<PointFeature> allPointfeatures = new ArrayList<>(numVisibleMarkers);
-
-      for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
-
-         final Object clusterItem = allClusterItemsAsArray[itemIndex];
-
-         if (clusterItem instanceof final MapMarker mapMarker) {
-
-            String text = mapMarker.title;
-
-            if (UI.IS_SCRAMBLE_DATA) {
-               text = UI.scrambleText(text);
-            }
-
-            final int devX = mapMarker.devX;
-            final int devY = mapMarker.devY;
-
-            final Point textExtent = gc.textExtent(text);
-
-            final int textWidth = textExtent.x;
-            final int textHeight = textExtent.y;
-
-            allPointfeatures.add(new PointFeature(
-
-                  text,
-                  -1,
-
-                  devX,
-                  devY,
-
-                  textWidth,
-                  textHeight));
-         }
-      }
-
-      final Rectangle clusterRectangle = hoveredClusterMarker.clusterRectangle;
-
-      // generate the point-features to label and calculate their label-sizes
-
-      final PointFeatureLabeler pfLabeler = new PointFeatureLabeler();
-
-      pfLabeler.loadDataStandard(allPointfeatures,
-
-            0, //          left
-            mapWidth, //   right
-            0, //          top
-            mapHeight) //  bottom
-      ;
-
-      final float circleRadius = clusterRectangle.width + 10;
-      final float circleRadius2 = circleRadius / 2;
-
-      final float circleX = clusterRectangle.x + circleRadius2;
-      final float circleY = clusterRectangle.y + circleRadius2;
-
-      pfLabeler.respectCircle(
-            circleX,
-            circleY,
-            circleRadius);
-
-      final int numPlacedLabels = pfLabeler.label_StandardPipelineAll();
-
-      // all labeling is done now, the resulting label positions are stored within the point-features
-
-      /*
-       * Draw all visible markers
-       */
-      for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
-
-         final PointFeature pointFeature = allPointfeatures.get(itemIndex);
-
-         if (pointFeature.isLabeled == false) {
-            continue;
-         }
-
-         String text = pointFeature.label;
-
-         if (UI.IS_SCRAMBLE_DATA) {
-            text = UI.scrambleText(text);
-         }
-
-         final int devX = (int) pointFeature.labelBoxL + hoveredDiffX;
-         final int devY = (int) pointFeature.labelBoxT + hoveredDiffY;
-
-         final Point textExtent = gc.textExtent(text);
-
-         final int textWidth = textExtent.x;
-         final int textHeight = textExtent.y;
-
-         gc.setBackground(UI.SYS_COLOR_WHITE);
-         gc.fillRectangle(
-               devX,
-               devY,
-               textWidth,
-               textHeight);
-
-         gc.setForeground(UI.SYS_COLOR_GRAY);
-         gc.drawRectangle(
-               devX,
-               devY,
-               textWidth,
-               textHeight);
-
-         gc.setForeground(UI.SYS_COLOR_BLACK);
-         gc.drawString(text, devX, devY, true);
-      }
-
-      /*
-       * Draw number of painted labels which can be different to the cluster labels
-       */
-      // fill background
-      if (markerConfig.isFillClusterSymbol) {
-
-//       gc.setBackground(markerConfig.clusterOutline_Color);
-         gc.setBackground(UI.SYS_COLOR_BLUE);
-         gc.fillOval(
-
-               clusterRectangle.x - hoveredDiffX,
-               clusterRectangle.y - hoveredDiffY,
-
-               clusterRectangle.width,
-               clusterRectangle.height);
-      }
-
-      final Font gcFontBackup = gc.getFont();
-      gc.setFont(_map2.getClusterFont());
-
-      gc.setForeground(UI.SYS_COLOR_GREEN);
-      gc.drawString(
-            Integer.toString(numPlacedLabels),
-            hoveredClusterMarker.clusterLabelDevX + hoveredDiffX,
-            hoveredClusterMarker.clusterLabelDevY + hoveredDiffY,
-            true);
-
-      gc.setFont(gcFontBackup);
-
-      // DEBUGGING
-      //
-//         pfLabeler.drawParticles(gc);
-//         pfLabeler.drawSpiral(gc, (int) circleX, (int) circleY);
    }
 
    private void drawMapLocation(final DirectPainterContext painterContext,
@@ -1074,12 +867,6 @@ public class DirectMappingPainter implements IDirectPainter {
 
       if (_map2 == null) {
          return;
-      }
-
-      final PaintedMarkerCluster hoveredClusterMarker = _map2.getHoveredClusterMarker();
-      if (hoveredClusterMarker != null) {
-
-         drawClusterMarker(painterContext, hoveredClusterMarker);
       }
 
       if (_isShowLocations_Tour || _isShowLocations_Common) {
