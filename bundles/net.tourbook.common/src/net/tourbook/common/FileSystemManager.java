@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.core.runtime.CoreException;
@@ -32,8 +33,6 @@ import org.eclipse.core.runtime.Platform;
 
 /**
  * Class that manages virtual file systems.
- *
- * @author Frédéric Bard
  */
 public class FileSystemManager {
 
@@ -52,9 +51,10 @@ public class FileSystemManager {
     * local file system.
     *
     * @param absolutefilePath
+    *
     * @return
     */
-   public static File CopyLocally(final String absolutefilePath) {
+   public static File copyLocally(final String absolutefilePath) {
 
       final TourbookFileSystem tourbookFileSystem = getTourbookFileSystem(absolutefilePath);
 
@@ -71,6 +71,7 @@ public class FileSystemManager {
     * Returns the {@link FileSystem}, if found, for a given device folder.
     *
     * @param deviceFolder
+    *
     * @return
     */
    public static FileSystem getFileSystem(final String deviceFolder) {
@@ -88,6 +89,7 @@ public class FileSystemManager {
     * Returns the id, if the {@link TourbookFileSystem} was found, for a given device folder name
     *
     * @param deviceFolderName
+    *
     * @return
     */
    public static String getFileSystemId(final String deviceFolderName) {
@@ -146,6 +148,7 @@ public class FileSystemManager {
     * Returns the {@link TourbookFileSystem}, if found, for a given device folder.
     *
     * @param deviceFolder
+    *
     * @return
     */
    public static TourbookFileSystem getTourbookFileSystem(final String deviceFolder) {
@@ -173,6 +176,7 @@ public class FileSystemManager {
     *
     * @param absoluteFilePath
     *           A given absolute file path
+    *
     * @return True if the file comes from a {@link TourbookFileSystem}, false otherwise.
     */
    public static boolean isFileFromTourBookFileSystem(final String absoluteFilePath) {
@@ -188,6 +192,7 @@ public class FileSystemManager {
     *
     * @param extensionPointName
     *           The extension point name
+    *
     * @return The list of {@link TourbookFileSystem}.
     */
    private static ArrayList<TourbookFileSystem> readFileSystemsExtensions(final String extensionPointName) {
@@ -213,13 +218,14 @@ public class FileSystemManager {
 
                   object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
 
-                  if (object instanceof TourbookFileSystem) {
-                     final TourbookFileSystem fileSystem = (TourbookFileSystem) object;
+                  if (object instanceof final TourbookFileSystem fileSystem &&
+                        fileSystem.isEnabled()) {
+
                      fileSystemsList.add(fileSystem);
                   }
 
                } catch (final CoreException e) {
-                  e.printStackTrace();
+                  StatusUtil.log(e);
                }
             }
          }

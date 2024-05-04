@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,8 +26,6 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * A class to implement and use a File System in MyTourbook.
  * This file system can be used by the easy import manager.
- *
- * @author Frédéric Bard
  */
 public abstract class TourbookFileSystem {
 
@@ -49,6 +47,7 @@ public abstract class TourbookFileSystem {
     *
     * @param filePath
     *           The absolute file path of the locally copied file
+    *
     * @return The {@link File} of the copied file.
     */
    protected abstract File copyFileLocally(String filePath);
@@ -94,6 +93,7 @@ public abstract class TourbookFileSystem {
     * Gets the {@link Path} of a given folder in the file system.
     *
     * @param folderName
+    *
     * @return
     */
    protected abstract Path getfolderPath(String folderName);
@@ -114,6 +114,8 @@ public abstract class TourbookFileSystem {
     * @return
     */
    public abstract String getPreferencePageId();
+
+   protected abstract boolean isEnabled();
 
    /**
     * Provides a way, for the user, to select a specific folder to be used in this file system.

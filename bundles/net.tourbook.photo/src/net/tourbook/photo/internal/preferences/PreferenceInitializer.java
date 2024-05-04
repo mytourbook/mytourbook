@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,8 +16,8 @@
 package net.tourbook.photo.internal.preferences;
 
 import net.tourbook.common.UI;
-import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoLoadManager;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
@@ -100,7 +100,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
                   ? PhotoLoadManager.IMAGE_FRAMEWORK_SWT
 
                   //
-                  // SWT is terrible when scolling large images on win & linux, osx is smoothly
+                  // SWT is terrible when scrolling large images on win & linux, osx is smoothly
                   //
                   : PhotoLoadManager.IMAGE_FRAMEWORK_AWT);
 
