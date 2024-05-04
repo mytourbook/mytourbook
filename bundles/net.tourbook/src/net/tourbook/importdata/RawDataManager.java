@@ -2406,7 +2406,7 @@ public class RawDataManager {
 
       if (FileSystemManager.isFileFromTourBookFileSystem(osFilePath)) {
 
-         importFile = FileSystemManager.CopyLocally(osFilePath);
+         importFile = FileSystemManager.copyLocally(osFilePath);
       }
 
       final Map<Long, TourData> allImportedToursFromOneFile = new HashMap<>();

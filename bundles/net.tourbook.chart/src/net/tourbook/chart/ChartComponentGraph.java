@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -811,7 +811,7 @@ public class ChartComponentGraph extends Canvas {
 //      setCursorStyle();
 
       /*
-       * The hited slider could be outsite of the chart, hide the labels on the slider
+       * The hit slider could be outside of the chart, hide the labels on the slider
        */
       _hitYSlider = null;
 
@@ -850,6 +850,7 @@ public class ChartComponentGraph extends Canvas {
 
    /**
     * @param allGraphDrawingData
+    *
     * @return Returns <code>true</code> when a chart can be overlapped.
     *         <p>
     *         The overlap feature is currently supported for graphs which all have the chart type
@@ -907,7 +908,7 @@ public class ChartComponentGraph extends Canvas {
       }
 
       /*
-       * check if one slider was hit, when yes, the leftslider is set and the right slider is null
+       * check if one slider was hit, when yes, the left slider is set and the right slider is null
        */
       if (slider1 != null && slider2 == null) {
          // only slider 1 was hit
@@ -1037,6 +1038,7 @@ public class ChartComponentGraph extends Canvas {
     * Create a cursor resource from an image file
     *
     * @param imageName
+    *
     * @return
     */
    private Cursor createCursorFromImage(final String imageName) {
@@ -2752,7 +2754,7 @@ public class ChartComponentGraph extends Canvas {
       final double scaleX = graphDrawingData.getScaleX();
       final double scaleY = graphDrawingData.getScaleY();
 
-// this feature also needs that the y-axis is scaled accordingly -> this not yet implemted
+// this feature also needs that the y-axis is scaled accordingly -> this not yet implemented
 //
 //      if (_canChartBeOverlapped && _isChartOverlapped) {
 //
@@ -7017,6 +7019,7 @@ public class ChartComponentGraph extends Canvas {
 
    /**
     * @param rgb
+    *
     * @return Returns the color from the color cache, the color must not be disposed this is done
     *         when the cache is disposed
     */
@@ -7107,7 +7110,7 @@ public class ChartComponentGraph extends Canvas {
 
       if (isAdjusted) {
 
-         // force repaining
+         // force repainting
          _isOverlayDirty = true;
       }
 
@@ -7375,6 +7378,7 @@ public class ChartComponentGraph extends Canvas {
 
    /**
     * @param devXGraph
+    *
     * @return Returns <code>true</code> when the synch marker was hit
     */
    private boolean isSynchMarkerHit(final int devXGraph) {
@@ -7427,6 +7431,7 @@ public class ChartComponentGraph extends Canvas {
     *
     * @param graphX
     * @param devY
+    *
     * @return
     */
    private ChartYSlider isYSliderHit(final int graphX, final int devY) {
@@ -7620,6 +7625,7 @@ public class ChartComponentGraph extends Canvas {
     * @param xxDevSliderLinePos
     *           x coordinate for the slider line within the graph, this can be outside of the
     *           visible graph
+    *
     * @return Returns <code>true</code> when the slider position has changed
     */
    private boolean moveXSlider(final ChartXSlider xSlider, final long devXSliderLinePos) {
@@ -8203,6 +8209,7 @@ public class ChartComponentGraph extends Canvas {
 
    /**
     * @param mouseEvent
+    *
     * @return Returns <code>true</code> when the mouse event was handled.
     */
    boolean onMouseExitAxis(final MouseEvent mouseEvent) {
@@ -8426,7 +8433,7 @@ public class ChartComponentGraph extends Canvas {
       if (_hoveredValuePointIndex != -1
 
             /*
-             * This reduces flickering when the slider is dragged, it's not prefect but better and
+             * This reduces flickering when the slider is dragged, it's not pefect but better and
              * it depends on the zoom level in the map and chart
              */
             && (isSliderPositionModified || _isSliderDirty == false)
@@ -8483,6 +8490,7 @@ public class ChartComponentGraph extends Canvas {
 
    /**
     * @param mouseEvent
+    *
     * @return Returns <code>true</code> when the mouse event was been handled.
     */
    boolean onMouseMoveAxis(final MouseEvent mouseEvent) {
@@ -8691,7 +8699,7 @@ public class ChartComponentGraph extends Canvas {
 
       if (_isAutoScroll) {
 
-         // stop auto scolling
+         // stop auto scrolling
          _isAutoScroll = false;
 
          /*
@@ -9837,6 +9845,7 @@ public class ChartComponentGraph extends Canvas {
     * Set the value index in the X-slider for the hovered position.
     *
     * @param xSlider
+    *
     * @return Returns <code>true</code> when the slider position has changed
     */
    boolean setXSliderValue_FromHoveredValuePoint(final ChartXSlider xSlider) {
@@ -10134,7 +10143,7 @@ public class ChartComponentGraph extends Canvas {
       updateVisibleMinMaxValues();
 
       /*
-       * draw the dragged image until the graph image is recomuted
+       * draw the dragged image until the graph image is recomputed
        */
       _isPaintDraggedImage = true;
 
