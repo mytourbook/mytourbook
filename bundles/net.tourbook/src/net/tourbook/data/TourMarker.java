@@ -295,6 +295,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    @Transient
    private int       _multiTourSerieIndex = -1;
 
+   @Transient
+   private String    _scrambledLabel;
+
    public TourMarker() {}
 
    /**
@@ -319,6 +322,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
    /**
     * @param pc
+    *
     * @return Returns the default max size in pixel for a {@link TourSign} image. This is used when
     *         drawing a table column.<br>
     *         When a sign image is drawn in a chart or map, the sign image size from the pref store
@@ -354,6 +358,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * sets the state that the marker as not yet saved
     *
     * @param newTourData
+    *
     * @return
     */
    public TourMarker clone(final TourData newTourData) {
@@ -546,6 +551,16 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
       return _multiTourSerieIndex;
    }
 
+   public String getScrambledLabel() {
+
+      if (_scrambledLabel == null) {
+
+         _scrambledLabel = UI.scrambleText(label);
+      }
+
+      return _scrambledLabel;
+   }
+
    /**
     * @return Returns position of this marker in the data serie.
     */
@@ -629,6 +644,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * @param comparedMarker
     * @param isIgnoreType
     *           When <code>true</code> the type field is not compared.
+    *
     * @return Returns <code>true</code> when the content of the markers are equal.
     */
    public boolean isEqual(final TourMarker comparedMarker, final boolean isIgnoreType) {

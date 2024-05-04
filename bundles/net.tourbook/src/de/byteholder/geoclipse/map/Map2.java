@@ -382,6 +382,8 @@ public class Map2 extends Canvas {
    private final AtomicInteger             _backgroundPainter_RunnableCounter = new AtomicInteger();
    private Rectangle                       _backgroundPainter_Viewport_WhenPainted;
    private Rectangle                       _backgroundPainter_Viewport_DuringPainting;
+   private int                             _backgroundPainter_MicroAdjustment_DiffX;
+   private int                             _backgroundPainter_MicroAdjustment_DiffY;
 
    private DistanceClustering<ClusterItem> _distanceClustering                = new DistanceClustering<>();
    private List<PaintedMarkerCluster>      _allPaintedMarkerClusters          = new ArrayList<>();
@@ -1267,9 +1269,13 @@ public class Map2 extends Canvas {
                final int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
                final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
 
+               final String markerLabel = UI.IS_SCRAMBLE_DATA
+                     ? tourMarker.getScrambledLabel()
+                     : tourMarker.getLabel();
+
                final MapMarker mapMarker = new MapMarker(
 
-                     tourMarker.getLabel(),
+                     markerLabel,
                      tourMarker.getDescription(),
 
                      new GeoPoint(latitude, longitude));
@@ -4200,6 +4206,9 @@ public class Map2 extends Canvas {
 
             gcMapImage.drawImage(_backgroundPainterImage_WhichIsDisplayed, devX, devY);
 
+            _backgroundPainter_MicroAdjustment_DiffX = devX;
+            _backgroundPainter_MicroAdjustment_DiffY = devY;
+
          } catch (final Exception e) {
 
             // ignore
@@ -4603,9 +4612,7 @@ public class Map2 extends Canvas {
 
       if (isMarkerInViewport) {
 
-         final String text = UI.IS_SCRAMBLE_DATA
-               ? UI.scrambleText(markerLabel)
-               : markerLabel;
+         final String text = markerLabel;
 
          final Point textExtent = gc.stringExtent(text);
          final int textHeight = textExtent.y;
@@ -4722,8 +4729,7 @@ public class Map2 extends Canvas {
 
       if (markerConfig.isFillClusterSymbol) {
 
-//       gc.setBackground(markerConfig.clusterFill_Color);
-         gc.setBackground(UI.SYS_COLOR_RED);
+         gc.setBackground(markerConfig.clusterFill_Color);
          gc.fillOval(
 
                ovalDevX,
@@ -4733,8 +4739,7 @@ public class Map2 extends Canvas {
                circleSize);
       }
 
-//    gc.setForeground(markerConfig.clusterOutline_Color);
-      gc.setForeground(UI.SYS_COLOR_WHITE);
+      gc.setForeground(markerConfig.clusterOutline_Color);
 
       final int outlineWidth = markerConfig.clusterOutline_Width;
 
@@ -4816,7 +4821,8 @@ public class Map2 extends Canvas {
       final int mapWidth = clientArea.width;
       final int mapHeight = clientArea.height;
 
-      // draw something to respect later
+      final int diffX = _backgroundPainter_MicroAdjustment_DiffX;
+      final int diffY = _backgroundPainter_MicroAdjustment_DiffY;
 
       final List<PointFeature> allPointfeatures = new ArrayList<>(numVisibleMarkers);
 
@@ -4826,11 +4832,7 @@ public class Map2 extends Canvas {
 
          if (clusterItem instanceof final MapMarker mapMarker) {
 
-            String text = mapMarker.title;
-
-            if (UI.IS_SCRAMBLE_DATA) {
-               text = UI.scrambleText(text);
-            }
+            final String text = mapMarker.title;
 
             final int devX = mapMarker.devX;
             final int devY = mapMarker.devY;
@@ -4893,14 +4895,10 @@ public class Map2 extends Canvas {
             continue;
          }
 
-         String text = pointFeature.label;
+         final String text = pointFeature.label;
 
-         if (UI.IS_SCRAMBLE_DATA) {
-            text = UI.scrambleText(text);
-         }
-
-         final int devX = (int) pointFeature.labelBoxL;
-         final int devY = (int) pointFeature.labelBoxT;
+         final int devX = (int) pointFeature.labelBoxL + diffX;
+         final int devY = (int) pointFeature.labelBoxT + diffY;
 
          final Point textExtent = gc.textExtent(text);
 
@@ -4931,12 +4929,11 @@ public class Map2 extends Canvas {
       // fill background
       if (markerConfig.isFillClusterSymbol) {
 
-//       gc.setBackground(markerConfig.clusterOutline_Color);
-         gc.setBackground(UI.SYS_COLOR_BLUE);
+         gc.setBackground(markerConfig.clusterOutline_Color);
          gc.fillOval(
 
-               clusterRectangle.x,
-               clusterRectangle.y,
+               clusterRectangle.x + diffX,
+               clusterRectangle.y + diffY,
 
                clusterRectangle.width,
                clusterRectangle.height);
@@ -4945,11 +4942,11 @@ public class Map2 extends Canvas {
       final Font gcFontBackup = gc.getFont();
       gc.setFont(getClusterFont());
 
-      gc.setForeground(UI.SYS_COLOR_GREEN);
+      gc.setForeground(markerConfig.clusterFill_Color);
       gc.drawString(
             Integer.toString(numPlacedLabels),
-            hoveredMarkerCluster.clusterLabelDevX,
-            hoveredMarkerCluster.clusterLabelDevY,
+            hoveredMarkerCluster.clusterLabelDevX + diffX,
+            hoveredMarkerCluster.clusterLabelDevY + diffY,
             true);
 
       gc.setFont(gcFontBackup);
