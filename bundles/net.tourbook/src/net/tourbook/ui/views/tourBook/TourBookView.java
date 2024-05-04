@@ -444,7 +444,7 @@ public class TourBookView extends ViewPart implements
 
       public ActionGotoLastTour() {
 
-         super(Messages.Tour_Book_Action_GoToLastTour_Tooltip, AS_PUSH_BUTTON);
+         super(Messages.Tour_Book_Action_GoToLastTour_Tooltip2, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Today));
          setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Today_Disabled));
