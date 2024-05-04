@@ -3502,8 +3502,6 @@ public class Map2 extends Canvas {
 
                _hoveredMarkerCluster = newHoveredCluster = paintedCluster;
 
-               updateBackgroundImageHoverPosition();
-
                break;
             }
          }
@@ -4202,6 +4200,10 @@ public class Map2 extends Canvas {
             final int devY = topLeft_Viewport_WhenPainted.y - topLeft_Viewport_Current.y;
 
             gcMapImage.drawImage(_backgroundPainterImage_WhichIsDisplayed, devX, devY);
+
+            // TODO this do not work
+            _directMapPainterContext.hoveredDiffX = devX;
+            _directMapPainterContext.hoveredDiffY = devY;
 
          } catch (final Exception e) {
 
@@ -8572,25 +8574,6 @@ public class Map2 extends Canvas {
 
    public MapTourBreadcrumb tourBreadcrumb() {
       return _tourBreadcrumb;
-   }
-
-   /**
-    * Do micro adjustments otherwise panning the cluster is NOT smooth
-    */
-   private void updateBackgroundImageHoverPosition() {
-
-      final Rectangle oldTopLeft_Viewport = _backgroundPainter_Viewport_WhenPainted;
-      final Rectangle currentTopLeft_Viewport = _worldPixel_TopLeft_Viewport;
-
-      if (oldTopLeft_Viewport == null) {
-         return;
-      }
-
-      final int devX = oldTopLeft_Viewport.x - currentTopLeft_Viewport.x;
-      final int devY = oldTopLeft_Viewport.y - currentTopLeft_Viewport.y;
-
-      _directMapPainterContext.hoveredDiffX = devX;
-      _directMapPainterContext.hoveredDiffY = devY;
    }
 
    public void updateGraphColors() {
