@@ -251,29 +251,18 @@ public class DirectMappingPainter implements IDirectPainter {
    private void drawClusterMarker(final DirectPainterContext painterContext,
                                   final PaintedMarkerCluster hoveredClusterMarker) {
 
-      final GC gc = painterContext.gc;
-
       final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
 
-      final Rectangle clusterRectangle = hoveredClusterMarker.clusterRectangle;
+      // draw hovered cluster marker
+      if (markerConfig.isShowClusterMarker == false) {
+         return;
+      }
+
+
+      final GC gc = painterContext.gc;
 
       gc.setAntialias(markerConfig.isClusterSymbolAntialiased ? SWT.ON : SWT.OFF);
       gc.setTextAntialias(markerConfig.isClusterTextAntialiased ? SWT.ON : SWT.OFF);
-
-      /*
-       * Draw all markers in the cluster
-       */
-
-      // draw hovered cluster marker
-      if (markerConfig.isShowClusterMarker) {
-         drawClusterMarker_Hovered(painterContext, hoveredClusterMarker);
-      }
-   }
-
-   private void drawClusterMarker_Hovered(final DirectPainterContext painterContext,
-                                          final PaintedMarkerCluster hoveredClusterMarker) {
-
-      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
 
       final float markerSize = 6;
       final int maxVisibleHoveredMarker = 500;
@@ -304,7 +293,6 @@ public class DirectMappingPainter implements IDirectPainter {
          numVisibleMarkers = maxVisibleHoveredMarker;
       }
 
-      final GC gc = painterContext.gc;
       final Rectangle clientArea = painterContext.clientArea;
 
       final int mapWidth = clientArea.width;
