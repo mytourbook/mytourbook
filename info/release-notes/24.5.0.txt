@@ -55,6 +55,9 @@ New + Improvements
   - Set column alignment in the viewer header context menu
     https://github.com/mytourbook/mytourbook/issues/1300  
 
+* Linux AArch64
+  - Support for Linux AArch64 platform
+    https://github.com/mytourbook/mytourbook/discussions/1174#discussioncomment-9316290
 
 Changes
 =======
