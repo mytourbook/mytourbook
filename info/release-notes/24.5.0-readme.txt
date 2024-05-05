@@ -1,6 +1,13 @@
 24.5.0                                                 ?. May 2024
 
 
+New Download Site
+=================
+
+https://github.com/mytourbook/mytourbook/discussions/1322
+
+
+
 New + Improvements
 ==================
     
