@@ -29,14 +29,10 @@
 
       <echo message="${ant.version}" />
 
-      <!--
-      <antcall target="delete-all-translation-files" />
-      -->
       <antcall target="delete-all-translation-temp-files" />
 
       <antcall target="copy-empty-language-projects" />
       <antcall target="copy-language-property-files" />
-
       <antcall target="create-language-archive-file" />
 
       <!-- 
@@ -45,28 +41,15 @@
       <antcall target="delete-all-translation-temp-files" />
 
    </target>
-
-   <target name="delete-all-translation-files">
-
-      <!-- delete all translation files: ${path-mt-translations} -->
-      <echo message="Delete all files in : ${path-translation-archive}" />
-
-      <delete includeemptydirs="true" quiet="true">
-         <fileset dir="${path-translation-archive}" includes="**/*" />
-      </delete>
-
-   </target>
    
    <target name="delete-all-translation-temp-files">
 
       <!-- delete all translation temp files: ${path-mt-translations-temp} -->
       <echo message="Delete all files in : ${path-mt-translations-temp}" />
 
-      <!-- 
-      -->
-         <delete includeemptydirs="true" quiet="true">
-            <fileset dir="${path-mt-translations-temp}" includes="**/*" />
-         </delete>
+      <delete includeemptydirs="true" quiet="true">
+         <fileset dir="${path-mt-translations-temp}" includes="**/*" />
+      </delete>
 
    </target>
 
@@ -121,8 +104,7 @@
          </fileset>
 
          <mapper>
-            <regexpmapper from="^(de\.byteholder[^\\]*)(.*)$$" to="\1\.nl\2" />
-            <regexpmapper from="^(net\.tourbook[^\\]*)(.*)$$" to="\1\.nl\2" />
+            <regexpmapper from="^(net\.tourbook[^\\]*)(.*)$$" to="\1.nl\2" />
          </mapper>
 
       </copy>
