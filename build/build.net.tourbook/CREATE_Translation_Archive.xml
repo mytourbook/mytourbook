@@ -2,143 +2,125 @@
 
 <project name="create-language-archive" default="create-language-archive">
 
-	<!--
-		create an archive which contains all projects with only the files which needs to be translated
-		
-		C:\DAT\MT\mytourbook\releng\net.tourbook.build
-		C:\DAT\MT\mytourbook\bundles
-		
-		C:\DAT\mytourbook-BUILD-autocreated
-		C:\DAT\mytourbook-TRANSLATIONS\temp\translations
-	-->
-	
-	<property name="path-root"							value="c:/DAT" />
-	
-	<property name="path-mt-bundles"					value="${path-root}/MT/mytourbook/bundles" />
-	<property name="path-mt-nl"							value="${path-root}/MT/mytourbook/LANGUAGE-FRAGMENTS" />
-	
-	<property name="path-mt-translations-temp" 			value="${path-root}/mytourbook-TRANSLATIONS/temp/translations" />
+   <!--
+      create an archive which contains all projects with only the files which needs to be translated
+      
+      C:\DAT\MT\mytourbook\releng\net.tourbook.build
+      C:\DAT\MT\mytourbook\bundles
+      
+      C:\DAT\mytourbook-BUILD-autocreated
+      C:\DAT\mytourbook-TRANSLATIONS\temp\translations
+   -->
+   
+   <property name="path-root"                      value="c:/DAT" />
+   
+   <property name="path-mt-bundles"                value="${path-root}/MT/mytourbook/bundles" />
+   <property name="path-mt-nl"                     value="${path-root}/MT/mytourbook/LANGUAGE-FRAGMENTS" />
+   
+   <property name="path-mt-translations-temp"      value="${path-root}/mytourbook-TRANSLATIONS/temp/translations" />
 
-	<property name="path-translation-archive" 			value="${path-mt-bundles}/net.tourbook/translations" />
-	<property name="file-translation-archive" 			value="${path-translation-archive}/mt-translations.zip" />
+   <property name="path-translation-archive"       value="${path-mt-bundles}/net.tourbook/translations" />
+   <property name="file-translation-archive"       value="${path-translation-archive}/mt-translations.zip" />
 
-	<!--
-		DEFAULT target
-	-->
-	<target name="create-language-archive">
+   <!--
+      DEFAULT target
+   -->
+   <target name="create-language-archive">
 
-		<echo message="${ant.version}" />
+      <echo message="${ant.version}" />
 
-		<!--
-		<antcall target="delete-all-translation-files" />
-		-->
-		<antcall target="delete-all-translation-temp-files" />
+      <antcall target="delete-all-translation-temp-files" />
 
-		<antcall target="copy-empty-language-projects" />
-		<antcall target="copy-language-property-files" />
+      <antcall target="copy-empty-language-projects" />
+      <antcall target="copy-language-property-files" />
+      <antcall target="create-language-archive-file" />
 
-		<antcall target="create-language-archive-file" />
+      <!-- 
+         delete all files in the translation temp directory
+       -->
+      <antcall target="delete-all-translation-temp-files" />
 
-		<!-- 
-			delete all files in the translation temp directory
-		 -->
-		<antcall target="delete-all-translation-temp-files" />
+   </target>
+   
+   <target name="delete-all-translation-temp-files">
 
-	</target>
+      <!-- delete all translation temp files: ${path-mt-translations-temp} -->
+      <echo message="Delete all files in : ${path-mt-translations-temp}" />
 
-	<target name="delete-all-translation-files">
+      <delete includeemptydirs="true" quiet="true">
+         <fileset dir="${path-mt-translations-temp}" includes="**/*" />
+      </delete>
 
-		<!-- delete all translation files: ${path-mt-translations} -->
-		<echo message="Delete all files in : ${path-translation-archive}" />
+   </target>
 
-		<delete includeemptydirs="true" quiet="true">
-			<fileset dir="${path-translation-archive}" includes="**/*" />
-		</delete>
+   <target name="copy-empty-language-projects">
 
-	</target>
-	
-	<target name="delete-all-translation-temp-files">
+      <!-- copy language fragments into ${path-build-translation} -->
+      <echo message="Copy language fragments into ${path-build-translation}" />
 
-		<!-- delete all translation temp files: ${path-mt-translations-temp} -->
-		<echo message="Delete all files in : ${path-mt-translations-temp}" />
+      <copy todir="${path-mt-translations-temp}" preservelastmodified="true" includeemptydirs="true">
 
-		<!-- 
-		-->
-			<delete includeemptydirs="true" quiet="true">
-				<fileset dir="${path-mt-translations-temp}" includes="**/*" />
-			</delete>
+         <fileset dir="${path-mt-nl}" >
+            
+            <!-- exclude update site content-->
+            <exclude name="**/features/" />
+            <exclude name="**/plugins/" />
+            <exclude name="**/target/" />
 
-	</target>
+            <exclude name="**/pom.xml" />
+            <exclude name="**/*.jar" />
+            
+         </fileset>
+         
+      </copy>
 
-	<target name="copy-empty-language-projects">
+   </target>
 
-		<!-- copy language fragments into ${path-build-translation} -->
-		<echo message="Copy language fragments into ${path-build-translation}" />
+   <target name="copy-language-property-files">
 
-		<copy todir="${path-mt-translations-temp}" preservelastmodified="true" includeemptydirs="true">
+      <echo message="Copy language property files into ${path-mt-translations-temp}" />
 
-			<fileset dir="${path-mt-nl}" >
-				
-				<!-- exclude update site content-->
-				<exclude name="**/features/" />
-				<exclude name="**/plugins/" />
-				<exclude name="**/target/" />
+      <copy todir="${path-mt-translations-temp}/" preservelastmodified="true" includeemptydirs="true">
 
-				<exclude name="**/pom.xml" />
-				<exclude name="**/*.jar" />
-				
-			</fileset>
-			
-		</copy>
+         <fileset dir="${path-mt-bundles}">
 
-	</target>
+            <include name="**/plugin*.properties" />
+            <include name="**/messages*.properties" />
 
-	<target name="copy-language-property-files">
+            <exclude name="**/bin/" />
+            <exclude name="**/classes/" />
 
-		<echo message="Copy language property files into ${path-mt-translations-temp}" />
+            <!--    exclude files which do not have a project, after one day testing, 
+                  I didn't find another way how to exclude them 
+            -->
+            <exclude name="**/net.tourbook.rxtx*/" />
+            
+            <!-- exclude duplicated js text files -->
+            <exclude name="**/WebContent-rel/"/>
 
-		<copy todir="${path-mt-translations-temp}/" preservelastmodified="true" includeemptydirs="true">
+            <!-- ignore empty files -->
+            <size value="0" when="more" />
 
-			<fileset dir="${path-mt-bundles}">
+         </fileset>
 
-				<include name="**/plugin*.properties" />
-				<include name="**/messages*.properties" />
+         <mapper>
+            <regexpmapper from="^(net\.tourbook[^\\]*)(.*)$$" to="\1.nl\2" />
+         </mapper>
 
-				<exclude name="**/bin/" />
-				<exclude name="**/classes/" />
+      </copy>
 
-				<!-- 	exclude files which do not have a project, after one day testing, 
-						I didn't find another way how to exclude them 
-				-->
-				<exclude name="**/net.tourbook.rxtx*/" />
-				
-				<!-- exclude duplicated js text files -->
-				<exclude name="**/WebContent-rel/"/>
+   </target>
 
-				<!-- ignore empty files -->
-				<size value="0" when="more" />
+   <target name="create-language-archive-file">
 
-			</fileset>
+      <echo message="Create language archive ${file-translation-archive} (and delete old)" />
+      
+      <delete file="${file-translation-archive}" failonerror="false"></delete>
 
-			<mapper>
-				<regexpmapper from="^(de\.byteholder[^\\]*)(.*)$$" to="\1\.nl\2" />
-				<regexpmapper from="^(net\.tourbook[^\\]*)(.*)$$" to="\1\.nl\2" />
-			</mapper>
+      <zip destfile="${file-translation-archive}">
+         <fileset dir="${path-mt-translations-temp}" />
+      </zip>
 
-		</copy>
-
-	</target>
-
-	<target name="create-language-archive-file">
-
-		<echo message="Create language archive ${file-translation-archive} (and delete old)" />
-		
-		<delete file="${file-translation-archive}" failonerror="false"></delete>
-
-		<zip destfile="${file-translation-archive}">
-			<fileset dir="${path-mt-translations-temp}" />
-		</zip>
-
-	</target>
+   </target>
 
 </project>
