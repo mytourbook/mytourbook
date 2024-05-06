@@ -75,6 +75,10 @@ Changes
 
 * 2D Map Options
   - Moved map location options into the new slideout for map locations
+
+* Tour Concatenation
+  Elevation up/down values are now ignored between joined tours
+  https://github.com/mytourbook/mytourbook/issues/1330
   
 
 Bugfix

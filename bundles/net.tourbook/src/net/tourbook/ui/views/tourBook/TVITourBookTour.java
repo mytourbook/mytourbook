@@ -93,7 +93,11 @@ public class TVITourBookTour extends TVITourBookItem implements Comparable<TVITo
                   : 1;
 
       // add additional comparing when both tours have the same date/time that the sorting is unique
-      if (compared == 0) {
+      if (compared == 0
+
+            // this can happen when tours are concatenated
+            && col_ImportFileName != null
+            && tviTour.col_ImportFileName != null) {
 
          compared = col_ImportFileName.compareTo(tviTour.col_ImportFileName);
       }
