@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -604,7 +604,7 @@ public abstract class GalleryMT20 extends Canvas {
 
       // Deselect groups
       // We could set selectionFlags to null, but we rather set all values to
-      // 0 to redure garbage collection. On each iteration, we deselect 32
+      // 0 to reduce garbage collection. On each iteration, we deselect 32
       // items.
       if (_selectionFlags != null) {
          for (int i = 0; i < _selectionFlags.length; i++) {
@@ -728,6 +728,7 @@ public abstract class GalleryMT20 extends Canvas {
     * Original method: AbstractGridGroupRenderer.getVisibleItems()
     *
     * @param clippingArea
+    *
     * @return Returns indices for all gallery items contained in the clipping area. This can also
     *         contain indices for which items are not available.
     */
@@ -883,6 +884,7 @@ public abstract class GalleryMT20 extends Canvas {
 
    /**
     * @param itemIndex
+    *
     * @return Returns gallery item (which has been initialized with custom data) from the given
     *         gallery position or <code>null</code> when the index is out of scope.
     */
@@ -919,6 +921,7 @@ public abstract class GalleryMT20 extends Canvas {
     * Get item virtual index at pixel position
     *
     * @param coords
+    *
     * @return Returns gallery item index in {@link #_virtualGalleryItems} or <code> <0</code> when
     *         item is not available.
     */
@@ -1002,6 +1005,7 @@ public abstract class GalleryMT20 extends Canvas {
     * @param itemIndex
     *           Index within the gallery items, these are the gallery items which the gallery can
     *           display.
+    *
     * @return
     */
    public abstract Photo getPhoto(final int itemIndex);
@@ -1033,7 +1037,7 @@ public abstract class GalleryMT20 extends Canvas {
    }
 
    /**
-    * @return Returns all selected items in an unorderd {@link Collection}.
+    * @return Returns all selected items in an unordered {@link Collection}.
     */
    public Collection<GalleryMT20Item> getSelection() {
       return _selectedItems.values();
@@ -1078,6 +1082,7 @@ public abstract class GalleryMT20 extends Canvas {
     * @param isZoomIn
     * @param isShiftKey
     * @param isCtrlKey
+    *
     * @return Returns zoomed size starting with {@link #_itemWidth}.
     *         <p>
     *         The returned value is also checked against {@link #_minItemWidth} and
@@ -1148,6 +1153,7 @@ public abstract class GalleryMT20 extends Canvas {
 
    /**
     * @param itemIndex
+    *
     * @return Returns <code>true</code> when the item is selected
     */
    private boolean isItemSelected(final int itemIndex) {
@@ -1168,6 +1174,7 @@ public abstract class GalleryMT20 extends Canvas {
 
    /**
     * @param checkedGalleryItem
+    *
     * @return Returns <code>true</code> when the requested gallery item is currently visible in the
     *         client area.
     *         <p>
@@ -1935,7 +1942,7 @@ public abstract class GalleryMT20 extends Canvas {
 
          if (_isHorizontal) {
 
-            // when gallerie is vertical then scrolling to work very well
+            // when gallery is vertical then scrolling to work very well
 
             // select next/previous image
             if (mouseEvent.count < 0) {
@@ -2143,7 +2150,7 @@ public abstract class GalleryMT20 extends Canvas {
 //
 //			if (_isMouseWheel) {
 //				/*
-//				 * mouse wheel in the client area and NOT in the scrollbar has caused this scolling
+//				 * mouse wheel in the client area and NOT in the scrollbar has caused this scrolling
 //				 * event, accelerate scrolling
 //				 */
 ////				destX *= 10;
@@ -2338,7 +2345,7 @@ public abstract class GalleryMT20 extends Canvas {
    }
 
    /**
-    * Removes a gallery item ftom the selected items.
+    * Removes a gallery item from the selected items.
     *
     * @param itemIndex
     */
@@ -2627,6 +2634,7 @@ public abstract class GalleryMT20 extends Canvas {
     *
     * @param visibleSize
     * @param itemSize
+    *
     * @return
     */
    private Point setGridSize_10(final int visibleSize, final int itemSize) {
@@ -2663,6 +2671,7 @@ public abstract class GalleryMT20 extends Canvas {
     * Set the delay after the last user action before the redraw at higher quality is triggered
     *
     * @see #setLowQualityOnUserAction(boolean)
+    *
     * @param higherQualityDelay
     */
    public void setHigherQualityDelay(final int higherQualityDelay) {
@@ -3261,6 +3270,7 @@ public abstract class GalleryMT20 extends Canvas {
     * @param isInitializeGallery
     *           When <code>true</code> the gallery is not yet initialized, grid and item width is
     *           not yet set.
+    *
     * @return Returns new item size or <code>-1</code> when gallery is not zoomed.
     */
    public int zoomGallery(int newZoomedSize, final boolean isInitializeGallery) {
@@ -3440,6 +3450,7 @@ public abstract class GalleryMT20 extends Canvas {
     * @param requestedItemSize
     * @param isZoomIn
     * @param isInitializeGallery
+    *
     * @return Returns the size which has been set. This value can differ from the requested item
     *         size when a scrollbar needs to be displayed.
     */
@@ -3464,7 +3475,7 @@ public abstract class GalleryMT20 extends Canvas {
             // ensure width is not the same
             if (newItemWidth == _itemWidth) {
 
-               // size has not changed, this occures by small images
+               // size has not changed, this occurs by small images
 
                newItemWidth = isZoomIn ? _itemWidth + 1 : _itemWidth - 1;
                numberOfImages = _clientArea.width / newItemWidth;
@@ -3483,7 +3494,7 @@ public abstract class GalleryMT20 extends Canvas {
 
       }
 
-      // ensure min size otherwise it can cause devide by zero
+      // ensure min size otherwise it can cause divide by zero
       if (_itemWidth < 10) {
          _itemWidth = 10;
          _itemHeight = (int) (_itemWidth / _itemRatio);
@@ -3518,7 +3529,7 @@ public abstract class GalleryMT20 extends Canvas {
                      /*
                       * vertical bar is not yet displayed but the content is larger than the
                       * visible area, vertical bar needs to be displayed and the content
-                      * width and hight must be adjusted
+                      * width and height must be adjusted
                       */
 
                      final int barWidth = bar.getSize().x;

@@ -192,6 +192,12 @@ public class DropboxFileSystem extends TourbookFileSystem {
       return PrefPageDropbox.ID;
    }
 
+   @Override
+   protected boolean isEnabled() {
+
+      return _prefStore.getBoolean(Preferences.DROPBOX_IS_ENABLED);
+   }
+
    /**
     * When the user clicks on the "Choose Folder" button, a dialog is opened
     * so that the user can choose which folder will be used when using their Dropbox

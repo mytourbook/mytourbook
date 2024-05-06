@@ -14,7 +14,11 @@
    	-->
       <move 
          file     ="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86_64.tar.gz"
-         tofile   ="${tycho-path}\products\mytourbook-${tycho-version}-linux.tar.gz"/>
+         tofile   ="${tycho-path}\products\mytourbook-${tycho-version}-linux.x86.tar.gz"/>
+   	
+      <move 
+         file     ="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.aarch64.tar.gz"
+         tofile   ="${tycho-path}\products\mytourbook-${tycho-version}-linux.arm.tar.gz"/>
 
       <move 
          file     ="${tycho-path}\products\mytourbook-${tycho-version}-macosx.cocoa.x86_64.tar.gz"
