@@ -1753,8 +1753,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       final String averageFluidsPerHour = NutritionUtils.computeAverageFluidsPerHour(_tourData);
       _lblFluid_Average.setText(averageFluidsPerHour);
 
-      final String averageSodiumPerHour = NutritionUtils.computeAverageSodiumPerLiter(_tourData);
-      _lblSodium_Average.setText(averageSodiumPerHour);
+      final String averageSodiumPerLiter = NutritionUtils.computeAverageSodiumPerLiter(_tourData);
+      _lblSodium_Average.setText(averageSodiumPerLiter);
    }
 
 }
