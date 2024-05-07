@@ -20,6 +20,7 @@ import de.byteholder.geoclipse.map.IDirectPainter;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Map2Painter;
 import de.byteholder.geoclipse.map.MapLegend;
+import de.byteholder.geoclipse.map.PaintedClusterMarker;
 import de.byteholder.geoclipse.map.PaintedMapLocation;
 import de.byteholder.geoclipse.mapprovider.MP;
 
@@ -233,6 +234,79 @@ public class DirectMappingPainter implements IDirectPainter {
       if ((image != null) && !image.isDisposed()) {
          image.dispose();
       }
+   }
+
+   private void drawClusterMarkerHovered(final DirectPainterContext painterContext) {
+
+      final GC gc = painterContext.gc;
+
+      gc.setAntialias(SWT.ON);
+
+      final PaintedClusterMarker hoveredMarker = painterContext.hoveredClusterMarker;
+      final Rectangle markerLabelRectangle = hoveredMarker.markerRectangle;
+      final int labelWidth = markerLabelRectangle.width;
+      final int labelHeight = markerLabelRectangle.height;
+
+      final Map2Marker mapMarker = hoveredMarker.mapMarker;
+      final int markerPointDevX = mapMarker.devX;
+      final int markerPointDevY = mapMarker.devY;
+      final int markerSize = 5;
+
+      // draw a symbol at the marker location
+      gc.setBackground(UI.SYS_COLOR_WHITE);
+      gc.fillRectangle(
+            markerPointDevX,
+            markerPointDevY,
+            markerSize,
+            markerSize);
+
+      gc.setForeground(UI.SYS_COLOR_RED);
+      gc.drawRectangle(
+            markerPointDevX,
+            markerPointDevY,
+            markerSize,
+            markerSize);
+
+      int lineFromDevX = markerLabelRectangle.x;
+      int lineFromDevY = markerLabelRectangle.y;
+      final int lineToDevX = markerPointDevX;
+      final int lineToDevY = markerPointDevY;
+
+      /*
+       * Ensure that the line is not crossing the label
+       */
+      if (lineToDevX > lineFromDevX + labelWidth) {
+
+         lineFromDevX += labelWidth;
+
+      } else if (lineToDevX > lineFromDevX && lineToDevX < lineFromDevX + labelWidth) {
+
+         lineFromDevX = lineToDevX;
+      }
+
+      if (lineToDevY > lineFromDevY + labelHeight) {
+
+         lineFromDevY += labelHeight;
+
+      } else if (lineToDevY > lineFromDevY && lineToDevY < lineFromDevY + labelHeight) {
+
+         lineFromDevY = lineToDevY;
+      }
+
+      gc.setLineWidth(2);
+      gc.drawLine(
+            lineFromDevX,
+            lineFromDevY,
+            lineToDevX,
+            lineToDevY);
+
+      gc.setForeground(UI.SYS_COLOR_RED);
+      gc.drawRectangle(
+            markerLabelRectangle.x,
+            markerLabelRectangle.y,
+            labelWidth,
+            labelHeight);
+
    }
 
    private void drawMapLocation(final DirectPainterContext painterContext,
@@ -890,6 +964,10 @@ public class DirectMappingPainter implements IDirectPainter {
                drawMapLocation(painterContext, _allCommonLocations);
             }
          }
+      }
+
+      if (painterContext.hoveredClusterMarker != null) {
+         drawClusterMarkerHovered(painterContext);
       }
 
       if (_tourData == null

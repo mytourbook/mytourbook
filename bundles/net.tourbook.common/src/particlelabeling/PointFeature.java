@@ -196,6 +196,11 @@ public class PointFeature {
    private int     id;
 
    /**
+    * Custom data to store anything
+    */
+   public Object   data;
+
+   /**
     * Generates a new point-feature, defined by its label, id and position. The label-box dimensions
     * and
     * the graphical rectangular extend are 0. The label-box dimension have to be set separately

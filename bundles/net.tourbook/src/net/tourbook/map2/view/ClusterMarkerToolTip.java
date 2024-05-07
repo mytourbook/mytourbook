@@ -16,39 +16,55 @@
 package net.tourbook.map2.view;
 
 import de.byteholder.geoclipse.map.Map2;
-import de.byteholder.geoclipse.map.PaintedMarkerCluster;
-
-import java.util.Collection;
+import de.byteholder.geoclipse.map.PaintedClusterMarker;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.ToolTip;
-import net.tourbook.map25.layer.marker.MapMarker;
-import net.tourbook.map25.layer.marker.algorithm.distance.StaticCluster;
+import net.tourbook.data.TourMarker;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 
 /**
  * Tour info tooltip, implemented custom tooltip similar like
  * {@link org.eclipse.ui.internal.dialogs.CustomizePerspectiveDialog} and
  * {@link org.eclipse.jface.viewers.ColumnViewerToolTipSupport}
  */
-public class MarkerClusterToolTip extends ToolTip {
+public class ClusterMarkerToolTip extends ToolTip {
+
+   private static final int     DEFAULT_TEXT_WIDTH  = 50;
+   private static final int     DEFAULT_TEXT_HEIGHT = 20;
+
+   private static final int     _textStyle          = SWT.WRAP               //
+         | SWT.MULTI
+         | SWT.READ_ONLY
+//                                                               | SWT.BORDER
+   ;
 
    private Map2                 _map2;
 
-   private PaintedMarkerCluster _hoveredItem;
+   private PaintedClusterMarker _hoveredMarker;
 
-   public MarkerClusterToolTip(final Map2 map2) {
+   private PixelConverter       _pc;
+   private int                  _defaultTextWidth;
+   private int                  _defaultTextHeight;
+   private Font                 _boldFont;
+
+   public ClusterMarkerToolTip(final Map2 map2) {
 
       super(map2, NO_RECREATE, true);
 
@@ -62,6 +78,8 @@ public class MarkerClusterToolTip extends ToolTip {
 
    @Override
    public Composite createToolTipContentArea(final Event event, final Composite parent) {
+
+      initUI(parent);
 
       final Composite shellContainer = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(shellContainer);
@@ -78,38 +96,54 @@ public class MarkerClusterToolTip extends ToolTip {
 
    private void createUI(final Composite parent) {
 
-      final StaticCluster<?> markerCluster = _hoveredItem.markerCluster;
-      final Collection<?> allClusterItems = markerCluster.getItems();
+      final TourMarker tourMarker = _hoveredMarker.mapMarker.tourMarker;
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).spacing(5, 3).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
-         int itemIndex = 0;
+         {
+            /*
+             * Marker label
+             */
 
-         for (final Object clusterItem : allClusterItems) {
-
-            if (clusterItem instanceof final MapMarker mapMarker) {
-
-               if (itemIndex++ >= 10) {
-
-                  final Label label = new Label(container, SWT.NONE);
-                  label.setText("\n... %d additional markers".formatted(allClusterItems.size() - itemIndex + 1));
-
-                  break;
-
-               } else {
-
-                  String title = mapMarker.title;
-                  if (UI.IS_SCRAMBLE_DATA) {
-                     title = UI.scrambleText(title);
-                  }
-
-                  final Label label = new Label(container, SWT.NONE);
-                  label.setText(title);
-               }
+            String markerLabel = tourMarker.getLabel();
+            if (UI.IS_SCRAMBLE_DATA) {
+               markerLabel = tourMarker.getScrambledLabel();
             }
+
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(markerLabel);
+            label.setFont(_boldFont);
+         }
+         {
+            /*
+             * Marker description
+             */
+            String markerDescription = tourMarker.getDescription();
+            if (StringUtils.hasContent(markerDescription)) {
+
+               if (UI.IS_SCRAMBLE_DATA) {
+                  markerDescription = UI.scrambleText(markerDescription);
+               }
+
+               final Text txtDescription = new Text(container, _textStyle);
+               txtDescription.setText(markerDescription);
+               GridDataFactory.fillDefaults().applyTo(txtDescription);
+
+               setTextControlSize(container, txtDescription, markerDescription);
+            }
+         }
+         {
+            /*
+             * Tour date/time
+             */
+
+            final Label label = new Label(container, SWT.TRAIL);
+            label.setText(TourManager.getTourDateShort(tourMarker.getTourData()));
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+
          }
       }
    }
@@ -117,7 +151,7 @@ public class MarkerClusterToolTip extends ToolTip {
    @Override
    public Point getLocation(final Point tipSize, final Event event) {
 
-      if (_hoveredItem != null) {
+      if (_hoveredMarker != null) {
 
          final Display display = _map2.getDisplay();
 
@@ -128,15 +162,15 @@ public class MarkerClusterToolTip extends ToolTip {
          final int devMouseX = devMouse.x;
          final int devMouseY = devMouse.y;
 
-         final Rectangle clusterBounds = _hoveredItem.clusterRectangle;
-         final int clusterWidth = clusterBounds.width;
+         final Rectangle markerBounds = _hoveredMarker.markerRectangle;
+         final int clusterWidth = markerBounds.width;
          final int clusterWidth2 = clusterWidth / 2;
-         final int clusterHeight = clusterBounds.height;
-         final int clusterHeight2 = clusterBounds.height / 2;
+         final int clusterHeight = markerBounds.height;
+         final int clusterHeight2 = markerBounds.height / 2;
 
          // center horizontally to the mouse position
          int devX = devMouseX - tipSizeWidth / 2;
-         int devY = clusterBounds.y + clusterHeight;
+         int devY = markerBounds.y + clusterHeight;
 
          // offset that the tooltip can be hovered with the mouse
          final int grabOffset = Math.min(10, clusterWidth2);
@@ -145,26 +179,26 @@ public class MarkerClusterToolTip extends ToolTip {
           * Set x/y depending on the mouse position, that the tooltip do not cover the side from
           * where the cluster is hovered
           */
-         if (devMouseX < clusterBounds.x + clusterWidth2) {
+         if (devMouseX < markerBounds.x + clusterWidth2) {
 
             // show on the right side
-            devX = clusterBounds.x + clusterWidth - grabOffset;
+            devX = markerBounds.x + clusterWidth - grabOffset;
 
-         } else if (devMouseX > clusterBounds.x + clusterWidth2) {
+         } else if (devMouseX > markerBounds.x + clusterWidth2) {
 
             // show on the left side
-            devX = clusterBounds.x - tipSizeWidth + grabOffset;
+            devX = markerBounds.x - tipSizeWidth + grabOffset;
          }
 
-         if (devMouseY < clusterBounds.y + clusterHeight2) {
+         if (devMouseY < markerBounds.y + clusterHeight2) {
 
             // show on the right side
-            devY = clusterBounds.y + clusterHeight - grabOffset;
+            devY = markerBounds.y + clusterHeight - grabOffset;
 
-         } else if (devMouseY > clusterBounds.y + clusterHeight2) {
+         } else if (devMouseY > markerBounds.y + clusterHeight2) {
 
             // show on the left side
-            devY = clusterBounds.y - tipSizeHeight + grabOffset;
+            devY = markerBounds.y - tipSizeHeight + grabOffset;
          }
 
          /*
@@ -218,28 +252,67 @@ public class MarkerClusterToolTip extends ToolTip {
    @Override
    protected Object getToolTipArea(final Event event) {
 
-      _hoveredItem = _map2.getHoveredClusterMarker();
+      _hoveredMarker = _map2.getHoveredClusterMarker();
 
-      return _hoveredItem;
+      return _hoveredMarker;
    }
 
-   private void setMaxContentWidth(final Control control) {
+   private void initUI(final Composite parent) {
 
-      final int maxContentWidth = 300;
+      _pc = new PixelConverter(parent);
+      _defaultTextWidth = _pc.convertWidthInCharsToPixels(DEFAULT_TEXT_WIDTH);
+      _defaultTextHeight = _pc.convertHeightInCharsToPixels(DEFAULT_TEXT_HEIGHT);
 
-      final GridData gd = (GridData) control.getLayoutData();
-      final Point contentSize = control.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+      _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   }
 
-      if (contentSize.x > maxContentWidth) {
+   private void setTextControlSize(final Composite parent, final Text txtControl, final String text) {
 
-         // adjust max width
-         gd.widthHint = maxContentWidth;
+      Point defaultSize = txtControl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 
-      } else {
+      // check default width
+      if (defaultSize.x > _defaultTextWidth) {
 
-         // reset layout width
-         gd.widthHint = SWT.DEFAULT;
+         // check default height
+         defaultSize = txtControl.computeSize(_defaultTextWidth, SWT.DEFAULT);
+         if (defaultSize.y > _defaultTextHeight) {
+
+            setTextControlSize_RecreateWithVScroll(parent, txtControl, text, _defaultTextWidth);
+
+         } else {
+
+            // limit width
+            final GridData gd = (GridData) txtControl.getLayoutData();
+            gd.widthHint = _defaultTextWidth;
+         }
+
+      } else if (defaultSize.y > _defaultTextHeight) {
+
+         setTextControlSize_RecreateWithVScroll(parent, txtControl, text, SWT.DEFAULT);
       }
+   }
+
+   /**
+    * Recreate text control with vertical scrollbar and limited height.
+    *
+    * @param parent
+    * @param txtControl
+    * @param text
+    * @param widthHint
+    */
+   private void setTextControlSize_RecreateWithVScroll(final Composite parent,
+                                                       Text txtControl,
+                                                       final String text,
+                                                       final int widthHint) {
+
+      txtControl.dispose();
+
+      txtControl = new Text(parent, _textStyle | SWT.V_SCROLL);
+      GridDataFactory.fillDefaults()
+            .hint(widthHint, _defaultTextHeight)
+            .applyTo(txtControl);
+
+      txtControl.setText(text);
    }
 
    @Override
@@ -253,7 +326,7 @@ public class MarkerClusterToolTip extends ToolTip {
          return false;
       }
 
-      if (_hoveredItem == null) {
+      if (_hoveredMarker == null) {
          return false;
       }
 

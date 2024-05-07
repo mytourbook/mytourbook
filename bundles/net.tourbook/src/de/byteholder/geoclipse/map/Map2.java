@@ -95,19 +95,21 @@ import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.ToolTip;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map.location.MapLocationToolTip;
+import net.tourbook.map2.view.ClusterMarkerToolTip;
 import net.tourbook.map2.view.Map2ConfigManager;
+import net.tourbook.map2.view.Map2Marker;
 import net.tourbook.map2.view.Map2MarkerConfig;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.TourPainterConfiguration;
 import net.tourbook.map2.view.WayPointToolTipProvider;
-import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.ScreenUtils;
 import net.tourbook.map25.layer.marker.algorithm.distance.Cluster;
 import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
@@ -350,9 +352,10 @@ public class Map2 extends Canvas {
    private final AtomicInteger           _redrawMapCounter          = new AtomicInteger();
    private final AtomicInteger           _overlayRunnableCounter    = new AtomicInteger();
 
-   private boolean                       _isLeftMouseButtonPressed;
+   private boolean                       _canPanMap;
    private boolean                       _isMapPanned;
 
+   private boolean                       _isMouseDown;
    private Point                         _mouseDownPosition;
    private GeoPosition                   _mouseDown_ContextMenu_GeoPosition;
    private int                           _mouseMove_DevPosition_X   = Integer.MIN_VALUE;
@@ -387,14 +390,17 @@ public class Map2 extends Canvas {
 
    private DistanceClustering<ClusterItem> _distanceClustering                = new DistanceClustering<>();
    private List<PaintedMarkerCluster>      _allPaintedMarkerClusters          = new ArrayList<>();
+   private List<PaintedClusterMarker>      _allPaintedOneClusterMarkers       = new ArrayList<>();
    private PaintedMarkerCluster            _hoveredMarkerCluster;
-// private MarkerClusterToolTip            _markerCluster_Tooltip;
+   private PaintedClusterMarker            _hoveredClusterMarker;
+   private boolean                         _isMarkerClusterSelected;
+   private ClusterMarkerToolTip            _clusterMarker_Tooltip;
 
-   private final NumberFormat _nf0;
-   private final NumberFormat _nf1;
-   private final NumberFormat _nf2;
-   private final NumberFormat _nf3;
-   private final NumberFormat _nfLatLon;
+   private final NumberFormat              _nf0;
+   private final NumberFormat              _nf1;
+   private final NumberFormat              _nf2;
+   private final NumberFormat              _nf3;
+   private final NumberFormat              _nfLatLon;
    {
       _nf0 = NumberFormat.getNumberInstance();
       _nf1 = NumberFormat.getNumberInstance();
@@ -754,7 +760,7 @@ public class Map2 extends Canvas {
 // SET_FORMATTING_ON
 
       _mapLocation_Tooltip = new MapLocationToolTip(this);
-//      _markerCluster_Tooltip = new MarkerClusterToolTip(this);
+      _clusterMarker_Tooltip = new ClusterMarkerToolTip(this);
 
       _poiImage = TourbookPlugin.getImageDescriptor(Images.POI_InMap).createImage();
       _poiImageBounds = _poiImage.getBounds();
@@ -1202,11 +1208,11 @@ public class Map2 extends Canvas {
       return mapImage;
    }
 
-   private List<MapMarker> createMapMarkers(final ArrayList<TourData> allTourData) {
+   private List<Map2Marker> createMapMarkers(final ArrayList<TourData> allTourData) {
 
       final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
 
-      final List<MapMarker> allMapMarkers = new ArrayList<>();
+      final List<Map2Marker> allMapMarkers = new ArrayList<>();
 
       for (final TourData tourData : allTourData) {
 
@@ -1265,20 +1271,11 @@ public class Map2 extends Canvas {
 
             if (isMarkerInViewport) {
 
+               final Map2Marker mapMarker = new Map2Marker(tourMarker, new GeoPoint(latitude, longitude));
+
                // convert world position into device position
                final int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
                final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
-
-               final String markerLabel = UI.IS_SCRAMBLE_DATA
-                     ? tourMarker.getScrambledLabel()
-                     : tourMarker.getLabel();
-
-               final MapMarker mapMarker = new MapMarker(
-
-                     markerLabel,
-                     tourMarker.getDescription(),
-
-                     new GeoPoint(latitude, longitude));
 
                mapMarker.devX = devX;
                mapMarker.devY = devY;
@@ -1519,13 +1516,29 @@ public class Map2 extends Canvas {
    }
 
    /**
+    * Is used to activate/deactivate the tooltip
+    *
+    * @return
+    */
+   public ToolTip getClusterMarkerTooltip() {
+
+      return _clusterMarker_Tooltip;
+   }
+
+   /**
     * Gets the current common location of the map. This property does not change when the user pans
     * the map. This property is bound.
     *
     * @return the current map location (address)
     */
    public GeoPosition getCommonLocation() {
+
       return _commonLocation;
+   }
+
+   public PaintedClusterMarker getHoveredClusterMarker() {
+
+      return _hoveredClusterMarker;
    }
 
    public PaintedMapLocation getHoveredMapLocation() {
@@ -1663,16 +1676,6 @@ public class Map2 extends Canvas {
    public List<Map2Painter> getMapPainter() {
       return _allMapPainter;
    }
-
-   /**
-    * Is used to activate/deactivate the tooltip
-    *
-    * @return
-    */
-//   public ToolTip getMarkerClusterTooltip() {
-//
-//      return _markerCluster_Tooltip;
-//   }
 
    /**
     * Get the current map provider
@@ -2812,6 +2815,75 @@ public class Map2 extends Canvas {
    }
 
    /**
+    * @return Returns <code>true</code> when a cluster is hovered
+    */
+   private boolean markerCluster_SetHoveredCluster() {
+
+      final PaintedMarkerCluster oldHoveredCluster = _hoveredMarkerCluster;
+      PaintedMarkerCluster newHoveredCluster = null;
+
+      _hoveredMarkerCluster = null;
+
+      for (final PaintedMarkerCluster paintedCluster : _allPaintedMarkerClusters) {
+
+         final Rectangle paintedRect = paintedCluster.clusterRectangle;
+
+         // increase hovered rectangle to prevent flickering when moving too fast
+
+         final int clusterWidth = paintedRect.width;
+         final int clusterHeight = paintedRect.height;
+
+         final int hoveredOffset = clusterWidth > 30 ? 0 : 10;
+
+         if (true
+               && (_mouseMove_DevPosition_X > paintedRect.x - hoveredOffset)
+               && (_mouseMove_DevPosition_X < paintedRect.x + clusterWidth + hoveredOffset)
+               && (_mouseMove_DevPosition_Y > paintedRect.y - hoveredOffset)
+               && (_mouseMove_DevPosition_Y < paintedRect.y + clusterHeight + hoveredOffset)) {
+
+            // a cluster is hovered
+
+            _hoveredMarkerCluster = newHoveredCluster = paintedCluster;
+
+            break;
+         }
+      }
+
+      // repaint map when hovered state has changed
+      if (oldHoveredCluster == null && newHoveredCluster == null) {
+
+         // ignore
+
+      } else if (false
+
+            || oldHoveredCluster == null && newHoveredCluster != null
+            || oldHoveredCluster != null && newHoveredCluster == null
+
+            // now both should be NOT null -> compare cluster rectangles
+            || oldHoveredCluster.clusterRectangle.equals(newHoveredCluster.clusterRectangle) == false) {
+
+         // another cluster is hovered
+
+         paint();
+
+         return true;
+
+      } else {
+
+         // the same cluster is hovered
+
+         // hide hovered tours
+         _allHoveredDevPoints.clear();
+         _allHoveredTourIds.clear();
+         _allHoveredSerieIndices.clear();
+
+         return true;
+      }
+
+      return false;
+   }
+
+   /**
     * Hide offline area and all states
     */
    private void offline_DisableOfflineAreaSelection() {
@@ -3132,13 +3204,36 @@ public class Map2 extends Canvas {
          return;
       }
 
+      _isMouseDown = true;
+
       final boolean isShift = (mouseEvent.stateMask & SWT.SHIFT) != 0;
-//    final boolean isCtrl = (mouseEvent.stateMask & SWT.CTRL) != 0;
 
       hideTourTooltipHoveredArea();
       setPoiVisible(false);
 
       final Point devMousePosition = new Point(devMouseX, devMouseY);
+
+      if (_isMarkerClusterSelected) {
+
+         // check if a marker is selected
+
+         // switch cluster OFF
+
+         _isMarkerClusterSelected = false;
+         _directMapPainterContext.hoveredClusterMarker = null;
+
+         markerCluster_SetHoveredCluster();
+
+         paint();
+
+      } else if (_hoveredMarkerCluster != null) {
+
+         // switch cluster ON
+
+         _isMarkerClusterSelected = true;
+
+         paint();
+      }
 
       if (_offline_IsSelectingOfflineArea) {
 
@@ -3164,8 +3259,6 @@ public class Map2 extends Canvas {
          final Point worldMousePosition = new Point(
                _worldPixel_TopLeft_Viewport.x + devMouseX,
                _worldPixel_TopLeft_Viewport.y + devMouseY);
-
-         _geoGrid_Data_Hovered.isSelectionStarted = true;
 
          final GeoPosition geoMousePosition = _mp.pixelToGeo(new Point2D.Double(worldMousePosition.x, worldMousePosition.y), _mapZoomLevel);
          _geoGrid_Data_Hovered.geo_Start = geoMousePosition;
@@ -3254,7 +3347,7 @@ public class Map2 extends Canvas {
       } else {
 
          // when the left mousebutton is clicked remember this point (for panning)
-         _isLeftMouseButtonPressed = true;
+         _canPanMap = true;
          _mouseDownPosition = devMousePosition;
 
          setCursorOptimized(_cursorPan);
@@ -3275,13 +3368,12 @@ public class Map2 extends Canvas {
          // one tour is hovered -> select tour or trackpoint
 
          final long hoveredTourId = _allHoveredTourIds.get(0);
-         final boolean isAnotherTourSelected = _hovered_SelectedTourId != hoveredTourId;
 
          if (_hoveredSelectedTour_CanSelectTour) {
 
             // a tour can be/is selected
 
-            if (isAnotherTourSelected) {
+            if (_hovered_SelectedTourId == -1) {
 
                // toggle selection -> select tour
 
@@ -3304,6 +3396,8 @@ public class Map2 extends Canvas {
             // a trackpoint can be/is selected
 
             _hovered_SelectedTourId = hoveredTourId;
+
+            final boolean isAnotherTourSelected = _hovered_SelectedTourId != -1 && _hovered_SelectedTourId != hoveredTourId;
 
             if (isAnotherTourSelected) {
 
@@ -3400,8 +3494,6 @@ public class Map2 extends Canvas {
       _geoGrid_IsGridAutoScroll = false;
       _geoGrid_Label_IsHovered = false;
 
-      _hoveredMarkerCluster = null;
-
       if (_isShowHoveredOrSelectedTour) {
 
          _tourBreadcrumb.onMouseExit();
@@ -3410,11 +3502,11 @@ public class Map2 extends Canvas {
          _allHoveredTourIds.clear();
          _allHoveredDevPoints.clear();
          _allHoveredSerieIndices.clear();
-
-         redraw();
       }
 
       setCursorOptimized(_cursorDefault);
+
+      paint();
    }
 
    private void onMouse_Move(final MouseEvent mouseEvent) {
@@ -3425,15 +3517,15 @@ public class Map2 extends Canvas {
 
       final Point devMousePosition = new Point(mouseEvent.x, mouseEvent.y);
 
-      _mouseMove_DevPosition_X = mouseEvent.x;
-      _mouseMove_DevPosition_Y = mouseEvent.y;
+      final int mouseMoveDevX = _mouseMove_DevPosition_X = mouseEvent.x;
+      final int mouseMoveDevY = _mouseMove_DevPosition_Y = mouseEvent.y;
 
       // keep position for out of the map events, e.g. to recenter map
-      _mouseMove_DevPosition_X_Last = _mouseMove_DevPosition_X;
-      _mouseMove_DevPosition_Y_Last = _mouseMove_DevPosition_Y;
+      _mouseMove_DevPosition_X_Last = mouseMoveDevX;
+      _mouseMove_DevPosition_Y_Last = mouseMoveDevY;
 
-      final int worldMouseX = _worldPixel_TopLeft_Viewport.x + _mouseMove_DevPosition_X;
-      final int worldMouseY = _worldPixel_TopLeft_Viewport.y + _mouseMove_DevPosition_Y;
+      final int worldMouseX = _worldPixel_TopLeft_Viewport.x + mouseMoveDevX;
+      final int worldMouseY = _worldPixel_TopLeft_Viewport.y + mouseMoveDevY;
       final Point worldMouse_Move = new Point(worldMouseX, worldMouseY);
 
       final GeoPosition geoMouseMove = _mp.pixelToGeo(new Point2D.Double(worldMouseX, worldMouseY), _mapZoomLevel);
@@ -3480,54 +3572,58 @@ public class Map2 extends Canvas {
          return;
       }
 
+      _hoveredClusterMarker = null;
+      _directMapPainterContext.hoveredClusterMarker = null;
+
       if (_allPaintedMarkerClusters.size() > 0) {
 
          // marker clusters are painted
 
-         final PaintedMarkerCluster oldHoveredCluster = _hoveredMarkerCluster;
-         PaintedMarkerCluster newHoveredCluster = null;
+         if (_isMarkerClusterSelected
 
-         _hoveredMarkerCluster = null;
+               // map will not be panned
+               && _isMouseDown == false) {
 
-         for (final PaintedMarkerCluster paintedCluster : _allPaintedMarkerClusters) {
+            // keep selected and check if a cluster marker is hovered
 
-            final Rectangle paintedRect = paintedCluster.clusterRectangle;
+            if (_allPaintedOneClusterMarkers.size() > 0) {
 
-            // increase hovered rectangle to prevent flickering when moving too fast
-            final int hoveredOffset = 10;
+               for (final PaintedClusterMarker paintedMarker : _allPaintedOneClusterMarkers) {
 
-            if (true
-                  && (_mouseMove_DevPosition_X > paintedRect.x - hoveredOffset)
-                  && (_mouseMove_DevPosition_X < paintedRect.x + paintedRect.width + hoveredOffset)
-                  && (_mouseMove_DevPosition_Y > paintedRect.y - hoveredOffset)
-                  && (_mouseMove_DevPosition_Y < paintedRect.y + paintedRect.height + hoveredOffset)) {
+                  final Rectangle paintedRect = paintedMarker.markerRectangle;
 
-               // a cluster is hovered
+                  if (true
+                        && (mouseMoveDevX > paintedRect.x)
+                        && (mouseMoveDevX < paintedRect.x + paintedRect.width)
+                        && (mouseMoveDevY > paintedRect.y)
+                        && (mouseMoveDevY < paintedRect.y + paintedRect.height)) {
 
-               _hoveredMarkerCluster = newHoveredCluster = paintedCluster;
+                     // a map marker is hovered
 
-               break;
+                     _directMapPainterContext.hoveredClusterMarker = _hoveredClusterMarker = paintedMarker;
+                  }
+               }
             }
-         }
 
-         // repaint map when hovered state has changed
-         if (oldHoveredCluster == null && newHoveredCluster == null) {
-
-            // ignore
-
-         } else if (false
-
-               || oldHoveredCluster == null && newHoveredCluster != null
-               || oldHoveredCluster != null && newHoveredCluster == null
-
-               // now both should be NOT null
-               || oldHoveredCluster.clusterRectangle.equals(newHoveredCluster.clusterRectangle) == false) {
-
-//            redraw();
-            paint();
+            redraw();
 
             return;
          }
+
+         final boolean isClusterHovered = markerCluster_SetHoveredCluster();
+
+         if (isClusterHovered) {
+
+            if (_isMouseDown) {
+
+               // allow map panning
+
+            } else {
+
+               return;
+            }
+         }
+
       }
 
       if (_directMapPainterContext.allPaintedMapLocations.size() > 0) {
@@ -3546,14 +3642,17 @@ public class Map2 extends Canvas {
             final Rectangle paintedRect = paintedLocation.locationRectangle;
 
             if (true
-                  && (_mouseMove_DevPosition_X > paintedRect.x)
-                  && (_mouseMove_DevPosition_X < paintedRect.x + paintedRect.width)
-                  && (_mouseMove_DevPosition_Y > paintedRect.y)
-                  && (_mouseMove_DevPosition_Y < paintedRect.y + paintedRect.height)) {
+                  && (mouseMoveDevX > paintedRect.x)
+                  && (mouseMoveDevX < paintedRect.x + paintedRect.width)
+                  && (mouseMoveDevY > paintedRect.y)
+                  && (mouseMoveDevY < paintedRect.y + paintedRect.height)) {
 
                // a map location is hovered
 
                _directMapPainterContext.hoveredMapLocation = newHoveredMapLocation = paintedLocation;
+
+               // hide hovered tour tooltip
+               _tourTooltip_HoveredAreaContext = null;
 
                break;
             }
@@ -3578,7 +3677,7 @@ public class Map2 extends Canvas {
          }
       }
 
-      if (_isLeftMouseButtonPressed) {
+      if (_canPanMap) {
 
          // pan map
 
@@ -3600,10 +3699,10 @@ public class Map2 extends Canvas {
             final int topLeftX = _tourTooltip_HoveredAreaContext.hoveredTopLeftX;
             final int topLeftY = _tourTooltip_HoveredAreaContext.hoveredTopLeftY;
 
-            if (_mouseMove_DevPosition_X >= topLeftX
-                  && _mouseMove_DevPosition_X < topLeftX + _tourTooltip_HoveredAreaContext.hoveredWidth
-                  && _mouseMove_DevPosition_Y >= topLeftY
-                  && _mouseMove_DevPosition_Y < topLeftY + _tourTooltip_HoveredAreaContext.hoveredHeight) {
+            if (mouseMoveDevX >= topLeftX
+                  && mouseMoveDevX < topLeftX + _tourTooltip_HoveredAreaContext.hoveredWidth
+                  && mouseMoveDevY >= topLeftY
+                  && mouseMoveDevY < topLeftY + _tourTooltip_HoveredAreaContext.hoveredHeight) {
 
                isContextValid = true;
             }
@@ -3620,10 +3719,10 @@ public class Map2 extends Canvas {
 
          // check if mouse is within the poi image
          if (_isPoiVisible
-               && (_mouseMove_DevPosition_X > _poiImageDevPosition.x)
-               && (_mouseMove_DevPosition_X < _poiImageDevPosition.x + _poiImageBounds.width)
-               && (_mouseMove_DevPosition_Y > _poiImageDevPosition.y - _poi_Tooltip_OffsetY - 5)
-               && (_mouseMove_DevPosition_Y < _poiImageDevPosition.y + _poiImageBounds.height)) {
+               && (mouseMoveDevX > _poiImageDevPosition.x)
+               && (mouseMoveDevX < _poiImageDevPosition.x + _poiImageBounds.width)
+               && (mouseMoveDevY > _poiImageDevPosition.y - _poi_Tooltip_OffsetY - 5)
+               && (mouseMoveDevY < _poiImageDevPosition.y + _poiImageBounds.height)) {
 
             // display poi
             showPoi();
@@ -3643,7 +3742,7 @@ public class Map2 extends Canvas {
 
          _geoGrid_Label_IsHovered = false;
 
-         if (_geoGrid_Label_Outline.contains(_mouseMove_DevPosition_X, _mouseMove_DevPosition_Y)) {
+         if (_geoGrid_Label_Outline.contains(mouseMoveDevX, mouseMoveDevY)) {
 
             _geoGrid_Label_IsHovered = true;
 
@@ -3672,7 +3771,7 @@ public class Map2 extends Canvas {
 
          _geoGrid_Action_IsHovered = false;
 
-         if (_geoGrid_Action_Outline.contains(_mouseMove_DevPosition_X, _mouseMove_DevPosition_Y)) {
+         if (_geoGrid_Action_Outline.contains(mouseMoveDevX, mouseMoveDevY)) {
 
             _geoGrid_Action_IsHovered = true;
 
@@ -3734,6 +3833,8 @@ public class Map2 extends Canvas {
    }
 
    private void onMouse_Up(final MouseEvent mouseEvent) {
+
+      _isMouseDown = false;
 
       if (_offline_IsSelectingOfflineArea) {
 
@@ -3808,7 +3909,7 @@ public class Map2 extends Canvas {
             }
 
             _mouseDownPosition = null;
-            _isLeftMouseButtonPressed = false;
+            _canPanMap = false;
 
             setCursorOptimized(_cursorDefault);
 
@@ -3819,7 +3920,8 @@ public class Map2 extends Canvas {
       }
 
       // show poi info when mouse is within the poi image
-      if ((_mouseMove_DevPosition_X > _poiImageDevPosition.x)
+      if (true
+            && (_mouseMove_DevPosition_X > _poiImageDevPosition.x)
             && (_mouseMove_DevPosition_X < _poiImageDevPosition.x + _poiImageBounds.width)
             && (_mouseMove_DevPosition_Y > _poiImageDevPosition.y - _poi_Tooltip_OffsetY - 5)
             && (_mouseMove_DevPosition_Y < _poiImageDevPosition.y + _poiImageBounds.height)) {
@@ -3863,7 +3965,7 @@ public class Map2 extends Canvas {
 
       // draw map image to the screen
 
-      final long start = System.nanoTime();
+//      final long start = System.nanoTime();
 
       if (_mapImage == null || _mapImage.isDisposed()) {
          return;
@@ -4398,6 +4500,7 @@ public class Map2 extends Canvas {
       _backgroundPainter_Viewport_DuringPainting = _worldPixel_TopLeft_Viewport;
 
       final List<PaintedMarkerCluster> allPaintedClusters = new ArrayList<>();
+      _allPaintedOneClusterMarkers.clear();
 
       try {
 
@@ -4527,7 +4630,7 @@ public class Map2 extends Canvas {
 
       // convert MapMarker's into ClusterItem's
       final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
-      final List<MapMarker> allMarkers = createMapMarkers(allTourData);
+      final List<Map2Marker> allMarkers = createMapMarkers(allTourData);
 
       final List<ClusterItem> allClusterItems = new ArrayList<>();
       allClusterItems.addAll(allMarkers);
@@ -4537,8 +4640,7 @@ public class Map2 extends Canvas {
 
       final Set<? extends Cluster<ClusterItem>> allMarkerClusters = _distanceClustering.getClusters(_mapZoomLevel, clusterGridSize);
 
-//      final List<Cluster<?>> allClusterOnly = new ArrayList<>();
-      final List<MapMarker> allMarkersOnly = new ArrayList<>();
+      final List<Map2Marker> allMarkersOnly = new ArrayList<>();
 
       // firstly paint the clusters
       for (final Cluster<ClusterItem> item : allMarkerClusters) {
@@ -4553,20 +4655,17 @@ public class Map2 extends Canvas {
 
             final int numClusterItems = staticCluster.getSize();
 
-            if (paint_BackgroundImage_60_OneCluster(
+            paint_BackgroundImage_60_OneCluster(
                   gc,
                   staticCluster,
                   Integer.toString(numClusterItems),
-                  allPaintedClusters)) {
-
-//               allClusterOnly.add(staticCluster);
-            }
+                  allPaintedClusters);
 
          } else if (item instanceof final QuadItem markerItem) {
 
             // item is a marker
 
-            if (markerItem.mClusterItem instanceof final MapMarker mapMarker) {
+            if (markerItem.mClusterItem instanceof final Map2Marker mapMarker) {
 
                allMarkersOnly.add(mapMarker);
             }
@@ -4578,10 +4677,10 @@ public class Map2 extends Canvas {
       // markers MUST be sorted otherwise they are flickering when the sequence is randomly
       Collections.sort(
             allMarkersOnly,
-            (tourMarker1, tourMarker2) -> tourMarker1.title.compareTo(tourMarker2.title));
+            (tourMarker1, tourMarker2) -> tourMarker1.tourMarker.getLabel().compareTo(tourMarker2.tourMarker.getLabel()));
 
       // secondly paint the markers
-      for (final MapMarker mapMarker : allMarkersOnly) {
+      for (final Map2Marker mapMarker : allMarkersOnly) {
 
          if (_backgroundPainterFuture.isCancelled()) {
             return;
@@ -4591,7 +4690,7 @@ public class Map2 extends Canvas {
                gc,
                mapMarker.geoPoint.getLatitude(),
                mapMarker.geoPoint.getLongitude(),
-               mapMarker.title);
+               mapMarker.tourMarker.getLabel());
       }
    }
 
@@ -4635,10 +4734,10 @@ public class Map2 extends Canvas {
       return isMarkerInViewport;
    }
 
-   private boolean paint_BackgroundImage_60_OneCluster(final GC gc,
-                                                       final StaticCluster<?> markerCluster,
-                                                       final String clusterLabel,
-                                                       final List<PaintedMarkerCluster> allPaintedClusters) {
+   private PaintedMarkerCluster paint_BackgroundImage_60_OneCluster(final GC gc,
+                                                                    final StaticCluster<?> markerCluster,
+                                                                    final String clusterLabel,
+                                                                    final List<PaintedMarkerCluster> allPaintedClusters) {
 
       // convert marker lat/long into world pixels
 
@@ -4655,7 +4754,7 @@ public class Map2 extends Canvas {
       final boolean isClusterInViewport = worldPixel_Viewport.contains(worldPixel_MarkerPosX, worldPixel_MarkerPosY);
 
       if (isClusterInViewport == false) {
-         return false;
+         return null;
       }
 
       final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
@@ -4772,23 +4871,24 @@ public class Map2 extends Canvas {
             circleSize,
             circleSize);
 
-      // keep cluster painting data
-      allPaintedClusters.add(new PaintedMarkerCluster(
+      final PaintedMarkerCluster paintedCluster = new PaintedMarkerCluster(
 
             markerCluster,
             paintedClusterRectangle,
 
             clusterLabel,
             clusterLabelDevX,
-            clusterLabelDevY));
+            clusterLabelDevY);
 
-      return isClusterInViewport;
+      // keep cluster painting data
+      allPaintedClusters.add(paintedCluster);
+
+      return paintedCluster;
    }
 
    /**
     * Highligh the cluster and its markers
     *
-    * @param _hoveredMarkerCluster2
     *
     * @param painterContext
     * @param hoveredClusterMarker
@@ -4800,8 +4900,7 @@ public class Map2 extends Canvas {
       gc.setAntialias(markerConfig.isClusterSymbolAntialiased ? SWT.ON : SWT.OFF);
       gc.setTextAntialias(markerConfig.isClusterTextAntialiased ? SWT.ON : SWT.OFF);
 
-      final float markerSize = 6;
-      final int maxVisibleHoveredMarker = 500;
+      final int maxVisibleHoveredMarker = 300;
 
       final Object[] allClusterItemsAsArray = hoveredMarkerCluster.allClusterItemsAsArray;
       final int numMarkers = allClusterItemsAsArray.length;
@@ -4824,41 +4923,53 @@ public class Map2 extends Canvas {
       final int diffX = _backgroundPainter_MicroAdjustment_DiffX;
       final int diffY = _backgroundPainter_MicroAdjustment_DiffY;
 
+      final String markerDescriptionFlag = UI.SPACE1 + UI.SYMBOL_STAR;
+
+      /*
+       * Setup cluster labeler
+       */
       final List<PointFeature> allPointfeatures = new ArrayList<>(numVisibleMarkers);
 
       for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
 
          final Object clusterItem = allClusterItemsAsArray[itemIndex];
 
-         if (clusterItem instanceof final MapMarker mapMarker) {
+         if (clusterItem instanceof final Map2Marker mapMarker) {
 
-            final String text = mapMarker.title;
+            String markerLabel = UI.SPACE1 + mapMarker.tourMarker.getLabel();
+
+            if (mapMarker.tourMarker.getDescription().length() > 0) {
+               markerLabel += markerDescriptionFlag;
+            } else {
+               markerLabel += UI.SPACE1;
+            }
 
             final int devX = mapMarker.devX;
             final int devY = mapMarker.devY;
 
-            final Point textExtent = gc.textExtent(text);
+            final Point textExtent = gc.textExtent(markerLabel);
 
             final int textWidth = textExtent.x;
             final int textHeight = textExtent.y;
 
-            allPointfeatures.add(new PointFeature(
+            final PointFeature pointFeature = new PointFeature(
 
-                  text,
+                  markerLabel,
                   -1,
 
                   devX,
                   devY,
 
                   textWidth,
-                  textHeight));
+                  textHeight);
+
+            pointFeature.data = mapMarker;
+
+            allPointfeatures.add(pointFeature);
          }
       }
 
-      final Rectangle clusterRectangle = hoveredMarkerCluster.clusterRectangle;
-
       // generate the point-features to label and calculate their label-sizes
-
       final PointFeatureLabeler pfLabeler = new PointFeatureLabeler();
 
       pfLabeler.loadDataStandard(allPointfeatures,
@@ -4869,7 +4980,9 @@ public class Map2 extends Canvas {
             mapHeight) //  bottom
       ;
 
-      final float circleRadius = clusterRectangle.width + 10;
+      final Rectangle clusterRectangle = hoveredMarkerCluster.clusterRectangle;
+
+      final float circleRadius = clusterRectangle.width + 0;
       final float circleRadius2 = circleRadius / 2;
 
       final float circleX = clusterRectangle.x + circleRadius2;
@@ -4878,7 +4991,7 @@ public class Map2 extends Canvas {
       pfLabeler.respectCircle(
             circleX,
             circleY,
-            circleRadius);
+            circleRadius2);
 
       final int numPlacedLabels = pfLabeler.label_StandardPipelineAll();
 
@@ -4905,14 +5018,19 @@ public class Map2 extends Canvas {
          final int textWidth = textExtent.x;
          final int textHeight = textExtent.y;
 
-         gc.setBackground(UI.SYS_COLOR_WHITE);
-         gc.fillRectangle(
+         final Rectangle markerRectangle = new Rectangle(
                devX,
                devY,
                textWidth,
                textHeight);
 
-         gc.setForeground(UI.SYS_COLOR_GRAY);
+         gc.setBackground(UI.SYS_COLOR_WHITE);
+         gc.fillRectangle(markerRectangle);
+
+         gc.setForeground(_isMarkerClusterSelected
+               ? UI.SYS_COLOR_BLUE
+               : UI.SYS_COLOR_GRAY);
+
          gc.drawRectangle(
                devX,
                devY,
@@ -4921,6 +5039,8 @@ public class Map2 extends Canvas {
 
          gc.setForeground(UI.SYS_COLOR_BLACK);
          gc.drawString(text, devX, devY, true);
+
+         _allPaintedOneClusterMarkers.add(new PaintedClusterMarker(pointFeature, markerRectangle));
       }
 
       /*
@@ -4929,7 +5049,10 @@ public class Map2 extends Canvas {
       // fill background
       if (markerConfig.isFillClusterSymbol) {
 
-         gc.setBackground(markerConfig.clusterOutline_Color);
+         gc.setBackground(_isMarkerClusterSelected
+               ? UI.SYS_COLOR_BLUE
+               : markerConfig.clusterOutline_Color);
+
          gc.fillOval(
 
                clusterRectangle.x + diffX,
@@ -4940,15 +5063,19 @@ public class Map2 extends Canvas {
       }
 
       final Font gcFontBackup = gc.getFont();
-      gc.setFont(getClusterFont());
+      {
+         gc.setFont(getClusterFont());
 
-      gc.setForeground(markerConfig.clusterFill_Color);
-      gc.drawString(
-            Integer.toString(numPlacedLabels),
-            hoveredMarkerCluster.clusterLabelDevX + diffX,
-            hoveredMarkerCluster.clusterLabelDevY + diffY,
-            true);
+         gc.setForeground(_isMarkerClusterSelected
+               ? UI.SYS_COLOR_WHITE
+               : markerConfig.clusterFill_Color);
+         gc.drawString(
+               Integer.toString(numPlacedLabels),
+               hoveredMarkerCluster.clusterLabelDevX + diffX,
+               hoveredMarkerCluster.clusterLabelDevY + diffY,
+               true);
 
+      }
       gc.setFont(gcFontBackup);
 
       // DEBUGGING
@@ -7728,6 +7855,10 @@ public class Map2 extends Canvas {
     */
    public void resetTours_HoveredData() {
 
+      _allPaintedMarkerClusters.clear();
+      _hoveredClusterMarker = null;
+      _hoveredMarkerCluster = null;
+
       _allHoveredTourIds.clear();
       _allHoveredDevPoints.clear();
       _allHoveredSerieIndices.clear();
@@ -8555,6 +8686,8 @@ public class Map2 extends Canvas {
 //    updatePoiVisibility();
 
       _hoveredMarkerCluster = null;
+      _isMarkerClusterSelected = false;
+      _directMapPainterContext.hoveredClusterMarker = null;
 
       isTourHovered();
       paint();

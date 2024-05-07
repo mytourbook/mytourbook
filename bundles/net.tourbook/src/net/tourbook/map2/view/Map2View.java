@@ -5436,12 +5436,12 @@ public class Map2View extends ViewPart implements
 // SET_FORMATTING_ON
 
       // enable/disable cluster/marker tooltip
-//      final boolean isShowTourMarker = Map2ConfigManager.getActiveMarkerConfig().isShowTourMarker;
-//      if (isShowTourMarker) {
-//         _map.getMarkerClusterTooltip().activate();
-//      } else {
-//         _map.getMarkerClusterTooltip().deactivate();
-//      }
+      final boolean isShowTourMarker = Map2ConfigManager.getActiveMarkerConfig().isShowTourMarker;
+      if (isShowTourMarker) {
+         _map.getClusterMarkerTooltip().activate();
+      } else {
+         _map.getClusterMarkerTooltip().deactivate();
+      }
 
       /*
        * Update options for the map direct painter
