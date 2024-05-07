@@ -767,8 +767,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             GridDataFactory.fillDefaults().hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT).align(SWT.END, SWT.FILL)
                   .applyTo(_txtSodium_Average);
 
-            // Unit: mg/h
-            UI.createLabel(container, UI.UNIT_WEIGHT_MG + UI.SLASH + UI.UNIT_LABEL_TIME);
+            // Unit: mg/L
+            UI.createLabel(container, UI.UNIT_WEIGHT_MG + UI.SLASH + UI.UNIT_FLUIDS_L);
          }
       }
    }
@@ -1758,7 +1758,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       final String averageFluidsPerHour = NutritionUtils.computeAverageFluidsPerHour(_tourData);
       _txtFluid_Average.setText(averageFluidsPerHour);
 
-      final String averageSodiumPerHour = NutritionUtils.computeAverageSodiumPerHour(_tourData);
+      final String averageSodiumPerHour = NutritionUtils.computeAverageSodiumPerLiter(_tourData);
       _txtSodium_Average.setText(averageSodiumPerHour);
    }
 

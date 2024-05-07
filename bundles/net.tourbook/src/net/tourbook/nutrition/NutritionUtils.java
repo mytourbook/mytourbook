@@ -112,13 +112,14 @@ public class NutritionUtils {
       return totalAmount * 60 / (tourDeviceTime_Recorded / 60f);
    }
 
-   public static String computeAverageSodiumPerHour(final TourData tourData) {
+   public static String computeAverageSodiumPerLiter(final TourData tourData) {
 
       final float totalSodium = NutritionUtils.getTotalSodium(tourData.getTourNutritionProducts());
-      final float averageCaloriesPerHour = NutritionUtils.computeAveragePerHour(tourData, totalSodium);
-      final String averageCaloriesPerHourFormatted = FormatManager.formatNumber_0(averageCaloriesPerHour);
+      final float totalFluids = NutritionUtils.getTotalFluids(tourData.getTourNutritionProducts()) * 100 / 100;
+      final float averageSodiumPerLiter = totalFluids == 0 ? 0 : totalSodium / totalFluids;
+      final String averageSodiumPerLiterFormatted = FormatManager.formatNumber_0(averageSodiumPerLiter);
 
-      return averageCaloriesPerHourFormatted;
+      return averageSodiumPerLiterFormatted;
    }
 
    private static List<Product> deserializeResponse(final String body, final ProductSearchType productSearchType) {

@@ -396,7 +396,7 @@ public class TourBlogView extends ViewPart {
             averageCaloriesPerHour,
             OtherMessages.VALUE_UNIT_K_CALORIES + UI.SLASH + UI.UNIT_LABEL_TIME));
       // Average sodium per L
-      final String averageSodiumPerHour = NutritionUtils.computeAverageSodiumPerHour(_tourData);
+      final String averageSodiumPerHour = NutritionUtils.computeAverageSodiumPerLiter(_tourData);
       sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Sodium,
             averageSodiumPerHour,
             UI.UNIT_WEIGHT_MG + UI.SLASH + UI.UNIT_FLUIDS_L));
