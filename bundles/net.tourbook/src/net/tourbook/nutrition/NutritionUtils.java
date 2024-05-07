@@ -80,8 +80,8 @@ public class NutritionUtils {
 
    public static String computeAverageCaloriesPerHour(final TourData tourData) {
 
-      final int totalCalories = NutritionUtils.getTotalCalories(tourData.getTourNutritionProducts());
-      final float averageCaloriesPerHour = NutritionUtils.computeAveragePerHour(tourData, totalCalories);
+      final int totalCalories = getTotalCalories(tourData.getTourNutritionProducts());
+      final float averageCaloriesPerHour = computeAveragePerHour(tourData, totalCalories);
       final String averageCaloriesPerHourFormatted = FormatManager.formatNumber_0(averageCaloriesPerHour);
 
       return averageCaloriesPerHourFormatted;
@@ -89,8 +89,8 @@ public class NutritionUtils {
 
    public static String computeAverageFluidsPerHour(final TourData tourData) {
 
-      final float totalFluids = NutritionUtils.getTotalFluids(tourData.getTourNutritionProducts()) * 100 / 100;
-      final float averageFluidsPerHour = NutritionUtils.computeAveragePerHour(tourData, totalFluids);
+      final float totalFluids = getTotalFluids(tourData.getTourNutritionProducts()) * 100 / 100;
+      final float averageFluidsPerHour = computeAveragePerHour(tourData, totalFluids);
 
       _nf2.setMinimumFractionDigits(0);
       _nf2.setMaximumFractionDigits(2);
@@ -101,21 +101,21 @@ public class NutritionUtils {
 
    private static float computeAveragePerHour(final TourData tourData, final float totalAmount) {
 
-      long tourDeviceTime_Recorded = tourData.getTourDeviceTime_Recorded();
+      long tourDeviceTime_Elapsed = tourData.getTourDeviceTime_Elapsed();
 
-      if (tourDeviceTime_Recorded > 3600 && _prefStore.getBoolean(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR)) {
-         tourDeviceTime_Recorded -= 3600;
-      } else if (tourDeviceTime_Recorded <= 3600) {
+      if (tourDeviceTime_Elapsed > 3600 && _prefStore.getBoolean(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR)) {
+         tourDeviceTime_Elapsed -= 3600;
+      } else if (tourDeviceTime_Elapsed <= 3600) {
          return totalAmount;
       }
 
-      return totalAmount * 60 / (tourDeviceTime_Recorded / 60f);
+      return totalAmount * 60 / (tourDeviceTime_Elapsed / 60f);
    }
 
    public static String computeAverageSodiumPerLiter(final TourData tourData) {
 
-      final float totalSodium = NutritionUtils.getTotalSodium(tourData.getTourNutritionProducts());
-      final float totalFluids = NutritionUtils.getTotalFluids(tourData.getTourNutritionProducts()) * 100 / 100;
+      final float totalSodium = getTotalSodium(tourData.getTourNutritionProducts());
+      final float totalFluids = getTotalFluids(tourData.getTourNutritionProducts()) * 100 / 100;
       final float averageSodiumPerLiter = totalFluids == 0 ? 0 : totalSodium / totalFluids;
       final String averageSodiumPerLiterFormatted = FormatManager.formatNumber_0(averageSodiumPerLiter);
 
