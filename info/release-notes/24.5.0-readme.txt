@@ -69,12 +69,15 @@ New + Improvements
 Changes
 =======
 
+* General Tour Import Changes
+  Some of the tour import improvements or fixed are not automatically applied to already imported tours. To see these changes, the tours have to be reimported.
+
 * Fit Import
-  - Device sensors are now imported which do not contain a serial number
-    -> Now there can be new sensors in the sensor view which were currently ignored !
+  Device sensors are now imported which do not contain a serial number
+  -> Now there can be new sensors in the sensor view which were currently ignored !
 
 * 2D Map Options
-  - Moved map location options into the new slideout for map locations
+  Moved map location options into the new slideout for map locations
 
 * Tour Concatenation
   Elevation up/down values are now ignored between joined tours
