@@ -100,7 +100,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -196,12 +195,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private Composite                 _viewerContainer;
 
    private boolean                   _isInUpdate;
-   private Text                      _txtCalories_Average;
-   private Text                      _txtCalories_Total;
-   private Text                      _txtFluid_Average;
-   private Text                      _txtFluid_Total;
-   private Text                      _txtSodium_Average;
-   private Text                      _txtSodium_Total;
+   private Label                     _lblCalories_Average;
+   private Label                     _lblCalories_Total;
+   private Label                     _lblFluid_Average;
+   private Label                     _lblFluid_Total;
+   private Label                     _lblSodium_Average;
+   private Label                     _lblSodium_Total;
    private Section                   _sectionProductsList;
    private Section                   _sectionSummary;
    private FormToolkit               _tk;
@@ -708,32 +707,29 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             final Label label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Totals, Messages.Tour_Nutrition_Label_Totals_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(label);
 
-            _txtCalories_Total = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
-            _txtCalories_Total.setEnabled(false);
+            _lblCalories_Total = _tk.createLabel(container, UI.EMPTY_STRING, SWT.TRAIL);
             GridDataFactory.fillDefaults()
                   .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.END, SWT.FILL)
-                  .applyTo(_txtCalories_Total);
+                  .applyTo(_lblCalories_Total);
 
             // Unit: kcal
             UI.createLabel(container, OtherMessages.VALUE_UNIT_K_CALORIES);
 
-            _txtFluid_Total = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
-            _txtFluid_Total.setEnabled(false);
+            _lblFluid_Total = _tk.createLabel(container, UI.EMPTY_STRING, SWT.TRAIL);
             GridDataFactory.fillDefaults()
                   .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.END, SWT.FILL)
-                  .applyTo(_txtFluid_Total);
+                  .applyTo(_lblFluid_Total);
 
             // Unit: L
             UI.createLabel(container, UI.UNIT_FLUIDS_L);
 
-            _txtSodium_Total = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
-            _txtSodium_Total.setEnabled(false);
+            _lblSodium_Total = _tk.createLabel(container, UI.EMPTY_STRING, SWT.TRAIL);
             GridDataFactory.fillDefaults()
                   .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
                   .align(SWT.END, SWT.FILL)
-                  .applyTo(_txtSodium_Total);
+                  .applyTo(_lblSodium_Total);
 
             // Unit: mg
             UI.createLabel(container, UI.UNIT_WEIGHT_MG);
@@ -743,32 +739,31 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
           * Averages
           */
          {
-            final Label label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Averages, Messages.Tour_Nutrition_Label_Averages_Tooltip);
+            Label label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Averages, Messages.Tour_Nutrition_Label_Averages_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.CENTER).applyTo(label);
 
-            _txtCalories_Average = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
-            _txtCalories_Average.setEnabled(false);
+            _lblCalories_Average = _tk.createLabel(container, UI.EMPTY_STRING, SWT.TRAIL);
             GridDataFactory.fillDefaults().hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT).align(SWT.END, SWT.FILL)
-                  .applyTo(_txtCalories_Average);
+                  .applyTo(_lblCalories_Average);
 
             // Unit: kcal/h
             UI.createLabel(container, OtherMessages.VALUE_UNIT_K_CALORIES + UI.SLASH + UI.UNIT_LABEL_TIME);
 
-            _txtFluid_Average = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
-            _txtFluid_Average.setEnabled(false);
+            _lblFluid_Average = _tk.createLabel(container, UI.EMPTY_STRING, SWT.TRAIL);
             GridDataFactory.fillDefaults().hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT).align(SWT.END, SWT.FILL)
-                  .applyTo(_txtFluid_Average);
+                  .applyTo(_lblFluid_Average);
 
             // Unit: L/h
             UI.createLabel(container, UI.UNIT_FLUIDS_L + UI.SLASH + UI.UNIT_LABEL_TIME);
 
-            _txtSodium_Average = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
-            _txtSodium_Average.setEnabled(false);
+            _lblSodium_Average = _tk.createLabel(container, UI.EMPTY_STRING, SWT.TRAIL);
+            _lblSodium_Average.setToolTipText(Messages.Tour_Nutrition_Text_AverageSodium_Tooltip);
             GridDataFactory.fillDefaults().hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT).align(SWT.END, SWT.FILL)
-                  .applyTo(_txtSodium_Average);
+                  .applyTo(_lblSodium_Average);
 
-            // Unit: mg/h
-            UI.createLabel(container, UI.UNIT_WEIGHT_MG + UI.SLASH + UI.UNIT_LABEL_TIME);
+            // Unit: mg/L
+            label = UI.createLabel(container, UI.UNIT_WEIGHT_MG + UI.SLASH + UI.UNIT_FLUIDS_L);
+            label.setToolTipText(Messages.Tour_Nutrition_Text_AverageSodium_Tooltip);
          }
       }
    }
@@ -1742,24 +1737,24 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final int totalCalories = NutritionUtils.getTotalCalories(tourNutritionProducts);
       final String totalCaloriesFormatted = FormatManager.formatNumber_0(totalCalories);
-      _txtCalories_Total.setText(totalCaloriesFormatted);
+      _lblCalories_Total.setText(totalCaloriesFormatted);
 
       final float totalFluid = NutritionUtils.getTotalFluids(tourNutritionProducts) * 100 / 100;
       final String totalFluidFormatted = _nf2.format(totalFluid);
-      _txtFluid_Total.setText(totalFluidFormatted);
+      _lblFluid_Total.setText(totalFluidFormatted);
 
       final int totalSodium = (int) NutritionUtils.getTotalSodium(tourNutritionProducts);
       final String totalSodiumFormatted = FormatManager.formatNumber_0(totalSodium);
-      _txtSodium_Total.setText(totalSodiumFormatted);
+      _lblSodium_Total.setText(totalSodiumFormatted);
 
       final String averageCaloriesPerHour = NutritionUtils.computeAverageCaloriesPerHour(_tourData);
-      _txtCalories_Average.setText(averageCaloriesPerHour);
+      _lblCalories_Average.setText(averageCaloriesPerHour);
 
       final String averageFluidsPerHour = NutritionUtils.computeAverageFluidsPerHour(_tourData);
-      _txtFluid_Average.setText(averageFluidsPerHour);
+      _lblFluid_Average.setText(averageFluidsPerHour);
 
-      final String averageSodiumPerHour = NutritionUtils.computeAverageSodiumPerHour(_tourData);
-      _txtSodium_Average.setText(averageSodiumPerHour);
+      final String averageSodiumPerLiter = NutritionUtils.computeAverageSodiumPerLiter(_tourData);
+      _lblSodium_Average.setText(averageSodiumPerLiter);
    }
 
 }

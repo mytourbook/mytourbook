@@ -3363,6 +3363,7 @@ public class Messages extends NLS {
    public static String        Tour_Nutrition_Section_ProductsList_Tooltip;
    public static String        Tour_Nutrition_Section_Summary;
    public static String        Tour_Nutrition_Section_Summary_Tooltip;
+   public static String        Tour_Nutrition_Text_AverageSodium_Tooltip;
 
    public static String        Tour_Pauses_Checkbox_Duration_Hours;
    public static String        Tour_Pauses_Checkbox_Duration_Minutes;
