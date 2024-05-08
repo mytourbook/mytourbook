@@ -215,7 +215,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
          if (rc == 0) {
 
-            // subsort 1 by category
+            // subsort 1 by name
             rc = StringUtils.compareIgnoreCase(p1.productName, p2.productName);
          }
 

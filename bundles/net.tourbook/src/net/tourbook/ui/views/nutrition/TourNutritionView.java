@@ -58,6 +58,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -400,15 +401,15 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          case COLUMN_NAME:
          default:
-            rc = tnp1.getName().compareToIgnoreCase(tnp2.getName());
+            rc = StringUtils.compareIgnoreCase(tnp1.getName(), tnp2.getName());
             break;
 
          }
 
          if (rc == 0) {
 
-            // subsort 1 by category
-            rc = tnp1.getName().compareToIgnoreCase(tnp2.getName());
+            // subsort 1 by name
+            rc = StringUtils.compareIgnoreCase(tnp1.getName(), tnp2.getName());
          }
 
          // if descending order, flip the direction
