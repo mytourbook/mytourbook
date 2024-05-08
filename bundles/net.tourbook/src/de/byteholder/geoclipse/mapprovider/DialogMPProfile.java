@@ -309,6 +309,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
    /**
     * @param mapProvider
     *           {@link MPWms}
+    *
     * @return Returns <code>true</code> when the wms map provider can be displayed, this is
     *         possible when a layer is displayed
     */
@@ -1011,7 +1012,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
          _spinAlpha.setMaximum(100);
          _spinAlpha.setToolTipText(Messages.Dialog_CustomConfig_Label_Alpha_Tooltip);
 
-         _spinAlpha.addMouseWheelListener(Util::adjustSpinnerValueOnMouseScroll);
+         _spinAlpha.addMouseWheelListener(mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent));
 
          _spinAlpha.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyAlphaSpinner()));
 
@@ -1555,6 +1556,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
    /**
     * @param colorSelector
+    *
     * @return Returns the color value of the {@link ColorSelector} or -1 when the color is black
     */
    private int getColorValue(final ColorSelector colorSelector) {
@@ -1989,15 +1991,15 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
       Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
-      if (firstElement instanceof TVIWmsLayer) {
+      if (firstElement instanceof final TVIWmsLayer tviItem) {
+
          // get map provider item
-         final TVIWmsLayer tviItem = (TVIWmsLayer) firstElement;
          firstElement = tviItem.getParentItem();
       }
 
-      if (firstElement instanceof TVIMapProvider) {
+      if (firstElement instanceof final TVIMapProvider tviMapProvider) {
 
-         final MPWrapper selectedMpWrapper = ((TVIMapProvider) firstElement).getMapProviderWrapper();
+         final MPWrapper selectedMpWrapper = tviMapProvider.getMapProviderWrapper();
 
          _isInitUI = true;
          {
@@ -2182,7 +2184,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
             // check if this is the last created runnable
             if (fRunnableCounter != _statUpdateCounter) {
-               // a new update event occured
+               // a new update event occurred
                return;
             }
 
