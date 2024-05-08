@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2023 Frédéric Bard
+ * Copyright (C) 2020, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -602,6 +602,7 @@ public class TourExporter {
     * @param trackDateTime
     * @param _mergedDistance2
     * @param _mergedTime2
+    *
     * @return Returns a track or <code>null</code> when tour data cannot be exported.
     */
    public GarminTrack doExport_60_TrackPoints(final ZonedDateTime trackDateTime, final ZonedDateTime[] mergedTime, final int[] mergedDistance) {
