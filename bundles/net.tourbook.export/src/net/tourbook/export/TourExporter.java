@@ -491,6 +491,7 @@ public class TourExporter {
     */
    private void doExport_24_MinMax_Other(final VelocityContext vcContext, final Date creationDate) {
 
+      //todo fb use the notification popup for each vendor export gpx, fit tcx mt
       Date starttime = null;
       Date endtime = null;
       int heartNum = 0;
