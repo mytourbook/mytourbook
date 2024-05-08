@@ -3504,9 +3504,28 @@ public class TourBookView extends ViewPart implements
 
             final PositionCoordinate selectionAnchor = _natTable_Body_SelectionLayer.getSelectionAnchor();
 
-            _natTable_Body_HoverLayer.setCurrentHoveredCellPosition(
-                  selectionAnchor.columnPosition,
-                  allRowPositions[0]);
+            try {
+
+               _natTable_Body_HoverLayer.setCurrentHoveredCellPosition(
+                     selectionAnchor.columnPosition,
+                     allRowPositions[0]);
+
+            } catch (final Exception e) {
+
+               // ignore, sometimes this happens
+
+               /**
+                * <code>
+                *
+                * java.lang.NullPointerException: Cannot read field "x" because "this.currentHoveredCellPosition" is null
+                * 	at org.eclipse.nebula.widgets.nattable.hover.HoverLayer.setCurrentHoveredCellPosition(HoverLayer.java:191)
+                * 	at org.eclipse.nebula.widgets.nattable.hover.HoverLayer.setCurrentHoveredCellPosition(HoverLayer.java:146)
+                * 	at net.tourbook.ui.views.tourBook.TourBookView.onSelect_NatTableItem(TourBookView.java:3507)
+                * 	at net.tourbook.ui.views.tourBook.TourBookView.lambda$10(TourBookView.java:1859)
+                *
+                * </code>
+                */
+            }
          }
       }
 

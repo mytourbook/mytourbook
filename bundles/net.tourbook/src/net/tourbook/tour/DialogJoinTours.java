@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -935,9 +935,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       final boolean isOriginalTime = getStateJoinMethod().equals(STATE_JOIN_METHOD_ORIGINAL);
 
       /**
-       * number of slices, time series are already checked in ActionJoinTours
+       * Number of slices, time series are already checked in ActionJoinTours
        */
-      int joinedSliceCounter = 0;
+      int numJoinedSlices = 0;
 
       for (final TourData tourData : _selectedTours) {
 
@@ -950,71 +950,79 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          final boolean isTourLat = (tourLatitudeSerie != null) && (tourLatitudeSerie.length > 0);
 
          if (isTourTime) {
-            joinedSliceCounter += tourTimeSerie.length;
+            numJoinedSlices += tourTimeSerie.length;
          } else if (isTourDistance) {
-            joinedSliceCounter += tourDistanceSerie.length;
+            numJoinedSlices += tourDistanceSerie.length;
          } else if (isTourLat) {
-            joinedSliceCounter += tourLatitudeSerie.length;
+            numJoinedSlices += tourLatitudeSerie.length;
          }
       }
 
-      boolean isJoinAltitude = false;
-      boolean isJoinDistance = false;
-      boolean isJoinCadence = false;
-      boolean isJoinLat = false;
-      boolean isJoinLon = false;
-      boolean isJoinPower = false;
-      boolean isJoinPulse = false;
-      boolean isJoinSpeed = false;
-//      boolean isJoinTemperature = false;
-      boolean isJoinTime = false;
+// SET_FORMATTING_OFF
 
-      final float[] joinedAltitudeSerie = new float[joinedSliceCounter];
-      final float[] joinedCadenceSerie = new float[joinedSliceCounter];
-      final float[] joinedDistanceSerie = new float[joinedSliceCounter];
-      final double[] joinedLatitudeSerie = new double[joinedSliceCounter];
-      final double[] joinedLongitudeSerie = new double[joinedSliceCounter];
-      final float[] joinedPowerSerie = new float[joinedSliceCounter];
-      final float[] joinedPulseSerie = new float[joinedSliceCounter];
-      final float[] joinedSpeedSerie = new float[joinedSliceCounter];
-      final float[] joinedTemperatureSerie = new float[joinedSliceCounter];
-      final int[] joinedTimeSerie = new int[joinedSliceCounter];
+      boolean isJoinAltitude  = false;
+      boolean isJoinDistance  = false;
+      boolean isJoinCadence   = false;
+      boolean isJoinLat       = false;
+      boolean isJoinLon       = false;
+      boolean isJoinPower     = false;
+      boolean isJoinPulse     = false;
+      boolean isJoinSpeed     = false;
+      boolean isJoinTime      = false;
 
-      final StringBuilder joinedDescription = new StringBuilder();
-      final HashSet<TourMarker> joinedTourMarker = new HashSet<>();
+      final float[]  joinedAltitudeSerie     = new float[numJoinedSlices];
+      final float[]  joinedCadenceSerie      = new float[numJoinedSlices];
+      final float[]  joinedDistanceSerie     = new float[numJoinedSlices];
+      final double[] joinedLatitudeSerie     = new double[numJoinedSlices];
+      final double[] joinedLongitudeSerie    = new double[numJoinedSlices];
+      final float[]  joinedPowerSerie        = new float[numJoinedSlices];
+      final float[]  joinedPulseSerie        = new float[numJoinedSlices];
+      final float[]  joinedSpeedSerie        = new float[numJoinedSlices];
+      final float[]  joinedTemperatureSerie  = new float[numJoinedSlices];
+      final int[]    joinedTimeSerie         = new int[numJoinedSlices];
+
+      final StringBuilder           joinedDescription = new StringBuilder();
+      final HashSet<TourMarker>     joinedTourMarker = new HashSet<>();
       final ArrayList<TourWayPoint> joinedWayPoints = new ArrayList<>();
 
-      int joinedSerieIndex = 0;
-      int joinedTourStartIndex = 0;
-      int joinedTourStartDistance = 0;
-      long joinedRecordedTime = 0;
-      int joinedPausedTime = 0;
-      final ArrayList<Long> joinedPausedTime_Start = new ArrayList<>();
-      final ArrayList<Long> joinedPausedTime_End = new ArrayList<>();
-      final ArrayList<Long> joinedPausedTime_Data = new ArrayList<>();
-      int joinedMovingTime = 0;
-      float joinedDistance = 0;
-      int joinedCalories = 0;
-      int joinedTss = 0;
-      float joinedCadenceMultiplier = 0;
-      boolean isJoinedDistanceFromSensor = false;
-      boolean isJoinedPowerFromSensor = false;
-      boolean isJoinedPulseFromSensor = false;
-      short joinedDeviceTimeInterval = -1;
-      int joinedRestPulse = 0;
+      int joinedSerieIndex          = 0;
+      int joinedTourStartIndex      = 0;
+      int joinedTourStartDistance   = 0;
 
-      int relTourTime = 0;
-      long relTourTimeOffset = 0;
-      long absFirstTourStartTimeSec = 0;
-      long absJoinedTourStartTimeSec = 0;
-      ZonedDateTime joinedTourStart = null;
+      long joinedRecordedTime       = 0;
+      int  joinedPausedTime         = 0;
+      int  joinedMovingTime         = 0;
+      final ArrayList<Long> joinedPausedTime_Start = new ArrayList<>();
+      final ArrayList<Long> joinedPausedTime_End   = new ArrayList<>();
+      final ArrayList<Long> joinedPausedTime_Data  = new ArrayList<>();
+
+      float    joinedDistance             = 0;
+      int      joinedCalories             = 0;
+      int      joinedTss                  = 0;
+      float    joinedCadenceMultiplier    = 0;
+      boolean  isJoinedDistanceFromSensor = false;
+      boolean  isJoinedPowerFromSensor    = false;
+      boolean  isJoinedPulseFromSensor    = false;
+      short    joinedDeviceTimeInterval   = -1;
+      int      joinedRestPulse            = 0;
+      float    joinedElevationDiffUp      = 0;
+      float    joinedElevationDiffDown    = 0;
+      float    joinedTourLastElevation        = Float.MIN_VALUE;
+
+      int      relTourTime                = 0;
+      long     relTourTimeOffset          = 0;
+      long     absFirstTourStartTimeSec   = 0;
+      long     absJoinedTourStartTimeSec  = 0;
+      ZonedDateTime joinedTourStart       = null;
 
       TourData previousTourData = null;
 
       boolean isFirstTour = true;
 
+// SET_FORMATTING_ON
+
       /*
-       * copy tour data series into joined data series
+       * Copy tour data series into joined data series
        */
       for (final TourData tourData : _selectedTours) {
 
@@ -1037,7 +1045,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          final boolean isTourTime = (tourTimeSerie != null) && (tourTimeSerie.length > 0);
 
          /*
-          * get speed/power data when it's from the device
+          * Get speed/power data when it's from the device
           */
          float[] tourPowerSerie = null;
          float[] tourSpeedSerie = null;
@@ -1104,21 +1112,21 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          /*
           * get number of slices
           */
-         int tourSliceCounter = 0;
+         int numTourSlices = 0;
          if (isTourTime) {
-            tourSliceCounter = tourTimeSerie.length;
+            numTourSlices = tourTimeSerie.length;
          } else if (isTourDistance) {
-            tourSliceCounter = tourDistanceSerie.length;
+            numTourSlices = tourDistanceSerie.length;
          } else if (isTourLat) {
-            tourSliceCounter = tourLatitudeSerie.length;
+            numTourSlices = tourLatitudeSerie.length;
          }
 
          float relTourDistance = 0;
 
          /*
-          * copy data series
+          * Copy data series
           */
-         for (int tourSerieIndex = 0; tourSerieIndex < tourSliceCounter; tourSerieIndex++) {
+         for (int tourSerieIndex = 0; tourSerieIndex < numTourSlices; tourSerieIndex++) {
 
             if (isTourTime) {
 
@@ -1130,9 +1138,11 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             }
 
             if (isTourAltitude) {
+
                joinedAltitudeSerie[joinedSerieIndex] = tourAltitudeSerie[tourSerieIndex];
                isJoinAltitude = true;
             }
+
             if (isTourCadence) {
                joinedCadenceSerie[joinedSerieIndex] = tourCadenceSerie[tourSerieIndex];
                isJoinCadence = true;
@@ -1190,8 +1200,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
                final TourMarker clonedMarker = tourMarker.clone(_joinedTourData);
 
                int joinMarkerIndex = joinedTourStartIndex + clonedMarker.getSerieIndex();
-               if (joinMarkerIndex >= joinedSliceCounter) {
-                  joinMarkerIndex = joinedSliceCounter - 1;
+               if (joinMarkerIndex >= numJoinedSlices) {
+                  joinMarkerIndex = numJoinedSlices - 1;
                }
 
                // adjust marker position, position is relative to the tour start
@@ -1199,7 +1209,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
                if (isJoinTime) {
                   final int relativeTourTime = joinedTimeSerie[joinMarkerIndex];
-                  clonedMarker.setTime(//
+                  clonedMarker.setTime(
                         relativeTourTime,
                         joinedTourStart.toInstant().toEpochMilli() + (relativeTourTime * 1000));
                }
@@ -1236,7 +1246,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
             // first find a free marker position in the tour
             int tourMarkerIndex = -1;
-            for (int tourSerieIndex = 0; tourSerieIndex < tourSliceCounter; tourSerieIndex++) {
+            for (int tourSerieIndex = 0; tourSerieIndex < numTourSlices; tourSerieIndex++) {
 
                boolean isIndexAvailable = true;
 
@@ -1287,7 +1297,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
                   final int relativeTourTime = joinedTimeSerie[joinMarkerIndex];
 
-                  tourMarker.setTime(//
+                  tourMarker.setTime(
                         relativeTourTime,
                         joinedTourStart.toInstant().toEpochMilli() + (relativeTourTime * 1000));
                }
@@ -1346,16 +1356,19 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             joinedRestPulse = tourData.getRestPulse();
 
          } else {
+
             if (isJoinedDistanceFromSensor && tourData.isDistanceSensorPresent()) {
                // keep TRUE state
             } else {
                isJoinedDistanceFromSensor = false;
             }
+
             if (isJoinedPowerFromSensor && tourData.isPowerSensorPresent()) {
                // keep TRUE state
             } else {
                isJoinedPowerFromSensor = false;
             }
+
             if (isJoinedPulseFromSensor && tourData.isPulseSensorPresent()) {
                // keep TRUE state
             } else {
@@ -1400,7 +1413,37 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          joinedPausedTime += tourData.getTourDeviceTime_Paused();
 
          /*
-          * summarize other fields
+          * Elevation up/down
+          */
+         if (isTourAltitude) {
+
+            final float currentTourLastElevation = tourAltitudeSerie[numTourSlices - 1];
+
+            if (joinedTourLastElevation == Float.MIN_VALUE) {
+
+               // value is not yet set
+
+               joinedTourLastElevation = currentTourLastElevation;
+
+            } else {
+
+               final float elevationDiff = currentTourLastElevation - joinedTourLastElevation;
+
+               joinedTourLastElevation = currentTourLastElevation;
+
+               if (elevationDiff >= 0) {
+
+                  joinedElevationDiffUp += elevationDiff;
+
+               } else {
+
+                  joinedElevationDiffDown -= elevationDiff;
+               }
+            }
+         }
+
+         /*
+          * Summarize other fields
           */
          tourData.computeTourMovingTime();
          joinedRecordedTime += tourData.getTourDeviceTime_Recorded();
@@ -1412,7 +1455,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          joinedTss += tourData.getPower_TrainingStressScore();
 
          /*
-          * init next tour
+          * Init next tour
           */
          isFirstTour = false;
          joinedTourStartIndex = joinedSerieIndex;
@@ -1491,6 +1534,19 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       }
 
       _joinedTourData.computeAltitudeUpDown();
+      if (isJoinAltitude) {
+
+         /*
+          * Adjust elevation up/down by removing the additional values between two tours
+          */
+
+         final int tourAltUp = _joinedTourData.getTourAltUp();
+         final int tourAltDown = _joinedTourData.getTourAltDown();
+
+         _joinedTourData.setTourAltUp(tourAltUp - joinedElevationDiffUp);
+         _joinedTourData.setTourAltDown(tourAltDown - joinedElevationDiffDown);
+      }
+
       _joinedTourData.computeComputedValues();
 
       // set person which is required to save a tour

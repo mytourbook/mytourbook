@@ -8433,7 +8433,7 @@ public class ChartComponentGraph extends Canvas {
       if (_hoveredValuePointIndex != -1
 
             /*
-             * This reduces flickering when the slider is dragged, it's not pefect but better and
+             * This reduces flickering when the slider is dragged, it's not perfect but better and
              * it depends on the zoom level in the map and chart
              */
             && (isSliderPositionModified || _isSliderDirty == false)

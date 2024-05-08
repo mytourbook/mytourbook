@@ -3,9 +3,14 @@
 
 New Download Site
 =================
+MyTourbook program files can be downloaded now ONLY from the new download site https://github.com/mytourbook/mytourbook/releases 
+See discussion https://github.com/mytourbook/mytourbook/discussions/1322 for more details.
 
-https://github.com/mytourbook/mytourbook/discussions/1322
 
+General Tour Import Changes
+===========================
+Some of the tour import improvements or fixed are not automatically applied to already imported and saved tours. 
+To see these changes, the tours or parts of them, have to be reimported.
 
 
 New + Improvements
@@ -66,15 +71,20 @@ New + Improvements
   - Support for Linux AArch64 platform
     https://github.com/mytourbook/mytourbook/discussions/1174#discussioncomment-9316290
 
+
 Changes
 =======
 
 * Fit Import
-  - Device sensors are now imported which do not contain a serial number
-    -> Now there can be new sensors in the sensor view which were currently ignored !
+  Device sensors are now imported which do not contain a serial number
+  -> Now there can be new sensors in the sensor view which were currently ignored !
 
 * 2D Map Options
-  - Moved map location options into the new slideout for map locations
+  Moved map location options into the new slideout for map locations
+
+* Tour Concatenation
+  Elevation up/down values are now ignored between joined tours
+  https://github.com/mytourbook/mytourbook/issues/1330
   
 
 Bugfix
@@ -96,8 +106,9 @@ Bugfix
     https://github.com/mytourbook/mytourbook/discussions/1194
 
 * Tour location profiles
-  The default location profiles were not translated in the last version. Now they are translated but the location names are saved in the configuraiton file C:\Users\<YOUR NAME>\mytourbook\.metadata\.plugins\net.tourbook\tour-location.xml and will not use the translated names. 
+  The default location profiles were not translated in the last version. Now they are translated but the location names are saved in the configuration file C:\Users\<YOUR NAME>\mytourbook\.metadata\.plugins\net.tourbook\tour-location.xml and will not use the translated names. 
   To use the translated names, this files needs to be deleted when MyTourbook is not running but this will also delete any customizations which you have already done !
+
 
 Translation    
 ===========
