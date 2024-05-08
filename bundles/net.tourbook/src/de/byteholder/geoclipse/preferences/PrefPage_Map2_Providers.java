@@ -164,7 +164,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private static final String       COLUMN_MAP_PROVIDER_NAME       = "MapProviderName";               //$NON-NLS-1$
    private static final String       COLUMN_MODIFIED                = "Modified";                      //$NON-NLS-1$
    private static final String       COLUMN_MP_TYPE                 = "MPType";                        //$NON-NLS-1$
-   private static final String       COLUMN_NUM_Layers              = "NumLayers";                     //$NON-NLS-1$
+   private static final String       COLUMN_NUM_LAYERS              = "NumLayers";                     //$NON-NLS-1$
    private static final String       COLUMN_OFFLINE_FILE_COUNTER    = "OfflineFileCounter";            //$NON-NLS-1$
    private static final String       COLUMN_OFFLINE_FILE_SIZE       = "OfflineFileSize";               //$NON-NLS-1$
    private static final String       COLUMN_OFFLINE_FOLDER_NAME     = "OfflineFolderName";             //$NON-NLS-1$
@@ -364,7 +364,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             rc = MapProviderManager.getTileLayerInfo(mp1).compareTo(MapProviderManager.getTileLayerInfo(mp2));
             break;
 
-         case COLUMN_NUM_Layers:
+         case COLUMN_NUM_LAYERS:
 
             if (mp1 instanceof final MPWms wmsMP1 && mp2 instanceof final MPWms wmsMP2) {
 
@@ -1707,7 +1707,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
     */
    private void defineColumn_60_Layers() {
 
-      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_NUM_Layers, SWT.TRAIL);
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_NUM_LAYERS, SWT.TRAIL);
 
       colDef.setColumnName(Messages.Pref_Map2_Viewer_Column_Layers);
       colDef.setColumnHeaderToolTipText(Messages.Pref_Map2_Viewer_Column_Layers);
