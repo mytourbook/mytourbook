@@ -60,6 +60,7 @@ public class Map2MarkerConfig {
 
    public boolean isFillClusterSymbol        = Map2ConfigManager.DEFAULT_IS_FILL_CLUSTER_SYMBOL;
    public int     clusterGridSize            = Map2ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
+   public int     clusterHoveredLabelSize    = Map2ConfigManager.DEFAULT_CLUSTER_HOVERED_LABEL_SIZE;
    public RGB     clusterFill_RGB            = Map2ConfigManager.DEFAULT_CLUSTER_FILL_RGB;
    public RGB     clusterOutline_RGB         = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_RGB;
    public int     clusterOutline_Width       = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_WIDTH;

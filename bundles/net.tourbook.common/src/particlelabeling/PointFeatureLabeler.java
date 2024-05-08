@@ -118,27 +118,26 @@ import org.eclipse.swt.graphics.GC;
  */
 public class PointFeatureLabeler extends Object {
 
-   private static double    _deg_to_rad       = Math.PI / 180.;
+   private static double    _deg_to_rad            = Math.PI / 180.;
 
-   private static int       _spiralN          = 500;
-   private static float[][] _spiral           = new float[_spiralN][2];
+   private static int       _numSamplePoints  = 500;
+   private static float[][] _spiral           = new float[_numSamplePoints][2];
 
-   private static int       _angleSubDivision = 4;
-   private static float[]   _sin              = new float[360 * _angleSubDivision];
-   private static float[]   _cos              = new float[360 * _angleSubDivision];
+   private static int       _angleSubDivision      = 4;
+   private static float[]   _sin                   = new float[360 * _angleSubDivision];
+   private static float[]   _cos                   = new float[360 * _angleSubDivision];
+
+   private static float     _spiralRadius          = 100;
+   private static float     _numWindings           = 20;
 
    static {
 
-      final float radius = 300;
-      final float u = 20;
-      float n;
+      for (int i = 1; i < _numSamplePoints; i++) {
 
-      for (int i = 1; i < _spiralN; i++) {
+         final float m = (float) i / (float) _numSamplePoints;
 
-         n = (float) i / (float) _spiralN;
-
-         _spiral[i][0] = -(float) Math.cos(2 * Math.PI * Math.sqrt(n) * u) * n * radius;
-         _spiral[i][1] = (float) Math.sin(2 * Math.PI * Math.sqrt(n) * u) * n * radius;
+         _spiral[i][0] = -(float) Math.cos(2 * Math.PI * Math.sqrt(m) * _numWindings) * m * _spiralRadius;
+         _spiral[i][1] = (float) Math.sin(2 * Math.PI * Math.sqrt(m) * _numWindings) * m * _spiralRadius;
       }
 
       for (int i = 0; i < 360 * _angleSubDivision; i++) {
@@ -607,10 +606,10 @@ public class PointFeatureLabeler extends Object {
     * Features"
     * (M. Luboschik, H. Cords, H. Schumann) for details. Standard parameters are
     * <ul>
-    * <li>n = 500
-    * <li>r = 150
-    * <li>u = 20
-    * <li>d = -1
+    * <li>numSamplePoints = 500
+    * <li>radius = 150
+    * <li>numWindings = 20
+    * <li>spiralDirection = -1
     * </ul>
     *
     * @param numSamplePoints
@@ -627,7 +626,7 @@ public class PointFeatureLabeler extends Object {
                                           final float numWindings,
                                           final float spiralDirection) {
 
-      _spiralN = numSamplePoints;
+      _numSamplePoints = numSamplePoints;
       _spiral = new float[numSamplePoints][2];
 
       float rotationDirection;
@@ -638,12 +637,40 @@ public class PointFeatureLabeler extends Object {
          rotationDirection = -1f;
       }
 
-      for (int i = 1; i < _spiralN; i++) {
+// SET_FORMATTING_OFF
 
-         final float m = (float) i / (float) _spiralN;
+      for (int i = 1; i < _numSamplePoints; i++) {
+
+         final float m = (float) i / (float) _numSamplePoints;
 
          _spiral[i][0] = rotationDirection * (float) Math.cos(2 * Math.PI * Math.sqrt(m) * numWindings) * m * radius;
-         _spiral[i][1] = (float) Math.sin(2 * Math.PI * Math.sqrt(m) * numWindings) * m * radius;
+         _spiral[i][1] =                     (float) Math.sin(2 * Math.PI * Math.sqrt(m) * numWindings) * m * radius;
+      }
+
+// SET_FORMATTING_ON
+   }
+
+   public static void setSpiralRadius(final float spiralRadius) {
+
+      if (spiralRadius == _spiralRadius) {
+
+         // radius is not modified
+
+         return;
+      }
+
+      _spiralRadius = spiralRadius;
+      _numWindings = spiralRadius / 2;
+      _numSamplePoints = (int) (spiralRadius * 3);
+
+      _spiral = new float[_numSamplePoints][2];
+
+      for (int i = 1; i < _numSamplePoints; i++) {
+
+         final float m = (float) i / (float) _numSamplePoints;
+
+         _spiral[i][0] = -(float) Math.cos(2 * Math.PI * Math.sqrt(m) * _numWindings) * m * _spiralRadius;
+         _spiral[i][1] = (float) Math.sin(2 * Math.PI * Math.sqrt(m) * _numWindings) * m * _spiralRadius;
       }
    }
 
@@ -699,7 +726,7 @@ public class PointFeatureLabeler extends Object {
 
       gc.setBackground(UI.SYS_COLOR_WHITE);
 
-      for (int i = 0; i < _spiralN; i++) {
+      for (int i = 0; i < _numSamplePoints; i++) {
 
          gc.fillRectangle(
 
@@ -1868,7 +1895,7 @@ public class PointFeatureLabeler extends Object {
                   spiralPos = 0;
 
                   //walking the spiral
-                  while ((spiralPos < _spiralN) && (!found)) {
+                  while ((spiralPos < _numSamplePoints) && (!found)) {
 
                      labelX = px + _spiral[spiralPos][0];
                      labelY = py + _spiral[spiralPos][1];
@@ -2305,7 +2332,6 @@ public class PointFeatureLabeler extends Object {
                                 final int labelAreaR,
                                 final int labelAreaT,
                                 final int labelAreaB) {
-      // TODO Auto-generated method stub
 
       if (allPointfeatures != null) {
 

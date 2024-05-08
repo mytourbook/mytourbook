@@ -155,68 +155,79 @@ public class ClusterMarkerToolTip extends ToolTip {
 
          final Display display = _map2.getDisplay();
 
-         final int tipSizeWidth = tipSize.x;
-         final int tipSizeHeight = tipSize.y;
+         final int tooltipWidth = tipSize.x;
+         final int tooltipHeight = tipSize.y;
 
          final Point devMouse = _map2.toControl(display.getCursorLocation());
          final int devMouseX = devMouse.x;
-         final int devMouseY = devMouse.y;
 
-         final Rectangle markerBounds = _hoveredMarker.markerRectangle;
-         final int clusterWidth = markerBounds.width;
-         final int clusterWidth2 = clusterWidth / 2;
-         final int clusterHeight = markerBounds.height;
-         final int clusterHeight2 = markerBounds.height / 2;
+         final Rectangle markerBounds = _hoveredMarker.markerLabelRectangle;
+         final int markerWidth = markerBounds.width;
+         final int markerWidth2 = markerWidth / 2;
+         final int markerHeight = markerBounds.height;
+
+         final int markerLeft = markerBounds.x;
+         final int markerRight = markerLeft + markerWidth;
+         final int markerTop = markerBounds.y;
+         final int markerBottom = markerBounds.y + markerHeight;
+
+         final Map2Marker mapMarker = _hoveredMarker.mapMarker;
+         final int geoPointDevX = mapMarker.geoPointDevX;
+         final int geoPointDevY = mapMarker.geoPointDevY;
 
          // center horizontally to the mouse position
-         int devX = devMouseX - tipSizeWidth / 2;
-         int devY = markerBounds.y + clusterHeight;
+         int devX = devMouseX - tooltipWidth / 2;
+         int devY = markerTop + markerHeight;
+         int noCoverHeight;
 
-         // offset that the tooltip can be hovered with the mouse
-         final int grabOffset = Math.min(10, clusterWidth2);
+         if (geoPointDevX <= markerLeft) {
 
-         /*
-          * Set x/y depending on the mouse position, that the tooltip do not cover the side from
-          * where the cluster is hovered
-          */
-         if (devMouseX < markerBounds.x + clusterWidth2) {
+            // label is on the right site
 
-            // show on the right side
-            devX = markerBounds.x + clusterWidth - grabOffset;
+            devX = markerRight;
 
-         } else if (devMouseX > markerBounds.x + clusterWidth2) {
+         } else {
 
-            // show on the left side
-            devX = markerBounds.x - tipSizeWidth + grabOffset;
+            // label is on the left site -
+
+            devX = markerLeft - tooltipWidth;
          }
 
-         if (devMouseY < markerBounds.y + clusterHeight2) {
+         if (geoPointDevY <= markerTop) {
 
-            // show on the right side
-            devY = markerBounds.y + clusterHeight - grabOffset;
+            // label is below the geo point
 
-         } else if (devMouseY > markerBounds.y + clusterHeight2) {
+            devY = markerTop;
+            noCoverHeight = markerHeight;
 
-            // show on the left side
-            devY = markerBounds.y - tipSizeHeight + grabOffset;
+         } else {
+
+            // label is above the geo point
+
+            devY = markerBottom - tooltipHeight;
+            noCoverHeight = -markerHeight;
          }
 
          /*
           * Check if the tooltip is outside of the parent
           */
          final Rectangle mapBounds = _map2.getBounds();
+         final int mapWidth = mapBounds.width;
+
          boolean isDevXAdjusted = false;
 
-         if (devX >= mapBounds.width) {
-            devX = mapBounds.width - 40;
+         if (devX >= mapWidth) {
+            devX = mapWidth - 40;
             isDevXAdjusted = true;
          }
 
-         final Rectangle displayBounds = display.getBounds();
-
          Point ttDisplayLocation = _map2.toDisplay(devX, devY);
 
-         if (ttDisplayLocation.x + tipSizeWidth > displayBounds.width) {
+         final Rectangle displayBounds = display.getBounds();
+         final int displayWidth = displayBounds.width;
+         final int displayHeight = displayBounds.height;
+
+         if (ttDisplayLocation.x + tooltipWidth > displayWidth) {
 
             /*
              * Adjust horizontal position, it is outside of the display, prevent default
@@ -225,22 +236,23 @@ public class ClusterMarkerToolTip extends ToolTip {
 
             if (isDevXAdjusted) {
 
-               ttDisplayLocation = _map2.toDisplay(devMouseX - tipSizeWidth / 2 - clusterWidth2 + 20 - tipSizeWidth, devY);
+               ttDisplayLocation = _map2.toDisplay(devMouseX - tooltipWidth / 2 - markerWidth2 + 20 - tooltipWidth, devY);
 
             } else {
 
-               ttDisplayLocation.x = ttDisplayLocation.x - tipSizeWidth;
+               ttDisplayLocation.x = displayWidth - tooltipWidth;
+               ttDisplayLocation.y += noCoverHeight;
             }
          }
 
-         if (ttDisplayLocation.y + tipSizeHeight > displayBounds.height) {
+         if (ttDisplayLocation.y + tooltipHeight > displayHeight) {
 
             /*
              * Adjust vertical position, it is outside of the display, prevent default
              * repositioning
              */
 
-            ttDisplayLocation.y = ttDisplayLocation.y - tipSizeHeight - clusterHeight;
+            ttDisplayLocation.y = ttDisplayLocation.y - tooltipHeight - markerHeight;
          }
 
          return fixupDisplayBoundsWithMonitor(tipSize, ttDisplayLocation);

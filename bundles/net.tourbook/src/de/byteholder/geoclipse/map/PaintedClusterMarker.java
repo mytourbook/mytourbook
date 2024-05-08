@@ -26,15 +26,19 @@ public class PaintedClusterMarker {
 
    private static final char NL = UI.NEW_LINE;
 
-   public PointFeature       pointFeature;
-   public Rectangle          markerRectangle;
+   public PointFeature       distributedLabel;
+
+   /**
+    * Rectangle of the painted marker label
+    */
+   public Rectangle          markerLabelRectangle;
 
    public Map2Marker         mapMarker;
 
-   public PaintedClusterMarker(final PointFeature pointFeature, final Rectangle markerRectangle) {
+   public PaintedClusterMarker(final PointFeature pointFeature, final Rectangle markerLabelRectangle) {
 
-      this.pointFeature = pointFeature;
-      this.markerRectangle = markerRectangle;
+      this.distributedLabel = pointFeature;
+      this.markerLabelRectangle = markerLabelRectangle;
 
       if (pointFeature.data instanceof final Map2Marker mapMarker) {
 
@@ -47,7 +51,7 @@ public class PaintedClusterMarker {
 
       return UI.EMPTY_STRING
 
-            + "PaintedMarkerCluster" + NL //                         //$NON-NLS-1$
+            + "PaintedClusterMarker" + NL //                         //$NON-NLS-1$
 
 //            + " clusterLabel     = " + clusterLabel + NL //           //$NON-NLS-1$
 

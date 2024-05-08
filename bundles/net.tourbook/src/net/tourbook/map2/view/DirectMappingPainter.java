@@ -243,14 +243,14 @@ public class DirectMappingPainter implements IDirectPainter {
       gc.setAntialias(SWT.ON);
 
       final PaintedClusterMarker hoveredMarker = painterContext.hoveredClusterMarker;
-      final Rectangle markerLabelRectangle = hoveredMarker.markerRectangle;
+      final Rectangle markerLabelRectangle = hoveredMarker.markerLabelRectangle;
       final int labelWidth = markerLabelRectangle.width;
       final int labelHeight = markerLabelRectangle.height;
 
       final Map2Marker mapMarker = hoveredMarker.mapMarker;
-      final int markerPointDevX = mapMarker.devX;
-      final int markerPointDevY = mapMarker.devY;
-      final int markerSize = 5;
+      final int markerPointDevX = mapMarker.geoPointDevX;
+      final int markerPointDevY = mapMarker.geoPointDevY;
+      final int markerSize = 6;
 
       // draw a symbol at the marker location
       gc.setBackground(UI.SYS_COLOR_WHITE);
@@ -260,6 +260,7 @@ public class DirectMappingPainter implements IDirectPainter {
             markerSize,
             markerSize);
 
+      gc.setLineWidth(3);
       gc.setForeground(UI.SYS_COLOR_RED);
       gc.drawRectangle(
             markerPointDevX,
@@ -273,23 +274,18 @@ public class DirectMappingPainter implements IDirectPainter {
       final int lineToDevY = markerPointDevY;
 
       /*
+       * Draw a line from the marker to the marker location.
        * Ensure that the line is not crossing the label
        */
       if (lineToDevX > lineFromDevX + labelWidth) {
-
          lineFromDevX += labelWidth;
-
       } else if (lineToDevX > lineFromDevX && lineToDevX < lineFromDevX + labelWidth) {
-
          lineFromDevX = lineToDevX;
       }
 
       if (lineToDevY > lineFromDevY + labelHeight) {
-
          lineFromDevY += labelHeight;
-
       } else if (lineToDevY > lineFromDevY && lineToDevY < lineFromDevY + labelHeight) {
-
          lineFromDevY = lineToDevY;
       }
 
@@ -300,12 +296,24 @@ public class DirectMappingPainter implements IDirectPainter {
             lineToDevX,
             lineToDevY);
 
+      /*
+       * Highlight hovered label
+       */
+      final int labelDevX = markerLabelRectangle.x;
+      final int labelDevY = markerLabelRectangle.y;
+
       gc.setForeground(UI.SYS_COLOR_RED);
-      gc.drawRectangle(
-            markerLabelRectangle.x,
-            markerLabelRectangle.y,
-            labelWidth,
-            labelHeight);
+      gc.drawLine(
+            labelDevX,
+            labelDevY + labelHeight,
+            labelDevX + labelWidth,
+            labelDevY + labelHeight);
+
+      gc.drawLine(
+            labelDevX,
+            labelDevY,
+            labelDevX,
+            labelDevY + labelHeight);
 
    }
 

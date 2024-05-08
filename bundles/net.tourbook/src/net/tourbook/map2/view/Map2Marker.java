@@ -34,8 +34,8 @@ public class Map2Marker implements ClusterItem {
     * Device position for the marker which is within a cluster, this is used to visualize the
     * markers in a cluster
     */
-   public int        devX;
-   public int        devY;
+   public int        geoPointDevX;
+   public int        geoPointDevY;
 
    /**
     * @param tourMarker
