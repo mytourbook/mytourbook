@@ -10,7 +10,7 @@ See discussion https://github.com/mytourbook/mytourbook/discussions/1322 for mor
 General Tour Import Changes
 ===========================
 Some of the tour import improvements or fixed are not automatically applied to already imported and saved tours. 
-To see these changes, the tours or parts of them, have to be reimported, see also below the new section "Changes that require Tour Reimport"
+To see these changes, the tours or parts of them, have to be reimported, see also below the new section "Changes that require Tour Re-import"
 
 
 New + Improvements
@@ -87,8 +87,8 @@ Changes
   https://github.com/mytourbook/mytourbook/issues/1330
   
 
-Changes that require Tour Reimport
-==================================
+Changes that require Tour Re-import
+===================================
 
 * TCX Import (Frederic)
   - Fix for average and maximum power computation
