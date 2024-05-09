@@ -392,7 +392,9 @@ public class TourBlogView extends ViewPart {
       final String averageFluidPerHour = NutritionUtils.computeAverageFluidsPerHour(_tourData);
       if (net.tourbook.common.util.StringUtils.hasContent(averageFluidPerHour)) {
 
-         sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Fluids, averageFluidPerHour, UI.UNIT_FLUIDS_L + UI.SLASH + UI.UNIT_LABEL_TIME));
+         sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Fluids,
+               averageFluidPerHour,
+               UI.UNIT_FLUIDS_L + UI.SLASH + UI.UNIT_LABEL_TIME));
       }
 
       // Average calories per hour
