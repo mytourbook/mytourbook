@@ -391,7 +391,7 @@ public class Map2 extends Canvas {
    private DistanceClustering<ClusterItem> _distanceClustering                = new DistanceClustering<>();
    private PointFeatureLabeler             _clusterLabeler                    = new PointFeatureLabeler();
    private List<PaintedMarkerCluster>      _allPaintedMarkerClusters          = new ArrayList<>();
-   private List<PaintedClusterMarker>      _allPaintedOneClusterMarkers       = new ArrayList<>();
+   private List<PaintedClusterMarker>      _allPaintedOneClusterMarkers;
    private PaintedMarkerCluster            _hoveredMarkerCluster;
    private PaintedClusterMarker            _hoveredClusterMarker;
    private boolean                         _isMarkerClusterSelected;
@@ -3597,9 +3597,12 @@ public class Map2 extends Canvas {
 
             // keep selected and check if a cluster marker is hovered
 
-            if (_allPaintedOneClusterMarkers.size() > 0) {
+            // use a local ref otherwise the list could be modified in another thread which caused exceptions
+            final List<PaintedClusterMarker> allPaintedOneClusterMarkers = _allPaintedOneClusterMarkers;
 
-               for (final PaintedClusterMarker paintedMarker : _allPaintedOneClusterMarkers) {
+            if (allPaintedOneClusterMarkers != null && allPaintedOneClusterMarkers.size() > 0) {
+
+               for (final PaintedClusterMarker paintedMarker : allPaintedOneClusterMarkers) {
 
                   final Rectangle paintedRect = paintedMarker.markerLabelRectangle;
 
@@ -4511,7 +4514,7 @@ public class Map2 extends Canvas {
       _backgroundPainter_Viewport_DuringPainting = _worldPixel_TopLeft_Viewport;
 
       final List<PaintedMarkerCluster> allPaintedClusters = new ArrayList<>();
-      _allPaintedOneClusterMarkers.clear();
+      _allPaintedOneClusterMarkers = null;
 
       try {
 
@@ -4663,6 +4666,17 @@ public class Map2 extends Canvas {
          if (item instanceof final StaticCluster staticCluster) {
 
             // item is a cluster
+
+            // do not paint the selected cluster
+            if (_isMarkerClusterSelected
+
+                  && _hoveredMarkerCluster != null
+                  && _hoveredMarkerCluster.markerCluster.getPosition().equals(staticCluster.getPosition())
+
+            ) {
+
+               continue;
+            }
 
             final int numClusterItems = staticCluster.getSize();
 
@@ -4911,28 +4925,36 @@ public class Map2 extends Canvas {
     */
    private void paint_BackgroundImage_70_HoveredCluster(final GC gc, final PaintedMarkerCluster hoveredMarkerCluster) {
 
+      final long start = System.nanoTime();
+
       final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
 
-      final int maxVisibleHoveredMarker = 500;
-      final int clusterSymbolBorder = 50;
+      final int maxVisibleHoveredMarker = 200;
+      final int clusterSymbolBorder = 10;
+
+      final int markerSize = 6;
+      final int markerSize2 = markerSize / 2;
+
+      final int markerRespectSize = 20;
+      final int markerRespectSize2 = markerRespectSize / 2;
 
       gc.setAntialias(markerConfig.isClusterSymbolAntialiased ? SWT.ON : SWT.OFF);
       gc.setTextAntialias(markerConfig.isClusterTextAntialiased ? SWT.ON : SWT.OFF);
 
       final Object[] allClusterItemsAsArray = hoveredMarkerCluster.allClusterItemsAsArray;
-      final int numMarkers = allClusterItemsAsArray.length;
-      int numVisibleMarkers = numMarkers;
+      final int numAllMarkers = allClusterItemsAsArray.length;
+      int numVisibleMarkers = numAllMarkers;
 
-      if (numMarkers == 0) {
+      if (numAllMarkers == 0) {
          return;
       }
 
       // limit markers
-      if (numMarkers > maxVisibleHoveredMarker) {
+      if (numAllMarkers > maxVisibleHoveredMarker) {
          numVisibleMarkers = maxVisibleHoveredMarker;
       }
 
-      final float subMarkerDiff = numMarkers / (float) numVisibleMarkers;
+      final float subMarkerDiff = numAllMarkers / (float) numVisibleMarkers;
 
       final Rectangle clientArea = _clientArea;
 
@@ -4953,7 +4975,7 @@ public class Map2 extends Canvas {
 
          int clusterIndex = itemIndex;
 
-         if (numVisibleMarkers != numMarkers) {
+         if (numVisibleMarkers != numAllMarkers) {
 
             // not all available markers are displayed -> use a random label
 
@@ -5033,6 +5055,28 @@ public class Map2 extends Canvas {
             circleY,
             circleRadius2);
 
+      /**
+       * !!! This performs 3 time slower than without but for 200 max visible markers, it is OK !!!
+       */
+      for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
+
+         final PointFeature distribLabel = allDistributedLabels.get(itemIndex);
+
+         final Map2Marker mapMarker = (Map2Marker) distribLabel.data;
+
+         final int markerPointDevX = mapMarker.geoPointDevX;
+         final int markerPointDevY = mapMarker.geoPointDevY;
+
+         final int markerSymbolDevX = markerPointDevX - markerRespectSize2;
+         final int markerSymbolDevY = markerPointDevY - markerRespectSize2;
+
+         _clusterLabeler.respectBox(
+               markerSymbolDevX,
+               markerSymbolDevY,
+               markerRespectSize,
+               markerRespectSize);
+      }
+
       // the resulting label positions are stored within the point-features
       final int numPlacedLabels = _clusterLabeler.label_StandardPipelineAll();
 
@@ -5040,6 +5084,8 @@ public class Map2 extends Canvas {
        * Draw marker label
        */
       gc.setLineWidth(1);
+
+      final ArrayList<PaintedClusterMarker> allPaintedOneClusterMarkers = new ArrayList<>();
 
       for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
 
@@ -5078,19 +5124,40 @@ public class Map2 extends Canvas {
                ? UI.SYS_COLOR_BLUE
                : UI.SYS_COLOR_BLACK);
 
-         // border: horizontal
-         gc.drawLine(
-               labelDevX,
-               labelDevY + textHeight,
-               labelDevX + textWidth - 1,
-               labelDevY + textHeight);
+         final int labelRight = labelDevX + textWidth - 1;
 
-         // border: vertical
-         gc.drawLine(
-               labelDevX,
-               labelDevY,
-               labelDevX,
-               labelDevY + textHeight);
+         if (_isMarkerClusterSelected) {
+
+            // border: horizontal top
+            gc.drawLine(
+                  labelDevX,
+                  labelDevY,
+                  labelRight,
+                  labelDevY);
+
+            // border: vertical right
+            gc.drawLine(
+                  labelRight,
+                  labelDevY,
+                  labelRight,
+                  labelDevY + textHeight);
+
+         } else {
+
+            // border: horizontal bottom
+            gc.drawLine(
+                  labelDevX,
+                  labelDevY + textHeight,
+                  labelRight,
+                  labelDevY + textHeight);
+
+            // border: vertical left
+            gc.drawLine(
+                  labelDevX,
+                  labelDevY,
+                  labelDevX,
+                  labelDevY + textHeight);
+         }
 
          gc.setForeground(UI.SYS_COLOR_BLACK);
          gc.drawString(text, labelDevX, labelDevY, true);
@@ -5098,97 +5165,101 @@ public class Map2 extends Canvas {
          /*
           * Keep painted positions
           */
-         _allPaintedOneClusterMarkers.add(new PaintedClusterMarker(distribLabel, markerLabelRectangle));
+         allPaintedOneClusterMarkers.add(new PaintedClusterMarker(distribLabel, markerLabelRectangle));
       }
 
       /*
        * Draw marker positions
        */
-      if (_isMarkerClusterSelected == false) {
 
-         gc.setLineWidth(2);
-         gc.setForeground(UI.SYS_COLOR_RED);
-         gc.setBackground(UI.SYS_COLOR_WHITE);
+      gc.setLineWidth(2);
+      gc.setForeground(UI.SYS_COLOR_BLUE);
+      gc.setBackground(UI.SYS_COLOR_WHITE);
 
-         final int markerSize = 6;
-         final int markerSize2 = markerSize / 2;
+      for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
 
-         for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
+         final PointFeature distribLabel = allDistributedLabels.get(itemIndex);
 
-            final PointFeature distribLabel = allDistributedLabels.get(itemIndex);
-
-            if (distribLabel.isLabeled == false) {
-               continue;
-            }
-
-            final Map2Marker mapMarker = (Map2Marker) distribLabel.data;
-
-            final int markerPointDevX = mapMarker.geoPointDevX;
-            final int markerPointDevY = mapMarker.geoPointDevY;
-
-            final int markerSymbolDevX = markerPointDevX - markerSize2;
-            final int markerSymbolDevY = markerPointDevY - markerSize2;
-
-            /*
-             * Draw a symbol at the marker location
-             */
-            gc.fillRectangle(
-                  markerSymbolDevX,
-                  markerSymbolDevY,
-                  markerSize,
-                  markerSize);
-
-            gc.drawRectangle(
-                  markerSymbolDevX,
-                  markerSymbolDevY,
-                  markerSize,
-                  markerSize);
+         if (distribLabel.isLabeled == false) {
+            continue;
          }
+
+         final Map2Marker mapMarker = (Map2Marker) distribLabel.data;
+
+         final int markerPointDevX = mapMarker.geoPointDevX;
+         final int markerPointDevY = mapMarker.geoPointDevY;
+
+         final int markerSymbolDevX = markerPointDevX - markerSize2 + diffX;
+         final int markerSymbolDevY = markerPointDevY - markerSize2 + diffY;
+
+         /*
+          * Draw a symbol at the marker location
+          */
+         gc.fillRectangle(
+               markerSymbolDevX,
+               markerSymbolDevY,
+               markerSize,
+               markerSize);
+
+         gc.drawRectangle(
+               markerSymbolDevX,
+               markerSymbolDevY,
+               markerSize,
+               markerSize);
       }
 
       /*
        * Draw number of painted labels which can be different to the cluster labels
        */
 
-      // the background must be filled because another number could be displayed
-      gc.setBackground(_isMarkerClusterSelected
-            ? UI.SYS_COLOR_BLUE
-            : markerConfig.clusterOutline_Color);
+      if (_isMarkerClusterSelected == false) {
 
-      gc.fillOval(
+         // the background must be filled because another number could be displayed
+         gc.setBackground(_isMarkerClusterSelected
+               ? UI.SYS_COLOR_BLUE
+               : markerConfig.clusterOutline_Color);
 
-            clusterRectangle.x + diffX,
-            clusterRectangle.y + diffY,
+         gc.fillOval(
 
-            clusterRectangle.width + 1,
-            clusterRectangle.height + 1);
+               clusterRectangle.x + diffX,
+               clusterRectangle.y + diffY,
 
-      final Font gcFontBackup = gc.getFont();
-      {
-         gc.setFont(getClusterFont());
+               clusterRectangle.width + 1,
+               clusterRectangle.height + 1);
 
-         gc.setForeground(_isMarkerClusterSelected
-               ? UI.SYS_COLOR_WHITE
-               : markerConfig.clusterFill_Color);
+         final Font gcFontBackup = gc.getFont();
+         {
+            gc.setFont(getClusterFont());
 
-         final String numPlacedLabels_Text = Integer.toString(numPlacedLabels);
-         final Point numPlacedLabels_Size = gc.stringExtent(numPlacedLabels_Text);
+            gc.setForeground(_isMarkerClusterSelected
+                  ? UI.SYS_COLOR_WHITE
+                  : markerConfig.clusterFill_Color);
 
-         final int clusterSymbolDevX = hoveredMarkerCluster.clusterRectangle.x;
-         final int clusterSymbolWidth = hoveredMarkerCluster.clusterRectangle.width;
+            final String numPlacedLabels_Text = Integer.toString(numPlacedLabels);
+            final Point numPlacedLabels_Size = gc.stringExtent(numPlacedLabels_Text);
 
-         // center number in the cluster symbol
-         final int devX_NumPlacedLabels = clusterSymbolDevX + clusterSymbolWidth / 2 - numPlacedLabels_Size.x / 2;
-         final int devY_NumPlacedLabels = hoveredMarkerCluster.clusterLabelDevY + diffY;
+            final int clusterSymbolDevX = hoveredMarkerCluster.clusterRectangle.x;
+            final int clusterSymbolWidth = hoveredMarkerCluster.clusterRectangle.width;
 
-         gc.drawString(
-               numPlacedLabels_Text,
-               devX_NumPlacedLabels,
-               devY_NumPlacedLabels,
-               true);
+            // center number in the cluster symbol
+            final int devX_NumPlacedLabels = clusterSymbolDevX + clusterSymbolWidth / 2 - numPlacedLabels_Size.x / 2;
+            final int devY_NumPlacedLabels = hoveredMarkerCluster.clusterLabelDevY + diffY;
+
+            gc.drawString(
+                  numPlacedLabels_Text,
+                  devX_NumPlacedLabels,
+                  devY_NumPlacedLabels,
+                  true);
+         }
+         gc.setFont(gcFontBackup);
 
       }
-      gc.setFont(gcFontBackup);
+
+      _allPaintedOneClusterMarkers = allPaintedOneClusterMarkers;
+
+//      final long end = System.nanoTime();
+//      System.out.println(UI.timeStampNano() + " paint_HoveredCluster - %7.3f ms".formatted((float) (end - start) / 1000000));
+      // TODO remove SYSTEM.OUT.PRINTLN
 
       // DEBUGGING
       //

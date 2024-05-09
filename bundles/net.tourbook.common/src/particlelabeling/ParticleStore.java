@@ -219,10 +219,13 @@ public class ParticleStore {
       int indexX;
       int indexY;
 
+      final float[][] particleData = _particleData;
+      final ParticleList[][] particleGrid = _particleGrid;
+
       // calculating the concrete size of the result
       for (indexX = rx1; indexX <= rx2; indexX++) {
 
-         final ParticleList[] particleListX = _particleGrid[indexX];
+         final ParticleList[] particleListX = particleGrid[indexX];
 
          for (indexY = ry1; indexY <= ry2; indexY++) {
 
@@ -236,17 +239,18 @@ public class ParticleStore {
       // storing the particles into the output array
       for (indexX = rx1; indexX <= rx2; indexX++) {
 
-         final ParticleList[] particleListX = _particleGrid[indexX];
+         final ParticleList[] particleListX = particleGrid[indexX];
 
          for (indexY = ry1; indexY <= ry2; indexY++) {
 
             final ParticleList particleListXY = particleListX[indexY];
 
             numParticlesWithinCell = particleListXY.numParticlesWithinCell;
+            final int[] registeredParticles = particleListXY.registeredParticles;
 
             for (int k = 0; k < numParticlesWithinCell; k++) {
 
-               output[l++] = _particleData[particleListXY.registeredParticles[k]];
+               output[l++] = particleData[registeredParticles[k]];
             }
          }
       }
