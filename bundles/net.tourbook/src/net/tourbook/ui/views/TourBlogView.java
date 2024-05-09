@@ -42,6 +42,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_1;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
@@ -579,14 +580,14 @@ public class TourBlogView extends ViewPart {
       final float bodyWeight = _tourData.getBodyWeight() * UI.UNIT_VALUE_WEIGHT;
       if (bodyWeight > 0) {
          sb.append("&#9878;" + UI.SPACE1); //$NON-NLS-1$
-         sb.append(new ValueFormatter_Number_1_0().printDouble(bodyWeight));
+         sb.append(new ValueFormatter_Number_1_1().printDouble(bodyWeight));
          sb.append(UI.SPACE1 + UI.UNIT_LABEL_WEIGHT + UI.SPACE3);
       }
 
       // Body fat
       final float bodyFat = _tourData.getBodyFat();
       if (bodyFat > 0) {
-         sb.append(new ValueFormatter_Number_1_0().printDouble(bodyFat));
+         sb.append(new ValueFormatter_Number_1_1().printDouble(bodyFat));
          sb.append(UI.SPACE1 + UI.SYMBOL_PERCENTAGE + UI.SPACE3);
       }
 

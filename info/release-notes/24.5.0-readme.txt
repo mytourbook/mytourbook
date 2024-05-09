@@ -10,7 +10,7 @@ See discussion https://github.com/mytourbook/mytourbook/discussions/1322 for mor
 General Tour Import Changes
 ===========================
 Some of the tour import improvements or fixed are not automatically applied to already imported and saved tours. 
-To see these changes, the tours or parts of them, have to be reimported.
+To see these changes, the tours or parts of them, have to be reimported, see also below the new section "Changes that require Tour Re-import"
 
 
 New + Improvements
@@ -70,8 +70,8 @@ New + Improvements
 * Linux AArch64
   - Support for Linux AArch64 platform
     https://github.com/mytourbook/mytourbook/discussions/1174#discussioncomment-9316290
-
-
+  
+  
 Changes
 =======
 
@@ -87,12 +87,8 @@ Changes
   https://github.com/mytourbook/mytourbook/issues/1330
   
 
-Bugfix
-======
-
-* EasyImport (Frederic)
-  - Added the ability to disable a cloud file system
-    https://github.com/mytourbook/mytourbook/issues/1293
+Changes that require Tour Re-import
+===================================
 
 * TCX Import (Frederic)
   - Fix for average and maximum power computation
@@ -100,6 +96,14 @@ Bugfix
 
 * Suunto XML/SML Import (Frederic)
   - Fix for the calories import values
+  
+
+Bugfix
+======
+
+* EasyImport (Frederic)
+  - Added the ability to disable a cloud file system
+    https://github.com/mytourbook/mytourbook/issues/1293
 
 * Fit Export (Frederic)
   - Fix for the Suunto App replay issue
