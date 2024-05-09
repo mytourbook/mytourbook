@@ -155,11 +155,11 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             UI.createLabel(container, UI.UNIT_WEIGHT_MG);
          }
          {
-            // Label: Is Beverage
-            UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_IsBeverage);
+            // Checkbox: Is Beverage
             _checkIsBeverage = new Button(container, SWT.CHECK);
+            _checkIsBeverage.setText(Messages.Dialog_CustomTourNutritionProduct_Label_IsBeverage);
             GridDataFactory.fillDefaults()
-                  .span(2, 1)
+                  .span(3, 1)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_checkIsBeverage);
          }
