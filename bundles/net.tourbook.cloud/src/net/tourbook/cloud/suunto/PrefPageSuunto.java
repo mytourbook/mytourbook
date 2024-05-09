@@ -1025,9 +1025,10 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
             final String[] currentDeviceFolderHistoryItems = Util.getStateStringArray(_state,
                   DialogEasyImportConfig.STATE_DEVICE_FOLDER_HISTORY_ITEMS,
                   new String[0]);
-            final List<String> stateDeviceFolderHistoryItems = Arrays.asList(currentDeviceFolderHistoryItems);
+            final List<String> stateDeviceFolderHistoryItems = new ArrayList<>(Arrays.asList(currentDeviceFolderHistoryItems));
 
             if (!stateDeviceFolderHistoryItems.contains(downloadFolder)) {
+
                stateDeviceFolderHistoryItems.add(downloadFolder);
                _state.put(DialogEasyImportConfig.STATE_DEVICE_FOLDER_HISTORY_ITEMS,
                      stateDeviceFolderHistoryItems.toArray(new String[stateDeviceFolderHistoryItems.size()]));
