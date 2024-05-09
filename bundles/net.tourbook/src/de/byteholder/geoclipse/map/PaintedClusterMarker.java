@@ -53,7 +53,7 @@ public class PaintedClusterMarker {
 
             + "PaintedClusterMarker" + NL //                         //$NON-NLS-1$
 
-//            + " clusterLabel     = " + clusterLabel + NL //           //$NON-NLS-1$
+            + " mapMarker     = " + mapMarker.tourMarker.getLabel() + NL //           //$NON-NLS-1$
 
       ;
    }

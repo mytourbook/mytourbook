@@ -22,20 +22,19 @@ import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
 import org.oscim.core.GeoPoint;
 
 /**
- * Immutable class describing a GeoPoint with a Title and a Description.
+ * Immutable class describing a GeoPoint with a Title and a Description
  */
 public class Map2Marker implements ClusterItem {
-
-   public TourMarker tourMarker;
 
    public GeoPoint   geoPoint;
 
    /**
-    * Device position for the marker which is within a cluster, this is used to visualize the
-    * markers in a cluster
+    * Geo position in device pixel for the marker which is within a cluster
     */
    public int        geoPointDevX;
    public int        geoPointDevY;
+
+   public TourMarker tourMarker;
 
    /**
     * @param tourMarker

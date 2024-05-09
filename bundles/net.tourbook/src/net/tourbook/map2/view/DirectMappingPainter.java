@@ -251,32 +251,23 @@ public class DirectMappingPainter implements IDirectPainter {
       final int markerPointDevX = mapMarker.geoPointDevX;
       final int markerPointDevY = mapMarker.geoPointDevY;
       final int markerSize = 6;
+      final int markerSize2 = markerSize / 2;
 
-      // draw a symbol at the marker location
+      final int markerSymbolDevX = markerPointDevX - markerSize2;
+      final int markerSymbolDevY = markerPointDevY - markerSize2;
+
       gc.setBackground(UI.SYS_COLOR_WHITE);
-      gc.fillRectangle(
-            markerPointDevX,
-            markerPointDevY,
-            markerSize,
-            markerSize);
-
-      gc.setLineWidth(3);
       gc.setForeground(UI.SYS_COLOR_RED);
-      gc.drawRectangle(
-            markerPointDevX,
-            markerPointDevY,
-            markerSize,
-            markerSize);
-
-      int lineFromDevX = markerLabelRectangle.x;
-      int lineFromDevY = markerLabelRectangle.y;
-      final int lineToDevX = markerPointDevX;
-      final int lineToDevY = markerPointDevY;
 
       /*
        * Draw a line from the marker to the marker location.
        * Ensure that the line is not crossing the label
        */
+      int lineFromDevX = markerLabelRectangle.x;
+      int lineFromDevY = markerLabelRectangle.y;
+      final int lineToDevX = markerPointDevX;
+      final int lineToDevY = markerPointDevY;
+
       if (lineToDevX > lineFromDevX + labelWidth) {
          lineFromDevX += labelWidth;
       } else if (lineToDevX > lineFromDevX && lineToDevX < lineFromDevX + labelWidth) {
@@ -295,6 +286,22 @@ public class DirectMappingPainter implements IDirectPainter {
             lineFromDevY,
             lineToDevX,
             lineToDevY);
+
+      /*
+       * Draw a symbol at the marker location
+       */
+      gc.fillRectangle(
+            markerSymbolDevX,
+            markerSymbolDevY,
+            markerSize,
+            markerSize);
+
+      gc.setLineWidth(2);
+      gc.drawRectangle(
+            markerSymbolDevX,
+            markerSymbolDevY,
+            markerSize,
+            markerSize);
 
       /*
        * Highlight hovered label
