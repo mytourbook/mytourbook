@@ -44,9 +44,6 @@ New + Improvements
 * Fit Import
   - Import device sensors which do not contain a serial number
     https://github.com/mytourbook/mytourbook/issues/1287
-  - Code changes to support the upcoming Garmin Activity File Message Change (Frederic)
-    https://forums.garmin.com/developer/fit-sdk/b/news-announcements/posts/important-fit-activity-file-message-change
-    https://github.com/mytourbook/mytourbook/discussions/1279
 
 * Fit Export (Frederic)
   - Improvements per the 'FitTestTool'
@@ -76,8 +73,11 @@ Changes
 =======
 
 * Fit Import
-  Device sensors are now imported which do not contain a serial number
+  - Device sensors are now imported which do not contain a serial number
   -> Now there can be new sensors in the sensor view which were currently ignored !
+  - Code changes to support the upcoming Garmin Activity File Message Change (Frederic)
+    https://forums.garmin.com/developer/fit-sdk/b/news-announcements/posts/important-fit-activity-file-message-change
+    https://github.com/mytourbook/mytourbook/discussions/1279
 
 * 2D Map Options
   Moved map location options into the new slideout for map locations
