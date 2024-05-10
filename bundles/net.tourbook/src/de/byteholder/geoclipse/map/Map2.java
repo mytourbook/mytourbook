@@ -3592,7 +3592,7 @@ public class Map2 extends Canvas {
 
          if (_isMarkerClusterSelected
 
-               // map will not be panned
+               // map is not panned
                && _isMouseDown == false) {
 
             // keep selected and check if a cluster marker is hovered
@@ -3600,21 +3600,32 @@ public class Map2 extends Canvas {
             // use a local ref otherwise the list could be modified in another thread which caused exceptions
             final List<PaintedClusterMarker> allPaintedOneClusterMarkers = _allPaintedOneClusterMarkers;
 
-            if (allPaintedOneClusterMarkers != null && allPaintedOneClusterMarkers.size() > 0) {
+            if (allPaintedOneClusterMarkers != null) {
 
                for (final PaintedClusterMarker paintedMarker : allPaintedOneClusterMarkers) {
 
-                  final Rectangle paintedRect = paintedMarker.markerLabelRectangle;
+                  final Rectangle paintedLabelRect = paintedMarker.markerLabelRectangle;
+                  final Rectangle paintedSymbolRect = paintedMarker.markerSymbolRectangle;
 
                   if (true
-                        && (mouseMoveDevX > paintedRect.x)
-                        && (mouseMoveDevX < paintedRect.x + paintedRect.width)
-                        && (mouseMoveDevY > paintedRect.y)
-                        && (mouseMoveDevY < paintedRect.y + paintedRect.height)) {
+                        && (mouseMoveDevX > paintedLabelRect.x)
+                        && (mouseMoveDevX < paintedLabelRect.x + paintedLabelRect.width)
+                        && (mouseMoveDevY > paintedLabelRect.y)
+                        && (mouseMoveDevY < paintedLabelRect.y + paintedLabelRect.height)
+
+                        || (mouseMoveDevX > paintedSymbolRect.x)
+                              && (mouseMoveDevX < paintedSymbolRect.x + paintedSymbolRect.width)
+                              && (mouseMoveDevY > paintedSymbolRect.y)
+                              && (mouseMoveDevY < paintedSymbolRect.y + paintedSymbolRect.height)
+
+                  ) {
 
                      // a map marker is hovered
 
-                     _directMapPainterContext.hoveredClusterMarker = _hoveredClusterMarker = paintedMarker;
+                     _hoveredClusterMarker = paintedMarker;
+                     _directMapPainterContext.hoveredClusterMarker = paintedMarker;
+
+                     break;
                   }
                }
             }
@@ -4514,7 +4525,7 @@ public class Map2 extends Canvas {
       _backgroundPainter_Viewport_DuringPainting = _worldPixel_TopLeft_Viewport;
 
       final List<PaintedMarkerCluster> allPaintedClusters = new ArrayList<>();
-      _allPaintedOneClusterMarkers = null;
+      final List<PaintedClusterMarker> allPaintedOneClusterMarkers = new ArrayList<>();
 
       try {
 
@@ -4539,7 +4550,7 @@ public class Map2 extends Canvas {
 
                if (_hoveredMarkerCluster != null) {
 
-                  paint_BackgroundImage_70_HoveredCluster(gcCanvas, _hoveredMarkerCluster);
+                  paint_BackgroundImage_70_HoveredCluster(gcCanvas, _hoveredMarkerCluster, allPaintedOneClusterMarkers);
                }
             }
          }
@@ -4554,6 +4565,12 @@ public class Map2 extends Canvas {
          _backgroundPainter_Viewport_WhenPainted = _backgroundPainter_Viewport_DuringPainting;
 
          _allPaintedMarkerClusters = allPaintedClusters;
+         _allPaintedOneClusterMarkers = allPaintedOneClusterMarkers;
+
+         // reset state which can happen when map is moved and no cluster is displayed
+         if (allPaintedClusters.size() == 0 && _isMarkerClusterSelected) {
+            _isMarkerClusterSelected = false;
+         }
 
       } catch (final Exception e) {
 
@@ -4667,24 +4684,36 @@ public class Map2 extends Canvas {
 
             // item is a cluster
 
-            // do not paint the selected cluster
-            if (_isMarkerClusterSelected
+            boolean isPaintCluster = true;
+            boolean isPaintBackground = true;
 
-                  && _hoveredMarkerCluster != null
-                  && _hoveredMarkerCluster.markerCluster.getPosition().equals(staticCluster.getPosition())
+            if (_isMarkerClusterSelected) {
 
-            ) {
+               if (_hoveredMarkerCluster != null
+                     && _hoveredMarkerCluster.markerCluster.getPosition().equals(staticCluster.getPosition())) {
 
-               continue;
+                  isPaintCluster = true;
+                  isPaintBackground = false;
+
+               } else {
+
+                  // paint only the selected cluster
+
+                  isPaintCluster = false;
+               }
             }
 
-            final int numClusterItems = staticCluster.getSize();
+            if (isPaintCluster) {
 
-            paint_BackgroundImage_60_OneCluster(
-                  gc,
-                  staticCluster,
-                  Integer.toString(numClusterItems),
-                  allPaintedClusters);
+               final int numClusterItems = staticCluster.getSize();
+
+               paint_BackgroundImage_60_OneCluster(
+                     gc,
+                     staticCluster,
+                     Integer.toString(numClusterItems),
+                     allPaintedClusters,
+                     isPaintBackground);
+            }
 
          } else if (item instanceof final QuadItem markerItem) {
 
@@ -4752,13 +4781,17 @@ public class Map2 extends Canvas {
          final int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
          final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y - textHeight2;
 
-         gc.setForeground(UI.SYS_COLOR_GREEN);
+         gc.setForeground(_isMapBackgroundDark
+               ? UI.SYS_COLOR_BLACK
+               : UI.SYS_COLOR_YELLOW);
          gc.drawString(text, devX - 1, devY, true);
          gc.drawString(text, devX + 1, devY, true);
          gc.drawString(text, devX, devY - 1, true);
          gc.drawString(text, devX, devY + 1, true);
 
-         gc.setForeground(UI.SYS_COLOR_BLACK);
+         gc.setForeground(_isMapBackgroundDark
+               ? UI.SYS_COLOR_WHITE
+               : UI.SYS_COLOR_BLACK);
          gc.drawString(text, devX, devY, true);
       }
 
@@ -4768,7 +4801,8 @@ public class Map2 extends Canvas {
    private PaintedMarkerCluster paint_BackgroundImage_60_OneCluster(final GC gc,
                                                                     final StaticCluster<?> markerCluster,
                                                                     final String clusterLabel,
-                                                                    final List<PaintedMarkerCluster> allPaintedClusters) {
+                                                                    final List<PaintedMarkerCluster> allPaintedClusters,
+                                                                    final boolean isPaintBackground) {
 
       // convert marker lat/long into world pixels
 
@@ -4857,7 +4891,7 @@ public class Map2 extends Canvas {
       final int ovalDevX = devX - circleSize2 + textWidth2 - 2;
       final int ovalDevY = devY - circleSize2 + textHeight2 + 2;
 
-      if (markerConfig.isFillClusterSymbol) {
+      if (isPaintBackground && markerConfig.isFillClusterSymbol) {
 
          gc.setBackground(markerConfig.clusterFill_Color);
          gc.fillOval(
@@ -4922,8 +4956,11 @@ public class Map2 extends Canvas {
     *
     * @param gc
     * @param hoveredMarkerCluster
+    * @param allPaintedMarkers
     */
-   private void paint_BackgroundImage_70_HoveredCluster(final GC gc, final PaintedMarkerCluster hoveredMarkerCluster) {
+   private void paint_BackgroundImage_70_HoveredCluster(final GC gc,
+                                                        final PaintedMarkerCluster hoveredMarkerCluster,
+                                                        final List<PaintedClusterMarker> allPaintedMarkers) {
 
       final long start = System.nanoTime();
 
@@ -5079,13 +5116,12 @@ public class Map2 extends Canvas {
 
       // the resulting label positions are stored within the point-features
       final int numPlacedLabels = _clusterLabeler.label_StandardPipelineAll();
+//    final int numPlacedLabels = _clusterLabeler.label_StandardPipelineAdjacentAll();
 
       /*
        * Draw marker label
        */
       gc.setLineWidth(1);
-
-      final ArrayList<PaintedClusterMarker> allPaintedOneClusterMarkers = new ArrayList<>();
 
       for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
 
@@ -5120,61 +5156,39 @@ public class Map2 extends Canvas {
          /*
           * Draw marker label
           */
-         gc.setForeground(_isMarkerClusterSelected
-               ? UI.SYS_COLOR_BLUE
-               : UI.SYS_COLOR_BLACK);
-
-         final int labelRight = labelDevX + textWidth - 1;
-
-         if (_isMarkerClusterSelected) {
-
-            // border: horizontal top
-            gc.drawLine(
-                  labelDevX,
-                  labelDevY,
-                  labelRight,
-                  labelDevY);
-
-            // border: vertical right
-            gc.drawLine(
-                  labelRight,
-                  labelDevY,
-                  labelRight,
-                  labelDevY + textHeight);
-
-         } else {
-
-            // border: horizontal bottom
-            gc.drawLine(
-                  labelDevX,
-                  labelDevY + textHeight,
-                  labelRight,
-                  labelDevY + textHeight);
-
-            // border: vertical left
-            gc.drawLine(
-                  labelDevX,
-                  labelDevY,
-                  labelDevX,
-                  labelDevY + textHeight);
-         }
-
          gc.setForeground(UI.SYS_COLOR_BLACK);
+//         gc.setForeground(UI.SYS_COLOR_WHITE);
+
+         // border: horizontal bottom
+         gc.drawLine(
+               labelDevX,
+               labelDevY + textHeight,
+               labelDevX + textWidth - 1,
+               labelDevY + textHeight);
+
+         // border: vertical left
+         gc.drawLine(
+               labelDevX,
+               labelDevY,
+               labelDevX,
+               labelDevY + textHeight);
+
          gc.drawString(text, labelDevX, labelDevY, true);
 
          /*
           * Keep painted positions
           */
-         allPaintedOneClusterMarkers.add(new PaintedClusterMarker(distribLabel, markerLabelRectangle));
+         allPaintedMarkers.add(new PaintedClusterMarker(distribLabel, markerLabelRectangle));
       }
 
       /*
        * Draw marker positions
        */
-
       gc.setLineWidth(2);
       gc.setForeground(UI.SYS_COLOR_BLUE);
       gc.setBackground(UI.SYS_COLOR_WHITE);
+
+      int paintedMarkerIndex = 0;
 
       for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
 
@@ -5184,6 +5198,9 @@ public class Map2 extends Canvas {
             continue;
          }
 
+         /*
+          * Draw a symbol at the marker location
+          */
          final Map2Marker mapMarker = (Map2Marker) distribLabel.data;
 
          final int markerPointDevX = mapMarker.geoPointDevX;
@@ -5192,20 +5209,20 @@ public class Map2 extends Canvas {
          final int markerSymbolDevX = markerPointDevX - markerSize2 + diffX;
          final int markerSymbolDevY = markerPointDevY - markerSize2 + diffY;
 
-         /*
-          * Draw a symbol at the marker location
-          */
-         gc.fillRectangle(
+         final Rectangle markerSymbolRectangle = new Rectangle(
                markerSymbolDevX,
                markerSymbolDevY,
                markerSize,
                markerSize);
 
-         gc.drawRectangle(
-               markerSymbolDevX,
-               markerSymbolDevY,
-               markerSize,
-               markerSize);
+         gc.fillRectangle(markerSymbolRectangle);
+         gc.drawRectangle(markerSymbolRectangle);
+
+         /*
+          * Keep painted symbol position
+          */
+         final PaintedClusterMarker paintedMarker = allPaintedMarkers.get(paintedMarkerIndex++);
+         paintedMarker.markerSymbolRectangle = markerSymbolRectangle;
       }
 
       /*
@@ -5242,7 +5259,7 @@ public class Map2 extends Canvas {
             final int clusterSymbolWidth = hoveredMarkerCluster.clusterRectangle.width;
 
             // center number in the cluster symbol
-            final int devX_NumPlacedLabels = clusterSymbolDevX + clusterSymbolWidth / 2 - numPlacedLabels_Size.x / 2;
+            final int devX_NumPlacedLabels = clusterSymbolDevX + clusterSymbolWidth / 2 - numPlacedLabels_Size.x / 2 + diffX;
             final int devY_NumPlacedLabels = hoveredMarkerCluster.clusterLabelDevY + diffY;
 
             gc.drawString(
@@ -5254,8 +5271,6 @@ public class Map2 extends Canvas {
          gc.setFont(gcFontBackup);
 
       }
-
-      _allPaintedOneClusterMarkers = allPaintedOneClusterMarkers;
 
 //      final long end = System.nanoTime();
 //      System.out.println(UI.timeStampNano() + " paint_HoveredCluster - %7.3f ms".formatted((float) (end - start) / 1000000));

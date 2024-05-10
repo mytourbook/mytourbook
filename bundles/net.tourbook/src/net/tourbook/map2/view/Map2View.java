@@ -5461,6 +5461,8 @@ public class Map2View extends ViewPart implements
       // create legend image after the dim level is modified
       createLegendImage(TourPainterConfiguration.getMapColorProvider());
 
+      _map.resetCluster();
+
       _map.paint();
    }
 

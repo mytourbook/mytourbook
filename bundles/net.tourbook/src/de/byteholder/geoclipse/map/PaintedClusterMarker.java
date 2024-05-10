@@ -33,9 +33,15 @@ public class PaintedClusterMarker {
     */
    public Rectangle          markerLabelRectangle;
 
+   /**
+    * Rectangle of the painted marker location symbol
+    */
+   public Rectangle          markerSymbolRectangle;
+
    public Map2Marker         mapMarker;
 
-   public PaintedClusterMarker(final PointFeature pointFeature, final Rectangle markerLabelRectangle) {
+   public PaintedClusterMarker(final PointFeature pointFeature,
+                               final Rectangle markerLabelRectangle) {
 
       this.distributedLabel = pointFeature;
       this.markerLabelRectangle = markerLabelRectangle;
