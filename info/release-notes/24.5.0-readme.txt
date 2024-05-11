@@ -74,8 +74,8 @@ Changes
 
 * Fit Import
   - Device sensors are now imported which do not contain a serial number
-  -> Now there can be new sensors in the sensor view which were currently ignored !
-  - Code changes to support the upcoming Garmin Activity File Message Change (Frederic)
+    -> Now there can be new sensors in the sensor view which were currently ignored !
+  - Code changes to support the changed Garmin Activity File Message (FIT) format (Frederic)
     https://forums.garmin.com/developer/fit-sdk/b/news-announcements/posts/important-fit-activity-file-message-change
     https://github.com/mytourbook/mytourbook/discussions/1279
 
