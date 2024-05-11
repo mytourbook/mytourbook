@@ -29,21 +29,21 @@ public class PaintedMarkerCluster {
    public StaticCluster<?>   markerCluster;
    public Object[]           allClusterItemsAsArray;
 
-   public Rectangle          clusterRectangle;
+   public Rectangle          clusterSymbolRectangle;
 
    public String             clusterLabel;
    public int                clusterLabelDevX;
    public int                clusterLabelDevY;
 
    public PaintedMarkerCluster(final StaticCluster<?> staticCluster,
-                               final Rectangle clusterRectangle,
+                               final Rectangle clusterSymbolRectangle,
 
                                final String clusterLabel,
                                final int clusterLabelDevX,
                                final int clusterLabelDevY) {
 
       this.markerCluster = staticCluster;
-      this.clusterRectangle = clusterRectangle;
+      this.clusterSymbolRectangle = clusterSymbolRectangle;
 
       this.clusterLabel = clusterLabel;
       this.clusterLabelDevX = clusterLabelDevX;
@@ -63,19 +63,18 @@ public class PaintedMarkerCluster {
 
       return UI.EMPTY_STRING
 
-            + "PaintedMarkerCluster" + NL //                         //$NON-NLS-1$
+            + "PaintedMarkerCluster" + NL //                                  //$NON-NLS-1$
 
-            + " clusterLabel     = " + clusterLabel + NL //           //$NON-NLS-1$
-            + " clusterLabelDevX = " + clusterLabelDevX + NL //       //$NON-NLS-1$
-            + " clusterLabelDevY = " + clusterLabelDevY + NL //       //$NON-NLS-1$
-            + " clusterRectangle = " + clusterRectangle + NL //       //$NON-NLS-1$
+            + " clusterLabel           = " + clusterLabel + NL //             //$NON-NLS-1$
+            + " clusterLabelDevX       = " + clusterLabelDevX + NL //         //$NON-NLS-1$
+            + " clusterLabelDevY       = " + clusterLabelDevY + NL //         //$NON-NLS-1$
+            + " clusterSymbolRectangle = " + clusterSymbolRectangle + NL //   //$NON-NLS-1$
 
 //            + " markerCluster    = " + markerCluster + NL //          //$NON-NLS-1$
 
 //            + " allClusterItemsAsArray=" + (allClusterItemsAsArray != null
 //                  ? Arrays.asList(allClusterItemsAsArray).subList(0, Math.min(allClusterItemsAsArray.length, maxLen))
 //                  : null) + UI.NEW_LINE //
-
       ;
    }
 }

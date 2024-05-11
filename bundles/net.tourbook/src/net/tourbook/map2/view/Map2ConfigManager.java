@@ -25,7 +25,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.map25.Map25ConfigManager;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -85,11 +84,6 @@ public class Map2ConfigManager {
    // marker
    private static final String ATTR_IS_SHOW_TOUR_MARKER    = "isShowTourMarker";     //$NON-NLS-1$
    //
-   private static final String ATTR_MARKER_FILL_OPACITY    = "markerFillOpacity";    //$NON-NLS-1$
-   private static final String ATTR_MARKER_OUTLINE_OPACITY = "markerOutlineOpacity"; //$NON-NLS-1$
-   private static final String ATTR_MARKER_OUTLINE_SIZE    = "markerOutlineSize";    //$NON-NLS-1$
-   private static final String ATTR_MARKER_SYMBOL_SIZE     = "markerSymbolSize";     //$NON-NLS-1$
-   //
    private static final String TAG_MARKER_FILL_COLOR       = "MarkerFillColor";      //$NON-NLS-1$
    private static final String TAG_MARKER_OUTLINE_COLOR    = "MarkerOutlineColor";   //$NON-NLS-1$
    //
@@ -137,9 +131,7 @@ public class Map2ConfigManager {
    public static final RGB   DEFAULT_CLUSTER_OUTLINE_RGB    = new RGB(0xff, 0xff, 0xff);
    public static final float DEFAULT_CLUSTER_OUTLINE_SIZE   = 2.0f;
    public static final RGB   DEFAULT_MARKER_FILL_RGB        = new RGB(0xFF, 0xFF, 0x00);
-   public static final int   DEFAULT_MARKER_FILL_OPACITY    = 200;                      // 80%;
    public static final RGB   DEFAULT_MARKER_OUTLINE_RGB     = new RGB(0, 0, 0);
-   public static final int   DEFAULT_MARKER_OUTLINE_OPACITY = 200;                      // 80%;
    //
    //
    /**
@@ -293,10 +285,6 @@ public class Map2ConfigManager {
           */
          xmlConfig.putBoolean(      ATTR_IS_SHOW_TOUR_MARKER,           config.isShowTourMarker);
 
-         xmlConfig.putInteger(      ATTR_MARKER_FILL_OPACITY,           config.markerFill_Opacity);
-         xmlConfig.putInteger(      ATTR_MARKER_OUTLINE_OPACITY,        config.markerOutline_Opacity);
-         xmlConfig.putFloat(        ATTR_MARKER_OUTLINE_SIZE,           config.markerOutline_Size);
-         xmlConfig.putInteger(      ATTR_MARKER_SYMBOL_SIZE,            config.markerSymbol_Size);
          Util.setXmlRgb(xmlConfig,  TAG_MARKER_OUTLINE_COLOR,           config.markerOutline_RGB);
          Util.setXmlRgb(xmlConfig,  TAG_MARKER_FILL_COLOR,              config.markerFill_RGB);
 
@@ -407,13 +395,7 @@ public class Map2ConfigManager {
       config.id                           = Util.getXmlString(xmlConfig,      ATTR_ID,                            Long.toString(System.nanoTime()));
       config.name                         = Util.getXmlString(xmlConfig,      ATTR_CONFIG_NAME,                   UI.EMPTY_STRING);
 
-
       config.isShowTourMarker             = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_MARKER,           true);
-      config.markerFill_Opacity           = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_FILL_OPACITY,           Map25ConfigManager.DEFAULT_MARKER_FILL_OPACITY);
-      config.markerOutline_Opacity        = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_OUTLINE_OPACITY,        Map25ConfigManager.DEFAULT_MARKER_FILL_OPACITY);
-      config.markerOutline_Size           = Util.getXmlFloatFloat(xmlConfig,  ATTR_MARKER_OUTLINE_SIZE,           DEFAULT_MARKER_OUTLINE_SIZE,     MARKER_OUTLINE_SIZE_MIN,   MARKER_OUTLINE_SIZE_MAX);
-      config.markerSymbol_Size            = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_SYMBOL_SIZE,            DEFAULT_MARKER_SYMBOL_SIZE,      MARKER_SYMBOL_SIZE_MIN,    MARKER_SYMBOL_SIZE_MAX);
-
       config.isMarkerClustered            = Util.getXmlBoolean(xmlConfig,     ATTR_IS_MARKER_CLUSTERED,           true);
       config.isClusterSymbolAntialiased   = Util.getXmlBoolean(xmlConfig,     ATTR_IS_CLUSTER_SYMBOL_ANTIALIASED, true);
       config.isClusterTextAntialiased     = Util.getXmlBoolean(xmlConfig,     ATTR_IS_CLUSTER_TEXT_ANTIALIASED,   true);

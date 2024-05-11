@@ -296,6 +296,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    private int       _multiTourSerieIndex = -1;
 
    @Transient
+   private String    _markerMapLabel;
+
+   @Transient
    private String    _scrambledLabel;
 
    public TourMarker() {}
@@ -527,6 +530,30 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     */
    public long getMarkerId() {
       return markerId;
+   }
+
+   /**
+    * @return
+    */
+   public String getMarkerMapLabel() {
+
+      if (_markerMapLabel != null) {
+         return _markerMapLabel;
+      }
+
+      final String markerText = UI.IS_SCRAMBLE_DATA
+            ? getScrambledLabel()
+            : label;
+
+      String markerLabel = UI.SPACE + markerText + UI.SPACE;
+
+      if (getDescription().length() > 0) {
+         markerLabel += UI.SYMBOL_STAR;
+      }
+
+      _markerMapLabel = markerLabel;
+
+      return markerLabel;
    }
 
    /**

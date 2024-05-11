@@ -44,35 +44,37 @@ public class Map2MarkerConfig {
    public boolean isMarkerTextAntialiased   = true;
 
    public RGB     markerFill_RGB            = Map2ConfigManager.DEFAULT_MARKER_FILL_RGB;
-   public int     markerFill_Opacity        = Map2ConfigManager.DEFAULT_MARKER_FILL_OPACITY;
    public RGB     markerOutline_RGB         = Map2ConfigManager.DEFAULT_MARKER_OUTLINE_RGB;
-   public int     markerOutline_Opacity     = Map2ConfigManager.DEFAULT_MARKER_OUTLINE_OPACITY;
-   public float   markerOutline_Size        = Map2ConfigManager.DEFAULT_MARKER_OUTLINE_SIZE;
-   public int     markerSymbol_Size         = Map2ConfigManager.DEFAULT_MARKER_SYMBOL_SIZE;
 
    /*
     * Cluster
     */
-   public boolean isMarkerClustered          = true;
-   public boolean isClusterSymbolAntialiased = true;
-   public boolean isClusterTextAntialiased   = true;
-   public boolean isShowClusterMarker        = true;
+   public boolean        isMarkerClustered          = true;
+   public boolean        isClusterSymbolAntialiased = true;
+   public boolean        isClusterTextAntialiased   = true;
+   public boolean        isShowClusterMarker        = true;
 
-   public boolean isFillClusterSymbol        = Map2ConfigManager.DEFAULT_IS_FILL_CLUSTER_SYMBOL;
-   public int     clusterGridSize            = Map2ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
-   public int     clusterHoveredLabelSize    = Map2ConfigManager.DEFAULT_CLUSTER_HOVERED_LABEL_SIZE;
-   public RGB     clusterFill_RGB            = Map2ConfigManager.DEFAULT_CLUSTER_FILL_RGB;
-   public RGB     clusterOutline_RGB         = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_RGB;
-   public int     clusterOutline_Width       = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_WIDTH;
-   public int     clusterSymbol_Size         = Map2ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
+   public MapLabelLayout markerLabelLayout;
 
-   public Color   clusterFill_Color;
-   public Color   clusterOutline_Color;
+   public boolean        isFillClusterSymbol        = Map2ConfigManager.DEFAULT_IS_FILL_CLUSTER_SYMBOL;
+   public int            clusterGridSize            = Map2ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
+   public int            clusterHoveredLabelSize    = Map2ConfigManager.DEFAULT_CLUSTER_HOVERED_LABEL_SIZE;
+   public RGB            clusterFill_RGB            = Map2ConfigManager.DEFAULT_CLUSTER_FILL_RGB;
+   public RGB            clusterOutline_RGB         = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_RGB;
+   public int            clusterOutline_Width       = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_WIDTH;
+   public int            clusterSymbol_Size         = Map2ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
+
+   public Color          clusterFill_Color;
+   public Color          clusterOutline_Color;
+   public Color          markerFill_Color;
+   public Color          markerOutline_Color;
 
    public void setupColors() {
 
       clusterFill_Color = new Color(clusterFill_RGB);
       clusterOutline_Color = new Color(clusterOutline_RGB);
+      markerFill_Color = new Color(markerFill_RGB);
+      markerOutline_Color = new Color(markerOutline_RGB);
    }
 
    @Override
@@ -87,12 +89,8 @@ public class Map2MarkerConfig {
             + " id                        = " + id + NL //                          //$NON-NLS-1$
 
             + " isShowTourMarker          = " + isShowTourMarker + NL //            //$NON-NLS-1$
-            + " markerSymbol_Size         = " + markerSymbol_Size + NL //           //$NON-NLS-1$
-            + " markerOutline_Opacity     = " + markerOutline_Opacity + NL //       //$NON-NLS-1$
             + " markerOutline_RGB         = " + markerOutline_RGB + NL //           //$NON-NLS-1$
-            + " markerOutline_Size        = " + markerOutline_Size + NL //          //$NON-NLS-1$
             + " markerFill_RGB            = " + markerFill_RGB + NL //              //$NON-NLS-1$
-            + " markerFill_Opacity        = " + markerFill_Opacity + NL //          //$NON-NLS-1$
 
             + " isMarkerClustered            = " + isMarkerClustered + NL //           //$NON-NLS-1$
             + " isClusterSymbolAntialiased   = " + isClusterSymbolAntialiased + NL //  //$NON-NLS-1$
