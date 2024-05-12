@@ -96,72 +96,69 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements ITourViewer2, IColorSelectorListener {
 
-   private static final String        COLUMN_CREATED_DATE_TIME        = "createdDateTime";                         //$NON-NLS-1$
-   private static final String        COLUMN_LOCATION_NAME            = "LocationName";                            //$NON-NLS-1$
-   private static final String        COLUMN_SEQUENCE                 = "sequence";                                //$NON-NLS-1$
-   private static final String        COLUMN_ZOOM_LEVEL               = "zoomLevel";                               //$NON-NLS-1$
+   private static final String     COLUMN_CREATED_DATE_TIME        = "createdDateTime";                         //$NON-NLS-1$
+   private static final String     COLUMN_LOCATION_NAME            = "LocationName";                            //$NON-NLS-1$
+   private static final String     COLUMN_SEQUENCE                 = "sequence";                                //$NON-NLS-1$
+   private static final String     COLUMN_ZOOM_LEVEL               = "zoomLevel";                               //$NON-NLS-1$
    //
-   private static final String        STATE_SELECTED_TAB              = "STATE_SELECTED_TAB";                      //$NON-NLS-1$
-   private static final String        STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";             //$NON-NLS-1$
-   private static final String        STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                    //$NON-NLS-1$
-   //
-   public static final String         STATE_DURATION_OPERATOR         = "STATE_DURATION_OPERATOR";                 //$NON-NLS-1$
-   public static final MapLabelLayout STATE_DURATION_OPERATOR_DEFAULT = MapLabelLayout.RECTANGLE_BOX;
+   private static final String     STATE_SELECTED_TAB              = "STATE_SELECTED_TAB";                      //$NON-NLS-1$
+   private static final String     STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";             //$NON-NLS-1$
+   private static final String     STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                    //$NON-NLS-1$
    //
    /**
     * MUST be in sync with {@link #_allMarkerLabelLayout_Label}
     */
-   private static MapLabelLayout[]    _allMarkerLabelLayout_Value     = {
+   private static MapLabelLayout[] _allMarkerLabelLayout_Value     = {
 
          MapLabelLayout.RECTANGLE_BOX,
-         MapLabelLayout.BORDER_ONE_POINT,
-         MapLabelLayout.BORDER_TWO_POINT,
-         MapLabelLayout.BORDER_THREE_POINT,
+         MapLabelLayout.BORDER_2_POINT,
+         MapLabelLayout.BORDER_1_POINT,
+         MapLabelLayout.BORDER_0_POINT,
 
    };
    //
    /**
     * MUST be in sync with {@link #_allMarkerLabelLayout_Value}
     */
-   private static String[]            _allMarkerLabelLayout_Label     = {
+   private static String[]         _allMarkerLabelLayout_Label     = {
 
          "Rectangle Box",
-         "1 Point Border",
          "2 Point Border",
-         "3 Point Border",
+         "1 Point Border",
+         "0 Point Border",
 
    };
    //
-   private final IPreferenceStore     _prefStore                      = TourbookPlugin.getPrefStore();
-   private IDialogSettings            _state_Map2;
-   private IDialogSettings            _state_Slideout;
+   private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
+   private IDialogSettings         _state_Map2;
+   private IDialogSettings         _state_Slideout;
    //
-   private Map2View                   _map2View;
-   private ToolItem                   _toolItem;
+   private Map2View                _map2View;
+   private ToolItem                _toolItem;
    //
-   private TableViewer                _mapCommonLocationViewer;
-   private MapLocationComparator      _mapLocationComparator          = new MapLocationComparator();
-   private ColumnManager              _columnManager;
-   private SelectionAdapter           _columnSortListener;
+   private TableViewer             _mapCommonLocationViewer;
+   private MapLocationComparator   _mapLocationComparator          = new MapLocationComparator();
+   private ColumnManager           _columnManager;
+   private SelectionAdapter        _columnSortListener;
    //
-   private SelectionListener          _defaultSelectionListener;
-   private SelectionListener          _markerSelectionListener;
-   private IPropertyChangeListener    _markerPropertyChangeListener;
-   private MouseWheelListener         _markerMouseWheelListener;
-   private FocusListener              _keepOpenListener;
-   private IPropertyChangeListener    _prefChangeListener;
+   private SelectionListener       _defaultSelectionListener;
+   private SelectionListener       _markerSelectionListener;
+   private IPropertyChangeListener _markerPropertyChangeListener;
+   private MouseWheelListener      _markerMouseWheelListener;
+   private FocusListener           _keepOpenListener;
+   private IPropertyChangeListener _prefChangeListener;
    //
-   private MenuManager                _viewerMenuManager;
-   private IContextMenuProvider       _tableViewerContextMenuProvider = new TableContextMenuProvider();
-   private ActionDeleteLocation       _actionDeleteLocation;
+   private MenuManager             _viewerMenuManager;
+   private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
+   private ActionDeleteLocation    _actionDeleteLocation;
    //
-   private List<TourLocation>         _allMapLocations                = CommonLocationManager.getCommonLocations();
+   private List<TourLocation>      _allMapLocations                = CommonLocationManager.getCommonLocations();
    //
-   private TourLocationToolTip        _locationTooltip;
+   private TourLocationToolTip     _locationTooltip;
    //
-   private PixelConverter             _pc;
+   private PixelConverter          _pc;
    //
-   private final NumberFormat         _nf3                            = NumberFormat.getNumberInstance();
+   private final NumberFormat      _nf3                            = NumberFormat.getNumberInstance();
    {
       _nf3.setMinimumFractionDigits(3);
       _nf3.setMaximumFractionDigits(3);
@@ -189,6 +186,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    private Button                _chkIsClusterTextAntialiased;
    private Button                _chkIsFillClusterSymbol;
    private Button                _chkIsMarkerClustered;
+   private Button                _chkIsMarkerLabelAntialiased;
    private Button                _chkIsShowCommonLocations;
    private Button                _chkIsShowMapLocations_BoundingBox;
    private Button                _chkIsShowTourLocations;
@@ -586,22 +584,6 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
             _chkIsShowTourMarker.setText(Messages.Slideout_Map25MarkerOptions_Checkbox_IsShowTourMarker);
             _chkIsShowTourMarker.addSelectionListener(_markerSelectionListener);
          }
-         {
-            /*
-             * Antialias text
-             */
-            _chkIsClusterTextAntialiased = new Button(tabContainer, SWT.CHECK);
-            _chkIsClusterTextAntialiased.setText("Antialias text painting");
-            _chkIsClusterTextAntialiased.addSelectionListener(_markerSelectionListener);
-         }
-         {
-            /*
-             * Antialias symbol
-             */
-            _chkIsClusterSymbolAntialiased = new Button(tabContainer, SWT.CHECK);
-            _chkIsClusterSymbolAntialiased.setText("Antialias symbol painting");
-            _chkIsClusterSymbolAntialiased.addSelectionListener(_markerSelectionListener);
-         }
 
          final Composite container = new Composite(tabContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -661,8 +643,8 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
          // label
          _lblMarkerLabelLayout = new Label(parent, SWT.NONE);
-         _lblMarkerLabelLayout.setText(Messages.Slideout_MapLocation_Label_MarkerColor);
-         _lblMarkerLabelLayout.setToolTipText(Messages.Slideout_MapLocation_Label_MarkerColor_Tooltip);
+         _lblMarkerLabelLayout.setText("Marker &background");
+         _lblMarkerLabelLayout.setToolTipText("");
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(_lblMarkerLabelLayout);
@@ -670,8 +652,19 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          // combo
          _comboMarkerLabelLayout = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
          _comboMarkerLabelLayout.setVisibleItemCount(20);
-         _comboMarkerLabelLayout.addSelectionListener(_defaultSelectionListener);
+         _comboMarkerLabelLayout.addSelectionListener(_markerSelectionListener);
          _comboMarkerLabelLayout.addFocusListener(_keepOpenListener);
+      }
+      {
+         /*
+          * Antialias marker text
+          */
+         _chkIsMarkerLabelAntialiased = new Button(parent, SWT.CHECK);
+         _chkIsMarkerLabelAntialiased.setText("Antialias marker label");
+         _chkIsMarkerLabelAntialiased.addSelectionListener(_markerSelectionListener);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .applyTo(_chkIsMarkerLabelAntialiased);
       }
    }
 
@@ -708,7 +701,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          // spinner
          _spinnerClusterGrid_Size = new Spinner(parent, SWT.BORDER);
          _spinnerClusterGrid_Size.setMinimum(0);
-         _spinnerClusterGrid_Size.setMaximum(Map2ConfigManager.CLUSTER_GRID_MAX_SIZE);
+         _spinnerClusterGrid_Size.setMaximum(Map2ConfigManager.CLUSTER_GRID_SIZE_MAX);
          _spinnerClusterGrid_Size.setIncrement(1);
          _spinnerClusterGrid_Size.setPageIncrement(10);
          _spinnerClusterGrid_Size.addSelectionListener(_markerSelectionListener);
@@ -730,7 +723,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          // spinner
          _spinnerClusterHoveredLabel_Size = new Spinner(parent, SWT.BORDER);
          _spinnerClusterHoveredLabel_Size.setMinimum(0);
-         _spinnerClusterHoveredLabel_Size.setMaximum(Map2ConfigManager.CLUSTER_GRID_MAX_SIZE);
+         _spinnerClusterHoveredLabel_Size.setMaximum(Map2ConfigManager.CLUSTER_GRID_SIZE_MAX);
          _spinnerClusterHoveredLabel_Size.setIncrement(1);
          _spinnerClusterHoveredLabel_Size.setPageIncrement(10);
          _spinnerClusterHoveredLabel_Size.addSelectionListener(_markerSelectionListener);
@@ -832,6 +825,30 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
                   .indent(clusterIndent, 0)
                   .applyTo(_chkIsFillClusterSymbol);
          }
+      }
+      {
+         /*
+          * Antialias text
+          */
+         _chkIsClusterTextAntialiased = new Button(parent, SWT.CHECK);
+         _chkIsClusterTextAntialiased.setText("Antialias text painting");
+         _chkIsClusterTextAntialiased.addSelectionListener(_markerSelectionListener);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .indent(clusterIndent, 0)
+               .applyTo(_chkIsClusterTextAntialiased);
+      }
+      {
+         /*
+          * Antialias symbol
+          */
+         _chkIsClusterSymbolAntialiased = new Button(parent, SWT.CHECK);
+         _chkIsClusterSymbolAntialiased.setText("Antialias symbol painting");
+         _chkIsClusterSymbolAntialiased.addSelectionListener(_markerSelectionListener);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .indent(clusterIndent, 0)
+               .applyTo(_chkIsClusterSymbolAntialiased);
       }
    }
 
@@ -1187,10 +1204,11 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _btnSwapClusterSymbolColor       .setEnabled(isShowClusteredMarker);
       _btnSwapMarkerColor              .setEnabled(isShowTourMarker);
 
-      _chkIsClusterSymbolAntialiased   .setEnabled(isShowTourMarker);
-      _chkIsClusterTextAntialiased     .setEnabled(isShowTourMarker);
-      _chkIsMarkerClustered            .setEnabled(isShowTourMarker);
+      _chkIsClusterSymbolAntialiased   .setEnabled(isShowClusteredMarker);
+      _chkIsClusterTextAntialiased     .setEnabled(isShowClusteredMarker);
       _chkIsFillClusterSymbol          .setEnabled(isShowClusteredMarker);
+      _chkIsMarkerClustered            .setEnabled(isShowTourMarker);
+      _chkIsMarkerLabelAntialiased     .setEnabled(isShowTourMarker);
 
       _lblClusterGrid_Size             .setEnabled(isShowClusteredMarker);
       _lblClusterHoverdLabel_Size      .setEnabled(isShowClusteredMarker);
@@ -1204,12 +1222,12 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _spinnerClusterSymbol_Size       .setEnabled(isShowClusteredMarker);
       _spinnerClusterOutline_Width     .setEnabled(isShowClusteredMarker);
 
-      _comboMarkerLabelLayout       .setEnabled(isShowTourMarker);
-
       _colorClusterSymbol_Fill         .setEnabled(isShowClusteredMarker);
       _colorClusterSymbol_Outline      .setEnabled(isShowClusteredMarker);
       _colorMarkerLabel_Fill           .setEnabled(isShowTourMarker);
       _colorMarkerLabel_Outline        .setEnabled(isShowTourMarker);
+
+      _comboMarkerLabelLayout          .setEnabled(isShowTourMarker);
 
       /*
        * Common locations
@@ -1280,7 +1298,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       if (selectedIndex >= 0) {
          return _allMarkerLabelLayout_Value[selectedIndex];
       } else {
-         return STATE_DURATION_OPERATOR_DEFAULT;
+         return Map2ConfigManager.MARKER_LABEL_LAYOUT_DEFAULT;
       }
    }
 
@@ -1593,10 +1611,11 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _chkIsShowTourMarker             .setSelection( config.isShowTourMarker);
 
 
-      _chkIsMarkerClustered            .setSelection( config.isMarkerClustered);
       _chkIsClusterSymbolAntialiased   .setSelection( config.isClusterSymbolAntialiased);
       _chkIsClusterTextAntialiased     .setSelection( config.isClusterTextAntialiased);
       _chkIsFillClusterSymbol          .setSelection( config.isFillClusterSymbol);
+      _chkIsMarkerClustered            .setSelection( config.isMarkerClustered);
+      _chkIsMarkerLabelAntialiased     .setSelection( config.isMarkerLabelAntialiased);
 
       _spinnerClusterGrid_Size         .setSelection( config.clusterGridSize);
       _spinnerClusterHoveredLabel_Size .setSelection( config.clusterHoveredLabelSize);
@@ -1610,7 +1629,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
 // SET_FORMATTING_ON
 
-      selectPauseDurationOperator(config.markerLabelLayout);
+      selectMarkerLabelLayout(config.markerLabelLayout);
 
    }
 
@@ -1638,11 +1657,12 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
       config.isShowTourMarker             = _chkIsShowTourMarker              .getSelection();
 
-
-      config.isMarkerClustered            = _chkIsMarkerClustered             .getSelection();
       config.isClusterSymbolAntialiased   = _chkIsClusterSymbolAntialiased    .getSelection();
       config.isClusterTextAntialiased     = _chkIsClusterTextAntialiased      .getSelection();
       config.isFillClusterSymbol          = _chkIsFillClusterSymbol           .getSelection();
+
+      config.isMarkerClustered            = _chkIsMarkerClustered             .getSelection();
+      config.isMarkerLabelAntialiased     = _chkIsMarkerLabelAntialiased      .getSelection();
 
       config.clusterGridSize              = _spinnerClusterGrid_Size          .getSelection();
       config.clusterHoveredLabelSize      = _spinnerClusterHoveredLabel_Size  .getSelection();
@@ -1660,7 +1680,6 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
       config.setupColors();
 
-
    }
 
    @Override
@@ -1676,7 +1695,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       super.saveState();
    }
 
-   private void selectPauseDurationOperator(final Enum<MapLabelLayout> filterOperator) {
+   private void selectMarkerLabelLayout(final Enum<MapLabelLayout> filterOperator) {
 
       int selectionIndex = 0;
 

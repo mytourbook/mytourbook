@@ -39,35 +39,35 @@ public class Map2MarkerConfig {
    /*
     * Marker
     */
-   public boolean isShowTourMarker          = true;
-   public boolean isMarkerSymbolAntialiased = true;
-   public boolean isMarkerTextAntialiased   = true;
+   public boolean        isShowTourMarker         = true;
+   public boolean        isMarkerLabelAntialiased = true;
 
-   public RGB     markerFill_RGB            = Map2ConfigManager.DEFAULT_MARKER_FILL_RGB;
-   public RGB     markerOutline_RGB         = Map2ConfigManager.DEFAULT_MARKER_OUTLINE_RGB;
+   public MapLabelLayout markerLabelLayout        = Map2ConfigManager.MARKER_LABEL_LAYOUT_DEFAULT;
+
+   public RGB            markerFill_RGB           = Map2ConfigManager.DEFAULT_MARKER_FILL_RGB;
+   public RGB            markerOutline_RGB        = Map2ConfigManager.DEFAULT_MARKER_OUTLINE_RGB;
+
+   public Color          markerFill_Color;
+   public Color          markerOutline_Color;
 
    /*
     * Cluster
     */
-   public boolean        isMarkerClustered          = true;
-   public boolean        isClusterSymbolAntialiased = true;
-   public boolean        isClusterTextAntialiased   = true;
-   public boolean        isShowClusterMarker        = true;
+   public boolean isMarkerClustered          = true;
+   public boolean isClusterSymbolAntialiased = true;
+   public boolean isClusterTextAntialiased   = true;
+   public boolean isShowClusterMarker        = true;
 
-   public MapLabelLayout markerLabelLayout;
+   public boolean isFillClusterSymbol        = Map2ConfigManager.DEFAULT_IS_FILL_CLUSTER_SYMBOL;
+   public int     clusterGridSize            = Map2ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
+   public int     clusterHoveredLabelSize    = Map2ConfigManager.DEFAULT_CLUSTER_HOVERED_LABEL_SIZE;
+   public RGB     clusterFill_RGB            = Map2ConfigManager.DEFAULT_CLUSTER_FILL_RGB;
+   public RGB     clusterOutline_RGB         = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_RGB;
+   public int     clusterOutline_Width       = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_WIDTH;
+   public int     clusterSymbol_Size         = Map2ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
 
-   public boolean        isFillClusterSymbol        = Map2ConfigManager.DEFAULT_IS_FILL_CLUSTER_SYMBOL;
-   public int            clusterGridSize            = Map2ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
-   public int            clusterHoveredLabelSize    = Map2ConfigManager.DEFAULT_CLUSTER_HOVERED_LABEL_SIZE;
-   public RGB            clusterFill_RGB            = Map2ConfigManager.DEFAULT_CLUSTER_FILL_RGB;
-   public RGB            clusterOutline_RGB         = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_RGB;
-   public int            clusterOutline_Width       = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_WIDTH;
-   public int            clusterSymbol_Size         = Map2ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
-
-   public Color          clusterFill_Color;
-   public Color          clusterOutline_Color;
-   public Color          markerFill_Color;
-   public Color          markerOutline_Color;
+   public Color   clusterFill_Color;
+   public Color   clusterOutline_Color;
 
    public void setupColors() {
 

@@ -19,7 +19,7 @@ public enum MapLabelLayout {
 
    RECTANGLE_BOX, //
 
-   BORDER_ONE_POINT, //
-   BORDER_TWO_POINT, //
-   BORDER_THREE_POINT, //
+   BORDER_0_POINT, //
+   BORDER_1_POINT, //
+   BORDER_2_POINT, //
 }

@@ -107,6 +107,7 @@ import net.tourbook.map2.view.Map2ConfigManager;
 import net.tourbook.map2.view.Map2Marker;
 import net.tourbook.map2.view.Map2MarkerConfig;
 import net.tourbook.map2.view.Map2View;
+import net.tourbook.map2.view.MapLabelLayout;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.TourPainterConfiguration;
 import net.tourbook.map2.view.WayPointToolTipProvider;
@@ -4590,6 +4591,10 @@ public class Map2 extends Canvas {
 
    private void paint_BackgroundImage_20_AllMarker(final GC gc, final List<PaintedMarker> allPaintedMarkers) {
 
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+
+      gc.setTextAntialias(markerConfig.isMarkerLabelAntialiased ? SWT.ON : SWT.OFF);
+
       final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
 
       for (final TourData tourData : allTourData) {
@@ -4712,6 +4717,7 @@ public class Map2 extends Canvas {
       }
 
       gc.setFont(gcFontBackup);
+      gc.setTextAntialias(markerConfig.isMarkerLabelAntialiased ? SWT.ON : SWT.OFF);
 
       // markers MUST be sorted otherwise they are flickering when the sequence is randomly
       Collections.sort(
@@ -4774,35 +4780,40 @@ public class Map2 extends Canvas {
 
       final Rectangle markerRectangle = new Rectangle(devX, devY, textExtent.x, textHeight);
 
-      boolean isDrawRectangle = true;
-
-      isDrawRectangle = true;
-      isDrawRectangle = false;
-      isDrawRectangle = isDrawRectangle;
-
-      if (isDrawRectangle) {
+      /*
+       * Draw marker background
+       */
+      if (markerConfig.markerLabelLayout.equals(MapLabelLayout.RECTANGLE_BOX)) {
 
          gc.setBackground(markerConfig.markerFill_Color);
          gc.fillRectangle(markerRectangle);
 
-      } else {
+      } else if (markerConfig.markerLabelLayout.equals(MapLabelLayout.BORDER_0_POINT)) {
+
+         // no border
+
+      } else if (markerConfig.markerLabelLayout.equals(MapLabelLayout.BORDER_1_POINT)) {
 
          gc.setForeground(markerConfig.markerFill_Color);
 
-//         gc.drawString(markerLabel, devX - 1, devY, true);
-//         gc.drawString(markerLabel, devX + 1, devY, true);
-//         gc.drawString(markerLabel, devX, devY - 1, true);
-//         gc.drawString(markerLabel, devX, devY + 1, true);
+         gc.drawString(markerLabel, devX - 1, devY, true);
+         gc.drawString(markerLabel, devX + 1, devY, true);
+         gc.drawString(markerLabel, devX, devY - 1, true);
+         gc.drawString(markerLabel, devX, devY + 1, true);
+
+      } else if (markerConfig.markerLabelLayout.equals(MapLabelLayout.BORDER_2_POINT)) {
+
+         gc.setForeground(markerConfig.markerFill_Color);
+
+         gc.drawString(markerLabel, devX - 1, devY, true);
+         gc.drawString(markerLabel, devX + 1, devY, true);
+         gc.drawString(markerLabel, devX, devY - 1, true);
+         gc.drawString(markerLabel, devX, devY + 1, true);
 
          gc.drawString(markerLabel, devX - 2, devY, true);
          gc.drawString(markerLabel, devX + 2, devY, true);
          gc.drawString(markerLabel, devX, devY - 2, true);
          gc.drawString(markerLabel, devX, devY + 2, true);
-
-//         gc.drawString(markerLabel, devX - 3, devY, true);
-//         gc.drawString(markerLabel, devX + 3, devY, true);
-//         gc.drawString(markerLabel, devX, devY - 3, true);
-//         gc.drawString(markerLabel, devX, devY + 3, true);
       }
 
       gc.setForeground(markerConfig.markerOutline_Color);
@@ -5019,7 +5030,6 @@ public class Map2 extends Canvas {
       final int diffX = _backgroundPainter_MicroAdjustment_DiffX;
       final int diffY = _backgroundPainter_MicroAdjustment_DiffY;
 
-
       /*
        * Setup labels for the cluster labeler
        */
@@ -5044,7 +5054,6 @@ public class Map2 extends Canvas {
          if (clusterItem instanceof final Map2Marker mapMarker) {
 
             final TourMarker tourMarker = mapMarker.tourMarker;
-
 
             final int devX = mapMarker.geoPointDevX;
             final int devY = mapMarker.geoPointDevY;
