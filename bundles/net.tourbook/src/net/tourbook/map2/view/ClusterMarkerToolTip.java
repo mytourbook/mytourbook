@@ -16,7 +16,7 @@
 package net.tourbook.map2.view;
 
 import de.byteholder.geoclipse.map.Map2;
-import de.byteholder.geoclipse.map.PaintedClusterMarker;
+import de.byteholder.geoclipse.map.PaintedMarker;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
@@ -46,23 +46,23 @@ import org.eclipse.swt.widgets.Text;
  */
 public class ClusterMarkerToolTip extends ToolTip {
 
-   private static final int     DEFAULT_TEXT_WIDTH  = 50;
-   private static final int     DEFAULT_TEXT_HEIGHT = 20;
+   private static final int DEFAULT_TEXT_WIDTH  = 50;
+   private static final int DEFAULT_TEXT_HEIGHT = 20;
 
-   private static final int     _textStyle          = SWT.WRAP               //
+   private static final int _textStyle          = SWT.WRAP                   //
          | SWT.MULTI
          | SWT.READ_ONLY
 //                                                               | SWT.BORDER
    ;
 
-   private Map2                 _map2;
+   private Map2             _map2;
 
-   private PaintedClusterMarker _hoveredMarker;
+   private PaintedMarker    _hoveredMarker;
 
-   private PixelConverter       _pc;
-   private int                  _defaultTextWidth;
-   private int                  _defaultTextHeight;
-   private Font                 _boldFont;
+   private PixelConverter   _pc;
+   private int              _defaultTextWidth;
+   private int              _defaultTextHeight;
+   private Font             _boldFont;
 
    public ClusterMarkerToolTip(final Map2 map2) {
 

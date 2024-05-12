@@ -17,6 +17,7 @@ package de.byteholder.geoclipse.map;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TourMarker;
+import net.tourbook.map2.view.Map2Marker;
 
 import org.eclipse.swt.graphics.Rectangle;
 
@@ -24,13 +25,26 @@ public class PaintedMarker {
 
    private static final char NL = UI.NEW_LINE;
 
-   public TourMarker         tourMarker;
-   public Rectangle          markerRectangle;
+   /**
+    * Contains the {@link TourMarker}
+    */
+   public Map2Marker         mapMarker;
 
-   public PaintedMarker(final TourMarker marker, final Rectangle rectangle) {
+   /**
+    * Rectangle of the painted marker label
+    */
+   public Rectangle          markerLabelRectangle;
 
-      tourMarker = marker;
-      markerRectangle = rectangle;
+   /**
+    * Rectangle of the painted marker location symbol
+    */
+   public Rectangle          markerSymbolRectangle;
+
+   public PaintedMarker(final Map2Marker mapMarker,
+                        final Rectangle markerLabelRectangle) {
+
+      this.mapMarker = mapMarker;
+      this.markerLabelRectangle = markerLabelRectangle;
    }
 
    @Override
@@ -38,9 +52,9 @@ public class PaintedMarker {
 
       return UI.EMPTY_STRING
 
-            + "PaintedMarker" + NL //                                  //$NON-NLS-1$
+            + "PaintedClusterMarker" + NL //                         //$NON-NLS-1$
 
-            + " markerRectangle = " + markerRectangle + NL //   //$NON-NLS-1$
+            + " mapMarker     = " + mapMarker.tourMarker.getLabel() + NL //           //$NON-NLS-1$
 
       ;
    }

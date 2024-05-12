@@ -20,7 +20,7 @@ import de.byteholder.geoclipse.map.IDirectPainter;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Map2Painter;
 import de.byteholder.geoclipse.map.MapLegend;
-import de.byteholder.geoclipse.map.PaintedClusterMarker;
+import de.byteholder.geoclipse.map.PaintedMarker;
 import de.byteholder.geoclipse.map.PaintedMapLocation;
 import de.byteholder.geoclipse.mapprovider.MP;
 
@@ -242,7 +242,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
       gc.setAntialias(SWT.ON);
 
-      final PaintedClusterMarker hoveredMarker = painterContext.hoveredClusterMarker;
+      final PaintedMarker hoveredMarker = painterContext.hoveredClusterMarker;
       final Rectangle markerLabelRectangle = hoveredMarker.markerLabelRectangle;
       final int labelWidth = markerLabelRectangle.width;
       final int labelHeight = markerLabelRectangle.height;
