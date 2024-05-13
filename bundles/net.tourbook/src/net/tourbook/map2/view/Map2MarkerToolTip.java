@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Text;
  * {@link org.eclipse.ui.internal.dialogs.CustomizePerspectiveDialog} and
  * {@link org.eclipse.jface.viewers.ColumnViewerToolTipSupport}
  */
-public class ClusterMarkerToolTip extends ToolTip {
+public class Map2MarkerToolTip extends ToolTip {
 
    private static final int DEFAULT_TEXT_WIDTH  = 50;
    private static final int DEFAULT_TEXT_HEIGHT = 20;
@@ -64,7 +64,7 @@ public class ClusterMarkerToolTip extends ToolTip {
    private int              _defaultTextHeight;
    private Font             _boldFont;
 
-   public ClusterMarkerToolTip(final Map2 map2) {
+   public Map2MarkerToolTip(final Map2 map2) {
 
       super(map2, NO_RECREATE, true);
 
@@ -264,7 +264,7 @@ public class ClusterMarkerToolTip extends ToolTip {
    @Override
    protected Object getToolTipArea(final Event event) {
 
-      _hoveredMarker = _map2.getHoveredClusterMarker();
+      _hoveredMarker = _map2.getHoveredMarker();
 
       return _hoveredMarker;
    }

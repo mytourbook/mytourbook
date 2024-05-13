@@ -145,6 +145,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    private SelectionListener       _markerSelectionListener;
    private IPropertyChangeListener _markerPropertyChangeListener;
    private MouseWheelListener      _markerMouseWheelListener;
+   private MouseWheelListener      _markerMouseWheelListener10;
    private FocusListener           _keepOpenListener;
    private IPropertyChangeListener _prefChangeListener;
    //
@@ -195,16 +196,18 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    private Combo                 _comboMarkerLabelLayout;
    //
    private Label                 _lblClusterGrid_Size;
-   private Label                 _lblClusterHoverdLabel_Size;
    private Label                 _lblClusterSymbol;
    private Label                 _lblClusterSymbol_Size;
+   private Label                 _lblLabelDistributorMaxLabels;
+   private Label                 _lblLabelDistributorRadius;
    private Label                 _lblMarkerLabelColor;
    private Label                 _lblMarkerLabelLayout;
    //
    private Spinner               _spinnerClusterGrid_Size;
-   private Spinner               _spinnerClusterHoveredLabel_Size;
    private Spinner               _spinnerClusterOutline_Width;
    private Spinner               _spinnerClusterSymbol_Size;
+   private Spinner               _spinnerLabelDistributorMaxLabels;
+   private Spinner               _spinnerLabelDistributorRadius;
    //
    private ColorSelectorExtended _colorClusterSymbol_Fill;
    private ColorSelectorExtended _colorClusterSymbol_Outline;
@@ -638,7 +641,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       }
       {
          /*
-          * Marker label layout
+          * Marker background
           */
 
          // label
@@ -654,6 +657,49 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          _comboMarkerLabelLayout.setVisibleItemCount(20);
          _comboMarkerLabelLayout.addSelectionListener(_markerSelectionListener);
          _comboMarkerLabelLayout.addFocusListener(_keepOpenListener);
+      }
+      {
+         /*
+          * Label distributor max items
+          */
+         // label
+         _lblLabelDistributorMaxLabels = new Label(parent, SWT.NONE);
+         _lblLabelDistributorMaxLabels.setText("Label distributor &max");
+         _lblLabelDistributorMaxLabels.setToolTipText(
+               "Number of ALL labels which are distributed within the map viewport or a hovered cluster. A large number can slow down performance");
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_lblLabelDistributorMaxLabels);
+
+         // spinner
+         _spinnerLabelDistributorMaxLabels = new Spinner(parent, SWT.BORDER);
+         _spinnerLabelDistributorMaxLabels.setMinimum(Map2ConfigManager.LABEL_DISTRIBUTOR_MAX_LABELS_MIN);
+         _spinnerLabelDistributorMaxLabels.setMaximum(Map2ConfigManager.LABEL_DISTRIBUTOR_MAX_LABELS_MAX);
+         _spinnerLabelDistributorMaxLabels.setIncrement(10);
+         _spinnerLabelDistributorMaxLabels.setPageIncrement(100);
+         _spinnerLabelDistributorMaxLabels.addSelectionListener(_markerSelectionListener);
+         _spinnerLabelDistributorMaxLabels.addMouseWheelListener(_markerMouseWheelListener10);
+      }
+      {
+         /*
+          * Label distributor radius
+          */
+         // label
+         _lblLabelDistributorRadius = new Label(parent, SWT.NONE);
+         _lblLabelDistributorRadius.setText("Label distributor &radius");
+         _lblLabelDistributorRadius.setToolTipText("Radius for the displayed labels around the marker locations");
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_lblLabelDistributorRadius);
+
+         // spinner
+         _spinnerLabelDistributorRadius = new Spinner(parent, SWT.BORDER);
+         _spinnerLabelDistributorRadius.setMinimum(Map2ConfigManager.LABEL_DISTRIBUTOR_RADIUS_MIN);
+         _spinnerLabelDistributorRadius.setMaximum(Map2ConfigManager.LABEL_DISTRIBUTOR_RADIUS_MAX);
+         _spinnerLabelDistributorRadius.setIncrement(10);
+         _spinnerLabelDistributorRadius.setPageIncrement(100);
+         _spinnerLabelDistributorRadius.addSelectionListener(_markerSelectionListener);
+         _spinnerLabelDistributorRadius.addMouseWheelListener(_markerMouseWheelListener10);
       }
       {
          /*
@@ -702,32 +748,10 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          _spinnerClusterGrid_Size = new Spinner(parent, SWT.BORDER);
          _spinnerClusterGrid_Size.setMinimum(0);
          _spinnerClusterGrid_Size.setMaximum(Map2ConfigManager.CLUSTER_GRID_SIZE_MAX);
-         _spinnerClusterGrid_Size.setIncrement(1);
-         _spinnerClusterGrid_Size.setPageIncrement(10);
+         _spinnerClusterGrid_Size.setIncrement(10);
+         _spinnerClusterGrid_Size.setPageIncrement(100);
          _spinnerClusterGrid_Size.addSelectionListener(_markerSelectionListener);
-         _spinnerClusterGrid_Size.addMouseWheelListener(_markerMouseWheelListener);
-      }
-      {
-         /*
-          * Hovered cluster label size
-          */
-         // label
-         _lblClusterHoverdLabel_Size = new Label(parent, SWT.NONE);
-         _lblClusterHoverdLabel_Size.setText("Hovered size");
-         _lblClusterHoverdLabel_Size.setToolTipText("Size of the displayed labels, a large number can slow down performance");
-         GridDataFactory.fillDefaults()
-               .align(SWT.FILL, SWT.CENTER)
-               .indent(clusterIndent, 0)
-               .applyTo(_lblClusterHoverdLabel_Size);
-
-         // spinner
-         _spinnerClusterHoveredLabel_Size = new Spinner(parent, SWT.BORDER);
-         _spinnerClusterHoveredLabel_Size.setMinimum(0);
-         _spinnerClusterHoveredLabel_Size.setMaximum(Map2ConfigManager.CLUSTER_GRID_SIZE_MAX);
-         _spinnerClusterHoveredLabel_Size.setIncrement(1);
-         _spinnerClusterHoveredLabel_Size.setPageIncrement(10);
-         _spinnerClusterHoveredLabel_Size.addSelectionListener(_markerSelectionListener);
-         _spinnerClusterHoveredLabel_Size.addMouseWheelListener(_markerMouseWheelListener);
+         _spinnerClusterGrid_Size.addMouseWheelListener(_markerMouseWheelListener10);
       }
       {
          /*
@@ -1201,33 +1225,35 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
       final boolean isShowClusteredMarker = isShowTourMarker && isMarkerClustered;
 
-      _btnSwapClusterSymbolColor       .setEnabled(isShowClusteredMarker);
-      _btnSwapMarkerColor              .setEnabled(isShowTourMarker);
+      _btnSwapClusterSymbolColor          .setEnabled(isShowClusteredMarker);
+      _btnSwapMarkerColor                 .setEnabled(isShowTourMarker);
 
-      _chkIsClusterSymbolAntialiased   .setEnabled(isShowClusteredMarker);
-      _chkIsClusterTextAntialiased     .setEnabled(isShowClusteredMarker);
-      _chkIsFillClusterSymbol          .setEnabled(isShowClusteredMarker);
-      _chkIsMarkerClustered            .setEnabled(isShowTourMarker);
-      _chkIsMarkerLabelAntialiased     .setEnabled(isShowTourMarker);
+      _chkIsClusterSymbolAntialiased      .setEnabled(isShowClusteredMarker);
+      _chkIsClusterTextAntialiased        .setEnabled(isShowClusteredMarker);
+      _chkIsFillClusterSymbol             .setEnabled(isShowClusteredMarker);
+      _chkIsMarkerClustered               .setEnabled(isShowTourMarker);
+      _chkIsMarkerLabelAntialiased        .setEnabled(isShowTourMarker);
 
-      _lblClusterGrid_Size             .setEnabled(isShowClusteredMarker);
-      _lblClusterHoverdLabel_Size      .setEnabled(isShowClusteredMarker);
-      _lblClusterSymbol                .setEnabled(isShowClusteredMarker);
-      _lblClusterSymbol_Size           .setEnabled(isShowClusteredMarker);
-      _lblMarkerLabelColor             .setEnabled(isShowTourMarker);
-      _lblMarkerLabelLayout            .setEnabled(isShowTourMarker);
+      _lblClusterGrid_Size                .setEnabled(isShowClusteredMarker);
+      _lblClusterSymbol                   .setEnabled(isShowClusteredMarker);
+      _lblClusterSymbol_Size              .setEnabled(isShowClusteredMarker);
+      _lblLabelDistributorMaxLabels       .setEnabled(isShowTourMarker);
+      _lblLabelDistributorRadius          .setEnabled(isShowTourMarker);
+      _lblMarkerLabelColor                .setEnabled(isShowTourMarker);
+      _lblMarkerLabelLayout               .setEnabled(isShowTourMarker);
 
-      _spinnerClusterGrid_Size         .setEnabled(isShowClusteredMarker);
-      _spinnerClusterHoveredLabel_Size .setEnabled(isShowClusteredMarker);
-      _spinnerClusterSymbol_Size       .setEnabled(isShowClusteredMarker);
-      _spinnerClusterOutline_Width     .setEnabled(isShowClusteredMarker);
+      _spinnerClusterGrid_Size            .setEnabled(isShowClusteredMarker);
+      _spinnerClusterSymbol_Size          .setEnabled(isShowClusteredMarker);
+      _spinnerClusterOutline_Width        .setEnabled(isShowClusteredMarker);
+      _spinnerLabelDistributorMaxLabels   .setEnabled(isShowTourMarker);
+      _spinnerLabelDistributorRadius      .setEnabled(isShowTourMarker);
 
-      _colorClusterSymbol_Fill         .setEnabled(isShowClusteredMarker);
-      _colorClusterSymbol_Outline      .setEnabled(isShowClusteredMarker);
-      _colorMarkerLabel_Fill           .setEnabled(isShowTourMarker);
-      _colorMarkerLabel_Outline        .setEnabled(isShowTourMarker);
+      _colorClusterSymbol_Fill            .setEnabled(isShowClusteredMarker);
+      _colorClusterSymbol_Outline         .setEnabled(isShowClusteredMarker);
+      _colorMarkerLabel_Fill              .setEnabled(isShowTourMarker);
+      _colorMarkerLabel_Outline           .setEnabled(isShowTourMarker);
 
-      _comboMarkerLabelLayout          .setEnabled(isShowTourMarker);
+      _comboMarkerLabelLayout             .setEnabled(isShowTourMarker);
 
       /*
        * Common locations
@@ -1361,9 +1387,16 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
       _markerSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyMarkerConfig());
       _markerPropertyChangeListener = propertyChangeEvent -> onModifyMarkerConfig();
+
       _markerMouseWheelListener = mouseEvent -> {
 
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 1);
+         onModifyMarkerConfig();
+      };
+
+      _markerMouseWheelListener10 = mouseEvent -> {
+
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
          onModifyMarkerConfig();
       };
 
@@ -1581,7 +1614,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
       final Map2 map2 = _map2View.getMap();
 
-      map2.resetCluster();
+      map2.resetMarkerCluster();
       map2.paint();
    }
 
@@ -1608,29 +1641,28 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
 // SET_FORMATTING_OFF
 
-      _chkIsShowTourMarker             .setSelection( config.isShowTourMarker);
+      _chkIsShowTourMarker                .setSelection( config.isShowTourMarker);
 
+      _chkIsClusterSymbolAntialiased      .setSelection( config.isClusterSymbolAntialiased);
+      _chkIsClusterTextAntialiased        .setSelection( config.isClusterTextAntialiased);
+      _chkIsFillClusterSymbol             .setSelection( config.isFillClusterSymbol);
+      _chkIsMarkerClustered               .setSelection( config.isMarkerClustered);
+      _chkIsMarkerLabelAntialiased        .setSelection( config.isMarkerLabelAntialiased);
 
-      _chkIsClusterSymbolAntialiased   .setSelection( config.isClusterSymbolAntialiased);
-      _chkIsClusterTextAntialiased     .setSelection( config.isClusterTextAntialiased);
-      _chkIsFillClusterSymbol          .setSelection( config.isFillClusterSymbol);
-      _chkIsMarkerClustered            .setSelection( config.isMarkerClustered);
-      _chkIsMarkerLabelAntialiased     .setSelection( config.isMarkerLabelAntialiased);
+      _spinnerClusterGrid_Size            .setSelection( config.clusterGridSize);
+      _spinnerClusterOutline_Width        .setSelection( config.clusterOutline_Width);
+      _spinnerClusterSymbol_Size          .setSelection( config.clusterSymbol_Size);
+      _spinnerLabelDistributorMaxLabels   .setSelection( config.labelDistributorMaxLabels);
+      _spinnerLabelDistributorRadius      .setSelection( config.labelDistributorRadius);
 
-      _spinnerClusterGrid_Size         .setSelection( config.clusterGridSize);
-      _spinnerClusterHoveredLabel_Size .setSelection( config.clusterHoveredLabelSize);
-      _spinnerClusterOutline_Width     .setSelection( config.clusterOutline_Width);
-      _spinnerClusterSymbol_Size       .setSelection( config.clusterSymbol_Size);
-
-      _colorClusterSymbol_Fill         .setColorValue(config.clusterFill_RGB);
-      _colorClusterSymbol_Outline      .setColorValue(config.clusterOutline_RGB);
-      _colorMarkerLabel_Fill           .setColorValue(config.markerFill_RGB);
-      _colorMarkerLabel_Outline        .setColorValue(config.markerOutline_RGB);
+      _colorClusterSymbol_Fill            .setColorValue(config.clusterFill_RGB);
+      _colorClusterSymbol_Outline         .setColorValue(config.clusterOutline_RGB);
+      _colorMarkerLabel_Fill              .setColorValue(config.markerFill_RGB);
+      _colorMarkerLabel_Outline           .setColorValue(config.markerOutline_RGB);
 
 // SET_FORMATTING_ON
 
       selectMarkerLabelLayout(config.markerLabelLayout);
-
    }
 
    private void restoreState_BeforeUI() {
@@ -1665,11 +1697,13 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       config.isMarkerLabelAntialiased     = _chkIsMarkerLabelAntialiased      .getSelection();
 
       config.clusterGridSize              = _spinnerClusterGrid_Size          .getSelection();
-      config.clusterHoveredLabelSize      = _spinnerClusterHoveredLabel_Size  .getSelection();
       config.clusterOutline_Width         = _spinnerClusterOutline_Width      .getSelection();
       config.clusterSymbol_Size           = _spinnerClusterSymbol_Size        .getSelection();
       config.clusterFill_RGB              = _colorClusterSymbol_Fill          .getColorValue();
       config.clusterOutline_RGB           = _colorClusterSymbol_Outline       .getColorValue();
+
+      config.labelDistributorMaxLabels    = _spinnerLabelDistributorMaxLabels .getSelection();
+      config.labelDistributorRadius       = _spinnerLabelDistributorRadius    .getSelection();
 
       config.markerFill_RGB               = _colorMarkerLabel_Fill            .getColorValue();
       config.markerOutline_RGB            = _colorMarkerLabel_Outline         .getColorValue();

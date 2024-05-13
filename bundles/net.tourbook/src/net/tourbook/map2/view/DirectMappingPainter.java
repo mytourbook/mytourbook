@@ -20,8 +20,8 @@ import de.byteholder.geoclipse.map.IDirectPainter;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Map2Painter;
 import de.byteholder.geoclipse.map.MapLegend;
-import de.byteholder.geoclipse.map.PaintedMarker;
 import de.byteholder.geoclipse.map.PaintedMapLocation;
+import de.byteholder.geoclipse.map.PaintedMarker;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 import java.util.HashMap;
@@ -234,94 +234,6 @@ public class DirectMappingPainter implements IDirectPainter {
       if ((image != null) && !image.isDisposed()) {
          image.dispose();
       }
-   }
-
-   private void drawClusterMarkerHovered(final DirectPainterContext painterContext) {
-
-      final GC gc = painterContext.gc;
-
-      gc.setAntialias(SWT.ON);
-
-      final PaintedMarker hoveredMarker = painterContext.hoveredClusterMarker;
-      final Rectangle markerLabelRectangle = hoveredMarker.markerLabelRectangle;
-      final int labelWidth = markerLabelRectangle.width;
-      final int labelHeight = markerLabelRectangle.height;
-
-      final Map2Marker mapMarker = hoveredMarker.mapMarker;
-      final int markerPointDevX = mapMarker.geoPointDevX;
-      final int markerPointDevY = mapMarker.geoPointDevY;
-      final int markerSize = 6;
-      final int markerSize2 = markerSize / 2;
-
-      final int markerSymbolDevX = markerPointDevX - markerSize2;
-      final int markerSymbolDevY = markerPointDevY - markerSize2;
-
-      gc.setBackground(UI.SYS_COLOR_WHITE);
-      gc.setForeground(UI.SYS_COLOR_RED);
-
-      /*
-       * Draw a line from the marker to the marker location.
-       * Ensure that the line is not crossing the label
-       */
-      int lineFromDevX = markerLabelRectangle.x;
-      int lineFromDevY = markerLabelRectangle.y;
-      final int lineToDevX = markerPointDevX;
-      final int lineToDevY = markerPointDevY;
-
-      if (lineToDevX > lineFromDevX + labelWidth) {
-         lineFromDevX += labelWidth;
-      } else if (lineToDevX > lineFromDevX && lineToDevX < lineFromDevX + labelWidth) {
-         lineFromDevX = lineToDevX;
-      }
-
-      if (lineToDevY > lineFromDevY + labelHeight) {
-         lineFromDevY += labelHeight;
-      } else if (lineToDevY > lineFromDevY && lineToDevY < lineFromDevY + labelHeight) {
-         lineFromDevY = lineToDevY;
-      }
-
-      gc.setLineWidth(2);
-      gc.drawLine(
-            lineFromDevX,
-            lineFromDevY,
-            lineToDevX,
-            lineToDevY);
-
-      /*
-       * Draw a symbol at the marker location
-       */
-      gc.fillRectangle(
-            markerSymbolDevX,
-            markerSymbolDevY,
-            markerSize,
-            markerSize);
-
-      gc.setLineWidth(2);
-      gc.drawRectangle(
-            markerSymbolDevX,
-            markerSymbolDevY,
-            markerSize,
-            markerSize);
-
-      /*
-       * Highlight hovered label
-       */
-      final int labelDevX = markerLabelRectangle.x;
-      final int labelDevY = markerLabelRectangle.y;
-
-      gc.setForeground(UI.SYS_COLOR_RED);
-      gc.drawLine(
-            labelDevX,
-            labelDevY + labelHeight,
-            labelDevX + labelWidth,
-            labelDevY + labelHeight);
-
-      gc.drawLine(
-            labelDevX,
-            labelDevY,
-            labelDevX,
-            labelDevY + labelHeight);
-
    }
 
    private void drawMapLocation(final DirectPainterContext painterContext,
@@ -563,6 +475,94 @@ public class DirectMappingPainter implements IDirectPainter {
       }
    }
 
+   private void drawMarker_Hovered(final DirectPainterContext painterContext) {
+
+      final GC gc = painterContext.gc;
+
+      gc.setAntialias(SWT.ON);
+
+      final PaintedMarker hoveredMarker = painterContext.hoveredMarker;
+      final Rectangle markerLabelRectangle = hoveredMarker.markerLabelRectangle;
+      final int labelWidth = markerLabelRectangle.width;
+      final int labelHeight = markerLabelRectangle.height;
+
+      final Map2Marker mapMarker = hoveredMarker.mapMarker;
+      final int markerPointDevX = mapMarker.geoPointDevX;
+      final int markerPointDevY = mapMarker.geoPointDevY;
+      final int markerSize = 6;
+      final int markerSize2 = markerSize / 2;
+
+      final int markerSymbolDevX = markerPointDevX - markerSize2;
+      final int markerSymbolDevY = markerPointDevY - markerSize2;
+
+      gc.setBackground(UI.SYS_COLOR_WHITE);
+      gc.setForeground(UI.SYS_COLOR_RED);
+
+      /*
+       * Draw a line from the marker to the marker location.
+       * Ensure that the line is not crossing the label
+       */
+      int lineFromDevX = markerLabelRectangle.x;
+      int lineFromDevY = markerLabelRectangle.y;
+      final int lineToDevX = markerPointDevX;
+      final int lineToDevY = markerPointDevY;
+
+      if (lineToDevX > lineFromDevX + labelWidth) {
+         lineFromDevX += labelWidth;
+      } else if (lineToDevX > lineFromDevX && lineToDevX < lineFromDevX + labelWidth) {
+         lineFromDevX = lineToDevX;
+      }
+
+      if (lineToDevY > lineFromDevY + labelHeight) {
+         lineFromDevY += labelHeight;
+      } else if (lineToDevY > lineFromDevY && lineToDevY < lineFromDevY + labelHeight) {
+         lineFromDevY = lineToDevY;
+      }
+
+      gc.setLineWidth(2);
+      gc.drawLine(
+            lineFromDevX,
+            lineFromDevY,
+            lineToDevX,
+            lineToDevY);
+
+      /*
+       * Draw a symbol at the marker location
+       */
+      gc.fillRectangle(
+            markerSymbolDevX,
+            markerSymbolDevY,
+            markerSize,
+            markerSize);
+
+      gc.setLineWidth(2);
+      gc.drawRectangle(
+            markerSymbolDevX,
+            markerSymbolDevY,
+            markerSize,
+            markerSize);
+
+      /*
+       * Highlight hovered label
+       */
+      final int labelDevX = markerLabelRectangle.x;
+      final int labelDevY = markerLabelRectangle.y;
+
+      gc.setForeground(UI.SYS_COLOR_RED);
+      gc.drawLine(
+            labelDevX,
+            labelDevY + labelHeight,
+            labelDevX + labelWidth,
+            labelDevY + labelHeight);
+
+      gc.drawLine(
+            labelDevX,
+            labelDevY,
+            labelDevX,
+            labelDevY + labelHeight);
+
+   }
+
    /**
     * @param painterContext
     * @param sliderValueIndex
@@ -571,7 +571,7 @@ public class DirectMappingPainter implements IDirectPainter {
     *
     * @return Returns <code>true</code> when the marker is visible and painted
     */
-   private boolean drawMarkerImage(final DirectPainterContext painterContext,
+   private boolean drawSliderImage(final DirectPainterContext painterContext,
                                    final int sliderValueIndex,
                                    final Image markerImage,
                                    final boolean isYPosCenter) {
@@ -981,8 +981,8 @@ public class DirectMappingPainter implements IDirectPainter {
          }
       }
 
-      if (painterContext.hoveredClusterMarker != null) {
-         drawClusterMarkerHovered(painterContext);
+      if (painterContext.hoveredMarker != null) {
+         drawMarker_Hovered(painterContext);
       }
 
       if (_tourData == null
@@ -1001,8 +1001,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
       if (_isShowSliderInMap) {
 
-         drawMarkerImage(painterContext, _rightSliderValueIndex, _imageSlider_Right, false);
-         drawMarkerImage(painterContext, _leftSliderValueIndex, _imageSlider_Left, false);
+         drawSliderImage(painterContext, _rightSliderValueIndex, _imageSlider_Right, false);
+         drawSliderImage(painterContext, _leftSliderValueIndex, _imageSlider_Left, false);
       }
 
       if (_isShowValuePoint
@@ -1010,7 +1010,7 @@ public class DirectMappingPainter implements IDirectPainter {
             // check if value point is valid -> do not show invalid point
             && _externalValuePointIndex != -1) {
 
-         drawMarkerImage(painterContext, _externalValuePointIndex, _imageValuePoint, true);
+         drawSliderImage(painterContext, _externalValuePointIndex, _imageValuePoint, true);
       }
 
       if (_isShowSliderInLegend) {

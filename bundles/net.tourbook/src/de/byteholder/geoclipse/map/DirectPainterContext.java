@@ -51,5 +51,5 @@ public class DirectPainterContext {
     */
    public PaintedMapLocation       hoveredMapLocation;
 
-   public PaintedMarker            hoveredClusterMarker;
+   public PaintedMarker            hoveredMarker;
 }

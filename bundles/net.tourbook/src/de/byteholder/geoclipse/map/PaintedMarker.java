@@ -52,7 +52,7 @@ public class PaintedMarker {
 
       return UI.EMPTY_STRING
 
-            + "PaintedClusterMarker" + NL //                         //$NON-NLS-1$
+            + "PaintedMarker" + NL //                         //$NON-NLS-1$
 
             + " mapMarker     = " + mapMarker.tourMarker.getLabel() + NL //           //$NON-NLS-1$
 

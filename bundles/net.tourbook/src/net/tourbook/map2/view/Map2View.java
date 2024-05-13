@@ -5438,9 +5438,9 @@ public class Map2View extends ViewPart implements
       // enable/disable cluster/marker tooltip
       final boolean isShowTourMarker = Map2ConfigManager.getActiveMarkerConfig().isShowTourMarker;
       if (isShowTourMarker) {
-         _map.getClusterMarkerTooltip().activate();
+         _map.getMapMarkerTooltip().activate();
       } else {
-         _map.getClusterMarkerTooltip().deactivate();
+         _map.getMapMarkerTooltip().deactivate();
       }
 
       /*
@@ -5461,7 +5461,7 @@ public class Map2View extends ViewPart implements
       // create legend image after the dim level is modified
       createLegendImage(TourPainterConfiguration.getMapColorProvider());
 
-      _map.resetCluster();
+      _map.resetMarkerCluster();
 
       _map.paint();
    }
