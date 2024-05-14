@@ -75,10 +75,63 @@ public class AdvancedMenuForActions {
 
    private class ContextArmListener implements ArmListener {
 
+      private synchronized void onAnimation10Start() {
+
+         if (_isAnimating) {
+            return;
+         }
+
+         _isAnimating = true;
+
+         _consumedAnimationTime = 0;
+
+         _display.asyncExec(_animationRunnable);
+      }
+
+      private void onArmEvent(final ArmEvent event) {
+
+         final MenuItem menuItem = (MenuItem) event.widget;
+
+         if (_isAutoOpen && menuItem.isEnabled()) {
+
+            final Object itemData = menuItem.getData();
+            if (itemData instanceof final ActionContributionItem actionContributionItem) {
+
+               final String itemId = actionContributionItem.getId();
+               final String actionId = _actionContributionItem.getId();
+
+               if (itemId != null && itemId.equals(actionId)) {
+
+                  /*
+                   * the item is hovered which is associated with the action for the advanced menu
+                   */
+
+                  _armItemTimeAction = System.currentTimeMillis();
+
+                  _armMenuItem = menuItem;
+                  _armActionText = _actionContributionItem.getAction().getText();
+
+                  onAnimation10Start();
+
+                  return;
+               }
+            }
+         }
+
+         restoreMenuItemText();
+
+         _armMenuItem = null;
+         _isAnimating = false;
+
+         // system time is needed because OSX has the same time for all arm events until the menu is closed
+         _armItemTimeOther = System.currentTimeMillis();
+      }
+
       @Override
       public void widgetArmed(final ArmEvent event) {
          onArmEvent(event);
       }
+
    }
 
    /**
@@ -101,19 +154,6 @@ public class AdvancedMenuForActions {
          }
       };
 
-   }
-
-   private synchronized void onAnimation10Start() {
-
-      if (_isAnimating) {
-         return;
-      }
-
-      _isAnimating = true;
-
-      _consumedAnimationTime = 0;
-
-      _display.asyncExec(_animationRunnable);
    }
 
    private void onAnimation20Run(final Runnable runnable) {
@@ -146,45 +186,6 @@ public class AdvancedMenuForActions {
 
          _display.timerExec(_animationDelay, runnable);
       }
-   }
-
-   private void onArmEvent(final ArmEvent event) {
-
-      final MenuItem menuItem = (MenuItem) event.widget;
-
-      if (_isAutoOpen && menuItem.isEnabled()) {
-
-         final Object itemData = menuItem.getData();
-         if (itemData instanceof final ActionContributionItem actionContributionItem) {
-
-            final String itemId = actionContributionItem.getId();
-            final String actionId = _actionContributionItem.getId();
-
-            if (itemId != null && itemId.equals(actionId)) {
-
-               /*
-                * the item is hovered which is associated with the action for the advanced menu
-                */
-
-               _armItemTimeAction = System.currentTimeMillis();
-
-               _armMenuItem = menuItem;
-               _armActionText = _actionContributionItem.getAction().getText();
-
-               onAnimation10Start();
-
-               return;
-            }
-         }
-      }
-
-      restoreMenuItemText();
-
-      _armMenuItem = null;
-      _isAnimating = false;
-
-      // system time is needed because OSX has the same time for all arm events until the menu is closed
-      _armItemTimeOther = System.currentTimeMillis();
    }
 
    private void onArmEventOpenMenu() {
