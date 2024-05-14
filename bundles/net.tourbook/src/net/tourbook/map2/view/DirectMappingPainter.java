@@ -492,6 +492,14 @@ public class DirectMappingPainter implements IDirectPainter {
       final int markerSize = 6;
       final int markerSize2 = markerSize / 2;
 
+// this is not working, need more brain to fix it
+//
+//      final int diffX = painterContext.backgroundPainter_MicroAdjustment_DiffX;
+//      final int diffY = painterContext.backgroundPainter_MicroAdjustment_DiffY;
+//
+//      final int markerSymbolDevX = markerPointDevX - markerSize2 + diffX;
+//      final int markerSymbolDevY = markerPointDevY - markerSize2 + diffY;
+
       final int markerSymbolDevX = markerPointDevX - markerSize2;
       final int markerSymbolDevY = markerPointDevY - markerSize2;
 
@@ -549,18 +557,34 @@ public class DirectMappingPainter implements IDirectPainter {
       final int labelDevY = markerLabelRectangle.y;
 
       gc.setForeground(UI.SYS_COLOR_RED);
+
+      // border: horizontal bottom
       gc.drawLine(
             labelDevX,
             labelDevY + labelHeight,
             labelDevX + labelWidth,
             labelDevY + labelHeight);
 
-      gc.drawLine(
-            labelDevX,
-            labelDevY,
-            labelDevX,
-            labelDevY + labelHeight);
+      // border: vertical left
+//      gc.drawLine(
+//            labelDevX,
+//            labelDevY,
+//            labelDevX,
+//            labelDevY + labelHeight);
 
+//       border: horizontal bottom
+//      gc.drawLine(
+//            labelDevX,
+//            labelDevY + labelHeight,
+//            labelDevX + labelWidth - 1,
+//            labelDevY + labelHeight);
+//
+//      // border: vertical left
+//      gc.drawLine(
+//            labelDevX,
+//            labelDevY,
+//            labelDevX,
+//            labelDevY + labelHeight);
    }
 
    /**
