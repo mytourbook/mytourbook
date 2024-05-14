@@ -117,7 +117,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .indent(DEFAULT_H_INDENT, 0)
-                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                  .hint(pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
                   .applyTo(linkApiSignup);
          }
          {

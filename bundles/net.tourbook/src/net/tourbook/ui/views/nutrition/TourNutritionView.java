@@ -1746,7 +1746,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final int totalSodium = (int) NutritionUtils.getTotalSodium(tourNutritionProducts);
       final String totalSodiumFormatted = FormatManager.formatNumber_0(totalSodium);
-      _lblSodium_Total.setText(totalSodiumFormatted);
+      _lblSodium_Total.setText(totalSodiumFormatted.equals("0") ? UI.EMPTY_STRING : totalSodiumFormatted);
 
       final String averageCaloriesPerHour = NutritionUtils.computeAverageCaloriesPerHour(_tourData);
       _lblCalories_Average.setText(averageCaloriesPerHour);
