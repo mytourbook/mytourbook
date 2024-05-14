@@ -553,11 +553,11 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
             final Object selectedItem = ((IStructuredSelection) _treeViewer.getSelection()).getFirstElement();
             if (selectedItem != null) {
 
-               if (selectedItem instanceof TVIMapProvider) {
+               if (selectedItem instanceof final TVIMapProvider tviMapProvider) {
 
                   // expand/collapse current item
 
-                  final MP mapProvider = ((TVIMapProvider) selectedItem).getMapProviderWrapper().getMP();
+                  final MP mapProvider = tviMapProvider.getMapProviderWrapper().getMP();
 
                   if ((mapProvider instanceof MPWms) == false) {
 
@@ -697,18 +697,18 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
                final StyledString styledString = new StyledString();
                final Object element = cell.getElement();
 
-               if (element instanceof TVIMapProvider) {
+               if (element instanceof final TVIMapProvider tviMapProvider) {
 
-                  final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+                  final MPWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
                   final MP mapProvider = mpWrapper.getMP();
 
                   styledString.append(mapProvider.getName());
 
                   cell.setImage(mpWrapper.isDisplayedInMap() ? _imageMap : _imagePlaceholder);
 
-               } else if (element instanceof TVIWmsLayer) {
+               } else if (element instanceof final TVIWmsLayer tviWmsLayer) {
 
-                  final MtLayer mtLayer = ((TVIWmsLayer) element).getMtLayer();
+                  final MtLayer mtLayer = tviWmsLayer.getMtLayer();
 
                   styledString.append(mtLayer.getGeoLayer().getTitle());
 
@@ -743,16 +743,16 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
                final Object element = cell.getElement();
 
-               if (element instanceof TVIMapProvider) {
+               if (element instanceof final TVIMapProvider tviMapProvider) {
 
-                  final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+                  final MPWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
                   final boolean isVisible = mpWrapper.isDisplayedInMap();
 
                   cell.setText(isVisible ? Boolean.toString(isVisible) : UI.EMPTY_STRING);
 
-               } else if (element instanceof TVIWmsLayer) {
+               } else if (element instanceof final TVIWmsLayer tviWmsLayer) {
 
-                  final MtLayer mtLayer = ((TVIWmsLayer) element).getMtLayer();
+                  final MtLayer mtLayer = tviWmsLayer.getMtLayer();
                   final boolean isVisible = mtLayer.isDisplayedInMap();
 
                   cell.setText(isVisible ? Boolean.toString(isVisible) : UI.EMPTY_STRING);
@@ -770,16 +770,15 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
             @Override
             protected boolean canEdit(final Object element) {
 
-               if (element instanceof TVIMapProvider) {
+               if (element instanceof final TVIMapProvider tvi) {
 
-                  final TVIMapProvider tvi = (TVIMapProvider) element;
                   final MP mapProvider = tvi.getMapProviderWrapper().getMP();
 
-                  if (mapProvider instanceof MPWms) {
+                  if (mapProvider instanceof final MPWms mpWms) {
 
                      // wms can be toggled when at least one layer is displayed
 
-                     return canWmsBeDisplayed((MPWms) mapProvider);
+                     return canWmsBeDisplayed(mpWms);
                   }
                }
 
@@ -794,15 +793,15 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
             @Override
             protected Object getValue(final Object element) {
 
-               if (element instanceof TVIMapProvider) {
+               if (element instanceof final TVIMapProvider tviMapProvider) {
 
-                  final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+                  final MPWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
 
                   return mpWrapper.isDisplayedInMap();
 
-               } else if (element instanceof TVIWmsLayer) {
+               } else if (element instanceof final TVIWmsLayer tviWmsLayer) {
 
-                  final MtLayer mtLayer = ((TVIWmsLayer) element).getMtLayer();
+                  final MtLayer mtLayer = tviWmsLayer.getMtLayer();
 
                   return mtLayer.isDisplayedInMap();
                }
@@ -815,9 +814,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
                final boolean isChecked = ((Boolean) value);
 
-               if (element instanceof TVIMapProvider) {
+               if (element instanceof final TVIMapProvider tviMapProvider) {
 
-                  final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+                  final MPWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
 
                   mpWrapper.setIsDisplayedInMap(isChecked);
 
@@ -832,9 +831,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
                   enableProfileMapButton();
 
-               } else if (element instanceof TVIWmsLayer) {
+               } else if (element instanceof final TVIWmsLayer tviLayer) {
 
-                  final TVIWmsLayer tviLayer = (TVIWmsLayer) element;
                   final MtLayer mtLayer = tviLayer.getMtLayer();
 
                   mtLayer.setIsDisplayedInMap(isChecked);
@@ -865,9 +863,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
                final Object element = cell.getElement();
 
-               if (element instanceof TVIMapProvider) {
+               if (element instanceof final TVIMapProvider tviMapProvider) {
 
-                  final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+                  final MPWrapper mpWrapper = (tviMapProvider).getMapProviderWrapper();
                   final boolean isVisible = mpWrapper.isDisplayedInMap();
 
                   cell.setText(isVisible ? Integer.toString(mpWrapper.getAlpha()) : UI.EMPTY_STRING);
@@ -895,9 +893,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
                final Object element = cell.getElement();
 
-               if (element instanceof TVIMapProvider) {
+               if (element instanceof final TVIMapProvider tviMapProvider) {
 
-                  final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+                  final MPWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
 
                   cell.setText(mpWrapper.isBrightnessForNextMp()
                         ? Integer.toString(mpWrapper.getBrightnessValueForNextMp())
@@ -1666,23 +1664,21 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
    private String getMpUrl(final MP mp) {
 
-      if (mp instanceof MPWms) {
+      if (mp instanceof final MPWms mpWms) {
 
          // wms map provider
 
-         return ((MPWms) mp).getCapabilitiesUrl();
+         return mpWms.getCapabilitiesUrl();
 
-      } else if (mp instanceof MPCustom) {
+      } else if (mp instanceof final MPCustom mpCustom) {
 
          // custom map provider
 
-         return ((MPCustom) mp).getCustomUrl();
+         return mpCustom.getCustomUrl();
 
-      } else if (mp instanceof MPPlugin) {
+      } else if (mp instanceof final MPPlugin pluginMapProvider) {
 
          // plugin map provider
-
-         final MPPlugin pluginMapProvider = (MPPlugin) mp;
 
          return pluginMapProvider.getBaseURL();
       }
@@ -1815,11 +1811,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
    private void onModifyTransparentColor() {
 
       final Object firstElement = ((StructuredSelection) _treeViewer.getSelection()).getFirstElement();
-      if (firstElement instanceof TVIMapProvider) {
+      if (firstElement instanceof final TVIMapProvider tviMapProvider) {
 
          // map provider is selected
-
-         final TVIMapProvider tviMapProvider = (TVIMapProvider) firstElement;
 
          // update alpha in the map provider
 
@@ -2229,13 +2223,13 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
          // get tree custom item
          final Object itemData = items[0].getData();
 
-         if (itemData instanceof TVIMapProvider) {
+         if (itemData instanceof final TVIMapProvider tviMapProvider) {
 
-            final MPWrapper mpWrapper = ((TVIMapProvider) itemData).getMapProviderWrapper();
+            final MPWrapper mpWrapper = tviMapProvider.getMapProviderWrapper();
             boolean isWmsDisplayed = mpWrapper.isDisplayedInMap();
 
             final MP mapProvider = mpWrapper.getMP();
-            if (mapProvider instanceof MPWms) {
+            if (mapProvider instanceof final MPWms mpWms) {
 
                // visibility for a wms map provider can be toggled only a layer
 
@@ -2244,7 +2238,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
                   isWmsDisplayed = false;
                } else {
                   // show wms only when one layer is displayed
-                  isWmsDisplayed = canWmsBeDisplayed((MPWms) mapProvider);
+                  isWmsDisplayed = canWmsBeDisplayed(mpWms);
                }
 
             } else {
@@ -2266,9 +2260,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
             mpWrapper.setIsDisplayedInMap(isWmsDisplayed);
             enableProfileMapButton();
 
-         } else if (itemData instanceof TVIWmsLayer) {
+         } else if (itemData instanceof final TVIWmsLayer tviLayer) {
 
-            final TVIWmsLayer tviLayer = (TVIWmsLayer) itemData;
             final MtLayer mtLayer = tviLayer.getMtLayer();
 
             // toggle layer state
@@ -2330,9 +2323,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
          // update wms layer
          final MP mapProvider = mpWrapper.getMP();
-         if (mapProvider instanceof MPWms) {
-
-            final MPWms mpWms = (MPWms) mapProvider;
+         if (mapProvider instanceof final MPWms mpWms) {
 
             if (mpWrapper.isDisplayedInMap()) {
 
@@ -2366,9 +2357,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
                for (final TreeItem childItem : treeChildren) {
 
                   final Object childData = childItem.getData();
-                  if (childData instanceof TVIWmsLayer) {
+                  if (childData instanceof final TVIWmsLayer tviWmsLayer) {
 
-                     final MtLayer mtLayer = ((TVIWmsLayer) childData).getMtLayer();
+                     final MtLayer mtLayer = tviWmsLayer.getMtLayer();
 
                      mtLayer.setPositionIndex(itemIndex++);
 
@@ -2398,11 +2389,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
          tviMapProvider = (TVIMapProvider) firstElement;
 
-      } else if (firstElement instanceof TVIWmsLayer) {
+      } else if (firstElement instanceof final TVIWmsLayer tviWmsLayer) {
 
          // wms layer is selected, get parent
-
-         final TVIWmsLayer tviWmsLayer = (TVIWmsLayer) firstElement;
 
          final TreeViewerItem parentItem = tviWmsLayer.getParentItem();
          if (parentItem instanceof TVIMapProvider) {
@@ -2428,11 +2417,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
    private void updateMVBrightness() {
 
       final Object firstElement = ((StructuredSelection) _treeViewer.getSelection()).getFirstElement();
-      if (firstElement instanceof TVIMapProvider) {
+      if (firstElement instanceof final TVIMapProvider tviMapProvider) {
 
          // map provider is selected
-
-         final TVIMapProvider tviMapProvider = (TVIMapProvider) firstElement;
 
          // update brightness in the map provider
 
@@ -2457,16 +2444,16 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
    private void updateMVMapProvider(final TVIWmsLayer tviLayer) {
 
       final TreeViewerItem tviParent = tviLayer.getParentItem();
-      if (tviParent instanceof TVIMapProvider) {
+      if (tviParent instanceof final TVIMapProvider tviMapProvider) {
 
-         final MPWrapper parentMpWrapper = ((TVIMapProvider) tviParent).getMapProviderWrapper();
+         final MPWrapper parentMpWrapper = tviMapProvider.getMapProviderWrapper();
          final MP mapProvider = parentMpWrapper.getMP();
 
-         if (mapProvider instanceof MPWms) {
+         if (mapProvider instanceof final MPWms mpWms) {
 
             // check if a layer is visible
 
-            parentMpWrapper.setIsDisplayedInMap(canWmsBeDisplayed((MPWms) mapProvider));
+            parentMpWrapper.setIsDisplayedInMap(canWmsBeDisplayed(mpWms));
             enableProfileMapButton();
 
             // update parent item in the viewer
