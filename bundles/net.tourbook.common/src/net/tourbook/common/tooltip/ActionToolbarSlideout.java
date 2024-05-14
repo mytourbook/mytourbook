@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -348,6 +348,12 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
     * @param imageNumber
     */
    public void showOtherEnabledImage(final int imageNumber) {
+
+      if (_actionToolItem == null) {
+
+         // this happened
+         return;
+      }
 
       Assert.isTrue(imageNumber < _allOtherEnabledImages_Descriptors.size(), "Image number is larger than the available images");//$NON-NLS-1$
 
