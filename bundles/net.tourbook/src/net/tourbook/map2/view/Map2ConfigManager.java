@@ -90,7 +90,9 @@ public class Map2ConfigManager {
    private static final String ATTR_LABEL_DISTRIBUTOR_RADIUS      = "labelDistributorRadius";     //$NON-NLS-1$
    //
    private static final String TAG_MARKER_FILL_COLOR              = "MarkerFillColor";            //$NON-NLS-1$
+   private static final String TAG_MARKER_FILL_HOVERED_COLOR      = "MarkerFillHoveredColor";     //$NON-NLS-1$
    private static final String TAG_MARKER_OUTLINE_COLOR           = "MarkerOutlineColor";         //$NON-NLS-1$
+   private static final String TAG_MARKER_OUTLINE_HOVERED_COLOR   = "MarkerOutlineHoveredColor";  //$NON-NLS-1$
    // cluster
    private static final String ATTR_IS_MARKER_CLUSTERED           = "isMarkerClustered";          //$NON-NLS-1$
    private static final String ATTR_IS_CLUSTER_SYMBOL_ANTIALIASED = "isClusterSymbolAntialiased"; //$NON-NLS-1$
@@ -132,7 +134,9 @@ public class Map2ConfigManager {
    public static final RGB            DEFAULT_CLUSTER_OUTLINE_RGB          = new RGB(0xff, 0xff, 0xff);
    public static final float          DEFAULT_CLUSTER_OUTLINE_SIZE         = 2.0f;
    public static final RGB            DEFAULT_MARKER_FILL_RGB              = new RGB(0xFF, 0xFF, 0x00);
+   public static final RGB            DEFAULT_MARKER_FILL_HOVERED_RGB      = new RGB(0xFF, 0x00, 0x00);
    public static final RGB            DEFAULT_MARKER_OUTLINE_RGB           = new RGB(0, 0, 0);
+   public static final RGB            DEFAULT_MARKER_OUTLINE_HOVERED_RGB   = new RGB(0, 0XFF, 0);
    //
    //
    /**
@@ -289,8 +293,10 @@ public class Map2ConfigManager {
 
          Util.setXmlEnum(xmlConfig, ATTR_MARKER_LABEL_LAYOUT,           config.markerLabelLayout);
 
-         Util.setXmlRgb(xmlConfig,  TAG_MARKER_OUTLINE_COLOR,           config.markerOutline_RGB);
          Util.setXmlRgb(xmlConfig,  TAG_MARKER_FILL_COLOR,              config.markerFill_RGB);
+         Util.setXmlRgb(xmlConfig,  TAG_MARKER_FILL_HOVERED_COLOR,      config.markerFill_Hovered_RGB);
+         Util.setXmlRgb(xmlConfig,  TAG_MARKER_OUTLINE_COLOR,           config.markerOutline_RGB);
+         Util.setXmlRgb(xmlConfig,  TAG_MARKER_OUTLINE_HOVERED_COLOR,   config.markerOutline_Hovered_RGB);
 
          /*
           * Cluster
@@ -430,20 +436,28 @@ public class Map2ConfigManager {
 
          switch (configTag) {
 
+         case TAG_CLUSTER_FILL_COLOR:
+            config.clusterFill_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_FILL_RGB);
+            break;
+
          case TAG_CLUSTER_OUTLINE_COLOR:
             config.clusterOutline_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_OUTLINE_RGB);
             break;
 
-         case TAG_CLUSTER_FILL_COLOR:
-            config.clusterFill_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_FILL_RGB);
+         case TAG_MARKER_FILL_COLOR:
+            config.markerFill_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_FILL_RGB);
+            break;
+
+         case TAG_MARKER_FILL_HOVERED_COLOR:
+            config.markerFill_Hovered_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_FILL_HOVERED_RGB);
             break;
 
          case TAG_MARKER_OUTLINE_COLOR:
             config.markerOutline_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_OUTLINE_RGB);
             break;
 
-         case TAG_MARKER_FILL_COLOR:
-            config.markerFill_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_FILL_RGB);
+         case TAG_MARKER_OUTLINE_HOVERED_COLOR:
+            config.markerOutline_Hovered_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_OUTLINE_HOVERED_RGB);
             break;
          }
       }

@@ -45,10 +45,14 @@ public class Map2MarkerConfig {
    public MapLabelLayout markerLabelLayout         = Map2ConfigManager.MARKER_LABEL_LAYOUT_DEFAULT;
 
    public RGB            markerFill_RGB            = Map2ConfigManager.DEFAULT_MARKER_FILL_RGB;
+   public RGB            markerFill_Hovered_RGB    = Map2ConfigManager.DEFAULT_MARKER_FILL_HOVERED_RGB;
    public RGB            markerOutline_RGB         = Map2ConfigManager.DEFAULT_MARKER_OUTLINE_RGB;
+   public RGB            markerOutline_Hovered_RGB = Map2ConfigManager.DEFAULT_MARKER_OUTLINE_HOVERED_RGB;
 
    public Color          markerFill_Color;
+   public Color          markerFill_Hovered_Color;
    public Color          markerOutline_Color;
+   public Color          markerOutline_Hovered_Color;
 
    public int            labelDistributorMaxLabels = Map2ConfigManager.LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT;
    public int            labelDistributorRadius    = Map2ConfigManager.LABEL_DISTRIBUTOR_RADIUS_DEFAULT;
@@ -73,10 +77,17 @@ public class Map2MarkerConfig {
 
    public void setupColors() {
 
-      clusterFill_Color = new Color(clusterFill_RGB);
-      clusterOutline_Color = new Color(clusterOutline_RGB);
-      markerFill_Color = new Color(markerFill_RGB);
-      markerOutline_Color = new Color(markerOutline_RGB);
+// SET_FORMATTING_OFF
+
+      clusterFill_Color             = new Color(clusterFill_RGB);
+      clusterOutline_Color          = new Color(clusterOutline_RGB);
+
+      markerFill_Color              = new Color(markerFill_RGB);
+      markerFill_Hovered_Color      = new Color(markerFill_Hovered_RGB);
+      markerOutline_Color           = new Color(markerOutline_RGB);
+      markerOutline_Hovered_Color   = new Color(markerOutline_Hovered_RGB);
+
+// SET_FORMATTING_ON
    }
 
    @Override

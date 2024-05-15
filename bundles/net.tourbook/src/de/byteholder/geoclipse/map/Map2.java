@@ -4597,11 +4597,11 @@ public class Map2 extends Canvas {
       _backgroundPainter_Viewport_DuringPainting = _worldPixel_TopLeft_Viewport;
 
       final List<PaintedMarkerCluster> allPaintedClusters = new ArrayList<>();
-      final List<PaintedMarker> allPaintedMarkers = new ArrayList<>();
+      List<PaintedMarker> allPaintedMarkers = new ArrayList<>();
 
       try {
 
-         final Map2MarkerConfig map2Config = Map2ConfigManager.getActiveMarkerConfig();
+         final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
 
          final Image canvasImage = _backgroundPainterImage_WhichIsPainted;
          final GC gcCanvas = new GC(canvasImage);
@@ -4609,9 +4609,9 @@ public class Map2 extends Canvas {
             gcCanvas.setBackground(_mapTransparentColor);
             gcCanvas.fillRectangle(_newOverlaySize);
 
-            if (map2Config.isShowTourMarker) {
+            if (markerConfig.isShowTourMarker) {
 
-               if (map2Config.isMarkerClustered) {
+               if (markerConfig.isMarkerClustered) {
 
                   paint_BackgroundImage_30_AllClusterAndMarker(gcCanvas,
                         allPaintedMarkers,
@@ -4624,9 +4624,20 @@ public class Map2 extends Canvas {
 
                if (_hoveredMarkerCluster != null) {
 
+                  /*
+                   * Paint hovered cluster marker at the end, over other markers but put the painted
+                   * locations at the beginning that they are hit before the other !!!
+                   */
+
+                  final List<PaintedMarker> allPaintedClusterMarkers = new ArrayList<>();
+
                   paint_BackgroundImage_70_HoveredCluster(gcCanvas,
                         _hoveredMarkerCluster,
-                        allPaintedMarkers);
+                        allPaintedClusterMarkers);
+
+                  allPaintedClusterMarkers.addAll(allPaintedMarkers);
+
+                  allPaintedMarkers = allPaintedClusterMarkers;
                }
             }
          }
@@ -4754,7 +4765,9 @@ public class Map2 extends Canvas {
                   Integer.toString(numClusterItems),
                   allPaintedClusters);
 
-            allClusterOnly.add(paintedCluster.clusterSymbolRectangle);
+            if (paintedCluster != null) {
+               allClusterOnly.add(paintedCluster.clusterSymbolRectangle);
+            }
 
          } else if (item instanceof final QuadItem markerItem) {
 
@@ -5122,7 +5135,7 @@ public class Map2 extends Canvas {
          numVisibleMarkers = maxVisibleHoveredMarker;
       }
 
-      final int markerSize = 6;
+      final int markerSize = 5;
       final int markerSize2 = markerSize / 2;
 
       final int markerRespectSize = 10;//isPaintClusterMarker ? 20 : 6;
@@ -5320,11 +5333,11 @@ public class Map2 extends Canvas {
       }
 
       /*
-       * Draw marker positions
+       * Draw a symbol at the marker location
        */
       gc.setLineWidth(2);
-      gc.setForeground(UI.SYS_COLOR_BLUE);
-      gc.setBackground(UI.SYS_COLOR_WHITE);
+      gc.setForeground(markerConfig.markerFill_Color);
+      gc.setBackground(markerConfig.markerOutline_Color);
 
       int paintedMarkerIndex = 0;
 
@@ -5336,9 +5349,6 @@ public class Map2 extends Canvas {
             continue;
          }
 
-         /*
-          * Draw a symbol at the marker location
-          */
          final Map2Marker mapMarker = (Map2Marker) distribLabel.data;
 
          final int markerPointDevX = mapMarker.geoPointDevX + diffX;

@@ -181,7 +181,8 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    //
    private Button                _btnDeleteCommonLocation;
    private Button                _btnSwapClusterSymbolColor;
-   private Button                _btnSwapMarkerColor;
+   private Button                _btnSwapMarkerLabel_Color;
+   private Button                _btnSwapMarkerLabel_Hovered_Color;
    //
    private Button                _chkIsClusterSymbolAntialiased;
    private Button                _chkIsClusterTextAntialiased;
@@ -200,8 +201,9 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    private Label                 _lblClusterSymbol_Size;
    private Label                 _lblLabelDistributorMaxLabels;
    private Label                 _lblLabelDistributorRadius;
-   private Label                 _lblMarkerLabelColor;
-   private Label                 _lblMarkerLabelLayout;
+   private Label                 _lblMarkerLabel_Color;
+   private Label                 _lblMarkerLabel_HoveredColor;
+   private Label                 _lblMarkerLabel_Layout;
    //
    private Spinner               _spinnerClusterGrid_Size;
    private Spinner               _spinnerClusterOutline_Width;
@@ -212,7 +214,9 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    private ColorSelectorExtended _colorClusterSymbol_Fill;
    private ColorSelectorExtended _colorClusterSymbol_Outline;
    private ColorSelectorExtended _colorMarkerLabel_Fill;
+   private ColorSelectorExtended _colorMarkerLabel_Fill_Hovered;
    private ColorSelectorExtended _colorMarkerLabel_Outline;
+   private ColorSelectorExtended _colorMarkerLabel_Outline_Hovered;
 
    private class ActionDeleteLocation extends Action {
 
@@ -604,16 +608,16 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
       {
          /*
-          * Marker label text
+          * Marker label
           */
          {
             // label
-            _lblMarkerLabelColor = new Label(parent, SWT.NONE);
-            _lblMarkerLabelColor.setText(Messages.Slideout_MapLocation_Label_MarkerColor);
-            _lblMarkerLabelColor.setToolTipText(Messages.Slideout_MapLocation_Label_MarkerColor_Tooltip);
+            _lblMarkerLabel_Color = new Label(parent, SWT.NONE);
+            _lblMarkerLabel_Color.setText(Messages.Slideout_MapLocation_Label_MarkerColor);
+            _lblMarkerLabel_Color.setToolTipText(Messages.Slideout_MapLocation_Label_MarkerColor_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(_lblMarkerLabelColor);
+                  .applyTo(_lblMarkerLabel_Color);
          }
          {
             final Composite container = new Composite(parent, SWT.NONE);
@@ -633,10 +637,49 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
             _colorMarkerLabel_Fill.setToolTipText(Messages.Slideout_MapLocation_Label_MarkerColor_Tooltip);
 
             // button: swap color
-            _btnSwapMarkerColor = new Button(container, SWT.PUSH);
-            _btnSwapMarkerColor.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
-            _btnSwapMarkerColor.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
-            _btnSwapMarkerColor.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSwapMarkerColor()));
+            _btnSwapMarkerLabel_Color = new Button(container, SWT.PUSH);
+            _btnSwapMarkerLabel_Color.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
+            _btnSwapMarkerLabel_Color.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
+            _btnSwapMarkerLabel_Color.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> onSwapMarkerColor()));
+         }
+      }
+      {
+         /*
+          * Hovered marker label
+          */
+         {
+            // label
+            _lblMarkerLabel_HoveredColor = new Label(parent, SWT.NONE);
+            _lblMarkerLabel_HoveredColor.setText("Marker &hovered label");
+            _lblMarkerLabel_HoveredColor.setToolTipText(Messages.Slideout_MapLocation_Label_MarkerColor_Tooltip);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(_lblMarkerLabel_HoveredColor);
+         }
+         {
+            final Composite container = new Composite(parent, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+
+            // outline/text color
+            _colorMarkerLabel_Outline_Hovered = new ColorSelectorExtended(container);
+            _colorMarkerLabel_Outline_Hovered.addListener(_markerPropertyChangeListener);
+            _colorMarkerLabel_Outline_Hovered.addOpenListener(this);
+            _colorMarkerLabel_Outline_Hovered.setToolTipText(Messages.Slideout_MapLocation_Label_MarkerColor_Tooltip);
+
+            // background color
+            _colorMarkerLabel_Fill_Hovered = new ColorSelectorExtended(container);
+            _colorMarkerLabel_Fill_Hovered.addListener(_markerPropertyChangeListener);
+            _colorMarkerLabel_Fill_Hovered.addOpenListener(this);
+            _colorMarkerLabel_Fill_Hovered.setToolTipText(Messages.Slideout_MapLocation_Label_MarkerColor_Tooltip);
+
+            // button: swap color
+            _btnSwapMarkerLabel_Hovered_Color = new Button(container, SWT.PUSH);
+            _btnSwapMarkerLabel_Hovered_Color.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
+            _btnSwapMarkerLabel_Hovered_Color.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
+            _btnSwapMarkerLabel_Hovered_Color.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> onSwapMarkerHoveredColor()));
          }
       }
       {
@@ -645,12 +688,12 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
           */
 
          // label
-         _lblMarkerLabelLayout = new Label(parent, SWT.NONE);
-         _lblMarkerLabelLayout.setText("Marker &background");
-         _lblMarkerLabelLayout.setToolTipText("");
+         _lblMarkerLabel_Layout = new Label(parent, SWT.NONE);
+         _lblMarkerLabel_Layout.setText("Marker &background");
+         _lblMarkerLabel_Layout.setToolTipText("");
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
-               .applyTo(_lblMarkerLabelLayout);
+               .applyTo(_lblMarkerLabel_Layout);
 
          // combo
          _comboMarkerLabelLayout = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -1226,7 +1269,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       final boolean isShowClusteredMarker = isShowTourMarker && isMarkerClustered;
 
       _btnSwapClusterSymbolColor          .setEnabled(isShowClusteredMarker);
-      _btnSwapMarkerColor                 .setEnabled(isShowTourMarker);
+      _btnSwapMarkerLabel_Color           .setEnabled(isShowTourMarker);
 
       _chkIsClusterSymbolAntialiased      .setEnabled(isShowClusteredMarker);
       _chkIsClusterTextAntialiased        .setEnabled(isShowClusteredMarker);
@@ -1239,8 +1282,9 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _lblClusterSymbol_Size              .setEnabled(isShowClusteredMarker);
       _lblLabelDistributorMaxLabels       .setEnabled(isShowTourMarker);
       _lblLabelDistributorRadius          .setEnabled(isShowTourMarker);
-      _lblMarkerLabelColor                .setEnabled(isShowTourMarker);
-      _lblMarkerLabelLayout               .setEnabled(isShowTourMarker);
+      _lblMarkerLabel_Color               .setEnabled(isShowTourMarker);
+      _lblMarkerLabel_HoveredColor        .setEnabled(isShowTourMarker);
+      _lblMarkerLabel_Layout              .setEnabled(isShowTourMarker);
 
       _spinnerClusterGrid_Size            .setEnabled(isShowClusteredMarker);
       _spinnerClusterSymbol_Size          .setEnabled(isShowClusteredMarker);
@@ -1251,7 +1295,9 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _colorClusterSymbol_Fill            .setEnabled(isShowClusteredMarker);
       _colorClusterSymbol_Outline         .setEnabled(isShowClusteredMarker);
       _colorMarkerLabel_Fill              .setEnabled(isShowTourMarker);
+      _colorMarkerLabel_Fill_Hovered      .setEnabled(isShowTourMarker);
       _colorMarkerLabel_Outline           .setEnabled(isShowTourMarker);
+      _colorMarkerLabel_Outline_Hovered   .setEnabled(isShowTourMarker);
 
       _comboMarkerLabelLayout             .setEnabled(isShowTourMarker);
 
@@ -1586,6 +1632,22 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       repaintMap();
    }
 
+   private void onSwapMarkerHoveredColor() {
+
+      final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
+
+      final RGB fgColor = config.markerOutline_Hovered_RGB;
+      final RGB bgColor = config.markerFill_Hovered_RGB;
+
+      config.markerOutline_Hovered_RGB = bgColor;
+      config.markerFill_Hovered_RGB = fgColor;
+
+      config.setupColors();
+
+      restoreState();
+      repaintMap();
+   }
+
    @Override
    public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
@@ -1658,7 +1720,9 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _colorClusterSymbol_Fill            .setColorValue(config.clusterFill_RGB);
       _colorClusterSymbol_Outline         .setColorValue(config.clusterOutline_RGB);
       _colorMarkerLabel_Fill              .setColorValue(config.markerFill_RGB);
+      _colorMarkerLabel_Fill_Hovered      .setColorValue(config.markerFill_Hovered_RGB);
       _colorMarkerLabel_Outline           .setColorValue(config.markerOutline_RGB);
+      _colorMarkerLabel_Outline_Hovered   .setColorValue(config.markerOutline_Hovered_RGB);
 
 // SET_FORMATTING_ON
 
@@ -1706,7 +1770,9 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       config.labelDistributorRadius       = _spinnerLabelDistributorRadius    .getSelection();
 
       config.markerFill_RGB               = _colorMarkerLabel_Fill            .getColorValue();
+      config.markerFill_Hovered_RGB       = _colorMarkerLabel_Fill_Hovered    .getColorValue();
       config.markerOutline_RGB            = _colorMarkerLabel_Outline         .getColorValue();
+      config.markerOutline_Hovered_RGB    = _colorMarkerLabel_Outline_Hovered .getColorValue();
 
       config.markerLabelLayout            = getSelectedMarkerLabelLayout();
 

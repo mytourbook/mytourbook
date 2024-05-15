@@ -38,6 +38,7 @@ import net.tourbook.common.ui.FormattedWord;
 import net.tourbook.common.ui.TextWrapPainter;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
+import net.tourbook.data.TourMarker;
 import net.tourbook.map2.Messages;
 import net.tourbook.tour.location.TourLocationExtended;
 
@@ -487,10 +488,19 @@ public class DirectMappingPainter implements IDirectPainter {
       final int labelHeight = markerLabelRectangle.height;
 
       final Map2Marker mapMarker = hoveredMarker.mapMarker;
+
       final int markerPointDevX = mapMarker.geoPointDevX;
       final int markerPointDevY = mapMarker.geoPointDevY;
       final int markerSize = 6;
       final int markerSize2 = markerSize / 2;
+
+      final TourMarker tourMarker = mapMarker.tourMarker;
+
+      final String markerLabel = UI.SPACE
+            + (UI.IS_SCRAMBLE_DATA
+                  ? tourMarker.getScrambledLabel()
+                  : tourMarker.getMarkerMapLabel())
+            + UI.SPACE;
 
 // this is not working, need more brain to fix it
 //
@@ -503,8 +513,10 @@ public class DirectMappingPainter implements IDirectPainter {
       final int markerSymbolDevX = markerPointDevX - markerSize2;
       final int markerSymbolDevY = markerPointDevY - markerSize2;
 
-      gc.setBackground(UI.SYS_COLOR_WHITE);
-      gc.setForeground(UI.SYS_COLOR_RED);
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+
+      gc.setBackground(markerConfig.markerFill_Hovered_Color);
+      gc.setForeground(markerConfig.markerOutline_Hovered_Color);
 
       /*
        * Draw a line from the marker to the marker location.
@@ -556,7 +568,18 @@ public class DirectMappingPainter implements IDirectPainter {
       final int labelDevX = markerLabelRectangle.x;
       final int labelDevY = markerLabelRectangle.y;
 
-      gc.setForeground(UI.SYS_COLOR_RED);
+      // fill label background
+      gc.fillRectangle(markerLabelRectangle);
+
+      // border: horizontal bottom
+      gc.drawLine(
+            labelDevX,
+            labelDevY + labelHeight,
+            labelDevX + labelWidth - 1,
+            labelDevY + labelHeight);
+
+      // marker label
+      gc.drawString(markerLabel, labelDevX, labelDevY, true);
 
       // border: horizontal bottom
       gc.drawLine(
@@ -564,27 +587,6 @@ public class DirectMappingPainter implements IDirectPainter {
             labelDevY + labelHeight,
             labelDevX + labelWidth,
             labelDevY + labelHeight);
-
-      // border: vertical left
-//      gc.drawLine(
-//            labelDevX,
-//            labelDevY,
-//            labelDevX,
-//            labelDevY + labelHeight);
-
-//       border: horizontal bottom
-//      gc.drawLine(
-//            labelDevX,
-//            labelDevY + labelHeight,
-//            labelDevX + labelWidth - 1,
-//            labelDevY + labelHeight);
-//
-//      // border: vertical left
-//      gc.drawLine(
-//            labelDevX,
-//            labelDevY,
-//            labelDevX,
-//            labelDevY + labelHeight);
    }
 
    /**
