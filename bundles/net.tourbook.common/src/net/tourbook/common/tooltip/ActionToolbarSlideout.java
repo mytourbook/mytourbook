@@ -336,6 +336,12 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
    public void setTooltip(final String object) {
 
+      if (_actionToolItem == null) {
+
+         // this happened
+         return;
+      }
+
       _actionToolItem.setToolTipText(object);
    }
 
