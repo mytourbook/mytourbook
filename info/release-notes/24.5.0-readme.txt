@@ -1,4 +1,8 @@
-24.5.0                                                 ?. May 2024
+24.5.0                                                 15. May 2024
+
+
+IMPORTANT INFOS
+===============
 
 
 New Download Site
@@ -7,10 +11,16 @@ MyTourbook program files can be downloaded now ONLY from the new download site h
 See discussion https://github.com/mytourbook/mytourbook/discussions/1322 for more details.
 
 
+Cloud Services
+==============
+All cloud services, e.g weather retrieval can have a delay up to 50 seconds
+
+
 General Tour Import Changes
 ===========================
 Some of the tour import improvements or fixed are not automatically applied to already imported and saved tours. 
 To see these changes, the tours or parts of them, have to be reimported, see also below the new section "Changes that require Tour Re-import"
+
 
 
 New + Improvements
