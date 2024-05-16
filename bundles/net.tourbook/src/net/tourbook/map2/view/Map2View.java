@@ -22,6 +22,7 @@ import de.byteholder.geoclipse.map.IMapContextMenuProvider;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.MapGridData;
 import de.byteholder.geoclipse.map.MapLegend;
+import de.byteholder.geoclipse.map.PaintedMarker;
 import de.byteholder.geoclipse.map.event.MapGeoPositionEvent;
 import de.byteholder.geoclipse.map.event.MapHoveredTourEvent;
 import de.byteholder.geoclipse.map.event.MapPOIEvent;
@@ -134,6 +135,7 @@ import net.tourbook.photo.PhotoSelection;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.Map2_Appearance;
 import net.tourbook.srtm.IPreferences;
+import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
@@ -158,6 +160,7 @@ import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.photo.IMapWithPhotos;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ValuePoint_ToolTip_UI;
 import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.tourChart.TourChart;
@@ -201,6 +204,7 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
+import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 
 /**
@@ -511,6 +515,9 @@ public class Map2View extends ViewPart implements
    private ActionMap2_Options                _actionMap2Slideout_Options;
    private ActionMap2_PhotoFilter            _actionMap2Slideout_PhotoFilter;
    private ActionMap2_Graphs                 _actionMap2Slideout_TourColors;
+   private ActionMapMarker_CenterMap         _actionMapMarker_CenterMap;
+   private ActionMapMarker_Edit              _actionMapMarker_Edit;
+   private ActionMapMarker_ZoomIn            _actionMapMarker_ZoomIn;
    private ActionReloadFailedMapImages       _actionReloadFailedMapImages;
    private ActionSaveDefaultPosition         _actionSaveDefaultPosition;
    private ActionSearchTourByLocation        _actionSearchTourByLocation;
@@ -655,6 +662,49 @@ public class Map2View extends ViewPart implements
       @Override
       protected void onBeforeOpenSlideout() {
          closeOpenedDialogs(this);
+      }
+   }
+
+   private class ActionMapMarker_CenterMap extends Action {
+
+      public ActionMapMarker_CenterMap() {
+
+         setText("&Center map to the marker position");
+      }
+
+      @Override
+      public void run() {
+         actionMapMarker_CenterMap();
+      }
+   }
+
+   private class ActionMapMarker_Edit extends Action {
+
+      public ActionMapMarker_Edit() {
+
+         setText("&Edit tour marker");
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit_Disabled));
+      }
+
+      @Override
+      public void run() {
+         actionMapMarker_Edit();
+      }
+
+   }
+
+   private class ActionMapMarker_ZoomIn extends Action {
+
+      public ActionMapMarker_ZoomIn() {
+
+         setText("&Zoom in to the marker position");
+      }
+
+      @Override
+      public void run() {
+         actionMapMarker_ZoomIn();
       }
    }
 
@@ -1066,6 +1116,52 @@ public class Map2View extends ViewPart implements
       if (isCreateMapBookmark) {
          MapBookmarkManager.addBookmark(mapPosition, bookmarkName);
       }
+   }
+
+   private void actionMapMarker_CenterMap() {
+
+      final PaintedMarker hoveredMarker = _map.getHoveredMarker();
+
+      final GeoPoint geoPoint = hoveredMarker.mapMarker.geoPoint;
+      final GeoPosition geoPosition = new GeoPosition(geoPoint.getLatitude(), geoPoint.getLongitude());
+
+      _map.setMapCenter(geoPosition);
+   }
+
+   private void actionMapMarker_Edit() {
+
+      final PaintedMarker hoveredMarker = _map.getHoveredMarker();
+
+      final TourMarker tourMarker = hoveredMarker.mapMarker.tourMarker;
+
+      final ITourProvider tourProvider = new ITourProvider() {
+
+         @Override
+         public ArrayList<TourData> getSelectedTours() {
+
+            final ArrayList<TourData> allTours = new ArrayList<>();
+            allTours.add(tourMarker.getTourData());
+
+            return allTours;
+         }
+      };
+
+      ActionOpenMarkerDialog.doAction(tourProvider, true, tourMarker);
+
+      // hide hovered marker
+      _map.resetHoveredMarker();
+
+      _map.paint();
+   }
+
+   private void actionMapMarker_ZoomIn() {
+
+      final PaintedMarker hoveredMarker = _map.getHoveredMarker();
+
+      final GeoPoint geoPoint = hoveredMarker.mapMarker.geoPoint;
+
+      _map.setZoom(_map.getMapProvider().getMaximumZoomLevel());
+      _map.setMapCenter(new GeoPosition(geoPoint.getLatitude(), geoPoint.getLongitude()));
    }
 
    public void actionPOI() {
@@ -1864,6 +1960,9 @@ public class Map2View extends ViewPart implements
       _actionGotoLocation                 = new ActionGotoLocation();
       _actionLookupTourLocation           = new ActionLookupCommonLocation(this);
       _actionManageMapProvider            = new ActionManageMapProviders(this);
+      _actionMapMarker_CenterMap          = new ActionMapMarker_CenterMap();
+      _actionMapMarker_Edit               = new ActionMapMarker_Edit();
+      _actionMapMarker_ZoomIn             = new ActionMapMarker_ZoomIn();
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
       _actionExportMap_SubMenu            = new Action_ExportMap_SubMenu(this);
@@ -2293,6 +2392,15 @@ public class Map2View extends ViewPart implements
 // SET_FORMATTING_ON
    }
 
+   private void enableActions_MapMarker() {
+
+      final boolean isMarkerHovered = _map.getHoveredMarker() != null;
+
+      _actionMapMarker_CenterMap.setEnabled(isMarkerHovered);
+      _actionMapMarker_Edit.setEnabled(isMarkerHovered);
+      _actionMapMarker_ZoomIn.setEnabled(isMarkerHovered);
+   }
+
    private void fillActionBars() {
 
       /*
@@ -2337,56 +2445,76 @@ public class Map2View extends ViewPart implements
    @Override
    public void fillContextMenu(final IMenuManager menuMgr, final ActionManageOfflineImages actionManageOfflineImages) {
 
-      enableActions();
+      final PaintedMarker hoveredMarker = _map.getHoveredMarker();
 
-      menuMgr.add(_actionSearchTourByLocation);
-      menuMgr.add(_actionCreateTourMarkerFromMap);
-      menuMgr.add(_actionLookupTourLocation);
+      if (hoveredMarker != null) {
 
-      /*
-       * Show tour features
-       */
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionShowTourMarker);
-      menuMgr.add(_actionShowTourPauses);
-      menuMgr.add(_actionShowWayPoints);
-      menuMgr.add(_actionShowPOI);
-      menuMgr.add(_actionShowStartEndInMap);
-      if (isShowTrackColor_InContextMenu()) {
-         menuMgr.add(_actionMap2Slideout_Color);
+         // open context menu for a map marker
+
+         enableActions_MapMarker();
+
+         menuMgr.add(_actionMapMarker_ZoomIn);
+         menuMgr.add(_actionMapMarker_CenterMap);
+
+         menuMgr.add(new Separator());
+
+         menuMgr.add(_actionMapMarker_Edit);
+
+      } else {
+
+         // open default context menu
+
+         enableActions();
+
+         menuMgr.add(_actionSearchTourByLocation);
+         menuMgr.add(_actionCreateTourMarkerFromMap);
+         menuMgr.add(_actionLookupTourLocation);
+
+         /*
+          * Show tour features
+          */
+         menuMgr.add(new Separator());
+         menuMgr.add(_actionShowTourMarker);
+         menuMgr.add(_actionShowTourPauses);
+         menuMgr.add(_actionShowWayPoints);
+         menuMgr.add(_actionShowPOI);
+         menuMgr.add(_actionShowStartEndInMap);
+         if (isShowTrackColor_InContextMenu()) {
+            menuMgr.add(_actionMap2Slideout_Color);
+         }
+
+         /*
+          * Show map features
+          */
+         menuMgr.add(new Separator());
+         menuMgr.add(_actionShowTourInfoInMap);
+         menuMgr.add(_actionShowTourWeatherInMap);
+         menuMgr.add(_actionShowLegendInMap);
+         menuMgr.add(_actionShowScaleInMap);
+         menuMgr.add(_actionShowValuePoint);
+         menuMgr.add(_actionShowSliderInMap);
+         menuMgr.add(_actionShowSliderInLegend);
+         menuMgr.add(_actionZoom_ShowEntireMap);
+
+         menuMgr.add(new Separator());
+
+         MapBookmarkManager.fillContextMenu_RecentBookmarks(menuMgr, this);
+
+         menuMgr.add(_actionGotoLocation);
+         menuMgr.add(_actionCopyLocation);
+         menuMgr.add(_actionSetDefaultPosition);
+         menuMgr.add(_actionSaveDefaultPosition);
+
+         menuMgr.add(new Separator());
+
+         menuMgr.add(_actionExportMap_SubMenu);
+         menuMgr.add(_actionZoomLevelAdjustment);
+
+         menuMgr.add(new Separator());
+         menuMgr.add(actionManageOfflineImages);
+         menuMgr.add(_actionReloadFailedMapImages);
+         menuMgr.add(_actionManageMapProvider);
       }
-
-      /*
-       * Show map features
-       */
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionShowTourInfoInMap);
-      menuMgr.add(_actionShowTourWeatherInMap);
-      menuMgr.add(_actionShowLegendInMap);
-      menuMgr.add(_actionShowScaleInMap);
-      menuMgr.add(_actionShowValuePoint);
-      menuMgr.add(_actionShowSliderInMap);
-      menuMgr.add(_actionShowSliderInLegend);
-      menuMgr.add(_actionZoom_ShowEntireMap);
-
-      menuMgr.add(new Separator());
-
-      MapBookmarkManager.fillContextMenu_RecentBookmarks(menuMgr, this);
-
-      menuMgr.add(_actionGotoLocation);
-      menuMgr.add(_actionCopyLocation);
-      menuMgr.add(_actionSetDefaultPosition);
-      menuMgr.add(_actionSaveDefaultPosition);
-
-      menuMgr.add(new Separator());
-
-      menuMgr.add(_actionExportMap_SubMenu);
-      menuMgr.add(_actionZoomLevelAdjustment);
-
-      menuMgr.add(new Separator());
-      menuMgr.add(actionManageOfflineImages);
-      menuMgr.add(_actionReloadFailedMapImages);
-      menuMgr.add(_actionManageMapProvider);
    }
 
    private void fillToolbar_TourColors(final IToolBarManager tbm) {

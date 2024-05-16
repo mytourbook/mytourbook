@@ -2206,7 +2206,7 @@ public class Map2 extends Canvas {
 
             // set new map center
             setMapCenterInWorldPixel(new Point2D.Double(newCenterX, newCenterY));
-            updateViewPortData();
+            updateViewportData();
 
             paint();
 
@@ -3228,10 +3228,7 @@ public class Map2 extends Canvas {
 
          if (_hoveredMarker != null) {
 
-            // a marker is selected
-
-            int a = 0;
-            a++;
+            // a marker is hovered
 
          } else {
 
@@ -4141,7 +4138,7 @@ public class Map2 extends Canvas {
             _clientArea.height // + 2 * MAP_OVERLAY_MARGIN
       );
 
-      updateViewPortData();
+      updateViewportData();
 
       // stop painting thread
       if (_backgroundPainterFuture != null) {
@@ -4186,7 +4183,7 @@ public class Map2 extends Canvas {
          // internal data are not yet initialized, this happens only the first time when a map is displayed
 
          initMap();
-         updateViewPortData();
+         updateViewportData();
       }
 
       // get time when the redraw is requested
@@ -4563,6 +4560,7 @@ public class Map2 extends Canvas {
       if (_backgroundPainterFuture != null) {
 
          // an overlay task is currently running
+
          return;
       }
 
@@ -4585,8 +4583,23 @@ public class Map2 extends Canvas {
             _backgroundPainterFuture = null;
          }
 
-         // redraw map image with updated background image
+         // redraw map image with the updated background image
          paint();
+
+         /*
+          * Paint again when there are viewport differences, this will fix e.g. the zoom in issue
+          * where some markers are not painted
+          */
+         final Rectangle topLeft_Viewport_WhenPainted = _backgroundPainter_Viewport_WhenPainted;
+         final Rectangle topLeft_Viewport_Current = _worldPixel_TopLeft_Viewport;
+
+         final int diffX = topLeft_Viewport_WhenPainted.x - topLeft_Viewport_Current.x;
+         final int diffY = topLeft_Viewport_WhenPainted.y - topLeft_Viewport_Current.y;
+
+         if (diffX != 0 || diffY != 0) {
+
+            getDisplay().asyncExec(() -> paint());
+         }
       };
 
       _backgroundPainterFuture = _backgroundPainterExecutor.submit(backgroundTask);
@@ -7780,7 +7793,7 @@ public class Map2 extends Canvas {
 
       // set new map center
       setMapCenterInWorldPixel(new Point2D.Double(newCenterX, newCenterY));
-      updateViewPortData();
+      updateViewportData();
 
       paint();
 
@@ -8099,7 +8112,7 @@ public class Map2 extends Canvas {
       final Point2D.Double pixelCenter = new Point2D.Double(newCenterX, newCenterY);
 
       setMapCenterInWorldPixel(pixelCenter);
-      updateViewPortData();
+      updateViewportData();
 
       resetMarkerCluster();
 
@@ -8149,10 +8162,17 @@ public class Map2 extends Canvas {
       paint();
    }
 
+   public void resetHoveredMarker() {
+
+      _hoveredMarker = null;
+      _directMapPainterContext.hoveredMarker = null;
+   }
+
    public void resetMarkerCluster() {
 
       _hoveredMarker = null;
       _hoveredMarkerCluster = null;
+
       _directMapPainterContext.hoveredMarker = null;
 
       _isMarkerClusterSelected = false;
@@ -8412,7 +8432,7 @@ public class Map2 extends Canvas {
          });
       }
 
-      updateViewPortData();
+      updateViewportData();
       updateTourToolTip();
 
       stopOldPainting();
@@ -8534,7 +8554,7 @@ public class Map2 extends Canvas {
          // set new map center
          _worldPixel_MapCenter = wpMapCenter;
 
-         updateViewPortData();
+         updateViewportData();
       }
 
       fireEvent_MapInfo();
@@ -8909,7 +8929,7 @@ public class Map2 extends Canvas {
       final int oldZoomLevel = _mapZoomLevel;
 
       /*
-       * check if the requested zoom level is within the bounds of the map provider
+       * Check if the requested zoom level is within the bounds of the map provider
        */
       int adjustedZoomLevel = newZoomLevel;
       final int mpMinimumZoomLevel = _mp.getMinimumZoomLevel();
@@ -8990,7 +9010,7 @@ public class Map2 extends Canvas {
 
       setMapCenterInWorldPixel(wpNewMapCenter);
 
-      updateViewPortData();
+      updateViewportData();
       updateTourToolTip();
 //    updatePoiVisibility();
 
@@ -9154,7 +9174,7 @@ public class Map2 extends Canvas {
 
             // map is not synched but location is wrong
 
-            updateViewPortData();
+            updateViewportData();
             paint();
          }
       }
@@ -9398,7 +9418,7 @@ public class Map2 extends Canvas {
     * {@link #_worldPixel_MapCenter} and {@link #_mapZoomLevel} are the base values for the other
     * viewport fields.
     */
-   private void updateViewPortData() {
+   private void updateViewportData() {
 
       if (_mp == null) {
          // the map has currently no map provider
@@ -9455,6 +9475,8 @@ public class Map2 extends Canvas {
       _devGridPixelSize_Y = Math.abs(worldGrid2.y - worldGrid1.y);
 
       grid_UpdateGeoGridData();
+
+      resetMarkerCluster();
    }
 
    public void zoomIn(final CenterMapBy centerMapBy) {
