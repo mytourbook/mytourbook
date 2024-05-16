@@ -4713,6 +4713,8 @@ public class Map2 extends Canvas {
 
       } catch (final Exception e) {
 
+         UI.disposeResource(_backgroundPainterImage_WhichIsPainted);
+
          StatusUtil.log(e);
       }
    }

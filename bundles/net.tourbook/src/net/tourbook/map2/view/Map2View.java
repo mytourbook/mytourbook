@@ -517,6 +517,7 @@ public class Map2View extends ViewPart implements
    private ActionMap2_Graphs                 _actionMap2Slideout_TourColors;
    private ActionMapMarker_CenterMap         _actionMapMarker_CenterMap;
    private ActionMapMarker_Edit              _actionMapMarker_Edit;
+   private ActionMapMarker_ShowOnlyThisTour  _actionMapMarker_ShowOnlyThisTour;
    private ActionMapMarker_ZoomIn            _actionMapMarker_ZoomIn;
    private ActionReloadFailedMapImages       _actionReloadFailedMapImages;
    private ActionSaveDefaultPosition         _actionSaveDefaultPosition;
@@ -691,6 +692,20 @@ public class Map2View extends ViewPart implements
       @Override
       public void run() {
          actionMapMarker_Edit();
+      }
+
+   }
+
+   private class ActionMapMarker_ShowOnlyThisTour extends Action {
+
+      public ActionMapMarker_ShowOnlyThisTour() {
+
+         setText("&Show only this tour");
+      }
+
+      @Override
+      public void run() {
+         actionMapMarker_ShowOnlyThisTour();
       }
 
    }
@@ -1152,6 +1167,16 @@ public class Map2View extends ViewPart implements
       _map.resetHoveredMarker();
 
       _map.paint();
+   }
+
+   private void actionMapMarker_ShowOnlyThisTour() {
+      // TODO Auto-generated method stub
+
+      final PaintedMarker hoveredMarker = _map.getHoveredMarker();
+
+      final TourMarker tourMarker = hoveredMarker.mapMarker.tourMarker;
+
+      paintTours_20_One(tourMarker.getTourData(), true);
    }
 
    private void actionMapMarker_ZoomIn() {
@@ -1962,6 +1987,7 @@ public class Map2View extends ViewPart implements
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionMapMarker_CenterMap          = new ActionMapMarker_CenterMap();
       _actionMapMarker_Edit               = new ActionMapMarker_Edit();
+      _actionMapMarker_ShowOnlyThisTour   = new ActionMapMarker_ShowOnlyThisTour();
       _actionMapMarker_ZoomIn             = new ActionMapMarker_ZoomIn();
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
@@ -2398,6 +2424,7 @@ public class Map2View extends ViewPart implements
 
       _actionMapMarker_CenterMap.setEnabled(isMarkerHovered);
       _actionMapMarker_Edit.setEnabled(isMarkerHovered);
+      _actionMapMarker_ShowOnlyThisTour.setEnabled(isMarkerHovered);
       _actionMapMarker_ZoomIn.setEnabled(isMarkerHovered);
    }
 
@@ -2458,6 +2485,7 @@ public class Map2View extends ViewPart implements
 
          menuMgr.add(new Separator());
 
+         menuMgr.add(_actionMapMarker_ShowOnlyThisTour);
          menuMgr.add(_actionMapMarker_Edit);
 
       } else {
@@ -5099,9 +5127,7 @@ public class Map2View extends ViewPart implements
       _valuePointTooltipUI.setTourData(tourData);
 
       // update tour id's in the map
-      final List<Long> allTourIds = new ArrayList<>();
-      allTourIds.add(tourId);
-      _map.setTourIds(allTourIds);
+      _map.setTourIds(Arrays.asList(tourId));
 
       setTourData_Common();
    }
