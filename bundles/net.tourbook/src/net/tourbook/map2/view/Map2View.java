@@ -74,7 +74,9 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.map.Action_ExportMap_SubMenu;
 import net.tourbook.map.IMapSyncListener;
+import net.tourbook.map.IMapView;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapInfoManager;
 import net.tourbook.map.MapManager;
@@ -124,7 +126,6 @@ import net.tourbook.map2.action.ActionZoomLevelAdjustment;
 import net.tourbook.map2.action.ActionZoomOut;
 import net.tourbook.map2.action.ActionZoomShowEntireMap;
 import net.tourbook.map2.action.ActionZoomShowEntireTour;
-import net.tourbook.map2.action.Action_ExportMap_SubMenu;
 import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.Photo;
@@ -188,7 +189,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -217,6 +217,7 @@ public class Map2View extends ViewPart implements
       IMapBookmarkListener,
       IMapSyncListener,
       IMapWithPhotos,
+      IMapView,
       IPhotoEventListener {
 
 // SET_FORMATTING_OFF
@@ -502,7 +503,7 @@ public class Map2View extends ViewPart implements
    private ActionCreateTourMarkerFromMap     _actionCreateTourMarkerFromMap;
    private Action_ExportMap_SubMenu          _actionExportMap_SubMenu;
    private ActionGotoLocation                _actionGotoLocation;
-   private ActionLookupCommonLocation       _actionLookupTourLocation;
+   private ActionLookupCommonLocation        _actionLookupTourLocation;
    private ActionManageMapProviders          _actionManageMapProvider;
    private ActionMapBookmarks                _actionMap2Slideout_Bookmarks;
    private ActionMap2Color                   _actionMap2Slideout_Color;
@@ -1978,7 +1979,7 @@ public class Map2View extends ViewPart implements
 
       } else if (mapColorProvider instanceof IDiscreteColorProvider) {
 
-         // return null image to hide the legend -> there is currenly no legend provider for a IDiscreteColorProvider
+         // return null image to hide the legend -> there is currently no legend provider for a IDiscreteColorProvider
 
 //         isDataAvailable = createLegendImage_20_SetProviderValues((IDiscreteColorProvider) mapColorProvider);
       }
@@ -2624,20 +2625,10 @@ public class Map2View extends ViewPart implements
             Math.pow(2, mapZoomLevel));
    }
 
+   @Override
    public Image getMapViewImage() {
 
-      final Image image = new Image(_parent.getDisplay(),
-            _parent.getSize().x,
-            _parent.getSize().y);
-
-      final GC gc = new GC(image);
-      _parent.print(gc);
-      //This produces the same result
-      //  final GC gc = new GC(_parent);
-      //  gc.copyArea(image, 0, 0);
-      gc.dispose();
-
-      return image;
+      return MapUtils.getMapViewImage(_parent);
    }
 
    /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2023 Frédéric Bard
+ * Copyright (C) 2021, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map2.view;
+package net.tourbook.map;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
@@ -60,7 +60,7 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class DialogMap2ExportViewImage extends TitleAreaDialog {
+public class DialogMapExportViewImage extends TitleAreaDialog {
 
    private static final List<String> DistanceData = List.of("JPEG, JPG", "PNG", "BMP"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -94,7 +94,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
    private PixelConverter        _pc;
    private Point                 _shellDefaultSize;
 
-   private Map2View              _map2View;
+   private IMapView              _mapView;
 
    private FileCollisionBehavior _exportState_FileCollisionBehavior;
 
@@ -120,14 +120,14 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
    private Text      _txtFilePath;
 
-   public DialogMap2ExportViewImage(final Shell parentShell, final Map2View map2View) {
+   public DialogMapExportViewImage(final Shell parentShell, final IMapView mapView) {
 
       super(parentShell);
 
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      _map2View = map2View;
+      _mapView = mapView;
    }
 
    @Override
@@ -395,7 +395,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       net.tourbook.ui.UI.disableAllControls(_inputContainer);
 
-      final Image mapViewImage = _map2View.getMapViewImage();
+      final Image mapViewImage = _mapView.getMapViewImage();
 
       final ImageLoader loader = new ImageLoader();
 
