@@ -1248,6 +1248,9 @@ public class Map2 extends Canvas {
     */
    private List<Map2Marker> createMapMarkers(final ArrayList<TourData> allTourData) {
 
+      // wrap label
+      final int markerWrapLength = 40;
+
       final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
 
       final List<Map2Marker> allMapMarkers = new ArrayList<>();
@@ -1317,6 +1320,26 @@ public class Map2 extends Canvas {
 
                mapMarker.geoPointDevX = devX;
                mapMarker.geoPointDevY = devY;
+
+               /*
+                * Create formatted label
+                */
+               String markerLabel = tourMarker.getMarkerMapLabel();
+
+               if (markerLabel.length() > markerWrapLength) {
+
+                  markerLabel = WordUtils.wrap(markerLabel, markerWrapLength);
+
+                  final String lineSeparator = System.lineSeparator();
+
+                  // remove line separator at the end
+                  if (markerLabel.endsWith(lineSeparator)) {
+
+                     markerLabel = markerLabel.substring(0, markerLabel.length() - lineSeparator.length());
+                  }
+               }
+
+               mapMarker.formattedLabel = markerLabel;
 
                allMapMarkers.add(mapMarker);
             }
@@ -4818,27 +4841,15 @@ public class Map2 extends Canvas {
 
    private void paint_BackgroundImage_50_OneMarker(final GC gc,
                                                    final Map2Marker mapMarker,
-                                                   final int markerDevX,
-                                                   final int markerDevY,
+                                                   final Rectangle labelRectangle,
                                                    final List<PaintedMarker> allPaintedMarkers) {
 
       final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
-      final TourMarker tourMarker = mapMarker.tourMarker;
 
-      final String markerLabel = UI.SPACE
-            + (UI.IS_SCRAMBLE_DATA
-                  ? tourMarker.getScrambledLabel()
-                  : tourMarker.getMarkerMapLabel())
-            + UI.SPACE;
+      final String markerLabel = mapMarker.formattedLabel;
 
-      final Point textExtent = gc.stringExtent(markerLabel);
-      final int textHeight = textExtent.y;
-      final int textHeight2 = textHeight / 2;
-
-      final int devX = markerDevX;
-      final int devY = markerDevY - textHeight2;
-
-      final Rectangle markerRectangle = new Rectangle(devX, devY, textExtent.x, textHeight);
+      final int devX = labelRectangle.x;
+      final int devY = labelRectangle.y;
 
       /*
        * Draw marker background
@@ -4846,7 +4857,7 @@ public class Map2 extends Canvas {
       if (markerConfig.markerLabelLayout.equals(MapLabelLayout.RECTANGLE_BOX)) {
 
          gc.setBackground(markerConfig.markerFill_Color);
-         gc.fillRectangle(markerRectangle);
+         gc.fillRectangle(labelRectangle);
 
       } else if (markerConfig.markerLabelLayout.equals(MapLabelLayout.BORDER_0_POINT)) {
 
@@ -4856,30 +4867,30 @@ public class Map2 extends Canvas {
 
          gc.setForeground(markerConfig.markerFill_Color);
 
-         gc.drawString(markerLabel, devX - 1, devY, true);
-         gc.drawString(markerLabel, devX + 1, devY, true);
-         gc.drawString(markerLabel, devX, devY - 1, true);
-         gc.drawString(markerLabel, devX, devY + 1, true);
+         gc.drawText(markerLabel, devX - 1, devY, true);
+         gc.drawText(markerLabel, devX + 1, devY, true);
+         gc.drawText(markerLabel, devX, devY - 1, true);
+         gc.drawText(markerLabel, devX, devY + 1, true);
 
       } else if (markerConfig.markerLabelLayout.equals(MapLabelLayout.BORDER_2_POINT)) {
 
          gc.setForeground(markerConfig.markerFill_Color);
 
-         gc.drawString(markerLabel, devX - 1, devY, true);
-         gc.drawString(markerLabel, devX + 1, devY, true);
-         gc.drawString(markerLabel, devX, devY - 1, true);
-         gc.drawString(markerLabel, devX, devY + 1, true);
+         gc.drawText(markerLabel, devX - 1, devY, true);
+         gc.drawText(markerLabel, devX + 1, devY, true);
+         gc.drawText(markerLabel, devX, devY - 1, true);
+         gc.drawText(markerLabel, devX, devY + 1, true);
 
-         gc.drawString(markerLabel, devX - 2, devY, true);
-         gc.drawString(markerLabel, devX + 2, devY, true);
-         gc.drawString(markerLabel, devX, devY - 2, true);
-         gc.drawString(markerLabel, devX, devY + 2, true);
+         gc.drawText(markerLabel, devX - 2, devY, true);
+         gc.drawText(markerLabel, devX + 2, devY, true);
+         gc.drawText(markerLabel, devX, devY - 2, true);
+         gc.drawText(markerLabel, devX, devY + 2, true);
       }
 
       gc.setForeground(markerConfig.markerOutline_Color);
-      gc.drawString(markerLabel, devX, devY, true);
+      gc.drawText(markerLabel, devX, devY, true);
 
-      allPaintedMarkers.add(new PaintedMarker(mapMarker, markerRectangle));
+      allPaintedMarkers.add(new PaintedMarker(mapMarker, labelRectangle));
 
       return;
    }
@@ -5151,7 +5162,7 @@ public class Map2 extends Canvas {
       final int markerSize = 5;
       final int markerSize2 = markerSize / 2;
 
-      final int markerRespectSize = 10;//isPaintClusterMarker ? 20 : 6;
+      final int markerRespectSize = 20;
       final int markerRespectSize2 = markerRespectSize / 2;
 
       final float subMarkerDiff = numAllMarkers / (float) numVisibleMarkers;
@@ -5189,12 +5200,11 @@ public class Map2 extends Canvas {
          }
 
          final Map2Marker mapMarker = allMapMarker[clusterIndex];
-         final TourMarker tourMarker = mapMarker.tourMarker;
 
          final int devX = mapMarker.geoPointDevX;
          final int devY = mapMarker.geoPointDevY;
 
-         final String markerLabel = tourMarker.getMarkerMapLabel();
+         final String markerLabel = mapMarker.formattedLabel;
 
          final Point textExtent = gc.textExtent(markerLabel);
          final int textWidth = textExtent.x;
@@ -5289,7 +5299,9 @@ public class Map2 extends Canvas {
             continue;
          }
 
-         final String text = UI.SPACE1 + distribLabel.label;
+         final Map2Marker mapMarker = (Map2Marker) distribLabel.data;
+
+         final String text = mapMarker.formattedLabel;
          final Point textExtent = gc.textExtent(text);
 
          final int textWidth = textExtent.x;
@@ -5303,8 +5315,6 @@ public class Map2 extends Canvas {
                labelDevY,
                textWidth,
                textHeight);
-
-         final Map2Marker mapMarker = (Map2Marker) distribLabel.data;
 
          /*
           * Draw marker label
@@ -5339,8 +5349,7 @@ public class Map2 extends Canvas {
             paint_BackgroundImage_50_OneMarker(
                   gc,
                   mapMarker,
-                  labelDevX,
-                  labelDevY,
+                  markerLabelRectangle,
                   allPaintedMarkers);
          }
       }

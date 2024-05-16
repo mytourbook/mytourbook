@@ -34,6 +34,11 @@ public class Map2Marker implements ClusterItem {
    public int        geoPointDevX;
    public int        geoPointDevY;
 
+   /**
+    * Long labels are wrapped
+    */
+   public String     formattedLabel;
+
    public TourMarker tourMarker;
 
    /**

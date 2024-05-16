@@ -38,7 +38,6 @@ import net.tourbook.common.ui.FormattedWord;
 import net.tourbook.common.ui.TextWrapPainter;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
-import net.tourbook.data.TourMarker;
 import net.tourbook.map2.Messages;
 import net.tourbook.tour.location.TourLocationExtended;
 
@@ -494,21 +493,7 @@ public class DirectMappingPainter implements IDirectPainter {
       final int markerSize = 6;
       final int markerSize2 = markerSize / 2;
 
-      final TourMarker tourMarker = mapMarker.tourMarker;
-
-      final String markerLabel = UI.SPACE
-            + (UI.IS_SCRAMBLE_DATA
-                  ? tourMarker.getScrambledLabel()
-                  : tourMarker.getMarkerMapLabel())
-            + UI.SPACE;
-
-// this is not working, need more brain to fix it
-//
-//      final int diffX = painterContext.backgroundPainter_MicroAdjustment_DiffX;
-//      final int diffY = painterContext.backgroundPainter_MicroAdjustment_DiffY;
-//
-//      final int markerSymbolDevX = markerPointDevX - markerSize2 + diffX;
-//      final int markerSymbolDevY = markerPointDevY - markerSize2 + diffY;
+      final String markerLabel = mapMarker.formattedLabel;
 
       final int markerSymbolDevX = markerPointDevX - markerSize2;
       final int markerSymbolDevY = markerPointDevY - markerSize2;
@@ -579,7 +564,7 @@ public class DirectMappingPainter implements IDirectPainter {
             labelDevY + labelHeight);
 
       // marker label
-      gc.drawString(markerLabel, labelDevX, labelDevY, true);
+      gc.drawText(markerLabel, labelDevX, labelDevY, true);
 
       // border: horizontal bottom
       gc.drawLine(
