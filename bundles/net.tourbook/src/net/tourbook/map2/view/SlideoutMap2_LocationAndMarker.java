@@ -608,6 +608,12 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
    private void createUI_220_Marker_Label(final Composite parent) {
 
+      final int firstColumnIndent = UI.FORM_FIRST_COLUMN_INDENT;
+
+      final GridDataFactory labelGridData = GridDataFactory.fillDefaults()
+            .align(SWT.FILL, SWT.CENTER)
+            .indent(firstColumnIndent, 0);
+
       {
          /*
           * Marker label
@@ -617,9 +623,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
             _lblMarkerLabel_Color = new Label(parent, SWT.NONE);
             _lblMarkerLabel_Color.setText(Messages.Slideout_MapLocation_Label_MarkerColor);
             _lblMarkerLabel_Color.setToolTipText(Messages.Slideout_MapLocation_Label_MarkerColor_Tooltip);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(_lblMarkerLabel_Color);
+            labelGridData.applyTo(_lblMarkerLabel_Color);
          }
          {
             final Composite container = new Composite(parent, SWT.NONE);
@@ -655,9 +659,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
             _lblMarkerLabel_HoveredColor = new Label(parent, SWT.NONE);
             _lblMarkerLabel_HoveredColor.setText("Marker &hovered label");
             _lblMarkerLabel_HoveredColor.setToolTipText(Messages.Slideout_MapLocation_Label_MarkerColor_Tooltip);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(_lblMarkerLabel_HoveredColor);
+            labelGridData.applyTo(_lblMarkerLabel_HoveredColor);
          }
          {
             final Composite container = new Composite(parent, SWT.NONE);
@@ -693,9 +695,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          _lblMarkerLabel_Layout = new Label(parent, SWT.NONE);
          _lblMarkerLabel_Layout.setText("Marker &background");
          _lblMarkerLabel_Layout.setToolTipText("");
-         GridDataFactory.fillDefaults()
-               .align(SWT.FILL, SWT.CENTER)
-               .applyTo(_lblMarkerLabel_Layout);
+         labelGridData.applyTo(_lblMarkerLabel_Layout);
 
          // combo
          _comboMarkerLabelLayout = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -712,9 +712,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          _lblLabelDistributorMaxLabels.setText("&Visible labels");
          _lblLabelDistributorMaxLabels.setToolTipText(
                "Number of ALL labels which are distributed within the map viewport or a hovered cluster. A large number can slow down performance");
-         GridDataFactory.fillDefaults()
-               .align(SWT.FILL, SWT.CENTER)
-               .applyTo(_lblLabelDistributorMaxLabels);
+         labelGridData.applyTo(_lblLabelDistributorMaxLabels);
 
          // spinner
          _spinnerLabelDistributorMaxLabels = new Spinner(parent, SWT.BORDER);
@@ -733,9 +731,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          _lblLabelDistributorRadius = new Label(parent, SWT.NONE);
          _lblLabelDistributorRadius.setText("Label distributor &radius");
          _lblLabelDistributorRadius.setToolTipText("Radius for the displayed labels around the marker locations");
-         GridDataFactory.fillDefaults()
-               .align(SWT.FILL, SWT.CENTER)
-               .applyTo(_lblLabelDistributorRadius);
+         labelGridData.applyTo(_lblLabelDistributorRadius);
 
          // spinner
          _spinnerLabelDistributorRadius = new Spinner(parent, SWT.BORDER);
@@ -754,9 +750,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          _lblLabelWrapLength = new Label(parent, SWT.NONE);
          _lblLabelWrapLength.setText("Label wrap &length");
          _lblLabelWrapLength.setToolTipText("");
-         GridDataFactory.fillDefaults()
-               .align(SWT.FILL, SWT.CENTER)
-               .applyTo(_lblLabelWrapLength);
+         labelGridData.applyTo(_lblLabelWrapLength);
 
          // spinner
          _spinnerLabelWrapLength = new Spinner(parent, SWT.BORDER);
@@ -776,13 +770,14 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          _chkIsMarkerLabelAntialiased.addSelectionListener(_markerSelectionListener);
          GridDataFactory.fillDefaults()
                .span(2, 1)
+               .indent(firstColumnIndent, 0)
                .applyTo(_chkIsMarkerLabelAntialiased);
       }
    }
 
    private void createUI_230_Marker_Cluster(final Composite parent) {
 
-      final int clusterIndent = UI.FORM_FIRST_COLUMN_INDENT;
+      final int firstColumnIndent = UI.FORM_FIRST_COLUMN_INDENT;
 
       {
          /*
@@ -807,7 +802,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          _lblClusterGrid_Size.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterGridSize);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
-               .indent(clusterIndent, 0)
+               .indent(firstColumnIndent, 0)
                .applyTo(_lblClusterGrid_Size);
 
          // spinner
@@ -830,7 +825,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
             _lblClusterSymbol_Size.setToolTipText(Messages.Slideout_MapLocation_Label_ClusterSize_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
-                  .indent(clusterIndent, 0)
+                  .indent(firstColumnIndent, 0)
                   .applyTo(_lblClusterSymbol_Size);
          }
          {
@@ -873,7 +868,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
             _lblClusterSymbol.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_ClusterSymbolColor_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
-                  .indent(clusterIndent, 0)
+                  .indent(firstColumnIndent, 0)
                   .applyTo(_lblClusterSymbol);
          }
 
@@ -912,7 +907,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
             _chkIsFillClusterSymbol.addSelectionListener(_markerSelectionListener);
             GridDataFactory.fillDefaults()
                   .span(2, 1)
-                  .indent(clusterIndent, 0)
+                  .indent(firstColumnIndent, 0)
                   .applyTo(_chkIsFillClusterSymbol);
          }
       }
@@ -925,7 +920,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          _chkIsClusterTextAntialiased.addSelectionListener(_markerSelectionListener);
          GridDataFactory.fillDefaults()
                .span(2, 1)
-               .indent(clusterIndent, 0)
+               .indent(firstColumnIndent, 0)
                .applyTo(_chkIsClusterTextAntialiased);
       }
       {
@@ -937,7 +932,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          _chkIsClusterSymbolAntialiased.addSelectionListener(_markerSelectionListener);
          GridDataFactory.fillDefaults()
                .span(2, 1)
-               .indent(clusterIndent, 0)
+               .indent(firstColumnIndent, 0)
                .applyTo(_chkIsClusterSymbolAntialiased);
       }
    }

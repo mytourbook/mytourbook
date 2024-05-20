@@ -493,7 +493,7 @@ public class DirectMappingPainter implements IDirectPainter {
       final int markerSize = 6;
       final int markerSize2 = markerSize / 2;
 
-      final String markerLabel = mapMarker.formattedLabel;
+      final String markerLabel = mapMarker.getFormattedLabel();
 
       final int markerSymbolDevX = markerPointDevX - markerSize2;
       final int markerSymbolDevY = markerPointDevY - markerSize2;

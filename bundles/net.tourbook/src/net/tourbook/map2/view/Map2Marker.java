@@ -37,9 +37,11 @@ public class Map2Marker implements ClusterItem {
    /**
     * Long labels are wrapped
     */
-   public String     formattedLabel;
+   private String    formattedLabel;
 
    public TourMarker tourMarker;
+
+   public int        numSkippedLabels;
 
    /**
     * @param tourMarker
@@ -52,9 +54,21 @@ public class Map2Marker implements ClusterItem {
       this.tourMarker = tourMarker;
    }
 
+   public String getFormattedLabel() {
+
+      return numSkippedLabels < 2
+            ? formattedLabel
+            : formattedLabel + " (" + numSkippedLabels + ")";
+   }
+
    @Override
    public GeoPoint getPosition() {
       return geoPoint;
+   }
+
+   public void setFormattedLabel(final String formattedLabel) {
+
+      this.formattedLabel = formattedLabel;
    }
 
    @Override

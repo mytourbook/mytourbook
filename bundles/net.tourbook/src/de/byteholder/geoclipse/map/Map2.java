@@ -64,8 +64,10 @@ import java.net.URLDecoder;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -1249,6 +1251,31 @@ public class Map2 extends Canvas {
     */
    private List<Map2Marker> createMapMarkers(final List<TourData> allTourData) {
 
+      final Map<String, Map2Marker> _allMapMarkerWithSkipLabels = new HashMap<>();
+      final Map<String, Object> _allMapMarkerSkipLabels = new HashMap<>();
+
+      _allMapMarkerSkipLabels.put("Cooldown", new Object());
+      _allMapMarkerSkipLabels.put("cooldown", new Object());
+      _allMapMarkerSkipLabels.put("slowdown", new Object());
+      _allMapMarkerSkipLabels.put("cool", new Object());
+
+      _allMapMarkerSkipLabels.put("0", new Object());
+      _allMapMarkerSkipLabels.put("1", new Object());
+      _allMapMarkerSkipLabels.put("2", new Object());
+      _allMapMarkerSkipLabels.put("3", new Object());
+      _allMapMarkerSkipLabels.put("4", new Object());
+      _allMapMarkerSkipLabels.put("5", new Object());
+      _allMapMarkerSkipLabels.put("6", new Object());
+      _allMapMarkerSkipLabels.put("7", new Object());
+      _allMapMarkerSkipLabels.put("8", new Object());
+      _allMapMarkerSkipLabels.put("9", new Object());
+      _allMapMarkerSkipLabels.put("10", new Object());
+      _allMapMarkerSkipLabels.put("11", new Object());
+      _allMapMarkerSkipLabels.put("12", new Object());
+      _allMapMarkerSkipLabels.put("13", new Object());
+
+      final int skipLabelBorder = 400;
+
       final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
 
       final int markerWrapLength = markerConfig.labelWrapLength;
@@ -1263,7 +1290,7 @@ public class Map2 extends Canvas {
             continue;
          }
 
-         if (_backgroundPainterFuture.isCancelled()) {
+         if (_backgroundPainterFuture == null || _backgroundPainterFuture.isCancelled()) {
             break;
          }
 
@@ -1314,11 +1341,41 @@ public class Map2 extends Canvas {
 
             if (isMarkerInViewport) {
 
-               final Map2Marker mapMarker = new Map2Marker(tourMarker, new GeoPoint(latitude, longitude));
-
                // convert world position into device position
                final int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
                final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
+
+               String markerLabel = tourMarker.getMarkerMapLabel();
+               boolean isFirstSkipLabel = false;
+
+               String skipKey = null;
+               final Object skipLabel = _allMapMarkerSkipLabels.get(markerLabel);
+               if (skipLabel != null) {
+
+                  // the label may be skipped
+
+                  final int skipX = devX / skipLabelBorder;
+                  final int skipY = devY / skipLabelBorder;
+
+                  skipKey = markerLabel + "-" + skipX + "-" + skipY;
+
+                  final Map2Marker skipLabelMarker = _allMapMarkerWithSkipLabels.get(skipKey);
+
+                  if (skipLabelMarker != null) {
+
+                     // update number of skipped labels
+
+                     skipLabelMarker.numSkippedLabels++;
+
+                     continue;
+
+                  } else {
+
+                     isFirstSkipLabel = true;
+                  }
+               }
+
+               final Map2Marker mapMarker = new Map2Marker(tourMarker, new GeoPoint(latitude, longitude));
 
                mapMarker.geoPointDevX = devX;
                mapMarker.geoPointDevY = devY;
@@ -1326,7 +1383,6 @@ public class Map2 extends Canvas {
                /*
                 * Create formatted label
                 */
-               String markerLabel = tourMarker.getMarkerMapLabel();
 
                if (markerLabel.length() > markerWrapLength) {
 
@@ -1341,7 +1397,14 @@ public class Map2 extends Canvas {
                   }
                }
 
-               mapMarker.formattedLabel = markerLabel;
+               mapMarker.setFormattedLabel(markerLabel);
+
+               if (isFirstSkipLabel) {
+
+                  mapMarker.numSkippedLabels++;
+
+                  _allMapMarkerWithSkipLabels.put(skipKey, mapMarker);
+               }
 
                allMapMarkers.add(mapMarker);
             }
@@ -4584,7 +4647,18 @@ public class Map2 extends Canvas {
 
          // an overlay task is currently running
 
-         return;
+         final boolean isDone = _backgroundPainterFuture.isDone();
+
+         if (isDone) {
+
+            StatusUtil.logInfo("paint_BackgroundImage(): _backgroundPainterFuture.isDone() == true, however it should be null");
+
+         } else {
+
+            // this case happened but the future was not set to null
+
+            return;
+         }
       }
 
       final Runnable backgroundTask = () -> {
@@ -4786,7 +4860,7 @@ public class Map2 extends Canvas {
       // firstly paint the clusters
       for (final Cluster<ClusterItem> item : allMarkerClusters) {
 
-         if (_backgroundPainterFuture.isCancelled()) {
+         if (_backgroundPainterFuture == null || _backgroundPainterFuture.isCancelled()) {
             return;
          }
 
@@ -4847,7 +4921,7 @@ public class Map2 extends Canvas {
 
       final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
 
-      final String markerLabel = mapMarker.formattedLabel;
+      final String markerLabel = mapMarker.getFormattedLabel();
 
       final int devX = labelRectangle.x;
       final int devY = labelRectangle.y;
@@ -5210,7 +5284,7 @@ public class Map2 extends Canvas {
          final int devX = mapMarker.geoPointDevX;
          final int devY = mapMarker.geoPointDevY;
 
-         final String markerLabel = mapMarker.formattedLabel;
+         final String markerLabel = mapMarker.getFormattedLabel();
 
          final Point textExtent = gc.textExtent(markerLabel);
          final int textWidth = textExtent.x;
@@ -5307,7 +5381,7 @@ public class Map2 extends Canvas {
 
          final Map2Marker mapMarker = (Map2Marker) distribLabel.data;
 
-         final String text = mapMarker.formattedLabel;
+         final String text = mapMarker.getFormattedLabel();
          final Point textExtent = gc.textExtent(text);
 
          final int textWidth = textExtent.x;
