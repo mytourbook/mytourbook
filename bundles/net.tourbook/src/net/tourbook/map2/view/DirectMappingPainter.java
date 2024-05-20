@@ -554,7 +554,11 @@ public class DirectMappingPainter implements IDirectPainter {
       final int labelDevY = markerLabelRectangle.y;
 
       // fill label background
-      gc.fillRectangle(markerLabelRectangle);
+      gc.fillRectangle(
+            markerLabelRectangle.x - Map2.MAP_MARKER_BORDER_WIDTH,
+            markerLabelRectangle.y,
+            markerLabelRectangle.width + 2 * Map2.MAP_MARKER_BORDER_WIDTH,
+            markerLabelRectangle.height);
 
       // border: horizontal bottom
       gc.drawLine(

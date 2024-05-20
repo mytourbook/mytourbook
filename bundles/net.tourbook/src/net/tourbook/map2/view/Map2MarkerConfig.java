@@ -56,6 +56,7 @@ public class Map2MarkerConfig {
 
    public int            labelDistributorMaxLabels = Map2ConfigManager.LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT;
    public int            labelDistributorRadius    = Map2ConfigManager.LABEL_DISTRIBUTOR_RADIUS_DEFAULT;
+   public int            labelWrapLength           = Map2ConfigManager.LABEL_WRAP_LENGTH_DEFAULT;
 
    /*
     * Cluster

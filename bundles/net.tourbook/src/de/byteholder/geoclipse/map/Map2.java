@@ -207,6 +207,7 @@ public class Map2 extends Canvas {
    private static final String          DIRECTION_N                                    = "N";                             //$NON-NLS-1$
 
    private static final int             TEXT_MARGIN                                    = 6;
+   public static final int              MAP_MARKER_BORDER_WIDTH                        = UI.IS_4K_DISPLAY ? 4 : 2;
 
    private static final String          GEO_GRID_ACTION_UPDATE_GEO_LOCATION_ZOOM_LEVEL = "\uE003";                        //$NON-NLS-1$
 
@@ -1246,10 +1247,11 @@ public class Map2 extends Canvas {
     *
     * @return Returns a list with all markers which are visible in the map viewport
     */
-   private List<Map2Marker> createMapMarkers(final ArrayList<TourData> allTourData) {
+   private List<Map2Marker> createMapMarkers(final List<TourData> allTourData) {
 
-      // wrap label
-      final int markerWrapLength = 40;
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+
+      final int markerWrapLength = markerConfig.labelWrapLength;
 
       final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
 
@@ -3307,9 +3309,7 @@ public class Map2 extends Canvas {
 
          redraw();
 
-      } else if (_isShowHoveredOrSelectedTour
-
-            && _isShowBreadcrumbs
+      } else if (_isShowBreadcrumbs
 
             // check if breadcrumb is hit
             && _tourBreadcrumb.onMouseDown(devMousePosition)) {
@@ -3903,7 +3903,7 @@ public class Map2 extends Canvas {
          }
       }
 
-      if (isSomethingHit == false && _isShowHoveredOrSelectedTour) {
+      if (isSomethingHit == false) {
 
          final int numOldHoveredTours = _allHoveredTourIds.size();
 
@@ -4647,15 +4647,21 @@ public class Map2 extends Canvas {
 
             if (markerConfig.isShowTourMarker) {
 
+               // clone list to prevent concurrency exceptions, this happened
+               final List<TourData> allTourData = new ArrayList<>(TourPainterConfiguration.getTourData());
+
                if (markerConfig.isMarkerClustered) {
 
                   paint_BackgroundImage_30_AllClusterAndMarker(gcCanvas,
+                        allTourData,
                         allPaintedMarkers,
                         allPaintedClusters);
 
                } else {
 
-                  paint_BackgroundImage_20_AllMarker(gcCanvas, allPaintedMarkers);
+                  paint_BackgroundImage_20_AllMarker(gcCanvas,
+                        allTourData,
+                        allPaintedMarkers);
                }
 
                if (_hoveredMarkerCluster != null) {
@@ -4719,9 +4725,9 @@ public class Map2 extends Canvas {
       }
    }
 
-   private void paint_BackgroundImage_20_AllMarker(final GC gc, final List<PaintedMarker> allPaintedMarkers) {
-
-      final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
+   private void paint_BackgroundImage_20_AllMarker(final GC gc,
+                                                   final List<TourData> allTourData,
+                                                   final List<PaintedMarker> allPaintedMarkers) {
 
       final List<Map2Marker> allMapMarkers = createMapMarkers(allTourData);
 
@@ -4741,16 +4747,10 @@ public class Map2 extends Canvas {
             allMapMarkersArray,
             allPaintedMarkers,
             false);
-
-//      paint_BackgroundImage_50_OneMarker(
-//                                         gc,
-//                                         latitudeSerie[serieIndex],
-//                                         longitudeSerie[serieIndex],
-//                                         tourMarker,
-//                                         allPaintedMarkers);
    }
 
    private void paint_BackgroundImage_30_AllClusterAndMarker(final GC gc,
+                                                             final List<TourData> allTourData,
                                                              final List<PaintedMarker> allPaintedMarkers,
                                                              final List<PaintedMarkerCluster> allPaintedClusters) {
 
@@ -4770,7 +4770,6 @@ public class Map2 extends Canvas {
       gc.setTextAntialias(markerConfig.isClusterTextAntialiased ? SWT.ON : SWT.OFF);
 
       // convert MapMarker's into ClusterItem's
-      final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
       final List<Map2Marker> allMapMarkers = createMapMarkers(allTourData);
 
       final List<ClusterItem> allClusterItems = new ArrayList<>();
@@ -4859,7 +4858,12 @@ public class Map2 extends Canvas {
       if (markerConfig.markerLabelLayout.equals(MapLabelLayout.RECTANGLE_BOX)) {
 
          gc.setBackground(markerConfig.markerFill_Color);
-         gc.fillRectangle(labelRectangle);
+
+         gc.fillRectangle(
+               labelRectangle.x - MAP_MARKER_BORDER_WIDTH,
+               labelRectangle.y,
+               labelRectangle.width + 2 * MAP_MARKER_BORDER_WIDTH,
+               labelRectangle.height);
 
       } else if (markerConfig.markerLabelLayout.equals(MapLabelLayout.BORDER_0_POINT)) {
 
@@ -5723,7 +5727,6 @@ public class Map2 extends Canvas {
       Long hoveredTourId = null;
       boolean isTourHoveredAndSelected = false;
       boolean isPaintTourInfo = false;
-      boolean isPaintBreadcrumbs = false;
 
       final int numHoveredTours = _allHoveredDevPoints.size();
 
@@ -5781,8 +5784,6 @@ public class Map2 extends Canvas {
        * Paint hovered tour or trackpoint
        */
       if (_isShowHoveredOrSelectedTour) {
-
-         isPaintBreadcrumbs = _isShowBreadcrumbs;
 
          if (numHoveredTours > 0) {
 
@@ -5872,9 +5873,9 @@ public class Map2 extends Canvas {
       final boolean isEnhancedPaintingMethod = isPaintTile_With_BasicMethod() == false;
       final boolean isShowTourPaintMethodEnhancedWarning = isEnhancedPaintingMethod && _isShowTourPaintMethodEnhancedWarning;
 
-      if (isPaintBreadcrumbs || isShowTourPaintMethodEnhancedWarning) {
+      if (_isShowBreadcrumbs || isShowTourPaintMethodEnhancedWarning) {
 
-         _tourBreadcrumb.paint(gc, isPaintBreadcrumbs, isShowTourPaintMethodEnhancedWarning);
+         _tourBreadcrumb.paint(gc, _isShowBreadcrumbs, isShowTourPaintMethodEnhancedWarning);
       }
 
       return isPaintTourInfo;

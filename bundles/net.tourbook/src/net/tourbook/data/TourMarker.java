@@ -541,11 +541,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
          return _markerMapLabel;
       }
 
-      final String markerText = UI.IS_SCRAMBLE_DATA
+      String markerLabel = UI.IS_SCRAMBLE_DATA
             ? getScrambledLabel()
             : label;
-
-      String markerLabel = UI.SPACE + markerText + UI.SPACE;
 
       if (getDescription().length() > 0) {
          markerLabel += UI.SYMBOL_STAR;

@@ -88,6 +88,7 @@ public class Map2ConfigManager {
    //
    private static final String ATTR_LABEL_DISTRIBUTOR_MAX_LABELS  = "labelDistributorMaxLabels";  //$NON-NLS-1$
    private static final String ATTR_LABEL_DISTRIBUTOR_RADIUS      = "labelDistributorRadius";     //$NON-NLS-1$
+   private static final String ATTR_LABEL_WRAP_LENGTH             = "labelWrapLength";            //$NON-NLS-1$
    //
    private static final String TAG_MARKER_FILL_COLOR              = "MarkerFillColor";            //$NON-NLS-1$
    private static final String TAG_MARKER_FILL_HOVERED_COLOR      = "MarkerFillHoveredColor";     //$NON-NLS-1$
@@ -117,6 +118,9 @@ public class Map2ConfigManager {
    static final int                   LABEL_DISTRIBUTOR_RADIUS_MIN         = 10;
    static final int                   LABEL_DISTRIBUTOR_RADIUS_MAX         = 2000;
    static final int                   LABEL_DISTRIBUTOR_RADIUS_DEFAULT     = 300;
+   static final int                   LABEL_WRAP_LENGTH_MIN                = 10;
+   static final int                   LABEL_WRAP_LENGTH_MAX                = 1000;
+   static final int                   LABEL_WRAP_LENGTH_DEFAULT            = 40;
    // cluster
    public static final boolean        DEFAULT_IS_FILL_CLUSTER_SYMBOL       = true;
    public static final int            DEFAULT_CLUSTER_GRID_SIZE            = 60;
@@ -312,6 +316,7 @@ public class Map2ConfigManager {
 
          xmlConfig.putInteger(      ATTR_LABEL_DISTRIBUTOR_MAX_LABELS,  config.labelDistributorMaxLabels);
          xmlConfig.putInteger(      ATTR_LABEL_DISTRIBUTOR_RADIUS,      config.labelDistributorRadius);
+         xmlConfig.putInteger(      ATTR_LABEL_WRAP_LENGTH,             config.labelWrapLength);
 
          Util.setXmlRgb(xmlConfig,  TAG_CLUSTER_FILL_COLOR,             config.clusterFill_RGB);
          Util.setXmlRgb(xmlConfig,  TAG_CLUSTER_OUTLINE_COLOR,          config.clusterOutline_RGB);
@@ -421,6 +426,7 @@ public class Map2ConfigManager {
 
       config.labelDistributorMaxLabels    = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_DISTRIBUTOR_MAX_LABELS,  LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT,  LABEL_DISTRIBUTOR_MAX_LABELS_MIN,   LABEL_DISTRIBUTOR_MAX_LABELS_MAX);
       config.labelDistributorRadius       = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_DISTRIBUTOR_RADIUS,      LABEL_DISTRIBUTOR_RADIUS_DEFAULT,      LABEL_DISTRIBUTOR_RADIUS_MIN,       LABEL_DISTRIBUTOR_RADIUS_MAX);
+      config.labelWrapLength              = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_WRAP_LENGTH,             LABEL_WRAP_LENGTH_DEFAULT,             LABEL_WRAP_LENGTH_MIN,              LABEL_WRAP_LENGTH_MAX);
 
 // SET_FORMATTING_ON
 

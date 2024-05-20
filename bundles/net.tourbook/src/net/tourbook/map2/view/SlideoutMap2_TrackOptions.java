@@ -153,9 +153,9 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
     * @param map2State
     */
    SlideoutMap2_TrackOptions(final Control ownerControl,
-                            final ToolBar toolBar,
-                            final Map2View map2View,
-                            final IDialogSettings map2State) {
+                             final ToolBar toolBar,
+                             final Map2View map2View,
+                             final IDialogSettings map2State) {
 
       super(ownerControl, toolBar);
 
@@ -516,8 +516,8 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
       {
          createUI_210_HoveredSelection(container);
-         createUI_220_Breadcrumb(container);
          createUI_230_TourDirection(container);
+         createUI_240_Breadcrumb(container);
       }
 
       return container;
@@ -639,45 +639,6 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
       }
    }
 
-   /**
-    * Breadcrumb history
-    *
-    * @param parent
-    */
-   private void createUI_220_Breadcrumb(final Composite parent) {
-
-      {
-         /*
-          * Show breadcrumbs
-          */
-         _chkShowBreadcrumbs = new Button(parent, SWT.CHECK);
-         _chkShowBreadcrumbs.setText(Messages.Slideout_Map_Options_Checkbox_ShowBreadcrumbs);
-         _chkShowBreadcrumbs.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowBreadcrumbs_Tooltip);
-         _chkShowBreadcrumbs.addSelectionListener(_defaultMapOptions_SelectionListener);
-         _firstColumnLayoutData.span(2, 1).applyTo(_chkShowBreadcrumbs);
-      }
-      {
-         /*
-          * Number of crumbs
-          */
-
-         // label
-         _lblBreadcrumbItems = new Label(parent, SWT.NONE);
-         _lblBreadcrumbItems.setText(Messages.Slideout_Map_Options_Label_BreadcrumbItems);
-         _lblBreadcrumbItems.setToolTipText(Messages.Slideout_Map_Options_Label_BreadcrumbItems_Tooltip);
-         _secondColumnLayoutData.span(1, 1).applyTo(_lblBreadcrumbItems);
-
-         // number of crumbs
-         _spinnerBreadcrumbItems = new Spinner(parent, SWT.BORDER);
-         _spinnerBreadcrumbItems.setMinimum(0); // 0 will hide the bread crumb
-         _spinnerBreadcrumbItems.setMaximum(99);
-         _spinnerBreadcrumbItems.setToolTipText(Messages.Slideout_Map_Options_Label_BreadcrumbItems_Tooltip);
-         _spinnerBreadcrumbItems.addSelectionListener(_defaultMapOptions_SelectionListener);
-         _spinnerBreadcrumbItems.addMouseWheelListener(_defaultMapOptions_MouseWheelListener);
-         _spinnerLayoutData.applyTo(_spinnerBreadcrumbItems);
-      }
-   }
-
    private void createUI_230_TourDirection(final Composite parent) {
 
       {
@@ -773,6 +734,45 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
          _colorTourDirection_SymbolColor.addListener(_defaultMapOptions_ChangePropertyListener);
          _colorTourDirection_SymbolColor.addOpenListener(this);
 
+      }
+   }
+
+   /**
+    * Breadcrumb history
+    *
+    * @param parent
+    */
+   private void createUI_240_Breadcrumb(final Composite parent) {
+
+      {
+         /*
+          * Show breadcrumbs
+          */
+         _chkShowBreadcrumbs = new Button(parent, SWT.CHECK);
+         _chkShowBreadcrumbs.setText(Messages.Slideout_Map_Options_Checkbox_ShowBreadcrumbs);
+         _chkShowBreadcrumbs.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowBreadcrumbs_Tooltip);
+         _chkShowBreadcrumbs.addSelectionListener(_defaultMapOptions_SelectionListener);
+         GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowBreadcrumbs);
+      }
+      {
+         /*
+          * Number of crumbs
+          */
+
+         // label
+         _lblBreadcrumbItems = new Label(parent, SWT.NONE);
+         _lblBreadcrumbItems.setText(Messages.Slideout_Map_Options_Label_BreadcrumbItems);
+         _lblBreadcrumbItems.setToolTipText(Messages.Slideout_Map_Options_Label_BreadcrumbItems_Tooltip);
+         _firstColumnLayoutData.span(1, 1).applyTo(_lblBreadcrumbItems);
+
+         // number of crumbs
+         _spinnerBreadcrumbItems = new Spinner(parent, SWT.BORDER);
+         _spinnerBreadcrumbItems.setMinimum(0); // 0 will hide the bread crumb
+         _spinnerBreadcrumbItems.setMaximum(99);
+         _spinnerBreadcrumbItems.setToolTipText(Messages.Slideout_Map_Options_Label_BreadcrumbItems_Tooltip);
+         _spinnerBreadcrumbItems.addSelectionListener(_defaultMapOptions_SelectionListener);
+         _spinnerBreadcrumbItems.addMouseWheelListener(_defaultMapOptions_MouseWheelListener);
+         _spinnerLayoutData.applyTo(_spinnerBreadcrumbItems);
       }
    }
 
@@ -895,7 +895,7 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
 
       final boolean isHoveredSelected              = _chkShowHoveredSelectedTour.getSelection();
       final boolean isShowTourDirection            = _chkShowTourDirections.getSelection() && isHoveredSelected;
-      final boolean isShowBreadcrumbs              = _chkShowBreadcrumbs.getSelection() && isHoveredSelected;
+      final boolean isShowBreadcrumbs              = _chkShowBreadcrumbs.getSelection();
 
       final boolean isBasicPaintingMode            = isEnhancedPaintingMode == false;
       final boolean isHoveredSelectedAndBasicMode  = isHoveredSelected && isBasicPaintingMode;
@@ -937,9 +937,9 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
       _spinnerHoveredSelected_SelectedOpacity            .setEnabled(isHoveredSelectedAndBasicMode);
 
       // breadcrumbs
-      _chkShowBreadcrumbs                       .setEnabled(isHoveredSelectedAndBasicMode);
-      _lblBreadcrumbItems                       .setEnabled(isShowBreadcrumbs && isHoveredSelectedAndBasicMode);
-      _spinnerBreadcrumbItems                   .setEnabled(isShowBreadcrumbs && isHoveredSelectedAndBasicMode);
+      _chkShowBreadcrumbs                       .setEnabled(true);
+      _lblBreadcrumbItems                       .setEnabled(isShowBreadcrumbs);
+      _spinnerBreadcrumbItems                   .setEnabled(isShowBreadcrumbs);
 
       // tour direction
       _chkShowTourDirections                    .setEnabled(isHoveredSelectedAndBasicMode);

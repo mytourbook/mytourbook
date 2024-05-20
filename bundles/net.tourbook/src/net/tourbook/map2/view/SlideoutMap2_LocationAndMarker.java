@@ -201,6 +201,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    private Label                 _lblClusterSymbol_Size;
    private Label                 _lblLabelDistributorMaxLabels;
    private Label                 _lblLabelDistributorRadius;
+   private Label                 _lblLabelWrapLength;
    private Label                 _lblMarkerLabel_Color;
    private Label                 _lblMarkerLabel_HoveredColor;
    private Label                 _lblMarkerLabel_Layout;
@@ -210,6 +211,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    private Spinner               _spinnerClusterSymbol_Size;
    private Spinner               _spinnerLabelDistributorMaxLabels;
    private Spinner               _spinnerLabelDistributorRadius;
+   private Spinner               _spinnerLabelWrapLength;
    //
    private ColorSelectorExtended _colorClusterSymbol_Fill;
    private ColorSelectorExtended _colorClusterSymbol_Outline;
@@ -707,7 +709,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
           */
          // label
          _lblLabelDistributorMaxLabels = new Label(parent, SWT.NONE);
-         _lblLabelDistributorMaxLabels.setText("Label distributor &max");
+         _lblLabelDistributorMaxLabels.setText("&Visible labels");
          _lblLabelDistributorMaxLabels.setToolTipText(
                "Number of ALL labels which are distributed within the map viewport or a hovered cluster. A large number can slow down performance");
          GridDataFactory.fillDefaults()
@@ -743,6 +745,27 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          _spinnerLabelDistributorRadius.setPageIncrement(100);
          _spinnerLabelDistributorRadius.addSelectionListener(_markerSelectionListener);
          _spinnerLabelDistributorRadius.addMouseWheelListener(_markerMouseWheelListener10);
+      }
+      {
+         /*
+          * Label wrapping
+          */
+         // label
+         _lblLabelWrapLength = new Label(parent, SWT.NONE);
+         _lblLabelWrapLength.setText("Label wrap &length");
+         _lblLabelWrapLength.setToolTipText("");
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_lblLabelWrapLength);
+
+         // spinner
+         _spinnerLabelWrapLength = new Spinner(parent, SWT.BORDER);
+         _spinnerLabelWrapLength.setMinimum(Map2ConfigManager.LABEL_WRAP_LENGTH_MIN);
+         _spinnerLabelWrapLength.setMaximum(Map2ConfigManager.LABEL_WRAP_LENGTH_MAX);
+         _spinnerLabelWrapLength.setIncrement(1);
+         _spinnerLabelWrapLength.setPageIncrement(10);
+         _spinnerLabelWrapLength.addSelectionListener(_markerSelectionListener);
+         _spinnerLabelWrapLength.addMouseWheelListener(_markerMouseWheelListener10);
       }
       {
          /*
@@ -1282,6 +1305,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _lblClusterSymbol_Size              .setEnabled(isShowClusteredMarker);
       _lblLabelDistributorMaxLabels       .setEnabled(isShowTourMarker);
       _lblLabelDistributorRadius          .setEnabled(isShowTourMarker);
+      _lblLabelWrapLength                 .setEnabled(isShowTourMarker);
       _lblMarkerLabel_Color               .setEnabled(isShowTourMarker);
       _lblMarkerLabel_HoveredColor        .setEnabled(isShowTourMarker);
       _lblMarkerLabel_Layout              .setEnabled(isShowTourMarker);
@@ -1291,6 +1315,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _spinnerClusterOutline_Width        .setEnabled(isShowClusteredMarker);
       _spinnerLabelDistributorMaxLabels   .setEnabled(isShowTourMarker);
       _spinnerLabelDistributorRadius      .setEnabled(isShowTourMarker);
+      _spinnerLabelWrapLength             .setEnabled(isShowTourMarker);
 
       _colorClusterSymbol_Fill            .setEnabled(isShowClusteredMarker);
       _colorClusterSymbol_Outline         .setEnabled(isShowClusteredMarker);
@@ -1716,6 +1741,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _spinnerClusterSymbol_Size          .setSelection( config.clusterSymbol_Size);
       _spinnerLabelDistributorMaxLabels   .setSelection( config.labelDistributorMaxLabels);
       _spinnerLabelDistributorRadius      .setSelection( config.labelDistributorRadius);
+      _spinnerLabelWrapLength             .setSelection( config.labelWrapLength);
 
       _colorClusterSymbol_Fill            .setColorValue(config.clusterFill_RGB);
       _colorClusterSymbol_Outline         .setColorValue(config.clusterOutline_RGB);
@@ -1768,6 +1794,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
       config.labelDistributorMaxLabels    = _spinnerLabelDistributorMaxLabels .getSelection();
       config.labelDistributorRadius       = _spinnerLabelDistributorRadius    .getSelection();
+      config.labelWrapLength              = _spinnerLabelWrapLength           .getSelection();
 
       config.markerFill_RGB               = _colorMarkerLabel_Fill            .getColorValue();
       config.markerFill_Hovered_RGB       = _colorMarkerLabel_Fill_Hovered    .getColorValue();

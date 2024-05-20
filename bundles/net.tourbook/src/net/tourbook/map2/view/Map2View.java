@@ -707,7 +707,6 @@ public class Map2View extends ViewPart implements
       public void run() {
          actionMapMarker_ShowOnlyThisTour();
       }
-
    }
 
    private class ActionMapMarker_ZoomIn extends Action {
@@ -2420,11 +2419,14 @@ public class Map2View extends ViewPart implements
 
    private void enableActions_MapMarker() {
 
+      final int numTours = _allTourData.size();
+      final boolean isMultipleTours = numTours > 1;
+
       final boolean isMarkerHovered = _map.getHoveredMarker() != null;
 
       _actionMapMarker_CenterMap.setEnabled(isMarkerHovered);
       _actionMapMarker_Edit.setEnabled(isMarkerHovered);
-      _actionMapMarker_ShowOnlyThisTour.setEnabled(isMarkerHovered);
+      _actionMapMarker_ShowOnlyThisTour.setEnabled(isMarkerHovered && isMultipleTours);
       _actionMapMarker_ZoomIn.setEnabled(isMarkerHovered);
    }
 
