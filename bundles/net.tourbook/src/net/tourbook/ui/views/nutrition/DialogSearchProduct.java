@@ -195,7 +195,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
          switch (__sortColumnName) {
 
          case COLUMN_CODE:
-            rc = p1.code.compareToIgnoreCase(p2.code);
+            rc = StringUtils.compareIgnoreCase(p1.code, p2.code);
             break;
 
          case COLUMN_QUANTITY:
@@ -203,20 +203,20 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
                   ? UI.EMPTY_STRING : p1.quantity;
             final String quantity2 = net.tourbook.common.util.StringUtils.isNullOrEmpty(p2.quantity)
                   ? UI.EMPTY_STRING : p2.quantity;
-            rc = quantity1.compareToIgnoreCase(quantity2);
+            rc = StringUtils.compareIgnoreCase(quantity1, quantity2);
             break;
 
          case COLUMN_NAME:
          default:
-            rc = p1.productName.compareToIgnoreCase(p2.productName);
+            rc = StringUtils.compareIgnoreCase(p1.productName, p2.productName);
             break;
 
          }
 
          if (rc == 0) {
 
-            // subsort 1 by category
-            rc = p1.productName.compareToIgnoreCase(p1.productName);
+            // subsort 1 by name
+            rc = StringUtils.compareIgnoreCase(p1.productName, p2.productName);
          }
 
          // if descending order, flip the direction

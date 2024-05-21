@@ -42,6 +42,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_1;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
@@ -389,17 +390,31 @@ public class TourBlogView extends ViewPart {
 
       // Average fluids per hour
       final String averageFluidPerHour = NutritionUtils.computeAverageFluidsPerHour(_tourData);
-      sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Fluids, averageFluidPerHour, UI.UNIT_FLUIDS_L + UI.SLASH + UI.UNIT_LABEL_TIME));
+      if (net.tourbook.common.util.StringUtils.hasContent(averageFluidPerHour) &&
+            !averageFluidPerHour.equals("0")) { //$NON-NLS-1$
+
+         sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Fluids,
+               averageFluidPerHour,
+               UI.UNIT_FLUIDS_L + UI.SLASH + UI.UNIT_LABEL_TIME));
+      }
+
       // Average calories per hour
       final String averageCaloriesPerHour = NutritionUtils.computeAverageCaloriesPerHour(_tourData);
-      sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Calories,
-            averageCaloriesPerHour,
-            OtherMessages.VALUE_UNIT_K_CALORIES + UI.SLASH + UI.UNIT_LABEL_TIME));
+      if (net.tourbook.common.util.StringUtils.hasContent(averageCaloriesPerHour)) {
+
+         sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Calories,
+               averageCaloriesPerHour,
+               OtherMessages.VALUE_UNIT_K_CALORIES + UI.SLASH + UI.UNIT_LABEL_TIME));
+      }
+
       // Average sodium per L
-      final String averageSodiumPerHour = NutritionUtils.computeAverageSodiumPerHour(_tourData);
-      sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Sodium,
-            averageSodiumPerHour,
-            UI.UNIT_WEIGHT_MG + UI.SLASH + UI.UNIT_FLUIDS_L));
+      final String averageSodiumPerLiter = NutritionUtils.computeAverageSodiumPerLiter(_tourData);
+      if (net.tourbook.common.util.StringUtils.hasContent(averageSodiumPerLiter)) {
+
+         sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Sodium,
+               averageSodiumPerLiter,
+               UI.UNIT_WEIGHT_MG + UI.SLASH + UI.UNIT_FLUIDS_L));
+      }
 
       sb.append("</table>"); //$NON-NLS-1$
 
@@ -579,14 +594,14 @@ public class TourBlogView extends ViewPart {
       final float bodyWeight = _tourData.getBodyWeight() * UI.UNIT_VALUE_WEIGHT;
       if (bodyWeight > 0) {
          sb.append("&#9878;" + UI.SPACE1); //$NON-NLS-1$
-         sb.append(new ValueFormatter_Number_1_0().printDouble(bodyWeight));
+         sb.append(new ValueFormatter_Number_1_1().printDouble(bodyWeight));
          sb.append(UI.SPACE1 + UI.UNIT_LABEL_WEIGHT + UI.SPACE3);
       }
 
       // Body fat
       final float bodyFat = _tourData.getBodyFat();
       if (bodyFat > 0) {
-         sb.append(new ValueFormatter_Number_1_0().printDouble(bodyFat));
+         sb.append(new ValueFormatter_Number_1_1().printDouble(bodyFat));
          sb.append(UI.SPACE1 + UI.SYMBOL_PERCENTAGE + UI.SPACE3);
       }
 
