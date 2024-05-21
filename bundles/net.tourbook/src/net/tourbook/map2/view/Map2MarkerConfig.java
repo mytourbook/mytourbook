@@ -42,6 +42,9 @@ public class Map2MarkerConfig {
    public boolean        isShowTourMarker          = true;
    public boolean        isMarkerLabelAntialiased  = true;
 
+   public boolean        isGroupDuplicatedMarkers;
+   public String         duplicatedMarkers         = UI.EMPTY_STRING;
+
    public MapLabelLayout markerLabelLayout         = Map2ConfigManager.MARKER_LABEL_LAYOUT_DEFAULT;
 
    public RGB            markerFill_RGB            = Map2ConfigManager.DEFAULT_MARKER_FILL_RGB;

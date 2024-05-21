@@ -95,6 +95,7 @@ import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
@@ -396,6 +397,10 @@ public class Map2 extends Canvas {
    private PointFeatureLabeler             _clusterLabeler                    = new PointFeatureLabeler();
    private List<PaintedMarker>             _allPaintedMarkers                 = new ArrayList<>();
    private List<PaintedMarkerCluster>      _allPaintedMarkerClusters          = new ArrayList<>();
+   private final Map<String, Object>       _allMapMarkerSkipLabels            = new HashMap<>();
+   private final Map<String, Map2Marker>   _allMapMarkerWithSkipLabels        = new HashMap<>();
+   private String                          _groupedMarkers;
+
    private PaintedMarkerCluster            _hoveredMarkerCluster;
    private PaintedMarker                   _hoveredMarker;
    private boolean                         _isMarkerClusterSelected;
@@ -1251,32 +1256,40 @@ public class Map2 extends Canvas {
     */
    private List<Map2Marker> createMapMarkers(final List<TourData> allTourData) {
 
-      final Map<String, Map2Marker> _allMapMarkerWithSkipLabels = new HashMap<>();
-      final Map<String, Object> _allMapMarkerSkipLabels = new HashMap<>();
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
 
-      _allMapMarkerSkipLabels.put("Cooldown", new Object());
-      _allMapMarkerSkipLabels.put("cooldown", new Object());
-      _allMapMarkerSkipLabels.put("slowdown", new Object());
-      _allMapMarkerSkipLabels.put("cool", new Object());
+      final boolean isGroupDuplicatedMarkers = markerConfig.isGroupDuplicatedMarkers;
 
-      _allMapMarkerSkipLabels.put("0", new Object());
-      _allMapMarkerSkipLabels.put("1", new Object());
-      _allMapMarkerSkipLabels.put("2", new Object());
-      _allMapMarkerSkipLabels.put("3", new Object());
-      _allMapMarkerSkipLabels.put("4", new Object());
-      _allMapMarkerSkipLabels.put("5", new Object());
-      _allMapMarkerSkipLabels.put("6", new Object());
-      _allMapMarkerSkipLabels.put("7", new Object());
-      _allMapMarkerSkipLabels.put("8", new Object());
-      _allMapMarkerSkipLabels.put("9", new Object());
-      _allMapMarkerSkipLabels.put("10", new Object());
-      _allMapMarkerSkipLabels.put("11", new Object());
-      _allMapMarkerSkipLabels.put("12", new Object());
-      _allMapMarkerSkipLabels.put("13", new Object());
+      if (isGroupDuplicatedMarkers) {
+
+         _allMapMarkerWithSkipLabels.clear();
+
+         final String duplicatedMarkers = markerConfig.duplicatedMarkers;
+
+         if (duplicatedMarkers.equals(_groupedMarkers) == false) {
+
+            // setup skipped labels
+
+            _groupedMarkers = duplicatedMarkers;
+
+            final String[] allDuplicatedMarkers = StringUtils.splitIntoLines(duplicatedMarkers);
+
+            final Object dummyObject = new Object();
+
+            _allMapMarkerSkipLabels.clear();
+
+            for (String markerLabel : allDuplicatedMarkers) {
+
+               markerLabel = markerLabel.trim();
+
+               if (markerLabel.length() > 0) {
+                  _allMapMarkerSkipLabels.put(markerLabel, dummyObject);
+               }
+            }
+         }
+      }
 
       final int skipLabelBorder = 400;
-
-      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
 
       final int markerWrapLength = markerConfig.labelWrapLength;
 
@@ -1346,32 +1359,36 @@ public class Map2 extends Canvas {
                final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
 
                String markerLabel = tourMarker.getMarkerMapLabel();
+
                boolean isFirstSkipLabel = false;
-
                String skipKey = null;
-               final Object skipLabel = _allMapMarkerSkipLabels.get(markerLabel);
-               if (skipLabel != null) {
 
-                  // the label may be skipped
+               if (isGroupDuplicatedMarkers && _allMapMarkerSkipLabels.size() > 0) {
 
-                  final int skipX = devX / skipLabelBorder;
-                  final int skipY = devY / skipLabelBorder;
+                  final Object skipLabel = _allMapMarkerSkipLabels.get(markerLabel);
+                  if (skipLabel != null) {
 
-                  skipKey = markerLabel + "-" + skipX + "-" + skipY;
+                     // the label may be skipped
 
-                  final Map2Marker skipLabelMarker = _allMapMarkerWithSkipLabels.get(skipKey);
+                     final int skipX = devX / skipLabelBorder;
+                     final int skipY = devY / skipLabelBorder;
 
-                  if (skipLabelMarker != null) {
+                     skipKey = markerLabel + "-" + skipX + "-" + skipY;
 
-                     // update number of skipped labels
+                     final Map2Marker skipLabelMarker = _allMapMarkerWithSkipLabels.get(skipKey);
 
-                     skipLabelMarker.numSkippedLabels++;
+                     if (skipLabelMarker != null) {
 
-                     continue;
+                        // update number of skipped labels
 
-                  } else {
+                        skipLabelMarker.numSkippedLabels++;
 
-                     isFirstSkipLabel = true;
+                        continue;
+
+                     } else {
+
+                        isFirstSkipLabel = true;
+                     }
                   }
                }
 

@@ -86,6 +86,9 @@ public class Map2ConfigManager {
    private static final String ATTR_IS_MARKER_LABEL_ANTIALIASED   = "isMarkerLabelAntialiased";   //$NON-NLS-1$
    private static final String ATTR_MARKER_LABEL_LAYOUT           = "markerLabelLayout";          //$NON-NLS-1$
    //
+   private static final String ATTR_IS_GROUP_DUPLICATED_MARKERS   = "isGroupDuplicatedMarkers";   //$NON-NLS-1$
+   private static final String ATTR_DUPLICATED_MARKERS            = "duplicatedMarkers";          //$NON-NLS-1$
+   //
    private static final String ATTR_LABEL_DISTRIBUTOR_MAX_LABELS  = "labelDistributorMaxLabels";  //$NON-NLS-1$
    private static final String ATTR_LABEL_DISTRIBUTOR_RADIUS      = "labelDistributorRadius";     //$NON-NLS-1$
    private static final String ATTR_LABEL_WRAP_LENGTH             = "labelWrapLength";            //$NON-NLS-1$
@@ -295,6 +298,9 @@ public class Map2ConfigManager {
          xmlConfig.putBoolean(      ATTR_IS_SHOW_TOUR_MARKER,           config.isShowTourMarker);
          xmlConfig.putBoolean(      ATTR_IS_MARKER_LABEL_ANTIALIASED,   config.isMarkerLabelAntialiased);
 
+         xmlConfig.putBoolean(      ATTR_IS_GROUP_DUPLICATED_MARKERS,   config.isGroupDuplicatedMarkers);
+         xmlConfig.putString(       ATTR_DUPLICATED_MARKERS,            config.duplicatedMarkers);
+
          Util.setXmlEnum(xmlConfig, ATTR_MARKER_LABEL_LAYOUT,           config.markerLabelLayout);
 
          Util.setXmlRgb(xmlConfig,  TAG_MARKER_FILL_COLOR,              config.markerFill_RGB);
@@ -410,11 +416,14 @@ public class Map2ConfigManager {
 
 // SET_FORMATTING_OFF
 
-      config.id                           = Util.getXmlString(xmlConfig,      ATTR_ID,                            Long.toString(System.nanoTime()));
-      config.name                         = Util.getXmlString(xmlConfig,      ATTR_CONFIG_NAME,                   UI.EMPTY_STRING);
+      config.id                           = Util.getXmlString (xmlConfig,     ATTR_ID,                            Long.toString(System.nanoTime()));
+      config.name                         = Util.getXmlString (xmlConfig,     ATTR_CONFIG_NAME,                   UI.EMPTY_STRING);
 
       config.isShowTourMarker             = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_MARKER,           true);
       config.isMarkerLabelAntialiased     = Util.getXmlBoolean(xmlConfig,     ATTR_IS_MARKER_LABEL_ANTIALIASED,   true);
+
+      config.isGroupDuplicatedMarkers     = Util.getXmlBoolean(xmlConfig,     ATTR_IS_GROUP_DUPLICATED_MARKERS,   false);
+      config.duplicatedMarkers            = Util.getXmlString (xmlConfig,     ATTR_DUPLICATED_MARKERS,            UI.EMPTY_STRING);
 
       config.isMarkerClustered            = Util.getXmlBoolean(xmlConfig,     ATTR_IS_MARKER_CLUSTERED,           true);
       config.isClusterSymbolAntialiased   = Util.getXmlBoolean(xmlConfig,     ATTR_IS_CLUSTER_SYMBOL_ANTIALIASED, true);

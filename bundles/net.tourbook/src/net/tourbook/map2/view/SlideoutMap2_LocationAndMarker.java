@@ -88,6 +88,7 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 
@@ -177,7 +178,8 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    private CTabFolder            _tabFolder;
    private CTabItem              _tabOptions;
    private CTabItem              _tabCommonLocations;
-   private CTabItem              _tabTourMarkers;
+   private CTabItem              _tabTourMarkers_1;
+   private CTabItem              _tabTourMarkers_2;
    //
    private Button                _btnDeleteCommonLocation;
    private Button                _btnSwapClusterSymbolColor;
@@ -187,6 +189,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    private Button                _chkIsClusterSymbolAntialiased;
    private Button                _chkIsClusterTextAntialiased;
    private Button                _chkIsFillClusterSymbol;
+   private Button                _chkIsGroupDuplicatedMarkers;
    private Button                _chkIsMarkerClustered;
    private Button                _chkIsMarkerLabelAntialiased;
    private Button                _chkIsShowCommonLocations;
@@ -199,6 +202,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    private Label                 _lblClusterGrid_Size;
    private Label                 _lblClusterSymbol;
    private Label                 _lblClusterSymbol_Size;
+   private Label                 _lblGroupDuplicatedMarkers;
    private Label                 _lblLabelDistributorMaxLabels;
    private Label                 _lblLabelDistributorRadius;
    private Label                 _lblLabelWrapLength;
@@ -212,6 +216,8 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    private Spinner               _spinnerLabelDistributorMaxLabels;
    private Spinner               _spinnerLabelDistributorRadius;
    private Spinner               _spinnerLabelWrapLength;
+   //
+   private Text                  _txtGroupDuplicatedMarkers;
    //
    private ColorSelectorExtended _colorClusterSymbol_Fill;
    private ColorSelectorExtended _colorClusterSymbol_Outline;
@@ -514,9 +520,13 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
                _tabOptions.setText(Messages.Slideout_MapLocation_Tab_Options);
                _tabOptions.setControl(createUI_100_Tab_Options(_tabFolder));
 
-               _tabTourMarkers = new CTabItem(_tabFolder, SWT.NONE);
-               _tabTourMarkers.setText(Messages.Slideout_MapLocation_Tab_TourMarkers);
-               _tabTourMarkers.setControl(createUI_200_Tab_TourMarker(_tabFolder));
+               _tabTourMarkers_1 = new CTabItem(_tabFolder, SWT.NONE);
+               _tabTourMarkers_1.setText(Messages.Slideout_MapLocation_Tab_TourMarkers);
+               _tabTourMarkers_1.setControl(createUI_200_Tab_TourMarker_1(_tabFolder));
+
+               _tabTourMarkers_2 = new CTabItem(_tabFolder, SWT.NONE);
+               _tabTourMarkers_2.setText("Marker 2");
+               _tabTourMarkers_2.setControl(createUI_250_Tab_TourMarker_2(_tabFolder));
 
                _tabCommonLocations = new CTabItem(_tabFolder, SWT.NONE);
                _tabCommonLocations.setText(Messages.Slideout_MapLocation_Tab_CommonLocations);
@@ -579,7 +589,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 //      });
    }
 
-   private Control createUI_200_Tab_TourMarker(final Composite parent) {
+   private Control createUI_200_Tab_TourMarker_1(final Composite parent) {
 
       final Composite tabContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(tabContainer);
@@ -608,11 +618,9 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
    private void createUI_220_Marker_Label(final Composite parent) {
 
-      final int firstColumnIndent = UI.FORM_FIRST_COLUMN_INDENT;
-
       final GridDataFactory labelGridData = GridDataFactory.fillDefaults()
             .align(SWT.FILL, SWT.CENTER)
-            .indent(firstColumnIndent, 0);
+            .indent(UI.FORM_FIRST_COLUMN_INDENT, 0);
 
       {
          /*
@@ -770,7 +778,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          _chkIsMarkerLabelAntialiased.addSelectionListener(_markerSelectionListener);
          GridDataFactory.fillDefaults()
                .span(2, 1)
-               .indent(firstColumnIndent, 0)
+               .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
                .applyTo(_chkIsMarkerLabelAntialiased);
       }
    }
@@ -935,6 +943,44 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
                .indent(firstColumnIndent, 0)
                .applyTo(_chkIsClusterSymbolAntialiased);
       }
+   }
+
+   private Control createUI_250_Tab_TourMarker_2(final Composite parent) {
+
+      final Composite tabContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(tabContainer);
+      GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(1).applyTo(tabContainer);
+      {
+         {
+            /*
+             * Group duplicate markers
+             */
+            _chkIsGroupDuplicatedMarkers = new Button(tabContainer, SWT.CHECK);
+            _chkIsGroupDuplicatedMarkers.setText("&Group markers with the same label");
+            _chkIsGroupDuplicatedMarkers.setToolTipText("");
+            _chkIsGroupDuplicatedMarkers.addSelectionListener(_markerSelectionListener);
+         }
+         {
+            // label
+            _lblGroupDuplicatedMarkers = new Label(tabContainer, SWT.NONE);
+            _lblGroupDuplicatedMarkers.setText("Marker &labels which are grouped");
+            _lblGroupDuplicatedMarkers.setToolTipText("");
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+                  .applyTo(_lblGroupDuplicatedMarkers);
+
+            _txtGroupDuplicatedMarkers = new Text(tabContainer, SWT.MULTI | SWT.WRAP | SWT.BORDER);
+            _txtGroupDuplicatedMarkers.setToolTipText("");
+            _txtGroupDuplicatedMarkers.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onModifyMarkerConfig()));
+            GridDataFactory.fillDefaults()
+                  .grab(true, true)
+                  .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+                  .applyTo(_txtGroupDuplicatedMarkers);
+         }
+      }
+
+      return tabContainer;
    }
 
    private Control createUI_500_Tab_CommonLocations(final Composite parent) {
@@ -1281,10 +1327,11 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       /*
        * Tour marker
        */
-      final boolean isShowTourMarker      = _chkIsShowTourMarker.getSelection();
-      final boolean isMarkerClustered     = _chkIsMarkerClustered.getSelection();
+      final boolean isShowTourMarker         = _chkIsShowTourMarker.getSelection();
+      final boolean isGroupDuplicatedMarkers = _chkIsGroupDuplicatedMarkers.getSelection();
+      final boolean isMarkerClustered        = _chkIsMarkerClustered.getSelection();
 
-      final boolean isShowClusteredMarker = isShowTourMarker && isMarkerClustered;
+      final boolean isShowClusteredMarker    = isShowTourMarker && isMarkerClustered;
 
       _btnSwapClusterSymbolColor          .setEnabled(isShowClusteredMarker);
       _btnSwapMarkerLabel_Color           .setEnabled(isShowTourMarker);
@@ -1292,12 +1339,14 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _chkIsClusterSymbolAntialiased      .setEnabled(isShowClusteredMarker);
       _chkIsClusterTextAntialiased        .setEnabled(isShowClusteredMarker);
       _chkIsFillClusterSymbol             .setEnabled(isShowClusteredMarker);
+      _chkIsGroupDuplicatedMarkers        .setEnabled(isShowTourMarker);
       _chkIsMarkerClustered               .setEnabled(isShowTourMarker);
       _chkIsMarkerLabelAntialiased        .setEnabled(isShowTourMarker);
 
       _lblClusterGrid_Size                .setEnabled(isShowClusteredMarker);
       _lblClusterSymbol                   .setEnabled(isShowClusteredMarker);
       _lblClusterSymbol_Size              .setEnabled(isShowClusteredMarker);
+      _lblGroupDuplicatedMarkers          .setEnabled(isShowTourMarker && isGroupDuplicatedMarkers);
       _lblLabelDistributorMaxLabels       .setEnabled(isShowTourMarker);
       _lblLabelDistributorRadius          .setEnabled(isShowTourMarker);
       _lblLabelWrapLength                 .setEnabled(isShowTourMarker);
@@ -1311,6 +1360,8 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _spinnerLabelDistributorMaxLabels   .setEnabled(isShowTourMarker);
       _spinnerLabelDistributorRadius      .setEnabled(isShowTourMarker);
       _spinnerLabelWrapLength             .setEnabled(isShowTourMarker);
+
+      _txtGroupDuplicatedMarkers          .setEnabled(isShowTourMarker && isGroupDuplicatedMarkers);
 
       _colorClusterSymbol_Fill            .setEnabled(isShowClusteredMarker);
       _colorClusterSymbol_Outline         .setEnabled(isShowClusteredMarker);
@@ -1724,6 +1775,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 // SET_FORMATTING_OFF
 
       _chkIsShowTourMarker                .setSelection( config.isShowTourMarker);
+      _chkIsGroupDuplicatedMarkers        .setSelection( config.isGroupDuplicatedMarkers);
 
       _chkIsClusterSymbolAntialiased      .setSelection( config.isClusterSymbolAntialiased);
       _chkIsClusterTextAntialiased        .setSelection( config.isClusterTextAntialiased);
@@ -1745,6 +1797,8 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _colorMarkerLabel_Outline           .setColorValue(config.markerOutline_RGB);
       _colorMarkerLabel_Outline_Hovered   .setColorValue(config.markerOutline_Hovered_RGB);
 
+      _txtGroupDuplicatedMarkers          .setText(      config.duplicatedMarkers);
+      
 // SET_FORMATTING_ON
 
       selectMarkerLabelLayout(config.markerLabelLayout);
@@ -1773,6 +1827,9 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 // SET_FORMATTING_OFF
 
       config.isShowTourMarker             = _chkIsShowTourMarker              .getSelection();
+      
+      config.isGroupDuplicatedMarkers     = _chkIsGroupDuplicatedMarkers      .getSelection();
+      config.duplicatedMarkers            = _txtGroupDuplicatedMarkers        .getText();
 
       config.isClusterSymbolAntialiased   = _chkIsClusterSymbolAntialiased    .getSelection();
       config.isClusterTextAntialiased     = _chkIsClusterTextAntialiased      .getSelection();
@@ -1907,9 +1964,13 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
             ? UI.SYMBOL_STAR + UI.SPACE + Messages.Slideout_MapLocation_Tab_CommonLocations
             : Messages.Slideout_MapLocation_Tab_CommonLocations);
 
-      _tabTourMarkers.setText(isShowTourMarker
+      _tabTourMarkers_1.setText(isShowTourMarker
             ? UI.SYMBOL_STAR + UI.SPACE + Messages.Slideout_MapLocation_Tab_TourMarkers
             : Messages.Slideout_MapLocation_Tab_TourMarkers);
+
+      _tabTourMarkers_2.setText(isShowTourMarker
+            ? UI.SYMBOL_STAR + UI.SPACE + "Marker 2"
+            : "Marker 2");
    }
 
    private void updateUI_Viewer() {
