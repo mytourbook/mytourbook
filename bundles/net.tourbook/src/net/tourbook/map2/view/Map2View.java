@@ -1239,7 +1239,7 @@ public class Map2View extends ViewPart implements
 
          } else {
 
-            // tour -> mous
+            // tour -> mouse
             newCenterMode = CenterMapBy.Mouse;
          }
 
