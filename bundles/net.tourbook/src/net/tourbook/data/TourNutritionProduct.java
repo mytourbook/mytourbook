@@ -58,7 +58,7 @@ public class TourNutritionProduct {
     * The code identifying the product:
     * - The bar code (https://en.wikipedia.org/wiki/Barcode)
     * OR
-    * - A string following the below pattern if it's a user's custom product "MTCUSTOMPRODUCT-XX"
+    * - An empty string if it's a user's custom product
     */
    private String                     productCode;
 
@@ -379,6 +379,10 @@ public class TourNutritionProduct {
       productId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
       tourData = tourDataFromClone;
+   }
+
+   public long getProductId() {
+      return productId;
    }
 
 }

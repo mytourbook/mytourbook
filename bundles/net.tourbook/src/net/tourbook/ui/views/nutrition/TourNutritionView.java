@@ -1337,7 +1337,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
       tourNutritionProducts.removeIf(tourNutritionProduct -> selectedProducts.stream().anyMatch(selectedProduct -> selectedProduct
-            .getProductCode().equals(tourNutritionProduct.getProductCode())));
+            .getProductId() == tourNutritionProduct.getProductId()));
 
       _tourData.setTourNutritionProducts(tourNutritionProducts);
       _tourData = TourManager.saveModifiedTour(_tourData);
