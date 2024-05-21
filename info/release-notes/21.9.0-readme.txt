@@ -117,6 +117,9 @@ Improvements
     This is an experimental feature and can be activated with the 
     command line parameter -DsetAllViewsClosable 
 
+* 2.5D & 3D Maps (Frederic)
+  - Export map view to an image file (jpeg, png or bmp) or to the clipboard
+
 
 Changes  
 =======

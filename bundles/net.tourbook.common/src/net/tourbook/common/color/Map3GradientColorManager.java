@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -701,12 +701,12 @@ public class Map3GradientColorManager {
                   Messages.Graph_Label_Speed,
                   defaultSpeed));
 
-      _initColorDefinitions();
+      initColorDefinitions();
    }
 
    private Map3GradientColorManager() {}
 
-   private static void _initColorDefinitions() {
+   private static void initColorDefinitions() {
 
       // overwrite default colors with saved colors
       readColors();
@@ -868,6 +868,7 @@ public class Map3GradientColorManager {
 
    /**
     * @param graphId
+    *
     * @return Returns all color profiles for the requested {@link MapGraphId}.
     */
    public static List<Map3GradientColorProvider> getColorProviders(final MapGraphId graphId) {
@@ -877,6 +878,7 @@ public class Map3GradientColorManager {
 
    /**
     * @param graphId
+    *
     * @return Returns a clone from the default color profile of the requested {@link MapGraphId}.
     */
    public static Map3ColorProfile getDefaultColorProfile(final MapGraphId graphId) {
@@ -906,17 +908,8 @@ public class Map3GradientColorManager {
       if (xmlColorDefinitions == null) {
 
          // set only first default color profile as active
-         getColorDefinitions().values().forEach(colorDefinition -> {
-
-            final Map3GradientColorProvider firstColorProvider = colorDefinition.getColorProviders().get(0);
-            if (firstColorProvider == null) {
-               return;
-            }
-
-            firstColorProvider.getMap3ColorProfile().setIsActiveColorProfile(true);
-         }
-
-         );
+         _map3ColorDefinitions.values().forEach(colorDef -> colorDef.getColorProviders().get(0).getMap3ColorProfile().setIsActiveColorProfile(
+               true));
 
          return;
       }
@@ -1191,9 +1184,7 @@ public class Map3GradientColorManager {
          for (final Map3GradientColorProvider colorProvider : colorDef.getColorProviders()) {
 
             final MapColorProfile colorProfile = colorProvider.getColorProfile();
-            if (colorProfile instanceof Map3ColorProfile) {
-
-               final Map3ColorProfile map3ColorProfile = (Map3ColorProfile) colorProfile;
+            if (colorProfile instanceof final Map3ColorProfile map3ColorProfile) {
 
                final IMemento xmlProfile = xmlColor.createChild(TAG_COLOR_PROFILE);
 
