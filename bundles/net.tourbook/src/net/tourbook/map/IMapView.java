@@ -15,9 +15,16 @@
  *******************************************************************************/
 package net.tourbook.map;
 
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.graphics.Image;
 
 public interface IMapView {
 
-   public Image getMapViewImage();
+   Image getMapViewImage();
+
+   void onSelectionChanged(final ISelection selection);
+
+   void restoreState();
+
+   void saveState();
 }

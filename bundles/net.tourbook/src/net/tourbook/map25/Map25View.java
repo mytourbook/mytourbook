@@ -1423,7 +1423,8 @@ public class Map25View extends ViewPart implements
       updateUI_MapPosition(mapGeoPoint.getLatitude(), mapGeoPoint.getLongitude(), zoomLevel);
    }
 
-   private void onSelectionChanged(final ISelection selection) {
+   @Override
+   public void onSelectionChanged(final ISelection selection) {
 
       //_mapApp.debugPrint(" Map25View: * onSelectionChanged: tour selection changed");
 
@@ -1895,7 +1896,8 @@ public class Map25View extends ViewPart implements
       updateFilteredPhotos();
    }
 
-   void restoreState() {
+   @Override
+   public void restoreState() {
 
 // SET_FORMATTING_OFF
 
@@ -2047,8 +2049,9 @@ public class Map25View extends ViewPart implements
       _actionMapPhotoFilter.getPhotoFilterSlideout().updateUI_NumberOfPhotos();
    }
 
+   @Override
    @PersistState
-   private void saveState() {
+   public void saveState() {
 
 // SET_FORMATTING_OFF
 

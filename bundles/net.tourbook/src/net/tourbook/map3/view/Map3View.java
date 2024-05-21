@@ -1687,7 +1687,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       Map3Manager.getLayer_Marker().onModifyConfig(_allTours);
    }
 
-   private void onSelectionChanged(final ISelection selection) {
+   @Override
+   public void onSelectionChanged(final ISelection selection) {
 
       if (_isPartVisible == false || _isRestored == false) {
 
@@ -1811,7 +1812,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       }
    }
 
-   private void restoreState() {
+   @Override
+   public void restoreState() {
 
       final boolean isTourAvailable = _allTours.size() > 0;
 
@@ -1911,8 +1913,9 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    }
 
+   @Override
    @PersistState
-   private void saveState() {
+   public void saveState() {
 
       /*
        * It can happen that this view is not yet restored with restoreState() but the saveState()
