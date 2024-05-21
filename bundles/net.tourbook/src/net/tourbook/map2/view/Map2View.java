@@ -1169,13 +1169,21 @@ public class Map2View extends ViewPart implements
    }
 
    private void actionMapMarker_ShowOnlyThisTour() {
-      // TODO Auto-generated method stub
 
       final PaintedMarker hoveredMarker = _map.getHoveredMarker();
 
       final TourMarker tourMarker = hoveredMarker.mapMarker.tourMarker;
 
       paintTours_20_One(tourMarker.getTourData(), true);
+
+      // force marker repaint otherwise the other markers are still be visible
+      // this seems to be more complicated, a syncexec() to not work
+      _map.getDisplay().timerExec(300, () -> {
+
+         _map.resetHoveredMarker();
+
+         _map.paint();
+      });
    }
 
    private void actionMapMarker_ZoomIn() {

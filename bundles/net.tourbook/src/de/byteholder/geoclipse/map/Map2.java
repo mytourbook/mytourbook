@@ -1258,17 +1258,19 @@ public class Map2 extends Canvas {
 
       final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
 
+      final int markerWrapLength = markerConfig.labelWrapLength;
+      final int skipLabelGridSize = markerConfig.labelGroupGridSize;
       final boolean isGroupDuplicatedMarkers = markerConfig.isGroupDuplicatedMarkers;
 
       if (isGroupDuplicatedMarkers) {
+
+         // setup skipped labels
 
          _allMapMarkerWithSkipLabels.clear();
 
          final String duplicatedMarkers = markerConfig.duplicatedMarkers;
 
          if (duplicatedMarkers.equals(_groupedMarkers) == false) {
-
-            // setup skipped labels
 
             _groupedMarkers = duplicatedMarkers;
 
@@ -1288,10 +1290,6 @@ public class Map2 extends Canvas {
             }
          }
       }
-
-      final int skipLabelBorder = 400;
-
-      final int markerWrapLength = markerConfig.labelWrapLength;
 
       final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
 
@@ -1339,7 +1337,7 @@ public class Map2 extends Canvas {
             }
 
             /*
-             * Create map marker
+             * Check if marker is visible
              */
             final double latitude = latitudeSerie[serieIndex];
             final double longitude = longitudeSerie[serieIndex];
@@ -1352,79 +1350,79 @@ public class Map2 extends Canvas {
 
             final boolean isMarkerInViewport = worldPixel_Viewport.contains(worldPixel_MarkerPosX, worldPixel_MarkerPosY);
 
-            if (isMarkerInViewport) {
-
-               // convert world position into device position
-               final int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
-               final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
-
-               String markerLabel = tourMarker.getMarkerMapLabel();
-
-               boolean isFirstSkipLabel = false;
-               String skipKey = null;
-
-               if (isGroupDuplicatedMarkers && _allMapMarkerSkipLabels.size() > 0) {
-
-                  final Object skipLabel = _allMapMarkerSkipLabels.get(markerLabel);
-                  if (skipLabel != null) {
-
-                     // the label may be skipped
-
-                     final int skipX = devX / skipLabelBorder;
-                     final int skipY = devY / skipLabelBorder;
-
-                     skipKey = markerLabel + "-" + skipX + "-" + skipY;
-
-                     final Map2Marker skipLabelMarker = _allMapMarkerWithSkipLabels.get(skipKey);
-
-                     if (skipLabelMarker != null) {
-
-                        // update number of skipped labels
-
-                        skipLabelMarker.numSkippedLabels++;
-
-                        continue;
-
-                     } else {
-
-                        isFirstSkipLabel = true;
-                     }
-                  }
-               }
-
-               final Map2Marker mapMarker = new Map2Marker(tourMarker, new GeoPoint(latitude, longitude));
-
-               mapMarker.geoPointDevX = devX;
-               mapMarker.geoPointDevY = devY;
-
-               /*
-                * Create formatted label
-                */
-
-               if (markerLabel.length() > markerWrapLength) {
-
-                  markerLabel = WordUtils.wrap(markerLabel, markerWrapLength);
-
-                  final String lineSeparator = System.lineSeparator();
-
-                  // remove line separator at the end
-                  if (markerLabel.endsWith(lineSeparator)) {
-
-                     markerLabel = markerLabel.substring(0, markerLabel.length() - lineSeparator.length());
-                  }
-               }
-
-               mapMarker.setFormattedLabel(markerLabel);
-
-               if (isFirstSkipLabel) {
-
-                  mapMarker.numSkippedLabels++;
-
-                  _allMapMarkerWithSkipLabels.put(skipKey, mapMarker);
-               }
-
-               allMapMarkers.add(mapMarker);
+            if (isMarkerInViewport == false) {
+               continue;
             }
+
+            // convert world position into device position
+            final int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
+            final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
+
+            String markerLabel = tourMarker.getMarkerMapLabel();
+            String skipKey = null;
+
+            /*
+             * Check if marker is a duplicate
+             */
+            if (isGroupDuplicatedMarkers && _allMapMarkerSkipLabels.size() > 0) {
+
+               final Object skipLabel = _allMapMarkerSkipLabels.get(markerLabel);
+               if (skipLabel != null) {
+
+                  // this label is marked to be grouped
+
+                  final int skipX = devX / skipLabelGridSize;
+                  final int skipY = devY / skipLabelGridSize;
+
+                  skipKey = markerLabel + "-" + skipX + "-" + skipY;
+
+                  final Map2Marker skipLabelMarker = _allMapMarkerWithSkipLabels.get(skipKey);
+
+                  if (skipLabelMarker != null) {
+
+                     // skip label, update number of skipped labels
+
+                     skipLabelMarker.numSkippedLabels++;
+
+                     continue;
+                  }
+               }
+            }
+
+            /*
+             * Create map marker
+             */
+
+            // create formatted label
+            if (markerLabel.length() > markerWrapLength) {
+
+               markerLabel = WordUtils.wrap(markerLabel, markerWrapLength);
+
+               final String lineSeparator = System.lineSeparator();
+
+               // remove line separator at the end
+               if (markerLabel.endsWith(lineSeparator)) {
+
+                  markerLabel = markerLabel.substring(0, markerLabel.length() - lineSeparator.length());
+               }
+            }
+
+            final Map2Marker mapMarker = new Map2Marker(tourMarker, new GeoPoint(latitude, longitude));
+
+            mapMarker.geoPointDevX = devX;
+            mapMarker.geoPointDevY = devY;
+            mapMarker.setFormattedLabel(markerLabel);
+
+            if (skipKey != null) {
+
+               // update and keep skipped labels
+
+               mapMarker.numSkippedLabels++;
+
+               _allMapMarkerWithSkipLabels.put(skipKey, mapMarker);
+            }
+
+            allMapMarkers.add(mapMarker);
          }
       }
 
@@ -4668,7 +4666,7 @@ public class Map2 extends Canvas {
 
          if (isDone) {
 
-            StatusUtil.logInfo("paint_BackgroundImage(): _backgroundPainterFuture.isDone() == true, however it should be null");
+            // this can happen when changing e.g. the map dimm level
 
          } else {
 
@@ -8269,6 +8267,8 @@ public class Map2 extends Canvas {
 
       _hoveredMarker = null;
       _directMapPainterContext.hoveredMarker = null;
+
+      _mapMarker_Tooltip.hide();
    }
 
    public void resetMarkerCluster() {

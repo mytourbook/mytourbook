@@ -203,8 +203,8 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    private Label                 _lblClusterSymbol;
    private Label                 _lblClusterSymbol_Size;
    private Label                 _lblGroupDuplicatedMarkers;
+   private Label                 _lblLabelGroupGridSize;
    private Label                 _lblLabelDistributorMaxLabels;
-   private Label                 _lblLabelDistributorRadius;
    private Label                 _lblLabelWrapLength;
    private Label                 _lblMarkerLabel_Color;
    private Label                 _lblMarkerLabel_HoveredColor;
@@ -215,6 +215,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    private Spinner               _spinnerClusterSymbol_Size;
    private Spinner               _spinnerLabelDistributorMaxLabels;
    private Spinner               _spinnerLabelDistributorRadius;
+   private Spinner               _spinnerLabelGroupGridSize;
    private Spinner               _spinnerLabelWrapLength;
    //
    private Text                  _txtGroupDuplicatedMarkers;
@@ -713,42 +714,39 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       }
       {
          /*
-          * Label distributor max items
+          * Visible labels
           */
          // label
          _lblLabelDistributorMaxLabels = new Label(parent, SWT.NONE);
          _lblLabelDistributorMaxLabels.setText("&Visible labels");
-         _lblLabelDistributorMaxLabels.setToolTipText(
-               "Number of ALL labels which are distributed within the map viewport or a hovered cluster. A large number can slow down performance");
+         _lblLabelDistributorMaxLabels.setToolTipText("• Number of visible labels\n• Label spreader radius");
          labelGridData.applyTo(_lblLabelDistributorMaxLabels);
 
-         // spinner
-         _spinnerLabelDistributorMaxLabels = new Spinner(parent, SWT.BORDER);
-         _spinnerLabelDistributorMaxLabels.setMinimum(Map2ConfigManager.LABEL_DISTRIBUTOR_MAX_LABELS_MIN);
-         _spinnerLabelDistributorMaxLabels.setMaximum(Map2ConfigManager.LABEL_DISTRIBUTOR_MAX_LABELS_MAX);
-         _spinnerLabelDistributorMaxLabels.setIncrement(10);
-         _spinnerLabelDistributorMaxLabels.setPageIncrement(100);
-         _spinnerLabelDistributorMaxLabels.addSelectionListener(_markerSelectionListener);
-         _spinnerLabelDistributorMaxLabels.addMouseWheelListener(_markerMouseWheelListener10);
-      }
-      {
-         /*
-          * Label distributor radius
-          */
-         // label
-         _lblLabelDistributorRadius = new Label(parent, SWT.NONE);
-         _lblLabelDistributorRadius.setText("Label distributor &radius");
-         _lblLabelDistributorRadius.setToolTipText("Radius for the displayed labels around the marker locations");
-         labelGridData.applyTo(_lblLabelDistributorRadius);
+         final Composite container = new Composite(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+         {
+            // number of visible labels
+            _spinnerLabelDistributorMaxLabels = new Spinner(container, SWT.BORDER);
+            _spinnerLabelDistributorMaxLabels.setMinimum(Map2ConfigManager.LABEL_DISTRIBUTOR_MAX_LABELS_MIN);
+            _spinnerLabelDistributorMaxLabels.setMaximum(Map2ConfigManager.LABEL_DISTRIBUTOR_MAX_LABELS_MAX);
+            _spinnerLabelDistributorMaxLabels.setIncrement(10);
+            _spinnerLabelDistributorMaxLabels.setPageIncrement(100);
+            _spinnerLabelDistributorMaxLabels.addSelectionListener(_markerSelectionListener);
+            _spinnerLabelDistributorMaxLabels.addMouseWheelListener(_markerMouseWheelListener10);
+            _spinnerLabelDistributorMaxLabels.setToolTipText(
+                  "Number of ALL labels which are distributed within the map viewport or a hovered cluster. A large number can slow down performance");
 
-         // spinner
-         _spinnerLabelDistributorRadius = new Spinner(parent, SWT.BORDER);
-         _spinnerLabelDistributorRadius.setMinimum(Map2ConfigManager.LABEL_DISTRIBUTOR_RADIUS_MIN);
-         _spinnerLabelDistributorRadius.setMaximum(Map2ConfigManager.LABEL_DISTRIBUTOR_RADIUS_MAX);
-         _spinnerLabelDistributorRadius.setIncrement(10);
-         _spinnerLabelDistributorRadius.setPageIncrement(100);
-         _spinnerLabelDistributorRadius.addSelectionListener(_markerSelectionListener);
-         _spinnerLabelDistributorRadius.addMouseWheelListener(_markerMouseWheelListener10);
+            // label distributor radius
+            _spinnerLabelDistributorRadius = new Spinner(container, SWT.BORDER);
+            _spinnerLabelDistributorRadius.setMinimum(Map2ConfigManager.LABEL_DISTRIBUTOR_RADIUS_MIN);
+            _spinnerLabelDistributorRadius.setMaximum(Map2ConfigManager.LABEL_DISTRIBUTOR_RADIUS_MAX);
+            _spinnerLabelDistributorRadius.setIncrement(10);
+            _spinnerLabelDistributorRadius.setPageIncrement(100);
+            _spinnerLabelDistributorRadius.addSelectionListener(_markerSelectionListener);
+            _spinnerLabelDistributorRadius.addMouseWheelListener(_markerMouseWheelListener10);
+            _spinnerLabelDistributorRadius.setToolTipText("Radius for the displayed labels around the marker locations");
+         }
       }
       {
          /*
@@ -949,7 +947,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
       final Composite tabContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(tabContainer);
-      GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(1).applyTo(tabContainer);
+      GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(2).applyTo(tabContainer);
       {
          {
             /*
@@ -959,6 +957,33 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
             _chkIsGroupDuplicatedMarkers.setText("&Group markers with the same label");
             _chkIsGroupDuplicatedMarkers.setToolTipText("");
             _chkIsGroupDuplicatedMarkers.addSelectionListener(_markerSelectionListener);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .span(2, 1)
+                  .applyTo(_chkIsGroupDuplicatedMarkers);
+
+         }
+         {
+            /*
+             * Label group grid size
+             */
+
+            // label
+            _lblLabelGroupGridSize = new Label(tabContainer, SWT.NONE);
+            _lblLabelGroupGridSize.setText("Group grid &size");
+            _lblLabelGroupGridSize.setToolTipText("");
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .indent(UI.FORM_FIRST_COLUMN_INDENT, 0).applyTo(_lblLabelGroupGridSize);
+
+            // spinner
+            _spinnerLabelGroupGridSize = new Spinner(tabContainer, SWT.BORDER);
+            _spinnerLabelGroupGridSize.setMinimum(Map2ConfigManager.LABEL_WRAP_LENGTH_MIN);
+            _spinnerLabelGroupGridSize.setMaximum(Map2ConfigManager.LABEL_WRAP_LENGTH_MAX);
+            _spinnerLabelGroupGridSize.setIncrement(1);
+            _spinnerLabelGroupGridSize.setPageIncrement(10);
+            _spinnerLabelGroupGridSize.addSelectionListener(_markerSelectionListener);
+            _spinnerLabelGroupGridSize.addMouseWheelListener(_markerMouseWheelListener10);
          }
          {
             // label
@@ -967,6 +992,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
             _lblGroupDuplicatedMarkers.setToolTipText("");
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
+                  .span(2, 1)
                   .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
                   .applyTo(_lblGroupDuplicatedMarkers);
 
@@ -975,6 +1001,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
             _txtGroupDuplicatedMarkers.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onModifyMarkerConfig()));
             GridDataFactory.fillDefaults()
                   .grab(true, true)
+                  .span(2, 1)
                   .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
                   .applyTo(_txtGroupDuplicatedMarkers);
          }
@@ -1331,6 +1358,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       final boolean isGroupDuplicatedMarkers = _chkIsGroupDuplicatedMarkers.getSelection();
       final boolean isMarkerClustered        = _chkIsMarkerClustered.getSelection();
 
+      final boolean isGroupMarkers           = isShowTourMarker && isGroupDuplicatedMarkers;
       final boolean isShowClusteredMarker    = isShowTourMarker && isMarkerClustered;
 
       _btnSwapClusterSymbolColor          .setEnabled(isShowClusteredMarker);
@@ -1346,9 +1374,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _lblClusterGrid_Size                .setEnabled(isShowClusteredMarker);
       _lblClusterSymbol                   .setEnabled(isShowClusteredMarker);
       _lblClusterSymbol_Size              .setEnabled(isShowClusteredMarker);
-      _lblGroupDuplicatedMarkers          .setEnabled(isShowTourMarker && isGroupDuplicatedMarkers);
       _lblLabelDistributorMaxLabels       .setEnabled(isShowTourMarker);
-      _lblLabelDistributorRadius          .setEnabled(isShowTourMarker);
       _lblLabelWrapLength                 .setEnabled(isShowTourMarker);
       _lblMarkerLabel_Color               .setEnabled(isShowTourMarker);
       _lblMarkerLabel_HoveredColor        .setEnabled(isShowTourMarker);
@@ -1361,8 +1387,6 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _spinnerLabelDistributorRadius      .setEnabled(isShowTourMarker);
       _spinnerLabelWrapLength             .setEnabled(isShowTourMarker);
 
-      _txtGroupDuplicatedMarkers          .setEnabled(isShowTourMarker && isGroupDuplicatedMarkers);
-
       _colorClusterSymbol_Fill            .setEnabled(isShowClusteredMarker);
       _colorClusterSymbol_Outline         .setEnabled(isShowClusteredMarker);
       _colorMarkerLabel_Fill              .setEnabled(isShowTourMarker);
@@ -1371,6 +1395,11 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _colorMarkerLabel_Outline_Hovered   .setEnabled(isShowTourMarker);
 
       _comboMarkerLabelLayout             .setEnabled(isShowTourMarker);
+
+      _lblGroupDuplicatedMarkers          .setEnabled(isGroupMarkers);
+      _lblLabelGroupGridSize              .setEnabled(isGroupMarkers);
+      _spinnerLabelGroupGridSize          .setEnabled(isGroupMarkers);
+      _txtGroupDuplicatedMarkers          .setEnabled(isGroupMarkers);
 
       /*
        * Common locations
@@ -1788,6 +1817,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _spinnerClusterSymbol_Size          .setSelection( config.clusterSymbol_Size);
       _spinnerLabelDistributorMaxLabels   .setSelection( config.labelDistributorMaxLabels);
       _spinnerLabelDistributorRadius      .setSelection( config.labelDistributorRadius);
+      _spinnerLabelGroupGridSize          .setSelection( config.labelGroupGridSize);
       _spinnerLabelWrapLength             .setSelection( config.labelWrapLength);
 
       _colorClusterSymbol_Fill            .setColorValue(config.clusterFill_RGB);
@@ -1798,7 +1828,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _colorMarkerLabel_Outline_Hovered   .setColorValue(config.markerOutline_Hovered_RGB);
 
       _txtGroupDuplicatedMarkers          .setText(      config.duplicatedMarkers);
-      
+
 // SET_FORMATTING_ON
 
       selectMarkerLabelLayout(config.markerLabelLayout);
@@ -1827,7 +1857,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 // SET_FORMATTING_OFF
 
       config.isShowTourMarker             = _chkIsShowTourMarker              .getSelection();
-      
+
       config.isGroupDuplicatedMarkers     = _chkIsGroupDuplicatedMarkers      .getSelection();
       config.duplicatedMarkers            = _txtGroupDuplicatedMarkers        .getText();
 
@@ -1846,6 +1876,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
       config.labelDistributorMaxLabels    = _spinnerLabelDistributorMaxLabels .getSelection();
       config.labelDistributorRadius       = _spinnerLabelDistributorRadius    .getSelection();
+      config.labelGroupGridSize           = _spinnerLabelGroupGridSize        .getSelection();
       config.labelWrapLength              = _spinnerLabelWrapLength           .getSelection();
 
       config.markerFill_RGB               = _colorMarkerLabel_Fill            .getColorValue();

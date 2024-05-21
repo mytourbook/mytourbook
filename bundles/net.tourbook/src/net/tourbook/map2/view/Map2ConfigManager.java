@@ -88,6 +88,7 @@ public class Map2ConfigManager {
    //
    private static final String ATTR_IS_GROUP_DUPLICATED_MARKERS   = "isGroupDuplicatedMarkers";   //$NON-NLS-1$
    private static final String ATTR_DUPLICATED_MARKERS            = "duplicatedMarkers";          //$NON-NLS-1$
+   private static final String ATTR_LABEL_GROUP_GRID_SIZE         = "labelGroupGridSize";         //$NON-NLS-1$
    //
    private static final String ATTR_LABEL_DISTRIBUTOR_MAX_LABELS  = "labelDistributorMaxLabels";  //$NON-NLS-1$
    private static final String ATTR_LABEL_DISTRIBUTOR_RADIUS      = "labelDistributorRadius";     //$NON-NLS-1$
@@ -114,6 +115,9 @@ public class Map2ConfigManager {
     * Defaults, min/max
     */
    // marker
+   static final int                   MARKER_LABEL_GROUP_GRID_SIZE_MIN     = 50;
+   static final int                   MARKER_LABEL_GROUP_GRID_SIZE_MAX     = 1000;
+   static final int                   MARKER_LABEL_GROUP_GRID_SIZE_DEFAULT = 300;
    public static final MapLabelLayout MARKER_LABEL_LAYOUT_DEFAULT          = MapLabelLayout.RECTANGLE_BOX;
    static final int                   LABEL_DISTRIBUTOR_MAX_LABELS_MIN     = 10;
    static final int                   LABEL_DISTRIBUTOR_MAX_LABELS_MAX     = 2000;
@@ -300,6 +304,7 @@ public class Map2ConfigManager {
 
          xmlConfig.putBoolean(      ATTR_IS_GROUP_DUPLICATED_MARKERS,   config.isGroupDuplicatedMarkers);
          xmlConfig.putString(       ATTR_DUPLICATED_MARKERS,            config.duplicatedMarkers);
+         xmlConfig.putInteger(      ATTR_LABEL_GROUP_GRID_SIZE,         config.labelGroupGridSize);
 
          Util.setXmlEnum(xmlConfig, ATTR_MARKER_LABEL_LAYOUT,           config.markerLabelLayout);
 
@@ -424,6 +429,7 @@ public class Map2ConfigManager {
 
       config.isGroupDuplicatedMarkers     = Util.getXmlBoolean(xmlConfig,     ATTR_IS_GROUP_DUPLICATED_MARKERS,   false);
       config.duplicatedMarkers            = Util.getXmlString (xmlConfig,     ATTR_DUPLICATED_MARKERS,            UI.EMPTY_STRING);
+      config.labelGroupGridSize           = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_GROUP_GRID_SIZE,         MARKER_LABEL_GROUP_GRID_SIZE_DEFAULT,  MARKER_LABEL_GROUP_GRID_SIZE_MIN,   MARKER_LABEL_GROUP_GRID_SIZE_MAX);
 
       config.isMarkerClustered            = Util.getXmlBoolean(xmlConfig,     ATTR_IS_MARKER_CLUSTERED,           true);
       config.isClusterSymbolAntialiased   = Util.getXmlBoolean(xmlConfig,     ATTR_IS_CLUSTER_SYMBOL_ANTIALIASED, true);

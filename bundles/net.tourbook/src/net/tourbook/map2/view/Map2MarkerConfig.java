@@ -44,6 +44,7 @@ public class Map2MarkerConfig {
 
    public boolean        isGroupDuplicatedMarkers;
    public String         duplicatedMarkers         = UI.EMPTY_STRING;
+   public int            labelGroupGridSize        = Map2ConfigManager.MARKER_LABEL_GROUP_GRID_SIZE_DEFAULT;
 
    public MapLabelLayout markerLabelLayout         = Map2ConfigManager.MARKER_LABEL_LAYOUT_DEFAULT;
 
