@@ -274,6 +274,10 @@ public class TourNutritionProduct {
       return productCode;
    }
 
+   public long getProductId() {
+      return productId;
+   }
+
    public QuantityType getQuantityType() {
       return quantityType;
    }
@@ -380,9 +384,4 @@ public class TourNutritionProduct {
 
       tourData = tourDataFromClone;
    }
-
-   public long getProductId() {
-      return productId;
-   }
-
 }
