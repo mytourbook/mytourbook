@@ -117,6 +117,7 @@ Improvements
     This is an experimental feature and can be activated with the 
     command line parameter -DsetAllViewsClosable 
 
+
 Changes  
 =======
 
@@ -194,4 +195,3 @@ System
   # Java VM: OpenJDK 64-Bit Server VM Temurin-11.0.12+7 (11.0.12+7, mixed mode, tiered, compressed oops, g1 gc, windows-amd64)
   # Problematic frame:
   # C  [vtm-jni64.dll+0x19fe]
-  
