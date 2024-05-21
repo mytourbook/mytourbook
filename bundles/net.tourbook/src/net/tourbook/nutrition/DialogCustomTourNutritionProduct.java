@@ -115,7 +115,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_NumberServings);
 
             // Spinner: number of servings
-            _spinnerNumServings = UI.createSpinner(container, 2, 25, 10000, 25, 100);
+            _spinnerNumServings = UI.createSpinner(container, 2, 100, 10000, 25, 100);
             _spinnerNumServings.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCapacityModified()));
             _spinnerNumServings.addModifyListener(event -> onCapacityModified());
             _spinnerNumServings.addMouseWheelListener(mouseEvent -> {
