@@ -114,6 +114,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          MapLabelLayout.RECTANGLE_BOX,
          MapLabelLayout.BORDER_2_POINT,
          MapLabelLayout.BORDER_1_POINT,
+         MapLabelLayout.SHADOW,
          MapLabelLayout.BORDER_0_POINT,
 
    };
@@ -126,6 +127,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
          "Rectangle Box",
          "2 Point Border",
          "1 Point Border",
+         "Shadow",
          "0 Point Border",
 
    };

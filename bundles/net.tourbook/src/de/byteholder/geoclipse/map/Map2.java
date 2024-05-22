@@ -87,6 +87,7 @@ import net.tourbook.common.DPITools;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
 import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.time.TimeTools;
@@ -4734,6 +4735,8 @@ public class Map2 extends Canvas {
             gcCanvas.setBackground(_mapTransparentColor);
             gcCanvas.fillRectangle(_newOverlaySize);
 
+            gcCanvas.setFont(MTFont.getTitleFont());
+
             if (markerConfig.isShowTourMarker) {
 
                // clone list to prevent concurrency exceptions, this happened
@@ -4953,6 +4956,12 @@ public class Map2 extends Canvas {
                labelRectangle.y,
                labelRectangle.width + 2 * MAP_MARKER_BORDER_WIDTH,
                labelRectangle.height);
+
+      } else if (markerConfig.markerLabelLayout.equals(MapLabelLayout.SHADOW)) {
+
+         gc.setForeground(markerConfig.markerFill_Color);
+
+         gc.drawText(markerLabel, devX + 1, devY + 1, true);
 
       } else if (markerConfig.markerLabelLayout.equals(MapLabelLayout.BORDER_0_POINT)) {
 

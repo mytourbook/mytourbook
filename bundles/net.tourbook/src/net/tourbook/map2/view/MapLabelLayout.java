@@ -19,6 +19,8 @@ public enum MapLabelLayout {
 
    RECTANGLE_BOX, //
 
+   SHADOW, //
+
    BORDER_0_POINT, //
    BORDER_1_POINT, //
    BORDER_2_POINT, //

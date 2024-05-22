@@ -39,9 +39,9 @@ public class Map2Marker implements ClusterItem {
     */
    private String    formattedLabel;
 
-   public TourMarker tourMarker;
-
    public int        numSkippedLabels;
+
+   public TourMarker tourMarker;
 
    /**
     * @param tourMarker

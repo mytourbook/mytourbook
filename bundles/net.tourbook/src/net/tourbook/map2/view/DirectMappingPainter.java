@@ -504,7 +504,7 @@ public class DirectMappingPainter implements IDirectPainter {
       gc.setForeground(markerConfig.markerOutline_Hovered_Color);
 
       /*
-       * Draw a line from the marker to the marker location.
+       * Draw a line from the marker label to the marker location.
        * Ensure that the line is not crossing the label
        */
       int lineFromDevX = markerLabelRectangle.x;
