@@ -10822,10 +10822,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return tourLocationEnd;
    }
 
-//   public Set<TourLocationPoint> getTourLocationPoints() {
-//      return tourLocationPoints;
-//   }
-
    public TourLocation getTourLocationStart() {
       return tourLocationStart;
    }
@@ -11171,6 +11167,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    public boolean isDistanceSensorPresent() {
       return isDistanceFromSensor == 1;
+   }
+
+   /**
+    * @return <code>true</code> when latitude/longitude are available
+    */
+   public boolean isLatLonAvailable() {
+
+      if ((longitudeSerie == null)
+            || latitudeSerie == null
+            || longitudeSerie.length == 0
+            || latitudeSerie.length == 0) {
+
+         return false;
+      }
+
+      return true;
    }
 
    /**

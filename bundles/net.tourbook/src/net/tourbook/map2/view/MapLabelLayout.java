@@ -17,11 +17,12 @@ package net.tourbook.map2.view;
 
 public enum MapLabelLayout {
 
+   NONE, //
+
    RECTANGLE_BOX, //
 
    SHADOW, //
 
-   BORDER_0_POINT, //
-   BORDER_1_POINT, //
-   BORDER_2_POINT, //
+   BORDER_1_PIXEL, //
+   BORDER_2_PIXEL, //
 }

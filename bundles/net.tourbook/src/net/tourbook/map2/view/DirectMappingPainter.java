@@ -64,11 +64,11 @@ public class DirectMappingPainter implements IDirectPainter {
    private boolean                    _isShowValuePoint;
 
    private boolean                    _isShowLocations_Common;
-   private boolean                    _isShowLocations_Tour;
+//   private boolean                    _isShowLocations_Tour;
    private boolean                    _isShowMapLocations_BoundingBox;
 
    private List<TourLocationExtended> _allCommonLocations;
-   private List<TourLocationExtended> _allTourLocations;
+//   private List<TourLocationExtended> _allTourLocations;
    private int                        _mapLocationLineHeight    = MTFont.getTitleFontHeight() + 3;
 
    private SliderPathPaintingData     _sliderPathPaintingData;
@@ -973,26 +973,15 @@ public class DirectMappingPainter implements IDirectPainter {
          return;
       }
 
-      if (_isShowLocations_Tour || _isShowLocations_Common) {
+      if (_isShowLocations_Common) {
+
+         // show common locations
 
          painterContext.allPaintedMapLocations.clear();
 
-         // show tour locations
-         if (_isShowLocations_Tour) {
+         if (_allCommonLocations != null && _allCommonLocations.size() > 0) {
 
-            if (_allTourLocations != null && _allTourLocations.size() > 0) {
-
-               drawMapLocation(painterContext, _allTourLocations);
-            }
-         }
-
-         // show common locations
-         if (_isShowLocations_Common) {
-
-            if (_allCommonLocations != null && _allCommonLocations.size() > 0) {
-
-               drawMapLocation(painterContext, _allCommonLocations);
-            }
+            drawMapLocation(painterContext, _allCommonLocations);
          }
       }
 
@@ -1033,7 +1022,7 @@ public class DirectMappingPainter implements IDirectPainter {
       }
    }
 
-   public void setCommonLocations(final List<TourLocationExtended> allCommonLocations) {
+   public void setLocations_Common(final List<TourLocationExtended> allCommonLocations) {
 
       _allCommonLocations = allCommonLocations;
    }
@@ -1087,7 +1076,6 @@ public class DirectMappingPainter implements IDirectPainter {
    public void setPaintingOptions_2(final boolean isShowMapLocations_BBox,
 
                                     final boolean isShowCommonLocations,
-                                    final boolean isShowTourLocations,
 
                                     final boolean isMapBackgroundDark) {
 // SET_FORMATTING_OFF
@@ -1095,16 +1083,10 @@ public class DirectMappingPainter implements IDirectPainter {
       _isShowMapLocations_BoundingBox  = isShowMapLocations_BBox;
 
       _isShowLocations_Common          = isShowCommonLocations;
-      _isShowLocations_Tour            = isShowTourLocations;
 
       _isMapBackgroundDark             = isMapBackgroundDark;
 
 // SET_FORMATTING_ON
-   }
-
-   public void setTourLocations(final List<TourLocationExtended> allLocations) {
-
-      _allTourLocations = allLocations;
    }
 
    private void setupMapLocationName(final GC gc, final TourLocationExtended tourLocationExtended) {

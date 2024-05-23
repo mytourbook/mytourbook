@@ -78,21 +78,27 @@ public class Map2ConfigManager {
    /*
     * Tour marker, map bookmarks, photos
     */
-   private static final String TAG_TOUR_MARKERS = "TourMarkers"; //$NON-NLS-1$
-   private static final String TAG_MARKER       = "Marker";      //$NON-NLS-1$
-   //
+   private static final String TAG_TOUR_MARKERS                   = "TourMarkers";                 //$NON-NLS-1$
+   private static final String TAG_MARKER                         = "Marker";                      //$NON-NLS-1$
+   // location
+   private static final String ATTR_IS_SHOW_TOUR_LOCATION         = "isShowTourLocation";          //$NON-NLS-1$
+   private static final String TAG_LOCATION_FILL_COLOR            = "locationFillColor";           //$NON-NLS-1$
+   private static final String TAG_LOCATION_FILL_HOVERED_COLOR    = "locationFillHoveredColor";    //$NON-NLS-1$
+   private static final String TAG_LOCATION_OUTLINE_COLOR         = "locationOutlineColor";        //$NON-NLS-1$
+   private static final String TAG_LOCATION_OUTLINE_HOVERED_COLOR = "locationOutlineHoveredColor"; //$NON-NLS-1$
    // marker
-   private static final String ATTR_IS_SHOW_TOUR_MARKER           = "isShowTourMarker";           //$NON-NLS-1$
-   private static final String ATTR_IS_MARKER_LABEL_ANTIALIASED   = "isMarkerLabelAntialiased";   //$NON-NLS-1$
-   private static final String ATTR_MARKER_LABEL_LAYOUT           = "markerLabelLayout";          //$NON-NLS-1$
+   private static final String ATTR_IS_SHOW_TOUR_MARKER           = "isShowTourMarker";            //$NON-NLS-1$
+   private static final String ATTR_IS_MARKER_LABEL_ANTIALIASED   = "isMarkerLabelAntialiased";    //$NON-NLS-1$
+   private static final String ATTR_MARKER_LABEL_LAYOUT           = "markerLabelLayout";           //$NON-NLS-1$
    //
-   private static final String ATTR_IS_GROUP_DUPLICATED_MARKERS   = "isGroupDuplicatedMarkers";   //$NON-NLS-1$
-   private static final String ATTR_DUPLICATED_MARKERS            = "duplicatedMarkers";          //$NON-NLS-1$
-   private static final String ATTR_LABEL_GROUP_GRID_SIZE         = "labelGroupGridSize";         //$NON-NLS-1$
+   private static final String ATTR_IS_GROUP_DUPLICATED_MARKERS   = "isGroupDuplicatedMarkers";    //$NON-NLS-1$
+   private static final String ATTR_GROUPED_MARKERS               = "groupedLabels";               //$NON-NLS-1$
+   private static final String ATTR_GROUP_GRID_SIZE               = "groupGridSize";               //$NON-NLS-1$
    //
-   private static final String ATTR_LABEL_DISTRIBUTOR_MAX_LABELS  = "labelDistributorMaxLabels";  //$NON-NLS-1$
-   private static final String ATTR_LABEL_DISTRIBUTOR_RADIUS      = "labelDistributorRadius";     //$NON-NLS-1$
-   private static final String ATTR_LABEL_WRAP_LENGTH             = "labelWrapLength";            //$NON-NLS-1$
+   private static final String ATTR_LABEL_DISTRIBUTOR_MAX_LABELS  = "labelDistributorMaxLabels";   //$NON-NLS-1$
+   private static final String ATTR_LABEL_DISTRIBUTOR_RADIUS      = "labelDistributorRadius";      //$NON-NLS-1$
+   private static final String ATTR_LABEL_WRAP_LENGTH             = "labelWrapLength";             //$NON-NLS-1$
+   //
    //
    private static final String TAG_MARKER_FILL_COLOR              = "MarkerFillColor";            //$NON-NLS-1$
    private static final String TAG_MARKER_FILL_HOVERED_COLOR      = "MarkerFillHoveredColor";     //$NON-NLS-1$
@@ -115,10 +121,10 @@ public class Map2ConfigManager {
     * Defaults, min/max
     */
    // marker
-   static final int                   MARKER_LABEL_GROUP_GRID_SIZE_MIN     = 50;
-   static final int                   MARKER_LABEL_GROUP_GRID_SIZE_MAX     = 1000;
-   static final int                   MARKER_LABEL_GROUP_GRID_SIZE_DEFAULT = 300;
-   public static final MapLabelLayout MARKER_LABEL_LAYOUT_DEFAULT          = MapLabelLayout.RECTANGLE_BOX;
+   static final int                   LABEL_GROUP_GRID_SIZE_MIN            = 50;
+   static final int                   LABEL_GROUP_GRID_SIZE_MAX            = 1000;
+   static final int                   LABEL_GROUP_GRID_SIZE_DEFAULT        = 300;
+   public static final MapLabelLayout LABEL_LAYOUT_DEFAULT                 = MapLabelLayout.RECTANGLE_BOX;
    static final int                   LABEL_DISTRIBUTOR_MAX_LABELS_MIN     = 10;
    static final int                   LABEL_DISTRIBUTOR_MAX_LABELS_MAX     = 2000;
    static final int                   LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT = 200;
@@ -144,6 +150,10 @@ public class Map2ConfigManager {
    public static final RGB            DEFAULT_CLUSTER_FILL_RGB             = new RGB(0xFC, 0x67, 0x00);
    public static final RGB            DEFAULT_CLUSTER_OUTLINE_RGB          = new RGB(0xff, 0xff, 0xff);
    public static final float          DEFAULT_CLUSTER_OUTLINE_SIZE         = 2.0f;
+   public static final RGB            DEFAULT_LOCATION_FILL_RGB            = new RGB(0xFF, 0xFF, 0x00);
+   public static final RGB            DEFAULT_LOCATION_FILL_HOVERED_RGB    = new RGB(0xFF, 0x00, 0x00);
+   public static final RGB            DEFAULT_LOCATION_OUTLINE_RGB         = new RGB(0, 0, 0);
+   public static final RGB            DEFAULT_LOCATION_OUTLINE_HOVERED_RGB = new RGB(0, 0XFF, 0);
    public static final RGB            DEFAULT_MARKER_FILL_RGB              = new RGB(0xFF, 0xFF, 0x00);
    public static final RGB            DEFAULT_MARKER_FILL_HOVERED_RGB      = new RGB(0xFF, 0x00, 0x00);
    public static final RGB            DEFAULT_MARKER_OUTLINE_RGB           = new RGB(0, 0, 0);
@@ -297,14 +307,24 @@ public class Map2ConfigManager {
          xmlConfig.putString(ATTR_CONFIG_NAME,  config.name);
 
          /*
+          * Location
+          */
+         xmlConfig.putBoolean(      ATTR_IS_SHOW_TOUR_MARKER,           config.isShowTourLocation);
+
+         Util.setXmlRgb(xmlConfig,  TAG_LOCATION_FILL_COLOR,            config.locationFill_RGB);
+         Util.setXmlRgb(xmlConfig,  TAG_LOCATION_FILL_HOVERED_COLOR,    config.locationFill_Hovered_RGB);
+         Util.setXmlRgb(xmlConfig,  TAG_LOCATION_OUTLINE_COLOR,         config.locationOutline_RGB);
+         Util.setXmlRgb(xmlConfig,  TAG_LOCATION_OUTLINE_HOVERED_COLOR, config.locationOutline_Hovered_RGB);
+
+         /*
           * Marker
           */
          xmlConfig.putBoolean(      ATTR_IS_SHOW_TOUR_MARKER,           config.isShowTourMarker);
          xmlConfig.putBoolean(      ATTR_IS_MARKER_LABEL_ANTIALIASED,   config.isMarkerLabelAntialiased);
 
          xmlConfig.putBoolean(      ATTR_IS_GROUP_DUPLICATED_MARKERS,   config.isGroupDuplicatedMarkers);
-         xmlConfig.putString(       ATTR_DUPLICATED_MARKERS,            config.duplicatedMarkers);
-         xmlConfig.putInteger(      ATTR_LABEL_GROUP_GRID_SIZE,         config.labelGroupGridSize);
+         xmlConfig.putString(       ATTR_GROUPED_MARKERS,               config.groupedMarkers);
+         xmlConfig.putInteger(      ATTR_GROUP_GRID_SIZE,               config.groupGridSize);
 
          Util.setXmlEnum(xmlConfig, ATTR_MARKER_LABEL_LAYOUT,           config.markerLabelLayout);
 
@@ -424,12 +444,13 @@ public class Map2ConfigManager {
       config.id                           = Util.getXmlString (xmlConfig,     ATTR_ID,                            Long.toString(System.nanoTime()));
       config.name                         = Util.getXmlString (xmlConfig,     ATTR_CONFIG_NAME,                   UI.EMPTY_STRING);
 
+      config.isShowTourLocation           = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_LOCATION,         true);
       config.isShowTourMarker             = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_MARKER,           true);
-      config.isMarkerLabelAntialiased     = Util.getXmlBoolean(xmlConfig,     ATTR_IS_MARKER_LABEL_ANTIALIASED,   true);
 
+      config.isMarkerLabelAntialiased     = Util.getXmlBoolean(xmlConfig,     ATTR_IS_MARKER_LABEL_ANTIALIASED,   true);
       config.isGroupDuplicatedMarkers     = Util.getXmlBoolean(xmlConfig,     ATTR_IS_GROUP_DUPLICATED_MARKERS,   false);
-      config.duplicatedMarkers            = Util.getXmlString (xmlConfig,     ATTR_DUPLICATED_MARKERS,            UI.EMPTY_STRING);
-      config.labelGroupGridSize           = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_GROUP_GRID_SIZE,         MARKER_LABEL_GROUP_GRID_SIZE_DEFAULT,  MARKER_LABEL_GROUP_GRID_SIZE_MIN,   MARKER_LABEL_GROUP_GRID_SIZE_MAX);
+      config.groupedMarkers               = Util.getXmlString (xmlConfig,     ATTR_GROUPED_MARKERS,               UI.EMPTY_STRING);
+      config.groupGridSize                = Util.getXmlInteger(xmlConfig,     ATTR_GROUP_GRID_SIZE,               LABEL_GROUP_GRID_SIZE_DEFAULT,  LABEL_GROUP_GRID_SIZE_MIN,   LABEL_GROUP_GRID_SIZE_MAX);
 
       config.isMarkerClustered            = Util.getXmlBoolean(xmlConfig,     ATTR_IS_MARKER_CLUSTERED,           true);
       config.isClusterSymbolAntialiased   = Util.getXmlBoolean(xmlConfig,     ATTR_IS_CLUSTER_SYMBOL_ANTIALIASED, true);
@@ -445,7 +466,7 @@ public class Map2ConfigManager {
 
 // SET_FORMATTING_ON
 
-      config.markerLabelLayout = (MapLabelLayout) Util.getXmlEnum(xmlConfig, ATTR_MARKER_LABEL_LAYOUT, MARKER_LABEL_LAYOUT_DEFAULT);
+      config.markerLabelLayout = (MapLabelLayout) Util.getXmlEnum(xmlConfig, ATTR_MARKER_LABEL_LAYOUT, LABEL_LAYOUT_DEFAULT);
 
       /*
        * Each color is in it's own tag
@@ -457,29 +478,22 @@ public class Map2ConfigManager {
 
          switch (configTag) {
 
-         case TAG_CLUSTER_FILL_COLOR:
-            config.clusterFill_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_FILL_RGB);
-            break;
+// SET_FORMATTING_OFF
 
-         case TAG_CLUSTER_OUTLINE_COLOR:
-            config.clusterOutline_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_OUTLINE_RGB);
-            break;
+         case TAG_CLUSTER_FILL_COLOR:              config.clusterFill_RGB              = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_FILL_RGB);             break;
+         case TAG_CLUSTER_OUTLINE_COLOR:           config.clusterOutline_RGB           = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_OUTLINE_RGB);          break;
 
-         case TAG_MARKER_FILL_COLOR:
-            config.markerFill_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_FILL_RGB);
-            break;
+         case TAG_LOCATION_FILL_COLOR:             config.locationFill_RGB             = Util.getXmlRgb(xmlConfigChild, DEFAULT_LOCATION_FILL_RGB);            break;
+         case TAG_LOCATION_FILL_HOVERED_COLOR:     config.locationFill_Hovered_RGB     = Util.getXmlRgb(xmlConfigChild, DEFAULT_LOCATION_FILL_HOVERED_RGB);    break;
+         case TAG_LOCATION_OUTLINE_COLOR:          config.locationOutline_RGB          = Util.getXmlRgb(xmlConfigChild, DEFAULT_LOCATION_OUTLINE_RGB);         break;
+         case TAG_LOCATION_OUTLINE_HOVERED_COLOR:  config.locationOutline_Hovered_RGB  = Util.getXmlRgb(xmlConfigChild, DEFAULT_LOCATION_OUTLINE_HOVERED_RGB); break;
 
-         case TAG_MARKER_FILL_HOVERED_COLOR:
-            config.markerFill_Hovered_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_FILL_HOVERED_RGB);
-            break;
+         case TAG_MARKER_FILL_COLOR:               config.markerFill_RGB               = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_FILL_RGB);              break;
+         case TAG_MARKER_FILL_HOVERED_COLOR:       config.markerFill_Hovered_RGB       = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_FILL_HOVERED_RGB);      break;
+         case TAG_MARKER_OUTLINE_COLOR:            config.markerOutline_RGB            = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_OUTLINE_RGB);           break;
+         case TAG_MARKER_OUTLINE_HOVERED_COLOR:    config.markerOutline_Hovered_RGB    = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_OUTLINE_HOVERED_RGB);   break;
 
-         case TAG_MARKER_OUTLINE_COLOR:
-            config.markerOutline_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_OUTLINE_RGB);
-            break;
-
-         case TAG_MARKER_OUTLINE_HOVERED_COLOR:
-            config.markerOutline_Hovered_RGB = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_OUTLINE_HOVERED_RGB);
-            break;
+// SET_FORMATTING_ON
          }
       }
 

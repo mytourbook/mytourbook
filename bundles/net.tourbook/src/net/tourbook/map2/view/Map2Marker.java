@@ -16,6 +16,7 @@
 package net.tourbook.map2.view;
 
 import net.tourbook.common.UI;
+import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
 import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
 
@@ -26,39 +27,74 @@ import org.oscim.core.GeoPoint;
  */
 public class Map2Marker implements ClusterItem {
 
-   public GeoPoint   geoPoint;
+   public GeoPoint     geoPoint;
 
    /**
     * Geo position in device pixel for the marker position
     */
-   public int        geoPointDevX;
-   public int        geoPointDevY;
+   public int          geoPointDevX;
+   public int          geoPointDevY;
 
    /**
     * Long labels are wrapped
     */
-   private String    formattedLabel;
+   private String      formattedLabel;
 
-   public int        numSkippedLabels;
+   public int          numDuplicates;
 
-   public TourMarker tourMarker;
+   public int          numDuplicates_Start;
+   public int          numDuplicates_End;
+
+   /**
+    * {@link #tourMarker} or {@link #tourLocation} is set
+    */
+   public TourMarker   tourMarker;
+
+   /**
+    * {@link #tourMarker} or {@link #tourLocation} is set
+    */
+   public TourLocation tourLocation;
 
    /**
     * @param tourMarker
     * @param geoPoint
     */
-   public Map2Marker(final TourMarker tourMarker,
-                     final GeoPoint geoPoint) {
+   public Map2Marker(final GeoPoint geoPoint) {
 
       this.geoPoint = geoPoint;
-      this.tourMarker = tourMarker;
    }
 
    public String getFormattedLabel() {
 
-      return numSkippedLabels < 2
-            ? formattedLabel
-            : formattedLabel + " (" + numSkippedLabels + ")";
+      if (tourMarker != null) {
+         
+         // tour marker is wrapped
+
+         return numDuplicates < 2
+               ? formattedLabel
+               : formattedLabel + " (" + numDuplicates + ")";
+
+      } else {
+         
+         // tour location is wrapped
+
+         if (numDuplicates_Start > 1 && numDuplicates_End > 1) {
+
+            return formattedLabel + " (" + numDuplicates_Start + " / " + numDuplicates_End + ")";
+
+         } else if (numDuplicates_Start > 1) {
+
+            return formattedLabel + " (" + numDuplicates_Start + ")";
+
+         } else if (numDuplicates_End > 1) {
+
+            return formattedLabel + " (" + numDuplicates_End + ")";
+
+         } else {
+
+            return formattedLabel;
+         }
+      }
    }
 
    @Override

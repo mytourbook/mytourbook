@@ -52,11 +52,11 @@ public class PaintedMarker {
 
       return UI.EMPTY_STRING
 
-            + "PaintedMarker" + NL //                         //$NON-NLS-1$
+            + "PaintedMarker" + NL //                                      //$NON-NLS-1$
 
-            + " mapMarker  = " + mapMarker.tourMarker.getLabel() + NL //           //$NON-NLS-1$
-            + " x          = " + mapMarker.geoPointDevX + NL //           //$NON-NLS-1$
-            + " y          = " + mapMarker.geoPointDevY + NL //           //$NON-NLS-1$
+            + " mapMarker  = " + mapMarker.tourMarker.getLabel() + NL //   //$NON-NLS-1$
+            + " x          = " + mapMarker.geoPointDevX + NL //            //$NON-NLS-1$
+            + " y          = " + mapMarker.geoPointDevY + NL //            //$NON-NLS-1$
 
       ;
    }

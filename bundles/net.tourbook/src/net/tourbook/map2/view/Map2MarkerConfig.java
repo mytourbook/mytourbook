@@ -37,16 +37,32 @@ public class Map2MarkerConfig {
    public String name      = Map2ConfigManager.CONFIG_DEFAULT_ID_1;
 
    /*
+    * Location
+    */
+   public boolean isShowTourLocation          = true;
+
+   public RGB     locationFill_RGB            = Map2ConfigManager.DEFAULT_LOCATION_FILL_RGB;
+   public RGB     locationFill_Hovered_RGB    = Map2ConfigManager.DEFAULT_LOCATION_FILL_HOVERED_RGB;
+   public RGB     locationOutline_RGB         = Map2ConfigManager.DEFAULT_LOCATION_OUTLINE_RGB;
+   public RGB     locationOutline_Hovered_RGB = Map2ConfigManager.DEFAULT_LOCATION_OUTLINE_HOVERED_RGB;
+
+   public Color   locationFill_Color;
+   public Color   locationFill_Hovered_Color;
+   public Color   locationOutline_Color;
+   public Color   locationOutline_Hovered_Color;
+
+   /*
     * Marker
     */
    public boolean        isShowTourMarker          = true;
    public boolean        isMarkerLabelAntialiased  = true;
 
+   /** When <code>true</code> then markers with the same label are grouped together */
    public boolean        isGroupDuplicatedMarkers;
-   public String         duplicatedMarkers         = UI.EMPTY_STRING;
-   public int            labelGroupGridSize        = Map2ConfigManager.MARKER_LABEL_GROUP_GRID_SIZE_DEFAULT;
+   public String         groupedMarkers         = UI.EMPTY_STRING;
+   public int            groupGridSize        = Map2ConfigManager.LABEL_GROUP_GRID_SIZE_DEFAULT;
 
-   public MapLabelLayout markerLabelLayout         = Map2ConfigManager.MARKER_LABEL_LAYOUT_DEFAULT;
+   public MapLabelLayout markerLabelLayout         = Map2ConfigManager.LABEL_LAYOUT_DEFAULT;
 
    public RGB            markerFill_RGB            = Map2ConfigManager.DEFAULT_MARKER_FILL_RGB;
    public RGB            markerFill_Hovered_RGB    = Map2ConfigManager.DEFAULT_MARKER_FILL_HOVERED_RGB;
@@ -86,6 +102,11 @@ public class Map2MarkerConfig {
 
       clusterFill_Color             = new Color(clusterFill_RGB);
       clusterOutline_Color          = new Color(clusterOutline_RGB);
+
+      locationFill_Color            = new Color(locationFill_RGB);
+      locationFill_Hovered_Color    = new Color(locationFill_Hovered_RGB);
+      locationOutline_Color         = new Color(locationOutline_RGB);
+      locationOutline_Hovered_Color = new Color(locationOutline_Hovered_RGB);
 
       markerFill_Color              = new Color(markerFill_RGB);
       markerFill_Hovered_Color      = new Color(markerFill_Hovered_RGB);

@@ -156,7 +156,6 @@ import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 import net.tourbook.tour.location.CommonLocationManager;
 import net.tourbook.tour.location.TourLocationExtended;
-import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.photo.IMapWithPhotos;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
@@ -250,8 +249,8 @@ public class Map2View extends ViewPart implements
 
    public static final String    STATE_IS_SHOW_COMMON_LOCATIONS                        = "STATE_IS_SHOW_COMMON_LOCATIONS";                           //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_COMMON_LOCATIONS_DEFAULT                = true;
-   public static final String    STATE_IS_SHOW_TOUR_LOCATIONS                          = "STATE_IS_SHOW_TOUR_LOCATIONS";                           //$NON-NLS-1$
-   public static final boolean   STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT                  = true;
+//   public static final String    STATE_IS_SHOW_TOUR_LOCATIONS                          = "STATE_IS_SHOW_TOUR_LOCATIONS";                           //$NON-NLS-1$
+//   public static final boolean   STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT                  = true;
 
    public static final String    STATE_IS_SHOW_HOVERED_SELECTED_TOUR                            = "STATE_IS_SHOW_HOVERED_SELECTED_TOUR";                 //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT                    = true;
@@ -3421,7 +3420,7 @@ public class Map2View extends ViewPart implements
 
          // hide tour locations
 
-         _directMappingPainter.setCommonLocations(null);
+         _directMappingPainter.setLocations_Common(null);
 
          _map.redraw();
 
@@ -3434,7 +3433,7 @@ public class Map2View extends ViewPart implements
          allCommonLocations.add(new TourLocationExtended(tourLocation, LocationType.Common));
       }
 
-      _directMappingPainter.setCommonLocations(allCommonLocations);
+      _directMappingPainter.setLocations_Common(allCommonLocations);
 
       _map.redraw();
 
@@ -3459,43 +3458,42 @@ public class Map2View extends ViewPart implements
       _map.setMapCenter(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()));
    }
 
-   @SuppressWarnings("unchecked")
    private void moveToTourLocation(final Object eventData) {
 
-      List<TourLocation> allTourLocations = null;
+      final List<TourLocation> allTourLocations = null;
 
-      if (eventData instanceof final List allTourLocationsFromEvent) {
-         allTourLocations = allTourLocationsFromEvent;
-      }
-
-      if (eventData == null
-            || allTourLocations == null
-            || allTourLocations.size() == 0) {
-
-         // hide tour locations
-
-         _directMappingPainter.setTourLocations(null);
-
-         _map.redraw();
-
-         return;
-      }
-
-      // repaint map
-      final List<TourLocationExtended> allTourLocationsExtended = new ArrayList<>();
-      for (final TourLocation tourLocation : allTourLocations) {
-         allTourLocationsExtended.add(new TourLocationExtended(tourLocation, LocationType.Tour));
-      }
-      _directMappingPainter.setTourLocations(allTourLocationsExtended);
-
-      _map.redraw();
-
-      if (_isMapSyncWith_MapLocation) {
-
-         final GeoPosition geoPosition = getTourLocationCenter(allTourLocations);
-
-         _map.setMapCenter(geoPosition);
-      }
+//      if (eventData instanceof final List allTourLocationsFromEvent) {
+//         allTourLocations = allTourLocationsFromEvent;
+//      }
+//
+//      if (eventData == null
+//            || allTourLocations == null
+//            || allTourLocations.size() == 0) {
+//
+//         // hide tour locations
+//
+//         _directMappingPainter.setLocations_Tour(null);
+//
+//         _map.redraw();
+//
+//         return;
+//      }
+//
+//      // repaint map
+//      final List<TourLocationExtended> allTourLocationsExtended = new ArrayList<>();
+//      for (final TourLocation tourLocation : allTourLocations) {
+//         allTourLocationsExtended.add(new TourLocationExtended(tourLocation, LocationType.Tour));
+//      }
+//      _directMappingPainter.setLocations_Tour(allTourLocationsExtended);
+//
+//      _map.redraw();
+//
+//      if (_isMapSyncWith_MapLocation) {
+//
+//         final GeoPosition geoPosition = getTourLocationCenter(allTourLocations);
+//
+//         _map.setMapCenter(geoPosition);
+//      }
    }
 
    @Override
@@ -5090,7 +5088,7 @@ public class Map2View extends ViewPart implements
       _allTourData.clear();
       _allTourData.addAll(allTourData);
 
-      _directMappingPainter.setTourLocations(TourLocationManager.getTourLocations(allTourData));
+//      _directMappingPainter.setLocations_Tour(TourLocationManager.getTourLocations(allTourData));
 
       for (final TourData tourData : allTourData) {
          setVisibleDataPoints(tourData);
@@ -5128,7 +5126,7 @@ public class Map2View extends ViewPart implements
       _allTourData.clear();
       _allTourData.add(tourData);
 
-      _directMappingPainter.setTourLocations(getTourLocations(tourData));
+//      _directMappingPainter.setLocations_Tour(getTourLocations(tourData));
 
       setVisibleDataPoints(tourData);
 
@@ -5593,14 +5591,13 @@ public class Map2View extends ViewPart implements
             Map2View.STATE_IS_SHOW_COMMON_LOCATIONS,
             Map2View.STATE_IS_SHOW_COMMON_LOCATIONS_DEFAULT);
 
-      final boolean isShowTourLocations = Util.getStateBoolean(_state,
-            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS,
-            Map2View.STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT);
 
 // SET_FORMATTING_ON
 
       // enable/disable cluster/marker tooltip
-      final boolean isShowTourMarker = Map2ConfigManager.getActiveMarkerConfig().isShowTourMarker;
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+
+      final boolean isShowTourMarker = markerConfig.isShowTourMarker;
       if (isShowTourMarker) {
          _map.getMapMarkerTooltip().activate();
       } else {
@@ -5615,7 +5612,6 @@ public class Map2View extends ViewPart implements
             isShowMapLocations_BBox,
 
             isShowCommonLocations,
-            isShowTourLocations,
 
             isBackgroundDark);
 
