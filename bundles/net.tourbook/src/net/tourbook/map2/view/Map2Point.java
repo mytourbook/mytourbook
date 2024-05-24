@@ -68,7 +68,7 @@ public class Map2Point implements ClusterItem {
 
       if (tourMarker != null) {
 
-         // a tour marker is wrapped
+         // a tour marker is displayed
 
          return numDuplicates < 2
                ? formattedLabel
@@ -76,7 +76,7 @@ public class Map2Point implements ClusterItem {
 
       } else {
 
-         // a tour location is wrapped
+         // a tour location is displayed
 
          if (numDuplicates_Start > 1 || numDuplicates_End > 1) {
 

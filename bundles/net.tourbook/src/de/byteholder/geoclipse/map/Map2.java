@@ -108,9 +108,9 @@ import net.tourbook.map.location.MapLocationToolTip;
 import net.tourbook.map2.view.Map2ConfigManager;
 import net.tourbook.map2.view.Map2MarkerConfig;
 import net.tourbook.map2.view.Map2Point;
-import net.tourbook.map2.view.Map2PointToolTip;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.MapLabelLayout;
+import net.tourbook.map2.view.MapPointToolTip;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.TourPainterConfiguration;
 import net.tourbook.map2.view.WayPointToolTipProvider;
@@ -407,7 +407,7 @@ public class Map2 extends Canvas {
    private PaintedMarkerCluster            _hoveredMarkerCluster;
    private PaintedMapPoint                 _hoveredMapPoint;
    private boolean                         _isMarkerClusterSelected;
-   private Map2PointToolTip                _mapPointTooltip;
+   private MapPointToolTip                _mapPointTooltip;
 
    private final NumberFormat              _nf0;
    private final NumberFormat              _nf1;
@@ -792,7 +792,7 @@ public class Map2 extends Canvas {
 // SET_FORMATTING_ON
 
       _mapLocation_Tooltip = new MapLocationToolTip(this);
-      _mapPointTooltip = new Map2PointToolTip(this);
+      _mapPointTooltip = new MapPointToolTip(this);
 
       _poiImage = TourbookPlugin.getImageDescriptor(Images.POI_InMap).createImage();
       _poiImageBounds = _poiImage.getBounds();
@@ -5660,10 +5660,10 @@ public class Map2 extends Canvas {
 
             final PointFeature distribLabel = allLocationLabels.get(itemIndex);
 
-            final Map2Point mapMarker = (Map2Point) distribLabel.data;
+            final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
-            final int locationSymbolDevX = mapMarker.geoPointDevX - locationRespectWidth2;
-            final int locationSymbolDevY = mapMarker.geoPointDevY - locationRespectHeight;
+            final int locationSymbolDevX = mapPoint.geoPointDevX - locationRespectWidth2;
+            final int locationSymbolDevY = mapPoint.geoPointDevY - locationRespectHeight;
 
             _labelDistributor.respectBox(
                   locationSymbolDevX,
@@ -5679,10 +5679,10 @@ public class Map2 extends Canvas {
 
             final PointFeature distribLabel = allMarkerLabels.get(itemIndex);
 
-            final Map2Point mapMarker = (Map2Point) distribLabel.data;
+            final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
-            final int markerSymbolDevX = mapMarker.geoPointDevX - markerRespectSize2;
-            final int markerSymbolDevY = mapMarker.geoPointDevY - markerRespectSize2;
+            final int markerSymbolDevX = mapPoint.geoPointDevX - markerRespectSize2;
+            final int markerSymbolDevY = mapPoint.geoPointDevY - markerRespectSize2;
 
             _labelDistributor.respectBox(
                   markerSymbolDevX,
@@ -5710,9 +5710,9 @@ public class Map2 extends Canvas {
             continue;
          }
 
-         final Map2Point mapMarker = (Map2Point) distribLabel.data;
+         final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
-         final String text = mapMarker.getFormattedLabel();
+         final String text = mapPoint.getFormattedLabel();
          final Point textExtent = gc.textExtent(text);
 
          final int textWidth = textExtent.x;
@@ -5721,7 +5721,7 @@ public class Map2 extends Canvas {
          final int labelDevX = (int) distribLabel.labelBoxL + diffX;
          final int labelDevY = (int) distribLabel.labelBoxT + diffY;
 
-         final Rectangle markerLabelRectangle = new Rectangle(
+         final Rectangle labelRectangle = new Rectangle(
                labelDevX,
                labelDevY,
                textWidth,
@@ -5729,8 +5729,8 @@ public class Map2 extends Canvas {
 
          paint_BackgroundImage_50_OneMarker(
                gc,
-               mapMarker,
-               markerLabelRectangle,
+               mapPoint,
+               labelRectangle,
                allPaintedTourLocations);
       }
 
@@ -5746,9 +5746,9 @@ public class Map2 extends Canvas {
             continue;
          }
 
-         final Map2Point mapMarker = (Map2Point) distribLabel.data;
+         final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
-         final String text = mapMarker.getFormattedLabel();
+         final String text = mapPoint.getFormattedLabel();
          final Point textExtent = gc.textExtent(text);
 
          final int textWidth = textExtent.x;
@@ -5784,7 +5784,7 @@ public class Map2 extends Canvas {
             gc.drawString(text, labelDevX, labelDevY, true);
 
             // keep painted positions
-            allPaintedMarkers.add(new PaintedMapPoint(mapMarker, markerLabelRectangle));
+            allPaintedMarkers.add(new PaintedMapPoint(mapPoint, markerLabelRectangle));
 
          } else {
 
@@ -5792,7 +5792,7 @@ public class Map2 extends Canvas {
 
             paint_BackgroundImage_50_OneMarker(
                   gc,
-                  mapMarker,
+                  mapPoint,
                   markerLabelRectangle,
                   allPaintedMarkers);
          }
@@ -5815,13 +5815,13 @@ public class Map2 extends Canvas {
             continue;
          }
 
-         final Map2Point mapMarker = (Map2Point) distribLabel.data;
+         final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
-         final int markerPointDevX = mapMarker.geoPointDevX + diffX;
-         final int markerPointDevY = mapMarker.geoPointDevY + diffY;
+         final int mapPointDevX = mapPoint.geoPointDevX + diffX;
+         final int mapPointDevY = mapPoint.geoPointDevY + diffY;
 
-         final int markerSymbolDevX = markerPointDevX - markerSize2;
-         final int markerSymbolDevY = markerPointDevY - markerSize2;
+         final int markerSymbolDevX = mapPointDevX - markerSize2;
+         final int markerSymbolDevY = mapPointDevY - markerSize2;
 
          final Rectangle markerSymbolRectangle = new Rectangle(
                markerSymbolDevX,
@@ -5854,10 +5854,10 @@ public class Map2 extends Canvas {
             continue;
          }
 
-         final Map2Point mapMarker = (Map2Point) distribLabel.data;
+         final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
-         final int locationDevX = mapMarker.geoPointDevX + diffX;
-         final int locationDevY = mapMarker.geoPointDevY + diffY;
+         final int locationDevX = mapPoint.geoPointDevX + diffX;
+         final int locationDevY = mapPoint.geoPointDevY + diffY;
 
          final int iconDevX = locationDevX - imageWidth2;
          final int iconDevY = locationDevY - imageHeight;
@@ -5873,8 +5873,8 @@ public class Map2 extends Canvas {
 
          // draw location image
 
-         final int numDuplicates_Start = mapMarker.numDuplicates_Start;
-         final int numDuplicates_End = mapMarker.numDuplicates_End;
+         final int numDuplicates_Start = mapPoint.numDuplicates_Start;
+         final int numDuplicates_End = mapPoint.numDuplicates_End;
 
          if (numDuplicates_Start > 0 && numDuplicates_End > 0) {
 

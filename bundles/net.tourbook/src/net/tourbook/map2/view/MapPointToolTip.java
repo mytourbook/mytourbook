@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Text;
  * {@link org.eclipse.ui.internal.dialogs.CustomizePerspectiveDialog} and
  * {@link org.eclipse.jface.viewers.ColumnViewerToolTipSupport}
  */
-public class Map2PointToolTip extends ToolTip {
+public class MapPointToolTip extends ToolTip {
 
    private static final int DEFAULT_TEXT_WIDTH  = 50;
    private static final int DEFAULT_TEXT_HEIGHT = 20;
@@ -65,7 +65,7 @@ public class Map2PointToolTip extends ToolTip {
    private int              _defaultTextHeight;
    private Font             _boldFont;
 
-   public Map2PointToolTip(final Map2 map2) {
+   public MapPointToolTip(final Map2 map2) {
 
       super(map2, NO_RECREATE, true);
 

@@ -495,7 +495,9 @@ public class DirectMappingPainter implements IDirectPainter {
       final TourMarker tourMarker = mapPoint.tourMarker;
       final TourLocation tourLocation = mapPoint.tourLocation;
 
-      if (tourMarker != null) {
+      final boolean isTourMarker = tourMarker != null;
+
+      if (isTourMarker) {
 
          // tour marker
 
@@ -552,18 +554,30 @@ public class DirectMappingPainter implements IDirectPainter {
       /*
        * Draw a symbol at the marker location
        */
-      gc.fillRectangle(
-            markerSymbolDevX,
-            markerSymbolDevY,
-            markerSize,
-            markerSize);
+      if (isTourMarker) {
 
-      gc.setLineWidth(2);
-      gc.drawRectangle(
-            markerSymbolDevX,
-            markerSymbolDevY,
-            markerSize,
-            markerSize);
+         gc.fillRectangle(
+               markerSymbolDevX,
+               markerSymbolDevY,
+               markerSize,
+               markerSize);
+
+         gc.setLineWidth(2);
+         gc.drawRectangle(
+               markerSymbolDevX,
+               markerSymbolDevY,
+               markerSize,
+               markerSize);
+      } else {
+
+         final int imageWidth = _imageMapLocationBounds.width;
+         final int imageHeight = _imageMapLocationBounds.height;
+         final int imageWidth2 = imageWidth / 2;
+
+         gc.drawImage(_imageMapLocation_Hovered,
+               mapPointDevX - imageWidth2,
+               mapPointDevY - imageHeight);
+      }
 
       /*
        * Highlight hovered label
