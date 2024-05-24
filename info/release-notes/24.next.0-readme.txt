@@ -64,8 +64,14 @@ Improvements
 Changes
 =======
 
-* 
-  
+* 2D Map
+  - Moved map dim options from the "2D Map Options" slideout into the "Location / Marker" slideout
+
+
+Changes that require Tour Re-import
+===================================
+
+*  
 
 
 Bugfix

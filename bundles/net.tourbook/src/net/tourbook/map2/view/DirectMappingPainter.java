@@ -21,7 +21,7 @@ import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Map2Painter;
 import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.PaintedMapLocation;
-import de.byteholder.geoclipse.map.PaintedMarker;
+import de.byteholder.geoclipse.map.PaintedMapPoint;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 import java.util.HashMap;
@@ -38,6 +38,7 @@ import net.tourbook.common.ui.FormattedWord;
 import net.tourbook.common.ui.TextWrapPainter;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
+import net.tourbook.data.TourMarker;
 import net.tourbook.map2.Messages;
 import net.tourbook.tour.location.TourLocationExtended;
 
@@ -475,42 +476,59 @@ public class DirectMappingPainter implements IDirectPainter {
       }
    }
 
-   private void drawMarker_Hovered(final DirectPainterContext painterContext) {
+   private void drawMapPoint_Hovered(final DirectPainterContext painterContext) {
 
       final GC gc = painterContext.gc;
 
-      gc.setAntialias(SWT.ON);
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
 
-      final PaintedMarker hoveredMarker = painterContext.hoveredMarker;
-      final Rectangle markerLabelRectangle = hoveredMarker.markerLabelRectangle;
-      final int labelWidth = markerLabelRectangle.width;
-      final int labelHeight = markerLabelRectangle.height;
+      gc.setAntialias(markerConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
 
-      final Map2Marker mapMarker = hoveredMarker.mapMarker;
+      final PaintedMapPoint hoveredPoint = painterContext.hoveredMapPoint;
+      final Rectangle labelRectangle = hoveredPoint.labelRectangle;
 
-      final int markerPointDevX = mapMarker.geoPointDevX;
-      final int markerPointDevY = mapMarker.geoPointDevY;
+      final int labelWidth = labelRectangle.width;
+      final int labelHeight = labelRectangle.height;
+
+      final Map2Point mapPoint = hoveredPoint.mapPoint;
+
+      final TourMarker tourMarker = mapPoint.tourMarker;
+      final TourLocation tourLocation = mapPoint.tourLocation;
+
+      if (tourMarker != null) {
+
+         // tour marker
+
+         gc.setBackground(markerConfig.markerFill_Hovered_Color);
+         gc.setForeground(markerConfig.markerOutline_Hovered_Color);
+
+      } else {
+
+         // tour location
+
+         gc.setBackground(markerConfig.locationFill_Hovered_Color);
+         gc.setForeground(markerConfig.locationOutline_Hovered_Color);
+      }
+
+      final int mapPointDevX = mapPoint.geoPointDevX;
+      final int mapPointDevY = mapPoint.geoPointDevY;
+
       final int markerSize = 6;
       final int markerSize2 = markerSize / 2;
 
-      final String markerLabel = mapMarker.getFormattedLabel();
+      final String markerLabel = mapPoint.getFormattedLabel();
 
-      final int markerSymbolDevX = markerPointDevX - markerSize2;
-      final int markerSymbolDevY = markerPointDevY - markerSize2;
-
-      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
-
-      gc.setBackground(markerConfig.markerFill_Hovered_Color);
-      gc.setForeground(markerConfig.markerOutline_Hovered_Color);
+      final int markerSymbolDevX = mapPointDevX - markerSize2;
+      final int markerSymbolDevY = mapPointDevY - markerSize2;
 
       /*
        * Draw a line from the marker label to the marker location.
        * Ensure that the line is not crossing the label
        */
-      int lineFromDevX = markerLabelRectangle.x;
-      int lineFromDevY = markerLabelRectangle.y;
-      final int lineToDevX = markerPointDevX;
-      final int lineToDevY = markerPointDevY;
+      int lineFromDevX = labelRectangle.x;
+      int lineFromDevY = labelRectangle.y;
+      final int lineToDevX = mapPointDevX;
+      final int lineToDevY = mapPointDevY;
 
       if (lineToDevX > lineFromDevX + labelWidth) {
          lineFromDevX += labelWidth;
@@ -550,15 +568,15 @@ public class DirectMappingPainter implements IDirectPainter {
       /*
        * Highlight hovered label
        */
-      final int labelDevX = markerLabelRectangle.x;
-      final int labelDevY = markerLabelRectangle.y;
+      final int labelDevX = labelRectangle.x;
+      final int labelDevY = labelRectangle.y;
 
       // fill label background
       gc.fillRectangle(
-            markerLabelRectangle.x - Map2.MAP_MARKER_BORDER_WIDTH,
-            markerLabelRectangle.y,
-            markerLabelRectangle.width + 2 * Map2.MAP_MARKER_BORDER_WIDTH,
-            markerLabelRectangle.height);
+            labelRectangle.x - Map2.MAP_MARKER_BORDER_WIDTH,
+            labelRectangle.y,
+            labelRectangle.width + 2 * Map2.MAP_MARKER_BORDER_WIDTH,
+            labelRectangle.height);
 
       // border: horizontal bottom
       gc.drawLine(
@@ -985,8 +1003,8 @@ public class DirectMappingPainter implements IDirectPainter {
          }
       }
 
-      if (painterContext.hoveredMarker != null) {
-         drawMarker_Hovered(painterContext);
+      if (painterContext.hoveredMapPoint != null) {
+         drawMapPoint_Hovered(painterContext);
       }
 
       if (_tourData == null

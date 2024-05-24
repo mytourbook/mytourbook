@@ -17,34 +17,34 @@ package de.byteholder.geoclipse.map;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TourMarker;
-import net.tourbook.map2.view.Map2Marker;
+import net.tourbook.map2.view.Map2Point;
 
 import org.eclipse.swt.graphics.Rectangle;
 
-public class PaintedMarker {
+public class PaintedMapPoint {
 
    private static final char NL = UI.NEW_LINE;
 
    /**
     * Contains the {@link TourMarker}
     */
-   public Map2Marker         mapMarker;
+   public Map2Point          mapPoint;
 
    /**
     * Rectangle of the painted marker label
     */
-   public Rectangle          markerLabelRectangle;
+   public Rectangle          labelRectangle;
 
    /**
     * Rectangle of the painted marker location symbol
     */
-   public Rectangle          markerSymbolRectangle;
+   public Rectangle          symbolRectangle;
 
-   public PaintedMarker(final Map2Marker mapMarker,
-                        final Rectangle markerLabelRectangle) {
+   public PaintedMapPoint(final Map2Point mapPoint,
+                          final Rectangle labelRectangle) {
 
-      this.mapMarker = mapMarker;
-      this.markerLabelRectangle = markerLabelRectangle;
+      this.mapPoint = mapPoint;
+      this.labelRectangle = labelRectangle;
    }
 
    @Override
@@ -52,11 +52,11 @@ public class PaintedMarker {
 
       return UI.EMPTY_STRING
 
-            + "PaintedMarker" + NL //                                      //$NON-NLS-1$
+            + "PaintedMapPoint" + NL //                                      //$NON-NLS-1$
 
-            + " mapMarker  = " + mapMarker.tourMarker.getLabel() + NL //   //$NON-NLS-1$
-            + " x          = " + mapMarker.geoPointDevX + NL //            //$NON-NLS-1$
-            + " y          = " + mapMarker.geoPointDevY + NL //            //$NON-NLS-1$
+            + " mapMarker  = " + mapPoint.tourMarker.getLabel() + NL //   //$NON-NLS-1$
+            + " x          = " + mapPoint.geoPointDevX + NL //            //$NON-NLS-1$
+            + " y          = " + mapPoint.geoPointDevY + NL //            //$NON-NLS-1$
 
       ;
    }

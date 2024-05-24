@@ -55,7 +55,7 @@ public class Map2MarkerConfig {
     * Marker
     */
    public boolean        isShowTourMarker          = true;
-   public boolean        isMarkerLabelAntialiased  = true;
+   public boolean        isLabelAntialiased  = true;
 
    /** When <code>true</code> then markers with the same label are grouped together */
    public boolean        isGroupDuplicatedMarkers;

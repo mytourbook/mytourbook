@@ -16,11 +16,12 @@
 package net.tourbook.map2.view;
 
 import de.byteholder.geoclipse.map.Map2;
-import de.byteholder.geoclipse.map.PaintedMarker;
+import de.byteholder.geoclipse.map.PaintedMapPoint;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.ToolTip;
+import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.TourManager;
 
@@ -44,7 +45,7 @@ import org.eclipse.swt.widgets.Text;
  * {@link org.eclipse.ui.internal.dialogs.CustomizePerspectiveDialog} and
  * {@link org.eclipse.jface.viewers.ColumnViewerToolTipSupport}
  */
-public class Map2MarkerToolTip extends ToolTip {
+public class Map2PointToolTip extends ToolTip {
 
    private static final int DEFAULT_TEXT_WIDTH  = 50;
    private static final int DEFAULT_TEXT_HEIGHT = 20;
@@ -57,14 +58,14 @@ public class Map2MarkerToolTip extends ToolTip {
 
    private Map2             _map2;
 
-   private PaintedMarker    _hoveredMarker;
+   private PaintedMapPoint  _hoveredMarker;
 
    private PixelConverter   _pc;
    private int              _defaultTextWidth;
    private int              _defaultTextHeight;
    private Font             _boldFont;
 
-   public Map2MarkerToolTip(final Map2 map2) {
+   public Map2PointToolTip(final Map2 map2) {
 
       super(map2, NO_RECREATE, true);
 
@@ -96,7 +97,27 @@ public class Map2MarkerToolTip extends ToolTip {
 
    private void createUI(final Composite parent) {
 
-      final TourMarker tourMarker = _hoveredMarker.mapMarker.tourMarker;
+      final Map2Point mapMarker = _hoveredMarker.mapPoint;
+
+      final TourMarker tourMarker = mapMarker.tourMarker;
+      final TourLocation tourLocation = mapMarker.tourLocation;
+
+      if (tourMarker != null) {
+
+         createUI_TourMarker(parent, tourMarker);
+
+      } else if (tourLocation != null) {
+
+         createUI_TourLocation(parent, tourLocation);
+      }
+   }
+
+   private void createUI_TourLocation(final Composite parent, final TourLocation tourLocation) {
+      // TODO Auto-generated method stub
+
+   }
+
+   private void createUI_TourMarker(final Composite parent, final TourMarker tourMarker) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -161,7 +182,7 @@ public class Map2MarkerToolTip extends ToolTip {
          final Point devMouse = _map2.toControl(display.getCursorLocation());
          final int devMouseX = devMouse.x;
 
-         final Rectangle markerBounds = _hoveredMarker.markerLabelRectangle;
+         final Rectangle markerBounds = _hoveredMarker.labelRectangle;
          final int markerWidth = markerBounds.width;
          final int markerWidth2 = markerWidth / 2;
          final int markerHeight = markerBounds.height;
@@ -171,7 +192,7 @@ public class Map2MarkerToolTip extends ToolTip {
          final int markerTop = markerBounds.y;
          final int markerBottom = markerBounds.y + markerHeight;
 
-         final Map2Marker mapMarker = _hoveredMarker.mapMarker;
+         final Map2Point mapMarker = _hoveredMarker.mapPoint;
          final int geoPointDevX = mapMarker.geoPointDevX;
          final int geoPointDevY = mapMarker.geoPointDevY;
 

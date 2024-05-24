@@ -25,7 +25,7 @@ import org.oscim.core.GeoPoint;
 /**
  * Immutable class describing a GeoPoint with a Title and a Description
  */
-public class Map2Marker implements ClusterItem {
+public class Map2Point implements ClusterItem {
 
    public GeoPoint     geoPoint;
 
@@ -59,7 +59,7 @@ public class Map2Marker implements ClusterItem {
     * @param tourMarker
     * @param geoPoint
     */
-   public Map2Marker(final GeoPoint geoPoint) {
+   public Map2Point(final GeoPoint geoPoint) {
 
       this.geoPoint = geoPoint;
    }
@@ -67,28 +67,28 @@ public class Map2Marker implements ClusterItem {
    public String getFormattedLabel() {
 
       if (tourMarker != null) {
-         
-         // tour marker is wrapped
+
+         // a tour marker is wrapped
 
          return numDuplicates < 2
                ? formattedLabel
                : formattedLabel + " (" + numDuplicates + ")";
 
       } else {
-         
-         // tour location is wrapped
 
-         if (numDuplicates_Start > 1 && numDuplicates_End > 1) {
+         // a tour location is wrapped
 
-            return formattedLabel + " (" + numDuplicates_Start + " / " + numDuplicates_End + ")";
+         if (numDuplicates_Start > 1 || numDuplicates_End > 1) {
+
+            return formattedLabel + " (" + numDuplicates_Start + "/" + numDuplicates_End + ")";
 
          } else if (numDuplicates_Start > 1) {
 
-            return formattedLabel + " (" + numDuplicates_Start + ")";
+            return formattedLabel + " (" + numDuplicates_Start + "s)";
 
          } else if (numDuplicates_End > 1) {
 
-            return formattedLabel + " (" + numDuplicates_End + ")";
+            return formattedLabel + " (" + numDuplicates_End + "e)";
 
          } else {
 

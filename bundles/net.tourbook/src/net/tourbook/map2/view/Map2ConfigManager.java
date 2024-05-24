@@ -320,7 +320,7 @@ public class Map2ConfigManager {
           * Marker
           */
          xmlConfig.putBoolean(      ATTR_IS_SHOW_TOUR_MARKER,           config.isShowTourMarker);
-         xmlConfig.putBoolean(      ATTR_IS_MARKER_LABEL_ANTIALIASED,   config.isMarkerLabelAntialiased);
+         xmlConfig.putBoolean(      ATTR_IS_MARKER_LABEL_ANTIALIASED,   config.isLabelAntialiased);
 
          xmlConfig.putBoolean(      ATTR_IS_GROUP_DUPLICATED_MARKERS,   config.isGroupDuplicatedMarkers);
          xmlConfig.putString(       ATTR_GROUPED_MARKERS,               config.groupedMarkers);
@@ -447,7 +447,7 @@ public class Map2ConfigManager {
       config.isShowTourLocation           = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_LOCATION,         true);
       config.isShowTourMarker             = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_MARKER,           true);
 
-      config.isMarkerLabelAntialiased     = Util.getXmlBoolean(xmlConfig,     ATTR_IS_MARKER_LABEL_ANTIALIASED,   true);
+      config.isLabelAntialiased     = Util.getXmlBoolean(xmlConfig,     ATTR_IS_MARKER_LABEL_ANTIALIASED,   true);
       config.isGroupDuplicatedMarkers     = Util.getXmlBoolean(xmlConfig,     ATTR_IS_GROUP_DUPLICATED_MARKERS,   false);
       config.groupedMarkers               = Util.getXmlString (xmlConfig,     ATTR_GROUPED_MARKERS,               UI.EMPTY_STRING);
       config.groupGridSize                = Util.getXmlInteger(xmlConfig,     ATTR_GROUP_GRID_SIZE,               LABEL_GROUP_GRID_SIZE_DEFAULT,  LABEL_GROUP_GRID_SIZE_MIN,   LABEL_GROUP_GRID_SIZE_MAX);

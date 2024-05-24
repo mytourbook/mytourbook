@@ -22,7 +22,7 @@ import de.byteholder.geoclipse.map.IMapContextMenuProvider;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.MapGridData;
 import de.byteholder.geoclipse.map.MapLegend;
-import de.byteholder.geoclipse.map.PaintedMarker;
+import de.byteholder.geoclipse.map.PaintedMapPoint;
 import de.byteholder.geoclipse.map.event.MapGeoPositionEvent;
 import de.byteholder.geoclipse.map.event.MapHoveredTourEvent;
 import de.byteholder.geoclipse.map.event.MapPOIEvent;
@@ -1133,9 +1133,9 @@ public class Map2View extends ViewPart implements
 
    private void actionMapMarker_CenterMap() {
 
-      final PaintedMarker hoveredMarker = _map.getHoveredMarker();
+      final PaintedMapPoint hoveredMarker = _map.getHoveredMarker();
 
-      final GeoPoint geoPoint = hoveredMarker.mapMarker.geoPoint;
+      final GeoPoint geoPoint = hoveredMarker.mapPoint.geoPoint;
       final GeoPosition geoPosition = new GeoPosition(geoPoint.getLatitude(), geoPoint.getLongitude());
 
       _map.setMapCenter(geoPosition);
@@ -1143,9 +1143,9 @@ public class Map2View extends ViewPart implements
 
    private void actionMapMarker_Edit() {
 
-      final PaintedMarker hoveredMarker = _map.getHoveredMarker();
+      final PaintedMapPoint hoveredMarker = _map.getHoveredMarker();
 
-      final TourMarker tourMarker = hoveredMarker.mapMarker.tourMarker;
+      final TourMarker tourMarker = hoveredMarker.mapPoint.tourMarker;
 
       final ITourProvider tourProvider = new ITourProvider() {
 
@@ -1169,9 +1169,9 @@ public class Map2View extends ViewPart implements
 
    private void actionMapMarker_ShowOnlyThisTour() {
 
-      final PaintedMarker hoveredMarker = _map.getHoveredMarker();
+      final PaintedMapPoint hoveredMarker = _map.getHoveredMarker();
 
-      final TourMarker tourMarker = hoveredMarker.mapMarker.tourMarker;
+      final TourMarker tourMarker = hoveredMarker.mapPoint.tourMarker;
 
       paintTours_20_One(tourMarker.getTourData(), true);
 
@@ -1187,9 +1187,9 @@ public class Map2View extends ViewPart implements
 
    private void actionMapMarker_ZoomIn() {
 
-      final PaintedMarker hoveredMarker = _map.getHoveredMarker();
+      final PaintedMapPoint hoveredMarker = _map.getHoveredMarker();
 
-      final GeoPoint geoPoint = hoveredMarker.mapMarker.geoPoint;
+      final GeoPoint geoPoint = hoveredMarker.mapPoint.geoPoint;
 
       _map.setZoom(_map.getMapProvider().getMaximumZoomLevel());
       _map.setMapCenter(new GeoPosition(geoPoint.getLatitude(), geoPoint.getLongitude()));
@@ -2481,7 +2481,7 @@ public class Map2View extends ViewPart implements
    @Override
    public void fillContextMenu(final IMenuManager menuMgr, final ActionManageOfflineImages actionManageOfflineImages) {
 
-      final PaintedMarker hoveredMarker = _map.getHoveredMarker();
+      final PaintedMapPoint hoveredMarker = _map.getHoveredMarker();
 
       if (hoveredMarker != null) {
 
@@ -5163,6 +5163,8 @@ public class Map2View extends ViewPart implements
 
    void setupMapDimLevel() {
 
+      _map.setTransparencyColor(Util.getStateRGB(_state, STATE_MAP_TRANSPARENCY_COLOR, STATE_MAP_TRANSPARENCY_COLOR_DEFAULT));
+
 // SET_FORMATTING_OFF
 
       final boolean  isMapDimmed       = Util.getStateBoolean( _state, STATE_IS_MAP_DIMMED,                       STATE_IS_MAP_DIMMED_DEFAULT);
@@ -5552,7 +5554,6 @@ public class Map2View extends ViewPart implements
       /*
        * Set dim level/color after the map providers are set
        */
-      _map.setTransparencyColor(Util.getStateRGB(_state, STATE_MAP_TRANSPARENCY_COLOR, STATE_MAP_TRANSPARENCY_COLOR_DEFAULT));
       setupMapDimLevel();
 
       /*
