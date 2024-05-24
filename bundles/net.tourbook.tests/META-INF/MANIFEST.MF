@@ -16,7 +16,8 @@ Bundle-ClassPath: .,
  hibernate-entitymanager.jar,
  jsonassert-1.5.1.jar,
  xmlunit-core-2.10.0.jar,
- HttpClientMock-1.0.0.jar
+ HttpClientMock-1.0.0.jar,
+ hamcrest-2.2.jar
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: com.fasterxml.jackson.core.type,
