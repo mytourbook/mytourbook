@@ -145,7 +145,6 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    private ColumnManager           _columnManager;
    private SelectionAdapter        _columnSortListener;
    //
-   private SelectionListener       _defaultSelectionListener;
    private SelectionListener       _markerSelectionListener;
    private IPropertyChangeListener _markerPropertyChangeListener;
    private MouseWheelListener      _markerMouseWheelListener;
@@ -1042,7 +1041,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
             _chkIsShowCommonLocations = new Button(container, SWT.CHECK);
             _chkIsShowCommonLocations.setText(Messages.Slideout_MapLocation_Checkbox_ShowCommonLocations);
             _chkIsShowCommonLocations.setToolTipText(Messages.Slideout_MapLocation_Checkbox_ShowCommonLocations_Tooltip);
-            _chkIsShowCommonLocations.addSelectionListener(_defaultSelectionListener);
+            _chkIsShowCommonLocations.addSelectionListener(_markerSelectionListener);
             GridDataFactory.fillDefaults().applyTo(_chkIsShowCommonLocations);
          }
          {
@@ -1583,7 +1582,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
       _chkUseMapDimColor                  .setEnabled(isDimMap);
       _colorMapDimColor                   .setEnabled(isDimMap);
-      _spinnerMapDimValue                    .setEnabled(isDimMap);
+      _spinnerMapDimValue                 .setEnabled(isDimMap);
 
       /*
        * Common locations
@@ -1593,9 +1592,8 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       final boolean isShowCommonLocations       = _chkIsShowCommonLocations.getSelection();
       final boolean isCommonLocationSelected    = isShowCommonLocations && allSelectedLocations.size() > 0;
 
-      _btnDeleteCommonLocation.setEnabled(isCommonLocationSelected);
-
-      _mapCommonLocationViewer.getTable().setEnabled(isShowCommonLocations);
+      _btnDeleteCommonLocation            .setEnabled(isCommonLocationSelected);
+      _mapCommonLocationViewer.getTable() .setEnabled(isShowCommonLocations);
 
 // SET_FORMATTING_ON
 
@@ -1711,7 +1709,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       // force spinner controls to have the same width
       _spinnerGridData = GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(3), SWT.DEFAULT);
 
-      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI());
+//      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI());
 
       _columnSortListener = new SelectionAdapter() {
          @Override
@@ -1775,9 +1773,6 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
    private void onChangeUI() {
 
 // SET_FORMATTING_OFF
-
-
-      _state_Map2.put(Map2View.STATE_IS_SHOW_COMMON_LOCATIONS,             _chkIsShowCommonLocations.getSelection());
 
       _state_Map2.put(Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX,    _chkIsShowMapLocations_BoundingBox.getSelection());
 
@@ -2007,10 +2002,6 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
    private void restoreState() {
 
-      _chkIsShowCommonLocations.setSelection(Util.getStateBoolean(_state_Map2,
-            Map2View.STATE_IS_SHOW_COMMON_LOCATIONS,
-            Map2View.STATE_IS_SHOW_COMMON_LOCATIONS_DEFAULT));
-
       _chkIsShowMapLocations_BoundingBox.setSelection(Util.getStateBoolean(_state_Map2,
             Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX,
             Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX_DEFAULT));
@@ -2024,6 +2015,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
 // SET_FORMATTING_OFF
 
+      _chkIsShowCommonLocations           .setSelection( config.isShowCommonLocation);
       _chkIsShowTourLocations             .setSelection( config.isShowTourLocation);
       _chkIsShowTourMarker                .setSelection( config.isShowTourMarker);
 
@@ -2062,7 +2054,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _chkUseMapDimColor         .setSelection(    Util.getStateBoolean(_state_Map2,  Map2View.STATE_MAP_TRANSPARENCY_USE_MAP_DIM_COLOR,  Map2View.STATE_MAP_TRANSPARENCY_USE_MAP_DIM_COLOR_DEFAULT));
       _colorMapDimColor          .setColorValue(   Util.getStateRGB(    _state_Map2,  Map2View.STATE_DIM_MAP_COLOR,                       Map2View.STATE_DIM_MAP_COLOR_DEFAULT));
       _colorMapTransparencyColor .setColorValue(   Util.getStateRGB(    _state_Map2,  Map2View.STATE_MAP_TRANSPARENCY_COLOR,              Map2View.STATE_MAP_TRANSPARENCY_COLOR_DEFAULT));
-      _spinnerMapDimValue           .setSelection(    Util.getStateInt(    _state_Map2,  Map2View.STATE_DIM_MAP_VALUE,                       Map2View.STATE_DIM_MAP_VALUE_DEFAULT));
+      _spinnerMapDimValue        .setSelection(    Util.getStateInt(    _state_Map2,  Map2View.STATE_DIM_MAP_VALUE,                       Map2View.STATE_DIM_MAP_VALUE_DEFAULT));
 
 // SET_FORMATTING_ON
 
@@ -2091,6 +2083,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 
 // SET_FORMATTING_OFF
 
+      config.isShowCommonLocation         = _chkIsShowCommonLocations            .getSelection();
       config.isShowTourLocation           = _chkIsShowTourLocations              .getSelection();
       config.isShowTourMarker             = _chkIsShowTourMarker                 .getSelection();
 
@@ -2102,7 +2095,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       config.isFillClusterSymbol          = _chkIsFillClusterSymbol              .getSelection();
 
       config.isMarkerClustered            = _chkIsMarkerClustered                .getSelection();
-      config.isLabelAntialiased     = _chkIsLabelAntialiased               .getSelection();
+      config.isLabelAntialiased           = _chkIsLabelAntialiased               .getSelection();
 
       config.clusterGridSize              = _spinnerClusterGrid_Size             .getSelection();
       config.clusterOutline_Width         = _spinnerClusterOutline_Width         .getSelection();

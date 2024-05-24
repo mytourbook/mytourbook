@@ -18,6 +18,7 @@ package net.tourbook.map2.view;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
+import net.tourbook.map.location.LocationType;
 import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
 
 import org.oscim.core.GeoPoint;
@@ -46,14 +47,19 @@ public class Map2Point implements ClusterItem {
    public int          numDuplicates_End;
 
    /**
-    * {@link #tourMarker} or {@link #tourLocation} is set
+    * A {@link #tourMarker} or a {@link #tourLocation} is set
     */
    public TourMarker   tourMarker;
 
    /**
-    * {@link #tourMarker} or {@link #tourLocation} is set
+    * A {@link #tourMarker} or a {@link #tourLocation} is set
     */
    public TourLocation tourLocation;
+
+   /**
+    * Type of the tour location {@link #tourLocation}
+    */
+   public LocationType locationType;
 
    /**
     * @param tourMarker

@@ -247,8 +247,8 @@ public class Map2View extends ViewPart implements
    public static final String    STATE_IS_SHOW_LOCATION_BOUNDING_BOX                   = "STATE_IS_SHOW_LOCATION_BOUNDING_BOX";                           //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_LOCATION_BOUNDING_BOX_DEFAULT           = true;
 
-   public static final String    STATE_IS_SHOW_COMMON_LOCATIONS                        = "STATE_IS_SHOW_COMMON_LOCATIONS";                           //$NON-NLS-1$
-   public static final boolean   STATE_IS_SHOW_COMMON_LOCATIONS_DEFAULT                = true;
+//   public static final String    STATE_IS_SHOW_COMMON_LOCATIONS                        = "STATE_IS_SHOW_COMMON_LOCATIONS";                           //$NON-NLS-1$
+//   public static final boolean   STATE_IS_SHOW_COMMON_LOCATIONS_DEFAULT                = true;
 //   public static final String    STATE_IS_SHOW_TOUR_LOCATIONS                          = "STATE_IS_SHOW_TOUR_LOCATIONS";                           //$NON-NLS-1$
 //   public static final boolean   STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT                  = true;
 
@@ -1133,7 +1133,7 @@ public class Map2View extends ViewPart implements
 
    private void actionMapMarker_CenterMap() {
 
-      final PaintedMapPoint hoveredMarker = _map.getHoveredMarker();
+      final PaintedMapPoint hoveredMarker = _map.getHoveredMapPoint();
 
       final GeoPoint geoPoint = hoveredMarker.mapPoint.geoPoint;
       final GeoPosition geoPosition = new GeoPosition(geoPoint.getLatitude(), geoPoint.getLongitude());
@@ -1143,7 +1143,7 @@ public class Map2View extends ViewPart implements
 
    private void actionMapMarker_Edit() {
 
-      final PaintedMapPoint hoveredMarker = _map.getHoveredMarker();
+      final PaintedMapPoint hoveredMarker = _map.getHoveredMapPoint();
 
       final TourMarker tourMarker = hoveredMarker.mapPoint.tourMarker;
 
@@ -1169,7 +1169,7 @@ public class Map2View extends ViewPart implements
 
    private void actionMapMarker_ShowOnlyThisTour() {
 
-      final PaintedMapPoint hoveredMarker = _map.getHoveredMarker();
+      final PaintedMapPoint hoveredMarker = _map.getHoveredMapPoint();
 
       final TourMarker tourMarker = hoveredMarker.mapPoint.tourMarker;
 
@@ -1187,12 +1187,17 @@ public class Map2View extends ViewPart implements
 
    private void actionMapMarker_ZoomIn() {
 
-      final PaintedMapPoint hoveredMarker = _map.getHoveredMarker();
+      final PaintedMapPoint hoveredMarker = _map.getHoveredMapPoint();
 
       final GeoPoint geoPoint = hoveredMarker.mapPoint.geoPoint;
 
       _map.setZoom(_map.getMapProvider().getMaximumZoomLevel());
       _map.setMapCenter(new GeoPosition(geoPoint.getLatitude(), geoPoint.getLongitude()));
+
+      // hide hovered marker
+      _map.resetHoveredMarker();
+
+      _map.redraw();
    }
 
    public void actionPOI() {
@@ -2429,7 +2434,7 @@ public class Map2View extends ViewPart implements
       final int numTours = _allTourData.size();
       final boolean isMultipleTours = numTours > 1;
 
-      final boolean isMarkerHovered = _map.getHoveredMarker() != null;
+      final boolean isMarkerHovered = _map.getHoveredMapPoint() != null;
 
       _actionMapMarker_CenterMap.setEnabled(isMarkerHovered);
       _actionMapMarker_Edit.setEnabled(isMarkerHovered);
@@ -2481,7 +2486,7 @@ public class Map2View extends ViewPart implements
    @Override
    public void fillContextMenu(final IMenuManager menuMgr, final ActionManageOfflineImages actionManageOfflineImages) {
 
-      final PaintedMapPoint hoveredMarker = _map.getHoveredMarker();
+      final PaintedMapPoint hoveredMarker = _map.getHoveredMapPoint();
 
       if (hoveredMarker != null) {
 
@@ -3405,7 +3410,6 @@ public class Map2View extends ViewPart implements
       _actionShowPOI.setChecked(true);
    }
 
-   @SuppressWarnings("unchecked")
    private void moveToCommonLocation(final Object eventData) {
 
       List<TourLocation> allTourLocations = null;
@@ -3420,9 +3424,8 @@ public class Map2View extends ViewPart implements
 
          // hide tour locations
 
-         _directMappingPainter.setLocations_Common(null);
+         _map.setLocations_Common(null);
 
-         _map.redraw();
 
          return;
       }
@@ -3433,9 +3436,8 @@ public class Map2View extends ViewPart implements
          allCommonLocations.add(new TourLocationExtended(tourLocation, LocationType.Common));
       }
 
-      _directMappingPainter.setLocations_Common(allCommonLocations);
+      _map.setLocations_Common(allTourLocations);
 
-      _map.redraw();
 
       if (_isMapSyncWith_MapLocation) {
 
@@ -3462,38 +3464,38 @@ public class Map2View extends ViewPart implements
 
       final List<TourLocation> allTourLocations = null;
 
-//      if (eventData instanceof final List allTourLocationsFromEvent) {
-//         allTourLocations = allTourLocationsFromEvent;
-//      }
-//
-//      if (eventData == null
-//            || allTourLocations == null
-//            || allTourLocations.size() == 0) {
-//
-//         // hide tour locations
-//
-//         _directMappingPainter.setLocations_Tour(null);
-//
-//         _map.redraw();
-//
-//         return;
-//      }
-//
-//      // repaint map
-//      final List<TourLocationExtended> allTourLocationsExtended = new ArrayList<>();
-//      for (final TourLocation tourLocation : allTourLocations) {
-//         allTourLocationsExtended.add(new TourLocationExtended(tourLocation, LocationType.Tour));
-//      }
-//      _directMappingPainter.setLocations_Tour(allTourLocationsExtended);
-//
-//      _map.redraw();
-//
-//      if (_isMapSyncWith_MapLocation) {
-//
-//         final GeoPosition geoPosition = getTourLocationCenter(allTourLocations);
-//
-//         _map.setMapCenter(geoPosition);
-//      }
+      if (eventData instanceof final List allTourLocationsFromEvent) {
+         allTourLocations = allTourLocationsFromEvent;
+      }
+
+      if (eventData == null
+            || allTourLocations == null
+            || allTourLocations.size() == 0) {
+
+         // hide tour locations
+
+         _directMappingPainter.setLocations_Tour(null);
+
+         _map.redraw();
+
+         return;
+      }
+
+      // repaint map
+      final List<TourLocationExtended> allTourLocationsExtended = new ArrayList<>();
+      for (final TourLocation tourLocation : allTourLocations) {
+         allTourLocationsExtended.add(new TourLocationExtended(tourLocation, LocationType.Tour));
+      }
+      _directMappingPainter.setLocations_Tour(allTourLocationsExtended);
+
+      _map.redraw();
+
+      if (_isMapSyncWith_MapLocation) {
+
+         final GeoPosition geoPosition = getTourLocationCenter(allTourLocations);
+
+         _map.setMapCenter(geoPosition);
+      }
    }
 
    @Override
@@ -5588,9 +5590,6 @@ public class Map2View extends ViewPart implements
             Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX,
             Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX_DEFAULT);
 
-      final boolean isShowCommonLocations = Util.getStateBoolean(_state,
-            Map2View.STATE_IS_SHOW_COMMON_LOCATIONS,
-            Map2View.STATE_IS_SHOW_COMMON_LOCATIONS_DEFAULT);
 
 
 // SET_FORMATTING_ON
@@ -5612,7 +5611,6 @@ public class Map2View extends ViewPart implements
 
             isShowMapLocations_BBox,
 
-            isShowCommonLocations,
 
             isBackgroundDark);
 

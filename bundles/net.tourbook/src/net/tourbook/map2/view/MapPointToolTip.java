@@ -285,7 +285,7 @@ public class MapPointToolTip extends ToolTip {
    @Override
    protected Object getToolTipArea(final Event event) {
 
-      _hoveredMarker = _map2.getHoveredMarker();
+      _hoveredMarker = _map2.getHoveredMapPoint();
 
       return _hoveredMarker;
    }

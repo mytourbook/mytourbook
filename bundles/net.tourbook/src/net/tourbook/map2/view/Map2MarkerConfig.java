@@ -40,6 +40,7 @@ public class Map2MarkerConfig {
     * Location
     */
    public boolean isShowTourLocation          = true;
+   public boolean isShowCommonLocation        = true;
 
    public RGB     locationFill_RGB            = Map2ConfigManager.DEFAULT_LOCATION_FILL_RGB;
    public RGB     locationFill_Hovered_RGB    = Map2ConfigManager.DEFAULT_LOCATION_FILL_HOVERED_RGB;
@@ -55,12 +56,12 @@ public class Map2MarkerConfig {
     * Marker
     */
    public boolean        isShowTourMarker          = true;
-   public boolean        isLabelAntialiased  = true;
+   public boolean        isLabelAntialiased        = true;
 
    /** When <code>true</code> then markers with the same label are grouped together */
    public boolean        isGroupDuplicatedMarkers;
-   public String         groupedMarkers         = UI.EMPTY_STRING;
-   public int            groupGridSize        = Map2ConfigManager.LABEL_GROUP_GRID_SIZE_DEFAULT;
+   public String         groupedMarkers            = UI.EMPTY_STRING;
+   public int            groupGridSize             = Map2ConfigManager.LABEL_GROUP_GRID_SIZE_DEFAULT;
 
    public MapLabelLayout markerLabelLayout         = Map2ConfigManager.LABEL_LAYOUT_DEFAULT;
 
