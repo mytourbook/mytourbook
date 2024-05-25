@@ -39,18 +39,28 @@ public class Map2MarkerConfig {
    /*
     * Location
     */
-   public boolean isShowTourLocation          = true;
-   public boolean isShowCommonLocation        = true;
+   public boolean isShowTourLocation                = true;
+   public boolean isShowCommonLocation              = true;
 
-   public RGB     locationFill_RGB            = Map2ConfigManager.DEFAULT_LOCATION_FILL_RGB;
-   public RGB     locationFill_Hovered_RGB    = Map2ConfigManager.DEFAULT_LOCATION_FILL_HOVERED_RGB;
-   public RGB     locationOutline_RGB         = Map2ConfigManager.DEFAULT_LOCATION_OUTLINE_RGB;
-   public RGB     locationOutline_Hovered_RGB = Map2ConfigManager.DEFAULT_LOCATION_OUTLINE_HOVERED_RGB;
+   public RGB     commonLocationFill_RGB            = Map2ConfigManager.DEFAULT_COMMON_LOCATION_FILL_RGB;
+   public RGB     commonLocationFill_Hovered_RGB    = Map2ConfigManager.DEFAULT_COMMON_LOCATION_FILL_HOVERED_RGB;
+   public RGB     commonLocationOutline_RGB         = Map2ConfigManager.DEFAULT_COMMON_LOCATION_OUTLINE_RGB;
+   public RGB     commonLocationOutline_Hovered_RGB = Map2ConfigManager.DEFAULT_COMMON_LOCATION_OUTLINE_HOVERED_RGB;
 
-   public Color   locationFill_Color;
-   public Color   locationFill_Hovered_Color;
-   public Color   locationOutline_Color;
-   public Color   locationOutline_Hovered_Color;
+   public RGB     tourLocationFill_RGB              = Map2ConfigManager.DEFAULT_TOUR_LOCATION_FILL_RGB;
+   public RGB     tourLocationFill_Hovered_RGB      = Map2ConfigManager.DEFAULT_TOUR_LOCATION_FILL_HOVERED_RGB;
+   public RGB     tourLocationOutline_RGB           = Map2ConfigManager.DEFAULT_TOUR_LOCATION_OUTLINE_RGB;
+   public RGB     tourLocationOutline_Hovered_RGB   = Map2ConfigManager.DEFAULT_TOUR_LOCATION_OUTLINE_HOVERED_RGB;
+
+   public Color   commonLocationFill_Color;
+   public Color   commonLocationFill_Hovered_Color;
+   public Color   commonLocationOutline_Color;
+   public Color   commonLocationOutline_Hovered_Color;
+
+   public Color   tourLocationFill_Color;
+   public Color   tourLocationFill_Hovered_Color;
+   public Color   tourLocationOutline_Color;
+   public Color   tourLocationOutline_Hovered_Color;
 
    /*
     * Marker
@@ -101,18 +111,23 @@ public class Map2MarkerConfig {
 
 // SET_FORMATTING_OFF
 
-      clusterFill_Color             = new Color(clusterFill_RGB);
-      clusterOutline_Color          = new Color(clusterOutline_RGB);
+      clusterFill_Color                   = new Color(clusterFill_RGB);
+      clusterOutline_Color                = new Color(clusterOutline_RGB);
 
-      locationFill_Color            = new Color(locationFill_RGB);
-      locationFill_Hovered_Color    = new Color(locationFill_Hovered_RGB);
-      locationOutline_Color         = new Color(locationOutline_RGB);
-      locationOutline_Hovered_Color = new Color(locationOutline_Hovered_RGB);
+      commonLocationFill_Color            = new Color(commonLocationFill_RGB);
+      commonLocationFill_Hovered_Color    = new Color(commonLocationFill_Hovered_RGB);
+      commonLocationOutline_Color         = new Color(commonLocationOutline_RGB);
+      commonLocationOutline_Hovered_Color = new Color(commonLocationOutline_Hovered_RGB);
 
-      markerFill_Color              = new Color(markerFill_RGB);
-      markerFill_Hovered_Color      = new Color(markerFill_Hovered_RGB);
-      markerOutline_Color           = new Color(markerOutline_RGB);
-      markerOutline_Hovered_Color   = new Color(markerOutline_Hovered_RGB);
+      tourLocationFill_Color              = new Color(tourLocationFill_RGB);
+      tourLocationFill_Hovered_Color      = new Color(tourLocationFill_Hovered_RGB);
+      tourLocationOutline_Color           = new Color(tourLocationOutline_RGB);
+      tourLocationOutline_Hovered_Color   = new Color(tourLocationOutline_Hovered_RGB);
+
+      markerFill_Color                    = new Color(markerFill_RGB);
+      markerFill_Hovered_Color            = new Color(markerFill_Hovered_RGB);
+      markerOutline_Color                 = new Color(markerOutline_RGB);
+      markerOutline_Hovered_Color         = new Color(markerOutline_Hovered_RGB);
 
 // SET_FORMATTING_ON
    }

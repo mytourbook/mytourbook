@@ -5217,21 +5217,19 @@ public class Map2 extends Canvas {
    }
 
    private void paint_BackgroundImage_50_OneMarker(final GC gc,
-                                                   final Map2Point mapMarker,
+                                                   final Map2Point mapPoint,
                                                    final Rectangle labelRectangle,
                                                    final List<PaintedMapPoint> allPaintedMarkers) {
 
       final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
 
-      final String markerLabel = mapMarker.getFormattedLabel();
+      final String markerLabel = mapPoint.getFormattedLabel();
 
       final int devX = labelRectangle.x;
       final int devY = labelRectangle.y;
 
-      final boolean isTourMarker = mapMarker.tourMarker != null;
-
-      final Color fillColor = isTourMarker ? markerConfig.markerFill_Color : markerConfig.locationFill_Color;
-      final Color outlineColor = isTourMarker ? markerConfig.markerOutline_Color : markerConfig.locationOutline_Color;
+      final Color fillColor = mapPoint.getFillColor();
+      final Color outlineColor = mapPoint.getOutlineColor();
 
       /*
        * Draw marker background
@@ -5283,7 +5281,7 @@ public class Map2 extends Canvas {
       gc.setForeground(outlineColor);
       gc.drawText(markerLabel, devX, devY, true);
 
-      allPaintedMarkers.add(new PaintedMapPoint(mapMarker, labelRectangle));
+      allPaintedMarkers.add(new PaintedMapPoint(mapPoint, labelRectangle));
 
       return;
    }

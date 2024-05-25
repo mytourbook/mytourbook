@@ -21,6 +21,7 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.map.location.LocationType;
 import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
 
+import org.eclipse.swt.graphics.Color;
 import org.oscim.core.GeoPoint;
 
 /**
@@ -70,6 +71,41 @@ public class Map2Point implements ClusterItem {
       this.geoPoint = geoPoint;
    }
 
+   public Color getFillColor() {
+
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+
+      final boolean isTourMarker = tourMarker != null;
+
+      final Color fillColor = isTourMarker
+
+            ? markerConfig.markerFill_Color
+            : locationType.equals(LocationType.Common)
+
+                  ? markerConfig.commonLocationFill_Color
+                  : markerConfig.tourLocationFill_Color;
+
+      return fillColor;
+   }
+
+   public Color getFillColor_Hovered() {
+
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+
+      final boolean isTourMarker = tourMarker != null;
+
+      final Color fillColor = isTourMarker
+
+            ? markerConfig.markerFill_Hovered_Color
+
+            : locationType.equals(LocationType.Common)
+
+                  ? markerConfig.commonLocationFill_Hovered_Color
+                  : markerConfig.tourLocationFill_Hovered_Color;
+
+      return fillColor;
+   }
+
    public String getFormattedLabel() {
 
       if (tourMarker != null) {
@@ -101,6 +137,40 @@ public class Map2Point implements ClusterItem {
             return formattedLabel;
          }
       }
+   }
+
+   public Color getOutlineColor() {
+
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+
+      final boolean isTourMarker = tourMarker != null;
+
+      final Color outlineColor = isTourMarker
+
+            ? markerConfig.markerOutline_Color
+            : locationType.equals(LocationType.Common)
+
+                  ? markerConfig.commonLocationOutline_Color
+                  : markerConfig.tourLocationOutline_Color;
+
+      return outlineColor;
+   }
+
+   public Color getOutlineColor_Hovered() {
+
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+
+      final boolean isTourMarker = tourMarker != null;
+
+      final Color outlineColor = isTourMarker
+
+            ? markerConfig.markerOutline_Hovered_Color
+            : locationType.equals(LocationType.Common)
+
+                  ? markerConfig.commonLocationOutline_Hovered_Color
+                  : markerConfig.tourLocationOutline_Hovered_Color;
+
+      return outlineColor;
    }
 
    @Override

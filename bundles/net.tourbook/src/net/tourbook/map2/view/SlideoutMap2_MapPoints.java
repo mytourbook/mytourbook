@@ -146,6 +146,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    private SelectionAdapter        _columnSortListener;
    //
    private SelectionListener       _markerSelectionListener;
+   private SelectionListener       _markerSelectionListener_All;
    private IPropertyChangeListener _markerPropertyChangeListener;
    private MouseWheelListener      _markerMouseWheelListener;
    private MouseWheelListener      _markerMouseWheelListener10;
@@ -178,6 +179,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    private Menu                  _tableContextMenu;
    //
    private CTabFolder            _tabFolder;
+   //
+   private CTabItem              _tabAll;
    private CTabItem              _tabTourLocations;
    private CTabItem              _tabCommonLocations;
    private CTabItem              _tabOptions;
@@ -186,8 +189,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    //
    private Button                _btnDeleteCommonLocation;
    private Button                _btnSwapClusterSymbolColor;
-   private Button                _btnSwapLocationLabel_Color;
-   private Button                _btnSwapLocationLabel_Hovered_Color;
+   private Button                _btnSwapCommonLocationLabel_Color;
+   private Button                _btnSwapCommonLocationLabel_Hovered_Color;
+   private Button                _btnSwapTourLocationLabel_Color;
+   private Button                _btnSwapTourLocationLabel_Hovered_Color;
    private Button                _btnSwapMarkerLabel_Color;
    private Button                _btnSwapMarkerLabel_Hovered_Color;
    //
@@ -196,12 +201,16 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    private Button                _chkIsDimMap;
    private Button                _chkIsFillClusterSymbol;
    private Button                _chkIsGroupDuplicatedMarkers;
+   private Button                _chkIsGroupDuplicatedMarkers_All;
    private Button                _chkIsMarkerClustered;
    private Button                _chkIsLabelAntialiased;
    private Button                _chkIsShowCommonLocations;
+   private Button                _chkIsShowCommonLocations_All;
    private Button                _chkIsShowMapLocations_BoundingBox;
    private Button                _chkIsShowTourLocations;
+   private Button                _chkIsShowTourLocations_All;
    private Button                _chkIsShowTourMarker;
+   private Button                _chkIsShowTourMarker_All;
    private Button                _chkUseMapDimColor;
    //
    private Combo                 _comboLabelLayout;
@@ -213,8 +222,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    private Label                 _lblLabelGroupGridSize;
    private Label                 _lblVisibleLabels;
    private Label                 _lblLabelWrapLength;
-   private Label                 _lblLocationLabel_Color;
-   private Label                 _lblLocationLabel_HoveredColor;
+   private Label                 _lblCommonLocationLabel_Color;
+   private Label                 _lblCommonLocationLabel_HoveredColor;
+   private Label                 _lblTourLocationLabel_Color;
+   private Label                 _lblTourLocationLabel_HoveredColor;
    private Label                 _lblMarkerLabel_Color;
    private Label                 _lblMarkerLabel_HoveredColor;
    private Label                 _lblLabelBackgrouond;
@@ -232,10 +243,14 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    //
    private ColorSelectorExtended _colorClusterSymbol_Fill;
    private ColorSelectorExtended _colorClusterSymbol_Outline;
-   private ColorSelectorExtended _colorLocationLabel_Fill;
-   private ColorSelectorExtended _colorLocationLabel_Fill_Hovered;
-   private ColorSelectorExtended _colorLocationLabel_Outline;
-   private ColorSelectorExtended _colorLocationLabel_Outline_Hovered;
+   private ColorSelectorExtended _colorCommonLocationLabel_Fill;
+   private ColorSelectorExtended _colorCommonLocationLabel_Fill_Hovered;
+   private ColorSelectorExtended _colorCommonLocationLabel_Outline;
+   private ColorSelectorExtended _colorCommonLocationLabel_Outline_Hovered;
+   private ColorSelectorExtended _colorTourLocationLabel_Fill;
+   private ColorSelectorExtended _colorTourLocationLabel_Fill_Hovered;
+   private ColorSelectorExtended _colorTourLocationLabel_Outline;
+   private ColorSelectorExtended _colorTourLocationLabel_Outline_Hovered;
    private ColorSelectorExtended _colorMarkerLabel_Fill;
    private ColorSelectorExtended _colorMarkerLabel_Fill_Hovered;
    private ColorSelectorExtended _colorMarkerLabel_Outline;
@@ -407,7 +422,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
          disposeContextMenu();
 
-         _tableContextMenu = createUI_525_CreateViewerContextMenu();
+         _tableContextMenu = createUI_525_CommonLocation_CreateViewerContextMenu();
 
          return _tableContextMenu;
       }
@@ -426,9 +441,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
     * @param toolBar
     */
    public SlideoutMap2_MapPoints(final ToolItem toolItem,
-                                         final IDialogSettings map2State,
-                                         final IDialogSettings slideoutState,
-                                         final Map2View map2View) {
+                                 final IDialogSettings map2State,
+                                 final IDialogSettings slideoutState,
+                                 final Map2View map2View) {
 
       super(toolItem.getParent(), slideoutState, new int[] { 325, 400, 325, 400 });
 
@@ -538,10 +553,14 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             GridLayoutFactory.fillDefaults().applyTo(_tabFolder);
 
             {
+               _tabAll = new CTabItem(_tabFolder, SWT.NONE);
+               _tabAll.setText("All");
+               _tabAll.setControl(createUI_100_Tab_All(_tabFolder));
+
                _tabTourMarkers = new CTabItem(_tabFolder, SWT.NONE);
                _tabTourMarkers.setImage(_imageTourMarker);
                _tabTourMarkers.setToolTipText(Messages.Slideout_MapPoints_Tab_TourMarkers);
-               _tabTourMarkers.setControl(createUI_200_Tab_Marker(_tabFolder));
+               _tabTourMarkers.setControl(createUI_200_Tab_TourMarker(_tabFolder));
 
                _tabTourMarkerGroups = new CTabItem(_tabFolder, SWT.NONE);
                _tabTourMarkerGroups.setImage(_imageTourMarkerGroups);
@@ -568,7 +587,56 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       return shellContainer;
    }
 
-   private Control createUI_200_Tab_Marker(final Composite parent) {
+   private Control createUI_100_Tab_All(final Composite parent) {
+
+      final Composite tabContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(tabContainer);
+      GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(1).applyTo(tabContainer);
+      {
+         {
+            /*
+             * Show tour marker
+             */
+            _chkIsShowTourMarker_All = new Button(tabContainer, SWT.CHECK);
+            _chkIsShowTourMarker_All.setText(Messages.Slideout_Map25MarkerOptions_Checkbox_IsShowTourMarker);
+            _chkIsShowTourMarker_All.setImage(_imageTourMarker);
+            _chkIsShowTourMarker_All.addSelectionListener(_markerSelectionListener_All);
+         }
+         {
+            /*
+             * Group duplicate markers
+             */
+            _chkIsGroupDuplicatedMarkers_All = new Button(tabContainer, SWT.CHECK);
+            _chkIsGroupDuplicatedMarkers_All.setText("&Group tour markers with the same label");
+            _chkIsGroupDuplicatedMarkers_All.setImage(_imageTourMarkerGroups);
+            _chkIsGroupDuplicatedMarkers_All.addSelectionListener(_markerSelectionListener_All);
+         }
+         {
+            /*
+             * Show tour locations
+             */
+            _chkIsShowTourLocations_All = new Button(tabContainer, SWT.CHECK);
+            _chkIsShowTourLocations_All.setText(Messages.Slideout_MapPoints_Checkbox_ShowTourLocations);
+            _chkIsShowTourLocations_All.setToolTipText(Messages.Slideout_MapPoints_Checkbox_ShowTourLocations_Tooltip);
+            _chkIsShowTourLocations_All.setImage(_imageMapLocation_Tour);
+            _chkIsShowTourLocations_All.addSelectionListener(_markerSelectionListener_All);
+         }
+         {
+            /*
+             * Show common locations
+             */
+            _chkIsShowCommonLocations_All = new Button(tabContainer, SWT.CHECK);
+            _chkIsShowCommonLocations_All.setText(Messages.Slideout_MapPoints_Checkbox_ShowCommonLocations);
+            _chkIsShowCommonLocations_All.setToolTipText(Messages.Slideout_MapPoints_Checkbox_ShowCommonLocations_Tooltip);
+            _chkIsShowCommonLocations_All.setImage(_imageMapLocation_Common);
+            _chkIsShowCommonLocations_All.addSelectionListener(_markerSelectionListener_All);
+         }
+      }
+
+      return tabContainer;
+   }
+
+   private Control createUI_200_Tab_TourMarker(final Composite parent) {
 
       final Composite tabContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(tabContainer);
@@ -587,15 +655,15 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
          {
-            createUI_220_Marker_Label(container);
-            createUI_230_Marker_Cluster(container);
+            createUI_220_TourMarker_Label(container);
+            createUI_230_TourMarker_Cluster(container);
          }
       }
 
       return tabContainer;
    }
 
-   private void createUI_220_Marker_Label(final Composite parent) {
+   private void createUI_220_TourMarker_Label(final Composite parent) {
 
       final GridDataFactory labelGridData = GridDataFactory.fillDefaults()
             .align(SWT.FILL, SWT.CENTER)
@@ -675,7 +743,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       }
    }
 
-   private void createUI_230_Marker_Cluster(final Composite parent) {
+   private void createUI_230_TourMarker_Cluster(final Composite parent) {
 
       final int firstColumnIndent = UI.FORM_FIRST_COLUMN_INDENT;
 
@@ -848,8 +916,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
              * Group duplicate markers
              */
             _chkIsGroupDuplicatedMarkers = new Button(tabContainer, SWT.CHECK);
-            _chkIsGroupDuplicatedMarkers.setText("&Group markers with the same label");
-            _chkIsGroupDuplicatedMarkers.setToolTipText("");
+            _chkIsGroupDuplicatedMarkers.setText("&Group tour markers with the same label");
             _chkIsGroupDuplicatedMarkers.addSelectionListener(_markerSelectionListener);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
@@ -892,7 +959,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
             _txtGroupDuplicatedMarkers = new Text(tabContainer, SWT.MULTI | SWT.WRAP | SWT.BORDER);
             _txtGroupDuplicatedMarkers.setToolTipText("");
-            _txtGroupDuplicatedMarkers.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onModifyMarkerConfig()));
+            _txtGroupDuplicatedMarkers.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onModifyConfig(false)));
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   .span(2, 1)
@@ -910,13 +977,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(2).applyTo(container);
       {
-         createUI_310_Location_Label(container);
+         createUI_310_TourLocation_Label(container);
       }
 
       return container;
    }
 
-   private void createUI_310_Location_Label(final Composite parent) {
+   private void createUI_310_TourLocation_Label(final Composite parent) {
 
       final GridDataFactory labelGridData = GridDataFactory.fillDefaults()
             .align(SWT.FILL, SWT.CENTER)
@@ -938,10 +1005,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
           */
          {
             // label
-            _lblLocationLabel_Color = new Label(parent, SWT.NONE);
-            _lblLocationLabel_Color.setText("Location &label");
-            _lblLocationLabel_Color.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
-            labelGridData.applyTo(_lblLocationLabel_Color);
+            _lblTourLocationLabel_Color = new Label(parent, SWT.NONE);
+            _lblTourLocationLabel_Color.setText("Location &label");
+            _lblTourLocationLabel_Color.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+            labelGridData.applyTo(_lblTourLocationLabel_Color);
          }
          {
             final Composite container = new Composite(parent, SWT.NONE);
@@ -949,23 +1016,23 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 
             // outline/text color
-            _colorLocationLabel_Outline = new ColorSelectorExtended(container);
-            _colorLocationLabel_Outline.addListener(_markerPropertyChangeListener);
-            _colorLocationLabel_Outline.addOpenListener(this);
-            _colorLocationLabel_Outline.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+            _colorTourLocationLabel_Outline = new ColorSelectorExtended(container);
+            _colorTourLocationLabel_Outline.addListener(_markerPropertyChangeListener);
+            _colorTourLocationLabel_Outline.addOpenListener(this);
+            _colorTourLocationLabel_Outline.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
 
             // background color
-            _colorLocationLabel_Fill = new ColorSelectorExtended(container);
-            _colorLocationLabel_Fill.addListener(_markerPropertyChangeListener);
-            _colorLocationLabel_Fill.addOpenListener(this);
-            _colorLocationLabel_Fill.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+            _colorTourLocationLabel_Fill = new ColorSelectorExtended(container);
+            _colorTourLocationLabel_Fill.addListener(_markerPropertyChangeListener);
+            _colorTourLocationLabel_Fill.addOpenListener(this);
+            _colorTourLocationLabel_Fill.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
 
             // button: swap color
-            _btnSwapLocationLabel_Color = new Button(container, SWT.PUSH);
-            _btnSwapLocationLabel_Color.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
-            _btnSwapLocationLabel_Color.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
-            _btnSwapLocationLabel_Color.addSelectionListener(SelectionListener.widgetSelectedAdapter(
-                  selectionEvent -> onSwapLocationColor()));
+            _btnSwapTourLocationLabel_Color = new Button(container, SWT.PUSH);
+            _btnSwapTourLocationLabel_Color.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
+            _btnSwapTourLocationLabel_Color.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
+            _btnSwapTourLocationLabel_Color.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> onSwapTourLocationColor()));
          }
       }
       {
@@ -974,10 +1041,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
           */
          {
             // label
-            _lblLocationLabel_HoveredColor = new Label(parent, SWT.NONE);
-            _lblLocationLabel_HoveredColor.setText("&Hovered label");
-            _lblLocationLabel_HoveredColor.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
-            labelGridData.applyTo(_lblLocationLabel_HoveredColor);
+            _lblTourLocationLabel_HoveredColor = new Label(parent, SWT.NONE);
+            _lblTourLocationLabel_HoveredColor.setText("&Hovered label");
+            _lblTourLocationLabel_HoveredColor.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+            labelGridData.applyTo(_lblTourLocationLabel_HoveredColor);
          }
          {
             final Composite container = new Composite(parent, SWT.NONE);
@@ -985,23 +1052,23 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 
             // outline/text color
-            _colorLocationLabel_Outline_Hovered = new ColorSelectorExtended(container);
-            _colorLocationLabel_Outline_Hovered.addListener(_markerPropertyChangeListener);
-            _colorLocationLabel_Outline_Hovered.addOpenListener(this);
-            _colorLocationLabel_Outline_Hovered.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+            _colorTourLocationLabel_Outline_Hovered = new ColorSelectorExtended(container);
+            _colorTourLocationLabel_Outline_Hovered.addListener(_markerPropertyChangeListener);
+            _colorTourLocationLabel_Outline_Hovered.addOpenListener(this);
+            _colorTourLocationLabel_Outline_Hovered.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
 
             // background color
-            _colorLocationLabel_Fill_Hovered = new ColorSelectorExtended(container);
-            _colorLocationLabel_Fill_Hovered.addListener(_markerPropertyChangeListener);
-            _colorLocationLabel_Fill_Hovered.addOpenListener(this);
-            _colorLocationLabel_Fill_Hovered.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+            _colorTourLocationLabel_Fill_Hovered = new ColorSelectorExtended(container);
+            _colorTourLocationLabel_Fill_Hovered.addListener(_markerPropertyChangeListener);
+            _colorTourLocationLabel_Fill_Hovered.addOpenListener(this);
+            _colorTourLocationLabel_Fill_Hovered.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
 
             // button: swap color
-            _btnSwapLocationLabel_Hovered_Color = new Button(container, SWT.PUSH);
-            _btnSwapLocationLabel_Hovered_Color.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
-            _btnSwapLocationLabel_Hovered_Color.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
-            _btnSwapLocationLabel_Hovered_Color.addSelectionListener(SelectionListener.widgetSelectedAdapter(
-                  selectionEvent -> onSwapLocationHoveredColor()));
+            _btnSwapTourLocationLabel_Hovered_Color = new Button(container, SWT.PUSH);
+            _btnSwapTourLocationLabel_Hovered_Color.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
+            _btnSwapTourLocationLabel_Hovered_Color.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
+            _btnSwapTourLocationLabel_Hovered_Color.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> onSwapTourLocationHoveredColor()));
          }
       }
       {
@@ -1021,18 +1088,23 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(1).applyTo(container);
       {
-         createUI_510_Viewer(container);
-         createUI_520_Actions(container);
+         createUI_510_CommonLocation_Label(container);
+         createUI_520_CommonLocation_Viewer(container);
+         createUI_530_CommonLocation_Actions(container);
       }
 
       return container;
    }
 
-   private void createUI_510_Viewer(final Composite parent) {
+   private void createUI_510_CommonLocation_Label(final Composite parent) {
+
+      final GridDataFactory labelGridData = GridDataFactory.fillDefaults()
+            .align(SWT.FILL, SWT.CENTER)
+            .indent(UI.FORM_FIRST_COLUMN_INDENT, 0);
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.fillDefaults().applyTo(container);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          {
             /*
@@ -1042,8 +1114,89 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             _chkIsShowCommonLocations.setText(Messages.Slideout_MapPoints_Checkbox_ShowCommonLocations);
             _chkIsShowCommonLocations.setToolTipText(Messages.Slideout_MapPoints_Checkbox_ShowCommonLocations_Tooltip);
             _chkIsShowCommonLocations.addSelectionListener(_markerSelectionListener);
-            GridDataFactory.fillDefaults().applyTo(_chkIsShowCommonLocations);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowCommonLocations);
          }
+         {
+            /*
+             * Location label
+             */
+            {
+               // label
+               _lblCommonLocationLabel_Color = new Label(container, SWT.NONE);
+               _lblCommonLocationLabel_Color.setText("Location &label");
+               _lblCommonLocationLabel_Color.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+               labelGridData.applyTo(_lblCommonLocationLabel_Color);
+            }
+            {
+               final Composite labelContainer = new Composite(container, SWT.NONE);
+               GridDataFactory.fillDefaults().grab(true, false).applyTo(labelContainer);
+               GridLayoutFactory.fillDefaults().numColumns(3).applyTo(labelContainer);
+
+               // outline/text color
+               _colorCommonLocationLabel_Outline = new ColorSelectorExtended(labelContainer);
+               _colorCommonLocationLabel_Outline.addListener(_markerPropertyChangeListener);
+               _colorCommonLocationLabel_Outline.addOpenListener(this);
+               _colorCommonLocationLabel_Outline.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+
+               // background color
+               _colorCommonLocationLabel_Fill = new ColorSelectorExtended(labelContainer);
+               _colorCommonLocationLabel_Fill.addListener(_markerPropertyChangeListener);
+               _colorCommonLocationLabel_Fill.addOpenListener(this);
+               _colorCommonLocationLabel_Fill.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+
+               // button: swap color
+               _btnSwapCommonLocationLabel_Color = new Button(labelContainer, SWT.PUSH);
+               _btnSwapCommonLocationLabel_Color.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
+               _btnSwapCommonLocationLabel_Color.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
+               _btnSwapCommonLocationLabel_Color.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                     selectionEvent -> onSwapCommonLocationColor()));
+            }
+         }
+         {
+            /*
+             * Hovered location label
+             */
+            {
+               // label
+               _lblCommonLocationLabel_HoveredColor = new Label(container, SWT.NONE);
+               _lblCommonLocationLabel_HoveredColor.setText("&Hovered label");
+               _lblCommonLocationLabel_HoveredColor.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+               labelGridData.applyTo(_lblCommonLocationLabel_HoveredColor);
+            }
+            {
+               final Composite hoveredContainer = new Composite(container, SWT.NONE);
+               GridDataFactory.fillDefaults().grab(true, false).applyTo(hoveredContainer);
+               GridLayoutFactory.fillDefaults().numColumns(3).applyTo(hoveredContainer);
+
+               // outline/text color
+               _colorCommonLocationLabel_Outline_Hovered = new ColorSelectorExtended(hoveredContainer);
+               _colorCommonLocationLabel_Outline_Hovered.addListener(_markerPropertyChangeListener);
+               _colorCommonLocationLabel_Outline_Hovered.addOpenListener(this);
+               _colorCommonLocationLabel_Outline_Hovered.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+
+               // background color
+               _colorCommonLocationLabel_Fill_Hovered = new ColorSelectorExtended(hoveredContainer);
+               _colorCommonLocationLabel_Fill_Hovered.addListener(_markerPropertyChangeListener);
+               _colorCommonLocationLabel_Fill_Hovered.addOpenListener(this);
+               _colorCommonLocationLabel_Fill_Hovered.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+
+               // button: swap color
+               _btnSwapCommonLocationLabel_Hovered_Color = new Button(hoveredContainer, SWT.PUSH);
+               _btnSwapCommonLocationLabel_Hovered_Color.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
+               _btnSwapCommonLocationLabel_Hovered_Color.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
+               _btnSwapCommonLocationLabel_Hovered_Color.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                     selectionEvent -> onSwapCommonLocationHoveredColor()));
+            }
+         }
+      }
+   }
+
+   private void createUI_520_CommonLocation_Viewer(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
+      {
          {
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Slideout_MapPoints_Label_CommonLocations);
@@ -1053,7 +1206,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
             GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
             {
-               createUI_522_Table(_viewerContainer);
+               createUI_522_CommonLocation_Table(_viewerContainer);
             }
          }
 
@@ -1061,30 +1214,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       }
    }
 
-   private void createUI_520_Actions(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()
-            .grab(true, false)
-            .align(SWT.END, SWT.FILL)
-            .applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-      {
-         {
-            /*
-             * Button: Delete
-             */
-            _btnDeleteCommonLocation = new Button(container, SWT.PUSH);
-            _btnDeleteCommonLocation.setText(Messages.App_Action_Delete);
-            _btnDeleteCommonLocation.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onLocation_Delete()));
-
-            // set button default width
-            UI.setButtonLayoutData(_btnDeleteCommonLocation);
-         }
-      }
-   }
-
-   private void createUI_522_Table(final Composite parent) {
+   private void createUI_522_CommonLocation_Table(final Composite parent) {
 
       /*
        * Create table
@@ -1128,15 +1258,15 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       // ensure that tooltips are hidden
       table.addListener(SWT.MouseExit, (event) -> hideTooltip());
 
-      createUI_524_ContextMenu();
+      createUI_524_CommonLocation_ContextMenu();
    }
 
    /**
     * Ceate the view context menus
     */
-   private void createUI_524_ContextMenu() {
+   private void createUI_524_CommonLocation_ContextMenu() {
 
-      _tableContextMenu = createUI_525_CreateViewerContextMenu();
+      _tableContextMenu = createUI_525_CommonLocation_CreateViewerContextMenu();
 
       _columnManager.createHeaderContextMenu(
 
@@ -1144,12 +1274,35 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             _tableViewerContextMenuProvider);
    }
 
-   private Menu createUI_525_CreateViewerContextMenu() {
+   private Menu createUI_525_CommonLocation_CreateViewerContextMenu() {
 
       final Table table = (Table) _mapCommonLocationViewer.getControl();
       final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
 
       return tableContextMenu;
+   }
+
+   private void createUI_530_CommonLocation_Actions(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .align(SWT.END, SWT.FILL)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         {
+            /*
+             * Button: Delete
+             */
+            _btnDeleteCommonLocation = new Button(container, SWT.PUSH);
+            _btnDeleteCommonLocation.setText(Messages.App_Action_Delete);
+            _btnDeleteCommonLocation.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onLocation_Delete()));
+
+            // set button default width
+            UI.setButtonLayoutData(_btnDeleteCommonLocation);
+         }
+      }
    }
 
    private Control createUI_800_Tab_Options(final Composite parent) {
@@ -1512,6 +1665,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       final boolean isMarkerClustered        = _chkIsMarkerClustered          .getSelection();
       final boolean isShowTourMarker         = _chkIsShowTourMarker           .getSelection();
       final boolean isShowTourLocations      = _chkIsShowTourLocations        .getSelection();
+      final boolean isShowCommonLocations    = _chkIsShowCommonLocations      .getSelection();
 
       final boolean isDimMap                 = _chkIsDimMap                   .getSelection();
       final boolean isUseMapDimColor         = _chkUseMapDimColor             .getSelection();
@@ -1540,13 +1694,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       _chkIsFillClusterSymbol             .setEnabled(isShowClusteredMarker);
 
       _chkIsGroupDuplicatedMarkers        .setEnabled(isShowTourMarker);
+      _chkIsGroupDuplicatedMarkers_All    .setEnabled(isShowTourMarker);
       _chkIsMarkerClustered               .setEnabled(isShowTourMarker);
 
       _lblClusterGrid_Size                .setEnabled(isShowClusteredMarker);
       _lblClusterSymbol                   .setEnabled(isShowClusteredMarker);
       _lblClusterSymbol_Size              .setEnabled(isShowClusteredMarker);
 
-      _lblLocationLabel_Color             .setEnabled(isShowTourMarker);
       _lblMarkerLabel_Color               .setEnabled(isShowTourMarker);
       _lblMarkerLabel_HoveredColor        .setEnabled(isShowTourMarker);
 
@@ -1564,15 +1718,24 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       _colorMarkerLabel_Outline_Hovered   .setEnabled(isShowTourMarker);
 
       // tour location
-      _btnSwapLocationLabel_Color         .setEnabled(isShowTourLocations);
-      _btnSwapLocationLabel_Hovered_Color .setEnabled(isShowTourLocations);
-      _chkIsShowMapLocations_BoundingBox  .setEnabled(isShowTourLocations);
-      _lblLocationLabel_Color             .setEnabled(isShowTourLocations);
-      _lblLocationLabel_HoveredColor      .setEnabled(isShowTourLocations);
-      _colorLocationLabel_Fill            .setEnabled(isShowTourLocations);
-      _colorLocationLabel_Fill_Hovered    .setEnabled(isShowTourLocations);
-      _colorLocationLabel_Outline         .setEnabled(isShowTourLocations);
-      _colorLocationLabel_Outline_Hovered .setEnabled(isShowTourLocations);
+      _btnSwapTourLocationLabel_Hovered_Color   .setEnabled(isShowTourLocations);
+      _lblTourLocationLabel_Color               .setEnabled(isShowTourLocations);
+      _lblTourLocationLabel_HoveredColor        .setEnabled(isShowTourLocations);
+      _colorTourLocationLabel_Fill              .setEnabled(isShowTourLocations);
+      _colorTourLocationLabel_Fill_Hovered      .setEnabled(isShowTourLocations);
+      _colorTourLocationLabel_Outline           .setEnabled(isShowTourLocations);
+      _colorTourLocationLabel_Outline_Hovered   .setEnabled(isShowTourLocations);
+
+      // common location
+      _btnSwapCommonLocationLabel_Color         .setEnabled(isShowCommonLocations);
+      _lblCommonLocationLabel_Color             .setEnabled(isShowCommonLocations);
+      _lblCommonLocationLabel_HoveredColor      .setEnabled(isShowCommonLocations);
+      _colorCommonLocationLabel_Fill            .setEnabled(isShowCommonLocations);
+      _colorCommonLocationLabel_Fill_Hovered    .setEnabled(isShowCommonLocations);
+      _colorCommonLocationLabel_Outline         .setEnabled(isShowCommonLocations);
+      _colorCommonLocationLabel_Outline_Hovered .setEnabled(isShowCommonLocations);
+
+      _chkIsShowMapLocations_BoundingBox        .setEnabled(isShowTourLocations);
 
       // groups
       _lblGroupDuplicatedMarkers          .setEnabled(isGroupMarkers);
@@ -1589,7 +1752,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
        */
       final List<TourLocation> allSelectedLocations = getSelectedLocations();
 
-      final boolean isShowCommonLocations       = _chkIsShowCommonLocations.getSelection();
       final boolean isCommonLocationSelected    = isShowCommonLocations && allSelectedLocations.size() > 0;
 
       _btnDeleteCommonLocation            .setEnabled(isCommonLocationSelected);
@@ -1718,19 +1880,20 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
          }
       };
 
-      _markerSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyMarkerConfig());
-      _markerPropertyChangeListener = propertyChangeEvent -> onModifyMarkerConfig();
+      _markerSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyConfig(false));
+      _markerSelectionListener_All = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyConfigAll());
+      _markerPropertyChangeListener = propertyChangeEvent -> onModifyConfig(false);
 
       _markerMouseWheelListener = mouseEvent -> {
 
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 1);
-         onModifyMarkerConfig();
+         onModifyConfig(false);
       };
 
       _markerMouseWheelListener10 = mouseEvent -> {
 
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
-         onModifyMarkerConfig();
+         onModifyConfig(false);
       };
 
       _keepOpenListener = new FocusListener() {
@@ -1862,13 +2025,41 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             null);
    }
 
-   private void onModifyMarkerConfig() {
+   private void onModifyConfig(final boolean isFromAllControls) {
+
+      if (isFromAllControls == false) {
+
+         // update "all" controls
+         
+// SET_FORMATTING_OFF
+
+         _chkIsGroupDuplicatedMarkers_All .setSelection(_chkIsGroupDuplicatedMarkers.getSelection());
+         _chkIsShowCommonLocations_All    .setSelection(_chkIsShowCommonLocations.getSelection());
+         _chkIsShowTourMarker_All         .setSelection(_chkIsShowTourMarker.getSelection());
+         _chkIsShowTourLocations_All      .setSelection(_chkIsShowTourLocations.getSelection());
+
+// SET_FORMATTING_ON
+      }
 
       saveMarkerConfig();
 
       enableControls();
 
       repaintMap();
+   }
+
+   private void onModifyConfigAll() {
+
+// SET_FORMATTING_OFF
+
+      _chkIsGroupDuplicatedMarkers  .setSelection(_chkIsGroupDuplicatedMarkers_All.getSelection());
+      _chkIsShowCommonLocations     .setSelection(_chkIsShowCommonLocations_All.getSelection());
+      _chkIsShowTourMarker          .setSelection(_chkIsShowTourMarker_All.getSelection());
+      _chkIsShowTourLocations       .setSelection(_chkIsShowTourLocations_All.getSelection());
+
+// SET_FORMATTING_ON
+
+      onModifyConfig(true);
    }
 
    private void onSelectSortColumn(final SelectionEvent e) {
@@ -1904,15 +2095,15 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       repaintMap();
    }
 
-   private void onSwapLocationColor() {
+   private void onSwapCommonLocationColor() {
 
       final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
 
-      final RGB fgColor = config.locationOutline_RGB;
-      final RGB bgColor = config.locationFill_RGB;
+      final RGB fgColor = config.commonLocationOutline_RGB;
+      final RGB bgColor = config.commonLocationFill_RGB;
 
-      config.locationOutline_RGB = bgColor;
-      config.locationFill_RGB = fgColor;
+      config.commonLocationOutline_RGB = bgColor;
+      config.commonLocationFill_RGB = fgColor;
 
       config.setupColors();
 
@@ -1920,15 +2111,15 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       repaintMap();
    }
 
-   private void onSwapLocationHoveredColor() {
+   private void onSwapCommonLocationHoveredColor() {
 
       final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
 
-      final RGB fgColor = config.locationOutline_Hovered_RGB;
-      final RGB bgColor = config.locationFill_Hovered_RGB;
+      final RGB fgColor = config.commonLocationOutline_Hovered_RGB;
+      final RGB bgColor = config.commonLocationFill_Hovered_RGB;
 
-      config.locationOutline_Hovered_RGB = bgColor;
-      config.locationFill_Hovered_RGB = fgColor;
+      config.commonLocationOutline_Hovered_RGB = bgColor;
+      config.commonLocationFill_Hovered_RGB = fgColor;
 
       config.setupColors();
 
@@ -1968,6 +2159,38 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       repaintMap();
    }
 
+   private void onSwapTourLocationColor() {
+
+      final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
+
+      final RGB fgColor = config.tourLocationOutline_RGB;
+      final RGB bgColor = config.tourLocationFill_RGB;
+
+      config.tourLocationOutline_RGB = bgColor;
+      config.tourLocationFill_RGB = fgColor;
+
+      config.setupColors();
+
+      restoreState();
+      repaintMap();
+   }
+
+   private void onSwapTourLocationHoveredColor() {
+
+      final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
+
+      final RGB fgColor = config.tourLocationOutline_Hovered_RGB;
+      final RGB bgColor = config.tourLocationFill_Hovered_RGB;
+
+      config.tourLocationOutline_Hovered_RGB = bgColor;
+      config.tourLocationFill_Hovered_RGB = fgColor;
+
+      config.setupColors();
+
+      restoreState();
+      repaintMap();
+   }
+
    @Override
    public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
@@ -1975,7 +2198,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       {
          _mapCommonLocationViewer.getTable().dispose();
 
-         createUI_522_Table(_viewerContainer);
+         createUI_522_CommonLocation_Table(_viewerContainer);
          _viewerContainer.layout();
 
          // update the viewer
@@ -2014,13 +2237,17 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 // SET_FORMATTING_OFF
 
       _chkIsShowCommonLocations           .setSelection( config.isShowCommonLocation);
+      _chkIsShowCommonLocations_All       .setSelection( config.isShowCommonLocation);
       _chkIsShowTourLocations             .setSelection( config.isShowTourLocation);
+      _chkIsShowTourLocations_All         .setSelection( config.isShowTourLocation);
       _chkIsShowTourMarker                .setSelection( config.isShowTourMarker);
+      _chkIsShowTourMarker_All            .setSelection( config.isShowTourMarker);
+      _chkIsGroupDuplicatedMarkers        .setSelection( config.isGroupDuplicatedMarkers);
+      _chkIsGroupDuplicatedMarkers_All    .setSelection( config.isGroupDuplicatedMarkers);
 
       _chkIsClusterSymbolAntialiased      .setSelection( config.isClusterSymbolAntialiased);
       _chkIsClusterTextAntialiased        .setSelection( config.isClusterTextAntialiased);
       _chkIsFillClusterSymbol             .setSelection( config.isFillClusterSymbol);
-      _chkIsGroupDuplicatedMarkers        .setSelection( config.isGroupDuplicatedMarkers);
       _chkIsMarkerClustered               .setSelection( config.isMarkerClustered);
       _chkIsLabelAntialiased              .setSelection( config.isLabelAntialiased);
 
@@ -2034,16 +2261,22 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
       _colorClusterSymbol_Fill            .setColorValue(config.clusterFill_RGB);
       _colorClusterSymbol_Outline         .setColorValue(config.clusterOutline_RGB);
-      _colorLocationLabel_Fill            .setColorValue(config.locationFill_RGB);
-      _colorLocationLabel_Fill_Hovered    .setColorValue(config.locationFill_Hovered_RGB);
-      _colorLocationLabel_Outline         .setColorValue(config.locationOutline_RGB);
-      _colorLocationLabel_Outline_Hovered .setColorValue(config.locationOutline_Hovered_RGB);
       _colorMarkerLabel_Fill              .setColorValue(config.markerFill_RGB);
       _colorMarkerLabel_Fill_Hovered      .setColorValue(config.markerFill_Hovered_RGB);
       _colorMarkerLabel_Outline           .setColorValue(config.markerOutline_RGB);
       _colorMarkerLabel_Outline_Hovered   .setColorValue(config.markerOutline_Hovered_RGB);
 
-      _txtGroupDuplicatedMarkers          .setText(      config.groupedMarkers);
+      _colorCommonLocationLabel_Fill            .setColorValue(config.commonLocationFill_RGB);
+      _colorCommonLocationLabel_Fill_Hovered    .setColorValue(config.commonLocationFill_Hovered_RGB);
+      _colorCommonLocationLabel_Outline         .setColorValue(config.commonLocationOutline_RGB);
+      _colorCommonLocationLabel_Outline_Hovered .setColorValue(config.commonLocationOutline_Hovered_RGB);
+
+      _colorTourLocationLabel_Fill              .setColorValue(config.tourLocationFill_RGB);
+      _colorTourLocationLabel_Fill_Hovered      .setColorValue(config.tourLocationFill_Hovered_RGB);
+      _colorTourLocationLabel_Outline           .setColorValue(config.tourLocationOutline_RGB);
+      _colorTourLocationLabel_Outline_Hovered   .setColorValue(config.tourLocationOutline_Hovered_RGB);
+
+      _txtGroupDuplicatedMarkers                .setText(      config.groupedMarkers);
 
       /*
        * Map dimming & transparency
@@ -2108,15 +2341,20 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       config.groupGridSize                = _spinnerLabelGroupGridSize           .getSelection();
       config.labelWrapLength              = _spinnerLabelWrapLength              .getSelection();
 
-      config.locationFill_RGB             = _colorLocationLabel_Fill             .getColorValue();
-      config.locationFill_Hovered_RGB     = _colorLocationLabel_Fill_Hovered     .getColorValue();
-      config.locationOutline_RGB          = _colorLocationLabel_Outline          .getColorValue();
-      config.locationOutline_Hovered_RGB  = _colorLocationLabel_Outline_Hovered  .getColorValue();
+      config.markerFill_RGB                     = _colorMarkerLabel_Fill                     .getColorValue();
+      config.markerFill_Hovered_RGB             = _colorMarkerLabel_Fill_Hovered             .getColorValue();
+      config.markerOutline_RGB                  = _colorMarkerLabel_Outline                  .getColorValue();
+      config.markerOutline_Hovered_RGB          = _colorMarkerLabel_Outline_Hovered          .getColorValue();
 
-      config.markerFill_RGB               = _colorMarkerLabel_Fill               .getColorValue();
-      config.markerFill_Hovered_RGB       = _colorMarkerLabel_Fill_Hovered       .getColorValue();
-      config.markerOutline_RGB            = _colorMarkerLabel_Outline            .getColorValue();
-      config.markerOutline_Hovered_RGB    = _colorMarkerLabel_Outline_Hovered    .getColorValue();
+      config.commonLocationFill_RGB             = _colorCommonLocationLabel_Fill             .getColorValue();
+      config.commonLocationFill_Hovered_RGB     = _colorCommonLocationLabel_Fill_Hovered     .getColorValue();
+      config.commonLocationOutline_RGB          = _colorCommonLocationLabel_Outline          .getColorValue();
+      config.commonLocationOutline_Hovered_RGB  = _colorCommonLocationLabel_Outline_Hovered  .getColorValue();
+
+      config.tourLocationFill_RGB               = _colorTourLocationLabel_Fill               .getColorValue();
+      config.tourLocationFill_Hovered_RGB       = _colorTourLocationLabel_Fill_Hovered       .getColorValue();
+      config.tourLocationOutline_RGB            = _colorTourLocationLabel_Outline            .getColorValue();
+      config.tourLocationOutline_Hovered_RGB    = _colorTourLocationLabel_Outline_Hovered    .getColorValue();
 
       config.markerLabelLayout            = getSelectedMarkerLabelLayout();
 

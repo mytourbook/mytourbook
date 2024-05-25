@@ -469,21 +469,6 @@ public class DirectMappingPainter implements IDirectPainter {
       final TourMarker tourMarker = mapPoint.tourMarker;
       final boolean isTourMarker = tourMarker != null;
 
-      if (isTourMarker) {
-
-         // tour marker
-
-         gc.setBackground(markerConfig.markerFill_Hovered_Color);
-         gc.setForeground(markerConfig.markerOutline_Hovered_Color);
-
-      } else {
-
-         // tour location
-
-         gc.setBackground(markerConfig.locationFill_Hovered_Color);
-         gc.setForeground(markerConfig.locationOutline_Hovered_Color);
-      }
-
       final int mapPointDevX = mapPoint.geoPointDevX;
       final int mapPointDevY = mapPoint.geoPointDevY;
 
@@ -515,6 +500,9 @@ public class DirectMappingPainter implements IDirectPainter {
       } else if (lineToDevY > lineFromDevY && lineToDevY < lineFromDevY + labelHeight) {
          lineFromDevY = lineToDevY;
       }
+
+      gc.setForeground(mapPoint.getOutlineColor_Hovered());
+      gc.setBackground(mapPoint.getFillColor_Hovered());
 
       gc.setLineWidth(2);
       gc.drawLine(
