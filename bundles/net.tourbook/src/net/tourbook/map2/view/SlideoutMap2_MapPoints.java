@@ -438,7 +438,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       _state_Slideout = slideoutState;
       _map2View = map2View;
 
-      setTitleText(Messages.Slideout_MapPoints_Label_Title);
+      setTitleText(Messages.Slideout_MapPoints_Label_Title2);
 
       // prevent that the opened slideout is partly hidden
       setIsForceBoundsToBeInsideOfViewport(true);
