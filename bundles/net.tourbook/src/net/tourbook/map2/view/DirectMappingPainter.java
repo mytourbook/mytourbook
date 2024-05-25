@@ -23,15 +23,18 @@ import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.PaintedMapPoint;
 import de.byteholder.geoclipse.mapprovider.MP;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.map.GeoPosition;
-import net.tourbook.common.ui.TextWrapPainter;
+import net.tourbook.common.ui.FormattedWord;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
 import net.tourbook.map2.Messages;
 import net.tourbook.tour.location.TourLocationExtended;
@@ -68,11 +71,12 @@ public class DirectMappingPainter implements IDirectPainter {
 
    private SliderPathPaintingData _sliderPathPaintingData;
 
+   private Map<Long, Color>       _locationColors        = new HashMap<>();
+   private int                    _colorSwitchCounter;
+
    private boolean                _isMapBackgroundDark;
 
    private Rectangle              _imageMapLocationBounds;
-
-   private TextWrapPainter        _textWrapPainter;
 
    /*
     * UI resources
@@ -102,8 +106,6 @@ public class DirectMappingPainter implements IDirectPainter {
 // SET_FORMATTING_ON
 
       _imageMapLocationBounds = _imageMapLocation_Hovered.getBounds();
-
-      _textWrapPainter = new TextWrapPainter();
    }
 
    /**
@@ -212,163 +214,163 @@ public class DirectMappingPainter implements IDirectPainter {
    private void drawMapLocation(final DirectPainterContext painterContext,
                                 final List<TourLocationExtended> allTourLocations) {
 
-//      final MP mp = _map2.getMapProvider();
-//      final int zoomLevel = _map2.getZoom();
-//
-//      final GC gc = painterContext.gc;
-//      final Rectangle mapViewport = painterContext.mapViewport;
-//      final int viewportX = mapViewport.x;
-//      final int viewportY = mapViewport.y;
-//
-//      gc.setAntialias(SWT.ON);
-//      gc.setLineWidth(2);
-//      gc.setFont(MTFont.getTitleFont());
-//
+      final MP mp = _map2.getMapProvider();
+      final int zoomLevel = _map2.getZoom();
+
+      final GC gc = painterContext.gc;
+      final Rectangle mapViewport = painterContext.mapViewport;
+      final int viewportX = mapViewport.x;
+      final int viewportY = mapViewport.y;
+
+      gc.setAntialias(SWT.ON);
+      gc.setLineWidth(2);
+      gc.setFont(MTFont.getTitleFont());
+
 //      final Color textColor = _isMapBackgroundDark ? _nameColor_Dark : _nameColor_Bright;
 //      final Color hoveredColor = _isMapBackgroundDark ? _nameColor_Dark_Hovered : _nameColor_Bright_Hovered;
 //      final Color shadowColor = _isMapBackgroundDark ? _nameColor_Dark_Shadow : _nameColor_Bright_Shadow;
-//
-//      // use different colors each time
-//      if (_colorSwitchCounter++ % 50 == 0) {
-//         _locationColors.clear();
-//      }
-//
-//      // setup hovered map location
+
+      // use different colors each time
+      if (_colorSwitchCounter++ % 50 == 0) {
+         _locationColors.clear();
+      }
+
+      // setup hovered map location
 //      final PaintedMapLocation hoveredMapLocation = painterContext.hoveredMapLocation;
-//      Rectangle hoveredLocation = null;
-//      Rectangle hoveredTextLocation = null;
-//      List<FormattedWord> hoveredTexts = null;
-//      int hoveredIconX = 0;
-//      int hoveredIconY = 0;
-//
-//      final int imageWidth = _imageMapLocationBounds.width;
-//      final int imageHeight = _imageMapLocationBounds.height;
-//      final int imageWidth2 = imageWidth / 2;
-//
-//      for (final TourLocationExtended tourLocationExtended : allTourLocations) {
-//
-//         final TourLocation tourLocation = tourLocationExtended.tourLocation;
-//
-//         final Point requestedLocation = convertGeoPoint(mp, tourLocation.latitude, tourLocation.longitude, zoomLevel);
-//
-//         final double latitudeMin_Resized = tourLocation.latitudeMin_Resized;
-//         final double latitudeMax_Resized = tourLocation.latitudeMax_Resized;
-//         final double longitudeMin_Resized = tourLocation.longitudeMin_Resized;
-//         final double longitudeMax_Resized = tourLocation.longitudeMax_Resized;
-//
-//         final Point providedBBox_TopLeft_Resized = convertGeoPoint(mp, latitudeMin_Resized, longitudeMin_Resized, zoomLevel);
-//         final Point providedBBox_TopRight_Resized = convertGeoPoint(mp, latitudeMin_Resized, longitudeMax_Resized, zoomLevel);
-//         final Point providedBBox_BottomLeft_Resized = convertGeoPoint(mp, latitudeMax_Resized, longitudeMin_Resized, zoomLevel);
-//         final Point providedBBox_BottomRight_Resized = convertGeoPoint(mp, latitudeMax_Resized, longitudeMax_Resized, zoomLevel);
-//
-//         // check if location is visible
-//         if (mapViewport.contains(requestedLocation)
-//
-//               || mapViewport.contains(providedBBox_TopLeft_Resized)
-//               || mapViewport.contains(providedBBox_TopRight_Resized)
-//               || mapViewport.contains(providedBBox_BottomLeft_Resized)
-//               || mapViewport.contains(providedBBox_BottomRight_Resized)
-//
-//         ) {
-//
-//            // convert world position into device position
-//            final int requestedDevX = requestedLocation.x - viewportX;
-//            final int requestedDevY = requestedLocation.y - viewportY;
-//
-//            if (_isShowMapLocations_BoundingBox) {
-//
-//               /*
-//                * Paint each bbox with a different color but use the same color for the same bbox
-//                */
-//               final long bboxKey = tourLocation.boundingBoxKey;
-//
-//               Color locationColor = _locationColors.get(bboxKey);
-//
-//               if (locationColor == null) {
-//
-//                  // create bbox color
-//
-//                  locationColor = createBBoxColor();
-//
-//                  _locationColors.put(bboxKey, locationColor);
-//               }
-//
-//               gc.setForeground(locationColor);
-//               gc.setBackground(locationColor);
-//
-//               // draw original bbox
-//
-//               final double latitudeMin = tourLocation.latitudeMin;
-//               final double latitudeMax = tourLocation.latitudeMax;
-//               final double longitudeMin = tourLocation.longitudeMin;
-//               final double longitudeMax = tourLocation.longitudeMax;
-//
-//               final Point providedBBox_TopLeft = convertGeoPoint(mp, latitudeMin, longitudeMin, zoomLevel);
-//               final Point providedBBox_TopRight = convertGeoPoint(mp, latitudeMin, longitudeMax, zoomLevel);
-//               final Point providedBBox_BottomLeft = convertGeoPoint(mp, latitudeMax, longitudeMin, zoomLevel);
-//
-//               final int bboxTopLeft_DevX = providedBBox_TopLeft.x - viewportX;
-//               final int bboxTopRight_DevX = providedBBox_TopRight.x - viewportX;
-//
-//               final int bboxTopLeft_DevY = providedBBox_TopLeft.y - viewportY;
-//               final int bboxBottomLeft_DevY = providedBBox_BottomLeft.y - viewportY;
-//
-//               final int bboxWidth = bboxTopRight_DevX - bboxTopLeft_DevX;
-//               final int bboxHeight = bboxBottomLeft_DevY - bboxTopLeft_DevY;
-//
-//               gc.drawRectangle(
-//
-//                     bboxTopLeft_DevX,
-//                     bboxTopLeft_DevY,
-//                     bboxWidth,
-//                     bboxHeight
-//
-//               );
-//
-//               final boolean isBBoxResized = false
-//
-//                     || latitudeMin != latitudeMin_Resized
-//                     || latitudeMax != latitudeMax_Resized
-//
-//                     || longitudeMin != longitudeMin_Resized
-//                     || longitudeMax != longitudeMax_Resized;
-//
-//               if (isBBoxResized) {
-//
-//                  // draw resized bbox
-//
-//                  final int bboxTopLeft_DevX_Resized = providedBBox_TopLeft_Resized.x - viewportX;
-//                  final int bboxTopRight_DevX_Resized = providedBBox_TopRight_Resized.x - viewportX;
-//                  final int bboxTopLeft_DevY_Resized = providedBBox_TopLeft_Resized.y - viewportY;
-//                  final int bboxBottomLeft_DevY_Resized = providedBBox_BottomLeft_Resized.y - viewportY;
-//
-//                  final int bboxWidth_Resized = bboxTopRight_DevX_Resized - bboxTopLeft_DevX_Resized;
-//                  final int bboxHeight_Resized = bboxBottomLeft_DevY_Resized - bboxTopLeft_DevY_Resized;
-//
-//                  gc.drawRectangle(
-//
-//                        bboxTopLeft_DevX_Resized,
-//                        bboxTopLeft_DevY_Resized,
-//                        bboxWidth_Resized,
-//                        bboxHeight_Resized
-//
-//                  );
-//               }
-//            }
-//
-//            final int iconDevX = requestedDevX - imageWidth2;
-//            final int iconDevY = requestedDevY - imageHeight;
-//
-//            // set rectangle from the icon image
-//            final Rectangle paintedRectangle = new Rectangle(
-//
-//                  iconDevX,
-//                  iconDevY,
-//
-//                  imageWidth,
-//                  imageHeight);
-//
-//            // draw location image
+      final Rectangle hoveredLocation = null;
+      final Rectangle hoveredTextLocation = null;
+      final List<FormattedWord> hoveredTexts = null;
+      final int hoveredIconX = 0;
+      final int hoveredIconY = 0;
+
+      final int imageWidth = _imageMapLocationBounds.width;
+      final int imageHeight = _imageMapLocationBounds.height;
+      final int imageWidth2 = imageWidth / 2;
+
+      for (final TourLocationExtended tourLocationExtended : allTourLocations) {
+
+         final TourLocation tourLocation = tourLocationExtended.tourLocation;
+
+         final Point requestedLocation = convertGeoPoint(mp, tourLocation.latitude, tourLocation.longitude, zoomLevel);
+
+         final double latitudeMin_Resized = tourLocation.latitudeMin_Resized;
+         final double latitudeMax_Resized = tourLocation.latitudeMax_Resized;
+         final double longitudeMin_Resized = tourLocation.longitudeMin_Resized;
+         final double longitudeMax_Resized = tourLocation.longitudeMax_Resized;
+
+         final Point providedBBox_TopLeft_Resized = convertGeoPoint(mp, latitudeMin_Resized, longitudeMin_Resized, zoomLevel);
+         final Point providedBBox_TopRight_Resized = convertGeoPoint(mp, latitudeMin_Resized, longitudeMax_Resized, zoomLevel);
+         final Point providedBBox_BottomLeft_Resized = convertGeoPoint(mp, latitudeMax_Resized, longitudeMin_Resized, zoomLevel);
+         final Point providedBBox_BottomRight_Resized = convertGeoPoint(mp, latitudeMax_Resized, longitudeMax_Resized, zoomLevel);
+
+         // check if location is visible
+         if (mapViewport.contains(requestedLocation)
+
+               || mapViewport.contains(providedBBox_TopLeft_Resized)
+               || mapViewport.contains(providedBBox_TopRight_Resized)
+               || mapViewport.contains(providedBBox_BottomLeft_Resized)
+               || mapViewport.contains(providedBBox_BottomRight_Resized)
+
+         ) {
+
+            // convert world position into device position
+            final int requestedDevX = requestedLocation.x - viewportX;
+            final int requestedDevY = requestedLocation.y - viewportY;
+
+            if (_isShowMapLocations_BoundingBox) {
+
+               /*
+                * Paint each bbox with a different color but use the same color for the same bbox
+                */
+               final long bboxKey = tourLocation.boundingBoxKey;
+
+               Color locationColor = _locationColors.get(bboxKey);
+
+               if (locationColor == null) {
+
+                  // create bbox color
+
+                  locationColor = createBBoxColor();
+
+                  _locationColors.put(bboxKey, locationColor);
+               }
+
+               gc.setForeground(locationColor);
+               gc.setBackground(locationColor);
+
+               // draw original bbox
+
+               final double latitudeMin = tourLocation.latitudeMin;
+               final double latitudeMax = tourLocation.latitudeMax;
+               final double longitudeMin = tourLocation.longitudeMin;
+               final double longitudeMax = tourLocation.longitudeMax;
+
+               final Point providedBBox_TopLeft = convertGeoPoint(mp, latitudeMin, longitudeMin, zoomLevel);
+               final Point providedBBox_TopRight = convertGeoPoint(mp, latitudeMin, longitudeMax, zoomLevel);
+               final Point providedBBox_BottomLeft = convertGeoPoint(mp, latitudeMax, longitudeMin, zoomLevel);
+
+               final int bboxTopLeft_DevX = providedBBox_TopLeft.x - viewportX;
+               final int bboxTopRight_DevX = providedBBox_TopRight.x - viewportX;
+
+               final int bboxTopLeft_DevY = providedBBox_TopLeft.y - viewportY;
+               final int bboxBottomLeft_DevY = providedBBox_BottomLeft.y - viewportY;
+
+               final int bboxWidth = bboxTopRight_DevX - bboxTopLeft_DevX;
+               final int bboxHeight = bboxBottomLeft_DevY - bboxTopLeft_DevY;
+
+               gc.drawRectangle(
+
+                     bboxTopLeft_DevX,
+                     bboxTopLeft_DevY,
+                     bboxWidth,
+                     bboxHeight
+
+               );
+
+               final boolean isBBoxResized = false
+
+                     || latitudeMin != latitudeMin_Resized
+                     || latitudeMax != latitudeMax_Resized
+
+                     || longitudeMin != longitudeMin_Resized
+                     || longitudeMax != longitudeMax_Resized;
+
+               if (isBBoxResized) {
+
+                  // draw resized bbox
+
+                  final int bboxTopLeft_DevX_Resized = providedBBox_TopLeft_Resized.x - viewportX;
+                  final int bboxTopRight_DevX_Resized = providedBBox_TopRight_Resized.x - viewportX;
+                  final int bboxTopLeft_DevY_Resized = providedBBox_TopLeft_Resized.y - viewportY;
+                  final int bboxBottomLeft_DevY_Resized = providedBBox_BottomLeft_Resized.y - viewportY;
+
+                  final int bboxWidth_Resized = bboxTopRight_DevX_Resized - bboxTopLeft_DevX_Resized;
+                  final int bboxHeight_Resized = bboxBottomLeft_DevY_Resized - bboxTopLeft_DevY_Resized;
+
+                  gc.drawRectangle(
+
+                        bboxTopLeft_DevX_Resized,
+                        bboxTopLeft_DevY_Resized,
+                        bboxWidth_Resized,
+                        bboxHeight_Resized
+
+                  );
+               }
+            }
+
+            final int iconDevX = requestedDevX - imageWidth2;
+            final int iconDevY = requestedDevY - imageHeight;
+
+            // set rectangle from the icon image
+            final Rectangle paintedRectangle = new Rectangle(
+
+                  iconDevX,
+                  iconDevY,
+
+                  imageWidth,
+                  imageHeight);
+
+            // draw location image
 //            switch (tourLocationExtended.locationType) {
 //
 //            case Common    -> gc.drawImage(_imageMapLocation_Address, iconDevX, iconDevY);
@@ -429,10 +431,10 @@ public class DirectMappingPainter implements IDirectPainter {
 //               hoveredIconY = iconDevY;
 //               hoveredTexts = tourLocationExtended.allFormattedLocationNameWords;
 //            }
-//         }
-//      }
-//
-//      // draw hovered location icon + text
+         }
+      }
+
+      // draw hovered location icon + text
 //      if (hoveredLocation != null) {
 //
 //         gc.drawImage(_imageMapLocation_Hovered, hoveredIconX, hoveredIconY);

@@ -96,7 +96,7 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * Slideout for all 2D map locations and marker
  */
-public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements ITourViewer2, IColorSelectorListener {
+public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourViewer2, IColorSelectorListener {
 
    private static final String     COLUMN_CREATED_DATE_TIME        = "createdDateTime";                         //$NON-NLS-1$
    private static final String     COLUMN_LOCATION_NAME            = "LocationName";                            //$NON-NLS-1$
@@ -425,7 +425,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
     * @param ownerControl
     * @param toolBar
     */
-   public SlideoutMap2_LocationAndMarker(final ToolItem toolItem,
+   public SlideoutMap2_MapPoints(final ToolItem toolItem,
                                          final IDialogSettings map2State,
                                          final IDialogSettings slideoutState,
                                          final Map2View map2View) {
@@ -1704,7 +1704,7 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
       _imageMapLocation_Common = TourbookPlugin.getImageDescriptor(Images.MapLocation).createImage();
       _imageMapLocation_Tour = TourbookPlugin.getImageDescriptor(Images.MapLocation_Start).createImage();
       _imageTourMarker = TourbookPlugin.getImageDescriptor(Images.TourMarker).createImage();
-      _imageTourMarkerGroups = TourbookPlugin.getImageDescriptor(Images.TourMarker_All).createImage();
+      _imageTourMarkerGroups = TourbookPlugin.getImageDescriptor(Images.TourMarker_Group).createImage();
 
       // force spinner controls to have the same width
       _spinnerGridData = GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(3), SWT.DEFAULT);
@@ -2006,8 +2006,6 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
             Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX,
             Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX_DEFAULT));
 
-      updateUI_TabLabel();
-
       /*
        * Tour marker
        */
@@ -2059,6 +2057,8 @@ public class SlideoutMap2_LocationAndMarker extends AdvancedSlideout implements 
 // SET_FORMATTING_ON
 
       selectMarkerLabelLayout(config.markerLabelLayout);
+
+      updateUI_TabLabel();
    }
 
    private void restoreState_BeforeUI() {

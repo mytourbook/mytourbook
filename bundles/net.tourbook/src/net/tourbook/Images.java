@@ -377,6 +377,7 @@ public class Images {
    public static final String TourMarker                                 = "tour-marker.png";                                     //$NON-NLS-1$
    public static final String TourMarker_All                             = "tour-marker-all.png";                                 //$NON-NLS-1$
    public static final String TourMarker_Disabled                        = "tour-marker-disabled.png";                            //$NON-NLS-1$
+   public static final String TourMarker_Group                           = "tour-marker-group.png";                               //$NON-NLS-1$
    public static final String TourMarker_New                             = "tour-marker-new.png";                                 //$NON-NLS-1$
    public static final String TourMarker_New_Disabled                    = "tour-marker-new-disabled.png";                        //$NON-NLS-1$
    public static final String TourNew                                    = "tour-new.png";                                        //$NON-NLS-1$

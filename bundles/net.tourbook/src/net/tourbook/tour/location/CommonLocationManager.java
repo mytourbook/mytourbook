@@ -28,7 +28,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourLocation;
-import net.tourbook.map2.view.SlideoutMap2_LocationAndMarker;
+import net.tourbook.map2.view.SlideoutMap2_MapPoints;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -143,7 +143,7 @@ public class CommonLocationManager {
    //
    private static final List<TourLocation>     _allMapLocations                         = new ArrayList<>();
 
-   private static SlideoutMap2_LocationAndMarker _mapLocationAndMarkerSlideout;
+   private static SlideoutMap2_MapPoints _mapLocationAndMarkerSlideout;
 
    private static int                          _locationRequestZoomlevel                = TourLocationManager.DEFAULT_ZOOM_LEVEL_VALUE;
 
@@ -523,7 +523,7 @@ public class CommonLocationManager {
       _locationRequestZoomlevel = locationRequestZoomlevel;
    }
 
-   public static void setMapLocationSlideout(final SlideoutMap2_LocationAndMarker mapLocationSlideout) {
+   public static void setMapLocationSlideout(final SlideoutMap2_MapPoints mapLocationSlideout) {
 
       _mapLocationAndMarkerSlideout = mapLocationSlideout;
    }

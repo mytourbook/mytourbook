@@ -560,7 +560,7 @@ public class Map2View extends ViewPart implements
    private GeoFilter_LoaderData              _geoFilter_PreviousGeoLoaderItem;
    private AtomicInteger                     _geoFilter_RunningId  = new AtomicInteger();
    //
-   private SlideoutMap2_LocationAndMarker    _slideoutMapLocation;
+   private SlideoutMap2_MapPoints    _slideoutMapLocation;
    //
    /*
     * UI controls
@@ -633,7 +633,7 @@ public class Map2View extends ViewPart implements
       @Override
       protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-         _slideoutMapLocation = new SlideoutMap2_LocationAndMarker(toolItem, _state, _state_MapLocation, Map2View.this);
+         _slideoutMapLocation = new SlideoutMap2_MapPoints(toolItem, _state, _state_MapLocation, Map2View.this);
          _slideoutMapLocation.setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
 
          return _slideoutMapLocation;
