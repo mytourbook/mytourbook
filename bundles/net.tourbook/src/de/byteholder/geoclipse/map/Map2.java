@@ -411,6 +411,9 @@ public class Map2 extends Canvas {
    private boolean                         _isMarkerClusterSelected;
    private MapPointToolTip                 _mapPointTooltip;
 
+   private Map<Long, Color>                _locationColors                    = new HashMap<>();
+   private int                             _colorSwitchCounter;
+
    private final NumberFormat              _nf0;
    private final NumberFormat              _nf1;
    private final NumberFormat              _nf2;
@@ -1202,6 +1205,62 @@ public class Map2 extends Canvas {
       return Executors.newSingleThreadExecutor(threadFactory);
    }
 
+   private Color createBoundingBoxColor() {
+
+      int red = (int) (Math.random() * 255);
+      int green = (int) (Math.random() * 255);
+      int blue = (int) (Math.random() * 255);
+
+      final float[] hsbValues = java.awt.Color.RGBtoHSB(red, green, blue, null);
+
+      final float hue = hsbValues[0];
+      final float saturation = hsbValues[1];
+      float brightness = hsbValues[2];
+
+      int adjustedRGB = Integer.MIN_VALUE;
+
+      final float brightnessClipValue = 0.5f;
+      final float darknessClipValue = 0.6f;
+
+      if (_isMapBackgroundDark) {
+
+         // background is dark -> ensure that a bright color is used
+
+         if (brightness < brightnessClipValue) {
+
+            brightness = brightnessClipValue;
+
+            adjustedRGB = java.awt.Color.HSBtoRGB(hue, saturation, brightness);
+         }
+
+      } else {
+
+         // background is bright -> ensure that a darker color is used
+
+         if (brightness > darknessClipValue) {
+
+            brightness = darknessClipValue;
+
+            adjustedRGB = java.awt.Color.HSBtoRGB(hue, saturation, brightness);
+         }
+      }
+
+      if (adjustedRGB != Integer.MIN_VALUE) {
+
+         // brightness is adjusted
+
+         final java.awt.Color adjustedColor = new java.awt.Color(adjustedRGB);
+
+         red = adjustedColor.getRed();
+         green = adjustedColor.getBlue();
+         blue = adjustedColor.getBlue();
+      }
+
+      final Color locationColor = new Color(red, green, blue);
+
+      return locationColor;
+   }
+
    /**
     * create the context menu
     */
@@ -1324,82 +1383,8 @@ public class Map2 extends Canvas {
       return mapImage;
    }
 
-   private void createMapPoints_CommonLocations(final List<TourLocation> allCommonLocations,
-                                                final Collection<Map2Point> allMapPoints) {
-
-      if (allCommonLocations == null || allCommonLocations.size() == 0) {
-         return;
-      }
-
-      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
-
-      final int labelWrapLength = markerConfig.labelWrapLength;
-
-      final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
-
-      for (final TourLocation tourLocation : allCommonLocations) {
-
-         if (_backgroundPainterFuture == null || _backgroundPainterFuture.isCancelled()) {
-            break;
-         }
-
-         /*
-          * Check if location is visible
-          */
-         final double latitude = tourLocation.latitude;
-         final double longitude = tourLocation.longitude;
-
-         // convert location lat/long into world pixels
-         final java.awt.Point worldPixel_LocationPos = _mp.geoToPixel(new GeoPosition(latitude, longitude), _mapZoomLevel);
-
-         final int worldPixel_LocationPosX = worldPixel_LocationPos.x;
-         final int worldPixel_LocationPosY = worldPixel_LocationPos.y;
-
-         final boolean isLocationInViewport = worldPixel_Viewport.contains(worldPixel_LocationPosX, worldPixel_LocationPosY);
-
-         if (isLocationInViewport == false) {
-            continue;
-         }
-
-         // convert world position into device position
-         final int devX = worldPixel_LocationPosX - worldPixel_Viewport.x;
-         final int devY = worldPixel_LocationPosY - worldPixel_Viewport.y;
-
-         // create formatted label
-         String locationLabel = tourLocation.getMapName();
-         if (locationLabel.length() > labelWrapLength) {
-
-            locationLabel = WordUtils.wrap(locationLabel, labelWrapLength);
-
-            final String lineSeparator = System.lineSeparator();
-
-            // remove line separator at the end
-            if (locationLabel.endsWith(lineSeparator)) {
-
-               locationLabel = locationLabel.substring(0, locationLabel.length() - lineSeparator.length());
-            }
-         }
-
-         /*
-          * Create map marker
-          */
-
-         final Map2Point mapPoint = new Map2Point(new GeoPoint(latitude, longitude));
-
-         mapPoint.tourLocation = tourLocation;
-         mapPoint.locationType = LocationType.Common;
-
-         mapPoint.geoPointDevX = devX;
-         mapPoint.geoPointDevY = devY;
-
-         mapPoint.setFormattedLabel(locationLabel);
-
-         allMapPoints.add(mapPoint);
-      }
-   }
-
-   private void createMapPoints_TourLocations(final List<TourData> allTourData,
-                                              final Collection<Map2Point> allMapPoints) {
+   private void createMapPoints_Locations_10_Tour(final List<TourData> allTourData,
+                                                  final Collection<Map2Point> allMapPoints) {
 
       final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
 
@@ -1506,31 +1491,210 @@ public class Map2 extends Canvas {
                }
             }
 
-            final Map2Point mapLocation = new Map2Point(new GeoPoint(latitude, longitude));
+            final Map2Point mapPoint = new Map2Point(new GeoPoint(latitude, longitude));
 
-            mapLocation.tourLocation = tourLocation;
-            mapLocation.locationType = LocationType.Tour;
+            mapPoint.tourLocation = tourLocation;
+            mapPoint.locationType = LocationType.Tour;
 
-            mapLocation.geoPointDevX = devX;
-            mapLocation.geoPointDevY = devY;
-            mapLocation.setFormattedLabel(locationLabel);
+            mapPoint.geoPointDevX = devX;
+            mapPoint.geoPointDevY = devY;
+            mapPoint.setFormattedLabel(locationLabel);
 
             // update and keep skipped labels
 
             if (isStartLocation) {
 
-               mapLocation.numDuplicates_Start++;
+               mapPoint.numDuplicates_Start++;
 
             } else {
 
-               mapLocation.numDuplicates_End++;
+               mapPoint.numDuplicates_End++;
             }
 
-            allTourLocationsMap.put(tourLocation, mapLocation);
+            if (markerConfig.isShowLocationBoundingBox) {
+               createMapPoints_Locations_90_BoundingBox(tourLocation, mapPoint);
+            }
+
+            allTourLocationsMap.put(tourLocation, mapPoint);
          }
       }
 
       allMapPoints.addAll(allTourLocationsMap.values());
+   }
+
+   private void createMapPoints_Locations_20_Common(final List<TourLocation> allCommonLocations,
+                                                    final Collection<Map2Point> allMapPoints) {
+
+      if (allCommonLocations == null || allCommonLocations.size() == 0) {
+         return;
+      }
+
+      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+
+      final int labelWrapLength = markerConfig.labelWrapLength;
+
+      final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
+
+      for (final TourLocation tourLocation : allCommonLocations) {
+
+         if (_backgroundPainterFuture == null || _backgroundPainterFuture.isCancelled()) {
+            break;
+         }
+
+         /*
+          * Check if location is visible
+          */
+         final double latitude = tourLocation.latitude;
+         final double longitude = tourLocation.longitude;
+
+         // convert location lat/long into world pixels
+         final java.awt.Point worldPixel_LocationPos = _mp.geoToPixel(new GeoPosition(latitude, longitude), _mapZoomLevel);
+
+         final int worldPixel_LocationPosX = worldPixel_LocationPos.x;
+         final int worldPixel_LocationPosY = worldPixel_LocationPos.y;
+
+         final boolean isLocationInViewport = worldPixel_Viewport.contains(worldPixel_LocationPosX, worldPixel_LocationPosY);
+
+         if (isLocationInViewport == false) {
+            continue;
+         }
+
+         // convert world position into device position
+         final int devX = worldPixel_LocationPosX - worldPixel_Viewport.x;
+         final int devY = worldPixel_LocationPosY - worldPixel_Viewport.y;
+
+         // create formatted label
+         String locationLabel = tourLocation.getMapName();
+         if (locationLabel.length() > labelWrapLength) {
+
+            locationLabel = WordUtils.wrap(locationLabel, labelWrapLength);
+
+            final String lineSeparator = System.lineSeparator();
+
+            // remove line separator at the end
+            if (locationLabel.endsWith(lineSeparator)) {
+
+               locationLabel = locationLabel.substring(0, locationLabel.length() - lineSeparator.length());
+            }
+         }
+
+         /*
+          * Create map point
+          */
+
+         final Map2Point mapPoint = new Map2Point(new GeoPoint(latitude, longitude));
+
+         mapPoint.tourLocation = tourLocation;
+         mapPoint.locationType = LocationType.Common;
+
+         mapPoint.geoPointDevX = devX;
+         mapPoint.geoPointDevY = devY;
+
+         mapPoint.setFormattedLabel(locationLabel);
+
+         if (markerConfig.isShowLocationBoundingBox) {
+            createMapPoints_Locations_90_BoundingBox(tourLocation, mapPoint);
+         }
+
+         allMapPoints.add(mapPoint);
+      }
+   }
+
+   private void createMapPoints_Locations_90_BoundingBox(final TourLocation tourLocation,
+                                                         final Map2Point mapPoints) {
+
+      final int viewportX = _worldPixel_TopLeft_Viewport.x;
+      final int viewportY = _worldPixel_TopLeft_Viewport.y;
+
+      // create original bbox
+
+      final double latitudeMin = tourLocation.latitudeMin;
+      final double latitudeMax = tourLocation.latitudeMax;
+      final double longitudeMin = tourLocation.longitudeMin;
+      final double longitudeMax = tourLocation.longitudeMax;
+
+      // convert location lat/long into world pixels
+
+      final java.awt.Point providedBBox_TopLeft = _mp.geoToPixel(new GeoPosition(latitudeMax, longitudeMin), _mapZoomLevel);
+      final java.awt.Point providedBBox_TopRight = _mp.geoToPixel(new GeoPosition(latitudeMax, longitudeMax), _mapZoomLevel);
+      final java.awt.Point providedBBox_BottomLeft = _mp.geoToPixel(new GeoPosition(latitudeMin, longitudeMin), _mapZoomLevel);
+
+      final int bboxTopLeft_DevX = providedBBox_TopLeft.x - viewportX;
+      final int bboxTopRight_DevX = providedBBox_TopRight.x - viewportX;
+
+      final int bboxTopLeft_DevY = providedBBox_TopLeft.y - viewportY;
+      final int bboxBottomLeft_DevY = providedBBox_BottomLeft.y - viewportY;
+
+      final int bboxWidth = bboxTopRight_DevX - bboxTopLeft_DevX;
+      final int bboxHeight = bboxBottomLeft_DevY - bboxTopLeft_DevY;
+
+      mapPoints.boundingBox = new Rectangle(
+
+            bboxTopLeft_DevX,
+            bboxTopLeft_DevY,
+            bboxWidth,
+            bboxHeight);
+
+      final double latitudeMin_Resized = tourLocation.latitudeMin_Resized;
+      final double latitudeMax_Resized = tourLocation.latitudeMax_Resized;
+      final double longitudeMin_Resized = tourLocation.longitudeMin_Resized;
+      final double longitudeMax_Resized = tourLocation.longitudeMax_Resized;
+
+      final boolean isBBoxResized = false
+
+            || latitudeMin != latitudeMin_Resized
+            || latitudeMax != latitudeMax_Resized
+
+            || longitudeMin != longitudeMin_Resized
+            || longitudeMax != longitudeMax_Resized;
+
+      if (isBBoxResized) {
+
+         // draw resized bbox
+
+// SET_FORMATTING_OFF
+
+         final java.awt.Point providedBBox_TopLeft_Resized     = _mp.geoToPixel(new GeoPosition(latitudeMax_Resized, longitudeMin_Resized), _mapZoomLevel);
+         final java.awt.Point providedBBox_TopRight_Resized    = _mp.geoToPixel(new GeoPosition(latitudeMax_Resized, longitudeMax_Resized), _mapZoomLevel);
+         final java.awt.Point providedBBox_BottomLeft_Resized  = _mp.geoToPixel(new GeoPosition(latitudeMin_Resized, longitudeMin_Resized), _mapZoomLevel);
+
+         final int bboxTopLeft_DevX_Resized     = providedBBox_TopLeft_Resized.x - viewportX;
+         final int bboxTopRight_DevX_Resized    = providedBBox_TopRight_Resized.x - viewportX;
+         final int bboxTopLeft_DevY_Resized     = providedBBox_TopLeft_Resized.y - viewportY;
+         final int bboxBottomLeft_DevY_Resized  = providedBBox_BottomLeft_Resized.y - viewportY;
+
+         final int bboxWidth_Resized            = bboxTopRight_DevX_Resized - bboxTopLeft_DevX_Resized;
+         final int bboxHeight_Resized           = bboxBottomLeft_DevY_Resized - bboxTopLeft_DevY_Resized;
+
+// SET_FORMATTING_ON
+
+         mapPoints.boundingBox_Resized = new Rectangle(
+
+               bboxTopLeft_DevX_Resized,
+               bboxTopLeft_DevY_Resized,
+               bboxWidth_Resized,
+               bboxHeight_Resized
+
+         );
+      }
+
+      /*
+       * Paint each bbox with a different color but use the same color for the same bbox
+       */
+      final long bboxKey = tourLocation.boundingBoxKey;
+
+      Color boundingBoxColor = _locationColors.get(bboxKey);
+
+      if (boundingBoxColor == null) {
+
+         // create bbox color
+
+         boundingBoxColor = createBoundingBoxColor();
+
+         _locationColors.put(bboxKey, boundingBoxColor);
+      }
+
+      mapPoints.boundingBox_Color = boundingBoxColor;
    }
 
    /**
@@ -5093,11 +5257,11 @@ public class Map2 extends Canvas {
       }
 
       if (markerConfig.isShowCommonLocation) {
-         createMapPoints_CommonLocations(_allCommonLocations, allMapLocationPoints);
+         createMapPoints_Locations_20_Common(_allCommonLocations, allMapLocationPoints);
       }
 
       if (markerConfig.isShowTourLocation) {
-         createMapPoints_TourLocations(allTourData, allMapLocationPoints);
+         createMapPoints_Locations_10_Tour(allTourData, allMapLocationPoints);
       }
 
       if (allMapMarkerPoints.size() == 0 && allMapLocationPoints.size() == 0) {
@@ -5195,7 +5359,7 @@ public class Map2 extends Canvas {
 
       final Collection<Map2Point> allTourLocations = new ArrayList<>();
 
-      createMapPoints_TourLocations(allTourData, allTourLocations);
+      createMapPoints_Locations_10_Tour(allTourData, allTourLocations);
 
       final Map2Point[] allTourLocationsArray = allTourLocations.toArray(new Map2Point[allTourLocations.size()]);
 
@@ -5527,8 +5691,8 @@ public class Map2 extends Canvas {
    /**
     * @param gc
     * @param allClusterRectangle
-    * @param allMapMarker
-    * @param allPaintedMarkers
+    * @param allMapPoints
+    * @param allPaintedMapPoints
     * @param allPaintedTourLocations
     * @param allTourLocationsArray
     * @param isPaintClusterMarker
@@ -5538,8 +5702,8 @@ public class Map2 extends Canvas {
    private int paint_BackgroundImage_80_MarkerAndLocations(final GC gc,
                                                            final Rectangle[] allClusterRectangle,
 
-                                                           final Map2Point[] allMapMarker,
-                                                           final List<PaintedMapPoint> allPaintedMarkers,
+                                                           final Map2Point[] allMapPoints,
+                                                           final List<PaintedMapPoint> allPaintedMapPoints,
 
                                                            final Map2Point[] allTourLocations,
                                                            final List<PaintedMapPoint> allPaintedTourLocations,
@@ -5551,7 +5715,12 @@ public class Map2 extends Canvas {
       final int maxVisibleItems = markerConfig.labelDistributorMaxLabels;
       final int clusterSymbolBorder = 10;
 
-      final int numAllMarkers = allMapMarker.length;
+      // use different colors each time
+      if (_colorSwitchCounter++ % 50 == 0) {
+         _locationColors.clear();
+      }
+
+      final int numAllMarkers = allMapPoints.length;
       final int numAllLocations = allTourLocations.length;
 
       // limit markers/locations
@@ -5617,7 +5786,7 @@ public class Map2 extends Canvas {
 
          allMarkerLabels = createLabelSpreaderLabels(
                gc,
-               allMapMarker,
+               allMapPoints,
                numAllMarkers,
                numVisibleMarkers);
 
@@ -5726,6 +5895,22 @@ public class Map2 extends Canvas {
 
          final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
+         // paint location bounding box
+         if (markerConfig.isShowLocationBoundingBox) {
+
+            gc.setForeground(mapPoint.boundingBox_Color);
+            
+            // draw original bbox
+            gc.drawRectangle(mapPoint.boundingBox);
+
+            if (mapPoint.boundingBox_Resized != null) {
+
+               // draw resized bbox
+               gc.drawRectangle(mapPoint.boundingBox_Resized);
+            }
+         }
+
+         // draw location label
          final String text = mapPoint.getFormattedLabel();
          final Point textExtent = gc.textExtent(text);
 
@@ -5798,7 +5983,7 @@ public class Map2 extends Canvas {
             gc.drawString(text, labelDevX, labelDevY, true);
 
             // keep painted positions
-            allPaintedMarkers.add(new PaintedMapPoint(mapPoint, markerLabelRectangle));
+            allPaintedMapPoints.add(new PaintedMapPoint(mapPoint, markerLabelRectangle));
 
          } else {
 
@@ -5808,7 +5993,7 @@ public class Map2 extends Canvas {
                   gc,
                   mapPoint,
                   markerLabelRectangle,
-                  allPaintedMarkers);
+                  allPaintedMapPoints);
          }
       }
 
@@ -5847,12 +6032,12 @@ public class Map2 extends Canvas {
          gc.drawRectangle(markerSymbolRectangle);
 
          // keep painted symbol position
-         final PaintedMapPoint paintedMarker = allPaintedMarkers.get(paintedMarkerIndex++);
+         final PaintedMapPoint paintedMarker = allPaintedMapPoints.get(paintedMarkerIndex++);
          paintedMarker.symbolRectangle = markerSymbolRectangle;
       }
 
       /*
-       * Draw location icon
+       * Draw location symbol
        */
       int paintedLocationIndex = 0;
 
@@ -5892,14 +6077,20 @@ public class Map2 extends Canvas {
 
          if (numDuplicates_Start > 0 && numDuplicates_End > 0) {
 
+            // start & end location
+
             gc.drawImage(_imageMapLocation_End, iconDevX, iconDevY);
             gc.drawImage(_imageMapLocation_Start, iconDevX, iconDevY);
 
          } else if (numDuplicates_Start > 0) {
 
+            // start location
+
             gc.drawImage(_imageMapLocation_Start, iconDevX, iconDevY);
 
          } else if (numDuplicates_End > 0) {
+
+            // end location
 
             gc.drawImage(_imageMapLocation_End, iconDevX, iconDevY);
 
@@ -5907,9 +6098,13 @@ public class Map2 extends Canvas {
 
             if (mapPoint.locationType.equals(LocationType.Common)) {
 
+               // common location
+
                gc.drawImage(_imageMapLocation_Common, iconDevX, iconDevY);
 
             } else {
+
+               // other location
 
                gc.drawImage(_imageMapLocation, iconDevX, iconDevY);
             }

@@ -243,15 +243,7 @@ public class Map2View extends ViewPart implements
    static final String           STATE_IS_TOGGLE_KEYBOARD_PANNING                      = "STATE_IS_TOGGLE_KEYBOARD_PANNING";                    //$NON-NLS-1$
    static final boolean          STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT              = true;
 
-   // locations + marker
-   public static final String    STATE_IS_SHOW_LOCATION_BOUNDING_BOX                   = "STATE_IS_SHOW_LOCATION_BOUNDING_BOX";                           //$NON-NLS-1$
-   public static final boolean   STATE_IS_SHOW_LOCATION_BOUNDING_BOX_DEFAULT           = true;
-
-//   public static final String    STATE_IS_SHOW_COMMON_LOCATIONS                        = "STATE_IS_SHOW_COMMON_LOCATIONS";                           //$NON-NLS-1$
-//   public static final boolean   STATE_IS_SHOW_COMMON_LOCATIONS_DEFAULT                = true;
-//   public static final String    STATE_IS_SHOW_TOUR_LOCATIONS                          = "STATE_IS_SHOW_TOUR_LOCATIONS";                           //$NON-NLS-1$
-//   public static final boolean   STATE_IS_SHOW_TOUR_LOCATIONS_DEFAULT                  = true;
-
+   // hovered/selected tour
    public static final String    STATE_IS_SHOW_HOVERED_SELECTED_TOUR                            = "STATE_IS_SHOW_HOVERED_SELECTED_TOUR";                 //$NON-NLS-1$
    public static final boolean   STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT                    = true;
    static final String           STATE_HOVERED_SELECTED__HOVERED_OPACITY                        = "STATE_HOVERED_SELECTED__HOVERED_OPACITY";             //$NON-NLS-1$
@@ -560,7 +552,7 @@ public class Map2View extends ViewPart implements
    private GeoFilter_LoaderData              _geoFilter_PreviousGeoLoaderItem;
    private AtomicInteger                     _geoFilter_RunningId  = new AtomicInteger();
    //
-   private SlideoutMap2_MapPoints    _slideoutMapLocation;
+   private SlideoutMap2_MapPoints            _slideoutMapLocation;
    //
    /*
     * UI controls
@@ -3426,7 +3418,6 @@ public class Map2View extends ViewPart implements
 
          _map.setLocations_Common(null);
 
-
          return;
       }
 
@@ -3437,7 +3428,6 @@ public class Map2View extends ViewPart implements
       }
 
       _map.setLocations_Common(allTourLocations);
-
 
       if (_isMapSyncWith_MapLocation) {
 
@@ -5583,15 +5573,6 @@ public class Map2View extends ViewPart implements
       TourPainterConfiguration.pauseDuration          = pauseDuration;
       TourPainterConfiguration.pauseDurationOperator  = pauseDurationOperator;
 
-      /*
-       * Location/marker
-       */
-      final boolean isShowMapLocations_BBox = Util.getStateBoolean(_state,
-            Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX,
-            Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX_DEFAULT);
-
-
-
 // SET_FORMATTING_ON
 
       // enable/disable cluster/marker tooltip
@@ -5603,16 +5584,6 @@ public class Map2View extends ViewPart implements
       } else {
          _map.getMapMarkerTooltip().deactivate();
       }
-
-      /*
-       * Update options for the map direct painter
-       */
-      _directMappingPainter.setPaintingOptions_2(
-
-            isShowMapLocations_BBox,
-
-
-            isBackgroundDark);
 
       setIconPosition_TourInfo();
       setIconPosition_TourWeather();

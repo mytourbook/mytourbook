@@ -24,6 +24,7 @@ import net.tourbook.common.util.ToolTip;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.location.TourLocationUI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -113,8 +114,14 @@ public class MapPointToolTip extends ToolTip {
    }
 
    private void createUI_TourLocation(final Composite parent, final TourLocation tourLocation) {
-      // TODO Auto-generated method stub
 
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         // location fields
+         TourLocationUI.createUI(container, tourLocation);
+      }
    }
 
    private void createUI_TourMarker(final Composite parent, final TourMarker tourMarker) {

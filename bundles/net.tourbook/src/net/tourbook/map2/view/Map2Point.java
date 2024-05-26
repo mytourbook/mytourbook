@@ -22,6 +22,7 @@ import net.tourbook.map.location.LocationType;
 import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
 
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Rectangle;
 import org.oscim.core.GeoPoint;
 
 /**
@@ -61,6 +62,11 @@ public class Map2Point implements ClusterItem {
     * Type of the tour location {@link #tourLocation}
     */
    public LocationType locationType;
+
+   public Color        boundingBox_Color;
+   
+   public Rectangle    boundingBox;
+   public Rectangle    boundingBox_Resized;
 
    /**
     * @param tourMarker

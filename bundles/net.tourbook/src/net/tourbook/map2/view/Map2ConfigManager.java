@@ -82,6 +82,7 @@ public class Map2ConfigManager {
    private static final String TAG_MARKER                                = "Marker";                            //$NON-NLS-1$
    // location
    private static final String ATTR_IS_SHOW_COMMON_LOCATION              = "isShowCommonLocation";              //$NON-NLS-1$
+   private static final String ATTR_IS_SHOW_LOCATION_BOUNDING_BOX        = "isShowLocationBoundingBox";         //$NON-NLS-1$
    private static final String ATTR_IS_SHOW_TOUR_LOCATION                = "isShowTourLocation";                //$NON-NLS-1$
    private static final String TAG_COMMON_LOCATION_FILL_COLOR            = "commonLocationFillColor";           //$NON-NLS-1$
    private static final String TAG_COMMON_LOCATION_FILL_HOVERED_COLOR    = "commonLocationFillHoveredColor";    //$NON-NLS-1$
@@ -318,6 +319,7 @@ public class Map2ConfigManager {
           * Location
           */
          xmlConfig.putBoolean(      ATTR_IS_SHOW_TOUR_LOCATION,                  config.isShowTourLocation);
+         xmlConfig.putBoolean(      ATTR_IS_SHOW_LOCATION_BOUNDING_BOX,          config.isShowLocationBoundingBox);
          xmlConfig.putBoolean(      ATTR_IS_SHOW_COMMON_LOCATION,                config.isShowCommonLocation);
 
          Util.setXmlRgb(xmlConfig,  TAG_COMMON_LOCATION_FILL_COLOR,              config.commonLocationFill_RGB);
@@ -459,6 +461,7 @@ public class Map2ConfigManager {
       config.name                         = Util.getXmlString (xmlConfig,     ATTR_CONFIG_NAME,                   UI.EMPTY_STRING);
 
       config.isShowCommonLocation         = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_COMMON_LOCATION,       true);
+      config.isShowLocationBoundingBox    = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_LOCATION_BOUNDING_BOX, false);
       config.isShowTourLocation           = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_LOCATION,         true);
       config.isShowTourMarker             = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_MARKER,           true);
 
@@ -482,7 +485,6 @@ public class Map2ConfigManager {
       config.markerLabelLayout = (MapLabelLayout) Util.getXmlEnum(xmlConfig,  ATTR_MARKER_LABEL_LAYOUT,           LABEL_LAYOUT_DEFAULT);
 
 // SET_FORMATTING_ON
-
 
       /*
        * Each color is in it's own tag

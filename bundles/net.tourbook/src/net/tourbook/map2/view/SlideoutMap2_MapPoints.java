@@ -1674,7 +1674,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
       final boolean isGroupMarkers           = isShowTourMarker && isGroupDuplicatedMarkers;
       final boolean isShowClusteredMarker    = isShowTourMarker && isMarkerClustered;
-      final boolean isShowLabels             = isShowTourMarker || isShowTourLocations;
+      final boolean isShowLabels             = isShowTourMarker || isShowTourLocations || isShowCommonLocations;
 
       _colorMapTransparencyColor.setEnabled(isDimMap == false || isUseTransparencyColor);
 
@@ -1693,7 +1693,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       _chkIsClusterSymbolAntialiased      .setEnabled(isShowClusteredMarker);
       _chkIsClusterTextAntialiased        .setEnabled(isShowClusteredMarker);
       _chkIsFillClusterSymbol             .setEnabled(isShowClusteredMarker);
-
       _chkIsGroupDuplicatedMarkers        .setEnabled(isShowTourMarker);
       _chkIsGroupDuplicatedMarkers_All    .setEnabled(isShowTourMarker);
       _chkIsMarkerClustered               .setEnabled(isShowTourMarker);
@@ -1701,14 +1700,12 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       _lblClusterGrid_Size                .setEnabled(isShowClusteredMarker);
       _lblClusterSymbol                   .setEnabled(isShowClusteredMarker);
       _lblClusterSymbol_Size              .setEnabled(isShowClusteredMarker);
-
       _lblMarkerLabel_Color               .setEnabled(isShowTourMarker);
       _lblMarkerLabel_HoveredColor        .setEnabled(isShowTourMarker);
 
       _spinnerClusterGrid_Size            .setEnabled(isShowClusteredMarker);
       _spinnerClusterSymbol_Size          .setEnabled(isShowClusteredMarker);
       _spinnerClusterOutline_Width        .setEnabled(isShowClusteredMarker);
-
       _spinnerLabelWrapLength             .setEnabled(isShowTourMarker);
 
       _colorClusterSymbol_Fill            .setEnabled(isShowClusteredMarker);
@@ -1717,6 +1714,17 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       _colorMarkerLabel_Fill_Hovered      .setEnabled(isShowTourMarker);
       _colorMarkerLabel_Outline           .setEnabled(isShowTourMarker);
       _colorMarkerLabel_Outline_Hovered   .setEnabled(isShowTourMarker);
+
+      // groups
+      _lblGroupDuplicatedMarkers          .setEnabled(isGroupMarkers);
+      _lblLabelGroupGridSize              .setEnabled(isGroupMarkers);
+      _spinnerLabelGroupGridSize          .setEnabled(isGroupMarkers);
+      _txtGroupDuplicatedMarkers          .setEnabled(isGroupMarkers);
+
+      // map dimming
+      _chkUseMapDimColor                  .setEnabled(isDimMap);
+      _colorMapDimColor                   .setEnabled(isDimMap);
+      _spinnerMapDimValue                 .setEnabled(isDimMap);
 
       // common location
       _btnSwapCommonLocationLabel_Color         .setEnabled(isShowCommonLocations);
@@ -1737,16 +1745,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       _colorTourLocationLabel_Outline_Hovered   .setEnabled(isShowTourLocations);
 
       _chkIsShowMapLocations_BoundingBox        .setEnabled(isShowCommonLocations || isShowTourLocations);
-
-      // groups
-      _lblGroupDuplicatedMarkers          .setEnabled(isGroupMarkers);
-      _lblLabelGroupGridSize              .setEnabled(isGroupMarkers);
-      _spinnerLabelGroupGridSize          .setEnabled(isGroupMarkers);
-      _txtGroupDuplicatedMarkers          .setEnabled(isGroupMarkers);
-
-      _chkUseMapDimColor                  .setEnabled(isDimMap);
-      _colorMapDimColor                   .setEnabled(isDimMap);
-      _spinnerMapDimValue                 .setEnabled(isDimMap);
 
       /*
        * Common locations
@@ -1877,8 +1875,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       // force spinner controls to have the same width
       _spinnerGridData = GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(3), SWT.DEFAULT);
 
-//      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI());
-
       _columnSortListener = new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
@@ -1937,19 +1933,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       }
 
       return false;
-   }
-
-   private void onChangeUI() {
-
-// SET_FORMATTING_OFF
-
-      _state_Map2.put(Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX,    _chkIsShowMapLocations_BoundingBox.getSelection());
-
-// SET_FORMATTING_ON
-
-      repaintMap();
-
-      enableControls();
    }
 
    @Override
@@ -2232,17 +2215,11 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void restoreState() {
 
-      _chkIsShowMapLocations_BoundingBox.setSelection(Util.getStateBoolean(_state_Map2,
-            Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX,
-            Map2View.STATE_IS_SHOW_LOCATION_BOUNDING_BOX_DEFAULT));
-
-      /*
-       * Tour marker
-       */
       final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
 
 // SET_FORMATTING_OFF
 
+      _chkIsShowMapLocations_BoundingBox  .setSelection( config.isShowLocationBoundingBox);
       _chkIsShowCommonLocations           .setSelection( config.isShowCommonLocation);
       _chkIsShowCommonLocations_All       .setSelection( config.isShowCommonLocation);
       _chkIsShowTourLocations             .setSelection( config.isShowTourLocation);
@@ -2323,6 +2300,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
 // SET_FORMATTING_OFF
 
+      config.isShowLocationBoundingBox    = _chkIsShowMapLocations_BoundingBox   .getSelection();
       config.isShowCommonLocation         = _chkIsShowCommonLocations            .getSelection();
       config.isShowTourLocation           = _chkIsShowTourLocations              .getSelection();
       config.isShowTourMarker             = _chkIsShowTourMarker                 .getSelection();

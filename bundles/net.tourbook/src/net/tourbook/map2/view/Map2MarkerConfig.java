@@ -41,6 +41,7 @@ public class Map2MarkerConfig {
     */
    public boolean isShowTourLocation                = true;
    public boolean isShowCommonLocation              = true;
+   public boolean isShowLocationBoundingBox;
 
    public RGB     commonLocationFill_RGB            = Map2ConfigManager.DEFAULT_COMMON_LOCATION_FILL_RGB;
    public RGB     commonLocationFill_Hovered_RGB    = Map2ConfigManager.DEFAULT_COMMON_LOCATION_FILL_HOVERED_RGB;
