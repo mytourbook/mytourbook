@@ -186,6 +186,7 @@ public class Images {
    public static final String MapLayer                                   = "map-layer.png";                                       //$NON-NLS-1$
    public static final String MapLayer_Dark                              = "map-layer-dark.png";                                  //$NON-NLS-1$
    public static final String MapLocation                                = "map-location.png";                                    //$NON-NLS-1$
+   public static final String MapLocation_BoundingBox                    = "map-location-boundingbox.png";                        //$NON-NLS-1$
    public static final String MapLocation_Start                          = "map-location-start.png";                              //$NON-NLS-1$
    public static final String MapLocationMarker                          = "map-location-marker.png";                             //$NON-NLS-1$
    public static final String MapLocationMarker_Address                  = "map-location-marker-address.png";                     //$NON-NLS-1$
