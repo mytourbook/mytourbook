@@ -593,9 +593,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    private Control createUI_100_Tab_All(final Composite parent) {
 
       final Composite tabContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()
-//      .grab(true, true)
-            .applyTo(tabContainer);
       GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(1).applyTo(tabContainer);
       {
          {
@@ -665,9 +662,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       final GridDataFactory gdSpan2 = GridDataFactory.fillDefaults().span(2, 1);
 
       final Composite tabContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()
-//            .grab(true, true)
-            .applyTo(tabContainer);
       GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(2).applyTo(tabContainer);
 //      tabContainer.setBackground(UI.SYS_COLOR_YELLOW);
       {
@@ -699,7 +693,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             gdLabel.applyTo(_lblVisibleLabels);
 
             final Composite container = new Composite(tabContainer, SWT.NONE);
-//            GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
             {
                // number of visible labels
@@ -757,7 +750,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
              * Dim map
              */
             final Composite dimContainer = new Composite(tabContainer, SWT.NONE);
-//            GridDataFactory.fillDefaults().grab(true, false).applyTo(dimContainer);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(dimContainer);
             {
                // checkbox
@@ -818,7 +810,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    private Control createUI_200_Tab_TourMarker(final Composite parent) {
 
       final Composite tabContainer = new Composite(parent, SWT.NONE);
-//      GridDataFactory.fillDefaults().grab(true, true).applyTo(tabContainer);
       GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(1).applyTo(tabContainer);
       {
          {
@@ -831,7 +822,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
          }
 
          final Composite container = new Composite(tabContainer, SWT.NONE);
-//         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
          {
             createUI_220_TourMarker_Label(container);
@@ -861,7 +851,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
          }
          {
             final Composite container = new Composite(parent, SWT.NONE);
-//            GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
             GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 
             // outline/text color
@@ -897,7 +886,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
          }
          {
             final Composite container = new Composite(parent, SWT.NONE);
-//            GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
             GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 
             // outline/text color
@@ -977,7 +965,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
          }
          {
             final Composite container = new Composite(parent, SWT.NONE);
-//            GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
             {
                // spinner: symbol size
@@ -1021,7 +1008,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
          {
             final Composite container = new Composite(parent, SWT.NONE);
-//            GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
             GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 
             // foreground color
@@ -1087,7 +1073,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    private Control createUI_250_Tab_Groups(final Composite parent) {
 
       final Composite tabContainer = new Composite(parent, SWT.NONE);
-//      GridDataFactory.fillDefaults().grab(true, true).applyTo(tabContainer);
       GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(2).applyTo(tabContainer);
       {
          {
@@ -1098,7 +1083,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             _chkIsGroupDuplicatedMarkers.setText("&Group tour markers with the same label");
             _chkIsGroupDuplicatedMarkers.addSelectionListener(_markerSelectionListener);
             GridDataFactory.fillDefaults()
-//                  .grab(true, false)
                   .span(2, 1)
                   .applyTo(_chkIsGroupDuplicatedMarkers);
 
@@ -1140,7 +1124,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             _txtGroupDuplicatedMarkers.setToolTipText("");
             _txtGroupDuplicatedMarkers.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onModifyConfig(false)));
             GridDataFactory.fillDefaults()
-//                  .grab(true, true)
                   .span(2, 1)
                   .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
                   .applyTo(_txtGroupDuplicatedMarkers);
@@ -1153,7 +1136,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    private Control createUI_300_Tab_TourLocations(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-//      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(2).applyTo(container);
       {
          createUI_310_TourLocation_Label(container);
@@ -1191,7 +1173,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
          }
          {
             final Composite container = new Composite(parent, SWT.NONE);
-//            GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
             GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 
             // outline/text color
@@ -1227,7 +1208,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
          }
          {
             final Composite container = new Composite(parent, SWT.NONE);
-//            GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
             GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 
             // outline/text color
@@ -1273,7 +1253,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             .indent(UI.FORM_FIRST_COLUMN_INDENT, 0);
 
       final Composite container = new Composite(parent, SWT.NONE);
-//      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          {
@@ -1299,7 +1278,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             }
             {
                final Composite labelContainer = new Composite(container, SWT.NONE);
-//               GridDataFactory.fillDefaults().grab(true, false).applyTo(labelContainer);
                GridLayoutFactory.fillDefaults().numColumns(3).applyTo(labelContainer);
 
                // outline/text color
@@ -1335,7 +1313,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             }
             {
                final Composite hoveredContainer = new Composite(container, SWT.NONE);
-//               GridDataFactory.fillDefaults().grab(true, false).applyTo(hoveredContainer);
                GridLayoutFactory.fillDefaults().numColumns(3).applyTo(hoveredContainer);
 
                // outline/text color
