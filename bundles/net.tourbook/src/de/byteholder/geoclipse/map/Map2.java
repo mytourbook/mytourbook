@@ -1877,6 +1877,44 @@ public class Map2 extends Canvas {
       _mp.disposeTiles();
    }
 
+   private Point finetuneClusterLabelPosition(final boolean isOneDigit) {
+
+      /*
+       * Do fine adjustment to center the number within the circle
+       */
+      final int offsetX;
+      final int offsetY;
+
+// SET_FORMATTING_OFF
+
+      if (        _clusterFontSize > 19) {   offsetX = isOneDigit ? 0 : -1;
+      } else if ( _clusterFontSize > 17) {   offsetX = isOneDigit ? -1 : -1;
+      } else if ( _clusterFontSize > 15) {   offsetX = isOneDigit ? 0 : -1;
+      } else if ( _clusterFontSize > 13) {   offsetX = isOneDigit ? 0 : -1;
+      } else if ( _clusterFontSize > 11) {   offsetX = isOneDigit ? 0 : -1;
+      } else if ( _clusterFontSize >  9) {   offsetX = isOneDigit ? 1 : -1;
+      } else if ( _clusterFontSize >  7) {   offsetX = isOneDigit ? 0 : -1;
+      } else if ( _clusterFontSize >  5) {   offsetX = isOneDigit ? 0 : -1;
+      } else if ( _clusterFontSize >  3) {   offsetX = isOneDigit ? 0 : -1;
+      } else {                               offsetX = isOneDigit ? 1 : -1;
+      }
+
+      if (        _clusterFontSize > 19) {   offsetY = isOneDigit ? 0 : 0;
+      } else if ( _clusterFontSize > 17) {   offsetY = isOneDigit ? 1 : 1;
+      } else if ( _clusterFontSize > 15) {   offsetY = isOneDigit ? 0 : 0;
+      } else if ( _clusterFontSize > 13) {   offsetY = isOneDigit ? 2 : 2;
+      } else if ( _clusterFontSize > 11) {   offsetY = 2;
+      } else if ( _clusterFontSize >  9) {   offsetY = isOneDigit ? 2 : 2;
+      } else if ( _clusterFontSize >  7) {   offsetY = isOneDigit ? 3 : 3;
+      } else if ( _clusterFontSize >  5) {   offsetY = 2;
+      } else {                               offsetY = 3;
+      }
+
+// SET_FORMATTING_ON
+
+      return new Point(offsetX, offsetY);
+   }
+
    private void fireEvent_HoveredTour(final Long hoveredTourId, final int hoveredValuePointIndex) {
 
       final MapHoveredTourEvent event = new MapHoveredTourEvent(
@@ -5275,7 +5313,7 @@ public class Map2 extends Canvas {
                    * locations at the beginning that they are hit before the other !!!
                    */
 
-                  paint_BackgroundImage_70_HoveredCluster(gcCanvas,
+                  paint_BackgroundImage_70_OneCluster_Hovered(gcCanvas,
                         _hoveredMarkerCluster,
                         allPaintedClusterMarkers);
                }
@@ -5599,52 +5637,9 @@ public class Map2 extends Canvas {
       int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
       int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
 
-      final String text = clusterLabel;
-      final int textLength = text.length();
+      final int textLength = clusterLabel.length();
 
-      /*
-       * Do fine adjustment to center the number within the circle
-       */
-      final int offsetX;
-      final int offsetY;
-      final boolean isOneDigit = textLength == 1;
-
-// SET_FORMATTING_OFF
-
-      if (        _clusterFontSize > 19) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize > 17) {   offsetX = isOneDigit ? -1 : -1;
-      } else if ( _clusterFontSize > 15) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize > 13) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize > 11) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize >  9) {   offsetX = isOneDigit ? 1 : -1;
-      } else if ( _clusterFontSize >  7) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize >  5) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize >  3) {   offsetX = isOneDigit ? 0 : -1;
-      } else {                               offsetX = isOneDigit ? 1 : -1;
-      }
-
-      if (        _clusterFontSize > 19) {   offsetY = isOneDigit ? 0 : 0;
-      } else if ( _clusterFontSize > 17) {   offsetY = isOneDigit ? 1 : 1;
-      } else if ( _clusterFontSize > 15) {   offsetY = isOneDigit ? 0 : 0;
-      } else if ( _clusterFontSize > 13) {   offsetY = isOneDigit ? 2 : 2;
-      } else if ( _clusterFontSize > 11) {   offsetY = 2;
-      } else if ( _clusterFontSize >  9) {   offsetY = isOneDigit ? 2 : 2;
-      } else if ( _clusterFontSize >  7) {   offsetY = isOneDigit ? 3 : 3;
-      } else if ( _clusterFontSize >  5) {   offsetY = 2;
-      } else {                               offsetY = 3;
-      }
-
-// SET_FORMATTING_ON
-
-//         final FontData fontDataNew = _clusterFont.getFontData()[0];
-//
-//         System.out.println(UI.timeStamp()
-//               + " _clusterFontSize: " + _clusterFontSize
-////               + " - new: " + fontDataNew.height
-//               + "  x: " + offsetX
-//               + "  y: " + offsetY);
-
-      final Point textExtent = gc.stringExtent(text);
+      final Point textExtent = gc.stringExtent(clusterLabel);
 
       final int textWidth = textLength < 2 ? textExtent.x + 2 : textExtent.x;
       final int textHeight = textExtent.y;
@@ -5661,6 +5656,11 @@ public class Map2 extends Canvas {
 
       final int ovalDevX = devX - circleSize2 + textWidth2 - 2;
       final int ovalDevY = devY - circleSize2 + textHeight2 + 2;
+
+      final Point labelOffset = finetuneClusterLabelPosition(textLength == 1);
+
+      final int clusterLabelDevX = devX + labelOffset.x;
+      final int clusterLabelDevY = devY + labelOffset.y;
 
       final boolean isPaintBackground = _isMarkerClusterSelected ? false : true;
 
@@ -5692,11 +5692,8 @@ public class Map2 extends Canvas {
                circleSize);
       }
 
-      final int clusterLabelDevX = devX + offsetX;
-      final int clusterLabelDevY = devY + offsetY;
-
       gc.drawString(
-            text,
+            clusterLabel,
             clusterLabelDevX,
             clusterLabelDevY,
             true);
@@ -5731,9 +5728,9 @@ public class Map2 extends Canvas {
     * @param hoveredMarkerCluster
     * @param allPaintedMarkerPoints
     */
-   private void paint_BackgroundImage_70_HoveredCluster(final GC gc,
-                                                        final PaintedMarkerCluster hoveredMarkerCluster,
-                                                        final List<PaintedMapPoint> allPaintedMarkerPoints) {
+   private void paint_BackgroundImage_70_OneCluster_Hovered(final GC gc,
+                                                            final PaintedMarkerCluster hoveredMarkerCluster,
+                                                            final List<PaintedMapPoint> allPaintedMarkerPoints) {
 
       final Map2Point[] allClusterMarkerPoints = hoveredMarkerCluster.allClusterMarker;
       final int numAllMarkers = allClusterMarkerPoints.length;
@@ -5760,51 +5757,56 @@ public class Map2 extends Canvas {
             true, // isPaintClusterMarker
             new Rectangle[] { clusterRectangle });
 
+      if (_isMarkerClusterSelected) {
+         return;
+      }
+
       /*
        * Draw number of painted labels which can be different to the cluster labels
        */
 
-      if (_isMarkerClusterSelected == false) {
+      final int diffX = _backgroundPainter_MicroAdjustment_DiffX;
+      final int diffY = _backgroundPainter_MicroAdjustment_DiffY;
 
-         final int diffX = _backgroundPainter_MicroAdjustment_DiffX;
-         final int diffY = _backgroundPainter_MicroAdjustment_DiffY;
+      final int ovalDevX = clusterRectangle.x + diffX;
+      final int ovalDevY = clusterRectangle.y + diffY;
 
-         // the background must be filled because another number could be displayed
-         gc.setBackground(_isMarkerClusterSelected
-               ? UI.SYS_COLOR_BLUE
-               : markerConfig.clusterOutline_Color);
+      // the background must be filled because another number could be displayed
+      gc.setBackground(markerConfig.clusterOutline_Color);
 
-         gc.fillOval(
+      gc.fillOval(
 
-               clusterRectangle.x + diffX,
-               clusterRectangle.y + diffY,
+            ovalDevX,
+            ovalDevY,
 
-               clusterRectangle.width + 1,
-               clusterRectangle.height + 1);
+            clusterRectangle.width + 1,
+            clusterRectangle.height + 1);
 
-         final String numPlacedLabels_Text = Integer.toString(numPlacedLabels);
-         final Point numPlacedLabels_Size = gc.stringExtent(numPlacedLabels_Text);
+      // must be set BEFORE stringExtent !!!
+      gc.setFont(getClusterFont());
 
-         final int clusterSymbolDevX = hoveredMarkerCluster.clusterSymbolRectangle.x;
-         final int clusterSymbolWidth = hoveredMarkerCluster.clusterSymbolRectangle.width;
+      final String clusterLabel = Integer.toString(numPlacedLabels);
+      final Point clusterLabel_Size = gc.stringExtent(clusterLabel);
+      final int clusterLabelWidth = clusterLabel_Size.x;
+      final int clusterLabelHeight = clusterLabel_Size.y;
 
-         // center number in the cluster symbol
-         final int devX_NumPlacedLabels = clusterSymbolDevX + clusterSymbolWidth / 2 - numPlacedLabels_Size.x / 2 + diffX;
-         final int devY_NumPlacedLabels = hoveredMarkerCluster.clusterLabelDevY + diffY;
+      final int clusterSymbolWidth = clusterRectangle.width;
+      final int clusterSymbolHeight = clusterRectangle.height;
 
-         gc.setFont(getClusterFont());
-         gc.setForeground(_isMarkerClusterSelected
-               ? UI.SYS_COLOR_WHITE
-               : markerConfig.clusterFill_Color);
+      // center number in the cluster symbol
+      final int clusterLabelDevX = ovalDevX + clusterSymbolWidth / 2 - clusterLabelWidth / 2;
+      final int clusterLabelDevY = ovalDevY + clusterSymbolHeight / 2 - clusterLabelHeight / 2;
 
-         gc.drawString(
-               numPlacedLabels_Text,
-               devX_NumPlacedLabels,
-               devY_NumPlacedLabels,
-               true);
+      gc.setForeground(markerConfig.clusterFill_Color);
 
-         gc.setFont(null);
-      }
+      gc.drawString(clusterLabel,
+
+            clusterLabelDevX,
+            clusterLabelDevY,
+
+            true);
+
+      gc.setFont(null);
    }
 
    /**
