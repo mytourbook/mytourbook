@@ -61,6 +61,7 @@ import org.dinopolis.gpstool.gpsinput.GPSTrackpoint;
 import org.dinopolis.gpstool.gpsinput.garmin.GarminTrack;
 import org.dinopolis.gpstool.gpsinput.garmin.GarminTrackpointAdapter;
 import org.dinopolis.gpstool.gpsinput.garmin.GarminTrackpointD304;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.osgi.framework.Version;
@@ -112,30 +113,32 @@ public class TourExporter {
       _dateFormat.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
    }
 
-   private String       _activityType;
+   private String          _activityType;
    /**
     * The speed is in meters/second
     */
-   private float        _camouflageSpeed;
-   private String       _courseName;
-   private final String _formatTemplate;
-   private boolean      _isCamouflageSpeed;
-   private boolean      _isCourse;
-   private boolean      _isExportAllTourData;
-   private boolean      _isExportSurfingWaves;
-   private boolean      _isExportWithBarometer;
-   private boolean      _isRange;
-   private TourData     _tourData;
-   private int          _tourEndIndex;
-   private int          _tourStartIndex;
-   private boolean      _useAbsoluteDistance;
-   private boolean      _useActivityType;
-   private boolean      _useDescription;
+   private float           _camouflageSpeed;
+   private String          _courseName;
+   private boolean         _displayNotificationPopup;
+   private final String    _formatTemplate;
+   private ImageDescriptor _imageDescriptor;
+   private boolean         _isCamouflageSpeed;
+   private boolean         _isCourse;
+   private boolean         _isExportAllTourData;
+   private boolean         _isExportSurfingWaves;
+   private boolean         _isExportWithBarometer;
+   private boolean         _isRange;
+   private TourData        _tourData;
+   private int             _tourEndIndex;
+   private int             _tourStartIndex;
+   private boolean         _useAbsoluteDistance;
+   private boolean         _useActivityType;
+   private boolean         _useDescription;
 
-   private boolean      _isFIT;
-   private boolean      _isGPX;
-   private boolean      _isMT;
-   private boolean      _isTCX;
+   private boolean         _isFIT;
+   private boolean         _isGPX;
+   private boolean         _isMT;
+   private boolean         _isTCX;
 
    public TourExporter(final String formatTemplate) {
 
@@ -168,9 +171,12 @@ public class TourExporter {
                        final boolean isExportSurfingWaves,
                        final boolean isExportAllTourData,
                        final boolean isCourse,
-                       final String courseName) {
+                       final String courseName,
+                       final ImageDescriptor imageDescriptor) {
 
       this(formatTemplate);
+
+      _displayNotificationPopup = true;
 
       setUseDescription(useDescription);
       setIsExportWithBarometer(isExportWithBarometer);
@@ -189,6 +195,8 @@ public class TourExporter {
       //For TCX
       setIsCourse(isCourse);
       setCourseName(courseName);
+
+      _imageDescriptor = imageDescriptor;
    }
 
    public boolean doExport_10_Tour(final List<GarminTrack> tracks,
@@ -489,7 +497,6 @@ public class TourExporter {
     */
    private void doExport_24_MinMax_Other(final VelocityContext vcContext, final Date creationDate) {
 
-      //todo fb use the notification popup for each vendor export gpx, fit tcx mt
       Date starttime = null;
       Date endtime = null;
       int heartNum = 0;
@@ -985,12 +992,18 @@ public class TourExporter {
 
       doExport_70_WayPoints(wayPoints, tourMarkers, trackStartTime);
 
+      boolean exportStatus = false;
       try {
-         return doExport_10_Tour(tracks, wayPoints, tourMarkers, tourLap, exportFileName);
+         exportStatus = doExport_10_Tour(tracks, wayPoints, tourMarkers, tourLap, exportFileName);
       } catch (final IOException e) {
          StatusUtil.log(e);
       }
-      return false;
+
+      if (_displayNotificationPopup) {
+         UI.openNotificationPopup(Messages.dialog_export_dialog_title, _imageDescriptor, "the file exportFileName was successfully exported");
+      }
+
+      return exportStatus;
    }
 
    public void setActivityType(final String activityType) {
