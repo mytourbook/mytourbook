@@ -1082,7 +1082,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_Sodium.setColumnLabel(Messages.Tour_Nutrition_Label_Sodium);
       _colDef_Sodium.setColumnHeaderText(Messages.Tour_Nutrition_Label_Sodium);
-      _colDef_Calories.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Label_Sodium_Tooltip);
+      _colDef_Sodium.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Label_Sodium_Tooltip);
 
       _colDef_Sodium.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
 
