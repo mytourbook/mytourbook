@@ -14,10 +14,6 @@ TODO's
 
 * Support first column alignment in all views
 
-tooltip for the tour nutrition table :
-Calories: The quantity of calories per serving/product
-Sodium: The ... of sodium  ....
-
 * Update fulltext url https://lucene.apache.org/core/7_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Wildcard_Searches
   in https://mytourbook.sourceforge.io/mytourbook/index.php/documentation/show-tours/search
 
@@ -64,7 +60,8 @@ New
 Improvements
 ============
 
-* 
+* Tour Export (Frederic)
+  - Use of the notification popups for successful/unsuccessful exports
 
 Changes
 =======
