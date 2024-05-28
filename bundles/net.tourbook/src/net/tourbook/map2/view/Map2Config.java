@@ -23,7 +23,7 @@ import org.eclipse.swt.graphics.RGB;
 /**
  * Contains data which are needed to paint a marker into the 2D map
  */
-public class Map2MarkerConfig {
+public class Map2Config {
 
    private static final char NL = UI.NEW_LINE;
 
@@ -67,7 +67,6 @@ public class Map2MarkerConfig {
     * Marker
     */
    public boolean        isShowTourMarker          = true;
-   public boolean        isLabelAntialiased        = true;
 
    /** When <code>true</code> then markers with the same label are grouped together */
    public boolean        isGroupDuplicatedMarkers;
@@ -86,9 +85,16 @@ public class Map2MarkerConfig {
    public Color          markerOutline_Color;
    public Color          markerOutline_Hovered_Color;
 
-   public int            labelDistributorMaxLabels = Map2ConfigManager.LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT;
-   public int            labelDistributorRadius    = Map2ConfigManager.LABEL_DISTRIBUTOR_RADIUS_DEFAULT;
-   public int            labelWrapLength           = Map2ConfigManager.LABEL_WRAP_LENGTH_DEFAULT;
+   /*
+    * Label
+    */
+   public boolean isLabelAntialiased        = true;
+   public boolean isTruncateLabel;
+   public boolean isWrapLabel;
+   public int     labelDistributorMaxLabels = Map2ConfigManager.LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT;
+   public int     labelDistributorRadius    = Map2ConfigManager.LABEL_DISTRIBUTOR_RADIUS_DEFAULT;
+   public int     labelTruncateLength       = Map2ConfigManager.LABEL_TRUNCATE_LENGTH_DEFAULT;
+   public int     labelWrapLength           = Map2ConfigManager.LABEL_WRAP_LENGTH_DEFAULT;
 
    /*
     * Cluster

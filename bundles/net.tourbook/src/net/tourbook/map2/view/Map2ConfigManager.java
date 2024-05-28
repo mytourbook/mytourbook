@@ -78,8 +78,17 @@ public class Map2ConfigManager {
    /*
     * Tour marker, map bookmarks, photos
     */
-   private static final String TAG_TOUR_MARKERS                          = "TourMarkers";                       //$NON-NLS-1$
-   private static final String TAG_MARKER                                = "Marker";                            //$NON-NLS-1$
+   private static final String TAG_MAP_POINTS                            = "MapPoints";                         //$NON-NLS-1$
+   private static final String TAG_MAP_POINT                             = "MapPoint";                          //$NON-NLS-1$
+   // label
+   private static final String ATTR_IS_LABEL_ANTIALIASED                 = "isLabelAntialiased";                //$NON-NLS-1$
+   private static final String ATTR_IS_TRUNCATE_LABEL                    = "isTruncateLabel";                   //$NON-NLS-1$
+   private static final String ATTR_IS_WRAP_LABEL                        = "isWrapLabel";                       //$NON-NLS-1$
+   private static final String ATTR_LABEL_LAYOUT                         = "labelLayout";                       //$NON-NLS-1$
+   private static final String ATTR_LABEL_DISTRIBUTOR_MAX_LABELS         = "labelDistributorMaxLabels";         //$NON-NLS-1$
+   private static final String ATTR_LABEL_DISTRIBUTOR_RADIUS             = "labelDistributorRadius";            //$NON-NLS-1$
+   private static final String ATTR_LABEL_TRUNCATE_LENGTH                = "labelTruncateLength";               //$NON-NLS-1$
+   private static final String ATTR_LABEL_WRAP_LENGTH                    = "labelWrapLength";                   //$NON-NLS-1$
    // location
    private static final String ATTR_IS_SHOW_COMMON_LOCATION              = "isShowCommonLocation";              //$NON-NLS-1$
    private static final String ATTR_IS_SHOW_LOCATION_BOUNDING_BOX        = "isShowLocationBoundingBox";         //$NON-NLS-1$
@@ -94,16 +103,9 @@ public class Map2ConfigManager {
    private static final String TAG_TOUR_LOCATION_OUTLINE_HOVERED_COLOR   = "tourLocationOutlineHoveredColor";   //$NON-NLS-1$
    // marker
    private static final String ATTR_IS_SHOW_TOUR_MARKER                  = "isShowTourMarker";                  //$NON-NLS-1$
-   private static final String ATTR_IS_MARKER_LABEL_ANTIALIASED          = "isMarkerLabelAntialiased";          //$NON-NLS-1$
-   private static final String ATTR_MARKER_LABEL_LAYOUT                  = "markerLabelLayout";                 //$NON-NLS-1$
-   //
    private static final String ATTR_IS_GROUP_DUPLICATED_MARKERS          = "isGroupDuplicatedMarkers";          //$NON-NLS-1$
    private static final String ATTR_GROUPED_MARKERS                      = "groupedLabels";                     //$NON-NLS-1$
    private static final String ATTR_GROUP_GRID_SIZE                      = "groupGridSize";                     //$NON-NLS-1$
-   //
-   private static final String ATTR_LABEL_DISTRIBUTOR_MAX_LABELS         = "labelDistributorMaxLabels";         //$NON-NLS-1$
-   private static final String ATTR_LABEL_DISTRIBUTOR_RADIUS             = "labelDistributorRadius";            //$NON-NLS-1$
-   private static final String ATTR_LABEL_WRAP_LENGTH                    = "labelWrapLength";                   //$NON-NLS-1$
    //
    private static final String TAG_MARKER_FILL_COLOR                     = "MarkerFillColor";                   //$NON-NLS-1$
    private static final String TAG_MARKER_FILL_HOVERED_COLOR             = "MarkerFillHoveredColor";            //$NON-NLS-1$
@@ -136,6 +138,9 @@ public class Map2ConfigManager {
    static final int                   LABEL_DISTRIBUTOR_RADIUS_MIN                = 10;
    static final int                   LABEL_DISTRIBUTOR_RADIUS_MAX                = 2000;
    static final int                   LABEL_DISTRIBUTOR_RADIUS_DEFAULT            = 300;
+   static final int                   LABEL_TRUNCATE_LENGTH_MIN                   = 0;
+   static final int                   LABEL_TRUNCATE_LENGTH_MAX                   = 1000;
+   static final int                   LABEL_TRUNCATE_LENGTH_DEFAULT               = 40;
    static final int                   LABEL_WRAP_LENGTH_MIN                       = 10;
    static final int                   LABEL_WRAP_LENGTH_MAX                       = 1000;
    static final int                   LABEL_WRAP_LENGTH_DEFAULT                   = 40;
@@ -172,10 +177,10 @@ public class Map2ConfigManager {
    /**
     * Contains all configurations which are loaded from a xml file.
     */
-   private static final ArrayList<Map2MarkerConfig> _allMarkerConfigs = new ArrayList<>();
-   private static Map2MarkerConfig                  _activeMarkerConfig;
+   private static final ArrayList<Map2Config> _allMapPointConfigs = new ArrayList<>();
+   private static Map2Config                  _activeMapPointConfig;
    //
-   private static String                            _fromXml_ActiveMarkerConfigId;
+   private static String                      _fromXml_ActiveMarkerConfigId;
 
    //
    private static XMLMemento create_Root() {
@@ -200,11 +205,11 @@ public class Map2ConfigManager {
 
    private static void createDefaults_Markers() {
 
-      _allMarkerConfigs.clear();
+      _allMapPointConfigs.clear();
 
       // append custom configurations
       for (int configIndex = 1; configIndex < 11; configIndex++) {
-         _allMarkerConfigs.add(createDefaults_Markers_One(configIndex));
+         _allMapPointConfigs.add(createDefaults_Markers_One(configIndex));
       }
    }
 
@@ -214,9 +219,9 @@ public class Map2ConfigManager {
     *
     * @return
     */
-   private static Map2MarkerConfig createDefaults_Markers_One(final int configIndex) {
+   private static Map2Config createDefaults_Markers_One(final int configIndex) {
 
-      final Map2MarkerConfig config = new Map2MarkerConfig();
+      final Map2Config config = new Map2Config();
 
       final RGB fgBlack = new RGB(0, 0, 0);
       final RGB fgWhite = new RGB(0xff, 0xff, 0xff);
@@ -305,15 +310,26 @@ public class Map2ConfigManager {
       return config;
    }
 
-   private static void createXml_FromMarkerConfig(final Map2MarkerConfig config, final IMemento xmlMarkers) {
+   private static void createXml_FromMarkerConfig(final Map2Config config, final IMemento xmlMarkers) {
 
 // SET_FORMATTING_OFF
 
       // <Marker>
-      final IMemento xmlConfig = xmlMarkers.createChild(TAG_MARKER);
+      final IMemento xmlConfig = xmlMarkers.createChild(TAG_MAP_POINT);
       {
          xmlConfig.putString(ATTR_ID,           config.id);
          xmlConfig.putString(ATTR_CONFIG_NAME,  config.name);
+
+         /*
+          * Label
+          */
+         xmlConfig.putBoolean(      ATTR_IS_LABEL_ANTIALIASED,          config.isLabelAntialiased);
+         xmlConfig.putBoolean(      ATTR_IS_TRUNCATE_LABEL,             config.isTruncateLabel);
+         xmlConfig.putBoolean(      ATTR_IS_WRAP_LABEL,                 config.isWrapLabel);
+         xmlConfig.putInteger(      ATTR_LABEL_DISTRIBUTOR_MAX_LABELS,  config.labelDistributorMaxLabels);
+         xmlConfig.putInteger(      ATTR_LABEL_DISTRIBUTOR_RADIUS,      config.labelDistributorRadius);
+         xmlConfig.putInteger(      ATTR_LABEL_TRUNCATE_LENGTH,         config.labelTruncateLength);
+         xmlConfig.putInteger(      ATTR_LABEL_WRAP_LENGTH,             config.labelWrapLength);
 
          /*
           * Location
@@ -336,13 +352,12 @@ public class Map2ConfigManager {
           * Marker
           */
          xmlConfig.putBoolean(      ATTR_IS_SHOW_TOUR_MARKER,           config.isShowTourMarker);
-         xmlConfig.putBoolean(      ATTR_IS_MARKER_LABEL_ANTIALIASED,   config.isLabelAntialiased);
 
          xmlConfig.putBoolean(      ATTR_IS_GROUP_DUPLICATED_MARKERS,   config.isGroupDuplicatedMarkers);
          xmlConfig.putString(       ATTR_GROUPED_MARKERS,               config.groupedMarkers);
          xmlConfig.putInteger(      ATTR_GROUP_GRID_SIZE,               config.groupGridSize);
 
-         Util.setXmlEnum(xmlConfig, ATTR_MARKER_LABEL_LAYOUT,           config.markerLabelLayout);
+         Util.setXmlEnum(xmlConfig, ATTR_LABEL_LAYOUT,           config.markerLabelLayout);
 
          Util.setXmlRgb(xmlConfig,  TAG_MARKER_FILL_COLOR,              config.markerFill_RGB);
          Util.setXmlRgb(xmlConfig,  TAG_MARKER_FILL_HOVERED_COLOR,      config.markerFill_Hovered_RGB);
@@ -361,10 +376,6 @@ public class Map2ConfigManager {
          xmlConfig.putInteger(      ATTR_CLUSTER_OUTLINE_WIDTH,         config.clusterOutline_Width);
          xmlConfig.putInteger(      ATTR_CLUSTER_SYMBOL_SIZE,           config.clusterSymbol_Size);
 
-         xmlConfig.putInteger(      ATTR_LABEL_DISTRIBUTOR_MAX_LABELS,  config.labelDistributorMaxLabels);
-         xmlConfig.putInteger(      ATTR_LABEL_DISTRIBUTOR_RADIUS,      config.labelDistributorRadius);
-         xmlConfig.putInteger(      ATTR_LABEL_WRAP_LENGTH,             config.labelWrapLength);
-
          Util.setXmlRgb(xmlConfig,  TAG_CLUSTER_FILL_COLOR,             config.clusterFill_RGB);
          Util.setXmlRgb(xmlConfig,  TAG_CLUSTER_OUTLINE_COLOR,          config.clusterOutline_RGB);
       }
@@ -373,25 +384,25 @@ public class Map2ConfigManager {
 
    }
 
-   public static Map2MarkerConfig getActiveMarkerConfig() {
+   public static Map2Config getActiveConfig() {
 
-      if (_activeMarkerConfig == null) {
+      if (_activeMapPointConfig == null) {
          readConfigFromXml();
       }
 
-      return _activeMarkerConfig;
+      return _activeMapPointConfig;
    }
 
    /**
-    * @return Returns the index for the {@link #_activeMarkerConfig}, the index starts with 0.
+    * @return Returns the index for the {@link #_activeMapPointConfig}, the index starts with 0.
     */
-   public static int getActiveMarkerConfigIndex() {
+   public static int getActiveConfigIndex() {
 
-      final Map2MarkerConfig activeConfig = getActiveMarkerConfig();
+      final Map2Config activeConfig = getActiveConfig();
 
-      for (int configIndex = 0; configIndex < _allMarkerConfigs.size(); configIndex++) {
+      for (int configIndex = 0; configIndex < _allMapPointConfigs.size(); configIndex++) {
 
-         final Map2MarkerConfig config = _allMarkerConfigs.get(configIndex);
+         final Map2Config config = _allMapPointConfigs.get(configIndex);
 
          if (config.equals(activeConfig)) {
             return configIndex;
@@ -400,28 +411,28 @@ public class Map2ConfigManager {
 
       // this case should not happen but ensure that a correct config is set
 
-      setActiveMarkerConfig(_allMarkerConfigs.get(0));
+      setActiveMarkerConfig(_allMapPointConfigs.get(0));
 
       return 0;
    }
 
-   public static ArrayList<Map2MarkerConfig> getAllMarkerConfigs() {
+   public static ArrayList<Map2Config> getAllMarkerConfigs() {
 
       // ensure configs are loaded
-      getActiveMarkerConfig();
+      getActiveConfig();
 
-      return _allMarkerConfigs;
+      return _allMapPointConfigs;
    }
 
-   private static Map2MarkerConfig getConfig_Marker() {
+   private static Map2Config getConfig_Marker() {
 
-      Map2MarkerConfig activeConfig = null;
+      Map2Config activeConfig = null;
 
       if (_fromXml_ActiveMarkerConfigId != null) {
 
          // ensure config id belongs to a config which is available
 
-         for (final Map2MarkerConfig config : _allMarkerConfigs) {
+         for (final Map2Config config : _allMapPointConfigs) {
 
             if (config.id.equals(_fromXml_ActiveMarkerConfigId)) {
 
@@ -439,7 +450,7 @@ public class Map2ConfigManager {
 
          createDefaults_Markers();
 
-         activeConfig = _allMarkerConfigs.get(0);
+         activeConfig = _allMapPointConfigs.get(0);
       }
 
       return activeConfig;
@@ -453,7 +464,7 @@ public class Map2ConfigManager {
    }
 
    private static void parse_210_MarkerConfig(final XMLMemento xmlConfig,
-                                              final Map2MarkerConfig config) {
+                                              final Map2Config config) {
 
 // SET_FORMATTING_OFF
 
@@ -465,7 +476,6 @@ public class Map2ConfigManager {
       config.isShowTourLocation           = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_LOCATION,         true);
       config.isShowTourMarker             = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_MARKER,           true);
 
-      config.isLabelAntialiased           = Util.getXmlBoolean(xmlConfig,     ATTR_IS_MARKER_LABEL_ANTIALIASED,   true);
       config.isGroupDuplicatedMarkers     = Util.getXmlBoolean(xmlConfig,     ATTR_IS_GROUP_DUPLICATED_MARKERS,   false);
       config.groupedMarkers               = Util.getXmlString (xmlConfig,     ATTR_GROUPED_MARKERS,               UI.EMPTY_STRING);
       config.groupGridSize                = Util.getXmlInteger(xmlConfig,     ATTR_GROUP_GRID_SIZE,               LABEL_GROUP_GRID_SIZE_DEFAULT,  LABEL_GROUP_GRID_SIZE_MIN,   LABEL_GROUP_GRID_SIZE_MAX);
@@ -478,11 +488,15 @@ public class Map2ConfigManager {
       config.clusterOutline_Width         = Util.getXmlInteger(xmlConfig,     ATTR_CLUSTER_OUTLINE_WIDTH,         DEFAULT_CLUSTER_OUTLINE_WIDTH,      CLUSTER_OUTLINE_WIDTH_MIN, CLUSTER_OUTLINE_WIDTH_MAX);
       config.clusterSymbol_Size           = Util.getXmlInteger(xmlConfig,     ATTR_CLUSTER_SYMBOL_SIZE,           DEFAULT_CLUSTER_SYMBOL_SIZE,        CLUSTER_SYMBOL_SIZE_MIN,   CLUSTER_SYMBOL_SIZE_MAX);
 
+      config.isLabelAntialiased           = Util.getXmlBoolean(xmlConfig,     ATTR_IS_LABEL_ANTIALIASED,          true);
+      config.isTruncateLabel              = Util.getXmlBoolean(xmlConfig,     ATTR_IS_TRUNCATE_LABEL,             false);
+      config.isWrapLabel                  = Util.getXmlBoolean(xmlConfig,     ATTR_IS_WRAP_LABEL,                 false);
       config.labelDistributorMaxLabels    = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_DISTRIBUTOR_MAX_LABELS,  LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT,  LABEL_DISTRIBUTOR_MAX_LABELS_MIN,   LABEL_DISTRIBUTOR_MAX_LABELS_MAX);
       config.labelDistributorRadius       = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_DISTRIBUTOR_RADIUS,      LABEL_DISTRIBUTOR_RADIUS_DEFAULT,      LABEL_DISTRIBUTOR_RADIUS_MIN,       LABEL_DISTRIBUTOR_RADIUS_MAX);
       config.labelWrapLength              = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_WRAP_LENGTH,             LABEL_WRAP_LENGTH_DEFAULT,             LABEL_WRAP_LENGTH_MIN,              LABEL_WRAP_LENGTH_MAX);
+      config.labelTruncateLength          = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_TRUNCATE_LENGTH,         LABEL_WRAP_LENGTH_DEFAULT,             LABEL_TRUNCATE_LENGTH_MIN,          LABEL_TRUNCATE_LENGTH_MAX);
 
-      config.markerLabelLayout = (MapLabelLayout) Util.getXmlEnum(xmlConfig,  ATTR_MARKER_LABEL_LAYOUT,           LABEL_LAYOUT_DEFAULT);
+      config.markerLabelLayout = (MapLabelLayout) Util.getXmlEnum(xmlConfig,  ATTR_LABEL_LAYOUT,           LABEL_LAYOUT_DEFAULT);
 
 // SET_FORMATTING_ON
 
@@ -555,10 +569,10 @@ public class Map2ConfigManager {
 
          // parse xml and set states
          restoreState_10_Options(xmlRoot);
-         restoreState_30_Markers(xmlRoot, _allMarkerConfigs);
+         restoreState_30_Markers(xmlRoot, _allMapPointConfigs);
 
          // ensure config is created
-         if (_allMarkerConfigs.isEmpty()) {
+         if (_allMapPointConfigs.isEmpty()) {
             createDefaults_Markers();
          }
 
@@ -574,28 +588,28 @@ public class Map2ConfigManager {
    public static void resetActiveMarkerConfiguration() {
 
       // do not replace the name
-      final String oldName = _activeMarkerConfig.name;
+      final String oldName = _activeMapPointConfig.name;
 
-      final int activeConfigIndex = getActiveMarkerConfigIndex();
+      final int activeConfigIndex = getActiveConfigIndex();
 
       // remove old config
-      _allMarkerConfigs.remove(_activeMarkerConfig);
+      _allMapPointConfigs.remove(_activeMapPointConfig);
 
       // create new config
       final int configID = activeConfigIndex + 1;
-      final Map2MarkerConfig newConfig = createDefaults_Markers_One(configID);
+      final Map2Config newConfig = createDefaults_Markers_One(configID);
       newConfig.name = oldName;
 
       // update model
       setActiveMarkerConfig(newConfig);
-      _allMarkerConfigs.add(activeConfigIndex, newConfig);
+      _allMapPointConfigs.add(activeConfigIndex, newConfig);
    }
 
    public static void resetAllMarkerConfigurations() {
 
       createDefaults_Markers();
 
-      setActiveMarkerConfig(_allMarkerConfigs.get(0));
+      setActiveMarkerConfig(_allMapPointConfigs.get(0));
    }
 
    private static void restoreState_10_Options(final XMLMemento xmlRoot) {
@@ -612,13 +626,13 @@ public class Map2ConfigManager {
    }
 
    private static void restoreState_30_Markers(final XMLMemento xmlRoot,
-                                               final ArrayList<Map2MarkerConfig> allMarkerConfigs) {
+                                               final ArrayList<Map2Config> allMarkerConfigs) {
 
       if (xmlRoot == null) {
          return;
       }
 
-      final XMLMemento xmlMarkers = (XMLMemento) xmlRoot.getChild(TAG_TOUR_MARKERS);
+      final XMLMemento xmlMarkers = (XMLMemento) xmlRoot.getChild(TAG_MAP_POINTS);
 
       if (xmlMarkers == null) {
          return;
@@ -634,11 +648,11 @@ public class Map2ConfigManager {
 
             final String xmlConfigType = xmlConfig.getType();
 
-            if (xmlConfigType.equals(TAG_MARKER)) {
+            if (xmlConfigType.equals(TAG_MAP_POINT)) {
 
-               // <Marker>
+               // <MapPoint>
 
-               final Map2MarkerConfig markerConfig = new Map2MarkerConfig();
+               final Map2Config markerConfig = new Map2Config();
 
                parse_210_MarkerConfig(xmlConfig, markerConfig);
 
@@ -653,7 +667,7 @@ public class Map2ConfigManager {
 
    public static void saveState() {
 
-      if (_activeMarkerConfig == null) {
+      if (_activeMapPointConfig == null) {
 
          // this can happen when not yet used
 
@@ -672,19 +686,19 @@ public class Map2ConfigManager {
     */
    private static void saveState_Markers(final XMLMemento xmlRoot) {
 
-      final IMemento xmlMarkers = xmlRoot.createChild(TAG_TOUR_MARKERS);
+      final IMemento xmlMarkers = xmlRoot.createChild(TAG_MAP_POINTS);
       {
-         xmlMarkers.putString(ATTR_ACTIVE_CONFIG_ID, _activeMarkerConfig.id);
+         xmlMarkers.putString(ATTR_ACTIVE_CONFIG_ID, _activeMapPointConfig.id);
 
-         for (final Map2MarkerConfig config : _allMarkerConfigs) {
+         for (final Map2Config config : _allMapPointConfigs) {
             createXml_FromMarkerConfig(config, xmlMarkers);
          }
       }
    }
 
-   public static void setActiveMarkerConfig(final Map2MarkerConfig newConfig) {
+   public static void setActiveMarkerConfig(final Map2Config newConfig) {
 
-      _activeMarkerConfig = newConfig;
+      _activeMapPointConfig = newConfig;
    }
 
 }

@@ -1264,7 +1264,7 @@ public class Map2View extends ViewPart implements
 
       final boolean isSelected = _actionShowTourMarker.isChecked();
 
-      Map2ConfigManager.getActiveMarkerConfig().isShowTourMarker = isSelected;
+      Map2ConfigManager.getActiveConfig().isShowTourMarker = isSelected;
 
       CommonLocationManager.updateMapLocationAndMarkerSlideout();
 
@@ -2311,7 +2311,7 @@ public class Map2View extends ViewPart implements
       _actionCreateTourMarkerFromMap.setCurrentHoveredTourId(hoveredTourId);
       _actionLookupTourLocation.setCurrentHoveredTourId(hoveredTourId);
 
-      _actionShowTourMarker.setChecked(Map2ConfigManager.getActiveMarkerConfig().isShowTourMarker);
+      _actionShowTourMarker.setChecked(Map2ConfigManager.getActiveConfig().isShowTourMarker);
 
 // SET_FORMATTING_OFF
 
@@ -4698,7 +4698,7 @@ public class Map2View extends ViewPart implements
       TourPainterConfiguration.isShowTourStartEnd = _actionShowStartEndInMap.isChecked();
 
       // show tour marker
-      _actionShowTourMarker.setChecked(Map2ConfigManager.getActiveMarkerConfig().isShowTourMarker);
+      _actionShowTourMarker.setChecked(Map2ConfigManager.getActiveConfig().isShowTourMarker);
 
       // show tour pauses
       final boolean isShowPauses = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_PAUSES, true);
@@ -5576,7 +5576,7 @@ public class Map2View extends ViewPart implements
 // SET_FORMATTING_ON
 
       // enable/disable cluster/marker tooltip
-      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2Config markerConfig = Map2ConfigManager.getActiveConfig();
 
       final boolean isShowTourMarker = markerConfig.isShowTourMarker;
       if (isShowTourMarker) {

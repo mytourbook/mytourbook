@@ -212,6 +212,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    private Button                _chkIsShowTourLocations_All;
    private Button                _chkIsShowTourMarker;
    private Button                _chkIsShowTourMarker_All;
+   private Button                _chkIsTruncateLabel;
+   private Button                _chkIsWrapLabel;
    private Button                _chkUseMapDimColor;
    //
    private Combo                 _comboLabelLayout;
@@ -222,7 +224,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    private Label                 _lblGroupDuplicatedMarkers;
    private Label                 _lblLabelGroupGridSize;
    private Label                 _lblVisibleLabels;
-   private Label                 _lblLabelWrapLength;
    private Label                 _lblCommonLocationLabel_Color;
    private Label                 _lblCommonLocationLabel_HoveredColor;
    private Label                 _lblTourLocationLabel_Color;
@@ -237,6 +238,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    private Spinner               _spinnerLabelDistributorMaxLabels;
    private Spinner               _spinnerLabelDistributorRadius;
    private Spinner               _spinnerLabelGroupGridSize;
+   private Spinner               _spinnerLabelTruncateLength;
    private Spinner               _spinnerLabelWrapLength;
    private Spinner               _spinnerMapDimValue;
    //
@@ -658,7 +660,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private Control createUI_120_Tab_Options(final Composite parent) {
 
-      final GridDataFactory gdLabel = GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER);
+      final GridDataFactory gdHCenter = GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER);
       final GridDataFactory gdSpan2 = GridDataFactory.fillDefaults().span(2, 1);
 
       final Composite tabContainer = new Composite(parent, SWT.NONE);
@@ -674,7 +676,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             _lblLabelBackgrouond = new Label(tabContainer, SWT.NONE);
             _lblLabelBackgrouond.setText("Label &background");
             _lblLabelBackgrouond.setToolTipText("");
-            gdLabel.applyTo(_lblLabelBackgrouond);
+            gdHCenter.applyTo(_lblLabelBackgrouond);
 
             // combo
             _comboLabelLayout = new Combo(tabContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -690,7 +692,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             _lblVisibleLabels = new Label(tabContainer, SWT.NONE);
             _lblVisibleLabels.setText("&Visible labels");
             _lblVisibleLabels.setToolTipText("• Number of visible labels\n• Label spreader radius");
-            gdLabel.applyTo(_lblVisibleLabels);
+            gdHCenter.applyTo(_lblVisibleLabels);
 
             final Composite container = new Composite(tabContainer, SWT.NONE);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
@@ -719,13 +721,12 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
          }
          {
             /*
-             * Label wrapping
+             * Wrap label
              */
-            // label
-            _lblLabelWrapLength = new Label(tabContainer, SWT.NONE);
-            _lblLabelWrapLength.setText("Label wrap &length");
-            _lblLabelWrapLength.setToolTipText("");
-            gdLabel.applyTo(_lblLabelWrapLength);
+            _chkIsWrapLabel = new Button(tabContainer, SWT.CHECK);
+            _chkIsWrapLabel.setText("&Wrap label");
+            _chkIsWrapLabel.addSelectionListener(_markerSelectionListener);
+            gdHCenter.applyTo(_chkIsWrapLabel);
 
             // spinner
             _spinnerLabelWrapLength = new Spinner(tabContainer, SWT.BORDER);
@@ -738,10 +739,28 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
          }
          {
             /*
+             * Truncate label
+             */
+            _chkIsTruncateLabel = new Button(tabContainer, SWT.CHECK);
+            _chkIsTruncateLabel.setText("&Truncate label");
+            _chkIsTruncateLabel.addSelectionListener(_markerSelectionListener);
+            gdHCenter.applyTo(_chkIsTruncateLabel);
+
+            // spinner
+            _spinnerLabelTruncateLength = new Spinner(tabContainer, SWT.BORDER);
+            _spinnerLabelTruncateLength.setMinimum(Map2ConfigManager.LABEL_TRUNCATE_LENGTH_MIN);
+            _spinnerLabelTruncateLength.setMaximum(Map2ConfigManager.LABEL_TRUNCATE_LENGTH_MAX);
+            _spinnerLabelTruncateLength.setIncrement(1);
+            _spinnerLabelTruncateLength.setPageIncrement(10);
+            _spinnerLabelTruncateLength.addSelectionListener(_markerSelectionListener);
+            _spinnerLabelTruncateLength.addMouseWheelListener(_markerMouseWheelListener);
+         }
+         {
+            /*
              * Antialias marker text
              */
             _chkIsLabelAntialiased = new Button(tabContainer, SWT.CHECK);
-            _chkIsLabelAntialiased.setText("&Antialias labels");
+            _chkIsLabelAntialiased.setText("&Antialias label");
             _chkIsLabelAntialiased.addSelectionListener(_markerSelectionListener);
             gdSpan2.applyTo(_chkIsLabelAntialiased);
          }
@@ -1659,6 +1678,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       final boolean isShowTourLocations      = _chkIsShowTourLocations        .getSelection();
       final boolean isShowCommonLocations    = _chkIsShowCommonLocations      .getSelection();
 
+      final boolean isTruncateLabel          = _chkIsTruncateLabel            .getSelection();
+      final boolean isWrapLabel              = _chkIsWrapLabel                .getSelection();
+      
       final boolean isDimMap                 = _chkIsDimMap                   .getSelection();
       final boolean isUseMapDimColor         = _chkUseMapDimColor             .getSelection();
       final boolean isUseTransparencyColor   = isUseMapDimColor == false;
@@ -1671,12 +1693,15 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
       // label options
       _chkIsLabelAntialiased              .setEnabled(isShowLabels);
+      _chkIsTruncateLabel                 .setEnabled(isShowLabels);
+      _chkIsWrapLabel                     .setEnabled(isShowLabels);
       _comboLabelLayout                   .setEnabled(isShowLabels);
       _lblLabelBackgrouond                .setEnabled(isShowLabels);
-      _lblLabelWrapLength                 .setEnabled(isShowLabels);
       _lblVisibleLabels                   .setEnabled(isShowLabels);
       _spinnerLabelDistributorMaxLabels   .setEnabled(isShowLabels);
       _spinnerLabelDistributorRadius      .setEnabled(isShowLabels);
+      _spinnerLabelTruncateLength         .setEnabled(isShowLabels && isTruncateLabel);
+      _spinnerLabelWrapLength             .setEnabled(isShowLabels && isWrapLabel);
 
       _btnSwapClusterSymbolColor          .setEnabled(isShowClusteredMarker);
       _btnSwapMarkerLabel_Color           .setEnabled(isShowTourMarker);
@@ -1698,7 +1723,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       _spinnerClusterGrid_Size            .setEnabled(isShowClusteredMarker);
       _spinnerClusterSymbol_Size          .setEnabled(isShowClusteredMarker);
       _spinnerClusterOutline_Width        .setEnabled(isShowClusteredMarker);
-      _spinnerLabelWrapLength             .setEnabled(isShowTourMarker);
 
       _colorClusterSymbol_Fill            .setEnabled(isShowClusteredMarker);
       _colorClusterSymbol_Outline         .setEnabled(isShowClusteredMarker);
@@ -2067,7 +2091,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void onSwapClusterColor() {
 
-      final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2Config config = Map2ConfigManager.getActiveConfig();
 
       final RGB fgColor = config.clusterOutline_RGB;
       final RGB bgColor = config.clusterFill_RGB;
@@ -2083,7 +2107,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void onSwapCommonLocationColor() {
 
-      final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2Config config = Map2ConfigManager.getActiveConfig();
 
       final RGB fgColor = config.commonLocationOutline_RGB;
       final RGB bgColor = config.commonLocationFill_RGB;
@@ -2099,7 +2123,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void onSwapCommonLocationHoveredColor() {
 
-      final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2Config config = Map2ConfigManager.getActiveConfig();
 
       final RGB fgColor = config.commonLocationOutline_Hovered_RGB;
       final RGB bgColor = config.commonLocationFill_Hovered_RGB;
@@ -2115,7 +2139,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void onSwapMarkerColor() {
 
-      final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2Config config = Map2ConfigManager.getActiveConfig();
 
       final RGB fgColor = config.markerOutline_RGB;
       final RGB bgColor = config.markerFill_RGB;
@@ -2131,7 +2155,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void onSwapMarkerHoveredColor() {
 
-      final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2Config config = Map2ConfigManager.getActiveConfig();
 
       final RGB fgColor = config.markerOutline_Hovered_RGB;
       final RGB bgColor = config.markerFill_Hovered_RGB;
@@ -2147,7 +2171,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void onSwapTourLocationColor() {
 
-      final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2Config config = Map2ConfigManager.getActiveConfig();
 
       final RGB fgColor = config.tourLocationOutline_RGB;
       final RGB bgColor = config.tourLocationFill_RGB;
@@ -2163,7 +2187,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void onSwapTourLocationHoveredColor() {
 
-      final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2Config config = Map2ConfigManager.getActiveConfig();
 
       final RGB fgColor = config.tourLocationOutline_Hovered_RGB;
       final RGB bgColor = config.tourLocationFill_Hovered_RGB;
@@ -2211,7 +2235,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void restoreState() {
 
-      final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2Config config = Map2ConfigManager.getActiveConfig();
 
 // SET_FORMATTING_OFF
 
@@ -2231,6 +2255,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       _chkIsFillClusterSymbol             .setSelection( config.isFillClusterSymbol);
       _chkIsLabelAntialiased              .setSelection( config.isLabelAntialiased);
       _chkIsShowMapLocations_BoundingBox  .setSelection( config.isShowLocationBoundingBox);
+      _chkIsTruncateLabel                 .setSelection( config.isTruncateLabel);
+      _chkIsWrapLabel                     .setSelection( config.isWrapLabel);
 
       _spinnerClusterGrid_Size            .setSelection( config.clusterGridSize);
       _spinnerClusterOutline_Width        .setSelection( config.clusterOutline_Width);
@@ -2238,6 +2264,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       _spinnerLabelDistributorMaxLabels   .setSelection( config.labelDistributorMaxLabels);
       _spinnerLabelDistributorRadius      .setSelection( config.labelDistributorRadius);
       _spinnerLabelGroupGridSize          .setSelection( config.groupGridSize);
+      _spinnerLabelTruncateLength         .setSelection( config.labelTruncateLength);
       _spinnerLabelWrapLength             .setSelection( config.labelWrapLength);
 
       _colorClusterSymbol_Fill            .setColorValue(config.clusterFill_RGB);
@@ -2293,7 +2320,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void saveMarkerConfig() {
 
-      final Map2MarkerConfig config = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2Config config = Map2ConfigManager.getActiveConfig();
 
 // SET_FORMATTING_OFF
 
@@ -2303,14 +2330,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       config.isShowTourMarker             = _chkIsShowTourMarker                 .getSelection();
 
       config.isGroupDuplicatedMarkers     = _chkIsGroupDuplicatedMarkers         .getSelection();
+      config.groupGridSize                = _spinnerLabelGroupGridSize           .getSelection();
       config.groupedMarkers               = _txtGroupDuplicatedMarkers           .getText();
 
       config.isClusterSymbolAntialiased   = _chkIsClusterSymbolAntialiased       .getSelection();
       config.isClusterTextAntialiased     = _chkIsClusterTextAntialiased         .getSelection();
       config.isFillClusterSymbol          = _chkIsFillClusterSymbol              .getSelection();
-
       config.isMarkerClustered            = _chkIsMarkerClustered                .getSelection();
-      config.isLabelAntialiased           = _chkIsLabelAntialiased               .getSelection();
 
       config.clusterGridSize              = _spinnerClusterGrid_Size             .getSelection();
       config.clusterOutline_Width         = _spinnerClusterOutline_Width         .getSelection();
@@ -2318,9 +2344,12 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       config.clusterFill_RGB              = _colorClusterSymbol_Fill             .getColorValue();
       config.clusterOutline_RGB           = _colorClusterSymbol_Outline          .getColorValue();
 
+      config.isLabelAntialiased           = _chkIsLabelAntialiased               .getSelection();
+      config.isTruncateLabel              = _chkIsTruncateLabel                  .getSelection();
+      config.isWrapLabel                  = _chkIsWrapLabel                      .getSelection();
       config.labelDistributorMaxLabels    = _spinnerLabelDistributorMaxLabels    .getSelection();
       config.labelDistributorRadius       = _spinnerLabelDistributorRadius       .getSelection();
-      config.groupGridSize                = _spinnerLabelGroupGridSize           .getSelection();
+      config.labelTruncateLength          = _spinnerLabelTruncateLength          .getSelection();
       config.labelWrapLength              = _spinnerLabelWrapLength              .getSelection();
 
       config.markerFill_RGB                     = _colorMarkerLabel_Fill                     .getColorValue();

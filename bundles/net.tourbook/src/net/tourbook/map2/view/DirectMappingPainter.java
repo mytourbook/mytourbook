@@ -118,7 +118,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
       final GC gc = painterContext.gc;
 
-      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2Config markerConfig = Map2ConfigManager.getActiveConfig();
 
       gc.setAntialias(markerConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
 

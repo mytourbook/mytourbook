@@ -79,7 +79,7 @@ public class Map2Point implements ClusterItem {
 
    public Color getFillColor() {
 
-      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2Config markerConfig = Map2ConfigManager.getActiveConfig();
 
       final boolean isTourMarker = tourMarker != null;
 
@@ -96,7 +96,7 @@ public class Map2Point implements ClusterItem {
 
    public Color getFillColor_Hovered() {
 
-      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2Config markerConfig = Map2ConfigManager.getActiveConfig();
 
       final boolean isTourMarker = tourMarker != null;
 
@@ -147,7 +147,7 @@ public class Map2Point implements ClusterItem {
 
    public Color getOutlineColor() {
 
-      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2Config markerConfig = Map2ConfigManager.getActiveConfig();
 
       final boolean isTourMarker = tourMarker != null;
 
@@ -164,7 +164,7 @@ public class Map2Point implements ClusterItem {
 
    public Color getOutlineColor_Hovered() {
 
-      final Map2MarkerConfig markerConfig = Map2ConfigManager.getActiveMarkerConfig();
+      final Map2Config markerConfig = Map2ConfigManager.getActiveConfig();
 
       final boolean isTourMarker = tourMarker != null;
 
