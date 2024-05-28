@@ -251,7 +251,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
                   UI.openNotificationPopup(
                         Messages.Dialog_DownloadWorkoutsFromSuunto_Title,
-                        Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo_Small),
+                        Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo),
                         infoText);
                });
 

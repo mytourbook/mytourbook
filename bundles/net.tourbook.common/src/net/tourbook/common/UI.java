@@ -2449,13 +2449,13 @@ public class UI {
 
       final int delay = _prefStore_Common.getInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION) * 1000;
 
-      final MTNotificationPopup notication = new MTNotificationPopup(
+      final MTNotificationPopup notification = new MTNotificationPopup(
             Display.getCurrent(),
             imageDescriptor,
             title,
             text);
-      notication.setDelayClose(delay);
-      notication.open();
+      notification.setDelayClose(delay);
+      notification.open();
    }
 
    /**

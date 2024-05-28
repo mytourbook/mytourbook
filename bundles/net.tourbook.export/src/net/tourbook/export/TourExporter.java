@@ -51,6 +51,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.export.fit.FitExporter;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -431,9 +432,11 @@ public class TourExporter {
       double max_longitude = -180.0;
 
       final List<?> routes = (List<?>) vcContext.get("routes"); //$NON-NLS-1$
-      if (routes != null) {
+      if (CollectionUtils.isNotEmpty(routes)) {
+
          final Iterator<?> route_iterator = routes.iterator();
          while (route_iterator.hasNext()) {
+
             final GPSRoute route = (GPSRoute) route_iterator.next();
             min_longitude = route.getMinLongitude();
             max_longitude = route.getMaxLongitude();
@@ -443,9 +446,11 @@ public class TourExporter {
       }
 
       final List<?> wayPoints = (List<?>) vcContext.get(VC_WAY_POINTS);
-      if (wayPoints != null) {
+      if (CollectionUtils.isNotEmpty(wayPoints)) {
+
          final Iterator<?> waypoint_iterator = wayPoints.iterator();
          while (waypoint_iterator.hasNext()) {
+
             final TourWayPoint waypoint = (TourWayPoint) waypoint_iterator.next();
             min_longitude = Math.min(min_longitude, waypoint.getLongitude());
             max_longitude = Math.max(max_longitude, waypoint.getLongitude());
@@ -455,9 +460,10 @@ public class TourExporter {
       }
 
       final List<?> tourMarkers = (List<?>) vcContext.get(VC_TOUR_MARKERS);
-      if (tourMarkers != null) {
+      if (CollectionUtils.isNotEmpty(tourMarkers)) {
 
          for (final Object element : tourMarkers) {
+
             if (element instanceof final TourMarker tourMarker) {
 
                final double longitude = tourMarker.getLongitude();
@@ -475,9 +481,11 @@ public class TourExporter {
       }
 
       final List<?> tracks = (List<?>) vcContext.get(VC_TRACKS);
-      if (tracks != null) {
+      if (CollectionUtils.isNotEmpty(tracks)) {
+
          final Iterator<?> track_iterator = tracks.iterator();
          while (track_iterator.hasNext()) {
+
             final GPSTrack track = (GPSTrack) track_iterator.next();
             min_longitude = Math.min(min_longitude, track.getMinLongitude());
             max_longitude = Math.max(max_longitude, track.getMaxLongitude());
