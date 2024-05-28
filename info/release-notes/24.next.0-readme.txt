@@ -81,6 +81,7 @@ Translation
 - French (Frederic)
 - German
 - Italian (Doriano)
+- Spanish (Daniel)
 
  
 System   
