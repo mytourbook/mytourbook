@@ -602,6 +602,8 @@ public class Messages extends NLS {
    public static String        Dialog_Export_Label_TCX_NameFrom;
    public static String        Dialog_Export_Label_TCX_NameFrom_Tooltip;
    public static String        Dialog_Export_Label_TCX_Type;
+   public static String        Dialog_Export_Message_Successful;
+   public static String        Dialog_Export_Message_Unsuccessful;
    public static String        dialog_export_msg_fileAlreadyExists;
    public static String        dialog_export_msg_fileNameIsInvalid;
    public static String        dialog_export_msg_pathIsNotAvailable;

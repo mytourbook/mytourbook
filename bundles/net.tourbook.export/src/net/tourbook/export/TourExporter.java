@@ -1001,14 +1001,19 @@ public class TourExporter {
       doExport_70_WayPoints(wayPoints, tourMarkers, trackStartTime);
 
       boolean exportStatus = false;
+      String notificationText;
       try {
+
          exportStatus = doExport_10_Tour(tracks, wayPoints, tourMarkers, tourLap, exportFileName);
+         notificationText = String.format(Messages.Dialog_Export_Message_Successful, exportFileName);
+
       } catch (final IOException e) {
          StatusUtil.log(e);
+         notificationText = String.format(Messages.Dialog_Export_Message_Unsuccessful, exportFileName);
       }
 
       if (_displayNotificationPopup) {
-         UI.openNotificationPopup(Messages.dialog_export_dialog_title, _imageDescriptor, "the file exportFileName was successfully exported");
+         UI.openNotificationPopup(Messages.dialog_export_dialog_title, _imageDescriptor, notificationText);
       }
 
       return exportStatus;
