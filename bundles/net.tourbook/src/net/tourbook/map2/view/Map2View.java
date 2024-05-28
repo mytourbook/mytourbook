@@ -1266,7 +1266,7 @@ public class Map2View extends ViewPart implements
 
       Map2ConfigManager.getActiveConfig().isShowTourMarker = isSelected;
 
-      CommonLocationManager.updateMapLocationAndMarkerSlideout();
+      Map2PointManager.updateMapLocationAndMarkerSlideout();
 
       _map.paint();
    }

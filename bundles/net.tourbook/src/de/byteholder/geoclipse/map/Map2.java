@@ -109,10 +109,12 @@ import net.tourbook.map.location.MapLocationToolTip;
 import net.tourbook.map2.view.Map2Config;
 import net.tourbook.map2.view.Map2ConfigManager;
 import net.tourbook.map2.view.Map2Point;
+import net.tourbook.map2.view.Map2PointManager;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.MapLabelLayout;
 import net.tourbook.map2.view.MapPointToolTip;
 import net.tourbook.map2.view.SelectionMapSelection;
+import net.tourbook.map2.view.SlideoutMap2_MapPoints;
 import net.tourbook.map2.view.TourPainterConfiguration;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.map25.layer.marker.ScreenUtils;
@@ -413,6 +415,10 @@ public class Map2 extends Canvas {
    private PaintedMapPoint                 _hoveredMapPoint;
    private boolean                         _isMarkerClusterSelected;
    private MapPointToolTip                 _mapPointTooltip;
+
+   private int                             _numStatistics_AllTourMarkers;
+   private int                             _numStatistics_AllTourLocations;
+   private int                             _numStatistics_AllCommonLocations;
 
    private Map<Long, Color>                _locationBoundingBoxColors         = new HashMap<>();
    private int                             _colorSwitchCounter;
@@ -1534,6 +1540,8 @@ public class Map2 extends Canvas {
             }
 
             allTourLocationsMap.put(tourLocation, mapPoint);
+
+            _numStatistics_AllTourLocations++;
          }
       }
 
@@ -1629,6 +1637,8 @@ public class Map2 extends Canvas {
          }
 
          allMapPoints.add(mapPoint);
+
+         _numStatistics_AllCommonLocations++;
       }
    }
 
@@ -1899,6 +1909,8 @@ public class Map2 extends Canvas {
             }
 
             allMapPoints.add(mapPoint);
+
+            _numStatistics_AllTourMarkers++;
          }
       }
    }
@@ -5305,6 +5317,24 @@ public class Map2 extends Canvas {
 
             getDisplay().asyncExec(() -> paint());
          }
+
+         /*
+          * Update statistics
+          */
+         final SlideoutMap2_MapPoints mapPointSlideout = Map2PointManager.getMapPointSlideout(false);
+         if (mapPointSlideout != null) {
+
+            getDisplay().asyncExec(() -> mapPointSlideout.updateStatistics(
+
+                  _allPaintedMarkers.size(),
+                  _numStatistics_AllTourMarkers,
+
+                  _allPaintedLocations.size(),
+                  _numStatistics_AllTourLocations + _numStatistics_AllCommonLocations
+
+            ));
+         }
+
       };
 
       _backgroundPainter_Task = _backgroundPainter_Executor.submit(backgroundTask);
@@ -5323,6 +5353,10 @@ public class Map2 extends Canvas {
          // use different colors each time
          _locationBoundingBoxColors.clear();
       }
+
+      _numStatistics_AllTourMarkers = 0;
+      _numStatistics_AllTourLocations = 0;
+      _numStatistics_AllCommonLocations = 0;
 
 // SET_FORMATTING_OFF
 

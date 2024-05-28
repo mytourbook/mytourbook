@@ -28,6 +28,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourLocation;
+import net.tourbook.map2.view.Map2PointManager;
 import net.tourbook.map2.view.SlideoutMap2_MapPoints;
 
 import org.eclipse.core.runtime.IPath;
@@ -43,109 +44,107 @@ import org.osgi.framework.Version;
  */
 public class CommonLocationManager {
 
-   private static final String                 CONFIG_FILE_NAME                         = "common-locations.xml";                      //$NON-NLS-1$
+   private static final String             CONFIG_FILE_NAME                         = "common-locations.xml";                      //$NON-NLS-1$
 
-   private static final Bundle                 _bundle                                  = TourbookPlugin.getDefault().getBundle();
-   private static final IPath                  _stateLocation                           = Platform.getStateLocation(_bundle);
+   private static final Bundle             _bundle                                  = TourbookPlugin.getDefault().getBundle();
+   private static final IPath              _stateLocation                           = Platform.getStateLocation(_bundle);
 
    /**
     * Version number is not yet used.
     */
-   private static final int                    CONFIG_VERSION                           = 1;
-   private static final String                 ATTR_CONFIG_VERSION                      = "configVersion";                             //$NON-NLS-1$
+   private static final int                CONFIG_VERSION                           = 1;
+   private static final String             ATTR_CONFIG_VERSION                      = "configVersion";                             //$NON-NLS-1$
    //
-   private static final String                 TAG_ROOT                                 = "CommonLocations";                           //$NON-NLS-1$
-   private static final String                 TAG_ALL_LOCATIONS                        = "AllLocations";                              //$NON-NLS-1$
-   private static final String                 TAG_LOCATION                             = "Location";                                  //$NON-NLS-1$
+   private static final String             TAG_ROOT                                 = "CommonLocations";                           //$NON-NLS-1$
+   private static final String             TAG_ALL_LOCATIONS                        = "AllLocations";                              //$NON-NLS-1$
+   private static final String             TAG_LOCATION                             = "Location";                                  //$NON-NLS-1$
    //
-   private static final String                 ATTR_CREATED                             = "created";                                   //$NON-NLS-1$
-   private static final String                 ATTR_ZOOMLEVEL                           = "zoomLevel";                                 //$NON-NLS-1$
+   private static final String             ATTR_CREATED                             = "created";                                   //$NON-NLS-1$
+   private static final String             ATTR_ZOOMLEVEL                           = "zoomLevel";                                 //$NON-NLS-1$
    //
-   private static final String                 ATTR_LATITUDE_E6                         = "latitude";                                  //$NON-NLS-1$
-   private static final String                 ATTR_LATITUDE_E6_NORMALIZED              = "latitudeNormalized";                        //$NON-NLS-1$
-   private static final String                 ATTR_LATITUDE_MIN_E6_NORMALIZED          = "latitudeMinE6_Normalized";                  //$NON-NLS-1$
-   private static final String                 ATTR_LATITUDE_MAX_E6_NORMALIZED          = "latitudeMaxE6_Normalized";                  //$NON-NLS-1$
-   private static final String                 ATTR_LATITUDE_MIN_E6_RESIZED_NORMALIZED  = "latitudeMinE6_Resized_Normalized";          //$NON-NLS-1$
-   private static final String                 ATTR_LATITUDE_MAX_E6_RESIZED_NORMALIZED  = "latitudeMaxE6_Resized_Normalized";          //$NON-NLS-1$
-   private static final String                 ATTR_LONGITUDE_E6                        = "longitude";                                 //$NON-NLS-1$
-   private static final String                 ATTR_LONGITUDE_E6_NORMALIZED             = "longitudeNormalized";                       //$NON-NLS-1$
-   private static final String                 ATTR_LONGITUDE_MIN_E6_NORMALIZED         = "longitudeMinE6_Normalized";                 //$NON-NLS-1$
-   private static final String                 ATTR_LONGITUDE_MAX_E6_NORMALIZED         = "longitudeMaxE6_Normalized";                 //$NON-NLS-1$
-   private static final String                 ATTR_LONGITUDE_MIN_E6_RESIZED_NORMALIZED = "longitudeMinE6_Resized_Normalized";         //$NON-NLS-1$
-   private static final String                 ATTR_LONGITUDE_MAX_E6_RESIZED_NORMALIZED = "longitudeMaxE6_Resized_Normalized";         //$NON-NLS-1$
+   private static final String             ATTR_LATITUDE_E6                         = "latitude";                                  //$NON-NLS-1$
+   private static final String             ATTR_LATITUDE_E6_NORMALIZED              = "latitudeNormalized";                        //$NON-NLS-1$
+   private static final String             ATTR_LATITUDE_MIN_E6_NORMALIZED          = "latitudeMinE6_Normalized";                  //$NON-NLS-1$
+   private static final String             ATTR_LATITUDE_MAX_E6_NORMALIZED          = "latitudeMaxE6_Normalized";                  //$NON-NLS-1$
+   private static final String             ATTR_LATITUDE_MIN_E6_RESIZED_NORMALIZED  = "latitudeMinE6_Resized_Normalized";          //$NON-NLS-1$
+   private static final String             ATTR_LATITUDE_MAX_E6_RESIZED_NORMALIZED  = "latitudeMaxE6_Resized_Normalized";          //$NON-NLS-1$
+   private static final String             ATTR_LONGITUDE_E6                        = "longitude";                                 //$NON-NLS-1$
+   private static final String             ATTR_LONGITUDE_E6_NORMALIZED             = "longitudeNormalized";                       //$NON-NLS-1$
+   private static final String             ATTR_LONGITUDE_MIN_E6_NORMALIZED         = "longitudeMinE6_Normalized";                 //$NON-NLS-1$
+   private static final String             ATTR_LONGITUDE_MAX_E6_NORMALIZED         = "longitudeMaxE6_Normalized";                 //$NON-NLS-1$
+   private static final String             ATTR_LONGITUDE_MIN_E6_RESIZED_NORMALIZED = "longitudeMinE6_Resized_Normalized";         //$NON-NLS-1$
+   private static final String             ATTR_LONGITUDE_MAX_E6_RESIZED_NORMALIZED = "longitudeMaxE6_Resized_Normalized";         //$NON-NLS-1$
    //
-   private static final String                 ATTR_NAME_NAME                           = "name";                                      //$NON-NLS-1$
-   private static final String                 ATTR_NAME_DISPLAY_NAME                   = "displayName";                               //$NON-NLS-1$
+   private static final String             ATTR_NAME_NAME                           = "name";                                      //$NON-NLS-1$
+   private static final String             ATTR_NAME_DISPLAY_NAME                   = "displayName";                               //$NON-NLS-1$
 
-   private static final String                 ATTR_COUNTRY_COUNTRY                     = "country";                                   //$NON-NLS-1$
-   private static final String                 ATTR_COUNTRY__COUNTRY_CODE               = "countryCode";                               //$NON-NLS-1$
-   private static final String                 ATTR_COUNTRY__CONTINENT                  = "continent";                                 //$NON-NLS-1$
+   private static final String             ATTR_COUNTRY_COUNTRY                     = "country";                                   //$NON-NLS-1$
+   private static final String             ATTR_COUNTRY__COUNTRY_CODE               = "countryCode";                               //$NON-NLS-1$
+   private static final String             ATTR_COUNTRY__CONTINENT                  = "continent";                                 //$NON-NLS-1$
 
-   private static final String                 ATTR_STATE_REGION                        = "region";                                    //$NON-NLS-1$
-   private static final String                 ATTR_STATE_STATE                         = "state";                                     //$NON-NLS-1$
-   private static final String                 ATTR_STATE_STATE_DISTRICT                = "stateDistrict";                             //$NON-NLS-1$
-   private static final String                 ATTR_STATE_COUNTY                        = "county";                                    //$NON-NLS-1$
+   private static final String             ATTR_STATE_REGION                        = "region";                                    //$NON-NLS-1$
+   private static final String             ATTR_STATE_STATE                         = "state";                                     //$NON-NLS-1$
+   private static final String             ATTR_STATE_STATE_DISTRICT                = "stateDistrict";                             //$NON-NLS-1$
+   private static final String             ATTR_STATE_COUNTY                        = "county";                                    //$NON-NLS-1$
 
-   private static final String                 ATTR_CITY_MUNICIPALITY                   = "municipality";                              //$NON-NLS-1$
-   private static final String                 ATTR_CITY_CITY                           = "city";                                      //$NON-NLS-1$
-   private static final String                 ATTR_CITY_TOWN                           = "town";                                      //$NON-NLS-1$
-   private static final String                 ATTR_CITY_VILLAGE                        = "village";                                   //$NON-NLS-1$
-   private static final String                 ATTR_CITY_POSTCODE                       = "postcode";                                  //$NON-NLS-1$
+   private static final String             ATTR_CITY_MUNICIPALITY                   = "municipality";                              //$NON-NLS-1$
+   private static final String             ATTR_CITY_CITY                           = "city";                                      //$NON-NLS-1$
+   private static final String             ATTR_CITY_TOWN                           = "town";                                      //$NON-NLS-1$
+   private static final String             ATTR_CITY_VILLAGE                        = "village";                                   //$NON-NLS-1$
+   private static final String             ATTR_CITY_POSTCODE                       = "postcode";                                  //$NON-NLS-1$
 
-   private static final String                 ATTR_ROAD_ROAD                           = "road";                                      //$NON-NLS-1$
-   private static final String                 ATTR_ROAD_HOUSE_NUMBER                   = "houseNumber";                               //$NON-NLS-1$
-   private static final String                 ATTR_ROAD_HOUSE_NAME                     = "houseName";                                 //$NON-NLS-1$
+   private static final String             ATTR_ROAD_ROAD                           = "road";                                      //$NON-NLS-1$
+   private static final String             ATTR_ROAD_HOUSE_NUMBER                   = "houseNumber";                               //$NON-NLS-1$
+   private static final String             ATTR_ROAD_HOUSE_NAME                     = "houseName";                                 //$NON-NLS-1$
 
-   private static final String                 ATTR_AREA1_CITY_DISTRICT                 = "cityDistrict";                              //$NON-NLS-1$
-   private static final String                 ATTR_AREA1_DISTRICT                      = "district";                                  //$NON-NLS-1$
-   private static final String                 ATTR_AREA1_BOROUGH                       = "borough";                                   //$NON-NLS-1$
-   private static final String                 ATTR_AREA1_SUBURB                        = "suburb";                                    //$NON-NLS-1$
-   private static final String                 ATTR_AREA1_SUBDIVISION                   = "subdivision";                               //$NON-NLS-1$
+   private static final String             ATTR_AREA1_CITY_DISTRICT                 = "cityDistrict";                              //$NON-NLS-1$
+   private static final String             ATTR_AREA1_DISTRICT                      = "district";                                  //$NON-NLS-1$
+   private static final String             ATTR_AREA1_BOROUGH                       = "borough";                                   //$NON-NLS-1$
+   private static final String             ATTR_AREA1_SUBURB                        = "suburb";                                    //$NON-NLS-1$
+   private static final String             ATTR_AREA1_SUBDIVISION                   = "subdivision";                               //$NON-NLS-1$
 
-   private static final String                 ATTR_AREA2_HAMLET                        = "hamlet";                                    //$NON-NLS-1$
-   private static final String                 ATTR_AREA2_CROFT                         = "croft";                                     //$NON-NLS-1$
-   private static final String                 ATTR_AREA2_ISOLATED_DWELLING             = "isolatedDwelling";                          //$NON-NLS-1$
+   private static final String             ATTR_AREA2_HAMLET                        = "hamlet";                                    //$NON-NLS-1$
+   private static final String             ATTR_AREA2_CROFT                         = "croft";                                     //$NON-NLS-1$
+   private static final String             ATTR_AREA2_ISOLATED_DWELLING             = "isolatedDwelling";                          //$NON-NLS-1$
 
-   private static final String                 ATTR_AREA3_NEIGHBOURHOOD                 = "neighbourhood";                             //$NON-NLS-1$
-   private static final String                 ATTR_AREA3_ALLOTMENTS                    = "allotments";                                //$NON-NLS-1$
-   private static final String                 ATTR_AREA3_QUARTER                       = "quarter";                                   //$NON-NLS-1$
+   private static final String             ATTR_AREA3_NEIGHBOURHOOD                 = "neighbourhood";                             //$NON-NLS-1$
+   private static final String             ATTR_AREA3_ALLOTMENTS                    = "allotments";                                //$NON-NLS-1$
+   private static final String             ATTR_AREA3_QUARTER                       = "quarter";                                   //$NON-NLS-1$
 
-   private static final String                 ATTR_AREA4_CITY_BLOCK                    = "cityBlock";                                 //$NON-NLS-1$
-   private static final String                 ATTR_AREA4_RESIDETIAL                    = "residential";                               //$NON-NLS-1$
-   private static final String                 ATTR_AREA4_FARM                          = "farm";                                      //$NON-NLS-1$
-   private static final String                 ATTR_AREA4_FARMYARD                      = "farmyard";                                  //$NON-NLS-1$
-   private static final String                 ATTR_AREA4_INDUSTRIAL                    = "industrial";                                //$NON-NLS-1$
-   private static final String                 ATTR_AREA4_COMMERCIAL                    = "commercial";                                //$NON-NLS-1$
-   private static final String                 ATTR_AREA4_RETAIL                        = "retail";                                    //$NON-NLS-1$
+   private static final String             ATTR_AREA4_CITY_BLOCK                    = "cityBlock";                                 //$NON-NLS-1$
+   private static final String             ATTR_AREA4_RESIDETIAL                    = "residential";                               //$NON-NLS-1$
+   private static final String             ATTR_AREA4_FARM                          = "farm";                                      //$NON-NLS-1$
+   private static final String             ATTR_AREA4_FARMYARD                      = "farmyard";                                  //$NON-NLS-1$
+   private static final String             ATTR_AREA4_INDUSTRIAL                    = "industrial";                                //$NON-NLS-1$
+   private static final String             ATTR_AREA4_COMMERCIAL                    = "commercial";                                //$NON-NLS-1$
+   private static final String             ATTR_AREA4_RETAIL                        = "retail";                                    //$NON-NLS-1$
 
-   private static final String                 ATTR_OTHER_AERIALWAY                     = "aerialway";                                 //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_AEROWAY                       = "aeroway";                                   //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_AMENITY                       = "amenity";                                   //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_BOUNDARY                      = "boundary";                                  //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_BRIDGE                        = "bridge";                                    //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_CLUB                          = "club";                                      //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_CRAFT                         = "craft";                                     //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_EMERGENCY                     = "emergency";                                 //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_HISTORIC                      = "historic";                                  //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_LANDUSE                       = "landuse";                                   //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_LEISURE                       = "leisure";                                   //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_MAN_MADE                      = "manMade";                                   //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_MILITARY                      = "military";                                  //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_MOUNTAIN_PASS                 = "mountainPass";                              //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_NATURAL2                      = "natural2";                                  //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_OFFICE                        = "office";                                    //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_PLACE                         = "place";                                     //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_RAILWAY                       = "railway";                                   //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_SHOP                          = "shop";                                      //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_TOURISM                       = "tourism";                                   //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_TUNNEL                        = "tunnel";                                    //$NON-NLS-1$
-   private static final String                 ATTR_OTHER_WATERWAY                      = "waterway";                                  //$NON-NLS-1$
+   private static final String             ATTR_OTHER_AERIALWAY                     = "aerialway";                                 //$NON-NLS-1$
+   private static final String             ATTR_OTHER_AEROWAY                       = "aeroway";                                   //$NON-NLS-1$
+   private static final String             ATTR_OTHER_AMENITY                       = "amenity";                                   //$NON-NLS-1$
+   private static final String             ATTR_OTHER_BOUNDARY                      = "boundary";                                  //$NON-NLS-1$
+   private static final String             ATTR_OTHER_BRIDGE                        = "bridge";                                    //$NON-NLS-1$
+   private static final String             ATTR_OTHER_CLUB                          = "club";                                      //$NON-NLS-1$
+   private static final String             ATTR_OTHER_CRAFT                         = "craft";                                     //$NON-NLS-1$
+   private static final String             ATTR_OTHER_EMERGENCY                     = "emergency";                                 //$NON-NLS-1$
+   private static final String             ATTR_OTHER_HISTORIC                      = "historic";                                  //$NON-NLS-1$
+   private static final String             ATTR_OTHER_LANDUSE                       = "landuse";                                   //$NON-NLS-1$
+   private static final String             ATTR_OTHER_LEISURE                       = "leisure";                                   //$NON-NLS-1$
+   private static final String             ATTR_OTHER_MAN_MADE                      = "manMade";                                   //$NON-NLS-1$
+   private static final String             ATTR_OTHER_MILITARY                      = "military";                                  //$NON-NLS-1$
+   private static final String             ATTR_OTHER_MOUNTAIN_PASS                 = "mountainPass";                              //$NON-NLS-1$
+   private static final String             ATTR_OTHER_NATURAL2                      = "natural2";                                  //$NON-NLS-1$
+   private static final String             ATTR_OTHER_OFFICE                        = "office";                                    //$NON-NLS-1$
+   private static final String             ATTR_OTHER_PLACE                         = "place";                                     //$NON-NLS-1$
+   private static final String             ATTR_OTHER_RAILWAY                       = "railway";                                   //$NON-NLS-1$
+   private static final String             ATTR_OTHER_SHOP                          = "shop";                                      //$NON-NLS-1$
+   private static final String             ATTR_OTHER_TOURISM                       = "tourism";                                   //$NON-NLS-1$
+   private static final String             ATTR_OTHER_TUNNEL                        = "tunnel";                                    //$NON-NLS-1$
+   private static final String             ATTR_OTHER_WATERWAY                      = "waterway";                                  //$NON-NLS-1$
    //
-   private static final List<TourLocation>     _allMapLocations                         = new ArrayList<>();
+   private static final List<TourLocation> _allMapLocations                         = new ArrayList<>();
 
-   private static SlideoutMap2_MapPoints _mapLocationAndMarkerSlideout;
-
-   private static int                          _locationRequestZoomlevel                = TourLocationManager.DEFAULT_ZOOM_LEVEL_VALUE;
+   private static int                      _locationRequestZoomlevel                = TourLocationManager.DEFAULT_ZOOM_LEVEL_VALUE;
 
    static {
 
@@ -159,12 +158,12 @@ public class CommonLocationManager {
       _allMapLocations.add(tourLocation);
 
       // update UI
-      if (_mapLocationAndMarkerSlideout != null) {
 
-         _mapLocationAndMarkerSlideout.open(false);
+      final SlideoutMap2_MapPoints mapPointSlideout = Map2PointManager.getMapPointSlideout(true);
+      if (mapPointSlideout != null) {
 
          // delay to be sure that the slideout is opened
-         PlatformUI.getWorkbench().getDisplay().asyncExec(() -> _mapLocationAndMarkerSlideout.updateUI(tourLocation));
+         PlatformUI.getWorkbench().getDisplay().asyncExec(() -> mapPointSlideout.updateUI(tourLocation));
       }
    }
 
@@ -523,19 +522,4 @@ public class CommonLocationManager {
       _locationRequestZoomlevel = locationRequestZoomlevel;
    }
 
-   public static void setMapLocationSlideout(final SlideoutMap2_MapPoints mapLocationSlideout) {
-
-      _mapLocationAndMarkerSlideout = mapLocationSlideout;
-   }
-
-   /**
-    * Update UI in the location + marker slideout
-    */
-   public static void updateMapLocationAndMarkerSlideout() {
-
-      if (_mapLocationAndMarkerSlideout != null) {
-
-         _mapLocationAndMarkerSlideout.updateUI();
-      }
-   }
 }

@@ -224,13 +224,20 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    private Label                 _lblGroupDuplicatedMarkers;
    private Label                 _lblLabelGroupGridSize;
    private Label                 _lblVisibleLabels;
+   private Label                 _lblCommonLocations;
    private Label                 _lblCommonLocationLabel_Color;
    private Label                 _lblCommonLocationLabel_HoveredColor;
    private Label                 _lblTourLocationLabel_Color;
    private Label                 _lblTourLocationLabel_HoveredColor;
    private Label                 _lblMarkerLabel_Color;
    private Label                 _lblMarkerLabel_HoveredColor;
-   private Label                 _lblLabelBackgrouond;
+   private Label                 _lblLabelBackground;
+   private Label                 _lblStats_Locations;
+   private Label                 _lblStats_Locations_All;
+   private Label                 _lblStats_Locations_Visible;
+   private Label                 _lblStats_TourMarkers;
+   private Label                 _lblStats_TourMarkers_All;
+   private Label                 _lblStats_TourMarkers_Visible;
    //
    private Spinner               _spinnerClusterGrid_Size;
    private Spinner               _spinnerClusterOutline_Width;
@@ -483,7 +490,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    @Override
    public void close() {
 
-      CommonLocationManager.setMapLocationSlideout(null);
+      Map2PointManager.setMapLocationSlideout(null);
 
       super.close();
    }
@@ -533,7 +540,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
       enableControls();
 
-      CommonLocationManager.setMapLocationSlideout(this);
+      Map2PointManager.setMapLocationSlideout(this);
    }
 
    /**
@@ -545,7 +552,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       final Composite shellContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(shellContainer);
       GridLayoutFactory.fillDefaults().applyTo(shellContainer);
-      shellContainer.setBackground(UI.SYS_COLOR_MAGENTA);
+//      shellContainer.setBackground(UI.SYS_COLOR_MAGENTA);
       {
          final Composite container = new Composite(shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -584,7 +591,49 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
                _tabTourMarkerGroups = new CTabItem(_tabFolder, SWT.NONE);
                _tabTourMarkerGroups.setImage(_imageTourMarker_Groups);
                _tabTourMarkerGroups.setToolTipText("Tour marker groups");
-               _tabTourMarkerGroups.setControl(createUI_250_Tab_Groups(_tabFolder));
+               _tabTourMarkerGroups.setControl(createUI_600_Tab_Groups(_tabFolder));
+            }
+         }
+         {
+            /*
+             * Statistics
+             */
+            final GridDataFactory gd = GridDataFactory.fillDefaults().grab(false, false);
+
+            final String tooltipMarkers = "Number of visible / available tour markers";
+            final String tooltipLocations = "Number of visible / available tour + common locations";
+
+            final Composite statContainer = new Composite(shellContainer, SWT.NONE);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.END).applyTo(statContainer);
+            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(statContainer);
+//            container.setBackground(UI.SYS_COLOR_GREEN);
+            {
+               {
+                  _lblStats_TourMarkers = new Label(statContainer, SWT.NONE);
+                  _lblStats_TourMarkers.setText("Tour markers");
+                  _lblStats_TourMarkers.setToolTipText(tooltipMarkers);
+
+                  _lblStats_TourMarkers_Visible = new Label(statContainer, SWT.TRAIL);
+                  _lblStats_TourMarkers_Visible.setToolTipText(tooltipMarkers);
+                  gd.applyTo(_lblStats_TourMarkers_Visible);
+
+                  _lblStats_TourMarkers_All = new Label(statContainer, SWT.TRAIL);
+                  _lblStats_TourMarkers_All.setToolTipText(tooltipMarkers);
+                  gd.applyTo(_lblStats_TourMarkers_All);
+               }
+               {
+                  _lblStats_Locations = new Label(statContainer, SWT.NONE);
+                  _lblStats_Locations.setText("Locations");
+                  _lblStats_Locations.setToolTipText(tooltipLocations);
+
+                  _lblStats_Locations_Visible = new Label(statContainer, SWT.TRAIL);
+                  _lblStats_Locations_Visible.setToolTipText(tooltipLocations);
+                  gd.applyTo(_lblStats_Locations_Visible);
+
+                  _lblStats_Locations_All = new Label(statContainer, SWT.TRAIL);
+                  _lblStats_Locations_All.setToolTipText(tooltipLocations);
+                  gd.applyTo(_lblStats_Locations_All);
+               }
             }
          }
       }
@@ -595,7 +644,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    private Control createUI_100_Tab_All(final Composite parent) {
 
       final Composite tabContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(1).applyTo(tabContainer);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(tabContainer);
+      GridLayoutFactory.fillDefaults().margins(5, 5).numColumns(1).applyTo(tabContainer);
       {
          {
             /*
@@ -664,8 +714,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       final GridDataFactory gdSpan2 = GridDataFactory.fillDefaults().span(2, 1);
 
       final Composite tabContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(2).applyTo(tabContainer);
-//      tabContainer.setBackground(UI.SYS_COLOR_YELLOW);
+      GridLayoutFactory.fillDefaults().margins(5, 5).numColumns(2).applyTo(tabContainer);
       {
          {
             /*
@@ -673,10 +722,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
              */
 
             // label
-            _lblLabelBackgrouond = new Label(tabContainer, SWT.NONE);
-            _lblLabelBackgrouond.setText("Label &background");
-            _lblLabelBackgrouond.setToolTipText("");
-            gdHCenter.applyTo(_lblLabelBackgrouond);
+            _lblLabelBackground = new Label(tabContainer, SWT.NONE);
+            _lblLabelBackground.setText("Label &background");
+            gdHCenter.applyTo(_lblLabelBackground);
 
             // combo
             _comboLabelLayout = new Combo(tabContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -829,7 +877,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    private Control createUI_200_Tab_TourMarker(final Composite parent) {
 
       final Composite tabContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(1).applyTo(tabContainer);
+      GridLayoutFactory.fillDefaults().margins(5, 5).numColumns(1).applyTo(tabContainer);
       {
          {
             /*
@@ -1089,73 +1137,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       }
    }
 
-   private Control createUI_250_Tab_Groups(final Composite parent) {
-
-      final Composite tabContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(2).applyTo(tabContainer);
-      {
-         {
-            /*
-             * Group duplicate markers
-             */
-            _chkIsGroupDuplicatedMarkers = new Button(tabContainer, SWT.CHECK);
-            _chkIsGroupDuplicatedMarkers.setText("&Group tour markers with the same label");
-            _chkIsGroupDuplicatedMarkers.addSelectionListener(_markerSelectionListener);
-            GridDataFactory.fillDefaults()
-                  .span(2, 1)
-                  .applyTo(_chkIsGroupDuplicatedMarkers);
-
-         }
-         {
-            /*
-             * Label group grid size
-             */
-
-            // label
-            _lblLabelGroupGridSize = new Label(tabContainer, SWT.NONE);
-            _lblLabelGroupGridSize.setText("Group grid &size");
-            _lblLabelGroupGridSize.setToolTipText("");
-            GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.CENTER)
-                  .indent(UI.FORM_FIRST_COLUMN_INDENT, 0).applyTo(_lblLabelGroupGridSize);
-
-            // spinner
-            _spinnerLabelGroupGridSize = new Spinner(tabContainer, SWT.BORDER);
-            _spinnerLabelGroupGridSize.setMinimum(Map2ConfigManager.LABEL_WRAP_LENGTH_MIN);
-            _spinnerLabelGroupGridSize.setMaximum(Map2ConfigManager.LABEL_WRAP_LENGTH_MAX);
-            _spinnerLabelGroupGridSize.setIncrement(1);
-            _spinnerLabelGroupGridSize.setPageIncrement(10);
-            _spinnerLabelGroupGridSize.addSelectionListener(_markerSelectionListener);
-            _spinnerLabelGroupGridSize.addMouseWheelListener(_markerMouseWheelListener10);
-         }
-         {
-            // label
-            _lblGroupDuplicatedMarkers = new Label(tabContainer, SWT.NONE);
-            _lblGroupDuplicatedMarkers.setText("Marker &labels which are grouped");
-            _lblGroupDuplicatedMarkers.setToolTipText("");
-            GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.CENTER)
-                  .span(2, 1)
-                  .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
-                  .applyTo(_lblGroupDuplicatedMarkers);
-
-            _txtGroupDuplicatedMarkers = new Text(tabContainer, SWT.MULTI | SWT.WRAP | SWT.BORDER);
-            _txtGroupDuplicatedMarkers.setToolTipText("");
-            _txtGroupDuplicatedMarkers.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onModifyConfig(false)));
-            GridDataFactory.fillDefaults()
-                  .span(2, 1)
-                  .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
-                  .applyTo(_txtGroupDuplicatedMarkers);
-         }
-      }
-
-      return tabContainer;
-   }
-
    private Control createUI_300_Tab_TourLocations(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(2).applyTo(container);
+      GridLayoutFactory.fillDefaults().margins(5, 5).numColumns(2).applyTo(container);
       {
          createUI_310_TourLocation_Label(container);
       }
@@ -1255,7 +1240,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 5, 0).numColumns(1).applyTo(container);
+      GridLayoutFactory.fillDefaults().margins(5, 5).numColumns(1).applyTo(container);
       {
          createUI_510_CommonLocation_Label(container);
          createUI_520_CommonLocation_Viewer(container);
@@ -1360,16 +1345,21 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
    private void createUI_520_CommonLocation_Viewer(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridDataFactory.fillDefaults()
+            .grab(true, true)
+            .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+            .applyTo(container);
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
          {
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Slideout_MapPoints_Label_CommonLocations);
+            _lblCommonLocations = new Label(container, SWT.NONE);
+            _lblCommonLocations.setText(Messages.Slideout_MapPoints_Label_CommonLocations);
          }
          {
             _viewerContainer = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
+            GridDataFactory.fillDefaults()
+                  .grab(true, true)
+                  .applyTo(_viewerContainer);
             GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
             {
                createUI_522_CommonLocation_Table(_viewerContainer);
@@ -1467,6 +1457,76 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             UI.setButtonLayoutData(_btnDeleteCommonLocation);
          }
       }
+   }
+
+   private Control createUI_600_Tab_Groups(final Composite parent) {
+
+      final Composite tabContainer = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().margins(5, 5).numColumns(2).applyTo(tabContainer);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(tabContainer);
+
+      {
+         {
+            /*
+             * Group duplicate markers
+             */
+            _chkIsGroupDuplicatedMarkers = new Button(tabContainer, SWT.CHECK);
+            _chkIsGroupDuplicatedMarkers.setText("&Group tour markers with the same label");
+            _chkIsGroupDuplicatedMarkers.addSelectionListener(_markerSelectionListener);
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .applyTo(_chkIsGroupDuplicatedMarkers);
+
+         }
+         {
+            /*
+             * Label group grid size
+             */
+
+            // label
+            _lblLabelGroupGridSize = new Label(tabContainer, SWT.NONE);
+            _lblLabelGroupGridSize.setText("Group grid &size");
+            _lblLabelGroupGridSize.setToolTipText("");
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .indent(UI.FORM_FIRST_COLUMN_INDENT, 0).applyTo(_lblLabelGroupGridSize);
+
+            // spinner
+            _spinnerLabelGroupGridSize = new Spinner(tabContainer, SWT.BORDER);
+            _spinnerLabelGroupGridSize.setMinimum(Map2ConfigManager.LABEL_WRAP_LENGTH_MIN);
+            _spinnerLabelGroupGridSize.setMaximum(Map2ConfigManager.LABEL_WRAP_LENGTH_MAX);
+            _spinnerLabelGroupGridSize.setIncrement(1);
+            _spinnerLabelGroupGridSize.setPageIncrement(10);
+            _spinnerLabelGroupGridSize.addSelectionListener(_markerSelectionListener);
+            _spinnerLabelGroupGridSize.addMouseWheelListener(_markerMouseWheelListener10);
+         }
+         {
+            // label
+            _lblGroupDuplicatedMarkers = new Label(tabContainer, SWT.NONE);
+            _lblGroupDuplicatedMarkers.setText("Marker &labels which are grouped");
+            _lblGroupDuplicatedMarkers.setToolTipText("");
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .span(2, 1)
+                  .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+                  .applyTo(_lblGroupDuplicatedMarkers);
+
+            _txtGroupDuplicatedMarkers = new Text(tabContainer, SWT.MULTI | SWT.WRAP | SWT.BORDER);
+            _txtGroupDuplicatedMarkers.setToolTipText("");
+            _txtGroupDuplicatedMarkers.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onModifyConfig(false)));
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+                  .applyTo(_txtGroupDuplicatedMarkers);
+            GridDataFactory.fillDefaults()
+                  .grab(true, true)
+                  .span(2, 1)
+                  .indent(UI.FORM_FIRST_COLUMN_INDENT, 0).applyTo(_txtGroupDuplicatedMarkers);
+
+         }
+      }
+
+      return tabContainer;
    }
 
    private void defineAllColumns() {
@@ -1680,7 +1740,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
       final boolean isTruncateLabel          = _chkIsTruncateLabel            .getSelection();
       final boolean isWrapLabel              = _chkIsWrapLabel                .getSelection();
-      
+
       final boolean isDimMap                 = _chkIsDimMap                   .getSelection();
       final boolean isUseMapDimColor         = _chkUseMapDimColor             .getSelection();
       final boolean isUseTransparencyColor   = isUseMapDimColor == false;
@@ -1696,7 +1756,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
       _chkIsTruncateLabel                 .setEnabled(isShowLabels);
       _chkIsWrapLabel                     .setEnabled(isShowLabels);
       _comboLabelLayout                   .setEnabled(isShowLabels);
-      _lblLabelBackgrouond                .setEnabled(isShowLabels);
+      _lblLabelBackground                 .setEnabled(isShowLabels);
+      _lblStats_Locations                 .setEnabled(isShowLabels);
+      _lblStats_Locations_All             .setEnabled(isShowLabels);
+      _lblStats_Locations_Visible         .setEnabled(isShowLabels);
+      _lblStats_TourMarkers               .setEnabled(isShowLabels);
+      _lblStats_TourMarkers_All           .setEnabled(isShowLabels);
+      _lblStats_TourMarkers_Visible       .setEnabled(isShowLabels);
       _lblVisibleLabels                   .setEnabled(isShowLabels);
       _spinnerLabelDistributorMaxLabels   .setEnabled(isShowLabels);
       _spinnerLabelDistributorRadius      .setEnabled(isShowLabels);
@@ -1744,6 +1810,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
       // common location
       _btnSwapCommonLocationLabel_Color         .setEnabled(isShowCommonLocations);
+      _lblCommonLocations                       .setEnabled(isShowCommonLocations);
       _lblCommonLocationLabel_Color             .setEnabled(isShowCommonLocations);
       _lblCommonLocationLabel_HoveredColor      .setEnabled(isShowCommonLocations);
       _colorCommonLocationLabel_Fill            .setEnabled(isShowCommonLocations);
@@ -2419,6 +2486,21 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
+
+   public void updateStatistics(final int numVisibleTourMarkers,
+                                final int numAllTourMarkers,
+
+                                final int numVisibleLocations,
+                                final int numAllLocations) {
+
+      _lblStats_Locations_All.setText(Integer.toString(numAllLocations));
+      _lblStats_Locations_Visible.setText(Integer.toString(numVisibleLocations));
+
+      _lblStats_TourMarkers_All.setText(Integer.toString(numAllTourMarkers));
+      _lblStats_TourMarkers_Visible.setText(Integer.toString(numVisibleTourMarkers));
+
+      _lblStats_Locations.getParent().pack();
+   }
 
    public void updateUI() {
 
