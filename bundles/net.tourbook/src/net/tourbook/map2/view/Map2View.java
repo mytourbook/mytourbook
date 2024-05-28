@@ -1125,9 +1125,9 @@ public class Map2View extends ViewPart implements
 
    private void actionMapMarker_CenterMap() {
 
-      final PaintedMapPoint hoveredMarker = _map.getHoveredMapPoint();
+      final PaintedMapPoint hoveredMapPoint = _map.getHoveredMapPoint();
 
-      final GeoPoint geoPoint = hoveredMarker.mapPoint.geoPoint;
+      final GeoPoint geoPoint = hoveredMapPoint.mapPoint.geoPoint;
       final GeoPosition geoPosition = new GeoPosition(geoPoint.getLatitude(), geoPoint.getLongitude());
 
       _map.setMapCenter(geoPosition);
@@ -1135,9 +1135,9 @@ public class Map2View extends ViewPart implements
 
    private void actionMapMarker_Edit() {
 
-      final PaintedMapPoint hoveredMarker = _map.getHoveredMapPoint();
+      final PaintedMapPoint hoveredMapPoint = _map.getHoveredMapPoint();
 
-      final TourMarker tourMarker = hoveredMarker.mapPoint.tourMarker;
+      final TourMarker tourMarker = hoveredMapPoint.mapPoint.tourMarker;
 
       final ITourProvider tourProvider = new ITourProvider() {
 
@@ -1161,9 +1161,9 @@ public class Map2View extends ViewPart implements
 
    private void actionMapMarker_ShowOnlyThisTour() {
 
-      final PaintedMapPoint hoveredMarker = _map.getHoveredMapPoint();
+      final PaintedMapPoint hoveredMapPoint = _map.getHoveredMapPoint();
 
-      final TourMarker tourMarker = hoveredMarker.mapPoint.tourMarker;
+      final TourMarker tourMarker = hoveredMapPoint.mapPoint.tourMarker;
 
       paintTours_20_One(tourMarker.getTourData(), true);
 
@@ -1179,9 +1179,9 @@ public class Map2View extends ViewPart implements
 
    private void actionMapMarker_ZoomIn() {
 
-      final PaintedMapPoint hoveredMarker = _map.getHoveredMapPoint();
+      final PaintedMapPoint hoveredMapPoint = _map.getHoveredMapPoint();
 
-      final GeoPoint geoPoint = hoveredMarker.mapPoint.geoPoint;
+      final GeoPoint geoPoint = hoveredMapPoint.mapPoint.geoPoint;
 
       _map.setZoom(_map.getMapProvider().getMaximumZoomLevel());
       _map.setMapCenter(new GeoPosition(geoPoint.getLatitude(), geoPoint.getLongitude()));
@@ -2423,15 +2423,21 @@ public class Map2View extends ViewPart implements
 
    private void enableActions_MapMarker() {
 
-      final int numTours = _allTourData.size();
-      final boolean isMultipleTours = numTours > 1;
+// SET_FORMATTING_OFF
 
-      final boolean isMarkerHovered = _map.getHoveredMapPoint() != null;
+      final int      numTours = _allTourData.size();
+      final boolean  isMultipleTours = numTours > 1;
 
-      _actionMapMarker_CenterMap.setEnabled(isMarkerHovered);
-      _actionMapMarker_Edit.setEnabled(isMarkerHovered);
-      _actionMapMarker_ShowOnlyThisTour.setEnabled(isMarkerHovered && isMultipleTours);
-      _actionMapMarker_ZoomIn.setEnabled(isMarkerHovered);
+      final PaintedMapPoint   hoveredMapPoint   = _map.getHoveredMapPoint();
+      final boolean           isHoveredMapPoint = hoveredMapPoint != null;
+      final boolean           isTourAvailable   = isHoveredMapPoint && hoveredMapPoint.mapPoint.tourMarker != null;
+
+      _actionMapMarker_CenterMap       .setEnabled(isHoveredMapPoint);
+      _actionMapMarker_Edit            .setEnabled(isHoveredMapPoint);
+      _actionMapMarker_ShowOnlyThisTour.setEnabled(isHoveredMapPoint && isMultipleTours && isTourAvailable);
+      _actionMapMarker_ZoomIn          .setEnabled(isHoveredMapPoint);
+
+// SET_FORMATTING_ON
    }
 
    private void fillActionBars() {
@@ -2478,9 +2484,9 @@ public class Map2View extends ViewPart implements
    @Override
    public void fillContextMenu(final IMenuManager menuMgr, final ActionManageOfflineImages actionManageOfflineImages) {
 
-      final PaintedMapPoint hoveredMarker = _map.getHoveredMapPoint();
+      final PaintedMapPoint hoveredMapPoint = _map.getHoveredMapPoint();
 
-      if (hoveredMarker != null) {
+      if (hoveredMapPoint != null) {
 
          // open context menu for a map marker
 

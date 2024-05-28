@@ -6053,7 +6053,7 @@ public class Map2 extends Canvas {
 
       // the resulting label positions are stored within the point-features
       final int numPlacedLabels = _labelDistributor.label_StandardPipelineAll();
-//    final int numPlacedLabels = _clusterLabeler.label_StandardPipelineAdjacentAll();
+//      final int numPlacedLabels = _labelDistributor.label_StandardPipelineAdjacentAll();
 
       if (isBackgroundPainterInterrupted()) {
          return 0;
