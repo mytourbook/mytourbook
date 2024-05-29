@@ -56,7 +56,6 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -64,7 +63,6 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
@@ -85,13 +83,13 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer2 {
 
-   private static final String     COLUMN_CREATED_DATE_TIME        = "createdDateTime";                           //$NON-NLS-1$
-   private static final String     COLUMN_LOCATION_NAME            = "LocationName";                              //$NON-NLS-1$
-   private static final String     COLUMN_SEQUENCE                 = "sequence";                                  //$NON-NLS-1$
-   private static final String     COLUMN_ZOOM_LEVEL               = "zoomLevel";                                 //$NON-NLS-1$
+   private static final String     COLUMN_CREATED_DATE_TIME        = "createdDateTime";                          //$NON-NLS-1$
+   private static final String     COLUMN_LOCATION_NAME            = "LocationName";                             //$NON-NLS-1$
+   private static final String     COLUMN_SEQUENCE                 = "sequence";                                 //$NON-NLS-1$
+   private static final String     COLUMN_ZOOM_LEVEL               = "zoomLevel";                                //$NON-NLS-1$
 
-   private static final String     STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";               //$NON-NLS-1$
-   private static final String     STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                      //$NON-NLS-1$
+   private static final String     STATE_SORT_COLUMN_DIRECTION     = "STATE_SORT_COLUMN_DIRECTION";              //$NON-NLS-1$
+   private static final String     STATE_SORT_COLUMN_ID            = "STATE_SORT_COLUMN_ID";                     //$NON-NLS-1$
 
    private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
    private IDialogSettings         _state_Map2;
@@ -103,7 +101,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
    private TableViewer             _mapLocationViewer;
    private MapLocationComparator   _mapLocationComparator          = new MapLocationComparator();
    private ColumnManager           _columnManager;
-   private SelectionAdapter        _columnSortListener;
+   private SelectionListener       _columnSortListener;
 
    private SelectionListener       _defaultSelectionListener;
    private IPropertyChangeListener _prefChangeListener;
@@ -507,7 +505,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
       _mapLocationViewer.setContentProvider(new MapLocationContentProvider());
       _mapLocationViewer.setComparator(_mapLocationComparator);
 
-      _mapLocationViewer.addSelectionChangedListener(selectionChangedEvent -> onLocation_Select(selectionChangedEvent));
+      _mapLocationViewer.addSelectionChangedListener(selectionChangedEvent -> onLocation_Select());
 //    _mapLocationViewer.addDoubleClickListener(doubleClickEvent -> onGeoFilter_ToggleReadEditMode());
 
       updateUI_SetSortDirection(
@@ -524,7 +522,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
    }
 
    /**
-    * Ceate the view context menus
+    * Create the view context menus
     */
    private void createUI_84_ContextMenu() {
 
@@ -865,12 +863,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
 
       _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI());
 
-      _columnSortListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSelectSortColumn(e);
-         }
-      };
+      _columnSortListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelectSortColumn(selectionEvent));
    }
 
    @Override
@@ -962,7 +955,7 @@ public class SlideoutMapLocation extends AdvancedSlideout implements ITourViewer
             null);
    }
 
-   private void onLocation_Select(final SelectionChangedEvent selectionChangedEvent) {
+   private void onLocation_Select() {
 
       final IStructuredSelection selection = _mapLocationViewer.getStructuredSelection();
 
