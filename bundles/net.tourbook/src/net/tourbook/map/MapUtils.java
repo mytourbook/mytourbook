@@ -56,7 +56,7 @@ public class MapUtils {
       }
 
       /**
-       * This occurred at least twice but is not reproducable <code>
+       * This occurred at least twice but is not reproducible <code>
        *
        * java.util.ConcurrentModificationException
        * at java.base/java.util.ArrayList$Itr.checkForComodification(ArrayList.java:1043)
@@ -105,7 +105,7 @@ public class MapUtils {
 
                if (dataValue == Float.MIN_VALUE
 
-                     // 0 values can occure when multiple tours are displayed where some tours do not have an elevation
+                     // 0 values can occur when multiple tours are displayed where some tours do not have an elevation
                      || dataValue == 0) {
 
                   // skip invalid values
