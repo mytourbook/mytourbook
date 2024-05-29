@@ -5441,7 +5441,8 @@ public class Map2 extends Canvas {
                                                                 final List<PaintedMarkerCluster> allPaintedMarkerClusters,
                                                                 final List<PaintedMapPoint> allPaintedLocations) {
 
-      final List<Map2Point> allMarkersOnly = new ArrayList<>();
+      final Map<String, Map2Point> allMarkersOnlyMap = new HashMap<>();
+      final List<Map2Point> allMarkersOnlyList = new ArrayList<>();
       final List<StaticCluster<?>> allClustersOnly = new ArrayList<>();
       final List<Rectangle> allClusterRectangleOnly = new ArrayList<>();
 
@@ -5477,7 +5478,23 @@ public class Map2 extends Canvas {
 
                if (markerItem.mClusterItem instanceof final Map2Point mapMarker) {
 
-                  allMarkersOnly.add(mapMarker);
+                  allMarkersOnlyMap.put(mapMarker.ID, mapMarker);
+               }
+            }
+         }
+
+         /*
+          * Resort markers to the original sequence, otherwise they are displayed with random
+          * label positions !!!
+          */
+         if (allMarkersOnlyMap.size() > 0) {
+
+            for (final Map2Point mapPoint : allMapPoints) {
+
+               final Map2Point mapPointInMap = allMarkersOnlyMap.get(mapPoint.ID);
+
+               if (mapPointInMap != null) {
+                  allMarkersOnlyList.add(mapPoint);
                }
             }
          }
@@ -5527,13 +5544,13 @@ public class Map2 extends Canvas {
       /*
        * Paint markers
        */
-      final int numMarkers = allMarkersOnly.size();
+      final int numMarkers = allMarkersOnlyList.size();
       final int numLocations = allLocationPointList.size();
 
       if (numMarkers > 0 || numLocations > 0) {
 
          final Map2Point[] allLocationPoints = allLocationPointList.toArray(new Map2Point[numLocations]);
-         final Map2Point[] allVisibleMarkers = allMarkersOnly.toArray(new Map2Point[numMarkers]);
+         final Map2Point[] allVisibleMarkers = allMarkersOnlyList.toArray(new Map2Point[numMarkers]);
          final Rectangle[] allClusterRectangle = allClusterRectangleOnly.toArray(new Rectangle[allClusterRectangleOnly.size()]);
 
          paint_BackgroundImage_80_MarkerAndLocations(gc,
@@ -5909,8 +5926,8 @@ public class Map2 extends Canvas {
          }
       }
 
-      final int markerSize = 5;
-      final int markerSize2 = markerSize / 2;
+      final int markerSymbolSize = 5;
+      final int markerSymbolSize2 = markerSymbolSize / 2;
 
       final int markerRespectSize = 20;
       final int markerRespectSize2 = markerRespectSize / 2;
@@ -5992,9 +6009,15 @@ public class Map2 extends Canvas {
             final float circleX = clusterRectangle.x + circleRadius2 - circleBorder2;
             final float circleY = clusterRectangle.y + circleRadius2 - circleBorder2;
 
-            _labelSpreader.respectCircle(
+//            _labelSpreader.respectCircle(
+//                  circleX,
+//                  circleY,
+//                  circleRadius2);
+
+            _labelSpreader.respectBox(
                   circleX,
                   circleY,
+                  circleRadius2,
                   circleRadius2);
          }
       }
@@ -6200,14 +6223,14 @@ public class Map2 extends Canvas {
          final int mapPointDevX = mapPoint.geoPointDevX + diffX;
          final int mapPointDevY = mapPoint.geoPointDevY + diffY;
 
-         final int markerSymbolDevX = mapPointDevX - markerSize2;
-         final int markerSymbolDevY = mapPointDevY - markerSize2;
+         final int markerSymbolDevX = mapPointDevX - markerSymbolSize2;
+         final int markerSymbolDevY = mapPointDevY - markerSymbolSize2;
 
          final Rectangle markerSymbolRectangle = new Rectangle(
                markerSymbolDevX,
                markerSymbolDevY,
-               markerSize,
-               markerSize);
+               markerSymbolSize,
+               markerSymbolSize);
 
          gc.fillRectangle(markerSymbolRectangle);
          gc.drawRectangle(markerSymbolRectangle);
@@ -6312,8 +6335,8 @@ public class Map2 extends Canvas {
 
       // FOR DEBUGGING
       //
-//      _labelDistributor.drawParticles(gc);
-//      _labelDistributor.drawSpiral(gc, (int) circleX, (int) circleY);
+//      _labelSpreader.drawParticles(gc);
+//      _labelSpreader.drawSpiral(gc, (int) circleX, (int) circleY);
 
       return numPlacedLabels;
    }

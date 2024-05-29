@@ -64,9 +64,19 @@ public class Map2Point implements ClusterItem {
    public LocationType locationType;
 
    public Color        boundingBox_Color;
-   
+
    public Rectangle    boundingBox;
    public Rectangle    boundingBox_Resized;
+
+   private int         _uniqueID;
+
+   /**
+    * Unique ID
+    */
+   public String       ID;
+
+   @SuppressWarnings("unused")
+   private Map2Point() {}
 
    /**
     * @param tourMarker
@@ -75,6 +85,8 @@ public class Map2Point implements ClusterItem {
    public Map2Point(final GeoPoint geoPoint) {
 
       this.geoPoint = geoPoint;
+
+      ID = String.valueOf(_uniqueID++);
    }
 
    public Color getFillColor() {
@@ -194,9 +206,10 @@ public class Map2Point implements ClusterItem {
 
       return UI.EMPTY_STRING
 
-            + "Map2Marker" //$NON-NLS-1$
+            + "Map2Point" //$NON-NLS-1$
 
-            + " geoPoint =" + geoPoint + ", " //$NON-NLS-1$ //$NON-NLS-2$
+//            + " geoPoint =" + geoPoint + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + " label =" + formattedLabel + ", " //$NON-NLS-1$ //$NON-NLS-2$
 
             + UI.NEW_LINE;
    }
