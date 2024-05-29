@@ -598,15 +598,15 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
             /*
              * Statistics
              */
-            final GridDataFactory gd = GridDataFactory.fillDefaults().grab(false, false);
+            final GridDataFactory gd = GridDataFactory.fillDefaults();
 
             final String tooltipMarkers = "Number of visible / available tour markers";
             final String tooltipLocations = "Number of visible / available tour + common locations";
 
             final Composite statContainer = new Composite(shellContainer, SWT.NONE);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.END).applyTo(statContainer);
-            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(statContainer);
-//            container.setBackground(UI.SYS_COLOR_GREEN);
+            GridLayoutFactory.fillDefaults().numColumns(6).applyTo(statContainer);
+//            statContainer.setBackground(UI.SYS_COLOR_GREEN);
             {
                {
                   _lblStats_TourMarkers = new Label(statContainer, SWT.NONE);
@@ -625,6 +625,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
                   _lblStats_Locations = new Label(statContainer, SWT.NONE);
                   _lblStats_Locations.setText("Locations");
                   _lblStats_Locations.setToolTipText(tooltipLocations);
+                  GridDataFactory.fillDefaults().indent(20, 0).applyTo(_lblStats_Locations);
 
                   _lblStats_Locations_Visible = new Label(statContainer, SWT.TRAIL);
                   _lblStats_Locations_Visible.setToolTipText(tooltipLocations);
