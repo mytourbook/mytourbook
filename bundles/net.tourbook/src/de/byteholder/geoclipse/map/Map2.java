@@ -410,6 +410,7 @@ public class Map2 extends Canvas {
    private final Map<String, Map2Point>    _allMapMarkerWithGroupedLabels     = new HashMap<>();
    private String                          _groupedMarkers;
    private List<TourLocation>              _allCommonLocations;
+   private List<TourLocation>              _allTourLocations;
 
    private PaintedMarkerCluster            _hoveredMarkerCluster;
    private PaintedMapPoint                 _hoveredMapPoint;
@@ -1394,14 +1395,14 @@ public class Map2 extends Canvas {
       return mapImage;
    }
 
-   private void createMapPoints_Locations_10_Tour(final List<TourData> allTourData,
-                                                  final Collection<Map2Point> allMapPoints) {
+   private void createMapPoints_Locations_10_FromTourData(final List<TourData> allTourData,
+                                                          final Collection<Map2Point> allMapPoints) {
 
       final HashMap<TourLocation, Map2Point> allTourLocationsMap = new HashMap<>();
 
       for (final TourData tourData : allTourData) {
 
-         if (_backgroundPainter_Task == null || _backgroundPainter_Task.isCancelled()) {
+         if (isBackgroundPainterInterrupted()) {
             break;
          }
 
@@ -1428,127 +1429,159 @@ public class Map2 extends Canvas {
             continue;
          }
 
-         final boolean isTruncateLabel = _mapConfig.isTruncateLabel;
-         final boolean isWrapLabel = _mapConfig.isWrapLabel;
-         final int labelTruncateLength = _mapConfig.labelTruncateLength;
-         final int labelWrapLength = _mapConfig.labelWrapLength;
-
-         final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
-
          for (int locationIndex = 0; locationIndex < allTempTourLocations.size(); locationIndex++) {
 
             final TourLocation tourLocation = allTempTourLocations.get(locationIndex);
 
             final boolean isStartLocation = hasStartLocation && locationIndex == 0;
 
-            /*
-             * Check if location is visible
-             */
-            final double latitude = tourLocation.latitude;
-            final double longitude = tourLocation.longitude;
+            final LocationType locationType = isStartLocation
+                  ? LocationType.TourStart
+                  : LocationType.TourEnd;
 
-            // convert location lat/long into world pixels
-            final java.awt.Point worldPixel_LocationPos = _mp.geoToPixel(new GeoPosition(latitude, longitude), _mapZoomLevel);
-
-            final int worldPixel_LocationPosX = worldPixel_LocationPos.x;
-            final int worldPixel_LocationPosY = worldPixel_LocationPos.y;
-
-            final boolean isLocationInViewport = worldPixel_Viewport.contains(worldPixel_LocationPosX, worldPixel_LocationPosY);
-
-            if (isLocationInViewport == false) {
-               continue;
-            }
-
-            // convert world position into device position
-            final int devX = worldPixel_LocationPosX - worldPixel_Viewport.x;
-            final int devY = worldPixel_LocationPosY - worldPixel_Viewport.y;
-
-            String locationLabel = tourLocation.getMapName();
-
-            /*
-             * Check if location is a duplicate
-             */
-            final Map2Point existingMap2Location = allTourLocationsMap.get(tourLocation);
-            if (existingMap2Location != null) {
-
-               // this location is a duplicate
-
-               if (isStartLocation) {
-
-                  existingMap2Location.numDuplicates_Start++;
-
-               } else {
-
-                  existingMap2Location.numDuplicates_End++;
-               }
-
-               continue;
-            }
-
-            /*
-             * Create map marker
-             */
-
-            // create formatted label
-            if (isTruncateLabel && locationLabel.length() > labelTruncateLength) {
-
-               if (labelTruncateLength == 0) {
-
-                  locationLabel = UI.SYMBOL_DOT;
-
-               } else {
-
-                  locationLabel = locationLabel.substring(0, labelTruncateLength) + UI.SYMBOL_ELLIPSIS;
-               }
-            }
-
-            if (isWrapLabel && locationLabel.length() > labelWrapLength) {
-
-               locationLabel = WordUtils.wrap(locationLabel, labelWrapLength);
-
-               final String lineSeparator = System.lineSeparator();
-
-               // remove line separator at the end
-               if (locationLabel.endsWith(lineSeparator)) {
-
-                  locationLabel = locationLabel.substring(0, locationLabel.length() - lineSeparator.length());
-               }
-            }
-
-            final Map2Point mapPoint = new Map2Point(new GeoPoint(latitude, longitude));
-
-            mapPoint.tourLocation = tourLocation;
-            mapPoint.locationType = LocationType.Tour;
-
-            mapPoint.geoPointDevX = devX;
-            mapPoint.geoPointDevY = devY;
-            mapPoint.setFormattedLabel(locationLabel);
-
-            // update and keep skipped labels
-
-            if (isStartLocation) {
-
-               mapPoint.numDuplicates_Start++;
-
-            } else {
-
-               mapPoint.numDuplicates_End++;
-            }
-
-            if (_mapConfig.isShowLocationBoundingBox) {
-               createMapPoints_Locations_90_BoundingBox(tourLocation, mapPoint);
-            }
-
-            allTourLocationsMap.put(tourLocation, mapPoint);
-
-            _numStatistics_AllTourLocations++;
+            createMapPoints_Locations_30_TourLocation(tourLocation, locationType, allTourLocationsMap);
          }
       }
 
       allMapPoints.addAll(allTourLocationsMap.values());
    }
 
-   private void createMapPoints_Locations_20_Common(final List<TourLocation> allCommonLocations,
+   private void createMapPoints_Locations_20_FromLocations(final List<TourLocation> allTourLocations,
+                                                           final Collection<Map2Point> allMapPoints) {
+
+      if (allTourLocations == null) {
+         return;
+      }
+
+      final HashMap<TourLocation, Map2Point> allTourLocationsMap = new HashMap<>();
+
+      for (final TourLocation tourLocation : allTourLocations) {
+
+         if (isBackgroundPainterInterrupted()) {
+            break;
+         }
+
+         createMapPoints_Locations_30_TourLocation(tourLocation, LocationType.Tour, allTourLocationsMap);
+      }
+
+      allMapPoints.addAll(allTourLocationsMap.values());
+   }
+
+   private void createMapPoints_Locations_30_TourLocation(final TourLocation tourLocation,
+                                                          final LocationType locationType,
+                                                          final HashMap<TourLocation, Map2Point> allTourLocationsMap) {
+
+      final boolean isTruncateLabel = _mapConfig.isTruncateLabel;
+      final boolean isWrapLabel = _mapConfig.isWrapLabel;
+      final int labelTruncateLength = _mapConfig.labelTruncateLength;
+      final int labelWrapLength = _mapConfig.labelWrapLength;
+
+      final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
+
+      /*
+       * Check if location is visible
+       */
+      final double latitude = tourLocation.latitude;
+      final double longitude = tourLocation.longitude;
+
+      // convert location lat/long into world pixels
+      final java.awt.Point worldPixel_LocationPos = _mp.geoToPixel(new GeoPosition(latitude, longitude), _mapZoomLevel);
+
+      final int worldPixel_LocationPosX = worldPixel_LocationPos.x;
+      final int worldPixel_LocationPosY = worldPixel_LocationPos.y;
+
+      final boolean isLocationInViewport = worldPixel_Viewport.contains(worldPixel_LocationPosX, worldPixel_LocationPosY);
+
+      if (isLocationInViewport == false) {
+         return;
+      }
+
+      // convert world position into device position
+      final int devX = worldPixel_LocationPosX - worldPixel_Viewport.x;
+      final int devY = worldPixel_LocationPosY - worldPixel_Viewport.y;
+
+      String locationLabel = tourLocation.getMapName();
+
+      /*
+       * Check if location is a duplicate
+       */
+      final Map2Point existingMap2Location = allTourLocationsMap.get(tourLocation);
+      if (existingMap2Location != null) {
+
+         // this location is a duplicate
+
+         if (locationType.equals(LocationType.TourStart)) {
+
+            existingMap2Location.numDuplicates_Start++;
+
+         } else if (locationType.equals(LocationType.TourEnd)) {
+
+            existingMap2Location.numDuplicates_End++;
+         }
+
+         return;
+      }
+
+      /*
+       * Create map point
+       */
+
+      // create formatted label
+      if (isTruncateLabel && locationLabel.length() > labelTruncateLength) {
+
+         if (labelTruncateLength == 0) {
+
+            locationLabel = UI.SYMBOL_DOT;
+
+         } else {
+
+            locationLabel = locationLabel.substring(0, labelTruncateLength) + UI.SYMBOL_ELLIPSIS;
+         }
+      }
+
+      if (isWrapLabel && locationLabel.length() > labelWrapLength) {
+
+         locationLabel = WordUtils.wrap(locationLabel, labelWrapLength);
+
+         final String lineSeparator = System.lineSeparator();
+
+         // remove line separator at the end
+         if (locationLabel.endsWith(lineSeparator)) {
+
+            locationLabel = locationLabel.substring(0, locationLabel.length() - lineSeparator.length());
+         }
+      }
+
+      final Map2Point mapPoint = new Map2Point(new GeoPoint(latitude, longitude));
+
+      mapPoint.tourLocation = tourLocation;
+      mapPoint.locationType = LocationType.Tour;
+
+      mapPoint.geoPointDevX = devX;
+      mapPoint.geoPointDevY = devY;
+      mapPoint.setFormattedLabel(locationLabel);
+
+      // update and keep skipped labels
+
+      if (locationType.equals(LocationType.TourStart)) {
+
+         mapPoint.numDuplicates_Start++;
+
+      } else if (locationType.equals(LocationType.TourEnd)) {
+
+         mapPoint.numDuplicates_End++;
+      }
+
+      if (_mapConfig.isShowLocationBoundingBox) {
+         createMapPoints_Locations_90_BoundingBox(tourLocation, mapPoint);
+      }
+
+      allTourLocationsMap.put(tourLocation, mapPoint);
+
+      _numStatistics_AllTourLocations++;
+   }
+
+   private void createMapPoints_Locations_50_Common(final List<TourLocation> allCommonLocations,
                                                     final Collection<Map2Point> allMapPoints) {
 
       if (allCommonLocations == null || allCommonLocations.size() == 0) {
@@ -1564,7 +1597,7 @@ public class Map2 extends Canvas {
 
       for (final TourLocation tourLocation : allCommonLocations) {
 
-         if (_backgroundPainter_Task == null || _backgroundPainter_Task.isCancelled()) {
+         if (isBackgroundPainterInterrupted()) {
             break;
          }
 
@@ -1767,7 +1800,7 @@ public class Map2 extends Canvas {
 
       for (final TourData tourData : allTourData) {
 
-         if (_backgroundPainter_Task == null || _backgroundPainter_Task.isCancelled()) {
+         if (isBackgroundPainterInterrupted()) {
             break;
          }
 
@@ -2298,7 +2331,7 @@ public class Map2 extends Canvas {
     *
     * @return
     */
-   public ToolTip getMapMarkerTooltip() {
+   public ToolTip getMapPointTooltip() {
 
       return _mapPointTooltip;
    }
@@ -3052,7 +3085,7 @@ public class Map2 extends Canvas {
 
    private boolean isBackgroundPainterInterrupted() {
 
-      return _backgroundPainter_Task != null && _backgroundPainter_Task.isCancelled();
+      return _backgroundPainter_Task == null || _backgroundPainter_Task.isCancelled();
    }
 
    public boolean isCutOffLinesInPauses() {
@@ -5324,7 +5357,7 @@ public class Map2 extends Canvas {
                // clone list to prevent concurrency exceptions, this happened
                final List<TourData> allTourData = new ArrayList<>(TourPainterConfiguration.getTourData());
 
-               if (_mapConfig.isMarkerClustered) {
+               if (_mapConfig.isShowTourMarker && _mapConfig.isMarkerClustered) {
 
                   paint_BackgroundImage_30_AllMapPointsAndCluster(gcCanvas,
                         allTourData,
@@ -5410,11 +5443,13 @@ public class Map2 extends Canvas {
       }
 
       if (_mapConfig.isShowCommonLocation) {
-         createMapPoints_Locations_20_Common(_allCommonLocations, allLocationPointsList);
+         createMapPoints_Locations_50_Common(_allCommonLocations, allLocationPointsList);
       }
 
       if (_mapConfig.isShowTourLocation) {
-         createMapPoints_Locations_10_Tour(allTourData, allLocationPointsList);
+
+         createMapPoints_Locations_10_FromTourData(allTourData, allLocationPointsList);
+         createMapPoints_Locations_20_FromLocations(_allTourLocations, allLocationPointsList);
       }
 
       if (allMarkerPointsList.size() == 0 && allLocationPointsList.size() == 0) {
@@ -5505,11 +5540,13 @@ public class Map2 extends Canvas {
       final Collection<Map2Point> allLocationPointList = new ArrayList<>();
 
       if (_mapConfig.isShowCommonLocation) {
-         createMapPoints_Locations_20_Common(_allCommonLocations, allLocationPointList);
+         createMapPoints_Locations_50_Common(_allCommonLocations, allLocationPointList);
       }
 
       if (_mapConfig.isShowTourLocation) {
-         createMapPoints_Locations_10_Tour(allTourData, allLocationPointList);
+         createMapPoints_Locations_10_FromTourData(allTourData, allLocationPointList);
+         createMapPoints_Locations_20_FromLocations(_allTourLocations, allLocationPointList);
+
       }
 
       /*
@@ -9340,6 +9377,13 @@ public class Map2 extends Canvas {
    public void setLocations_Common(final List<TourLocation> allTourLocations) {
 
       _allCommonLocations = allTourLocations;
+
+      paint();
+   }
+
+   public void setLocations_Tours(final List<TourLocation> allTourLocations) {
+
+      _allTourLocations = allTourLocations;
 
       paint();
    }

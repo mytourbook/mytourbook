@@ -2159,15 +2159,15 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void onSwapClusterColor() {
 
-      final Map2Config config = Map2ConfigManager.getActiveConfig();
+      final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
 
-      final RGB fgColor = config.clusterOutline_RGB;
-      final RGB bgColor = config.clusterFill_RGB;
+      final RGB fgColor = mapConfig.clusterOutline_RGB;
+      final RGB bgColor = mapConfig.clusterFill_RGB;
 
-      config.clusterOutline_RGB = bgColor;
-      config.clusterFill_RGB = fgColor;
+      mapConfig.clusterOutline_RGB = bgColor;
+      mapConfig.clusterFill_RGB = fgColor;
 
-      config.setupColors();
+      mapConfig.setupColors();
 
       restoreState();
       repaintMap();
@@ -2175,15 +2175,15 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void onSwapCommonLocationColor() {
 
-      final Map2Config config = Map2ConfigManager.getActiveConfig();
+      final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
 
-      final RGB fgColor = config.commonLocationOutline_RGB;
-      final RGB bgColor = config.commonLocationFill_RGB;
+      final RGB fgColor = mapConfig.commonLocationOutline_RGB;
+      final RGB bgColor = mapConfig.commonLocationFill_RGB;
 
-      config.commonLocationOutline_RGB = bgColor;
-      config.commonLocationFill_RGB = fgColor;
+      mapConfig.commonLocationOutline_RGB = bgColor;
+      mapConfig.commonLocationFill_RGB = fgColor;
 
-      config.setupColors();
+      mapConfig.setupColors();
 
       restoreState();
       repaintMap();
@@ -2191,15 +2191,15 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void onSwapCommonLocationHoveredColor() {
 
-      final Map2Config config = Map2ConfigManager.getActiveConfig();
+      final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
 
-      final RGB fgColor = config.commonLocationOutline_Hovered_RGB;
-      final RGB bgColor = config.commonLocationFill_Hovered_RGB;
+      final RGB fgColor = mapConfig.commonLocationOutline_Hovered_RGB;
+      final RGB bgColor = mapConfig.commonLocationFill_Hovered_RGB;
 
-      config.commonLocationOutline_Hovered_RGB = bgColor;
-      config.commonLocationFill_Hovered_RGB = fgColor;
+      mapConfig.commonLocationOutline_Hovered_RGB = bgColor;
+      mapConfig.commonLocationFill_Hovered_RGB = fgColor;
 
-      config.setupColors();
+      mapConfig.setupColors();
 
       restoreState();
       repaintMap();
@@ -2207,15 +2207,15 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void onSwapMarkerColor() {
 
-      final Map2Config config = Map2ConfigManager.getActiveConfig();
+      final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
 
-      final RGB fgColor = config.markerOutline_RGB;
-      final RGB bgColor = config.markerFill_RGB;
+      final RGB fgColor = mapConfig.markerOutline_RGB;
+      final RGB bgColor = mapConfig.markerFill_RGB;
 
-      config.markerOutline_RGB = bgColor;
-      config.markerFill_RGB = fgColor;
+      mapConfig.markerOutline_RGB = bgColor;
+      mapConfig.markerFill_RGB = fgColor;
 
-      config.setupColors();
+      mapConfig.setupColors();
 
       restoreState();
       repaintMap();
@@ -2223,15 +2223,15 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void onSwapMarkerHoveredColor() {
 
-      final Map2Config config = Map2ConfigManager.getActiveConfig();
+      final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
 
-      final RGB fgColor = config.markerOutline_Hovered_RGB;
-      final RGB bgColor = config.markerFill_Hovered_RGB;
+      final RGB fgColor = mapConfig.markerOutline_Hovered_RGB;
+      final RGB bgColor = mapConfig.markerFill_Hovered_RGB;
 
-      config.markerOutline_Hovered_RGB = bgColor;
-      config.markerFill_Hovered_RGB = fgColor;
+      mapConfig.markerOutline_Hovered_RGB = bgColor;
+      mapConfig.markerFill_Hovered_RGB = fgColor;
 
-      config.setupColors();
+      mapConfig.setupColors();
 
       restoreState();
       repaintMap();
@@ -2239,15 +2239,15 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void onSwapTourLocationColor() {
 
-      final Map2Config config = Map2ConfigManager.getActiveConfig();
+      final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
 
-      final RGB fgColor = config.tourLocationOutline_RGB;
-      final RGB bgColor = config.tourLocationFill_RGB;
+      final RGB fgColor = mapConfig.tourLocationOutline_RGB;
+      final RGB bgColor = mapConfig.tourLocationFill_RGB;
 
-      config.tourLocationOutline_RGB = bgColor;
-      config.tourLocationFill_RGB = fgColor;
+      mapConfig.tourLocationOutline_RGB = bgColor;
+      mapConfig.tourLocationFill_RGB = fgColor;
 
-      config.setupColors();
+      mapConfig.setupColors();
 
       restoreState();
       repaintMap();
@@ -2255,15 +2255,15 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements ITourVie
 
    private void onSwapTourLocationHoveredColor() {
 
-      final Map2Config config = Map2ConfigManager.getActiveConfig();
+      final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
 
-      final RGB fgColor = config.tourLocationOutline_Hovered_RGB;
-      final RGB bgColor = config.tourLocationFill_Hovered_RGB;
+      final RGB fgColor = mapConfig.tourLocationOutline_Hovered_RGB;
+      final RGB bgColor = mapConfig.tourLocationFill_Hovered_RGB;
 
-      config.tourLocationOutline_Hovered_RGB = bgColor;
-      config.tourLocationFill_Hovered_RGB = fgColor;
+      mapConfig.tourLocationOutline_Hovered_RGB = bgColor;
+      mapConfig.tourLocationFill_Hovered_RGB = fgColor;
 
-      config.setupColors();
+      mapConfig.setupColors();
 
       restoreState();
       repaintMap();

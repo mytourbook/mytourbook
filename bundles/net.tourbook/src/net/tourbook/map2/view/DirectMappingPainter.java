@@ -118,9 +118,9 @@ public class DirectMappingPainter implements IDirectPainter {
 
       final GC gc = painterContext.gc;
 
-      final Map2Config markerConfig = Map2ConfigManager.getActiveConfig();
+      final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
 
-      gc.setAntialias(markerConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
+      gc.setAntialias(mapConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
 
       final PaintedMapPoint hoveredPoint = _map2.getHoveredMapPoint();
       final Rectangle labelRectangle = hoveredPoint.labelRectangle;
@@ -150,7 +150,7 @@ public class DirectMappingPainter implements IDirectPainter {
       /*
        * Draw location bounding box
        */
-      if (markerConfig.isShowLocationBoundingBox) {
+      if (mapConfig.isShowLocationBoundingBox) {
 
          // draw original bbox
          final Rectangle boundingBox = mapPoint.boundingBox;

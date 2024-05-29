@@ -2431,9 +2431,13 @@ public class Map2View extends ViewPart implements
       final PaintedMapPoint   hoveredMapPoint   = _map.getHoveredMapPoint();
       final boolean           isHoveredMapPoint = hoveredMapPoint != null;
       final boolean           isTourAvailable   = isHoveredMapPoint && hoveredMapPoint.mapPoint.tourMarker != null;
+      final boolean           canEditTour       = isHoveredMapPoint
+
+            && (hoveredMapPoint.mapPoint.locationType.equals(LocationType.TourStart)
+            ||  hoveredMapPoint.mapPoint.locationType.equals(LocationType.TourEnd));
 
       _actionMapMarker_CenterMap       .setEnabled(isHoveredMapPoint);
-      _actionMapMarker_Edit            .setEnabled(isHoveredMapPoint);
+      _actionMapMarker_Edit            .setEnabled(isHoveredMapPoint && canEditTour);
       _actionMapMarker_ShowOnlyThisTour.setEnabled(isHoveredMapPoint && isMultipleTours && isTourAvailable);
       _actionMapMarker_ZoomIn          .setEnabled(isHoveredMapPoint);
 
@@ -3036,30 +3040,6 @@ public class Map2View extends ViewPart implements
       return new GeoPosition(latitudeCenter, longitudeCenter);
    }
 
-   /**
-    * Collect tour locations from a tour
-    *
-    * @param tourData
-    *
-    * @return
-    */
-   private List<TourLocationExtended> getTourLocations(final TourData tourData) {
-
-      final List<TourLocationExtended> allTourLocations = new ArrayList<>();
-
-      final TourLocation tourLocationStart = tourData.getTourLocationStart();
-      final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
-
-      if (tourLocationStart != null) {
-         allTourLocations.add(new TourLocationExtended(tourLocationStart, LocationType.TourStart));
-      }
-      if (tourLocationEnd != null) {
-         allTourLocations.add(new TourLocationExtended(tourLocationEnd, LocationType.TourEnd));
-      }
-
-      return allTourLocations;
-   }
-
    private Set<GeoPosition> getXSliderGeoPositions(final TourData tourData,
                                                    int valueIndex1,
                                                    int valueIndex2) {
@@ -3408,12 +3388,14 @@ public class Map2View extends ViewPart implements
       _actionShowPOI.setChecked(true);
    }
 
+   @SuppressWarnings("unchecked")
    private void moveToCommonLocation(final Object eventData) {
 
       List<TourLocation> allTourLocations = null;
 
       if (eventData instanceof final List allTourLocationsFromEvent) {
          allTourLocations = allTourLocationsFromEvent;
+
       }
 
       if (eventData == null
@@ -3456,9 +3438,10 @@ public class Map2View extends ViewPart implements
       _map.setMapCenter(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()));
    }
 
+   @SuppressWarnings("unchecked")
    private void moveToTourLocation(final Object eventData) {
 
-      final List<TourLocation> allTourLocations = null;
+      List<TourLocation> allTourLocations = null;
 
       if (eventData instanceof final List allTourLocationsFromEvent) {
          allTourLocations = allTourLocationsFromEvent;
@@ -3470,7 +3453,7 @@ public class Map2View extends ViewPart implements
 
          // hide tour locations
 
-         _directMappingPainter.setLocations_Tour(null);
+         _map.setLocations_Tours(null);
 
          _map.redraw();
 
@@ -3478,11 +3461,8 @@ public class Map2View extends ViewPart implements
       }
 
       // repaint map
-      final List<TourLocationExtended> allTourLocationsExtended = new ArrayList<>();
-      for (final TourLocation tourLocation : allTourLocations) {
-         allTourLocationsExtended.add(new TourLocationExtended(tourLocation, LocationType.Tour));
-      }
-      _directMappingPainter.setLocations_Tour(allTourLocationsExtended);
+
+      _map.setLocations_Tours(allTourLocations);
 
       _map.redraw();
 
@@ -5582,13 +5562,16 @@ public class Map2View extends ViewPart implements
 // SET_FORMATTING_ON
 
       // enable/disable cluster/marker tooltip
-      final Map2Config markerConfig = Map2ConfigManager.getActiveConfig();
+      final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
 
-      final boolean isShowTourMarker = markerConfig.isShowTourMarker;
-      if (isShowTourMarker) {
-         _map.getMapMarkerTooltip().activate();
+      final boolean isShowTooltip = mapConfig.isShowTourMarker
+            || mapConfig.isShowTourLocation
+            || mapConfig.isShowCommonLocation;
+
+      if (isShowTooltip) {
+         _map.getMapPointTooltip().activate();
       } else {
-         _map.getMapMarkerTooltip().deactivate();
+         _map.getMapPointTooltip().deactivate();
       }
 
       setIconPosition_TourInfo();
