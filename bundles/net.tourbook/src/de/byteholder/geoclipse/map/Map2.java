@@ -5444,7 +5444,7 @@ public class Map2 extends Canvas {
       final Map<String, Map2Point> allMarkersOnlyMap = new HashMap<>();
       final List<Map2Point> allMarkersOnlyList = new ArrayList<>();
       final List<StaticCluster<?>> allClustersOnly = new ArrayList<>();
-      final List<Rectangle> allClusterRectangleOnly = new ArrayList<>();
+      final List<Rectangle> allClusterSymbolRectangleOnly = new ArrayList<>();
 
       if (_mapConfig.isShowTourMarker) {
 
@@ -5534,7 +5534,7 @@ public class Map2 extends Canvas {
                   allPaintedMarkerClusters);
 
             if (paintedCluster != null) {
-               allClusterRectangleOnly.add(paintedCluster.clusterSymbolRectangle);
+               allClusterSymbolRectangleOnly.add(paintedCluster.clusterSymbolRectangle);
             }
          }
 
@@ -5551,7 +5551,7 @@ public class Map2 extends Canvas {
 
          final Map2Point[] allLocationPoints = allLocationPointList.toArray(new Map2Point[numLocations]);
          final Map2Point[] allVisibleMarkers = allMarkersOnlyList.toArray(new Map2Point[numMarkers]);
-         final Rectangle[] allClusterRectangle = allClusterRectangleOnly.toArray(new Rectangle[allClusterRectangleOnly.size()]);
+         final Rectangle[] allClusterRectangle = allClusterSymbolRectangleOnly.toArray(new Rectangle[allClusterSymbolRectangleOnly.size()]);
 
          paint_BackgroundImage_80_MarkerAndLocations(gc,
 
@@ -5747,19 +5747,19 @@ public class Map2 extends Canvas {
 
       final boolean isPaintBackground = _isMarkerClusterSelected ? false : true;
 
-      final Rectangle paintedClusterRectangle = paintedCluster.clusterSymbolRectangle;
+      final Rectangle clusterSymbolRectangle = paintedCluster.clusterSymbolRectangle;
 
-      final int ovalDevX = paintedClusterRectangle.x;
-      final int ovalDevY = paintedClusterRectangle.y;
-      final int circleSize = paintedClusterRectangle.width;
+      final int symbolDevX = clusterSymbolRectangle.x;
+      final int symbolDevY = clusterSymbolRectangle.y;
+      final int circleSize = clusterSymbolRectangle.width;
 
       if (isPaintBackground && _mapConfig.isFillClusterSymbol) {
 
          gc.setBackground(_mapConfig.clusterFill_Color);
          gc.fillOval(
 
-               ovalDevX,
-               ovalDevY,
+               symbolDevX,
+               symbolDevY,
 
                circleSize,
                circleSize);
@@ -5774,8 +5774,8 @@ public class Map2 extends Canvas {
          gc.setLineWidth(outlineWidth);
          gc.drawOval(
 
-               ovalDevX,
-               ovalDevY,
+               symbolDevX,
+               symbolDevY,
 
                circleSize,
                circleSize);
@@ -5884,7 +5884,7 @@ public class Map2 extends Canvas {
     * @param allPaintedLocationsPoints
     *
     * @param isPaintClusterMarker
-    * @param allClusterRectangle
+    * @param allClusterSymbolRectangle
     *
     * @return
     */
@@ -5897,7 +5897,7 @@ public class Map2 extends Canvas {
                                                            final List<PaintedMapPoint> allPaintedLocationsPoints,
 
                                                            final boolean isPaintClusterMarker,
-                                                           final Rectangle[] allClusterRectangle) {
+                                                           final Rectangle[] allClusterSymbolRectangle) {
 
       final int maxVisibleItems = _mapConfig.labelDistributorMaxLabels;
       final int clusterSymbolBorder = 10;
@@ -5993,9 +5993,9 @@ public class Map2 extends Canvas {
       /*
        * Prevent that marker clusters are overwritten
        */
-      if (allClusterRectangle != null) {
+      if (allClusterSymbolRectangle != null) {
 
-         for (final Rectangle clusterRectangle : allClusterRectangle) {
+         for (final Rectangle clusterRectangle : allClusterSymbolRectangle) {
 
             if (isBackgroundPainterInterrupted()) {
                return 0;
@@ -6009,15 +6009,9 @@ public class Map2 extends Canvas {
             final float circleX = clusterRectangle.x + circleRadius2 - circleBorder2;
             final float circleY = clusterRectangle.y + circleRadius2 - circleBorder2;
 
-//            _labelSpreader.respectCircle(
-//                  circleX,
-//                  circleY,
-//                  circleRadius2);
-
-            _labelSpreader.respectBox(
-                  circleX,
-                  circleY,
-                  circleRadius2,
+            _labelSpreader.respectCircle(
+                  circleX, //  x-coordinate of center point
+                  circleY, //  y-coordinate of center point
                   circleRadius2);
          }
       }
