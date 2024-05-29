@@ -1948,6 +1948,8 @@ public class Map2 extends Canvas {
       final int offsetX;
       final int offsetY;
 
+//    System.out.println(UI.timeStamp() + " _clusterFontSize: " + _clusterFontSize);
+
 // SET_FORMATTING_OFF
 
       if (        _clusterFontSize > 19) {   offsetX = isOneDigit ? 0 : -1;
@@ -1964,7 +1966,7 @@ public class Map2 extends Canvas {
 
       if (        _clusterFontSize > 19) {   offsetY = isOneDigit ? 0 : 0;
       } else if ( _clusterFontSize > 17) {   offsetY = isOneDigit ? 1 : 1;
-      } else if ( _clusterFontSize > 15) {   offsetY = isOneDigit ? 0 : 0;
+      } else if ( _clusterFontSize > 15) {   offsetY = isOneDigit ? 1 : 0;
       } else if ( _clusterFontSize > 13) {   offsetY = isOneDigit ? 1 : 1;
       } else if ( _clusterFontSize > 11) {   offsetY = 1;
       } else if ( _clusterFontSize >  9) {   offsetY = isOneDigit ? 0 : 2;

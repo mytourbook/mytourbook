@@ -86,8 +86,8 @@ public class StaticCluster<T extends ClusterItem> implements Cluster<T> {
 
             + " StaticCluster   " //$NON-NLS-1$
 
-            + " size = %3d".formatted(_clusterItems.size()) //$NON-NLS-1$
-            + " _geoCenter =" + _geoCenter //$NON-NLS-1$
+            + " numChildren=%d".formatted(_clusterItems.size()) //$NON-NLS-1$
+            + " _geoCenter=" + _geoCenter //$NON-NLS-1$
 
       ;
    }

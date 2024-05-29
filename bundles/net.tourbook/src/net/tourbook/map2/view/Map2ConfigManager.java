@@ -137,11 +137,11 @@ public class Map2ConfigManager {
    static final int                   LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT        = 200;
    static final int                   LABEL_DISTRIBUTOR_RADIUS_MIN                = 10;
    static final int                   LABEL_DISTRIBUTOR_RADIUS_MAX                = 2000;
-   static final int                   LABEL_DISTRIBUTOR_RADIUS_DEFAULT            = 300;
+   static final int                   LABEL_DISTRIBUTOR_RADIUS_DEFAULT            = 100;
    static final int                   LABEL_TRUNCATE_LENGTH_MIN                   = 0;
    static final int                   LABEL_TRUNCATE_LENGTH_MAX                   = 1000;
    static final int                   LABEL_TRUNCATE_LENGTH_DEFAULT               = 40;
-   static final int                   LABEL_WRAP_LENGTH_MIN                       = 10;
+   static final int                   LABEL_WRAP_LENGTH_MIN                       = 1;
    static final int                   LABEL_WRAP_LENGTH_MAX                       = 1000;
    static final int                   LABEL_WRAP_LENGTH_DEFAULT                   = 40;
    // cluster

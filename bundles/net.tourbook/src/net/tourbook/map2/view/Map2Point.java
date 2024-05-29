@@ -30,6 +30,8 @@ import org.oscim.core.GeoPoint;
  */
 public class Map2Point implements ClusterItem {
 
+   private static int  _uniqueID;
+
    public GeoPoint     geoPoint;
 
    /**
@@ -67,8 +69,6 @@ public class Map2Point implements ClusterItem {
 
    public Rectangle    boundingBox;
    public Rectangle    boundingBox_Resized;
-
-   private int         _uniqueID;
 
    /**
     * Unique ID
@@ -208,8 +208,9 @@ public class Map2Point implements ClusterItem {
 
             + "Map2Point" //$NON-NLS-1$
 
-//            + " geoPoint =" + geoPoint + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + " label =" + formattedLabel + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + " ID=" + ID + ", " //$NON-NLS-1$ //$NON-NLS-2$
+//          + " geoPoint =" + geoPoint + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + " label=" + formattedLabel + ", " //$NON-NLS-1$ //$NON-NLS-2$
 
             + UI.NEW_LINE;
    }
