@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.io.InputStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -46,6 +44,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
@@ -580,7 +579,7 @@ public class ChartComponentGraph extends Canvas {
       final ScrollBar horizontalBar = getHorizontalBar();
       horizontalBar.setEnabled(false);
       horizontalBar.setVisible(false);
-      horizontalBar.addSelectionListener(widgetSelectedAdapter(this::onScroll));
+      horizontalBar.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onScroll(selectionEvent)));
 
       addMouseMoveListener(mouseEvent -> {
          if (_isGraphVisible) {
@@ -683,7 +682,7 @@ public class ChartComponentGraph extends Canvas {
          }
       });
 
-      addListener(SWT.KeyDown, this::onKeyDown);
+      addListener(SWT.KeyDown, event -> onKeyDown(event));
 
       addDisposeListener(disposeEvent -> onDispose());
 
@@ -2048,8 +2047,8 @@ public class ChartComponentGraph extends Canvas {
                 */
                final ChartTitleSegment chartTitleSegment = new ChartTitleSegment();
 
-               if (segmentCustomData != null && segmentCustomData[segmentIndex] instanceof Long) {
-                  chartTitleSegment.setTourId((Long) segmentCustomData[segmentIndex]);
+               if (segmentCustomData != null && segmentCustomData[segmentIndex] instanceof final Long tourId) {
+                  chartTitleSegment.setTourId(tourId);
                }
 
                chartTitleSegment.devXTitle = devXTitle;
@@ -2103,8 +2102,8 @@ public class ChartComponentGraph extends Canvas {
          final ChartTitleSegment chartTitleSegment = new ChartTitleSegment();
 
          final Object tourIdObject = _chartDrawingData.chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-         if (tourIdObject instanceof Long) {
-            chartTitleSegment.setTourId((Long) tourIdObject);
+         if (tourIdObject instanceof final Long tourId) {
+            chartTitleSegment.setTourId(tourId);
          }
 
          chartTitleSegment.devXTitle = devXTitle;
@@ -6966,8 +6965,8 @@ public class ChartComponentGraph extends Canvas {
             }
 
             for (final Object item : _chart.getChartOverlays()) {
-               if (item instanceof IChartOverlay) {
-                  ((IChartOverlay) item).drawOverlay(gcOverlay, graphDrawingData);
+               if (item instanceof final IChartOverlay chartOverlay) {
+                  chartOverlay.drawOverlay(gcOverlay, graphDrawingData);
                }
             }
          }
@@ -7062,7 +7061,7 @@ public class ChartComponentGraph extends Canvas {
 
    private PointLong getHoveredValue_DevPosition() {
 
-      if (_lineDevPositions.size() == 0) {
+      if (_lineDevPositions.isEmpty()) {
          return null;
       }
 
@@ -8223,8 +8222,8 @@ public class ChartComponentGraph extends Canvas {
          _devXAutoScrollMousePosition = Integer.MIN_VALUE;
 
          // hide move/scroll cursor
-         if (mouseEvent.widget instanceof ChartComponentAxis) {
-            ((ChartComponentAxis) mouseEvent.widget).setCursor(null);
+         if (mouseEvent.widget instanceof final ChartComponentAxis chartComponentAxis) {
+            chartComponentAxis.setCursor(null);
          }
 
          return true;
@@ -8519,8 +8518,7 @@ public class ChartComponentGraph extends Canvas {
 
          // get tooltip shell
          final Shell ttShell = valuePointToolTip.getToolTipShell();
-         if (ttShell != null && mouseWidget instanceof Control) {
-            final Control control = (Control) mouseWidget;
+         if (ttShell != null && mouseWidget instanceof final Control control) {
 
             if (control.getShell() == ttShell) {
 
@@ -9677,7 +9675,7 @@ public class ChartComponentGraph extends Canvas {
 
    void setHovered_ValuePoint_Index(final int newHoveredValuePointIndex) {
 
-      if (_lineDevPositions.size() == 0
+      if (_lineDevPositions.isEmpty()
 
             // this can happen when multiple tours are selected in the map
             // but only one tour is displayed in the chart
