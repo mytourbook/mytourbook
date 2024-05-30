@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,40 +29,40 @@ import net.tourbook.tour.filter.TourFilterFieldOperator;
  */
 public class TourPainterConfiguration {
 
-   private final static ArrayList<TourData> _allTourData = new ArrayList<>();
-   private final static ArrayList<Photo>    _allPhotos   = new ArrayList<>();
+   private final static ArrayList<TourData>    _allTourData = new ArrayList<>();
+   private final static ArrayList<Photo>       _allPhotos   = new ArrayList<>();
 
    /**
     * contains the upper left and lower right position for a tour
     */
-   private static Set<GeoPosition>          _tourBounds;
+   private static Set<GeoPosition>             _tourBounds;
 
-   private static int                       _zoomLevelAdjustment;
+   private static int                          _zoomLevelAdjustment;
 
-   private static IMapColorProvider         _mapColorProvider;
+   private static IMapColorProvider            _mapColorProvider;
 
-   static boolean                           isBackgroundDark;
+   static boolean                              isBackgroundDark;
 
-   static boolean                           isShowPhotos;
-   static boolean                           isShowTours;
-   static boolean                           isShowTourPauses;
-   static boolean                           isShowTourStartEnd;
-   static boolean                           isShowWayPoints;
+   static boolean                              isShowPhotos;
+   static boolean                              isShowTours;
+   static boolean                              isShowTourPauses;
+   static boolean                              isShowTourStartEnd;
+   static boolean                              isShowWayPoints;
 
    /**
     * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
     * save in a tour) is displayed.
     */
-   static boolean                           isLinkPhotoDisplayed;
+   static boolean                              isLinkPhotoDisplayed;
 
-   static boolean                           isFilterTourPauses;
-   static boolean                           isFilterPauseDuration;
-   static boolean                           isShowAutoPauses;
-   static boolean                           isShowUserPauses;
-   static long                              pauseDuration;
-   static Enum<TourFilterFieldOperator>     pauseDurationOperator;
+   public static boolean                       isFilterTourPauses;
+   public static boolean                       isFilterPauseDuration;
+   public static boolean                       isShowAutoPauses;
+   public static boolean                       isShowUserPauses;
+   public static long                          pauseDuration;
+   public static Enum<TourFilterFieldOperator> pauseDurationOperator;
 
-   static boolean                           isShowBreadcrumbs;
+   static boolean                              isShowBreadcrumbs;
 
    private TourPainterConfiguration() {}
 

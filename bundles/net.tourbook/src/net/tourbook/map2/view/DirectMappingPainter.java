@@ -30,7 +30,6 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
 import net.tourbook.map2.Messages;
 
 import org.eclipse.swt.SWT;
@@ -129,9 +128,7 @@ public class DirectMappingPainter implements IDirectPainter {
       final int labelHeight = labelRectangle.height;
 
       final Map2Point mapPoint = hoveredPoint.mapPoint;
-
-      final TourMarker tourMarker = mapPoint.tourMarker;
-      final boolean isTourMarker = tourMarker != null;
+      final MapPointType mapPointType = mapPoint.type;
 
       final int mapPointDevX = mapPoint.geoPointDevX;
       final int mapPointDevY = mapPoint.geoPointDevY;
@@ -210,9 +207,24 @@ public class DirectMappingPainter implements IDirectPainter {
             lineToDevY);
 
       /*
-       * Draw a symbol at the marker location
+       * Draw a symbol at the point location
        */
-      if (isTourMarker) {
+      if (mapPointType.equals(MapPointType.COMMON_LOCATION)
+            || mapPointType.equals(MapPointType.TOUR_LOCATION)) {
+
+         // display hovered location image
+
+         final int imageWidth = _imageMapLocationBounds.width;
+         final int imageHeight = _imageMapLocationBounds.height;
+         final int imageWidth2 = imageWidth / 2;
+
+         gc.drawImage(_imageMapLocation_Hovered,
+               mapPointDevX - imageWidth2,
+               mapPointDevY - imageHeight);
+
+      } else {
+         
+         // draw a symbol
 
          gc.fillRectangle(
                markerSymbolDevX,
@@ -226,15 +238,6 @@ public class DirectMappingPainter implements IDirectPainter {
                markerSymbolDevY,
                markerSize,
                markerSize);
-      } else {
-
-         final int imageWidth = _imageMapLocationBounds.width;
-         final int imageHeight = _imageMapLocationBounds.height;
-         final int imageWidth2 = imageWidth / 2;
-
-         gc.drawImage(_imageMapLocation_Hovered,
-               mapPointDevX - imageWidth2,
-               mapPointDevY - imageHeight);
       }
 
       /*

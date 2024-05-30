@@ -32,6 +32,16 @@ public class Map2Point implements ClusterItem {
 
    private static int  _uniqueID;
 
+   /**
+    * Unique ID
+    */
+   public String       ID;
+
+   /**
+    * Depending on this type, other fields are set
+    */
+   public MapPointType type;
+
    public GeoPoint     geoPoint;
 
    /**
@@ -50,14 +60,7 @@ public class Map2Point implements ClusterItem {
    public int          numDuplicates_Start;
    public int          numDuplicates_End;
 
-   /**
-    * A {@link #tourMarker} or a {@link #tourLocation} is set
-    */
    public TourMarker   tourMarker;
-
-   /**
-    * A {@link #tourMarker} or a {@link #tourLocation} is set
-    */
    public TourLocation tourLocation;
 
    /**
@@ -70,10 +73,7 @@ public class Map2Point implements ClusterItem {
    public Rectangle    boundingBox;
    public Rectangle    boundingBox_Resized;
 
-   /**
-    * Unique ID
-    */
-   public String       ID;
+   public boolean      isPauseAnAutoPause;
 
    @SuppressWarnings("unused")
    private Map2Point() {}
@@ -82,7 +82,9 @@ public class Map2Point implements ClusterItem {
     * @param tourMarker
     * @param geoPoint
     */
-   public Map2Point(final GeoPoint geoPoint) {
+   public Map2Point(final MapPointType type, final GeoPoint geoPoint) {
+
+      this.type = type;
 
       this.geoPoint = geoPoint;
 
@@ -93,35 +95,42 @@ public class Map2Point implements ClusterItem {
 
       final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
 
-      final boolean isTourMarker = tourMarker != null;
+// SET_FORMATTING_OFF
 
-      final Color fillColor = isTourMarker
+      switch (type) {
 
-            ? mapConfig.markerFill_Color
-            : locationType.equals(LocationType.Common)
+      case COMMON_LOCATION:   return mapConfig.commonLocationFill_Color;
 
-                  ? mapConfig.commonLocationFill_Color
-                  : mapConfig.tourLocationFill_Color;
+      case TOUR_LOCATION:     return mapConfig.tourLocationFill_Color;
+      case TOUR_PAUSE:        return mapConfig.tourPauseFill_Color;
 
-      return fillColor;
+      default:
+      case TOUR_MARKER:       return mapConfig.tourMarkerFill_Color;
+
+      }
+
+// SET_FORMATTING_ON
    }
 
    public Color getFillColor_Hovered() {
 
       final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
 
-      final boolean isTourMarker = tourMarker != null;
+// SET_FORMATTING_OFF
 
-      final Color fillColor = isTourMarker
+      switch (type) {
 
-            ? mapConfig.markerFill_Hovered_Color
+      case COMMON_LOCATION:   return mapConfig.commonLocationFill_Hovered_Color;
 
-            : locationType.equals(LocationType.Common)
+      case TOUR_LOCATION:     return mapConfig.tourLocationFill_Hovered_Color;
+      case TOUR_PAUSE:        return mapConfig.tourPauseFill_Hovered_Color;
 
-                  ? mapConfig.commonLocationFill_Hovered_Color
-                  : mapConfig.tourLocationFill_Hovered_Color;
+      default:
+      case TOUR_MARKER:       return mapConfig.tourMarkerFill_Hovered_Color;
 
-      return fillColor;
+      }
+
+// SET_FORMATTING_ON
    }
 
    public String getFormattedLabel() {
@@ -161,36 +170,47 @@ public class Map2Point implements ClusterItem {
 
       final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
 
-      final boolean isTourMarker = tourMarker != null;
+// SET_FORMATTING_OFF
 
-      final Color outlineColor = isTourMarker
+      switch (type) {
 
-            ? mapConfig.markerOutline_Color
-            : locationType.equals(LocationType.Common)
+      case COMMON_LOCATION:   return mapConfig.commonLocationOutline_Color;
 
-                  ? mapConfig.commonLocationOutline_Color
-                  : mapConfig.tourLocationOutline_Color;
+      case TOUR_LOCATION:     return mapConfig.tourLocationOutline_Color;
+      case TOUR_PAUSE:        return mapConfig.tourPauseOutline_Color;
 
-      return outlineColor;
+      default:
+      case TOUR_MARKER:       return mapConfig.tourMarkerOutline_Color;
+
+      }
+
+// SET_FORMATTING_ON
    }
 
    public Color getOutlineColor_Hovered() {
 
       final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
 
-      final boolean isTourMarker = tourMarker != null;
+// SET_FORMATTING_OFF
 
-      final Color outlineColor = isTourMarker
+      switch (type) {
 
-            ? mapConfig.markerOutline_Hovered_Color
-            : locationType.equals(LocationType.Common)
+      case COMMON_LOCATION:   return mapConfig.commonLocationOutline_Hovered_Color;
 
-                  ? mapConfig.commonLocationOutline_Hovered_Color
-                  : mapConfig.tourLocationOutline_Hovered_Color;
+      case TOUR_LOCATION:     return mapConfig.tourLocationOutline_Hovered_Color;
+      case TOUR_PAUSE:        return mapConfig.tourPauseOutline_Hovered_Color;
 
-      return outlineColor;
+      default:
+      case TOUR_MARKER:       return mapConfig.tourMarkerOutline_Hovered_Color;
+
+      }
+
+// SET_FORMATTING_ON
    }
 
+   /**
+    * This is needed for the tour marker clustering
+    */
    @Override
    public GeoPoint getPosition() {
       return geoPoint;

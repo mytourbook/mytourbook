@@ -113,6 +113,7 @@ import net.tourbook.map2.view.Map2PointManager;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.MapLabelLayout;
 import net.tourbook.map2.view.MapPointToolTip;
+import net.tourbook.map2.view.MapPointType;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.SlideoutMap2_MapPoints;
 import net.tourbook.map2.view.TourPainterConfiguration;
@@ -128,6 +129,7 @@ import net.tourbook.preferences.Map2_Appearance;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.filter.TourFilterFieldOperator;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 import net.tourbook.ui.IInfoToolTipProvider;
@@ -402,9 +404,10 @@ public class Map2 extends Canvas {
 
    private DistanceClustering<ClusterItem> _distanceClustering                = new DistanceClustering<>();
    private PointFeatureLabeler             _labelSpreader                     = new PointFeatureLabeler();
-   private List<PaintedMapPoint>           _allPaintedMarkers                 = new ArrayList<>();
    private List<PaintedMapPoint>           _allPaintedClusterMarkers          = new ArrayList<>();
    private List<PaintedMapPoint>           _allPaintedLocations               = new ArrayList<>();
+   private List<PaintedMapPoint>           _allPaintedMarkers                 = new ArrayList<>();
+   private List<PaintedMapPoint>           _allPaintedPauses                  = new ArrayList<>();
    private List<PaintedMarkerCluster>      _allPaintedMarkerClusters          = new ArrayList<>();
    private final Set<String>               _allMapMarkerSkipLabels            = new HashSet<>();
    private final Map<String, Map2Point>    _allMapMarkerWithGroupedLabels     = new HashMap<>();
@@ -417,9 +420,10 @@ public class Map2 extends Canvas {
    private boolean                         _isMarkerClusterSelected;
    private MapPointToolTip                 _mapPointTooltip;
 
+   private int                             _numStatistics_AllCommonLocations;
    private int                             _numStatistics_AllTourMarkers;
    private int                             _numStatistics_AllTourLocations;
-   private int                             _numStatistics_AllCommonLocations;
+   private int                             _numStatistics_AllTourPauses;
 
    private Map<Long, Color>                _locationBoundingBoxColors         = new HashMap<>();
    private int                             _colorSwitchCounter;
@@ -1307,41 +1311,46 @@ public class Map2 extends Canvas {
    }
 
    private void createLabelSpreaderLabels(final GC gc,
-                                          final Map2Point[] allMapMarker,
+                                          final Map2Point[] allMapPoints,
                                           final int numAllLabels,
                                           final int numVisibleLabels,
                                           final List<PointFeature> allLabels) {
 
-      final float subMarkerDiff = numAllLabels / (float) numVisibleLabels;
+      final float subPointDiff = numAllLabels / (float) numVisibleLabels;
 
       for (int itemIndex = 0; itemIndex < numVisibleLabels; itemIndex++) {
 
-         int clusterIndex = itemIndex;
+         int subIndex = itemIndex;
 
          if (numVisibleLabels != numAllLabels) {
 
             // not all available markers are displayed -> use a random label
 
-            final double randomDiff = Math.random() * subMarkerDiff;
-            final float nextItemIndex = subMarkerDiff * itemIndex;
+            final double randomDiff = Math.random() * subPointDiff;
+            final float nextItemIndex = subPointDiff * itemIndex;
 
-            clusterIndex = (int) (nextItemIndex + randomDiff);
+            subIndex = (int) (nextItemIndex + randomDiff);
          }
 
-         final Map2Point mapMarker = allMapMarker[clusterIndex];
+         // check bound
+         if (subIndex >= allMapPoints.length) {
+            break;
+         }
 
-         final int devX = mapMarker.geoPointDevX;
-         final int devY = mapMarker.geoPointDevY;
+         final Map2Point mapPoint = allMapPoints[subIndex];
 
-         final String markerLabel = mapMarker.getFormattedLabel();
+         final int devX = mapPoint.geoPointDevX;
+         final int devY = mapPoint.geoPointDevY;
 
-         final Point textExtent = gc.textExtent(markerLabel);
+         final String pointLabel = mapPoint.getFormattedLabel();
+
+         final Point textExtent = gc.textExtent(pointLabel);
          final int textWidth = textExtent.x;
          final int textHeight = textExtent.y;
 
          final PointFeature pointFeature = new PointFeature(
 
-               markerLabel,
+               pointLabel,
                -1,
 
                devX,
@@ -1350,7 +1359,7 @@ public class Map2 extends Canvas {
                textWidth,
                textHeight);
 
-         pointFeature.data = mapMarker;
+         pointFeature.data = mapPoint;
 
          allLabels.add(pointFeature);
       }
@@ -1552,7 +1561,7 @@ public class Map2 extends Canvas {
          }
       }
 
-      final Map2Point mapPoint = new Map2Point(new GeoPoint(latitude, longitude));
+      final Map2Point mapPoint = new Map2Point(MapPointType.TOUR_LOCATION, new GeoPoint(latitude, longitude));
 
       mapPoint.tourLocation = tourLocation;
       mapPoint.locationType = LocationType.Tour;
@@ -1655,7 +1664,7 @@ public class Map2 extends Canvas {
           * Create map point
           */
 
-         final Map2Point mapPoint = new Map2Point(new GeoPoint(latitude, longitude));
+         final Map2Point mapPoint = new Map2Point(MapPointType.COMMON_LOCATION, new GeoPoint(latitude, longitude));
 
          mapPoint.tourLocation = tourLocation;
          mapPoint.locationType = LocationType.Common;
@@ -1798,6 +1807,11 @@ public class Map2 extends Canvas {
 
       final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
 
+      int numVisibleItems = 0;
+      final int maxVisibleItems = _mapConfig.labelDistributorMaxLabels;
+
+      VisibleLimit:
+
       for (final TourData tourData : allTourData) {
 
          if (isBackgroundPainterInterrupted()) {
@@ -1924,7 +1938,7 @@ public class Map2 extends Canvas {
             /*
              * Create map point
              */
-            final Map2Point mapPoint = new Map2Point(new GeoPoint(latitude, longitude));
+            final Map2Point mapPoint = new Map2Point(MapPointType.TOUR_MARKER, new GeoPoint(latitude, longitude));
 
             mapPoint.tourMarker = tourMarker;
 
@@ -1944,6 +1958,120 @@ public class Map2 extends Canvas {
             allMapPoints.add(mapPoint);
 
             _numStatistics_AllTourMarkers++;
+
+            numVisibleItems++;
+            if (numVisibleItems > maxVisibleItems) {
+               break VisibleLimit;
+            }
+         }
+      }
+   }
+
+   private void createMapPoints_TourPauses(final List<TourData> allTourData, final List<Map2Point> allMapPoints) {
+
+      final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
+
+      int numVisibleItems = 0;
+      final int maxVisibleItems = _mapConfig.labelDistributorMaxLabels;
+
+      VisibleLimit:
+
+      for (final TourData tourData : allTourData) {
+
+         if (isBackgroundPainterInterrupted()) {
+            break;
+         }
+
+         if (tourData == null || tourData.isLatLonAvailable() == false) {
+            continue;
+         }
+
+         final long[] pausedTime_Start = tourData.getPausedTime_Start();
+
+         // check if pauses are available
+         if (pausedTime_Start == null || pausedTime_Start.length == 0) {
+            continue;
+         }
+
+         final long[] pausedTime_End = tourData.getPausedTime_End();
+         final long[] pausedTime_Data = tourData.getPausedTime_Data();
+
+         final double[] latitudeSerie = tourData.latitudeSerie;
+         final double[] longitudeSerie = tourData.longitudeSerie;
+
+         int serieIndex = 0;
+
+         final int[] timeSerie = tourData.timeSerie;
+         for (int index = 0; index < pausedTime_Start.length; ++index) {
+
+            final long startTime = pausedTime_Start[index];
+            final long endTime = pausedTime_End[index];
+
+            /*
+             * Check if pause is filtered out
+             */
+            final long pauseDuration = Math.round((endTime - startTime) / 1000f);
+
+            final boolean isPauseAnAutoPause = pausedTime_Data == null
+                  ? true
+                  : pausedTime_Data[index] == 1;
+
+            if (isTourPauseVisible(isPauseAnAutoPause, pauseDuration) == false) {
+               continue;
+            }
+
+            /*
+             * Get geo positon
+             */
+            for (int timeSerieIndex = serieIndex; timeSerieIndex < timeSerie.length; ++timeSerieIndex) {
+
+               final long currentTime = timeSerie[timeSerieIndex] * 1000L + tourData.getTourStartTimeMS();
+
+               if (currentTime >= startTime) {
+                  serieIndex = timeSerieIndex;
+                  break;
+               }
+            }
+
+            final double latitude = latitudeSerie[serieIndex];
+            final double longitude = longitudeSerie[serieIndex];
+
+            // convert marker lat/long into world pixels
+            final java.awt.Point worldPixel_MarkerPos = _mp.geoToPixel(new GeoPosition(latitude, longitude), _mapZoomLevel);
+
+            final int worldPixel_MarkerPosX = worldPixel_MarkerPos.x;
+            final int worldPixel_MarkerPosY = worldPixel_MarkerPos.y;
+
+            final boolean isPauseInViewport = worldPixel_Viewport.contains(worldPixel_MarkerPosX, worldPixel_MarkerPosY);
+
+            if (isPauseInViewport == false) {
+               continue;
+            }
+
+            // convert world position into device position
+            final int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
+            final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
+
+            /*
+             * Create map point
+             */
+            final Map2Point mapPoint = new Map2Point(MapPointType.TOUR_PAUSE, new GeoPoint(latitude, longitude));
+
+            mapPoint.geoPointDevX = devX;
+            mapPoint.geoPointDevY = devY;
+
+            mapPoint.isPauseAnAutoPause = isPauseAnAutoPause;
+
+            mapPoint.setFormattedLabel(UI.format_hh_mm_ss(pauseDuration));
+
+            allMapPoints.add(mapPoint);
+
+            _numStatistics_AllTourPauses++;
+
+            numVisibleItems++;
+            if (numVisibleItems > maxVisibleItems) {
+               break VisibleLimit;
+            }
          }
       }
    }
@@ -2327,6 +2455,13 @@ public class Map2 extends Canvas {
    }
 
    /**
+    * @return Returns the overlay map painter which are defined as plugin extension
+    */
+   public List<Map2Painter> getMapPainter() {
+      return _allMapPainter;
+   }
+
+   /**
     * Is used to activate/deactivate the tooltip
     *
     * @return
@@ -2334,13 +2469,6 @@ public class Map2 extends Canvas {
    public ToolTip getMapPointTooltip() {
 
       return _mapPointTooltip;
-   }
-
-   /**
-    * @return Returns the overlay map painter which are defined as plugin extension
-    */
-   public List<Map2Painter> getMapPainter() {
-      return _allMapPainter;
    }
 
    /**
@@ -3486,6 +3614,64 @@ public class Map2 extends Canvas {
    }
 
    /**
+    * @param isPauseAnAutoPause
+    *           When <code>true</code> an auto-pause happened otherwise it is an user pause
+    * @param pauseDuration
+    *           Pause duration in seconds
+    *
+    * @return
+    */
+   private boolean isTourPauseVisible(final boolean isPauseAnAutoPause, final long pauseDuration) {
+
+      if (TourPainterConfiguration.isFilterTourPauses == false) {
+
+         // nothing is filtered
+         return true;
+      }
+
+      boolean isPauseVisible = false;
+
+      if (TourPainterConfiguration.isShowAutoPauses && isPauseAnAutoPause) {
+
+         // pause is an auto-pause
+         isPauseVisible = true;
+      }
+
+      if (TourPainterConfiguration.isShowUserPauses && !isPauseAnAutoPause) {
+
+         // pause is a user-pause
+         isPauseVisible = true;
+      }
+
+      if (isPauseVisible && TourPainterConfiguration.isFilterPauseDuration) {
+
+         // filter by pause duration -> hide pause when condition is true
+
+         final long requiredPauseDuration = TourPainterConfiguration.pauseDuration;
+         final Enum<TourFilterFieldOperator> pauseDurationOperator = TourPainterConfiguration.pauseDurationOperator;
+
+         if (TourFilterFieldOperator.GREATER_THAN_OR_EQUAL.equals(pauseDurationOperator)) {
+
+            isPauseVisible = (pauseDuration >= requiredPauseDuration) == false;
+
+         } else if (TourFilterFieldOperator.LESS_THAN_OR_EQUAL.equals(pauseDurationOperator)) {
+
+            isPauseVisible = (pauseDuration <= requiredPauseDuration) == false;
+
+         } else if (TourFilterFieldOperator.EQUALS.equals(pauseDurationOperator)) {
+
+            isPauseVisible = (pauseDuration == requiredPauseDuration) == false;
+
+         } else if (TourFilterFieldOperator.NOT_EQUALS.equals(pauseDurationOperator)) {
+
+            isPauseVisible = (pauseDuration != requiredPauseDuration) == false;
+         }
+      }
+
+      return isPauseVisible;
+   }
+
+   /**
     * @return Returns <code>true</code> when a cluster is hovered
     */
    private boolean markerCluster_SetHoveredCluster() {
@@ -4266,8 +4452,10 @@ public class Map2 extends Canvas {
       _hoveredMapPoint = null;
 
       // use a local ref otherwise the list could be modified in another thread which caused exceptions
-      final List<PaintedMapPoint> allPaintedMarkers = _allPaintedMarkers;
       final List<PaintedMapPoint> allPaintedClusterMarkers = _allPaintedClusterMarkers;
+      final List<PaintedMapPoint> allPaintedLocations = _allPaintedLocations;
+      final List<PaintedMapPoint> allPaintedMarkers = _allPaintedMarkers;
+      final List<PaintedMapPoint> allPaintedPauses = _allPaintedPauses;
 
       /*
        * Prio 1: Marker cluster
@@ -4333,113 +4521,19 @@ public class Map2 extends Canvas {
          }
       }
 
-      /*
-       * Prio 2: Map locations
-       */
-
-      // use a local ref otherwise the list could be modified in another thread which caused exceptions
-      final List<PaintedMapPoint> allPaintedLocations = _allPaintedLocations;
-
+      // prio 2: Map locations
       if (allPaintedLocations.size() > 0) {
-
-         if (allPaintedLocations != null) {
-
-            // first check the symbol
-            for (final PaintedMapPoint paintedMarker : allPaintedLocations) {
-
-               final Rectangle paintedSymbolRect = paintedMarker.symbolRectangle;
-
-               if (paintedSymbolRect != null
-                     && (mouseMoveDevX > paintedSymbolRect.x)
-                     && (mouseMoveDevX < paintedSymbolRect.x + paintedSymbolRect.width)
-                     && (mouseMoveDevY > paintedSymbolRect.y)
-                     && (mouseMoveDevY < paintedSymbolRect.y + paintedSymbolRect.height)
-
-               ) {
-
-                  // a map marker is hovered
-
-                  _hoveredMapPoint = paintedMarker;
-
-                  break;
-               }
-            }
-
-            // second check the label
-            if (_hoveredMapPoint == null) {
-
-               for (final PaintedMapPoint paintedMarker : allPaintedLocations) {
-
-                  final Rectangle paintedLabelRect = paintedMarker.labelRectangle;
-
-                  if (true
-                        && (mouseMoveDevX > paintedLabelRect.x)
-                        && (mouseMoveDevX < paintedLabelRect.x + paintedLabelRect.width)
-                        && (mouseMoveDevY > paintedLabelRect.y)
-                        && (mouseMoveDevY < paintedLabelRect.y + paintedLabelRect.height)) {
-
-                     // a map marker is hovered
-
-                     _hoveredMapPoint = paintedMarker;
-
-                     break;
-                  }
-               }
-            }
-         }
+         onMouse_Move_CheckMapPoints(allPaintedLocations, mouseMoveDevX, mouseMoveDevY);
       }
 
-      /*
-       * Prio 3: Map marker
-       */
-
+      // prio 3: Tour marker
       if (_hoveredMapPoint == null && allPaintedMarkers.size() > 0) {
+         onMouse_Move_CheckMapPoints(allPaintedMarkers, mouseMoveDevX, mouseMoveDevY);
+      }
 
-         if (allPaintedMarkers != null) {
-
-            // first check the symbol
-            for (final PaintedMapPoint paintedMarker : allPaintedMarkers) {
-
-               final Rectangle paintedSymbolRect = paintedMarker.symbolRectangle;
-
-               if (paintedSymbolRect != null
-                     && (mouseMoveDevX > paintedSymbolRect.x)
-                     && (mouseMoveDevX < paintedSymbolRect.x + paintedSymbolRect.width)
-                     && (mouseMoveDevY > paintedSymbolRect.y)
-                     && (mouseMoveDevY < paintedSymbolRect.y + paintedSymbolRect.height)
-
-               ) {
-
-                  // a map marker is hovered
-
-                  _hoveredMapPoint = paintedMarker;
-
-                  break;
-               }
-            }
-
-            // second check the label
-            if (_hoveredMapPoint == null) {
-
-               for (final PaintedMapPoint paintedMarker : allPaintedMarkers) {
-
-                  final Rectangle paintedLabelRect = paintedMarker.labelRectangle;
-
-                  if (true
-                        && (mouseMoveDevX > paintedLabelRect.x)
-                        && (mouseMoveDevX < paintedLabelRect.x + paintedLabelRect.width)
-                        && (mouseMoveDevY > paintedLabelRect.y)
-                        && (mouseMoveDevY < paintedLabelRect.y + paintedLabelRect.height)) {
-
-                     // a map marker is hovered
-
-                     _hoveredMapPoint = paintedMarker;
-
-                     break;
-                  }
-               }
-            }
-         }
+      // prio 4: Tour pauses
+      if (_hoveredMapPoint == null && allPaintedPauses.size() > 0) {
+         onMouse_Move_CheckMapPoints(allPaintedPauses, mouseMoveDevX, mouseMoveDevY);
       }
 
       // ensure that the old map point is hidden
@@ -4600,6 +4694,55 @@ public class Map2 extends Canvas {
       }
 
       fireEvent_MousePosition();
+   }
+
+   private void onMouse_Move_CheckMapPoints(final List<PaintedMapPoint> allPaintedMapPoints,
+                                            final int mouseMoveDevX,
+                                            final int mouseMoveDevY) {
+
+      // first check the symbol
+
+      for (final PaintedMapPoint paintedMarker : allPaintedMapPoints) {
+
+         final Rectangle paintedSymbolRect = paintedMarker.symbolRectangle;
+
+         if (paintedSymbolRect != null
+               && (mouseMoveDevX > paintedSymbolRect.x)
+               && (mouseMoveDevX < paintedSymbolRect.x + paintedSymbolRect.width)
+               && (mouseMoveDevY > paintedSymbolRect.y)
+               && (mouseMoveDevY < paintedSymbolRect.y + paintedSymbolRect.height)
+
+         ) {
+
+            // a map point is hovered
+
+            _hoveredMapPoint = paintedMarker;
+
+            break;
+         }
+      }
+
+      // second check the label
+      if (_hoveredMapPoint == null) {
+
+         for (final PaintedMapPoint paintedMarker : allPaintedMapPoints) {
+
+            final Rectangle paintedLabelRect = paintedMarker.labelRectangle;
+
+            if (true
+                  && (mouseMoveDevX > paintedLabelRect.x)
+                  && (mouseMoveDevX < paintedLabelRect.x + paintedLabelRect.width)
+                  && (mouseMoveDevY > paintedLabelRect.y)
+                  && (mouseMoveDevY < paintedLabelRect.y + paintedLabelRect.height)) {
+
+               // a map point is hovered
+
+               _hoveredMapPoint = paintedMarker;
+
+               break;
+            }
+         }
+      }
    }
 
    private void onMouse_Up(final MouseEvent mouseEvent) {
@@ -5330,6 +5473,7 @@ public class Map2 extends Canvas {
       }
 
       _numStatistics_AllTourMarkers = 0;
+      _numStatistics_AllTourPauses = 0;
       _numStatistics_AllTourLocations = 0;
       _numStatistics_AllCommonLocations = 0;
 
@@ -5337,8 +5481,10 @@ public class Map2 extends Canvas {
 
       final List<PaintedMapPoint>      allPaintedMarkers          = new ArrayList<>();
       final List<PaintedMapPoint>      allPaintedClusterMarkers   = new ArrayList<>();
-      final List<PaintedMapPoint>      allPaintedLocations        = new ArrayList<>();
       final List<PaintedMarkerCluster> allPaintedMarkerClusters   = new ArrayList<>();
+
+      final List<PaintedMapPoint>      allPaintedLocations        = new ArrayList<>();
+      final List<PaintedMapPoint>      allPaintedPauses           = new ArrayList<>();
 
 // SET_FORMATTING_ON
 
@@ -5352,12 +5498,13 @@ public class Map2 extends Canvas {
 
             if (_mapConfig.isShowTourMarker
                   || _mapConfig.isShowTourLocation
-                  || _mapConfig.isShowCommonLocation) {
+                  || _mapConfig.isShowCommonLocation
+                  || _mapConfig.isShowTourPauses) {
 
                // clone list to prevent concurrency exceptions, this happened
                final List<TourData> allTourData = new ArrayList<>(TourPainterConfiguration.getTourData());
 
-               if (_mapConfig.isShowTourMarker && _mapConfig.isMarkerClustered) {
+               if (_mapConfig.isShowTourMarker && _mapConfig.isTourMarkerClustered) {
 
                   paint_BackgroundImage_30_AllMapPointsAndCluster(gcCanvas,
                         allTourData,
@@ -5370,7 +5517,8 @@ public class Map2 extends Canvas {
                   paint_BackgroundImage_20_AllMapPoints(gcCanvas,
                         allTourData,
                         allPaintedMarkers,
-                        allPaintedLocations);
+                        allPaintedLocations,
+                        allPaintedPauses);
                }
 
                if (_hoveredMarkerCluster != null) {
@@ -5400,6 +5548,7 @@ public class Map2 extends Canvas {
          _allPaintedMarkerClusters = allPaintedMarkerClusters;
          _allPaintedClusterMarkers = allPaintedClusterMarkers;
          _allPaintedLocations = allPaintedLocations;
+         _allPaintedPauses = allPaintedPauses;
 
          // reset state which can happen when map is moved and no cluster is displayed
          if (_isMarkerClusterSelected && allPaintedMarkerClusters.size() == 0) {
@@ -5433,13 +5582,19 @@ public class Map2 extends Canvas {
    private void paint_BackgroundImage_20_AllMapPoints(final GC gc,
                                                       final List<TourData> allTourData,
                                                       final List<PaintedMapPoint> allPaintedMarkers,
-                                                      final List<PaintedMapPoint> allPaintedLocations) {
+                                                      final List<PaintedMapPoint> allPaintedLocations,
+                                                      final List<PaintedMapPoint> allPaintedPauses) {
 
       final List<Map2Point> allMarkerPointsList = new ArrayList<>();
+      final List<Map2Point> allPausesPointsList = new ArrayList<>();
       final Collection<Map2Point> allLocationPointsList = new ArrayList<>();
 
       if (_mapConfig.isShowTourMarker) {
          createMapPoints_TourMarkers(allTourData, allMarkerPointsList);
+      }
+
+      if (_mapConfig.isShowTourPauses) {
+         createMapPoints_TourPauses(allTourData, allPausesPointsList);
       }
 
       if (_mapConfig.isShowCommonLocation) {
@@ -5452,24 +5607,27 @@ public class Map2 extends Canvas {
          createMapPoints_Locations_20_FromLocations(_allTourLocations, allLocationPointsList);
       }
 
-      if (allMarkerPointsList.size() == 0 && allLocationPointsList.size() == 0) {
-         return;
+      if (allMarkerPointsList.size() > 0 || allLocationPointsList.size() > 0 || allPausesPointsList.size() > 0) {
+
+         final Map2Point[] allLocationPoints = allLocationPointsList.toArray(new Map2Point[allLocationPointsList.size()]);
+         final Map2Point[] allMarkerPoints = allMarkerPointsList.toArray(new Map2Point[allMarkerPointsList.size()]);
+         final Map2Point[] allPausePoints = allPausesPointsList.toArray(new Map2Point[allPausesPointsList.size()]);
+
+         paint_BackgroundImage_99_All(gc,
+
+               allMarkerPoints,
+               allPaintedMarkers,
+
+               allLocationPoints,
+               allPaintedLocations,
+
+               allPausePoints,
+               allPaintedPauses,
+
+               false, // isPaintClusterMarker
+               null // allClusterRectangle
+         );
       }
-
-      final Map2Point[] allMarkerPoints = allMarkerPointsList.toArray(new Map2Point[allMarkerPointsList.size()]);
-      final Map2Point[] allLocationPoints = allLocationPointsList.toArray(new Map2Point[allLocationPointsList.size()]);
-
-      paint_BackgroundImage_80_MarkerAndLocations(gc,
-
-            allMarkerPoints,
-            allPaintedMarkers,
-
-            allLocationPoints,
-            allPaintedLocations,
-
-            false, // isPaintClusterMarker
-            null // allClusterRectangle
-      );
    }
 
    private void paint_BackgroundImage_30_AllMapPointsAndCluster(final GC gc,
@@ -5592,13 +5750,16 @@ public class Map2 extends Canvas {
          final Map2Point[] allVisibleMarkers = allMarkersOnlyList.toArray(new Map2Point[numMarkers]);
          final Rectangle[] allClusterRectangle = allClusterSymbolRectangleOnly.toArray(new Rectangle[allClusterSymbolRectangleOnly.size()]);
 
-         paint_BackgroundImage_80_MarkerAndLocations(gc,
+         paint_BackgroundImage_99_All(gc,
 
                allVisibleMarkers,
                allPaintedMarkers,
 
                allLocationPoints,
                allPaintedLocations,
+
+               null, // pauses
+               null, // pauses
 
                false,
                allClusterRectangle);
@@ -5622,19 +5783,20 @@ public class Map2 extends Canvas {
       }
    }
 
-   private void paint_BackgroundImage_50_OneMarker(final GC gc,
-                                                   final Map2Point mapPoint,
-                                                   final Rectangle labelRectangle,
-                                                   final List<PaintedMapPoint> allPaintedMapPoints) {
+   private void paint_BackgroundImage_50_OneLabel(final GC gc,
+                                                  final Map2Point mapPoint,
+                                                  final Rectangle labelRectangle,
+                                                  final List<PaintedMapPoint> allPaintedMapPoints) {
 
-      final String markerLabel = mapPoint.getFormattedLabel();
+      final String labelText = mapPoint.getFormattedLabel();
 
       final int devX = labelRectangle.x;
       final int devY = labelRectangle.y;
 
       Color fillColor;
       Color outlineColor;
-      MapLabelLayout markerLabelLayout = _mapConfig.markerLabelLayout;
+
+      MapLabelLayout markerLabelLayout = _mapConfig.labelLayout;
 
       if (_isMarkerClusterSelected) {
 
@@ -5652,7 +5814,7 @@ public class Map2 extends Canvas {
       }
 
       /*
-       * Draw marker background
+       * Draw label background
        */
       if (markerLabelLayout.equals(MapLabelLayout.RECTANGLE_BOX)) {
 
@@ -5668,7 +5830,7 @@ public class Map2 extends Canvas {
 
          gc.setForeground(fillColor);
 
-         gc.drawText(markerLabel, devX + 1, devY + 1, true);
+         gc.drawText(labelText, devX + 1, devY + 1, true);
 
       } else if (markerLabelLayout.equals(MapLabelLayout.NONE)) {
 
@@ -5678,29 +5840,33 @@ public class Map2 extends Canvas {
 
          gc.setForeground(fillColor);
 
-         gc.drawText(markerLabel, devX - 1, devY, true);
-         gc.drawText(markerLabel, devX + 1, devY, true);
-         gc.drawText(markerLabel, devX, devY - 1, true);
-         gc.drawText(markerLabel, devX, devY + 1, true);
+         gc.drawText(labelText, devX - 1, devY, true);
+         gc.drawText(labelText, devX + 1, devY, true);
+         gc.drawText(labelText, devX, devY - 1, true);
+         gc.drawText(labelText, devX, devY + 1, true);
 
       } else if (markerLabelLayout.equals(MapLabelLayout.BORDER_2_PIXEL)) {
 
          gc.setForeground(fillColor);
 
-         gc.drawText(markerLabel, devX - 1, devY, true);
-         gc.drawText(markerLabel, devX + 1, devY, true);
-         gc.drawText(markerLabel, devX, devY - 1, true);
-         gc.drawText(markerLabel, devX, devY + 1, true);
+         gc.drawText(labelText, devX - 1, devY, true);
+         gc.drawText(labelText, devX + 1, devY, true);
+         gc.drawText(labelText, devX, devY - 1, true);
+         gc.drawText(labelText, devX, devY + 1, true);
 
-         gc.drawText(markerLabel, devX - 2, devY, true);
-         gc.drawText(markerLabel, devX + 2, devY, true);
-         gc.drawText(markerLabel, devX, devY - 2, true);
-         gc.drawText(markerLabel, devX, devY + 2, true);
+         gc.drawText(labelText, devX - 2, devY, true);
+         gc.drawText(labelText, devX + 2, devY, true);
+         gc.drawText(labelText, devX, devY - 2, true);
+         gc.drawText(labelText, devX, devY + 2, true);
       }
 
+      /*
+       * Draw label text
+       */
       gc.setForeground(outlineColor);
-      gc.drawText(markerLabel, devX, devY, true);
+      gc.drawText(labelText, devX, devY, true);
 
+      // keep position
       allPaintedMapPoints.add(new PaintedMapPoint(mapPoint, labelRectangle));
 
       return;
@@ -5850,10 +6016,13 @@ public class Map2 extends Canvas {
 
       final Rectangle clusterRectangle = hoveredMarkerCluster.clusterSymbolRectangle;
 
-      final int numPlacedLabels = paint_BackgroundImage_80_MarkerAndLocations(gc,
+      final int numPlacedLabels = paint_BackgroundImage_99_All(gc,
 
             allClusterMarkerPoints,
             allPaintedMarkerPoints,
+
+            null,
+            null,
 
             null,
             null,
@@ -5922,51 +6091,56 @@ public class Map2 extends Canvas {
     * @param allLocationPoints
     * @param allPaintedLocationsPoints
     *
+    * @param allPaintedPauses
+    * @param allPausePoints
+    *
     * @param isPaintClusterMarker
     * @param allClusterSymbolRectangle
     *
     * @return
     */
-   private int paint_BackgroundImage_80_MarkerAndLocations(final GC gc,
+   private int paint_BackgroundImage_99_All(final GC gc,
 
-                                                           final Map2Point[] allMarkerPoints,
-                                                           final List<PaintedMapPoint> allPaintedMarkerPoints,
+                                            final Map2Point[] allMarkerPoints,
+                                            final List<PaintedMapPoint> allPaintedMarkerPoints,
 
-                                                           final Map2Point[] allLocationPoints,
-                                                           final List<PaintedMapPoint> allPaintedLocationsPoints,
+                                            final Map2Point[] allLocationPoints,
+                                            final List<PaintedMapPoint> allPaintedLocationsPoints,
 
-                                                           final boolean isPaintClusterMarker,
-                                                           final Rectangle[] allClusterSymbolRectangle) {
+                                            final Map2Point[] allPausePoints,
+                                            final List<PaintedMapPoint> allPaintedPauses,
+
+                                            final boolean isPaintClusterMarker,
+                                            final Rectangle[] allClusterSymbolRectangle) {
 
       final int maxVisibleItems = _mapConfig.labelDistributorMaxLabels;
       final int clusterSymbolBorder = 10;
 
       final int numAllMarkers = allMarkerPoints.length;
       final int numAllLocations = allLocationPoints == null ? 0 : allLocationPoints.length;
+      final int numAllPauses = allPausePoints == null ? 0 : allPausePoints.length;
 
       // limit markers/locations
-      int numVisibleMarkers = numAllMarkers;
-      int numVisibleLocations = numAllLocations;
+      final int numVisibleMarkers = numAllMarkers;
+      final int numVisibleLocations = numAllLocations;
+      final int numVisiblePauses = numAllPauses;
 
-      final int numVisibleItems = numAllLocations + numAllMarkers;
+      final int numVisibleItems = numAllLocations + numAllMarkers + numAllPauses;
 
-      if (numVisibleItems > maxVisibleItems) {
-
-         if (numVisibleLocations > maxVisibleItems) {
-
-            // locations have a higher priority
-
-            numVisibleLocations = maxVisibleItems;
-            numVisibleMarkers = 0;
-
-         } else {
-
-            numVisibleMarkers = Math.max(0, maxVisibleItems - numVisibleLocations);
-         }
-      }
-
-      final int markerSymbolSize = 5;
-      final int markerSymbolSize2 = markerSymbolSize / 2;
+//      if (numVisibleItems > maxVisibleItems) {
+//
+//         if (numVisibleLocations > maxVisibleItems) {
+//
+//            // locations have a higher priority
+//
+//            numVisibleLocations = maxVisibleItems;
+//            numVisibleMarkers = 0;
+//
+//         } else {
+//
+//            numVisibleMarkers = Math.max(0, maxVisibleItems - numVisibleLocations);
+//         }
+//      }
 
       final int markerRespectSize = 20;
       final int markerRespectSize2 = markerRespectSize / 2;
@@ -5976,14 +6150,6 @@ public class Map2 extends Canvas {
       final int mapWidth = clientArea.width;
       final int mapHeight = clientArea.height;
 
-      int diffY = 0;
-      int diffX = 0;
-
-      if (isPaintClusterMarker) {
-         diffX = _backgroundPainter_MicroAdjustment_DiffX;
-         diffY = _backgroundPainter_MicroAdjustment_DiffY;
-      }
-
       /*
        * Setup labels for the label spreader
        */
@@ -5991,6 +6157,7 @@ public class Map2 extends Canvas {
 
       final List<PointFeature> allLocationLabels = new ArrayList<>(numVisibleLocations);
       final List<PointFeature> allMarkerLabels = new ArrayList<>(numVisibleMarkers);
+      final List<PointFeature> allPauseLabels = new ArrayList<>(numVisiblePauses);
 
       if (numVisibleLocations > 0) {
 
@@ -6014,6 +6181,18 @@ public class Map2 extends Canvas {
                allMarkerLabels);
 
          allDistributedLabels.add(allMarkerLabels);
+      }
+
+      if (numVisiblePauses > 0) {
+
+         createLabelSpreaderLabels(
+               gc,
+               allPausePoints,
+               numAllPauses,
+               numVisiblePauses,
+               allPauseLabels);
+
+         allDistributedLabels.add(allPauseLabels);
       }
 
       /*
@@ -6107,19 +6286,61 @@ public class Map2 extends Canvas {
                markerRespectSize);
       }
 
-      // the resulting label positions are stored within the point-features
+      /*
+       * Run label spreader, the resulting label positions are stored within the point-features
+       */
       final int numPlacedLabels = _labelSpreader.label_StandardPipelineAll();
-//      final int numPlacedLabels = _labelDistributor.label_StandardPipelineAdjacentAll();
+//    final int numPlacedLabels = _labelDistributor.label_StandardPipelineAdjacentAll();
 
       if (isBackgroundPainterInterrupted()) {
          return 0;
       }
 
+      gc.setTextAntialias(_mapConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
+      gc.setLineWidth(1);
+
       /*
        * Draw location label
        */
-      gc.setTextAntialias(_mapConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
-      gc.setLineWidth(1);
+      paint_BgImage_10_LocationLabel(gc,
+            numVisibleLocations,
+            allLocationLabels,
+            allPaintedLocationsPoints);
+
+      /*
+       * Draw marker label
+       */
+      paint_BgImage_30_Markers(gc,
+            numVisibleMarkers,
+            isPaintClusterMarker,
+            allMarkerLabels,
+            allPaintedMarkerPoints);
+
+      paint_BgImage_40_Pauses(gc,
+            numVisiblePauses,
+            allPauseLabels,
+            allPaintedPauses);
+
+      /*
+       * Draw location symbol
+       */
+      paint_BgImage_20_LocationSymbol(gc,
+            numVisibleLocations,
+            allLocationLabels,
+            allPaintedLocationsPoints);
+
+      // FOR DEBUGGING
+      //
+//      _labelSpreader.drawParticles(gc);
+//      _labelSpreader.drawSpiral(gc, (int) circleX, (int) circleY);
+
+      return numPlacedLabels;
+   }
+
+   private void paint_BgImage_10_LocationLabel(final GC gc,
+                                               final int numVisibleLocations,
+                                               final List<PointFeature> allLocationLabels,
+                                               final List<PaintedMapPoint> allPaintedLocationsPoints) {
 
       for (int itemIndex = 0; itemIndex < numVisibleLocations; itemIndex++) {
 
@@ -6154,8 +6375,8 @@ public class Map2 extends Canvas {
          final int textWidth = textExtent.x;
          final int textHeight = textExtent.y;
 
-         final int labelDevX = (int) distribLabel.labelBoxL + diffX;
-         final int labelDevY = (int) distribLabel.labelBoxT + diffY;
+         final int labelDevX = (int) distribLabel.labelBoxL;
+         final int labelDevY = (int) distribLabel.labelBoxT;
 
          final Rectangle labelRectangle = new Rectangle(
                labelDevX,
@@ -6163,119 +6384,18 @@ public class Map2 extends Canvas {
                textWidth,
                textHeight);
 
-         paint_BackgroundImage_50_OneMarker(
+         paint_BackgroundImage_50_OneLabel(
                gc,
                mapPoint,
                labelRectangle,
                allPaintedLocationsPoints);
       }
+   }
 
-      /*
-       * Draw marker label
-       */
-      for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
-
-         final PointFeature distribLabel = allMarkerLabels.get(itemIndex);
-
-         // check if label is displayed
-         if (distribLabel.isLabeled == false) {
-            continue;
-         }
-
-         final Map2Point mapPoint = (Map2Point) distribLabel.data;
-
-         final String text = mapPoint.getFormattedLabel();
-         final Point textExtent = gc.textExtent(text);
-
-         final int textWidth = textExtent.x;
-         final int textHeight = textExtent.y;
-
-         final int labelDevX = (int) distribLabel.labelBoxL + diffX;
-         final int labelDevY = (int) distribLabel.labelBoxT + diffY;
-
-         final Rectangle markerLabelRectangle = new Rectangle(
-               labelDevX,
-               labelDevY,
-               textWidth,
-               textHeight);
-
-         if (isPaintClusterMarker) {
-
-            // paint a cluster marker, all markers within one cluster
-
-            // fill label background
-            gc.setBackground(_mapConfig.markerFill_Color);
-            gc.fillRectangle(markerLabelRectangle);
-
-            gc.setForeground(_mapConfig.markerOutline_Color);
-
-            // border: horizontal bottom
-            gc.drawLine(
-                  labelDevX,
-                  labelDevY + textHeight,
-                  labelDevX + textWidth - 1,
-                  labelDevY + textHeight);
-
-            // marker label
-            gc.drawString(text, labelDevX, labelDevY, true);
-
-            // keep painted positions
-            allPaintedMarkerPoints.add(new PaintedMapPoint(mapPoint, markerLabelRectangle));
-
-         } else {
-
-            // paint a normal marker
-
-            paint_BackgroundImage_50_OneMarker(
-                  gc,
-                  mapPoint,
-                  markerLabelRectangle,
-                  allPaintedMarkerPoints);
-         }
-      }
-
-      /*
-       * Draw marker symbol
-       */
-      gc.setLineWidth(2);
-      gc.setForeground(_mapConfig.markerFill_Color);
-      gc.setBackground(_mapConfig.markerOutline_Color);
-
-      int paintedMarkerIndex = 0;
-
-      for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
-
-         final PointFeature distribLabel = allMarkerLabels.get(itemIndex);
-
-         if (distribLabel.isLabeled == false) {
-            continue;
-         }
-
-         final Map2Point mapPoint = (Map2Point) distribLabel.data;
-
-         final int mapPointDevX = mapPoint.geoPointDevX + diffX;
-         final int mapPointDevY = mapPoint.geoPointDevY + diffY;
-
-         final int markerSymbolDevX = mapPointDevX - markerSymbolSize2;
-         final int markerSymbolDevY = mapPointDevY - markerSymbolSize2;
-
-         final Rectangle markerSymbolRectangle = new Rectangle(
-               markerSymbolDevX,
-               markerSymbolDevY,
-               markerSymbolSize,
-               markerSymbolSize);
-
-         gc.fillRectangle(markerSymbolRectangle);
-         gc.drawRectangle(markerSymbolRectangle);
-
-         // keep painted symbol position
-         final PaintedMapPoint paintedMarker = allPaintedMarkerPoints.get(paintedMarkerIndex++);
-         paintedMarker.symbolRectangle = markerSymbolRectangle;
-      }
-
-      /*
-       * Draw location symbol
-       */
+   private void paint_BgImage_20_LocationSymbol(final GC gc,
+                                                final int numVisibleLocations,
+                                                final List<PointFeature> allLocationLabels,
+                                                final List<PaintedMapPoint> allPaintedLocationsPoints) {
       int paintedLocationIndex = 0;
 
       final int imageWidth = _imageMapLocationBounds.width;
@@ -6292,8 +6412,8 @@ public class Map2 extends Canvas {
 
          final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
-         final int locationDevX = mapPoint.geoPointDevX + diffX;
-         final int locationDevY = mapPoint.geoPointDevY + diffY;
+         final int locationDevX = mapPoint.geoPointDevX;
+         final int locationDevY = mapPoint.geoPointDevY;
 
          final int iconDevX = locationDevX - imageWidth2;
          final int iconDevY = locationDevY - imageHeight;
@@ -6365,13 +6485,197 @@ public class Map2 extends Canvas {
          final PaintedMapPoint paintedMarker = allPaintedLocationsPoints.get(paintedLocationIndex++);
          paintedMarker.symbolRectangle = paintedRectangle;
       }
+   }
 
-      // FOR DEBUGGING
-      //
-//      _labelSpreader.drawParticles(gc);
-//      _labelSpreader.drawSpiral(gc, (int) circleX, (int) circleY);
+   private void paint_BgImage_30_Markers(final GC gc,
+                                         final int numVisibleMarkers,
+                                         final boolean isPaintClusterMarker,
+                                         final List<PointFeature> allMarkerItems,
+                                         final List<PaintedMapPoint> allPaintedMarkerPoints) {
 
-      return numPlacedLabels;
+      final int markerSymbolSize = 5;
+      final int markerSymbolSize2 = markerSymbolSize / 2;
+
+      for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
+
+         final PointFeature distribLabel = allMarkerItems.get(itemIndex);
+
+         // check if label is displayed
+         if (distribLabel.isLabeled == false) {
+            continue;
+         }
+
+         final Map2Point mapPoint = (Map2Point) distribLabel.data;
+
+         final String text = mapPoint.getFormattedLabel();
+         final Point textExtent = gc.textExtent(text);
+
+         final int textWidth = textExtent.x;
+         final int textHeight = textExtent.y;
+
+         final int labelDevX = (int) distribLabel.labelBoxL;
+         final int labelDevY = (int) distribLabel.labelBoxT;
+
+         final Rectangle markerLabelRectangle = new Rectangle(
+               labelDevX,
+               labelDevY,
+               textWidth,
+               textHeight);
+
+         if (isPaintClusterMarker) {
+
+            // paint a cluster marker, all markers within one cluster
+
+            // fill label background
+            gc.setBackground(_mapConfig.tourMarkerFill_Color);
+            gc.fillRectangle(markerLabelRectangle);
+
+            gc.setForeground(_mapConfig.tourMarkerOutline_Color);
+
+            // border: horizontal bottom
+            gc.drawLine(
+                  labelDevX,
+                  labelDevY + textHeight,
+                  labelDevX + textWidth - 1,
+                  labelDevY + textHeight);
+
+            // marker label
+            gc.drawString(text, labelDevX, labelDevY, true);
+
+            // keep painted positions
+            allPaintedMarkerPoints.add(new PaintedMapPoint(mapPoint, markerLabelRectangle));
+
+         } else {
+
+            // paint a normal marker
+
+            paint_BackgroundImage_50_OneLabel(
+                  gc,
+                  mapPoint,
+                  markerLabelRectangle,
+                  allPaintedMarkerPoints);
+         }
+      }
+
+      /*
+       * Draw marker symbol
+       */
+      gc.setLineWidth(2);
+      gc.setForeground(_mapConfig.tourMarkerFill_Color);
+      gc.setBackground(_mapConfig.tourMarkerOutline_Color);
+
+      int paintedMarkerIndex = 0;
+
+      for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
+
+         final PointFeature distribLabel = allMarkerItems.get(itemIndex);
+
+         if (distribLabel.isLabeled == false) {
+            continue;
+         }
+
+         final Map2Point mapPoint = (Map2Point) distribLabel.data;
+
+         final int mapPointDevX = mapPoint.geoPointDevX;
+         final int mapPointDevY = mapPoint.geoPointDevY;
+
+         final int markerSymbolDevX = mapPointDevX - markerSymbolSize2;
+         final int markerSymbolDevY = mapPointDevY - markerSymbolSize2;
+
+         final Rectangle markerSymbolRectangle = new Rectangle(
+               markerSymbolDevX,
+               markerSymbolDevY,
+               markerSymbolSize,
+               markerSymbolSize);
+
+         gc.fillRectangle(markerSymbolRectangle);
+         gc.drawRectangle(markerSymbolRectangle);
+
+         // keep painted symbol position
+         final PaintedMapPoint paintedMarker = allPaintedMarkerPoints.get(paintedMarkerIndex++);
+         paintedMarker.symbolRectangle = markerSymbolRectangle;
+      }
+   }
+
+   private void paint_BgImage_40_Pauses(final GC gc,
+                                        final int numVisibleItems,
+                                        final List<PointFeature> allPauseItems,
+                                        final List<PaintedMapPoint> allPaintedPoints) {
+
+      final int symbolSize = 5;
+      final int symbolSize2 = symbolSize / 2;
+
+      for (int itemIndex = 0; itemIndex < numVisibleItems; itemIndex++) {
+
+         final PointFeature distribLabel = allPauseItems.get(itemIndex);
+
+         // check if label is displayed
+         if (distribLabel.isLabeled == false) {
+            continue;
+         }
+
+         final Map2Point mapPoint = (Map2Point) distribLabel.data;
+
+         final String text = mapPoint.getFormattedLabel();
+         final Point textExtent = gc.textExtent(text);
+
+         final int textWidth = textExtent.x;
+         final int textHeight = textExtent.y;
+
+         final int labelDevX = (int) distribLabel.labelBoxL;
+         final int labelDevY = (int) distribLabel.labelBoxT;
+
+         final Rectangle pauseLabelRectangle = new Rectangle(
+               labelDevX,
+               labelDevY,
+               textWidth,
+               textHeight);
+
+         paint_BackgroundImage_50_OneLabel(
+               gc,
+               mapPoint,
+               pauseLabelRectangle,
+               allPaintedPoints);
+      }
+
+      /*
+       * Draw pause symbol
+       */
+      gc.setLineWidth(2);
+      gc.setForeground(_mapConfig.tourPauseFill_Color);
+      gc.setBackground(_mapConfig.tourPauseOutline_Color);
+
+      int paintedPointIndex = 0;
+
+      for (int itemIndex = 0; itemIndex < numVisibleItems; itemIndex++) {
+
+         final PointFeature distribLabel = allPauseItems.get(itemIndex);
+
+         if (distribLabel.isLabeled == false) {
+            continue;
+         }
+
+         final Map2Point mapPoint = (Map2Point) distribLabel.data;
+
+         final int mapPointDevX = mapPoint.geoPointDevX;
+         final int mapPointDevY = mapPoint.geoPointDevY;
+
+         final int markerSymbolDevX = mapPointDevX - symbolSize2;
+         final int markerSymbolDevY = mapPointDevY - symbolSize2;
+
+         final Rectangle symbolRectangle = new Rectangle(
+               markerSymbolDevX,
+               markerSymbolDevY,
+               symbolSize,
+               symbolSize);
+
+         gc.fillRectangle(symbolRectangle);
+         gc.drawRectangle(symbolRectangle);
+
+         // keep painted symbol position
+         final PaintedMapPoint paintedMarker = allPaintedPoints.get(paintedPointIndex++);
+         paintedMarker.symbolRectangle = symbolRectangle;
+      }
    }
 
    private void paint_Debug_GeoGrid(final GC gc) {
