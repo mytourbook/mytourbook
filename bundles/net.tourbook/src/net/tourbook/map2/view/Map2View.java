@@ -235,7 +235,6 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_IS_SHOW_SLIDER_IN_LEGEND                        = "STATE_IS_SHOW_SLIDER_IN_LEGEND";                      //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_START_END_IN_MAP                        = "STATE_IS_SHOW_START_END_IN_MAP";                      //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_INFO_IN_MAP                        = "STATE_IS_SHOW_TOUR_INFO_IN_MAP";                      //$NON-NLS-1$
-   private static final String   STATE_IS_SHOW_TOUR_PAUSES                             = "STATE_IS_SHOW_TOUR_PAUSES";                           //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_WEATHER_IN_MAP                     = "STATE_IS_SHOW_TOUR_WEATHER_IN_MAP";                //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_VALUE_POINT                             = "STATE_IS_SHOW_VALUE_POINT";                           //$NON-NLS-1$
    private static final boolean  STATE_IS_SHOW_VALUE_POINT_DEFAULT                     = true;
@@ -506,10 +505,10 @@ public class Map2View extends ViewPart implements
    private ActionMap2_Options                _actionMap2Slideout_Options;
    private ActionMap2_PhotoFilter            _actionMap2Slideout_PhotoFilter;
    private ActionMap2_Graphs                 _actionMap2Slideout_TourColors;
-   private ActionMapMarker_CenterMap         _actionMapMarker_CenterMap;
-   private ActionMapMarker_Edit              _actionMapMarker_Edit;
-   private ActionMapMarker_ShowOnlyThisTour  _actionMapMarker_ShowOnlyThisTour;
-   private ActionMapMarker_ZoomIn            _actionMapMarker_ZoomIn;
+   private ActionMapPoint_CenterMap          _actionMapPoint_CenterMap;
+   private ActionMapPoint_EditTourMarker     _actionMapPoint_EditTourMarker;
+   private ActionMapPoint_ShowOnlyThisTour   _actionMapPoint_ShowOnlyThisTour;
+   private ActionMapPoint_ZoomIn             _actionMapPoint_ZoomIn;
    private ActionReloadFailedMapImages       _actionReloadFailedMapImages;
    private ActionSaveDefaultPosition         _actionSaveDefaultPosition;
    private ActionSearchTourByLocation        _actionSearchTourByLocation;
@@ -657,11 +656,11 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   private class ActionMapMarker_CenterMap extends Action {
+   private class ActionMapPoint_CenterMap extends Action {
 
-      public ActionMapMarker_CenterMap() {
+      public ActionMapPoint_CenterMap() {
 
-         setText("&Center map to the marker position");
+         setText("&Center map to the map point position");
       }
 
       @Override
@@ -670,9 +669,9 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   private class ActionMapMarker_Edit extends Action {
+   private class ActionMapPoint_EditTourMarker extends Action {
 
-      public ActionMapMarker_Edit() {
+      public ActionMapPoint_EditTourMarker() {
 
          setText("&Edit tour marker");
 
@@ -687,9 +686,9 @@ public class Map2View extends ViewPart implements
 
    }
 
-   private class ActionMapMarker_ShowOnlyThisTour extends Action {
+   private class ActionMapPoint_ShowOnlyThisTour extends Action {
 
-      public ActionMapMarker_ShowOnlyThisTour() {
+      public ActionMapPoint_ShowOnlyThisTour() {
 
          setText("&Show only this tour");
       }
@@ -700,11 +699,11 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   private class ActionMapMarker_ZoomIn extends Action {
+   private class ActionMapPoint_ZoomIn extends Action {
 
-      public ActionMapMarker_ZoomIn() {
+      public ActionMapPoint_ZoomIn() {
 
-         setText("&Zoom in to the marker position");
+         setText("&Zoom in to the map point position");
       }
 
       @Override
@@ -1262,9 +1261,7 @@ public class Map2View extends ViewPart implements
 
    public void actionSetShowTourMarkerInMap() {
 
-      final boolean isSelected = _actionShowTourMarker.isChecked();
-
-      Map2ConfigManager.getActiveConfig().isShowTourMarker = isSelected;
+      Map2ConfigManager.getActiveConfig().isShowTourMarker = _actionShowTourMarker.isChecked();
 
       Map2PointManager.updateMapLocationAndMarkerSlideout();
 
@@ -1273,9 +1270,10 @@ public class Map2View extends ViewPart implements
 
    public void actionSetShowTourPausesInMap() {
 
-      TourPainterConfiguration.isShowTourPauses = _actionShowTourPauses.isChecked();
+      Map2ConfigManager.getActiveConfig().isShowTourPauses = _actionShowTourPauses.isChecked();
 
-      _map.disposeOverlayImageCache();
+      Map2PointManager.updateMapLocationAndMarkerSlideout();
+
       _map.paint();
    }
 
@@ -1988,10 +1986,10 @@ public class Map2View extends ViewPart implements
       _actionGotoLocation                 = new ActionGotoLocation();
       _actionLookupTourLocation           = new ActionLookupCommonLocation(this);
       _actionManageMapProvider            = new ActionManageMapProviders(this);
-      _actionMapMarker_CenterMap          = new ActionMapMarker_CenterMap();
-      _actionMapMarker_Edit               = new ActionMapMarker_Edit();
-      _actionMapMarker_ShowOnlyThisTour   = new ActionMapMarker_ShowOnlyThisTour();
-      _actionMapMarker_ZoomIn             = new ActionMapMarker_ZoomIn();
+      _actionMapPoint_CenterMap           = new ActionMapPoint_CenterMap();
+      _actionMapPoint_EditTourMarker      = new ActionMapPoint_EditTourMarker();
+      _actionMapPoint_ShowOnlyThisTour    = new ActionMapPoint_ShowOnlyThisTour();
+      _actionMapPoint_ZoomIn              = new ActionMapPoint_ZoomIn();
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
       _actionExportMap_SubMenu            = new Action_ExportMap_SubMenu(this);
@@ -2421,25 +2419,27 @@ public class Map2View extends ViewPart implements
 // SET_FORMATTING_ON
    }
 
-   private void enableActions_MapMarker() {
+   private void enableActions_MapPoint(final PaintedMapPoint hoveredMapPoint) {
 
 // SET_FORMATTING_OFF
 
-      final int      numTours = _allTourData.size();
-      final boolean  isMultipleTours = numTours > 1;
+      final Map2Point mapPoint         = hoveredMapPoint.mapPoint;
 
-      final PaintedMapPoint   hoveredMapPoint   = _map.getHoveredMapPoint();
-      final boolean           isHoveredMapPoint = hoveredMapPoint != null;
-      final boolean           isTourAvailable   = isHoveredMapPoint && hoveredMapPoint.mapPoint.tourMarker != null;
-      final boolean           canEditTour       = isHoveredMapPoint
+      final MapPointType pointType     = mapPoint.pointType;
+      final LocationType locationType  = mapPoint.locationType;
 
-            && (hoveredMapPoint.mapPoint.locationType.equals(LocationType.TourStart)
-            ||  hoveredMapPoint.mapPoint.locationType.equals(LocationType.TourEnd));
+      final int      numTours          = _allTourData.size();
+      final boolean  isMultipleTours   = numTours > 1;
 
-      _actionMapMarker_CenterMap       .setEnabled(isHoveredMapPoint);
-      _actionMapMarker_Edit            .setEnabled(isHoveredMapPoint && canEditTour);
-      _actionMapMarker_ShowOnlyThisTour.setEnabled(isHoveredMapPoint && isMultipleTours && isTourAvailable);
-      _actionMapMarker_ZoomIn          .setEnabled(isHoveredMapPoint);
+      final boolean  isTourAvailable   = mapPoint.tourMarker != null;
+
+      final boolean  canEditTourMarker = isTourAvailable;
+
+      _actionMapPoint_EditTourMarker  .setEnabled(canEditTourMarker);
+      _actionMapPoint_ShowOnlyThisTour.setEnabled(isMultipleTours && isTourAvailable);
+
+//    _actionMapPoint_CenterMap       .setEnabled(true);
+//    _actionMapPoint_ZoomIn          .setEnabled(true);
 
 // SET_FORMATTING_ON
    }
@@ -2494,15 +2494,15 @@ public class Map2View extends ViewPart implements
 
          // open context menu for a map marker
 
-         enableActions_MapMarker();
+         enableActions_MapPoint(hoveredMapPoint);
 
-         menuMgr.add(_actionMapMarker_ZoomIn);
-         menuMgr.add(_actionMapMarker_CenterMap);
+         menuMgr.add(_actionMapPoint_ZoomIn);
+         menuMgr.add(_actionMapPoint_CenterMap);
 
          menuMgr.add(new Separator());
 
-         menuMgr.add(_actionMapMarker_ShowOnlyThisTour);
-         menuMgr.add(_actionMapMarker_Edit);
+         menuMgr.add(_actionMapPoint_ShowOnlyThisTour);
+         menuMgr.add(_actionMapPoint_EditTourMarker);
 
       } else {
 
@@ -4683,13 +4683,10 @@ public class Map2View extends ViewPart implements
       _actionShowStartEndInMap.setChecked(_state.getBoolean(STATE_IS_SHOW_START_END_IN_MAP));
       TourPainterConfiguration.isShowTourStartEnd = _actionShowStartEndInMap.isChecked();
 
-      // show tour marker
-      _actionShowTourMarker.setChecked(Map2ConfigManager.getActiveConfig().isShowTourMarker);
-
-      // show tour pauses
-      final boolean isShowPauses = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_PAUSES, true);
-      _actionShowTourPauses.setChecked(isShowPauses);
-      TourPainterConfiguration.isShowTourPauses = isShowPauses;
+      // show tour marker / pauses
+      final Map2Config activeConfig = Map2ConfigManager.getActiveConfig();
+      _actionShowTourMarker.setChecked(activeConfig.isShowTourMarker);
+      _actionShowTourPauses.setChecked(activeConfig.isShowTourPauses);
 
       // show way points
       final boolean isShowWayPoints = Util.getStateBoolean(_state, STATE_IS_SHOW_WAY_POINTS, true);
@@ -4890,7 +4887,6 @@ public class Map2View extends ViewPart implements
       _state.put(STATE_IS_SHOW_SLIDER_IN_MAP,                     _actionShowSliderInMap.isChecked());
       _state.put(STATE_IS_SHOW_SLIDER_IN_LEGEND,                  _actionShowSliderInLegend.isChecked());
       _state.put(STATE_IS_SHOW_TOUR_INFO_IN_MAP,                  _actionShowTourInfoInMap.isChecked());
-      _state.put(STATE_IS_SHOW_TOUR_PAUSES,                       _actionShowTourPauses.isChecked());
       _state.put(STATE_IS_SHOW_TOUR_WEATHER_IN_MAP,               _actionShowTourWeatherInMap.isChecked());
       _state.put(STATE_IS_SHOW_WAY_POINTS,                        _actionShowWayPoints.isChecked());
 
@@ -5564,9 +5560,11 @@ public class Map2View extends ViewPart implements
       // enable/disable cluster/marker tooltip
       final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
 
-      final boolean isShowTooltip = mapConfig.isShowTourMarker
+      final boolean isShowTooltip = false
+            || mapConfig.isShowCommonLocation
             || mapConfig.isShowTourLocation
-            || mapConfig.isShowCommonLocation;
+            || mapConfig.isShowTourMarker
+            || mapConfig.isShowTourPauses;
 
       if (isShowTooltip) {
          _map.getMapPointTooltip().activate();

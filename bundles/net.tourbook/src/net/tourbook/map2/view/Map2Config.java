@@ -16,6 +16,7 @@
 package net.tourbook.map2.view;
 
 import net.tourbook.common.UI;
+import net.tourbook.tour.filter.TourFilterFieldOperator;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -66,15 +67,15 @@ public class Map2Config {
    /*
     * Tour markers
     */
-   public boolean isShowTourMarker          = true;
+   public boolean isShowTourMarker              = true;
 
    /** When <code>true</code> then markers with the same label are grouped together */
    public boolean isGroupDuplicatedMarkers;
-   public String  groupedMarkers            = UI.EMPTY_STRING;
-   public int     groupGridSize             = Map2ConfigManager.LABEL_GROUP_GRID_SIZE_DEFAULT;
+   public String  groupedMarkers                = UI.EMPTY_STRING;
+   public int     groupGridSize                 = Map2ConfigManager.LABEL_GROUP_GRID_SIZE_DEFAULT;
 
-   public RGB     tourMarkerFill_RGB         = Map2ConfigManager.DEFAULT_TOUR_MARKER_FILL_RGB;
-   public RGB     tourMarkerFill_Hovered_RGB = Map2ConfigManager.DEFAULT_TOUR_MARKER_FILL_HOVERED_RGB;
+   public RGB     tourMarkerFill_RGB            = Map2ConfigManager.DEFAULT_TOUR_MARKER_FILL_RGB;
+   public RGB     tourMarkerFill_Hovered_RGB    = Map2ConfigManager.DEFAULT_TOUR_MARKER_FILL_HOVERED_RGB;
    public RGB     tourMarkerOutline_RGB         = Map2ConfigManager.DEFAULT_TOUR_MARKER_OUTLINE_RGB;
    public RGB     tourMarkerOutline_Hovered_RGB = Map2ConfigManager.DEFAULT_TOUR_MARKER_OUTLINE_HOVERED_RGB;
 
@@ -127,6 +128,25 @@ public class Map2Config {
    public Color   tourPauseFill_Hovered_Color;
    public Color   tourPauseOutline_Color;
    public Color   tourPauseOutline_Hovered_Color;
+
+   /*
+    * Tour pause filter
+    */
+   public boolean                 isFilterTourPauses;
+   public boolean                 isFilterTourPause_Duration;
+   public boolean                 isShowAutoPauses;
+   public boolean                 isShowUserPauses;
+
+   public boolean                 useTourPause_DurationFilter_Hours;
+   public boolean                 useTourPause_DurationFilter_Minutes;
+   public boolean                 useTourPause_DurationFilter_Seconds;
+
+   public int                     tourPauseDurationFilter_Hours;
+   public int                     tourPauseDurationFilter_Minutes;
+   public int                     tourPauseDurationFilter_Seconds;
+   public long                    tourPauseDuration;
+
+   public TourFilterFieldOperator tourPauseDurationFilter_Operator;
 
    public void setupColors() {
 

@@ -45,7 +45,6 @@ public class TourPainterConfiguration {
 
    static boolean                              isShowPhotos;
    static boolean                              isShowTours;
-   static boolean                              isShowTourPauses;
    static boolean                              isShowTourStartEnd;
    static boolean                              isShowWayPoints;
 
@@ -59,6 +58,7 @@ public class TourPainterConfiguration {
    public static boolean                       isFilterPauseDuration;
    public static boolean                       isShowAutoPauses;
    public static boolean                       isShowUserPauses;
+
    public static long                          pauseDuration;
    public static Enum<TourFilterFieldOperator> pauseDurationOperator;
 

@@ -97,7 +97,6 @@ import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
-import net.tourbook.common.util.ToolTip;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -1316,7 +1315,7 @@ public class Map2 extends Canvas {
                                           final int numVisibleLabels,
                                           final List<PointFeature> allLabels) {
 
-      final float subPointDiff = numAllLabels / (float) numVisibleLabels;
+      final float subDiff = numAllLabels / (float) numVisibleLabels;
 
       for (int itemIndex = 0; itemIndex < numVisibleLabels; itemIndex++) {
 
@@ -1324,10 +1323,10 @@ public class Map2 extends Canvas {
 
          if (numVisibleLabels != numAllLabels) {
 
-            // not all available markers are displayed -> use a random label
+            // not all available markers can be displayed -> use a random label
 
-            final double randomDiff = Math.random() * subPointDiff;
-            final float nextItemIndex = subPointDiff * itemIndex;
+            final double randomDiff = Math.random() * subDiff;
+            final float nextItemIndex = subDiff * itemIndex;
 
             subIndex = (int) (nextItemIndex + randomDiff);
          }
@@ -1971,12 +1970,17 @@ public class Map2 extends Canvas {
 
       final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
 
-      int numVisibleItems = 0;
       final int maxVisibleItems = _mapConfig.labelDistributorMaxLabels;
+
+      int numAllRemainingItems = maxVisibleItems;
+
+      final int numTours = allTourData.size();
 
       VisibleLimit:
 
-      for (final TourData tourData : allTourData) {
+      for (int tourIndex = 0; tourIndex < numTours; tourIndex++) {
+
+         final TourData tourData = allTourData.get(tourIndex);
 
          if (isBackgroundPainterInterrupted()) {
             break;
@@ -2002,10 +2006,40 @@ public class Map2 extends Canvas {
          int serieIndex = 0;
 
          final int[] timeSerie = tourData.timeSerie;
-         for (int index = 0; index < pausedTime_Start.length; ++index) {
 
-            final long startTime = pausedTime_Start[index];
-            final long endTime = pausedTime_End[index];
+         final int numPauses = pausedTime_Start.length;
+
+         final float numRemainingTours = numTours - tourIndex;
+         final float subTourItems = numAllRemainingItems / numRemainingTours;
+//         final float subPauseItems = numPauses / subTourItems;
+
+         // max number of pauses which can be displayed in the current tour
+         int numRemainingPauses = (int) subTourItems;
+
+         for (int pauseIndex = 0; pauseIndex < numPauses; ++pauseIndex) {
+
+            final int pauseSubIndex = pauseIndex;
+
+//            if (subPauseItems > 1) {
+//
+//               // there are more pauses than visible pauses
+//
+//               final double randomDiff = Math.random() * subPauseItems;
+//               final float nextItemIndex = subPauseItems * pauseIndex;
+//
+//               pauseSubIndex = (int) (nextItemIndex + randomDiff);
+//            }
+//
+//            if (pauseSubIndex >= numPauses) {
+//               break;
+//            }
+
+//            if (pauseIndex >= subTourItems) {
+//               break;
+//            }
+
+            final long startTime = pausedTime_Start[pauseSubIndex];
+            final long endTime = pausedTime_End[pauseSubIndex];
 
             /*
              * Check if pause is filtered out
@@ -2014,7 +2048,7 @@ public class Map2 extends Canvas {
 
             final boolean isPauseAnAutoPause = pausedTime_Data == null
                   ? true
-                  : pausedTime_Data[index] == 1;
+                  : pausedTime_Data[pauseSubIndex] == 1;
 
             if (isTourPauseVisible(isPauseAnAutoPause, pauseDuration) == false) {
                continue;
@@ -2060,6 +2094,7 @@ public class Map2 extends Canvas {
             mapPoint.geoPointDevX = devX;
             mapPoint.geoPointDevY = devY;
 
+            mapPoint.tourData = tourData;
             mapPoint.isPauseAnAutoPause = isPauseAnAutoPause;
 
             mapPoint.setFormattedLabel(UI.format_hh_mm_ss(pauseDuration));
@@ -2068,9 +2103,12 @@ public class Map2 extends Canvas {
 
             _numStatistics_AllTourPauses++;
 
-            numVisibleItems++;
-            if (numVisibleItems > maxVisibleItems) {
+            if (--numAllRemainingItems <= 0) {
                break VisibleLimit;
+            }
+
+            if (--numRemainingPauses <= 0) {
+               break;
             }
          }
       }
@@ -2466,7 +2504,7 @@ public class Map2 extends Canvas {
     *
     * @return
     */
-   public ToolTip getMapPointTooltip() {
+   public MapPointToolTip getMapPointTooltip() {
 
       return _mapPointTooltip;
    }
@@ -3623,7 +3661,9 @@ public class Map2 extends Canvas {
     */
    private boolean isTourPauseVisible(final boolean isPauseAnAutoPause, final long pauseDuration) {
 
-      if (TourPainterConfiguration.isFilterTourPauses == false) {
+      final Map2Config config = Map2ConfigManager.getActiveConfig();
+
+      if (config.isFilterTourPauses == false) {
 
          // nothing is filtered
          return true;
@@ -3631,24 +3671,24 @@ public class Map2 extends Canvas {
 
       boolean isPauseVisible = false;
 
-      if (TourPainterConfiguration.isShowAutoPauses && isPauseAnAutoPause) {
+      if (config.isShowAutoPauses && isPauseAnAutoPause) {
 
          // pause is an auto-pause
          isPauseVisible = true;
       }
 
-      if (TourPainterConfiguration.isShowUserPauses && !isPauseAnAutoPause) {
+      if (config.isShowUserPauses && !isPauseAnAutoPause) {
 
          // pause is a user-pause
          isPauseVisible = true;
       }
 
-      if (isPauseVisible && TourPainterConfiguration.isFilterPauseDuration) {
+      if (isPauseVisible && config.isFilterTourPause_Duration) {
 
          // filter by pause duration -> hide pause when condition is true
 
-         final long requiredPauseDuration = TourPainterConfiguration.pauseDuration;
-         final Enum<TourFilterFieldOperator> pauseDurationOperator = TourPainterConfiguration.pauseDurationOperator;
+         final long requiredPauseDuration = config.tourPauseDuration;
+         final Enum<TourFilterFieldOperator> pauseDurationOperator = config.tourPauseDurationFilter_Operator;
 
          if (TourFilterFieldOperator.GREATER_THAN_OR_EQUAL.equals(pauseDurationOperator)) {
 
@@ -5448,7 +5488,10 @@ public class Map2 extends Canvas {
                   _numStatistics_AllTourMarkers,
 
                   _allPaintedLocations.size(),
-                  _numStatistics_AllTourLocations + _numStatistics_AllCommonLocations
+                  _numStatistics_AllTourLocations + _numStatistics_AllCommonLocations,
+
+                  _allPaintedPauses.size(),
+                  _numStatistics_AllTourPauses
 
             ));
          }
@@ -6142,7 +6185,7 @@ public class Map2 extends Canvas {
 //         }
 //      }
 
-      final int markerRespectSize = 20;
+      final int markerRespectSize = 10;
       final int markerRespectSize2 = markerRespectSize / 2;
 
       final Rectangle clientArea = _clientArea;

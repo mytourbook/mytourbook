@@ -21,7 +21,7 @@ import de.byteholder.geoclipse.map.PaintedMapPoint;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.ToolTip;
-import net.tourbook.data.TourLocation;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.location.TourLocationUI;
@@ -98,33 +98,36 @@ public class MapPointToolTip extends ToolTip {
 
    private void createUI(final Composite parent) {
 
-      final Map2Point mapMarker = _hoveredMarker.mapPoint;
+      final Map2Point mapPoint = _hoveredMarker.mapPoint;
 
-      final TourMarker tourMarker = mapMarker.tourMarker;
-      final TourLocation tourLocation = mapMarker.tourLocation;
+// SET_FORMATTING_OFF
 
-      if (tourMarker != null) {
+      switch (mapPoint.pointType) {
+      case COMMON_LOCATION:
+      case TOUR_LOCATION:     createUI_TourLocation(parent, mapPoint);  break;
 
-         createUI_TourMarker(parent, tourMarker);
+      case TOUR_MARKER:       createUI_TourMarker(parent, mapPoint);    break;
 
-      } else if (tourLocation != null) {
-
-         createUI_TourLocation(parent, tourLocation);
+      case TOUR_PAUSE:        createUI_TourPause(parent, mapPoint);     break;
       }
+
+// SET_FORMATTING_ON
    }
 
-   private void createUI_TourLocation(final Composite parent, final TourLocation tourLocation) {
+   private void createUI_TourLocation(final Composite parent, final Map2Point mapPoint) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          // location fields
-         TourLocationUI.createUI(container, tourLocation);
+         TourLocationUI.createUI(container, mapPoint.tourLocation);
       }
    }
 
-   private void createUI_TourMarker(final Composite parent, final TourMarker tourMarker) {
+   private void createUI_TourMarker(final Composite parent, final Map2Point mapPoint) {
+
+      final TourMarker tourMarker = mapPoint.tourMarker;
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -173,6 +176,22 @@ public class MapPointToolTip extends ToolTip {
             GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
 
          }
+      }
+   }
+
+   private void createUI_TourPause(final Composite parent, final Map2Point mapPoint) {
+
+      final TourData tourData = mapPoint.tourData;
+
+      {
+         /*
+          * Tour date/time
+          */
+
+         final Label label = new Label(parent, SWT.TRAIL);
+         label.setText(TourManager.getTourDateShort(tourData));
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+
       }
    }
 

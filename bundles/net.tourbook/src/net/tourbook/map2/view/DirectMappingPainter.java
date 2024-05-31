@@ -128,7 +128,7 @@ public class DirectMappingPainter implements IDirectPainter {
       final int labelHeight = labelRectangle.height;
 
       final Map2Point mapPoint = hoveredPoint.mapPoint;
-      final MapPointType mapPointType = mapPoint.type;
+      final MapPointType mapPointType = mapPoint.pointType;
 
       final int mapPointDevX = mapPoint.geoPointDevX;
       final int mapPointDevY = mapPoint.geoPointDevY;

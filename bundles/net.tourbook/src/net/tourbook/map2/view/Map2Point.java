@@ -16,6 +16,7 @@
 package net.tourbook.map2.view;
 
 import net.tourbook.common.UI;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
 import net.tourbook.map.location.LocationType;
@@ -26,7 +27,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.oscim.core.GeoPoint;
 
 /**
- * Immutable class describing a GeoPoint with a Title and a Description
+ *
  */
 public class Map2Point implements ClusterItem {
 
@@ -40,7 +41,7 @@ public class Map2Point implements ClusterItem {
    /**
     * Depending on this type, other fields are set
     */
-   public MapPointType type;
+   public MapPointType pointType;
 
    public GeoPoint     geoPoint;
 
@@ -60,6 +61,7 @@ public class Map2Point implements ClusterItem {
    public int          numDuplicates_Start;
    public int          numDuplicates_End;
 
+   public TourData     tourData;
    public TourMarker   tourMarker;
    public TourLocation tourLocation;
 
@@ -82,10 +84,9 @@ public class Map2Point implements ClusterItem {
     * @param tourMarker
     * @param geoPoint
     */
-   public Map2Point(final MapPointType type, final GeoPoint geoPoint) {
+   public Map2Point(final MapPointType pointType, final GeoPoint geoPoint) {
 
-      this.type = type;
-
+      this.pointType = pointType;
       this.geoPoint = geoPoint;
 
       ID = String.valueOf(_uniqueID++);
@@ -97,7 +98,7 @@ public class Map2Point implements ClusterItem {
 
 // SET_FORMATTING_OFF
 
-      switch (type) {
+      switch (pointType) {
 
       case COMMON_LOCATION:   return mapConfig.commonLocationFill_Color;
 
@@ -118,7 +119,7 @@ public class Map2Point implements ClusterItem {
 
 // SET_FORMATTING_OFF
 
-      switch (type) {
+      switch (pointType) {
 
       case COMMON_LOCATION:   return mapConfig.commonLocationFill_Hovered_Color;
 
@@ -172,7 +173,7 @@ public class Map2Point implements ClusterItem {
 
 // SET_FORMATTING_OFF
 
-      switch (type) {
+      switch (pointType) {
 
       case COMMON_LOCATION:   return mapConfig.commonLocationOutline_Color;
 
@@ -193,7 +194,7 @@ public class Map2Point implements ClusterItem {
 
 // SET_FORMATTING_OFF
 
-      switch (type) {
+      switch (pointType) {
 
       case COMMON_LOCATION:   return mapConfig.commonLocationOutline_Hovered_Color;
 

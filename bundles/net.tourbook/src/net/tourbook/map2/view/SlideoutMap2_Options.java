@@ -126,7 +126,7 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
 
          UI.createSpacer_Vertical(shellContainer, 4, 1);
 
-         _tourPausesUI.createContent(shellContainer, TourPainterConfiguration.isShowTourPauses);
+         _tourPausesUI.createContent(shellContainer, Map2ConfigManager.getActiveConfig().isShowTourPauses);
       }
 
       return shellContainer;
