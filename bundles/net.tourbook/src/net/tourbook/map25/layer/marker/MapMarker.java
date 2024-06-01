@@ -20,13 +20,6 @@ public class MapMarker implements ClusterItem {
    public MarkerSymbol markerSymbol;
 
    /**
-    * Device position for the marker which is within a cluster, this is used to visualize the
-    * markers in a cluster
-    */
-   public int          devX;
-   public int          devY;
-
-   /**
     * @param title
     *           this should be <b>singleLine</b> (no <code>'\n'</code> )
     * @param description
