@@ -65,7 +65,9 @@ Changes
 =======
 
 * 2D Map
-  - Moved map dim options from the "2D Map Options" slideout into the "Location / Marker" slideout
+  - Moved options from the "2D Map Options" slideout to the "Map Points" slideout
+    - Map dimming
+    - Filter tour pauses
 
 
 Changes that require Tour Re-import

@@ -147,9 +147,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourPauseUI;
 import net.tourbook.tour.TourWeatherToolTipProvider;
-import net.tourbook.tour.filter.TourFilterFieldOperator;
 import net.tourbook.tour.filter.geo.GeoFilter_LoaderData;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Loader;
@@ -5535,25 +5533,6 @@ public class Map2View extends ViewPart implements
        */
       final boolean isBackgroundDark   = isBackgroundDark();
       TourPainterConfiguration.isBackgroundDark = isBackgroundDark;
-
-      /*
-       * Tour pauses
-       */
-      final boolean isFilterTourPauses    = Util.getStateBoolean( _state, TourPauseUI.STATE_IS_FILTER_TOUR_PAUSES,      TourPauseUI.STATE_IS_FILTER_TOUR_PAUSES_DEFAULT);
-      final boolean isFilterPauseDuration = Util.getStateBoolean( _state, TourPauseUI.STATE_IS_FILTER_PAUSE_DURATION,   TourPauseUI.STATE_IS_FILTER_PAUSE_DURATION_DEFAULT);
-
-      final boolean isShowAutoPauses      = Util.getStateBoolean( _state, TourPauseUI.STATE_IS_SHOW_AUTO_PAUSES,        TourPauseUI.STATE_IS_SHOW_AUTO_PAUSES_DEFAULT);
-      final boolean isShowUserPauses      = Util.getStateBoolean( _state, TourPauseUI.STATE_IS_SHOW_USER_PAUSES,        TourPauseUI.STATE_IS_SHOW_USER_PAUSES_DEFAULT);
-
-      final long pauseDuration            = Util.getStateLong(    _state, TourPauseUI.STATE_DURATION_FILTER_SUMMARIZED, 0);
-      final Enum<TourFilterFieldOperator> pauseDurationOperator = Util.getStateEnum(_state, TourPauseUI.STATE_DURATION_OPERATOR, TourPauseUI.STATE_DURATION_OPERATOR_DEFAULT);
-
-      TourPainterConfiguration.isFilterTourPauses     = isFilterTourPauses;
-      TourPainterConfiguration.isFilterPauseDuration  = isFilterPauseDuration;
-      TourPainterConfiguration.isShowAutoPauses       = isShowAutoPauses;
-      TourPainterConfiguration.isShowUserPauses       = isShowUserPauses;
-      TourPainterConfiguration.pauseDuration          = pauseDuration;
-      TourPainterConfiguration.pauseDurationOperator  = pauseDurationOperator;
 
 // SET_FORMATTING_ON
 

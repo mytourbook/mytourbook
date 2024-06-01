@@ -26,7 +26,6 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.ui.IChangeUIListener;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.TourPauseUI;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -66,11 +65,9 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
    /*
     * UI controls
     */
-   private Button      _chkIsToggleKeyboardPanning;
-   private Button      _chkSelectInbetweenTimeSlices;
-   private Button      _chkShowValuePointTooltip;
-
-   private TourPauseUI _tourPausesUI;
+   private Button _chkIsToggleKeyboardPanning;
+   private Button _chkSelectInbetweenTimeSlices;
+   private Button _chkShowValuePointTooltip;
 
    /**
     * @param ownerControl
@@ -87,8 +84,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
 
       _map2View = map2View;
       _state = map2State;
-
-      _tourPausesUI = new TourPauseUI(map2State, this, this);
    }
 
    @Override
@@ -123,10 +118,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
       {
          createUI_10_Header(shellContainer);
          createUI_20_MapOptions(shellContainer);
-
-         UI.createSpacer_Vertical(shellContainer, 4, 1);
-
-         _tourPausesUI.createContent(shellContainer, Map2ConfigManager.getActiveConfig().isShowTourPauses);
       }
 
       return shellContainer;
@@ -212,7 +203,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
 
    private void enableControls() {
 
-      _tourPausesUI.enableControls();
    }
 
    private void initUI(final Composite parent) {
@@ -262,8 +252,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
       // this is not set in saveState()
       _prefStore.setValue(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2, isShowValuePointTooltip);
 
-      _tourPausesUI.resetToDefaults();
-
       onChangeUI_UpdateMap();
    }
 
@@ -277,7 +265,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
 
 // SET_FORMATTING_ON
 
-      _tourPausesUI.restoreState();
    }
 
    private void saveState() {
@@ -290,7 +277,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
 
 // SET_FORMATTING_ON
 
-      _tourPausesUI.saveState();
    }
 
    private void saveState_ValuePointTooltip() {

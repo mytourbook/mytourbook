@@ -22,47 +22,38 @@ import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.photo.Photo;
-import net.tourbook.tour.filter.TourFilterFieldOperator;
 
 /**
  * Contains data which are needed to paint a tour into the 2D map.
  */
 public class TourPainterConfiguration {
 
-   private final static ArrayList<TourData>    _allTourData = new ArrayList<>();
-   private final static ArrayList<Photo>       _allPhotos   = new ArrayList<>();
+   private final static ArrayList<TourData> _allTourData = new ArrayList<>();
+   private final static ArrayList<Photo>    _allPhotos   = new ArrayList<>();
 
    /**
     * contains the upper left and lower right position for a tour
     */
-   private static Set<GeoPosition>             _tourBounds;
+   private static Set<GeoPosition>          _tourBounds;
 
-   private static int                          _zoomLevelAdjustment;
+   private static int                       _zoomLevelAdjustment;
 
-   private static IMapColorProvider            _mapColorProvider;
+   private static IMapColorProvider         _mapColorProvider;
 
-   static boolean                              isBackgroundDark;
+   static boolean                           isBackgroundDark;
 
-   static boolean                              isShowPhotos;
-   static boolean                              isShowTours;
-   static boolean                              isShowTourStartEnd;
-   static boolean                              isShowWayPoints;
+   static boolean                           isShowPhotos;
+   static boolean                           isShowTours;
+   static boolean                           isShowTourStartEnd;
+   static boolean                           isShowWayPoints;
 
    /**
     * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
     * save in a tour) is displayed.
     */
-   static boolean                              isLinkPhotoDisplayed;
+   static boolean                           isLinkPhotoDisplayed;
 
-   public static boolean                       isFilterTourPauses;
-   public static boolean                       isFilterPauseDuration;
-   public static boolean                       isShowAutoPauses;
-   public static boolean                       isShowUserPauses;
-
-   public static long                          pauseDuration;
-   public static Enum<TourFilterFieldOperator> pauseDurationOperator;
-
-   static boolean                              isShowBreadcrumbs;
+   static boolean                           isShowBreadcrumbs;
 
    private TourPainterConfiguration() {}
 

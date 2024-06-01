@@ -43,7 +43,6 @@ import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.color.MapUnits;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.StatusUtil;
@@ -62,7 +61,6 @@ import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.Map2_Appearance;
-import net.tourbook.tour.filter.TourFilterFieldOperator;
 import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
 
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
@@ -75,14 +73,10 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * Paints a tour into the 2D map.
@@ -90,9 +84,6 @@ import org.eclipse.swt.widgets.Display;
 public class TourMapPainter extends Map2Painter {
 
    private static final Font              DEFAULT_FONT      = net.tourbook.common.UI.AWT_DIALOG_FONT;
-
-   private static final int               MARKER_MARGIN     = 2;
-   private static final int               MARKER_POLE       = 16;
 
    private static final IPreferenceStore  _prefStore        = TourbookPlugin.getPrefStore();
 
@@ -1932,189 +1923,6 @@ public class TourMapPainter extends Map2Painter {
    }
 
    /**
-    * Create an image for the tour pause
-    *
-    * @param device
-    * @param pauseDurationText
-    * @param pauseBounds
-    * @param isAutoPause
-    *
-    * @return
-    */
-   private Image drawTourPauses_Image(final Device device,
-                                      final String pauseDurationText,
-                                      final Rectangle pauseBounds,
-                                      final boolean isAutoPause) {
-
-      final int bannerWidth = pauseBounds.x;
-      final int bannerHeight = pauseBounds.y;
-      final int bannerWidth2 = bannerWidth / 2;
-
-      final int markerImageWidth = pauseBounds.width;
-      final int markerImageHeight = pauseBounds.height;
-
-      final int arcSize = 5;
-
-      final RGB rgbTransparent = Map2.getTransparentRGB();
-
-      final ImageData markerImageData = new ImageData(
-            markerImageWidth,
-            markerImageHeight,
-            24,
-            new PaletteData(0xff, 0xff00, 0xff0000));
-
-      markerImageData.transparentPixel = markerImageData.palette.getPixel(rgbTransparent);
-
-      final Image markerImage = new Image(device, markerImageData);
-      final Rectangle markerImageBounds = markerImage.getBounds();
-
-      final Color transparentColor = new Color(rgbTransparent);
-
-      Color bannerColor;
-      Color bannerBorderColor;
-      Color textColor;
-
-      final Color systemColorRed = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
-      final Color systemColorYellow = Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
-
-      final boolean isBackgroundDark = TourPainterConfiguration.isBackgroundDark;
-
-      if (isAutoPause) {
-
-         bannerColor = isBackgroundDark
-               ? ThemeUtil.getDefaultBackgroundColor_Shell()
-               : new Color(0xFF, 0xFF, 0xFF);
-
-         bannerBorderColor = new Color(0x69, 0xAF, 0x3D);
-
-         textColor = isBackgroundDark
-               ? new Color(new RGB(0xff, 0xff, 0xff))
-               : new Color(new RGB(0x0, 0x0, 0x0));
-
-      } else {
-
-         // user started/stopped pause
-
-         bannerColor = isBackgroundDark
-               ? ThemeUtil.getDefaultBackgroundColor_Shell()
-               : new Color(0xFF, 0xFF, 0xFF);
-
-         bannerBorderColor = isBackgroundDark
-               ? systemColorYellow
-               : systemColorRed;
-
-         textColor = isBackgroundDark
-               ? systemColorYellow
-               : systemColorRed;
-      }
-
-      final GC gc = new GC(markerImage);
-      {
-         // fill transparent color
-         gc.setBackground(transparentColor);
-         gc.fillRectangle(markerImageBounds);
-
-         gc.setBackground(bannerColor);
-         gc.fillRoundRectangle(0, 0, bannerWidth, bannerHeight, arcSize, arcSize);
-
-         // draw banner border
-         gc.setForeground(bannerBorderColor);
-         gc.drawRoundRectangle(0, 0, bannerWidth - 1, bannerHeight - 1, arcSize, arcSize);
-
-         // draw text
-         gc.setForeground(textColor);
-         gc.drawText(pauseDurationText, MARKER_MARGIN + 1, MARKER_MARGIN, true);
-
-         // draw pole
-         gc.setForeground(bannerBorderColor);
-         gc.drawLine(bannerWidth2 - 1, bannerHeight, bannerWidth2 - 1, bannerHeight + MARKER_POLE);
-         gc.drawLine(bannerWidth2 + 1, bannerHeight, bannerWidth2 + 1, bannerHeight + MARKER_POLE);
-
-         gc.setForeground(bannerColor);
-         gc.drawLine(bannerWidth2 - 0, bannerHeight, bannerWidth2 - 0, bannerHeight + MARKER_POLE);
-      }
-      gc.dispose();
-
-      return markerImage;
-   }
-
-   /**
-    * @param gcTile
-    * @param map
-    * @param tile
-    * @param latitude
-    * @param longitude
-    * @param tourTimerPause
-    * @param parts
-    * @param isAutoPause
-    *
-    * @return Returns <code>true</code> when pause duration has been painted
-    */
-   private boolean drawTourPausesxxx(final GC gcTile,
-                                     final Map2 map,
-                                     final Tile tile,
-                                     final double latitude,
-                                     final double longitude,
-                                     final long pauseDuration,
-                                     final int parts,
-                                     final boolean isAutoPause) {
-
-      final MP mp = map.getMapProvider();
-      final int zoomLevel = map.getZoom();
-      final int tileSize = mp.getTileSize();
-      final int devPartOffset = ((parts - 1) / 2) * tileSize;
-
-      // get world viewport for the current tile
-      final int worldTileX = tile.getX() * tileSize;
-      final int worldTileY = tile.getY() * tileSize;
-
-      // convert lat/long into world pixels
-      final Point worldMarkerPos = mp.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
-
-      // convert world position into device position
-      final int devMarkerPosX = worldMarkerPos.x - worldTileX;
-      final int devMarkerPosY = worldMarkerPos.y - worldTileY;
-
-      /*
-       * create and cache marker bounds
-       */
-
-      final String pauseDurationText = UI.format_hh_mm_ss(pauseDuration);
-      final org.eclipse.swt.graphics.Point labelExtent = gcTile.textExtent(pauseDurationText);
-
-      final int bannerWidth = labelExtent.x + 2 * MARKER_MARGIN + 1;
-      final int bannerHeight = labelExtent.y + 2 * MARKER_MARGIN;
-
-      final int markerImageWidth = bannerWidth;
-      final int markerImageHeight = bannerHeight + MARKER_POLE;
-
-      final Rectangle pauseBounds = new Rectangle(bannerWidth, bannerHeight, markerImageWidth, markerImageHeight);
-
-      final boolean isPauseInTile = isInTile_Bounds(pauseBounds, devMarkerPosX, devMarkerPosY, tileSize);
-      if (isPauseInTile) {
-
-         int devX;
-         int devY;
-
-         final Image tourMarkerImage = drawTourPauses_Image(gcTile.getDevice(), pauseDurationText, pauseBounds, isAutoPause);
-         {
-            devX = devMarkerPosX - pauseBounds.width / 2;
-            devY = devMarkerPosY - pauseBounds.height;
-
-            devX += devPartOffset;
-            devY += devPartOffset;
-
-            gcTile.drawImage(tourMarkerImage, devX, devY);
-         }
-         tourMarkerImage.dispose();
-
-         tile.addMarkerBounds(devX, devY, pauseBounds.x, pauseBounds.y, zoomLevel, parts);
-      }
-
-      return isPauseInTile;
-   }
-
-   /**
     * @param gcTile
     * @param map
     * @param tile
@@ -2609,64 +2417,6 @@ public class TourMapPainter extends Map2Painter {
       }
 
       return false;
-   }
-
-   /**
-    * @param isPauseAnAutoPause
-    *           When <code>true</code> an auto-pause happened otherwise it is an user pause
-    * @param pauseDuration
-    *           Pause duration in seconds
-    *
-    * @return
-    */
-   private boolean isTourPauseVisible(final boolean isPauseAnAutoPause, final long pauseDuration) {
-
-      if (TourPainterConfiguration.isFilterTourPauses == false) {
-
-         // nothing is filtered
-         return true;
-      }
-
-      boolean isPauseVisible = false;
-
-      if (TourPainterConfiguration.isShowAutoPauses && isPauseAnAutoPause) {
-
-         // pause is an auto-pause
-         isPauseVisible = true;
-      }
-
-      if (TourPainterConfiguration.isShowUserPauses && !isPauseAnAutoPause) {
-
-         // pause is a user-pause
-         isPauseVisible = true;
-      }
-
-      if (isPauseVisible && TourPainterConfiguration.isFilterPauseDuration) {
-
-         // filter by pause duration -> hide pause when condition is true
-
-         final long requiredPauseDuration = TourPainterConfiguration.pauseDuration;
-         final Enum<TourFilterFieldOperator> pauseDurationOperator = TourPainterConfiguration.pauseDurationOperator;
-
-         if (TourFilterFieldOperator.GREATER_THAN_OR_EQUAL.equals(pauseDurationOperator)) {
-
-            isPauseVisible = (pauseDuration >= requiredPauseDuration) == false;
-
-         } else if (TourFilterFieldOperator.LESS_THAN_OR_EQUAL.equals(pauseDurationOperator)) {
-
-            isPauseVisible = (pauseDuration <= requiredPauseDuration) == false;
-
-         } else if (TourFilterFieldOperator.EQUALS.equals(pauseDurationOperator)) {
-
-            isPauseVisible = (pauseDuration == requiredPauseDuration) == false;
-
-         } else if (TourFilterFieldOperator.NOT_EQUALS.equals(pauseDurationOperator)) {
-
-            isPauseVisible = (pauseDuration != requiredPauseDuration) == false;
-         }
-      }
-
-      return isPauseVisible;
    }
 
    /**
