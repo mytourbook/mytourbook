@@ -15,9 +15,20 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import org.eclipse.ui.PlatformUI;
+
 public class Map2PointManager {
 
    private static SlideoutMap2_MapPoints _mapPointSlideout;
+
+   private static int                    _numPaintedMarkers;
+   private static int                    _numAllTourMarkers;
+
+   private static int                    _numPaintedLocations;
+   private static int                    _numAllLocations;
+
+   private static int                    _numPaintedPauses;
+   private static int                    _numAllTourPauses;
 
    /**
     * @param isOpenSlideout
@@ -52,5 +63,59 @@ public class Map2PointManager {
 
          _mapPointSlideout.updateUI();
       }
+   }
+
+   public static void updateStatistics() {
+
+      if (_mapPointSlideout != null) {
+
+         PlatformUI.getWorkbench().getDisplay().asyncExec(() -> _mapPointSlideout.updateStatistics(
+
+               _numPaintedMarkers,
+               _numAllTourMarkers,
+
+               _numPaintedLocations,
+               _numAllLocations,
+
+               _numPaintedPauses,
+               _numAllTourPauses
+
+         ));
+      }
+
+   }
+
+   public static void updateStatistics(final int numPaintedMarkers,
+                                       final int numAllTourMarkers,
+
+                                       final int numPaintedLocations,
+                                       final int numAllLocations,
+
+                                       final int numPaintedPauses,
+                                       final int numAllTourPauses) {
+
+      _numPaintedMarkers = numPaintedMarkers;
+      _numAllTourMarkers = numAllTourMarkers;
+      _numPaintedLocations = numPaintedLocations;
+      _numAllLocations = numAllLocations;
+      _numPaintedPauses = numPaintedPauses;
+      _numAllTourPauses = numAllTourPauses;
+
+      if (_mapPointSlideout != null) {
+
+         PlatformUI.getWorkbench().getDisplay().asyncExec(() -> _mapPointSlideout.updateStatistics(
+
+               numPaintedMarkers,
+               numAllTourMarkers,
+
+               numPaintedLocations,
+               numAllLocations,
+
+               numPaintedPauses,
+               numAllTourPauses
+
+         ));
+      }
+
    }
 }

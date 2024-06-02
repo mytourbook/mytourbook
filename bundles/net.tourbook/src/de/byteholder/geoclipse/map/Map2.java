@@ -114,7 +114,6 @@ import net.tourbook.map2.view.MapLabelLayout;
 import net.tourbook.map2.view.MapPointToolTip;
 import net.tourbook.map2.view.MapPointType;
 import net.tourbook.map2.view.SelectionMapSelection;
-import net.tourbook.map2.view.SlideoutMap2_MapPoints;
 import net.tourbook.map2.view.TourPainterConfiguration;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.map25.layer.marker.ScreenUtils;
@@ -414,11 +413,17 @@ public class Map2 extends Canvas {
    private List<TourLocation>              _allCommonLocations;
    private List<TourLocation>              _allTourLocations;
 
+   private int                             _clusterSymbolBorder               = 10;
+   private int                             _labelRespectMargin                = 1;
+   private int                             _mapPointSymbolMargin              = 5;
+   private int                             _mapPointSymbolRespectSize         = _mapPointSymbolMargin + 2;
+
    private PaintedMarkerCluster            _hoveredMarkerCluster;
    private PaintedMapPoint                 _hoveredMapPoint;
    private boolean                         _isMarkerClusterSelected;
    private MapPointToolTip                 _mapPointTooltip;
 
+   /** Number of created map points */
    private int                             _numStatistics_AllCommonLocations;
    private int                             _numStatistics_AllTourMarkers;
    private int                             _numStatistics_AllTourLocations;
@@ -514,10 +519,12 @@ public class Map2 extends Canvas {
     * tried to document this behaviour.
     */
    private Rectangle                                  _worldPixel_TopLeft_Viewport;
+
    /**
     * Size in device pixel where the map is displayed
     */
    private Rectangle                                  _devMapViewport;
+
    /**
     * Size of the map in tiles at the current zoom level {@link #_mapZoomLevel} (num tiles tall by
     * num tiles wide)
@@ -737,9 +744,6 @@ public class Map2 extends Canvas {
    private final Image       _imageMapLocation_Disabled_Dark;
 
    private Rectangle         _imageMapLocationBounds;
-
-// SET_FORMATTING_OFF
-
 
    private static enum HoveredPoint_PaintMode {
 
@@ -1317,6 +1321,9 @@ public class Map2 extends Canvas {
 
       final float subDiff = numAllLabels / (float) numVisibleLabels;
 
+      // without margin the labels are too close
+      final int margin2 = 2 * _labelRespectMargin;
+
       for (int itemIndex = 0; itemIndex < numVisibleLabels; itemIndex++) {
 
          int subIndex = itemIndex;
@@ -1352,11 +1359,11 @@ public class Map2 extends Canvas {
                pointLabel,
                -1,
 
-               devX,
-               devY,
+               devX - _labelRespectMargin,
+               devY - _labelRespectMargin,
 
-               textWidth,
-               textHeight);
+               textWidth + margin2,
+               textHeight + margin2);
 
          pointFeature.data = mapPoint;
 
@@ -1970,80 +1977,136 @@ public class Map2 extends Canvas {
 
       final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
 
-      final int maxVisibleItems = _mapConfig.labelDistributorMaxLabels;
+      /*
+       * Get all visible tours
+       */
+      final List<TourData> allVisibleTourList = new ArrayList<>();
+      final int numAllTours = allTourData.size();
 
-      int numAllRemainingItems = maxVisibleItems;
-
-      final int numTours = allTourData.size();
-
-      VisibleLimit:
-
-      for (int tourIndex = 0; tourIndex < numTours; tourIndex++) {
-
-         final TourData tourData = allTourData.get(tourIndex);
+      for (int tourIndex = 0; tourIndex < numAllTours; tourIndex++) {
 
          if (isBackgroundPainterInterrupted()) {
             break;
          }
 
+         final TourData tourData = allTourData.get(tourIndex);
+
+         // check if geo positions are available
          if (tourData == null || tourData.isLatLonAvailable() == false) {
             continue;
          }
 
-         final long[] pausedTime_Start = tourData.getPausedTime_Start();
+         // check if tour is visible
+         final Rectangle tourWorldPixelBounds = tourData.getWorldPixelBounds(_mp, _mapZoomLevel);
+         if (worldPixel_Viewport.intersects(tourWorldPixelBounds) == false) {
+            continue;
+         }
 
          // check if pauses are available
+         final long[] pausedTime_Start = tourData.getPausedTime_Start();
          if (pausedTime_Start == null || pausedTime_Start.length == 0) {
             continue;
          }
 
+         allVisibleTourList.add(tourData);
+      }
+
+//      if (_mapConfig.isFilterTourPauses) {
+//
+//         // filter out pauses
+//
+//
+//         for (final TourData tourData : allVisibleTourList) {
+//
+//            final List<TourPause> allFilteredPauses = new ArrayList<>();
+//
+//            final long[] pausedTime_Start = tourData.getPausedTime_Start();
+//            final long[] pausedTime_End = tourData.getPausedTime_End();
+//            final long[] pausedTime_Data = tourData.getPausedTime_Data();
+//
+//            final int numPauses = pausedTime_Start.length;
+//
+//            for (int pauseIndex = 0; pauseIndex < numPauses; ++pauseIndex) {
+//
+//               final long startTime = pausedTime_Start[pauseIndex];
+//               final long endTime = pausedTime_End[pauseIndex];
+//
+//               /*
+//                * Check if pause is filtered out
+//                */
+//               final long pauseDuration = Math.round((endTime - startTime) / 1000f);
+//
+//               final boolean isPauseAnAutoPause = pausedTime_Data == null
+//                     ? true
+//                     : pausedTime_Data[pauseIndex] == 1;
+//
+//               if (isTourPauseVisible(isPauseAnAutoPause, pauseDuration)) {
+//
+//               }
+//            }
+//
+//            tourData.setVisiblePauses(allFilteredPauses);
+//         }
+//      }
+
+      /*
+       * Create pauses for all visible tours
+       */
+      final TourData[] allVisibleTours = allVisibleTourList.toArray(new TourData[allVisibleTourList.size()]);
+      final int maxVisibleItems = _mapConfig.labelDistributorMaxLabels;
+
+      int numAllRemainingItems = maxVisibleItems;
+      final int numVisibleTours = allVisibleTours.length;
+
+      VisibleLimit:
+
+      for (int tourIndex = 0; tourIndex < numVisibleTours; tourIndex++) {
+
+         final TourData tourData = allVisibleTours[tourIndex];
+
+         final long[] pausedTime_Start = tourData.getPausedTime_Start();
          final long[] pausedTime_End = tourData.getPausedTime_End();
          final long[] pausedTime_Data = tourData.getPausedTime_Data();
 
+         final long tourStartTimeMS = tourData.getTourStartTimeMS();
+
          final double[] latitudeSerie = tourData.latitudeSerie;
          final double[] longitudeSerie = tourData.longitudeSerie;
-
-         int serieIndex = 0;
 
          final int[] timeSerie = tourData.timeSerie;
 
          final int numPauses = pausedTime_Start.length;
 
-         final float numRemainingTours = numTours - tourIndex;
+         final float numRemainingTours = numVisibleTours - tourIndex;
          final float subTourItems = numAllRemainingItems / numRemainingTours;
-//         final float subPauseItems = numPauses / subTourItems;
+         final float subPauseItems = numPauses / subTourItems;
 
          // max number of pauses which can be displayed in the current tour
          int numRemainingPauses = (int) subTourItems;
 
+         int serieIndex = 0;
+
          for (int pauseIndex = 0; pauseIndex < numPauses; ++pauseIndex) {
 
-            final int pauseSubIndex = pauseIndex;
+            int pauseSubIndex = pauseIndex;
 
-//            if (subPauseItems > 1) {
-//
-//               // there are more pauses than visible pauses
-//
-//               final double randomDiff = Math.random() * subPauseItems;
-//               final float nextItemIndex = subPauseItems * pauseIndex;
-//
-//               pauseSubIndex = (int) (nextItemIndex + randomDiff);
-//            }
-//
-//            if (pauseSubIndex >= numPauses) {
-//               break;
-//            }
+            if (subPauseItems > 1) {
 
-//            if (pauseIndex >= subTourItems) {
-//               break;
-//            }
+               // there are more pauses than visible pauses
+
+               final double randomDiff = Math.random() * subPauseItems;
+               final float nextItemIndex = subPauseItems * pauseIndex;
+
+               pauseSubIndex = (int) (nextItemIndex + randomDiff);
+            }
+
+            if (pauseSubIndex >= numPauses) {
+               break;
+            }
 
             final long startTime = pausedTime_Start[pauseSubIndex];
             final long endTime = pausedTime_End[pauseSubIndex];
 
-            /*
-             * Check if pause is filtered out
-             */
             final long pauseDuration = Math.round((endTime - startTime) / 1000f);
 
             final boolean isPauseAnAutoPause = pausedTime_Data == null
@@ -2055,11 +2118,11 @@ public class Map2 extends Canvas {
             }
 
             /*
-             * Get geo positon
+             * Get geo position
              */
             for (int timeSerieIndex = serieIndex; timeSerieIndex < timeSerie.length; ++timeSerieIndex) {
 
-               final long currentTime = timeSerie[timeSerieIndex] * 1000L + tourData.getTourStartTimeMS();
+               final long currentTime = timeSerie[timeSerieIndex] * 1000L + tourStartTimeMS;
 
                if (currentTime >= startTime) {
                   serieIndex = timeSerieIndex;
@@ -2070,21 +2133,21 @@ public class Map2 extends Canvas {
             final double latitude = latitudeSerie[serieIndex];
             final double longitude = longitudeSerie[serieIndex];
 
-            // convert marker lat/long into world pixels
-            final java.awt.Point worldPixel_MarkerPos = _mp.geoToPixel(new GeoPosition(latitude, longitude), _mapZoomLevel);
+            // convert lat/long into world pixels
+            final java.awt.Point worldPixel_PausePos = _mp.geoToPixel(new GeoPosition(latitude, longitude), _mapZoomLevel);
 
-            final int worldPixel_MarkerPosX = worldPixel_MarkerPos.x;
-            final int worldPixel_MarkerPosY = worldPixel_MarkerPos.y;
+            final int worldPixel_PausePosX = worldPixel_PausePos.x;
+            final int worldPixel_PausePosY = worldPixel_PausePos.y;
 
-            final boolean isPauseInViewport = worldPixel_Viewport.contains(worldPixel_MarkerPosX, worldPixel_MarkerPosY);
+            final boolean isPauseInViewport = worldPixel_Viewport.contains(worldPixel_PausePosX, worldPixel_PausePosY);
 
             if (isPauseInViewport == false) {
                continue;
             }
 
             // convert world position into device position
-            final int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
-            final int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
+            final int devX = worldPixel_PausePosX - worldPixel_Viewport.x;
+            final int devY = worldPixel_PausePosY - worldPixel_Viewport.y;
 
             /*
              * Create map point
@@ -2103,11 +2166,11 @@ public class Map2 extends Canvas {
 
             _numStatistics_AllTourPauses++;
 
-            if (--numAllRemainingItems <= 0) {
+            if (numAllRemainingItems-- <= 0) {
                break VisibleLimit;
             }
 
-            if (--numRemainingPauses <= 0) {
+            if (numRemainingPauses-- <= 0) {
                break;
             }
          }
@@ -3661,7 +3724,7 @@ public class Map2 extends Canvas {
     */
    private boolean isTourPauseVisible(final boolean isPauseAnAutoPause, final long pauseDuration) {
 
-      final Map2Config config = Map2ConfigManager.getActiveConfig();
+      final Map2Config config = _mapConfig;
 
       if (config.isFilterTourPauses == false) {
 
@@ -5479,23 +5542,18 @@ public class Map2 extends Canvas {
          /*
           * Update statistics
           */
-         final SlideoutMap2_MapPoints mapPointSlideout = Map2PointManager.getMapPointSlideout(false);
-         if (mapPointSlideout != null) {
+         Map2PointManager.updateStatistics(
 
-            getDisplay().asyncExec(() -> mapPointSlideout.updateStatistics(
+               _allPaintedMarkers.size(),
+               _numStatistics_AllTourMarkers,
 
-                  _allPaintedMarkers.size(),
-                  _numStatistics_AllTourMarkers,
+               _allPaintedLocations.size(),
+               _numStatistics_AllTourLocations + _numStatistics_AllCommonLocations,
 
-                  _allPaintedLocations.size(),
-                  _numStatistics_AllTourLocations + _numStatistics_AllCommonLocations,
+               _allPaintedPauses.size(),
+               _numStatistics_AllTourPauses
 
-                  _allPaintedPauses.size(),
-                  _numStatistics_AllTourPauses
-
-            ));
-         }
-
+         );
       };
 
       _backgroundPainter_Task = _backgroundPainter_Executor.submit(backgroundTask);
@@ -5515,10 +5573,10 @@ public class Map2 extends Canvas {
          _locationBoundingBoxColors.clear();
       }
 
+      _numStatistics_AllCommonLocations = 0;
+      _numStatistics_AllTourLocations = 0;
       _numStatistics_AllTourMarkers = 0;
       _numStatistics_AllTourPauses = 0;
-      _numStatistics_AllTourLocations = 0;
-      _numStatistics_AllCommonLocations = 0;
 
 // SET_FORMATTING_OFF
 
@@ -6164,7 +6222,6 @@ public class Map2 extends Canvas {
                                             final Rectangle[] allClusterSymbolRectangle) {
 
       final int maxVisibleItems = _mapConfig.labelDistributorMaxLabels;
-      final int clusterSymbolBorder = 10;
 
       final int numAllMarkers = allMarkerPoints.length;
       final int numAllLocations = allLocationPoints == null ? 0 : allLocationPoints.length;
@@ -6192,8 +6249,7 @@ public class Map2 extends Canvas {
 //         }
 //      }
 
-      final int markerRespectSize = 10;
-      final int markerRespectSize2 = markerRespectSize / 2;
+      final int mapPointRespectSize2 = _mapPointSymbolRespectSize / 2;
 
       final Rectangle clientArea = _clientArea;
 
@@ -6269,9 +6325,9 @@ public class Map2 extends Canvas {
                return 0;
             }
 
-            final int circleBorder2 = clusterSymbolBorder / 2;
+            final int circleBorder2 = _clusterSymbolBorder / 2;
 
-            final float circleRadius = clusterRectangle.width + clusterSymbolBorder;
+            final float circleRadius = clusterRectangle.width + _clusterSymbolBorder;
             final float circleRadius2 = circleRadius / 2;
 
             final float circleX = clusterRectangle.x + circleRadius2 - circleBorder2;
@@ -6326,14 +6382,34 @@ public class Map2 extends Canvas {
 
          final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
-         final int markerSymbolDevX = mapPoint.geoPointDevX - markerRespectSize2;
-         final int markerSymbolDevY = mapPoint.geoPointDevY - markerRespectSize2;
+         final int symbolDevX = mapPoint.geoPointDevX - mapPointRespectSize2;
+         final int symbolDevY = mapPoint.geoPointDevY - mapPointRespectSize2;
 
          _labelSpreader.respectBox(
-               markerSymbolDevX,
-               markerSymbolDevY,
-               markerRespectSize,
-               markerRespectSize);
+               symbolDevX,
+               symbolDevY,
+               _mapPointSymbolRespectSize,
+               _mapPointSymbolRespectSize);
+      }
+
+      for (int itemIndex = 0; itemIndex < numVisiblePauses; itemIndex++) {
+
+         if (isBackgroundPainterInterrupted()) {
+            return 0;
+         }
+
+         final PointFeature distribLabel = allPauseLabels.get(itemIndex);
+
+         final Map2Point mapPoint = (Map2Point) distribLabel.data;
+
+         final int symbolDevX = mapPoint.geoPointDevX - mapPointRespectSize2;
+         final int symbolDevY = mapPoint.geoPointDevY - mapPointRespectSize2;
+
+         _labelSpreader.respectBox(
+               symbolDevX,
+               symbolDevY,
+               _mapPointSymbolRespectSize,
+               _mapPointSymbolRespectSize);
       }
 
       /*
@@ -6543,8 +6619,7 @@ public class Map2 extends Canvas {
                                          final List<PointFeature> allMarkerItems,
                                          final List<PaintedMapPoint> allPaintedMarkerPoints) {
 
-      final int markerSymbolSize = 5;
-      final int markerSymbolSize2 = markerSymbolSize / 2;
+      final int markerSymbolSize2 = _mapPointSymbolMargin / 2;
 
       for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
 
@@ -6635,8 +6710,8 @@ public class Map2 extends Canvas {
          final Rectangle markerSymbolRectangle = new Rectangle(
                markerSymbolDevX,
                markerSymbolDevY,
-               markerSymbolSize,
-               markerSymbolSize);
+               _mapPointSymbolMargin,
+               _mapPointSymbolMargin);
 
          gc.fillRectangle(markerSymbolRectangle);
          gc.drawRectangle(markerSymbolRectangle);
@@ -6652,8 +6727,7 @@ public class Map2 extends Canvas {
                                         final List<PointFeature> allPauseItems,
                                         final List<PaintedMapPoint> allPaintedPoints) {
 
-      final int symbolSize = 5;
-      final int symbolSize2 = symbolSize / 2;
+      final int symbolSize2 = _mapPointSymbolMargin / 2;
 
       for (int itemIndex = 0; itemIndex < numVisibleItems; itemIndex++) {
 
@@ -6710,14 +6784,14 @@ public class Map2 extends Canvas {
          final int mapPointDevX = mapPoint.geoPointDevX;
          final int mapPointDevY = mapPoint.geoPointDevY;
 
-         final int markerSymbolDevX = mapPointDevX - symbolSize2;
-         final int markerSymbolDevY = mapPointDevY - symbolSize2;
+         final int symbolDevX = mapPointDevX - symbolSize2;
+         final int symbolDevY = mapPointDevY - symbolSize2;
 
          final Rectangle symbolRectangle = new Rectangle(
-               markerSymbolDevX,
-               markerSymbolDevY,
-               symbolSize,
-               symbolSize);
+               symbolDevX,
+               symbolDevY,
+               _mapPointSymbolMargin,
+               _mapPointSymbolMargin);
 
          gc.fillRectangle(symbolRectangle);
          gc.drawRectangle(symbolRectangle);
@@ -8457,7 +8531,7 @@ public class Map2 extends Canvas {
                   final int markerHeight = markerBound.height;
 
                   // check if marker intersects the part
-                  final boolean isMarkerInTile = //
+                  final boolean isMarkerInTile =
                         (devXMarker < devXPart + partSize)
                               && (devYMarker < devYPart + partSize)
                               && (devXMarker + markerWidth > devXPart)
@@ -10792,12 +10866,15 @@ public class Map2 extends Canvas {
    private void updateViewportData() {
 
       if (_mp == null) {
+
          // the map has currently no map provider
          return;
       }
 
       _worldPixel_TopLeft_Viewport = getWorldPixel_TopLeft_Viewport(_worldPixel_MapCenter);
 
+      final int worldTopLeft_ViewportX = _worldPixel_TopLeft_Viewport.x;
+      final int worldTopLeft_ViewportY = _worldPixel_TopLeft_Viewport.y;
       final int visiblePixelWidth = _worldPixel_TopLeft_Viewport.width;
       final int visiblePixelHeight = _worldPixel_TopLeft_Viewport.height;
 
@@ -10814,8 +10891,8 @@ public class Map2 extends Canvas {
        * tileOffsetX and tileOffsetY are the x- and y-values for the offset of the visible screen to
        * the map's origin.
        */
-      final int tileOffsetX = (int) Math.floor((double) _worldPixel_TopLeft_Viewport.x / (double) _tilePixelSize);
-      final int tileOffsetY = (int) Math.floor((double) _worldPixel_TopLeft_Viewport.y / (double) _tilePixelSize);
+      final int tileOffsetX = (int) Math.floor((double) worldTopLeft_ViewportX / (double) _tilePixelSize);
+      final int tileOffsetY = (int) Math.floor((double) worldTopLeft_ViewportY / (double) _tilePixelSize);
 
       _tilePos_MinX = tileOffsetX;
       _tilePos_MinY = tileOffsetY;
@@ -10828,8 +10905,8 @@ public class Map2 extends Canvas {
        * Pixel size for one geo grid, 0.01 degree
        */
       final Point2D.Double viewportMapCenter_worldPixel = new Point2D.Double(
-            _worldPixel_TopLeft_Viewport.x + visiblePixelWidth / 2,
-            _worldPixel_TopLeft_Viewport.y + visiblePixelHeight / 2);
+            worldTopLeft_ViewportX + visiblePixelWidth / 2,
+            worldTopLeft_ViewportY + visiblePixelHeight / 2);
 
       final GeoPosition geoPos = _mp.pixelToGeo(viewportMapCenter_worldPixel, _mapZoomLevel);
 

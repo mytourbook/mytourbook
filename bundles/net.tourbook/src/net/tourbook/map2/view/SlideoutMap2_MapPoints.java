@@ -562,6 +562,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       enableControls();
 
       Map2PointManager.setMapLocationSlideout(this);
+      Map2PointManager.updateStatistics();
    }
 
    /**

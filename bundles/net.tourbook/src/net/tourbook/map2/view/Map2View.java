@@ -1160,18 +1160,33 @@ public class Map2View extends ViewPart implements
 
       final PaintedMapPoint hoveredMapPoint = _map.getHoveredMapPoint();
 
-      final TourMarker tourMarker = hoveredMapPoint.mapPoint.tourMarker;
+      final Map2Point mapPoint = hoveredMapPoint.mapPoint;
+      final MapPointType pointType = mapPoint.pointType;
 
-      paintTours_20_One(tourMarker.getTourData(), true);
+      TourData tourData = null;
 
-      // force marker repaint otherwise the other markers are still be visible
-      // this seems to be more complicated, a syncexec() to not work
-      _map.getDisplay().timerExec(300, () -> {
+      if (pointType.equals(MapPointType.TOUR_MARKER)) {
 
-         _map.resetHoveredMarker();
+         tourData = mapPoint.tourMarker.getTourData();
 
-         _map.paint();
-      });
+      } else if (pointType.equals(MapPointType.TOUR_PAUSE)) {
+
+         tourData = mapPoint.tourData;
+      }
+
+      if (tourData != null) {
+
+         paintTours_20_One(tourData, true);
+
+         // force marker repaint otherwise the other markers are still be visible
+         // this seems to be more complicated, a syncexec() to not work
+         _map.getDisplay().timerExec(300, () -> {
+
+            _map.resetHoveredMarker();
+
+            _map.paint();
+         });
+      }
    }
 
    private void actionMapMarker_ZoomIn() {
@@ -2421,23 +2436,17 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-      final Map2Point mapPoint         = hoveredMapPoint.mapPoint;
-
-      final MapPointType pointType     = mapPoint.pointType;
-      final LocationType locationType  = mapPoint.locationType;
+      final Map2Point      mapPoint    = hoveredMapPoint.mapPoint;
+      final MapPointType   pointType   = mapPoint.pointType;
 
       final int      numTours          = _allTourData.size();
+
       final boolean  isMultipleTours   = numTours > 1;
+      final boolean  isTourMarker      = pointType.equals(MapPointType.TOUR_MARKER);
+      final boolean  isTourAvailable   = isTourMarker || pointType.equals(MapPointType.TOUR_PAUSE);
 
-      final boolean  isTourAvailable   = mapPoint.tourMarker != null;
-
-      final boolean  canEditTourMarker = isTourAvailable;
-
-      _actionMapPoint_EditTourMarker  .setEnabled(canEditTourMarker);
+      _actionMapPoint_EditTourMarker  .setEnabled(isTourMarker);
       _actionMapPoint_ShowOnlyThisTour.setEnabled(isMultipleTours && isTourAvailable);
-
-//    _actionMapPoint_CenterMap       .setEnabled(true);
-//    _actionMapPoint_ZoomIn          .setEnabled(true);
 
 // SET_FORMATTING_ON
    }

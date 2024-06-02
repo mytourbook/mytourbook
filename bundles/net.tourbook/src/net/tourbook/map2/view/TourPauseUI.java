@@ -21,7 +21,6 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.tooltip.AdvancedSlideout;
-import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.ui.IChangeUIListener;
 import net.tourbook.tour.filter.TourFilterFieldOperator;
 
@@ -90,23 +89,21 @@ public class TourPauseUI implements IColorSelectorListener {
    /*
     * UI controls
     */
-   private Button               _chkIsFilter_TourPauses;
-   private Button               _chkIsShow_AutoPauses;
-   private Button               _chkIsFilter_PauseDuration;
-   private Button               _chkIsShow_UserPauses;
-   private Button               _chkUseDurationFilter_Hours;
-   private Button               _chkUseDurationFilter_Minutes;
-   private Button               _chkUseDurationFilter_Seconds;
+   private Button  _chkIsFilter_TourPauses;
+   private Button  _chkIsShow_AutoPauses;
+   private Button  _chkIsFilter_PauseDuration;
+   private Button  _chkIsShow_UserPauses;
+   private Button  _chkUseDurationFilter_Hours;
+   private Button  _chkUseDurationFilter_Minutes;
+   private Button  _chkUseDurationFilter_Seconds;
 
-   private Combo                _comboPauseFilter_Duration;
+   private Combo   _comboPauseFilter_Duration;
 
-   private Spinner              _spinnerHours;
-   private Spinner              _spinnerMinutes;
-   private Spinner              _spinnerSeconds;
+   private Spinner _spinnerHours;
+   private Spinner _spinnerMinutes;
+   private Spinner _spinnerSeconds;
 
-   private AnimatedToolTipShell _tooltipShell;
-
-   private Label                _lblPauseDuration;
+   private Label   _lblPauseDuration;
 
    /**
     * Reset spinner value
@@ -430,12 +427,12 @@ public class TourPauseUI implements IColorSelectorListener {
              * This will fix the problem that when the list of a combobox is displayed, then the
              * slideout will disappear :-(((
              */
-            _tooltipShell.setIsAnotherDialogOpened(true);
+            _slideout.setIsAnotherDialogOpened(true);
          }
 
          @Override
          public void focusLost(final FocusEvent e) {
-            _tooltipShell.setIsAnotherDialogOpened(false);
+            _slideout.setIsAnotherDialogOpened(false);
          }
       };
 
