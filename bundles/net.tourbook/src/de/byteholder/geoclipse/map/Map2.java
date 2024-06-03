@@ -2011,54 +2011,129 @@ public class Map2 extends Canvas {
          allVisibleTourList.add(tourData);
       }
 
-//      if (_mapConfig.isFilterTourPauses) {
-//
-//         // filter out pauses
-//
-//
-//         for (final TourData tourData : allVisibleTourList) {
-//
-//            final List<TourPause> allFilteredPauses = new ArrayList<>();
-//
-//            final long[] pausedTime_Start = tourData.getPausedTime_Start();
-//            final long[] pausedTime_End = tourData.getPausedTime_End();
-//            final long[] pausedTime_Data = tourData.getPausedTime_Data();
-//
-//            final int numPauses = pausedTime_Start.length;
-//
-//            for (int pauseIndex = 0; pauseIndex < numPauses; ++pauseIndex) {
-//
-//               final long startTime = pausedTime_Start[pauseIndex];
-//               final long endTime = pausedTime_End[pauseIndex];
-//
-//               /*
-//                * Check if pause is filtered out
-//                */
-//               final long pauseDuration = Math.round((endTime - startTime) / 1000f);
-//
-//               final boolean isPauseAnAutoPause = pausedTime_Data == null
-//                     ? true
-//                     : pausedTime_Data[pauseIndex] == 1;
-//
-//               if (isTourPauseVisible(isPauseAnAutoPause, pauseDuration)) {
-//
-//               }
-//            }
-//
-//            tourData.setVisiblePauses(allFilteredPauses);
-//         }
-//      }
+      /*
+       * Filter out pauses by duration and location
+       */
+      final List<TourPause> allFilteredPausesList = new ArrayList<>();
+
+      for (final TourData tourData : allVisibleTourList) {
+
+         final int[] timeSerie = tourData.timeSerie;
+         final double[] latitudeSerie = tourData.latitudeSerie;
+         final double[] longitudeSerie = tourData.longitudeSerie;
+
+         final long tourStartTimeMS = tourData.getTourStartTimeMS();
+         final long[] pausedTime_Start = tourData.getPausedTime_Start();
+
+         final List<TourPause> allTourPauses = tourData.getTourPauses();
+
+         int serieIndex = 0;
+
+         for (int pauseIndex = 0; pauseIndex < allTourPauses.size(); pauseIndex++) {
+
+            final TourPause tourPause = allTourPauses.get(pauseIndex);
+
+            if (isTourPauseVisible(tourPause.duration, tourPause.isAutoPause)) {
+
+               // pause is not filtered by the duration
+
+               final java.awt.Point pixelPosition = tourPause.getWorldPixelPosition(_mapZoomLevel);
+
+               if (pixelPosition == null) {
+
+                  /*
+                   * Get geo position
+                   */
+
+                  final long startTime = pausedTime_Start[pauseIndex];
+
+                  for (int timeSerieIndex = serieIndex; timeSerieIndex < timeSerie.length; ++timeSerieIndex) {
+
+                     final long currentTime = timeSerie[timeSerieIndex] * 1000L + tourStartTimeMS;
+
+                     if (currentTime >= startTime) {
+                        serieIndex = timeSerieIndex;
+                        break;
+                     }
+                  }
+
+                  final double latitude = latitudeSerie[serieIndex];
+                  final double longitude = longitudeSerie[serieIndex];
+                  final GeoPosition geoPosition = new GeoPosition(latitude, longitude);
+
+                  // convert lat/long into world pixels
+                  final java.awt.Point worldPixel_PausePos = _mp.geoToPixel(geoPosition, _mapZoomLevel);
+
+                  final int worldPixel_PausePosX = worldPixel_PausePos.x;
+                  final int worldPixel_PausePosY = worldPixel_PausePos.y;
+
+                  tourPause.setPosition(geoPosition, worldPixel_PausePos, _mapZoomLevel);
+
+                  pixelPosition = worldPixel_PausePos;
+               }
+
+               final boolean isPauseInViewport = worldPixel_Viewport.contains(pixelPosition.x, pixelPosition.y);
+
+               if (isPauseInViewport == false) {
+                  continue;
+               }
+
+               // pause is not filtered by the geo position
+               allFilteredPausesList.add(tourPause);
+            }
+         }
+      }
 
       /*
        * Create pauses for all visible tours
        */
-      final TourData[] allVisibleTours = allVisibleTourList.toArray(new TourData[allVisibleTourList.size()]);
+      final TourPause[] allFilteredPauses = allFilteredPausesList.toArray(new TourPause[allFilteredPausesList.size()]);
+
       final int maxVisibleItems = _mapConfig.labelDistributorMaxLabels;
 
-      int numAllRemainingItems = maxVisibleItems;
-      final int numVisibleTours = allVisibleTours.length;
+      final int numAllRemainingItems = maxVisibleItems;
+
+      final int numPauses = allFilteredPauses.length;
 
       VisibleLimit:
+
+      for (int pauseIndex = 0; pauseIndex < numPauses; pauseIndex++) {
+
+         final TourPause tourPause = allFilteredPauses[pauseIndex];
+
+         final java.awt.Point worldPixelPosition = tourPause.getWorldPixelPosition(_mapZoomLevel);
+
+         // convert world position into device position
+         final int devX = worldPixelPosition.x - worldPixel_Viewport.x;
+         final int devY = worldPixelPosition.y - worldPixel_Viewport.y;
+
+         final GeoPosition geoPosition = tourPause.geoPosition;
+         /*
+          * Create map point
+          */
+         final Map2Point mapPoint = new Map2Point(MapPointType.TOUR_PAUSE, new GeoPoint(geoPosition.latitude, geoPosition.longitude));
+
+         mapPoint.geoPointDevX = devX;
+         mapPoint.geoPointDevY = devY;
+
+         mapPoint.tourData = tourPause.tourData;
+         mapPoint.isPauseAnAutoPause = tourPause.isAutoPause;
+
+         mapPoint.setFormattedLabel(UI.format_hh_mm_ss(tourPause.duration));
+
+         allMapPoints.add(mapPoint);
+
+         _numStatistics_AllTourPauses++;
+
+         if (numAllRemainingItems-- <= 0) {
+            break VisibleLimit;
+         }
+      }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
       for (int tourIndex = 0; tourIndex < numVisibleTours; tourIndex++) {
 
@@ -2068,12 +2143,9 @@ public class Map2 extends Canvas {
          final long[] pausedTime_End = tourData.getPausedTime_End();
          final long[] pausedTime_Data = tourData.getPausedTime_Data();
 
-         final long tourStartTimeMS = tourData.getTourStartTimeMS();
+//         final long tourStartTimeMS = tourData.getTourStartTimeMS();
 
-         final double[] latitudeSerie = tourData.latitudeSerie;
-         final double[] longitudeSerie = tourData.longitudeSerie;
-
-         final int[] timeSerie = tourData.timeSerie;
+//         final int[] timeSerie = tourData.timeSerie;
 
          final int numPauses = pausedTime_Start.length;
 
@@ -2082,9 +2154,9 @@ public class Map2 extends Canvas {
          final float subPauseItems = numPauses / subTourItems;
 
          // max number of pauses which can be displayed in the current tour
-         int numRemainingPauses = (int) subTourItems;
+         final int numRemainingPauses = (int) subTourItems;
 
-         int serieIndex = 0;
+//         int serieIndex = 0;
 
          for (int pauseIndex = 0; pauseIndex < numPauses; ++pauseIndex) {
 
@@ -2101,76 +2173,6 @@ public class Map2 extends Canvas {
             }
 
             if (pauseSubIndex >= numPauses) {
-               break;
-            }
-
-            final long startTime = pausedTime_Start[pauseSubIndex];
-            final long endTime = pausedTime_End[pauseSubIndex];
-
-            final long pauseDuration = Math.round((endTime - startTime) / 1000f);
-
-            final boolean isPauseAnAutoPause = pausedTime_Data == null
-                  ? true
-                  : pausedTime_Data[pauseSubIndex] == 1;
-
-            if (isTourPauseVisible(isPauseAnAutoPause, pauseDuration) == false) {
-               continue;
-            }
-
-            /*
-             * Get geo position
-             */
-            for (int timeSerieIndex = serieIndex; timeSerieIndex < timeSerie.length; ++timeSerieIndex) {
-
-               final long currentTime = timeSerie[timeSerieIndex] * 1000L + tourStartTimeMS;
-
-               if (currentTime >= startTime) {
-                  serieIndex = timeSerieIndex;
-                  break;
-               }
-            }
-
-            final double latitude = latitudeSerie[serieIndex];
-            final double longitude = longitudeSerie[serieIndex];
-
-            // convert lat/long into world pixels
-            final java.awt.Point worldPixel_PausePos = _mp.geoToPixel(new GeoPosition(latitude, longitude), _mapZoomLevel);
-
-            final int worldPixel_PausePosX = worldPixel_PausePos.x;
-            final int worldPixel_PausePosY = worldPixel_PausePos.y;
-
-            final boolean isPauseInViewport = worldPixel_Viewport.contains(worldPixel_PausePosX, worldPixel_PausePosY);
-
-            if (isPauseInViewport == false) {
-               continue;
-            }
-
-            // convert world position into device position
-            final int devX = worldPixel_PausePosX - worldPixel_Viewport.x;
-            final int devY = worldPixel_PausePosY - worldPixel_Viewport.y;
-
-            /*
-             * Create map point
-             */
-            final Map2Point mapPoint = new Map2Point(MapPointType.TOUR_PAUSE, new GeoPoint(latitude, longitude));
-
-            mapPoint.geoPointDevX = devX;
-            mapPoint.geoPointDevY = devY;
-
-            mapPoint.tourData = tourData;
-            mapPoint.isPauseAnAutoPause = isPauseAnAutoPause;
-
-            mapPoint.setFormattedLabel(UI.format_hh_mm_ss(pauseDuration));
-
-            allMapPoints.add(mapPoint);
-
-            _numStatistics_AllTourPauses++;
-
-            if (numAllRemainingItems-- <= 0) {
-               break VisibleLimit;
-            }
-
-            if (numRemainingPauses-- <= 0) {
                break;
             }
          }
@@ -3715,14 +3717,14 @@ public class Map2 extends Canvas {
    }
 
    /**
-    * @param isPauseAnAutoPause
-    *           When <code>true</code> an auto-pause happened otherwise it is an user pause
     * @param pauseDuration
     *           Pause duration in seconds
+    * @param isPauseAnAutoPause
+    *           When <code>true</code> an auto-pause happened otherwise it is an user pause
     *
     * @return
     */
-   private boolean isTourPauseVisible(final boolean isPauseAnAutoPause, final long pauseDuration) {
+   private boolean isTourPauseVisible(final long pauseDuration, final boolean isPauseAnAutoPause) {
 
       final Map2Config config = _mapConfig;
 

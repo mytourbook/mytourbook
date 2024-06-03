@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.skedgo.converter.TimezoneMapper;
 
+import de.byteholder.geoclipse.map.TourPause;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 import java.awt.Point;
@@ -2074,6 +2075,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    @Transient
    public TourLocationData    tourLocationData_End;
+
+   @Transient
+   private List<TourPause>    _allTourPauses;
 
 
 // SET_FORMATTING_ON
@@ -10870,6 +10874,46 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    public Set<TourNutritionProduct> getTourNutritionProducts() {
       return tourNutritionProducts;
+   }
+
+   public List<TourPause> getTourPauses() {
+
+      if (_allTourPauses != null) {
+         return _allTourPauses;
+      }
+
+      _allTourPauses = new ArrayList<>();
+
+      if (pausedTime_Start == null) {
+         return _allTourPauses;
+      }
+
+      final int numPauses = pausedTime_Start.length;
+
+      for (int pauseIndex = 0; pauseIndex < numPauses; ++pauseIndex) {
+
+         final long startTime = pausedTime_Start[pauseIndex];
+         final long endTime = pausedTime_End[pauseIndex];
+
+         /*
+          * Check if pause is filtered out
+          */
+         final long pauseDuration = Math.round((endTime - startTime) / 1000f);
+
+         final boolean isPauseAnAutoPause = pausedTime_Data == null
+               ? true
+               : pausedTime_Data[pauseIndex] == 1;
+
+         final TourPause tourPause = new TourPause();
+
+         tourPause.duration = pauseDuration;
+         tourPause.isAutoPause = isPauseAnAutoPause;
+         tourPause.tourData = this;
+
+         _allTourPauses.add(tourPause);
+      }
+
+      return _allTourPauses;
    }
 
    /**
