@@ -37,8 +37,6 @@ public class TourPause {
 
    public TourPause() {}
 
-// private Map<Integer, java.awt.Point>     _worldPixelPositions2;
-
    public java.awt.Point getWorldPixelPosition(final int zoomLevel) {
 
       if (_worldPixelPositions != null) {

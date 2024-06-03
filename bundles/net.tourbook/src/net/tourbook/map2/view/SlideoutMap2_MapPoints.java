@@ -67,6 +67,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.FocusEvent;
@@ -238,13 +239,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Label                 _lblCommonLocationLabel_Color;
    private Label                 _lblCommonLocationLabel_HoveredColor;
    private Label                 _lblLabelBackground;
-   private Label                 _lblStats_Locations;
    private Label                 _lblStats_Locations_All;
    private Label                 _lblStats_Locations_Visible;
-   private Label                 _lblStats_TourMarkers;
    private Label                 _lblStats_TourMarkers_All;
    private Label                 _lblStats_TourMarkers_Visible;
-   private Label                 _lblStats_TourPauses;
    private Label                 _lblStats_TourPauses_All;
    private Label                 _lblStats_TourPauses_Visible;
    private Label                 _lblTourLocationLabel_Color;
@@ -254,6 +252,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Label                 _lblTourPauseLabel_Color;
    private Label                 _lblTourPauseLabel_HoveredColor;
    private Label                 _lblVisibleLabels;
+   //
+   private CLabel                _lblStats_Locations;
+   private CLabel                _lblStats_TourMarkers;
+   private CLabel                _lblStats_TourPauses;
    //
    private Spinner               _spinnerClusterGrid_Size;
    private Spinner               _spinnerClusterOutline_Width;
@@ -627,7 +629,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             /*
              * Statistics
              */
-            final GridDataFactory gd = GridDataFactory.fillDefaults();
+            final GridDataFactory gd = GridDataFactory.fillDefaults().align(SWT.FILL, SWT.END);
 
             final String tooltipMarkers = "Number of visible / displayed tour markers";
             final String tooltipLocations = "Number of visible / displayed tour + common locations";
@@ -642,8 +644,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                   /*
                    * Tour marker
                    */
-                  _lblStats_TourMarkers = new Label(statContainer, SWT.NONE);
-                  _lblStats_TourMarkers.setText("M");
+                  _lblStats_TourMarkers = new CLabel(statContainer, SWT.NONE);
+                  _lblStats_TourMarkers.setImage(_imageTourMarker);
                   _lblStats_TourMarkers.setToolTipText(tooltipMarkers);
 
                   _lblStats_TourMarkers_Visible = new Label(statContainer, SWT.TRAIL);
@@ -658,8 +660,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                   /*
                    * Locations
                    */
-                  _lblStats_Locations = new Label(statContainer, SWT.NONE);
-                  _lblStats_Locations.setText("L");
+                  _lblStats_Locations = new CLabel(statContainer, SWT.NONE);
+                  _lblStats_Locations.setImage(_imageMapLocation_Tour);
                   _lblStats_Locations.setToolTipText(tooltipLocations);
                   GridDataFactory.fillDefaults().indent(20, 0).applyTo(_lblStats_Locations);
 
@@ -675,8 +677,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                   /*
                    * Tour pauses
                    */
-                  _lblStats_TourPauses = new Label(statContainer, SWT.NONE);
-                  _lblStats_TourPauses.setText("P");
+                  _lblStats_TourPauses = new CLabel(statContainer, SWT.NONE);
+                  _lblStats_TourPauses.setImage(_imageTourPauses);
                   _lblStats_TourPauses.setToolTipText(tooltipPauses);
                   GridDataFactory.fillDefaults().indent(20, 0).applyTo(_lblStats_TourPauses);
 

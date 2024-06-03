@@ -48,6 +48,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
 
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.graphics.Rectangle;
 
@@ -265,7 +266,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * visibleType is used to show the marker with different visible effects (color)
     */
    @Transient
-   private int       _visibleType;
+   private int                              _visibleType;
 
    /**
     * Contains <b>width</b> and <b>height</b> of the marker image.
@@ -274,32 +275,38 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * label text including the border
     */
    @Transient
-   private Rectangle _markerBounds;
+   private Rectangle                        _markerBounds;
 
    /**
     * unique id for manually created markers because the {@link #markerId} is 0 when the marker is
     * not persisted
     */
    @Transient
-   private long      _createId            = 0;
+   private long                             _createId            = 0;
 
    /**
     * Device time in ms.
     */
    @Transient
-   private long      _deviceLapTime       = Long.MIN_VALUE;
+   private long                             _deviceLapTime       = Long.MIN_VALUE;
 
    /**
     * Serie index in {@link TourData} when tour is {@link TourData#isMultipleTours}.
     */
    @Transient
-   private int       _multiTourSerieIndex = -1;
+   private int                              _multiTourSerieIndex = -1;
 
    @Transient
-   private String    _markerMapLabel;
+   private String                           _markerMapLabel;
 
    @Transient
-   private String    _scrambledLabel;
+   private String                           _scrambledLabel;
+
+   /**
+    * Caches the world positions for the pause lat/long values for each zoom level
+    */
+   @Transient
+   private IntObjectHashMap<java.awt.Point> _worldPixelPositions;
 
    public TourMarker() {}
 
@@ -626,6 +633,16 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
    public int getVisibleType() {
       return _visibleType;
+   }
+
+   public java.awt.Point getWorldPixelPosition(final int zoomLevel) {
+
+      if (_worldPixelPositions != null) {
+
+         return _worldPixelPositions.get(zoomLevel);
+      }
+
+      return null;
    }
 
    public boolean hasAltitude() {
@@ -996,6 +1013,17 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
    public void setVisibleType(final int visibleType) {
       _visibleType = visibleType;
+   }
+
+   public void setWorldPixelPosition(final java.awt.Point worldPixelPosition,
+                                     final int zoomLevel) {
+
+      if (_worldPixelPositions == null) {
+
+         _worldPixelPositions = new IntObjectHashMap<>();
+      }
+
+      _worldPixelPositions.put(zoomLevel, worldPixelPosition);
    }
 
    /**
