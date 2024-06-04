@@ -519,23 +519,24 @@ public class StravaUploader extends TourbookCloudUploader {
          @Override
          public void done(final IJobChangeEvent event) {
 
-            if (PlatformUI.isWorkbenchRunning()) {
-
-               final String infoText = event.getResult().isOK()
-                     ? NLS.bind(Messages.Dialog_UploadToursToStrava_Message,
-                           numberOfUploadedTours[0],
-                           numberOfTours - numberOfUploadedTours[0])
-                     : notificationText[0];
-
-               PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
-
-                  TourLogManager.log_TITLE(String.format(Messages.Log_CloudAction_End, (System.currentTimeMillis() - start) / 1000.0));
-
-                  UI.openNotificationPopup(Messages.Dialog_UploadToursToStrava_Title,
-                        Activator.getImageDescriptor(CloudImages.Cloud_Strava_Logo),
-                        infoText);
-               });
+            if (!PlatformUI.isWorkbenchRunning()) {
+               return;
             }
+
+            final String infoText = event.getResult().isOK()
+                  ? NLS.bind(Messages.Dialog_UploadToursToStrava_Message,
+                        numberOfUploadedTours[0],
+                        numberOfTours - numberOfUploadedTours[0])
+                  : notificationText[0];
+
+            PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+
+               TourLogManager.log_TITLE(String.format(Messages.Log_CloudAction_End, (System.currentTimeMillis() - start) / 1000.0));
+
+               UI.openNotificationPopup(Messages.Dialog_UploadToursToStrava_Title,
+                     Activator.getImageDescriptor(CloudImages.Cloud_Strava_Logo),
+                     infoText);
+            });
          }
       });
    }

@@ -1001,18 +1001,21 @@ public class TourExporter {
       doExport_70_WayPoints(wayPoints, tourMarkers, trackStartTime);
 
       boolean exportStatus = false;
-      String notificationText;
       try {
 
          exportStatus = doExport_10_Tour(tracks, wayPoints, tourMarkers, tourLap, exportFileName);
-         notificationText = String.format(Messages.Dialog_Export_Message_Successful, exportFileName);
 
       } catch (final IOException e) {
+
          StatusUtil.log(e);
-         notificationText = String.format(Messages.Dialog_Export_Message_Unsuccessful, exportFileName);
       }
 
       if (_displayNotificationPopup) {
+
+         final String notificationText = exportStatus
+               ? "\u2713 " + String.format(Messages.Dialog_Export_Message_Successful, exportFileName) //$NON-NLS-1$
+               : "\u274C" + String.format(Messages.Dialog_Export_Message_Unsuccessful, exportFileName); //$NON-NLS-1$
+
          UI.openNotificationPopup(Messages.dialog_export_dialog_title, _imageDescriptor, notificationText);
       }
 
