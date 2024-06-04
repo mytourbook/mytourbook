@@ -668,7 +668,7 @@ public class Map2 extends Canvas {
 
    private DropTarget                _dropTarget;
 
-   private boolean                   _isRedrawEnabled           = true;
+   private boolean                   _isMapPaintingEnabled      = true;
 
    private int                       _overlayAlpha              = 0xff;
 
@@ -5088,7 +5088,7 @@ public class Map2 extends Canvas {
       // repaint the background image
       _backgroundPainter_RunnableCounter.incrementAndGet();
 
-      if (isDisposed() || _mp == null || _isRedrawEnabled == false) {
+      if (isDisposed() || _mp == null || _isMapPaintingEnabled == false) {
          return;
       }
 
@@ -5465,9 +5465,10 @@ public class Map2 extends Canvas {
 
       final int currentBackgroundImageCounter = _backgroundPainter_RunnableCounter.get();
 
-      if (_backgroundPainter_LastCounter >= currentBackgroundImageCounter) {
+      if (_backgroundPainter_LastCounter == currentBackgroundImageCounter) {
 
          // counter is not incremented -> nothing to do
+
          return;
       }
 
@@ -5493,6 +5494,8 @@ public class Map2 extends Canvas {
 
          try {
 
+            _backgroundPainter_LastCounter = _backgroundPainter_RunnableCounter.get();
+
             paint_BackgroundImage_10_Runnable();
 
          } finally {
@@ -5504,27 +5507,28 @@ public class Map2 extends Canvas {
              * The next paint() will increment the counter but the paint() from this thread "should
              * not" increment it, so it's decremented.
              */
-            _backgroundPainter_LastCounter = _backgroundPainter_RunnableCounter.decrementAndGet() + 1;
             _backgroundPainter_Task = null;
          }
 
          // redraw map image with the updated background image
-         paint();
+         getDisplay().asyncExec(() -> paint_10_PaintMapImage());
 
          /*
           * Paint again when there are viewport differences, this will fix e.g. the zoom in issue
           * where some markers are not painted
           */
-         final Rectangle topLeft_Viewport_WhenPainted = _backgroundPainter_Viewport_WhenPainted;
-         final Rectangle topLeft_Viewport_Current = _worldPixel_TopLeft_Viewport;
-
-         final int diffX = topLeft_Viewport_WhenPainted.x - topLeft_Viewport_Current.x;
-         final int diffY = topLeft_Viewport_WhenPainted.y - topLeft_Viewport_Current.y;
-
-         if (diffX != 0 || diffY != 0) {
-
-            getDisplay().asyncExec(() -> paint());
-         }
+//         final Rectangle topLeft_Viewport_WhenPainted = _backgroundPainter_Viewport_WhenPainted;
+//         final Rectangle topLeft_Viewport_Current = _worldPixel_TopLeft_Viewport;
+//
+//         final int diffX = topLeft_Viewport_WhenPainted.x - topLeft_Viewport_Current.x;
+//         final int diffY = topLeft_Viewport_WhenPainted.y - topLeft_Viewport_Current.y;
+//
+//         final boolean isCounterIncremented = _backgroundPainter_LastCounter != _backgroundPainter_RunnableCounter.get();
+//
+//         if (diffX != 0 || diffY != 0 || isCounterIncremented) {
+//
+//            getDisplay().asyncExec(() -> paint_10_PaintMapImage());
+//         }
 
          /*
           * Update statistics
@@ -9487,7 +9491,7 @@ public class Map2 extends Canvas {
       setMapCenterInWorldPixel(pixelCenter);
       updateViewportData();
 
-      resetMarkerCluster();
+      resetMapPoints();
 
       paint();
 
@@ -9542,7 +9546,7 @@ public class Map2 extends Canvas {
       _mapPointTooltip.hide();
    }
 
-   public void resetMarkerCluster() {
+   public void resetMapPoints() {
 
       _hoveredMapPoint = null;
       _hoveredMarkerCluster = null;
@@ -10029,7 +10033,7 @@ public class Map2 extends Canvas {
     */
    public void setPainting(final boolean isRedrawEnabled) {
 
-      _isRedrawEnabled = isRedrawEnabled;
+      _isMapPaintingEnabled = isRedrawEnabled;
 
       if (isRedrawEnabled) {
          paint();
@@ -10423,7 +10427,7 @@ public class Map2 extends Canvas {
       updateTourToolTip();
 //    updatePoiVisibility();
 
-      resetMarkerCluster();
+      resetMapPoints();
 
       isTourHovered();
       paint();
@@ -10888,7 +10892,7 @@ public class Map2 extends Canvas {
 
       grid_UpdateGeoGridData();
 
-      resetMarkerCluster();
+      resetMapPoints();
    }
 
    public void zoomIn(final CenterMapBy centerMapBy) {

@@ -2536,7 +2536,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       final Map2 map2 = _map2View.getMap();
 
-      map2.resetMarkerCluster();
+      map2.resetMapPoints();
       map2.paint();
    }
 
@@ -2576,12 +2576,12 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _spinnerLabelTruncateLength         .setSelection( config.labelTruncateLength);
       _spinnerLabelWrapLength             .setSelection( config.labelWrapLength);
 
-      _colorClusterSymbol_Fill            .setColorValue(config.clusterFill_RGB);
-      _colorClusterSymbol_Outline         .setColorValue(config.clusterOutline_RGB);
-      _colorTourMarkerLabel_Fill              .setColorValue(config.tourMarkerFill_RGB);
-      _colorTourMarkerLabel_Fill_Hovered      .setColorValue(config.tourMarkerFill_Hovered_RGB);
-      _colorTourMarkerLabel_Outline           .setColorValue(config.tourMarkerOutline_RGB);
-      _colorTourMarkerLabel_Outline_Hovered   .setColorValue(config.tourMarkerOutline_Hovered_RGB);
+      _colorClusterSymbol_Fill                  .setColorValue(config.clusterFill_RGB);
+      _colorClusterSymbol_Outline               .setColorValue(config.clusterOutline_RGB);
+      _colorTourMarkerLabel_Fill                .setColorValue(config.tourMarkerFill_RGB);
+      _colorTourMarkerLabel_Fill_Hovered        .setColorValue(config.tourMarkerFill_Hovered_RGB);
+      _colorTourMarkerLabel_Outline             .setColorValue(config.tourMarkerOutline_RGB);
+      _colorTourMarkerLabel_Outline_Hovered     .setColorValue(config.tourMarkerOutline_Hovered_RGB);
 
       _colorCommonLocationLabel_Fill            .setColorValue(config.commonLocationFill_RGB);
       _colorCommonLocationLabel_Fill_Hovered    .setColorValue(config.commonLocationFill_Hovered_RGB);
