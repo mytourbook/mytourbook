@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,9 +49,7 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActionResetToDefault {
 
-   private static final String   MAP_ACTION_EDIT2D_MAP_PREFERENCES = net.tourbook.map2.Messages.Map_Action_Edit2DMapPreferences;
-
-   private static final String   STATE_PHOTO_PROPERTIES_IMAGE_SIZE = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE";                       //$NON-NLS-1$
+   private static final String   STATE_PHOTO_PROPERTIES_IMAGE_SIZE = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE"; //$NON-NLS-1$
 
    private static final int      MIN_IMAGE_WIDTH                   = 10;
 
@@ -72,9 +70,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
    /*
     * UI controls
     */
-   private Composite _parent;
-
-   private Spinner   _spinnerImageSize;
+   private Spinner _spinnerImageSize;
 
    /**
     * @param ownerControl
@@ -102,8 +98,6 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
 
    @Override
    protected Composite createToolTipContentArea(final Composite parent) {
-
-      initUI(parent);
 
       createActions();
 
@@ -206,7 +200,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
             _spinnerImageSize.addMouseWheelListener(new MouseWheelListener() {
                @Override
                public void mouseScrolled(final MouseEvent event) {
-                  Util.adjustSpinnerValueOnMouseScroll(event);
+                  UI.adjustSpinnerValueOnMouseScroll(event, 10);
                   onChangeUI();
                }
             });
@@ -220,11 +214,6 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
 
    private void enableControls() {
 
-   }
-
-   private void initUI(final Composite parent) {
-
-      _parent = parent;
    }
 
    @Override

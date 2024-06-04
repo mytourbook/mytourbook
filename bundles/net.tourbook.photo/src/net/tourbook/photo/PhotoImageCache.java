@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -58,7 +58,7 @@ public class PhotoImageCache {
 
    static {
 
-      final RemovalListener<String, ImageCacheWrapper> removalListener = new RemovalListener<String, ImageCacheWrapper>() {
+      final RemovalListener<String, ImageCacheWrapper> removalListener = new RemovalListener<>() {
 
          final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -293,28 +293,19 @@ public class PhotoImageCache {
 
       boolean isSet = false;
 
-      if (!isSet) {
-         isSet = setImageSize_IntoCacheWrapper(photo,
-               imageWidth,
-               imageHeight, //
-               ImageQuality.THUMB,
-               _imageCacheThumb);
+      if (isSet == false) {
+
+         isSet = setImageSize_IntoCacheWrapper(photo, imageWidth, imageHeight, ImageQuality.THUMB, _imageCacheThumb);
       }
 
-      if (!isSet) {
-         isSet = setImageSize_IntoCacheWrapper(photo,
-               imageWidth,
-               imageHeight, //
-               ImageQuality.HQ,
-               _imageCacheThumb);
+      if (isSet == false) {
+
+         isSet = setImageSize_IntoCacheWrapper(photo, imageWidth, imageHeight, ImageQuality.HQ, _imageCacheThumb);
       }
 
-      if (!isSet) {
-         isSet = setImageSize_IntoCacheWrapper(photo,
-               imageWidth,
-               imageHeight, //
-               ImageQuality.ORIGINAL,
-               _imageCacheOriginal);
+      if (isSet == false) {
+
+         isSet = setImageSize_IntoCacheWrapper(photo, imageWidth, imageHeight, ImageQuality.ORIGINAL, _imageCacheOriginal);
       }
    }
 

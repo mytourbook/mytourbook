@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import net.tourbook.common.UI;
+
 import org.oscim.core.GeoPoint;
 
 /**
@@ -28,62 +30,65 @@ import org.oscim.core.GeoPoint;
  */
 public class StaticCluster<T extends ClusterItem> implements Cluster<T> {
 
-	private final GeoPoint	_geoCenter;
+   private static final char NL            = UI.NEW_LINE;
 
-	private final List<T>	_clusterItems	= new ArrayList<T>();
+   private final GeoPoint    _geoCenter;
 
-	public StaticCluster(final GeoPoint center) {
-		_geoCenter = center;
-	}
+   private final List<T>     _clusterItems = new ArrayList<>();
 
-	public boolean add(final T t) {
-		return _clusterItems.add(t);
-	}
+   public StaticCluster(final GeoPoint center) {
+      _geoCenter = center;
+   }
 
-	@Override
-	public boolean equals(final Object other) {
+   public boolean add(final T t) {
+      return _clusterItems.add(t);
+   }
 
-		if (!(other instanceof StaticCluster<?>)) {
-			return false;
-		}
+   @Override
+   public boolean equals(final Object other) {
 
-		return ((StaticCluster<?>) other)._geoCenter.equals(_geoCenter)
-				&& ((StaticCluster<?>) other)._clusterItems.equals(_clusterItems);
-	}
+      if (!(other instanceof StaticCluster<?>)) {
+         return false;
+      }
 
-	@Override
-	public Collection<T> getItems() {
-		return _clusterItems;
-	}
+      return ((StaticCluster<?>) other)._geoCenter.equals(_geoCenter)
+            && ((StaticCluster<?>) other)._clusterItems.equals(_clusterItems);
+   }
 
-	@Override
-	public GeoPoint getPosition() {
-		return _geoCenter;
-	}
+   @Override
+   public Collection<T> getItems() {
+      return _clusterItems;
+   }
 
-	@Override
-	public int getSize() {
-		return _clusterItems.size();
-	}
+   @Override
+   public GeoPoint getPosition() {
+      return _geoCenter;
+   }
 
-	@Override
-	public int hashCode() {
-		return _geoCenter.hashCode() + _clusterItems.hashCode();
-	}
+   @Override
+   public int getSize() {
+      return _clusterItems.size();
+   }
 
-	public boolean remove(final T t) {
-		return _clusterItems.remove(t);
-	}
+   @Override
+   public int hashCode() {
+      return _geoCenter.hashCode() + _clusterItems.hashCode();
+   }
 
-	@Override
-	public String toString() {
-		return "\n" //$NON-NLS-1$
+   public boolean remove(final T t) {
+      return _clusterItems.remove(t);
+   }
 
-				+ "\tStaticCluster	[" //$NON-NLS-1$
+   @Override
+   public String toString() {
 
-				+ "_clusterItems.size=" + _clusterItems.size() + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				+ "_geoCenter=" + _geoCenter + ", " //$NON-NLS-1$ //$NON-NLS-2$
+      return NL
 
-				+ "]"; //$NON-NLS-1$
-	}
+            + " StaticCluster   " //$NON-NLS-1$
+
+            + " numChildren=%d".formatted(_clusterItems.size()) //$NON-NLS-1$
+            + " _geoCenter=" + _geoCenter //$NON-NLS-1$
+
+      ;
+   }
 }

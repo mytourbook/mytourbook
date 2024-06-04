@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,14 +20,12 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
-import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.ui.IChangeUIListener;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.TourPauseUI;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -42,7 +40,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
@@ -54,31 +51,23 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
       IActionResetToDefault,
       IChangeUIListener {
 
-   private static final IPreferenceStore  _prefStore         = TourbookPlugin.getPrefStore();
-   private static IDialogSettings         _state;
+   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private static IDialogSettings        _state;
 
-   private IPropertyChangeListener        _defaultChangePropertyListener;
-   private SelectionListener              _defaultSelectionListener;
-   private MouseWheelListener             _defaultMouseWheelListener;
+   private IPropertyChangeListener       _defaultChangePropertyListener;
+   private SelectionListener             _defaultSelectionListener;
+   private MouseWheelListener            _defaultMouseWheelListener;
 
-   private ActionResetToDefaults          _actionRestoreDefaults;
+   private ActionResetToDefaults         _actionRestoreDefaults;
 
-   private Map2View                       _map2View;
-
-   private final TourPainterConfiguration _tourPainterConfig = TourPainterConfiguration.getInstance();
+   private Map2View                      _map2View;
 
    /*
     * UI controls
     */
-   private Button                _chkIsDimMap;
-   private Button                _chkIsToggleKeyboardPanning;
-   private Button                _chkSelectInbetweenTimeSlices;
-   private Button                _chkShowValuePointTooltip;
-
-   private Spinner               _spinnerDimValue;
-
-   private ColorSelectorExtended _colorMapDimmColor;
-   private TourPauseUI           _tourPausesUI;
+   private Button _chkIsToggleKeyboardPanning;
+   private Button _chkSelectInbetweenTimeSlices;
+   private Button _chkShowValuePointTooltip;
 
    /**
     * @param ownerControl
@@ -95,8 +84,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
 
       _map2View = map2View;
       _state = map2State;
-
-      _tourPausesUI = new TourPauseUI(map2State, this, this);
    }
 
    @Override
@@ -131,8 +118,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
       {
          createUI_10_Header(shellContainer);
          createUI_20_MapOptions(shellContainer);
-
-         _tourPausesUI.createContent(shellContainer, _tourPainterConfig.isShowTourPauses);
       }
 
       return shellContainer;
@@ -152,8 +137,7 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Slideout_Map_Options_Label_Title);
             MTFont.setBannerFont(label);
-            GridDataFactory
-                  .fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(label);
          }
@@ -162,7 +146,7 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
              * Actionbar
              */
             final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.END, SWT.BEGINNING)
                   .applyTo(toolbar);
@@ -214,47 +198,11 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
             _chkIsToggleKeyboardPanning.addSelectionListener(_defaultSelectionListener);
             gdSpan2.applyTo(_chkIsToggleKeyboardPanning);
          }
-         {
-            /*
-             * Dim map
-             */
-            // checkbox
-            _chkIsDimMap = new Button(container, SWT.CHECK);
-            _chkIsDimMap.setText(Messages.Slideout_Map_Options_Checkbox_DimMap);
-            _chkIsDimMap.addSelectionListener(_defaultSelectionListener);
-
-            final Composite dimContainer = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(dimContainer);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(dimContainer);
-            {
-               // spinner
-               _spinnerDimValue = new Spinner(dimContainer, SWT.BORDER);
-               _spinnerDimValue.setToolTipText(Messages.Slideout_Map_Options_Spinner_DimValue_Tooltip);
-               _spinnerDimValue.setMinimum(0);
-               _spinnerDimValue.setMaximum(Map2View.MAX_DIM_STEPS);
-               _spinnerDimValue.setIncrement(1);
-               _spinnerDimValue.setPageIncrement(4);
-               _spinnerDimValue.addSelectionListener(_defaultSelectionListener);
-               _spinnerDimValue.addMouseWheelListener(_defaultMouseWheelListener);
-
-               // dimming color
-               _colorMapDimmColor = new ColorSelectorExtended(dimContainer);
-               _colorMapDimmColor.setToolTipText(Messages.Slideout_Map_Options_Color_DimColor_Tooltip);
-               _colorMapDimmColor.addListener(_defaultChangePropertyListener);
-               _colorMapDimmColor.addOpenListener(this);
-            }
-         }
       }
    }
 
    private void enableControls() {
 
-      final boolean isDimMap = _chkIsDimMap.getSelection();
-
-      _colorMapDimmColor.setEnabled(isDimMap);
-      _spinnerDimValue.setEnabled(isDimMap);
-
-      _tourPausesUI.enableControls();
    }
 
    private void initUI(final Composite parent) {
@@ -291,15 +239,7 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
 // SET_FORMATTING_OFF
 
       _chkIsToggleKeyboardPanning.setSelection(    Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT);
-
       _chkSelectInbetweenTimeSlices.setSelection(  _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
-
-      /*
-       * Map dimming
-       */
-      _chkIsDimMap.setSelection(                   Map2View.STATE_IS_MAP_DIMMED_DEFAULT);
-      _spinnerDimValue.setSelection(               Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
-      _colorMapDimmColor.setColorValue(            Map2View.STATE_DIM_MAP_COLOR_DEFAULT);
 
 // SET_FORMATTING_ON
 
@@ -312,8 +252,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
       // this is not set in saveState()
       _prefStore.setValue(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2, isShowValuePointTooltip);
 
-      _tourPausesUI.resetToDefaults();
-
       onChangeUI_UpdateMap();
    }
 
@@ -321,43 +259,24 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
 
 // SET_FORMATTING_OFF
 
-      _chkIsToggleKeyboardPanning.setSelection(    Util.getStateBoolean(_state,  Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,      Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
-
-      _chkSelectInbetweenTimeSlices.setSelection(  _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
-
-
-      /*
-       * Map dimming
-       */
-      _chkIsDimMap.setSelection(          Util.getStateBoolean(_state,  Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT));
-      _spinnerDimValue.setSelection(      Util.getStateInt(    _state,  Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT));
-      _colorMapDimmColor.setColorValue(   Util.getStateRGB(    _state,  Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT));
-
-      _chkShowValuePointTooltip.setSelection(      _prefStore.getBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2));
+      _chkIsToggleKeyboardPanning   .setSelection( Util.getStateBoolean(_state,  Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,      Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
+      _chkSelectInbetweenTimeSlices .setSelection( _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
+      _chkShowValuePointTooltip     .setSelection( _prefStore.getBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2));
 
 // SET_FORMATTING_ON
 
-      _tourPausesUI.restoreState();
    }
 
    private void saveState() {
 
 // SET_FORMATTING_OFF
 
-      _state.put(Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,    _chkIsToggleKeyboardPanning.getSelection());
+      _state.put(Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,       _chkIsToggleKeyboardPanning.getSelection());
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES, _chkSelectInbetweenTimeSlices.getSelection());
 
-      /*
-       * Map dimming
-       */
-      _state.put(Map2View.STATE_IS_MAP_DIMMED,                 _chkIsDimMap.getSelection());
-      _state.put(Map2View.STATE_DIM_MAP_VALUE,                 _spinnerDimValue.getSelection());
-      Util.setState(_state,Map2View.STATE_DIM_MAP_COLOR,       _colorMapDimmColor.getColorValue());
-
 // SET_FORMATTING_ON
 
-      _tourPausesUI.saveState();
    }
 
    private void saveState_ValuePointTooltip() {

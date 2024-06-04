@@ -23,6 +23,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.skedgo.converter.TimezoneMapper;
 
+import de.byteholder.geoclipse.map.TourPause;
+import de.byteholder.geoclipse.mapprovider.MP;
+
 import java.awt.Point;
 import java.io.File;
 import java.io.PrintStream;
@@ -38,8 +41,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Basic;
@@ -113,6 +118,7 @@ import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
 
@@ -1139,56 +1145,56 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * Contains the absolute elevation in feet (imperial system)
     */
    @Transient
-   private float[]               altitudeSerieImperial;
+   private float[]            altitudeSerieImperial;
 
    /**
     * Smoothed elevation serie is used to display the tour chart when not <code>null</code>
     */
    @Transient
-   private float[]               altitudeSerieImperialSmoothed;
+   private float[]            altitudeSerieImperialSmoothed;
 
    /**
     * SRTM elevation values, when <code>null</code> srtm data have not yet been attached, when
     * <code>length()==0</code> data are invalid.
     */
    @Transient
-   private float[]               srtmSerie;
+   private float[]            srtmSerie;
 
    @Transient
-   private float[]               srtmSerieImperial;
+   private float[]            srtmSerieImperial;
 
    /**
     * Is <code>true</code> when {@link #srtmSerie} contains SRTM 1 values, otherwise SRTM 3 values
     */
    @Transient
-   private boolean               _isSRTM1Values;
+   private boolean            _isSRTM1Values;
 
    @Transient
    @JsonProperty
-   private float[]               cadenceSerie;
+   private float[]            cadenceSerie;
 
    /**
     * Pulse values from the device
     */
    @Transient
    @JsonProperty
-   public float[]                pulseSerie;
+   public float[]             pulseSerie;
 
    @Transient
-   private float[]               _pulseSerie_Smoothed;
+   private float[]            _pulseSerie_Smoothed;
 
    /**
     * Pulse values computed from the pulse times in {@link #pulseTime_Milliseconds}.
     * One pulse value is the average of all pulse times within one timeslice.
     */
    @Transient
-   public float[]                pulseSerie_FromTime;
+   public float[]             pulseSerie_FromTime;
 
    /**
     * One time slice contains all of it's R-R interval values.
     */
    @Transient
-   private String[]               pulseSerie_RRIntervals;
+   private String[]           pulseSerie_RRIntervals;
 
    /**
     * This value is contained in the saved {@link SerieData}
@@ -1200,7 +1206,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    @Transient
    @JsonProperty
-   public int[]                  pulseTime_Milliseconds;
+   public int[]               pulseTime_Milliseconds;
 
    /**
     * This value is contained in the saved {@link SerieData}
@@ -1210,47 +1216,47 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    */
    @Transient
    @JsonProperty
-   public int[]                  pulseTime_TimeIndex;
+   public int[]               pulseTime_TimeIndex;
 
    /**
     * Contains <code>true</code> or <code>false</code> for each time slice of the whole tour.
     * <code>true</code> is set when a time slice is a break.
     */
    @Transient
-   private boolean[]             breakTimeSerie;
+   private boolean[]          breakTimeSerie;
 
    /**
     * Contains <code>true</code> or <code>false</code> for each time slice of the whole tour.
     * <code>true</code> is set when a time slice is a pause.
     */
    @Transient
-   private boolean[]             pausedTimeSerie;
+   private boolean[]          pausedTimeSerie;
 
    /**
     * This is a time serie like {@link #timeSerie} but contains only moving times, break times are 0
     */
    @Transient
-   private int[]                 movingTimeSerie;
+   private int[]              movingTimeSerie;
 
    /**
     *
     * This is a time serie like {@link #timeSerie} but contains only times without pauses
     */
    @Transient
-   private int[]                 recordedTimeSerie;
+   private int[]              recordedTimeSerie;
 
    /**
     * Contains the temperature in the metric measurement system.
     */
    @Transient
    @JsonProperty
-   public float[]                temperatureSerie;
+   public float[]             temperatureSerie;
 
    /**
     * contains the temperature in the imperial measurement system
     */
    @Transient
-   private float[]               temperatureSerieImperial;
+   private float[]            temperatureSerieImperial;
 
    /**
     * Speed in km/h
@@ -1260,37 +1266,37 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    @Transient
    @JsonProperty
-   private float[]               speedSerie;
+   private float[]            speedSerie;
 
    @Transient
-   private float[]               speedSerie_Mile;
+   private float[]            speedSerie_Mile;
 
    @Transient
-   private float[]               speedSerie_NauticalMile;
+   private float[]            speedSerie_NauticalMile;
 
    /**
     * Summarized average speed in km/h from the first time slice
     */
    @Transient
-   private float[]               speedSerie_Summarized;
+   private float[]            speedSerie_Summarized;
 
    @Transient
-   private float[]               speedSerie_Summarized_Mile;
+   private float[]            speedSerie_Summarized_Mile;
 
    @Transient
-   private float[]               speedSerie_Summarized_NauticalMile;
+   private float[]            speedSerie_Summarized_NauticalMile;
 
    /**
     * Average speed in km/h within an interval of {@link TourChart#speedIntervalDistance} km
     */
    @Transient
-   private float[]               speedSerie_Interval;
+   private float[]            speedSerie_Interval;
 
    @Transient
-   private float[]               speedSerie_Interval_Mile;
+   private float[]            speedSerie_Interval_Mile;
 
    @Transient
-   private float[]               speedSerie_Interval_NauticalMile;
+   private float[]            speedSerie_Interval_NauticalMile;
 
 
    /**
@@ -1298,76 +1304,76 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * computed. Speed data are normally available from an ergometer and not from a bike computer
     */
    @Transient
-   private boolean               isSpeedSerieFromDevice        = false;
+   private boolean            isSpeedSerieFromDevice        = false;
 
    /**
     * Pace in sec/km
     */
    @Transient
-   private float[]               paceSerie_Seconds;
+   private float[]            paceSerie_Seconds;
 
    /**
     * Pace in sec/mile
     */
    @Transient
-   private float[]               paceSerie_Seconds_Imperial;
+   private float[]            paceSerie_Seconds_Imperial;
 
    /**
     * Pace in min/km
     */
    @Transient
-   private float[]               paceSerie_Minute;
+   private float[]            paceSerie_Minute;
 
    /**
     * Pace in min/mile
     */
    @Transient
-   private float[]               paceSerie_Minute_Imperial;
+   private float[]            paceSerie_Minute_Imperial;
 
    @Transient
-   private float[]               paceSerie_Interval_Seconds;
+   private float[]            paceSerie_Interval_Seconds;
 
    @Transient
-   private float[]               paceSerie_Interval_Seconds_Imperial;
+   private float[]            paceSerie_Interval_Seconds_Imperial;
 
    /**
     * Summarized average pace in sec/km
     */
    @Transient
-   private float[]               paceSerie_Summarized_Seconds;
+   private float[]            paceSerie_Summarized_Seconds;
 
    /**
     * Summarized average pace in sec/mile
     */
    @Transient
-   private float[]               paceSerie_Summarized_Seconds_Imperial;
+   private float[]            paceSerie_Summarized_Seconds_Imperial;
 
 
    @Transient
    @JsonProperty
-   private float[]               powerSerie;
+   private float[]            powerSerie;
 
    /**
     * Is <code>true</code> when the data in {@link #powerSerie} are from the device and not
     * computed. Power data source can be an ergometer or a power sensor
     */
    @Transient
-   private boolean               isPowerSerieFromDevice               = false;
+   private boolean            isPowerSerieFromDevice               = false;
 
    @Transient
-   private float[]               altimeterSerie;
+   private float[]            altimeterSerie;
 
    @Transient
-   private float[]               altimeterSerieImperial;
+   private float[]            altimeterSerieImperial;
 
    @Transient
-   public float[]                gradientSerie;
+   public float[]             gradientSerie;
 
    @Transient
-   public float[]                tourCompare_DiffSerie;
+   public float[]             tourCompare_DiffSerie;
 
    @Transient
-   public float[]                tourCompare_ReferenceSerie;
+   public float[]             tourCompare_ReferenceSerie;
 
    /*
     * GPS data
@@ -1377,11 +1383,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    @Transient
    @JsonProperty
-   public double[]               latitudeSerie;
+   public double[]            latitudeSerie;
 
    @Transient
    @JsonProperty
-   public double[]               longitudeSerie;
+   public double[]            longitudeSerie;
 
    /**
     * Gears which are saved in a tour are in this HEX format (left to right)
@@ -1401,7 +1407,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    @Transient
    @JsonProperty
-   public long[]                 gearSerie;
+   public long[]              gearSerie;
 
    /**
     * Gears have this format:
@@ -1413,7 +1419,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * _gears[4] = rear gear number, starting with 1<br>
     */
    @Transient
-   private float[][]             _gears;
+   private float[][]          _gears;
 
    /**
     * Contains the bounds of the tour in latitude/longitude:
@@ -1422,13 +1428,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * 2nd item contains lat/lon maximum values<br>
     */
    @Transient
-   private GeoPosition[]         _geoBounds;
+   private GeoPosition[]            _geoBounds;
 
    /**
     * Is <code>true</code> when geo bounds are checked
     */
    @Transient
-   private boolean               _isGeoBoundsChecked;
+   private boolean                  _isGeoBoundsChecked;
+
+   /**
+    * Contains the bounds of the tour in world pixel, X/Y is the top left position, key is the zoom level.
+    */
+   @Transient
+   private Map<Integer, Rectangle>  _worldPixelBounds;
 
    /**
     * Contains the rough geo parts of the tour or <code>null</code> when geo data are not available. A
@@ -1662,7 +1674,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * Contains seconds from all hr zones: {@link #hrZone0} ... {@link #hrZone9}
     */
    @Transient
-   private int[]               _hrZones;
+   private int[]              _hrZones;
 
    @Transient
    private HrZoneContext      _hrZoneContext;
@@ -1671,7 +1683,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * Copy of {@link #timeSerie} with double type, this is used for the chart x-axis to support history tours
     */
    @Transient
-   private double[]            timeSerieDouble;
+   private double[]           timeSerieDouble;
 
    /**
     * Contains photo data from a {@link TourPhotoLink}.
@@ -1680,7 +1692,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * {@link #tourPhotos} are displayed.
     */
    @Transient
-   public TourPhotoLink         tourPhotoLink;
+   public TourPhotoLink       tourPhotoLink;
 
    /**
     * Contains photos which are displayed in photo galleries.
@@ -1969,7 +1981,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public boolean[]     visiblePoints_ForSurfing;
 
    /**
-    * An array containing the start time of each pause (in milliseconds)
+    * An array containing the absolute start time of each pause (in milliseconds)
     * A timer pause is a device event, triggered by the user or automatically triggered by the device.
     */
    @Transient
@@ -1977,7 +1989,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private long[]       pausedTime_Start;
 
    /**
-    * An array containing the end time of each pause (in milliseconds)
+    * An array containing the absolute end time of each pause (in milliseconds)
     * A timer pause is a device event, triggered by the user or automatically triggered by the device.
     */
    @Transient
@@ -2063,6 +2075,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    @Transient
    public TourLocationData    tourLocationData_End;
+
+   @Transient
+   private List<TourPause>    _allTourPauses;
 
 
 // SET_FORMATTING_ON
@@ -2500,6 +2515,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       _isSRTM1Values = false;
 
       _geoBounds = null;
+      _worldPixelBounds = null;
       _isGeoBoundsChecked = false;
 
       _rasterizedLatLon = null;
@@ -4646,7 +4662,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * Computes geo bounds when data are available.
+    * Computes geo bounds for the whole tour
     *
     * @return Returns geo min/max positions when data are available, otherwise <code>null</code>.
     */
@@ -4662,10 +4678,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          return;
       }
 
-      double minLatitude = Double.MIN_VALUE;
-      double maxLatitude = 0;
-      double minLongitude = 0;
-      double maxLongitude = 0;
+      double latMin = Double.MIN_VALUE;
+      double latMax = 0;
+      double lonMin = 0;
+      double lonMax = 0;
 
       int serieIndex = 0;
 
@@ -4677,11 +4693,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          if (latitude != 0 || longitude != 0) {
 
-            minLatitude = latitude;
-            maxLatitude = latitude;
+            latMin = latitude;
+            latMax = latitude;
 
-            minLongitude = longitude;
-            maxLongitude = longitude;
+            lonMin = longitude;
+            lonMax = longitude;
 
             break;
          }
@@ -4697,27 +4713,30 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             continue;
          }
 
-         minLatitude = latitude < minLatitude ? latitude : minLatitude;
-         maxLatitude = latitude > maxLatitude ? latitude : maxLatitude;
+         latMin = latitude < latMin ? latitude : latMin;
+         latMax = latitude > latMax ? latitude : latMax;
 
-         minLongitude = longitude < minLongitude ? longitude : minLongitude;
-         maxLongitude = longitude > maxLongitude ? longitude : maxLongitude;
+         lonMin = longitude < lonMin ? longitude : lonMin;
+         lonMax = longitude > lonMax ? longitude : lonMax;
 
-         if (minLatitude == 0) {
-            minLatitude = -180.0;
+         if (latMin == 0) {
+            latMin = -180.0;
          }
       }
 
       _isGeoBoundsChecked = true;
 
-      _geoBounds = minLatitude == Double.MIN_VALUE
+      if (latMin == Double.MIN_VALUE) {
 
-            ? null
+         _geoBounds = null;
+         _worldPixelBounds = null;
 
-            // geo data are available
-            : new GeoPosition[] {
-                  new GeoPosition(minLatitude, minLongitude),
-                  new GeoPosition(maxLatitude, maxLongitude) };
+      } else {
+
+         _geoBounds = new GeoPosition[] {
+               new GeoPosition(latMin, lonMin),
+               new GeoPosition(latMax, lonMax) };
+      }
    }
 
    /**
@@ -10822,10 +10841,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return tourLocationEnd;
    }
 
-//   public Set<TourLocationPoint> getTourLocationPoints() {
-//      return tourLocationPoints;
-//   }
-
    public TourLocation getTourLocationStart() {
       return tourLocationStart;
    }
@@ -10859,6 +10874,44 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    public Set<TourNutritionProduct> getTourNutritionProducts() {
       return tourNutritionProducts;
+   }
+
+   public List<TourPause> getTourPauses() {
+
+      if (_allTourPauses != null) {
+         return _allTourPauses;
+      }
+
+      _allTourPauses = new ArrayList<>();
+
+      if (pausedTime_Start == null) {
+         return _allTourPauses;
+      }
+
+      final int numPauses = pausedTime_Start.length;
+
+      for (int pauseIndex = 0; pauseIndex < numPauses; ++pauseIndex) {
+
+         final long startTime = pausedTime_Start[pauseIndex];
+         final long endTime = pausedTime_End[pauseIndex];
+
+         final long pauseDuration = Math.round((endTime - startTime) / 1000f);
+
+         final boolean isPauseAnAutoPause = pausedTime_Data == null
+               ? true
+               : pausedTime_Data[pauseIndex] == 1;
+
+         final TourPause tourPause = new TourPause();
+
+         tourPause.startTime = startTime;
+         tourPause.duration = pauseDuration;
+         tourPause.isAutoPause = isPauseAnAutoPause;
+         tourPause.tourData = this;
+
+         _allTourPauses.add(tourPause);
+      }
+
+      return _allTourPauses;
    }
 
    /**
@@ -11081,6 +11134,51 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
+    * @param mp
+    * @param mapZoomLevel
+    *
+    * @return Returns the bounds of the tour in world pixel, X/Y is the top left position, key is
+    *         the zoom level.
+    *         <p>
+    *         Returns <code>null</code> when geo positions are not available or the bound are not
+    *         yet set
+    */
+
+   public Rectangle getWorldPixelBounds(final MP mp, final Integer mapZoomLevel) {
+
+      if (_worldPixelBounds == null) {
+         _worldPixelBounds = new HashMap<>();
+      }
+
+      Rectangle tourGeoBounds = _worldPixelBounds.get(mapZoomLevel);
+
+      if (tourGeoBounds != null) {
+         return tourGeoBounds;
+      }
+
+      final GeoPosition[] geoBounds = getGeoBounds();
+
+      final GeoPosition geoMin = geoBounds[0];
+      final GeoPosition geoMax = geoBounds[1];
+
+      final java.awt.Point tourTopLeftPixel = mp.geoToPixel(new GeoPosition(geoMax.latitude, geoMin.longitude), mapZoomLevel);
+      final java.awt.Point tourBotRightPixel = mp.geoToPixel(new GeoPosition(geoMin.latitude, geoMax.longitude), mapZoomLevel);
+
+      tourGeoBounds = new Rectangle(
+
+            tourTopLeftPixel.x,
+            tourTopLeftPixel.y,
+
+            tourBotRightPixel.x - tourTopLeftPixel.x,
+            tourBotRightPixel.y - tourTopLeftPixel.y);
+
+      // keep tour bounds
+      _worldPixelBounds.put(mapZoomLevel, tourGeoBounds);
+
+      return tourGeoBounds;
+   }
+
+   /**
     * @param zoomLevel
     * @param projectionHash
     *
@@ -11171,6 +11269,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    public boolean isDistanceSensorPresent() {
       return isDistanceFromSensor == 1;
+   }
+
+   /**
+    * @return <code>true</code> when latitude/longitude are available
+    */
+   public boolean isLatLonAvailable() {
+
+      if ((longitudeSerie == null)
+            || latitudeSerie == null
+            || longitudeSerie.length == 0
+            || latitudeSerie.length == 0) {
+
+         return false;
+      }
+
+      return true;
    }
 
    /**

@@ -15,9 +15,6 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 
@@ -26,22 +23,17 @@ public class DirectPainterContext {
    /**
     * GC in the onPaint event
     */
-   public GC                       gc;
+   public GC        gc;
+
+   /**
+    * Contains the client area of the map without trimmings, this rectangle has the width and
+    * height of the map image
+    *
+    */
+   public Rectangle clientArea;
 
    /**
     * Viewport for the current map image in world pixel
     */
-   public Rectangle                mapViewport;
-
-   /**
-    * All map locations which are painted in the viewport
-    */
-   public List<PaintedMapLocation> allPaintedMapLocations = new ArrayList<>();
-
-   /**
-    * {@link PaintedMapLocation} which is hovered with the mouse, can be <code>null</code> when it's
-    * not hovered
-    */
-   public PaintedMapLocation       hoveredMapLocation;
-
+   public Rectangle mapViewport;
 }

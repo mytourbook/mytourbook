@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2017, 2024 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -18,6 +18,8 @@ package net.tourbook.map25.layer.marker.algorithm.distance;
 import java.util.Collections;
 import java.util.Set;
 
+import net.tourbook.common.UI;
+
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MercatorProjection;
 import org.oscim.core.Point;
@@ -26,76 +28,79 @@ import org.oscim.core.Point;
  * Original:
  * {@link com.google.maps.android.clustering.algo.NonHierarchicalDistanceBasedAlgorithm.QuadItem<T>}
  * <p>
- * 
+ *
  * @param <T>
  */
 public class QuadItem<T extends ClusterItem> implements PointQuadTree.Item, Cluster<T> {
 
-	public final T			mClusterItem;
+   private static final char NL = UI.NEW_LINE;
 
-	public final Point		mPoint;
+   public final T            mClusterItem;
 
-	private final GeoPoint	mPosition;
+   public final Point        mPoint;
 
-	private Set<T>			singletonSet;
+   private final GeoPoint    mPosition;
 
-	QuadItem(final T item) {
+   private Set<T>            singletonSet;
 
-		mClusterItem = item;
-		mPosition = item.getPosition();
+   QuadItem(final T item) {
 
-		mPoint = MercatorProjection.project(mPosition, null);
+      mClusterItem = item;
+      mPosition = item.getPosition();
 
-		singletonSet = Collections.singleton(mClusterItem);
-	}
+      mPoint = MercatorProjection.project(mPosition, null);
 
-	@Override
-	public boolean equals(final Object other) {
+      singletonSet = Collections.singleton(mClusterItem);
+   }
 
-		if (!(other instanceof QuadItem<?>)) {
-			return false;
-		}
+   @Override
+   public boolean equals(final Object other) {
 
-		return ((QuadItem<?>) other).mClusterItem.equals(mClusterItem);
-	}
+      if (!(other instanceof QuadItem<?>)) {
+         return false;
+      }
 
-	@Override
-	public Set<T> getItems() {
-		return singletonSet;
-	}
+      return ((QuadItem<?>) other).mClusterItem.equals(mClusterItem);
+   }
 
-	@Override
-	public Point getPoint() {
-		return mPoint;
-	}
+   @Override
+   public Set<T> getItems() {
+      return singletonSet;
+   }
 
-	@Override
-	public GeoPoint getPosition() {
-		return mPosition;
-	}
+   @Override
+   public Point getPoint() {
+      return mPoint;
+   }
 
-	@Override
-	public int getSize() {
-		return 1;
-	}
+   @Override
+   public GeoPoint getPosition() {
+      return mPosition;
+   }
 
-	@Override
-	public int hashCode() {
-		return mClusterItem.hashCode();
-	}
+   @Override
+   public int getSize() {
+      return 1;
+   }
 
-	@Override
-	public String toString() {
+   @Override
+   public int hashCode() {
+      return mClusterItem.hashCode();
+   }
 
-		return "\n" //$NON-NLS-1$
+   @Override
+   public String toString() {
 
-				+ "\tQuadItem\t\t[" //$NON-NLS-1$
+      return NL
 
-				+ "mClusterItem=" + mClusterItem + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				//					+ "mPoint=" + mPoint + ", "
-				//					+ "mPosition=" + mPosition + ", "
-				//					+ "singletonSet=" + singletonSet
+            + " QuadItem                   " //$NON-NLS-1$
 
-				+ "]"; //$NON-NLS-1$
-	}
+            + " mClusterItem = " + mClusterItem //$NON-NLS-1$
+
+      //               + "mPoint=" + mPoint + ", "
+      //               + "mPosition=" + mPosition + ", "
+      //               + "singletonSet=" + singletonSet
+
+      ;
+   }
 }
