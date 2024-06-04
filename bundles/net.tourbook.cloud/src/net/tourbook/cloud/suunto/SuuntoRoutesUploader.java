@@ -362,13 +362,13 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
                return;
             }
 
-            PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+            final String infoText = event.getResult().isOK()
+                  ? NLS.bind(Messages.Dialog_UploadRoutesToSuunto_Message,
+                        numberOfUploadedTours[0],
+                        numberOfTours - numberOfUploadedTours[0])
+                  : notificationText[0];
 
-               final String infoText = event.getResult().isOK()
-                     ? NLS.bind(Messages.Dialog_UploadRoutesToSuunto_Message,
-                           numberOfUploadedTours[0],
-                           numberOfTours - numberOfUploadedTours[0])
-                     : notificationText[0];
+            PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
 
                TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
 
