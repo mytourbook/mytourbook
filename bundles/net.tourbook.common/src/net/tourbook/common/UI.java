@@ -1657,7 +1657,7 @@ public class UI {
           * effects.
           */
 
-         final ImageData imageData = new ImageData(//
+         final ImageData imageData = new ImageData(
                imageWidth,
                imageHeight,
                24,

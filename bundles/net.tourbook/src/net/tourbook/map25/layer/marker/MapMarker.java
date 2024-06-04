@@ -3,6 +3,7 @@
  */
 package net.tourbook.map25.layer.marker;
 
+import net.tourbook.common.UI;
 import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
 
 import org.oscim.core.GeoPoint;
@@ -12,43 +13,47 @@ import org.oscim.core.GeoPoint;
  */
 public class MapMarker implements ClusterItem {
 
-	public String		title;
-	public String		description;
+   public String       title;
+   public String       description;
 
-	public GeoPoint		geoPoint;
-	public MarkerSymbol	markerSymbol;
+   public GeoPoint     geoPoint;
+   public MarkerSymbol markerSymbol;
 
-	/**
-	 * @param title
-	 *            this should be <b>singleLine</b> (no <code>'\n'</code> )
-	 * @param description
-	 *            a <b>multiLine</b> description ( <code>'\n'</code> possible)
-	 */
-	public MapMarker(final String title, final String description, final GeoPoint geoPoint) {
+   /**
+    * @param title
+    *           this should be <b>singleLine</b> (no <code>'\n'</code> )
+    * @param description
+    *           a <b>multiLine</b> description ( <code>'\n'</code> possible)
+    */
+   public MapMarker(final String title,
+                    final String description,
+                    final GeoPoint geoPoint) {
 
-		this.title = title;
-		this.description = description;
+      this.title = title;
+      this.description = description;
 
-		this.geoPoint = geoPoint;
-	}
+      this.geoPoint = geoPoint;
+   }
 
-	@Override
-	public GeoPoint getPosition() {
-		return geoPoint;
-	}
+   @Override
+   public GeoPoint getPosition() {
+      return geoPoint;
+   }
 
-	@Override
-	public String toString() {
-		return
-//				"\n"
-		"MapMarker [" //$NON-NLS-1$
+   @Override
+   public String toString() {
 
-				//				+ "title=" + title + ", "
-				//				+ "description=" + description + ", "
-				+ "geoPoint=" + geoPoint + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				//				+ "markerSymbol=" + markerSymbol
+      return UI.EMPTY_STRING
 
-				+ "]"; //$NON-NLS-1$
-	}
+            + "MapMarker" //$NON-NLS-1$
+
+            + " geoPoint =" + geoPoint + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + " title = " + title //$NON-NLS-1$
+
+            //				+ "description=" + description + ", "
+            //				+ "markerSymbol=" + markerSymbol
+
+            + UI.NEW_LINE;
+   }
 
 }

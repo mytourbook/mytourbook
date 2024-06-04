@@ -73,7 +73,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
    private boolean            _isShowDecimalPlaces;
    private boolean            _isShowSegmenterMarker;
    private boolean            _isShowSegmenterValue;
-   private int                _stackedValues;
+   private int                _numStackedValues;
    private double[]           _xDataSerie;
 
    /**
@@ -150,7 +150,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
       int tourIndex = 0;
       int nextTourStartIndex = 0;
 
-      final ValueOverlapChecker overlapChecker = new ValueOverlapChecker(_stackedValues);
+      final ValueOverlapChecker overlapChecker = new ValueOverlapChecker(_numStackedValues);
 
       int devXPrev = Integer.MIN_VALUE;
       int devYPrev = Integer.MIN_VALUE;
@@ -706,7 +706,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 
    ChartLayerSegmentAltitude setStackedValues(final int stackedValues) {
 
-      _stackedValues = stackedValues;
+      _numStackedValues = stackedValues;
 
       return this;
    }

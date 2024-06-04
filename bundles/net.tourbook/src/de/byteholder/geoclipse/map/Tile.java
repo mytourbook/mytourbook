@@ -2,9 +2,6 @@
  * Tile.java
  *
  * Created on March 14, 2006, 4:53 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 package de.byteholder.geoclipse.map;
 
@@ -210,6 +207,11 @@ public class Tile {
    private TileImageLoaderCallback         _tileImageLoaderCallback;
 
    /**
+    * Set map dimming when this tile image is painted the first time
+    */
+   public String                           dimImage_TileKey;
+
+   /**
     * Create a new Tile at the specified tile point and zoom level
     *
     * @param mp
@@ -243,6 +245,7 @@ public class Tile {
     * @param customTileKey
     *           custom tile key which can be <code>null</code> when it's not set
     * @param projectionId
+    *
     * @return
     */
    public static String getTileKey(final MP mp,
@@ -368,6 +371,7 @@ public class Tile {
 
    /**
     * @param tileChildren
+    *
     * @return Returns <code>true</code> when all children are loaded, otherwise <code>false</code>
     */
    private boolean areAllChildrenLoaded(final ArrayList<Tile> tileChildren) {
@@ -473,6 +477,7 @@ public class Tile {
     * are available
     *
     * @param childImageData
+    *
     * @return
     */
    public ParentImageStatus createParentImage(final ImageData childImageData) {
@@ -590,23 +595,18 @@ public class Tile {
     * Check if the new image is valid
     *
     * @param newImage
+    *
     * @return Returns a valid image or <code>null</code> when the image is invald
     */
    private Image getCheckedImage(Image image) {
 
       // check if available or disposed
-      if ((image == null) || image.isDisposed()) {
+      if (image == null || image.isDisposed()) {
+
          image = null;
+
          return null;
       }
-
-//      // check image bounds
-//      final Rectangle imageBounds = image.getBounds();
-//      if (imageBounds.width <= 0 || imageBounds.height <= 0) {
-//         image.dispose();
-//         image = null;
-//         return null;
-//      }
 
       return image;
    }
@@ -718,6 +718,7 @@ public class Tile {
 
    /**
     * @param zoomLevel
+    *
     * @return Returns marker bounds which are set for a part or <code>null</code> when there are no
     *         part marker bounds
     */
@@ -761,6 +762,7 @@ public class Tile {
     * @param isTourPaintMethodEnhanced
     *           When <code>true</code> the overlay image is painted with the enhanced method which
     *           is currently 3 x 3 parts.
+    *
     * @return Returns a list with rectangles for each way point in the tile or <code>null</code>
     *         when there are no way points within the tile.
     */
@@ -1032,6 +1034,7 @@ public class Tile {
     * Set the map image for this tile, the image is checked before it is set
     *
     * @param newImage
+    *
     * @return <code>true</code> when the image was set, <code>false</code> when the image is invalid
     */
    public boolean setMapImage(final Image newImage) {

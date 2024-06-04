@@ -57,6 +57,13 @@ New
 * 2.5D & 3D Maps (Frederic)
   - Export map view to an image file (jpeg, png or bmp) or to the clipboard
  
+* 2D Map
+  - Enhanced display of the
+    - Tour marker
+    - Tour pauses
+    - Tour/common locations
+    https://github.com/mytourbook/mytourbook/issues/1323
+    
 
 Improvements
 ============
@@ -67,8 +74,16 @@ Improvements
 Changes
 =======
 
-* 
-  
+* 2D Map
+  - Moved options from the "2D Map Options" slideout to the "Map Points" slideout
+    - Map dimming
+    - Filter tour pauses
+
+
+Changes that require Tour Re-import
+===================================
+
+*  
 
 
 Bugfix

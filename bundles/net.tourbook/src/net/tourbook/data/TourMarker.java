@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,6 +48,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
 
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.graphics.Rectangle;
 
@@ -265,7 +266,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * visibleType is used to show the marker with different visible effects (color)
     */
    @Transient
-   private int       _visibleType;
+   private int                              _visibleType;
 
    /**
     * Contains <b>width</b> and <b>height</b> of the marker image.
@@ -274,26 +275,38 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * label text including the border
     */
    @Transient
-   private Rectangle _markerBounds;
+   private Rectangle                        _markerBounds;
 
    /**
     * unique id for manually created markers because the {@link #markerId} is 0 when the marker is
     * not persisted
     */
    @Transient
-   private long      _createId            = 0;
+   private long                             _createId            = 0;
 
    /**
     * Device time in ms.
     */
    @Transient
-   private long      _deviceLapTime       = Long.MIN_VALUE;
+   private long                             _deviceLapTime       = Long.MIN_VALUE;
 
    /**
     * Serie index in {@link TourData} when tour is {@link TourData#isMultipleTours}.
     */
    @Transient
-   private int       _multiTourSerieIndex = -1;
+   private int                              _multiTourSerieIndex = -1;
+
+   @Transient
+   private String                           _markerMapLabel;
+
+   @Transient
+   private String                           _scrambledLabel;
+
+   /**
+    * Caches the world positions for the pause lat/long values for each zoom level
+    */
+   @Transient
+   private IntObjectHashMap<java.awt.Point> _worldPixelPositions;
 
    public TourMarker() {}
 
@@ -319,6 +332,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
    /**
     * @param pc
+    *
     * @return Returns the default max size in pixel for a {@link TourSign} image. This is used when
     *         drawing a table column.<br>
     *         When a sign image is drawn in a chart or map, the sign image size from the pref store
@@ -354,6 +368,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * sets the state that the marker as not yet saved
     *
     * @param newTourData
+    *
     * @return
     */
    public TourMarker clone(final TourData newTourData) {
@@ -525,6 +540,28 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    }
 
    /**
+    * @return
+    */
+   public String getMarkerMapLabel() {
+
+      if (_markerMapLabel != null) {
+         return _markerMapLabel;
+      }
+
+      String markerLabel = UI.IS_SCRAMBLE_DATA
+            ? getScrambledLabel()
+            : label;
+
+      if (getDescription().length() > 0) {
+         markerLabel += UI.SYMBOL_STAR;
+      }
+
+      _markerMapLabel = markerLabel;
+
+      return markerLabel;
+   }
+
+   /**
     * @return Return the absolute time of the marker in ms since 1970-01-01T00:00:00Z.
     */
    public long getMarkerTime() {
@@ -544,6 +581,16 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
    public int getMultiTourSerieIndex() {
       return _multiTourSerieIndex;
+   }
+
+   public String getScrambledLabel() {
+
+      if (_scrambledLabel == null) {
+
+         _scrambledLabel = UI.scrambleText(label);
+      }
+
+      return _scrambledLabel;
    }
 
    /**
@@ -588,6 +635,16 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
       return _visibleType;
    }
 
+   public java.awt.Point getWorldPixelPosition(final int zoomLevel) {
+
+      if (_worldPixelPositions != null) {
+
+         return _worldPixelPositions.get(zoomLevel);
+      }
+
+      return null;
+   }
+
    public boolean hasAltitude() {
       return altitude != TourDatabase.DEFAULT_FLOAT;
    }
@@ -629,6 +686,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * @param comparedMarker
     * @param isIgnoreType
     *           When <code>true</code> the type field is not compared.
+    *
     * @return Returns <code>true</code> when the content of the markers are equal.
     */
    public boolean isEqual(final TourMarker comparedMarker, final boolean isIgnoreType) {
@@ -955,6 +1013,17 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
    public void setVisibleType(final int visibleType) {
       _visibleType = visibleType;
+   }
+
+   public void setWorldPixelPosition(final java.awt.Point worldPixelPosition,
+                                     final int zoomLevel) {
+
+      if (_worldPixelPositions == null) {
+
+         _worldPixelPositions = new IntObjectHashMap<>();
+      }
+
+      _worldPixelPositions.put(zoomLevel, worldPixelPosition);
    }
 
    /**

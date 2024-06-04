@@ -157,8 +157,8 @@ public class Util {
     * @return
     */
    public static String addLineNumbers(final String text, final int startLineNumer) {
-
-      final String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
+ 
+      final String[] lines = StringUtils.splitIntoLines(text);
 
       final StringBuilder sb = new StringBuilder();
 
@@ -3382,6 +3382,8 @@ public class Util {
 
       return serializeObject(object).length;
    }
+
+
 
    /**
     * Writes a XML memento into a XML file.

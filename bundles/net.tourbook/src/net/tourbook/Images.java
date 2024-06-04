@@ -186,11 +186,15 @@ public class Images {
    public static final String MapLayer                                   = "map-layer.png";                                       //$NON-NLS-1$
    public static final String MapLayer_Dark                              = "map-layer-dark.png";                                  //$NON-NLS-1$
    public static final String MapLocation                                = "map-location.png";                                    //$NON-NLS-1$
+   public static final String MapLocation_BoundingBox                    = "map-location-boundingbox.png";                        //$NON-NLS-1$
+   public static final String MapLocation_Start                          = "map-location-start.png";                              //$NON-NLS-1$
    public static final String MapLocationMarker                          = "map-location-marker.png";                             //$NON-NLS-1$
    public static final String MapLocationMarker_Address                  = "map-location-marker-address.png";                     //$NON-NLS-1$
    public static final String MapLocationMarker_Start                    = "map-location-marker-start.png";                       //$NON-NLS-1$
    public static final String MapLocationMarker_End                      = "map-location-marker-end.png";                         //$NON-NLS-1$
    public static final String MapLocationMarker_Hovered                  = "map-location-marker-hovered.png";                     //$NON-NLS-1$
+   public static final String MapLocation_Disabled                       = "map-location-disabled.png";                           //$NON-NLS-1$
+   public static final String MapLocation_Disabled_Dark                  = "map-location-disabled-dark.png";                      //$NON-NLS-1$
    public static final String MapModel                                   = "map-model.png";                                       //$NON-NLS-1$
    public static final String MapModel_Disabled                          = "map-model-disabled.png";                              //$NON-NLS-1$
    public static final String MapModelCursor                             = "map-model-cursor.png";                                //$NON-NLS-1$
@@ -376,6 +380,8 @@ public class Images {
    public static final String TourMarker                                 = "tour-marker.png";                                     //$NON-NLS-1$
    public static final String TourMarker_All                             = "tour-marker-all.png";                                 //$NON-NLS-1$
    public static final String TourMarker_Disabled                        = "tour-marker-disabled.png";                            //$NON-NLS-1$
+   public static final String TourMarker_Cluster                         = "tour-marker-cluster.png";                             //$NON-NLS-1$
+   public static final String TourMarker_Group                           = "tour-marker-group.png";                               //$NON-NLS-1$
    public static final String TourMarker_New                             = "tour-marker-new.png";                                 //$NON-NLS-1$
    public static final String TourMarker_New_Disabled                    = "tour-marker-new-disabled.png";                        //$NON-NLS-1$
    public static final String TourNew                                    = "tour-new.png";                                        //$NON-NLS-1$

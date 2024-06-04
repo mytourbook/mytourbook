@@ -186,7 +186,7 @@ public class ActionLookupCommonLocation extends SubMenu {
 //         tourData.getTourLocationPoints().add(tourLocationPoint);
 //      }
 
-      _map2View.addAddressLocation(tourLocation);
+      _map2View.addCommonLocation(tourLocation);
    }
 
    public void setCurrentHoveredTourId(final Long hoveredTourId) {

@@ -67,9 +67,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
    /*
     * UI controls
     */
-   private Composite _parent;
-
-   private Spinner   _spinnerImageSize;
+   private Spinner _spinnerImageSize;
 
    /**
     * @param ownerControl
@@ -97,8 +95,6 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
 
    @Override
    protected Composite createToolTipContentArea(final Composite parent) {
-
-      initUI(parent);
 
       createActions();
 
@@ -194,7 +190,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
             _spinnerImageSize.setPageIncrement(10);
             _spinnerImageSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI()));
             _spinnerImageSize.addMouseWheelListener(mouseEvent -> {
-               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
                onChangeUI();
             });
 
@@ -207,11 +203,6 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
 
    private void enableControls() {
 
-   }
-
-   private void initUI(final Composite parent) {
-
-      _parent = parent;
    }
 
    @Override
