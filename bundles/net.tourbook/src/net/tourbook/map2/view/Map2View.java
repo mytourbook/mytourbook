@@ -1138,16 +1138,12 @@ public class Map2View extends ViewPart implements
 
       final TourMarker tourMarker = hoveredMapPoint.mapPoint.tourMarker;
 
-      final ITourProvider tourProvider = new ITourProvider() {
+      final ITourProvider tourProvider = () -> {
 
-         @Override
-         public ArrayList<TourData> getSelectedTours() {
+         final ArrayList<TourData> allTours = new ArrayList<>();
+         allTours.add(tourMarker.getTourData());
 
-            final ArrayList<TourData> allTours = new ArrayList<>();
-            allTours.add(tourMarker.getTourData());
-
-            return allTours;
-         }
+         return allTours;
       };
 
       ActionOpenMarkerDialog.doAction(tourProvider, true, tourMarker);
@@ -3394,9 +3390,7 @@ public class Map2View extends ViewPart implements
 
       }
 
-      if (eventData == null
-            || allTourLocations == null
-            || allTourLocations.isEmpty()) {
+      if (eventData == null || CollectionUtils.isEmpty(allTourLocations)) {
 
          // hide tour locations
 
@@ -3443,9 +3437,7 @@ public class Map2View extends ViewPart implements
          allTourLocations = allTourLocationsFromEvent;
       }
 
-      if (eventData == null
-            || allTourLocations == null
-            || allTourLocations.isEmpty()) {
+      if (eventData == null || CollectionUtils.isEmpty(allTourLocations)) {
 
          // hide tour locations
 
