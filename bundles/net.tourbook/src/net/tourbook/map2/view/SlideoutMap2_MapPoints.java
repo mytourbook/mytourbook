@@ -604,11 +604,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                _tabTourMarkers.setToolTipText(Messages.Slideout_MapPoints_Tab_TourMarkers);
                _tabTourMarkers.setControl(createUI_200_Tab_TourMarkers(_tabFolder));
 
-               _tabTourMarkerGroups = new CTabItem(_tabFolder, SWT.NONE);
-               _tabTourMarkerGroups.setImage(_imageTourMarker_Groups);
-               _tabTourMarkerGroups.setToolTipText("Tour marker groups");
-               _tabTourMarkerGroups.setControl(createUI_300_Tab_Groups(_tabFolder));
-
                _tabTourPauses = new CTabItem(_tabFolder, SWT.NONE);
                _tabTourPauses.setImage(_imageTourPauses);
                _tabTourPauses.setToolTipText("Tour pauses");
@@ -623,6 +618,11 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                _tabCommonLocations.setImage(_imageMapLocation_Common);
                _tabCommonLocations.setToolTipText(Messages.Slideout_MapPoints_Tab_CommonLocations);
                _tabCommonLocations.setControl(createUI_700_Tab_CommonLocations(_tabFolder));
+
+               _tabTourMarkerGroups = new CTabItem(_tabFolder, SWT.NONE);
+               _tabTourMarkerGroups.setImage(_imageTourMarker_Groups);
+               _tabTourMarkerGroups.setToolTipText("Tour marker groups");
+               _tabTourMarkerGroups.setControl(createUI_300_Tab_Groups(_tabFolder));
             }
          }
          {
