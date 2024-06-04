@@ -1066,7 +1066,7 @@ public class TourBookView extends ViewPart implements
 
          for (final TVITourBookTour tviTour : selectedTVITours) {
 
-            // collect only fetched items, the other are "empty" !!!
+            // collect only fetched items, the others are "empty" !!!
             if (tviTour.colTourDateTime != null) {
 
                sortedItems.add(tviTour);
