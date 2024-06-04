@@ -1857,20 +1857,7 @@ public class TourManager {
          return false;
       }
 
-      // check if coordinates are available
-
-      final double[] longitudeSerie = tourData.longitudeSerie;
-      final double[] latitudeSerie = tourData.latitudeSerie;
-
-      if ((longitudeSerie == null)
-            || (longitudeSerie.length == 0)
-            || (latitudeSerie == null)
-            || (latitudeSerie.length == 0)) {
-
-         return false;
-      }
-
-      return true;
+      return tourData.isLatLonAvailable();
    }
 
    /**

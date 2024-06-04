@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -86,7 +86,6 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -1216,6 +1215,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
    /**
     * @param sortColumnId
+    *
     * @return Returns the column widget by it's column id, when column id is not found then the
     *         first column is returned.
     */
@@ -1676,11 +1676,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
       map.setMapProvider(mp);
 
       // set map dim level
-      final IDialogSettings state_Map2 = Map2View.getState();
-      final boolean isMapDimmed = Util.getStateBoolean(state_Map2, Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT);
-      final int mapDimValue = Util.getStateInt(state_Map2, Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT);
-      final RGB mapDimColor = Util.getStateRGB(state_Map2, Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT);
-      map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, _map2View.isBackgroundDark());
+      _map2View.setupMapDimLevel();
    }
 
    private void setWidth_ForColumn_IsVisible() {

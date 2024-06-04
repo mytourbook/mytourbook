@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -125,6 +125,7 @@ public class TimeTools {
    public static final DateTimeFormatter   Formatter_DateTime_M         = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
    public static final DateTimeFormatter   Formatter_DateTime_MS        = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT);
    public static final DateTimeFormatter   Formatter_DateTime_ML        = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.LONG);
+   public static final DateTimeFormatter   Formatter_DateTime_LL        = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.LONG);
    public static final DateTimeFormatter   Formatter_DateTime_F         = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL);
    public static final DateTimeFormatter   Formatter_FileName           = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");    //$NON-NLS-1$
 
@@ -298,6 +299,7 @@ public class TimeTools {
     * Creates a {@link ZonedDateTime} from the number: YYYYMMDDhhmmss
     *
     * @param yyyymmddhhmmss
+    *
     * @return
     */
    public static ZonedDateTime createDateTimeFromYMDhms(final long yyyymmddhhmmss) {
@@ -342,6 +344,7 @@ public class TimeTools {
     * @param dbTimeZoneId
     *           Time zone ID or <code>null</code> when the time zone ID is not defined, then the
     *           local time zone is used.
+    *
     * @return
     */
    public static TourDateTime createTourDateTime(final long epochMilli, final String dbTimeZoneId) {
@@ -548,6 +551,7 @@ public class TimeTools {
 
    /**
     * @param year
+    *
     * @return Returns the number of days in a year
     */
    public static int getNumberOfDaysWithYear(final int year) {
@@ -557,6 +561,7 @@ public class TimeTools {
 
    /**
     * @param year
+    *
     * @return Returns the number of weeks in a year, this do NOT include weeks which are belonging
     *         to other week years, e.g. 1.1.2012 is week 52 in weekyear 2011
     */
@@ -576,6 +581,7 @@ public class TimeTools {
 
    /**
     * @param timeZoneId
+    *
     * @return Returns the timezone for the ID or <code>null</code> when not available.
     */
    private static TimeZoneData getTimeZone(final String timeZoneId) {
@@ -608,6 +614,7 @@ public class TimeTools {
    /**
     * @param latitude
     * @param longitude
+    *
     * @return Returns the time zone index in {@link #getAllTimeZones()}, when latitude is
     *         {@link Double#MIN_VALUE} then the time zone index for the default time zone is
     *         returned.
@@ -635,6 +642,7 @@ public class TimeTools {
 
    /**
     * @param timeZoneId
+    *
     * @return Returns the time zone index for the time zone ID or -1 when not available.
     */
    public static int getTimeZoneIndex(final String timeZoneId) {
@@ -662,6 +670,7 @@ public class TimeTools {
 
    /**
     * @param timeZoneId
+    *
     * @return Returns the time zone index for the time zone ID or the index for the default time
     *         zone when not available.
     */
@@ -677,12 +686,16 @@ public class TimeTools {
    }
 
    public static String getUTCISODateTime(final long date) {
-      return Instant.ofEpochMilli(date).atZone(TimeTools.UTC).format(DateTimeFormatter.ISO_DATE_TIME);
+
+      return Instant.ofEpochMilli(date)
+            .atZone(TimeTools.UTC)
+            .format(DateTimeFormatter.ISO_DATE_TIME);
    }
 
    /**
     * @param epochOfMilli
     *           The number of milliseconds from 1970-01-01T00:00:00Z
+    *
     * @return Returns a zoned date time from epochOfMilli with the default time zone.
     */
    public static ZonedDateTime getZonedDateTime(final long epochOfMilli) {
@@ -695,6 +708,21 @@ public class TimeTools {
    /**
     * @param epochOfMilli
     *           The number of milliseconds from 1970-01-01T00:00:00Z
+    * @param timeZone
+    *
+    * @return Returns a zoned date time from epochOfMilli
+    */
+   public static ZonedDateTime getZonedDateTime(final long epochOfMilli, final ZoneId timeZone) {
+
+      return ZonedDateTime.ofInstant(
+            Instant.ofEpochMilli(epochOfMilli),
+            timeZone);
+   }
+
+   /**
+    * @param epochOfMilli
+    *           The number of milliseconds from 1970-01-01T00:00:00Z
+    *
     * @return Returns a zoned date time from epochOfMilli with the UTC time zone.
     */
    public static ZonedDateTime getZonedDateTimeWithUTC(final long epochOfMilli) {
@@ -723,6 +751,7 @@ public class TimeTools {
    /**
     * @param duration
     *           in milliseconds.
+    *
     * @return
     */
    public static String printDSTDuration(final long duration) {
@@ -741,6 +770,7 @@ public class TimeTools {
     * @param isDefaultZone
     *           When <code>true</code>, then a star is added to the offset value to indicate the
     *           default zone
+    *
     * @return Returns a time offset string
     */
    private static String printOffset(final int timeZoneOffset, final boolean isDefaultZone) {
@@ -818,6 +848,7 @@ public class TimeTools {
     * 1970-01-01T00:00:00Z.
     *
     * @param localDateTime
+    *
     * @return
     */
    public static long toEpochMilli(final LocalDateTime localDateTime) {
@@ -833,21 +864,23 @@ public class TimeTools {
    /**
     * @param epochOfMilli
     *           The number of milliseconds from 1970-01-01T00:00:00Z
+    *
     * @return Returns a date from epochOfMilli.
     */
    public static LocalDate toLocalDate(final long epochOfMilli) {
 
-      return LocalDate.ofEpochDay(epochOfMilli / 86400000L);
+      return LocalDate.ofEpochDay(epochOfMilli / 86_400_000L);
    }
 
    /**
     * @param epochOfMilli
     *           The number of milliseconds from 1970-01-01T00:00:00Z
+    *
     * @return Returns a zoned date time from epochOfMilli with the default time zone.
     */
    public static LocalDateTime toLocalDateTime(final long epochOfMilli) {
 
-      return LocalDateTime.ofInstant(//
+      return LocalDateTime.ofInstant(
             Instant.ofEpochMilli(epochOfMilli),
             ZoneOffset.UTC);
    }

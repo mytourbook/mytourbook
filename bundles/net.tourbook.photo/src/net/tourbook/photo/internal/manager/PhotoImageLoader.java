@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -145,7 +145,7 @@ public class PhotoImageLoader {
 
       } catch (final Exception e) {
 
-         StatusUtil.log(NLS.bind(//
+         StatusUtil.log(NLS.bind(
                "Cannot save thumbnail image with AWT: \"{0}\"", //$NON-NLS-1$
                imageFilePath), e);
       } finally {
@@ -157,7 +157,7 @@ public class PhotoImageLoader {
 
          } catch (final Exception e) {
 
-            StatusUtil.log(NLS.bind(//
+            StatusUtil.log(NLS.bind(
                   "Cannot load thumbnail image with SWT: \"{0}\"", //$NON-NLS-1$
                   tempFilename), e);
          } finally {
@@ -225,7 +225,7 @@ public class PhotoImageLoader {
     */
    private boolean isAWTImageSupported() {
 
-      final String photoSuffix = _photo.imageFileExt;
+      final String photoSuffix = _photo.imageFileExt.toLowerCase();
 
       for (final String awtImageSuffix : awtImageFileSuffixes) {
          if (photoSuffix.equals(awtImageSuffix)) {
@@ -279,7 +279,7 @@ public class PhotoImageLoader {
                   awtBufferedImage = transformImageRotate(awtBufferedImage);
 
                } catch (final Exception e) {
-                  StatusUtil.log(NLS.bind(//
+                  StatusUtil.log(NLS.bind(
                         "Image \"{0}\" cannot be resized", //$NON-NLS-1$
                         _photo.imageFilePathName), e);
                   return null;
@@ -295,7 +295,7 @@ public class PhotoImageLoader {
                }
 
             } catch (final Exception e) {
-               StatusUtil.log(NLS.bind(//
+               StatusUtil.log(NLS.bind(
                      "SWT store image \"{0}\" cannot be created", //$NON-NLS-1$
                      storeImageFilePath.toOSString()), e);
             } finally {
@@ -497,7 +497,7 @@ public class PhotoImageLoader {
 
          if (hqImage == null) {
 
-            System.out.println(NLS.bind(//
+            System.out.println(NLS.bind(
                   UI.timeStampNano() + " image == NULL when loading with {0}: \"{1}\"", //$NON-NLS-1$
                   _imageFramework.toUpperCase(),
                   _photo.imageFilePathName));
@@ -521,7 +521,7 @@ public class PhotoImageLoader {
                } finally {
 
                   if (hqImage == null) {
-                     System.out.println(NLS.bind(//
+                     System.out.println(NLS.bind(
                            UI.timeStampNano() + " image == NULL when loading with SWT: \"{0}\"", //$NON-NLS-1$
                            _photo.imageFilePathName));
                   }
@@ -576,7 +576,7 @@ public class PhotoImageLoader {
 
       } catch (final Exception e) {
 
-         System.out.println(NLS.bind(//
+         System.out.println(NLS.bind(
                "SWT: image \"{0}\" cannot be loaded", //$NON-NLS-1$
                originalImagePathName));
 
@@ -852,7 +852,7 @@ public class PhotoImageLoader {
 
          if (awtOriginalImage == null) {
 
-            System.out.println(NLS.bind(//
+            System.out.println(NLS.bind(
                   UI.timeStampNano() + " AWT: image \"{0}\" cannot be loaded, will load with SWT", //$NON-NLS-1$
                   originalImagePathName));
 
@@ -872,7 +872,7 @@ public class PhotoImageLoader {
 
          if (swtImage == null) {
 
-            exceptionMessage = NLS.bind(//
+            exceptionMessage = NLS.bind(
                   "Photo image with thumb save error cannot be created with SWT (1): ", //$NON-NLS-1$
                   originalImagePathName);
          } else {
@@ -1060,7 +1060,7 @@ public class PhotoImageLoader {
                requestedSWTImage = createSWTimageFromAWTimage(saveThumbAWT, originalImagePathName);
 
                if (requestedSWTImage == null) {
-                  exceptionMessage = NLS.bind(//
+                  exceptionMessage = NLS.bind(
                         "Photo image cannot be converted from AWT to SWT: ", //$NON-NLS-1$
                         originalImagePathName);
                }
@@ -1188,7 +1188,7 @@ public class PhotoImageLoader {
 
             isLoadingException = true;
 
-            System.out.println(NLS.bind(//
+            System.out.println(NLS.bind(
                   "SWT: image \"{0}\" cannot be loaded (1)", //$NON-NLS-1$
                   originalImagePathName));
 
@@ -1229,7 +1229,7 @@ public class PhotoImageLoader {
 
                   isLoadingException = true;
 
-                  System.out.println(NLS.bind(//
+                  System.out.println(NLS.bind(
                         "SWT: image \"{0}\" cannot be loaded (3)", //$NON-NLS-1$
                         originalImagePathName));
 

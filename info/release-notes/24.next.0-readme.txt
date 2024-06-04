@@ -54,7 +54,13 @@ Experimental
 New
 ===
 
-* 
+* 2D Map
+  - Enhanced display of the
+    - Tour marker
+    - Tour pauses
+    - Tour/common locations
+    https://github.com/mytourbook/mytourbook/issues/1323
+    
 
 Improvements
 ============
@@ -64,8 +70,16 @@ Improvements
 Changes
 =======
 
-* 
-  
+* 2D Map
+  - Moved options from the "2D Map Options" slideout to the "Map Points" slideout
+    - Map dimming
+    - Filter tour pauses
+
+
+Changes that require Tour Re-import
+===================================
+
+*  
 
 
 Bugfix

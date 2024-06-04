@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,7 +28,6 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.awt.image.BufferedImage;
 import java.text.NumberFormat;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -43,13 +42,10 @@ import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.color.MapUnits;
-import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map2.Messages;
@@ -64,7 +60,6 @@ import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.Map2_Appearance;
-import net.tourbook.tour.filter.TourFilterFieldOperator;
 import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
 
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
@@ -77,57 +72,49 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * Paints a tour into the 2D map.
  */
 public class TourMapPainter extends Map2Painter {
 
-   private static final Font               DEFAULT_FONT      = net.tourbook.common.UI.AWT_DIALOG_FONT;
+   private static final Font              DEFAULT_FONT      = net.tourbook.common.UI.AWT_DIALOG_FONT;
 
-   private static final int                MARKER_MARGIN     = 2;
-   private static final int                MARKER_POLE       = 16;
+   private static final IPreferenceStore  _prefStore        = TourbookPlugin.getPrefStore();
 
-   private static final IPreferenceStore   _prefStore        = TourbookPlugin.getPrefStore();
+   private static IPropertyChangeListener _prefChangeListener;
 
-   private static IPropertyChangeListener  _prefChangeListener;
+   private static float                   _borderBrightness;
 
-   private static float                    _borderBrightness;
+   private static RGB                     _prefBorderRGB;
+   private static int                     _prefBorderType;
+   private static int                     _prefBorderWidth;
+   private static boolean                 _prefIsAntialiasPainting;
+   private static boolean                 _prefIsDrawLine;
+   private static boolean                 _prefIsDrawSquare;
+   private static boolean                 _prefIsWithBorder;
+   private static int                     _prefLineWidth;
 
-   private static RGB                      _prefBorderRGB;
-   private static int                      _prefBorderType;
-   private static int                      _prefBorderWidth;
-   private static boolean                  _prefIsAntialiasPainting;
-   private static boolean                  _prefIsDrawLine;
-   private static boolean                  _prefIsDrawSquare;
-   private static boolean                  _prefIsWithBorder;
-   private static int                      _prefLineWidth;
+   private static int                     _prefGeoCompare_LineWidth;
+   private static RGB                     _prefGeoCompare_RefTour_RGB;
+   private static RGB                     _prefGeoCompare_CompartTourPart_RGB;
 
-   private static int                      _prefGeoCompare_LineWidth;
-   private static RGB                      _prefGeoCompare_RefTour_RGB;
-   private static RGB                      _prefGeoCompare_CompartTourPart_RGB;
-
-   private static boolean                  _isImageAvailable = false;
-   private static boolean                  _isErrorLogged;
+   private static boolean                 _isImageAvailable = false;
+   private static boolean                 _isErrorLogged;
 
    /**
     * Tour start/end image
     */
-   private static Image                    _tourStartMarker;
-   private static Image                    _tourEndMarker;
+   private static Image                   _tourStartMarker;
+   private static Image                   _tourEndMarker;
 
-   private static Rectangle                _twpImageBounds;
-   private static TourPainterConfiguration _tourPaintConfig;
+   private static Rectangle               _twpImageBounds;
 
-   private static final NumberFormat       _nf1              = NumberFormat.getNumberInstance();
+   private static final NumberFormat      _nf1              = NumberFormat.getNumberInstance();
    static {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -203,6 +190,7 @@ public class TourMapPainter extends Map2Painter {
     * @param isDarkBackground
     * @param isDrawUnitShadow
     * @param isDrawLegendText
+    *
     * @return
     */
    public static Image createMap2_LegendImage_AWT(final IGradientColorProvider colorProvider,
@@ -734,9 +722,9 @@ public class TourMapPainter extends Map2Painter {
       return allLegendLabels;
    }
 
-// SET_FORMATTING_OFF
-
    private static void getTourPainterSettings() {
+
+// SET_FORMATTING_OFF
 
       final String drawSymbol = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE);
 
@@ -763,9 +751,9 @@ public class TourMapPainter extends Map2Painter {
       _prefGeoCompare_LineWidth           = _prefStore.getInt(ITourbookPreferences.GEO_COMPARE_REF_TOUR_LINE_WIDTH);
       _prefGeoCompare_RefTour_RGB         = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_REF_TOUR_RGB);
       _prefGeoCompare_CompartTourPart_RGB = PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GEO_COMPARE_COMPARED_TOUR_PART_RGB);
-   }
 
 // SET_FORMATTING_ON
+   }
 
    private static void initPainter() {
 
@@ -779,8 +767,6 @@ public class TourMapPainter extends Map2Painter {
 
       final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
       _bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
-
-      _tourPaintConfig = TourPainterConfiguration.getInstance();
 
       /**
        * this code optimizes the performance by reading from the pref store which is not very
@@ -845,8 +831,8 @@ public class TourMapPainter extends Map2Painter {
 
       initPainter();
 
-      final ArrayList<TourData> allTourData = _tourPaintConfig.getTourData();
-      final ArrayList<Photo> photoList = _tourPaintConfig.getPhotos();
+      final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
+      final ArrayList<Photo> photoList = TourPainterConfiguration.getPhotos();
 
       if (allTourData.isEmpty() && photoList.isEmpty()) {
          return false;
@@ -859,7 +845,7 @@ public class TourMapPainter extends Map2Painter {
       }
 
       // first draw the tour, then the marker and photos
-      if (_tourPaintConfig.isTourVisible) {
+      if (TourPainterConfiguration.isShowTours) {
 
          if (_prefIsAntialiasPainting) {
             gcTile.setAntialias(SWT.ON);
@@ -953,7 +939,7 @@ public class TourMapPainter extends Map2Painter {
             int staticMarkerCounter = 0;
 
             // draw start/end marker
-            if (_tourPaintConfig.isShowStartEndInMap) {
+            if (TourPainterConfiguration.isShowTourStartEnd) {
 
                // draw end marker first
                if (drawStaticMarker(
@@ -988,17 +974,9 @@ public class TourMapPainter extends Map2Painter {
          _colorCache.dispose();
       }
 
-      if (_tourPaintConfig.isShowTourMarker
-            || _tourPaintConfig.isShowWayPoints
-            || _tourPaintConfig.isShowTourPauses) {
+      if (TourPainterConfiguration.isShowWayPoints) {
 
          // draw marker/pauses above the tour
-
-         // status if a marker is drawn
-         int staticMarkerCounter = 0;
-
-         // status if a pause is drawn
-         int staticPauseCounter = 0;
 
          for (final TourData tourData : allTourData) {
 
@@ -1015,43 +993,7 @@ public class TourMapPainter extends Map2Painter {
 
             setDataSerie(tourData);
 
-            if (_tourPaintConfig.isShowTourMarker) {
-
-               if (doPaint_Marker(
-                     gcTile,
-                     map,
-                     tile,
-                     parts,
-                     isContentInTile,
-                     tourData,
-                     latitudeSerie,
-                     longitudeSerie)) {
-
-                  ++staticMarkerCounter;
-               }
-
-               isContentInTile = isContentInTile || staticMarkerCounter > 0;
-            }
-
-            if (_tourPaintConfig.isShowTourPauses) {
-
-               if (doPaint_Pauses(
-                     gcTile,
-                     map,
-                     tile,
-                     parts,
-                     isContentInTile,
-                     tourData,
-                     latitudeSerie,
-                     longitudeSerie)) {
-
-                  ++staticPauseCounter;
-               }
-
-               isContentInTile = isContentInTile || staticPauseCounter > 0;
-            }
-
-            if (_tourPaintConfig.isShowWayPoints) {
+            if (TourPainterConfiguration.isShowWayPoints) {
 
                // check if way points are available
                final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
@@ -1095,7 +1037,7 @@ public class TourMapPainter extends Map2Painter {
          }
       }
 
-      if (_tourPaintConfig.isPhotoVisible && photoList.size() > 0) {
+      if (TourPainterConfiguration.isShowPhotos && photoList.size() > 0) {
 
          /*
           * world positions are cached to optimize performance
@@ -1112,7 +1054,7 @@ public class TourMapPainter extends Map2Painter {
                   mp,
                   projectionHash,
                   mapZoomLevel,
-                  _tourPaintConfig.isLinkPhotoDisplayed);
+                  TourPainterConfiguration.isLinkPhotoDisplayed);
 
             if (photoWorldPixel == null) {
                continue;
@@ -1126,278 +1068,6 @@ public class TourMapPainter extends Map2Painter {
          isContentInTile = isContentInTile || photoCounter > 0;
       }
 
-      return isContentInTile;
-   }
-
-   private boolean doPaint_Marker(final GC gcTile,
-                                  final Map2 map,
-                                  final Tile tile,
-                                  final int parts,
-                                  boolean isContentInTile,
-                                  final TourData tourData,
-                                  final double[] latitudeSerie,
-                                  final double[] longitudeSerie) {
-
-      if (tourData.isMultipleTours()) {
-
-         final int[] multipleStartTimeIndex = tourData.multipleTourStartIndex;
-         final int[] multipleNumberOfMarkers = tourData.multipleNumberOfMarkers;
-
-         int tourIndex = 0;
-         int numberOfMultiMarkers = 0;
-         int tourSerieIndex = 0;
-
-         // setup first multiple tour
-         tourSerieIndex = multipleStartTimeIndex[tourIndex];
-         numberOfMultiMarkers = multipleNumberOfMarkers[tourIndex];
-
-         final ArrayList<TourMarker> allTourMarkers = tourData.multipleTourMarkers;
-
-         // draw tour marker
-
-         int markerCounter = 0;
-
-         for (int markerIndex = 0; markerIndex < allTourMarkers.size(); markerIndex++) {
-
-            while (markerIndex >= numberOfMultiMarkers) {
-
-               // setup next tour
-
-               tourIndex++;
-
-               if (tourIndex <= multipleStartTimeIndex.length - 1) {
-
-                  tourSerieIndex = multipleStartTimeIndex[tourIndex];
-                  numberOfMultiMarkers += multipleNumberOfMarkers[tourIndex];
-               }
-            }
-
-            final TourMarker tourMarker = allTourMarkers.get(markerIndex);
-
-            // skip marker when hidden or not set
-            if (tourMarker.isMarkerVisible() == false || StringUtils.isNullOrEmpty(tourMarker.getLabel())) {
-               continue;
-            }
-
-            final int markerSerieIndex = tourSerieIndex + tourMarker.getSerieIndex();
-
-            tourMarker.setMultiTourSerieIndex(markerSerieIndex);
-
-            // draw tour marker
-            if (drawTourMarker(
-                  gcTile,
-                  map,
-                  tile,
-                  latitudeSerie[markerSerieIndex],
-                  longitudeSerie[markerSerieIndex],
-                  tourMarker,
-                  parts)) {
-
-               markerCounter++;
-            }
-         }
-
-         isContentInTile = isContentInTile || markerCounter > 0;
-
-      } else {
-
-         final ArrayList<TourMarker> sortedMarkers = tourData.getTourMarkersSorted();
-
-         // check if markers are available
-         if (sortedMarkers.size() > 0) {
-
-            // draw tour marker
-
-            int markerCounter = 0;
-
-            for (final TourMarker tourMarker : sortedMarkers) {
-
-               // skip marker when hidden or not set
-               if (tourMarker.isMarkerVisible() == false || StringUtils.isNullOrEmpty(tourMarker.getLabel())) {
-                  continue;
-               }
-
-               final int serieIndex = tourMarker.getSerieIndex();
-
-               /*
-                * check bounds because when a tour is split, it can happen that the marker serie
-                * index is out of scope
-                */
-               if (serieIndex >= latitudeSerie.length) {
-                  continue;
-               }
-
-               // draw tour marker
-               if (drawTourMarker(
-                     gcTile,
-                     map,
-                     tile,
-                     latitudeSerie[serieIndex],
-                     longitudeSerie[serieIndex],
-                     tourMarker,
-                     parts)) {
-
-                  markerCounter++;
-               }
-            }
-
-            isContentInTile = isContentInTile || markerCounter > 0;
-         }
-      }
-      return isContentInTile;
-   }
-
-   private boolean doPaint_Pauses(final GC gcTile,
-                                  final Map2 map,
-                                  final Tile tile,
-                                  final int parts,
-                                  boolean isContentInTile,
-                                  final TourData tourData,
-                                  final double[] latitudeSerie,
-                                  final double[] longitudeSerie) {
-
-      if (tourData.isMultipleTours()) {
-
-         final int numberOfTours = tourData.multipleTourStartIndex.length;
-         final int[] multipleStartTimeIndex = tourData.multipleTourStartIndex;
-         final int[] multipleNumberOfPauses = tourData.multipleNumberOfPauses;
-         final ZonedDateTime[] multipleTourZonedStartTime = tourData.multipleTourZonedStartTime;
-
-         if (multipleStartTimeIndex.length == 0) {
-            return isContentInTile;
-         }
-
-         int tourSerieIndex = 0;
-         int numberOfPauses = 0;
-         long tourStartTime = 0;
-         final List<List<Long>> allTourPauses = tourData.multipleTourPauses;
-         int currentTourPauseIndex = 0;
-         int pauseCounter = 0;
-         final int[] timeSerie = tourData.timeSerie;
-         for (int tourIndex = 0; tourIndex < numberOfTours; ++tourIndex) {
-
-            tourStartTime = multipleTourZonedStartTime[tourIndex].toInstant().toEpochMilli();
-            numberOfPauses = multipleNumberOfPauses[tourIndex];
-            tourSerieIndex = multipleStartTimeIndex[tourIndex];
-
-            for (int relativeTourPauseIndex = 0; relativeTourPauseIndex < numberOfPauses;) {
-
-               final long pausedTime_Start = allTourPauses.get(currentTourPauseIndex).get(0);
-               final long pausedTime_End = allTourPauses.get(currentTourPauseIndex).get(1);
-               final long pausedTime_Data = allTourPauses.get(currentTourPauseIndex).get(2);
-
-               final long pauseDuration = Math.round((pausedTime_End - pausedTime_Start) / 1000f);
-
-               long previousTourElapsedTime = 0;
-               if (tourIndex > 0) {
-                  previousTourElapsedTime = timeSerie[multipleStartTimeIndex[tourIndex] - 1] * 1000L;
-               }
-
-               for (; tourSerieIndex < timeSerie.length; ++tourSerieIndex) {
-
-                  final long currentTime = timeSerie[tourSerieIndex] * 1000L + tourStartTime - previousTourElapsedTime;
-
-                  if (currentTime >= pausedTime_Start) {
-                     break;
-                  }
-               }
-
-               final boolean isPauseAnAutoPause = pausedTime_Data == -1 || pausedTime_Data == 1;
-
-               // exclude pauses
-               if (isTourPauseVisible(isPauseAnAutoPause, pauseDuration)) {
-
-                  // draw tour pause
-                  if (drawTourPauses(
-                        gcTile,
-                        map,
-                        tile,
-                        latitudeSerie[tourSerieIndex],
-                        longitudeSerie[tourSerieIndex],
-                        pauseDuration,
-                        parts,
-                        isPauseAnAutoPause)) {
-
-                     pauseCounter++;
-                  }
-               }
-
-               ++relativeTourPauseIndex;
-               ++currentTourPauseIndex;
-            }
-         }
-
-         isContentInTile = isContentInTile || pauseCounter > 0;
-
-      } else {
-
-         final long[] pausedTime_Start = tourData.getPausedTime_Start();
-
-         // check if pauses are available
-         if (pausedTime_Start == null || pausedTime_Start.length == 0) {
-            return isContentInTile;
-         }
-
-         final long[] pausedTime_End = tourData.getPausedTime_End();
-         final long[] pausedTime_Data = tourData.getPausedTime_Data();
-
-         // draw tour pauses durations
-
-         int pauseCounter = 0;
-         int serieIndex = 0;
-
-         final int[] timeSerie = tourData.timeSerie;
-         for (int index = 0; index < pausedTime_Start.length; ++index) {
-
-            final long startTime = pausedTime_Start[index];
-            final long endTime = pausedTime_End[index];
-
-            for (int timeSerieIndex = serieIndex; timeSerieIndex < timeSerie.length; ++timeSerieIndex) {
-
-               final long currentTime = timeSerie[timeSerieIndex] * 1000L + tourData.getTourStartTimeMS();
-
-               if (currentTime >= startTime) {
-                  serieIndex = timeSerieIndex;
-                  break;
-               }
-            }
-
-            /*
-             * check bounds because when a tour is split, it can happen that the marker serie
-             * index is out of scope
-             */
-            if (serieIndex >= latitudeSerie.length) {
-               continue;
-            }
-
-            final long pauseDuration = Math.round((endTime - startTime) / 1000f);
-
-            final boolean isPauseAnAutoPause = pausedTime_Data == null
-                  ? true
-                  : pausedTime_Data[index] == 1;
-
-            // exclude pauses
-            if (isTourPauseVisible(isPauseAnAutoPause, pauseDuration) == false) {
-               continue;
-            }
-
-            // draw tour pause
-            if (drawTourPauses(
-                  gcTile,
-                  map,
-                  tile,
-                  latitudeSerie[serieIndex],
-                  longitudeSerie[serieIndex],
-                  pauseDuration,
-                  parts,
-                  isPauseAnAutoPause)) {
-
-               pauseCounter++;
-            }
-
-            isContentInTile = isContentInTile || pauseCounter > 0;
-         }
-      }
       return isContentInTile;
    }
 
@@ -2101,348 +1771,10 @@ public class TourMapPainter extends Map2Painter {
     * @param gcTile
     * @param map
     * @param tile
-    * @param latitude
-    * @param longitude
-    * @param tourMarker
-    * @param parts
-    * @return Returns <code>true</code> when marker has been painted
-    */
-   private boolean drawTourMarker(final GC gcTile,
-                                  final Map2 map,
-                                  final Tile tile,
-                                  final double latitude,
-                                  final double longitude,
-                                  final TourMarker tourMarker,
-                                  final int parts) {
-
-      final MP mp = map.getMapProvider();
-      final int zoomLevel = map.getZoom();
-      final int tileSize = mp.getTileSize();
-      final int devPartOffset = ((parts - 1) / 2) * tileSize;
-
-      // get world viewport for the current tile
-      final int worldTileX = tile.getX() * tileSize;
-      final int worldTileY = tile.getY() * tileSize;
-
-      // convert lat/long into world pixels
-      final Point worldMarkerPos = mp.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
-
-      // convert world position into device position
-      final int devMarkerPosX = worldMarkerPos.x - worldTileX;
-      final int devMarkerPosY = worldMarkerPos.y - worldTileY;
-
-      Rectangle markerBounds = tourMarker.getMarkerBounds();
-      if (markerBounds == null) {
-
-         /*
-          * create and cache marker bounds
-          */
-
-         final org.eclipse.swt.graphics.Point labelExtent = gcTile.textExtent(tourMarker.getLabel());
-
-         final int bannerWidth = labelExtent.x + 2 * MARKER_MARGIN + 1;
-         final int bannerHeight = labelExtent.y + 2 * MARKER_MARGIN;
-
-         final int markerImageWidth = bannerWidth;
-         final int markerImageHeight = bannerHeight + MARKER_POLE;
-
-         markerBounds = new Rectangle(bannerWidth, bannerHeight, markerImageWidth, markerImageHeight);
-
-         tourMarker.setMarkerBounds(markerBounds);
-      }
-
-      final boolean isMarkerInTile = isInTile_Bounds(markerBounds, devMarkerPosX, devMarkerPosY, tileSize);
-      if (isMarkerInTile) {
-
-         int devX;
-         int devY;
-
-         final Image tourMarkerImage = drawTourMarkerImage(gcTile.getDevice(), tourMarker.getLabel(), markerBounds);
-         {
-            devX = devMarkerPosX - markerBounds.width / 2;
-            devY = devMarkerPosY - markerBounds.height;
-
-            devX += devPartOffset;
-            devY += devPartOffset;
-
-            gcTile.drawImage(tourMarkerImage, devX, devY);
-         }
-         tourMarkerImage.dispose();
-
-         tile.addMarkerBounds(devX, devY, markerBounds.x, markerBounds.y, zoomLevel, parts);
-      }
-
-      return isMarkerInTile;
-   }
-
-   /**
-    * create an image for the tour marker
-    *
-    * @param device
-    * @param markerLabel
-    * @param markerBounds
-    * @return
-    */
-   private Image drawTourMarkerImage(final Device device, final String markerLabel, final Rectangle markerBounds) {
-
-      final int bannerWidth = markerBounds.x;
-      final int bannerHeight = markerBounds.y;
-      final int bannerWidth2 = bannerWidth / 2;
-
-      final int markerImageWidth = markerBounds.width;
-      final int markerImageHeight = markerBounds.height;
-
-      final int arcSize = 5;
-
-      final RGB rgbTransparent = Map2.getTransparentRGB();
-
-      final ImageData markerImageData = new ImageData(
-            markerImageWidth,
-            markerImageHeight,
-            24,
-            new PaletteData(0xff, 0xff00, 0xff0000));
-
-      markerImageData.transparentPixel = markerImageData.palette.getPixel(rgbTransparent);
-
-      final Image markerImage = new Image(device, markerImageData);
-      final Rectangle markerImageBounds = markerImage.getBounds();
-
-      final Color transparentColor = new Color(device, rgbTransparent);
-      final Color bannerColor = new Color(device, 0x65, 0xF9, 0x1F);
-      final Color bannerBorderColor = new Color(device, 0x69, 0xAF, 0x3D);
-
-      final GC gc = new GC(markerImage);
-
-      {
-         // fill transparent color
-         gc.setBackground(transparentColor);
-         gc.fillRectangle(markerImageBounds);
-
-         gc.setBackground(bannerColor);
-         gc.fillRoundRectangle(0, 0, bannerWidth, bannerHeight, arcSize, arcSize);
-
-         // draw banner border
-         gc.setForeground(bannerBorderColor);
-         gc.drawRoundRectangle(0, 0, bannerWidth - 1, bannerHeight - 1, arcSize, arcSize);
-
-         // draw text
-         gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-         gc.drawText(
-               markerLabel,
-               MARKER_MARGIN + 1,
-               MARKER_MARGIN,
-               true);
-
-         // draw pole
-         gc.setForeground(bannerBorderColor);
-         gc.drawLine(bannerWidth2 - 1, bannerHeight, bannerWidth2 - 1, bannerHeight + MARKER_POLE);
-         gc.drawLine(bannerWidth2 + 1, bannerHeight, bannerWidth2 + 1, bannerHeight + MARKER_POLE);
-
-         gc.setForeground(bannerColor);
-         gc.drawLine(bannerWidth2 - 0, bannerHeight, bannerWidth2 - 0, bannerHeight + MARKER_POLE);
-
-         // draw image debug border
-//       gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-//       gc.drawRectangle(0, 0, markerImageBounds.width - 1, markerImageBounds.height - 1);
-      }
-
-      gc.dispose();
-
-      bannerColor.dispose();
-      bannerBorderColor.dispose();
-      transparentColor.dispose();
-
-      return markerImage;
-   }
-
-   /**
-    * @param gcTile
-    * @param map
-    * @param tile
-    * @param latitude
-    * @param longitude
-    * @param tourTimerPause
-    * @param parts
-    * @param isAutoPause
-    * @return Returns <code>true</code> when pause duration has been painted
-    */
-   private boolean drawTourPauses(final GC gcTile,
-                                  final Map2 map,
-                                  final Tile tile,
-                                  final double latitude,
-                                  final double longitude,
-                                  final long pauseDuration,
-                                  final int parts,
-                                  final boolean isAutoPause) {
-
-      final MP mp = map.getMapProvider();
-      final int zoomLevel = map.getZoom();
-      final int tileSize = mp.getTileSize();
-      final int devPartOffset = ((parts - 1) / 2) * tileSize;
-
-      // get world viewport for the current tile
-      final int worldTileX = tile.getX() * tileSize;
-      final int worldTileY = tile.getY() * tileSize;
-
-      // convert lat/long into world pixels
-      final Point worldMarkerPos = mp.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
-
-      // convert world position into device position
-      final int devMarkerPosX = worldMarkerPos.x - worldTileX;
-      final int devMarkerPosY = worldMarkerPos.y - worldTileY;
-
-      /*
-       * create and cache marker bounds
-       */
-
-      final String pauseDurationText = UI.format_hh_mm_ss(pauseDuration);
-      final org.eclipse.swt.graphics.Point labelExtent = gcTile.textExtent(pauseDurationText);
-
-      final int bannerWidth = labelExtent.x + 2 * MARKER_MARGIN + 1;
-      final int bannerHeight = labelExtent.y + 2 * MARKER_MARGIN;
-
-      final int markerImageWidth = bannerWidth;
-      final int markerImageHeight = bannerHeight + MARKER_POLE;
-
-      final Rectangle pauseBounds = new Rectangle(bannerWidth, bannerHeight, markerImageWidth, markerImageHeight);
-
-      final boolean isPauseInTile = isInTile_Bounds(pauseBounds, devMarkerPosX, devMarkerPosY, tileSize);
-      if (isPauseInTile) {
-
-         int devX;
-         int devY;
-
-         final Image tourMarkerImage = drawTourPauses_Image(gcTile.getDevice(), pauseDurationText, pauseBounds, isAutoPause);
-         {
-            devX = devMarkerPosX - pauseBounds.width / 2;
-            devY = devMarkerPosY - pauseBounds.height;
-
-            devX += devPartOffset;
-            devY += devPartOffset;
-
-            gcTile.drawImage(tourMarkerImage, devX, devY);
-         }
-         tourMarkerImage.dispose();
-
-         tile.addMarkerBounds(devX, devY, pauseBounds.x, pauseBounds.y, zoomLevel, parts);
-      }
-
-      return isPauseInTile;
-   }
-
-   /**
-    * Create an image for the tour pause
-    *
-    * @param device
-    * @param pauseDurationText
-    * @param pauseBounds
-    * @param isAutoPause
-    * @return
-    */
-   private Image drawTourPauses_Image(final Device device,
-                                      final String pauseDurationText,
-                                      final Rectangle pauseBounds,
-                                      final boolean isAutoPause) {
-
-      final int bannerWidth = pauseBounds.x;
-      final int bannerHeight = pauseBounds.y;
-      final int bannerWidth2 = bannerWidth / 2;
-
-      final int markerImageWidth = pauseBounds.width;
-      final int markerImageHeight = pauseBounds.height;
-
-      final int arcSize = 5;
-
-      final RGB rgbTransparent = Map2.getTransparentRGB();
-
-      final ImageData markerImageData = new ImageData(
-            markerImageWidth,
-            markerImageHeight,
-            24,
-            new PaletteData(0xff, 0xff00, 0xff0000));
-
-      markerImageData.transparentPixel = markerImageData.palette.getPixel(rgbTransparent);
-
-      final Image markerImage = new Image(device, markerImageData);
-      final Rectangle markerImageBounds = markerImage.getBounds();
-
-      final Color transparentColor = new Color(rgbTransparent);
-
-      Color bannerColor;
-      Color bannerBorderColor;
-      Color textColor;
-
-      final Color systemColorRed = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
-      final Color systemColorYellow = Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW);
-
-      final boolean isBackgroundDark = _tourPaintConfig.isBackgroundDark;
-
-      if (isAutoPause) {
-
-         bannerColor = isBackgroundDark
-               ? ThemeUtil.getDefaultBackgroundColor_Shell()
-               : new Color(0xFF, 0xFF, 0xFF);
-
-         bannerBorderColor = new Color(0x69, 0xAF, 0x3D);
-
-         textColor = isBackgroundDark
-               ? new Color(new RGB(0xff, 0xff, 0xff))
-               : new Color(new RGB(0x0, 0x0, 0x0));
-
-      } else {
-
-         // user started/stopped pause
-
-         bannerColor = isBackgroundDark
-               ? ThemeUtil.getDefaultBackgroundColor_Shell()
-               : new Color(0xFF, 0xFF, 0xFF);
-
-         bannerBorderColor = isBackgroundDark
-               ? systemColorYellow
-               : systemColorRed;
-
-         textColor = isBackgroundDark
-               ? systemColorYellow
-               : systemColorRed;
-      }
-
-      final GC gc = new GC(markerImage);
-      {
-         // fill transparent color
-         gc.setBackground(transparentColor);
-         gc.fillRectangle(markerImageBounds);
-
-         gc.setBackground(bannerColor);
-         gc.fillRoundRectangle(0, 0, bannerWidth, bannerHeight, arcSize, arcSize);
-
-         // draw banner border
-         gc.setForeground(bannerBorderColor);
-         gc.drawRoundRectangle(0, 0, bannerWidth - 1, bannerHeight - 1, arcSize, arcSize);
-
-         // draw text
-         gc.setForeground(textColor);
-         gc.drawText(pauseDurationText, MARKER_MARGIN + 1, MARKER_MARGIN, true);
-
-         // draw pole
-         gc.setForeground(bannerBorderColor);
-         gc.drawLine(bannerWidth2 - 1, bannerHeight, bannerWidth2 - 1, bannerHeight + MARKER_POLE);
-         gc.drawLine(bannerWidth2 + 1, bannerHeight, bannerWidth2 + 1, bannerHeight + MARKER_POLE);
-
-         gc.setForeground(bannerColor);
-         gc.drawLine(bannerWidth2 - 0, bannerHeight, bannerWidth2 - 0, bannerHeight + MARKER_POLE);
-      }
-      gc.dispose();
-
-      return markerImage;
-   }
-
-   /**
-    * @param gcTile
-    * @param map
-    * @param tile
     * @param twp
     * @param twpWorldPixel
     * @param parts
+    *
     * @return Returns <code>true</code> when way point has been painted
     */
    private boolean drawTourWayPoint(final GC gcTile,
@@ -2506,6 +1838,7 @@ public class TourMapPainter extends Map2Painter {
     * @param config
     * @param legendBounds
     * @param valueIndex
+    *
     * @return Returns the position for the value according to the value index in the legend,
     *         {@link Integer#MIN_VALUE} when data are not initialized
     */
@@ -2572,6 +1905,7 @@ public class TourMapPainter extends Map2Painter {
     * @param photo
     * @param map
     * @param tile
+    *
     * @return Returns the photo image or <code>null</code> when image is not loaded.
     */
    private Image getPhotoImage(final Photo photo, final Map2 map, final Tile tile) {
@@ -2673,6 +2007,7 @@ public class TourMapPainter extends Map2Painter {
     *           y position for the image
     * @param tileSize
     *           width and height of the tile
+    *
     * @return Returns <code>true</code> when the image is visible in the tile
     */
    private boolean isInTile_Bounds(final Rectangle imageBounds,
@@ -2812,8 +2147,8 @@ public class TourMapPainter extends Map2Painter {
    @Override
    protected boolean isPaintingNeeded(final Map2 map, final Tile tile) {
 
-      final ArrayList<TourData> allTourData = _tourPaintConfig.getTourData();
-      final ArrayList<Photo> allPhotos = _tourPaintConfig.getPhotos();
+      final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
+      final ArrayList<Photo> allPhotos = TourPainterConfiguration.getPhotos();
 
       if (allTourData.isEmpty() && allPhotos.isEmpty()) {
          return false;
@@ -2832,7 +2167,7 @@ public class TourMapPainter extends Map2Painter {
       final int tileWorldPixelLeft = tile.getX() * tileSize;
       final int tileWorldPixelTop = tile.getY() * tileSize;
 
-      if (_tourPaintConfig.isTourVisible
+      if (TourPainterConfiguration.isShowTours
 
             && allTourData.size() > 0
 
@@ -2847,7 +2182,7 @@ public class TourMapPainter extends Map2Painter {
          return true;
       }
 
-      if (_tourPaintConfig.isPhotoVisible
+      if (TourPainterConfiguration.isShowPhotos
 
             && allPhotos.size() > 0
 
@@ -2881,7 +2216,7 @@ public class TourMapPainter extends Map2Painter {
                mp,
                projectionHash,
                mapZoomLevel,
-               _tourPaintConfig.isLinkPhotoDisplayed);
+               TourPainterConfiguration.isLinkPhotoDisplayed);
 
          if (photoWorldPixel == null) {
             continue;
@@ -2930,70 +2265,13 @@ public class TourMapPainter extends Map2Painter {
    }
 
    /**
-    * @param isPauseAnAutoPause
-    *           When <code>true</code> an auto-pause happened otherwise it is an user pause
-    * @param pauseDuration
-    *           Pause duration in seconds
-    * @return
-    */
-   private boolean isTourPauseVisible(final boolean isPauseAnAutoPause, final long pauseDuration) {
-
-      if (_tourPaintConfig.isFilterTourPauses == false) {
-
-         // nothing is filtered
-         return true;
-      }
-
-      boolean isPauseVisible = false;
-
-      if (_tourPaintConfig.isShowAutoPauses && isPauseAnAutoPause) {
-
-         // pause is an auto-pause
-         isPauseVisible = true;
-      }
-
-      if (_tourPaintConfig.isShowUserPauses && !isPauseAnAutoPause) {
-
-         // pause is a user-pause
-         isPauseVisible = true;
-      }
-
-      if (isPauseVisible && _tourPaintConfig.isFilterPauseDuration) {
-
-         // filter by pause duration -> hide pause when condition is true
-
-         final long requiredPauseDuration = _tourPaintConfig.pauseDuration;
-         final Enum<TourFilterFieldOperator> pauseDurationOperator = _tourPaintConfig.pauseDurationOperator;
-
-         if (TourFilterFieldOperator.GREATER_THAN_OR_EQUAL.equals(pauseDurationOperator)) {
-
-            isPauseVisible = (pauseDuration >= requiredPauseDuration) == false;
-
-         } else if (TourFilterFieldOperator.LESS_THAN_OR_EQUAL.equals(pauseDurationOperator)) {
-
-            isPauseVisible = (pauseDuration <= requiredPauseDuration) == false;
-
-         } else if (TourFilterFieldOperator.EQUALS.equals(pauseDurationOperator)) {
-
-            isPauseVisible = (pauseDuration == requiredPauseDuration) == false;
-
-         } else if (TourFilterFieldOperator.NOT_EQUALS.equals(pauseDurationOperator)) {
-
-            isPauseVisible = (pauseDuration != requiredPauseDuration) == false;
-         }
-      }
-
-      return isPauseVisible;
-   }
-
-   /**
     * Set the data serie which is painted
     *
     * @param tourData
     */
    private void setDataSerie(final TourData tourData) {
 
-      final IMapColorProvider legendProvider = _tourPaintConfig.getMapColorProvider();
+      final IMapColorProvider legendProvider = TourPainterConfiguration.getMapColorProvider();
 
       if (legendProvider == null) {
          _dataSerie = null;
@@ -3049,6 +2327,7 @@ public class TourMapPainter extends Map2Painter {
     * @param latitudeSerie
     * @param longitudeSerie
     * @param projectionHash
+    *
     * @return
     */
    private IntHashSet setupTileHashes_Tour(final TourData tourData,
@@ -3095,6 +2374,7 @@ public class TourMapPainter extends Map2Painter {
     * @param mapZoomLevel
     * @param tourWayPoints
     * @param projectionHash
+    *
     * @return
     */
    private IntHashSet setupTileHashes_WayPoint(final TourData tourData,
@@ -3140,6 +2420,7 @@ public class TourMapPainter extends Map2Painter {
     * @param latitudeSerie
     * @param longitudeSerie
     * @param projectionHash
+    *
     * @return
     */
    private Point[] setupWorldPixel_Tour(final TourData tourData,

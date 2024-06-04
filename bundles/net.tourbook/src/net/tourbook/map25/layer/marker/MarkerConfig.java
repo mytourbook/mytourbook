@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -100,7 +100,8 @@ public class MarkerConfig {
 
    @Override
    public String toString() {
-      return "Map25MarkerConfig [" //$NON-NLS-1$
+
+      return "MarkerConfig [" //$NON-NLS-1$
 
             + "id=" + id + ", " //$NON-NLS-1$ //$NON-NLS-2$
             + "name=" + name + ", " //$NON-NLS-1$ //$NON-NLS-2$

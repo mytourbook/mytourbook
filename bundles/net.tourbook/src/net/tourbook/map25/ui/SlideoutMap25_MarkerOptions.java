@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2017, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
@@ -61,12 +62,6 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements IColorSelectorListener {
 
-// SET_FORMATTING_OFF
-
-   private static final String TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT_TOOLTIP   = net.tourbook.map3.Messages.TourTrack_Properties_Button_Default_Tooltip;
-   private static final String TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT           = net.tourbook.map3.Messages.TourTrack_Properties_Button_Default;
-
-// SET_FORMATTING_ON
 
    private static final int        DEFAULT_COMBO_WIDTH = 30;
 
@@ -235,8 +230,8 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
              * Button: Reset
              */
             _btnReset = new Button(container, SWT.PUSH);
-            _btnReset.setText(TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT);
-            _btnReset.setToolTipText(TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT_TOOLTIP);
+            _btnReset.setText(OtherMessages.TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT);
+            _btnReset.setToolTipText(OtherMessages.TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT_TOOLTIP);
             _btnReset.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectConfig_Default(selectionEvent)));
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)

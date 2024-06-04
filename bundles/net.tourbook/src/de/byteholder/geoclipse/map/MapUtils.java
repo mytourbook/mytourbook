@@ -190,6 +190,7 @@ public class MapUtils {
     * Create a transparent image
     *
     * @param imageSize
+    *           Width and height are the same
     *
     * @return
     */
@@ -200,21 +201,44 @@ public class MapUtils {
       if (net.tourbook.common.UI.IS_OSX) {
 
          // OSX
-         transparentImageData = new ImageData(//
-               imageSize,
-               imageSize,
-               32,
-               getPaletteData());
+         transparentImageData = new ImageData(imageSize, imageSize, 32, getPaletteData());
 
       } else {
 
          // Win & Linux
-         transparentImageData = new ImageData(//
-               imageSize,
-               imageSize,
-               24,
-               getPaletteData());
+         transparentImageData = new ImageData(imageSize, imageSize, 24, getPaletteData());
       }
+
+      return createTransparentImageData_10(transparentImageData);
+   }
+
+   /**
+    * Create a transparent image
+    *
+    * @param imageWidth
+    * @param imageHeight
+    *
+    * @return
+    */
+   public static ImageData createTransparentImageData(final int imageWidth, final int imageHeight) {
+
+      ImageData transparentImageData;
+
+      if (net.tourbook.common.UI.IS_OSX) {
+
+         // OSX
+         transparentImageData = new ImageData(imageWidth, imageHeight, 32, getPaletteData());
+
+      } else {
+
+         // Win & Linux
+         transparentImageData = new ImageData(imageWidth, imageHeight, 24, getPaletteData());
+      }
+
+      return createTransparentImageData_10(transparentImageData);
+   }
+
+   private static ImageData createTransparentImageData_10(final ImageData transparentImageData) {
 
       final RGB transparentRGB = Map2.getTransparentRGB();
 
@@ -239,7 +263,7 @@ public class MapUtils {
       }
    }
 
-   public static void setBackgroundColor(final RGB backgroundRGB, final ImageData imageData) {
+   private static void setBackgroundColor(final RGB backgroundRGB, final ImageData imageData) {
 
       final byte blue = (byte) backgroundRGB.blue;
       final byte green = (byte) backgroundRGB.green;

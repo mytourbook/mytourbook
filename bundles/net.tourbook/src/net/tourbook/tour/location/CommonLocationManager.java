@@ -28,7 +28,8 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourLocation;
-import net.tourbook.map.location.SlideoutMapLocation;
+import net.tourbook.map2.view.Map2PointManager;
+import net.tourbook.map2.view.SlideoutMap2_MapPoints;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -143,8 +144,6 @@ public class CommonLocationManager {
    //
    private static final List<TourLocation> _allMapLocations                         = new ArrayList<>();
 
-   private static SlideoutMapLocation      _mapLocationSlideout;
-
    private static int                      _locationRequestZoomlevel                = TourLocationManager.DEFAULT_ZOOM_LEVEL_VALUE;
 
    static {
@@ -159,12 +158,12 @@ public class CommonLocationManager {
       _allMapLocations.add(tourLocation);
 
       // update UI
-      if (_mapLocationSlideout != null) {
 
-         _mapLocationSlideout.open(false);
+      final SlideoutMap2_MapPoints mapPointSlideout = Map2PointManager.getMapPointSlideout(true);
+      if (mapPointSlideout != null) {
 
          // delay to be sure that the slideout is opened
-         PlatformUI.getWorkbench().getDisplay().asyncExec(() -> _mapLocationSlideout.updateUI(tourLocation));
+         PlatformUI.getWorkbench().getDisplay().asyncExec(() -> mapPointSlideout.updateUI(tourLocation));
       }
    }
 
@@ -195,7 +194,7 @@ public class CommonLocationManager {
       return true;
    }
 
-   public static List<TourLocation> getAddressLocations() {
+   public static List<TourLocation> getCommonLocations() {
       return _allMapLocations;
    }
 
@@ -523,8 +522,4 @@ public class CommonLocationManager {
       _locationRequestZoomlevel = locationRequestZoomlevel;
    }
 
-   public static void setMapLocationSlideout(final SlideoutMapLocation mapLocationSlideout) {
-
-      _mapLocationSlideout = mapLocationSlideout;
-   }
 }
