@@ -10895,9 +10895,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          final long startTime = pausedTime_Start[pauseIndex];
          final long endTime = pausedTime_End[pauseIndex];
 
-         /*
-          * Check if pause is filtered out
-          */
          final long pauseDuration = Math.round((endTime - startTime) / 1000f);
 
          final boolean isPauseAnAutoPause = pausedTime_Data == null

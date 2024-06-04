@@ -548,7 +548,7 @@ public class Map2 extends Canvas {
     */
    private Rectangle                                  _clientArea;
 
-   private Rectangle                                  _newOverlaySize;
+   private Rectangle                                  _backgroundImageSize;
 
    private final ListenerList<IBreadcrumbListener>    _allBreadcrumbListener     = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IHoveredTourListener>   _allHoveredTourListeners   = new ListenerList<>(ListenerList.IDENTITY);
@@ -1187,8 +1187,8 @@ public class Map2 extends Canvas {
 
       final ImageData transparentImageData = MapUtils.createTransparentImageData(
 
-            _newOverlaySize.width,
-            _newOverlaySize.height);
+            _backgroundImageSize.width,
+            _backgroundImageSize.height);
 
       final Image transparentImage = new Image(_display, transparentImageData);
 
@@ -5043,7 +5043,7 @@ public class Map2 extends Canvas {
 
       _clientArea = getClientArea();
 
-      _newOverlaySize = new Rectangle(
+      _backgroundImageSize = new Rectangle(
 
             0,
             0,
@@ -5280,8 +5280,8 @@ public class Map2 extends Canvas {
          final Image image2 = _backgroundPainterImage_WhichIsPainted;
 
          if (_isTransparentColorModified
-               || canReuseImage(image1, _newOverlaySize) == false
-               || canReuseImage(image2, _newOverlaySize) == false
+               || canReuseImage(image1, _backgroundImageSize) == false
+               || canReuseImage(image2, _backgroundImageSize) == false
 
          ) {
 
@@ -5582,7 +5582,7 @@ public class Map2 extends Canvas {
          final GC gcCanvas = new GC(canvasImage);
          {
             gcCanvas.setBackground(_mapTransparentColor);
-            gcCanvas.fillRectangle(_newOverlaySize);
+            gcCanvas.fillRectangle(_backgroundImageSize);
 
             if (_mapConfig.isShowTourMarker
                   || _mapConfig.isShowTourLocation
@@ -9633,10 +9633,6 @@ public class Map2 extends Canvas {
       }
 
       resetTours_HoveredData();
-
-//      disposeOverlayImageCache();
-//
-//      paint();
    }
 
    public void setConfig_TourDirection(final boolean isShowTourDirection,

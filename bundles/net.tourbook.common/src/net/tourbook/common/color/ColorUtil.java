@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -71,7 +71,7 @@ public class ColorUtil {
     * @param green
     * @param blue
     *
-    * @return Returns an integer value from a the colors
+    * @return Returns an integer value from the color components
     */
    public static int getColorValue(final int red, final int green, final int blue) {
 

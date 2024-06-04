@@ -48,7 +48,6 @@ public class Map2ConfigManager {
    private static final IPath  _stateLocation       = Platform.getStateLocation(_bundle);
 
    public static final String  CONFIG_DEFAULT_ID_1  = "#1";                                   //$NON-NLS-1$
-
    static final String         CONFIG_DEFAULT_ID_2  = "#2";                                   //$NON-NLS-1$
    static final String         CONFIG_DEFAULT_ID_3  = "#3";                                   //$NON-NLS-1$
    static final String         CONFIG_DEFAULT_ID_4  = "#4";                                   //$NON-NLS-1$

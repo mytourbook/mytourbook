@@ -86,6 +86,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
@@ -1629,6 +1630,61 @@ public class UI {
       tbm.add(contribItem);
 
       tbm.update(true);
+   }
+
+   /**
+    * @param imageWidth
+    * @param imageHeight
+    * @param existingImage
+    * @param gcPainter
+    *
+    * @return Returns create image or reused image
+    */
+   public static Image createTransparentImage(final int imageWidth,
+                                              final int imageHeight,
+                                              final Image existingImage,
+                                              final ImagePainter gcPainter) {
+
+      final Device display = Display.getDefault();
+      final RGB rgbTransparent = new RGB(0xfa, 0xfb, 0xfc);
+
+      Image image;
+
+      if (existingImage == null) {
+
+         /*
+          * Use a color which is likely not used, the previous color 0xfefefe was used and had bad
+          * effects.
+          */
+
+         final ImageData imageData = new ImageData(
+               imageWidth,
+               imageHeight,
+               24,
+               new PaletteData(0xff, 0xff00, 0xff0000));
+
+         imageData.transparentPixel = imageData.palette.getPixel(rgbTransparent);
+
+         image = new Image(display, imageData);
+
+      } else {
+
+         image = existingImage;
+      }
+
+      final GC gc = new GC(image);
+
+      final Color transparentColor = new Color(display, rgbTransparent);
+      {
+         gc.setBackground(transparentColor);
+         gc.fillRectangle(image.getBounds());
+
+         gcPainter.drawImage(gc);
+      }
+      transparentColor.dispose();
+      gc.dispose();
+
+      return image;
    }
 
    public static Composite createUI_PageNoData(final Composite parent, final String message) {

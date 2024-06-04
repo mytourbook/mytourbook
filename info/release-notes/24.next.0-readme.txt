@@ -54,7 +54,13 @@ Experimental
 New
 ===
 
-* 
+* 2D Map
+  - Enhanced display of the
+    - Tour marker
+    - Tour pauses
+    - Tour/common locations
+    https://github.com/mytourbook/mytourbook/issues/1323
+    
 
 Improvements
 ============

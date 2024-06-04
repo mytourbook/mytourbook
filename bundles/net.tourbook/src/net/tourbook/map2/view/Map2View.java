@@ -5069,8 +5069,6 @@ public class Map2View extends ViewPart implements
       _allTourData.clear();
       _allTourData.addAll(allTourData);
 
-//      _directMappingPainter.setLocations_Tour(TourLocationManager.getTourLocations(allTourData));
-
       for (final TourData tourData : allTourData) {
          setVisibleDataPoints(tourData);
       }
@@ -5106,8 +5104,6 @@ public class Map2View extends ViewPart implements
 
       _allTourData.clear();
       _allTourData.add(tourData);
-
-//      _directMappingPainter.setLocations_Tour(getTourLocations(tourData));
 
       setVisibleDataPoints(tourData);
 
@@ -5511,7 +5507,6 @@ public class Map2View extends ViewPart implements
 
       TourPainterConfiguration.isShowBreadcrumbs   = isShowBreadcrumbs;
 
-
       /*
        * Tour direction
        */
@@ -5522,6 +5517,8 @@ public class Map2View extends ViewPart implements
       final float tourDirection_SymbolSize      = Util.getStateInt(_state,          STATE_TOUR_DIRECTION_SYMBOL_SIZE,      STATE_TOUR_DIRECTION_SYMBOL_SIZE_DEFAULT);
       final RGB tourDirection_RGB               = Util.getStateRGB(_state,          STATE_TOUR_DIRECTION_RGB,              STATE_TOUR_DIRECTION_RGB_DEFAULT);
 
+// SET_FORMATTING_ON
+
       _map.setConfig_TourDirection(
             isShowTourDirection,
             isShowTourDirection_Always,
@@ -5530,7 +5527,7 @@ public class Map2View extends ViewPart implements
             tourDirection_SymbolSize,
             tourDirection_RGB);
 
-      _map.setIsInInverseKeyboardPanning(Util.getStateBoolean(_state,   STATE_IS_TOGGLE_KEYBOARD_PANNING,   STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
+      _map.setIsInInverseKeyboardPanning(Util.getStateBoolean(_state, STATE_IS_TOGGLE_KEYBOARD_PANNING, STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
 
       /*
        * Set dim level/color after the map providers are set
@@ -5540,10 +5537,8 @@ public class Map2View extends ViewPart implements
       /*
        * Painting
        */
-      final boolean isBackgroundDark   = isBackgroundDark();
+      final boolean isBackgroundDark = isBackgroundDark();
       TourPainterConfiguration.isBackgroundDark = isBackgroundDark;
-
-// SET_FORMATTING_ON
 
       // enable/disable cluster/marker tooltip
       final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
