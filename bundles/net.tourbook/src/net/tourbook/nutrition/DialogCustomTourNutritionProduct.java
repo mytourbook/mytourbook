@@ -168,7 +168,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             // Label: Beverage quantity
             UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_BeverageQuantity);
 
-            _spinnerBeverageQuantity = UI.createSpinner(container, 2, 0, 10000, 25, 100);
+            _spinnerBeverageQuantity = UI.createSpinner(container, 3, 0, 10000, 25, 100);
             _spinnerBeverageQuantity.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onBeverageQuantityModified()));
             _spinnerBeverageQuantity.addModifyListener(event -> onBeverageQuantityModified());
             _spinnerBeverageQuantity.addMouseWheelListener(mouseEvent -> {
