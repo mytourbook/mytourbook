@@ -17,13 +17,16 @@ package net.tourbook.map2.view;
 
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.PaintedMapPoint;
+import de.byteholder.geoclipse.map.TourPause;
+
+import java.time.ZonedDateTime;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.location.TourLocationUI;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -128,6 +131,10 @@ public class MapPointToolTip extends ToolTip {
    private void createUI_TourMarker(final Composite parent, final Map2Point mapPoint) {
 
       final TourMarker tourMarker = mapPoint.tourMarker;
+      final TourData tourData = tourMarker.getTourData();
+
+      final ZonedDateTime tourStartTime = tourData.getTourStartTime();
+      final ZonedDateTime markerStartTime = TimeTools.getZonedDateTime(tourMarker.getTourTime(), tourStartTime.getZone());
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -168,11 +175,11 @@ public class MapPointToolTip extends ToolTip {
          }
          {
             /*
-             * Tour date/time
+             * Marker date/time
              */
 
             final Label label = new Label(container, SWT.TRAIL);
-            label.setText(TourManager.getTourDateShort(tourMarker.getTourData()));
+            label.setText(TimeTools.Formatter_DateTime_LL.format(markerStartTime));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
 
          }
@@ -181,17 +188,19 @@ public class MapPointToolTip extends ToolTip {
 
    private void createUI_TourPause(final Composite parent, final Map2Point mapPoint) {
 
-      final TourData tourData = mapPoint.tourData;
+      final TourPause tourPause = mapPoint.tourPause;
+      final TourData tourData = tourPause.tourData;
+
+      final ZonedDateTime tourStartTime = tourData.getTourStartTime();
+      final ZonedDateTime pauseStartTime = TimeTools.getZonedDateTime(tourPause.startTime, tourStartTime.getZone());
 
       {
          /*
-          * Tour date/time
+          * Pause date/time
           */
 
          final Label label = new Label(parent, SWT.TRAIL);
-         label.setText(TourManager.getTourDateShort(tourData));
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
-
+         label.setText(TimeTools.Formatter_DateTime_LL.format(pauseStartTime));
       }
    }
 

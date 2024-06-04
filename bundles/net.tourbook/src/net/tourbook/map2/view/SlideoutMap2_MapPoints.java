@@ -658,23 +658,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                }
                {
                   /*
-                   * Locations
-                   */
-                  _lblStats_Locations = new CLabel(statContainer, SWT.NONE);
-                  _lblStats_Locations.setImage(_imageMapLocation_Tour);
-                  _lblStats_Locations.setToolTipText(tooltipLocations);
-                  GridDataFactory.fillDefaults().indent(20, 0).applyTo(_lblStats_Locations);
-
-                  _lblStats_Locations_Visible = new Label(statContainer, SWT.TRAIL);
-                  _lblStats_Locations_Visible.setToolTipText(tooltipLocations);
-                  gd.applyTo(_lblStats_Locations_Visible);
-
-                  _lblStats_Locations_All = new Label(statContainer, SWT.TRAIL);
-                  _lblStats_Locations_All.setToolTipText(tooltipLocations);
-                  gd.applyTo(_lblStats_Locations_All);
-               }
-               {
-                  /*
                    * Tour pauses
                    */
                   _lblStats_TourPauses = new CLabel(statContainer, SWT.NONE);
@@ -689,6 +672,23 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                   _lblStats_TourPauses_All = new Label(statContainer, SWT.TRAIL);
                   _lblStats_TourPauses_All.setToolTipText(tooltipPauses);
                   gd.applyTo(_lblStats_TourPauses_All);
+               }
+               {
+                  /*
+                   * Locations
+                   */
+                  _lblStats_Locations = new CLabel(statContainer, SWT.NONE);
+                  _lblStats_Locations.setImage(_imageMapLocation_Tour);
+                  _lblStats_Locations.setToolTipText(tooltipLocations);
+                  GridDataFactory.fillDefaults().indent(20, 0).applyTo(_lblStats_Locations);
+
+                  _lblStats_Locations_Visible = new Label(statContainer, SWT.TRAIL);
+                  _lblStats_Locations_Visible.setToolTipText(tooltipLocations);
+                  gd.applyTo(_lblStats_Locations_Visible);
+
+                  _lblStats_Locations_All = new Label(statContainer, SWT.TRAIL);
+                  _lblStats_Locations_All.setToolTipText(tooltipLocations);
+                  gd.applyTo(_lblStats_Locations_All);
                }
             }
          }

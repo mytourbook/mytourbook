@@ -1981,7 +1981,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public boolean[]     visiblePoints_ForSurfing;
 
    /**
-    * An array containing the start time of each pause (in milliseconds)
+    * An array containing the absolute start time of each pause (in milliseconds)
     * A timer pause is a device event, triggered by the user or automatically triggered by the device.
     */
    @Transient
@@ -1989,7 +1989,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private long[]       pausedTime_Start;
 
    /**
-    * An array containing the end time of each pause (in milliseconds)
+    * An array containing the absolute end time of each pause (in milliseconds)
     * A timer pause is a device event, triggered by the user or automatically triggered by the device.
     */
    @Transient
@@ -10906,6 +10906,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          final TourPause tourPause = new TourPause();
 
+         tourPause.startTime = startTime;
          tourPause.duration = pauseDuration;
          tourPause.isAutoPause = isPauseAnAutoPause;
          tourPause.tourData = this;

@@ -22,6 +22,7 @@ import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
 public class TourPause {
 
+   public long                              startTime;
    public long                              duration;
 
    public boolean                           isAutoPause;
@@ -35,6 +36,7 @@ public class TourPause {
     */
    private IntObjectHashMap<java.awt.Point> _worldPixelPositions;
 
+
    public TourPause() {}
 
    public java.awt.Point getWorldPixelPosition(final int zoomLevel) {
@@ -47,6 +49,11 @@ public class TourPause {
       return null;
    }
 
+   /**
+    * @param geoPosition
+    * @param worldPixelPosition
+    * @param zoomLevel
+    */
    public void setPosition(final GeoPosition geoPosition,
                            final java.awt.Point worldPixelPosition,
                            final int zoomLevel) {

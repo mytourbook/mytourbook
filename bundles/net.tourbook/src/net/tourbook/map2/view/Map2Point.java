@@ -15,8 +15,9 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import de.byteholder.geoclipse.map.TourPause;
+
 import net.tourbook.common.UI;
-import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
 import net.tourbook.map.location.LocationType;
@@ -61,9 +62,9 @@ public class Map2Point implements ClusterItem {
    public int          numDuplicates_Start;
    public int          numDuplicates_End;
 
-   public TourData     tourData;
-   public TourMarker   tourMarker;
    public TourLocation tourLocation;
+   public TourMarker   tourMarker;
+   public TourPause    tourPause;
 
    /**
     * Type of the tour location {@link #tourLocation}
@@ -74,8 +75,6 @@ public class Map2Point implements ClusterItem {
 
    public Rectangle    boundingBox;
    public Rectangle    boundingBox_Resized;
-
-   public boolean      isPauseAnAutoPause;
 
    @SuppressWarnings("unused")
    private Map2Point() {}

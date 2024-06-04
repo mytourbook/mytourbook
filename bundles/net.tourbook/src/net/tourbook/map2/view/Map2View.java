@@ -1171,7 +1171,7 @@ public class Map2View extends ViewPart implements
 
       } else if (pointType.equals(MapPointType.TOUR_PAUSE)) {
 
-         tourData = mapPoint.tourData;
+         tourData = mapPoint.tourPause.tourData;
       }
 
       if (tourData != null) {

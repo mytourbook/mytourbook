@@ -2150,8 +2150,7 @@ public class Map2 extends Canvas {
          mapPoint.geoPointDevX = devX;
          mapPoint.geoPointDevY = devY;
 
-         mapPoint.tourData = tourPause.tourData;
-         mapPoint.isPauseAnAutoPause = tourPause.isAutoPause;
+         mapPoint.tourPause = tourPause;
 
          mapPoint.setFormattedLabel(UI.format_hh_mm_ss(tourPause.duration));
 
