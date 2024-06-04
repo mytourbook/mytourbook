@@ -79,6 +79,9 @@ Changes
     - Map dimming
     - Filter tour pauses
 
+* Tour Concatenation (Frederic)
+  - Removed the ability to delete the source tours when using the NatTable layout as it was causing random tours to be deleted
+
 
 Changes that require Tour Re-import
 ===================================
