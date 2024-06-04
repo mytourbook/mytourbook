@@ -1768,7 +1768,7 @@ public class UI {
     * Escape the ampersand symbol when it's not a mnemonic but is displayed in a
     * {@link Label#setText(String)}
     * <p>
-    * "The mnemonic indicator character'&' can be escaped by doubling it in the string, causinga
+    * "The mnemonic indicator character'&' can be escaped by doubling it in the string, causing a
     * single '&' to be displayed."
     *
     * @param text
@@ -2481,7 +2481,7 @@ public class UI {
       int xOffset = 0;
       final int horizontalOSOffset = UI.IS_WIN
 
-            // W$ has a horizontal ident which prevents to be exactly centered
+            // W$ has a horizontal indent which prevents to be exactly centered
             ? 4
             : 0;
 
