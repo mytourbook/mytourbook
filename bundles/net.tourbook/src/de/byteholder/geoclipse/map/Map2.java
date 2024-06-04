@@ -5059,18 +5059,23 @@ public class Map2 extends Canvas {
 
          synchronized (_backgroundPainter_Task) {
 
-            _backgroundPainter_Task.cancel(true);
+            // check again, this happens
 
-            try {
+            if (_backgroundPainter_Task != null) {
 
-               // wait until the task is canceled
-               _backgroundPainter_Task.get(5000, TimeUnit.MILLISECONDS);
+               _backgroundPainter_Task.cancel(true);
 
-            } catch (final Exception e) {
+               try {
 
-               // ignore
+                  // wait until the task is canceled
+                  _backgroundPainter_Task.get(5000, TimeUnit.MILLISECONDS);
+
+               } catch (final Exception e) {
+
+                  // ignore
 
 //               StatusUtil.log(e);
+               }
             }
          }
       }
@@ -10254,10 +10259,13 @@ public class Map2 extends Canvas {
 
       final RGB transparentColorAdjusted = new RGB(red, green, blue);
 
-      _mapTransparentRGB = transparentColorAdjusted;
-      _mapTransparentColor = new Color(transparentColorAdjusted);
+      if (transparentColorAdjusted.equals(_mapTransparentRGB) == false) {
 
-      _isTransparentColorModified = true;
+         _mapTransparentRGB = transparentColorAdjusted;
+         _mapTransparentColor = new Color(transparentColorAdjusted);
+
+         _isTransparentColorModified = true;
+      }
    }
 
    private void setupClusterFont(final GC gc, final int newClusterFontSize) {
