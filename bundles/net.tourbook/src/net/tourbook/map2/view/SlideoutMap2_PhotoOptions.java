@@ -238,7 +238,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
 
       _imageSize = Util.getStateInt(_state, STATE_PHOTO_PROPERTIES_IMAGE_SIZE, Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT);
 
-      // ensure that an image is displayed, it happend that image size was 0
+      // ensure that an image is displayed, it happened that image size was 0
       if (_imageSize < 10) {
          _imageSize = Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
       }
