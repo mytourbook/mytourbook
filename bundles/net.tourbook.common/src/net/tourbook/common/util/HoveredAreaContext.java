@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -15,7 +15,7 @@ package net.tourbook.common.util;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * Contains the context for a hovered area which displays a tool tip when the mouse hoveres the
+ * Contains the context for a hovered area which displays a tool tip when the mouse hovered the
  * hovered area.
  * <p>
  * Each property is set in this context or it can be <code>null</code> when documented.
@@ -34,12 +34,12 @@ public class HoveredAreaContext {
    public Image                hoveredImage;
 
    /**
-    * Left corner of the hovereded area relativ to the client area
+    * Left corner of the hovered area relative to the client area
     */
    public int                  hoveredTopLeftX;
 
    /**
-    * top corner of the hovereded area
+    * top corner of the hovered area
     */
    public int                  hoveredTopLeftY;
 
