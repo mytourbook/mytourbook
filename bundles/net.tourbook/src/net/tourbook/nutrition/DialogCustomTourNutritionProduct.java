@@ -158,6 +158,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             // Checkbox: Is Beverage
             _checkIsBeverage = new Button(container, SWT.CHECK);
             _checkIsBeverage.setText(Messages.Dialog_CustomTourNutritionProduct_Label_IsBeverage);
+            _checkIsBeverage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> enableControls()));
             GridDataFactory.fillDefaults()
                   .span(3, 1)
                   .align(SWT.BEGINNING, SWT.CENTER)
@@ -176,6 +177,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
                onBeverageQuantityModified();
             });
+            _spinnerBeverageQuantity.setEnabled(false);
             GridDataFactory.fillDefaults()
                   .hint(_pc.convertWidthInCharsToPixels(5), SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
@@ -185,6 +187,11 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             UI.createLabel(container, UI.UNIT_FLUIDS_L);
          }
       }
+   }
+
+   private void enableControls() {
+
+      _spinnerBeverageQuantity.setEnabled(_checkIsBeverage.getSelection());
    }
 
    private void enableOK(final boolean isEnabled) {
@@ -228,7 +235,9 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       _calories = UI.verifyIntegerValue(_txtCalories.getText()) ? Integer.valueOf(_txtCalories.getText()) : 0;
       _sodium = UI.verifyIntegerValue(_txtSodium.getText()) ? Integer.valueOf(_txtSodium.getText()) : 0;
       _isBeverage = _checkIsBeverage.getSelection();
-      _beverageQuantity = _spinnerBeverageQuantity.getSelection();
+      _beverageQuantity = _isBeverage
+            ? _spinnerBeverageQuantity.getSelection()
+            : 0;
 
       super.okPressed();
    }
@@ -293,6 +302,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       if (_isInUIInit) {
          return;
       }
+
       final boolean isCustomTourNutritionProductValid = StringUtils.hasContent(_txtName.getText());
       enableOK(isCustomTourNutritionProductValid);
    }
