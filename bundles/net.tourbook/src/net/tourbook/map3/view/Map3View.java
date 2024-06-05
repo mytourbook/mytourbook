@@ -195,11 +195,11 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    private final IPreferenceStore           _prefStore_Common                      = CommonActivator.getPrefStore();
    private final IDialogSettings            _state                                 = TourbookPlugin.getState(getClass().getCanonicalName());
-   private ActionMap3Color                  _actionMap3Color;
 
    // SET_FORMATTING_ON
 
    private Action_ExportMap_SubMenu          _actionExportMap_SubMenu;
+   private ActionMap3Color                   _actionMap3Color;
    private ActionOpenPrefDialog              _actionMap3Colors;
    private ActionMapBookmarks                _actionMapBookmarks;
    //	private ActionOpenGLVersions					_actionOpenGLVersions;
@@ -285,7 +285,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
     * UI controls
     */
    private Composite _parent;
-
    private Composite _mapContainer;
    private Frame     _awtFrame;
    private Menu      _swtContextMenu;
