@@ -892,9 +892,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 
       final Object viewerItem = event.getElement();
 
-      if (viewerItem instanceof Map3GradientColorProvider) {
-
-         final Map3GradientColorProvider colorProvider = (Map3GradientColorProvider) viewerItem;
+      if (viewerItem instanceof final Map3GradientColorProvider colorProvider) {
 
          if (event.getChecked()) {
 
@@ -914,11 +912,10 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 
    private boolean onViewerIsChecked(final Object element) {
 
-      if (element instanceof Map3GradientColorProvider) {
+      if (element instanceof final Map3GradientColorProvider mgrColorProvider) {
 
          // set checked only active color providers
 
-         final Map3GradientColorProvider mgrColorProvider = (Map3GradientColorProvider) element;
          final boolean isActiveColorProfile = mgrColorProvider.getMap3ColorProfile().isActiveColorProfile();
 
          return isActiveColorProfile;
@@ -954,9 +951,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
             final TableItem item = (TableItem) event.item;
             final Object itemData = item.getData();
 
-            if (itemData instanceof Map3GradientColorProvider) {
-
-               final Map3GradientColorProvider colorProvider = (Map3GradientColorProvider) itemData;
+            if (itemData instanceof final Map3GradientColorProvider colorProvider) {
 
                final Image image = getProfileImage(colorProvider);
 
