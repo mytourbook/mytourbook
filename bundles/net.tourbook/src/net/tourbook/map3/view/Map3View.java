@@ -192,7 +192,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    private static final WorldWindowGLCanvas _wwCanvas                              = Map3Manager.getWWCanvas();
 
    private final IPreferenceStore           _prefStore                             = TourbookPlugin.getPrefStore();
-
    private final IPreferenceStore           _prefStore_Common                      = CommonActivator.getPrefStore();
    private final IDialogSettings            _state                                 = TourbookPlugin.getState(getClass().getCanonicalName());
 
