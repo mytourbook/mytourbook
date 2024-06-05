@@ -190,7 +190,6 @@ public class AdvancedMenuForActions {
    private void onArmEventOpenMenu() {
 
       // it's possible that a tool tip is displayed
-      //todo fb ca part aussi de la
       if (_toolTip != null) {
          _toolTip.hide();
       }
