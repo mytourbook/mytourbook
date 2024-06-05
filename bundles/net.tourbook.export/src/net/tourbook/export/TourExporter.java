@@ -1013,8 +1013,8 @@ public class TourExporter {
       if (_displayNotificationPopup) {
 
          final String notificationText = exportStatus
-               ? "\u2713 " + String.format(Messages.Dialog_Export_Message_Successful, exportFileName) //$NON-NLS-1$
-               : "\u274C" + String.format(Messages.Dialog_Export_Message_Unsuccessful, exportFileName); //$NON-NLS-1$
+               ? UI.SYMBOL_HEAVY_CHECK_MARK + UI.SPACE + String.format(Messages.Dialog_Export_Message_Successful, exportFileName)
+               : UI.SYMBOL_CROSS_MARK + UI.SPACE + String.format(Messages.Dialog_Export_Message_Unsuccessful, exportFileName);
 
          UI.openNotificationPopup(Messages.dialog_export_dialog_title, _imageDescriptor, notificationText);
       }
