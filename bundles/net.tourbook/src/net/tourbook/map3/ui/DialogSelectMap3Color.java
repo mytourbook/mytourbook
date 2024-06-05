@@ -144,14 +144,6 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
    private TableColumn _tableColumn_ProfileImage;
 
    private final class WaitTimer implements Runnable {
-      private void open_Runnable() {
-
-         _isWaitTimerStarted = false;
-
-         if (_canOpenToolTip) {
-            showToolTip();
-         }
-      }
 
       @Override
       public void run() {
@@ -1042,6 +1034,15 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 
             Display.getCurrent().timerExec(50, _waitTimer);
          }
+      }
+   }
+
+   private void open_Runnable() {
+
+      _isWaitTimerStarted = false;
+
+      if (_canOpenToolTip) {
+         showToolTip();
       }
    }
 
