@@ -298,8 +298,8 @@ public class Map2 extends Canvas {
    private static final RGB              MAP_DEFAULT_BACKGROUND_RGB = new RGB(0x40, 0x40, 0x40);
 
    private static RGB                    _mapTransparentRGB;
-   private Color                         _mapTransparentColor;
-   private boolean                       _isTransparentColorModified;
+   private static Color                  _mapTransparentColor;
+   private static boolean                _isTransparentColorModified;
 
    private Color                         _defaultBackgroundColor;
 
@@ -843,7 +843,20 @@ public class Map2 extends Canvas {
     */
    public static RGB getTransparentRGB() {
 
+      if (_mapTransparentRGB == null) {
+
+         updateTransparencyColor(Map2View.STATE_MAP_TRANSPARENCY_COLOR_DEFAULT);
+      }
+
       return _mapTransparentRGB;
+   }
+
+   private static void updateTransparencyColor(final RGB transparentColor) {
+
+      _mapTransparentRGB = transparentColor;
+      _mapTransparentColor = new Color(transparentColor);
+
+      _isTransparentColorModified = true;
    }
 
    public void actionManageOfflineImages(final Event event) {
@@ -10257,14 +10270,13 @@ public class Map2 extends Canvas {
          red = red - 1;
       }
 
-      final RGB transparentColorAdjusted = new RGB(red, green, blue);
+      final RGB newTransparentColor = new RGB(red, green, blue);
 
-      if (transparentColorAdjusted.equals(_mapTransparentRGB) == false) {
+      if (newTransparentColor.equals(_mapTransparentRGB) == false) {
 
-         _mapTransparentRGB = transparentColorAdjusted;
-         _mapTransparentColor = new Color(transparentColorAdjusted);
+         // transparent color is modified
 
-         _isTransparentColorModified = true;
+         updateTransparencyColor(newTransparentColor);
       }
    }
 
