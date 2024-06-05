@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="build.eclipse.nl.repo.feature"
+      label="Eclipse NL Repository"
+      version="4.23.0.qualifier"
+      provider-name="MyTourbook">
+
+   <description>
+      Eclipse language plugins
+   </description>
+
+   <url>
+      <update url="https://github.com/mytourbook/mytourbook.github.io/"/>
+   </url>
+
+   <plugin
+         id="build.eclipse.nl.repo.plugin"
+         version="0.0.0"/>
+
+</feature>

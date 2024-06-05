@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Eclipse NL Repo Plugin
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-SymbolicName: build.eclipse.nl.repo.plugin;singleton:=true
+Bundle-Version: 4.23.0.qualifier
+Bundle-Vendor: MyTourbook
+Automatic-Module-Name: build.eclipse.nl.repo.plugin
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: plugins/

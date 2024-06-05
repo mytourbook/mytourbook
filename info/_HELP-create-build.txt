@@ -93,6 +93,10 @@ Setup the graddle wrapper in the build folder:
 
 see "build\build.eclipse.4.23.nl.repo\How to update this p2 repo.txt"
 
+      - Select folder "C:\DAT\MT\mytourbook"   
+
+      - Run "mvn verify -P build-nl-repo"
+
 
 
 ################################################################

@@ -62,6 +62,13 @@
             <module>build/build.update-site-no-NL</module>
          </modules>
       </profile>
+
+      <profile>
+         <id>build-nl-repo</id>
+         <modules>
+            <module>build/build.eclipse.nl.repo.update-site</module>
+         </modules>
+      </profile>
       
    </profiles>
 
