@@ -144,7 +144,6 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
    private TableColumn _tableColumn_ProfileImage;
 
    private final class WaitTimer implements Runnable {
-
       @Override
       public void run() {
          open_Runnable();
