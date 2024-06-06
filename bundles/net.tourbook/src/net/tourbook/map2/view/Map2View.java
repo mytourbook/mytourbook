@@ -3593,8 +3593,7 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   @Override
-   public void onSelectionChanged(final ISelection selection) {
+   private void onSelectionChanged(final ISelection selection) {
 
       if (_isPartVisible == false) {
 
@@ -4834,9 +4833,8 @@ public class Map2View extends ViewPart implements
       _actionMap2Slideout_PhotoFilter.getPhotoFilterSlideout().updateUI_NumberOfPhotos();
    }
 
-   @Override
    @PersistState
-   public void saveState() {
+   private void saveState() {
 
 // SET_FORMATTING_OFF
 
