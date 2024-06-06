@@ -9,10 +9,6 @@
       Eclipse language plugins
    </description>
 
-   <url>
-      <update url="https://github.com/mytourbook/mytourbook.github.io/"/>
-   </url>
-
    <plugin
          id="build.eclipse.nl.repo.plugin"
          version="0.0.0"/>

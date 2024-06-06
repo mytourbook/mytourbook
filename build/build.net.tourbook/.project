@@ -59,5 +59,9 @@
          <type>1</type>
       </link>
 
+      <link>                                    
+         <name>pom-70-BUILD.ECLIPSE.NL.REPO.xml</name>                <locationURI>PARENT-2-PROJECT_LOC/build.eclipse.nl.repo/pom.xml</locationURI>
+         <type>1</type>                         
+      </link>                                   
    </linkedResources>
 </projectDescription>

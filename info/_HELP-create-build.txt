@@ -91,11 +91,13 @@ Setup the graddle wrapper in the build folder:
  Update Eclipse NL repo
 ###########################
 
-see "build\build.eclipse.4.23.nl.repo\How to update this p2 repo.txt"
+See also "build\build.eclipse.4.23.nl.repo\How to update this p2 repo.txt"
 
-      - Select folder "C:\DAT\MT\mytourbook"   
+      - Select folder   C:\DAT\MT\mytourbook\build.eclipse.nl.repo
 
-      - Run "mvn verify -P build-nl-repo"
+      - Run             "mvn verify"
+
+      - Run             "mvn verify -X --log-file mvn-log.txt"      this will log into a file
 
 
 
