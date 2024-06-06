@@ -99,7 +99,7 @@ see "build\build.eclipse.4.23.nl.repo\How to update this p2 repo.txt"
 Create Dojo files, when web-UI in net.tourbook.web is modified
 ################################################################
 
-   - Set "IS_DEBUG = false" in net.tourbook.web.WEB 
+   - Set "IS_DEBUG = false" in net.tourbook.web/WEB.java 
    - 1. run script /build.net.tourbook.ant/build-files/Convert-i18-To-Dojo.xml
    - 2. run script /net.tourbook.web/build-files/Create-Dojo-Bundle.xml
 
