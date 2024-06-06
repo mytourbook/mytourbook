@@ -10,7 +10,7 @@
    <name>MyTourbook App</name>
 
    <artifactId>mytourbook-app</artifactId>   <groupId>net.tourbook</groupId>
-                                             <version>24.5.0-SNAPSHOT</version>
+                                             <version>24.6.0-SNAPSHOT</version>
    <packaging>pom</packaging>
    
    <dependencies>
@@ -62,13 +62,6 @@
             <module>build/build.update-site-no-NL</module>
          </modules>
       </profile>
-
-      <profile>
-         <id>build-nl-repo</id>
-         <modules>
-            <module>build/build.eclipse.nl.repo.update-site</module>
-         </modules>
-      </profile>
       
    </profiles>
 
@@ -100,18 +93,23 @@
       
       <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build 
       <repository> <id>eclipse.4.23.nl</id> <layout>p2</layout> <url>file:build/build.eclipse.4.23.nl.repo</url> </repository>
+      
+      <repository> <id>eclipse.4.23.nl</id> <layout>p2</layout> <url>file:build.eclipse.nl.repo/build.eclipse.nl.repo.update-site/target/repository</url> </repository>
       -->
-      <repository> <id>eclipse.4.23.nl</id> <layout>p2</layout> <url>file:build.eclipse.nl.repo/build.eclipse.nl.repo.update-site/target/repository/</url> </repository>
+      <repository> <id>eclipse.4.23.nl</id> <layout>p2</layout> 
+
+         <url>file:///C:/DAT/MT/mytourbook/build.eclipse.nl.repo/build.eclipse.nl.repo.update-site/target/repository/</url> 
+
+      </repository>
 
    </repositories>
 
    <build>
    
-      <testSourceDirectory>${project.basedir}/src-test</testSourceDirectory>
-
 <!-- 
-      <defaultGoal>clean verify</defaultGoal>
--->
+      <testSourceDirectory>${project.basedir}/src-test</testSourceDirectory>
+ -->   
+
       <plugins>
 
          <plugin>
@@ -128,7 +126,7 @@
                <!-- Fix this problem (and propably others)
 
                 Access restriction: The method 'BaseDateTime.getMillis()' is not API 
-                (restriction on classpath entry 'C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.jars\joda-time-2.1.jar')
+                (restriction on classpath entry 'C:\DAT\MT\mytourbook\bun/les\net.tourbook.ext.jars\joda-time-2.1.jar')
 
                 -->
                <compilerArgument>-warn:none</compilerArgument>
