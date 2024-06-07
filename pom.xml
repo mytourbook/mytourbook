@@ -95,12 +95,12 @@
       <repository> <id>eclipse.4.23.nl</id> <layout>p2</layout> <url>file:build/build.eclipse.4.23.nl.repo</url> </repository>
       
       <repository> <id>eclipse.4.23.nl</id> <layout>p2</layout> <url>file:build.eclipse.nl.repo/build.eclipse.nl.repo.update-site/target/repository</url> </repository>
-      -->
       <repository> <id>eclipse.4.23.nl</id> <layout>p2</layout> 
 
          <url>file:///C:/DAT/MT/mytourbook/build.eclipse.nl.repo/build.eclipse.nl.repo.update-site/target/repository</url> 
 
       </repository>
+      -->
 
    </repositories>
 

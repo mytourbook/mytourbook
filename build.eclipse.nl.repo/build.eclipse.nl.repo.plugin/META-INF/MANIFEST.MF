@@ -7,9 +7,4 @@ Bundle-Version: 4.23.0.qualifier
 Bundle-Vendor: MyTourbook
 Automatic-Module-Name: build.eclipse.nl.repo.plugin
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: org.eclipse.core.commands.nl_cs_4.23.0.v20230221055001.jar,
- org.eclipse.core.commands.nl_de_4.23.0.v20230221055001.jar,
- org.eclipse.core.commands.nl_es_4.23.0.v20230221055001.jar,
- org.eclipse.core.commands.nl_fr_4.23.0.v20230221055001.jar,
- org.eclipse.core.commands.nl_it_4.23.0.v20230221055001.jar,
- org.eclipse.core.commands.nl_nl_4.23.0.v20230221055001.jar
+Bundle-ClassPath: plugins/

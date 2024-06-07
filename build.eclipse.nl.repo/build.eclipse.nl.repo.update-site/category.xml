@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <bundle id="build.eclipse.nl.repo.plugin">
+   <feature id="build.eclipse.nl.repo.feature">
       <category name="build.eclipse.nl.repo.update-site"/>
-   </bundle>
+   </feature>
    <category-def name="build.eclipse.nl.repo.update-site" label="Eclipse NL repo"/>
 </site>
