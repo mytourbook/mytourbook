@@ -1809,8 +1809,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       }
    }
 
-   @Override
-   public void restoreState() {
+   private void restoreState() {
 
       final boolean isTourAvailable = _allTours.size() > 0;
 

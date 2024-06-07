@@ -1897,8 +1897,7 @@ public class Map25View extends ViewPart implements
       updateFilteredPhotos();
    }
 
-   @Override
-   public void restoreState() {
+   protected void restoreState() {
 
 // SET_FORMATTING_OFF
 

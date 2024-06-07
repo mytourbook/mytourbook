@@ -20,6 +20,4 @@ import org.eclipse.swt.graphics.Image;
 public interface IMapView {
 
    Image getMapViewImage();
-
-   void restoreState();
 }

@@ -4601,8 +4601,7 @@ public class Map2View extends ViewPart implements
       _map.paint();
    }
 
-   @Override
-   public void restoreState() {
+   private void restoreState() {
 
       // is show tour
       _isShowTour = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_IN_MAP, true);
