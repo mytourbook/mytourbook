@@ -162,7 +162,7 @@ public class ParticleStore {
 
             _maximumNrOfParticles *= 2;
 
-            System.out.println("ALLOCATING PARTICLE-DATA-SPACE - SPACE FOR " + (_maximumNrOfParticles) + " PARTICLES");
+            System.out.println("ALLOCATING PARTICLE-DATA-SPACE - SPACE FOR " + (_maximumNrOfParticles) + " PARTICLES"); //$NON-NLS-1$ //$NON-NLS-2$
 
             _particleData = newPData;
 

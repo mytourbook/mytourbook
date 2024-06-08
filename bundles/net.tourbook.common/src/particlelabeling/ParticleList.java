@@ -120,7 +120,7 @@ public class ParticleList {
       //allocating new memory
       if (numParticlesWithinCell == _maxLength) {
 
-         System.out.println("ALLOCAING NEW GRIDCELL-SPACE - SPACE FOR " + _maxLength + " PARTICLES");
+         System.out.println("ALLOCAING NEW GRIDCELL-SPACE - SPACE FOR " + _maxLength + " PARTICLES"); //$NON-NLS-1$ //$NON-NLS-2$
 
          final int[] newRegPart = new int[this._maxLength * 2];
 
