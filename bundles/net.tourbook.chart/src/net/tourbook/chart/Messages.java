@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -53,7 +53,7 @@ public class Messages extends NLS {
    public static String        Month_jan;
    public static String        Month_jul;
    public static String        Month_jun;
-   public static String        Month_mai;
+   public static String        Month_may;
    public static String        Month_mar;
    public static String        Month_nov;
    public static String        Month_oct;

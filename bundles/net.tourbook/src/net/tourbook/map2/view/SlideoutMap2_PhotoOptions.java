@@ -34,10 +34,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -58,7 +55,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
     */
    private static final int      MAX_IMAGE_WIDTH                   = 200;
 
-   final static IPreferenceStore _prefStore                        = TourbookPlugin.getPrefStore();
+   static final IPreferenceStore _prefStore                        = TourbookPlugin.getPrefStore();
    private IDialogSettings       _state;
 
    private ActionResetToDefaults _actionRestoreDefaults;
@@ -191,18 +188,10 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
             _spinnerImageSize.setMaximum(MAX_IMAGE_WIDTH);
             _spinnerImageSize.setIncrement(1);
             _spinnerImageSize.setPageIncrement(10);
-            _spinnerImageSize.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onChangeUI();
-               }
-            });
-            _spinnerImageSize.addMouseWheelListener(new MouseWheelListener() {
-               @Override
-               public void mouseScrolled(final MouseEvent event) {
-                  UI.adjustSpinnerValueOnMouseScroll(event, 10);
-                  onChangeUI();
-               }
+            _spinnerImageSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI()));
+            _spinnerImageSize.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+               onChangeUI();
             });
 
             GridDataFactory.fillDefaults()
@@ -249,7 +238,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
 
       _imageSize = Util.getStateInt(_state, STATE_PHOTO_PROPERTIES_IMAGE_SIZE, Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT);
 
-      // ensure that an image is displayed, it happend that image size was 0
+      // ensure that an image is displayed, it happened that image size was 0
       if (_imageSize < 10) {
          _imageSize = Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
       }

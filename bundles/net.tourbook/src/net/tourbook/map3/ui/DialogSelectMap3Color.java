@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -68,10 +68,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -115,7 +113,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
    private Map3View           _map3View;
 
    private MouseWheelListener _defaultMouseWheelListener;
-   private SelectionAdapter   _defaultSelectionListener;
+   private SelectionListener  _defaultSelectionListener;
 
    private boolean            _canOpenToolTip;
    private boolean            _isWaitTimerStarted;
@@ -832,24 +830,17 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 
       PROFILE_IMAGE_HEIGHT = (int) (_pc.convertHeightInCharsToPixels(1) * 1.0);
 
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeUI();
-         }
-      };
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI());
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onChangeUI();
-         }
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeUI();
       };
    }
 
    /**
     * @param image
+    *
     * @return Returns <code>true</code> when the image is valid, returns <code>false</code> when
     *         the profile image must be created,
     */
@@ -901,9 +892,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 
       final Object viewerItem = event.getElement();
 
-      if (viewerItem instanceof Map3GradientColorProvider) {
-
-         final Map3GradientColorProvider colorProvider = (Map3GradientColorProvider) viewerItem;
+      if (viewerItem instanceof final Map3GradientColorProvider colorProvider) {
 
          if (event.getChecked()) {
 
@@ -923,11 +912,10 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 
    private boolean onViewerIsChecked(final Object element) {
 
-      if (element instanceof Map3GradientColorProvider) {
+      if (element instanceof final Map3GradientColorProvider mgrColorProvider) {
 
          // set checked only active color providers
 
-         final Map3GradientColorProvider mgrColorProvider = (Map3GradientColorProvider) element;
          final boolean isActiveColorProfile = mgrColorProvider.getMap3ColorProfile().isActiveColorProfile();
 
          return isActiveColorProfile;
@@ -963,9 +951,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
             final TableItem item = (TableItem) event.item;
             final Object itemData = item.getData();
 
-            if (itemData instanceof Map3GradientColorProvider) {
-
-               final Map3GradientColorProvider colorProvider = (Map3GradientColorProvider) itemData;
+            if (itemData instanceof final Map3GradientColorProvider colorProvider) {
 
                final Image image = getProfileImage(colorProvider);
 
@@ -997,9 +983,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
       final IStructuredSelection selection = (IStructuredSelection) _colorViewer.getSelection();
       final Object selectedItem = selection.getFirstElement();
 
-      if (selectedItem instanceof Map3GradientColorProvider) {
-
-         final Map3GradientColorProvider selectedColorProvider = (Map3GradientColorProvider) selectedItem;
+      if (selectedItem instanceof final Map3GradientColorProvider selectedColorProvider) {
 
          setActiveColorProvider(selectedColorProvider);
       }
@@ -1073,6 +1057,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 
    /**
     * @param selectedColorProvider
+    *
     * @return Returns <code>true</code> when a new color provider is set, otherwise
     *         <code>false</code>.
     */

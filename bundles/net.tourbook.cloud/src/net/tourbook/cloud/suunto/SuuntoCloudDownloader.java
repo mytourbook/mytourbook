@@ -237,28 +237,29 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          @Override
          public void done(final IJobChangeEvent event) {
 
-            if (PlatformUI.isWorkbenchRunning()) {
-
-               final String infoText = event.getResult().isOK()
-                     ? NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_Message,
-                           numberOfDownloadedTours[0],
-                           _numberOfAvailableTours[0] - numberOfDownloadedTours[0])
-                     : notificationText[0];
-
-               PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
-
-                  TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
-
-                  UI.openNotificationPopup(
-                        Messages.Dialog_DownloadWorkoutsFromSuunto_Title,
-                        Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo_Small),
-                        infoText);
-               });
-
-               PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
-                  PersonManager.getPersonSelector().setEnabled(true);
-               });
+            if (!PlatformUI.isWorkbenchRunning()) {
+               return;
             }
+
+            final String infoText = event.getResult().isOK()
+                  ? NLS.bind(Messages.Dialog_DownloadWorkoutsFromSuunto_Message,
+                        numberOfDownloadedTours[0],
+                        _numberOfAvailableTours[0] - numberOfDownloadedTours[0])
+                  : notificationText[0];
+
+            PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+
+               TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
+
+               UI.openNotificationPopup(
+                     Messages.Dialog_DownloadWorkoutsFromSuunto_Title,
+                     Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo),
+                     infoText);
+            });
+
+            PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+               PersonManager.getPersonSelector().setEnabled(true);
+            });
          }
 
          @Override

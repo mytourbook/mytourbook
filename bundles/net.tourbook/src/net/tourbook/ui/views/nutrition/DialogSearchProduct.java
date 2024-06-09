@@ -881,7 +881,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       _comboSearchType.setEnabled(false);
       _lblSearchType.setEnabled(false);
 
-      String searchText = _comboSearchQuery.getText();
+      String searchText = _comboSearchQuery.getText().trim();
 
       // remove same search text
       if (_searchHistory.contains(searchText) == false) {
@@ -1052,7 +1052,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
       final ISelection selection = _productsViewer.getSelection();
       _btnAdd.setEnabled(!selection.isEmpty());
-      final String searchQueryText = _comboSearchQuery.getText();
+      final String searchQueryText = _comboSearchQuery.getText().trim();
 
       if (net.tourbook.common.util.StringUtils.isNullOrEmpty(searchQueryText)) {
 

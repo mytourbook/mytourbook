@@ -252,9 +252,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          return;
       }
 
-      if (data instanceof Boolean) {
+      if (data instanceof final Boolean isCreatePerson) {
 
-         final Boolean isCreatePerson = (Boolean) data;
          if (isCreatePerson && _people.isEmpty()) {
 
             // this is a request, to create a new person
@@ -286,9 +285,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             _txtFirstName.setFocus();
          }
 
-      } else if (data instanceof PrefPagePeopleData) {
-
-         final PrefPagePeopleData prefPageData = (PrefPagePeopleData) data;
+      } else if (data instanceof final PrefPagePeopleData prefPageData) {
 
          if (prefPageData.person != null && _peopleViewer != null) {
 
@@ -1572,7 +1569,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          public void update(final ViewerCell cell) {
 
             final TourPerson person = (TourPerson) cell.getElement();
-            
+
             final float heightMetric = person.getHeight();
 
             if (UI.UNIT_IS_ELEVATION_METER) {
@@ -2124,8 +2121,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       // selected person
       final Object firstElement = ((IStructuredSelection) _peopleViewer.getSelection()).getFirstElement();
-      if (firstElement instanceof TourPerson) {
-         _state.put(STATE_SELECTED_PERSON, ((TourPerson) firstElement).getPersonId());
+      if (firstElement instanceof final TourPerson tourPerson) {
+         _state.put(STATE_SELECTED_PERSON, tourPerson.getPersonId());
       }
 
       // selected tab folder

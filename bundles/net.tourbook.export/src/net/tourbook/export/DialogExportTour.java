@@ -58,6 +58,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -226,6 +227,8 @@ public class DialogExportTour extends TitleAreaDialog {
    private Combo                  _comboTcxActivityTypes;
    private Combo                  _comboTcxCourseName;
 
+   private ImageDescriptor        _imageDescriptor;
+
    private Composite              _dlgContainer;
    private Composite              _inputContainer;
 
@@ -253,7 +256,8 @@ public class DialogExportTour extends TitleAreaDialog {
                     final List<TourData> tourDataList,
                     final int tourStartIndex,
                     final int tourEndIndex,
-                    final String formatTemplate) {
+                    final String formatTemplate,
+                    final ImageDescriptor imageDescriptor) {
 
       super(parentShell);
 
@@ -269,6 +273,8 @@ public class DialogExportTour extends TitleAreaDialog {
 
       // make dialog resizable
       setShellStyle(shellStyle);
+
+      _imageDescriptor = imageDescriptor;
 
       _exportExtensionPoint = exportExtensionPoint;
       _formatTemplate = formatTemplate;
@@ -999,7 +1005,8 @@ public class DialogExportTour extends TitleAreaDialog {
             _exportState_GPX_IsExportSurfingWaves,
             _exportState_GPX_IsExportAllTourData,
             _exportState_TCX_IsCourses,
-            _exportState_TCX_CourseName);
+            _exportState_TCX_CourseName,
+            _imageDescriptor);
 
       if (_exportState_isAbsoluteDistance) {
          _tourExporter.setUseAbsoluteDistance(true);

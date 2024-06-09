@@ -1052,6 +1052,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_Calories.setColumnLabel(Messages.Tour_Nutrition_Label_Calories);
       _colDef_Calories.setColumnHeaderText(Messages.Tour_Nutrition_Label_Calories);
+      _colDef_Calories.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Label_Calories_Tooltip);
 
       _colDef_Calories.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
 
@@ -1081,6 +1082,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_Sodium.setColumnLabel(Messages.Tour_Nutrition_Label_Sodium);
       _colDef_Sodium.setColumnHeaderText(Messages.Tour_Nutrition_Label_Sodium);
+      _colDef_Sodium.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Label_Sodium_Tooltip);
 
       _colDef_Sodium.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
 
@@ -1337,7 +1339,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
       tourNutritionProducts.removeIf(tourNutritionProduct -> selectedProducts.stream().anyMatch(selectedProduct -> selectedProduct
-            .getProductCode().equals(tourNutritionProduct.getProductCode())));
+            .getProductId() == tourNutritionProduct.getProductId()));
 
       _tourData.setTourNutritionProducts(tourNutritionProducts);
       _tourData = TourManager.saveModifiedTour(_tourData);
@@ -1746,7 +1748,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final int totalSodium = (int) NutritionUtils.getTotalSodium(tourNutritionProducts);
       final String totalSodiumFormatted = FormatManager.formatNumber_0(totalSodium);
-      _lblSodium_Total.setText(totalSodiumFormatted);
+      _lblSodium_Total.setText(totalSodiumFormatted.equals("0") ? UI.EMPTY_STRING : totalSodiumFormatted);
 
       final String averageCaloriesPerHour = NutritionUtils.computeAverageCaloriesPerHour(_tourData);
       _lblCalories_Average.setText(averageCaloriesPerHour);

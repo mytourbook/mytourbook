@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -89,8 +89,8 @@ public class AdvancedMenuForActions {
       _actionContributionItem = actionContributionItem;
 
       final IAction action = actionContributionItem.getAction();
-      if (action instanceof IAdvancedMenuForActions) {
-         ((IAdvancedMenuForActions) action).setAdvancedMenuProvider(this);
+      if (action instanceof final IAdvancedMenuForActions advancedMenuForActions) {
+         advancedMenuForActions.setAdvancedMenuProvider(this);
       }
 
       _display = Display.getCurrent();
@@ -155,9 +155,9 @@ public class AdvancedMenuForActions {
       if (_isAutoOpen && menuItem.isEnabled()) {
 
          final Object itemData = menuItem.getData();
-         if (itemData instanceof ActionContributionItem) {
+         if (itemData instanceof final ActionContributionItem actionContributionItem) {
 
-            final String itemId = ((ActionContributionItem) itemData).getId();
+            final String itemId = actionContributionItem.getId();
             final String actionId = _actionContributionItem.getId();
 
             if (itemId != null && itemId.equals(actionId)) {
@@ -199,7 +199,7 @@ public class AdvancedMenuForActions {
          return;
       }
 
-      // check if a hide event has occured
+      // check if a hide event has occurred
       if (_armItemTimeOther >= _armItemTimeAction) {
          return;
       }
@@ -211,12 +211,7 @@ public class AdvancedMenuForActions {
       }
 
       // run async because the hide menu action is also doing cleanup in async mode
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            openAdvancedMenu();
-         }
-      });
+      Display.getCurrent().asyncExec(() -> openAdvancedMenu());
    }
 
    public void onHideParentMenu() {
@@ -261,8 +256,8 @@ public class AdvancedMenuForActions {
          boolean isArmAvailable = false;
 
          for (final Listener listener : itemArmListeners) {
-            if (listener instanceof TypedListener) {
-               if (((TypedListener) listener).getEventListener() instanceof ContextArmListener) {
+            if (listener instanceof final TypedListener typedListener) {
+               if (typedListener.getEventListener() instanceof ContextArmListener) {
                   isArmAvailable = true;
                   break;
                }
@@ -284,8 +279,8 @@ public class AdvancedMenuForActions {
 
       // reset data from previous menu
       final IAction action = _actionContributionItem.getAction();
-      if (action instanceof IAdvancedMenuForActions) {
-         ((IAdvancedMenuForActions) action).resetData();
+      if (action instanceof final IAdvancedMenuForActions advancedMenuForActions) {
+         advancedMenuForActions.resetData();
       }
    }
 
@@ -304,11 +299,11 @@ public class AdvancedMenuForActions {
       }
 
       final IAction action = _actionContributionItem.getAction();
-      if (action instanceof IMenuCreator) {
+      if (action instanceof final IMenuCreator menuCreator) {
 
          // create menu
 
-         final Menu actionMenu = ((IMenuCreator) action).getMenu(_menuParentControl);
+         final Menu actionMenu = menuCreator.getMenu(_menuParentControl);
          if (actionMenu != null && actionMenu.isDisposed() == false) {
 
             actionMenu.addMenuListener(new MenuListener() {
@@ -325,8 +320,8 @@ public class AdvancedMenuForActions {
                   _isAnimating = false;
 
                   final IAction action = _actionContributionItem.getAction();
-                  if (action instanceof IAdvancedMenuForActions) {
-                     ((IAdvancedMenuForActions) action).onShowMenu();
+                  if (action instanceof final IAdvancedMenuForActions advancedMenuForActions) {
+                     advancedMenuForActions.onShowMenu();
                   }
                }
             });

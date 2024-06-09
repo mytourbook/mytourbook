@@ -710,6 +710,18 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       final boolean isCustomTourType = getStateTourTypeSource().equals(STATE_TYPE_SOURCE_CUSTOM);
       final boolean isCreateMarker = _chkCreateTourMarker.getSelection();
 
+      final boolean isTourBookView = _tourProvider instanceof TourBookView;
+      boolean isNatTable = false;
+
+      if (_tourProvider instanceof final TourBookView tourBookView) {
+
+         // if the TourBookView is using the NatTable layout, we need to
+         // disable the button to unlock the multiple tours selection
+         // because the NatTable layout has issues with tour selection
+         // See https://github.com/mytourbook/mytourbook/issues/1342
+         isNatTable = tourBookView.isLayoutNatTable();
+      }
+
       _txtTourTitle.setEnabled(isCustomTourTitle);
 
       _dtTourDate.setEnabled(isCustomTime);
@@ -727,7 +739,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       _linkTourType.setEnabled(isCustomTourType);
       _lblTourType.setEnabled(isCustomTourType);
 
-      _btnUnlockDeleteSourceToursSelection.setEnabled(_tourProvider instanceof TourBookView);
+      _btnUnlockDeleteSourceToursSelection.setEnabled(isTourBookView && !isNatTable);
    }
 
    @Override
@@ -1604,11 +1616,11 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
       if (_chkDeleteSourceTours.isEnabled() &&
             _chkDeleteSourceTours.getSelection() &&
-            _tourProvider instanceof TourBookView) {
+            _tourProvider instanceof final TourBookView tourBookView) {
 
          super.close();
 
-         final ActionDeleteTour actionDeleteTours = new ActionDeleteTour((TourBookView) _tourProvider);
+         final ActionDeleteTour actionDeleteTours = new ActionDeleteTour(tourBookView);
          actionDeleteTours.run();
       }
 

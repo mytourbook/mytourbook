@@ -14,7 +14,7 @@ define(
       Search_Grid_Label_NoDataMessage                              : 'No search results found',
       Search_Options_Action_RestoreDefaults                        : 'Restore Defaults',
       Search_Options_Checkbox_EaseSearching                        : 'Use ease searching',
-      Search_Options_Checkbox_EaseSearching_Tooltip                : '<div class="tooltip-container">' + '<b>* Wildcard Search</b><br>' + 'When <i>Use ease searching</i> is selected, a * wildcard is appended to the search text, this is done internally which is not visible.<br><br>' + '' + '<b>Extended Search</b><br>' + 'It can be helpfull to deactivate <i>Use ease searching</i> when doing a search with Lucene query parser options.' + '</div>',
+      Search_Options_Checkbox_EaseSearching_Tooltip                : '<div class="tooltip-container">' + '<b>* Wildcard Search</b><br>' + 'When <i>Use ease searching</i> is selected, a * wildcard is appended to the search text, this is done internally which is not visible.<br><br>' + '' + '<b>Extended Search</b><br>' + 'It can be helpful to deactivate <i>Use ease searching</i> when doing a search with Lucene query parser options.' + '</div>',
       Search_Options_Checkbox_Search_All                           : 'All',
       Search_Options_Checkbox_Search_Marker                        : 'Markers',
       Search_Options_Checkbox_Search_Marker_Tooltip                : 'Search label and description in tour markers',

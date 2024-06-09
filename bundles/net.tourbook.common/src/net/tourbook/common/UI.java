@@ -191,6 +191,7 @@ public class UI {
    public static final String       SYMBOL_BLACK_LARGE_CIRCLE            = "\u2B24";                                    //$NON-NLS-1$
    public static final String       SYMBOL_BOX                           = "\u25a0";                                    //$NON-NLS-1$
    public static final String       SYMBOL_BULLET                        = "\u2022";                                    //$NON-NLS-1$
+   public static final String       SYMBOL_CROSS_MARK                    = "\u274C";                                    //$NON-NLS-1$
    /** This is the real dash and not the negative sign character */
    public static final String       SYMBOL_DASH                          = "\u2212";                                    //$NON-NLS-1$
    public static final String       SYMBOL_DEGREE                        = "\u00B0";                                    //$NON-NLS-1$
@@ -1773,7 +1774,7 @@ public class UI {
     * Escape the ampersand symbol when it's not a mnemonic but is displayed in a
     * {@link Label#setText(String)}
     * <p>
-    * "The mnemonic indicator character'&' can be escaped by doubling it in the string, causinga
+    * "The mnemonic indicator character'&' can be escaped by doubling it in the string, causing a
     * single '&' to be displayed."
     *
     * @param text
@@ -2196,17 +2197,13 @@ public class UI {
       final IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
       final IWorkbenchPart activePart = activePage.getActivePart();
-      if (activePart instanceof IViewPart) {
-
-         final IViewPart viewPart = (IViewPart) activePart;
+      if (activePart instanceof final IViewPart viewPart) {
 
          return viewPart.getViewSite().getActionBars().getStatusLineManager();
       }
 
       final IWorkbenchPart activeEditor = activePage.getActiveEditor();
-      if (activeEditor instanceof IEditorSite) {
-
-         final IEditorSite editorSite = (IEditorSite) activeEditor;
+      if (activeEditor instanceof final IEditorSite editorSite) {
 
          return editorSite.getActionBars().getStatusLineManager();
       }
@@ -2454,13 +2451,13 @@ public class UI {
 
       final int delay = _prefStore_Common.getInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION) * 1000;
 
-      final MTNotificationPopup notication = new MTNotificationPopup(
+      final MTNotificationPopup notification = new MTNotificationPopup(
             Display.getCurrent(),
             imageDescriptor,
             title,
             text);
-      notication.setDelayClose(delay);
-      notication.open();
+      notification.setDelayClose(delay);
+      notification.open();
    }
 
    /**
@@ -2486,7 +2483,7 @@ public class UI {
       int xOffset = 0;
       final int horizontalOSOffset = UI.IS_WIN
 
-            // W$ has a horizontal ident which prevents to be exactly centered
+            // W$ has a horizontal indent which prevents to be exactly centered
             ? 4
             : 0;
 
@@ -2877,9 +2874,9 @@ public class UI {
       child.setForeground(fgColor);
       child.setBackground(bgColor);
 
-      if (child instanceof Composite) {
+      if (child instanceof final Composite composite) {
 
-         for (final Control element : ((Composite) child).getChildren()) {
+         for (final Control element : composite.getChildren()) {
 
             if (element != null && element.isDisposed() == false) {
                setChildColors(element, fgColor, bgColor);
@@ -2902,9 +2899,9 @@ public class UI {
       parent.setForeground(foregroundColor);
       parent.setBackground(backgroundColor);
 
-      if (parent instanceof Composite) {
+      if (parent instanceof final Composite composite) {
 
-         final Control[] children = ((Composite) parent).getChildren();
+         final Control[] children = composite.getChildren();
 
          for (final Control child : children) {
 
@@ -2927,9 +2924,9 @@ public class UI {
 
       parent.setEnabled(isEnabled);
 
-      if (parent instanceof Composite) {
+      if (parent instanceof final Composite composite) {
 
-         final Control[] children = ((Composite) parent).getChildren();
+         final Control[] children = composite.getChildren();
 
          for (final Control child : children) {
 
@@ -2989,9 +2986,8 @@ public class UI {
       for (final Control control : columnControls) {
 
          final Object layoutData = control.getLayoutData();
-         if (layoutData instanceof GridData) {
+         if (layoutData instanceof final GridData gd) {
 
-            final GridData gd = (GridData) layoutData;
             gd.widthHint = SWT.DEFAULT;
          }
          control.pack(true);
@@ -3018,9 +3014,8 @@ public class UI {
       for (final Control control : columnControls) {
 
          final Object layoutData = control.getLayoutData();
-         if (layoutData instanceof GridData) {
+         if (layoutData instanceof final GridData gd) {
 
-            final GridData gd = (GridData) layoutData;
             gd.widthHint = maxWidth;
          }
       }
@@ -3305,9 +3300,7 @@ public class UI {
 
       if (isVisible) {
 
-         if (control.getLayoutData() instanceof GridData) {
-
-            final GridData gridData = (GridData) control.getLayoutData();
+         if (control.getLayoutData() instanceof final GridData gridData) {
 
             gridData.widthHint = defaultWidth;
             gridData.heightHint = defaultHeight;
@@ -3322,9 +3315,7 @@ public class UI {
 
       } else {
 
-         if (control.getLayoutData() instanceof GridData) {
-
-            final GridData gridData = (GridData) control.getLayoutData();
+         if (control.getLayoutData() instanceof final GridData gridData) {
 
             gridData.widthHint = 0;
             gridData.heightHint = 0;
@@ -3481,9 +3472,7 @@ public class UI {
 
          // go up until the first scrolled container
 
-         if (parent instanceof ScrolledComposite) {
-
-            final ScrolledComposite scrolledContainer = (ScrolledComposite) parent;
+         if (parent instanceof final ScrolledComposite scrolledContainer) {
 
             /*
              * update layout: both methods must be called because the size can be modified and a

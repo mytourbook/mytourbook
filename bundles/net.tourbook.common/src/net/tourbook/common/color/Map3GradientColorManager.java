@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -701,20 +701,10 @@ public class Map3GradientColorManager {
                   Messages.Graph_Label_Speed,
                   defaultSpeed));
 
-      _initColorDefinitions();
+      initColorDefinitions();
    }
 
    private Map3GradientColorManager() {}
-
-   private static void _initColorDefinitions() {
-
-      // overwrite default colors with saved colors
-      readColors();
-
-      // sort by name
-      _sortedColorDefinitions = new ArrayList<>(getColorDefinitions().values());
-      Collections.sort(_sortedColorDefinitions);
-   }
 
    public static void addColorProvider(final Map3GradientColorProvider newColorProvider) {
 
@@ -868,6 +858,7 @@ public class Map3GradientColorManager {
 
    /**
     * @param graphId
+    *
     * @return Returns all color profiles for the requested {@link MapGraphId}.
     */
    public static List<Map3GradientColorProvider> getColorProviders(final MapGraphId graphId) {
@@ -877,6 +868,7 @@ public class Map3GradientColorManager {
 
    /**
     * @param graphId
+    *
     * @return Returns a clone from the default color profile of the requested {@link MapGraphId}.
     */
    public static Map3ColorProfile getDefaultColorProfile(final MapGraphId graphId) {
@@ -896,6 +888,16 @@ public class Map3GradientColorManager {
    public static ArrayList<Map3ColorDefinition> getSortedColorDefinitions() {
 
       return _sortedColorDefinitions;
+   }
+
+   private static void initColorDefinitions() {
+
+      // overwrite default colors with saved colors
+      readColors();
+
+      // sort by name
+      _sortedColorDefinitions = new ArrayList<>(getColorDefinitions().values());
+      Collections.sort(_sortedColorDefinitions);
    }
 
    private static void readColors() {
@@ -919,6 +921,7 @@ public class Map3GradientColorManager {
          );
 
          return;
+
       }
 
       // replace existing color providers with loaded color providers
@@ -1191,9 +1194,7 @@ public class Map3GradientColorManager {
          for (final Map3GradientColorProvider colorProvider : colorDef.getColorProviders()) {
 
             final MapColorProfile colorProfile = colorProvider.getColorProfile();
-            if (colorProfile instanceof Map3ColorProfile) {
-
-               final Map3ColorProfile map3ColorProfile = (Map3ColorProfile) colorProfile;
+            if (colorProfile instanceof final Map3ColorProfile map3ColorProfile) {
 
                final IMemento xmlProfile = xmlColor.createChild(TAG_COLOR_PROFILE);
 

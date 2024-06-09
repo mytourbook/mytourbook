@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2023 Frédéric Bard
+ * Copyright (C) 2021, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map2.view;
+package net.tourbook.map;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
@@ -60,46 +61,30 @@ import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class DialogMap2ExportViewImage extends TitleAreaDialog {
+public class DialogMapExportViewImage extends TitleAreaDialog {
 
-   private static final List<String> DistanceData = List.of("JPEG, JPG", "PNG", "BMP"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+   private static final List<String> DistanceData                  = List.of("JPEG, JPG", "PNG", "BMP");                   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-// SET_FORMATTING_OFF
-   private static final String   APP_BTN_BROWSE                           = net.tourbook.Messages.app_btn_browse;
-   private static final String   DIALOG_EXPORT_CHK_OVERWRITEFILES         = net.tourbook.Messages.dialog_export_chk_overwriteFiles;
-   private static final String   DIALOG_EXPORT_CHK_OVERWRITEFILES_TOOLTIP = net.tourbook.Messages.dialog_export_chk_overwriteFiles_tooltip;
-   private static final String   DIALOG_EXPORT_DIR_DIALOG_MESSAGE         = net.tourbook.Messages.dialog_export_dir_dialog_message;
-   private static final String   DIALOG_EXPORT_DIR_DIALOG_TEXT            = net.tourbook.Messages.dialog_export_dir_dialog_text;
-   private static final String   DIALOG_EXPORT_GROUP_EXPORTFILENAME       = net.tourbook.Messages.dialog_export_group_exportFileName;
-   private static final String   DIALOG_EXPORT_LABEL_EXPORTFILEPATH       = net.tourbook.Messages.dialog_export_label_exportFilePath;
-   private static final String   DIALOG_EXPORT_LABEL_FILENAME             = net.tourbook.Messages.dialog_export_label_fileName;
-   private static final String   DIALOG_EXPORT_LABEL_FILEPATH             = net.tourbook.Messages.dialog_export_label_filePath;
-   private static final String   DIALOG_EXPORT_MSG_FILEALREADYEXISTS      = net.tourbook.Messages.dialog_export_msg_fileAlreadyExists;
-   private static final String   DIALOG_EXPORT_MSG_FILENAMEISINVALID      = net.tourbook.Messages.dialog_export_msg_fileNameIsInvalid;
-   private static final String   DIALOG_EXPORT_MSG_PATHISNOTAVAILABLE     = net.tourbook.Messages.dialog_export_msg_pathIsNotAvailable;
-   private static final String   DIALOG_EXPORT_TXT_FILEPATH_TOOLTIP       = net.tourbook.Messages.dialog_export_txt_filePath_tooltip;
-// SET_FORMATTING_ON
+   private static final String       STATE_IMAGE_FORMAT            = "STATE_IMAGE_FORMAT";                                 //$NON-NLS-1$
+   private static final String       STATE_IS_OVERWRITE_IMAGE_FILE = "STATE_IS_OVERWRITE_IMAGE_FILE";                      //$NON-NLS-1$
+   private static final String       STATE_EXPORT_IMAGE_FILE_PATH  = "STATE_EXPORT_IMAGE_FILE_PATH";                       //$NON-NLS-1$
+   private static final String       STATE_EXPORT_IMAGE_FILE_NAME  = "STATE_EXPORT_IMAGE_FILE_NAME";                       //$NON-NLS-1$
+   private static final String       STATE_IMAGE_QUALITY_VALUE     = "STATE_IMAGE_QUALITY_VALUE";                          //$NON-NLS-1$
 
-   private static final String   STATE_IMAGE_FORMAT            = "STATE_IMAGE_FORMAT";                                 //$NON-NLS-1$
-   private static final String   STATE_IS_OVERWRITE_IMAGE_FILE = "STATE_IS_OVERWRITE_IMAGE_FILE";                      //$NON-NLS-1$
-   private static final String   STATE_EXPORT_IMAGE_FILE_PATH  = "STATE_EXPORT_IMAGE_FILE_PATH";                       //$NON-NLS-1$
-   private static final String   STATE_EXPORT_IMAGE_FILE_NAME  = "STATE_EXPORT_IMAGE_FILE_NAME";                       //$NON-NLS-1$
-   private static final String   STATE_IMAGE_QUALITY_VALUE     = "STATE_IMAGE_QUALITY_VALUE";                          //$NON-NLS-1$
+   private static final int          COMBO_HISTORY_LENGTH          = 20;
+   private static final int          DEFAULT_JPEG_QUALITY          = 75;
 
-   private static final int      COMBO_HISTORY_LENGTH          = 20;
-   private static final int      DEFAULT_JPEG_QUALITY          = 75;
+   private final IDialogSettings     _state                        = TourbookPlugin.getState("DialogMap2ExportViewImage"); //$NON-NLS-1$
 
-   private final IDialogSettings _state                        = TourbookPlugin.getState("DialogMap2ExportViewImage"); //$NON-NLS-1$
+   private PixelConverter            _pc;
+   private Point                     _shellDefaultSize;
 
-   private PixelConverter        _pc;
-   private Point                 _shellDefaultSize;
+   private IMapView                  _mapView;
 
-   private Map2View              _map2View;
+   private FileCollisionBehavior     _exportState_FileCollisionBehavior;
 
-   private FileCollisionBehavior _exportState_FileCollisionBehavior;
-
-   private ModifyListener        _filePathModifyListener;
-   private SelectionListener     _selectionListener;
+   private ModifyListener            _filePathModifyListener;
+   private SelectionListener         _selectionListener;
 
    /*
     * UI controls
@@ -120,14 +105,14 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
    private Text      _txtFilePath;
 
-   public DialogMap2ExportViewImage(final Shell parentShell, final Map2View map2View) {
+   public DialogMapExportViewImage(final Shell parentShell, final IMapView mapView) {
 
       super(parentShell);
 
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      _map2View = map2View;
+      _mapView = mapView;
    }
 
    @Override
@@ -280,7 +265,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
        * group: filename
        */
       final Group group = new Group(parent, SWT.NONE);
-      group.setText(DIALOG_EXPORT_GROUP_EXPORTFILENAME);
+      group.setText(OtherMessages.DIALOG_EXPORT_GROUP_EXPORTFILENAME);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
       {
@@ -290,7 +275,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
           * label: filename
           */
          label = new Label(group, SWT.NONE);
-         label.setText(DIALOG_EXPORT_LABEL_FILENAME);
+         label.setText(OtherMessages.DIALOG_EXPORT_LABEL_FILENAME);
 
          /*
           * combo: path
@@ -306,7 +291,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
           * button: browse
           */
          final Button btnSelectFile = new Button(group, SWT.PUSH);
-         btnSelectFile.setText(APP_BTN_BROWSE);
+         btnSelectFile.setText(OtherMessages.APP_BTN_BROWSE);
          btnSelectFile.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
             onSelectBrowseFile();
             validateFields();
@@ -319,7 +304,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
           * label: path
           */
          label = new Label(group, SWT.NONE);
-         label.setText(DIALOG_EXPORT_LABEL_EXPORTFILEPATH);
+         label.setText(OtherMessages.DIALOG_EXPORT_LABEL_EXPORTFILEPATH);
 
          /*
           * combo: path
@@ -334,7 +319,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
           * button: browse
           */
          final Button btnSelectDirectory = new Button(group, SWT.PUSH);
-         btnSelectDirectory.setText(APP_BTN_BROWSE);
+         btnSelectDirectory.setText(OtherMessages.APP_BTN_BROWSE);
          btnSelectDirectory.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
             onSelectBrowseDirectory();
             validateFields();
@@ -347,14 +332,14 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
           * label: file path
           */
          label = new Label(group, SWT.NONE);
-         label.setText(DIALOG_EXPORT_LABEL_FILEPATH);
+         label.setText(OtherMessages.DIALOG_EXPORT_LABEL_FILEPATH);
 
          /*
           * text: filename
           */
          _txtFilePath = new Text(group, SWT.READ_ONLY);
          GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_txtFilePath);
-         _txtFilePath.setToolTipText(DIALOG_EXPORT_TXT_FILEPATH_TOOLTIP);
+         _txtFilePath.setToolTipText(OtherMessages.DIALOG_EXPORT_TXT_FILEPATH_TOOLTIP);
          _txtFilePath.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
          // -----------------------------------------------------------------------------
@@ -368,8 +353,8 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
                .span(3, 1)
                .indent(0, _pc.convertVerticalDLUsToPixels(4))
                .applyTo(_chkOverwriteFiles);
-         _chkOverwriteFiles.setText(DIALOG_EXPORT_CHK_OVERWRITEFILES);
-         _chkOverwriteFiles.setToolTipText(DIALOG_EXPORT_CHK_OVERWRITEFILES_TOOLTIP);
+         _chkOverwriteFiles.setText(OtherMessages.DIALOG_EXPORT_CHK_OVERWRITEFILES);
+         _chkOverwriteFiles.setToolTipText(OtherMessages.DIALOG_EXPORT_CHK_OVERWRITEFILES_TOOLTIP);
       }
 
    }
@@ -395,7 +380,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       net.tourbook.ui.UI.disableAllControls(_inputContainer);
 
-      final Image mapViewImage = _map2View.getMapViewImage();
+      final Image mapViewImage = _mapView.getMapViewImage();
 
       final ImageLoader loader = new ImageLoader();
 
@@ -480,8 +465,8 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
    private void onSelectBrowseDirectory() {
 
       final DirectoryDialog dialog = new DirectoryDialog(_dlgContainer.getShell(), SWT.SAVE);
-      dialog.setText(DIALOG_EXPORT_DIR_DIALOG_TEXT);
-      dialog.setMessage(DIALOG_EXPORT_DIR_DIALOG_MESSAGE);
+      dialog.setText(OtherMessages.DIALOG_EXPORT_DIR_DIALOG_TEXT);
+      dialog.setMessage(OtherMessages.DIALOG_EXPORT_DIR_DIALOG_MESSAGE);
       dialog.setFilterPath(getExportPathName());
 
       final String selectedDirectoryName = dialog.open();
@@ -498,7 +483,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
       final String fileExtension = getFileExtension();
 
       final FileDialog dialog = new FileDialog(_dlgContainer.getShell(), SWT.SAVE);
-      dialog.setText(DIALOG_EXPORT_DIR_DIALOG_TEXT);
+      dialog.setText(OtherMessages.DIALOG_EXPORT_DIR_DIALOG_TEXT);
 
       dialog.setFilterPath(getExportPathName());
       dialog.setFilterExtensions(new String[] { fileExtension });
@@ -587,7 +572,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
       if (!new File(filePath.toOSString()).exists()) {
 
          // invalid path
-         setError(NLS.bind(DIALOG_EXPORT_MSG_PATHISNOTAVAILABLE, filePath.toOSString()));
+         setError(NLS.bind(OtherMessages.DIALOG_EXPORT_MSG_PATHISNOTAVAILABLE, filePath.toOSString()));
          return false;
       }
 
@@ -609,13 +594,13 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
          // invalid filename
 
-         setError(DIALOG_EXPORT_MSG_FILENAMEISINVALID);
+         setError(OtherMessages.DIALOG_EXPORT_MSG_FILENAMEISINVALID);
 
       } else if (newFile.exists()) {
 
          // file already exists
 
-         setMessage(NLS.bind(DIALOG_EXPORT_MSG_FILEALREADYEXISTS, filePath.toOSString()), IMessageProvider.WARNING);
+         setMessage(NLS.bind(OtherMessages.DIALOG_EXPORT_MSG_FILEALREADYEXISTS, filePath.toOSString()), IMessageProvider.WARNING);
 
          returnValue = true;
 
@@ -635,7 +620,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
             returnValue = true;
 
          } catch (final IOException ioe) {
-            setError(DIALOG_EXPORT_MSG_FILENAMEISINVALID);
+            setError(OtherMessages.DIALOG_EXPORT_MSG_FILENAMEISINVALID);
          }
 
       }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,7 +57,7 @@ public class TourToolTip extends ToolTip {
    /**
     * Add a tool tip hide listener which is called when the tool tip was hidden.
     * <p>
-    * This is helpfull to hide the hovered area when the mouse is not within the tool tip control
+    * This is helpful to hide the hovered area when the mouse is not within the tool tip control
     * but is leaving the tool tip window.
     *
     * @param hideListener
@@ -106,7 +106,8 @@ public class TourToolTip extends ToolTip {
    /**
     * @param tipSize
     * @param ttTopLeft
-    *           Top/left location for the hovered area relativ to the display
+    *           Top/left location for the hovered area relative to the display
+    *
     * @return
     */
    private Point fixupDisplayBounds(final Point tipSize, final Point ttTopLeft) {

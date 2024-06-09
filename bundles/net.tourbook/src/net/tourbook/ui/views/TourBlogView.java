@@ -390,8 +390,7 @@ public class TourBlogView extends ViewPart {
 
       // Average fluids per hour
       final String averageFluidPerHour = NutritionUtils.computeAverageFluidsPerHour(_tourData);
-      if (net.tourbook.common.util.StringUtils.hasContent(averageFluidPerHour) &&
-            !averageFluidPerHour.equals("0")) { //$NON-NLS-1$
+      if (net.tourbook.common.util.StringUtils.hasContent(averageFluidPerHour)) {
 
          sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Fluids,
                averageFluidPerHour,
