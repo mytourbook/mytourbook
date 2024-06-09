@@ -1307,7 +1307,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
             _txtGroupDuplicatedMarkers = new Text(tabContainer, SWT.MULTI | SWT.WRAP | SWT.BORDER);
             _txtGroupDuplicatedMarkers.setToolTipText("");
-            _txtGroupDuplicatedMarkers.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onModifyConfig(false)));
+            _txtGroupDuplicatedMarkers.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onModifyConfig()));
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
@@ -2295,20 +2295,20 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          }
       };
 
-      _markerSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyConfig(false));
+      _markerSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyConfig());
       _markerSelectionListener_All = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyConfigAll());
-      _markerPropertyChangeListener = propertyChangeEvent -> onModifyConfig(false);
+      _markerPropertyChangeListener = propertyChangeEvent -> onModifyConfig();
 
       _markerMouseWheelListener = mouseEvent -> {
 
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 1);
-         onModifyConfig(false);
+         onModifyConfig();
       };
 
       _markerMouseWheelListener10 = mouseEvent -> {
 
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
-         onModifyConfig(false);
+         onModifyConfig();
       };
 
       _keepOpenListener = new FocusListener() {
@@ -2435,6 +2435,11 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             TourEventId.COMMON_LOCATION_SELECTION,
             selection.toList(),
             null);
+   }
+
+   private void onModifyConfig() {
+
+      onModifyConfig(false);
    }
 
    private void onModifyConfig(final boolean isFromAllControls) {
@@ -2878,7 +2883,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
        */
       tabItem.getControl().setBackground(ThemeUtil.getDefaultBackgroundColor_Shell());
 
-      onModifyConfig(false);
+      onModifyConfig();
    }
 
    @Override

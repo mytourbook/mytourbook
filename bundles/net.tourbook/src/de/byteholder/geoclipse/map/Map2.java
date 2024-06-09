@@ -1463,11 +1463,13 @@ public class Map2 extends Canvas {
 
             final boolean isStartLocation = hasStartLocation && locationIndex == 0;
 
-            final LocationType locationType = isStartLocation
-                  ? LocationType.TourStart
-                  : LocationType.TourEnd;
+            createMapPoints_Locations_30_TourLocation(tourLocation,
 
-            createMapPoints_Locations_30_TourLocation(tourLocation, locationType, allTourLocationsMap);
+                  isStartLocation
+                        ? LocationType.TourStart
+                        : LocationType.TourEnd,
+
+                  allTourLocationsMap);
          }
       }
 
@@ -6609,7 +6611,6 @@ public class Map2 extends Canvas {
                                          final boolean isPaintClusterMarker,
                                          final List<PointFeature> allMarkerItems,
                                          final List<PaintedMapPoint> allPaintedMarkerPoints) {
-
 
       for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
 

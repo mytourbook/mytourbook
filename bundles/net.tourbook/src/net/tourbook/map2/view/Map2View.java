@@ -3443,22 +3443,16 @@ public class Map2View extends ViewPart implements
 
          _map.setLocations_Tours(null);
 
-         _map.redraw();
+      } else {
 
-         return;
-      }
+         _map.setLocations_Tours(allTourLocations);
 
-      // repaint map
+         if (_isMapSyncWith_MapLocation) {
 
-      _map.setLocations_Tours(allTourLocations);
+            final GeoPosition geoPosition = getTourLocationCenter(allTourLocations);
 
-      _map.redraw();
-
-      if (_isMapSyncWith_MapLocation) {
-
-         final GeoPosition geoPosition = getTourLocationCenter(allTourLocations);
-
-         _map.setMapCenter(geoPosition);
+            _map.setMapCenter(geoPosition);
+         }
       }
    }
 
