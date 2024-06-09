@@ -1385,7 +1385,7 @@ public class Map2 extends Canvas {
    }
 
    /**
-    * Creates a new image, old image is disposed
+    * Creates a new image, the old image is disposed
     *
     * @param display
     * @param oldImage
@@ -1404,7 +1404,7 @@ public class Map2 extends Canvas {
          oldImage.dispose();
       }
 
-      // ensure the image has a width/height of 1, otherwise this causes troubles
+      // ensure that the image has a minimum width/height of 1, otherwise this causes troubles
       final int width = Math.max(1, imageSize.width);
       final int height = Math.max(1, imageSize.height);
 
@@ -5183,11 +5183,9 @@ public class Map2 extends Canvas {
       try {
 
          // check or create map image
-         final Image mapImage = _mapImage;
+         final Image currentMapImage = _mapImage;
 
-         if (mapImage == null
-               || mapImage.isDisposed()
-               || canReuseImage(mapImage, _clientArea) == false) {
+         if (canReuseImage(currentMapImage, _clientArea) == false) {
 
             final Color fillColor = UI.IS_DARK_THEME
 
@@ -5198,7 +5196,7 @@ public class Map2 extends Canvas {
                   ? ThemeUtil.getDarkestBackgroundColor()
                   : null;
 
-            _mapImage = createMapImage(_display, mapImage, _clientArea, fillColor);
+            _mapImage = createMapImage(_display, currentMapImage, _clientArea, fillColor);
          }
 
          gcMapImage = new GC(_mapImage);
@@ -5553,11 +5551,14 @@ public class Map2 extends Canvas {
           */
          Map2PointManager.updateStatistics(
 
-               _allPaintedMarkers.size(),
-               _numStatistics_AllTourMarkers,
+               _allPaintedLocations.size(),
+               _numStatistics_AllCommonLocations,
 
                _allPaintedLocations.size(),
-               _numStatistics_AllTourLocations + _numStatistics_AllCommonLocations,
+               _numStatistics_AllTourLocations,
+
+               _allPaintedMarkers.size(),
+               _numStatistics_AllTourMarkers,
 
                _allPaintedPauses.size(),
                _numStatistics_AllTourPauses
@@ -6609,7 +6610,6 @@ public class Map2 extends Canvas {
                                          final List<PointFeature> allMarkerItems,
                                          final List<PaintedMapPoint> allPaintedMarkerPoints) {
 
-      final int markerSymbolSize2 = _mapPointSymbolMargin / 2;
 
       for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
 
@@ -6675,9 +6675,28 @@ public class Map2 extends Canvas {
       /*
        * Draw marker symbol
        */
+
+      final int markerSymbolSize2 = _mapPointSymbolMargin / 2;
+
+      Color fillColor;
+      Color outlineColor;
+
+      if (_isMarkerClusterSelected) {
+
+         // all other labels are disable -> display grayed out
+
+         fillColor = UI.SYS_COLOR_WHITE;
+         outlineColor = _isMapBackgroundDark ? UI.SYS_COLOR_GRAY : UI.SYS_COLOR_WHITE;
+
+      } else {
+
+         fillColor = _mapConfig.tourMarkerFill_Color;
+         outlineColor = _mapConfig.tourMarkerOutline_Color;
+      }
+
       gc.setLineWidth(2);
-      gc.setForeground(_mapConfig.tourMarkerFill_Color);
-      gc.setBackground(_mapConfig.tourMarkerOutline_Color);
+      gc.setForeground(fillColor);
+      gc.setBackground(outlineColor);
 
       int paintedMarkerIndex = 0;
 
@@ -6717,8 +6736,6 @@ public class Map2 extends Canvas {
                                         final List<PointFeature> allPauseItems,
                                         final List<PaintedMapPoint> allPaintedPoints) {
 
-      final int symbolSize2 = _mapPointSymbolMargin / 2;
-
       for (int itemIndex = 0; itemIndex < numVisibleItems; itemIndex++) {
 
          final PointFeature distribLabel = allPauseItems.get(itemIndex);
@@ -6755,9 +6772,28 @@ public class Map2 extends Canvas {
       /*
        * Draw pause symbol
        */
+
+      final int symbolSize2 = _mapPointSymbolMargin / 2;
+
+      Color fillColor;
+      Color outlineColor;
+
+      if (_isMarkerClusterSelected) {
+
+         // all other labels are disable -> display grayed out
+
+         fillColor = UI.SYS_COLOR_WHITE;
+         outlineColor = _isMapBackgroundDark ? UI.SYS_COLOR_GRAY : UI.SYS_COLOR_WHITE;
+
+      } else {
+
+         fillColor = _mapConfig.tourPauseFill_Color;
+         outlineColor = _mapConfig.tourPauseOutline_Color;
+      }
+
       gc.setLineWidth(2);
-      gc.setForeground(_mapConfig.tourPauseFill_Color);
-      gc.setBackground(_mapConfig.tourPauseOutline_Color);
+      gc.setForeground(fillColor);
+      gc.setBackground(outlineColor);
 
       int paintedPointIndex = 0;
 

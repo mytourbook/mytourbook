@@ -21,14 +21,17 @@ public class Map2PointManager {
 
    private static SlideoutMap2_MapPoints _mapPointSlideout;
 
-   private static int                    _numPaintedMarkers;
-   private static int                    _numAllTourMarkers;
+   private static int                    _numCommonLocations_Painted;
+   private static int                    _numCommonLocations_All;
 
-   private static int                    _numPaintedLocations;
-   private static int                    _numAllLocations;
+   private static int                    _numTourLocations_Painted;
+   private static int                    _numTourLocations_All;
 
-   private static int                    _numPaintedPauses;
-   private static int                    _numAllTourPauses;
+   private static int                    _numTourMarkers_Painted;
+   private static int                    _numTourMarkers_All;
+
+   private static int                    _numTourPauses_Painted;
+   private static int                    _numTourPauses_All;
 
    /**
     * @param isOpenSlideout
@@ -71,48 +74,63 @@ public class Map2PointManager {
 
          PlatformUI.getWorkbench().getDisplay().asyncExec(() -> _mapPointSlideout.updateStatistics(
 
-               _numPaintedMarkers,
-               _numAllTourMarkers,
+               _numCommonLocations_Painted,
+               _numCommonLocations_All,
 
-               _numPaintedLocations,
-               _numAllLocations,
+               _numTourLocations_Painted,
+               _numTourLocations_All,
 
-               _numPaintedPauses,
-               _numAllTourPauses
+               _numTourMarkers_Painted,
+               _numTourMarkers_All,
+
+               _numTourPauses_Painted,
+               _numTourPauses_All
 
          ));
       }
 
    }
 
-   public static void updateStatistics(final int numPaintedMarkers,
-                                       final int numAllTourMarkers,
+   public static void updateStatistics(final int numCommonLocations_Painted,
+                                       final int numCommonLocations_All,
 
-                                       final int numPaintedLocations,
-                                       final int numAllLocations,
+                                       final int numTourLocations_Painted,
+                                       final int numTourLocations_All,
 
-                                       final int numPaintedPauses,
-                                       final int numAllTourPauses) {
+                                       final int numTourMarkers_Painted,
+                                       final int numTourMarkers_All,
 
-      _numPaintedMarkers = numPaintedMarkers;
-      _numAllTourMarkers = numAllTourMarkers;
-      _numPaintedLocations = numPaintedLocations;
-      _numAllLocations = numAllLocations;
-      _numPaintedPauses = numPaintedPauses;
-      _numAllTourPauses = numAllTourPauses;
+                                       final int numTourPauses_Painted,
+                                       final int numTourPauses_All) {
+
+// SET_FORMATTING_OFF
+
+      _numCommonLocations_Painted   = numCommonLocations_Painted;
+      _numCommonLocations_All       = numCommonLocations_All;
+      _numTourLocations_Painted     = numTourLocations_Painted;
+      _numTourLocations_All         = numTourLocations_All;
+      _numTourMarkers_Painted       = numTourMarkers_Painted;
+      _numTourMarkers_All           = numTourMarkers_All;
+      _numTourPauses_Painted        = numTourPauses_Painted;
+      _numTourPauses_All            = numTourPauses_All;
+
+// SET_FORMATTING_ON
 
       if (_mapPointSlideout != null) {
 
          PlatformUI.getWorkbench().getDisplay().asyncExec(() -> _mapPointSlideout.updateStatistics(
 
-               numPaintedMarkers,
-               numAllTourMarkers,
+               numCommonLocations_Painted,
+               numCommonLocations_All,
 
-               numPaintedLocations,
-               numAllLocations,
+               numTourLocations_Painted,
+               numTourLocations_All,
 
-               numPaintedPauses,
-               numAllTourPauses
+               numTourMarkers_Painted,
+               numTourMarkers_All,
+
+               numTourPauses_Painted,
+               numTourPauses_All
 
          ));
       }
