@@ -709,7 +709,18 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       final boolean isCustomTourTitle = getStateTourTitleSource().equals(STATE_TOUR_TITLE_SOURCE_CUSTOM);
       final boolean isCustomTourType = getStateTourTypeSource().equals(STATE_TYPE_SOURCE_CUSTOM);
       final boolean isCreateMarker = _chkCreateTourMarker.getSelection();
+
+      final boolean isTourBookView = _tourProvider instanceof TourBookView;
       boolean isNatTable = false;
+
+      if (_tourProvider instanceof final TourBookView tourBookView) {
+
+         // if the TourBookView is using the NatTable layout, we need to
+         // disable the button to unlock the multiple tours selection
+         // because the NatTable layout has issues with tour selection
+         // See https://github.com/mytourbook/mytourbook/issues/1342
+         isNatTable = tourBookView.isLayoutNatTable();
+      }
 
       _txtTourTitle.setEnabled(isCustomTourTitle);
 
@@ -728,16 +739,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       _linkTourType.setEnabled(isCustomTourType);
       _lblTourType.setEnabled(isCustomTourType);
 
-      if (_tourProvider instanceof final TourBookView tourBookView) {
-
-         // if the TourBookView is using the NatTable layout, we need to
-         // disable the button to unlock the multiple tours selection
-         // because the NatTable layout has issues with tour selection
-         // See https://github.com/mytourbook/mytourbook/issues/1342
-         isNatTable = tourBookView.isLayoutNatTable();
-      }
-      _btnUnlockDeleteSourceToursSelection.setEnabled(_tourProvider instanceof TourBookView &&
-            !isNatTable);
+      _btnUnlockDeleteSourceToursSelection.setEnabled(isTourBookView && !isNatTable);
    }
 
    @Override
