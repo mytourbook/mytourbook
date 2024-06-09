@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  * Copyright (C) 2018, 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -584,7 +584,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * Checks if a file is available for reading
     *
     * @param FilePath
-    * @return Returns the absolut file path or <code>null</code> when not available
+    *
+    * @return Returns the absolute file path or <code>null</code> when not available
     */
    public String checkFile(final String FilePath) {
 
@@ -615,6 +616,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * Checks if a given file is a valid mapsforge file
     *
     * @param file2check
+    *
     * @return Returns <code>true</code> when file is OK
     */
    public Boolean checkMapFile(final File file2check) {
@@ -640,6 +642,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * @param color
     * @param luminance
     *           Luminance -1 ... +1
+    *
     * @return
     */
    private int computeLuminanceColor(final int color, final float luminance) {
@@ -877,13 +880,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       final MarkerConfig markerConfig = Map25ConfigManager.getActiveMarkerConfig();
 
       _layer_MapBookmark_Clustered = new ItemizedLayer(mMap,
-            new ArrayList<MarkerInterface>(),
+            new ArrayList<>(),
             _mapBookmarkToolkit.getMarkerRendererFactory(),
             _mapBookmarkToolkit);
 
       _layer_MapBookmark_NotClustered = new ItemizedLayer(
             mMap,
-            new ArrayList<MarkerInterface>(),
+            new ArrayList<>(),
             _mapBookmarkToolkit.getMarkerSymbol(),
             _mapBookmarkToolkit);
 
@@ -906,8 +909,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       /*
        * Photos
        */
-      _layer_Photo_Clustered = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit.getMarkerRendererFactory(), _photoToolkit);
-      _layer_Photo_NotCluster = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit.getSymbol(), _photoToolkit);
+      _layer_Photo_Clustered = new ItemizedLayer(mMap, new ArrayList<>(), _photoToolkit.getMarkerRendererFactory(), _photoToolkit);
+      _layer_Photo_NotCluster = new ItemizedLayer(mMap, new ArrayList<>(), _photoToolkit.getSymbol(), _photoToolkit);
       if (markerConfig.isMarkerClustered) {
          //sharing same setting as MapBookmarks, later photolayer should get its own configuration
          _layer_Photo_VARYING = _layer_Photo_Clustered;
@@ -1029,6 +1032,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    /**
     * @param requestedMapFilePathName
+    *
     * @return Returns all map files which are available in the map file folder and sets the number
     *         of map files into {@link #_numOfflineMapFiles}
     */
@@ -1328,6 +1332,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     *
     * @param index
     * @param MarkerItem
+    *
     * @return true, when clicked
     */
    @Override
@@ -1355,6 +1360,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     *
     * @param index
     * @param MapMarker
+    *
     * @return true, when clicked
     */
    @Override
@@ -1382,6 +1388,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     *
     * @param index
     * @param MarkerItem
+    *
     * @return true, when clicked
     */
    @Override
@@ -1762,6 +1769,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * Setup offline map for mapsforge
     *
     * @param mapProvider
+    *
     * @throws Exception
     */
    private void setMapProvider_02_Offline(final Map25Provider mapProvider) throws Exception {
@@ -2022,7 +2030,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          // force update
          _currentOffOnline = null;
 
-         // this is necessarry that the new zoom level is applied, otherwise it do not work
+         // this is necessary that the new zoom level is applied, otherwise it do not work
          setMapProvider(_selectedMapProvider);
       }
    }
@@ -2037,7 +2045,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       final IRenderTheme mapTheme = _layer_BaseMap.getTheme();
 
-      if (mapTheme instanceof RenderTheme) {
+      if (mapTheme instanceof final RenderTheme renderTheme) {
 
          if (_cartography_IsLuminance) {
 
@@ -2052,8 +2060,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
             _ruleVisitor_Luminance.__isUseOriginalColor = true;
          }
-
-         final RenderTheme renderTheme = (RenderTheme) mapTheme;
 
          renderTheme.traverseRules(_ruleVisitor_Luminance);
          renderTheme.updateStyles();

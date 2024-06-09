@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -111,7 +111,6 @@ import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener2;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -661,24 +660,18 @@ public class TourBookView extends ViewPart implements
             return true;
          }
 
-         if (a instanceof TVITourBookYear && b instanceof TVITourBookYear) {
+         if (a instanceof final TVITourBookYear item1 && b instanceof final TVITourBookYear item2) {
 
-            final TVITourBookYear item1 = (TVITourBookYear) a;
-            final TVITourBookYear item2 = (TVITourBookYear) b;
             return item1.tourYear == item2.tourYear;
          }
 
-         if (a instanceof TVITourBookYearCategorized && b instanceof TVITourBookYearCategorized) {
+         if (a instanceof final TVITourBookYearCategorized item1 && b instanceof final TVITourBookYearCategorized item2) {
 
-            final TVITourBookYearCategorized item1 = (TVITourBookYearCategorized) a;
-            final TVITourBookYearCategorized item2 = (TVITourBookYearCategorized) b;
             return item1.tourYear == item2.tourYear && item1.tourYearSub == item2.tourYearSub;
          }
 
-         if (a instanceof TVITourBookTour && b instanceof TVITourBookTour) {
+         if (a instanceof final TVITourBookTour item1 && b instanceof final TVITourBookTour item2) {
 
-            final TVITourBookTour item1 = (TVITourBookTour) a;
-            final TVITourBookTour item2 = (TVITourBookTour) b;
             return item1.tourId == item2.tourId;
          }
 
@@ -1071,17 +1064,12 @@ public class TourBookView extends ViewPart implements
 
          final List<TVITourBookTour> sortedItems = new ArrayList<>();
 
-         for (final Object element : selectedTVITours) {
+         for (final TVITourBookTour tviTour : selectedTVITours) {
 
-            if (element instanceof TVITourBookTour) {
+            // collect only fetched items, the others are "empty" !!!
+            if (tviTour.colTourDateTime != null) {
 
-               final TVITourBookTour tviTour = (TVITourBookTour) element;
-
-               // collect only fetched items, the other are "empty" !!!
-               if (tviTour.colTourDateTime != null) {
-
-                  sortedItems.add(tviTour);
-               }
+               sortedItems.add(tviTour);
             }
          }
 
@@ -1513,9 +1501,9 @@ public class TourBookView extends ViewPart implements
              */
             reloadViewer();
 
-         } else if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+         } else if (tourEventId == TourEventId.TOUR_SELECTION && eventData instanceof final ISelection selection) {
 
-            onSelectionChanged((ISelection) eventData);
+            onSelectionChanged(selection);
 
          } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED
                || tourEventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
@@ -1623,17 +1611,11 @@ public class TourBookView extends ViewPart implements
 
       _viewerMenuManager_NatTable = new MenuManager();
       _viewerMenuManager_NatTable.setRemoveAllWhenShown(true);
-      _viewerMenuManager_NatTable.addMenuListener(new IMenuListener2() {
-         @Override
-         public void menuAboutToHide(final IMenuManager manager) {}
+      _viewerMenuManager_NatTable.addMenuListener(menuManager -> {
 
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
+         _tourInfoToolTip_NatTable.hideToolTip();
 
-            _tourInfoToolTip_NatTable.hideToolTip();
-
-            natTable_ContextMenu_OnShow(manager);
-         }
+         natTable_ContextMenu_OnShow(menuManager);
       });
 
       _viewerMenuManager_Tree = new MenuManager();
@@ -1916,7 +1898,7 @@ public class TourBookView extends ViewPart implements
       _tourLocationTooltip_NatTable = new TourLocationToolTip(this, true);
 
       // ensure that tooltips are hidden
-      _tourViewer_NatTable.addListener(SWT.MouseExit, (event) -> hideTooltip());
+      _tourViewer_NatTable.addListener(SWT.MouseExit, event -> hideTooltip());
 
       _natTable_DummyColumnViewer = new NatTable_DummyColumnViewer(this);
 
@@ -2066,7 +2048,7 @@ public class TourBookView extends ViewPart implements
       _tourLocationTooltip_Tree = new TourLocationToolTip(this, false);
 
       // ensure that tooltips are hidden
-      tree.addListener(SWT.MouseExit, (event) -> hideTooltip());
+      tree.addListener(SWT.MouseExit, event -> hideTooltip());
    }
 
    private void createUI_40_Tree_ColumnImages(final Tree tree) {
@@ -2261,9 +2243,9 @@ public class TourBookView extends ViewPart implements
 
          for (final Object treeItem : selection) {
 
-            if (treeItem instanceof TVITourBookTour) {
+            if (treeItem instanceof final TVITourBookTour tviTourBookTour) {
                if (numTourItems == 0) {
-                  firstTourItem = (TVITourBookTour) treeItem;
+                  firstTourItem = tviTourBookTour;
                }
                numTourItems++;
             }
@@ -2698,26 +2680,26 @@ public class TourBookView extends ViewPart implements
 
          for (final Object viewItem : selectedTours) {
 
-            if (viewItem instanceof TVITourBookYear) {
+            if (viewItem instanceof final TVITourBookYear tviTourBookYear) {
 
                // one year is selected
 
                if (isSelectAllInHierarchy) {
 
                   // loop: all months
-                  for (final TreeViewerItem viewerItem : ((TVITourBookYear) viewItem).getFetchedChildren()) {
-                     if (viewerItem instanceof TVITourBookYearCategorized) {
-                        getYearSubTourIDs((TVITourBookYearCategorized) viewerItem, tourIds);
+                  for (final TreeViewerItem viewerItem : tviTourBookYear.getFetchedChildren()) {
+                     if (viewerItem instanceof final TVITourBookYearCategorized tviTourBookYearCategorized) {
+                        getYearSubTourIDs(tviTourBookYearCategorized, tourIds);
                      }
                   }
                }
 
-            } else if (viewItem instanceof TVITourBookYearCategorized) {
+            } else if (viewItem instanceof final TVITourBookYearCategorized tviTourBookYearCategorized) {
 
                // one month/week is selected
 
                if (isSelectAllInHierarchy) {
-                  getYearSubTourIDs((TVITourBookYearCategorized) viewItem, tourIds);
+                  getYearSubTourIDs(tviTourBookYearCategorized, tourIds);
                }
 
             } else if (viewItem instanceof TVITourBookTour) {
@@ -2883,9 +2865,8 @@ public class TourBookView extends ViewPart implements
 
       // get all tours for the month item
       for (final TreeViewerItem viewerItem : yearSubItem.getFetchedChildren()) {
-         if (viewerItem instanceof TVITourBookTour) {
+         if (viewerItem instanceof final TVITourBookTour tourItem) {
 
-            final TVITourBookTour tourItem = (TVITourBookTour) viewerItem;
             allTourIds.add(tourItem.getTourId());
          }
       }
@@ -3310,7 +3291,7 @@ public class TourBookView extends ViewPart implements
 
    /**
     * This is not yet working thoroughly because the expanded position moves up or down and all
-    * expanded childrens are not visible (but they could) like when the triangle (+/-) icon in the
+    * expanded children are not visible (but they could) like when the triangle (+/-) icon in the
     * tree is clicked.
     *
     * @param treeSelection
@@ -3340,7 +3321,7 @@ public class TourBookView extends ViewPart implements
             @Override
             public void run() {
 
-               // check if a newer expand event occured
+               // check if a newer expand event occurred
                if (__expandRunnableCounter != _expandRunnableCounter) {
                   return;
                }
@@ -3678,9 +3659,9 @@ public class TourBookView extends ViewPart implements
       }
 
       // show and select the selected tour
-      if (selection instanceof SelectionTourId) {
+      if (selection instanceof final SelectionTourId selectionTourId) {
 
-         final long tourId = ((SelectionTourId) selection).getTourId();
+         final long tourId = selectionTourId.getTourId();
 
          if (_isLayoutNatTable) {
 
@@ -3694,30 +3675,24 @@ public class TourBookView extends ViewPart implements
             selectTour(tourId);
          }
 
-      } else if (selection instanceof SelectionTourIds) {
-
-         final SelectionTourIds selectionTourIds = (SelectionTourIds) selection;
+      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
 
          _selectedTourIds.clear();
          _selectedTourIds.addAll(selectionTourIds.getTourIds());
 
          reselectTourViewer(false);
 
-      } else if (selection instanceof StructuredSelection) {
+      } else if (selection instanceof final StructuredSelection structuredSelection) {
 
-         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+         final Object firstElement = structuredSelection.getFirstElement();
 
-         if (firstElement instanceof GeoComparedTour) {
+         if (firstElement instanceof final GeoComparedTour comparerItem) {
 
             // show selected compared tour
 
-            final GeoComparedTour comparerItem = (GeoComparedTour) firstElement;
-
             selectTour(comparerItem.tourId);
 
-         } else if (firstElement instanceof TVIRefTour_ComparedTour) {
-
-            final TVIRefTour_ComparedTour comparedTour = (TVIRefTour_ComparedTour) firstElement;
+         } else if (firstElement instanceof final TVIRefTour_ComparedTour comparedTour) {
 
             selectTour(comparedTour.getTourId());
          }
@@ -3953,9 +3928,8 @@ public class TourBookView extends ViewPart implements
 
       for (final TreeViewerItem rootItem : rootItems) {
 
-         if (rootItem instanceof TVITourBookYear) {
+         if (rootItem instanceof final TVITourBookYear tourBookYear) {
 
-            final TVITourBookYear tourBookYear = ((TVITourBookYear) rootItem);
             if (tourBookYear.tourYear == _selectedYear) {
 
                reselectYearItem = rootItem;
@@ -4002,9 +3976,7 @@ public class TourBookView extends ViewPart implements
 
          _tourViewer_Tree.setSelection(new StructuredSelection(reselectYearItem) {}, false);
 
-      } else if (rootItems.size() > 0)
-
-      {
+      } else if (rootItems.size() > 0) {
 
          // the old year was not found, select the newest year
 
@@ -4346,7 +4318,7 @@ public class TourBookView extends ViewPart implements
          }
 
          /*
-          * Prevent that _tourViewer_NatTable.setFocus() is fireing a part selection which would
+          * Prevent that _tourViewer_NatTable.setFocus() is firing a part selection which would
           * case the 2D map crumb to show the last part selection
           */
          _postSelectionProvider.clearSelection();
@@ -4561,7 +4533,7 @@ public class TourBookView extends ViewPart implements
       _natTable_DataLoader.setTourCollectionFilter(tourSelectionFilterInDataLoader, _selectedTourIds);
 
       /*
-       * Found no simple way to update the tabel otherwise an exceptions occurs somewhere in the
+       * Found no simple way to update the table otherwise an exceptions occurs somewhere in the
        * deep nattable layers
        */
       _tourViewer_NatTable.setRedraw(false);

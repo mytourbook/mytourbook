@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -89,7 +89,7 @@ public class ChartComponents extends Composite {
          Messages.Month_feb,
          Messages.Month_mar,
          Messages.Month_apr,
-         Messages.Month_mai,
+         Messages.Month_may,
          Messages.Month_jun,
          Messages.Month_jul,
          Messages.Month_aug,
@@ -441,7 +441,7 @@ public class ChartComponents extends Composite {
          } else if (unitType == ChartDataSerie.X_AXIS_UNIT_NUMBER_CENTER) {
 
             /*
-             * Set bar width that it is wide enouth to overlap the next right bar, the
+             * Set bar width that it is wide enough to overlap the next right bar, the
              * overlapped part will be removed in ChartComponentGraph.draw210BarGraph()
              */
             final float barWidth = ((float) devVirtualGraphWidth / (numValues - 1));
@@ -503,7 +503,7 @@ public class ChartComponents extends Composite {
 
       /*
        * increase by one unit that the right side of the chart is drawing a unit, in some
-       * cases this didn't occured
+       * cases this didn't occurred
        */
       double graphMinVisibleValue = xData.getVisibleMinValue();
       double graphMaxVisibleValue = xData.getVisibleMaxValue() + graphUnit;
@@ -1715,7 +1715,7 @@ public class ChartComponents extends Composite {
 
       if (isAdjustGraphUnit || unitType == ChartDataSerie.AXIS_UNIT_HOUR_MINUTE_24H && (graphMaxValue / 3600 > 24)) {
 
-         // max value exeeds 24h
+         // max value exceeds 24h
 
          // count number of units
          int unitCounter = 0;
@@ -2423,7 +2423,7 @@ public class ChartComponents extends Composite {
    }
 
    /**
-    * Set's a {@link SynchConfiguration}, this chart will then be sychronized with the chart which
+    * Set's a {@link SynchConfiguration}, this chart will then be synchronized with the chart which
     * sets the synch config
     *
     * @param synchConfigIn

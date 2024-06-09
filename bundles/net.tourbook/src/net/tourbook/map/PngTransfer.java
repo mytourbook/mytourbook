@@ -1,4 +1,4 @@
-package net.tourbook.map2.view;
+package net.tourbook.map;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

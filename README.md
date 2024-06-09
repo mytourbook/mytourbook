@@ -1,9 +1,8 @@
 <center><img src="https://mytourbook.sourceforge.io/mytourbook/images/mytb/start-page/2024/splash-2401.png" width="50%"></center>
 
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-[![Downloads](https://img.shields.io/sourceforge/dt/mytourbook)](https://sourceforge.net/projects/mytourbook/files/latest/download)
-[![Downloads](https://img.shields.io/sourceforge/dm/mytourbook)](https://sourceforge.net/projects/mytourbook/files/latest/download)
-[![Latest release](https://badgen.net/github/tag/wolfgang-ch/mytourbook)](https://github.com/wolfgang-ch/mytourbook/tags/)
+[![Github All Releases](https://img.shields.io/github/downloads/wolfgang-ch/mytourbook/total.svg)]()
+[![Latest release](https://img.shields.io/github/v/release/wolfgang-ch/mytourbook)](https://github.com/wolfgang-ch/mytourbook/releases)
 
 [![Build status](https://github.com/wolfgang-ch/mytourbook/actions/workflows/build.yml/badge.svg)](https://github.com/wolfgang-ch/mytourbook/actions/workflows/build.yml)
 

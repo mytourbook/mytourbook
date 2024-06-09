@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2022 Frédéric Bard
+ * Copyright (C) 2021, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,16 +13,14 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map2.action;
-
-import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
+package net.tourbook.map;
 
 import net.tourbook.map2.Messages;
-import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -34,12 +32,12 @@ public class Action_ExportMap_SubMenu extends Action implements IMenuCreator {
    private ActionExportMapViewImage     _actionExportMapViewImage;
    private ActionExportMapViewClipboard _actionExportMapViewClipboard;
 
-   public Action_ExportMap_SubMenu(final Map2View map2View) {
+   public Action_ExportMap_SubMenu(final IMapView mapView) {
 
       super(Messages.Map_Action_Export_Map_View, AS_DROP_DOWN_MENU);
 
-      _actionExportMapViewImage = new ActionExportMapViewImage(map2View);
-      _actionExportMapViewClipboard = new ActionExportMapViewClipboard(map2View);
+      _actionExportMapViewImage = new ActionExportMapViewImage(mapView);
+      _actionExportMapViewClipboard = new ActionExportMapViewClipboard(mapView);
 
       setMenuCreator(this);
    }
@@ -69,7 +67,7 @@ public class Action_ExportMap_SubMenu extends Action implements IMenuCreator {
       _menu = new Menu(parent);
 
       // Add listener to re-populate the menu each time
-      _menu.addMenuListener(menuShownAdapter(menuEvent -> {
+      _menu.addMenuListener(MenuListener.menuShownAdapter(menuEvent -> {
 
          // dispose old menu items
          for (final MenuItem menuItem : ((Menu) menuEvent.widget).getItems()) {

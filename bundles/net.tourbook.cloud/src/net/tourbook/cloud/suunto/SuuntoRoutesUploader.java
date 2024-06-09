@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2023 Frédéric Bard
+ * Copyright (C) 2021, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,6 +48,7 @@ import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -184,10 +185,8 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
    private boolean isTourContainsGpsData(final TourData tourData) {
 
-      return tourData.latitudeSerie != null &&
-            tourData.latitudeSerie.length > 0 &&
-            tourData.longitudeSerie != null &&
-            tourData.longitudeSerie.length > 0;
+      return ArrayUtils.isNotEmpty(tourData.latitudeSerie) &&
+            ArrayUtils.isNotEmpty(tourData.longitudeSerie);
    }
 
    private boolean logUploadResult(final RouteUpload routeUpload) {
@@ -359,23 +358,24 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
          @Override
          public void done(final IJobChangeEvent event) {
 
-            if (PlatformUI.isWorkbenchRunning()) {
-
-               PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
-
-                  final String infoText = event.getResult().isOK()
-                        ? NLS.bind(Messages.Dialog_UploadRoutesToSuunto_Message,
-                              numberOfUploadedTours[0],
-                              numberOfTours - numberOfUploadedTours[0])
-                        : notificationText[0];
-
-                  TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
-
-                  UI.openNotificationPopup(Messages.Dialog_UploadRoutesToSuunto_Title,
-                        Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo_Small),
-                        infoText);
-               });
+            if (!PlatformUI.isWorkbenchRunning()) {
+               return;
             }
+
+            final String infoText = event.getResult().isOK()
+                  ? NLS.bind(Messages.Dialog_UploadRoutesToSuunto_Message,
+                        numberOfUploadedTours[0],
+                        numberOfTours - numberOfUploadedTours[0])
+                  : notificationText[0];
+
+            PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+
+               TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
+
+               UI.openNotificationPopup(Messages.Dialog_UploadRoutesToSuunto_Title,
+                     Activator.getImageDescriptor(CloudImages.Cloud_Suunto_Logo),
+                     infoText);
+            });
          }
       });
    }

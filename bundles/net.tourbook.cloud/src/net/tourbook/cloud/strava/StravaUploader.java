@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2023 Frédéric Bard
+ * Copyright (C) 2020, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -519,23 +519,24 @@ public class StravaUploader extends TourbookCloudUploader {
          @Override
          public void done(final IJobChangeEvent event) {
 
-            if (PlatformUI.isWorkbenchRunning()) {
-
-               final String infoText = event.getResult().isOK()
-                     ? NLS.bind(Messages.Dialog_UploadToursToStrava_Message,
-                           numberOfUploadedTours[0],
-                           numberOfTours - numberOfUploadedTours[0])
-                     : notificationText[0];
-
-               PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
-
-                  TourLogManager.log_TITLE(String.format(Messages.Log_CloudAction_End, (System.currentTimeMillis() - start) / 1000.0));
-
-                  UI.openNotificationPopup(Messages.Dialog_UploadToursToStrava_Title,
-                        Activator.getImageDescriptor(CloudImages.Cloud_Strava_Logo_Small),
-                        infoText);
-               });
+            if (!PlatformUI.isWorkbenchRunning()) {
+               return;
             }
+
+            final String infoText = event.getResult().isOK()
+                  ? NLS.bind(Messages.Dialog_UploadToursToStrava_Message,
+                        numberOfUploadedTours[0],
+                        numberOfTours - numberOfUploadedTours[0])
+                  : notificationText[0];
+
+            PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+
+               TourLogManager.log_TITLE(String.format(Messages.Log_CloudAction_End, (System.currentTimeMillis() - start) / 1000.0));
+
+               UI.openNotificationPopup(Messages.Dialog_UploadToursToStrava_Title,
+                     Activator.getImageDescriptor(CloudImages.Cloud_Strava_Logo),
+                     infoText);
+            });
          }
       });
    }

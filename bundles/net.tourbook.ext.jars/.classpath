@@ -3,12 +3,12 @@
    <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17"/>
    <classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
    <classpathentry kind="src" path="src"/>
-   <classpathentry exported="true" kind="lib" path="c3p0-0.10.0.jar"/>                    <!-- https://mvnrepository.com/artifact/com.mchange/c3p0 -->
+   <classpathentry exported="true" kind="lib" path="c3p0-0.10.1.jar"/>                    <!-- https://mvnrepository.com/artifact/com.mchange/c3p0 -->
    <classpathentry exported="true" kind="lib" path="mchange-commons-java-0.3.0.jar"/>    <!-- https://mvnrepository.com/artifact/com.mchange/mchange-commons-java -->
-   <classpathentry exported="true" kind="lib" path="caffeine-3.1.4.jar"/>                 <!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
+   <classpathentry exported="true" kind="lib" path="caffeine-3.1.8.jar"/>                 <!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
    <classpathentry exported="true" kind="lib" path="commons-imaging-1.0-alpha1.jar"/>     <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-imaging -->
    <classpathentry exported="true" kind="lib" path="commons-lang3-3.14.0.jar"          sourcepath="jar-sources/commons-lang3-3.14.0-sources.jar"/>    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
-   <classpathentry exported="true" kind="lib" path="commons-text-1.11.0.jar"           sourcepath="jar-sources/commons-text-1.11.0-sources.jar"/>     <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
+   <classpathentry exported="true" kind="lib" path="commons-text-1.12.0.jar"           sourcepath="jar-sources/commons-text-1.11.0-sources.jar"/>     <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
    <classpathentry exported="true" kind="lib" path="imgscalr-lib-4.2.jar"/>               <!-- https://mvnrepository.com/artifact/org.imgscalr/imgscalr-lib -->
    <classpathentry exported="true" kind="lib" path="jackson-core-2.17.0.jar"           sourcepath="/Jackson Core"/>                                   <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
    <classpathentry exported="true" kind="lib" path="jackson-databind-2.17.0.jar"       sourcepath="/Jackson Databind"/>                               <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
@@ -18,11 +18,11 @@
          <attribute name="javadoc_location" value="https://www.javadoc.io/doc/joda-time/joda-time/2.12.5"/>
       </attributes>
    </classpathentry>
-   <classpathentry exported="true" kind="lib" path="json-20231013.jar"/>                              <!-- https://mvnrepository.com/artifact/org.json/json -->
+   <classpathentry exported="true" kind="lib" path="json-20240303.jar"/>                              <!-- https://mvnrepository.com/artifact/org.json/json -->
    <classpathentry exported="true" kind="lib" path="lat-lon-timezone-converter-2019-04-30.jar" />     <!-- https://github.com/drtimcooper/LatLongToTimezone/blob/master/src/main/java/com/skedgo/converter/TimezoneMapper.java -->
    <classpathentry exported="true" kind="lib" path="simplelatlng-1.4.0.jar"                        sourcepath="jar-sources/simplelatlng-1.4.0-sources.jar"/>      <!-- https://mvnrepository.com/artifact/com.javadocmd/simplelatlng -->
    <classpathentry exported="true" kind="lib" path="commons-suncalc-3.4.jar"/>                        <!-- https://mvnrepository.com/artifact/org.shredzone.commons/commons-suncalc -->
-   <classpathentry exported="true" kind="lib" path="fit-21.133.0.jar"                              sourcepath="/FIT SDK/FitSDKRelease/java"/>                     <!-- https://mvnrepository.com/artifact/com.garmin/fit https://github.com/garmin/fit-java-sdk -->
+   <classpathentry exported="true" kind="lib" path="fit-21.141.0.jar"                              sourcepath="/FIT SDK/FitSDKRelease/java"/>                     <!-- https://mvnrepository.com/artifact/com.garmin/fit https://github.com/garmin/fit-java-sdk -->
    <classpathentry exported="true" kind="lib" path="url-detector-0.1.23.jar"/>                        <!-- https://mvnrepository.com/artifact/io.github.url-detector/url-detector -->
    <classpathentry kind="output" path="bin"/>
 </classpath>

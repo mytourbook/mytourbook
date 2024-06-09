@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2023 Frédéric Bard
+ * Copyright (C) 2020, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -51,6 +51,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.export.fit.FitExporter;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -61,6 +62,7 @@ import org.dinopolis.gpstool.gpsinput.GPSTrackpoint;
 import org.dinopolis.gpstool.gpsinput.garmin.GarminTrack;
 import org.dinopolis.gpstool.gpsinput.garmin.GarminTrackpointAdapter;
 import org.dinopolis.gpstool.gpsinput.garmin.GarminTrackpointD304;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.osgi.framework.Version;
@@ -112,30 +114,32 @@ public class TourExporter {
       _dateFormat.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
    }
 
-   private String       _activityType;
+   private String          _activityType;
    /**
     * The speed is in meters/second
     */
-   private float        _camouflageSpeed;
-   private String       _courseName;
-   private final String _formatTemplate;
-   private boolean      _isCamouflageSpeed;
-   private boolean      _isCourse;
-   private boolean      _isExportAllTourData;
-   private boolean      _isExportSurfingWaves;
-   private boolean      _isExportWithBarometer;
-   private boolean      _isRange;
-   private TourData     _tourData;
-   private int          _tourEndIndex;
-   private int          _tourStartIndex;
-   private boolean      _useAbsoluteDistance;
-   private boolean      _useActivityType;
-   private boolean      _useDescription;
+   private float           _camouflageSpeed;
+   private String          _courseName;
+   private boolean         _displayNotificationPopup;
+   private final String    _formatTemplate;
+   private ImageDescriptor _imageDescriptor;
+   private boolean         _isCamouflageSpeed;
+   private boolean         _isCourse;
+   private boolean         _isExportAllTourData;
+   private boolean         _isExportSurfingWaves;
+   private boolean         _isExportWithBarometer;
+   private boolean         _isRange;
+   private TourData        _tourData;
+   private int             _tourEndIndex;
+   private int             _tourStartIndex;
+   private boolean         _useAbsoluteDistance;
+   private boolean         _useActivityType;
+   private boolean         _useDescription;
 
-   private boolean      _isFIT;
-   private boolean      _isGPX;
-   private boolean      _isMT;
-   private boolean      _isTCX;
+   private boolean         _isFIT;
+   private boolean         _isGPX;
+   private boolean         _isMT;
+   private boolean         _isTCX;
 
    public TourExporter(final String formatTemplate) {
 
@@ -168,9 +172,12 @@ public class TourExporter {
                        final boolean isExportSurfingWaves,
                        final boolean isExportAllTourData,
                        final boolean isCourse,
-                       final String courseName) {
+                       final String courseName,
+                       final ImageDescriptor imageDescriptor) {
 
       this(formatTemplate);
+
+      _displayNotificationPopup = true;
 
       setUseDescription(useDescription);
       setIsExportWithBarometer(isExportWithBarometer);
@@ -189,6 +196,8 @@ public class TourExporter {
       //For TCX
       setIsCourse(isCourse);
       setCourseName(courseName);
+
+      _imageDescriptor = imageDescriptor;
    }
 
    public boolean doExport_10_Tour(final List<GarminTrack> tracks,
@@ -423,9 +432,11 @@ public class TourExporter {
       double max_longitude = -180.0;
 
       final List<?> routes = (List<?>) vcContext.get("routes"); //$NON-NLS-1$
-      if (routes != null) {
+      if (CollectionUtils.isNotEmpty(routes)) {
+
          final Iterator<?> route_iterator = routes.iterator();
          while (route_iterator.hasNext()) {
+
             final GPSRoute route = (GPSRoute) route_iterator.next();
             min_longitude = route.getMinLongitude();
             max_longitude = route.getMaxLongitude();
@@ -435,9 +446,11 @@ public class TourExporter {
       }
 
       final List<?> wayPoints = (List<?>) vcContext.get(VC_WAY_POINTS);
-      if (wayPoints != null) {
+      if (CollectionUtils.isNotEmpty(wayPoints)) {
+
          final Iterator<?> waypoint_iterator = wayPoints.iterator();
          while (waypoint_iterator.hasNext()) {
+
             final TourWayPoint waypoint = (TourWayPoint) waypoint_iterator.next();
             min_longitude = Math.min(min_longitude, waypoint.getLongitude());
             max_longitude = Math.max(max_longitude, waypoint.getLongitude());
@@ -447,12 +460,11 @@ public class TourExporter {
       }
 
       final List<?> tourMarkers = (List<?>) vcContext.get(VC_TOUR_MARKERS);
-      if (tourMarkers != null) {
+      if (CollectionUtils.isNotEmpty(tourMarkers)) {
 
          for (final Object element : tourMarkers) {
-            if (element instanceof TourMarker) {
 
-               final TourMarker tourMarker = (TourMarker) element;
+            if (element instanceof final TourMarker tourMarker) {
 
                final double longitude = tourMarker.getLongitude();
                final double latitude = tourMarker.getLatitude();
@@ -469,9 +481,11 @@ public class TourExporter {
       }
 
       final List<?> tracks = (List<?>) vcContext.get(VC_TRACKS);
-      if (tracks != null) {
+      if (CollectionUtils.isNotEmpty(tracks)) {
+
          final Iterator<?> track_iterator = tracks.iterator();
          while (track_iterator.hasNext()) {
+
             final GPSTrack track = (GPSTrack) track_iterator.next();
             min_longitude = Math.min(min_longitude, track.getMinLongitude());
             max_longitude = Math.max(max_longitude, track.getMaxLongitude());
@@ -517,28 +531,26 @@ public class TourExporter {
                endtime = wp.getDate();
             }
 
-            if (wp instanceof GarminTrackpointAdapter) {
-
-               final GarminTrackpointAdapter gta = (GarminTrackpointAdapter) wp;
+            if (wp instanceof final GarminTrackpointAdapter garminTrackpointAdapter) {
 
                // average heartrate, maximum heartrate
-               if (gta.hasValidHeartrate()) {
-                  heartSum += gta.getHeartrate();
+               if (garminTrackpointAdapter.hasValidHeartrate()) {
+                  heartSum += garminTrackpointAdapter.getHeartrate();
                   heartNum++;
-                  if (gta.getHeartrate() > maximumheartrate) {
-                     maximumheartrate = gta.getHeartrate();
+                  if (garminTrackpointAdapter.getHeartrate() > maximumheartrate) {
+                     maximumheartrate = garminTrackpointAdapter.getHeartrate();
                   }
                }
 
                // average cadence
-               if (gta.hasValidCadence()) {
-                  cadSum += gta.getCadence();
+               if (garminTrackpointAdapter.hasValidCadence()) {
+                  cadSum += garminTrackpointAdapter.getCadence();
                   cadNum++;
                }
 
                // total distance
-               if (gta.hasValidDistance()) {
-                  totaldistance = gta.getDistance();
+               if (garminTrackpointAdapter.hasValidDistance()) {
+                  totaldistance = garminTrackpointAdapter.getDistance();
                }
             }
          }
@@ -602,6 +614,7 @@ public class TourExporter {
     * @param trackDateTime
     * @param _mergedDistance2
     * @param _mergedTime2
+    *
     * @return Returns a track or <code>null</code> when tour data cannot be exported.
     */
    public GarminTrack doExport_60_TrackPoints(final ZonedDateTime trackDateTime, final ZonedDateTime[] mergedTime, final int[] mergedDistance) {
@@ -987,12 +1000,26 @@ public class TourExporter {
 
       doExport_70_WayPoints(wayPoints, tourMarkers, trackStartTime);
 
+      boolean exportStatus = false;
       try {
-         return doExport_10_Tour(tracks, wayPoints, tourMarkers, tourLap, exportFileName);
+
+         exportStatus = doExport_10_Tour(tracks, wayPoints, tourMarkers, tourLap, exportFileName);
+
       } catch (final IOException e) {
+
          StatusUtil.log(e);
       }
-      return false;
+
+      if (_displayNotificationPopup) {
+
+         final String notificationText = exportStatus
+               ? UI.SYMBOL_HEAVY_CHECK_MARK + UI.SPACE + String.format(Messages.Dialog_Export_Message_Successful, exportFileName)
+               : UI.SYMBOL_CROSS_MARK + UI.SPACE + String.format(Messages.Dialog_Export_Message_Unsuccessful, exportFileName);
+
+         UI.openNotificationPopup(Messages.dialog_export_dialog_title, _imageDescriptor, notificationText);
+      }
+
+      return exportStatus;
    }
 
    public void setActivityType(final String activityType) {

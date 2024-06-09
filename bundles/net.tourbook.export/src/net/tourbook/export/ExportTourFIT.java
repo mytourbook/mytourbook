@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Frédéric Bard and Contributors
+ * Copyright (C) 2023, 2024 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,6 +47,7 @@ public class ExportTourFIT extends ExportTourExtension {
             tourDataList,
             tourStartIndex,
             tourEndIndex,
-            "fit").open(); //$NON-NLS-1$
+            "fit", //$NON-NLS-1$
+            getImageDescriptor()).open();
    }
 }

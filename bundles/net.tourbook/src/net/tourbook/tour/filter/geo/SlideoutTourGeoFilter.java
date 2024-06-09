@@ -45,8 +45,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -57,7 +55,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -77,7 +74,6 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -86,9 +82,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
@@ -116,8 +110,8 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
    private static final String            STATE_IS_FILTER_VIEWER_IN_EDIT_MODE = "isFilterViewerInEditMode";             //$NON-NLS-1$
 
-   private final static IPreferenceStore  _prefStore                          = TourbookPlugin.getPrefStore();
-   private final static IDialogSettings   _state                              = TourGeoFilter_Manager.getState();
+   private static final IPreferenceStore  _prefStore                          = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings   _state                              = TourGeoFilter_Manager.getState();
 
    private TableViewer                    _geoFilterViewer;
    private TableColumnDefinition          _colDef_FilterName;
@@ -382,7 +376,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
       /**
        * Context menu must be set lately, otherwise an "Widget has the wrong parent" exception
-       * occures
+       * occurs
        */
       if (isVisible) {
          _columnManager.createHeaderContextMenu(_geoFilterViewer.getTable(), null, getRRShellWithResize());
@@ -683,12 +677,8 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
        * It took a while that the correct listener is set and also the checked item is fired and not
        * the wrong selection.
        */
-      table.addListener(SWT.Selection, new Listener() {
-
-         @Override
-         public void handleEvent(final Event event) {
+      table.addListener(SWT.Selection, event -> {
 //            onGeoPart_Select(event);
-         }
       });
 
       table.addKeyListener(new KeyListener() {
@@ -739,7 +729,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
    }
 
    /**
-    * Ceate the view context menus
+    * Create the view context menus
     */
    private void createUI_620_ContextMenu() {
 
@@ -747,11 +737,8 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
       menuMgr.setRemoveAllWhenShown(true);
 
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
+      menuMgr.addMenuListener(manager -> {
 //          fillContextMenu(manager);
-         }
       });
 
       /**
@@ -1075,9 +1062,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
    private void disposeMapOverlayImages() {
 
       final IViewPart view = Util.getView(Map2View.ID);
-      if (view instanceof Map2View) {
-
-         final Map2View map2View = (Map2View) view;
+      if (view instanceof final Map2View map2View) {
 
          final Map2 map = map2View.getMap();
 
@@ -1188,23 +1173,15 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
          }
       };
 
-      _defaultChangePropertyListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-            onChangeUI();
-         }
-      };
+      _defaultChangePropertyListener = propertyChangeEvent -> onChangeUI();
 
-      _mouseWheelListener_WithUpdateUI_WithRepainting = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
+      _mouseWheelListener_WithUpdateUI_WithRepainting = mouseEvent -> {
 
-            // force repainting
-            disposeMapOverlayImages();
+         // force repainting
+         disposeMapOverlayImages();
 
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onChangeUI();
-         }
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeUI();
       };
 //
 //      _keepOpenListener = new FocusListener() {
@@ -1410,7 +1387,7 @@ public class SlideoutTourGeoFilter extends AdvancedSlideout implements ITourView
 
    private void onResize_Options() {
 
-      // horizontal scroll bar ishidden, only the vertical scrollbar can be displayed
+      // horizontal scroll bar is hidden, only the vertical scrollbar can be displayed
       int infoContainerWidth = _optionsContainer.getBounds().width;
       final ScrollBar vertBar = _optionsContainer.getVerticalBar();
 
