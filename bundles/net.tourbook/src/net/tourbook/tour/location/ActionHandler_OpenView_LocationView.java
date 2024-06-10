@@ -41,6 +41,6 @@ public class ActionHandler_OpenView_LocationView extends AbstractHandler impleme
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
 
-      UI.setThemedIcon(uiElement, Images.TourLocations);
+      UI.setThemedIcon(uiElement, Images.MapLocation_Tour);
    }
 }

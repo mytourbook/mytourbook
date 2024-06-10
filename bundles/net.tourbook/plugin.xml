@@ -634,8 +634,8 @@
                <command
                   commandId   ="command.net.tourbook.tour.location.TourLocationView"
                   icon        ="icons/tour-locations.png"
-                  label       ="%View_Name_TourLocations"
-                  mnemonic    ="%View_Name_TourLocations_Mnemonic"/>
+                  label       ="%View_Name_TourLocations2"
+                  mnemonic    ="%View_Name_TourLocations2_Mnemonic"/>
 
                
             <!-- GROUP: Sensors -->
@@ -1368,7 +1368,7 @@
 
       <command
          id             ="command.net.tourbook.tour.location.TourLocationView"
-         name           ="%View_Name_TourLocations"
+         name           ="%View_Name_TourLocations2"
          defaultHandler ="net.tourbook.tour.location.ActionHandler_OpenView_LocationView"/>
 
       <command
@@ -1668,7 +1668,7 @@
             id          ="net.tourbook.tour.location.TourLocationView"
             class       ="net.tourbook.tour.location.TourLocationView"
             icon        ="icons/tour-locations.png"
-            name        ="%View_Name_TourLocations"/>
+            name        ="%View_Name_TourLocations2"/>
 
 
       <!-- 2. Tour Properties -->

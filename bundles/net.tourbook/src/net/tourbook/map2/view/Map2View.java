@@ -500,7 +500,7 @@ public class Map2View extends ViewPart implements
    private ActionManageMapProviders          _actionManageMapProvider;
    private ActionMapBookmarks                _actionMap2Slideout_Bookmarks;
    private ActionMap2Color                   _actionMap2Slideout_Color;
-   private ActionMap2_MapLocationAndMarker   _actionMap2Slideout_MapLocationsAndMarkers;
+   private ActionMap2_MapPoint               _actionMap2Slideout_MapLocationsAndMarkers;
    private ActionMap2_MapProvider            _actionMap2Slideout_MapProvider;
    private ActionMap2_Options                _actionMap2Slideout_Options;
    private ActionMap2_PhotoFilter            _actionMap2Slideout_PhotoFilter;
@@ -551,7 +551,7 @@ public class Map2View extends ViewPart implements
    private GeoFilter_LoaderData              _geoFilter_PreviousGeoLoaderItem;
    private AtomicInteger                     _geoFilter_RunningId  = new AtomicInteger();
    //
-   private SlideoutMap2_MapPoints            _slideoutMapLocation;
+   private SlideoutMap2_MapPoints            _slideoutMapPoint;
    //
    /*
     * UI controls
@@ -612,11 +612,11 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   private class ActionMap2_MapLocationAndMarker extends ActionToolbarSlideoutAdv {
+   private class ActionMap2_MapPoint extends ActionToolbarSlideoutAdv {
 
-      private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getThemedImageDescriptor(Images.MapLocation);
+      private static final ImageDescriptor _actionImageDescriptor = TourbookPlugin.getThemedImageDescriptor(Images.MapLocation_MapPoint);
 
-      public ActionMap2_MapLocationAndMarker() {
+      public ActionMap2_MapPoint() {
 
          super(_actionImageDescriptor, _actionImageDescriptor);
       }
@@ -624,10 +624,10 @@ public class Map2View extends ViewPart implements
       @Override
       protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-         _slideoutMapLocation = new SlideoutMap2_MapPoints(toolItem, _state, _state_MapLocation, Map2View.this);
-         _slideoutMapLocation.setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
+         _slideoutMapPoint = new SlideoutMap2_MapPoints(toolItem, _state, _state_MapLocation, Map2View.this);
+         _slideoutMapPoint.setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
 
-         return _slideoutMapLocation;
+         return _slideoutMapPoint;
       }
 
       @Override
@@ -1980,7 +1980,7 @@ public class Map2View extends ViewPart implements
       // actions with slideouts
       _actionMap2Slideout_Bookmarks                = new ActionMapBookmarks(this._parent, this);
       _actionMap2Slideout_Color                    = new ActionMap2Color();
-      _actionMap2Slideout_MapLocationsAndMarkers   = new ActionMap2_MapLocationAndMarker();
+      _actionMap2Slideout_MapLocationsAndMarkers   = new ActionMap2_MapPoint();
       _actionMap2Slideout_MapProvider              = new ActionMap2_MapProvider(this, _state_MapProvider);
       _actionMap2Slideout_PhotoFilter              = new ActionMap2_PhotoFilter(this, _state_PhotoFilter);
       _actionMap2Slideout_Options                  = new ActionMap2_Options();

@@ -735,10 +735,10 @@ public class Map2 extends Canvas {
    private int               _prefOptions_LineWidth;
    private List<Long>        _allTourIds;
 
-   private final Image       _imageMapLocation;
+   private final Image       _imageMapLocation_Tour;
    private final Image       _imageMapLocation_Common;
-   private final Image       _imageMapLocation_Start;
-   private final Image       _imageMapLocation_End;
+   private final Image       _imageMapLocation_TourStart;
+   private final Image       _imageMapLocation_TourEnd;
    private final Image       _imageMapLocation_Hovered;
    private final Image       _imageMapLocation_Disabled;
    private final Image       _imageMapLocation_Disabled_Dark;
@@ -805,14 +805,14 @@ public class Map2 extends Canvas {
       _cursorSearchTour_Scroll         = createCursorFromImage(Images.SearchTours_ByLocation_Scroll);
       _cursorSelect                    = createCursorFromImage(Images.Cursor_Select);
 
-      _imageMapLocation                = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker).createImage();
-      _imageMapLocation_Common         = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Address).createImage();
-      _imageMapLocation_Start          = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Start).createImage();
-      _imageMapLocation_End            = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_End).createImage();
-      _imageMapLocation_Hovered        = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Hovered).createImage();
+      _imageMapLocation_Common         = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Common).createImage();
+      _imageMapLocation_Tour           = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Tour).createImage();
+      _imageMapLocation_TourStart      = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_TourStart).createImage();
+      _imageMapLocation_TourEnd        = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_TourEnd).createImage();
 
-      _imageMapLocation_Disabled       = TourbookPlugin.getImageDescriptor(Images.MapLocation_Disabled).createImage();
-      _imageMapLocation_Disabled_Dark  = TourbookPlugin.getImageDescriptor(Images.MapLocation_Disabled_Dark).createImage();
+      _imageMapLocation_Disabled       = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Disabled).createImage();
+      _imageMapLocation_Disabled_Dark  = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Disabled_Dark).createImage();
+      _imageMapLocation_Hovered        = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Hovered).createImage();
 
       _imageMapLocationBounds          = _imageMapLocation_Hovered.getBounds();
 
@@ -3983,10 +3983,10 @@ public class Map2 extends Canvas {
       UI.disposeResource(_9PartImage);
       UI.disposeResource(_9PartGC);
 
-      UI.disposeResource(_imageMapLocation);
+      UI.disposeResource(_imageMapLocation_Tour);
       UI.disposeResource(_imageMapLocation_Common);
-      UI.disposeResource(_imageMapLocation_Start);
-      UI.disposeResource(_imageMapLocation_End);
+      UI.disposeResource(_imageMapLocation_TourStart);
+      UI.disposeResource(_imageMapLocation_TourEnd);
       UI.disposeResource(_imageMapLocation_Disabled);
       UI.disposeResource(_imageMapLocation_Disabled_Dark);
       UI.disposeResource(_imageMapLocation_Hovered);
@@ -6568,20 +6568,20 @@ public class Map2 extends Canvas {
 
                // start & end location
 
-               gc.drawImage(_imageMapLocation_End, iconDevX, iconDevY);
-               gc.drawImage(_imageMapLocation_Start, iconDevX, iconDevY);
+               gc.drawImage(_imageMapLocation_TourEnd, iconDevX, iconDevY);
+               gc.drawImage(_imageMapLocation_TourStart, iconDevX, iconDevY);
 
             } else if (numDuplicates_Start > 0) {
 
                // start location
 
-               gc.drawImage(_imageMapLocation_Start, iconDevX, iconDevY);
+               gc.drawImage(_imageMapLocation_TourStart, iconDevX, iconDevY);
 
             } else if (numDuplicates_End > 0) {
 
                // end location
 
-               gc.drawImage(_imageMapLocation_End, iconDevX, iconDevY);
+               gc.drawImage(_imageMapLocation_TourEnd, iconDevX, iconDevY);
 
             } else {
 
@@ -6595,7 +6595,7 @@ public class Map2 extends Canvas {
 
                   // other location
 
-                  gc.drawImage(_imageMapLocation, iconDevX, iconDevY);
+                  gc.drawImage(_imageMapLocation_Tour, iconDevX, iconDevY);
                }
             }
          }
