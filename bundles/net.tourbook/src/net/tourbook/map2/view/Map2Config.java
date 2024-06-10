@@ -148,17 +148,21 @@ public class Map2Config {
 
    public TourFilterFieldOperator tourPauseDurationFilter_Operator;
 
+   private void logColor(final StringBuilder sb, final Color color, final String name) {
+
+      sb.append("   public static final RGB %-45s = new RGB(%d, %d, %d);\n" //$NON-NLS-1$
+
+            .formatted(
+
+                  name,
+                  color.getRed(),
+                  color.getGreen(),
+                  color.getBlue()));
+   }
+
    public void setupColors() {
 
 // SET_FORMATTING_OFF
-
-      tourMarkerFill_Color                = new Color(tourMarkerFill_RGB);
-      tourMarkerFill_Hovered_Color        = new Color(tourMarkerFill_Hovered_RGB);
-      tourMarkerOutline_Color             = new Color(tourMarkerOutline_RGB);
-      tourMarkerOutline_Hovered_Color     = new Color(tourMarkerOutline_Hovered_RGB);
-
-      clusterFill_Color                   = new Color(clusterFill_RGB);
-      clusterOutline_Color                = new Color(clusterOutline_RGB);
 
       commonLocationFill_Color            = new Color(commonLocationFill_RGB);
       commonLocationFill_Hovered_Color    = new Color(commonLocationFill_Hovered_RGB);
@@ -170,10 +174,56 @@ public class Map2Config {
       tourLocationOutline_Color           = new Color(tourLocationOutline_RGB);
       tourLocationOutline_Hovered_Color   = new Color(tourLocationOutline_Hovered_RGB);
 
+      tourMarkerFill_Color                = new Color(tourMarkerFill_RGB);
+      tourMarkerFill_Hovered_Color        = new Color(tourMarkerFill_Hovered_RGB);
+      tourMarkerOutline_Color             = new Color(tourMarkerOutline_RGB);
+      tourMarkerOutline_Hovered_Color     = new Color(tourMarkerOutline_Hovered_RGB);
+
+      clusterFill_Color                   = new Color(clusterFill_RGB);
+      clusterOutline_Color                = new Color(clusterOutline_RGB);
+
       tourPauseFill_Color                 = new Color(tourPauseFill_RGB);
       tourPauseFill_Hovered_Color         = new Color(tourPauseFill_Hovered_RGB);
       tourPauseOutline_Color              = new Color(tourPauseOutline_RGB);
       tourPauseOutline_Hovered_Color      = new Color(tourPauseOutline_Hovered_RGB);
+
+
+      /*
+       * Log color which is used when defining defaults
+       */
+      final boolean isLogColor = false;
+      if (isLogColor) {
+
+         final StringBuilder sb = new StringBuilder();
+
+
+         logColor(sb, clusterFill_Color,                    "DEFAULT_CLUSTER_FILL_RGB");                    //$NON-NLS-1$
+         logColor(sb, clusterOutline_Color,                 "DEFAULT_CLUSTER_OUTLINE_RGB");                 //$NON-NLS-1$
+
+         logColor(sb, commonLocationFill_Color,             "DEFAULT_COMMON_LOCATION_FILL_RGB");            //$NON-NLS-1$
+         logColor(sb, commonLocationFill_Hovered_Color,     "DEFAULT_COMMON_LOCATION_FILL_HOVERED_RGB");    //$NON-NLS-1$
+         logColor(sb, commonLocationOutline_Color,          "DEFAULT_COMMON_LOCATION_OUTLINE_RGB");         //$NON-NLS-1$
+         logColor(sb, commonLocationOutline_Hovered_Color,  "DEFAULT_COMMON_LOCATION_OUTLINE_HOVERED_RGB"); //$NON-NLS-1$
+
+         logColor(sb, tourLocationFill_Color,               "DEFAULT_TOUR_LOCATION_FILL_RGB");              //$NON-NLS-1$
+         logColor(sb, tourLocationFill_Hovered_Color,       "DEFAULT_TOUR_LOCATION_FILL_HOVERED_RGB");      //$NON-NLS-1$
+         logColor(sb, tourLocationOutline_Color,            "DEFAULT_TOUR_LOCATION_OUTLINE_RGB");           //$NON-NLS-1$
+         logColor(sb, tourLocationOutline_Hovered_Color,    "DEFAULT_TOUR_LOCATION_OUTLINE_HOVERED_RGB");   //$NON-NLS-1$
+
+         logColor(sb, tourMarkerFill_Color,                 "DEFAULT_TOUR_MARKER_FILL_RGB");                //$NON-NLS-1$
+         logColor(sb, tourMarkerFill_Hovered_Color,         "DEFAULT_TOUR_MARKER_FILL_HOVERED_RGB");        //$NON-NLS-1$
+         logColor(sb, tourMarkerOutline_Color,              "DEFAULT_TOUR_MARKER_OUTLINE_RGB");             //$NON-NLS-1$
+         logColor(sb, tourMarkerOutline_Hovered_Color,      "DEFAULT_TOUR_MARKER_OUTLINE_HOVERED_RGB");     //$NON-NLS-1$
+
+         logColor(sb, tourPauseFill_Color,                  "DEFAULT_TOUR_PAUSE_FILL_RGB");                 //$NON-NLS-1$
+         logColor(sb, tourPauseFill_Hovered_Color,          "DEFAULT_TOUR_PAUSE_FILL_HOVERED_RGB");         //$NON-NLS-1$
+         logColor(sb, tourPauseOutline_Color,               "DEFAULT_TOUR_PAUSE_OUTLINE_RGB");              //$NON-NLS-1$
+         logColor(sb, tourPauseOutline_Hovered_Color,       "DEFAULT_TOUR_PAUSE_OUTLINE_HOVERED_RGB");      //$NON-NLS-1$
+
+         System.out.println(sb.toString());
+         System.out.println();
+         System.out.println();
+      }
 
 // SET_FORMATTING_ON
    }

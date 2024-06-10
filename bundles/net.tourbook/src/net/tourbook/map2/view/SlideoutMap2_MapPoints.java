@@ -2803,10 +2803,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       config.labelTruncateLength          = _spinnerLabelTruncateLength          .getSelection();
       config.labelWrapLength              = _spinnerLabelWrapLength              .getSelection();
 
-      config.tourMarkerFill_RGB                 = _colorTourMarkerLabel_Fill                 .getColorValue();
-      config.tourMarkerFill_Hovered_RGB         = _colorTourMarkerLabel_Fill_Hovered         .getColorValue();
-      config.tourMarkerOutline_RGB              = _colorTourMarkerLabel_Outline              .getColorValue();
-      config.tourMarkerOutline_Hovered_RGB      = _colorTourMarkerLabel_Outline_Hovered      .getColorValue();
+      config.labelLayout                  = getSelectedMarkerLabelLayout();
 
       config.commonLocationFill_RGB             = _colorCommonLocationLabel_Fill             .getColorValue();
       config.commonLocationFill_Hovered_RGB     = _colorCommonLocationLabel_Fill_Hovered     .getColorValue();
@@ -2818,12 +2815,16 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       config.tourLocationOutline_RGB            = _colorTourLocationLabel_Outline            .getColorValue();
       config.tourLocationOutline_Hovered_RGB    = _colorTourLocationLabel_Outline_Hovered    .getColorValue();
 
+      config.tourMarkerFill_RGB                 = _colorTourMarkerLabel_Fill                 .getColorValue();
+      config.tourMarkerFill_Hovered_RGB         = _colorTourMarkerLabel_Fill_Hovered         .getColorValue();
+      config.tourMarkerOutline_RGB              = _colorTourMarkerLabel_Outline              .getColorValue();
+      config.tourMarkerOutline_Hovered_RGB      = _colorTourMarkerLabel_Outline_Hovered      .getColorValue();
+
       config.tourPauseFill_RGB                  = _colorTourPauseLabel_Fill                  .getColorValue();
       config.tourPauseFill_Hovered_RGB          = _colorTourPauseLabel_Fill_Hovered          .getColorValue();
       config.tourPauseOutline_RGB               = _colorTourPauseLabel_Outline               .getColorValue();
       config.tourPauseOutline_Hovered_RGB       = _colorTourPauseLabel_Outline_Hovered       .getColorValue();
 
-      config.labelLayout                  = getSelectedMarkerLabelLayout();
 
       config.setupColors();
 
@@ -2841,6 +2842,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _map2View.setupMapDimLevel();
 
 // SET_FORMATTING_ON
+
    }
 
    @Override
