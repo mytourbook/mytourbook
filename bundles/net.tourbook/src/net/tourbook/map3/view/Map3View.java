@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.map3.view;
+
+import de.byteholder.geoclipse.util.Images;
 
 import gov.nasa.worldwind.View;
 import gov.nasa.worldwind.WorldWind;
@@ -31,14 +33,19 @@ import gov.nasa.worldwind.render.GlobeAnnotation;
 import gov.nasa.worldwind.view.BasicView;
 import gov.nasa.worldwind.view.orbit.BasicOrbitView;
 
+import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Frame;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Robot;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,12 +72,15 @@ import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.SWTPopupOverAWT;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
+import net.tourbook.map.Action_ExportMap_SubMenu;
 import net.tourbook.map.IMapSyncListener;
+import net.tourbook.map.IMapView;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapManager;
 import net.tourbook.map.bookmark.ActionMapBookmarks;
@@ -142,6 +152,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -157,7 +169,7 @@ import org.oscim.core.MapPosition;
 /**
  * Display 3-D map with tour tracks.
  */
-public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, IMapBookmarkListener, IMapSyncListener {
+public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, IMapBookmarkListener, IMapSyncListener, IMapView {
 
    private static final String              SLIDER_TEXT_ALTITUDE                   = "%.1f %s";                                             //$NON-NLS-1$
    private static final String              SLIDER_TEXT_GRADIENT                   = "%.1f %%";                                             //$NON-NLS-1$
@@ -185,10 +197,11 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    // SET_FORMATTING_ON
 
+   private Action_ExportMap_SubMenu          _actionExportMap_SubMenu;
    private ActionMap3Color                   _actionMap3Color;
    private ActionOpenPrefDialog              _actionMap3Colors;
    private ActionMapBookmarks                _actionMapBookmarks;
-//	private ActionOpenGLVersions					_actionOpenGLVersions;
+   //	private ActionOpenGLVersions					_actionOpenGLVersions;
    private ActionOpenMap3StatisticsView      _actionOpenMap3StatisticsView;
    private ActionSetTrackSliderPositionLeft  _actionSetTrackSliderLeft;
    private ActionSetTrackSliderPositionRight _actionSetTrackSliderRight;
@@ -287,6 +300,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    /**
     * @param eyePosition
+    *
     * @return Returns altitude offset depending on the configuration settings.
     */
    public static double getAltitudeOffset(final Position eyePosition) {
@@ -696,9 +710,9 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
             showAllTours_InternalTours();
 
-         } else if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         } else if (tourEventId == TourEventId.TOUR_CHANGED && eventData instanceof final TourEvent tourEvent) {
 
-            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
             if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
                updateModifiedTours(modifiedTours);
             }
@@ -709,9 +723,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          } else if (tourEventId == TourEventId.MARKER_SELECTION) {
 
-            if (eventData instanceof SelectionTourMarker) {
-
-               final SelectionTourMarker selection = (SelectionTourMarker) eventData;
+            if (eventData instanceof final SelectionTourMarker selection) {
 
                final TourData tourData = selection.getTourData();
                final ArrayList<TourMarker> tourMarker = selection.getSelectedTourMarker();
@@ -719,13 +731,13 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
                syncMapWith_TourMarker(tourData, tourMarker);
             }
 
-         } else if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+         } else if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof final ISelection selection) {
 
-            onSelectionChanged((ISelection) eventData);
+            onSelectionChanged(selection);
 
-         } else if (tourEventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+         } else if (tourEventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof final ISelection selection) {
 
-            onSelectionChanged((ISelection) eventData);
+            onSelectionChanged(selection);
          }
       };
 
@@ -812,6 +824,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
     *           View pitch.
     * @param altitudeMode
     *           Altitude mode of {@code eyePosition}.
+    *
     * @return The center position of the view.
     */
    protected Position computeCenterPosition(final Position eyePosition,
@@ -849,6 +862,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    }
 
    private void createActions(final Composite parent) {
+
+      _actionExportMap_SubMenu = new Action_ExportMap_SubMenu(this);
 
 //		_actionOpenGLVersions = new ActionOpenGLVersions();
       _actionOpenMap3StatisticsView = new ActionOpenMap3StatisticsView();
@@ -1307,6 +1322,9 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       fillMenuItem(menu, _actionExportTour);
       fillMenuItem(menu, _actionPrintTour);
 
+      (new Separator()).fill(menu, -1);
+      fillMenuItem(menu, _actionExportMap_SubMenu);
+
       enableContextMenuActions();
    }
 
@@ -1319,9 +1337,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    public void fireTourSelection(final ISelection selection) {
 
       // add slider position to the selection
-      if (selection instanceof SelectionTourData) {
-
-         final SelectionTourData tourDataSelection = (SelectionTourData) selection;
+      if (selection instanceof final SelectionTourData tourDataSelection) {
 
          tourDataSelection.setSliderValueIndex(_currentLeftSliderValueIndex, _currentRightSliderValueIndex);
       }
@@ -1403,6 +1419,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    /**
     * @param allTours
+    *
     * @return Returns only tours which can be displayed in the map (which contains geo coordinates).
     */
    private ArrayList<TourData> getMapTours(final List<TourData> allTours) {
@@ -1427,8 +1444,33 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       return mapTours;
    }
 
+   @Override
+   public Image getMapViewImage() {
+
+      try {
+
+         final Point locationOnScreen = _wwCanvas.getLocationOnScreen();
+         final BufferedImage screencapture = new Robot()
+               .createScreenCapture(new Rectangle(locationOnScreen.x,
+                     locationOnScreen.y,
+                     _wwCanvas.getWidth(),
+                     _wwCanvas.getHeight()));
+
+         // Convert the BufferedImage to an SWT Image
+         final ImageData imageData = Images.convertToSWT(screencapture);
+         final Image swtImage = new Image(Display.getDefault(), imageData);
+         return swtImage;
+
+      } catch (final AWTException e) {
+         StatusUtil.log(e);
+      }
+
+      return null;
+   }
+
    /**
     * @param trackSliderLayer
+    *
     * @return Returns {@link TourData} of the selected tour track or <code>null</code> when a tour
     *         is not selected.
     */
@@ -1667,25 +1709,24 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          return;
       }
 
-      if (selection instanceof SelectionTourData) {
+      if (selection instanceof final SelectionTourData selectionTourData) {
 
-         final SelectionTourData selectionTourData = (SelectionTourData) selection;
          final TourData tourData = selectionTourData.getTourData();
 
          showTour(tourData);
 
-      } else if (selection instanceof SelectionTourId) {
+      } else if (selection instanceof final SelectionTourId selectionTourId) {
 
-         final Long tourId = ((SelectionTourId) selection).getTourId();
+         final Long tourId = selectionTourId.getTourId();
          final TourData tourData = TourManager.getInstance().getTourData(tourId);
 
          showTour(tourData);
 
-      } else if (selection instanceof SelectionTourIds) {
+      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
 
          // paint all selected tours
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final ArrayList<Long> tourIds = selectionTourIds.getTourIds();
          if (tourIds.isEmpty()) {
 
             clearView();
@@ -1705,37 +1746,32 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
             showTours(tourIds);
          }
 
-      } else if (selection instanceof SelectionTourMarker) {
-
-         final SelectionTourMarker markerSelection = (SelectionTourMarker) selection;
+      } else if (selection instanceof final SelectionTourMarker markerSelection) {
 
          syncMapWith_TourMarker(markerSelection.getTourData(), markerSelection.getSelectedTourMarker());
 
-      } else if (selection instanceof SelectionChartInfo) {
+      } else if (selection instanceof final SelectionChartInfo chartInfo) {
 
          if (isTrackSliderVisible == false) {
             return;
          }
 
-         final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
-
          final ChartDataModel chartDataModel = chartInfo.chartDataModel;
          if (chartDataModel != null) {
 
-            final Object tourData = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
-            if (tourData instanceof TourData) {
+            final Object tourDataObject = chartDataModel.getCustomData(TourManager.CUSTOM_DATA_TOUR_DATA);
+            if (tourDataObject instanceof final TourData tourData) {
 
                syncMapWith_ChartSlider(
-                     (TourData) tourData,
+                     tourData,
                      chartInfo.leftSliderValuesIndex,
                      chartInfo.rightSliderValuesIndex,
                      chartInfo.selectedSliderValuesIndex);
             }
          }
 
-      } else if (selection instanceof SelectionChartXSliderPosition) {
+      } else if (selection instanceof final SelectionChartXSliderPosition xSliderPos) {
 
-         final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
          final Chart chart = xSliderPos.getChart();
          if (chart == null) {
             return;
@@ -1744,9 +1780,9 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          final ChartDataModel chartDataModel = chart.getChartDataModel();
 
          final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-         if (tourId instanceof Long) {
+         if (tourId instanceof final Long tourIdLong) {
 
-            final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+            final TourData tourData = TourManager.getInstance().getTourData(tourIdLong);
             if (tourData != null) {
 
                final int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
@@ -1920,9 +1956,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
       Integer colorValue = null;
 
-      if (colorProvider instanceof IGradientColorProvider) {
-
-         final IGradientColorProvider gradientColorProvider = (IGradientColorProvider) colorProvider;
+      if (colorProvider instanceof final IGradientColorProvider gradientColorProvider) {
 
          final MapUnits mapUnits = gradientColorProvider.getMapUnits(ColorProviderConfig.MAP3_TOUR);
          final float legendMinValue = mapUnits.legendMinValue;
@@ -1963,9 +1997,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          // get color according to the value
          colorValue = gradientColorProvider.getRGBValue(ColorProviderConfig.MAP3_TOUR, graphValue);
 
-      } else if (colorProvider instanceof IDiscreteColorProvider) {
-
-         final IDiscreteColorProvider discreteColorProvider = (IDiscreteColorProvider) colorProvider;
+      } else if (colorProvider instanceof final IDiscreteColorProvider discreteColorProvider) {
 
          colorValue = discreteColorProvider.getColorValue(tourData, positionIndex);
       }
@@ -2337,9 +2369,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       final float[] altitudeSerie = tourData.altitudeSerie;
 
       final View view = _wwCanvas.getView();
-      if (view instanceof BasicOrbitView) {
+      if (view instanceof final BasicOrbitView orbitView) {
 
-         final BasicOrbitView orbitView = (BasicOrbitView) view;
          final Position eyePos = orbitView.getCurrentEyePosition();
 
          final float trackAltitude = altitudeSerie == null ? 0 : altitudeSerie[valuesIndex];

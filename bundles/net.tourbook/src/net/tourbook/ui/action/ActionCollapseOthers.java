@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -44,9 +44,8 @@ public class ActionCollapseOthers extends Action {
       if (_tourViewer != null) {
 
          final ColumnViewer viewer = _tourViewer.getViewer();
-         if (viewer instanceof TreeViewer) {
+         if (viewer instanceof final TreeViewer treeViewer) {
 
-            final TreeViewer treeViewer = (TreeViewer) viewer;
             final Object firstElement = ((StructuredSelection) treeViewer.getSelection()).getFirstElement();
 
             if (firstElement != null) {
@@ -55,7 +54,7 @@ public class ActionCollapseOthers extends Action {
                tree.setRedraw(false);
                {
                   treeViewer.collapseAll();
-                  treeViewer.setExpandedElements(new Object[] { firstElement });
+                  treeViewer.setExpandedElements(firstElement);
                   treeViewer.setSelection(new StructuredSelection(firstElement), true);
                }
                tree.setRedraw(true);

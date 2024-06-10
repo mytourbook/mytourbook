@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,7 +39,7 @@ public class NatTable_Header_Tooltip extends NatTableContentTooltip {
 
    public NatTable_Header_Tooltip(final NatTable natTable, final TourBookView tourBookView) {
 
-// The 4th parameter is necessarry otherwise the build process fails !!!
+// The 4th parameter is necessary otherwise the build process fails !!!
 //
 //[ERROR] Failed to execute goal org.eclipse.tycho:tycho-compiler-plugin:1.4.0:compile (default-compile) on project net.tourbook: Compilation failure: Compilation failure:
 //[ERROR] C:\DAT\mytourbook-BUILD-autocreated\core\net.tourbook\src\net\tourbook\\ui\views\tourBook\natTable\NatTable_Header_Tooltip.java:[42]
@@ -137,7 +137,7 @@ public class NatTable_Header_Tooltip extends NatTableContentTooltip {
 
          } else {
 
-            // hovered colum is not sorted
+            // hovered column is not sorted
 
             final ColumnManager columnMgr = _tourBookView.getNatTable_ColumnManager();
             final boolean isShowSortingInHeader = columnMgr.isShowColumnAnnotation_Sorting();
@@ -189,10 +189,10 @@ public class NatTable_Header_Tooltip extends NatTableContentTooltip {
    private boolean isHoveredColumnAlsoSorted(final String hoveredColumnId) {
 
       final NatTable_SortModel sortModel = _tourBookView.getNatTableLayer_SortModel();
-      final List<Integer> _allSortedColumnIndexes = sortModel.getSortedColumnIndexes();
+      final List<Integer> allSortedColumnIndexes = sortModel.getSortedColumnIndexes();
       final ArrayList<ColumnDefinition> allColumnDefs = _tourBookView.getNatTable_ColumnManager().getVisibleAndSortedColumns();
 
-      for (final Integer sortedIndex : _allSortedColumnIndexes) {
+      for (final Integer sortedIndex : allSortedColumnIndexes) {
 
          final String sortedColumnId = allColumnDefs.get(sortedIndex).getColumnId();
 

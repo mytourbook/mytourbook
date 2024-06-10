@@ -419,7 +419,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
       /**
        * Context menu must be set lately, otherwise an "Widget has the wrong parent" exception
-       * occures
+       * occurs
        */
       if (isVisible) {
          _columnManager.createHeaderContextMenu(_mpViewer.getTable(), null, getRRShellWithResize());
@@ -660,7 +660,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
       _mpViewer.setContentProvider((IStructuredContentProvider) inputElement -> _allMapProvider.toArray());
 
-      _mpViewer.addSelectionChangedListener(this::onSelect_MapProvider);
+      _mpViewer.addSelectionChangedListener(event -> onSelect_MapProvider(event));
 
       _mpViewer.addDoubleClickListener(doubleClickEvent -> _action_ManageMapProviders.run());
 
@@ -762,17 +762,13 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
          @Override
          public boolean performDrop(final Object data) {
 
-            if (data instanceof StructuredSelection) {
+            if (data instanceof final StructuredSelection selection) {
 
-               final StructuredSelection selection = (StructuredSelection) data;
-
-               if (selection.getFirstElement() instanceof MP) {
+               if (selection.getFirstElement() instanceof final MP droppedMapProvider) {
 
                   // prevent selection, this occurred and mapprovider was null
                   _isInUpdate = true;
                   {
-                     final MP droppedMapProvider = (MP) selection.getFirstElement();
-
                      final int location = getCurrentLocation();
                      final Table mpTable = _mpViewer.getTable();
 
@@ -876,8 +872,8 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
             // check if dragged item is the target item
             final ISelection selection = transferData.getSelection();
-            if (selection instanceof StructuredSelection) {
-               final Object dragMP = ((StructuredSelection) selection).getFirstElement();
+            if (selection instanceof final StructuredSelection structuredSelection) {
+               final Object dragMP = structuredSelection.getFirstElement();
                if (target == dragMP) {
                   return false;
                }
@@ -904,7 +900,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
    }
 
    /**
-    * Ceate the view context menus
+    * Create the view context menus
     */
    private void createUI_22_ContextMenu() {
 
@@ -978,7 +974,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
       _colDef_IsMPVisible.setLabelProvider(new CellLabelProvider() {
 
          // !!! When using cell.setImage() then it is not centered !!!
-         // !!! Set dummy label provider, otherwise an error occures !!!
+         // !!! Set dummy label provider, otherwise an error occurs !!!
          @Override
          public void update(final ViewerCell cell) {}
       });
@@ -1252,7 +1248,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
       _imageYes = CommonActivator.getImageDescriptor(CommonImages.App_Yes).createImage();
       _imageNo = CommonActivator.getImageDescriptor(CommonImages.App_No).createImage();
 
-      _columnSortListener = widgetSelectedAdapter(this::onSelect_SortColumn);
+      _columnSortListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
    }
 
    @Override
@@ -1372,7 +1368,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
       if (_mpViewer.getTable().isDisposed()) {
 
-         // this can occures when the action is pressed with the keyboard and the slideout is closed
+         // this can occurs when the action is pressed with the keyboard and the slideout is closed
 
          return;
       }
@@ -1697,7 +1693,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
       if (mp == null) {
 
-         // this occured
+         // this occurred
 
          return;
       }

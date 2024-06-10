@@ -96,7 +96,7 @@ public class NutritionUtils {
       _nf2.setMaximumFractionDigits(2);
       final String averageFluidsPerHourFormatted = _nf2.format(averageFluidsPerHour);
 
-      return averageFluidsPerHourFormatted;
+      return averageFluidsPerHourFormatted.equals("0") ? UI.EMPTY_STRING : averageFluidsPerHourFormatted; //$NON-NLS-1$
    }
 
    private static float computeAveragePerHour(final TourData tourData, final float totalAmount) {

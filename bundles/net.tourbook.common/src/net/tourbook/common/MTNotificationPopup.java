@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Frédéric Bard
+ * Copyright (C) 2023, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.common;
 
+import net.tourbook.common.util.ImageUtils;
 import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -39,7 +40,7 @@ class MTNotificationPopup extends AbstractNotificationPopup {
                        final String title,
                        final String text) {
       super(display);
-      _image = imageDescriptor.createImage();
+      _image = ImageUtils.resize(display, imageDescriptor.createImage(), 16, 16);
       _title = title;
       _text = text;
    }

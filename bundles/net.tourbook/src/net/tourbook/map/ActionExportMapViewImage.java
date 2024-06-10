@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,22 +13,20 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map2.action;
+package net.tourbook.map;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.map2.Messages;
-import net.tourbook.map2.view.DialogMap2ExportViewImage;
-import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
 
 public class ActionExportMapViewImage extends Action {
 
-   private Map2View _map2View;
+   private IMapView _mapView;
 
-   public ActionExportMapViewImage(final Map2View mapView) {
+   public ActionExportMapViewImage(final IMapView mapView) {
 
       super(Messages.Map_Action_Export_Map_View_Image, AS_PUSH_BUTTON);
 
@@ -36,13 +34,13 @@ public class ActionExportMapViewImage extends Action {
 
       setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Save));
 
-      _map2View = mapView;
+      _mapView = mapView;
    }
 
    @Override
    public void run() {
 
-      new DialogMap2ExportViewImage(Display.getCurrent().getActiveShell(), _map2View).open();
+      new DialogMapExportViewImage(Display.getCurrent().getActiveShell(), _mapView).open();
 
    }
 

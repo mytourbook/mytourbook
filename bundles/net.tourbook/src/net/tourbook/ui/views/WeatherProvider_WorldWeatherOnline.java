@@ -56,7 +56,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
                              final Composite parent,
                              final FormToolkit formToolkit) {
 
-      final PixelConverter _pc = new PixelConverter(parent);
+      final PixelConverter pc = new PixelConverter(parent);
 
       final Composite container = formToolkit.createComposite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -117,7 +117,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .indent(DEFAULT_H_INDENT, 0)
-                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                  .hint(pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
                   .applyTo(linkApiSignup);
          }
          {

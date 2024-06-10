@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,6 +30,10 @@ import net.tourbook.common.color.MapUnits;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.Messages;
 
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Composite;
+
 public class MapUtils {
 
    /**
@@ -52,7 +56,7 @@ public class MapUtils {
       }
 
       /**
-       * This occurred at least twice but is not reproducable <code>
+       * This occurred at least twice but is not reproducible <code>
        *
        * java.util.ConcurrentModificationException
        * at java.base/java.util.ArrayList$Itr.checkForComodification(ArrayList.java:1043)
@@ -101,7 +105,7 @@ public class MapUtils {
 
                if (dataValue == Float.MIN_VALUE
 
-                     // 0 values can occure when multiple tours are displayed where some tours do not have an elevation
+                     // 0 values can occur when multiple tours are displayed where some tours do not have an elevation
                      || dataValue == 0) {
 
                   // skip invalid values
@@ -514,6 +518,22 @@ public class MapUtils {
       }
 
       return true;
+   }
+
+   public static Image getMapViewImage(final Composite parent) {
+
+      final Image image = new Image(parent.getDisplay(),
+            parent.getSize().x,
+            parent.getSize().y);
+
+      final GC gc = new GC(image);
+      parent.print(gc);
+      //This produces the same result
+      //  final GC gc = new GC(_parent);
+      //  gc.copyArea(image, 0, 0);
+      gc.dispose();
+
+      return image;
    }
 
    /**

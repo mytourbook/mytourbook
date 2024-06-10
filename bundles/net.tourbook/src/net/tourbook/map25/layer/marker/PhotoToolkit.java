@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019, 2023 Wolfgang Schramm and Contributors
+ * Copyright 2019, 2024 Wolfgang Schramm and Contributors
  * Copyright 2019, 2021 Thomas Theussing
  * Copyright 2016-2018 devemux86
  * Copyright 2017 nebular
@@ -32,14 +32,17 @@ import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.ui.SlideoutMap25_PhotoOptions;
 import net.tourbook.photo.ILoadCallBack;
+import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.ImageUtils;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoImageMetadata;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
@@ -56,18 +59,21 @@ import org.oscim.layers.marker.MarkerSymbol;
 
 public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerInterface> {
 
-   private Map25App _mapApp;
-   private Display  _display;
+   private static IPreferenceStore _prefStore = PhotoActivator.getPrefStore();
+
+   private Map25App                _mapApp;
+
+   private Display                 _display;
 
    /**
     * This image is displayed when a photo is not yet loaded
     */
-   private Bitmap   _bitmapNotLoadedPhoto;
+   private Bitmap                  _bitmapNotLoadedPhoto;
 // private Bitmap   _bitmapClusterPhoto;   // The Bitmap when markers are clustered
 
-   private MarkerSymbol _symbol; // marker symbol, circle or star
-
 // private boolean _isBillboard;
+
+   private MarkerSymbol _symbol; // marker symbol, circle or star
 
    private class ImageState {
 
@@ -365,14 +371,17 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
                //thumbRotation = getRotation();
             }
 
-            scaledImage = ImageUtils.resize(
+            final boolean isRotateImageAutomatically = _prefStore.getBoolean(IPhotoPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY);
+
+            scaledImage = net.tourbook.common.util.ImageUtils.resize(
                   _display,
                   photoImage,
                   bestSize.x,
                   bestSize.y,
                   SWT.ON,
                   SWT.LOW,
-                  thumbRotation);
+                  thumbRotation,
+                  isRotateImageAutomatically);
 
             isMustDisposeImage = true;
 

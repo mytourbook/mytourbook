@@ -15,11 +15,15 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
+import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Frame;
+import java.awt.Rectangle;
+import java.awt.Robot;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -42,10 +46,13 @@ import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.SWTPopupOverAWT;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.map.Action_ExportMap_SubMenu;
 import net.tourbook.map.IMapSyncListener;
+import net.tourbook.map.IMapView;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapInfoManager;
 import net.tourbook.map.MapManager;
@@ -101,6 +108,7 @@ import net.tourbook.ui.tourChart.TourChart;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -112,6 +120,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -121,7 +131,6 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.BoundingBox;
@@ -137,6 +146,7 @@ public class Map25View extends ViewPart implements
       ICloseOpenedDialogs,
       IMapBookmarkListener,
       IMapSyncListener,
+      IMapView,
       IMapWithPhotos,
       IPhotoEventListener {
 
@@ -207,6 +217,7 @@ public class Map25View extends ViewPart implements
    private ISelection                    _lastHiddenSelection;
    private int                           _lastSelectionHash;
    //
+   private Action_ExportMap_SubMenu      _actionExportMap_SubMenu;
    private ActionMapBookmarks            _actionMapBookmarks;
    private ActionMap25_MapProvider       _actionMapProvider;
    private ActionMap25_Layer             _actionMapLayer;
@@ -477,15 +488,11 @@ public class Map25View extends ViewPart implements
       // set state here because opening the context menu is async
 //      _isContextMenuVisible = true;
 
-      _swtContainer.getDisplay().asyncExec(new Runnable() {
+      _swtContainer.getDisplay().asyncExec(() -> {
 
-         @Override
-         public void run() {
+         final Point screenPoint = _swtContainer.toDisplay(relativeX, relativeY);
 
-            final Point screenPoint = _swtContainer.toDisplay(relativeX, relativeY);
-
-            createContextMenu(screenPoint.x, screenPoint.y);
-         }
+         createContextMenu(screenPoint.x, screenPoint.y);
       });
 
    }
@@ -599,13 +606,13 @@ public class Map25View extends ViewPart implements
 
       // get graph ID
       MapGraphId selectedActionGraphId = null;
-      if (selectedAction instanceof ActionTrackColor) {
+      if (selectedAction instanceof final ActionTrackColor actionTrackColor) {
 
-         selectedActionGraphId = ((ActionTrackColor) selectedAction)._graphId;
+         selectedActionGraphId = actionTrackColor._graphId;
 
-      } else if (selectedAction instanceof ActionTrackColor_HrZone) {
+      } else if (selectedAction instanceof final ActionTrackColor_HrZone actionTrackColor_HrZone) {
 
-         selectedActionGraphId = ((ActionTrackColor_HrZone) selectedAction)._graphId;
+         selectedActionGraphId = actionTrackColor_HrZone._graphId;
       }
 
       final MapGraphId trackGraphId = Map25ConfigManager.getActiveTourTrackConfig().gradientColorGraphID;
@@ -613,17 +620,15 @@ public class Map25View extends ViewPart implements
 
          // active color is selected -> prevent unchecking selected color
 
-         if (selectedAction instanceof ActionTrackColor) {
+         if (selectedAction instanceof final ActionTrackColor action) {
 
-            final ActionTrackColor action = (ActionTrackColor) selectedAction;
             if (action.getSelection() == false) {
 
                action.setSelection(true);
             }
 
-         } else if (selectedAction instanceof ActionTrackColor_HrZone) {
+         } else if (selectedAction instanceof final ActionTrackColor_HrZone action) {
 
-            final ActionTrackColor_HrZone action = (ActionTrackColor_HrZone) selectedAction;
             if (action.isChecked() == false) {
 
                action.setChecked(true);
@@ -640,13 +645,13 @@ public class Map25View extends ViewPart implements
          // uncheck any other colors
          if (action != selectedAction) {
 
-            if (action instanceof ActionTrackColor) {
+            if (action instanceof final ActionTrackColor actionTrackColor) {
 
-               ((ActionTrackColor) action).setSelection(false);
+               actionTrackColor.setSelection(false);
 
-            } else if (action instanceof ActionTrackColor_HrZone) {
+            } else if (action instanceof final ActionTrackColor_HrZone actionTrackColor_HrZone) {
 
-               ((ActionTrackColor_HrZone) action).setChecked(false);
+               actionTrackColor_HrZone.setChecked(false);
             }
          }
       }
@@ -808,31 +813,24 @@ public class Map25View extends ViewPart implements
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-            onSelectionChanged(selection);
-         }
-      };
+      _postSelectionListener = (workbenchPart, selection) -> onSelectionChanged(selection);
 
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
 
-            if (part == Map25View.this) {
-               return;
-            }
+         if (workbenchPart == Map25View.this) {
+            return;
+         }
 
-            if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
+         if (tourEventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
 //					resetMap();
 
-            } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         } else if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
 //					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
 //					if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
@@ -843,25 +841,24 @@ public class Map25View extends ViewPart implements
 //						resetMap();
 //					}
 
-            } else if (eventId == TourEventId.UPDATE_UI || eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+         } else if (tourEventId == TourEventId.UPDATE_UI || tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
 //					clearView();
 
-            } else if (eventId == TourEventId.MARKER_SELECTION) {
+         } else if (tourEventId == TourEventId.MARKER_SELECTION) {
 
 //					if (eventData instanceof SelectionTourMarker) {
 //
 //						onSelectionChanged_TourMarker((SelectionTourMarker) eventData, false);
 //					}
 
-            } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+         } else if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof final ISelection selection) {
 
-               onSelectionChanged((ISelection) eventData);
+            onSelectionChanged(selection);
 
-            } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof ISelection) {
+         } else if (tourEventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof final ISelection selection) {
 
-               onSelectionChanged((ISelection) eventData);
-            }
+            onSelectionChanged(selection);
          }
       };
 
@@ -910,6 +907,7 @@ public class Map25View extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
+      _actionExportMap_SubMenu         = new Action_ExportMap_SubMenu(this);
       _actionMapBookmarks              = new ActionMapBookmarks(this._parent, this);
       _actionMapLayer                  = new ActionMap25_Layer();
       _actionMapOptions                = new ActionMap25_Options();
@@ -991,12 +989,9 @@ public class Map25View extends ViewPart implements
              * run async that the context state and tour info reset is done after the context menu
              * actions has done they tasks
              */
-            Display.getCurrent().asyncExec(new Runnable() {
-               @Override
-               public void run() {
+            Display.getCurrent().asyncExec(() -> {
 
 //						hideTourInfo();
-               }
             });
          }
 
@@ -1020,12 +1015,9 @@ public class Map25View extends ViewPart implements
 
       final Map25ContextMenu swt_awt_ContextMenu = new Map25ContextMenu(display, _swtContextMenu);
 
-      display.asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      display.asyncExec(() -> {
 //				_mapApp.debugPrint("SWT calling menu"); //$NON-NLS-1$
-            swt_awt_ContextMenu.swtIndirectShowMenu(xScreenPos, yScreenPos);
-         }
+         swt_awt_ContextMenu.swtIndirectShowMenu(xScreenPos, yScreenPos);
       });
    }
 
@@ -1305,6 +1297,7 @@ public class Map25View extends ViewPart implements
    private void fillContextMenu(final Menu menu) {
 
       MapBookmarkManager.fillContextMenu_RecentBookmarks(menu, this);
+      new ActionContributionItem(_actionExportMap_SubMenu).fill(menu, -1);
 
       enableContextMenuActions();
    }
@@ -1335,6 +1328,29 @@ public class Map25View extends ViewPart implements
    public MapPosition getMapPosition() {
 
       return _map25App.getMap().getMapPosition();
+   }
+
+   @Override
+   public Image getMapViewImage() {
+
+      try {
+
+         final BufferedImage screencapture = new Robot()
+               .createScreenCapture(new Rectangle(_parent.toDisplay(1, 1).x,
+                     _parent.toDisplay(1, 1).y,
+                     _parent.getSize().x,
+                     _parent.getSize().y));
+
+         // Convert the BufferedImage to an SWT Image
+         final ImageData imageData = de.byteholder.geoclipse.util.Images.convertToSWT(screencapture);
+         final Image swtImage = new Image(Display.getDefault(), imageData);
+         return swtImage;
+
+      } catch (final AWTException e) {
+         StatusUtil.log(e);
+      }
+
+      return null;
    }
 
    @Override
@@ -1417,7 +1433,7 @@ public class Map25View extends ViewPart implements
       if (_lastSelectionHash == selectionHash) {
 
          /*
-          * Last selection has not changed, this can occure when the app lost the focus and got the
+          * Last selection has not changed, this can occur when the app lost the focus and got the
           * focus again.
           */
          return;
@@ -1440,9 +1456,8 @@ public class Map25View extends ViewPart implements
       final boolean isSyncWithSlider = _mapSynchedWith == MapSync.WITH_SLIDER
             || _mapSynchedWith == MapSync.WITH_SLIDER_CENTERED;
 
-      if (selection instanceof SelectionTourData) {
+      if (selection instanceof final SelectionTourData selectionTourData) {
 
-         final SelectionTourData selectionTourData = (SelectionTourData) selection;
          final TourData tourData = selectionTourData.getTourData();
 
          setMapTour(tourData);
@@ -1450,9 +1465,8 @@ public class Map25View extends ViewPart implements
 
          paintTours();
 
-      } else if (selection instanceof SelectionTourId) {
+      } else if (selection instanceof final SelectionTourId tourIdSelection) {
 
-         final SelectionTourId tourIdSelection = (SelectionTourId) selection;
          final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
          setMapTour(tourData);
@@ -1460,11 +1474,11 @@ public class Map25View extends ViewPart implements
 
          paintTours();
 
-      } else if (selection instanceof SelectionTourIds) {
+      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
 
          // paint all selected tours
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final ArrayList<Long> tourIds = selectionTourIds.getTourIds();
          if (tourIds.isEmpty()) {
 
             // history tour (without tours) is displayed
@@ -1491,7 +1505,7 @@ public class Map25View extends ViewPart implements
 
          }
 
-      } else if (selection instanceof SelectionChartInfo) {
+      } else if (selection instanceof final SelectionChartInfo chartInfo) {
 
          final Map25TrackConfig activeTourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
          final boolean isShowSliderLocation = activeTourTrackConfig.isShowSliderLocation;
@@ -1507,12 +1521,9 @@ public class Map25View extends ViewPart implements
 
          TourData tourData = null;
 
-         final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
-
          final Chart chart = chartInfo.getChart();
-         if (chart instanceof TourChart) {
+         if (chart instanceof final TourChart tourChart) {
 
-            final TourChart tourChart = (TourChart) chart;
             tourData = tourChart.getTourData();
          }
 
@@ -1564,13 +1575,12 @@ public class Map25View extends ViewPart implements
             }
          }
 
-      } else if (selection instanceof SelectionChartXSliderPosition) {
+      } else if (selection instanceof final SelectionChartXSliderPosition xSliderPos) {
 
          if (isSyncWithSlider == false) {
             return;
          }
 
-         final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
          final Chart chart = xSliderPos.getChart();
          if (chart == null) {
             return;
@@ -1579,9 +1589,9 @@ public class Map25View extends ViewPart implements
          final ChartDataModel chartDataModel = chart.getChartDataModel();
 
          final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-         if (tourId instanceof Long) {
+         if (tourId instanceof final Long tourIdLong) {
 
-            final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+            final TourData tourData = TourManager.getInstance().getTourData(tourIdLong);
             if (tourData != null) {
 
                final int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
@@ -1633,11 +1643,11 @@ public class Map25View extends ViewPart implements
       }
 
       // set colors according to the tour values
-      if (_mapColorProvider instanceof IGradientColorProvider) {
+      if (_mapColorProvider instanceof final IGradientColorProvider gradientColorProvider) {
 
          MapUtils.configureColorProvider(
                _allTourData,
-               (IGradientColorProvider) _mapColorProvider,
+               gradientColorProvider,
                ColorProviderConfig.MAP3_TOUR,
                200 // set dummy for now
          );
@@ -1723,17 +1733,17 @@ public class Map25View extends ViewPart implements
                int colorValue = 0xff_80_80_80;
                int abgr = 0;
 
-               if (valueSerie != null && _mapColorProvider instanceof IGradientColorProvider) {
+               if (valueSerie != null && _mapColorProvider instanceof final IGradientColorProvider gradientColorProvider) {
 
-                  abgr = ((IGradientColorProvider) _mapColorProvider).getRGBValue(
+                  abgr = gradientColorProvider.getRGBValue(
                         ColorProviderConfig.MAP3_TOUR,
                         valueSerie[serieIndex]);
 
-               } else if (_mapColorProvider instanceof IDiscreteColorProvider) {
+               } else if (_mapColorProvider instanceof final IDiscreteColorProvider discreteColorProvider) {
 
                   // e.g. HR zone color provider
 
-                  abgr = ((IDiscreteColorProvider) _mapColorProvider).getColorValue(tourData, serieIndex, true);
+                  abgr = discreteColorProvider.getColorValue(tourData, serieIndex, true);
                }
 
 // SET_FORMATTING_OFF
@@ -1887,7 +1897,7 @@ public class Map25View extends ViewPart implements
       updateFilteredPhotos();
    }
 
-   void restoreState() {
+   protected void restoreState() {
 
 // SET_FORMATTING_OFF
 
@@ -1974,15 +1984,11 @@ public class Map25View extends ViewPart implements
 
       for (final Object action : _allTrackColorActions) {
 
-         if (action instanceof ActionTrackColor) {
-
-            final ActionTrackColor trackAction = (ActionTrackColor) action;
+         if (action instanceof final ActionTrackColor trackAction) {
 
             trackAction.setSelection(trackGraphId == trackAction._graphId);
 
-         } else if (action instanceof ActionTrackColor_HrZone) {
-
-            final ActionTrackColor_HrZone trackAction = (ActionTrackColor_HrZone) action;
+         } else if (action instanceof final ActionTrackColor_HrZone trackAction) {
 
             trackAction.setChecked(trackGraphId == trackAction._graphId);
          }
@@ -2094,15 +2100,11 @@ public class Map25View extends ViewPart implements
 
       for (final Object action : _allTrackColorActions) {
 
-         if (action instanceof ActionTrackColor) {
-
-            final ActionTrackColor colorAction = (ActionTrackColor) action;
+         if (action instanceof final ActionTrackColor colorAction) {
 
             colorAction.setSelection(colorAction._graphId == graphId);
 
-         } else if (action instanceof ActionTrackColor_HrZone) {
-
-            final ActionTrackColor_HrZone colorAction = (ActionTrackColor_HrZone) action;
+         } else if (action instanceof final ActionTrackColor_HrZone colorAction) {
 
             colorAction.setChecked(colorAction._graphId == graphId);
          }
@@ -2148,9 +2150,7 @@ public class Map25View extends ViewPart implements
 
       final ArrayList<Photo> allPhotos = new ArrayList<>();
 
-      if (selection instanceof TourPhotoLinkSelection) {
-
-         final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) selection;
+      if (selection instanceof final TourPhotoLinkSelection linkSelection) {
 
          final ArrayList<TourPhotoLink> tourPhotoLinks = linkSelection.tourPhotoLinks;
 
@@ -2430,17 +2430,14 @@ public class Map25View extends ViewPart implements
          return;
       }
 
-      _swtContainer.getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      _swtContainer.getDisplay().asyncExec(() -> {
 
-            // validate widget
-            if (_swtContainer.isDisposed()) {
-               return;
-            }
-
-            _mapInfoManager.setMapPosition(latitude, longitude, zoomLevel);
+         // validate widget
+         if (_swtContainer.isDisposed()) {
+            return;
          }
+
+         _mapInfoManager.setMapPosition(latitude, longitude, zoomLevel);
       });
    }
 

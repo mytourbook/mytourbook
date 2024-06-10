@@ -54,6 +54,9 @@ Experimental
 New
 ===
 
+* 2.5D & 3D Maps (Frederic)
+  - Export map view to an image file (jpeg, png or bmp) or to the clipboard
+ 
 * 2D Map
   - Enhanced display of the
     - Tour marker
@@ -65,7 +68,8 @@ New
 Improvements
 ============
 
-* 
+* Tour Export (Frederic)
+  - Use of the notification popups for successful/unsuccessful exports
 
 Changes
 =======
@@ -74,6 +78,9 @@ Changes
   - Moved options from the "2D Map Options" slideout to the "Map Points" slideout
     - Map dimming
     - Filter tour pauses
+
+* Tour Concatenation (Frederic)
+  - Removed the ability to delete the source tours when using the NatTable layout as it was causing random tours to be deleted
 
 
 Changes that require Tour Re-import
@@ -85,7 +92,8 @@ Changes that require Tour Re-import
 Bugfix
 ======
 
-* 
+* Tour Nutrition (Frederic)
+  - Fixed an issue where deleting a custom tour product for a given tour would delete all of them
 
 
 Translation    
@@ -106,5 +114,5 @@ System
 * Eclipse 2024-03 (4.31)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.31-202402290520/
 * NatTable 2.20               https://www.eclipse.org/nattable/download.php
 * Nebula Widgets              https://download.eclipse.org/nebula/releases/latest
-* FIT SDK 21.133.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* FIT SDK 21.141.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
 * WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

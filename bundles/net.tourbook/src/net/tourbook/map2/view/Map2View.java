@@ -75,7 +75,9 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.map.Action_ExportMap_SubMenu;
 import net.tourbook.map.IMapSyncListener;
+import net.tourbook.map.IMapView;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapInfoManager;
 import net.tourbook.map.MapManager;
@@ -124,7 +126,6 @@ import net.tourbook.map2.action.ActionZoomLevelAdjustment;
 import net.tourbook.map2.action.ActionZoomOut;
 import net.tourbook.map2.action.ActionZoomShowEntireMap;
 import net.tourbook.map2.action.ActionZoomShowEntireTour;
-import net.tourbook.map2.action.Action_ExportMap_SubMenu;
 import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.Photo;
@@ -169,6 +170,7 @@ import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -186,7 +188,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -216,6 +217,7 @@ public class Map2View extends ViewPart implements
       IMapBookmarkListener,
       IMapSyncListener,
       IMapWithPhotos,
+      IMapView,
       IPhotoEventListener {
 
 // SET_FORMATTING_OFF
@@ -1136,16 +1138,12 @@ public class Map2View extends ViewPart implements
 
       final TourMarker tourMarker = hoveredMapPoint.mapPoint.tourMarker;
 
-      final ITourProvider tourProvider = new ITourProvider() {
+      final ITourProvider tourProvider = () -> {
 
-         @Override
-         public ArrayList<TourData> getSelectedTours() {
+         final ArrayList<TourData> allTours = new ArrayList<>();
+         allTours.add(tourMarker.getTourData());
 
-            final ArrayList<TourData> allTours = new ArrayList<>();
-            allTours.add(tourMarker.getTourData());
-
-            return allTours;
-         }
+         return allTours;
       };
 
       ActionOpenMarkerDialog.doAction(tourProvider, true, tourMarker);
@@ -1363,7 +1361,7 @@ public class Map2View extends ViewPart implements
 
          } else {
 
-            // tour -> mous
+            // tour -> mouse
             newCenterMode = CenterMapBy.Mouse;
          }
 
@@ -1578,7 +1576,7 @@ public class Map2View extends ViewPart implements
 
                if (_selectionWhenHidden != null) {
 
-                  onSelection(_selectionWhenHidden);
+                  onSelectionChanged(_selectionWhenHidden);
 
                   _selectionWhenHidden = null;
                }
@@ -1728,7 +1726,7 @@ public class Map2View extends ViewPart implements
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = (part, selection) -> onSelection(selection);
+      _postSelectionListener = (part, selection) -> onSelectionChanged(selection);
 
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
@@ -1748,7 +1746,7 @@ public class Map2View extends ViewPart implements
          } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof final TourEvent tourEvent)) {
 
             final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
-            if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+            if (CollectionUtils.isNotEmpty(modifiedTours)) {
 
                setTourData(modifiedTours);
 
@@ -1761,9 +1759,9 @@ public class Map2View extends ViewPart implements
 
          } else if (eventId == TourEventId.MARKER_SELECTION) {
 
-            if (eventData instanceof SelectionTourMarker) {
+            if (eventData instanceof final SelectionTourMarker selectionTourMarker) {
 
-               onSelection_TourMarker((SelectionTourMarker) eventData, false);
+               onSelection_TourMarker(selectionTourMarker, false);
             }
 
          } else if (eventId == TourEventId.PAUSE_SELECTION && eventData instanceof final SelectionTourPause selectionTourPause) {
@@ -1772,11 +1770,11 @@ public class Map2View extends ViewPart implements
 
          } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof final ISelection selection) {
 
-            onSelection(selection);
+            onSelectionChanged(selection);
 
          } else if (eventId == TourEventId.SLIDER_POSITION_CHANGED && eventData instanceof final ISelection selection) {
 
-            onSelection(selection);
+            onSelectionChanged(selection);
 
          } else if (eventId == TourEventId.MAP_SHOW_GEO_GRID) {
 
@@ -1797,9 +1795,10 @@ public class Map2View extends ViewPart implements
                hideGeoGrid();
             }
 
-         } else if (eventId == TourEventId.HOVERED_VALUE_POSITION && eventData instanceof HoveredValueData) {
+         } else if (eventId == TourEventId.HOVERED_VALUE_POSITION &&
+               eventData instanceof final HoveredValueData hoveredValueData) {
 
-            onSelection_HoveredValue((HoveredValueData) eventData);
+            onSelection_HoveredValue(hoveredValueData);
 
          } else if (eventId == TourEventId.COMMON_LOCATION_SELECTION) {
 
@@ -2075,19 +2074,19 @@ public class Map2View extends ViewPart implements
 
       boolean isDataAvailable = false;
 
-      if (mapColorProvider instanceof IGradientColorProvider) {
+      if (mapColorProvider instanceof final IGradientColorProvider gradientColorProvider) {
 
          final int legendHeightNoMargin = legendHeight - 2 * IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
 
          isDataAvailable = MapUtils.configureColorProvider(
                _allTourData,
-               (IGradientColorProvider) mapColorProvider,
+               gradientColorProvider,
                ColorProviderConfig.MAP2,
                legendHeightNoMargin);
 
          if (isDataAvailable) {
 
-            legendImage = TourMapPainter.createMap2_LegendImage_AWT((IGradientColorProvider) mapColorProvider,
+            legendImage = TourMapPainter.createMap2_LegendImage_AWT(gradientColorProvider,
                   legendWidth,
                   legendHeight,
                   isBackgroundDark(),
@@ -2101,7 +2100,7 @@ public class Map2View extends ViewPart implements
 
       } else if (mapColorProvider instanceof IDiscreteColorProvider) {
 
-         // return null image to hide the legend -> there is currenly no legend provider for a IDiscreteColorProvider
+         // return null image to hide the legend -> there is currently no legend provider for a IDiscreteColorProvider
 
 //         isDataAvailable = createLegendImage_20_SetProviderValues((IDiscreteColorProvider) mapColorProvider);
       }
@@ -2790,20 +2789,10 @@ public class Map2View extends ViewPart implements
             Math.pow(2, mapZoomLevel));
    }
 
+   @Override
    public Image getMapViewImage() {
 
-      final Image image = new Image(_parent.getDisplay(),
-            _parent.getSize().x,
-            _parent.getSize().y);
-
-      final GC gc = new GC(image);
-      _parent.print(gc);
-      //This produces the same result
-      //  final GC gc = new GC(_parent);
-      //  gc.copyArea(image, 0, 0);
-      gc.dispose();
-
-      return image;
+      return MapUtils.getMapViewImage(_parent);
    }
 
    /**
@@ -3232,13 +3221,11 @@ public class Map2View extends ViewPart implements
 
          _lastSelectedTourInsideMap = null;
 
-      } else if (selection instanceof SelectionTourId) {
+      } else if (selection instanceof final SelectionTourId selectionTourId) {
 
          /*
           * Update tour info tooltip
           */
-         final SelectionTourId selectionTourId = (SelectionTourId) selection;
-
          final Long tourId = selectionTourId.getTourId();
          final TourData tourData = TourManager.getInstance().getTourData(tourId);
 
@@ -3260,7 +3247,7 @@ public class Map2View extends ViewPart implements
 
       _map.getDisplay().asyncExec(() -> {
 
-         onSelection(selection);
+         onSelectionChanged(selection);
       });
 
       TourManager.fireEventWithCustomData(
@@ -3318,9 +3305,7 @@ public class Map2View extends ViewPart implements
 
    private void mapListener_MapSelection(final ISelection selection) {
 
-      if (selection instanceof SelectionMapSelection) {
-
-         final SelectionMapSelection mapSelection = (SelectionMapSelection) selection;
+      if (selection instanceof final SelectionMapSelection mapSelection) {
 
          final boolean isShowSliderInMap = _actionShowSliderInMap.isChecked();
          final boolean isShowValuePointInMap = _actionShowValuePoint.isChecked();
@@ -3405,9 +3390,7 @@ public class Map2View extends ViewPart implements
 
       }
 
-      if (eventData == null
-            || allTourLocations == null
-            || allTourLocations.size() == 0) {
+      if (eventData == null || CollectionUtils.isEmpty(allTourLocations)) {
 
          // hide tour locations
 
@@ -3454,9 +3437,7 @@ public class Map2View extends ViewPart implements
          allTourLocations = allTourLocationsFromEvent;
       }
 
-      if (eventData == null
-            || allTourLocations == null
-            || allTourLocations.size() == 0) {
+      if (eventData == null || CollectionUtils.isEmpty(allTourLocations)) {
 
          // hide tour locations
 
@@ -3492,363 +3473,6 @@ public class Map2View extends ViewPart implements
             }
             _isInSelectBookmark = false;
          }
-      }
-   }
-
-   /**
-    * @param selection
-    */
-   private void onSelection(final ISelection selection) {
-
-      if (_isPartVisible == false) {
-
-         if (selection instanceof SelectionTourData
-               || selection instanceof SelectionTourId
-               || selection instanceof SelectionTourIds) {
-
-            // keep only selected tours
-            _selectionWhenHidden = selection;
-         }
-         return;
-      }
-
-      if (selection instanceof SelectionTourData) {
-
-         hideGeoGrid();
-
-         final SelectionTourData selectionTourData = (SelectionTourData) selection;
-         final TourData tourData = selectionTourData.getTourData();
-
-         paintToursAndPhotos(tourData, selection);
-
-      } else if (selection instanceof SelectionTourId) {
-
-         hideGeoGrid();
-
-         final SelectionTourId tourIdSelection = (SelectionTourId) selection;
-
-         if (tourIdSelection.isSetBreadcrumbOnly()) {
-
-            // special case :-)
-
-            _map.tourBreadcrumb().addBreadcrumTour(tourIdSelection.getTourId());
-            setIconPosition_TourInfo();
-            setIconPosition_TourWeather();
-
-         } else {
-
-            final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
-
-            paintToursAndPhotos(tourData, selection);
-
-            // recenter map AFTER it was centered in the paint... method
-            if (_isMapSyncWith_MapLocation) {
-
-               final GeoPosition hoveredTourLocation = tourIdSelection.getHoveredTourLocation();
-
-               if (hoveredTourLocation != null) {
-                  _map.setMapCenter(hoveredTourLocation);
-               }
-            }
-         }
-
-      } else if (selection instanceof SelectionTourIds) {
-
-         // paint all selected tours
-
-         hideGeoGrid();
-
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if (tourIds.isEmpty()) {
-
-            // history tour (without tours) is displayed
-
-            final ArrayList<Photo> allPhotos = paintPhotoSelection(selection);
-
-            if (allPhotos.size() > 0) {
-
-               showDefaultMap(true);
-
-               enableActions();
-            }
-
-         } else if (tourIds.size() == 1) {
-
-            // only 1 tour is displayed, synch with this tour !!!
-
-            final TourData tourData = TourManager.getInstance().getTourData(tourIds.get(0));
-
-            paintToursAndPhotos(tourData, selection);
-
-         } else {
-
-            // paint multiple tours
-
-            paintTours(tourIds);
-            paintPhotoSelection(selection);
-
-            enableActions(true);
-         }
-
-      } else if (selection instanceof SelectionChartInfo) {
-
-         final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
-
-         TourData tourData = null;
-
-         final Chart chart = chartInfo.getChart();
-         if (chart instanceof TourChart) {
-            final TourChart tourChart = (TourChart) chart;
-            tourData = tourChart.getTourData();
-         }
-
-         if (tourData != null && tourData.isMultipleTours()) {
-
-            // multiple tours are selected
-
-         } else {
-
-            // use old behavior
-
-            final ChartDataModel chartDataModel = chartInfo.chartDataModel;
-            if (chartDataModel != null) {
-
-               final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-               if (tourId instanceof Long) {
-
-                  tourData = TourManager.getInstance().getTourData((Long) tourId);
-                  if (tourData == null) {
-
-                     // tour is not in the database, try to get it from the raw data manager
-
-                     final java.util.Map<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
-                     tourData = rawData.get(tourId);
-                  }
-               }
-            }
-         }
-
-         if (tourData != null) {
-
-            positionMapTo_0_TourSliders(
-                  tourData,
-                  chartInfo.leftSliderValuesIndex,
-                  chartInfo.rightSliderValuesIndex,
-                  chartInfo.selectedSliderValuesIndex,
-                  null);
-
-            enableActions();
-         }
-
-      } else if (selection instanceof SelectionChartXSliderPosition) {
-
-         final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
-
-         final Object customData = xSliderPos.getCustomData();
-         if (customData instanceof SelectedTourSegmenterSegments) {
-
-            /*
-             * This event is fired in the tour chart when a toursegmenter segment is selected
-             */
-
-            selectTourSegments((SelectedTourSegmenterSegments) customData);
-
-         } else {
-
-            final Chart chart = xSliderPos.getChart();
-            if (chart == null) {
-               return;
-            }
-
-            final ChartDataModel chartDataModel = chart.getChartDataModel();
-            final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-
-            if (tourId instanceof Long) {
-
-               final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
-               if (tourData != null) {
-
-                  final int beforeLeftSliderIndex = xSliderPos.getBeforeLeftSliderIndex();
-                  int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
-                  int rightSliderValueIndex = xSliderPos.getRightSliderValueIndex();
-
-                  /*
-                   * These values are tested with the selection from the tour editor
-                   */
-                  if (beforeLeftSliderIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
-
-                     // one slice is selected
-
-                     leftSliderValueIndex = beforeLeftSliderIndex;
-                     rightSliderValueIndex = leftSliderValueIndex;
-                  }
-
-                  positionMapTo_0_TourSliders(
-                        tourData,
-                        leftSliderValueIndex,
-                        rightSliderValueIndex,
-                        leftSliderValueIndex,
-                        null);
-
-                  enableActions();
-               }
-            }
-         }
-
-      } else if (selection instanceof SelectionTourMarker) {
-
-         final SelectionTourMarker markerSelection = (SelectionTourMarker) selection;
-
-         onSelection_TourMarker(markerSelection, true);
-
-      } else if (selection instanceof SelectionMapPosition) {
-
-         final SelectionMapPosition mapPositionSelection = (SelectionMapPosition) selection;
-
-         final int valueIndex1 = mapPositionSelection.getSlider1ValueIndex();
-         int valueIndex2 = mapPositionSelection.getSlider2ValueIndex();
-
-         valueIndex2 = valueIndex2 == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
-               ? valueIndex1
-               : valueIndex2;
-
-         positionMapTo_0_TourSliders(
-               mapPositionSelection.getTourData(),
-               valueIndex1,
-               valueIndex2,
-               valueIndex1,
-               null);
-
-         enableActions();
-
-      } else if (selection instanceof PointOfInterest) {
-
-         _isTourPainted = false;
-
-         clearView();
-
-         final PointOfInterest poi = (PointOfInterest) selection;
-
-         _poiPosition = poi.getPosition();
-         _poiName = poi.getName();
-
-         final String boundingBox = poi.getBoundingBox();
-         if (boundingBox == null) {
-            _poiZoomLevel = _map.getZoom();
-         } else {
-            _poiZoomLevel = _map.setZoomToBoundingBox(boundingBox);
-         }
-
-         if (_poiZoomLevel == -1) {
-            _poiZoomLevel = _map.getZoom();
-         }
-
-         _map.setPoi(_poiPosition, _poiZoomLevel, _poiName);
-
-         _actionShowPOI.setChecked(true);
-
-         enableActions();
-
-      } else if (selection instanceof StructuredSelection) {
-
-         final StructuredSelection structuredSelection = (StructuredSelection) selection;
-         final Object firstElement = structuredSelection.getFirstElement();
-
-         if (firstElement instanceof TVIRefTour_ComparedTour) {
-
-            final TVIRefTour_ComparedTour comparedTour = (TVIRefTour_ComparedTour) firstElement;
-            final GeoComparedTour geoCompareTour = comparedTour.getGeoCompareTour();
-
-            if (geoCompareTour != null) {
-
-               onSelection_GeoComparedTour(geoCompareTour);
-
-            } else {
-
-               final long tourId = comparedTour.getTourId();
-               final TourData tourData = TourManager.getInstance().getTourData(tourId);
-
-               paintTours_20_One(tourData, false);
-            }
-
-         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
-
-            final TVIElevationCompareResult_ComparedTour compareResultItem = (TVIElevationCompareResult_ComparedTour) firstElement;
-            final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getTourId());
-
-            paintTours_20_One(tourData, false);
-
-         } else if (firstElement instanceof GeoComparedTour) {
-
-            onSelection_GeoComparedTour((GeoComparedTour) firstElement);
-
-         } else if (firstElement instanceof TourWayPoint) {
-
-            final TourWayPoint wp = (TourWayPoint) firstElement;
-
-            final TourData tourData = wp.getTourData();
-
-            paintTours_20_One(tourData, false);
-
-            // delay to show the poi otherwise the map is being painted OVER the poi !!!
-            _map.getDisplay().timerExec(500, () -> _map.setPOI(_wayPointToolTipProvider, wp));
-
-            enableActions();
-         }
-
-         enableActions();
-
-      } else if (selection instanceof PhotoSelection) {
-
-         final PhotoSelection photoSelection = (PhotoSelection) selection;
-
-         final ArrayList<Photo> allGalleryPhotos = photoSelection.galleryPhotos;
-
-         TourData tourData = null;
-
-         allPhotoLoop:
-
-         // get first tour id
-         for (final Photo photo : allGalleryPhotos) {
-
-            for (final Long photoTourId : photo.getTourPhotoReferences().keySet()) {
-
-               tourData = TourManager.getInstance().getTourData(photoTourId);
-
-               break allPhotoLoop;
-            }
-         }
-
-         if (tourData != null) {
-
-            paintToursAndPhotos(tourData, selection);
-
-         } else {
-
-            paintPhotos(((PhotoSelection) selection).galleryPhotos);
-         }
-
-         enableActions();
-
-      } else if (selection instanceof SelectionReferenceTourView) {
-
-         // show reference tour
-
-         final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
-
-         final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
-         if (refItem != null) {
-
-            final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());
-
-            paintTours_20_One(tourData, false);
-
-            enableActions();
-         }
-
-      } else if (selection instanceof SelectionDeletedTours) {
-
-         clearView();
       }
    }
 
@@ -3969,6 +3593,337 @@ public class Map2View extends ViewPart implements
       }
    }
 
+   private void onSelectionChanged(final ISelection selection) {
+
+      if (_isPartVisible == false) {
+
+         if (selection instanceof SelectionTourData
+               || selection instanceof SelectionTourId
+               || selection instanceof SelectionTourIds) {
+
+            // keep only selected tours
+            _selectionWhenHidden = selection;
+         }
+         return;
+      }
+
+      if (selection instanceof final SelectionTourData selectionTourData) {
+
+         hideGeoGrid();
+
+         final TourData tourData = selectionTourData.getTourData();
+
+         paintToursAndPhotos(tourData, selection);
+
+      } else if (selection instanceof final SelectionTourId tourIdSelection) {
+
+         hideGeoGrid();
+
+         if (tourIdSelection.isSetBreadcrumbOnly()) {
+
+            // special case :-)
+
+            _map.tourBreadcrumb().addBreadcrumTour(tourIdSelection.getTourId());
+            setIconPosition_TourInfo();
+            setIconPosition_TourWeather();
+
+         } else {
+
+            final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
+
+            paintToursAndPhotos(tourData, selection);
+
+            // recenter map AFTER it was centered in the paint... method
+            if (_isMapSyncWith_MapLocation) {
+
+               final GeoPosition hoveredTourLocation = tourIdSelection.getHoveredTourLocation();
+
+               if (hoveredTourLocation != null) {
+                  _map.setMapCenter(hoveredTourLocation);
+               }
+            }
+         }
+
+      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
+
+         // paint all selected tours
+
+         hideGeoGrid();
+
+         final ArrayList<Long> tourIds = selectionTourIds.getTourIds();
+         if (tourIds.isEmpty()) {
+
+            // history tour (without tours) is displayed
+
+            final ArrayList<Photo> allPhotos = paintPhotoSelection(selection);
+
+            if (allPhotos.size() > 0) {
+
+               showDefaultMap(true);
+
+               enableActions();
+            }
+
+         } else if (tourIds.size() == 1) {
+
+            // only 1 tour is displayed, synch with this tour !!!
+
+            final TourData tourData = TourManager.getInstance().getTourData(tourIds.get(0));
+
+            paintToursAndPhotos(tourData, selection);
+
+         } else {
+
+            // paint multiple tours
+
+            paintTours(tourIds);
+            paintPhotoSelection(selection);
+
+            enableActions(true);
+         }
+
+      } else if (selection instanceof final SelectionChartInfo chartInfo) {
+
+         TourData tourData = null;
+
+         final Chart chart = chartInfo.getChart();
+         if (chart instanceof final TourChart tourChart) {
+            tourData = tourChart.getTourData();
+         }
+
+         if (tourData != null && tourData.isMultipleTours()) {
+
+            // multiple tours are selected
+
+         } else {
+
+            // use old behavior
+
+            final ChartDataModel chartDataModel = chartInfo.chartDataModel;
+            if (chartDataModel != null) {
+
+               final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
+               if (tourId instanceof final Long tourIdLong) {
+
+                  tourData = TourManager.getInstance().getTourData(tourIdLong);
+                  if (tourData == null) {
+
+                     // tour is not in the database, try to get it from the raw data manager
+
+                     final java.util.Map<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
+                     tourData = rawData.get(tourId);
+                  }
+               }
+            }
+         }
+
+         if (tourData != null) {
+
+            positionMapTo_0_TourSliders(
+                  tourData,
+                  chartInfo.leftSliderValuesIndex,
+                  chartInfo.rightSliderValuesIndex,
+                  chartInfo.selectedSliderValuesIndex,
+                  null);
+
+            enableActions();
+         }
+
+      } else if (selection instanceof final SelectionChartXSliderPosition xSliderPos) {
+
+         final Object customData = xSliderPos.getCustomData();
+         if (customData instanceof final SelectedTourSegmenterSegments selectedTourSegmenterSegments) {
+
+            /*
+             * This event is fired in the tour chart when a toursegmenter segment is selected
+             */
+
+            selectTourSegments(selectedTourSegmenterSegments);
+
+         } else {
+
+            final Chart chart = xSliderPos.getChart();
+            if (chart == null) {
+               return;
+            }
+
+            final ChartDataModel chartDataModel = chart.getChartDataModel();
+            final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
+
+            if (tourId instanceof final Long tourIdLong) {
+
+               final TourData tourData = TourManager.getInstance().getTourData(tourIdLong);
+               if (tourData != null) {
+
+                  final int beforeLeftSliderIndex = xSliderPos.getBeforeLeftSliderIndex();
+                  int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
+                  int rightSliderValueIndex = xSliderPos.getRightSliderValueIndex();
+
+                  /*
+                   * These values are tested with the selection from the tour editor
+                   */
+                  if (beforeLeftSliderIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+
+                     // one slice is selected
+
+                     leftSliderValueIndex = beforeLeftSliderIndex;
+                     rightSliderValueIndex = leftSliderValueIndex;
+                  }
+
+                  positionMapTo_0_TourSliders(
+                        tourData,
+                        leftSliderValueIndex,
+                        rightSliderValueIndex,
+                        leftSliderValueIndex,
+                        null);
+
+                  enableActions();
+               }
+            }
+         }
+
+      } else if (selection instanceof final SelectionTourMarker markerSelection) {
+
+         onSelection_TourMarker(markerSelection, true);
+
+      } else if (selection instanceof final SelectionMapPosition mapPositionSelection) {
+
+         final int valueIndex1 = mapPositionSelection.getSlider1ValueIndex();
+         int valueIndex2 = mapPositionSelection.getSlider2ValueIndex();
+
+         valueIndex2 = valueIndex2 == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
+               ? valueIndex1
+               : valueIndex2;
+
+         positionMapTo_0_TourSliders(
+               mapPositionSelection.getTourData(),
+               valueIndex1,
+               valueIndex2,
+               valueIndex1,
+               null);
+
+         enableActions();
+
+      } else if (selection instanceof final PointOfInterest poi) {
+
+         _isTourPainted = false;
+
+         clearView();
+
+         _poiPosition = poi.getPosition();
+         _poiName = poi.getName();
+
+         final String boundingBox = poi.getBoundingBox();
+         if (boundingBox == null) {
+            _poiZoomLevel = _map.getZoom();
+         } else {
+            _poiZoomLevel = _map.setZoomToBoundingBox(boundingBox);
+         }
+
+         if (_poiZoomLevel == -1) {
+            _poiZoomLevel = _map.getZoom();
+         }
+
+         _map.setPoi(_poiPosition, _poiZoomLevel, _poiName);
+
+         _actionShowPOI.setChecked(true);
+
+         enableActions();
+
+      } else if (selection instanceof final StructuredSelection structuredSelection) {
+
+         final Object firstElement = structuredSelection.getFirstElement();
+
+         if (firstElement instanceof final TVIRefTour_ComparedTour comparedTour) {
+
+            final GeoComparedTour geoCompareTour = comparedTour.getGeoCompareTour();
+
+            if (geoCompareTour != null) {
+
+               onSelection_GeoComparedTour(geoCompareTour);
+
+            } else {
+
+               final long tourId = comparedTour.getTourId();
+               final TourData tourData = TourManager.getInstance().getTourData(tourId);
+
+               paintTours_20_One(tourData, false);
+            }
+
+         } else if (firstElement instanceof final TVIElevationCompareResult_ComparedTour compareResultItem) {
+
+            final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getTourId());
+
+            paintTours_20_One(tourData, false);
+
+         } else if (firstElement instanceof final GeoComparedTour geoCompareTour) {
+
+            onSelection_GeoComparedTour(geoCompareTour);
+
+         } else if (firstElement instanceof final TourWayPoint wp) {
+
+            final TourData tourData = wp.getTourData();
+
+            paintTours_20_One(tourData, false);
+
+            // delay to show the poi otherwise the map is being painted OVER the poi !!!
+            _map.getDisplay().timerExec(500, () -> _map.setPOI(_wayPointToolTipProvider, wp));
+
+            enableActions();
+         }
+
+         enableActions();
+
+      } else if (selection instanceof final PhotoSelection photoSelection) {
+
+         final ArrayList<Photo> allGalleryPhotos = photoSelection.galleryPhotos;
+
+         TourData tourData = null;
+
+         allPhotoLoop:
+
+         // get first tour id
+         for (final Photo photo : allGalleryPhotos) {
+
+            for (final Long photoTourId : photo.getTourPhotoReferences().keySet()) {
+
+               tourData = TourManager.getInstance().getTourData(photoTourId);
+
+               break allPhotoLoop;
+            }
+         }
+
+         if (tourData != null) {
+
+            paintToursAndPhotos(tourData, selection);
+
+         } else {
+
+            paintPhotos(((PhotoSelection) selection).galleryPhotos);
+         }
+
+         enableActions();
+
+      } else if (selection instanceof final SelectionReferenceTourView tourCatalogSelection) {
+
+         // show reference tour
+
+         final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
+         if (refItem != null) {
+
+            final TourData tourData = TourManager.getInstance().getTourData(refItem.getTourId());
+
+            paintTours_20_One(tourData, false);
+
+            enableActions();
+         }
+
+      } else if (selection instanceof SelectionDeletedTours) {
+
+         clearView();
+      }
+   }
+
    private void paintEntireTour() {
 
       // get overlay key for all tours which have valid tour data
@@ -4071,11 +4026,9 @@ public class Map2View extends ViewPart implements
 
       final ArrayList<Photo> allPhotos = new ArrayList<>();
 
-      if (selection instanceof TourPhotoLinkSelection) {
+      if (selection instanceof final TourPhotoLinkSelection linkSelection) {
 
          _isLinkPhotoDisplayed = true;
-
-         final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) selection;
 
          final ArrayList<TourPhotoLink> tourPhotoLinks = linkSelection.tourPhotoLinks;
 
@@ -4464,13 +4417,13 @@ public class Map2View extends ViewPart implements
 
       if (photoEventId == PhotoEventId.PHOTO_SELECTION) {
 
-         if (data instanceof TourPhotoLinkSelection) {
+         if (data instanceof final TourPhotoLinkSelection tourPhotoLinkSelection) {
 
-            onSelection((TourPhotoLinkSelection) data);
+            onSelectionChanged(tourPhotoLinkSelection);
 
-         } else if (data instanceof PhotoSelection) {
+         } else if (data instanceof final PhotoSelection photoSelection) {
 
-            onSelection((PhotoSelection) data);
+            onSelectionChanged(photoSelection);
          }
 
       } else if (photoEventId == PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED) {
