@@ -377,15 +377,16 @@ public class Map2 extends Canvas {
    private Map2Config                    _mapConfig;
 
    /*
-    * New overlay
+    * Map points
     */
+   private boolean                         _isShowMapPoints;
+
    private final ExecutorService           _backgroundPainter_Executor        = createBackgroundPainterThread();
    private Future<?>                       _backgroundPainter_Task;
 
    /**
     * The {@link #_backgroundPainter_Executor} is drawing into this image. 2 images are necessary
-    * that the
-    * current image which is drawn is not displayed, only when drawing is done
+    * that the current image which is drawn is not displayed, only when drawing is done
     */
    private Image                           _backgroundPainterImage_WhichIsDisplayed;
    private Image                           _backgroundPainterImage_WhichIsPainted;
@@ -5209,14 +5210,16 @@ public class Map2 extends Canvas {
          {
             paint_30_Tiles(gcMapImage);
 
-            paint_32_PaintBackgroundImage(gcMapImage);
+            if (_isShowMapPoints) {
+               paint_40_MapPoints(gcMapImage);
+            }
 
             if (_isLegendVisible && _mapLegend != null) {
-               paint_40_Legend(gcMapImage);
+               paint_80_Legend(gcMapImage);
             }
 
             if (_isScaleVisible) {
-               paint_50_Scale(gcMapImage);
+               paint_90_Scale(gcMapImage);
             }
 
             if (_isShowDebug_GeoGrid) {
@@ -5293,7 +5296,7 @@ public class Map2 extends Canvas {
    /**
     * @param gcMapImage
     */
-   private void paint_32_PaintBackgroundImage(final GC gcMapImage) {
+   private void paint_40_MapPoints(final GC gcMapImage) {
 
       try {
 
@@ -5361,7 +5364,7 @@ public class Map2 extends Canvas {
       }
    }
 
-   private void paint_40_Legend(final GC gc) {
+   private void paint_80_Legend(final GC gc) {
 
       // get legend image from the legend
       final Image legendImage = _mapLegend.getImage();
@@ -5386,7 +5389,7 @@ public class Map2 extends Canvas {
     *
     * @param gc
     */
-   private void paint_50_Scale(final GC gc) {
+   private void paint_90_Scale(final GC gc) {
 
       final int viewPortWidth = _worldPixel_TopLeft_Viewport.width;
 
@@ -6001,9 +6004,9 @@ public class Map2 extends Canvas {
    }
 
    private PaintedMarkerCluster paint_BackgroundImage_42_OneCluster_Setup(final GC gc,
-                                                                      final StaticCluster<?> markerCluster,
-                                                                      final String clusterLabel,
-                                                                      final List<PaintedMarkerCluster> allPaintedClusters) {
+                                                                          final StaticCluster<?> markerCluster,
+                                                                          final String clusterLabel,
+                                                                          final List<PaintedMarkerCluster> allPaintedClusters) {
 
       // convert marker lat/long into world pixels
 
@@ -10238,7 +10241,15 @@ public class Map2 extends Canvas {
     * @param isVisibility
     */
    public void setShowLegend(final boolean isVisibility) {
+
       _isLegendVisible = isVisibility;
+   }
+
+   public void setShowMapPoint(final boolean isShowMapPoint) {
+
+      _isShowMapPoints = isShowMapPoint;
+
+      paint();
    }
 
    /**
@@ -10248,6 +10259,7 @@ public class Map2 extends Canvas {
     *           set <code>true</code> to see the overlays, <code>false</code> to hide the overlays
     */
    public void setShowOverlays(final boolean showOverlays) {
+
       _isDrawOverlays = showOverlays;
    }
 
@@ -10259,6 +10271,7 @@ public class Map2 extends Canvas {
    }
 
    public void setShowScale(final boolean isScaleVisible) {
+
       _isScaleVisible = isScaleVisible;
    }
 
@@ -10268,6 +10281,7 @@ public class Map2 extends Canvas {
     * @param allTourIds
     */
    public void setTourIds(final List<Long> allTourIds) {
+
       _allTourIds = allTourIds;
    }
 
