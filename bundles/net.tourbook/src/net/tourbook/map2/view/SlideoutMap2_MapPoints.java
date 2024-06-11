@@ -86,6 +86,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Spinner;
@@ -215,15 +216,14 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Button                _btnSwapTourPauseLabel_Color;
    private Button                _btnSwapTourPauseLabel_Hovered_Color;
    //
-   private Button                _chkIsClusterSymbolAntialiased;
-   private Button                _chkIsClusterTextAntialiased;
+   private Button                _chkIsLabelAntialiased;
+   private Button                _chkIsSymbolAntialiased;
    private Button                _chkIsDimMap;
    private Button                _chkIsFillClusterSymbol;
    private Button                _chkIsGroupMarkers;
    private Button                _chkIsGroupMarkers_All;
    private Button                _chkIsMarkerClustered;
    private Button                _chkIsMarkerClustered_All;
-   private Button                _chkIsLabelAntialiased;
    private Button                _chkIsShowCommonLocations;
    private Button                _chkIsShowCommonLocations_All;
    private Button                _chkIsShowMapLocations_BoundingBox;
@@ -334,13 +334,14 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       public ActionStatistic_CommonLocation() {
 
-         setText("Show/hide common locations");
+         setText("Show/hide common locations\n\nHint: <Ctrl> key will prevent tab selection");
          setImageDescriptor(_imageDescriptor_CommonLocation);
       }
 
       @Override
-      public void run() {
-         actionStatistic_CommonLocation();
+      public void runWithEvent(final Event event) {
+
+         actionStatistic_CommonLocation(event);
       }
    }
 
@@ -348,13 +349,14 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       public ActionStatistic_TourLocation() {
 
-         setText("Show/hide tour locations");
+         setText("Show/hide tour locations\n\nHint: <Ctrl> key will prevent tab selection");
          setImageDescriptor(_imageDescriptor_TourLocation);
       }
 
       @Override
-      public void run() {
-         actionStatistic_TourLocation();
+      public void runWithEvent(final Event event) {
+
+         actionStatistic_TourLocation(event);
       }
    }
 
@@ -362,13 +364,14 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       public ActionStatistic_TourMarker() {
 
-         setText("Show/hide tour markers");
+         setText("Show/hide tour markers\n\nHint: <Ctrl> key will prevent tab selection");
          setImageDescriptor(_imageDescriptor_TourMarker);
       }
 
       @Override
-      public void run() {
-         actionStatistic_TourMarker();
+      public void runWithEvent(final Event event) {
+
+         actionStatistic_TourMarker(event);
       }
    }
 
@@ -376,13 +379,14 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       public ActionStatistic_TourPause() {
 
-         setText("Show/hide tour pauses");
+         setText("Show/hide tour pauses\n\nHint: <Ctrl> key will prevent tab selection");
          setImageDescriptor(_imageDescriptor_TourPause);
       }
 
       @Override
-      public void run() {
-         actionStatistic_TourPause();
+      public void runWithEvent(final Event event) {
+
+         actionStatistic_TourPause(event);
       }
    }
 
@@ -565,37 +569,37 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       setIsForceBoundsToBeInsideOfViewport(true);
    }
 
-   private void actionStatistic_CommonLocation() {
+   private void actionStatistic_CommonLocation(final Event event) {
 
       // toggle checkbox
       _chkIsShowCommonLocations.setSelection(!_chkIsShowCommonLocations.getSelection());
 
-      selectTab(_tabCommonLocations);
+      selectTab(_tabCommonLocations, event);
 
    }
 
-   private void actionStatistic_TourLocation() {
+   private void actionStatistic_TourLocation(final Event event) {
 
       // toggle checkbox
       _chkIsShowTourLocations.setSelection(!_chkIsShowTourLocations.getSelection());
 
-      selectTab(_tabTourLocations);
+      selectTab(_tabTourLocations, event);
    }
 
-   private void actionStatistic_TourMarker() {
+   private void actionStatistic_TourMarker(final Event event) {
 
       // toggle checkbox
       _chkIsShowTourMarkers.setSelection(!_chkIsShowTourMarkers.getSelection());
 
-      selectTab(_tabTourMarkers);
+      selectTab(_tabTourMarkers, event);
    }
 
-   private void actionStatistic_TourPause() {
+   private void actionStatistic_TourPause(final Event event) {
 
       // toggle checkbox
       _chkIsShowTourPauses.setSelection(!_chkIsShowTourPauses.getSelection());
 
-      selectTab(_tabTourPauses);
+      selectTab(_tabTourPauses, event);
    }
 
    private void addPrefListener() {
@@ -921,12 +925,21 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          }
          {
             /*
-             * Antialias marker text
+             * Antialias label
              */
             _chkIsLabelAntialiased = new Button(tabContainer, SWT.CHECK);
-            _chkIsLabelAntialiased.setText("&Antialias label");
+            _chkIsLabelAntialiased.setText("&Antialias label painting");
             _chkIsLabelAntialiased.addSelectionListener(_markerSelectionListener);
             gdSpan2.applyTo(_chkIsLabelAntialiased);
+         }
+         {
+            /*
+             * Antialias symbol
+             */
+            _chkIsSymbolAntialiased = new Button(tabContainer, SWT.CHECK);
+            _chkIsSymbolAntialiased.setText("Antialias &symbol painting");
+            _chkIsSymbolAntialiased.addSelectionListener(_markerSelectionListener);
+            gdSpan2.applyTo(_chkIsSymbolAntialiased);
          }
          {
             /*
@@ -1226,30 +1239,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                   .indent(firstColumnIndent, 0)
                   .applyTo(_chkIsFillClusterSymbol);
          }
-      }
-      {
-         /*
-          * Antialias text
-          */
-         _chkIsClusterTextAntialiased = new Button(parent, SWT.CHECK);
-         _chkIsClusterTextAntialiased.setText("Antialias text painting");
-         _chkIsClusterTextAntialiased.addSelectionListener(_markerSelectionListener);
-         GridDataFactory.fillDefaults()
-               .span(2, 1)
-               .indent(firstColumnIndent, 0)
-               .applyTo(_chkIsClusterTextAntialiased);
-      }
-      {
-         /*
-          * Antialias symbol
-          */
-         _chkIsClusterSymbolAntialiased = new Button(parent, SWT.CHECK);
-         _chkIsClusterSymbolAntialiased.setText("Antialias symbol painting");
-         _chkIsClusterSymbolAntialiased.addSelectionListener(_markerSelectionListener);
-         GridDataFactory.fillDefaults()
-               .span(2, 1)
-               .indent(firstColumnIndent, 0)
-               .applyTo(_chkIsClusterSymbolAntialiased);
       }
    }
 
@@ -2060,8 +2049,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _lblStats_TourPauses_All               .setEnabled(isShowTourPauses);
       _lblStats_TourPauses_Visible           .setEnabled(isShowTourPauses);
 
-      // label options
+      // common
       _chkIsLabelAntialiased                 .setEnabled(isShowLabels);
+      _chkIsSymbolAntialiased                .setEnabled(isShowLabels);
       _chkIsTruncateLabel                    .setEnabled(isShowLabels);
       _chkIsWrapLabel                        .setEnabled(isShowLabels);
       _comboLabelLayout                      .setEnabled(isShowLabels);
@@ -2076,8 +2066,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _btnSwapTourMarkerLabel_Color          .setEnabled(isShowTourMarker);
       _btnSwapTourMarkerLabel_Hovered_Color  .setEnabled(isShowTourMarker);
 
-      _chkIsClusterSymbolAntialiased         .setEnabled(isShowClusteredMarker);
-      _chkIsClusterTextAntialiased           .setEnabled(isShowClusteredMarker);
       _chkIsFillClusterSymbol                .setEnabled(isShowClusteredMarker);
       _chkIsGroupMarkers                     .setEnabled(isShowTourMarker);
       _chkIsGroupMarkers_All                 .setEnabled(isShowTourMarker);
@@ -2682,6 +2670,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
 // SET_FORMATTING_OFF
 
+      _chkIsFillClusterSymbol             .setSelection( config.isFillClusterSymbol);
       _chkIsShowCommonLocations           .setSelection( config.isShowCommonLocation);
       _chkIsShowCommonLocations_All       .setSelection( config.isShowCommonLocation);
       _chkIsShowTourLocations             .setSelection( config.isShowTourLocation);
@@ -2692,14 +2681,11 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _chkIsShowTourPauses_All            .setSelection( config.isShowTourPauses);
       _chkIsGroupMarkers                  .setSelection( config.isGroupDuplicatedMarkers);
       _chkIsGroupMarkers_All              .setSelection( config.isGroupDuplicatedMarkers);
+      _chkIsLabelAntialiased              .setSelection( config.isLabelAntialiased);
       _chkIsMarkerClustered               .setSelection( config.isTourMarkerClustered);
       _chkIsMarkerClustered_All           .setSelection( config.isTourMarkerClustered);
-
-      _chkIsClusterSymbolAntialiased      .setSelection( config.isClusterSymbolAntialiased);
-      _chkIsClusterTextAntialiased        .setSelection( config.isClusterTextAntialiased);
-      _chkIsFillClusterSymbol             .setSelection( config.isFillClusterSymbol);
-      _chkIsLabelAntialiased              .setSelection( config.isLabelAntialiased);
       _chkIsShowMapLocations_BoundingBox  .setSelection( config.isShowLocationBoundingBox);
+      _chkIsSymbolAntialiased             .setSelection( config.isSymbolAntialiased);
       _chkIsTruncateLabel                 .setSelection( config.isTruncateLabel);
       _chkIsWrapLabel                     .setSelection( config.isWrapLabel);
 
@@ -2784,8 +2770,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       config.groupGridSize                = _spinnerLabelGroupGridSize           .getSelection();
       config.groupedMarkers               = _txtGroupDuplicatedMarkers           .getText();
 
-      config.isClusterSymbolAntialiased   = _chkIsClusterSymbolAntialiased       .getSelection();
-      config.isClusterTextAntialiased     = _chkIsClusterTextAntialiased         .getSelection();
+      config.isLabelAntialiased           = _chkIsLabelAntialiased               .getSelection();
+      config.isSymbolAntialiased          = _chkIsSymbolAntialiased              .getSelection();
+
       config.isFillClusterSymbol          = _chkIsFillClusterSymbol              .getSelection();
       config.isTourMarkerClustered        = _chkIsMarkerClustered                .getSelection();
 
@@ -2795,7 +2782,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       config.clusterFill_RGB              = _colorClusterSymbol_Fill             .getColorValue();
       config.clusterOutline_RGB           = _colorClusterSymbol_Outline          .getColorValue();
 
-      config.isLabelAntialiased           = _chkIsLabelAntialiased               .getSelection();
       config.isTruncateLabel              = _chkIsTruncateLabel                  .getSelection();
       config.isWrapLabel                  = _chkIsWrapLabel                      .getSelection();
       config.labelDistributorMaxLabels    = _spinnerLabelDistributorMaxLabels    .getSelection();
@@ -2875,15 +2861,19 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _comboLabelLayout.select(selectionIndex);
    }
 
-   private void selectTab(final CTabItem tabItem) {
+   private void selectTab(final CTabItem tabItem, final Event event) {
 
-      _tabFolder.setSelection(tabItem);
+      // prevent tab selection when ctrl key is hit
+      if (UI.isCtrlKey(event) == false) {
 
-      /**
-       * !!! This is needed in the dark mode otherwise the tab background is in bright color when
-       * tabs are switch with the action button :-(
-       */
-      tabItem.getControl().setBackground(ThemeUtil.getDefaultBackgroundColor_Shell());
+         _tabFolder.setSelection(tabItem);
+
+         /**
+          * !!! This is needed in the dark mode otherwise the tab background is in bright color when
+          * tabs are switch with the action button :-(
+          */
+         tabItem.getControl().setBackground(ThemeUtil.getDefaultBackgroundColor_Shell());
+      }
 
       onModifyConfig();
    }

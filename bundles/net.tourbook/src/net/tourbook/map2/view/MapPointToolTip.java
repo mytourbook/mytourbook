@@ -179,7 +179,7 @@ public class MapPointToolTip extends ToolTip {
              */
 
             final Label label = new Label(container, SWT.TRAIL);
-            label.setText(TimeTools.Formatter_DateTime_LL.format(markerStartTime));
+            label.setText(TimeTools.Formatter_DateTime_FL.format(markerStartTime));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
 
          }
@@ -200,7 +200,7 @@ public class MapPointToolTip extends ToolTip {
           */
 
          final Label label = new Label(parent, SWT.TRAIL);
-         label.setText(TimeTools.Formatter_DateTime_LL.format(pauseStartTime));
+         label.setText(TimeTools.Formatter_DateTime_FL.format(pauseStartTime));
       }
    }
 

@@ -4631,6 +4631,11 @@ public class Map2 extends Canvas {
          onMouse_Move_CheckMapPoints(allPaintedLocations, mouseMoveDevX, mouseMoveDevY);
       }
 
+//      // prio 2b: Map tour locations
+//      if (_hoveredMapPoint == null && allPaintedTourLocations.size() > 0) {
+//         onMouse_Move_CheckMapPoints(allPaintedTourLocations, mouseMoveDevX, mouseMoveDevY);
+//      }
+
       // prio 3: Tour marker
       if (_hoveredMapPoint == null && allPaintedMarkers.size() > 0) {
          onMouse_Move_CheckMapPoints(allPaintedMarkers, mouseMoveDevX, mouseMoveDevY);
@@ -5604,10 +5609,13 @@ public class Map2 extends Canvas {
       try {
 
          final Image canvasImage = _backgroundPainterImage_WhichIsPainted;
-         final GC gcCanvas = new GC(canvasImage);
+         final GC gc = new GC(canvasImage);
          {
-            gcCanvas.setBackground(_mapTransparentColor);
-            gcCanvas.fillRectangle(_backgroundImageSize);
+            gc.setBackground(_mapTransparentColor);
+            gc.fillRectangle(_backgroundImageSize);
+
+            gc.setAntialias(_mapConfig.isSymbolAntialiased ? SWT.ON : SWT.OFF);
+            gc.setTextAntialias(_mapConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
 
             if (_mapConfig.isShowTourMarker
                   || _mapConfig.isShowTourLocation
@@ -5619,7 +5627,7 @@ public class Map2 extends Canvas {
 
                if (_mapConfig.isShowTourMarker && _mapConfig.isTourMarkerClustered) {
 
-                  paint_BackgroundImage_30_AllMapPointsAndCluster(gcCanvas,
+                  paint_BackgroundImage_30_AllMapPointsAndCluster(gc,
                         allTourData,
                         allPaintedMarkers,
                         allPaintedMarkerClusters,
@@ -5628,7 +5636,7 @@ public class Map2 extends Canvas {
 
                } else {
 
-                  paint_BackgroundImage_20_AllMapPoints(gcCanvas,
+                  paint_BackgroundImage_20_AllMapPoints(gc,
                         allTourData,
                         allPaintedMarkers,
                         allPaintedLocations,
@@ -5642,13 +5650,13 @@ public class Map2 extends Canvas {
                    * locations at the beginning that they are hit before the other !!!
                    */
 
-                  paint_BackgroundImage_70_OneCluster_Hovered(gcCanvas,
+                  paint_BackgroundImage_70_OneCluster_Hovered(gc,
                         _hoveredMarkerCluster,
                         allPaintedClusterMarkers);
                }
             }
          }
-         gcCanvas.dispose();
+         gc.dispose();
 
          // swap images
          final Image oldVisibleImage = _backgroundPainterImage_WhichIsDisplayed;
@@ -5891,8 +5899,6 @@ public class Map2 extends Canvas {
       if (allPaintedMarkerClusters.size() > 0) {
 
          gc.setFont(_clusterFont);
-         gc.setAntialias(_mapConfig.isClusterSymbolAntialiased ? SWT.ON : SWT.OFF);
-         gc.setTextAntialias(_mapConfig.isClusterTextAntialiased ? SWT.ON : SWT.OFF);
 
          for (final PaintedMarkerCluster paintedCluster : allPaintedMarkerClusters) {
 
@@ -6130,9 +6136,6 @@ public class Map2 extends Canvas {
       if (numAllMarkers == 0) {
          return;
       }
-
-      gc.setAntialias(_mapConfig.isClusterSymbolAntialiased ? SWT.ON : SWT.OFF);
-      gc.setTextAntialias(_mapConfig.isClusterTextAntialiased ? SWT.ON : SWT.OFF);
 
       final Rectangle clusterRectangle = hoveredMarkerCluster.clusterSymbolRectangle;
 
@@ -6415,7 +6418,6 @@ public class Map2 extends Canvas {
          return 0;
       }
 
-      gc.setTextAntialias(_mapConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
       gc.setLineWidth(1);
 
       /*
