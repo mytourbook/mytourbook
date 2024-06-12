@@ -5734,7 +5734,7 @@ public class Map2 extends Canvas {
       }
 
       /*
-       * Paint map points
+       * Paint all collected map points
        */
       if (allMarkerPointsList.size() > 0 || allLocationPointsList.size() > 0 || allPausesPointsList.size() > 0) {
 

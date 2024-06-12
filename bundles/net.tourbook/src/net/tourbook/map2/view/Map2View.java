@@ -624,7 +624,7 @@ public class Map2View extends ViewPart implements
          super(_actionImageDescriptor, _actionImageDescriptor);
 
          isToggleAction = true;
-         notSelectedTooltip = Messages.Map_Action_ShowMapPonts_Tooltip;
+         notSelectedTooltip = Messages.Map_Action_ShowMapPoints_Tooltip;
       }
 
       @Override

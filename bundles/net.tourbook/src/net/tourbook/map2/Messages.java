@@ -83,7 +83,7 @@ public class Messages extends NLS {
    public static String Map_Action_SearchTourByLocation_Tooltip;
    public static String Map_Action_ShowAllFilteredPhotos_Tooltip;
    public static String Map_Action_ShowEarthMap;
-   public static String Map_Action_ShowMapPonts_Tooltip;
+   public static String Map_Action_ShowMapPoints_Tooltip;
    public static String Map_Action_ShowPhotos_Tooltip;
    public static String Map_Action_ShowTourInfoInMap;
    public static String Map_Action_ShowTourWeatherInMap;
