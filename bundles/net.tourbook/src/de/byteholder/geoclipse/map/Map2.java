@@ -1332,35 +1332,12 @@ public class Map2 extends Canvas {
 
    private void createLabelSpreaderLabels(final GC gc,
                                           final Map2Point[] allMapPoints,
-                                          final int numAllLabels,
-                                          final int numVisibleLabels,
-                                          final List<PointFeature> allLabels) {
-
-      final float subDiff = numAllLabels / (float) numVisibleLabels;
+                                          final List<PointFeature> allCreatedLabels) {
 
       // without margin the labels are too close
       final int margin2 = 2 * _labelRespectMargin;
 
-      for (int itemIndex = 0; itemIndex < numVisibleLabels; itemIndex++) {
-
-         int subIndex = itemIndex;
-
-         if (numVisibleLabels != numAllLabels) {
-
-            // not all available markers can be displayed -> use a random label
-
-            final double randomDiff = Math.random() * subDiff;
-            final float nextItemIndex = subDiff * itemIndex;
-
-            subIndex = (int) (nextItemIndex + randomDiff);
-         }
-
-         // check bound
-         if (subIndex >= allMapPoints.length) {
-            break;
-         }
-
-         final Map2Point mapPoint = allMapPoints[subIndex];
+      for (final Map2Point mapPoint : allMapPoints) {
 
          final int devX = mapPoint.geoPointDevX;
          final int devY = mapPoint.geoPointDevY;
@@ -1384,7 +1361,7 @@ public class Map2 extends Canvas {
 
          pointFeature.data = mapPoint;
 
-         allLabels.add(pointFeature);
+         allCreatedLabels.add(pointFeature);
       }
    }
 
@@ -6118,15 +6095,6 @@ public class Map2 extends Canvas {
                                                           final boolean isPaintClusterMarker,
                                                           final Rectangle[] allClusterSymbolRectangle) {
 
-      final int numAllMarkers = allMarkerPoints.length;
-      final int numAllLocations = allLocationPoints == null ? 0 : allLocationPoints.length;
-      final int numAllPauses = allPausePoints == null ? 0 : allPausePoints.length;
-
-      // limit markers/locations
-      final int numVisibleMarkers = numAllMarkers;
-      final int numVisibleLocations = numAllLocations;
-      final int numVisiblePauses = numAllPauses;
-
       final int mapPointRespectSize2 = _mapPointSymbolRespectSize / 2;
 
       final Rectangle clientArea = _clientArea;
@@ -6137,43 +6105,41 @@ public class Map2 extends Canvas {
       /*
        * Setup labels for the label spreader
        */
+      final int numAllMarkers = allMarkerPoints.length;
+      final int numAllLocations = allLocationPoints == null ? 0 : allLocationPoints.length;
+      final int numAllPauses = allPausePoints == null ? 0 : allPausePoints.length;
+
+      final List<PointFeature> allLocationLabels = new ArrayList<>(numAllLocations);
+      final List<PointFeature> allMarkerLabels = new ArrayList<>(numAllMarkers);
+      final List<PointFeature> allPauseLabels = new ArrayList<>(numAllPauses);
+
       final List<List<PointFeature>> allDistributedLabels = new ArrayList<>();
 
-      final List<PointFeature> allLocationLabels = new ArrayList<>(numVisibleLocations);
-      final List<PointFeature> allMarkerLabels = new ArrayList<>(numVisibleMarkers);
-      final List<PointFeature> allPauseLabels = new ArrayList<>(numVisiblePauses);
-
-      if (numVisibleLocations > 0) {
+      if (numAllLocations > 0) {
 
          createLabelSpreaderLabels(
                gc,
                allLocationPoints,
-               numAllLocations,
-               numVisibleLocations,
                allLocationLabels);
 
          allDistributedLabels.add(allLocationLabels);
       }
 
-      if (numVisibleMarkers > 0) {
+      if (numAllMarkers > 0) {
 
          createLabelSpreaderLabels(
                gc,
                allMarkerPoints,
-               numAllMarkers,
-               numVisibleMarkers,
                allMarkerLabels);
 
          allDistributedLabels.add(allMarkerLabels);
       }
 
-      if (numVisiblePauses > 0) {
+      if (numAllPauses > 0) {
 
          createLabelSpreaderLabels(
                gc,
                allPausePoints,
-               numAllPauses,
-               numVisiblePauses,
                allPauseLabels);
 
          allDistributedLabels.add(allPauseLabels);
@@ -6223,13 +6189,13 @@ public class Map2 extends Canvas {
        * <p>
        * !!! This performs 3 time slower than without but for 200 max visible markers, it is OK !!!
        */
-      if (numVisibleLocations > 0) {
+      if (numAllLocations > 0) {
 
          final int locationRespectWidth = _imageMapLocationBounds.width;
          final int locationRespectHeight = _imageMapLocationBounds.height;
          final int locationRespectWidth2 = locationRespectWidth / 2;
 
-         for (int itemIndex = 0; itemIndex < numVisibleLocations; itemIndex++) {
+         for (int itemIndex = 0; itemIndex < numAllLocations; itemIndex++) {
 
             if (isBackgroundPainterInterrupted()) {
                return 0;
@@ -6250,7 +6216,7 @@ public class Map2 extends Canvas {
          }
       }
 
-      for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
+      for (int itemIndex = 0; itemIndex < numAllMarkers; itemIndex++) {
 
          if (isBackgroundPainterInterrupted()) {
             return 0;
@@ -6270,7 +6236,7 @@ public class Map2 extends Canvas {
                _mapPointSymbolRespectSize);
       }
 
-      for (int itemIndex = 0; itemIndex < numVisiblePauses; itemIndex++) {
+      for (int itemIndex = 0; itemIndex < numAllPauses; itemIndex++) {
 
          if (isBackgroundPainterInterrupted()) {
             return 0;
@@ -6306,7 +6272,7 @@ public class Map2 extends Canvas {
        * Draw location label
        */
       paint_BgImage_10_LocationLabel(gc,
-            numVisibleLocations,
+            numAllLocations,
             allLocationLabels,
             allPaintedLocationsPoints);
 
@@ -6314,13 +6280,13 @@ public class Map2 extends Canvas {
        * Draw marker label
        */
       paint_BgImage_30_Markers(gc,
-            numVisibleMarkers,
+            numAllMarkers,
             isPaintClusterMarker,
             allMarkerLabels,
             allPaintedMarkerPoints);
 
       paint_BgImage_40_Pauses(gc,
-            numVisiblePauses,
+            numAllPauses,
             allPauseLabels,
             allPaintedPauses);
 
@@ -6328,7 +6294,7 @@ public class Map2 extends Canvas {
        * Draw location symbol
        */
       paint_BgImage_20_LocationSymbol(gc,
-            numVisibleLocations,
+            numAllLocations,
             allLocationLabels,
             allPaintedLocationsPoints);
 
