@@ -1858,7 +1858,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    }
 
    /**
-    * Column: Number of geo parts
+    * Column: Name
     */
    private void defineColumn_05_LocationName() {
 
@@ -1877,15 +1877,15 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          @Override
          public void update(final ViewerCell cell) {
 
-            final TourLocation item = (TourLocation) cell.getElement();
+            final TourLocation tourLocation = (TourLocation) cell.getElement();
 
             if (UI.IS_SCRAMBLE_DATA) {
 
-               cell.setText(UI.scrambleText(item.name));
+               cell.setText(UI.scrambleText(tourLocation.getMapName()));
 
             } else {
 
-               cell.setText(item.name);
+               cell.setText(tourLocation.getMapName());
             }
          }
       });
