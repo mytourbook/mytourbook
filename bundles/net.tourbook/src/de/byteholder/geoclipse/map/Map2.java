@@ -110,6 +110,7 @@ import net.tourbook.map2.view.Map2Point;
 import net.tourbook.map2.view.Map2PointManager;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.MapLabelLayout;
+import net.tourbook.map2.view.MapPointStatistics;
 import net.tourbook.map2.view.MapPointToolTip;
 import net.tourbook.map2.view.MapPointType;
 import net.tourbook.map2.view.SelectionMapSelection;
@@ -428,6 +429,9 @@ public class Map2 extends Canvas {
    private int                             _numStatistics_AllTourMarkers;
    private int                             _numStatistics_AllTourLocations;
    private int                             _numStatistics_AllTourPauses;
+
+   private boolean                         _numStatistics_AllTourMarkers_IsTruncated;
+   private boolean                         _numStatistics_AllTourPauses_IsTruncated;
 
    private Map<Long, Color>                _locationBoundingBoxColors         = new HashMap<>();
    private int                             _colorSwitchCounter;
@@ -1900,6 +1904,8 @@ public class Map2 extends Canvas {
             final double randomDiff = Math.random() * subMarkerItems;
 
             markerSubIndex = (int) (nextItemIndex + randomDiff);
+
+            _numStatistics_AllTourMarkers_IsTruncated = true;
          }
 
          // check bounds
@@ -2130,6 +2136,8 @@ public class Map2 extends Canvas {
             final double randomDiff = Math.random() * subPauseItems;
 
             pauseSubIndex = (int) (nextItemIndex + randomDiff);
+
+            _numStatistics_AllTourPauses_IsTruncated = true;
          }
 
          // check bounds
@@ -5558,7 +5566,7 @@ public class Map2 extends Canvas {
          /*
           * Update statistics
           */
-         Map2PointManager.updateStatistics(
+         Map2PointManager.updateStatistics(new MapPointStatistics(
 
                _allPaintedLocations.size(),
                _numStatistics_AllCommonLocations,
@@ -5568,9 +5576,11 @@ public class Map2 extends Canvas {
 
                _allPaintedMarkers.size(),
                _numStatistics_AllTourMarkers,
+               _numStatistics_AllTourMarkers_IsTruncated,
 
                _allPaintedPauses.size(),
-               _numStatistics_AllTourPauses
+               _numStatistics_AllTourPauses,
+               _numStatistics_AllTourPauses_IsTruncated)
 
          );
       };
@@ -5596,6 +5606,9 @@ public class Map2 extends Canvas {
       _numStatistics_AllTourLocations = 0;
       _numStatistics_AllTourMarkers = 0;
       _numStatistics_AllTourPauses = 0;
+
+      _numStatistics_AllTourMarkers_IsTruncated = false;
+      _numStatistics_AllTourPauses_IsTruncated = false;
 
 // SET_FORMATTING_OFF
 
@@ -5631,17 +5644,17 @@ public class Map2 extends Canvas {
 
                   paint_BackgroundImage_30_MapPointsAndCluster(gc,
                         allTourData,
+                        allPaintedLocations,
                         allPaintedMarkers,
                         allPaintedMarkerClusters,
-                        allPaintedLocations,
                         allPaintedPauses);
 
                } else {
 
                   paint_BackgroundImage_20_MapPoints(gc,
                         allTourData,
-                        allPaintedMarkers,
                         allPaintedLocations,
+                        allPaintedMarkers,
                         allPaintedPauses);
                }
 
@@ -5705,8 +5718,8 @@ public class Map2 extends Canvas {
 
    private void paint_BackgroundImage_20_MapPoints(final GC gc,
                                                    final List<TourData> allTourData,
-                                                   final List<PaintedMapPoint> allPaintedMarkers,
                                                    final List<PaintedMapPoint> allPaintedLocations,
+                                                   final List<PaintedMapPoint> allPaintedMarkers,
                                                    final List<PaintedMapPoint> allPaintedPauses) {
 
       final List<Map2Point> allMarkerPointsList = new ArrayList<>();
@@ -5744,11 +5757,11 @@ public class Map2 extends Canvas {
 
          paint_BackgroundImage_50_AllCollectedItems(gc,
 
-               allMarkerPoints,
-               allPaintedMarkers,
-
                allLocationPoints,
                allPaintedLocations,
+
+               allMarkerPoints,
+               allPaintedMarkers,
 
                allPausePoints,
                allPaintedPauses,
@@ -5761,9 +5774,9 @@ public class Map2 extends Canvas {
 
    private void paint_BackgroundImage_30_MapPointsAndCluster(final GC gc,
                                                              final List<TourData> allTourData,
+                                                             final List<PaintedMapPoint> allPaintedLocations,
                                                              final List<PaintedMapPoint> allPaintedMarkers,
                                                              final List<PaintedMarkerCluster> allPaintedMarkerClusters,
-                                                             final List<PaintedMapPoint> allPaintedLocations,
                                                              final List<PaintedMapPoint> allPaintedPauses) {
 
       final Map<String, Map2Point> allMarkersOnlyMap = new HashMap<>();
@@ -5888,11 +5901,11 @@ public class Map2 extends Canvas {
 
          paint_BackgroundImage_50_AllCollectedItems(gc,
 
-               allMarkerPoints,
-               allPaintedMarkers,
-
                allLocationPoints,
                allPaintedLocations,
+
+               allMarkerPoints,
+               allPaintedMarkers,
 
                allPausePoints,
                allPaintedPauses,
@@ -5939,11 +5952,11 @@ public class Map2 extends Canvas {
 
       final int numPlacedLabels = paint_BackgroundImage_50_AllCollectedItems(gc,
 
+            null,
+            null,
+
             allClusterMarkerPoints,
             allPaintedMarkerPoints,
-
-            null,
-            null,
 
             null,
             null,
@@ -6080,16 +6093,12 @@ public class Map2 extends Canvas {
 
    /**
     * @param gc
-    *
-    * @param allMarkerPoints
-    * @param allPaintedMarkerPoints
-    *
     * @param allLocationPoints
     * @param allPaintedLocationsPoints
-    *
-    * @param allPaintedPauses
+    * @param allMarkerPoints
+    * @param allPaintedMarkerPoints
     * @param allPausePoints
-    *
+    * @param allPaintedPauses
     * @param isPaintClusterMarker
     * @param allClusterSymbolRectangle
     *
@@ -6097,11 +6106,11 @@ public class Map2 extends Canvas {
     */
    private int paint_BackgroundImage_50_AllCollectedItems(final GC gc,
 
-                                                          final Map2Point[] allMarkerPoints,
-                                                          final List<PaintedMapPoint> allPaintedMarkerPoints,
-
                                                           final Map2Point[] allLocationPoints,
                                                           final List<PaintedMapPoint> allPaintedLocationsPoints,
+
+                                                          final Map2Point[] allMarkerPoints,
+                                                          final List<PaintedMapPoint> allPaintedMarkerPoints,
 
                                                           final Map2Point[] allPausePoints,
                                                           final List<PaintedMapPoint> allPaintedPauses,

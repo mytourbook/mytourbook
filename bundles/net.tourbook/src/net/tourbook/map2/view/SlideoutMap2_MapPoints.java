@@ -248,9 +248,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Label                 _lblCommonLocationLabel_Color;
    private Label                 _lblCommonLocationLabel_HoveredColor;
    private Label                 _lblLabelBackground;
-   private Label                 _lblStats_CommonLocations;
+   private Label                 _lblStats_CommonLocations_All;
    private Label                 _lblStats_CommonLocations_Visible;
-   private Label                 _lblStats_TourLocations;
+   private Label                 _lblStats_TourLocations_All;
    private Label                 _lblStats_TourLocations_Visible;
    private Label                 _lblStats_TourMarkers_All;
    private Label                 _lblStats_TourMarkers_Visible;
@@ -1745,9 +1745,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       final GridDataFactory gd = GridDataFactory.fillDefaults().align(SWT.FILL, SWT.END);
       final int horizontalSpacing = 0;
 
-      final String tooltipMarkers = "Number of visible / displayed tour markers";
-      final String tooltipLocations = "Number of visible / displayed tour + common locations";
-      final String tooltipPauses = "Number of visible / displayed tour pauses";
+      final String tooltipCommonLocations = "Number of visible / available common locations";
+      final String tooltipTourLocations = "Number of visible / available tour locations";
+      final String tooltipMarkers = "Number of visible / available tour markers\n\nA star * indicates that not all markers can be displayed";
+      final String tooltipPauses = "Number of visible / available tour pauses\n\nA star * indicates that not all pauses can be displayed";
 
       _statisticsContainer = new Composite(shellContainer, SWT.NONE);
       GridDataFactory.fillDefaults().align(SWT.FILL, SWT.END).applyTo(_statisticsContainer);
@@ -1791,12 +1792,12 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             GridDataFactory.fillDefaults().indent(horizontalSpacing, 0).applyTo(toolbarAction);
 
             _lblStats_TourLocations_Visible = new Label(_statisticsContainer, SWT.TRAIL);
-            _lblStats_TourLocations_Visible.setToolTipText(tooltipLocations);
+            _lblStats_TourLocations_Visible.setToolTipText(tooltipTourLocations);
             gd.applyTo(_lblStats_TourLocations_Visible);
 
-            _lblStats_TourLocations = new Label(_statisticsContainer, SWT.TRAIL);
-            _lblStats_TourLocations.setToolTipText(tooltipLocations);
-            gd.applyTo(_lblStats_TourLocations);
+            _lblStats_TourLocations_All = new Label(_statisticsContainer, SWT.TRAIL);
+            _lblStats_TourLocations_All.setToolTipText(tooltipTourLocations);
+            gd.applyTo(_lblStats_TourLocations_All);
          }
          {
             /*
@@ -1806,12 +1807,12 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             GridDataFactory.fillDefaults().indent(horizontalSpacing, 0).applyTo(toolbarAction);
 
             _lblStats_CommonLocations_Visible = new Label(_statisticsContainer, SWT.TRAIL);
-            _lblStats_CommonLocations_Visible.setToolTipText(tooltipLocations);
+            _lblStats_CommonLocations_Visible.setToolTipText(tooltipCommonLocations);
             gd.applyTo(_lblStats_CommonLocations_Visible);
 
-            _lblStats_CommonLocations = new Label(_statisticsContainer, SWT.TRAIL);
-            _lblStats_CommonLocations.setToolTipText(tooltipLocations);
-            gd.applyTo(_lblStats_CommonLocations);
+            _lblStats_CommonLocations_All = new Label(_statisticsContainer, SWT.TRAIL);
+            _lblStats_CommonLocations_All.setToolTipText(tooltipCommonLocations);
+            gd.applyTo(_lblStats_CommonLocations_All);
          }
       }
    }
@@ -2040,9 +2041,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _colorMapTransparencyColor.setEnabled(isDimMap == false || isUseTransparencyColor);
 
       // statistics
-      _lblStats_CommonLocations              .setEnabled(isShowCommonLocations);
+      _lblStats_CommonLocations_All          .setEnabled(isShowCommonLocations);
       _lblStats_CommonLocations_Visible      .setEnabled(isShowCommonLocations);
-      _lblStats_TourLocations                .setEnabled(isShowTourLocations);
+      _lblStats_TourLocations_All            .setEnabled(isShowTourLocations);
       _lblStats_TourLocations_Visible        .setEnabled(isShowTourLocations);
       _lblStats_TourMarkers_All              .setEnabled(isShowTourMarker);
       _lblStats_TourMarkers_Visible          .setEnabled(isShowTourMarker);
@@ -2881,34 +2882,39 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
 
-   public void updateStatistics(final int numVisibleCommonLocations,
-                                final int numCommonLocations,
+   public void updateStatistics(final MapPointStatistics stats) {
 
-                                final int numVisibleTourLocations,
-                                final int numTourLocations,
-
-                                final int numVisibleTourMarkers,
-                                final int numAllTourMarkers,
-
-                                final int numVisibleTourPauses,
-                                final int numAllTourPauses) {
+      // TODO Auto-generated method stub
 
       if (_tabFolder.isDisposed()) {
          // this happened
          return;
       }
 
-      _lblStats_CommonLocations.setText(Integer.toString(numCommonLocations));
-      _lblStats_CommonLocations_Visible.setText(Integer.toString(numVisibleCommonLocations));
+      final String numCommonLocations_All = Integer.toString(stats.numCommonLocations_All);
+      final String numTourLocations_All = Integer.toString(stats.numTourLocations_All);
+      String numTourMarkers_All = Integer.toString(stats.numTourMarkers_All);
+      String numTourPauses_All = Integer.toString(stats.numTourPauses_All);
 
-      _lblStats_TourLocations.setText(Integer.toString(numTourLocations));
-      _lblStats_TourLocations_Visible.setText(Integer.toString(numVisibleTourLocations));
+      if (stats.numTourMarkers_All_IsTruncated) {
+         numTourMarkers_All += UI.SYMBOL_STAR;
+      }
 
-      _lblStats_TourMarkers_All.setText(Integer.toString(numAllTourMarkers));
-      _lblStats_TourMarkers_Visible.setText(Integer.toString(numVisibleTourMarkers));
+      if (stats.numTourPauses_All_IsTruncated) {
+         numTourPauses_All += UI.SYMBOL_STAR;
+      }
 
-      _lblStats_TourPauses_All.setText(Integer.toString(numAllTourPauses));
-      _lblStats_TourPauses_Visible.setText(Integer.toString(numVisibleTourPauses));
+      _lblStats_CommonLocations_All.setText(numCommonLocations_All);
+      _lblStats_CommonLocations_Visible.setText(Integer.toString(stats.numCommonLocations_Painted));
+
+      _lblStats_TourLocations_All.setText(numTourLocations_All);
+      _lblStats_TourLocations_Visible.setText(Integer.toString(stats.numTourLocations_Painted));
+
+      _lblStats_TourMarkers_All.setText(numTourMarkers_All);
+      _lblStats_TourMarkers_Visible.setText(Integer.toString(stats.numTourMarkers_Painted));
+
+      _lblStats_TourPauses_All.setText(numTourPauses_All);
+      _lblStats_TourPauses_Visible.setText(Integer.toString(stats.numTourPauses_Painted));
 
       _statisticsContainer.pack();
    }
