@@ -90,11 +90,11 @@ public class TourLocationToolTip extends ToolTip {
     */
    private Composite _ttContainer;
 
-   public TourLocationToolTip(final SlideoutMap2_MapPoints slideoutMapLocation) {
+   public TourLocationToolTip(final CommonLocationView commonLocationViewer) {
 
-      super(slideoutMapLocation.getLocationViewer().getTable(), NO_RECREATE, false);
+      super(commonLocationViewer.getLocationViewer().getTable(), NO_RECREATE, false);
 
-      final TableViewer locationViewer = slideoutMapLocation.getLocationViewer();
+      final TableViewer locationViewer = commonLocationViewer.getLocationViewer();
 
       _ttControl = locationViewer.getTable();
       _columnViewer = locationViewer;

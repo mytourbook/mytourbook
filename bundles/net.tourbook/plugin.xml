@@ -637,6 +637,13 @@
                   label       ="%View_Name_TourLocations2"
                   mnemonic    ="%View_Name_TourLocations2_Mnemonic"/>
 
+               <!-- All Common Locations -->
+               <command
+                  commandId   ="command.net.tourbook.tour.location.CommonLocationView"
+                  icon        ="icons/map-location-common.png"
+                  label       ="%View_Name_CommonLocations"
+                  mnemonic    ="%View_Name_CommonLocations_Mnemonic"/>
+
                
             <!-- GROUP: Sensors -->
             
@@ -1369,7 +1376,12 @@
       <command
          id             ="command.net.tourbook.tour.location.TourLocationView"
          name           ="%View_Name_TourLocations2"
-         defaultHandler ="net.tourbook.tour.location.ActionHandler_OpenView_LocationView"/>
+         defaultHandler ="net.tourbook.tour.location.ActionHandler_OpenView_TourLocationView"/>
+
+      <command
+         id             ="command.net.tourbook.tour.location.CommonLocationView"
+         name           ="%View_Name_CommonLocations"
+         defaultHandler ="net.tourbook.tour.location.ActionHandler_OpenView_CommonLocationView"/>
 
       <command
          id             ="net.tourbook.command.tourChart.tool.adjustAltitude"
@@ -1669,6 +1681,13 @@
             class       ="net.tourbook.tour.location.TourLocationView"
             icon        ="icons/tour-locations.png"
             name        ="%View_Name_TourLocations2"/>
+
+         <view
+            category    ="net.tourbook.category.Tour_Directory"
+            id          ="net.tourbook.tour.location.CommonLocationView"
+            class       ="net.tourbook.tour.location.CommonLocationView"
+            icon        ="icons/map-location-common.png"
+            name        ="%View_Name_CommonLocations"/>
 
 
       <!-- 2. Tour Properties -->
@@ -2046,6 +2065,12 @@
       <key
          commandId   ="command.net.tourbook.tour.location.TourLocationView"
          sequence    ="%Shortcut_Key_App_TourLocations"
+         contextId   ="org.eclipse.ui.contexts.window"
+         schemeId    ="net.tourbook.scheme"/>
+
+      <key
+         commandId   ="command.net.tourbook.tour.location.CommonLocationView"
+         sequence    ="%Shortcut_Key_App_CommonLocations"
          contextId   ="org.eclipse.ui.contexts.window"
          schemeId    ="net.tourbook.scheme"/>
 

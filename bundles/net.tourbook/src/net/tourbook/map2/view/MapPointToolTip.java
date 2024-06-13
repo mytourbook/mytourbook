@@ -121,7 +121,10 @@ public class MapPointToolTip extends ToolTip {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.fillDefaults()
+            .numColumns(2)
+            .spacing(10, 2)
+            .applyTo(container);
       {
          // location fields
          TourLocationUI.createUI(container, mapPoint.tourLocation);

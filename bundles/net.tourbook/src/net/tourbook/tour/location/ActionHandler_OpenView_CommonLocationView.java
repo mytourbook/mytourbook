@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,12 +27,12 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.menus.UIElement;
 
-public class ActionHandler_OpenView_LocationView extends AbstractHandler implements IElementUpdater {
+public class ActionHandler_OpenView_CommonLocationView extends AbstractHandler implements IElementUpdater {
 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-      Util.showView(TourLocationView.ID, true);
+      Util.showView(CommonLocationView.ID, true);
 
       return null;
    }
@@ -41,6 +41,6 @@ public class ActionHandler_OpenView_LocationView extends AbstractHandler impleme
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
 
-      UI.setThemedIcon(uiElement, Images.MapLocation_Tour);
+      UI.setThemedIcon(uiElement, Images.MapLocation_Common);
    }
 }
