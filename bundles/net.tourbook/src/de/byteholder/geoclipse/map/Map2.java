@@ -1921,7 +1921,7 @@ public class Map2 extends Canvas {
                final int groupX = devX / skipLabelGridSize;
                final int groupY = devY / skipLabelGridSize;
 
-               groupKey = markerLabel + "-" + groupX + "-" + groupY;
+               groupKey = markerLabel + UI.DASH + groupX + UI.DASH + groupY;
 
                final Map2Point groupedMarker = _allMapMarkerWithGroupedLabels.get(groupKey);
 

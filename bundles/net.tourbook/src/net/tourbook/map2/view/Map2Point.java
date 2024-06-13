@@ -141,7 +141,7 @@ public class Map2Point implements ClusterItem {
 
          return numDuplicates < 2
                ? formattedLabel
-               : formattedLabel + " (" + numDuplicates + ")";
+               : formattedLabel + UI.SPACE + UI.SYMBOL_BRACKET_LEFT + numDuplicates + UI.SYMBOL_BRACKET_RIGHT;
 
       } else {
 
