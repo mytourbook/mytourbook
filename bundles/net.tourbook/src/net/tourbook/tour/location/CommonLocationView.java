@@ -627,6 +627,9 @@ public class CommonLocationView extends ViewPart implements ITourViewer {
 
    private void enableControls() {
 
+      final int numSelectedLocations = getSelectedLocations().size();
+
+      _actionDeleteLocation.setEnabled(numSelectedLocations > 0);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
@@ -752,15 +755,11 @@ public class CommonLocationView extends ViewPart implements ITourViewer {
 
    private void onLocation_Select(final SelectionChangedEvent selectionChangedEvent) {
 
-      final IStructuredSelection selection = _mapCommonLocationViewer.getStructuredSelection();
-
-      if (selection.isEmpty()) {
-         return;
-      }
-
       enableControls();
 
       // fire selection
+      final IStructuredSelection selection = _mapCommonLocationViewer.getStructuredSelection();
+
       TourManager.fireEventWithCustomData(
             TourEventId.COMMON_LOCATION_SELECTION,
             selection.toList(),

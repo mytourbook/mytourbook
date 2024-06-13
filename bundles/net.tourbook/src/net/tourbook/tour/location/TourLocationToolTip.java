@@ -27,7 +27,6 @@ import net.tourbook.common.util.ToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.map.location.LocationType;
-import net.tourbook.map2.view.SlideoutMap2_MapPoints;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.location.TourLocationView.LocationItem;
 import net.tourbook.ui.Messages;
@@ -482,9 +481,9 @@ public class TourLocationToolTip extends ToolTip {
                _tourLocation = locationItem.tourLocation;
             }
 
-         } else if (labelProvider instanceof SlideoutMap2_MapPoints.TooltipLabelProvider) {
+         } else if (labelProvider instanceof CommonLocationView.TooltipLabelProvider) {
 
-            // slideout map location
+            // common location view
 
             final Object cellElement = _colViewerCell.getElement();
 
