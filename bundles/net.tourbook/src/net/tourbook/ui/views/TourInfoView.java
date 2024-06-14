@@ -44,7 +44,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -55,7 +54,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 
 public class TourInfoView extends ViewPart {
@@ -83,16 +81,13 @@ public class TourInfoView extends ViewPart {
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
 
-               updateUI();
-            }
+            updateUI();
          }
       };
 
@@ -104,14 +99,11 @@ public class TourInfoView extends ViewPart {
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-            if (part == TourInfoView.this) {
-               return;
-            }
-            onSelectionChanged(selection);
+      _postSelectionListener = (part, selection) -> {
+         if (part == TourInfoView.this) {
+            return;
          }
+         onSelectionChanged(selection);
       };
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
@@ -124,9 +116,9 @@ public class TourInfoView extends ViewPart {
             return;
          }
 
-         if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof final TourEvent tourEvent) {
 
-            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
 
             if (!modifiedTours.isEmpty()) {
 
@@ -289,44 +281,41 @@ public class TourInfoView extends ViewPart {
 
       long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-      if (selection instanceof SelectionTourData) {
+      if (selection instanceof final SelectionTourData tourDataSelection) {
 
          // a tour is selected
 
-         final SelectionTourData tourDataSelection = (SelectionTourData) selection;
          _tourData = tourDataSelection.getTourData();
 
          if (_tourData != null) {
             tourId = _tourData.getTourId();
          }
 
-      } else if (selection instanceof SelectionTourId) {
+      } else if (selection instanceof final SelectionTourId selectionTourId) {
 
-         tourId = ((SelectionTourId) selection).getTourId();
+         tourId = selectionTourId.getTourId();
 
-      } else if (selection instanceof SelectionTourIds) {
+      } else if (selection instanceof final SelectionTourIds selectionTourIds) {
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final ArrayList<Long> tourIds = selectionTourIds.getTourIds();
          if (CollectionUtils.isNotEmpty(tourIds)) {
             tourId = tourIds.get(0);
          }
 
-      } else if (selection instanceof SelectionReferenceTourView) {
-
-         final SelectionReferenceTourView tourCatalogSelection = (SelectionReferenceTourView) selection;
+      } else if (selection instanceof final SelectionReferenceTourView tourCatalogSelection) {
 
          final TVIRefTour_RefTourItem refItem = tourCatalogSelection.getRefItem();
          if (refItem != null) {
             tourId = refItem.getTourId();
          }
 
-      } else if (selection instanceof StructuredSelection) {
+      } else if (selection instanceof final StructuredSelection structuredSelection) {
 
-         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-         if (firstElement instanceof TVIRefTour_ComparedTour) {
-            tourId = ((TVIRefTour_ComparedTour) firstElement).getTourId();
-         } else if (firstElement instanceof TVIElevationCompareResult_ComparedTour) {
-            tourId = ((TVIElevationCompareResult_ComparedTour) firstElement).getTourId();
+         final Object firstElement = structuredSelection.getFirstElement();
+         if (firstElement instanceof final TVIRefTour_ComparedTour tviRefTour_ComparedTour) {
+            tourId = tviRefTour_ComparedTour.getTourId();
+         } else if (firstElement instanceof final TVIElevationCompareResult_ComparedTour tviElevationCompareResult_ComparedTour) {
+            tourId = tviElevationCompareResult_ComparedTour.getTourId();
          }
 
       } else if (selection instanceof SelectionDeletedTours) {
@@ -361,27 +350,24 @@ public class TourInfoView extends ViewPart {
    private void showTourFromTourProvider() {
 
       // a tour is not displayed, find a tour provider which provides a tour
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getCurrent().asyncExec(() -> {
 
-            // validate widget
-            if (_infoContainer.isDisposed()) {
-               return;
-            }
+         // validate widget
+         if (_infoContainer.isDisposed()) {
+            return;
+         }
 
-            /*
-             * check if tour was set from a selection provider
-             */
-            if (_tourData != null) {
-               return;
-            }
+         /*
+          * check if tour was set from a selection provider
+          */
+         if (_tourData != null) {
+            return;
+         }
 
-            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+         final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
 
-            if ((selectedTours != null) && (selectedTours.size() > 0)) {
-               onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
-            }
+         if (CollectionUtils.isNotEmpty(selectedTours)) {
+            onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
          }
       });
    }
