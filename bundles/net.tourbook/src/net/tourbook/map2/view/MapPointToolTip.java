@@ -121,7 +121,10 @@ public class MapPointToolTip extends ToolTip {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.fillDefaults()
+            .numColumns(2)
+            .spacing(10, 2)
+            .applyTo(container);
       {
          // location fields
          TourLocationUI.createUI(container, mapPoint.tourLocation);
@@ -179,7 +182,7 @@ public class MapPointToolTip extends ToolTip {
              */
 
             final Label label = new Label(container, SWT.TRAIL);
-            label.setText(TimeTools.Formatter_DateTime_LL.format(markerStartTime));
+            label.setText(TimeTools.Formatter_DateTime_FL.format(markerStartTime));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
 
          }
@@ -200,7 +203,7 @@ public class MapPointToolTip extends ToolTip {
           */
 
          final Label label = new Label(parent, SWT.TRAIL);
-         label.setText(TimeTools.Formatter_DateTime_LL.format(pauseStartTime));
+         label.setText(TimeTools.Formatter_DateTime_FL.format(pauseStartTime));
       }
    }
 

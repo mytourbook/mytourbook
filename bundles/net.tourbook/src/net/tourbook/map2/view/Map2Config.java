@@ -38,6 +38,20 @@ public class Map2Config {
    public String name      = Map2ConfigManager.CONFIG_DEFAULT_ID_1;
 
    /*
+    * Common
+    */
+   public boolean        isTruncateLabel;
+   public boolean        isWrapLabel;
+   public int            labelDistributorMaxLabels = Map2ConfigManager.LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT;
+   public int            labelDistributorRadius    = Map2ConfigManager.LABEL_DISTRIBUTOR_RADIUS_DEFAULT;
+   public int            labelTruncateLength       = Map2ConfigManager.LABEL_TRUNCATE_LENGTH_DEFAULT;
+   public int            labelWrapLength           = Map2ConfigManager.LABEL_WRAP_LENGTH_DEFAULT;
+   public MapLabelLayout labelLayout               = Map2ConfigManager.LABEL_LAYOUT_DEFAULT;
+
+   public boolean        isLabelAntialiased        = true;
+   public boolean        isSymbolAntialiased       = true;
+
+   /*
     * Tour/common locations
     */
    public boolean isShowTourLocation                = true;
@@ -85,31 +99,16 @@ public class Map2Config {
    public Color   tourMarkerOutline_Hovered_Color;
 
    /*
-    * Labels
-    */
-   public boolean        isLabelAntialiased        = true;
-   public boolean        isTruncateLabel;
-   public boolean        isWrapLabel;
-   public int            labelDistributorMaxLabels = Map2ConfigManager.LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT;
-   public int            labelDistributorRadius    = Map2ConfigManager.LABEL_DISTRIBUTOR_RADIUS_DEFAULT;
-   public int            labelTruncateLength       = Map2ConfigManager.LABEL_TRUNCATE_LENGTH_DEFAULT;
-   public int            labelWrapLength           = Map2ConfigManager.LABEL_WRAP_LENGTH_DEFAULT;
-   public MapLabelLayout labelLayout               = Map2ConfigManager.LABEL_LAYOUT_DEFAULT;
-
-   /*
     * Tour marker cluster
     */
-   public boolean isTourMarkerClustered      = true;
-   public boolean isClusterSymbolAntialiased = true;
-   public boolean isClusterTextAntialiased   = true;
-   public boolean isShowClusterMarker        = true;
+   public boolean isTourMarkerClustered;
 
-   public boolean isFillClusterSymbol        = Map2ConfigManager.DEFAULT_IS_FILL_CLUSTER_SYMBOL;
-   public int     clusterGridSize            = Map2ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
-   public RGB     clusterFill_RGB            = Map2ConfigManager.DEFAULT_CLUSTER_FILL_RGB;
-   public RGB     clusterOutline_RGB         = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_RGB;
-   public int     clusterOutline_Width       = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_WIDTH;
-   public int     clusterSymbol_Size         = Map2ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
+   public boolean isFillClusterSymbol  = Map2ConfigManager.DEFAULT_IS_FILL_CLUSTER_SYMBOL;
+   public int     clusterGridSize      = Map2ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
+   public RGB     clusterFill_RGB      = Map2ConfigManager.DEFAULT_CLUSTER_FILL_RGB;
+   public RGB     clusterOutline_RGB   = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_RGB;
+   public int     clusterOutline_Width = Map2ConfigManager.DEFAULT_CLUSTER_OUTLINE_WIDTH;
+   public int     clusterSymbol_Size   = Map2ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
 
    public Color   clusterFill_Color;
    public Color   clusterOutline_Color;
@@ -117,7 +116,7 @@ public class Map2Config {
    /*
     * Tour pauses
     */
-   public boolean isShowTourPauses;
+   public boolean isShowTourPauses             = true;
 
    public RGB     tourPauseFill_RGB            = Map2ConfigManager.DEFAULT_TOUR_PAUSE_FILL_RGB;
    public RGB     tourPauseFill_Hovered_RGB    = Map2ConfigManager.DEFAULT_TOUR_PAUSE_FILL_HOVERED_RGB;
@@ -133,32 +132,37 @@ public class Map2Config {
     * Tour pause filter
     */
    public boolean                 isFilterTourPauses;
-   public boolean                 isFilterTourPause_Duration;
-   public boolean                 isShowAutoPauses;
-   public boolean                 isShowUserPauses;
+   public boolean                 isFilterTourPause_Duration          = true;
+   public boolean                 isShowAutoPauses                    = true;
+   public boolean                 isShowUserPauses                    = true;
 
    public boolean                 useTourPause_DurationFilter_Hours;
-   public boolean                 useTourPause_DurationFilter_Minutes;
+   public boolean                 useTourPause_DurationFilter_Minutes = true;
    public boolean                 useTourPause_DurationFilter_Seconds;
 
    public int                     tourPauseDurationFilter_Hours;
-   public int                     tourPauseDurationFilter_Minutes;
+   public int                     tourPauseDurationFilter_Minutes     = 3;
    public int                     tourPauseDurationFilter_Seconds;
    public long                    tourPauseDuration;
 
    public TourFilterFieldOperator tourPauseDurationFilter_Operator;
 
+   private void logColor(final StringBuilder sb, final Color color, final String name) {
+
+      sb.append("public static final RGB %-45s = new RGB(%d, %d, %d);\n" //$NON-NLS-1$
+
+            .formatted(
+
+                  name,
+
+                  color.getRed(),
+                  color.getGreen(),
+                  color.getBlue()));
+   }
+
    public void setupColors() {
 
 // SET_FORMATTING_OFF
-
-      tourMarkerFill_Color                = new Color(tourMarkerFill_RGB);
-      tourMarkerFill_Hovered_Color        = new Color(tourMarkerFill_Hovered_RGB);
-      tourMarkerOutline_Color             = new Color(tourMarkerOutline_RGB);
-      tourMarkerOutline_Hovered_Color     = new Color(tourMarkerOutline_Hovered_RGB);
-
-      clusterFill_Color                   = new Color(clusterFill_RGB);
-      clusterOutline_Color                = new Color(clusterOutline_RGB);
 
       commonLocationFill_Color            = new Color(commonLocationFill_RGB);
       commonLocationFill_Hovered_Color    = new Color(commonLocationFill_Hovered_RGB);
@@ -170,10 +174,56 @@ public class Map2Config {
       tourLocationOutline_Color           = new Color(tourLocationOutline_RGB);
       tourLocationOutline_Hovered_Color   = new Color(tourLocationOutline_Hovered_RGB);
 
+      tourMarkerFill_Color                = new Color(tourMarkerFill_RGB);
+      tourMarkerFill_Hovered_Color        = new Color(tourMarkerFill_Hovered_RGB);
+      tourMarkerOutline_Color             = new Color(tourMarkerOutline_RGB);
+      tourMarkerOutline_Hovered_Color     = new Color(tourMarkerOutline_Hovered_RGB);
+
+      clusterFill_Color                   = new Color(clusterFill_RGB);
+      clusterOutline_Color                = new Color(clusterOutline_RGB);
+
       tourPauseFill_Color                 = new Color(tourPauseFill_RGB);
       tourPauseFill_Hovered_Color         = new Color(tourPauseFill_Hovered_RGB);
       tourPauseOutline_Color              = new Color(tourPauseOutline_RGB);
       tourPauseOutline_Hovered_Color      = new Color(tourPauseOutline_Hovered_RGB);
+
+
+      /*
+       * Log color which is used when defining defaults
+       */
+      final boolean isLogColor = false;
+      if (isLogColor) {
+
+         final StringBuilder sb = new StringBuilder();
+
+
+         logColor(sb, clusterFill_Color,                    "DEFAULT_CLUSTER_FILL_RGB");                    //$NON-NLS-1$
+         logColor(sb, clusterOutline_Color,                 "DEFAULT_CLUSTER_OUTLINE_RGB");                 //$NON-NLS-1$
+
+         logColor(sb, commonLocationFill_Color,             "DEFAULT_COMMON_LOCATION_FILL_RGB");            //$NON-NLS-1$
+         logColor(sb, commonLocationFill_Hovered_Color,     "DEFAULT_COMMON_LOCATION_FILL_HOVERED_RGB");    //$NON-NLS-1$
+         logColor(sb, commonLocationOutline_Color,          "DEFAULT_COMMON_LOCATION_OUTLINE_RGB");         //$NON-NLS-1$
+         logColor(sb, commonLocationOutline_Hovered_Color,  "DEFAULT_COMMON_LOCATION_OUTLINE_HOVERED_RGB"); //$NON-NLS-1$
+
+         logColor(sb, tourLocationFill_Color,               "DEFAULT_TOUR_LOCATION_FILL_RGB");              //$NON-NLS-1$
+         logColor(sb, tourLocationFill_Hovered_Color,       "DEFAULT_TOUR_LOCATION_FILL_HOVERED_RGB");      //$NON-NLS-1$
+         logColor(sb, tourLocationOutline_Color,            "DEFAULT_TOUR_LOCATION_OUTLINE_RGB");           //$NON-NLS-1$
+         logColor(sb, tourLocationOutline_Hovered_Color,    "DEFAULT_TOUR_LOCATION_OUTLINE_HOVERED_RGB");   //$NON-NLS-1$
+
+         logColor(sb, tourMarkerFill_Color,                 "DEFAULT_TOUR_MARKER_FILL_RGB");                //$NON-NLS-1$
+         logColor(sb, tourMarkerFill_Hovered_Color,         "DEFAULT_TOUR_MARKER_FILL_HOVERED_RGB");        //$NON-NLS-1$
+         logColor(sb, tourMarkerOutline_Color,              "DEFAULT_TOUR_MARKER_OUTLINE_RGB");             //$NON-NLS-1$
+         logColor(sb, tourMarkerOutline_Hovered_Color,      "DEFAULT_TOUR_MARKER_OUTLINE_HOVERED_RGB");     //$NON-NLS-1$
+
+         logColor(sb, tourPauseFill_Color,                  "DEFAULT_TOUR_PAUSE_FILL_RGB");                 //$NON-NLS-1$
+         logColor(sb, tourPauseFill_Hovered_Color,          "DEFAULT_TOUR_PAUSE_FILL_HOVERED_RGB");         //$NON-NLS-1$
+         logColor(sb, tourPauseOutline_Color,               "DEFAULT_TOUR_PAUSE_OUTLINE_RGB");              //$NON-NLS-1$
+         logColor(sb, tourPauseOutline_Hovered_Color,       "DEFAULT_TOUR_PAUSE_OUTLINE_HOVERED_RGB");      //$NON-NLS-1$
+
+         System.out.println(sb.toString());
+         System.out.println();
+         System.out.println();
+      }
 
 // SET_FORMATTING_ON
    }
@@ -183,20 +233,20 @@ public class Map2Config {
 
       return UI.EMPTY_STRING
 
-            + "Map2MarkerConfig" + NL //                                            //$NON-NLS-1$
+            + "Map2MarkerConfig" + NL //                                               //$NON-NLS-1$
 
-            + " name                      = " + name + NL //                        //$NON-NLS-1$
-            + " defaultId                 = " + defaultId + NL //                   //$NON-NLS-1$
-            + " id                        = " + id + NL //                          //$NON-NLS-1$
+            + " name                      = " + name + NL //                           //$NON-NLS-1$
+            + " defaultId                 = " + defaultId + NL //                      //$NON-NLS-1$
+            + " id                        = " + id + NL //                             //$NON-NLS-1$
 
-            + " isShowTourMarker          = " + isShowTourMarker + NL //            //$NON-NLS-1$
-            + " markerOutline_RGB         = " + tourMarkerOutline_RGB + NL //           //$NON-NLS-1$
-            + " markerFill_RGB            = " + tourMarkerFill_RGB + NL //              //$NON-NLS-1$
+            + " isShowTourMarker          = " + isShowTourMarker + NL //               //$NON-NLS-1$
+            + " markerOutline_RGB         = " + tourMarkerOutline_RGB + NL //          //$NON-NLS-1$
+            + " markerFill_RGB            = " + tourMarkerFill_RGB + NL //             //$NON-NLS-1$
 
-            + " isMarkerClustered            = " + isTourMarkerClustered + NL //           //$NON-NLS-1$
-            + " isClusterSymbolAntialiased   = " + isClusterSymbolAntialiased + NL //  //$NON-NLS-1$
-            + " isClusterTextAntialiased     = " + isClusterTextAntialiased + NL //    //$NON-NLS-1$
-            + " isFillClusterSymbol          = " + isFillClusterSymbol + NL //         //$NON-NLS-1$
+            + " isMarkerClustered            = " + isTourMarkerClustered + NL //       //$NON-NLS-1$
+            + " isLabelAntialiased           = " + isLabelAntialiased + NL //          //$NON-NLS-1$
+            + " isClusterSymbolAntialiased   = " + isSymbolAntialiased + NL //         //$NON-NLS-1$
+            + " isSymbolAntialiased          = " + isFillClusterSymbol + NL //         //$NON-NLS-1$
             + " clusterGridSize              = " + clusterGridSize + NL //             //$NON-NLS-1$
             + " clusterSymbol_Size           = " + clusterSymbol_Size + NL //          //$NON-NLS-1$
             + " clusterOutline_Width         = " + clusterOutline_Width + NL //        //$NON-NLS-1$

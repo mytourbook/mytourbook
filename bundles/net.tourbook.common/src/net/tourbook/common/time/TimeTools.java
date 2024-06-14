@@ -125,8 +125,9 @@ public class TimeTools {
    public static final DateTimeFormatter   Formatter_DateTime_M         = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
    public static final DateTimeFormatter   Formatter_DateTime_MS        = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT);
    public static final DateTimeFormatter   Formatter_DateTime_ML        = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.LONG);
-   public static final DateTimeFormatter   Formatter_DateTime_LL        = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.LONG);
+   public static final DateTimeFormatter   Formatter_DateTime_LL        = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG,   FormatStyle.LONG);
    public static final DateTimeFormatter   Formatter_DateTime_F         = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL);
+   public static final DateTimeFormatter   Formatter_DateTime_FL        = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL,   FormatStyle.LONG);
    public static final DateTimeFormatter   Formatter_FileName           = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");    //$NON-NLS-1$
 
 

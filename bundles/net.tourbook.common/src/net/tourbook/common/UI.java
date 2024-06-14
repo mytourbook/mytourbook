@@ -1606,8 +1606,11 @@ public class UI {
     *
     * @param parent
     * @param action
+    *
+    * @return
+    * @return
     */
-   public static void createToolbarAction(final Composite parent, final Action action) {
+   public static ToolBar createToolbarAction(final Composite parent, final Action action) {
 
       final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
       final ToolBarManager tbm = new ToolBarManager(toolbar);
@@ -1615,6 +1618,8 @@ public class UI {
       tbm.add(action);
 
       tbm.update(true);
+
+      return toolbar;
    }
 
    /**

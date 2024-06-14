@@ -69,7 +69,7 @@ public class ActionLookupCommonLocation extends SubMenu {
 
       _map2View = mapView;
 
-      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapLocation));
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapLocation_Common));
 
       /*
        * Create all sub menu actions

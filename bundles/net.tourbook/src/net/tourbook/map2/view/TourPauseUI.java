@@ -524,7 +524,7 @@ public class TourPauseUI implements IColorSelectorListener {
 
 // SET_FORMATTING_OFF
 
-      config.isFilterTourPauses                     = _chkIsFilter_TourPauses.getSelection();
+      config.isFilterTourPauses                    = _chkIsFilter_TourPauses.getSelection();
       config.isFilterTourPause_Duration            = _chkIsFilter_PauseDuration.getSelection();
       config.isShowAutoPauses                      = _chkIsShow_AutoPauses.getSelection();
       config.isShowUserPauses                      = _chkIsShow_UserPauses.getSelection();

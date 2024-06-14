@@ -2803,10 +2803,6 @@ public class TourLocationView extends ViewPart implements ITourViewer {
 
       final IStructuredSelection selection = _locationViewer.getStructuredSelection();
 
-      if (selection.isEmpty()) {
-         return;
-      }
-
       final List<TourLocation> allTourLocations = new ArrayList<>();
 
       for (final Object object : selection.toArray()) {

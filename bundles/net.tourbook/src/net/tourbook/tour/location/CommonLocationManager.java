@@ -34,7 +34,7 @@ import net.tourbook.map2.view.SlideoutMap2_MapPoints;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IMemento;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
@@ -158,12 +158,11 @@ public class CommonLocationManager {
       _allMapLocations.add(tourLocation);
 
       // update UI
+      final IViewPart viewPart = Util.showView(CommonLocationView.ID, true);
 
-      final SlideoutMap2_MapPoints mapPointSlideout = Map2PointManager.getMapPointSlideout(true);
-      if (mapPointSlideout != null) {
+      if (viewPart instanceof final CommonLocationView locationView) {
 
-         // delay to be sure that the slideout is opened
-         PlatformUI.getWorkbench().getDisplay().asyncExec(() -> mapPointSlideout.updateUI(tourLocation));
+         locationView.updateUI(tourLocation);
       }
    }
 
