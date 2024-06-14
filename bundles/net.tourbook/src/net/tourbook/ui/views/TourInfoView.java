@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,6 +38,7 @@ import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTou
 import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -306,7 +307,7 @@ public class TourInfoView extends ViewPart {
       } else if (selection instanceof SelectionTourIds) {
 
          final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-         if ((tourIds != null) && (tourIds.size() > 0)) {
+         if (CollectionUtils.isNotEmpty(tourIds)) {
             tourId = tourIds.get(0);
          }
 
