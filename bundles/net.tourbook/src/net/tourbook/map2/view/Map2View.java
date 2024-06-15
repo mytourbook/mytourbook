@@ -677,7 +677,7 @@ public class Map2View extends ViewPart implements
 
       public ActionMapPoint_CenterMap() {
 
-         setText("&Center map to the map point position");
+         setText(Messages.Map_Action_CenterMapToMapPointPosition);
       }
 
       @Override
@@ -690,7 +690,7 @@ public class Map2View extends ViewPart implements
 
       public ActionMapPoint_EditTourMarker() {
 
-         setText("&Edit tour marker");
+         setText(Messages.Map_Action_EditTourMarker);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
          setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit_Disabled));
@@ -707,7 +707,7 @@ public class Map2View extends ViewPart implements
 
       public ActionMapPoint_ShowOnlyThisTour() {
 
-         setText("&Show only this tour");
+         setText(Messages.Map_Action_ShowOnlyThisTour);
       }
 
       @Override
@@ -720,7 +720,7 @@ public class Map2View extends ViewPart implements
 
       public ActionMapPoint_ZoomIn() {
 
-         setText("&Zoom in to the map point position");
+         setText(Messages.Map_Action_ZoomInToTheMapPointPosition);
       }
 
       @Override

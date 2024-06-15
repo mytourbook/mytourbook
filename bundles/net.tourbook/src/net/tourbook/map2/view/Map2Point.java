@@ -147,21 +147,13 @@ public class Map2Point implements ClusterItem {
 
          // a tour location is displayed
 
-         if (numDuplicates_Start > 1 || numDuplicates_End > 1) {
+         if (numDuplicates_Start == 0 || numDuplicates_End == 0) {
 
-            return formattedLabel + " (" + numDuplicates_Start + "/" + numDuplicates_End + ")";
-
-         } else if (numDuplicates_Start > 1) {
-
-            return formattedLabel + " (" + numDuplicates_Start + "s)";
-
-         } else if (numDuplicates_End > 1) {
-
-            return formattedLabel + " (" + numDuplicates_End + "e)";
+            return formattedLabel;
 
          } else {
 
-            return formattedLabel;
+            return formattedLabel + UI.SPACE + UI.SYMBOL_BRACKET_LEFT + numDuplicates_Start + UI.SLASH + numDuplicates_End + UI.SYMBOL_BRACKET_RIGHT;
          }
       }
    }

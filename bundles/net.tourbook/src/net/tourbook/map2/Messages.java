@@ -66,8 +66,10 @@ public class Messages extends NLS {
    public static String map_action_save_default_position;
    public static String map_action_set_default_position;
 
+   public static String Map_Action_CenterMapToMapPointPosition;
    public static String Map_Action_CopyLocation;
    public static String Map_Action_CreateTourMarkerFromMap;
+   public static String Map_Action_EditTourMarker;
    public static String Map_Action_Export_Map_Clipboard_Copied_Info;
    public static String Map_Action_Export_Map_View;
    public static String Map_Action_Export_Map_View_Clipboard;
@@ -84,6 +86,7 @@ public class Messages extends NLS {
    public static String Map_Action_ShowAllFilteredPhotos_Tooltip;
    public static String Map_Action_ShowEarthMap;
    public static String Map_Action_ShowMapPoints_Tooltip;
+   public static String Map_Action_ShowOnlyThisTour;
    public static String Map_Action_ShowPhotos_Tooltip;
    public static String Map_Action_ShowTourInfoInMap;
    public static String Map_Action_ShowTourWeatherInMap;
@@ -96,6 +99,7 @@ public class Messages extends NLS {
    public static String Map_Action_Zoom_CenteredBy_Map_Tooltip;
    public static String Map_Action_Zoom_CenteredBy_Mouse_Tooltip;
    public static String Map_Action_Zoom_CenteredBy_Tour_Tooltip;
+   public static String Map_Action_ZoomInToTheMapPointPosition;
 
    public static String Map_Label_ValuePoint_Title;
 
