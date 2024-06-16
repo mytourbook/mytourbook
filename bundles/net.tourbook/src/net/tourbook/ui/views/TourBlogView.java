@@ -1416,6 +1416,10 @@ public class TourBlogView extends ViewPart {
 
    private void reloadTourData() {
 
+      if (_tourData == null) {
+         return;
+      }
+
       final Long tourId = _tourData.getTourId();
       final TourManager tourManager = TourManager.getInstance();
 
