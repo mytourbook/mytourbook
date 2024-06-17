@@ -80,9 +80,9 @@ public abstract class AdvancedSlideoutShell {
    private static final String        STATE_IS_KEEP_SLIDEOUT_OPEN         = "STATE_IS_KEEP_SLIDEOUT_OPEN";         //$NON-NLS-1$
 
    private static final int           MIN_SHELL_HORIZ_WIDTH               = 100;
-   private static final int           MIN_SHELL_HORIZ_HEIGHT              = 60;
+   private static final int           MIN_SHELL_HORIZ_HEIGHT              = 40;
    private static final int           MIN_SHELL_VERT_WIDTH                = 100;
-   private static final int           MIN_SHELL_VERT_HEIGHT               = 60;
+   private static final int           MIN_SHELL_VERT_HEIGHT               = 40;
 
    private int                        _shellFadeInSteps                   = SHELL_FADE_IN_STEPS;
    private int                        _shellFadeOutSteps                  = SHELL_FADE_OUT_STEPS;
@@ -683,16 +683,11 @@ public abstract class AdvancedSlideoutShell {
       }
 
       /*
-       * resize shell
+       * Create resize shell
        */
-      _rrShellWithResize = new RRShell(
-            _ownerControl.getShell(), //
-            SWT.ON_TOP //
-                  //                  | SWT.TOOL
-                  | SWT.RESIZE
-                  | SWT.NO_FOCUS,
-            getShellTitle_WithResize(),
-            true);
+      final int styleWithResize = SWT.ON_TOP | SWT.RESIZE | SWT.NO_FOCUS;
+
+      _rrShellWithResize = new RRShell(_ownerControl.getShell(), styleWithResize, getShellTitle_WithResize(), true);
 
       final Shell shellWithResize = _rrShellWithResize.getShell();
       shellWithResize.addControlListener(new ControlAdapter() {
@@ -705,15 +700,11 @@ public abstract class AdvancedSlideoutShell {
       ttShellAddListener(shellWithResize);
 
       /*
-       * no resize shell
+       * Create NO resize shell
        */
-      _rrShellNoResize = new RRShell(
-            _ownerControl.getShell(), //
-            SWT.ON_TOP //
-                  //                  | SWT.TOOL
-                  | SWT.NO_FOCUS,
-            getShellTitle_NoResize(),
-            false);
+      final int styleNoResize = SWT.ON_TOP | SWT.NO_FOCUS;
+
+      _rrShellNoResize = new RRShell(_ownerControl.getShell(), styleNoResize, getShellTitle_NoResize(), false);
 
       ttShellAddListener(_rrShellNoResize.getShell());
 
@@ -1027,6 +1018,19 @@ public abstract class AdvancedSlideoutShell {
 
    protected abstract void onReparentShell(Shell reparentedShell);
 
+   /**
+    * Customize shell size, this is used to collapse/expand a slideout
+    * 
+    * @param newContentWidth
+    * @param newContentHeight
+    * 
+    * @return
+    */
+   protected Point onResize(final int newContentWidth, final int newContentHeight) {
+
+      return null;
+   }
+
    private void onTTAllControlsEvent(final Event event) {
 
 //      System.out.println(UI.timeStampNano() + " onTTAllControlsEvent\t");
@@ -1302,7 +1306,7 @@ public abstract class AdvancedSlideoutShell {
 
    }
 
-   private void onTTShellResize(final ControlEvent event) {
+   protected void onTTShellResize(final ControlEvent event) {
 
       if (_isInShellResize) {
          return;
@@ -1352,6 +1356,24 @@ public abstract class AdvancedSlideoutShell {
       } else {
          _horizContentWidth = newContentWidth;
          _horizContentHeight = newContentHeight;
+      }
+
+      // customize content size
+      final Point newContentSize = onResize(newContentWidth, newContentHeight);
+      if (newContentSize != null) {
+
+         newContentWidth = newContentSize.x;
+         newContentHeight = newContentSize.y;
+
+         if (isVerticalLayout()) {
+            _vertContentWidth = newContentWidth;
+            _vertContentHeight = newContentHeight;
+         } else {
+            _horizContentWidth = newContentWidth;
+            _horizContentHeight = newContentHeight;
+         }
+
+         isResizeAdjusted = true;
       }
 
       if (isResizeAdjusted) {

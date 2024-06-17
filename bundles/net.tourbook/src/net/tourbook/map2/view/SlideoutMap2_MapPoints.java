@@ -22,6 +22,8 @@ import java.text.NumberFormat;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
@@ -31,6 +33,7 @@ import net.tourbook.common.ui.IChangeUIListener;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -69,7 +72,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       IChangeUIListener {
 
    //
-   private static final String            STATE_SELECTED_TAB          = "STATE_SELECTED_TAB";                      //$NON-NLS-1$
+   private static final String            STATE_EXPANDED_HEIGHT       = "STATE_EXPANDED_HEIGHT";         //$NON-NLS-1$
+   private static final String            STATE_IS_SLIDEOUT_EXPANDED  = "STATE_IS_SLIDEOUT_EXPANDED";    //$NON-NLS-1$
+   private static final String            STATE_SELECTED_TAB          = "STATE_SELECTED_TAB";            //$NON-NLS-1$
    //
    /**
     * MUST be in sync with {@link #_allMarkerLabelLayout_Label}
@@ -103,6 +108,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    //
    private Map2View                       _map2View;
    private ToolItem                       _toolItem;
+   private ToolBarManager                 _toolbarManagerExpandCollapseSlideout;
    //
    private SelectionListener              _markerSelectionListener;
    private SelectionListener              _markerSelectionListener_All;
@@ -112,16 +118,21 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private FocusListener                  _keepOpenListener;
    private IPropertyChangeListener        _prefChangeListener;
    //
+   private ActionExpandSlideout           _actionExpandCollapseSlideout;
    private ActionStatistic_CommonLocation _actionStatistic_CommonLocation;
    private ActionStatistic_TourLocation   _actionStatistic_TourLocation;
    private ActionStatistic_TourMarker     _actionStatistic_TourMarker;
    private ActionStatistic_TourPause      _actionStatistic_TourPause;
    //
-   private PixelConverter     _pc;
+   private PixelConverter                 _pc;
    //
-   private TourPauseUI        _tourPausesUI;
+   private boolean                        _isSlideoutExpanded;
+   private int                            _expandingCounter;
+   private int                            _expandedHeight             = -1;
    //
-   private final NumberFormat _nf3 = NumberFormat.getNumberInstance();
+   private TourPauseUI                    _tourPausesUI;
+   //
+   private final NumberFormat             _nf3                        = NumberFormat.getNumberInstance();
    {
       _nf3.setMinimumFractionDigits(3);
       _nf3.setMaximumFractionDigits(3);
@@ -134,6 +145,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
     */
    private Composite             _shellContainer;
    private Composite             _statisticsContainer;
+   private Composite             _tabContainer;
    //
    private CTabFolder            _tabFolder;
    //
@@ -221,6 +233,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    //
    private ImageDescriptor       _imageDescriptor_BoundingBox;
    private ImageDescriptor       _imageDescriptor_CommonLocation;
+   private ImageDescriptor       _imageDescriptor_SlideoutCollapse;
+   private ImageDescriptor       _imageDescriptor_SlideoutExpand;
    private ImageDescriptor       _imageDescriptor_TourLocation;
    private ImageDescriptor       _imageDescriptor_TourMarker;
    private ImageDescriptor       _imageDescriptor_TourMarker_Cluster;
@@ -234,6 +248,21 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Image                 _imageTourMarker_Cluster;
    private Image                 _imageTourMarker_Group;
    private Image                 _imageTourPauses;
+
+   private class ActionExpandSlideout extends Action {
+
+      public ActionExpandSlideout() {
+
+         setToolTipText(UI.SPACE1);
+         setImageDescriptor(_imageDescriptor_SlideoutExpand);
+      }
+
+      @Override
+      public void run() {
+
+         actionExpandCollapseSlideout();
+      }
+   }
 
    private class ActionStatistic_CommonLocation extends Action {
 
@@ -326,6 +355,16 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       setIsForceBoundsToBeInsideOfViewport(true);
    }
 
+   private void actionExpandCollapseSlideout() {
+
+      // toggle expand state
+      _isSlideoutExpanded = !_isSlideoutExpanded;
+
+      updateUI_ExpandCollapse();
+
+      onTTShellResize(null);
+   }
+
    private void actionStatistic_CommonLocation(final Event event) {
 
       // toggle checkbox
@@ -375,6 +414,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
    private void createActions() {
 
+      _actionExpandCollapseSlideout = new ActionExpandSlideout();
+
       _actionStatistic_CommonLocation = new ActionStatistic_CommonLocation();
       _actionStatistic_TourMarker = new ActionStatistic_TourMarker();
       _actionStatistic_TourPause = new ActionStatistic_TourPause();
@@ -383,10 +424,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
    @Override
    protected void createSlideoutContent(final Composite parent) {
-
-      initUI(parent);
-
-      createActions();
 
       createUI(parent);
       fillUI();
@@ -400,6 +437,22 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       Map2PointManager.updateStatistics();
    }
 
+   @Override
+   protected void createTitleBarControls(final Composite parent) {
+
+      // this method is called 1st !!!
+
+      initUI(parent);
+      createActions();
+
+      final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
+      _toolbarManagerExpandCollapseSlideout = new ToolBarManager(toolbar);
+
+      _toolbarManagerExpandCollapseSlideout.add(_actionExpandCollapseSlideout);
+
+      _toolbarManagerExpandCollapseSlideout.update(true);
+   }
+
    /**
     * Create a list with all available map providers, sorted by preference settings
     */
@@ -411,18 +464,17 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       GridLayoutFactory.fillDefaults()
             .spacing(0, 0)
             .applyTo(_shellContainer);
-//      shellContainer.setBackground(UI.SYS_COLOR_MAGENTA);
+//      _shellContainer.setBackground(UI.SYS_COLOR_MAGENTA);
       {
-         final Composite container = new Composite(_shellContainer, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-         GridLayoutFactory.fillDefaults()
-//               .extendedMargins(5, 5, 0, 5)
-               .applyTo(container);
+         _tabContainer = new Composite(_shellContainer, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_tabContainer);
+         GridLayoutFactory.fillDefaults().applyTo(_tabContainer);
+//         _tabContainer.setBackground(UI.SYS_COLOR_RED);
          {
-            _tabFolder = new CTabFolder(container, SWT.TOP);
+            _tabFolder = new CTabFolder(_tabContainer, SWT.TOP);
             GridDataFactory.fillDefaults().grab(true, true).applyTo(_tabFolder);
             GridLayoutFactory.fillDefaults().applyTo(_tabFolder);
-//            _tabFolder.setBackground(UI.SYS_COLOR_YELLOW);
+//            _tabFolder.setBackground(UI.SYS_COLOR_CYAN);
 
             {
                _tabAll = new CTabItem(_tabFolder, SWT.NONE);
@@ -1423,6 +1475,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
 // SET_FORMATTING_OFF
 
+      _imageDescriptor_SlideoutCollapse   = CommonActivator.getThemedImageDescriptor(  CommonImages.Slideout_Collapse);
+      _imageDescriptor_SlideoutExpand     = CommonActivator.getThemedImageDescriptor(  CommonImages.Slideout_Expand);
+
       _imageDescriptor_BoundingBox        = TourbookPlugin.getThemedImageDescriptor(   Images.MapLocation_BoundingBox);
       _imageDescriptor_CommonLocation     = TourbookPlugin.getImageDescriptor(         Images.MapLocation_Common);
       _imageDescriptor_TourLocation       = TourbookPlugin.getImageDescriptor(         Images.MapLocation_Tour);
@@ -1558,6 +1613,60 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       onModifyConfig(true);
    }
 
+   @Override
+   protected Point onResize(final int contentWidth, final int contentHeight) {
+
+      final int newContentWidth = contentWidth;
+      int newContentHeight = contentHeight;
+
+      if (_expandedHeight == -1) {
+
+         // setup initial height
+
+         _expandedHeight = contentHeight;
+      }
+
+      if (_isSlideoutExpanded) {
+
+         // slideout is expanded collappsed
+
+         _expandingCounter++;
+
+         if (_expandingCounter < 2) {
+
+            // the first height is the old/collapsed height
+
+            newContentHeight = _expandedHeight;
+
+         } else {
+
+            newContentHeight = _expandedHeight = contentHeight;
+         }
+
+         _tabContainer.setVisible(true);
+
+      } else {
+
+         // slideout is collappsed
+
+         _expandingCounter = 0;
+
+         final int titleHeight = getTitleContainer().computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+         final int statHeight = _statisticsContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+
+         newContentHeight = titleHeight + statHeight
+
+         // is needs additional spacing to see the stats
+               + 10;
+
+         _tabContainer.setVisible(false);
+      }
+
+      final Point newContentSize = new Point(newContentWidth, newContentHeight);
+
+      return newContentSize;
+   }
+
    private void onSwapClusterColor() {
 
       final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
@@ -1590,7 +1699,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       repaintMap();
    }
 
-
    private void onSwapMarkerColor() {
 
       final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
@@ -1606,7 +1714,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       restoreState();
       repaintMap();
    }
-
 
    private void onSwapTourLocationColor() {
 
@@ -1624,7 +1731,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       repaintMap();
    }
 
-
    private void onSwapTourPauseColor() {
 
       final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
@@ -1640,7 +1746,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       restoreState();
       repaintMap();
    }
-
 
    private void repaintMap() {
 
@@ -1709,11 +1814,22 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _colorMapTransparencyColor .setColorValue(   Util.getStateRGB(    _state_Map2,  Map2View.STATE_MAP_TRANSPARENCY_COLOR,              Map2View.STATE_MAP_TRANSPARENCY_COLOR_DEFAULT));
       _spinnerMapDimValue        .setSelection(    Util.getStateInt(    _state_Map2,  Map2View.STATE_DIM_MAP_VALUE,                       Map2View.STATE_DIM_MAP_VALUE_DEFAULT));
 
+      /*
+       * Slideout expand/collapse
+       */
+      final int defaultHeight    = _shellContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+
+      _expandedHeight            = Util.getStateInt(     _state_Slideout, STATE_EXPANDED_HEIGHT, defaultHeight);
+      _isSlideoutExpanded        = Util.getStateBoolean( _state_Slideout, STATE_IS_SLIDEOUT_EXPANDED, true);
+
+      _tabContainer.setVisible(_isSlideoutExpanded);
+
 // SET_FORMATTING_ON
 
       selectMarkerLabelLayout(config.labelLayout);
 
       updateUI_TabLabel();
+      updateUI_ExpandCollapse();
    }
 
    private void restoreTabFolder() {
@@ -1793,6 +1909,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    @Override
    protected void saveState() {
 
+      _state_Slideout.put(STATE_EXPANDED_HEIGHT, _expandedHeight);
+      _state_Slideout.put(STATE_IS_SLIDEOUT_EXPANDED, _isSlideoutExpanded);
       _state_Slideout.put(STATE_SELECTED_TAB, _tabFolder.getSelectionIndex());
 
       super.saveState();
@@ -1872,6 +1990,22 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       restoreState();
 
       enableControls();
+   }
+
+   private void updateUI_ExpandCollapse() {
+
+      if (_isSlideoutExpanded) {
+
+         _actionExpandCollapseSlideout.setToolTipText("Collapse slideout");
+         _actionExpandCollapseSlideout.setImageDescriptor(_imageDescriptor_SlideoutCollapse);
+
+      } else {
+
+         _actionExpandCollapseSlideout.setToolTipText("Expand slideout");
+         _actionExpandCollapseSlideout.setImageDescriptor(_imageDescriptor_SlideoutExpand);
+      }
+
+      _toolbarManagerExpandCollapseSlideout.update(true);
    }
 
    /**

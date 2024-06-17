@@ -3666,6 +3666,9 @@ public class Map2View extends ViewPart implements
 
             // history tour (without tours) is displayed
 
+            // hide tours
+            paintTours(tourIds);
+
             final ArrayList<Photo> allPhotos = paintPhotoSelection(selection);
 
             if (allPhotos.size() > 0) {

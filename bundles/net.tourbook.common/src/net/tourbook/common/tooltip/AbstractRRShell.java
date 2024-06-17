@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -35,15 +35,15 @@ import org.eclipse.ui.part.PageBook;
  */
 public abstract class AbstractRRShell {
 
-   private boolean      _isResizeable;
+   private boolean _isResizeable;
 
-   private int       _shellTrimWidth;
-   private int       _shellTrimHeight;
+   private int     _shellTrimWidth;
+   private int     _shellTrimHeight;
 
    /*
     * UI resources
     */
-   private Display      _display;
+   private Display   _display;
 
    private Shell     _shell;
 
@@ -208,7 +208,7 @@ public abstract class AbstractRRShell {
       if (_isResizeable == false) {
 
          /*
-          * set size ONLY for the shell without resize, size for shell with resize is set by the
+          * Set size ONLY for the shell without resize, size for shell with resize is set by the
           * user by resizing the window, when size is not set, the shell is empty and default
           * size is 2x2
           */

@@ -89,6 +89,9 @@ public class CommonImages {
    public static final String PlayControl_Play             = "play-control-play.png";                     //$NON-NLS-1$
    public static final String PlayControl_Play_Disabled    = "play-control-play-disabled.png";            //$NON-NLS-1$
 
+   public static final String Slideout_Collapse            = "slideout-collapse.png";                     //$NON-NLS-1$
+   public static final String Slideout_Expand              = "slideout-expand.png";                       //$NON-NLS-1$
+
    public static final String TourOptions                  = "tour-options.png";                          //$NON-NLS-1$
    public static final String TourOptions_Disabled         = "tour-options-disabled.png";                 //$NON-NLS-1$
 
