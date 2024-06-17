@@ -78,6 +78,9 @@ Changes
   - Moved options from the "2D Map Options" slideout to the "Map Points" slideout
     - Map dimming
     - Filter tour pauses
+  - Removed actions from the context menu, they are now available in the "Map Points" slideout
+    - "Show Tour Markers"
+    - "Show Tour Pauses"
 
 * Tour Concatenation (Frederic)
   - Removed the ability to delete the source tours when using the NatTable layout as it was causing random tours to be deleted

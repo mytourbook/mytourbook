@@ -115,7 +115,6 @@ public class Messages extends NLS {
    public static String map_action_show_slider_in_map;
    public static String map_action_show_start_finish_in_map;
    public static String map_action_show_tour_in_map;
-   public static String map_action_show_tour_marker;
    public static String map_action_synch_with_slider;
    public static String map_action_synch_with_tour;
    public static String map_action_tour_color_altitude_tooltip;

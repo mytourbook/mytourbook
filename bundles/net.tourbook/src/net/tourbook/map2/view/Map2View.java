@@ -108,8 +108,6 @@ import net.tourbook.map2.action.ActionShowSliderInLegend;
 import net.tourbook.map2.action.ActionShowSliderInMap;
 import net.tourbook.map2.action.ActionShowStartEndInMap;
 import net.tourbook.map2.action.ActionShowTourInfoInMap;
-import net.tourbook.map2.action.ActionShowTourMarker;
-import net.tourbook.map2.action.ActionShowTourPauses;
 import net.tourbook.map2.action.ActionShowTourWeatherInMap;
 import net.tourbook.map2.action.ActionShowValuePoint;
 import net.tourbook.map2.action.ActionShowWayPoints;
@@ -526,8 +524,6 @@ public class Map2View extends ViewPart implements
    private ActionShowStartEndInMap           _actionShowStartEndInMap;
    private ActionShowTour                    _actionShowTour;
    private ActionShowTourInfoInMap           _actionShowTourInfoInMap;
-   private ActionShowTourMarker              _actionShowTourMarker;
-   private ActionShowTourPauses              _actionShowTourPauses;
    private ActionShowTourWeatherInMap        _actionShowTourWeatherInMap;
    private ActionShowValuePoint              _actionShowValuePoint;
    private ActionShowWayPoints               _actionShowWayPoints;
@@ -1287,24 +1283,6 @@ public class Map2View extends ViewPart implements
       _map.paint();
    }
 
-   public void actionSetShowTourMarkerInMap() {
-
-      Map2ConfigManager.getActiveConfig().isShowTourMarker = _actionShowTourMarker.isChecked();
-
-      Map2PointManager.updateMapLocationAndMarkerSlideout();
-
-      _map.paint();
-   }
-
-   public void actionSetShowTourPausesInMap() {
-
-      Map2ConfigManager.getActiveConfig().isShowTourPauses = _actionShowTourPauses.isChecked();
-
-      Map2PointManager.updateMapLocationAndMarkerSlideout();
-
-      _map.paint();
-   }
-
    public void actionSetShowTourWeatherInMap() {
 
       final boolean isVisible = _actionShowTourWeatherInMap.isChecked();
@@ -2035,8 +2013,6 @@ public class Map2View extends ViewPart implements
       _actionShowPOI                      = new ActionShowPOI(this);
       _actionShowTour                     = new ActionShowTour();
       _actionShowTourInfoInMap            = new ActionShowTourInfoInMap(this);
-      _actionShowTourMarker               = new ActionShowTourMarker(this);
-      _actionShowTourPauses               = new ActionShowTourPauses(this);
       _actionShowTourWeatherInMap         = new ActionShowTourWeatherInMap(this);
       _actionShowWayPoints                = new ActionShowWayPoints(this);
       _actionZoomLevelAdjustment          = new ActionZoomLevelAdjustment();
@@ -2338,8 +2314,6 @@ public class Map2View extends ViewPart implements
       _actionCreateTourMarkerFromMap.setCurrentHoveredTourId(hoveredTourId);
       _actionLookupTourLocation.setCurrentHoveredTourId(hoveredTourId);
 
-      _actionShowTourMarker.setChecked(Map2ConfigManager.getActiveConfig().isShowTourMarker);
-
 // SET_FORMATTING_OFF
 
       /*
@@ -2380,8 +2354,6 @@ public class Map2View extends ViewPart implements
       _actionShowStartEndInMap            .setEnabled(isOneTourDisplayed);
       _actionShowTourInfoInMap            .setEnabled(isOneTourDisplayed);
       _actionShowTour                     .setEnabled(_isTourPainted);
-      _actionShowTourMarker               .setEnabled(_isTourPainted);
-      _actionShowTourPauses               .setEnabled(_isTourPainted);
       _actionShowTourWeatherInMap         .setEnabled(isTourAvailable);
       _actionShowWayPoints                .setEnabled(_isTourPainted);
       _actionZoom_CenterMapBy             .setEnabled(true);
@@ -2541,8 +2513,6 @@ public class Map2View extends ViewPart implements
           * Show tour features
           */
          menuMgr.add(new Separator());
-         menuMgr.add(_actionShowTourMarker);
-         menuMgr.add(_actionShowTourPauses);
          menuMgr.add(_actionShowWayPoints);
          menuMgr.add(_actionShowPOI);
          menuMgr.add(_actionShowStartEndInMap);
@@ -4661,11 +4631,6 @@ public class Map2View extends ViewPart implements
       // show start/end in map
       _actionShowStartEndInMap.setChecked(_state.getBoolean(STATE_IS_SHOW_START_END_IN_MAP));
       TourPainterConfiguration.isShowTourStartEnd = _actionShowStartEndInMap.isChecked();
-
-      // show tour marker / pauses
-      final Map2Config activeConfig = Map2ConfigManager.getActiveConfig();
-      _actionShowTourMarker.setChecked(activeConfig.isShowTourMarker);
-      _actionShowTourPauses.setChecked(activeConfig.isShowTourPauses);
 
       // show way points
       final boolean isShowWayPoints = Util.getStateBoolean(_state, STATE_IS_SHOW_WAY_POINTS, true);
