@@ -382,43 +382,50 @@ public class Map2 extends Canvas {
     */
    private boolean                         _isShowMapPoints;
 
-   private final ExecutorService           _backgroundPainter_Executor        = createMapPoint_PainterThread();
-   private Future<?>                       _backgroundPainter_Task;
+   private final ExecutorService           _mapPointPainter_Executor        = createMapPoint_PainterThread();
+   private Future<?>                       _mapPointPainter_Task;
 
    /**
-    * The {@link #_backgroundPainter_Executor} is drawing into this image. 2 images are necessary
+    * The {@link #_mapPointPainter_Executor} is drawing into this image. 2 images are necessary
     * that the current image which is drawn is not displayed, only when drawing is done
     */
-   private Image                           _backgroundPainterImage_WhichIsDisplayed;
-   private Image                           _backgroundPainterImage_WhichIsPainted;
+   private Image                           _mapPointPainterImage_WhichIsDisplayed;
+   private Image                           _mapPointPainterImage_WhichIsPainted;
 
-   private List<Image>                     _disposableBackgroundImages        = new ArrayList<>();
+   private List<Image>                     _disposableMapPointImages        = new ArrayList<>();
 
-   private int                             _backgroundPainter_LastCounter;
-   private final AtomicInteger             _backgroundPainter_RunnableCounter = new AtomicInteger();
-   private Rectangle                       _backgroundPainter_Viewport_WhenPainted;
-   private Rectangle                       _backgroundPainter_Viewport_DuringPainting;
-   private int                             _backgroundPainter_MicroAdjustment_DiffX;
-   private int                             _backgroundPainter_MicroAdjustment_DiffY;
+   /**
+    * It looks like that onResize() is not called very early from the swtbot to initialize this
+    * field <a href=
+    * "https://github.com/mytourbook/mytourbook/issues/1361#issuecomment-2166663604">https://github.com/mytourbook/mytourbook/issues/1361#issuecomment-2166663604</a>
+    */
+   private Rectangle                       _mapPointImageSize               = new Rectangle(0, 0, 400, 400);
 
-   private DistanceClustering<ClusterItem> _distanceClustering                = new DistanceClustering<>();
-   private PointFeatureLabeler             _labelSpreader                     = new PointFeatureLabeler();
-   private List<PaintedMapPoint>           _allPaintedClusterMarkers          = new ArrayList<>();
-   private List<PaintedMapPoint>           _allPaintedCommonLocations         = new ArrayList<>();
-   private List<PaintedMapPoint>           _allPaintedTourLocations           = new ArrayList<>();
-   private List<PaintedMapPoint>           _allPaintedMarkers                 = new ArrayList<>();
-   private List<PaintedMapPoint>           _allPaintedPauses                  = new ArrayList<>();
-   private List<PaintedMarkerCluster>      _allPaintedMarkerClusters          = new ArrayList<>();
-   private final Set<String>               _allMapMarkerSkipLabels            = new HashSet<>();
-   private final Map<String, Map2Point>    _allMapMarkerWithGroupedLabels     = new HashMap<>();
+   private int                             _mapPointPainter_LastCounter;
+   private final AtomicInteger             _mapPointPainter_RunnableCounter = new AtomicInteger();
+   private Rectangle                       _mapPointPainter_Viewport_WhenPainted;
+   private Rectangle                       _mapPointPainter_Viewport_DuringPainting;
+   private int                             _mapPointPainter_MicroAdjustment_DiffX;
+   private int                             _mapPointPainter_MicroAdjustment_DiffY;
+
+   private DistanceClustering<ClusterItem> _distanceClustering              = new DistanceClustering<>();
+   private PointFeatureLabeler             _labelSpreader                   = new PointFeatureLabeler();
+   private List<PaintedMapPoint>           _allPaintedClusterMarkers        = new ArrayList<>();
+   private List<PaintedMapPoint>           _allPaintedCommonLocations       = new ArrayList<>();
+   private List<PaintedMapPoint>           _allPaintedTourLocations         = new ArrayList<>();
+   private List<PaintedMapPoint>           _allPaintedMarkers               = new ArrayList<>();
+   private List<PaintedMapPoint>           _allPaintedPauses                = new ArrayList<>();
+   private List<PaintedMarkerCluster>      _allPaintedMarkerClusters        = new ArrayList<>();
+   private final Set<String>               _allMapMarkerSkipLabels          = new HashSet<>();
+   private final Map<String, Map2Point>    _allMapMarkerWithGroupedLabels   = new HashMap<>();
    private String                          _groupedMarkers;
    private List<TourLocation>              _allCommonLocations;
    private List<TourLocation>              _allTourLocations;
 
-   private int                             _clusterSymbolBorder               = 10;
-   private int                             _labelRespectMargin                = 1;
-   private int                             _mapPointSymbolMargin              = 5;
-   private int                             _mapPointSymbolRespectSize         = _mapPointSymbolMargin + 2;
+   private int                             _clusterSymbolBorder             = 10;
+   private int                             _labelRespectMargin              = 1;
+   private int                             _mapPointSymbolMargin            = 5;
+   private int                             _mapPointSymbolRespectSize       = _mapPointSymbolMargin + 2;
 
    private PaintedMarkerCluster            _hoveredMarkerCluster;
    private PaintedMapPoint                 _hoveredMapPoint;
@@ -434,7 +441,7 @@ public class Map2 extends Canvas {
    private boolean                         _numStatistics_AllTourMarkers_IsTruncated;
    private boolean                         _numStatistics_AllTourPauses_IsTruncated;
 
-   private Map<Long, Color>                _locationBoundingBoxColors         = new HashMap<>();
+   private Map<Long, Color>                _locationBoundingBoxColors       = new HashMap<>();
    private int                             _colorSwitchCounter;
 
    private final NumberFormat              _nf0;
@@ -552,16 +559,6 @@ public class Map2 extends Canvas {
     * of the map image
     */
    private Rectangle                                  _clientArea;
-
-   /**
-    * It looks like that onResize() is not called very early from the swtbot to initialize this
-    * field
-    * <p>
-    * <a
-    * href=
-    * "https://github.com/mytourbook/mytourbook/issues/1361#issuecomment-2166663604">https://github.com/mytourbook/mytourbook/issues/1361#issuecomment-2166663604</a>
-    */
-   private Rectangle                                  _backgroundImageSize       = new Rectangle(0, 0, 400, 400);
 
    private final ListenerList<IBreadcrumbListener>    _allBreadcrumbListener     = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IHoveredTourListener>   _allHoveredTourListeners   = new ListenerList<>(ListenerList.IDENTITY);
@@ -1373,8 +1370,8 @@ public class Map2 extends Canvas {
 
       final ImageData transparentImageData = MapUtils.createTransparentImageData(
 
-            _backgroundImageSize.width,
-            _backgroundImageSize.height);
+            _mapPointImageSize.width,
+            _mapPointImageSize.height);
 
       final Image transparentImage = new Image(_display, transparentImageData);
 
@@ -1415,7 +1412,7 @@ public class Map2 extends Canvas {
 
    private void createMapPoints_Locations_10_FromTourData(final List<TourData> allTourData,
                                                           final List<Map2Point> allMapPoints) {
- 
+
       final HashMap<TourLocation, Map2Point> allTourLocationsMap = new HashMap<>();
 
       for (final TourData tourData : allTourData) {
@@ -1496,7 +1493,7 @@ public class Map2 extends Canvas {
       final int labelTruncateLength = _mapConfig.labelTruncateLength;
       final int labelWrapLength = _mapConfig.labelWrapLength;
 
-      final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
+      final Rectangle worldPixel_Viewport = _mapPointPainter_Viewport_DuringPainting;
 
       /*
        * Check if location is visible
@@ -1613,7 +1610,7 @@ public class Map2 extends Canvas {
       final int labelTruncateLength = _mapConfig.labelTruncateLength;
       final int labelWrapLength = _mapConfig.labelWrapLength;
 
-      final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
+      final Rectangle worldPixel_Viewport = _mapPointPainter_Viewport_DuringPainting;
 
       for (final TourLocation tourLocation : allCommonLocations) {
 
@@ -1810,7 +1807,7 @@ public class Map2 extends Canvas {
 
       _allMapMarkerWithGroupedLabels.clear();
 
-      final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
+      final Rectangle worldPixel_Viewport = _mapPointPainter_Viewport_DuringPainting;
 
       final List<TourMarker> allFilteredMakerList = new ArrayList<>();
 
@@ -2014,7 +2011,7 @@ public class Map2 extends Canvas {
 
    private void createMapPoints_TourPauses(final List<TourData> allTourData, final List<Map2Point> allMapPoints) {
 
-      final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
+      final Rectangle worldPixel_Viewport = _mapPointPainter_Viewport_DuringPainting;
 
       final List<TourPause> allFilteredPausesList = new ArrayList<>();
 
@@ -3310,7 +3307,7 @@ public class Map2 extends Canvas {
 
    private boolean isBackgroundPainterInterrupted() {
 
-      return _backgroundPainter_Task == null || _backgroundPainter_Task.isCancelled();
+      return _mapPointPainter_Task == null || _mapPointPainter_Task.isCancelled();
    }
 
    public boolean isCutOffLinesInPauses() {
@@ -3965,13 +3962,13 @@ public class Map2 extends Canvas {
          _dropTarget.dispose();
       }
 
-      if (_backgroundPainter_Task != null) {
-         _backgroundPainter_Task.cancel(true);
+      if (_mapPointPainter_Task != null) {
+         _mapPointPainter_Task.cancel(true);
       }
 
       UI.disposeResource(_mapImage);
-      UI.disposeResource(_backgroundPainterImage_WhichIsDisplayed);
-      UI.disposeResource(_backgroundPainterImage_WhichIsPainted);
+      UI.disposeResource(_mapPointPainterImage_WhichIsDisplayed);
+      UI.disposeResource(_mapPointPainterImage_WhichIsPainted);
       UI.disposeResource(_poiImage);
 
       UI.disposeResource(_9PartImage);
@@ -4019,7 +4016,7 @@ public class Map2 extends Canvas {
       // stop overlay thread
       _overlayThread.interrupt();
 
-      _backgroundPainter_Executor.shutdownNow();
+      _mapPointPainter_Executor.shutdownNow();
    }
 
    private void onDropRunnable(final DropTargetEvent event) {
@@ -5058,7 +5055,7 @@ public class Map2 extends Canvas {
 
       _clientArea = getClientArea();
 
-      _backgroundImageSize = new Rectangle(
+      _mapPointImageSize = new Rectangle(
 
             0,
             0,
@@ -5070,20 +5067,20 @@ public class Map2 extends Canvas {
       updateViewportData();
 
       // stop painting thread
-      if (_backgroundPainter_Task != null) {
+      if (_mapPointPainter_Task != null) {
 
-         synchronized (_backgroundPainter_Task) {
+         synchronized (_mapPointPainter_Task) {
 
             // check again, this happens
 
-            if (_backgroundPainter_Task != null) {
+            if (_mapPointPainter_Task != null) {
 
-               _backgroundPainter_Task.cancel(true);
+               _mapPointPainter_Task.cancel(true);
 
                try {
 
                   // wait until the task is canceled
-                  _backgroundPainter_Task.get(5000, TimeUnit.MILLISECONDS);
+                  _mapPointPainter_Task.get(5000, TimeUnit.MILLISECONDS);
 
                } catch (final Exception e) {
 
@@ -5106,7 +5103,7 @@ public class Map2 extends Canvas {
       final int redrawCounter = _redrawMapCounter.incrementAndGet();
 
       // repaint the map point image
-      _backgroundPainter_RunnableCounter.incrementAndGet();
+      _mapPointPainter_RunnableCounter.incrementAndGet();
 
       if (isDisposed() || _mp == null || _isMapPaintingEnabled == false) {
          return;
@@ -5228,8 +5225,8 @@ public class Map2 extends Canvas {
 
          // map image is corrupt
          _mapImage.dispose();
-         _backgroundPainterImage_WhichIsDisplayed.dispose();
-         _backgroundPainterImage_WhichIsPainted.dispose();
+         _mapPointPainterImage_WhichIsDisplayed.dispose();
+         _mapPointPainterImage_WhichIsPainted.dispose();
 
       } finally {
 
@@ -5296,12 +5293,12 @@ public class Map2 extends Canvas {
       try {
 
          // check or create map background image
-         final Image image1 = _backgroundPainterImage_WhichIsDisplayed;
-         final Image image2 = _backgroundPainterImage_WhichIsPainted;
+         final Image image1 = _mapPointPainterImage_WhichIsDisplayed;
+         final Image image2 = _mapPointPainterImage_WhichIsPainted;
 
          if (_isTransparentColorModified
-               || canReuseImage(image1, _backgroundImageSize) == false
-               || canReuseImage(image2, _backgroundImageSize) == false
+               || canReuseImage(image1, _mapPointImageSize) == false
+               || canReuseImage(image2, _mapPointImageSize) == false
 
          ) {
 
@@ -5309,20 +5306,20 @@ public class Map2 extends Canvas {
 
             _isTransparentColorModified = false;
 
-            final Image oldBackgroundImage_WhichIsVisible = _backgroundPainterImage_WhichIsDisplayed;
-            final Image oldBackgroundImage_WhichIsPainted = _backgroundPainterImage_WhichIsPainted;
+            final Image oldBackgroundImage_WhichIsVisible = _mapPointPainterImage_WhichIsDisplayed;
+            final Image oldBackgroundImage_WhichIsPainted = _mapPointPainterImage_WhichIsPainted;
 
             // create new image but paint old image into new image to prevent flickering
-            _backgroundPainterImage_WhichIsDisplayed = createMapPoint_Image(_backgroundPainterImage_WhichIsDisplayed);
-            _backgroundPainterImage_WhichIsPainted = createMapPoint_Image(null);
+            _mapPointPainterImage_WhichIsDisplayed = createMapPoint_Image(_mapPointPainterImage_WhichIsDisplayed);
+            _mapPointPainterImage_WhichIsPainted = createMapPoint_Image(null);
 
-            synchronized (_disposableBackgroundImages) {
+            synchronized (_disposableMapPointImages) {
 
-               _disposableBackgroundImages.add(oldBackgroundImage_WhichIsVisible);
-               _disposableBackgroundImages.add(oldBackgroundImage_WhichIsPainted);
+               _disposableMapPointImages.add(oldBackgroundImage_WhichIsVisible);
+               _disposableMapPointImages.add(oldBackgroundImage_WhichIsPainted);
 
-               if (_backgroundPainter_Task != null) {
-                  _backgroundPainter_Task.cancel(true);
+               if (_mapPointPainter_Task != null) {
+                  _mapPointPainter_Task.cancel(true);
                }
             }
          }
@@ -5330,23 +5327,23 @@ public class Map2 extends Canvas {
          try {
 
             // do micro adjustments otherwise panning the map is NOT smooth
-            final Rectangle topLeft_Viewport_WhenPainted = _backgroundPainter_Viewport_WhenPainted;
+            final Rectangle topLeft_Viewport_WhenPainted = _mapPointPainter_Viewport_WhenPainted;
             final Rectangle topLeft_Viewport_Current = _worldPixel_TopLeft_Viewport;
 
             final int diffX = topLeft_Viewport_WhenPainted.x - topLeft_Viewport_Current.x;
             final int diffY = topLeft_Viewport_WhenPainted.y - topLeft_Viewport_Current.y;
 
-            gcMapImage.drawImage(_backgroundPainterImage_WhichIsDisplayed, diffX, diffY);
+            gcMapImage.drawImage(_mapPointPainterImage_WhichIsDisplayed, diffX, diffY);
 
-            _backgroundPainter_MicroAdjustment_DiffX = diffX;
-            _backgroundPainter_MicroAdjustment_DiffY = diffY;
+            _mapPointPainter_MicroAdjustment_DiffX = diffX;
+            _mapPointPainter_MicroAdjustment_DiffY = diffY;
 
          } catch (final Exception e) {
 
             // ignore
          }
 
-         // do not know, when to start the background painting
+         // start the map point painting
          paint_MapPointImage();
 
       } catch (final Exception e) {
@@ -5354,8 +5351,8 @@ public class Map2 extends Canvas {
          StatusUtil.log(e);
 
          // new overlay image is corrupt
-         UI.disposeResource(_backgroundPainterImage_WhichIsDisplayed);
-         UI.disposeResource(_backgroundPainterImage_WhichIsPainted);
+         UI.disposeResource(_mapPointPainterImage_WhichIsDisplayed);
+         UI.disposeResource(_mapPointPainterImage_WhichIsPainted);
       }
    }
 
@@ -6570,20 +6567,20 @@ public class Map2 extends Canvas {
 
    private void paint_MapPointImage() {
 
-      final int currentBackgroundImageCounter = _backgroundPainter_RunnableCounter.get();
+      final int currentMapPointImageCounter = _mapPointPainter_RunnableCounter.get();
 
-      if (_backgroundPainter_LastCounter == currentBackgroundImageCounter) {
+      if (_mapPointPainter_LastCounter == currentMapPointImageCounter) {
 
          // counter is not incremented -> nothing to do
 
          return;
       }
 
-      if (_backgroundPainter_Task != null) {
+      if (_mapPointPainter_Task != null) {
 
          // an overlay task is currently running
 
-         final boolean isDone = _backgroundPainter_Task.isDone();
+         final boolean isDone = _mapPointPainter_Task.isDone();
 
          if (isDone) {
 
@@ -6597,20 +6594,20 @@ public class Map2 extends Canvas {
          }
       }
 
-      final Runnable backgroundTask = () -> {
+      final Runnable mapPointTask = () -> {
 
          try {
 
-            _backgroundPainter_LastCounter = _backgroundPainter_RunnableCounter.get();
+            _mapPointPainter_LastCounter = _mapPointPainter_RunnableCounter.get();
 
             paint_MapPointImage_10_Runnable();
 
          } finally {
 
-            _backgroundPainter_Task = null;
+            _mapPointPainter_Task = null;
          }
 
-         // redraw map image with the updated background image
+         // redraw map image with the updated map point image
          getDisplay().asyncExec(() -> paint_10_PaintMapImage());
 
          /*
@@ -6652,7 +6649,7 @@ public class Map2 extends Canvas {
          );
       };
 
-      _backgroundPainter_Task = _backgroundPainter_Executor.submit(backgroundTask);
+      _mapPointPainter_Task = _mapPointPainter_Executor.submit(mapPointTask);
    }
 
    private void paint_MapPointImage_10_Runnable() {
@@ -6662,7 +6659,7 @@ public class Map2 extends Canvas {
        */
       _mapConfig = Map2ConfigManager.getActiveConfig();
 
-      _backgroundPainter_Viewport_DuringPainting = _worldPixel_TopLeft_Viewport;
+      _mapPointPainter_Viewport_DuringPainting = _worldPixel_TopLeft_Viewport;
 
       if (_colorSwitchCounter++ % 50 == 0) {
          // use different colors each time
@@ -6691,11 +6688,11 @@ public class Map2 extends Canvas {
 
       try {
 
-         final Image canvasImage = _backgroundPainterImage_WhichIsPainted;
+         final Image canvasImage = _mapPointPainterImage_WhichIsPainted;
          final GC gc = new GC(canvasImage);
          {
             gc.setBackground(_mapTransparentColor);
-            gc.fillRectangle(_backgroundImageSize);
+            gc.fillRectangle(_mapPointImageSize);
 
             gc.setAntialias(_mapConfig.isSymbolAntialiased ? SWT.ON : SWT.OFF);
             gc.setTextAntialias(_mapConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
@@ -6744,12 +6741,12 @@ public class Map2 extends Canvas {
          gc.dispose();
 
          // swap images
-         final Image oldVisibleImage = _backgroundPainterImage_WhichIsDisplayed;
+         final Image oldVisibleImage = _mapPointPainterImage_WhichIsDisplayed;
 
-         _backgroundPainterImage_WhichIsDisplayed = canvasImage;
-         _backgroundPainterImage_WhichIsPainted = oldVisibleImage;
+         _mapPointPainterImage_WhichIsDisplayed = canvasImage;
+         _mapPointPainterImage_WhichIsPainted = oldVisibleImage;
 
-         _backgroundPainter_Viewport_WhenPainted = _backgroundPainter_Viewport_DuringPainting;
+         _mapPointPainter_Viewport_WhenPainted = _mapPointPainter_Viewport_DuringPainting;
 
          _allPaintedCommonLocations = allPaintedCommonLocations;
          _allPaintedTourLocations = allPaintedTourLocations;
@@ -6767,11 +6764,11 @@ public class Map2 extends Canvas {
           * Cleanup images, they cannot be disposed in the UI thread otherwise there are tons of
           * exceptions when the map image is resized
           */
-         if (_disposableBackgroundImages.size() > 0) {
+         if (_disposableMapPointImages.size() > 0) {
 
-            synchronized (_disposableBackgroundImages) {
+            synchronized (_disposableMapPointImages) {
 
-               for (final Image image : _disposableBackgroundImages) {
+               for (final Image image : _disposableMapPointImages) {
                   if (image != null) {
                      image.dispose();
                   }
@@ -6781,18 +6778,18 @@ public class Map2 extends Canvas {
 
       } catch (final Exception e) {
 
-         UI.disposeResource(_backgroundPainterImage_WhichIsPainted);
+         UI.disposeResource(_mapPointPainterImage_WhichIsPainted);
 
          StatusUtil.log(e);
       }
    }
 
    private void paint_MapPointImage_20_MapPoints(final GC gc,
-                                                   final List<TourData> allTourData,
-                                                   final List<PaintedMapPoint> allPaintedCommonLocations,
-                                                   final List<PaintedMapPoint> allPaintedTourLocations,
-                                                   final List<PaintedMapPoint> allPaintedMarkers,
-                                                   final List<PaintedMapPoint> allPaintedPauses) {
+                                                 final List<TourData> allTourData,
+                                                 final List<PaintedMapPoint> allPaintedCommonLocations,
+                                                 final List<PaintedMapPoint> allPaintedTourLocations,
+                                                 final List<PaintedMapPoint> allPaintedMarkers,
+                                                 final List<PaintedMapPoint> allPaintedPauses) {
 
       final List<Map2Point> allCommonLocationPointsList = new ArrayList<>();
       final List<Map2Point> allTourLocationPointsList = new ArrayList<>();
@@ -6853,12 +6850,12 @@ public class Map2 extends Canvas {
    }
 
    private void paint_MapPointImage_30_MapPointsAndCluster(final GC gc,
-                                                             final List<TourData> allTourData,
-                                                             final List<PaintedMapPoint> allPaintedCommonLocations,
-                                                             final List<PaintedMapPoint> allPaintedTourLocations,
-                                                             final List<PaintedMapPoint> allPaintedMarkers,
-                                                             final List<PaintedMarkerCluster> allPaintedMarkerClusters,
-                                                             final List<PaintedMapPoint> allPaintedPauses) {
+                                                           final List<TourData> allTourData,
+                                                           final List<PaintedMapPoint> allPaintedCommonLocations,
+                                                           final List<PaintedMapPoint> allPaintedTourLocations,
+                                                           final List<PaintedMapPoint> allPaintedMarkers,
+                                                           final List<PaintedMarkerCluster> allPaintedMarkerClusters,
+                                                           final List<PaintedMapPoint> allPaintedPauses) {
 
       final Map<String, Map2Point> allMarkersOnlyMap = new HashMap<>();
       final List<Map2Point> allMarkersOnlyList = new ArrayList<>();
@@ -7028,8 +7025,8 @@ public class Map2 extends Canvas {
     * @param allPaintedMarkerPoints
     */
    private void paint_MapPointImage_40_HoveredCluster(final GC gc,
-                                                        final PaintedMarkerCluster hoveredMarkerCluster,
-                                                        final List<PaintedMapPoint> allPaintedMarkerPoints) {
+                                                      final PaintedMarkerCluster hoveredMarkerCluster,
+                                                      final List<PaintedMapPoint> allPaintedMarkerPoints) {
 
       final Map2Point[] allClusterMarkerPoints = hoveredMarkerCluster.allClusterMarker;
       final int numAllMarkers = allClusterMarkerPoints.length;
@@ -7065,8 +7062,8 @@ public class Map2 extends Canvas {
        * Draw number of painted labels which can be different to the cluster labels
        */
 
-      final int diffX = _backgroundPainter_MicroAdjustment_DiffX;
-      final int diffY = _backgroundPainter_MicroAdjustment_DiffY;
+      final int diffX = _mapPointPainter_MicroAdjustment_DiffX;
+      final int diffY = _mapPointPainter_MicroAdjustment_DiffY;
 
       final int ovalDevX = clusterRectangle.x + diffX;
       final int ovalDevY = clusterRectangle.y + diffY;
@@ -7110,9 +7107,9 @@ public class Map2 extends Canvas {
    }
 
    private PaintedMarkerCluster paint_MapPointImage_42_OneCluster_Setup(final GC gc,
-                                                                          final StaticCluster<?> markerCluster,
-                                                                          final String clusterLabel,
-                                                                          final List<PaintedMarkerCluster> allPaintedClusters) {
+                                                                        final StaticCluster<?> markerCluster,
+                                                                        final String clusterLabel,
+                                                                        final List<PaintedMarkerCluster> allPaintedClusters) {
 
       // convert marker lat/long into world pixels
 
@@ -7124,7 +7121,7 @@ public class Map2 extends Canvas {
       final int worldPixel_MarkerPosX = worldPixel_MarkerPos.x;
       final int worldPixel_MarkerPosY = worldPixel_MarkerPos.y;
 
-      final Rectangle worldPixel_Viewport = _backgroundPainter_Viewport_DuringPainting;
+      final Rectangle worldPixel_Viewport = _mapPointPainter_Viewport_DuringPainting;
 
       final boolean isClusterInViewport = worldPixel_Viewport.contains(worldPixel_MarkerPosX, worldPixel_MarkerPosY);
 
@@ -7199,20 +7196,20 @@ public class Map2 extends Canvas {
     */
    private int paint_MapPointImage_50_AllCollectedItems(final GC gc,
 
-                                                          final Map2Point[] allCommonLocationPoints,
-                                                          final List<PaintedMapPoint> allPaintedCommonLocationsPoints,
+                                                        final Map2Point[] allCommonLocationPoints,
+                                                        final List<PaintedMapPoint> allPaintedCommonLocationsPoints,
 
-                                                          final Map2Point[] allTourLocationPoints,
-                                                          final List<PaintedMapPoint> allPaintedTourLocationsPoints,
+                                                        final Map2Point[] allTourLocationPoints,
+                                                        final List<PaintedMapPoint> allPaintedTourLocationsPoints,
 
-                                                          final Map2Point[] allMarkerPoints,
-                                                          final List<PaintedMapPoint> allPaintedMarkerPoints,
+                                                        final Map2Point[] allMarkerPoints,
+                                                        final List<PaintedMapPoint> allPaintedMarkerPoints,
 
-                                                          final Map2Point[] allPausePoints,
-                                                          final List<PaintedMapPoint> allPaintedPauses,
+                                                        final Map2Point[] allPausePoints,
+                                                        final List<PaintedMapPoint> allPaintedPauses,
 
-                                                          final boolean isPaintClusterMarker,
-                                                          final Rectangle[] allClusterSymbolRectangle) {
+                                                        final boolean isPaintClusterMarker,
+                                                        final Rectangle[] allClusterSymbolRectangle) {
 
       final int mapPointRespectSize2 = _mapPointSymbolRespectSize / 2;
 
@@ -7461,7 +7458,7 @@ public class Map2 extends Canvas {
    }
 
    private void paint_MapPointImage_60_OneCluster_Paint(final GC gc,
-                                                          final PaintedMarkerCluster paintedCluster) {
+                                                        final PaintedMarkerCluster paintedCluster) {
 
       final boolean isPaintBackground = _isMarkerClusterSelected ? false : true;
 
