@@ -59,24 +59,16 @@ public class Map2Config {
    public boolean isShowLocationBoundingBox;
 
    public RGB     commonLocationFill_RGB            = Map2ConfigManager.DEFAULT_COMMON_LOCATION_FILL_RGB;
-   public RGB     commonLocationFill_Hovered_RGB    = Map2ConfigManager.DEFAULT_COMMON_LOCATION_FILL_HOVERED_RGB;
    public RGB     commonLocationOutline_RGB         = Map2ConfigManager.DEFAULT_COMMON_LOCATION_OUTLINE_RGB;
-   public RGB     commonLocationOutline_Hovered_RGB = Map2ConfigManager.DEFAULT_COMMON_LOCATION_OUTLINE_HOVERED_RGB;
 
    public RGB     tourLocationFill_RGB              = Map2ConfigManager.DEFAULT_TOUR_LOCATION_FILL_RGB;
-   public RGB     tourLocationFill_Hovered_RGB      = Map2ConfigManager.DEFAULT_TOUR_LOCATION_FILL_HOVERED_RGB;
    public RGB     tourLocationOutline_RGB           = Map2ConfigManager.DEFAULT_TOUR_LOCATION_OUTLINE_RGB;
-   public RGB     tourLocationOutline_Hovered_RGB   = Map2ConfigManager.DEFAULT_TOUR_LOCATION_OUTLINE_HOVERED_RGB;
 
    public Color   commonLocationFill_Color;
-   public Color   commonLocationFill_Hovered_Color;
    public Color   commonLocationOutline_Color;
-   public Color   commonLocationOutline_Hovered_Color;
 
    public Color   tourLocationFill_Color;
-   public Color   tourLocationFill_Hovered_Color;
    public Color   tourLocationOutline_Color;
-   public Color   tourLocationOutline_Hovered_Color;
 
    /*
     * Tour markers
@@ -89,14 +81,10 @@ public class Map2Config {
    public int     groupGridSize                 = Map2ConfigManager.LABEL_GROUP_GRID_SIZE_DEFAULT;
 
    public RGB     tourMarkerFill_RGB            = Map2ConfigManager.DEFAULT_TOUR_MARKER_FILL_RGB;
-   public RGB     tourMarkerFill_Hovered_RGB    = Map2ConfigManager.DEFAULT_TOUR_MARKER_FILL_HOVERED_RGB;
    public RGB     tourMarkerOutline_RGB         = Map2ConfigManager.DEFAULT_TOUR_MARKER_OUTLINE_RGB;
-   public RGB     tourMarkerOutline_Hovered_RGB = Map2ConfigManager.DEFAULT_TOUR_MARKER_OUTLINE_HOVERED_RGB;
 
    public Color   tourMarkerFill_Color;
-   public Color   tourMarkerFill_Hovered_Color;
    public Color   tourMarkerOutline_Color;
-   public Color   tourMarkerOutline_Hovered_Color;
 
    /*
     * Tour marker cluster
@@ -119,14 +107,10 @@ public class Map2Config {
    public boolean isShowTourPauses             = true;
 
    public RGB     tourPauseFill_RGB            = Map2ConfigManager.DEFAULT_TOUR_PAUSE_FILL_RGB;
-   public RGB     tourPauseFill_Hovered_RGB    = Map2ConfigManager.DEFAULT_TOUR_PAUSE_FILL_HOVERED_RGB;
    public RGB     tourPauseOutline_RGB         = Map2ConfigManager.DEFAULT_TOUR_PAUSE_OUTLINE_RGB;
-   public RGB     tourPauseOutline_Hovered_RGB = Map2ConfigManager.DEFAULT_TOUR_PAUSE_OUTLINE_HOVERED_RGB;
 
    public Color   tourPauseFill_Color;
-   public Color   tourPauseFill_Hovered_Color;
    public Color   tourPauseOutline_Color;
-   public Color   tourPauseOutline_Hovered_Color;
 
    /*
     * Tour pause filter
@@ -165,27 +149,19 @@ public class Map2Config {
 // SET_FORMATTING_OFF
 
       commonLocationFill_Color            = new Color(commonLocationFill_RGB);
-      commonLocationFill_Hovered_Color    = new Color(commonLocationFill_Hovered_RGB);
       commonLocationOutline_Color         = new Color(commonLocationOutline_RGB);
-      commonLocationOutline_Hovered_Color = new Color(commonLocationOutline_Hovered_RGB);
 
       tourLocationFill_Color              = new Color(tourLocationFill_RGB);
-      tourLocationFill_Hovered_Color      = new Color(tourLocationFill_Hovered_RGB);
       tourLocationOutline_Color           = new Color(tourLocationOutline_RGB);
-      tourLocationOutline_Hovered_Color   = new Color(tourLocationOutline_Hovered_RGB);
 
       tourMarkerFill_Color                = new Color(tourMarkerFill_RGB);
-      tourMarkerFill_Hovered_Color        = new Color(tourMarkerFill_Hovered_RGB);
       tourMarkerOutline_Color             = new Color(tourMarkerOutline_RGB);
-      tourMarkerOutline_Hovered_Color     = new Color(tourMarkerOutline_Hovered_RGB);
 
       clusterFill_Color                   = new Color(clusterFill_RGB);
       clusterOutline_Color                = new Color(clusterOutline_RGB);
 
       tourPauseFill_Color                 = new Color(tourPauseFill_RGB);
-      tourPauseFill_Hovered_Color         = new Color(tourPauseFill_Hovered_RGB);
       tourPauseOutline_Color              = new Color(tourPauseOutline_RGB);
-      tourPauseOutline_Hovered_Color      = new Color(tourPauseOutline_Hovered_RGB);
 
 
       /*
@@ -201,24 +177,16 @@ public class Map2Config {
          logColor(sb, clusterOutline_Color,                 "DEFAULT_CLUSTER_OUTLINE_RGB");                 //$NON-NLS-1$
 
          logColor(sb, commonLocationFill_Color,             "DEFAULT_COMMON_LOCATION_FILL_RGB");            //$NON-NLS-1$
-         logColor(sb, commonLocationFill_Hovered_Color,     "DEFAULT_COMMON_LOCATION_FILL_HOVERED_RGB");    //$NON-NLS-1$
          logColor(sb, commonLocationOutline_Color,          "DEFAULT_COMMON_LOCATION_OUTLINE_RGB");         //$NON-NLS-1$
-         logColor(sb, commonLocationOutline_Hovered_Color,  "DEFAULT_COMMON_LOCATION_OUTLINE_HOVERED_RGB"); //$NON-NLS-1$
 
          logColor(sb, tourLocationFill_Color,               "DEFAULT_TOUR_LOCATION_FILL_RGB");              //$NON-NLS-1$
-         logColor(sb, tourLocationFill_Hovered_Color,       "DEFAULT_TOUR_LOCATION_FILL_HOVERED_RGB");      //$NON-NLS-1$
          logColor(sb, tourLocationOutline_Color,            "DEFAULT_TOUR_LOCATION_OUTLINE_RGB");           //$NON-NLS-1$
-         logColor(sb, tourLocationOutline_Hovered_Color,    "DEFAULT_TOUR_LOCATION_OUTLINE_HOVERED_RGB");   //$NON-NLS-1$
 
          logColor(sb, tourMarkerFill_Color,                 "DEFAULT_TOUR_MARKER_FILL_RGB");                //$NON-NLS-1$
-         logColor(sb, tourMarkerFill_Hovered_Color,         "DEFAULT_TOUR_MARKER_FILL_HOVERED_RGB");        //$NON-NLS-1$
          logColor(sb, tourMarkerOutline_Color,              "DEFAULT_TOUR_MARKER_OUTLINE_RGB");             //$NON-NLS-1$
-         logColor(sb, tourMarkerOutline_Hovered_Color,      "DEFAULT_TOUR_MARKER_OUTLINE_HOVERED_RGB");     //$NON-NLS-1$
 
          logColor(sb, tourPauseFill_Color,                  "DEFAULT_TOUR_PAUSE_FILL_RGB");                 //$NON-NLS-1$
-         logColor(sb, tourPauseFill_Hovered_Color,          "DEFAULT_TOUR_PAUSE_FILL_HOVERED_RGB");         //$NON-NLS-1$
          logColor(sb, tourPauseOutline_Color,               "DEFAULT_TOUR_PAUSE_OUTLINE_RGB");              //$NON-NLS-1$
-         logColor(sb, tourPauseOutline_Hovered_Color,       "DEFAULT_TOUR_PAUSE_OUTLINE_HOVERED_RGB");      //$NON-NLS-1$
 
          System.out.println(sb.toString());
          System.out.println();

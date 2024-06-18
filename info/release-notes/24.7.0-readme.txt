@@ -1,0 +1,66 @@
+24.7.0                                                 ?. July 2024
+
+
+New
+===
+
+* 2D Map
+  - Enhanced display of the
+    - Tour markers
+    - Tour pauses
+    - Tour and common locations
+    https://github.com/mytourbook/mytourbook/issues/1323
+    
+* 2.5D & 3D Maps (Frederic)
+  - Export map view to an image file (jpeg, png or bmp) or to the clipboard
+ 
+
+Improvements
+============
+
+* Tour Export (Frederic)
+  - Use of the notification popups for successful/unsuccessful exports
+  
+
+Changes
+=======
+
+* 2D Map
+  - Moved options from the "2D Map Options" slideout to the "Map Points" slideout
+    - Map dimming
+    - Filter tour pauses
+  - Removed actions from the context menu, they are now available in the "Map Points" slideout
+    - "Show Tour Markers"
+    - "Show Tour Pauses"
+
+* Tour Concatenation (Frederic)
+  - Removed the ability to delete the source tours when using the NatTable layout as it was causing random tours to be deleted
+
+
+Bugfix
+======
+
+* Tour Nutrition (Frederic)
+  - Fixed an issue where deleting a custom tour product for a given tour would delete all of them
+
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+- Spanish (Daniel)
+
+ 
+System   
+======
+
+* MyTourbook Milestone 24.7   https://github.com/mytourbook/mytourbook/milestone/15?closed=1
+* Java 17                     https://adoptium.net/temurin/releases/?version=17
+* Eclipse 2023-06 (4.28)      https://archive.eclipse.org/eclipse/downloads/drops4/R-4.28-202306050440/
+* NatTable 2.20               https://www.eclipse.org/nattable/download.php
+* Nebula Widgets              https://download.eclipse.org/nebula/releases/latest
+* FIT SDK 21.141.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

@@ -112,27 +112,6 @@ public class Map2Point implements ClusterItem {
 // SET_FORMATTING_ON
    }
 
-   public Color getFillColor_Hovered() {
-
-      final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
-
-// SET_FORMATTING_OFF
-
-      switch (pointType) {
-
-      case COMMON_LOCATION:   return mapConfig.commonLocationFill_Hovered_Color;
-
-      case TOUR_LOCATION:     return mapConfig.tourLocationFill_Hovered_Color;
-      case TOUR_PAUSE:        return mapConfig.tourPauseFill_Hovered_Color;
-
-      default:
-      case TOUR_MARKER:       return mapConfig.tourMarkerFill_Hovered_Color;
-
-      }
-
-// SET_FORMATTING_ON
-   }
-
    public String getFormattedLabel() {
 
       if (tourMarker != null) {
@@ -147,21 +126,13 @@ public class Map2Point implements ClusterItem {
 
          // a tour location is displayed
 
-         if (numDuplicates_Start > 1 || numDuplicates_End > 1) {
+         if (numDuplicates_Start == 0 || numDuplicates_End == 0) {
 
-            return formattedLabel + " (" + numDuplicates_Start + "/" + numDuplicates_End + ")";
-
-         } else if (numDuplicates_Start > 1) {
-
-            return formattedLabel + " (" + numDuplicates_Start + "s)";
-
-         } else if (numDuplicates_End > 1) {
-
-            return formattedLabel + " (" + numDuplicates_End + "e)";
+            return formattedLabel;
 
          } else {
 
-            return formattedLabel;
+            return formattedLabel + UI.SPACE + UI.SYMBOL_BRACKET_LEFT + numDuplicates_Start + UI.SLASH + numDuplicates_End + UI.SYMBOL_BRACKET_RIGHT;
          }
       }
    }
@@ -181,27 +152,6 @@ public class Map2Point implements ClusterItem {
 
       default:
       case TOUR_MARKER:       return mapConfig.tourMarkerOutline_Color;
-
-      }
-
-// SET_FORMATTING_ON
-   }
-
-   public Color getOutlineColor_Hovered() {
-
-      final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
-
-// SET_FORMATTING_OFF
-
-      switch (pointType) {
-
-      case COMMON_LOCATION:   return mapConfig.commonLocationOutline_Hovered_Color;
-
-      case TOUR_LOCATION:     return mapConfig.tourLocationOutline_Hovered_Color;
-      case TOUR_PAUSE:        return mapConfig.tourPauseOutline_Hovered_Color;
-
-      default:
-      case TOUR_MARKER:       return mapConfig.tourMarkerOutline_Hovered_Color;
 
       }
 

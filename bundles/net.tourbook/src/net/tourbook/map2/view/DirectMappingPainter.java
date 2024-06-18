@@ -141,8 +141,8 @@ public class DirectMappingPainter implements IDirectPainter {
       final int markerSymbolDevX = mapPointDevX - markerSize2;
       final int markerSymbolDevY = mapPointDevY - markerSize2;
 
-      gc.setForeground(mapPoint.getOutlineColor_Hovered());
-      gc.setBackground(mapPoint.getFillColor_Hovered());
+      gc.setForeground(mapPoint.getOutlineColor());
+      gc.setBackground(mapPoint.getFillColor());
 
       /*
        * Draw location bounding box
@@ -223,7 +223,7 @@ public class DirectMappingPainter implements IDirectPainter {
                mapPointDevY - imageHeight);
 
       } else {
-         
+
          // draw a symbol
 
          gc.fillRectangle(

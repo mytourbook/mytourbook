@@ -1607,8 +1607,7 @@ public class UI {
     * @param parent
     * @param action
     *
-    * @return
-    * @return
+    * @return Returns the created {@link ToolBar} for the action
     */
    public static ToolBar createToolbarAction(final Composite parent, final Action action) {
 
