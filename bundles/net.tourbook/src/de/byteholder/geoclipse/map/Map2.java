@@ -554,7 +554,8 @@ public class Map2 extends Canvas {
    private Rectangle                                  _clientArea;
 
    /**
-    * It looks like that onResize() is not called very early from the swtbot to initialize this field
+    * It looks like that onResize() is not called very early from the swtbot to initialize this
+    * field
     * <p>
     * <a
     * href=
@@ -5104,7 +5105,7 @@ public class Map2 extends Canvas {
 
       final int redrawCounter = _redrawMapCounter.incrementAndGet();
 
-      // repaint the background image
+      // repaint the map point image
       _backgroundPainter_RunnableCounter.incrementAndGet();
 
       if (isDisposed() || _mp == null || _isMapPaintingEnabled == false) {
@@ -5519,13 +5520,6 @@ public class Map2 extends Canvas {
 
          } finally {
 
-            /**
-             * This counter is very tricky but with this setup it seems to work and is not
-             * reentering endlessly.
-             * <p>
-             * The next paint() will increment the counter but the paint() from this thread "should
-             * not" increment it, so it's decremented.
-             */
             _backgroundPainter_Task = null;
          }
 
