@@ -31,6 +31,8 @@ import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.ui.IChangeUIListener;
 import net.tourbook.common.util.Util;
+import net.tourbook.tour.location.CommonLocationView;
+import net.tourbook.tour.location.TourLocationView;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -376,6 +378,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       selectTab(_tabCommonLocations, event);
 
+      if (UI.isShiftKey(event)) {
+
+         Util.showView(CommonLocationView.ID, true);
+      }
    }
 
    private void actionStatistic_TourLocation(final Event event) {
@@ -384,6 +390,11 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _chkIsShowTourLocations.setSelection(!_chkIsShowTourLocations.getSelection());
 
       selectTab(_tabTourLocations, event);
+
+      if (UI.isShiftKey(event)) {
+
+         Util.showView(TourLocationView.ID, true);
+      }
    }
 
    private void actionStatistic_TourMarker(final Event event) {
