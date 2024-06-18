@@ -553,7 +553,14 @@ public class Map2 extends Canvas {
     */
    private Rectangle                                  _clientArea;
 
-   private Rectangle                                  _backgroundImageSize;
+   /**
+    * It looks like that onResize() is not called very early from the swtbot to initialize this field
+    * <p>
+    * <a
+    * href=
+    * "https://github.com/mytourbook/mytourbook/issues/1361#issuecomment-2166663604">https://github.com/mytourbook/mytourbook/issues/1361#issuecomment-2166663604</a>
+    */
+   private Rectangle                                  _backgroundImageSize       = new Rectangle(0, 0, 400, 400);
 
    private final ListenerList<IBreadcrumbListener>    _allBreadcrumbListener     = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IHoveredTourListener>   _allHoveredTourListeners   = new ListenerList<>(ListenerList.IDENTITY);
