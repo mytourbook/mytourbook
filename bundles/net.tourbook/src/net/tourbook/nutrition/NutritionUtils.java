@@ -103,8 +103,7 @@ public class NutritionUtils {
 
       long tourDeviceTime_Elapsed = tourData.getTourDeviceTime_Elapsed();
 
-      //todo fb, extend to 2h ??
-      if (tourDeviceTime_Elapsed > 3600 && _prefStore.getBoolean(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR)) {
+      if (tourDeviceTime_Elapsed > 7200 && _prefStore.getBoolean(ITourbookPreferences.NUTRITION_IGNORE_FIRST_HOUR)) {
          tourDeviceTime_Elapsed -= 3600;
       } else if (tourDeviceTime_Elapsed <= 3600) {
          return totalAmount;
