@@ -221,8 +221,8 @@ public class OtherMessages {
    public static final String TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME           = net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime;
    public static final String TOUR_TOOLTIP_LABEL_DISTANCE                  = net.tourbook.ui.Messages.Tour_Tooltip_Label_Distance;
    public static final String TOUR_TOOLTIP_LABEL_ELEVATION_UP              = net.tourbook.ui.Messages.Tour_Tooltip_Label_AltitudeUp;
-   public static final String TOUR_TOOLTIP_LABEL_LOCATION_START            = net.tourbook.ui.Messages.Tour_Tooltip_Label_LocationStart;
-   public static final String TOUR_TOOLTIP_LABEL_LOCATION_END              = net.tourbook.ui.Messages.Tour_Tooltip_Label_LocationEnd;
+   public static final String TOUR_TOOLTIP_LABEL_LOCATION_START            = net.tourbook.ui.Messages.Tour_Tooltip_Label_TourLocation_Start;
+   public static final String TOUR_TOOLTIP_LABEL_LOCATION_END              = net.tourbook.ui.Messages.Tour_Tooltip_Label_TourLocation_End;
    public static final String TOUR_TOOLTIP_LABEL_MOVING_TIME               = net.tourbook.ui.Messages.Tour_Tooltip_Label_MovingTime;
    public static final String TOUR_TOOLTIP_LABEL_NO_GEO_TOUR               = net.tourbook.ui.Messages.Tour_Tooltip_Label_NoGeoTour;
    public static final String TOUR_TOOLTIP_LABEL_RECORDED_TIME             = net.tourbook.ui.Messages.Tour_Tooltip_Label_RecordedTime;

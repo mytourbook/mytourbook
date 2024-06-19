@@ -102,6 +102,7 @@ public class Map2Point implements ClusterItem {
       case COMMON_LOCATION:   return mapConfig.commonLocationFill_Color;
 
       case TOUR_LOCATION:     return mapConfig.tourLocationFill_Color;
+
       case TOUR_PAUSE:        return mapConfig.tourPauseFill_Color;
 
       default:

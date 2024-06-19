@@ -7426,8 +7426,8 @@ public class Map2 extends Canvas {
       /*
        * Draw location label
        */
-      paint_MpImage_10_AllLocationLabel(gc, numAllCommonLocations, allCommonLocationLabels, allPaintedCommonLocationsPoints);
-      paint_MpImage_10_AllLocationLabel(gc, numAllTourLocations, allTourLocationLabels, allPaintedTourLocationsPoints);
+      paint_MpImage_10_AllLocationLabels(gc, numAllCommonLocations, allCommonLocationLabels, allPaintedCommonLocationsPoints);
+      paint_MpImage_10_AllLocationLabels(gc, numAllTourLocations, allTourLocationLabels, allPaintedTourLocationsPoints);
 
       /*
        * Draw marker label
@@ -7446,8 +7446,8 @@ public class Map2 extends Canvas {
       /*
        * Draw location symbol
        */
-      paint_MpImage_20_AllLocationSymbol(gc, numAllCommonLocations, allCommonLocationLabels, allPaintedCommonLocationsPoints);
-      paint_MpImage_20_AllLocationSymbol(gc, numAllTourLocations, allTourLocationLabels, allPaintedTourLocationsPoints);
+      paint_MpImage_20_AllLocationSymbols(gc, numAllCommonLocations, allCommonLocationLabels, allPaintedCommonLocationsPoints);
+      paint_MpImage_20_AllLocationSymbols(gc, numAllTourLocations, allTourLocationLabels, allPaintedTourLocationsPoints);
 
       // FOR DEBUGGING
       //
@@ -7503,10 +7503,10 @@ public class Map2 extends Canvas {
             true);
    }
 
-   private void paint_MpImage_10_AllLocationLabel(final GC gc,
-                                                  final int numVisibleLocations,
-                                                  final List<PointFeature> allLocationLabels,
-                                                  final List<PaintedMapPoint> allPaintedLocationsPoints) {
+   private void paint_MpImage_10_AllLocationLabels(final GC gc,
+                                                   final int numVisibleLocations,
+                                                   final List<PointFeature> allLocationLabels,
+                                                   final List<PaintedMapPoint> allPaintedLocationsPoints) {
 
       for (int itemIndex = 0; itemIndex < numVisibleLocations; itemIndex++) {
 
@@ -7558,10 +7558,10 @@ public class Map2 extends Canvas {
       }
    }
 
-   private void paint_MpImage_20_AllLocationSymbol(final GC gc,
-                                                   final int numVisibleLocations,
-                                                   final List<PointFeature> allLocationLabels,
-                                                   final List<PaintedMapPoint> allPaintedLocationsPoints) {
+   private void paint_MpImage_20_AllLocationSymbols(final GC gc,
+                                                    final int numVisibleLocations,
+                                                    final List<PointFeature> allLocationLabels,
+                                                    final List<PaintedMapPoint> allPaintedLocationsPoints) {
       int paintedLocationIndex = 0;
 
       final int imageWidth = _imageMapLocationBounds.width;

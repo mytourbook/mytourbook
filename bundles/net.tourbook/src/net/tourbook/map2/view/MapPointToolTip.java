@@ -22,12 +22,16 @@ import de.byteholder.geoclipse.map.TourPause;
 import java.time.ZonedDateTime;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
+import net.tourbook.map.location.LocationType;
 import net.tourbook.tour.location.TourLocationUI;
+import net.tourbook.ui.Messages;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -54,10 +58,10 @@ public class MapPointToolTip extends ToolTip {
    private static final int DEFAULT_TEXT_WIDTH  = 50;
    private static final int DEFAULT_TEXT_HEIGHT = 20;
 
-   private static final int _textStyle          = SWT.WRAP                   //
+   private static final int _textStyle          = SWT.WRAP   //
          | SWT.MULTI
          | SWT.READ_ONLY
-//                                                               | SWT.BORDER
+//       | SWT.BORDER
    ;
 
    private Map2             _map2;
@@ -106,6 +110,7 @@ public class MapPointToolTip extends ToolTip {
 // SET_FORMATTING_OFF
 
       switch (mapPoint.pointType) {
+
       case COMMON_LOCATION:
       case TOUR_LOCATION:     createUI_TourLocation(parent, mapPoint);  break;
 
@@ -119,6 +124,17 @@ public class MapPointToolTip extends ToolTip {
 
    private void createUI_TourLocation(final Composite parent, final Map2Point mapPoint) {
 
+      final GridDataFactory gdHeaderIndent = GridDataFactory.fillDefaults()
+
+            .span(2, 1)
+
+            // indent to the left that this text is aligned with the labels
+            .indent(-4, 0);
+
+      final TourLocation tourLocation = mapPoint.tourLocation;
+      final int numDuplicates_Start = mapPoint.numDuplicates_Start;
+      final int numDuplicates_End = mapPoint.numDuplicates_End;
+
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
@@ -126,8 +142,63 @@ public class MapPointToolTip extends ToolTip {
             .spacing(10, 2)
             .applyTo(container);
       {
-         // location fields
-         TourLocationUI.createUI(container, mapPoint.tourLocation);
+         {
+            /*
+             * Title
+             */
+
+            String locationTitle;
+
+            if (numDuplicates_Start > 0 && numDuplicates_End > 0) {
+
+               // start & end location
+
+               locationTitle = Messages.Tour_Tooltip_Label_TourLocation_StartEnd;
+
+            } else if (numDuplicates_Start > 0) {
+
+               // start location
+
+               locationTitle = Messages.Tour_Tooltip_Label_TourLocation_Start;
+
+            } else if (numDuplicates_End > 0) {
+
+               // end location
+
+               locationTitle = Messages.Tour_Tooltip_Label_TourLocation_End;
+
+            } else {
+
+               if (mapPoint.locationType.equals(LocationType.Common)) {
+
+                  // common location
+
+                  locationTitle = Messages.Tour_Location_Label_CommonLocation;
+
+               } else {
+
+                  // tourr location
+
+                  locationTitle = Messages.Tour_Location_Tooltip_Title;
+               }
+            }
+
+            // using text control that & is not displayed as mnemonic
+            final Text headerText = new Text(container, SWT.READ_ONLY);
+            gdHeaderIndent.applyTo(headerText);
+            MTFont.setBannerFont(headerText);
+
+            headerText.setText(locationTitle);
+         }
+
+         UI.createSpacer_Vertical(container, 8, 2);
+
+         {
+            /*
+             * Location fields
+             */
+            TourLocationUI.createUI(container, tourLocation);
+         }
       }
    }
 
