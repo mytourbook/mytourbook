@@ -57,6 +57,7 @@ import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTou
 import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -862,7 +863,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
          final ArrayList<Long> tourIds = selectionTourIds.getTourIds();
 
-         if (tourIds != null && tourIds.size() > 0) {
+         if (CollectionUtils.isNotEmpty(tourIds)) {
 
             if (tourIds.size() == 1) {
                tourId = tourIds.get(0);

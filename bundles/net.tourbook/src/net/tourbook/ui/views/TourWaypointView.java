@@ -46,6 +46,7 @@ import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTou
 import net.tourbook.ui.views.referenceTour.TVIRefTour_ComparedTour;
 import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -815,7 +816,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
       } else if (selection instanceof final SelectionTourIds selectionTourIds) {
 
          final ArrayList<Long> tourIds = selectionTourIds.getTourIds();
-         if ((tourIds != null) && (tourIds.size() > 0)) {
+         if (CollectionUtils.isNotEmpty(tourIds)) {
             tourId = tourIds.get(0);
          }
 
@@ -918,7 +919,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
          }
 
          final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-         if ((selectedTours != null) && (selectedTours.size() > 0)) {
+         if (CollectionUtils.isNotEmpty(selectedTours)) {
             onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
          }
       });
