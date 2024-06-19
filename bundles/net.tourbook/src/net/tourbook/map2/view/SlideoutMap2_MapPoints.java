@@ -162,6 +162,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Button                _btnSwapClusterSymbolColor;
    private Button                _btnSwapCommonLocationLabel_Color;
    private Button                _btnSwapTourLocationLabel_Color;
+   private Button                _btnSwapTourLocation_StartLabel_Color;
+   private Button                _btnSwapTourLocation_EndLabel_Color;
    private Button                _btnSwapTourMarkerLabel_Color;
    private Button                _btnSwapTourPauseLabel_Color;
    //
@@ -204,6 +206,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Label                 _lblStats_TourPauses_All;
    private Label                 _lblStats_TourPauses_Visible;
    private Label                 _lblTourLocationLabel_Color;
+   private Label                 _lblTourLocation_StartLabel_Color;
+   private Label                 _lblTourLocation_EndLabel_Color;
    private Label                 _lblTourMarkerLabel_Color;
    private Label                 _lblTourPauseLabel_Color;
    private Label                 _lblVisibleLabels;
@@ -230,6 +234,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private ColorSelectorExtended _colorTourMarkerLabel_Outline;
    private ColorSelectorExtended _colorTourLocationLabel_Fill;
    private ColorSelectorExtended _colorTourLocationLabel_Outline;
+   private ColorSelectorExtended _colorTourLocation_StartLabel_Outline;
+   private ColorSelectorExtended _colorTourLocation_StartLabel_Fill;
+   private ColorSelectorExtended _colorTourLocation_EndLabel_Outline;
+   private ColorSelectorExtended _colorTourLocation_EndLabel_Fill;
    private ColorSelectorExtended _colorTourPauseLabel_Outline;
    private ColorSelectorExtended _colorTourPauseLabel_Fill;
    //
@@ -1162,12 +1170,12 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       }
       {
          /*
-          * Location label
+          * Tour location label
           */
          {
             // label
             _lblTourLocationLabel_Color = new Label(parent, SWT.NONE);
-            _lblTourLocationLabel_Color.setText(Messages.Slideout_MapPoints_Label_LocationColor);
+            _lblTourLocationLabel_Color.setText(Messages.Slideout_MapPoints_Label_TourLocationColor);
             _lblTourLocationLabel_Color.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
             labelGridData.applyTo(_lblTourLocationLabel_Color);
          }
@@ -1193,6 +1201,76 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _btnSwapTourLocationLabel_Color.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
             _btnSwapTourLocationLabel_Color.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> onSwapTourLocationColor()));
+         }
+      }
+      {
+         /*
+          * Start location label
+          */
+         {
+            // label
+            _lblTourLocation_StartLabel_Color = new Label(parent, SWT.NONE);
+            _lblTourLocation_StartLabel_Color.setText(Messages.Slideout_MapPoints_Label_TourLocation_StartColor);
+            _lblTourLocation_StartLabel_Color.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+            labelGridData.applyTo(_lblTourLocation_StartLabel_Color);
+         }
+         {
+            final Composite container = new Composite(parent, SWT.NONE);
+            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+
+            // outline/text color
+            _colorTourLocation_StartLabel_Outline = new ColorSelectorExtended(container);
+            _colorTourLocation_StartLabel_Outline.addListener(_markerPropertyChangeListener);
+            _colorTourLocation_StartLabel_Outline.addOpenListener(this);
+            _colorTourLocation_StartLabel_Outline.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+
+            // background color
+            _colorTourLocation_StartLabel_Fill = new ColorSelectorExtended(container);
+            _colorTourLocation_StartLabel_Fill.addListener(_markerPropertyChangeListener);
+            _colorTourLocation_StartLabel_Fill.addOpenListener(this);
+            _colorTourLocation_StartLabel_Fill.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+
+            // button: swap color
+            _btnSwapTourLocation_StartLabel_Color = new Button(container, SWT.PUSH);
+            _btnSwapTourLocation_StartLabel_Color.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
+            _btnSwapTourLocation_StartLabel_Color.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
+            _btnSwapTourLocation_StartLabel_Color.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> onSwapTourLocation_StartColor()));
+         }
+      }
+      {
+         /*
+          * End location label
+          */
+         {
+            // label
+            _lblTourLocation_EndLabel_Color = new Label(parent, SWT.NONE);
+            _lblTourLocation_EndLabel_Color.setText(Messages.Slideout_MapPoints_Label_TourLocation_EndColor);
+            _lblTourLocation_EndLabel_Color.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+            labelGridData.applyTo(_lblTourLocation_EndLabel_Color);
+         }
+         {
+            final Composite container = new Composite(parent, SWT.NONE);
+            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+
+            // outline/text color
+            _colorTourLocation_EndLabel_Outline = new ColorSelectorExtended(container);
+            _colorTourLocation_EndLabel_Outline.addListener(_markerPropertyChangeListener);
+            _colorTourLocation_EndLabel_Outline.addOpenListener(this);
+            _colorTourLocation_EndLabel_Outline.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+
+            // background color
+            _colorTourLocation_EndLabel_Fill = new ColorSelectorExtended(container);
+            _colorTourLocation_EndLabel_Fill.addListener(_markerPropertyChangeListener);
+            _colorTourLocation_EndLabel_Fill.addOpenListener(this);
+            _colorTourLocation_EndLabel_Fill.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
+
+            // button: swap color
+            _btnSwapTourLocation_EndLabel_Color = new Button(container, SWT.PUSH);
+            _btnSwapTourLocation_EndLabel_Color.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
+            _btnSwapTourLocation_EndLabel_Color.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
+            _btnSwapTourLocation_EndLabel_Color.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> onSwapTourLocation_EndColor()));
          }
       }
    }
@@ -1230,7 +1308,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          }
          {
             /*
-             * Location label
+             * Common location label
              */
             {
                // label
@@ -1737,6 +1815,38 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       repaintMap();
    }
 
+   private void onSwapTourLocation_EndColor() {
+
+      final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
+
+      final RGB fgColor = mapConfig.tourLocation_EndOutline_RGB;
+      final RGB bgColor = mapConfig.tourLocation_EndFill_RGB;
+
+      mapConfig.tourLocation_EndOutline_RGB = bgColor;
+      mapConfig.tourLocation_EndFill_RGB = fgColor;
+
+      mapConfig.setupColors();
+
+      restoreState();
+      repaintMap();
+   }
+
+   private void onSwapTourLocation_StartColor() {
+
+      final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
+
+      final RGB fgColor = mapConfig.tourLocation_StartOutline_RGB;
+      final RGB bgColor = mapConfig.tourLocation_StartFill_RGB;
+
+      mapConfig.tourLocation_StartOutline_RGB = bgColor;
+      mapConfig.tourLocation_StartFill_RGB = fgColor;
+
+      mapConfig.setupColors();
+
+      restoreState();
+      repaintMap();
+   }
+
    private void onSwapTourLocationColor() {
 
       final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
@@ -1783,49 +1893,53 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
 // SET_FORMATTING_OFF
 
-      _chkIsFillClusterSymbol             .setSelection( config.isFillClusterSymbol);
-      _chkIsShowCommonLocations           .setSelection( config.isShowCommonLocation);
-      _chkIsShowCommonLocations_All       .setSelection( config.isShowCommonLocation);
-      _chkIsShowTourLocations             .setSelection( config.isShowTourLocation);
-      _chkIsShowTourLocations_All         .setSelection( config.isShowTourLocation);
-      _chkIsShowTourMarkers               .setSelection( config.isShowTourMarker);
-      _chkIsShowTourMarkers_All           .setSelection( config.isShowTourMarker);
-      _chkIsShowTourPauses                .setSelection( config.isShowTourPauses);
-      _chkIsShowTourPauses_All            .setSelection( config.isShowTourPauses);
-      _chkIsGroupMarkers                  .setSelection( config.isGroupDuplicatedMarkers);
-      _chkIsGroupMarkers_All              .setSelection( config.isGroupDuplicatedMarkers);
-      _chkIsLabelAntialiased              .setSelection( config.isLabelAntialiased);
-      _chkIsMarkerClustered               .setSelection( config.isTourMarkerClustered);
-      _chkIsMarkerClustered_All           .setSelection( config.isTourMarkerClustered);
-      _chkIsShowMapLocations_BoundingBox  .setSelection( config.isShowLocationBoundingBox);
-      _chkIsSymbolAntialiased             .setSelection( config.isSymbolAntialiased);
-      _chkIsTruncateLabel                 .setSelection( config.isTruncateLabel);
-      _chkIsWrapLabel                     .setSelection( config.isWrapLabel);
+      _chkIsFillClusterSymbol                .setSelection( config.isFillClusterSymbol);
+      _chkIsShowCommonLocations              .setSelection( config.isShowCommonLocation);
+      _chkIsShowCommonLocations_All          .setSelection( config.isShowCommonLocation);
+      _chkIsShowTourLocations                .setSelection( config.isShowTourLocation);
+      _chkIsShowTourLocations_All            .setSelection( config.isShowTourLocation);
+      _chkIsShowTourMarkers                  .setSelection( config.isShowTourMarker);
+      _chkIsShowTourMarkers_All              .setSelection( config.isShowTourMarker);
+      _chkIsShowTourPauses                   .setSelection( config.isShowTourPauses);
+      _chkIsShowTourPauses_All               .setSelection( config.isShowTourPauses);
+      _chkIsGroupMarkers                     .setSelection( config.isGroupDuplicatedMarkers);
+      _chkIsGroupMarkers_All                 .setSelection( config.isGroupDuplicatedMarkers);
+      _chkIsLabelAntialiased                 .setSelection( config.isLabelAntialiased);
+      _chkIsMarkerClustered                  .setSelection( config.isTourMarkerClustered);
+      _chkIsMarkerClustered_All              .setSelection( config.isTourMarkerClustered);
+      _chkIsShowMapLocations_BoundingBox     .setSelection( config.isShowLocationBoundingBox);
+      _chkIsSymbolAntialiased                .setSelection( config.isSymbolAntialiased);
+      _chkIsTruncateLabel                    .setSelection( config.isTruncateLabel);
+      _chkIsWrapLabel                        .setSelection( config.isWrapLabel);
 
-      _spinnerClusterGrid_Size            .setSelection( config.clusterGridSize);
-      _spinnerClusterOutline_Width        .setSelection( config.clusterOutline_Width);
-      _spinnerClusterSymbol_Size          .setSelection( config.clusterSymbol_Size);
-      _spinnerLabelDistributorMaxLabels   .setSelection( config.labelDistributorMaxLabels);
-      _spinnerLabelDistributorRadius      .setSelection( config.labelDistributorRadius);
-      _spinnerLabelGroupGridSize          .setSelection( config.groupGridSize);
-      _spinnerLabelTruncateLength         .setSelection( config.labelTruncateLength);
-      _spinnerLabelWrapLength             .setSelection( config.labelWrapLength);
+      _spinnerClusterGrid_Size               .setSelection( config.clusterGridSize);
+      _spinnerClusterOutline_Width           .setSelection( config.clusterOutline_Width);
+      _spinnerClusterSymbol_Size             .setSelection( config.clusterSymbol_Size);
+      _spinnerLabelDistributorMaxLabels      .setSelection( config.labelDistributorMaxLabels);
+      _spinnerLabelDistributorRadius         .setSelection( config.labelDistributorRadius);
+      _spinnerLabelGroupGridSize             .setSelection( config.groupGridSize);
+      _spinnerLabelTruncateLength            .setSelection( config.labelTruncateLength);
+      _spinnerLabelWrapLength                .setSelection( config.labelWrapLength);
 
-      _colorClusterSymbol_Fill            .setColorValue(config.clusterFill_RGB);
-      _colorClusterSymbol_Outline         .setColorValue(config.clusterOutline_RGB);
-      _colorTourMarkerLabel_Fill          .setColorValue(config.tourMarkerFill_RGB);
-      _colorTourMarkerLabel_Outline       .setColorValue(config.tourMarkerOutline_RGB);
+      _colorClusterSymbol_Fill               .setColorValue(config.clusterFill_RGB);
+      _colorClusterSymbol_Outline            .setColorValue(config.clusterOutline_RGB);
+      _colorTourMarkerLabel_Fill             .setColorValue(config.tourMarkerFill_RGB);
+      _colorTourMarkerLabel_Outline          .setColorValue(config.tourMarkerOutline_RGB);
 
-      _colorCommonLocationLabel_Fill      .setColorValue(config.commonLocationFill_RGB);
-      _colorCommonLocationLabel_Outline   .setColorValue(config.commonLocationOutline_RGB);
+      _colorCommonLocationLabel_Fill         .setColorValue(config.commonLocationFill_RGB);
+      _colorCommonLocationLabel_Outline      .setColorValue(config.commonLocationOutline_RGB);
 
-      _colorTourLocationLabel_Fill        .setColorValue(config.tourLocationFill_RGB);
-      _colorTourLocationLabel_Outline     .setColorValue(config.tourLocationOutline_RGB);
+      _colorTourLocationLabel_Fill           .setColorValue(config.tourLocationFill_RGB);
+      _colorTourLocationLabel_Outline        .setColorValue(config.tourLocationOutline_RGB);
+      _colorTourLocation_StartLabel_Fill     .setColorValue(config.tourLocation_StartFill_RGB);
+      _colorTourLocation_StartLabel_Outline  .setColorValue(config.tourLocation_StartOutline_RGB);
+      _colorTourLocation_EndLabel_Fill       .setColorValue(config.tourLocation_EndFill_RGB);
+      _colorTourLocation_EndLabel_Outline    .setColorValue(config.tourLocation_EndOutline_RGB);
 
-      _colorTourPauseLabel_Fill           .setColorValue(config.tourPauseFill_RGB);
-      _colorTourPauseLabel_Outline        .setColorValue(config.tourPauseOutline_RGB);
+      _colorTourPauseLabel_Fill              .setColorValue(config.tourPauseFill_RGB);
+      _colorTourPauseLabel_Outline           .setColorValue(config.tourPauseOutline_RGB);
 
-      _txtGroupDuplicatedMarkers          .setText(      config.groupedMarkers);
+      _txtGroupDuplicatedMarkers             .setText(      config.groupedMarkers);
 
       /*
        * Map dimming & transparency
@@ -1906,6 +2020,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       config.tourLocationFill_RGB               = _colorTourLocationLabel_Fill               .getColorValue();
       config.tourLocationOutline_RGB            = _colorTourLocationLabel_Outline            .getColorValue();
+      config.tourLocation_StartFill_RGB         = _colorTourLocation_StartLabel_Fill         .getColorValue();
+      config.tourLocation_StartOutline_RGB      = _colorTourLocation_StartLabel_Outline      .getColorValue();
+      config.tourLocation_EndFill_RGB           = _colorTourLocation_EndLabel_Fill           .getColorValue();
+      config.tourLocation_EndOutline_RGB        = _colorTourLocation_EndLabel_Outline        .getColorValue();
 
       config.tourMarkerFill_RGB                 = _colorTourMarkerLabel_Fill                 .getColorValue();
       config.tourMarkerOutline_RGB              = _colorTourMarkerLabel_Outline              .getColorValue();

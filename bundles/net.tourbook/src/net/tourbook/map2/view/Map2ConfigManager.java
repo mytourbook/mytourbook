@@ -78,123 +78,131 @@ public class Map2ConfigManager {
    /*
     * Map points
     */
-   private static final String TAG_MAP_POINTS                     = "MapPoints";                           //$NON-NLS-1$
-   private static final String TAG_MAP_POINT                      = "MapPoint";                            //$NON-NLS-1$
+   private static final String TAG_MAP_POINTS                        = "MapPoints";                           //$NON-NLS-1$
+   private static final String TAG_MAP_POINT                         = "MapPoint";                            //$NON-NLS-1$
    // common
-   private static final String ATTR_IS_LABEL_ANTIALIASED          = "isLabelAntialiased";                  //$NON-NLS-1$
-   private static final String ATTR_IS_SYMBOL_ANTIALIASED         = "isSymbolAntialiased";                 //$NON-NLS-1$
+   private static final String ATTR_IS_LABEL_ANTIALIASED             = "isLabelAntialiased";                  //$NON-NLS-1$
+   private static final String ATTR_IS_SYMBOL_ANTIALIASED            = "isSymbolAntialiased";                 //$NON-NLS-1$
    // all labels
-   private static final String ATTR_IS_TRUNCATE_LABEL             = "isTruncateLabel";                     //$NON-NLS-1$
-   private static final String ATTR_IS_WRAP_LABEL                 = "isWrapLabel";                         //$NON-NLS-1$
-   private static final String ATTR_LABEL_LAYOUT                  = "labelLayout";                         //$NON-NLS-1$
-   private static final String ATTR_LABEL_DISTRIBUTOR_MAX_LABELS  = "labelDistributorMaxLabels";           //$NON-NLS-1$
-   private static final String ATTR_LABEL_DISTRIBUTOR_RADIUS      = "labelDistributorRadius";              //$NON-NLS-1$
-   private static final String ATTR_LABEL_TRUNCATE_LENGTH         = "labelTruncateLength";                 //$NON-NLS-1$
-   private static final String ATTR_LABEL_WRAP_LENGTH             = "labelWrapLength";                     //$NON-NLS-1$
+   private static final String ATTR_IS_TRUNCATE_LABEL                = "isTruncateLabel";                     //$NON-NLS-1$
+   private static final String ATTR_IS_WRAP_LABEL                    = "isWrapLabel";                         //$NON-NLS-1$
+   private static final String ATTR_LABEL_LAYOUT                     = "labelLayout";                         //$NON-NLS-1$
+   private static final String ATTR_LABEL_DISTRIBUTOR_MAX_LABELS     = "labelDistributorMaxLabels";           //$NON-NLS-1$
+   private static final String ATTR_LABEL_DISTRIBUTOR_RADIUS         = "labelDistributorRadius";              //$NON-NLS-1$
+   private static final String ATTR_LABEL_TRUNCATE_LENGTH            = "labelTruncateLength";                 //$NON-NLS-1$
+   private static final String ATTR_LABEL_WRAP_LENGTH                = "labelWrapLength";                     //$NON-NLS-1$
    // tour + common location
-   private static final String ATTR_IS_SHOW_COMMON_LOCATION       = "isShowCommonLocation";                //$NON-NLS-1$
-   private static final String ATTR_IS_SHOW_LOCATION_BOUNDING_BOX = "isShowLocationBoundingBox";           //$NON-NLS-1$
-   private static final String ATTR_IS_SHOW_TOUR_LOCATION         = "isShowTourLocation";                  //$NON-NLS-1$
+   private static final String ATTR_IS_SHOW_COMMON_LOCATION          = "isShowCommonLocation";                //$NON-NLS-1$
+   private static final String ATTR_IS_SHOW_LOCATION_BOUNDING_BOX    = "isShowLocationBoundingBox";           //$NON-NLS-1$
+   private static final String ATTR_IS_SHOW_TOUR_LOCATION            = "isShowTourLocation";                  //$NON-NLS-1$
    //
-   private static final String TAG_COMMON_LOCATION_FILL_COLOR     = "CommonLocationFillColor";             //$NON-NLS-1$
-   private static final String TAG_COMMON_LOCATION_OUTLINE_COLOR  = "CommonLocationOutlineColor";          //$NON-NLS-1$
-   private static final String TAG_TOUR_LOCATION_FILL_COLOR       = "TourLocationFillColor";               //$NON-NLS-1$
-   private static final String TAG_TOUR_LOCATION_OUTLINE_COLOR    = "TourLocationOutlineColor";            //$NON-NLS-1$
+   private static final String TAG_COMMON_LOCATION_FILL_COLOR        = "CommonLocationFillColor";             //$NON-NLS-1$
+   private static final String TAG_COMMON_LOCATION_OUTLINE_COLOR     = "CommonLocationOutlineColor";          //$NON-NLS-1$
+   private static final String TAG_TOUR_LOCATION_FILL_COLOR          = "TourLocationFillColor";               //$NON-NLS-1$
+   private static final String TAG_TOUR_LOCATION_OUTLINE_COLOR       = "TourLocationOutlineColor";            //$NON-NLS-1$
+   private static final String TAG_TOUR_LOCATION_START_FILL_COLOR    = "TourLocation_StartFillColor";         //$NON-NLS-1$
+   private static final String TAG_TOUR_LOCATION_START_OUTLINE_COLOR = "TourLocation_StartOutlineColor";      //$NON-NLS-1$
+   private static final String TAG_TOUR_LOCATION_END_FILL_COLOR      = "TourLocation_EndFillColor";           //$NON-NLS-1$
+   private static final String TAG_TOUR_LOCATION_END_OUTLINE_COLOR   = "TourLocation_EndOutlineColor";        //$NON-NLS-1$
    // tour marker
-   private static final String ATTR_IS_SHOW_TOUR_MARKER           = "isShowTourMarker";                    //$NON-NLS-1$
-   private static final String ATTR_IS_GROUP_DUPLICATED_MARKERS   = "isGroupDuplicatedMarkers";            //$NON-NLS-1$
-   private static final String ATTR_GROUPED_MARKERS               = "groupedLabels";                       //$NON-NLS-1$
-   private static final String ATTR_GROUP_GRID_SIZE               = "groupGridSize";                       //$NON-NLS-1$
+   private static final String ATTR_IS_SHOW_TOUR_MARKER              = "isShowTourMarker";                    //$NON-NLS-1$
+   private static final String ATTR_IS_GROUP_DUPLICATED_MARKERS      = "isGroupDuplicatedMarkers";            //$NON-NLS-1$
+   private static final String ATTR_GROUPED_MARKERS                  = "groupedLabels";                       //$NON-NLS-1$
+   private static final String ATTR_GROUP_GRID_SIZE                  = "groupGridSize";                       //$NON-NLS-1$
    //
-   private static final String TAG_TOUR_MARKER_FILL_COLOR         = "TourMarkerFillColor";                 //$NON-NLS-1$
-   private static final String TAG_TOUR_MARKER_OUTLINE_COLOR      = "TourMarkerOutlineColor";              //$NON-NLS-1$
+   private static final String TAG_TOUR_MARKER_FILL_COLOR            = "TourMarkerFillColor";                 //$NON-NLS-1$
+   private static final String TAG_TOUR_MARKER_OUTLINE_COLOR         = "TourMarkerOutlineColor";              //$NON-NLS-1$
    // tour marker cluster
-   private static final String ATTR_IS_TOUR_MARKER_CLUSTERED      = "isTourMarkerClustered";               //$NON-NLS-1$
-   private static final String ATTR_IS_CLUSTER_FILL_OPACITY       = "isClusterFillOpacity";                //$NON-NLS-1$
+   private static final String ATTR_IS_TOUR_MARKER_CLUSTERED         = "isTourMarkerClustered";               //$NON-NLS-1$
+   private static final String ATTR_IS_CLUSTER_FILL_OPACITY          = "isClusterFillOpacity";                //$NON-NLS-1$
    //
-   private static final String ATTR_CLUSTER_GRID_SIZE             = "clusterGridSize";                     //$NON-NLS-1$
-   private static final String ATTR_CLUSTER_OUTLINE_WIDTH         = "clusterOutlineWidth";                 //$NON-NLS-1$
-   private static final String ATTR_CLUSTER_SYMBOL_SIZE           = "clusterSymbolSize";                   //$NON-NLS-1$
+   private static final String ATTR_CLUSTER_GRID_SIZE                = "clusterGridSize";                     //$NON-NLS-1$
+   private static final String ATTR_CLUSTER_OUTLINE_WIDTH            = "clusterOutlineWidth";                 //$NON-NLS-1$
+   private static final String ATTR_CLUSTER_SYMBOL_SIZE              = "clusterSymbolSize";                   //$NON-NLS-1$
    //
-   private static final String TAG_CLUSTER_FILL_COLOR             = "ClusterFillColor";                    //$NON-NLS-1$
-   private static final String TAG_CLUSTER_OUTLINE_COLOR          = "ClusterOutlineColor";                 //$NON-NLS-1$
+   private static final String TAG_CLUSTER_FILL_COLOR                = "ClusterFillColor";                    //$NON-NLS-1$
+   private static final String TAG_CLUSTER_OUTLINE_COLOR             = "ClusterOutlineColor";                 //$NON-NLS-1$
    // tour pauses
-   private static final String ATTR_IS_SHOW_TOUR_PAUSES           = "isShowTourPauses";                    //$NON-NLS-1$
-   private static final String ATTR_IS_FILTER_TOUR_PAUSES         = "isFilterTourPauses";                  //$NON-NLS-1$
-   private static final String ATTR_IS_FILTER_PAUSE_DURATION      = "isFilterPauseDuration";               //$NON-NLS-1$
-   private static final String ATTR_IS_SHOW_AUTO_PAUSES           = "isShowAutoPauses";                    //$NON-NLS-1$
-   private static final String ATTR_IS_SHOW_USER_PAUSES           = "isShowUserPauses";                    //$NON-NLS-1$
-   private static final String ATTR_DURATION_FILTER_HOURS         = "tourPause_DurationFilter_Hours";      //$NON-NLS-1$
-   private static final String ATTR_DURATION_FILTER_MINUTES       = "tourPause_DurationFilter_Minutes";    //$NON-NLS-1$
-   private static final String ATTR_DURATION_FILTER_SECONDS       = "tourPause_DurationFilter_Seconds";    //$NON-NLS-1$
-   private static final String ATTR_DURATION_FILTER_SUMMARIZED    = "tourPause_DurationFilter_Summarized"; //$NON-NLS-1$
-   private static final String ATTR_DURATION_OPERATOR             = "tourPause_DurationFilter_Operator";   //$NON-NLS-1$
-   private static final String ATTR_USE_DURATION_FILTER_HOURS     = "useTourPause_DurationFilter_Hours";   //$NON-NLS-1$
-   private static final String ATTR_USE_DURATION_FILTER_MINUTES   = "useTourPause_DurationFilter_Minutes"; //$NON-NLS-1$
-   private static final String ATTR_USE_DURATION_FILTER_SECONDS   = "useTourPause_DurationFilter_Seconds"; //$NON-NLS-1$
+   private static final String ATTR_IS_SHOW_TOUR_PAUSES              = "isShowTourPauses";                    //$NON-NLS-1$
+   private static final String ATTR_IS_FILTER_TOUR_PAUSES            = "isFilterTourPauses";                  //$NON-NLS-1$
+   private static final String ATTR_IS_FILTER_PAUSE_DURATION         = "isFilterPauseDuration";               //$NON-NLS-1$
+   private static final String ATTR_IS_SHOW_AUTO_PAUSES              = "isShowAutoPauses";                    //$NON-NLS-1$
+   private static final String ATTR_IS_SHOW_USER_PAUSES              = "isShowUserPauses";                    //$NON-NLS-1$
+   private static final String ATTR_DURATION_FILTER_HOURS            = "tourPause_DurationFilter_Hours";      //$NON-NLS-1$
+   private static final String ATTR_DURATION_FILTER_MINUTES          = "tourPause_DurationFilter_Minutes";    //$NON-NLS-1$
+   private static final String ATTR_DURATION_FILTER_SECONDS          = "tourPause_DurationFilter_Seconds";    //$NON-NLS-1$
+   private static final String ATTR_DURATION_FILTER_SUMMARIZED       = "tourPause_DurationFilter_Summarized"; //$NON-NLS-1$
+   private static final String ATTR_DURATION_OPERATOR                = "tourPause_DurationFilter_Operator";   //$NON-NLS-1$
+   private static final String ATTR_USE_DURATION_FILTER_HOURS        = "useTourPause_DurationFilter_Hours";   //$NON-NLS-1$
+   private static final String ATTR_USE_DURATION_FILTER_MINUTES      = "useTourPause_DurationFilter_Minutes"; //$NON-NLS-1$
+   private static final String ATTR_USE_DURATION_FILTER_SECONDS      = "useTourPause_DurationFilter_Seconds"; //$NON-NLS-1$
    //
-   private static final String TAG_TOUR_PAUSE_FILL_COLOR          = "TourPauseFillColor";                  //$NON-NLS-1$
-   private static final String TAG_TOUR_PAUSE_OUTLINE_COLOR       = "TourPauseOutlineColor";               //$NON-NLS-1$
+   private static final String TAG_TOUR_PAUSE_FILL_COLOR             = "TourPauseFillColor";                  //$NON-NLS-1$
+   private static final String TAG_TOUR_PAUSE_OUTLINE_COLOR          = "TourPauseOutlineColor";               //$NON-NLS-1$
    //
    /*
     * Defaults, min/max
     */
    // marker
-   static final int                            LABEL_GROUP_GRID_SIZE_MIN            = 50;
-   static final int                            LABEL_GROUP_GRID_SIZE_MAX            = 1000;
-   static final int                            LABEL_GROUP_GRID_SIZE_DEFAULT        = 300;
-   public static final MapLabelLayout          LABEL_LAYOUT_DEFAULT                 = MapLabelLayout.RECTANGLE_BOX;
-   static final int                            LABEL_DISTRIBUTOR_MAX_LABELS_MIN     = 10;
-   static final int                            LABEL_DISTRIBUTOR_MAX_LABELS_MAX     = 2000;
-   static final int                            LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT = 200;
-   static final int                            LABEL_DISTRIBUTOR_RADIUS_MIN         = 10;
-   static final int                            LABEL_DISTRIBUTOR_RADIUS_MAX         = 2000;
-   static final int                            LABEL_DISTRIBUTOR_RADIUS_DEFAULT     = 100;
-   static final int                            LABEL_TRUNCATE_LENGTH_MIN            = 0;
-   static final int                            LABEL_TRUNCATE_LENGTH_MAX            = 1000;
-   static final int                            LABEL_TRUNCATE_LENGTH_DEFAULT        = 40;
-   static final int                            LABEL_WRAP_LENGTH_MIN                = 1;
-   static final int                            LABEL_WRAP_LENGTH_MAX                = 1000;
-   static final int                            LABEL_WRAP_LENGTH_DEFAULT            = 40;
+   static final int                            LABEL_GROUP_GRID_SIZE_MIN               = 50;
+   static final int                            LABEL_GROUP_GRID_SIZE_MAX               = 1000;
+   static final int                            LABEL_GROUP_GRID_SIZE_DEFAULT           = 300;
+   public static final MapLabelLayout          LABEL_LAYOUT_DEFAULT                    = MapLabelLayout.RECTANGLE_BOX;
+   static final int                            LABEL_DISTRIBUTOR_MAX_LABELS_MIN        = 10;
+   static final int                            LABEL_DISTRIBUTOR_MAX_LABELS_MAX        = 2000;
+   static final int                            LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT    = 200;
+   static final int                            LABEL_DISTRIBUTOR_RADIUS_MIN            = 10;
+   static final int                            LABEL_DISTRIBUTOR_RADIUS_MAX            = 2000;
+   static final int                            LABEL_DISTRIBUTOR_RADIUS_DEFAULT        = 100;
+   static final int                            LABEL_TRUNCATE_LENGTH_MIN               = 0;
+   static final int                            LABEL_TRUNCATE_LENGTH_MAX               = 1000;
+   static final int                            LABEL_TRUNCATE_LENGTH_DEFAULT           = 40;
+   static final int                            LABEL_WRAP_LENGTH_MIN                   = 1;
+   static final int                            LABEL_WRAP_LENGTH_MAX                   = 1000;
+   static final int                            LABEL_WRAP_LENGTH_DEFAULT               = 40;
    // cluster
-   public static final boolean                 DEFAULT_IS_FILL_CLUSTER_SYMBOL       = true;
-   public static final int                     DEFAULT_CLUSTER_GRID_SIZE            = 50;
-   public static final int                     DEFAULT_CLUSTER_SYMBOL_SIZE          = 8;
-   public static final int                     DEFAULT_CLUSTER_OUTLINE_WIDTH        = 1;
-   public static final int                     CLUSTER_GRID_SIZE_MIN                = 1;
-   public static final int                     CLUSTER_GRID_SIZE_MAX                = 10000;
-   public static final int                     CLUSTER_OUTLINE_WIDTH_MIN            = 0;
-   public static final int                     CLUSTER_OUTLINE_WIDTH_MAX            = 10;
-   public static final int                     CLUSTER_SYMBOL_SIZE_MIN              = 5;
-   public static final int                     CLUSTER_SYMBOL_SIZE_MAX              = 200;
+   public static final boolean                 DEFAULT_IS_FILL_CLUSTER_SYMBOL          = true;
+   public static final int                     DEFAULT_CLUSTER_GRID_SIZE               = 50;
+   public static final int                     DEFAULT_CLUSTER_SYMBOL_SIZE             = 8;
+   public static final int                     DEFAULT_CLUSTER_OUTLINE_WIDTH           = 1;
+   public static final int                     CLUSTER_GRID_SIZE_MIN                   = 1;
+   public static final int                     CLUSTER_GRID_SIZE_MAX                   = 10000;
+   public static final int                     CLUSTER_OUTLINE_WIDTH_MIN               = 0;
+   public static final int                     CLUSTER_OUTLINE_WIDTH_MAX               = 10;
+   public static final int                     CLUSTER_SYMBOL_SIZE_MIN                 = 5;
+   public static final int                     CLUSTER_SYMBOL_SIZE_MAX                 = 200;
    // colors
-   public static final RGB                     DEFAULT_CLUSTER_FILL_RGB             = new RGB(0, 160, 237);
-   public static final RGB                     DEFAULT_CLUSTER_OUTLINE_RGB          = new RGB(255, 255, 255);
-   public static final RGB                     DEFAULT_COMMON_LOCATION_FILL_RGB     = new RGB(170, 213, 255);
-   public static final RGB                     DEFAULT_COMMON_LOCATION_OUTLINE_RGB  = new RGB(0, 0, 0);
-   public static final RGB                     DEFAULT_TOUR_LOCATION_FILL_RGB       = new RGB(255, 206, 243);
-   public static final RGB                     DEFAULT_TOUR_LOCATION_OUTLINE_RGB    = new RGB(0, 0, 0);
-   public static final RGB                     DEFAULT_TOUR_MARKER_FILL_RGB         = new RGB(208, 236, 134);
-   public static final RGB                     DEFAULT_TOUR_MARKER_OUTLINE_RGB      = new RGB(0, 0, 0);
-   public static final RGB                     DEFAULT_TOUR_PAUSE_FILL_RGB          = new RGB(255, 224, 179);
-   public static final RGB                     DEFAULT_TOUR_PAUSE_OUTLINE_RGB       = new RGB(0, 0, 0);
+   public static final RGB                     DEFAULT_CLUSTER_FILL_RGB                = new RGB(0, 160, 237);
+   public static final RGB                     DEFAULT_CLUSTER_OUTLINE_RGB             = new RGB(255, 255, 255);
+   public static final RGB                     DEFAULT_COMMON_LOCATION_FILL_RGB        = new RGB(170, 213, 255);
+   public static final RGB                     DEFAULT_COMMON_LOCATION_OUTLINE_RGB     = new RGB(0, 0, 0);
+   public static final RGB                     DEFAULT_TOUR_LOCATION_FILL_RGB          = new RGB(228, 244, 185);
+   public static final RGB                     DEFAULT_TOUR_LOCATION_OUTLINE_RGB       = new RGB(0, 0, 0);
+   public static final RGB                     DEFAULT_TOUR_LOCATION_START_FILL_RGB    = new RGB(255, 206, 207);
+   public static final RGB                     DEFAULT_TOUR_LOCATION_START_OUTLINE_RGB = new RGB(0, 0, 0);
+   public static final RGB                     DEFAULT_TOUR_LOCATION_END_FILL_RGB      = new RGB(255, 253, 179);
+   public static final RGB                     DEFAULT_TOUR_LOCATION_END_OUTLINE_RGB   = new RGB(0, 0, 0);
+   public static final RGB                     DEFAULT_TOUR_MARKER_FILL_RGB            = new RGB(208, 236, 134);
+   public static final RGB                     DEFAULT_TOUR_MARKER_OUTLINE_RGB         = new RGB(0, 0, 0);
+   public static final RGB                     DEFAULT_TOUR_PAUSE_FILL_RGB             = new RGB(208, 236, 134);
+   public static final RGB                     DEFAULT_TOUR_PAUSE_OUTLINE_RGB          = new RGB(0, 0, 0);
    //
-   public static final boolean                 IS_FILTER_TOUR_PAUSES_DEFAULT        = false;
-   public static final boolean                 IS_FILTER_PAUSE_DURATION_DEFAULT     = false;
-   public static final boolean                 IS_SHOW_AUTO_PAUSES_DEFAULT          = true;
-   public static final boolean                 IS_SHOW_USER_PAUSES_DEFAULT          = true;
-   public static final int                     DURATION_FILTER_HOURS_DEFAULT        = 1;
-   public static final int                     DURATION_FILTER_MINUTES_DEFAULT      = 1;
-   public static final int                     DURATION_FILTER_SECONDS_DEFAULT      = 5;
-   public static final TourFilterFieldOperator DURATION_OPERATOR_DEFAULT            = TourFilterFieldOperator.LESS_THAN_OR_EQUAL;
-   public static final boolean                 USE_DURATION_FILTER_HOURS_DEFAULT    = false;
-   public static final boolean                 USE_DURATION_FILTER_MINUTES_DEFAULT  = false;
-   public static final boolean                 USE_DURATION_FILTER_SECONDS_DEFAULT  = true;
+   public static final boolean                 IS_FILTER_TOUR_PAUSES_DEFAULT           = false;
+   public static final boolean                 IS_FILTER_PAUSE_DURATION_DEFAULT        = false;
+   public static final boolean                 IS_SHOW_AUTO_PAUSES_DEFAULT             = true;
+   public static final boolean                 IS_SHOW_USER_PAUSES_DEFAULT             = true;
+   public static final int                     DURATION_FILTER_HOURS_DEFAULT           = 1;
+   public static final int                     DURATION_FILTER_MINUTES_DEFAULT         = 1;
+   public static final int                     DURATION_FILTER_SECONDS_DEFAULT         = 5;
+   public static final TourFilterFieldOperator DURATION_OPERATOR_DEFAULT               = TourFilterFieldOperator.LESS_THAN_OR_EQUAL;
+   public static final boolean                 USE_DURATION_FILTER_HOURS_DEFAULT       = false;
+   public static final boolean                 USE_DURATION_FILTER_MINUTES_DEFAULT     = false;
+   public static final boolean                 USE_DURATION_FILTER_SECONDS_DEFAULT     = true;
    //
    /**
     * Contains all configurations which are loaded from a xml file.
     */
-   private static final ArrayList<Map2Config>  _allMapPointConfigs                  = new ArrayList<>();
+   private static final ArrayList<Map2Config>  _allMapPointConfigs                     = new ArrayList<>();
    private static Map2Config                   _activeMapPointConfig;
    //
    private static String                       _fromXml_ActiveMapPointConfigId;
@@ -224,10 +232,13 @@ public class Map2ConfigManager {
 
       _allMapPointConfigs.clear();
 
-      // append custom configurations
-      for (int configIndex = 1; configIndex < 11; configIndex++) {
-         _allMapPointConfigs.add(createDefaults_MapPoints_One(configIndex));
-      }
+      // currently only 1 config is supported
+      _allMapPointConfigs.add(createDefaults_MapPoints_One(1));
+
+//      // append custom configurations
+//      for (int configIndex = 1; configIndex < 11; configIndex++) {
+//         _allMapPointConfigs.add(createDefaults_MapPoints_One(configIndex));
+//      }
    }
 
    /**
@@ -328,6 +339,10 @@ public class Map2ConfigManager {
 
          Util.setXmlRgb(xmlConfig,  TAG_TOUR_LOCATION_FILL_COLOR,                config.tourLocationFill_RGB);
          Util.setXmlRgb(xmlConfig,  TAG_TOUR_LOCATION_OUTLINE_COLOR,             config.tourLocationOutline_RGB);
+         Util.setXmlRgb(xmlConfig,  TAG_TOUR_LOCATION_START_FILL_COLOR,          config.tourLocation_StartFill_RGB);
+         Util.setXmlRgb(xmlConfig,  TAG_TOUR_LOCATION_START_OUTLINE_COLOR,       config.tourLocation_StartOutline_RGB);
+         Util.setXmlRgb(xmlConfig,  TAG_TOUR_LOCATION_END_FILL_COLOR,            config.tourLocation_EndFill_RGB);
+         Util.setXmlRgb(xmlConfig,  TAG_TOUR_LOCATION_END_OUTLINE_COLOR,         config.tourLocation_EndOutline_RGB);
 
          /*
           * Tour marker
@@ -510,7 +525,7 @@ public class Map2ConfigManager {
       config.tourPauseDurationFilter_Minutes       = Util.getXmlInteger(xmlConfig,  ATTR_DURATION_FILTER_MINUTES,       DURATION_FILTER_MINUTES_DEFAULT);
       config.tourPauseDurationFilter_Seconds       = Util.getXmlInteger(xmlConfig,  ATTR_DURATION_FILTER_SECONDS,       DURATION_FILTER_SECONDS_DEFAULT);
 
-      config.tourPauseDuration    = Util.getXmlLong(xmlConfig, ATTR_DURATION_FILTER_SUMMARIZED,        0L);
+      config.tourPauseDuration                     = Util.getXmlLong(xmlConfig, ATTR_DURATION_FILTER_SUMMARIZED,        0L);
       config.tourPauseDurationFilter_Operator      = (TourFilterFieldOperator) Util.getXmlEnum(xmlConfig, ATTR_DURATION_OPERATOR,                 DURATION_OPERATOR_DEFAULT);
 
 // SET_FORMATTING_ON
@@ -527,20 +542,24 @@ public class Map2ConfigManager {
 
 // SET_FORMATTING_OFF
 
-         case TAG_CLUSTER_FILL_COLOR:                    config.clusterFill_RGB                    = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_FILL_RGB);                     break;
-         case TAG_CLUSTER_OUTLINE_COLOR:                 config.clusterOutline_RGB                 = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_OUTLINE_RGB);                  break;
+         case TAG_CLUSTER_FILL_COLOR:                    config.clusterFill_RGB                    = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_FILL_RGB);                   break;
+         case TAG_CLUSTER_OUTLINE_COLOR:                 config.clusterOutline_RGB                 = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_OUTLINE_RGB);                break;
 
-         case TAG_COMMON_LOCATION_FILL_COLOR:            config.commonLocationFill_RGB             = Util.getXmlRgb(xmlConfigChild, DEFAULT_COMMON_LOCATION_FILL_RGB);             break;
-         case TAG_COMMON_LOCATION_OUTLINE_COLOR:         config.commonLocationOutline_RGB          = Util.getXmlRgb(xmlConfigChild, DEFAULT_COMMON_LOCATION_OUTLINE_RGB);          break;
+         case TAG_COMMON_LOCATION_FILL_COLOR:            config.commonLocationFill_RGB             = Util.getXmlRgb(xmlConfigChild, DEFAULT_COMMON_LOCATION_FILL_RGB);           break;
+         case TAG_COMMON_LOCATION_OUTLINE_COLOR:         config.commonLocationOutline_RGB          = Util.getXmlRgb(xmlConfigChild, DEFAULT_COMMON_LOCATION_OUTLINE_RGB);        break;
 
-         case TAG_TOUR_LOCATION_FILL_COLOR:              config.tourLocationFill_RGB               = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_LOCATION_FILL_RGB);               break;
-         case TAG_TOUR_LOCATION_OUTLINE_COLOR:           config.tourLocationOutline_RGB            = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_LOCATION_OUTLINE_RGB);            break;
+         case TAG_TOUR_LOCATION_FILL_COLOR:              config.tourLocationFill_RGB               = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_LOCATION_FILL_RGB);             break;
+         case TAG_TOUR_LOCATION_OUTLINE_COLOR:           config.tourLocationOutline_RGB            = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_LOCATION_OUTLINE_RGB);          break;
+         case TAG_TOUR_LOCATION_START_FILL_COLOR:        config.tourLocation_StartFill_RGB         = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_LOCATION_START_FILL_RGB);       break;
+         case TAG_TOUR_LOCATION_START_OUTLINE_COLOR:     config.tourLocation_StartOutline_RGB      = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_LOCATION_START_OUTLINE_RGB);    break;
+         case TAG_TOUR_LOCATION_END_FILL_COLOR:          config.tourLocation_EndFill_RGB           = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_LOCATION_END_FILL_RGB);         break;
+         case TAG_TOUR_LOCATION_END_OUTLINE_COLOR:       config.tourLocation_EndOutline_RGB        = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_LOCATION_END_OUTLINE_RGB);      break;
 
-         case TAG_TOUR_MARKER_FILL_COLOR:                config.tourMarkerFill_RGB                 = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_MARKER_FILL_RGB);                 break;
-         case TAG_TOUR_MARKER_OUTLINE_COLOR:             config.tourMarkerOutline_RGB              = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_MARKER_OUTLINE_RGB);              break;
+         case TAG_TOUR_MARKER_FILL_COLOR:                config.tourMarkerFill_RGB                 = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_MARKER_FILL_RGB);               break;
+         case TAG_TOUR_MARKER_OUTLINE_COLOR:             config.tourMarkerOutline_RGB              = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_MARKER_OUTLINE_RGB);            break;
 
-         case TAG_TOUR_PAUSE_FILL_COLOR:                 config.tourPauseFill_RGB                  = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_PAUSE_FILL_RGB);                  break;
-         case TAG_TOUR_PAUSE_OUTLINE_COLOR:              config.tourPauseOutline_RGB               = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_PAUSE_OUTLINE_RGB);               break;
+         case TAG_TOUR_PAUSE_FILL_COLOR:                 config.tourPauseFill_RGB                  = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_PAUSE_FILL_RGB);                break;
+         case TAG_TOUR_PAUSE_OUTLINE_COLOR:              config.tourPauseOutline_RGB               = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_PAUSE_OUTLINE_RGB);             break;
 
 // SET_FORMATTING_ON
          }

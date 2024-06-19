@@ -101,7 +101,20 @@ public class Map2Point implements ClusterItem {
 
       case COMMON_LOCATION:   return mapConfig.commonLocationFill_Color;
 
-      case TOUR_LOCATION:     return mapConfig.tourLocationFill_Color;
+      case TOUR_LOCATION:
+
+         if (numDuplicates_Start > 0 && numDuplicates_End == 0) {
+
+            return mapConfig.tourLocation_StartFill_Color;
+
+         } else if (numDuplicates_End > 0 && numDuplicates_Start == 0) {
+
+            return mapConfig.tourLocation_EndFill_Color;
+
+         } else {
+
+            return mapConfig.tourLocationFill_Color;
+         }
 
       case TOUR_PAUSE:        return mapConfig.tourPauseFill_Color;
 
@@ -148,7 +161,21 @@ public class Map2Point implements ClusterItem {
 
       case COMMON_LOCATION:   return mapConfig.commonLocationOutline_Color;
 
-      case TOUR_LOCATION:     return mapConfig.tourLocationOutline_Color;
+      case TOUR_LOCATION:
+
+         if (numDuplicates_Start > 0 && numDuplicates_End == 0) {
+
+            return mapConfig.tourLocation_StartOutline_Color;
+
+         } else if (numDuplicates_End > 0 && numDuplicates_Start == 0) {
+
+            return mapConfig.tourLocation_EndOutline_Color;
+
+         } else {
+
+            return mapConfig.tourLocationOutline_Color;
+         }
+
       case TOUR_PAUSE:        return mapConfig.tourPauseOutline_Color;
 
       default:
