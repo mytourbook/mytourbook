@@ -2478,10 +2478,10 @@ public class ColumnManager {
 
       if (colDef == null) {
 
-         final String errorMessage = String.format("\"colDef\" is null for columnId = \"%s\"", columnId); //$NON-NLS-1$
-
-         System.out.println(errorMessage);
-// TODO remove SYSTEM.OUT.PRINTLN
+//         final String errorMessage = String.format("\"colDef\" is null for columnId = \"%s\"", columnId); //$NON-NLS-1$
+//
+//         System.out.println(errorMessage);
+//// TODO remove SYSTEM.OUT.PRINTLN
 
 //         StatusUtil.log(new Throwable(errorMessage));
 
