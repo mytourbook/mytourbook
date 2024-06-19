@@ -2325,16 +2325,16 @@ public class ColumnManager {
       final ArrayList<String> allOrderedColumnIds = new ArrayList<>();
       final ArrayList<String> allColumnIdsAndWidth = new ArrayList<>();
 
-// TODO
-      System.out.println("All columns in _allDefinedColumnDefinitions, number of entries: " + _allDefinedColumnDefinitions.size()); //$NON-NLS-1$
-      System.out.println();
-
-      for (final ColumnDefinition colDefLog : _allDefinedColumnDefinitions) {
-         System.out.println("  \"" + colDefLog.getColumnId() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
-      }
-
-      System.out.println();
-      System.out.println();
+//// TODO
+//      System.out.println("All columns in _allDefinedColumnDefinitions, number of entries: " + _allDefinedColumnDefinitions.size()); //$NON-NLS-1$
+//      System.out.println();
+//
+//      for (final ColumnDefinition colDefLog : _allDefinedColumnDefinitions) {
+//         System.out.println("  \"" + colDefLog.getColumnId() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+//      }
+//
+//      System.out.println();
+//      System.out.println();
 
       for (int uiColumnPos = 0; uiColumnPos < numColumns; uiColumnPos++) {
 
@@ -2478,10 +2478,10 @@ public class ColumnManager {
 
       if (colDef == null) {
 
-         final String errorMessage = String.format("\"colDef\" is null for columnId = \"%s\"", columnId); //$NON-NLS-1$
-
-         System.out.println(errorMessage);
-// TODO remove SYSTEM.OUT.PRINTLN
+//         final String errorMessage = String.format("\"colDef\" is null for columnId = \"%s\"", columnId); //$NON-NLS-1$
+//
+//         System.out.println(errorMessage);
+//// TODO remove SYSTEM.OUT.PRINTLN
 
 //         StatusUtil.log(new Throwable(errorMessage));
 

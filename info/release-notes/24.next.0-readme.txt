@@ -18,11 +18,6 @@ TODO's
 * Update fulltext url https://lucene.apache.org/core/7_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Wildcard_Searches
   in https://mytourbook.sourceforge.io/mytourbook/index.php/documentation/show-tours/search
 
-* Remove debug code in ColumnManager.java
-   // TODO
-      System.out.println("All columns in _allDefinedColumnDefinitions, number of entries: " + _allDefinedColumnDefinitions.size());
-      System.out.println();
-
 
 * Maybe replace "Display.getDefault()" with "PlatformUI.getWorkbench().getDisplay()"
   "Code should always ask the workbench for the display rather than rely on Display.getDefault()"
