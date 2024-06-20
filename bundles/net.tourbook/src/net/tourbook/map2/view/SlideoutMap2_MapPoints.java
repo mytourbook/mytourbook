@@ -25,6 +25,8 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionResetToDefaults;
+import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.color.ThemeUtil;
@@ -70,8 +72,10 @@ import org.eclipse.swt.widgets.ToolItem;
  * Slideout for all 2D map locations and marker
  */
 public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
+
       IColorSelectorListener,
-      IChangeUIListener {
+      IChangeUIListener,
+      IActionResetToDefault {
 
    //
    private static final String            STATE_EXPANDED_HEIGHT       = "STATE_EXPANDED_HEIGHT";         //$NON-NLS-1$
@@ -121,6 +125,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private IPropertyChangeListener        _prefChangeListener;
    //
    private ActionExpandSlideout           _actionExpandCollapseSlideout;
+   private ActionResetToDefaults          _actionRestoreDefaults;
    private ActionStatistic_CommonLocation _actionStatistic_CommonLocation;
    private ActionStatistic_TourLocation   _actionStatistic_TourLocation;
    private ActionStatistic_TourMarker     _actionStatistic_TourMarker;
@@ -438,6 +443,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private void createActions() {
 
       _actionExpandCollapseSlideout = new ActionExpandSlideout();
+      _actionRestoreDefaults = new ActionResetToDefaults(this);
 
       _actionStatistic_CommonLocation = new ActionStatistic_CommonLocation();
       _actionStatistic_TourMarker = new ActionStatistic_TourMarker();
@@ -1355,9 +1361,11 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       final String tooltipPauses = Messages.Slideout_MapPoints_Label_Stats_TourPauses;
 
       _statisticsContainer = new Composite(shellContainer, SWT.NONE);
-      GridDataFactory.fillDefaults().align(SWT.FILL, SWT.END).applyTo(_statisticsContainer);
-      GridLayoutFactory.fillDefaults().numColumns(12).applyTo(_statisticsContainer);
-//      _statisticsContainer.setBackground(UI.SYS_COLOR_GREEN);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .applyTo(_statisticsContainer);
+      GridLayoutFactory.fillDefaults().numColumns(13).applyTo(_statisticsContainer);
+//      _statisticsContainer.setBackground(UI.SYS_COLOR_YELLOW);
       {
          {
             /*
@@ -1377,8 +1385,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             /*
              * Tour pauses
              */
-            final ToolBar toolbarAction = UI.createToolbarAction(_statisticsContainer, _actionStatistic_TourPause);
-            GridDataFactory.fillDefaults().indent(horizontalSpacing, 0).applyTo(toolbarAction);
+            final ToolBar actionToolbar = UI.createToolbarAction(_statisticsContainer, _actionStatistic_TourPause);
+            GridDataFactory.fillDefaults().indent(horizontalSpacing, 0).applyTo(actionToolbar);
 
             _lblStats_TourPauses_Visible = new Label(_statisticsContainer, SWT.TRAIL);
             _lblStats_TourPauses_Visible.setToolTipText(tooltipPauses);
@@ -1392,8 +1400,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             /*
              * Tour locations
              */
-            final ToolBar toolbarAction = UI.createToolbarAction(_statisticsContainer, _actionStatistic_TourLocation);
-            GridDataFactory.fillDefaults().indent(horizontalSpacing, 0).applyTo(toolbarAction);
+            final ToolBar actionToolbar = UI.createToolbarAction(_statisticsContainer, _actionStatistic_TourLocation);
+            GridDataFactory.fillDefaults().indent(horizontalSpacing, 0).applyTo(actionToolbar);
 
             _lblStats_TourLocations_Visible = new Label(_statisticsContainer, SWT.TRAIL);
             _lblStats_TourLocations_Visible.setToolTipText(tooltipTourLocations);
@@ -1407,8 +1415,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             /*
              * Common locations
              */
-            final ToolBar toolbarAction = UI.createToolbarAction(_statisticsContainer, _actionStatistic_CommonLocation);
-            GridDataFactory.fillDefaults().indent(horizontalSpacing, 0).applyTo(toolbarAction);
+            final ToolBar actionToolbar = UI.createToolbarAction(_statisticsContainer, _actionStatistic_CommonLocation);
+            GridDataFactory.fillDefaults().indent(horizontalSpacing, 0).applyTo(actionToolbar);
 
             _lblStats_CommonLocations_Visible = new Label(_statisticsContainer, SWT.TRAIL);
             _lblStats_CommonLocations_Visible.setToolTipText(tooltipCommonLocations);
@@ -1417,6 +1425,20 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _lblStats_CommonLocations_All = new Label(_statisticsContainer, SWT.TRAIL);
             _lblStats_CommonLocations_All.setToolTipText(tooltipCommonLocations);
             gd.applyTo(_lblStats_CommonLocations_All);
+         }
+         {
+            /*
+             * Reset values
+             */
+            final ToolBar actionToolbar = UI.createToolbarAction(_statisticsContainer, _actionRestoreDefaults);
+            GridDataFactory.fillDefaults()
+                  .indent(10, 0)
+
+                  // this is sometimes not working !!!
+                  .grab(true, false)
+                  .align(SWT.END, SWT.FILL)
+
+                  .applyTo(actionToolbar);
          }
       }
    }
@@ -1443,7 +1465,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       final boolean isShowClusteredMarker    = isShowTourMarker && isMarkerClustered;
       final boolean isShowLabels             = isShowTourMarker || isShowTourLocations || isShowTourPauses || isShowCommonLocations;
 
-      _colorMapTransparencyColor.setEnabled(isDimMap == false || isUseTransparencyColor);
+      _colorMapTransparencyColor             .setEnabled(isDimMap == false || isUseTransparencyColor);
 
       // statistics
       _lblStats_CommonLocations_All          .setEnabled(isShowCommonLocations);
@@ -1887,6 +1909,19 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       map2.paint();
    }
 
+   @Override
+   public void resetToDefaults() {
+
+      _tourPausesUI.resetToDefaults();
+
+      Map2ConfigManager.resetActiveMapPointConfiguration();
+
+      restoreState();
+      enableControls();
+
+      repaintMap();
+   }
+
    private void restoreState() {
 
       final Map2Config config = Map2ConfigManager.getActiveConfig();
@@ -1966,6 +2001,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _actionStatistic_TourPause       .setChecked(config.isShowTourPauses);
 
 // SET_FORMATTING_ON
+
+      _tourPausesUI.restoreState();
 
       selectMarkerLabelLayout(config.labelLayout);
 
@@ -2133,7 +2170,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    public void updateUI() {
 
       restoreState();
-
       enableControls();
    }
 

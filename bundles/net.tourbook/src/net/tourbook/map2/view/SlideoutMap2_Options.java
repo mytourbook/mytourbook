@@ -17,7 +17,6 @@ package net.tourbook.map2.view;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.IColorSelectorListener;
@@ -32,9 +31,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -54,9 +51,7 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
    private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
    private static IDialogSettings        _state;
 
-   private IPropertyChangeListener       _defaultChangePropertyListener;
    private SelectionListener             _defaultSelectionListener;
-   private MouseWheelListener            _defaultMouseWheelListener;
 
    private ActionResetToDefaults         _actionRestoreDefaults;
 
@@ -208,14 +203,6 @@ public class SlideoutMap2_Options extends ToolbarSlideout implements
    private void initUI(final Composite parent) {
 
       _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI_UpdateMap());
-
-      _defaultChangePropertyListener = propertyChangeEvent -> onChangeUI_UpdateMap();
-
-      _defaultMouseWheelListener = mouseEvent -> {
-
-         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
-         onChangeUI_UpdateMap();
-      };
    }
 
    @Override
