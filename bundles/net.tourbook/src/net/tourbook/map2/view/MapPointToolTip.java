@@ -177,7 +177,7 @@ public class MapPointToolTip extends ToolTip {
 
                } else {
 
-                  // tourr location
+                  // tour location
 
                   locationTitle = Messages.Tour_Location_Tooltip_Title;
                }

@@ -691,24 +691,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          }
          {
             /*
-             * Wrap label
-             */
-            _chkIsWrapLabel = new Button(tabContainer, SWT.CHECK);
-            _chkIsWrapLabel.setText(Messages.Slideout_MapPoints_Checkbox_WrapLabel);
-            _chkIsWrapLabel.addSelectionListener(_markerSelectionListener);
-            gdHCenter.applyTo(_chkIsWrapLabel);
-
-            // spinner
-            _spinnerLabelWrapLength = new Spinner(tabContainer, SWT.BORDER);
-            _spinnerLabelWrapLength.setMinimum(Map2ConfigManager.LABEL_WRAP_LENGTH_MIN);
-            _spinnerLabelWrapLength.setMaximum(Map2ConfigManager.LABEL_WRAP_LENGTH_MAX);
-            _spinnerLabelWrapLength.setIncrement(1);
-            _spinnerLabelWrapLength.setPageIncrement(10);
-            _spinnerLabelWrapLength.addSelectionListener(_markerSelectionListener);
-            _spinnerLabelWrapLength.addMouseWheelListener(_markerMouseWheelListener10);
-         }
-         {
-            /*
              * Truncate label
              */
             _chkIsTruncateLabel = new Button(tabContainer, SWT.CHECK);
@@ -724,6 +706,24 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _spinnerLabelTruncateLength.setPageIncrement(10);
             _spinnerLabelTruncateLength.addSelectionListener(_markerSelectionListener);
             _spinnerLabelTruncateLength.addMouseWheelListener(_markerMouseWheelListener);
+         }
+         {
+            /*
+             * Wrap label
+             */
+            _chkIsWrapLabel = new Button(tabContainer, SWT.CHECK);
+            _chkIsWrapLabel.setText(Messages.Slideout_MapPoints_Checkbox_WrapLabel);
+            _chkIsWrapLabel.addSelectionListener(_markerSelectionListener);
+            gdHCenter.applyTo(_chkIsWrapLabel);
+
+            // spinner
+            _spinnerLabelWrapLength = new Spinner(tabContainer, SWT.BORDER);
+            _spinnerLabelWrapLength.setMinimum(Map2ConfigManager.LABEL_WRAP_LENGTH_MIN);
+            _spinnerLabelWrapLength.setMaximum(Map2ConfigManager.LABEL_WRAP_LENGTH_MAX);
+            _spinnerLabelWrapLength.setIncrement(1);
+            _spinnerLabelWrapLength.setPageIncrement(10);
+            _spinnerLabelWrapLength.addSelectionListener(_markerSelectionListener);
+            _spinnerLabelWrapLength.addMouseWheelListener(_markerMouseWheelListener10);
          }
          {
             /*
@@ -779,14 +779,14 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
              */
             {
                final Label label = new Label(tabContainer, SWT.NONE);
-               label.setText(Messages.Slideout_Map_Options_Label_MapTransparencyColor);
-               label.setToolTipText(Messages.Slideout_Map_Options_Label_MapTransparencyColor_Tooltip);
+               label.setText(Messages.Slideout_MapPoints_Label_MapTransparencyColor);
+               label.setToolTipText(Messages.Slideout_MapPoints_Label_MapTransparencyColor_Tooltip);
                GridDataFactory.fillDefaults()
                      .align(SWT.BEGINNING, SWT.CENTER)
                      .applyTo(label);
 
                _colorMapTransparencyColor = new ColorSelectorExtended(tabContainer);
-               _colorMapTransparencyColor.setToolTipText(Messages.Slideout_Map_Options_Label_MapTransparencyColor_Tooltip);
+               _colorMapTransparencyColor.setToolTipText(Messages.Slideout_MapPoints_Label_MapTransparencyColor_Tooltip);
                _colorMapTransparencyColor.addListener(_markerPropertyChangeListener);
                _colorMapTransparencyColor.addOpenListener(this);
             }
@@ -795,7 +795,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                 * Use map dim color
                 */
                _chkUseMapDimColor = new Button(tabContainer, SWT.CHECK);
-               _chkUseMapDimColor.setText(Messages.Slideout_Map_Options_Checkbox_UseMapDimColor);
+               _chkUseMapDimColor.setText(Messages.Slideout_MapPoints_Checkbox_UseMapDimColor);
                _chkUseMapDimColor.addSelectionListener(_markerSelectionListener);
                gdSpan2.indent(16, 0).applyTo(_chkUseMapDimColor);
             }
@@ -884,7 +884,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
          // checkbox: Is clustering
          _chkIsMarkerClustered = new Button(parent, SWT.CHECK);
-         _chkIsMarkerClustered.setText(Messages.Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering);
+         _chkIsMarkerClustered.setText(Messages.Slideout_MapPoints_Checkbox_ClusterTourMarkers);
+         _chkIsMarkerClustered.setToolTipText(Messages.Slideout_MapPoints_Checkbox_ClusterTourMarkers_Tooltip);
          _chkIsMarkerClustered.addSelectionListener(_markerSelectionListener);
          GridDataFactory.fillDefaults()
                .span(2, 1)
@@ -1020,11 +1021,12 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             /*
              * Group duplicate markers
              */
-            _chkIsGroupMarkers = new Button(tabContainer, SWT.CHECK);
+            _chkIsGroupMarkers = new Button(tabContainer, SWT.CHECK | SWT.WRAP);
             _chkIsGroupMarkers.setText(Messages.Slideout_MapPoints_Checkbox_GroupTourMarkers_Extended);
             _chkIsGroupMarkers.addSelectionListener(_markerSelectionListener);
             GridDataFactory.fillDefaults()
                   .span(2, 1)
+                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
                   .applyTo(_chkIsGroupMarkers);
 
          }

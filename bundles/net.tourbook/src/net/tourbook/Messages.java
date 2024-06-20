@@ -2308,7 +2308,7 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Checkbox_ToggleKeyboardPanning_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_TrackOpacity;
    public static String        Slideout_Map_Options_Checkbox_TrackOpacity_Tooltip;
-   public static String        Slideout_Map_Options_Checkbox_UseMapDimColor;
+   public static String        Slideout_MapPoints_Checkbox_UseMapDimColor;
    public static String        Slideout_Map_Options_Color_DimColor_Tooltip;
    public static String        Slideout_Map_Options_Group_TourTrack;
    public static String        Slideout_Map_Options_Label_BreadcrumbItems;
@@ -2317,8 +2317,8 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Label_HoveredAndSelectedColor_Tooltip;
    public static String        Slideout_Map_Options_Label_HoveredColor;
    public static String        Slideout_Map_Options_Label_HoveredColor_Tooltip;
-   public static String        Slideout_Map_Options_Label_MapTransparencyColor;
-   public static String        Slideout_Map_Options_Label_MapTransparencyColor_Tooltip;
+   public static String        Slideout_MapPoints_Label_MapTransparencyColor;
+   public static String        Slideout_MapPoints_Label_MapTransparencyColor_Tooltip;
    public static String        Slideout_Map_Options_Label_SelectedColor;
    public static String        Slideout_Map_Options_Label_SelectedColor_Tooltip;
    public static String        Slideout_Map_Options_Label_SliderLocation_Color;
