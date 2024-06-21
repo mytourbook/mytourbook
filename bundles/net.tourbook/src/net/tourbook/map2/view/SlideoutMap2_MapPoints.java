@@ -67,6 +67,7 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * Slideout for all 2D map locations and marker
@@ -116,11 +117,11 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private ToolItem                       _toolItem;
    private ToolBarManager                 _toolbarManagerExpandCollapseSlideout;
    //
-   private SelectionListener              _markerSelectionListener;
-   private SelectionListener              _markerSelectionListener_All;
-   private IPropertyChangeListener        _markerPropertyChangeListener;
-   private MouseWheelListener             _markerMouseWheelListener;
-   private MouseWheelListener             _markerMouseWheelListener10;
+   private SelectionListener              _mapPointSelectionListener;
+   private SelectionListener              _mapPointSelectionListener_All;
+   private IPropertyChangeListener        _mapPointPropertyChangeListener;
+   private MouseWheelListener             _mapPointMouseWheelListener;
+   private MouseWheelListener             _mapPointMouseWheelListener10;
    private FocusListener                  _keepOpenListener;
    private IPropertyChangeListener        _prefChangeListener;
    //
@@ -182,7 +183,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Button                _chkIsMarkerClustered_All;
    private Button                _chkIsShowCommonLocations;
    private Button                _chkIsShowCommonLocations_All;
-   private Button                _chkIsShowMapLocations_BoundingBox;
+   private Button                _chkIsShowBoundingBox_All;
+   private Button                _chkIsShowBoundingBox_Common;
+   private Button                _chkIsShowBoundingBox_Tour;
    private Button                _chkIsShowTourLocations;
    private Button                _chkIsShowTourLocations_All;
    private Button                _chkIsShowTourMarkers;
@@ -562,7 +565,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _chkIsShowTourMarkers_All = new Button(tabContainer, SWT.CHECK);
             _chkIsShowTourMarkers_All.setText(Messages.Slideout_MapPoints_Checkbox_ShowTourMarkers);
             _chkIsShowTourMarkers_All.setImage(_imageTourMarker);
-            _chkIsShowTourMarkers_All.addSelectionListener(_markerSelectionListener_All);
+            _chkIsShowTourMarkers_All.addSelectionListener(_mapPointSelectionListener_All);
          }
          {
             /*
@@ -572,7 +575,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _chkIsGroupMarkers_All.setText(Messages.Slideout_MapPoints_Checkbox_GroupTourMarkers);
             _chkIsGroupMarkers_All.setToolTipText(Messages.Slideout_MapPoints_Checkbox_GroupTourMarkers_Tooltip);
             _chkIsGroupMarkers_All.setImage(_imageTourMarker_Group);
-            _chkIsGroupMarkers_All.addSelectionListener(_markerSelectionListener_All);
+            _chkIsGroupMarkers_All.addSelectionListener(_mapPointSelectionListener_All);
             GridDataFactory.fillDefaults().indent(UI.FORM_FIRST_COLUMN_INDENT, 0).applyTo(_chkIsGroupMarkers_All);
          }
          {
@@ -583,7 +586,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _chkIsMarkerClustered_All.setText(Messages.Slideout_MapPoints_Checkbox_ClusterTourMarkers);
             _chkIsMarkerClustered_All.setToolTipText(Messages.Slideout_MapPoints_Checkbox_ClusterTourMarkers_Tooltip);
             _chkIsMarkerClustered_All.setImage(_imageTourMarker_Cluster);
-            _chkIsMarkerClustered_All.addSelectionListener(_markerSelectionListener_All);
+            _chkIsMarkerClustered_All.addSelectionListener(_mapPointSelectionListener_All);
             GridDataFactory.fillDefaults().indent(UI.FORM_FIRST_COLUMN_INDENT, 0).applyTo(_chkIsMarkerClustered_All);
 
          }
@@ -594,7 +597,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _chkIsShowTourPauses_All = new Button(tabContainer, SWT.CHECK);
             _chkIsShowTourPauses_All.setText(Messages.Slideout_MapPoints_Checkbox_ShowTourPauses);
             _chkIsShowTourPauses_All.setImage(_imageTourPauses);
-            _chkIsShowTourPauses_All.addSelectionListener(_markerSelectionListener_All);
+            _chkIsShowTourPauses_All.addSelectionListener(_mapPointSelectionListener_All);
          }
          {
             /*
@@ -604,7 +607,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _chkIsShowTourLocations_All.setText(Messages.Slideout_MapPoints_Checkbox_ShowTourLocations);
             _chkIsShowTourLocations_All.setToolTipText(Messages.Slideout_MapPoints_Checkbox_ShowTourLocations_Tooltip);
             _chkIsShowTourLocations_All.setImage(_imageMapLocation_Tour);
-            _chkIsShowTourLocations_All.addSelectionListener(_markerSelectionListener_All);
+            _chkIsShowTourLocations_All.addSelectionListener(_mapPointSelectionListener_All);
          }
          {
             /*
@@ -614,16 +617,16 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _chkIsShowCommonLocations_All.setText(Messages.Slideout_MapPoints_Checkbox_ShowCommonLocations);
             _chkIsShowCommonLocations_All.setToolTipText(Messages.Slideout_MapPoints_Checkbox_ShowCommonLocations_Tooltip);
             _chkIsShowCommonLocations_All.setImage(_imageMapLocation_Common);
-            _chkIsShowCommonLocations_All.addSelectionListener(_markerSelectionListener_All);
+            _chkIsShowCommonLocations_All.addSelectionListener(_mapPointSelectionListener_All);
          }
          {
             /*
              * Show location bounding box
              */
-            _chkIsShowMapLocations_BoundingBox = new Button(tabContainer, SWT.CHECK);
-            _chkIsShowMapLocations_BoundingBox.setText(Messages.Slideout_MapPoints_Checkbox_ShowLocationBoundingBox);
-            _chkIsShowMapLocations_BoundingBox.setImage(_imageMapLocation_BoundingBox);
-            _chkIsShowMapLocations_BoundingBox.addSelectionListener(_markerSelectionListener);
+            _chkIsShowBoundingBox_All = new Button(tabContainer, SWT.CHECK);
+            _chkIsShowBoundingBox_All.setText(Messages.Slideout_MapPoints_Checkbox_ShowLocationBoundingBox);
+            _chkIsShowBoundingBox_All.setImage(_imageMapLocation_BoundingBox);
+            _chkIsShowBoundingBox_All.addSelectionListener(_mapPointSelectionListener_All);
          }
       }
 
@@ -651,7 +654,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             // combo
             _comboLabelLayout = new Combo(tabContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
             _comboLabelLayout.setVisibleItemCount(20);
-            _comboLabelLayout.addSelectionListener(_markerSelectionListener);
+            _comboLabelLayout.addSelectionListener(_mapPointSelectionListener);
             _comboLabelLayout.addFocusListener(_keepOpenListener);
          }
          {
@@ -673,8 +676,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                _spinnerLabelDistributorMaxLabels.setMaximum(Map2ConfigManager.LABEL_DISTRIBUTOR_MAX_LABELS_MAX);
                _spinnerLabelDistributorMaxLabels.setIncrement(10);
                _spinnerLabelDistributorMaxLabels.setPageIncrement(100);
-               _spinnerLabelDistributorMaxLabels.addSelectionListener(_markerSelectionListener);
-               _spinnerLabelDistributorMaxLabels.addMouseWheelListener(_markerMouseWheelListener10);
+               _spinnerLabelDistributorMaxLabels.addSelectionListener(_mapPointSelectionListener);
+               _spinnerLabelDistributorMaxLabels.addMouseWheelListener(_mapPointMouseWheelListener10);
                _spinnerLabelDistributorMaxLabels.setToolTipText(
                      Messages.Slideout_MapPoints_Spinner_LabelDistributor_MaxLabels_Tooltip);
 
@@ -684,8 +687,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                _spinnerLabelDistributorRadius.setMaximum(Map2ConfigManager.LABEL_DISTRIBUTOR_RADIUS_MAX);
                _spinnerLabelDistributorRadius.setIncrement(10);
                _spinnerLabelDistributorRadius.setPageIncrement(100);
-               _spinnerLabelDistributorRadius.addSelectionListener(_markerSelectionListener);
-               _spinnerLabelDistributorRadius.addMouseWheelListener(_markerMouseWheelListener10);
+               _spinnerLabelDistributorRadius.addSelectionListener(_mapPointSelectionListener);
+               _spinnerLabelDistributorRadius.addMouseWheelListener(_mapPointMouseWheelListener10);
                _spinnerLabelDistributorRadius.setToolTipText(Messages.Slideout_MapPoints_Spinner_LabelDistributor_Radius_Tooltip);
             }
          }
@@ -695,7 +698,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
              */
             _chkIsTruncateLabel = new Button(tabContainer, SWT.CHECK);
             _chkIsTruncateLabel.setText(Messages.Slideout_MapPoints_Checkbox_TruncateLabel);
-            _chkIsTruncateLabel.addSelectionListener(_markerSelectionListener);
+            _chkIsTruncateLabel.addSelectionListener(_mapPointSelectionListener);
             gdHCenter.applyTo(_chkIsTruncateLabel);
 
             // spinner
@@ -704,8 +707,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _spinnerLabelTruncateLength.setMaximum(Map2ConfigManager.LABEL_TRUNCATE_LENGTH_MAX);
             _spinnerLabelTruncateLength.setIncrement(1);
             _spinnerLabelTruncateLength.setPageIncrement(10);
-            _spinnerLabelTruncateLength.addSelectionListener(_markerSelectionListener);
-            _spinnerLabelTruncateLength.addMouseWheelListener(_markerMouseWheelListener);
+            _spinnerLabelTruncateLength.addSelectionListener(_mapPointSelectionListener);
+            _spinnerLabelTruncateLength.addMouseWheelListener(_mapPointMouseWheelListener);
          }
          {
             /*
@@ -713,7 +716,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
              */
             _chkIsWrapLabel = new Button(tabContainer, SWT.CHECK);
             _chkIsWrapLabel.setText(Messages.Slideout_MapPoints_Checkbox_WrapLabel);
-            _chkIsWrapLabel.addSelectionListener(_markerSelectionListener);
+            _chkIsWrapLabel.addSelectionListener(_mapPointSelectionListener);
             gdHCenter.applyTo(_chkIsWrapLabel);
 
             // spinner
@@ -722,8 +725,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _spinnerLabelWrapLength.setMaximum(Map2ConfigManager.LABEL_WRAP_LENGTH_MAX);
             _spinnerLabelWrapLength.setIncrement(1);
             _spinnerLabelWrapLength.setPageIncrement(10);
-            _spinnerLabelWrapLength.addSelectionListener(_markerSelectionListener);
-            _spinnerLabelWrapLength.addMouseWheelListener(_markerMouseWheelListener10);
+            _spinnerLabelWrapLength.addSelectionListener(_mapPointSelectionListener);
+            _spinnerLabelWrapLength.addMouseWheelListener(_mapPointMouseWheelListener10);
          }
          {
             /*
@@ -731,7 +734,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
              */
             _chkIsLabelAntialiased = new Button(tabContainer, SWT.CHECK);
             _chkIsLabelAntialiased.setText(Messages.Slideout_MapPoints_Checkbox_AntialiasLabel);
-            _chkIsLabelAntialiased.addSelectionListener(_markerSelectionListener);
+            _chkIsLabelAntialiased.addSelectionListener(_mapPointSelectionListener);
             gdSpan2.applyTo(_chkIsLabelAntialiased);
          }
          {
@@ -740,7 +743,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
              */
             _chkIsSymbolAntialiased = new Button(tabContainer, SWT.CHECK);
             _chkIsSymbolAntialiased.setText(Messages.Slideout_MapPoints_Checkbox_AntialiasSymbol);
-            _chkIsSymbolAntialiased.addSelectionListener(_markerSelectionListener);
+            _chkIsSymbolAntialiased.addSelectionListener(_mapPointSelectionListener);
             gdSpan2.applyTo(_chkIsSymbolAntialiased);
          }
          {
@@ -753,7 +756,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                // checkbox
                _chkIsDimMap = new Button(dimContainer, SWT.CHECK);
                _chkIsDimMap.setText(Messages.Slideout_Map_Options_Checkbox_DimMap);
-               _chkIsDimMap.addSelectionListener(_markerSelectionListener);
+               _chkIsDimMap.addSelectionListener(_mapPointSelectionListener);
 
                // spinner
                _spinnerMapDimValue = new Spinner(dimContainer, SWT.BORDER);
@@ -762,15 +765,15 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                _spinnerMapDimValue.setMaximum(Map2View.MAX_DIM_STEPS);
                _spinnerMapDimValue.setIncrement(1);
                _spinnerMapDimValue.setPageIncrement(4);
-               _spinnerMapDimValue.addSelectionListener(_markerSelectionListener);
-               _spinnerMapDimValue.addMouseWheelListener(_markerMouseWheelListener);
+               _spinnerMapDimValue.addSelectionListener(_mapPointSelectionListener);
+               _spinnerMapDimValue.addMouseWheelListener(_mapPointMouseWheelListener);
                GridDataFactory.fillDefaults().indent(10, 0).applyTo(_spinnerMapDimValue);
             }
 
             // dimming color
             _colorMapDimColor = new ColorSelectorExtended(tabContainer);
             _colorMapDimColor.setToolTipText(Messages.Slideout_Map_Options_Color_DimColor_Tooltip);
-            _colorMapDimColor.addListener(_markerPropertyChangeListener);
+            _colorMapDimColor.addListener(_mapPointPropertyChangeListener);
             _colorMapDimColor.addOpenListener(this);
          }
          {
@@ -787,7 +790,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
                _colorMapTransparencyColor = new ColorSelectorExtended(tabContainer);
                _colorMapTransparencyColor.setToolTipText(Messages.Slideout_MapPoints_Label_MapTransparencyColor_Tooltip);
-               _colorMapTransparencyColor.addListener(_markerPropertyChangeListener);
+               _colorMapTransparencyColor.addListener(_mapPointPropertyChangeListener);
                _colorMapTransparencyColor.addOpenListener(this);
             }
             {
@@ -796,7 +799,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                 */
                _chkUseMapDimColor = new Button(tabContainer, SWT.CHECK);
                _chkUseMapDimColor.setText(Messages.Slideout_MapPoints_Checkbox_UseMapDimColor);
-               _chkUseMapDimColor.addSelectionListener(_markerSelectionListener);
+               _chkUseMapDimColor.addSelectionListener(_mapPointSelectionListener);
                gdSpan2.indent(16, 0).applyTo(_chkUseMapDimColor);
             }
          }
@@ -816,7 +819,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
              */
             _chkIsShowTourMarkers = new Button(tabContainer, SWT.CHECK);
             _chkIsShowTourMarkers.setText(Messages.Slideout_MapPoints_Checkbox_ShowTourMarkers);
-            _chkIsShowTourMarkers.addSelectionListener(_markerSelectionListener);
+            _chkIsShowTourMarkers.addSelectionListener(_mapPointSelectionListener);
          }
 
          final Composite container = new Composite(tabContainer, SWT.NONE);
@@ -853,13 +856,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
             // outline/text color
             _colorTourMarkerLabel_Outline = new ColorSelectorExtended(container);
-            _colorTourMarkerLabel_Outline.addListener(_markerPropertyChangeListener);
+            _colorTourMarkerLabel_Outline.addListener(_mapPointPropertyChangeListener);
             _colorTourMarkerLabel_Outline.addOpenListener(this);
             _colorTourMarkerLabel_Outline.setToolTipText(Messages.Slideout_MapPoints_Label_MarkerColor_Tooltip);
 
             // background color
             _colorTourMarkerLabel_Fill = new ColorSelectorExtended(container);
-            _colorTourMarkerLabel_Fill.addListener(_markerPropertyChangeListener);
+            _colorTourMarkerLabel_Fill.addListener(_mapPointPropertyChangeListener);
             _colorTourMarkerLabel_Fill.addOpenListener(this);
             _colorTourMarkerLabel_Fill.setToolTipText(Messages.Slideout_MapPoints_Label_MarkerColor_Tooltip);
 
@@ -886,7 +889,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          _chkIsMarkerClustered = new Button(parent, SWT.CHECK);
          _chkIsMarkerClustered.setText(Messages.Slideout_MapPoints_Checkbox_ClusterTourMarkers);
          _chkIsMarkerClustered.setToolTipText(Messages.Slideout_MapPoints_Checkbox_ClusterTourMarkers_Tooltip);
-         _chkIsMarkerClustered.addSelectionListener(_markerSelectionListener);
+         _chkIsMarkerClustered.addSelectionListener(_mapPointSelectionListener);
          GridDataFactory.fillDefaults()
                .span(2, 1)
                .indent(0, 10)
@@ -910,8 +913,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          _spinnerClusterGrid_Size.setMaximum(Map2ConfigManager.CLUSTER_GRID_SIZE_MAX);
          _spinnerClusterGrid_Size.setIncrement(1);
          _spinnerClusterGrid_Size.setPageIncrement(10);
-         _spinnerClusterGrid_Size.addSelectionListener(_markerSelectionListener);
-         _spinnerClusterGrid_Size.addMouseWheelListener(_markerMouseWheelListener10);
+         _spinnerClusterGrid_Size.addSelectionListener(_mapPointSelectionListener);
+         _spinnerClusterGrid_Size.addMouseWheelListener(_mapPointMouseWheelListener10);
       }
       {
          /*
@@ -938,8 +941,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                _spinnerClusterSymbol_Size.setMaximum(Map2ConfigManager.CLUSTER_SYMBOL_SIZE_MAX);
                _spinnerClusterSymbol_Size.setIncrement(1);
                _spinnerClusterSymbol_Size.setPageIncrement(10);
-               _spinnerClusterSymbol_Size.addSelectionListener(_markerSelectionListener);
-               _spinnerClusterSymbol_Size.addMouseWheelListener(_markerMouseWheelListener);
+               _spinnerClusterSymbol_Size.addSelectionListener(_mapPointSelectionListener);
+               _spinnerClusterSymbol_Size.addMouseWheelListener(_mapPointMouseWheelListener);
                _spinnerGridData.applyTo(_spinnerClusterSymbol_Size);
 
                // outline width
@@ -949,8 +952,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                _spinnerClusterOutline_Width.setMaximum(Map2ConfigManager.CLUSTER_OUTLINE_WIDTH_MAX);
                _spinnerClusterOutline_Width.setIncrement(1);
                _spinnerClusterOutline_Width.setPageIncrement(10);
-               _spinnerClusterOutline_Width.addSelectionListener(_markerSelectionListener);
-               _spinnerClusterOutline_Width.addMouseWheelListener(_markerMouseWheelListener);
+               _spinnerClusterOutline_Width.addSelectionListener(_mapPointSelectionListener);
+               _spinnerClusterOutline_Width.addMouseWheelListener(_mapPointMouseWheelListener);
                _spinnerGridData.applyTo(_spinnerClusterOutline_Width);
             }
          }
@@ -976,13 +979,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
             // foreground color
             _colorClusterSymbol_Outline = new ColorSelectorExtended(container);
-            _colorClusterSymbol_Outline.addListener(_markerPropertyChangeListener);
+            _colorClusterSymbol_Outline.addListener(_mapPointPropertyChangeListener);
             _colorClusterSymbol_Outline.addOpenListener(this);
             _colorClusterSymbol_Outline.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_ClusterSymbolColor_Tooltip);
 
             // foreground color
             _colorClusterSymbol_Fill = new ColorSelectorExtended(container);
-            _colorClusterSymbol_Fill.addListener(_markerPropertyChangeListener);
+            _colorClusterSymbol_Fill.addListener(_mapPointPropertyChangeListener);
             _colorClusterSymbol_Fill.addOpenListener(this);
             _colorClusterSymbol_Fill.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_ClusterSymbolColor_Tooltip);
 
@@ -1001,7 +1004,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             // checkbox: fill cluster symbol
             _chkIsFillClusterSymbol = new Button(parent, SWT.CHECK);
             _chkIsFillClusterSymbol.setText(Messages.Slideout_MapPoints_Checkbox_FillClusterSymbol);
-            _chkIsFillClusterSymbol.addSelectionListener(_markerSelectionListener);
+            _chkIsFillClusterSymbol.addSelectionListener(_mapPointSelectionListener);
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .indent(firstColumnIndent, 0)
@@ -1023,7 +1026,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
              */
             _chkIsGroupMarkers = new Button(tabContainer, SWT.CHECK | SWT.WRAP);
             _chkIsGroupMarkers.setText(Messages.Slideout_MapPoints_Checkbox_GroupTourMarkers_Extended);
-            _chkIsGroupMarkers.addSelectionListener(_markerSelectionListener);
+            _chkIsGroupMarkers.addSelectionListener(_mapPointSelectionListener);
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
@@ -1048,8 +1051,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _spinnerLabelGroupGridSize.setMaximum(Map2ConfigManager.LABEL_WRAP_LENGTH_MAX);
             _spinnerLabelGroupGridSize.setIncrement(1);
             _spinnerLabelGroupGridSize.setPageIncrement(10);
-            _spinnerLabelGroupGridSize.addSelectionListener(_markerSelectionListener);
-            _spinnerLabelGroupGridSize.addMouseWheelListener(_markerMouseWheelListener10);
+            _spinnerLabelGroupGridSize.addSelectionListener(_mapPointSelectionListener);
+            _spinnerLabelGroupGridSize.addMouseWheelListener(_mapPointMouseWheelListener10);
          }
          {
             // label
@@ -1062,7 +1065,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                   .applyTo(_lblGroupDuplicatedMarkers);
 
             _txtGroupDuplicatedMarkers = new Text(tabContainer, SWT.MULTI | SWT.WRAP | SWT.BORDER);
-            _txtGroupDuplicatedMarkers.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onModifyConfig()));
+            _txtGroupDuplicatedMarkers.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onModifyConfig(focusEvent.widget)));
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
@@ -1107,7 +1110,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
              */
             _chkIsShowTourPauses = new Button(container, SWT.CHECK);
             _chkIsShowTourPauses.setText(Messages.Slideout_MapPoints_Checkbox_ShowTourPauses);
-            _chkIsShowTourPauses.addSelectionListener(_markerSelectionListener);
+            _chkIsShowTourPauses.addSelectionListener(_mapPointSelectionListener);
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowTourPauses);
 
          }
@@ -1128,13 +1131,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
                // outline/text color
                _colorTourPauseLabel_Outline = new ColorSelectorExtended(labelContainer);
-               _colorTourPauseLabel_Outline.addListener(_markerPropertyChangeListener);
+               _colorTourPauseLabel_Outline.addListener(_mapPointPropertyChangeListener);
                _colorTourPauseLabel_Outline.addOpenListener(this);
                _colorTourPauseLabel_Outline.setToolTipText(Messages.Slideout_MapPoints_Label_TourPauseColor_Tooltip);
 
                // background color
                _colorTourPauseLabel_Fill = new ColorSelectorExtended(labelContainer);
-               _colorTourPauseLabel_Fill.addListener(_markerPropertyChangeListener);
+               _colorTourPauseLabel_Fill.addListener(_mapPointPropertyChangeListener);
                _colorTourPauseLabel_Fill.addOpenListener(this);
                _colorTourPauseLabel_Fill.setToolTipText(Messages.Slideout_MapPoints_Label_TourPauseColor_Tooltip);
 
@@ -1173,7 +1176,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          _chkIsShowTourLocations = new Button(parent, SWT.CHECK);
          _chkIsShowTourLocations.setText(Messages.Slideout_MapPoints_Checkbox_ShowTourLocations);
          _chkIsShowTourLocations.setToolTipText(Messages.Slideout_MapPoints_Checkbox_ShowTourLocations_Tooltip);
-         _chkIsShowTourLocations.addSelectionListener(_markerSelectionListener);
+         _chkIsShowTourLocations.addSelectionListener(_mapPointSelectionListener);
          GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowTourLocations);
       }
       {
@@ -1193,13 +1196,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
             // outline/text color
             _colorTourLocationLabel_Outline = new ColorSelectorExtended(container);
-            _colorTourLocationLabel_Outline.addListener(_markerPropertyChangeListener);
+            _colorTourLocationLabel_Outline.addListener(_mapPointPropertyChangeListener);
             _colorTourLocationLabel_Outline.addOpenListener(this);
             _colorTourLocationLabel_Outline.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
 
             // background color
             _colorTourLocationLabel_Fill = new ColorSelectorExtended(container);
-            _colorTourLocationLabel_Fill.addListener(_markerPropertyChangeListener);
+            _colorTourLocationLabel_Fill.addListener(_mapPointPropertyChangeListener);
             _colorTourLocationLabel_Fill.addOpenListener(this);
             _colorTourLocationLabel_Fill.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
 
@@ -1228,13 +1231,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
             // outline/text color
             _colorTourLocation_StartLabel_Outline = new ColorSelectorExtended(container);
-            _colorTourLocation_StartLabel_Outline.addListener(_markerPropertyChangeListener);
+            _colorTourLocation_StartLabel_Outline.addListener(_mapPointPropertyChangeListener);
             _colorTourLocation_StartLabel_Outline.addOpenListener(this);
             _colorTourLocation_StartLabel_Outline.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
 
             // background color
             _colorTourLocation_StartLabel_Fill = new ColorSelectorExtended(container);
-            _colorTourLocation_StartLabel_Fill.addListener(_markerPropertyChangeListener);
+            _colorTourLocation_StartLabel_Fill.addListener(_mapPointPropertyChangeListener);
             _colorTourLocation_StartLabel_Fill.addOpenListener(this);
             _colorTourLocation_StartLabel_Fill.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
 
@@ -1263,13 +1266,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
             // outline/text color
             _colorTourLocation_EndLabel_Outline = new ColorSelectorExtended(container);
-            _colorTourLocation_EndLabel_Outline.addListener(_markerPropertyChangeListener);
+            _colorTourLocation_EndLabel_Outline.addListener(_mapPointPropertyChangeListener);
             _colorTourLocation_EndLabel_Outline.addOpenListener(this);
             _colorTourLocation_EndLabel_Outline.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
 
             // background color
             _colorTourLocation_EndLabel_Fill = new ColorSelectorExtended(container);
-            _colorTourLocation_EndLabel_Fill.addListener(_markerPropertyChangeListener);
+            _colorTourLocation_EndLabel_Fill.addListener(_mapPointPropertyChangeListener);
             _colorTourLocation_EndLabel_Fill.addOpenListener(this);
             _colorTourLocation_EndLabel_Fill.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
 
@@ -1280,6 +1283,19 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _btnSwapTourLocation_EndLabel_Color.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> onSwapTourLocation_EndColor()));
          }
+      }
+      {
+         /*
+          * Show location bounding box
+          */
+         _chkIsShowBoundingBox_Tour = new Button(parent, SWT.CHECK);
+         _chkIsShowBoundingBox_Tour.setText(Messages.Slideout_MapPoints_Checkbox_ShowLocationBoundingBox);
+         _chkIsShowBoundingBox_Tour.addSelectionListener(_mapPointSelectionListener);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+               .applyTo(_chkIsShowBoundingBox_Tour);
+
       }
    }
 
@@ -1311,7 +1327,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _chkIsShowCommonLocations = new Button(container, SWT.CHECK);
             _chkIsShowCommonLocations.setText(Messages.Slideout_MapPoints_Checkbox_ShowCommonLocations);
             _chkIsShowCommonLocations.setToolTipText(Messages.Slideout_MapPoints_Checkbox_ShowCommonLocations_Tooltip);
-            _chkIsShowCommonLocations.addSelectionListener(_markerSelectionListener);
+            _chkIsShowCommonLocations.addSelectionListener(_mapPointSelectionListener);
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowCommonLocations);
          }
          {
@@ -1331,13 +1347,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
                // outline/text color
                _colorCommonLocationLabel_Outline = new ColorSelectorExtended(labelContainer);
-               _colorCommonLocationLabel_Outline.addListener(_markerPropertyChangeListener);
+               _colorCommonLocationLabel_Outline.addListener(_mapPointPropertyChangeListener);
                _colorCommonLocationLabel_Outline.addOpenListener(this);
                _colorCommonLocationLabel_Outline.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
 
                // background color
                _colorCommonLocationLabel_Fill = new ColorSelectorExtended(labelContainer);
-               _colorCommonLocationLabel_Fill.addListener(_markerPropertyChangeListener);
+               _colorCommonLocationLabel_Fill.addListener(_mapPointPropertyChangeListener);
                _colorCommonLocationLabel_Fill.addOpenListener(this);
                _colorCommonLocationLabel_Fill.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
 
@@ -1348,6 +1364,18 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                _btnSwapCommonLocationLabel_Color.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                      selectionEvent -> onSwapCommonLocationColor()));
             }
+         }
+         {
+            /*
+             * Show location bounding box
+             */
+            _chkIsShowBoundingBox_Common = new Button(parent, SWT.CHECK);
+            _chkIsShowBoundingBox_Common.setText(Messages.Slideout_MapPoints_Checkbox_ShowLocationBoundingBox);
+            _chkIsShowBoundingBox_Common.addSelectionListener(_mapPointSelectionListener);
+            GridDataFactory.fillDefaults()
+                  .span(2, 1)
+                  .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+                  .applyTo(_chkIsShowBoundingBox_Common);
          }
       }
    }
@@ -1527,24 +1555,32 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _spinnerMapDimValue                    .setEnabled(isDimMap);
 
       // common location
-      _btnSwapCommonLocationLabel_Color         .setEnabled(isShowCommonLocations);
-      _lblCommonLocationLabel_Color             .setEnabled(isShowCommonLocations);
-      _colorCommonLocationLabel_Fill            .setEnabled(isShowCommonLocations);
-      _colorCommonLocationLabel_Outline         .setEnabled(isShowCommonLocations);
+      _btnSwapCommonLocationLabel_Color      .setEnabled(isShowCommonLocations);
+      _chkIsShowBoundingBox_Common           .setEnabled(isShowCommonLocations);
+      _lblCommonLocationLabel_Color          .setEnabled(isShowCommonLocations);
+      _colorCommonLocationLabel_Fill         .setEnabled(isShowCommonLocations);
+      _colorCommonLocationLabel_Outline      .setEnabled(isShowCommonLocations);
 
       // tour location
-      _btnSwapTourLocationLabel_Color           .setEnabled(isShowTourLocations);
-      _lblTourLocationLabel_Color               .setEnabled(isShowTourLocations);
-      _colorTourLocationLabel_Fill              .setEnabled(isShowTourLocations);
-      _colorTourLocationLabel_Outline           .setEnabled(isShowTourLocations);
+      _btnSwapTourLocationLabel_Color        .setEnabled(isShowTourLocations);
+      _chkIsShowBoundingBox_Tour             .setEnabled(isShowTourLocations);
+      _lblTourLocationLabel_Color            .setEnabled(isShowTourLocations);
+      _lblTourLocation_StartLabel_Color      .setEnabled(isShowTourLocations);
+      _lblTourLocation_EndLabel_Color        .setEnabled(isShowTourLocations);
+      _colorTourLocationLabel_Fill           .setEnabled(isShowTourLocations);
+      _colorTourLocationLabel_Outline        .setEnabled(isShowTourLocations);
+      _colorTourLocation_StartLabel_Fill     .setEnabled(isShowTourLocations);
+      _colorTourLocation_StartLabel_Outline  .setEnabled(isShowTourLocations);
+      _colorTourLocation_EndLabel_Fill       .setEnabled(isShowTourLocations);
+      _colorTourLocation_EndLabel_Outline    .setEnabled(isShowTourLocations);
 
       // tour pause
-      _btnSwapTourPauseLabel_Color              .setEnabled(isShowTourPauses);
-      _lblTourPauseLabel_Color                  .setEnabled(isShowTourPauses);
-      _colorTourPauseLabel_Fill                 .setEnabled(isShowTourPauses);
-      _colorTourPauseLabel_Outline              .setEnabled(isShowTourPauses);
+      _btnSwapTourPauseLabel_Color           .setEnabled(isShowTourPauses);
+      _lblTourPauseLabel_Color               .setEnabled(isShowTourPauses);
+      _colorTourPauseLabel_Fill              .setEnabled(isShowTourPauses);
+      _colorTourPauseLabel_Outline           .setEnabled(isShowTourPauses);
 
-      _chkIsShowMapLocations_BoundingBox        .setEnabled(isShowCommonLocations || isShowTourLocations);
+      _chkIsShowBoundingBox_All              .setEnabled(isShowCommonLocations || isShowTourLocations);
 
 // SET_FORMATTING_ON
 
@@ -1615,20 +1651,20 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       // force spinner controls to have the same width
       _spinnerGridData = GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(3), SWT.DEFAULT);
 
-      _markerSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyConfig());
-      _markerSelectionListener_All = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyConfigAll());
-      _markerPropertyChangeListener = propertyChangeEvent -> onModifyConfig();
+      _mapPointSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyConfig(selectionEvent.widget));
+      _mapPointSelectionListener_All = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyConfigAll());
+      _mapPointPropertyChangeListener = propertyChangeEvent -> onModifyConfig(null);
 
-      _markerMouseWheelListener = mouseEvent -> {
+      _mapPointMouseWheelListener = mouseEvent -> {
 
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 1);
-         onModifyConfig();
+         onModifyConfig(mouseEvent.widget);
       };
 
-      _markerMouseWheelListener10 = mouseEvent -> {
+      _mapPointMouseWheelListener10 = mouseEvent -> {
 
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
-         onModifyConfig();
+         onModifyConfig(mouseEvent.widget);
       };
 
       _keepOpenListener = new FocusListener() {
@@ -1681,19 +1717,42 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
    }
 
-   private void onModifyConfig() {
+   /**
+    * @param isFromAllControls
+    * @param widget
+    *           Can be <code>null</code>
+    */
+   private void onModifyConfig(final boolean isFromAllControls, final Widget widget) {
 
-      onModifyConfig(false);
-   }
+      boolean isShowBoundingBox = _chkIsShowBoundingBox_All.getSelection();
 
-   private void onModifyConfig(final boolean isFromAllControls) {
+      if (widget != null) {
+
+         if (widget == _chkIsShowBoundingBox_Common) {
+
+            isShowBoundingBox = _chkIsShowBoundingBox_Common.getSelection();
+
+            _chkIsShowBoundingBox_Tour.setSelection(isShowBoundingBox);
+
+         } else if (widget == _chkIsShowBoundingBox_Tour) {
+
+            isShowBoundingBox = _chkIsShowBoundingBox_Tour.getSelection();
+
+            _chkIsShowBoundingBox_Common.setSelection(isShowBoundingBox);
+
+         } else if (widget == _chkIsShowBoundingBox_All) {
+
+            _chkIsShowBoundingBox_Common.setSelection(isShowBoundingBox);
+            _chkIsShowBoundingBox_Tour.setSelection(isShowBoundingBox);
+         }
+      }
 
 // SET_FORMATTING_OFF
 
-      final boolean isShowCommonLocations    = _chkIsShowCommonLocations   .getSelection();
-      final boolean isShowTourLocations      = _chkIsShowTourLocations     .getSelection();
-      final boolean isShowTourMarkers        = _chkIsShowTourMarkers       .getSelection();
-      final boolean isShowTourPauses         = _chkIsShowTourPauses        .getSelection();
+      final boolean isShowCommonLocations    = _chkIsShowCommonLocations      .getSelection();
+      final boolean isShowTourLocations      = _chkIsShowTourLocations        .getSelection();
+      final boolean isShowTourMarkers        = _chkIsShowTourMarkers          .getSelection();
+      final boolean isShowTourPauses         = _chkIsShowTourPauses           .getSelection();
 
       _actionStatistic_CommonLocation  .setChecked(isShowCommonLocations);
       _actionStatistic_TourLocation    .setChecked(isShowTourLocations);
@@ -1704,12 +1763,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       if (isFromAllControls == false) {
 
          // update "all" controls
-         _chkIsGroupMarkers_All           .setSelection(_chkIsGroupMarkers          .getSelection());
-         _chkIsMarkerClustered_All        .setSelection(_chkIsMarkerClustered       .getSelection());
-         _chkIsShowCommonLocations_All    .setSelection(isShowCommonLocations);
-         _chkIsShowTourLocations_All      .setSelection(isShowTourLocations);
-         _chkIsShowTourMarkers_All        .setSelection(isShowTourMarkers);
-         _chkIsShowTourPauses_All         .setSelection(isShowTourPauses);
+         _chkIsGroupMarkers_All                 .setSelection(_chkIsGroupMarkers          .getSelection());
+         _chkIsMarkerClustered_All              .setSelection(_chkIsMarkerClustered       .getSelection());
+         _chkIsShowBoundingBox_All              .setSelection(isShowBoundingBox);
+         _chkIsShowCommonLocations_All          .setSelection(isShowCommonLocations);
+         _chkIsShowTourLocations_All            .setSelection(isShowTourLocations);
+         _chkIsShowTourMarkers_All              .setSelection(isShowTourMarkers);
+         _chkIsShowTourPauses_All               .setSelection(isShowTourPauses);
       }
 
 // SET_FORMATTING_ON
@@ -1721,12 +1781,21 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       repaintMap();
    }
 
+   private void onModifyConfig(final Widget widget) {
+
+      onModifyConfig(false, widget);
+   }
+
    private void onModifyConfigAll() {
+
+      final boolean isShowBoundingBox = _chkIsShowBoundingBox_All.getSelection();
 
 // SET_FORMATTING_OFF
 
       _chkIsGroupMarkers            .setSelection(_chkIsGroupMarkers_All            .getSelection());
       _chkIsMarkerClustered         .setSelection(_chkIsMarkerClustered_All         .getSelection());
+      _chkIsShowBoundingBox_Common  .setSelection(isShowBoundingBox);
+      _chkIsShowBoundingBox_Tour    .setSelection(isShowBoundingBox);
       _chkIsShowCommonLocations     .setSelection(_chkIsShowCommonLocations_All     .getSelection());
       _chkIsShowTourLocations       .setSelection(_chkIsShowTourLocations_All       .getSelection());
       _chkIsShowTourMarkers         .setSelection(_chkIsShowTourMarkers_All         .getSelection());
@@ -1734,7 +1803,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
 // SET_FORMATTING_ON
 
-      onModifyConfig(true);
+      onModifyConfig(true, null);
    }
 
    @Override
@@ -1944,7 +2013,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _chkIsLabelAntialiased                 .setSelection( config.isLabelAntialiased);
       _chkIsMarkerClustered                  .setSelection( config.isTourMarkerClustered);
       _chkIsMarkerClustered_All              .setSelection( config.isTourMarkerClustered);
-      _chkIsShowMapLocations_BoundingBox     .setSelection( config.isShowLocationBoundingBox);
+      _chkIsShowBoundingBox_All              .setSelection( config.isShowLocationBoundingBox);
+      _chkIsShowBoundingBox_Common           .setSelection( config.isShowLocationBoundingBox);
+      _chkIsShowBoundingBox_Tour             .setSelection( config.isShowLocationBoundingBox);
       _chkIsSymbolAntialiased                .setSelection( config.isSymbolAntialiased);
       _chkIsTruncateLabel                    .setSelection( config.isTruncateLabel);
       _chkIsWrapLabel                        .setSelection( config.isWrapLabel);
@@ -2023,7 +2094,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
 // SET_FORMATTING_OFF
 
-      config.isShowLocationBoundingBox    = _chkIsShowMapLocations_BoundingBox   .getSelection();
+      config.isShowLocationBoundingBox    = _chkIsShowBoundingBox_All            .getSelection();
       config.isShowCommonLocation         = _chkIsShowCommonLocations            .getSelection();
       config.isShowTourLocation           = _chkIsShowTourLocations              .getSelection();
       config.isShowTourMarker             = _chkIsShowTourMarkers                .getSelection();
@@ -2131,7 +2202,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          tabItem.getControl().setBackground(ThemeUtil.getDefaultBackgroundColor_Shell());
       }
 
-      onModifyConfig();
+      onModifyConfig(null);
    }
 
    public void updateStatistics(final MapPointStatistics stats) {

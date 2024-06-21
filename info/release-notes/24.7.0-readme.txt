@@ -5,11 +5,11 @@ New
 ===
 
 * 2D Map
-  - Enhanced display of the
+  - Paint map points which are not overlapped
     - Tour markers
     - Tour pauses
     - Tour and common locations
-    https://github.com/mytourbook/mytourbook/issues/1323
+    https://github.com/mytourbook/mytourbook/issues/1369
     
 * 2.5D & 3D Maps (Frederic)
   - Export map view to an image file (jpeg, png or bmp) or to the clipboard
@@ -26,7 +26,7 @@ Changes
 =======
 
 * 2D Map
-  - Moved options from the "2D Map Options" slideout to the "Map Points" slideout
+  - Moved options from the "2D Map Options" slideout into the "Map Points" slideout
     - Map dimming
     - Filter tour pauses
   - Removed actions from the context menu, they are now available in the "Map Points" slideout

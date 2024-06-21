@@ -176,15 +176,15 @@ public class Map2ConfigManager {
    public static final RGB                     DEFAULT_CLUSTER_OUTLINE_RGB             = new RGB(255, 255, 255);
    public static final RGB                     DEFAULT_COMMON_LOCATION_FILL_RGB        = new RGB(170, 213, 255);
    public static final RGB                     DEFAULT_COMMON_LOCATION_OUTLINE_RGB     = new RGB(0, 0, 0);
-   public static final RGB                     DEFAULT_TOUR_LOCATION_FILL_RGB          = new RGB(228, 244, 185);
+   public static final RGB                     DEFAULT_TOUR_LOCATION_FILL_RGB          = new RGB(145, 255, 194);
    public static final RGB                     DEFAULT_TOUR_LOCATION_OUTLINE_RGB       = new RGB(0, 0, 0);
-   public static final RGB                     DEFAULT_TOUR_LOCATION_START_FILL_RGB    = new RGB(255, 206, 207);
+   public static final RGB                     DEFAULT_TOUR_LOCATION_START_FILL_RGB    = new RGB(255, 168, 170);
    public static final RGB                     DEFAULT_TOUR_LOCATION_START_OUTLINE_RGB = new RGB(0, 0, 0);
-   public static final RGB                     DEFAULT_TOUR_LOCATION_END_FILL_RGB      = new RGB(255, 253, 179);
+   public static final RGB                     DEFAULT_TOUR_LOCATION_END_FILL_RGB      = new RGB(255, 252, 145);
    public static final RGB                     DEFAULT_TOUR_LOCATION_END_OUTLINE_RGB   = new RGB(0, 0, 0);
-   public static final RGB                     DEFAULT_TOUR_MARKER_FILL_RGB            = new RGB(208, 236, 134);
+   public static final RGB                     DEFAULT_TOUR_MARKER_FILL_RGB            = new RGB(194, 231, 99);
    public static final RGB                     DEFAULT_TOUR_MARKER_OUTLINE_RGB         = new RGB(0, 0, 0);
-   public static final RGB                     DEFAULT_TOUR_PAUSE_FILL_RGB             = new RGB(208, 236, 134);
+   public static final RGB                     DEFAULT_TOUR_PAUSE_FILL_RGB             = new RGB(255, 211, 130);
    public static final RGB                     DEFAULT_TOUR_PAUSE_OUTLINE_RGB          = new RGB(0, 0, 0);
    //
    public static final boolean                 IS_FILTER_TOUR_PAUSES_DEFAULT           = false;
@@ -618,8 +618,9 @@ public class Map2ConfigManager {
 
    public static void resetActiveMapPointConfiguration() {
 
-      // do not replace the name
+      // keep old values
       final String oldName = _activeMapPointConfig.name;
+      final String oldGroupedMarkers = _activeMapPointConfig.groupedMarkers;
 
       final int activeConfigIndex = getActiveConfigIndex();
 
@@ -628,8 +629,11 @@ public class Map2ConfigManager {
 
       // create new config
       final int configID = activeConfigIndex + 1;
+
       final Map2Config newConfig = createDefaults_MapPoints_One(configID);
+
       newConfig.name = oldName;
+      newConfig.groupedMarkers = oldGroupedMarkers;
 
       // update model
       setActiveMapPointConfig(newConfig);
