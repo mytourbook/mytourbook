@@ -22,7 +22,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
 /**
- * Contains data which are needed to paint a marker into the 2D map
+ * Contains data which are needed to paint a map point into the 2D map
  */
 public class Map2Config {
 

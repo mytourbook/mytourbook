@@ -618,8 +618,9 @@ public class Map2ConfigManager {
 
    public static void resetActiveMapPointConfiguration() {
 
-      // do not replace the name
+      // keep old values
       final String oldName = _activeMapPointConfig.name;
+      final String oldGroupedMarkers = _activeMapPointConfig.groupedMarkers;
 
       final int activeConfigIndex = getActiveConfigIndex();
 
@@ -628,8 +629,11 @@ public class Map2ConfigManager {
 
       // create new config
       final int configID = activeConfigIndex + 1;
+
       final Map2Config newConfig = createDefaults_MapPoints_One(configID);
+
       newConfig.name = oldName;
+      newConfig.groupedMarkers = oldGroupedMarkers;
 
       // update model
       setActiveMapPointConfig(newConfig);

@@ -1290,7 +1290,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
           */
          _chkIsShowBoundingBox_Tour = new Button(parent, SWT.CHECK);
          _chkIsShowBoundingBox_Tour.setText(Messages.Slideout_MapPoints_Checkbox_ShowLocationBoundingBox);
-         _chkIsShowBoundingBox_Tour.setImage(_imageMapLocation_BoundingBox);
          _chkIsShowBoundingBox_Tour.addSelectionListener(_mapPointSelectionListener);
          GridDataFactory.fillDefaults()
                .span(2, 1)
@@ -1372,7 +1371,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
              */
             _chkIsShowBoundingBox_Common = new Button(parent, SWT.CHECK);
             _chkIsShowBoundingBox_Common.setText(Messages.Slideout_MapPoints_Checkbox_ShowLocationBoundingBox);
-            _chkIsShowBoundingBox_Common.setImage(_imageMapLocation_BoundingBox);
             _chkIsShowBoundingBox_Common.addSelectionListener(_mapPointSelectionListener);
             GridDataFactory.fillDefaults()
                   .span(2, 1)
@@ -1721,7 +1719,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
    /**
     * @param isFromAllControls
-    * @param widget Can be <code>null</code>
+    * @param widget
+    *           Can be <code>null</code>
     */
    private void onModifyConfig(final boolean isFromAllControls, final Widget widget) {
 
