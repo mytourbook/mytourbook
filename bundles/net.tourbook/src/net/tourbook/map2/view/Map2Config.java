@@ -133,7 +133,7 @@ public class Map2Config {
    public boolean                 useTourPause_DurationFilter_Seconds;
 
    public int                     tourPauseDurationFilter_Hours;
-   public int                     tourPauseDurationFilter_Minutes     = 3;
+   public int                     tourPauseDurationFilter_Minutes     = 5;
    public int                     tourPauseDurationFilter_Seconds;
    public long                    tourPauseDuration;
 
