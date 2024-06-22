@@ -8961,19 +8961,22 @@ public class TourDataEditorView extends ViewPart implements
          return;
       }
 
-      final int valueIndex_Before = sliderPosition.getBeforeLeftSliderIndex();
+      final int beforeLeftSliderIndex = sliderPosition.getBeforeLeftSliderIndex();
+      final int leftSliderValueIndex = sliderPosition.getLeftSliderValueIndex();
+      final int rightSliderValueIndex = sliderPosition.getRightSliderValueIndex();
+
       int valueIndex_Start;
       int valueIndex_End;
 
-      if (valueIndex_Before != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+      if (beforeLeftSliderIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
-         valueIndex_Start = valueIndex_Before;
-         valueIndex_End = sliderPosition.getLeftSliderValueIndex();
+         valueIndex_Start = beforeLeftSliderIndex;
+         valueIndex_End = leftSliderValueIndex;
 
       } else {
 
-         valueIndex_Start = sliderPosition.getLeftSliderValueIndex();
-         valueIndex_End = sliderPosition.getRightSliderValueIndex();
+         valueIndex_Start = leftSliderValueIndex;
+         valueIndex_End = rightSliderValueIndex - 1;
       }
 
       selectTimeSlice_InViewer(valueIndex_Start, valueIndex_End);

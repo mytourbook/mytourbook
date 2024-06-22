@@ -7996,6 +7996,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          tourMarker.setLabel(timeData.markerLabel);
       }
 
+      // set lat/lon and elevation values
+      completeTourMarker(tourMarker, serieIndex);
+
       tourMarkers.add(tourMarker);
    }
 

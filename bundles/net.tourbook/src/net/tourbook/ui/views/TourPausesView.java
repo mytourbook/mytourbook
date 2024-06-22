@@ -730,7 +730,6 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       final int numSelectedSlices = selectedPauses.length;
       final Object slice1 = selectedPauses[0];
 
-      int serieIndex0 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
       int serieIndex1 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
       int serieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
 
@@ -746,12 +745,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
              * Position slider at the beginning of the slice so that each slice borders has an
              * slider
              */
-            serieIndex0 = serieIndexFirst > 0
-                  ? serieIndexFirst - 1
-                  : SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
 
-            serieIndex1 = serieIndexFirst;
-            serieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
+            serieIndex1 = serieIndexFirst == 0 ? 0 : serieIndexFirst - 1;
+            serieIndex2 = serieIndexFirst;
          }
 
       } else if (numSelectedSlices > 1) {
@@ -765,50 +761,51 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
             /*
              * Position slider at the beginning of the first slice
              */
-            serieIndex1 = serieIndexFirst > 0 ? serieIndexFirst - 1 : 0;
+            serieIndex1 = serieIndexFirst == 0 ? 0 : serieIndexFirst - 1;
             serieIndex2 = ((DevicePause) selectedPauses[numSelectedSlices - 1]).serieIndex;
          }
       }
 
+      if (serieIndex1 == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+         return;
+      }
+
       ISelection sliderSelection = null;
-      if (serieIndex1 != -1) {
 
-         TourChart tourChart = null;
-         final TourChart activeTourChart = TourManager.getInstance().getActiveTourChart();
+      TourChart tourChart = null;
+      final TourChart activeTourChart = TourManager.getInstance().getActiveTourChart();
 
-         if ((activeTourChart != null) && (activeTourChart.isDisposed() == false)) {
-            tourChart = activeTourChart;
+      if ((activeTourChart != null) && (activeTourChart.isDisposed() == false)) {
+         tourChart = activeTourChart;
+      }
+
+      if (tourChart == null) {
+
+         // chart is not available, fire a map position
+
+         final double[] latitudeSerie = _tourData.latitudeSerie;
+
+         if ((latitudeSerie != null) && (latitudeSerie.length > 0)) {
+
+            // map position is available
+
+            sliderSelection = new SelectionMapPosition(_tourData, serieIndex1, serieIndex2, true);
          }
 
-         if (tourChart == null) {
+      } else {
 
-            // chart is not available, fire a map position
+         final SelectionChartXSliderPosition xSliderSelection = new SelectionChartXSliderPosition(
+               tourChart,
+               serieIndex1,
+               serieIndex2);
 
-            final double[] latitudeSerie = _tourData.latitudeSerie;
+         xSliderSelection.setCenterSliderPosition(true);
 
-            if ((latitudeSerie != null) && (latitudeSerie.length > 0)) {
+         sliderSelection = xSliderSelection;
+      }
 
-               // map position is available
-
-               sliderSelection = new SelectionMapPosition(_tourData, serieIndex1, serieIndex2, true);
-            }
-
-         } else {
-
-            final SelectionChartXSliderPosition xSliderSelection = new SelectionChartXSliderPosition(
-                  tourChart,
-                  serieIndex0,
-                  serieIndex1,
-                  serieIndex2);
-
-//            xSliderSelection.setCenterSliderPosition(true);
-
-            sliderSelection = xSliderSelection;
-         }
-
-         if (sliderSelection != null) {
-            _postSelectionProvider.setSelection(sliderSelection);
-         }
+      if (sliderSelection != null) {
+         _postSelectionProvider.setSelection(sliderSelection);
       }
    }
 
