@@ -30,6 +30,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnDefinitionFor1stVisibleAlignmentColumn;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
@@ -512,6 +513,8 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
       defineColumn_Time_Daytime_Start();
       defineColumn_Time_Daytime_End();
+
+      new ColumnDefinitionFor1stVisibleAlignmentColumn(_columnManager);
    }
 
    /**
@@ -798,7 +801,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
                   serieIndex1,
                   serieIndex2);
 
-            xSliderSelection.setCenterSliderPosition(true);
+//            xSliderSelection.setCenterSliderPosition(true);
 
             sliderSelection = xSliderSelection;
          }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,9 +34,11 @@ public class Messages extends NLS {
    public static String        PrefPage_TCX_Checkbox_IgnoreSpeedValues;
    public static String        PrefPage_TCX_Checkbox_ImportIntoDescriptionField;
    public static String        PrefPage_TCX_Checkbox_ImportIntoTitleField;
+   public static String        PrefPage_TCX_Checkbox_PausedTimes;
    public static String        PrefPage_TCX_Group_ImportNotes;
    public static String        PrefPage_TCX_Label_IgnoreSpeedValues;
    public static String        PrefPage_TCX_Label_ImportNotes;
+   public static String        PrefPage_TCX_Label_PausedTimes;
    public static String        PrefPage_TCX_Radio_ImportIntoTitleAll;
    public static String        PrefPage_TCX_Radio_ImportIntoTitleTruncated;
 

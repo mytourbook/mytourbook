@@ -29,6 +29,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -58,12 +59,15 @@ public class PrefPageTCX extends FieldEditorPreferencePage implements IWorkbench
    private BooleanFieldEditor2 _editBool_IgnoreSpeedValues;
    private BooleanFieldEditor  _editBool_ImportIntoDescription;
    private BooleanFieldEditor2 _editBool_ImportIntoTitle;
+   private BooleanFieldEditor2 _editBool_PausedTime;
 
    private IntegerFieldEditor  _editInt_TruncatedNotes;
 
    private Label               _lblIgnoreSpeed;
+   private Label               _lblPausedTime;
 
    private Button              _chkIgnoreSpeed;
+   private Button              _chkPausedTime;
    private Button              _rdoImportAll;
    private Button              _rdoImportTruncated;
 
@@ -84,7 +88,8 @@ public class PrefPageTCX extends FieldEditorPreferencePage implements IWorkbench
       initUI(parent);
 
       createUI_10_Notes(parent);
-      createUI_20_Other(parent);
+      createUI_20_Speed(parent);
+      createUI_30_Pause(parent);
    }
 
    private void createUI_10_Notes(final Composite parent) {
@@ -163,7 +168,7 @@ public class PrefPageTCX extends FieldEditorPreferencePage implements IWorkbench
       regionalLayout.marginHeight = 5;
    }
 
-   private void createUI_20_Other(final Composite parent) {
+   private void createUI_20_Speed(final Composite parent) {
 
       /*
        * Check: Ignore speed values
@@ -180,14 +185,45 @@ public class PrefPageTCX extends FieldEditorPreferencePage implements IWorkbench
       _chkIgnoreSpeed = _editBool_IgnoreSpeedValues.getChangeControl(parent);
       _chkIgnoreSpeed.addSelectionListener(_defaultSelectionListener);
 
+      ((GridData) _chkIgnoreSpeed.getLayoutData()).verticalIndent = 10;
+
       /*
        * Label: Info
        */
       _lblIgnoreSpeed = UI.createLabel(parent, Messages.PrefPage_TCX_Label_IgnoreSpeedValues, SWT.WRAP);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .indent(_pc.convertHorizontalDLUsToPixels(10), 0)
             .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
             .applyTo(_lblIgnoreSpeed);
+   }
+
+   private void createUI_30_Pause(final Composite parent) {
+
+      /*
+       * Check: Paused time
+       */
+      _editBool_PausedTime = new BooleanFieldEditor2(
+            IPreferences.IS_COMPUTE_PAUSED_TIME,
+            Messages.PrefPage_TCX_Checkbox_PausedTimes,
+            parent);
+      _editBool_PausedTime.fillIntoGrid(parent, 1);
+      _editBool_PausedTime.setPreferenceStore(_prefStore);
+      _editBool_PausedTime.load();
+      addField(_editBool_PausedTime);
+
+      _chkPausedTime = _editBool_PausedTime.getChangeControl(parent);
+      _chkPausedTime.addSelectionListener(_defaultSelectionListener);
+
+      ((GridData) _chkPausedTime.getLayoutData()).verticalIndent = 10;
+
+      /*
+       * Label: Info
+       */
+      _lblPausedTime = UI.createLabel(parent, Messages.PrefPage_TCX_Label_PausedTimes, SWT.WRAP);
+      GridDataFactory.fillDefaults()
+            .indent(_pc.convertHorizontalDLUsToPixels(10), 0)
+            .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+            .applyTo(_lblPausedTime);
    }
 
    private void enableFields() {
@@ -196,6 +232,7 @@ public class PrefPageTCX extends FieldEditorPreferencePage implements IWorkbench
       final boolean isTruncateTitle = _rdoImportTruncated.getSelection();
 
       _lblIgnoreSpeed.setEnabled(_chkIgnoreSpeed.getSelection());
+      _lblPausedTime.setEnabled(_chkPausedTime.getSelection());
 
       _rdoImportAll.setEnabled(isTitleImport);
       _rdoImportTruncated.setEnabled(isTitleImport);
@@ -221,6 +258,7 @@ public class PrefPageTCX extends FieldEditorPreferencePage implements IWorkbench
       _editBool_IgnoreSpeedValues.loadDefault();
       _editBool_ImportIntoDescription.loadDefault();
       _editBool_ImportIntoTitle.loadDefault();
+      _editBool_PausedTime.loadDefault();
 
       _editInt_TruncatedNotes.loadDefault();
 

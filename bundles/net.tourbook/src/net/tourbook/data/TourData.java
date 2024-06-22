@@ -114,6 +114,7 @@ import net.tourbook.weather.WeatherUtils;
 
 import org.apache.commons.lang3.SerializationUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -4150,9 +4151,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             if (pausedTime > 0 && timeDiff >= pausedTime) {
                timeDiff = Math.max(0, timeDiff - pausedTime);
             }
-         }
-         // Check if a break occurred, break time is ignored
-         else if (breakTimeSerie != null) {
+
+         } else if (breakTimeSerie != null) {
+
+            // Check if a break occurred, break time is ignored
 
             /*
              * break time requires distance data, so it's possible that break time data are not
@@ -12374,6 +12376,81 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    public void setPausedTime_Start(final long[] pausedTime_Start) {
       this.pausedTime_Start = pausedTime_Start;
+   }
+
+   /**
+    * Get paused times from the computed break times
+    */
+   public void setPausedTimesFromBreakTimes() {
+
+      // TODO Auto-generated method stub
+
+      if (breakTimeSerie == null) {
+         getBreakTime();
+      }
+
+      if (breakTimeSerie == null) {
+         return;
+      }
+
+      final LongArrayList allPausedTime_Start = new LongArrayList();
+      final LongArrayList allPausedTime_End = new LongArrayList();
+
+      long absoluteTime = tourStartTime;
+      long pauseTimeStart = tourStartTime;
+      long previousTime = tourStartTime;
+
+      long sumTourPauses = 0;
+      boolean isWithinBreak = false;
+
+      for (int serieIndex = 0; serieIndex < breakTimeSerie.length; serieIndex++) {
+
+         final int relativeTime = timeSerie[serieIndex];
+         absoluteTime = tourStartTime + relativeTime * 1000;
+
+         final boolean isTimeSliceBreak = breakTimeSerie[serieIndex];
+
+         if (isWithinBreak == false && isTimeSliceBreak) {
+
+            // a new break starts
+
+            isWithinBreak = true;
+
+            allPausedTime_Start.add(previousTime);
+
+            pauseTimeStart = previousTime;
+
+         } else if (isWithinBreak && isTimeSliceBreak == false) {
+
+            // current break stops
+
+            isWithinBreak = false;
+
+            final long timeDiff = previousTime - pauseTimeStart;
+
+            allPausedTime_End.add(previousTime);
+
+            sumTourPauses += timeDiff;
+         }
+
+         previousTime = absoluteTime;
+      }
+
+      // set last pause time when not yet set
+      if (allPausedTime_Start.size() != allPausedTime_End.size()) {
+
+         final long timeDiff = previousTime - pauseTimeStart;
+
+         allPausedTime_End.add(previousTime);
+
+         sumTourPauses += timeDiff;
+      }
+
+      pausedTime_Start = allPausedTime_Start.toArray(new long[allPausedTime_Start.size()]);
+      pausedTime_End = allPausedTime_End.toArray(new long[allPausedTime_End.size()]);
+
+      tourDeviceTime_Paused = sumTourPauses;
+
    }
 
    /**

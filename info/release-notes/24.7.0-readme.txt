@@ -18,6 +18,9 @@ New
 Improvements
 ============
 
+* TCX Import
+  - Paused times can be set optional from the computed break times
+
 * Tour Export (Frederic)
   - Use of the notification popups for successful/unsuccessful exports
   
@@ -36,6 +39,14 @@ Changes
 * Tour Concatenation (Frederic)
   - Removed the ability to delete the source tours when using the NatTable layout as it was causing random tours to be deleted
 
+
+Changes that require Tour Re-import
+===================================
+
+* TCX Import
+  - Existing TCX imports could have paused time which are not satisfactorily. 
+    There is now an option to use the computed break times for the paused times.
+  
 
 Bugfix
 ======

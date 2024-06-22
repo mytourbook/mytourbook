@@ -123,6 +123,7 @@ class GarminTCX_SAXHandler extends DefaultHandler {
    }
 
    private ImportState_File    _importState_File;
+   private boolean             _importState_IsComputePauseTime;
    private boolean             _importState_IsIgnoreSpeedValues;
 
    private boolean             _isComputeAveragePower;
@@ -221,6 +222,7 @@ class GarminTCX_SAXHandler extends DefaultHandler {
 
       final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 
+      _importState_IsComputePauseTime = store.getBoolean(IPreferences.IS_COMPUTE_PAUSED_TIME);
       _importState_IsIgnoreSpeedValues = store.getBoolean(IPreferences.IS_IGNORE_SPEED_VALUES);
    }
 
@@ -649,9 +651,7 @@ class GarminTCX_SAXHandler extends DefaultHandler {
       // set tour notes
       setTourNotes(tourData);
 
-      /*
-       * set tour start date/time
-       */
+      // set tour start date/time
       adjustTourStart();
       final ZonedDateTime zonedStartTime = TimeTools.getZonedDateTime(_allTimeData.get(0).absoluteTime);
       tourData.setTourStartTime(zonedStartTime);
@@ -717,6 +717,10 @@ class GarminTCX_SAXHandler extends DefaultHandler {
          tourData.computeComputedValues();
 
          setTourDataPowerAvgMax(tourData);
+
+         if (_importState_IsComputePauseTime) {
+            tourData.setPausedTimesFromBreakTimes();
+         }
       }
 
       _importState_File.isFileImportedWithValidData = true;
