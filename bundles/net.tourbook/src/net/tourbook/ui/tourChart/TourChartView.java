@@ -722,7 +722,6 @@ public class TourChartView extends ViewPart implements
 
       final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
             _tourChart,
-            SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
             mapSelection.getValueIndex1(),
             mapSelection.getValueIndex2());
 
@@ -787,7 +786,6 @@ public class TourChartView extends ViewPart implements
 
             final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
                   _tourChart,
-                  SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
                   leftSliderValueIndex,
                   rightSliderValueIndex);
 
