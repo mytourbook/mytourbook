@@ -89,12 +89,12 @@ public class Comparison {
 
          // Modify the session/activity messages to remove/ignore their creation timestamps
          // since it will be different at every test run
-         String timeCreatedData = "Data,0,activity,num_sessions,";
+         String timeCreatedData = "Data,0,activity,num_sessions,"; //$NON-NLS-1$
 
          List<String> timeCreatedLine = controlFileContentArray.stream().filter(s -> s.startsWith(timeCreatedData))
                .toList();
          // Retrieve the value of "time_created"
-         String controlTimeCreatedValue = timeCreatedLine.get(0).split(",")[7];
+         String controlTimeCreatedValue = timeCreatedLine.get(0).split(",")[7]; //$NON-NLS-1$
          //Replace all the values by an empty string
          controlFileContentArray.replaceAll(line -> line = line.replace(
                controlTimeCreatedValue,
@@ -102,7 +102,7 @@ public class Comparison {
 
          timeCreatedLine = testFileContentArray.stream().filter(s -> s.startsWith(timeCreatedData)).toList();
          // Retrieve the value of "time_created"
-         String testTimeCreatedValue = timeCreatedLine.get(0).split(",")[7];
+         String testTimeCreatedValue = timeCreatedLine.get(0).split(",")[7]; //$NON-NLS-1$
          //Replace all the values by an empty string
          testFileContentArray.replaceAll(line -> line = line.replace(
                testTimeCreatedValue,
