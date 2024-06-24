@@ -5,15 +5,20 @@ New
 ===
 
 * 2D Map
-  - Paint map points which are not overlapped
+  - Paint map points which are not overlapped    		https://github.com/mytourbook/mytourbook/issues/1369
     - Tour markers
     - Tour pauses
     - Tour and common locations
-    https://github.com/mytourbook/mytourbook/issues/1369
     
 * 2.5D & 3D Maps (Frederic)
   - Export map view to an image file (jpeg, png or bmp) or to the clipboard
  
+
+* Tour Book View
+  - New actions in "Adjust Tour Values"
+    - Compute break times for selected tours
+    - Set pause times from break times for selected tours  
+
 
 Improvements
 ============
@@ -23,7 +28,7 @@ Improvements
 
 * Tour Export (Frederic)
   - Use of the notification popups for successful/unsuccessful exports
-  
+
 
 Changes
 =======
@@ -39,14 +44,6 @@ Changes
 * Tour Concatenation (Frederic)
   - Removed the ability to delete the source tours when using the NatTable layout as it was causing random tours to be deleted
 
-
-Changes that require Tour Re-import
-===================================
-
-* TCX Import
-  - Existing TCX imports could have paused time which are not satisfactorily. 
-    There is now an option to use the computed break times for the paused times.
-  
 
 Bugfix
 ======

@@ -517,7 +517,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                _tabOptions = new CTabItem(_tabFolder, SWT.NONE);
                _tabOptions.setText(Messages.Slideout_MapPoints_Tab_Options);
                _tabOptions.setToolTipText(Messages.Slideout_MapPoints_Tab_Options_Tooltip);
-               _tabOptions.setControl(createUI_150_Tab_Options(_tabFolder));
+               _tabOptions.setControl(createUI_150_Tab_Common(_tabFolder));
 
                _tabTourMarkers = new CTabItem(_tabFolder, SWT.NONE);
                _tabTourMarkers.setImage(_imageTourMarker);
@@ -633,7 +633,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       return tabContainer;
    }
 
-   private Control createUI_150_Tab_Options(final Composite parent) {
+   private Control createUI_150_Tab_Common(final Composite parent) {
 
       final GridDataFactory gdHCenter = GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER);
       final GridDataFactory gdSpan2 = GridDataFactory.fillDefaults().span(2, 1);

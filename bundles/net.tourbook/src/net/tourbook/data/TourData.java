@@ -1222,6 +1222,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * Contains <code>true</code> or <code>false</code> for each time slice of the whole tour.
     * <code>true</code> is set when a time slice is a break.
+    * <p>
+    * <b>There are historical reasons why break and pause time series are not in sync,
+    * there is a 1 slice difference !!!</b>
     */
    @Transient
    private boolean[]          breakTimeSerie;
@@ -1229,6 +1232,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * Contains <code>true</code> or <code>false</code> for each time slice of the whole tour.
     * <code>true</code> is set when a time slice is a pause.
+    * <p>
+    * <b>There are historical reasons why break and pause time series are not in sync,
+    * there is a 1 slice difference !!!</b>
     */
    @Transient
    private boolean[]          pausedTimeSerie;
@@ -6097,9 +6103,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
 
       if ((timeSerie == null) || (timeSerie.length == 0)) {
+
          tourComputedTime_Moving = 0;
+
       } else {
+
          final int tourMovingTimeRaw = timeSerie[timeSerie.length - 1] - getBreakTime();
+
          tourComputedTime_Moving = Math.max(0, tourMovingTimeRaw);
       }
    }
@@ -12382,11 +12392,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * Get paused times from the computed break times
+    * Set paused times from the computed break times
     */
    public void setPausedTimesFromBreakTimes() {
-
-      // TODO Auto-generated method stub
 
       if (breakTimeSerie == null) {
          getBreakTime();
@@ -12453,7 +12461,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       pausedTime_End = allPausedTime_End.toArray(new long[allPausedTime_End.size()]);
 
       tourDeviceTime_Paused = sumTourPauses;
-
    }
 
    /**

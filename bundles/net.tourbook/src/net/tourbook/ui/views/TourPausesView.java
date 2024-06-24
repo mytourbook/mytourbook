@@ -138,19 +138,22 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       private long relativeStartTime;
       private long relativeEndTime;
 
-      private int  serieIndex;
+      private int  serieIndex_Start;
+      private int  serieIndex_End;
 
       private DevicePause(final long type,
                           final long relativeStartTime,
                           final long relativeEndTime,
-                          final int serieIndex) {
+                          final int serieIndex_Start,
+                          final int serieIndex_End) {
 
          this.type = type;
 
          this.relativeStartTime = relativeStartTime;
          this.relativeEndTime = relativeEndTime;
 
-         this.serieIndex = serieIndex;
+         this.serieIndex_Start = serieIndex_Start;
+         this.serieIndex_End = serieIndex_End;
       }
    }
 
@@ -727,19 +730,19 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
          return;
       }
 
-      final int numSelectedSlices = selectedPauses.length;
+      final int numSelectedPauses = selectedPauses.length;
       final Object slice1 = selectedPauses[0];
 
       int serieIndex1 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
       int serieIndex2 = SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION;
 
-      if (numSelectedSlices == 1) {
+      if (numSelectedPauses == 1) {
 
          // One slice is selected
 
          if (slice1 instanceof final DevicePause devicePause) {
 
-            final int serieIndexFirst = devicePause.serieIndex;
+            final int serieIndexFirst = devicePause.serieIndex_Start;
 
             /*
              * Position slider at the beginning of the slice so that each slice borders has an
@@ -747,22 +750,22 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
              */
 
             serieIndex1 = serieIndexFirst == 0 ? 0 : serieIndexFirst - 1;
-            serieIndex2 = serieIndexFirst;
+            serieIndex2 = devicePause.serieIndex_End;
          }
 
-      } else if (numSelectedSlices > 1) {
+      } else if (numSelectedPauses > 1) {
 
          // Two or more slices are selected, set the 2 sliders to the first and last selected slices
 
          if (slice1 instanceof final DevicePause devicePause) {
 
-            final int serieIndexFirst = devicePause.serieIndex;
+            final int serieIndexFirst = devicePause.serieIndex_Start;
 
             /*
              * Position slider at the beginning of the first slice
              */
             serieIndex1 = serieIndexFirst == 0 ? 0 : serieIndexFirst - 1;
-            serieIndex2 = ((DevicePause) selectedPauses[numSelectedSlices - 1]).serieIndex;
+            serieIndex2 = ((DevicePause) selectedPauses[numSelectedPauses - 1]).serieIndex_Start;
          }
       }
 
@@ -928,9 +931,14 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       _isInUpdate = true;
       {
          final int pauseIndex = pauseSelection.getPauseIndex();
-         final DevicePause devicePause = _allDevicePauses.get(pauseIndex);
 
-         _pausesViewer.setSelection(new StructuredSelection(devicePause), true);
+         // check bounds
+         if (pauseIndex < _allDevicePauses.size()) {
+
+            final DevicePause devicePause = _allDevicePauses.get(pauseIndex);
+
+            _pausesViewer.setSelection(new StructuredSelection(devicePause), true);
+         }
       }
       _isInUpdate = false;
    }
@@ -1032,30 +1040,45 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             // the pause start is before the tour start -> this occurs very often, so keep this value !
 
-//            continue;
+//          continue;
          }
 
-         int serieIndex = 0;
+         final int numAllSlices = timeSerie.length;
+         int serieIndexStart = 0;
+         int serieIndexEnd = 0;
 
-         for (; serieIndex < timeSerie.length; ++serieIndex) {
+         for (; serieIndexStart < numAllSlices; ++serieIndexStart) {
 
-            final long currentTime = timeSerie[serieIndex] * 1000L + tourStartTimeMS;
+            final long absoluteSliceTime = timeSerie[serieIndexStart] * 1000L + tourStartTimeMS;
 
-            if (currentTime > absolutePausedTimeStartMS) {
+            if (absoluteSliceTime > absolutePausedTimeStartMS) {
                break;
             }
          }
 
-         final boolean isPauseAnAutoPause = allPausedTime_Data == null
-               || allPausedTime_Data[pausesIndex] == 1;
-//
-//         final long pauseDuration = Math.round((pausedTimeEndMS - pausedTimeStartMS) / 1000f);
+         for (serieIndexEnd = serieIndexStart; serieIndexEnd < numAllSlices; ++serieIndexEnd) {
+
+            final long absoluteSliceTime = timeSerie[serieIndexEnd] * 1000L + tourStartTimeMS;
+
+            if (absoluteSliceTime > absolutePausedTimeEndMS) {
+
+               serieIndexEnd = serieIndexEnd - 1;
+
+               break;
+            }
+         }
+
+         final boolean isPauseAnAutoPause = allPausedTime_Data == null || allPausedTime_Data[pausesIndex] == 1;
 
          _allDevicePauses.add(new DevicePause(
+
                isPauseAnAutoPause ? 1 : 0,
+
                relativeStartTime,
                relativeEndTime,
-               serieIndex));
+
+               serieIndexStart,
+               serieIndexEnd));
       }
 
    }
