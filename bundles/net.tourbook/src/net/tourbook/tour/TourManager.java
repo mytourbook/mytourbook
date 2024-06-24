@@ -3630,13 +3630,12 @@ public class TourManager {
 
             int monitorCounter = 0;
 
-            monitor.beginTask("Updating tours", numAllTourIds);
+            monitor.beginTask(Messages.Tour_Data_Task_UpdateTours, numAllTourIds);
 
             // loop: all tours
             for (final Long tourId : allTourIds) {
 
-               monitor.subTask(NLS.bind(
-                     "Updated tours: {0}/{1}",
+               monitor.subTask(Messages.Tour_Data_Task_UpdateTours_Subtask.formatted(
                      ++monitorCounter,
                      numAllTourIds));
 

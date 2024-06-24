@@ -3041,6 +3041,8 @@ public class Messages extends NLS {
    public static String        Tour_Data_RetrievingWeatherData_Monitor_Subtask;
    public static String        Tour_Data_SaveTour_Monitor;
    public static String        Tour_Data_SaveTour_MonitorSubtask;
+   public static String        Tour_Data_Task_UpdateTours;
+   public static String        Tour_Data_Task_UpdateTours_Subtask;
    public static String        Tour_Data_Text_AltitudeValues;
    public static String        Tour_Data_Text_BatteryValues;
    public static String        Tour_Data_Text_CadenceValues;
