@@ -15,15 +15,15 @@ New
  
 
 * Tour Book View
-  - New actions in "Adjust Tour Values"
+  - New actions in "Adjust Tour Values"               https://github.com/mytourbook/mytourbook/issues/1372
     - Compute break times for selected tours
-    - Set pause times from break times for selected tours  
+    - Set pause times from break times for selected tours
 
 
 Improvements
 ============
 
-* TCX Import
+* TCX Import                                          https://github.com/mytourbook/mytourbook/issues/1372
   - Paused times can be set optional from the computed break times
 
 * Tour Export (Frederic)
