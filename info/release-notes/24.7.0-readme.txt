@@ -49,7 +49,7 @@ Bugfix
 ======
 
 * Tour Nutrition (Frederic)
-  - Fixed an issue where deleting a custom tour product for a given tour would delete all of them
+  - Fixed an issue where deleting a custom tour product for a given tour would delete all the custom tour products
 
 
 Translation    

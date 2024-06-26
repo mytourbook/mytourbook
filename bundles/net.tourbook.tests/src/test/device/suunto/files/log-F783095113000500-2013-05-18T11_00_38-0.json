@@ -77,19 +77,19 @@
   "tourEndTime" : 1368907395000,
   "tourMarkers" : [ {
     "markerId" : -1,
-    "altitude" : -1.0E35,
+    "altitude" : 274.0,
     "distance20" : 5955.027,
-    "latitude" : -1.0E300,
-    "longitude" : -1.0E300,
+    "latitude" : 45.543643566680714,
+    "longitude" : -122.73954550003789,
     "serieIndex" : 2383,
     "time" : 2496,
     "tourTime" : 1368902532000
   }, {
     "markerId" : -1,
-    "altitude" : -1.0E35,
+    "altitude" : 295.0,
     "distance20" : 11206.127,
-    "latitude" : -1.0E300,
-    "longitude" : -1.0E300,
+    "latitude" : 45.55248990001405,
+    "longitude" : -122.74728570003789,
     "serieIndex" : 4151,
     "time" : 4286,
     "tourTime" : 1368904322000
