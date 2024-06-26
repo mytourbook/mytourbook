@@ -5092,6 +5092,9 @@ public class Map2View extends ViewPart implements
       final boolean isBackgroundDark = isBackgroundDark();
 
       _map.setDimLevel(isMapDimmed, mapDimValue, mapDimColor, isUseMapDimColor, isBackgroundDark);
+
+      // update legend image after the dim level is modified
+      createLegendImage(TourPainterConfiguration.getMapColorProvider());
    }
 
    private void setVisibleDataPoints(final TourData tourData) {
@@ -5495,9 +5498,6 @@ public class Map2View extends ViewPart implements
 
       setIconPosition_TourInfo();
       setIconPosition_TourWeather();
-
-      // create legend image after the dim level is modified
-      createLegendImage(TourPainterConfiguration.getMapColorProvider());
 
       _map.resetMapPoints();
 

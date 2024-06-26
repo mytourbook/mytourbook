@@ -1495,8 +1495,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       final boolean isShowClusteredMarker    = isShowTourMarker && isMarkerClustered;
       final boolean isShowLabels             = isShowTourMarker || isShowTourLocations || isShowTourPauses || isShowCommonLocations;
 
-      _colorMapTransparencyColor             .setEnabled(isDimMap == false || isUseTransparencyColor);
-
       // statistics
       _lblStats_CommonLocations_All          .setEnabled(isShowCommonLocations);
       _lblStats_CommonLocations_Visible      .setEnabled(isShowCommonLocations);
@@ -1551,8 +1549,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       // map dimming
       _chkUseMapDimColor                     .setEnabled(isDimMap);
-      _colorMapDimColor                      .setEnabled(isDimMap);
       _spinnerMapDimValue                    .setEnabled(isDimMap);
+      _colorMapDimColor                      .setEnabled(isDimMap);
+      _colorMapTransparencyColor             .setEnabled(isDimMap == false || isUseTransparencyColor);
 
       // common location
       _btnSwapCommonLocationLabel_Color      .setEnabled(isShowCommonLocations);

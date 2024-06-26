@@ -47,9 +47,9 @@ public class Map2PointManager {
    }
 
    /**
-    * Update UI in the location + marker slideout
+    * Update UI in the map point slideout
     */
-   public static void updateMapLocationAndMarkerSlideout() {
+   public static void updateMapPointSlideout() {
 
       if (_mapPoint_Slideout != null) {
 

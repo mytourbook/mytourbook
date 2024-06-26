@@ -35,7 +35,6 @@ Changes
 
 * 2D Map
   - Moved options from the "2D Map Options" slideout into the "Map Points" slideout
-    - Map dimming
     - Filter tour pauses
   - Removed actions from the context menu, they are now available in the "Map Points" slideout
     - "Show Tour Markers"
