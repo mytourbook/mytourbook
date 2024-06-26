@@ -3629,15 +3629,23 @@ public class TourManager {
             _tourUpdate_Queue.clear();
 
             int monitorCounter = 0;
+            long lastUIUpdateTime = 0;
 
             monitor.beginTask(Messages.Tour_Data_Task_UpdateTours, numAllTourIds);
 
             // loop: all tours
             for (final Long tourId : allTourIds) {
 
-               monitor.subTask(Messages.Tour_Data_Task_UpdateTours_Subtask.formatted(
-                     ++monitorCounter,
-                     numAllTourIds));
+               // reduce monitor updates
+               final long currentTime = System.currentTimeMillis();
+               if (currentTime > lastUIUpdateTime + 200) {
+
+                  lastUIUpdateTime = currentTime;
+
+                  monitor.subTask(Messages.Tour_Data_Task_UpdateTours_Subtask.formatted(
+                        monitorCounter,
+                        numAllTourIds));
+               }
 
                if (monitor.isCanceled()) {
 
@@ -3653,6 +3661,8 @@ public class TourManager {
                }
 
                updateTourData_Concurrent_OneTour(tourId, tourDataUpdater, _allSavedTours, _allSavedTourIds, monitor);
+
+               ++monitorCounter;
             }
 
             // wait until all loadings are performed
@@ -3666,12 +3676,13 @@ public class TourManager {
 
             if (numSavedTours > 0) {
 
-               final List<TourData> allTourDataAsList = _allSavedTours.subList(0, numSavedTours);
                final List<Long> allIDsAsList = _allSavedTourIds.stream().toList();
-
                TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(allIDsAsList);
 
-               final TourEvent tourEvent = new TourEvent(new ArrayList<>(allTourDataAsList));
+               final TourData[] allTourDataAsArray = _allSavedTours.toArray(new TourData[numSavedTours]);
+               final ArrayList<TourData> allTourDataAsList = new ArrayList<>(Arrays.asList(allTourDataAsArray));
+
+               final TourEvent tourEvent = new TourEvent(allTourDataAsList);
 
                // set tour data into the editor that the editor do not get modified
                tourEvent.tourDataEditorSavedTour = getTourDataEditorTour(allTourDataAsList);

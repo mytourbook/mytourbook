@@ -54,9 +54,9 @@ public class ActionSetTourPauseTimes extends Action implements ITourDataUpdate {
          return;
       }
 
-      final Set<Long> selectedTours = _tourProvider.getSelectedTourIDs();
+      final Set<Long> selectedTourIDs = _tourProvider.getSelectedTourIDs();
 
-      TourManager.updateTourData_Concurrent(selectedTours, this);
+      TourManager.updateTourData_Concurrent(selectedTourIDs, this);
    }
 
    @Override
