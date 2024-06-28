@@ -144,8 +144,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
       final Color lineColor = _map2.isMapBackgroundDark() ? UI.SYS_COLOR_WHITE : UI.SYS_COLOR_BLACK;
 
-      gc.setForeground(mapPoint.getOutlineColor());
-      gc.setBackground(mapPoint.getFillColor());
+      gc.setForeground(mapPoint.getOutlineColorSWT());
+      gc.setBackground(mapPoint.getFillColorSWT());
 
       /*
        * Draw location bounding box
@@ -153,7 +153,7 @@ public class DirectMappingPainter implements IDirectPainter {
       if (mapConfig.isShowLocationBoundingBox) {
 
          // draw original bbox
-         final Rectangle boundingBox = mapPoint.boundingBox;
+         final Rectangle boundingBox = mapPoint.boundingBoxSWT;
 
          if (boundingBox != null) {
 
@@ -166,7 +166,7 @@ public class DirectMappingPainter implements IDirectPainter {
             );
          }
 
-         final Rectangle boundingBox_Resized = mapPoint.boundingBox_Resized;
+         final Rectangle boundingBox_Resized = mapPoint.boundingBox_ResizedSWT;
 
          if (boundingBox_Resized != null) {
 
@@ -211,7 +211,7 @@ public class DirectMappingPainter implements IDirectPainter {
             lineToDevX,
             lineToDevY);
 
-      gc.setForeground(mapPoint.getOutlineColor());
+      gc.setForeground(mapPoint.getOutlineColorSWT());
 
       /*
        * Draw a symbol at the point location
