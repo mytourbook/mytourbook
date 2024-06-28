@@ -61,6 +61,8 @@ import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.font.TextAttribute;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.UnsupportedEncodingException;
@@ -305,6 +307,8 @@ public class Map2 extends Canvas {
    private static RGB                    _mapTransparentRGB;
    private static Color                  _mapTransparentColor;
    private static boolean                _isTransparentColorModified;
+
+   private static java.awt.Font          _defaultFont               = net.tourbook.common.UI.AWT_DIALOG_FONT;
 
    private Color                         _defaultBackgroundColor;
 
@@ -6720,6 +6724,8 @@ public class Map2 extends Canvas {
                   || _mapConfig.isShowCommonLocation
                   || _mapConfig.isShowTourPauses) {
 
+               setupDefaultFont(g2d);
+
                // clone list to prevent concurrency exceptions, this happened
                final List<TourData> allTourData = new ArrayList<>(TourPainterConfiguration.getTourData());
 
@@ -6978,7 +6984,6 @@ public class Map2 extends Canvas {
          }
 
          // font MUST be set before string.extend() !!!
-         final java.awt.Font defaultFont = g2d.getFont();
          g2d.setFont(_clusterFont);
 
          for (final StaticCluster<?> staticCluster : allClustersOnly) {
@@ -6996,7 +7001,7 @@ public class Map2 extends Canvas {
             }
          }
 
-         g2d.setFont(defaultFont);
+         g2d.setFont(_defaultFont);
       }
 
       /*
@@ -7048,7 +7053,7 @@ public class Map2 extends Canvas {
             paint_MapPointImage_60_OneCluster_Paint(g2d, paintedCluster);
          }
 
-         g2d.setFont(null);
+         g2d.setFont(_defaultFont);
       }
    }
 
@@ -7134,7 +7139,7 @@ public class Map2 extends Canvas {
 
       g2d.drawString(clusterLabel, clusterLabelDevX, clusterLabelDevY);
 
-      g2d.setFont(null);
+      g2d.setFont(_defaultFont);
    }
 
    private PaintedMarkerCluster paint_MapPointImage_42_OneCluster_Setup(final Graphics2D g2d,
@@ -7917,10 +7922,14 @@ public class Map2 extends Canvas {
                                           final Rectangle labelRectangle,
                                           final List<PaintedMapPoint> allPaintedMapPoints) {
 
+      final FontMetrics fontMetrics = g2d.getFontMetrics();
+
       final String labelText = mapPoint.getFormattedLabel();
 
-      final int devX = labelRectangle.x;
-      final int devY = labelRectangle.y;
+      final int rectangleHeight = labelRectangle.height;
+
+      final int devX = labelRectangle.x - 1;
+      final int devY = labelRectangle.y + rectangleHeight - fontMetrics.getDescent() - 1;
 
       java.awt.Color fillColor;
       java.awt.Color outlineColor;
@@ -7947,13 +7956,13 @@ public class Map2 extends Canvas {
        */
       if (markerLabelLayout.equals(MapLabelLayout.RECTANGLE_BOX)) {
 
-         g2d.setBackground(fillColor);
+         g2d.setColor(fillColor);
 
          g2d.fillRect(
                labelRectangle.x - MAP_MARKER_BORDER_WIDTH,
                labelRectangle.y,
                labelRectangle.width + 2 * MAP_MARKER_BORDER_WIDTH,
-               labelRectangle.height);
+               rectangleHeight);
 
       } else if (markerLabelLayout.equals(MapLabelLayout.SHADOW)) {
 
@@ -10436,6 +10445,43 @@ public class Map2 extends Canvas {
          _clusterFont = currentFont.deriveFont(fontHeight_NEW);
          _clusterFontSize = newClusterFontSize;
       }
+   }
+
+   private void setupDefaultFont(final Graphics2D g2d) {
+
+      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+            _mapConfig.isSymbolAntialiased
+                  ? RenderingHints.VALUE_ANTIALIAS_ON
+                  : RenderingHints.VALUE_ANTIALIAS_OFF);
+
+      Object textAntialiasingON = null;
+
+      textAntialiasingON = RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
+//    textAntialiasingON = RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT;
+//    textAntialiasingON = RenderingHints.VALUE_TEXT_ANTIALIAS_GASP;
+//    textAntialiasingON = RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HBGR;
+//    textAntialiasingON = RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB;
+//    textAntialiasingON = RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VBGR;
+//    textAntialiasingON = RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VRGB;
+
+      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+            _mapConfig.isLabelAntialiased
+                  ? textAntialiasingON
+                  : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+
+      final Map<TextAttribute, Object> fontAttributes = new HashMap<>();
+
+      fontAttributes.put(TextAttribute.SIZE, 12);
+      fontAttributes.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
+//    fontAttributes.put(TextAttribute.FAMILY, java.awt.Font.DIALOG);
+//    fontAttributes.put(TextAttribute.FAMILY, java.awt.Font.SANS_SERIF);
+//    fontAttributes.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_EXTRA_LIGHT);
+//    fontAttributes.put(TextAttribute.LIGATURES, TextAttribute.LIGATURES_ON);
+
+      _defaultFont = UI.AWT_DIALOG_FONT.deriveFont(fontAttributes);
+//    _defaultFont = UI.AWT_FONT_ARIAL_12.deriveFont(fontAttributes);
+
+      g2d.setFont(_defaultFont);
    }
 
    private void setupGroupedLabels() {

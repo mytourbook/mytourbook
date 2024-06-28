@@ -663,6 +663,9 @@ public class UI {
    public static final Font    AWT_FONT_ARIAL_BOLD_12    = Font.decode("Arial-bold-12");  //$NON-NLS-1$
    public static final Font    AWT_FONT_ARIAL_BOLD_24    = Font.decode("Arial-bold-24");  //$NON-NLS-1$
 
+   /**
+    * Is "Segoe UI" with Win10
+    */
    public static Font          AWT_DIALOG_FONT;
 
 // SET_FORMATTING_OFF
