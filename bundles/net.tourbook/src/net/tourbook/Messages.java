@@ -2373,6 +2373,7 @@ public class Messages extends NLS {
    public static String        Slideout_MapPoints_Label_GroupDuplicatedMarkers;
    public static String        Slideout_MapPoints_Label_GroupGridSize;
    public static String        Slideout_MapPoints_Label_LabelBackground;
+   public static String        Slideout_MapPoints_Label_LabelFontSize;
    public static String        Slideout_MapPoints_Label_LocationColor;
    public static String        Slideout_MapPoints_Label_LocationColor_Tooltip;
    public static String        Slideout_MapPoints_Label_MarkerColor;

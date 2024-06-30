@@ -738,6 +738,8 @@ public class Map2 extends Canvas {
    private Font              _boldFont          = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
    private Font              _clusterFont;
    private int               _clusterFontSize;
+   private Font              _labelFont;
+   private int               _labelFontSize;
 
    private int               _prefOptions_BorderWidth;
    private boolean           _prefOptions_isCutOffLinesInPauses;
@@ -3991,6 +3993,7 @@ public class Map2 extends Canvas {
       UI.disposeResource(_cursorSelect);
 
       UI.disposeResource(_clusterFont);
+      UI.disposeResource(_labelFont);
 
       // dispose resources in the overlay plugins
       for (final Map2Painter overlay : _allMapPainter) {
@@ -6697,6 +6700,13 @@ public class Map2 extends Canvas {
             gc.setAntialias(_mapConfig.isSymbolAntialiased ? SWT.ON : SWT.OFF);
             gc.setTextAntialias(_mapConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
 
+            final int labelFontSize = (_mapConfig.labelFontSize);
+            if (_labelFontSize != labelFontSize) {
+               setupFont_Label(gc, labelFontSize);
+            }
+
+            gc.setFont(_labelFont);
+
             if (_mapConfig.isShowTourMarker
                   || _mapConfig.isShowTourLocation
                   || _mapConfig.isShowCommonLocation
@@ -6940,7 +6950,7 @@ public class Map2 extends Canvas {
 
          final int clusterFontSize = (int) (_mapConfig.clusterSymbol_Size * 2.0f);
          if (_clusterFontSize != clusterFontSize) {
-            setupClusterFont(gc, clusterFontSize);
+            setupFont_Cluster(gc, clusterFontSize);
          }
 
          // font MUST be set before string.extend() !!!
@@ -6961,7 +6971,7 @@ public class Map2 extends Canvas {
             }
          }
 
-         gc.setFont(null);
+         gc.setFont(_labelFont);
       }
 
       /*
@@ -7013,7 +7023,7 @@ public class Map2 extends Canvas {
             paint_MapPointImage_60_OneCluster_Paint(gc, paintedCluster);
          }
 
-         gc.setFont(null);
+         gc.setFont(_labelFont);
       }
    }
 
@@ -7103,7 +7113,7 @@ public class Map2 extends Canvas {
 
             true);
 
-      gc.setFont(null);
+      gc.setFont(_labelFont);
    }
 
    private PaintedMarkerCluster paint_MapPointImage_42_OneCluster_Setup(final GC gc,
@@ -10384,26 +10394,34 @@ public class Map2 extends Canvas {
       }
    }
 
-   private void setupClusterFont(final GC gc, final int newClusterFontSize) {
+   private void setupFont_Cluster(final GC gc, final int newFontSize) {
+
+      // dispose old font
+      UI.disposeResource(_clusterFont);
 
       final Font gcFont = gc.getFont();
       final FontData fontData = gcFont.getFontData()[0];
 
-      final int fontHeight_OLD = fontData.getHeight();
-      final int fontHeight_NEW = newClusterFontSize;
+      final int fontHeight_NEW = newFontSize;
 
-      if (fontHeight_OLD != fontHeight_NEW) {
+      fontData.setHeight(fontHeight_NEW);
 
-         // fontsize has changed
+      _clusterFont = new Font(getDisplay(), fontData);
+      _clusterFontSize = newFontSize;
+   }
 
-         fontData.setHeight(fontHeight_NEW);
+   private void setupFont_Label(final GC gc, final int newFontSize) {
 
-         // dispose old font
-         UI.disposeResource(_clusterFont);
+      // dispose old font
+      UI.disposeResource(_labelFont);
 
-         _clusterFont = new Font(getDisplay(), fontData);
-         _clusterFontSize = newClusterFontSize;
-      }
+      final Font gcFont = gc.getFont();
+      final FontData fontData = gcFont.getFontData()[0];
+
+      fontData.setHeight(newFontSize);
+
+      _labelFont = new Font(getDisplay(), fontData);
+      _labelFontSize = newFontSize;
    }
 
    private void setupGroupedLabels() {

@@ -205,6 +205,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Label                 _lblLabelGroupGridSize;
    private Label                 _lblCommonLocationLabel_Color;
    private Label                 _lblLabelBackground;
+   private Label                 _lblLabelFontSize;
    private Label                 _lblStats_CommonLocations_All;
    private Label                 _lblStats_CommonLocations_Visible;
    private Label                 _lblStats_TourLocations_All;
@@ -226,6 +227,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Spinner               _spinnerLabelDistributorMaxLabels;
    private Spinner               _spinnerLabelDistributorRadius;
    private Spinner               _spinnerLabelGroupGridSize;
+   private Spinner               _spinnerLabelFontSize;
    private Spinner               _spinnerLabelTruncateLength;
    private Spinner               _spinnerLabelWrapLength;
    private Spinner               _spinnerMapDimValue;
@@ -691,6 +693,23 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                _spinnerLabelDistributorRadius.addMouseWheelListener(_mapPointMouseWheelListener10);
                _spinnerLabelDistributorRadius.setToolTipText(Messages.Slideout_MapPoints_Spinner_LabelDistributor_Radius_Tooltip);
             }
+         }
+         {
+            /*
+             * Label font size
+             */
+            _lblLabelFontSize = new Label(tabContainer, SWT.NONE);
+            _lblLabelFontSize.setText(Messages.Slideout_MapPoints_Label_LabelFontSize);
+            gdHCenter.applyTo(_lblLabelFontSize);
+
+            // spinner
+            _spinnerLabelFontSize = new Spinner(tabContainer, SWT.BORDER);
+            _spinnerLabelFontSize.setMinimum(Map2ConfigManager.LABEL_FONT_SIZE_MIN);
+            _spinnerLabelFontSize.setMaximum(Map2ConfigManager.LABEL_FONT_SIZE_MAX);
+            _spinnerLabelFontSize.setIncrement(1);
+            _spinnerLabelFontSize.setPageIncrement(10);
+            _spinnerLabelFontSize.addSelectionListener(_mapPointSelectionListener);
+            _spinnerLabelFontSize.addMouseWheelListener(_mapPointMouseWheelListener);
          }
          {
             /*
@@ -1512,9 +1531,11 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _chkIsWrapLabel                        .setEnabled(isShowLabels);
       _comboLabelLayout                      .setEnabled(isShowLabels);
       _lblLabelBackground                    .setEnabled(isShowLabels);
+      _lblLabelFontSize                      .setEnabled(isShowLabels);
       _lblVisibleLabels                      .setEnabled(isShowLabels);
       _spinnerLabelDistributorMaxLabels      .setEnabled(isShowLabels);
       _spinnerLabelDistributorRadius         .setEnabled(isShowLabels);
+      _spinnerLabelFontSize                  .setEnabled(isShowLabels);
       _spinnerLabelTruncateLength            .setEnabled(isShowLabels && isTruncateLabel);
       _spinnerLabelWrapLength                .setEnabled(isShowLabels && isWrapLabel);
 
@@ -2025,6 +2046,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _spinnerLabelDistributorMaxLabels      .setSelection( config.labelDistributorMaxLabels);
       _spinnerLabelDistributorRadius         .setSelection( config.labelDistributorRadius);
       _spinnerLabelGroupGridSize             .setSelection( config.groupGridSize);
+      _spinnerLabelFontSize                  .setSelection( config.labelFontSize);
       _spinnerLabelTruncateLength            .setSelection( config.labelTruncateLength);
       _spinnerLabelWrapLength                .setSelection( config.labelWrapLength);
 
@@ -2119,6 +2141,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       config.isWrapLabel                  = _chkIsWrapLabel                      .getSelection();
       config.labelDistributorMaxLabels    = _spinnerLabelDistributorMaxLabels    .getSelection();
       config.labelDistributorRadius       = _spinnerLabelDistributorRadius       .getSelection();
+      config.labelFontSize                = _spinnerLabelFontSize                .getSelection();
       config.labelTruncateLength          = _spinnerLabelTruncateLength          .getSelection();
       config.labelWrapLength              = _spinnerLabelWrapLength              .getSelection();
 
