@@ -18,6 +18,7 @@ package net.tourbook.common;
 import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
@@ -1754,6 +1755,35 @@ public class UI {
       }
 
       return null;
+   }
+
+   public static void dumpAllFonts() {
+
+      System.out.println("All available font family names");
+
+      // all fonts available in AWT
+      final Font[] allFonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
+
+      for (final Font font : allFonts) {
+
+         String style;
+
+         if (font.isBold()) {
+            style = font.isItalic() ? "bolditalic" : "bold";
+         } else {
+            style = font.isItalic() ? "italic" : "plain";
+         }
+
+         System.out.println(""
+
+               + "%-35s - %s".formatted(
+
+                     font.getFamily(),
+//                           font.getName(),
+                     style
+
+               ));
+      }
    }
 
    public static void dumpSuperClasses(final Object o) {

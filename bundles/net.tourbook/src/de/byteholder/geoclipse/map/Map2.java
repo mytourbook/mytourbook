@@ -62,7 +62,6 @@ import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.font.TextAttribute;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.UnsupportedEncodingException;
@@ -6768,18 +6767,6 @@ public class Map2 extends Canvas {
 
          final Image swtPaintedImage = ImageConverter.convertIntoSWT(awtPaintedImage);
 
-//         final Image canvasImage = _mapPointPainterImage_WhichIsPaintedSWT;
-//         final GC gc = new GC(canvasImage);
-//         {
-//            gc.setBackground(_mapTransparentColor);
-//            gc.fillRectangle(_mapPointImageSize);
-//
-//            gc.setAntialias(_mapConfig.isSymbolAntialiased ? SWT.ON : SWT.OFF);
-//            gc.setTextAntialias(_mapConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
-//
-//         }
-//         gc.dispose();
-
          // swap images
          final Image swtOldVisibleImage = _mapPointPainterImage_WhichIsDisplayedSWT;
 
@@ -7929,7 +7916,7 @@ public class Map2 extends Canvas {
       final int rectangleHeight = labelRectangle.height;
 
       final int devX = labelRectangle.x - 1;
-      final int devY = labelRectangle.y + rectangleHeight - fontMetrics.getDescent() - 1;
+      final int devY = labelRectangle.y + rectangleHeight - fontMetrics.getDescent() - 0;
 
       java.awt.Color fillColor;
       java.awt.Color outlineColor;
@@ -10469,16 +10456,26 @@ public class Map2 extends Canvas {
                   ? textAntialiasingON
                   : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 
-      final Map<TextAttribute, Object> fontAttributes = new HashMap<>();
-
-      fontAttributes.put(TextAttribute.SIZE, 12);
-      fontAttributes.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
+//    final Map<TextAttribute, Object> fontAttributes = new HashMap<>();
+//
+//    fontAttributes.put(TextAttribute.SIZE, 12);
+//    fontAttributes.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
+//    fontAttributes.put(TextAttribute.LIGATURES, TextAttribute.LIGATURES_ON);
 //    fontAttributes.put(TextAttribute.FAMILY, java.awt.Font.DIALOG);
 //    fontAttributes.put(TextAttribute.FAMILY, java.awt.Font.SANS_SERIF);
 //    fontAttributes.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_EXTRA_LIGHT);
-//    fontAttributes.put(TextAttribute.LIGATURES, TextAttribute.LIGATURES_ON);
 
-      _defaultFont = UI.AWT_DIALOG_FONT.deriveFont(fontAttributes);
+//    UI.dumpAllFonts();
+//    final java.awt.Font systemFont = new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 12); //$NON-NLS-1$
+//    final java.awt.Font systemFont = new java.awt.Font("Liberation Sans", java.awt.Font.PLAIN, 12); //$NON-NLS-1$
+//    final java.awt.Font systemFont = new java.awt.Font("Segoe UI Light", java.awt.Font.PLAIN, 12); //$NON-NLS-1$
+
+      final java.awt.Font userFont = new java.awt.Font(_mapConfig.labelFont, java.awt.Font.PLAIN, _mapConfig.labelFontSize);
+
+      _defaultFont = userFont;
+
+//    _defaultFont = systemFont.deriveFont(fontAttributes);
+//    _defaultFont = UI.AWT_DIALOG_FONT.deriveFont(fontAttributes);
 //    _defaultFont = UI.AWT_FONT_ARIAL_12.deriveFont(fontAttributes);
 
       g2d.setFont(_defaultFont);
