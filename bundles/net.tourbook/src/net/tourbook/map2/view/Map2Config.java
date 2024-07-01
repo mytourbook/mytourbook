@@ -44,6 +44,7 @@ public class Map2Config {
    public boolean        isWrapLabel;
    public int            labelDistributorMaxLabels = Map2ConfigManager.LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT;
    public int            labelDistributorRadius    = Map2ConfigManager.LABEL_DISTRIBUTOR_RADIUS_DEFAULT;
+   public String         labelFont                 = Map2ConfigManager.LABEL_FONT_DEFAULT;
    public int            labelFontSize             = Map2ConfigManager.LABEL_FONT_SIZE_DEFAULT;
    public int            labelTruncateLength       = Map2ConfigManager.LABEL_TRUNCATE_LENGTH_DEFAULT;
    public int            labelWrapLength           = Map2ConfigManager.LABEL_WRAP_LENGTH_DEFAULT;

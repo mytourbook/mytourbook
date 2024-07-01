@@ -735,6 +735,7 @@ public class Map2 extends Canvas {
    private Font              _clusterFont;
    private int               _clusterFontSize;
    private Font              _labelFont;
+   private String            _labelFontName;
    private int               _labelFontSize;
 
    private int               _prefOptions_BorderWidth;
@@ -4445,6 +4446,9 @@ public class Map2 extends Canvas {
       // hide map point tooltip
       _mapPointTooltip.hide();
 
+// this causes context menu actions to NOT work
+//      _hoveredMapPoint = null;
+
       paint();
    }
 
@@ -6657,9 +6661,10 @@ public class Map2 extends Canvas {
             gc.setAntialias(_mapConfig.isSymbolAntialiased ? SWT.ON : SWT.OFF);
             gc.setTextAntialias(_mapConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
 
-            final int labelFontSize = (_mapConfig.labelFontSize);
-            if (_labelFontSize != labelFontSize) {
-               setupFont_Label(gc, labelFontSize);
+            final String labelFontName = _mapConfig.labelFont;
+            final int labelFontSize = _mapConfig.labelFontSize;
+            if (_labelFontSize != labelFontSize || _labelFontName != labelFontName) {
+               setupFont_Label(gc, labelFontName, labelFontSize);
             }
 
             gc.setFont(_labelFont);
@@ -10346,7 +10351,7 @@ public class Map2 extends Canvas {
       _clusterFontSize = newFontSize;
    }
 
-   private void setupFont_Label(final GC gc, final int newFontSize) {
+   private void setupFont_Label(final GC gc, final String newFontName, final int newFontSize) {
 
       // dispose old font
       UI.disposeResource(_labelFont);
@@ -10354,6 +10359,7 @@ public class Map2 extends Canvas {
       final Font gcFont = gc.getFont();
       final FontData fontData = gcFont.getFontData()[0];
 
+      fontData.setName(newFontName);
       fontData.setHeight(newFontSize);
 
       _labelFont = new Font(getDisplay(), fontData);

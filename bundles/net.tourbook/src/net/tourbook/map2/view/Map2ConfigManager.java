@@ -90,7 +90,8 @@ public class Map2ConfigManager {
    private static final String ATTR_LABEL_DISTRIBUTOR_MAX_LABELS     = "labelDistributorMaxLabels";           //$NON-NLS-1$
    private static final String ATTR_LABEL_DISTRIBUTOR_RADIUS         = "labelDistributorRadius";              //$NON-NLS-1$
    private static final String ATTR_LABEL_TRUNCATE_LENGTH            = "labelTruncateLength";                 //$NON-NLS-1$
-   private static final String ATTR_LABEL_LABEL_FONT_SIZE            = "labelFontSize";                       //$NON-NLS-1$
+   private static final String ATTR_LABEL_FONT                       = "labelFont";                           //$NON-NLS-1$
+   private static final String ATTR_LABEL_FONT_SIZE                  = "labelFontSize";                       //$NON-NLS-1$
    private static final String ATTR_LABEL_WRAP_LENGTH                = "labelWrapLength";                     //$NON-NLS-1$
    // tour + common location
    private static final String ATTR_IS_SHOW_COMMON_LOCATION          = "isShowCommonLocation";                //$NON-NLS-1$
@@ -154,6 +155,7 @@ public class Map2ConfigManager {
    static final int                            LABEL_DISTRIBUTOR_RADIUS_MIN            = 10;
    static final int                            LABEL_DISTRIBUTOR_RADIUS_MAX            = 2000;
    static final int                            LABEL_DISTRIBUTOR_RADIUS_DEFAULT        = 100;
+   static final String                         LABEL_FONT_DEFAULT                      = UI.AWT_DIALOG_FONT.getFontName();
    static final int                            LABEL_FONT_SIZE_DEFAULT                 = 9;                                         // SWT: 9 - AWT: 12
    static final int                            LABEL_FONT_SIZE_MIN                     = 2;
    static final int                            LABEL_FONT_SIZE_MAX                     = 100;
@@ -326,7 +328,8 @@ public class Map2ConfigManager {
          xmlConfig.putBoolean(      ATTR_IS_WRAP_LABEL,                 config.isWrapLabel);
          xmlConfig.putInteger(      ATTR_LABEL_DISTRIBUTOR_MAX_LABELS,  config.labelDistributorMaxLabels);
          xmlConfig.putInteger(      ATTR_LABEL_DISTRIBUTOR_RADIUS,      config.labelDistributorRadius);
-         xmlConfig.putInteger(      ATTR_LABEL_LABEL_FONT_SIZE,         config.labelFontSize);
+         xmlConfig.putString(       ATTR_LABEL_FONT,                    config.labelFont);
+         xmlConfig.putInteger(      ATTR_LABEL_FONT_SIZE,               config.labelFontSize);
          xmlConfig.putInteger(      ATTR_LABEL_TRUNCATE_LENGTH,         config.labelTruncateLength);
          xmlConfig.putInteger(      ATTR_LABEL_WRAP_LENGTH,             config.labelWrapLength);
 
@@ -511,7 +514,8 @@ public class Map2ConfigManager {
       config.isWrapLabel                  = Util.getXmlBoolean(xmlConfig,     ATTR_IS_WRAP_LABEL,                 false);
       config.labelDistributorMaxLabels    = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_DISTRIBUTOR_MAX_LABELS,  LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT,  LABEL_DISTRIBUTOR_MAX_LABELS_MIN,   LABEL_DISTRIBUTOR_MAX_LABELS_MAX);
       config.labelDistributorRadius       = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_DISTRIBUTOR_RADIUS,      LABEL_DISTRIBUTOR_RADIUS_DEFAULT,      LABEL_DISTRIBUTOR_RADIUS_MIN,       LABEL_DISTRIBUTOR_RADIUS_MAX);
-      config.labelFontSize                = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_LABEL_FONT_SIZE,         LABEL_FONT_SIZE_DEFAULT,               LABEL_FONT_SIZE_MIN,                LABEL_FONT_SIZE_MAX);
+      config.labelFont                    = Util.getXmlString (xmlConfig,     ATTR_LABEL_FONT,                    LABEL_FONT_DEFAULT);
+      config.labelFontSize                = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_FONT_SIZE,               LABEL_FONT_SIZE_DEFAULT,               LABEL_FONT_SIZE_MIN,                LABEL_FONT_SIZE_MAX);
       config.labelTruncateLength          = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_TRUNCATE_LENGTH,         LABEL_TRUNCATE_LENGTH_DEFAULT,         LABEL_TRUNCATE_LENGTH_MIN,          LABEL_TRUNCATE_LENGTH_MAX);
       config.labelWrapLength              = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_WRAP_LENGTH,             LABEL_WRAP_LENGTH_DEFAULT,             LABEL_WRAP_LENGTH_MIN,              LABEL_WRAP_LENGTH_MAX);
       config.labelLayout = (MapLabelLayout) Util.getXmlEnum(   xmlConfig,     ATTR_LABEL_LAYOUT,                  LABEL_LAYOUT_DEFAULT);

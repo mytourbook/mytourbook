@@ -17,6 +17,7 @@ package net.tourbook.map2.view;
 
 import de.byteholder.geoclipse.map.Map2;
 
+import java.awt.GraphicsEnvironment;
 import java.text.NumberFormat;
 
 import net.tourbook.Images;
@@ -79,14 +80,14 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       IActionResetToDefault {
 
    //
-   private static final String            STATE_EXPANDED_HEIGHT       = "STATE_EXPANDED_HEIGHT";         //$NON-NLS-1$
-   private static final String            STATE_IS_SLIDEOUT_EXPANDED  = "STATE_IS_SLIDEOUT_EXPANDED";    //$NON-NLS-1$
-   private static final String            STATE_SELECTED_TAB          = "STATE_SELECTED_TAB";            //$NON-NLS-1$
+   private static final String     STATE_EXPANDED_HEIGHT       = "STATE_EXPANDED_HEIGHT";                                                        //$NON-NLS-1$
+   private static final String     STATE_IS_SLIDEOUT_EXPANDED  = "STATE_IS_SLIDEOUT_EXPANDED";                                                   //$NON-NLS-1$
+   private static final String     STATE_SELECTED_TAB          = "STATE_SELECTED_TAB";                                                           //$NON-NLS-1$
    //
    /**
     * MUST be in sync with {@link #_allMarkerLabelLayout_Label}
     */
-   private static MapLabelLayout[]        _allMarkerLabelLayout_Value = {
+   private static MapLabelLayout[] _allMarkerLabelLayout_Value = {
 
          MapLabelLayout.RECTANGLE_BOX,
          MapLabelLayout.BORDER_2_PIXEL,
@@ -99,7 +100,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    /**
     * MUST be in sync with {@link #_allMarkerLabelLayout_Value}
     */
-   private static String[]                _allMarkerLabelLayout_Label = {
+   private static String[]         _allMarkerLabelLayout_Label = {
 
          Messages.Map_Points_LabelBackground_RectangleBox,
          Messages.Map_Points_LabelBackground_Border2,
@@ -109,7 +110,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
    };
    //
-   private final IPreferenceStore         _prefStore                  = TourbookPlugin.getPrefStore();
+   private static final String[]   _allFontNames               = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+   //
+   //
+   private static final IPreferenceStore  _prefStore      = TourbookPlugin.getPrefStore();
    private IDialogSettings                _state_Map2;
    private IDialogSettings                _state_Slideout;
    //
@@ -136,11 +140,11 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    //
    private boolean                        _isSlideoutExpanded;
    private int                            _expandingCounter;
-   private int                            _expandedHeight             = -1;
+   private int                            _expandedHeight = -1;
    //
    private TourPauseUI                    _tourPausesUI;
    //
-   private final NumberFormat             _nf3                        = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf3            = NumberFormat.getNumberInstance();
    {
       _nf3.setMinimumFractionDigits(3);
       _nf3.setMaximumFractionDigits(3);
@@ -195,16 +199,18 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Button                _chkIsTruncateLabel;
    private Button                _chkIsWrapLabel;
    //
+   private Combo                 _comboLabelFont;
    private Combo                 _comboLabelLayout;
    //
    private Label                 _lblClusterGrid_Size;
    private Label                 _lblClusterSymbol;
    private Label                 _lblClusterSymbol_Size;
-   private Label                 _lblGroupDuplicatedMarkers;
-   private Label                 _lblLabelGroupGridSize;
    private Label                 _lblCommonLocationLabel_Color;
    private Label                 _lblLabelBackground;
+   private Label                 _lblLabelFont;
    private Label                 _lblLabelFontSize;
+   private Label                 _lblLabelGroup_DuplicatedMarkers;
+   private Label                 _lblLabelGroup_GridSize;
    private Label                 _lblStats_CommonLocations_All;
    private Label                 _lblStats_CommonLocations_Visible;
    private Label                 _lblStats_TourLocations_All;
@@ -231,12 +237,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Spinner               _spinnerLabelWrapLength;
    private Spinner               _spinnerMapDimValue;
    //
-   private Text                  _txtGroupDuplicatedMarkers;
+   private Text                  _txtLabelGroupDuplicatedMarkers;
    //
    private ColorSelectorExtended _colorClusterSymbol_Fill;
    private ColorSelectorExtended _colorClusterSymbol_Outline;
    private ColorSelectorExtended _colorCommonLocationLabel_Fill;
    private ColorSelectorExtended _colorCommonLocationLabel_Outline;
+   private ColorSelectorExtended _colorMapDimColor;
    private ColorSelectorExtended _colorTourMarkerLabel_Fill;
    private ColorSelectorExtended _colorTourMarkerLabel_Outline;
    private ColorSelectorExtended _colorTourLocationLabel_Fill;
@@ -693,6 +700,27 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          }
          {
             /*
+             * Label font name
+             */
+
+            // label
+            _lblLabelFont = new Label(tabContainer, SWT.NONE);
+            _lblLabelFont.setText(Messages.Slideout_MapPoints_Label_Font);
+            gdHCenter.applyTo(_lblLabelFont);
+
+            // font names
+            _comboLabelFont = new Combo(tabContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboLabelFont.setVisibleItemCount(50);
+            _comboLabelFont.addSelectionListener(_mapPointSelectionListener);
+            _comboLabelFont.addFocusListener(_keepOpenListener);
+            GridDataFactory.fillDefaults()
+            
+                  // the default width is too wide for this small slideout
+                  .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+                  .applyTo(_comboLabelFont);
+         }
+         {
+            /*
              * Label font size
              */
             _lblLabelFontSize = new Label(tabContainer, SWT.NONE);
@@ -771,15 +799,26 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _chkIsDimMap.setText(Messages.Slideout_Map_Options_Checkbox_DimMap);
             _chkIsDimMap.addSelectionListener(_mapPointSelectionListener);
 
-            // spinner
-            _spinnerMapDimValue = new Spinner(tabContainer, SWT.BORDER);
-            _spinnerMapDimValue.setToolTipText(Messages.Slideout_Map_Options_Spinner_DimValue_Tooltip);
-            _spinnerMapDimValue.setMinimum(0);
-            _spinnerMapDimValue.setMaximum(Map2View.MAX_DIM_STEPS);
-            _spinnerMapDimValue.setIncrement(1);
-            _spinnerMapDimValue.setPageIncrement(4);
-            _spinnerMapDimValue.addSelectionListener(_mapPointSelectionListener);
-            _spinnerMapDimValue.addMouseWheelListener(_mapPointMouseWheelListener);
+            final Composite container = new Composite(tabContainer, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+            {
+               // spinner
+               _spinnerMapDimValue = new Spinner(container, SWT.BORDER);
+               _spinnerMapDimValue.setToolTipText(Messages.Slideout_Map_Options_Spinner_DimValue_Tooltip);
+               _spinnerMapDimValue.setMinimum(0);
+               _spinnerMapDimValue.setMaximum(Map2View.MAX_DIM_STEPS);
+               _spinnerMapDimValue.setIncrement(1);
+               _spinnerMapDimValue.setPageIncrement(4);
+               _spinnerMapDimValue.addSelectionListener(_mapPointSelectionListener);
+               _spinnerMapDimValue.addMouseWheelListener(_mapPointMouseWheelListener);
+
+               // dimming color
+               _colorMapDimColor = new ColorSelectorExtended(container);
+               _colorMapDimColor.setToolTipText(Messages.Slideout_Map_Options_Color_DimColor_Tooltip);
+               _colorMapDimColor.addListener(_mapPointPropertyChangeListener);
+               _colorMapDimColor.addOpenListener(this);
+            }
          }
       }
 
@@ -1017,11 +1056,11 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
              */
 
             // label
-            _lblLabelGroupGridSize = new Label(tabContainer, SWT.NONE);
-            _lblLabelGroupGridSize.setText(Messages.Slideout_MapPoints_Label_GroupGridSize);
+            _lblLabelGroup_GridSize = new Label(tabContainer, SWT.NONE);
+            _lblLabelGroup_GridSize.setText(Messages.Slideout_MapPoints_Label_GroupGridSize);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
-                  .indent(UI.FORM_FIRST_COLUMN_INDENT, 0).applyTo(_lblLabelGroupGridSize);
+                  .indent(UI.FORM_FIRST_COLUMN_INDENT, 0).applyTo(_lblLabelGroup_GridSize);
 
             // spinner
             _spinnerLabelGroupGridSize = new Spinner(tabContainer, SWT.BORDER);
@@ -1034,24 +1073,24 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          }
          {
             // label
-            _lblGroupDuplicatedMarkers = new Label(tabContainer, SWT.NONE);
-            _lblGroupDuplicatedMarkers.setText(Messages.Slideout_MapPoints_Label_GroupDuplicatedMarkers);
+            _lblLabelGroup_DuplicatedMarkers = new Label(tabContainer, SWT.NONE);
+            _lblLabelGroup_DuplicatedMarkers.setText(Messages.Slideout_MapPoints_Label_GroupDuplicatedMarkers);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .span(2, 1)
                   .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
-                  .applyTo(_lblGroupDuplicatedMarkers);
+                  .applyTo(_lblLabelGroup_DuplicatedMarkers);
 
-            _txtGroupDuplicatedMarkers = new Text(tabContainer, SWT.MULTI | SWT.WRAP | SWT.BORDER);
-            _txtGroupDuplicatedMarkers.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onModifyConfig(focusEvent.widget)));
+            _txtLabelGroupDuplicatedMarkers = new Text(tabContainer, SWT.MULTI | SWT.WRAP | SWT.BORDER);
+            _txtLabelGroupDuplicatedMarkers.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onModifyConfig(focusEvent.widget)));
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
-                  .applyTo(_txtGroupDuplicatedMarkers);
+                  .applyTo(_txtLabelGroupDuplicatedMarkers);
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   .span(2, 1)
-                  .indent(UI.FORM_FIRST_COLUMN_INDENT, 0).applyTo(_txtGroupDuplicatedMarkers);
+                  .indent(UI.FORM_FIRST_COLUMN_INDENT, 0).applyTo(_txtLabelGroupDuplicatedMarkers);
 
          }
       }
@@ -1486,6 +1525,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _chkIsSymbolAntialiased                .setEnabled(isShowLabels);
       _chkIsTruncateLabel                    .setEnabled(isShowLabels);
       _chkIsWrapLabel                        .setEnabled(isShowLabels);
+      _comboLabelFont                        .setEnabled(isShowLabels);
       _comboLabelLayout                      .setEnabled(isShowLabels);
       _lblLabelBackground                    .setEnabled(isShowLabels);
       _lblLabelFontSize                      .setEnabled(isShowLabels);
@@ -1520,12 +1560,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _colorTourMarkerLabel_Outline          .setEnabled(isShowTourMarker);
 
       // groups
-      _lblGroupDuplicatedMarkers             .setEnabled(isGroupMarkers);
-      _lblLabelGroupGridSize                 .setEnabled(isGroupMarkers);
+      _lblLabelGroup_DuplicatedMarkers       .setEnabled(isGroupMarkers);
+      _lblLabelGroup_GridSize                .setEnabled(isGroupMarkers);
       _spinnerLabelGroupGridSize             .setEnabled(isGroupMarkers);
-      _txtGroupDuplicatedMarkers             .setEnabled(isGroupMarkers);
+      _txtLabelGroupDuplicatedMarkers        .setEnabled(isGroupMarkers);
 
       // map dimming
+      _colorMapDimColor                      .setEnabled(isDimMap);
       _spinnerMapDimValue                    .setEnabled(isDimMap);
 
       // common location
@@ -1568,6 +1609,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       for (final String label : _allMarkerLabelLayout_Label) {
          _comboLabelLayout.add(label);
       }
+
+      for (final String label : _allFontNames) {
+         _comboLabelFont.add(label);
+      }
    }
 
    @Override
@@ -1580,6 +1625,17 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       itemBounds.y = itemDisplayPosition.y;
 
       return itemBounds;
+   }
+
+   private String getSelectedLabelFont() {
+
+      final int selectedIndex = _comboLabelFont.getSelectionIndex();
+
+      if (selectedIndex >= 0) {
+         return _allFontNames[selectedIndex];
+      } else {
+         return Map2ConfigManager.LABEL_FONT_DEFAULT;
+      }
    }
 
    private MapLabelLayout getSelectedMarkerLabelLayout() {
@@ -2022,13 +2078,14 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _colorTourPauseLabel_Fill              .setColorValue(config.tourPauseFill_RGB);
       _colorTourPauseLabel_Outline           .setColorValue(config.tourPauseOutline_RGB);
 
-      _txtGroupDuplicatedMarkers             .setText(      config.groupedMarkers);
+      _txtLabelGroupDuplicatedMarkers        .setText(      config.groupedMarkers);
 
       /*
        * Map dimming & transparency
        */
-      _chkIsDimMap               .setSelection(    Util.getStateBoolean(_state_Map2,  Map2View.STATE_IS_MAP_DIMMED,                       Map2View.STATE_IS_MAP_DIMMED_DEFAULT));
-      _spinnerMapDimValue        .setSelection(    Util.getStateInt(    _state_Map2,  Map2View.STATE_DIM_MAP_VALUE,                       Map2View.STATE_DIM_MAP_VALUE_DEFAULT));
+      _chkIsDimMap               .setSelection(    Util.getStateBoolean(_state_Map2,  Map2View.STATE_IS_MAP_DIMMED,  Map2View.STATE_IS_MAP_DIMMED_DEFAULT));
+      _colorMapDimColor          .setColorValue(   Util.getStateRGB(    _state_Map2,  Map2View.STATE_DIM_MAP_COLOR,  Map2View.STATE_DIM_MAP_COLOR_DEFAULT));
+      _spinnerMapDimValue        .setSelection(    Util.getStateInt(    _state_Map2,  Map2View.STATE_DIM_MAP_VALUE,  Map2View.STATE_DIM_MAP_VALUE_DEFAULT));
 
       /*
        * Slideout expand/collapse
@@ -2049,6 +2106,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       _tourPausesUI.restoreState();
 
+      selectLabelFont(config.labelFont);
       selectMarkerLabelLayout(config.labelLayout);
 
       updateUI_TabLabel();
@@ -2074,7 +2132,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       config.isGroupDuplicatedMarkers     = _chkIsGroupMarkers                   .getSelection();
       config.groupGridSize                = _spinnerLabelGroupGridSize           .getSelection();
-      config.groupedMarkers               = _txtGroupDuplicatedMarkers           .getText();
+      config.groupedMarkers               = _txtLabelGroupDuplicatedMarkers      .getText();
 
       config.isLabelAntialiased           = _chkIsLabelAntialiased               .getSelection();
       config.isSymbolAntialiased          = _chkIsSymbolAntialiased              .getSelection();
@@ -2096,6 +2154,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       config.labelTruncateLength          = _spinnerLabelTruncateLength          .getSelection();
       config.labelWrapLength              = _spinnerLabelWrapLength              .getSelection();
 
+      config.labelFont                    = getSelectedLabelFont();
       config.labelLayout                  = getSelectedMarkerLabelLayout();
 
       config.commonLocationFill_RGB             = _colorCommonLocationLabel_Fill             .getColorValue();
@@ -2123,6 +2182,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _state_Map2.put(Map2View.STATE_IS_MAP_DIMMED, _chkIsDimMap        .getSelection());
       _state_Map2.put(Map2View.STATE_DIM_MAP_VALUE, _spinnerMapDimValue .getSelection());
 
+      Util.setState(_state_Map2, Map2View.STATE_DIM_MAP_COLOR,    _colorMapDimColor.getColorValue());
+
       _map2View.setupMapDimLevel();
 
 // SET_FORMATTING_ON
@@ -2137,6 +2198,23 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _state_Slideout.put(STATE_SELECTED_TAB, _tabFolder.getSelectionIndex());
 
       super.saveState();
+   }
+
+   private void selectLabelFont(final String selectedFontName) {
+
+      int selectionIndex = 0;
+
+      for (int fontIndex = 0; fontIndex < _allFontNames.length; fontIndex++) {
+
+         final String fontName = _allFontNames[fontIndex];
+
+         if (fontName.equals(selectedFontName)) {
+            selectionIndex = fontIndex;
+            break;
+         }
+      }
+
+      _comboLabelFont.select(selectionIndex);
    }
 
    private void selectMarkerLabelLayout(final Enum<MapLabelLayout> filterOperator) {
