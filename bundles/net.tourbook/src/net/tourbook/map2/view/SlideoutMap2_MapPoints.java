@@ -194,7 +194,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Button                _chkIsShowTourPauses_All;
    private Button                _chkIsTruncateLabel;
    private Button                _chkIsWrapLabel;
-   private Button                _chkUseMapDimColor;
    //
    private Combo                 _comboLabelLayout;
    //
@@ -238,8 +237,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private ColorSelectorExtended _colorClusterSymbol_Outline;
    private ColorSelectorExtended _colorCommonLocationLabel_Fill;
    private ColorSelectorExtended _colorCommonLocationLabel_Outline;
-   private ColorSelectorExtended _colorMapDimColor;
-   private ColorSelectorExtended _colorMapTransparencyColor;
    private ColorSelectorExtended _colorTourMarkerLabel_Fill;
    private ColorSelectorExtended _colorTourMarkerLabel_Outline;
    private ColorSelectorExtended _colorTourLocationLabel_Fill;
@@ -769,58 +766,20 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             /*
              * Dim map
              */
-            final Composite dimContainer = new Composite(tabContainer, SWT.NONE);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(dimContainer);
-            {
-               // checkbox
-               _chkIsDimMap = new Button(dimContainer, SWT.CHECK);
-               _chkIsDimMap.setText(Messages.Slideout_Map_Options_Checkbox_DimMap);
-               _chkIsDimMap.addSelectionListener(_mapPointSelectionListener);
+            // checkbox
+            _chkIsDimMap = new Button(tabContainer, SWT.CHECK);
+            _chkIsDimMap.setText(Messages.Slideout_Map_Options_Checkbox_DimMap);
+            _chkIsDimMap.addSelectionListener(_mapPointSelectionListener);
 
-               // spinner
-               _spinnerMapDimValue = new Spinner(dimContainer, SWT.BORDER);
-               _spinnerMapDimValue.setToolTipText(Messages.Slideout_Map_Options_Spinner_DimValue_Tooltip);
-               _spinnerMapDimValue.setMinimum(0);
-               _spinnerMapDimValue.setMaximum(Map2View.MAX_DIM_STEPS);
-               _spinnerMapDimValue.setIncrement(1);
-               _spinnerMapDimValue.setPageIncrement(4);
-               _spinnerMapDimValue.addSelectionListener(_mapPointSelectionListener);
-               _spinnerMapDimValue.addMouseWheelListener(_mapPointMouseWheelListener);
-               GridDataFactory.fillDefaults().indent(10, 0).applyTo(_spinnerMapDimValue);
-            }
-
-            // dimming color
-            _colorMapDimColor = new ColorSelectorExtended(tabContainer);
-            _colorMapDimColor.setToolTipText(Messages.Slideout_Map_Options_Color_DimColor_Tooltip);
-            _colorMapDimColor.addListener(_mapPointPropertyChangeListener);
-            _colorMapDimColor.addOpenListener(this);
-         }
-         {
-            /*
-             * Map transparency color
-             */
-            {
-               final Label label = new Label(tabContainer, SWT.NONE);
-               label.setText(Messages.Slideout_MapPoints_Label_MapTransparencyColor);
-               label.setToolTipText(Messages.Slideout_MapPoints_Label_MapTransparencyColor_Tooltip);
-               GridDataFactory.fillDefaults()
-                     .align(SWT.BEGINNING, SWT.CENTER)
-                     .applyTo(label);
-
-               _colorMapTransparencyColor = new ColorSelectorExtended(tabContainer);
-               _colorMapTransparencyColor.setToolTipText(Messages.Slideout_MapPoints_Label_MapTransparencyColor_Tooltip);
-               _colorMapTransparencyColor.addListener(_mapPointPropertyChangeListener);
-               _colorMapTransparencyColor.addOpenListener(this);
-            }
-            {
-               /*
-                * Use map dim color
-                */
-               _chkUseMapDimColor = new Button(tabContainer, SWT.CHECK);
-               _chkUseMapDimColor.setText(Messages.Slideout_MapPoints_Checkbox_UseMapDimColor);
-               _chkUseMapDimColor.addSelectionListener(_mapPointSelectionListener);
-               gdSpan2.indent(16, 0).applyTo(_chkUseMapDimColor);
-            }
+            // spinner
+            _spinnerMapDimValue = new Spinner(tabContainer, SWT.BORDER);
+            _spinnerMapDimValue.setToolTipText(Messages.Slideout_Map_Options_Spinner_DimValue_Tooltip);
+            _spinnerMapDimValue.setMinimum(0);
+            _spinnerMapDimValue.setMaximum(Map2View.MAX_DIM_STEPS);
+            _spinnerMapDimValue.setIncrement(1);
+            _spinnerMapDimValue.setPageIncrement(4);
+            _spinnerMapDimValue.addSelectionListener(_mapPointSelectionListener);
+            _spinnerMapDimValue.addMouseWheelListener(_mapPointMouseWheelListener);
          }
       }
 
@@ -1507,8 +1466,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       final boolean isWrapLabel              = _chkIsWrapLabel                .getSelection();
 
       final boolean isDimMap                 = _chkIsDimMap                   .getSelection();
-      final boolean isUseMapDimColor         = _chkUseMapDimColor             .getSelection();
-      final boolean isUseTransparencyColor   = isUseMapDimColor == false;
 
       final boolean isGroupMarkers           = isShowTourMarker && isGroupDuplicatedMarkers;
       final boolean isShowClusteredMarker    = isShowTourMarker && isMarkerClustered;
@@ -1569,10 +1526,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _txtGroupDuplicatedMarkers             .setEnabled(isGroupMarkers);
 
       // map dimming
-      _chkUseMapDimColor                     .setEnabled(isDimMap);
       _spinnerMapDimValue                    .setEnabled(isDimMap);
-      _colorMapDimColor                      .setEnabled(isDimMap);
-      _colorMapTransparencyColor             .setEnabled(isDimMap == false || isUseTransparencyColor);
 
       // common location
       _btnSwapCommonLocationLabel_Color      .setEnabled(isShowCommonLocations);
@@ -2074,9 +2028,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
        * Map dimming & transparency
        */
       _chkIsDimMap               .setSelection(    Util.getStateBoolean(_state_Map2,  Map2View.STATE_IS_MAP_DIMMED,                       Map2View.STATE_IS_MAP_DIMMED_DEFAULT));
-      _chkUseMapDimColor         .setSelection(    Util.getStateBoolean(_state_Map2,  Map2View.STATE_MAP_TRANSPARENCY_USE_MAP_DIM_COLOR,  Map2View.STATE_MAP_TRANSPARENCY_USE_MAP_DIM_COLOR_DEFAULT));
-      _colorMapDimColor          .setColorValue(   Util.getStateRGB(    _state_Map2,  Map2View.STATE_DIM_MAP_COLOR,                       Map2View.STATE_DIM_MAP_COLOR_DEFAULT));
-      _colorMapTransparencyColor .setColorValue(   Util.getStateRGB(    _state_Map2,  Map2View.STATE_MAP_TRANSPARENCY_COLOR,              Map2View.STATE_MAP_TRANSPARENCY_COLOR_DEFAULT));
       _spinnerMapDimValue        .setSelection(    Util.getStateInt(    _state_Map2,  Map2View.STATE_DIM_MAP_VALUE,                       Map2View.STATE_DIM_MAP_VALUE_DEFAULT));
 
       /*
@@ -2167,15 +2118,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       config.setupColors();
 
       /*
-       * Map dimming & transparency
+       * Map dimming
        */
-      _state_Map2.put(Map2View.STATE_IS_MAP_DIMMED,                     _chkIsDimMap               .getSelection());
-      _state_Map2.put(Map2View.STATE_MAP_TRANSPARENCY_USE_MAP_DIM_COLOR,_chkUseMapDimColor         .getSelection());
-
-      _state_Map2.put(Map2View.STATE_DIM_MAP_VALUE,                     _spinnerMapDimValue        .getSelection());
-
-      Util.setState(_state_Map2, Map2View.STATE_DIM_MAP_COLOR,          _colorMapDimColor          .getColorValue());
-      Util.setState(_state_Map2, Map2View.STATE_MAP_TRANSPARENCY_COLOR, _colorMapTransparencyColor .getColorValue());
+      _state_Map2.put(Map2View.STATE_IS_MAP_DIMMED, _chkIsDimMap        .getSelection());
+      _state_Map2.put(Map2View.STATE_DIM_MAP_VALUE, _spinnerMapDimValue .getSelection());
 
       _map2View.setupMapDimLevel();
 

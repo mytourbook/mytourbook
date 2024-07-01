@@ -172,6 +172,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -299,7 +300,6 @@ public class Map2 extends Canvas {
 
    private static RGB                    _mapTransparentRGB;
    private static Color                  _mapTransparentColor;
-   private static boolean                _isTransparentColorModified;
 
    private Color                         _defaultBackgroundColor;
 
@@ -375,7 +375,7 @@ public class Map2 extends Canvas {
    private Thread                        _overlayThread;
    private long                          _nextOverlayRedrawTime;
 
-   private Map2Config                    _mapConfig;
+   private Map2Config                    _mapConfig                 = Map2ConfigManager.getActiveConfig();
 
    /*
     * Map points
@@ -386,20 +386,16 @@ public class Map2 extends Canvas {
    private Future<?>                       _mapPointPainter_Task;
 
    /**
-    * The {@link #_mapPointPainter_Executor} is drawing into this image. 2 images are necessary
-    * that the current image which is drawn is not displayed, only when drawing is done
+    * The {@link #_mapPointPainter_Executor} is drawing into this image.
     */
-   private Image                           _mapPointPainterImage_WhichIsDisplayed;
-   private Image                           _mapPointPainterImage_WhichIsPainted;
-
-   private List<Image>                     _disposableMapPointImages        = new ArrayList<>();
+   private Image                           _mapPointImage;
 
    /**
     * It looks like that onResize() is not called very early from the swtbot to initialize this
     * field <a href=
     * "https://github.com/mytourbook/mytourbook/issues/1361#issuecomment-2166663604">https://github.com/mytourbook/mytourbook/issues/1361#issuecomment-2166663604</a>
     */
-   private Rectangle                       _mapPointImageSize               = new Rectangle(0, 0, 400, 400);
+   private Point                           _mapPointImageSize               = new Point(400, 400);
 
    private int                             _mapPointPainter_LastCounter;
    private final AtomicInteger             _mapPointPainter_RunnableCounter = new AtomicInteger();
@@ -867,8 +863,6 @@ public class Map2 extends Canvas {
 
       _mapTransparentRGB = transparentColor;
       _mapTransparentColor = new Color(transparentColor);
-
-      _isTransparentColorModified = true;
    }
 
    public void actionManageOfflineImages(final Event event) {
@@ -1366,35 +1360,6 @@ public class Map2 extends Canvas {
       }
 
       return mapImage;
-   }
-
-   private Image createMapPoint_Image(final Image oldImage) {
-
-      final ImageData transparentImageData = MapUtils.createTransparentImageData(
-
-            _mapPointImageSize.width,
-            _mapPointImageSize.height);
-
-      final Image transparentImage = new Image(_display, transparentImageData);
-
-      final GC gcImage = new GC(transparentImage);
-      {
-         /*
-          * Ubuntu 12.04 fails, when background is not filled, it draws a black background
-          */
-         gcImage.setBackground(_mapTransparentColor);
-         gcImage.fillRectangle(transparentImage.getBounds());
-
-         if (oldImage != null && oldImage.isDisposed() == false) {
-
-            // paint old image into the new image otherwise the screen is flickering
-            gcImage.drawImage(oldImage, 0, 0);
-         }
-
-      }
-      gcImage.dispose();
-
-      return transparentImage;
    }
 
    private ExecutorService createMapPoint_PainterThread() {
@@ -3969,8 +3934,7 @@ public class Map2 extends Canvas {
       }
 
       UI.disposeResource(_mapImage);
-      UI.disposeResource(_mapPointPainterImage_WhichIsDisplayed);
-      UI.disposeResource(_mapPointPainterImage_WhichIsPainted);
+      UI.disposeResource(_mapPointImage);
       UI.disposeResource(_poiImage);
 
       UI.disposeResource(_9PartImage);
@@ -4477,6 +4441,9 @@ public class Map2 extends Canvas {
       }
 
       setCursorOptimized(_cursorDefault);
+
+      // hide map point tooltip
+      _mapPointTooltip.hide();
 
       paint();
    }
@@ -5058,14 +5025,7 @@ public class Map2 extends Canvas {
 
       _clientArea = getClientArea();
 
-      _mapPointImageSize = new Rectangle(
-
-            0,
-            0,
-
-            _clientArea.width, // + 2 * MAP_OVERLAY_MARGIN,
-            _clientArea.height // + 2 * MAP_OVERLAY_MARGIN
-      );
+      _mapPointImageSize = new Point(_clientArea.width, _clientArea.height);
 
       updateViewportData();
 
@@ -5228,8 +5188,7 @@ public class Map2 extends Canvas {
 
          // map image is corrupt
          _mapImage.dispose();
-         _mapPointPainterImage_WhichIsDisplayed.dispose();
-         _mapPointPainterImage_WhichIsPainted.dispose();
+         _mapPointImage.dispose();
 
       } finally {
 
@@ -5293,39 +5252,26 @@ public class Map2 extends Canvas {
     */
    private void paint_40_MapPoints(final GC gcMapImage) {
 
+      if (_mapConfig == null
+            || _mapConfig.isShowTourMarker == false
+                  && _mapConfig.isShowTourLocation == false
+                  && _mapConfig.isShowCommonLocation == false
+                  && _mapConfig.isShowTourPauses == false) {
+
+         return;
+      }
+
+      if (_mapPointImage == null || _mapPointImage.isDisposed()) {
+
+         // start the map point painting
+         paint_MapPointImage();
+
+         return;
+      }
+
       try {
 
          // check or create map background image
-         final Image image1 = _mapPointPainterImage_WhichIsDisplayed;
-         final Image image2 = _mapPointPainterImage_WhichIsPainted;
-
-         if (_isTransparentColorModified
-               || canReuseImage(image1, _mapPointImageSize) == false
-               || canReuseImage(image2, _mapPointImageSize) == false
-
-         ) {
-
-            // image needs to be recreated
-
-            _isTransparentColorModified = false;
-
-            final Image oldBackgroundImage_WhichIsVisible = _mapPointPainterImage_WhichIsDisplayed;
-            final Image oldBackgroundImage_WhichIsPainted = _mapPointPainterImage_WhichIsPainted;
-
-            // create new image but paint old image into new image to prevent flickering
-            _mapPointPainterImage_WhichIsDisplayed = createMapPoint_Image(_mapPointPainterImage_WhichIsDisplayed);
-            _mapPointPainterImage_WhichIsPainted = createMapPoint_Image(null);
-
-            synchronized (_disposableMapPointImages) {
-
-               _disposableMapPointImages.add(oldBackgroundImage_WhichIsVisible);
-               _disposableMapPointImages.add(oldBackgroundImage_WhichIsPainted);
-
-               if (_mapPointPainter_Task != null) {
-                  _mapPointPainter_Task.cancel(true);
-               }
-            }
-         }
 
          try {
 
@@ -5336,7 +5282,7 @@ public class Map2 extends Canvas {
             final int diffX = topLeft_Viewport_WhenPainted.x - topLeft_Viewport_Current.x;
             final int diffY = topLeft_Viewport_WhenPainted.y - topLeft_Viewport_Current.y;
 
-            gcMapImage.drawImage(_mapPointPainterImage_WhichIsDisplayed, diffX, diffY);
+            gcMapImage.drawImage(_mapPointImage, diffX, diffY);
 
             _mapPointPainter_MicroAdjustment_DiffX = diffX;
             _mapPointPainter_MicroAdjustment_DiffY = diffY;
@@ -5354,8 +5300,7 @@ public class Map2 extends Canvas {
          StatusUtil.log(e);
 
          // new overlay image is corrupt
-         UI.disposeResource(_mapPointPainterImage_WhichIsDisplayed);
-         UI.disposeResource(_mapPointPainterImage_WhichIsPainted);
+         UI.disposeResource(_mapPointImage);
       }
    }
 
@@ -6691,12 +6636,24 @@ public class Map2 extends Canvas {
 
       try {
 
-         final Image canvasImage = _mapPointPainterImage_WhichIsPainted;
-         final GC gc = new GC(canvasImage);
-         {
-            gc.setBackground(_mapTransparentColor);
-            gc.fillRectangle(_mapPointImageSize);
+         /*
+          * Create fully transparent image
+          */
+         final int srcWidth = _mapPointImageSize.x;
+         final int srcHeight = _mapPointImageSize.y;
 
+         final PaletteData palette = new PaletteData(0xFF00, 0xFF0000, 0xFF000000);
+
+         final ImageData imageData = new ImageData(srcWidth, srcHeight, 32, palette);
+         imageData.alphaData = new byte[srcWidth * srcHeight];
+
+         final Image mapPointImage = new Image(_display, imageData);
+
+         /*
+          * Paint into image
+          */
+         final GC gc = new GC(mapPointImage);
+         {
             gc.setAntialias(_mapConfig.isSymbolAntialiased ? SWT.ON : SWT.OFF);
             gc.setTextAntialias(_mapConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
 
@@ -6707,54 +6664,51 @@ public class Map2 extends Canvas {
 
             gc.setFont(_labelFont);
 
-            if (_mapConfig.isShowTourMarker
-                  || _mapConfig.isShowTourLocation
-                  || _mapConfig.isShowCommonLocation
-                  || _mapConfig.isShowTourPauses) {
+            // clone list to prevent concurrency exceptions, this happened
+            final List<TourData> allTourData = new ArrayList<>(TourPainterConfiguration.getTourData());
 
-               // clone list to prevent concurrency exceptions, this happened
-               final List<TourData> allTourData = new ArrayList<>(TourPainterConfiguration.getTourData());
+            if (_mapConfig.isShowTourMarker && _mapConfig.isTourMarkerClustered) {
 
-               if (_mapConfig.isShowTourMarker && _mapConfig.isTourMarkerClustered) {
+               paint_MapPointImage_30_MapPointsAndCluster(gc,
+                     allTourData,
+                     allPaintedCommonLocations,
+                     allPaintedTourLocations,
+                     allPaintedMarkers,
+                     allPaintedMarkerClusters,
+                     allPaintedPauses);
 
-                  paint_MapPointImage_30_MapPointsAndCluster(gc,
-                        allTourData,
-                        allPaintedCommonLocations,
-                        allPaintedTourLocations,
-                        allPaintedMarkers,
-                        allPaintedMarkerClusters,
-                        allPaintedPauses);
+            } else {
 
-               } else {
+               paint_MapPointImage_20_MapPoints(gc,
+                     allTourData,
+                     allPaintedCommonLocations,
+                     allPaintedTourLocations,
+                     allPaintedMarkers,
+                     allPaintedPauses);
+            }
 
-                  paint_MapPointImage_20_MapPoints(gc,
-                        allTourData,
-                        allPaintedCommonLocations,
-                        allPaintedTourLocations,
-                        allPaintedMarkers,
-                        allPaintedPauses);
-               }
+            if (_hoveredMarkerCluster != null) {
 
-               if (_hoveredMarkerCluster != null) {
+               /*
+                * Paint hovered cluster marker at the end, over other markers but put the painted
+                * locations at the beginning that they are hit before the other !!!
+                */
 
-                  /*
-                   * Paint hovered cluster marker at the end, over other markers but put the painted
-                   * locations at the beginning that they are hit before the other !!!
-                   */
-
-                  paint_MapPointImage_40_HoveredCluster(gc,
-                        _hoveredMarkerCluster,
-                        allPaintedClusterMarkers);
-               }
+               paint_MapPointImage_40_HoveredCluster(gc,
+                     _hoveredMarkerCluster,
+                     allPaintedClusterMarkers);
             }
          }
          gc.dispose();
 
-         // swap images
-         final Image oldVisibleImage = _mapPointPainterImage_WhichIsDisplayed;
+         /*
+          * This may be needed to be synchronized ?
+          */
+         final Image oldImage = _mapPointImage;
 
-         _mapPointPainterImage_WhichIsDisplayed = canvasImage;
-         _mapPointPainterImage_WhichIsPainted = oldVisibleImage;
+         _mapPointImage = mapPointImage;
+
+         UI.disposeResource(oldImage);
 
          _mapPointPainter_Viewport_WhenPainted = _mapPointPainter_Viewport_DuringPainting;
 
@@ -6770,25 +6724,7 @@ public class Map2 extends Canvas {
             _isMarkerClusterSelected = false;
          }
 
-         /**
-          * Cleanup images, they cannot be disposed in the UI thread otherwise there are tons of
-          * exceptions when the map image is resized
-          */
-         if (_disposableMapPointImages.size() > 0) {
-
-            synchronized (_disposableMapPointImages) {
-
-               for (final Image image : _disposableMapPointImages) {
-                  if (image != null) {
-                     image.dispose();
-                  }
-               }
-            }
-         }
-
       } catch (final Exception e) {
-
-         UI.disposeResource(_mapPointPainterImage_WhichIsPainted);
 
          StatusUtil.log(e);
       }
