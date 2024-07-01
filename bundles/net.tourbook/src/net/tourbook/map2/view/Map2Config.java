@@ -52,7 +52,7 @@ public class Map2Config {
    public boolean        isLabelAntialiased        = true;
    public boolean        isSymbolAntialiased       = true;
 
-   public String         labelFont                 = Map2ConfigManager.LABEL_FONT_DEFAULT;
+   public String         labelFontName             = Map2ConfigManager.LABEL_FONT_NAME_DEFAULT;
    public int            labelFontSize             = Map2ConfigManager.LABEL_FONT_SIZE_DEFAULT;
 
    /*

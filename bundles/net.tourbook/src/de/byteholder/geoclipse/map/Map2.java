@@ -10470,7 +10470,7 @@ public class Map2 extends Canvas {
 //    final java.awt.Font systemFont = new java.awt.Font("Liberation Sans", java.awt.Font.PLAIN, 12); //$NON-NLS-1$
 //    final java.awt.Font systemFont = new java.awt.Font("Segoe UI Light", java.awt.Font.PLAIN, 12); //$NON-NLS-1$
 
-      final java.awt.Font userFont = new java.awt.Font(_mapConfig.labelFont, java.awt.Font.PLAIN, _mapConfig.labelFontSize);
+      final java.awt.Font userFont = new java.awt.Font(_mapConfig.labelFontName, java.awt.Font.PLAIN, _mapConfig.labelFontSize);
 
       _defaultFont = userFont;
 
