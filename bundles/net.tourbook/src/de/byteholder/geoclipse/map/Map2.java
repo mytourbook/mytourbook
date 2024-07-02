@@ -305,7 +305,6 @@ public class Map2 extends Canvas {
 
    private static RGB                    _mapTransparentRGB;
    private static Color                  _mapTransparentColor;
-   private static boolean                _isTransparentColorModified;
 
    private static java.awt.Font          _defaultFont               = net.tourbook.common.UI.AWT_DIALOG_FONT;
 
@@ -383,7 +382,7 @@ public class Map2 extends Canvas {
    private Thread                        _overlayThread;
    private long                          _nextOverlayRedrawTime;
 
-   private Map2Config                    _mapConfig;
+   private Map2Config                    _mapConfig                 = Map2ConfigManager.getActiveConfig();
 
    /*
     * Map points
@@ -394,11 +393,9 @@ public class Map2 extends Canvas {
    private Future<?>                       _mapPointPainter_Task;
 
    /**
-    * The {@link #_mapPointPainter_Executor} is drawing into this image. 2 images are necessary
-    * that the current image which is drawn is not displayed, only when drawing is done
+    * The {@link #_mapPointPainter_Executor} is drawing into this image.
     */
-   private Image                           _mapPointPainterImage_WhichIsDisplayedSWT;
-   private Image                           _mapPointPainterImage_WhichIsPaintedSWT;
+   private Image                           _mapPointImage;
 
    /**
     * Cleanup images, they cannot be disposed in the UI thread otherwise there are tons of
@@ -877,8 +874,6 @@ public class Map2 extends Canvas {
 
       _mapTransparentRGB = transparentColor;
       _mapTransparentColor = new Color(transparentColor);
-
-      _isTransparentColorModified = true;
    }
 
    public void actionManageOfflineImages(final Event event) {
@@ -1377,42 +1372,6 @@ public class Map2 extends Canvas {
       }
 
       return mapImage;
-   }
-
-   private Image createMapPoint_Image(final Image swtOldImage) {
-
-      final BufferedImage awtImage = new BufferedImage(
-            _mapPointImageSize.width,
-            _mapPointImageSize.height,
-            BufferedImage.TYPE_4BYTE_ABGR);
-
-      final Graphics2D g2d = awtImage.createGraphics();
-      try {
-
-         /*
-          * Ubuntu 12.04 fails, when background is not filled, it draws a black background
-          */
-//         gcImage.setBackground(_mapTransparentColor);
-//         gcImage.fillRectangle(transparentImage.getBounds());
-
-         if (swtOldImage != null && swtOldImage.isDisposed() == false) {
-
-            // paint old image into the new image otherwise the screen is flickering
-//          gcImage.drawImage(oldImage, 0, 0);
-
-            final BufferedImage awtOldImage = ImageConverter.convertIntoAWT(swtOldImage);
-
-            g2d.drawImage(awtOldImage, 0, 0, awtOldImage.getWidth(), awtOldImage.getHeight(), null);
-         }
-
-      } finally {
-
-         g2d.dispose();
-      }
-
-//    return awtImage;
-
-      return ImageConverter.convertIntoSWT(awtImage);
    }
 
    private ExecutorService createMapPoint_PainterThread() {
@@ -3999,8 +3958,7 @@ public class Map2 extends Canvas {
       }
 
       UI.disposeResource(_mapImage);
-      UI.disposeResource(_mapPointPainterImage_WhichIsDisplayedSWT);
-      UI.disposeResource(_mapPointPainterImage_WhichIsPaintedSWT);
+      UI.disposeResource(_mapPointImage);
       UI.disposeResource(_poiImage);
 
       UI.disposeResource(_9PartImage);
@@ -5247,8 +5205,7 @@ public class Map2 extends Canvas {
 
          // map image is corrupt
          _mapImage.dispose();
-         _mapPointPainterImage_WhichIsDisplayedSWT.dispose();
-         _mapPointPainterImage_WhichIsPaintedSWT.dispose();
+         _mapPointImage.dispose();
 
       } finally {
 
@@ -5312,39 +5269,26 @@ public class Map2 extends Canvas {
     */
    private void paint_40_MapPoints(final GC gcMapImage) {
 
+      if (_mapConfig == null
+            || _mapConfig.isShowTourMarker == false
+                  && _mapConfig.isShowTourLocation == false
+                  && _mapConfig.isShowCommonLocation == false
+                  && _mapConfig.isShowTourPauses == false) {
+
+         return;
+      }
+
+      if (_mapPointImage == null || _mapPointImage.isDisposed()) {
+
+         // start the map point painting
+         paint_MapPointImage();
+
+         return;
+      }
+
       try {
 
-         // check or create map background image
-         final Image image1 = _mapPointPainterImage_WhichIsDisplayedSWT;
-         final Image image2 = _mapPointPainterImage_WhichIsPaintedSWT;
-
-         if (_isTransparentColorModified
-               || canReuseImage(image1, _mapPointImageSize) == false
-               || canReuseImage(image2, _mapPointImageSize) == false
-
-         ) {
-
-            // image needs to be recreated
-
-            _isTransparentColorModified = false;
-
-            final Image oldBackgroundImage_WhichIsVisible = _mapPointPainterImage_WhichIsDisplayedSWT;
-            final Image oldBackgroundImage_WhichIsPainted = _mapPointPainterImage_WhichIsPaintedSWT;
-
-            // create new image but paint old image into new image to prevent flickering
-            _mapPointPainterImage_WhichIsDisplayedSWT = createMapPoint_Image(_mapPointPainterImage_WhichIsDisplayedSWT);
-            _mapPointPainterImage_WhichIsPaintedSWT = createMapPoint_Image(null);
-
-            synchronized (_disposableMapPointImagesSWT) {
-
-               _disposableMapPointImagesSWT.add(oldBackgroundImage_WhichIsVisible);
-               _disposableMapPointImagesSWT.add(oldBackgroundImage_WhichIsPainted);
-
-               if (_mapPointPainter_Task != null) {
-                  _mapPointPainter_Task.cancel(true);
-               }
-            }
-         }
+         // paint map point image
 
          try {
 
@@ -5355,7 +5299,7 @@ public class Map2 extends Canvas {
             final int diffX = topLeft_Viewport_WhenPainted.x - topLeft_Viewport_Current.x;
             final int diffY = topLeft_Viewport_WhenPainted.y - topLeft_Viewport_Current.y;
 
-            gcMapImage.drawImage(_mapPointPainterImage_WhichIsDisplayedSWT, diffX, diffY);
+            gcMapImage.drawImage(_mapPointImage, diffX, diffY);
 
             _mapPointPainter_MicroAdjustment_DiffX = diffX;
             _mapPointPainter_MicroAdjustment_DiffY = diffY;
@@ -5373,8 +5317,7 @@ public class Map2 extends Canvas {
          StatusUtil.log(e);
 
          // new overlay image is corrupt
-         UI.disposeResource(_mapPointPainterImage_WhichIsDisplayedSWT);
-         UI.disposeResource(_mapPointPainterImage_WhichIsPaintedSWT);
+         UI.disposeResource(_mapPointImage);
       }
    }
 
@@ -6710,68 +6653,65 @@ public class Map2 extends Canvas {
 
       try {
 
-         final BufferedImage awtPaintedImage = new BufferedImage(
+         final BufferedImage awtImage = new BufferedImage(
                _mapPointImageSize.width,
                _mapPointImageSize.height,
                BufferedImage.TYPE_4BYTE_ABGR);
 
-         final Graphics2D g2d = awtPaintedImage.createGraphics();
+         final Graphics2D g2d = awtImage.createGraphics();
          try {
 
-            if (_mapConfig.isShowTourMarker
-                  || _mapConfig.isShowTourLocation
-                  || _mapConfig.isShowCommonLocation
-                  || _mapConfig.isShowTourPauses) {
+            setupPainting(g2d);
 
-               setupDefaultFont(g2d);
+            // clone list to prevent concurrency exceptions, this happened
+            final List<TourData> allTourData = new ArrayList<>(TourPainterConfiguration.getTourData());
 
-               // clone list to prevent concurrency exceptions, this happened
-               final List<TourData> allTourData = new ArrayList<>(TourPainterConfiguration.getTourData());
+            if (_mapConfig.isShowTourMarker && _mapConfig.isTourMarkerClustered) {
 
-               if (_mapConfig.isShowTourMarker && _mapConfig.isTourMarkerClustered) {
+               paint_MapPointImage_30_MapPointsAndCluster(g2d,
+                     allTourData,
+                     allPaintedCommonLocations,
+                     allPaintedTourLocations,
+                     allPaintedMarkers,
+                     allPaintedMarkerClusters,
+                     allPaintedPauses);
 
-                  paint_MapPointImage_30_MapPointsAndCluster(g2d,
-                        allTourData,
-                        allPaintedCommonLocations,
-                        allPaintedTourLocations,
-                        allPaintedMarkers,
-                        allPaintedMarkerClusters,
-                        allPaintedPauses);
+            } else {
 
-               } else {
+               paint_MapPointImage_20_MapPoints(g2d,
+                     allTourData,
+                     allPaintedCommonLocations,
+                     allPaintedTourLocations,
+                     allPaintedMarkers,
+                     allPaintedPauses);
+            }
 
-                  paint_MapPointImage_20_MapPoints(g2d,
-                        allTourData,
-                        allPaintedCommonLocations,
-                        allPaintedTourLocations,
-                        allPaintedMarkers,
-                        allPaintedPauses);
-               }
+            if (_hoveredMarkerCluster != null) {
 
-               if (_hoveredMarkerCluster != null) {
+               /*
+                * Paint hovered cluster marker at the end, over other markers but put the painted
+                * locations at the beginning that they are hit before the other !!!
+                */
 
-                  /*
-                   * Paint hovered cluster marker at the end, over other markers but put the painted
-                   * locations at the beginning that they are hit before the other !!!
-                   */
-
-                  paint_MapPointImage_40_HoveredCluster(g2d,
-                        _hoveredMarkerCluster,
-                        allPaintedClusterMarkers);
-               }
+               paint_MapPointImage_40_HoveredCluster(g2d,
+                     _hoveredMarkerCluster,
+                     allPaintedClusterMarkers);
             }
 
          } finally {
             g2d.dispose();
          }
 
-         final Image swtPaintedImage = ImageConverter.convertIntoSWT(awtPaintedImage);
+         final Image swtImage = ImageConverter.convertIntoSWT(awtImage);
 
-         // swap images
-         final Image swtOldVisibleImage = _mapPointPainterImage_WhichIsDisplayedSWT;
+         /*
+          * This may be needed to be synchronized ?
+          */
+         final Image oldImage = _mapPointImage;
 
-         _mapPointPainterImage_WhichIsDisplayedSWT = swtPaintedImage;
-         _mapPointPainterImage_WhichIsPaintedSWT = swtOldVisibleImage;
+         _mapPointImage = swtImage;
+
+         UI.disposeResource(oldImage);
 
          _mapPointPainter_Viewport_WhenPainted = _mapPointPainter_Viewport_DuringPainting;
 
@@ -6804,8 +6744,6 @@ public class Map2 extends Canvas {
          }
 
       } catch (final Exception e) {
-
-         UI.disposeResource(_mapPointPainterImage_WhichIsPaintedSWT);
 
          StatusUtil.log(e);
       }
@@ -10434,7 +10372,34 @@ public class Map2 extends Canvas {
       }
    }
 
-   private void setupDefaultFont(final Graphics2D g2d) {
+   private void setupGroupedLabels() {
+
+      final String groupedMarkers = _mapConfig.groupedMarkers;
+
+      if (groupedMarkers.equals(_groupedMarkers)) {
+
+         // skip labels are not modified
+
+         return;
+      }
+
+      _groupedMarkers = groupedMarkers;
+
+      final String[] allDuplicatedMarkers = StringUtils.splitIntoLines(groupedMarkers);
+
+      _allMapMarkerSkipLabels.clear();
+
+      for (String markerLabel : allDuplicatedMarkers) {
+
+         markerLabel = markerLabel.trim();
+
+         if (markerLabel.length() > 0) {
+            _allMapMarkerSkipLabels.add(markerLabel);
+         }
+      }
+   }
+
+   private void setupPainting(final Graphics2D g2d) {
 
       g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
             _mapConfig.isSymbolAntialiased
@@ -10479,33 +10444,6 @@ public class Map2 extends Canvas {
 //    _defaultFont = UI.AWT_FONT_ARIAL_12.deriveFont(fontAttributes);
 
       g2d.setFont(_defaultFont);
-   }
-
-   private void setupGroupedLabels() {
-
-      final String groupedMarkers = _mapConfig.groupedMarkers;
-
-      if (groupedMarkers.equals(_groupedMarkers)) {
-
-         // skip labels are not modified
-
-         return;
-      }
-
-      _groupedMarkers = groupedMarkers;
-
-      final String[] allDuplicatedMarkers = StringUtils.splitIntoLines(groupedMarkers);
-
-      _allMapMarkerSkipLabels.clear();
-
-      for (String markerLabel : allDuplicatedMarkers) {
-
-         markerLabel = markerLabel.trim();
-
-         if (markerLabel.length() > 0) {
-            _allMapMarkerSkipLabels.add(markerLabel);
-         }
-      }
    }
 
    /**
