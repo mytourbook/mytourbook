@@ -179,7 +179,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Button                _btnSwapTourPauseLabel_Color;
    //
    private Button                _chkIsLabelAntialiased;
-   private Button                _chkIsSymbolAntialiased;
    private Button                _chkIsDimMap;
    private Button                _chkIsFillClusterSymbol;
    private Button                _chkIsGroupMarkers;
@@ -760,15 +759,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _chkIsLabelAntialiased.setText(Messages.Slideout_MapPoints_Checkbox_AntialiasLabel);
             _chkIsLabelAntialiased.addSelectionListener(_mapPointSelectionListener);
             gdSpan2.applyTo(_chkIsLabelAntialiased);
-         }
-         {
-            /*
-             * Antialias symbol
-             */
-            _chkIsSymbolAntialiased = new Button(tabContainer, SWT.CHECK);
-            _chkIsSymbolAntialiased.setText(Messages.Slideout_MapPoints_Checkbox_AntialiasSymbol);
-            _chkIsSymbolAntialiased.addSelectionListener(_mapPointSelectionListener);
-            gdSpan2.applyTo(_chkIsSymbolAntialiased);
          }
          {
             /*
@@ -1501,7 +1491,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       // common
       _chkIsLabelAntialiased                 .setEnabled(isShowLabels);
-      _chkIsSymbolAntialiased                .setEnabled(isShowLabels);
       _chkIsTruncateLabel                    .setEnabled(isShowLabels);
       _comboLabelFont                        .setEnabled(isShowLabels);
       _comboLabelLayout                      .setEnabled(isShowLabels);
@@ -2024,7 +2013,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _chkIsShowBoundingBox_All              .setSelection( config.isShowLocationBoundingBox);
       _chkIsShowBoundingBox_Common           .setSelection( config.isShowLocationBoundingBox);
       _chkIsShowBoundingBox_Tour             .setSelection( config.isShowLocationBoundingBox);
-      _chkIsSymbolAntialiased                .setSelection( config.isSymbolAntialiased);
       _chkIsTruncateLabel                    .setSelection( config.isTruncateLabel);
 
       _spinnerClusterGrid_Size               .setSelection( config.clusterGridSize);
@@ -2111,8 +2099,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       config.groupedMarkers               = _txtGroupDuplicatedMarkers           .getText();
 
       config.isLabelAntialiased           = _chkIsLabelAntialiased               .getSelection();
-      config.isSymbolAntialiased          = _chkIsSymbolAntialiased              .getSelection();
-
       config.isFillClusterSymbol          = _chkIsFillClusterSymbol              .getSelection();
       config.isTourMarkerClustered        = _chkIsMarkerClustered                .getSelection();
 

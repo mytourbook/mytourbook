@@ -82,8 +82,6 @@ public class Map2ConfigManager {
    private static final String TAG_MAP_POINT                         = "MapPoint";                            //$NON-NLS-1$
    // common
    private static final String ATTR_IS_LABEL_ANTIALIASED             = "isLabelAntialiased";                  //$NON-NLS-1$
-   private static final String ATTR_IS_SYMBOL_ANTIALIASED            = "isSymbolAntialiased";                 //$NON-NLS-1$
-   // all labels
    private static final String ATTR_IS_TRUNCATE_LABEL                = "isTruncateLabel";                     //$NON-NLS-1$
    private static final String ATTR_LABEL_LAYOUT                     = "labelLayout";                         //$NON-NLS-1$
    private static final String ATTR_LABEL_DISTRIBUTOR_MAX_LABELS     = "labelDistributorMaxLabels";           //$NON-NLS-1$
@@ -318,7 +316,6 @@ public class Map2ConfigManager {
           * Common
           */
          xmlConfig.putBoolean(      ATTR_IS_LABEL_ANTIALIASED,          config.isLabelAntialiased);
-         xmlConfig.putBoolean(      ATTR_IS_SYMBOL_ANTIALIASED,         config.isSymbolAntialiased);
          xmlConfig.putBoolean(      ATTR_IS_TRUNCATE_LABEL,             config.isTruncateLabel);
          xmlConfig.putInteger(      ATTR_LABEL_DISTRIBUTOR_MAX_LABELS,  config.labelDistributorMaxLabels);
          xmlConfig.putInteger(      ATTR_LABEL_DISTRIBUTOR_RADIUS,      config.labelDistributorRadius);
@@ -485,8 +482,8 @@ public class Map2ConfigManager {
       config.id                           = Util.getXmlString (xmlConfig,     ATTR_ID,                            Long.toString(System.nanoTime()));
       config.name                         = Util.getXmlString (xmlConfig,     ATTR_CONFIG_NAME,                   UI.EMPTY_STRING);
 
+
       config.isLabelAntialiased           = Util.getXmlBoolean(xmlConfig,     ATTR_IS_LABEL_ANTIALIASED,          true);
-      config.isSymbolAntialiased          = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SYMBOL_ANTIALIASED,         true);
 
       config.isShowCommonLocation         = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_COMMON_LOCATION,       true);
       config.isShowLocationBoundingBox    = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_LOCATION_BOUNDING_BOX, false);

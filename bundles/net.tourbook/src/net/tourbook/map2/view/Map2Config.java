@@ -48,7 +48,6 @@ public class Map2Config {
    public MapLabelLayout labelLayout               = Map2ConfigManager.LABEL_LAYOUT_DEFAULT;
 
    public boolean        isLabelAntialiased        = true;
-   public boolean        isSymbolAntialiased       = true;
 
    public String         labelFontName             = Map2ConfigManager.LABEL_FONT_NAME_DEFAULT;
    public int            labelFontSize             = Map2ConfigManager.LABEL_FONT_SIZE_DEFAULT;
@@ -266,7 +265,6 @@ public class Map2Config {
 
             + " isMarkerClustered            = " + isTourMarkerClustered + NL //       //$NON-NLS-1$
             + " isLabelAntialiased           = " + isLabelAntialiased + NL //          //$NON-NLS-1$
-            + " isClusterSymbolAntialiased   = " + isSymbolAntialiased + NL //         //$NON-NLS-1$
             + " isSymbolAntialiased          = " + isFillClusterSymbol + NL //         //$NON-NLS-1$
             + " clusterGridSize              = " + clusterGridSize + NL //             //$NON-NLS-1$
             + " clusterSymbol_Size           = " + clusterSymbol_Size + NL //          //$NON-NLS-1$

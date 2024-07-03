@@ -10311,11 +10311,6 @@ public class Map2 extends Canvas {
 
    private void setupPainting(final Graphics2D g2d) {
 
-      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-            _mapConfig.isSymbolAntialiased
-                  ? RenderingHints.VALUE_ANTIALIAS_ON
-                  : RenderingHints.VALUE_ANTIALIAS_OFF);
-
       Object textAntialiasingON = null;
 
       textAntialiasingON = RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
