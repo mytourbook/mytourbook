@@ -306,7 +306,13 @@ public class Map2 extends Canvas {
    private static RGB                    _mapTransparentRGB;
    private static Color                  _mapTransparentColor;
 
-   private static java.awt.Font          _defaultFont               = net.tourbook.common.UI.AWT_DIALOG_FONT;
+   private Font                          _boldFontSWT               = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   private Font                          _labelFontSWT;
+   private String                        _labelFontName;
+   private int                           _labelFontSize;
+
+   private java.awt.Font                 _labelFontAWT              = UI.AWT_DIALOG_FONT;
+   private java.awt.Font                 _clusterFontAWT;
 
    private Color                         _defaultBackgroundColor;
 
@@ -743,10 +749,6 @@ public class Map2 extends Canvas {
 
    private MapTourBreadcrumb   _tourBreadcrumb;
    private boolean             _isShowBreadcrumbs = Map2View.STATE_IS_SHOW_BREADCRUMBS_DEFAULT;
-
-   private Font                _boldFont          = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
-   private java.awt.Font       _clusterFont;
-   private int                 _clusterFontSize;
 
    private int                 _prefOptions_BorderWidth;
    private boolean             _prefOptions_isCutOffLinesInPauses;
@@ -2190,46 +2192,6 @@ public class Map2 extends Canvas {
       _mp.disposeTiles();
    }
 
-   private Point finetuneClusterLabelPosition(final boolean isOneDigit) {
-
-      /*
-       * Do fine adjustment to center the number within the circle
-       */
-      final int offsetX;
-      final int offsetY;
-
-//    System.out.println(UI.timeStamp() + " _clusterFontSize: " + _clusterFontSize);
-
-// SET_FORMATTING_OFF
-
-      if (        _clusterFontSize > 19) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize > 17) {   offsetX = isOneDigit ? -1 : -1;
-      } else if ( _clusterFontSize > 15) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize > 13) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize > 11) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize >  9) {   offsetX = isOneDigit ? -1 : -1;
-      } else if ( _clusterFontSize >  7) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize >  5) {   offsetX = isOneDigit ? 0 : -1;
-      } else if ( _clusterFontSize >  3) {   offsetX = isOneDigit ? 0 : -1;
-      } else {                               offsetX = isOneDigit ? 1 : -1;
-      }
-
-      if (        _clusterFontSize > 19) {   offsetY = isOneDigit ? 0 : 0;
-      } else if ( _clusterFontSize > 17) {   offsetY = isOneDigit ? 1 : 1;
-      } else if ( _clusterFontSize > 15) {   offsetY = isOneDigit ? 1 : 0;
-      } else if ( _clusterFontSize > 13) {   offsetY = isOneDigit ? 1 : 1;
-      } else if ( _clusterFontSize > 11) {   offsetY = 1;
-      } else if ( _clusterFontSize >  9) {   offsetY = isOneDigit ? 0 : 2;
-      } else if ( _clusterFontSize >  7) {   offsetY = isOneDigit ? 1 : 1;
-      } else if ( _clusterFontSize >  5) {   offsetY = 1;
-      } else {                               offsetY = 2;
-      }
-
-// SET_FORMATTING_ON
-
-      return new Point(offsetX, offsetY);
-   }
-
    private void fireEvent_HoveredTour(final Long hoveredTourId, final int hoveredValuePointIndex) {
 
       final MapHoveredTourEvent event = new MapHoveredTourEvent(
@@ -2510,6 +2472,10 @@ public class Map2 extends Canvas {
       }
 
       return minHoverIndex;
+   }
+
+   public Font getLabelFont() {
+      return _labelFontSWT;
    }
 
    /**
@@ -3957,6 +3923,7 @@ public class Map2 extends Canvas {
          _mapPointPainter_Task.cancel(true);
       }
 
+      UI.disposeResource(_labelFontSWT);
       UI.disposeResource(_mapImage);
       UI.disposeResource(_mapPointImage);
       UI.disposeResource(_poiImage);
@@ -5275,39 +5242,35 @@ public class Map2 extends Canvas {
                   && _mapConfig.isShowCommonLocation == false
                   && _mapConfig.isShowTourPauses == false) {
 
+         // there is nothing which should be painted
+
          return;
       }
 
       if (_mapPointImage == null || _mapPointImage.isDisposed()) {
 
          // start the map point painting
+
          paint_MapPointImage();
 
          return;
       }
 
+      // paint map point image
+
       try {
 
-         // paint map point image
+         // do micro adjustments otherwise panning the map is NOT smooth
+         final Rectangle topLeft_Viewport_WhenPainted = _mapPointPainter_Viewport_WhenPainted;
+         final Rectangle topLeft_Viewport_Current = _worldPixel_TopLeft_Viewport;
 
-         try {
+         final int diffX = topLeft_Viewport_WhenPainted.x - topLeft_Viewport_Current.x;
+         final int diffY = topLeft_Viewport_WhenPainted.y - topLeft_Viewport_Current.y;
 
-            // do micro adjustments otherwise panning the map is NOT smooth
-            final Rectangle topLeft_Viewport_WhenPainted = _mapPointPainter_Viewport_WhenPainted;
-            final Rectangle topLeft_Viewport_Current = _worldPixel_TopLeft_Viewport;
+         gcMapImage.drawImage(_mapPointImage, diffX, diffY);
 
-            final int diffX = topLeft_Viewport_WhenPainted.x - topLeft_Viewport_Current.x;
-            final int diffY = topLeft_Viewport_WhenPainted.y - topLeft_Viewport_Current.y;
-
-            gcMapImage.drawImage(_mapPointImage, diffX, diffY);
-
-            _mapPointPainter_MicroAdjustment_DiffX = diffX;
-            _mapPointPainter_MicroAdjustment_DiffY = diffY;
-
-         } catch (final Exception e) {
-
-            // ignore
-         }
+         _mapPointPainter_MicroAdjustment_DiffX = diffX;
+         _mapPointPainter_MicroAdjustment_DiffY = diffY;
 
          // start the map point painting
          paint_MapPointImage();
@@ -6192,7 +6155,7 @@ public class Map2 extends Canvas {
 
          wrappedTitle = WordUtils.wrap(text_TourTitle, 40);
 
-         gc.setFont(_boldFont);
+         gc.setFont(_boldFontSWT);
          size_Title = gc.textExtent(wrappedTitle);
 
          titleHeight = size_Title.y;
@@ -6244,7 +6207,7 @@ public class Map2 extends Canvas {
 
       if (isTourTitle) {
 
-         gc.setFont(_boldFont);
+         gc.setFont(_boldFontSWT);
          gc.drawText(wrappedTitle, devX, devY);
 
          devY += titleHeight;
@@ -6903,13 +6866,8 @@ public class Map2 extends Canvas {
        */
       if (allClustersOnly.size() > 0) {
 
-         final int clusterFontSize = (int) (_mapConfig.clusterSymbol_Size * 2.0f);
-         if (_clusterFontSize != clusterFontSize) {
-            setupClusterFont(g2d, clusterFontSize);
-         }
-
          // font MUST be set before string.extend() !!!
-         g2d.setFont(_clusterFont);
+         g2d.setFont(_clusterFontAWT);
 
          for (final StaticCluster<?> staticCluster : allClustersOnly) {
 
@@ -6926,7 +6884,7 @@ public class Map2 extends Canvas {
             }
          }
 
-         g2d.setFont(_defaultFont);
+         g2d.setFont(_labelFontAWT);
       }
 
       /*
@@ -6971,14 +6929,14 @@ public class Map2 extends Canvas {
        */
       if (allPaintedMarkerClusters.size() > 0) {
 
-         g2d.setFont(_clusterFont);
+         g2d.setFont(_clusterFontAWT);
 
          for (final PaintedMarkerCluster paintedCluster : allPaintedMarkerClusters) {
 
             paint_MapPointImage_60_OneCluster_Paint(g2d, paintedCluster);
          }
 
-         g2d.setFont(_defaultFont);
+         g2d.setFont(_labelFontAWT);
       }
    }
 
@@ -7030,41 +6988,47 @@ public class Map2 extends Canvas {
       final int diffX = _mapPointPainter_MicroAdjustment_DiffX;
       final int diffY = _mapPointPainter_MicroAdjustment_DiffY;
 
-      final int ovalDevX = clusterRectangle.x + diffX;
-      final int ovalDevY = clusterRectangle.y + diffY;
+      final int devX = clusterRectangle.x + diffX;
+      final int devY = clusterRectangle.y + diffY;
 
       // the background must be filled because another number could be displayed
-      g2d.setBackground(_mapConfig.clusterOutline_ColorAWT);
+      g2d.setColor(_mapConfig.clusterOutline_ColorAWT);
 
       g2d.fillOval(
 
-            ovalDevX,
-            ovalDevY,
+            devX,
+            devY,
 
             clusterRectangle.width + 1,
             clusterRectangle.height + 1);
 
       // must be set BEFORE stringExtent !!!
-      g2d.setFont(_clusterFont);
+      g2d.setFont(_clusterFontAWT);
 
       final FontMetrics fontMetrics = g2d.getFontMetrics();
 
       final String clusterLabel = Integer.toString(numPlacedLabels);
-      final int clusterLabelWidth = fontMetrics.stringWidth(clusterLabel);
-      final int clusterLabelHeight = fontMetrics.getHeight();
 
-      final int clusterSymbolWidth = clusterRectangle.width;
-      final int clusterSymbolHeight = clusterRectangle.height;
+      final int textWidth = fontMetrics.stringWidth(clusterLabel);
+      final int textAscent = fontMetrics.getAscent();
+      final int textDescent = fontMetrics.getDescent();
+
+      final int textWidth2 = textWidth / 2;
+      final int textAscent2 = textAscent / 2;
+      final int textDescent2 = textDescent / 2;
+
+      final int margin = _mapConfig.clusterSymbol_Size;
+      final int circleSize = textWidth + margin;
+      final int circleSize2 = circleSize / 2;
 
       // center number in the cluster symbol
-      final int clusterLabelDevX = ovalDevX + clusterSymbolWidth / 2 - clusterLabelWidth / 2;
-      final int clusterLabelDevY = ovalDevY + clusterSymbolHeight / 2 - clusterLabelHeight / 2;
+      final int clusterLabelDevX = devX + circleSize2 - textWidth2;
+      final int clusterLabelDevY = devY + circleSize2 + textAscent2 - textDescent2;
 
       g2d.setColor(_mapConfig.clusterFill_ColorAWT);
-
       g2d.drawString(clusterLabel, clusterLabelDevX, clusterLabelDevY);
 
-      g2d.setFont(_defaultFont);
+      g2d.setFont(_labelFontAWT);
    }
 
    private PaintedMarkerCluster paint_MapPointImage_42_OneCluster_Setup(final Graphics2D g2d,
@@ -7094,15 +7058,15 @@ public class Map2 extends Canvas {
       int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
       int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
 
-      final int textLength = clusterLabel.length();
-
       final FontMetrics fontMetrics = g2d.getFontMetrics();
-      final int stringWidth = fontMetrics.stringWidth(clusterLabel);
 
-      final int textWidth = textLength < 2 ? stringWidth + 2 : stringWidth;
-      final int textHeight = fontMetrics.getHeight();
+      final int textWidth = fontMetrics.stringWidth(clusterLabel);
+      final int textAscent = fontMetrics.getAscent();
+      final int textDescent = fontMetrics.getDescent();
+
       final int textWidth2 = textWidth / 2;
-      final int textHeight2 = textHeight / 2;
+      final int textAscent2 = textAscent / 2;
+      final int textDescent2 = textDescent / 2;
 
       final int margin = _mapConfig.clusterSymbol_Size;
 
@@ -7112,13 +7076,11 @@ public class Map2 extends Canvas {
       devX = devX - circleSize2;
       devY = devY - circleSize2;
 
-      final int ovalDevX = devX - circleSize2 + textWidth2 - 2;
-      final int ovalDevY = devY - circleSize2 + textHeight2 + 2;
+      final int ovalDevX = devX;
+      final int ovalDevY = devY;
 
-      final Point labelOffset = finetuneClusterLabelPosition(textLength == 1);
-
-      final int clusterLabelDevX = devX + labelOffset.x;
-      final int clusterLabelDevY = devY + labelOffset.y;
+      final int clusterLabelDevX = devX + circleSize2 - textWidth2;
+      final int clusterLabelDevY = devY + circleSize2 + textAscent2 - textDescent2;
 
       final Rectangle paintedClusterRectangle = new Rectangle(
 
@@ -7134,6 +7096,7 @@ public class Map2 extends Canvas {
             paintedClusterRectangle,
 
             clusterLabel,
+
             clusterLabelDevX,
             clusterLabelDevY);
 
@@ -7432,7 +7395,7 @@ public class Map2 extends Canvas {
 
       if (isPaintBackground && _mapConfig.isFillClusterSymbol) {
 
-         g2d.setBackground(_mapConfig.clusterFill_ColorAWT);
+         g2d.setColor(_mapConfig.clusterFill_ColorAWT);
          g2d.fillOval(
 
                symbolDevX,
@@ -7654,9 +7617,18 @@ public class Map2 extends Canvas {
 
             // paint a cluster marker, all markers within one cluster
 
+            final int devX = labelDevX;
+            final int devY = labelDevY + textHeight - fontMetrics.getDescent();
+
             // fill label background
-            g2d.setBackground(_mapConfig.tourMarkerFill_ColorAWT);
+            g2d.setColor(_mapConfig.tourMarkerFill_ColorAWT);
             g2d.fillRect(markerLabelRectangle.x, markerLabelRectangle.y, markerLabelRectangle.width, markerLabelRectangle.height);
+
+            g2d.fillRect(
+                  markerLabelRectangle.x - MAP_MARKER_BORDER_WIDTH,
+                  markerLabelRectangle.y,
+                  markerLabelRectangle.width + 2 * MAP_MARKER_BORDER_WIDTH,
+                  markerLabelRectangle.height);
 
             g2d.setColor(_mapConfig.tourMarkerOutline_ColorAWT);
 
@@ -7668,7 +7640,7 @@ public class Map2 extends Canvas {
                   labelDevY + textHeight);
 
             // marker label
-            g2d.drawString(text, labelDevX, labelDevY);
+            g2d.drawString(text, devX, devY);
 
             // keep painted positions
             allPaintedMarkerPoints.add(new PaintedMapPoint(mapPoint, markerLabelRectangle));
@@ -7708,8 +7680,6 @@ public class Map2 extends Canvas {
       }
 
       g2d.setStroke(new BasicStroke(2));
-      g2d.setColor(fillColor);
-      g2d.setBackground(outlineColor);
 
       int paintedMarkerIndex = 0;
 
@@ -7735,7 +7705,10 @@ public class Map2 extends Canvas {
                _mapPointSymbolMargin,
                _mapPointSymbolMargin);
 
+         g2d.setColor(fillColor);
          g2d.fillRect(markerSymbolRectangle.x, markerSymbolRectangle.y, markerSymbolRectangle.width, markerSymbolRectangle.height);
+
+         g2d.setColor(outlineColor);
          g2d.drawRect(markerSymbolRectangle.x, markerSymbolRectangle.y, markerSymbolRectangle.width, markerSymbolRectangle.height);
 
          // keep painted symbol position
@@ -7853,8 +7826,8 @@ public class Map2 extends Canvas {
 
       final int rectangleHeight = labelRectangle.height;
 
-      final int devX = labelRectangle.x - 1;
-      final int devY = labelRectangle.y + rectangleHeight - fontMetrics.getDescent() - 0;
+      final int devX = labelRectangle.x;
+      final int devY = labelRectangle.y + rectangleHeight - fontMetrics.getDescent();
 
       java.awt.Color fillColor;
       java.awt.Color outlineColor;
@@ -10354,24 +10327,6 @@ public class Map2 extends Canvas {
       }
    }
 
-   private void setupClusterFont(final Graphics2D g2d, final int newClusterFontSize) {
-
-      final FontMetrics fontMetrics = g2d.getFontMetrics();
-
-      final int fontHeight_OLD = fontMetrics.getHeight();
-      final int fontHeight_NEW = newClusterFontSize;
-
-      if (fontHeight_OLD != fontHeight_NEW) {
-
-         // fontsize has changed
-
-         final java.awt.Font currentFont = g2d.getFont();
-
-         _clusterFont = currentFont.deriveFont(fontHeight_NEW);
-         _clusterFontSize = newClusterFontSize;
-      }
-   }
-
    private void setupGroupedLabels() {
 
       final String groupedMarkers = _mapConfig.groupedMarkers;
@@ -10429,21 +10384,39 @@ public class Map2 extends Canvas {
 //    fontAttributes.put(TextAttribute.FAMILY, java.awt.Font.DIALOG);
 //    fontAttributes.put(TextAttribute.FAMILY, java.awt.Font.SANS_SERIF);
 //    fontAttributes.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_EXTRA_LIGHT);
-
-//    UI.dumpAllFonts();
-//    final java.awt.Font systemFont = new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 12); //$NON-NLS-1$
-//    final java.awt.Font systemFont = new java.awt.Font("Liberation Sans", java.awt.Font.PLAIN, 12); //$NON-NLS-1$
-//    final java.awt.Font systemFont = new java.awt.Font("Segoe UI Light", java.awt.Font.PLAIN, 12); //$NON-NLS-1$
-
-      final java.awt.Font userFont = new java.awt.Font(_mapConfig.labelFontName, java.awt.Font.PLAIN, _mapConfig.labelFontSize);
-
-      _defaultFont = userFont;
-
+//
 //    _defaultFont = systemFont.deriveFont(fontAttributes);
 //    _defaultFont = UI.AWT_DIALOG_FONT.deriveFont(fontAttributes);
 //    _defaultFont = UI.AWT_FONT_ARIAL_12.deriveFont(fontAttributes);
 
-      g2d.setFont(_defaultFont);
+//    UI.dumpAllFonts();
+//
+//    final java.awt.Font systemFont = new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 12); //$NON-NLS-1$
+//    final java.awt.Font systemFont = new java.awt.Font("Liberation Sans", java.awt.Font.PLAIN, 12); //$NON-NLS-1$
+//    final java.awt.Font systemFont = new java.awt.Font("Segoe UI Light", java.awt.Font.PLAIN, 12); //$NON-NLS-1$
+
+      final String labelFontName = _mapConfig.labelFontName;
+      final int labelFontSize = _mapConfig.labelFontSize;
+
+      if (labelFontName.equals(_labelFontName) == false || labelFontSize != _labelFontSize) {
+
+         // font is changed -> recreate it
+
+         UI.disposeResource(_labelFontSWT);
+
+         _labelFontName = labelFontName;
+         _labelFontSize = labelFontSize;
+
+         // awt and swt font have not the same size
+         final int swtFontSize = (int) (_labelFontSize * 0.75);
+
+         _labelFontSWT = new Font(_display, _labelFontName, swtFontSize, SWT.NORMAL);
+      }
+
+      _labelFontAWT = new java.awt.Font(labelFontName, java.awt.Font.PLAIN, labelFontSize);
+      _clusterFontAWT = new java.awt.Font(labelFontName, java.awt.Font.PLAIN, _mapConfig.clusterSymbol_Size * 2);
+
+      g2d.setFont(_labelFontAWT);
    }
 
    /**

@@ -35,6 +35,7 @@ import net.tourbook.map2.Messages;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -120,8 +121,6 @@ public class DirectMappingPainter implements IDirectPainter {
 
       final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
 
-      gc.setAntialias(mapConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
-
       final PaintedMapPoint hoveredPoint = _map2.getHoveredMapPoint();
       final Rectangle labelRectangle = hoveredPoint.labelRectangle;
 
@@ -143,6 +142,8 @@ public class DirectMappingPainter implements IDirectPainter {
       final int markerSymbolDevY = mapPointDevY - markerSize2;
 
       final Color lineColor = _map2.isMapBackgroundDark() ? UI.SYS_COLOR_WHITE : UI.SYS_COLOR_BLACK;
+
+      gc.setAntialias(mapConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
 
       gc.setForeground(mapPoint.getOutlineColorSWT());
       gc.setBackground(mapPoint.getFillColorSWT());
@@ -268,7 +269,12 @@ public class DirectMappingPainter implements IDirectPainter {
             labelDevY + labelHeight);
 
       // marker label
+      final Font currentFont = gc.getFont();
+
+      gc.setFont(_map2.getLabelFont());
       gc.drawText(markerLabel, labelDevX, labelDevY, true);
+
+      gc.setFont(currentFont);
 
       // border: horizontal bottom
       gc.drawLine(
