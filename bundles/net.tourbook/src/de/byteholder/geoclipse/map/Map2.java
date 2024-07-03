@@ -1470,9 +1470,7 @@ public class Map2 extends Canvas {
                                                           final HashMap<TourLocation, Map2Point> allTourLocationsMap) {
 
       final boolean isTruncateLabel = _mapConfig.isTruncateLabel;
-      final boolean isWrapLabel = _mapConfig.isWrapLabel;
       final int labelTruncateLength = _mapConfig.labelTruncateLength;
-      final int labelWrapLength = _mapConfig.labelWrapLength;
 
       final Rectangle worldPixel_Viewport = _mapPointPainter_Viewport_DuringPainting;
 
@@ -1537,19 +1535,6 @@ public class Map2 extends Canvas {
          }
       }
 
-      if (isWrapLabel && locationLabel.length() > labelWrapLength) {
-
-         locationLabel = WordUtils.wrap(locationLabel, labelWrapLength);
-
-         final String lineSeparator = System.lineSeparator();
-
-         // remove line separator at the end
-         if (locationLabel.endsWith(lineSeparator)) {
-
-            locationLabel = locationLabel.substring(0, locationLabel.length() - lineSeparator.length());
-         }
-      }
-
       final Map2Point mapPoint = new Map2Point(MapPointType.TOUR_LOCATION, new GeoPoint(latitude, longitude));
 
       mapPoint.tourLocation = tourLocation;
@@ -1587,9 +1572,7 @@ public class Map2 extends Canvas {
       }
 
       final boolean isTruncateLabel = _mapConfig.isTruncateLabel;
-      final boolean isWrapLabel = _mapConfig.isWrapLabel;
       final int labelTruncateLength = _mapConfig.labelTruncateLength;
-      final int labelWrapLength = _mapConfig.labelWrapLength;
 
       final Rectangle worldPixel_Viewport = _mapPointPainter_Viewport_DuringPainting;
 
@@ -1633,19 +1616,6 @@ public class Map2 extends Canvas {
             } else {
 
                locationLabel = locationLabel.substring(0, labelTruncateLength) + UI.SYMBOL_ELLIPSIS;
-            }
-         }
-
-         if (isWrapLabel && locationLabel.length() > labelWrapLength) {
-
-            locationLabel = WordUtils.wrap(locationLabel, labelWrapLength);
-
-            final String lineSeparator = System.lineSeparator();
-
-            // remove line separator at the end
-            if (locationLabel.endsWith(lineSeparator)) {
-
-               locationLabel = locationLabel.substring(0, locationLabel.length() - lineSeparator.length());
             }
          }
 
@@ -1861,9 +1831,7 @@ public class Map2 extends Canvas {
       }
 
       final boolean isTruncateLabel = _mapConfig.isTruncateLabel;
-      final boolean isWrapLabel = _mapConfig.isWrapLabel;
       final int labelTruncateLength = _mapConfig.labelTruncateLength;
-      final int labelWrapLength = _mapConfig.labelWrapLength;
       final int skipLabelGridSize = _mapConfig.groupGridSize;
 
       float numAllRemainingItems = _mapConfig.labelDistributorMaxLabels;
@@ -1957,19 +1925,6 @@ public class Map2 extends Canvas {
                      + UI.SYMBOL_ELLIPSIS
 
                      + endSymbol;
-            }
-         }
-
-         if (isWrapLabel && markerLabel.length() > labelWrapLength) {
-
-            markerLabel = WordUtils.wrap(markerLabel, labelWrapLength);
-
-            final String lineSeparator = System.lineSeparator();
-
-            // remove line separator at the end
-            if (markerLabel.endsWith(lineSeparator)) {
-
-               markerLabel = markerLabel.substring(0, markerLabel.length() - lineSeparator.length());
             }
          }
 
