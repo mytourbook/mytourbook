@@ -1064,7 +1064,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                   .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
                   .applyTo(_lblGroupDuplicatedMarkers);
 
-            _txtGroupDuplicatedMarkers = new Text(tabContainer, SWT.MULTI | SWT.WRAP | SWT.BORDER);
+            _txtGroupDuplicatedMarkers = new Text(tabContainer, SWT.MULTI | SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
             _txtGroupDuplicatedMarkers.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onModifyConfig(focusEvent.widget)));
             GridDataFactory.fillDefaults()
                   .span(2, 1)
