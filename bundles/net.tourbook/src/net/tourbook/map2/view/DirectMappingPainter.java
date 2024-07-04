@@ -272,7 +272,18 @@ public class DirectMappingPainter implements IDirectPainter {
       final Font currentFont = gc.getFont();
 
       gc.setFont(_map2.getLabelFont());
-      gc.drawText(markerLabel, labelDevX, labelDevY, true);
+      gc.drawText(
+
+            markerLabel,
+
+            labelDevX,
+            labelDevY
+
+                  // for some fonts, e.g. "Yu Gothic UI Semilight" which looks very similar like "Segoe UI"
+                  // this will paint the text at the same position as with AWT
+                  + 1,
+
+            true);
 
       gc.setFont(currentFont);
 

@@ -396,7 +396,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       // toggle checkbox
       _chkIsShowCommonLocations.setSelection(!_chkIsShowCommonLocations.getSelection());
 
-      selectTab(_tabCommonLocations, event);
+         selectTab(_tabCommonLocations, event);
 
       if (UI.isShiftKey(event)) {
 
@@ -409,7 +409,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       // toggle checkbox
       _chkIsShowTourLocations.setSelection(!_chkIsShowTourLocations.getSelection());
 
-      selectTab(_tabTourLocations, event);
+         selectTab(_tabTourLocations, event);
 
       if (UI.isShiftKey(event)) {
 
@@ -422,16 +422,16 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       // toggle checkbox
       _chkIsShowTourMarkers.setSelection(!_chkIsShowTourMarkers.getSelection());
 
-      selectTab(_tabTourMarkers, event);
-   }
+         selectTab(_tabTourMarkers, event);
+      }
 
    private void actionStatistic_TourPause(final Event event) {
 
       // toggle checkbox
       _chkIsShowTourPauses.setSelection(!_chkIsShowTourPauses.getSelection());
 
-      selectTab(_tabTourPauses, event);
-   }
+         selectTab(_tabTourPauses, event);
+      }
 
    @Override
    public void close() {
@@ -1051,6 +1051,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                   .indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
                   .applyTo(_lblGroupDuplicatedMarkers);
 
+            // group list
             _txtGroupDuplicatedMarkers = new Text(tabContainer, SWT.MULTI | SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
             _txtGroupDuplicatedMarkers.addFocusListener(FocusListener.focusLostAdapter(focusEvent -> onModifyConfig(focusEvent.widget)));
             GridDataFactory.fillDefaults()
