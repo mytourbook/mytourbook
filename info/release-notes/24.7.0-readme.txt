@@ -9,6 +9,8 @@ New
     - Tour markers
     - Tour pauses
     - Tour and common locations
+  - Edit tour markers
+  
     
 * 2.5D & 3D Maps (Frederic)
   - Export map view to an image file (jpeg, png or bmp) or to the clipboard
