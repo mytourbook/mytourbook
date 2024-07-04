@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -336,6 +336,7 @@ public class Photo implements Serializable {
     *
     * @param imageMetadata
     *           Can be <code>null</code> when not available
+    *
     * @return
     */
    private PhotoImageMetadata createPhotoMetadata(final ImageMetadata imageMetadata) {
@@ -590,6 +591,7 @@ public class Photo implements Serializable {
     *
     * @param jpegMetadata
     * @param file
+    *
     * @return
     */
    private LocalDateTime getExifValueDate(final JpegImageMetadata jpegMetadata) {
@@ -783,6 +785,7 @@ public class Photo implements Serializable {
     * Updated metadata from the image file
     *
     * @param isReadThumbnail
+    *
     * @return Returns image metadata <b>with</b> image thumbnail <b>only</b> when
     *         <code>isReadThumbnail</code> is <code>true</code>, otherwise it checks if metadata
     *         are already loaded.
@@ -1049,6 +1052,7 @@ public class Photo implements Serializable {
     * @param projectionHash
     * @param zoomLevel
     * @param isLinkPhotoDisplayed
+    *
     * @return Returns the world position for this photo or <code>null</code> when geo position is
     *         not set.
     */
@@ -1072,6 +1076,7 @@ public class Photo implements Serializable {
             : _tourWorldPosition.get(hashKey);
 
       if (worldPosition == null) {
+
          // convert lat/long into world pixels which depends on the map projection
 
          final GeoPosition photoGeoPosition = new GeoPosition(latitude,

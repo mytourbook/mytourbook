@@ -832,9 +832,9 @@ public class TourMapPainter extends Map2Painter {
       initPainter();
 
       final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
-      final ArrayList<Photo> photoList = TourPainterConfiguration.getPhotos();
+      final ArrayList<Photo> allPhotos = TourPainterConfiguration.getPhotos();
 
-      if (allTourData.isEmpty() && photoList.isEmpty()) {
+      if (allTourData.isEmpty() && allPhotos.isEmpty()) {
          return false;
       }
 
@@ -1037,7 +1037,7 @@ public class TourMapPainter extends Map2Painter {
          }
       }
 
-      if (TourPainterConfiguration.isShowPhotos && photoList.size() > 0) {
+      if (TourPainterConfiguration.isShowPhotos && allPhotos.size() > 0) {
 
          /*
           * world positions are cached to optimize performance
@@ -1048,7 +1048,7 @@ public class TourMapPainter extends Map2Painter {
 
          int photoCounter = 0;
 
-         for (final Photo photo : photoList) {
+         for (final Photo photo : allPhotos) {
 
             final Point photoWorldPixel = photo.getWorldPosition(
                   mp,
@@ -1114,14 +1114,15 @@ public class TourMapPainter extends Map2Painter {
          devX += devPartOffset;
          devY += devPartOffset;
 
-         gcTile.drawImage(
-               image,
+         gcTile.drawImage(image,
+
+               // source
                0,
                0,
                imageSize.width,
                imageSize.height,
 
-               //
+               // destication
                devX,
                devY,
                photoWidth,

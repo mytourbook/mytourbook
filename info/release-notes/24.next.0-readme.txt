@@ -55,7 +55,8 @@ New
 Improvements
 ============
 
-* 
+* Tour Chart
+  - Paint photo point with better contrast color for the dark theme
 
 Changes
 =======
