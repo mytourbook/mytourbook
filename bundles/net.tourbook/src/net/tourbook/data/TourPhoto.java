@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -106,13 +106,14 @@ public class TourPhoto implements Serializable {
     * Rating for a photo, stars can be set from 0 to 5, 0 is no rating.
     */
    private int                        ratingStars;
+
    /**
     * Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the value when the
     * value is <b>NOT</b> set !!!
     */
-   private double                     latitude            = 0;
+   private double                     latitude;
 
-   private double                     longitude           = 0;
+   private double                     longitude;
 
    @ManyToOne(optional = false)
    private TourData                   tourData;

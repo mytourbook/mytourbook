@@ -42,7 +42,7 @@ public class TourPainterConfiguration {
 
    static boolean                           isBackgroundDark;
 
-   static boolean                           isShowPhotos;
+   public static boolean                    isShowPhotos;
    static boolean                           isShowTours;
    static boolean                           isShowTourStartEnd;
    static boolean                           isShowWayPoints;
@@ -51,7 +51,7 @@ public class TourPainterConfiguration {
     * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
     * save in a tour) is displayed.
     */
-   static boolean                           isLinkPhotoDisplayed;
+   public static boolean                    isLinkPhotoDisplayed;
 
    static boolean                           isShowBreadcrumbs;
 
@@ -102,8 +102,9 @@ public class TourPainterConfiguration {
 
    /**
     * @param allPhotos
-    *           When <code>null</code>, photos are not displayed.
+    *           When <code>null</code> then photos are not displayed
     * @param isShowPhoto
+    * @param isLinkPhoto
     */
    public static void setPhotos(final ArrayList<Photo> allPhotos, final boolean isShowPhoto, final boolean isLinkPhoto) {
 

@@ -1040,13 +1040,13 @@ public class TourMapPainter extends Map2Painter {
       if (TourPainterConfiguration.isShowPhotos && allPhotos.size() > 0) {
 
          /*
-          * world positions are cached to optimize performance
+          * World positions are cached to optimize performance
           */
          final MP mp = map.getMapProvider();
          final int projectionHash = mp.getProjection().getId().hashCode();
          final int mapZoomLevel = map.getZoom();
 
-         int photoCounter = 0;
+         final int photoCounter = 0;
 
          for (final Photo photo : allPhotos) {
 
@@ -1060,9 +1060,9 @@ public class TourMapPainter extends Map2Painter {
                continue;
             }
 
-            if (drawPhoto(gcTile, map, tile, photo, photoWorldPixel, parts)) {
-               photoCounter++;
-            }
+//            if (drawPhoto(gcTile, map, tile, photo, photoWorldPixel, parts)) {
+//               photoCounter++;
+//            }
          }
 
          isContentInTile = isContentInTile || photoCounter > 0;

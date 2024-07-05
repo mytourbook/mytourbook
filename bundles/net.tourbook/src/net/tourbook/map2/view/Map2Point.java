@@ -25,6 +25,7 @@ import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
 import net.tourbook.map.location.LocationType;
 import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
+import net.tourbook.photo.Photo;
 
 import org.oscim.core.GeoPoint;
 
@@ -66,6 +67,7 @@ public class Map2Point implements ClusterItem {
    public TourLocation                       tourLocation;
    public TourMarker                         tourMarker;
    public TourPause                          tourPause;
+   public Photo                              photo;
 
    /**
     * Type of the tour location {@link #tourLocation}
