@@ -2876,19 +2876,11 @@ public class TourManager {
       TourLogManager.showLogView(AutoOpenEvent.DOWNLOAD_SOMETHING);
       TourLogManager.subLog_INFO(NLS.bind(LOG_RETRIEVE_WEATHER_DATA_001_START, weatherProvider));
 
-      final int numTours = allTourData.size();
-
       final String weatherRetrievalFailureLogMessage = TourWeatherRetriever.getWeatherRetrievalFailureLogMessage(weatherProvider);
+
       if (!TourWeatherRetriever.canRetrieveWeather(weatherProvider)) {
 
          TourLogManager.log_ERROR(weatherRetrievalFailureLogMessage);
-
-      } else if (numTours < 2) {
-
-         BusyIndicator.showWhile(Display.getCurrent(), () -> {
-
-            retrieveWeatherData_OneTour(allTourData.get(0), allModifiedTours, weatherProvider);
-         });
 
       } else {
 
@@ -2897,7 +2889,8 @@ public class TourManager {
             @Override
             public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-               int monitorCounter = 0;
+               final int numTours = allTourData.size();
+               int numRetrieved = 0;
 
                monitor.beginTask(Messages.Tour_Data_RetrievingWeatherData_Monitor, numTours);
 
@@ -2906,7 +2899,7 @@ public class TourManager {
 
                   monitor.subTask(NLS.bind(
                         Messages.Tour_Data_RetrievingWeatherData_Monitor_Subtask,
-                        ++monitorCounter,
+                        numRetrieved,
                         numTours));
 
                   if (monitor.isCanceled()) {
@@ -2918,9 +2911,10 @@ public class TourManager {
                      break;
                   }
 
-                  monitor.worked(1);
-
                   retrieveWeatherData_OneTour(tourData, allModifiedTours, weatherProvider);
+
+                  numRetrieved++;
+                  monitor.worked(1);
                }
             }
          };
