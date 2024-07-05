@@ -182,7 +182,7 @@ public class Map2ConfigManager {
    public static final RGB                     DEFAULT_TOUR_LOCATION_START_OUTLINE_RGB = new RGB(0, 0, 0);
    public static final RGB                     DEFAULT_TOUR_LOCATION_END_FILL_RGB      = new RGB(255, 252, 145);
    public static final RGB                     DEFAULT_TOUR_LOCATION_END_OUTLINE_RGB   = new RGB(0, 0, 0);
-   public static final RGB                     DEFAULT_TOUR_MARKER_FILL_RGB            = new RGB(194, 231, 99);
+   public static final RGB                     DEFAULT_TOUR_MARKER_FILL_RGB            = new RGB(210, 255, 74);
    public static final RGB                     DEFAULT_TOUR_MARKER_OUTLINE_RGB         = new RGB(0, 0, 0);
    public static final RGB                     DEFAULT_TOUR_PAUSE_FILL_RGB             = new RGB(255, 211, 130);
    public static final RGB                     DEFAULT_TOUR_PAUSE_OUTLINE_RGB          = new RGB(0, 0, 0);
