@@ -1523,6 +1523,17 @@ public class UI {
    }
 
    /**
+    * @param href
+    * @param text
+    *
+    * @return
+    */
+   public static String createLinkText(final String href, final String text) {
+
+      return "<a href=\"%s\">%s</a>".formatted(href, text); //$NON-NLS-1$
+   }
+
+   /**
     * Creates a page with a static text by using a {@link FormToolkit}
     *
     * @param formToolkit

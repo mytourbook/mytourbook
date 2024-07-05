@@ -55,8 +55,12 @@ New
 Improvements
 ============
 
+* 2D Map
+  - Show tour marker link in tooltip
+
 * Tour Chart
   - Paint photo point with better contrast color for the dark theme
+  
 
 Changes
 =======

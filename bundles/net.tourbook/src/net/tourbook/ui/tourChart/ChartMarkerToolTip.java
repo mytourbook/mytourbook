@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -600,15 +600,15 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
             // only text is in the link -> this is not a internet address but create a link of it
 
-            linkText = "<a href=\"" + urlText + "\">" + urlText + "</a>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            linkText = UI.createLinkText(urlText, urlText);
 
          } else if (isText == false) {
 
-            linkText = "<a href=\"" + urlAddress + "\">" + urlAddress + "</a>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            linkText = UI.createLinkText(urlAddress, urlAddress);
 
          } else {
 
-            linkText = "<a href=\"" + urlAddress + "\">" + urlText + "</a>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            linkText = UI.createLinkText(urlAddress, urlText);
          }
 
          linkUrl.setText(linkText);
@@ -670,6 +670,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
    /**
     * @param hoveredLabel
+    *
     * @return Returns a {@link TourMarker} when a chart label (marker) is hovered or
     *         <code>null</code> when a marker is not hovered.
     */
@@ -761,6 +762,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
          ttPosY = devYTop - tipHeight;
 
          break;
+
       case TOOLTIP_POSITION_CHART_BOTTOM:
 
          ttPosX = devHoveredX + devHoveredWidth / 2 - tipWidth / 2;

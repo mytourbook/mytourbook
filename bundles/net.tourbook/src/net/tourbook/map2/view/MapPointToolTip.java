@@ -32,6 +32,7 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.map.location.LocationType;
 import net.tourbook.tour.location.TourLocationUI;
 import net.tourbook.ui.Messages;
+import net.tourbook.web.WEB;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -43,9 +44,11 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -257,6 +260,55 @@ public class MapPointToolTip extends ToolTip {
             GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
 
          }
+         {
+            /*
+             * Link
+             */
+
+            createUI_TourMarker_10_Link(container, tourMarker);
+         }
+      }
+   }
+
+   /**
+    * Url
+    *
+    * @param parent
+    * @param tourMarker
+    */
+   private void createUI_TourMarker_10_Link(final Composite parent, final TourMarker tourMarker) {
+
+      final String urlText = tourMarker.getUrlText();
+      final String urlAddress = tourMarker.getUrlAddress();
+
+      final boolean isText = urlText.length() > 0;
+      final boolean isAddress = urlAddress.length() > 0;
+
+      if (isText || isAddress) {
+
+         String linkText;
+
+         if (isAddress == false) {
+
+            // only text is in the link -> this is not a internet address but create a link of it
+
+            linkText = UI.createLinkText(urlText, urlText);
+
+         } else if (isText == false) {
+
+            linkText = UI.createLinkText(urlAddress, urlAddress);
+
+         } else {
+
+            linkText = UI.createLinkText(urlAddress, urlText);
+         }
+
+         final Link linkUrl = new Link(parent, SWT.NONE);
+         linkUrl.addListener(SWT.Selection, event -> onSelectUrl(event.text));
+         linkUrl.setText(linkText);
+
+         GridDataFactory.fillDefaults().applyTo(linkUrl);
+         setLinkWidth(linkUrl);
       }
    }
 
@@ -406,6 +458,27 @@ public class MapPointToolTip extends ToolTip {
       _defaultTextHeight = _pc.convertHeightInCharsToPixels(DEFAULT_TEXT_HEIGHT);
 
       _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   }
+
+   private void onSelectUrl(final String address) {
+
+      WEB.openUrl(address);
+
+      // close tooltip when a link is selected
+      hide();
+   }
+
+   private void setLinkWidth(final Control control) {
+
+      final Point defaultSize = control.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+
+      // check default width
+      if (defaultSize.x > _defaultTextWidth) {
+
+         // limit width
+         final GridData gd = (GridData) control.getLayoutData();
+         gd.widthHint = _defaultTextWidth;
+      }
    }
 
    private void setTextControlSize(final Composite parent, final Text txtControl, final String text) {
