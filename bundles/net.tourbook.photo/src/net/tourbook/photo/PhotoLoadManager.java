@@ -560,7 +560,7 @@ public class PhotoLoadManager {
 
    public static void putImageInLoadingQueueThumbMap(final Photo photo,
                                                      final ImageQuality imageQuality,
-                                                     final ILoadCallBack imageLoadCallback) {
+                                                     final ILoadCallBack imageLoaderCallback) {
 
       // set state
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
@@ -572,7 +572,7 @@ public class PhotoLoadManager {
             imageQuality,
             _imageFramework,
             _hqImageSize,
-            imageLoadCallback));
+            imageLoaderCallback));
 
       final Runnable executorTask = new Runnable() {
          @Override

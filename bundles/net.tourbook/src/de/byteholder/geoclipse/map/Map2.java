@@ -129,7 +129,12 @@ import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
 import net.tourbook.map25.layer.marker.algorithm.distance.DistanceClustering;
 import net.tourbook.map25.layer.marker.algorithm.distance.QuadItem;
 import net.tourbook.map25.layer.marker.algorithm.distance.StaticCluster;
+import net.tourbook.photo.ILoadCallBack;
+import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoImageCache;
+import net.tourbook.photo.PhotoLoadManager;
+import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.Map2_Appearance;
 import net.tourbook.tour.SelectionTourId;
@@ -775,6 +780,17 @@ public class Map2 extends Canvas {
       IS_HOVERED, //
       IS_SELECTED, //
       IS_HOVERED_AND_SELECTED, //
+   }
+
+   private class PhotoImageLoaderCallback implements ILoadCallBack {
+
+      @Override
+      public void callBackImageIsLoaded(final boolean isUpdateUI) {
+
+         if (isUpdateUI) {
+            paint();
+         }
+      }
    }
 
    /**
@@ -2643,6 +2659,43 @@ public class Map2 extends Canvas {
     */
    private String getOverlayKey(final Tile tile, final int xOffset, final int yOffset, final String projectionId) {
       return _overlayKey + tile.getTileKey(xOffset, yOffset, projectionId);
+   }
+
+   /**
+    * @param photo
+    * @param map
+    * @param tile
+    *
+    * @return Returns the photo image or <code>null</code> when image is not loaded.
+    */
+   private Image getPhotoImage(final Photo photo) {
+
+      Image photoImage = null;
+
+      final ImageQuality requestedImageQuality = ImageQuality.THUMB;
+
+      // check if image has an loading error
+      final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
+
+      if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+
+         // image is not yet loaded
+
+         // check if image is in the cache
+         photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+
+         if ((photoImage == null || photoImage.isDisposed())
+               && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+
+            // the requested image is not available in the image cache -> image must be loaded
+
+            final ILoadCallBack imageLoadCallback = new PhotoImageLoaderCallback();
+
+            PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
+         }
+      }
+
+      return photoImage;
    }
 
    private PoiToolTip getPoiTooltip() {
@@ -8071,7 +8124,6 @@ public class Map2 extends Canvas {
                                            final int numAllPhotos,
                                            final List<PointFeature> allPhotoItems,
                                            final List<PaintedMapPoint> allPaintedPhotos) {
-      // TODO Auto-generated method stub
 
       for (int itemIndex = 0; itemIndex < numAllPhotos; itemIndex++) {
 
@@ -8099,13 +8151,35 @@ public class Map2 extends Canvas {
                photoWidth,
                photoHeight);
 
-         g2d.setColor(java.awt.Color.cyan);
+         final Image swtPhotoImage = getPhotoImage(photo);
 
-         g2d.fillRect(
-               photoRectangle.x - MAP_MARKER_BORDER_WIDTH,
-               photoRectangle.y,
-               photoRectangle.width + 2 * MAP_MARKER_BORDER_WIDTH,
-               photoRectangle.height);
+         if (swtPhotoImage == null) {
+
+            // paint placeholder
+
+            g2d.setColor(java.awt.Color.cyan);
+
+            g2d.fillRect(
+                  photoRectangle.x - MAP_MARKER_BORDER_WIDTH,
+                  photoRectangle.y,
+                  photoRectangle.width + 2 * MAP_MARKER_BORDER_WIDTH,
+                  photoRectangle.height);
+
+         } else {
+
+            // paint image
+
+            final java.awt.Image awtPhotoImage = ImageConverter.convertIntoAWT(swtPhotoImage);
+
+            g2d.drawImage(awtPhotoImage,
+
+                  photoRectangle.x - MAP_MARKER_BORDER_WIDTH,
+                  photoRectangle.y,
+                  photoRectangle.width + 2 * MAP_MARKER_BORDER_WIDTH,
+                  photoRectangle.height,
+
+                  null);
+         }
 
          // keep position
          allPaintedPhotos.add(new PaintedMapPoint(mapPoint, photoRectangle));

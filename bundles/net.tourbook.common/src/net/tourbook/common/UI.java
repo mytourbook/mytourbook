@@ -1076,11 +1076,11 @@ public class UI {
 
       if (isSmallValueAdjustment) {
 
-         if (oldValue < 20) {
+         if (oldValue < 10) {
 
             valueAdjustment = 1 * valueSign;
 
-         } else if (oldValue < 40) {
+         } else if (oldValue < 20) {
 
             valueAdjustment = 2 * valueSign;
 
