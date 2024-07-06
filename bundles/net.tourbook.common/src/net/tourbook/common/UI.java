@@ -1037,6 +1037,19 @@ public class UI {
     */
    public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event, final int defaultAccelerator) {
 
+      adjustSpinnerValueOnMouseScroll(event, defaultAccelerator, false);
+   }
+
+   /**
+    * @param event
+    * @param defaultAccelerator
+    *           Could be 10 to increase e.g. image size by 10 without pressing an accelerator key
+    * @param isSmallValueAdjustment
+    */
+   public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event,
+                                                      final int defaultAccelerator,
+                                                      final boolean isSmallValueAdjustment) {
+
       boolean isCtrlKey;
       boolean isShiftKey;
 
@@ -1048,6 +1061,8 @@ public class UI {
          isShiftKey = (event.stateMask & SWT.MOD2) > 0;
       }
 
+      final int valueSign = event.count > 0 ? 1 : -1;
+
       // accelerate with Ctrl + Shift key
       int accelerator = isCtrlKey ? 10 : 1;
       accelerator *= isShiftKey ? 5 : 1;
@@ -1055,9 +1070,26 @@ public class UI {
       accelerator *= defaultAccelerator;
 
       final Spinner spinner = (Spinner) event.widget;
-      final int valueAdjustment = (event.count > 0 ? 1 : -1) * accelerator;
+      int valueAdjustment = valueSign * accelerator;
 
       final int oldValue = spinner.getSelection();
+
+      if (isSmallValueAdjustment) {
+
+         if (oldValue < 20) {
+
+            valueAdjustment = 1 * valueSign;
+
+         } else if (oldValue < 40) {
+
+            valueAdjustment = 2 * valueSign;
+
+         } else if (oldValue < 100) {
+
+            valueAdjustment = 5 * valueSign;
+         }
+      }
+
       spinner.setSelection(oldValue + valueAdjustment);
    }
 

@@ -454,9 +454,11 @@ public class Map2 extends Canvas {
    private int                             _numStatistics_AllTourMarkers;
    private int                             _numStatistics_AllTourLocations;
    private int                             _numStatistics_AllTourPauses;
+   private int                             _numStatistics_AllTourPhotos;
 
    private boolean                         _numStatistics_AllTourMarkers_IsTruncated;
    private boolean                         _numStatistics_AllTourPauses_IsTruncated;
+   private boolean                         _numStatistics_AllTourPhotos_IsTruncated;
 
    private Map<Long, java.awt.Color>       _locationBoundingBoxColors       = new HashMap<>();
    private int                             _colorSwitchCounter;
@@ -2167,9 +2169,33 @@ public class Map2 extends Canvas {
        */
       final int projectionHash = _mp.getProjection().getId().hashCode();
 
-      final int numPhotos = 0;
+      final float numPhotos = allPhotos.size();
+      float numAllRemainingItems = _mapConfig.labelDistributorMaxLabels;
 
-      for (final Photo photo : allPhotos) {
+      final float subPhotoItems = numPhotos / numAllRemainingItems;
+
+      for (int photoIndex = 0; photoIndex < allPhotos.size(); photoIndex++) {
+
+         int photoSubIndex = photoIndex;
+
+         if (subPhotoItems > 1) {
+
+            // there are more photos than visible photos
+
+            final float nextItemIndex = subPhotoItems * photoIndex;
+            final double randomDiff = Math.random() * subPhotoItems;
+
+            photoSubIndex = (int) (nextItemIndex + randomDiff);
+
+            _numStatistics_AllTourPhotos_IsTruncated = true;
+         }
+
+         // check bounds
+         if (photoSubIndex >= numPhotos) {
+            break;
+         }
+
+         final Photo photo = allPhotos.get(photoSubIndex);
 
          final java.awt.Point photoWorldPixel = photo.getWorldPosition(
                _mp,
@@ -2213,6 +2239,12 @@ public class Map2 extends Canvas {
          mapPoint.photo = photo;
 
          allMapPoints.add(mapPoint);
+
+         _numStatistics_AllTourPhotos++;
+
+         if (numAllRemainingItems-- <= 0) {
+            break;
+         }
       }
    }
 
@@ -5291,7 +5323,8 @@ public class Map2 extends Canvas {
             || _mapConfig.isShowTourMarker == false
                   && _mapConfig.isShowTourLocation == false
                   && _mapConfig.isShowCommonLocation == false
-                  && _mapConfig.isShowTourPauses == false) {
+                  && _mapConfig.isShowTourPauses == false
+                  && TourPainterConfiguration.isShowPhotos == false) {
 
          // there is nothing which should be painted
 
@@ -6623,7 +6656,11 @@ public class Map2 extends Canvas {
 
                _allPaintedPauses.size(),
                _numStatistics_AllTourPauses,
-               _numStatistics_AllTourPauses_IsTruncated)
+               _numStatistics_AllTourPauses_IsTruncated,
+
+               _allPaintedPhotos.size(),
+               _numStatistics_AllTourPhotos,
+               _numStatistics_AllTourPhotos_IsTruncated)
 
          );
       };
@@ -6645,15 +6682,17 @@ public class Map2 extends Canvas {
          _locationBoundingBoxColors.clear();
       }
 
-      _numStatistics_AllCommonLocations = 0;
-      _numStatistics_AllTourLocations = 0;
-      _numStatistics_AllTourMarkers = 0;
-      _numStatistics_AllTourPauses = 0;
+// SET_FORMATTING_OFF
+
+      _numStatistics_AllCommonLocations         = 0;
+      _numStatistics_AllTourLocations           = 0;
+      _numStatistics_AllTourMarkers             = 0;
+      _numStatistics_AllTourPauses              = 0;
+      _numStatistics_AllTourPhotos              = 0;
 
       _numStatistics_AllTourMarkers_IsTruncated = false;
-      _numStatistics_AllTourPauses_IsTruncated = false;
-
-// SET_FORMATTING_OFF
+      _numStatistics_AllTourPauses_IsTruncated  = false;
+      _numStatistics_AllTourPhotos_IsTruncated  = false;
 
       final List<PaintedMapPoint>      allPaintedCommonLocations  = new ArrayList<>();
       final List<PaintedMapPoint>      allPaintedTourLocations    = new ArrayList<>();

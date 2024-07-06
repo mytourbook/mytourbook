@@ -16,7 +16,6 @@
 package net.tourbook.map2.view;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
@@ -30,7 +29,6 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -48,14 +46,13 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
 
    private static final String   STATE_PHOTO_PROPERTIES_IMAGE_SIZE = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE"; //$NON-NLS-1$
 
-   private static final int      MIN_IMAGE_WIDTH                   = 10;
+   private static final int      MIN_IMAGE_WIDTH                   = 3;
 
    /**
     * This value is small because a map do not yet load large images !!!
     */
    private static final int      MAX_IMAGE_WIDTH                   = 200;
 
-   static final IPreferenceStore _prefStore                        = TourbookPlugin.getPrefStore();
    private IDialogSettings       _state;
 
    private ActionResetToDefaults _actionRestoreDefaults;
@@ -190,7 +187,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
             _spinnerImageSize.setPageIncrement(10);
             _spinnerImageSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI()));
             _spinnerImageSize.addMouseWheelListener(mouseEvent -> {
-               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10, true);
                onChangeUI();
             });
 
