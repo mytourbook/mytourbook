@@ -2180,18 +2180,48 @@ public class Map2 extends Canvas {
 
       final boolean isLinkPhotoDisplayed = TourPainterConfiguration.isLinkPhotoDisplayed;
 
-      /*
-       * World positions are cached to optimize performance
-       */
+      // world positions are cached to optimize performance
       final int projectionHash = _mp.getProjection().getId().hashCode();
 
-      final float numPhotos = allPhotos.size();
+      final List<Photo> allVisiblePhotos = new ArrayList<>();
+      final List<java.awt.Point> allWorldPixel = new ArrayList<>();
+
+      /*
+       * Get all visible photos
+       */
+      for (final Photo photo : allPhotos) {
+
+         final java.awt.Point photoWorldPixel = photo.getWorldPosition(
+               _mp,
+               projectionHash,
+               _mapZoomLevel,
+               isLinkPhotoDisplayed);
+
+         if (photoWorldPixel == null) {
+            continue;
+         }
+
+         final boolean isPhotoInViewport = worldPixel_Viewport.contains(photoWorldPixel.x, photoWorldPixel.y);
+         if (isPhotoInViewport) {
+
+            allVisiblePhotos.add(photo);
+            allWorldPixel.add(photoWorldPixel);
+         }
+      }
+
+      /*
+       * Create map points
+       */
+      final float numVisiblePhotos = allVisiblePhotos.size();
       float numAllRemainingItems = _mapConfig.labelDistributorMaxLabels;
 
-      final float subPhotoItems = numPhotos / numAllRemainingItems;
+      final float subPhotoItems = numVisiblePhotos / numAllRemainingItems;
 
-      for (int photoIndex = 0; photoIndex < allPhotos.size(); photoIndex++) {
+      for (int photoIndex = 0; photoIndex < numVisiblePhotos; photoIndex++) {
 
+         /*
+          * Skip photos when there are too many
+          */
          int photoSubIndex = photoIndex;
 
          if (subPhotoItems > 1) {
@@ -2207,27 +2237,12 @@ public class Map2 extends Canvas {
          }
 
          // check bounds
-         if (photoSubIndex >= numPhotos) {
+         if (photoSubIndex >= numVisiblePhotos) {
             break;
          }
 
-         final Photo photo = allPhotos.get(photoSubIndex);
-
-         final java.awt.Point photoWorldPixel = photo.getWorldPosition(
-               _mp,
-               projectionHash,
-               _mapZoomLevel,
-               isLinkPhotoDisplayed);
-
-         if (photoWorldPixel == null) {
-            continue;
-         }
-
-         final boolean isPhotoInViewport = worldPixel_Viewport.contains(photoWorldPixel.x, photoWorldPixel.y);
-
-         if (isPhotoInViewport == false) {
-            continue;
-         }
+         final Photo photo = allVisiblePhotos.get(photoSubIndex);
+         final java.awt.Point photoWorldPixel = allWorldPixel.get(photoSubIndex);
 
          // convert world position into device position
          final int devXPhoto = photoWorldPixel.x - worldPixel_Viewport.x;
