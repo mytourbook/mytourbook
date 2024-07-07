@@ -212,7 +212,7 @@ public class PhotoImageCache {
 
             final Rectangle imageSize = photoImage.getBounds();
 
-            photo.setPhotoDimension(imageSize.width, imageSize.height);
+            photo.setPhotoSize(imageSize.width, imageSize.height);
          }
       }
       return photoImage;
@@ -321,7 +321,7 @@ public class PhotoImageCache {
 
       if (cacheWrapper != null) {
 
-         photo.setPhotoDimension(imageWidth, imageHeight);
+         photo.setPhotoSize(imageWidth, imageHeight);
 
          return true;
       }

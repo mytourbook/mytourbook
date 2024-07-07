@@ -1373,7 +1373,7 @@ public class PhotoImageLoader {
                final int width = Integer.parseInt(originalImageWidth);
                final int height = Integer.parseInt(originalImageHeight);
 
-               _photo.setPhotoDimension(width, height);
+               _photo.setPhotoSize(width, height);
 
             } catch (final NumberFormatException e) {
                StatusUtil.log(e);
@@ -1771,7 +1771,7 @@ public class PhotoImageLoader {
 
       if (isOriginalSize) {
 
-         _photo.setPhotoDimension(imageWidth, imageHeight);
+         _photo.setPhotoSize(imageWidth, imageHeight);
 
          // update cached image size
 
@@ -1779,7 +1779,7 @@ public class PhotoImageLoader {
 
       } else {
 
-         _photo.setThumbDimension(imageWidth, imageHeight);
+         _photo.setThumbSize(imageWidth, imageHeight);
       }
    }
 

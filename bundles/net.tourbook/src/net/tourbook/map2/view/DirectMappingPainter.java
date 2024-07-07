@@ -249,50 +249,64 @@ public class DirectMappingPainter implements IDirectPainter {
       }
 
       /*
-       * Highlight hovered label
+       * Highlight hovered label/photo
        */
       final int labelDevX = labelRectangle.x;
       final int labelDevY = labelRectangle.y;
 
-      // fill label background
-      gc.fillRectangle(
-            labelRectangle.x - Map2.MAP_MARKER_BORDER_WIDTH,
-            labelRectangle.y,
-            labelRectangle.width + 2 * Map2.MAP_MARKER_BORDER_WIDTH,
-            labelRectangle.height);
+      if (mapPointType.equals(MapPointType.TOUR_PHOTO)) {
 
-      // border: horizontal bottom
-      gc.drawLine(
-            labelDevX,
-            labelDevY + labelHeight,
-            labelDevX + labelWidth - 1,
-            labelDevY + labelHeight);
+         gc.setLineWidth(1);
+         gc.setForeground(lineColor);
 
-      // marker label
-      final Font currentFont = gc.getFont();
+         gc.drawRectangle(
+               labelRectangle.x - Map2.MAP_MARKER_BORDER_WIDTH,
+               labelRectangle.y,
+               labelRectangle.width + 2 * Map2.MAP_MARKER_BORDER_WIDTH,
+               labelRectangle.height);
 
-      gc.setFont(_map2.getLabelFont());
-      gc.drawText(
+      } else {
 
-            markerLabel,
+         // fill label background
+         gc.fillRectangle(
+               labelRectangle.x - Map2.MAP_MARKER_BORDER_WIDTH,
+               labelRectangle.y,
+               labelRectangle.width + 2 * Map2.MAP_MARKER_BORDER_WIDTH,
+               labelRectangle.height);
 
-            labelDevX,
-            labelDevY
+         // border: horizontal bottom
+         gc.drawLine(
+               labelDevX,
+               labelDevY + labelHeight,
+               labelDevX + labelWidth - 1,
+               labelDevY + labelHeight);
 
-                  // for some fonts, e.g. "Yu Gothic UI Semilight" which looks very similar like "Segoe UI"
-                  // this will paint the text at the same position as with AWT
-                  + 1,
+         // marker label
+         final Font currentFont = gc.getFont();
 
-            true);
+         gc.setFont(_map2.getLabelFont());
+         gc.drawText(
 
-      gc.setFont(currentFont);
+               markerLabel,
 
-      // border: horizontal bottom
-      gc.drawLine(
-            labelDevX,
-            labelDevY + labelHeight,
-            labelDevX + labelWidth,
-            labelDevY + labelHeight);
+               labelDevX,
+               labelDevY
+
+                     // for some fonts, e.g. "Yu Gothic UI Semilight" which looks very similar like "Segoe UI"
+                     // this will paint the text at the same position as with AWT
+                     + 1,
+
+               true);
+
+         gc.setFont(currentFont);
+
+         // border: horizontal bottom
+         gc.drawLine(
+               labelDevX,
+               labelDevY + labelHeight,
+               labelDevX + labelWidth,
+               labelDevY + labelHeight);
+      }
    }
 
    /**

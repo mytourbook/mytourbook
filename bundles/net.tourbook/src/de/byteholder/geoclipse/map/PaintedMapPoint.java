@@ -31,12 +31,12 @@ public class PaintedMapPoint {
    public Map2Point          mapPoint;
 
    /**
-    * Rectangle of the painted marker label
+    * Rectangle of the painted label or photo
     */
    public Rectangle          labelRectangle;
 
    /**
-    * Rectangle of the painted marker location symbol
+    * Rectangle of the painted location symbol
     */
    public Rectangle          symbolRectangle;
 

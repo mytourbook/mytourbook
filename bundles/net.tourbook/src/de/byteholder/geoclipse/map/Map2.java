@@ -4736,6 +4736,11 @@ public class Map2 extends Canvas {
          onMouse_Move_CheckMapPoints(allPaintedPauses, mouseMoveDevX, mouseMoveDevY);
       }
 
+      // prio 5: Photos
+      if (_hoveredMapPoint == null && allPaintedPhotos.size() > 0) {
+         onMouse_Move_CheckMapPoints(allPaintedPhotos, mouseMoveDevX, mouseMoveDevY);
+      }
+
       // ensure that the old map point is hidden
       if (oldHoveredMapPoint != null) {
          redraw();
@@ -4902,9 +4907,9 @@ public class Map2 extends Canvas {
 
       // first check the symbol
 
-      for (final PaintedMapPoint paintedMarker : allPaintedMapPoints) {
+      for (final PaintedMapPoint paintedMapPoint : allPaintedMapPoints) {
 
-         final Rectangle paintedSymbolRect = paintedMarker.symbolRectangle;
+         final Rectangle paintedSymbolRect = paintedMapPoint.symbolRectangle;
 
          if (paintedSymbolRect != null
                && (mouseMoveDevX > paintedSymbolRect.x)
@@ -4916,7 +4921,7 @@ public class Map2 extends Canvas {
 
             // a map point is hovered
 
-            _hoveredMapPoint = paintedMarker;
+            _hoveredMapPoint = paintedMapPoint;
 
             break;
          }
@@ -4925,9 +4930,9 @@ public class Map2 extends Canvas {
       // second check the label
       if (_hoveredMapPoint == null) {
 
-         for (final PaintedMapPoint paintedMarker : allPaintedMapPoints) {
+         for (final PaintedMapPoint paintedMapPoint : allPaintedMapPoints) {
 
-            final Rectangle paintedLabelRect = paintedMarker.labelRectangle;
+            final Rectangle paintedLabelRect = paintedMapPoint.labelRectangle;
 
             if (true
                   && (mouseMoveDevX > paintedLabelRect.x)
@@ -4937,7 +4942,7 @@ public class Map2 extends Canvas {
 
                // a map point is hovered
 
-               _hoveredMapPoint = paintedMarker;
+               _hoveredMapPoint = paintedMapPoint;
 
                break;
             }
@@ -7579,7 +7584,7 @@ public class Map2 extends Canvas {
       paint_MpImage_10_AllLocationLabels(g2d, numAllTourLocations, allTourLocationLabels, allPaintedTourLocationsPoints);
 
       /*
-       * Draw marker label
+       * Paint other items
        */
       paint_MpImage_30_AllMarker(g2d,
             numAllMarkers,
@@ -7593,7 +7598,6 @@ public class Map2 extends Canvas {
             allPaintedPauses);
 
       paint_MpImage_60_AllPhotos(g2d,
-            numAllPhotos,
             allPhotoItems,
             allPaintedPhotos);
 
@@ -7904,8 +7908,8 @@ public class Map2 extends Canvas {
 
       } else {
 
-         fillColor = _mapConfig.tourMarkerFill_ColorAWT;
-         outlineColor = _mapConfig.tourMarkerOutline_ColorAWT;
+         fillColor = _mapConfig.tourMarkerOutline_ColorAWT;
+         outlineColor = _mapConfig.tourMarkerFill_ColorAWT;
       }
 
       g2d.setStroke(new BasicStroke(2));
@@ -7951,6 +7955,9 @@ public class Map2 extends Canvas {
                                            final List<PointFeature> allPauseItems,
                                            final List<PaintedMapPoint> allPaintedPoints) {
 
+      /*
+       * Draw pause label
+       */
       final FontMetrics fontMetrics = g2d.getFontMetrics();
       final int textHeight = fontMetrics.getHeight();
 
@@ -7988,7 +7995,6 @@ public class Map2 extends Canvas {
       /*
        * Draw pause symbol
        */
-
       final int symbolSize2 = _mapPointSymbolMargin / 2;
 
       java.awt.Color fillColor;
@@ -8003,13 +8009,11 @@ public class Map2 extends Canvas {
 
       } else {
 
-         fillColor = _mapConfig.tourPauseFill_ColorAWT;
-         outlineColor = _mapConfig.tourPauseOutline_ColorAWT;
+         fillColor = _mapConfig.tourPauseOutline_ColorAWT;
+         outlineColor = _mapConfig.tourPauseFill_ColorAWT;
       }
 
       g2d.setStroke(new BasicStroke(2));
-      g2d.setColor(fillColor);
-      g2d.setBackground(outlineColor);
 
       int paintedPointIndex = 0;
 
@@ -8035,7 +8039,10 @@ public class Map2 extends Canvas {
                _mapPointSymbolMargin,
                _mapPointSymbolMargin);
 
+         g2d.setColor(fillColor);
          g2d.fillRect(symbolRectangle.x, symbolRectangle.y, symbolRectangle.width, symbolRectangle.height);
+
+         g2d.setColor(outlineColor);
          g2d.drawRect(symbolRectangle.x, symbolRectangle.y, symbolRectangle.width, symbolRectangle.height);
 
          // keep painted symbol position
@@ -8136,11 +8143,17 @@ public class Map2 extends Canvas {
    }
 
    private void paint_MpImage_60_AllPhotos(final Graphics2D g2d,
-                                           final int numAllPhotos,
                                            final List<PointFeature> allPhotoItems,
                                            final List<PaintedMapPoint> allPaintedPhotos) {
 
-      for (int itemIndex = 0; itemIndex < numAllPhotos; itemIndex++) {
+      final int numPhotosItems = allPhotoItems.size();
+
+      g2d.setStroke(new BasicStroke(1));
+
+      /*
+       * Paint photos
+       */
+      for (int itemIndex = 0; itemIndex < numPhotosItems; itemIndex++) {
 
          final PointFeature distribLabel = allPhotoItems.get(itemIndex);
 
@@ -8194,10 +8207,77 @@ public class Map2 extends Canvas {
                   photoRectangle.height,
 
                   null);
+
+            // draw border
+
+            g2d.setColor(java.awt.Color.GRAY);
+            g2d.drawRect(
+                  photoRectangle.x - MAP_MARKER_BORDER_WIDTH,
+                  photoRectangle.y,
+                  photoRectangle.width + 2 * MAP_MARKER_BORDER_WIDTH,
+                  photoRectangle.height);
          }
 
          // keep position
          allPaintedPhotos.add(new PaintedMapPoint(mapPoint, photoRectangle));
+      }
+
+      /*
+       * Draw photo symbol
+       */
+      final int symbolSize2 = _mapPointSymbolMargin / 2;
+
+      java.awt.Color fillColor;
+      java.awt.Color outlineColor;
+
+      if (_isMarkerClusterSelected) {
+
+         // all other labels are disable -> display grayed out
+
+         fillColor = java.awt.Color.WHITE;
+         outlineColor = _isMapBackgroundDark ? java.awt.Color.GRAY : java.awt.Color.WHITE;
+
+      } else {
+
+         fillColor = java.awt.Color.BLACK;
+         outlineColor = java.awt.Color.WHITE;
+      }
+
+      g2d.setStroke(new BasicStroke(2));
+
+      int paintedPointIndex = 0;
+
+      for (int itemIndex = 0; itemIndex < numPhotosItems; itemIndex++) {
+
+         final PointFeature distribLabel = allPhotoItems.get(itemIndex);
+
+         if (distribLabel.isLabeled == false) {
+            continue;
+         }
+
+         final Map2Point mapPoint = (Map2Point) distribLabel.data;
+
+         final int mapPointDevX = mapPoint.geoPointDevX;
+         final int mapPointDevY = mapPoint.geoPointDevY;
+
+         final int symbolDevX = mapPointDevX - symbolSize2;
+         final int symbolDevY = mapPointDevY - symbolSize2;
+
+         final Rectangle symbolRectangle = new Rectangle(
+               symbolDevX,
+               symbolDevY,
+               _mapPointSymbolMargin,
+               _mapPointSymbolMargin);
+
+         g2d.setColor(fillColor);
+         g2d.fillRect(symbolRectangle.x, symbolRectangle.y, symbolRectangle.width, symbolRectangle.height);
+
+         g2d.setColor(outlineColor);
+         g2d.drawRect(symbolRectangle.x, symbolRectangle.y, symbolRectangle.width, symbolRectangle.height);
+
+         // keep painted symbol position
+         final PaintedMapPoint paintedMarker = allPaintedPhotos.get(paintedPointIndex++);
+         paintedMarker.symbolRectangle = symbolRectangle;
       }
    }
 

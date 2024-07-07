@@ -16,23 +16,23 @@
 package net.tourbook.map2.view;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
-import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.Photo;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.resource.ColorRegistry;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -40,18 +40,25 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * Slideout for 2D map track options
+ * Slideout for 2D map photo options
  */
 public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActionResetToDefault {
 
-   private static final String   STATE_PHOTO_PROPERTIES_IMAGE_SIZE = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE"; //$NON-NLS-1$
+   private static final String   STATE_PHOTO_IMAGE_SIZE        = "STATE_PHOTO_IMAGE_SIZE";        //$NON-NLS-1$
+   private static final String   STATE_PHOTO_IMAGE_SIZE_SMALL  = "STATE_PHOTO_IMAGE_SIZE_SMALL";  //$NON-NLS-1$
+   private static final String   STATE_PHOTO_IMAGE_SIZE_MEDIUM = "STATE_PHOTO_IMAGE_SIZE_MEDIUM"; //$NON-NLS-1$
+   private static final String   STATE_PHOTO_IMAGE_SIZE_LARGE  = "STATE_PHOTO_IMAGE_SIZE_LARGE";  //$NON-NLS-1$
 
-   private static final int      MIN_IMAGE_WIDTH                   = 3;
+   private static final int      MIN_IMAGE_SIZE                = 3;
 
    /**
     * This value is small because a map do not yet load large images !!!
     */
-   private static final int      MAX_IMAGE_WIDTH                   = 200;
+   private static final int      MAX_IMAGE_SIZE                = 200;
+
+   private static final int      MAP_IMAGE_DEFAULT_SIZE_SMALL  = 20;
+   private static final int      MAP_IMAGE_DEFAULT_SIZE_MEDIUM = 80;
+   private static final int      MAP_IMAGE_DEFAULT_SIZE_LARGE  = 200;
 
    private IDialogSettings       _state;
 
@@ -59,12 +66,26 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
 
    private Map2View              _map2View;
 
+   private MouseWheelListener    _defaultMouseWheelListener;
+   private SelectionListener     _defaultSelectedListener;
+
    private int                   _imageSize;
 
    /*
     * UI controls
     */
-   private Spinner _spinnerImageSize;
+   private Button  _radioImageSize_Small;
+   private Button  _radioImageSize_Medium;
+   private Button  _radioImageSize_Large;
+
+   private Spinner _spinnerImageSize_Small;
+   private Spinner _spinnerImageSize_Medium;
+   private Spinner _spinnerImageSize_Large;
+
+   private enum ImageSize {
+
+      SMALL, MEDIUM, LARGE
+   }
 
    /**
     * @param ownerControl
@@ -82,7 +103,6 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
       _map2View = map2View;
       _state = map2State;
 
-      restoreState_BeforeUI();
    }
 
    private void createActions() {
@@ -93,18 +113,15 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
    @Override
    protected Composite createToolTipContentArea(final Composite parent) {
 
+      initUI();
+
       createActions();
 
       final Composite ui = createUI(parent);
 
+      restoreState();
+
       enableControls();
-
-      updateUI();
-
-      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-      UI.setChildColors(parent,
-            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND),
-            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
 
       return ui;
    }
@@ -174,32 +191,95 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
             label.setToolTipText(Messages.Photo_Properties_Label_ThumbnailSize_Tooltip);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
+                  .span(2, 1)
                   .applyTo(label);
          }
          {
             /*
-             * spinner: size
+             * Image size: Small
              */
-            _spinnerImageSize = new Spinner(container, SWT.BORDER);
-            _spinnerImageSize.setMinimum(MIN_IMAGE_WIDTH);
-            _spinnerImageSize.setMaximum(MAX_IMAGE_WIDTH);
-            _spinnerImageSize.setIncrement(1);
-            _spinnerImageSize.setPageIncrement(10);
-            _spinnerImageSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI()));
-            _spinnerImageSize.addMouseWheelListener(mouseEvent -> {
-               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10, true);
-               onChangeUI();
-            });
+            _radioImageSize_Small = new Button(container, SWT.RADIO);
+            _radioImageSize_Small.setText(OtherMessages.APP_SIZE_SMALL_NAME);
+            _radioImageSize_Small.addSelectionListener(_defaultSelectedListener);
 
-            GridDataFactory.fillDefaults()
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(_spinnerImageSize);
+            _spinnerImageSize_Small = new Spinner(container, SWT.BORDER);
+            _spinnerImageSize_Small.setMinimum(MIN_IMAGE_SIZE);
+            _spinnerImageSize_Small.setMaximum(MAX_IMAGE_SIZE);
+            _spinnerImageSize_Small.setIncrement(1);
+            _spinnerImageSize_Small.setPageIncrement(10);
+            _spinnerImageSize_Small.addSelectionListener(_defaultSelectedListener);
+            _spinnerImageSize_Small.addMouseWheelListener(_defaultMouseWheelListener);
+         }
+         {
+            /*
+             * Image size: Medium
+             */
+            _radioImageSize_Medium = new Button(container, SWT.RADIO);
+            _radioImageSize_Medium.setText(OtherMessages.APP_SIZE_MEDIUM_NAME);
+            _radioImageSize_Medium.addSelectionListener(_defaultSelectedListener);
+
+            _spinnerImageSize_Medium = new Spinner(container, SWT.BORDER);
+            _spinnerImageSize_Medium.setMinimum(MIN_IMAGE_SIZE);
+            _spinnerImageSize_Medium.setMaximum(MAX_IMAGE_SIZE);
+            _spinnerImageSize_Medium.setIncrement(1);
+            _spinnerImageSize_Medium.setPageIncrement(10);
+            _spinnerImageSize_Medium.addSelectionListener(_defaultSelectedListener);
+            _spinnerImageSize_Medium.addMouseWheelListener(_defaultMouseWheelListener);
+         }
+         {
+            /*
+             * Image size: Large
+             */
+            _radioImageSize_Large = new Button(container, SWT.RADIO);
+            _radioImageSize_Large.setText(OtherMessages.APP_SIZE_LARGE_NAME);
+            _radioImageSize_Large.addSelectionListener(_defaultSelectedListener);
+
+            _spinnerImageSize_Large = new Spinner(container, SWT.BORDER);
+            _spinnerImageSize_Large.setMinimum(MIN_IMAGE_SIZE);
+            _spinnerImageSize_Large.setMaximum(MAX_IMAGE_SIZE);
+            _spinnerImageSize_Large.setIncrement(1);
+            _spinnerImageSize_Large.setPageIncrement(10);
+            _spinnerImageSize_Large.addSelectionListener(_defaultSelectedListener);
+            _spinnerImageSize_Large.addMouseWheelListener(_defaultMouseWheelListener);
          }
       }
    }
 
    private void enableControls() {
 
+      _spinnerImageSize_Large.setEnabled(_radioImageSize_Large.getSelection());
+      _spinnerImageSize_Medium.setEnabled(_radioImageSize_Medium.getSelection());
+      _spinnerImageSize_Small.setEnabled(_radioImageSize_Small.getSelection());
+   }
+
+   private int getSelectedImageSize() {
+
+      int imageSize;
+
+      if (_radioImageSize_Large.getSelection()) {
+
+         imageSize = _spinnerImageSize_Large.getSelection();
+
+      } else if (_radioImageSize_Medium.getSelection()) {
+
+         imageSize = _spinnerImageSize_Medium.getSelection();
+
+      } else {
+
+         imageSize = _spinnerImageSize_Small.getSelection();
+      }
+
+      return imageSize;
+   }
+
+   private void initUI() {
+
+      _defaultSelectedListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI());
+
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10, true);
+         onChangeUI();
+      };
    }
 
    @Override
@@ -211,54 +291,90 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
 
       final int oldImageSize = _imageSize;
 
-      _imageSize = _spinnerImageSize.getSelection();
+      _imageSize = getSelectedImageSize();
 
       saveState();
 
       // optimize fire event
       if (oldImageSize != _imageSize) {
 
-         updateUI_Map();
+         updateMap();
       }
+
+      enableControls();
    }
 
    @Override
    public void resetToDefaults() {
 
-      _imageSize = Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
+      _imageSize = MAP_IMAGE_DEFAULT_SIZE_MEDIUM;
 
-      updateUI();
-      updateUI_Map();
+      _radioImageSize_Large.setSelection(false);
+      _radioImageSize_Medium.setSelection(true);
+      _radioImageSize_Small.setSelection(false);
+
+      _spinnerImageSize_Large.setSelection(MAP_IMAGE_DEFAULT_SIZE_LARGE);
+      _spinnerImageSize_Medium.setSelection(MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
+      _spinnerImageSize_Small.setSelection(MAP_IMAGE_DEFAULT_SIZE_SMALL);
+
+      enableControls();
+
+      updateMap();
    }
 
-   private void restoreState_BeforeUI() {
+   private void restoreState() {
 
-      _imageSize = Util.getStateInt(_state, STATE_PHOTO_PROPERTIES_IMAGE_SIZE, Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT);
+      final Enum<ImageSize> imageSize = Util.getStateEnum(_state, STATE_PHOTO_IMAGE_SIZE, ImageSize.MEDIUM);
 
-      // ensure that an image is displayed, it happened that image size was 0
-      if (_imageSize < 10) {
-         _imageSize = Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
+      final int imageSizeLarge = Util.getStateInt(_state, STATE_PHOTO_IMAGE_SIZE_LARGE, MAP_IMAGE_DEFAULT_SIZE_LARGE);
+      final int imageSizeMedium = Util.getStateInt(_state, STATE_PHOTO_IMAGE_SIZE_MEDIUM, MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
+      final int imageSizeSmall = Util.getStateInt(_state, STATE_PHOTO_IMAGE_SIZE_SMALL, MAP_IMAGE_DEFAULT_SIZE_SMALL);
+
+      _spinnerImageSize_Large.setSelection(imageSizeLarge);
+      _spinnerImageSize_Medium.setSelection(imageSizeMedium);
+      _spinnerImageSize_Small.setSelection(imageSizeSmall);
+
+      if (imageSize.equals(ImageSize.LARGE)) {
+
+         _imageSize = imageSizeLarge;
+         _radioImageSize_Large.setSelection(true);
+
+      } else if (imageSize.equals(ImageSize.MEDIUM)) {
+
+         _imageSize = imageSizeMedium;
+         _radioImageSize_Medium.setSelection(true);
+
+      } else {
+
+         _imageSize = imageSizeSmall;
+         _radioImageSize_Small.setSelection(true);
       }
 
-      Photo.setPaintedMapImageWidth(_imageSize);
+      Photo.setMapImageRequestedSize(_imageSize);
    }
 
    private void saveState() {
 
-      _state.put(STATE_PHOTO_PROPERTIES_IMAGE_SIZE, _imageSize);
+      final Enum<ImageSize> selectedSize = _radioImageSize_Large.getSelection()
+
+            ? ImageSize.LARGE
+            : _radioImageSize_Medium.getSelection()
+
+                  ? ImageSize.MEDIUM
+                  : ImageSize.SMALL;
+
+      _state.put(STATE_PHOTO_IMAGE_SIZE_LARGE, _spinnerImageSize_Large.getSelection());
+      _state.put(STATE_PHOTO_IMAGE_SIZE_MEDIUM, _spinnerImageSize_Medium.getSelection());
+      _state.put(STATE_PHOTO_IMAGE_SIZE_SMALL, _spinnerImageSize_Small.getSelection());
+
+      Util.setStateEnum(_state, STATE_PHOTO_IMAGE_SIZE, selectedSize);
    }
 
-   private void updateUI() {
+   private void updateMap() {
 
-      // image size
-      _spinnerImageSize.setSelection(_imageSize);
-   }
+      Photo.setMapImageRequestedSize(_imageSize);
 
-   private void updateUI_Map() {
-
-      Photo.setPaintedMapImageWidth(_imageSize);
-
-      _map2View.updateUI_Photos();
+      _map2View.getMap().paint();
    }
 
 }

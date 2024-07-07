@@ -5606,13 +5606,6 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   public void updateUI_Photos() {
-
-      _map.disposeOverlayImageCache();
-
-      _map.paint();
-   }
-
    /**
     * Show tour when it is not yet displayed.
     *
