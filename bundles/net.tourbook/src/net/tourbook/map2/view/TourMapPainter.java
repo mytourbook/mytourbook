@@ -50,7 +50,6 @@ import net.tourbook.data.TourReference;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map2.Messages;
 import net.tourbook.map3.layer.TourLegendLabel;
-import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.Map2_Appearance;
@@ -61,8 +60,6 @@ import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.resource.ColorRegistry;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -114,7 +111,6 @@ public class TourMapPainter extends Map2Painter {
       _nf1.setMaximumFractionDigits(1);
    }
 
-   private static Color               _bgColor;
    private static final ColorCacheSWT _colorCache = new ColorCacheSWT();
 
    /*
@@ -736,9 +732,6 @@ public class TourMapPainter extends Map2Painter {
 
       // ensure color registry is setup
       PhotoUI.init();
-
-      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-      _bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 
       /**
        * this code optimizes the performance by reading from the pref store which is not very

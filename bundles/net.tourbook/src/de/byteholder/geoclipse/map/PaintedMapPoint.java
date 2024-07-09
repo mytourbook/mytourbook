@@ -16,7 +16,6 @@
 package de.byteholder.geoclipse.map;
 
 import net.tourbook.common.UI;
-import net.tourbook.data.TourMarker;
 import net.tourbook.map2.view.Map2Point;
 
 import org.eclipse.swt.graphics.Rectangle;
@@ -26,7 +25,7 @@ public class PaintedMapPoint {
    private static final char NL = UI.NEW_LINE;
 
    /**
-    * Contains the {@link TourMarker}
+    * Contains the different map points
     */
    public Map2Point          mapPoint;
 
