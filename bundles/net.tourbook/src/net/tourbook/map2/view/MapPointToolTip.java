@@ -26,17 +26,10 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.ToolTip;
-import net.tourbook.common.widgets.ImageCanvas;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
 import net.tourbook.map.location.LocationType;
-import net.tourbook.photo.ILoadCallBack;
-import net.tourbook.photo.ImageQuality;
-import net.tourbook.photo.Photo;
-import net.tourbook.photo.PhotoImageCache;
-import net.tourbook.photo.PhotoLoadManager;
-import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.tour.location.TourLocationUI;
 import net.tourbook.ui.Messages;
 import net.tourbook.web.WEB;
@@ -47,7 +40,6 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -57,7 +49,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -79,38 +70,11 @@ public class MapPointToolTip extends ToolTip {
    private Map2             _map2;
 
    private PaintedMapPoint  _hoveredMapPoint;
-   private boolean          _isPhotoTooltip;
 
    private PixelConverter   _pc;
    private int              _defaultTextWidth;
    private int              _defaultTextHeight;
    private Font             _boldFont;
-
-   /*
-    * UI controls
-    */
-   private ImageCanvas _photoImageCanvas;
-
-   private class PhotoImageLoaderCallback implements ILoadCallBack {
-
-      @Override
-      public void callBackImageIsLoaded(final boolean isUpdateUI) {
-
-         if (isUpdateUI) {
-
-            if (_hoveredMapPoint != null) {
-
-               getShell().getDisplay().asyncExec(() -> {
-
-                  if (_hoveredMapPoint != null) {
-
-                     updateUI_Photo(_hoveredMapPoint.mapPoint);
-                  }
-               });
-            }
-         }
-      }
-   }
 
    public MapPointToolTip(final Map2 map2) {
 
@@ -161,7 +125,7 @@ public class MapPointToolTip extends ToolTip {
 
       case TOUR_PAUSE:        createUI_TourPause(parent, mapPoint);     break;
 
-      case TOUR_PHOTO:        createUI_TourPhoto(parent, mapPoint);     break;
+      case TOUR_PHOTO:        break;
       }
 
 // SET_FORMATTING_ON
@@ -372,192 +336,118 @@ public class MapPointToolTip extends ToolTip {
       }
    }
 
-   private void createUI_TourPhoto(final Composite parent, final Map2Point mapPoint) {
-
-      final Label label = new Label(parent, SWT.NONE);
-      label.setText("Photo");
-      GridDataFactory.fillDefaults().applyTo(label);
-
-      _photoImageCanvas = new ImageCanvas(parent, SWT.NONE);
-      _photoImageCanvas.setIsSmoothImages(true);
-      _photoImageCanvas.setStyle(SWT.CENTER);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_photoImageCanvas);
-
-      updateUI_Photo(mapPoint);
-   }
-
    @Override
    public Point getLocation(final Point tipSize, final Event event) {
 
-      if (_hoveredMapPoint != null) {
+      if (_hoveredMapPoint == null) {
 
-         final Display display = _map2.getDisplay();
-
-         final int tooltipWidth = tipSize.x;
-         final int tooltipHeight = tipSize.y;
-
-         final Point devMouse = _map2.toControl(display.getCursorLocation());
-         final int devMouseX = devMouse.x;
-
-         final Rectangle markerBounds = _hoveredMapPoint.labelRectangle;
-         final int markerWidth = markerBounds.width;
-         final int markerWidth2 = markerWidth / 2;
-         final int markerHeight = markerBounds.height;
-
-         final int markerLeft = markerBounds.x;
-         final int markerRight = markerLeft + markerWidth;
-         final int markerTop = markerBounds.y;
-         final int markerBottom = markerBounds.y + markerHeight;
-
-         final Map2Point mapMarker = _hoveredMapPoint.mapPoint;
-         final int geoPointDevX = mapMarker.geoPointDevX;
-         final int geoPointDevY = mapMarker.geoPointDevY;
-
-         // center horizontally to the mouse position
-         int devX = devMouseX - tooltipWidth / 2;
-         int devY = markerTop + markerHeight;
-         int noCoverHeight;
-         final int photoOffset = _isPhotoTooltip
-
-               // a resized tooltip has a border
-               ? 7
-
-               : 0;
-
-         if (geoPointDevX <= markerLeft) {
-
-            // label is on the right site
-
-            devX = markerRight - photoOffset;
-
-         } else {
-
-            // label is on the left site -
-
-            devX = markerLeft - tooltipWidth + photoOffset;
-
-         }
-
-         if (geoPointDevY <= markerTop) {
-
-            // label is below the geo point
-
-            devY = markerTop;
-            noCoverHeight = markerHeight;
-
-         } else {
-
-            // label is above the geo point
-
-            devY = markerBottom - tooltipHeight;
-            noCoverHeight = -markerHeight;
-         }
-
-         /*
-          * Check if the tooltip is outside of the parent
-          */
-         final Rectangle mapBounds = _map2.getBounds();
-         final int mapWidth = mapBounds.width;
-
-         boolean isDevXAdjusted = false;
-
-         if (devX >= mapWidth) {
-            devX = mapWidth - 40;
-            isDevXAdjusted = true;
-         }
-
-         Point ttDisplayLocation = _map2.toDisplay(devX, devY);
-
-         final Rectangle displayBounds = display.getBounds();
-         final int displayWidth = displayBounds.width;
-         final int displayHeight = displayBounds.height;
-
-         if (ttDisplayLocation.x + tooltipWidth > displayWidth) {
-
-            /*
-             * Adjust horizontal position, it is outside of the display, prevent default
-             * repositioning
-             */
-
-            if (isDevXAdjusted) {
-
-               ttDisplayLocation = _map2.toDisplay(devMouseX - tooltipWidth / 2 - markerWidth2 + 20 - tooltipWidth, devY);
-
-            } else {
-
-               ttDisplayLocation.x = displayWidth - tooltipWidth;
-               ttDisplayLocation.y += noCoverHeight;
-            }
-         }
-
-         if (ttDisplayLocation.y + tooltipHeight > displayHeight) {
-
-            /*
-             * Adjust vertical position, it is outside of the display, prevent default
-             * repositioning
-             */
-
-            ttDisplayLocation.y = ttDisplayLocation.y - tooltipHeight - markerHeight;
-         }
-
-         return fixupDisplayBoundsWithMonitor(tipSize, ttDisplayLocation);
+         return super.getLocation(tipSize, event);
       }
 
-      return super.getLocation(tipSize, event);
-   }
+      final Display display = _map2.getDisplay();
 
-   /**
-    * @param photo
-    * @param map
-    * @param tile
-    *
-    * @return Returns the photo image or <code>null</code> when image is not loaded.
-    */
-   private Image getPhotoImage(final Photo photo) {
+      final int tooltipWidth = tipSize.x;
+      final int tooltipHeight = tipSize.y;
 
-      Image photoImage = null;
+      final Point devMouse = _map2.toControl(display.getCursorLocation());
+      final int devMouseX = devMouse.x;
 
-      final ImageQuality requestedImageQuality = ImageQuality.HQ;
+      final Rectangle labelBounds = _hoveredMapPoint.labelRectangle;
+      final int labelWidth = labelBounds.width;
+      final int labelWidth2 = labelWidth / 2;
+      final int labelHeight = labelBounds.height;
 
-      // check if image has an loading error
-      final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
+      final int labelLeft = labelBounds.x;
+      final int labelRight = labelLeft + labelWidth;
+      final int labelTop = labelBounds.y;
+      final int labelBottom = labelBounds.y + labelHeight;
 
-      if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+      final Map2Point mapPoint = _hoveredMapPoint.mapPoint;
+      final int geoPointDevX = mapPoint.geoPointDevX;
+      final int geoPointDevY = mapPoint.geoPointDevY;
 
-         // image is not yet loaded
+      // center horizontally to the mouse position
+      int devX = devMouseX - tooltipWidth / 2;
+      int devY = labelTop + labelHeight;
+      int noCoverHeight;
 
-         // check if image is in the cache
-         photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+      if (geoPointDevX <= labelLeft) {
 
-         if ((photoImage == null || photoImage.isDisposed())
-               && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+         // label is on the right site
 
-            // the requested image is not available in the image cache -> image must be loaded
-
-            final ILoadCallBack imageLoadCallback = new PhotoImageLoaderCallback();
-
-            PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
-         }
-      }
-
-      return photoImage;
-   }
-
-   @Override
-   protected int getShellStyle() {
-
-      if (_isPhotoTooltip) {
-
-         // allow tooltip resize
-
-         return SWT.ON_TOP | SWT.TOOL | SWT.NO_FOCUS
-
-               | SWT.RESIZE;
+         devX = labelRight;
 
       } else {
 
-         return super.getShellStyle();
+         // label is on the left site -
+
+         devX = labelLeft - tooltipWidth;
+
       }
+
+      if (geoPointDevY <= labelTop) {
+
+         // label is below the geo point
+
+         devY = labelTop;
+         noCoverHeight = labelHeight;
+
+      } else {
+
+         // label is above the geo point
+
+         devY = labelBottom - tooltipHeight;
+         noCoverHeight = -labelHeight;
+      }
+
+      /*
+       * Check if the tooltip is outside of the parent
+       */
+      final Rectangle mapBounds = _map2.getBounds();
+      final int mapWidth = mapBounds.width;
+
+      boolean isDevXAdjusted = false;
+
+      if (devX >= mapWidth) {
+         devX = mapWidth - 40;
+         isDevXAdjusted = true;
+      }
+
+      Point ttDisplayLocation = _map2.toDisplay(devX, devY);
+
+      final Rectangle displayBounds = display.getBounds();
+      final int displayWidth = displayBounds.width;
+      final int displayHeight = displayBounds.height;
+
+      if (ttDisplayLocation.x + tooltipWidth > displayWidth) {
+
+         /*
+          * Adjust horizontal position, it is outside of the display, prevent default
+          * repositioning
+          */
+
+         if (isDevXAdjusted) {
+
+            ttDisplayLocation = _map2.toDisplay(devMouseX - tooltipWidth / 2 - labelWidth2 + 20 - tooltipWidth, devY);
+
+         } else {
+
+            ttDisplayLocation.x = displayWidth - tooltipWidth;
+            ttDisplayLocation.y += noCoverHeight;
+         }
+      }
+
+      if (ttDisplayLocation.y + tooltipHeight > displayHeight) {
+
+         /*
+          * Adjust vertical position, it is outside of the display, prevent default
+          * repositioning
+          */
+
+         ttDisplayLocation.y = ttDisplayLocation.y - tooltipHeight - labelHeight;
+      }
+
+      return fixupDisplayBoundsWithMonitor(tipSize, ttDisplayLocation);
    }
 
    @Override
@@ -565,10 +455,12 @@ public class MapPointToolTip extends ToolTip {
 
       _hoveredMapPoint = _map2.getHoveredMapPoint();
 
-      _isPhotoTooltip = _hoveredMapPoint != null
+      final boolean isPhotoTooltip = _hoveredMapPoint != null
             && _hoveredMapPoint.mapPoint.pointType.equals(MapPointType.TOUR_PHOTO) ? true : false;
 
-      return _hoveredMapPoint;
+      // this tooltip is not used for photos
+
+      return isPhotoTooltip ? null : _hoveredMapPoint;
    }
 
    private void initUI(final Composite parent) {
@@ -598,34 +490,6 @@ public class MapPointToolTip extends ToolTip {
          // limit width
          final GridData gd = (GridData) control.getLayoutData();
          gd.widthHint = _defaultTextWidth;
-      }
-   }
-
-   @Override
-   protected Point setupShellSize(final Shell ttShell) {
-
-      // TODO Auto-generated method stub
-
-      if (_isPhotoTooltip) {
-
-         final Point shellSize = getShellSize();
-
-         if (shellSize == null) {
-
-            return super.setupShellSize(ttShell);
-         }
-
-         final int maxSize = 1500;
-         final int shellWidth = Math.min(shellSize.x, maxSize);
-         final int shellHeight = Math.min(shellSize.y, maxSize);
-
-         ttShell.setSize(ttShell.computeSize(shellWidth, shellHeight, true));
-
-         return new Point(shellWidth, shellHeight);
-
-      } else {
-
-         return super.setupShellSize(ttShell);
       }
    }
 
@@ -681,10 +545,6 @@ public class MapPointToolTip extends ToolTip {
    @Override
    protected boolean shouldCreateToolTip(final Event event) {
 
-//      if (_map2.isShowMapLocationTooltip() == false) {
-//         return false;
-//      }
-
       if (super.shouldCreateToolTip(event) == false) {
          return false;
       }
@@ -696,16 +556,4 @@ public class MapPointToolTip extends ToolTip {
       return true;
    }
 
-   private void updateUI_Photo(final Map2Point mapPoint) {
-
-      if (_photoImageCanvas.isDisposed()) {
-         return;
-      }
-
-      final Image photoImage = getPhotoImage(mapPoint.photo);
-
-      if (photoImage != null) {
-         _photoImageCanvas.setImage(photoImage, false);
-      }
-   }
 }

@@ -1162,7 +1162,7 @@ public class Map2View extends ViewPart implements
       ActionOpenMarkerDialog.doAction(tourProvider, true, tourMarker);
 
       // hide hovered marker
-      _map.resetHoveredMarker();
+      _map.resetHoveredMapPoint();
 
       _map.paint();
    }
@@ -1193,7 +1193,7 @@ public class Map2View extends ViewPart implements
          // this seems to be more complicated, a syncexec() to not work
          _map.getDisplay().timerExec(300, () -> {
 
-            _map.resetHoveredMarker();
+            _map.resetHoveredMapPoint();
 
             _map.paint();
          });
@@ -1210,7 +1210,7 @@ public class Map2View extends ViewPart implements
       _map.setMapCenter(new GeoPosition(geoPoint.getLatitude(), geoPoint.getLongitude()));
 
       // hide hovered marker
-      _map.resetHoveredMarker();
+      _map.resetHoveredMapPoint();
 
       _map.redraw();
    }

@@ -119,6 +119,7 @@ import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.MapLabelLayout;
 import net.tourbook.map2.view.MapPointStatistics;
 import net.tourbook.map2.view.MapPointToolTip;
+import net.tourbook.map2.view.MapPointToolTip_Photo;
 import net.tourbook.map2.view.MapPointType;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.TourPainterConfiguration;
@@ -453,6 +454,7 @@ public class Map2 extends Canvas {
    private PaintedMapPoint                 _hoveredMapPoint;
    private boolean                         _isMarkerClusterSelected;
    private MapPointToolTip                 _mapPointTooltip;
+   private MapPointToolTip_Photo           _mapPointTooltip_Photo;
 
    /** Number of created map points */
    private int                             _numStatistics_AllCommonLocations;
@@ -861,6 +863,7 @@ public class Map2 extends Canvas {
 
       _mapLocation_Tooltip = new MapLocationToolTip(this);
       _mapPointTooltip = new MapPointToolTip(this);
+      _mapPointTooltip_Photo = new MapPointToolTip_Photo(this);
 
       _poiImage = TourbookPlugin.getImageDescriptor(Images.POI_InMap).createImage();
       _poiImageBounds = _poiImage.getBounds();
@@ -2176,6 +2179,9 @@ public class Map2 extends Canvas {
 
    private void createMapPoints_TourPhotos(final List<Photo> allPhotos, final List<Map2Point> allMapPoints) {
 
+      // clone list to prevent concurrency exceptions, this happened
+      final List<Photo> allPhotosCloned = new ArrayList<>(allPhotos);
+
       final Rectangle worldPixel_Viewport = _mapPointPainter_Viewport_DuringPainting;
 
       final boolean isLinkPhotoDisplayed = TourPainterConfiguration.isLinkPhotoDisplayed;
@@ -2189,7 +2195,7 @@ public class Map2 extends Canvas {
       /*
        * Get all visible photos
        */
-      for (final Photo photo : allPhotos) {
+      for (final Photo photo : allPhotosCloned) {
 
          final java.awt.Point photoWorldPixel = photo.getWorldPosition(
                _mp,
@@ -4738,7 +4744,19 @@ public class Map2 extends Canvas {
 
       // prio 5: Photos
       if (_hoveredMapPoint == null && allPaintedPhotos.size() > 0) {
+
          onMouse_Move_CheckMapPoints(allPaintedPhotos, mouseMoveDevX, mouseMoveDevY);
+
+         if (_hoveredMapPoint != null) {
+
+            // a photo is hovered -> show photo tooltip
+
+            _mapPointTooltip_Photo.setupPhoto(_hoveredMapPoint);
+
+         } else {
+
+            _mapPointTooltip_Photo.setupPhoto(null);
+         }
       }
 
       // ensure that the old map point is hidden
@@ -9959,11 +9977,12 @@ public class Map2 extends Canvas {
       paint();
    }
 
-   public void resetHoveredMarker() {
+   public void resetHoveredMapPoint() {
 
       _hoveredMapPoint = null;
 
       _mapPointTooltip.hide();
+      _mapPointTooltip_Photo.hide();
    }
 
    public void resetMapPoints() {

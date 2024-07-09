@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,8 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.common.tooltip;
-
-import static org.eclipse.swt.events.MouseTrackListener.mouseExitAdapter;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
@@ -171,7 +169,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
    private void addListener(final Control ownerControl) {
 
-      ownerControl.addMouseTrackListener(mouseExitAdapter(mouseEvent -> {
+      ownerControl.addMouseTrackListener(MouseTrackListener.mouseExitAdapter(mouseEvent -> {
 
          // prevent to open the tooltip
          _canOpenToolTip = false;
@@ -356,13 +354,13 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       final int slideoutWidth = slideoutSize.x;
       final int slideoutHeight = slideoutSize.y;
 
-      final Rectangle _slideoutParentBounds = getParentBounds();
+      final Rectangle parentBounds = getParentBounds();
 
       // toolitem top left position and size
-      final int devXParent = _slideoutParentBounds.x;
-      final int devYParent = _slideoutParentBounds.y;
-      final int itemWidth = _slideoutParentBounds.width;
-      final int itemHeight = _slideoutParentBounds.height;
+      final int devXParent = parentBounds.x;
+      final int devYParent = parentBounds.y;
+      final int itemWidth = parentBounds.width;
+      final int itemHeight = parentBounds.height;
 
       // center horizontally
 
