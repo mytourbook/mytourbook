@@ -51,11 +51,11 @@ public class PaintedMapPoint {
 
       return UI.EMPTY_STRING
 
-            + "PaintedMapPoint" + NL //                                      //$NON-NLS-1$
+            + "PaintedMapPoint" + NL //                           //$NON-NLS-1$
 
-            + " mapMarker  = " + mapPoint.tourMarker.getLabel() + NL //   //$NON-NLS-1$
-            + " x          = " + mapPoint.geoPointDevX + NL //            //$NON-NLS-1$
-            + " y          = " + mapPoint.geoPointDevY + NL //            //$NON-NLS-1$
+            + " mapPoint = " + mapPoint //                   //$NON-NLS-1$
+            + " x        = " + mapPoint.geoPointDevX + NL //      //$NON-NLS-1$
+            + " y        = " + mapPoint.geoPointDevY + NL //      //$NON-NLS-1$
 
       ;
    }

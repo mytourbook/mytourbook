@@ -19,6 +19,7 @@ import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.PaintedMapPoint;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.widgets.ImageCanvas;
 import net.tourbook.photo.ILoadCallBack;
@@ -33,6 +34,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
@@ -95,23 +97,10 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
       super.close();
    }
 
-   private void createActions() {
-
-   }
-
    @Override
    protected void createSlideoutContent(final Composite parent) {
 
-      initUI(parent);
-      createActions();
-
       createUI(parent);
-
-      fillUI();
-
-      restoreState();
-
-      enableControls();
 
       updateUI_Photo(_hoveredMapPoint);
    }
@@ -134,23 +123,11 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
       return _contentContainer;
    }
 
-   private void enableControls() {
-
-// SET_FORMATTING_OFF
-
-
-// SET_FORMATTING_ON
-
-   }
-
-   private void fillUI() {
-
-   }
-
    @Override
    protected Rectangle getParentBounds() {
 
-      return _map2.getBounds();
+      // ignore, is overwritten with getToolTipLocation()
+      return null;
    }
 
    /**
@@ -190,19 +167,36 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
       return photoImage;
    }
 
-   private void initUI(final Composite parent) {
-
-// SET_FORMATTING_OFF
-
-
-// SET_FORMATTING_ON
-
-   }
-
    @Override
-   protected void onDispose() {
+   public Point getToolTipLocation(final Point slideoutSize) {
 
-      super.onDispose();
+      final Rectangle labelBounds = _hoveredMapPoint.labelRectangle;
+      final int labelWidth = labelBounds.width;
+      final int labelWidth2 = labelWidth / 2;
+      final int labelHeight = labelBounds.height;
+
+      final int labelLeft = labelBounds.x;
+      final int labelRight = labelLeft + labelWidth;
+      final int labelTop = labelBounds.y;
+      final int labelBottom = labelBounds.y + labelHeight;
+
+      final Map2Point mapPoint = _hoveredMapPoint.mapPoint;
+      final int geoPointDevX = mapPoint.geoPointDevX;
+      final int geoPointDevY = mapPoint.geoPointDevY;
+
+      final Rectangle mapBounds = _map2.getBounds();
+      final Point mapDisplayPosition = _map2.toDisplay(mapBounds.x, mapBounds.y);
+
+      final int tooltipWidth = slideoutSize.x;
+      final int tooltipHeight = slideoutSize.y;
+
+      final int devX = mapDisplayPosition.x + labelLeft - tooltipWidth;
+      final int devY = mapDisplayPosition.y + labelTop + labelHeight - tooltipHeight;
+
+      System.out.println(UI.timeStamp() + " labelBounds: " + labelBounds);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+      return new Point(devX, devY);
    }
 
    @Override
@@ -210,27 +204,29 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
 
    }
 
-   private void restoreState() {
-
-// SET_FORMATTING_OFF
-
-
-// SET_FORMATTING_ON
-
-   }
-
-   @Override
-   protected void saveState() {
-
-      super.saveState();
-   }
-
    public void setupPhoto(final PaintedMapPoint hoveredMapPoint) {
 
       if (hoveredMapPoint == null) {
-         hide();
+
+         _hoveredMapPoint = null;
+
+         hideNow();
+
          return;
       }
+
+      final boolean isOtherMapPoint = _hoveredMapPoint != hoveredMapPoint;
+
+      if (isOtherMapPoint && isVisible()) {
+         hideNow();
+      }
+
+      if (isOtherMapPoint == false) {
+         return;
+      }
+
+      System.out.println(UI.timeStamp() + " setupPhoto: " + hoveredMapPoint);
+// TODO remove SYSTEM.OUT.PRINTLN
 
       _hoveredMapPoint = hoveredMapPoint;
 
@@ -251,9 +247,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
 
       final Image photoImage = getPhotoImage(hoveredMapPoint.mapPoint.photo);
 
-      if (photoImage != null) {
-         _photoImageCanvas.setImage(photoImage, false);
-      }
+      _photoImageCanvas.setImage(photoImage, false);
    }
 
 }
