@@ -8199,9 +8199,9 @@ public class Map2 extends Canvas {
 
          final Image swtPhotoImage = getPhotoImage(photo);
 
-         if (swtPhotoImage == null) {
+         if (swtPhotoImage == null || swtPhotoImage.isDisposed()) {
 
-            // paint placeholder
+            // paint photo placeholder
 
             g2d.setColor(java.awt.Color.cyan);
 
@@ -8213,7 +8213,7 @@ public class Map2 extends Canvas {
 
          } else {
 
-            // paint image
+            // paint photo image
 
             final java.awt.Image awtPhotoImage = ImageConverter.convertIntoAWT(swtPhotoImage);
 

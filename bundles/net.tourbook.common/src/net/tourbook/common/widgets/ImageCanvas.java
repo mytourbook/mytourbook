@@ -161,6 +161,20 @@ public class ImageCanvas extends Canvas implements PaintListener {
    }
 
    /**
+    * Do custom painting when an image is not valid, e.g. when it is loading
+    *
+    * @param gc
+    * @param rectangle
+    *
+    * @return Returns <code>true</code> when it is customized painted, <code>false</code> when it is
+    *         not painted and the default painting should be performed
+    */
+   public boolean drawInvalidImage(final GC gc, final Rectangle rectangle) {
+
+      return false;
+   }
+
+   /**
     * Fires an event when the image canvas was selected.
     */
    private void fireSelection() {
@@ -192,6 +206,11 @@ public class ImageCanvas extends Canvas implements PaintListener {
       if (_image == null || _image.isDisposed()) {
 
          final Rectangle rect = getClientArea();
+
+         if (drawInvalidImage(gc, rect)) {
+            return;
+         }
+
          final int devX = rect.x;
          final int devY = rect.y;
          final int width = rect.width;

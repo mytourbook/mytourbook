@@ -23,6 +23,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.widgets.ImageCanvas;
 import net.tourbook.photo.ILoadCallBack;
+import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
@@ -32,29 +33,51 @@ import net.tourbook.photo.PhotoLoadingState;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Slideout for all 2D map locations and marker
  */
 public class MapPointToolTip_Photo extends AdvancedSlideout {
 
-   private static final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.map2.view.MapPointToolTip_Photo"); //$NON-NLS-1$
+   private static final IDialogSettings _state                = TourbookPlugin.getState("net.tourbook.map2.view.MapPointToolTip_Photo"); //$NON-NLS-1$
 
    private Map2                         _map2;
 
    private PaintedMapPoint              _hoveredMapPoint;
 
+   private final ColorRegistry          _colorRegistry        = JFaceResources.getColorRegistry();
+   private final Color                  _photoForegroundColor = _colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
+   private final Color                  _photoBackgroundColor = _colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+
    /*
     * UI controls
     */
-   private Composite   _contentContainer;
+   private Composite        _contentContainer;
 
-   private ImageCanvas _photoImageCanvas;
+   private PhotoImageCanvas _photoImageCanvas;
+
+   private class PhotoImageCanvas extends ImageCanvas {
+
+      public PhotoImageCanvas(final Composite parent, final int style) {
+         super(parent, style);
+      }
+
+      @Override
+      public boolean drawInvalidImage(final GC gc, final Rectangle rectangle) {
+
+         return drawInvalidPhotoImage(gc, rectangle);
+      }
+   }
 
    private class PhotoImageLoaderCallback implements ILoadCallBack {
 
@@ -65,12 +88,11 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
 
             if (_hoveredMapPoint != null) {
 
-               _map2.getShell().getDisplay().asyncExec(() -> {
+               final PaintedMapPoint hoveredMapPoint = _hoveredMapPoint;
 
-                  if (_hoveredMapPoint != null) {
+               Display.getDefault().asyncExec(() -> {
 
-                     updateUI_Photo(_hoveredMapPoint);
-                  }
+                  updateUI_Photo(hoveredMapPoint);
                });
             }
          }
@@ -102,6 +124,8 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
 
       createUI(parent);
 
+      UI.setChildColors(parent.getShell(), _photoForegroundColor, _photoBackgroundColor);
+
       updateUI_Photo(_hoveredMapPoint);
    }
 
@@ -114,13 +138,41 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
             .applyTo(_contentContainer);
 //      _shellContainer.setBackground(UI.SYS_COLOR_MAGENTA);
       {
-         _photoImageCanvas = new ImageCanvas(_contentContainer, SWT.NONE);
+         _photoImageCanvas = new PhotoImageCanvas(_contentContainer, SWT.NONE);
          _photoImageCanvas.setIsSmoothImages(true);
          _photoImageCanvas.setStyle(SWT.CENTER);
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_photoImageCanvas);
       }
 
       return _contentContainer;
+   }
+
+   private boolean drawInvalidPhotoImage(final GC gc, final Rectangle rectangle) {
+
+      if (_hoveredMapPoint == null) {
+         return false;
+      }
+
+      final Photo photo = _hoveredMapPoint.mapPoint.photo;
+
+      final String photoText = "Loading " + photo.imageFilePathName;
+
+      final Point textSize = gc.stringExtent(photoText);
+
+      final int textWidth = textSize.x;
+      final int textHeight = textSize.y;
+
+      // center text
+      final int devX = rectangle.width / 2 - textWidth / 2;
+      final int devY = rectangle.height / 2 - textHeight / 2;
+
+      gc.drawText(
+            photoText,
+            devX,
+            devY,
+            true);
+
+      return true;
    }
 
    @Override
@@ -160,7 +212,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
 
             final ILoadCallBack imageLoadCallback = new PhotoImageLoaderCallback();
 
-            PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
+            PhotoLoadManager.putImageInLoadingQueueHQ_Map(photo, requestedImageQuality, imageLoadCallback);
          }
       }
 
@@ -169,6 +221,10 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
 
    @Override
    public Point getToolTipLocation(final Point slideoutSize) {
+
+      if (_hoveredMapPoint == null) {
+         return null;
+      }
 
       final Rectangle labelBounds = _hoveredMapPoint.labelRectangle;
       final int labelWidth = labelBounds.width;
@@ -193,9 +249,6 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
       final int devX = mapDisplayPosition.x + labelLeft - tooltipWidth;
       final int devY = mapDisplayPosition.y + labelTop + labelHeight - tooltipHeight;
 
-      System.out.println(UI.timeStamp() + " labelBounds: " + labelBounds);
-// TODO remove SYSTEM.OUT.PRINTLN
-
       return new Point(devX, devY);
    }
 
@@ -206,27 +259,27 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
 
    public void setupPhoto(final PaintedMapPoint hoveredMapPoint) {
 
-      if (hoveredMapPoint == null) {
+      final boolean isVisible = isVisible();
+
+      if (hoveredMapPoint == null && isVisible) {
 
          _hoveredMapPoint = null;
 
-         hideNow();
+         hide();
 
          return;
       }
 
       final boolean isOtherMapPoint = _hoveredMapPoint != hoveredMapPoint;
 
-      if (isOtherMapPoint && isVisible()) {
+      if (isOtherMapPoint && isVisible) {
+
          hideNow();
       }
 
       if (isOtherMapPoint == false) {
          return;
       }
-
-      System.out.println(UI.timeStamp() + " setupPhoto: " + hoveredMapPoint);
-// TODO remove SYSTEM.OUT.PRINTLN
 
       _hoveredMapPoint = hoveredMapPoint;
 

@@ -128,6 +128,7 @@ import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoEventId;
+import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoRatingStarOperator;
 import net.tourbook.photo.PhotoSelection;
@@ -3609,6 +3610,10 @@ public class Map2View extends ViewPart implements
             setIconPosition_TourWeather();
 
          } else {
+
+            int a = 0;
+            a++;
+            PhotoImageCache.disposeAll();
 
             final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
