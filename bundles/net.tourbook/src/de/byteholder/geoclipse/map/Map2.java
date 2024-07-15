@@ -4577,8 +4577,6 @@ public class Map2 extends Canvas {
       }
 
       setCursorOptimized(_cursorDefault);
-
-      paint();
    }
 
    private void onMouse_Move(final MouseEvent mouseEvent) {

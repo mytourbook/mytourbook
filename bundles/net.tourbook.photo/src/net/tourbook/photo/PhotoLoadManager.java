@@ -194,11 +194,15 @@ public class PhotoLoadManager {
          }
       };
 
-      _executorExif = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactoryExif);
-      _executorThumb = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactoryThumb);
-      _executorHQ = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryHQ);
+// SET_FORMATTING_OFF
+
+      _executorExif     = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactoryExif);
+      _executorThumb    = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactoryThumb);
+      _executorHQ       = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactoryHQ);
       _executorOriginal = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryOriginal);
-      _executorSql = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactorySql);
+      _executorSql      = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactorySql);
+
+// SET_FORMATTING_ON
    }
 
    /**

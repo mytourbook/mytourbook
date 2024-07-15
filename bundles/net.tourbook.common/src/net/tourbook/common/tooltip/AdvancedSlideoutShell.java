@@ -1020,10 +1020,10 @@ public abstract class AdvancedSlideoutShell {
 
    /**
     * Customize shell size, this is used to collapse/expand a slideout
-    * 
+    *
     * @param newContentWidth
     * @param newContentHeight
-    * 
+    *
     * @return
     */
    protected Point onResize(final int newContentWidth, final int newContentHeight) {

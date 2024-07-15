@@ -54,8 +54,8 @@ public class PaintedMapPoint {
             + "PaintedMapPoint" + NL //                           //$NON-NLS-1$
 
             + " mapPoint = " + mapPoint //                   //$NON-NLS-1$
-            + " x        = " + mapPoint.geoPointDevX + NL //      //$NON-NLS-1$
-            + " y        = " + mapPoint.geoPointDevY + NL //      //$NON-NLS-1$
+//            + " x        = " + mapPoint.geoPointDevX + NL //      //$NON-NLS-1$
+//            + " y        = " + mapPoint.geoPointDevY + NL //      //$NON-NLS-1$
 
       ;
    }

@@ -138,7 +138,9 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
             .applyTo(_contentContainer);
 //      _shellContainer.setBackground(UI.SYS_COLOR_MAGENTA);
       {
-         _photoImageCanvas = new PhotoImageCanvas(_contentContainer, SWT.NONE);
+         _photoImageCanvas = new PhotoImageCanvas(_contentContainer, SWT.DOUBLE_BUFFERED
+//               | SWT.NO_BACKGROUND
+         );
          _photoImageCanvas.setIsSmoothImages(true);
          _photoImageCanvas.setStyle(SWT.CENTER);
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_photoImageCanvas);
@@ -246,7 +248,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
       final int tooltipWidth = slideoutSize.x;
       final int tooltipHeight = slideoutSize.y;
 
-      final int devX = mapDisplayPosition.x + labelLeft - tooltipWidth;
+      final int devX = mapDisplayPosition.x + labelLeft - tooltipWidth ;
       final int devY = mapDisplayPosition.y + labelTop + labelHeight - tooltipHeight;
 
       return new Point(devX, devY);
@@ -261,11 +263,14 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
 
       final boolean isVisible = isVisible();
 
-      if (hoveredMapPoint == null && isVisible) {
+      if (hoveredMapPoint == null) {
 
-         _hoveredMapPoint = null;
+         if (isVisible) {
 
-         hide();
+            _hoveredMapPoint = null;
+
+            hideNow();
+         }
 
          return;
       }
@@ -277,8 +282,20 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
          hideNow();
       }
 
-      if (isOtherMapPoint == false) {
-         return;
+      final boolean isSameMapPoint = isOtherMapPoint == false;
+
+      if (isSameMapPoint && isVisible) {
+
+//         if (isShellFadingOut) {
+//
+//            // open it again
+//
+////            stopFadingOut();
+//
+//         } else {
+//
+////            return;
+//         }
       }
 
       _hoveredMapPoint = hoveredMapPoint;
