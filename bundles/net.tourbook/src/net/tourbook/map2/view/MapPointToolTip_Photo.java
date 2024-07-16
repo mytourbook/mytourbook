@@ -222,34 +222,47 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
    }
 
    @Override
-   public Point getToolTipLocation(final Point slideoutSize) {
+   public Point getToolTipLocation(final Point tooltipSize) {
 
       if (_hoveredMapPoint == null) {
          return null;
       }
 
-      final Rectangle labelBounds = _hoveredMapPoint.labelRectangle;
-      final int labelWidth = labelBounds.width;
-      final int labelWidth2 = labelWidth / 2;
-      final int labelHeight = labelBounds.height;
-
-      final int labelLeft = labelBounds.x;
-      final int labelRight = labelLeft + labelWidth;
-      final int labelTop = labelBounds.y;
-      final int labelBottom = labelBounds.y + labelHeight;
-
-      final Map2Point mapPoint = _hoveredMapPoint.mapPoint;
-      final int geoPointDevX = mapPoint.geoPointDevX;
-      final int geoPointDevY = mapPoint.geoPointDevY;
+      final int tooltipWidth = tooltipSize.x;
+      final int tooltipHeight = tooltipSize.y;
 
       final Rectangle mapBounds = _map2.getBounds();
       final Point mapDisplayPosition = _map2.toDisplay(mapBounds.x, mapBounds.y);
 
-      final int tooltipWidth = slideoutSize.x;
-      final int tooltipHeight = slideoutSize.y;
+      final Rectangle photoBounds = _hoveredMapPoint.labelRectangle;
+      final int photoWidth = photoBounds.width;
+      final int photoHeight = photoBounds.height;
 
-      final int devX = mapDisplayPosition.x + labelLeft - tooltipWidth ;
-      final int devY = mapDisplayPosition.y + labelTop + labelHeight - tooltipHeight;
+      final int photoLeft = photoBounds.x;
+      final int photoRight = photoLeft + photoWidth;
+      final int photoTop = photoBounds.y;
+      final int photoBottom = photoTop + photoHeight;
+
+      final Map2Point mapPoint = _hoveredMapPoint.mapPoint;
+      final int mapPointDevX = mapPoint.geoPointDevX;
+      final int mapPointDevY = mapPoint.geoPointDevY;
+
+      // set top/left as default
+      int devX = photoLeft - tooltipWidth;
+      int devY = photoBottom - tooltipHeight;
+
+      // adjust x/y to not overlap the map point position
+      if (photoLeft > mapPointDevX) {
+         devX = photoRight;
+      }
+
+      if (photoTop > mapPointDevY) {
+         devY = photoTop;
+      }
+
+      // adjust to display position
+      devX += mapDisplayPosition.x;
+      devY += mapDisplayPosition.y;
 
       return new Point(devX, devY);
    }
