@@ -282,7 +282,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
 
             _hoveredMapPoint = null;
 
-            hideNow();
+            hide();
          }
 
          return;
@@ -292,28 +292,13 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
 
       if (isOtherMapPoint && isVisible) {
 
-         hideNow();
-      }
-
-      final boolean isSameMapPoint = isOtherMapPoint == false;
-
-      if (isSameMapPoint && isVisible) {
-
-//         if (isShellFadingOut) {
-//
-//            // open it again
-//
-////            stopFadingOut();
-//
-//         } else {
-//
-////            return;
-//         }
+         hide();
       }
 
       _hoveredMapPoint = hoveredMapPoint;
 
-      open(false);
+      doNotStopAnimation();
+      showShell();
 
       updateUI_Photo(hoveredMapPoint);
    }
