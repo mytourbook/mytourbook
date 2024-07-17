@@ -164,12 +164,12 @@ public class ImageCanvas extends Canvas implements PaintListener {
     * Do custom painting when an image is not valid, e.g. when it is loading
     *
     * @param gc
-    * @param rectangle
+    * @param clientArea
     *
     * @return Returns <code>true</code> when it is customized painted, <code>false</code> when it is
     *         not painted and the default painting should be performed
     */
-   public boolean drawInvalidImage(final GC gc, final Rectangle rectangle) {
+   public boolean drawInvalidImage(final GC gc, final Rectangle clientArea) {
 
       return false;
    }
@@ -205,16 +205,16 @@ public class ImageCanvas extends Canvas implements PaintListener {
 
       if (_image == null || _image.isDisposed()) {
 
-         final Rectangle rect = getClientArea();
+         final Rectangle clientArea = getClientArea();
 
-         if (drawInvalidImage(gc, rect)) {
+         if (drawInvalidImage(gc, clientArea)) {
             return;
          }
 
-         final int devX = rect.x;
-         final int devY = rect.y;
-         final int width = rect.width;
-         final int height = rect.height;
+         final int devX = clientArea.x;
+         final int devY = clientArea.y;
+         final int width = clientArea.width;
+         final int height = clientArea.height;
 
          // draw image indicator
          gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
