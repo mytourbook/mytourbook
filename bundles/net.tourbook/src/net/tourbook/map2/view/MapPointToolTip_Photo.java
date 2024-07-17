@@ -54,6 +54,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
    private Map2                         _map2;
 
    private PaintedMapPoint              _hoveredMapPoint;
+   private PaintedMapPoint              _previousHoveredMapPoint;
 
    private final ColorRegistry          _colorRegistry        = JFaceResources.getColorRegistry();
    private final Color                  _photoForegroundColor = _colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
@@ -75,7 +76,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
       @Override
       public boolean drawInvalidImage(final GC gc, final Rectangle rectangle) {
 
-         return drawInvalidPhotoImage(gc, rectangle);
+         return onDrawInvalidPhotoImage(gc, rectangle);
       }
    }
 
@@ -85,16 +86,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
       public void callBackImageIsLoaded(final boolean isUpdateUI) {
 
          if (isUpdateUI) {
-
-            if (_hoveredMapPoint != null) {
-
-               final PaintedMapPoint hoveredMapPoint = _hoveredMapPoint;
-
-               Display.getDefault().asyncExec(() -> {
-
-                  updateUI_Photo(hoveredMapPoint);
-               });
-            }
+            onImageIsLoaded();
          }
       }
    }
@@ -138,9 +130,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
             .applyTo(_contentContainer);
 //      _shellContainer.setBackground(UI.SYS_COLOR_MAGENTA);
       {
-         _photoImageCanvas = new PhotoImageCanvas(_contentContainer, SWT.DOUBLE_BUFFERED
-//               | SWT.NO_BACKGROUND
-         );
+         _photoImageCanvas = new PhotoImageCanvas(_contentContainer, SWT.DOUBLE_BUFFERED);
          _photoImageCanvas.setIsSmoothImages(true);
          _photoImageCanvas.setStyle(SWT.CENTER);
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_photoImageCanvas);
@@ -149,32 +139,82 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
       return _contentContainer;
    }
 
-   private boolean drawInvalidPhotoImage(final GC gc, final Rectangle rectangle) {
+   private Point fixupDisplayBounds(final Point tipSize, final Point location) {
 
-      if (_hoveredMapPoint == null) {
-         return false;
+      final int tipWidth = tipSize.x;
+      final int tipHeight = tipSize.y;
+
+      final Rectangle displayBounds = UI.getDisplayBounds(_map2, location);
+      final Point tipRightBottom = new Point(location.x + tipWidth, location.y + tipHeight);
+
+      final Rectangle photoBounds = _hoveredMapPoint.labelRectangle;
+
+      final int photoWidth = photoBounds.width;
+      final int photoHeight = photoBounds.height;
+
+      final int photoLeft = photoBounds.x;
+      final int photoRight = photoLeft + photoWidth;
+      final int photoTop = photoBounds.y;
+
+      final Map2Point mapPoint = _hoveredMapPoint.mapPoint;
+      final int mapPointDevY = mapPoint.geoPointDevY;
+
+      final Rectangle mapBounds = _map2.getBounds();
+      final Point mapDisplayPosition = _map2.toDisplay(mapBounds.x, mapBounds.y);
+
+      final boolean isTooltipInDisplay = displayBounds.contains(location);
+      final boolean isTTBottomRightInDisplay = displayBounds.contains(tipRightBottom);
+
+      final int displayWidth = displayBounds.width;
+      final int displayHeight = displayBounds.height;
+      final int displayX = displayBounds.x;
+      final int displayY = displayBounds.y;
+
+      if ((isTooltipInDisplay && isTTBottomRightInDisplay) == false) {
+
+         if (tipRightBottom.x > displayX + displayWidth) {
+
+            location.x -= tipRightBottom.x - (displayX + displayWidth);
+
+            // adjust x/y to not overlap the map point position
+
+            if (photoTop > mapPointDevY) {
+
+               location.y += photoHeight;
+
+            } else {
+
+               location.y -= photoHeight;
+            }
+
+         }
+
+         if (tipRightBottom.y > displayY + displayHeight - photoHeight) {
+
+            location.y -= tipRightBottom.y - (displayY + displayHeight);
+
+            location.x = displayX + mapDisplayPosition.x + photoLeft - tipWidth;
+         }
+
+         if (location.x < displayX) {
+
+            location.x = displayX + mapDisplayPosition.x + photoRight;
+         }
+
+         if (location.y < displayY) {
+
+            location.y = displayY;
+
+            location.x = displayX + mapDisplayPosition.x + photoLeft - tipWidth;
+         }
+
+         if (location.x < displayX) {
+
+            location.x = displayX + mapDisplayPosition.x + photoRight;
+         }
       }
 
-      final Photo photo = _hoveredMapPoint.mapPoint.photo;
-
-      final String photoText = "Loading " + photo.imageFilePathName;
-
-      final Point textSize = gc.stringExtent(photoText);
-
-      final int textWidth = textSize.x;
-      final int textHeight = textSize.y;
-
-      // center text
-      final int devX = rectangle.width / 2 - textWidth / 2;
-      final int devY = rectangle.height / 2 - textHeight / 2;
-
-      gc.drawText(
-            photoText,
-            devX,
-            devY,
-            true);
-
-      return true;
+      return location;
    }
 
    @Override
@@ -235,6 +275,8 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
       final Point mapDisplayPosition = _map2.toDisplay(mapBounds.x, mapBounds.y);
 
       final Rectangle photoBounds = _hoveredMapPoint.labelRectangle;
+      final Map2Point mapPoint = _hoveredMapPoint.mapPoint;
+
       final int photoWidth = photoBounds.width;
       final int photoHeight = photoBounds.height;
 
@@ -243,7 +285,6 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
       final int photoTop = photoBounds.y;
       final int photoBottom = photoTop + photoHeight;
 
-      final Map2Point mapPoint = _hoveredMapPoint.mapPoint;
       final int mapPointDevX = mapPoint.geoPointDevX;
       final int mapPointDevY = mapPoint.geoPointDevY;
 
@@ -264,12 +305,66 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
       devX += mapDisplayPosition.x;
       devY += mapDisplayPosition.y;
 
-      return new Point(devX, devY);
+      final Point location = new Point(devX, devY);
+
+      final Point fixedDisplayBounds = fixupDisplayBounds(tooltipSize, location);
+
+      return fixedDisplayBounds;
+   }
+
+   private boolean onDrawInvalidPhotoImage(final GC gc, final Rectangle rectangle) {
+
+      if (_hoveredMapPoint == null) {
+         return true;
+      }
+
+      final Photo photo = _hoveredMapPoint.mapPoint.photo;
+
+      final String photoText = "Loading " + photo.imageFilePathName;
+
+      final Point textSize = gc.stringExtent(photoText);
+
+      final int textWidth = textSize.x;
+      final int textHeight = textSize.y;
+
+      // center text
+      final int devX = rectangle.width / 2 - textWidth / 2;
+      final int devY = rectangle.height / 2 - textHeight / 2;
+
+      gc.drawText(
+            photoText,
+            devX,
+            devY,
+            true);
+
+      return true;
    }
 
    @Override
    protected void onFocus() {
 
+   }
+
+   private void onImageIsLoaded() {
+
+      final PaintedMapPoint hoveredMapPoint = _hoveredMapPoint;
+
+      Display.getDefault().asyncExec(() -> {
+
+         if (_hoveredMapPoint != null) {
+
+            updateUI_Photo(hoveredMapPoint);
+
+         } else if (_previousHoveredMapPoint != null) {
+
+            /*
+             * This happens when an image is loading and the mouse has exited the tooltip -> paint
+             * loaded image
+             */
+
+            updateUI_Photo(_previousHoveredMapPoint);
+         }
+      });
    }
 
    public void setupPhoto(final PaintedMapPoint hoveredMapPoint) {
@@ -279,6 +374,10 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
       if (hoveredMapPoint == null) {
 
          if (isVisible) {
+
+            if (_hoveredMapPoint != null) {
+               _previousHoveredMapPoint = _hoveredMapPoint;
+            }
 
             _hoveredMapPoint = null;
 
@@ -293,6 +392,10 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
       if (isOtherMapPoint && isVisible) {
 
          hide();
+      }
+
+      if (_hoveredMapPoint != null) {
+         _previousHoveredMapPoint = _hoveredMapPoint;
       }
 
       _hoveredMapPoint = hoveredMapPoint;

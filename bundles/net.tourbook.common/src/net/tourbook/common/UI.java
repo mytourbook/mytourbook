@@ -2168,24 +2168,28 @@ public class UI {
    public static Rectangle getDisplayBounds(final Control composite, final Point location) {
 
       Rectangle displayBounds;
+
       final Monitor[] allMonitors = composite.getDisplay().getMonitors();
 
       if (allMonitors.length > 1) {
+
          // By default present in the monitor of the control
          displayBounds = composite.getMonitor().getBounds();
-         final Point p = new Point(location.x, location.y);
 
          // Search on which monitor the event occurred
-         Rectangle tmp;
-         for (final Monitor element : allMonitors) {
-            tmp = element.getBounds();
-            if (tmp.contains(p)) {
-               displayBounds = tmp;
+         for (final Monitor monitor : allMonitors) {
+
+            final Rectangle monitorBounds = monitor.getBounds();
+
+            if (monitorBounds.contains(location)) {
+
+               displayBounds = monitorBounds;
                break;
             }
          }
 
       } else {
+
          displayBounds = composite.getDisplay().getBounds();
       }
 

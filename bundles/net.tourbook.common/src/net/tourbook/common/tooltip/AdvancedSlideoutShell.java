@@ -384,6 +384,10 @@ public abstract class AdvancedSlideoutShell {
                contentLocation = getToolTipLocation(contentSize);
             }
 
+            if (contentLocation == null) {
+               return;
+            }
+
             Point newShellEndLocation = _visibleRRShell.getShellLocation(contentLocation);
             newShellEndLocation = fixupDisplayBounds(shellSize, newShellEndLocation);
 

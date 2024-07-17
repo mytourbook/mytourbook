@@ -251,6 +251,12 @@ public abstract class AbstractRRShell {
    }
 
    public void setShellLocation(final int x, final int y, final int flag) {
+
+// Sometimes, not very often, the tooltip location is running amok, this logging should help to find this issues
+//      
+//      System.out.println(UI.timeStamp() + " setShellLocation: " + x + " / " + y);
+// TODO remove SYSTEM.OUT.PRINTLN
+
       _shell.setLocation(x, y);
    }
 
