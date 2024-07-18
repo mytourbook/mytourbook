@@ -147,7 +147,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
 
       createUI_00_Tooltip(parent);
 
-      UI.setChildColors(parent.getShell(), _photoForegroundColor, _photoBackgroundColor);
+//      UI.setChildColors(parent.getShell(), _photoForegroundColor, _photoBackgroundColor);
 
       updateUI_Photo(_hoveredMapPoint);
    }
@@ -302,7 +302,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
          }
 
          if (isDrawFileDate) {
-            createUI_30_MetadataLine(container, //
+            createUI_30_MetadataLine(container,
                   Messages.Photo_ToolTip_FileDate,
                   imageFileDateTime.format(TimeTools.Formatter_Weekday)
                         + UI.SPACE2
@@ -699,6 +699,14 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
       }
 
       _photo = hoveredMapPoint.mapPoint.photo;
+
+      final long photoTime = _photo.getPhotoTime();
+      final LocalDateTime photoLocalDateTime = TimeTools.toLocalDateTime(photoTime);
+      final String photoDateTime = photoLocalDateTime.format(TimeTools.Formatter_Weekday)
+            + UI.SPACE2
+            + photoLocalDateTime.format(TimeTools.Formatter_DateTime_M);
+
+      updateTitleText(photoDateTime);
 
       final Image photoImage = getPhotoImage(_photo);
 

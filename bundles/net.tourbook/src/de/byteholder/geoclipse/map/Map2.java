@@ -4757,6 +4757,16 @@ public class Map2 extends Canvas {
          }
       }
 
+      if (_hoveredMapPoint != null) {
+
+         isSomethingHit = true;
+
+         // reset hovered data
+         _allHoveredDevPoints.clear();
+         _allHoveredTourIds.clear();
+         _allHoveredSerieIndices.clear();
+      }
+
       // ensure that the old map point is hidden
       if (oldHoveredMapPoint != null) {
          redraw();
@@ -6873,7 +6883,7 @@ public class Map2 extends Canvas {
             _isMarkerClusterSelected = false;
          }
 
-         /**
+         /*
           * Cleanup images, they cannot be disposed in the UI thread otherwise there are tons of
           * exceptions when the map image is resized
           */
@@ -6885,6 +6895,39 @@ public class Map2 extends Canvas {
                   if (image != null) {
                      image.dispose();
                   }
+               }
+            }
+         }
+
+         /*
+          * Preload photo images in HQ
+          */
+         PhotoLoadManager.stopImageLoading(true);
+
+         final ImageQuality requestedImageQuality = ImageQuality.HQ;
+
+         for (final PaintedMapPoint paintedMapPoint : allPaintedPhotos) {
+
+            final Photo photo = paintedMapPoint.mapPoint.photo;
+
+            // check if image has an loading error
+            final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
+
+            if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+
+               // image is not yet loaded
+
+               // check if image is in the cache
+               final Image photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+
+               if ((photoImage == null || photoImage.isDisposed())
+                     && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+
+                  // the requested image is not available in the image cache -> image must be loaded
+
+                  final ILoadCallBack imageLoadCallback = new PhotoImageLoaderCallback();
+
+                  PhotoLoadManager.putImageInLoadingQueueHQ_Map(photo, requestedImageQuality, imageLoadCallback);
                }
             }
          }

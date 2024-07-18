@@ -408,7 +408,7 @@ public class PhotoLoadManager {
     * @param imageLoaderCallback
     */
    public static void putImageInLoadingQueueHQ_Map(final Photo photo,
-                                                    final ImageQuality imageQuality,
+                                                   final ImageQuality imageQuality,
                                                    final ILoadCallBack imageLoaderCallback) {
 
       // set state

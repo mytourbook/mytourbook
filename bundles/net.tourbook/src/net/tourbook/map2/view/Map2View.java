@@ -124,11 +124,11 @@ import net.tourbook.map2.action.ActionZoomLevelAdjustment;
 import net.tourbook.map2.action.ActionZoomOut;
 import net.tourbook.map2.action.ActionZoomShowEntireMap;
 import net.tourbook.map2.action.ActionZoomShowEntireTour;
+import net.tourbook.map2.view.SlideoutMap2_PhotoOptions.ImageSize;
 import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoEventId;
-import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoRatingStarOperator;
 import net.tourbook.photo.PhotoSelection;
@@ -2174,6 +2174,8 @@ public class Map2View extends ViewPart implements
       // register overlays which draw the tour
       GeoclipseExtensions.registerOverlays(_map);
 
+      setMapImageSize();
+
       // initialize map when part is created and the map size is > 0
       _map.getDisplay().asyncExec(() -> {
 
@@ -3613,7 +3615,20 @@ public class Map2View extends ViewPart implements
 
             int a = 0;
             a++;
-            PhotoImageCache.disposeAll();
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//            PhotoImageCache.disposeAll();
 
             final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
@@ -5000,6 +5015,36 @@ public class Map2View extends ViewPart implements
                   : TOUR_INFO_TOOLTIP_X;
 
       _tourWeatherToolTipProvider.setIconPosition(devXTooltip, devYTooltip);
+   }
+
+   public void setMapImageSize() {
+
+      final Enum<ImageSize> imageSize = Util.getStateEnum(_state,
+            SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE,
+            ImageSize.MEDIUM);
+
+      int mapImageSize;
+
+      if (imageSize.equals(ImageSize.LARGE)) {
+
+         mapImageSize = Util.getStateInt(_state,
+               SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_LARGE,
+               SlideoutMap2_PhotoOptions.MAP_IMAGE_DEFAULT_SIZE_LARGE);
+
+      } else if (imageSize.equals(ImageSize.MEDIUM)) {
+
+         mapImageSize = Util.getStateInt(_state,
+               SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_MEDIUM,
+               SlideoutMap2_PhotoOptions.MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
+
+      } else {
+
+         mapImageSize = Util.getStateInt(_state,
+               SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_SMALL,
+               SlideoutMap2_PhotoOptions.MAP_IMAGE_DEFAULT_SIZE_SMALL);
+      }
+
+      Photo.setMapImageRequestedSize(mapImageSize);
    }
 
    /**

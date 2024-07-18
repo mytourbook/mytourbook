@@ -44,10 +44,15 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActionResetToDefault {
 
-   private static final String   STATE_PHOTO_IMAGE_SIZE        = "STATE_PHOTO_IMAGE_SIZE";        //$NON-NLS-1$
-   private static final String   STATE_PHOTO_IMAGE_SIZE_SMALL  = "STATE_PHOTO_IMAGE_SIZE_SMALL";  //$NON-NLS-1$
-   private static final String   STATE_PHOTO_IMAGE_SIZE_MEDIUM = "STATE_PHOTO_IMAGE_SIZE_MEDIUM"; //$NON-NLS-1$
-   private static final String   STATE_PHOTO_IMAGE_SIZE_LARGE  = "STATE_PHOTO_IMAGE_SIZE_LARGE";  //$NON-NLS-1$
+   static final String           STATE_PHOTO_IMAGE_SIZE        = "STATE_PHOTO_IMAGE_SIZE";        //$NON-NLS-1$
+
+   static final String           STATE_PHOTO_IMAGE_SIZE_SMALL  = "STATE_PHOTO_IMAGE_SIZE_SMALL";  //$NON-NLS-1$
+   static final String           STATE_PHOTO_IMAGE_SIZE_MEDIUM = "STATE_PHOTO_IMAGE_SIZE_MEDIUM"; //$NON-NLS-1$
+   static final String           STATE_PHOTO_IMAGE_SIZE_LARGE  = "STATE_PHOTO_IMAGE_SIZE_LARGE";  //$NON-NLS-1$
+
+   static final int              MAP_IMAGE_DEFAULT_SIZE_SMALL  = 20;
+   static final int              MAP_IMAGE_DEFAULT_SIZE_MEDIUM = 80;
+   static final int              MAP_IMAGE_DEFAULT_SIZE_LARGE  = 200;
 
    private static final int      MIN_IMAGE_SIZE                = 3;
 
@@ -55,10 +60,6 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
     * This value is small because a map do not yet load large images !!!
     */
    private static final int      MAX_IMAGE_SIZE                = 200;
-
-   private static final int      MAP_IMAGE_DEFAULT_SIZE_SMALL  = 20;
-   private static final int      MAP_IMAGE_DEFAULT_SIZE_MEDIUM = 80;
-   private static final int      MAP_IMAGE_DEFAULT_SIZE_LARGE  = 200;
 
    private IDialogSettings       _state;
 
@@ -82,7 +83,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
    private Spinner _spinnerImageSize_Medium;
    private Spinner _spinnerImageSize_Large;
 
-   private enum ImageSize {
+   enum ImageSize {
 
       SMALL, MEDIUM, LARGE
    }

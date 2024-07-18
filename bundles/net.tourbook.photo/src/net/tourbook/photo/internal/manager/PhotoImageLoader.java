@@ -1139,16 +1139,27 @@ public class PhotoImageLoader {
 
       final long end = System.currentTimeMillis() - start;
 
-      System.out.println(UI.timeStampNano() + " AWT: " //$NON-NLS-1$
-            + (Thread.currentThread().getName() + UI.SPACE1 + _photo.imageFileName)
-            + ("\ttotal: " + end) //$NON-NLS-1$
-            + ("\tload: " + endHqLoad) //$NON-NLS-1$
-            + ("\tresizeHQ: " + endResizeHQ) //$NON-NLS-1$
-            + ("\tsaveHQ: " + endSaveHQ) //$NON-NLS-1$
-            + ("\tresizeThumb: " + endResizeThumb) //$NON-NLS-1$
-            + ("\tsaveThumb: " + endSaveThumb) //$NON-NLS-1$
-      //
-      );
+      final String text = " AWT: " //$NON-NLS-1$
+            + "%-15s " //$NON-NLS-1$
+            + "%-15s  " //$NON-NLS-1$
+            + "total: %5d  " //$NON-NLS-1$
+            + "load: %5d  " //$NON-NLS-1$
+            + "resizeHQ: %3d  " //$NON-NLS-1$
+            + "saveHQ: %4d  " //$NON-NLS-1$
+            + "resizeThumb: %3d  " //$NON-NLS-1$
+            + "saveThumb: %3d"; //$NON-NLS-1$
+
+      System.out.println(UI.timeStampNano() + text.formatted(
+
+            Thread.currentThread().getName(),
+            _photo.imageFileName,
+
+            end,
+            endHqLoad,
+            endResizeHQ,
+            endSaveHQ,
+            endResizeThumb,
+            endSaveThumb));
 
       if (exceptionMessage != null) {
          throw new Exception(exceptionMessage);

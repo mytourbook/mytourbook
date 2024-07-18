@@ -6460,7 +6460,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          if (galleryPhoto == null) {
 
             /*
-             * photo is not found in the photo cache, create a new photo
+             * Photo is not found in the photo cache, create a new photo
              */
 
             final File photoFile = new File(imageFilePathName);
