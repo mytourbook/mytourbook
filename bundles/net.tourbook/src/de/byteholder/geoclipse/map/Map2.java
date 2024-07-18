@@ -122,6 +122,7 @@ import net.tourbook.map2.view.MapPointToolTip;
 import net.tourbook.map2.view.MapPointToolTip_Photo;
 import net.tourbook.map2.view.MapPointType;
 import net.tourbook.map2.view.SelectionMapSelection;
+import net.tourbook.map2.view.SlideoutMap2_PhotoOptions;
 import net.tourbook.map2.view.TourPainterConfiguration;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.map25.layer.marker.ScreenUtils;
@@ -313,6 +314,8 @@ public class Map2 extends Canvas {
    private static RGB                    _mapTransparentRGB;
    private static Color                  _mapTransparentColor;
 
+   private IDialogSettings               _state;
+
    private Font                          _boldFontSWT               = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
    private Font                          _labelFontSWT;
    private String                        _labelFontName;
@@ -455,6 +458,7 @@ public class Map2 extends Canvas {
    private boolean                         _isMarkerClusterSelected;
    private MapPointToolTip                 _mapPointTooltip;
    private MapPointToolTip_Photo           _mapPointTooltip_Photo;
+   private boolean                         _isPreloadHQImages;
 
    /** Number of created map points */
    private int                             _numStatistics_AllCommonLocations;
@@ -823,6 +827,8 @@ public class Map2 extends Canvas {
 
       super(parent, style | SWT.DOUBLE_BUFFERED);
 
+      _state = state;
+
       _display = getDisplay();
       _displayThread = _display.getThread();
 
@@ -834,6 +840,7 @@ public class Map2 extends Canvas {
 
       updateGraphColors();
       updateMapOptions();
+      updatePhotoOptions();
 
       grid_UpdatePaintingStateData();
 
@@ -6902,32 +6909,35 @@ public class Map2 extends Canvas {
          /*
           * Preload photo images in HQ
           */
-         PhotoLoadManager.stopImageLoading(true);
+         if (_isPreloadHQImages) {
 
-         final ImageQuality requestedImageQuality = ImageQuality.HQ;
+            PhotoLoadManager.stopImageLoading(true);
 
-         for (final PaintedMapPoint paintedMapPoint : allPaintedPhotos) {
+            final ImageQuality requestedImageQuality = ImageQuality.HQ;
 
-            final Photo photo = paintedMapPoint.mapPoint.photo;
+            for (final PaintedMapPoint paintedMapPoint : allPaintedPhotos) {
 
-            // check if image has an loading error
-            final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
+               final Photo photo = paintedMapPoint.mapPoint.photo;
 
-            if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+               // check if image has an loading error
+               final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
 
-               // image is not yet loaded
+               if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
 
-               // check if image is in the cache
-               final Image photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+                  // image is not yet loaded
 
-               if ((photoImage == null || photoImage.isDisposed())
-                     && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+                  // check if image is in the cache
+                  final Image photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
 
-                  // the requested image is not available in the image cache -> image must be loaded
+                  if ((photoImage == null || photoImage.isDisposed())
+                        && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
 
-                  final ILoadCallBack imageLoadCallback = new PhotoImageLoaderCallback();
+                     // the requested image is not available in the image cache -> image must be loaded
 
-                  PhotoLoadManager.putImageInLoadingQueueHQ_Map(photo, requestedImageQuality, imageLoadCallback);
+                     final ILoadCallBack imageLoadCallback = new PhotoImageLoaderCallback();
+
+                     PhotoLoadManager.putImageInLoadingQueueHQ_Map(photo, requestedImageQuality, imageLoadCallback);
+                  }
                }
             }
          }
@@ -11185,6 +11195,20 @@ public class Map2 extends Canvas {
 
       final boolean isCutOffLinesInPauses = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_IS_CUT_OFF_LINES_IN_PAUSES);
       _prefOptions_isCutOffLinesInPauses = isCutOffLinesInPauses && drawSymbol.equals(Map2_Appearance.PLOT_TYPE_LINE);
+   }
+
+   public void updatePhotoOptions() {
+
+      _isPreloadHQImages = Util.getStateBoolean(_state,
+            SlideoutMap2_PhotoOptions.STATE_IS_PRELOAD_HQ_IMAGES,
+            SlideoutMap2_PhotoOptions.STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT);
+
+      if (_isPreloadHQImages == false) {
+
+         // cleanup loading queue
+
+         PhotoLoadManager.stopImageLoading(true);
+      }
    }
 
    /**

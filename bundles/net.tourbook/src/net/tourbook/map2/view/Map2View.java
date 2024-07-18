@@ -5037,11 +5037,17 @@ public class Map2View extends ViewPart implements
                SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_MEDIUM,
                SlideoutMap2_PhotoOptions.MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
 
-      } else {
+      } else if (imageSize.equals(ImageSize.SMALL)) {
 
          mapImageSize = Util.getStateInt(_state,
                SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_SMALL,
                SlideoutMap2_PhotoOptions.MAP_IMAGE_DEFAULT_SIZE_SMALL);
+
+      } else {
+
+         mapImageSize = Util.getStateInt(_state,
+               SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_TINY,
+               SlideoutMap2_PhotoOptions.MAP_IMAGE_DEFAULT_SIZE_TINY);
       }
 
       Photo.setMapImageRequestedSize(mapImageSize);

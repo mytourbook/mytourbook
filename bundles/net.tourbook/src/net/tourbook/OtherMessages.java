@@ -77,6 +77,8 @@ public class OtherMessages {
    public static final String APP_SIZE_MEDIUM_NAME                         = net.tourbook.common.Messages.App_Size_Medium_Name;
    public static final String APP_SIZE_SMALL                               = net.tourbook.common.Messages.App_Size_Small;
    public static final String APP_SIZE_SMALL_NAME                          = net.tourbook.common.Messages.App_Size_Small_Name;
+   public static final String APP_SIZE_TINY                                = net.tourbook.common.Messages.App_Size_Tiny;
+   public static final String APP_SIZE_TINY_NAME                           = net.tourbook.common.Messages.App_Size_Tiny_Name;
 
    public static final String APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP      = net.tourbook.common.Messages.App_Theme_BackgroundColor_Dark_Tooltip;
    public static final String APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP     = net.tourbook.common.Messages.App_Theme_BackgroundColor_Light_Tooltip;

@@ -41,6 +41,8 @@ public class Messages extends NLS {
    public static String        App_Size_Medium_Name;
    public static String        App_Size_Small;
    public static String        App_Size_Small_Name;
+   public static String        App_Size_Tiny;
+   public static String        App_Size_Tiny_Name;
 
    public static String        App_Theme_BackgroundColor_Light_Tooltip;
    public static String        App_Theme_BackgroundColor_Dark_Tooltip;
