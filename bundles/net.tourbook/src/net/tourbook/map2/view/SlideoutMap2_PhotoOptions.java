@@ -26,6 +26,7 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoImageCache;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -38,6 +39,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
@@ -92,6 +94,8 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
    private Spinner _spinnerImageSize_Small;
    private Spinner _spinnerImageSize_Medium;
    private Spinner _spinnerImageSize_Large;
+
+   private Link    _linkDiscardImages;
 
    enum ImageSize {
 
@@ -275,14 +279,29 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
 
    private void createUI_30_Options(final Composite parent) {
 
-      _chkPreloadHQImages = new Button(parent, SWT.CHECK);
-      _chkPreloadHQImages.setText("&Preload photo tooltip images");
-      _chkPreloadHQImages.setToolTipText("This can be very very CPU intensive\nwhen there are many photos");
-      _chkPreloadHQImages.addSelectionListener(_defaultSelectedListener);
-      GridDataFactory.fillDefaults()
-            .indent(0, 20)
-            .applyTo(_chkPreloadHQImages);
-
+      {
+         /*
+          * Preload photos
+          */
+         _chkPreloadHQImages = new Button(parent, SWT.CHECK);
+         _chkPreloadHQImages.setText("&Preload photo tooltip images");
+         _chkPreloadHQImages.setToolTipText(
+               "This can be very very CPU intensive\nwhen there are many photos.\n\nOnly the visible images will be preloaded.");
+         _chkPreloadHQImages.addSelectionListener(_defaultSelectedListener);
+         GridDataFactory.fillDefaults()
+               .indent(0, 20)
+               .applyTo(_chkPreloadHQImages);
+      }
+      {
+         /*
+          * Discard cached images
+          */
+         _linkDiscardImages = new Link(parent, SWT.NONE);
+         _linkDiscardImages.setText(UI.createLinkText("&Discard cached images"));
+         _linkDiscardImages.setToolTipText(
+               "This will not delete any images,\nonly the cached images are discarded\nand will be reloaded when needed");
+         _linkDiscardImages.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onDiscardImages()));
+      }
    }
 
    private void enableControls() {
@@ -327,11 +346,6 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
       };
    }
 
-   @Override
-   protected boolean isCenterHorizontal() {
-      return true;
-   }
-
    private void onChangeUI() {
 
       _imageSize = getSelectedImageSize();
@@ -341,6 +355,13 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
       updateMap();
 
       enableControls();
+   }
+
+   private void onDiscardImages() {
+
+      PhotoImageCache.disposeAll();
+
+      _map2View.getMap().paint();
    }
 
    @Override

@@ -689,13 +689,33 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
       updateUI_Photo(hoveredMapPoint);
    }
 
+   private void updateUI_LoadingMessage() {
+
+      if (_hoveredMapPoint == null) {
+
+         _labelMessage.setText(UI.EMPTY_STRING);
+
+      } else {
+
+         final Photo photo = _hoveredMapPoint.mapPoint.photo;
+
+         final String photoText = "Loading " + photo.imageFilePathName;
+
+         _labelMessage.setText(photoText);
+      }
+
+      _pageBook.showPage(_pageNoPhoto);
+   }
+
    private void updateUI_Photo(final PaintedMapPoint hoveredMapPoint) {
 
       if (hoveredMapPoint == null) {
+         _pageBook.showPage(_pageNoPhoto);
          return;
       }
 
       if (_photoImageCanvas.isDisposed()) {
+         _pageBook.showPage(_pageNoPhoto);
          return;
       }
 
@@ -713,25 +733,19 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
 
       _photoImageCanvas.setImage(photoImage, false);
 
-      _pageBook.showPage(_pagePhoto);
+      if (photoImage == null || photoImage.isDisposed()) {
+
+         updateUI_LoadingMessage();
+
+      } else {
+
+         _pageBook.showPage(_pagePhoto);
+      }
    }
 
    private boolean updateUI_ShowLoadingImage(final GC gc, final Rectangle rectangle) {
 
-      if (_hoveredMapPoint == null) {
-
-         _labelMessage.setText(UI.EMPTY_STRING);
-
-      } else {
-
-         final Photo photo = _hoveredMapPoint.mapPoint.photo;
-
-         final String photoText = "Loading " + photo.imageFilePathName;
-
-         _labelMessage.setText(photoText);
-      }
-
-      _pageBook.showPage(_pageNoPhoto);
+      updateUI_LoadingMessage();
 
       return true;
    }

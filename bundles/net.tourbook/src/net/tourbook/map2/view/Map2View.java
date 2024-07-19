@@ -509,6 +509,7 @@ public class Map2View extends ViewPart implements
    private ActionMap2_Graphs                 _actionMap2Slideout_TourColors;
    private ActionMapPoint_CenterMap          _actionMapPoint_CenterMap;
    private ActionMapPoint_EditTourMarker     _actionMapPoint_EditTourMarker;
+   private ActionMapPoint_RemovePhoto        _actionMapPoint_RemovePhoto;
    private ActionMapPoint_ShowOnlyThisTour   _actionMapPoint_ShowOnlyThisTour;
    private ActionMapPoint_ZoomIn             _actionMapPoint_ZoomIn;
    private ActionReloadFailedMapImages       _actionReloadFailedMapImages;
@@ -698,6 +699,22 @@ public class Map2View extends ViewPart implements
          actionMapMarker_Edit();
       }
 
+   }
+
+   private class ActionMapPoint_RemovePhoto extends Action {
+
+      public ActionMapPoint_RemovePhoto() {
+
+         super(OtherMessages.ACTION_PHOTOS_AND_TOURS_REMOVE_PHOTO, Action.AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+      }
+
+      @Override
+      public void run() {
+
+         TourManager.tourPhoto_Remove(_map.getHoveredMapPoint());
+      }
    }
 
    private class ActionMapPoint_ShowOnlyThisTour extends Action {
@@ -1996,6 +2013,7 @@ public class Map2View extends ViewPart implements
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionMapPoint_CenterMap           = new ActionMapPoint_CenterMap();
       _actionMapPoint_EditTourMarker      = new ActionMapPoint_EditTourMarker();
+      _actionMapPoint_RemovePhoto         = new ActionMapPoint_RemovePhoto();
       _actionMapPoint_ShowOnlyThisTour    = new ActionMapPoint_ShowOnlyThisTour();
       _actionMapPoint_ZoomIn              = new ActionMapPoint_ZoomIn();
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
@@ -2428,16 +2446,19 @@ public class Map2View extends ViewPart implements
 // SET_FORMATTING_OFF
 
       final Map2Point      mapPoint    = hoveredMapPoint.mapPoint;
+      final Photo          photo       = mapPoint.photo;
       final MapPointType   pointType   = mapPoint.pointType;
 
       final int      numTours          = _allTourData.size();
 
       final boolean  isMultipleTours   = numTours > 1;
+      final boolean  isPhotoAvailable  = photo != null;
       final boolean  isTourMarker      = pointType.equals(MapPointType.TOUR_MARKER);
       final boolean  isTourAvailable   = isTourMarker || pointType.equals(MapPointType.TOUR_PAUSE);
 
-      _actionMapPoint_EditTourMarker  .setEnabled(isTourMarker);
-      _actionMapPoint_ShowOnlyThisTour.setEnabled(isMultipleTours && isTourAvailable);
+      _actionMapPoint_EditTourMarker   .setEnabled(isTourMarker);
+      _actionMapPoint_RemovePhoto      .setEnabled(isPhotoAvailable);
+      _actionMapPoint_ShowOnlyThisTour .setEnabled(isMultipleTours && isTourAvailable);
 
 // SET_FORMATTING_ON
    }
@@ -2501,6 +2522,7 @@ public class Map2View extends ViewPart implements
 
          menuMgr.add(_actionMapPoint_ShowOnlyThisTour);
          menuMgr.add(_actionMapPoint_EditTourMarker);
+         menuMgr.add(_actionMapPoint_RemovePhoto);
 
       } else {
 

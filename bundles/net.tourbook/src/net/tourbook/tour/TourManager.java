@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import de.byteholder.geoclipse.map.PaintedMapPoint;
+
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -3455,6 +3457,133 @@ public class TourManager {
          final Collection<TourPhoto> tourPhotos = tourWithPhotos.values();
 
          tourData.addPhotos(tourPhotos);
+      }
+   }
+
+   public static void tourPhoto_Remove(final PaintedMapPoint hoveredMapPoint) {
+
+      if (isTourEditorModified()) {
+         return;
+      }
+
+      final Photo hoveredPhoto = hoveredMapPoint.mapPoint.photo;
+
+      int numPhotos = 0;
+
+      // key: tour id, photo id
+      final HashMap<Long, HashMap<Long, TourPhoto>> allToursWithTourPhotos = new HashMap<>();
+
+      final Photo removedPhoto = hoveredPhoto;
+
+      final Collection<TourPhotoReference> removedPhotoRefs = removedPhoto.getTourPhotoReferences().values();
+
+      // loop: all tour references in a photo
+      for (final TourPhotoReference photoTourRef : removedPhotoRefs) {
+
+         final long removedTourId = photoTourRef.tourId;
+         final long removedPhotoId = photoTourRef.photoId;
+
+         final TourData tourData = getTour(removedTourId);
+         if (tourData != null) {
+
+            // photo is from this tour
+
+            // loop: all tour photos
+            for (final TourPhoto tourPhoto : tourData.getTourPhotos()) {
+
+               if (tourPhoto.getPhotoId() == removedPhotoId) {
+
+                  // photo is in tour photo collection -> remove it
+
+                  HashMap<Long, TourPhoto> allTourIdPhotos = allToursWithTourPhotos.get(removedTourId);
+
+                  if (allTourIdPhotos == null) {
+                     allTourIdPhotos = new HashMap<>();
+                     allToursWithTourPhotos.put(removedTourId, allTourIdPhotos);
+                  }
+
+                  final TourPhoto prevTourPhoto = allTourIdPhotos.put(removedPhotoId, tourPhoto);
+                  if (prevTourPhoto == null) {
+                     numPhotos++;
+                  }
+
+                  break;
+               }
+            }
+         }
+      }
+
+      if (numPhotos == 0) {
+         return;
+      }
+
+      // remove photos from this tour and save it
+
+      final MessageDialog dialog = new MessageDialog(
+
+            Display.getDefault().getActiveShell(),
+
+            Messages.Photos_AndTours_Dialog_RemovePhotos_Title,
+            null, // no title image
+
+            NLS.bind(Messages.Photos_AndTours_Dialog_RemovePhotos_Message,
+                  numPhotos,
+                  allToursWithTourPhotos.size()),
+
+            MessageDialog.CONFIRM,
+
+            0, // default index
+
+            Messages.App_Action_RemoveTourPhotos,
+            Messages.App_Action_Cancel);
+
+      if (dialog.open() == IDialogConstants.OK_ID) {
+
+         /*
+          * Remove tour reference from the photo, this MUST be done after the user has
+          * confirmed the removal otherwise the photo do not have a tour reference when the dialog
+          * is canceled
+          */
+
+         final Photo removedPhoto2 = hoveredPhoto;
+
+         final Collection<TourPhotoReference> removedPhotoRefs2 = removedPhoto2.getTourPhotoReferences().values();
+
+         // loop: all tour references in a photo
+         for (final TourPhotoReference tourPhotoReference : removedPhotoRefs2) {
+
+            final long removedTourId = tourPhotoReference.tourId;
+            final long removedPhotoId = tourPhotoReference.photoId;
+
+            final HashMap<Long, TourPhoto> allTourIdPhotos = allToursWithTourPhotos.get(removedTourId);
+
+            if (allTourIdPhotos != null) {
+
+               // loop: all current tour photos
+               for (final TourPhoto tourIdPhoto : allTourIdPhotos.values()) {
+
+                  if (tourIdPhoto.getPhotoId() == removedPhotoId) {
+
+                     // photo is in tour photo collection -> remove it
+
+                     removedPhoto2.removeTour(removedTourId);
+
+                     break;
+                  }
+               }
+            }
+         }
+
+         for (final Long tourId : allToursWithTourPhotos.keySet()) {
+
+            final TourData tourData = getTour(tourId);
+
+            final HashMap<Long, TourPhoto> tourWithPhotos = allToursWithTourPhotos.get(tourId);
+
+            final Collection<TourPhoto> tourPhotos = tourWithPhotos.values();
+
+            tourData.removePhotos(tourPhotos);
+         }
       }
    }
 

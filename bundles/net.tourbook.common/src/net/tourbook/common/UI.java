@@ -1555,6 +1555,16 @@ public class UI {
    }
 
    /**
+    * @param text
+    *
+    * @return
+    */
+   public static String createLinkText(final String text) {
+
+      return "<a>%s</a>".formatted(text); //$NON-NLS-1$
+   }
+
+   /**
     * @param href
     * @param text
     *

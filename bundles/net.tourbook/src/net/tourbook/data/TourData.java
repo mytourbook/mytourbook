@@ -6480,19 +6480,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          galleryPhoto.adjustedTime_Tour = tourPhoto.getAdjustedTime();
          galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
 
-         // set adjusted time
+         /*
+          * Set adjusted time with time zone
+          */
          final ZoneId timeZone = getTourStartTime().getZone();
          final long adjustedTime_Tour = galleryPhoto.adjustedTime_Tour;
-         ZonedDateTime zonedDateTime;
 
-         if (adjustedTime_Tour == Long.MIN_VALUE) {
-
-            zonedDateTime = TimeTools.getZonedDateTime(galleryPhoto.imageExifTime, timeZone);
-
-         } else {
-
-            zonedDateTime = TimeTools.getZonedDateTime(adjustedTime_Tour, timeZone);
-         }
+         final ZonedDateTime zonedDateTime = adjustedTime_Tour == Long.MIN_VALUE
+               ? TimeTools.getZonedDateTime(galleryPhoto.imageExifTime, timeZone)
+               : TimeTools.getZonedDateTime(adjustedTime_Tour, timeZone);
 
          galleryPhoto.adjustedTime_Tour_WithZone = zonedDateTime;
 

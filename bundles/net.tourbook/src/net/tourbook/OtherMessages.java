@@ -36,9 +36,12 @@ public class OtherMessages {
    public static final String THEME_FONT_LOGGING                           = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging;
 
 
+
    //
    // net.tourbook.Messages
    //
+   public static final String ACTION_PHOTOS_AND_TOURS_REMOVE_PHOTO         = net.tourbook.Messages.Action_PhotosAndTours_RemovePhoto;
+   
    public static final String APP_BTN_BROWSE                               = net.tourbook.Messages.app_btn_browse;
 
    public static final String APP_UNIT_HHMMSS                              = net.tourbook.Messages.App_Unit_HHMMSS;
