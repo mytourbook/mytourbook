@@ -21,6 +21,7 @@ import de.byteholder.geoclipse.map.PaintedMapPoint;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -700,11 +701,11 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
 
       _photo = hoveredMapPoint.mapPoint.photo;
 
-      final long photoTime = _photo.getPhotoTime();
-      final LocalDateTime photoLocalDateTime = TimeTools.toLocalDateTime(photoTime);
-      final String photoDateTime = photoLocalDateTime.format(TimeTools.Formatter_Weekday)
-            + UI.SPACE2
-            + photoLocalDateTime.format(TimeTools.Formatter_DateTime_M);
+      final ZonedDateTime adjustedTime_Tour_WithZone = _photo.adjustedTime_Tour_WithZone;
+
+      final String photoDateTime = "%s  %s".formatted(
+            adjustedTime_Tour_WithZone.format(TimeTools.Formatter_Weekday),
+            adjustedTime_Tour_WithZone.format(TimeTools.Formatter_DateTime_M));
 
       updateTitleText(photoDateTime);
 

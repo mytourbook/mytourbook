@@ -6469,7 +6469,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          }
 
          /*
-          * when a photo is in the photo cache it is possible that the tour is from the file system,
+          * When a photo is in the photo cache it is possible that the tour is from the file system,
           * update tour relevant fields
           */
          galleryPhoto.isSavedInTour = true;
@@ -6479,6 +6479,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          galleryPhoto.adjustedTime_Tour = tourPhoto.getAdjustedTime();
          galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
+
+         // set adjusted time
+         final ZoneId timeZone = getTourStartTime().getZone();
+         final long adjustedTime_Tour = galleryPhoto.adjustedTime_Tour;
+         ZonedDateTime zonedDateTime;
+
+         if (adjustedTime_Tour == Long.MIN_VALUE) {
+
+            zonedDateTime = TimeTools.getZonedDateTime(galleryPhoto.imageExifTime, timeZone);
+
+         } else {
+
+            zonedDateTime = TimeTools.getZonedDateTime(adjustedTime_Tour, timeZone);
+         }
+
+         galleryPhoto.adjustedTime_Tour_WithZone = zonedDateTime;
 
          final double tourLatitude = tourPhoto.getLatitude();
 

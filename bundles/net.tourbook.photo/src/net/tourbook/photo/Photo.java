@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -124,6 +125,8 @@ public class Photo implements Serializable {
     * e.g. wrong time zone, wrong time is set in the camera. This time is saved in the tour photo.
     */
    public long                                     adjustedTime_Tour      = Long.MIN_VALUE;
+
+   public ZonedDateTime                            adjustedTime_Tour_WithZone;
 
    /**
     * Time in ms which is set in the link view with the adjusted camera time
@@ -286,11 +289,6 @@ public class Photo implements Serializable {
    public Photo(final File photoImageFile) {
 
       setupPhoto(photoImageFile, new Path(photoImageFile.getPath()));
-   }
-
-   public Photo(final String imageFilePathName) {
-
-      this(new File(imageFilePathName));
    }
 
    public static String getImageKeyHQ(final String imageFilePathName) {

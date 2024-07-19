@@ -277,7 +277,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
 
       _chkPreloadHQImages = new Button(parent, SWT.CHECK);
       _chkPreloadHQImages.setText("&Preload photo tooltip images");
-      _chkPreloadHQImages.setToolTipText("This can be very very CPU intensive");
+      _chkPreloadHQImages.setToolTipText("This can be very very CPU intensive\nwhen there are many photos");
       _chkPreloadHQImages.addSelectionListener(_defaultSelectedListener);
       GridDataFactory.fillDefaults()
             .indent(0, 20)
