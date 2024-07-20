@@ -14,8 +14,8 @@ Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ClassPath: .,
- dropbox-core-sdk-4.0.0.jar,
- java7-fs-dropbox-0.0.3.jar,
+ dropbox-core-sdk-7.0.0.jar,
+ java-fs-dropbox-0.1.0.jar,
  java7-fs-base-0.0.3.jar
 Import-Package: com.fasterxml.jackson.core,
  net.tourbook,
