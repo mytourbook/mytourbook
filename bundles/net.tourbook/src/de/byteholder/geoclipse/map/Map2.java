@@ -2700,17 +2700,16 @@ public class Map2 extends Canvas {
 
       Image photoImage = null;
 
-      final ImageQuality requestedImageQuality = ImageQuality.THUMB;
 
       // check if image has an loading error
-      final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
+      final PhotoLoadingState photoLoadingState = photo.getLoadingState(ImageQuality.THUMB);
 
       if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
 
          // image is not yet loaded
 
          // check if image is in the cache
-         photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+         photoImage = PhotoImageCache.getImage(photo, ImageQuality.THUMB);
 
          if ((photoImage == null || photoImage.isDisposed())
                && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
@@ -2719,7 +2718,7 @@ public class Map2 extends Canvas {
 
             final ILoadCallBack imageLoadCallback = new PhotoImageLoaderCallback();
 
-            PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
+            PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, ImageQuality.THUMB, imageLoadCallback);
          }
       }
 

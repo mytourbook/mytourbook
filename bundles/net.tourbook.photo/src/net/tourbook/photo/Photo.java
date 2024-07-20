@@ -1245,8 +1245,17 @@ public class Photo implements Serializable {
 
    public void setPhotoSize(final int width, final int height) {
 
-      _photoImageWidth = width;
-      _photoImageHeight = height;
+      if (width == _photoImageHeight && height == _photoImageWidth) {
+
+         /*
+          * There is somewhere a bug which do not recognize the photo orientation
+          */
+
+      } else {
+
+         _photoImageWidth = width;
+         _photoImageHeight = height;
+      }
 
       setMapImageRenderSize(_mapImageRequestedSize);
    }

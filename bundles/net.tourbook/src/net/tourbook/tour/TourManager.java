@@ -3526,15 +3526,13 @@ public class TourManager {
             Messages.Photos_AndTours_Dialog_RemovePhotos_Title,
             null, // no title image
 
-            NLS.bind(Messages.Photos_AndTours_Dialog_RemovePhotos_Message,
-                  numPhotos,
-                  allToursWithTourPhotos.size()),
+            "Remove photo from tour?",
 
             MessageDialog.CONFIRM,
 
             0, // default index
 
-            Messages.App_Action_RemoveTourPhotos,
+            Messages.App_Action_Remove_Immediate,
             Messages.App_Action_Cancel);
 
       if (dialog.open() == IDialogConstants.OK_ID) {
