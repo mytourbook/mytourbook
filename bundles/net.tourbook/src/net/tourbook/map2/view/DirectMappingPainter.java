@@ -133,13 +133,15 @@ public class DirectMappingPainter implements IDirectPainter {
       final int mapPointDevX = mapPoint.geoPointDevX;
       final int mapPointDevY = mapPoint.geoPointDevY;
 
-      final int markerSize = 6;
-      final int markerSize2 = markerSize / 2;
+      final int symbolSize = mapConfig.locationSymbolSize;
+      final int symbolSize2 = symbolSize / 2;
+      final int lineWidth = symbolSize / 4;
+      final int lineWidth2 = lineWidth / 2;
 
       final String markerLabel = mapPoint.getFormattedLabel();
 
-      final int markerSymbolDevX = mapPointDevX - markerSize2;
-      final int markerSymbolDevY = mapPointDevY - markerSize2;
+      final int markerSymbolDevX = mapPointDevX - symbolSize2;
+      final int markerSymbolDevY = mapPointDevY - symbolSize2;
 
       final Color lineColor = _map2.isMapBackgroundDark() ? UI.SYS_COLOR_WHITE : UI.SYS_COLOR_BLACK;
 
@@ -234,18 +236,24 @@ public class DirectMappingPainter implements IDirectPainter {
 
          // draw a symbol
 
-         gc.fillRectangle(
+         final Rectangle symbolRectangle = new Rectangle(
                markerSymbolDevX,
                markerSymbolDevY,
-               markerSize,
-               markerSize);
+               symbolSize,
+               symbolSize);
 
-         gc.setLineWidth(2);
+         gc.fillRectangle(
+               symbolRectangle.x,
+               symbolRectangle.y,
+               symbolRectangle.width,
+               symbolRectangle.height);
+
+         gc.setLineWidth(lineWidth);
          gc.drawRectangle(
-               markerSymbolDevX,
-               markerSymbolDevY,
-               markerSize,
-               markerSize);
+               symbolRectangle.x + lineWidth2,
+               symbolRectangle.y + lineWidth2,
+               symbolRectangle.width - lineWidth,
+               symbolRectangle.height - lineWidth);
       }
 
       /*
@@ -256,9 +264,9 @@ public class DirectMappingPainter implements IDirectPainter {
 
       if (mapPointType.equals(MapPointType.TOUR_PHOTO)) {
 
-         gc.setLineWidth(1);
          gc.setForeground(lineColor);
 
+         gc.setLineWidth(1);
          gc.drawRectangle(
                labelRectangle.x - Map2.MAP_MARKER_BORDER_WIDTH,
                labelRectangle.y,
@@ -275,6 +283,7 @@ public class DirectMappingPainter implements IDirectPainter {
                labelRectangle.height);
 
          // border: horizontal bottom
+         gc.setLineWidth(2);
          gc.drawLine(
                labelDevX,
                labelDevY + labelHeight,

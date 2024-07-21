@@ -126,6 +126,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private SelectionListener              _mapPointSelectionListener_All;
    private IPropertyChangeListener        _mapPointPropertyChangeListener;
    private MouseWheelListener             _mapPointMouseWheelListener;
+   private MouseWheelListener             _mapPointMouseWheelListener4;
    private MouseWheelListener             _mapPointMouseWheelListener10;
    private FocusListener                  _keepOpenListener;
    private IPropertyChangeListener        _prefChangeListener;
@@ -233,6 +234,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Spinner               _spinnerLabelFontSize;
    private Spinner               _spinnerLabelGroupGridSize;
    private Spinner               _spinnerLabelTruncateLength;
+   private Spinner               _spinnerLocationSymbolSize;
    private Spinner               _spinnerMapDimValue;
    //
    private Text                  _txtGroupDuplicatedMarkers;
@@ -396,7 +398,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       // toggle checkbox
       _chkIsShowCommonLocations.setSelection(!_chkIsShowCommonLocations.getSelection());
 
-         selectTab(_tabCommonLocations, event);
+      selectTab(_tabCommonLocations, event);
 
       if (UI.isShiftKey(event)) {
 
@@ -409,7 +411,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       // toggle checkbox
       _chkIsShowTourLocations.setSelection(!_chkIsShowTourLocations.getSelection());
 
-         selectTab(_tabTourLocations, event);
+      selectTab(_tabTourLocations, event);
 
       if (UI.isShiftKey(event)) {
 
@@ -422,16 +424,16 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       // toggle checkbox
       _chkIsShowTourMarkers.setSelection(!_chkIsShowTourMarkers.getSelection());
 
-         selectTab(_tabTourMarkers, event);
-      }
+      selectTab(_tabTourMarkers, event);
+   }
 
    private void actionStatistic_TourPause(final Event event) {
 
       // toggle checkbox
       _chkIsShowTourPauses.setSelection(!_chkIsShowTourPauses.getSelection());
 
-         selectTab(_tabTourPauses, event);
-      }
+      selectTab(_tabTourPauses, event);
+   }
 
    @Override
    public void close() {
@@ -682,22 +684,40 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          }
          {
             /*
-             * Font size
+             * Label/symbol size
              */
 
             // label
             _lblFontSize = new Label(tabContainer, SWT.NONE);
             _lblFontSize.setText(Messages.Slideout_MapPoints_Label_FontSize);
+            _lblFontSize.setToolTipText(Messages.Slideout_MapPoints_Label_FontSize_Tooltip);
             gdHCenter.applyTo(_lblFontSize);
 
-            // font size
-            _spinnerLabelFontSize = new Spinner(tabContainer, SWT.BORDER);
-            _spinnerLabelFontSize.setMinimum(Map2ConfigManager.LABEL_FONT_SIZE_MIN);
-            _spinnerLabelFontSize.setMaximum(Map2ConfigManager.LABEL_FONT_SIZE_MAX);
-            _spinnerLabelFontSize.setIncrement(1);
-            _spinnerLabelFontSize.setPageIncrement(10);
-            _spinnerLabelFontSize.addSelectionListener(_mapPointSelectionListener);
-            _spinnerLabelFontSize.addMouseWheelListener(_mapPointMouseWheelListener);
+            final Composite container = new Composite(tabContainer, SWT.NONE);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+            {
+               // font size
+               _spinnerLabelFontSize = new Spinner(container, SWT.BORDER);
+               _spinnerLabelFontSize.setToolTipText(Messages.Slideout_MapPoints_Label_FontSize_Tooltip);
+               _spinnerLabelFontSize.setMinimum(Map2ConfigManager.LABEL_FONT_SIZE_MIN);
+               _spinnerLabelFontSize.setMaximum(Map2ConfigManager.LABEL_FONT_SIZE_MAX);
+               _spinnerLabelFontSize.setIncrement(1);
+               _spinnerLabelFontSize.setPageIncrement(10);
+               _spinnerLabelFontSize.addSelectionListener(_mapPointSelectionListener);
+               _spinnerLabelFontSize.addMouseWheelListener(_mapPointMouseWheelListener);
+               _spinnerGridData.applyTo(_spinnerLabelFontSize);
+
+               // symbol size
+               _spinnerLocationSymbolSize = new Spinner(container, SWT.BORDER);
+               _spinnerLocationSymbolSize.setToolTipText(Messages.Slideout_MapPoints_Label_FontSize_Tooltip);
+               _spinnerLocationSymbolSize.setMinimum(Map2ConfigManager.LOCATION_SYMBOL_SIZE_MIN);
+               _spinnerLocationSymbolSize.setMaximum(Map2ConfigManager.LOCATION_SYMBOL_SIZE_MAX);
+               _spinnerLocationSymbolSize.setIncrement(1);
+               _spinnerLocationSymbolSize.setPageIncrement(10);
+               _spinnerLocationSymbolSize.addSelectionListener(_mapPointSelectionListener);
+               _spinnerLocationSymbolSize.addMouseWheelListener(_mapPointMouseWheelListener4);
+               _spinnerGridData.applyTo(_spinnerLocationSymbolSize);
+            }
          }
          {
             /*
@@ -721,6 +741,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                _spinnerLabelDistributorMaxLabels.addSelectionListener(_mapPointSelectionListener);
                _spinnerLabelDistributorMaxLabels.addMouseWheelListener(_mapPointMouseWheelListener10);
                _spinnerLabelDistributorMaxLabels.setToolTipText(Messages.Slideout_MapPoints_Spinner_LabelDistributor_MaxLabels_Tooltip);
+               _spinnerGridData.applyTo(_spinnerLabelDistributorMaxLabels);
 
                // label distributor radius
                _spinnerLabelDistributorRadius = new Spinner(container, SWT.BORDER);
@@ -731,6 +752,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                _spinnerLabelDistributorRadius.addSelectionListener(_mapPointSelectionListener);
                _spinnerLabelDistributorRadius.addMouseWheelListener(_mapPointMouseWheelListener10);
                _spinnerLabelDistributorRadius.setToolTipText(Messages.Slideout_MapPoints_Spinner_LabelDistributor_Radius_Tooltip);
+               _spinnerGridData.applyTo(_spinnerLabelDistributorRadius);
             }
          }
          {
@@ -1503,6 +1525,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _spinnerLabelDistributorMaxLabels      .setEnabled(isShowLabels);
       _spinnerLabelDistributorRadius         .setEnabled(isShowLabels);
       _spinnerLabelTruncateLength            .setEnabled(isShowLabels && isTruncateLabel);
+      _spinnerLocationSymbolSize             .setEnabled(isShowLabels);
 
       _btnSwapClusterSymbolColor             .setEnabled(isShowClusteredMarker);
       _btnSwapTourMarkerLabel_Color          .setEnabled(isShowTourMarker);
@@ -1656,6 +1679,12 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _mapPointMouseWheelListener = mouseEvent -> {
 
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 1);
+         onModifyConfig(mouseEvent.widget);
+      };
+
+      _mapPointMouseWheelListener4 = mouseEvent -> {
+
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 4);
          onModifyConfig(mouseEvent.widget);
       };
 
@@ -2024,6 +2053,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _spinnerLabelFontSize                  .setSelection( config.labelFontSize);
       _spinnerLabelGroupGridSize             .setSelection( config.groupGridSize);
       _spinnerLabelTruncateLength            .setSelection( config.labelTruncateLength);
+      _spinnerLocationSymbolSize             .setSelection( config.locationSymbolSize);
 
       _colorClusterSymbol_Fill               .setColorValue(config.clusterFill_RGB);
       _colorClusterSymbol_Outline            .setColorValue(config.clusterOutline_RGB);
@@ -2114,6 +2144,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       config.labelDistributorRadius       = _spinnerLabelDistributorRadius       .getSelection();
       config.labelFontSize                = _spinnerLabelFontSize                .getSelection();
       config.labelTruncateLength          = _spinnerLabelTruncateLength          .getSelection();
+      config.locationSymbolSize           = _spinnerLocationSymbolSize           .getSelection();
 
       config.labelFontName                = getSelectedLabelFont();
       config.labelLayout                  = getSelectedLabelLayout();

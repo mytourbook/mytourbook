@@ -151,7 +151,7 @@ public class Map2ConfigManager {
    static final int                            LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT    = 200;
    static final int                            LABEL_DISTRIBUTOR_RADIUS_MIN            = 10;
    static final int                            LABEL_DISTRIBUTOR_RADIUS_MAX            = 2000;
-   static final int                            LABEL_DISTRIBUTOR_RADIUS_DEFAULT        = 100;
+   static final int                            LABEL_DISTRIBUTOR_RADIUS_DEFAULT        = 200;
    static final String                         LABEL_FONT_NAME_DEFAULT                 = UI.AWT_DIALOG_FONT.getFontName();
    static final int                            LABEL_FONT_SIZE_MIN                     = 2;
    static final int                            LABEL_FONT_SIZE_MAX                     = 100;
@@ -159,6 +159,9 @@ public class Map2ConfigManager {
    static final int                            LABEL_TRUNCATE_LENGTH_MIN               = 0;
    static final int                            LABEL_TRUNCATE_LENGTH_MAX               = 1000;
    static final int                            LABEL_TRUNCATE_LENGTH_DEFAULT           = 40;
+   static final int                            LOCATION_SYMBOL_SIZE_MIN                = 4;
+   static final int                            LOCATION_SYMBOL_SIZE_MAX                = 100;
+   static final int                            LOCATION_SYMBOL_SIZE_DEFAULT            = 16;
    // cluster
    public static final boolean                 DEFAULT_IS_FILL_CLUSTER_SYMBOL          = true;
    public static final int                     DEFAULT_CLUSTER_GRID_SIZE               = 50;

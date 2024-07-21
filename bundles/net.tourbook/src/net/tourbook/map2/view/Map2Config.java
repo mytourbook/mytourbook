@@ -51,6 +51,7 @@ public class Map2Config {
 
    public String         labelFontName             = Map2ConfigManager.LABEL_FONT_NAME_DEFAULT;
    public int            labelFontSize             = Map2ConfigManager.LABEL_FONT_SIZE_DEFAULT;
+   public int            locationSymbolSize        = Map2ConfigManager.LOCATION_SYMBOL_SIZE_DEFAULT;
 
    /*
     * Tour/common locations

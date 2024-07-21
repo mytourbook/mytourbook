@@ -450,8 +450,8 @@ public class Map2 extends Canvas {
 
    private int                             _clusterSymbolBorder             = 10;
    private int                             _labelRespectMargin              = 1;
-   private int                             _mapPointSymbolMargin            = 5;
-   private int                             _mapPointSymbolRespectSize       = _mapPointSymbolMargin + 2;
+   private int                             _mapPointSymbolSize              = 5;
+   private int                             _mapPointSymbolRespectSize       = _mapPointSymbolSize + 2;
 
    private PaintedMarkerCluster            _hoveredMarkerCluster;
    private PaintedMapPoint                 _hoveredMapPoint;
@@ -2699,7 +2699,6 @@ public class Map2 extends Canvas {
    private Image getPhotoImage(final Photo photo) {
 
       Image photoImage = null;
-
 
       // check if image has an loading error
       final PhotoLoadingState photoLoadingState = photo.getLoadingState(ImageQuality.THUMB);
@@ -6787,6 +6786,9 @@ public class Map2 extends Canvas {
          _locationBoundingBoxColors.clear();
       }
 
+      _mapPointSymbolSize = _mapConfig.locationSymbolSize;
+      _mapPointSymbolRespectSize = _mapPointSymbolSize + 2;
+
 // SET_FORMATTING_OFF
 
       _numStatistics_AllCommonLocations         = 0;
@@ -7962,7 +7964,11 @@ public class Map2 extends Canvas {
        * Draw marker symbol
        */
 
-      final int markerSymbolSize2 = _mapPointSymbolMargin / 2;
+      final int symbolSize2 = _mapPointSymbolSize / 2;
+      final int lineWidth = _mapPointSymbolSize / 4;
+      final int lineWidth2 = lineWidth / 2;
+
+      g2d.setStroke(new BasicStroke(lineWidth));
 
       java.awt.Color fillColor;
       java.awt.Color outlineColor;
@@ -7980,8 +7986,6 @@ public class Map2 extends Canvas {
          outlineColor = _mapConfig.tourMarkerFill_ColorAWT;
       }
 
-      g2d.setStroke(new BasicStroke(2));
-
       int paintedMarkerIndex = 0;
 
       for (int itemIndex = 0; itemIndex < numVisibleMarkers; itemIndex++) {
@@ -7997,24 +8001,28 @@ public class Map2 extends Canvas {
          final int mapPointDevX = mapPoint.geoPointDevX;
          final int mapPointDevY = mapPoint.geoPointDevY;
 
-         final int markerSymbolDevX = mapPointDevX - markerSymbolSize2;
-         final int markerSymbolDevY = mapPointDevY - markerSymbolSize2;
+         final int markerSymbolDevX = mapPointDevX - symbolSize2;
+         final int markerSymbolDevY = mapPointDevY - symbolSize2;
 
-         final Rectangle markerSymbolRectangle = new Rectangle(
+         final Rectangle symbolRectangle = new Rectangle(
                markerSymbolDevX,
                markerSymbolDevY,
-               _mapPointSymbolMargin,
-               _mapPointSymbolMargin);
+               _mapPointSymbolSize,
+               _mapPointSymbolSize);
 
          g2d.setColor(fillColor);
-         g2d.fillRect(markerSymbolRectangle.x, markerSymbolRectangle.y, markerSymbolRectangle.width, markerSymbolRectangle.height);
+         g2d.fillRect(symbolRectangle.x, symbolRectangle.y, symbolRectangle.width, symbolRectangle.height);
 
          g2d.setColor(outlineColor);
-         g2d.drawRect(markerSymbolRectangle.x, markerSymbolRectangle.y, markerSymbolRectangle.width, markerSymbolRectangle.height);
+         g2d.drawRect(
+               symbolRectangle.x + lineWidth2,
+               symbolRectangle.y + lineWidth2,
+               symbolRectangle.width - lineWidth,
+               symbolRectangle.height - lineWidth);
 
          // keep painted symbol position
          final PaintedMapPoint paintedMarker = allPaintedMarkerPoints.get(paintedMarkerIndex++);
-         paintedMarker.symbolRectangle = markerSymbolRectangle;
+         paintedMarker.symbolRectangle = symbolRectangle;
       }
    }
 
@@ -8063,7 +8071,11 @@ public class Map2 extends Canvas {
       /*
        * Draw pause symbol
        */
-      final int symbolSize2 = _mapPointSymbolMargin / 2;
+      final int symbolSize2 = _mapPointSymbolSize / 2;
+      final int lineWidth = _mapPointSymbolSize / 4;
+      final int lineWidth2 = lineWidth / 2;
+
+      g2d.setStroke(new BasicStroke(lineWidth));
 
       java.awt.Color fillColor;
       java.awt.Color outlineColor;
@@ -8080,8 +8092,6 @@ public class Map2 extends Canvas {
          fillColor = _mapConfig.tourPauseOutline_ColorAWT;
          outlineColor = _mapConfig.tourPauseFill_ColorAWT;
       }
-
-      g2d.setStroke(new BasicStroke(2));
 
       int paintedPointIndex = 0;
 
@@ -8104,14 +8114,18 @@ public class Map2 extends Canvas {
          final Rectangle symbolRectangle = new Rectangle(
                symbolDevX,
                symbolDevY,
-               _mapPointSymbolMargin,
-               _mapPointSymbolMargin);
+               _mapPointSymbolSize,
+               _mapPointSymbolSize);
 
          g2d.setColor(fillColor);
          g2d.fillRect(symbolRectangle.x, symbolRectangle.y, symbolRectangle.width, symbolRectangle.height);
 
          g2d.setColor(outlineColor);
-         g2d.drawRect(symbolRectangle.x, symbolRectangle.y, symbolRectangle.width, symbolRectangle.height);
+         g2d.drawRect(
+               symbolRectangle.x + lineWidth2,
+               symbolRectangle.y + lineWidth2,
+               symbolRectangle.width - lineWidth,
+               symbolRectangle.height - lineWidth);
 
          // keep painted symbol position
          final PaintedMapPoint paintedMarker = allPaintedPoints.get(paintedPointIndex++);
@@ -8251,7 +8265,7 @@ public class Map2 extends Canvas {
 
          if (swtPhotoImage == null || swtPhotoImage.isDisposed()) {
 
-            // paint photo placeholder
+            // image is not yet available -> paint photo placeholder
 
             g2d.setColor(java.awt.Color.cyan);
 
@@ -8293,7 +8307,11 @@ public class Map2 extends Canvas {
       /*
        * Draw photo symbol
        */
-      final int symbolSize2 = _mapPointSymbolMargin / 2;
+      final int symbolSize2 = _mapPointSymbolSize / 2;
+      final int lineWidth = _mapPointSymbolSize / 4;
+      final int lineWidth2 = lineWidth / 2;
+
+      g2d.setStroke(new BasicStroke(lineWidth));
 
       java.awt.Color fillColor;
       java.awt.Color outlineColor;
@@ -8307,11 +8325,9 @@ public class Map2 extends Canvas {
 
       } else {
 
-         fillColor = java.awt.Color.BLACK;
+         fillColor = java.awt.Color.GRAY;
          outlineColor = java.awt.Color.WHITE;
       }
-
-      g2d.setStroke(new BasicStroke(2));
 
       int paintedPointIndex = 0;
 
@@ -8334,14 +8350,18 @@ public class Map2 extends Canvas {
          final Rectangle symbolRectangle = new Rectangle(
                symbolDevX,
                symbolDevY,
-               _mapPointSymbolMargin,
-               _mapPointSymbolMargin);
+               _mapPointSymbolSize,
+               _mapPointSymbolSize);
 
          g2d.setColor(fillColor);
          g2d.fillRect(symbolRectangle.x, symbolRectangle.y, symbolRectangle.width, symbolRectangle.height);
 
          g2d.setColor(outlineColor);
-         g2d.drawRect(symbolRectangle.x, symbolRectangle.y, symbolRectangle.width, symbolRectangle.height);
+         g2d.drawRect(
+               symbolRectangle.x + lineWidth2,
+               symbolRectangle.y + lineWidth2,
+               symbolRectangle.width - lineWidth,
+               symbolRectangle.height - lineWidth);
 
          // keep painted symbol position
          final PaintedMapPoint paintedMarker = allPaintedPhotos.get(paintedPointIndex++);

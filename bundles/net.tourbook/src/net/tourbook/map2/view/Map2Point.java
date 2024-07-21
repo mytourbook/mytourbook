@@ -49,7 +49,7 @@ public class Map2Point implements ClusterItem {
    public GeoPoint                           geoPoint;
 
    /**
-    * Geo position in device pixel for the marker position
+    * Geo position in device pixel for the map point position
     */
    public int                                geoPointDevX;
    public int                                geoPointDevY;

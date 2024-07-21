@@ -1227,10 +1227,14 @@ public class Map2View extends ViewPart implements
       _map.setZoom(_map.getMapProvider().getMaximumZoomLevel());
       _map.setMapCenter(new GeoPosition(geoPoint.getLatitude(), geoPoint.getLongitude()));
 
-      // hide hovered marker
-      _map.resetHoveredMapPoint();
-
       _map.redraw();
+
+      // this need a delay otherwise the hovered map point is not hidden
+      _map.getDisplay().timerExec(10, () -> {
+
+         // hide hovered marker
+         _map.resetHoveredMapPoint();
+      });
    }
 
    public void actionPOI() {

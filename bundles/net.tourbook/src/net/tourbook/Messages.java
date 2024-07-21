@@ -2370,6 +2370,7 @@ public class Messages extends NLS {
    public static String        Slideout_MapPoints_Label_CommonLocations;
    public static String        Slideout_MapPoints_Label_Font;
    public static String        Slideout_MapPoints_Label_FontSize;
+   public static String        Slideout_MapPoints_Label_FontSize_Tooltip;
    public static String        Slideout_MapPoints_Label_GroupDuplicatedMarkers;
    public static String        Slideout_MapPoints_Label_GroupGridSize;
    public static String        Slideout_MapPoints_Label_LabelBackground;
