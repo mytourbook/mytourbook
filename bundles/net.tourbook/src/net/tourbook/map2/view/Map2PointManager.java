@@ -47,9 +47,9 @@ public class Map2PointManager {
    }
 
    /**
-    * Update UI in the location + marker slideout
+    * Update UI in the map point slideout
     */
-   public static void updateMapLocationAndMarkerSlideout() {
+   public static void updateMapPointSlideout() {
 
       if (_mapPoint_Slideout != null) {
 
@@ -61,7 +61,13 @@ public class Map2PointManager {
 
       if (_mapPoint_Slideout != null && _mapPoint_Statistics != null) {
 
-         PlatformUI.getWorkbench().getDisplay().asyncExec(() -> _mapPoint_Slideout.updateStatistics(_mapPoint_Statistics));
+         PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+
+            if (_mapPoint_Slideout != null) {
+
+               _mapPoint_Slideout.updateStatistics(_mapPoint_Statistics);
+            }
+         });
       }
 
    }

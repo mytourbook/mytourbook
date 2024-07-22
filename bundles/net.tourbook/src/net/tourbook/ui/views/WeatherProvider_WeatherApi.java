@@ -75,7 +75,7 @@ public class WeatherProvider_WeatherApi implements IWeatherProvider {
 
             HistoricalWeatherRetriever.checkVendorConnection(
                   WeatherApiRetriever.getBaseApiUrl() +
-                        "?lat=0&lon=0&dt=" + //$NON-NLS-1$
+                        "?lat=40&lon=-105&dt=" + //$NON-NLS-1$
                         LocalDate.now().format(TimeTools.Formatter_YearMonthDay),
                   IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI_NAME);
          }));

@@ -27,6 +27,7 @@ import java.util.List;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
@@ -141,8 +142,10 @@ public class DirectMappingPainter implements IDirectPainter {
       final int markerSymbolDevX = mapPointDevX - markerSize2;
       final int markerSymbolDevY = mapPointDevY - markerSize2;
 
-      gc.setForeground(mapPoint.getOutlineColor_Hovered());
-      gc.setBackground(mapPoint.getFillColor_Hovered());
+      final Color lineColor = _map2.isMapBackgroundDark() ? UI.SYS_COLOR_WHITE : UI.SYS_COLOR_BLACK;
+
+      gc.setForeground(mapPoint.getOutlineColor());
+      gc.setBackground(mapPoint.getFillColor());
 
       /*
        * Draw location bounding box
@@ -199,12 +202,16 @@ public class DirectMappingPainter implements IDirectPainter {
          lineFromDevY = lineToDevY;
       }
 
+      gc.setForeground(lineColor);
+
       gc.setLineWidth(2);
       gc.drawLine(
             lineFromDevX,
             lineFromDevY,
             lineToDevX,
             lineToDevY);
+
+      gc.setForeground(mapPoint.getOutlineColor());
 
       /*
        * Draw a symbol at the point location
@@ -223,7 +230,7 @@ public class DirectMappingPainter implements IDirectPainter {
                mapPointDevY - imageHeight);
 
       } else {
-         
+
          // draw a symbol
 
          gc.fillRectangle(

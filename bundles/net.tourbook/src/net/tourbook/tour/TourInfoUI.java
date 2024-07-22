@@ -1516,7 +1516,7 @@ public class TourInfoUI {
             /*
              * Start location
              */
-            _lblLocationStart = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_LocationStart);
+            _lblLocationStart = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_TourLocation_Start);
             _lblLocationStart.setFont(_boldFont);
             GridDataFactory.fillDefaults()
                   .span(numColumns, 1)
@@ -1532,7 +1532,7 @@ public class TourInfoUI {
             /*
              * End location
              */
-            _lblLocationEnd = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_LocationEnd);
+            _lblLocationEnd = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_TourLocation_End);
             _lblLocationEnd.setFont(_boldFont);
             GridDataFactory.fillDefaults()
                   .span(numColumns, 1)

@@ -18,11 +18,6 @@ TODO's
 * Update fulltext url https://lucene.apache.org/core/7_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Wildcard_Searches
   in https://mytourbook.sourceforge.io/mytourbook/index.php/documentation/show-tours/search
 
-* Remove debug code in ColumnManager.java
-   // TODO
-      System.out.println("All columns in _allDefinedColumnDefinitions, number of entries: " + _allDefinedColumnDefinitions.size());
-      System.out.println();
-
 
 * Maybe replace "Display.getDefault()" with "PlatformUI.getWorkbench().getDisplay()"
   "Code should always ask the workbench for the display rather than rely on Display.getDefault()"
@@ -54,33 +49,19 @@ Experimental
 New
 ===
 
-* 2.5D & 3D Maps (Frederic)
-  - Export map view to an image file (jpeg, png or bmp) or to the clipboard
- 
-* 2D Map
-  - Enhanced display of the
-    - Tour marker
-    - Tour pauses
-    - Tour/common locations
-    https://github.com/mytourbook/mytourbook/issues/1323
+* 
     
 
 Improvements
 ============
 
-* Tour Export (Frederic)
-  - Use of the notification popups for successful/unsuccessful exports
+* 
 
 Changes
 =======
 
-* 2D Map
-  - Moved options from the "2D Map Options" slideout to the "Map Points" slideout
-    - Map dimming
-    - Filter tour pauses
+* 
 
-* Tour Concatenation (Frederic)
-  - Removed the ability to delete the source tours when using the NatTable layout as it was causing random tours to be deleted
 
 
 Changes that require Tour Re-import
@@ -92,8 +73,7 @@ Changes that require Tour Re-import
 Bugfix
 ======
 
-* Tour Nutrition (Frederic)
-  - Fixed an issue where deleting a custom tour product for a given tour would delete all of them
+* 
 
 
 Translation    

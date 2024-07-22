@@ -1408,6 +1408,12 @@ public class Messages extends NLS {
    public static String        Map_Model_Name_HighWheeler;
    public static String        Map_Model_Name_Skateboard;
 
+   public static String        Map_Points_LabelBackground_Border1;
+   public static String        Map_Points_LabelBackground_Border2;
+   public static String        Map_Points_LabelBackground_None;
+   public static String        Map_Points_LabelBackground_RectangleBox;
+   public static String        Map_Points_LabelBackground_Shadow;
+
    public static String        Model_Player_Button_MapModel_Tooltip;
    public static String        Model_Player_Button_MapModelCursor_Tooltip;
    public static String        Model_Player_Button_Pause_Tooltip;
@@ -2302,7 +2308,7 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Checkbox_ToggleKeyboardPanning_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_TrackOpacity;
    public static String        Slideout_Map_Options_Checkbox_TrackOpacity_Tooltip;
-   public static String        Slideout_Map_Options_Checkbox_UseMapDimColor;
+   public static String        Slideout_MapPoints_Checkbox_UseMapDimColor;
    public static String        Slideout_Map_Options_Color_DimColor_Tooltip;
    public static String        Slideout_Map_Options_Group_TourTrack;
    public static String        Slideout_Map_Options_Label_BreadcrumbItems;
@@ -2311,8 +2317,8 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Label_HoveredAndSelectedColor_Tooltip;
    public static String        Slideout_Map_Options_Label_HoveredColor;
    public static String        Slideout_Map_Options_Label_HoveredColor_Tooltip;
-   public static String        Slideout_Map_Options_Label_MapTransparencyColor;
-   public static String        Slideout_Map_Options_Label_MapTransparencyColor_Tooltip;
+   public static String        Slideout_MapPoints_Label_MapTransparencyColor;
+   public static String        Slideout_MapPoints_Label_MapTransparencyColor_Tooltip;
    public static String        Slideout_Map_Options_Label_SelectedColor;
    public static String        Slideout_Map_Options_Label_SelectedColor_Tooltip;
    public static String        Slideout_Map_Options_Label_SliderLocation_Color;
@@ -2338,23 +2344,62 @@ public class Messages extends NLS {
    public static String        Slideout_Map_TrackOptions_Label_Title;
    public static String        Slideout_Map_TrackOptions_Label_Title_Tooltip;
 
+   public static String        Slideout_MapPoints_Action_CollapseSlideout_Tooltip;
+   public static String        Slideout_MapPoints_Action_CommonLocations_Tooltip;
+   public static String        Slideout_MapPoints_Action_ExpandSlideout_Tooltip;
+   public static String        Slideout_MapPoints_Action_TourLocations_Tooltip;
+   public static String        Slideout_MapPoints_Action_TourMarkers_Tooltip;
+   public static String        Slideout_MapPoints_Action_TourPauses_Tooltip;
+   public static String        Slideout_MapPoints_Checkbox_AntialiasLabel;
+   public static String        Slideout_MapPoints_Checkbox_AntialiasSymbol;
+   public static String        Slideout_MapPoints_Checkbox_ClusterTourMarkers;
+   public static String        Slideout_MapPoints_Checkbox_ClusterTourMarkers_Tooltip;
    public static String        Slideout_MapPoints_Checkbox_FillClusterSymbol;
+   public static String        Slideout_MapPoints_Checkbox_GroupTourMarkers;
+   public static String        Slideout_MapPoints_Checkbox_GroupTourMarkers_Extended;
+   public static String        Slideout_MapPoints_Checkbox_GroupTourMarkers_Tooltip;
    public static String        Slideout_MapPoints_Checkbox_ShowCommonLocations;
    public static String        Slideout_MapPoints_Checkbox_ShowCommonLocations_Tooltip;
    public static String        Slideout_MapPoints_Checkbox_ShowLocationBoundingBox;
    public static String        Slideout_MapPoints_Checkbox_ShowTourLocations;
    public static String        Slideout_MapPoints_Checkbox_ShowTourLocations_Tooltip;
+   public static String        Slideout_MapPoints_Checkbox_ShowTourMarkers;
+   public static String        Slideout_MapPoints_Checkbox_ShowTourPauses;
+   public static String        Slideout_MapPoints_Checkbox_TruncateLabel;
+   public static String        Slideout_MapPoints_Checkbox_WrapLabel;
    public static String        Slideout_MapPoints_Label_ClusterSize_Tooltip;
    public static String        Slideout_MapPoints_Label_ClusterSymbolSize;
    public static String        Slideout_MapPoints_Label_CommonLocations;
+   public static String        Slideout_MapPoints_Label_GroupDuplicatedMarkers;
+   public static String        Slideout_MapPoints_Label_GroupGridSize;
+   public static String        Slideout_MapPoints_Label_LabelBackground;
    public static String        Slideout_MapPoints_Label_LocationColor;
    public static String        Slideout_MapPoints_Label_LocationColor_Tooltip;
    public static String        Slideout_MapPoints_Label_MarkerColor;
    public static String        Slideout_MapPoints_Label_MarkerColor_Tooltip;
+   public static String        Slideout_MapPoints_Label_Stats_CommonLocations;
+   public static String        Slideout_MapPoints_Label_Stats_TourLocations;
+   public static String        Slideout_MapPoints_Label_Stats_TourMarkers;
+   public static String        Slideout_MapPoints_Label_Stats_TourPauses;
    public static String        Slideout_MapPoints_Label_Title2;
-   public static String        Slideout_MapPoints_Tab_CommonLocations;
-   public static String        Slideout_MapPoints_Tab_TourLocations;
-   public static String        Slideout_MapPoints_Tab_TourMarkers;
+   public static String        Slideout_MapPoints_Label_TourLocationColor;
+   public static String        Slideout_MapPoints_Label_TourLocation_StartColor;
+   public static String        Slideout_MapPoints_Label_TourLocation_EndColor;
+   public static String        Slideout_MapPoints_Label_TourPauseColor;
+   public static String        Slideout_MapPoints_Label_TourPauseColor_Tooltip;
+   public static String        Slideout_MapPoints_Label_VisibleLabels;
+   public static String        Slideout_MapPoints_Label_VisibleLabels_Tooltip;
+   public static String        Slideout_MapPoints_Spinner_LabelDistributor_MaxLabels_Tooltip;
+   public static String        Slideout_MapPoints_Spinner_LabelDistributor_Radius_Tooltip;
+   public static String        Slideout_MapPoints_Tab_All;
+   public static String        Slideout_MapPoints_Tab_All_Tooltip;
+   public static String        Slideout_MapPoints_Tab_CommonLocations_Tooltip;
+   public static String        Slideout_MapPoints_Tab_Options;
+   public static String        Slideout_MapPoints_Tab_Options_Tooltip;
+   public static String        Slideout_MapPoints_Tab_TourLocations_Tooltip;
+   public static String        Slideout_MapPoints_Tab_TourMarkerGroups_Tooltip;
+   public static String        Slideout_MapPoints_Tab_TourMarkers_Tooltip;
+   public static String        Slideout_MapPoints_Tab_TourPauses_Tooltip;
 
    public static String        Slideout_MapModel_Column_Name;
    public static String        Slideout_MapModel_Dialog_DeleteModel_Message;
@@ -2454,8 +2499,11 @@ public class Messages extends NLS {
    public static String        Slideout_TMVOptions_Radio_RecordedTime;
 
    public static String        Slideout_TourBlogOptions_Checkbox_ShowTourMarkers;
+   public static String        Slideout_TourBlogOptions_Checkbox_ShowTourNutrition;
+   public static String        Slideout_TourBlogOptions_Checkbox_ShowTourSummary;
    public static String        Slideout_TourBlogOptions_Checkbox_ShowTourTags;
    public static String        Slideout_TourBlogOptions_Checkbox_ShowTourTags_Tooltip;
+   public static String        Slideout_TourBlogOptions_Checkbox_ShowTourWeather;
    public static String        Slideout_TourBlogOptions_Label_Title;
 
    public static String        Slideout_TourBookOptions_Checkbox_ShowTotalRow;
@@ -2834,11 +2882,12 @@ public class Messages extends NLS {
    public static String        Tour_Action_ComputeCadenceZonesTimes;
    public static String        Tour_Action_ComputeCadenceZonesTimes_Message;
    public static String        Tour_Action_ComputeCadenceZonesTimes_Title;
+   public static String        Tour_Action_ComputeTourBreakTimes;
+   public static String        Tour_Action_ComputeTourBreakTimes_Tooltip;
    public static String        Tour_Action_DuplicateTour;
    public static String        Tour_Action_EditChartPreferences;
    public static String        Tour_Action_EditSmoothingPreferences;
    public static String        Tour_Action_EditStatisticPreferences;
-
    public static String        Tour_Action_GeoCompare;
    public static String        Tour_Action_GeoCompare_Tooltip;
    public static String        Tour_Action_Graph_PaceInterval_Tooltip;
@@ -2859,7 +2908,6 @@ public class Messages extends NLS {
    public static String        Tour_Action_graph_speed_tooltip;
    public static String        Tour_Action_graph_temperature_tooltip;
    public static String        Tour_Action_graph_tour_compare_tooltip;
-
    public static String        Tour_Action_MapMarkerOptions_Tooltip;
    public static String        Tour_Action_MarkerOptions_Tooltip;
    public static String        Tour_Action_Marker_Delete;
@@ -2888,6 +2936,7 @@ public class Messages extends NLS {
    public static String        Tour_Action_SetMinMaxTemperature_Message;
    public static String        Tour_Action_SetMinMaxTemperature_Title;
    public static String        Tour_Action_SetTimeZone;
+   public static String        Tour_Action_SetTourPauseTimes;
    public static String        Tour_Action_SetWeatherConditions;
    public static String        Tour_Action_ShowBreaktimeValues;
    public static String        Tour_Action_ShowDistanceOnXAxis_Tooltip;
@@ -2895,7 +2944,6 @@ public class Messages extends NLS {
    public static String        Tour_Action_ShowTourPauses;
    public static String        Tour_Action_ShowTourPauses_Tooltip;
    public static String        Tour_Action_ShowValuePointValue;
-
    public static String        tour_action_show_srtm_data;
    public static String        Tour_Action_show_start_time_on_x_axis;
    public static String        Tour_Action_Swim_Strokes_Tooltip;
@@ -2996,6 +3044,8 @@ public class Messages extends NLS {
    public static String        Tour_Data_RetrievingWeatherData_Monitor_Subtask;
    public static String        Tour_Data_SaveTour_Monitor;
    public static String        Tour_Data_SaveTour_MonitorSubtask;
+   public static String        Tour_Data_Task_UpdateTours;
+   public static String        Tour_Data_Task_UpdateTours_Subtask;
    public static String        Tour_Data_Text_AltitudeValues;
    public static String        Tour_Data_Text_BatteryValues;
    public static String        Tour_Data_Text_CadenceValues;

@@ -33,6 +33,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -66,6 +68,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPhoto;
+import net.tourbook.database.ITourDataUpdate;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.RawDataManager;
@@ -298,15 +301,15 @@ public class TourManager {
    private static long                     _allLoaded_TourData_Key;
    private static int                      _allLoaded_TourIds_Hash;
    //
+   private static CountDownLatch           _loadingTour_CountDownLatch;
    private static ThreadPoolExecutor       _loadingTour_Executor;
    private static ArrayBlockingQueue<Long> _loadingTour_Queue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
-   private static CountDownLatch           _loadingTour_CountDownLatch;
    //
    static {
 
       final ThreadFactory loadingThreadFactory = runnable -> {
 
-         final Thread thread = new Thread(runnable, "Loading tours from DB");//$NON-NLS-1$
+         final Thread thread = new Thread(runnable, "TourManager : Loading tours from DB");//$NON-NLS-1$
 
          thread.setPriority(Thread.MIN_PRIORITY);
          thread.setDaemon(true);
@@ -315,6 +318,25 @@ public class TourManager {
       };
 
       _loadingTour_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, loadingThreadFactory);
+   }
+   //
+   private static CountDownLatch           _tourUpdate_CountDownLatch;
+   private static ThreadPoolExecutor       _tourUpdate_Executor;
+   private static ArrayBlockingQueue<Long> _tourUpdate_Queue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   //
+   static {
+
+      final ThreadFactory updateThreadFactory = runnable -> {
+
+         final Thread thread = new Thread(runnable, "TourManager : Updating tours");//$NON-NLS-1$
+
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
+
+         return thread;
+      };
+
+      _tourUpdate_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, updateThreadFactory);
    }
    //
    private ComputeChartValue   _computeAvg_Altimeter;
@@ -516,11 +538,12 @@ public class TourManager {
 
       final long tourId1 = tourData1.getTourId().longValue();
       final long tourId2 = tourData2.getTourId().longValue();
-      final String message = NLS.bind(Messages.TourManager_Dialog_OutOfSyncError_Message,
-            tourData2.toStringWithHash(),
-            tourData1.toStringWithHash());
 
       if (tourId1 == tourId2 && tourData1 != tourData2) {
+
+         final String message = NLS.bind(Messages.TourManager_Dialog_OutOfSyncError_Message,
+               tourData2.toStringWithHash(),
+               tourData1.toStringWithHash());
 
          MessageDialog.openError(Display.getDefault().getActiveShell(),
                Messages.TourManager_Dialog_OutOfSyncError_Title,
@@ -1711,6 +1734,32 @@ public class TourManager {
       return _tourDataEditorInstance;
    }
 
+   private static TourData getTourDataEditorTour(final List<TourData> allToursAsList) {
+
+      final TourData defaultTourData = allToursAsList.get(0);
+
+      if (_tourDataEditorInstance == null) {
+         return defaultTourData;
+      }
+
+      final TourData tourDataInEditor = _tourDataEditorInstance.getTourData();
+
+      if (tourDataInEditor == null) {
+         return defaultTourData;
+      }
+
+      final Long tourIDInEditor = tourDataInEditor.getTourId();
+
+      for (final TourData tourData : allToursAsList) {
+
+         if (tourIDInEditor.equals(tourData.getTourId())) {
+            return tourData;
+         }
+      }
+
+      return defaultTourData;
+   }
+
    public static String getTourDateFull(final TourData tourData) {
 
       return tourData.getTourStartTime().format(TimeTools.Formatter_Date_F);
@@ -2827,19 +2876,11 @@ public class TourManager {
       TourLogManager.showLogView(AutoOpenEvent.DOWNLOAD_SOMETHING);
       TourLogManager.subLog_INFO(NLS.bind(LOG_RETRIEVE_WEATHER_DATA_001_START, weatherProvider));
 
-      final int numTours = allTourData.size();
-
       final String weatherRetrievalFailureLogMessage = TourWeatherRetriever.getWeatherRetrievalFailureLogMessage(weatherProvider);
+
       if (!TourWeatherRetriever.canRetrieveWeather(weatherProvider)) {
 
          TourLogManager.log_ERROR(weatherRetrievalFailureLogMessage);
-
-      } else if (numTours < 2) {
-
-         BusyIndicator.showWhile(Display.getCurrent(), () -> {
-
-            retrieveWeatherData_OneTour(allTourData.get(0), allModifiedTours, weatherProvider);
-         });
 
       } else {
 
@@ -2848,7 +2889,8 @@ public class TourManager {
             @Override
             public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-               int monitorCounter = 0;
+               final int numTours = allTourData.size();
+               int numRetrieved = 0;
 
                monitor.beginTask(Messages.Tour_Data_RetrievingWeatherData_Monitor, numTours);
 
@@ -2857,7 +2899,7 @@ public class TourManager {
 
                   monitor.subTask(NLS.bind(
                         Messages.Tour_Data_RetrievingWeatherData_Monitor_Subtask,
-                        ++monitorCounter,
+                        numRetrieved,
                         numTours));
 
                   if (monitor.isCanceled()) {
@@ -2869,9 +2911,10 @@ public class TourManager {
                      break;
                   }
 
-                  monitor.worked(1);
-
                   retrieveWeatherData_OneTour(tourData, allModifiedTours, weatherProvider);
+
+                  numRetrieved++;
+                  monitor.worked(1);
                }
             }
          };
@@ -3552,6 +3595,182 @@ public class TourManager {
             tourData.removePhotos(tourPhotos);
          }
       }
+   }
+
+   /**
+    * Update tours concurrently
+    *
+    * @param allTourIds
+    * @param tourDataUpdater
+    */
+   public static void updateTourData_Concurrent(final Set<Long> allTourIds,
+                                                final ITourDataUpdate tourDataUpdater) {
+
+      final int numAllTourIds = allTourIds.size();
+
+      final ConcurrentSkipListSet<Long> _allSavedTourIds = new ConcurrentSkipListSet<>();
+      final CopyOnWriteArrayList<TourData> _allSavedTours = new CopyOnWriteArrayList<>();
+
+      final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+
+         @Override
+         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+            /*
+             * Setup concurrency
+             */
+            _tourUpdate_CountDownLatch = new CountDownLatch(numAllTourIds);
+            _tourUpdate_Queue.clear();
+
+            int monitorCounter = 0;
+            long lastUIUpdateTime = 0;
+
+            monitor.beginTask(Messages.Tour_Data_Task_UpdateTours, numAllTourIds);
+
+            // loop: all tours
+            for (final Long tourId : allTourIds) {
+
+               // reduce monitor updates
+               final long currentTime = System.currentTimeMillis();
+               if (currentTime > lastUIUpdateTime + 200) {
+
+                  lastUIUpdateTime = currentTime;
+
+                  monitor.subTask(Messages.Tour_Data_Task_UpdateTours_Subtask.formatted(
+                        monitorCounter,
+                        numAllTourIds));
+               }
+
+               if (monitor.isCanceled()) {
+
+                  /*
+                   * Count down all, that the loading task can finish but process loaded tours
+                   */
+                  long numCounts = _tourUpdate_CountDownLatch.getCount();
+                  while (numCounts-- > 0) {
+                     _tourUpdate_CountDownLatch.countDown();
+                  }
+
+                  break;
+               }
+
+               updateTourData_Concurrent_OneTour(tourId, tourDataUpdater, _allSavedTours, _allSavedTourIds, monitor);
+
+               ++monitorCounter;
+            }
+
+            // wait until all loadings are performed
+            _tourUpdate_CountDownLatch.await();
+
+            /*
+             * All tours are now updated
+             */
+
+            final int numSavedTours = _allSavedTours.size();
+
+            if (numSavedTours > 0) {
+
+               final List<Long> allIDsAsList = _allSavedTourIds.stream().toList();
+               TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(allIDsAsList);
+
+               final TourData[] allTourDataAsArray = _allSavedTours.toArray(new TourData[numSavedTours]);
+               final ArrayList<TourData> allTourDataAsList = new ArrayList<>(Arrays.asList(allTourDataAsArray));
+
+               final TourEvent tourEvent = new TourEvent(allTourDataAsList);
+
+               // set tour data into the editor that the editor do not get modified
+               tourEvent.tourDataEditorSavedTour = getTourDataEditorTour(allTourDataAsList);
+
+               PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+
+                  // this must be fired in the UI thread
+                  TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent);
+               });
+            }
+         }
+
+      };
+
+      try {
+
+         new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, runnable);
+
+      } catch (InvocationTargetException | InterruptedException e) {
+
+         TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         Thread.currentThread().interrupt();
+      }
+   }
+
+   /**
+    * Do data updates concurrently with all available processor threads, this is reducing time
+    * significantly.
+    *
+    * @param tourDataUpdater
+    *           {@link ITourDataUpdate} interface to update a tour
+    * @param tourId
+    *           Tour ID of the tour to be updated
+    * @param allSavedTours
+    * @param allSavedTourIds
+    * @param monitor
+    *
+    * @return
+    */
+   private static void updateTourData_Concurrent_OneTour(final long tourId,
+                                                         final ITourDataUpdate tourDataUpdater,
+                                                         final List<TourData> allSavedTours,
+                                                         final ConcurrentSkipListSet<Long> allSavedTourIds,
+                                                         final IProgressMonitor monitor) {
+
+      try {
+
+         // put tour ID (queue item) into the queue AND wait when it is full
+
+         _tourUpdate_Queue.put(tourId);
+
+      } catch (final InterruptedException e) {
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _tourUpdate_Executor.submit(() -> {
+
+         try {
+
+            // get last added item
+            final Long queueItem_TourId = _tourUpdate_Queue.poll();
+
+            if (queueItem_TourId == null) {
+               return;
+            }
+
+            final TourData tourData = getTour(queueItem_TourId);
+
+            if (tourData == null) {
+               return;
+            }
+
+            final boolean isTourUpdated = tourDataUpdater.updateTourData(tourData);
+
+            if (isTourUpdated) {
+
+               final TourData savedTour = TourDatabase.saveTour_Concurrent(tourData, true);
+
+               if (savedTour != null) {
+
+                  allSavedTours.add(savedTour);
+                  allSavedTourIds.add(savedTour.getTourId());
+               }
+            }
+
+         } finally {
+
+            monitor.worked(1);
+
+            _tourUpdate_CountDownLatch.countDown();
+         }
+      });
    }
 
    public void addTourEventListener(final ITourEventListener listener) {

@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
-   private final WaitTimer        _waitTimer = new WaitTimer();
+   private final WaitTimer        _waitTimer        = new WaitTimer();
 
    private boolean                _isWaitTimerStarted;
    private boolean                _canOpenToolTip;
@@ -60,19 +60,21 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
    private ActionSlideoutKeepOpen _actionKeepSlideoutOpen;
    private ActionPinSlideout      _actionPinSlideout;
 
-   private String                 _titleText = UI.EMPTY_STRING;
+   private String                 _titleText        = UI.EMPTY_STRING;
+
+   private SlideoutLocation       _slideoutLocation = SlideoutLocation.BELOW_CENTER;
 
    /*
     * UI controls
     */
-   private ToolBar          _toolbarSlideoutActions;
+   private Composite _titleContainer;
 
-   private Label            _labelDragSlideout;
+   private Label     _labelDragSlideout;
 
-   private Cursor           _cursorResize;
-   private Cursor           _cursorHand;
+   private Cursor    _cursorResize;
+   private Cursor    _cursorHand;
 
-   private SlideoutLocation _slideoutLocation = SlideoutLocation.BELOW_CENTER;
+   private ToolBar   _toolbarSlideoutActions;
 
    private class ActionCloseSlideout extends Action {
 
@@ -207,15 +209,17 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       return container;
    }
 
+   /**
+    * Overwrite this to create custom title bar controls
+    *
+    * @param parent
+    */
    protected void createTitleBarControls(final Composite parent) {
 
       // create default content
       final Label label = new Label(parent, SWT.NONE);
       label.setText(UI.EMPTY_STRING);
-      GridDataFactory
-            .fillDefaults()//
-            //				.grab(true, false)
-            .applyTo(label);
+      GridDataFactory.fillDefaults().applyTo(label);
    }
 
    private Composite createUI(final Composite parent) {
@@ -224,7 +228,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       GridLayoutFactory.swtDefaults()
             .spacing(0, 0)
             .applyTo(shellContainer);
-//		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+//      shellContainer.setBackground(UI.SYS_COLOR_GREEN);
       {
          createUI_10_ActionBar(shellContainer);
          createSlideoutContent(shellContainer);
@@ -237,18 +241,18 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
    private void createUI_10_ActionBar(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      _titleContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(_titleContainer);
       GridLayoutFactory.fillDefaults()
             .numColumns(3)
             .extendedMargins(0, 0, 0, 5)
             .spacing(0, 0)
-            .applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+            .applyTo(_titleContainer);
+//      _titleContainer.setBackground(UI.SYS_COLOR_YELLOW);
       {
-         createUI_12_Header_Draggable(container);
-         createTitleBarControls(container);
-         createUI_14_Header_Toolbar(container);
+         createUI_12_Header_Draggable(_titleContainer);
+         createTitleBarControls(_titleContainer);
+         createUI_14_Header_Toolbar(_titleContainer);
       }
    }
 
@@ -303,9 +307,8 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
    private void createUI_14_Header_Toolbar(final Composite container) {
 
       _toolbarSlideoutActions = new ToolBar(container, SWT.FLAT);
-      GridDataFactory
-            .fillDefaults()//
-            .indent(10, 0)
+      GridDataFactory.fillDefaults()
+            .indent(0, 0)
             .applyTo(_toolbarSlideoutActions);
    }
 
@@ -341,6 +344,10 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
    protected SlideoutLocation getSlideoutLocation() {
 
       return _slideoutLocation;
+   }
+
+   public Composite getTitleContainer() {
+      return _titleContainer;
    }
 
    @Override

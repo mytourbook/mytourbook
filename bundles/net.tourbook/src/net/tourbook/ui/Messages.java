@@ -785,8 +785,6 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_NoGeoTour;
    public static String        Tour_Tooltip_Label_NoTour;
    public static String        Tour_Tooltip_Label_ElapsedTime;
-   public static String        Tour_Tooltip_Label_LocationEnd;
-   public static String        Tour_Tooltip_Label_LocationStart;
    public static String        Tour_Tooltip_Label_PausedTime;
    public static String        Tour_Tooltip_Label_RecordedTime;
    public static String        Tour_Tooltip_Label_RestPulse;
@@ -809,6 +807,9 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_Temperature;
    public static String        Tour_Tooltip_Label_TimeZone;
    public static String        Tour_Tooltip_Label_TimeZoneDifference;
+   public static String        Tour_Tooltip_Label_TourLocation_End;
+   public static String        Tour_Tooltip_Label_TourLocation_Start;
+   public static String        Tour_Tooltip_Label_TourLocation_StartEnd;
    public static String        Tour_Tooltip_Label_TourType;
    public static String        Tour_Tooltip_Label_Weather;
    public static String        Tour_Tooltip_Label_WindDirection;

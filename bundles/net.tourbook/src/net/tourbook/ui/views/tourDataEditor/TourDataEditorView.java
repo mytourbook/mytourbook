@@ -6282,16 +6282,20 @@ public class TourDataEditorView extends ViewPart implements
                final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 
                // get break time state from the next slice, a break is between the current and the previous slice
+
                final int numSlices = _serieBreakTime.length;
                int serieIndex = timeSlice.serieIndex;
-               serieIndex = serieIndex < numSlices - 2
+
+               serieIndex = serieIndex < numSlices - 1
                      ? serieIndex + 1
                      : serieIndex;
 
                cell.setText(_serieBreakTime[serieIndex]
                      ? UI.SYMBOL_BOX
                      : UI.EMPTY_STRING);
+
             } else {
+
                cell.setText(UI.EMPTY_STRING);
             }
          }
@@ -8961,19 +8965,22 @@ public class TourDataEditorView extends ViewPart implements
          return;
       }
 
-      final int valueIndex_Before = sliderPosition.getBeforeLeftSliderIndex();
+      final int beforeLeftSliderIndex = sliderPosition.getBeforeLeftSliderIndex();
+      final int leftSliderValueIndex = sliderPosition.getLeftSliderValueIndex();
+      final int rightSliderValueIndex = sliderPosition.getRightSliderValueIndex();
+
       int valueIndex_Start;
       int valueIndex_End;
 
-      if (valueIndex_Before != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+      if (beforeLeftSliderIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
 
-         valueIndex_Start = valueIndex_Before;
-         valueIndex_End = sliderPosition.getLeftSliderValueIndex();
+         valueIndex_Start = beforeLeftSliderIndex;
+         valueIndex_End = leftSliderValueIndex;
 
       } else {
 
-         valueIndex_Start = sliderPosition.getLeftSliderValueIndex();
-         valueIndex_End = sliderPosition.getRightSliderValueIndex();
+         valueIndex_Start = leftSliderValueIndex;
+         valueIndex_End = rightSliderValueIndex - 1;
       }
 
       selectTimeSlice_InViewer(valueIndex_Start, valueIndex_End);
@@ -9142,7 +9149,7 @@ public class TourDataEditorView extends ViewPart implements
 
       _postSelectionProvider.clearSelection();
 
-      updateUI_FromModel(tourDataForEditor, false, true);
+      updateUI_FromModel(tourDataForEditor, true, true);
    }
 
    /**
@@ -10086,7 +10093,9 @@ public class TourDataEditorView extends ViewPart implements
          _timeSlice_ViewerTourId = -1L;
       }
 
-      if ((_tabFolder.getSelection() == _tab_20_TimeSlices) && (_timeSlice_ViewerTourId != _tourData.getTourId())) {
+      final CTabItem selectedTab = _tabFolder.getSelection();
+
+      if ((selectedTab == _tab_20_TimeSlices) && (_timeSlice_ViewerTourId != _tourData.getTourId())) {
 
          /*
           * Time slice tab is selected and the viewer is not yet loaded
