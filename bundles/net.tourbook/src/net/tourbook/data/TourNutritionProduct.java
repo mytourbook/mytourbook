@@ -77,6 +77,18 @@ public class TourNutritionProduct {
    private int                        calories;
 
    /**
+    * Carbohydrates per product.
+    * Unit: g
+    */
+   private int                        carbohydrates;
+
+   /**
+    * Carbohydrates per serving.
+    * Unit: g
+    */
+   private int                        carbohydrates_Serving;
+
+   /**
     * Sodium amount per product.
     * Unit: mg
     */
@@ -258,6 +270,14 @@ public class TourNutritionProduct {
       return calories_Serving;
    }
 
+   public int getCarbohydrates() {
+      return carbohydrates;
+   }
+
+   public int getCarbohydrates_Serving() {
+      return carbohydrates_Serving;
+   }
+
    public float getConsumedQuantity() {
       return consumedQuantity;
    }
@@ -338,6 +358,10 @@ public class TourNutritionProduct {
 
    public void setCalories_Serving(final int calories_Serving) {
       this.calories_Serving = calories_Serving;
+   }
+
+   public void setCarbohydrates(final int carbohydrates) {
+      this.carbohydrates = carbohydrates;
    }
 
    public void setConsumedQuantity(final float consumedQuantity) {

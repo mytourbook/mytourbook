@@ -124,6 +124,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private static final String           COLUMN_QUANTITY_TYPE           = "QuantityType";                                      //$NON-NLS-1$
    private static final String           COLUMN_NAME                    = "Name";                                              //$NON-NLS-1$
    private static final String           COLUMN_CALORIES                = "Calories";                                          //$NON-NLS-1$
+   private static final String           COLUMN_CARBOHYDRATES           = "Carbohydrates";                                     //$NON-NLS-1$
    private static final String           COLUMN_SODIUM                  = "Sodium";                                            //$NON-NLS-1$
    private static final String           COLUMN_ISBEVERAGE              = "IsBeverage";                                        //$NON-NLS-1$
    private static final String           COLUMN_BEVERAGE_QUANTITY       = "BeverageQuantity";                                  //$NON-NLS-1$
@@ -154,6 +155,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private TableColumnDefinition          _colDef_QuantityType;
    private TableColumnDefinition          _colDef_Name;
    private TableColumnDefinition          _colDef_Calories;
+   private TableColumnDefinition          _colDef_Carbohydrates;
    private TableColumnDefinition          _colDef_Sodium;
    private TableColumnDefinition          _colDef_IsBeverage;
    /**
@@ -966,6 +968,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       defineColumn_20_QuantityType();
       defineColumn_30_Name();
       defineColumn_40_Calories();
+      defineColumn_41_Carbohydrates();
       defineColumn_50_Sodium();
       defineColumn_60_IsBeverage();
       defineColumn_70_BeverageQuantity();
@@ -1071,6 +1074,36 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             final String text = caloriesValue == 0
                   ? UI.EMPTY_STRING
                   : String.valueOf(caloriesValue);
+            cell.setText(text);
+         }
+      });
+   }
+
+   private void defineColumn_41_Carbohydrates() {
+
+      _colDef_Carbohydrates = new TableColumnDefinition(_columnManager, COLUMN_CARBOHYDRATES, SWT.TRAIL);
+
+      _colDef_Carbohydrates.setColumnLabel(Messages.Tour_Nutrition_Label_Carbohydrates);
+      _colDef_Carbohydrates.setColumnHeaderText(Messages.Tour_Nutrition_Label_Carbohydrates);
+      _colDef_Carbohydrates.setColumnHeaderToolTipText(Messages.Tour_Nutrition_Label_Carbohydrates_Tooltip);
+
+      _colDef_Carbohydrates.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
+
+      _colDef_Carbohydrates.setIsDefaultColumn();
+
+      _colDef_Carbohydrates.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) cell.getElement();
+
+            final int carbohydratesValue = tourNutritionProduct.getQuantityType() == QuantityType.Products
+                  ? tourNutritionProduct.getCarbohydrates()
+                  : tourNutritionProduct.getCarbohydrates_Serving();
+
+            final String text = carbohydratesValue == 0
+                  ? UI.EMPTY_STRING
+                  : String.valueOf(carbohydratesValue);
             cell.setText(text);
          }
       });
