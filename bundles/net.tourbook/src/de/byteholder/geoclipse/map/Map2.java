@@ -1339,7 +1339,8 @@ public class Map2 extends Canvas {
       final int textHeight = fontMetrics.getHeight();
 
       // without margin the labels are too close
-      final int margin2 = 2 * _labelRespectMargin;
+      final int margin = _labelRespectMargin;
+      final int margin2x = margin * 2;
 
       for (final Map2Point mapPoint : allMapPoints) {
 
@@ -1355,11 +1356,11 @@ public class Map2 extends Canvas {
                null,
                -1,
 
-               devX - _labelRespectMargin,
-               devY - _labelRespectMargin,
+               devX - margin,
+               devY - margin,
 
-               textWidth + margin2,
-               textHeight + margin2);
+               textWidth + margin2x,
+               textHeight + margin2x);
 
          pointFeature.data = mapPoint;
 
@@ -1371,9 +1372,9 @@ public class Map2 extends Canvas {
                                           final Map2Point[] allMapPoints,
                                           final List<PointFeature> allCreatedItems) {
 
-      // without margin the images are too close
-      final int margin = 3;
-      final int margin2 = margin * 2;
+      // without a margin the images are too close
+      final int margin = _labelRespectMargin;
+      final int margin2x = margin * 2;
 
       for (final Map2Point mapPoint : allMapPoints) {
 
@@ -1391,8 +1392,8 @@ public class Map2 extends Canvas {
                devX - margin,
                devY - margin,
 
-               mapImageSize.x + margin2,
-               mapImageSize.y + margin2);
+               mapImageSize.x + margin2x,
+               mapImageSize.y + margin2x);
 
          pointFeature.data = mapPoint;
 
@@ -6787,6 +6788,7 @@ public class Map2 extends Canvas {
          _locationBoundingBoxColors.clear();
       }
 
+      _labelRespectMargin = _mapConfig.labelRespectMargin;
       _mapPointSymbolSize = _mapConfig.locationSymbolSize;
       _mapPointSymbolRespectSize = _mapPointSymbolSize + 2;
 

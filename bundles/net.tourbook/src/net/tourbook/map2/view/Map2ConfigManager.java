@@ -88,6 +88,7 @@ public class Map2ConfigManager {
    private static final String ATTR_LABEL_DISTRIBUTOR_RADIUS         = "labelDistributorRadius";              //$NON-NLS-1$
    private static final String ATTR_LABEL_FONT_NAME                  = "labelFontName";                       //$NON-NLS-1$
    private static final String ATTR_LABEL_FONT_SIZE                  = "labelFontSize";                       //$NON-NLS-1$
+   private static final String ATTR_LABEL_RESPECT_MARGIN             = "labelRespectMargin";                        //$NON-NLS-1$
    private static final String ATTR_LABEL_TRUNCATE_LENGTH            = "labelTruncateLength";                 //$NON-NLS-1$
    // tour + common location
    private static final String ATTR_IS_SHOW_COMMON_LOCATION          = "isShowCommonLocation";                //$NON-NLS-1$
@@ -158,6 +159,9 @@ public class Map2ConfigManager {
    static final int                            LABEL_FONT_SIZE_MIN                     = 2;
    static final int                            LABEL_FONT_SIZE_MAX                     = 100;
    static final int                            LABEL_FONT_SIZE_DEFAULT                 = 12;
+   static final int                            LABEL_RESPECT_MARGIN_MIN                = 0;
+   static final int                            LABEL_RESPECT_MARGIN_MAX                = 100;
+   static final int                            LABEL_RESPECT_MARGIN_DEFAULT            = 2;
    static final int                            LABEL_TRUNCATE_LENGTH_MIN               = 0;
    static final int                            LABEL_TRUNCATE_LENGTH_MAX               = 1000;
    static final int                            LABEL_TRUNCATE_LENGTH_DEFAULT           = 40;
@@ -328,6 +332,7 @@ public class Map2ConfigManager {
          xmlConfig.putInteger(      ATTR_LABEL_DISTRIBUTOR_RADIUS,      config.labelDistributorRadius);
          xmlConfig.putString(       ATTR_LABEL_FONT_NAME,               config.labelFontName);
          xmlConfig.putInteger(      ATTR_LABEL_FONT_SIZE,               config.labelFontSize);
+         xmlConfig.putInteger(      ATTR_LABEL_RESPECT_MARGIN,          config.labelRespectMargin);
          xmlConfig.putInteger(      ATTR_LABEL_TRUNCATE_LENGTH,         config.labelTruncateLength);
 
          Util.setXmlEnum(xmlConfig, ATTR_LABEL_LAYOUT,                  config.labelLayout);
@@ -518,6 +523,7 @@ public class Map2ConfigManager {
       config.labelDistributorRadius       = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_DISTRIBUTOR_RADIUS,      LABEL_DISTRIBUTOR_RADIUS_DEFAULT,      LABEL_DISTRIBUTOR_RADIUS_MIN,       LABEL_DISTRIBUTOR_RADIUS_MAX);
       config.labelFontName                = Util.getXmlString( xmlConfig,     ATTR_LABEL_FONT_NAME,               LABEL_FONT_NAME_DEFAULT);
       config.labelFontSize                = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_FONT_SIZE,               LABEL_FONT_SIZE_DEFAULT,               LABEL_FONT_SIZE_MIN,                LABEL_FONT_SIZE_MAX);
+      config.labelRespectMargin           = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_RESPECT_MARGIN,          LABEL_RESPECT_MARGIN_DEFAULT,          LABEL_RESPECT_MARGIN_MIN,           LABEL_RESPECT_MARGIN_MAX);
       config.labelTruncateLength          = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_TRUNCATE_LENGTH,         LABEL_TRUNCATE_LENGTH_DEFAULT,         LABEL_TRUNCATE_LENGTH_MIN,          LABEL_TRUNCATE_LENGTH_MAX);
       config.labelLayout = (MapLabelLayout) Util.getXmlEnum(   xmlConfig,     ATTR_LABEL_LAYOUT,                  LABEL_LAYOUT_DEFAULT);
 
