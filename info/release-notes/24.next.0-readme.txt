@@ -55,7 +55,10 @@ New
 Improvements
 ============
 
-* 
+* Tour Nutrition (Frederic):
+  - Added the support for the carbohydrates
+  - Added a button to refresh/redownload the nutrition facts of a given product(s)
+  - Added the ability to select a product from a list of the most recent products used
 
 Changes
 =======
