@@ -29,7 +29,6 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.widgets.ImageCanvas;
 import net.tourbook.photo.ILoadCallBack;
-import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
@@ -42,10 +41,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.resource.ColorRegistry;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -60,9 +56,11 @@ import org.eclipse.ui.part.PageBook;
  */
 public class MapPointToolTip_Photo extends AdvancedSlideout {
 
-   private static final IDialogSettings _state                = TourbookPlugin.getState("net.tourbook.map2.view.MapPointToolTip_Photo"); //$NON-NLS-1$
+   private static final String          ID                 = "net.tourbook.map2.view.MapPointToolTip_Photo"; //$NON-NLS-1$
 
-   private static final int             DEFAULT_TEXT_WIDTH    = 50;
+   private static final int             DEFAULT_TEXT_WIDTH = 50;
+
+   private final static IDialogSettings _state             = TourbookPlugin.getState(ID);
 
    private Map2                         _map2;
 
@@ -70,11 +68,11 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
    private PaintedMapPoint              _previousHoveredMapPoint;
    private Photo                        _photo;
 
-   private final ColorRegistry          _colorRegistry        = JFaceResources.getColorRegistry();
-   private final Color                  _photoForegroundColor = _colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
-   private final Color                  _photoBackgroundColor = _colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+//   private final ColorRegistry          _colorRegistry        = JFaceResources.getColorRegistry();
+//   private final Color                  _photoForegroundColor = _colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
+//   private final Color                  _photoBackgroundColor = _colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 
-   private final NumberFormat           _nfMByte              = NumberFormat.getNumberInstance();
+   private final NumberFormat _nfMByte = NumberFormat.getNumberInstance();
    {
       _nfMByte.setMinimumFractionDigits(3);
       _nfMByte.setMaximumFractionDigits(3);
@@ -87,12 +85,12 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
    /*
     * UI controls
     */
-   private PageBook         _pageBook;
+   private PageBook  _pageBook;
 
-   private Composite        _pageNoPhoto;
-   private Composite        _pagePhoto;
+   private Composite _pageNoPhoto;
+   private Composite _pagePhoto;
 
-   private Label            _labelError;
+//   private Label            _labelError;
    private Label            _labelMessage;
 
    private PhotoImageCanvas _photoImageCanvas;
@@ -651,6 +649,13 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
    }
 
    public void setupPhoto(final PaintedMapPoint hoveredMapPoint) {
+
+      if (TourPainterConfiguration.isShowPhotoTooltip == false) {
+
+         // photo tooltip is not displayed
+
+         return;
+      }
 
       final boolean isVisible = isVisible();
 

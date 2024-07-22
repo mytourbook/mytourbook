@@ -229,7 +229,7 @@ public class Map2 extends Canvas {
    private static final String          DIRECTION_N                                    = "N";                             //$NON-NLS-1$
 
    private static final int             TEXT_MARGIN                                    = 6;
-   public static final int              MAP_MARKER_BORDER_WIDTH                        = UI.IS_4K_DISPLAY ? 4 : 2;
+   public static final int              MAP_POINT_BORDER                               = UI.IS_4K_DISPLAY ? 4 : 2;
 
    private static final String          GEO_GRID_ACTION_UPDATE_GEO_LOCATION_ZOOM_LEVEL = "\uE003";                        //$NON-NLS-1$
 
@@ -314,7 +314,7 @@ public class Map2 extends Canvas {
    private static RGB                    _mapTransparentRGB;
    private static Color                  _mapTransparentColor;
 
-   private IDialogSettings               _state;
+   private IDialogSettings               _state_Map2;
 
    private Font                          _boldFontSWT               = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
    private Font                          _labelFontSWT;
@@ -827,7 +827,7 @@ public class Map2 extends Canvas {
 
       super(parent, style | SWT.DOUBLE_BUFFERED);
 
-      _state = state;
+      _state_Map2 = state;
 
       _display = getDisplay();
       _displayThread = _display.getThread();
@@ -1372,7 +1372,8 @@ public class Map2 extends Canvas {
                                           final List<PointFeature> allCreatedItems) {
 
       // without margin the images are too close
-      final int margin2 = 2 * _labelRespectMargin;
+      final int margin = 3;
+      final int margin2 = margin * 2;
 
       for (final Map2Point mapPoint : allMapPoints) {
 
@@ -1387,8 +1388,8 @@ public class Map2 extends Canvas {
                null,
                -1,
 
-               devX - _labelRespectMargin,
-               devY - _labelRespectMargin,
+               devX - margin,
+               devY - margin,
 
                mapImageSize.x + margin2,
                mapImageSize.y + margin2);
@@ -5336,7 +5337,7 @@ public class Map2 extends Canvas {
          {
             paint_30_Tiles(gcMapImage);
 
-            if (_isShowMapPoints) {
+            if (_isShowMapPoints || TourPainterConfiguration.isShowPhotos) {
                paint_40_MapPoints(gcMapImage);
             }
 
@@ -7928,9 +7929,9 @@ public class Map2 extends Canvas {
             g2d.fillRect(markerLabelRectangle.x, markerLabelRectangle.y, markerLabelRectangle.width, markerLabelRectangle.height);
 
             g2d.fillRect(
-                  markerLabelRectangle.x - MAP_MARKER_BORDER_WIDTH,
+                  markerLabelRectangle.x - MAP_POINT_BORDER,
                   markerLabelRectangle.y,
-                  markerLabelRectangle.width + 2 * MAP_MARKER_BORDER_WIDTH,
+                  markerLabelRectangle.width + 2 * MAP_POINT_BORDER,
                   markerLabelRectangle.height);
 
             g2d.setColor(_mapConfig.tourMarkerOutline_ColorAWT);
@@ -8175,9 +8176,9 @@ public class Map2 extends Canvas {
          g2d.setColor(fillColor);
 
          g2d.fillRect(
-               labelRectangle.x - MAP_MARKER_BORDER_WIDTH,
+               labelRectangle.x - MAP_POINT_BORDER,
                labelRectangle.y,
-               labelRectangle.width + 2 * MAP_MARKER_BORDER_WIDTH,
+               labelRectangle.width + 2 * MAP_POINT_BORDER,
                rectangleHeight);
 
       } else if (markerLabelLayout.equals(MapLabelLayout.SHADOW)) {
@@ -8270,9 +8271,9 @@ public class Map2 extends Canvas {
             g2d.setColor(java.awt.Color.cyan);
 
             g2d.fillRect(
-                  photoRectangle.x - MAP_MARKER_BORDER_WIDTH,
+                  photoRectangle.x - MAP_POINT_BORDER,
                   photoRectangle.y,
-                  photoRectangle.width + 2 * MAP_MARKER_BORDER_WIDTH,
+                  photoRectangle.width + 2 * MAP_POINT_BORDER,
                   photoRectangle.height);
 
          } else {
@@ -8283,21 +8284,21 @@ public class Map2 extends Canvas {
 
             g2d.drawImage(awtPhotoImage,
 
-                  photoRectangle.x - MAP_MARKER_BORDER_WIDTH,
+                  photoRectangle.x - MAP_POINT_BORDER,
                   photoRectangle.y,
-                  photoRectangle.width + 2 * MAP_MARKER_BORDER_WIDTH,
+                  photoRectangle.width + 2 * MAP_POINT_BORDER,
                   photoRectangle.height,
 
                   null);
 
             // draw border
 
-            g2d.setColor(java.awt.Color.GRAY);
-            g2d.drawRect(
-                  photoRectangle.x - MAP_MARKER_BORDER_WIDTH,
-                  photoRectangle.y,
-                  photoRectangle.width + 2 * MAP_MARKER_BORDER_WIDTH,
-                  photoRectangle.height);
+//            g2d.setColor(_mapConfig.photoOutline_ColorAWT);
+//            g2d.drawRect(
+//                  photoRectangle.x - MAP_POINT_BORDER,
+//                  photoRectangle.y,
+//                  photoRectangle.width + 2 * MAP_POINT_BORDER,
+//                  photoRectangle.height);
          }
 
          // keep position
@@ -8313,6 +8314,9 @@ public class Map2 extends Canvas {
 
       g2d.setStroke(new BasicStroke(lineWidth));
 
+      // ensure that ovals are smooth
+      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
       java.awt.Color fillColor;
       java.awt.Color outlineColor;
 
@@ -8325,8 +8329,8 @@ public class Map2 extends Canvas {
 
       } else {
 
-         fillColor = java.awt.Color.GRAY;
-         outlineColor = java.awt.Color.WHITE;
+         fillColor = _mapConfig.photoOutline_ColorAWT;
+         outlineColor = _mapConfig.photoFill_ColorAWT;
       }
 
       int paintedPointIndex = 0;
@@ -8354,10 +8358,14 @@ public class Map2 extends Canvas {
                _mapPointSymbolSize);
 
          g2d.setColor(fillColor);
-         g2d.fillRect(symbolRectangle.x, symbolRectangle.y, symbolRectangle.width, symbolRectangle.height);
+         g2d.fillOval(
+               symbolRectangle.x + 1, // fill a smaller shape that antialiasing do not show a light border !!!
+               symbolRectangle.y + 1,
+               _mapPointSymbolSize - 2,
+               _mapPointSymbolSize - 2);
 
          g2d.setColor(outlineColor);
-         g2d.drawRect(
+         g2d.drawOval(
                symbolRectangle.x + lineWidth2,
                symbolRectangle.y + lineWidth2,
                symbolRectangle.width - lineWidth,
@@ -8367,6 +8375,9 @@ public class Map2 extends Canvas {
          final PaintedMapPoint paintedMarker = allPaintedPhotos.get(paintedPointIndex++);
          paintedMarker.symbolRectangle = symbolRectangle;
       }
+
+      // ensure that rectangels are not smoothed
+      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
    }
 
    private void paint_OfflineArea(final GC gc) {
@@ -10819,9 +10830,9 @@ public class Map2 extends Canvas {
 
    private void setupPainting(final Graphics2D g2d) {
 
-      Object textAntialiasingON = null;
-
-      textAntialiasingON = RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
+//    Object textAntialiasingON = null;
+//
+//    textAntialiasingON = RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
 //    textAntialiasingON = RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT;
 //    textAntialiasingON = RenderingHints.VALUE_TEXT_ANTIALIAS_GASP;
 //    textAntialiasingON = RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HBGR;
@@ -10831,7 +10842,7 @@ public class Map2 extends Canvas {
 
       g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
             _mapConfig.isLabelAntialiased
-                  ? textAntialiasingON
+                  ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                   : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 
 //    final Map<TextAttribute, Object> fontAttributes = new HashMap<>();
@@ -11218,7 +11229,7 @@ public class Map2 extends Canvas {
 
    public void updatePhotoOptions() {
 
-      _isPreloadHQImages = Util.getStateBoolean(_state,
+      _isPreloadHQImages = Util.getStateBoolean(_state_Map2,
             SlideoutMap2_PhotoOptions.STATE_IS_PRELOAD_HQ_IMAGES,
             SlideoutMap2_PhotoOptions.STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT);
 

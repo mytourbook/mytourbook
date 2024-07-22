@@ -157,6 +157,17 @@ public class Map2Config {
 
    public TourFilterFieldOperator tourPauseDurationFilter_Operator;
 
+   /*
+    * Photo
+    */
+   public RGB                            photoFill_RGB    = Map2ConfigManager.DEFAULT_PHOTO_FILL_RGB;
+   public RGB                            photoOutline_RGB = Map2ConfigManager.DEFAULT_PHOTO_OUTLINE_RGB;
+
+   public Color                          photoFill_ColorAWT;
+   public Color                          photoOutline_ColorAWT;
+   public org.eclipse.swt.graphics.Color photoFill_ColorSWT;
+   public org.eclipse.swt.graphics.Color photoOutline_ColorSWT;
+
    private void logColor(final StringBuilder sb, final org.eclipse.swt.graphics.Color color, final String name) {
 
       sb.append("public static final RGB %-45s = new RGB(%d, %d, %d);\n" //$NON-NLS-1$
@@ -193,6 +204,11 @@ public class Map2Config {
       tourPauseFill_ColorSWT              = new org.eclipse.swt.graphics.Color(tourPauseFill_RGB);
       tourPauseOutline_ColorSWT           = new org.eclipse.swt.graphics.Color(tourPauseOutline_RGB);
 
+      photoFill_ColorSWT                  = new org.eclipse.swt.graphics.Color(photoFill_RGB);
+      photoOutline_ColorSWT               = new org.eclipse.swt.graphics.Color(photoOutline_RGB);
+
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
       commonLocationFill_ColorAWT         = new Color(commonLocationFill_RGB.red,         commonLocationFill_RGB.green,          commonLocationFill_RGB.blue);
       commonLocationOutline_ColorAWT      = new Color(commonLocationOutline_RGB.red,      commonLocationOutline_RGB.green,       commonLocationOutline_RGB.blue);
 
@@ -212,6 +228,8 @@ public class Map2Config {
       tourPauseFill_ColorAWT              = new Color(tourPauseFill_RGB.red,     tourPauseFill_RGB.green,      tourPauseFill_RGB.blue);
       tourPauseOutline_ColorAWT           = new Color(tourPauseOutline_RGB.red,  tourPauseOutline_RGB.green,   tourPauseOutline_RGB.blue);
 
+      photoFill_ColorAWT                  = new Color(photoFill_RGB.red,         photoFill_RGB.green,          photoFill_RGB.blue);
+      photoOutline_ColorAWT               = new Color(photoOutline_RGB.red,      photoOutline_RGB.green,       photoOutline_RGB.blue);
 
       /*
        * Log color which is used when defining defaults
@@ -227,6 +245,9 @@ public class Map2Config {
 
          logColor(sb, commonLocationFill_ColorSWT,          "DEFAULT_COMMON_LOCATION_FILL_RGB");            //$NON-NLS-1$
          logColor(sb, commonLocationOutline_ColorSWT,       "DEFAULT_COMMON_LOCATION_OUTLINE_RGB");         //$NON-NLS-1$
+
+         logColor(sb, photoFill_ColorSWT,                   "DEFAULT_PHOTO_FILL_RGB");                      //$NON-NLS-1$
+         logColor(sb, photoOutline_ColorSWT,                "DEFAULT_PHOTO_OUTLINE_RGB");                   //$NON-NLS-1$
 
          logColor(sb, tourLocationFill_ColorSWT,            "DEFAULT_TOUR_LOCATION_FILL_RGB");              //$NON-NLS-1$
          logColor(sb, tourLocationOutline_ColorSWT,         "DEFAULT_TOUR_LOCATION_OUTLINE_RGB");           //$NON-NLS-1$

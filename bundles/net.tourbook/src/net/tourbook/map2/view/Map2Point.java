@@ -123,6 +123,8 @@ public class Map2Point implements ClusterItem {
 
       case TOUR_PAUSE:        return mapConfig.tourPauseFill_ColorAWT;
 
+      case TOUR_PHOTO:        return mapConfig.photoFill_ColorAWT;
+
       default:
       case TOUR_MARKER:       return mapConfig.tourMarkerFill_ColorAWT;
 
@@ -157,6 +159,8 @@ public class Map2Point implements ClusterItem {
          }
 
       case TOUR_PAUSE:        return mapConfig.tourPauseFill_ColorSWT;
+
+      case TOUR_PHOTO:        return mapConfig.photoFill_ColorSWT;
 
       default:
       case TOUR_MARKER:       return mapConfig.tourMarkerFill_ColorSWT;
@@ -218,6 +222,8 @@ public class Map2Point implements ClusterItem {
 
       case TOUR_PAUSE:        return mapConfig.tourPauseOutline_ColorAWT;
 
+      case TOUR_PHOTO:        return mapConfig.photoOutline_ColorAWT;
+
       default:
       case TOUR_MARKER:       return mapConfig.tourMarkerOutline_ColorAWT;
 
@@ -252,6 +258,8 @@ public class Map2Point implements ClusterItem {
          }
 
       case TOUR_PAUSE:        return mapConfig.tourPauseOutline_ColorSWT;
+
+      case TOUR_PHOTO:        return mapConfig.photoOutline_ColorSWT;
 
       default:
       case TOUR_MARKER:       return mapConfig.tourMarkerOutline_ColorSWT;

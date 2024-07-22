@@ -1096,7 +1096,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().margins(5, 5).numColumns(1).applyTo(container);
       {
-         createUI_410_TourPauses_Label(container);
+         createUI_410_TourPauses(container);
 
          _tourPausesUI.createContent(container);
       }
@@ -1104,7 +1104,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       return container;
    }
 
-   private void createUI_410_TourPauses_Label(final Composite parent) {
+   private void createUI_410_TourPauses(final Composite parent) {
 
       final GridDataFactory labelGridData = GridDataFactory.fillDefaults()
             .align(SWT.FILL, SWT.CENTER)
@@ -1167,13 +1167,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().margins(5, 5).numColumns(2).applyTo(container);
       {
-         createUI_610_TourLocation_Label(container);
+         createUI_610_TourLocation(container);
       }
 
       return container;
    }
 
-   private void createUI_610_TourLocation_Label(final Composite parent) {
+   private void createUI_610_TourLocation(final Composite parent) {
 
       final GridDataFactory labelGridData = GridDataFactory.fillDefaults()
             .align(SWT.FILL, SWT.CENTER)
@@ -1315,13 +1315,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().margins(5, 5).numColumns(1).applyTo(container);
       {
-         createUI_710_CommonLocation_Label(container);
+         createUI_710_CommonLocation(container);
       }
 
       return container;
    }
 
-   private void createUI_710_CommonLocation_Label(final Composite parent) {
+   private void createUI_710_CommonLocation(final Composite parent) {
 
       final GridDataFactory labelGridData = GridDataFactory.fillDefaults()
             .align(SWT.FILL, SWT.CENTER)

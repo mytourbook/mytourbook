@@ -242,18 +242,36 @@ public class DirectMappingPainter implements IDirectPainter {
                symbolSize,
                symbolSize);
 
-         gc.fillRectangle(
-               symbolRectangle.x,
-               symbolRectangle.y,
-               symbolRectangle.width,
-               symbolRectangle.height);
+         if (mapPointType.equals(MapPointType.TOUR_PHOTO)) {
 
-         gc.setLineWidth(lineWidth);
-         gc.drawRectangle(
-               symbolRectangle.x + lineWidth2,
-               symbolRectangle.y + lineWidth2,
-               symbolRectangle.width - lineWidth,
-               symbolRectangle.height - lineWidth);
+            gc.fillOval(
+                  symbolRectangle.x + 1, // fill a larger shape to hide the antialiasing which looks like a light border !!!
+                  symbolRectangle.y + 1,
+                  symbolRectangle.width - 2,
+                  symbolRectangle.height - 2);
+
+            gc.setLineWidth(lineWidth);
+            gc.drawOval(
+                  symbolRectangle.x + lineWidth2 - 1,
+                  symbolRectangle.y + lineWidth2 - 1,
+                  symbolRectangle.width - lineWidth + 2,
+                  symbolRectangle.height - lineWidth + 2);
+
+         } else {
+
+            gc.fillRectangle(
+                  symbolRectangle.x,
+                  symbolRectangle.y,
+                  symbolRectangle.width,
+                  symbolRectangle.height);
+
+            gc.setLineWidth(lineWidth);
+            gc.drawRectangle(
+                  symbolRectangle.x + lineWidth2,
+                  symbolRectangle.y + lineWidth2,
+                  symbolRectangle.width - lineWidth,
+                  symbolRectangle.height - lineWidth);
+         }
       }
 
       /*
@@ -268,18 +286,18 @@ public class DirectMappingPainter implements IDirectPainter {
 
          gc.setLineWidth(1);
          gc.drawRectangle(
-               labelRectangle.x - Map2.MAP_MARKER_BORDER_WIDTH,
+               labelRectangle.x - Map2.MAP_POINT_BORDER,
                labelRectangle.y,
-               labelRectangle.width + 2 * Map2.MAP_MARKER_BORDER_WIDTH,
+               labelRectangle.width + 2 * Map2.MAP_POINT_BORDER,
                labelRectangle.height);
 
       } else {
 
          // fill label background
          gc.fillRectangle(
-               labelRectangle.x - Map2.MAP_MARKER_BORDER_WIDTH,
+               labelRectangle.x - Map2.MAP_POINT_BORDER,
                labelRectangle.y,
-               labelRectangle.width + 2 * Map2.MAP_MARKER_BORDER_WIDTH,
+               labelRectangle.width + 2 * Map2.MAP_POINT_BORDER,
                labelRectangle.height);
 
          // border: horizontal bottom

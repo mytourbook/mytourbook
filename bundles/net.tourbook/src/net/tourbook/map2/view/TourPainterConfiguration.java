@@ -20,6 +20,7 @@ import java.util.Set;
 
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.photo.Photo;
 
@@ -43,6 +44,7 @@ public class TourPainterConfiguration {
    static boolean                           isBackgroundDark;
 
    public static boolean                    isShowPhotos;
+   public static boolean                    isShowPhotoTooltip;
    static boolean                           isShowTours;
    static boolean                           isShowTourStartEnd;
    static boolean                           isShowWayPoints;
@@ -54,6 +56,14 @@ public class TourPainterConfiguration {
    public static boolean                    isLinkPhotoDisplayed;
 
    static boolean                           isShowBreadcrumbs;
+
+   static {
+
+      // the state is kept in dialog settings
+      isShowPhotoTooltip = Util.getStateBoolean(Map2View.getState(),
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_TOOLTIP,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT);
+   }
 
    private TourPainterConfiguration() {}
 
