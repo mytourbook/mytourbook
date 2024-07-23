@@ -81,6 +81,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
    }
 
    private boolean              _isSlideoutExpanded;
+   private boolean              _isExpandCollapseModified;
 
    private ActionExpandSlideout _actionExpandCollapseSlideout;
 
@@ -159,6 +160,8 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
       // toggle expand state
       _isSlideoutExpanded = !_isSlideoutExpanded;
 
+      _isExpandCollapseModified = true;
+
       /*
        * Update actions
        */
@@ -175,25 +178,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
 
       _toolbarManagerExpandCollapseSlideout.update(true);
 
-      /*
-       * Do a simple relayout, resizing the shell is too complicated
-       */
-      final GridData gd = (GridData) _containerPhotoOptions.getLayoutData();
-
-      if (_isSlideoutExpanded) {
-
-         // slideout is expanded
-
-         gd.heightHint = SWT.DEFAULT;
-
-      } else {
-
-         // slideout is collappsed
-
-         gd.heightHint = 0;
-      }
-
-      _containerPhotoOptions.getParent().layout(true);
+      onTTShellResize(null);
    }
 
    @Override
@@ -522,6 +507,45 @@ public class MapPointToolTip_Photo extends AdvancedSlideout {
             updateUI_Photo(_previousHoveredMapPoint);
          }
       });
+   }
+
+   @Override
+   protected Point onResize(final int contentWidth, final int contentHeight) {
+
+      int newContentHeight = contentHeight;
+
+      if (_isExpandCollapseModified) {
+
+         _isExpandCollapseModified = false;
+
+         final GridData gd = (GridData) _containerPhotoOptions.getLayoutData();
+         
+         // get options container default height, this also makes the options visible/expanded
+         gd.heightHint = SWT.DEFAULT;
+         _containerPhotoOptions.getParent().layout(true);
+
+         final Point optionsSize = _containerPhotoOptions.getSize();
+         final int optionsHeight = optionsSize.y;
+
+         if (_isSlideoutExpanded) {
+
+            // slideout is expanded
+
+            newContentHeight += optionsHeight;
+
+         } else {
+
+            // slideout is collappsed
+
+            // hide options
+            gd.heightHint = 0;
+            _containerPhotoOptions.getParent().layout(true);
+
+            newContentHeight -= optionsHeight;
+         }
+      }
+
+      return new Point(contentWidth, newContentHeight);
    }
 
    public void setupPhoto(final PaintedMapPoint hoveredMapPoint) {
