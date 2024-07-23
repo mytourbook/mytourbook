@@ -1858,7 +1858,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       if (_isSlideoutExpanded) {
 
-         // slideout is expanded collappsed
+         // slideout is expanded
 
          _expandingCounter++;
 
@@ -2300,12 +2300,12 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       if (_isSlideoutExpanded) {
 
-         _actionExpandCollapseSlideout.setToolTipText(Messages.Slideout_MapPoints_Action_CollapseSlideout_Tooltip);
+         _actionExpandCollapseSlideout.setToolTipText(Messages.Slideout_Action_CollapseSlideout_Tooltip);
          _actionExpandCollapseSlideout.setImageDescriptor(_imageDescriptor_SlideoutCollapse);
 
       } else {
 
-         _actionExpandCollapseSlideout.setToolTipText(Messages.Slideout_MapPoints_Action_ExpandSlideout_Tooltip);
+         _actionExpandCollapseSlideout.setToolTipText(Messages.Slideout_Action_ExpandSlideout_Tooltip);
          _actionExpandCollapseSlideout.setImageDescriptor(_imageDescriptor_SlideoutExpand);
       }
 

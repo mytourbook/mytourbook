@@ -2016,6 +2016,9 @@ public class Messages extends NLS {
    public static String        Sensor_View_Dialog_DeleteSensor_Message;
    public static String        Sensor_View_Dialog_DeleteSensor_Title;
 
+   public static String        Slideout_Action_CollapseSlideout_Tooltip;
+   public static String        Slideout_Action_ExpandSlideout_Tooltip;
+
    public static String        Slideout_CalendarOptions_Action_AddProfile_Tooltip;
    public static String        Slideout_CalendarOptions_Action_CopyProfile_Tooltip;
    public static String        Slideout_CalendarOptions_Action_DeleteProfile_Tooltip;
@@ -2344,9 +2347,7 @@ public class Messages extends NLS {
    public static String        Slideout_Map_TrackOptions_Label_Title;
    public static String        Slideout_Map_TrackOptions_Label_Title_Tooltip;
 
-   public static String        Slideout_MapPoints_Action_CollapseSlideout_Tooltip;
    public static String        Slideout_MapPoints_Action_CommonLocations_Tooltip;
-   public static String        Slideout_MapPoints_Action_ExpandSlideout_Tooltip;
    public static String        Slideout_MapPoints_Action_TourLocations_Tooltip;
    public static String        Slideout_MapPoints_Action_TourMarkers_Tooltip;
    public static String        Slideout_MapPoints_Action_TourPauses_Tooltip;

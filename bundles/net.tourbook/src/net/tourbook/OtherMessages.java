@@ -41,7 +41,7 @@ public class OtherMessages {
    // net.tourbook.Messages
    //
    public static final String ACTION_PHOTOS_AND_TOURS_REMOVE_PHOTO         = net.tourbook.Messages.Action_PhotosAndTours_RemovePhoto;
-   
+
    public static final String APP_BTN_BROWSE                               = net.tourbook.Messages.app_btn_browse;
 
    public static final String APP_UNIT_HHMMSS                              = net.tourbook.Messages.App_Unit_HHMMSS;
@@ -61,6 +61,9 @@ public class OtherMessages {
    public static final String DIALOG_EXPORT_TXT_FILEPATH_TOOLTIP           = net.tourbook.Messages.dialog_export_txt_filePath_tooltip;
 
    public static final String LOG_TOUR_LOCATION_RETRIEVE_LOCATION_POINT    = net.tourbook.Messages.Log_TourLocation_Retrieve_LocationPoint;
+
+   public static final String SLIDEOUT_ACTION_COLLAPSE_SLIDEOUT_TOOLTIP    = net.tourbook.Messages.Slideout_Action_CollapseSlideout_Tooltip;
+   public static final String SLIDEOUT_ACTION_EXPAND_SLIDEOUT_TOOLTIP      = net.tourbook.Messages.Slideout_Action_ExpandSlideout_Tooltip;
 
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_DESCENT  = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Descent;
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_ASCENT   = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Ascent;
