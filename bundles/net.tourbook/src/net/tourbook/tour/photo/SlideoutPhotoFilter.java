@@ -118,6 +118,9 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
 
       // prevent that the opened slideout is partly hidden
       setIsForceBoundsToBeInsideOfViewport(true);
+
+      // ensure the tooltip header actions are displayed with the dark theme icons
+      setDarkThemeForToolbarActions();
    }
 
    @Override

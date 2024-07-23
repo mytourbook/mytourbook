@@ -61,6 +61,8 @@ public class ImageCanvas extends Canvas implements PaintListener {
    private boolean                               _isFocusGained;
    private boolean                               _isSmoothImages;
 
+   private Point                                 _imageSize;
+
    /**
     * @param parent
     * @param style
@@ -192,6 +194,10 @@ public class ImageCanvas extends Canvas implements PaintListener {
       return _image;
    }
 
+   public Point getResizedImageSize() {
+      return _imageSize;
+   }
+
    @Override
    public void paintControl(final PaintEvent e) {
 
@@ -287,6 +293,8 @@ public class ImageCanvas extends Canvas implements PaintListener {
                bestSizeWidth,
                bestSizeHeight);
       }
+
+      _imageSize = new Point(bestSizeWidth, bestSizeHeight);
    }
 
    public void removeSelectionListener(final SelectionListener listener) {

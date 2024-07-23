@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,6 +57,7 @@ public class CommonActivator extends AbstractUIPlugin {
     *
     * @param path
     *           the path
+    *
     * @return the axisImage descriptor
     */
    public static ImageDescriptor getImageDescriptor(final String path) {
@@ -72,6 +73,7 @@ public class CommonActivator extends AbstractUIPlugin {
 
    /**
     * @param sectionName
+    *
     * @return Returns the dialog setting section for the sectionName, a section is always returned
     *         even when it's empty
     */
@@ -89,11 +91,23 @@ public class CommonActivator extends AbstractUIPlugin {
 
    /**
     * @param imageName
+    *
     * @return Returns the themed image descriptor from {@link CommonActivator} plugin images
     */
    public static ImageDescriptor getThemedImageDescriptor(final String imageName) {
 
       return CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName(imageName));
+   }
+
+   /**
+    * @param imageName
+    *
+    * @return Returns the dark themed image descriptor from {@link CommonActivator} plugin images.
+    *         This is used for photo slideouts because they always have a dark UI.
+    */
+   public static ImageDescriptor getThemedImageDescriptor_Dark(final String imageName) {
+
+      return CommonActivator.getImageDescriptor(ThemeUtil.getThemedImageName_Dark(imageName));
    }
 
    @Override

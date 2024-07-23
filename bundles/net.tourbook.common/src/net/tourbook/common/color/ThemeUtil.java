@@ -263,6 +263,17 @@ public class ThemeUtil {
    }
 
    /**
+    * @param imageName
+    *
+    * @return Returns the dark themed image name. The postfix {@value #DARK_THEME_POSTFIX} is
+    *         appended to the image name when the dark theme image name is returned.
+    */
+   public static String getThemedImageName_Dark(final String imageName) {
+
+      return imageName.substring(0, imageName.length() - 4) + DARK_THEME_POSTFIX + IMAGE_NAME_EXTENSION_PNG;
+   }
+
+   /**
     * In the dark theme the right aligned text in a tree control is just left of the column
     * separator which cannot be set hidden, it looks just awful
     */

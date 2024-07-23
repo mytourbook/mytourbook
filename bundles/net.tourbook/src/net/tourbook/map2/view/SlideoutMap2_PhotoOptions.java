@@ -247,7 +247,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
              * Image size: Tiny
              */
             _radioImageSize_Tiny = new Button(container, SWT.RADIO);
-            _radioImageSize_Tiny.setText(OtherMessages.APP_SIZE_TINY_NAME);
+            _radioImageSize_Tiny.setText(OtherMessages.APP_SIZE_TINY_LABEL);
             _radioImageSize_Tiny.addSelectionListener(_defaultSelectedListener);
             gdIndent.applyTo(_radioImageSize_Tiny);
 
@@ -264,7 +264,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
              * Image size: Small
              */
             _radioImageSize_Small = new Button(container, SWT.RADIO);
-            _radioImageSize_Small.setText(OtherMessages.APP_SIZE_SMALL_NAME);
+            _radioImageSize_Small.setText(OtherMessages.APP_SIZE_SMALL_LABEL);
             _radioImageSize_Small.addSelectionListener(_defaultSelectedListener);
             gdIndent.applyTo(_radioImageSize_Small);
 
@@ -281,7 +281,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
              * Image size: Medium
              */
             _radioImageSize_Medium = new Button(container, SWT.RADIO);
-            _radioImageSize_Medium.setText(OtherMessages.APP_SIZE_MEDIUM_NAME);
+            _radioImageSize_Medium.setText(OtherMessages.APP_SIZE_MEDIUM_LABEL);
             _radioImageSize_Medium.addSelectionListener(_defaultSelectedListener);
             gdIndent.applyTo(_radioImageSize_Medium);
 
@@ -298,7 +298,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
              * Image size: Large
              */
             _radioImageSize_Large = new Button(container, SWT.RADIO);
-            _radioImageSize_Large.setText(OtherMessages.APP_SIZE_LARGE_NAME);
+            _radioImageSize_Large.setText(OtherMessages.APP_SIZE_LARGE_LABEL);
             _radioImageSize_Large.addSelectionListener(_defaultSelectedListener);
             gdIndent.applyTo(_radioImageSize_Large);
 
