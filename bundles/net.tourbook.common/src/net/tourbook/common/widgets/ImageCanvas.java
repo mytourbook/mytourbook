@@ -264,7 +264,9 @@ public class ImageCanvas extends Canvas implements PaintListener {
       if (_isSmoothImages) {
 
          gc.setAntialias(SWT.ON);
-         gc.setInterpolation(SWT.LOW);
+
+         // Linux needs SWT.HIGH otherwise it is not interpolated
+         gc.setInterpolation(SWT.HIGH);
 
       } else {
 
