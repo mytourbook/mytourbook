@@ -2926,8 +2926,9 @@ public class UI {
        * ignore these controls because they do not look very good on Linux & OSX
        */
       if (child instanceof Spinner || child instanceof Combo) {
-         return;
+//         return;
       }
+
 
       /*
        * Toolbar action render awfully on Win7.
