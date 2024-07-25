@@ -2134,28 +2134,30 @@ public class UI {
 
       final double bestRatio = widthRatio > heightRatio ? widthRatio : heightRatio;
 
-      int newWidth = (int) (imageWidth / bestRatio);
-      int newHeight = (int) (imageHeight / bestRatio);
+      final int ratioWidth = (int) (imageWidth / bestRatio) + 1;
+      final int ratioHeight = (int) (imageHeight / bestRatio) + 1;
 
       /*
        * This will fix a 1 pixel issues because of the ratio rounding
        */
-      if (widthRatio > heightRatio) {
+// this do not work, also the previous algorithm :-(
+//      if (widthRatio > heightRatio) {
+//
+//         if (ratioHeight == canvasHeight - 1) {
+//            System.out.println("W  %5.3f %5.3f w: %d  h: %d".formatted(widthRatio, heightRatio, ratioWidth, ratioHeight));
+//            ratioHeight = canvasHeight;
+//         }
+//
+//      } else {
+//
+//         if (ratioWidth == canvasWidth - 1) {
+//            System.out.println("H  %5.3f %5.3f w: %d  h: %d".formatted(widthRatio, heightRatio, ratioWidth, ratioHeight));
+//            ratioWidth = canvasWidth;
+//         }
+//
+//      }
 
-         if (imageHeight > imageWidth) {
-
-            newHeight = canvasHeight;
-         }
-
-      } else {
-
-         if (imageWidth > imageHeight) {
-
-            newWidth = canvasWidth;
-         }
-      }
-
-      return new Point(newWidth, newHeight);
+      return new Point(ratioWidth, ratioHeight);
    }
 
    /**
