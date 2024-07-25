@@ -33,6 +33,7 @@ import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -226,7 +227,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       GridLayoutFactory.swtDefaults()
             .spacing(0, 0)
             .applyTo(shellContainer);
-//      shellContainer.setBackground(UI.SYS_COLOR_GREEN);
+//      shellContainer.setBackground(UI.SYS_COLOR_MAGENTA);
       {
          createUI_10_ActionBar(shellContainer);
          createSlideoutContent(shellContainer);
@@ -243,7 +244,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_titleContainer);
       GridLayoutFactory.fillDefaults()
             .numColumns(3)
-            .extendedMargins(0, 0, 0, 5)
+            .extendedMargins(0, 0, 0, 3)
             .spacing(0, 0)
             .applyTo(_titleContainer);
 //      _titleContainer.setBackground(UI.SYS_COLOR_YELLOW);
@@ -261,11 +262,11 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       _labelDragSlideout.setToolTipText(Messages.Slideout_Dialog_Action_DragSlideout_ToolTip);
       GridDataFactory.fillDefaults()
             .grab(true, false)
-            .align(SWT.FILL, SWT.CENTER)
+            .align(SWT.FILL, SWT.FILL)
+            .indent(0, 1) // adjust to controls in the custom header, e.g. combo box
             .applyTo(_labelDragSlideout);
       MTFont.setBannerFont(_labelDragSlideout);
-
-//		_labelDragSlideout.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+//      _labelDragSlideout.setBackground(UI.SYS_COLOR_BLUE);
 
       _labelDragSlideout.addMouseTrackListener(new MouseTrackListener() {
 
@@ -568,6 +569,23 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
    protected void setTitleText(final String titleText) {
 
       _titleText = titleText;
+   }
+
+   /**
+    * Show/hide default action
+    *
+    * @param isResizableShell
+    */
+   protected void showDefaultActions(final boolean isResizableShell) {
+
+      final GridData gd = (GridData) _toolbarSlideoutActions.getLayoutData();
+
+      _toolbarSlideoutActions.setVisible(isResizableShell);
+
+      gd.exclude = isResizableShell == false;
+
+      _toolbarSlideoutActions.getParent().layout(true);
+
    }
 
    protected void updateTitleText(final String titleText) {

@@ -64,6 +64,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.part.PageBook;
 
@@ -128,6 +129,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout implements IActionRe
    private PageBook         _pageBook;
 
    private Composite        _containerPhotoOptions;
+   private Composite        _containerToolbar;
    private Composite        _pageNoPhoto;
    private Composite        _pagePhoto;
 
@@ -228,6 +230,8 @@ public class MapPointToolTip_Photo extends AdvancedSlideout implements IActionRe
       updateUI_ExpandedCollapsed_Action();
       updateUI_ExpandedCollapsed_Layout();
 
+      updateUI_Toolbar();
+
       // show dialog with dark colors, this looks better for photos with the bright theme
       UI.setChildColors(parent.getShell(), _photoForegroundColor, _photoBackgroundColor);
    }
@@ -240,33 +244,39 @@ public class MapPointToolTip_Photo extends AdvancedSlideout implements IActionRe
       initUI(parent);
       createActions();
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).spacing(5, 0).applyTo(container);
-//      container.setBackground(UI.SYS_COLOR_GREEN);
+      _containerToolbar = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(false, false).applyTo(_containerToolbar);
+      GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).applyTo(_containerToolbar);
+//      _containerToolbar.setBackground(UI.SYS_COLOR_GREEN);
 
       {
          {
             /*
              * Tooltip size
              */
-            _comboTooltipSize = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+            _comboTooltipSize = new Combo(_containerToolbar, SWT.READ_ONLY | SWT.BORDER);
             _comboTooltipSize.setVisibleItemCount(10);
             _comboTooltipSize.setToolTipText("When the photo tooltip is resized, the tooltip window size is saved in the selected size");
             _comboTooltipSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_TooltipSize(selectionEvent)));
             _comboTooltipSize.addFocusListener(_keepOpenListener);
 
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboTooltipSize);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(_comboTooltipSize);
          }
          {
             /*
              * Expand/collapse slideout
              */
-            final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+            final ToolBar toolbar = new ToolBar(_containerToolbar, SWT.FLAT);
 
             _toolbarManagerExpandCollapseSlideout = new ToolBarManager(toolbar);
             _toolbarManagerExpandCollapseSlideout.add(_actionExpandCollapseSlideout);
             _toolbarManagerExpandCollapseSlideout.update(true);
+
+            GridDataFactory.fillDefaults().grab(true, false)
+                  .indent(5, 0)
+                  .align(SWT.END, SWT.CENTER).applyTo(toolbar);
          }
       }
    }
@@ -356,10 +366,10 @@ public class MapPointToolTip_Photo extends AdvancedSlideout implements IActionRe
 
    private void fillUI() {
 
-      _comboTooltipSize.add(OtherMessages.APP_SIZE_TINY_SHORTCUT);
-      _comboTooltipSize.add(OtherMessages.APP_SIZE_SMALL_SHORTCUT);
-      _comboTooltipSize.add(OtherMessages.APP_SIZE_MEDIUM_SHORTCUT);
-      _comboTooltipSize.add(OtherMessages.APP_SIZE_LARGE_SHORTCUT);
+      _comboTooltipSize.add(OtherMessages.APP_SIZE_TINY_TEXT);
+      _comboTooltipSize.add(OtherMessages.APP_SIZE_SMALL_TEXT);
+      _comboTooltipSize.add(OtherMessages.APP_SIZE_MEDIUM_TEXT);
+      _comboTooltipSize.add(OtherMessages.APP_SIZE_LARGE_TEXT);
    }
 
    private Point fixupDisplayBounds(final Point tipSize, final Point location) {
@@ -599,6 +609,15 @@ public class MapPointToolTip_Photo extends AdvancedSlideout implements IActionRe
    }
 
    @Override
+   protected void onReparentShell(final Shell reparentedShell) {
+
+      updateUI_Toolbar();
+
+      // set default focus
+      super.onReparentShell(reparentedShell);
+   }
+
+   @Override
    protected Point onResize(final int contentWidth, final int contentHeight) {
 
       final Point newSize = new Point(contentWidth, contentHeight);
@@ -661,6 +680,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout implements IActionRe
 
       return newSize;
    }
+
 
    private void onResize_AutoResize(final Point tooltipSize) {
 
@@ -736,8 +756,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout implements IActionRe
 
       _isTooltipExpanded = Util.getStateBoolean(_state, STATE_IS_TOOLTIP_EXPANDED, false);
 
-      final int tooltipSize = Util.getStateInt(_state, STATE_TOOLTIP_SIZE_INDEX, 0);
-      _comboTooltipSize.select(tooltipSize);
+      _comboTooltipSize.select(Util.getStateInt(_state, STATE_TOOLTIP_SIZE_INDEX, 0));
 
       setTooltipSize();
    }
@@ -918,6 +937,29 @@ public class MapPointToolTip_Photo extends AdvancedSlideout implements IActionRe
       updateUI_LoadingMessage();
 
       return true;
+   }
+
+   private void updateUI_Toolbar() {
+
+      final GridData gd = (GridData) _containerToolbar.getLayoutData();
+
+      final boolean isResizableShell = isResizableShell();
+      if (isResizableShell) {
+
+         gd.exclude = false;
+
+         _containerToolbar.setVisible(true);
+
+      } else {
+
+         gd.exclude = true;
+
+         _containerToolbar.setVisible(false);
+      }
+
+      _containerToolbar.getParent().layout(true);
+
+      showDefaultActions(isResizableShell);
    }
 
 }

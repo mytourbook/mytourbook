@@ -49,7 +49,9 @@ Experimental
 New
 ===
 
-* 
+* 2D Map
+  - Photos are not overlapped
+  - Photo tooltip
     
 
 Improvements

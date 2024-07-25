@@ -933,6 +933,11 @@ public abstract class AdvancedSlideoutShell {
       return _isKeepSlideoutOpen_DuringUIAction;
    }
 
+   protected boolean isResizableShell() {
+
+      return _visibleRRShell == _rrShellWithResize;
+   }
+
    /**
     * @return Returns <code>true</code> to hide tooltip, <code>false</code> will not hide the
     *         tooltip.
