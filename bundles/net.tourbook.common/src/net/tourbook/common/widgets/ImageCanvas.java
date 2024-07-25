@@ -194,6 +194,9 @@ public class ImageCanvas extends Canvas implements PaintListener {
       return _image;
    }
 
+   /**
+    * @return Returns the size of the currently resized image
+    */
    public Point getResizedImageSize() {
       return _imageSize;
    }

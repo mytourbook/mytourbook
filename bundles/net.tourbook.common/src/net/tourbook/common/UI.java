@@ -2112,6 +2112,10 @@ public class UI {
 
    /**
     * Get best-fit size for an image drawn in an area of maxX, maxY
+    * <p>
+    *
+    * Original:
+    * org.eclipse.nebula.widgets.gallery/src/org/eclipse/nebula/widgets/gallery/RendererHelper.java
     *
     * @param imageWidth
     * @param imageHeight
@@ -2130,8 +2134,26 @@ public class UI {
 
       final double bestRatio = widthRatio > heightRatio ? widthRatio : heightRatio;
 
-      final int newWidth = (int) (imageWidth / bestRatio);
-      final int newHeight = (int) (imageHeight / bestRatio);
+      int newWidth = (int) (imageWidth / bestRatio);
+      int newHeight = (int) (imageHeight / bestRatio);
+
+      /*
+       * This will fix a 1 pixel issues because of the ratio rounding
+       */
+      if (widthRatio > heightRatio) {
+
+         if (imageHeight > imageWidth) {
+
+            newHeight = canvasHeight;
+         }
+
+      } else {
+
+         if (imageWidth > imageHeight) {
+
+            newWidth = canvasWidth;
+         }
+      }
 
       return new Point(newWidth, newHeight);
    }
@@ -2928,7 +2950,6 @@ public class UI {
       if (child instanceof Spinner || child instanceof Combo) {
 //         return;
       }
-
 
       /*
        * Toolbar action render awfully on Win7.
