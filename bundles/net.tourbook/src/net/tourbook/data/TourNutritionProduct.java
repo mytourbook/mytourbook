@@ -204,8 +204,12 @@ public class TourNutritionProduct {
             servingQuantity != Float.MIN_VALUE) {
 
          final int numberOfServings = Math.round(productQuantity / servingQuantity);
-         setCalories(Math.round(nutriments.energyKcalServing * numberOfServings));
-         setCalories_Serving(Math.round(nutriments.energyKcalServing));
+
+         setCalories(Math.round(nutriments.carbohydratesServing * numberOfServings));
+         setCalories_Serving(Math.round(nutriments.carbohydratesServing));
+
+         setCarbohydrates(Math.round(nutriments.carbohydratesServing * numberOfServings));
+         setCarbohydrates_Serving(Math.round(nutriments.carbohydratesServing));
 
          setSodium(Math.round(nutriments.sodiumServing * numberOfServings * 1000));
          setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
@@ -362,6 +366,10 @@ public class TourNutritionProduct {
 
    public void setCarbohydrates(final int carbohydrates) {
       this.carbohydrates = carbohydrates;
+   }
+
+   public void setCarbohydrates_Serving(final int carbohydrates_Serving) {
+      this.carbohydrates_Serving = carbohydrates_Serving;
    }
 
    public void setConsumedQuantity(final float consumedQuantity) {

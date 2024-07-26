@@ -27,6 +27,12 @@ public class Nutriments {
    @JsonProperty("energy-kcal_serving")
    public float energyKcalServing;
 
+   @JsonProperty("carbohydrates_100g")
+   public float carbohydrates100g;
+
+   @JsonProperty("carbohydrates_serving")
+   public float carbohydratesServing;
+
    @JsonProperty("sodium_100g")
    public float sodium100g;
 
