@@ -690,7 +690,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void createUI_110_Report(final Composite parent) {
 
       final Composite container = _tk.createComposite(parent);
-      GridLayoutFactory.fillDefaults().numColumns(7).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(9).applyTo(container);
       {
          /*
           * Columns headers
