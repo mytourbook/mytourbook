@@ -702,6 +702,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Calories);
             GridDataFactory.fillDefaults().span(2, 1).align(SWT.CENTER, SWT.FILL).applyTo(label);
 
+            label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Carbohydrates);
+            GridDataFactory.fillDefaults().span(2, 1).align(SWT.CENTER, SWT.FILL).applyTo(label);
+
             label = UI.createLabel(container, Messages.Tour_Nutrition_Label_Fluids);
             GridDataFactory.fillDefaults().span(2, 1).align(SWT.CENTER, SWT.FILL).applyTo(label);
 
@@ -732,7 +735,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                   .applyTo(_lblCarbohydrates_Total);
 
             // Unit: g
-            UI.createLabel(container, OtherMessages.VALUE_UNIT_g);
+            UI.createLabel(container, UI.UNIT_WEIGHT_G);
 
             _lblFluid_Total = _tk.createLabel(container, UI.EMPTY_STRING, SWT.TRAIL);
             GridDataFactory.fillDefaults()
@@ -772,7 +775,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                   .applyTo(_lblCarbohydrates_Average);
 
             // Unit: g/h
-            UI.createLabel(container, OtherMessages.VALUE_UNIT_g + UI.SLASH + UI.UNIT_LABEL_TIME);
+            UI.createLabel(container, UI.UNIT_WEIGHT_G + UI.SLASH + UI.UNIT_LABEL_TIME);
 
             _lblFluid_Average = _tk.createLabel(container, UI.EMPTY_STRING, SWT.TRAIL);
             GridDataFactory.fillDefaults().hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT).align(SWT.END, SWT.FILL)
