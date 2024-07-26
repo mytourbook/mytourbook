@@ -204,6 +204,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private boolean                   _isInUpdate;
    private Label                     _lblCalories_Average;
    private Label                     _lblCalories_Total;
+   private Label                     _lblCarbohydrates_Average;
+   private Label                     _lblCarbohydrates_Total;
    private Label                     _lblFluid_Average;
    private Label                     _lblFluid_Total;
    private Label                     _lblSodium_Average;
@@ -723,6 +725,15 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
             // Unit: kcal
             UI.createLabel(container, OtherMessages.VALUE_UNIT_K_CALORIES);
 
+            _lblCarbohydrates_Total = _tk.createLabel(container, UI.EMPTY_STRING, SWT.TRAIL);
+            GridDataFactory.fillDefaults()
+                  .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_lblCarbohydrates_Total);
+
+            // Unit: g
+            UI.createLabel(container, OtherMessages.VALUE_UNIT_g);
+
             _lblFluid_Total = _tk.createLabel(container, UI.EMPTY_STRING, SWT.TRAIL);
             GridDataFactory.fillDefaults()
                   .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
@@ -755,6 +766,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             // Unit: kcal/h
             UI.createLabel(container, OtherMessages.VALUE_UNIT_K_CALORIES + UI.SLASH + UI.UNIT_LABEL_TIME);
+
+            _lblCarbohydrates_Average = _tk.createLabel(container, UI.EMPTY_STRING, SWT.TRAIL);
+            GridDataFactory.fillDefaults().hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT).align(SWT.END, SWT.FILL)
+                  .applyTo(_lblCarbohydrates_Average);
+
+            // Unit: g/h
+            UI.createLabel(container, OtherMessages.VALUE_UNIT_g + UI.SLASH + UI.UNIT_LABEL_TIME);
 
             _lblFluid_Average = _tk.createLabel(container, UI.EMPTY_STRING, SWT.TRAIL);
             GridDataFactory.fillDefaults().hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT).align(SWT.END, SWT.FILL)
