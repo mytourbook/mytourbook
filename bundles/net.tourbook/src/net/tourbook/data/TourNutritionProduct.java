@@ -224,6 +224,7 @@ public class TourNutritionProduct {
       } else {
 
          setCalories_Serving(Math.round(nutriments.energyKcalServing));
+         setCarbohydrates_Serving(Math.round(nutriments.carbohydratesServing));
          setSodium_Serving(Math.round(nutriments.sodiumServing * 1000));
 
          // In some cases, the product quantity is not provided, we can only
@@ -245,6 +246,7 @@ public class TourNutritionProduct {
          if (product.nutritionDataPer == NutritionDataPer.HUNDRED_GRAMS) {
 
             setCalories(Math.round((nutriments.energyKcal100g * productQuantity) / 100f));
+            setCarbohydrates(Math.round((nutriments.carbohydrates100g * productQuantity) / 100f));
             setSodium(Math.round(nutriments.sodium100g * productQuantity * 10));
 
          } else if (product.nutritionDataPer == NutritionDataPer.SERVING) {
@@ -253,6 +255,7 @@ public class TourNutritionProduct {
                   ? 0 : productQuantity / servingQuantity;
 
             setCalories(Math.round(getCalories_Serving() * numServingsPerProduct));
+            setCarbohydrates(Math.round(getCarbohydrates_Serving() * numServingsPerProduct));
             setSodium(Math.round(getSodium_Serving() * numServingsPerProduct));
          }
       }
