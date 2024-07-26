@@ -56,6 +56,8 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
    public static final String      STATE_IS_PRELOAD_HQ_IMAGES          = "STATE_IS_PRELOAD_HQ_IMAGES";    //$NON-NLS-1$
    public static final boolean     STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT  = false;
+   static final String             STATE_IS_SHOW_PHOTO_RATING          = "STATE_IS_SHOW_PHOTO_RATING";    //$NON-NLS-1$
+   static final boolean            STATE_IS_SHOW_PHOTO_RATING_DEFAULT  = false;
    static final String             STATE_IS_SHOW_PHOTO_TOOLTIP         = "STATE_IS_SHOW_PHOTO_TOOLTIP";   //$NON-NLS-1$
    static final boolean            STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT = true;
 
@@ -95,6 +97,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
    private Button                _btnSwapTourPauseLabel_Color;
 
    private Button                _chkPreloadHQImages;
+   private Button                _chkShowPhotoRating;
    private Button                _chkShowPhotoTooltip;
 
    private Button                _radioImageSize_Tiny;
@@ -168,8 +171,9 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       GridLayoutFactory.swtDefaults().applyTo(shellContainer);
       {
          createUI_10_Header(shellContainer);
-         createUI_20_ImageSize(shellContainer);
-         createUI_30_Options(shellContainer);
+         createUI_20_Options1(shellContainer);
+         createUI_30_ImageSize(shellContainer);
+         createUI_40_Options2(shellContainer);
       }
 
       return shellContainer;
@@ -212,9 +216,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       }
    }
 
-   private void createUI_20_ImageSize(final Composite parent) {
-
-      final GridDataFactory gdIndent = GridDataFactory.fillDefaults().indent(16, 0);
+   private void createUI_20_Options1(final Composite parent) {
 
       {
          /*
@@ -224,6 +226,19 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
          _chkShowPhotoTooltip.setText("Show photo t&ooltip");
          _chkShowPhotoTooltip.addSelectionListener(_defaultSelectedListener);
       }
+      {
+         /*
+          * Show photo rating
+          */
+         _chkShowPhotoRating = new Button(parent, SWT.CHECK);
+         _chkShowPhotoRating.setText("Show photo &rating");
+         _chkShowPhotoRating.addSelectionListener(_defaultSelectedListener);
+      }
+   }
+
+   private void createUI_30_ImageSize(final Composite parent) {
+
+      final GridDataFactory gdIndent = GridDataFactory.fillDefaults().indent(16, 0);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -313,7 +328,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       }
    }
 
-   private void createUI_30_Options(final Composite parent) {
+   private void createUI_40_Options2(final Composite parent) {
 
       final String coloTooltipText = "Symbol color\n\n● Outline color\n● Fill color";
 
@@ -483,6 +498,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       _spinnerImageSize_Tiny.setSelection(MAP_IMAGE_DEFAULT_SIZE_TINY);
 
       _chkPreloadHQImages.setSelection(STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT);
+      _chkShowPhotoRating.setSelection(STATE_IS_SHOW_PHOTO_RATING_DEFAULT);
       _chkShowPhotoTooltip.setSelection(STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT);
 
       /*
@@ -506,6 +522,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 // SET_FORMATTING_OFF
 
       _chkPreloadHQImages  .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_PRELOAD_HQ_IMAGES,   STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT));
+      _chkShowPhotoRating  .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_SHOW_PHOTO_RATING,   STATE_IS_SHOW_PHOTO_RATING_DEFAULT));
       _chkShowPhotoTooltip .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_SHOW_PHOTO_TOOLTIP,  STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT));
 
       final Enum<ImageSize> imageSize = Util.getStateEnum(_state_Map2, STATE_PHOTO_IMAGE_SIZE, ImageSize.MEDIUM);
@@ -552,11 +569,14 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
       final Map2Config config = Map2ConfigManager.getActiveConfig();
 
+      final boolean isShowPhotoRating = _chkShowPhotoRating.getSelection();
       final boolean isShowPhotoTooltip = _chkShowPhotoTooltip.getSelection();
 
       _state_Map2.put(STATE_IS_PRELOAD_HQ_IMAGES, _chkPreloadHQImages.getSelection());
+      _state_Map2.put(STATE_IS_SHOW_PHOTO_RATING, isShowPhotoRating);
       _state_Map2.put(STATE_IS_SHOW_PHOTO_TOOLTIP, isShowPhotoTooltip);
 
+      TourPainterConfiguration.isShowPhotoRating = isShowPhotoRating;
       TourPainterConfiguration.isShowPhotoTooltip = isShowPhotoTooltip;
 
 // SET_FORMATTING_OFF

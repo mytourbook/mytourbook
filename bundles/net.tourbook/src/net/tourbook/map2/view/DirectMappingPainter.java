@@ -32,7 +32,14 @@ import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.Messages;
+import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoUI;
+import net.tourbook.photo.RatingStars;
 
+import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -58,7 +65,11 @@ public class DirectMappingPainter implements IDirectPainter {
 
    private SliderPathPaintingData _sliderPathPaintingData;
 
+   private final ColorRegistry    _colorRegistry        = JFaceResources.getColorRegistry();
+   private final Color            _photoBackgroundColor = _colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+
    private Rectangle              _imageMapLocationBounds;
+   private int                    _ratingStarImageSize;
 
    /*
     * UI resources
@@ -67,6 +78,30 @@ public class DirectMappingPainter implements IDirectPainter {
    private final Image _imageSlider_Left;
    private final Image _imageSlider_Right;
    private final Image _imageValuePoint;
+
+   private Image       _imageRatingStar;
+   private Image       _imageRatingStarAndHovered;
+   private Image       _imageRatingStarDelete;
+   private Image       _imageRatingStarHovered;
+   private Image       _imageRatingStarNotHovered;
+   private Image       _imageRatingStarNotHoveredButSet;
+
+   {
+      final ImageRegistry imageRegistry = UI.IMAGE_REGISTRY;
+
+// SET_FORMATTING_OFF
+
+      _imageRatingStar                  = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR);
+      _imageRatingStarAndHovered        = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_AND_HOVERED);
+      _imageRatingStarDelete            = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_DELETE);
+      _imageRatingStarHovered           = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_HOVERED);
+      _imageRatingStarNotHovered        = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_NOT_HOVERED);
+      _imageRatingStarNotHoveredButSet  = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET);
+
+// SET_FORMATTING_ON
+
+      _ratingStarImageSize = _imageRatingStar.getBounds().width;
+   }
 
    /**
     * @param map2
@@ -118,10 +153,18 @@ public class DirectMappingPainter implements IDirectPainter {
    private void drawMapPoint_Hovered(final DirectPainterContext painterContext) {
 
       final GC gc = painterContext.gc;
+      final PaintedMapPoint hoveredPoint = _map2.getHoveredMapPoint();
+
+      drawMapPoint_Hovered_LabelItem(gc, hoveredPoint);
+
+      if (TourPainterConfiguration.isShowPhotoRating) {
+         drawMapPoint_Hovered_RatingStars(gc, hoveredPoint);
+      }
+   }
+
+   private void drawMapPoint_Hovered_LabelItem(final GC gc, final PaintedMapPoint hoveredPoint) {
 
       final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
-
-      final PaintedMapPoint hoveredPoint = _map2.getHoveredMapPoint();
       final Rectangle labelRectangle = hoveredPoint.labelRectangle;
 
       final int labelWidth = labelRectangle.width;
@@ -333,6 +376,85 @@ public class DirectMappingPainter implements IDirectPainter {
                labelDevY + labelHeight,
                labelDevX + labelWidth,
                labelDevY + labelHeight);
+      }
+   }
+
+   private void drawMapPoint_Hovered_RatingStars(final GC gc, final PaintedMapPoint hoveredPoint) {
+
+      final Photo photo = hoveredPoint.mapPoint.photo;
+
+      if (photo == null
+
+            // this happend when the photo was not yet painted
+            || photo.paintedPhoto == null
+
+      ) {
+
+         return;
+      }
+
+      if (photo.isSmallRatingStars) {
+
+         // make the rating stars more visible
+
+         gc.setBackground(_photoBackgroundColor);
+         gc.fillRectangle(photo.paintedRatingStars);
+      }
+
+      final int hoveredStars = photo.hoveredStars;
+      final boolean isStarHovered = hoveredStars > 0;
+
+      final int photoDevX = photo.paintedPhoto.x;
+      final int photoDevY = photo.paintedPhoto.y;
+      final int photoWidth = photo.paintedPhoto.width;
+
+      final int numRatingStars = photo.ratingStars;
+
+      // center ratings stars in the middle of the image
+      final int ratingStarsLeftBorder = photoDevX + photoWidth / 2 - _map2.MAX_RATING_STARS_WIDTH / 2;
+
+      for (int starIndex = 0; starIndex < RatingStars.MAX_RATING_STARS; starIndex++) {
+
+         Image starImage;
+
+         if (isStarHovered) {
+
+            if (starIndex < hoveredStars) {
+
+               if (starIndex < numRatingStars) {
+
+                  if (starIndex == numRatingStars - 1) {
+                     starImage = _imageRatingStarDelete;
+                  } else {
+                     starImage = _imageRatingStarAndHovered;
+                  }
+               } else {
+                  starImage = _imageRatingStarHovered;
+               }
+
+            } else {
+               if (starIndex < numRatingStars) {
+                  starImage = _imageRatingStarNotHoveredButSet;
+               } else {
+                  starImage = _imageRatingStarNotHovered;
+               }
+            }
+
+         } else {
+
+            if (starIndex < numRatingStars) {
+               starImage = _imageRatingStarNotHoveredButSet;
+            } else {
+               starImage = _imageRatingStarNotHovered;
+            }
+         }
+
+         // draw stars at the top of the photo
+
+         gc.drawImage(starImage,
+
+               ratingStarsLeftBorder + (_ratingStarImageSize * starIndex),
+               photoDevY);
       }
    }
 

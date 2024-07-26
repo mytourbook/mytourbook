@@ -132,11 +132,13 @@ import net.tourbook.map25.layer.marker.algorithm.distance.DistanceClustering;
 import net.tourbook.map25.layer.marker.algorithm.distance.QuadItem;
 import net.tourbook.map25.layer.marker.algorithm.distance.StaticCluster;
 import net.tourbook.photo.ILoadCallBack;
+import net.tourbook.photo.IPhotoServiceProvider;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
+import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.Map2_Appearance;
 import net.tourbook.tour.SelectionTourId;
@@ -160,6 +162,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
@@ -311,6 +314,8 @@ public class Map2 extends Canvas {
    public static final RGB               OSM_BACKGROUND_RGB         = new RGB(181, 208, 208);
    private static final RGB              MAP_DEFAULT_BACKGROUND_RGB = new RGB(0x40, 0x40, 0x40);
 
+   private static final java.awt.Color   RATING_STAR_COLOR          = new java.awt.Color(250, 224, 0);
+
    private static RGB                    _mapTransparentRGB;
    private static Color                  _mapTransparentColor;
 
@@ -455,6 +460,7 @@ public class Map2 extends Canvas {
 
    private PaintedMarkerCluster            _hoveredMarkerCluster;
    private PaintedMapPoint                 _hoveredMapPoint;
+   private boolean                         _isInHoveredRatingStar;
    private boolean                         _isMarkerClusterSelected;
    private MapPointToolTip                 _mapPointTooltip;
    private MapPointToolTip_Photo           _mapPointTooltip_Photo;
@@ -780,6 +786,24 @@ public class Map2 extends Canvas {
    private final BufferedImage _imageMapLocation_Disabled_Dark;
 
    private Point               _imageMapLocationBounds;
+
+   private BufferedImage       _imageRatingStar;
+
+   private int                 _ratingStarImageSize;
+
+   private final int           MAX_RATING_STARS   = 5;
+   public int                  MAX_RATING_STARS_WIDTH;
+
+   {
+      final ImageRegistry imageRegistry = UI.IMAGE_REGISTRY;
+
+      _imageRatingStar = ImageConverter.convertIntoAWT(imageRegistry.get(PhotoUI.PHOTO_RATING_STAR));
+
+      // rating star width and height are the same
+      _ratingStarImageSize = _imageRatingStar.getWidth();
+
+      MAX_RATING_STARS_WIDTH = _ratingStarImageSize * MAX_RATING_STARS;
+   }
 
    private static enum HoveredPoint_PaintMode {
 
@@ -4387,6 +4411,18 @@ public class Map2 extends Canvas {
             fireEvent_TourSelection(new SelectionTourIds(crumbTourIds));
          }
 
+      } else if (_hoveredMapPoint != null && _isInHoveredRatingStar) {
+
+         final Photo photo = _hoveredMapPoint.mapPoint.photo;
+
+         if (photo != null) {
+
+            saveRatingStars(photo);
+
+            // when a rating star is removed, then the photo may be filtered out -> hide hovered mappoint/photo
+            _hoveredMapPoint = null;
+         }
+
       } else if (_geoGrid_Label_IsHovered) {
 
          // set map location to the selected geo filter default position
@@ -4960,7 +4996,7 @@ public class Map2 extends Canvas {
          }
       }
 
-      // second check the label
+      // second check the label/photo
       if (_hoveredMapPoint == null) {
 
          for (final PaintedMapPoint paintedMapPoint : allPaintedMapPoints) {
@@ -4977,10 +5013,42 @@ public class Map2 extends Canvas {
 
                _hoveredMapPoint = paintedMapPoint;
 
+               final Photo photo = paintedMapPoint.mapPoint.photo;
+
+               if (photo != null) {
+                  onMouse_Move_CheckMapPoints_Photo(photo);
+               }
+
                break;
             }
          }
       }
+   }
+
+   private void onMouse_Move_CheckMapPoints_Photo(final Photo photo) {
+
+      int hoveredStars = 0;
+      _isInHoveredRatingStar = false;
+
+x      final Rectangle paintedRatingStars = photo.paintedRatingStars;
+
+      if (paintedRatingStars != null) {
+
+         final int photoDevX = photo.paintedPhoto.x;
+         final int photoWidth = photo.paintedPhoto.width;
+
+         _isInHoveredRatingStar = paintedRatingStars.contains(_mouseMove_DevPosition_X, _mouseMove_DevPosition_Y);
+
+         // center ratings stars in the middle of the image
+         final int ratingStarsLeftBorder = photoDevX + photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
+
+         if (_isInHoveredRatingStar) {
+
+            hoveredStars = (_mouseMove_DevPosition_X - ratingStarsLeftBorder) / _ratingStarImageSize + 1;
+         }
+      }
+
+      photo.hoveredStars = hoveredStars;
    }
 
    private void onMouse_Up(final MouseEvent mouseEvent) {
@@ -8301,6 +8369,12 @@ public class Map2 extends Canvas {
 //                  photoRectangle.y,
 //                  photoRectangle.width + 2 * MAP_POINT_BORDER,
 //                  photoRectangle.height);
+
+            photo.paintedPhoto = photoRectangle;
+
+            if (TourPainterConfiguration.isShowPhotoRating) {
+               paint_MpImage_RatingStars(g2d, photo);
+            }
          }
 
          // keep position
@@ -8380,6 +8454,78 @@ public class Map2 extends Canvas {
 
       // ensure that rectangels are not smoothed
       g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+   }
+
+   private void paint_MpImage_RatingStars(final Graphics2D g2d, final Photo photo) {
+
+      final int photoDevX = photo.paintedPhoto.x;
+      final int photoDevY = photo.paintedPhoto.y;
+      final int photoWidth = photo.paintedPhoto.width;
+      final int numRatingStars = photo.ratingStars;
+
+      final boolean isSmallRatingStar = photoWidth < 70;
+
+      photo.isSmallRatingStars = isSmallRatingStar;
+
+      final int smallRatingStarGap = 4;
+      final int smallRatingStarSize = (photoWidth / MAX_RATING_STARS) - smallRatingStarGap;
+
+      final int maxSmallRatingStarsWidth = MAX_RATING_STARS * smallRatingStarSize
+            + (MAX_RATING_STARS - 1) * smallRatingStarGap;
+
+      final int leftBorderWithVisibleStars = photoDevX + photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
+      // center ratings stars in the middle of the image
+
+      final int ratingStarsLeftBorder = isSmallRatingStar
+            ? photoDevX + photoWidth / 2 - maxSmallRatingStarsWidth / 2
+            : leftBorderWithVisibleStars;
+
+      g2d.setColor(RATING_STAR_COLOR);
+
+      if (isSmallRatingStar) {
+
+         // ensure that ovals are smooth
+         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      }
+
+      photo.paintedRatingStars = new Rectangle(
+
+            leftBorderWithVisibleStars,
+            photoDevY,
+
+            _ratingStarImageSize * MAX_RATING_STARS,
+            _ratingStarImageSize);
+
+      for (int starIndex = 0; starIndex < numRatingStars; starIndex++) {
+
+         // draw stars are at the top of the photo
+
+         if (isSmallRatingStar) {
+
+            final int ratingStarXOffset = (smallRatingStarSize + smallRatingStarGap) * starIndex;
+
+            g2d.fillOval(
+
+                  ratingStarsLeftBorder + ratingStarXOffset,
+                  photoDevY + 1,
+                  smallRatingStarSize,
+                  smallRatingStarSize);
+
+         } else {
+
+            g2d.drawImage(_imageRatingStar,
+
+                  ratingStarsLeftBorder + (_ratingStarImageSize * starIndex),
+                  photoDevY,
+                  _ratingStarImageSize,
+                  _ratingStarImageSize,
+
+                  null);
+         }
+
+         // ensure that rectangels are not smoothed
+         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+      }
    }
 
    private void paint_OfflineArea(final GC gc) {
@@ -10115,7 +10261,36 @@ public class Map2 extends Canvas {
       _hovered_SelectedTourId = -1;
       _hovered_SelectedSerieIndex_Behind = -1;
       _hovered_SelectedSerieIndex_Front = -1;
+   }
 
+   /**
+    * Save star rating of the hovered/selected tours
+    */
+   private void saveRatingStars(final Photo photo) {
+
+      final IPhotoServiceProvider photoServiceProvider = Photo.getPhotoServiceProvider();
+
+      final int hoveredRatingStars = photo.ratingStars;
+      int newRatingStars = photo.hoveredStars;
+
+      if (newRatingStars == hoveredRatingStars) {
+
+         /**
+          * Feature to remove rating stars:
+          * <p>
+          * When a rating star is hit and this rating is already set in the photo, the rating
+          * stars are removed.
+          */
+
+         newRatingStars = 0;
+      }
+
+      photo.ratingStars = newRatingStars;
+
+      final ArrayList<Photo> photos = new ArrayList<>();
+      photos.add(photo);
+
+      photoServiceProvider.saveStarRating(photos);
    }
 
    public void setCenterMapBy(final CenterMapBy centerMapBy) {

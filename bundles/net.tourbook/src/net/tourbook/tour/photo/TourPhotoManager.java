@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -114,7 +114,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
    static {
 
-      AdjustTimeComparatorLink = new Comparator<Photo>() {
+      AdjustTimeComparatorLink = new Comparator<>() {
 
          @Override
          public int compare(final Photo photo1, final Photo photo2) {
@@ -125,7 +125,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
          }
       };
 
-      AdjustTimeComparatorTour = new Comparator<Photo>() {
+      AdjustTimeComparatorTour = new Comparator<>() {
 
          @Override
          public int compare(final Photo photo1, final Photo photo2) {
@@ -302,15 +302,14 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
       if (selectedPhotos > warningLevel) {
 
-         final boolean isShowWarning = _prefStore.getBoolean(//
-               ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING) == false;
+         final boolean isShowWarning = _prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING) == false;
 
          if (isShowWarning) {
 
             final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(//
                   Display.getCurrent().getActiveShell(),
                   Messages.Photo_TourPhotoMgr_Dialog_SaveStarRating_Title,
-                  NLS.bind(//
+                  NLS.bind(
                         Messages.Photo_TourPhotoMgr_Dialog_SaveStarRating_Message,
                         new Object[] { ratingStars, selectedPhotos, warningLevel }),
                   Messages.App_ToggleState_DoNotShowAgain,
@@ -803,6 +802,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
    /**
     * @param imageFolder
+    *
     * @return Returns number of photos which set in {@link TourPhoto}s for a given folder.
     */
    private ArrayList<String> getTourPhotos(final String imageFolder) {
@@ -849,6 +849,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
     *
     * @param allPhotos
     * @param isResetGeoPosition
+    *
     * @return Returns <code>true</code> when tours are loaded from the database, <code>false</code>
     *         is returned when all photo time stamps are within the previously loaded tours.
     */
@@ -1230,6 +1231,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
     *
     * @param oldImageFolder
     * @param modifiedImages
+    *
     * @return
     */
    private ArrayList<ImagePathReplacement> replaceImageFilePath_InSQLDb(final String oldImageFolder,
@@ -1353,6 +1355,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
     *
     * @param photo
     * @param allTourCameras
+    *
     * @return Returns camera which is set into the photo.
     */
    Camera setCamera(final Photo photo, final HashMap<String, Camera> allTourCameras) {
@@ -1399,6 +1402,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
     * @param originalJpegImageFile
     * @param latitude
     * @param longitude
+    *
     * @return Returns
     *
     *         <pre>
@@ -1558,6 +1562,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
     *           The output file.
     * @param latitude
     * @param longitude
+    *
     * @throws IOException
     * @throws ImageReadException
     * @throws ImageWriteException

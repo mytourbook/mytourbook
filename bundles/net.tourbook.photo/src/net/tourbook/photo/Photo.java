@@ -53,6 +53,7 @@ import org.apache.commons.imaging.formats.tiff.taginfos.TagInfoShortOrLong;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.graphics.Rectangle;
 
 public class Photo implements Serializable {
 
@@ -179,6 +180,27 @@ public class Photo implements Serializable {
     * (8.1.2013) ratings stars can be set only for ALL tours.
     */
    public int                                      ratingStars;
+
+   /**
+    * Is <code>true</code> when small rating stars are painted in the map. Small rating stars cannot
+    * be modified.
+    */
+   public boolean                                  isSmallRatingStars;
+
+   /**
+    * Rectangle in device coordinates where the photo is painted
+    */
+   public Rectangle                                paintedPhoto;
+
+   /**
+    * Rectangle for the painted rating stars
+    */
+   public Rectangle                                paintedRatingStars;
+
+   /**
+    * Number of hovered rating stars
+    */
+   public int                                      hoveredStars;
 
    private PhotoImageMetadata                      _photoImageMetadata;
 

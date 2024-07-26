@@ -24,6 +24,8 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.photo.Photo;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
+
 /**
  * Contains data which are needed to paint a tour into the 2D map.
  */
@@ -44,6 +46,7 @@ public class TourPainterConfiguration {
    static boolean                           isBackgroundDark;
 
    public static boolean                    isShowPhotos;
+   public static boolean                    isShowPhotoRating;
    public static boolean                    isShowPhotoTooltip;
    static boolean                           isShowTours;
    static boolean                           isShowTourStartEnd;
@@ -59,10 +62,18 @@ public class TourPainterConfiguration {
 
    static {
 
-      // the state is kept in dialog settings
-      isShowPhotoTooltip = Util.getStateBoolean(Map2View.getState(),
+      // restore states
+
+      final IDialogSettings state = Map2View.getState();
+
+      isShowPhotoRating = (Util.getStateBoolean(state,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_RATING,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_RATING_DEFAULT));
+
+      isShowPhotoTooltip = Util.getStateBoolean(state,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_TOOLTIP,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT);
+
    }
 
    private TourPainterConfiguration() {}
@@ -124,7 +135,15 @@ public class TourPainterConfiguration {
          _allPhotos.addAll(allPhotos);
       }
 
-      isShowPhotos = isShowPhoto && _allPhotos.size() > 0;
+      isShowPhotos = isShowPhoto
+
+      /*
+       * This is disabled otherwise the photo map points are not reset and are displayed as ghost
+       * images, the photo border is visible when hovered
+       */
+//            && _allPhotos.size() > 0
+
+      ;
 
       isLinkPhotoDisplayed = isLinkPhoto;
    }
