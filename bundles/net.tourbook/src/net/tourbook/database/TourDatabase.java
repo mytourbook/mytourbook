@@ -118,8 +118,9 @@ public class TourDatabase {
     */
 //   private static final int TOURBOOK_DB_VERSION = 56;
 
-   private static final int TOURBOOK_DB_VERSION = 55; // 24.x ??????
+   private static final int TOURBOOK_DB_VERSION = 56; // 24.x ??????
 
+//   private static final int TOURBOOK_DB_VERSION = 55; // 24.7
 //   private static final int TOURBOOK_DB_VERSION = 54; // 24.1 fixed db data update bug 47 -> 48
 //   private static final int TOURBOOK_DB_VERSION = 53; // 24.1 added new fields
 //   private static final int TOURBOOK_DB_VERSION = 52; // 24.1
@@ -6675,15 +6676,20 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_053_To_054(splashManager);
          }
 
-// 54 -> 55 > 24.XX
+// 54 -> 55 > 24.7
          if (currentDbVersion == 54) {
             currentDbVersion = _dbDesignVersion_New = updateDb_054_To_055(conn, splashManager);
          }
 
-//// 55 -> 56    24.XX
-//         if (currentDbVersion == 55) {
-//            currentDbVersion = _dbDesignVersion_New = updateDb_055_To_056(conn, splashManager);
-//         }
+// 55 -> 56    24.XX
+         if (currentDbVersion == 55) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_055_To_056(conn, splashManager);
+         }
+
+         //// 56 -> 57    24.XX
+//       if (currentDbVersion == 56) {
+//          currentDbVersion = _dbDesignVersion_New = updateDb_056_To_057(conn, splashManager);
+//       }
 
          // update db design version number
          updateVersionNumber_10_AfterDesignUpdate(conn, _dbDesignVersion_New);
@@ -10741,6 +10747,32 @@ public class TourDatabase {
             createTable_TourBeverageContainer(stmt);
             createTable_TourNutritionProduct(stmt);
          }
+      }
+      stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDb_055_To_056(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 56;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // alter columns
+
+// SET_FORMATTING_OFF
+
+         SQL.AddColumn_Int          (stmt, TABLE_TOUR_NUTRITION_PRODUCT, "carbohydrates",  null);   //$NON-NLS-1$
+         SQL.AddColumn_Int          (stmt, TABLE_TOUR_NUTRITION_PRODUCT, "carbohydrates_Serving",  null);   //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+
       }
       stmt.close();
 
