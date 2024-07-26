@@ -41,6 +41,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
 
    private static final int HINT_TEXT_COLUMN_WIDTH = UI.IS_OSX ? 100 : 50;
    private int              _calories;
+   private int              _carbohydrates;
    private boolean          _isBeverage;
    private int              _sodium;
    private String           _name                  = UI.EMPTY_STRING;
@@ -59,6 +60,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
    private Spinner        _spinnerBeverageQuantity;
 
    private Text           _txtCalories;
+   private Text           _txtCarbohydrates;
    private Text           _txtName;
    private Text           _txtSodium;
 
