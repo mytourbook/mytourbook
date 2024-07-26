@@ -1610,6 +1610,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
             //Trigger the update of the calories and sodium values
             _colDef_Calories.setColumnLabel(UI.EMPTY_STRING);
+            _colDef_Carbohydrates.setColumnLabel(UI.EMPTY_STRING);
             _colDef_Sodium.setColumnLabel(UI.EMPTY_STRING);
             _tourData = TourManager.saveModifiedTour(_tourData);
          }
@@ -1617,6 +1618,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _colDef_Name.setEditingSupport(new NoEditingSupport());
       _colDef_Calories.setEditingSupport(new NoEditingSupport());
+      _colDef_Carbohydrates.setEditingSupport(new NoEditingSupport());
       _colDef_Sodium.setEditingSupport(new NoEditingSupport());
 
       _colDef_IsBeverage.setEditingSupport(new EditingSupport(_productsViewer) {
@@ -1800,6 +1802,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       final String totalCaloriesFormatted = FormatManager.formatNumber_0(totalCalories);
       _lblCalories_Total.setText(totalCaloriesFormatted);
 
+      final int totalCarbohydrates = NutritionUtils.getTotalCarbohydrates(tourNutritionProducts);
+      final String totalCarbohydratesFormatted = FormatManager.formatNumber_0(totalCarbohydrates);
+      _lblCarbohydrates_Total.setText(totalCarbohydratesFormatted);
+
       final float totalFluid = NutritionUtils.getTotalFluids(tourNutritionProducts) * 100 / 100;
       final String totalFluidFormatted = _nf2.format(totalFluid);
       _lblFluid_Total.setText(totalFluidFormatted);
@@ -1810,6 +1816,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final String averageCaloriesPerHour = NutritionUtils.computeAverageCaloriesPerHour(_tourData);
       _lblCalories_Average.setText(averageCaloriesPerHour);
+
+      final String averageCarbohydratesPerHour = NutritionUtils.computeAverageCarbohydratesPerHour(_tourData);
+      _lblCarbohydrates_Average.setText(averageCarbohydratesPerHour);
 
       final String averageFluidsPerHour = NutritionUtils.computeAverageFluidsPerHour(_tourData);
       _lblFluid_Average.setText(averageFluidsPerHour);

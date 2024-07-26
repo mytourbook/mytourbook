@@ -87,6 +87,15 @@ public class NutritionUtils {
       return averageCaloriesPerHourFormatted;
    }
 
+   public static String computeAverageCarbohydratesPerHour(final TourData tourData) {
+
+      final int totalCarbohydrates = getTotalCarbohydrates(tourData.getTourNutritionProducts());
+      final float averageCarbohydratesPerHour = computeAveragePerHour(tourData, totalCarbohydrates);
+      final String averageCarbohydratesPerHourFormatted = FormatManager.formatNumber_0(averageCarbohydratesPerHour);
+
+      return averageCarbohydratesPerHourFormatted;
+   }
+
    public static String computeAverageFluidsPerHour(final TourData tourData) {
 
       final float totalFluids = getTotalFluids(tourData.getTourNutritionProducts()) * 100 / 100;
@@ -177,6 +186,29 @@ public class NutritionUtils {
       }
 
       return totalCalories;
+   }
+
+   public static int getTotalCarbohydrates(final Set<TourNutritionProduct> tourNutritionProducts) {
+
+      int totalCarbohydrates = 0;
+
+      for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
+
+         switch (tourNutritionProduct.getQuantityType()) {
+
+         case Servings:
+
+            totalCarbohydrates += tourNutritionProduct.getCarbohydrates_Serving() * tourNutritionProduct.getConsumedQuantity();
+            break;
+
+         case Products:
+
+            totalCarbohydrates += tourNutritionProduct.getCarbohydrates() * tourNutritionProduct.getConsumedQuantity();
+            break;
+         }
+      }
+
+      return totalCarbohydrates;
    }
 
    /**
