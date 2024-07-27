@@ -1836,7 +1836,7 @@ public class UI {
 
    public static void dumpAllFonts() {
 
-      System.out.println("All available font family names");
+      System.out.println("All available font family names"); //$NON-NLS-1$
 
       // all fonts available in AWT
       final Font[] allFonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
@@ -1846,14 +1846,14 @@ public class UI {
          String style;
 
          if (font.isBold()) {
-            style = font.isItalic() ? "bolditalic" : "bold";
+            style = font.isItalic() ? "bolditalic" : "bold"; //$NON-NLS-1$ //$NON-NLS-2$
          } else {
-            style = font.isItalic() ? "italic" : "plain";
+            style = font.isItalic() ? "italic" : "plain"; //$NON-NLS-1$ //$NON-NLS-2$
          }
 
-         System.out.println(""
+         System.out.println(EMPTY_STRING
 
-               + "%-35s - %s".formatted(
+               + "%-35s - %s".formatted( //$NON-NLS-1$
 
                      font.getFamily(),
 //                           font.getName(),
