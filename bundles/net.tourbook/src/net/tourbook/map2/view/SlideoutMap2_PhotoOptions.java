@@ -513,6 +513,8 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
       updateUI_FromConfig();
 
+      saveState();
+
       enableControls();
       updateMap();
    }

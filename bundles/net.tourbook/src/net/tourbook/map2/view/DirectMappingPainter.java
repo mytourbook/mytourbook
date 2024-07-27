@@ -393,13 +393,10 @@ public class DirectMappingPainter implements IDirectPainter {
          return;
       }
 
-      if (photo.isSmallRatingStars) {
-
-         // make the rating stars more visible
-
-         gc.setBackground(_photoBackgroundColor);
-         gc.fillRectangle(photo.paintedRatingStars);
-      }
+      // make the rating stars more visible
+      gc.setBackground(_photoBackgroundColor);
+      gc.fillRectangle(photo.paintedRatingStars);
+      _map2.setPaintedRatingStars(photo.paintedRatingStars);
 
       final int hoveredStars = photo.hoveredStars;
       final boolean isStarHovered = hoveredStars > 0;

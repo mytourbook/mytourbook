@@ -460,6 +460,7 @@ public class Map2 extends Canvas {
 
    private PaintedMarkerCluster            _hoveredMarkerCluster;
    private PaintedMapPoint                 _hoveredMapPoint;
+   private PaintedMapPoint                 _hoveredMapPoint_Previous;
    private boolean                         _isInHoveredRatingStar;
    private boolean                         _isMarkerClusterSelected;
    private MapPointToolTip                 _mapPointTooltip;
@@ -790,6 +791,7 @@ public class Map2 extends Canvas {
    private BufferedImage       _imageRatingStar;
 
    private int                 _ratingStarImageSize;
+   private Rectangle           _paintedRatingStars;
 
    private final int           MAX_RATING_STARS   = 5;
    public int                  MAX_RATING_STARS_WIDTH;
@@ -4688,7 +4690,7 @@ public class Map2 extends Canvas {
       /*
        * Setup map points
        */
-      final PaintedMapPoint oldHoveredMapPoint = _hoveredMapPoint;
+      _hoveredMapPoint_Previous = _hoveredMapPoint;
       _hoveredMapPoint = null;
 
       // use a local ref otherwise the list could be modified in another thread which caused exceptions
@@ -4811,7 +4813,7 @@ public class Map2 extends Canvas {
       }
 
       // ensure that the old map point is hidden
-      if (oldHoveredMapPoint != null) {
+      if (_hoveredMapPoint_Previous != null) {
          redraw();
       }
 
@@ -5016,7 +5018,29 @@ public class Map2 extends Canvas {
                final Photo photo = paintedMapPoint.mapPoint.photo;
 
                if (photo != null) {
-                  onMouse_Move_CheckMapPoints_Photo(photo);
+                  onMouse_Move_CheckMapPoints_Photo(photo, photo.paintedRatingStars);
+               }
+
+               break;
+
+            } else if (_paintedRatingStars != null
+
+                  // this can be null when a hovered rating star was set
+                  && _hoveredMapPoint_Previous != null
+
+                  && (mouseMoveDevX > _paintedRatingStars.x)
+                  && (mouseMoveDevX < _paintedRatingStars.x + _paintedRatingStars.width)
+                  && (mouseMoveDevY > _paintedRatingStars.y)
+                  && (mouseMoveDevY < _paintedRatingStars.y + _paintedRatingStars.height)) {
+
+               // a rating star is hovered
+
+               _hoveredMapPoint = _hoveredMapPoint_Previous;
+
+               final Photo photo = _hoveredMapPoint.mapPoint.photo;
+
+               if (photo != null) {
+                  onMouse_Move_CheckMapPoints_Photo(photo, photo.paintedRatingStars);
                }
 
                break;
@@ -5025,12 +5049,10 @@ public class Map2 extends Canvas {
       }
    }
 
-   private void onMouse_Move_CheckMapPoints_Photo(final Photo photo) {
+   private void onMouse_Move_CheckMapPoints_Photo(final Photo photo, final Rectangle paintedRatingStars) {
 
       int hoveredStars = 0;
       _isInHoveredRatingStar = false;
-
-x      final Rectangle paintedRatingStars = photo.paintedRatingStars;
 
       if (paintedRatingStars != null) {
 
@@ -8473,20 +8495,13 @@ x      final Rectangle paintedRatingStars = photo.paintedRatingStars;
       final int maxSmallRatingStarsWidth = MAX_RATING_STARS * smallRatingStarSize
             + (MAX_RATING_STARS - 1) * smallRatingStarGap;
 
-      final int leftBorderWithVisibleStars = photoDevX + photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
       // center ratings stars in the middle of the image
-
-      final int ratingStarsLeftBorder = isSmallRatingStar
+      final int leftBorderWithVisibleStars = photoDevX + photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
+      final int leftBorderRatingStars = isSmallRatingStar
             ? photoDevX + photoWidth / 2 - maxSmallRatingStarsWidth / 2
             : leftBorderWithVisibleStars;
 
       g2d.setColor(RATING_STAR_COLOR);
-
-      if (isSmallRatingStar) {
-
-         // ensure that ovals are smooth
-         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      }
 
       photo.paintedRatingStars = new Rectangle(
 
@@ -8504,9 +8519,9 @@ x      final Rectangle paintedRatingStars = photo.paintedRatingStars;
 
             final int ratingStarXOffset = (smallRatingStarSize + smallRatingStarGap) * starIndex;
 
-            g2d.fillOval(
+            g2d.fillRect(
 
-                  ratingStarsLeftBorder + ratingStarXOffset,
+                  leftBorderRatingStars + ratingStarXOffset,
                   photoDevY + 1,
                   smallRatingStarSize,
                   smallRatingStarSize);
@@ -8515,16 +8530,13 @@ x      final Rectangle paintedRatingStars = photo.paintedRatingStars;
 
             g2d.drawImage(_imageRatingStar,
 
-                  ratingStarsLeftBorder + (_ratingStarImageSize * starIndex),
+                  leftBorderRatingStars + (_ratingStarImageSize * starIndex),
                   photoDevY,
                   _ratingStarImageSize,
                   _ratingStarImageSize,
 
                   null);
          }
-
-         // ensure that rectangels are not smoothed
-         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
       }
    }
 
@@ -10718,6 +10730,11 @@ x      final Rectangle paintedRatingStars = photo.paintedRatingStars;
     */
    public void setOverlayKey(final String key) {
       _overlayKey = key;
+   }
+
+   public void setPaintedRatingStars(final Rectangle paintedRatingStars) {
+
+      _paintedRatingStars = paintedRatingStars;
    }
 
    /**
