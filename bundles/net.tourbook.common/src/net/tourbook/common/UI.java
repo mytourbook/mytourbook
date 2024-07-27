@@ -173,7 +173,31 @@ public class UI {
 
    private static final String      JS_APOSTROPHE                        = "'";                                         //$NON-NLS-1$
    private static final String      JS_APOSTROPHE_REPLACEMENT            = "\\'";                                       //$NON-NLS-1$
-   private static final String      JS_QUOTA_MARK                        = "\"";                                        //$NON-NLS-1$
+
+   /**
+    * Suddenly JS_QUOTA_MARK causes this Eclipse exception when opening the string externalization
+    * dialog
+    *
+    * <pre>
+    *
+    *  java.lang.StringIndexOutOfBoundsException: begin 3, end 0, length 3
+    *          at java.base/java.lang.String.checkBoundsBeginEnd(String.java:4606)
+    *          at java.base/java.lang.String.substring(String.java:2709)
+    *          at org.eclipse.jdt.internal.corext.refactoring.nls.NLSHint.stripQuotes(NLSHint.java:266)
+    *          at org.eclipse.jdt.internal.corext.refactoring.nls.NLSHint.createSubstitutions(NLSHint.java:221)
+    *          at org.eclipse.jdt.internal.corext.refactoring.nls.NLSHint.<init>(NLSHint.java:106)
+    *          at org.eclipse.jdt.internal.corext.refactoring.nls.NLSRefactoring.<init>(NLSRefactoring.java:92)
+    *          at org.eclipse.jdt.internal.corext.refactoring.nls.NLSRefactoring.create(NLSRefactoring.java:113)
+    *          at org.eclipse.jdt.internal.ui.refactoring.nls.ExternalizeWizard.lambda$0(ExternalizeWizard.java:84)
+    *          at org.eclipse.swt.custom.BusyIndicator.showWhile(BusyIndicator.java:67)
+    *          at org.eclipse.jdt.internal.ui.refactoring.nls.ExternalizeWizard.open(ExternalizeWizard.java:81)
+    *          at org.eclipse.jdt.ui.actions.ExternalizeStringsAction.run(ExternalizeStringsAction.java:191)
+    *          at org.eclipse.jdt.ui.actions.ExternalizeStringsAction.run(ExternalizeStringsAction.java:156)
+    *          at org.eclipse.jdt.ui.actions.SelectionDispatchAction.dispatchRun(SelectionDispatchAction.java:278)
+    * </pre>
+    */
+// private static final String      JS_QUOTA_MARK                        = "\"";                                        //$NON-NLS-1$
+   private static String            JS_QUOTA_MARK                        = new StringBuilder().append('"').toString();
    private static final String      JS_QUOTA_MARK_REPLACEMENT            = "\\\"";                                      //$NON-NLS-1$
    private static final String      JS_BACKSLASH_REPLACEMENT             = "\\\\";                                      //$NON-NLS-1$
    private static final String      HTML_NEW_LINE                        = "\\n";                                       //$NON-NLS-1$
