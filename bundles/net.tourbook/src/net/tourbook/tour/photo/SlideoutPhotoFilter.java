@@ -53,6 +53,7 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
          PhotoRatingStarOperator.HAS_ANY,
          PhotoRatingStarOperator.IS_EQUAL,
          PhotoRatingStarOperator.IS_MORE_OR_EQUAL,
+         PhotoRatingStarOperator.IS_MORE_OR_EQUAL_OR_NONE,
          PhotoRatingStarOperator.IS_LESS_OR_EQUAL,
 
    };
@@ -65,6 +66,7 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
          Messages.Photo_Filter_Operator_HasAny,
          Messages.Photo_Filter_Operator_IsEqual,
          Messages.Photo_Filter_Operator_IsMore,
+         Messages.Photo_Filter_Operator_IsMoreOrNone,
          Messages.Photo_Filter_Operator_IsLess,
 
    };
@@ -77,6 +79,7 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
          Messages.Photo_Filter_Operator_HasAny_Tooltip,
          Messages.Photo_Filter_Operator_IsEqual_Tooltip,
          Messages.Photo_Filter_Operator_IsMore_Tooltip,
+         Messages.Photo_Filter_Operator_IsMoreOrNone_Tooltip,
          Messages.Photo_Filter_Operator_IsLess_Tooltip,
 
    };
@@ -334,6 +337,7 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
       // select operator
       int ratingStarOperatorIndex = 0;
       for (int operatorIndex = 0; operatorIndex < _allRatingStar_Operators.length; operatorIndex++) {
+
          final PhotoRatingStarOperator photoRatingStarOperator = _allRatingStar_Operators[operatorIndex];
 
          if (photoRatingStarOperator.equals(_selectedRatingStarOperator)) {
