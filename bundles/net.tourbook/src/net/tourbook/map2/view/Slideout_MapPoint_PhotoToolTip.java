@@ -21,6 +21,7 @@ import de.byteholder.geoclipse.map.PaintedMapPoint;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 
+import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
@@ -71,7 +72,7 @@ import org.eclipse.ui.part.PageBook;
 /**
  * Slideout for all 2D map locations and marker
  */
-public class MapPointToolTip_Photo extends AdvancedSlideout implements IActionResetToDefault {
+public class Slideout_MapPoint_PhotoToolTip extends AdvancedSlideout implements IActionResetToDefault {
 
    private static final String          ID                                = "net.tourbook.map2.view.MapPointToolTip_Photo";                     //$NON-NLS-1$
 
@@ -178,7 +179,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout implements IActionRe
       }
    }
 
-   public MapPointToolTip_Photo(final Map2 map2) {
+   public Slideout_MapPoint_PhotoToolTip(final Map2 map2) {
 
       super(map2, _state, null);
 
@@ -256,7 +257,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout implements IActionRe
              */
             _comboTooltipSize = new Combo(_containerToolbar, SWT.READ_ONLY | SWT.BORDER);
             _comboTooltipSize.setVisibleItemCount(10);
-            _comboTooltipSize.setToolTipText("When the photo tooltip is resized, the tooltip window size is saved in the selected size");
+            _comboTooltipSize.setToolTipText(Messages.Slideout_MapPoint_PhotoToolTip_Combo_TooltipSize_Tooltip);
             _comboTooltipSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_TooltipSize(selectionEvent)));
             _comboTooltipSize.addFocusListener(_keepOpenListener);
 
@@ -331,8 +332,8 @@ public class MapPointToolTip_Photo extends AdvancedSlideout implements IActionRe
 
          {
             final Link link = new Link(_containerPhotoOptions, SWT.NONE);
-            link.setText(UI.createLinkText("Resize tooltip to photo image"));
-            link.setToolTipText("The photo tooltip is resize, that all empty space is removed");
+            link.setText(UI.createLinkText(Messages.Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip));
+            link.setToolTipText(Messages.Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip_Tooltip);
             link.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_TooltipResize()));
             GridDataFactory.fillDefaults()
                   .grab(true, false)
@@ -888,7 +889,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout implements IActionRe
 
          final Photo photo = _hoveredMapPoint.mapPoint.photo;
 
-         final String photoText = "Loading " + photo.imageFilePathName;
+         final String photoText = Messages.Slideout_MapPoint_PhotoToolTip_Label_LoadingMessage + photo.imageFilePathName;
 
          _labelMessage.setText(photoText);
       }
@@ -912,7 +913,7 @@ public class MapPointToolTip_Photo extends AdvancedSlideout implements IActionRe
 
       final ZonedDateTime adjustedTime_Tour_WithZone = _photo.adjustedTime_Tour_WithZone;
 
-      final String photoDateTime = "%s  %s".formatted(
+      final String photoDateTime = "%s  %s".formatted( //$NON-NLS-1$
             adjustedTime_Tour_WithZone.format(TimeTools.Formatter_Weekday),
             adjustedTime_Tour_WithZone.format(TimeTools.Formatter_DateTime_M));
 

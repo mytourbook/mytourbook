@@ -223,7 +223,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
           * Show tooltip
           */
          _chkShowPhotoTooltip = new Button(parent, SWT.CHECK);
-         _chkShowPhotoTooltip.setText("Show photo t&ooltip");
+         _chkShowPhotoTooltip.setText(Messages.Slideout_Map_PhotoOptions_Checkbox_ShowPhotoTooltip);
          _chkShowPhotoTooltip.addSelectionListener(_defaultSelectedListener);
       }
       {
@@ -231,7 +231,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
           * Show photo rating
           */
          _chkShowPhotoRating = new Button(parent, SWT.CHECK);
-         _chkShowPhotoRating.setText("Show photo &rating");
+         _chkShowPhotoRating.setText(Messages.Slideout_Map_PhotoOptions_Checkbox_ShowPhotoRating);
          _chkShowPhotoRating.addSelectionListener(_defaultSelectedListener);
       }
    }
@@ -330,7 +330,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
    private void createUI_40_Options2(final Composite parent) {
 
-      final String coloTooltipText = "Symbol color\n\n● Outline color\n● Fill color";
+      final String coloTooltipText = Messages.Slideout_Map_PhotoOptions_Label_SymbolColor_Tooltip;
 
       final GridDataFactory labelGridData = GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER);
 
@@ -347,7 +347,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
             {
                // label
                final Label label = new Label(container, SWT.NONE);
-               label.setText("S&ymbol color");
+               label.setText(Messages.Slideout_Map_PhotoOptions_Label_SymbolColor);
                label.setToolTipText(coloTooltipText);
                labelGridData.applyTo(label);
             }
@@ -381,9 +381,8 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
           * Preload photos
           */
          _chkPreloadHQImages = new Button(parent, SWT.CHECK);
-         _chkPreloadHQImages.setText("&Preload photo tooltip images");
-         _chkPreloadHQImages.setToolTipText(
-               "This can be very very CPU intensive\nwhen there are many photos.\n\nOnly the visible images will be preloaded.");
+         _chkPreloadHQImages.setText(Messages.Slideout_Map_PhotoOptions_Checkbox_PreloadPhotoImages);
+         _chkPreloadHQImages.setToolTipText(Messages.Slideout_Map_PhotoOptions_Checkbox_PreloadPhotoImages_Tooltip);
          _chkPreloadHQImages.addSelectionListener(_defaultSelectedListener);
       }
       {
@@ -391,9 +390,8 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
           * Discard cached images
           */
          _linkDiscardImages = new Link(parent, SWT.NONE);
-         _linkDiscardImages.setText(UI.createLinkText("&Discard cached images"));
-         _linkDiscardImages.setToolTipText(
-               "This will not delete any images,\nonly the cached images are discarded\nand will be reloaded when needed");
+         _linkDiscardImages.setText(UI.createLinkText(Messages.Slideout_Map_PhotoOptions_Link_DiscardCachedImages));
+         _linkDiscardImages.setToolTipText(Messages.Slideout_Map_PhotoOptions_Link_DiscardCachedImages_Tooltip);
          _linkDiscardImages.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onDiscardImages()));
       }
    }

@@ -3526,7 +3526,7 @@ public class TourManager {
             Messages.Photos_AndTours_Dialog_RemovePhotos_Title,
             null, // no title image
 
-            "Remove photo from tour?",
+            Messages.TourManager_Dialog_RemovePhoto_Message,
 
             MessageDialog.CONFIRM,
 
