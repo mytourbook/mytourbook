@@ -1,4 +1,4 @@
-24.next.0                                                 ?. January 2024
+24.next.0                                                 ?. August 2024
 
 
 TODO's
@@ -51,6 +51,7 @@ New
 
 * 2D Map
   - Photos are not overlapped
+  - Set photo rating
   - Photo tooltip
     
 
