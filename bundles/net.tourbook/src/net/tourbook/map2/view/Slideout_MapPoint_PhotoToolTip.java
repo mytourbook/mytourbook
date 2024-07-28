@@ -682,7 +682,6 @@ public class Slideout_MapPoint_PhotoToolTip extends AdvancedSlideout implements 
       return newSize;
    }
 
-
    private void onResize_AutoResize(final Point tooltipSize) {
 
       final Point imageSize = _photoImageCanvas.getResizedImageSize();
@@ -889,7 +888,7 @@ public class Slideout_MapPoint_PhotoToolTip extends AdvancedSlideout implements 
 
          final Photo photo = _hoveredMapPoint.mapPoint.photo;
 
-         final String photoText = Messages.Slideout_MapPoint_PhotoToolTip_Label_LoadingMessage + photo.imageFilePathName;
+         final String photoText = Messages.Slideout_MapPoint_PhotoToolTip_Label_LoadingMessage + UI.SPACE + photo.imageFilePathName;
 
          _labelMessage.setText(photoText);
       }

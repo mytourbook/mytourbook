@@ -57,7 +57,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
    public static final String      STATE_IS_PRELOAD_HQ_IMAGES          = "STATE_IS_PRELOAD_HQ_IMAGES";    //$NON-NLS-1$
    public static final boolean     STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT  = false;
    static final String             STATE_IS_SHOW_PHOTO_RATING          = "STATE_IS_SHOW_PHOTO_RATING";    //$NON-NLS-1$
-   static final boolean            STATE_IS_SHOW_PHOTO_RATING_DEFAULT  = false;
+   static final boolean            STATE_IS_SHOW_PHOTO_RATING_DEFAULT  = true;
    static final String             STATE_IS_SHOW_PHOTO_TOOLTIP         = "STATE_IS_SHOW_PHOTO_TOOLTIP";   //$NON-NLS-1$
    static final boolean            STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT = true;
 
