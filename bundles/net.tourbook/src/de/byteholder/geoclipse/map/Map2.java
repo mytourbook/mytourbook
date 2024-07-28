@@ -119,7 +119,7 @@ import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.MapLabelLayout;
 import net.tourbook.map2.view.MapPointStatistics;
 import net.tourbook.map2.view.MapPointToolTip;
-import net.tourbook.map2.view.Slideout_MapPoint_PhotoToolTip;
+import net.tourbook.map2.view.SlideoutMap2_PhotoToolTip;
 import net.tourbook.map2.view.MapPointType;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.SlideoutMap2_PhotoOptions;
@@ -464,7 +464,7 @@ public class Map2 extends Canvas {
    private boolean                         _isInHoveredRatingStar;
    private boolean                         _isMarkerClusterSelected;
    private MapPointToolTip                 _mapPointTooltip;
-   private Slideout_MapPoint_PhotoToolTip           _mapPointTooltip_Photo;
+   private SlideoutMap2_PhotoToolTip       _mapPointTooltip_Photo;
    private boolean                         _isPreloadHQImages;
 
    /** Number of created map points */
@@ -896,7 +896,7 @@ public class Map2 extends Canvas {
 
       _mapLocation_Tooltip = new MapLocationToolTip(this);
       _mapPointTooltip = new MapPointToolTip(this);
-      _mapPointTooltip_Photo = new Slideout_MapPoint_PhotoToolTip(this);
+      _mapPointTooltip_Photo = new SlideoutMap2_PhotoToolTip(this);
 
       _poiImage = TourbookPlugin.getImageDescriptor(Images.POI_InMap).createImage();
       _poiImageBounds = _poiImage.getBounds();

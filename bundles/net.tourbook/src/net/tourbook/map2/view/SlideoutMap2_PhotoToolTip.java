@@ -72,7 +72,7 @@ import org.eclipse.ui.part.PageBook;
 /**
  * Slideout for all 2D map locations and marker
  */
-public class Slideout_MapPoint_PhotoToolTip extends AdvancedSlideout implements IActionResetToDefault {
+public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActionResetToDefault {
 
    private static final String          ID                                = "net.tourbook.map2.view.MapPointToolTip_Photo";                     //$NON-NLS-1$
 
@@ -179,7 +179,7 @@ public class Slideout_MapPoint_PhotoToolTip extends AdvancedSlideout implements 
       }
    }
 
-   public Slideout_MapPoint_PhotoToolTip(final Map2 map2) {
+   public SlideoutMap2_PhotoToolTip(final Map2 map2) {
 
       super(map2, _state, null);
 
