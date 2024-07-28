@@ -2584,7 +2584,32 @@ public class UI {
     * @param imageDescriptor
     * @param text
     */
-   public static void openNotificationPopup(final String title, final ImageDescriptor imageDescriptor, final String text) {
+   public static void openNotificationPopup(final String title,
+                                            final ImageDescriptor imageDescriptor,
+                                            final String text) {
+
+      final Display display = PlatformUI.getWorkbench().getDisplay();
+
+      if (display.getThread() == Thread.currentThread()) {
+
+         openNotificationPopup_InUIThread(title, imageDescriptor, text);
+
+      } else {
+
+         display.asyncExec(() -> {
+            openNotificationPopup_InUIThread(title, imageDescriptor, text);
+         });
+      }
+   }
+
+   /**
+    * Open a notification popup for the number of seconds configured by the user
+    *
+    * @param title
+    * @param imageDescriptor
+    * @param text
+    */
+   private static void openNotificationPopup_InUIThread(final String title, final ImageDescriptor imageDescriptor, final String text) {
 
       final int delay = _prefStore_Common.getInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION) * 1000;
 
