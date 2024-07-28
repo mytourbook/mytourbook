@@ -1443,6 +1443,9 @@ public class Map2View extends ViewPart implements
 
       TourPainterConfiguration.isShowPhotos = _isShowPhoto;
 
+      // update UI in the map point slideout
+      Map2PointManager.enableControls();
+
       _map.setOverlayKey(Integer.toString(_filteredPhotos.hashCode()));
       _map.disposeOverlayImageCache();
 

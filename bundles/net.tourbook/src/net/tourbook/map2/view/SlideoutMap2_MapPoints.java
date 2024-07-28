@@ -1496,7 +1496,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       }
    }
 
-   private void enableControls() {
+   void enableControls() {
 
 // SET_FORMATTING_OFF
 
@@ -1510,6 +1510,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       final boolean isTruncateLabel          = _chkIsTruncateLabel            .getSelection();
 
       final boolean isDimMap                 = _chkIsDimMap                   .getSelection();
+
+      final boolean isShowPhotos             = TourPainterConfiguration.isShowPhotos;
 
       final boolean isGroupMarkers           = isShowTourMarker && isGroupDuplicatedMarkers;
       final boolean isShowClusteredMarker    = isShowTourMarker && isMarkerClustered;
@@ -1530,11 +1532,16 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _chkIsTruncateLabel                    .setEnabled(isShowLabels);
       _comboLabelFont                        .setEnabled(isShowLabels);
       _comboLabelLayout                      .setEnabled(isShowLabels);
-      _lblLabelBackground                    .setEnabled(isShowLabels);
       _lblFontName                           .setEnabled(isShowLabels);
+      _lblLabelBackground                    .setEnabled(isShowLabels);
+      _lblLabelSize                          .setEnabled(isShowLabels || isShowPhotos);
       _lblVisibleLabels                      .setEnabled(isShowLabels);
       _spinnerLabelFontSize                  .setEnabled(isShowLabels);
       _spinnerLabelTruncateLength            .setEnabled(isShowLabels && isTruncateLabel);
+      _spinnerLocationSymbolSize             .setEnabled(isShowLabels || isShowPhotos);
+      _spinnerLabelRespectMargin             .setEnabled(isShowLabels || isShowPhotos);
+      _spinnerLabelDistributorMaxLabels      .setEnabled(isShowLabels || isShowPhotos);
+      _spinnerLabelDistributorRadius         .setEnabled(isShowLabels || isShowPhotos);
 
       _btnSwapClusterSymbolColor             .setEnabled(isShowClusteredMarker);
       _btnSwapTourMarkerLabel_Color          .setEnabled(isShowTourMarker);
