@@ -54,7 +54,6 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -74,14 +73,14 @@ import org.eclipse.ui.part.PageBook;
  */
 public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActionResetToDefault {
 
-   private static final String          ID                                = "net.tourbook.map2.view.MapPointToolTip_Photo";                     //$NON-NLS-1$
+   private static final String          ID                                = "net.tourbook.map2.view.MapPointToolTip_Photo"; //$NON-NLS-1$
 
-   private static final String          STATE_TOOLTIP_SIZE_INDEX          = "STATE_TOOLTIP_SIZE_INDEX";                                         //$NON-NLS-1$
+   private static final String          STATE_TOOLTIP_SIZE_INDEX          = "STATE_TOOLTIP_SIZE_INDEX";                     //$NON-NLS-1$
 
-   private static final String          STATE_TOOLTIP_SIZE_LARGE          = "STATE_TOOLTIP_SIZE_LARGE";                                         //$NON-NLS-1$
-   private static final String          STATE_TOOLTIP_SIZE_MEDIUM         = "STATE_TOOLTIP_SIZE_MEDIUM";                                        //$NON-NLS-1$
-   private static final String          STATE_TOOLTIP_SIZE_SMALL          = "STATE_TOOLTIP_SIZE_SMALL";                                         //$NON-NLS-1$
-   private static final String          STATE_TOOLTIP_SIZE_TINY           = "STATE_TOOLTIP_SIZE_TINY";                                          //$NON-NLS-1$
+   private static final String          STATE_TOOLTIP_SIZE_LARGE          = "STATE_TOOLTIP_SIZE_LARGE";                     //$NON-NLS-1$
+   private static final String          STATE_TOOLTIP_SIZE_MEDIUM         = "STATE_TOOLTIP_SIZE_MEDIUM";                    //$NON-NLS-1$
+   private static final String          STATE_TOOLTIP_SIZE_SMALL          = "STATE_TOOLTIP_SIZE_SMALL";                     //$NON-NLS-1$
+   private static final String          STATE_TOOLTIP_SIZE_TINY           = "STATE_TOOLTIP_SIZE_TINY";                      //$NON-NLS-1$
    private static final int[]           STATE_TOOLTIP_SIZE_TINY_DEFAULT   = new int[] { 250, 250 };
    private static final int[]           STATE_TOOLTIP_SIZE_SMALL_DEFAULT  = new int[] { 500, 500 };
    private static final int[]           STATE_TOOLTIP_SIZE_MEDIUM_DEFAULT = new int[] { 800, 800 };
@@ -89,17 +88,13 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private final static IDialogSettings _state                            = TourbookPlugin.getState(ID);
 
-   private static final String          STATE_IS_TOOLTIP_EXPANDED         = "STATE_IS_TOOLTIP_EXPANDED";                                        //$NON-NLS-1$
+   private static final String          STATE_IS_TOOLTIP_EXPANDED         = "STATE_IS_TOOLTIP_EXPANDED";                    //$NON-NLS-1$
 
    private Map2                         _map2;
 
    private PaintedMapPoint              _hoveredMapPoint;
    private PaintedMapPoint              _previousHoveredMapPoint;
    private Photo                        _photo;
-
-   private final ColorRegistry          _colorRegistry                    = JFaceResources.getColorRegistry();
-   private final Color                  _photoForegroundColor             = _colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
-   private final Color                  _photoBackgroundColor             = _colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 
    private final NumberFormat           _nfMByte                          = NumberFormat.getNumberInstance();
    {
@@ -130,7 +125,8 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
    private PageBook         _pageBook;
 
    private Composite        _containerPhotoOptions;
-   private Composite        _containerToolbar;
+   private Composite        _containerHeader_1;
+   private Composite        _containerHeader_2;
    private Composite        _pageNoPhoto;
    private Composite        _pagePhoto;
 
@@ -234,28 +230,31 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       updateUI_Toolbar();
 
       // show dialog with dark colors, this looks better for photos with the bright theme
-      UI.setChildColors(parent.getShell(), _photoForegroundColor, _photoBackgroundColor);
+      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+      UI.setChildColors(parent.getShell(),
+            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND),
+            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
    }
 
    @Override
-   protected void createTitleBarControls(final Composite parent) {
+   protected void createTitleBar_FirstControls(final Composite parent) {
 
       // this method is called 1st !!!
 
       initUI(parent);
       createActions();
 
-      _containerToolbar = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(false, false).applyTo(_containerToolbar);
-      GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).applyTo(_containerToolbar);
-//      _containerToolbar.setBackground(UI.SYS_COLOR_GREEN);
+      _containerHeader_1 = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(false, false).applyTo(_containerHeader_1);
+      GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).applyTo(_containerHeader_1);
+//      _containerHeader_1.setBackground(UI.SYS_COLOR_GREEN);
 
       {
          {
             /*
              * Tooltip size
              */
-            _comboTooltipSize = new Combo(_containerToolbar, SWT.READ_ONLY | SWT.BORDER);
+            _comboTooltipSize = new Combo(_containerHeader_1, SWT.READ_ONLY | SWT.BORDER);
             _comboTooltipSize.setVisibleItemCount(10);
             _comboTooltipSize.setToolTipText(Messages.Slideout_MapPoint_PhotoToolTip_Combo_TooltipSize_Tooltip);
             _comboTooltipSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_TooltipSize(selectionEvent)));
@@ -265,11 +264,24 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(_comboTooltipSize);
          }
+
+         UI.createLabel(_containerHeader_1, UI.SPACE3);
+      }
+   }
+
+   @Override
+   protected void createTitleBarControls(final Composite parent) {
+
+      _containerHeader_2 = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(false, false).applyTo(_containerHeader_2);
+      GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(_containerHeader_2);
+//      _containerHeader_2.setBackground(UI.SYS_COLOR_BLUE);
+      {
          {
             /*
              * Expand/collapse slideout
              */
-            final ToolBar toolbar = new ToolBar(_containerToolbar, SWT.FLAT);
+            final ToolBar toolbar = new ToolBar(_containerHeader_2, SWT.FLAT);
 
             _toolbarManagerExpandCollapseSlideout = new ToolBarManager(toolbar);
             _toolbarManagerExpandCollapseSlideout.add(_actionExpandCollapseSlideout);
@@ -676,7 +688,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
        */
       if (isUpdateState) {
 
-         saveState_TooltipSize(contentWidth, newSize.y);
+         saveState_TooltipSize(newSize.x, newSize.y);
       }
 
       return newSize;
@@ -941,23 +953,29 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private void updateUI_Toolbar() {
 
-      final GridData gd = (GridData) _containerToolbar.getLayoutData();
-
       final boolean isResizableShell = isResizableShell();
+
+      final GridData gd1 = (GridData) _containerHeader_1.getLayoutData();
+      final GridData gd2 = (GridData) _containerHeader_2.getLayoutData();
+
       if (isResizableShell) {
 
-         gd.exclude = false;
+         gd1.exclude = false;
+         gd2.exclude = false;
 
-         _containerToolbar.setVisible(true);
+         _containerHeader_1.setVisible(true);
+         _containerHeader_2.setVisible(true);
 
       } else {
 
-         gd.exclude = true;
+         gd1.exclude = true;
+         gd2.exclude = true;
 
-         _containerToolbar.setVisible(false);
+         _containerHeader_1.setVisible(false);
+         _containerHeader_2.setVisible(false);
       }
 
-      _containerToolbar.getParent().layout(true);
+      _containerHeader_1.getParent().layout(true);
 
       showDefaultActions(isResizableShell);
    }

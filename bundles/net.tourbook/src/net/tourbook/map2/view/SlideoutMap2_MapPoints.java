@@ -1498,6 +1498,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
    void enableControls() {
 
+      if (_shellContainer == null || _shellContainer.isDisposed()) {
+         return;
+      }
+
 // SET_FORMATTING_OFF
 
       final boolean isGroupDuplicatedMarkers = _chkIsGroupMarkers             .getSelection();

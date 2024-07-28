@@ -208,6 +208,14 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       return container;
    }
 
+   protected void createTitleBar_FirstControls(final Composite parent) {
+
+      // create default content
+      final Label label = new Label(parent, SWT.NONE);
+      label.setText(UI.EMPTY_STRING);
+      GridDataFactory.fillDefaults().applyTo(label);
+   }
+
    /**
     * Overwrite this to create custom title bar controls
     *
@@ -243,12 +251,13 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       _titleContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_titleContainer);
       GridLayoutFactory.fillDefaults()
-            .numColumns(3)
+            .numColumns(4)
             .extendedMargins(0, 0, 0, 3)
             .spacing(0, 0)
             .applyTo(_titleContainer);
 //      _titleContainer.setBackground(UI.SYS_COLOR_YELLOW);
       {
+         createTitleBar_FirstControls(_titleContainer);
          createUI_12_Header_Draggable(_titleContainer);
          createTitleBarControls(_titleContainer);
          createUI_14_Header_Toolbar(_titleContainer);
