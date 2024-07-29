@@ -143,6 +143,19 @@ public class DialogCustomTourNutritionProduct extends Dialog {
             UI.createLabel(container, net.tourbook.ui.Messages.Value_Unit_KCalories);
          }
          {
+            // Label: carbohydrates
+            UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_Carbohydrates);
+            _txtCarbohydrates = new Text(container, SWT.BORDER);
+            _txtCarbohydrates.addModifyListener(event -> onModifyCarbohydrates(event));
+            GridDataFactory.fillDefaults()
+                  .hint(HINT_TEXT_COLUMN_WIDTH, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_txtCarbohydrates);
+
+            // Unit: g
+            UI.createLabel(container, UI.UNIT_WEIGHT_G);
+         }
+         {
             // Label: sodium
             UI.createLabel(container, Messages.Dialog_CustomTourNutritionProduct_Label_Sodium);
 
@@ -220,6 +233,9 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       product.setCalories(_calories);
       product.setCalories_Serving((int) Math.round(_calories * 1.0 / _numServings));
 
+      product.setCarbohydrates(_carbohydrates);
+      product.setCarbohydrates_Serving((int) Math.round(_carbohydrates * 1.0 / _numServings));
+
       product.setSodium(_sodium);
       product.setSodium_Serving((int) Math.round(_sodium * 1.0 / _numServings));
 
@@ -238,6 +254,7 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       _name = _txtName.getText();
       _numServings = (int) Math.round(_spinnerNumServings.getSelection() / 100.0);
       _calories = UI.verifyIntegerValue(_txtCalories.getText()) ? Integer.valueOf(_txtCalories.getText()) : 0;
+      _carbohydrates = UI.verifyIntegerValue(_txtCarbohydrates.getText()) ? Integer.valueOf(_txtCarbohydrates.getText()) : 0;
       _sodium = UI.verifyIntegerValue(_txtSodium.getText()) ? Integer.valueOf(_txtSodium.getText()) : 0;
       _isBeverage = _checkIsBeverage.getSelection();
       _beverageQuantity = _isBeverage
@@ -276,6 +293,18 @@ public class DialogCustomTourNutritionProduct extends Dialog {
       if (UI.verifyIntegerValue(userText)) {
 
          _calories = Integer.parseInt(userText);
+      }
+
+      validateFields();
+   }
+
+   private void onModifyCarbohydrates(final ModifyEvent event) {
+
+      final Text textWidget = (Text) event.getSource();
+      final String userText = textWidget.getText();
+      if (UI.verifyIntegerValue(userText)) {
+
+         _carbohydrates = Integer.parseInt(userText);
       }
 
       validateFields();

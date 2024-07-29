@@ -508,6 +508,7 @@ public class Messages extends NLS {
 
    public static String        Dialog_CustomTourNutritionProduct_Label_BeverageQuantity;
    public static String        Dialog_CustomTourNutritionProduct_Label_Calories;
+   public static String        Dialog_CustomTourNutritionProduct_Label_Carbohydrates;
    public static String        Dialog_CustomTourNutritionProduct_Label_IsBeverage;
    public static String        Dialog_CustomTourNutritionProduct_Label_Name;
    public static String        Dialog_CustomTourNutritionProduct_Label_NumberServings;
