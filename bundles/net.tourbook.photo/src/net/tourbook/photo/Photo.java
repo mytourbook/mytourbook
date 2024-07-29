@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -52,6 +53,7 @@ import org.apache.commons.imaging.formats.tiff.taginfos.TagInfoShortOrLong;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.graphics.Rectangle;
 
 public class Photo implements Serializable {
 
@@ -78,7 +80,14 @@ public class Photo implements Serializable {
    /**
     * This is the image size which the user has selected to paint a photo image.
     */
-   private static int                              PAINTED_MAP_IMAGE_WIDTH = MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
+   private static int                              _mapImageRequestedSize = MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
+
+   private int                                     _mapImageRequestedAndCheckedSize;
+
+   /**
+    * Image size which is painted in the map
+    */
+   private org.eclipse.swt.graphics.Point          _mapImageRenderSize    = MAP_IMAGE_DEFAULT_SIZE;
 
    private String                                  _uniqueId;
 
@@ -116,12 +125,14 @@ public class Photo implements Serializable {
     * Time in ms (or {@link Long#MIN_VALUE} when not set) when photo was taken + time adjustments,
     * e.g. wrong time zone, wrong time is set in the camera. This time is saved in the tour photo.
     */
-   public long                                     adjustedTime_Tour       = Long.MIN_VALUE;
+   public long                                     adjustedTime_Tour      = Long.MIN_VALUE;
+
+   public ZonedDateTime                            adjustedTime_Tour_WithZone;
 
    /**
     * Time in ms which is set in the link view with the adjusted camera time
     */
-   public long                                     adjustedTime_Camera     = Long.MIN_VALUE;
+   public long                                     adjustedTime_Camera    = Long.MIN_VALUE;
 
    public long                                     imageFileSize;
 
@@ -156,19 +167,40 @@ public class Photo implements Serializable {
    /**
     * A photo can be linked with different tours, key is tourId
     */
-   private final HashMap<Long, TourPhotoReference> _tourPhotoRef           = new HashMap<>();
+   private final HashMap<Long, TourPhotoReference> _tourPhotoRef          = new HashMap<>();
 
    /**
     * When sql loading state is {@link PhotoSqlLoadingState#NOT_LOADED}, the photo is created from
     * the file system and {@link #_tourPhotoRef} needs to be retrieved from the sql db.
     */
-   private AtomicReference<PhotoSqlLoadingState>   _photoSqlLoadingState   = new AtomicReference<>(PhotoSqlLoadingState.NOT_LOADED);
+   private AtomicReference<PhotoSqlLoadingState>   _photoSqlLoadingState  = new AtomicReference<>(PhotoSqlLoadingState.NOT_LOADED);
 
    /**
     * Rating stars are very complicated when a photo is saved in multiple tours. Currently
     * (8.1.2013) ratings stars can be set only for ALL tours.
     */
    public int                                      ratingStars;
+
+   /**
+    * Is <code>true</code> when small rating stars are painted in the map. Small rating stars cannot
+    * be modified.
+    */
+   public boolean                                  isSmallRatingStars;
+
+   /**
+    * Rectangle in device coordinates where the photo is painted
+    */
+   public Rectangle                                paintedPhoto;
+
+   /**
+    * Rectangle for the painted rating stars
+    */
+   public Rectangle                                paintedRatingStars;
+
+   /**
+    * Number of hovered rating stars
+    */
+   public int                                      hoveredStars;
 
    private PhotoImageMetadata                      _photoImageMetadata;
 
@@ -191,7 +223,7 @@ public class Photo implements Serializable {
     * Other        =     reserved
     * </pre>
     */
-   private int                                     _orientation            = 1;
+   private int                                     _orientation           = 1;
 
    /**
     * When <code>true</code>, EXIF geo is returned when available, otherwise tour geo is returned
@@ -199,38 +231,38 @@ public class Photo implements Serializable {
     */
 //   private static boolean                        _isGetExifGeo               = false;
 
-   private int                                     _photoImageWidth        = Integer.MIN_VALUE;
-   private int                                     _photoImageHeight       = Integer.MIN_VALUE;
+   private int                                     _photoImageWidth       = Integer.MIN_VALUE;
+   private int                                     _photoImageHeight      = Integer.MIN_VALUE;
 
-   private int                                     _thumbImageWidth        = Integer.MIN_VALUE;
-   private int                                     _thumbImageHeight       = Integer.MIN_VALUE;
+   private int                                     _thumbImageWidth       = Integer.MIN_VALUE;
+   private int                                     _thumbImageHeight      = Integer.MIN_VALUE;
 
    /**
     * Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the value when the
     * value is not set !!!
     */
-   private double                                  _exifLatitude           = 0;
-   private double                                  _exifLongitude          = 0;
+   private double                                  _exifLatitude          = 0;
+   private double                                  _exifLongitude         = 0;
 
-   private double                                  _tourLatitude           = 0;
-   private double                                  _tourLongitude          = 0;
+   private double                                  _tourLatitude          = 0;
+   private double                                  _tourLongitude         = 0;
 
-   private double                                  _linkLatitude           = 0;
-   private double                                  _linkLongitude          = 0;
+   private double                                  _linkLatitude          = 0;
+   private double                                  _linkLongitude         = 0;
 
    private String                                  _gpsAreaInfo;
 
-   private double                                  _imageDirection         = Double.MIN_VALUE;
+   private double                                  _imageDirection        = Double.MIN_VALUE;
 
-   private double                                  _altitude               = Double.MIN_VALUE;
+   private double                                  _altitude              = Double.MIN_VALUE;
 
    /**
     * Caches the world positions for the photo lat/long values for each zoom level
     * <p>
     * key: projection id + zoom level
     */
-   private final HashMap<Integer, Point>           _tourWorldPosition      = new HashMap<>();
-   private final HashMap<Integer, Point>           _linkWorldPosition      = new HashMap<>();
+   private final HashMap<Integer, Point>           _tourWorldPosition     = new HashMap<>();
+   private final HashMap<Integer, Point>           _linkWorldPosition     = new HashMap<>();
 
    /**
     * Contains image keys for each image quality which can be used to get images from an image
@@ -267,14 +299,7 @@ public class Photo implements Serializable {
     * -1 exif thumb has not yet been retrieved
     * </pre>
     */
-   private int                                     _exifThumbImageState    = -1;
-
-   /**
-    * Image size which is painted in the map
-    */
-   private org.eclipse.swt.graphics.Point          _mapImageSize           = MAP_IMAGE_DEFAULT_SIZE;
-
-   private int                                     _paintedMapImageWidth;
+   private int                                     _exifThumbImageState   = -1;
 
    /**
     * Temporarily tour id from a {@link TourPhotoLink}
@@ -286,11 +311,6 @@ public class Photo implements Serializable {
    public Photo(final File photoImageFile) {
 
       setupPhoto(photoImageFile, new Path(photoImageFile.getPath()));
-   }
-
-   public Photo(final String imageFilePathName) {
-
-      this(new File(imageFilePathName));
    }
 
    public static String getImageKeyHQ(final String imageFilePathName) {
@@ -308,8 +328,8 @@ public class Photo implements Serializable {
       return photoServiceProvider;
    }
 
-   public static void setPaintedMapImageWidth(final int paintedMapImageWidth) {
-      PAINTED_MAP_IMAGE_WIDTH = paintedMapImageWidth;
+   public static void setMapImageRequestedSize(final int mapImageSize) {
+      _mapImageRequestedSize = mapImageSize;
    }
 
    public static void setPhotoServiceProvider(final IPhotoServiceProvider photoServiceProvider) {
@@ -318,7 +338,7 @@ public class Photo implements Serializable {
 
    static void setupTimeZone() {
 
-      _dtParser = DateTimeFormatter//
+      _dtParser = DateTimeFormatter
             .ofPattern("yyyy:MM:dd HH:mm:ss") //$NON-NLS-1$
             .withZone(TimeTools.getDefaultTimeZone());
    }
@@ -336,6 +356,7 @@ public class Photo implements Serializable {
     *
     * @param imageMetadata
     *           Can be <code>null</code> when not available
+    *
     * @return
     */
    private PhotoImageMetadata createPhotoMetadata(final ImageMetadata imageMetadata) {
@@ -590,6 +611,7 @@ public class Photo implements Serializable {
     *
     * @param jpegMetadata
     * @param file
+    *
     * @return
     */
    private LocalDateTime getExifValueDate(final JpegImageMetadata jpegMetadata) {
@@ -783,6 +805,7 @@ public class Photo implements Serializable {
     * Updated metadata from the image file
     *
     * @param isReadThumbnail
+    *
     * @return Returns image metadata <b>with</b> image thumbnail <b>only</b> when
     *         <code>isReadThumbnail</code> is <code>true</code>, otherwise it checks if metadata
     *         are already loaded.
@@ -856,13 +879,14 @@ public class Photo implements Serializable {
 
    public double getLinkLatitude() {
 
-      return _linkLatitude != 0 //
+      return _linkLatitude != 0
             ? _linkLatitude
             : _exifLatitude;
    }
 
    public double getLinkLongitude() {
-      return _linkLongitude != 0 //
+
+      return _linkLongitude != 0
             ? _linkLongitude
             : _exifLongitude;
    }
@@ -890,14 +914,14 @@ public class Photo implements Serializable {
     */
    public org.eclipse.swt.graphics.Point getMapImageSize() {
 
-      if (PAINTED_MAP_IMAGE_WIDTH != _paintedMapImageWidth) {
+      if (_mapImageRequestedSize != _mapImageRequestedAndCheckedSize) {
 
-         setMapImageSize();
+         setMapImageRenderSize(_mapImageRequestedSize);
 
-         _paintedMapImageWidth = PAINTED_MAP_IMAGE_WIDTH;
+         _mapImageRequestedAndCheckedSize = _mapImageRequestedSize;
       }
 
-      return _mapImageSize;
+      return _mapImageRenderSize;
    }
 
    /**
@@ -1049,6 +1073,7 @@ public class Photo implements Serializable {
     * @param projectionHash
     * @param zoomLevel
     * @param isLinkPhotoDisplayed
+    *
     * @return Returns the world position for this photo or <code>null</code> when geo position is
     *         not set.
     */
@@ -1072,6 +1097,7 @@ public class Photo implements Serializable {
             : _tourWorldPosition.get(hashKey);
 
       if (worldPosition == null) {
+
          // convert lat/long into world pixels which depends on the map projection
 
          final GeoPosition photoGeoPosition = new GeoPosition(latitude,
@@ -1220,43 +1246,56 @@ public class Photo implements Serializable {
 //      // TODO remove SYSTEM.OUT.PRINTLN
    }
 
-   private void setMapImageSize() {
+   private void setMapImageRenderSize(final int mapImageRequestedSize) {
 
-      final int imageCanvasWidth = PAINTED_MAP_IMAGE_WIDTH;
-      final int imageCanvasHeight = imageCanvasWidth;
+      final int imageCanvasWidth = mapImageRequestedSize;
+      final int imageCanvasHeight = mapImageRequestedSize;
 
       final int imageWidth = _photoImageWidth != Integer.MIN_VALUE ? _photoImageWidth : _thumbImageWidth;
       final int imageHeight = _photoImageHeight != Integer.MIN_VALUE ? _photoImageHeight : _thumbImageHeight;
 
-      _mapImageSize = RendererHelper.getBestSize(this, //
+      final org.eclipse.swt.graphics.Point renderSize = RendererHelper.getBestSize(this,
+
             imageWidth,
             imageHeight,
+
             imageCanvasWidth,
             imageCanvasHeight);
+
+      _mapImageRenderSize = renderSize;
    }
 
-   public void setPhotoDimension(final int width, final int height) {
+   public void setPhotoSize(final int width, final int height) {
 
-      _photoImageWidth = width;
-      _photoImageHeight = height;
+      if (width == _photoImageHeight && height == _photoImageWidth) {
 
-      setMapImageSize();
+         /*
+          * There is somewhere a bug which do not recognize the photo orientation
+          */
+
+      } else {
+
+         _photoImageWidth = width;
+         _photoImageHeight = height;
+      }
+
+      setMapImageRenderSize(_mapImageRequestedSize);
    }
 
    public void setStateExifThumb(final int exifThumbState) {
       _exifThumbImageState = exifThumbState;
    }
 
-   public void setThumbDimension(final int width, final int height) {
+   public void setThumbSaveError() {
+      PhotoLoadManager.putPhotoInThumbSaveErrorMap(imageFilePathName);
+   }
+
+   public void setThumbSize(final int width, final int height) {
 
       _thumbImageWidth = width;
       _thumbImageHeight = height;
 
-      setMapImageSize();
-   }
-
-   public void setThumbSaveError() {
-      PhotoLoadManager.putPhotoInThumbSaveErrorMap(imageFilePathName);
+      setMapImageRenderSize(_mapImageRequestedSize);
    }
 
    public void setTourGeoPosition(final double latitude, final double longitude) {
@@ -1387,7 +1426,7 @@ public class Photo implements Serializable {
          }
       }
 
-      setMapImageSize();
+      setMapImageRenderSize(_mapImageRequestedSize);
 
       isExifLoaded = true;
 

@@ -16,6 +16,8 @@
 
 package net.tourbook.common.util;
 
+import java.awt.image.BufferedImage;
+
 import net.tourbook.common.UI;
 
 import org.eclipse.swt.SWT;
@@ -71,6 +73,22 @@ public class ImageUtils {
       }
 
       return destData;
+   }
+
+   /**
+    * Create an AWT image from a SWT image, the SWT image is disposed
+    *
+    * @param swtImage
+    *
+    * @return
+    */
+   public static BufferedImage createAWTImage(final Image swtImage) {
+
+      final BufferedImage awtImage = ImageConverter.convertIntoAWT(swtImage);
+
+      UI.disposeResource(swtImage);
+
+      return awtImage;
    }
 
    /**

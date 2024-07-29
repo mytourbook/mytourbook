@@ -50,13 +50,6 @@ import net.tourbook.data.TourReference;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map2.Messages;
 import net.tourbook.map3.layer.TourLegendLabel;
-import net.tourbook.photo.ILoadCallBack;
-import net.tourbook.photo.IPhotoPreferences;
-import net.tourbook.photo.ImageQuality;
-import net.tourbook.photo.Photo;
-import net.tourbook.photo.PhotoImageCache;
-import net.tourbook.photo.PhotoLoadManager;
-import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.Map2_Appearance;
@@ -67,8 +60,6 @@ import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.resource.ColorRegistry;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -120,7 +111,6 @@ public class TourMapPainter extends Map2Painter {
       _nf1.setMaximumFractionDigits(1);
    }
 
-   private static Color               _bgColor;
    private static final ColorCacheSWT _colorCache = new ColorCacheSWT();
 
    /*
@@ -142,28 +132,6 @@ public class TourMapPainter extends Map2Painter {
 
    private boolean _isFastPainting;
    private int     _fastPainting_SkippedValues;
-
-   private class LoadCallbackImage implements ILoadCallBack {
-
-      private Map2 __map;
-      private Tile __tile;
-
-      public LoadCallbackImage(final Map2 map, final Tile tile) {
-         __map = map;
-         __tile = tile;
-      }
-
-      @Override
-      public void callBackImageIsLoaded(final boolean isUpdateUI) {
-
-         if (isUpdateUI == false) {
-            return;
-         }
-
-         __map.queueOverlayPainting(__tile);
-//       __map.paint();
-      }
-   }
 
    public TourMapPainter() {
 
@@ -758,15 +726,12 @@ public class TourMapPainter extends Map2Painter {
    private static void initPainter() {
 
       // setup only ONCE
-      if (_bgColor != null) {
+      if (_prefChangeListener != null) {
          return;
       }
 
       // ensure color registry is setup
       PhotoUI.init();
-
-      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-      _bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 
       /**
        * this code optimizes the performance by reading from the pref store which is not very
@@ -832,9 +797,8 @@ public class TourMapPainter extends Map2Painter {
       initPainter();
 
       final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
-      final ArrayList<Photo> photoList = TourPainterConfiguration.getPhotos();
 
-      if (allTourData.isEmpty() && photoList.isEmpty()) {
+      if (allTourData.isEmpty()) {
          return false;
       }
 
@@ -1037,102 +1001,7 @@ public class TourMapPainter extends Map2Painter {
          }
       }
 
-      if (TourPainterConfiguration.isShowPhotos && photoList.size() > 0) {
-
-         /*
-          * world positions are cached to optimize performance
-          */
-         final MP mp = map.getMapProvider();
-         final int projectionHash = mp.getProjection().getId().hashCode();
-         final int mapZoomLevel = map.getZoom();
-
-         int photoCounter = 0;
-
-         for (final Photo photo : photoList) {
-
-            final Point photoWorldPixel = photo.getWorldPosition(
-                  mp,
-                  projectionHash,
-                  mapZoomLevel,
-                  TourPainterConfiguration.isLinkPhotoDisplayed);
-
-            if (photoWorldPixel == null) {
-               continue;
-            }
-
-            if (drawPhoto(gcTile, map, tile, photo, photoWorldPixel, parts)) {
-               photoCounter++;
-            }
-         }
-
-         isContentInTile = isContentInTile || photoCounter > 0;
-      }
-
       return isContentInTile;
-   }
-
-   private boolean drawPhoto(final GC gcTile,
-                             final Map2 map,
-                             final Tile tile,
-                             final Photo photo,
-                             final Point photoWorldPixel,
-                             final int parts) {
-
-      final MP mp = map.getMapProvider();
-      final int tileSize = mp.getTileSize();
-
-      // get world viewport for the current tile
-      final int tileWorldPixelX = tile.getX() * tileSize;
-      final int tilwWorldPixelY = tile.getY() * tileSize;
-
-      // convert world position into device position
-      final int devXPhoto = photoWorldPixel.x - tileWorldPixelX;
-      final int devYPhoto = photoWorldPixel.y - tilwWorldPixelY;
-
-      final org.eclipse.swt.graphics.Point photoSize = photo.getMapImageSize();
-
-      final boolean isPhotoInTile = isInTile_Photo(photoSize, devXPhoto, devYPhoto, tileSize);
-
-      if (isPhotoInTile) {
-
-         final int devPartOffset = ((parts - 1) / 2) * tileSize;
-
-         final Image image = getPhotoImage(photo, map, tile);
-
-         if (image == null) {
-            return false;
-         }
-
-         final Rectangle imageSize = image.getBounds();
-
-         final int photoWidth = photoSize.x;
-         final int photoHeight = photoSize.y;
-
-         int devX = devXPhoto - photoWidth / 2;
-         int devY = devYPhoto - photoHeight;
-
-         devX += devPartOffset;
-         devY += devPartOffset;
-
-         gcTile.drawImage(
-               image,
-               0,
-               0,
-               imageSize.width,
-               imageSize.height,
-
-               //
-               devX,
-               devY,
-               photoWidth,
-               photoHeight);
-
-         gcTile.setForeground(_bgColor);
-         gcTile.setLineWidth(1);
-         gcTile.drawRectangle(devX, devY, photoWidth, photoHeight);
-      }
-
-      return isPhotoInTile;
    }
 
    private boolean drawStaticMarker(final GC gcTile,
@@ -1901,43 +1770,6 @@ public class TourMapPainter extends Map2Painter {
       return valuePosition;
    }
 
-   /**
-    * @param photo
-    * @param map
-    * @param tile
-    *
-    * @return Returns the photo image or <code>null</code> when image is not loaded.
-    */
-   private Image getPhotoImage(final Photo photo, final Map2 map, final Tile tile) {
-
-      Image photoImage = null;
-
-      final ImageQuality requestedImageQuality = ImageQuality.THUMB;
-
-      // check if image has an loading error
-      final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
-
-      if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
-
-         // image is not yet loaded
-
-         // check if image is in the cache
-         photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
-
-         if ((photoImage == null || photoImage.isDisposed())
-               && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
-
-            // the requested image is not available in the image cache -> image must be loaded
-
-            final ILoadCallBack imageLoadCallback = new LoadCallbackImage(map, tile);
-
-            PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
-         }
-      }
-
-      return photoImage;
-   }
-
    private Color getTourColor(final TourData tourData,
                               final int serieIndex,
                               final boolean isBorder,
@@ -2035,31 +1867,6 @@ public class TourMapPainter extends Map2Painter {
       return false;
    }
 
-   private boolean isInTile_Photo(final org.eclipse.swt.graphics.Point photoSize,
-                                  final int devXPhoto,
-                                  final int devYPhoto,
-                                  final int tileSize) {
-
-      // get image size
-      final int imageWidth = photoSize.x;
-      final int imageWidth2 = imageWidth / 2;
-      final int imageHeight = photoSize.y;
-
-      final int devImagePosLeft = devXPhoto - imageWidth2;
-      final int devImagePosRight = devXPhoto + imageWidth2;
-
-      // image position top is in the opposite direction
-      final int devImagePosTop = devYPhoto - imageHeight;
-
-      if (((devImagePosLeft >= 0 && devImagePosLeft <= tileSize) || (devImagePosRight >= 0 && devImagePosRight <= tileSize))
-            && (devYPhoto >= 0 && devYPhoto <= tileSize || devImagePosTop >= 0 && devImagePosTop <= tileSize)) {
-
-         return true;
-      }
-
-      return false;
-   }
-
    private boolean isInTile_Tour(final TourData tourData,
                                  final MP mp,
                                  final int mapZoomLevel,
@@ -2148,9 +1955,8 @@ public class TourMapPainter extends Map2Painter {
    protected boolean isPaintingNeeded(final Map2 map, final Tile tile) {
 
       final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
-      final ArrayList<Photo> allPhotos = TourPainterConfiguration.getPhotos();
 
-      if (allTourData.isEmpty() && allPhotos.isEmpty()) {
+      if (allTourData.isEmpty()) {
          return false;
       }
 
@@ -2160,12 +1966,7 @@ public class TourMapPainter extends Map2Painter {
 
       final MP mp = map.getMapProvider();
       final int mapZoomLevel = map.getZoom();
-      final int tileSize = mp.getTileSize();
       final int projectionHash = mp.getProjection().getId().hashCode();
-
-      // get viewport for the current tile
-      final int tileWorldPixelLeft = tile.getX() * tileSize;
-      final int tileWorldPixelTop = tile.getY() * tileSize;
 
       if (TourPainterConfiguration.isShowTours
 
@@ -2180,60 +1981,6 @@ public class TourMapPainter extends Map2Painter {
                   projectionHash)) {
 
          return true;
-      }
-
-      if (TourPainterConfiguration.isShowPhotos
-
-            && allPhotos.size() > 0
-
-            && isPaintingNeeded_Photos(
-
-                  allPhotos,
-                  mp,
-                  mapZoomLevel,
-                  projectionHash,
-                  tileWorldPixelLeft,
-                  tileWorldPixelTop)) {
-
-         return true;
-      }
-
-      return false;
-   }
-
-   private boolean isPaintingNeeded_Photos(final ArrayList<Photo> photoList,
-                                           final MP mp,
-                                           final int mapZoomLevel,
-                                           final int projectionHash,
-                                           final int tileWorldPixelLeft,
-                                           final int tileWorldPixelTop) {
-      /*
-       * check photos
-       */
-      for (final Photo photo : photoList) {
-
-         final Point photoWorldPixel = photo.getWorldPosition(
-               mp,
-               projectionHash,
-               mapZoomLevel,
-               TourPainterConfiguration.isLinkPhotoDisplayed);
-
-         if (photoWorldPixel == null) {
-            continue;
-         }
-
-         final org.eclipse.swt.graphics.Point photoSize = photo.getMapImageSize();
-         final int tileSize = mp.getTileSize();
-
-         // convert world position into tile position
-         final int devXPhoto = photoWorldPixel.x - tileWorldPixelLeft;
-         final int devYPhoto = photoWorldPixel.y - tileWorldPixelTop;
-
-         final boolean isPhotoInTile = isInTile_Photo(photoSize, devXPhoto, devYPhoto, tileSize);
-
-         if (isPhotoInTile) {
-            return true;
-         }
       }
 
       return false;

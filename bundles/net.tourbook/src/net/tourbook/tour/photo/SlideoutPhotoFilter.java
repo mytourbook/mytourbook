@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,13 +30,13 @@ import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolItem;
 
 /**
@@ -53,6 +53,7 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
          PhotoRatingStarOperator.HAS_ANY,
          PhotoRatingStarOperator.IS_EQUAL,
          PhotoRatingStarOperator.IS_MORE_OR_EQUAL,
+         PhotoRatingStarOperator.IS_MORE_OR_EQUAL_OR_NONE,
          PhotoRatingStarOperator.IS_LESS_OR_EQUAL,
 
    };
@@ -65,6 +66,7 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
          Messages.Photo_Filter_Operator_HasAny,
          Messages.Photo_Filter_Operator_IsEqual,
          Messages.Photo_Filter_Operator_IsMore,
+         Messages.Photo_Filter_Operator_IsMoreOrNone,
          Messages.Photo_Filter_Operator_IsLess,
 
    };
@@ -77,6 +79,7 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
          Messages.Photo_Filter_Operator_HasAny_Tooltip,
          Messages.Photo_Filter_Operator_IsEqual_Tooltip,
          Messages.Photo_Filter_Operator_IsMore_Tooltip,
+         Messages.Photo_Filter_Operator_IsMoreOrNone_Tooltip,
          Messages.Photo_Filter_Operator_IsLess_Tooltip,
 
    };
@@ -98,9 +101,12 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
    private Composite   _shellContainer;
    private Composite   _containerNumbers;
 
+   private Combo       _comboRatingStarOperators;
+
    private Label       _lblAllPhotos;
    private Label       _lblFilteredPhotos;
-   private Combo       _comboRatingStarOperators;
+
+   private Spinner     _spinnerRatingStars;
 
    private RatingStars _ratingStars;
 
@@ -118,6 +124,9 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
 
       // prevent that the opened slideout is partly hidden
       setIsForceBoundsToBeInsideOfViewport(true);
+
+      // ensure the tooltip header actions are displayed with the dark theme icons
+      setDarkThemeForToolbarActions();
    }
 
    @Override
@@ -127,14 +136,16 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
 
       createUI(parent);
 
+      fillUI();
+
+      restoreState();
+
       final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
       UI.setChildColors(parent,
             colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND),
             colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
 
       updateUI();
-
-      enableActions();
    }
 
    private Composite createUI(final Composite parent) {
@@ -153,8 +164,8 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
    private void createUI_10_Filter(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NO_FOCUS);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_BLUE);
       {
          {
             /*
@@ -162,27 +173,32 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
              */
             _comboRatingStarOperators = new Combo(container, SWT.READ_ONLY);
             _comboRatingStarOperators.setVisibleItemCount(10);
-            _comboRatingStarOperators.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelect_RatingStarOperands();
-               }
-            });
+            _comboRatingStarOperators.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_RatingStarOperands()));
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.FILL)
                   .applyTo(_comboRatingStarOperators);
          }
          {
             /*
+             * Image size: Large
+             */
+            _spinnerRatingStars = new Spinner(container, SWT.BORDER);
+            _spinnerRatingStars.setMinimum(0);
+            _spinnerRatingStars.setMaximum(5);
+            _spinnerRatingStars.setIncrement(1);
+            _spinnerRatingStars.setPageIncrement(10);
+            _spinnerRatingStars.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_RatingStars_Spinner()));
+            _spinnerRatingStars.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               onSelect_RatingStars_Spinner();
+            });
+         }
+         {
+            /*
              * Rating stars
              */
             _ratingStars = new RatingStars(container);
-            _ratingStars.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelect_RatingStars();
-               }
-            });
+            _ratingStars.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_RatingStars()));
          }
          {
             /*
@@ -197,7 +213,7 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
             GridLayoutFactory.fillDefaults().numColumns(3).applyTo(_containerNumbers);
             {
                /*
-                * value: number of all photos
+                * Number of all photos
                 */
                _lblAllPhotos = new Label(_containerNumbers, SWT.NO_FOCUS);
                _lblAllPhotos.setText(UI.EMPTY_STRING);
@@ -207,13 +223,13 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
                      .align(SWT.END, SWT.FILL).applyTo(_lblAllPhotos);
 
                /*
-                * label: number of filtered photos
+                * Dash
                 */
                final Label label = new Label(_containerNumbers, SWT.NO_FOCUS);
                label.setText(UI.DASH);
 
                /*
-                * value: number of filtered photos
+                * Number of filtered photos
                 */
                _lblFilteredPhotos = new Label(_containerNumbers, SWT.NO_FOCUS);
                _lblFilteredPhotos.setText(UI.EMPTY_STRING);
@@ -223,8 +239,11 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
       }
    }
 
-   private void enableActions() {
+   private void fillUI() {
 
+      for (final String operatorLabel : _allRatingStar_Labels) {
+         _comboRatingStarOperators.add(operatorLabel);
+      }
    }
 
    @Override
@@ -266,15 +285,32 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
 
       _selectedRatingStars = selectedStars;
 
+      _spinnerRatingStars.setSelection(selectedStars);
+
       final int ratingStarOperatorIndex = _comboRatingStarOperators.getSelectionIndex();
       updateUI_OperatorTooltip(ratingStarOperatorIndex);
-
-      enableActions();
 
       updateMapPhotoFilter();
    }
 
-   public void restoreState(final int photoFilter_RatingStars, final Enum<PhotoRatingStarOperator> photoFilter_RatingStar_Operator) {
+   private void onSelect_RatingStars_Spinner() {
+
+      final int selectedStars = _spinnerRatingStars.getSelection();
+
+      _selectedRatingStars = selectedStars;
+
+      updateUI();
+
+      updateMapPhotoFilter();
+   }
+
+   private void restoreState() {
+
+      _spinnerRatingStars.setSelection(_selectedRatingStars);
+   }
+
+   public void restoreState(final int photoFilter_RatingStars,
+                            final Enum<PhotoRatingStarOperator> photoFilter_RatingStar_Operator) {
 
       // keep values, when this method is called, then the slideout UI was not yet created
       _selectedRatingStars = photoFilter_RatingStars;
@@ -298,13 +334,10 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
       // select rating star
       _ratingStars.setSelection(_selectedRatingStars);
 
-      for (final String operatorLabel : _allRatingStar_Labels) {
-         _comboRatingStarOperators.add(operatorLabel);
-      }
-
       // select operator
       int ratingStarOperatorIndex = 0;
       for (int operatorIndex = 0; operatorIndex < _allRatingStar_Operators.length; operatorIndex++) {
+
          final PhotoRatingStarOperator photoRatingStarOperator = _allRatingStar_Operators[operatorIndex];
 
          if (photoRatingStarOperator.equals(_selectedRatingStarOperator)) {

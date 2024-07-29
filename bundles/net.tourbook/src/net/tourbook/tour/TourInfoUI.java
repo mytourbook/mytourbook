@@ -1810,9 +1810,9 @@ public class TourInfoUI {
 
       if (_comboUIWidth_Size != null && _comboUIWidth_Size.isDisposed() == false) {
 
-         _comboUIWidth_Size.add(OtherMessages.APP_SIZE_SMALL);
-         _comboUIWidth_Size.add(OtherMessages.APP_SIZE_MEDIUM);
-         _comboUIWidth_Size.add(OtherMessages.APP_SIZE_LARGE);
+         _comboUIWidth_Size.add(OtherMessages.APP_SIZE_SMALL_SHORTCUT);
+         _comboUIWidth_Size.add(OtherMessages.APP_SIZE_MEDIUM_SHORTCUT);
+         _comboUIWidth_Size.add(OtherMessages.APP_SIZE_LARGE_SHORTCUT);
       }
    }
 

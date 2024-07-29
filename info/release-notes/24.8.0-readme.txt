@@ -1,4 +1,4 @@
-24.next.0                                                 ?. August 2024
+24.8.0                                                 ?. August 2024
 
 
 TODO's
@@ -49,16 +49,21 @@ Experimental
 New
 ===
 
-*     
-
+* 2D Map
+  - Photos are not overlapped
+  - Set photo rating
+  - Photo tooltip
+    
 
 Improvements
 ============
 
-* Tour Nutrition (Frederic):
-  - Added the support for the carbohydrates
-  - Added a button to refresh/redownload the nutrition facts of a given product(s)
-  - Added the ability to select a product from a list of the most recent products used
+* 2D Map
+  - Show tour marker link in tooltip
+
+* Tour Chart
+  - Paint photo point with better contrast color for the dark theme
+  
 
 Changes
 =======

@@ -384,6 +384,10 @@ public abstract class AdvancedSlideoutShell {
                contentLocation = getToolTipLocation(contentSize);
             }
 
+            if (contentLocation == null) {
+               return;
+            }
+
             Point newShellEndLocation = _visibleRRShell.getShellLocation(contentLocation);
             newShellEndLocation = fixupDisplayBounds(shellSize, newShellEndLocation);
 
@@ -929,6 +933,11 @@ public abstract class AdvancedSlideoutShell {
       return _isKeepSlideoutOpen_DuringUIAction;
    }
 
+   protected boolean isResizableShell() {
+
+      return _visibleRRShell == _rrShellWithResize;
+   }
+
    /**
     * @return Returns <code>true</code> to hide tooltip, <code>false</code> will not hide the
     *         tooltip.
@@ -1020,10 +1029,10 @@ public abstract class AdvancedSlideoutShell {
 
    /**
     * Customize shell size, this is used to collapse/expand a slideout
-    * 
+    *
     * @param newContentWidth
     * @param newContentHeight
-    * 
+    *
     * @return
     */
    protected Point onResize(final int newContentWidth, final int newContentHeight) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,8 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.common.tooltip;
-
-import static org.eclipse.swt.events.MouseTrackListener.mouseExitAdapter;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
@@ -35,6 +33,7 @@ import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -171,7 +170,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
    private void addListener(final Control ownerControl) {
 
-      ownerControl.addMouseTrackListener(mouseExitAdapter(mouseEvent -> {
+      ownerControl.addMouseTrackListener(MouseTrackListener.mouseExitAdapter(mouseEvent -> {
 
          // prevent to open the tooltip
          _canOpenToolTip = false;
@@ -209,6 +208,14 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       return container;
    }
 
+   protected void createTitleBar_FirstControls(final Composite parent) {
+
+      // create default content
+      final Label label = new Label(parent, SWT.NONE);
+      label.setText(UI.EMPTY_STRING);
+      GridDataFactory.fillDefaults().applyTo(label);
+   }
+
    /**
     * Overwrite this to create custom title bar controls
     *
@@ -228,7 +235,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       GridLayoutFactory.swtDefaults()
             .spacing(0, 0)
             .applyTo(shellContainer);
-//      shellContainer.setBackground(UI.SYS_COLOR_GREEN);
+//      shellContainer.setBackground(UI.SYS_COLOR_MAGENTA);
       {
          createUI_10_ActionBar(shellContainer);
          createSlideoutContent(shellContainer);
@@ -244,12 +251,13 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       _titleContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_titleContainer);
       GridLayoutFactory.fillDefaults()
-            .numColumns(3)
-            .extendedMargins(0, 0, 0, 5)
+            .numColumns(4)
+            .extendedMargins(0, 0, 0, 3)
             .spacing(0, 0)
             .applyTo(_titleContainer);
 //      _titleContainer.setBackground(UI.SYS_COLOR_YELLOW);
       {
+         createTitleBar_FirstControls(_titleContainer);
          createUI_12_Header_Draggable(_titleContainer);
          createTitleBarControls(_titleContainer);
          createUI_14_Header_Toolbar(_titleContainer);
@@ -263,11 +271,11 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       _labelDragSlideout.setToolTipText(Messages.Slideout_Dialog_Action_DragSlideout_ToolTip);
       GridDataFactory.fillDefaults()
             .grab(true, false)
-            .align(SWT.FILL, SWT.CENTER)
+            .align(SWT.FILL, SWT.FILL)
+            .indent(0, 1) // adjust to controls in the custom header, e.g. combo box
             .applyTo(_labelDragSlideout);
       MTFont.setBannerFont(_labelDragSlideout);
-
-//		_labelDragSlideout.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+//      _labelDragSlideout.setBackground(UI.SYS_COLOR_BLUE);
 
       _labelDragSlideout.addMouseTrackListener(new MouseTrackListener() {
 
@@ -356,13 +364,13 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       final int slideoutWidth = slideoutSize.x;
       final int slideoutHeight = slideoutSize.y;
 
-      final Rectangle _slideoutParentBounds = getParentBounds();
+      final Rectangle parentBounds = getParentBounds();
 
       // toolitem top left position and size
-      final int devXParent = _slideoutParentBounds.x;
-      final int devYParent = _slideoutParentBounds.y;
-      final int itemWidth = _slideoutParentBounds.width;
-      final int itemHeight = _slideoutParentBounds.height;
+      final int devXParent = parentBounds.x;
+      final int devYParent = parentBounds.y;
+      final int itemWidth = parentBounds.width;
+      final int itemHeight = parentBounds.height;
 
       // center horizontally
 
@@ -555,6 +563,13 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       _actionPinSlideout.setChecked(isToolTipPinned);
    }
 
+   public void setDarkThemeForToolbarActions() {
+
+      _actionCloseSlideout.setImageDescriptor(CommonActivator.getThemedImageDescriptor_Dark(CommonImages.App_Close));
+      _actionKeepSlideoutOpen.setImageDescriptor(CommonActivator.getThemedImageDescriptor_Dark(CommonImages.App_KeepOpen));
+      _actionPinSlideout.setImageDescriptor(CommonActivator.getThemedImageDescriptor_Dark(CommonImages.App_Pin));
+   }
+
    public void setSlideoutLocation(final SlideoutLocation slideoutLocation) {
 
       _slideoutLocation = slideoutLocation;
@@ -563,6 +578,23 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
    protected void setTitleText(final String titleText) {
 
       _titleText = titleText;
+   }
+
+   /**
+    * Show/hide default action
+    *
+    * @param isResizableShell
+    */
+   protected void showDefaultActions(final boolean isResizableShell) {
+
+      final GridData gd = (GridData) _toolbarSlideoutActions.getLayoutData();
+
+      _toolbarSlideoutActions.setVisible(isResizableShell);
+
+      gd.exclude = isResizableShell == false;
+
+      _toolbarSlideoutActions.getParent().layout(true);
+
    }
 
    protected void updateTitleText(final String titleText) {

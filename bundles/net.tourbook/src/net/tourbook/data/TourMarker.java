@@ -552,7 +552,14 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
             ? getScrambledLabel()
             : label;
 
-      if (getDescription().length() > 0) {
+      final boolean isDescription = getDescription().length() > 0;
+      final boolean isUrlAddress = getUrlAddress().length() > 0;
+      final boolean isUrlText = getUrlText().length() > 0;
+
+      if (isDescription
+            || isUrlText
+            || isUrlAddress) {
+
          markerLabel += UI.SYMBOL_STAR;
       }
 
@@ -834,7 +841,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    }
 
    public void setDescription(final String description) {
+
       this.description = description;
+
+      _markerMapLabel = null;
    }
 
    public void setDeviceLapTime(final long lapTime) {
@@ -1004,11 +1014,17 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    }
 
    public void setUrlAddress(final String urlAddress) {
+
       this.urlAddress = urlAddress;
+
+      _markerMapLabel = null;
    }
 
    public void setUrlText(final String urlText) {
+
       this.urlText = urlText;
+
+      _markerMapLabel = null;
    }
 
    public void setVisibleType(final int visibleType) {

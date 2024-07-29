@@ -2006,10 +2006,15 @@ public class Map25View extends ViewPart implements
 
       if (_isPhotoFilterActive && hasAnyStars == false) {
 
-         final boolean isNoStar = _photoFilter_RatingStars == 0;
-         final boolean isEqual = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_EQUAL;
-         final boolean isMore = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_MORE_OR_EQUAL;
-         final boolean isLess = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_LESS_OR_EQUAL;
+// SET_FORMATTING_OFF
+
+         final boolean isNoStar     = _photoFilter_RatingStars == 0;
+         final boolean isEqual      = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_EQUAL;
+         final boolean isMore       = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_MORE_OR_EQUAL;
+         final boolean isMoreOrNone = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_MORE_OR_EQUAL_OR_NONE;
+         final boolean isLess       = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_LESS_OR_EQUAL;
+
+// SET_FORMATTING_ON
 
          for (final Photo photo : _allPhotos) {
 
@@ -2027,6 +2032,9 @@ public class Map25View extends ViewPart implements
 
             } else if (isMore && ratingStars >= _photoFilter_RatingStars) {
 
+               _filteredPhotos.add(photo);
+
+            } else if (isMoreOrNone && (ratingStars >= _photoFilter_RatingStars || ratingStars == 0)) {
                _filteredPhotos.add(photo);
 
             } else if (isLess && ratingStars <= _photoFilter_RatingStars) {

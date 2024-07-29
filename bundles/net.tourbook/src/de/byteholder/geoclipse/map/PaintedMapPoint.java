@@ -16,7 +16,6 @@
 package de.byteholder.geoclipse.map;
 
 import net.tourbook.common.UI;
-import net.tourbook.data.TourMarker;
 import net.tourbook.map2.view.Map2Point;
 
 import org.eclipse.swt.graphics.Rectangle;
@@ -26,17 +25,17 @@ public class PaintedMapPoint {
    private static final char NL = UI.NEW_LINE;
 
    /**
-    * Contains the {@link TourMarker}
+    * Contains the different map points
     */
    public Map2Point          mapPoint;
 
    /**
-    * Rectangle of the painted marker label
+    * Rectangle of the painted label or photo
     */
    public Rectangle          labelRectangle;
 
    /**
-    * Rectangle of the painted marker location symbol
+    * Rectangle of the painted location symbol
     */
    public Rectangle          symbolRectangle;
 
@@ -52,11 +51,11 @@ public class PaintedMapPoint {
 
       return UI.EMPTY_STRING
 
-            + "PaintedMapPoint" + NL //                                      //$NON-NLS-1$
+            + "PaintedMapPoint" + NL //                           //$NON-NLS-1$
 
-            + " mapMarker  = " + mapPoint.tourMarker.getLabel() + NL //   //$NON-NLS-1$
-            + " x          = " + mapPoint.geoPointDevX + NL //            //$NON-NLS-1$
-            + " y          = " + mapPoint.geoPointDevY + NL //            //$NON-NLS-1$
+            + " mapPoint = " + mapPoint //                   //$NON-NLS-1$
+//            + " x        = " + mapPoint.geoPointDevX + NL //      //$NON-NLS-1$
+//            + " y        = " + mapPoint.geoPointDevY + NL //      //$NON-NLS-1$
 
       ;
    }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -59,6 +59,9 @@ public class ImageCanvas extends Canvas implements PaintListener {
    private final ListenerList<SelectionListener> _selectionListener = new ListenerList<>();
 
    private boolean                               _isFocusGained;
+   private boolean                               _isSmoothImages;
+
+   private Point                                 _imageSize;
 
    /**
     * @param parent
@@ -160,6 +163,20 @@ public class ImageCanvas extends Canvas implements PaintListener {
    }
 
    /**
+    * Do custom painting when an image is not valid, e.g. when it is loading
+    *
+    * @param gc
+    * @param clientArea
+    *
+    * @return Returns <code>true</code> when it is customized painted, <code>false</code> when it is
+    *         not painted and the default painting should be performed
+    */
+   public boolean drawInvalidImage(final GC gc, final Rectangle clientArea) {
+
+      return false;
+   }
+
+   /**
     * Fires an event when the image canvas was selected.
     */
    private void fireSelection() {
@@ -177,6 +194,13 @@ public class ImageCanvas extends Canvas implements PaintListener {
       return _image;
    }
 
+   /**
+    * @return Returns the size of the currently resized image
+    */
+   public Point getResizedImageSize() {
+      return _imageSize;
+   }
+
    @Override
    public void paintControl(final PaintEvent e) {
 
@@ -190,11 +214,16 @@ public class ImageCanvas extends Canvas implements PaintListener {
 
       if (_image == null || _image.isDisposed()) {
 
-         final Rectangle rect = getClientArea();
-         final int devX = rect.x;
-         final int devY = rect.y;
-         final int width = rect.width;
-         final int height = rect.height;
+         final Rectangle clientArea = getClientArea();
+
+         if (drawInvalidImage(gc, clientArea)) {
+            return;
+         }
+
+         final int devX = clientArea.x;
+         final int devY = clientArea.y;
+         final int width = clientArea.width;
+         final int height = clientArea.height;
 
          // draw image indicator
          gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
@@ -217,7 +246,7 @@ public class ImageCanvas extends Canvas implements PaintListener {
       final int canvasWidth = canvasBounds.width;
       final int canvasHeight = canvasBounds.height;
 
-      final Point bestSize = UI.getBestFitCanvasSize(//
+      final Point bestSize = UI.getBestFitCanvasSize(
             imageWidth,
             imageHeight,
             canvasWidth,
@@ -235,8 +264,21 @@ public class ImageCanvas extends Canvas implements PaintListener {
       final int offsetX = _isLead ? 0 : (canvasWidth - bestSizeWidth) / 2;
       final int offsetY = _isCentered ? (canvasHeight - bestSizeHeight) / 2 : 0;
 
+      if (_isSmoothImages) {
+
+         gc.setAntialias(SWT.ON);
+
+         // Linux needs SWT.HIGH otherwise it is not interpolated
+         gc.setInterpolation(SWT.HIGH);
+
+      } else {
+
+         gc.setAntialias(SWT.OFF);
+         gc.setInterpolation(SWT.OFF);
+      }
+
       // draw image
-      gc.drawImage(_image, //
+      gc.drawImage(_image,
             0,
             0,
             imageWidth,
@@ -250,12 +292,14 @@ public class ImageCanvas extends Canvas implements PaintListener {
       // draw focus
       if (isFocus) {
 
-         gc.drawFocus(//
+         gc.drawFocus(
                offsetX,
                offsetY,
                bestSizeWidth,
                bestSizeHeight);
       }
+
+      _imageSize = new Point(bestSizeWidth, bestSizeHeight);
    }
 
    public void removeSelectionListener(final SelectionListener listener) {
@@ -310,6 +354,15 @@ public class ImageCanvas extends Canvas implements PaintListener {
       _image = image;
 
       redraw();
+   }
+
+   /**
+    * @param isSmoothImages
+    *           When <code>true</code> then smaller images are interpolated
+    */
+   public void setIsSmoothImages(final boolean isSmoothImages) {
+
+      _isSmoothImages = isSmoothImages;
    }
 
    /**

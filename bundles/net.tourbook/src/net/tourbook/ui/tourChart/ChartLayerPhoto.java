@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,15 +26,14 @@ import net.tourbook.chart.ChartType;
 import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
+import net.tourbook.common.UI;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
 
 public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
 
@@ -56,7 +55,8 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
 
    private Color                    _bgColorLink;
    private Color                    _bgColorTour;
-   private Display                  _display;
+   private Color                    _photoGroupColor;
+   private Color                    _photoPointColor;
 
    public ChartLayerPhoto(final ArrayList<PhotoCategory> photoCategories) {
 
@@ -395,8 +395,6 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
                     final Chart chart,
                     final PixelConverter pixelConverter) {
 
-      _display = Display.getCurrent();
-
       final int devYTop = graphDrawingData.getDevYTop();
       final long devGraphImageOffset = chart.getXXDevViewPortLeftBorder();
       final int devGraphHeight = graphDrawingData.devGraphHeight;
@@ -469,8 +467,10 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
          /*
           * set color depending on photo type and number of photo categories
           */
-         gc.setForeground(_display.getSystemColor(SWT.COLOR_WHITE));
-         gc.setBackground(getPhotoGroupBackgroundColor(photoCategory.photoType, false));
+         _photoGroupColor = getPhotoGroupBackgroundColor(photoCategory.photoType, false);
+         _photoPointColor = getPhotoPointBackgroundColor(photoCategory.photoType, false);
+
+         gc.setForeground(UI.SYS_COLOR_WHITE);
 
          for (final PhotoPaintGroup paintGroup : photoCategory.paintGroups) {
 
@@ -554,10 +554,10 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
          return;
       }
 
-      final Device display = gcOverlay.getDevice();
+      _photoGroupColor = getPhotoGroupBackgroundColor(_hoveredPhotoCategory.photoType, true);
+      _photoPointColor = getPhotoPointBackgroundColor(_hoveredPhotoCategory.photoType, true);
 
-      gcOverlay.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
-      gcOverlay.setBackground(getPhotoGroupBackgroundColor(_hoveredPhotoCategory.photoType, true));
+      gcOverlay.setForeground(UI.SYS_COLOR_WHITE);
 
       drawPhotoAndGroup(gcOverlay, _hoveredPaintGroup, _hoveredPhotoCategory);
    }
@@ -569,7 +569,11 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
       int prevDevYPhoto = Integer.MIN_VALUE;
       int prevDevXPhoto = Integer.MIN_VALUE;
 
-      // draw photo marker at the graph vertical position
+      /*
+       * Draw photo marker at the graph vertical position
+       */
+      gc.setBackground(_photoPointColor);
+
       for (final int photoIndex : paintGroup.photoIndex) {
 
          final Point photoPosition = photoPositions[photoIndex];
@@ -597,7 +601,10 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
          prevDevYPhoto = devYPhoto;
       }
 
-      // draw group
+      /*
+       * Draw group
+       */
+      gc.setBackground(_photoGroupColor);
       gc.fillRoundRectangle(
             paintGroup.paintedGroupDevX,
             paintGroup.paintedGroupDevY,
@@ -630,6 +637,7 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
     * @param eventTime
     * @param devXMouseMove
     * @param devYMouseMove
+    *
     * @return Returns photos which are currently be hovered. 0 means no photo is hovered.
     */
    ArrayList<ChartPhoto> getHoveredPhotos(final long eventTime, final int devXMouseMove, final int devYMouseMove) {
@@ -658,16 +666,58 @@ public class ChartLayerPhoto implements IChartLayer, IChartOverlay {
             }
 
          } else {
-            return _display.getSystemColor(SWT.COLOR_DARK_GRAY);
+
+            return UI.SYS_COLOR_DARK_GRAY;
          }
 
       } else {
 
          if (isHovered) {
 
-            return _display.getSystemColor(SWT.COLOR_DARK_GRAY);
+            return UI.SYS_COLOR_DARK_GRAY;
 
          } else {
+
+            if (photoType == ChartPhotoType.LINK) {
+               return _bgColorLink;
+            } else {
+               return _bgColorTour;
+            }
+         }
+      }
+   }
+
+   private Color getPhotoPointBackgroundColor(final ChartPhotoType photoType, final boolean isHovered) {
+
+      if (_photoCategories.size() == 1) {
+
+         // only ONE category is available
+
+         if (isHovered) {
+
+            if (photoType == ChartPhotoType.LINK) {
+               return _bgColorLink;
+            } else {
+               return _bgColorTour;
+            }
+
+         } else {
+
+            return UI.IS_DARK_THEME
+                  ? UI.SYS_COLOR_WHITE
+                  : UI.SYS_COLOR_DARK_GRAY;
+         }
+
+      } else {
+
+         if (isHovered) {
+
+            return UI.IS_DARK_THEME
+                  ? UI.SYS_COLOR_WHITE
+                  : UI.SYS_COLOR_DARK_GRAY;
+
+         } else {
+
             if (photoType == ChartPhotoType.LINK) {
                return _bgColorLink;
             } else {
