@@ -1539,7 +1539,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _lblFontName                           .setEnabled(isShowLabels);
       _lblLabelBackground                    .setEnabled(isShowLabels);
       _lblLabelSize                          .setEnabled(isShowLabels || isShowPhotos);
-      _lblVisibleLabels                      .setEnabled(isShowLabels);
+      _lblVisibleLabels                      .setEnabled(isShowLabels || isShowPhotos);
       _spinnerLabelFontSize                  .setEnabled(isShowLabels);
       _spinnerLabelTruncateLength            .setEnabled(isShowLabels && isTruncateLabel);
       _spinnerLocationSymbolSize             .setEnabled(isShowLabels || isShowPhotos);
