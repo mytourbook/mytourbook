@@ -190,6 +190,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
     * UI controls
     */
    private Image                     _imageAdd     = TourbookPlugin.getImageDescriptor(Images.App_Add).createImage();
+   private Image                     _imageRefreshAll = TourbookPlugin.getImageDescriptor(Images.App_Refresh_All).createImage();
    private Image                     _imageSearch  = TourbookPlugin.getImageDescriptor(Images.SearchTours).createImage();
 
    private Image                     _imageCheck   = TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked).createImage();
@@ -800,7 +801,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
 
          /*
@@ -842,7 +843,16 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          /*
           * Update products button
           */
-         //todo fb
+         final Button btnUpdateProducts = new Button(container, SWT.NONE);
+         btnUpdateProducts.setText(Messages.Tour_Nutrition_Button_UpdateProducts);
+         btnUpdateProducts.setToolTipText(Messages.Tour_Nutrition_Button_UpdateProducts_Tooltip);
+         btnUpdateProducts.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
+            //todo fb
+
+         }));
+         btnUpdateProducts.setImage(_imageRefreshAll);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(btnUpdateProducts);
       }
    }
 
@@ -1285,6 +1295,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       _prefStore.removePropertyChangeListener(_prefChangeListener);
 
       UI.disposeResource(_imageAdd);
+      UI.disposeResource(_imageRefreshAll);
       UI.disposeResource(_imageSearch);
       UI.disposeResource(_imageCheck);
       UI.disposeResource(_imageUncheck);
