@@ -24,5 +24,6 @@
    <classpathentry exported="true" kind="lib" path="commons-suncalc-3.4.jar"/>                        <!-- https://mvnrepository.com/artifact/org.shredzone.commons/commons-suncalc -->
    <classpathentry exported="true" kind="lib" path="fit-21.141.0.jar"                              sourcepath="/FIT SDK/FitSDKRelease/java"/>                     <!-- https://mvnrepository.com/artifact/com.garmin/fit https://github.com/garmin/fit-java-sdk -->
    <classpathentry exported="true" kind="lib" path="url-detector-0.1.23.jar"/>                        <!-- https://mvnrepository.com/artifact/io.github.url-detector/url-detector -->
+   <classpathentry exported="true" kind="lib" path="openfoodfacts-java-wrapper-0.9.3.jar"/>           <!-- https://mvnrepository.com/artifact/pl.coderion/openfoodfacts-java-wrapper -->
    <classpathentry kind="output" path="bin"/>
 </classpath>

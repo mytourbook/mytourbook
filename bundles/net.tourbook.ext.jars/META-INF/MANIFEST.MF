@@ -22,7 +22,8 @@ Bundle-ClassPath:
  jackson-databind-2.17.0.jar,
  jackson-annotations-2.17.0.jar,
  fit-21.141.0.jar,
- url-detector-0.1.23.jar
+ url-detector-0.1.23.jar,
+ openfoodfacts-java-wrapper-0.9.3.jar
 Export-Package: com.fasterxml.jackson.annotation,
  com.fasterxml.jackson.core,
  com.fasterxml.jackson.core.async,
@@ -179,6 +180,9 @@ Export-Package: com.fasterxml.jackson.annotation,
  org.joda.time.tz.data.Pacific,
  org.json,
  org.shredzone.commons.suncalc,
- org.shredzone.commons.suncalc.param
+ org.shredzone.commons.suncalc.param,
+ pl.coderion.model,
+ pl.coderion.service,
+ pl.coderion.service.impl
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Automatic-Module-Name: net.tourbook.ext.jars

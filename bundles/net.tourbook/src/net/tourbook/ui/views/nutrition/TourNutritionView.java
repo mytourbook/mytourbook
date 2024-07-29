@@ -112,6 +112,9 @@ import org.eclipse.ui.part.ViewPart;
 
 import cop.swt.widgets.viewers.table.celleditors.RangeContent;
 import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
+import pl.coderion.model.ProductResponse;
+import pl.coderion.service.OpenFoodFactsWrapper;
+import pl.coderion.service.impl.OpenFoodFactsWrapperImpl;
 
 public class TourNutritionView extends ViewPart implements ITourViewer {
 
@@ -189,13 +192,15 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    /*
     * UI controls
     */
-   private Image                     _imageAdd     = TourbookPlugin.getImageDescriptor(Images.App_Add).createImage();
-   private Image                     _imageRefreshAll = TourbookPlugin.getImageDescriptor(Images.App_Refresh_All).createImage();
-   private Image                     _imageSearch  = TourbookPlugin.getImageDescriptor(Images.SearchTours).createImage();
+   private Button                    _btnUpdateProducts;
 
-   private Image                     _imageCheck   = TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked).createImage();
-   private Image                     _imageUncheck = TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck).createImage();
-   private Image                     _imageYes     = CommonActivator.getImageDescriptor(CommonImages.App_Yes).createImage();
+   private Image                     _imageAdd        = TourbookPlugin.getImageDescriptor(Images.App_Add).createImage();
+   private Image                     _imageRefreshAll = TourbookPlugin.getImageDescriptor(Images.App_Refresh_All).createImage();
+   private Image                     _imageSearch     = TourbookPlugin.getImageDescriptor(Images.SearchTours).createImage();
+
+   private Image                     _imageCheck      = TourbookPlugin.getImageDescriptor(Images.Checkbox_Checked).createImage();
+   private Image                     _imageUncheck    = TourbookPlugin.getImageDescriptor(Images.Checkbox_Uncheck).createImage();
+   private Image                     _imageYes        = CommonActivator.getImageDescriptor(CommonImages.App_Yes).createImage();
 
    private PageBook                  _pageBook;
    private Composite                 _pageNoData;
@@ -840,19 +845,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          btnAddCustomProduct.setImage(_imageAdd);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(btnAddCustomProduct);
 
-         /*
-          * Update products button
-          */
-         final Button btnUpdateProducts = new Button(container, SWT.NONE);
-         btnUpdateProducts.setText(Messages.Tour_Nutrition_Button_UpdateProducts);
-         btnUpdateProducts.setToolTipText(Messages.Tour_Nutrition_Button_UpdateProducts_Tooltip);
-         btnUpdateProducts.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-
-            //todo fb
-
-         }));
-         btnUpdateProducts.setImage(_imageRefreshAll);
-         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(btnUpdateProducts);
+         _btnUpdateProducts = new Button(container, SWT.NONE);
+         _btnUpdateProducts.setText(Messages.Tour_Nutrition_Button_UpdateProducts);
+         _btnUpdateProducts.setToolTipText(Messages.Tour_Nutrition_Button_UpdateProducts_Tooltip);
+         _btnUpdateProducts.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onUpdateProducts()));
+         _btnUpdateProducts.setImage(_imageRefreshAll);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_btnUpdateProducts);
       }
    }
 
@@ -1522,6 +1520,36 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       }
 
       updateUI_ProductViewer();
+   }
+
+   private void onUpdateProducts() {
+      //todo fb
+      final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
+      for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
+
+         if (net.tourbook.common.util.StringUtils.isNullOrEmpty(tourNutritionProduct.getProductCode())) {
+            continue;
+         }
+
+         final OpenFoodFactsWrapper wrapper = new OpenFoodFactsWrapperImpl();
+         final ProductResponse productResponse = wrapper.fetchProductByCode("737628064502");
+
+//         tourNutritionProduct.setName(productResponse.());
+//         tourNutritionProduct.setBrand(productResponse.getBrand());
+//         tourNutritionProduct.setNutritionFacts(productResponse.getNutritionFacts());
+//         tourNutritionProduct.setUnit(productResponse.getUnit());
+//         tourNutritionProduct.setServingSize(productResponse.getServingSize());
+//         tourNutritionProduct.setServingUnit(productResponse.getServingUnit());
+//         tourNutritionProduct.setCalories(productResponse.getCalories());
+//         tourNutritionProduct.setCarbohydrates(productResponse.getCarbohydrates());
+
+      }
+      _tourData.setTourNutritionProducts(tourNutritionProducts);
+      _tourData = TourManager.saveModifiedTour(_tourData);
+      _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
+
+      //todo fb enablecontrols
+
    }
 
    @Override
