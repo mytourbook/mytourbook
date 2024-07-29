@@ -112,6 +112,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import cop.swt.widgets.viewers.table.celleditors.RangeContent;
 import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
+import pl.coderion.model.Product;
 import pl.coderion.model.ProductResponse;
 import pl.coderion.service.OpenFoodFactsWrapper;
 import pl.coderion.service.impl.OpenFoodFactsWrapperImpl;
@@ -657,6 +658,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       if (_tourData == null) {
          showTourFromTourProvider();
       }
+
+      enableControls();
    }
 
    private Section createSection(final Composite parent,
@@ -1310,6 +1313,14 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    }
 
+   private void enableControls() {
+
+      final int numberOfProducts = _productsViewer.getTable().getItemCount();
+
+      //todo fb only enable when the number of products FROM the OF database is greater than 0
+      _btnUpdateProducts.setEnabled(numberOfProducts > 0);
+   }
+
    private void fillContextMenu(final IMenuManager menuMgr) {
 
       _actionOpenProductsWebsite.setTourNutritionProducts(getSelectedProductsCodes());
@@ -1533,23 +1544,20 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          final OpenFoodFactsWrapper wrapper = new OpenFoodFactsWrapperImpl();
          final ProductResponse productResponse = wrapper.fetchProductByCode("737628064502");
+         final Product product = productResponse.getProduct();
 
-//         tourNutritionProduct.setName(productResponse.());
-//         tourNutritionProduct.setBrand(productResponse.getBrand());
-//         tourNutritionProduct.setNutritionFacts(productResponse.getNutritionFacts());
-//         tourNutritionProduct.setUnit(productResponse.getUnit());
-//         tourNutritionProduct.setServingSize(productResponse.getServingSize());
-//         tourNutritionProduct.setServingUnit(productResponse.getServingUnit());
-//         tourNutritionProduct.setCalories(productResponse.getCalories());
-//         tourNutritionProduct.setCarbohydrates(productResponse.getCarbohydrates());
+         tourNutritionProduct.setName(product.getProductName());
+//         tourNutritionProduct.setNutritionFacts(product.getNutritionFacts());
+//         tourNutritionProduct.setUnit(product.getUnit());
+//         tourNutritionProduct.setServingSize(product.getServingSize());
+//         tourNutritionProduct.setServingUnit(product.getServingUnit());
+//         tourNutritionProduct.setCalories(product.getCalories());
+//         tourNutritionProduct.setCarbohydrates(product.getNutriments().getCarbohydrates());
 
       }
       _tourData.setTourNutritionProducts(tourNutritionProducts);
       _tourData = TourManager.saveModifiedTour(_tourData);
       _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
-
-      //todo fb enablecontrols
-
    }
 
    @Override
