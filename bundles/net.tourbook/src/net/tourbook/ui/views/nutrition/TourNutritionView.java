@@ -838,6 +838,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          }));
          btnAddCustomProduct.setImage(_imageAdd);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(btnAddCustomProduct);
+
+         /*
+          * Update products button
+          */
+         //todo fb
       }
    }
 
