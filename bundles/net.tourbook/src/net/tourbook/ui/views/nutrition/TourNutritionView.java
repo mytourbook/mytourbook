@@ -658,8 +658,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       if (_tourData == null) {
          showTourFromTourProvider();
       }
-
-      enableControls();
    }
 
    private Section createSection(final Composite parent,
@@ -1317,7 +1315,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final int numberOfProducts = _productsViewer.getTable().getItemCount();
 
-      //todo fb only enable when the number of products FROM the OF database is greater than 0
+      //todo fb only enable when the number of products FROM the OFF database is greater than 0
+
       _btnUpdateProducts.setEnabled(numberOfProducts > 0);
    }
 
@@ -1329,6 +1328,39 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       menuMgr.add(_actionDeleteProducts);
 
       enableActions();
+   }
+
+   private List<TourNutritionProduct> getAllProducts() {
+
+      final StructuredSelection selection = (StructuredSelection) _productsViewer.getSelection();
+
+      final List<TourNutritionProduct> selectedTourNutritionProducts = new ArrayList<>();
+
+      for (final Object object : selection.toList()) {
+
+         if (object instanceof final TourNutritionProduct tourNutritionProduct) {
+            selectedTourNutritionProducts.add(tourNutritionProduct);
+         }
+      }
+
+      return selectedTourNutritionProducts;
+   }
+
+   private List<String> getAllProducts() {
+
+      final List<TourNutritionProduct> selectedTourNutritionProducts = getSelectedProducts();
+
+      final List<String> selectedTourNutritionProductsCodes = new ArrayList<>();
+
+      for (final TourNutritionProduct tourNutritionProduct : selectedTourNutritionProducts) {
+
+         if (tourNutritionProduct.isCustomProduct()) {
+            continue;
+         }
+         selectedTourNutritionProductsCodes.add(tourNutritionProduct.getProductCode());
+      }
+
+      return selectedTourNutritionProductsCodes;
    }
 
    @Override
@@ -1574,6 +1606,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          reloadViewer();
       }
       _viewerContainer.setRedraw(true);
+
+      enableControls();
 
       return _productsViewer;
    }
@@ -1844,6 +1878,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          updateUI_SummaryFromModel();
       }
+
+      enableControls();
    }
 
    private void updateUI_SummaryFromModel() {
