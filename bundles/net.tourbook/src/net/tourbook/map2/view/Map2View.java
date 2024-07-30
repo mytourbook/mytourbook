@@ -124,6 +124,7 @@ import net.tourbook.map2.action.ActionZoomLevelAdjustment;
 import net.tourbook.map2.action.ActionZoomOut;
 import net.tourbook.map2.action.ActionZoomShowEntireMap;
 import net.tourbook.map2.action.ActionZoomShowEntireTour;
+import net.tourbook.map2.view.SlideoutMap2_PhotoOptions.ImageSize;
 import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.Photo;
@@ -508,6 +509,7 @@ public class Map2View extends ViewPart implements
    private ActionMap2_Graphs                 _actionMap2Slideout_TourColors;
    private ActionMapPoint_CenterMap          _actionMapPoint_CenterMap;
    private ActionMapPoint_EditTourMarker     _actionMapPoint_EditTourMarker;
+   private ActionMapPoint_RemovePhoto        _actionMapPoint_RemovePhoto;
    private ActionMapPoint_ShowOnlyThisTour   _actionMapPoint_ShowOnlyThisTour;
    private ActionMapPoint_ZoomIn             _actionMapPoint_ZoomIn;
    private ActionReloadFailedMapImages       _actionReloadFailedMapImages;
@@ -697,6 +699,22 @@ public class Map2View extends ViewPart implements
          actionMapMarker_Edit();
       }
 
+   }
+
+   private class ActionMapPoint_RemovePhoto extends Action {
+
+      public ActionMapPoint_RemovePhoto() {
+
+         super(OtherMessages.ACTION_PHOTOS_AND_TOURS_REMOVE_PHOTO, Action.AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
+      }
+
+      @Override
+      public void run() {
+
+         TourManager.tourPhoto_Remove(_map.getHoveredMapPoint());
+      }
    }
 
    private class ActionMapPoint_ShowOnlyThisTour extends Action {
@@ -1162,7 +1180,7 @@ public class Map2View extends ViewPart implements
       ActionOpenMarkerDialog.doAction(tourProvider, true, tourMarker);
 
       // hide hovered marker
-      _map.resetHoveredMarker();
+      _map.resetHoveredMapPoint();
 
       _map.paint();
    }
@@ -1193,7 +1211,7 @@ public class Map2View extends ViewPart implements
          // this seems to be more complicated, a syncexec() to not work
          _map.getDisplay().timerExec(300, () -> {
 
-            _map.resetHoveredMarker();
+            _map.resetHoveredMapPoint();
 
             _map.paint();
          });
@@ -1209,10 +1227,14 @@ public class Map2View extends ViewPart implements
       _map.setZoom(_map.getMapProvider().getMaximumZoomLevel());
       _map.setMapCenter(new GeoPosition(geoPoint.getLatitude(), geoPoint.getLongitude()));
 
-      // hide hovered marker
-      _map.resetHoveredMarker();
-
       _map.redraw();
+
+      // this need a delay otherwise the hovered map point is not hidden
+      _map.getDisplay().timerExec(10, () -> {
+
+         // hide hovered marker
+         _map.resetHoveredMapPoint();
+      });
    }
 
    public void actionPOI() {
@@ -1420,6 +1442,9 @@ public class Map2View extends ViewPart implements
       enableActions();
 
       TourPainterConfiguration.isShowPhotos = _isShowPhoto;
+
+      // update UI in the map point slideout
+      Map2PointManager.enableControls();
 
       _map.setOverlayKey(Integer.toString(_filteredPhotos.hashCode()));
       _map.disposeOverlayImageCache();
@@ -1995,6 +2020,7 @@ public class Map2View extends ViewPart implements
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionMapPoint_CenterMap           = new ActionMapPoint_CenterMap();
       _actionMapPoint_EditTourMarker      = new ActionMapPoint_EditTourMarker();
+      _actionMapPoint_RemovePhoto         = new ActionMapPoint_RemovePhoto();
       _actionMapPoint_ShowOnlyThisTour    = new ActionMapPoint_ShowOnlyThisTour();
       _actionMapPoint_ZoomIn              = new ActionMapPoint_ZoomIn();
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
@@ -2172,6 +2198,8 @@ public class Map2View extends ViewPart implements
 
       // register overlays which draw the tour
       GeoclipseExtensions.registerOverlays(_map);
+
+      setMapImageSize();
 
       // initialize map when part is created and the map size is > 0
       _map.getDisplay().asyncExec(() -> {
@@ -2425,16 +2453,19 @@ public class Map2View extends ViewPart implements
 // SET_FORMATTING_OFF
 
       final Map2Point      mapPoint    = hoveredMapPoint.mapPoint;
+      final Photo          photo       = mapPoint.photo;
       final MapPointType   pointType   = mapPoint.pointType;
 
       final int      numTours          = _allTourData.size();
 
       final boolean  isMultipleTours   = numTours > 1;
+      final boolean  isPhotoAvailable  = photo != null;
       final boolean  isTourMarker      = pointType.equals(MapPointType.TOUR_MARKER);
       final boolean  isTourAvailable   = isTourMarker || pointType.equals(MapPointType.TOUR_PAUSE);
 
-      _actionMapPoint_EditTourMarker  .setEnabled(isTourMarker);
-      _actionMapPoint_ShowOnlyThisTour.setEnabled(isMultipleTours && isTourAvailable);
+      _actionMapPoint_EditTourMarker   .setEnabled(isTourMarker);
+      _actionMapPoint_RemovePhoto      .setEnabled(isPhotoAvailable);
+      _actionMapPoint_ShowOnlyThisTour .setEnabled(isMultipleTours && isTourAvailable);
 
 // SET_FORMATTING_ON
    }
@@ -2498,6 +2529,7 @@ public class Map2View extends ViewPart implements
 
          menuMgr.add(_actionMapPoint_ShowOnlyThisTour);
          menuMgr.add(_actionMapPoint_EditTourMarker);
+         menuMgr.add(_actionMapPoint_RemovePhoto);
 
       } else {
 
@@ -3609,6 +3641,23 @@ public class Map2View extends ViewPart implements
             setIconPosition_TourWeather();
 
          } else {
+
+            int a = 0;
+            a++;
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//            PhotoImageCache.disposeAll();
 
             final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
@@ -4769,12 +4818,17 @@ public class Map2View extends ViewPart implements
 
       final boolean hasAnyStars = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.HAS_ANY;
 
-      if (_isPhotoFilterActive && !hasAnyStars) {
+      if (_isPhotoFilterActive && hasAnyStars == false) {
 
-         final boolean isNoStar = _photoFilter_RatingStars == 0;
-         final boolean isEqual = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_EQUAL;
-         final boolean isMore = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_MORE_OR_EQUAL;
-         final boolean isLess = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_LESS_OR_EQUAL;
+// SET_FORMATTING_OFF
+
+         final boolean isNoStar     = _photoFilter_RatingStars == 0;
+         final boolean isEqual      = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_EQUAL;
+         final boolean isMore       = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_MORE_OR_EQUAL;
+         final boolean isMoreOrNone = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_MORE_OR_EQUAL_OR_NONE;
+         final boolean isLess       = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_LESS_OR_EQUAL;
+
+// SET_FORMATTING_ON
 
          for (final Photo photo : _allPhotos) {
 
@@ -4791,6 +4845,10 @@ public class Map2View extends ViewPart implements
                _filteredPhotos.add(photo);
 
             } else if (isMore && ratingStars >= _photoFilter_RatingStars) {
+
+               _filteredPhotos.add(photo);
+
+            } else if (isMoreOrNone && (ratingStars >= _photoFilter_RatingStars || ratingStars == 0)) {
 
                _filteredPhotos.add(photo);
 
@@ -4995,6 +5053,42 @@ public class Map2View extends ViewPart implements
                   : TOUR_INFO_TOOLTIP_X;
 
       _tourWeatherToolTipProvider.setIconPosition(devXTooltip, devYTooltip);
+   }
+
+   public void setMapImageSize() {
+
+      final Enum<ImageSize> imageSize = Util.getStateEnum(_state,
+            SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE,
+            ImageSize.MEDIUM);
+
+      int mapImageSize;
+
+      if (imageSize.equals(ImageSize.LARGE)) {
+
+         mapImageSize = Util.getStateInt(_state,
+               SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_LARGE,
+               SlideoutMap2_PhotoOptions.MAP_IMAGE_DEFAULT_SIZE_LARGE);
+
+      } else if (imageSize.equals(ImageSize.MEDIUM)) {
+
+         mapImageSize = Util.getStateInt(_state,
+               SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_MEDIUM,
+               SlideoutMap2_PhotoOptions.MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
+
+      } else if (imageSize.equals(ImageSize.SMALL)) {
+
+         mapImageSize = Util.getStateInt(_state,
+               SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_SMALL,
+               SlideoutMap2_PhotoOptions.MAP_IMAGE_DEFAULT_SIZE_SMALL);
+
+      } else {
+
+         mapImageSize = Util.getStateInt(_state,
+               SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_TINY,
+               SlideoutMap2_PhotoOptions.MAP_IMAGE_DEFAULT_SIZE_TINY);
+      }
+
+      Photo.setMapImageRequestedSize(mapImageSize);
    }
 
    /**
@@ -5604,13 +5698,6 @@ public class Map2View extends ViewPart implements
       if (_isMapSyncWith_ValuePoint) {
          positionMapTo_ValueIndex(hoveredTourData, hoveredSerieIndex);
       }
-   }
-
-   public void updateUI_Photos() {
-
-      _map.disposeOverlayImageCache();
-
-      _map.paint();
    }
 
    /**

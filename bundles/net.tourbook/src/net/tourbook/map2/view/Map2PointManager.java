@@ -22,6 +22,14 @@ public class Map2PointManager {
    private static SlideoutMap2_MapPoints _mapPoint_Slideout;
    private static MapPointStatistics     _mapPoint_Statistics;
 
+   public static void enableControls() {
+
+      if (_mapPoint_Slideout != null) {
+
+         _mapPoint_Slideout.enableControls();
+      }
+   }
+
    /**
     * @param isOpenSlideout
     *           When <code>true</code> then the slideout is opened when it is available

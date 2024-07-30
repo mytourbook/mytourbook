@@ -63,8 +63,8 @@ public abstract class ToolTip {
    private int                         hideDelay              = 0;
 
    private TooltipHideListener         hideListener           = new TooltipHideListener();
-   private ToolTipOwnerControlListener listener;
-   private Listener                    shellListener;
+   private ToolTipOwnerControlListener _controlListener;
+   private Listener                    _shellListener;
 
    private HashMap<String, Object>     data;
 
@@ -72,6 +72,7 @@ public abstract class ToolTip {
     * Ensure that only one tooltip is active in time
     */
    private Shell                       _tooltipShell;
+   public Point                        _shellSize;
 
    private boolean                     isHideOnMouseDown      = true;
    private boolean                     isRespectDisplayBounds = true;
@@ -110,6 +111,8 @@ public abstract class ToolTip {
                break;
 
             case SWT.MouseExit:
+
+               _shellSize = shell.getSize();
 
                /*
                 * Give some insets to ensure we get exit informations from a wider area ;-)
@@ -222,28 +225,26 @@ public abstract class ToolTip {
 
       });
 
-      this.listener = new ToolTipOwnerControlListener();
+      _controlListener = new ToolTipOwnerControlListener();
 
-      this.shellListener = new Listener() {
+      _shellListener = new Listener() {
          @Override
          public void handleEvent(final Event event) {
 
-            final Control ttControl = ToolTip.this._control;
-
-            if (ttControl == null || ttControl.isDisposed()) {
+            if (_control == null || _control.isDisposed()) {
                return;
             }
 
-            ttControl.getDisplay().asyncExec(() -> {
+            _control.getDisplay().asyncExec(() -> {
 
                // check again, NPE has occured during debugging
 
-               if (ttControl == null || ttControl.isDisposed()) {
+               if (_control == null || _control.isDisposed()) {
                   return;
                }
 
                // Check if the new active shell is the tooltip itself
-               if (ttControl.getDisplay().getActiveShell() != _tooltipShell) {
+               if (_control.getDisplay().getActiveShell() != _tooltipShell) {
                   toolTipHide(_tooltipShell, event);
                }
             });
@@ -262,11 +263,11 @@ public abstract class ToolTip {
 
       deactivate();
 
-      _control.addListener(SWT.Dispose, listener);
-      _control.addListener(SWT.MouseMove, listener);
-      _control.addListener(SWT.MouseExit, listener);
-      _control.addListener(SWT.MouseDown, listener);
-      _control.addListener(SWT.MouseWheel, listener);
+      _control.addListener(SWT.Dispose, _controlListener);
+      _control.addListener(SWT.MouseMove, _controlListener);
+      _control.addListener(SWT.MouseExit, _controlListener);
+      _control.addListener(SWT.MouseDown, _controlListener);
+      _control.addListener(SWT.MouseWheel, _controlListener);
    }
 
    /**
@@ -300,11 +301,11 @@ public abstract class ToolTip {
     */
    public void deactivate() {
 
-      _control.removeListener(SWT.Dispose, listener);
-      _control.removeListener(SWT.MouseMove, listener);
-      _control.removeListener(SWT.MouseExit, listener);
-      _control.removeListener(SWT.MouseDown, listener);
-      _control.removeListener(SWT.MouseWheel, listener);
+      _control.removeListener(SWT.Dispose, _controlListener);
+      _control.removeListener(SWT.MouseMove, _controlListener);
+      _control.removeListener(SWT.MouseExit, _controlListener);
+      _control.removeListener(SWT.MouseDown, _controlListener);
+      _control.removeListener(SWT.MouseWheel, _controlListener);
    }
 
    private Point fixupDisplayBounds(final Point tipSize, final Point location) {
@@ -440,6 +441,7 @@ public abstract class ToolTip {
     * @return the absolute position on the display
     */
    public Point getLocation(final Point tipSize, final Event event) {
+
       return _control.toDisplay(event.x + xShift, event.y + yShift);
    }
 
@@ -453,6 +455,19 @@ public abstract class ToolTip {
       }
 
       return _tooltipShell;
+   }
+
+   /**
+    * @return Returns the current shell size
+    */
+   public Point getShellSize() {
+
+      return _shellSize;
+   }
+
+   protected int getShellStyle() {
+
+      return SWT.ON_TOP | SWT.TOOL | SWT.NO_FOCUS;
    }
 
    /**
@@ -633,6 +648,21 @@ public abstract class ToolTip {
    }
 
    /**
+    * Set the shell size after the shell is created
+    *
+    * @param shell
+    *           Tooltip shell
+    *
+    * @return Returns the shell size
+    */
+   protected Point setupShellSize(final Shell shell) {
+
+      shell.pack();
+
+      return shell.getSize();
+   }
+
+   /**
     * Set the shift (from the mouse position triggered the event) used to display the tooltip.
     * <p>
     * By default the tooltip is shifted 3 pixels to the right.
@@ -642,6 +672,7 @@ public abstract class ToolTip {
     *           the new shift
     */
    public void setShift(final Point p) {
+
       xShift = p.x;
       yShift = p.y;
    }
@@ -736,7 +767,8 @@ public abstract class ToolTip {
 
       if (shouldCreateToolTip(event)) {
 
-         final Shell shell = new Shell(_controlShell, SWT.ON_TOP | SWT.TOOL | SWT.NO_FOCUS);
+         final Shell shell = new Shell(_controlShell, getShellStyle());
+
          shell.setLayout(new FillLayout());
 
          toolTipOpen(shell, event);
@@ -752,7 +784,7 @@ public abstract class ToolTip {
       final boolean isShouldHideToolTip = shouldHideToolTip(event);
 
       if (_control != null && !_control.isDisposed() && isShouldHideToolTip) {
-         _controlShell.removeListener(SWT.Deactivate, shellListener);
+         _controlShell.removeListener(SWT.Deactivate, _shellListener);
       }
 
       if (tooltipShell != null && !tooltipShell.isDisposed() && isShouldHideToolTip) {
@@ -806,7 +838,7 @@ public abstract class ToolTip {
 
       _tooltipShell = shell;
 
-      _controlShell.addListener(SWT.Deactivate, shellListener);
+      _controlShell.addListener(SWT.Deactivate, _shellListener);
 
       if (popupDelay > 0) {
 
@@ -833,7 +865,7 @@ public abstract class ToolTip {
 
    private void toolTipShow(final Shell ttShell, final Event event) {
 
-      if (!ttShell.isDisposed()) {
+      if (ttShell.isDisposed() == false) {
 
          currentArea = getToolTipArea(event);
 
@@ -848,9 +880,8 @@ public abstract class ToolTip {
                toolTipHookByTypeRecursively(ttShell, true, SWT.MouseExit);
             }
 
-            ttShell.pack();
-            final Point size = ttShell.getSize();
-            final Point location = fixupDisplayBounds(size, getLocation(size, event));
+            final Point shellSize = setupShellSize(ttShell);
+            final Point location = fixupDisplayBounds(shellSize, getLocation(shellSize, event));
 
             // Need to adjust a bit more if the mouse cursor.y == tip.y and
             // the cursor.x is inside the tip
@@ -858,7 +889,8 @@ public abstract class ToolTip {
 
             if (cursorLocation.y == location.y
                   && location.x < cursorLocation.x
-                  && location.x + size.x > cursorLocation.x) {
+                  && location.x + shellSize.x > cursorLocation.x) {
+
                location.y -= 2;
             }
 

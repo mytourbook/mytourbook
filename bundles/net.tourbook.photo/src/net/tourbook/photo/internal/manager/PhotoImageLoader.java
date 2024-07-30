@@ -67,15 +67,15 @@ public class PhotoImageLoader {
 
       awtImageFileSuffixes = ImageIO.getReaderFileSuffixes();
 
-//		final String[] formatNames = ImageIO.getReaderFormatNames();
-//		final String mimeReadFormats[] = ImageIO.getReaderMIMETypes();
+//      final String[] formatNames = ImageIO.getReaderFormatNames();
+//      final String mimeReadFormats[] = ImageIO.getReaderMIMETypes();
 //
-//		System.out.println("Mime Reader:      " + Arrays.asList(mimeReadFormats));
-//		System.out.println("Format Reader:    " + Arrays.asList(formatNames));
-//		System.out.println("Suffixes Readers: " + Arrays.asList(awtImageFileSuffixes));
+//      System.out.println("Mime Reader:      " + Arrays.asList(mimeReadFormats));
+//      System.out.println("Format Reader:    " + Arrays.asList(formatNames));
+//      System.out.println("Suffixes Readers: " + Arrays.asList(awtImageFileSuffixes));
 
-//		final String writeFormats[] = ImageIO.getWriterMIMETypes();
-//		System.out.println("Mime Writers:     " + Arrays.asList(writeFormats));
+//      final String writeFormats[] = ImageIO.getWriterMIMETypes();
+//      System.out.println("Mime Writers:     " + Arrays.asList(writeFormats));
    }
 
    private Photo                    _photo;
@@ -107,8 +107,8 @@ public class PhotoImageLoader {
                            final int hqImageSize,
                            final ILoadCallBack loadCallBack) {
 
-//		System.out.println(UI.timeStampNano() + " PhotoImageLoader\tthread:" + Thread.currentThread().getName());
-//		// TODO remove SYSTEM.OUT.PRINTLN
+//      System.out.println(UI.timeStampNano() + " PhotoImageLoader\tthread:" + Thread.currentThread().getName());
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
       _display = display;
       _photo = photo;
@@ -122,7 +122,7 @@ public class PhotoImageLoader {
 
    private Image createSWTimageFromAWTimage(final BufferedImage awtBufferedImage, final String imageFilePath) {
 
-//		final ImageData swtImageData = UI.convertAWTimageIntoSWTimage(awtBufferedImage, imageFilePath);
+//      final ImageData swtImageData = UI.convertAWTimageIntoSWTimage(awtBufferedImage, imageFilePath);
 
       final ImageData swtImageData = SWT2Dutil.convertToSWT(awtBufferedImage, imageFilePath);
 
@@ -264,7 +264,7 @@ public class PhotoImageLoader {
          }
 
 // this will print out all metadata
-//			System.out.println(metadata);
+//         System.out.println(metadata);
 
          if (metadata instanceof JpegImageMetadata) {
 
@@ -359,7 +359,7 @@ public class PhotoImageLoader {
             PhotoImageCache.putImage(imageKey, loadedExifImage, originalImagePathName);
 
             // display image in the loading callback
-//				_loadCallBack.callBackImageIsLoaded(true);
+//            _loadCallBack.callBackImageIsLoaded(true);
          }
       }
    }
@@ -456,10 +456,10 @@ public class PhotoImageLoader {
    public void loadImageHQ(final LinkedBlockingDeque<PhotoImageLoader> thumbImageWaitingQueue,
                            final LinkedBlockingDeque<PhotoExifLoader> exifWaitingQueue) {
 
-//		if (isImageVisible() == false) {
-//			setStateUndefined();
-//			return;
-//		}
+//      if (isImageVisible() == false) {
+//         setStateUndefined();
+//         return;
+//      }
 
       /*
        * wait until exif data and small images are loaded
@@ -1139,16 +1139,27 @@ public class PhotoImageLoader {
 
       final long end = System.currentTimeMillis() - start;
 
-      System.out.println(UI.timeStampNano() + " AWT: " //$NON-NLS-1$
-            + (Thread.currentThread().getName() + UI.SPACE1 + _photo.imageFileName)
-            + ("\ttotal: " + end) //$NON-NLS-1$
-            + ("\tload: " + endHqLoad) //$NON-NLS-1$
-            + ("\tresizeHQ: " + endResizeHQ) //$NON-NLS-1$
-            + ("\tsaveHQ: " + endSaveHQ) //$NON-NLS-1$
-            + ("\tresizeThumb: " + endResizeThumb) //$NON-NLS-1$
-            + ("\tsaveThumb: " + endSaveThumb) //$NON-NLS-1$
-      //
-      );
+      final String text = " AWT: " //$NON-NLS-1$
+            + "%-15s " //$NON-NLS-1$
+            + "%-15s  " //$NON-NLS-1$
+            + "total: %5d  " //$NON-NLS-1$
+            + "load: %5d  " //$NON-NLS-1$
+            + "resizeHQ: %3d  " //$NON-NLS-1$
+            + "saveHQ: %4d  " //$NON-NLS-1$
+            + "resizeThumb: %3d  " //$NON-NLS-1$
+            + "saveThumb: %3d"; //$NON-NLS-1$
+
+      System.out.println(UI.timeStampNano() + text.formatted(
+
+            Thread.currentThread().getName(),
+            _photo.imageFileName,
+
+            end,
+            endHqLoad,
+            endResizeHQ,
+            endSaveHQ,
+            endResizeThumb,
+            endSaveThumb));
 
       if (exceptionMessage != null) {
          throw new Exception(exceptionMessage);
@@ -1373,7 +1384,7 @@ public class PhotoImageLoader {
                final int width = Integer.parseInt(originalImageWidth);
                final int height = Integer.parseInt(originalImageHeight);
 
-               _photo.setPhotoDimension(width, height);
+               _photo.setPhotoSize(width, height);
 
             } catch (final NumberFormatException e) {
                StatusUtil.log(e);
@@ -1385,38 +1396,38 @@ public class PhotoImageLoader {
 
 // JAI implementation to read tiff images with AWT
 //
-//	private BufferedImage loadImageHQ_22_ExtendedAWT(final PhotoWrapper photoWrapper) throws IOException {
+//   private BufferedImage loadImageHQ_22_ExtendedAWT(final PhotoWrapper photoWrapper) throws IOException {
 //
-//		if (isAWTImageSupported == false) {
+//      if (isAWTImageSupported == false) {
 //
-//			// extension is not supported
+//         // extension is not supported
 //
-//			return null;
+//         return null;
 //
 ////
-////			final SeekableStream s = new FileSeekableStream(_photo.getPhotoWrapper().imageFile);
+////         final SeekableStream s = new FileSeekableStream(_photo.getPhotoWrapper().imageFile);
 ////
-////			final TIFFDecodeParam param = null;
+////         final TIFFDecodeParam param = null;
 ////
-////			final ImageDecoder dec = ImageCodec.createImageDecoder("tiff", s, param);
+////         final ImageDecoder dec = ImageCodec.createImageDecoder("tiff", s, param);
 ////
-////			// Which of the multiple images in the TIFF file do we want to load
-////			// 0 refers to the first, 1 to the second and so on.
-////			final int imageToLoad = 0;
+////         // Which of the multiple images in the TIFF file do we want to load
+////         // 0 refers to the first, 1 to the second and so on.
+////         final int imageToLoad = 0;
 ////
-////			final RenderedImage op = new NullOpImage(
-////					dec.decodeAsRenderedImage(imageToLoad),
-////					null,
-////					OpImage.OP_IO_BOUND,
-////					null);
+////         final RenderedImage op = new NullOpImage(
+////               dec.decodeAsRenderedImage(imageToLoad),
+////               null,
+////               OpImage.OP_IO_BOUND,
+////               null);
 ////
-////			final BufferedImage img = new BufferedImage(op.getWidth(), op.getHeight(), BufferedImage.TYPE_INT_ARGB);
+////         final BufferedImage img = new BufferedImage(op.getWidth(), op.getHeight(), BufferedImage.TYPE_INT_ARGB);
 //
-//		} else {
+//      } else {
 //
-//			return ImageIO.read(photoWrapper.imageFile);
-//		}
-//	}
+//         return ImageIO.read(photoWrapper.imageFile);
+//      }
+//   }
 
    /**
     * This is called from the executor when the loading task is starting. It loads an image and
@@ -1428,60 +1439,60 @@ public class PhotoImageLoader {
     * =========
     *
     * SWT
-    * Photo-Image-Loader-1	IMG_1219_10.JPG	load:	1165	resize:	645	save:	110	total:	1920
-    * Photo-Image-Loader-0	IMG_1219_9.JPG	load:	1165	resize:	650	save:	110	total:	1925
-    * Photo-Image-Loader-1	IMG_1219.JPG	load:	566		resize:	875	save:	60	total:	1501
-    * Photo-Image-Loader-0	IMG_1219_2.JPG	load:	835		resize:	326	save:	55	total:	1216
-    * Photo-Image-Loader-1	IMG_1219_3.JPG	load:	1150	resize:	625	save:	55	total:	1830
-    * Photo-Image-Loader-0	IMG_1219_4.JPG	load:	565		resize:	630	save:	60	total:	1255
-    * Photo-Image-Loader-1	IMG_1219_5.JPG	load:	566		resize:	880	save:	60	total:	1506
-    * Photo-Image-Loader-0	IMG_1219_6.JPG	load:	845		resize:	341	save:	65	total:	1251
-    * Photo-Image-Loader-1	IMG_1219_7.JPG	load:	575		resize:	875	save:	50	total:	1500
-    * Photo-Image-Loader-0	IMG_1219_8.JPG	load:	845		resize:	356	save:	45	total:	1246
-    * 												8277			6203		670			15150
+    * Photo-Image-Loader-1   IMG_1219_10.JPG  load:   1165   resize:   645   save:   110  total:   1920
+    * Photo-Image-Loader-0   IMG_1219_9.JPG   load:   1165   resize:   650   save:   110  total:   1925
+    * Photo-Image-Loader-1   IMG_1219.JPG     load:   566    resize:   875   save:   60   total:   1501
+    * Photo-Image-Loader-0   IMG_1219_2.JPG   load:   835    resize:   326   save:   55   total:   1216
+    * Photo-Image-Loader-1   IMG_1219_3.JPG   load:   1150   resize:   625   save:   55   total:   1830
+    * Photo-Image-Loader-0   IMG_1219_4.JPG   load:   565    resize:   630   save:   60   total:   1255
+    * Photo-Image-Loader-1   IMG_1219_5.JPG   load:   566    resize:   880   save:   60   total:   1506
+    * Photo-Image-Loader-0   IMG_1219_6.JPG   load:   845    resize:   341   save:   65   total:   1251
+    * Photo-Image-Loader-1   IMG_1219_7.JPG   load:   575    resize:   875   save:   50   total:   1500
+    * Photo-Image-Loader-0   IMG_1219_8.JPG   load:   845    resize:   356   save:   45   total:   1246
+    *                                                8277             6203          670           15150
     *
     *
     * AWT
-    * Photo-Image-Loader-1	IMG_1219_9.JPG	load:	1005	resize:	770		save AWT:	25	load SWT:	10	total:	1810
-    * Photo-Image-Loader-0	IMG_1219_10.JPG	load:	1015	resize:	1311	save AWT:	145	load SWT:	5	total:	2476
-    * Photo-Image-Loader-1	IMG_1219.JPG	load:	931		resize:	755		save AWT:	65	load SWT:	5	total:	1756
-    * Photo-Image-Loader-0	IMG_1219_2.JPG	load:	960		resize:	737		save AWT:	30	load SWT:	5	total:	1732
-    * Photo-Image-Loader-1	IMG_1219_3.JPG	load:	1340	resize:	700		save AWT:	25	load SWT:	10	total:	2075
-    * Photo-Image-Loader-0	IMG_1219_4.JPG	load:	935		resize:	751		save AWT:	25	load SWT:	10	total:	1721
-    * Photo-Image-Loader-1	IMG_1219_5.JPG	load:	981		resize:	810		save AWT:	25	load SWT:	5	total:	1821
-    * Photo-Image-Loader-0	IMG_1219_6.JPG	load:	970		resize:	821		save AWT:	30	load SWT:	5	total:	1826
-    * Photo-Image-Loader-1	IMG_1219_7.JPG	load:	950		resize:	710		save AWT:	25	load SWT:	5	total:	1690
-    * Photo-Image-Loader-0	IMG_1219_8.JPG	load:	950		resize:	706		save AWT:	30	load SWT:	5	total:	1691
-    * 												10037			8071				425				65			18598
+    * Photo-Image-Loader-1   IMG_1219_9.JPG   load:  1005      resize:   770      save AWT:   25   load SWT:  10   total:   1810
+    * Photo-Image-Loader-0   IMG_1219_10.JPG  load:  1015      resize:  1311      save AWT:  145   load SWT:   5   total:   2476
+    * Photo-Image-Loader-1   IMG_1219.JPG     load:   931      resize:   755      save AWT:   65   load SWT:   5   total:   1756
+    * Photo-Image-Loader-0   IMG_1219_2.JPG   load:   960      resize:   737      save AWT:   30   load SWT:   5   total:   1732
+    * Photo-Image-Loader-1   IMG_1219_3.JPG   load:  1340      resize:   700      save AWT:   25   load SWT:  10   total:   2075
+    * Photo-Image-Loader-0   IMG_1219_4.JPG   load:   935      resize:   751      save AWT:   25   load SWT:  10   total:   1721
+    * Photo-Image-Loader-1   IMG_1219_5.JPG   load:   981      resize:   810      save AWT:   25   load SWT:   5   total:   1821
+    * Photo-Image-Loader-0   IMG_1219_6.JPG   load:   970      resize:   821      save AWT:   30   load SWT:   5   total:   1826
+    * Photo-Image-Loader-1   IMG_1219_7.JPG   load:   950      resize:   710      save AWT:   25   load SWT:   5   total:   1690
+    * Photo-Image-Loader-0   IMG_1219_8.JPG   load:   950      resize:   706      save AWT:   30   load SWT:   5   total:   1691
+    *                                               10037               8071                 425              65           18598
     *
     * 1 Thread
     * ========
     *
     * SWT
-    * Photo-Image-Loader-0	IMG_1219_10.JPG	load:	595	resize:	330	save:	70	total:	995
-    * Photo-Image-Loader-0	IMG_1219.JPG	load:	561	resize:	325	save:	80	total:	966
-    * Photo-Image-Loader-0	IMG_1219_2.JPG	load:	560	resize:	330	save:	50	total:	940
-    * Photo-Image-Loader-0	IMG_1219_3.JPG	load:	561	resize:	325	save:	45	total:	931
-    * Photo-Image-Loader-0	IMG_1219_4.JPG	load:	570	resize:	325	save:	50	total:	945
-    * Photo-Image-Loader-0	IMG_1219_5.JPG	load:	570	resize:	340	save:	50	total:	960
-    * Photo-Image-Loader-0	IMG_1219_6.JPG	load:	575	resize:	330	save:	45	total:	950
-    * Photo-Image-Loader-0	IMG_1219_7.JPG	load:	560	resize:	335	save:	50	total:	945
-    * Photo-Image-Loader-0	IMG_1219_8.JPG	load:	565	resize:	330	save:	45	total:	940
-    * Photo-Image-Loader-0	IMG_1219_9.JPG	load:	565	resize:	330	save:	45	total:	940
-    * 												5682		3300		530			9512
+    * Photo-Image-Loader-0   IMG_1219_10.JPG  load:   595   resize:   330   save:   70   total:   995
+    * Photo-Image-Loader-0   IMG_1219.JPG     load:   561   resize:   325   save:   80   total:   966
+    * Photo-Image-Loader-0   IMG_1219_2.JPG   load:   560   resize:   330   save:   50   total:   940
+    * Photo-Image-Loader-0   IMG_1219_3.JPG   load:   561   resize:   325   save:   45   total:   931
+    * Photo-Image-Loader-0   IMG_1219_4.JPG   load:   570   resize:   325   save:   50   total:   945
+    * Photo-Image-Loader-0   IMG_1219_5.JPG   load:   570   resize:   340   save:   50   total:   960
+    * Photo-Image-Loader-0   IMG_1219_6.JPG   load:   575   resize:   330   save:   45   total:   950
+    * Photo-Image-Loader-0   IMG_1219_7.JPG   load:   560   resize:   335   save:   50   total:   945
+    * Photo-Image-Loader-0   IMG_1219_8.JPG   load:   565   resize:   330   save:   45   total:   940
+    * Photo-Image-Loader-0   IMG_1219_9.JPG   load:   565   resize:   330   save:   45   total:   940
+    *                                                5682            3300          530           9512
     *
     * AWT
-    * Photo-Image-Loader-0	IMG_1219.JPG	load:	1115	resize:	790	save AWT:	45	load SWT:	5	total:	1955
-    * Photo-Image-Loader-0	IMG_1219_2.JPG	load:	1070	resize:	695	save AWT:	30	load SWT:	5	total:	1800
-    * Photo-Image-Loader-0	IMG_1219_3.JPG	load:	1035	resize:	695	save AWT:	25	load SWT:	5	total:	1760
-    * Photo-Image-Loader-0	IMG_1219_4.JPG	load:	1040	resize:	695	save AWT:	25	load SWT:	5	total:	1765
-    * Photo-Image-Loader-0	IMG_1219_5.JPG	load:	1040	resize:	695	save AWT:	25	load SWT:	110	total:	1870
-    * Photo-Image-Loader-0	IMG_1219_6.JPG	load:	1050	resize:	690	save AWT:	25	load SWT:	5	total:	1770
-    * Photo-Image-Loader-0	IMG_1219_7.JPG	load:	1035	resize:	690	save AWT:	145	load SWT:	5	total:	1875
-    * Photo-Image-Loader-0	IMG_1219_8.JPG	load:	1032	resize:	700	save AWT:	20	load SWT:	10	total:	1762
-    * Photo-Image-Loader-0	IMG_1219_9.JPG	load:	1030	resize:	700	save AWT:	25	load SWT:	5	total:	1760
-    * Photo-Image-Loader-0	IMG_1219_10.JPG	load:	1032	resize:	700	save AWT:	25	load SWT:	5	total:	1762
-    * 												10479			7050			390				160			18079
+    * Photo-Image-Loader-0   IMG_1219.JPG     load:   1115   resize:   790   save AWT:   45   load SWT:   5   total:   1955
+    * Photo-Image-Loader-0   IMG_1219_2.JPG   load:   1070   resize:   695   save AWT:   30   load SWT:   5   total:   1800
+    * Photo-Image-Loader-0   IMG_1219_3.JPG   load:   1035   resize:   695   save AWT:   25   load SWT:   5   total:   1760
+    * Photo-Image-Loader-0   IMG_1219_4.JPG   load:   1040   resize:   695   save AWT:   25   load SWT:   5   total:   1765
+    * Photo-Image-Loader-0   IMG_1219_5.JPG   load:   1040   resize:   695   save AWT:   25   load SWT: 110   total:   1870
+    * Photo-Image-Loader-0   IMG_1219_6.JPG   load:   1050   resize:   690   save AWT:   25   load SWT:   5   total:   1770
+    * Photo-Image-Loader-0   IMG_1219_7.JPG   load:   1035   resize:   690   save AWT:  145   load SWT:   5   total:   1875
+    * Photo-Image-Loader-0   IMG_1219_8.JPG   load:   1032   resize:   700   save AWT:   20   load SWT:  10   total:   1762
+    * Photo-Image-Loader-0   IMG_1219_9.JPG   load:   1030   resize:   700   save AWT:   25   load SWT:   5   total:   1760
+    * Photo-Image-Loader-0   IMG_1219_10.JPG  load:   1032   resize:   700   save AWT:   25   load SWT:   5   total:   1762
+    *                                                10479            7050              390             160           18079
     * </pre>
     *
     * @param waitingqueueoriginal
@@ -1526,7 +1537,7 @@ public class PhotoImageLoader {
             // 2. get image from thumbnail image in the EXIF data
 
 //  debug (delay) image loading
-//				Thread.sleep(500);
+//            Thread.sleep(500);
 
             final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
 
@@ -1771,7 +1782,7 @@ public class PhotoImageLoader {
 
       if (isOriginalSize) {
 
-         _photo.setPhotoDimension(imageWidth, imageHeight);
+         _photo.setPhotoSize(imageWidth, imageHeight);
 
          // update cached image size
 
@@ -1779,7 +1790,7 @@ public class PhotoImageLoader {
 
       } else {
 
-         _photo.setThumbDimension(imageWidth, imageHeight);
+         _photo.setThumbSize(imageWidth, imageHeight);
       }
    }
 

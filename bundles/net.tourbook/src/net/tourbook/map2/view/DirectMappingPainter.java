@@ -32,9 +32,17 @@ import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.Messages;
+import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoUI;
+import net.tourbook.photo.RatingStars;
 
+import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -57,7 +65,11 @@ public class DirectMappingPainter implements IDirectPainter {
 
    private SliderPathPaintingData _sliderPathPaintingData;
 
+   private final ColorRegistry    _colorRegistry        = JFaceResources.getColorRegistry();
+   private final Color            _photoBackgroundColor = _colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+
    private Rectangle              _imageMapLocationBounds;
+   private int                    _ratingStarImageSize;
 
    /*
     * UI resources
@@ -66,6 +78,30 @@ public class DirectMappingPainter implements IDirectPainter {
    private final Image _imageSlider_Left;
    private final Image _imageSlider_Right;
    private final Image _imageValuePoint;
+
+   private Image       _imageRatingStar;
+   private Image       _imageRatingStarAndHovered;
+   private Image       _imageRatingStarDelete;
+   private Image       _imageRatingStarHovered;
+   private Image       _imageRatingStarNotHovered;
+   private Image       _imageRatingStarNotHoveredButSet;
+
+   {
+      final ImageRegistry imageRegistry = UI.IMAGE_REGISTRY;
+
+// SET_FORMATTING_OFF
+
+      _imageRatingStar                  = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR);
+      _imageRatingStarAndHovered        = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_AND_HOVERED);
+      _imageRatingStarDelete            = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_DELETE);
+      _imageRatingStarHovered           = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_HOVERED);
+      _imageRatingStarNotHovered        = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_NOT_HOVERED);
+      _imageRatingStarNotHoveredButSet  = imageRegistry.get(PhotoUI.PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET);
+
+// SET_FORMATTING_ON
+
+      _ratingStarImageSize = _imageRatingStar.getBounds().width;
+   }
 
    /**
     * @param map2
@@ -117,12 +153,18 @@ public class DirectMappingPainter implements IDirectPainter {
    private void drawMapPoint_Hovered(final DirectPainterContext painterContext) {
 
       final GC gc = painterContext.gc;
+      final PaintedMapPoint hoveredPoint = _map2.getHoveredMapPoint();
+
+      drawMapPoint_Hovered_LabelItem(gc, hoveredPoint);
+
+      if (TourPainterConfiguration.isShowPhotoRating) {
+         drawMapPoint_Hovered_RatingStars(gc, hoveredPoint);
+      }
+   }
+
+   private void drawMapPoint_Hovered_LabelItem(final GC gc, final PaintedMapPoint hoveredPoint) {
 
       final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
-
-      gc.setAntialias(mapConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
-
-      final PaintedMapPoint hoveredPoint = _map2.getHoveredMapPoint();
       final Rectangle labelRectangle = hoveredPoint.labelRectangle;
 
       final int labelWidth = labelRectangle.width;
@@ -134,18 +176,22 @@ public class DirectMappingPainter implements IDirectPainter {
       final int mapPointDevX = mapPoint.geoPointDevX;
       final int mapPointDevY = mapPoint.geoPointDevY;
 
-      final int markerSize = 6;
-      final int markerSize2 = markerSize / 2;
+      final int symbolSize = mapConfig.locationSymbolSize;
+      final int symbolSize2 = symbolSize / 2;
+      final int lineWidth = symbolSize / 4;
+      final int lineWidth2 = lineWidth / 2;
 
       final String markerLabel = mapPoint.getFormattedLabel();
 
-      final int markerSymbolDevX = mapPointDevX - markerSize2;
-      final int markerSymbolDevY = mapPointDevY - markerSize2;
+      final int markerSymbolDevX = mapPointDevX - symbolSize2;
+      final int markerSymbolDevY = mapPointDevY - symbolSize2;
 
       final Color lineColor = _map2.isMapBackgroundDark() ? UI.SYS_COLOR_WHITE : UI.SYS_COLOR_BLACK;
 
-      gc.setForeground(mapPoint.getOutlineColor());
-      gc.setBackground(mapPoint.getFillColor());
+      gc.setAntialias(mapConfig.isLabelAntialiased ? SWT.ON : SWT.OFF);
+
+      gc.setForeground(mapPoint.getOutlineColorSWT());
+      gc.setBackground(mapPoint.getFillColorSWT());
 
       /*
        * Draw location bounding box
@@ -153,7 +199,7 @@ public class DirectMappingPainter implements IDirectPainter {
       if (mapConfig.isShowLocationBoundingBox) {
 
          // draw original bbox
-         final Rectangle boundingBox = mapPoint.boundingBox;
+         final Rectangle boundingBox = mapPoint.boundingBoxSWT;
 
          if (boundingBox != null) {
 
@@ -166,7 +212,7 @@ public class DirectMappingPainter implements IDirectPainter {
             );
          }
 
-         final Rectangle boundingBox_Resized = mapPoint.boundingBox_Resized;
+         final Rectangle boundingBox_Resized = mapPoint.boundingBox_ResizedSWT;
 
          if (boundingBox_Resized != null) {
 
@@ -211,7 +257,7 @@ public class DirectMappingPainter implements IDirectPainter {
             lineToDevX,
             lineToDevY);
 
-      gc.setForeground(mapPoint.getOutlineColor());
+      gc.setForeground(mapPoint.getOutlineColorSWT());
 
       /*
        * Draw a symbol at the point location
@@ -233,49 +279,180 @@ public class DirectMappingPainter implements IDirectPainter {
 
          // draw a symbol
 
-         gc.fillRectangle(
+         final Rectangle symbolRectangle = new Rectangle(
                markerSymbolDevX,
                markerSymbolDevY,
-               markerSize,
-               markerSize);
+               symbolSize,
+               symbolSize);
 
-         gc.setLineWidth(2);
-         gc.drawRectangle(
-               markerSymbolDevX,
-               markerSymbolDevY,
-               markerSize,
-               markerSize);
+         if (mapPointType.equals(MapPointType.TOUR_PHOTO)) {
+
+            gc.fillOval(
+                  symbolRectangle.x + 1, // fill a larger shape to hide the antialiasing which looks like a light border !!!
+                  symbolRectangle.y + 1,
+                  symbolRectangle.width - 2,
+                  symbolRectangle.height - 2);
+
+            gc.setLineWidth(lineWidth);
+            gc.drawOval(
+                  symbolRectangle.x + lineWidth2 - 1,
+                  symbolRectangle.y + lineWidth2 - 1,
+                  symbolRectangle.width - lineWidth + 2,
+                  symbolRectangle.height - lineWidth + 2);
+
+         } else {
+
+            gc.fillRectangle(
+                  symbolRectangle.x,
+                  symbolRectangle.y,
+                  symbolRectangle.width,
+                  symbolRectangle.height);
+
+            gc.setLineWidth(lineWidth);
+            gc.drawRectangle(
+                  symbolRectangle.x + lineWidth2,
+                  symbolRectangle.y + lineWidth2,
+                  symbolRectangle.width - lineWidth,
+                  symbolRectangle.height - lineWidth);
+         }
       }
 
       /*
-       * Highlight hovered label
+       * Highlight hovered label/photo
        */
       final int labelDevX = labelRectangle.x;
       final int labelDevY = labelRectangle.y;
 
-      // fill label background
-      gc.fillRectangle(
-            labelRectangle.x - Map2.MAP_MARKER_BORDER_WIDTH,
-            labelRectangle.y,
-            labelRectangle.width + 2 * Map2.MAP_MARKER_BORDER_WIDTH,
-            labelRectangle.height);
+      if (mapPointType.equals(MapPointType.TOUR_PHOTO)) {
 
-      // border: horizontal bottom
-      gc.drawLine(
-            labelDevX,
-            labelDevY + labelHeight,
-            labelDevX + labelWidth - 1,
-            labelDevY + labelHeight);
+         gc.setForeground(lineColor);
 
-      // marker label
-      gc.drawText(markerLabel, labelDevX, labelDevY, true);
+         gc.setLineWidth(1);
+         gc.drawRectangle(
+               labelRectangle.x - Map2.MAP_POINT_BORDER,
+               labelRectangle.y,
+               labelRectangle.width + 2 * Map2.MAP_POINT_BORDER,
+               labelRectangle.height);
 
-      // border: horizontal bottom
-      gc.drawLine(
-            labelDevX,
-            labelDevY + labelHeight,
-            labelDevX + labelWidth,
-            labelDevY + labelHeight);
+      } else {
+
+         // fill label background
+         gc.fillRectangle(
+               labelRectangle.x - Map2.MAP_POINT_BORDER,
+               labelRectangle.y,
+               labelRectangle.width + 2 * Map2.MAP_POINT_BORDER,
+               labelRectangle.height);
+
+         // border: horizontal bottom
+         gc.setLineWidth(2);
+         gc.drawLine(
+               labelDevX,
+               labelDevY + labelHeight,
+               labelDevX + labelWidth - 1,
+               labelDevY + labelHeight);
+
+         // marker label
+         final Font currentFont = gc.getFont();
+
+         gc.setFont(_map2.getLabelFont());
+         gc.drawText(
+
+               markerLabel,
+
+               labelDevX,
+               labelDevY
+
+                     // for some fonts, e.g. "Yu Gothic UI Semilight" which looks very similar like "Segoe UI"
+                     // this will paint the text at the same position as with AWT
+                     + 1,
+
+               true);
+
+         gc.setFont(currentFont);
+
+         // border: horizontal bottom
+         gc.drawLine(
+               labelDevX,
+               labelDevY + labelHeight,
+               labelDevX + labelWidth,
+               labelDevY + labelHeight);
+      }
+   }
+
+   private void drawMapPoint_Hovered_RatingStars(final GC gc, final PaintedMapPoint hoveredPoint) {
+
+      final Photo photo = hoveredPoint.mapPoint.photo;
+
+      if (photo == null
+
+            // this happend when the photo was not yet painted
+            || photo.paintedPhoto == null
+
+      ) {
+
+         return;
+      }
+
+      // make the rating stars more visible
+      gc.setBackground(_photoBackgroundColor);
+      gc.fillRectangle(photo.paintedRatingStars);
+      _map2.setPaintedRatingStars(photo.paintedRatingStars);
+
+      final int hoveredStars = photo.hoveredStars;
+      final boolean isStarHovered = hoveredStars > 0;
+
+      final int photoDevX = photo.paintedPhoto.x;
+      final int photoDevY = photo.paintedPhoto.y;
+      final int photoWidth = photo.paintedPhoto.width;
+
+      final int numRatingStars = photo.ratingStars;
+
+      // center ratings stars in the middle of the image
+      final int ratingStarsLeftBorder = photoDevX + photoWidth / 2 - _map2.MAX_RATING_STARS_WIDTH / 2;
+
+      for (int starIndex = 0; starIndex < RatingStars.MAX_RATING_STARS; starIndex++) {
+
+         Image starImage;
+
+         if (isStarHovered) {
+
+            if (starIndex < hoveredStars) {
+
+               if (starIndex < numRatingStars) {
+
+                  if (starIndex == numRatingStars - 1) {
+                     starImage = _imageRatingStarDelete;
+                  } else {
+                     starImage = _imageRatingStarAndHovered;
+                  }
+               } else {
+                  starImage = _imageRatingStarHovered;
+               }
+
+            } else {
+               if (starIndex < numRatingStars) {
+                  starImage = _imageRatingStarNotHoveredButSet;
+               } else {
+                  starImage = _imageRatingStarNotHovered;
+               }
+            }
+
+         } else {
+
+            if (starIndex < numRatingStars) {
+               starImage = _imageRatingStarNotHoveredButSet;
+            } else {
+               starImage = _imageRatingStarNotHovered;
+            }
+         }
+
+         // draw stars at the top of the photo
+
+         gc.drawImage(starImage,
+
+               ratingStarsLeftBorder + (_ratingStarImageSize * starIndex),
+               photoDevY);
+      }
    }
 
    /**

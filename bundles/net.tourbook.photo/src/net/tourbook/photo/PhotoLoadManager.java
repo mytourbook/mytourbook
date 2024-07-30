@@ -194,11 +194,15 @@ public class PhotoLoadManager {
          }
       };
 
-      _executorExif = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactoryExif);
-      _executorThumb = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactoryThumb);
-      _executorHQ = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryHQ);
-      _executorOriginal = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryOriginal);
-      _executorSql = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactorySql);
+// SET_FORMATTING_OFF
+
+      _executorExif     = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactoryExif);
+      _executorThumb    = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactoryThumb);
+      _executorHQ       = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactoryHQ);
+      _executorOriginal = (ThreadPoolExecutor) Executors.newFixedThreadPool(1,                  threadFactoryOriginal);
+      _executorSql      = (ThreadPoolExecutor) Executors.newFixedThreadPool(numberOfProcessors, threadFactorySql);
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -249,6 +253,7 @@ public class PhotoLoadManager {
 
    /**
     * @param hqImageSize
+    *
     * @return Returns the index in the HQ image size array for the requested image size, default is
     *         used when requested size is not available
     */
@@ -292,6 +297,7 @@ public class PhotoLoadManager {
     * check if the image is still visible
     *
     * @param galleryItem
+    *
     * @return
     */
    private static boolean isImageVisible(final GalleryMT20Item galleryItem) {
@@ -303,6 +309,7 @@ public class PhotoLoadManager {
 
    /**
     * @param imageFilePath
+    *
     * @return Returns <code>true</code> when the thumb image cannot be saved, the original image
     *         will be displayed. Possible AWT save error: "Bogus input colorspace"
     */
@@ -350,10 +357,10 @@ public class PhotoLoadManager {
     * @param imageQuality
     * @param loadCallBack
     */
-   private static void putImageInLoadingQueueHQ(final GalleryMT20Item galleryItem,
-                                                final Photo photo,
-                                                final ImageQuality imageQuality,
-                                                final ILoadCallBack loadCallBack) {
+   private static void putImageInLoadingQueueHQ_Gallery(final GalleryMT20Item galleryItem,
+                                                        final Photo photo,
+                                                        final ImageQuality imageQuality,
+                                                        final ILoadCallBack loadCallBack) {
       // set state
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
@@ -389,6 +396,59 @@ public class PhotoLoadManager {
             checkLoadingState(photo, imageQuality);
          }
       };
+      _executorHQ.submit(executorTask);
+   }
+
+   /**
+    * @param galleryItem
+    *           Gallery item is used to check if it is still visible. Can be <code>null</code>,
+    *           then the visibility is not checked.
+    * @param photo
+    * @param imageQuality
+    * @param imageLoaderCallback
+    */
+   public static void putImageInLoadingQueueHQ_Map(final Photo photo,
+                                                   final ImageQuality imageQuality,
+                                                   final ILoadCallBack imageLoaderCallback) {
+
+      // set state
+      photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
+
+      // put image loading item into the waiting queue
+      _waitingQueueHQ.add(new PhotoImageLoader(
+            _display,
+            photo,
+            imageQuality,
+            _imageFramework,
+            _hqImageSize,
+            imageLoaderCallback));
+
+      final Runnable executorTask = new Runnable() {
+         @Override
+         public void run() {
+
+            // get last added loader item
+            final PhotoImageLoader imageLoader = _waitingQueueHQ.pollFirst();
+
+            if (imageLoader == null) {
+               return;
+            }
+
+            final String errorKey = imageLoader.getPhoto().imageFilePathName;
+
+            if (_photoWithLoadingError.containsKey(errorKey)) {
+
+               photo.setLoadingState(PhotoLoadingState.IMAGE_IS_INVALID, imageQuality);
+
+            } else {
+
+               imageLoader.loadImageHQ(_waitingQueueThumb, _waitingQueueExif);
+            }
+
+            checkLoadingState(photo, imageQuality);
+         }
+      };
+
       _executorHQ.submit(executorTask);
    }
 
@@ -540,7 +600,7 @@ public class PhotoLoadManager {
 
                   // HQ image is requested
 
-                  putImageInLoadingQueueHQ(//
+                  putImageInLoadingQueueHQ_Gallery(
                         galleryItem,
                         photo,
                         imageQuality,
@@ -560,7 +620,7 @@ public class PhotoLoadManager {
 
    public static void putImageInLoadingQueueThumbMap(final Photo photo,
                                                      final ImageQuality imageQuality,
-                                                     final ILoadCallBack imageLoadCallback) {
+                                                     final ILoadCallBack imageLoaderCallback) {
 
       // set state
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
@@ -572,7 +632,7 @@ public class PhotoLoadManager {
             imageQuality,
             _imageFramework,
             _hqImageSize,
-            imageLoadCallback));
+            imageLoaderCallback));
 
       final Runnable executorTask = new Runnable() {
          @Override

@@ -36,9 +36,12 @@ public class OtherMessages {
    public static final String THEME_FONT_LOGGING                           = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging;
 
 
+
    //
    // net.tourbook.Messages
    //
+   public static final String ACTION_PHOTOS_AND_TOURS_REMOVE_PHOTO         = net.tourbook.Messages.Action_PhotosAndTours_RemovePhoto;
+
    public static final String APP_BTN_BROWSE                               = net.tourbook.Messages.app_btn_browse;
 
    public static final String APP_UNIT_HHMMSS                              = net.tourbook.Messages.App_Unit_HHMMSS;
@@ -59,6 +62,9 @@ public class OtherMessages {
 
    public static final String LOG_TOUR_LOCATION_RETRIEVE_LOCATION_POINT    = net.tourbook.Messages.Log_TourLocation_Retrieve_LocationPoint;
 
+   public static final String SLIDEOUT_ACTION_COLLAPSE_SLIDEOUT_TOOLTIP    = net.tourbook.Messages.Slideout_Action_CollapseSlideout_Tooltip;
+   public static final String SLIDEOUT_ACTION_EXPAND_SLIDEOUT_TOOLTIP      = net.tourbook.Messages.Slideout_Action_ExpandSlideout_Tooltip;
+
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_DESCENT  = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Descent;
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_ASCENT   = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Ascent;
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_FLAT     = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Flat;
@@ -71,9 +77,18 @@ public class OtherMessages {
    public static final String APP_ACTION_CLOSE_TOOLTIP                     = net.tourbook.common.Messages.App_Action_Close_Tooltip;
    public static final String APP_ACTION_RESTORE_DEFAULT                   = net.tourbook.common.Messages.App_Action_RestoreDefault;
 
-   public static final String APP_SIZE_LARGE                               = net.tourbook.common.Messages.App_Size_Large;
-   public static final String APP_SIZE_MEDIUM                              = net.tourbook.common.Messages.App_Size_Medium;
-   public static final String APP_SIZE_SMALL                               = net.tourbook.common.Messages.App_Size_Small;
+   public static final String APP_SIZE_LARGE_LABEL                         = net.tourbook.common.Messages.App_Size_Large_Label;
+   public static final String APP_SIZE_LARGE_SHORTCUT                      = net.tourbook.common.Messages.App_Size_Large_Shortcut;
+   public static final String APP_SIZE_LARGE_TEXT                          = net.tourbook.common.Messages.App_Size_Large_Text;
+   public static final String APP_SIZE_MEDIUM_LABEL                        = net.tourbook.common.Messages.App_Size_Medium_Label;
+   public static final String APP_SIZE_MEDIUM_SHORTCUT                     = net.tourbook.common.Messages.App_Size_Medium_Shortcut;
+   public static final String APP_SIZE_MEDIUM_TEXT                         = net.tourbook.common.Messages.App_Size_Medium_Text;
+   public static final String APP_SIZE_SMALL_LABEL                         = net.tourbook.common.Messages.App_Size_Small_Label;
+   public static final String APP_SIZE_SMALL_SHORTCUT                      = net.tourbook.common.Messages.App_Size_Small_Shortcut;
+   public static final String APP_SIZE_SMALL_TEXT                          = net.tourbook.common.Messages.App_Size_Small_Text;
+   public static final String APP_SIZE_TINY_LABEL                          = net.tourbook.common.Messages.App_Size_Tiny_Label;
+   public static final String APP_SIZE_TINY_SHORTCUT                       = net.tourbook.common.Messages.App_Size_Tiny_Shortcut;
+   public static final String APP_SIZE_TINY_TEXT                           = net.tourbook.common.Messages.App_Size_Tiny_Text;
 
    public static final String APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP      = net.tourbook.common.Messages.App_Theme_BackgroundColor_Dark_Tooltip;
    public static final String APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP     = net.tourbook.common.Messages.App_Theme_BackgroundColor_Light_Tooltip;

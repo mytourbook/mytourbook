@@ -20,8 +20,11 @@ import java.util.Set;
 
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.photo.Photo;
+
+import org.eclipse.jface.dialogs.IDialogSettings;
 
 /**
  * Contains data which are needed to paint a tour into the 2D map.
@@ -42,7 +45,9 @@ public class TourPainterConfiguration {
 
    static boolean                           isBackgroundDark;
 
-   static boolean                           isShowPhotos;
+   public static boolean                    isShowPhotos;
+   public static boolean                    isShowPhotoRating;
+   public static boolean                    isShowPhotoTooltip;
    static boolean                           isShowTours;
    static boolean                           isShowTourStartEnd;
    static boolean                           isShowWayPoints;
@@ -51,9 +56,25 @@ public class TourPainterConfiguration {
     * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
     * save in a tour) is displayed.
     */
-   static boolean                           isLinkPhotoDisplayed;
+   public static boolean                    isLinkPhotoDisplayed;
 
    static boolean                           isShowBreadcrumbs;
+
+   static {
+
+      // restore states
+
+      final IDialogSettings state = Map2View.getState();
+
+      isShowPhotoRating = (Util.getStateBoolean(state,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_RATING,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_RATING_DEFAULT));
+
+      isShowPhotoTooltip = Util.getStateBoolean(state,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_TOOLTIP,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT);
+
+   }
 
    private TourPainterConfiguration() {}
 
@@ -102,8 +123,9 @@ public class TourPainterConfiguration {
 
    /**
     * @param allPhotos
-    *           When <code>null</code>, photos are not displayed.
+    *           When <code>null</code> then photos are not displayed
     * @param isShowPhoto
+    * @param isLinkPhoto
     */
    public static void setPhotos(final ArrayList<Photo> allPhotos, final boolean isShowPhoto, final boolean isLinkPhoto) {
 
@@ -113,7 +135,15 @@ public class TourPainterConfiguration {
          _allPhotos.addAll(allPhotos);
       }
 
-      isShowPhotos = isShowPhoto && _allPhotos.size() > 0;
+      isShowPhotos = isShowPhoto
+
+      /*
+       * This is disabled otherwise the photo map points are not reset and are displayed as ghost
+       * images, the photo border is visible when hovered
+       */
+//            && _allPhotos.size() > 0
+
+      ;
 
       isLinkPhotoDisplayed = isLinkPhoto;
    }

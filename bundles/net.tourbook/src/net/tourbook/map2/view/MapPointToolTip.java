@@ -32,6 +32,7 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.map.location.LocationType;
 import net.tourbook.tour.location.TourLocationUI;
 import net.tourbook.ui.Messages;
+import net.tourbook.web.WEB;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -43,9 +44,11 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -66,7 +69,7 @@ public class MapPointToolTip extends ToolTip {
 
    private Map2             _map2;
 
-   private PaintedMapPoint  _hoveredMarker;
+   private PaintedMapPoint  _hoveredMapPoint;
 
    private PixelConverter   _pc;
    private int              _defaultTextWidth;
@@ -92,11 +95,15 @@ public class MapPointToolTip extends ToolTip {
 
       final Composite shellContainer = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(shellContainer);
+//      shellContainer.setBackground(UI.SYS_COLOR_BLUE);
       {
-         final Composite _ttContainer = new Composite(shellContainer, SWT.NONE);
-         GridLayoutFactory.fillDefaults().margins(SHELL_MARGIN, SHELL_MARGIN).applyTo(_ttContainer);
+         final Composite ttContainer = new Composite(shellContainer, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(ttContainer);
+
+         GridLayoutFactory.fillDefaults().margins(SHELL_MARGIN, SHELL_MARGIN).applyTo(ttContainer);
+//         ttContainer.setBackground(UI.SYS_COLOR_GREEN);
          {
-            createUI(_ttContainer);
+            createUI(ttContainer);
          }
       }
 
@@ -105,7 +112,7 @@ public class MapPointToolTip extends ToolTip {
 
    private void createUI(final Composite parent) {
 
-      final Map2Point mapPoint = _hoveredMarker.mapPoint;
+      final Map2Point mapPoint = _hoveredMapPoint.mapPoint;
 
 // SET_FORMATTING_OFF
 
@@ -117,6 +124,8 @@ public class MapPointToolTip extends ToolTip {
       case TOUR_MARKER:       createUI_TourMarker(parent, mapPoint);    break;
 
       case TOUR_PAUSE:        createUI_TourPause(parent, mapPoint);     break;
+
+      case TOUR_PHOTO:        break;
       }
 
 // SET_FORMATTING_ON
@@ -257,6 +266,55 @@ public class MapPointToolTip extends ToolTip {
             GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
 
          }
+         {
+            /*
+             * Link
+             */
+
+            createUI_TourMarker_10_Link(container, tourMarker);
+         }
+      }
+   }
+
+   /**
+    * Url
+    *
+    * @param parent
+    * @param tourMarker
+    */
+   private void createUI_TourMarker_10_Link(final Composite parent, final TourMarker tourMarker) {
+
+      final String urlText = tourMarker.getUrlText();
+      final String urlAddress = tourMarker.getUrlAddress();
+
+      final boolean isText = urlText.length() > 0;
+      final boolean isAddress = urlAddress.length() > 0;
+
+      if (isText || isAddress) {
+
+         String linkText;
+
+         if (isAddress == false) {
+
+            // only text is in the link -> this is not a internet address but create a link of it
+
+            linkText = UI.createLinkText(urlText, urlText);
+
+         } else if (isText == false) {
+
+            linkText = UI.createLinkText(urlAddress, urlAddress);
+
+         } else {
+
+            linkText = UI.createLinkText(urlAddress, urlText);
+         }
+
+         final Link linkUrl = new Link(parent, SWT.NONE);
+         linkUrl.addListener(SWT.Selection, event -> onSelectUrl(event.text));
+         linkUrl.setText(linkText);
+
+         GridDataFactory.fillDefaults().applyTo(linkUrl);
+         setLinkWidth(linkUrl);
       }
    }
 
@@ -281,122 +339,128 @@ public class MapPointToolTip extends ToolTip {
    @Override
    public Point getLocation(final Point tipSize, final Event event) {
 
-      if (_hoveredMarker != null) {
+      if (_hoveredMapPoint == null) {
 
-         final Display display = _map2.getDisplay();
-
-         final int tooltipWidth = tipSize.x;
-         final int tooltipHeight = tipSize.y;
-
-         final Point devMouse = _map2.toControl(display.getCursorLocation());
-         final int devMouseX = devMouse.x;
-
-         final Rectangle markerBounds = _hoveredMarker.labelRectangle;
-         final int markerWidth = markerBounds.width;
-         final int markerWidth2 = markerWidth / 2;
-         final int markerHeight = markerBounds.height;
-
-         final int markerLeft = markerBounds.x;
-         final int markerRight = markerLeft + markerWidth;
-         final int markerTop = markerBounds.y;
-         final int markerBottom = markerBounds.y + markerHeight;
-
-         final Map2Point mapMarker = _hoveredMarker.mapPoint;
-         final int geoPointDevX = mapMarker.geoPointDevX;
-         final int geoPointDevY = mapMarker.geoPointDevY;
-
-         // center horizontally to the mouse position
-         int devX = devMouseX - tooltipWidth / 2;
-         int devY = markerTop + markerHeight;
-         int noCoverHeight;
-
-         if (geoPointDevX <= markerLeft) {
-
-            // label is on the right site
-
-            devX = markerRight;
-
-         } else {
-
-            // label is on the left site -
-
-            devX = markerLeft - tooltipWidth;
-         }
-
-         if (geoPointDevY <= markerTop) {
-
-            // label is below the geo point
-
-            devY = markerTop;
-            noCoverHeight = markerHeight;
-
-         } else {
-
-            // label is above the geo point
-
-            devY = markerBottom - tooltipHeight;
-            noCoverHeight = -markerHeight;
-         }
-
-         /*
-          * Check if the tooltip is outside of the parent
-          */
-         final Rectangle mapBounds = _map2.getBounds();
-         final int mapWidth = mapBounds.width;
-
-         boolean isDevXAdjusted = false;
-
-         if (devX >= mapWidth) {
-            devX = mapWidth - 40;
-            isDevXAdjusted = true;
-         }
-
-         Point ttDisplayLocation = _map2.toDisplay(devX, devY);
-
-         final Rectangle displayBounds = display.getBounds();
-         final int displayWidth = displayBounds.width;
-         final int displayHeight = displayBounds.height;
-
-         if (ttDisplayLocation.x + tooltipWidth > displayWidth) {
-
-            /*
-             * Adjust horizontal position, it is outside of the display, prevent default
-             * repositioning
-             */
-
-            if (isDevXAdjusted) {
-
-               ttDisplayLocation = _map2.toDisplay(devMouseX - tooltipWidth / 2 - markerWidth2 + 20 - tooltipWidth, devY);
-
-            } else {
-
-               ttDisplayLocation.x = displayWidth - tooltipWidth;
-               ttDisplayLocation.y += noCoverHeight;
-            }
-         }
-
-         if (ttDisplayLocation.y + tooltipHeight > displayHeight) {
-
-            /*
-             * Adjust vertical position, it is outside of the display, prevent default
-             * repositioning
-             */
-
-            ttDisplayLocation.y = ttDisplayLocation.y - tooltipHeight - markerHeight;
-         }
-
-         return fixupDisplayBoundsWithMonitor(tipSize, ttDisplayLocation);
+         return super.getLocation(tipSize, event);
       }
 
-      return super.getLocation(tipSize, event);
+      final Display display = _map2.getDisplay();
+
+      final int tooltipWidth = tipSize.x;
+      final int tooltipHeight = tipSize.y;
+
+      final Point devMouse = _map2.toControl(display.getCursorLocation());
+      final int devMouseX = devMouse.x;
+
+      final Rectangle labelBounds = _hoveredMapPoint.labelRectangle;
+      final int labelWidth = labelBounds.width;
+      final int labelWidth2 = labelWidth / 2;
+      final int labelHeight = labelBounds.height;
+
+      final int labelLeft = labelBounds.x;
+      final int labelRight = labelLeft + labelWidth;
+      final int labelTop = labelBounds.y;
+      final int labelBottom = labelBounds.y + labelHeight;
+
+      final Map2Point mapPoint = _hoveredMapPoint.mapPoint;
+      final int geoPointDevX = mapPoint.geoPointDevX;
+      final int geoPointDevY = mapPoint.geoPointDevY;
+
+      // center horizontally to the mouse position
+      int devX = devMouseX - tooltipWidth / 2;
+      int devY = labelTop + labelHeight;
+      int noCoverHeight;
+
+      if (geoPointDevX <= labelLeft) {
+
+         // label is on the right site
+
+         devX = labelRight;
+
+      } else {
+
+         // label is on the left site -
+
+         devX = labelLeft - tooltipWidth;
+
+      }
+
+      if (geoPointDevY <= labelTop) {
+
+         // label is below the geo point
+
+         devY = labelTop;
+         noCoverHeight = labelHeight;
+
+      } else {
+
+         // label is above the geo point
+
+         devY = labelBottom - tooltipHeight;
+         noCoverHeight = -labelHeight;
+      }
+
+      /*
+       * Check if the tooltip is outside of the parent
+       */
+      final Rectangle mapBounds = _map2.getBounds();
+      final int mapWidth = mapBounds.width;
+
+      boolean isDevXAdjusted = false;
+
+      if (devX >= mapWidth) {
+         devX = mapWidth - 40;
+         isDevXAdjusted = true;
+      }
+
+      Point ttDisplayLocation = _map2.toDisplay(devX, devY);
+
+      final Rectangle displayBounds = display.getBounds();
+      final int displayWidth = displayBounds.width;
+      final int displayHeight = displayBounds.height;
+
+      if (ttDisplayLocation.x + tooltipWidth > displayWidth) {
+
+         /*
+          * Adjust horizontal position, it is outside of the display, prevent default
+          * repositioning
+          */
+
+         if (isDevXAdjusted) {
+
+            ttDisplayLocation = _map2.toDisplay(devMouseX - tooltipWidth / 2 - labelWidth2 + 20 - tooltipWidth, devY);
+
+         } else {
+
+            ttDisplayLocation.x = displayWidth - tooltipWidth;
+            ttDisplayLocation.y += noCoverHeight;
+         }
+      }
+
+      if (ttDisplayLocation.y + tooltipHeight > displayHeight) {
+
+         /*
+          * Adjust vertical position, it is outside of the display, prevent default
+          * repositioning
+          */
+
+         ttDisplayLocation.y = ttDisplayLocation.y - tooltipHeight - labelHeight;
+      }
+
+      return fixupDisplayBoundsWithMonitor(tipSize, ttDisplayLocation);
    }
 
    @Override
    protected Object getToolTipArea(final Event event) {
 
-      _hoveredMarker = _map2.getHoveredMapPoint();
+      _hoveredMapPoint = _map2.getHoveredMapPoint();
 
-      return _hoveredMarker;
+      final boolean isPhotoTooltip = _hoveredMapPoint != null
+            && _hoveredMapPoint.mapPoint.pointType.equals(MapPointType.TOUR_PHOTO) ? true : false;
+
+      // this tooltip is not used for photos
+
+      return isPhotoTooltip ? null : _hoveredMapPoint;
    }
 
    private void initUI(final Composite parent) {
@@ -406,6 +470,27 @@ public class MapPointToolTip extends ToolTip {
       _defaultTextHeight = _pc.convertHeightInCharsToPixels(DEFAULT_TEXT_HEIGHT);
 
       _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   }
+
+   private void onSelectUrl(final String address) {
+
+      WEB.openUrl(address);
+
+      // close tooltip when a link is selected
+      hide();
+   }
+
+   private void setLinkWidth(final Control control) {
+
+      final Point defaultSize = control.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+
+      // check default width
+      if (defaultSize.x > _defaultTextWidth) {
+
+         // limit width
+         final GridData gd = (GridData) control.getLayoutData();
+         gd.widthHint = _defaultTextWidth;
+      }
    }
 
    private void setTextControlSize(final Composite parent, final Text txtControl, final String text) {
@@ -460,18 +545,15 @@ public class MapPointToolTip extends ToolTip {
    @Override
    protected boolean shouldCreateToolTip(final Event event) {
 
-//      if (_map2.isShowMapLocationTooltip() == false) {
-//         return false;
-//      }
-
       if (super.shouldCreateToolTip(event) == false) {
          return false;
       }
 
-      if (_hoveredMarker == null) {
+      if (_hoveredMapPoint == null) {
          return false;
       }
 
       return true;
    }
+
 }

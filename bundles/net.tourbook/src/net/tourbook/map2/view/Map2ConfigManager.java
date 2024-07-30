@@ -82,15 +82,14 @@ public class Map2ConfigManager {
    private static final String TAG_MAP_POINT                         = "MapPoint";                            //$NON-NLS-1$
    // common
    private static final String ATTR_IS_LABEL_ANTIALIASED             = "isLabelAntialiased";                  //$NON-NLS-1$
-   private static final String ATTR_IS_SYMBOL_ANTIALIASED            = "isSymbolAntialiased";                 //$NON-NLS-1$
-   // all labels
    private static final String ATTR_IS_TRUNCATE_LABEL                = "isTruncateLabel";                     //$NON-NLS-1$
-   private static final String ATTR_IS_WRAP_LABEL                    = "isWrapLabel";                         //$NON-NLS-1$
    private static final String ATTR_LABEL_LAYOUT                     = "labelLayout";                         //$NON-NLS-1$
    private static final String ATTR_LABEL_DISTRIBUTOR_MAX_LABELS     = "labelDistributorMaxLabels";           //$NON-NLS-1$
    private static final String ATTR_LABEL_DISTRIBUTOR_RADIUS         = "labelDistributorRadius";              //$NON-NLS-1$
+   private static final String ATTR_LABEL_FONT_NAME                  = "labelFontName";                       //$NON-NLS-1$
+   private static final String ATTR_LABEL_FONT_SIZE                  = "labelFontSize";                       //$NON-NLS-1$
+   private static final String ATTR_LABEL_RESPECT_MARGIN             = "labelRespectMargin";                        //$NON-NLS-1$
    private static final String ATTR_LABEL_TRUNCATE_LENGTH            = "labelTruncateLength";                 //$NON-NLS-1$
-   private static final String ATTR_LABEL_WRAP_LENGTH                = "labelWrapLength";                     //$NON-NLS-1$
    // tour + common location
    private static final String ATTR_IS_SHOW_COMMON_LOCATION          = "isShowCommonLocation";                //$NON-NLS-1$
    private static final String ATTR_IS_SHOW_LOCATION_BOUNDING_BOX    = "isShowLocationBoundingBox";           //$NON-NLS-1$
@@ -98,6 +97,8 @@ public class Map2ConfigManager {
    //
    private static final String TAG_COMMON_LOCATION_FILL_COLOR        = "CommonLocationFillColor";             //$NON-NLS-1$
    private static final String TAG_COMMON_LOCATION_OUTLINE_COLOR     = "CommonLocationOutlineColor";          //$NON-NLS-1$
+   private static final String TAG_PHOTO_FILL_COLOR                  = "PhotoFillColor";                      //$NON-NLS-1$
+   private static final String TAG_PHOTO_OUTLINE_COLOR               = "PhotoOutlineColor";                   //$NON-NLS-1$
    private static final String TAG_TOUR_LOCATION_FILL_COLOR          = "TourLocationFillColor";               //$NON-NLS-1$
    private static final String TAG_TOUR_LOCATION_OUTLINE_COLOR       = "TourLocationOutlineColor";            //$NON-NLS-1$
    private static final String TAG_TOUR_LOCATION_START_FILL_COLOR    = "TourLocation_StartFillColor";         //$NON-NLS-1$
@@ -143,7 +144,7 @@ public class Map2ConfigManager {
    /*
     * Defaults, min/max
     */
-   // marker
+   // common
    static final int                            LABEL_GROUP_GRID_SIZE_MIN               = 50;
    static final int                            LABEL_GROUP_GRID_SIZE_MAX               = 1000;
    static final int                            LABEL_GROUP_GRID_SIZE_DEFAULT           = 300;
@@ -153,13 +154,20 @@ public class Map2ConfigManager {
    static final int                            LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT    = 200;
    static final int                            LABEL_DISTRIBUTOR_RADIUS_MIN            = 10;
    static final int                            LABEL_DISTRIBUTOR_RADIUS_MAX            = 2000;
-   static final int                            LABEL_DISTRIBUTOR_RADIUS_DEFAULT        = 100;
+   static final int                            LABEL_DISTRIBUTOR_RADIUS_DEFAULT        = 200;
+   static final String                         LABEL_FONT_NAME_DEFAULT                 = UI.AWT_DIALOG_FONT.getFontName();
+   static final int                            LABEL_FONT_SIZE_MIN                     = 2;
+   static final int                            LABEL_FONT_SIZE_MAX                     = 100;
+   static final int                            LABEL_FONT_SIZE_DEFAULT                 = 12;
+   static final int                            LABEL_RESPECT_MARGIN_MIN                = 0;
+   static final int                            LABEL_RESPECT_MARGIN_MAX                = 100;
+   static final int                            LABEL_RESPECT_MARGIN_DEFAULT            = 2;
    static final int                            LABEL_TRUNCATE_LENGTH_MIN               = 0;
    static final int                            LABEL_TRUNCATE_LENGTH_MAX               = 1000;
    static final int                            LABEL_TRUNCATE_LENGTH_DEFAULT           = 40;
-   static final int                            LABEL_WRAP_LENGTH_MIN                   = 1;
-   static final int                            LABEL_WRAP_LENGTH_MAX                   = 1000;
-   static final int                            LABEL_WRAP_LENGTH_DEFAULT               = 40;
+   static final int                            LOCATION_SYMBOL_SIZE_MIN                = 4;
+   static final int                            LOCATION_SYMBOL_SIZE_MAX                = 100;
+   static final int                            LOCATION_SYMBOL_SIZE_DEFAULT            = 16;
    // cluster
    public static final boolean                 DEFAULT_IS_FILL_CLUSTER_SYMBOL          = true;
    public static final int                     DEFAULT_CLUSTER_GRID_SIZE               = 50;
@@ -176,6 +184,8 @@ public class Map2ConfigManager {
    public static final RGB                     DEFAULT_CLUSTER_OUTLINE_RGB             = new RGB(255, 255, 255);
    public static final RGB                     DEFAULT_COMMON_LOCATION_FILL_RGB        = new RGB(170, 213, 255);
    public static final RGB                     DEFAULT_COMMON_LOCATION_OUTLINE_RGB     = new RGB(0, 0, 0);
+   public static final RGB                     DEFAULT_PHOTO_FILL_RGB                  = new RGB(81, 86, 88);
+   public static final RGB                     DEFAULT_PHOTO_OUTLINE_RGB               = new RGB(229, 229, 229);
    public static final RGB                     DEFAULT_TOUR_LOCATION_FILL_RGB          = new RGB(145, 255, 194);
    public static final RGB                     DEFAULT_TOUR_LOCATION_OUTLINE_RGB       = new RGB(0, 0, 0);
    public static final RGB                     DEFAULT_TOUR_LOCATION_START_FILL_RGB    = new RGB(255, 168, 170);
@@ -317,13 +327,13 @@ public class Map2ConfigManager {
           * Common
           */
          xmlConfig.putBoolean(      ATTR_IS_LABEL_ANTIALIASED,          config.isLabelAntialiased);
-         xmlConfig.putBoolean(      ATTR_IS_SYMBOL_ANTIALIASED,         config.isSymbolAntialiased);
          xmlConfig.putBoolean(      ATTR_IS_TRUNCATE_LABEL,             config.isTruncateLabel);
-         xmlConfig.putBoolean(      ATTR_IS_WRAP_LABEL,                 config.isWrapLabel);
          xmlConfig.putInteger(      ATTR_LABEL_DISTRIBUTOR_MAX_LABELS,  config.labelDistributorMaxLabels);
          xmlConfig.putInteger(      ATTR_LABEL_DISTRIBUTOR_RADIUS,      config.labelDistributorRadius);
+         xmlConfig.putString(       ATTR_LABEL_FONT_NAME,               config.labelFontName);
+         xmlConfig.putInteger(      ATTR_LABEL_FONT_SIZE,               config.labelFontSize);
+         xmlConfig.putInteger(      ATTR_LABEL_RESPECT_MARGIN,          config.labelRespectMargin);
          xmlConfig.putInteger(      ATTR_LABEL_TRUNCATE_LENGTH,         config.labelTruncateLength);
-         xmlConfig.putInteger(      ATTR_LABEL_WRAP_LENGTH,             config.labelWrapLength);
 
          Util.setXmlEnum(xmlConfig, ATTR_LABEL_LAYOUT,                  config.labelLayout);
 
@@ -391,6 +401,12 @@ public class Map2ConfigManager {
 
          Util.setXmlRgb(xmlConfig,  TAG_TOUR_PAUSE_FILL_COLOR,             config.tourPauseFill_RGB);
          Util.setXmlRgb(xmlConfig,  TAG_TOUR_PAUSE_OUTLINE_COLOR,          config.tourPauseOutline_RGB);
+
+         /*
+          * Photo
+          */
+         Util.setXmlRgb(xmlConfig,  TAG_PHOTO_FILL_COLOR,                  config.photoFill_RGB);
+         Util.setXmlRgb(xmlConfig,  TAG_PHOTO_OUTLINE_COLOR,               config.photoOutline_RGB);
       }
 
 // SET_FORMATTING_ON
@@ -484,8 +500,8 @@ public class Map2ConfigManager {
       config.id                           = Util.getXmlString (xmlConfig,     ATTR_ID,                            Long.toString(System.nanoTime()));
       config.name                         = Util.getXmlString (xmlConfig,     ATTR_CONFIG_NAME,                   UI.EMPTY_STRING);
 
+
       config.isLabelAntialiased           = Util.getXmlBoolean(xmlConfig,     ATTR_IS_LABEL_ANTIALIASED,          true);
-      config.isSymbolAntialiased          = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SYMBOL_ANTIALIASED,         true);
 
       config.isShowCommonLocation         = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_COMMON_LOCATION,       true);
       config.isShowLocationBoundingBox    = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_LOCATION_BOUNDING_BOX, false);
@@ -503,11 +519,12 @@ public class Map2ConfigManager {
       config.clusterSymbol_Size           = Util.getXmlInteger(xmlConfig,     ATTR_CLUSTER_SYMBOL_SIZE,           DEFAULT_CLUSTER_SYMBOL_SIZE,        CLUSTER_SYMBOL_SIZE_MIN,   CLUSTER_SYMBOL_SIZE_MAX);
 
       config.isTruncateLabel              = Util.getXmlBoolean(xmlConfig,     ATTR_IS_TRUNCATE_LABEL,             false);
-      config.isWrapLabel                  = Util.getXmlBoolean(xmlConfig,     ATTR_IS_WRAP_LABEL,                 false);
       config.labelDistributorMaxLabels    = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_DISTRIBUTOR_MAX_LABELS,  LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT,  LABEL_DISTRIBUTOR_MAX_LABELS_MIN,   LABEL_DISTRIBUTOR_MAX_LABELS_MAX);
       config.labelDistributorRadius       = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_DISTRIBUTOR_RADIUS,      LABEL_DISTRIBUTOR_RADIUS_DEFAULT,      LABEL_DISTRIBUTOR_RADIUS_MIN,       LABEL_DISTRIBUTOR_RADIUS_MAX);
-      config.labelWrapLength              = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_WRAP_LENGTH,             LABEL_WRAP_LENGTH_DEFAULT,             LABEL_WRAP_LENGTH_MIN,              LABEL_WRAP_LENGTH_MAX);
-      config.labelTruncateLength          = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_TRUNCATE_LENGTH,         LABEL_WRAP_LENGTH_DEFAULT,             LABEL_TRUNCATE_LENGTH_MIN,          LABEL_TRUNCATE_LENGTH_MAX);
+      config.labelFontName                = Util.getXmlString( xmlConfig,     ATTR_LABEL_FONT_NAME,               LABEL_FONT_NAME_DEFAULT);
+      config.labelFontSize                = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_FONT_SIZE,               LABEL_FONT_SIZE_DEFAULT,               LABEL_FONT_SIZE_MIN,                LABEL_FONT_SIZE_MAX);
+      config.labelRespectMargin           = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_RESPECT_MARGIN,          LABEL_RESPECT_MARGIN_DEFAULT,          LABEL_RESPECT_MARGIN_MIN,           LABEL_RESPECT_MARGIN_MAX);
+      config.labelTruncateLength          = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_TRUNCATE_LENGTH,         LABEL_TRUNCATE_LENGTH_DEFAULT,         LABEL_TRUNCATE_LENGTH_MIN,          LABEL_TRUNCATE_LENGTH_MAX);
       config.labelLayout = (MapLabelLayout) Util.getXmlEnum(   xmlConfig,     ATTR_LABEL_LAYOUT,                  LABEL_LAYOUT_DEFAULT);
 
       config.isShowTourPauses                      = Util.getXmlBoolean(xmlConfig,  ATTR_IS_SHOW_TOUR_PAUSES,           false);
@@ -547,6 +564,9 @@ public class Map2ConfigManager {
 
          case TAG_COMMON_LOCATION_FILL_COLOR:            config.commonLocationFill_RGB             = Util.getXmlRgb(xmlConfigChild, DEFAULT_COMMON_LOCATION_FILL_RGB);           break;
          case TAG_COMMON_LOCATION_OUTLINE_COLOR:         config.commonLocationOutline_RGB          = Util.getXmlRgb(xmlConfigChild, DEFAULT_COMMON_LOCATION_OUTLINE_RGB);        break;
+
+         case TAG_PHOTO_FILL_COLOR:                      config.photoFill_RGB                      = Util.getXmlRgb(xmlConfigChild, DEFAULT_PHOTO_FILL_RGB);                     break;
+         case TAG_PHOTO_OUTLINE_COLOR:                   config.photoOutline_RGB                   = Util.getXmlRgb(xmlConfigChild, DEFAULT_PHOTO_OUTLINE_RGB);                  break;
 
          case TAG_TOUR_LOCATION_FILL_COLOR:              config.tourLocationFill_RGB               = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_LOCATION_FILL_RGB);             break;
          case TAG_TOUR_LOCATION_OUTLINE_COLOR:           config.tourLocationOutline_RGB            = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_LOCATION_OUTLINE_RGB);          break;

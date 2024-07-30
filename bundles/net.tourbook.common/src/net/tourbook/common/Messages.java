@@ -35,9 +35,18 @@ public class Messages extends NLS {
 
    public static String        App_Error_NotSupportedValueFormatter;
 
-   public static String        App_Size_Large;
-   public static String        App_Size_Medium;
-   public static String        App_Size_Small;
+   public static String        App_Size_Large_Label;
+   public static String        App_Size_Large_Shortcut;
+   public static String        App_Size_Large_Text;
+   public static String        App_Size_Medium_Label;
+   public static String        App_Size_Medium_Shortcut;
+   public static String        App_Size_Medium_Text;
+   public static String        App_Size_Small_Label;
+   public static String        App_Size_Small_Shortcut;
+   public static String        App_Size_Small_Text;
+   public static String        App_Size_Tiny_Label;
+   public static String        App_Size_Tiny_Shortcut;
+   public static String        App_Size_Tiny_Text;
 
    public static String        App_Theme_BackgroundColor_Light_Tooltip;
    public static String        App_Theme_BackgroundColor_Dark_Tooltip;

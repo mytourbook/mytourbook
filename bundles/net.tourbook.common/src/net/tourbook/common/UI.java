@@ -18,6 +18,7 @@ package net.tourbook.common;
 import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
@@ -172,7 +173,31 @@ public class UI {
 
    private static final String      JS_APOSTROPHE                        = "'";                                         //$NON-NLS-1$
    private static final String      JS_APOSTROPHE_REPLACEMENT            = "\\'";                                       //$NON-NLS-1$
-   private static final String      JS_QUOTA_MARK                        = "\"";                                        //$NON-NLS-1$
+
+   /**
+    * Suddenly JS_QUOTA_MARK causes this Eclipse exception when opening the string externalization
+    * dialog
+    *
+    * <pre>
+    *
+    *  java.lang.StringIndexOutOfBoundsException: begin 3, end 0, length 3
+    *          at java.base/java.lang.String.checkBoundsBeginEnd(String.java:4606)
+    *          at java.base/java.lang.String.substring(String.java:2709)
+    *          at org.eclipse.jdt.internal.corext.refactoring.nls.NLSHint.stripQuotes(NLSHint.java:266)
+    *          at org.eclipse.jdt.internal.corext.refactoring.nls.NLSHint.createSubstitutions(NLSHint.java:221)
+    *          at org.eclipse.jdt.internal.corext.refactoring.nls.NLSHint.<init>(NLSHint.java:106)
+    *          at org.eclipse.jdt.internal.corext.refactoring.nls.NLSRefactoring.<init>(NLSRefactoring.java:92)
+    *          at org.eclipse.jdt.internal.corext.refactoring.nls.NLSRefactoring.create(NLSRefactoring.java:113)
+    *          at org.eclipse.jdt.internal.ui.refactoring.nls.ExternalizeWizard.lambda$0(ExternalizeWizard.java:84)
+    *          at org.eclipse.swt.custom.BusyIndicator.showWhile(BusyIndicator.java:67)
+    *          at org.eclipse.jdt.internal.ui.refactoring.nls.ExternalizeWizard.open(ExternalizeWizard.java:81)
+    *          at org.eclipse.jdt.ui.actions.ExternalizeStringsAction.run(ExternalizeStringsAction.java:191)
+    *          at org.eclipse.jdt.ui.actions.ExternalizeStringsAction.run(ExternalizeStringsAction.java:156)
+    *          at org.eclipse.jdt.ui.actions.SelectionDispatchAction.dispatchRun(SelectionDispatchAction.java:278)
+    * </pre>
+    */
+// private static final String      JS_QUOTA_MARK                        = "\"";                                        //$NON-NLS-1$
+   private static String            JS_QUOTA_MARK                        = new StringBuilder().append('"').toString();
    private static final String      JS_QUOTA_MARK_REPLACEMENT            = "\\\"";                                      //$NON-NLS-1$
    private static final String      JS_BACKSLASH_REPLACEMENT             = "\\\\";                                      //$NON-NLS-1$
    private static final String      HTML_NEW_LINE                        = "\\n";                                       //$NON-NLS-1$
@@ -663,6 +688,9 @@ public class UI {
    public static final Font    AWT_FONT_ARIAL_BOLD_12    = Font.decode("Arial-bold-12");  //$NON-NLS-1$
    public static final Font    AWT_FONT_ARIAL_BOLD_24    = Font.decode("Arial-bold-24");  //$NON-NLS-1$
 
+   /**
+    * Is "Segoe UI" with Win10
+    */
    public static Font          AWT_DIALOG_FONT;
 
 // SET_FORMATTING_OFF
@@ -1033,6 +1061,19 @@ public class UI {
     */
    public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event, final int defaultAccelerator) {
 
+      adjustSpinnerValueOnMouseScroll(event, defaultAccelerator, false);
+   }
+
+   /**
+    * @param event
+    * @param defaultAccelerator
+    *           Could be 10 to increase e.g. image size by 10 without pressing an accelerator key
+    * @param isSmallValueAdjustment
+    */
+   public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event,
+                                                      final int defaultAccelerator,
+                                                      final boolean isSmallValueAdjustment) {
+
       boolean isCtrlKey;
       boolean isShiftKey;
 
@@ -1044,6 +1085,8 @@ public class UI {
          isShiftKey = (event.stateMask & SWT.MOD2) > 0;
       }
 
+      final int valueSign = event.count > 0 ? 1 : -1;
+
       // accelerate with Ctrl + Shift key
       int accelerator = isCtrlKey ? 10 : 1;
       accelerator *= isShiftKey ? 5 : 1;
@@ -1051,9 +1094,26 @@ public class UI {
       accelerator *= defaultAccelerator;
 
       final Spinner spinner = (Spinner) event.widget;
-      final int valueAdjustment = (event.count > 0 ? 1 : -1) * accelerator;
+      int valueAdjustment = valueSign * accelerator;
 
       final int oldValue = spinner.getSelection();
+
+      if (isSmallValueAdjustment) {
+
+         if (oldValue < 10) {
+
+            valueAdjustment = 1 * valueSign;
+
+         } else if (oldValue < 20) {
+
+            valueAdjustment = 2 * valueSign;
+
+         } else if (oldValue < 100) {
+
+            valueAdjustment = 5 * valueSign;
+         }
+      }
+
       spinner.setSelection(oldValue + valueAdjustment);
    }
 
@@ -1519,6 +1579,27 @@ public class UI {
    }
 
    /**
+    * @param text
+    *
+    * @return
+    */
+   public static String createLinkText(final String text) {
+
+      return "<a>%s</a>".formatted(text); //$NON-NLS-1$
+   }
+
+   /**
+    * @param href
+    * @param text
+    *
+    * @return
+    */
+   public static String createLinkText(final String href, final String text) {
+
+      return "<a href=\"%s\">%s</a>".formatted(href, text); //$NON-NLS-1$
+   }
+
+   /**
     * Creates a page with a static text by using a {@link FormToolkit}
     *
     * @param formToolkit
@@ -1751,6 +1832,35 @@ public class UI {
       }
 
       return null;
+   }
+
+   public static void dumpAllFonts() {
+
+      System.out.println("All available font family names"); //$NON-NLS-1$
+
+      // all fonts available in AWT
+      final Font[] allFonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
+
+      for (final Font font : allFonts) {
+
+         String style;
+
+         if (font.isBold()) {
+            style = font.isItalic() ? "bolditalic" : "bold"; //$NON-NLS-1$ //$NON-NLS-2$
+         } else {
+            style = font.isItalic() ? "italic" : "plain"; //$NON-NLS-1$ //$NON-NLS-2$
+         }
+
+         System.out.println(EMPTY_STRING
+
+               + "%-35s - %s".formatted( //$NON-NLS-1$
+
+                     font.getFamily(),
+//                           font.getName(),
+                     style
+
+               ));
+      }
    }
 
    public static void dumpSuperClasses(final Object o) {
@@ -2026,6 +2136,10 @@ public class UI {
 
    /**
     * Get best-fit size for an image drawn in an area of maxX, maxY
+    * <p>
+    *
+    * Original:
+    * org.eclipse.nebula.widgets.gallery/src/org/eclipse/nebula/widgets/gallery/RendererHelper.java
     *
     * @param imageWidth
     * @param imageHeight
@@ -2044,10 +2158,30 @@ public class UI {
 
       final double bestRatio = widthRatio > heightRatio ? widthRatio : heightRatio;
 
-      final int newWidth = (int) (imageWidth / bestRatio);
-      final int newHeight = (int) (imageHeight / bestRatio);
+      final int ratioWidth = (int) (imageWidth / bestRatio) + 1;
+      final int ratioHeight = (int) (imageHeight / bestRatio) + 1;
 
-      return new Point(newWidth, newHeight);
+      /*
+       * This will fix a 1 pixel issues because of the ratio rounding
+       */
+// this do not work, also the previous algorithm :-(
+//      if (widthRatio > heightRatio) {
+//
+//         if (ratioHeight == canvasHeight - 1) {
+//            System.out.println("W  %5.3f %5.3f w: %d  h: %d".formatted(widthRatio, heightRatio, ratioWidth, ratioHeight));
+//            ratioHeight = canvasHeight;
+//         }
+//
+//      } else {
+//
+//         if (ratioWidth == canvasWidth - 1) {
+//            System.out.println("H  %5.3f %5.3f w: %d  h: %d".formatted(widthRatio, heightRatio, ratioWidth, ratioHeight));
+//            ratioWidth = canvasWidth;
+//         }
+//
+//      }
+
+      return new Point(ratioWidth, ratioHeight);
    }
 
    /**
@@ -2092,24 +2226,28 @@ public class UI {
    public static Rectangle getDisplayBounds(final Control composite, final Point location) {
 
       Rectangle displayBounds;
+
       final Monitor[] allMonitors = composite.getDisplay().getMonitors();
 
       if (allMonitors.length > 1) {
+
          // By default present in the monitor of the control
          displayBounds = composite.getMonitor().getBounds();
-         final Point p = new Point(location.x, location.y);
 
          // Search on which monitor the event occurred
-         Rectangle tmp;
-         for (final Monitor element : allMonitors) {
-            tmp = element.getBounds();
-            if (tmp.contains(p)) {
-               displayBounds = tmp;
+         for (final Monitor monitor : allMonitors) {
+
+            final Rectangle monitorBounds = monitor.getBounds();
+
+            if (monitorBounds.contains(location)) {
+
+               displayBounds = monitorBounds;
                break;
             }
          }
 
       } else {
+
          displayBounds = composite.getDisplay().getBounds();
       }
 
@@ -2446,7 +2584,32 @@ public class UI {
     * @param imageDescriptor
     * @param text
     */
-   public static void openNotificationPopup(final String title, final ImageDescriptor imageDescriptor, final String text) {
+   public static void openNotificationPopup(final String title,
+                                            final ImageDescriptor imageDescriptor,
+                                            final String text) {
+
+      final Display display = PlatformUI.getWorkbench().getDisplay();
+
+      if (display.getThread() == Thread.currentThread()) {
+
+         openNotificationPopup_InUIThread(title, imageDescriptor, text);
+
+      } else {
+
+         display.asyncExec(() -> {
+            openNotificationPopup_InUIThread(title, imageDescriptor, text);
+         });
+      }
+   }
+
+   /**
+    * Open a notification popup for the number of seconds configured by the user
+    *
+    * @param title
+    * @param imageDescriptor
+    * @param text
+    */
+   private static void openNotificationPopup_InUIThread(final String title, final ImageDescriptor imageDescriptor, final String text) {
 
       final int delay = _prefStore_Common.getInt(ICommonPreferences.APPEARANCE_NOTIFICATION_MESSAGES_DURATION) * 1000;
 
@@ -2836,7 +2999,7 @@ public class UI {
        * ignore these controls because they do not look very good on Linux & OSX
        */
       if (child instanceof Spinner || child instanceof Combo) {
-         return;
+//         return;
       }
 
       /*
