@@ -88,6 +88,7 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -848,7 +849,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          _btnUpdateProducts = new Button(container, SWT.NONE);
          _btnUpdateProducts.setText(Messages.Tour_Nutrition_Button_UpdateProducts);
          _btnUpdateProducts.setToolTipText(Messages.Tour_Nutrition_Button_UpdateProducts_Tooltip);
-         _btnUpdateProducts.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onUpdateProducts()));
+         _btnUpdateProducts.addSelectionListener(widgetSelectedAdapter(selectionEvent -> BusyIndicator.showWhile(Display.getCurrent(),
+               () -> onUpdateProducts())));
          _btnUpdateProducts.setImage(_imageRefreshAll);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_btnUpdateProducts);
       }
@@ -1565,7 +1567,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    }
 
    private void onUpdateProducts() {
-      //todo fb
+
+      //todo fb add a progress bar ?
       final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
       final Set<TourNutritionProduct> updatedTourNutritionProducts = new HashSet<>();
       for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
@@ -1575,10 +1578,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
          }
 
          final List<Product> searchProductResults = NutritionUtils.searchProduct(tourNutritionProduct.getProductCode(), ProductSearchType.ByCode);
+         if (searchProductResults.isEmpty()) {
+            continue;
+         }
+
          final Product updatedProduct = searchProductResults.get(0);
          final TourNutritionProduct updatedTourNutritionProduct = new TourNutritionProduct(_tourData, updatedProduct);
          updatedTourNutritionProducts.add(updatedTourNutritionProduct);
-
       }
 
       if (!updatedTourNutritionProducts.isEmpty()) {
