@@ -278,7 +278,7 @@ public class NutritionUtils {
       }
    }
 
-   static List<Product> searchProduct(final String searchText, final ProductSearchType productSearchType) {
+   public static List<Product> searchProduct(final String searchText, final ProductSearchType productSearchType) {
 
       String searchUrl = UI.EMPTY_STRING;
 

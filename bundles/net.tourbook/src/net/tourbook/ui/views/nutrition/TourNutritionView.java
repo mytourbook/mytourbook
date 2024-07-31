@@ -20,6 +20,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -47,7 +48,9 @@ import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.DialogCustomTourNutritionProduct;
 import net.tourbook.nutrition.NutritionUtils;
+import net.tourbook.nutrition.ProductSearchType;
 import net.tourbook.nutrition.QuantityType;
+import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -112,10 +115,6 @@ import org.eclipse.ui.part.ViewPart;
 
 import cop.swt.widgets.viewers.table.celleditors.RangeContent;
 import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
-import pl.coderion.model.Product;
-import pl.coderion.model.ProductResponse;
-import pl.coderion.service.OpenFoodFactsWrapper;
-import pl.coderion.service.impl.OpenFoodFactsWrapperImpl;
 
 public class TourNutritionView extends ViewPart implements ITourViewer {
 
@@ -1346,22 +1345,22 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       return selectedTourNutritionProducts;
    }
 
-   private List<String> getAllProducts() {
-
-      final List<TourNutritionProduct> selectedTourNutritionProducts = getSelectedProducts();
-
-      final List<String> selectedTourNutritionProductsCodes = new ArrayList<>();
-
-      for (final TourNutritionProduct tourNutritionProduct : selectedTourNutritionProducts) {
-
-         if (tourNutritionProduct.isCustomProduct()) {
-            continue;
-         }
-         selectedTourNutritionProductsCodes.add(tourNutritionProduct.getProductCode());
-      }
-
-      return selectedTourNutritionProductsCodes;
-   }
+//   private List<String> getAllProducts() {
+//
+//      final List<TourNutritionProduct> selectedTourNutritionProducts = getSelectedProducts();
+//
+//      final List<String> selectedTourNutritionProductsCodes = new ArrayList<>();
+//
+//      for (final TourNutritionProduct tourNutritionProduct : selectedTourNutritionProducts) {
+//
+//         if (tourNutritionProduct.isCustomProduct()) {
+//            continue;
+//         }
+//         selectedTourNutritionProductsCodes.add(tourNutritionProduct.getProductCode());
+//      }
+//
+//      return selectedTourNutritionProductsCodes;
+//   }
 
    @Override
    public ColumnManager getColumnManager() {
@@ -1568,28 +1567,26 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void onUpdateProducts() {
       //todo fb
       final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
+      final Set<TourNutritionProduct> updatedTourNutritionProducts = new HashSet<>();
       for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
 
          if (net.tourbook.common.util.StringUtils.isNullOrEmpty(tourNutritionProduct.getProductCode())) {
             continue;
          }
 
-         final OpenFoodFactsWrapper wrapper = new OpenFoodFactsWrapperImpl();
-         final ProductResponse productResponse = wrapper.fetchProductByCode("737628064502");
-         final Product product = productResponse.getProduct();
-
-         tourNutritionProduct.setName(product.getProductName());
-//         tourNutritionProduct.setNutritionFacts(product.getNutritionFacts());
-//         tourNutritionProduct.setUnit(product.getUnit());
-//         tourNutritionProduct.setServingSize(product.getServingSize());
-//         tourNutritionProduct.setServingUnit(product.getServingUnit());
-//         tourNutritionProduct.setCalories(product.getCalories());
-//         tourNutritionProduct.setCarbohydrates(product.getNutriments().getCarbohydrates());
+         final List<Product> searchProductResults = NutritionUtils.searchProduct(tourNutritionProduct.getProductCode(), ProductSearchType.ByCode);
+         final Product updatedProduct = searchProductResults.get(0);
+         final TourNutritionProduct updatedTourNutritionProduct = new TourNutritionProduct(_tourData, updatedProduct);
+         updatedTourNutritionProducts.add(updatedTourNutritionProduct);
 
       }
-      _tourData.setTourNutritionProducts(tourNutritionProducts);
-      _tourData = TourManager.saveModifiedTour(_tourData);
-      _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
+
+      if (!updatedTourNutritionProducts.isEmpty()) {
+
+         _tourData.setTourNutritionProducts(updatedTourNutritionProducts);
+         _tourData = TourManager.saveModifiedTour(_tourData);
+         _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
+      }
    }
 
    @Override
