@@ -8209,7 +8209,7 @@ public class TourDataEditorView extends ViewPart implements
 
                /*
                 * Show info only when it is not yet displayed, this is an optimization because
-                * setting the message causes an layout and this is EXTREMLY SLOW because of the bad
+                * setting the message causes an layout and this is EXTREMELY SLOW because of the bad
                 * date time controls
                 */
 
