@@ -10768,8 +10768,8 @@ public class TourDatabase {
 
 // SET_FORMATTING_OFF
 
-         SQL.AddColumn_Int          (stmt, TABLE_TOUR_NUTRITION_PRODUCT, "carbohydrates",  null);   //$NON-NLS-1$
-         SQL.AddColumn_Int          (stmt, TABLE_TOUR_NUTRITION_PRODUCT, "carbohydrates_Serving",  null);   //$NON-NLS-1$
+         SQL.AddColumn_Int          (stmt, TABLE_TOUR_NUTRITION_PRODUCT, "carbohydrates",  DEFAULT_0);   //$NON-NLS-1$
+         SQL.AddColumn_Int          (stmt, TABLE_TOUR_NUTRITION_PRODUCT, "carbohydrates_Serving",  DEFAULT_0);   //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
