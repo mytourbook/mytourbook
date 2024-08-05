@@ -51,7 +51,6 @@ import de.byteholder.geoclipse.map.event.ITourSelectionListener;
 import de.byteholder.geoclipse.map.event.MapGeoPositionEvent;
 import de.byteholder.geoclipse.map.event.MapHoveredTourEvent;
 import de.byteholder.geoclipse.map.event.MapPOIEvent;
-import de.byteholder.geoclipse.mapprovider.ImageDataResources;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
@@ -153,11 +152,7 @@ import net.tourbook.ui.MTRectangle;
 
 import org.apache.commons.text.WordUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -239,7 +234,7 @@ public class Map2 extends Canvas {
    /*
     * Wikipedia data
     */
-//   private static final String WIKI_PARAMETER_DIM                     = "dim";                                                   //$NON-NLS-1$
+// private static final String WIKI_PARAMETER_DIM  = "dim";  //$NON-NLS-1$
    private static final String WIKI_PARAMETER_TYPE = "type"; //$NON-NLS-1$
 
 //   http://toolserver.org/~geohack/geohack.php?pagename=Sydney&language=de&params=33.85_S_151.2_E_region:AU-NSW_type:city(3641422)
@@ -341,9 +336,6 @@ public class Map2 extends Canvas {
 
    /** This image contains the map which is painted in the map viewport */
    private Image                         _mapImage;
-
-   private Image                         _9PartImage;
-   private GC                            _9PartGC;
 
    /**
     * Indicates whether or not to draw the borders between tiles. Defaults to false. not very nice
@@ -686,9 +678,6 @@ public class Map2 extends Canvas {
    private final Display _display;
    private final Thread  _displayThread;
    //
-   private int           _jobCounterSplitImages = 0;
-   private Object        _splitJobFamily        = new Object();
-   private boolean       _isCancelSplitJobs;
 
    /*
     * Download offline images
@@ -735,13 +724,6 @@ public class Map2 extends Canvas {
    private boolean                   _geoGrid_IsGridAutoScroll;
 
    private ActionManageOfflineImages _actionManageOfflineImages;
-
-   /**
-    * When <code>true</code> the tour is painted in the map in the enhanced mode otherwise in the
-    * simple mode
-    */
-   private boolean                   _isTourPaintMethodEnhanced;
-   private boolean                   _isShowTourPaintMethodEnhancedWarning;
 
    private boolean                   _isMapBackgroundDark;
    private boolean                   _isFastMapPainting;
@@ -1170,34 +1152,6 @@ public class Map2 extends Canvas {
       }
 
       return false;
-   }
-
-   /**
-    * make sure that the parted overlay image has the correct size
-    */
-   private void checkImageTemplate9Parts() {
-
-      final int parts = 3;
-      final int partedTileSize = _tilePixelSize * parts;
-
-      if ((_9PartImage != null) && (_9PartImage.isDisposed() == false)) {
-         if (_9PartImage.getBounds().width == partedTileSize) {
-            // image is OK
-            return;
-         }
-      }
-      if (_9PartImage != null) {
-         _9PartImage.dispose();
-      }
-      if (_9PartGC != null) {
-         _9PartGC.dispose();
-      }
-
-      // create 9 part image/gc
-      final ImageData transparentImageData = MapUtils.createTransparentImageData(partedTileSize);
-
-      _9PartImage = new Image(_display, transparentImageData);
-      _9PartGC = new GC(_9PartImage);
    }
 
    /**
@@ -3464,134 +3418,6 @@ public class Map2 extends Canvas {
       return _mapPointPainter_Task == null || _mapPointPainter_Task.isCancelled();
    }
 
-   private boolean isPaintTile_With_BasicMethod() {
-
-      return _isTourPaintMethodEnhanced == false || (_isFastMapPainting && _isFastMapPainting_Active);
-   }
-
-   /**
-    * Checks if a part within the parted image is modified. This method is optimized to search first
-    * all 4 borders and then the whole image.
-    *
-    * @param imageData9Parts
-    * @param srcXStart
-    * @param srcYStart
-    * @param tileSize
-    *
-    * @return Returns <code>true</code> when a part is modified
-    */
-   private boolean isPartImageDataModified(final ImageData imageData9Parts,
-                                           final int srcXStart,
-                                           final int srcYStart,
-                                           final int tileSize) {
-
-      final int transRed = _mapTransparentRGB.red;
-      final int transGreen = _mapTransparentRGB.green;
-      final int transBlue = _mapTransparentRGB.blue;
-
-      final byte[] srcData = imageData9Parts.data;
-      final int srcBytesPerLine = imageData9Parts.bytesPerLine;
-      final int pixelBytes = imageData9Parts.depth == 32 ? 4 : 3;
-
-      int srcIndex;
-      int srcRed, srcGreen, srcBlue;
-
-      // check border: top
-      {
-         final int srcY = srcYStart;
-         final int srcYBytesPerLine = srcY * srcBytesPerLine;
-
-         for (int srcX = srcXStart; srcX < srcXStart + tileSize; srcX++) {
-
-            srcIndex = srcYBytesPerLine + (srcX * pixelBytes);
-
-            srcBlue = srcData[srcIndex] & 0xFF;
-            srcGreen = srcData[srcIndex + 1] & 0xFF;
-            srcRed = srcData[srcIndex + 2] & 0xFF;
-
-            if ((srcRed != transRed) || (srcGreen != transGreen) || (srcBlue != transBlue)) {
-               return true;
-            }
-         }
-      }
-
-      // check border: bottom
-      {
-         final int srcY = srcYStart + tileSize - 1;
-         final int srcYBytesPerLine = srcY * srcBytesPerLine;
-
-         for (int srcX = srcXStart; srcX < srcXStart + tileSize; srcX++) {
-
-            srcIndex = srcYBytesPerLine + (srcX * pixelBytes);
-
-            srcBlue = srcData[srcIndex] & 0xFF;
-            srcGreen = srcData[srcIndex + 1] & 0xFF;
-            srcRed = srcData[srcIndex + 2] & 0xFF;
-
-            if ((srcRed != transRed) || (srcGreen != transGreen) || (srcBlue != transBlue)) {
-               return true;
-            }
-         }
-      }
-
-      // check border: left
-      {
-         final int srcX = srcXStart * pixelBytes;
-
-         for (int srcY = srcYStart; srcY < srcYStart + tileSize; srcY++) {
-
-            srcIndex = (srcY * srcBytesPerLine) + srcX;
-
-            srcBlue = srcData[srcIndex] & 0xFF;
-            srcGreen = srcData[srcIndex + 1] & 0xFF;
-            srcRed = srcData[srcIndex + 2] & 0xFF;
-
-            if ((srcRed != transRed) || (srcGreen != transGreen) || (srcBlue != transBlue)) {
-               return true;
-            }
-         }
-      }
-
-      // check border: right
-      {
-         final int srcX = (srcXStart + tileSize - 1) * pixelBytes;
-
-         for (int srcY = srcYStart; srcY < srcYStart + tileSize; srcY++) {
-
-            srcIndex = (srcY * srcBytesPerLine) + srcX;
-
-            srcBlue = srcData[srcIndex] & 0xFF;
-            srcGreen = srcData[srcIndex + 1] & 0xFF;
-            srcRed = srcData[srcIndex + 2] & 0xFF;
-
-            if ((srcRed != transRed) || (srcGreen != transGreen) || (srcBlue != transBlue)) {
-               return true;
-            }
-         }
-      }
-
-      // check whole image
-      for (int srcY = srcYStart; srcY < srcYStart + tileSize; srcY++) {
-
-         final int srcYBytesPerLine = srcY * srcBytesPerLine;
-
-         for (int srcX = srcXStart; srcX < srcXStart + tileSize; srcX++) {
-
-            srcIndex = srcYBytesPerLine + (srcX * pixelBytes);
-
-            srcBlue = srcData[srcIndex] & 0xFF;
-            srcGreen = srcData[srcIndex + 1] & 0xFF;
-            srcRed = srcData[srcIndex + 2] & 0xFF;
-
-            if ((srcRed != transRed) || (srcGreen != transGreen) || (srcBlue != transBlue)) {
-               return true;
-            }
-         }
-      }
-
-      return false;
-   }
-
    /**
     * @return Returns <code>true</code> when 'Search tour by location' is active
     */
@@ -4116,9 +3942,6 @@ public class Map2 extends Canvas {
       UI.disposeResource(_mapImage);
       UI.disposeResource(_mapPointImage);
       UI.disposeResource(_poiImage);
-
-      UI.disposeResource(_9PartImage);
-      UI.disposeResource(_9PartGC);
 
       UI.disposeResource(_cursorCross);
       UI.disposeResource(_cursorDefault);
@@ -6147,12 +5970,9 @@ public class Map2 extends Canvas {
       /*
        * Paint breadcrumb bar
        */
-      final boolean isEnhancedPaintingMethod = isPaintTile_With_BasicMethod() == false;
-      final boolean isShowTourPaintMethodEnhancedWarning = isEnhancedPaintingMethod && _isShowTourPaintMethodEnhancedWarning;
+      if (_isShowBreadcrumbs) {
 
-      if (_isShowBreadcrumbs || isShowTourPaintMethodEnhancedWarning) {
-
-         _tourBreadcrumb.paint(gc, _isShowBreadcrumbs, isShowTourPaintMethodEnhancedWarning);
+         _tourBreadcrumb.paint(gc, _isShowBreadcrumbs);
       }
 
       return isPaintTourInfo;
@@ -8815,8 +8635,6 @@ public class Map2 extends Canvas {
 
          Tile tile;
 
-         checkImageTemplate9Parts();
-
          final long startTime = System.currentTimeMillis();
 
          while ((tile = _tileOverlayPaintQueue.poll()) != null) {
@@ -8856,11 +8674,7 @@ public class Map2 extends Canvas {
                }
 
                // paint overlay
-               if (isPaintTile_With_BasicMethod()) {
-                  paint_Overlay_22_PaintTileBasic(tile);
-               } else {
-                  paint_Overlay_30_PaintTileEnhanced(tile);
-               }
+               paint_Overlay_22_PaintTileBasic(tile);
 
                // allow to display painted overlays
                final long paintTime = System.currentTimeMillis();
@@ -8936,272 +8750,6 @@ public class Map2 extends Canvas {
 
          // set tile state
          tile.setOverlayImageState(OverlayImageState.NO_IMAGE);
-      }
-   }
-
-   /**
-    * Paints the overlay into the overlay image which is bigger than the tile image so that the
-    * drawings are not clipped at the tile border. The overlay image is afterwards splitted into
-    * parts which are drawn into the tile images
-    *
-    * @param tile
-    */
-   private void paint_Overlay_30_PaintTileEnhanced(final Tile tile) {
-
-      final int parts = 3;
-
-      boolean isOverlayPainted = false;
-
-      {
-         // clear 9 part image
-         _9PartGC.setBackground(_mapTransparentColor);
-         _9PartGC.fillRectangle(_9PartImage.getBounds());
-
-         // paint all overlays for the current tile
-         for (final Map2Painter overlayPainter : _allMapPainter) {
-
-            final boolean isPainted = overlayPainter.doPaint(
-                  _9PartGC,
-                  Map2.this,
-                  tile,
-                  parts,
-                  _isFastMapPainting && _isFastMapPainting_Active,
-                  _fastMapPainting_skippedValues);
-
-            isOverlayPainted = isOverlayPainted || isPainted;
-         }
-
-         if (isOverlayPainted) {
-
-            tile.setOverlayImageState(OverlayImageState.IMAGE_IS_BEING_CREATED);
-
-            final ImageData imageData9Parts = _9PartImage.getImageData();
-
-            /**
-             * overlay image is created, split overlay image into 3*3 part images where the center
-             * image is the requested tile image
-             */
-
-            final Job splitJob = new Job("SplitOverlayImages() " + _jobCounterSplitImages++) { //$NON-NLS-1$
-
-               @Override
-               public boolean belongsTo(final Object family) {
-
-                  return family == _splitJobFamily;
-               }
-
-               @Override
-               protected IStatus run(final IProgressMonitor monitor) {
-
-                  paint_Overlay_31_SplitParts(tile, imageData9Parts);
-
-                  if (_isCancelSplitJobs) {
-                     return Status.CANCEL_STATUS;
-                  }
-
-                  paint();
-
-                  return Status.OK_STATUS;
-               }
-
-            };
-
-            splitJob.setSystem(true);
-            splitJob.schedule();
-
-         } else {
-
-            if (tile.getOverlayContent() == 0) {
-               tile.setOverlayImageState(OverlayImageState.NO_IMAGE);
-            } else {
-               tile.setOverlayImageState(OverlayImageState.TILE_HAS_PART_CONTENT);
-            }
-         }
-      }
-   }
-
-   /**
-    * Splits the overlay tile image into 3*3 parts, the center image is the tile overlay image
-    *
-    * <pre>
-    *
-    * y,x
-    *
-    * 0,0      0,1      0,2
-    * 1,0      1,1      1,2
-    * 2,0      2,1      2,2
-    * </pre>
-    *
-    * @param tile
-    * @param imageData9Parts
-    */
-   private void paint_Overlay_31_SplitParts(final Tile tile, final ImageData imageData9Parts) {
-
-      final TileCache tileCache = MP.getTileCache();
-
-      final String projectionId = _mp.getProjection().getId();
-      final int partSize = _tilePixelSize;
-
-      final int tileZoom = tile.getZoom();
-      final int tileX = tile.getX();
-      final int tileY = tile.getY();
-      final int maxTiles = (int) Math.pow(2, tileZoom);
-
-      final ArrayList<Rectangle> partMarkerBounds = tile.getPartMarkerBounds(tileZoom);
-      final boolean isMarkerBounds = partMarkerBounds != null && partMarkerBounds.size() > 0;
-
-      for (int yIndex = 0; yIndex < 3; yIndex++) {
-         for (int xIndex = 0; xIndex < 3; xIndex++) {
-
-            if (_isCancelSplitJobs) {
-               return;
-            }
-
-            // check if the tile is within the map border
-            if (((tileX - xIndex < -1) //
-                  || (tileX + xIndex > maxTiles + 1))
-                  || ((tileY - yIndex < -1) //
-                        || (tileY + yIndex > maxTiles + 1))) {
-               continue;
-            }
-
-            final int devXPart = partSize * xIndex;
-            final int devYPart = partSize * yIndex;
-
-            // check if there are any drawings in the current part
-            if (isPartImageDataModified(imageData9Parts, devXPart, devYPart, partSize) == false) {
-
-               // there are no drawings within the current part
-               continue;
-            }
-
-            /*
-             * there are drawings in the current part
-             */
-
-            final int xOffset = xIndex - 1;
-            final int yOffset = yIndex - 1;
-
-            final String partImageKey = getOverlayKey(tile, xOffset, yOffset, projectionId);
-            final boolean isCenterPart = (xIndex == 1) && (yIndex == 1);
-            Image tileOverlayImage = null;
-
-            if (isCenterPart) {
-
-               // center part, this is the part which belongs to the current tile
-
-               // get image data resources
-               final ImageDataResources idResources = tile.getOverlayImageDataResources();
-
-               // draw center part into the tile image data
-               idResources.drawTileImageData(
-                     imageData9Parts,
-                     devXPart,
-                     devYPart,
-                     partSize,
-                     partSize);
-
-               tileOverlayImage = tile.createOverlayImage(_display);
-
-               // set tile state
-               tile.setOverlayImageState(OverlayImageState.TILE_HAS_CONTENT);
-               tile.incrementOverlayContent();
-
-            } else {
-
-               // neighbor part
-
-               final String neighborTileCacheKey = tile.getTileKey(xOffset, yOffset, projectionId);
-
-               boolean isNeighborTileCreated = false;
-
-               Tile neighborTile = tileCache.get(neighborTileCacheKey);
-               if (neighborTile == null) {
-
-                  // create neighbor tile
-
-                  isNeighborTileCreated = true;
-
-                  final MP mp = tile.getMP();
-
-                  neighborTile = new Tile(
-                        mp,
-                        tile.getZoom(), //
-                        tile.getX() + xOffset,
-                        tile.getY() + yOffset,
-                        null);
-
-                  neighborTile.setBoundingBoxEPSG4326();
-                  mp.doPostCreation(neighborTile);
-
-                  tileCache.add(neighborTileCacheKey, neighborTile);
-               }
-
-               // get neighbor image data resources
-               final ImageDataResources neighborIDResources = neighborTile.getOverlayImageDataResources();
-
-               // draw part image into the neighbor image
-               neighborIDResources.drawNeighborImageData(
-                     imageData9Parts,
-                     devXPart,
-                     devYPart,
-                     partSize,
-                     partSize);
-
-               if (isNeighborTileCreated == false) {
-
-                  /*
-                   * create overlay image only when the neighbor tile was not created so that the
-                   * normal tile image loading happens
-                   */
-
-                  tileOverlayImage = neighborTile.createOverlayImage(_display);
-               }
-
-               // set state for the neighbor tile
-               neighborTile.incrementOverlayContent();
-
-               final OverlayImageState partImageState = neighborTile.getOverlayImageState();
-               if (partImageState != OverlayImageState.TILE_HAS_CONTENT) {
-                  neighborTile.setOverlayImageState(OverlayImageState.TILE_HAS_PART_CONTENT);
-               }
-            }
-
-            if (isMarkerBounds) {
-               for (final Rectangle markerBound : partMarkerBounds) {
-
-                  /*
-                   * set marker bounds into the tile
-                   */
-
-                  // adjust tile center pos to top/left pos for a 9 part image
-                  final int devXMarker = markerBound.x;// + partSize;
-                  final int devYMarker = markerBound.y;// + partSize;
-
-                  final int markerWidth = markerBound.width;
-                  final int markerHeight = markerBound.height;
-
-                  // check if marker intersects the part
-                  final boolean isMarkerInTile =
-                        (devXMarker < devXPart + partSize)
-                              && (devYMarker < devYPart + partSize)
-                              && (devXMarker + markerWidth > devXPart)
-                              && (devYMarker + markerHeight > devYPart);
-
-                  if (isMarkerInTile) {
-                     tile.addMarkerBounds(devXMarker, devYMarker, markerWidth, markerHeight, tileZoom);
-                  }
-               }
-            }
-
-            /*
-             * keep image in the cache that not too much image resources are created and that all
-             * images can be disposed
-             */
-            if (tileOverlayImage != null) {
-               _overlayImageCache.add(partImageKey, tileOverlayImage);
-            }
-         }
       }
    }
 
@@ -10530,8 +10078,6 @@ public class Map2 extends Canvas {
       updateViewportData();
       updateTourToolTip();
 
-      stopOldPainting();
-
       paint();
    }
 
@@ -10812,7 +10358,6 @@ public class Map2 extends Canvas {
                _mp,
                _mapZoomLevel,
                _tilePixelSize,
-               _isTourPaintMethodEnhanced,
                twp);
 
          if (hoveredContext == null) {
@@ -10940,14 +10485,6 @@ public class Map2 extends Canvas {
    public void setTourIds(final List<Long> allTourIds) {
 
       _allTourIds = allTourIds;
-   }
-
-   public void setTourPaintMethodEnhanced(final boolean isEnhanced, final boolean isShowWarning) {
-
-      _isTourPaintMethodEnhanced = isEnhanced;
-      _isShowTourPaintMethodEnhancedWarning = isShowWarning;
-
-      disposeOverlayImageCache();
    }
 
    public void setTourToolTip(final TourToolTip tourToolTip) {
@@ -11384,17 +10921,6 @@ public class Map2 extends Canvas {
             _poi_Tooltip_OffsetY);
    }
 
-   private void stopOldPainting() {
-
-      // stop old painting jobs
-
-      _isCancelSplitJobs = true;
-      {
-         Job.getJobManager().cancel(_splitJobFamily);
-      }
-      _isCancelSplitJobs = false;
-   }
-
    public MapTourBreadcrumb tourBreadcrumb() {
       return _tourBreadcrumb;
    }
@@ -11578,7 +11104,6 @@ public class Map2 extends Canvas {
                      _mp,
                      _mapZoomLevel,
                      _tilePixelSize,
-                     _isTourPaintMethodEnhanced,
                      null);
 
                if (hoveredContext != null) {

@@ -187,9 +187,6 @@ public class Tile {
    @SuppressWarnings("unchecked")
    private final ArrayList<Rectangle>[]    _twpSimpleBounds             = new ArrayList[MAX_BOUNDS];
 
-   @SuppressWarnings("unchecked")
-   private final ArrayList<Rectangle>[]    _twpEnhancedBounds           = new ArrayList[MAX_BOUNDS];
-
    /**
     * The hover rectangles will be set when a tile is painted, the rectangle position is relative to
     * the tile
@@ -343,8 +340,7 @@ public class Tile {
     */
    public void addTourWayPointBounds(final TourWayPoint twp,
                                      final Rectangle twpBounds,
-                                     final int zoomLevel,
-                                     final int parts) {
+                                     final int zoomLevel) {
 
       if (_markerBounds[zoomLevel] == null) {
          initBounds(zoomLevel);
@@ -361,11 +357,7 @@ public class Tile {
           */
          twpList.add(0, twp);
 
-         if (parts == 1) {
-            _twpSimpleBounds[zoomLevel].add(0, twpBounds);
-         } else {
-            _twpEnhancedBounds[zoomLevel].add(0, twpBounds);
-         }
+         _twpSimpleBounds[zoomLevel].add(0, twpBounds);
       }
    }
 
@@ -766,11 +758,7 @@ public class Tile {
     * @return Returns a list with rectangles for each way point in the tile or <code>null</code>
     *         when there are no way points within the tile.
     */
-   public ArrayList<Rectangle> getWayPointBounds(final int mapZoomLevel, final boolean isTourPaintMethodEnhanced) {
-
-      if (isTourPaintMethodEnhanced) {
-         return _twpEnhancedBounds[mapZoomLevel];
-      }
+   public ArrayList<Rectangle> getWayPointBounds(final int mapZoomLevel) {
 
       return _twpSimpleBounds[mapZoomLevel];
    }
@@ -835,7 +823,6 @@ public class Tile {
             _markerBounds[zoomLevel] = new ArrayList<>();
             _markerPartBounds[zoomLevel] = new ArrayList<>();
             _twpSimpleBounds[zoomLevel] = new ArrayList<>();
-            _twpEnhancedBounds[zoomLevel] = new ArrayList<>();
          }
 
       } finally {
@@ -928,13 +915,7 @@ public class Tile {
          if (bounds != null) {
             bounds.clear();
          }
-
-         bounds = _twpEnhancedBounds[zoomLevel];
-         if (bounds != null) {
-            bounds.clear();
-         }
       }
-
    }
 
    /**

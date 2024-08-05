@@ -985,17 +985,18 @@ public class TourMapPainter extends Map2Painter {
 
                   // draw tour way points
 
-                  int wayPointCounter = 0;
+                  int numWayPoints = 0;
+
                   for (final TourWayPoint tourWayPoint : wayPoints) {
 
                      final Point twpWorldPixel = allWayPointWorldPixel.get(tourWayPoint.hashCode());
 
-                     if (drawTourWayPoint(gcTile, map, tile, tourWayPoint, twpWorldPixel, parts)) {
-                        wayPointCounter++;
+                     if (drawTourWayPoint(gcTile, map, tile, tourWayPoint, twpWorldPixel)) {
+                        numWayPoints++;
                      }
                   }
 
-                  isContentInTile = isContentInTile || wayPointCounter > 0;
+                  isContentInTile = isContentInTile || numWayPoints > 0;
                }
             }
          }
@@ -1642,7 +1643,6 @@ public class TourMapPainter extends Map2Painter {
     * @param tile
     * @param twp
     * @param twpWorldPixel
-    * @param parts
     *
     * @return Returns <code>true</code> when way point has been painted
     */
@@ -1650,13 +1650,11 @@ public class TourMapPainter extends Map2Painter {
                                     final Map2 map,
                                     final Tile tile,
                                     final TourWayPoint twp,
-                                    final Point twpWorldPixel,
-                                    final int parts) {
+                                    final Point twpWorldPixel) {
 
       final MP mp = map.getMapProvider();
       final int zoomLevel = map.getZoom();
       final int tileSize = mp.getTileSize();
-      final int devPartOffset = ((parts - 1) / 2) * tileSize;
 
       // get world viewport for the current tile
       final int tileWorldPixelX = tile.getX() * tileSize;
@@ -1670,34 +1668,19 @@ public class TourMapPainter extends Map2Painter {
 
       if (isBoundsInTile) {
 
-         int devX = devWayPointX - _twpImageBounds.width / 2;
-         int devY = devWayPointY - _twpImageBounds.height;
-
-         devX += devPartOffset;
-         devY += devPartOffset;
+         final int devX = devWayPointX - _twpImageBounds.width / 2;
+         final int devY = devWayPointY - _twpImageBounds.height;
 
          gcTile.drawImage(_tourWayPointImage, devX, devY);
 
-//       gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-//       gc.setLineWidth(1);
-//       gc.drawRectangle(devX, devY, _twpImageBounds.width, _twpImageBounds.height);
-//
          tile.addTourWayPointBounds(
                twp,
                new Rectangle(
-                     devX - devPartOffset,
-                     devY - devPartOffset,
+                     devX,
+                     devY,
                      _twpImageBounds.width,
                      _twpImageBounds.height),
-               zoomLevel,
-               parts);
-
-         /*
-          * check if the way point paints into a neighbor tile
-          */
-         if (parts > 1) {
-
-         }
+               zoomLevel);
       }
 
       return isBoundsInTile;

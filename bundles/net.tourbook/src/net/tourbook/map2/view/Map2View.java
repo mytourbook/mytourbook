@@ -133,7 +133,6 @@ import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoRatingStarOperator;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.Map2_Appearance;
 import net.tourbook.srtm.IPreferences;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
@@ -1673,14 +1672,6 @@ public class Map2View extends ViewPart implements
             _map.setShowDebugInfo(isShowTileInfo, isShowTileBorder, isShowGeoGrid);
             _map.paint();
 
-         } else if (property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD)
-               || property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING)) {
-
-            final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
-            final boolean isShowPaintingMethodWarning = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING);
-
-            _map.setTourPaintMethodEnhanced(Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(tourPaintMethod), isShowPaintingMethodWarning);
-
          } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
                || property.equals(ITourbookPreferences.MAP2_OPTIONS_IS_MODIFIED)) {
 
@@ -2145,10 +2136,6 @@ public class Map2View extends ViewPart implements
       _map.setLegend(_mapLegend);
       _map.setShowLegend(true);
       _map.setMeasurementSystem(UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
-
-      final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
-      final boolean isShowPaintingMethodWarning = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING);
-      _map.setTourPaintMethodEnhanced(Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(tourPaintMethod), isShowPaintingMethodWarning);
 
       // setup tool tip's
       _map.setTourToolTip(_tourToolTip = new TourToolTip(_map));

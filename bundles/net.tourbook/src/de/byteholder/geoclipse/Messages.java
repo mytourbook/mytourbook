@@ -199,7 +199,6 @@ public class Messages extends NLS {
    public static String        Map2_TourTooltip_Elevation;
    public static String        Map2_TourTooltip_Time;
 
-   public static String        Map2_TourBreadcrumb_Info_EnhancedPaintingWarning;
    public static String        Map2_TourBreadcrumb_Label_Tours;
 
    public static String        MP_Error_DialogTitle_ConfigurationError;

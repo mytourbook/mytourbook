@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,8 +45,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 
 public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTipProvider {
-
-//	private TourToolTip		_tourToolTip;
 
    private Color              _bgColor;
    private Color              _fgColor;
@@ -210,7 +208,6 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
                                                final MP mp,
                                                final int mapZoomLevel,
                                                final int tilePixelSize,
-                                               final boolean isTourPaintMethodEnhanced,
                                                final Object requestedObject) {
 
       // get mouse world position
@@ -227,7 +224,7 @@ public class WayPointToolTipProvider implements ITourToolTipProvider, IMapToolTi
       // get tile from the map provider
       final Tile tile = mp.getTile(tileX, tileY, mapZoomLevel);
 
-      final ArrayList<Rectangle> wayPointBounds = tile.getWayPointBounds(mapZoomLevel, isTourPaintMethodEnhanced);
+      final ArrayList<Rectangle> wayPointBounds = tile.getWayPointBounds(mapZoomLevel);
       if (wayPointBounds != null) {
 
          // tile contains way points

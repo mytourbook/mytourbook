@@ -428,34 +428,32 @@ public interface ITourbookPreferences {
    /*
     * regional settings
     */
-   public static final String REGIONAL_USE_CUSTOM_DECIMAL_FORMAT    = "regional_use.custom.decimal.format";      //$NON-NLS-1$
-   public static final String REGIONAL_DECIMAL_SEPARATOR            = "regional_decimal.separator";              //$NON-NLS-1$
-   public static final String REGIONAL_GROUP_SEPARATOR              = "regional_group.separator";                //$NON-NLS-1$
+   public static final String REGIONAL_USE_CUSTOM_DECIMAL_FORMAT    = "regional_use.custom.decimal.format"; //$NON-NLS-1$
+   public static final String REGIONAL_DECIMAL_SEPARATOR            = "regional_decimal.separator";         //$NON-NLS-1$
+   public static final String REGIONAL_GROUP_SEPARATOR              = "regional_group.separator";           //$NON-NLS-1$
 
    /**
     * layout for the views have been changed
     */
-   public static final String VIEW_LAYOUT_CHANGED                   = "view.layout.changed";                     //$NON-NLS-1$
-   public static final String VIEW_LAYOUT_DISPLAY_LINES             = "view.layout.display.lines";               //$NON-NLS-1$
+   public static final String VIEW_LAYOUT_CHANGED                   = "view.layout.changed";                //$NON-NLS-1$
+   public static final String VIEW_LAYOUT_DISPLAY_LINES             = "view.layout.display.lines";          //$NON-NLS-1$
 
    /**
     * Layout for maps
     */
-   public static final String MAP_LAYOUT_BORDER_TYPE                = "MAP_LAYOUT_BORDER_TYPE";                  //$NON-NLS-1$
-   public static final String MAP_LAYOUT_BORDER_COLOR               = "MAP_LAYOUT_BORDER_COLOR";                 //$NON-NLS-1$
-   public static final String MAP_LAYOUT_BORDER_DIMM_VALUE          = "MAP_LAYOUT_BORDER_DIMM_VALUE";            //$NON-NLS-1$
-   public static final String MAP_LAYOUT_BORDER_WIDTH               = "map.layout.borderWidth";                  //$NON-NLS-1$
-   public static final String MAP_LAYOUT_IS_ANTIALIAS_PAINTING      = "MAP_LAYOUT_IS_ANTIALIAS_PAINTING";        //$NON-NLS-1$
-   public static final String MAP_LAYOUT_IS_CUT_OFF_LINES_IN_PAUSES = "MAP_LAYOUT_IS_DRAW_LINES_IN_PAUSES";      //$NON-NLS-1$
-   public static final String MAP_LAYOUT_LIVE_UPDATE                = "MAP_LAYOUT_LIVE_UPDATE";                  //$NON-NLS-1$
-   public static final String MAP_LAYOUT_PAINT_WITH_BORDER          = "map.layout.paintWithBorder";              //$NON-NLS-1$
-   public static final String MAP_LAYOUT_PLOT_TYPE                  = "map.layout.symbol";                       //$NON-NLS-1$
-   public static final String MAP_LAYOUT_SYMBOL_WIDTH               = "map.layout.symbol-width";                 //$NON-NLS-1$
-   public static final String MAP_LAYOUT_TOUR_PAINT_METHOD          = "map.layout.tour-paint-algorithm";         //$NON-NLS-1$
-   public static final String MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING  = "map.layout.tour-paint-algorithm-warning"; //$NON-NLS-1$
+   public static final String MAP_LAYOUT_BORDER_TYPE                = "MAP_LAYOUT_BORDER_TYPE";             //$NON-NLS-1$
+   public static final String MAP_LAYOUT_BORDER_COLOR               = "MAP_LAYOUT_BORDER_COLOR";            //$NON-NLS-1$
+   public static final String MAP_LAYOUT_BORDER_DIMM_VALUE          = "MAP_LAYOUT_BORDER_DIMM_VALUE";       //$NON-NLS-1$
+   public static final String MAP_LAYOUT_BORDER_WIDTH               = "map.layout.borderWidth";             //$NON-NLS-1$
+   public static final String MAP_LAYOUT_IS_ANTIALIAS_PAINTING      = "MAP_LAYOUT_IS_ANTIALIAS_PAINTING";   //$NON-NLS-1$
+   public static final String MAP_LAYOUT_IS_CUT_OFF_LINES_IN_PAUSES = "MAP_LAYOUT_IS_DRAW_LINES_IN_PAUSES"; //$NON-NLS-1$
+   public static final String MAP_LAYOUT_LIVE_UPDATE                = "MAP_LAYOUT_LIVE_UPDATE";             //$NON-NLS-1$
+   public static final String MAP_LAYOUT_PAINT_WITH_BORDER          = "map.layout.paintWithBorder";         //$NON-NLS-1$
+   public static final String MAP_LAYOUT_PLOT_TYPE                  = "map.layout.symbol";                  //$NON-NLS-1$
+   public static final String MAP_LAYOUT_SYMBOL_WIDTH               = "map.layout.symbol-width";            //$NON-NLS-1$
 
-   public static final String MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY     = "MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY";       //$NON-NLS-1$
-   public static final String MAP2_LAYOUT_TOUR_TRACK_OPACITY        = "MAP2_LAYOUT_TOUR_TRACK_OPACITY";          //$NON-NLS-1$
+   public static final String MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY     = "MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY";  //$NON-NLS-1$
+   public static final String MAP2_LAYOUT_TOUR_TRACK_OPACITY        = "MAP2_LAYOUT_TOUR_TRACK_OPACITY";     //$NON-NLS-1$
 
    /*
     * Geo compare
