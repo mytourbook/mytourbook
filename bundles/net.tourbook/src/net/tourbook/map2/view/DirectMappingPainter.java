@@ -157,7 +157,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
       drawMapPoint_Hovered_LabelItem(gc, hoveredPoint);
 
-      if (TourPainterConfiguration.isShowPhotoRating) {
+      if (Map2PainterConfig.isShowPhotoRating) {
          drawMapPoint_Hovered_RatingStars(gc, hoveredPoint);
       }
    }

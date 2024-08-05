@@ -796,7 +796,7 @@ public class TourMapPainter extends Map2Painter {
 
       initPainter();
 
-      final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
+      final ArrayList<TourData> allTourData = Map2PainterConfig.getTourData();
 
       if (allTourData.isEmpty()) {
          return false;
@@ -809,7 +809,7 @@ public class TourMapPainter extends Map2Painter {
       }
 
       // first draw the tour, then the marker and photos
-      if (TourPainterConfiguration.isShowTours) {
+      if (Map2PainterConfig.isShowTours) {
 
          if (_prefIsAntialiasPainting) {
             gcTile.setAntialias(SWT.ON);
@@ -903,7 +903,7 @@ public class TourMapPainter extends Map2Painter {
             int staticMarkerCounter = 0;
 
             // draw start/end marker
-            if (TourPainterConfiguration.isShowTourStartEnd) {
+            if (Map2PainterConfig.isShowTourStartEnd) {
 
                // draw end marker first
                if (drawStaticMarker(
@@ -938,7 +938,7 @@ public class TourMapPainter extends Map2Painter {
          _colorCache.dispose();
       }
 
-      if (TourPainterConfiguration.isShowWayPoints) {
+      if (Map2PainterConfig.isShowWayPoints) {
 
          // draw marker/pauses above the tour
 
@@ -957,7 +957,7 @@ public class TourMapPainter extends Map2Painter {
 
             setDataSerie(tourData);
 
-            if (TourPainterConfiguration.isShowWayPoints) {
+            if (Map2PainterConfig.isShowWayPoints) {
 
                // check if way points are available
                final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
@@ -1954,7 +1954,7 @@ public class TourMapPainter extends Map2Painter {
    @Override
    protected boolean isPaintingNeeded(final Map2 map, final Tile tile) {
 
-      final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
+      final ArrayList<TourData> allTourData = Map2PainterConfig.getTourData();
 
       if (allTourData.isEmpty()) {
          return false;
@@ -1968,7 +1968,7 @@ public class TourMapPainter extends Map2Painter {
       final int mapZoomLevel = map.getZoom();
       final int projectionHash = mp.getProjection().getId().hashCode();
 
-      if (TourPainterConfiguration.isShowTours
+      if (Map2PainterConfig.isShowTours
 
             && allTourData.size() > 0
 
@@ -2018,7 +2018,7 @@ public class TourMapPainter extends Map2Painter {
     */
    private void setDataSerie(final TourData tourData) {
 
-      final IMapColorProvider legendProvider = TourPainterConfiguration.getMapColorProvider();
+      final IMapColorProvider legendProvider = Map2PainterConfig.getMapColorProvider();
 
       if (legendProvider == null) {
          _dataSerie = null;

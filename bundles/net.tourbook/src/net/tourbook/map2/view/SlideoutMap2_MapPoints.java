@@ -1515,7 +1515,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       final boolean isDimMap                 = _chkIsDimMap                   .getSelection();
 
-      final boolean isShowPhotos             = TourPainterConfiguration.isShowPhotos;
+      final boolean isShowPhotos             = Map2PainterConfig.isShowPhotos;
 
       final boolean isGroupMarkers           = isShowTourMarker && isGroupDuplicatedMarkers;
       final boolean isShowClusteredMarker    = isShowTourMarker && isMarkerClustered;

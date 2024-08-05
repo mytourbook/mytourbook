@@ -123,7 +123,7 @@ import net.tourbook.map2.view.SlideoutMap2_PhotoToolTip;
 import net.tourbook.map2.view.MapPointType;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.SlideoutMap2_PhotoOptions;
-import net.tourbook.map2.view.TourPainterConfiguration;
+import net.tourbook.map2.view.Map2PainterConfig;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.map25.layer.marker.ScreenUtils;
 import net.tourbook.map25.layer.marker.algorithm.distance.Cluster;
@@ -2219,7 +2219,7 @@ public class Map2 extends Canvas {
 
       final Rectangle worldPixel_Viewport = _mapPointPainter_Viewport_DuringPainting;
 
-      final boolean isLinkPhotoDisplayed = TourPainterConfiguration.isLinkPhotoDisplayed;
+      final boolean isLinkPhotoDisplayed = Map2PainterConfig.isLinkPhotoDisplayed;
 
       // world positions are cached to optimize performance
       final int projectionHash = _mp.getProjection().getId().hashCode();
@@ -5428,7 +5428,7 @@ public class Map2 extends Canvas {
          {
             paint_30_Tiles(gcMapImage);
 
-            if (_isShowMapPoints || TourPainterConfiguration.isShowPhotos) {
+            if (_isShowMapPoints || Map2PainterConfig.isShowPhotos) {
                paint_40_MapPoints(gcMapImage);
             }
 
@@ -5520,7 +5520,7 @@ public class Map2 extends Canvas {
                   && _mapConfig.isShowTourLocation == false
                   && _mapConfig.isShowCommonLocation == false
                   && _mapConfig.isShowTourPauses == false
-                  && TourPainterConfiguration.isShowPhotos == false) {
+                  && Map2PainterConfig.isShowPhotos == false) {
 
          // there is nothing which should be painted
 
@@ -6918,7 +6918,7 @@ public class Map2 extends Canvas {
             setupPainting(g2d);
 
             // clone list to prevent concurrency exceptions, this happened
-            final List<TourData> allTourData = new ArrayList<>(TourPainterConfiguration.getTourData());
+            final List<TourData> allTourData = new ArrayList<>(Map2PainterConfig.getTourData());
 
             if (_mapConfig.isShowTourMarker && _mapConfig.isTourMarkerClustered) {
 
@@ -7076,8 +7076,8 @@ public class Map2 extends Canvas {
          createMapPoints_Locations_20_FromTourLocations(_allTourLocations, allTourLocationPointsList);
       }
 
-      if (TourPainterConfiguration.isShowPhotos) {
-         createMapPoints_TourPhotos(TourPainterConfiguration.getPhotos(), allPhotoPointsList);
+      if (Map2PainterConfig.isShowPhotos) {
+         createMapPoints_TourPhotos(Map2PainterConfig.getPhotos(), allPhotoPointsList);
       }
 
       /*
@@ -7204,8 +7204,8 @@ public class Map2 extends Canvas {
          createMapPoints_Locations_20_FromTourLocations(_allTourLocations, allTourLocationPointList);
       }
 
-      if (TourPainterConfiguration.isShowPhotos) {
-         createMapPoints_TourPhotos(TourPainterConfiguration.getPhotos(), allPhotoPointsList);
+      if (Map2PainterConfig.isShowPhotos) {
+         createMapPoints_TourPhotos(Map2PainterConfig.getPhotos(), allPhotoPointsList);
       }
 
       /*
@@ -8394,7 +8394,7 @@ public class Map2 extends Canvas {
 
             photo.paintedPhoto = photoRectangle;
 
-            if (TourPainterConfiguration.isShowPhotoRating) {
+            if (Map2PainterConfig.isShowPhotoRating) {
                paint_MpImage_RatingStars(g2d, photo);
             }
          }
