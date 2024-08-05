@@ -768,7 +768,7 @@ public class TourMapPainter extends Map2Painter {
    }
 
    @Override
-   protected void dispose() {
+   public void dispose() {
 
       UI.disposeResource(_tourEndMarker);
       UI.disposeResource(_tourStartMarker);
@@ -784,7 +784,7 @@ public class TourMapPainter extends Map2Painter {
    }
 
    @Override
-   protected boolean doPaint(final GC gcTile,
+   public boolean doPaint(final GC gcTile,
                              final Map2 map,
                              final Tile tile,
                              final int parts,
@@ -1935,7 +1935,7 @@ public class TourMapPainter extends Map2Painter {
    }
 
    @Override
-   protected boolean isPaintingNeeded(final Map2 map, final Tile tile) {
+   public boolean isPaintingNeeded(final Map2 map, final Tile tile) {
 
       final ArrayList<TourData> allTourData = Map2PainterConfig.getTourData();
 

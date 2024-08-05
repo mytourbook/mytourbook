@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -12,6 +12,8 @@
  *******************************************************************************/
 package de.byteholder.geoclipse;
 
+import de.byteholder.geoclipse.mapprovider.MPPlugin;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,83 +24,55 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
 
-import de.byteholder.geoclipse.map.Map2;
-import de.byteholder.geoclipse.map.Map2Painter;
-import de.byteholder.geoclipse.mapprovider.MPPlugin;
-
 public class GeoclipseExtensions {
 
-	private static GeoclipseExtensions	_instance;
+   private static GeoclipseExtensions _instance;
 
-	private ArrayList<MPPlugin>			_tileFactories;
+   private ArrayList<MPPlugin>        _tileFactories;
 
-	private GeoclipseExtensions() {}
+   private GeoclipseExtensions() {}
 
-	public static GeoclipseExtensions getInstance() {
+   public static GeoclipseExtensions getInstance() {
 
-		if (_instance == null) {
-			_instance = new GeoclipseExtensions();
-		}
+      if (_instance == null) {
+         _instance = new GeoclipseExtensions();
+      }
 
-		return _instance;
-	}
+      return _instance;
+   }
 
-	public static void registerOverlays(final Map2 map) {
+   /**
+    * @return Returns a list with all available map/tile factories
+    */
+   public List<MPPlugin> readFactories() {
 
-		final IExtensionRegistry registry = RegistryFactory.getRegistry();
-		final IExtensionPoint point = registry.getExtensionPoint("net.tourbook.mapOverlay"); //$NON-NLS-1$
-		final IExtension[] extensions = point.getExtensions();
+      if (_tileFactories != null) {
+         return _tileFactories;
+      }
 
-		for (final IExtension extension : extensions) {
-			final IConfigurationElement[] elements = extension.getConfigurationElements();
+      final IExtensionRegistry registry = RegistryFactory.getRegistry();
+      final IExtensionPoint point = registry.getExtensionPoint("net.tourbook.tilefactory"); //$NON-NLS-1$
+      final IExtension[] extensions = point.getExtensions();
 
-			final IConfigurationElement element = elements[elements.length - 1];
+      _tileFactories = new ArrayList<>();
 
-			Object o = null;
-			try {
-				o = element.createExecutableExtension("class"); //$NON-NLS-1$
-			} catch (final CoreException e) {
-				e.printStackTrace();
-			}
+      for (final IExtension extension : extensions) {
+         final IConfigurationElement[] elements = extension.getConfigurationElements();
 
-			if (o != null && o instanceof Map2Painter) {
-				map.addOverlayPainter((Map2Painter) o);
-			}
-		}
-	}
+         final IConfigurationElement element = elements[elements.length - 1];
 
-	/**
-	 * @return Returns a list with all available map/tile factories
-	 */
-	public List<MPPlugin> readFactories() {
+         Object o = null;
+         try {
+            o = element.createExecutableExtension("class"); //$NON-NLS-1$
+         } catch (final CoreException e) {
+            e.printStackTrace();
+         }
 
-		if (_tileFactories != null) {
-			return _tileFactories;
-		}
+         if (o != null && o instanceof MPPlugin) {
+            _tileFactories.add((MPPlugin) o);
+         }
+      }
 
-		final IExtensionRegistry registry = RegistryFactory.getRegistry();
-		final IExtensionPoint point = registry.getExtensionPoint("net.tourbook.tilefactory"); //$NON-NLS-1$
-		final IExtension[] extensions = point.getExtensions();
-
-		_tileFactories = new ArrayList<MPPlugin>();
-
-		for (final IExtension extension : extensions) {
-			final IConfigurationElement[] elements = extension.getConfigurationElements();
-
-			final IConfigurationElement element = elements[elements.length - 1];
-
-			Object o = null;
-			try {
-				o = element.createExecutableExtension("class"); //$NON-NLS-1$
-			} catch (final CoreException e) {
-				e.printStackTrace();
-			}
-
-			if (o != null && o instanceof MPPlugin) {
-				_tileFactories.add((MPPlugin) o);
-			}
-		}
-
-		return _tileFactories;
-	}
+      return _tileFactories;
+   }
 }

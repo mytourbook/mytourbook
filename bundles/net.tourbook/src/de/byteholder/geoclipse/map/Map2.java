@@ -123,6 +123,7 @@ import net.tourbook.map2.view.MapPointType;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.SlideoutMap2_PhotoOptions;
 import net.tourbook.map2.view.SlideoutMap2_PhotoToolTip;
+import net.tourbook.map2.view.TourMapPainter;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.map25.layer.marker.ScreenUtils;
 import net.tourbook.map25.layer.marker.algorithm.distance.Cluster;
@@ -364,7 +365,7 @@ public class Map2 extends Canvas {
     * The overlay to delegate to for painting the "foreground" of the map component. This would
     * include painting waypoints, day/night, etc. also receives mouse events.
     */
-   private final List<Map2Painter>       _allMapPainter             = new ArrayList<>();
+   private final TourMapPainter          _mapPainter                = new TourMapPainter();
 
    private final TileImageLoaderCallback _tileImageLoaderCallback   = new TileImageLoaderCallback_ForTileImages();
 
@@ -1102,22 +1103,6 @@ public class Map2 extends Canvas {
 
    public void addMousePositionListener(final IGeoPositionListener mapListener) {
       _allMousePositionListeners.add(mapListener);
-   }
-
-   /**
-    * Adds a map overlay. This is a Painter which will paint on top of the map. It can be used to
-    * draw waypoints, lines, or static overlays like text messages.
-    *
-    * @param overlay
-    *           the map overlay to use
-    *
-    * @see org.jdesktop.swingx.painters.Painter
-    */
-   public void addOverlayPainter(final Map2Painter overlay) {
-
-      _allMapPainter.add(overlay);
-
-      paint();
    }
 
    public void addPOIListener(final IPOIListener poiListener) {
@@ -2614,10 +2599,11 @@ public class Map2 extends Canvas {
    }
 
    /**
-    * @return Returns the overlay map painter which are defined as plugin extension
+    * @return Returns the tour map painter
     */
-   public List<Map2Painter> getMapPainter() {
-      return _allMapPainter;
+   public TourMapPainter getMapPainter() {
+
+      return _mapPainter;
    }
 
    /**
@@ -3952,9 +3938,7 @@ public class Map2 extends Canvas {
       UI.disposeResource(_cursorSelect);
 
       // dispose resources in the overlay plugins
-      for (final Map2Painter overlay : _allMapPainter) {
-         overlay.dispose();
-      }
+      _mapPainter.dispose();
 
       _overlayImageCache.dispose();
       _colorCache.dispose();
@@ -8654,16 +8638,7 @@ public class Map2 extends Canvas {
                /*
                 * Check if a tour, marker or photo is within the current tile
                 */
-               boolean isPaintingNeeded = false;
-
-               for (final Map2Painter mapPainter : _allMapPainter) {
-
-                  isPaintingNeeded = mapPainter.isPaintingNeeded(Map2.this, tile);
-
-                  if (isPaintingNeeded) {
-                     break;
-                  }
-               }
+               final boolean isPaintingNeeded = _mapPainter.isPaintingNeeded(Map2.this, tile);
 
                if (isPaintingNeeded == false) {
 
@@ -8674,7 +8649,7 @@ public class Map2 extends Canvas {
                }
 
                // paint overlay
-               paint_Overlay_22_PaintTileBasic(tile);
+               paint_Overlay_22_OneTile(tile);
 
                // allow to display painted overlays
                final long paintTime = System.currentTimeMillis();
@@ -8696,7 +8671,7 @@ public class Map2 extends Canvas {
     *
     * @param tile
     */
-   private void paint_Overlay_22_PaintTileBasic(final Tile tile) {
+   private void paint_Overlay_22_OneTile(final Tile tile) {
 
       boolean isOverlayPainted = false;
 
@@ -8704,29 +8679,26 @@ public class Map2 extends Canvas {
       final ImageData transparentImageData = MapUtils.createTransparentImageData(_tilePixelSize);
 
       final Image overlayImage = new Image(_display, transparentImageData);
-      final GC gc1Part = new GC(overlayImage);
+      final GC gcTile = new GC(overlayImage);
       {
          /*
           * Ubuntu 12.04 fails, when background is not filled, it draws a black background
           */
-         gc1Part.setBackground(_mapTransparentColor);
-         gc1Part.fillRectangle(overlayImage.getBounds());
+         gcTile.setBackground(_mapTransparentColor);
+         gcTile.fillRectangle(overlayImage.getBounds());
 
          // paint all overlays for the current tile
-         for (final Map2Painter overlayPainter : _allMapPainter) {
+         final boolean isPainted = _mapPainter.doPaint(
+               gcTile,
+               Map2.this,
+               tile,
+               1,
+               _isFastMapPainting && _isFastMapPainting_Active,
+               _fastMapPainting_skippedValues);
 
-            final boolean isPainted = overlayPainter.doPaint(
-                  gc1Part,
-                  Map2.this,
-                  tile,
-                  1,
-                  _isFastMapPainting && _isFastMapPainting_Active,
-                  _fastMapPainting_skippedValues);
-
-            isOverlayPainted = isOverlayPainted || isPainted;
-         }
+         isOverlayPainted = isOverlayPainted || isPainted;
       }
-      gc1Part.dispose();
+      gcTile.dispose();
 
       if (isOverlayPainted) {
 
@@ -9742,18 +9714,6 @@ public class Map2 extends Canvas {
 
    public void removeMousePositionListener(final IGeoPositionListener listener) {
       _allMousePositionListeners.remove(listener);
-   }
-
-   /**
-    * Removes a map overlay.
-    *
-    * @return the current map overlay
-    */
-   public void removeOverlayPainter(final Map2Painter overlay) {
-
-      _allMapPainter.remove(overlay);
-
-      paint();
    }
 
    /**

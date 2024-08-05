@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
-import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.ActionManageOfflineImages;
 import de.byteholder.geoclipse.map.CenterMapBy;
 import de.byteholder.geoclipse.map.IMapContextMenuProvider;
@@ -2182,9 +2181,6 @@ public class Map2View extends ViewPart implements
       MapManager.addMapSyncListener(this);
 
       MapProviderManager.setMap2View(this);
-
-      // register overlays which draw the tour
-      GeoclipseExtensions.registerOverlays(_map);
 
       setMapImageSize();
 
