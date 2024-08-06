@@ -11022,6 +11022,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
+    * @return Returns the total elapsed time spent during the night (in seconds).
+    */
+   public long getTourTime_Night() {
+      return 1;
+   }
+
+   /**
     * @return Returns {@link #tourTitle} or an empty string when value is not set
     */
    public String getTourTitle() {
@@ -11455,6 +11462,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
 
       return timeSerieWithTimeZoneAdjustment != null;
+   }
+
+   public boolean isTourDuringNightTime() {
+      // TODO Auto-generated method stub
+      return false;
    }
 
    /**

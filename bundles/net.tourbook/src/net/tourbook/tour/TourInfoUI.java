@@ -756,7 +756,8 @@ public class TourInfoUI {
          }
       }
 
-      if (isTourDuringNightTime()) {
+      final long tourTime_Night = _tourData.getTourTime_Night();
+      if (tourTime_Night > 0) {
 
          createUI_Spacer(container);
 
@@ -1936,7 +1937,7 @@ public class TourInfoUI {
 
    private boolean isTourDuringNightTime() {
       // TODO Auto-generated method stub
-      return true;
+      return _tourData.isTourDuringNightTime();
    }
 
    /**
@@ -2283,6 +2284,13 @@ public class TourInfoUI {
          _lblMovingTime.setText(movingPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
          _lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
       }
+
+      /*
+       * Time during the day and night
+       */
+      final long tourTime_Night = _tourData.getTourTime_Night();
+      _lblTimeDuringDay_Value.setText(FormatManager.formatElapsedTime(elapsedTime - tourTime_Night));
+      _lblTimeDuringNight_Value.setText(FormatManager.formatElapsedTime(tourTime_Night));
 
       /*
        * Weather
