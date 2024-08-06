@@ -59,6 +59,7 @@ Improvements
   - Added the support for the carbohydrates
   - Added a button to update the nutrition facts of a given product(s)
   - Added the ability to select a product from a list of the most recent products used
+  - Added the ability to edit an existing custom nutrition product
 
 Changes
 =======
