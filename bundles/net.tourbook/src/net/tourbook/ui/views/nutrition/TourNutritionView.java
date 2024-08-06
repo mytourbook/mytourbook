@@ -123,6 +123,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    // slideout with ignore 1h
    // add group with 2 radio buttons "Use the last most added items", "Use the most used items for all the tours"
    // in that group, add a spinner for the number of items to show 1 to 15
+
+   //add the ability to insert 2 similar items if they are beverages (cf. example 08/03/2024)
+
    public static final String            ID                             = "net.tourbook.ui.views.nutrition.TourNutritionView"; //$NON-NLS-1$
    private static final String           STATE_PRODUCT_SEARCHES_HISTORY = "products.searchesHistory";                          //$NON-NLS-1$
    private static final String           STATE_SECTION_PRODUCTS_LIST    = "STATE_SECTION_PRODUCTS_LIST";                       //$NON-NLS-1$
