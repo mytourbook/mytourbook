@@ -21,13 +21,12 @@ import java.util.LinkedList;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourType;
+import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider2;
 
 import org.eclipse.jface.action.Action;
@@ -35,20 +34,20 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
 /**
  * Manage recently used tour types and fills the context menu
  * <p>
- * The method {@link #fillMenuRecentTourTypes} creates the actions and must be called before the
- * actions are enabled/disabled with {@link #enableRecentTourTypeActions}
+ * The method {@link #fillMenuRecentTourNutritionProducts} creates the actions and must be called
+ * before the
+ * actions are enabled/disabled with {@link #enableRecentTourNutritionProductActions}
  */
 public class TourNutritionProductMenuManager {
 
-   private static final String            STATE_ID           = "TourTypeManager.RecentTourTypes";               //$NON-NLS-1$
-   private static final String            STATE_TOUR_TYPE_ID = "TourTypeId";                                    //$NON-NLS-1$
+   private static final String                       STATE_ID                     = "TourNutritionProductManager.RecentTourNutritionProducts"; //$NON-NLS-1$
+   private static final String                       STATE_TOUR_TYPE_ID           = "TourNutritionProductId";                                  //$NON-NLS-1$
 
    private static final IPreferenceStore  _prefStore         = TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -62,47 +61,44 @@ public class TourNutritionProductMenuManager {
     * number of tour types which are displayed in the context menu or saved in the dialog settings,
     * it's max number is 9 to have a unique accelerator key
     */
-   private static LinkedList<TourType>    _recentTourTypes   = new LinkedList<>();
+   private static LinkedList<TourNutritionProduct>   _recentTourNutritionProducts = new LinkedList<>();
 
    /**
     * Contains actions which are displayed in the menu
     */
-   private static RecentTourTypeAction[]  _actionsRecentTourTypes;
+   private static RecentTourNutritionProductAction[] _actionsRecentTourNutritionProducts;
 
-   private static int                     _maxTourTypes      = -1;
+   private static int                                _maxTourNutritionProducts    = -1;
 
    private static IPropertyChangeListener _prefChangeListener;
 
    private static boolean                 _isInitialized     = false;
    private static boolean                 _isSaveTour;
 
-   private static class RecentTourTypeAction extends Action {
+   private static class RecentTourNutritionProductAction extends Action {
 
-      private TourType __tourType;
+      private TourNutritionProduct __TourNutritionProduct;
 
       @Override
       public void run() {
-         setTourTypeIntoTour(__tourType, _isSaveTour);
+         setTourNutritionProductIntoTour(__TourNutritionProduct, _isSaveTour);
       }
 
-      private void setTourType(final TourType tourType) {
-         __tourType = tourType;
+      private void setTourNutritionProduct(final TourNutritionProduct TourNutritionProduct) {
+         __TourNutritionProduct = TourNutritionProduct;
       }
    }
 
    private static void addPrefChangeListener() {
       // create pref listener
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-            final String property = event.getProperty();
+      _prefChangeListener = propertyChangeEvent -> {
+         final String property = propertyChangeEvent.getProperty();
 
-            // check if the number of recent tour types has changed
-            if (property.equals(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES)) {
-               setActions();
-            } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
-               updateTourTypes();
-            }
+         // check if the number of recent tour types has changed
+         if (property.equals(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES)) {
+            setActions();
+         } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+            updateTourNutritionProducts();
          }
       };
 
@@ -111,77 +107,78 @@ public class TourNutritionProductMenuManager {
    }
 
    /**
-    * Adds the {@link TourType} to the list of the recently used tour types
+    * Adds the {@link TourNutritionProduct} to the list of the recently used tour types
     *
-    * @param tourType
+    * @param TourNutritionProduct
     */
-   private static void addRecentTourType(final TourType tourType) {
-      _recentTourTypes.remove(tourType);
-      _recentTourTypes.addFirst(tourType);
+   private static void addRecentTourNutritionProduct(final TourNutritionProduct TourNutritionProduct) {
+      _recentTourNutritionProducts.remove(TourNutritionProduct);
+      _recentTourNutritionProducts.addFirst(TourNutritionProduct);
    }
 
    /**
     * @param isEnabled
-    * @param existingTourTypeId
+    * @param existingTourNutritionProductId
     */
-   public static void enableRecentTourTypeActions(final boolean isEnabled, final long existingTourTypeId) {
+   public static void enableRecentTourNutritionProductActions(final boolean isEnabled, final long existingTourNutritionProductId) {
 
       if (_isInitialized == false) {
-         initTourTypeManager();
+         initTourNutritionProductManager();
       }
 
-      for (final RecentTourTypeAction actionRecentTourType : _actionsRecentTourTypes) {
+      for (final RecentTourNutritionProductAction actionRecentTourNutritionProduct : _actionsRecentTourNutritionProducts) {
 
-         final TourType tourType = actionRecentTourType.__tourType;
-         if (tourType == null) {
+         final TourNutritionProduct TourNutritionProduct = actionRecentTourNutritionProduct.__TourNutritionProduct;
+         if (TourNutritionProduct == null) {
 
             // disable tour type
 
-            actionRecentTourType.setEnabled(false);
+            actionRecentTourNutritionProduct.setEnabled(false);
 
             // hide image because it looks ugly (on windows) when it's disabled
-            actionRecentTourType.setImageDescriptor(null);
+            actionRecentTourNutritionProduct.setImageDescriptor(null);
 
             continue;
          }
 
-         final long tourTypeId = tourType.getTypeId();
+         final long TourNutritionProductId = TourNutritionProduct.getTypeId();
 
          if (isEnabled) {
 
             // enable tour type
 
-            boolean isExistingTourTypeId = false;
+            boolean isExistingTourNutritionProductId = false;
 
             // check if the existing tour type should be enabled
-            if (existingTourTypeId != TourDatabase.ENTITY_IS_NOT_SAVED && tourTypeId == existingTourTypeId) {
-               isExistingTourTypeId = true;
+            if (existingTourNutritionProductId != TourDatabase.ENTITY_IS_NOT_SAVED && TourNutritionProductId == existingTourNutritionProductId) {
+               isExistingTourNutritionProductId = true;
             }
 
-            actionRecentTourType.setEnabled(isExistingTourTypeId == false);
+            actionRecentTourNutritionProduct.setEnabled(isExistingTourNutritionProductId == false);
 
-            if (isExistingTourTypeId) {
+            if (isExistingTourNutritionProductId) {
 
                // hide image because it looks ugly (on windows) when it's disabled
-               actionRecentTourType.setImageDescriptor(null);
+               actionRecentTourNutritionProduct.setImageDescriptor(null);
 
             } else {
 
                // set tour type image
-//					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
-//					actionRecentTourType.setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
+//					final Image TourNutritionProductImage = UI.getInstance().getTourNutritionProductImage(TourNutritionProductId);
+//					actionRecentTourNutritionProduct.setImageDescriptor(ImageDescriptor.createFromImage(TourNutritionProductImage));
 
-               actionRecentTourType.setImageDescriptor(TourTypeImage.getTourTypeImageDescriptor(tourTypeId));
+               actionRecentTourNutritionProduct.setImageDescriptor(TourNutritionProductImage.getTourNutritionProductImageDescriptor(
+                     TourNutritionProductId));
             }
 
          } else {
 
             // disable tour type
 
-            actionRecentTourType.setEnabled(false);
+            actionRecentTourNutritionProduct.setEnabled(false);
 
             // hide image because it looks ugly (on windows) when it's disabled
-            actionRecentTourType.setImageDescriptor(null);
+            actionRecentTourNutritionProduct.setImageDescriptor(null);
          }
       }
    }
@@ -193,45 +190,46 @@ public class TourNutritionProductMenuManager {
     * @param tourProvider
     * @param isSaveTour
     */
-   public static void fillMenuWithRecentTourTypes(final IMenuManager menuMgr,
+   public static void fillMenuWithRecentTourNutritionProducts(final IMenuManager menuMgr,
                                                   final boolean isSaveTour) {
 
       if (_isInitialized == false) {
-         initTourTypeManager();
+         initTourNutritionProductManager();
       }
 
-      if (_recentTourTypes.isEmpty()) {
+      if (_recentTourNutritionProducts.isEmpty()) {
          return;
       }
 
-      if (_maxTourTypes < 1) {
+      if (_maxTourNutritionProducts < 1) {
          return;
       }
 
       _isSaveTour = isSaveTour;
 
       // add tour types
-      int tourTypeIndex = 0;
-      for (final RecentTourTypeAction actionRecentTourType : _actionsRecentTourTypes) {
+      int TourNutritionProductIndex = 0;
+      for (final RecentTourNutritionProductAction actionRecentTourNutritionProduct : _actionsRecentTourNutritionProducts) {
          try {
 
-            final TourType recentTourType = _recentTourTypes.get(tourTypeIndex);
+            final TourNutritionProduct recentTourNutritionProduct = _recentTourNutritionProducts.get(TourNutritionProductIndex);
 
-            actionRecentTourType.setTourType(recentTourType);
-            actionRecentTourType.setText(UI.SPACE4 + UI.MNEMONIC + (tourTypeIndex + 1) + UI.SPACE2 + recentTourType.getName());
+            actionRecentTourNutritionProduct.setTourNutritionProduct(recentTourNutritionProduct);
+            actionRecentTourNutritionProduct.setText(UI.SPACE4 + UI.MNEMONIC + (TourNutritionProductIndex + 1) + UI.SPACE2
+                  + recentTourNutritionProduct.getName());
 
-            menuMgr.add(actionRecentTourType);
+            menuMgr.add(actionRecentTourNutritionProduct);
 
          } catch (final IndexOutOfBoundsException e) {
             // there are no more recent tour types
             break;
          }
 
-         tourTypeIndex++;
+         TourNutritionProductIndex++;
       }
    }
 
-   private static synchronized void initTourTypeManager() {
+   private static synchronized void initTourNutritionProductManager() {
 
       setActions();
 
@@ -242,23 +240,23 @@ public class TourNutritionProductMenuManager {
 
    public static void restoreState() {
 
-      final String[] allStateTourTypeIds = _state.getArray(STATE_TOUR_TYPE_ID);
-      if (allStateTourTypeIds == null) {
+      final String[] allStateTourNutritionProductIds = _state.getArray(STATE_TOUR_TYPE_ID);
+      if (allStateTourNutritionProductIds == null) {
          return;
       }
 
       /*
        * get all tour types from the database which are saved in the state
        */
-      final ArrayList<TourType> dbTourTypes = TourDatabase.getAllTourTypes();
-      for (final String stateTourTypeIdItem : allStateTourTypeIds) {
+      final ArrayList<TourNutritionProduct> dbTourNutritionProducts = TourDatabase.getAllTourNutritionProducts();
+      for (final String stateTourNutritionProductIdItem : allStateTourNutritionProductIds) {
          try {
 
-            final long stateTourTypeId = Long.parseLong(stateTourTypeIdItem);
+            final long stateTourNutritionProductId = Long.parseLong(stateTourNutritionProductIdItem);
 
-            for (final TourType dbTourType : dbTourTypes) {
-               if (dbTourType.getTypeId() == stateTourTypeId) {
-                  _recentTourTypes.add(dbTourType);
+            for (final TourNutritionProduct dbTourNutritionProduct : dbTourNutritionProducts) {
+               if (dbTourNutritionProduct.getTypeId() == stateTourNutritionProductId) {
+                  _recentTourNutritionProducts.add(dbTourNutritionProduct);
                   break;
                }
             }
@@ -270,23 +268,23 @@ public class TourNutritionProductMenuManager {
 
    public static void saveState() {
 
-      if (_maxTourTypes < 1) {
+      if (_maxTourNutritionProducts < 1) {
          // tour types are not initialized or not visible, do nothing
          return;
       }
 
-      final String[] stateTourTypeIds = new String[Math.min(_maxTourTypes, _recentTourTypes.size())];
-      int tourTypeIndex = 0;
+      final String[] stateTourNutritionProductIds = new String[Math.min(_maxTourNutritionProducts, _recentTourNutritionProducts.size())];
+      int TourNutritionProductIndex = 0;
 
-      for (final TourType recentTourType : _recentTourTypes) {
-         stateTourTypeIds[tourTypeIndex++] = Long.toString(recentTourType.getTypeId());
+      for (final TourNutritionProduct recentTourNutritionProduct : _recentTourNutritionProducts) {
+         stateTourNutritionProductIds[TourNutritionProductIndex++] = Long.toString(recentTourNutritionProduct.getTypeId());
 
-         if (tourTypeIndex == _maxTourTypes) {
+         if (TourNutritionProductIndex == _maxTourNutritionProducts) {
             break;
          }
       }
 
-      _state.put(STATE_TOUR_TYPE_ID, stateTourTypeIds);
+      _state.put(STATE_TOUR_TYPE_ID, stateTourNutritionProductIds);
    }
 
    /**
@@ -294,50 +292,47 @@ public class TourNutritionProductMenuManager {
     */
    private static void setActions() {
 
-      _maxTourTypes = TourbookPlugin
+      _maxTourNutritionProducts = TourbookPlugin
             .getDefault()
             .getPreferenceStore()
             .getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES);
 
-      _actionsRecentTourTypes = new RecentTourTypeAction[_maxTourTypes];
+      _actionsRecentTourNutritionProducts = new RecentTourNutritionProductAction[_maxTourNutritionProducts];
 
-      for (int actionIndex = 0; actionIndex < _actionsRecentTourTypes.length; actionIndex++) {
-         _actionsRecentTourTypes[actionIndex] = new RecentTourTypeAction();
+      for (int actionIndex = 0; actionIndex < _actionsRecentTourNutritionProducts.length; actionIndex++) {
+         _actionsRecentTourNutritionProducts[actionIndex] = new RecentTourNutritionProductAction();
       }
    }
 
-   public static void setTourTypeIntoTour(final TourType tourType,
+   public static void setTourNutritionProductIntoTour(final TourNutritionProduct TourNutritionProduct,
                                           final boolean isSaveTour) {
 
-      final Runnable runnable = new Runnable() {
-         @Override
-         public void run() {
+      final Runnable runnable = () -> {
 
-            // set tour type in all tours (without tours which are opened in an editor)
-            for (final TourData tourData : selectedTours) {
-               tourData.setTourType(tourType);
-            }
-
-            // keep tour type for the recent menu
-            addRecentTourType(tourType);
-
-            if (isSaveTour) {
-
-               // save all tours with the modified tour type
-               TourManager.saveModifiedTours(selectedTours);
-
-            } else {
-
-               // tours are not saved but the tour provider must be notified
-
-               if (tourProvider instanceof ITourProvider2) {
-                  ((ITourProvider2) tourProvider).toursAreModified(selectedTours);
-               } else {
-                  TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
-               }
-            }
-
+         // set tour type in all tours (without tours which are opened in an editor)
+         for (final TourData tourData : selectedTours) {
+            tourData.setTourNutritionProduct(TourNutritionProduct);
          }
+
+         // keep tour type for the recent menu
+         addRecentTourNutritionProduct(TourNutritionProduct);
+
+         if (isSaveTour) {
+
+            // save all tours with the modified tour type
+            TourManager.saveModifiedTours(selectedTours);
+
+         } else {
+
+            // tours are not saved but the tour provider must be notified
+
+            if (tourProvider instanceof ITourProvider2) {
+               ((ITourProvider2) tourProvider).toursAreModified(selectedTours);
+            } else {
+               TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
+            }
+         }
+
       };
       BusyIndicator.showWhile(Display.getCurrent(), runnable);
    }
@@ -345,27 +340,27 @@ public class TourNutritionProductMenuManager {
    /**
     * Tour types has changed
     */
-   private static void updateTourTypes() {
+   private static void updateTourNutritionProducts() {
 
-      final ArrayList<TourType> dbTourTypes = TourDatabase.getAllTourTypes();
-      final LinkedList<TourType> validTourTypes = new LinkedList<>();
+      final ArrayList<TourNutritionProduct> dbTourNutritionProducts = TourDatabase.getAllTourNutritionProducts();
+      final LinkedList<TourNutritionProduct> validTourNutritionProducts = new LinkedList<>();
 
       // check if the tour types are still available
-      for (final TourType recentTourType : _recentTourTypes) {
+      for (final TourNutritionProduct recentTourNutritionProduct : _recentTourNutritionProducts) {
 
-         final long recentTypeId = recentTourType.getTypeId();
+         final long recentTypeId = recentTourNutritionProduct.getTypeId();
 
-         for (final TourType dbTourType : dbTourTypes) {
+         for (final TourNutritionProduct dbTourNutritionProduct : dbTourNutritionProducts) {
 
-            if (recentTypeId == dbTourType.getTypeId()) {
-               validTourTypes.add(dbTourType);
+            if (recentTypeId == dbTourNutritionProduct.getTypeId()) {
+               validTourNutritionProducts.add(dbTourNutritionProduct);
                break;
             }
          }
       }
 
       // set updated list
-      _recentTourTypes.clear();
-      _recentTourTypes = validTourTypes;
+      _recentTourNutritionProducts.clear();
+      _recentTourNutritionProducts = validTourNutritionProducts;
    }
 }
