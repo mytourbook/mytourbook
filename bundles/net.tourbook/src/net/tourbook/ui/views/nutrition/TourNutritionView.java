@@ -20,7 +20,6 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -48,9 +47,7 @@ import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.DialogCustomTourNutritionProduct;
 import net.tourbook.nutrition.NutritionUtils;
-import net.tourbook.nutrition.ProductSearchType;
 import net.tourbook.nutrition.QuantityType;
-import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -1572,30 +1569,30 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private void onUpdateProducts() {
 
       //todo fb add a progress bar ?
-      final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
-      final Set<TourNutritionProduct> updatedTourNutritionProducts = new HashSet<>();
-      for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
-
-         if (net.tourbook.common.util.StringUtils.isNullOrEmpty(tourNutritionProduct.getProductCode())) {
-            continue;
-         }
-
-         final List<Product> searchProductResults = NutritionUtils.searchProduct(tourNutritionProduct.getProductCode(), ProductSearchType.ByCode);
-         if (searchProductResults.isEmpty()) {
-            continue;
-         }
-
-         final Product updatedProduct = searchProductResults.get(0);
-         final TourNutritionProduct updatedTourNutritionProduct = new TourNutritionProduct(_tourData, updatedProduct);
-         updatedTourNutritionProducts.add(updatedTourNutritionProduct);
-      }
-
-      if (!updatedTourNutritionProducts.isEmpty()) {
-
-         _tourData.setTourNutritionProducts(updatedTourNutritionProducts);
-         _tourData = TourManager.saveModifiedTour(_tourData);
-         _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
-      }
+//      final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
+//      final Set<TourNutritionProduct> updatedTourNutritionProducts = new HashSet<>();
+//      for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
+//
+//         if (net.tourbook.common.util.StringUtils.isNullOrEmpty(tourNutritionProduct.getProductCode())) {
+//            continue;
+//         }
+//
+//         final List<Product> searchProductResults = NutritionUtils.searchProduct(tourNutritionProduct.getProductCode(), ProductSearchType.ByCode);
+//         if (searchProductResults.isEmpty()) {
+//            continue;
+//         }
+//
+//         final Product updatedProduct = searchProductResults.get(0);
+//         final TourNutritionProduct updatedTourNutritionProduct = new TourNutritionProduct(_tourData, updatedProduct);
+//         updatedTourNutritionProducts.add(updatedTourNutritionProduct);
+//      }
+//
+//      if (!updatedTourNutritionProducts.isEmpty()) {
+//
+//         _tourData.setTourNutritionProducts(updatedTourNutritionProducts);
+//         _tourData = TourManager.saveModifiedTour(_tourData);
+//         _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
+//      }
    }
 
    @Override
