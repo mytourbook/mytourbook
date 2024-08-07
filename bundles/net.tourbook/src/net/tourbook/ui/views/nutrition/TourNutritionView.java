@@ -145,8 +145,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
    private static final int              HINT_TEXT_COLUMN_WIDTH         = UI.IS_OSX ? 100 : 50;
 
-   private TourNutritionProductMenuManager                             _tourNutritionProductMenuManager;
-
    private final NumberFormat            _nf2                           = NumberFormat.getNumberInstance();
    {
       _nf2.setMinimumFractionDigits(0);
@@ -1336,8 +1334,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       menuMgr.add(_actionDeleteProducts);
 
       //todo fb add the recent tour nutrition products when not selecting existing products
-      _tourNutritionProductMenuManager = new TourNutritionProductMenuManager(tourProvider, true);
-      TourNutritionProductMenuManager.fillMenuWithRecentTourTypes(menuMgr, tourProvider, true);
+      TourNutritionProductMenuManager.fillMenuWithRecentTourTypes(menuMgr, true);
 
       enableActions();
    }

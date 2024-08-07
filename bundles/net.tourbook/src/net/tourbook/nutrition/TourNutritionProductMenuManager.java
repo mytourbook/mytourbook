@@ -28,7 +28,6 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
-import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
 
 import org.eclipse.jface.action.Action;
@@ -72,8 +71,6 @@ public class TourNutritionProductMenuManager {
 
    private static int                     _maxTourTypes      = -1;
 
-   private static ITourProvider           _tourProvider;
-
    private static IPropertyChangeListener _prefChangeListener;
 
    private static boolean                 _isInitialized     = false;
@@ -85,7 +82,7 @@ public class TourNutritionProductMenuManager {
 
       @Override
       public void run() {
-         setTourTypeIntoTour(__tourType, _tourProvider, _isSaveTour);
+         setTourTypeIntoTour(__tourType, _isSaveTour);
       }
 
       private void setTourType(final TourType tourType) {
@@ -197,7 +194,6 @@ public class TourNutritionProductMenuManager {
     * @param isSaveTour
     */
    public static void fillMenuWithRecentTourTypes(final IMenuManager menuMgr,
-                                                  final ITourProvider tourProvider,
                                                   final boolean isSaveTour) {
 
       if (_isInitialized == false) {
@@ -212,7 +208,6 @@ public class TourNutritionProductMenuManager {
          return;
       }
 
-      _tourProvider = tourProvider;
       _isSaveTour = isSaveTour;
 
       // add tour types
@@ -312,17 +307,11 @@ public class TourNutritionProductMenuManager {
    }
 
    public static void setTourTypeIntoTour(final TourType tourType,
-                                          final ITourProvider tourProvider,
                                           final boolean isSaveTour) {
 
       final Runnable runnable = new Runnable() {
          @Override
          public void run() {
-
-            final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
-            if (selectedTours == null || selectedTours.isEmpty()) {
-               return;
-            }
 
             // set tour type in all tours (without tours which are opened in an editor)
             for (final TourData tourData : selectedTours) {
