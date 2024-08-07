@@ -1334,7 +1334,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       menuMgr.add(_actionDeleteProducts);
 
       //todo fb add the recent tour nutrition products when not selecting existing products
-      TourNutritionProductMenuManager.fillMenuWithRecentTourTypes(menuMgr, true);
+      TourNutritionProductMenuManager.fillMenuWithRecentTourNutritionProducts(menuMgr, true);
 
       enableActions();
    }
