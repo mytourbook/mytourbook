@@ -48,6 +48,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.DialogCustomTourNutritionProduct;
 import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.nutrition.QuantityType;
+import net.tourbook.nutrition.TourNutritionProductMenuManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -124,11 +125,13 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    //add the ability to insert 2 similar items if they are beverages (cf. example 08/03/2024)
 
    public static final String            ID                             = "net.tourbook.ui.views.nutrition.TourNutritionView"; //$NON-NLS-1$
+
+
    private static final String           STATE_PRODUCT_SEARCHES_HISTORY = "products.searchesHistory";                          //$NON-NLS-1$
    private static final String           STATE_SECTION_PRODUCTS_LIST    = "STATE_SECTION_PRODUCTS_LIST";                       //$NON-NLS-1$
    private static final String           STATE_SECTION_SUMMARY          = "STATE_SECTION_SUMMARY";                             //$NON-NLS-1$
-
    private static final String           COLUMN_CONSUMED_QUANTITY       = "ConsumedQuantity";                                  //$NON-NLS-1$
+
    private static final String           COLUMN_QUANTITY_TYPE           = "QuantityType";                                      //$NON-NLS-1$
    private static final String           COLUMN_NAME                    = "Name";                                              //$NON-NLS-1$
    private static final String           COLUMN_CALORIES                = "Calories";                                          //$NON-NLS-1$
@@ -138,10 +141,11 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    private static final String           COLUMN_BEVERAGE_QUANTITY       = "BeverageQuantity";                                  //$NON-NLS-1$
    private static final String           COLUMN_BEVERAGE_CONTAINER      = "BeverageContainer";                                 //$NON-NLS-1$
    private static final String           COLUMN_CONSUMED_CONTAINERS     = "ConsumedContainers";                                //$NON-NLS-1$
-
    private static final IPreferenceStore _prefStore                     = TourbookPlugin.getPrefStore();
 
    private static final int              HINT_TEXT_COLUMN_WIDTH         = UI.IS_OSX ? 100 : 50;
+
+   private TourNutritionProductMenuManager                             _tourNutritionProductMenuManager;
 
    private final NumberFormat            _nf2                           = NumberFormat.getNumberInstance();
    {
@@ -617,6 +621,9 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _actionDeleteProducts = new ActionDeleteProducts();
       _actionOpenProductsWebsite = new ActionOpenProductsWebsite();
+
+
+
    }
 
    private void createMenuManager() {
@@ -1327,6 +1334,10 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       menuMgr.add(_actionOpenProductsWebsite);
 
       menuMgr.add(_actionDeleteProducts);
+
+      //todo fb add the recent tour nutrition products when not selecting existing products
+      _tourNutritionProductMenuManager = new TourNutritionProductMenuManager(tourProvider, true);
+      TourNutritionProductMenuManager.fillMenuWithRecentTourTypes(menuMgr, tourProvider, true);
 
       enableActions();
    }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,6 +42,7 @@ import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.map3.view.Map3State;
+import net.tourbook.nutrition.TourNutritionProductMenuManager;
 import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
@@ -472,6 +473,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
          TagMenuManager.restoreTagState();
          TourTypeMenuManager.restoreState();
+         TourNutritionProductMenuManager.restoreState();
 
          loadPeopleData();
          setupAppSelectionListener();
@@ -542,6 +544,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       TourTypeFilterManager.saveState();
       TourTypeMenuManager.saveState();
+      TourNutritionProductMenuManager.saveState();
       TourTypeManager.saveState();
 
       CommonLocationManager.saveState();
