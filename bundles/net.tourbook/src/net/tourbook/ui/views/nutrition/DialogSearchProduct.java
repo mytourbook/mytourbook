@@ -843,7 +843,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
          final Set<TourNutritionProduct> tourNutritionProducts = tourData.getTourNutritionProducts();
 
          // Before adding the selected product, we need to check if it doesn't already exist
-         if (tourNutritionProducts.stream().anyMatch(tourNutritionProduct -> tourNutritionProduct.getProductCode().equals(selectedProduct.code))) {
+         // An existing product can only be added when the existing ones are
+         // attached to a beverage container
+         if (tourNutritionProducts.stream().anyMatch(tourNutritionProduct -> tourNutritionProduct.getProductCode().equals(selectedProduct.code) &&
+               tourNutritionProduct.getTourBeverageContainer() == null)) {
 
             setErrorMessage(Messages.Dialog_SearchProduct_Label_AlreadyExists);
             return;
@@ -1042,7 +1045,8 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
    }
 
    @Override
-   public void updateColumnHeader(final ColumnDefinition colDef) {}
+   public void updateColumnHeader(final ColumnDefinition colDef) { // Not implemented because the format can't change
+   }
 
    private void validateFields() {
 
