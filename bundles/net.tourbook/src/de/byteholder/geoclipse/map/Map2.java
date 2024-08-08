@@ -119,10 +119,10 @@ import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.MapLabelLayout;
 import net.tourbook.map2.view.MapPointStatistics;
 import net.tourbook.map2.view.MapPointToolTip;
-import net.tourbook.map2.view.SlideoutMap2_PhotoToolTip;
 import net.tourbook.map2.view.MapPointType;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.SlideoutMap2_PhotoOptions;
+import net.tourbook.map2.view.SlideoutMap2_PhotoToolTip;
 import net.tourbook.map2.view.TourPainterConfiguration;
 import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.map25.layer.marker.ScreenUtils;
@@ -7059,19 +7059,19 @@ public class Map2 extends Canvas {
       /*
        * Create map points
        */
-      if (_mapConfig.isShowTourMarker) {
+      if (_isShowMapPoints && _mapConfig.isShowTourMarker) {
          createMapPoints_TourMarkers(allTourData, allMarkerPointsList);
       }
 
-      if (_mapConfig.isShowTourPauses) {
+      if (_isShowMapPoints && _mapConfig.isShowTourPauses) {
          createMapPoints_TourPauses(allTourData, allPausesPointsList);
       }
 
-      if (_mapConfig.isShowCommonLocation) {
+      if (_isShowMapPoints && _mapConfig.isShowCommonLocation) {
          createMapPoints_Locations_50_FromCommonLocations(_allCommonLocations, allCommonLocationPointsList);
       }
 
-      if (_mapConfig.isShowTourLocation) {
+      if (_isShowMapPoints && _mapConfig.isShowTourLocation) {
          createMapPoints_Locations_10_FromTourData(allTourData, allTourLocationPointsList);
          createMapPoints_Locations_20_FromTourLocations(_allTourLocations, allTourLocationPointsList);
       }
