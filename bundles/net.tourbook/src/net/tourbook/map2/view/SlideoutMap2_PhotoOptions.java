@@ -111,6 +111,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
    private Spinner               _spinnerImageSize_Large;
 
    private Link                  _linkDiscardImages;
+   private Link                  _linkResetPhotoTooltipSize;
 
    private ColorSelectorExtended _colorTourPauseLabel_Outline;
    private ColorSelectorExtended _colorTourPauseLabel_Fill;
@@ -392,7 +393,16 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
          _linkDiscardImages = new Link(parent, SWT.NONE);
          _linkDiscardImages.setText(UI.createLinkText(Messages.Slideout_Map_PhotoOptions_Link_DiscardCachedImages));
          _linkDiscardImages.setToolTipText(Messages.Slideout_Map_PhotoOptions_Link_DiscardCachedImages_Tooltip);
-         _linkDiscardImages.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onDiscardImages()));
+         _linkDiscardImages.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onLink_DiscardImages()));
+      }
+      {
+         /*
+          * Reset photo tooltip size
+          */
+         _linkResetPhotoTooltipSize = new Link(parent, SWT.NONE);
+         _linkResetPhotoTooltipSize.setText(UI.createLinkText(Messages.Slideout_Map_PhotoOptions_Link_ResetPhotoTooltipSize));
+         _linkResetPhotoTooltipSize.setToolTipText(Messages.Slideout_Map_PhotoOptions_Link_ResetPhotoTooltipSize_Tooltip);
+         _linkResetPhotoTooltipSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onLink_ResetPhotoTooltipSize()));
       }
    }
 
@@ -451,11 +461,16 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       enableControls();
    }
 
-   private void onDiscardImages() {
+   private void onLink_DiscardImages() {
 
       PhotoImageCache.disposeAll();
 
       repaintMap();
+   }
+
+   private void onLink_ResetPhotoTooltipSize() {
+
+      _map2View.getMap().resetPhotoTooltipSize();
    }
 
    private void onSwapPhotoColor() {

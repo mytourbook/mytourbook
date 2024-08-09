@@ -10234,6 +10234,11 @@ public class Map2 extends Canvas {
       _isMarkerClusterSelected = false;
    }
 
+   public void resetPhotoTooltipSize() {
+
+      _mapPointTooltip_Photo.resetPhotoTooltipSize();
+   }
+
    /**
     * Reset hovered tour data
     */

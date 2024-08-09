@@ -83,7 +83,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
    private static final String          STATE_TOOLTIP_SIZE_TINY           = "STATE_TOOLTIP_SIZE_TINY";                      //$NON-NLS-1$
    private static final int[]           STATE_TOOLTIP_SIZE_TINY_DEFAULT   = new int[] { 250, 250 };
    private static final int[]           STATE_TOOLTIP_SIZE_SMALL_DEFAULT  = new int[] { 500, 500 };
-   private static final int[]           STATE_TOOLTIP_SIZE_MEDIUM_DEFAULT = new int[] { 800, 800 };
+   static final int[]                   STATE_TOOLTIP_SIZE_MEDIUM_DEFAULT = new int[] { 800, 800 };
    private static final int[]           STATE_TOOLTIP_SIZE_LARGE_DEFAULT  = new int[] { 1000, 1000 };
 
    private final static IDialogSettings _state                            = TourbookPlugin.getState(ID);
@@ -747,6 +747,29 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       onTTShellResize(null);
    }
 
+   /**
+    * Reset the photo tooltip to the medium default size
+    */
+   public void resetPhotoTooltipSize() {
+      // TODO Auto-generated method stub
+
+      // update model
+      _selectedTooltipSize = STATE_TOOLTIP_SIZE_MEDIUM_DEFAULT;
+
+      final int comboIndex = 2;
+
+      _state.put(STATE_TOOLTIP_SIZE_INDEX, comboIndex);
+      Util.setState(_state, STATE_TOOLTIP_SIZE_MEDIUM, _selectedTooltipSize);
+
+      // update UI
+      if (_comboTooltipSize != null && _comboTooltipSize.isDisposed() == false) {
+
+         _comboTooltipSize.select(comboIndex);
+
+         onTTShellResize(null);
+      }
+   }
+
    @Override
    public void resetToDefaults() {
 
@@ -805,6 +828,18 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       case 3 -> _selectedTooltipSize = Util.getStateIntArray(_state, STATE_TOOLTIP_SIZE_LARGE, STATE_TOOLTIP_SIZE_LARGE_DEFAULT);
 
       }
+   }
+
+   /**
+    * Set the tooltip size to the requested size
+    *
+    * @param tooltipSize
+    */
+   public void setTooltipSize(final int[] tooltipSize) {
+
+      _selectedTooltipSize = tooltipSize;
+
+      resetToDefaults();
    }
 
    public void setupPhoto(final PaintedMapPoint hoveredMapPoint) {
