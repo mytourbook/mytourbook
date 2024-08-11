@@ -1,4 +1,4 @@
-24.8.0                                                 ?. August 2024
+24.8.0                                                 11. August 2024
 
 
 New
@@ -18,7 +18,13 @@ Improvements
 
 * Tour Chart
   - Paint photo point with better contrast color for the dark theme
+
   
+Bugs
+====
+
+See milestone 24.8 https://github.com/mytourbook/mytourbook/milestone/16?closed=1
+
 
 Translation    
 ===========
@@ -34,7 +40,7 @@ System
 
 * MyTourbook Milestone 24.8   https://github.com/mytourbook/mytourbook/milestone/16?closed=1
 * Java 17                     https://adoptium.net/temurin/releases/?version=17
-* Eclipse 2024-03 (4.31)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.31-202402290520/
+* Eclipse 2023-06 (4.28)      https://archive.eclipse.org/eclipse/downloads/drops4/R-4.28-202306050440/
 * NatTable 2.20               https://www.eclipse.org/nattable/download.php
 * Nebula Widgets              https://download.eclipse.org/nebula/releases/latest
 * FIT SDK 21.141.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
