@@ -1,4 +1,4 @@
-24.8.0                                                 ?. August 2024
+24.8.0                                                 11. August 2024
 
 
 New
@@ -18,7 +18,13 @@ Improvements
 
 * Tour Chart
   - Paint photo point with better contrast color for the dark theme
+
   
+Bugs
+====
+
+See milestone 24.8 https://github.com/mytourbook/mytourbook/milestone/16?closed=1
+
 
 Translation    
 ===========
