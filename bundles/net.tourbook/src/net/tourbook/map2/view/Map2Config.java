@@ -169,6 +169,11 @@ public class Map2Config {
    public org.eclipse.swt.graphics.Color photoFill_ColorSWT;
    public org.eclipse.swt.graphics.Color photoOutline_ColorSWT;
 
+   /*
+    * Waypoints
+    */
+   public boolean isShowTourWayPoint = true;
+
    private void logColor(final StringBuilder sb, final org.eclipse.swt.graphics.Color color, final String name) {
 
       sb.append("public static final RGB %-45s = new RGB(%d, %d, %d);\n" //$NON-NLS-1$

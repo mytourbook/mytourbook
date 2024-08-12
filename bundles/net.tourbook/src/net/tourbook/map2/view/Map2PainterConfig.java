@@ -50,7 +50,6 @@ public class Map2PainterConfig {
    public static boolean                    isShowPhotoTooltip;
    static boolean                           isShowTours;
    static boolean                           isShowTourStartEnd;
-   static boolean                           isShowWayPoints;
 
    /**
     * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is

@@ -91,7 +91,6 @@ public class Messages extends NLS {
    public static String Map_Action_ShowTourInfoInMap;
    public static String Map_Action_ShowTourWeatherInMap;
    public static String Map_Action_ShowValuePoint;
-   public static String Map_Action_ShowWayPoints;
    public static String Map_Action_SynchWith_TourLocations;
    public static String Map_Action_SynchWith_ValuePoint;
    public static String Map_Action_SynchWithSlider_Centered;

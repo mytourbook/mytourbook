@@ -2355,6 +2355,7 @@ public class Messages extends NLS {
    public static String        Slideout_MapPoints_Action_TourLocations_Tooltip;
    public static String        Slideout_MapPoints_Action_TourMarkers_Tooltip;
    public static String        Slideout_MapPoints_Action_TourPauses_Tooltip;
+   public static String        Slideout_MapPoints_Action_TourWayPoints_Tooltip;
    public static String        Slideout_MapPoints_Checkbox_AntialiasLabel;
    public static String        Slideout_MapPoints_Checkbox_ClusterTourMarkers;
    public static String        Slideout_MapPoints_Checkbox_ClusterTourMarkers_Tooltip;
@@ -2369,6 +2370,7 @@ public class Messages extends NLS {
    public static String        Slideout_MapPoints_Checkbox_ShowTourLocations_Tooltip;
    public static String        Slideout_MapPoints_Checkbox_ShowTourMarkers;
    public static String        Slideout_MapPoints_Checkbox_ShowTourPauses;
+   public static String        Slideout_MapPoints_Checkbox_ShowTourWayPoints;
    public static String        Slideout_MapPoints_Checkbox_TruncateLabel;
    public static String        Slideout_MapPoints_Checkbox_UseMapDimColor;
    public static String        Slideout_MapPoints_Label_ClusterSize_Tooltip;
@@ -2409,6 +2411,7 @@ public class Messages extends NLS {
    public static String        Slideout_MapPoints_Tab_TourMarkerGroups_Tooltip;
    public static String        Slideout_MapPoints_Tab_TourMarkers_Tooltip;
    public static String        Slideout_MapPoints_Tab_TourPauses_Tooltip;
+   public static String        Slideout_MapPoints_Tab_TourWayPoints_Tooltip;
 
    public static String        Slideout_MapModel_Column_Name;
    public static String        Slideout_MapModel_Dialog_DeleteModel_Message;

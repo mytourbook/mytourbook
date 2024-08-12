@@ -253,7 +253,7 @@ public abstract class AbstractRRShell {
    public void setShellLocation(final int x, final int y, final int flag) {
 
 // Sometimes, not very often, the tooltip location is running amok, this logging should help to find this issues
-//      
+//
 //      System.out.println(UI.timeStamp() + " setShellLocation: " + x + " / " + y);
 // TODO remove SYSTEM.OUT.PRINTLN
 
@@ -278,6 +278,7 @@ public abstract class AbstractRRShell {
 
    @Override
    public String toString() {
+
       return ("_isResizeable=" + _isResizeable) //$NON-NLS-1$
             + ("\tTrimWidth=" + _shellTrimWidth) //$NON-NLS-1$
             + ("\tTrimHeight=" + _shellTrimHeight) //$NON-NLS-1$

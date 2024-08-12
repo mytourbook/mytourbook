@@ -65,7 +65,6 @@ import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.SlideoutLocation;
 import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -109,7 +108,6 @@ import net.tourbook.map2.action.ActionShowStartEndInMap;
 import net.tourbook.map2.action.ActionShowTourInfoInMap;
 import net.tourbook.map2.action.ActionShowTourWeatherInMap;
 import net.tourbook.map2.action.ActionShowValuePoint;
-import net.tourbook.map2.action.ActionShowWayPoints;
 import net.tourbook.map2.action.ActionSyncMapWith_OtherMap;
 import net.tourbook.map2.action.ActionSyncMapWith_Photo;
 import net.tourbook.map2.action.ActionSyncMapWith_Slider_Centered;
@@ -237,7 +235,6 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_IS_SHOW_TOUR_WEATHER_IN_MAP                     = "STATE_IS_SHOW_TOUR_WEATHER_IN_MAP";                //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_VALUE_POINT                             = "STATE_IS_SHOW_VALUE_POINT";                           //$NON-NLS-1$
    private static final boolean  STATE_IS_SHOW_VALUE_POINT_DEFAULT                     = true;
-   private static final String   STATE_IS_SHOW_WAY_POINTS                              = "STATE_IS_SHOW_WAY_POINTS";                            //$NON-NLS-1$
    static final String           STATE_IS_TOGGLE_KEYBOARD_PANNING                      = "STATE_IS_TOGGLE_KEYBOARD_PANNING";                    //$NON-NLS-1$
    static final boolean          STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT              = true;
 
@@ -371,11 +368,10 @@ public class Map2View extends ViewPart implements
    //
    //
    private final TourInfoIconToolTipProvider _tourInfoToolTipProvider    = new TourInfoIconToolTipProvider(TOUR_INFO_TOOLTIP_X, TOUR_INFO_TOOLTIP_Y);
+   private ValuePoint_ToolTip_UI             _valuePointTooltipUI;
    private final TourWeatherToolTipProvider  _tourWeatherToolTipProvider = new TourWeatherToolTipProvider(
          TOUR_WEATHER_TOOLTIP_X,
          TOUR_WEATHER_TOOLTIP_Y);
-   private final ITourToolTipProvider        _wayPointToolTipProvider    = new WayPointToolTipProvider();
-   private ValuePoint_ToolTip_UI             _valuePointTooltipUI;
    //
    private DirectMappingPainter              _directMappingPainter;
    //
@@ -526,7 +522,6 @@ public class Map2View extends ViewPart implements
    private ActionShowTourInfoInMap           _actionShowTourInfoInMap;
    private ActionShowTourWeatherInMap        _actionShowTourWeatherInMap;
    private ActionShowValuePoint              _actionShowValuePoint;
-   private ActionShowWayPoints               _actionShowWayPoints;
    private ActionZoomLevelAdjustment         _actionZoomLevelAdjustment;
    //
    private ActionSyncMap                     _actionMap2Slideout_SyncMap;
@@ -1316,21 +1311,6 @@ public class Map2View extends ViewPart implements
       _map.paint();
    }
 
-   public void actionSetShowWayPointsInMap() {
-
-      final boolean isShowWayPoints = _actionShowWayPoints.isChecked();
-      if (isShowWayPoints) {
-         _tourToolTip.addToolTipProvider(_wayPointToolTipProvider);
-      } else {
-         _tourToolTip.removeToolTipProvider(_wayPointToolTipProvider);
-      }
-
-      Map2PainterConfig.isShowWayPoints = isShowWayPoints;
-
-      _map.disposeOverlayImageCache();
-      _map.paint();
-   }
-
    public void actionSetTourColor(final MapGraphId colorId) {
 
       /*
@@ -2030,7 +2010,6 @@ public class Map2View extends ViewPart implements
       _actionShowTour                     = new ActionShowTour();
       _actionShowTourInfoInMap            = new ActionShowTourInfoInMap(this);
       _actionShowTourWeatherInMap         = new ActionShowTourWeatherInMap(this);
-      _actionShowWayPoints                = new ActionShowWayPoints(this);
       _actionZoomLevelAdjustment          = new ActionZoomLevelAdjustment();
 
       // map sync actions
@@ -2366,7 +2345,6 @@ public class Map2View extends ViewPart implements
       _actionShowTourInfoInMap            .setEnabled(isOneTourDisplayed);
       _actionShowTour                     .setEnabled(_isTourPainted);
       _actionShowTourWeatherInMap         .setEnabled(isTourAvailable);
-      _actionShowWayPoints                .setEnabled(_isTourPainted);
       _actionZoom_CenterMapBy             .setEnabled(true);
       _actionZoom_ShowEntireTour          .setEnabled(_isTourPainted && isTourAvailable);
       _actionZoomLevelAdjustment          .setEnabled(isTourAvailable);
@@ -2528,7 +2506,6 @@ public class Map2View extends ViewPart implements
           * Show tour features
           */
          menuMgr.add(new Separator());
-         menuMgr.add(_actionShowWayPoints);
          menuMgr.add(_actionShowPOI);
          menuMgr.add(_actionShowStartEndInMap);
          if (isShowTrackColor_InContextMenu()) {
@@ -3883,7 +3860,7 @@ public class Map2View extends ViewPart implements
             paintTours_20_One(tourData, false);
 
             // delay to show the poi otherwise the map is being painted OVER the poi !!!
-            _map.getDisplay().timerExec(500, () -> _map.setPOI(_wayPointToolTipProvider, wp));
+//            _map.getDisplay().timerExec(500, () -> _map.setPOI(_wayPointToolTipProvider, wp));
 
             enableActions();
          }
@@ -4664,14 +4641,6 @@ public class Map2View extends ViewPart implements
       _actionShowStartEndInMap.setChecked(_state.getBoolean(STATE_IS_SHOW_START_END_IN_MAP));
       Map2PainterConfig.isShowTourStartEnd = _actionShowStartEndInMap.isChecked();
 
-      // show way points
-      final boolean isShowWayPoints = Util.getStateBoolean(_state, STATE_IS_SHOW_WAY_POINTS, true);
-      _actionShowWayPoints.setChecked(isShowWayPoints);
-      Map2PainterConfig.isShowWayPoints = isShowWayPoints;
-      if (isShowWayPoints) {
-         _tourToolTip.addToolTipProvider(_wayPointToolTipProvider);
-      }
-
       // show tour info in map
       final boolean isShowTourInfo = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_INFO_IN_MAP, true);
       _actionShowTourInfoInMap.setChecked(isShowTourInfo);
@@ -4874,7 +4843,6 @@ public class Map2View extends ViewPart implements
       _state.put(STATE_IS_SHOW_SLIDER_IN_LEGEND,                  _actionShowSliderInLegend.isChecked());
       _state.put(STATE_IS_SHOW_TOUR_INFO_IN_MAP,                  _actionShowTourInfoInMap.isChecked());
       _state.put(STATE_IS_SHOW_TOUR_WEATHER_IN_MAP,               _actionShowTourWeatherInMap.isChecked());
-      _state.put(STATE_IS_SHOW_WAY_POINTS,                        _actionShowWayPoints.isChecked());
 
       Util.setStateEnum(_state, STATE_CENTER_MAP_BY,              _map.getCenterMapBy());
 

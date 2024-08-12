@@ -785,11 +785,11 @@ public class TourMapPainter extends Map2Painter {
 
    @Override
    public boolean doPaint(final GC gcTile,
-                             final Map2 map,
-                             final Tile tile,
-                             final int parts,
-                             final boolean isFastPainting,
-                             final int fastPainting_SkippedValues) {
+                          final Map2 map,
+                          final Tile tile,
+                          final int parts,
+                          final boolean isFastPainting,
+                          final int fastPainting_SkippedValues) {
 
       _isFastPainting = isFastPainting;
       _fastPainting_SkippedValues = fastPainting_SkippedValues;
@@ -938,69 +938,66 @@ public class TourMapPainter extends Map2Painter {
          _colorCache.dispose();
       }
 
-      if (Map2PainterConfig.isShowWayPoints) {
-
-         // draw marker/pauses above the tour
-
-         for (final TourData tourData : allTourData) {
-
-            if (tourData == null) {
-               continue;
-            }
-
-            // check if geo position is available
-            final double[] latitudeSerie = tourData.latitudeSerie;
-            final double[] longitudeSerie = tourData.longitudeSerie;
-            if (latitudeSerie == null || longitudeSerie == null) {
-               continue;
-            }
-
-            setDataSerie(tourData);
-
-            if (Map2PainterConfig.isShowWayPoints) {
-
-               // check if way points are available
-               final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
-               if (wayPoints.size() > 0) {
-
-                  /*
-                   * world positions are cached to optimize performance
-                   */
-                  final MP mp = map.getMapProvider();
-                  final int projectionHash = mp.getProjection().getId().hashCode();
-                  final int mapZoomLevel = map.getZoom();
-
-                  IntObjectHashMap<Point> allWayPointWorldPixel = tourData.getWorldPositionForWayPoints(
-                        projectionHash,
-                        mapZoomLevel);
-
-                  if ((allWayPointWorldPixel == null)) {
-                     allWayPointWorldPixel = setupWorldPixel_WayPoint(
-                           tourData,
-                           wayPoints,
-                           mp,
-                           projectionHash,
-                           mapZoomLevel);
-                  }
-
-                  // draw tour way points
-
-                  int numWayPoints = 0;
-
-                  for (final TourWayPoint tourWayPoint : wayPoints) {
-
-                     final Point twpWorldPixel = allWayPointWorldPixel.get(tourWayPoint.hashCode());
-
-                     if (drawTourWayPoint(gcTile, map, tile, tourWayPoint, twpWorldPixel)) {
-                        numWayPoints++;
-                     }
-                  }
-
-                  isContentInTile = isContentInTile || numWayPoints > 0;
-               }
-            }
-         }
-      }
+//      if (Map2PainterConfig.isShowWayPoints) {
+//
+//         // draw marker/pauses above the tour
+//
+//         for (final TourData tourData : allTourData) {
+//
+//            if (tourData == null) {
+//               continue;
+//            }
+//
+//            // check if geo position is available
+//            final double[] latitudeSerie = tourData.latitudeSerie;
+//            final double[] longitudeSerie = tourData.longitudeSerie;
+//            if (latitudeSerie == null || longitudeSerie == null) {
+//               continue;
+//            }
+//
+//            setDataSerie(tourData);
+//
+//            // check if way points are available
+//            final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
+//            if (wayPoints.size() > 0) {
+//
+//               /*
+//                * world positions are cached to optimize performance
+//                */
+//               final MP mp = map.getMapProvider();
+//               final int projectionHash = mp.getProjection().getId().hashCode();
+//               final int mapZoomLevel = map.getZoom();
+//
+//               IntObjectHashMap<Point> allWayPointWorldPixel = tourData.getWorldPositionForWayPoints(
+//                     projectionHash,
+//                     mapZoomLevel);
+//
+//               if ((allWayPointWorldPixel == null)) {
+//                  allWayPointWorldPixel = setupWorldPixel_WayPoint(
+//                        tourData,
+//                        wayPoints,
+//                        mp,
+//                        projectionHash,
+//                        mapZoomLevel);
+//               }
+//
+//               // draw tour way points
+//
+//               int numWayPoints = 0;
+//
+//               for (final TourWayPoint tourWayPoint : wayPoints) {
+//
+//                  final Point twpWorldPixel = allWayPointWorldPixel.get(tourWayPoint.hashCode());
+//
+//                  if (drawTourWayPoint(gcTile, map, tile, tourWayPoint, twpWorldPixel)) {
+//                     numWayPoints++;
+//                  }
+//               }
+//
+//               isContentInTile = isContentInTile || numWayPoints > 0;
+//            }
+//         }
+//      }
 
       return isContentInTile;
    }
@@ -1673,14 +1670,14 @@ public class TourMapPainter extends Map2Painter {
 
          gcTile.drawImage(_tourWayPointImage, devX, devY);
 
-         tile.addTourWayPointBounds(
-               twp,
-               new Rectangle(
-                     devX,
-                     devY,
-                     _twpImageBounds.width,
-                     _twpImageBounds.height),
-               zoomLevel);
+//         tile.addTourWayPointBounds(
+//               twp,
+//               new Rectangle(
+//                     devX,
+//                     devY,
+//                     _twpImageBounds.width,
+//                     _twpImageBounds.height),
+//               zoomLevel);
       }
 
       return isBoundsInTile;

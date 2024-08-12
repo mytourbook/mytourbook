@@ -61,7 +61,8 @@ Improvements
 Changes
 =======
 
-* 
+* Map2
+  - Show waypoints action in the context menu is moved into the map points slideout
 
 
 

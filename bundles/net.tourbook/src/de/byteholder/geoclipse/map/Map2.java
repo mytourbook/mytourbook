@@ -401,7 +401,7 @@ public class Map2 extends Canvas {
    /*
     * Map points
     */
-   private boolean                         _isShowMapPoints;
+   private boolean                         _isMapPointVisible;
 
    private final ExecutorService           _mapPointPainter_Executor        = createMapPoint_PainterThread();
    private Future<?>                       _mapPointPainter_Task;
@@ -437,6 +437,7 @@ public class Map2 extends Canvas {
    private List<PaintedMapPoint>           _allPaintedCommonLocations       = new ArrayList<>();
    private List<PaintedMapPoint>           _allPaintedTourLocations         = new ArrayList<>();
    private List<PaintedMapPoint>           _allPaintedMarkers               = new ArrayList<>();
+   private List<PaintedMapPoint>           _allPaintedWaypoints             = new ArrayList<>();
    private List<PaintedMarkerCluster>      _allPaintedMarkerClusters        = new ArrayList<>();
    private List<PaintedMapPoint>           _allPaintedPauses                = new ArrayList<>();
    private List<PaintedMapPoint>           _allPaintedPhotos                = new ArrayList<>();
@@ -464,10 +465,12 @@ public class Map2 extends Canvas {
    private int                             _numStatistics_AllCommonLocations;
    private int                             _numStatistics_AllTourMarkers;
    private int                             _numStatistics_AllTourLocations;
+   private int                             _numStatistics_AllTourWayPoints;
    private int                             _numStatistics_AllTourPauses;
    private int                             _numStatistics_AllTourPhotos;
 
    private boolean                         _numStatistics_AllTourMarkers_IsTruncated;
+   private boolean                         _numStatistics_AllTourWayPoints_IsTruncated;
    private boolean                         _numStatistics_AllTourPauses_IsTruncated;
    private boolean                         _numStatistics_AllTourPhotos_IsTruncated;
 
@@ -2257,6 +2260,12 @@ public class Map2 extends Canvas {
             break;
          }
       }
+   }
+
+   private void createMapPoints_TourWayPoints(final List<TourData> allTourData,
+                                              final List<Map2Point> allWayPointPointsList) {
+      // TODO Auto-generated method stub
+
    }
 
    public void deleteFailedImageFiles() {
@@ -5235,7 +5244,7 @@ public class Map2 extends Canvas {
          {
             paint_30_Tiles(gcMapImage);
 
-            if (_isShowMapPoints || Map2PainterConfig.isShowPhotos) {
+            if (_isMapPointVisible || Map2PainterConfig.isShowPhotos) {
                paint_40_MapPoints(gcMapImage);
             }
 
@@ -6654,6 +6663,10 @@ public class Map2 extends Canvas {
                _numStatistics_AllTourMarkers,
                _numStatistics_AllTourMarkers_IsTruncated,
 
+               _allPaintedWaypoints.size(),
+               _numStatistics_AllTourWayPoints,
+               _numStatistics_AllTourWayPoints_IsTruncated,
+
                _allPaintedPauses.size(),
                _numStatistics_AllTourPauses,
                _numStatistics_AllTourPauses_IsTruncated,
@@ -6706,6 +6719,7 @@ public class Map2 extends Canvas {
       final List<PaintedMarkerCluster> allPaintedMarkerClusters   = new ArrayList<>();
       final List<PaintedMapPoint>      allPaintedPauses           = new ArrayList<>();
       final List<PaintedMapPoint>      allPaintedPhotos           = new ArrayList<>();
+      final List<PaintedMapPoint>      allPaintedWayPoints        = new ArrayList<>();
 
 // SET_FORMATTING_ON
 
@@ -6733,7 +6747,8 @@ public class Map2 extends Canvas {
                      allPaintedMarkers,
                      allPaintedMarkerClusters,
                      allPaintedPauses,
-                     allPaintedPhotos);
+                     allPaintedPhotos,
+                     allPaintedWayPoints);
 
             } else {
 
@@ -6743,7 +6758,8 @@ public class Map2 extends Canvas {
                      allPaintedTourLocations,
                      allPaintedMarkers,
                      allPaintedPauses,
-                     allPaintedPhotos);
+                     allPaintedPhotos,
+                     allPaintedWayPoints);
             }
 
             if (_hoveredMarkerCluster != null) {
@@ -6852,32 +6868,38 @@ public class Map2 extends Canvas {
                                                  final List<PaintedMapPoint> allPaintedTourLocations,
                                                  final List<PaintedMapPoint> allPaintedMarkers,
                                                  final List<PaintedMapPoint> allPaintedPauses,
-                                                 final List<PaintedMapPoint> allPaintedPhotos) {
+                                                 final List<PaintedMapPoint> allPaintedPhotos,
+                                                 final List<PaintedMapPoint> allPaintedWayPoints) {
 
       final List<Map2Point> allCommonLocationPointsList = new ArrayList<>();
       final List<Map2Point> allTourLocationPointsList = new ArrayList<>();
       final List<Map2Point> allMarkerPointsList = new ArrayList<>();
       final List<Map2Point> allPausesPointsList = new ArrayList<>();
       final List<Map2Point> allPhotoPointsList = new ArrayList<>();
+      final List<Map2Point> allWayPointPointsList = new ArrayList<>();
 
       /*
        * Create map points
        */
-      if (_isShowMapPoints && _mapConfig.isShowTourMarker) {
+      if (_isMapPointVisible && _mapConfig.isShowTourMarker) {
          createMapPoints_TourMarkers(allTourData, allMarkerPointsList);
       }
 
-      if (_isShowMapPoints && _mapConfig.isShowTourPauses) {
+      if (_isMapPointVisible && _mapConfig.isShowTourPauses) {
          createMapPoints_TourPauses(allTourData, allPausesPointsList);
       }
 
-      if (_isShowMapPoints && _mapConfig.isShowCommonLocation) {
+      if (_isMapPointVisible && _mapConfig.isShowCommonLocation) {
          createMapPoints_Locations_50_FromCommonLocations(_allCommonLocations, allCommonLocationPointsList);
       }
 
-      if (_isShowMapPoints && _mapConfig.isShowTourLocation) {
+      if (_isMapPointVisible && _mapConfig.isShowTourLocation) {
          createMapPoints_Locations_10_FromTourData(allTourData, allTourLocationPointsList);
          createMapPoints_Locations_20_FromTourLocations(_allTourLocations, allTourLocationPointsList);
+      }
+
+      if (_isMapPointVisible && _mapConfig.isShowTourWayPoint) {
+         createMapPoints_TourWayPoints(allTourData, allWayPointPointsList);
       }
 
       if (Map2PainterConfig.isShowPhotos) {
@@ -6898,6 +6920,7 @@ public class Map2 extends Canvas {
          final Map2Point[] allMarkerPoints = allMarkerPointsList.toArray(new Map2Point[allMarkerPointsList.size()]);
          final Map2Point[] allPausePoints = allPausesPointsList.toArray(new Map2Point[allPausesPointsList.size()]);
          final Map2Point[] allPhotoPoints = allPhotoPointsList.toArray(new Map2Point[allPhotoPointsList.size()]);
+         final Map2Point[] allWayPointPoints = allWayPointPointsList.toArray(new Map2Point[allWayPointPointsList.size()]);
 
          paint_MapPointImage_50_AllCollectedItems(g2d,
 
@@ -6916,6 +6939,9 @@ public class Map2 extends Canvas {
                allPhotoPoints,
                allPaintedPhotos,
 
+               allWayPointPoints,
+               allPaintedWayPoints,
+
                false, // isPaintClusterMarker
                null // allClusterRectangle
          );
@@ -6929,7 +6955,8 @@ public class Map2 extends Canvas {
                                                            final List<PaintedMapPoint> allPaintedMarkers,
                                                            final List<PaintedMarkerCluster> allPaintedMarkerClusters,
                                                            final List<PaintedMapPoint> allPaintedPauses,
-                                                           final List<PaintedMapPoint> allPaintedPhotos) {
+                                                           final List<PaintedMapPoint> allPaintedPhotos,
+                                                           final List<PaintedMapPoint> allPaintedWayPoints) {
 
       final Map<String, Map2Point> allMarkersOnlyMap = new HashMap<>();
       final List<Map2Point> allMarkersOnlyList = new ArrayList<>();
@@ -6994,6 +7021,7 @@ public class Map2 extends Canvas {
       final List<Map2Point> allTourLocationPointList = new ArrayList<>();
       final List<Map2Point> allPausesPointsList = new ArrayList<>();
       final List<Map2Point> allPhotoPointsList = new ArrayList<>();
+      final List<Map2Point> allWayPointPointsList = new ArrayList<>();
 
       if (_mapConfig.isShowTourPauses) {
          createMapPoints_TourPauses(allTourData, allPausesPointsList);
@@ -7046,6 +7074,7 @@ public class Map2 extends Canvas {
       final int numMarkers = allMarkersOnlyList.size();
       final int numPauses = allPausesPointsList.size();
       final int numPhotos = allPhotoPointsList.size();
+      final int numWayPoints = allWayPointPointsList.size();
 
       if (numMarkers > 0
             || numCommonLocations > 0
@@ -7058,6 +7087,7 @@ public class Map2 extends Canvas {
          final Map2Point[] allPausePoints = allPausesPointsList.toArray(new Map2Point[numPauses]);
          final Map2Point[] allPhotoPoints = allPhotoPointsList.toArray(new Map2Point[numPhotos]);
          final Rectangle[] allClusterRectangle = allClusterSymbolRectangleOnly.toArray(new Rectangle[allClusterSymbolRectangleOnly.size()]);
+         final Map2Point[] allWayPointPoints = allWayPointPointsList.toArray(new Map2Point[numWayPoints]);
 
          paint_MapPointImage_50_AllCollectedItems(g2d,
 
@@ -7075,6 +7105,9 @@ public class Map2 extends Canvas {
 
                allPhotoPoints,
                allPaintedPhotos,
+
+               allWayPointPoints,
+               allPaintedWayPoints,
 
                false,
                allClusterRectangle);
@@ -7131,6 +7164,9 @@ public class Map2 extends Canvas {
             null,
 
             null, // photos
+            null,
+
+            null, // way points
             null,
 
             true, // isPaintClusterMarker
@@ -7275,6 +7311,8 @@ public class Map2 extends Canvas {
     * @param allPaintedPauses
     * @param allPaintedPhotos
     * @param allPhotoPoints
+    * @param allPaintedWayPoints
+    * @param allWayPointPoints
     * @param isPaintClusterMarker
     * @param allClusterSymbolRectangle
     *
@@ -7296,6 +7334,9 @@ public class Map2 extends Canvas {
 
                                                         final Map2Point[] allPhotoPoints,
                                                         final List<PaintedMapPoint> allPaintedPhotos,
+
+                                                        final Map2Point[] allWayPointPoints,
+                                                        final List<PaintedMapPoint> allPaintedWayPoints,
 
                                                         final boolean isPaintClusterMarker,
                                                         final Rectangle[] allClusterSymbolRectangle) {
@@ -10401,7 +10442,7 @@ public class Map2 extends Canvas {
 
    public void setShowMapPoint(final boolean isShowMapPoint) {
 
-      _isShowMapPoints = isShowMapPoint;
+      _isMapPointVisible = isShowMapPoint;
 
       // prevent that hovered map points are displayed when map points are hidden, this happened
       _allPaintedClusterMarkers.clear();
