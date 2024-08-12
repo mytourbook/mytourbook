@@ -67,6 +67,7 @@ import org.eclipse.nebula.widgets.nattable.print.command.TurnViewportOnCommand;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.resize.command.InitializeAutoResizeColumnsCommand;
 import org.eclipse.nebula.widgets.nattable.util.GCFactory;
+import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -141,6 +142,12 @@ public class ColumnManager {
     * 1000 would be too small on high-dpi displays
     */
    static final int            COLUMN_WIDTH_MAXIMUM                      = 5_000;
+
+   /**
+    * This is needed to adjust 4k display column widths, otherwise they get smaler and smaler every
+    * time when they are retrieved from the NatTable
+    */
+   private static float        _dpiScaleFactor                           = -1;
 
    /*
     * Value formatter
@@ -1552,11 +1559,10 @@ public class ColumnManager {
             final ColumnDefinition colDef = getColDef_ByCreateIndex(colIndexByPos);
             if (colDef != null) {
 
-               final int colWidthByPos = dataLayer.getColumnWidthByPosition(reorderColIndex);
-
+               final int columnWidth = getColumnWidth_NatTable(dataLayer, reorderColIndex);
                final String columnId = colDef.getColumnId();
 
-               setColumnIdAndWidth(allColumnIdsAndWidth, columnId, colWidthByPos);
+               setColumnIdAndWidth(allColumnIdsAndWidth, columnId, columnWidth);
             }
          }
 
@@ -1727,6 +1733,25 @@ public class ColumnManager {
       }
 
       return columnWidth;
+   }
+
+   private int getColumnWidth_NatTable(final DataLayer dataLayer, final int createdColumnIndex) {
+
+      int colWidthByPos = dataLayer.getColumnWidthByPosition(createdColumnIndex);
+
+      if (UI.IS_4K_DISPLAY) {
+
+         if (_dpiScaleFactor == -1) {
+
+            final int displayDpi = Display.getDefault().getDPI().x;
+
+            _dpiScaleFactor = GUIHelper.getDpiFactor(displayDpi);
+         }
+
+         colWidthByPos = (int) (colWidthByPos / _dpiScaleFactor);
+      }
+
+      return colWidthByPos;
    }
 
    /**
@@ -2357,12 +2382,11 @@ public class ColumnManager {
          final ColumnDefinition colDef = getColDef_ByCreateIndex(colIndexByPos);
          if (colDef != null) {
 
-            final int colWidthByPos = dataLayer.getColumnWidthByPosition(createdColumnIndex);
-
+            final int columnWidth = getColumnWidth_NatTable(dataLayer, createdColumnIndex);
             final String columnId = colDef.getColumnId();
 
             allOrderedColumnIds.add(columnId);
-            setColumnIdAndWidth(allColumnIdsAndWidth, columnId, colWidthByPos);
+            setColumnIdAndWidth(allColumnIdsAndWidth, columnId, columnWidth);
          }
       }
 
