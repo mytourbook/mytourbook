@@ -1371,18 +1371,27 @@ public abstract class AdvancedSlideoutShell {
       final Point newContentSize = onResize(newContentWidth, newContentHeight);
       if (newContentSize != null) {
 
-         newContentWidth = newContentSize.x;
-         newContentHeight = newContentSize.y;
+         /**
+          * Set new content size only when it has changed, otherwise there can be strange resizing
+          * issues when the shell is resized with the mouse
+          * https://github.com/mytourbook/mytourbook/issues/1393
+          */
 
-         if (isVerticalLayout()) {
-            _vertContentWidth = newContentWidth;
-            _vertContentHeight = newContentHeight;
-         } else {
-            _horizContentWidth = newContentWidth;
-            _horizContentHeight = newContentHeight;
+         if (newContentWidth != newContentSize.x || newContentHeight != newContentSize.y) {
+
+            newContentWidth = newContentSize.x;
+            newContentHeight = newContentSize.y;
+
+            if (isVerticalLayout()) {
+               _vertContentWidth = newContentWidth;
+               _vertContentHeight = newContentHeight;
+            } else {
+               _horizContentWidth = newContentWidth;
+               _horizContentHeight = newContentHeight;
+            }
+
+            isResizeAdjusted = true;
          }
-
-         isResizeAdjusted = true;
       }
 
       if (isResizeAdjusted) {
