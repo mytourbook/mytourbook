@@ -15,19 +15,13 @@
  *******************************************************************************/
 package net.tourbook.nutrition;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.data.TourData;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider2;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -141,7 +135,7 @@ public class TourNutritionProductMenuManager {
             continue;
          }
 
-         final long TourNutritionProductId = TourNutritionProduct.getTypeId();
+         final long TourNutritionProductId = 1L;//TourNutritionProduct.getTypeId();
 
          if (isEnabled) {
 
@@ -166,9 +160,9 @@ public class TourNutritionProductMenuManager {
                // set tour type image
 //					final Image TourNutritionProductImage = UI.getInstance().getTourNutritionProductImage(TourNutritionProductId);
 //					actionRecentTourNutritionProduct.setImageDescriptor(ImageDescriptor.createFromImage(TourNutritionProductImage));
-
-               actionRecentTourNutritionProduct.setImageDescriptor(TourNutritionProductImage.getTourNutritionProductImageDescriptor(
-                     TourNutritionProductId));
+//
+//               actionRecentTourNutritionProduct.setImageDescriptor(TourNutritionProductImage.getTourNutritionProductImageDescriptor(
+//                     TourNutritionProductId));
             }
 
          } else {
@@ -248,22 +242,22 @@ public class TourNutritionProductMenuManager {
       /*
        * get all tour types from the database which are saved in the state
        */
-      final ArrayList<TourNutritionProduct> dbTourNutritionProducts = TourDatabase.getAllTourNutritionProducts();
-      for (final String stateTourNutritionProductIdItem : allStateTourNutritionProductIds) {
-         try {
-
-            final long stateTourNutritionProductId = Long.parseLong(stateTourNutritionProductIdItem);
-
-            for (final TourNutritionProduct dbTourNutritionProduct : dbTourNutritionProducts) {
-               if (dbTourNutritionProduct.getTypeId() == stateTourNutritionProductId) {
-                  _recentTourNutritionProducts.add(dbTourNutritionProduct);
-                  break;
-               }
-            }
-         } catch (final NumberFormatException e) {
-            // ignore
-         }
-      }
+//      final ArrayList<TourNutritionProduct> dbTourNutritionProducts = TourDatabase.getAllTourNutritionProducts();
+//      for (final String stateTourNutritionProductIdItem : allStateTourNutritionProductIds) {
+//         try {
+//
+//            final long stateTourNutritionProductId = Long.parseLong(stateTourNutritionProductIdItem);
+//
+//            for (final TourNutritionProduct dbTourNutritionProduct : dbTourNutritionProducts) {
+//               if (dbTourNutritionProduct.getTypeId() == stateTourNutritionProductId) {
+//                  _recentTourNutritionProducts.add(dbTourNutritionProduct);
+//                  break;
+//               }
+//            }
+//         } catch (final NumberFormatException e) {
+//            // ignore
+//         }
+//      }
    }
 
    public static void saveState() {
@@ -274,15 +268,15 @@ public class TourNutritionProductMenuManager {
       }
 
       final String[] stateTourNutritionProductIds = new String[Math.min(_maxTourNutritionProducts, _recentTourNutritionProducts.size())];
-      int TourNutritionProductIndex = 0;
+      final int TourNutritionProductIndex = 0;
 
-      for (final TourNutritionProduct recentTourNutritionProduct : _recentTourNutritionProducts) {
-         stateTourNutritionProductIds[TourNutritionProductIndex++] = Long.toString(recentTourNutritionProduct.getTypeId());
-
-         if (TourNutritionProductIndex == _maxTourNutritionProducts) {
-            break;
-         }
-      }
+//      for (final TourNutritionProduct recentTourNutritionProduct : _recentTourNutritionProducts) {
+//         stateTourNutritionProductIds[TourNutritionProductIndex++] = Long.toString(recentTourNutritionProduct.getTypeId());
+//
+//         if (TourNutritionProductIndex == _maxTourNutritionProducts) {
+//            break;
+//         }
+//      }
 
       _state.put(STATE_TOUR_TYPE_ID, stateTourNutritionProductIds);
    }
@@ -310,28 +304,28 @@ public class TourNutritionProductMenuManager {
       final Runnable runnable = () -> {
 
          // set tour type in all tours (without tours which are opened in an editor)
-         for (final TourData tourData : selectedTours) {
-            tourData.setTourNutritionProduct(TourNutritionProduct);
-         }
-
-         // keep tour type for the recent menu
-         addRecentTourNutritionProduct(TourNutritionProduct);
-
-         if (isSaveTour) {
-
-            // save all tours with the modified tour type
-            TourManager.saveModifiedTours(selectedTours);
-
-         } else {
-
-            // tours are not saved but the tour provider must be notified
-
-            if (tourProvider instanceof ITourProvider2) {
-               ((ITourProvider2) tourProvider).toursAreModified(selectedTours);
-            } else {
-               TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
-            }
-         }
+//         for (final TourData tourData : selectedTours) {
+//            tourData.setTourNutritionProduct(TourNutritionProduct);
+//         }
+//
+//         // keep tour type for the recent menu
+//         addRecentTourNutritionProduct(TourNutritionProduct);
+//
+//         if (isSaveTour) {
+//
+//            // save all tours with the modified tour type
+//            TourManager.saveModifiedTours(selectedTours);
+//
+//         } else {
+//
+//            // tours are not saved but the tour provider must be notified
+//
+//            if (tourProvider instanceof ITourProvider2) {
+//               ((ITourProvider2) tourProvider).toursAreModified(selectedTours);
+//            } else {
+//               TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
+//            }
+//         }
 
       };
       BusyIndicator.showWhile(Display.getCurrent(), runnable);
@@ -342,25 +336,25 @@ public class TourNutritionProductMenuManager {
     */
    private static void updateTourNutritionProducts() {
 
-      final ArrayList<TourNutritionProduct> dbTourNutritionProducts = TourDatabase.getAllTourNutritionProducts();
-      final LinkedList<TourNutritionProduct> validTourNutritionProducts = new LinkedList<>();
-
-      // check if the tour types are still available
-      for (final TourNutritionProduct recentTourNutritionProduct : _recentTourNutritionProducts) {
-
-         final long recentTypeId = recentTourNutritionProduct.getTypeId();
-
-         for (final TourNutritionProduct dbTourNutritionProduct : dbTourNutritionProducts) {
-
-            if (recentTypeId == dbTourNutritionProduct.getTypeId()) {
-               validTourNutritionProducts.add(dbTourNutritionProduct);
-               break;
-            }
-         }
-      }
+//      final ArrayList<TourNutritionProduct> dbTourNutritionProducts = TourDatabase.getAllTourNutritionProducts();
+//      final LinkedList<TourNutritionProduct> validTourNutritionProducts = new LinkedList<>();
+//
+//      // check if the tour types are still available
+//      for (final TourNutritionProduct recentTourNutritionProduct : _recentTourNutritionProducts) {
+//
+//         final long recentTypeId = recentTourNutritionProduct.getTypeId();
+//
+//         for (final TourNutritionProduct dbTourNutritionProduct : dbTourNutritionProducts) {
+//
+//            if (recentTypeId == dbTourNutritionProduct.getTypeId()) {
+//               validTourNutritionProducts.add(dbTourNutritionProduct);
+//               break;
+//            }
+//         }
+//      }
 
       // set updated list
       _recentTourNutritionProducts.clear();
-      _recentTourNutritionProducts = validTourNutritionProducts;
+      // _recentTourNutritionProducts = validTourNutritionProducts;
    }
 }
