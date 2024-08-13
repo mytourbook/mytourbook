@@ -22,4 +22,5 @@ public enum MapPointType {
    TOUR_MARKER, //
    TOUR_PAUSE, //
    TOUR_PHOTO, //
+   TOUR_WAY_POINT, //
 }

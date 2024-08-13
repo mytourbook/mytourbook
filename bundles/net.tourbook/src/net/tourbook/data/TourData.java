@@ -1602,22 +1602,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private final IntObjectHashMap<Point[]>                    _tourWorldPosition   = new IntObjectHashMap<>();
 
    /**
-    * Caches the world positions for the way point lat/long values for each zoom level
-    */
-   @Transient
-   private final IntObjectHashMap<IntObjectHashMap<Point>>   _twpWorldPosition    = new IntObjectHashMap<>();
-
-   /**
     * Cashes tour tile hashes for each zoom level
     */
    @Transient
    private final IntObjectHashMap<IntHashSet>                _tileHashes_Tours     = new IntObjectHashMap<>();
-
-   /**
-    * Cashes way point tile hashes for each zoom level
-    */
-   @Transient
-   private final IntObjectHashMap<IntHashSet>                _tileHashes_WayPoints       = new IntObjectHashMap<>();
 
    /**
     * When a tour was deleted and is still visible in the raw data view, resaving the tour or
@@ -2543,7 +2531,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       _tourWorldPosition.clear();
       _tileHashes_Tours.clear();
-      _tileHashes_WayPoints.clear();
    }
 
    /**
@@ -10633,11 +10620,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       return _tileHashes_Tours.get(projectionHash + mapZoomLevel);
    }
 
-   public IntHashSet getTileHashes_ForWayPoints(final int projectionHash, final int mapZoomLevel) {
-
-      return _tileHashes_WayPoints.get(projectionHash + mapZoomLevel);
-   }
-
    /**
     * @return Returns time data serie in floating points which is used for drawing charts.
     */
@@ -11214,16 +11196,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public Point[] getWorldPositionForTour(final int projectionHash, final int zoomLevel) {
 
       return _tourWorldPosition.get(projectionHash + zoomLevel);
-   }
-
-   /**
-    * @param zoomLevel
-    * @param projectionHash
-    *
-    * @return Returns the world position for way points
-    */
-   public IntObjectHashMap<Point> getWorldPositionForWayPoints(final int projectionHash, final int zoomLevel) {
-      return _twpWorldPosition.get(projectionHash + zoomLevel);
    }
 
    /**
@@ -12771,11 +12743,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       _tileHashes_Tours.put(projectionHash + mapZoomLevel, tileHashes);
    }
 
-   public void setTileHashes_ForWayPoints(final IntHashSet tileHashes, final int mapZoomLevel, final int projectionHash) {
-
-      _tileHashes_WayPoints.put(projectionHash + mapZoomLevel, tileHashes);
-   }
-
    public void setTimeSerieDouble(final double[] timeSerieDouble) {
       this.timeSerieDouble = timeSerieDouble;
    }
@@ -13808,20 +13775,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public void setWorldPixelForTour(final Point[] worldPositions, final int zoomLevel, final int projectionHash) {
 
       _tourWorldPosition.put(projectionHash + zoomLevel, worldPositions);
-   }
-
-   /**
-    * Set world positions which are cached
-    *
-    * @param worldPositions
-    * @param zoomLevel
-    * @param projectionHash
-    */
-   public void setWorldPixelForWayPoints(final IntObjectHashMap<Point> worldPositions,
-                                         final int zoomLevel,
-                                         final int projectionHash) {
-
-      _twpWorldPosition.put(projectionHash + zoomLevel, worldPositions);
    }
 
    @Override

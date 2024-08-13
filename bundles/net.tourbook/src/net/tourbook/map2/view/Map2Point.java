@@ -23,6 +23,7 @@ import java.awt.Rectangle;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourWayPoint;
 import net.tourbook.map.location.LocationType;
 import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
 import net.tourbook.photo.Photo;
@@ -64,10 +65,11 @@ public class Map2Point implements ClusterItem {
    public int                                numDuplicates_Start;
    public int                                numDuplicates_End;
 
+   public Photo                              photo;
    public TourLocation                       tourLocation;
    public TourMarker                         tourMarker;
    public TourPause                          tourPause;
-   public Photo                              photo;
+   public TourWayPoint                       tourWayPoint;
 
    /**
     * Type of the tour location {@link #tourLocation}
