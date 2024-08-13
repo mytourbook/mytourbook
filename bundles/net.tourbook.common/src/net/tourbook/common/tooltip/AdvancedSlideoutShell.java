@@ -1338,6 +1338,8 @@ public abstract class AdvancedSlideoutShell {
       final double maxWidth = displayBounds.width * 0.95;
 
       boolean isResizeAdjusted = false;
+      boolean isHeightAdjusted = false;
+      boolean isWidthAdjusted = false;
 
       final Rectangle clientArea = resizeShell.getClientArea();
       int newContentWidth = clientArea.width;
@@ -1345,18 +1347,18 @@ public abstract class AdvancedSlideoutShell {
 
       if (newContentHeight > maxHeight) {
          newContentHeight = (int) maxHeight;
-         isResizeAdjusted = true;
+         isHeightAdjusted = true;
       } else if (newContentHeight < MIN_SHELL_HORIZ_HEIGHT) {
          newContentHeight = MIN_SHELL_HORIZ_HEIGHT;
-         isResizeAdjusted = true;
+         isHeightAdjusted = true;
       }
 
       if (newContentWidth > maxWidth) {
          newContentWidth = (int) maxWidth;
-         isResizeAdjusted = true;
+         isWidthAdjusted = true;
       } else if (newContentWidth < MIN_SHELL_HORIZ_WIDTH) {
          newContentWidth = MIN_SHELL_HORIZ_WIDTH;
-         isResizeAdjusted = true;
+         isWidthAdjusted = true;
       }
 
       if (isVerticalLayout()) {
@@ -1394,7 +1396,20 @@ public abstract class AdvancedSlideoutShell {
          }
       }
 
-      if (isResizeAdjusted) {
+      if (isResizeAdjusted || isWidthAdjusted || isHeightAdjusted) {
+
+         if (isWidthAdjusted && isHeightAdjusted == false) {
+            
+            // force current height
+            newContentHeight = Integer.MIN_VALUE;
+         }
+
+         if (isHeightAdjusted && isWidthAdjusted == false) {
+            
+            // force current width
+            newContentWidth = Integer.MIN_VALUE;
+         }
+
          _isInShellResize = true;
          {
             _rrShellWithResize.setContentSize(newContentWidth, newContentHeight);
