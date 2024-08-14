@@ -124,7 +124,6 @@ import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.SlideoutMap2_PhotoOptions;
 import net.tourbook.map2.view.SlideoutMap2_PhotoToolTip;
 import net.tourbook.map2.view.TourMapPainter;
-import net.tourbook.map2.view.WayPointToolTipProvider;
 import net.tourbook.map25.layer.marker.ScreenUtils;
 import net.tourbook.map25.layer.marker.algorithm.distance.Cluster;
 import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
@@ -437,7 +436,6 @@ public class Map2 extends Canvas {
    private List<PaintedMapPoint>           _allPaintedCommonLocations       = new ArrayList<>();
    private List<PaintedMapPoint>           _allPaintedTourLocations         = new ArrayList<>();
    private List<PaintedMapPoint>           _allPaintedMarkers               = new ArrayList<>();
-   private List<PaintedMapPoint>           _allPaintedWaypoints             = new ArrayList<>();
    private List<PaintedMarkerCluster>      _allPaintedMarkerClusters        = new ArrayList<>();
    private List<PaintedMapPoint>           _allPaintedPauses                = new ArrayList<>();
    private List<PaintedMapPoint>           _allPaintedPhotos                = new ArrayList<>();
@@ -2408,7 +2406,7 @@ public class Map2 extends Canvas {
 
          allWayPointPoints.add(mapPoint);
 
-         _numStatistics_AllTourMarkers++;
+         _numStatistics_AllTourWayPoints++;
 
          if (numAllRemainingItems-- <= 0) {
             break;
@@ -4664,7 +4662,7 @@ public class Map2 extends Canvas {
       final List<PaintedMapPoint> allPaintedMarkers = _allPaintedMarkers;
       final List<PaintedMapPoint> allPaintedPauses = _allPaintedPauses;
       final List<PaintedMapPoint> allPaintedPhotos = _allPaintedPhotos;
-      final List<PaintedMapPoint> allPaintedWayPoints = _allPaintedWaypoints;
+      final List<PaintedMapPoint> allPaintedWayPoints = _allPaintedWayPoints;
 
       /*
        * Prio 1: Marker cluster
@@ -4750,7 +4748,12 @@ public class Map2 extends Canvas {
          onMouse_Move_CheckMapPoints(allPaintedPauses, mouseMoveDevX, mouseMoveDevY);
       }
 
-      // prio 5: Photos
+      // prio 5: Tour waypoints
+      if (_hoveredMapPoint == null && allPaintedWayPoints.size() > 0) {
+         onMouse_Move_CheckMapPoints(allPaintedWayPoints, mouseMoveDevX, mouseMoveDevY);
+      }
+
+      // prio 6: Photos
       if (_hoveredMapPoint == null && allPaintedPhotos.size() > 0) {
 
          onMouse_Move_CheckMapPoints(allPaintedPhotos, mouseMoveDevX, mouseMoveDevY);
@@ -6812,17 +6815,17 @@ public class Map2 extends Canvas {
                _numStatistics_AllTourMarkers,
                _numStatistics_AllTourMarkers_IsTruncated,
 
-               _allPaintedWaypoints.size(),
-               _numStatistics_AllTourWayPoints,
-               _numStatistics_AllTourWayPoints_IsTruncated,
-
                _allPaintedPauses.size(),
                _numStatistics_AllTourPauses,
                _numStatistics_AllTourPauses_IsTruncated,
 
                _allPaintedPhotos.size(),
                _numStatistics_AllTourPhotos,
-               _numStatistics_AllTourPhotos_IsTruncated)
+               _numStatistics_AllTourPhotos_IsTruncated,
+
+               _allPaintedWayPoints.size(),
+               _numStatistics_AllTourWayPoints,
+               _numStatistics_AllTourWayPoints_IsTruncated)
 
          );
       };
@@ -6855,6 +6858,7 @@ public class Map2 extends Canvas {
       _numStatistics_AllTourMarkers             = 0;
       _numStatistics_AllTourPauses              = 0;
       _numStatistics_AllTourPhotos              = 0;
+      _numStatistics_AllTourWayPoints           = 0;
 
       _numStatistics_AllTourMarkers_IsTruncated = false;
       _numStatistics_AllTourPauses_IsTruncated  = false;
@@ -7777,7 +7781,7 @@ public class Map2 extends Canvas {
             allWayPointLabels,
             allPaintedWayPoints);
 
-      paint_MpImage_90_AllPhotos(g2d,
+      paint_MpImage_80_AllPhotos(g2d,
             allPhotoItems,
             allPaintedPhotos);
 
@@ -7890,7 +7894,7 @@ public class Map2 extends Canvas {
                textWidth,
                textHeight);
 
-         paint_MpImage_80_OneLabel(
+         paint_MpImage_90_OneLabel(
                g2d,
                mapPoint,
                labelRectangle,
@@ -8062,7 +8066,7 @@ public class Map2 extends Canvas {
 
             // paint a normal marker
 
-            paint_MpImage_80_OneLabel(
+            paint_MpImage_90_OneLabel(
                   g2d,
                   mapPoint,
                   markerLabelRectangle,
@@ -8171,7 +8175,7 @@ public class Map2 extends Canvas {
                textWidth,
                textHeight);
 
-         paint_MpImage_80_OneLabel(
+         paint_MpImage_90_OneLabel(
                g2d,
                mapPoint,
                pauseLabelRectangle,
@@ -8278,7 +8282,7 @@ public class Map2 extends Canvas {
                textWidth,
                textHeight);
 
-         paint_MpImage_80_OneLabel(
+         paint_MpImage_90_OneLabel(
                g2d,
                mapPoint,
                pauseLabelRectangle,
@@ -8306,8 +8310,8 @@ public class Map2 extends Canvas {
 
       } else {
 
-         fillColor = _mapConfig.tourPauseOutline_ColorAWT;
-         outlineColor = _mapConfig.tourPauseFill_ColorAWT;
+         fillColor = _mapConfig.tourWayPointOutline_ColorAWT;
+         outlineColor = _mapConfig.tourWayPointFill_ColorAWT;
       }
 
       int paintedPointIndex = 0;
@@ -8345,103 +8349,12 @@ public class Map2 extends Canvas {
                symbolRectangle.height - lineWidth);
 
          // keep painted symbol position
-         final PaintedMapPoint paintedMarker = allPaintedPoints.get(paintedPointIndex++);
-         paintedMarker.symbolRectangle = symbolRectangle;
+         final PaintedMapPoint paintedMapPoint = allPaintedPoints.get(paintedPointIndex++);
+         paintedMapPoint.symbolRectangle = symbolRectangle;
       }
    }
 
-   private void paint_MpImage_80_OneLabel(final Graphics2D g2d,
-                                          final Map2Point mapPoint,
-                                          final Rectangle labelRectangle,
-                                          final List<PaintedMapPoint> allPaintedMapPoints) {
-
-      final FontMetrics fontMetrics = g2d.getFontMetrics();
-
-      final String labelText = mapPoint.getFormattedLabel();
-
-      final int rectangleHeight = labelRectangle.height;
-
-      final int devX = labelRectangle.x;
-      final int devY = labelRectangle.y + rectangleHeight - fontMetrics.getDescent();
-
-      java.awt.Color fillColor;
-      java.awt.Color outlineColor;
-
-      MapLabelLayout markerLabelLayout = _mapConfig.labelLayout;
-
-      if (_isMarkerClusterSelected) {
-
-         // all other labels are disable -> display grayed out
-
-         fillColor = java.awt.Color.WHITE;
-         outlineColor = _isMapBackgroundDark ? java.awt.Color.GRAY : java.awt.Color.WHITE;
-
-         markerLabelLayout = MapLabelLayout.NONE;
-
-      } else {
-
-         fillColor = mapPoint.getFillColorAWT();
-         outlineColor = mapPoint.getOutlineColorAWT();
-      }
-
-      /*
-       * Draw label background
-       */
-      if (markerLabelLayout.equals(MapLabelLayout.RECTANGLE_BOX)) {
-
-         g2d.setColor(fillColor);
-
-         g2d.fillRect(
-               labelRectangle.x - MAP_POINT_BORDER,
-               labelRectangle.y,
-               labelRectangle.width + 2 * MAP_POINT_BORDER,
-               rectangleHeight);
-
-      } else if (markerLabelLayout.equals(MapLabelLayout.SHADOW)) {
-
-         g2d.setColor(fillColor);
-
-         g2d.drawString(labelText, devX + 1, devY + 1);
-
-      } else if (markerLabelLayout.equals(MapLabelLayout.NONE)) {
-
-         // no border
-
-      } else if (markerLabelLayout.equals(MapLabelLayout.BORDER_1_PIXEL)) {
-
-         g2d.setColor(fillColor);
-
-         g2d.drawString(labelText, devX - 1, devY);
-         g2d.drawString(labelText, devX + 1, devY);
-         g2d.drawString(labelText, devX, devY - 1);
-         g2d.drawString(labelText, devX, devY + 1);
-
-      } else if (markerLabelLayout.equals(MapLabelLayout.BORDER_2_PIXEL)) {
-
-         g2d.setColor(fillColor);
-
-         g2d.drawString(labelText, devX - 1, devY);
-         g2d.drawString(labelText, devX + 1, devY);
-         g2d.drawString(labelText, devX, devY - 1);
-         g2d.drawString(labelText, devX, devY + 1);
-
-         g2d.drawString(labelText, devX - 2, devY);
-         g2d.drawString(labelText, devX + 2, devY);
-         g2d.drawString(labelText, devX, devY - 2);
-         g2d.drawString(labelText, devX, devY + 2);
-      }
-
-      /*
-       * Draw label text
-       */
-      g2d.setColor(outlineColor);
-      g2d.drawString(labelText, devX, devY);
-
-      // keep position
-      allPaintedMapPoints.add(new PaintedMapPoint(mapPoint, labelRectangle));
-   }
-
-   private void paint_MpImage_90_AllPhotos(final Graphics2D g2d,
+   private void paint_MpImage_80_AllPhotos(final Graphics2D g2d,
                                            final List<PointFeature> allPhotoItems,
                                            final List<PaintedMapPoint> allPaintedPhotos) {
 
@@ -8600,6 +8513,97 @@ public class Map2 extends Canvas {
 
       // ensure that rectangels are not smoothed
       g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+   }
+
+   private void paint_MpImage_90_OneLabel(final Graphics2D g2d,
+                                          final Map2Point mapPoint,
+                                          final Rectangle labelRectangle,
+                                          final List<PaintedMapPoint> allPaintedMapPoints) {
+
+      final FontMetrics fontMetrics = g2d.getFontMetrics();
+
+      final String labelText = mapPoint.getFormattedLabel();
+
+      final int rectangleHeight = labelRectangle.height;
+
+      final int devX = labelRectangle.x;
+      final int devY = labelRectangle.y + rectangleHeight - fontMetrics.getDescent();
+
+      java.awt.Color fillColor;
+      java.awt.Color outlineColor;
+
+      MapLabelLayout markerLabelLayout = _mapConfig.labelLayout;
+
+      if (_isMarkerClusterSelected) {
+
+         // all other labels are disable -> display grayed out
+
+         fillColor = java.awt.Color.WHITE;
+         outlineColor = _isMapBackgroundDark ? java.awt.Color.GRAY : java.awt.Color.WHITE;
+
+         markerLabelLayout = MapLabelLayout.NONE;
+
+      } else {
+
+         fillColor = mapPoint.getFillColorAWT();
+         outlineColor = mapPoint.getOutlineColorAWT();
+      }
+
+      /*
+       * Draw label background
+       */
+      if (markerLabelLayout.equals(MapLabelLayout.RECTANGLE_BOX)) {
+
+         g2d.setColor(fillColor);
+
+         g2d.fillRect(
+               labelRectangle.x - MAP_POINT_BORDER,
+               labelRectangle.y,
+               labelRectangle.width + 2 * MAP_POINT_BORDER,
+               rectangleHeight);
+
+      } else if (markerLabelLayout.equals(MapLabelLayout.SHADOW)) {
+
+         g2d.setColor(fillColor);
+
+         g2d.drawString(labelText, devX + 1, devY + 1);
+
+      } else if (markerLabelLayout.equals(MapLabelLayout.NONE)) {
+
+         // no border
+
+      } else if (markerLabelLayout.equals(MapLabelLayout.BORDER_1_PIXEL)) {
+
+         g2d.setColor(fillColor);
+
+         g2d.drawString(labelText, devX - 1, devY);
+         g2d.drawString(labelText, devX + 1, devY);
+         g2d.drawString(labelText, devX, devY - 1);
+         g2d.drawString(labelText, devX, devY + 1);
+
+      } else if (markerLabelLayout.equals(MapLabelLayout.BORDER_2_PIXEL)) {
+
+         g2d.setColor(fillColor);
+
+         g2d.drawString(labelText, devX - 1, devY);
+         g2d.drawString(labelText, devX + 1, devY);
+         g2d.drawString(labelText, devX, devY - 1);
+         g2d.drawString(labelText, devX, devY + 1);
+
+         g2d.drawString(labelText, devX - 2, devY);
+         g2d.drawString(labelText, devX + 2, devY);
+         g2d.drawString(labelText, devX, devY - 2);
+         g2d.drawString(labelText, devX, devY + 2);
+      }
+
+      /*
+       * Draw label text
+       */
+      g2d.setColor(outlineColor);
+      g2d.drawString(labelText, devX, devY);
+
+      // keep position
+      allPaintedMapPoints.add(new PaintedMapPoint(mapPoint, labelRectangle));
    }
 
    private void paint_MpImage_RatingStars(final Graphics2D g2d, final Photo photo) {
@@ -10622,40 +10626,6 @@ public class Map2 extends Canvas {
       paint();
    }
 
-   public void setPOI(final IToolTipProvider tourToolTipProvider, final TourWayPoint twp) {
-
-      // display poi in the center of the map which make it also visible
-      setMapCenter(twp.getPosition());
-
-      if (tourToolTipProvider instanceof WayPointToolTipProvider) {
-
-         final WayPointToolTipProvider wpToolTipProvider = (WayPointToolTipProvider) tourToolTipProvider;
-
-         final HoveredAreaContext hoveredContext = wpToolTipProvider.getHoveredContext(
-               _worldPixel_TopLeft_Viewport.width / 2,
-               _worldPixel_TopLeft_Viewport.height / 2,
-               _worldPixel_TopLeft_Viewport,
-               _mp,
-               _mapZoomLevel,
-               _tilePixelSize,
-               twp);
-
-         if (hoveredContext == null) {
-            // this case should not happen
-            return;
-         }
-
-         _tourTooltip_HoveredAreaContext = hoveredContext;
-
-         // update tool tip control
-         _tourTooltip.setHoveredContext(_tourTooltip_HoveredAreaContext);
-
-         _tourTooltip.show(new Point(_tourTooltip_HoveredAreaContext.hoveredTopLeftX, _tourTooltip_HoveredAreaContext.hoveredTopLeftY));
-
-         redraw();
-      }
-   }
-
    /**
     * Sets the visibility of the poi tooltip. Poi tooltip is visible when the tooltip is available
     * and the poi image is within the map view port
@@ -10730,7 +10700,7 @@ public class Map2 extends Canvas {
       _allPaintedMarkers.clear();
       _allPaintedPauses.clear();
       _allPaintedPhotos.clear();
-      _allPaintedWaypoints.clear();
+      _allPaintedWayPoints.clear();
 
       paint();
    }
@@ -10852,10 +10822,20 @@ public class Map2 extends Canvas {
 //    textAntialiasingON = RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VBGR;
 //    textAntialiasingON = RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VRGB;
 
+//    g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
+
+//      final Toolkit tk = Toolkit.getDefaultToolkit();
+//      final Map map = (Map) (tk.getDesktopProperty("awt.font.desktophints"));
+
       g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
             _mapConfig.isLabelAntialiased
                   ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                   : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+
+
+//    g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+//    g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+//    g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
 //    final Map<TextAttribute, Object> fontAttributes = new HashMap<>();
 //

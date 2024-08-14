@@ -180,6 +180,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Button                _btnSwapTourLocation_EndLabel_Color;
    private Button                _btnSwapTourMarkerLabel_Color;
    private Button                _btnSwapTourPauseLabel_Color;
+   private Button                _btnSwapTourWayPointLabel_Color;
    //
    private Button                _chkIsLabelAntialiased;
    private Button                _chkIsDimMap;
@@ -231,6 +232,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Label                 _lblTourMarkerLabel_Color;
    private Label                 _lblTourPauseLabel_Color;
    private Label                 _lblVisibleLabels;
+   private Label                 _lblTourWayPointLabel_Color;
    //
    private Spinner               _spinnerClusterGrid_Size;
    private Spinner               _spinnerClusterOutline_Width;
@@ -261,6 +263,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private ColorSelectorExtended _colorTourLocation_EndLabel_Fill;
    private ColorSelectorExtended _colorTourPauseLabel_Outline;
    private ColorSelectorExtended _colorTourPauseLabel_Fill;
+   private ColorSelectorExtended _colorTourWayPointLabel_Fill;
+   private ColorSelectorExtended _colorTourWayPointLabel_Outline;
    //
    private ImageDescriptor       _imageDescriptor_BoundingBox;
    private ImageDescriptor       _imageDescriptor_CommonLocation;
@@ -1451,7 +1455,6 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    }
 
    private Control createUI_800_Tab_TourWayPoints(final Composite parent) {
-      // TODO Auto-generated method stub
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().margins(5, 5).numColumns(2).applyTo(container);
@@ -1477,41 +1480,41 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          _chkIsShowTourWayPoints.addSelectionListener(_mapPointSelectionListener);
          GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowTourWayPoints);
       }
-//      {
-//         /*
-//          * Tour location label
-//          */
-//         {
-//            // label
-//            _lblTourLocationLabel_Color = new Label(parent, SWT.NONE);
-//            _lblTourLocationLabel_Color.setText(Messages.Slideout_MapPoints_Label_TourLocationColor);
-//            _lblTourLocationLabel_Color.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
-//            labelGridData.applyTo(_lblTourLocationLabel_Color);
-//         }
-//         {
-//            final Composite container = new Composite(parent, SWT.NONE);
-//            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//
-//            // outline/text color
-//            _colorTourLocationLabel_Outline = new ColorSelectorExtended(container);
-//            _colorTourLocationLabel_Outline.addListener(_mapPointPropertyChangeListener);
-//            _colorTourLocationLabel_Outline.addOpenListener(this);
-//            _colorTourLocationLabel_Outline.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
-//
-//            // background color
-//            _colorTourLocationLabel_Fill = new ColorSelectorExtended(container);
-//            _colorTourLocationLabel_Fill.addListener(_mapPointPropertyChangeListener);
-//            _colorTourLocationLabel_Fill.addOpenListener(this);
-//            _colorTourLocationLabel_Fill.setToolTipText(Messages.Slideout_MapPoints_Label_LocationColor_Tooltip);
-//
-//            // button: swap color
-//            _btnSwapTourLocationLabel_Color = new Button(container, SWT.PUSH);
-//            _btnSwapTourLocationLabel_Color.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
-//            _btnSwapTourLocationLabel_Color.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
-//            _btnSwapTourLocationLabel_Color.addSelectionListener(SelectionListener.widgetSelectedAdapter(
-//                  selectionEvent -> onSwapTourLocationColor()));
-//         }
-//      }
+      {
+         /*
+          * Waypoint label
+          */
+         {
+            // label
+            _lblTourWayPointLabel_Color = new Label(parent, SWT.NONE);
+            _lblTourWayPointLabel_Color.setText(Messages.Slideout_MapPoints_Label_TourWayPointColor);
+            _lblTourWayPointLabel_Color.setToolTipText(Messages.Slideout_MapPoints_Label_TourWayPointColor_Tooltip);
+            labelGridData.applyTo(_lblTourWayPointLabel_Color);
+         }
+         {
+            final Composite container = new Composite(parent, SWT.NONE);
+            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+
+            // outline/text color
+            _colorTourWayPointLabel_Outline = new ColorSelectorExtended(container);
+            _colorTourWayPointLabel_Outline.addListener(_mapPointPropertyChangeListener);
+            _colorTourWayPointLabel_Outline.addOpenListener(this);
+            _colorTourWayPointLabel_Outline.setToolTipText(Messages.Slideout_MapPoints_Label_TourWayPointColor_Tooltip);
+
+            // background color
+            _colorTourWayPointLabel_Fill = new ColorSelectorExtended(container);
+            _colorTourWayPointLabel_Fill.addListener(_mapPointPropertyChangeListener);
+            _colorTourWayPointLabel_Fill.addOpenListener(this);
+            _colorTourWayPointLabel_Fill.setToolTipText(Messages.Slideout_MapPoints_Label_TourWayPointColor_Tooltip);
+
+            // button: swap color
+            _btnSwapTourWayPointLabel_Color = new Button(container, SWT.PUSH);
+            _btnSwapTourWayPointLabel_Color.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
+            _btnSwapTourWayPointLabel_Color.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
+            _btnSwapTourWayPointLabel_Color.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> onSwapTourWayPointColor()));
+         }
+      }
    }
 
    private void createUI_900_Statistics(final Composite shellContainer) {
@@ -1635,6 +1638,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       final boolean isShowTourPauses         = _chkIsShowTourPauses           .getSelection();
       final boolean isShowTourLocations      = _chkIsShowTourLocations        .getSelection();
       final boolean isShowCommonLocations    = _chkIsShowCommonLocations      .getSelection();
+      final boolean isShowTourWayPoints      = _chkIsShowTourWayPoints        .getSelection();
 
       final boolean isTruncateLabel          = _chkIsTruncateLabel            .getSelection();
 
@@ -1655,6 +1659,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _lblStats_TourMarkers_Visible          .setEnabled(isShowTourMarker);
       _lblStats_TourPauses_All               .setEnabled(isShowTourPauses);
       _lblStats_TourPauses_Visible           .setEnabled(isShowTourPauses);
+      _lblStats_TourWayPoints_All            .setEnabled(isShowTourWayPoints);
+      _lblStats_TourWayPoints_Visible        .setEnabled(isShowTourWayPoints);
 
       // common
       _chkIsLabelAntialiased                 .setEnabled(isShowLabels);
@@ -1732,6 +1738,12 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _colorTourPauseLabel_Outline           .setEnabled(isShowTourPauses);
 
       _chkIsShowBoundingBox_All              .setEnabled(isShowCommonLocations || isShowTourLocations);
+
+      // way points
+      _btnSwapTourWayPointLabel_Color        .setEnabled(isShowTourWayPoints);
+      _lblTourWayPointLabel_Color            .setEnabled(isShowTourWayPoints);
+      _colorTourWayPointLabel_Fill           .setEnabled(isShowTourWayPoints);
+      _colorTourWayPointLabel_Outline        .setEnabled(isShowTourWayPoints);
 
 // SET_FORMATTING_ON
 
@@ -2151,6 +2163,22 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       repaintMap();
    }
 
+   private void onSwapTourWayPointColor() {
+
+      final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
+
+      final RGB fgColor = mapConfig.tourWayPointOutline_RGB;
+      final RGB bgColor = mapConfig.tourWayPointFill_RGB;
+
+      mapConfig.tourWayPointOutline_RGB = bgColor;
+      mapConfig.tourWayPointFill_RGB = fgColor;
+
+      mapConfig.setupColors();
+
+      restoreState();
+      repaintMap();
+   }
+
    private void repaintMap() {
 
       final Map2 map2 = _map2View.getMap();
@@ -2196,6 +2224,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _chkIsShowBoundingBox_Common           .setSelection( config.isShowLocationBoundingBox);
       _chkIsShowBoundingBox_Tour             .setSelection( config.isShowLocationBoundingBox);
       _chkIsTruncateLabel                    .setSelection( config.isTruncateLabel);
+      _chkIsShowTourWayPoints                .setSelection( config.isShowTourWayPoint);
+      _chkIsShowTourWayPoints_All            .setSelection( config.isShowTourWayPoint);
 
       _spinnerClusterGrid_Size               .setSelection( config.clusterGridSize);
       _spinnerClusterOutline_Width           .setSelection( config.clusterOutline_Width);
@@ -2225,6 +2255,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       _colorTourPauseLabel_Fill              .setColorValue(config.tourPauseFill_RGB);
       _colorTourPauseLabel_Outline           .setColorValue(config.tourPauseOutline_RGB);
+
+      _colorTourWayPointLabel_Fill           .setColorValue(config.tourWayPointFill_RGB);
+      _colorTourWayPointLabel_Outline        .setColorValue(config.tourWayPointOutline_RGB);
 
       _txtGroupDuplicatedMarkers             .setText(      config.groupedMarkers);
 
@@ -2321,6 +2354,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       config.tourPauseFill_RGB                  = _colorTourPauseLabel_Fill                  .getColorValue();
       config.tourPauseOutline_RGB               = _colorTourPauseLabel_Outline               .getColorValue();
 
+      config.tourWayPointFill_RGB               = _colorTourWayPointLabel_Fill               .getColorValue();
+      config.tourWayPointOutline_RGB            = _colorTourWayPointLabel_Outline            .getColorValue();
+
 
       config.setupColors();
 
@@ -2409,19 +2445,19 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       final String numCommonLocations_All = Integer.toString(stats.numCommonLocations_All);
       final String numTourLocations_All = Integer.toString(stats.numTourLocations_All);
       String numTourMarkers_All = Integer.toString(stats.numTourMarkers_All);
-      String numTourWayPoints_All = Integer.toString(stats.numTourWayPoints_All);
       String numTourPauses_All = Integer.toString(stats.numTourPauses_All);
+      String numTourWayPoints_All = Integer.toString(stats.numTourWayPoints_All);
 
       if (stats.numTourMarkers_All_IsTruncated) {
          numTourMarkers_All += UI.SYMBOL_STAR;
       }
 
-      if (stats.numTourWayPoints_All_IsTruncated) {
-         numTourWayPoints_All += UI.SYMBOL_STAR;
-      }
-
       if (stats.numTourPauses_All_IsTruncated) {
          numTourPauses_All += UI.SYMBOL_STAR;
+      }
+
+      if (stats.numTourWayPoints_All_IsTruncated) {
+         numTourWayPoints_All += UI.SYMBOL_STAR;
       }
 
       _lblStats_CommonLocations_All.setText(numCommonLocations_All);
@@ -2433,11 +2469,11 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _lblStats_TourMarkers_All.setText(numTourMarkers_All);
       _lblStats_TourMarkers_Visible.setText(Integer.toString(stats.numTourMarkers_Painted));
 
-      _lblStats_TourWayPoints_All.setText(numTourWayPoints_All);
-      _lblStats_TourWayPoints_Visible.setText(Integer.toString(stats.numTourWayPoints_Painted));
-
       _lblStats_TourPauses_All.setText(numTourPauses_All);
       _lblStats_TourPauses_Visible.setText(Integer.toString(stats.numTourPauses_Painted));
+
+      _lblStats_TourWayPoints_All.setText(numTourWayPoints_All);
+      _lblStats_TourWayPoints_Visible.setText(Integer.toString(stats.numTourWayPoints_Painted));
 
       _statisticsContainer.pack();
    }

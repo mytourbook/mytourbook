@@ -124,8 +124,8 @@ public class Map2Point implements ClusterItem {
          }
 
       case TOUR_PAUSE:        return mapConfig.tourPauseFill_ColorAWT;
-
       case TOUR_PHOTO:        return mapConfig.photoFill_ColorAWT;
+      case TOUR_WAY_POINT:    return mapConfig.tourWayPointFill_ColorAWT;
 
       default:
       case TOUR_MARKER:       return mapConfig.tourMarkerFill_ColorAWT;
@@ -161,8 +161,8 @@ public class Map2Point implements ClusterItem {
          }
 
       case TOUR_PAUSE:        return mapConfig.tourPauseFill_ColorSWT;
-
       case TOUR_PHOTO:        return mapConfig.photoFill_ColorSWT;
+      case TOUR_WAY_POINT:    return mapConfig.tourWayPointFill_ColorSWT;
 
       default:
       case TOUR_MARKER:       return mapConfig.tourMarkerFill_ColorSWT;
@@ -206,7 +206,6 @@ public class Map2Point implements ClusterItem {
       switch (pointType) {
 
       case COMMON_LOCATION:   return mapConfig.commonLocationOutline_ColorAWT;
-
       case TOUR_LOCATION:
 
          if (numDuplicates_Start > 0 && numDuplicates_End == 0) {
@@ -223,8 +222,8 @@ public class Map2Point implements ClusterItem {
          }
 
       case TOUR_PAUSE:        return mapConfig.tourPauseOutline_ColorAWT;
-
       case TOUR_PHOTO:        return mapConfig.photoOutline_ColorAWT;
+      case TOUR_WAY_POINT:    return mapConfig.tourWayPointOutline_ColorAWT;
 
       default:
       case TOUR_MARKER:       return mapConfig.tourMarkerOutline_ColorAWT;
@@ -243,7 +242,6 @@ public class Map2Point implements ClusterItem {
       switch (pointType) {
 
       case COMMON_LOCATION:   return mapConfig.commonLocationOutline_ColorSWT;
-
       case TOUR_LOCATION:
 
          if (numDuplicates_Start > 0 && numDuplicates_End == 0) {
@@ -260,8 +258,8 @@ public class Map2Point implements ClusterItem {
          }
 
       case TOUR_PAUSE:        return mapConfig.tourPauseOutline_ColorSWT;
-
       case TOUR_PHOTO:        return mapConfig.photoOutline_ColorSWT;
+      case TOUR_WAY_POINT:    return mapConfig.tourWayPointOutline_ColorSWT;
 
       default:
       case TOUR_MARKER:       return mapConfig.tourMarkerOutline_ColorSWT;

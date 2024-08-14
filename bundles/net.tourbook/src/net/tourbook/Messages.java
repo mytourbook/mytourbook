@@ -2398,6 +2398,8 @@ public class Messages extends NLS {
    public static String        Slideout_MapPoints_Label_TourLocation_EndColor;
    public static String        Slideout_MapPoints_Label_TourPauseColor;
    public static String        Slideout_MapPoints_Label_TourPauseColor_Tooltip;
+   public static String        Slideout_MapPoints_Label_TourWayPointColor;
+   public static String        Slideout_MapPoints_Label_TourWayPointColor_Tooltip;
    public static String        Slideout_MapPoints_Label_VisibleLabels;
    public static String        Slideout_MapPoints_Label_VisibleLabels_Tooltip;
    public static String        Slideout_MapPoints_Spinner_LabelDistributor_MaxLabels_Tooltip;
