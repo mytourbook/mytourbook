@@ -49,17 +49,18 @@ Experimental
 New
 ===
 
-*     
+* Tour Nutrition (Frederic):
+  - Support for the carbohydrates
+  - New button to update the nutrition facts of (a) product(s)
+  - Select a product from a list of the most recent products used
+  - Edit an existing custom nutrition product
 
 
 Improvements
 ============
 
 * Tour Nutrition (Frederic):
-  - Added the support for the carbohydrates
-  - Added a button to update the nutrition facts of a given product(s)
-  - Added the ability to select a product from a list of the most recent products used
-  - Added the ability to edit an existing custom nutrition product
+  - Add duplicated products when they are contained in a beverage container
 
 Changes
 =======
