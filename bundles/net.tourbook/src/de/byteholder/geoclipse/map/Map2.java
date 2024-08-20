@@ -2263,7 +2263,6 @@ public class Map2 extends Canvas {
 
    private void createMapPoints_TourWayPoints(final List<TourData> allTourData,
                                               final List<Map2Point> allWayPointPoints) {
-      // TODO Auto-generated method stub
 
       final Rectangle worldPixel_Viewport = _mapPointPainter_Viewport_DuringPainting;
 
@@ -10831,7 +10830,6 @@ public class Map2 extends Canvas {
             _mapConfig.isLabelAntialiased
                   ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON
                   : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-
 
 //    g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 //    g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);

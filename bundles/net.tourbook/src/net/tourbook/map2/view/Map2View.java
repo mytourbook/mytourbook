@@ -3604,20 +3604,20 @@ public class Map2View extends ViewPart implements
 
             int a = 0;
             a++;
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //            PhotoImageCache.disposeAll();
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
             final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
@@ -3859,8 +3859,8 @@ public class Map2View extends ViewPart implements
 
             paintTours_20_One(tourData, false);
 
-            // delay to show the poi otherwise the map is being painted OVER the poi !!!
-//            _map.getDisplay().timerExec(500, () -> _map.setPOI(_wayPointToolTipProvider, wp));
+            // display wp in the center of the map which makes it also visible
+            _map.setMapCenter(wp.getPosition());
 
             enableActions();
          }
