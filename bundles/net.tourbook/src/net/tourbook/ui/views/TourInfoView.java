@@ -71,10 +71,6 @@ public class TourInfoView extends ViewPart {
 
    private TourInfoUI                    _tourInfoUI;
 
-   // todo fb if time spent at night > 0 then
-   // display time spent during the day : h mn
-   // time spent at night: h mn
-
    /*
     * UI controls
     */
