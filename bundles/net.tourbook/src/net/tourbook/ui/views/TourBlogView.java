@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
-import static org.eclipse.swt.browser.LocationListener.changingAdapter;
-import static org.eclipse.swt.browser.ProgressListener.completedAdapter;
-
 import com.linkedin.urls.Url;
 import com.linkedin.urls.detection.UrlDetector;
 import com.linkedin.urls.detection.UrlDetectorOptions;
@@ -97,6 +94,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
+import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -415,6 +414,15 @@ public class TourBlogView extends ViewPart {
          sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Calories,
                averageCaloriesPerHour,
                OtherMessages.VALUE_UNIT_K_CALORIES + UI.SLASH + UI.UNIT_LABEL_TIME));
+      }
+
+      // Average carbohydrates per hour
+      final String averageCarbohydratesPerHour = NutritionUtils.computeAverageCarbohydratesPerHour(_tourData);
+      if (net.tourbook.common.util.StringUtils.hasContent(averageCarbohydratesPerHour)) {
+
+         sb.append(buildTableRow(Messages.Tour_Nutrition_Label_Carbohydrates,
+               averageCarbohydratesPerHour,
+               UI.UNIT_WEIGHT_G + UI.SLASH + UI.UNIT_LABEL_TIME));
       }
 
       // Average sodium per L
@@ -837,7 +845,7 @@ public class TourBlogView extends ViewPart {
                /*
                 * Tags
                 */
-               if (isTourTags & _isShowTourTags) {
+               if (isTourTags && _isShowTourTags) {
 
                   sb.append(buildSection_Tags(tourTags, isDescription || isWeather || isNutrition));
                }
@@ -1067,9 +1075,9 @@ public class TourBlogView extends ViewPart {
 
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
 
-         _browser.addLocationListener(changingAdapter(locationEvent -> onBrowserLocationChanging(locationEvent)));
+         _browser.addLocationListener(LocationListener.changingAdapter(locationEvent -> onBrowserLocationChanging(locationEvent)));
 
-         _browser.addProgressListener(completedAdapter(progressEvent -> onBrowserCompleted()));
+         _browser.addProgressListener(ProgressListener.completedAdapter(progressEvent -> onBrowserCompleted()));
 
       } catch (final SWTError e) {
 
