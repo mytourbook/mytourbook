@@ -756,7 +756,7 @@ public class TourInfoUI {
          }
       }
 
-      final long tourTime_Night = _tourData.getTourTime_Night();
+      final long tourTime_Night = _tourData.getTourDeviceTime_Elapsed_Night();
       if (tourTime_Night > 0) {
 
          createUI_Spacer(container);
@@ -2283,7 +2283,7 @@ public class TourInfoUI {
       /*
        * Time during the day and night
        */
-      final long tourTime_Night = _tourData.getTourTime_Night();
+      final long tourTime_Night = _tourData.getTourDeviceTime_Elapsed_Night();
       if (tourTime_Night > 0) {
          _lblTimeDuringDay_Value.setText(FormatManager.formatElapsedTime(elapsedTime - tourTime_Night));
          _lblTimeDuringNight_Value.setText(FormatManager.formatElapsedTime(tourTime_Night));
