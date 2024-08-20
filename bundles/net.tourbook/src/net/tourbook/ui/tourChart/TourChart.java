@@ -2096,7 +2096,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
          final long currentTime = currentZonedDateTime.toEpochSecond();
 
-         if (isTimeSliceAtNight(sunsetTimes, sunriseTimes, currentTime)) {
+         if (TimeTools.isTimeSliceAtNight(sunsetTimes, sunriseTimes, currentTime)) {
 
             if (!isNightTime) {
 
@@ -3616,13 +3616,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    void hidePauseTooltip() {
 
       _tourPauseTooltip.hideNow();
-   }
-
-   private boolean isTimeSliceAtNight(final ZonedDateTime sunsetTimes,
-                                      final ZonedDateTime sunriseTimes,
-                                      final long time) {
-
-      return time >= sunsetTimes.toEpochSecond() || time <= sunriseTimes.toEpochSecond();
    }
 
    /**

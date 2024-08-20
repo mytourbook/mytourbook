@@ -733,6 +733,13 @@ public class TimeTools {
             ZoneOffset.UTC);
    }
 
+   public static boolean isTimeSliceAtNight(final ZonedDateTime sunsetTimes,
+                                      final ZonedDateTime sunriseTimes,
+                                      final long time) {
+
+      return time >= sunsetTimes.toEpochSecond() || time <= sunriseTimes.toEpochSecond();
+   }
+
    /**
     * @return Return now with the default time zone.
     */
