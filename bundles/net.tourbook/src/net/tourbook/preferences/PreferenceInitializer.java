@@ -394,8 +394,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE, 80); // 0...100
 
       PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR, new RGB(0x50, 0x50, 0x50));
-      store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD, Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
-      store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING, true);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE, true);
 
       store.setDefault(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY, false);

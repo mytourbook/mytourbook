@@ -17,8 +17,6 @@ package net.tourbook.map2.view;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import java.util.LinkedHashMap;
-
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -33,9 +31,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.Map2_Appearance;
 
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -87,14 +83,12 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
    /*
     * UI controls
     */
-   private Composite             _parent;
    private CTabFolder            _tabFolder;
    //
    private Button                _chkIsCutOffLinesInPauses;
    private Button                _chkIsAntialiasPainting;
    private Button                _chkPaintWithBorder;
    private Button                _chkShowBreadcrumbs;
-   private Button                _chkShowEnhancedWarning;
    private Button                _chkShowHoveredSelectedTour;
    private Button                _chkShowSlider_Location;
    private Button                _chkShowSlider_Path;
@@ -104,8 +98,6 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
    //
    private Button                _rdoBorderColorDarker;
    private Button                _rdoBorderColorColor;
-   private Button                _rdoPainting_Simple;
-   private Button                _rdoPainting_Complex;
    private Button                _rdoSymbolLine;
    private Button                _rdoSymbolDot;
    private Button                _rdoSymbolSquare;
@@ -277,7 +269,6 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
       {
          createUI_110_PaintTrack(container);
          createUI_120_PaintBorder(container);
-         createUI_130_PaintingMethod(container);
       }
 
       return container;
@@ -469,46 +460,6 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
       }
    }
 
-   private void createUI_130_PaintingMethod(final Composite parent) {
-
-      {
-         /*
-          * Radio: Tour painting method
-          */
-         // label
-         final Label label = new Label(parent, SWT.NONE);
-         label.setText(Messages.Pref_MapLayout_Label_TourPaintMethod);
-         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
-
-         final Composite paintingContainer = new Composite(parent, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(paintingContainer);
-         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(paintingContainer);
-         {
-            // Radio: Simple
-            _rdoPainting_Simple = new Button(paintingContainer, SWT.RADIO);
-            _rdoPainting_Simple.setText(Messages.Pref_MapLayout_Label_TourPaintMethod_Simple);
-            _rdoPainting_Simple.setToolTipText(Messages.Pref_MapLayout_Label_TourPaintMethod_Simple_Tooltip);
-            _rdoPainting_Simple.addSelectionListener(_defaultSelectionListener);
-
-            // Radio: Enhanced
-            _rdoPainting_Complex = new Button(paintingContainer, SWT.RADIO);
-            _rdoPainting_Complex.setText(Messages.Pref_MapLayout_Label_TourPaintMethod_Complex);
-            _rdoPainting_Complex.setToolTipText(Messages.Pref_MapLayout_Label_TourPaintMethod_Complex_Tooltip);
-            _rdoPainting_Complex.addSelectionListener(_defaultSelectionListener);
-
-            // Checkbox: Show warning
-            _chkShowEnhancedWarning = new Button(paintingContainer, SWT.CHECK);
-            _chkShowEnhancedWarning.setText(Messages.Slideout_Map_Options_Checkbox_ShowEnhancedWarning);
-            _chkShowEnhancedWarning.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowEnhancedWarning_Tooltip);
-            _chkShowEnhancedWarning.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .indent(_firstColumnIndent, 0)
-                  .applyTo(_chkShowEnhancedWarning);
-         }
-      }
-   }
-
    private Composite createUI_200_Tab_Selection(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -532,7 +483,7 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
          _chkShowHoveredSelectedTour = new Button(parent, SWT.CHECK);
          _chkShowHoveredSelectedTour.setText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour);
          _chkShowHoveredSelectedTour.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip);
-         _chkShowHoveredSelectedTour.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onChangeUI_ShowHoveredTour()));
+         _chkShowHoveredSelectedTour.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onChangeUI_UpdateMap_MapOptions()));
          GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowHoveredSelectedTour);
       }
       {
@@ -891,14 +842,11 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
       final boolean isShowSliderPath               = _chkShowSlider_Path.getSelection();
       final boolean isPaintWithBorder              = _chkPaintWithBorder.getSelection();
       final boolean isCutOffLinesInPauses          = _rdoSymbolLine.getSelection();
-      final boolean isEnhancedPaintingMode         = _rdoPainting_Complex.getSelection();
 
       final boolean isHoveredSelected              = _chkShowHoveredSelectedTour.getSelection();
       final boolean isShowTourDirection            = _chkShowTourDirections.getSelection() && isHoveredSelected;
       final boolean isShowBreadcrumbs              = _chkShowBreadcrumbs.getSelection();
 
-      final boolean isBasicPaintingMode            = isEnhancedPaintingMode == false;
-      final boolean isHoveredSelectedAndBasicMode  = isHoveredSelected && isBasicPaintingMode;
 
       _chkIsCutOffLinesInPauses     .setEnabled(isCutOffLinesInPauses);
       _spinnerTrackOpacity          .setEnabled(isUseTrackOpacity);
@@ -921,20 +869,18 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
       _spinnerSliderPath_Segments   .setEnabled(isShowSliderPath);
       _spinnerSliderPath_LineWidth  .setEnabled(isShowSliderPath);
 
-      // painting method
-      _chkShowEnhancedWarning       .setEnabled(isEnhancedPaintingMode);
 
       // hovered + selected
-      _chkShowHoveredSelectedTour                        .setEnabled(isBasicPaintingMode);
-      _lblHoveredSelected_HoveredColor                   .setEnabled(isHoveredSelectedAndBasicMode);
-      _lblHoveredSelected_HoveredAndSelectedColor        .setEnabled(isHoveredSelectedAndBasicMode);
-      _lblHoveredSelected_SelectedColor                  .setEnabled(isHoveredSelectedAndBasicMode);
-      _colorHoveredSelected_Hovered                      .setEnabled(isHoveredSelectedAndBasicMode);
-      _colorHoveredSelected_HoveredAndSelected           .setEnabled(isHoveredSelectedAndBasicMode);
-      _colorHoveredSelected_Selected                     .setEnabled(isHoveredSelectedAndBasicMode);
-      _spinnerHoveredSelected_HoveredOpacity             .setEnabled(isHoveredSelectedAndBasicMode);
-      _spinnerHoveredSelected_HoveredAndSelectedOpacity  .setEnabled(isHoveredSelectedAndBasicMode);
-      _spinnerHoveredSelected_SelectedOpacity            .setEnabled(isHoveredSelectedAndBasicMode);
+      _chkShowHoveredSelectedTour                        .setEnabled(true);
+      _lblHoveredSelected_HoveredColor                   .setEnabled(isHoveredSelected);
+      _lblHoveredSelected_HoveredAndSelectedColor        .setEnabled(isHoveredSelected);
+      _lblHoveredSelected_SelectedColor                  .setEnabled(isHoveredSelected);
+      _colorHoveredSelected_Hovered                      .setEnabled(isHoveredSelected);
+      _colorHoveredSelected_HoveredAndSelected           .setEnabled(isHoveredSelected);
+      _colorHoveredSelected_Selected                     .setEnabled(isHoveredSelected);
+      _spinnerHoveredSelected_HoveredOpacity             .setEnabled(isHoveredSelected);
+      _spinnerHoveredSelected_HoveredAndSelectedOpacity  .setEnabled(isHoveredSelected);
+      _spinnerHoveredSelected_SelectedOpacity            .setEnabled(isHoveredSelected);
 
       // breadcrumbs
       _chkShowBreadcrumbs                       .setEnabled(true);
@@ -942,16 +888,16 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
       _spinnerBreadcrumbItems                   .setEnabled(isShowBreadcrumbs);
 
       // tour direction
-      _chkShowTourDirections                    .setEnabled(isHoveredSelectedAndBasicMode);
-      _chkShowTourDirectionsAlways              .setEnabled(isHoveredSelectedAndBasicMode &&  isShowTourDirection);
-      _colorTourDirection_SymbolColor           .setEnabled(isShowTourDirection && isHoveredSelectedAndBasicMode);
-      _lblTourDirection_DistanceBetweenMarkers  .setEnabled(isShowTourDirection && isHoveredSelectedAndBasicMode);
-      _lblTourDirection_LineWidth               .setEnabled(isShowTourDirection && isHoveredSelectedAndBasicMode);
-      _lblTourDirection_SymbolColor             .setEnabled(isShowTourDirection && isHoveredSelectedAndBasicMode);
-      _lblTourDirection_SymbolSize              .setEnabled(isShowTourDirection && isHoveredSelectedAndBasicMode);
-      _spinnerTourDirection_MarkerGap           .setEnabled(isShowTourDirection && isHoveredSelectedAndBasicMode);
-      _spinnerTourDirection_LineWidth           .setEnabled(isShowTourDirection && isHoveredSelectedAndBasicMode);
-      _spinnerTourDirection_SymbolSize          .setEnabled(isShowTourDirection && isHoveredSelectedAndBasicMode);
+      _chkShowTourDirections                    .setEnabled(isHoveredSelected);
+      _chkShowTourDirectionsAlways              .setEnabled(isHoveredSelected &&  isShowTourDirection);
+      _colorTourDirection_SymbolColor           .setEnabled(isShowTourDirection && isHoveredSelected);
+      _lblTourDirection_DistanceBetweenMarkers  .setEnabled(isShowTourDirection && isHoveredSelected);
+      _lblTourDirection_LineWidth               .setEnabled(isShowTourDirection && isHoveredSelected);
+      _lblTourDirection_SymbolColor             .setEnabled(isShowTourDirection && isHoveredSelected);
+      _lblTourDirection_SymbolSize              .setEnabled(isShowTourDirection && isHoveredSelected);
+      _spinnerTourDirection_MarkerGap           .setEnabled(isShowTourDirection && isHoveredSelected);
+      _spinnerTourDirection_LineWidth           .setEnabled(isShowTourDirection && isHoveredSelected);
+      _spinnerTourDirection_SymbolSize          .setEnabled(isShowTourDirection && isHoveredSelected);
 
 // SET_FORMATTING_ON
    }
@@ -987,8 +933,6 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
    }
 
    private void initUI(final Composite parent) {
-
-      _parent = parent;
 
       _pc = new PixelConverter(parent);
 
@@ -1045,60 +989,6 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
 
       // fire one event for all modifications
       _prefStore.setValue(ITourbookPreferences.MAP2_OPTIONS_IS_MODIFIED, Math.random());
-   }
-
-   private void onChangeUI_ShowHoveredTour() {
-
-      if (_chkShowHoveredSelectedTour.getSelection()) {
-
-         // get current painting method
-         final String prefPaintingMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
-         final boolean isEnhancedPainting = Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(prefPaintingMethod);
-
-         if (isEnhancedPainting) {
-
-            // show warning that enhanced painting mode is selected
-
-            final LinkedHashMap<String, Integer> buttonLabelToIdMap = new LinkedHashMap<>();
-            buttonLabelToIdMap.put(Messages.Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic, IDialogConstants.OK_ID);
-            buttonLabelToIdMap.put(Messages.App_Action_Cancel, IDialogConstants.CANCEL_ID);
-
-            final MessageDialog dialog = new MessageDialog(
-
-                  _parent.getShell(),
-
-                  Messages.Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Title,
-                  null,
-
-                  Messages.Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message,
-                  MessageDialog.INFORMATION,
-
-                  // default index
-                  0,
-
-                  Messages.Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic,
-                  Messages.App_Action_Cancel);
-
-            setIsAnotherDialogOpened(true);
-            {
-               final int choice = dialog.open();
-
-               if (choice == IDialogConstants.OK_ID) {
-
-                  // update UI
-                  _rdoPainting_Simple.setSelection(true);
-                  _rdoPainting_Complex.setSelection(false);
-
-                  // set painting method to basic
-                  _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,
-                        Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
-               }
-            }
-            setIsAnotherDialogOpened(false);
-         }
-      }
-
-      onChangeUI_UpdateMap_MapOptions();
    }
 
    private void onChangeUI_UpdateMap_MapOptions() {
@@ -1177,11 +1067,6 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
 
       _colorBorderColor.setColorValue(PreferenceConverter.getDefaultColor(_prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR));
 
-      // painting method
-      final String paintingMethod =             _prefStore.getDefaultString(  ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
-      _chkShowEnhancedWarning.setSelection(     _prefStore.getDefaultBoolean( ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING));
-      _rdoPainting_Simple.setSelection(         Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE.equals(paintingMethod));
-      _rdoPainting_Complex.setSelection(        Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(paintingMethod));
 
       onChangeUI_UpdateMap_MapOptions();
       onChangeUI_UpdateMap_TrackOptions();
@@ -1251,12 +1136,6 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
       updateUI_SetBorderType(                   _prefStore.getInt(      ITourbookPreferences.MAP_LAYOUT_BORDER_TYPE));
 
       _colorBorderColor.setColorValue(PreferenceConverter.getColor( _prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR));
-
-      // painting method
-      final boolean isComplex = Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(_prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD));
-      _chkShowEnhancedWarning.setSelection(     _prefStore.getBoolean(  ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING));
-      _rdoPainting_Simple.setSelection(         isComplex == false);
-      _rdoPainting_Complex.setSelection(        isComplex);
    }
 
    private void saveState() {
@@ -1311,12 +1190,6 @@ class SlideoutMap2_TrackOptions extends ToolbarSlideout implements IColorSelecto
       _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE,           _spinnerBorder_ColorDarker.getSelection());
 
       PreferenceConverter.setValue(_prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR, _colorBorderColor.getColorValue());
-
-      // painting method
-      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING,   _chkShowEnhancedWarning.getSelection());
-      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,           _rdoPainting_Complex.getSelection()
-               ? Map2_Appearance.TOUR_PAINT_METHOD_COMPLEX
-               : Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
    }
 
    private void saveUIState() {

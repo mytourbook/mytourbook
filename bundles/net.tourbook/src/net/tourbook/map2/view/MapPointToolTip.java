@@ -19,6 +19,7 @@ import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.PaintedMapPoint;
 import de.byteholder.geoclipse.map.TourPause;
 
+import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 
 import net.tourbook.common.UI;
@@ -29,6 +30,7 @@ import net.tourbook.common.util.ToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourWayPoint;
 import net.tourbook.map.location.LocationType;
 import net.tourbook.tour.location.TourLocationUI;
 import net.tourbook.ui.Messages;
@@ -58,23 +60,32 @@ import org.eclipse.swt.widgets.Text;
  */
 public class MapPointToolTip extends ToolTip {
 
-   private static final int DEFAULT_TEXT_WIDTH  = 50;
-   private static final int DEFAULT_TEXT_HEIGHT = 20;
+   private static final int   DEFAULT_TEXT_WIDTH  = 50;
+   private static final int   DEFAULT_TEXT_HEIGHT = 20;
 
-   private static final int _textStyle          = SWT.WRAP   //
+   private static final int   _textStyle          = SWT.WRAP                         //
          | SWT.MULTI
          | SWT.READ_ONLY
 //       | SWT.BORDER
    ;
 
-   private Map2             _map2;
+   private Map2               _map2;
 
-   private PaintedMapPoint  _hoveredMapPoint;
+   private PaintedMapPoint    _hoveredMapPoint;
 
-   private PixelConverter   _pc;
-   private int              _defaultTextWidth;
-   private int              _defaultTextHeight;
-   private Font             _boldFont;
+   private PixelConverter     _pc;
+   private int                _defaultTextWidth;
+   private int                _defaultTextHeight;
+
+   private final NumberFormat _nf_1_1             = NumberFormat.getNumberInstance();
+   {
+      _nf_1_1.setMinimumFractionDigits(1);
+      _nf_1_1.setMaximumFractionDigits(1);
+   }
+   /*
+    * UI controls
+    */
+   private Font _boldFont;
 
    public MapPointToolTip(final Map2 map2) {
 
@@ -124,6 +135,8 @@ public class MapPointToolTip extends ToolTip {
       case TOUR_MARKER:       createUI_TourMarker(parent, mapPoint);    break;
 
       case TOUR_PAUSE:        createUI_TourPause(parent, mapPoint);     break;
+
+      case TOUR_WAY_POINT:    createUI_WayPoint(parent, mapPoint);     break;
 
       case TOUR_PHOTO:        break;
       }
@@ -334,6 +347,105 @@ public class MapPointToolTip extends ToolTip {
          final Label label = new Label(parent, SWT.TRAIL);
          label.setText(TimeTools.Formatter_DateTime_FL.format(pauseStartTime));
       }
+   }
+
+   private void createUI_WayPoint(final Composite parent, final Map2Point mapPoint) {
+
+      final TourWayPoint wayPoint = mapPoint.tourWayPoint;
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults()
+            .numColumns(2)
+            .spacing(5, 2) // reduce vertical spacing
+            .applyTo(container);
+//       container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+      {
+         {
+            /*
+             * Name
+             */
+            final String name = wayPoint.getName();
+            if (name != null) {
+
+               final Label label = UI.createLabel(container, name);
+               label.setFont(_boldFont);
+               GridDataFactory.fillDefaults().span(2, 1).indent(0, -5).applyTo(label);
+            }
+         }
+         {
+            /*
+             * Comment/description
+             */
+            final String description = wayPoint.getDescription();
+            if (description != null) {
+               createUITextarea(container, Messages.Tooltip_WayPoint_Label_Description, description, _pc);
+            }
+
+            final String comment = wayPoint.getComment();
+            if (comment != null) {
+
+               // ignore comment when it has the same content as the description
+
+               if (description == null || (description != null && description.equals(comment) == false)) {
+                  createUITextarea(container, Messages.Tooltip_WayPoint_Label_Comment, comment, _pc);
+               }
+            }
+         }
+
+         createUIItem(container, Messages.Tooltip_WayPoint_Label_Category, wayPoint.getCategory());
+         createUIItem(container, Messages.Tooltip_WayPoint_Label_Symbol, wayPoint.getSymbol());
+
+         {
+            /*
+             * Elevation
+             */
+            final float elevation = wayPoint.getAltitude();
+            if (elevation != Float.MIN_VALUE) {
+
+               final float altitude = elevation / UI.UNIT_VALUE_ELEVATION;
+
+               createUIItem(container,
+                     Messages.Tooltip_WayPoint_Label_Altitude,
+                     _nf_1_1.format(altitude) + UI.SPACE + UI.UNIT_LABEL_ELEVATION);
+            }
+         }
+         {
+            /*
+             * Date/time
+             */
+            final long time = wayPoint.getTime();
+
+            if (time != 0) {
+
+               final Label label = UI.createLabel(container, TimeTools.getZonedDateTime(time).format(TimeTools.Formatter_DateTime_FL));
+
+               GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
+            }
+         }
+      }
+   }
+
+   private void createUIItem(final Composite parent, final String label, final String value) {
+
+      if (value != null) {
+
+         UI.createLabel(parent, label);
+         UI.createLabel(parent, value);
+      }
+   }
+
+   private void createUITextarea(final Composite parent,
+                                 final String labelText,
+                                 final String areaText,
+                                 final PixelConverter pc) {
+      Label label;
+      final int horizontalHint = areaText.length() > 80 ? pc.convertWidthInCharsToPixels(80) : SWT.DEFAULT;
+
+      label = UI.createLabel(parent, labelText);
+      GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+
+      label = UI.createLabel(parent, areaText, SWT.WRAP);
+      GridDataFactory.fillDefaults().hint(horizontalHint, SWT.DEFAULT).applyTo(label);
    }
 
    @Override

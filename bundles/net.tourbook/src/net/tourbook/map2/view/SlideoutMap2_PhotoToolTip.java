@@ -809,7 +809,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    public void setupPhoto(final PaintedMapPoint hoveredMapPoint) {
 
-      if (TourPainterConfiguration.isShowPhotoTooltip == false) {
+      if (Map2PainterConfig.isShowPhotoTooltip == false) {
 
          // photo tooltip is not displayed
 

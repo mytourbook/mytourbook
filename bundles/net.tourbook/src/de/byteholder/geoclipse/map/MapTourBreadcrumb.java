@@ -25,10 +25,8 @@ import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.data.TourData;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -36,8 +34,8 @@ import org.eclipse.swt.widgets.Display;
 
 public class MapTourBreadcrumb {
 
-   private static final String        CRUMB_ACTION_REMOVE_ALL        = " X ";                                                               //$NON-NLS-1$
-   private static final String        CRUMB_ACTION_UPLIFT_LAST_CRUMB = " << ";                                                              //$NON-NLS-1$
+   private static final String        CRUMB_ACTION_REMOVE_ALL        = " X ";                                               //$NON-NLS-1$
+   private static final String        CRUMB_ACTION_UPLIFT_LAST_CRUMB = " << ";                                              //$NON-NLS-1$
 
    private static final Color         SYSTEM_COLOR_BLUE              = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
    private static final Color         SYSTEM_COLOR_BLACK             = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
@@ -69,8 +67,6 @@ public class MapTourBreadcrumb {
     * Crumb index of the hovered/selected crumb
     */
    private int                        _hoveredCrumbIndex             = NOT_HOVERED_INDEX;
-
-   private Font                       _boldFont                      = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    private Map2                       _map;
 
@@ -409,8 +405,7 @@ public class MapTourBreadcrumb {
    }
 
    public void paint(final GC gc,
-                     final boolean isPaintBreadcrumbs,
-                     final boolean isPaintTourPaintMethodEnhancedWarning) {
+                     final boolean isPaintBreadcrumbs) {
 
       final int marginVertical = 2;
       final int marginHorizontal_Crumb = 6;
@@ -418,15 +413,11 @@ public class MapTourBreadcrumb {
 
       int devX = 0;
 
-      boolean isBreadcrumbPainted = false;
-
       if (isPaintBreadcrumbs && _allCrumbsWithAllTours.isEmpty() == false) {
 
          /*
           * Crumbs are available -> Paint crumbs
           */
-
-         isBreadcrumbPainted = true;
 
          final int devY = 0;
 
@@ -595,43 +586,6 @@ public class MapTourBreadcrumb {
 
          // I'm not sure if this is necessary
          _crumbOutline_Bar = null;
-      }
-
-      /*
-       * Paint message that enhanced painting method is used and a tour cannot be selected
-       */
-      if (isPaintTourPaintMethodEnhancedWarning) {
-
-         final Font oldFont = gc.getFont();
-         gc.setFont(_boldFont);
-         gc.setAntialias(SWT.OFF);
-
-         final String warningText = Messages.Map2_TourBreadcrumb_Info_EnhancedPaintingWarning;
-         final Point warningSize = gc.textExtent(warningText);
-
-         final int devXWarning = isBreadcrumbPainted
-
-               ? devX
-
-               // the 'i' icon is displayed when bread crumb is not displayed -> move warning to the right
-               : 60;
-
-         final int devYWarning = 0;
-
-         gc.setBackground(SYSTEM_COLOR_RED);
-         gc.fillRectangle(
-               devXWarning,
-               devYWarning,
-               warningSize.x + 2 * marginHorizontal_Crumb,
-               warningSize.y + 2 * marginVertical);
-
-         gc.setForeground(SYSTEM_COLOR_WHITE);
-         gc.drawString(
-               warningText,
-               devXWarning + marginHorizontal_Crumb,
-               devYWarning + marginVertical);
-
-         gc.setFont(oldFont);
       }
    }
 

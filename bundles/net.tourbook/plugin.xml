@@ -1591,12 +1591,6 @@
       </context>
    </extension>
 
-
-   <extension  point="net.tourbook.mapOverlay">
-      <painter class="net.tourbook.map2.view.TourMapPainter"/>
-   </extension>
-
-
    <extension  point="net.tourbook.tilefactory">
       <tilefactory
             class="net.tourbook.srtm.tilefactory.SRTMMapProvider"

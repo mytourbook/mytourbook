@@ -29,7 +29,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 /**
  * Contains data which are needed to paint a tour into the 2D map.
  */
-public class TourPainterConfiguration {
+public class Map2PainterConfig {
 
    private final static ArrayList<TourData> _allTourData = new ArrayList<>();
    private final static ArrayList<Photo>    _allPhotos   = new ArrayList<>();
@@ -50,7 +50,6 @@ public class TourPainterConfiguration {
    public static boolean                    isShowPhotoTooltip;
    static boolean                           isShowTours;
    static boolean                           isShowTourStartEnd;
-   static boolean                           isShowWayPoints;
 
    /**
     * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
@@ -76,7 +75,7 @@ public class TourPainterConfiguration {
 
    }
 
-   private TourPainterConfiguration() {}
+   private Map2PainterConfig() {}
 
    public static IMapColorProvider getMapColorProvider() {
       return _mapColorProvider;

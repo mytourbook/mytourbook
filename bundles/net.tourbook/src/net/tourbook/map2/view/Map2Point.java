@@ -23,6 +23,7 @@ import java.awt.Rectangle;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourWayPoint;
 import net.tourbook.map.location.LocationType;
 import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
 import net.tourbook.photo.Photo;
@@ -64,10 +65,11 @@ public class Map2Point implements ClusterItem {
    public int                                numDuplicates_Start;
    public int                                numDuplicates_End;
 
+   public Photo                              photo;
    public TourLocation                       tourLocation;
    public TourMarker                         tourMarker;
    public TourPause                          tourPause;
-   public Photo                              photo;
+   public TourWayPoint                       tourWayPoint;
 
    /**
     * Type of the tour location {@link #tourLocation}
@@ -122,8 +124,8 @@ public class Map2Point implements ClusterItem {
          }
 
       case TOUR_PAUSE:        return mapConfig.tourPauseFill_ColorAWT;
-
       case TOUR_PHOTO:        return mapConfig.photoFill_ColorAWT;
+      case TOUR_WAY_POINT:    return mapConfig.tourWayPointFill_ColorAWT;
 
       default:
       case TOUR_MARKER:       return mapConfig.tourMarkerFill_ColorAWT;
@@ -159,8 +161,8 @@ public class Map2Point implements ClusterItem {
          }
 
       case TOUR_PAUSE:        return mapConfig.tourPauseFill_ColorSWT;
-
       case TOUR_PHOTO:        return mapConfig.photoFill_ColorSWT;
+      case TOUR_WAY_POINT:    return mapConfig.tourWayPointFill_ColorSWT;
 
       default:
       case TOUR_MARKER:       return mapConfig.tourMarkerFill_ColorSWT;
@@ -204,7 +206,6 @@ public class Map2Point implements ClusterItem {
       switch (pointType) {
 
       case COMMON_LOCATION:   return mapConfig.commonLocationOutline_ColorAWT;
-
       case TOUR_LOCATION:
 
          if (numDuplicates_Start > 0 && numDuplicates_End == 0) {
@@ -221,8 +222,8 @@ public class Map2Point implements ClusterItem {
          }
 
       case TOUR_PAUSE:        return mapConfig.tourPauseOutline_ColorAWT;
-
       case TOUR_PHOTO:        return mapConfig.photoOutline_ColorAWT;
+      case TOUR_WAY_POINT:    return mapConfig.tourWayPointOutline_ColorAWT;
 
       default:
       case TOUR_MARKER:       return mapConfig.tourMarkerOutline_ColorAWT;
@@ -241,7 +242,6 @@ public class Map2Point implements ClusterItem {
       switch (pointType) {
 
       case COMMON_LOCATION:   return mapConfig.commonLocationOutline_ColorSWT;
-
       case TOUR_LOCATION:
 
          if (numDuplicates_Start > 0 && numDuplicates_End == 0) {
@@ -258,8 +258,8 @@ public class Map2Point implements ClusterItem {
          }
 
       case TOUR_PAUSE:        return mapConfig.tourPauseOutline_ColorSWT;
-
       case TOUR_PHOTO:        return mapConfig.photoOutline_ColorSWT;
+      case TOUR_WAY_POINT:    return mapConfig.tourWayPointOutline_ColorSWT;
 
       default:
       case TOUR_MARKER:       return mapConfig.tourMarkerOutline_ColorSWT;

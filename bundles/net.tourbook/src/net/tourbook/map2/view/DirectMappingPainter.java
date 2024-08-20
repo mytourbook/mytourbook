@@ -18,12 +18,9 @@ package net.tourbook.map2.view;
 import de.byteholder.geoclipse.map.DirectPainterContext;
 import de.byteholder.geoclipse.map.IDirectPainter;
 import de.byteholder.geoclipse.map.Map2;
-import de.byteholder.geoclipse.map.Map2Painter;
 import de.byteholder.geoclipse.map.MapLegend;
 import de.byteholder.geoclipse.map.PaintedMapPoint;
 import de.byteholder.geoclipse.mapprovider.MP;
-
-import java.util.List;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
@@ -157,7 +154,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
       drawMapPoint_Hovered_LabelItem(gc, hoveredPoint);
 
-      if (TourPainterConfiguration.isShowPhotoRating) {
+      if (Map2PainterConfig.isShowPhotoRating) {
          drawMapPoint_Hovered_RatingStars(gc, hoveredPoint);
       }
    }
@@ -786,22 +783,7 @@ public class DirectMappingPainter implements IDirectPainter {
          return;
       }
 
-      final List<Map2Painter> allMapPainter = _map2.getMapPainter();
-      if (allMapPainter == null || allMapPainter.isEmpty()) {
-         return;
-      }
-
-      // get first tour painter
-      TourMapPainter tourPainter = null;
-      for (final Map2Painter mapPainter : allMapPainter) {
-         if (mapPainter instanceof TourMapPainter) {
-            tourPainter = (TourMapPainter) mapPainter;
-            break;
-         }
-      }
-      if (tourPainter == null) {
-         return;
-      }
+      final TourMapPainter tourPainter = _map2.getMapPainter();
 
       final Rectangle legendImageBounds = legendImage.getBounds();
 

@@ -16,7 +16,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.data.TourWayPoint;
 
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
@@ -39,15 +38,9 @@ public class Tile {
 
 //   private static final double            MAX_LATITUDE_85_05112877   = 85.05112877;
 
-   private static final String NL = "\n"; //$NON-NLS-1$
-   /*
-    * private static final String COLUMN_2 = "  "; //$NON-NLS-1$
-    * private static final String COLUMN_4 = "    "; //$NON-NLS-1$
-    * private static final String COLUMN_5 = "     ";
-    */
+   private static final String             NL                           = "\n";                                //$NON-NLS-1$
 
    private static final ReentrantLock      TILE_LOCK                    = new ReentrantLock();
-   private static final int                MAX_BOUNDS                   = Map2.MAP_MAX_ZOOM_LEVEL + 1;
 
    private OverlayTourState                _overlayTourState            = OverlayTourState.TILE_IS_NOT_CHECKED;
 
@@ -166,29 +159,9 @@ public class Tile {
    private long                            _timeEndLoading;
 
    /**
-    * contains children which contains loading errors
+    * Contains children which contains loading errors
     */
    private ConcurrentHashMap<String, Tile> _childrenWithErrors;
-
-   @SuppressWarnings("unchecked")
-   private final ArrayList<Rectangle>[]    _markerBounds                = new ArrayList[MAX_BOUNDS];
-   @SuppressWarnings("unchecked")
-   private final ArrayList<Rectangle>[]    _markerPartBounds            = new ArrayList[MAX_BOUNDS];
-
-   /**
-    * Contains the {@link TourWayPoint}'s which are displayed in this tile.
-    * <p>
-    * {@link #_twpSimpleBounds} and {@link #_twpEnhancedBounds} contains the rectangles in the same
-    * sequence as {@link #_twp}.
-    */
-   @SuppressWarnings("unchecked")
-   private final ArrayList<TourWayPoint>[] _twp                         = new ArrayList[MAX_BOUNDS];
-
-   @SuppressWarnings("unchecked")
-   private final ArrayList<Rectangle>[]    _twpSimpleBounds             = new ArrayList[MAX_BOUNDS];
-
-   @SuppressWarnings("unchecked")
-   private final ArrayList<Rectangle>[]    _twpEnhancedBounds           = new ArrayList[MAX_BOUNDS];
 
    /**
     * The hover rectangles will be set when a tile is painted, the rectangle position is relative to
@@ -283,90 +256,6 @@ public class Tile {
       }
 
       return sb.toString();
-   }
-
-   public void addMarkerBounds(final int x, //
-                               final int y,
-                               final int width,
-                               final int height,
-                               final int zoomLevel) {
-
-      if (_markerBounds[zoomLevel] == null) {
-         initBounds(zoomLevel);
-      }
-
-      _markerBounds[zoomLevel].add(new Rectangle(x, y, width, height));
-   }
-
-   /**
-    * @param x
-    *           left position relative to the tile image
-    * @param y
-    *           top position relative to the tile image
-    * @param width
-    * @param height
-    * @param zoomLevel
-    * @param parts
-    *           number of parts for which the marker is painted
-    */
-   public void addMarkerBounds(final int x,
-                               final int y,
-                               final int width,
-                               final int height,
-                               final int zoomLevel,
-                               final int parts) {
-
-      if (_markerBounds[zoomLevel] == null) {
-         initBounds(zoomLevel);
-      }
-
-//      final Rectangle markerBounds = new Rectangle(x < 0 ? 0 : x, y < 0 ? 0 : y, width, height);
-      final Rectangle markerBounds = new Rectangle(x, y, width, height);
-
-      if (parts == 1) {
-         _markerBounds[zoomLevel].add(markerBounds);
-      } else {
-         _markerPartBounds[zoomLevel].add(markerBounds);
-      }
-   }
-
-   /**
-    * @param twp
-    * @param twpBounds
-    *           Hovered area for the tour way point.
-    *           <p>
-    *           <i>x/y</i> is the top left corner within the control, <br>
-    *           <i>width/height</i> is the dimension for the hovered area which is the size of the
-    *           painted image
-    * @param zoomLevel
-    * @param parts
-    */
-   public void addTourWayPointBounds(final TourWayPoint twp,
-                                     final Rectangle twpBounds,
-                                     final int zoomLevel,
-                                     final int parts) {
-
-      if (_markerBounds[zoomLevel] == null) {
-         initBounds(zoomLevel);
-      }
-
-      final ArrayList<TourWayPoint> twpList = _twp[zoomLevel];
-
-      if (twpList.contains(twp) == false) {
-
-         /*
-          * The way point is set at the beginning of the list because further way point could
-          * overpaint the current. So the later painted way point can be not covered by another and
-          * the tooltips are displayed accordingly.
-          */
-         twpList.add(0, twp);
-
-         if (parts == 1) {
-            _twpSimpleBounds[zoomLevel].add(0, twpBounds);
-         } else {
-            _twpEnhancedBounds[zoomLevel].add(0, twpBounds);
-         }
-      }
    }
 
    /**
@@ -716,16 +605,6 @@ public class Tile {
       return _parentTile;
    }
 
-   /**
-    * @param zoomLevel
-    *
-    * @return Returns marker bounds which are set for a part or <code>null</code> when there are no
-    *         part marker bounds
-    */
-   public ArrayList<Rectangle> getPartMarkerBounds(final int zoomLevel) {
-      return _markerPartBounds[zoomLevel];
-   }
-
    public String getTileCustomPath() {
       return _tileCustomPath;
    }
@@ -755,28 +634,6 @@ public class Tile {
     */
    public String getUrl() {
       return _url;
-   }
-
-   /**
-    * @param mapZoomLevel
-    * @param isTourPaintMethodEnhanced
-    *           When <code>true</code> the overlay image is painted with the enhanced method which
-    *           is currently 3 x 3 parts.
-    *
-    * @return Returns a list with rectangles for each way point in the tile or <code>null</code>
-    *         when there are no way points within the tile.
-    */
-   public ArrayList<Rectangle> getWayPointBounds(final int mapZoomLevel, final boolean isTourPaintMethodEnhanced) {
-
-      if (isTourPaintMethodEnhanced) {
-         return _twpEnhancedBounds[mapZoomLevel];
-      }
-
-      return _twpSimpleBounds[mapZoomLevel];
-   }
-
-   public ArrayList<TourWayPoint> getWayPoints(final int _mapZoomLevel) {
-      return _twp[_mapZoomLevel];
    }
 
    /**
@@ -813,34 +670,6 @@ public class Tile {
     */
    public void incrementOverlayContent() {
       _overlayContent++;
-   }
-
-   /**
-    * creates marker bounds array for the zoom level
-    *
-    * @param zoomLevel
-    */
-   private void initBounds(final int zoomLevel) {
-
-      TILE_LOCK.lock();
-      try {
-
-         // check again
-         if (_markerBounds[zoomLevel] == null) {
-
-            // create bounds for current zoomlevel
-
-            _twp[zoomLevel] = new ArrayList<>();
-
-            _markerBounds[zoomLevel] = new ArrayList<>();
-            _markerPartBounds[zoomLevel] = new ArrayList<>();
-            _twpSimpleBounds[zoomLevel] = new ArrayList<>();
-            _twpEnhancedBounds[zoomLevel] = new ArrayList<>();
-         }
-
-      } finally {
-         TILE_LOCK.unlock();
-      }
    }
 
    /**
@@ -903,38 +732,6 @@ public class Tile {
       _overlayContent = 0;
 
       _overlayImageDataResources = null;
-
-      /*
-       * reset all bounds for all zoomlevels, this is necessary when a new tour is displayed
-       */
-      for (int zoomLevel = 0; zoomLevel < MAX_BOUNDS; zoomLevel++) {
-
-         final ArrayList<TourWayPoint> twpBounds = _twp[zoomLevel];
-         if (twpBounds != null) {
-            twpBounds.clear();
-         }
-
-         ArrayList<Rectangle> bounds = _markerBounds[zoomLevel];
-         if (bounds != null) {
-            bounds.clear();
-         }
-
-         bounds = _markerPartBounds[zoomLevel];
-         if (bounds != null) {
-            bounds.clear();
-         }
-
-         bounds = _twpSimpleBounds[zoomLevel];
-         if (bounds != null) {
-            bounds.clear();
-         }
-
-         bounds = _twpEnhancedBounds[zoomLevel];
-         if (bounds != null) {
-            bounds.clear();
-         }
-      }
-
    }
 
    /**
@@ -1039,11 +836,6 @@ public class Tile {
     */
    public boolean setMapImage(final Image newImage) {
 
-//      if (newImage != null) {
-//         int a = 0;
-//         a++;
-//      }
-
       _mapImage = getCheckedImage(newImage);
 
       return _mapImage != null;
@@ -1104,32 +896,13 @@ public class Tile {
    @Override
    public String toString() {
 
-      // final boolean isImageOK = _mapImage == null ? //
-      // false
-      // : _mapImage.isDisposed() ? //
-      // false
-      // : true;
-
       return UI.EMPTY_STRING
-
-//            + " z=" + Integer.toString(_zoom).concat(COLUMN_2).substring(0, 2) // //$NON-NLS-1$
-//            + " x=" + Integer.toString(_x).concat(COLUMN_5).substring(0, 5) //$NON-NLS-1$
-//            + " y=" + Integer.toString(_y).concat(COLUMN_5).substring(0, 5) + NL //$NON-NLS-1$
 
             + " z=" + Integer.toString(_zoom) // //$NON-NLS-1$
             + " x=" + Integer.toString(_x) //$NON-NLS-1$
             + " y=" + Integer.toString(_y) + NL //$NON-NLS-1$
 
             + "allHoverRectangle: " + allPainted_HoverRectangle.size() + NL //$NON-NLS-1$
-
-//
-//            + (_isLoading ? " LOAD" : COLUMN_5) //$NON-NLS-1$
-//            + " img=" + (isImageOK ? "OK" : COLUMN_2) //$NON-NLS-1$ //$NON-NLS-2$
-//            + (isLoadingError() ? " ERR" : COLUMN_4) //$NON-NLS-1$
-//            //
-//            //                            0123456789012345678901234567890123456789
-//            + (" key=" + _tileKey.concat("                                        ").substring(0, 40)) //$NON-NLS-1$ //$NON-NLS-2$
-      //
       ;
    }
 

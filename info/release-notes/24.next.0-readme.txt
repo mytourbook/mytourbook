@@ -55,6 +55,9 @@ New
   - Select a product from a list of the most recent products used
   - Edit an existing custom nutrition product
 
+* Waypoints
+  - Waypoints are now painted as map points
+
 
 Improvements
 ============
@@ -65,7 +68,8 @@ Improvements
 Changes
 =======
 
-* 
+* Map2
+  - Show waypoints action in the context menu is moved into the map points slideout
 
 
 

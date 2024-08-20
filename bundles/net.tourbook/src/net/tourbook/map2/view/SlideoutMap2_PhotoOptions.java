@@ -576,8 +576,8 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       _state_Map2.put(STATE_IS_SHOW_PHOTO_RATING, isShowPhotoRating);
       _state_Map2.put(STATE_IS_SHOW_PHOTO_TOOLTIP, isShowPhotoTooltip);
 
-      TourPainterConfiguration.isShowPhotoRating = isShowPhotoRating;
-      TourPainterConfiguration.isShowPhotoTooltip = isShowPhotoTooltip;
+      Map2PainterConfig.isShowPhotoRating = isShowPhotoRating;
+      Map2PainterConfig.isShowPhotoTooltip = isShowPhotoTooltip;
 
 // SET_FORMATTING_OFF
 
