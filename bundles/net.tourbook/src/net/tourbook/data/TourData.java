@@ -11012,11 +11012,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       ZonedDateTime sunsetTimes = null;
       ZonedDateTime sunriseTimes = null;
       int currentDay = 0;
-      final int timeSerieLength =  timeSerie.length;
+      final int timeSerieLength = timeSerie.length;
       for (int index = 0; index < timeSerieLength; ++index) {
 
          //todo fb support when multiple tours (cf. -0 below)
-         final ZonedDateTime currentZonedDateTime = getTourStartTime().plusSeconds(timeSerie[index] -0);
+         final ZonedDateTime currentZonedDateTime = getTourStartTime().plusSeconds(timeSerie[index] - 0);
 
          //If the current time is in the next day, we need to recalculate the sunrise/sunset times for this new day.
          if (currentDay == 0 || currentZonedDateTime.getDayOfMonth() != currentDay) {
@@ -11030,12 +11030,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          if (TimeTools.isTimeSliceAtNight(sunsetTimes, sunriseTimes, currentTime) &&
                index > 0) // Skip the first time slice, as it doesn't have a previous time slice.'
-            {
-               tourTime_Night += timeSerie[index] - timeSerie[index - 1];
-            }
+         {
+            tourTime_Night += timeSerie[index] - timeSerie[index - 1];
+         }
+      }
+      return tourTime_Night;
    }
-   return tourTime_Night;
-}
 
    /**
     * @return Returns {@link #tourTitle} or an empty string when value is not set
@@ -11462,8 +11462,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       return timeSerieWithTimeZoneAdjustment != null;
    }
-
-
 
    /**
     * @return Returns <code>true</code> when the tour is saved in the database.
