@@ -12,7 +12,9 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageDataProvider;
 import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -41,14 +43,18 @@ public class SWTvsAWT_FontsAndImages {
    private static Font[]               _swtFont;
    private static int[]                _swtFontHeight;
 
+   private static float                _deviceScaling;
+   private static int                  _scaledWidth;
+   private static int                  _scaledHeight;
+
    static {
 
       AUTO_SCALE = "quarter";
       AUTO_SCALE = "false";
 
-      AUTO_SCALE = "100";
-      AUTO_SCALE = "200";
       AUTO_SCALE = "150";
+      AUTO_SCALE = "200";
+      AUTO_SCALE = "100";
 
       FONT_SIZE = new int[] { //
 
@@ -85,11 +91,32 @@ public class SWTvsAWT_FontsAndImages {
          allFontHeights += fontHeight;
       }
 
-      IMAGE_WIDTH = 1000;
+      IMAGE_WIDTH = 1200;
       IMAGE_HEIGHT = (int) (allFontHeights * 1.9);
+
+      _deviceScaling = DPIUtil.getDeviceZoom() / 100f;
+
+      _scaledWidth = (int) (IMAGE_WIDTH * _deviceScaling);
+      _scaledHeight = (int) (IMAGE_HEIGHT * _deviceScaling);
    }
 
-   private static Image convertAWTtoSWT(final BufferedImage awtImage) {
+   private static class ScaledImageDataProvider implements ImageDataProvider {
+
+      private ImageData _imageData;
+
+      public ScaledImageDataProvider(final ImageData imageData) {
+
+         _imageData = imageData;
+      }
+
+      @Override
+      public ImageData getImageData(final int zoom) {
+
+         return _imageData;
+      }
+   }
+
+   private static ImageData convertAWTtoSWT(final BufferedImage awtImage) {
 
       final int imageWidth = awtImage.getWidth();
       final int imageHeight = awtImage.getHeight();
@@ -122,12 +149,12 @@ public class SWTvsAWT_FontsAndImages {
          }
       }
 
-      return new Image(_swtDisplay, swtImageData);
+      return swtImageData;
    }
 
    private static BufferedImage createAWTImage() {
 
-      final BufferedImage awtImage = new BufferedImage(IMAGE_WIDTH, IMAGE_HEIGHT, BufferedImage.TYPE_4BYTE_ABGR);
+      final BufferedImage awtImage = new BufferedImage(_scaledWidth, _scaledHeight, BufferedImage.TYPE_4BYTE_ABGR);
 
       final Graphics2D g2d = awtImage.createGraphics();
       try {
@@ -135,13 +162,15 @@ public class SWTvsAWT_FontsAndImages {
          g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
          g2d.setBackground(BACKGROUND_COLOR_AWT);
-         g2d.clearRect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+         g2d.clearRect(0, 0, _scaledWidth, _scaledHeight);
 
          int devY = 0;
 
          for (int fontIndex = 0; fontIndex < FONT_SIZE.length; fontIndex++) {
 
-            final java.awt.Font font = new java.awt.Font(FONT_NAME, java.awt.Font.PLAIN, FONT_SIZE[fontIndex]);
+            final int scaledFontSize = (int) (FONT_SIZE[fontIndex] * _deviceScaling);
+
+            final java.awt.Font font = new java.awt.Font(FONT_NAME, java.awt.Font.PLAIN, scaledFontSize);
             g2d.setFont(font);
 
             final FontMetrics fontMetrics = g2d.getFontMetrics();
@@ -196,14 +225,20 @@ public class SWTvsAWT_FontsAndImages {
    public static void main(final String[] args) {
 
       final Image swtImage = createSWTImage();
-
       final BufferedImage awtImage = createAWTImage();
-      final Image swtImageFromAwt = convertAWTtoSWT(awtImage);
+
+      final ImageData swtImageDataFromAwt = convertAWTtoSWT(awtImage);
+      final ScaledImageDataProvider imageDataProvider = new ScaledImageDataProvider(swtImageDataFromAwt);
+
+      final Image swtImageFromAwt = new Image(_swtDisplay, imageDataProvider);
 
       final Shell shell = new Shell(_swtDisplay);
       shell.setText("SWT vs AWT scaling");
       shell.setLocation(SHELL_X, SHELL_Y);
-      shell.setSize(IMAGE_WIDTH + 20, IMAGE_HEIGHT * 2 + 20);
+
+      shell.setSize(
+            IMAGE_WIDTH + 20,
+            IMAGE_HEIGHT * 2 + 20);
 
       shell.addListener(SWT.Paint, event -> {
 
