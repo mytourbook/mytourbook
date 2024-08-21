@@ -3,8 +3,9 @@
    <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17"/>
    <classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
    <classpathentry kind="src" path="src"/>
+   <classpathentry exported="true" kind="lib" path="jakarta.inject-api-2.0.1.jar"/>       <!-- https://mvnrepository.com/artifact/jakarta.inject/jakarta.inject-api -->
    <classpathentry exported="true" kind="lib" path="c3p0-0.10.1.jar"/>                    <!-- https://mvnrepository.com/artifact/com.mchange/c3p0 -->
-   <classpathentry exported="true" kind="lib" path="mchange-commons-java-0.3.0.jar"/>    <!-- https://mvnrepository.com/artifact/com.mchange/mchange-commons-java -->
+   <classpathentry exported="true" kind="lib" path="mchange-commons-java-0.3.0.jar"/>     <!-- https://mvnrepository.com/artifact/com.mchange/mchange-commons-java -->
    <classpathentry exported="true" kind="lib" path="caffeine-3.1.8.jar"/>                 <!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
    <classpathentry exported="true" kind="lib" path="commons-imaging-1.0-alpha2.jar"/>     <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-imaging -->
    <classpathentry exported="true" kind="lib" path="commons-lang3-3.15.0.jar"          sourcepath="jar-sources/commons-lang3-3.15.0-sources.jar"/>    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
