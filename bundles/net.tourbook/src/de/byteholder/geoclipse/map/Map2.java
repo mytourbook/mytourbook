@@ -184,11 +184,13 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageDataProvider;
 import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -396,6 +398,8 @@ public class Map2 extends Canvas {
    private long                          _nextOverlayRedrawTime;
 
    private Map2Config                    _mapConfig                 = Map2ConfigManager.getActiveConfig();
+
+   private float                         _deviceScaling;
 
    /*
     * Map points
@@ -807,6 +811,27 @@ public class Map2 extends Canvas {
          if (isUpdateUI) {
             paint();
          }
+      }
+   }
+
+   /**
+    * With helpful hints from Heiko Klare
+    *
+    * https://github.com/eclipse-platform/eclipse.platform.swt/issues/1411
+    */
+   private class ScaledImageDataProvider implements ImageDataProvider {
+
+      private ImageData _imageData;
+
+      public ScaledImageDataProvider(final ImageData imageData) {
+
+         _imageData = imageData;
+      }
+
+      @Override
+      public ImageData getImageData(final int zoom) {
+
+         return _imageData;
       }
    }
 
@@ -1571,8 +1596,8 @@ public class Map2 extends Canvas {
       mapPoint.tourLocation = tourLocation;
       mapPoint.locationType = LocationType.Tour;
 
-      mapPoint.geoPointDevX = devX;
-      mapPoint.geoPointDevY = devY;
+      mapPoint.geoPointDevX = (int) (devX * _deviceScaling);
+      mapPoint.geoPointDevY = (int) (devY * _deviceScaling);
       mapPoint.setFormattedLabel(locationLabel);
 
       // update and keep skipped labels
@@ -1659,8 +1684,8 @@ public class Map2 extends Canvas {
          mapPoint.tourLocation = tourLocation;
          mapPoint.locationType = LocationType.Common;
 
-         mapPoint.geoPointDevX = devX;
-         mapPoint.geoPointDevY = devY;
+         mapPoint.geoPointDevX = (int) (devX * _deviceScaling);
+         mapPoint.geoPointDevY = (int) (devY * _deviceScaling);
 
          mapPoint.setFormattedLabel(locationLabel);
 
@@ -1969,8 +1994,8 @@ public class Map2 extends Canvas {
 
          mapPoint.tourMarker = tourMarker;
 
-         mapPoint.geoPointDevX = devX;
-         mapPoint.geoPointDevY = devY;
+         mapPoint.geoPointDevX = (int) (devX * _deviceScaling);
+         mapPoint.geoPointDevY = (int) (devY * _deviceScaling);
          mapPoint.setFormattedLabel(markerLabel);
 
          if (groupKey != null) {
@@ -2136,8 +2161,8 @@ public class Map2 extends Canvas {
                MapPointType.TOUR_PAUSE,
                new GeoPoint(geoPosition.latitude, geoPosition.longitude));
 
-         mapPoint.geoPointDevX = devX;
-         mapPoint.geoPointDevY = devY;
+         mapPoint.geoPointDevX = (int) (devX * _deviceScaling);
+         mapPoint.geoPointDevY = (int) (devY * _deviceScaling);
 
          mapPoint.tourPause = tourPause;
 
@@ -2246,8 +2271,8 @@ public class Map2 extends Canvas {
                MapPointType.TOUR_PHOTO,
                new GeoPoint(latitude, longitude));
 
-         mapPoint.geoPointDevX = devXPhoto;
-         mapPoint.geoPointDevY = devYPhoto;
+         mapPoint.geoPointDevX = (int) (devXPhoto * _deviceScaling);
+         mapPoint.geoPointDevY = (int) (devYPhoto * _deviceScaling);
 
          mapPoint.photo = photo;
 
@@ -2399,8 +2424,9 @@ public class Map2 extends Canvas {
 
          mapPoint.tourWayPoint = wayPoint;
 
-         mapPoint.geoPointDevX = devX;
-         mapPoint.geoPointDevY = devY;
+         mapPoint.geoPointDevX = (int) (devX * _deviceScaling);
+         mapPoint.geoPointDevY = (int) (devY * _deviceScaling);
+
          mapPoint.setFormattedLabel(wpName);
 
          allWayPointPoints.add(mapPoint);
@@ -2617,6 +2643,11 @@ public class Map2 extends Canvas {
    public GeoPosition getCommonLocation() {
 
       return _commonLocation;
+   }
+
+   public float getDeviceScaling() {
+      
+      return _deviceScaling;
    }
 
    public PaintedMapPoint getHoveredMapPoint() {
@@ -4940,10 +4971,13 @@ public class Map2 extends Canvas {
    }
 
    private void onMouse_Move_CheckMapPoints(final List<PaintedMapPoint> allPaintedMapPoints,
-                                            final int mouseMoveDevX,
-                                            final int mouseMoveDevY) {
+                                            int mouseMoveDevX,
+                                            int mouseMoveDevY) {
 
       // first check the symbol
+
+      mouseMoveDevX = (int) (mouseMoveDevX * _deviceScaling);
+      mouseMoveDevY = (int) (mouseMoveDevY * _deviceScaling);
 
       for (final PaintedMapPoint paintedMapPoint : allPaintedMapPoints) {
 
@@ -5023,17 +5057,20 @@ public class Map2 extends Canvas {
 
       if (paintedRatingStars != null) {
 
+         final int mouseMoveDevX = (int) (_mouseMove_DevPosition_X * _deviceScaling);
+         final int mouseMoveDevY = (int) (_mouseMove_DevPosition_Y * _deviceScaling);
+
          final int photoDevX = photo.paintedPhoto.x;
          final int photoWidth = photo.paintedPhoto.width;
 
-         _isInHoveredRatingStar = paintedRatingStars.contains(_mouseMove_DevPosition_X, _mouseMove_DevPosition_Y);
+         _isInHoveredRatingStar = paintedRatingStars.contains(mouseMoveDevX, mouseMoveDevY);
 
          // center ratings stars in the middle of the image
          final int ratingStarsLeftBorder = photoDevX + photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
 
          if (_isInHoveredRatingStar) {
 
-            hoveredStars = (_mouseMove_DevPosition_X - ratingStarsLeftBorder) / _ratingStarImageSize + 1;
+            hoveredStars = (mouseMoveDevX - ratingStarsLeftBorder) / _ratingStarImageSize + 1;
          }
       }
 
@@ -6877,9 +6914,12 @@ public class Map2 extends Canvas {
 
       try {
 
+         _deviceScaling = DPIUtil.getDeviceZoom() / 100f;
+//         _deviceScaling = 1;
+
          final BufferedImage awtImage = new BufferedImage(
-               _mapPointImageSize.width,
-               _mapPointImageSize.height,
+               (int) (_mapPointImageSize.width * _deviceScaling),
+               (int) (_mapPointImageSize.height * _deviceScaling),
                BufferedImage.TYPE_4BYTE_ABGR);
 
          final Graphics2D g2d = awtImage.createGraphics();
@@ -6930,7 +6970,8 @@ public class Map2 extends Canvas {
             g2d.dispose();
          }
 
-         final Image swtImage = ImageConverter.convertIntoSWT(awtImage);
+         final ImageData swtImageDataFromAwt = ImageConverter.convertIntoSWTImageData(awtImage);
+         final Image swtImage = new Image(getDisplay(), new ScaledImageDataProvider(swtImageDataFromAwt));
 
          /*
           * This may be needed to be synchronized ?
@@ -7501,8 +7542,8 @@ public class Map2 extends Canvas {
 
       final Rectangle clientArea = _clientArea;
 
-      final int mapWidth = clientArea.width;
-      final int mapHeight = clientArea.height;
+      final int mapWidth = (int) (clientArea.width * _deviceScaling);
+      final int mapHeight = (int) (clientArea.height * _deviceScaling);
 
       /*
        * Setup labels for the label spreader
@@ -10864,7 +10905,7 @@ public class Map2 extends Canvas {
          UI.disposeResource(_labelFontSWT);
 
          _labelFontName = labelFontName;
-         _labelFontSize = labelFontSize;
+         _labelFontSize = (int) (labelFontSize * _deviceScaling);
 
          // awt and swt font have not the same size
          final int swtFontSize = (int) (_labelFontSize * 0.75);

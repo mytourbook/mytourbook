@@ -317,8 +317,11 @@ public class DirectMappingPainter implements IDirectPainter {
       /*
        * Highlight hovered label/photo
        */
-      final int labelDevX = labelRectangle.x;
-      final int labelDevY = labelRectangle.y;
+
+      final float deviceScaling = _map2.getDeviceScaling();
+
+      final int labelDevX = (int) (labelRectangle.x / deviceScaling);
+      final int labelDevY = (int) (labelRectangle.y / deviceScaling);
 
       if (mapPointType.equals(MapPointType.TOUR_PHOTO)) {
 
@@ -326,8 +329,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
          gc.setLineWidth(1);
          gc.drawRectangle(
-               labelRectangle.x - Map2.MAP_POINT_BORDER,
-               labelRectangle.y,
+               labelDevX - Map2.MAP_POINT_BORDER,
+               labelDevY,
                labelRectangle.width + 2 * Map2.MAP_POINT_BORDER,
                labelRectangle.height);
 
@@ -335,8 +338,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
          // fill label background
          gc.fillRectangle(
-               labelRectangle.x - Map2.MAP_POINT_BORDER,
-               labelRectangle.y,
+               labelDevX - Map2.MAP_POINT_BORDER,
+               labelDevY,
                labelRectangle.width + 2 * Map2.MAP_POINT_BORDER,
                labelRectangle.height);
 
