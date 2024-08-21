@@ -6,6 +6,7 @@ Bundle-Version: 24.8.0.qualifier
 Eclipse-BuddyPolicy: registered
 Bundle-Vendor: MyTourbook
 Bundle-ClassPath: 
+ jakarta.inject-api-2.0.1.jar,
  joda-time-2.12.5.jar,
  c3p0-0.10.1.jar,
  mchange-commons-java-0.3.0.jar,
@@ -108,6 +109,7 @@ Export-Package: com.fasterxml.jackson.annotation,
  com.mchange.v2.sql.filter,
  com.mchange.v2.util,
  com.skedgo.converter,
+ jakarta.inject,
  org.apache.commons.imaging,
  org.apache.commons.imaging.color,
  org.apache.commons.imaging.common,
