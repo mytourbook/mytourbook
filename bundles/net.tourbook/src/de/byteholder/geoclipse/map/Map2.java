@@ -64,6 +64,8 @@ import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
@@ -193,6 +195,7 @@ import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.oscim.core.GeoPoint;
@@ -392,6 +395,8 @@ public class Map2 extends Canvas {
    private int                           _mouseMove_DevPosition_Y   = Integer.MIN_VALUE;
    private int                           _mouseMove_DevPosition_X_Last;
    private int                           _mouseMove_DevPosition_Y_Last;
+   private int                           _mouseMove_DevPosition_X_Pixel;
+   private int                           _mouseMove_DevPosition_Y_Pixel;
    private GeoPosition                   _mouseMove_GeoPosition;
 
    private Thread                        _overlayThread;
@@ -399,7 +404,7 @@ public class Map2 extends Canvas {
 
    private Map2Config                    _mapConfig                 = Map2ConfigManager.getActiveConfig();
 
-   private float                         _deviceScaling;
+   private float                         _deviceScaling             = DPIUtil.getDeviceZoom() / 100f;
 
    /*
     * Map points
@@ -785,6 +790,9 @@ public class Map2 extends Canvas {
    private final int           MAX_RATING_STARS   = 5;
    public int                  MAX_RATING_STARS_WIDTH;
 
+   private Method              _getLocation_Method;
+   private Method              _toControlInPixels_Method;
+
    {
       final ImageRegistry imageRegistry = UI.IMAGE_REGISTRY;
 
@@ -879,6 +887,8 @@ public class Map2 extends Canvas {
       updatePhotoOptions();
 
       grid_UpdatePaintingStateData();
+
+      setupReflection();
 
 // SET_FORMATTING_OFF
 
@@ -2646,7 +2656,7 @@ public class Map2 extends Canvas {
    }
 
    public float getDeviceScaling() {
-      
+
       return _deviceScaling;
    }
 
@@ -4624,8 +4634,38 @@ public class Map2 extends Canvas {
 
       final Point devMousePosition = new Point(mouseEvent.x, mouseEvent.y);
 
-      final int mouseMoveDevX = _mouseMove_DevPosition_X = mouseEvent.x;
-      final int mouseMoveDevY = _mouseMove_DevPosition_Y = mouseEvent.y;
+      final int mouseMoveDevX = _mouseMove_DevPosition_X = _mouseMove_DevPosition_X_Pixel = mouseEvent.x;
+      final int mouseMoveDevY = _mouseMove_DevPosition_Y = _mouseMove_DevPosition_Y_Pixel = mouseEvent.y;
+
+      if (_deviceScaling != 1) {
+
+         try {
+
+            /*
+             * Get mouse position without scaling, there is no public API, so we use reflection
+             */
+
+            final Object getLocation_Result = _getLocation_Method.invoke(getDisplay());
+
+            if (getLocation_Result instanceof final Point displayLocation_Pixel) {
+
+               final Object toControlInPixels_Result = _toControlInPixels_Method.invoke(this, displayLocation_Pixel.x, displayLocation_Pixel.y);
+
+               if (toControlInPixels_Result instanceof final Point relativeLocation_Pixel) {
+
+                  _mouseMove_DevPosition_X_Pixel = relativeLocation_Pixel.x;
+                  _mouseMove_DevPosition_Y_Pixel = relativeLocation_Pixel.y;
+               }
+            }
+
+         } catch (SecurityException
+               | IllegalAccessException
+               | IllegalArgumentException
+               | InvocationTargetException e) {
+
+            StatusUtil.log(e);
+         }
+      }
 
       // keep position for out of the map events, e.g. to recenter map
       _mouseMove_DevPosition_X_Last = mouseMoveDevX;
@@ -9715,7 +9755,7 @@ public class Map2 extends Canvas {
    private void panMap(final MouseEvent mouseEvent) {
 
       /*
-       * set new map center
+       * Set new map center
        */
       final Point movePosition = new Point(mouseEvent.x, mouseEvent.y);
 
@@ -9733,6 +9773,7 @@ public class Map2 extends Canvas {
 
       // set new map center
       setMapCenterInWorldPixel(new Point2D.Double(newCenterX, newCenterY));
+
       updateViewportData();
 
       paint();
@@ -10917,6 +10958,22 @@ public class Map2 extends Canvas {
       _clusterFontAWT = new java.awt.Font(labelFontName, java.awt.Font.PLAIN, _mapConfig.clusterSymbol_Size * 2);
 
       g2d.setFont(_labelFontAWT);
+   }
+
+   private void setupReflection() {
+
+      try {
+
+         _getLocation_Method = Display.class.getDeclaredMethod("getCursorLocationInPixels"); //$NON-NLS-1$
+         _getLocation_Method.setAccessible(true);
+
+         _toControlInPixels_Method = Control.class.getDeclaredMethod("toControlInPixels", int.class, int.class); //$NON-NLS-1$
+         _toControlInPixels_Method.setAccessible(true);
+
+      } catch (NoSuchMethodException | SecurityException e) {
+
+         StatusUtil.log(e);
+      }
    }
 
    /**
