@@ -311,22 +311,22 @@ public class Map2 extends Canvas {
    private static final ColorCacheSWT    _colorCache                           = new ColorCacheSWT();
 
    // [181,208,208] is the color of water in the standard OSM material
-   public static final RGB               OSM_BACKGROUND_RGB         = new RGB(181, 208, 208);
-   private static final RGB              MAP_DEFAULT_BACKGROUND_RGB = new RGB(0x40, 0x40, 0x40);
+   public static final RGB               OSM_BACKGROUND_RGB            = new RGB(181, 208, 208);
+   private static final RGB              MAP_DEFAULT_BACKGROUND_RGB    = new RGB(0x40, 0x40, 0x40);
 
-   private static final java.awt.Color   RATING_STAR_COLOR          = new java.awt.Color(250, 224, 0);
+   private static final java.awt.Color   RATING_STAR_COLOR             = new java.awt.Color(250, 224, 0);
 
    private static RGB                    _mapTransparentRGB;
    private static Color                  _mapTransparentColor;
 
    private IDialogSettings               _state_Map2;
 
-   private Font                          _boldFontSWT               = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   private Font                          _boldFontSWT                  = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
    private Font                          _labelFontSWT;
    private String                        _labelFontName;
    private int                           _labelFontSize;
 
-   private java.awt.Font                 _labelFontAWT              = UI.AWT_DIALOG_FONT;
+   private java.awt.Font                 _labelFontAWT                 = UI.AWT_DIALOG_FONT;
    private java.awt.Font                 _clusterFontAWT;
 
    private Color                         _defaultBackgroundColor;
@@ -369,9 +369,9 @@ public class Map2 extends Canvas {
     * The overlay to delegate to for painting the "foreground" of the map component. This would
     * include painting waypoints, day/night, etc. also receives mouse events.
     */
-   private final TourMapPainter          _mapPainter                = new TourMapPainter();
+   private final TourMapPainter          _mapPainter                   = new TourMapPainter();
 
-   private final TileImageLoaderCallback _tileImageLoaderCallback   = new TileImageLoaderCallback_ForTileImages();
+   private final TileImageLoaderCallback _tileImageLoaderCallback      = new TileImageLoaderCallback_ForTileImages();
 
    private Cursor                        _currentCursor;
    private final Cursor                  _cursorCross;
@@ -382,29 +382,28 @@ public class Map2 extends Canvas {
    private final Cursor                  _cursorSearchTour_Scroll;
    private final Cursor                  _cursorSelect;
 
-   private final AtomicInteger           _redrawMapCounter          = new AtomicInteger();
-   private final AtomicInteger           _overlayRunnableCounter    = new AtomicInteger();
+   private final AtomicInteger           _redrawMapCounter             = new AtomicInteger();
+   private final AtomicInteger           _overlayRunnableCounter       = new AtomicInteger();
 
    private boolean                       _canPanMap;
    private boolean                       _isMapPanned;
 
    private boolean                       _isMouseDown;
-   private Point                         _mouseDownPosition;
    private GeoPosition                   _mouseDown_ContextMenu_GeoPosition;
-   private int                           _mouseMove_DevPosition_X   = Integer.MIN_VALUE;
-   private int                           _mouseMove_DevPosition_Y   = Integer.MIN_VALUE;
+   private int                           _mouseMove_DevPosition_X      = Integer.MIN_VALUE;
+   private int                           _mouseMove_DevPosition_Y      = Integer.MIN_VALUE;
    private int                           _mouseMove_DevPosition_X_Last;
    private int                           _mouseMove_DevPosition_Y_Last;
-   private int                           _mouseMove_DevPosition_X_Pixel;
-   private int                           _mouseMove_DevPosition_Y_Pixel;
    private GeoPosition                   _mouseMove_GeoPosition;
+   private Point                         _mouseDownPosition_ScalePixel = new Point(0, 0);
+   private Point                         _mouseMovePosition_ScalePixel = new Point(0, 0);
 
    private Thread                        _overlayThread;
    private long                          _nextOverlayRedrawTime;
 
-   private Map2Config                    _mapConfig                 = Map2ConfigManager.getActiveConfig();
+   private Map2Config                    _mapConfig                    = Map2ConfigManager.getActiveConfig();
 
-   private float                         _deviceScaling             = DPIUtil.getDeviceZoom() / 100f;
+   private float                         _deviceScaling                = DPIUtil.getDeviceZoom() / 100f;
 
    /*
     * Map points
@@ -558,7 +557,9 @@ public class Map2 extends Canvas {
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     * <br>
     */
-   private Point2D                                    _worldPixel_MapCenter      = null;
+   private Point2D                                    _worldPixel_MapCenter;
+
+   private Point2D                                    _worldPixel_MapCenter_ScalePixel;
 
    /**
     * Viewport in the map where the {@link #_mapImage} is painted <br>
@@ -2832,6 +2833,41 @@ public class Map2 extends Canvas {
    }
 
    /**
+    * @return Returns the current mouse position relative to the map or <code>null</code> when
+    *         reflection do not work
+    */
+   private Point getMousePositionInPixel() {
+
+      try {
+
+         /*
+          * Get mouse position without scaling, there is no public API, so we use reflection
+          */
+
+         final Object getLocation_Result = _getLocation_Method.invoke(getDisplay());
+
+         if (getLocation_Result instanceof final Point displayLocation_Pixel) {
+
+            final Object toControlInPixels_Result = _toControlInPixels_Method.invoke(this, displayLocation_Pixel.x, displayLocation_Pixel.y);
+
+            if (toControlInPixels_Result instanceof final Point relativeLocation_Pixel) {
+
+               return relativeLocation_Pixel;
+            }
+         }
+
+      } catch (SecurityException
+            | IllegalAccessException
+            | IllegalArgumentException
+            | InvocationTargetException e) {
+
+         StatusUtil.log(e);
+      }
+
+      return null;
+   }
+
+   /**
     * @param tileKey
     *
     * @return Returns the key to identify overlay images in the image cache
@@ -4467,7 +4503,7 @@ public class Map2 extends Canvas {
 
          // when the left mousebutton is clicked remember this point (for panning)
          _canPanMap = true;
-         _mouseDownPosition = devMousePosition;
+         _mouseDownPosition_ScalePixel = getMousePositionInPixel();
 
          setCursorOptimized(_cursorPan);
       }
@@ -4634,38 +4670,10 @@ public class Map2 extends Canvas {
 
       final Point devMousePosition = new Point(mouseEvent.x, mouseEvent.y);
 
-      final int mouseMoveDevX = _mouseMove_DevPosition_X = _mouseMove_DevPosition_X_Pixel = mouseEvent.x;
-      final int mouseMoveDevY = _mouseMove_DevPosition_Y = _mouseMove_DevPosition_Y_Pixel = mouseEvent.y;
+      final int mouseMoveDevX = _mouseMove_DevPosition_X = _mouseMovePosition_ScalePixel.x = mouseEvent.x;
+      final int mouseMoveDevY = _mouseMove_DevPosition_Y = _mouseMovePosition_ScalePixel.y = mouseEvent.y;
 
-      if (_deviceScaling != 1) {
-
-         try {
-
-            /*
-             * Get mouse position without scaling, there is no public API, so we use reflection
-             */
-
-            final Object getLocation_Result = _getLocation_Method.invoke(getDisplay());
-
-            if (getLocation_Result instanceof final Point displayLocation_Pixel) {
-
-               final Object toControlInPixels_Result = _toControlInPixels_Method.invoke(this, displayLocation_Pixel.x, displayLocation_Pixel.y);
-
-               if (toControlInPixels_Result instanceof final Point relativeLocation_Pixel) {
-
-                  _mouseMove_DevPosition_X_Pixel = relativeLocation_Pixel.x;
-                  _mouseMove_DevPosition_Y_Pixel = relativeLocation_Pixel.y;
-               }
-            }
-
-         } catch (SecurityException
-               | IllegalAccessException
-               | IllegalArgumentException
-               | InvocationTargetException e) {
-
-            StatusUtil.log(e);
-         }
-      }
+      _mouseMovePosition_ScalePixel = getMousePositionInPixel();
 
       // keep position for out of the map events, e.g. to recenter map
       _mouseMove_DevPosition_X_Last = mouseMoveDevX;
@@ -4859,7 +4867,7 @@ public class Map2 extends Canvas {
 
          // pan map
 
-         panMap(mouseEvent);
+         panMap(devMousePosition);
 
          return;
       }
@@ -5193,7 +5201,7 @@ public class Map2 extends Canvas {
                redraw();
             }
 
-            _mouseDownPosition = null;
+            _mouseDownPosition_ScalePixel = null;
             _canPanMap = false;
 
             setCursorOptimized(_cursorDefault);
@@ -9751,28 +9759,44 @@ public class Map2 extends Canvas {
 
    /**
     * pan the map
+    *
+    * @param devMousePosition
     */
-   private void panMap(final MouseEvent mouseEvent) {
+   private void panMap(final Point devMousePosition) {
 
       /*
        * Set new map center
        */
-      final Point movePosition = new Point(mouseEvent.x, mouseEvent.y);
 
-      final int mapDiffX = movePosition.x - _mouseDownPosition.x;
-      final int mapDiffY = movePosition.y - _mouseDownPosition.y;
+      final int mapDiffX_ScalePixel = _mouseMovePosition_ScalePixel.x - _mouseDownPosition_ScalePixel.x;
+      final int mapDiffY_ScalePixel = _mouseMovePosition_ScalePixel.y - _mouseDownPosition_ScalePixel.y;
 
-      final double oldCenterX = _worldPixel_MapCenter.getX();
-      final double oldCenterY = _worldPixel_MapCenter.getY();
+      _mouseDownPosition_ScalePixel = _mouseMovePosition_ScalePixel;
 
-      final double newCenterX = oldCenterX - mapDiffX;
-      final double newCenterY = oldCenterY - mapDiffY;
+      final double oldCenterX_ScalePixel = _worldPixel_MapCenter_ScalePixel.getX();
+      final double oldCenterY_ScalePixel = _worldPixel_MapCenter_ScalePixel.getY();
 
-      _mouseDownPosition = movePosition;
+      final double newCenterX_ScalePixel = oldCenterX_ScalePixel - mapDiffX_ScalePixel;
+      final double newCenterY_ScalePixel = oldCenterY_ScalePixel - mapDiffY_ScalePixel;
+
       _isMapPanned = true;
 
-      // set new map center
-      setMapCenterInWorldPixel(new Point2D.Double(newCenterX, newCenterY));
+      final Point2D.Double newWorldPixelCenter = new Point2D.Double(newCenterX_ScalePixel, newCenterY_ScalePixel);
+      final Point2D.Double newWorldPixelCenter_NoScaling = new Point2D.Double(
+            newCenterX_ScalePixel / _deviceScaling,
+            newCenterY_ScalePixel / _deviceScaling);
+
+      System.out.println(""
+
+            + mapDiffX_ScalePixel + " / " + mapDiffY_ScalePixel
+
+//            + " - " + _mouseMovePosition_ScalePixel
+//            + " - " + _mouseDownPosition_ScalePixel
+
+      );
+// TODO remove SYSTEM.OUT.PRINTLN
+
+      setMapCenterInWorldPixel(newWorldPixelCenter_NoScaling, newWorldPixelCenter);
 
       updateViewportData();
 
@@ -10446,15 +10470,27 @@ public class Map2 extends Canvas {
       paint();
    }
 
+   private void setMapCenterInWorldPixel(final Point2D newWorldPixelCenter) {
+
+      setMapCenterInWorldPixel(newWorldPixelCenter, null);
+   }
+
    /**
     * Sets the center of the map {@link #_worldPixel_MapCenter} in world pixel coordinates with the
     * current zoom level
     *
     * @param newWorldPixelCenter
+    * @param newWorldPixelCenter_ScalePixel
+    *           Can be <code>null</code>
     */
-   private void setMapCenterInWorldPixel(final Point2D newWorldPixelCenter) {
+   private void setMapCenterInWorldPixel(final Point2D newWorldPixelCenter,
+                                         final Point2D newWorldPixelCenter_ScalePixel) {
 
       _worldPixel_MapCenter = checkWorldPixel(newWorldPixelCenter);
+
+      _worldPixel_MapCenter_ScalePixel = newWorldPixelCenter_ScalePixel == null
+            ? new Point2D.Double(_worldPixel_MapCenter.getX() * _deviceScaling, _worldPixel_MapCenter.getY() * _deviceScaling)
+            : newWorldPixelCenter_ScalePixel;
 
       fireEvent_MousePosition();
    }
@@ -10559,6 +10595,7 @@ public class Map2 extends Canvas {
 
          // set new map center
          _worldPixel_MapCenter = wpMapCenter;
+         _worldPixel_MapCenter_ScalePixel = new Point2D.Double(wpMapCenter.x, wpMapCenter.y);
 
          updateViewportData();
       }

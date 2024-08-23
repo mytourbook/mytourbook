@@ -747,6 +747,10 @@ public class UI {
 
    static {
 
+      // overwrite 4k scaling for debugging
+      System.setProperty("swt.autoScale", "200");
+      System.setProperty("swt.autoScale", "101");
+
       /**
        * This creates a display which may contain also sleak options, otherwise sleak would not
        * work.
