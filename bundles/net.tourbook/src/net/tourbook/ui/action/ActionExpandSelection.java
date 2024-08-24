@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -88,27 +88,26 @@ public class ActionExpandSelection extends Action {
 
       final ITreeSelection selection = (ITreeSelection) treeViewer.getSelection();
 
-      treeViewer.expandAll(true);
+//      treeViewer.expandAll(true);
+//
+// TODO customize expand "all"
 
-// TODO customize expand "all"      
-//
-//
-//      if (selection.isEmpty()) {
-//
-//         if (_isExpandAllWhenNoSelection) {
-//
-//            treeViewer.expandAll(true);
-//         }
-//
-//      } else {
-//
-//         tree.setRedraw(false);
-//         {
-//            for (final Object name : selection) {
-//               treeViewer.expandToLevel(name, _expandLevels);
-//            }
-//         }
-//         tree.setRedraw(true);
-//      }
+      if (selection.isEmpty()) {
+
+         if (_isExpandAllWhenNoSelection) {
+
+            treeViewer.expandAll(true);
+         }
+
+      } else {
+
+         tree.setRedraw(false);
+         {
+            for (final Object name : selection) {
+               treeViewer.expandToLevel(name, _expandLevels);
+            }
+         }
+         tree.setRedraw(true);
+      }
    }
 }
