@@ -36,6 +36,7 @@ import net.tourbook.chart.Util;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
 import net.tourbook.common.color.ColorProviderConfig;
+import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
@@ -228,15 +229,15 @@ public class TourMapPainter extends Map2Painter {
     * @param isDarkBackground
     * @param isDrawUnitShadow
     */
-   private static void drawMap_Legend_AWT(final Graphics2D g2d,
-                                          final IGradientColorProvider colorProvider,
-                                          final ColorProviderConfig config,
-                                          final int legendWidth,
-                                          final int legendHeight,
-                                          final boolean isDrawVertical,
-                                          final boolean isDrawUnits,
-                                          final boolean isDarkBackground,
-                                          final boolean isDrawUnitShadow) {
+   public static void drawMap_Legend_AWT(final Graphics2D g2d,
+                                         final IGradientColorProvider colorProvider,
+                                         final ColorProviderConfig config,
+                                         final int legendWidth,
+                                         final int legendHeight,
+                                         final boolean isDrawVertical,
+                                         final boolean isDrawUnits,
+                                         final boolean isDarkBackground,
+                                         final boolean isDrawUnitShadow) {
 
       g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
@@ -263,8 +264,20 @@ public class TourMapPainter extends Map2Painter {
        * Setup font
        */
       final Font font = DEFAULT_FONT;
-      final Font font4k = font.deriveFont(font.getSize() * UI.SCALING_4K);
-      g2d.setFont(font4k);
+
+      final float defaultFontSize = font.getSize2D();
+
+      final float fontSize = //
+
+            UI.SCALING_4K <= 1.5 ? defaultFontSize * 1.5f
+
+                  : UI.SCALING_4K <= 2 ? defaultFontSize * 1.7f
+
+                        : UI.SCALING_4K <= 3 ? defaultFontSize * 1.8f
+
+                              : defaultFontSize * 1.8f;
+
+      g2d.setFont(font.deriveFont(fontSize));
 
       // Measure the font and the message
       final FontRenderContext fontRenderContext = g2d.getFontRenderContext();
@@ -463,35 +476,9 @@ public class TourMapPainter extends Map2Painter {
       }
    }
 
-   /**
-    * Draws map legend colors into the legend bounds.
-    *
-    * @param gc
-    * @param legendImageBounds
-    * @param colorProvider
-    * @param isDrawVertical
-    * @param isDrawVertical
-    *           When <code>true</code> the legend is drawn vertically otherwise it's drawn
-    *           horizontally.
-    * @param isDarkBackground
-    * @param isDrawLegendText
-    */
-   public static void drawMap2_Legend(final GC gc,
-                                      final Rectangle legendImageBounds,
-                                      final IMapColorProvider colorProvider) {
-
-      if (colorProvider instanceof IGradientColorProvider) {
-
-         drawMap2_Legend_GradientColors_SWT(
-               gc,
-               legendImageBounds,
-               (IGradientColorProvider) colorProvider);
-      }
-   }
-
-   private static void drawMap2_Legend_GradientColors_SWT(final GC gc,
-                                                          final Rectangle imageBounds,
-                                                          final IGradientColorProvider colorProvider) {
+   public static void drawMap2_Legend_GradientColors_AWT(final Graphics2D g2d,
+                                                         final Rectangle iconBounds,
+                                                         final IGradientColorProvider colorProvider) {
 
       final MapUnits mapUnits = colorProvider.getMapUnits(ColorProviderConfig.MAP2);
 
@@ -518,11 +505,11 @@ public class TourMapPainter extends Map2Painter {
       int availableLegendPixels;
 
       // horizontal legend
-      contentX = imageBounds.x;
-      contentY = imageBounds.y;
+      contentX = iconBounds.x;
+      contentY = iconBounds.y;
 
-      contentWidth = imageBounds.width;
-      contentHeight = imageBounds.height;
+      contentWidth = iconBounds.width;
+      contentHeight = iconBounds.height;
 
       availableLegendPixels = contentWidth;
 
@@ -544,11 +531,9 @@ public class TourMapPainter extends Map2Painter {
          final long valueRGB = colorProvider.getRGBValue(ColorProviderConfig.MAP2, legendValue);
          final Color valueColor = _colorCache.getColor((int) valueRGB);
 
-         gc.setForeground(valueColor);
-
          // horizontal legend
-
-         gc.drawLine(devXorY_Value, contentY, devXorY_Value, contentHeight);
+         g2d.setColor(ColorUtil.convertSWTColor_into_AWTColor(valueColor));
+         g2d.drawLine(devXorY_Value, contentY, devXorY_Value, contentHeight);
       }
 
       _colorCache.dispose();
