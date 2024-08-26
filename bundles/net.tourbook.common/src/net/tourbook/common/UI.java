@@ -341,6 +341,8 @@ public class UI {
     */
    public static boolean       IS_4K_DISPLAY;
 
+   public static float         SCALING_4K;
+
    /**
     * On Linux an async selection event is fired since e4
     */
@@ -758,7 +760,11 @@ public class UI {
 
       updateUnits();
 
-      IS_4K_DISPLAY = DPIUtil.getDeviceZoom() >= 140;
+      final int deviceZoom = DPIUtil.getDeviceZoom();
+
+      IS_4K_DISPLAY = deviceZoom >= 140;
+      SCALING_4K = deviceZoom / 100f;
+
       setupUI_FontMetrics();
       setupUI_AWTFonts();
 

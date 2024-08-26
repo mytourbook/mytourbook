@@ -42,6 +42,7 @@ import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.color.MapUnits;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.ImageConverter;
+import net.tourbook.common.util.ScaledImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
@@ -61,8 +62,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Paints a tour into the 2D map.
@@ -138,15 +141,11 @@ public class TourMapPainter extends Map2Painter {
    /**
     * Creates a legend image with AWT framework. This image must be disposed who created it.
     *
-    * @param display
     * @param colorProvider
     * @param imageWidth
     * @param imageHeight
     * @param isDarkBackground
-    * @param isDrawVertical
-    * @param isDarkBackground
     * @param isDrawUnitShadow
-    * @param isDrawLegendText
     *
     * @return
     */
@@ -156,17 +155,20 @@ public class TourMapPainter extends Map2Painter {
                                                   final boolean isDarkBackground,
                                                   final boolean isDrawUnitShadow) {
 
-      final BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_4BYTE_ABGR);
+      final int imageWidthScaled = (int) (imageWidth * UI.SCALING_4K);
+      final int imageHeightScaled = (int) (imageHeight * UI.SCALING_4K);
 
-      final Graphics2D g2d = image.createGraphics();
+      final BufferedImage awtImage = new BufferedImage(imageWidthScaled, imageHeightScaled, BufferedImage.TYPE_4BYTE_ABGR);
+
+      final Graphics2D g2d = awtImage.createGraphics();
       try {
 
          drawMap_Legend_AWT(
                g2d,
                colorProvider,
                ColorProviderConfig.MAP2,
-               imageWidth,
-               imageHeight,
+               imageWidthScaled,
+               imageHeightScaled,
                true, // isVertical
                true, // isDrawUnits
                isDarkBackground,
@@ -176,7 +178,10 @@ public class TourMapPainter extends Map2Painter {
          g2d.dispose();
       }
 
-      return ImageConverter.convertIntoSWT(image);
+      final ImageData swtImageDataFromAwt = ImageConverter.convertIntoSWTImageData(awtImage);
+      final Image swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(swtImageDataFromAwt));
+
+      return swtImage;
 
    }
 
@@ -233,28 +238,7 @@ public class TourMapPainter extends Map2Painter {
                                           final boolean isDarkBackground,
                                           final boolean isDrawUnitShadow) {
 
-// SET_FORMATTING_OFF
-
-      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HBGR);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VBGR);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VRGB);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-
-// sometimes it looks better with this parameter but sometimes not
-//      g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,     RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-//      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,          RenderingHints.VALUE_ANTIALIAS_ON);
-//      g2d.setRenderingHint(RenderingHints.KEY_DITHERING,             RenderingHints.VALUE_DITHER_ENABLE);
-//      g2d.setRenderingHint(RenderingHints.KEY_RENDERING,             RenderingHints.VALUE_RENDER_QUALITY);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST,     100);
-//      g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,   RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-//      g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,       RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-//      g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,        RenderingHints.VALUE_STROKE_PURE);
-
-// SET_FORMATTING_ON
+      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
       final MapUnits mapUnits = colorProvider.getMapUnits(config);
 
@@ -279,9 +263,8 @@ public class TourMapPainter extends Map2Painter {
        * Setup font
        */
       final Font font = DEFAULT_FONT;
-      g2d.setFont(font);
-//      final Font largerFont = font.deriveFont(font.getSize() * 1.1f);
-//      g2d.setFont(largerFont);
+      final Font font4k = font.deriveFont(font.getSize() * UI.SCALING_4K);
+      g2d.setFont(font4k);
 
       // Measure the font and the message
       final FontRenderContext fontRenderContext = g2d.getFontRenderContext();
@@ -335,6 +318,9 @@ public class TourMapPainter extends Map2Painter {
 
          availableLegendPixels = graphWidth;
       }
+
+      graphWidth *= UI.SCALING_4K;
+      graphHeight *= UI.SCALING_4K;
 
       // pixelValue contains the value for ONE pixel
       final float pixelValue = legendDiffValue / availableLegendPixels;
@@ -474,7 +460,6 @@ public class TourMapPainter extends Map2Painter {
             // horizontal legend
             g2d.drawLine(devValue, contentY, devValue, graphHeight);
          }
-
       }
    }
 

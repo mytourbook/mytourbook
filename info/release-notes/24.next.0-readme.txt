@@ -49,6 +49,10 @@ Experimental
 New
 ===
 
+* Beautified 4k Display
+  - 500+ icons
+  - 2D Map: Legend, scale
+
 * Waypoints
   - Waypoints are now painted as map points
 
@@ -56,7 +60,8 @@ New
 Improvements
 ============
 
-* 
+* Tour Type Icon
+  - Customize image scaling
   
 
 Changes

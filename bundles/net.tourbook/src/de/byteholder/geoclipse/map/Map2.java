@@ -100,6 +100,7 @@ import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.ImageUtils;
 import net.tourbook.common.util.MtMath;
+import net.tourbook.common.util.ScaledImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TourToolTip;
@@ -184,7 +185,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.ImageDataProvider;
 import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -811,27 +811,6 @@ public class Map2 extends Canvas {
          if (isUpdateUI) {
             paint();
          }
-      }
-   }
-
-   /**
-    * With helpful hints from Heiko Klare
-    *
-    * https://github.com/eclipse-platform/eclipse.platform.swt/issues/1411
-    */
-   private class ScaledImageDataProvider implements ImageDataProvider {
-
-      private ImageData _imageData;
-
-      public ScaledImageDataProvider(final ImageData imageData) {
-
-         _imageData = imageData;
-      }
-
-      @Override
-      public ImageData getImageData(final int zoom) {
-
-         return _imageData;
       }
    }
 
@@ -2646,7 +2625,7 @@ public class Map2 extends Canvas {
    }
 
    public float getDeviceScaling() {
-      
+
       return _deviceScaling;
    }
 
@@ -10589,6 +10568,7 @@ public class Map2 extends Canvas {
    }
 
    public void setMeasurementSystem(final float distanceUnitValue, final String distanceUnitLabel) {
+
       _distanceUnitValue = distanceUnitValue;
       _distanceUnitLabel = distanceUnitLabel;
    }
