@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,23 +24,23 @@ import org.eclipse.jface.action.Action;
 
 public class ActionZoomOutToMinZoom extends Action {
 
-	private IMapDefaultActions	_mapActionProvider;
+   private IMapDefaultActions _mapActionProvider;
 
-	public ActionZoomOutToMinZoom(final IMapDefaultActions mapActionProvider) {
+   public ActionZoomOutToMinZoom(final IMapDefaultActions mapActionProvider) {
 
-		super(null, AS_PUSH_BUTTON);
+      super(null, AS_PUSH_BUTTON);
 
-		_mapActionProvider = mapActionProvider;
+      _mapActionProvider = mapActionProvider;
 
-		setToolTipText(Messages.Map_Action_ZoomOutToMinZoom_Tooltip);
+      setToolTipText(Messages.Map_Action_ZoomOutToMinZoom_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_Out_ToMinZoom));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_Out_ToMinZoom_Disabled));
-	}
+      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_ShowEntireTour));
+      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_ShowEntireTour_Disabled));
+   }
 
-	@Override
-	public void run() {
-		_mapActionProvider.actionZoomOutToMinZoom();
-	}
+   @Override
+   public void run() {
+      _mapActionProvider.actionZoomOutToMinZoom();
+   }
 
 }
