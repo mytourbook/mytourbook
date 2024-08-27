@@ -50,8 +50,10 @@ New
 ===
 
 * Beautified 4k Display
-  - 500+ icons
-  - 2D Map: Legend, scale
+  - Rescaled 500+ icons
+  - 2D Map
+    - Rescaled map legend
+    - Rescaled SRTM map color provider
 
 * Waypoints
   - Waypoints are now painted as map points

@@ -2140,6 +2140,23 @@ public class UI {
       return accelerator;
    }
 
+   public static Font getAWT4kScaledDefaultFont() {
+
+      final float defaultFontSize = AWT_DIALOG_FONT.getSize2D();
+
+      final float fontSize = //
+
+            UI.SCALING_4K <= 1.5 ? defaultFontSize * 1.5f
+
+                  : UI.SCALING_4K <= 2 ? defaultFontSize * 1.7f
+
+                        : UI.SCALING_4K <= 3 ? defaultFontSize * 1.8f
+
+                              : defaultFontSize * 1.8f;
+
+      return AWT_DIALOG_FONT.deriveFont(fontSize);
+   }
+
    /**
     * Get best-fit size for an image drawn in an area of maxX, maxY
     * <p>

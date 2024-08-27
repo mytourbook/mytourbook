@@ -95,7 +95,7 @@ public class ColorChooser extends Composite {
 
    private static final double                    SINUS_120                             = Math.sin(A_120);
    private static final double                    SINUS_240                             = -SINUS_120;
-   private static final double                    COSINUS_120                            = Math.cos(A_120);
+   private static final double                    COSINUS_120                           = Math.cos(A_120);
    private static final double                    COSINUS_240                           = COSINUS_120;
 
    private RGB                                    _chooserRGB;
@@ -324,11 +324,6 @@ public class ColorChooser extends Composite {
       {
          {
             _hexagonCanvas = new ImageCanvas(container, SWT.NONE);
-            GridDataFactory.fillDefaults()//
-                  .hint(_chooserSize, _chooserSize)
-                  .grab(true, false)
-                  .align(SWT.CENTER, SWT.FILL)
-                  .applyTo(_hexagonCanvas);
             _hexagonCanvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
             final Image hexagonImage = new Image(container.getDisplay(), _chooserSize, _chooserSize);
@@ -359,6 +354,12 @@ public class ColorChooser extends Composite {
                   onHexagonMouseMove(e);
                }
             });
+
+            GridDataFactory.fillDefaults()
+                  .hint(_chooserSize, _chooserSize)
+                  .grab(true, false)
+                  .align(SWT.CENTER, SWT.FILL)
+                  .applyTo(_hexagonCanvas);
          }
 
          final Composite scaleContainer = new Composite(container, SWT.NONE);
@@ -955,8 +956,10 @@ public class ColorChooser extends Composite {
          switch (sector) {
          case 0:
             return new RGB(_col3, col2, col1);
+
          case 1:
             return new RGB(col1, _col3, col2);
+
          case 2:
             return new RGB(col2, col1, _col3);
          }

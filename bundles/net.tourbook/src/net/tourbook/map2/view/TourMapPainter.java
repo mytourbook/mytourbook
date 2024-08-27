@@ -265,19 +265,9 @@ public class TourMapPainter extends Map2Painter {
        */
       final Font font = DEFAULT_FONT;
 
-      final float defaultFontSize = font.getSize2D();
+      final Font scaled4kFont = UI.getAWT4kScaledDefaultFont();
 
-      final float fontSize = //
-
-            UI.SCALING_4K <= 1.5 ? defaultFontSize * 1.5f
-
-                  : UI.SCALING_4K <= 2 ? defaultFontSize * 1.7f
-
-                        : UI.SCALING_4K <= 3 ? defaultFontSize * 1.8f
-
-                              : defaultFontSize * 1.8f;
-
-      g2d.setFont(font.deriveFont(fontSize));
+      g2d.setFont(scaled4kFont);
 
       // Measure the font and the message
       final FontRenderContext fontRenderContext = g2d.getFontRenderContext();
@@ -475,6 +465,7 @@ public class TourMapPainter extends Map2Painter {
          }
       }
    }
+
 
    public static void drawMap2_Legend_GradientColors_AWT(final Graphics2D g2d,
                                                          final Rectangle iconBounds,
