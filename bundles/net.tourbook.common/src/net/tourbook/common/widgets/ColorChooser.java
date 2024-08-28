@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@
  */
 package net.tourbook.common.widgets;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -26,6 +27,8 @@ import java.io.Writer;
 
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.ImageConverter;
+import net.tourbook.common.util.ScaledImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.actions.ActionColorChooserAddColorsFromProfile;
@@ -49,13 +52,13 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -100,6 +103,7 @@ public class ColorChooser extends Composite {
 
    private RGB                                    _chooserRGB;
    private int                                    _chooserSize;
+   private int                                    _chooserSize_Unscaled;
    private int                                    _chooserRadius;
    private int                                    _hexagonRadius;
 
@@ -323,14 +327,11 @@ public class ColorChooser extends Composite {
       GridLayoutFactory.swtDefaults().applyTo(container);
       {
          {
-            _hexagonCanvas = new ImageCanvas(container, SWT.NONE);
-            _hexagonCanvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-
-            final Image hexagonImage = new Image(container.getDisplay(), _chooserSize, _chooserSize);
-            _hexagonCanvas.setImage(hexagonImage);
+            _hexagonCanvas = new ImageCanvas(container, SWT.NO_BACKGROUND);
 
             _hexagonCanvas.setToolTipText(Messages.Color_Chooser_Hexagon_Tooltip);
 
+            _hexagonCanvas.addMouseMoveListener(event -> onHexagonMouseMove(event));
             _hexagonCanvas.addMouseListener(new MouseListener() {
 
                @Override
@@ -338,25 +339,20 @@ public class ColorChooser extends Composite {
 
                @Override
                public void mouseDown(final MouseEvent e) {
+
                   _hexagonChangeState = true;
                   chooseRGBFromHexagon(e);
                }
 
                @Override
                public void mouseUp(final MouseEvent e) {
+
                   _hexagonChangeState = false;
                }
             });
 
-            _hexagonCanvas.addMouseMoveListener(new MouseMoveListener() {
-               @Override
-               public void mouseMove(final MouseEvent e) {
-                  onHexagonMouseMove(e);
-               }
-            });
-
             GridDataFactory.fillDefaults()
-                  .hint(_chooserSize, _chooserSize)
+                  .hint(_chooserSize_Unscaled, _chooserSize_Unscaled)
                   .grab(true, false)
                   .align(SWT.CENTER, SWT.FILL)
                   .applyTo(_hexagonCanvas);
@@ -368,33 +364,20 @@ public class ColorChooser extends Composite {
 //			scaleContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
          {
             _scaleHexagon = new Scale(scaleContainer, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleHexagon);
             _scaleHexagon.setMinimum(0);
             _scaleHexagon.setMaximum(255);
             _scaleHexagon.setPageIncrement(16);
-            _scaleHexagon.addListener(SWT.Selection, new Listener() {
-               @Override
-               public void handleEvent(final Event e) {
-                  onHexagonScale();
-               }
-            });
+            _scaleHexagon.addListener(SWT.Selection, e -> onHexagonScale());
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleHexagon);
 
             _spinnerHexagon = new Spinner(scaleContainer, SWT.BORDER);
             _spinnerHexagon.setMinimum(0);
             _spinnerHexagon.setMaximum(255);
             _spinnerHexagon.setPageIncrement(16);
-            _spinnerHexagon.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onHexagonSpinner();
-               }
-            });
-            _spinnerHexagon.addMouseWheelListener(new MouseWheelListener() {
-               @Override
-               public void mouseScrolled(final MouseEvent event) {
-                  Util.adjustSpinnerValueOnMouseScroll(event);
-                  onHexagonSpinner();
-               }
+            _spinnerHexagon.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onHexagonSpinner()));
+            _spinnerHexagon.addMouseWheelListener(event -> {
+               Util.adjustSpinnerValueOnMouseScroll(event);
+               onHexagonSpinner();
             });
          }
       }
@@ -695,14 +678,14 @@ public class ColorChooser extends Composite {
 
    private void createUI_40_SelectedColor(final Composite parent) {
 
-      final int colorHeight = _chooserSize / 10;
+      final int colorHeight = _chooserSize_Unscaled / 10;
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, true)
             .minSize(SWT.DEFAULT, SWT.DEFAULT)
             .applyTo(container);
-      GridLayoutFactory.fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(2)
             .spacing(5, 1)
             .equalWidth(true)
@@ -779,8 +762,7 @@ public class ColorChooser extends Composite {
       final int colorSpacing = 5;
       final int columnSpacing = (NUMBER_OF_HORIZONTAL_COLORS - 5) * colorSpacing;
 
-      final int customColorSize = (_chooserSize - columnSpacing) / NUMBER_OF_HORIZONTAL_COLORS;
-//		final int customColorSize = (_chooserSize) / NUMBER_OF_HORIZONTAL_COLORS;
+      final int customColorSize = (_chooserSize_Unscaled - columnSpacing) / NUMBER_OF_HORIZONTAL_COLORS;
 
       _customColors = new Label[NUMBER_OF_VERTICAL_COLORS][NUMBER_OF_HORIZONTAL_COLORS];
 
@@ -812,41 +794,29 @@ public class ColorChooser extends Composite {
 
    private void drawHexagon() {
 
-      final Display display = getDisplay();
+      final BufferedImage awtImage = new BufferedImage(_chooserSize, _chooserSize, BufferedImage.TYPE_4BYTE_ABGR);
 
-      final GC gc = new GC(_hexagonCanvas.getImage());
-      final Color defaultColor = new Color(display, _hexagonDefaultRGB);
-      {
-         for (int x = -_chooserRadius; x < _chooserRadius; x++) {
-            for (int y = -_chooserRadius; y < _chooserRadius; y++) {
+      for (int x = -_chooserRadius; x < _chooserRadius; x++) {
+         for (int y = -_chooserRadius; y < _chooserRadius; y++) {
 
-               /*
-                * This code is optimized that default color is not created all the time and
-                * disposed, this reduced drawing time from 700 to 500 ms.
-                */
-               final RGB rgbFromHexagon = getRgbFromHexagon(x, y);
+            final RGB rgbFromHexagon = getRgbFromHexagon(x, y);
 
-               Color fgColor;
-               if (rgbFromHexagon == _hexagonDefaultRGB) {
-                  fgColor = defaultColor;
-               } else {
-                  fgColor = new Color(display, rgbFromHexagon);
-               }
+            final int rgbFromHexagon_Value = ((0xFF) << 24) |
+                  ((rgbFromHexagon.red & 0xFF) << 16) |
+                  ((rgbFromHexagon.green & 0xFF) << 8) |
+                  ((rgbFromHexagon.blue & 0xFF) << 0);
 
-               {
-                  gc.setForeground(fgColor);
-                  gc.drawPoint(x + _chooserRadius, y + _chooserRadius);
-               }
-
-               if (rgbFromHexagon != _hexagonDefaultRGB) {
-                  fgColor.dispose();
-               }
-
-            }
+            awtImage.setRGB(
+                  x + _chooserRadius,
+                  y + _chooserRadius,
+                  rgbFromHexagon_Value);
          }
       }
-      defaultColor.dispose();
-      gc.dispose();
+
+      final ImageData swtImageDataFromAwt = ImageConverter.convertIntoSWTImageData(awtImage);
+      final Image swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(swtImageDataFromAwt));
+
+      _hexagonCanvas.setImage(swtImage);
    }
 
    private void enableControls() {
@@ -971,8 +941,16 @@ public class ColorChooser extends Composite {
 
    private RGB getRgbFromHexagon(final MouseEvent event) {
 
-      final int x = event.x - _chooserRadius;
-      final int y = event.y - _chooserRadius;
+      final int mouseX = event.x;
+      final int mouseY = event.y;
+
+      final float chooserRadius_Scaled = _chooserRadius / UI.SCALING_4K;
+
+      int x = (int) (mouseX - chooserRadius_Scaled);
+      int y = (int) (mouseY - chooserRadius_Scaled);
+
+      x = (int) (x * UI.SCALING_4K);
+      y = (int) (y * UI.SCALING_4K);
 
       return getRgbFromHexagon(x, y);
    }
@@ -1340,7 +1318,8 @@ public class ColorChooser extends Composite {
 
    private void setHexagonSize() {
 
-      _chooserSize = 300;
+      _chooserSize_Unscaled = 300;
+      _chooserSize = (int) (_chooserSize_Unscaled * UI.SCALING_4K);
 
       _chooserRadius = _chooserSize / 2;
       _hexagonRadius = (int) (_chooserSize / 2.1);
