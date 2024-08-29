@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -432,17 +432,25 @@ public class TourLegendLayer extends RenderableLayer {
          return;
       }
 
-      final int mapHeight = Map3Manager.getMap3View().getMapSize().height;
+      final int legendTopMargin = 100;
 
-      final int legendMinHeight = Math.min(IMapColorProvider.DEFAULT_LEGEND_HEIGHT, mapHeight - 40);
-      final int legendHeight = Math.max(40, legendMinHeight);
+      final int mapHeight = Map3Manager.getMap3View().getMapSize().height;
+      final int legendMaxTop = mapHeight - legendTopMargin;
+
+      final int legendMinHeight = Math.min(IMapColorProvider.DEFAULT_LEGEND_HEIGHT, legendMaxTop);
+      final int legendHeight = Math.max(legendTopMargin, legendMinHeight);
+
+      final int legendWidth = IMapColorProvider.DEFAULT_LEGEND_GRAPHIC_WIDTH;
+
+      final int legendWidthScaled = (int) (legendWidth * UI.SCALING_4K);
+      int legendHeightScaled = (int) (legendHeight * UI.SCALING_4K);
+
+      legendHeightScaled = Math.min(legendHeightScaled, legendMaxTop);
 
       final BufferedImage image = new BufferedImage(
-            IMapColorProvider.DEFAULT_LEGEND_GRAPHIC_WIDTH,
-            legendHeight,
+            legendWidthScaled,
+            legendHeightScaled,
             BufferedImage.TYPE_4BYTE_ABGR);
-
-      final int legendWidth = image.getWidth();
 
       final Graphics2D g2d = image.createGraphics();
 
@@ -452,7 +460,9 @@ public class TourLegendLayer extends RenderableLayer {
                Map3Manager.getMap3View().getAllTours(),
                gradientColorProvider,
                ColorProviderConfig.MAP3_TOUR,
-               legendHeight);
+
+               // complicate that not too much labels are created
+               (int) (legendHeight * 0.7f));
 
          if (isDataAvailable) {
 
@@ -460,8 +470,8 @@ public class TourLegendLayer extends RenderableLayer {
                   g2d,
                   gradientColorProvider,
                   ColorProviderConfig.MAP3_TOUR,
-                  legendWidth,
-                  legendHeight,
+                  legendWidthScaled,
+                  legendHeightScaled,
                   UI.IS_DARK_THEME,
                   false // no unit shadow
             );
@@ -477,25 +487,27 @@ public class TourLegendLayer extends RenderableLayer {
       /*
        * set legend position at left/bottom
        */
-      final int devXCenter = 5 + (int) (IMapColorProvider.DEFAULT_LEGEND_GRAPHIC_WIDTH / 2.0);
-      final int devYCenter = (int) (mapHeight - (legendHeight / 2.0)) - 30;
+      final int devXCenter = 5 + (int) (legendWidthScaled / 2.0);
+      final int devYCenter = (int) (mapHeight - (legendHeightScaled / 2.0)) - 30;
 
       _legendImageLocation = new Point(devXCenter, devYCenter);
       _legendImage.setScreenLocation(_legendImageLocation);
 
       final List<TourLegendLabel> legendLabels = TourMapPainter.getMap3_LegendLabels(
-            legendHeight,
+            legendHeightScaled,
             gradientColorProvider,
             ColorProviderConfig.MAP3_TOUR);
 
       final ArrayList<LabelAttributes> labelAttributes = new ArrayList<>();
+
+      final Font scaled4kFont = UI.getAWT4kScaledDefaultFont();
 
       for (final TourLegendLabel mapLegendLabel : legendLabels) {
 
          labelAttributes.add(createLegendLabelAttributes(
                mapLegendLabel.legendValue,
                mapLegendLabel.legendText,
-               DEFAULT_FONT,
+               scaled4kFont,
                Color.WHITE,
                5d,
                0d));
@@ -504,8 +516,8 @@ public class TourLegendLayer extends RenderableLayer {
       final MapUnits mapUnits = gradientColorProvider.getMapUnits(ColorProviderConfig.MAP3_TOUR);
 
       _labels = createColorGradientLegendLabels(
-            legendWidth,
-            legendHeight,
+            legendWidthScaled,
+            legendHeightScaled,
             mapUnits.legendMinValue,
             mapUnits.legendMaxValue,
             labelAttributes);

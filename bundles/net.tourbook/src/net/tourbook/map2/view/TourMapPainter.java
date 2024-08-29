@@ -609,7 +609,7 @@ public class TourMapPainter extends Map2Painter {
             if (legendValue >= unitValue) {
 
                /*
-                * get unit label
+                * Get unit label
                 */
                String valueText;
                if (unitLabels == null) {
@@ -631,6 +631,7 @@ public class TourMapPainter extends Map2Painter {
                   }
 
                } else {
+
                   // when unitLabels are available, they will overwrite the default labeling
                   valueText = unitLabels.get(unitLabelIndex++);
                }
