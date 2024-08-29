@@ -183,7 +183,6 @@ public class TourMapPainter extends Map2Painter {
       final Image swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(swtImageDataFromAwt));
 
       return swtImage;
-
    }
 
    public static Image createMap3_LegendImage(final IGradientColorProvider colorProvider,
@@ -195,17 +194,23 @@ public class TourMapPainter extends Map2Painter {
                                               final boolean isDarkBackground,
                                               final boolean isDrawUnitShadow) {
 
-      final BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_4BYTE_ABGR);
+      final int imageWidthScaled = (int) (imageWidth * UI.SCALING_4K);
+      final int imageHeightScaled = (int) (imageHeight * UI.SCALING_4K);
 
-      final Graphics2D g2d = image.createGraphics();
+      final BufferedImage awtImage = new BufferedImage(imageWidthScaled, imageHeightScaled, BufferedImage.TYPE_4BYTE_ABGR);
+
+      final Graphics2D g2d = awtImage.createGraphics();
       try {
 
          drawMap_Legend_AWT(
+
                g2d,
                colorProvider,
                config,
-               imageWidth,
-               imageHeight,
+
+               imageWidthScaled,
+               imageHeightScaled,
+
                isVertical,
                isDrawUnits,
                isDarkBackground,
@@ -215,7 +220,10 @@ public class TourMapPainter extends Map2Painter {
          g2d.dispose();
       }
 
-      return ImageConverter.convertIntoSWT(image);
+      final ImageData swtImageDataFromAwt = ImageConverter.convertIntoSWTImageData(awtImage);
+      final Image swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(swtImageDataFromAwt));
+
+      return swtImage;
    }
 
    /**
@@ -232,8 +240,10 @@ public class TourMapPainter extends Map2Painter {
    public static void drawMap_Legend_AWT(final Graphics2D g2d,
                                          final IGradientColorProvider colorProvider,
                                          final ColorProviderConfig config,
+
                                          final int legendWidth,
                                          final int legendHeight,
+
                                          final boolean isDrawVertical,
                                          final boolean isDrawUnits,
                                          final boolean isDarkBackground,
@@ -263,16 +273,15 @@ public class TourMapPainter extends Map2Painter {
       /*
        * Setup font
        */
-      final Font font = DEFAULT_FONT;
-
       final Font scaled4kFont = UI.getAWT4kScaledDefaultFont();
-
       g2d.setFont(scaled4kFont);
 
       // Measure the font and the message
       final FontRenderContext fontRenderContext = g2d.getFontRenderContext();
-      final LineMetrics metrics = font.getLineMetrics(unitText, fontRenderContext);
-      final float lineheight = metrics.getHeight(); // Total line height
+      final LineMetrics metrics = DEFAULT_FONT.getLineMetrics(unitText, fontRenderContext);
+
+      // Total line height
+      final float lineheight = metrics.getHeight();
 
       /*
        * Setup legend image
@@ -465,7 +474,6 @@ public class TourMapPainter extends Map2Painter {
          }
       }
    }
-
 
    public static void drawMap2_Legend_GradientColors_AWT(final Graphics2D g2d,
                                                          final Rectangle iconBounds,
