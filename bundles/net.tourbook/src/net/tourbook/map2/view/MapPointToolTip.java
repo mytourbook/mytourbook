@@ -457,9 +457,10 @@ public class MapPointToolTip extends ToolTip {
       }
 
       final Display display = _map2.getDisplay();
+      final float deviceScaling = _map2.getDeviceScaling();
 
-      final int tooltipWidth = tipSize.x;
-      final int tooltipHeight = tipSize.y;
+      final int tooltipWidth = (int) (tipSize.x * deviceScaling);
+      final int tooltipHeight = (int) (tipSize.y * deviceScaling);
 
       final Point devMouse = _map2.toControl(display.getCursorLocation());
       final int devMouseX = devMouse.x;
@@ -516,22 +517,30 @@ public class MapPointToolTip extends ToolTip {
        * Check if the tooltip is outside of the parent
        */
       final Rectangle mapBounds = _map2.getBounds();
-      final int mapWidth = mapBounds.width;
+      final int mapWidth = (int) (mapBounds.width * deviceScaling);
 
       boolean isDevXAdjusted = false;
 
       if (devX >= mapWidth) {
+
          devX = mapWidth - 40;
          isDevXAdjusted = true;
       }
 
+      devX /= deviceScaling;
+      devY /= deviceScaling;
+
       Point ttDisplayLocation = _map2.toDisplay(devX, devY);
 
       final Rectangle displayBounds = display.getBounds();
-      final int displayWidth = displayBounds.width;
-      final int displayHeight = displayBounds.height;
 
-      if (ttDisplayLocation.x + tooltipWidth > displayWidth) {
+      final int displayWidth = (int) (displayBounds.width * deviceScaling);
+      final int displayHeight = (int) (displayBounds.height * deviceScaling);
+
+      float ttLocationX = ttDisplayLocation.x * deviceScaling;
+      float ttLocationY = ttDisplayLocation.y * deviceScaling;
+
+      if (ttLocationX + tooltipWidth > displayWidth) {
 
          /*
           * Adjust horizontal position, it is outside of the display, prevent default
@@ -540,24 +549,32 @@ public class MapPointToolTip extends ToolTip {
 
          if (isDevXAdjusted) {
 
-            ttDisplayLocation = _map2.toDisplay(devMouseX - tooltipWidth / 2 - labelWidth2 + 20 - tooltipWidth, devY);
+            ttDisplayLocation = _map2.toDisplay(
+                  devMouseX - tooltipWidth / 2 - labelWidth2 + 20 - tooltipWidth,
+                  devY);
+
+            ttLocationX = ttDisplayLocation.x * deviceScaling;
+            ttLocationY = ttDisplayLocation.y * deviceScaling;
 
          } else {
 
-            ttDisplayLocation.x = displayWidth - tooltipWidth;
-            ttDisplayLocation.y += noCoverHeight;
+            ttLocationX = displayWidth - tooltipWidth;
+            ttLocationY += noCoverHeight;
          }
       }
 
-      if (ttDisplayLocation.y + tooltipHeight > displayHeight) {
+      if (ttLocationY + tooltipHeight > displayHeight) {
 
          /*
           * Adjust vertical position, it is outside of the display, prevent default
           * repositioning
           */
 
-         ttDisplayLocation.y = ttDisplayLocation.y - tooltipHeight - labelHeight;
+         ttLocationY = ttLocationY - tooltipHeight - labelHeight;
       }
+
+      ttDisplayLocation.x = (int) (ttLocationX / deviceScaling);
+      ttDisplayLocation.y = (int) (ttLocationY / deviceScaling);
 
       return fixupDisplayBoundsWithMonitor(tipSize, ttDisplayLocation);
    }

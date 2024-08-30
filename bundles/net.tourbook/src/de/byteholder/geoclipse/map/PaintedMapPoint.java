@@ -30,7 +30,7 @@ public class PaintedMapPoint {
    public Map2Point          mapPoint;
 
    /**
-    * Rectangle of the painted label or photo
+    * Rectangle of the painted label or photo, 4k scaled
     */
    public Rectangle          labelRectangle;
 

@@ -161,11 +161,15 @@ public class DirectMappingPainter implements IDirectPainter {
 
    private void drawMapPoint_Hovered_LabelItem(final GC gc, final PaintedMapPoint hoveredPoint) {
 
+      final float deviceScaling = _map2.getDeviceScaling();
+
       final Map2Config mapConfig = Map2ConfigManager.getActiveConfig();
       final Rectangle labelRectangle = hoveredPoint.labelRectangle;
 
-      final int labelWidth = labelRectangle.width;
-      final int labelHeight = labelRectangle.height;
+      final int labelDevX_Scaled = (int) (labelRectangle.x / deviceScaling);
+      final int labelDevY_Scaled = (int) (labelRectangle.y / deviceScaling);
+      final int labelWidth_Scaled = (int) (labelRectangle.width / deviceScaling);
+      final int labelHeight_Scaled = (int) (labelRectangle.height / deviceScaling);
 
       final Map2Point mapPoint = hoveredPoint.mapPoint;
       final MapPointType mapPointType = mapPoint.pointType;
@@ -175,8 +179,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
       final int symbolSize = mapConfig.locationSymbolSize;
       final int symbolSize2 = symbolSize / 2;
-      final int lineWidth = symbolSize / 4;
-      final int lineWidth2 = lineWidth / 2;
+      final int lineWidth = (int) (symbolSize / 4 / deviceScaling);
+      final int lineWidth2 = (int) (lineWidth / 2f);
 
       final String markerLabel = mapPoint.getFormattedLabel();
 
@@ -228,20 +232,20 @@ public class DirectMappingPainter implements IDirectPainter {
        * Draw a line from the marker label to the marker location.
        * Ensure that the line is not crossing the label
        */
-      int lineFromDevX = labelRectangle.x;
-      int lineFromDevY = labelRectangle.y;
-      final int lineToDevX = mapPointDevX;
-      final int lineToDevY = mapPointDevY;
+      int lineFromDevX = labelDevX_Scaled;
+      int lineFromDevY = labelDevY_Scaled;
+      final int lineToDevX = (int) (mapPointDevX / deviceScaling);
+      final int lineToDevY = (int) (mapPointDevY / deviceScaling);
 
-      if (lineToDevX > lineFromDevX + labelWidth) {
-         lineFromDevX += labelWidth;
-      } else if (lineToDevX > lineFromDevX && lineToDevX < lineFromDevX + labelWidth) {
+      if (lineToDevX > lineFromDevX + labelWidth_Scaled) {
+         lineFromDevX += labelWidth_Scaled;
+      } else if (lineToDevX > lineFromDevX && lineToDevX < lineFromDevX + labelWidth_Scaled) {
          lineFromDevX = lineToDevX;
       }
 
-      if (lineToDevY > lineFromDevY + labelHeight) {
-         lineFromDevY += labelHeight;
-      } else if (lineToDevY > lineFromDevY && lineToDevY < lineFromDevY + labelHeight) {
+      if (lineToDevY > lineFromDevY + labelHeight_Scaled) {
+         lineFromDevY += labelHeight_Scaled;
+      } else if (lineToDevY > lineFromDevY && lineToDevY < lineFromDevY + labelHeight_Scaled) {
          lineFromDevY = lineToDevY;
       }
 
@@ -277,10 +281,10 @@ public class DirectMappingPainter implements IDirectPainter {
          // draw a symbol
 
          final Rectangle symbolRectangle = new Rectangle(
-               markerSymbolDevX,
-               markerSymbolDevY,
-               symbolSize,
-               symbolSize);
+               (int) (markerSymbolDevX / deviceScaling),
+               (int) (markerSymbolDevY / deviceScaling),
+               (int) (symbolSize / deviceScaling),
+               (int) (symbolSize / deviceScaling));
 
          if (mapPointType.equals(MapPointType.TOUR_PHOTO)) {
 
@@ -307,10 +311,13 @@ public class DirectMappingPainter implements IDirectPainter {
 
             gc.setLineWidth(lineWidth);
             gc.drawRectangle(
-                  symbolRectangle.x + lineWidth2,
-                  symbolRectangle.y + lineWidth2,
+                  symbolRectangle.x + lineWidth2 + 0,
+                  symbolRectangle.y + lineWidth2 + 0,
+
                   symbolRectangle.width - lineWidth,
-                  symbolRectangle.height - lineWidth);
+                  symbolRectangle.height - lineWidth
+
+            );
          }
       }
 
@@ -318,38 +325,25 @@ public class DirectMappingPainter implements IDirectPainter {
        * Highlight hovered label/photo
        */
 
-      final float deviceScaling = _map2.getDeviceScaling();
-
-      final int labelDevX = (int) (labelRectangle.x / deviceScaling);
-      final int labelDevY = (int) (labelRectangle.y / deviceScaling);
-
       if (mapPointType.equals(MapPointType.TOUR_PHOTO)) {
 
          gc.setForeground(lineColor);
 
          gc.setLineWidth(1);
          gc.drawRectangle(
-               labelDevX - Map2.MAP_POINT_BORDER,
-               labelDevY,
-               labelRectangle.width + 2 * Map2.MAP_POINT_BORDER,
-               labelRectangle.height);
+               labelDevX_Scaled - Map2.MAP_POINT_BORDER,
+               labelDevY_Scaled,
+               labelWidth_Scaled + 2 * Map2.MAP_POINT_BORDER,
+               labelHeight_Scaled);
 
       } else {
 
          // fill label background
          gc.fillRectangle(
-               labelDevX - Map2.MAP_POINT_BORDER,
-               labelDevY,
-               labelRectangle.width + 2 * Map2.MAP_POINT_BORDER,
-               labelRectangle.height);
-
-         // border: horizontal bottom
-         gc.setLineWidth(2);
-         gc.drawLine(
-               labelDevX,
-               labelDevY + labelHeight,
-               labelDevX + labelWidth - 1,
-               labelDevY + labelHeight);
+               labelDevX_Scaled - Map2.MAP_POINT_BORDER,
+               labelDevY_Scaled,
+               labelWidth_Scaled + 2 * Map2.MAP_POINT_BORDER,
+               labelHeight_Scaled);
 
          // marker label
          final Font currentFont = gc.getFont();
@@ -359,8 +353,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
                markerLabel,
 
-               labelDevX,
-               labelDevY
+               labelDevX_Scaled,
+               labelDevY_Scaled
 
                      // for some fonts, e.g. "Yu Gothic UI Semilight" which looks very similar like "Segoe UI"
                      // this will paint the text at the same position as with AWT
@@ -371,11 +365,12 @@ public class DirectMappingPainter implements IDirectPainter {
          gc.setFont(currentFont);
 
          // border: horizontal bottom
-         gc.drawLine(
-               labelDevX,
-               labelDevY + labelHeight,
-               labelDevX + labelWidth,
-               labelDevY + labelHeight);
+//         gc.setLineWidth(1);
+//         gc.drawLine(
+//               labelDevX_Scaled,
+//               labelDevY_Scaled + labelHeight_Scaled,
+//               labelDevX_Scaled + labelWidth_Scaled,
+//               labelDevY_Scaled + labelHeight_Scaled);
       }
    }
 
@@ -393,10 +388,21 @@ public class DirectMappingPainter implements IDirectPainter {
          return;
       }
 
+      final float deviceScaling = _map2.getDeviceScaling();
+
+      final Rectangle paintedRatingStars = photo.paintedRatingStars;
+
+      final Rectangle paintedRatingStars_Unscaled = new Rectangle(
+            (int) (paintedRatingStars.x / deviceScaling),
+            (int) (paintedRatingStars.y / deviceScaling),
+            (int) (paintedRatingStars.width / deviceScaling),
+            (int) (paintedRatingStars.height / deviceScaling));
+
       // make the rating stars more visible
       gc.setBackground(_photoBackgroundColor);
-      gc.fillRectangle(photo.paintedRatingStars);
-      _map2.setPaintedRatingStars(photo.paintedRatingStars);
+      gc.fillRectangle(paintedRatingStars_Unscaled);
+
+      _map2.setPaintedRatingStars(paintedRatingStars);
 
       final int hoveredStars = photo.hoveredStars;
       final boolean isStarHovered = hoveredStars > 0;
@@ -407,8 +413,12 @@ public class DirectMappingPainter implements IDirectPainter {
 
       final int numRatingStars = photo.ratingStars;
 
-      // center ratings stars in the middle of the image
-      final int ratingStarsLeftBorder = photoDevX + photoWidth / 2 - _map2.MAX_RATING_STARS_WIDTH / 2;
+      // center ratings stars horizontally in the image
+      final int ratingStarsLeftBorder = (int) (photoDevX
+            + photoWidth / 2
+            - _map2.MAX_RATING_STARS_WIDTH * deviceScaling / 2);
+
+      final int ratingStarImageSize = (int) (_ratingStarImageSize * deviceScaling);
 
       for (int starIndex = 0; starIndex < RatingStars.MAX_RATING_STARS; starIndex++) {
 
@@ -448,10 +458,10 @@ public class DirectMappingPainter implements IDirectPainter {
 
          // draw stars at the top of the photo
 
-         gc.drawImage(starImage,
+         final int devX = (int) ((ratingStarsLeftBorder + ratingStarImageSize * starIndex) / deviceScaling);
+         final int devY = (int) (photoDevY / deviceScaling);
 
-               ratingStarsLeftBorder + (_ratingStarImageSize * starIndex),
-               photoDevY);
+         gc.drawImage(starImage, devX, devY);
       }
    }
 

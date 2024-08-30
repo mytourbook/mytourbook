@@ -2246,6 +2246,12 @@ public class UI {
       return _dialogFont_Metrics;
    }
 
+   /**
+    * @param composite
+    * @param location
+    *
+    * @return Returns the unscaled display bounds
+    */
    public static Rectangle getDisplayBounds(final Control composite, final Point location) {
 
       Rectangle displayBounds;

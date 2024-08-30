@@ -399,7 +399,7 @@ public class Map2 extends Canvas {
 
    private Map2Config                    _mapConfig                 = Map2ConfigManager.getActiveConfig();
 
-   private float                         _deviceScaling;
+   private float                         _deviceScaling             = DPIUtil.getDeviceZoom() / 100f;
 
    /*
     * Map points
@@ -6894,7 +6894,6 @@ public class Map2 extends Canvas {
       try {
 
          _deviceScaling = DPIUtil.getDeviceZoom() / 100f;
-//         _deviceScaling = 1;
 
          final BufferedImage awtImage = new BufferedImage(
                (int) (_mapPointImageSize.width * _deviceScaling),
@@ -8627,12 +8626,14 @@ public class Map2 extends Canvas {
 
    private void paint_MpImage_RatingStars(final Graphics2D g2d, final Photo photo) {
 
+      final int ratingStarImageSize = (int) (_ratingStarImageSize * _deviceScaling);
+
       final int photoDevX = photo.paintedPhoto.x;
       final int photoDevY = photo.paintedPhoto.y;
-      final int photoWidth = photo.paintedPhoto.width;
+      final int photoWidth = (photo.paintedPhoto.width);
       final int numRatingStars = photo.ratingStars;
 
-      final boolean isSmallRatingStar = photoWidth < 70;
+      final boolean isSmallRatingStar = photoWidth / _deviceScaling < 70;
 
       photo.isSmallRatingStars = isSmallRatingStar;
 
@@ -8643,7 +8644,10 @@ public class Map2 extends Canvas {
             + (MAX_RATING_STARS - 1) * smallRatingStarGap;
 
       // center ratings stars in the middle of the image
-      final int leftBorderWithVisibleStars = photoDevX + photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
+      final int leftBorderWithVisibleStars = (int) (photoDevX
+            + photoWidth / 2
+            - MAX_RATING_STARS_WIDTH * _deviceScaling / 2);
+
       final int leftBorderRatingStars = isSmallRatingStar
             ? photoDevX + photoWidth / 2 - maxSmallRatingStarsWidth / 2
             : leftBorderWithVisibleStars;
@@ -8655,8 +8659,8 @@ public class Map2 extends Canvas {
             leftBorderWithVisibleStars,
             photoDevY,
 
-            _ratingStarImageSize * MAX_RATING_STARS,
-            _ratingStarImageSize);
+            ratingStarImageSize * MAX_RATING_STARS,
+            ratingStarImageSize);
 
       for (int starIndex = 0; starIndex < numRatingStars; starIndex++) {
 
@@ -8677,10 +8681,10 @@ public class Map2 extends Canvas {
 
             g2d.drawImage(_imageRatingStar,
 
-                  leftBorderRatingStars + (_ratingStarImageSize * starIndex),
+                  leftBorderRatingStars + (ratingStarImageSize * starIndex),
                   photoDevY,
-                  _ratingStarImageSize,
-                  _ratingStarImageSize,
+                  ratingStarImageSize,
+                  ratingStarImageSize,
 
                   null);
          }
@@ -10885,10 +10889,10 @@ public class Map2 extends Canvas {
          UI.disposeResource(_labelFontSWT);
 
          _labelFontName = labelFontName;
-         _labelFontSize = (int) (labelFontSize * _deviceScaling);
+         _labelFontSize = (int) (labelFontSize / _deviceScaling);
 
          // awt and swt font have not the same size
-         final int swtFontSize = (int) (_labelFontSize * 0.75);
+         final int swtFontSize = (int) (_labelFontSize * 1f);
 
          _labelFontSWT = new Font(_display, _labelFontName, swtFontSize, SWT.NORMAL);
       }
