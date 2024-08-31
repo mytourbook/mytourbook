@@ -42,7 +42,6 @@ import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.color.MapUnits;
 import net.tourbook.common.map.GeoPosition;
-import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.ScaledImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
@@ -63,7 +62,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
@@ -179,8 +177,7 @@ public class TourMapPainter extends Map2Painter {
          g2d.dispose();
       }
 
-      final ImageData swtImageDataFromAwt = ImageConverter.convertIntoSWTImageData(awtImage);
-      final Image swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(swtImageDataFromAwt));
+      final Image swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(awtImage));
 
       return swtImage;
    }
@@ -220,8 +217,7 @@ public class TourMapPainter extends Map2Painter {
          g2d.dispose();
       }
 
-      final ImageData swtImageDataFromAwt = ImageConverter.convertIntoSWTImageData(awtImage);
-      final Image swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(swtImageDataFromAwt));
+      final Image swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(awtImage));
 
       return swtImage;
    }

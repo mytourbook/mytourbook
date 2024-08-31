@@ -26,7 +26,6 @@ import java.util.HashMap;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
-import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.ScaledImageDataProvider;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -34,7 +33,6 @@ import net.tourbook.database.TourDatabase;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
@@ -92,8 +90,7 @@ public class TourTypeImage {
 
          drawTourTypeImage(typeId, g2d);
 
-         final ImageData swtImageDataFromAwt = ImageConverter.convertIntoSWTImageData(awtImage);
-         final Image newImageSWT = new Image(Display.getCurrent(), new ScaledImageDataProvider(swtImageDataFromAwt));
+         final Image newImageSWT = new Image(Display.getCurrent(), new ScaledImageDataProvider(awtImage));
 
          if (existingImageSWT == null) {
 

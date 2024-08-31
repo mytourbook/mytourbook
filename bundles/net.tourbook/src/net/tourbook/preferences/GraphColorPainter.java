@@ -25,13 +25,11 @@ import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.common.color.IGradientColorProvider;
-import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.ScaledImageDataProvider;
 import net.tourbook.map2.view.TourMapPainter;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
@@ -176,8 +174,7 @@ public class GraphColorPainter {
             g2d.dispose();
          }
 
-         final ImageData swtImageDataFromAwt = ImageConverter.convertIntoSWTImageData(awtImage);
-         swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(swtImageDataFromAwt));
+         swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(awtImage));
 
          _imageCache.put(colorDefinitionId, swtImage);
       }
@@ -276,8 +273,7 @@ public class GraphColorPainter {
             g2d.dispose();
          }
 
-         final ImageData swtImageDataFromAwt = ImageConverter.convertIntoSWTImageData(awtImage);
-         swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(swtImageDataFromAwt));
+         swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(awtImage));
 
          _imageCache.put(colorId, swtImage);
       }

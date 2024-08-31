@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import java.awt.image.BufferedImage;
+
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageDataProvider;
 
@@ -37,6 +39,11 @@ import org.eclipse.swt.graphics.ImageDataProvider;
 public class ScaledImageDataProvider implements ImageDataProvider {
 
    private ImageData _imageData;
+
+   public ScaledImageDataProvider(final BufferedImage awtImage) {
+
+      _imageData = ImageConverter.convertIntoSWTImageData(awtImage);
+   }
 
    public ScaledImageDataProvider(final ImageData imageData) {
 

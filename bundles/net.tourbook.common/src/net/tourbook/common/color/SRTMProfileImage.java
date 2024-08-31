@@ -27,11 +27,9 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.ScaledImageDataProvider;
 
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
@@ -226,8 +224,7 @@ public class SRTMProfileImage extends ProfileImage implements Cloneable {
          g2d.dispose();
       }
 
-      final ImageData swtImageDataFromAwt = ImageConverter.convertIntoSWTImageData(awtImage);
-      final Image swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(swtImageDataFromAwt));
+      final Image swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(awtImage));
 
       return swtImage;
    }

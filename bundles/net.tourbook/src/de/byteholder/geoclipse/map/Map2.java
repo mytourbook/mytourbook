@@ -6957,8 +6957,7 @@ public class Map2 extends Canvas {
             g2d.dispose();
          }
 
-         final ImageData swtImageDataFromAwt = ImageConverter.convertIntoSWTImageData(awtImage);
-         final Image swtImage = new Image(getDisplay(), new ScaledImageDataProvider(swtImageDataFromAwt));
+         final Image swtImage = new Image(getDisplay(), new ScaledImageDataProvider(awtImage));
 
          /*
           * This may be needed to be synchronized ?

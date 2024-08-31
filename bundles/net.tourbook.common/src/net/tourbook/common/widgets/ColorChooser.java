@@ -27,7 +27,6 @@ import java.io.Writer;
 
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.ScaledImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -58,7 +57,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -813,8 +811,7 @@ public class ColorChooser extends Composite {
          }
       }
 
-      final ImageData swtImageDataFromAwt = ImageConverter.convertIntoSWTImageData(awtImage);
-      final Image swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(swtImageDataFromAwt));
+      final Image swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(awtImage));
 
       _hexagonCanvas.setImage(swtImage);
    }
