@@ -135,10 +135,11 @@ import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.IPhotoServiceProvider;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoImageCache;
+import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
-import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.Map2_Appearance;
 import net.tourbook.tour.SelectionTourId;
@@ -158,7 +159,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
@@ -787,9 +788,14 @@ public class Map2 extends Canvas {
    public int                  MAX_RATING_STARS_WIDTH;
 
    {
-      final ImageRegistry imageRegistry = UI.IMAGE_REGISTRY;
+      final ImageDescriptor imageDescriptor = PhotoActivator.getImageDescriptor(PhotoImages.PhotoRatingStar);
+      final ImageData imageData = imageDescriptor.getImageData(DPIUtil.getDeviceZoom());
 
-      _imageRatingStar = ImageConverter.convertIntoAWT(imageRegistry.get(PhotoUI.PHOTO_RATING_STAR));
+      final Image swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(imageData));
+      {
+         _imageRatingStar = ImageConverter.convertIntoAWT(swtImage);
+      }
+      swtImage.dispose();
 
       // rating star width and height are the same
       _ratingStarImageSize = _imageRatingStar.getWidth();
@@ -5046,13 +5052,13 @@ public class Map2 extends Canvas {
          _isInHoveredRatingStar = paintedRatingStars.contains(mouseMoveDevX, mouseMoveDevY);
 
          // center ratings stars in the middle of the image
-         final int ratingStarsLeftBorder = (int) (photoDevX
+         final int ratingStarsLeftBorder = photoDevX
                + photoWidth / 2
-               - MAX_RATING_STARS_WIDTH * _deviceScaling / 2);
+               - MAX_RATING_STARS_WIDTH / 2;
 
          if (_isInHoveredRatingStar) {
 
-            hoveredStars = (int) ((mouseMoveDevX - ratingStarsLeftBorder) / _ratingStarImageSize / _deviceScaling + 1);
+            hoveredStars = (mouseMoveDevX - ratingStarsLeftBorder) / _ratingStarImageSize + 1;
          }
       }
 
@@ -8421,9 +8427,9 @@ public class Map2 extends Canvas {
             g2d.setColor(java.awt.Color.cyan);
 
             g2d.fillRect(
-                  photoRectangle.x - MAP_POINT_BORDER,
+                  photoRectangle.x,
                   photoRectangle.y,
-                  photoRectangle.width + 2 * MAP_POINT_BORDER,
+                  photoRectangle.width,
                   photoRectangle.height);
 
          } else {
@@ -8434,9 +8440,9 @@ public class Map2 extends Canvas {
 
             g2d.drawImage(awtPhotoImage,
 
-                  photoRectangle.x - MAP_POINT_BORDER,
+                  photoRectangle.x,
                   photoRectangle.y,
-                  photoRectangle.width + 2 * MAP_POINT_BORDER,
+                  photoRectangle.width,
                   photoRectangle.height,
 
                   null);
@@ -8629,7 +8635,7 @@ public class Map2 extends Canvas {
 
    private void paint_MpImage_RatingStars(final Graphics2D g2d, final Photo photo) {
 
-      final int ratingStarImageSize = (int) (_ratingStarImageSize * _deviceScaling);
+      final int ratingStarImageSize = _ratingStarImageSize;
 
       final int photoDevX = photo.paintedPhoto.x;
       final int photoDevY = photo.paintedPhoto.y;
@@ -8647,9 +8653,9 @@ public class Map2 extends Canvas {
             + (MAX_RATING_STARS - 1) * smallRatingStarGap;
 
       // center ratings stars in the middle of the image
-      final int leftBorderWithVisibleStars = (int) (photoDevX
+      final int leftBorderWithVisibleStars = photoDevX
             + photoWidth / 2
-            - MAX_RATING_STARS_WIDTH * _deviceScaling / 2);
+            - MAX_RATING_STARS_WIDTH / 2;
 
       final int leftBorderRatingStars = isSmallRatingStar
             ? photoDevX + photoWidth / 2 - maxSmallRatingStarsWidth / 2
@@ -8673,19 +8679,22 @@ public class Map2 extends Canvas {
 
             final int ratingStarXOffset = (smallRatingStarSize + smallRatingStarGap) * starIndex;
 
+            final int ratingStarDevX = leftBorderRatingStars + ratingStarXOffset;
+            final int ratingStarDevY = photoDevY + (ratingStarImageSize / 2 - smallRatingStarSize / 2) / 2;
+
             g2d.setColor(RATING_STAR_COLOR);
             g2d.fillRect(
 
-                  leftBorderRatingStars + ratingStarXOffset,
-                  photoDevY + ratingStarImageSize / 2 - smallRatingStarSize / 2,
+                  ratingStarDevX,
+                  ratingStarDevY,
                   smallRatingStarSize,
                   smallRatingStarSize);
 
             g2d.setColor(RATING_STAR_COLOR_BORDER);
             g2d.drawRect(
 
-                  leftBorderRatingStars + ratingStarXOffset,
-                  photoDevY + ratingStarImageSize / 2 - smallRatingStarSize / 2,
+                  ratingStarDevX,
+                  ratingStarDevY,
                   smallRatingStarSize,
                   smallRatingStarSize);
 

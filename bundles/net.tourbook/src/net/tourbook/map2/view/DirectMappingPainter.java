@@ -251,7 +251,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
       gc.setForeground(lineColor);
 
-      gc.setLineWidth(2);
+      gc.setLineWidth(1);
       gc.drawLine(
             lineFromDevX,
             lineFromDevY,
@@ -331,9 +331,9 @@ public class DirectMappingPainter implements IDirectPainter {
 
          gc.setLineWidth(1);
          gc.drawRectangle(
-               labelDevX_Scaled - Map2.MAP_POINT_BORDER,
-               labelDevY_Scaled,
-               labelWidth_Scaled + 2 * Map2.MAP_POINT_BORDER,
+               labelDevX_Scaled + 0,
+               labelDevY_Scaled + 0,
+               labelWidth_Scaled,
                labelHeight_Scaled);
 
       } else {
@@ -394,7 +394,7 @@ public class DirectMappingPainter implements IDirectPainter {
 
       final Rectangle paintedRatingStars_Unscaled = new Rectangle(
             (int) (paintedRatingStars.x / deviceScaling),
-            (int) (paintedRatingStars.y / deviceScaling),
+            (int) (paintedRatingStars.y / deviceScaling + 2),
             (int) (paintedRatingStars.width / deviceScaling),
             (int) (paintedRatingStars.height / deviceScaling));
 
@@ -414,9 +414,9 @@ public class DirectMappingPainter implements IDirectPainter {
       final int numRatingStars = photo.ratingStars;
 
       // center ratings stars horizontally in the image
-      final int ratingStarsLeftBorder = (int) (photoDevX
+      final int ratingStarsLeftBorder = photoDevX
             + photoWidth / 2
-            - _map2.MAX_RATING_STARS_WIDTH * deviceScaling / 2);
+            - _map2.MAX_RATING_STARS_WIDTH / 2;
 
       final int ratingStarImageSize = (int) (_ratingStarImageSize * deviceScaling);
 
