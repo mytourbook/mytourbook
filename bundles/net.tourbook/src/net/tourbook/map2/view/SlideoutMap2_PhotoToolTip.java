@@ -389,6 +389,11 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       final float deviceScaling = _map2.getDeviceScaling();
 
+      final Rectangle mapBounds = _map2.getBounds();
+      final Point mapDisplayPosition = _map2.toDisplay(mapBounds.x, mapBounds.y);
+
+      final int mapDisplayPosX_Scaled = (int) (mapDisplayPosition.x * deviceScaling);
+
       final Point ttPosn_Unscaled = new Point(
             (int) (ttPos_Scaled.x / deviceScaling),
             (int) (ttPos_Scaled.y / deviceScaling));
@@ -405,6 +410,14 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       final int ttHeight = (int) (ttSize_Unscaled.y * deviceScaling);
       final Point ttBottomRight = new Point(ttPos_Scaled.x + ttWidth, ttPos_Scaled.y + ttHeight);
 
+      final boolean isTooltipInDisplay = displayBounds_Scaled.contains(ttPos_Scaled);
+      final boolean isTTBottomRightInDisplay = displayBounds_Scaled.contains(ttBottomRight);
+
+      final int displayWidth_Scaled = displayBounds_Scaled.width;
+      final int displayHeight_Scaled = displayBounds_Scaled.height;
+      final int displayX_Scaled = displayBounds_Scaled.x;
+      final int displayY_Scaled = displayBounds_Scaled.y;
+
       final Rectangle photoBounds_Scaled = _hoveredMapPoint.labelRectangle;
 
       final int photoWidth = photoBounds_Scaled.width;
@@ -415,81 +428,57 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       final int photoTop = photoBounds_Scaled.y;
 
       final Map2Point mapPoint = _hoveredMapPoint.mapPoint;
-      final int mapPointDevX = mapPoint.geoPointDevX;
       final int mapPointDevY = mapPoint.geoPointDevY;
 
-      final Rectangle mapBounds = _map2.getBounds();
-      final Point mapDisplayPosition = _map2.toDisplay(mapBounds.x, mapBounds.y);
-
-      final int mapDisplayPosX_Scaled = (int) (mapDisplayPosition.x * deviceScaling);
-      final int mapDisplayPosY_Scaled = (int) (mapDisplayPosition.y * deviceScaling);
-
-      final boolean isTooltipInDisplay = displayBounds_Scaled.contains(ttPos_Scaled);
-      final boolean isTTBottomRightInDisplay = displayBounds_Scaled.contains(ttBottomRight);
-
-      final int displayWidth_Scaled = displayBounds_Scaled.width;
-      final int displayHeight_Scaled = displayBounds_Scaled.height;
-      final int displayX_Scaled = displayBounds_Scaled.x;
-      final int displayY_Scaled = displayBounds_Scaled.y;
-
-      int ttPosX = ttPos_Scaled.x;
-      int ttPosY = ttPos_Scaled.y;
-
-      // adjust x/y to not overlap the map point position
-      if (photoLeft > mapPointDevX) {
-         ttPosX = mapDisplayPosX_Scaled + photoRight;
-      }
-
-      if (photoTop > mapPointDevY) {
-         ttPosY = mapDisplayPosY_Scaled + photoTop;
-      }
+      int ttDevX = ttPos_Scaled.x;
+      int ttDevY = ttPos_Scaled.y;
 
       if ((isTooltipInDisplay && isTTBottomRightInDisplay) == false) {
 
          if (ttBottomRight.x > displayX_Scaled + displayWidth_Scaled) {
 
-            ttPosX -= ttBottomRight.x - (displayX_Scaled + displayWidth_Scaled);
+            ttDevX -= ttBottomRight.x - (displayX_Scaled + displayWidth_Scaled);
 
-            // adjust x/y to not overlap the map point position
-
+            // do not overlap the photo with the tooltip
             if (photoTop > mapPointDevY) {
 
-               ttPosY += photoHeight;
+               ttDevY += photoHeight;
 
             } else {
 
-               ttPosY -= photoHeight;
+               ttDevY -= photoHeight;
             }
          }
 
          if (ttBottomRight.y > displayY_Scaled + displayHeight_Scaled - photoHeight) {
 
-            ttPosY -= ttBottomRight.y - (displayY_Scaled + displayHeight_Scaled);
+            ttDevY -= ttBottomRight.y - (displayY_Scaled + displayHeight_Scaled);
 
-            ttPosX = displayX_Scaled + mapDisplayPosX_Scaled + photoLeft - ttWidth;
+            ttDevX = displayX_Scaled + mapDisplayPosX_Scaled + photoLeft - ttWidth;
          }
 
-         if (ttPosX < displayX_Scaled) {
+         if (ttDevX < displayX_Scaled) {
 
-            ttPosX = displayX_Scaled + mapDisplayPosX_Scaled + photoRight;
+            ttDevX = displayX_Scaled + mapDisplayPosX_Scaled + photoRight;
          }
 
-         if (ttPosY < displayY_Scaled) {
+         if (ttDevY < displayY_Scaled) {
 
-            ttPosY = displayY_Scaled;
+            ttDevY = displayY_Scaled;
 
-            ttPosX = displayX_Scaled + mapDisplayPosX_Scaled + photoLeft - ttWidth;
+            ttDevX = displayX_Scaled + mapDisplayPosX_Scaled + photoLeft - ttWidth;
          }
 
-         if (ttPosX < displayX_Scaled) {
+         if (ttDevX < displayX_Scaled) {
 
-            ttPosX = displayX_Scaled + mapDisplayPosX_Scaled + photoRight;
+            ttDevX = displayX_Scaled + mapDisplayPosX_Scaled + photoRight;
          }
       }
 
+      // return unscaled position
       return new Point(
-            (int) (ttPosX / deviceScaling),
-            (int) (ttPosY / deviceScaling));
+            (int) (ttDevX / deviceScaling),
+            (int) (ttDevY / deviceScaling));
    }
 
    @Override
@@ -574,6 +563,15 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       // set photo bottom/left as default position
       int ttPosX = photoLeft - tooltipWidth;
       int ttPosY = photoBottom - tooltipHeight;
+
+      // adjust x/y to not overlap the map point position
+      if (photoLeft > mapPointDevX) {
+         ttPosX = photoRight;
+      }
+
+      if (photoTop > mapPointDevY) {
+         ttPosY = photoTop;
+      }
 
       // adjust to display position
       final Rectangle mapBounds = _map2.getBounds();

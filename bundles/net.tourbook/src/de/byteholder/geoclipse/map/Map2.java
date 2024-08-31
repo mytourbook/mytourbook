@@ -312,6 +312,7 @@ public class Map2 extends Canvas {
    private static final RGB              MAP_DEFAULT_BACKGROUND_RGB = new RGB(0x40, 0x40, 0x40);
 
    private static final java.awt.Color   RATING_STAR_COLOR          = new java.awt.Color(250, 224, 0);
+   private static final java.awt.Color   RATING_STAR_COLOR_BORDER   = new java.awt.Color(198, 178, 0);
 
    private static RGB                    _mapTransparentRGB;
    private static Color                  _mapTransparentColor;
@@ -5045,11 +5046,13 @@ public class Map2 extends Canvas {
          _isInHoveredRatingStar = paintedRatingStars.contains(mouseMoveDevX, mouseMoveDevY);
 
          // center ratings stars in the middle of the image
-         final int ratingStarsLeftBorder = photoDevX + photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
+         final int ratingStarsLeftBorder = (int) (photoDevX
+               + photoWidth / 2
+               - MAX_RATING_STARS_WIDTH * _deviceScaling / 2);
 
          if (_isInHoveredRatingStar) {
 
-            hoveredStars = (mouseMoveDevX - ratingStarsLeftBorder) / _ratingStarImageSize + 1;
+            hoveredStars = (int) ((mouseMoveDevX - ratingStarsLeftBorder) / _ratingStarImageSize / _deviceScaling + 1);
          }
       }
 
@@ -8637,7 +8640,7 @@ public class Map2 extends Canvas {
 
       photo.isSmallRatingStars = isSmallRatingStar;
 
-      final int smallRatingStarGap = 4;
+      final int smallRatingStarGap = (int) (5 * _deviceScaling);
       final int smallRatingStarSize = (photoWidth / MAX_RATING_STARS) - smallRatingStarGap;
 
       final int maxSmallRatingStarsWidth = MAX_RATING_STARS * smallRatingStarSize
@@ -8652,8 +8655,6 @@ public class Map2 extends Canvas {
             ? photoDevX + photoWidth / 2 - maxSmallRatingStarsWidth / 2
             : leftBorderWithVisibleStars;
 
-      g2d.setColor(RATING_STAR_COLOR);
-
       photo.paintedRatingStars = new Rectangle(
 
             leftBorderWithVisibleStars,
@@ -8661,6 +8662,8 @@ public class Map2 extends Canvas {
 
             ratingStarImageSize * MAX_RATING_STARS,
             ratingStarImageSize);
+
+      g2d.setStroke(new BasicStroke(1));
 
       for (int starIndex = 0; starIndex < numRatingStars; starIndex++) {
 
@@ -8670,10 +8673,19 @@ public class Map2 extends Canvas {
 
             final int ratingStarXOffset = (smallRatingStarSize + smallRatingStarGap) * starIndex;
 
+            g2d.setColor(RATING_STAR_COLOR);
             g2d.fillRect(
 
                   leftBorderRatingStars + ratingStarXOffset,
-                  photoDevY + 1,
+                  photoDevY + ratingStarImageSize / 2 - smallRatingStarSize / 2,
+                  smallRatingStarSize,
+                  smallRatingStarSize);
+
+            g2d.setColor(RATING_STAR_COLOR_BORDER);
+            g2d.drawRect(
+
+                  leftBorderRatingStars + ratingStarXOffset,
+                  photoDevY + ratingStarImageSize / 2 - smallRatingStarSize / 2,
                   smallRatingStarSize,
                   smallRatingStarSize);
 
