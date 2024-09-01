@@ -42,7 +42,7 @@ import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.color.MapUnits;
 import net.tourbook.common.map.GeoPosition;
-import net.tourbook.common.util.ScaledImageDataProvider;
+import net.tourbook.common.util.NoAutoScalingImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
@@ -177,7 +177,7 @@ public class TourMapPainter extends Map2Painter {
          g2d.dispose();
       }
 
-      final Image swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(awtImage));
+      final Image swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
 
       return swtImage;
    }
@@ -217,7 +217,7 @@ public class TourMapPainter extends Map2Painter {
          g2d.dispose();
       }
 
-      final Image swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(awtImage));
+      final Image swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
 
       return swtImage;
    }

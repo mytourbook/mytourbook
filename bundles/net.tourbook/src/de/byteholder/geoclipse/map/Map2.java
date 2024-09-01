@@ -100,7 +100,7 @@ import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.ImageUtils;
 import net.tourbook.common.util.MtMath;
-import net.tourbook.common.util.ScaledImageDataProvider;
+import net.tourbook.common.util.NoAutoScalingImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TourToolTip;
@@ -791,7 +791,7 @@ public class Map2 extends Canvas {
       final ImageDescriptor imageDescriptor = PhotoActivator.getImageDescriptor(PhotoImages.PhotoRatingStar);
       final ImageData imageData = imageDescriptor.getImageData(DPIUtil.getDeviceZoom());
 
-      final Image swtImage = new Image(Display.getCurrent(), new ScaledImageDataProvider(imageData));
+      final Image swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(imageData));
       {
          _imageRatingStar = ImageConverter.convertIntoAWT(swtImage);
       }
@@ -6957,7 +6957,7 @@ public class Map2 extends Canvas {
             g2d.dispose();
          }
 
-         final Image swtImage = new Image(getDisplay(), new ScaledImageDataProvider(awtImage));
+         final Image swtImage = new Image(getDisplay(), new NoAutoScalingImageDataProvider(awtImage));
 
          /*
           * This may be needed to be synchronized ?

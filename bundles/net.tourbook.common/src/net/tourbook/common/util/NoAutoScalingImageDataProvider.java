@@ -36,16 +36,16 @@ import org.eclipse.swt.graphics.ImageDataProvider;
  * <p>
  * https://github.com/eclipse-platform/eclipse.platform.swt/issues/1411
  */
-public class ScaledImageDataProvider implements ImageDataProvider {
+public class NoAutoScalingImageDataProvider implements ImageDataProvider {
 
    private ImageData _imageData;
 
-   public ScaledImageDataProvider(final BufferedImage awtImage) {
+   public NoAutoScalingImageDataProvider(final BufferedImage awtImage) {
 
       _imageData = ImageConverter.convertIntoSWTImageData(awtImage);
    }
 
-   public ScaledImageDataProvider(final ImageData imageData) {
+   public NoAutoScalingImageDataProvider(final ImageData imageData) {
 
       _imageData = imageData;
    }
