@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,12 +49,15 @@ public class PhotoLoadManager {
 //    */
 //   public static final double                           IMAGE_RATIO               = 15.0 / 10;                           //1.41;
 
-// SET_FORMATTING_OFF
+   public static final int[]                                  HQ_IMAGE_SIZES        = {
 
-   public static final int[]                           HQ_IMAGE_SIZES               =
-         { 200, IMAGE_SIZE_LARGE_DEFAULT, 1000, 2000 };
-
-// SET_FORMATTING_ON
+         200,
+         IMAGE_SIZE_LARGE_DEFAULT,
+         1000,
+         2000,
+         3000,
+         4000
+   };
 
    private static Display                                     _display;
 

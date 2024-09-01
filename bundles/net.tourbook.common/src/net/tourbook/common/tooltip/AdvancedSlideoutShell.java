@@ -119,8 +119,6 @@ public abstract class AdvancedSlideoutShell {
 
    private int                        _fadeOutDelayCounter;
 
-   private double                     _maxHeightFactor                    = 0.8;
-
    private int                        _horizContentWidth                  = MIN_SHELL_HORIZ_WIDTH;
    private int                        _horizContentHeight                 = MIN_SHELL_HORIZ_HEIGHT;
    private int                        _vertContentWidth                   = MIN_SHELL_VERT_WIDTH;
@@ -1334,8 +1332,8 @@ public abstract class AdvancedSlideoutShell {
 
       // ensure tooltip is not too large
       final Rectangle displayBounds = getDisplayBounds(shellLocation);
-      final double maxHeight = displayBounds.height * _maxHeightFactor;
-      final double maxWidth = displayBounds.width * 0.95;
+      final double maxHeight = displayBounds.height;
+      final double maxWidth = displayBounds.width;
 
       boolean isResizeAdjusted = false;
       boolean isHeightAdjusted = false;
@@ -1399,13 +1397,13 @@ public abstract class AdvancedSlideoutShell {
       if (isResizeAdjusted || isWidthAdjusted || isHeightAdjusted) {
 
          if (isWidthAdjusted && isHeightAdjusted == false) {
-            
+
             // force current height
             newContentHeight = Integer.MIN_VALUE;
          }
 
          if (isHeightAdjusted && isWidthAdjusted == false) {
-            
+
             // force current width
             newContentWidth = Integer.MIN_VALUE;
          }
@@ -1707,16 +1705,6 @@ public abstract class AdvancedSlideoutShell {
       if (isPinned) {
          setSlideoutPinnedLocation();
       }
-   }
-
-   /**
-    * This factor is multiplied with the display height to force the max height of this slideout
-    *
-    * @param maxHeightFactor
-    */
-   public void setMaxHeightFactor(final double maxHeightFactor) {
-
-      _maxHeightFactor = maxHeightFactor;
    }
 
    protected void setShellFadeInSteps(final int shellFadeInSteps) {
