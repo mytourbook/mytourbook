@@ -156,10 +156,10 @@ public class Map2ConfigManager {
    static final int                            LABEL_GROUP_GRID_SIZE_DEFAULT           = 300;
    public static final MapLabelLayout          LABEL_LAYOUT_DEFAULT                    = MapLabelLayout.RECTANGLE_BOX;
    static final int                            LABEL_DISTRIBUTOR_MAX_LABELS_MIN        = 10;
-   static final int                            LABEL_DISTRIBUTOR_MAX_LABELS_MAX        = 2000;
+   static final int                            LABEL_DISTRIBUTOR_MAX_LABELS_MAX        = 4000;
    static final int                            LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT    = 200;
    static final int                            LABEL_DISTRIBUTOR_RADIUS_MIN            = 10;
-   static final int                            LABEL_DISTRIBUTOR_RADIUS_MAX            = 2000;
+   static final int                            LABEL_DISTRIBUTOR_RADIUS_MAX            = 4000;
    static final int                            LABEL_DISTRIBUTOR_RADIUS_DEFAULT        = 200;
    static final String                         LABEL_FONT_NAME_DEFAULT                 = UI.AWT_DIALOG_FONT.getFontName();
    static final int                            LABEL_FONT_SIZE_MIN                     = 2;

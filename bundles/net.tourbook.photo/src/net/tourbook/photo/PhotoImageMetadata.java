@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -86,19 +86,19 @@ public class PhotoImageMetadata implements Serializable {
 
       return "PhotoImageMetadata [" + NL //                       //$NON-NLS-1$
 
-            + "fileDateTime      =" + fileDateTime + NL //        //$NON-NLS-1$
-            + "exifDateTime      =" + exifDateTime + NL //        //$NON-NLS-1$
-            + "imageWidth        =" + imageWidth + NL //          //$NON-NLS-1$
-            + "imageHeight       =" + imageHeight + NL //         //$NON-NLS-1$
-            + "orientation       =" + orientation + NL //         //$NON-NLS-1$
-            + "imageDirection    =" + imageDirection + NL //      //$NON-NLS-1$
-            + "altitude          =" + altitude + NL //            //$NON-NLS-1$
-            + "latitude          =" + latitude + NL //            //$NON-NLS-1$
-            + "longitude         =" + longitude + NL //           //$NON-NLS-1$
-            + "gpsAreaInfo       =" + gpsAreaInfo + NL //         //$NON-NLS-1$
-            + "objectName        =" + objectName + NL //          //$NON-NLS-1$
-            + "captionAbstract   =" + captionAbstract + NL //     //$NON-NLS-1$
-            + "model             =" + model + NL //               //$NON-NLS-1$
+            + "fileDateTime      = " + fileDateTime + NL //        //$NON-NLS-1$
+            + "exifDateTime      = " + exifDateTime + NL //        //$NON-NLS-1$
+            + "imageWidth        = " + imageWidth + NL //          //$NON-NLS-1$
+            + "imageHeight       = " + imageHeight + NL //         //$NON-NLS-1$
+            + "orientation       = " + orientation + NL //         //$NON-NLS-1$
+            + "imageDirection    = " + imageDirection + NL //      //$NON-NLS-1$
+            + "altitude          = " + altitude + NL //            //$NON-NLS-1$
+            + "latitude          = " + latitude + NL //            //$NON-NLS-1$
+            + "longitude         = " + longitude + NL //           //$NON-NLS-1$
+            + "gpsAreaInfo       = " + gpsAreaInfo + NL //         //$NON-NLS-1$
+            + "objectName        = " + objectName + NL //          //$NON-NLS-1$
+            + "captionAbstract   = " + captionAbstract + NL //     //$NON-NLS-1$
+            + "model             = " + model + NL //               //$NON-NLS-1$
 
             + "]"; //                                             //$NON-NLS-1$
    }

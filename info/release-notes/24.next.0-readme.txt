@@ -62,6 +62,9 @@ New
 Improvements
 ============
 
+* 2D Map
+  - Improved photo image quality
+
 * Tour Type Icon
   - Customize image scaling
   

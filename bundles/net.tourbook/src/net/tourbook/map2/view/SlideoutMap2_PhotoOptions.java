@@ -77,7 +77,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
    /**
     * This value is small because a map do not yet load large images !!!
     */
-   private static final int        MAX_IMAGE_SIZE                      = 200;
+   private static final int        MAX_IMAGE_SIZE                      = 2000;
 
    private IDialogSettings         _state_Map2;
 

@@ -1813,10 +1813,20 @@ public class UI {
     *
     * @return
     */
-   public static Image disposeResource(final Image resource) {
+   public static Image disposeResource(final Image image) {
 
-      if (resource != null) {
-         resource.dispose();
+      if (image != null) {
+
+         // sometimes the device of the image is null which causes an exception
+
+         try {
+
+            image.dispose();
+
+         } catch (final Exception e) {
+
+            // ignore
+         }
       }
 
       return null;

@@ -314,11 +314,13 @@ public class Photo implements Serializable {
    }
 
    public static String getImageKeyHQ(final String imageFilePathName) {
-      return Util.computeMD5(imageFilePathName + "_HQ");//$NON-NLS-1$
+      
+      return Util.computeMD5(imageFilePathName) + "_HQ";//$NON-NLS-1$
    }
 
    public static String getImageKeyThumb(final String imageFilePathName) {
-      return Util.computeMD5(imageFilePathName + "_Thumb");//$NON-NLS-1$
+      
+      return Util.computeMD5(imageFilePathName) + "_Thumb";//$NON-NLS-1$
    }
 
    public static IPhotoServiceProvider getPhotoServiceProvider() {
@@ -1337,7 +1339,7 @@ public class Photo implements Serializable {
        */
       _imageKeyThumb = getImageKeyThumb(photoImageFilePathName);
       _imageKeyHQ = getImageKeyHQ(photoImageFilePathName);
-      _imageKeyOriginal = Util.computeMD5(photoImageFilePathName + "_Original");//$NON-NLS-1$
+      _imageKeyOriginal = Util.computeMD5(photoImageFilePathName) + "_Original";//$NON-NLS-1$
 
       _isImageFileAvailable = photoImageFile.exists();
 

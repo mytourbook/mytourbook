@@ -383,6 +383,9 @@ public class DirectMappingPainter implements IDirectPainter {
             // this happend when the photo was not yet painted
             || photo.paintedPhoto == null
 
+            // this happend also
+            || photo.paintedRatingStars == null
+
       ) {
 
          return;
