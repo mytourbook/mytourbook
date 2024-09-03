@@ -380,13 +380,13 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 	private void createUI_PhotoImage(final Composite parent) {
 
 		// check if image is in the cache
-		_photoImage = PhotoImageCache.getImage(_photo, ImageQuality.THUMB);
+		_photoImage = PhotoImageCache.getImage_SWT(_photo, ImageQuality.THUMB);
 
 		if ((_photoImage == null || _photoImage.isDisposed())) {
 
 			// the requested image is not available in the image cache -> image must be loaded
 
-			_photoImage = PhotoImageCache.getImage(_photo, ImageQuality.HQ);
+			_photoImage = PhotoImageCache.getImage_SWT(_photo, ImageQuality.HQ);
 
 			if ((_photoImage == null || _photoImage.isDisposed())) {
 

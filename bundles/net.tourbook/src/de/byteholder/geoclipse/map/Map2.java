@@ -2835,9 +2835,9 @@ public class Map2 extends Canvas {
     *
     * @return Returns the photo image or <code>null</code> when image is not loaded.
     */
-   private Image getPhotoImage(final Photo photo) {
+   private BufferedImage getPhotoImage(final Photo photo) {
 
-      Image photoImage = null;
+      BufferedImage photoImage = null;
 
       // check if image has an loading error
       final PhotoLoadingState photoLoadingState = photo.getLoadingState(ImageQuality.THUMB);
@@ -2847,16 +2847,21 @@ public class Map2 extends Canvas {
          // image is not yet loaded
 
          // check if image is in the cache
-         photoImage = PhotoImageCache.getImage(photo, ImageQuality.THUMB);
+         photoImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB);
 
-         if ((photoImage == null || photoImage.isDisposed())
+         if (photoImage == null
                && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
 
             // the requested image is not available in the image cache -> image must be loaded
 
             final ILoadCallBack imageLoadCallback = new PhotoImageLoaderCallback();
 
-            PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, ImageQuality.THUMB, imageLoadCallback);
+            PhotoLoadManager.putImageInLoadingQueueThumb_Map(
+                  photo,
+                  ImageQuality.THUMB,
+                  imageLoadCallback,
+                  true // is AWT image
+            );
          }
       }
 
@@ -7021,7 +7026,7 @@ public class Map2 extends Canvas {
                   // image is not yet loaded
 
                   // check if image is in the cache
-                  final Image photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+                  final Image photoImage = PhotoImageCache.getImage_SWT(photo, requestedImageQuality);
 
                   if ((photoImage == null || photoImage.isDisposed())
                         && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
@@ -8417,9 +8422,9 @@ public class Map2 extends Canvas {
                photoWidth,
                photoHeight);
 
-         final Image swtPhotoImage = getPhotoImage(photo);
+         final BufferedImage awtPhotoImage = getPhotoImage(photo);
 
-         if (swtPhotoImage == null || swtPhotoImage.isDisposed()) {
+         if (awtPhotoImage == null) {
 
             // image is not yet available -> paint photo placeholder
 
@@ -8434,8 +8439,6 @@ public class Map2 extends Canvas {
          } else {
 
             // paint photo image
-
-            final java.awt.Image awtPhotoImage = ImageConverter.convertIntoAWT(swtPhotoImage);
 
             g2d.drawImage(awtPhotoImage,
 

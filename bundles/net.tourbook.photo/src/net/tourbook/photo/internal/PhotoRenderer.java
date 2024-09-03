@@ -396,7 +396,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
             // image is not yet loaded
 
             // check if image is in the cache
-            paintedImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+            paintedImage = PhotoImageCache.getImage_SWT(photo, requestedImageQuality);
 
             if ((paintedImage == null || paintedImage.isDisposed())
                   && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
@@ -405,7 +405,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
                final LoadCallbackImage imageLoadCallback = new LoadCallbackImage(_imageGallery, galleryItem);
 
-               PhotoLoadManager.putImageInLoadingQueueThumbGallery(
+               PhotoLoadManager.putImageInLoadingQueueThumb_Gallery(
                      galleryItem,
                      photo,
                      requestedImageQuality,
@@ -424,7 +424,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
                      ? ImageQuality.THUMB
                      : ImageQuality.HQ;
 
-               paintedImage = PhotoImageCache.getImage(photo, lowerImageQuality);
+               paintedImage = PhotoImageCache.getImage_SWT(photo, lowerImageQuality);
             }
          }
       }
@@ -1417,13 +1417,13 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
                // original size is not available, try to get image with lower quality
 
-               _fullsizePaintedImage = PhotoImageCache.getImage(photo, ImageQuality.HQ);
+               _fullsizePaintedImage = PhotoImageCache.getImage_SWT(photo, ImageQuality.HQ);
 
                if (_fullsizePaintedImage == null || _fullsizePaintedImage.isDisposed()) {
 
                   // requested size is not available, try to get image with lower quality
 
-                  _fullsizePaintedImage = PhotoImageCache.getImage(photo, ImageQuality.THUMB);
+                  _fullsizePaintedImage = PhotoImageCache.getImage_SWT(photo, ImageQuality.THUMB);
                }
             }
          }

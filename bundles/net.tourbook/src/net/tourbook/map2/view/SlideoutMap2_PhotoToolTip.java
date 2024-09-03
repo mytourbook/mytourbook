@@ -509,7 +509,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          // image is not yet loaded
 
          // check if image is in the cache
-         photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+         photoImage = PhotoImageCache.getImage_SWT(photo, requestedImageQuality);
 
          if ((photoImage == null || photoImage.isDisposed())
                && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {

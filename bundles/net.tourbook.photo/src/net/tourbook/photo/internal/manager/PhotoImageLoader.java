@@ -29,8 +29,8 @@ import javax.imageio.ImageIO;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.SWT2Dutil;
 import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+import net.tourbook.common.util.SWT2Dutil;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.IPhotoPreferences;
@@ -254,7 +254,107 @@ public class PhotoImageLoader {
     *
     * @return
     */
-   private Image loadImageFromEXIFThumbnail(final IPath storeImageFilePath) {
+   private BufferedImage loadImageFromEXIFThumbnail_AWT(final IPath storeImageFilePath) {
+
+      BufferedImage awtBufferedImage = null;
+
+      try {
+
+         // read exif meta data
+         final ImageMetadata metadata = _photo.getImageMetaData(true);
+
+         if (metadata == null) {
+            return null;
+         }
+
+         if (metadata instanceof JpegImageMetadata) {
+
+            awtBufferedImage = ((JpegImageMetadata) metadata).getEXIFThumbnail();
+
+            _trackedAWTImages.add(awtBufferedImage);
+
+            if (awtBufferedImage == null) {
+               return null;
+            }
+
+            /*
+             * Transform EXIF image
+             */
+            try {
+
+               awtBufferedImage = transformImageCrop(awtBufferedImage);
+               awtBufferedImage = transformImageRotate(awtBufferedImage);
+
+               return awtBufferedImage;
+
+            } catch (final Exception e) {
+
+               StatusUtil.log("Image \"%s\" cannot be resized".formatted(_photo.imageFilePathName), e); //$NON-NLS-1$
+
+               return null;
+            }
+         }
+
+      } catch (final ImageReadException | IOException e) {
+
+         StatusUtil.log(e);
+
+      } finally {
+
+         // set state after creating image
+         _photo.setStateExifThumb(awtBufferedImage == null ? 0 : 1);
+      }
+
+      return null;
+   }
+
+   private void loadImageFromEXIFThumbnail_Original() {
+
+      Image loadedExifImage = null;
+      String imageKey = null;
+
+      try {
+
+         // get image from thumbnail image in the EXIF data
+
+         final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
+
+         final Image exifThumbnail = loadImageFromEXIFThumbnail_SWT(storeThumbImageFilePath);
+         if (exifThumbnail != null) {
+
+            // EXIF image is available
+
+            imageKey = _photo.getImageKey(ImageQuality.THUMB);
+            loadedExifImage = exifThumbnail;
+         }
+
+      } catch (final Exception e) {
+
+      } finally {
+
+         disposeTrackedImages();
+
+         if (loadedExifImage != null) {
+
+            // cache loaded thumb, that the redraw finds the image
+
+            final String originalImagePathName = _photo.imageFilePathName;
+
+            PhotoImageCache.putImage_SWT(imageKey, loadedExifImage, originalImagePathName);
+
+            // display image in the loading callback
+//            _loadCallBack.callBackImageIsLoaded(true);
+         }
+      }
+   }
+
+   /**
+    * @param storeImageFilePath
+    *           Path to store image in the thumbnail store
+    *
+    * @return
+    */
+   private Image loadImageFromEXIFThumbnail_SWT(final IPath storeImageFilePath) {
 
       BufferedImage awtBufferedImage = null;
 
@@ -328,55 +428,15 @@ public class PhotoImageLoader {
       return null;
    }
 
-   private void loadImageFromEXIFThumbnailOriginal() {
-
-      Image loadedExifImage = null;
-      String imageKey = null;
-
-      try {
-
-         // get image from thumbnail image in the EXIF data
-
-         final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
-
-         final Image exifThumbnail = loadImageFromEXIFThumbnail(storeThumbImageFilePath);
-         if (exifThumbnail != null) {
-
-            // EXIF image is available
-
-            imageKey = _photo.getImageKey(ImageQuality.THUMB);
-            loadedExifImage = exifThumbnail;
-         }
-
-      } catch (final Exception e) {
-
-      } finally {
-
-         disposeTrackedImages();
-
-         if (loadedExifImage != null) {
-
-            // cache loaded thumb, that the redraw finds the image
-
-            final String originalImagePathName = _photo.imageFilePathName;
-
-            PhotoImageCache.putImage(imageKey, loadedExifImage, originalImagePathName);
-
-            // display image in the loading callback
-//            _loadCallBack.callBackImageIsLoaded(true);
-         }
-      }
-   }
-
    /**
-    * Get image from thumb store with the requested image quality.
+    * Get AWT image from thumb store with the requested image quality.
     *
     * @param _photo
     * @param requestedImageQuality
     *
     * @return
     */
-   private Image loadImageFromStore(final ImageQuality requestedImageQuality) {
+   private BufferedImage loadImageFromStore_AWT(final ImageQuality requestedImageQuality) {
 
       /*
        * check if image is available in the thumbstore
@@ -392,7 +452,58 @@ public class PhotoImageLoader {
 
       // photo image is available in the thumbnail store
 
-      Image storeImage = null;
+      /*
+       * touch store file when it is not yet done today, this is done to track last access time so
+       * that a store cleanup can check the date
+       */
+      final LocalDate dtModified = TimeTools.getZonedDateTime(storeImageFile.lastModified()).toLocalDate();
+
+      if (dtModified.equals(LocalDate.now()) == false) {
+
+         storeImageFile.setLastModified(TimeTools.now().toInstant().toEpochMilli());
+      }
+
+      BufferedImage awtImage = null;
+
+      try {
+
+         awtImage = ImageIO.read(new File(imageStoreFilePath));
+
+         loadImageProperties(requestedStoreImageFilePath);
+
+      } catch (final Exception e) {
+
+         StatusUtil.log("Image cannot be loaded with AWT: \"%s\"".formatted(imageStoreFilePath), e); //$NON-NLS-1$
+      }
+
+      return awtImage;
+   }
+
+   /**
+    * Get image from thumb store with the requested image quality.
+    *
+    * @param _photo
+    * @param requestedImageQuality
+    *
+    * @return
+    */
+   private Image loadImageFromStore_SWT(final ImageQuality requestedImageQuality) {
+
+      /*
+       * check if image is available in the thumbstore
+       */
+      final IPath requestedStoreImageFilePath = ThumbnailStore.getStoreImagePath(_photo, requestedImageQuality);
+
+      final String imageStoreFilePath = requestedStoreImageFilePath.toOSString();
+      final File storeImageFile = new File(imageStoreFilePath);
+
+      if (storeImageFile.isFile() == false) {
+         return null;
+      }
+
+      // photo image is available in the thumbnail store
+
+      Image swtImage = null;
 
       /*
        * touch store file when it is not yet done today, this is done to track last access time so
@@ -409,7 +520,7 @@ public class PhotoImageLoader {
 
          final BufferedImage awtImage = ImageIO.read(new File(imageStoreFilePath));
 
-         storeImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
+         swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
 
          loadImageProperties(requestedStoreImageFilePath);
 
@@ -418,7 +529,7 @@ public class PhotoImageLoader {
                imageStoreFilePath), e);
       } finally {
 
-         if (storeImage == null) {
+         if (swtImage == null) {
 
             String message = "Image \"{0}\" cannot be loaded and an exception did not occure.\n" //$NON-NLS-1$
                   + "The image file is available but it's possible that SWT.ERROR_NO_HANDLES occurred"; //$NON-NLS-1$
@@ -432,14 +543,14 @@ public class PhotoImageLoader {
              */
             try {
 
-               storeImage = new Image(_display, imageStoreFilePath);
+               swtImage = new Image(_display, imageStoreFilePath);
 
             } catch (final Exception e) {
                StatusUtil.log(NLS.bind("Image cannot be loaded with SWT (2): \"{0}\"", //$NON-NLS-1$
                      imageStoreFilePath), e);
             } finally {
 
-               if (storeImage == null) {
+               if (swtImage == null) {
 
                   message = "Image cannot be loaded again with SWT, even when disposing the image cache: \"{0}\" "; //$NON-NLS-1$
 
@@ -449,7 +560,7 @@ public class PhotoImageLoader {
          }
       }
 
-      return storeImage;
+      return swtImage;
    }
 
    /**
@@ -703,7 +814,7 @@ public class PhotoImageLoader {
          final long startSaveHQ = System.currentTimeMillis();
          final IPath storeHQImagePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.HQ);
 
-         ThumbnailStore.saveThumbImageWithSWT(scaledHQImage, storeHQImagePath, originalImageProperties);
+         ThumbnailStore.saveResizedImage_SWT(scaledHQImage, storeHQImagePath, originalImageProperties);
 
          isHQCreated = true;
 
@@ -739,7 +850,7 @@ public class PhotoImageLoader {
 
                final IPath storeImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
 
-               requestedSWTImage = loadImageFromEXIFThumbnail(storeImageFilePath);
+               requestedSWTImage = loadImageFromEXIFThumbnail_SWT(storeImageFilePath);
             }
 
          } else {
@@ -790,7 +901,7 @@ public class PhotoImageLoader {
             final long startSaveThumb = System.currentTimeMillis();
             final IPath storeThumbImagePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
 
-            ThumbnailStore.saveThumbImageWithSWT(scaledThumbImage, storeThumbImagePath, originalImageProperties);
+            ThumbnailStore.saveResizedImage_SWT(scaledThumbImage, storeThumbImagePath, originalImageProperties);
 
             endSaveThumb = System.currentTimeMillis() - startSaveThumb;
          }
@@ -808,7 +919,7 @@ public class PhotoImageLoader {
          _photo.getImageMetaData();
 
          // keep requested image in cache
-         PhotoImageCache.putImage(_requestedImageKey, requestedSWTImage, originalImagePathName);
+         PhotoImageCache.putImage_SWT(_requestedImageKey, requestedSWTImage, originalImagePathName);
       }
 
       if (requestedSWTImage == null) {
@@ -956,7 +1067,7 @@ public class PhotoImageLoader {
              */
             final long startSaveHQ = System.currentTimeMillis();
             {
-               final boolean isSaved = ThumbnailStore.saveThumbImageWithAWT(
+               final boolean isSaved = ThumbnailStore.saveResizedImage_AWT(
                      scaledHQImage,
                      ThumbnailStore.getStoreImagePath(_photo, ImageQuality.HQ),
                      originalImageProperties);
@@ -972,7 +1083,7 @@ public class PhotoImageLoader {
 
                   // create swt image from saved AWT image, this converts AWT -> SWT
 
-                  requestedSWTImage = loadImageFromStore(ImageQuality.HQ);
+                  requestedSWTImage = loadImageFromStore_SWT(ImageQuality.HQ);
                }
             }
             endSaveHQ = System.currentTimeMillis() - startSaveHQ;
@@ -1011,13 +1122,13 @@ public class PhotoImageLoader {
                   // get thumb image
 
                   final IPath storeImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
-                  requestedSWTImage = loadImageFromEXIFThumbnail(storeImageFilePath);
+                  requestedSWTImage = loadImageFromEXIFThumbnail_SWT(storeImageFilePath);
                }
 
             } else {
 
                // check if thumb image is already available
-               final Image exifThumbImage = loadImageFromStore(ImageQuality.THUMB);
+               final Image exifThumbImage = loadImageFromStore_SWT(ImageQuality.THUMB);
                if (exifThumbImage != null) {
 
                   // EXIF thumb image is already available in the thumbstore
@@ -1095,7 +1206,7 @@ public class PhotoImageLoader {
                {
                   final IPath storeThumbImagePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
 
-                  isSaved = ThumbnailStore.saveThumbImageWithAWT(
+                  isSaved = ThumbnailStore.saveResizedImage_AWT(
                         saveThumbAWT,
                         storeThumbImagePath,
                         originalImageProperties);
@@ -1126,7 +1237,7 @@ public class PhotoImageLoader {
 
             // create swt image from saved AWT image (convert AWT->SWT)
 
-            requestedSWTImage = loadImageFromStore(ImageQuality.THUMB);
+            requestedSWTImage = loadImageFromStore_SWT(ImageQuality.THUMB);
          }
 
          if (requestedSWTImage != null) {
@@ -1135,7 +1246,7 @@ public class PhotoImageLoader {
             _photo.getImageMetaData();
 
             // keep requested image in cache
-            PhotoImageCache.putImage(_requestedImageKey, requestedSWTImage, originalImagePathName);
+            PhotoImageCache.putImage_SWT(_requestedImageKey, requestedSWTImage, originalImagePathName);
          }
 
          if (requestedSWTImage == null) {
@@ -1185,9 +1296,9 @@ public class PhotoImageLoader {
        * display thumb image during loading the original when it's not in the cache, when it's in
        * the cache, the thumb is already displayed
        */
-      final Image photoImage = PhotoImageCache.getImage(_photo, ImageQuality.THUMB);
+      final Image photoImage = PhotoImageCache.getImage_SWT(_photo, ImageQuality.THUMB);
       if (photoImage == null || photoImage.isDisposed()) {
-         loadImageFromEXIFThumbnailOriginal();
+         loadImageFromEXIFThumbnail_Original();
       }
 
       /*
@@ -1397,43 +1508,131 @@ public class PhotoImageLoader {
             }
          }
       }
-
    }
 
-// JAI implementation to read tiff images with AWT
-//
-//   private BufferedImage loadImageHQ_22_ExtendedAWT(final PhotoWrapper photoWrapper) throws IOException {
-//
-//      if (isAWTImageSupported == false) {
-//
-//         // extension is not supported
-//
-//         return null;
-//
-////
-////         final SeekableStream s = new FileSeekableStream(_photo.getPhotoWrapper().imageFile);
-////
-////         final TIFFDecodeParam param = null;
-////
-////         final ImageDecoder dec = ImageCodec.createImageDecoder("tiff", s, param);
-////
-////         // Which of the multiple images in the TIFF file do we want to load
-////         // 0 refers to the first, 1 to the second and so on.
-////         final int imageToLoad = 0;
-////
-////         final RenderedImage op = new NullOpImage(
-////               dec.decodeAsRenderedImage(imageToLoad),
-////               null,
-////               OpImage.OP_IO_BOUND,
-////               null);
-////
-////         final BufferedImage img = new BufferedImage(op.getWidth(), op.getHeight(), BufferedImage.TYPE_INT_ARGB);
-//
-//      } else {
-//
-//         return ImageIO.read(photoWrapper.imageFile);
-//      }
-//   }
+   /**
+    * This is called from the executor when the loading task is starting. It loads an image and
+    * puts it into the image cache from where it is fetched when painted.
+    *
+    * @param waitingqueueoriginal
+    * @param waitingqueueexif
+    *
+    * @return Returns <code>true</code> when image should be loaded in HQ.
+    */
+   public boolean loadImageThumb_AWT(final LinkedBlockingDeque<PhotoImageLoader> waitingQueueOriginal) {
+
+      /*
+       * Wait until original images are loaded
+       */
+      try {
+
+         while (waitingQueueOriginal.size() > 0) {
+
+            Thread.sleep(PhotoLoadManager.DELAY_TO_CHECK_WAITING_QUEUE);
+         }
+
+      } catch (final InterruptedException e) {
+
+         // this should not happen, I hope so
+         Thread.currentThread().interrupt();
+      }
+
+      boolean isLoadedImageInRequestedQuality = false;
+      BufferedImage loadedExifImage = null;
+      String imageKey = null;
+      boolean isLoadingError = false;
+
+      boolean isHQRequired = false;
+
+      try {
+
+         // 1. get image with the requested quality from the image store
+
+         final BufferedImage storeImage = loadImageFromStore_AWT(_requestedImageQuality);
+         if (storeImage != null) {
+
+            isLoadedImageInRequestedQuality = true;
+
+            imageKey = _requestedImageKey;
+            loadedExifImage = storeImage;
+
+         } else {
+
+            // 2. get image from thumbnail image in the EXIF data
+
+            final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
+
+            final BufferedImage awtExifThumbnail = loadImageFromEXIFThumbnail_AWT(storeThumbImageFilePath);
+            if (awtExifThumbnail != null) {
+
+               // EXIF image is available
+
+               isLoadedImageInRequestedQuality = _requestedImageQuality == ImageQuality.THUMB;
+
+               imageKey = _photo.getImageKey(ImageQuality.THUMB);
+               loadedExifImage = awtExifThumbnail;
+            }
+         }
+
+      } catch (final Exception e) {
+
+         setStateLoadingError();
+
+         isLoadingError = true;
+
+      } finally {
+
+         disposeTrackedImages();
+
+         final boolean isImageLoaded = loadedExifImage != null;
+
+         /*
+          * keep image in cache
+          */
+         if (isImageLoaded) {
+
+            final String originalImagePathName = _photo.imageFilePathName;
+
+            // ensure metadata are loaded
+            _photo.getImageMetaData();
+
+            // check if width is set
+            if (_photo.getPhotoImageWidth() == Integer.MIN_VALUE) {
+
+               // photo image width/height is not set from metadata, set it from the image
+
+               // update dimension
+               updateImageSize(loadedExifImage.getWidth(), loadedExifImage.getHeight(), false);
+            }
+
+            PhotoImageCache.putImage_AWT(imageKey, loadedExifImage, originalImagePathName);
+         }
+
+         /*
+          * update loading state
+          */
+         if (isLoadedImageInRequestedQuality) {
+
+            // image is loaded with requested quality, reset image state
+
+            setStateUndefined();
+
+         } else {
+
+            // load image with higher quality
+
+            isHQRequired = true;
+         }
+
+         // show in the UI, that meta data are loaded, loading message is displayed with another color
+         final boolean isUpdateUI = _photo.getImageMetaDataRaw() != null;
+
+         // display image in the loading callback
+         _loadCallBack.callBackImageIsLoaded(isUpdateUI || isImageLoaded || isLoadingError);
+      }
+
+      return isHQRequired;
+   }
 
    /**
     * This is called from the executor when the loading task is starting. It loads an image and
@@ -1506,16 +1705,20 @@ public class PhotoImageLoader {
     *
     * @return Returns <code>true</code> when image should be loaded in HQ.
     */
-   public boolean loadImageThumb(final LinkedBlockingDeque<PhotoImageLoader> waitingQueueOriginal) {
+   public boolean loadImageThumb_SWT(final LinkedBlockingDeque<PhotoImageLoader> waitingQueueOriginal) {
 
       /*
-       * wait until original images are loaded
+       * Wait until original images are loaded
        */
       try {
+
          while (waitingQueueOriginal.size() > 0) {
+
             Thread.sleep(PhotoLoadManager.DELAY_TO_CHECK_WAITING_QUEUE);
          }
+
       } catch (final InterruptedException e) {
+
          // should not happen, I hope so
          Thread.currentThread().interrupt();
       }
@@ -1530,7 +1733,7 @@ public class PhotoImageLoader {
       try {
 
          // 1. get image with the requested quality from the image store
-         final Image storeImage = loadImageFromStore(_requestedImageQuality);
+         final Image storeImage = loadImageFromStore_SWT(_requestedImageQuality);
          if (storeImage != null) {
 
             isLoadedImageInRequestedQuality = true;
@@ -1547,7 +1750,7 @@ public class PhotoImageLoader {
 
             final IPath storeThumbImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
 
-            final Image exifThumbnail = loadImageFromEXIFThumbnail(storeThumbImageFilePath);
+            final Image exifThumbnail = loadImageFromEXIFThumbnail_SWT(storeThumbImageFilePath);
             if (exifThumbnail != null) {
 
                // EXIF image is available
@@ -1597,7 +1800,7 @@ public class PhotoImageLoader {
                updateImageSize(imageWidth, imageHeight, false);
             }
 
-            PhotoImageCache.putImage(imageKey, loadedExifImage, originalImagePathName);
+            PhotoImageCache.putImage_SWT(imageKey, loadedExifImage, originalImagePathName);
          }
 
          /*

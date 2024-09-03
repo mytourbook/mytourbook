@@ -545,10 +545,10 @@ public class PhotoLoadManager {
     * @param imageQuality
     * @param imageLoadCallback
     */
-   public static void putImageInLoadingQueueThumbGallery(final GalleryMT20Item galleryItem,
-                                                         final Photo photo,
-                                                         final ImageQuality imageQuality,
-                                                         final ILoadCallBack imageLoadCallback) {
+   public static void putImageInLoadingQueueThumb_Gallery(final GalleryMT20Item galleryItem,
+                                                          final Photo photo,
+                                                          final ImageQuality imageQuality,
+                                                          final ILoadCallBack imageLoadCallback) {
       // set state
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
@@ -599,7 +599,7 @@ public class PhotoLoadManager {
                   return;
                }
 
-               if (imageLoader.loadImageThumb(_waitingQueueOriginal)) {
+               if (imageLoader.loadImageThumb_SWT(_waitingQueueOriginal)) {
 
                   // HQ image is requested
 
@@ -621,9 +621,17 @@ public class PhotoLoadManager {
       _executorThumb.submit(executorTask);
    }
 
-   public static void putImageInLoadingQueueThumbMap(final Photo photo,
-                                                     final ImageQuality imageQuality,
-                                                     final ILoadCallBack imageLoaderCallback) {
+   /**
+    * @param photo
+    * @param imageQuality
+    * @param imageLoaderCallback
+    * @param isAWTImage
+    *           Has to be <code>false</code> for a SWT image
+    */
+   public static void putImageInLoadingQueueThumb_Map(final Photo photo,
+                                                      final ImageQuality imageQuality,
+                                                      final ILoadCallBack imageLoaderCallback,
+                                                      final boolean isAWTImage) {
 
       // set state
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
@@ -642,13 +650,13 @@ public class PhotoLoadManager {
          public void run() {
 
             // get last added loader item
-            final PhotoImageLoader imageLoader = _waitingQueueThumb.pollFirst();
+            final PhotoImageLoader photoImageLoader = _waitingQueueThumb.pollFirst();
 
-            if (imageLoader == null) {
+            if (photoImageLoader == null) {
                return;
             }
 
-            final String errorKey = imageLoader.getPhoto().imageFilePathName;
+            final String errorKey = photoImageLoader.getPhoto().imageFilePathName;
 
             if (_photoWithLoadingError.containsKey(errorKey)) {
 
@@ -656,7 +664,14 @@ public class PhotoLoadManager {
 
             } else {
 
-               imageLoader.loadImageThumb(_waitingQueueOriginal);
+               if (isAWTImage) {
+
+                  photoImageLoader.loadImageThumb_AWT(_waitingQueueOriginal);
+
+               } else {
+
+                  photoImageLoader.loadImageThumb_SWT(_waitingQueueOriginal);
+               }
             }
 
             checkLoadingState(photo, imageQuality);
