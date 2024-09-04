@@ -465,6 +465,7 @@ public class Map2 extends Canvas {
    private MapPointToolTip                 _mapPointTooltip;
    private SlideoutMap2_PhotoToolTip       _mapPointTooltip_Photo;
    private boolean                         _isPreloadHQImages;
+   private final ILoadCallBack             _photoImageLoaderCallback        = new PhotoImageLoaderCallback();
 
    /** Number of created map points */
    private int                             _numStatistics_AllCommonLocations;
@@ -761,7 +762,7 @@ public class Map2 extends Canvas {
    private int                 _fastMapPainting_skippedValues;
 
    private MapTourBreadcrumb   _tourBreadcrumb;
-   private boolean             _isShowBreadcrumbs = Map2View.STATE_IS_SHOW_BREADCRUMBS_DEFAULT;
+   private boolean             _isShowBreadcrumbs            = Map2View.STATE_IS_SHOW_BREADCRUMBS_DEFAULT;
 
    private int                 _prefOptions_BorderWidth;
    private boolean             _prefOptions_isCutOffLinesInPauses;
@@ -784,12 +785,25 @@ public class Map2 extends Canvas {
    private int                 _ratingStarImageSize;
    private Rectangle           _paintedRatingStars;
 
-   private final int           MAX_RATING_STARS   = 5;
+   private final int           MAX_RATING_STARS              = 5;
    public int                  MAX_RATING_STARS_WIDTH;
 
+   public int                  MAP_IMAGE_DEFAULT_SIZE_TINY   = 20;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_SMALL  = 60;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_MEDIUM = 120;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_LARGE  = 200;
+
    {
+      final int deviceZoom = DPIUtil.getDeviceZoom();
+      final float deviceScale = deviceZoom / 100f;
+
+      MAP_IMAGE_DEFAULT_SIZE_TINY = (int) (MAP_IMAGE_DEFAULT_SIZE_TINY * deviceScale);
+      MAP_IMAGE_DEFAULT_SIZE_SMALL = (int) (MAP_IMAGE_DEFAULT_SIZE_SMALL * deviceScale);
+      MAP_IMAGE_DEFAULT_SIZE_MEDIUM = (int) (MAP_IMAGE_DEFAULT_SIZE_MEDIUM * deviceScale);
+      MAP_IMAGE_DEFAULT_SIZE_LARGE = (int) (MAP_IMAGE_DEFAULT_SIZE_LARGE * deviceScale);
+
       final ImageDescriptor imageDescriptor = PhotoActivator.getImageDescriptor(PhotoImages.PhotoRatingStar);
-      final ImageData imageData = imageDescriptor.getImageData(DPIUtil.getDeviceZoom());
+      final ImageData imageData = imageDescriptor.getImageData(deviceZoom);
 
       final Image swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(imageData));
       {
@@ -2839,12 +2853,16 @@ public class Map2 extends Canvas {
 
       BufferedImage photoImage = null;
 
+      /*
+       * 1. The thumbs MUST be loaded firstly because they are also loading the image orientation
+       */
+
       // check if image has an loading error
       final PhotoLoadingState photoLoadingState = photo.getLoadingState(ImageQuality.THUMB);
 
       if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
 
-         // image is not yet loaded
+         // image is not invalid, it could be loaded
 
          // check if image is in the cache
          photoImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB);
@@ -2854,18 +2872,50 @@ public class Map2 extends Canvas {
 
             // the requested image is not available in the image cache -> image must be loaded
 
-            final ILoadCallBack imageLoadCallback = new PhotoImageLoaderCallback();
-
             PhotoLoadManager.putImageInLoadingQueueThumb_Map(
                   photo,
                   ImageQuality.THUMB,
-                  imageLoadCallback,
+                  _photoImageLoaderCallback,
                   true // is AWT image
             );
+
+            return null;
          }
+
+         return photoImage;
       }
 
-      return photoImage;
+      // check if image has an loading error
+//      photoLoadingState = photo.getLoadingState(ImageQuality.HQ);
+//
+//      if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+//
+//         // image is not yet loaded
+//
+//         // check if image is in the cache
+//         photoImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.HQ);
+//
+//         if (photoImage == null
+//               && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+//
+//            // the requested image is not available in the image cache -> image must be loaded
+//
+//            PhotoLoadManager.putImageInLoadingQueueHQ_Map(
+//                  photo,
+//                  ImageQuality.HQ,
+//                  _photoImageLoaderCallback,
+//                  true // is AWT image
+//            );
+//
+//            return null;
+//
+//         } else {
+//
+//            return photoImage;
+//         }
+//      }
+
+      return null;
    }
 
    private PoiToolTip getPoiTooltip() {
@@ -7033,9 +7083,13 @@ public class Map2 extends Canvas {
 
                      // the requested image is not available in the image cache -> image must be loaded
 
-                     final ILoadCallBack imageLoadCallback = new PhotoImageLoaderCallback();
+                     PhotoLoadManager.putImageInLoadingQueueHQ_Map(
+                           photo,
+                           requestedImageQuality,
+                           _photoImageLoaderCallback,
 
-                     PhotoLoadManager.putImageInLoadingQueueHQ_Map(photo, requestedImageQuality, imageLoadCallback);
+                           false // is SWT image
+                     );
                   }
                }
             }
@@ -8428,7 +8482,7 @@ public class Map2 extends Canvas {
 
             // image is not yet available -> paint photo placeholder
 
-            g2d.setColor(java.awt.Color.cyan);
+            g2d.setColor(java.awt.Color.GRAY);
 
             g2d.fillRect(
                   photoRectangle.x,

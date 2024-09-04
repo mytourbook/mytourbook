@@ -317,6 +317,7 @@ public class PhotoLoadManager {
     *         will be displayed. Possible AWT save error: "Bogus input colorspace"
     */
    public static boolean isThumbSaveError(final String imageFilePath) {
+
       return _photoWithThumbSaveError.containsKey(imageFilePath);
    }
 
@@ -394,7 +395,13 @@ public class PhotoLoadManager {
                return;
             }
 
-            imageLoader.loadImageHQ(_waitingQueueThumb, _waitingQueueExif);
+            imageLoader.loadImageHQ(
+
+                  _waitingQueueThumb,
+                  _waitingQueueExif,
+
+                  false // is SWT image
+            );
 
             checkLoadingState(photo, imageQuality);
          }
@@ -409,10 +416,12 @@ public class PhotoLoadManager {
     * @param photo
     * @param imageQuality
     * @param imageLoaderCallback
+    * @param isAWTImage
     */
    public static void putImageInLoadingQueueHQ_Map(final Photo photo,
                                                    final ImageQuality imageQuality,
-                                                   final ILoadCallBack imageLoaderCallback) {
+                                                   final ILoadCallBack imageLoaderCallback,
+                                                   final boolean isAWTImage) {
 
       // set state
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
@@ -445,7 +454,7 @@ public class PhotoLoadManager {
 
             } else {
 
-               imageLoader.loadImageHQ(_waitingQueueThumb, _waitingQueueExif);
+               imageLoader.loadImageHQ(_waitingQueueThumb, _waitingQueueExif, isAWTImage);
             }
 
             checkLoadingState(photo, imageQuality);
@@ -708,10 +717,12 @@ public class PhotoLoadManager {
    }
 
    public static void putPhotoInThumbSaveErrorMap(final String errorKey) {
+
       _photoWithThumbSaveError.put(errorKey, new Object());
    }
 
    public static void removeInvalidImageFiles() {
+
       _photoWithLoadingError.clear();
       _photoWithThumbSaveError.clear();
    }

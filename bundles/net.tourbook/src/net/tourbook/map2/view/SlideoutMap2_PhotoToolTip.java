@@ -518,7 +518,12 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
             final ILoadCallBack imageLoadCallback = new PhotoImageLoaderCallback();
 
-            PhotoLoadManager.putImageInLoadingQueueHQ_Map(photo, requestedImageQuality, imageLoadCallback);
+            PhotoLoadManager.putImageInLoadingQueueHQ_Map(photo,
+                  requestedImageQuality,
+                  imageLoadCallback,
+
+                  false // get SWT image
+            );
          }
       }
 
@@ -944,12 +949,14 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       _photo = hoveredMapPoint.mapPoint.photo;
 
       final ZonedDateTime adjustedTime_Tour_WithZone = _photo.adjustedTime_Tour_WithZone;
+      if (adjustedTime_Tour_WithZone != null) {
 
-      final String photoDateTime = "%s  %s".formatted( //$NON-NLS-1$
-            adjustedTime_Tour_WithZone.format(TimeTools.Formatter_Weekday),
-            adjustedTime_Tour_WithZone.format(TimeTools.Formatter_DateTime_M));
+         final String photoDateTime = "%s  %s".formatted( //$NON-NLS-1$
+               adjustedTime_Tour_WithZone.format(TimeTools.Formatter_Weekday),
+               adjustedTime_Tour_WithZone.format(TimeTools.Formatter_DateTime_M));
 
-      updateTitleText(photoDateTime);
+         updateTitleText(photoDateTime);
+      }
 
       final Image photoImage = getPhotoImage(_photo);
 

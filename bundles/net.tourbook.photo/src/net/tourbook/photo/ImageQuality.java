@@ -18,8 +18,8 @@ package net.tourbook.photo;
 public enum ImageQuality {
 
 	/**
-	 * Image is in thumb size
-	 */
+    * Image is in EXIF thumb size/quality
+    */
 	THUMB,
 
 	/**

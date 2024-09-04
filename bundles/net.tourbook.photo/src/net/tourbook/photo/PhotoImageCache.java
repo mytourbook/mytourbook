@@ -131,11 +131,12 @@ public class PhotoImageCache {
       }
 
       if (isDisposeAll) {
-         imageCache.cleanUp();
+         imageCache.invalidateAll();
       }
    }
 
    public static void disposeAll() {
+
       disposeThumbs(null);
       disposeOriginal(null);
    }
@@ -156,6 +157,7 @@ public class PhotoImageCache {
     * @param folderPath
     */
    public static void disposeOriginal(final String folderPath) {
+
       dispose(_imageCache_OriginalImage, folderPath);
    }
 
@@ -277,7 +279,9 @@ public class PhotoImageCache {
     * @param imageWidth
     * @param originalImagePathName
     */
-   public static void putImage_AWT(final String imageKey, final BufferedImage awtImage, final String originalImagePathName) {
+   public static void putImage_AWT(final String imageKey,
+                                   final BufferedImage awtImage,
+                                   final String originalImagePathName) {
 
       putImageInCache_AWT(_imageCache_ResizedImage, imageKey, awtImage, originalImagePathName);
    }
@@ -292,10 +296,14 @@ public class PhotoImageCache {
     * @param imageHeight
     * @param imageWidth
     * @param originalImagePathName
+    *
+    * @return
     */
-   public static void putImage_SWT(final String imageKey, final Image swtImage, final String originalImagePathName) {
+   public static ImageCacheWrapper putImage_SWT(final String imageKey,
+                                                final Image swtImage,
+                                                final String originalImagePathName) {
 
-      putImageInCache_SWT(_imageCache_ResizedImage, imageKey, swtImage, originalImagePathName);
+      return putImageInCache_SWT(_imageCache_ResizedImage, imageKey, swtImage, originalImagePathName);
    }
 
    private static void putImageInCache_AWT(final Cache<String, ImageCacheWrapper> imageCache,
@@ -312,10 +320,10 @@ public class PhotoImageCache {
       }
    }
 
-   private static void putImageInCache_SWT(final Cache<String, ImageCacheWrapper> imageCache,
-                                           final String imageKey,
-                                           final Image swtImage,
-                                           final String originalImagePathName) {
+   private static ImageCacheWrapper putImageInCache_SWT(final Cache<String, ImageCacheWrapper> imageCache,
+                                                        final String imageKey,
+                                                        final Image swtImage,
+                                                        final String originalImagePathName) {
 
       final ImageCacheWrapper imageCacheWrapper = new ImageCacheWrapper(swtImage, originalImagePathName, imageKey);
 
@@ -324,6 +332,8 @@ public class PhotoImageCache {
       if (oldWrapper != null) {
          disposeImage(oldWrapper);
       }
+
+      return imageCacheWrapper;
    }
 
    /**

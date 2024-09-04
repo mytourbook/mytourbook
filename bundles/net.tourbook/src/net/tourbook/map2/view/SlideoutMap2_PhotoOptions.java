@@ -67,11 +67,6 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
    static final String             STATE_PHOTO_IMAGE_SIZE_MEDIUM       = "STATE_PHOTO_IMAGE_SIZE_MEDIUM"; //$NON-NLS-1$
    static final String             STATE_PHOTO_IMAGE_SIZE_LARGE        = "STATE_PHOTO_IMAGE_SIZE_LARGE";  //$NON-NLS-1$
 
-   static final int                MAP_IMAGE_DEFAULT_SIZE_TINY         = 20;
-   static final int                MAP_IMAGE_DEFAULT_SIZE_SMALL        = 60;
-   static final int                MAP_IMAGE_DEFAULT_SIZE_MEDIUM       = 120;
-   static final int                MAP_IMAGE_DEFAULT_SIZE_LARGE        = 200;
-
    private static final int        MIN_IMAGE_SIZE                      = 3;
 
    /**
@@ -82,6 +77,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
    private IDialogSettings         _state_Map2;
 
    private Map2View                _map2View;
+   private Map2                    _map2;
 
    private ActionResetToDefaults   _actionRestoreDefaults;
 
@@ -134,6 +130,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       super(ownerControl, toolBar);
 
       _map2View = map2View;
+      _map2 = map2View.getMap();
       _state_Map2 = map2State;
 
    }
@@ -483,17 +480,17 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
    @Override
    public void resetToDefaults() {
 
-      _imageSize = MAP_IMAGE_DEFAULT_SIZE_MEDIUM;
+      _imageSize = _map2.MAP_IMAGE_DEFAULT_SIZE_MEDIUM;
 
       _radioImageSize_Large.setSelection(false);
       _radioImageSize_Medium.setSelection(true);
       _radioImageSize_Small.setSelection(false);
       _radioImageSize_Tiny.setSelection(false);
 
-      _spinnerImageSize_Large.setSelection(MAP_IMAGE_DEFAULT_SIZE_LARGE);
-      _spinnerImageSize_Medium.setSelection(MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
-      _spinnerImageSize_Small.setSelection(MAP_IMAGE_DEFAULT_SIZE_SMALL);
-      _spinnerImageSize_Tiny.setSelection(MAP_IMAGE_DEFAULT_SIZE_TINY);
+      _spinnerImageSize_Large.setSelection(_map2.MAP_IMAGE_DEFAULT_SIZE_LARGE);
+      _spinnerImageSize_Medium.setSelection(_map2.MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
+      _spinnerImageSize_Small.setSelection(_map2.MAP_IMAGE_DEFAULT_SIZE_SMALL);
+      _spinnerImageSize_Tiny.setSelection(_map2.MAP_IMAGE_DEFAULT_SIZE_TINY);
 
       _chkPreloadHQImages.setSelection(STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT);
       _chkShowPhotoRating.setSelection(STATE_IS_SHOW_PHOTO_RATING_DEFAULT);
@@ -527,10 +524,10 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
       final Enum<ImageSize> imageSize = Util.getStateEnum(_state_Map2, STATE_PHOTO_IMAGE_SIZE, ImageSize.MEDIUM);
 
-      final int imageSizeLarge   = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_LARGE,  MAP_IMAGE_DEFAULT_SIZE_LARGE);
-      final int imageSizeMedium  = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_MEDIUM, MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
-      final int imageSizeSmall   = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_SMALL,  MAP_IMAGE_DEFAULT_SIZE_SMALL);
-      final int imageSizeTiny    = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_TINY,   MAP_IMAGE_DEFAULT_SIZE_TINY);
+      final int imageSizeLarge   = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_LARGE,  _map2.MAP_IMAGE_DEFAULT_SIZE_LARGE);
+      final int imageSizeMedium  = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_MEDIUM, _map2.MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
+      final int imageSizeSmall   = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_SMALL,  _map2.MAP_IMAGE_DEFAULT_SIZE_SMALL);
+      final int imageSizeTiny    = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_TINY,   _map2.MAP_IMAGE_DEFAULT_SIZE_TINY);
 
       _spinnerImageSize_Large .setSelection(imageSizeLarge);
       _spinnerImageSize_Medium.setSelection(imageSizeMedium);
