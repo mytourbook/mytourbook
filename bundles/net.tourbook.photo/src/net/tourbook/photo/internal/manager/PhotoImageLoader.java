@@ -520,13 +520,14 @@ public class PhotoImageLoader {
          loadImageProperties(requestedStoreImageFilePath);
 
       } catch (final Exception e) {
-         StatusUtil.log(NLS.bind("Image cannot be loaded with SWT (1): \"{0}\"", //$NON-NLS-1$
-               imageStoreFilePath), e);
+
+         StatusUtil.log("Image cannot be loaded with SWT (1): \"%s\"".formatted(imageStoreFilePath), e); //$NON-NLS-1$
+
       } finally {
 
          if (swtImage == null) {
 
-            String message = "Image \"{0}\" cannot be loaded and an exception did not occure.\n" //$NON-NLS-1$
+            final String message = "Image \"{0}\" cannot be loaded and an exception did not occure.\n" //$NON-NLS-1$
                   + "The image file is available but it's possible that SWT.ERROR_NO_HANDLES occurred"; //$NON-NLS-1$
 
             System.out.println(UI.timeStampNano() + NLS.bind(message, imageStoreFilePath));
@@ -541,15 +542,16 @@ public class PhotoImageLoader {
                swtImage = new Image(_display, imageStoreFilePath);
 
             } catch (final Exception e) {
-               StatusUtil.log(NLS.bind("Image cannot be loaded with SWT (2): \"{0}\"", //$NON-NLS-1$
-                     imageStoreFilePath), e);
+
+               StatusUtil.log("Image cannot be loaded with SWT (2): \"%s\"".formatted(imageStoreFilePath), e); //$NON-NLS-1$
+
             } finally {
 
                if (swtImage == null) {
 
-                  message = "Image cannot be loaded again with SWT, even when disposing the image cache: \"{0}\" "; //$NON-NLS-1$
-
-                  System.out.println(UI.timeStampNano() + NLS.bind(message, imageStoreFilePath));
+                  System.out.println(UI.timeStampNano()
+                        + "Image cannot be loaded again with SWT, even when disposing the image cache: \"%s\" " //$NON-NLS-1$
+                              .formatted(imageStoreFilePath));
                }
             }
          }
@@ -622,8 +624,7 @@ public class PhotoImageLoader {
 
          if (hqImage == null) {
 
-            System.out.println(NLS.bind(
-                  UI.timeStampNano() + " image == NULL when loading with {0}: \"{1}\"", //$NON-NLS-1$
+            System.out.println(UI.timeStampNano() + " image == NULL when loading with %s: \"%s\"".formatted( //$NON-NLS-1$
                   _imageFramework.toUpperCase(),
                   _photo.imageFilePathName));
 
@@ -646,9 +647,8 @@ public class PhotoImageLoader {
                } finally {
 
                   if (hqImage == null) {
-                     System.out.println(NLS.bind(
-                           UI.timeStampNano() + " image == NULL when loading with SWT: \"{0}\"", //$NON-NLS-1$
-                           _photo.imageFilePathName));
+                     System.out.println(UI.timeStampNano()
+                           + " image == NULL when loading with SWT: \"%s\"".formatted(_photo.imageFilePathName)); //$NON-NLS-1$
                   }
                }
             }
@@ -661,6 +661,17 @@ public class PhotoImageLoader {
             setStateUndefined();
 
          } else {
+
+            if (_recursiveCounter[0] > 2) {
+
+               /**
+                * This may occur when heap stack is full, e.g. "[158.711s][warning][gc,alloc]
+                * LoadImg-HQ-6: Retried waiting for GCLocker too often allocating 6718466 words"
+                */
+
+               System.out.println(UI.timeStampNano()
+                     + " Heap may be full when loading \"%s\"".formatted(_photo.imageFilePathName)); //$NON-NLS-1$
+            }
 
             setStateLoadingError();
 

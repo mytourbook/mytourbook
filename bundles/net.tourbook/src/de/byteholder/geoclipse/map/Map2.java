@@ -2854,6 +2854,9 @@ public class Map2 extends Canvas {
       BufferedImage awtThumbImage = null;
       BufferedImage awtPhotoImageHQ = null;
 
+      boolean isShowHQImages = false;
+      isShowHQImages = false;
+
       try {
 
          /*
@@ -2884,6 +2887,11 @@ public class Map2 extends Canvas {
 
                return null;
             }
+         }
+
+         if (isShowHQImages == false) {
+
+            return awtThumbImage;
          }
 
          /*

@@ -1829,7 +1829,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _tourPausesUI = new TourPauseUI(this, this);
 
       // force spinner controls to have the same width
-      _spinnerGridData = GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(3), SWT.DEFAULT);
+      _spinnerGridData = GridDataFactory.fillDefaults().hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT);
 
       _mapPointSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyConfig(selectionEvent.widget));
       _mapPointSelectionListener_All = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyConfigAll());

@@ -29,6 +29,7 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
+import net.tourbook.photo.PhotoLoadManager;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -106,6 +107,8 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
    private Spinner               _spinnerImageSize_Medium;
    private Spinner               _spinnerImageSize_Large;
 
+   private Label                 _lblHeapSize;
+
    private Link                  _linkDiscardImages;
 
    private ColorSelectorExtended _colorTourPauseLabel_Outline;
@@ -132,7 +135,11 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       _map2View = map2View;
       _map2 = map2View.getMap();
       _state_Map2 = map2State;
+   }
 
+   public static String formatSize(final long value) {
+
+      return "%,d MB".formatted(value / 1024 / 1024); //$NON-NLS-1$
    }
 
    @Override
@@ -158,6 +165,8 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       restoreState();
 
       enableControls();
+
+      updateUI_Memory();
 
       return ui;
    }
@@ -383,6 +392,12 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
          _chkPreloadHQImages.addSelectionListener(_defaultSelectedListener);
       }
       {
+         // label
+         _lblHeapSize = new Label(parent, SWT.NONE);
+         _lblHeapSize.setText(UI.SPACE1);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_lblHeapSize);
+      }
+      {
          /*
           * Discard cached images
           */
@@ -445,14 +460,27 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
       updateMap();
 
+      updateUI_Memory();
+
       enableControls();
    }
 
    private void onDiscardImages() {
 
+      PhotoLoadManager.stopImageLoading(true);
+      PhotoLoadManager.removeInvalidImageFiles();
+
+//      ThumbnailStore.cleanupStoreFiles(true, true);
+
       PhotoImageCache.disposeAll();
 
+//      ExifCache.clear();
+
       repaintMap();
+
+      System.gc();
+
+      updateUI_Memory();
    }
 
    private void onSwapPhotoColor() {
@@ -617,6 +645,29 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
       _colorTourPauseLabel_Fill.setColorValue(config.photoFill_RGB);
       _colorTourPauseLabel_Outline.setColorValue(config.photoOutline_RGB);
+   }
+
+   private void updateUI_Memory() {
+
+      if (_lblHeapSize.isDisposed()) {
+         return;
+      }
+
+      final Runtime runtime = Runtime.getRuntime();
+
+      final String heapSize = "Heap: %s - Free: %s - Max: %s".formatted(
+
+            formatSize(runtime.totalMemory()),
+            formatSize(runtime.freeMemory()),
+            formatSize(runtime.maxMemory()));
+
+      _lblHeapSize.setText(heapSize);
+
+      // update UI when preloading is enabled
+      if (_chkPreloadHQImages.getSelection()) {
+
+         _lblHeapSize.getDisplay().timerExec(1000, () -> updateUI_Memory());
+      }
    }
 
 }
