@@ -28,11 +28,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+import net.tourbook.common.util.SWT2Dutil;
 import net.tourbook.photo.internal.manager.ImageCacheWrapper;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * This cache is caching photo images and its metadata.
@@ -202,11 +206,11 @@ public class PhotoImageCache {
 
       final ImageCacheWrapper cacheWrapper = imageCache.getIfPresent(imageKey);
 
-      BufferedImage photoImage = null;
+      BufferedImage awtImage = null;
 
       if (cacheWrapper != null) {
 
-         photoImage = cacheWrapper.awtImage;
+         awtImage = cacheWrapper.awtImage;
 
          /*
           * ensure image and metadata are set in the photo
@@ -218,11 +222,11 @@ public class PhotoImageCache {
 
             // image dimension is not yet set
 
-            photo.setPhotoSize(photoImage.getWidth(), photoImage.getHeight());
+            photo.setPhotoSize(awtImage.getWidth(), awtImage.getHeight());
          }
       }
 
-      return photoImage;
+      return awtImage;
    }
 
    private static Image getImageFromCache_SWT(final Cache<String, ImageCacheWrapper> imageCache,
@@ -231,11 +235,23 @@ public class PhotoImageCache {
 
       final ImageCacheWrapper cacheWrapper = imageCache.getIfPresent(imageKey);
 
-      Image photoImage = null;
+      Image swtImage = null;
 
       if (cacheWrapper != null) {
 
-         photoImage = cacheWrapper.swtImage;
+         swtImage = cacheWrapper.swtImage;
+
+         if (swtImage == null && cacheWrapper.awtImage != null) {
+
+            final ImageData swtImageData = SWT2Dutil.convertToSWT(cacheWrapper.awtImage, photo.imageFilePathName);
+
+            if (swtImageData != null) {
+
+               // image could be converted
+
+               swtImage = new Image(Display.getDefault(), new NoAutoScalingImageDataProvider(swtImageData));
+            }
+         }
 
          /*
           * ensure image and metadata are set in the photo
@@ -247,12 +263,12 @@ public class PhotoImageCache {
 
             // image dimension is not yet set
 
-            final Rectangle imageSize = photoImage.getBounds();
+            final Rectangle imageSize = swtImage.getBounds();
 
             photo.setPhotoSize(imageSize.width, imageSize.height);
          }
       }
-      return photoImage;
+      return swtImage;
    }
 
    public static Image getImageOriginal(final Photo photo) {

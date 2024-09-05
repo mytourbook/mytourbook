@@ -3339,9 +3339,9 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="565.42025"
-     inkscape:cx="488.08044"
-     inkscape:zoom="5.6568544"
+     inkscape:cy="837.56796"
+     inkscape:cx="368.04907"
+     inkscape:zoom="1.4142136"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -5160,7 +5160,7 @@
        inkscape:export-filename="..\..\net.tourbook.photo\icons\photo-invalid-photo-image-hovered.png"
        inkscape:connector-curvature="0"
        id="path4660-2"
-       d="M 601.38385,538.59356 H 612.6159 L 607.00006,527.361 Z"
+       d="M 631.38385,538.59356 H 642.6159 L 637.00006,527.361 Z"
        style="fill:#fcffff;fill-opacity:1;stroke:#fcffff;stroke-width:2.76793;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
        sodipodi:nodetypes="cscscccccc"
@@ -6939,7 +6939,7 @@
        sodipodi:nodetypes="cccc" />
     <path
        style="fill:#fcffff;fill-opacity:1;stroke:#fcffff;stroke-width:2.76793;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 601.38385,538.59356 H 612.6159 L 607.00006,527.361 Z"
+       d="M 631.38385,538.59356 H 642.6159 L 637.00006,527.361 Z"
        id="path6927"
        inkscape:connector-curvature="0"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.photo\icons\photo-invalid-photo-image-hovered.png"
@@ -6963,11 +6963,46 @@
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:18px;line-height:125%;font-family:Candara;-inkscape-font-specification:'Candara Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1" /></flowRegion><flowPara
          id="flowPara6933"
          style="font-size:18px;line-height:1.25">!</flowPara></flowRoot>
+    <path
+       sodipodi:nodetypes="cccc"
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="..\..\net.tourbook.photo\icons\photo-invalid-photo-image.png"
+       inkscape:connector-curvature="0"
+       id="path4660-7"
+       d="m 601.38382,538.61558 h 11.23219 l -5.6161,-11.23185 z"
+       style="fill:#ff0000;fill-opacity:1;stroke:#ff0000;stroke-width:2.76781;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       style="fill:#ff0000;fill-opacity:1;stroke:#ff0000;stroke-width:2.76781;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 601.38382,538.61558 h 11.23219 l -5.6161,-11.23185 z"
+       id="path6925-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.photo\icons\photo-invalid-photo-image.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       sodipodi:nodetypes="cccc" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot6935-1"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0.01%;font-family:Candara;-inkscape-font-specification:'Candara Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none"
+       transform="matrix(0.99999999,0,0,1.0000018,528.11659,334.55509)"
+       inkscape:export-filename="..\..\net.tourbook.photo\icons\photo-invalid-photo-image@2x.png"
+       inkscape:export-xdpi="192"
+       inkscape:export-ydpi="192"><flowRegion
+         id="flowRegion6931-4"><rect
+           id="rect6929-0"
+           width="14.792262"
+           height="23.289883"
+           x="76.4375"
+           y="188.98718"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:18px;line-height:125%;font-family:Candara;-inkscape-font-specification:'Candara Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1" /></flowRegion><flowPara
+         id="flowPara6933-7"
+         style="font-size:18px;line-height:1.25">!</flowPara></flowRoot>
     <flowRoot
        xml:space="preserve"
        id="flowRoot6943"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0.01%;font-family:Candara;-inkscape-font-specification:'Candara Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ff0000;fill-opacity:1;stroke:none"
-       transform="matrix(0.99999999,0,0,1.0000018,528.22855,334.5332)"
+       transform="matrix(0.99999999,0,0,1.0000018,558.22855,334.5332)"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.photo\icons\photo-invalid-photo-image-hovered.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><flowRegion
@@ -6979,6 +7014,41 @@
            y="188.98718"
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:18px;line-height:125%;font-family:Candara;-inkscape-font-specification:'Candara Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ff0000;fill-opacity:1" /></flowRegion><flowPara
          id="flowPara6941"
+         style="font-size:18px;line-height:1.25">!</flowPara></flowRoot>
+    <path
+       sodipodi:nodetypes="cccc"
+       inkscape:export-ydpi="192"
+       inkscape:export-xdpi="192"
+       inkscape:export-filename="..\..\net.tourbook.photo\icons\photo-invalid-photo-image-hovered@2x.png"
+       inkscape:connector-curvature="0"
+       id="path4660-2-6"
+       d="m 656.38388,538.61635 h 11.23205 l -5.61584,-11.23256 z"
+       style="fill:#fcffff;fill-opacity:1;stroke:#fcffff;stroke-width:2.76793;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       style="fill:#fcffff;fill-opacity:1;stroke:#fcffff;stroke-width:2.76793;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 656.38388,538.61635 h 11.23205 l -5.61584,-11.23256 z"
+       id="path6927-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.photo\icons\photo-invalid-photo-image-hovered.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       sodipodi:nodetypes="cccc" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot6943-7"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0.01%;font-family:Candara;-inkscape-font-specification:'Candara Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ff0000;fill-opacity:1;stroke:none"
+       transform="matrix(0.99999999,0,0,1.0000018,583.22858,334.55599)"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook.photo\icons\photo-invalid-photo-image-hovered.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><flowRegion
+         id="flowRegion6939-6"><rect
+           id="rect6937-7"
+           width="14.792262"
+           height="23.289883"
+           x="76.4375"
+           y="188.98718"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:18px;line-height:125%;font-family:Candara;-inkscape-font-specification:'Candara Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ff0000;fill-opacity:1" /></flowRegion><flowPara
+         id="flowPara6941-3"
          style="font-size:18px;line-height:1.25">!</flowPara></flowRoot>
     <path
        style="fill:#c2c2c2;fill-opacity:1;stroke:none;stroke-width:0.8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"

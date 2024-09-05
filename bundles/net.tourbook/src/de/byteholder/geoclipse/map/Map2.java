@@ -3981,6 +3981,15 @@ public class Map2 extends Canvas {
       return isPauseVisible;
    }
 
+   private String logImage(final BufferedImage image) {
+
+      if (image == null) {
+         return null;
+      }
+
+      return UI.EMPTY_STRING + image.getWidth();
+   }
+
    /**
     * @return Returns <code>true</code> when a cluster is hovered
     */
