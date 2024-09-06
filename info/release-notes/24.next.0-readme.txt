@@ -58,6 +58,12 @@ New
   - Select a product from a list of the most recent products used
   - Edit an existing custom nutrition product
 
+* Beautified 4k Display
+  - Rescaled 500+ icons
+  - 2D Map
+    - Rescaled map legend
+    - Rescaled SRTM map color provider
+
 * Waypoints
   - Waypoints are now painted as map points
 
@@ -67,6 +73,13 @@ Improvements
 
 * Tour Nutrition (Frederic):
   - Add duplicated products when they are contained in a beverage container
+
+* 2D Map
+  - Improved photo image quality
+
+* Tour Type Icon
+  - Customize image scaling
+  
 
 Changes
 =======

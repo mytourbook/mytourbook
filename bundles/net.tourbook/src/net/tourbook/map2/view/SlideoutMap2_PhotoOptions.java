@@ -29,6 +29,7 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
+import net.tourbook.photo.PhotoLoadManager;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -67,21 +68,17 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
    static final String             STATE_PHOTO_IMAGE_SIZE_MEDIUM       = "STATE_PHOTO_IMAGE_SIZE_MEDIUM"; //$NON-NLS-1$
    static final String             STATE_PHOTO_IMAGE_SIZE_LARGE        = "STATE_PHOTO_IMAGE_SIZE_LARGE";  //$NON-NLS-1$
 
-   static final int                MAP_IMAGE_DEFAULT_SIZE_TINY         = 20;
-   static final int                MAP_IMAGE_DEFAULT_SIZE_SMALL        = 60;
-   static final int                MAP_IMAGE_DEFAULT_SIZE_MEDIUM       = 120;
-   static final int                MAP_IMAGE_DEFAULT_SIZE_LARGE        = 200;
-
    private static final int        MIN_IMAGE_SIZE                      = 3;
 
    /**
     * This value is small because a map do not yet load large images !!!
     */
-   private static final int        MAX_IMAGE_SIZE                      = 200;
+   private static final int        MAX_IMAGE_SIZE                      = 2000;
 
    private IDialogSettings         _state_Map2;
 
    private Map2View                _map2View;
+   private Map2                    _map2;
 
    private ActionResetToDefaults   _actionRestoreDefaults;
 
@@ -110,6 +107,8 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
    private Spinner               _spinnerImageSize_Medium;
    private Spinner               _spinnerImageSize_Large;
 
+   private Label                 _lblHeapSize;
+
    private Link                  _linkDiscardImages;
 
    private ColorSelectorExtended _colorTourPauseLabel_Outline;
@@ -134,8 +133,13 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       super(ownerControl, toolBar);
 
       _map2View = map2View;
+      _map2 = map2View.getMap();
       _state_Map2 = map2State;
+   }
 
+   public static String formatSize(final long value) {
+
+      return "%,d MB".formatted(value / 1024 / 1024); //$NON-NLS-1$
    }
 
    @Override
@@ -161,6 +165,8 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       restoreState();
 
       enableControls();
+
+      updateUI_Memory();
 
       return ui;
    }
@@ -386,6 +392,12 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
          _chkPreloadHQImages.addSelectionListener(_defaultSelectedListener);
       }
       {
+         // label
+         _lblHeapSize = new Label(parent, SWT.NONE);
+         _lblHeapSize.setText(UI.SPACE1);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_lblHeapSize);
+      }
+      {
          /*
           * Discard cached images
           */
@@ -448,14 +460,27 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
       updateMap();
 
+      updateUI_Memory();
+
       enableControls();
    }
 
    private void onDiscardImages() {
 
+      PhotoLoadManager.stopImageLoading(true);
+      PhotoLoadManager.removeInvalidImageFiles();
+
+//      ThumbnailStore.cleanupStoreFiles(true, true);
+
       PhotoImageCache.disposeAll();
 
+//      ExifCache.clear();
+
       repaintMap();
+
+      System.gc();
+
+      updateUI_Memory();
    }
 
    private void onSwapPhotoColor() {
@@ -483,17 +508,17 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
    @Override
    public void resetToDefaults() {
 
-      _imageSize = MAP_IMAGE_DEFAULT_SIZE_MEDIUM;
+      _imageSize = _map2.MAP_IMAGE_DEFAULT_SIZE_MEDIUM;
 
       _radioImageSize_Large.setSelection(false);
       _radioImageSize_Medium.setSelection(true);
       _radioImageSize_Small.setSelection(false);
       _radioImageSize_Tiny.setSelection(false);
 
-      _spinnerImageSize_Large.setSelection(MAP_IMAGE_DEFAULT_SIZE_LARGE);
-      _spinnerImageSize_Medium.setSelection(MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
-      _spinnerImageSize_Small.setSelection(MAP_IMAGE_DEFAULT_SIZE_SMALL);
-      _spinnerImageSize_Tiny.setSelection(MAP_IMAGE_DEFAULT_SIZE_TINY);
+      _spinnerImageSize_Large.setSelection(_map2.MAP_IMAGE_DEFAULT_SIZE_LARGE);
+      _spinnerImageSize_Medium.setSelection(_map2.MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
+      _spinnerImageSize_Small.setSelection(_map2.MAP_IMAGE_DEFAULT_SIZE_SMALL);
+      _spinnerImageSize_Tiny.setSelection(_map2.MAP_IMAGE_DEFAULT_SIZE_TINY);
 
       _chkPreloadHQImages.setSelection(STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT);
       _chkShowPhotoRating.setSelection(STATE_IS_SHOW_PHOTO_RATING_DEFAULT);
@@ -527,10 +552,10 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
       final Enum<ImageSize> imageSize = Util.getStateEnum(_state_Map2, STATE_PHOTO_IMAGE_SIZE, ImageSize.MEDIUM);
 
-      final int imageSizeLarge   = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_LARGE,  MAP_IMAGE_DEFAULT_SIZE_LARGE);
-      final int imageSizeMedium  = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_MEDIUM, MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
-      final int imageSizeSmall   = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_SMALL,  MAP_IMAGE_DEFAULT_SIZE_SMALL);
-      final int imageSizeTiny    = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_TINY,   MAP_IMAGE_DEFAULT_SIZE_TINY);
+      final int imageSizeLarge   = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_LARGE,  _map2.MAP_IMAGE_DEFAULT_SIZE_LARGE);
+      final int imageSizeMedium  = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_MEDIUM, _map2.MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
+      final int imageSizeSmall   = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_SMALL,  _map2.MAP_IMAGE_DEFAULT_SIZE_SMALL);
+      final int imageSizeTiny    = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_TINY,   _map2.MAP_IMAGE_DEFAULT_SIZE_TINY);
 
       _spinnerImageSize_Large .setSelection(imageSizeLarge);
       _spinnerImageSize_Medium.setSelection(imageSizeMedium);
@@ -620,6 +645,29 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
       _colorTourPauseLabel_Fill.setColorValue(config.photoFill_RGB);
       _colorTourPauseLabel_Outline.setColorValue(config.photoOutline_RGB);
+   }
+
+   private void updateUI_Memory() {
+
+      if (_lblHeapSize.isDisposed()) {
+         return;
+      }
+
+      final Runtime runtime = Runtime.getRuntime();
+
+      final String heapSize = "Heap: %s - Free: %s - Max: %s".formatted(
+
+            formatSize(runtime.totalMemory()),
+            formatSize(runtime.freeMemory()),
+            formatSize(runtime.maxMemory()));
+
+      _lblHeapSize.setText(heapSize);
+
+      // update UI when preloading is enabled
+      if (_chkPreloadHQImages.getSelection()) {
+
+         _lblHeapSize.getDisplay().timerExec(1000, () -> updateUI_Memory());
+      }
    }
 
 }

@@ -100,6 +100,7 @@ import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.ImageUtils;
 import net.tourbook.common.util.MtMath;
+import net.tourbook.common.util.NoAutoScalingImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TourToolTip;
@@ -134,10 +135,11 @@ import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.IPhotoServiceProvider;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoImageCache;
+import net.tourbook.photo.PhotoImages;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
-import net.tourbook.photo.PhotoUI;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.Map2_Appearance;
 import net.tourbook.tour.SelectionTourId;
@@ -157,7 +159,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
@@ -189,6 +191,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -310,6 +313,7 @@ public class Map2 extends Canvas {
    private static final RGB              MAP_DEFAULT_BACKGROUND_RGB = new RGB(0x40, 0x40, 0x40);
 
    private static final java.awt.Color   RATING_STAR_COLOR          = new java.awt.Color(250, 224, 0);
+   private static final java.awt.Color   RATING_STAR_COLOR_BORDER   = new java.awt.Color(198, 178, 0);
 
    private static RGB                    _mapTransparentRGB;
    private static Color                  _mapTransparentColor;
@@ -397,6 +401,8 @@ public class Map2 extends Canvas {
 
    private Map2Config                    _mapConfig                 = Map2ConfigManager.getActiveConfig();
 
+   private float                         _deviceScaling             = DPIUtil.getDeviceZoom() / 100f;
+
    /*
     * Map points
     */
@@ -459,6 +465,7 @@ public class Map2 extends Canvas {
    private MapPointToolTip                 _mapPointTooltip;
    private SlideoutMap2_PhotoToolTip       _mapPointTooltip_Photo;
    private boolean                         _isPreloadHQImages;
+   private final ILoadCallBack             _photoImageLoaderCallback        = new PhotoImageLoaderCallback();
 
    /** Number of created map points */
    private int                             _numStatistics_AllCommonLocations;
@@ -755,7 +762,7 @@ public class Map2 extends Canvas {
    private int                 _fastMapPainting_skippedValues;
 
    private MapTourBreadcrumb   _tourBreadcrumb;
-   private boolean             _isShowBreadcrumbs = Map2View.STATE_IS_SHOW_BREADCRUMBS_DEFAULT;
+   private boolean             _isShowBreadcrumbs            = Map2View.STATE_IS_SHOW_BREADCRUMBS_DEFAULT;
 
    private int                 _prefOptions_BorderWidth;
    private boolean             _prefOptions_isCutOffLinesInPauses;
@@ -778,13 +785,31 @@ public class Map2 extends Canvas {
    private int                 _ratingStarImageSize;
    private Rectangle           _paintedRatingStars;
 
-   private final int           MAX_RATING_STARS   = 5;
+   private final int           MAX_RATING_STARS              = 5;
    public int                  MAX_RATING_STARS_WIDTH;
 
-   {
-      final ImageRegistry imageRegistry = UI.IMAGE_REGISTRY;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_TINY   = 20;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_SMALL  = 60;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_MEDIUM = 120;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_LARGE  = 200;
 
-      _imageRatingStar = ImageConverter.convertIntoAWT(imageRegistry.get(PhotoUI.PHOTO_RATING_STAR));
+   {
+      final int deviceZoom = DPIUtil.getDeviceZoom();
+      final float deviceScale = deviceZoom / 100f;
+
+      MAP_IMAGE_DEFAULT_SIZE_TINY = (int) (MAP_IMAGE_DEFAULT_SIZE_TINY * deviceScale);
+      MAP_IMAGE_DEFAULT_SIZE_SMALL = (int) (MAP_IMAGE_DEFAULT_SIZE_SMALL * deviceScale);
+      MAP_IMAGE_DEFAULT_SIZE_MEDIUM = (int) (MAP_IMAGE_DEFAULT_SIZE_MEDIUM * deviceScale);
+      MAP_IMAGE_DEFAULT_SIZE_LARGE = (int) (MAP_IMAGE_DEFAULT_SIZE_LARGE * deviceScale);
+
+      final ImageDescriptor imageDescriptor = PhotoActivator.getImageDescriptor(PhotoImages.PhotoRatingStar);
+      final ImageData imageData = imageDescriptor.getImageData(deviceZoom);
+
+      final Image swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(imageData));
+      {
+         _imageRatingStar = ImageConverter.convertIntoAWT(swtImage);
+      }
+      swtImage.dispose();
 
       // rating star width and height are the same
       _ratingStarImageSize = _imageRatingStar.getWidth();
@@ -1571,8 +1596,8 @@ public class Map2 extends Canvas {
       mapPoint.tourLocation = tourLocation;
       mapPoint.locationType = LocationType.Tour;
 
-      mapPoint.geoPointDevX = devX;
-      mapPoint.geoPointDevY = devY;
+      mapPoint.geoPointDevX = (int) (devX * _deviceScaling);
+      mapPoint.geoPointDevY = (int) (devY * _deviceScaling);
       mapPoint.setFormattedLabel(locationLabel);
 
       // update and keep skipped labels
@@ -1659,8 +1684,8 @@ public class Map2 extends Canvas {
          mapPoint.tourLocation = tourLocation;
          mapPoint.locationType = LocationType.Common;
 
-         mapPoint.geoPointDevX = devX;
-         mapPoint.geoPointDevY = devY;
+         mapPoint.geoPointDevX = (int) (devX * _deviceScaling);
+         mapPoint.geoPointDevY = (int) (devY * _deviceScaling);
 
          mapPoint.setFormattedLabel(locationLabel);
 
@@ -1969,8 +1994,8 @@ public class Map2 extends Canvas {
 
          mapPoint.tourMarker = tourMarker;
 
-         mapPoint.geoPointDevX = devX;
-         mapPoint.geoPointDevY = devY;
+         mapPoint.geoPointDevX = (int) (devX * _deviceScaling);
+         mapPoint.geoPointDevY = (int) (devY * _deviceScaling);
          mapPoint.setFormattedLabel(markerLabel);
 
          if (groupKey != null) {
@@ -2136,8 +2161,8 @@ public class Map2 extends Canvas {
                MapPointType.TOUR_PAUSE,
                new GeoPoint(geoPosition.latitude, geoPosition.longitude));
 
-         mapPoint.geoPointDevX = devX;
-         mapPoint.geoPointDevY = devY;
+         mapPoint.geoPointDevX = (int) (devX * _deviceScaling);
+         mapPoint.geoPointDevY = (int) (devY * _deviceScaling);
 
          mapPoint.tourPause = tourPause;
 
@@ -2246,8 +2271,8 @@ public class Map2 extends Canvas {
                MapPointType.TOUR_PHOTO,
                new GeoPoint(latitude, longitude));
 
-         mapPoint.geoPointDevX = devXPhoto;
-         mapPoint.geoPointDevY = devYPhoto;
+         mapPoint.geoPointDevX = (int) (devXPhoto * _deviceScaling);
+         mapPoint.geoPointDevY = (int) (devYPhoto * _deviceScaling);
 
          mapPoint.photo = photo;
 
@@ -2399,8 +2424,9 @@ public class Map2 extends Canvas {
 
          mapPoint.tourWayPoint = wayPoint;
 
-         mapPoint.geoPointDevX = devX;
-         mapPoint.geoPointDevY = devY;
+         mapPoint.geoPointDevX = (int) (devX * _deviceScaling);
+         mapPoint.geoPointDevY = (int) (devY * _deviceScaling);
+
          mapPoint.setFormattedLabel(wpName);
 
          allWayPointPoints.add(mapPoint);
@@ -2619,6 +2645,11 @@ public class Map2 extends Canvas {
       return _commonLocation;
    }
 
+   public float getDeviceScaling() {
+
+      return _deviceScaling;
+   }
+
    public PaintedMapPoint getHoveredMapPoint() {
 
       return _hoveredMapPoint;
@@ -2818,32 +2849,103 @@ public class Map2 extends Canvas {
     *
     * @return Returns the photo image or <code>null</code> when image is not loaded.
     */
-   private Image getPhotoImage(final Photo photo) {
+   private BufferedImage getPhotoImage(final Photo photo) {
 
-      Image photoImage = null;
+      BufferedImage awtThumbImage = null;
+      BufferedImage awtPhotoImageHQ = null;
 
-      // check if image has an loading error
-      final PhotoLoadingState photoLoadingState = photo.getLoadingState(ImageQuality.THUMB);
+      boolean isShowHQImages = false;
+      isShowHQImages = false;
 
-      if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+      try {
 
-         // image is not yet loaded
+         /*
+          * 1. The thumbs MUST be loaded firstly because they are also loading the image orientation
+          */
 
-         // check if image is in the cache
-         photoImage = PhotoImageCache.getImage(photo, ImageQuality.THUMB);
+         // check if image has an loading error
+         final PhotoLoadingState thumbPhotoLoadingState = photo.getLoadingState(ImageQuality.THUMB);
 
-         if ((photoImage == null || photoImage.isDisposed())
-               && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+         if (thumbPhotoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
 
-            // the requested image is not available in the image cache -> image must be loaded
+            // image is not invalid and not yet loaded
 
-            final ILoadCallBack imageLoadCallback = new PhotoImageLoaderCallback();
+            // check if image is in the cache
+            awtThumbImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB);
 
-            PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, ImageQuality.THUMB, imageLoadCallback);
+            if (awtThumbImage == null
+                  && thumbPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+
+               // the requested image is not available in the image cache -> image must be loaded
+
+               PhotoLoadManager.putImageInLoadingQueueThumb_Map(
+                     photo,
+                     ImageQuality.THUMB,
+                     _photoImageLoaderCallback,
+                     true // is AWT image
+               );
+
+               return null;
+            }
          }
+
+         if (isShowHQImages == false) {
+
+            return awtThumbImage;
+         }
+
+         /*
+          * 2. Display HQ image
+          */
+
+         // check if image has an loading error
+         final PhotoLoadingState hqPhotoLoadingState = photo.getLoadingState(ImageQuality.HQ);
+
+         if (hqPhotoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+
+            // image is not invalid and not yet loaded
+
+            // check if image is in the cache
+            awtPhotoImageHQ = PhotoImageCache.getImage_AWT(photo, ImageQuality.HQ);
+
+            if (awtPhotoImageHQ == null
+                  && hqPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+
+               // the requested image is not available in the image cache -> image must be loaded
+
+               PhotoLoadManager.putImageInLoadingQueueHQ_Map(
+                     photo,
+                     ImageQuality.HQ,
+                     _photoImageLoaderCallback,
+                     true // is AWT image
+               );
+            }
+         }
+
+      } finally {
+
+//         System.out.println(UI.timeStamp()
+//
+//               + " Thumb: " + dumpPhoto(awtThumbImage)
+//               + " - HQ: " + dumpPhoto(awtPhotoImageHQ)
+//
+//         );
+// TODO remove SYSTEM.OUT.PRINTLN
+
       }
 
-      return photoImage;
+      if (awtPhotoImageHQ != null) {
+
+         return awtPhotoImageHQ;
+
+      } else if (awtThumbImage != null) {
+
+         return awtThumbImage;
+
+      } else {
+
+         return null;
+      }
    }
 
    private PoiToolTip getPoiTooltip() {
@@ -3879,6 +3981,15 @@ public class Map2 extends Canvas {
       return isPauseVisible;
    }
 
+   private String logImage(final BufferedImage image) {
+
+      if (image == null) {
+         return null;
+      }
+
+      return UI.EMPTY_STRING + image.getWidth();
+   }
+
    /**
     * @return Returns <code>true</code> when a cluster is hovered
     */
@@ -4090,6 +4201,8 @@ public class Map2 extends Canvas {
       UI.disposeResource(_cursorSearchTour);
       UI.disposeResource(_cursorSearchTour_Scroll);
       UI.disposeResource(_cursorSelect);
+
+      PhotoLoadManager.stopImageLoading(true);
 
       // dispose resources in the overlay plugins
       _mapPainter.dispose();
@@ -4940,10 +5053,13 @@ public class Map2 extends Canvas {
    }
 
    private void onMouse_Move_CheckMapPoints(final List<PaintedMapPoint> allPaintedMapPoints,
-                                            final int mouseMoveDevX,
-                                            final int mouseMoveDevY) {
+                                            int mouseMoveDevX,
+                                            int mouseMoveDevY) {
 
       // first check the symbol
+
+      mouseMoveDevX = (int) (mouseMoveDevX * _deviceScaling);
+      mouseMoveDevY = (int) (mouseMoveDevY * _deviceScaling);
 
       for (final PaintedMapPoint paintedMapPoint : allPaintedMapPoints) {
 
@@ -5023,17 +5139,22 @@ public class Map2 extends Canvas {
 
       if (paintedRatingStars != null) {
 
+         final int mouseMoveDevX = (int) (_mouseMove_DevPosition_X * _deviceScaling);
+         final int mouseMoveDevY = (int) (_mouseMove_DevPosition_Y * _deviceScaling);
+
          final int photoDevX = photo.paintedPhoto.x;
          final int photoWidth = photo.paintedPhoto.width;
 
-         _isInHoveredRatingStar = paintedRatingStars.contains(_mouseMove_DevPosition_X, _mouseMove_DevPosition_Y);
+         _isInHoveredRatingStar = paintedRatingStars.contains(mouseMoveDevX, mouseMoveDevY);
 
          // center ratings stars in the middle of the image
-         final int ratingStarsLeftBorder = photoDevX + photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
+         final int ratingStarsLeftBorder = photoDevX
+               + photoWidth / 2
+               - MAX_RATING_STARS_WIDTH / 2;
 
          if (_isInHoveredRatingStar) {
 
-            hoveredStars = (_mouseMove_DevPosition_X - ratingStarsLeftBorder) / _ratingStarImageSize + 1;
+            hoveredStars = (mouseMoveDevX - ratingStarsLeftBorder) / _ratingStarImageSize + 1;
          }
       }
 
@@ -6877,9 +6998,11 @@ public class Map2 extends Canvas {
 
       try {
 
+         _deviceScaling = DPIUtil.getDeviceZoom() / 100f;
+
          final BufferedImage awtImage = new BufferedImage(
-               _mapPointImageSize.width,
-               _mapPointImageSize.height,
+               (int) (_mapPointImageSize.width * _deviceScaling),
+               (int) (_mapPointImageSize.height * _deviceScaling),
                BufferedImage.TYPE_4BYTE_ABGR);
 
          final Graphics2D g2d = awtImage.createGraphics();
@@ -6930,7 +7053,7 @@ public class Map2 extends Canvas {
             g2d.dispose();
          }
 
-         final Image swtImage = ImageConverter.convertIntoSWT(awtImage);
+         final Image swtImage = new Image(getDisplay(), new NoAutoScalingImageDataProvider(awtImage));
 
          /*
           * This may be needed to be synchronized ?
@@ -6994,16 +7117,20 @@ public class Map2 extends Canvas {
                   // image is not yet loaded
 
                   // check if image is in the cache
-                  final Image photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+                  final Image photoImage = PhotoImageCache.getImage_SWT(photo, requestedImageQuality);
 
                   if ((photoImage == null || photoImage.isDisposed())
                         && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
 
                      // the requested image is not available in the image cache -> image must be loaded
 
-                     final ILoadCallBack imageLoadCallback = new PhotoImageLoaderCallback();
+                     PhotoLoadManager.putImageInLoadingQueueHQ_Map(
+                           photo,
+                           requestedImageQuality,
+                           _photoImageLoaderCallback,
 
-                     PhotoLoadManager.putImageInLoadingQueueHQ_Map(photo, requestedImageQuality, imageLoadCallback);
+                           false // is SWT image
+                     );
                   }
                }
             }
@@ -7501,8 +7628,8 @@ public class Map2 extends Canvas {
 
       final Rectangle clientArea = _clientArea;
 
-      final int mapWidth = clientArea.width;
-      final int mapHeight = clientArea.height;
+      final int mapWidth = (int) (clientArea.width * _deviceScaling);
+      final int mapHeight = (int) (clientArea.height * _deviceScaling);
 
       /*
        * Setup labels for the label spreader
@@ -8390,31 +8517,29 @@ public class Map2 extends Canvas {
                photoWidth,
                photoHeight);
 
-         final Image swtPhotoImage = getPhotoImage(photo);
+         final BufferedImage awtPhotoImage = getPhotoImage(photo);
 
-         if (swtPhotoImage == null || swtPhotoImage.isDisposed()) {
+         if (awtPhotoImage == null) {
 
             // image is not yet available -> paint photo placeholder
 
-            g2d.setColor(java.awt.Color.cyan);
+            g2d.setColor(java.awt.Color.GRAY);
 
             g2d.fillRect(
-                  photoRectangle.x - MAP_POINT_BORDER,
+                  photoRectangle.x,
                   photoRectangle.y,
-                  photoRectangle.width + 2 * MAP_POINT_BORDER,
+                  photoRectangle.width,
                   photoRectangle.height);
 
          } else {
 
             // paint photo image
 
-            final java.awt.Image awtPhotoImage = ImageConverter.convertIntoAWT(swtPhotoImage);
-
             g2d.drawImage(awtPhotoImage,
 
-                  photoRectangle.x - MAP_POINT_BORDER,
+                  photoRectangle.x,
                   photoRectangle.y,
-                  photoRectangle.width + 2 * MAP_POINT_BORDER,
+                  photoRectangle.width,
                   photoRectangle.height,
 
                   null);
@@ -8607,36 +8732,41 @@ public class Map2 extends Canvas {
 
    private void paint_MpImage_RatingStars(final Graphics2D g2d, final Photo photo) {
 
+      final int ratingStarImageSize = _ratingStarImageSize;
+
       final int photoDevX = photo.paintedPhoto.x;
       final int photoDevY = photo.paintedPhoto.y;
-      final int photoWidth = photo.paintedPhoto.width;
+      final int photoWidth = (photo.paintedPhoto.width);
       final int numRatingStars = photo.ratingStars;
 
-      final boolean isSmallRatingStar = photoWidth < 70;
+      final boolean isSmallRatingStar = photoWidth / _deviceScaling < 70;
 
       photo.isSmallRatingStars = isSmallRatingStar;
 
-      final int smallRatingStarGap = 4;
+      final int smallRatingStarGap = (int) (5 * _deviceScaling);
       final int smallRatingStarSize = (photoWidth / MAX_RATING_STARS) - smallRatingStarGap;
 
       final int maxSmallRatingStarsWidth = MAX_RATING_STARS * smallRatingStarSize
             + (MAX_RATING_STARS - 1) * smallRatingStarGap;
 
       // center ratings stars in the middle of the image
-      final int leftBorderWithVisibleStars = photoDevX + photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
+      final int leftBorderWithVisibleStars = photoDevX
+            + photoWidth / 2
+            - MAX_RATING_STARS_WIDTH / 2;
+
       final int leftBorderRatingStars = isSmallRatingStar
             ? photoDevX + photoWidth / 2 - maxSmallRatingStarsWidth / 2
             : leftBorderWithVisibleStars;
-
-      g2d.setColor(RATING_STAR_COLOR);
 
       photo.paintedRatingStars = new Rectangle(
 
             leftBorderWithVisibleStars,
             photoDevY,
 
-            _ratingStarImageSize * MAX_RATING_STARS,
-            _ratingStarImageSize);
+            ratingStarImageSize * MAX_RATING_STARS,
+            ratingStarImageSize);
+
+      g2d.setStroke(new BasicStroke(1));
 
       for (int starIndex = 0; starIndex < numRatingStars; starIndex++) {
 
@@ -8646,10 +8776,22 @@ public class Map2 extends Canvas {
 
             final int ratingStarXOffset = (smallRatingStarSize + smallRatingStarGap) * starIndex;
 
+            final int ratingStarDevX = leftBorderRatingStars + ratingStarXOffset;
+            final int ratingStarDevY = photoDevY + (ratingStarImageSize / 2 - smallRatingStarSize / 2) / 2;
+
+            g2d.setColor(RATING_STAR_COLOR);
             g2d.fillRect(
 
-                  leftBorderRatingStars + ratingStarXOffset,
-                  photoDevY + 1,
+                  ratingStarDevX,
+                  ratingStarDevY,
+                  smallRatingStarSize,
+                  smallRatingStarSize);
+
+            g2d.setColor(RATING_STAR_COLOR_BORDER);
+            g2d.drawRect(
+
+                  ratingStarDevX,
+                  ratingStarDevY,
                   smallRatingStarSize,
                   smallRatingStarSize);
 
@@ -8657,10 +8799,10 @@ public class Map2 extends Canvas {
 
             g2d.drawImage(_imageRatingStar,
 
-                  leftBorderRatingStars + (_ratingStarImageSize * starIndex),
+                  leftBorderRatingStars + (ratingStarImageSize * starIndex),
                   photoDevY,
-                  _ratingStarImageSize,
-                  _ratingStarImageSize,
+                  ratingStarImageSize,
+                  ratingStarImageSize,
 
                   null);
          }
@@ -10548,6 +10690,7 @@ public class Map2 extends Canvas {
    }
 
    public void setMeasurementSystem(final float distanceUnitValue, final String distanceUnitLabel) {
+
       _distanceUnitValue = distanceUnitValue;
       _distanceUnitLabel = distanceUnitLabel;
    }
@@ -10864,10 +11007,10 @@ public class Map2 extends Canvas {
          UI.disposeResource(_labelFontSWT);
 
          _labelFontName = labelFontName;
-         _labelFontSize = labelFontSize;
+         _labelFontSize = (int) (labelFontSize / _deviceScaling);
 
          // awt and swt font have not the same size
-         final int swtFontSize = (int) (_labelFontSize * 0.75);
+         final int swtFontSize = (int) (_labelFontSize * 1f);
 
          _labelFontSWT = new Font(_display, _labelFontName, swtFontSize, SWT.NORMAL);
       }
@@ -11464,6 +11607,7 @@ public class Map2 extends Canvas {
       grid_UpdateGeoGridData();
 
       resetMapPoints();
+      PhotoLoadManager.stopImageLoading(true);
    }
 
    public void zoomIn(final CenterMapBy centerMapBy) {

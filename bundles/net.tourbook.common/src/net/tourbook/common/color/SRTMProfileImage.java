@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,14 +18,19 @@
  */
 package net.tourbook.common.color;
 
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Device;
-import org.eclipse.swt.graphics.GC;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.NoAutoScalingImageDataProvider;
+
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -36,112 +41,192 @@ public class SRTMProfileImage extends ProfileImage implements Cloneable {
    private static int MAX_VERTICES_VALUE = 8850;
 
    @Override
-   public Image createImage(int width, int height, final boolean isHorizontal) {
+   public Image createImage(int imageWidth, int imageHeight, final boolean isHorizontal) {
 
       // ensure min image size
-      width = width < IMAGE_MIN_WIDTH ? IMAGE_MIN_WIDTH : width;
-      height = height < IMAGE_MIN_HEIGHT ? IMAGE_MIN_HEIGHT : height;
+      imageWidth = imageWidth < IMAGE_MIN_WIDTH ? IMAGE_MIN_WIDTH : imageWidth;
+      imageHeight = imageHeight < IMAGE_MIN_HEIGHT ? IMAGE_MIN_HEIGHT : imageHeight;
 
-      final Device display = Display.getCurrent();
-      final Image profileImage = new Image(display, width, height);
+      final int imageWidthScaled = (int) (imageWidth * UI.SCALING_4K);
+      final int imageHeightScaled = (int) (imageHeight * UI.SCALING_4K);
 
-      /*
-       * draw colors
-       */
-      final GC gc = new GC(profileImage);
+      final BufferedImage awtImage = new BufferedImage(imageWidthScaled, imageHeightScaled, BufferedImage.TYPE_4BYTE_ABGR);
+      final Graphics2D g2d = awtImage.createGraphics();
 
-      final ArrayList<RGBVertex> rgbVertices = getRgbVertices();
+      try {
 
-      final long maxValue = rgbVertices.isEmpty() //
-            ? MAX_VERTICES_VALUE
-            : rgbVertices.get(rgbVertices.size() - 1).getValue();
+         /*
+          * Draw colors
+          */
 
-      final int horizontal = isHorizontal ? width : height + 1;
-      final int vertical = isHorizontal ? height : width;
+         final ArrayList<RGBVertex> rgbVertices = getRgbVertices();
 
-      for (int x = 0; x < horizontal; x++) {
+         final long maxValue = rgbVertices.isEmpty() //
+               ? MAX_VERTICES_VALUE
+               : rgbVertices.get(rgbVertices.size() - 1).getValue();
 
-         final long value = maxValue * x / horizontal;
+         final int horizontalSize = isHorizontal ? imageWidthScaled : imageHeightScaled + 1;
+         final int verticalSize = isHorizontal ? imageHeightScaled : imageWidthScaled;
 
-         final int rgb = getRGB(value);
+         for (int x = 0; x < horizontalSize; x++) {
 
-         final byte blue = (byte) ((rgb & 0xFF0000) >> 16);
-         final byte green = (byte) ((rgb & 0xFF00) >> 8);
-         final byte red = (byte) ((rgb & 0xFF) >> 0);
+            final long value = maxValue * x / horizontalSize;
 
-         final Color color = new Color(display, red & 0xFF, green & 0xFF, blue & 0xFF);
-         {
-            gc.setForeground(color);
+            final int rgb = getRGB(value);
+
+            final byte blue = (byte) ((rgb & 0xFF0000) >> 16);
+            final byte green = (byte) ((rgb & 0xFF00) >> 8);
+            final byte red = (byte) ((rgb & 0xFF) >> 0);
+
+            g2d.setColor(new java.awt.Color(red & 0xFF, green & 0xFF, blue & 0xFF));
 
             if (isHorizontal) {
 
                // draw horizontal
 
-               final int x1 = horizontal - x - 1;
-               final int x2 = horizontal - x - 1;
+               int x1 = horizontalSize - x - 1;
+               int x2 = horizontalSize - x - 1;
+
+               x1 = x2 = x;
 
                final int y1 = 0;
-               final int y2 = vertical;
+               final int y2 = verticalSize;
 
-               gc.drawLine(x1, y1, x2, y2);
+               g2d.drawLine(x1, y1, x2, y2);
 
             } else {
 
                // draw vertical
 
                final int x1 = 0;
-               final int x2 = vertical;
+               final int x2 = verticalSize;
 
-               final int y1 = horizontal - x - 1;
-               final int y2 = horizontal - x - 1;
+               final int y1 = horizontalSize - x - 1;
+               final int y2 = horizontalSize - x - 1;
 
-               gc.drawLine(x1, y1, x2, y2);
+               g2d.drawLine(x1, y1, x2, y2);
             }
          }
-         color.dispose();
-      }
 
-      /*
-       * draw text
-       */
-      final Transform transform = new Transform(display);
-      for (final RGBVertex element : rgbVertices) {
+         /*
+          * Draw text
+          */
 
-         final long elev = element.getValue();
+         final Font scaled4kFont = UI.getAWT4kScaledDefaultFont();
 
-         if (elev < 0) {
-            continue;
+         g2d.setFont(scaled4kFont);
+         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+         final FontMetrics fontMetrics = g2d.getFontMetrics();
+         final int fontHeight = fontMetrics.getHeight();
+
+         final AffineTransform at = new AffineTransform();
+
+         for (final RGBVertex vertex : rgbVertices) {
+
+            final long elevation = vertex.getValue();
+
+            if (elevation < 0) {
+               continue;
+            }
+
+            final int rgb = getRGB(elevation);
+            final byte blue = (byte) ((rgb & 0xFF0000) >> 16);
+            final byte green = (byte) ((rgb & 0xFF00) >> 8);
+            final byte red = (byte) ((rgb & 0xFF) >> 0);
+
+            final int devPos = maxValue == 0
+                  ? 0
+                  : (int) (elevation * horizontalSize / maxValue);
+
+//          @param m00 the X coordinate scaling element of the 3x3 matrix
+
+//          @param m10 the Y coordinate shearing element of the 3x3 matrix
+//          @param m01 the X coordinate shearing element of the 3x3 matrix
+
+//          @param m11 the Y coordinate scaling element of the 3x3 matrix
+
+//          @param m02 the X coordinate translation element of the 3x3 matrix
+//          @param m12 the Y coordinate translation element of the 3x3 matrix
+
+            if (isHorizontal) {
+
+               int devX = (int) (devPos
+
+                     - fontHeight * 0.2f)
+
+               ;
+
+               // ensure min/max value visibilty
+               if (devX > horizontalSize - 20) {
+                  devX = horizontalSize - 20;
+               }
+               if (devX < 5) {
+                  devX = 5;
+               }
+
+               // rotate by -90 degrees
+
+               at.setTransform(
+
+                     0,
+
+                     -1,
+                     1,
+
+                     0,
+
+                     devX,
+                     5);
+
+               // rotates 90 degree clockwise
+               at.quadrantRotate(2);
+
+            } else {
+
+               // vertical
+
+               int devY = (int) (horizontalSize - devPos
+
+                     + (fontHeight * 0.2f))
+
+               ;
+
+               // ensure min/max value visibilty
+               if (devY < 20) {
+                  devY = 20;
+               }
+               if (devY > horizontalSize - 10) {
+                  devY = horizontalSize - 10;
+               }
+
+               at.setTransform(
+
+                     1,
+
+                     0,
+                     0,
+
+                     1,
+
+                     5,
+                     devY);
+            }
+
+            g2d.setColor(ColorUtil.getContrastColorAWT(red & 0xFF, green & 0xFF, blue & 0xFF, 0xff));
+
+            g2d.setTransform(at);
+            g2d.drawString(UI.EMPTY_STRING + elevation, 0, 0);
          }
 
-         final int rgb = getRGB(elev);
-         final byte blue = (byte) ((rgb & 0xFF0000) >> 16);
-         final byte green = (byte) ((rgb & 0xFF00) >> 8);
-         final byte red = (byte) ((rgb & 0xFF) >> 0);
+      } finally {
 
-         int x = maxValue == 0 ? 0 : (int) (elev * horizontal / maxValue);
-         x = Math.max(x, 13);
-
-         // Rotate by -90 degrees
-
-         if (isHorizontal) {
-            final int dx = horizontal - x - 1;
-            final int dy = vertical - 3;
-            transform.setElements(0, -1, 1, 0, dx, dy);
-         } else {
-            final int dx = 3;
-            final int dy = horizontal - x - 1;
-            transform.setElements(1, 0, 0, 1, dx, dy);
-         }
-
-         gc.setTransform(transform);
-         gc.setForeground(ColorUtil.getContrastColor(red & 0xFF, green & 0xFF, blue & 0xFF));
-         gc.drawText(net.tourbook.common.UI.EMPTY_STRING + elev, 0, 0, true);
+         g2d.dispose();
       }
-      transform.dispose();
 
-      gc.dispose();
+      final Image swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
 
-      return profileImage;
+      return swtImage;
    }
 
    @Override

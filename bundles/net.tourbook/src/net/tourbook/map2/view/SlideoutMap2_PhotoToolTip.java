@@ -385,82 +385,100 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       _comboTooltipSize.add(OtherMessages.APP_SIZE_LARGE_TEXT);
    }
 
-   private Point fixupDisplayBounds(final Point tipSize, final Point location) {
+   private Point fixupDisplayBounds(final Point ttSize_Unscaled, final Point ttPos_Scaled) {
 
-      final int tipWidth = tipSize.x;
-      final int tipHeight = tipSize.y;
-
-      final Rectangle displayBounds = UI.getDisplayBounds(_map2, location);
-      final Point tipRightBottom = new Point(location.x + tipWidth, location.y + tipHeight);
-
-      final Rectangle photoBounds = _hoveredMapPoint.labelRectangle;
-
-      final int photoWidth = photoBounds.width;
-      final int photoHeight = photoBounds.height;
-
-      final int photoLeft = photoBounds.x;
-      final int photoRight = photoLeft + photoWidth;
-      final int photoTop = photoBounds.y;
-
-      final Map2Point mapPoint = _hoveredMapPoint.mapPoint;
-      final int mapPointDevY = mapPoint.geoPointDevY;
+      final float deviceScaling = _map2.getDeviceScaling();
 
       final Rectangle mapBounds = _map2.getBounds();
       final Point mapDisplayPosition = _map2.toDisplay(mapBounds.x, mapBounds.y);
 
-      final boolean isTooltipInDisplay = displayBounds.contains(location);
-      final boolean isTTBottomRightInDisplay = displayBounds.contains(tipRightBottom);
+      final int mapDisplayPosX_Scaled = (int) (mapDisplayPosition.x * deviceScaling);
 
-      final int displayWidth = displayBounds.width;
-      final int displayHeight = displayBounds.height;
-      final int displayX = displayBounds.x;
-      final int displayY = displayBounds.y;
+      final Point ttPosn_Unscaled = new Point(
+            (int) (ttPos_Scaled.x / deviceScaling),
+            (int) (ttPos_Scaled.y / deviceScaling));
+
+      final Rectangle displayBounds = UI.getDisplayBounds(_map2, ttPosn_Unscaled);
+
+      final Rectangle displayBounds_Scaled = new Rectangle(
+            (int) (displayBounds.x * deviceScaling),
+            (int) (displayBounds.y * deviceScaling),
+            (int) (displayBounds.width * deviceScaling),
+            (int) (displayBounds.height * deviceScaling));
+
+      final int ttWidth = (int) (ttSize_Unscaled.x * deviceScaling);
+      final int ttHeight = (int) (ttSize_Unscaled.y * deviceScaling);
+      final Point ttBottomRight = new Point(ttPos_Scaled.x + ttWidth, ttPos_Scaled.y + ttHeight);
+
+      final boolean isTooltipInDisplay = displayBounds_Scaled.contains(ttPos_Scaled);
+      final boolean isTTBottomRightInDisplay = displayBounds_Scaled.contains(ttBottomRight);
+
+      final int displayWidth_Scaled = displayBounds_Scaled.width;
+      final int displayHeight_Scaled = displayBounds_Scaled.height;
+      final int displayX_Scaled = displayBounds_Scaled.x;
+      final int displayY_Scaled = displayBounds_Scaled.y;
+
+      final Rectangle photoBounds_Scaled = _hoveredMapPoint.labelRectangle;
+
+      final int photoWidth = photoBounds_Scaled.width;
+      final int photoHeight = photoBounds_Scaled.height;
+
+      final int photoLeft = photoBounds_Scaled.x;
+      final int photoRight = photoLeft + photoWidth;
+      final int photoTop = photoBounds_Scaled.y;
+
+      final Map2Point mapPoint = _hoveredMapPoint.mapPoint;
+      final int mapPointDevY = mapPoint.geoPointDevY;
+
+      int ttDevX = ttPos_Scaled.x;
+      int ttDevY = ttPos_Scaled.y;
 
       if ((isTooltipInDisplay && isTTBottomRightInDisplay) == false) {
 
-         if (tipRightBottom.x > displayX + displayWidth) {
+         if (ttBottomRight.x > displayX_Scaled + displayWidth_Scaled) {
 
-            location.x -= tipRightBottom.x - (displayX + displayWidth);
+            ttDevX -= ttBottomRight.x - (displayX_Scaled + displayWidth_Scaled);
 
-            // adjust x/y to not overlap the map point position
-
+            // do not overlap the photo with the tooltip
             if (photoTop > mapPointDevY) {
 
-               location.y += photoHeight;
+               ttDevY += photoHeight;
 
             } else {
 
-               location.y -= photoHeight;
+               ttDevY -= photoHeight;
             }
-
          }
 
-         if (tipRightBottom.y > displayY + displayHeight - photoHeight) {
+         if (ttBottomRight.y > displayY_Scaled + displayHeight_Scaled - photoHeight) {
 
-            location.y -= tipRightBottom.y - (displayY + displayHeight);
+            ttDevY -= ttBottomRight.y - (displayY_Scaled + displayHeight_Scaled);
 
-            location.x = displayX + mapDisplayPosition.x + photoLeft - tipWidth;
+            ttDevX = displayX_Scaled + mapDisplayPosX_Scaled + photoLeft - ttWidth;
          }
 
-         if (location.x < displayX) {
+         if (ttDevX < displayX_Scaled) {
 
-            location.x = displayX + mapDisplayPosition.x + photoRight;
+            ttDevX = displayX_Scaled + mapDisplayPosX_Scaled + photoRight;
          }
 
-         if (location.y < displayY) {
+         if (ttDevY < displayY_Scaled) {
 
-            location.y = displayY;
+            ttDevY = displayY_Scaled;
 
-            location.x = displayX + mapDisplayPosition.x + photoLeft - tipWidth;
+            ttDevX = displayX_Scaled + mapDisplayPosX_Scaled + photoLeft - ttWidth;
          }
 
-         if (location.x < displayX) {
+         if (ttDevX < displayX_Scaled) {
 
-            location.x = displayX + mapDisplayPosition.x + photoRight;
+            ttDevX = displayX_Scaled + mapDisplayPosX_Scaled + photoRight;
          }
       }
 
-      return location;
+      // return unscaled position
+      return new Point(
+            (int) (ttDevX / deviceScaling),
+            (int) (ttDevY / deviceScaling));
    }
 
    @Override
@@ -491,7 +509,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          // image is not yet loaded
 
          // check if image is in the cache
-         photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+         photoImage = PhotoImageCache.getImage_SWT(photo, requestedImageQuality);
 
          if ((photoImage == null || photoImage.isDisposed())
                && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
@@ -500,7 +518,12 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
             final ILoadCallBack imageLoadCallback = new PhotoImageLoaderCallback();
 
-            PhotoLoadManager.putImageInLoadingQueueHQ_Map(photo, requestedImageQuality, imageLoadCallback);
+            PhotoLoadManager.putImageInLoadingQueueHQ_Map(photo,
+                  requestedImageQuality,
+                  imageLoadCallback,
+
+                  false // get SWT image
+            );
          }
       }
 
@@ -517,20 +540,19 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
    }
 
    @Override
-   public Point getToolTipLocation(final Point tooltipSize) {
+   public Point getToolTipLocation(final Point ttSize_Unscaled) {
 
       if (_hoveredMapPoint == null) {
          return null;
       }
 
-      final int tooltipWidth = tooltipSize.x;
-      final int tooltipHeight = tooltipSize.y;
-
-      final Rectangle mapBounds = _map2.getBounds();
-      final Point mapDisplayPosition = _map2.toDisplay(mapBounds.x, mapBounds.y);
+      final float deviceScaling = _map2.getDeviceScaling();
 
       final Rectangle photoBounds = _hoveredMapPoint.labelRectangle;
       final Map2Point mapPoint = _hoveredMapPoint.mapPoint;
+
+      final int tooltipWidth = (int) (ttSize_Unscaled.x * deviceScaling);
+      final int tooltipHeight = (int) (ttSize_Unscaled.y * deviceScaling);
 
       final int photoWidth = photoBounds.width;
       final int photoHeight = photoBounds.height;
@@ -543,25 +565,29 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       final int mapPointDevX = mapPoint.geoPointDevX;
       final int mapPointDevY = mapPoint.geoPointDevY;
 
-      // set top/left as default
-      int devX = photoLeft - tooltipWidth;
-      int devY = photoBottom - tooltipHeight;
+      // set photo bottom/left as default position
+      int ttPosX = photoLeft - tooltipWidth;
+      int ttPosY = photoBottom - tooltipHeight;
 
       // adjust x/y to not overlap the map point position
       if (photoLeft > mapPointDevX) {
-         devX = photoRight;
+         ttPosX = photoRight;
       }
 
       if (photoTop > mapPointDevY) {
-         devY = photoTop;
+         ttPosY = photoTop;
       }
 
       // adjust to display position
-      devX += mapDisplayPosition.x;
-      devY += mapDisplayPosition.y;
+      final Rectangle mapBounds = _map2.getBounds();
+      final Point mapDisplayPosition = _map2.toDisplay(mapBounds.x, mapBounds.y);
 
-      final Point location = new Point(devX, devY);
-      final Point fixedDisplayBounds = fixupDisplayBounds(tooltipSize, location);
+      ttPosX += mapDisplayPosition.x * deviceScaling;
+      ttPosY += mapDisplayPosition.y * deviceScaling;
+
+      final Point ttPos_Scaled = new Point(ttPosX, ttPosY);
+
+      final Point fixedDisplayBounds = fixupDisplayBounds(ttSize_Unscaled, ttPos_Scaled);
 
       return fixedDisplayBounds;
    }
@@ -923,12 +949,14 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       _photo = hoveredMapPoint.mapPoint.photo;
 
       final ZonedDateTime adjustedTime_Tour_WithZone = _photo.adjustedTime_Tour_WithZone;
+      if (adjustedTime_Tour_WithZone != null) {
 
-      final String photoDateTime = "%s  %s".formatted( //$NON-NLS-1$
-            adjustedTime_Tour_WithZone.format(TimeTools.Formatter_Weekday),
-            adjustedTime_Tour_WithZone.format(TimeTools.Formatter_DateTime_M));
+         final String photoDateTime = "%s  %s".formatted( //$NON-NLS-1$
+               adjustedTime_Tour_WithZone.format(TimeTools.Formatter_Weekday),
+               adjustedTime_Tour_WithZone.format(TimeTools.Formatter_DateTime_M));
 
-      updateTitleText(photoDateTime);
+         updateTitleText(photoDateTime);
+      }
 
       final Image photoImage = getPhotoImage(_photo);
 

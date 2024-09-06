@@ -12,7 +12,6 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.ImageDataProvider;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Display;
@@ -98,22 +97,6 @@ public class SWTvsAWT_FontsAndImages {
 
       _scaledWidth = (int) (IMAGE_WIDTH * _deviceScaling);
       _scaledHeight = (int) (IMAGE_HEIGHT * _deviceScaling);
-   }
-
-   private static class ScaledImageDataProvider implements ImageDataProvider {
-
-      private ImageData _imageData;
-
-      public ScaledImageDataProvider(final ImageData imageData) {
-
-         _imageData = imageData;
-      }
-
-      @Override
-      public ImageData getImageData(final int zoom) {
-
-         return _imageData;
-      }
    }
 
    private static ImageData convertAWTtoSWT(final BufferedImage awtImage) {
@@ -227,8 +210,7 @@ public class SWTvsAWT_FontsAndImages {
       final Image swtImage = createSWTImage();
       final BufferedImage awtImage = createAWTImage();
 
-      final ImageData swtImageDataFromAwt = convertAWTtoSWT(awtImage);
-      final ScaledImageDataProvider imageDataProvider = new ScaledImageDataProvider(swtImageDataFromAwt);
+      final NoAutoScalingImageDataProvider imageDataProvider = new NoAutoScalingImageDataProvider(awtImage);
 
       final Image swtImageFromAwt = new Image(_swtDisplay, imageDataProvider);
 

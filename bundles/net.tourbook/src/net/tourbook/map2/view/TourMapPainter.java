@@ -36,12 +36,13 @@ import net.tourbook.chart.Util;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
 import net.tourbook.common.color.ColorProviderConfig;
+import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.color.MapUnits;
 import net.tourbook.common.map.GeoPosition;
-import net.tourbook.common.util.ImageConverter;
+import net.tourbook.common.util.NoAutoScalingImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
@@ -63,6 +64,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Paints a tour into the 2D map.
@@ -138,15 +140,11 @@ public class TourMapPainter extends Map2Painter {
    /**
     * Creates a legend image with AWT framework. This image must be disposed who created it.
     *
-    * @param display
     * @param colorProvider
     * @param imageWidth
     * @param imageHeight
     * @param isDarkBackground
-    * @param isDrawVertical
-    * @param isDarkBackground
     * @param isDrawUnitShadow
-    * @param isDrawLegendText
     *
     * @return
     */
@@ -156,17 +154,20 @@ public class TourMapPainter extends Map2Painter {
                                                   final boolean isDarkBackground,
                                                   final boolean isDrawUnitShadow) {
 
-      final BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_4BYTE_ABGR);
+      final int imageWidthScaled = (int) (imageWidth * UI.SCALING_4K);
+      final int imageHeightScaled = (int) (imageHeight * UI.SCALING_4K);
 
-      final Graphics2D g2d = image.createGraphics();
+      final BufferedImage awtImage = new BufferedImage(imageWidthScaled, imageHeightScaled, BufferedImage.TYPE_4BYTE_ABGR);
+
+      final Graphics2D g2d = awtImage.createGraphics();
       try {
 
          drawMap_Legend_AWT(
                g2d,
                colorProvider,
                ColorProviderConfig.MAP2,
-               imageWidth,
-               imageHeight,
+               imageWidthScaled,
+               imageHeightScaled,
                true, // isVertical
                true, // isDrawUnits
                isDarkBackground,
@@ -176,8 +177,9 @@ public class TourMapPainter extends Map2Painter {
          g2d.dispose();
       }
 
-      return ImageConverter.convertIntoSWT(image);
+      final Image swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
 
+      return swtImage;
    }
 
    public static Image createMap3_LegendImage(final IGradientColorProvider colorProvider,
@@ -189,17 +191,23 @@ public class TourMapPainter extends Map2Painter {
                                               final boolean isDarkBackground,
                                               final boolean isDrawUnitShadow) {
 
-      final BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_4BYTE_ABGR);
+      final int imageWidthScaled = (int) (imageWidth * UI.SCALING_4K);
+      final int imageHeightScaled = (int) (imageHeight * UI.SCALING_4K);
 
-      final Graphics2D g2d = image.createGraphics();
+      final BufferedImage awtImage = new BufferedImage(imageWidthScaled, imageHeightScaled, BufferedImage.TYPE_4BYTE_ABGR);
+
+      final Graphics2D g2d = awtImage.createGraphics();
       try {
 
          drawMap_Legend_AWT(
+
                g2d,
                colorProvider,
                config,
-               imageWidth,
-               imageHeight,
+
+               imageWidthScaled,
+               imageHeightScaled,
+
                isVertical,
                isDrawUnits,
                isDarkBackground,
@@ -209,7 +217,9 @@ public class TourMapPainter extends Map2Painter {
          g2d.dispose();
       }
 
-      return ImageConverter.convertIntoSWT(image);
+      final Image swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
+
+      return swtImage;
    }
 
    /**
@@ -223,38 +233,19 @@ public class TourMapPainter extends Map2Painter {
     * @param isDarkBackground
     * @param isDrawUnitShadow
     */
-   private static void drawMap_Legend_AWT(final Graphics2D g2d,
-                                          final IGradientColorProvider colorProvider,
-                                          final ColorProviderConfig config,
-                                          final int legendWidth,
-                                          final int legendHeight,
-                                          final boolean isDrawVertical,
-                                          final boolean isDrawUnits,
-                                          final boolean isDarkBackground,
-                                          final boolean isDrawUnitShadow) {
+   public static void drawMap_Legend_AWT(final Graphics2D g2d,
+                                         final IGradientColorProvider colorProvider,
+                                         final ColorProviderConfig config,
 
-// SET_FORMATTING_OFF
+                                         final int legendWidth,
+                                         final int legendHeight,
 
-      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HBGR);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VBGR);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VRGB);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+                                         final boolean isDrawVertical,
+                                         final boolean isDrawUnits,
+                                         final boolean isDarkBackground,
+                                         final boolean isDrawUnitShadow) {
 
-// sometimes it looks better with this parameter but sometimes not
-//      g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,     RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-//      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,          RenderingHints.VALUE_ANTIALIAS_ON);
-//      g2d.setRenderingHint(RenderingHints.KEY_DITHERING,             RenderingHints.VALUE_DITHER_ENABLE);
-//      g2d.setRenderingHint(RenderingHints.KEY_RENDERING,             RenderingHints.VALUE_RENDER_QUALITY);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST,     100);
-//      g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,   RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-//      g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,       RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-//      g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,        RenderingHints.VALUE_STROKE_PURE);
-
-// SET_FORMATTING_ON
+      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
       final MapUnits mapUnits = colorProvider.getMapUnits(config);
 
@@ -278,15 +269,15 @@ public class TourMapPainter extends Map2Painter {
       /*
        * Setup font
        */
-      final Font font = DEFAULT_FONT;
-      g2d.setFont(font);
-//      final Font largerFont = font.deriveFont(font.getSize() * 1.1f);
-//      g2d.setFont(largerFont);
+      final Font scaled4kFont = UI.getAWT4kScaledDefaultFont();
+      g2d.setFont(scaled4kFont);
 
       // Measure the font and the message
       final FontRenderContext fontRenderContext = g2d.getFontRenderContext();
-      final LineMetrics metrics = font.getLineMetrics(unitText, fontRenderContext);
-      final float lineheight = metrics.getHeight(); // Total line height
+      final LineMetrics metrics = DEFAULT_FONT.getLineMetrics(unitText, fontRenderContext);
+
+      // Total line height
+      final float lineheight = metrics.getHeight();
 
       /*
        * Setup legend image
@@ -335,6 +326,9 @@ public class TourMapPainter extends Map2Painter {
 
          availableLegendPixels = graphWidth;
       }
+
+      graphWidth *= UI.SCALING_4K;
+      graphHeight *= UI.SCALING_4K;
 
       // pixelValue contains the value for ONE pixel
       final float pixelValue = legendDiffValue / availableLegendPixels;
@@ -474,39 +468,12 @@ public class TourMapPainter extends Map2Painter {
             // horizontal legend
             g2d.drawLine(devValue, contentY, devValue, graphHeight);
          }
-
       }
    }
 
-   /**
-    * Draws map legend colors into the legend bounds.
-    *
-    * @param gc
-    * @param legendImageBounds
-    * @param colorProvider
-    * @param isDrawVertical
-    * @param isDrawVertical
-    *           When <code>true</code> the legend is drawn vertically otherwise it's drawn
-    *           horizontally.
-    * @param isDarkBackground
-    * @param isDrawLegendText
-    */
-   public static void drawMap2_Legend(final GC gc,
-                                      final Rectangle legendImageBounds,
-                                      final IMapColorProvider colorProvider) {
-
-      if (colorProvider instanceof IGradientColorProvider) {
-
-         drawMap2_Legend_GradientColors_SWT(
-               gc,
-               legendImageBounds,
-               (IGradientColorProvider) colorProvider);
-      }
-   }
-
-   private static void drawMap2_Legend_GradientColors_SWT(final GC gc,
-                                                          final Rectangle imageBounds,
-                                                          final IGradientColorProvider colorProvider) {
+   public static void drawMap2_Legend_GradientColors_AWT(final Graphics2D g2d,
+                                                         final Rectangle iconBounds,
+                                                         final IGradientColorProvider colorProvider) {
 
       final MapUnits mapUnits = colorProvider.getMapUnits(ColorProviderConfig.MAP2);
 
@@ -533,11 +500,11 @@ public class TourMapPainter extends Map2Painter {
       int availableLegendPixels;
 
       // horizontal legend
-      contentX = imageBounds.x;
-      contentY = imageBounds.y;
+      contentX = iconBounds.x;
+      contentY = iconBounds.y;
 
-      contentWidth = imageBounds.width;
-      contentHeight = imageBounds.height;
+      contentWidth = iconBounds.width;
+      contentHeight = iconBounds.height;
 
       availableLegendPixels = contentWidth;
 
@@ -559,11 +526,9 @@ public class TourMapPainter extends Map2Painter {
          final long valueRGB = colorProvider.getRGBValue(ColorProviderConfig.MAP2, legendValue);
          final Color valueColor = _colorCache.getColor((int) valueRGB);
 
-         gc.setForeground(valueColor);
-
          // horizontal legend
-
-         gc.drawLine(devXorY_Value, contentY, devXorY_Value, contentHeight);
+         g2d.setColor(ColorUtil.convertSWTColor_into_AWTColor(valueColor));
+         g2d.drawLine(devXorY_Value, contentY, devXorY_Value, contentHeight);
       }
 
       _colorCache.dispose();
@@ -640,7 +605,7 @@ public class TourMapPainter extends Map2Painter {
             if (legendValue >= unitValue) {
 
                /*
-                * get unit label
+                * Get unit label
                 */
                String valueText;
                if (unitLabels == null) {
@@ -662,6 +627,7 @@ public class TourMapPainter extends Map2Painter {
                   }
 
                } else {
+
                   // when unitLabels are available, they will overwrite the default labeling
                   valueText = unitLabels.get(unitLabelIndex++);
                }

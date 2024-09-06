@@ -341,6 +341,8 @@ public class UI {
     */
    public static boolean       IS_4K_DISPLAY;
 
+   public static float         SCALING_4K;
+
    /**
     * On Linux an async selection event is fired since e4
     */
@@ -759,7 +761,11 @@ public class UI {
 
       updateUnits();
 
-      IS_4K_DISPLAY = DPIUtil.getDeviceZoom() >= 140;
+      final int deviceZoom = DPIUtil.getDeviceZoom();
+
+      IS_4K_DISPLAY = deviceZoom >= 140;
+      SCALING_4K = deviceZoom / 100f;
+
       setupUI_FontMetrics();
       setupUI_AWTFonts();
 
@@ -1808,10 +1814,20 @@ public class UI {
     *
     * @return
     */
-   public static Image disposeResource(final Image resource) {
+   public static Image disposeResource(final Image image) {
 
-      if (resource != null) {
-         resource.dispose();
+      if (image != null) {
+
+         // sometimes the device of the image is null which causes an exception
+
+         try {
+
+            image.dispose();
+
+         } catch (final Exception e) {
+
+            // ignore
+         }
       }
 
       return null;
@@ -2135,6 +2151,23 @@ public class UI {
       return accelerator;
    }
 
+   public static Font getAWT4kScaledDefaultFont() {
+
+      final float defaultFontSize = AWT_DIALOG_FONT.getSize2D();
+
+      final float fontSize = //
+
+            UI.SCALING_4K <= 1.5 ? defaultFontSize * 1.5f
+
+                  : UI.SCALING_4K <= 2 ? defaultFontSize * 1.7f
+
+                        : UI.SCALING_4K <= 3 ? defaultFontSize * 1.8f
+
+                              : defaultFontSize * 1.8f;
+
+      return AWT_DIALOG_FONT.deriveFont(fontSize);
+   }
+
    /**
     * Get best-fit size for an image drawn in an area of maxX, maxY
     * <p>
@@ -2224,6 +2257,12 @@ public class UI {
       return _dialogFont_Metrics;
    }
 
+   /**
+    * @param composite
+    * @param location
+    *
+    * @return Returns the unscaled display bounds
+    */
    public static Rectangle getDisplayBounds(final Control composite, final Point location) {
 
       Rectangle displayBounds;

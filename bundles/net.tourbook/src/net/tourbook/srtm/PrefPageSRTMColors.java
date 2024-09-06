@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -53,18 +53,10 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.Viewer;
@@ -75,8 +67,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -698,43 +689,32 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
       _profileViewer.setContentProvider(new ProfileContentProvider());
       _profileViewer.setComparator(new ProfileComparator());
 
-      _profileViewer.addCheckStateListener(new ICheckStateListener() {
-         @Override
-         public void checkStateChanged(final CheckStateChangedEvent event) {
+      _profileViewer.addCheckStateListener(event -> {
 
-            final SRTMProfile checkedProfile = (SRTMProfile) event.getElement();
+         final SRTMProfile checkedProfile = (SRTMProfile) event.getElement();
 
-            // ignore the same profile
-            if (_selectedProfile != null && checkedProfile == _selectedProfile) {
+         // ignore the same profile
+         if (_selectedProfile != null && checkedProfile == _selectedProfile) {
 
-               // prevent unchecking selected profile
-               event.getCheckable().setChecked(checkedProfile, true);
+            // prevent unchecking selected profile
+            event.getCheckable().setChecked(checkedProfile, true);
 
-               return;
-            }
+            return;
+         }
 
-            // select checked profile
-            selectProfileInViewer(checkedProfile);
+         // select checked profile
+         selectProfileInViewer(checkedProfile);
+      });
+
+      _profileViewer.addSelectionChangedListener(event -> {
+
+         final Object firstElement = ((StructuredSelection) event.getSelection()).getFirstElement();
+         if (firstElement instanceof SRTMProfile) {
+            onSelectProfile((SRTMProfile) firstElement, false);
          }
       });
 
-      _profileViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-
-            final Object firstElement = ((StructuredSelection) event.getSelection()).getFirstElement();
-            if (firstElement instanceof SRTMProfile) {
-               onSelectProfile((SRTMProfile) firstElement, false);
-            }
-         }
-      });
-
-      _profileViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-            onEditProfile();
-         }
-      });
+      _profileViewer.addDoubleClickListener(event -> onEditProfile());
 
    }
 
@@ -749,12 +729,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
           */
          _btnEditProfile = new Button(container, SWT.NONE);
          _btnEditProfile.setText(Messages.prefPage_srtm_profile_edit);
-         _btnEditProfile.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onEditProfile();
-            }
-         });
+         _btnEditProfile.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onEditProfile()));
          setButtonLayoutData(_btnEditProfile);
 
          /*
@@ -762,12 +737,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
           */
          _btnAddProfile = new Button(container, SWT.NONE);
          _btnAddProfile.setText(Messages.prefPage_srtm_profile_add);
-         _btnAddProfile.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onAddProfile();
-            }
-         });
+         _btnAddProfile.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onAddProfile()));
          setButtonLayoutData(_btnAddProfile);
 
          /*
@@ -775,12 +745,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
           */
          _btnRemoveProfile = new Button(container, SWT.NONE);
          _btnRemoveProfile.setText(Messages.prefPage_srtm_profile_remove);
-         _btnRemoveProfile.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onRemoveProfile();
-            }
-         });
+         _btnRemoveProfile.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onRemoveProfile()));
          setButtonLayoutData(_btnRemoveProfile);
 
          /*
@@ -788,12 +753,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
           */
          _btnDuplicateProfile = new Button(container, SWT.NONE);
          _btnDuplicateProfile.setText(Messages.prefPage_srtm_profile_duplicate);
-         _btnDuplicateProfile.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onDuplicateProfile();
-            }
-         });
+         _btnDuplicateProfile.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onDuplicateProfile()));
          setButtonLayoutData(_btnDuplicateProfile);
 
          /*
@@ -801,12 +761,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
           */
          final Button btnAdjustColumns = new Button(container, SWT.NONE);
          btnAdjustColumns.setText(Messages.prefPage_srtm_btn_adjust_columns);
-         btnAdjustColumns.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               _columnManager.openColumnDialog();
-            }
-         });
+         btnAdjustColumns.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> _columnManager.openColumnDialog()));
          setButtonLayoutData(btnAdjustColumns);
          final GridData gd = (GridData) btnAdjustColumns.getLayoutData();
          gd.verticalIndent = 20;
@@ -824,15 +779,14 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
             parent);
       _booleanEditorApplyOption.setPreferenceStore(_prefStore);
       _booleanEditorApplyOption.setPage(this);
-      _booleanEditorApplyOption.setPropertyChangeListener(new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-            if (((Boolean) event.getNewValue())) {
-               // apply profile
-               final Object firstElement = ((StructuredSelection) _profileViewer.getSelection()).getFirstElement();
-               if (firstElement instanceof SRTMProfile) {
-                  onSelectProfile((SRTMProfile) firstElement, true);
-               }
+      _booleanEditorApplyOption.setPropertyChangeListener(event -> {
+
+         if (((Boolean) event.getNewValue())) {
+
+            // apply profile
+            final Object firstElement = ((StructuredSelection) _profileViewer.getSelection()).getFirstElement();
+            if (firstElement instanceof SRTMProfile) {
+               onSelectProfile((SRTMProfile) firstElement, true);
             }
          }
       });
@@ -1023,6 +977,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     *
     * @param directory
+    *
     * @return Returns <code>true</code> if all deletions were successful
     */
    private boolean deleteDir(final File directory) {
@@ -1305,11 +1260,11 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
       final TableItem item = (TableItem) event.item;
       final SRTMProfile profile = (SRTMProfile) item.getData();
 
-      final Image image = profile.getRgbVertexImage().getValidatedImage(getImageWidth(), _imageHeight, true);
+      final Image swtImage = profile.getRgbVertexImage().getValidatedImage(getImageWidth(), _imageHeight, true);
 
-      if (image != null) {
+      if (swtImage != null) {
 
-         final Rectangle rect = image.getBounds();
+         final Rectangle rect = swtImage.getBounds();
 
          switch (event.type) {
 
@@ -1334,7 +1289,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
             final int x = event.x + event.width;
             final int offset = Math.max(0, (event.height - rect.height) / 2);
 
-            event.gc.drawImage(image, x, event.y + offset);
+            event.gc.drawImage(swtImage, x, event.y + offset);
 
             break;
          }

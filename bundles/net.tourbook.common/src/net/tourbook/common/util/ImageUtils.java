@@ -24,6 +24,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
@@ -89,6 +90,25 @@ public class ImageUtils {
       UI.disposeResource(swtImage);
 
       return awtImage;
+   }
+
+   public static double getBestRatio(final int originalX, final int originalY, final int maxX, final int maxY) {
+
+      final double widthRatio = (double) originalX / (double) maxX;
+      final double heightRatio = (double) originalY / (double) maxY;
+
+      final double bestRatio = widthRatio > heightRatio ? widthRatio : heightRatio;
+
+      return bestRatio;
+   }
+   public static Point getBestSize(final int originalX, final int originalY, final int maxX, final int maxY) {
+
+      final double bestRatio = getBestRatio(originalX, originalY, maxX, maxY);
+
+      final int newWidth = (int) (originalX / bestRatio);
+      final int newHeight = (int) (originalY / bestRatio);
+
+      return new Point(newWidth, newHeight);
    }
 
    /**

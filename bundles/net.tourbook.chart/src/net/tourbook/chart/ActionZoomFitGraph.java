@@ -29,7 +29,7 @@ public class ActionZoomFitGraph extends Action {
       setToolTipText(Messages.Action_zoom_fit_to_graph_tooltip);
 
       setImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.Zoom_FitToWindow));
-      setDisabledImageDescriptor(ChartActivator.getImageDescriptor(ChartImages.Zoom_FitToWindow_Disabled));
+      setDisabledImageDescriptor(ChartActivator.getThemedImageDescriptor(ChartImages.Zoom_FitToWindow_Disabled));
    }
 
    @Override

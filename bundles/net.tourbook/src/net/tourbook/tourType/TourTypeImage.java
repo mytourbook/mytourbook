@@ -24,8 +24,9 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
-import net.tourbook.common.util.ImageConverter;
+import net.tourbook.common.util.NoAutoScalingImageDataProvider;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 
@@ -33,6 +34,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Tour type images are painted with AWT because it has better antialiasing with transparency than
@@ -52,9 +54,9 @@ public class TourTypeImage {
       return TOUR_TYPE_PREFIX + typeId;
    }
 
-   private static Image createTourTypeImage(final long typeId, final String colorId, final Image existingImage) {
+   private static Image createTourTypeImage_SWT(final long typeId, final String colorId, final Image existingImage) {
 
-      final Image swtTourTypeImage = createTourTypeImage_Create(typeId, existingImage);
+      final Image swtTourTypeImage = createTourTypeImage_SWT_Create(typeId, existingImage);
 
       // keep image in cache
       _imageCache.put(colorId, swtTourTypeImage);
@@ -62,9 +64,9 @@ public class TourTypeImage {
       return swtTourTypeImage;
    }
 
-   private static Image createTourTypeImage_Create(final long typeId, final Image existingImageSWT) {
+   private static Image createTourTypeImage_SWT_Create(final long typeId, final Image existingImageSWT) {
 
-      final int imageSize = TourType.TOUR_TYPE_IMAGE_SIZE;
+      final int imageSize = (int) (TourType.TOUR_TYPE_IMAGE_SIZE * UI.SCALING_4K);
 
       final BufferedImage awtImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_4BYTE_ABGR);
 
@@ -88,7 +90,7 @@ public class TourTypeImage {
 
          drawTourTypeImage(typeId, g2d);
 
-         final Image newImageSWT = ImageConverter.convertIntoSWT(awtImage);
+         final Image newImageSWT = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
 
          if (existingImageSWT == null) {
 
@@ -171,15 +173,43 @@ public class TourTypeImage {
          return;
       }
 
-      final int imageSize = TourType.TOUR_TYPE_IMAGE_SIZE;
+      final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
+
+      final int imageSize = (int) (TourType.TOUR_TYPE_IMAGE_SIZE * UI.SCALING_4K * imageConfig.imageScaling / 100);
+
+      final int borderWidth = imageConfig.borderWidth;
+      final float borderWidth2 = borderWidth / 2f;
+
+      int ovalPos = 0;
+      int ovalSize = imageSize;
+
+      ovalPos = (int) (borderWidth2 + 0.0f);
+      ovalSize = imageSize - borderWidth - 0;
+
+//      // draw debug border
+//      g2d.setStroke(new BasicStroke(1));
+//      g2d.setColor(Color.GRAY);
+//      g2d.drawRect(0, 0, imageSize - 1, imageSize - 1);
+
       final DrawingColorsAWT drawingColors = getTourTypeColors(typeId);
 
-      drawTourTypeImage_Background(g2d, imageSize, drawingColors);
-      drawTourTypeImage_Border(g2d, imageSize, drawingColors);
+      drawTourTypeImage_Background(g2d,
+            imageSize,
+            ovalPos,
+            ovalSize,
+            drawingColors);
+
+      drawTourTypeImage_Border(g2d,
+            imageSize,
+            ovalPos,
+            ovalSize,
+            drawingColors);
    }
 
    private static void drawTourTypeImage_Background(final Graphics2D g2d,
                                                     final int imageSize,
+                                                    final int ovalPos,
+                                                    final int ovalSize,
                                                     final DrawingColorsAWT drawingColors) {
 
       final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
@@ -247,16 +277,18 @@ public class TourTypeImage {
 
       if (isRectangle) {
 
-         g2d.fillRect(0, 0, imageSize, imageSize);
+         g2d.fillRect(ovalPos, ovalPos, imageSize, imageSize);
 
       } else if (isOval) {
 
-         g2d.fillOval(0, 0, imageSize, imageSize);
+         g2d.fillOval(ovalPos, ovalPos, ovalSize, ovalSize);
       }
    }
 
    private static void drawTourTypeImage_Border(final Graphics2D g2d,
                                                 final int imageSize,
+                                                final int ovalPos,
+                                                final int ovalSize,
                                                 final DrawingColorsAWT drawingColors) {
 
       final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
@@ -290,9 +322,11 @@ public class TourTypeImage {
       case BORDER_LEFT:
          isLeft = true;
          break;
+
       case BORDER_RIGHT:
          isRight = true;
          break;
+
       case BORDER_LEFT_RIGHT:
          isLeft = true;
          isRight = true;
@@ -301,9 +335,11 @@ public class TourTypeImage {
       case BORDER_TOP:
          isTop = true;
          break;
+
       case BORDER_BOTTOM:
          isBottom = true;
          break;
+
       case BORDER_TOP_BOTTOM:
          isTop = true;
          isBottom = true;
@@ -317,29 +353,14 @@ public class TourTypeImage {
 
       if (isCircle) {
 
-//         // draw debug border
-//         g2d.setStroke(new BasicStroke(1));
-//         g2d.setColor(Color.GRAY);
-//         g2d.drawRect(0, 0, imageSize - 1, imageSize - 1);
-
          g2d.setStroke(new BasicStroke(borderWidth));
          g2d.setColor(color1);
 
-         /*
-          * Highly complicated formula that the oval outline has the correct size, needed some
-          * experimenting time to get it.
-          */
-         final float ovalPos = (borderWidth / 2f) + 0.5f;
-         final int ovalPosInt = (int) ovalPos;
-         final float ovalSize = imageSize - ovalPosInt - borderWidth / 2f;
-         final int ovalSizeInt = (int) ovalSize - 2;
-
-
          g2d.drawOval(
-               ovalPosInt,
-               ovalPosInt,
-               ovalSizeInt,
-               ovalSizeInt);
+               ovalPos,
+               ovalPos,
+               ovalSize,
+               ovalSize);
 
       } else if (isLeft || isRight || isTop || isBottom) {
 
@@ -385,6 +406,7 @@ public class TourTypeImage {
 
    /**
     * @param graphColor
+    *
     * @return return the color for the graph
     */
    private static DrawingColorsAWT getTourTypeColors(final long tourTypeId) {
@@ -427,6 +449,7 @@ public class TourTypeImage {
 
    /**
     * @param typeId
+    *
     * @return Returns an image which represents the tour type. This image must not be disposed,
     *         this is done when the app closes.
     */
@@ -439,6 +462,7 @@ public class TourTypeImage {
     * @param typeId
     * @param imageCacheKey
     * @param isDisposeCachedImage
+    *
     * @return
     */
    public static Image getTourTypeImage(final long typeId, final String imageCacheKey, final boolean isDisposeCachedImage) {
@@ -470,13 +494,13 @@ public class TourTypeImage {
 
       if (cachedImage == null || cachedImage.isDisposed()) {
 
-         return createTourTypeImage(typeId, imageCacheKey, null);
+         return createTourTypeImage_SWT(typeId, imageCacheKey, null);
 
       } else {
 
          // old tour type image is available and not disposed but needs to be updated
 
-         return createTourTypeImage(typeId, imageCacheKey, cachedImage);
+         return createTourTypeImage_SWT(typeId, imageCacheKey, cachedImage);
       }
    }
 
@@ -486,6 +510,7 @@ public class TourTypeImage {
     * With {@link #disposeRecreatedImages()} the newly created images can be disposed.
     *
     * @param typeId
+    *
     * @return
     */
    public static Image getTourTypeImage_New(final long typeId) {
@@ -501,6 +526,7 @@ public class TourTypeImage {
     *
     * @param tourTypeId
     *           Tour type id
+    *
     * @return Returns image descriptor for the tour type id
     */
    public static ImageDescriptor getTourTypeImageDescriptor(final long tourTypeId) {

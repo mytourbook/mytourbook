@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,12 +49,15 @@ public class PhotoLoadManager {
 //    */
 //   public static final double                           IMAGE_RATIO               = 15.0 / 10;                           //1.41;
 
-// SET_FORMATTING_OFF
+   public static final int[]                                  HQ_IMAGE_SIZES        = {
 
-   public static final int[]                           HQ_IMAGE_SIZES               =
-         { 200, IMAGE_SIZE_LARGE_DEFAULT, 1000, 2000 };
-
-// SET_FORMATTING_ON
+         200,
+         IMAGE_SIZE_LARGE_DEFAULT,
+         1000,
+         2000,
+         3000,
+         4000
+   };
 
    private static Display                                     _display;
 
@@ -314,6 +317,7 @@ public class PhotoLoadManager {
     *         will be displayed. Possible AWT save error: "Bogus input colorspace"
     */
    public static boolean isThumbSaveError(final String imageFilePath) {
+
       return _photoWithThumbSaveError.containsKey(imageFilePath);
    }
 
@@ -391,7 +395,13 @@ public class PhotoLoadManager {
                return;
             }
 
-            imageLoader.loadImageHQ(_waitingQueueThumb, _waitingQueueExif);
+            imageLoader.loadImageHQ(
+
+                  _waitingQueueThumb,
+                  _waitingQueueExif,
+
+                  false // is SWT image
+            );
 
             checkLoadingState(photo, imageQuality);
          }
@@ -406,10 +416,12 @@ public class PhotoLoadManager {
     * @param photo
     * @param imageQuality
     * @param imageLoaderCallback
+    * @param isAWTImage
     */
    public static void putImageInLoadingQueueHQ_Map(final Photo photo,
                                                    final ImageQuality imageQuality,
-                                                   final ILoadCallBack imageLoaderCallback) {
+                                                   final ILoadCallBack imageLoaderCallback,
+                                                   final boolean isAWTImage) {
 
       // set state
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
@@ -442,7 +454,7 @@ public class PhotoLoadManager {
 
             } else {
 
-               imageLoader.loadImageHQ(_waitingQueueThumb, _waitingQueueExif);
+               imageLoader.loadImageHQ(_waitingQueueThumb, _waitingQueueExif, isAWTImage);
             }
 
             checkLoadingState(photo, imageQuality);
@@ -542,10 +554,10 @@ public class PhotoLoadManager {
     * @param imageQuality
     * @param imageLoadCallback
     */
-   public static void putImageInLoadingQueueThumbGallery(final GalleryMT20Item galleryItem,
-                                                         final Photo photo,
-                                                         final ImageQuality imageQuality,
-                                                         final ILoadCallBack imageLoadCallback) {
+   public static void putImageInLoadingQueueThumb_Gallery(final GalleryMT20Item galleryItem,
+                                                          final Photo photo,
+                                                          final ImageQuality imageQuality,
+                                                          final ILoadCallBack imageLoadCallback) {
       // set state
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
@@ -596,7 +608,7 @@ public class PhotoLoadManager {
                   return;
                }
 
-               if (imageLoader.loadImageThumb(_waitingQueueOriginal)) {
+               if (imageLoader.loadImageThumb_SWT(_waitingQueueOriginal)) {
 
                   // HQ image is requested
 
@@ -618,9 +630,17 @@ public class PhotoLoadManager {
       _executorThumb.submit(executorTask);
    }
 
-   public static void putImageInLoadingQueueThumbMap(final Photo photo,
-                                                     final ImageQuality imageQuality,
-                                                     final ILoadCallBack imageLoaderCallback) {
+   /**
+    * @param photo
+    * @param imageQuality
+    * @param imageLoaderCallback
+    * @param isAWTImage
+    *           Has to be <code>false</code> for a SWT image
+    */
+   public static void putImageInLoadingQueueThumb_Map(final Photo photo,
+                                                      final ImageQuality imageQuality,
+                                                      final ILoadCallBack imageLoaderCallback,
+                                                      final boolean isAWTImage) {
 
       // set state
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
@@ -639,13 +659,13 @@ public class PhotoLoadManager {
          public void run() {
 
             // get last added loader item
-            final PhotoImageLoader imageLoader = _waitingQueueThumb.pollFirst();
+            final PhotoImageLoader photoImageLoader = _waitingQueueThumb.pollFirst();
 
-            if (imageLoader == null) {
+            if (photoImageLoader == null) {
                return;
             }
 
-            final String errorKey = imageLoader.getPhoto().imageFilePathName;
+            final String errorKey = photoImageLoader.getPhoto().imageFilePathName;
 
             if (_photoWithLoadingError.containsKey(errorKey)) {
 
@@ -653,7 +673,14 @@ public class PhotoLoadManager {
 
             } else {
 
-               imageLoader.loadImageThumb(_waitingQueueOriginal);
+               if (isAWTImage) {
+
+                  photoImageLoader.loadImageThumb_AWT(_waitingQueueOriginal);
+
+               } else {
+
+                  photoImageLoader.loadImageThumb_SWT(_waitingQueueOriginal);
+               }
             }
 
             checkLoadingState(photo, imageQuality);
@@ -690,10 +717,12 @@ public class PhotoLoadManager {
    }
 
    public static void putPhotoInThumbSaveErrorMap(final String errorKey) {
+
       _photoWithThumbSaveError.put(errorKey, new Object());
    }
 
    public static void removeInvalidImageFiles() {
+
       _photoWithLoadingError.clear();
       _photoWithThumbSaveError.clear();
    }

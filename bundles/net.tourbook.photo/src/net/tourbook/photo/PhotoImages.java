@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,9 +26,9 @@ public class PhotoImages {
    public static final String Photo_ShowAnnotation                = "photo-action-show-annotation.png";             //$NON-NLS-1$
    public static final String Photo_ShowAnnotation_Disabled       = "photo-action-show-annotation-disabled.png";    //$NON-NLS-1$
    public static final String PhotoAnnotation_ExifGPS             = "photo-annotation-exif-gps.png";                //$NON-NLS-1$
+   public static final String PhotoAnnotation_TourGPS             = "photo-annotation-tour-gps.png";                //$NON-NLS-1$
    public static final String PhotoAnnotation_SavedInTour         = "photo-annotation-saved-in-tour.png";           //$NON-NLS-1$
    public static final String PhotoAnnotation_SavedInTour_Hovered = "photo-annotation-saved-in-tour-hovered.png";   //$NON-NLS-1$
-   public static final String PhotoAnnotation_TourGPS             = "photo-annotation-tour-gps.png";                //$NON-NLS-1$
    public static final String PhotoDirectoryView                  = "photo-directory.png";                          //$NON-NLS-1$
    public static final String PhotoFilter_GPS                     = "photo-filter-gps.png";                         //$NON-NLS-1$
    public static final String PhotoFilter_GPS_Disabled            = "photo-filter-gps-disabled.png";                //$NON-NLS-1$

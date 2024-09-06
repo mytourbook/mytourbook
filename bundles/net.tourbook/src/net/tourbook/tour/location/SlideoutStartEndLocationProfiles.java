@@ -843,9 +843,6 @@ public class SlideoutStartEndLocationProfiles extends AdvancedSlideout {
       // cleanup previous slideout openings
       _selectedProfile = null;
       _allDualListItems.clear();
-
-      // allow this slideout to can have the max screen height
-      setMaxHeightFactor(1);
    }
 
    @Override

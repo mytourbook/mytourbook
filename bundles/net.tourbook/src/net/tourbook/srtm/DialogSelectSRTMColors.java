@@ -45,6 +45,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -427,13 +428,12 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
           * profile image
           */
          _canvasProfileImage = new ImageCanvas(container, SWT.NO_BACKGROUND);
-         GridDataFactory.fillDefaults().grab(true, true).hint(100, SWT.DEFAULT).applyTo(_canvasProfileImage);
-         _canvasProfileImage.addControlListener(new ControlAdapter() {
-            @Override
-            public void controlResized(final ControlEvent e) {
-               paintProfileImage();
-            }
-         });
+         _canvasProfileImage.addControlListener(ControlListener.controlResizedAdapter(controlEvent -> paintProfileImage()));
+
+         GridDataFactory.fillDefaults()
+               .grab(true, true)
+               .hint(100, SWT.DEFAULT)
+               .applyTo(_canvasProfileImage);
 
          /*
           * vertex fields
@@ -900,6 +900,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
       UI.disposeResource(_profileImage);
 
       final Rectangle imageBounds = _canvasProfileImage.getBounds();
+
       _profileImage = _dialogProfile.createImage(imageBounds.width, imageBounds.height, false);
 
       _canvasProfileImage.setImage(_profileImage);

@@ -6,14 +6,14 @@
    <classpathentry exported="true" kind="lib" path="jakarta.inject-api-2.0.1.jar"/>       <!-- https://mvnrepository.com/artifact/jakarta.inject/jakarta.inject-api -->
    <classpathentry exported="true" kind="lib" path="c3p0-0.10.1.jar"/>                    <!-- https://mvnrepository.com/artifact/com.mchange/c3p0 -->
    <classpathentry exported="true" kind="lib" path="mchange-commons-java-0.3.0.jar"/>     <!-- https://mvnrepository.com/artifact/com.mchange/mchange-commons-java -->
-   <classpathentry exported="true" kind="lib" path="caffeine-3.1.8.jar"/>                 <!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
-   <classpathentry exported="true" kind="lib" path="commons-imaging-1.0-alpha2.jar"/>     <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-imaging -->
-   <classpathentry exported="true" kind="lib" path="commons-lang3-3.15.0.jar"          sourcepath="jar-sources/commons-lang3-3.15.0-sources.jar"/>    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
-   <classpathentry exported="true" kind="lib" path="commons-text-1.12.0.jar"           sourcepath="jar-sources/commons-text-1.11.0-sources.jar"/>     <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
-   <classpathentry exported="true" kind="lib" path="imgscalr-lib-4.2.jar"/>               <!-- https://mvnrepository.com/artifact/org.imgscalr/imgscalr-lib -->
-   <classpathentry exported="true" kind="lib" path="jackson-core-2.17.0.jar"           sourcepath="/Jackson Core"/>                                   <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
-   <classpathentry exported="true" kind="lib" path="jackson-databind-2.17.0.jar"       sourcepath="/Jackson Databind"/>                               <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
-   <classpathentry exported="true" kind="lib" path="jackson-annotations-2.17.0.jar"    sourcepath="/Jackson Annotations"/>                            <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
+   <classpathentry exported="true" kind="lib" path="caffeine-3.1.8.jar"                sourcepath="jar-sources/caffeine-3.1.8-sources.jar"/>                <!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
+   <classpathentry exported="true" kind="lib" path="commons-imaging-1.0-alpha2.jar"    sourcepath="jar-sources/commons-imaging-1.0-alpha2-sources.jar"/>    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-imaging -->
+   <classpathentry exported="true" kind="lib" path="commons-lang3-3.15.0.jar"          sourcepath="jar-sources/commons-lang3-3.15.0-sources.jar"/>          <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+   <classpathentry exported="true" kind="lib" path="commons-text-1.12.0.jar"           sourcepath="jar-sources/commons-text-1.11.0-sources.jar"/>           <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
+   <classpathentry exported="true" kind="lib" path="imgscalr-lib-4.2.jar"              sourcepath="jar-sources/imgscalr-lib-4.2-sources.jar"/>              <!-- https://mvnrepository.com/artifact/org.imgscalr/imgscalr-lib -->
+   <classpathentry exported="true" kind="lib" path="jackson-core-2.17.0.jar"           sourcepath="/Jackson Core"/>                                         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+   <classpathentry exported="true" kind="lib" path="jackson-databind-2.17.0.jar"       sourcepath="/Jackson Databind"/>                                     <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+   <classpathentry exported="true" kind="lib" path="jackson-annotations-2.17.0.jar"    sourcepath="/Jackson Annotations"/>                                  <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
    <classpathentry exported="true" kind="lib" path="joda-time-2.12.5.jar">                <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
       <attributes>
          <attribute name="javadoc_location" value="https://www.javadoc.io/doc/joda-time/joda-time/2.12.5"/>
