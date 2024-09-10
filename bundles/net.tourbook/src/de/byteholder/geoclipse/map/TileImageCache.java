@@ -28,6 +28,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.NoAutoScalingImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.core.runtime.IPath;
@@ -201,31 +203,48 @@ public class TileImageCache {
     */
    private IPath getCheckedOfflineImagePath(final IPath tileImagePath) {
 
-      File tileImageFile = tileImagePath.toFile();
+      /*
+       * Test 4k image
+       */
 
-      if (tileImageFile.exists()) {
+      String fileExt = tileImagePath.getFileExtension();
+      IPath pathWithoutExt = tileImagePath.removeFileExtension();
 
+      final String fileName4k = pathWithoutExt.lastSegment() + UI.NAME_SUFFIX_4k;
+
+      IPath otherFilePath = pathWithoutExt
+            .removeLastSegments(1)
+            .append(fileName4k)
+            .addFileExtension(fileExt);
+
+      if (otherFilePath.toFile().exists()) {
+         return otherFilePath;
+      }
+
+      /*
+       * Test default image
+       */
+
+      if (tileImagePath.toFile().exists()) {
          return tileImagePath;
+      }
 
-      } else {
+      /*
+       * Test part image
+       */
 
-         // test a part image
+      fileExt = tileImagePath.getFileExtension();
+      pathWithoutExt = tileImagePath.removeFileExtension();
 
-         final String fileExt = tileImagePath.getFileExtension();
-         final IPath pathWithoutExt = tileImagePath.removeFileExtension();
+      final String partFileName = pathWithoutExt.lastSegment() + MapProviderManager.PART_IMAGE_FILE_NAME_SUFFIX;
 
-         final String partFileName = pathWithoutExt.lastSegment() + MapProviderManager.PART_IMAGE_FILE_NAME_SUFFIX;
+      otherFilePath = pathWithoutExt
+            .removeLastSegments(1)
+            .append(partFileName)
+            .addFileExtension(fileExt);
 
-         final IPath partFilePath = pathWithoutExt
-               .removeLastSegments(1)
-               .append(partFileName)
-               .addFileExtension(fileExt);
-
-         tileImageFile = partFilePath.toFile();
-
-         if (tileImageFile.exists()) {
-            return partFilePath;
-         }
+      if (otherFilePath.toFile().exists()) {
+         return otherFilePath;
       }
 
       return null;
@@ -271,7 +290,22 @@ public class TileImageCache {
                 * image with an imageloader
                 */
 
-               final Image loadedImage = new Image(_display, osTileImagePath);
+               Image loadedImage;
+
+               if (osTileImagePath.contains(UI.NAME_SUFFIX_4k)) {
+
+                  // create unscaled image
+
+                  final ImageData imageData = new ImageData(osTileImagePath);
+
+                  loadedImage = new Image(_display, new NoAutoScalingImageDataProvider(imageData));
+
+               } else {
+
+                  // create scaled image
+
+                  loadedImage = new Image(_display, osTileImagePath);
+               }
 
                /*
                 * It can happen that these images are not in the image cache. Keep all created
@@ -704,9 +738,33 @@ public class TileImageCache {
                                     final ImageData loadedImageData,
                                     final Image tileOfflineImage) {
 
-      final Image tileImage = tileOfflineImage != null
-            ? tileOfflineImage
-            : new Image(_display, loadedImageData);
+      final Image tileImage;
+
+      if (tileOfflineImage != null) {
+
+         tileImage = tileOfflineImage;
+
+      } else {
+
+         if (
+               
+         // ckeck offline image
+         (tile.getOfflinePath() != null && tile.getOfflinePath().contains(UI.NAME_SUFFIX_4k))
+
+               // check downloaded image
+               || (tile.getUrl() != null && tile.getUrl().contains(UI.NAME_SUFFIX_4k))) {
+
+            // create unscaled image
+
+            tileImage = new Image(_display, new NoAutoScalingImageDataProvider(loadedImageData));
+
+         } else {
+
+            // create scaled image
+
+            tileImage = new Image(_display, loadedImageData);
+         }
+      }
 
       // cache tile image
       putIntoImageCache(tileKey, tileImage);

@@ -348,7 +348,7 @@ public class TileImageLoader implements Runnable {
          }
 
          /*
-          * create tile image
+          * Create tile image
           */
          if (isSetupImage) {
 

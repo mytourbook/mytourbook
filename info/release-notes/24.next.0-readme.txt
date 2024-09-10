@@ -54,6 +54,7 @@ New
   - 2D Map
     - Rescaled map legend
     - Rescaled SRTM map color provider
+    - Support @2x map tiles
 
 * Waypoints
   - Waypoints are now painted as map points
