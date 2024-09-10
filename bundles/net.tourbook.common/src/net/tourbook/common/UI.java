@@ -342,6 +342,7 @@ public class UI {
    public static boolean       IS_4K_DISPLAY;
 
    public static float         SCALING_4K;
+   public static String        NAME_SUFFIX_4k                 = "@2x";                       //$NON-NLS-1$
 
    /**
     * On Linux an async selection event is fired since e4
