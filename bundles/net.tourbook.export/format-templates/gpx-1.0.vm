@@ -181,10 +181,10 @@
 ##
 #set($close_segment = false)
    <trk>
-#if($track.getIdentification().length() > 0)
+#if($track.getIdentification() && $track.getIdentification().length() > 0)
       <name><![CDATA[$!track.Identification]]></name>
 #end
-#if($track.getComment().length() > 0)
+#if($track.getComment() && $track.getComment().length() > 0)
       <desc><![CDATA[$!track.Comment]]></desc>
 #end
 ##
