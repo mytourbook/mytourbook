@@ -10238,6 +10238,12 @@ public class Map2 extends Canvas {
       }
    }
 
+   public void resetTours_Photos() {
+
+      // prevent that old photo images are displayed when a new tour should be displayed
+      Map2PainterConfig.getPhotos().clear();
+   }
+
    /**
     * Reset selected tour data
     */

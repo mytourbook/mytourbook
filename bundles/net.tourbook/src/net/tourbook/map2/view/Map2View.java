@@ -4247,6 +4247,7 @@ public class Map2View extends ViewPart implements
 
       _map.resetTours_HoveredData();
       _map.resetTours_SelectedData();
+      _map.resetTours_Photos();
 
       _map.setShowOverlays(_isShowTour || _isShowPhoto);
       _map.setShowLegend(_isShowTour && _isShowLegend);
