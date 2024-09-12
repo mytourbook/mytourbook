@@ -805,7 +805,7 @@ public class Map2 extends Canvas {
       final ImageDescriptor imageDescriptor = PhotoActivator.getImageDescriptor(PhotoImages.PhotoRatingStar);
       final ImageData imageData = imageDescriptor.getImageData(deviceZoom);
 
-      final Image swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(imageData));
+      final Image swtImage = new Image(getDisplay(), new NoAutoScalingImageDataProvider(imageData));
       {
          _imageRatingStar = ImageConverter.convertIntoAWT(swtImage);
       }
@@ -1729,10 +1729,10 @@ public class Map2 extends Canvas {
 
       mapPoints.boundingBoxAWT = new java.awt.Rectangle(
 
-            bboxTopLeft_DevX,
-            bboxTopLeft_DevY,
-            bboxWidth,
-            bboxHeight);
+            (int) (bboxTopLeft_DevX * _deviceScaling),
+            (int) (bboxTopLeft_DevY * _deviceScaling),
+            (int) (bboxWidth * _deviceScaling),
+            (int) (bboxHeight * _deviceScaling));
 
       mapPoints.boundingBoxSWT = new Rectangle(
 
@@ -1776,10 +1776,10 @@ public class Map2 extends Canvas {
 
          mapPoints.boundingBox_ResizedAWT = new java.awt.Rectangle(
 
-               bboxTopLeft_DevX_Resized,
-               bboxTopLeft_DevY_Resized,
-               bboxWidth_Resized,
-               bboxHeight_Resized
+               (int) (bboxTopLeft_DevX_Resized * _deviceScaling),
+               (int) (bboxTopLeft_DevY_Resized * _deviceScaling),
+               (int) (bboxWidth_Resized * _deviceScaling),
+               (int) (bboxHeight_Resized * _deviceScaling)
 
          );
 
@@ -10236,6 +10236,12 @@ public class Map2 extends Canvas {
             }
          }
       }
+   }
+
+   public void resetTours_Photos() {
+
+      // prevent that old photo images are displayed when a new tour should be displayed
+      Map2PainterConfig.getPhotos().clear();
    }
 
    /**

@@ -27,6 +27,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.util.NoAutoScalingImageDataProvider;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.Messages;
 import net.tourbook.photo.IPhotoPreferences;
@@ -35,6 +36,7 @@ import net.tourbook.photo.PhotoUI;
 import net.tourbook.photo.RatingStars;
 
 import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -42,8 +44,10 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Display;
 
 public class DirectMappingPainter implements IDirectPainter {
@@ -109,9 +113,19 @@ public class DirectMappingPainter implements IDirectPainter {
 
       _map2 = map2;
 
-// SET_FORMATTING_OFF
+      final int deviceZoom = DPIUtil.getDeviceZoom();
 
-      _imageMapLocation_Hovered  = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Hovered).createImage();
+      // get unscaled image
+      final ImageDescriptor imageDescriptor = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Hovered);
+
+// THIS NEEDS TO BE USED WHEN THE LOCATION ICON IS UNSCALES      
+//      final ImageData imageData = imageDescriptor.getImageData(deviceZoom);
+
+      final ImageData imageData = imageDescriptor.getImageData(100);
+
+      _imageMapLocation_Hovered = new Image(Display.getDefault(), new NoAutoScalingImageDataProvider(imageData));
+
+// SET_FORMATTING_OFF
 
       _imageSlider_Left          = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderLeft).createImage();
       _imageSlider_Right         = TourbookPlugin.getImageDescriptor(Messages.Image_Map_MarkerSliderRight).createImage();
@@ -272,9 +286,13 @@ public class DirectMappingPainter implements IDirectPainter {
          final int imageHeight = _imageMapLocationBounds.height;
          final int imageWidth2 = imageWidth / 2;
 
+//         gc.drawImage(_imageMapLocation_Hovered,
+//               (int) ((mapPointDevX - imageWidth2) / deviceScaling),
+//               (int) ((mapPointDevY - imageHeight) / deviceScaling));
+
          gc.drawImage(_imageMapLocation_Hovered,
-               mapPointDevX - imageWidth2,
-               mapPointDevY - imageHeight);
+               (int) ((mapPointDevX) / deviceScaling) - imageWidth2,
+               (int) ((mapPointDevY) / deviceScaling) - imageHeight);
 
       } else {
 

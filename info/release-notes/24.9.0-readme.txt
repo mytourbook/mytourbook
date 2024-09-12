@@ -1,14 +1,16 @@
-24.9.0                                                 ?. September 2024
+24.9.0                                                 12. September 2024
 
 New
 ===
 
 * Beautified 4k Display
+  The main focus in this version was that MyTourbook looks better on 4k displays 
+  https://github.com/mytourbook/mytourbook/discussions/1389
   - Rescaled 550+ icons
   - 2D Map
+    - Support @2x map tiles
     - Rescaled map legend
     - Rescaled SRTM map color provider
-    - Support @2x map tiles
 
 * 2D Map
   - Waypoints are now painted as map points
@@ -24,20 +26,26 @@ Improvements
 Changes
 =======
 
-* Map2
+* 2D Map
   - Show waypoints action in the context menu is moved into the map points slideout
+
+
+Bugs
+====
+
+See milestone 24.9 https://github.com/mytourbook/mytourbook/milestone/17?closed=1
 
 
 Translation    
 ===========
 
-- none
+Skipped, there are only a few new texts
 
  
 System   
 ======
 
-* MyTourbook Milestone 24.5   https://github.com/mytourbook/mytourbook/milestone/14?closed=1
+* MyTourbook Milestone 24.9   https://github.com/mytourbook/mytourbook/milestone/17?closed=1
 * Java 17                     https://adoptium.net/temurin/releases/?version=17
 * Eclipse 2024-03 (4.31)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.31-202402290520/
 * NatTable 2.20               https://www.eclipse.org/nattable/download.php
