@@ -74,7 +74,8 @@ Changes that require Tour Re-import
 Bugfix
 ======
 
-* 
+See milestone 24.x https://github.com/mytourbook/mytourbook/milestone/16?closed=1
+ 
 
 
 Translation    

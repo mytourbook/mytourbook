@@ -1,4 +1,4 @@
-24.9.0                                                 ?. September 2024
+24.9.0                                                 12. September 2024
 
 New
 ===
@@ -28,10 +28,16 @@ Changes
   - Show waypoints action in the context menu is moved into the map points slideout
 
 
+Bugs
+====
+
+See milestone 24.9 https://github.com/mytourbook/mytourbook/milestone/17?closed=1
+
+
 Translation    
 ===========
 
-- none
+Skipped, there are only a few texts
 
  
 System   
