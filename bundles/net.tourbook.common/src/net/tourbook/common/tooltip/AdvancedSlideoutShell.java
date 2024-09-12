@@ -119,8 +119,6 @@ public abstract class AdvancedSlideoutShell {
 
    private int                        _fadeOutDelayCounter;
 
-   private double                     _maxHeightFactor                    = 0.8;
-
    private int                        _horizContentWidth                  = MIN_SHELL_HORIZ_WIDTH;
    private int                        _horizContentHeight                 = MIN_SHELL_HORIZ_HEIGHT;
    private int                        _vertContentWidth                   = MIN_SHELL_VERT_WIDTH;
@@ -1334,10 +1332,12 @@ public abstract class AdvancedSlideoutShell {
 
       // ensure tooltip is not too large
       final Rectangle displayBounds = getDisplayBounds(shellLocation);
-      final double maxHeight = displayBounds.height * _maxHeightFactor;
-      final double maxWidth = displayBounds.width * 0.95;
+      final double maxHeight = displayBounds.height;
+      final double maxWidth = displayBounds.width;
 
       boolean isResizeAdjusted = false;
+      boolean isHeightAdjusted = false;
+      boolean isWidthAdjusted = false;
 
       final Rectangle clientArea = resizeShell.getClientArea();
       int newContentWidth = clientArea.width;
@@ -1345,18 +1345,18 @@ public abstract class AdvancedSlideoutShell {
 
       if (newContentHeight > maxHeight) {
          newContentHeight = (int) maxHeight;
-         isResizeAdjusted = true;
+         isHeightAdjusted = true;
       } else if (newContentHeight < MIN_SHELL_HORIZ_HEIGHT) {
          newContentHeight = MIN_SHELL_HORIZ_HEIGHT;
-         isResizeAdjusted = true;
+         isHeightAdjusted = true;
       }
 
       if (newContentWidth > maxWidth) {
          newContentWidth = (int) maxWidth;
-         isResizeAdjusted = true;
+         isWidthAdjusted = true;
       } else if (newContentWidth < MIN_SHELL_HORIZ_WIDTH) {
          newContentWidth = MIN_SHELL_HORIZ_WIDTH;
-         isResizeAdjusted = true;
+         isWidthAdjusted = true;
       }
 
       if (isVerticalLayout()) {
@@ -1371,21 +1371,43 @@ public abstract class AdvancedSlideoutShell {
       final Point newContentSize = onResize(newContentWidth, newContentHeight);
       if (newContentSize != null) {
 
-         newContentWidth = newContentSize.x;
-         newContentHeight = newContentSize.y;
+         /**
+          * Set new content size only when it has changed, otherwise there can be strange resizing
+          * issues when the shell is resized with the mouse
+          * https://github.com/mytourbook/mytourbook/issues/1393
+          */
 
-         if (isVerticalLayout()) {
-            _vertContentWidth = newContentWidth;
-            _vertContentHeight = newContentHeight;
-         } else {
-            _horizContentWidth = newContentWidth;
-            _horizContentHeight = newContentHeight;
+         if (newContentWidth != newContentSize.x || newContentHeight != newContentSize.y) {
+
+            newContentWidth = newContentSize.x;
+            newContentHeight = newContentSize.y;
+
+            if (isVerticalLayout()) {
+               _vertContentWidth = newContentWidth;
+               _vertContentHeight = newContentHeight;
+            } else {
+               _horizContentWidth = newContentWidth;
+               _horizContentHeight = newContentHeight;
+            }
+
+            isResizeAdjusted = true;
          }
-
-         isResizeAdjusted = true;
       }
 
-      if (isResizeAdjusted) {
+      if (isResizeAdjusted || isWidthAdjusted || isHeightAdjusted) {
+
+         if (isWidthAdjusted && isHeightAdjusted == false) {
+
+            // force current height
+            newContentHeight = Integer.MIN_VALUE;
+         }
+
+         if (isHeightAdjusted && isWidthAdjusted == false) {
+
+            // force current width
+            newContentWidth = Integer.MIN_VALUE;
+         }
+
          _isInShellResize = true;
          {
             _rrShellWithResize.setContentSize(newContentWidth, newContentHeight);
@@ -1683,16 +1705,6 @@ public abstract class AdvancedSlideoutShell {
       if (isPinned) {
          setSlideoutPinnedLocation();
       }
-   }
-
-   /**
-    * This factor is multiplied with the display height to force the max height of this slideout
-    *
-    * @param maxHeightFactor
-    */
-   public void setMaxHeightFactor(final double maxHeightFactor) {
-
-      _maxHeightFactor = maxHeightFactor;
    }
 
    protected void setShellFadeInSteps(final int shellFadeInSteps) {

@@ -88,8 +88,9 @@ public class Map2ConfigManager {
    private static final String ATTR_LABEL_DISTRIBUTOR_RADIUS         = "labelDistributorRadius";              //$NON-NLS-1$
    private static final String ATTR_LABEL_FONT_NAME                  = "labelFontName";                       //$NON-NLS-1$
    private static final String ATTR_LABEL_FONT_SIZE                  = "labelFontSize";                       //$NON-NLS-1$
-   private static final String ATTR_LABEL_RESPECT_MARGIN             = "labelRespectMargin";                        //$NON-NLS-1$
+   private static final String ATTR_LABEL_RESPECT_MARGIN             = "labelRespectMargin";                  //$NON-NLS-1$
    private static final String ATTR_LABEL_TRUNCATE_LENGTH            = "labelTruncateLength";                 //$NON-NLS-1$
+   private static final String ATTR_LOCATION_SYMBOL_SIZE             = "locationSymbolSize";                  //$NON-NLS-1$
    // tour + common location
    private static final String ATTR_IS_SHOW_COMMON_LOCATION          = "isShowCommonLocation";                //$NON-NLS-1$
    private static final String ATTR_IS_SHOW_LOCATION_BOUNDING_BOX    = "isShowLocationBoundingBox";           //$NON-NLS-1$
@@ -140,6 +141,11 @@ public class Map2ConfigManager {
    //
    private static final String TAG_TOUR_PAUSE_FILL_COLOR             = "TourPauseFillColor";                  //$NON-NLS-1$
    private static final String TAG_TOUR_PAUSE_OUTLINE_COLOR          = "TourPauseOutlineColor";               //$NON-NLS-1$
+   // tour waypoint
+   private static final String ATTR_IS_SHOW_TOUR_WAY_POINT           = "isShowTourWayPoint";                  //$NON-NLS-1$
+   //
+   private static final String TAG_TOUR_WAY_POINT_FILL_COLOR         = "TourWayPointFillColor";               //$NON-NLS-1$
+   private static final String TAG_TOUR_WAY_POINT_OUTLINE_COLOR      = "TourWayPointOutlineColor";            //$NON-NLS-1$
    //
    /*
     * Defaults, min/max
@@ -150,10 +156,10 @@ public class Map2ConfigManager {
    static final int                            LABEL_GROUP_GRID_SIZE_DEFAULT           = 300;
    public static final MapLabelLayout          LABEL_LAYOUT_DEFAULT                    = MapLabelLayout.RECTANGLE_BOX;
    static final int                            LABEL_DISTRIBUTOR_MAX_LABELS_MIN        = 10;
-   static final int                            LABEL_DISTRIBUTOR_MAX_LABELS_MAX        = 2000;
+   static final int                            LABEL_DISTRIBUTOR_MAX_LABELS_MAX        = 4000;
    static final int                            LABEL_DISTRIBUTOR_MAX_LABELS_DEFAULT    = 200;
    static final int                            LABEL_DISTRIBUTOR_RADIUS_MIN            = 10;
-   static final int                            LABEL_DISTRIBUTOR_RADIUS_MAX            = 2000;
+   static final int                            LABEL_DISTRIBUTOR_RADIUS_MAX            = 4000;
    static final int                            LABEL_DISTRIBUTOR_RADIUS_DEFAULT        = 200;
    static final String                         LABEL_FONT_NAME_DEFAULT                 = UI.AWT_DIALOG_FONT.getFontName();
    static final int                            LABEL_FONT_SIZE_MIN                     = 2;
@@ -196,6 +202,8 @@ public class Map2ConfigManager {
    public static final RGB                     DEFAULT_TOUR_MARKER_OUTLINE_RGB         = new RGB(0, 0, 0);
    public static final RGB                     DEFAULT_TOUR_PAUSE_FILL_RGB             = new RGB(255, 211, 130);
    public static final RGB                     DEFAULT_TOUR_PAUSE_OUTLINE_RGB          = new RGB(0, 0, 0);
+   public static final RGB                     DEFAULT_TOUR_WAY_POINT_FILL_RGB         = new RGB(215, 170, 255);
+   public static final RGB                     DEFAULT_TOUR_WAY_POINT_OUTLINE_RGB      = new RGB(0, 0, 0);
    //
    public static final boolean                 IS_FILTER_TOUR_PAUSES_DEFAULT           = false;
    public static final boolean                 IS_FILTER_PAUSE_DURATION_DEFAULT        = false;
@@ -334,6 +342,7 @@ public class Map2ConfigManager {
          xmlConfig.putInteger(      ATTR_LABEL_FONT_SIZE,               config.labelFontSize);
          xmlConfig.putInteger(      ATTR_LABEL_RESPECT_MARGIN,          config.labelRespectMargin);
          xmlConfig.putInteger(      ATTR_LABEL_TRUNCATE_LENGTH,         config.labelTruncateLength);
+         xmlConfig.putInteger(      ATTR_LOCATION_SYMBOL_SIZE,          config.locationSymbolSize);
 
          Util.setXmlEnum(xmlConfig, ATTR_LABEL_LAYOUT,                  config.labelLayout);
 
@@ -401,6 +410,14 @@ public class Map2ConfigManager {
 
          Util.setXmlRgb(xmlConfig,  TAG_TOUR_PAUSE_FILL_COLOR,             config.tourPauseFill_RGB);
          Util.setXmlRgb(xmlConfig,  TAG_TOUR_PAUSE_OUTLINE_COLOR,          config.tourPauseOutline_RGB);
+
+         /*
+          * Waypoint
+          */
+         xmlConfig.putBoolean(      ATTR_IS_SHOW_TOUR_WAY_POINT,           config.isShowTourWayPoint);
+
+         Util.setXmlRgb(xmlConfig,  TAG_TOUR_WAY_POINT_FILL_COLOR,         config.tourWayPointFill_RGB);
+         Util.setXmlRgb(xmlConfig,  TAG_TOUR_WAY_POINT_OUTLINE_COLOR,      config.tourWayPointOutline_RGB);
 
          /*
           * Photo
@@ -525,10 +542,11 @@ public class Map2ConfigManager {
       config.labelFontSize                = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_FONT_SIZE,               LABEL_FONT_SIZE_DEFAULT,               LABEL_FONT_SIZE_MIN,                LABEL_FONT_SIZE_MAX);
       config.labelRespectMargin           = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_RESPECT_MARGIN,          LABEL_RESPECT_MARGIN_DEFAULT,          LABEL_RESPECT_MARGIN_MIN,           LABEL_RESPECT_MARGIN_MAX);
       config.labelTruncateLength          = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_TRUNCATE_LENGTH,         LABEL_TRUNCATE_LENGTH_DEFAULT,         LABEL_TRUNCATE_LENGTH_MIN,          LABEL_TRUNCATE_LENGTH_MAX);
+      config.locationSymbolSize           = Util.getXmlInteger(xmlConfig,     ATTR_LOCATION_SYMBOL_SIZE,          LOCATION_SYMBOL_SIZE_DEFAULT,          LOCATION_SYMBOL_SIZE_MIN,           LOCATION_SYMBOL_SIZE_MAX);
+
       config.labelLayout = (MapLabelLayout) Util.getXmlEnum(   xmlConfig,     ATTR_LABEL_LAYOUT,                  LABEL_LAYOUT_DEFAULT);
 
       config.isShowTourPauses                      = Util.getXmlBoolean(xmlConfig,  ATTR_IS_SHOW_TOUR_PAUSES,           false);
-
       config.isFilterTourPauses                    = Util.getXmlBoolean(xmlConfig,  ATTR_IS_FILTER_TOUR_PAUSES,         IS_FILTER_TOUR_PAUSES_DEFAULT);
       config.isFilterTourPause_Duration            = Util.getXmlBoolean(xmlConfig,  ATTR_IS_FILTER_PAUSE_DURATION,      IS_FILTER_PAUSE_DURATION_DEFAULT);
       config.isShowAutoPauses                      = Util.getXmlBoolean(xmlConfig,  ATTR_IS_SHOW_AUTO_PAUSES,           IS_SHOW_AUTO_PAUSES_DEFAULT);
@@ -580,6 +598,9 @@ public class Map2ConfigManager {
 
          case TAG_TOUR_PAUSE_FILL_COLOR:                 config.tourPauseFill_RGB                  = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_PAUSE_FILL_RGB);                break;
          case TAG_TOUR_PAUSE_OUTLINE_COLOR:              config.tourPauseOutline_RGB               = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_PAUSE_OUTLINE_RGB);             break;
+
+         case TAG_TOUR_WAY_POINT_FILL_COLOR:             config.tourWayPointFill_RGB               = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_WAY_POINT_FILL_RGB);            break;
+         case TAG_TOUR_WAY_POINT_OUTLINE_COLOR:          config.tourWayPointOutline_RGB            = Util.getXmlRgb(xmlConfigChild, DEFAULT_TOUR_WAY_POINT_OUTLINE_RGB);         break;
 
 // SET_FORMATTING_ON
          }

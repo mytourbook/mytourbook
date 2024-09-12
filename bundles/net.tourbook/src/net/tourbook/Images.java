@@ -414,13 +414,10 @@ public class Images {
    public static final String Zoom_CenterBy_Mouse_Disabled               = "zoom-center-mouse-disabled.png";                      //$NON-NLS-1$
    public static final String Zoom_CenterBy_Tour                         = "zoom-center-tour.png";                                //$NON-NLS-1$
    public static final String Zoom_CenterBy_Tour_Disabled                = "zoom-center-tour-disabled.png";                       //$NON-NLS-1$
-   public static final String Zoom_FitGraph                              = "zoom-fit-graph.gif";                                  //$NON-NLS-1$
    public static final String Zoom_In                                    = "zoom-in.png";                                         //$NON-NLS-1$
    public static final String Zoom_In_Disabled                           = "zoom-in-disabled.png";                                //$NON-NLS-1$
    public static final String Zoom_Out                                   = "zoom-out.png";                                        //$NON-NLS-1$
    public static final String Zoom_Out_Disabled                          = "zoom-out-disabled.png";                               //$NON-NLS-1$
-   public static final String Zoom_Out_ToMinZoom                         = "zoom-fit-graph.gif";                                  //$NON-NLS-1$
-   public static final String Zoom_Out_ToMinZoom_Disabled                = "zoom-fit-graph-disabled.gif";                         //$NON-NLS-1$
    public static final String Zoom_ShowEntireLayer                       = "map-show-entire-layer.png";                           //$NON-NLS-1$
    public static final String Zoom_ShowEntireMap                         = "zoom-show-entire-map.png";                            //$NON-NLS-1$
    public static final String Zoom_ShowEntireTour                        = "zoom-show-entire-tour.png";                           //$NON-NLS-1$

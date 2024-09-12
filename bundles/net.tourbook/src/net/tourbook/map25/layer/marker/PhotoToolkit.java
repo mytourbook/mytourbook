@@ -328,7 +328,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          // image is not invalid
 
          // check if image is in the cache
-         photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+         photoImage = PhotoImageCache.getImage_SWT(photo, requestedImageQuality);
 
          // put photo image in loading queue
          if ((photoImage == null || photoImage.isDisposed())
@@ -343,7 +343,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
             final ILoadCallBack imageLoadCallback = new LoadCallbackImage(item, photo);
 
-            PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
+            PhotoLoadManager.putImageInLoadingQueueThumb_Map(photo, requestedImageQuality, imageLoadCallback, false);
          }
 
          if (photoImage != null && photoImage.isDisposed() == false) {

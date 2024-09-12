@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,33 +15,33 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import de.byteholder.geoclipse.mapprovider.MP;
+
 import net.tourbook.common.util.HoveredAreaContext;
 
 import org.eclipse.swt.graphics.Rectangle;
 
-import de.byteholder.geoclipse.mapprovider.MP;
-
 public interface IMapToolTipProvider {
 
-	/**
-	 * @param mouseMovePositionX
-	 * @param mouseMovePositionY
-	 * @param worldPixelTopLeftViewport
-	 * @param mp
-	 * @param mapZoomLevel
-	 * @param tilePixelSize
-	 * @param isTourPaintMethodEnhanced
-	 * @param requestedObject
-	 *            Requested object which should be found in the hovered tile or <code>null</code>
-	 *            when an object not requested.
-	 * @return Returns a hovered area context or <code>null</code> when an area is not hovered.
-	 */
-	HoveredAreaContext getHoveredContext(	int mouseMovePositionX,
-											int mouseMovePositionY,
-											Rectangle worldPixelTopLeftViewport,
-											MP mp,
-											int mapZoomLevel,
-											int tilePixelSize,
-											boolean isTourPaintMethodEnhanced,
-											Object requestedObject);
+   /**
+    * @param mouseMovePositionX
+    * @param mouseMovePositionY
+    * @param worldPixelTopLeftViewport
+    * @param mp
+    * @param mapZoomLevel
+    * @param tilePixelSize
+    * @param isTourPaintMethodEnhanced
+    * @param requestedObject
+    *           Requested object which should be found in the hovered tile or <code>null</code>
+    *           when an object not requested.
+    *
+    * @return Returns a hovered area context or <code>null</code> when an area is not hovered.
+    */
+   HoveredAreaContext getHoveredContext(int mouseMovePositionX,
+                                        int mouseMovePositionY,
+                                        Rectangle worldPixelTopLeftViewport,
+                                        MP mp,
+                                        int mapZoomLevel,
+                                        int tilePixelSize,
+                                        Object requestedObject);
 }

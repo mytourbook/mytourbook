@@ -238,22 +238,43 @@ public abstract class AbstractRRShell {
       _shell.setAlpha(alpha);
    }
 
-   public void setContentSize(final int width, final int height) {
+   public void setContentSize(final int contentWidth, final int contentHeight) {
 
-      final int shellWidth = width + _shellTrimWidth * 2;
-      final int shellHeight = height + _shellTrimHeight * 2;
+      int newContentWidth = contentWidth;
+      int newContentHeight = contentHeight;
+
+      if (contentWidth == Integer.MIN_VALUE || contentHeight == Integer.MIN_VALUE) {
+
+         // keep width and/or height
+
+         final Point shellSize = _shell.getSize();
+
+         if (contentWidth == Integer.MIN_VALUE) {
+
+            newContentWidth = shellSize.x - _shellTrimWidth * 2;
+         }
+
+         if (contentHeight == Integer.MIN_VALUE) {
+
+            newContentHeight = shellSize.y - _shellTrimHeight * 2;
+         }
+      }
+
+      final int shellWidth = newContentWidth + _shellTrimWidth * 2;
+      final int shellHeight = newContentHeight + _shellTrimHeight * 2;
 
       _shell.setSize(shellWidth, shellHeight);
    }
 
    private void setContentSize(final Point size) {
+
       setContentSize(size.x, size.y);
    }
 
    public void setShellLocation(final int x, final int y, final int flag) {
 
 // Sometimes, not very often, the tooltip location is running amok, this logging should help to find this issues
-//      
+//
 //      System.out.println(UI.timeStamp() + " setShellLocation: " + x + " / " + y);
 // TODO remove SYSTEM.OUT.PRINTLN
 
@@ -278,6 +299,7 @@ public abstract class AbstractRRShell {
 
    @Override
    public String toString() {
+
       return ("_isResizeable=" + _isResizeable) //$NON-NLS-1$
             + ("\tTrimWidth=" + _shellTrimWidth) //$NON-NLS-1$
             + ("\tTrimHeight=" + _shellTrimHeight) //$NON-NLS-1$

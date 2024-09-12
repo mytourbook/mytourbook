@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -32,303 +32,311 @@ import org.eclipse.ui.XMLMemento;
 
 public class TourTypeManager {
 
-	private static final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.tourType.TourTypeManager");//$NON-NLS-1$
-
-	static {}
-
-	private static final String					TAG_ROOT						= "TourTypeImageLayout";			//$NON-NLS-1$
-	private static final String					XML_STATE_TOUR_TYPE_MANAGER		= "XML_STATE_TOUR_TYPE_MANAGER";	//$NON-NLS-1$
-	private static final String					ATTR_TOUR_TYPE_BORDER_COLOR		= "tourTypeBorderColor";			//$NON-NLS-1$
-	private static final String					ATTR_TOUR_TYPE_BORDER_LAYOUT	= "tourTypeBorderLayout";			//$NON-NLS-1$
-	private static final String					ATTR_TOUR_TYPE_BORDER_WIDTH		= "tourTypeBorderWidth";			//$NON-NLS-1$
-	private static final String					ATTR_TOUR_TYPE_IMAGE_COLOR1		= "tourTypeImageColor1";			//$NON-NLS-1$
-	private static final String					ATTR_TOUR_TYPE_IMAGE_COLOR2		= "tourTypeImageColor2";			//$NON-NLS-1$
-	private static final String					ATTR_TOUR_TYPE_IMAGE_LAYOUT		= "tourTypeImageLayout";			//$NON-NLS-1$
-
-	public static final TourTypeColor			DEFAULT_IMAGE_COLOR1			= TourTypeColor.COLOR_DARK;
-	public static final TourTypeColor			DEFAULT_IMAGE_COLOR2			= TourTypeColor.COLOR_BRIGHT;
-	public static final TourTypeLayout			DEFAULT_IMAGE_LAYOUT			= TourTypeLayout.RECTANGLE;
-	public static final TourTypeColor			DEFAULT_BORDER_COLOR			= TourTypeColor.COLOR_LINE;
-	public static final TourTypeBorder			DEFAULT_BORDER_LAYOUT			= TourTypeBorder.BORDER_LEFT_RIGHT;
-	public static final int						DEFAULT_BORDER_WIDTH			= 1;
-
-	private static final TourTypeImageConfig	_imageConfig					= new TourTypeImageConfig();
-
-	private static final TourTypeColorData[]	_allTourTypeColorData			= new TourTypeColorData[] {
+   private static final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.tourType.TourTypeManager");//$NON-NLS-1$
+
+   static {}
+
+   private static final String               TAG_ROOT                     = "TourTypeImageLayout";           //$NON-NLS-1$
+   private static final String               XML_STATE_TOUR_TYPE_MANAGER  = "XML_STATE_TOUR_TYPE_MANAGER";   //$NON-NLS-1$
+   private static final String               ATTR_TOUR_TYPE_BORDER_COLOR  = "tourTypeBorderColor";           //$NON-NLS-1$
+   private static final String               ATTR_TOUR_TYPE_BORDER_LAYOUT = "tourTypeBorderLayout";          //$NON-NLS-1$
+   private static final String               ATTR_TOUR_TYPE_BORDER_WIDTH  = "tourTypeBorderWidth";           //$NON-NLS-1$
+   private static final String               ATTR_TOUR_TYPE_IMAGE_COLOR1  = "tourTypeImageColor1";           //$NON-NLS-1$
+   private static final String               ATTR_TOUR_TYPE_IMAGE_COLOR2  = "tourTypeImageColor2";           //$NON-NLS-1$
+   private static final String               ATTR_TOUR_TYPE_IMAGE_LAYOUT  = "tourTypeImageLayout";           //$NON-NLS-1$
+   private static final String               ATTR_TOUR_TYPE_IMAGE_SCALING = "tourTypeImageScaling";          //$NON-NLS-1$
+
+   public static final TourTypeColor         DEFAULT_IMAGE_COLOR1         = TourTypeColor.COLOR_DARK;
+   public static final TourTypeColor         DEFAULT_IMAGE_COLOR2         = TourTypeColor.COLOR_BRIGHT;
+   public static final TourTypeLayout        DEFAULT_IMAGE_LAYOUT         = TourTypeLayout.RECTANGLE;
+   public static final int                   DEFAULT_IMAGE_SCALING        = 100;
+   public static final TourTypeColor         DEFAULT_BORDER_COLOR         = TourTypeColor.COLOR_LINE;
+   public static final TourTypeBorder        DEFAULT_BORDER_LAYOUT        = TourTypeBorder.BORDER_LEFT_RIGHT;
+   public static final int                   DEFAULT_BORDER_WIDTH         = 1;
+
+   private static final TourTypeImageConfig  _imageConfig                 = new TourTypeImageConfig();
+
+   private static final TourTypeColorData[]  _allTourTypeColorData        = new TourTypeColorData[] {
+
+         new TourTypeColorData(
+               TourTypeColor.COLOR_BRIGHT,
+               Messages.TourType_Config_Color_Bright),
+
+         new TourTypeColorData(
+               TourTypeColor.COLOR_DARK,
+               Messages.TourType_Config_Color_Dark),
+
+         new TourTypeColorData(
+               TourTypeColor.COLOR_LINE,
+               Messages.TourType_Config_Color_Line),
+   };
+
+   private static final TourTypeLayoutData[] _allTourTypeLayoutData       = new TourTypeLayoutData[] {
 
-			new TourTypeColorData(
-					TourTypeColor.COLOR_BRIGHT,
-					Messages.TourType_Config_Color_Bright),
+         new TourTypeLayoutData(
+               TourTypeLayout.RECTANGLE,
+               Messages.TourType_Config_Layout_Fill_Rectangle,
+               true,
+               false),
+
+         new TourTypeLayoutData(
+               TourTypeLayout.CIRCLE,
+               Messages.TourType_Config_Layout_Fill_Circle,
+               true,
+               false),
+
+         new TourTypeLayoutData(
+               TourTypeLayout.GRADIENT_HORIZONTAL,
+               Messages.TourType_Config_Layout_Gradient_Horizontal,
+               true,
+               true),
+
+         new TourTypeLayoutData(
+               TourTypeLayout.GRADIENT_VERTICAL,
+               Messages.TourType_Config_Layout_Gradient_Vertical,
+               true,
+               true),
+
+         new TourTypeLayoutData(
+               TourTypeLayout.NOTHING,
+               Messages.TourType_Config_Layout_Nothing,
+               false,
+               false),
+   };
 
-			new TourTypeColorData(
-					TourTypeColor.COLOR_DARK,
-					Messages.TourType_Config_Color_Dark),
+   private static final TourTypeBorderData[] _allTourTypeBorderData       = new TourTypeBorderData[] {
 
-			new TourTypeColorData(
-					TourTypeColor.COLOR_LINE,
-					Messages.TourType_Config_Color_Line),
-	};
+         new TourTypeBorderData(
+               TourTypeBorder.BORDER_RECTANGLE,
+               Messages.TourType_Config_Border_Rectangle),
 
-	private static final TourTypeLayoutData[]	_allTourTypeLayoutData			= new TourTypeLayoutData[] {
+         new TourTypeBorderData(
+               TourTypeBorder.BORDER_CIRCLE,
+               Messages.TourType_Config_Border_Circle),
 
-			new TourTypeLayoutData(
-					TourTypeLayout.RECTANGLE,
-					Messages.TourType_Config_Layout_Fill_Rectangle,
-					true,
-					false),
+         new TourTypeBorderData(
+               TourTypeBorder.BORDER_LEFT,
+               Messages.TourType_Config_Border_Left),
 
-			new TourTypeLayoutData(
-					TourTypeLayout.CIRCLE,
-					Messages.TourType_Config_Layout_Fill_Circle,
-					true,
-					false),
-
-			new TourTypeLayoutData(
-					TourTypeLayout.GRADIENT_HORIZONTAL,
-					Messages.TourType_Config_Layout_Gradient_Horizontal,
-					true,
-					true),
-
-			new TourTypeLayoutData(
-					TourTypeLayout.GRADIENT_VERTICAL,
-					Messages.TourType_Config_Layout_Gradient_Vertical,
-					true,
-					true),
-
-			new TourTypeLayoutData(
-					TourTypeLayout.NOTHING,
-					Messages.TourType_Config_Layout_Nothing,
-					false,
-					false),
-	};
+         new TourTypeBorderData(
+               TourTypeBorder.BORDER_RIGHT,
+               Messages.TourType_Config_Border_Right),
 
-	private static final TourTypeBorderData[]	_allTourTypeBorderData			= new TourTypeBorderData[] {
+         new TourTypeBorderData(
+               TourTypeBorder.BORDER_LEFT_RIGHT,
+               Messages.TourType_Config_Border_LeftRight),
 
-			new TourTypeBorderData(
-					TourTypeBorder.BORDER_RECTANGLE,
-					Messages.TourType_Config_Border_Rectangle),
+         new TourTypeBorderData(
+               TourTypeBorder.BORDER_TOP,
+               Messages.TourType_Config_Border_Top),
 
-			new TourTypeBorderData(
-					TourTypeBorder.BORDER_CIRCLE,
-					Messages.TourType_Config_Border_Circle),
+         new TourTypeBorderData(
+               TourTypeBorder.BORDER_BOTTOM,
+               Messages.TourType_Config_Border_Bottom),
 
-			new TourTypeBorderData(
-					TourTypeBorder.BORDER_LEFT,
-					Messages.TourType_Config_Border_Left),
+         new TourTypeBorderData(
+               TourTypeBorder.BORDER_TOP_BOTTOM,
+               Messages.TourType_Config_Border_TopBottom),
 
-			new TourTypeBorderData(
-					TourTypeBorder.BORDER_RIGHT,
-					Messages.TourType_Config_Border_Right),
+   };
 
-			new TourTypeBorderData(
-					TourTypeBorder.BORDER_LEFT_RIGHT,
-					Messages.TourType_Config_Border_LeftRight),
+   public static class TourTypeBorderData {
 
-			new TourTypeBorderData(
-					TourTypeBorder.BORDER_TOP,
-					Messages.TourType_Config_Border_Top),
+      public TourTypeBorder tourTypeBorder;
+      public String         label;
 
-			new TourTypeBorderData(
-					TourTypeBorder.BORDER_BOTTOM,
-					Messages.TourType_Config_Border_Bottom),
+      public TourTypeBorderData(final TourTypeBorder tourTypeBorder, final String label) {
 
-			new TourTypeBorderData(
-					TourTypeBorder.BORDER_TOP_BOTTOM,
-					Messages.TourType_Config_Border_TopBottom),
+         this.tourTypeBorder = tourTypeBorder;
+         this.label = label;
+      }
+   }
 
-	};
+   public static class TourTypeColorData {
 
-	public static class TourTypeBorderData {
+      public TourTypeColor tourTypeColor;
+      public String        label;
 
-		public TourTypeBorder	tourTypeBorder;
-		public String			label;
+      public TourTypeColorData(final TourTypeColor tourTypeColor, final String label) {
 
-		public TourTypeBorderData(final TourTypeBorder tourTypeBorder, final String label) {
+         this.tourTypeColor = tourTypeColor;
+         this.label = label;
+      }
+   }
 
-			this.tourTypeBorder = tourTypeBorder;
-			this.label = label;
-		}
-	}
+   public static class TourTypeLayoutData {
 
-	public static class TourTypeColorData {
+      public TourTypeLayout tourTypeLayout;
+      public String         label;
+      public boolean        isColor1;
+      public boolean        isColor2;
 
-		public TourTypeColor	tourTypeColor;
-		public String			label;
+      public TourTypeLayoutData(final TourTypeLayout tourTypeLayout,
+                                final String label,
+                                final boolean isColor1,
+                                final boolean isColor2) {
 
-		public TourTypeColorData(final TourTypeColor tourTypeColor, final String label) {
+         this.tourTypeLayout = tourTypeLayout;
+         this.label = label;
+         this.isColor1 = isColor1;
+         this.isColor2 = isColor2;
+      }
+   }
 
-			this.tourTypeColor = tourTypeColor;
-			this.label = label;
-		}
-	}
+   public static TourTypeBorderData[] getAllTourTypeBorderData() {
+      return _allTourTypeBorderData;
+   }
 
-	public static class TourTypeLayoutData {
+   public static TourTypeColorData[] getAllTourTypeColorData() {
+      return _allTourTypeColorData;
+   }
 
-		public TourTypeLayout	tourTypeLayout;
-		public String			label;
-		public boolean			isColor1;
-		public boolean			isColor2;
+   public static TourTypeLayoutData[] getAllTourTypeLayoutData() {
+      return _allTourTypeLayoutData;
+   }
 
-		public TourTypeLayoutData(	final TourTypeLayout tourTypeLayout,
-									final String label,
-									final boolean isColor1,
-									final boolean isColor2) {
+   public static TourTypeImageConfig getImageConfig() {
+      return _imageConfig;
+   }
 
-			this.tourTypeLayout = tourTypeLayout;
-			this.label = label;
-			this.isColor1 = isColor1;
-			this.isColor2 = isColor2;
-		}
-	}
+   public static int getTourTypeBorderIndex(final TourTypeBorder requestedData) {
 
-	public static TourTypeBorderData[] getAllTourTypeBorderData() {
-		return _allTourTypeBorderData;
-	}
+      final TourTypeBorderData[] allData = getAllTourTypeBorderData();
 
-	public static TourTypeColorData[] getAllTourTypeColorData() {
-		return _allTourTypeColorData;
-	}
+      for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
 
-	public static TourTypeLayoutData[] getAllTourTypeLayoutData() {
-		return _allTourTypeLayoutData;
-	}
+         final TourTypeBorderData data = allData[dataIndex];
 
-	public static TourTypeImageConfig getImageConfig() {
-		return _imageConfig;
-	}
+         if (data.tourTypeBorder.equals(requestedData)) {
+            return dataIndex;
+         }
+      }
 
-	public static int getTourTypeBorderIndex(final TourTypeBorder requestedData) {
+      // this should not happen
+      return 0;
+   }
 
-		final TourTypeBorderData[] allData = getAllTourTypeBorderData();
+   public static int getTourTypeColorIndex(final TourTypeColor requestedData) {
 
-		for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
+      final TourTypeColorData[] allData = getAllTourTypeColorData();
 
-			final TourTypeBorderData data = allData[dataIndex];
+      for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
 
-			if (data.tourTypeBorder.equals(requestedData)) {
-				return dataIndex;
-			}
-		}
+         final TourTypeColorData data = allData[dataIndex];
 
-		// this should not happen
-		return 0;
-	}
+         if (data.tourTypeColor.equals(requestedData)) {
+            return dataIndex;
+         }
+      }
 
-	public static int getTourTypeColorIndex(final TourTypeColor requestedData) {
+      // this should not happen
+      return 0;
+   }
 
-		final TourTypeColorData[] allData = getAllTourTypeColorData();
+   public static int getTourTypeLayoutIndex(final TourTypeLayout requestedData) {
 
-		for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
+      final TourTypeLayoutData[] allData = getAllTourTypeLayoutData();
 
-			final TourTypeColorData data = allData[dataIndex];
+      for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
 
-			if (data.tourTypeColor.equals(requestedData)) {
-				return dataIndex;
-			}
-		}
+         final TourTypeLayoutData data = allData[dataIndex];
 
-		// this should not happen
-		return 0;
-	}
+         if (data.tourTypeLayout.equals(requestedData)) {
+            return dataIndex;
+         }
+      }
 
-	public static int getTourTypeLayoutIndex(final TourTypeLayout requestedData) {
+      // this should not happen
+      return 0;
+   }
 
-		final TourTypeLayoutData[] allData = getAllTourTypeLayoutData();
+   public static void restoreState() {
 
-		for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
+      final String stateValue = Util.getStateString(_state, XML_STATE_TOUR_TYPE_MANAGER, null);
+      if (stateValue != null) {
 
-			final TourTypeLayoutData data = allData[dataIndex];
+         try {
 
-			if (data.tourTypeLayout.equals(requestedData)) {
-				return dataIndex;
-			}
-		}
+            final Reader reader = new StringReader(stateValue);
+            final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
 
-		// this should not happen
-		return 0;
-	}
+            /*
+             * Image
+             */
+            _imageConfig.imageLayout = (TourTypeLayout) Util.getXmlEnum(
+                  xmlRoot,
+                  ATTR_TOUR_TYPE_IMAGE_LAYOUT,
+                  DEFAULT_IMAGE_LAYOUT);
 
-	public static void restoreState() {
+            _imageConfig.imageColor1 = (TourTypeColor) Util.getXmlEnum(
+                  xmlRoot,
+                  ATTR_TOUR_TYPE_IMAGE_COLOR1,
+                  DEFAULT_IMAGE_COLOR1);
 
-		final String stateValue = Util.getStateString(_state, XML_STATE_TOUR_TYPE_MANAGER, null);
-		if (stateValue != null) {
+            _imageConfig.imageColor2 = (TourTypeColor) Util.getXmlEnum(
+                  xmlRoot,
+                  ATTR_TOUR_TYPE_IMAGE_COLOR2,
+                  DEFAULT_IMAGE_COLOR2);
 
-			try {
+            _imageConfig.imageScaling = Util.getXmlInteger(
+                  xmlRoot,
+                  ATTR_TOUR_TYPE_IMAGE_SCALING,
+                  DEFAULT_IMAGE_SCALING);
 
-				final Reader reader = new StringReader(stateValue);
-				final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
+            /*
+             * Border
+             */
+            _imageConfig.borderColor = (TourTypeColor) Util.getXmlEnum(
+                  xmlRoot,
+                  ATTR_TOUR_TYPE_BORDER_COLOR,
+                  DEFAULT_BORDER_COLOR);
 
-				/*
-				 * Image
-				 */
-				_imageConfig.imageLayout = (TourTypeLayout) Util.getXmlEnum(
-						xmlRoot,
-						ATTR_TOUR_TYPE_IMAGE_LAYOUT,
-						DEFAULT_IMAGE_LAYOUT);
+            _imageConfig.borderLayout = (TourTypeBorder) Util.getXmlEnum(
+                  xmlRoot,
+                  ATTR_TOUR_TYPE_BORDER_LAYOUT,
+                  DEFAULT_BORDER_LAYOUT);
 
-				_imageConfig.imageColor1 = (TourTypeColor) Util.getXmlEnum(
-						xmlRoot,
-						ATTR_TOUR_TYPE_IMAGE_COLOR1,
-						DEFAULT_IMAGE_COLOR1);
+            _imageConfig.borderWidth = Util.getXmlInteger(
+                  xmlRoot,
+                  ATTR_TOUR_TYPE_BORDER_WIDTH,
+                  DEFAULT_BORDER_WIDTH);
 
-				_imageConfig.imageColor2 = (TourTypeColor) Util.getXmlEnum(
-						xmlRoot,
-						ATTR_TOUR_TYPE_IMAGE_COLOR2,
-						DEFAULT_IMAGE_COLOR2);
+         } catch (final WorkbenchException e) {
+            // ignore
+         }
+      }
+   }
 
-				/*
-				 * Border
-				 */
-				_imageConfig.borderColor = (TourTypeColor) Util.getXmlEnum(
-						xmlRoot,
-						ATTR_TOUR_TYPE_BORDER_COLOR,
-						DEFAULT_BORDER_COLOR);
+   public static void saveState() {
 
-				_imageConfig.borderLayout = (TourTypeBorder) Util.getXmlEnum(
-						xmlRoot,
-						ATTR_TOUR_TYPE_BORDER_LAYOUT,
-						DEFAULT_BORDER_LAYOUT);
+      // use xml to can use the enum tools
+      final XMLMemento xmlRoot = XMLMemento.createWriteRoot(TAG_ROOT);
 
-				_imageConfig.borderWidth = Util.getXmlInteger(
-						xmlRoot,
-						ATTR_TOUR_TYPE_BORDER_WIDTH,
-						DEFAULT_BORDER_WIDTH);
+      /*
+       * Image
+       */
+      Util.setXmlEnum(xmlRoot, ATTR_TOUR_TYPE_IMAGE_LAYOUT, _imageConfig.imageLayout);
+      Util.setXmlEnum(xmlRoot, ATTR_TOUR_TYPE_IMAGE_COLOR1, _imageConfig.imageColor1);
+      Util.setXmlEnum(xmlRoot, ATTR_TOUR_TYPE_IMAGE_COLOR2, _imageConfig.imageColor2);
+      xmlRoot.putInteger(ATTR_TOUR_TYPE_IMAGE_SCALING, _imageConfig.imageScaling);
 
-			} catch (final WorkbenchException e) {
-				// ignore
-			}
-		}
-	}
+      /*
+       * Border
+       */
+      Util.setXmlEnum(xmlRoot, ATTR_TOUR_TYPE_BORDER_COLOR, _imageConfig.borderColor);
+      Util.setXmlEnum(xmlRoot, ATTR_TOUR_TYPE_BORDER_LAYOUT, _imageConfig.borderLayout);
+      xmlRoot.putInteger(ATTR_TOUR_TYPE_BORDER_WIDTH, _imageConfig.borderWidth);
 
-	public static void saveState() {
+      // Write the XML block to the state store.
+      try (final Writer writer = new StringWriter()) {
 
-		// use xml to can use the enum tools
-		final XMLMemento xmlRoot = XMLMemento.createWriteRoot(TAG_ROOT);
+         xmlRoot.save(writer);
+         _state.put(XML_STATE_TOUR_TYPE_MANAGER, writer.toString());
 
-		/*
-		 * Image
-		 */
-		Util.setXmlEnum(xmlRoot, ATTR_TOUR_TYPE_IMAGE_LAYOUT, _imageConfig.imageLayout);
-		Util.setXmlEnum(xmlRoot, ATTR_TOUR_TYPE_IMAGE_COLOR1, _imageConfig.imageColor1);
-		Util.setXmlEnum(xmlRoot, ATTR_TOUR_TYPE_IMAGE_COLOR2, _imageConfig.imageColor2);
+      } catch (final IOException e) {
+         StatusUtil.log(e);
+      }
 
-		/*
-		 * Border
-		 */
-		Util.setXmlEnum(xmlRoot, ATTR_TOUR_TYPE_BORDER_COLOR, _imageConfig.borderColor);
-		Util.setXmlEnum(xmlRoot, ATTR_TOUR_TYPE_BORDER_LAYOUT, _imageConfig.borderLayout);
-		xmlRoot.putInteger(ATTR_TOUR_TYPE_BORDER_WIDTH, _imageConfig.borderWidth);
-
-		// Write the XML block to the state store.
-		try (final Writer writer = new StringWriter()) {
-
-			xmlRoot.save(writer);
-			_state.put(XML_STATE_TOUR_TYPE_MANAGER, writer.toString());
-
-		} catch (final IOException e) {
-			StatusUtil.log(e);
-		}
-
-	}
+   }
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,6 +38,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 
@@ -50,83 +51,91 @@ import org.eclipse.swt.graphics.Image;
 
 public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea, Serializable {
 
-   private static final long          serialVersionUID            = 1L;
+   private static final long                serialVersionUID            = 1L;
 
-   private static final char          NL                          = UI.NEW_LINE;
+   private static final char                NL                          = UI.NEW_LINE;
 
-   private static final String        IMAGE_MAP_WAY_POINT_HOVERED = Images.Map_WayPoint_Hovered;
+   private static final String              IMAGE_MAP_WAY_POINT_HOVERED = Images.Map_WayPoint_Hovered;
 
-   public static final int            DB_LENGTH_NAME              = 1024;
-   public static final int            DB_LENGTH_DESCRIPTION       = 4096;
-   public static final int            DB_LENGTH_COMMENT           = 4096;
-   public static final int            DB_LENGTH_SYMBOL            = 1024;
-   public static final int            DB_LENGTH_CATEGORY          = 1024;
+   public static final int                  DB_LENGTH_NAME              = 1024;
+   public static final int                  DB_LENGTH_DESCRIPTION       = 4096;
+   public static final int                  DB_LENGTH_COMMENT           = 4096;
+   public static final int                  DB_LENGTH_SYMBOL            = 1024;
+   public static final int                  DB_LENGTH_CATEGORY          = 1024;
 
    @Transient
-   private static Image               _twpHoveredImage;
+   private static Image                     _twpHoveredImage;
 
    /**
     * Manually created way points or imported way points need a unique id to identify them, saved
     * way points are compared with the way point id.
     */
    @Transient
-   private static final AtomicInteger _createCounter              = new AtomicInteger();
+   private static final AtomicInteger       _createCounter              = new AtomicInteger();
 
    /**
     * Unique id for the {@link TourWayPoint} entity
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long                       wayPointId                  = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                             wayPointId                  = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    @ManyToOne(optional = false)
-   private TourData                   tourData;
+   private TourData                         tourData;
 
-   // initialize with invalid values
-   private double      longitude = Double.MIN_VALUE;
-
-   private double      latitude  = Double.MIN_VALUE;
+   /**
+    * Initialize with invalid values
+    */
+   private double                           longitude                   = Double.MIN_VALUE;
+   private double                           latitude                    = Double.MIN_VALUE;
 
    /**
     * Absolute time in milliseconds since 1970-01-01T00:00:00Z with the default time zone.
     */
-   private long        time;
+   private long                             time;
 
    /**
     * Altitude in meters or {@link Float#MIN_VALUE} when not available.
     */
-   private float       altitude  = Float.MIN_VALUE;
-   private String      name;
-   private String      description;
-   private String      comment;
+   private float                            altitude                    = Float.MIN_VALUE;
 
-   private String      symbol;
+   private String                           name;
+   private String                           description;
+   private String                           comment;
 
-   private String      category;
+   private String                           symbol;
+
+   private String                           category;
 
    /**
     * Text to display on the hyperlink, can be <code>null</code>
     *
     * @since DB version 28
     */
-   private String      urlText;
+   private String                           urlText;
 
    /**
     * URL associated with the waypoint, can be <code>null</code>
     *
     * @since DB version 28
     */
-   private String      urlAddress;
+   private String                           urlAddress;
 
    @Transient
-   private GeoPosition _geoPosition;
+   private GeoPosition                      _geoPosition;
 
    /**
     * Unique id for manually created waypoints because the {@link #wayPointId} is 0 when the
     * waypoint is not persisted.
     */
    @Transient
-   private long        _createId = _createCounter.incrementAndGet();
+   private long                             _createId                   = _createCounter.incrementAndGet();
+
+   /**
+    * Caches the world positions for the pause lat/long values for each zoom level
+    */
+   @Transient
+   private IntObjectHashMap<java.awt.Point> _worldPixelPositions;
 
    public TourWayPoint() {}
 
@@ -360,6 +369,16 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
       return wayPointId;
    }
 
+   public java.awt.Point getWorldPixelPosition(final int zoomLevel) {
+
+      if (_worldPixelPositions != null) {
+
+         return _worldPixelPositions.get(zoomLevel);
+      }
+
+      return null;
+   }
+
    @Override
    public int hashCode() {
 
@@ -487,6 +506,17 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 
    public void setUrlText(final String urlText) {
       this.urlText = urlText;
+   }
+
+   public void setWorldPixelPosition(final java.awt.Point worldPixelPosition,
+                                     final int zoomLevel) {
+
+      if (_worldPixelPositions == null) {
+
+         _worldPixelPositions = new IntObjectHashMap<>();
+      }
+
+      _worldPixelPositions.put(zoomLevel, worldPixelPosition);
    }
 
    /**

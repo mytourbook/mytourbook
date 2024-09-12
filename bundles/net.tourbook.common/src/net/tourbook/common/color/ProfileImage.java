@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -33,237 +33,239 @@ import org.eclipse.swt.graphics.RGB;
  */
 public abstract class ProfileImage implements Cloneable {
 
-	protected static final int			IMAGE_MIN_WIDTH		= 20;
-	protected static final int			IMAGE_MIN_HEIGHT	= 10;
+   protected static final int       IMAGE_MIN_WIDTH  = 20;
+   protected static final int       IMAGE_MIN_HEIGHT = 10;
 
-	private int							_imageWidth;
-	private int							_imageHeight;
+   private static final RGBVertex[] DEFAULT_VERTICES = new RGBVertex[] {
+         new RGBVertex(0, 0xff, 0, 0),
+         new RGBVertex(10, 0, 0xff, 0),
+         new RGBVertex(20, 0, 0, 0xff) };
 
-	private boolean						_isHorizontal		= true;
+   private int                      _imageWidth;
+   private int                      _imageHeight;
 
-	private static final RGBVertex[]	DEFAULT_VERTICES	= new RGBVertex[] {
-			new RGBVertex(0, 0xff, 0, 0),
-			new RGBVertex(10, 0, 0xff, 0),
-			new RGBVertex(20, 0, 0, 0xff)					};
-	/**
-	 * Contains all vertices.
-	 */
-	private ArrayList<RGBVertex>		_rgbVertices		= new ArrayList<RGBVertex>(Arrays.asList(DEFAULT_VERTICES));
+   private boolean                  _isHorizontal    = true;
 
-	private RGBVertex[]					_cachedVertices;
+   /**
+    * Contains all vertices.
+    */
+   private ArrayList<RGBVertex>     _rgbVertices     = new ArrayList<>(Arrays.asList(DEFAULT_VERTICES));
 
-	/*
-	 * UI controls
-	 */
-	private Image						_profileImage;
+   private RGBVertex[]              _cachedVertices;
 
-	public void addVertex(final int vertexPosition, final RGBVertex rgbVertex) {
+   /*
+    * UI controls
+    */
+   private Image _profileImage;
 
-		_rgbVertices.add(vertexPosition, rgbVertex);
+   public void addVertex(final int vertexPosition, final RGBVertex rgbVertex) {
 
-		// sort vertices by value
-		Collections.sort(_rgbVertices);
+      _rgbVertices.add(vertexPosition, rgbVertex);
 
-		invalidateVertices();
-	}
+      // sort vertices by value
+      Collections.sort(_rgbVertices);
 
-	public void addVertex(final RGBVertex rgbVertex) {
+      invalidateVertices();
+   }
 
-		_rgbVertices.add(rgbVertex);
+   public void addVertex(final RGBVertex rgbVertex) {
 
-		invalidateVertices();
-	}
+      _rgbVertices.add(rgbVertex);
 
-	public void addVertices(final int startValue, final int endValue, final int valueDifference, final RGB rgb) {
+      invalidateVertices();
+   }
 
-		final ArrayList<RGBVertex> newVertices = new ArrayList<RGBVertex>();
+   public void addVertices(final int startValue, final int endValue, final int valueDifference, final RGB rgb) {
 
-		for (int currentValue = startValue; currentValue <= endValue; currentValue += valueDifference) {
+      final ArrayList<RGBVertex> newVertices = new ArrayList<>();
 
-			boolean isNewValue = true;
+      for (int currentValue = startValue; currentValue <= endValue; currentValue += valueDifference) {
 
-			// check if the current value is already available
-			for (final RGBVertex vertex : _rgbVertices) {
-				if (vertex.getValue() == currentValue) {
-					// value is already available
-					isNewValue = false;
-					break;
-				}
-			}
+         boolean isNewValue = true;
 
-			if (isNewValue) {
+         // check if the current value is already available
+         for (final RGBVertex vertex : _rgbVertices) {
+            if (vertex.getValue() == currentValue) {
+               // value is already available
+               isNewValue = false;
+               break;
+            }
+         }
 
-				// create new vertex
+         if (isNewValue) {
 
-				newVertices.add(new RGBVertex(currentValue, rgb, Map3GradientColorManager.OPACITY_DEFAULT));
-			}
-		}
+            // create new vertex
 
-		if (newVertices.size() > 0) {
+            newVertices.add(new RGBVertex(currentValue, rgb, Map3GradientColorManager.OPACITY_DEFAULT));
+         }
+      }
 
-			_rgbVertices.addAll(newVertices);
+      if (newVertices.size() > 0) {
 
-			// sort vertices by value
-			Collections.sort(_rgbVertices);
+         _rgbVertices.addAll(newVertices);
 
-			invalidateVertices();
-		}
-	}
+         // sort vertices by value
+         Collections.sort(_rgbVertices);
 
-	@Override
-	public ProfileImage clone() {
+         invalidateVertices();
+      }
+   }
 
-		ProfileImage clonedObject = null;
+   @Override
+   public ProfileImage clone() {
 
-		try {
+      ProfileImage clonedObject = null;
 
-			clonedObject = (ProfileImage) super.clone();
+      try {
 
-			clonedObject._rgbVertices = new ArrayList<RGBVertex>();
+         clonedObject = (ProfileImage) super.clone();
 
-			for (final RGBVertex rgbVertex : _rgbVertices) {
-				clonedObject._rgbVertices.add(rgbVertex.clone());
-			}
+         clonedObject._rgbVertices = new ArrayList<>();
 
-		} catch (final CloneNotSupportedException e) {
-			StatusUtil.log(e);
-		}
+         for (final RGBVertex rgbVertex : _rgbVertices) {
+            clonedObject._rgbVertices.add(rgbVertex.clone());
+         }
 
-		return clonedObject;
-	}
+      } catch (final CloneNotSupportedException e) {
+         StatusUtil.log(e);
+      }
 
-	public abstract Image createImage(int width, int height, final boolean isHorizontal);
+      return clonedObject;
+   }
 
-	public void disposeImage() {
-		UI.disposeResource(_profileImage);
-	}
-
-	public Image getImage() {
-		return _profileImage;
-	}
+   public abstract Image createImage(int width, int height, final boolean isHorizontal);
+
+   public void disposeImage() {
+      UI.disposeResource(_profileImage);
+   }
+
+   public Image getImage() {
+      return _profileImage;
+   }
+
+   public abstract int getRGB(final long value);
+
+   /**
+    * @return Return rgb verticies, this list should not be modified, use
+    *         {@link #setVertices(ArrayList)} to modify this list.
+    */
+   public ArrayList<RGBVertex> getRgbVertices() {
+      return _rgbVertices;
+   }
 
-	public abstract int getRGB(final long value);
+   public RGBVertex[] getRgbVerticesArray() {
 
-	/**
-	 * @return Return rgb verticies, this list should not be modified, use
-	 *         {@link #setVertices(ArrayList)} to modify this list.
-	 */
-	public ArrayList<RGBVertex> getRgbVertices() {
-		return _rgbVertices;
-	}
+      // ensure array is valid
+      if (_cachedVertices == null) {
+         _cachedVertices = _rgbVertices.toArray(new RGBVertex[_rgbVertices.size()]);
+      }
 
-	public RGBVertex[] getRgbVerticesArray() {
+      return _cachedVertices;
+   }
 
-		// ensure array is valid
-		if (_cachedVertices == null) {
-			_cachedVertices = _rgbVertices.toArray(new RGBVertex[_rgbVertices.size()]);
-		}
+   /**
+    * @param width
+    * @param height
+    * @param isHorizontal
+    *
+    * @return Returns cached rgb vertex image, the image will be created when size or orientation
+    *         is different.
+    */
+   public Image getValidatedImage(final int width, final int height, final boolean isHorizontal) {
 
-		return _cachedVertices;
-	}
+      /*
+       * create image when the requested image size/orientation is different than the previous
+       * created image
+       */
+      if (_profileImage == null
+            || _profileImage.isDisposed()
+            || _isHorizontal != isHorizontal
+            || _imageWidth != width
+            || _imageHeight != height) {
 
-	/**
-	 * @param width
-	 * @param height
-	 * @param isHorizontal
-	 * @return Returns cached rgb vertex image, the image will be created when size or orientation
-	 *         is different.
-	 */
-	public Image getValidatedImage(final int width, final int height, final boolean isHorizontal) {
+         _isHorizontal = isHorizontal;
+         _imageWidth = width;
+         _imageHeight = height;
 
-		/*
-		 * create image when the requested image size/orientation is different than the previous
-		 * created image
-		 */
-		if (_profileImage == null
-				|| _profileImage.isDisposed()
-				|| _isHorizontal != isHorizontal
-				|| _imageWidth != width
-				|| _imageHeight != height) {
+         // dispose previous image
+         disposeImage();
 
-			_isHorizontal = isHorizontal;
-			_imageWidth = width;
-			_imageHeight = height;
+         _profileImage = createImage(width, height, isHorizontal);
+      }
 
-			// dispose previous image
-			disposeImage();
+      return _profileImage;
+   }
 
-			_profileImage = createImage(width, height, isHorizontal);
-		}
+   public String getVertexKey() {
 
-		return _profileImage;
-	}
+      final StringBuilder sb = new StringBuilder();
+      for (final RGBVertex vertex : _rgbVertices) {
+         sb.append(vertex.toString());
+      }
+      return sb.toString();
+   }
 
-	public String getVertexKey() {
+   public void invalidateCachedColors() {
 
-		final StringBuilder sb = new StringBuilder();
-		for (final RGBVertex vertex : _rgbVertices) {
-			sb.append(vertex.toString());
-		}
-		return sb.toString();
-	}
+      invalidateVertices();
+   }
 
-	public void invalidateCachedColors() {
+   private void invalidateVertices() {
 
-		invalidateVertices();
-	}
+      _cachedVertices = null;
+   }
 
-	private void invalidateVertices() {
+   /**
+    * Removes vertices.
+    *
+    * @param removedVertex
+    */
+   public void removeVertex(final RGBVertex removedVertex) {
 
-		_cachedVertices = null;
-	}
+      _rgbVertices.remove(removedVertex);
 
-	/**
-	 * Removes vertices.
-	 * 
-	 * @param removedVertex
-	 */
-	public void removeVertex(final RGBVertex removedVertex) {
+      invalidateVertices();
+   }
 
-		_rgbVertices.remove(removedVertex);
+   /**
+    * Removes vertices by index.
+    *
+    * @param vertexRemoveIndex
+    */
+   public void removeVerticesByIndex(final ArrayList<Integer> vertexRemoveIndex) {
 
-		invalidateVertices();
-	}
+      final ArrayList<RGBVertex> removedVertices = new ArrayList<>();
 
-	/**
-	 * Removes vertices by index.
-	 * 
-	 * @param vertexRemoveIndex
-	 */
-	public void removeVerticesByIndex(final ArrayList<Integer> vertexRemoveIndex) {
+      for (final Integer integer : vertexRemoveIndex) {
+         removedVertices.add(_rgbVertices.get(integer));
+      }
 
-		final ArrayList<RGBVertex> removedVertices = new ArrayList<RGBVertex>();
+      _rgbVertices.removeAll(removedVertices);
 
-		for (final Integer integer : vertexRemoveIndex) {
-			removedVertices.add(_rgbVertices.get(integer));
-		}
+      invalidateVertices();
+   }
 
-		_rgbVertices.removeAll(removedVertices);
+   public void setVertices(final ArrayList<RGBVertex> rgbVertices) {
 
-		invalidateVertices();
-	}
+      _rgbVertices.clear();
+      _rgbVertices.addAll(rgbVertices);
 
-	public void setVertices(final ArrayList<RGBVertex> rgbVertices) {
+      invalidateVertices();
+   }
 
-		_rgbVertices.clear();
-		_rgbVertices.addAll(rgbVertices);
+   public void setVertices(final RGBVertex[] rgbVertices) {
 
-		invalidateVertices();
-	}
+      _rgbVertices.clear();
+      _rgbVertices.addAll(Arrays.asList(rgbVertices));
 
-	public void setVertices(final RGBVertex[] rgbVertices) {
+      invalidateVertices();
+   }
 
-		_rgbVertices.clear();
-		_rgbVertices.addAll(Arrays.asList(rgbVertices));
-
-		invalidateVertices();
-	}
-
-	@Override
-	public String toString() {
-		final int maxLen = 10;
-		return String.format("RGBVertices [_rgbVertices=%s]", //$NON-NLS-1$
-				_rgbVertices != null ? _rgbVertices.subList(0, Math.min(_rgbVertices.size(), maxLen)) : null);
-	}
+   @Override
+   public String toString() {
+      final int maxLen = 10;
+      return String.format("RGBVertices [_rgbVertices=%s]", //$NON-NLS-1$
+            _rgbVertices != null ? _rgbVertices.subList(0, Math.min(_rgbVertices.size(), maxLen)) : null);
+   }
 
 }

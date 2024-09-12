@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.photo.internal.manager;
 
+import java.awt.image.BufferedImage;
+
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -22,16 +24,28 @@ import org.eclipse.swt.graphics.Image;
  */
 public class ImageCacheWrapper {
 
-   public String imageKey;
+   public String        imageKey;
 
-   public Image  image;
+   public BufferedImage awtImage;
+   public Image         swtImage;
 
-   public String originalImagePathName;
+   public String        originalImagePathName;
 
-   public ImageCacheWrapper(final Image image,
+   public ImageCacheWrapper(final BufferedImage awtImage,
                             final String originalImagePathName,
                             final String imageKey) {
-      this.image = image;
+
+      this.awtImage = awtImage;
+
+      this.originalImagePathName = originalImagePathName;
+      this.imageKey = imageKey;
+   }
+
+   public ImageCacheWrapper(final Image swtImage,
+                            final String originalImagePathName,
+                            final String imageKey) {
+
+      this.swtImage = swtImage;
 
       this.originalImagePathName = originalImagePathName;
       this.imageKey = imageKey;

@@ -16,7 +16,7 @@
 package net.tourbook.map2.action;
 
 import net.tourbook.map2.Messages;
-import net.tourbook.map2.view.TourPainterConfiguration;
+import net.tourbook.map2.view.Map2PainterConfig;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -52,7 +52,7 @@ public class ActionZoomLevelAdjustment extends Action implements IMenuCreator {
       @Override
       public void run() {
          _zoomLevel = _actionZoomLevel;
-         TourPainterConfiguration.setZoomLevelAdjustment(_actionZoomLevel);
+         Map2PainterConfig.setZoomLevelAdjustment(_actionZoomLevel);
       }
    }
 
@@ -112,7 +112,7 @@ public class ActionZoomLevelAdjustment extends Action implements IMenuCreator {
 
       _zoomLevel = zoomLevel;
 
-      TourPainterConfiguration.setZoomLevelAdjustment(zoomLevel);
+      Map2PainterConfig.setZoomLevelAdjustment(zoomLevel);
 
       _actionZoomLevel_0.setChecked(false);
       _actionZoomLevel_1.setChecked(false);

@@ -172,7 +172,7 @@ public class HeartRateVariabilityView extends ViewPart {
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
          setToolTipText(Messages.HRV_View_Action_ShowAllValues);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.Zoom_FitGraph));
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_ShowEntireTour));
       }
 
       @Override
@@ -190,7 +190,7 @@ public class HeartRateVariabilityView extends ViewPart {
          setToolTipText(Messages.HRV_View_Action_SynchChartScale);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncStatistics));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SyncStatistics_Disabled));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncStatistics_Disabled));
       }
 
       @Override

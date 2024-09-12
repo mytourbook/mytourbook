@@ -30,24 +30,22 @@ import java.awt.image.BufferedImage;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Util;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
 import net.tourbook.common.color.ColorProviderConfig;
+import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.LegendUnitFormat;
 import net.tourbook.common.color.MapUnits;
 import net.tourbook.common.map.GeoPosition;
-import net.tourbook.common.util.ImageConverter;
+import net.tourbook.common.util.NoAutoScalingImageDataProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourReference;
-import net.tourbook.data.TourWayPoint;
 import net.tourbook.map2.Messages;
 import net.tourbook.map3.layer.TourLegendLabel;
 import net.tourbook.photo.PhotoUI;
@@ -55,7 +53,6 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.Map2_Appearance;
 import net.tourbook.ui.views.referenceTour.ReferenceTourManager;
 
-import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -67,6 +64,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Paints a tour into the 2D map.
@@ -103,8 +101,6 @@ public class TourMapPainter extends Map2Painter {
    private static Image                   _tourStartMarker;
    private static Image                   _tourEndMarker;
 
-   private static Rectangle               _twpImageBounds;
-
    private static final NumberFormat      _nf1              = NumberFormat.getNumberInstance();
    static {
       _nf1.setMinimumFractionDigits(1);
@@ -112,11 +108,6 @@ public class TourMapPainter extends Map2Painter {
    }
 
    private static final ColorCacheSWT _colorCache = new ColorCacheSWT();
-
-   /*
-    * Static UI resources
-    */
-   private static Image _tourWayPointImage;
 
    /*
     * None static fields
@@ -149,15 +140,11 @@ public class TourMapPainter extends Map2Painter {
    /**
     * Creates a legend image with AWT framework. This image must be disposed who created it.
     *
-    * @param display
     * @param colorProvider
     * @param imageWidth
     * @param imageHeight
     * @param isDarkBackground
-    * @param isDrawVertical
-    * @param isDarkBackground
     * @param isDrawUnitShadow
-    * @param isDrawLegendText
     *
     * @return
     */
@@ -167,17 +154,20 @@ public class TourMapPainter extends Map2Painter {
                                                   final boolean isDarkBackground,
                                                   final boolean isDrawUnitShadow) {
 
-      final BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_4BYTE_ABGR);
+      final int imageWidthScaled = (int) (imageWidth * UI.SCALING_4K);
+      final int imageHeightScaled = (int) (imageHeight * UI.SCALING_4K);
 
-      final Graphics2D g2d = image.createGraphics();
+      final BufferedImage awtImage = new BufferedImage(imageWidthScaled, imageHeightScaled, BufferedImage.TYPE_4BYTE_ABGR);
+
+      final Graphics2D g2d = awtImage.createGraphics();
       try {
 
          drawMap_Legend_AWT(
                g2d,
                colorProvider,
                ColorProviderConfig.MAP2,
-               imageWidth,
-               imageHeight,
+               imageWidthScaled,
+               imageHeightScaled,
                true, // isVertical
                true, // isDrawUnits
                isDarkBackground,
@@ -187,8 +177,9 @@ public class TourMapPainter extends Map2Painter {
          g2d.dispose();
       }
 
-      return ImageConverter.convertIntoSWT(image);
+      final Image swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
 
+      return swtImage;
    }
 
    public static Image createMap3_LegendImage(final IGradientColorProvider colorProvider,
@@ -200,17 +191,23 @@ public class TourMapPainter extends Map2Painter {
                                               final boolean isDarkBackground,
                                               final boolean isDrawUnitShadow) {
 
-      final BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_4BYTE_ABGR);
+      final int imageWidthScaled = (int) (imageWidth * UI.SCALING_4K);
+      final int imageHeightScaled = (int) (imageHeight * UI.SCALING_4K);
 
-      final Graphics2D g2d = image.createGraphics();
+      final BufferedImage awtImage = new BufferedImage(imageWidthScaled, imageHeightScaled, BufferedImage.TYPE_4BYTE_ABGR);
+
+      final Graphics2D g2d = awtImage.createGraphics();
       try {
 
          drawMap_Legend_AWT(
+
                g2d,
                colorProvider,
                config,
-               imageWidth,
-               imageHeight,
+
+               imageWidthScaled,
+               imageHeightScaled,
+
                isVertical,
                isDrawUnits,
                isDarkBackground,
@@ -220,7 +217,9 @@ public class TourMapPainter extends Map2Painter {
          g2d.dispose();
       }
 
-      return ImageConverter.convertIntoSWT(image);
+      final Image swtImage = new Image(Display.getCurrent(), new NoAutoScalingImageDataProvider(awtImage));
+
+      return swtImage;
    }
 
    /**
@@ -234,38 +233,19 @@ public class TourMapPainter extends Map2Painter {
     * @param isDarkBackground
     * @param isDrawUnitShadow
     */
-   private static void drawMap_Legend_AWT(final Graphics2D g2d,
-                                          final IGradientColorProvider colorProvider,
-                                          final ColorProviderConfig config,
-                                          final int legendWidth,
-                                          final int legendHeight,
-                                          final boolean isDrawVertical,
-                                          final boolean isDrawUnits,
-                                          final boolean isDarkBackground,
-                                          final boolean isDrawUnitShadow) {
+   public static void drawMap_Legend_AWT(final Graphics2D g2d,
+                                         final IGradientColorProvider colorProvider,
+                                         final ColorProviderConfig config,
 
-// SET_FORMATTING_OFF
+                                         final int legendWidth,
+                                         final int legendHeight,
 
-      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HBGR);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VBGR);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VRGB);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+                                         final boolean isDrawVertical,
+                                         final boolean isDrawUnits,
+                                         final boolean isDarkBackground,
+                                         final boolean isDrawUnitShadow) {
 
-// sometimes it looks better with this parameter but sometimes not
-//      g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,     RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-//      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,          RenderingHints.VALUE_ANTIALIAS_ON);
-//      g2d.setRenderingHint(RenderingHints.KEY_DITHERING,             RenderingHints.VALUE_DITHER_ENABLE);
-//      g2d.setRenderingHint(RenderingHints.KEY_RENDERING,             RenderingHints.VALUE_RENDER_QUALITY);
-//      g2d.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST,     100);
-//      g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,   RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-//      g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,       RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-//      g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,        RenderingHints.VALUE_STROKE_PURE);
-
-// SET_FORMATTING_ON
+      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
       final MapUnits mapUnits = colorProvider.getMapUnits(config);
 
@@ -289,15 +269,15 @@ public class TourMapPainter extends Map2Painter {
       /*
        * Setup font
        */
-      final Font font = DEFAULT_FONT;
-      g2d.setFont(font);
-//      final Font largerFont = font.deriveFont(font.getSize() * 1.1f);
-//      g2d.setFont(largerFont);
+      final Font scaled4kFont = UI.getAWT4kScaledDefaultFont();
+      g2d.setFont(scaled4kFont);
 
       // Measure the font and the message
       final FontRenderContext fontRenderContext = g2d.getFontRenderContext();
-      final LineMetrics metrics = font.getLineMetrics(unitText, fontRenderContext);
-      final float lineheight = metrics.getHeight(); // Total line height
+      final LineMetrics metrics = DEFAULT_FONT.getLineMetrics(unitText, fontRenderContext);
+
+      // Total line height
+      final float lineheight = metrics.getHeight();
 
       /*
        * Setup legend image
@@ -346,6 +326,9 @@ public class TourMapPainter extends Map2Painter {
 
          availableLegendPixels = graphWidth;
       }
+
+      graphWidth *= UI.SCALING_4K;
+      graphHeight *= UI.SCALING_4K;
 
       // pixelValue contains the value for ONE pixel
       final float pixelValue = legendDiffValue / availableLegendPixels;
@@ -485,39 +468,12 @@ public class TourMapPainter extends Map2Painter {
             // horizontal legend
             g2d.drawLine(devValue, contentY, devValue, graphHeight);
          }
-
       }
    }
 
-   /**
-    * Draws map legend colors into the legend bounds.
-    *
-    * @param gc
-    * @param legendImageBounds
-    * @param colorProvider
-    * @param isDrawVertical
-    * @param isDrawVertical
-    *           When <code>true</code> the legend is drawn vertically otherwise it's drawn
-    *           horizontally.
-    * @param isDarkBackground
-    * @param isDrawLegendText
-    */
-   public static void drawMap2_Legend(final GC gc,
-                                      final Rectangle legendImageBounds,
-                                      final IMapColorProvider colorProvider) {
-
-      if (colorProvider instanceof IGradientColorProvider) {
-
-         drawMap2_Legend_GradientColors_SWT(
-               gc,
-               legendImageBounds,
-               (IGradientColorProvider) colorProvider);
-      }
-   }
-
-   private static void drawMap2_Legend_GradientColors_SWT(final GC gc,
-                                                          final Rectangle imageBounds,
-                                                          final IGradientColorProvider colorProvider) {
+   public static void drawMap2_Legend_GradientColors_AWT(final Graphics2D g2d,
+                                                         final Rectangle iconBounds,
+                                                         final IGradientColorProvider colorProvider) {
 
       final MapUnits mapUnits = colorProvider.getMapUnits(ColorProviderConfig.MAP2);
 
@@ -544,11 +500,11 @@ public class TourMapPainter extends Map2Painter {
       int availableLegendPixels;
 
       // horizontal legend
-      contentX = imageBounds.x;
-      contentY = imageBounds.y;
+      contentX = iconBounds.x;
+      contentY = iconBounds.y;
 
-      contentWidth = imageBounds.width;
-      contentHeight = imageBounds.height;
+      contentWidth = iconBounds.width;
+      contentHeight = iconBounds.height;
 
       availableLegendPixels = contentWidth;
 
@@ -570,11 +526,9 @@ public class TourMapPainter extends Map2Painter {
          final long valueRGB = colorProvider.getRGBValue(ColorProviderConfig.MAP2, legendValue);
          final Color valueColor = _colorCache.getColor((int) valueRGB);
 
-         gc.setForeground(valueColor);
-
          // horizontal legend
-
-         gc.drawLine(devXorY_Value, contentY, devXorY_Value, contentHeight);
+         g2d.setColor(ColorUtil.convertSWTColor_into_AWTColor(valueColor));
+         g2d.drawLine(devXorY_Value, contentY, devXorY_Value, contentHeight);
       }
 
       _colorCache.dispose();
@@ -651,7 +605,7 @@ public class TourMapPainter extends Map2Painter {
             if (legendValue >= unitValue) {
 
                /*
-                * get unit label
+                * Get unit label
                 */
                String valueText;
                if (unitLabels == null) {
@@ -673,6 +627,7 @@ public class TourMapPainter extends Map2Painter {
                   }
 
                } else {
+
                   // when unitLabels are available, they will overwrite the default labeling
                   valueText = unitLabels.get(unitLabelIndex++);
                }
@@ -761,19 +716,14 @@ public class TourMapPainter extends Map2Painter {
       _tourStartMarker = TourbookPlugin.getImageDescriptor(Messages.Image_Map_TourStartMarker).createImage();
       _tourEndMarker = TourbookPlugin.getImageDescriptor(Messages.Image_Map_TourEndMarker).createImage();
 
-      _tourWayPointImage = TourbookPlugin.getImageDescriptor(Images.Map_WayPoint).createImage();
-      _twpImageBounds = _tourWayPointImage.getBounds();
-
       _isImageAvailable = true;
    }
 
    @Override
-   protected void dispose() {
+   public void dispose() {
 
       UI.disposeResource(_tourEndMarker);
       UI.disposeResource(_tourStartMarker);
-
-      UI.disposeResource(_tourWayPointImage);
 
       _isImageAvailable = false;
    }
@@ -784,19 +734,19 @@ public class TourMapPainter extends Map2Painter {
    }
 
    @Override
-   protected boolean doPaint(final GC gcTile,
-                             final Map2 map,
-                             final Tile tile,
-                             final int parts,
-                             final boolean isFastPainting,
-                             final int fastPainting_SkippedValues) {
+   public boolean doPaint(final GC gcTile,
+                          final Map2 map,
+                          final Tile tile,
+                          final int parts,
+                          final boolean isFastPainting,
+                          final int fastPainting_SkippedValues) {
 
       _isFastPainting = isFastPainting;
       _fastPainting_SkippedValues = fastPainting_SkippedValues;
 
       initPainter();
 
-      final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
+      final ArrayList<TourData> allTourData = Map2PainterConfig.getTourData();
 
       if (allTourData.isEmpty()) {
          return false;
@@ -809,7 +759,7 @@ public class TourMapPainter extends Map2Painter {
       }
 
       // first draw the tour, then the marker and photos
-      if (TourPainterConfiguration.isShowTours) {
+      if (Map2PainterConfig.isShowTours) {
 
          if (_prefIsAntialiasPainting) {
             gcTile.setAntialias(SWT.ON);
@@ -903,7 +853,7 @@ public class TourMapPainter extends Map2Painter {
             int staticMarkerCounter = 0;
 
             // draw start/end marker
-            if (TourPainterConfiguration.isShowTourStartEnd) {
+            if (Map2PainterConfig.isShowTourStartEnd) {
 
                // draw end marker first
                if (drawStaticMarker(
@@ -936,69 +886,6 @@ public class TourMapPainter extends Map2Painter {
          }
 
          _colorCache.dispose();
-      }
-
-      if (TourPainterConfiguration.isShowWayPoints) {
-
-         // draw marker/pauses above the tour
-
-         for (final TourData tourData : allTourData) {
-
-            if (tourData == null) {
-               continue;
-            }
-
-            // check if geo position is available
-            final double[] latitudeSerie = tourData.latitudeSerie;
-            final double[] longitudeSerie = tourData.longitudeSerie;
-            if (latitudeSerie == null || longitudeSerie == null) {
-               continue;
-            }
-
-            setDataSerie(tourData);
-
-            if (TourPainterConfiguration.isShowWayPoints) {
-
-               // check if way points are available
-               final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
-               if (wayPoints.size() > 0) {
-
-                  /*
-                   * world positions are cached to optimize performance
-                   */
-                  final MP mp = map.getMapProvider();
-                  final int projectionHash = mp.getProjection().getId().hashCode();
-                  final int mapZoomLevel = map.getZoom();
-
-                  IntObjectHashMap<Point> allWayPointWorldPixel = tourData.getWorldPositionForWayPoints(
-                        projectionHash,
-                        mapZoomLevel);
-
-                  if ((allWayPointWorldPixel == null)) {
-                     allWayPointWorldPixel = setupWorldPixel_WayPoint(
-                           tourData,
-                           wayPoints,
-                           mp,
-                           projectionHash,
-                           mapZoomLevel);
-                  }
-
-                  // draw tour way points
-
-                  int wayPointCounter = 0;
-                  for (final TourWayPoint tourWayPoint : wayPoints) {
-
-                     final Point twpWorldPixel = allWayPointWorldPixel.get(tourWayPoint.hashCode());
-
-                     if (drawTourWayPoint(gcTile, map, tile, tourWayPoint, twpWorldPixel, parts)) {
-                        wayPointCounter++;
-                     }
-                  }
-
-                  isContentInTile = isContentInTile || wayPointCounter > 0;
-               }
-            }
-         }
       }
 
       return isContentInTile;
@@ -1637,73 +1524,6 @@ public class TourMapPainter extends Map2Painter {
    }
 
    /**
-    * @param gcTile
-    * @param map
-    * @param tile
-    * @param twp
-    * @param twpWorldPixel
-    * @param parts
-    *
-    * @return Returns <code>true</code> when way point has been painted
-    */
-   private boolean drawTourWayPoint(final GC gcTile,
-                                    final Map2 map,
-                                    final Tile tile,
-                                    final TourWayPoint twp,
-                                    final Point twpWorldPixel,
-                                    final int parts) {
-
-      final MP mp = map.getMapProvider();
-      final int zoomLevel = map.getZoom();
-      final int tileSize = mp.getTileSize();
-      final int devPartOffset = ((parts - 1) / 2) * tileSize;
-
-      // get world viewport for the current tile
-      final int tileWorldPixelX = tile.getX() * tileSize;
-      final int tilwWorldPixelY = tile.getY() * tileSize;
-
-      // convert world position into device position
-      final int devWayPointX = twpWorldPixel.x - tileWorldPixelX;
-      final int devWayPointY = twpWorldPixel.y - tilwWorldPixelY;
-
-      final boolean isBoundsInTile = isInTile_Bounds(_twpImageBounds, devWayPointX, devWayPointY, tileSize);
-
-      if (isBoundsInTile) {
-
-         int devX = devWayPointX - _twpImageBounds.width / 2;
-         int devY = devWayPointY - _twpImageBounds.height;
-
-         devX += devPartOffset;
-         devY += devPartOffset;
-
-         gcTile.drawImage(_tourWayPointImage, devX, devY);
-
-//       gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-//       gc.setLineWidth(1);
-//       gc.drawRectangle(devX, devY, _twpImageBounds.width, _twpImageBounds.height);
-//
-         tile.addTourWayPointBounds(
-               twp,
-               new Rectangle(
-                     devX - devPartOffset,
-                     devY - devPartOffset,
-                     _twpImageBounds.width,
-                     _twpImageBounds.height),
-               zoomLevel,
-               parts);
-
-         /*
-          * check if the way point paints into a neighbor tile
-          */
-         if (parts > 1) {
-
-         }
-      }
-
-      return isBoundsInTile;
-   }
-
-   /**
     * @param config
     * @param legendBounds
     * @param valueIndex
@@ -1910,51 +1730,10 @@ public class TourMapPainter extends Map2Painter {
       return false;
    }
 
-   private boolean isInTile_WayPoint(final TourData tourData,
-                                     final MP mp,
-                                     final int mapZoomLevel,
-                                     final Tile tile,
-                                     final int projectionHash) {
-
-      // check if way points available
-      final Set<TourWayPoint> tourWayPoints = tourData.getTourWayPoints();
-
-      if (tourWayPoints.size() > 0) {
-
-         // tiles are cached to optimize performance when multiple tours are selected
-         IntHashSet tileHashes = tourData.getTileHashes_ForWayPoints(projectionHash, mapZoomLevel);
-
-         if (tileHashes == null) {
-
-            // tile hashes are not yet cached, create them now
-
-            tileHashes = setupTileHashes_WayPoint(
-                  tourData,
-                  mp,
-                  mapZoomLevel,
-                  tourWayPoints,
-                  projectionHash);
-         }
-
-         int tileHash = 15;
-         tileHash = 35 * tileHash + tile.getX();
-         tileHash = 35 * tileHash + tile.getY();
-
-         if (tileHashes.contains(tileHash)) {
-
-            // way point is in this tile
-
-            return true;
-         }
-      }
-
-      return false;
-   }
-
    @Override
-   protected boolean isPaintingNeeded(final Map2 map, final Tile tile) {
+   public boolean isPaintingNeeded(final Map2 map, final Tile tile) {
 
-      final ArrayList<TourData> allTourData = TourPainterConfiguration.getTourData();
+      final ArrayList<TourData> allTourData = Map2PainterConfig.getTourData();
 
       if (allTourData.isEmpty()) {
          return false;
@@ -1968,7 +1747,7 @@ public class TourMapPainter extends Map2Painter {
       final int mapZoomLevel = map.getZoom();
       final int projectionHash = mp.getProjection().getId().hashCode();
 
-      if (TourPainterConfiguration.isShowTours
+      if (Map2PainterConfig.isShowTours
 
             && allTourData.size() > 0
 
@@ -2002,10 +1781,6 @@ public class TourMapPainter extends Map2Painter {
          if (isInTile_Tour(tourData, mp, mapZoomLevel, tile, projectionHash)) {
             return true;
          }
-
-         if (isInTile_WayPoint(tourData, mp, mapZoomLevel, tile, projectionHash)) {
-            return true;
-         }
       }
 
       return false;
@@ -2018,7 +1793,7 @@ public class TourMapPainter extends Map2Painter {
     */
    private void setDataSerie(final TourData tourData) {
 
-      final IMapColorProvider legendProvider = TourPainterConfiguration.getMapColorProvider();
+      final IMapColorProvider legendProvider = Map2PainterConfig.getMapColorProvider();
 
       if (legendProvider == null) {
          _dataSerie = null;
@@ -2114,51 +1889,6 @@ public class TourMapPainter extends Map2Painter {
    }
 
    /**
-    * Create way point tile hashes for all geo positions and the current zoom level and projection
-    *
-    * @param tourData
-    * @param mp
-    * @param mapZoomLevel
-    * @param tourWayPoints
-    * @param projectionHash
-    *
-    * @return
-    */
-   private IntHashSet setupTileHashes_WayPoint(final TourData tourData,
-                                               final MP mp,
-                                               final int mapZoomLevel,
-                                               final Set<TourWayPoint> tourWayPoints,
-                                               final int projectionHash) {
-
-      final IntHashSet tileHashes = new IntHashSet();
-
-      final int tileSize = mp.getTileSize();
-
-      for (final TourWayPoint tourWayPoint : tourWayPoints) {
-
-         // convert lat/long into world pixels which depends on the map projection
-
-         final Point worldPixelPos = mp.geoToPixel(
-               new GeoPosition(tourWayPoint.getLatitude(), tourWayPoint.getLongitude()),
-               mapZoomLevel);
-
-         final int tileX = worldPixelPos.x / tileSize;
-         final int tileY = worldPixelPos.y / tileSize;
-
-         // create painting hash code
-         int tileHash = 15;
-         tileHash = 35 * tileHash + tileX;
-         tileHash = 35 * tileHash + tileY;
-
-         tileHashes.add(tileHash);
-      }
-
-      tourData.setTileHashes_ForWayPoints(tileHashes, mapZoomLevel, projectionHash);
-
-      return tileHashes;
-   }
-
-   /**
     * world pixels are not yet cached, create them now
     *
     * @param tourData
@@ -2193,29 +1923,6 @@ public class TourMapPainter extends Map2Painter {
       tourData.setWorldPixelForTour(allTour_WorldPixelPos, mapZoomLevel, projectionHash);
 
       return allTour_WorldPixelPos;
-   }
-
-   private IntObjectHashMap<Point> setupWorldPixel_WayPoint(final TourData tourData,
-                                                            final Set<TourWayPoint> wayPoints,
-                                                            final MP mp,
-                                                            final int projectionHash,
-                                                            final int mapZoomLevel) {
-      // world pixels are not yet cached, create them now
-
-      final IntObjectHashMap<Point> allWayPointWorldPixel = new IntObjectHashMap<>();
-
-      for (final TourWayPoint twp : wayPoints) {
-
-         // convert lat/long into world pixels which depends on the map projection
-
-         final GeoPosition geoPosition = new GeoPosition(twp.getLatitude(), twp.getLongitude());
-
-         allWayPointWorldPixel.put(twp.hashCode(), mp.geoToPixel(geoPosition, mapZoomLevel));
-      }
-
-      tourData.setWorldPixelForWayPoints(allWayPointWorldPixel, mapZoomLevel, projectionHash);
-
-      return allWayPointWorldPixel;
    }
 
 }

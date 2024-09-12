@@ -1769,11 +1769,6 @@ public class Messages extends NLS {
    public static String        Pref_MapLayout_Checkbox_BorderColor_Color;
    public static String        Pref_MapLayout_Checkbox_BorderColor_Darker;
    public static String        Pref_MapLayout_Label_BorderColor;
-   public static String        Pref_MapLayout_Label_TourPaintMethod;
-   public static String        Pref_MapLayout_Label_TourPaintMethod_Complex;
-   public static String        Pref_MapLayout_Label_TourPaintMethod_Complex_Tooltip;
-   public static String        Pref_MapLayout_Label_TourPaintMethod_Simple;
-   public static String        Pref_MapLayout_Label_TourPaintMethod_Simple_Tooltip;
 
    public static String        pref_map_layout_BorderWidth;
    public static String        pref_map_layout_PaintBorder;
@@ -2272,9 +2267,6 @@ public class Messages extends NLS {
    public static String        Slideout_Map25TrackOptions_Radio_ColorMode_Gradient;
    public static String        Slideout_Map25TrackOptions_Radio_ColorMode_Solid;
 
-   public static String        Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic;
-   public static String        Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message;
-   public static String        Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Title;
    public static String        Slideout_Map2Provider_Button_HideMP;
    public static String        Slideout_Map2Provider_Button_HideMP_Tooltip;
    public static String        Slideout_Map2Provider_Button_UnhideMP;
@@ -2299,8 +2291,6 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Checkbox_DimMap;
    public static String        Slideout_Map_Options_Checkbox_ShowBreadcrumbs;
    public static String        Slideout_Map_Options_Checkbox_ShowBreadcrumbs_Tooltip;
-   public static String        Slideout_Map_Options_Checkbox_ShowEnhancedWarning;
-   public static String        Slideout_Map_Options_Checkbox_ShowEnhancedWarning_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour;
    public static String        Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip;
    public static String        Slideout_Map_Options_Checkbox_ShowTourDirection;
@@ -2365,6 +2355,7 @@ public class Messages extends NLS {
    public static String        Slideout_MapPoints_Action_TourLocations_Tooltip;
    public static String        Slideout_MapPoints_Action_TourMarkers_Tooltip;
    public static String        Slideout_MapPoints_Action_TourPauses_Tooltip;
+   public static String        Slideout_MapPoints_Action_TourWayPoints_Tooltip;
    public static String        Slideout_MapPoints_Checkbox_AntialiasLabel;
    public static String        Slideout_MapPoints_Checkbox_ClusterTourMarkers;
    public static String        Slideout_MapPoints_Checkbox_ClusterTourMarkers_Tooltip;
@@ -2379,6 +2370,7 @@ public class Messages extends NLS {
    public static String        Slideout_MapPoints_Checkbox_ShowTourLocations_Tooltip;
    public static String        Slideout_MapPoints_Checkbox_ShowTourMarkers;
    public static String        Slideout_MapPoints_Checkbox_ShowTourPauses;
+   public static String        Slideout_MapPoints_Checkbox_ShowTourWayPoints;
    public static String        Slideout_MapPoints_Checkbox_TruncateLabel;
    public static String        Slideout_MapPoints_Checkbox_UseMapDimColor;
    public static String        Slideout_MapPoints_Label_ClusterSize_Tooltip;
@@ -2406,6 +2398,8 @@ public class Messages extends NLS {
    public static String        Slideout_MapPoints_Label_TourLocation_EndColor;
    public static String        Slideout_MapPoints_Label_TourPauseColor;
    public static String        Slideout_MapPoints_Label_TourPauseColor_Tooltip;
+   public static String        Slideout_MapPoints_Label_TourWayPointColor;
+   public static String        Slideout_MapPoints_Label_TourWayPointColor_Tooltip;
    public static String        Slideout_MapPoints_Label_VisibleLabels;
    public static String        Slideout_MapPoints_Label_VisibleLabels_Tooltip;
    public static String        Slideout_MapPoints_Spinner_LabelDistributor_MaxLabels_Tooltip;
@@ -2419,6 +2413,7 @@ public class Messages extends NLS {
    public static String        Slideout_MapPoints_Tab_TourMarkerGroups_Tooltip;
    public static String        Slideout_MapPoints_Tab_TourMarkers_Tooltip;
    public static String        Slideout_MapPoints_Tab_TourPauses_Tooltip;
+   public static String        Slideout_MapPoints_Tab_TourWayPoints_Tooltip;
 
    public static String        Slideout_MapModel_Column_Name;
    public static String        Slideout_MapModel_Dialog_DeleteModel_Message;

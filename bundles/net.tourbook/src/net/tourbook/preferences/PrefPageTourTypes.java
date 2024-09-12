@@ -143,6 +143,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
    private Combo                 _comboBorderLayout;
 
    private Spinner               _spinnerBorder;
+   private Spinner               _spinnerImageScale;
 
    private class ColorDefinitionContentProvider implements ITreeContentProvider {
 
@@ -353,7 +354,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(400, 600)
+            .hint(200, 300)
             .applyTo(layoutContainer);
 
       final TreeColumnLayout treeLayout = new TreeColumnLayout();
@@ -558,6 +559,11 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
          onSelectImageLayout();
       };
 
+      final MouseWheelListener mouseWheelListener_Scaling = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+         onSelectImageLayout();
+      };
+
       final MouseWheelListener mouseWheelListener_Combo = mouseEvent -> {
          onSelectImageLayout();
       };
@@ -601,6 +607,24 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
                _comboFillColor2.addSelectionListener(selectionListener);
                _comboFillColor2.addMouseWheelListener(mouseWheelListener_Combo);
             }
+         }
+         {
+            /*
+             * Image scale
+             */
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText("Image s&caling");
+            gridData_AlignVerticalCenter.applyTo(label);
+
+            // spinner
+            _spinnerImageScale = new Spinner(container, SWT.BORDER);
+            _spinnerImageScale.setMinimum(10);
+            _spinnerImageScale.setMaximum(200);
+            _spinnerImageScale.setPageIncrement(10);
+            _spinnerImageScale.addSelectionListener(selectionListener);
+            _spinnerImageScale.addMouseWheelListener(mouseWheelListener_Scaling);
          }
          {
             /*
@@ -1163,6 +1187,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       imageConfig.imageColor1 = getSelectedTourTypeColor(_comboFillColor1);
       imageConfig.imageColor2 = getSelectedTourTypeColor(_comboFillColor2);
       imageConfig.imageLayout = getSelectedTourTypeLayout();
+      imageConfig.imageScaling = _spinnerImageScale.getSelection();
 
       imageConfig.borderColor = getSelectedTourTypeColor(_comboBorderColor);
       imageConfig.borderLayout = getSelectedTourTypeBorderLayout();
@@ -1451,6 +1476,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
       if (_canModifyTourType) {
 
+         _spinnerImageScale.setSelection(TourTypeManager.DEFAULT_IMAGE_SCALING);
+
          _comboBorderColor.select(TourTypeManager.getTourTypeColorIndex(TourTypeManager.DEFAULT_BORDER_COLOR));
          _comboBorderLayout.select(TourTypeManager.getTourTypeBorderIndex(TourTypeManager.DEFAULT_BORDER_LAYOUT));
          _spinnerBorder.setSelection(TourTypeManager.DEFAULT_BORDER_WIDTH);
@@ -1479,6 +1506,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
    private void restoreState() {
 
       final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
+
+      _spinnerImageScale.setSelection(imageConfig.imageScaling);
 
       _comboBorderColor.select(TourTypeManager.getTourTypeColorIndex(imageConfig.borderColor));
       _comboBorderLayout.select(TourTypeManager.getTourTypeBorderIndex(imageConfig.borderLayout));

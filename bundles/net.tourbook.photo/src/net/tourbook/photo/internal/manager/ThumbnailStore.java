@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,10 +57,9 @@ public class ThumbnailStore {
    private static final String THUMBNAIL_STORE_OS_PATH       = "thumbnail-store"; //$NON-NLS-1$
 
    /*
-    * photo image properties saved in a properties file
+    * Photo image properties are saved in a properties file
     */
    private static final String        PROPERTIES_FILE_EXTENSION = "properties";                 //$NON-NLS-1$
-//	private static final String			PROPERTIES_FILE_HEADER			= "Image properties ";		//$NON-NLS-1$
    public static final String         ORIGINAL_IMAGE_WIDTH      = "OriginalImageWidth";         //$NON-NLS-1$
    public static final String         ORIGINAL_IMAGE_HEIGHT     = "OriginalImageHeight";        //$NON-NLS-1$
 
@@ -348,6 +347,7 @@ public class ThumbnailStore {
     *
     * @param fileOrFolder
     * @param monitor
+    *
     * @return Returns number of deleted files
     */
    private static int doCleanupDeleteFiles(final File fileOrFolder, final IProgressMonitor monitor) {
@@ -592,11 +592,12 @@ public class ThumbnailStore {
     * @param thumbImg
     * @param storeImageFilePath
     * @param originalImageProperties
+    *
     * @return Returns <code>true</code>when the image could be saved in the thumb store.
     */
-   static boolean saveThumbImageWithAWT(final BufferedImage thumbImg,
-                                        final IPath storeImageFilePath,
-                                        final Properties originalImageProperties) {
+   static boolean saveResizedImage_AWT(final BufferedImage thumbImg,
+                                       final IPath storeImageFilePath,
+                                       final Properties originalImageProperties) {
 
       try {
 
@@ -611,9 +612,7 @@ public class ThumbnailStore {
 
       } catch (final Exception e) {
 
-         StatusUtil.log(NLS.bind(//
-               "Cannot save thumbnail image with AWT: \"{0}\"", //$NON-NLS-1$
-               storeImageFilePath.toOSString()), e);
+         StatusUtil.log("Cannot save thumbnail image with AWT: \"%s\"".formatted(storeImageFilePath.toOSString()), e); //$NON-NLS-1$
 
          return false;
       }
@@ -621,9 +620,9 @@ public class ThumbnailStore {
       return true;
    }
 
-   static void saveThumbImageWithSWT(final Image thumbnailImage,
-                                     final IPath storeImageFilePath,
-                                     final Properties originalImageProperties) {
+   static void saveResizedImage_SWT(final Image thumbnailImage,
+                                    final IPath storeImageFilePath,
+                                    final Properties originalImageProperties) {
 
       try {
 
@@ -648,9 +647,7 @@ public class ThumbnailStore {
 
       } catch (final Exception e) {
 
-         StatusUtil.log(NLS.bind(//
-               "Cannot save thumbnail image with SWT: \"{0}\"", //$NON-NLS-1$
-               storeImageFilePath.toOSString()), e);
+         StatusUtil.log("Cannot save thumbnail image with SWT: \"%s\"".formatted(storeImageFilePath.toOSString()), e); //$NON-NLS-1$
       }
    }
 
