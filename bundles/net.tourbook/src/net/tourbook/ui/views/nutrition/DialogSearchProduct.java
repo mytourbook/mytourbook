@@ -884,7 +884,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       _comboSearchType.setEnabled(false);
       _lblSearchType.setEnabled(false);
 
-      final String searchText = _comboSearchQuery.getText().trim();
+      String searchText = _comboSearchQuery.getText().trim();
 
       // remove same search text
       if (_searchHistory.contains(searchText) == false) {
@@ -898,6 +898,10 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
 
       // start product search
       final ProductSearchType productSearchType = getProductSearchType();
+      if (productSearchType == ProductSearchType.ByCode &&
+            searchText.length() == 11) {
+         searchText = StringUtils.leftPad(searchText, 12, '0');
+      }
       _nutritionQuery.asyncFind(searchText, productSearchType);
    }
 
