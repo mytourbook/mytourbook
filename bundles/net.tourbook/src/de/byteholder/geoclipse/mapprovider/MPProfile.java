@@ -55,6 +55,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
    public MPProfile() {}
 
    public MPProfile(final ArrayList<MPWrapper> mpWrappers) {
+
       _mpWrappers = mpWrappers;
    }
 

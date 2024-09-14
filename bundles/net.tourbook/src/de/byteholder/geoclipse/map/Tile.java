@@ -377,8 +377,11 @@ public class Tile {
       final Tile parentTile = _parentTile;
 
       if (parentTile == null) {
-         // this happens often -> disabled log
-//         StatusUtil.log(NLS.bind(Messages.DBG057_MapProfile_NoParentTile, getTileKey()), new Exception());
+
+// this happens too often -> disabled log
+//
+//       StatusUtil.log(NLS.bind(Messages.DBG057_MapProfile_NoParentTile, getTileKey()), new Exception());
+
          return null;
       }
 
@@ -392,10 +395,11 @@ public class Tile {
 
                // check if the parent is already created
                final Image parentImage = parentTile._mapImage;
+
                if ((parentImage != null) && !parentImage.isDisposed()) {
+
                   // parent image is already created
                   return new ParentImageStatus(null, false, false, false);
-
                }
 
                // check if all children are loaded
