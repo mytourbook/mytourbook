@@ -9607,7 +9607,7 @@ public class Map2 extends Canvas {
       if (_isShowDebug_TileBorder) {
 
          // draw tile border
-         gc.setForeground(_display.getSystemColor(SWT.COLOR_YELLOW));
+         gc.setForeground(_isMapBackgroundDark ? UI.SYS_COLOR_YELLOW : UI.SYS_COLOR_RED);
          gc.drawRectangle(devTileViewport.x, devTileViewport.y, _tilePixelSize, _tilePixelSize);
       }
 

@@ -405,8 +405,7 @@ public class Tile {
                   final MP parentMp = parentTile._mp;
                   if (parentMp instanceof ITileChildrenCreator) {
 
-                     final ParentImageStatus parentImageStatus = ((ITileChildrenCreator) parentMp)
-                           .getParentImage(parentTile);
+                     final ParentImageStatus parentImageStatus = ((ITileChildrenCreator) parentMp).getParentImage(parentTile);
 
                      // prevent memory leaks: remove image data in the chilren tiles
                      for (final Tile childTile : tileChildren) {
@@ -762,6 +761,11 @@ public class Tile {
       }
 
       _childrenWithErrors.put(childTile.getTileKey(), childTile);
+   }
+
+   public void setChildTileImageData(final ImageData childTileImageData) {
+
+      _childTileImageData = childTileImageData;
    }
 
    /**
