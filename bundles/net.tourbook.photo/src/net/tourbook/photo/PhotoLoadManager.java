@@ -464,6 +464,55 @@ public class PhotoLoadManager {
       _executorHQ.submit(executorTask);
    }
 
+   public static void putImageInLoadingQueueHQThumb_Map(final Photo photo,
+                                                        final int thumbImageSize,
+                                                        final ILoadCallBack imageLoaderCallback) {
+
+      final ImageQuality imageQuality = ImageQuality.THUMB_HQ;
+
+      // set state
+      photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
+
+      // put image loading item into the waiting queue
+      final PhotoImageLoader photoImageLoader = new PhotoImageLoader(
+            _display,
+            photo,
+            imageQuality,
+            _imageFramework,
+            thumbImageSize,
+            imageLoaderCallback);
+
+      _waitingQueueHQ.add(photoImageLoader);
+
+      final Runnable executorTask = new Runnable() {
+         @Override
+         public void run() {
+
+            // get last added loader item
+            final PhotoImageLoader imageLoader = _waitingQueueHQ.pollFirst();
+
+            if (imageLoader == null) {
+               return;
+            }
+
+            final String errorKey = imageLoader.getPhoto().imageFilePathName;
+
+            if (_photoWithLoadingError.containsKey(errorKey)) {
+
+               photo.setLoadingState(PhotoLoadingState.IMAGE_IS_INVALID, imageQuality);
+
+            } else {
+
+               imageLoader.loadImageHQThumb_AWT(_waitingQueueThumb, _waitingQueueExif);
+            }
+
+            checkLoadingState(photo, imageQuality);
+         }
+      };
+
+      _executorHQ.submit(executorTask);
+   }
+
    /**
     * @param requestedItem
     * @param photo

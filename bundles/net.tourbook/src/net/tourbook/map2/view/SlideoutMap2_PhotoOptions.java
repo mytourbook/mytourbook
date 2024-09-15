@@ -55,25 +55,27 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       IActionResetToDefault,
       IColorSelectorListener {
 
-   public static final String      STATE_IS_PRELOAD_HQ_IMAGES          = "STATE_IS_PRELOAD_HQ_IMAGES";    //$NON-NLS-1$
-   public static final boolean     STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT  = false;
-   static final String             STATE_IS_SHOW_PHOTO_RATING          = "STATE_IS_SHOW_PHOTO_RATING";    //$NON-NLS-1$
-   static final boolean            STATE_IS_SHOW_PHOTO_RATING_DEFAULT  = true;
-   static final String             STATE_IS_SHOW_PHOTO_TOOLTIP         = "STATE_IS_SHOW_PHOTO_TOOLTIP";   //$NON-NLS-1$
-   static final boolean            STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT = true;
+   public static final String      STATE_IS_PRELOAD_HQ_IMAGES            = "STATE_IS_PRELOAD_HQ_IMAGES";    //$NON-NLS-1$
+   public static final boolean     STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT    = false;
+   public static final String      STATE_IS_SHOW_THUMB_HQ_IMAGES         = "STATE_IS_SHOW_THUMB_HQ_IMAGES"; //$NON-NLS-1$
+   public static final boolean     STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT = false;
+   static final String             STATE_IS_SHOW_PHOTO_RATING            = "STATE_IS_SHOW_PHOTO_RATING";    //$NON-NLS-1$
+   static final boolean            STATE_IS_SHOW_PHOTO_RATING_DEFAULT    = true;
+   static final String             STATE_IS_SHOW_PHOTO_TOOLTIP           = "STATE_IS_SHOW_PHOTO_TOOLTIP";   //$NON-NLS-1$
+   static final boolean            STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT   = true;
 
-   static final String             STATE_PHOTO_IMAGE_SIZE              = "STATE_PHOTO_IMAGE_SIZE";        //$NON-NLS-1$
-   static final String             STATE_PHOTO_IMAGE_SIZE_TINY         = "STATE_PHOTO_IMAGE_SIZE_TINY";   //$NON-NLS-1$
-   static final String             STATE_PHOTO_IMAGE_SIZE_SMALL        = "STATE_PHOTO_IMAGE_SIZE_SMALL";  //$NON-NLS-1$
-   static final String             STATE_PHOTO_IMAGE_SIZE_MEDIUM       = "STATE_PHOTO_IMAGE_SIZE_MEDIUM"; //$NON-NLS-1$
-   static final String             STATE_PHOTO_IMAGE_SIZE_LARGE        = "STATE_PHOTO_IMAGE_SIZE_LARGE";  //$NON-NLS-1$
+   static final String             STATE_PHOTO_IMAGE_SIZE                = "STATE_PHOTO_IMAGE_SIZE";        //$NON-NLS-1$
+   static final String             STATE_PHOTO_IMAGE_SIZE_TINY           = "STATE_PHOTO_IMAGE_SIZE_TINY";   //$NON-NLS-1$
+   static final String             STATE_PHOTO_IMAGE_SIZE_SMALL          = "STATE_PHOTO_IMAGE_SIZE_SMALL";  //$NON-NLS-1$
+   static final String             STATE_PHOTO_IMAGE_SIZE_MEDIUM         = "STATE_PHOTO_IMAGE_SIZE_MEDIUM"; //$NON-NLS-1$
+   static final String             STATE_PHOTO_IMAGE_SIZE_LARGE          = "STATE_PHOTO_IMAGE_SIZE_LARGE";  //$NON-NLS-1$
 
-   private static final int        MIN_IMAGE_SIZE                      = 3;
+   private static final int        MIN_IMAGE_SIZE                        = 3;
 
    /**
     * This value is small because a map do not yet load large images !!!
     */
-   private static final int        MAX_IMAGE_SIZE                      = 2000;
+   private static final int        MAX_IMAGE_SIZE                        = 2000;
 
    private IDialogSettings         _state_Map2;
 
@@ -94,6 +96,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
    private Button                _btnSwapTourPauseLabel_Color;
 
    private Button                _chkPreloadHQImages;
+   private Button                _chkShowHQImages;
    private Button                _chkShowPhotoRating;
    private Button                _chkShowPhotoTooltip;
 
@@ -384,18 +387,21 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       }
       {
          /*
+          * Show HQ photos
+          */
+         _chkShowHQImages = new Button(parent, SWT.CHECK);
+         _chkShowHQImages.setText(Messages.Slideout_Map_PhotoOptions_Checkbox_ShowHqPhotoImages);
+         _chkShowHQImages.setToolTipText(Messages.Slideout_Map_PhotoOptions_Checkbox_ShowHqPhotoImages_Tooltip);
+         _chkShowHQImages.addSelectionListener(_defaultSelectedListener);
+      }
+      {
+         /*
           * Preload photos
           */
          _chkPreloadHQImages = new Button(parent, SWT.CHECK);
          _chkPreloadHQImages.setText(Messages.Slideout_Map_PhotoOptions_Checkbox_PreloadPhotoImages);
          _chkPreloadHQImages.setToolTipText(Messages.Slideout_Map_PhotoOptions_Checkbox_PreloadPhotoImages_Tooltip);
          _chkPreloadHQImages.addSelectionListener(_defaultSelectedListener);
-      }
-      {
-         // label
-         _lblHeapSize = new Label(parent, SWT.NONE);
-         _lblHeapSize.setText(UI.SPACE1);
-         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_lblHeapSize);
       }
       {
          /*
@@ -406,9 +412,21 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
          _linkDiscardImages.setToolTipText(Messages.Slideout_Map_PhotoOptions_Link_DiscardCachedImages_Tooltip);
          _linkDiscardImages.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onDiscardImages()));
       }
+      {
+         /*
+          * Memory/heap size
+          */
+         _lblHeapSize = new Label(parent, SWT.NONE);
+         _lblHeapSize.setText(UI.SPACE1);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_lblHeapSize);
+      }
    }
 
    private void enableControls() {
+
+      final boolean isShowHQImages = _chkShowHQImages.getSelection();
+
+      _chkPreloadHQImages.setEnabled(isShowHQImages == false);
 
       _spinnerImageSize_Large.setEnabled(_radioImageSize_Large.getSelection());
       _spinnerImageSize_Medium.setEnabled(_radioImageSize_Medium.getSelection());
@@ -470,11 +488,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       PhotoLoadManager.stopImageLoading(true);
       PhotoLoadManager.removeInvalidImageFiles();
 
-//      ThumbnailStore.cleanupStoreFiles(true, true);
-
       PhotoImageCache.disposeAll();
-
-//      ExifCache.clear();
 
       repaintMap();
 
@@ -521,6 +535,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       _spinnerImageSize_Tiny.setSelection(_map2.MAP_IMAGE_DEFAULT_SIZE_TINY);
 
       _chkPreloadHQImages.setSelection(STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT);
+      _chkShowHQImages.setSelection(STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT);
       _chkShowPhotoRating.setSelection(STATE_IS_SHOW_PHOTO_RATING_DEFAULT);
       _chkShowPhotoTooltip.setSelection(STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT);
 
@@ -547,6 +562,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 // SET_FORMATTING_OFF
 
       _chkPreloadHQImages  .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_PRELOAD_HQ_IMAGES,   STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT));
+      _chkShowHQImages     .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_SHOW_THUMB_HQ_IMAGES,      STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT));
       _chkShowPhotoRating  .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_SHOW_PHOTO_RATING,   STATE_IS_SHOW_PHOTO_RATING_DEFAULT));
       _chkShowPhotoTooltip .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_SHOW_PHOTO_TOOLTIP,  STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT));
 
@@ -598,6 +614,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       final boolean isShowPhotoTooltip = _chkShowPhotoTooltip.getSelection();
 
       _state_Map2.put(STATE_IS_PRELOAD_HQ_IMAGES, _chkPreloadHQImages.getSelection());
+      _state_Map2.put(STATE_IS_SHOW_THUMB_HQ_IMAGES, _chkShowHQImages.getSelection());
       _state_Map2.put(STATE_IS_SHOW_PHOTO_RATING, isShowPhotoRating);
       _state_Map2.put(STATE_IS_SHOW_PHOTO_TOOLTIP, isShowPhotoTooltip);
 
@@ -655,7 +672,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
       final Runtime runtime = Runtime.getRuntime();
 
-      final String heapSize = "Heap: %s - Free: %s - Max: %s".formatted(
+      final String heapSize = Messages.Slideout_Map_PhotoOptions_Label_MemoryState.formatted(
 
             formatSize(runtime.totalMemory()),
             formatSize(runtime.freeMemory()),

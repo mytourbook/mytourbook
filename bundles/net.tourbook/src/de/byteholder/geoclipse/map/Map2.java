@@ -465,6 +465,7 @@ public class Map2 extends Canvas {
    private MapPointToolTip                 _mapPointTooltip;
    private SlideoutMap2_PhotoToolTip       _mapPointTooltip_Photo;
    private boolean                         _isPreloadHQImages;
+   private boolean                         _isShowHQPhotoImages;
    private final ILoadCallBack             _photoImageLoaderCallback        = new PhotoImageLoaderCallback();
 
    /** Number of created map points */
@@ -2807,6 +2808,7 @@ public class Map2 extends Canvas {
     * @return Returns the current map provider
     */
    public MP getMapProvider() {
+
       return _mp;
    }
 
@@ -2814,10 +2816,12 @@ public class Map2 extends Canvas {
     * @return
     */
    public GeoPosition getMouseDown_GeoPosition() {
+
       return _mouseDown_ContextMenu_GeoPosition;
    }
 
    public GeoPosition getMouseMove_GeoPosition() {
+
       return _mouseMove_GeoPosition;
    }
 
@@ -2827,6 +2831,7 @@ public class Map2 extends Canvas {
     * @return Returns the key to identify overlay images in the image cache
     */
    private String getOverlayKey(final Tile tile) {
+
       return _overlayKey + tile.getTileKey();
    }
 
@@ -2839,6 +2844,7 @@ public class Map2 extends Canvas {
     * @return
     */
    private String getOverlayKey(final Tile tile, final int xOffset, final int yOffset, final String projectionId) {
+
       return _overlayKey + tile.getTileKey(xOffset, yOffset, projectionId);
    }
 
@@ -2853,9 +2859,7 @@ public class Map2 extends Canvas {
 
       BufferedImage awtThumbImage = null;
       BufferedImage awtPhotoImageHQ = null;
-
-      boolean isShowHQImages = false;
-      isShowHQImages = false;
+      BufferedImage awtPhotoImageThumbHQ = null;
 
       try {
 
@@ -2889,7 +2893,7 @@ public class Map2 extends Canvas {
             }
          }
 
-         if (isShowHQImages == false) {
+         if (_isShowHQPhotoImages == false) {
 
             return awtThumbImage;
          }
@@ -2922,6 +2926,35 @@ public class Map2 extends Canvas {
             }
          }
 
+         /*
+          * 3. Display thumb HQ image
+          */
+
+         if (awtPhotoImageHQ != null) {
+
+            // check if image has an loading error
+            final PhotoLoadingState thumbHqPhotoLoadingState = photo.getLoadingState(ImageQuality.THUMB_HQ);
+
+            if (thumbHqPhotoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+
+               // image is not invalid and not yet loaded
+
+               // check if image is in the cache
+               awtPhotoImageThumbHQ = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB_HQ);
+
+               if (awtPhotoImageThumbHQ == null
+                     && thumbHqPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+
+                  // the requested image is not available in the image cache -> image must be loaded
+
+                  PhotoLoadManager.putImageInLoadingQueueHQThumb_Map(
+                        photo,
+                        Photo.getMapImageRequestedSize(),
+                        _photoImageLoaderCallback);
+               }
+            }
+         }
+
       } finally {
 
 //         System.out.println(UI.timeStamp()
@@ -2934,7 +2967,11 @@ public class Map2 extends Canvas {
 
       }
 
-      if (awtPhotoImageHQ != null) {
+      if (awtPhotoImageThumbHQ != null) {
+
+         return awtPhotoImageThumbHQ;
+
+      } else if (awtPhotoImageHQ != null) {
 
          return awtPhotoImageHQ;
 
@@ -8535,14 +8572,31 @@ public class Map2 extends Canvas {
 
             // paint photo image
 
-            g2d.drawImage(awtPhotoImage,
+            final int photoImageWidth = awtPhotoImage.getWidth();
+            final int photoImageHeight = awtPhotoImage.getHeight();
 
-                  photoRectangle.x,
-                  photoRectangle.y,
-                  photoRectangle.width,
-                  photoRectangle.height,
+            if (photoImageWidth == photoWidth && photoImageHeight == photoHeight) {
 
-                  null);
+               // do not resize the image which do not look very good
+
+               g2d.drawImage(awtPhotoImage,
+
+                     photoRectangle.x,
+                     photoRectangle.y,
+
+                     null);
+
+            } else {
+
+               g2d.drawImage(awtPhotoImage,
+
+                     photoRectangle.x,
+                     photoRectangle.y,
+                     photoRectangle.width,
+                     photoRectangle.height,
+
+                     null);
+            }
 
             // draw border
 
@@ -11356,6 +11410,10 @@ public class Map2 extends Canvas {
    }
 
    public void updatePhotoOptions() {
+
+      _isShowHQPhotoImages = Util.getStateBoolean(_state_Map2,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_THUMB_HQ_IMAGES,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT);
 
       _isPreloadHQImages = Util.getStateBoolean(_state_Map2,
             SlideoutMap2_PhotoOptions.STATE_IS_PRELOAD_HQ_IMAGES,

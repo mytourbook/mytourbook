@@ -2332,8 +2332,11 @@ public class Messages extends NLS {
 
    public static String        Slideout_Map_PhotoOptions_Checkbox_PreloadPhotoImages;
    public static String        Slideout_Map_PhotoOptions_Checkbox_PreloadPhotoImages_Tooltip;
+   public static String        Slideout_Map_PhotoOptions_Checkbox_ShowHqPhotoImages;
+   public static String        Slideout_Map_PhotoOptions_Checkbox_ShowHqPhotoImages_Tooltip;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoRating;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoTooltip;
+   public static String        Slideout_Map_PhotoOptions_Label_MemoryState;
    public static String        Slideout_Map_PhotoOptions_Label_SymbolColor;
    public static String        Slideout_Map_PhotoOptions_Label_SymbolColor_Tooltip;
    public static String        Slideout_Map_PhotoOptions_Label_Title;

@@ -197,8 +197,9 @@ public class ThumbnailStore {
 
          final String imageFilePath = imageFile.getPath();
 
-         cleanupStoreFiles_10_QFile(imageFile, ImageQuality.THUMB, Photo.getImageKeyThumb(imageFilePath));
-         cleanupStoreFiles_10_QFile(imageFile, ImageQuality.HQ, Photo.getImageKeyHQ(imageFilePath));
+         cleanupStoreFiles_10_QFile(imageFile, ImageQuality.THUMB, Photo.getImageKey_Thumb(imageFilePath));
+         cleanupStoreFiles_10_QFile(imageFile, ImageQuality.THUMB_HQ, Photo.getImageKey_ThumbHQ(imageFilePath));
+         cleanupStoreFiles_10_QFile(imageFile, ImageQuality.HQ, Photo.getImageKey_HQ(imageFilePath));
       }
    }
 
@@ -589,30 +590,34 @@ public class ThumbnailStore {
    }
 
    /**
-    * @param thumbImg
+    * @param awtResizedImage
     * @param storeImageFilePath
     * @param originalImageProperties
     *
     * @return Returns <code>true</code>when the image could be saved in the thumb store.
     */
-   static boolean saveResizedImage_AWT(final BufferedImage thumbImg,
+   static boolean saveResizedImage_AWT(final BufferedImage awtResizedImage,
                                        final IPath storeImageFilePath,
                                        final Properties originalImageProperties) {
 
       try {
 
          final IPath imagePathWithoutExt = checkPath(storeImageFilePath);
+
          if (imagePathWithoutExt == null) {
             return false;
          }
 
-         ImageIO.write(thumbImg, THUMBNAIL_IMAGE_EXTENSION_JPG, new File(storeImageFilePath.toOSString()));
+         ImageIO.write(awtResizedImage, THUMBNAIL_IMAGE_EXTENSION_JPG, new File(storeImageFilePath.toOSString()));
 
-         saveProperties(storeImageFilePath, originalImageProperties);
+         if (originalImageProperties != null) {
+
+            saveProperties(storeImageFilePath, originalImageProperties);
+         }
 
       } catch (final Exception e) {
 
-         StatusUtil.log("Cannot save thumbnail image with AWT: \"%s\"".formatted(storeImageFilePath.toOSString()), e); //$NON-NLS-1$
+         StatusUtil.log("Cannot save resized image with AWT: \"%s\"".formatted(storeImageFilePath.toOSString()), e); //$NON-NLS-1$
 
          return false;
       }
