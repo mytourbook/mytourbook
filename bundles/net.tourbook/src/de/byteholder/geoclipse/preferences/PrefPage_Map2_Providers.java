@@ -2089,38 +2089,43 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       final boolean isNoProfileMapProvider = isCustomMapProvider || isWmsMapProvider;
       final boolean canEditFields = _isNewMapProvider || isNonePluginMapProvider;
 
-      _mpViewer.getTable().setEnabled(isExistingMapProvider);
+// SET_FORMATTING_OFF
 
-      _chkIsIncludesHillshading.setEnabled(canEditFields);
-      _chkIsTransparentLayer.setEnabled(canEditFields && isNoProfileMapProvider);
-      _txtCategory.setEnabled(canEditFields);
-      _txtDescription.setEnabled(canEditFields);
-      _txtMapProviderId.setEnabled(canEditFields);
-      _txtMapProviderName.setEnabled(canEditFields);
-      _txtOfflineFolder.setEnabled(canEditFields);
-      _txtOnlineMapUrl.setEnabled(canEditFields);
+      _mpViewer.getTable().         setEnabled(isExistingMapProvider);
+
+      _chkIsIncludesHillshading     .setEnabled(canEditFields);
+      _chkIsTransparentLayer        .setEnabled(canEditFields && isNoProfileMapProvider);
+      _comboHiDPI                   .setEnabled(canEditFields);
+      _txtCategory                  .setEnabled(canEditFields);
+      _txtDescription               .setEnabled(canEditFields);
+      _txtMapProviderId             .setEnabled(canEditFields);
+      _txtMapProviderName           .setEnabled(canEditFields);
+      _txtOfflineFolder             .setEnabled(canEditFields);
+      _txtOnlineMapUrl              .setEnabled(canEditFields);
 
       // map provider list actions
-      _btnAddMapProviderCustom.setEnabled(isExistingMapProvider);
-      _btnAddMapProviderWms.setEnabled(isExistingMapProvider);
-      _btnAddMapProviderMapProfile.setEnabled(isExistingMapProvider);
-      _btnEdit.setEnabled(isExistingMapProvider && isNonePluginMapProvider);
-      _btnDeleteMapProvider.setEnabled(isExistingMapProvider && isNonePluginMapProvider);
-      _btnDeleteOfflineMap.setEnabled(isExistingMapProvider && canDeleteOfflineMap);
-      _btnImport.setEnabled(isExistingMapProvider);
-      _btnExport.setEnabled(isExistingMapProvider && isNonePluginMapProvider);
+      _btnAddMapProviderCustom      .setEnabled(isExistingMapProvider);
+      _btnAddMapProviderWms         .setEnabled(isExistingMapProvider);
+      _btnAddMapProviderMapProfile  .setEnabled(isExistingMapProvider);
+      _btnEdit                      .setEnabled(isExistingMapProvider && isNonePluginMapProvider);
+      _btnDeleteMapProvider         .setEnabled(isExistingMapProvider && isNonePluginMapProvider);
+      _btnDeleteOfflineMap          .setEnabled(isExistingMapProvider && canDeleteOfflineMap);
+      _btnImport                    .setEnabled(isExistingMapProvider);
+      _btnExport                    .setEnabled(isExistingMapProvider && isNonePluginMapProvider);
 
-      _lblDropTarget.setEnabled((_isModifiedMapProvider == false) && (_isNewMapProvider == false));
-      _lblMpDropTarget.setEnabled((_isModifiedMapProvider == false) && (_isNewMapProvider == false));
+      _lblDropTarget                .setEnabled((_isModifiedMapProvider == false) && (_isNewMapProvider == false));
+      _lblMpDropTarget              .setEnabled((_isModifiedMapProvider == false) && (_isNewMapProvider == false));
 
       // map provider detail actions
-      _btnUpdate.setEnabled(_isValid && _isModifiedMapProvider);
-      _btnCancel.setEnabled(_isNewMapProvider || _isModifiedMapProvider);
+      _btnUpdate                    .setEnabled(_isValid && _isModifiedMapProvider);
+      _btnCancel                    .setEnabled(_isNewMapProvider || _isModifiedMapProvider);
 
-      _actionRefreshAll.setEnabled(isOfflinePath && isOfflineJobStopped);
-      _actionRefreshSelected.setEnabled(isOfflinePath && isOfflineJobStopped);
-      _actionRefreshNotAssessed.setEnabled(isOfflinePath && isOfflineJobStopped);
-      _actionCancelRefresh.setEnabled(isOfflinePath && !isOfflineJobStopped);
+      _actionRefreshAll             .setEnabled(isOfflinePath && isOfflineJobStopped);
+      _actionRefreshSelected        .setEnabled(isOfflinePath && isOfflineJobStopped);
+      _actionRefreshNotAssessed     .setEnabled(isOfflinePath && isOfflineJobStopped);
+      _actionCancelRefresh          .setEnabled(isOfflinePath && !isOfflineJobStopped);
+
+// SET_FORMATTING_ON
 
       if (_isNewMapProvider) {
          _groupDetails.setText(Messages.Pref_Map_Group_Detail_NewMapProvider);

@@ -31,9 +31,16 @@ final class ProfileTileImage {
 
    private final ImageData _tileImageData;
 
-   ProfileTileImage() {
+   public ProfileTileImage(final Tile parentTile) {
 
-      _tileImageData = new ImageData(256, 256, 24, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+      if (parentTile.getMP().getHiDPI() == 2.0) {
+
+         _tileImageData = new ImageData(512, 512, 24, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+
+      } else {
+
+         _tileImageData = new ImageData(256, 256, 24, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+      }
    }
 
    /**
