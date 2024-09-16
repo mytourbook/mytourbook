@@ -62,14 +62,15 @@ public class MPCustom extends MP {
 
       filePath = filePath.append(getOfflineFolder());
 
-      final boolean is4kTile = tile.getUrl() != null && tile.getUrl().contains(UI.NAME_SUFFIX_4k);
-      final String nameSuffix4k = is4kTile ? UI.NAME_SUFFIX_4k : UI.EMPTY_STRING;
+      final float highDPIScaling = getHiDPI();
+
+      final String nameSuffix = highDPIScaling == 2.0 ? UI.HIDPI_NAME_2x : UI.EMPTY_STRING;
 
       filePath = filePath
 
             .append(Integer.toString(tile.getZoom()))
             .append(Integer.toString(tile.getX()))
-            .append(Integer.toString(tile.getY()) + nameSuffix4k)
+            .append(Integer.toString(tile.getY()) + nameSuffix)
 
             .addFileExtension(MapProviderManager.getImageFileExtension(getImageFormat()));
 

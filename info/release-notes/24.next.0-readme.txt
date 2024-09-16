@@ -1,4 +1,4 @@
-24.next.0                                                 ?. August 2024
+24.next.0                                                 ?. September 2024
 
 
 TODO's
@@ -55,7 +55,9 @@ New
 Improvements
 ============
 
-* 
+* 2D Map
+  - Support high quality photo images
+  - Support HiDPI map tiles without an "@2x" url name part
   
 
 Changes

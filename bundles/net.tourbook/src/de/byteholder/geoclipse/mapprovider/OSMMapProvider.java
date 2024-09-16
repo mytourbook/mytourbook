@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -61,6 +61,11 @@ class OSMMapProvider extends MPPlugin {
    }
 
    @Override
+   public float getHiDPI() {
+      return 1.0f;
+   }
+
+   @Override
    public String getId() {
       return FACTORY_ID;
    }
@@ -83,7 +88,7 @@ class OSMMapProvider extends MPPlugin {
    @Override
    public IPath getTileOSPath(final String fullPath, final Tile tile) {
 
-      return new Path(fullPath)//
+      return new Path(fullPath)
             .append(OFFLINE_FOLDER)
             .append(Integer.toString(tile.getZoom()))
             .append(Integer.toString(tile.getX()))
@@ -94,7 +99,7 @@ class OSMMapProvider extends MPPlugin {
    @Override
    public String getTileUrl(final Tile tile) {
 
-      return new StringBuilder()//
+      return new StringBuilder()
             .append(TILE_BASE_URL)
             .append(SEPARATOR)
             .append(tile.getZoom())

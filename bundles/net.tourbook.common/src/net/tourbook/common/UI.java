@@ -341,8 +341,8 @@ public class UI {
     */
    public static boolean       IS_4K_DISPLAY;
 
-   public static float         SCALING_4K;
-   public static String        NAME_SUFFIX_4k                 = "@2x";                       //$NON-NLS-1$
+   public static float         HIDPI_SCALING;
+   public static String        HIDPI_NAME_2x                  = "@2x";                       //$NON-NLS-1$
 
    /**
     * On Linux an async selection event is fired since e4
@@ -764,7 +764,7 @@ public class UI {
       final int deviceZoom = DPIUtil.getDeviceZoom();
 
       IS_4K_DISPLAY = deviceZoom >= 140;
-      SCALING_4K = deviceZoom / 100f;
+      HIDPI_SCALING = deviceZoom / 100f;
 
       setupUI_FontMetrics();
       setupUI_AWTFonts();
@@ -2157,11 +2157,11 @@ public class UI {
 
       final float fontSize = //
 
-            UI.SCALING_4K <= 1.5 ? defaultFontSize * 1.5f
+            UI.HIDPI_SCALING <= 1.5 ? defaultFontSize * 1.5f
 
-                  : UI.SCALING_4K <= 2 ? defaultFontSize * 1.7f
+                  : UI.HIDPI_SCALING <= 2 ? defaultFontSize * 1.7f
 
-                        : UI.SCALING_4K <= 3 ? defaultFontSize * 1.8f
+                        : UI.HIDPI_SCALING <= 3 ? defaultFontSize * 1.8f
 
                               : defaultFontSize * 1.8f;
 

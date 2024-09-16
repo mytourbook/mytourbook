@@ -891,7 +891,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
       _dialogColorProvider.configureColorProvider(
             ColorProviderConfig.MAP3_PROFILE,
 //            imageHeight,
-            (int) (imageHeight * UI.SCALING_4K),
+            (int) (imageHeight * UI.HIDPI_SCALING),
             getRgbVertices(),
             isDrawUnits);
 

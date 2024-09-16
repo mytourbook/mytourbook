@@ -47,8 +47,8 @@ public class SRTMProfileImage extends ProfileImage implements Cloneable {
       imageWidth = imageWidth < IMAGE_MIN_WIDTH ? IMAGE_MIN_WIDTH : imageWidth;
       imageHeight = imageHeight < IMAGE_MIN_HEIGHT ? IMAGE_MIN_HEIGHT : imageHeight;
 
-      final int imageWidthScaled = (int) (imageWidth * UI.SCALING_4K);
-      final int imageHeightScaled = (int) (imageHeight * UI.SCALING_4K);
+      final int imageWidthScaled = (int) (imageWidth * UI.HIDPI_SCALING);
+      final int imageHeightScaled = (int) (imageHeight * UI.HIDPI_SCALING);
 
       final BufferedImage awtImage = new BufferedImage(imageWidthScaled, imageHeightScaled, BufferedImage.TYPE_4BYTE_ABGR);
       final Graphics2D g2d = awtImage.createGraphics();

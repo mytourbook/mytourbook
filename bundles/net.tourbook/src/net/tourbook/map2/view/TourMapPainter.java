@@ -154,8 +154,8 @@ public class TourMapPainter extends Map2Painter {
                                                   final boolean isDarkBackground,
                                                   final boolean isDrawUnitShadow) {
 
-      final int imageWidthScaled = (int) (imageWidth * UI.SCALING_4K);
-      final int imageHeightScaled = (int) (imageHeight * UI.SCALING_4K);
+      final int imageWidthScaled = (int) (imageWidth * UI.HIDPI_SCALING);
+      final int imageHeightScaled = (int) (imageHeight * UI.HIDPI_SCALING);
 
       final BufferedImage awtImage = new BufferedImage(imageWidthScaled, imageHeightScaled, BufferedImage.TYPE_4BYTE_ABGR);
 
@@ -191,8 +191,8 @@ public class TourMapPainter extends Map2Painter {
                                               final boolean isDarkBackground,
                                               final boolean isDrawUnitShadow) {
 
-      final int imageWidthScaled = (int) (imageWidth * UI.SCALING_4K);
-      final int imageHeightScaled = (int) (imageHeight * UI.SCALING_4K);
+      final int imageWidthScaled = (int) (imageWidth * UI.HIDPI_SCALING);
+      final int imageHeightScaled = (int) (imageHeight * UI.HIDPI_SCALING);
 
       final BufferedImage awtImage = new BufferedImage(imageWidthScaled, imageHeightScaled, BufferedImage.TYPE_4BYTE_ABGR);
 
@@ -327,8 +327,8 @@ public class TourMapPainter extends Map2Painter {
          availableLegendPixels = graphWidth;
       }
 
-      graphWidth *= UI.SCALING_4K;
-      graphHeight *= UI.SCALING_4K;
+      graphWidth *= UI.HIDPI_SCALING;
+      graphHeight *= UI.HIDPI_SCALING;
 
       // pixelValue contains the value for ONE pixel
       final float pixelValue = legendDiffValue / availableLegendPixels;
