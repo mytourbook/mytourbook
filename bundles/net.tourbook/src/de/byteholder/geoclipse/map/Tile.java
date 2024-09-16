@@ -82,7 +82,7 @@ public class Tile {
    /**
     * Map image for this tile
     */
-   private Image                           _mapImage                    = null;
+   private Image                           _mapImage;
 
    /**
     * Image for the overlay tile, NOT the surrounding part tiles
@@ -106,14 +106,14 @@ public class Tile {
 
    private Future<?>                       _future;
 
-   private boolean                         _isLoading                   = false;
+   private boolean                         _isLoading;
 
-   private boolean                         _isOfflineError              = false;
+   private boolean                         _isOfflineError;
 
    /**
     * contains the error message when loading of the image fails
     */
-   private String                          _loadingError                = null;
+   private String                          _loadingError;
 
    /**
     * url which is used to load the tile

@@ -60,7 +60,13 @@ public class MPCustom extends MP {
 
       final float highDPIScaling = getHiDPI();
 
-      final String nameSuffix = highDPIScaling == 2.0 ? UI.HIDPI_NAME_2x : UI.EMPTY_STRING;
+      final String nameSuffix =
+
+            highDPIScaling == 2.0 ? UI.HIDPI_NAME_2x
+
+                  : highDPIScaling == 1.50 ? UI.HIDPI_NAME_15x
+
+                        : UI.EMPTY_STRING;
 
       final IPath filePath = new Path(fullPath)
 

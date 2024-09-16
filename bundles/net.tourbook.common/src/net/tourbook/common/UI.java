@@ -342,6 +342,7 @@ public class UI {
    public static boolean       IS_4K_DISPLAY;
 
    public static float         HIDPI_SCALING;
+   public static String        HIDPI_NAME_15x                 = "@1.5x";                     //$NON-NLS-1$
    public static String        HIDPI_NAME_2x                  = "@2x";                       //$NON-NLS-1$
 
    /**

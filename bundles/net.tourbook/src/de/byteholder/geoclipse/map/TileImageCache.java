@@ -196,25 +196,37 @@ public class TileImageCache {
    }
 
    /**
+    * @param tile
     * @param tileImagePath
     *
     * @return Returns the path for the offline image or <code>null</code> when the image is not
     *         available
     */
-   private IPath getCheckedOfflineImagePath(final IPath tileImagePath) {
+   private IPath getCheckedOfflineImagePath(final Tile tile, final IPath tileImagePath) {
 
       /*
        * Test 4k image
        */
 
-      String fileExt = tileImagePath.getFileExtension();
-      IPath pathWithoutExt = tileImagePath.removeFileExtension();
+      final String fileExt = tileImagePath.getFileExtension();
+      final IPath pathWithoutExt = tileImagePath.removeFileExtension();
 
-      final String hiDPIFileName = pathWithoutExt.lastSegment() + UI.HIDPI_NAME_2x;
+      final String hiDPI_2xFileName = pathWithoutExt.lastSegment() + UI.HIDPI_NAME_2x;
 
-      final IPath hiDPIFilePath = pathWithoutExt
+      IPath hiDPIFilePath = pathWithoutExt
             .removeLastSegments(1)
-            .append(hiDPIFileName)
+            .append(hiDPI_2xFileName)
+            .addFileExtension(fileExt);
+
+      if (hiDPIFilePath.toFile().exists()) {
+         return hiDPIFilePath;
+      }
+
+      final String hiDPI_15xFileName = pathWithoutExt.lastSegment() + UI.HIDPI_NAME_15x;
+
+      hiDPIFilePath = pathWithoutExt
+            .removeLastSegments(1)
+            .append(hiDPI_15xFileName)
             .addFileExtension(fileExt);
 
       if (hiDPIFilePath.toFile().exists()) {
@@ -232,9 +244,6 @@ public class TileImageCache {
       /*
        * Test part image
        */
-
-      fileExt = tileImagePath.getFileExtension();
-      pathWithoutExt = tileImagePath.removeFileExtension();
 
       final String partImageFileName = pathWithoutExt.lastSegment() + MapProviderManager.PART_IMAGE_FILE_NAME_SUFFIX;
 
@@ -274,7 +283,7 @@ public class TileImageCache {
             return null;
          }
 
-         final IPath offlineImagePath = getCheckedOfflineImagePath(tileImagePath);
+         final IPath offlineImagePath = getCheckedOfflineImagePath(tile, tileImagePath);
          if (offlineImagePath != null) {
 
             // get image for this tile
@@ -292,7 +301,8 @@ public class TileImageCache {
 
                Image loadedImage;
 
-               if (osTileImagePath.contains(UI.HIDPI_NAME_2x)) {
+               if (osTileImagePath.contains(UI.HIDPI_NAME_2x)
+                     || osTileImagePath.contains(UI.HIDPI_NAME_15x)) {
 
                   // create unscaled image
 
@@ -677,7 +687,7 @@ public class TileImageCache {
             return;
          }
 
-         final IPath offlineImagePath = getCheckedOfflineImagePath(tileImagePath);
+         final IPath offlineImagePath = getCheckedOfflineImagePath(tile, tileImagePath);
          if (offlineImagePath != null) {
 
             // offline image is available
@@ -749,7 +759,9 @@ public class TileImageCache {
          if (
 
          // ckeck offline image
-         (tile.getOfflinePath() != null && tile.getOfflinePath().contains(UI.HIDPI_NAME_2x))
+         (tile.getOfflinePath() != null
+               && (tile.getOfflinePath().contains(UI.HIDPI_NAME_2x)
+                     || tile.getOfflinePath().contains(UI.HIDPI_NAME_15x)))
 
                // check map provider
                || tile.getMP().getHiDPI() != 1.0) {

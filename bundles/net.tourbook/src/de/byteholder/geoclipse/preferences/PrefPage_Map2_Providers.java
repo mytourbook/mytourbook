@@ -192,6 +192,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private static float[]                      _allHiDPI_Values        = {
 
          1.0f,
+//       1.5f, this needs more testing, have not yet found a usable map provider
          2.0f,
    };
    //
@@ -201,6 +202,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private static String[]                     _allHiDPI_Label         = {
 
          "1x",                                                                                            //$NON-NLS-1$
+//       "1.5x",
          "2x",                                                                                            //$NON-NLS-1$
    };
 

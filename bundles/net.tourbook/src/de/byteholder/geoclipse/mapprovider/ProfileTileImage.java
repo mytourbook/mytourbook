@@ -37,6 +37,10 @@ final class ProfileTileImage {
 
          _tileImageData = new ImageData(512, 512, 24, new PaletteData(0xFF, 0xFF00, 0xFF0000));
 
+      } else if (parentTile.getMP().getHiDPI() == 1.5) {
+
+         _tileImageData = new ImageData(384, 384, 24, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+
       } else {
 
          _tileImageData = new ImageData(256, 256, 24, new PaletteData(0xFF, 0xFF00, 0xFF0000));
