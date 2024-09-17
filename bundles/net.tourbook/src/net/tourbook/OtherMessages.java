@@ -69,6 +69,9 @@ public class OtherMessages {
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_ASCENT   = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Ascent;
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_FLAT     = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Flat;
 
+   public static final String SLIDEOUT_MAP_PHOTO_OPTIONS_CHECKBOX_SHOW_PHOTO_RATING    = net.tourbook.Messages.Slideout_Map_PhotoOptions_Checkbox_ShowPhotoRating;
+   public static final String SLIDEOUT_MAP_PHOTO_OPTIONS_CHECKBOX_SHOW_PHOTO_TOOLTIP   = net.tourbook.Messages.Slideout_Map_PhotoOptions_Checkbox_ShowPhotoTooltip;
+
    //
    // net.tourbook.common.Messages
    //

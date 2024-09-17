@@ -789,10 +789,10 @@ public class Map2 extends Canvas {
    private final int           MAX_RATING_STARS              = 5;
    public int                  MAX_RATING_STARS_WIDTH;
 
-   public int                  MAP_IMAGE_DEFAULT_SIZE_TINY   = 20;
-   public int                  MAP_IMAGE_DEFAULT_SIZE_SMALL  = 60;
-   public int                  MAP_IMAGE_DEFAULT_SIZE_MEDIUM = 120;
-   public int                  MAP_IMAGE_DEFAULT_SIZE_LARGE  = 200;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_TINY   = 40;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_SMALL  = 100;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_MEDIUM = 200;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_LARGE  = 300;
 
    {
       final int deviceZoom = DPIUtil.getDeviceZoom();
@@ -2858,131 +2858,75 @@ public class Map2 extends Canvas {
    private BufferedImage getPhotoImage(final Photo photo) {
 
       BufferedImage awtThumbImage = null;
-      BufferedImage awtPhotoImageHQ = null;
       BufferedImage awtPhotoImageThumbHQ = null;
 
-      try {
+      /*
+       * 1. The thumbs MUST be loaded firstly because they are also loading the image orientation
+       */
 
-         /*
-          * 1. The thumbs MUST be loaded firstly because they are also loading the image orientation
-          */
+      // check if image has an loading error
+      final PhotoLoadingState thumbPhotoLoadingState = photo.getLoadingState(ImageQuality.THUMB);
 
-         // check if image has an loading error
-         final PhotoLoadingState thumbPhotoLoadingState = photo.getLoadingState(ImageQuality.THUMB);
+      if (thumbPhotoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
 
-         if (thumbPhotoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+         // image is not invalid and not yet loaded
 
-            // image is not invalid and not yet loaded
+         // check if image is in the cache
+         awtThumbImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB);
 
-            // check if image is in the cache
-            awtThumbImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB);
+         if (awtThumbImage == null
+               && thumbPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
 
-            if (awtThumbImage == null
-                  && thumbPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+            // the requested image is not available in the image cache -> image must be loaded
 
-               // the requested image is not available in the image cache -> image must be loaded
+            PhotoLoadManager.putImageInLoadingQueueThumb_Map(
+                  photo,
+                  ImageQuality.THUMB,
+                  _photoImageLoaderCallback,
+                  true // is AWT image
+            );
 
-               PhotoLoadManager.putImageInLoadingQueueThumb_Map(
-                     photo,
-                     ImageQuality.THUMB,
-                     _photoImageLoaderCallback,
-                     true // is AWT image
-               );
-
-               return null;
-            }
+            return null;
          }
+      }
 
-         if (_isShowHQPhotoImages == false) {
+      if (_isShowHQPhotoImages == false) {
 
-            return awtThumbImage;
+         return awtThumbImage;
+      }
+
+      /*
+       * 2. Display thumb HQ image
+       */
+
+      // check if image has an loading error
+      final PhotoLoadingState thumbHqPhotoLoadingState = photo.getLoadingState(ImageQuality.THUMB_HQ);
+
+      if (thumbHqPhotoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+
+         // image is not invalid and not yet loaded
+
+         // check if image is in the cache
+         awtPhotoImageThumbHQ = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB_HQ);
+
+         if (awtPhotoImageThumbHQ == null
+               && thumbHqPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+
+            // the requested image is not available in the image cache -> image must be loaded
+
+            PhotoLoadManager.putImageInLoadingQueueHQThumb_Map(
+                  photo,
+                  Photo.getMapImageRequestedSize(),
+                  _photoImageLoaderCallback);
          }
-
-         /*
-          * 2. Display HQ image
-          */
-
-         // check if image has an loading error
-         final PhotoLoadingState hqPhotoLoadingState = photo.getLoadingState(ImageQuality.HQ);
-
-         if (hqPhotoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
-
-            // image is not invalid and not yet loaded
-
-            // check if image is in the cache
-            awtPhotoImageHQ = PhotoImageCache.getImage_AWT(photo, ImageQuality.HQ);
-
-            if (awtPhotoImageHQ == null
-                  && hqPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
-
-               // the requested image is not available in the image cache -> image must be loaded
-
-               PhotoLoadManager.putImageInLoadingQueueHQ_Map(
-                     photo,
-                     ImageQuality.HQ,
-                     _photoImageLoaderCallback,
-                     true // is AWT image
-               );
-            }
-         }
-
-         /*
-          * 3. Display thumb HQ image
-          */
-
-         if (awtPhotoImageHQ != null) {
-
-            // check if image has an loading error
-            final PhotoLoadingState thumbHqPhotoLoadingState = photo.getLoadingState(ImageQuality.THUMB_HQ);
-
-            if (thumbHqPhotoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
-
-               // image is not invalid and not yet loaded
-
-               // check if image is in the cache
-               awtPhotoImageThumbHQ = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB_HQ);
-
-               if (awtPhotoImageThumbHQ == null
-                     && thumbHqPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
-
-                  // the requested image is not available in the image cache -> image must be loaded
-
-                  PhotoLoadManager.putImageInLoadingQueueHQThumb_Map(
-                        photo,
-                        Photo.getMapImageRequestedSize(),
-                        _photoImageLoaderCallback);
-               }
-            }
-         }
-
-      } finally {
-
-//         System.out.println(UI.timeStamp()
-//
-//               + " Thumb: " + dumpPhoto(awtThumbImage)
-//               + " - HQ: " + dumpPhoto(awtPhotoImageHQ)
-//
-//         );
-// TODO remove SYSTEM.OUT.PRINTLN
-
       }
 
       if (awtPhotoImageThumbHQ != null) {
 
          return awtPhotoImageThumbHQ;
-
-      } else if (awtPhotoImageHQ != null) {
-
-         return awtPhotoImageHQ;
-
-      } else if (awtThumbImage != null) {
-
-         return awtThumbImage;
-
-      } else {
-
-         return null;
       }
+
+      return awtThumbImage;
    }
 
    private PoiToolTip getPoiTooltip() {
@@ -3653,6 +3597,11 @@ public class Map2 extends Canvas {
             worldPosition.y - _worldPixel_TopLeft_Viewport.y);
 
       return gridGeoPos;
+   }
+
+   public void hidePhotoTooltip() {
+
+      _mapPointTooltip_Photo.hideNow();
    }
 
    private void hideTourTooltipHoveredArea() {
@@ -7164,10 +7113,7 @@ public class Map2 extends Canvas {
                      PhotoLoadManager.putImageInLoadingQueueHQ_Map(
                            photo,
                            requestedImageQuality,
-                           _photoImageLoaderCallback,
-
-                           false // is SWT image
-                     );
+                           _photoImageLoaderCallback);
                   }
                }
             }

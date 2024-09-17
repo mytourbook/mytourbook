@@ -408,8 +408,7 @@ public class PhotoLoadManager {
     */
    public static void putImageInLoadingQueueHQ_Map(final Photo photo,
                                                    final ImageQuality imageQuality,
-                                                   final ILoadCallBack imageLoaderCallback,
-                                                   final boolean isAWTImage) {
+                                                   final ILoadCallBack imageLoaderCallback) {
 
       // set state
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);

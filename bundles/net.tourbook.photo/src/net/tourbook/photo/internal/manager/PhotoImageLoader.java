@@ -60,24 +60,7 @@ import org.imgscalr.Scalr.Rotation;
 
 public class PhotoImageLoader {
 
-   private static IPreferenceStore _prefStore = PhotoActivator.getPrefStore();
-
-   private static String[]         awtImageFileSuffixes;
-
-   static {
-
-      awtImageFileSuffixes = ImageIO.getReaderFileSuffixes();
-
-//      final String[] formatNames = ImageIO.getReaderFormatNames();
-//      final String mimeReadFormats[] = ImageIO.getReaderMIMETypes();
-//
-//      System.out.println("Mime Reader:      " + Arrays.asList(mimeReadFormats));
-//      System.out.println("Format Reader:    " + Arrays.asList(formatNames));
-//      System.out.println("Suffixes Readers: " + Arrays.asList(awtImageFileSuffixes));
-
-//      final String writeFormats[] = ImageIO.getWriterMIMETypes();
-//      System.out.println("Mime Writers:     " + Arrays.asList(writeFormats));
-   }
+   private static IPreferenceStore  _prefStore        = PhotoActivator.getPrefStore();
 
    private Photo                    _photo;
    private ImageQuality             _requestedImageQuality;
@@ -219,22 +202,6 @@ public class PhotoImageLoader {
       }
 
       return thumbRotation;
-   }
-
-   /**
-    * @return Returns <code>true</code> when the image file can be loaded with AWT
-    */
-   private boolean isAWTImageSupported() {
-
-      final String photoSuffix = _photo.imageFileExt.toLowerCase();
-
-      for (final String awtImageSuffix : awtImageFileSuffixes) {
-         if (photoSuffix.equals(awtImageSuffix)) {
-            return true;
-         }
-      }
-
-      return false;
    }
 
    /**

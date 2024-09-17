@@ -55,15 +55,10 @@ New
 Improvements
 ============
 
-* 2D Map
-  - Support high quality photo images
-  - Support HiDPI map tiles without an "@2x" url name part
   
 
 Changes
 =======
-
-* 
 
 
 
