@@ -93,17 +93,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
                   : "1|sans-serif|7|0|");//$NON-NLS-1$
 /////////////////    1|DejaVu Sans|6.75|0|WINDOWS|1|-9|0|0|0|400|0|0|0|0|3|2|1|34|DejaVu Sans
 
-      store.setDefault(IPhotoPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK,
-
-            UI.IS_OSX
-
-                  ? PhotoLoadManager.IMAGE_FRAMEWORK_SWT
-
-                  //
-                  // SWT is terrible when scrolling large images on win & linux, osx is smoothly
-                  //
-                  : PhotoLoadManager.IMAGE_FRAMEWORK_AWT);
-
       store.setDefault(IPhotoPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_PREVIEW, false);
       store.setDefault(IPhotoPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_LOADING_MESSAGE, true);
       store.setDefault(IPhotoPreferences.PHOTO_FULLSIZE_VIEWER_IS_SHOW_HQ_IMAGE, false);
