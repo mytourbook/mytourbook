@@ -115,11 +115,10 @@ public class Util {
 
       final long timeAbsolute = time < 0 ? 0 - time : time;
 
-      return _formatter
-            .format(
-                  FORMAT_HH_MM,
-                  (timeAbsolute / 3600),
-                  (timeAbsolute % 3600) / 60)
+      return _formatter.format(FORMAT_HH_MM,
+
+            (timeAbsolute / 3600),
+            (timeAbsolute % 3600) / 60)
             .toString();
    }
 

@@ -157,7 +157,7 @@ public class Util {
     * @return
     */
    public static String addLineNumbers(final String text, final int startLineNumer) {
- 
+
       final String[] lines = StringUtils.splitIntoLines(text);
 
       final StringBuilder sb = new StringBuilder();
@@ -1566,6 +1566,16 @@ public class Util {
       }
 
       return newItems.toArray(new String[newItems.size()]);
+   }
+
+   /**
+    * @param value
+    *
+    * @return Returns the fraction of the value
+    */
+   public static double getValueFraction(final double value) {
+
+      return value - (int) value;
    }
 
    public static long getValueScaling(final double graphUnit) {
@@ -3382,8 +3392,6 @@ public class Util {
 
       return serializeObject(object).length;
    }
-
-
 
    /**
     * Writes a XML memento into a XML file.

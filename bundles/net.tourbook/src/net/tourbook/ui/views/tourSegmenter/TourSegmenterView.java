@@ -136,14 +136,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    //
    private static final boolean IS_DARK_THEME                                      = UI.isDarkTheme();
    //
-   private static final String  DISTANCE_MILES_1_8                                 = "1/8";                                        //$NON-NLS-1$
-   private static final String  DISTANCE_MILES_1_4                                 = "1/4";                                        //$NON-NLS-1$
-   private static final String  DISTANCE_MILES_3_8                                 = "3/8";                                        //$NON-NLS-1$
-   private static final String  DISTANCE_MILES_1_2                                 = "1/2";                                        //$NON-NLS-1$
-   private static final String  DISTANCE_MILES_5_8                                 = "5/8";                                        //$NON-NLS-1$
-   private static final String  DISTANCE_MILES_3_4                                 = "3/4";                                        //$NON-NLS-1$
-   private static final String  DISTANCE_MILES_7_8                                 = "7/8";                                        //$NON-NLS-1$
-   //
    private static final String  FORMAT_ALTITUDE_DIFF                               = "%d / %d %s";                                 //$NON-NLS-1$
    //
    private static final int     SEGMENTER_REQUIRES_ELEVATION                       = 0x01;
@@ -2925,11 +2917,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
           * force pages to be displayed otherwise they are hidden or the hint is not computed for
           * the first column until a resize is done
           */
-//			_pagebookBreakTime.showPage(_pageBreakBySliceSpeed);
-//			_pagebookBreakTime.showPage(_pageBreakByAvgSpeed);
-//			_pageBreakBySliceSpeed.layout(true, true);
-//			_pageBreakByAvgSpeed.layout(true, true);
-//			_pagebookBreakTime.layout(true, true);
+//       _pagebookBreakTime.showPage(_pageBreakBySliceSpeed);
+//       _pagebookBreakTime.showPage(_pageBreakByAvgSpeed);
+//       _pageBreakBySliceSpeed.layout(true, true);
+//       _pageBreakByAvgSpeed.layout(true, true);
+//       _pagebookBreakTime.layout(true, true);
       }
    }
 
@@ -2937,7 +2929,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
          {
             /*
@@ -3007,7 +2999,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
          /*
           * minimum average speed
@@ -3041,7 +3033,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          /*
           * minimum speed
@@ -3486,7 +3478,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI /* | SWT.BORDER */);
 
       table.setHeaderVisible(true);
-//		table.setLinesVisible(true);
+//    table.setLinesVisible(true);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
       _segmentViewer = new TableViewer(table);
@@ -5502,22 +5494,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          } else {
 
 // disabled, tour is only saved with the save button since v14.7
-//					final TourData savedTour = saveTour();
-//					if (savedTour != null) {
+//             final TourData savedTour = saveTour();
+//             if (savedTour != null) {
 //
-//						/*
-//						 * when a tour is saved, the change notification is not fired because
-//						 * another tour is already selected, but to update the tour in a TourViewer,
-//						 * a change notification must be fired afterwards
-//						 */
-////				Display.getCurrent().asyncExec(new Runnable() {
-////					public void run() {
-////						TourManager.fireEvent(TourEventId.TOUR_CHANGED,
-////								new TourEvent(savedTour),
-////								TourSegmenterView.this);
-////					}
-////				});
-//					}
+//                /*
+//                 * when a tour is saved, the change notification is not fired because
+//                 * another tour is already selected, but to update the tour in a TourViewer,
+//                 * a change notification must be fired afterwards
+//                 */
+////           Display.getCurrent().asyncExec(new Runnable() {
+////              public void run() {
+////                 TourManager.fireEvent(TourEventId.TOUR_CHANGED,
+////                       new TourEvent(savedTour),
+////                       TourSegmenterView.this);
+////              }
+////           });
+//             }
 
             if (eventTourChart == null) {
                eventTourChart = TourManager.getActiveTourChart(tourData);
@@ -6531,52 +6523,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void updateUI_Distance() {
 
-      float spinnerDistance = getDistance() / UI.UNIT_VALUE_DISTANCE;
+      final float distanceMeter = getDistance() / UI.UNIT_VALUE_DISTANCE;
 
       if (UI.UNIT_IS_DISTANCE_MILE) {
 
          // mile
 
-         spinnerDistance /= 1000;
-
-         final int distanceInt = (int) spinnerDistance;
-         final float distanceFract = spinnerDistance - distanceInt;
-
-         // create distance for imperials which shows the fraction with 1/8, 1/4, 3/8 ...
-         final StringBuilder sb = new StringBuilder();
-
-         if (distanceInt > 0) {
-            sb.append(Integer.toString(distanceInt));
-            sb.append(UI.SPACE);
-         }
-
-         if (Math.abs(distanceFract - 0.125f) <= 0.01) {
-            sb.append(DISTANCE_MILES_1_8);
-            sb.append(UI.SPACE);
-         } else if (Math.abs(distanceFract - 0.25f) <= 0.01) {
-            sb.append(DISTANCE_MILES_1_4);
-            sb.append(UI.SPACE);
-         } else if (Math.abs(distanceFract - 0.375) <= 0.01) {
-            sb.append(DISTANCE_MILES_3_8);
-            sb.append(UI.SPACE);
-         } else if (Math.abs(distanceFract - 0.5f) <= 0.01) {
-            sb.append(DISTANCE_MILES_1_2);
-            sb.append(UI.SPACE);
-         } else if (Math.abs(distanceFract - 0.625) <= 0.01) {
-            sb.append(DISTANCE_MILES_5_8);
-            sb.append(UI.SPACE);
-         } else if (Math.abs(distanceFract - 0.75f) <= 0.01) {
-            sb.append(DISTANCE_MILES_3_4);
-            sb.append(UI.SPACE);
-         } else if (Math.abs(distanceFract - 0.875) <= 0.01) {
-            sb.append(DISTANCE_MILES_7_8);
-            sb.append(UI.SPACE);
-         }
-
-         sb.append(UI.UNIT_LABEL_DISTANCE);
-
          // update UI
-         _lblDistanceValue.setText(sb.toString());
+         _lblDistanceValue.setText(UI.convertKmIntoMiles(distanceMeter));
 
       } else {
 
@@ -6586,6 +6540,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          _lblDistanceValue.setText(UI.UNIT_LABEL_DISTANCE);
       }
    }
+
 
    /**
     * Update ascending altitude computed value

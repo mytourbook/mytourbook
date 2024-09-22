@@ -49,7 +49,9 @@ Experimental
 New
 ===
 
-* 
+* Tour Book View
+  - Create tour markers by distance or time
+    https://github.com/mytourbook/mytourbook/issues/1319
 
 
 Improvements

@@ -506,6 +506,17 @@ public class Messages extends NLS {
    public static String        Dialog_BeverageContainer_Title_Create;
    public static String        Dialog_BeverageContainer_Title_Edit;
 
+   public static String        Dialog_CreateTourMarkers_Button_CreateMarkers;
+   public static String        Dialog_CreateTourMarkers_Button_CreateMarkers_NeedsConfirmation;
+   public static String        Dialog_CreateTourMarkers_Label_Title_MultipleTours;
+   public static String        Dialog_CreateTourMarkers_Label_Title_OneTour;
+   public static String        Dialog_CreateTourMarkers_Message_CreateMarkers;
+   public static String        Dialog_CreateTourMarkers_Message_NoNewMarkers;
+   public static String        Dialog_CreateTourMarkers_Radio_ByDistance;
+   public static String        Dialog_CreateTourMarkers_Radio_ByTime;
+   public static String        Dialog_CreateTourMarkers_Title;
+   public static String        Dialog_CreateTourMarkers_Tooltip;
+
    public static String        Dialog_CustomTourNutritionProduct_Label_BeverageQuantity;
    public static String        Dialog_CustomTourNutritionProduct_Label_Calories;
    public static String        Dialog_CustomTourNutritionProduct_Label_IsBeverage;
@@ -2902,6 +2913,7 @@ public class Messages extends NLS {
    public static String        Tour_Action_ComputeCadenceZonesTimes_Title;
    public static String        Tour_Action_ComputeTourBreakTimes;
    public static String        Tour_Action_ComputeTourBreakTimes_Tooltip;
+   public static String        Tour_Action_CreateTourMarkers;
    public static String        Tour_Action_DuplicateTour;
    public static String        Tour_Action_EditChartPreferences;
    public static String        Tour_Action_EditSmoothingPreferences;

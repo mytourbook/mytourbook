@@ -270,6 +270,7 @@ public class UI {
    public static final String       SYMBOL_TEMPERATURE_FAHRENHEIT        = "\u00b0F";                                   //$NON-NLS-1$
    public static final String       SYMBOL_UNDERSCORE                    = "_";                                         //$NON-NLS-1$
    public static final String       SYMBOL_WIND_WITH_SPACE               = "W ";                                        //$NON-NLS-1$
+   public static final String       SYMBOL_ZERO                          = "0";                                         //$NON-NLS-1$
 
    public static final CharSequence SYMBOL_HTML_BACKSLASH                = "&#92;";                                     //$NON-NLS-1$
 
@@ -566,6 +567,7 @@ public class UI {
     * Contains the unit label in the current measurement system for the distance values
     */
    public static String       UNIT_LABEL_ALTIMETER;
+   /** km or mile */
    public static String       UNIT_LABEL_DISTANCE;
    public static String       UNIT_LABEL_DISTANCE_M_OR_YD;
    public static String       UNIT_LABEL_DISTANCE_MM_OR_INCH;
@@ -626,6 +628,14 @@ public class UI {
    public static final String          UNIT_WEIGHT_LBS            = "lbs";                      //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_MG             = "mg";                       //$NON-NLS-1$
 
+   private static final String         DISTANCE_MILES_1_8         = "1/8";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_1_4         = "1/4";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_3_8         = "3/8";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_1_2         = "1/2";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_5_8         = "5/8";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_3_4         = "3/4";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_7_8         = "7/8";                      //$NON-NLS-1$
+   //
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER;
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER_SHORT;
 
@@ -1077,6 +1087,7 @@ public class UI {
     * @param defaultAccelerator
     *           Could be 10 to increase e.g. image size by 10 without pressing an accelerator key
     * @param isSmallValueAdjustment
+    *           When <code>true</code> then small values have another accelerator than bigger values
     */
    public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event,
                                                       final int defaultAccelerator,
@@ -1300,6 +1311,78 @@ public class UI {
       }
 
       return convertHorizontalDLUsToPixels(_dialogFont_Metrics, dlus);
+   }
+
+   /**
+    * Create distance for imperials which shows the fraction with 1/8, 1/4, 3/8 ...
+    *
+    * @param distanceMeter
+    *
+    * @return
+    */
+   public static String convertKmIntoMiles(final float distanceMeter) {
+
+      final float distanceKm = distanceMeter / 1000;
+
+      final int distanceKmInt = (int) distanceKm;
+      final float distanceKmFract = distanceKm - distanceKmInt;
+
+      final StringBuilder sb = new StringBuilder();
+
+      // set whole mile
+      if (distanceKmInt > 0) {
+
+         sb.append(Integer.toString(distanceKmInt));
+         sb.append(SPACE);
+      }
+
+      // set partial mile
+      if (Math.abs(distanceKmFract - 0.125f) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_1_8);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.25f) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_1_4);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.375) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_3_8);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.5f) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_1_2);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.625) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_5_8);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.75f) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_3_4);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.875) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_7_8);
+         sb.append(SPACE);
+      }
+
+      // ensure a value is displayed
+      if (sb.isEmpty()) {
+
+         sb.append(SYMBOL_ZERO);
+         sb.append(SPACE);
+      }
+
+      sb.append(UNIT_LABEL_DISTANCE);
+
+      return sb.toString();
    }
 
    /**

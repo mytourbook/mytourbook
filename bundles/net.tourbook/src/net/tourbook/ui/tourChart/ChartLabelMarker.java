@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2001, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,11 +23,12 @@ import org.eclipse.swt.graphics.Rectangle;
 public class ChartLabelMarker extends ChartLabel {
 
    /**
-    * marker was created in the device
+    * Marker was created in the device
     */
    public static final int MARKER_TYPE_DEVICE     = 1;
+
    /**
-    * marker was created in the tourbook application
+    * Marker was created in the tourbook application
     */
    public static final int MARKER_TYPE_CUSTOM     = 2;
 
