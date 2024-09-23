@@ -507,7 +507,7 @@ public class Messages extends NLS {
    public static String        Dialog_BeverageContainer_Title_Edit;
 
    public static String        Dialog_CreateTourMarkers_Button_CreateMarkers;
-   public static String        Dialog_CreateTourMarkers_Button_CreateMarkers_NeedsConfirmation;
+   public static String        Dialog_CreateTourMarkers_Button_ValidateMarkers;
    public static String        Dialog_CreateTourMarkers_Label_Title_MultipleTours;
    public static String        Dialog_CreateTourMarkers_Label_Title_OneTour;
    public static String        Dialog_CreateTourMarkers_Message_CreateMarkers;

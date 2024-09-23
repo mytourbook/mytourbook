@@ -1324,8 +1324,15 @@ public class UI {
 
       final float distanceKm = distanceMeter / 1000;
 
-      final int distanceKmInt = (int) distanceKm;
-      final float distanceKmFract = distanceKm - distanceKmInt;
+      int distanceKmInt = (int) distanceKm;
+      float distanceKmFract = distanceKm - distanceKmInt;
+
+      // fix rounding
+      if (distanceKmFract >= 0.9999) {
+
+         distanceKmInt++;
+         distanceKmFract = 0;
+      }
 
       final StringBuilder sb = new StringBuilder();
 

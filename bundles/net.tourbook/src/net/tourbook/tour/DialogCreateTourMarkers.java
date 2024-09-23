@@ -125,7 +125,7 @@ public class DialogCreateTourMarkers extends Dialog {
       super.createButtonsForButtonBar(parent);
 
       // OK -> Create Markers
-      getButton(IDialogConstants.OK_ID).setText(Messages.Dialog_CreateTourMarkers_Button_CreateMarkers_NeedsConfirmation);
+      getButton(IDialogConstants.OK_ID).setText(Messages.Dialog_CreateTourMarkers_Button_ValidateMarkers);
    }
 
    @Override
@@ -647,14 +647,14 @@ public class DialogCreateTourMarkers extends Dialog {
 
    private void updateUI_Distance() {
 
-      final float spinnerDistance = getSelectedDistance() / UI.UNIT_VALUE_DISTANCE;
+      final float spinnerDistanceKm = getSelectedDistance() / UI.UNIT_VALUE_DISTANCE;
 
       if (UI.UNIT_IS_DISTANCE_MILE) {
 
          // mile
 
          // update UI
-         _labelDistanceUnit.setText(UI.convertKmIntoMiles(spinnerDistance));
+         _labelDistanceUnit.setText(UI.convertKmIntoMiles(spinnerDistanceKm));
 
       } else {
 
