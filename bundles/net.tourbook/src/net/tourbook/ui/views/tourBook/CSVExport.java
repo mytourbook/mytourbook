@@ -20,6 +20,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -40,6 +44,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreePath;
 
 public class CSVExport {
+
+   private static final String SYMBOL_DOUBLE_QUOTES                                   = "\"";                                               //$NON-NLS-1$
 
    private static char         SEPARATOR;
 
@@ -128,6 +134,7 @@ public class CSVExport {
    private static final String HEADER_TIME_WEEKDAY                                    = "TIME Weekday";                                     //$NON-NLS-1$
    private static final String HEADER_TIME_YEAR                                       = "TIME Year";                                        //$NON-NLS-1$
 
+   private static final String HEADER_TOUR_DESCRIPTION                                = "TOUR Description";                                 //$NON-NLS-1$
    private static final String HEADER_TOUR_LOCATION_START                             = "TOUR Start Location";                              //$NON-NLS-1$
    private static final String HEADER_TOUR_LOCATION_END                               = "TOUR End Location";                                //$NON-NLS-1$
    private static final String HEADER_TOUR_NUMBER_OF_MARKER                           = "TOUR Number of markers";                           //$NON-NLS-1$
@@ -587,6 +594,7 @@ public class CSVExport {
       csvHeader(sb,                 HEADER_TOUR_TYPE_ID);
       csvHeader(sb,                 HEADER_TOUR_TYPE_NAME);
       csvHeader(sb,                 HEADER_TOUR_TITLE);
+      csvHeader(sb,                 HEADER_TOUR_DESCRIPTION);
       csvHeader(sb,                 HEADER_TOUR_LOCATION_START);
       csvHeader(sb,                 HEADER_TOUR_LOCATION_END);
       csvHeader(sb,                 HEADER_TOUR_TAGS);
@@ -1008,7 +1016,7 @@ public class CSVExport {
 
          final long colElapsedTime = (tviItem).colTourDeviceTime_Elapsed;
          if (colElapsedTime != 0) {
-            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colElapsedTime));
+            sb.append(UI.format_hh_mm_ss(colElapsedTime));
          }
          sb.append(SEPARATOR);
       }
@@ -1017,7 +1025,7 @@ public class CSVExport {
 
          final long colTourDeviceTime_Recorded = (tviItem).colTourDeviceTime_Recorded;
          if (colTourDeviceTime_Recorded != 0) {
-            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colTourDeviceTime_Recorded));
+            sb.append(UI.format_hh_mm_ss(colTourDeviceTime_Recorded));
          }
          sb.append(SEPARATOR);
       }
@@ -1026,7 +1034,7 @@ public class CSVExport {
 
          final long colTourDeviceTime_Paused = (tviItem).colTourDeviceTime_Paused;
          if (colTourDeviceTime_Paused != 0) {
-            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colTourDeviceTime_Paused));
+            sb.append(UI.format_hh_mm_ss(colTourDeviceTime_Paused));
          }
          sb.append(SEPARATOR);
       }
@@ -1035,7 +1043,7 @@ public class CSVExport {
 
          final long colMovingTime = tviItem.colTourComputedTime_Moving;
          if (colMovingTime != 0) {
-            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colMovingTime));
+            sb.append(UI.format_hh_mm_ss(colMovingTime));
          }
          sb.append(SEPARATOR);
       }
@@ -1044,7 +1052,7 @@ public class CSVExport {
 
          final long colBreakTime = tviItem.colTourComputedTime_Break;
          if (colBreakTime != 0) {
-            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colBreakTime));
+            sb.append(UI.format_hh_mm_ss(colBreakTime));
          }
          sb.append(SEPARATOR);
       }
@@ -1075,6 +1083,7 @@ public class CSVExport {
 //    csvField_Str(sb,                 HEADER_TOUR_TYPE_ID);
 //    csvField_Str(sb,                 HEADER_TOUR_TYPE_NAME);
 //    csvField_Str(sb,                 HEADER_TOUR_TITLE);
+//    csvField_Str(sb,                 HEADER_TOUR_DESCRIPTION);
 //    csvField_Str(sb,                 HEADER_TOUR_LOCATION_START);
 //    csvField_Str(sb,                 HEADER_TOUR_LOCATION_END);
 //    csvField_Str(sb,                 HEADER_TOUR_TAGS);
@@ -1108,9 +1117,10 @@ public class CSVExport {
          sb.append(SEPARATOR);
       }
 
-      csvField(sb, tviItem.colTourTitle); // HEADER_TOUR_TITLE
-      csvField(sb, tviItem.colTourLocation_Start); // HEADER_TOUR_LOCATION_START
-      csvField(sb, tviItem.colTourLocation_End); // HEADER_TOUR_LOCATION_END
+      csvField(sb, tviItem.colTourTitle); //                         HEADER_TOUR_TITLE
+      csvField(sb, getFullTourDescription(tviItem.getTourId())); //  HEADER_TOUR_DESCRIPTION
+      csvField(sb, tviItem.colTourLocation_Start); //                HEADER_TOUR_LOCATION_START
+      csvField(sb, tviItem.colTourLocation_End); //                  HEADER_TOUR_LOCATION_END
 
       { // HEADER_TOUR_TAGS
 
@@ -1187,7 +1197,7 @@ public class CSVExport {
 
          final float pace = tviItem.colAvgPace * UI.UNIT_VALUE_DISTANCE;
          if (pace != 0) {
-            sb.append(net.tourbook.common.UI.format_mm_ss((long) pace));
+            sb.append(UI.format_mm_ss((long) pace));
          }
          sb.append(SEPARATOR);
       }
@@ -1709,6 +1719,48 @@ public class CSVExport {
          }
          sb.append(SEPARATOR);
       }
+   }
+
+   private String getFullTourDescription(final Long tourId) {
+
+      String description = null;
+
+      final String select = "SELECT TourDescription" + NL //      //$NON-NLS-1$
+
+            + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //     //$NON-NLS-1$
+            + " WHERE TourId = ?" + NL; //                        //$NON-NLS-1$
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final PreparedStatement statement = conn.prepareStatement(select);
+
+         statement.setLong(1, tourId);
+         final ResultSet result = statement.executeQuery();
+
+         while (result.next()) {
+
+            description = result.getString(1);
+         }
+
+      } catch (final SQLException e) {
+
+         StatusUtil.logError(select);
+         UI.showSQLException(e);
+      }
+
+      if (description != null) {
+
+         // escape new lines
+         description = description.replaceAll("(\r\n|\n|\r)", "\\\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+         // escape double quotes
+         description = description.replace(SYMBOL_DOUBLE_QUOTES, "\"\""); //$NON-NLS-1$
+
+         // enclose in double quotes as string delimiter
+         description = SYMBOL_DOUBLE_QUOTES + description + SYMBOL_DOUBLE_QUOTES;
+      }
+
+      return description;
    }
 
    /**

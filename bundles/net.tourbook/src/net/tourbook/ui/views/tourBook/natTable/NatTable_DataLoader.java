@@ -1040,6 +1040,7 @@ public class NatTable_DataLoader {
       /*
        * TOUR
        */
+      case TableColumnFactory.TOUR_DESCRIPTION_ID:                   return "TourDescription";                             //$NON-NLS-1$
       case TableColumnFactory.TOUR_LOCATION_START_ID:                return "COALESCE(tourStartPlace, '')";                //$NON-NLS-1$
       case TableColumnFactory.TOUR_LOCATION_END_ID:                  return "COALESCE(tourEndPlace, '')";                  //$NON-NLS-1$
       case TableColumnFactory.TOUR_LOCATION_ID_START_ID:             return "tourLocationStart_LocationID";                //$NON-NLS-1$
