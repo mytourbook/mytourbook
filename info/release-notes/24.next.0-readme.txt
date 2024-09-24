@@ -60,10 +60,16 @@ Improvements
 * Tour Book View
   - Added column for tour description, the displayed text has been shortened to 100 characters
 
+
 Changes
 =======
 
+* Tour Type Preferences
+  - Renamed pref page
+  - Swapped pref page
 
+* Tag Preferences
+  - Renamed pref page
 
 Changes that require Tour Re-import
 ===================================

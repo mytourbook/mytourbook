@@ -528,7 +528,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(400, 500)
+            .hint(300, 300)
             .applyTo(layoutContainer);
 
       final TreeColumnLayout treeLayout = new TreeColumnLayout();
