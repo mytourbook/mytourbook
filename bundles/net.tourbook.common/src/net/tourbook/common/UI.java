@@ -175,7 +175,7 @@ public class UI {
    private static final String      JS_APOSTROPHE_REPLACEMENT            = "\\'";                                       //$NON-NLS-1$
 
    /**
-    * Suddenly JS_QUOTA_MARK causes this Eclipse exception when opening the string externalization
+    * Suddenly SYMBOL_QUOTA causes this Eclipse exception when opening the string externalization
     * dialog
     *
     * <pre>
@@ -196,8 +196,9 @@ public class UI {
     *          at org.eclipse.jdt.ui.actions.SelectionDispatchAction.dispatchRun(SelectionDispatchAction.java:278)
     * </pre>
     */
-// private static final String      JS_QUOTA_MARK                        = "\"";                                        //$NON-NLS-1$
-   private static String            JS_QUOTA_MARK                        = new StringBuilder().append('"').toString();
+// public static final String       SYMBOL_QUOTA                         = "\"";
+   public static final String       SYMBOL_QUOTATION_MARK                = new StringBuilder().append('"').toString();
+   //
    private static final String      JS_QUOTA_MARK_REPLACEMENT            = "\\\"";                                      //$NON-NLS-1$
    private static final String      JS_BACKSLASH_REPLACEMENT             = "\\\\";                                      //$NON-NLS-1$
    private static final String      HTML_NEW_LINE                        = "\\n";                                       //$NON-NLS-1$
@@ -2830,7 +2831,7 @@ public class UI {
 
    public static String replaceJS_QuotaMark(final String js) {
 
-      return js.replace(JS_QUOTA_MARK, JS_QUOTA_MARK_REPLACEMENT);
+      return js.replace(SYMBOL_QUOTATION_MARK, JS_QUOTA_MARK_REPLACEMENT);
    }
 
    public static void resetInitialLocation(final IDialogSettings _state, final String statePrefix) {

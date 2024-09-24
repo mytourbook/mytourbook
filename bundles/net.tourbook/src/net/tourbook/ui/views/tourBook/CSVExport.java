@@ -45,8 +45,6 @@ import org.eclipse.jface.viewers.TreePath;
 
 public class CSVExport {
 
-   private static final String SYMBOL_DOUBLE_QUOTES                                   = "\"";                                               //$NON-NLS-1$
-
    private static char         SEPARATOR;
 
    private static final String NL                                                     = UI.SYSTEM_NEW_LINE;
@@ -1754,10 +1752,10 @@ public class CSVExport {
          description = description.replaceAll("(\r\n|\n|\r)", "\\\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
          // escape double quotes
-         description = description.replace(SYMBOL_DOUBLE_QUOTES, "\"\""); //$NON-NLS-1$
+         description = description.replace(UI.SYMBOL_QUOTATION_MARK, "\"\""); //$NON-NLS-1$
 
          // enclose in double quotes as string delimiter
-         description = SYMBOL_DOUBLE_QUOTES + description + SYMBOL_DOUBLE_QUOTES;
+         description = UI.SYMBOL_QUOTATION_MARK + description + UI.SYMBOL_QUOTATION_MARK;
       }
 
       return description;

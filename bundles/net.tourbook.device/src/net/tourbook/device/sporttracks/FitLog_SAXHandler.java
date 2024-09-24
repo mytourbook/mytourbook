@@ -567,7 +567,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
                //If there is already content in the notes fields, then we insert a new line
                tourNotes.append(UI.NEW_LINE);
             }
-            tourNotes.append("\"" + key + "\" : \"" + value + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            tourNotes.append(UI.SYMBOL_QUOTATION_MARK + key + "\" : \"" + value + UI.SYMBOL_QUOTATION_MARK); //$NON-NLS-1$
          });
 
          tourData.setTourDescription(tourNotes.toString());
