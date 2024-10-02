@@ -175,7 +175,7 @@ public class UI {
    private static final String      JS_APOSTROPHE_REPLACEMENT            = "\\'";                                       //$NON-NLS-1$
 
    /**
-    * Suddenly JS_QUOTA_MARK causes this Eclipse exception when opening the string externalization
+    * Suddenly SYMBOL_QUOTA causes this Eclipse exception when opening the string externalization
     * dialog
     *
     * <pre>
@@ -196,8 +196,9 @@ public class UI {
     *          at org.eclipse.jdt.ui.actions.SelectionDispatchAction.dispatchRun(SelectionDispatchAction.java:278)
     * </pre>
     */
-// private static final String      JS_QUOTA_MARK                        = "\"";                                        //$NON-NLS-1$
-   private static String            JS_QUOTA_MARK                        = new StringBuilder().append('"').toString();
+// public static final String       SYMBOL_QUOTA                         = "\"";
+   public static final String       SYMBOL_QUOTATION_MARK                = new StringBuilder().append('"').toString();
+   //
    private static final String      JS_QUOTA_MARK_REPLACEMENT            = "\\\"";                                      //$NON-NLS-1$
    private static final String      JS_BACKSLASH_REPLACEMENT             = "\\\\";                                      //$NON-NLS-1$
    private static final String      HTML_NEW_LINE                        = "\\n";                                       //$NON-NLS-1$
@@ -270,6 +271,7 @@ public class UI {
    public static final String       SYMBOL_TEMPERATURE_FAHRENHEIT        = "\u00b0F";                                   //$NON-NLS-1$
    public static final String       SYMBOL_UNDERSCORE                    = "_";                                         //$NON-NLS-1$
    public static final String       SYMBOL_WIND_WITH_SPACE               = "W ";                                        //$NON-NLS-1$
+   public static final String       SYMBOL_ZERO                          = "0";                                         //$NON-NLS-1$
 
    public static final CharSequence SYMBOL_HTML_BACKSLASH                = "&#92;";                                     //$NON-NLS-1$
 
@@ -341,8 +343,9 @@ public class UI {
     */
    public static boolean       IS_4K_DISPLAY;
 
-   public static float         SCALING_4K;
-   public static String        NAME_SUFFIX_4k                 = "@2x";                       //$NON-NLS-1$
+   public static float         HIDPI_SCALING;
+   public static String        HIDPI_NAME_15x                 = "@1.5x";                     //$NON-NLS-1$
+   public static String        HIDPI_NAME_2x                  = "@2x";                       //$NON-NLS-1$
 
    /**
     * On Linux an async selection event is fired since e4
@@ -565,6 +568,7 @@ public class UI {
     * Contains the unit label in the current measurement system for the distance values
     */
    public static String       UNIT_LABEL_ALTIMETER;
+   /** km or mile */
    public static String       UNIT_LABEL_DISTANCE;
    public static String       UNIT_LABEL_DISTANCE_M_OR_YD;
    public static String       UNIT_LABEL_DISTANCE_MM_OR_INCH;
@@ -626,6 +630,14 @@ public class UI {
    public static final String          UNIT_WEIGHT_LBS            = "lbs";                      //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_MG             = "mg";                       //$NON-NLS-1$
 
+   private static final String         DISTANCE_MILES_1_8         = "1/8";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_1_4         = "1/4";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_3_8         = "3/8";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_1_2         = "1/2";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_5_8         = "5/8";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_3_4         = "3/4";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_7_8         = "7/8";                      //$NON-NLS-1$
+   //
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER;
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER_SHORT;
 
@@ -765,7 +777,7 @@ public class UI {
       final int deviceZoom = DPIUtil.getDeviceZoom();
 
       IS_4K_DISPLAY = deviceZoom >= 140;
-      SCALING_4K = deviceZoom / 100f;
+      HIDPI_SCALING = deviceZoom / 100f;
 
       setupUI_FontMetrics();
       setupUI_AWTFonts();
@@ -1077,6 +1089,7 @@ public class UI {
     * @param defaultAccelerator
     *           Could be 10 to increase e.g. image size by 10 without pressing an accelerator key
     * @param isSmallValueAdjustment
+    *           When <code>true</code> then small values have another accelerator than bigger values
     */
    public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event,
                                                       final int defaultAccelerator,
@@ -1300,6 +1313,85 @@ public class UI {
       }
 
       return convertHorizontalDLUsToPixels(_dialogFont_Metrics, dlus);
+   }
+
+   /**
+    * Create distance for imperials which shows the fraction with 1/8, 1/4, 3/8 ...
+    *
+    * @param distanceMeter
+    *
+    * @return
+    */
+   public static String convertKmIntoMiles(final float distanceMeter) {
+
+      final float distanceKm = distanceMeter / 1000;
+
+      int distanceKmInt = (int) distanceKm;
+      float distanceKmFract = distanceKm - distanceKmInt;
+
+      // fix rounding
+      if (distanceKmFract >= 0.9999) {
+
+         distanceKmInt++;
+         distanceKmFract = 0;
+      }
+
+      final StringBuilder sb = new StringBuilder();
+
+      // set whole mile
+      if (distanceKmInt > 0) {
+
+         sb.append(Integer.toString(distanceKmInt));
+         sb.append(SPACE);
+      }
+
+      // set partial mile
+      if (Math.abs(distanceKmFract - 0.125f) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_1_8);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.25f) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_1_4);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.375) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_3_8);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.5f) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_1_2);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.625) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_5_8);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.75f) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_3_4);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.875) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_7_8);
+         sb.append(SPACE);
+      }
+
+      // ensure a value is displayed
+      if (sb.isEmpty()) {
+
+         sb.append(SYMBOL_ZERO);
+         sb.append(SPACE);
+      }
+
+      sb.append(UNIT_LABEL_DISTANCE);
+
+      return sb.toString();
    }
 
    /**
@@ -2158,11 +2250,11 @@ public class UI {
 
       final float fontSize = //
 
-            UI.SCALING_4K <= 1.5 ? defaultFontSize * 1.5f
+            UI.HIDPI_SCALING <= 1.5 ? defaultFontSize * 1.5f
 
-                  : UI.SCALING_4K <= 2 ? defaultFontSize * 1.7f
+                  : UI.HIDPI_SCALING <= 2 ? defaultFontSize * 1.7f
 
-                        : UI.SCALING_4K <= 3 ? defaultFontSize * 1.8f
+                        : UI.HIDPI_SCALING <= 3 ? defaultFontSize * 1.8f
 
                               : defaultFontSize * 1.8f;
 
@@ -2740,7 +2832,7 @@ public class UI {
 
    public static String replaceJS_QuotaMark(final String js) {
 
-      return js.replace(JS_QUOTA_MARK, JS_QUOTA_MARK_REPLACEMENT);
+      return js.replace(SYMBOL_QUOTATION_MARK, JS_QUOTA_MARK_REPLACEMENT);
    }
 
    public static void resetInitialLocation(final IDialogSettings _state, final String statePrefix) {

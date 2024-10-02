@@ -1040,6 +1040,7 @@ public class NatTable_DataLoader {
       /*
        * TOUR
        */
+      case TableColumnFactory.TOUR_DESCRIPTION_ID:                   return "TourDescription";                             //$NON-NLS-1$
       case TableColumnFactory.TOUR_LOCATION_START_ID:                return "COALESCE(tourStartPlace, '')";                //$NON-NLS-1$
       case TableColumnFactory.TOUR_LOCATION_END_ID:                  return "COALESCE(tourEndPlace, '')";                  //$NON-NLS-1$
       case TableColumnFactory.TOUR_LOCATION_ID_START_ID:             return "tourLocationStart_LocationID";                //$NON-NLS-1$
@@ -1090,7 +1091,7 @@ public class NatTable_DataLoader {
          // ensure a valid field is returned, this case should not happen but it helps during development
 
          System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] getSqlField_OrderBy()" //$NON-NLS-1$ //$NON-NLS-2$
-               + "\tsortColumnId: \"" + sortColumnId + "\"" //$NON-NLS-1$ //$NON-NLS-2$
+               + "\tsortColumnId: \"" + sortColumnId + UI.SYMBOL_QUOTATION_MARK //$NON-NLS-1$ //$NON-NLS-2$
                + " has not a valid sql field" //$NON-NLS-1$
                );
 

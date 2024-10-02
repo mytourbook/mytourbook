@@ -145,25 +145,26 @@ public class MapProviderManager {
 
    private static final String ATTR_MP_NAME                        = "Name";                  //$NON-NLS-1$
    private static final String ATTR_MP_ID                          = "Id";                    //$NON-NLS-1$
-   private static final String ATTR_MP_DATE_TIME_MODIFIED          = "Modified";              //$NON-NLS-1$
    private static final String ATTR_MP_CATEGORY                    = "Category";              //$NON-NLS-1$
+   private static final String ATTR_MP_DATE_TIME_MODIFIED          = "Modified";              //$NON-NLS-1$
    private static final String ATTR_MP_DESCRIPTION                 = "Description";           //$NON-NLS-1$
-   private static final String ATTR_MP_IS_INCLUDES_HILLSHADING     = "isIncludesHillShading"; //$NON-NLS-1$
-   private static final String ATTR_MP_IS_TRANSPARENT_LAYER        = "isTransparentLayer";    //$NON-NLS-1$
-   private static final String ATTR_MP_OFFLINE_FOLDER              = "OfflineFolder";         //$NON-NLS-1$
-   private static final String ATTR_MP_ONLINE_MAP_URL              = "OnlineMapUrl";          //$NON-NLS-1$
-   private static final String ATTR_MP_TYPE                        = "Type";                  //$NON-NLS-1$
-   private static final String ATTR_MP_IMAGE_SIZE                  = "ImageSize";             //$NON-NLS-1$
-   private static final String ATTR_MP_IMAGE_FORMAT                = "ImageFormat";           //$NON-NLS-1$
-   private static final String ATTR_MP_USER_AGENT                  = "UserAgent";             //$NON-NLS-1$
-   private static final String ATTR_MP_ZOOM_LEVEL_MIN              = "ZoomMin";               //$NON-NLS-1$
-   private static final String ATTR_MP_ZOOM_LEVEL_MAX              = "ZoomMax";               //$NON-NLS-1$
-   private static final String ATTR_MP_LAST_USED_ZOOM_LEVEL        = "LastUsedZoomLevel";     //$NON-NLS-1$
-   private static final String ATTR_MP_LAST_USED_LATITUDE          = "LastUsedLatitude";      //$NON-NLS-1$
-   private static final String ATTR_MP_LAST_USED_LONGITUDE         = "LastUsedLongitude";     //$NON-NLS-1$
    private static final String ATTR_MP_FAVORITE_ZOOM_LEVEL         = "FavoriteZoomLevel";     //$NON-NLS-1$
    private static final String ATTR_MP_FAVORITE_LATITUDE           = "FavoriteLatitude";      //$NON-NLS-1$
    private static final String ATTR_MP_FAVORITE_LONGITUDE          = "FavoriteLongitude";     //$NON-NLS-1$
+   private static final String ATTR_MP_HIDPI                       = "HiDPI";                 //$NON-NLS-1$
+   private static final String ATTR_MP_IMAGE_SIZE                  = "ImageSize";             //$NON-NLS-1$
+   private static final String ATTR_MP_IMAGE_FORMAT                = "ImageFormat";           //$NON-NLS-1$
+   private static final String ATTR_MP_IS_INCLUDES_HILLSHADING     = "isIncludesHillShading"; //$NON-NLS-1$
+   private static final String ATTR_MP_IS_TRANSPARENT_LAYER        = "isTransparentLayer";    //$NON-NLS-1$
+   private static final String ATTR_MP_LAST_USED_ZOOM_LEVEL        = "LastUsedZoomLevel";     //$NON-NLS-1$
+   private static final String ATTR_MP_LAST_USED_LATITUDE          = "LastUsedLatitude";      //$NON-NLS-1$
+   private static final String ATTR_MP_LAST_USED_LONGITUDE         = "LastUsedLongitude";     //$NON-NLS-1$
+   private static final String ATTR_MP_OFFLINE_FOLDER              = "OfflineFolder";         //$NON-NLS-1$
+   private static final String ATTR_MP_ONLINE_MAP_URL              = "OnlineMapUrl";          //$NON-NLS-1$
+   private static final String ATTR_MP_TYPE                        = "Type";                  //$NON-NLS-1$
+   private static final String ATTR_MP_USER_AGENT                  = "UserAgent";             //$NON-NLS-1$
+   private static final String ATTR_MP_ZOOM_LEVEL_MIN              = "ZoomMin";               //$NON-NLS-1$
+   private static final String ATTR_MP_ZOOM_LEVEL_MAX              = "ZoomMax";               //$NON-NLS-1$
 
    /*
     * Custom map provider
@@ -288,6 +289,7 @@ public class MapProviderManager {
     *           can be <code>null</code> when capsUrl is <code>not null</code> to do an initial
     *           loading
     * @param capsUrl
+    *
     * @return Returns a wms map provider or <code>null</code> when the wms cannot be initialized
     *         which happens when an connection to the wms server cannot be established
     */
@@ -395,6 +397,7 @@ public class MapProviderManager {
     * @param isDeletePartImages
     *           When <code>true</code> only the part images are deleted, otherwise all images are
     *           deleted.
+    *
     * @return Returns <code>true</code> when image files are deleted.
     */
    public static boolean deleteOfflineMap(final MP mp, final boolean isDeletePartImages) {
@@ -483,6 +486,7 @@ public class MapProviderManager {
     * @param fileFolder
     * @param isDeletePartImages
     * @param monitor
+    *
     * @return Returns <code>true</code> if all deletions were successful
     */
    private static void deleteOfflineMapFilesFolder(final File fileFolder,
@@ -586,6 +590,7 @@ public class MapProviderManager {
     * Convert {@link DirectPosition} into a {@link GeoPosition}
     *
     * @param position
+    *
     * @return Returns a {@link GeoPosition}
     */
    private static GeoPosition getGeoPosition(final DirectPosition position) {
@@ -609,6 +614,7 @@ public class MapProviderManager {
    /**
     * @param imageType
     *           SWT image format like {@link SWT#IMAGE_PNG}
+    *
     * @return Returns <code>null</code> when the image type cannot be recognized
     */
    public static String getImageFileExtension(final int imageType) {
@@ -644,6 +650,7 @@ public class MapProviderManager {
    /**
     * @param imageType
     *           SWT image format like {@link SWT#IMAGE_PNG}
+    *
     * @return Returns <code>null</code> when the image type cannot be recognized
     */
    public static String getImageMimeType(final int imageType) {
@@ -908,8 +915,10 @@ public class MapProviderManager {
     *           <code>null</code> a new map provider is created
     * @param capsUrl
     *           capabilities url for the wms server
+    *
     * @return Returns a wms map provider when the data are loaded from the wms server or
     *         <code>null</code> otherwise
+    *
     * @throws Exception
     *            when the wms server cannot be accessed
     */
@@ -1423,6 +1432,7 @@ public class MapProviderManager {
    /**
     * @param withMapProfile
     *           when <code>true</code> the map profiles are included otherwise they are ignored
+    *
     * @return Returns a list with all available map providers but without empty map providers
     */
    public ArrayList<MP> getAllMapProviders(final boolean withMapProfile) {
@@ -1451,6 +1461,7 @@ public class MapProviderManager {
     * convert {@link PART_TYPE} into a string which can be saved in xml file
     *
     * @param partType
+    *
     * @return String representation of the {@link PART_TYPE} enum
     */
    @SuppressWarnings("incomplete-switch")
@@ -1463,6 +1474,7 @@ public class MapProviderManager {
 
       case X:
          return PART_TYPE_X;
+
       case Y:
          return PART_TYPE_Y;
 
@@ -1481,6 +1493,7 @@ public class MapProviderManager {
 
       case RANDOM_INTEGER:
          return PART_TYPE_RANDOM_INTEGER;
+
       case RANDOM_ALPHA:
          return PART_TYPE_RANDOM_ALPHA;
 
@@ -1493,6 +1506,7 @@ public class MapProviderManager {
     * convert part type from string into {@link PART_TYPE} enum
     *
     * @param partTypeText
+    *
     * @return
     */
    private PART_TYPE getPartType(final String partTypeText) {
@@ -1530,6 +1544,7 @@ public class MapProviderManager {
 
    /**
     * @param importFilePath
+    *
     * @return Returns the imported map providers or <code>null</code> when an import error
     *         occurred<br>
     *         <br>
@@ -1567,6 +1582,7 @@ public class MapProviderManager {
     * @param isShowExistError
     * @param isMpImport
     *           is <code>true</code> when a map provider should be imported
+    *
     * @return Returns a list with all map providers from a xml file including wrapped plugin map
     *         provider
     */
@@ -1652,9 +1668,11 @@ public class MapProviderManager {
 
          final Integer xmlImageSize = tagMapProvider.getInteger(ATTR_MP_IMAGE_SIZE);
          final String xmlImageFormat = tagMapProvider.getString(ATTR_MP_IMAGE_FORMAT);
+         final float xmlHiDPI = Util.getXmlFloat(tagMapProvider, ATTR_MP_HIDPI, 1.0f);
 
          final Boolean xmlHasTopo = tagMapProvider.getBoolean(ATTR_MP_IS_INCLUDES_HILLSHADING);
          final Boolean xmlIsLayer = tagMapProvider.getBoolean(ATTR_MP_IS_TRANSPARENT_LAYER);
+
 
          Boolean xmlIsVisible = null;
          ZonedDateTime xmlModified;
@@ -1807,6 +1825,7 @@ public class MapProviderManager {
             // image
             mapProvider.setTileSize(xmlImageSize == null ? Integer.parseInt(DEFAULT_IMAGE_SIZE) : xmlImageSize);
             mapProvider.setImageFormat(xmlImageFormat == null ? DEFAULT_IMAGE_FORMAT : xmlImageFormat);
+            mapProvider.setHiDPI(xmlHiDPI);
 
             // User Agent
             mapProvider.setUserAgent(StringUtils.hasContent(userAgent) ? userAgent : UI.EMPTY_STRING);
@@ -1836,6 +1855,7 @@ public class MapProviderManager {
    /**
     * @param mementoMapProvider
     * @param mapProviderId
+    *
     * @return
     */
    private MPCustom readXml_MP_Custom(final IMemento mementoMapProvider, final String mapProviderId) {
@@ -1932,6 +1952,7 @@ public class MapProviderManager {
     *
     * @param tagMapProvider
     * @param mapProviderId
+    *
     * @return
     */
    private MPProfile readXml_MP_Profile(final IMemento tagMapProvider, final String mapProviderId) {
@@ -2093,6 +2114,7 @@ public class MapProviderManager {
     * @param mementoMapProvider
     * @param mapProviderId
     * @param tagNameRootChildren
+    *
     * @return
     */
    private MPWms readXml_MP_Wms(final IMemento mementoMapProvider,
@@ -2233,6 +2255,7 @@ public class MapProviderManager {
     *
     * @param importedMPList
     *           contains all imported map provider including the plugin map provider
+    *
     * @return Returns the valid map provider or profile map providers which are not yet created.
     *         <br>
     *         Returns <code>null</code> when the map provider is not valid.
@@ -2305,6 +2328,7 @@ public class MapProviderManager {
    /**
     * @param importedMP
     * @param newMPs
+    *
     * @return
     */
    private ArrayList<MP> validateImportedProfile(final ArrayList<MP> importedMPList, final ArrayList<MP> newMPs) {
@@ -2533,7 +2557,7 @@ public class MapProviderManager {
       final ZonedDateTime dateTimeModified = mp.getDateTimeModified();
 
       /*
-       * set common fields
+       * Set common fields
        */
       tagMapProvider.putString(ATTR_MP_CATEGORY, mp.getCategory());
       tagMapProvider.putString(ATTR_MP_DATE_TIME_MODIFIED, dateTimeModified == null ? null : dateTimeModified.toString());
@@ -2548,6 +2572,9 @@ public class MapProviderManager {
       // image
       tagMapProvider.putInteger(ATTR_MP_IMAGE_SIZE, mp.getTileSize());
       tagMapProvider.putString(ATTR_MP_IMAGE_FORMAT, mp.getImageFormat());
+
+      // tile size multiplier
+      tagMapProvider.putFloat(ATTR_MP_HIDPI, mp.getHiDPI());
 
       // User Agent
       tagMapProvider.putString(ATTR_MP_USER_AGENT, mp.getUserAgent());
@@ -2567,7 +2594,7 @@ public class MapProviderManager {
       tagMapProvider.putFloat(ATTR_MP_LAST_USED_LONGITUDE, lastUsedPosition == null ? 0.0f : (float) lastUsedPosition.longitude);
 
       /*
-       * add special fields for each map provider
+       * Add special fields for each map provider
        */
       if (mp instanceof MPWms) {
 

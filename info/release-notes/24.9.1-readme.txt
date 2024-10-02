@@ -1,0 +1,24 @@
+24.9.1                                                 ?. September 2024
+
+
+Improvements
+============
+
+* 2D Map
+  - Show high quality photo images
+    Tip: When the photo image size is changed, then click "Discard cached photo image" to resize the high quality photo images, this is NOT done automatically.
+  - Support HiDPI map tiles without an "@2x" url name part, e.g. OsmAnd
+  
+
+Changes
+=======
+
+* 2D Map
+  - Moved photo option "Show photo tooltip" into the map point (photo) context menu
+
+
+Bugfix
+======
+
+See milestone 24.x https://github.com/mytourbook/mytourbook/milestone/16?closed=1
+ 

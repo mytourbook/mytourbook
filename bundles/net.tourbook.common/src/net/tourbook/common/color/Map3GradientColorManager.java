@@ -760,7 +760,7 @@ public class Map3GradientColorManager {
 
                   + "default" + graphId + ".add(" //                                         //$NON-NLS-1$ //$NON-NLS-2$
                   + "new Map3ColorProfile" + "( //" + NL //                                  //$NON-NLS-1$ //$NON-NLS-2$
-                  + "\"" + colorProfile.getProfileName() + "\", //$NON-NLS-1$" + NL //       //$NON-NLS-1$ //$NON-NLS-2$
+                  + UI.SYMBOL_QUOTATION_MARK + colorProfile.getProfileName() + "\", //$NON-NLS-1$" + NL //       //$NON-NLS-1$ //$NON-NLS-2$
                   + Boolean.toString(colorProfile.isAbsoluteValues()) + "," + NL //          //$NON-NLS-1$
                   + Boolean.toString(colorProfile.isOverwriteLegendValues()) + "," + NL //   //$NON-NLS-1$
                   + vertices

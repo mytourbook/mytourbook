@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package de.byteholder.geoclipse.mapprovider;
 
 import de.byteholder.geoclipse.map.Tile;
@@ -32,8 +31,20 @@ final class ProfileTileImage {
 
    private final ImageData _tileImageData;
 
-   ProfileTileImage() {
-      _tileImageData = new ImageData(256, 256, 24, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+   public ProfileTileImage(final Tile parentTile) {
+
+      if (parentTile.getMP().getHiDPI() == 2.0) {
+
+         _tileImageData = new ImageData(512, 512, 24, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+
+      } else if (parentTile.getMP().getHiDPI() == 1.5) {
+
+         _tileImageData = new ImageData(384, 384, 24, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+
+      } else {
+
+         _tileImageData = new ImageData(256, 256, 24, new PaletteData(0xFF, 0xFF00, 0xFF0000));
+      }
    }
 
    /**
@@ -215,20 +226,24 @@ final class ProfileTileImage {
                         + ((srcData[srcIndex + 2] & 0xFF) << 8)
                         + (srcData[srcIndex + 3] & 0xFF);
                   break;
+
                case 24:
                   srcIndex = srcYBytesPerLine + (srcX * 3);
                   srcPixel = ((srcData[srcIndex] & 0xFF) << 16)
                         + ((srcData[srcIndex + 1] & 0xFF) << 8)
                         + (srcData[srcIndex + 2] & 0xFF);
                   break;
+
                case 16:
                   srcIndex = srcYBytesPerLine + (srcX * 2);
                   srcPixel = ((srcData[srcIndex + 1] & 0xFF) << 8) + (srcData[srcIndex] & 0xFF);
                   break;
+
                case 8:
                   srcIndex = srcYBytesPerLine + srcX;
                   srcPixel = srcData[srcIndex] & 0xFF;
                   break;
+
                case 4:
                   srcIndex = srcYBytesPerLine + (srcX >> 1);
                   theByte = srcData[srcIndex] & 0xFF;
@@ -238,6 +253,7 @@ final class ProfileTileImage {
                      srcPixel = theByte & 0x0F;
                   }
                   break;
+
                case 2:
                   srcIndex = srcYBytesPerLine + (srcX >> 2);
                   theByte = srcData[srcIndex] & 0xFF;
@@ -245,6 +261,7 @@ final class ProfileTileImage {
                   mask = 3 << (offset * 2);
                   srcPixel = (theByte & mask) >> (offset * 2);
                   break;
+
                case 1:
                   srcIndex = srcYBytesPerLine + (srcX >> 3);
                   theByte = srcData[srcIndex] & 0xFF;
@@ -267,20 +284,24 @@ final class ProfileTileImage {
                            + ((brtData[srcIndex + 2] & 0xFF) << 8)
                            + (brtData[srcIndex + 3] & 0xFF);
                      break;
+
                   case 24:
                      srcIndex = brtYBytesPerLine + (srcX * 3);
                      brtPixel = ((brtData[srcIndex] & 0xFF) << 16)
                            + ((brtData[srcIndex + 1] & 0xFF) << 8)
                            + (brtData[srcIndex + 2] & 0xFF);
                      break;
+
                   case 16:
                      srcIndex = brtYBytesPerLine + (srcX * 2);
                      brtPixel = ((brtData[srcIndex + 1] & 0xFF) << 8) + (brtData[srcIndex] & 0xFF);
                      break;
+
                   case 8:
                      srcIndex = brtYBytesPerLine + srcX;
                      brtPixel = brtData[srcIndex] & 0xFF;
                      break;
+
                   case 4:
                      srcIndex = brtYBytesPerLine + (srcX >> 1);
                      theByte = brtData[srcIndex] & 0xFF;
@@ -290,6 +311,7 @@ final class ProfileTileImage {
                         brtPixel = theByte & 0x0F;
                      }
                      break;
+
                   case 2:
                      srcIndex = brtYBytesPerLine + (srcX >> 2);
                      theByte = brtData[srcIndex] & 0xFF;
@@ -297,6 +319,7 @@ final class ProfileTileImage {
                      mask = 3 << (offset * 2);
                      brtPixel = (theByte & mask) >> (offset * 2);
                      break;
+
                   case 1:
                      srcIndex = brtYBytesPerLine + (srcX >> 3);
                      theByte = brtData[srcIndex] & 0xFF;

@@ -503,7 +503,9 @@ public class Map2View extends ViewPart implements
    private ActionMap2_Graphs                 _actionMap2Slideout_TourColors;
    private ActionMapPoint_CenterMap          _actionMapPoint_CenterMap;
    private ActionMapPoint_EditTourMarker     _actionMapPoint_EditTourMarker;
-   private ActionMapPoint_RemovePhoto        _actionMapPoint_RemovePhoto;
+   private ActionMapPoint_Photo_Remove       _actionMapPoint_Photo_Remove;
+   private ActionMapPoint_Photo_ShowRating   _actionMapPoint_Photo_ShowRating;
+   private ActionMapPoint_Photo_ShowTooltip  _actionMapPoint_Photo_ShowTooltip;
    private ActionMapPoint_ShowOnlyThisTour   _actionMapPoint_ShowOnlyThisTour;
    private ActionMapPoint_ZoomIn             _actionMapPoint_ZoomIn;
    private ActionReloadFailedMapImages       _actionReloadFailedMapImages;
@@ -694,9 +696,9 @@ public class Map2View extends ViewPart implements
 
    }
 
-   private class ActionMapPoint_RemovePhoto extends Action {
+   private class ActionMapPoint_Photo_Remove extends Action {
 
-      public ActionMapPoint_RemovePhoto() {
+      public ActionMapPoint_Photo_Remove() {
 
          super(OtherMessages.ACTION_PHOTOS_AND_TOURS_REMOVE_PHOTO, Action.AS_PUSH_BUTTON);
 
@@ -708,6 +710,36 @@ public class Map2View extends ViewPart implements
 
          TourManager.tourPhoto_Remove(_map.getHoveredMapPoint());
       }
+   }
+
+   private class ActionMapPoint_Photo_ShowRating extends Action {
+
+      public ActionMapPoint_Photo_ShowRating() {
+
+         super(OtherMessages.SLIDEOUT_MAP_PHOTO_OPTIONS_CHECKBOX_SHOW_PHOTO_RATING, Action.AS_CHECK_BOX);
+      }
+
+      @Override
+      public void run() {
+
+         actionPhoto_ShowRating();
+      }
+
+   }
+
+   private class ActionMapPoint_Photo_ShowTooltip extends Action {
+
+      public ActionMapPoint_Photo_ShowTooltip() {
+
+         super(OtherMessages.SLIDEOUT_MAP_PHOTO_OPTIONS_CHECKBOX_SHOW_PHOTO_TOOLTIP, Action.AS_CHECK_BOX);
+      }
+
+      @Override
+      public void run() {
+
+         actionPhoto_ShowTooltip();
+      }
+
    }
 
    private class ActionMapPoint_ShowOnlyThisTour extends Action {
@@ -1228,6 +1260,37 @@ public class Map2View extends ViewPart implements
          // hide hovered marker
          _map.resetHoveredMapPoint();
       });
+   }
+
+   private void actionPhoto_ShowRating() {
+
+      final boolean isShowPhotoRating = _actionMapPoint_Photo_ShowRating.isChecked();
+
+      // update model
+      _state.put(SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_RATING, isShowPhotoRating);
+
+      Map2PainterConfig.isShowPhotoRating = isShowPhotoRating;
+
+      // update UI
+      _map.paint();
+   }
+
+   private void actionPhoto_ShowTooltip() {
+
+      final boolean isShowPhotoTooltip = _actionMapPoint_Photo_ShowTooltip.isChecked();
+
+      // update model
+      _state.put(SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_TOOLTIP, isShowPhotoTooltip);
+
+      Map2PainterConfig.isShowPhotoTooltip = isShowPhotoTooltip;
+
+      // update UI
+      if (isShowPhotoTooltip == false) {
+
+         // hide photo tooltip
+
+         _map.hidePhotoTooltip();
+      }
    }
 
    public void actionPOI() {
@@ -1990,7 +2053,9 @@ public class Map2View extends ViewPart implements
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionMapPoint_CenterMap           = new ActionMapPoint_CenterMap();
       _actionMapPoint_EditTourMarker      = new ActionMapPoint_EditTourMarker();
-      _actionMapPoint_RemovePhoto         = new ActionMapPoint_RemovePhoto();
+      _actionMapPoint_Photo_Remove        = new ActionMapPoint_Photo_Remove();
+      _actionMapPoint_Photo_ShowRating    = new ActionMapPoint_Photo_ShowRating();
+      _actionMapPoint_Photo_ShowTooltip   = new ActionMapPoint_Photo_ShowTooltip();
       _actionMapPoint_ShowOnlyThisTour    = new ActionMapPoint_ShowOnlyThisTour();
       _actionMapPoint_ZoomIn              = new ActionMapPoint_ZoomIn();
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
@@ -2414,21 +2479,32 @@ public class Map2View extends ViewPart implements
 // SET_FORMATTING_OFF
 
       final Map2Point      mapPoint    = hoveredMapPoint.mapPoint;
-      final Photo          photo       = mapPoint.photo;
       final MapPointType   pointType   = mapPoint.pointType;
 
       final int      numTours          = _allTourData.size();
 
       final boolean  isMultipleTours   = numTours > 1;
-      final boolean  isPhotoAvailable  = photo != null;
       final boolean  isTourMarker      = pointType.equals(MapPointType.TOUR_MARKER);
       final boolean  isTourAvailable   = isTourMarker || pointType.equals(MapPointType.TOUR_PAUSE);
 
       _actionMapPoint_EditTourMarker   .setEnabled(isTourMarker);
-      _actionMapPoint_RemovePhoto      .setEnabled(isPhotoAvailable);
       _actionMapPoint_ShowOnlyThisTour .setEnabled(isMultipleTours && isTourAvailable);
 
 // SET_FORMATTING_ON
+
+      /*
+       * Restore state
+       */
+      final boolean isShowPhotoRating = Util.getStateBoolean(_state,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_RATING,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_RATING_DEFAULT);
+
+      final boolean isShowPhotoTooltip = Util.getStateBoolean(_state,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_TOOLTIP,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT);
+
+      _actionMapPoint_Photo_ShowRating.setChecked(isShowPhotoRating);
+      _actionMapPoint_Photo_ShowTooltip.setChecked(isShowPhotoTooltip);
    }
 
    private void fillActionBars() {
@@ -2473,13 +2549,17 @@ public class Map2View extends ViewPart implements
    }
 
    @Override
-   public void fillContextMenu(final IMenuManager menuMgr, final ActionManageOfflineImages actionManageOfflineImages) {
+   public void fillContextMenu(final IMenuManager menuMgr,
+                               final ActionManageOfflineImages actionManageOfflineImages) {
 
       final PaintedMapPoint hoveredMapPoint = _map.getHoveredMapPoint();
 
       if (hoveredMapPoint != null) {
 
          // open context menu for a map marker
+
+         final Map2Point mapPoint = hoveredMapPoint.mapPoint;
+         final boolean isPhotoAvailable = mapPoint.photo != null;
 
          enableActions_MapPoint(hoveredMapPoint);
 
@@ -2490,7 +2570,14 @@ public class Map2View extends ViewPart implements
 
          menuMgr.add(_actionMapPoint_ShowOnlyThisTour);
          menuMgr.add(_actionMapPoint_EditTourMarker);
-         menuMgr.add(_actionMapPoint_RemovePhoto);
+
+         if (isPhotoAvailable) {
+
+            menuMgr.add(new Separator());
+            menuMgr.add(_actionMapPoint_Photo_ShowTooltip);
+            menuMgr.add(_actionMapPoint_Photo_ShowRating);
+            menuMgr.add(_actionMapPoint_Photo_Remove);
+         }
 
       } else {
 

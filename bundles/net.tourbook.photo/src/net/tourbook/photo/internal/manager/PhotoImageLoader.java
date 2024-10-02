@@ -60,28 +60,10 @@ import org.imgscalr.Scalr.Rotation;
 
 public class PhotoImageLoader {
 
-   private static IPreferenceStore _prefStore = PhotoActivator.getPrefStore();
-
-   private static String[]         awtImageFileSuffixes;
-
-   static {
-
-      awtImageFileSuffixes = ImageIO.getReaderFileSuffixes();
-
-//      final String[] formatNames = ImageIO.getReaderFormatNames();
-//      final String mimeReadFormats[] = ImageIO.getReaderMIMETypes();
-//
-//      System.out.println("Mime Reader:      " + Arrays.asList(mimeReadFormats));
-//      System.out.println("Format Reader:    " + Arrays.asList(formatNames));
-//      System.out.println("Suffixes Readers: " + Arrays.asList(awtImageFileSuffixes));
-
-//      final String writeFormats[] = ImageIO.getWriterMIMETypes();
-//      System.out.println("Mime Writers:     " + Arrays.asList(writeFormats));
-   }
+   private static IPreferenceStore  _prefStore        = PhotoActivator.getPrefStore();
 
    private Photo                    _photo;
    private ImageQuality             _requestedImageQuality;
-   private String                   _imageFramework;
    private int                      _hqImageSize;
    private String                   _requestedImageKey;
 
@@ -104,17 +86,12 @@ public class PhotoImageLoader {
    public PhotoImageLoader(final Display display,
                            final Photo photo,
                            final ImageQuality imageQuality,
-                           final String imageFramework,
                            final int hqImageSize,
                            final ILoadCallBack loadCallBack) {
-
-//      System.out.println(UI.timeStampNano() + " PhotoImageLoader\tthread:" + Thread.currentThread().getName());
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
       _display = display;
       _photo = photo;
       _requestedImageQuality = imageQuality;
-      _imageFramework = imageFramework;
       _hqImageSize = hqImageSize;
       _loadCallBack = loadCallBack;
 
@@ -225,22 +202,6 @@ public class PhotoImageLoader {
       }
 
       return thumbRotation;
-   }
-
-   /**
-    * @return Returns <code>true</code> when the image file can be loaded with AWT
-    */
-   private boolean isAWTImageSupported() {
-
-      final String photoSuffix = _photo.imageFileExt.toLowerCase();
-
-      for (final String awtImageSuffix : awtImageFileSuffixes) {
-         if (photoSuffix.equals(awtImageSuffix)) {
-            return true;
-         }
-      }
-
-      return false;
    }
 
    /**
@@ -569,17 +530,19 @@ public class PhotoImageLoader {
     * @param isAWTImage
     */
    public void loadImageHQ(final LinkedBlockingDeque<PhotoImageLoader> thumbImageWaitingQueue,
-                           final LinkedBlockingDeque<PhotoExifLoader> exifWaitingQueue,
-                           final boolean isAWTImage) {
+                           final LinkedBlockingDeque<PhotoExifLoader> exifWaitingQueue) {
 
       /*
        * Wait until exif data and small images are loaded
        */
       try {
+
          while (thumbImageWaitingQueue.size() > 0 || exifWaitingQueue.size() > 0) {
             Thread.sleep(PhotoLoadManager.DELAY_TO_CHECK_WAITING_QUEUE);
          }
+
       } catch (final InterruptedException e) {
+
          // should not happen, I hope so
       }
 
@@ -588,33 +551,11 @@ public class PhotoImageLoader {
 
       try {
 
-         /**
-          * sometimes (when images are loaded concurrently) larger images could not be loaded
-          * with SWT methods in Win7 (Eclipse 3.8 M6), try to load image with AWT. This bug fix
-          * <code>https://bugs.eclipse.org/bugs/show_bug.cgi?id=350783</code> has not solved this
-          * problem
-          */
-
-         // load original image and create thumbs
-
-         if (_imageFramework.equals(PhotoLoadManager.IMAGE_FRAMEWORK_SWT)
-
-               // use SWT when image format is not supported by AWT which is the case for tiff images
-               || (isAWTImageSupported() == false)
-
-                     // AWT is not forced
-                     && isAWTImage == false) {
-
-            hqImage = loadImageHQ_10_WithSWT();
-
-         } else {
-
-            hqImage = loadImageHQ_20_WithAWT();
-         }
+         hqImage = loadImageHQ_10();
 
       } catch (final Exception e) {
 
-         setStateLoadingError();
+         setState_LoadingError();
 
          isLoadingError = true;
 
@@ -624,41 +565,14 @@ public class PhotoImageLoader {
 
          if (hqImage == null) {
 
-            System.out.println(UI.timeStampNano() + " image == NULL when loading with %s: \"%s\"".formatted( //$NON-NLS-1$
-                  _imageFramework.toUpperCase(),
-                  _photo.imageFilePathName));
-
-            if (_imageFramework.equals(PhotoLoadManager.IMAGE_FRAMEWORK_AWT)) {
-
-               /*
-                * AWT fails, try to load image with SWT
-                */
-
-               try {
-
-                  hqImage = loadImageHQ_10_WithSWT();
-
-               } catch (final Exception e2) {
-
-                  setStateLoadingError();
-
-                  isLoadingError = true;
-
-               } finally {
-
-                  if (hqImage == null) {
-                     System.out.println(UI.timeStampNano()
-                           + " image == NULL when loading with SWT: \"%s\"".formatted(_photo.imageFilePathName)); //$NON-NLS-1$
-                  }
-               }
-            }
+            System.out.println(UI.timeStampNano() + " image == NULL when loading: \"%s\"".formatted(_photo.imageFilePathName)); //$NON-NLS-1$
          }
 
          // update image state
          final boolean isImageLoaded = hqImage != null;
          if (isImageLoaded) {
 
-            setStateUndefined();
+            setState_Undefined();
 
          } else {
 
@@ -673,7 +587,7 @@ public class PhotoImageLoader {
                      + " Heap may be full when loading \"%s\"".formatted(_photo.imageFilePathName)); //$NON-NLS-1$
             }
 
-            setStateLoadingError();
+            setState_LoadingError();
 
             isLoadingError = true;
          }
@@ -683,273 +597,7 @@ public class PhotoImageLoader {
       }
    }
 
-   private Image loadImageHQ_10_WithSWT() throws Exception {
-
-      if (_recursiveCounter[0]++ > 2) {
-         return null;
-      }
-
-      final long start = System.currentTimeMillis();
-      long endHqLoad = 0;
-      long endResizeHQ = 0;
-      long endResizeThumb = 0;
-      long endSaveHQ = 0;
-      long endSaveThumb = 0;
-
-      Image originalImage = null;
-
-      /*
-       * load original image
-       */
-      final String originalImagePathName = _photo.imageFilePathName;
-      try {
-
-         final long startHqLoad = System.currentTimeMillis();
-
-         originalImage = new Image(_display, originalImagePathName);
-
-         endHqLoad = System.currentTimeMillis() - startHqLoad;
-
-      } catch (final Exception e) {
-
-         System.out.println(NLS.bind(
-               "SWT: image \"{0}\" cannot be loaded", //$NON-NLS-1$
-               originalImagePathName));
-
-      } finally {
-
-         if (originalImage == null) {
-
-            System.out.println(NLS.bind( //
-                  UI.timeStampNano() + " SWT: image \"{0}\" cannot be loaded, will load with AWT", //$NON-NLS-1$
-                  originalImagePathName));
-
-            /**
-             * sometimes (when images are loaded concurrently) larger images could not be loaded
-             * with SWT methods in Win7 (Eclipse 3.8 M6), try to load image with AWT. This bug
-             * fix <code>
-             * https://bugs.eclipse.org/bugs/show_bug.cgi?id=350783
-             * https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845
-             * </code>
-             * has not solved this problem
-             */
-
-            try {
-               return loadImageHQ_20_WithAWT();
-            } catch (final Exception e) {
-               throw e;
-            }
-         }
-      }
-
-      Rectangle imageBounds = originalImage.getBounds();
-
-      final int originalImageWidth = imageBounds.width;
-      final int originalImageHeight = imageBounds.height;
-
-      int imageWidth = originalImageWidth;
-      int imageHeight = originalImageHeight;
-
-      final Properties originalImageProperties = new Properties();
-      originalImageProperties.put(ThumbnailStore.ORIGINAL_IMAGE_WIDTH, Integer.toString(originalImageWidth));
-      originalImageProperties.put(ThumbnailStore.ORIGINAL_IMAGE_HEIGHT, Integer.toString(originalImageHeight));
-
-      // update dimension
-      updatePhotoImageSize(imageWidth, imageHeight, true);
-
-      final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
-
-      // images are rotated only ONE time (the first one)
-      boolean isRotated = false;
-
-      boolean isHQCreated = false;
-
-      Image hqImage;
-      Image requestedSWTImage = null;
-      final boolean isRotateImageAutomatically = getIsRotateImageAutomatically();
-
-      /*
-       * create HQ image
-       */
-      if (imageWidth > _hqImageSize || imageHeight > _hqImageSize) {
-
-         /*
-          * image is larger than HQ image -> resize to HQ
-          */
-
-         final long startResizeHQ = System.currentTimeMillis();
-
-         final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, _hqImageSize, _hqImageSize);
-
-         Rotation hqRotation = null;
-
-         if (isRotated == false) {
-            isRotated = true;
-            hqRotation = getRotation();
-         }
-
-         final Image scaledHQImage = net.tourbook.common.util.ImageUtils.resize(
-               _display,
-               originalImage,
-               bestSize.x,
-               bestSize.y,
-               SWT.ON,
-               SWT.LOW,
-               hqRotation,
-               isRotateImageAutomatically);
-
-         endResizeHQ = System.currentTimeMillis() - startResizeHQ;
-
-         hqImage = scaledHQImage;
-
-         imageBounds = scaledHQImage.getBounds();
-         imageWidth = imageBounds.width;
-         imageHeight = imageBounds.height;
-
-         // new image has been created, loaded must be disposed
-         _trackedSWTImages.add(originalImage);
-
-         if (_requestedImageQuality == ImageQuality.HQ) {
-            // keep scaled image
-            requestedSWTImage = scaledHQImage;
-         } else {
-            // dispose scaled image
-            _trackedSWTImages.add(scaledHQImage);
-         }
-
-         /*
-          * save scaled image in store
-          */
-         final long startSaveHQ = System.currentTimeMillis();
-         final IPath storeHQImagePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.HQ);
-
-         ThumbnailStore.saveResizedImage_SWT(scaledHQImage, storeHQImagePath, originalImageProperties);
-
-         isHQCreated = true;
-
-         endSaveHQ = System.currentTimeMillis() - startSaveHQ;
-
-      } else {
-         hqImage = originalImage;
-      }
-
-      /*
-       * create thumb image
-       */
-      if (imageWidth > thumbSize || imageHeight > thumbSize) {
-
-         /*
-          * image is larger than thumb image -> resize to thumb
-          */
-
-         if (isHQCreated == false) {
-
-            // image size is between thumb and HQ
-
-            if (_requestedImageQuality == ImageQuality.HQ) {
-               requestedSWTImage = hqImage;
-            }
-         }
-
-         if (_photo.getExifThumbImageState() == 1) {
-
-            if (requestedSWTImage == null) {
-
-               // get thumb image
-
-               final IPath storeImageFilePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
-
-               requestedSWTImage = loadImageFromEXIFThumbnail_SWT(storeImageFilePath);
-            }
-
-         } else {
-
-            // create thumb image
-
-            final long startResizeThumb = System.currentTimeMillis();
-
-            final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, thumbSize, thumbSize);
-            Rotation thumbRotation = null;
-
-            if (isRotated == false) {
-               isRotated = true;
-               thumbRotation = getRotation();
-            }
-
-            final Image scaledThumbImage = net.tourbook.common.util.ImageUtils.resize(
-                  _display,
-                  hqImage,
-                  bestSize.x,
-                  bestSize.y,
-                  SWT.ON,
-                  SWT.LOW,
-                  thumbRotation,
-                  isRotateImageAutomatically);
-
-            /*
-             * new image has been created, source image must be disposed when it's not the
-             * requested image
-             */
-            if (requestedSWTImage != hqImage) {
-               _trackedSWTImages.add(hqImage);
-            }
-
-            if (requestedSWTImage == null) {
-               // keep scaled image
-               requestedSWTImage = scaledThumbImage;
-            } else {
-               // dispose scaled image
-               _trackedSWTImages.add(scaledThumbImage);
-            }
-
-            endResizeThumb = System.currentTimeMillis() - startResizeThumb;
-
-            /*
-             * save scaled image in store
-             */
-            final long startSaveThumb = System.currentTimeMillis();
-            final IPath storeThumbImagePath = ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB);
-
-            ThumbnailStore.saveResizedImage_SWT(scaledThumbImage, storeThumbImagePath, originalImageProperties);
-
-            endSaveThumb = System.currentTimeMillis() - startSaveThumb;
-         }
-
-      } else {
-
-         // loaded image is smaller than a thumb image
-
-         requestedSWTImage = originalImage;
-      }
-
-      if (requestedSWTImage != null) {
-
-         // ensure metadata are loaded
-         _photo.getImageMetaData();
-
-         // keep requested image in cache
-         PhotoImageCache.putImage_SWT(_requestedImageKey, requestedSWTImage, originalImagePathName);
-      }
-
-      if (requestedSWTImage == null) {
-         setStateLoadingError();
-      }
-
-      final long end = System.currentTimeMillis() - start;
-
-      System.out.println(UI.timeStampNano() + " SWT: " //$NON-NLS-1$
-            + (Thread.currentThread().getName() + UI.SPACE1 + _photo.imageFileName)
-            + ("\ttotal: " + end) //$NON-NLS-1$
-            + ("\tload: " + endHqLoad) //$NON-NLS-1$
-            + ("\tresizeHQ: " + endResizeHQ) //$NON-NLS-1$
-            + ("\tsaveHQ: " + endSaveHQ) //$NON-NLS-1$
-            + ("\tresizeThumb: " + endResizeThumb) //$NON-NLS-1$
-            + ("\tsaveThumb: " + endSaveThumb)); //$NON-NLS-1$
-
-      return requestedSWTImage;
-   }
-
-   private Image loadImageHQ_20_WithAWT() throws Exception {
+   private Image loadImageHQ_10() throws Exception {
 
       // prevent recursive calls
       if (_recursiveCounter[0]++ > 2) {
@@ -996,9 +644,9 @@ public class PhotoImageLoader {
 
          if (awtOriginalImage == null) {
 
-            System.out.println(UI.timeStampNano() + " AWT: image \"%s\" cannot be loaded, will load with SWT".formatted(originalImagePathName)); //$NON-NLS-1$
+            System.out.println(UI.timeStampNano() + " AWT: image \"%s\" cannot be loaded".formatted(originalImagePathName)); //$NON-NLS-1$
 
-            return loadImageHQ_10_WithSWT();
+            return null;
          }
       }
 
@@ -1053,7 +701,7 @@ public class PhotoImageLoader {
                final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, _hqImageSize, _hqImageSize);
                final int maxSize = Math.max(bestSize.x, bestSize.y);
 
-               scaledHQImage = Scalr.resize(awtOriginalImage, Method.SPEED, maxSize);
+               scaledHQImage = Scalr.resize(awtOriginalImage, Method.QUALITY, maxSize);
 
                _trackedAWTImages.add(scaledHQImage);
 
@@ -1255,7 +903,7 @@ public class PhotoImageLoader {
          }
 
          if (requestedSWTImage == null) {
-            setStateLoadingError();
+            setState_LoadingError();
          }
       }
 
@@ -1294,6 +942,233 @@ public class PhotoImageLoader {
       }
 
       return requestedSWTImage;
+   }
+
+   /**
+    * Image could not be loaded with {@link #loadImage()}, try to load high quality image.
+    *
+    * @param thumbImageWaitingQueue
+    *           waiting queue for small images
+    * @param exifWaitingQueue
+    * @param isAWTImage
+    */
+   public void loadImageHQThumb(final LinkedBlockingDeque<PhotoImageLoader> thumbImageWaitingQueue,
+                                final LinkedBlockingDeque<PhotoExifLoader> exifWaitingQueue) {
+
+      /*
+       * Wait until exif data and small images are loaded
+       */
+      try {
+
+         while (thumbImageWaitingQueue.size() > 0 || exifWaitingQueue.size() > 0) {
+            Thread.sleep(PhotoLoadManager.DELAY_TO_CHECK_WAITING_QUEUE);
+         }
+
+      } catch (final InterruptedException e) {
+
+         // should not happen, I hope so
+      }
+
+      boolean isLoadingError = false;
+      BufferedImage hqThumbImage = null;
+
+      try {
+
+         // load original image and create thumbs
+
+         hqThumbImage = loadImageHQThumb_10();
+
+      } catch (final Exception e) {
+
+         setState_LoadingError();
+
+         isLoadingError = true;
+
+      } finally {
+
+         disposeTrackedImages();
+
+         // update image state
+         final boolean isImageLoaded = hqThumbImage != null;
+         if (isImageLoaded) {
+
+            setState_Undefined();
+
+         } else {
+
+            if (_recursiveCounter[0] > 2) {
+
+               /**
+                * This may occur when heap stack is full, e.g. "[158.711s][warning][gc,alloc]
+                * LoadImg-HQ-6: Retried waiting for GCLocker too often allocating 6718466 words"
+                */
+
+               System.out.println(UI.timeStampNano()
+                     + " Heap may be full when loading \"%s\"".formatted(_photo.imageFilePathName)); //$NON-NLS-1$
+            }
+
+            setState_LoadingError();
+
+            isLoadingError = true;
+         }
+
+         // display image in the loading callback
+         _loadCallBack.callBackImageIsLoaded(isImageLoaded || isLoadingError);
+      }
+   }
+
+   private BufferedImage loadImageHQThumb_10() throws Exception {
+
+      // prevent recursive calls
+      if (_recursiveCounter[0]++ > 2) {
+         return null;
+      }
+
+      final long start = System.currentTimeMillis();
+      long endHqLoad = 0;
+      long endResizeHQ = 0;
+      long endSaveHQ = 0;
+
+      // images are rotated only ONCE (the first one)
+      boolean isRotated = false;
+
+      BufferedImage awtOriginalImage = null;
+      BufferedImage awtHQImage = null;
+
+      /*
+       * Load original image
+       */
+      final String originalImagePathName = _photo.imageFilePathName;
+      try {
+
+         final long startHqLoad = System.currentTimeMillis();
+         {
+            awtOriginalImage = ImageIO.read(_photo.imageFile);
+
+            _trackedAWTImages.add(awtOriginalImage);
+         }
+         endHqLoad = System.currentTimeMillis() - startHqLoad;
+
+      } catch (final Exception e) {
+
+         StatusUtil.logError("AWT: image \"%s\" cannot be loaded.".formatted(originalImagePathName)); //$NON-NLS-1$
+
+      } finally {
+
+         if (awtOriginalImage == null) {
+
+            System.out.println(UI.timeStampNano() + " AWT: image \"%s\" cannot be loaded, will load with SWT".formatted(originalImagePathName)); //$NON-NLS-1$
+
+            return null;
+         }
+      }
+
+      /*
+       * Create HQ thumb image from original image
+       */
+
+      final int originalImageWidth = awtOriginalImage.getWidth();
+      final int originalImageHeight = awtOriginalImage.getHeight();
+
+      // update dimension
+      updatePhotoImageSize(originalImageWidth, originalImageHeight, true);
+
+      if (originalImageWidth >= _hqImageSize || originalImageHeight >= _hqImageSize) {
+
+         // the original image is larger than HQ image -> resize it to HQ
+
+         BufferedImage scaledHQImage;
+
+         final long startResizeHQ = System.currentTimeMillis();
+         {
+            final Point bestSize = ImageUtils.getBestSize(originalImageWidth, originalImageHeight, _hqImageSize, _hqImageSize);
+            final int scaleWidth = bestSize.x;
+            final int scaledHeight = bestSize.y;
+
+            final int maxSize = Math.max(scaleWidth, scaledHeight);
+//            scaledHQImage = Scalr.resize(awtOriginalImage, Method.ULTRA_QUALITY, maxSize);
+            scaledHQImage = Scalr.resize(awtOriginalImage, Method.QUALITY, maxSize);
+
+//
+//            !!! THIS QUALITY IS NOT VERY GOOD !!!
+//
+//            scaledHQImage = new BufferedImage(
+//                  scaleWidth,
+//                  scaledHeight,
+//                  BufferedImage.TYPE_INT_ARGB);
+//
+//            final Graphics2D g2d = scaledHQImage.createGraphics();
+//            try {
+//
+//               g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+////               g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+////               g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+//
+//               g2d.drawImage(awtOriginalImage, 0, 0, scaleWidth, scaledHeight, null);
+//
+//            } finally {
+//               g2d.dispose();
+//            }
+
+            _trackedAWTImages.add(scaledHQImage);
+
+            // rotate image according to the EXIF flag
+            if (isRotated == false) {
+               isRotated = true;
+
+               scaledHQImage = transformImageRotate(scaledHQImage);
+            }
+
+            awtHQImage = scaledHQImage;
+         }
+         endResizeHQ = System.currentTimeMillis() - startResizeHQ;
+
+         /*
+          * Keep image in cache
+          */
+         final String imageKey = _photo.getImageKey(ImageQuality.THUMB_HQ);
+
+         PhotoImageCache.putImage_AWT(imageKey, awtHQImage, originalImagePathName);
+
+         /*
+          * Save scaled HQ image in store
+          */
+         final long startSaveHQ = System.currentTimeMillis();
+         {
+            ThumbnailStore.saveResizedImage_AWT(
+                  awtHQImage,
+                  ThumbnailStore.getStoreImagePath(_photo, ImageQuality.THUMB_HQ),
+                  null);
+         }
+         endSaveHQ = System.currentTimeMillis() - startSaveHQ;
+
+      } else {
+
+         awtHQImage = awtOriginalImage;
+      }
+
+      final long duration = System.currentTimeMillis() - start;
+
+      final String text = " AWT: " //$NON-NLS-1$
+            + "%-15s " //$NON-NLS-1$
+            + "%-15s  " //$NON-NLS-1$
+            + "total: %5d  " //$NON-NLS-1$
+            + "load: %5d  " //$NON-NLS-1$
+            + "resizeHQThumb: %3d  " //$NON-NLS-1$
+            + "saveHQThumb: %4d  " //$NON-NLS-1$
+      ;
+
+      System.out.println(UI.timeStampNano() + text.formatted(
+
+            Thread.currentThread().getName(),
+            _photo.imageFileName,
+
+            duration,
+            endHqLoad,
+            endResizeHQ,
+            endSaveHQ));
+
+      return awtHQImage;
    }
 
    public void loadImageOriginal() {
@@ -1447,12 +1322,12 @@ public class PhotoImageLoader {
          }
 
          if (isLoadingException) {
-            setStateLoadingError();
+            setState_LoadingError();
 
          } else {
 
             // image is loaded with requested quality or a SWT error has occurred, reset image state
-            setStateUndefined();
+            setState_Undefined();
          }
 
          final long end = System.currentTimeMillis() - start;
@@ -1587,7 +1462,7 @@ public class PhotoImageLoader {
 
       } catch (final Exception e) {
 
-         setStateLoadingError();
+         setState_LoadingError();
 
          isLoadingError = true;
 
@@ -1626,7 +1501,7 @@ public class PhotoImageLoader {
 
             // image is loaded with requested quality, reset image state
 
-            setStateUndefined();
+            setState_Undefined();
 
          } else {
 
@@ -1775,7 +1650,7 @@ public class PhotoImageLoader {
 
       } catch (final Exception e) {
 
-         setStateLoadingError();
+         setState_LoadingError();
 
          isLoadingError = true;
 
@@ -1821,7 +1696,7 @@ public class PhotoImageLoader {
 
             // image is loaded with requested quality, reset image state
 
-            setStateUndefined();
+            setState_Undefined();
 
          } else {
 
@@ -1840,7 +1715,7 @@ public class PhotoImageLoader {
       return isHQRequired;
    }
 
-   private void setStateLoadingError() {
+   private void setState_LoadingError() {
 
       // prevent loading the image again
       _photo.setLoadingState(PhotoLoadingState.IMAGE_IS_INVALID, _requestedImageQuality);
@@ -1848,18 +1723,23 @@ public class PhotoImageLoader {
       PhotoLoadManager.putPhotoInLoadingErrorMap(_photo.imageFilePathName);
    }
 
-   private void setStateUndefined() {
+   /**
+    * Set state to undefined that it will be loaded again when image is visible and not in the cache
+    */
+   private void setState_Undefined() {
 
-      // set state to undefined that it will be loaded again when image is visible and not in the cache
       _photo.setLoadingState(PhotoLoadingState.UNDEFINED, _requestedImageQuality);
    }
 
    @Override
    public String toString() {
+
       return "PhotoImageLoaderItem [" //$NON-NLS-1$
-            + ("_filePathName=" + _requestedImageKey + "{)}, ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("imageQuality=" + _requestedImageQuality + "{)}, ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("photo=" + _photo) //$NON-NLS-1$
+
+            + "_filePathName=" + _requestedImageKey + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "imageQuality=" + _requestedImageQuality + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "photo=" + _photo //$NON-NLS-1$
+
             + "]"; //$NON-NLS-1$
    }
 
@@ -1988,6 +1868,7 @@ public class PhotoImageLoader {
          }
 
          rotatedImage = Scalr.rotate(scaledImage, correction);
+
          _trackedAWTImages.add(rotatedImage);
       }
 

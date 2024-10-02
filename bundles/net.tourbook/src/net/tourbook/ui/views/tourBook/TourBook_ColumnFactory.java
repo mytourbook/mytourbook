@@ -142,6 +142,7 @@ class TourBook_ColumnFactory {
       defineColumn_Tour_Type_Image();
       defineColumn_Tour_Type_Text();
       defineColumn_Tour_Title();
+      defineColumn_Tour_Description();
       defineColumn_Tour_Marker();
       defineColumn_Tour_Photos();
       defineColumn_Tour_Tags();
@@ -3111,6 +3112,51 @@ class TourBook_ColumnFactory {
    }
 
    /**
+    * Column: Tour - Description
+    */
+   private void defineColumn_Tour_Description() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_DESCRIPTION.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final String colTourDescription = ((TVITourBookTour) element).colTourDescription;
+
+            if (colTourDescription == null) {
+               return UI.EMPTY_STRING;
+            } else {
+               return colTourDescription;
+            }
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_DESCRIPTION.createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setLabelProvider(new SelectionCellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof final TVITourBookTour tourItem) {
+
+               final String colTourDescription = tourItem.colTourDescription;
+
+               if (colTourDescription == null) {
+                  cell.setText(UI.EMPTY_STRING);
+               } else {
+                  cell.setText(colTourDescription);
+               }
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
     * Column: Tour - Tour end location
     */
    private void defineColumn_Tour_Location_End() {
@@ -3276,7 +3322,7 @@ class TourBook_ColumnFactory {
 
             if (tourLocation instanceof final Long value) {
 
-               return Long.toString((Long) tourLocation);
+               return Long.toString(value);
 
             } else {
 
@@ -3296,7 +3342,7 @@ class TourBook_ColumnFactory {
 
             if (tourLocation instanceof final Long value) {
 
-               cell.setText(Long.toString((Long) tourLocation));
+               cell.setText(Long.toString(value));
 
             } else {
 
@@ -3323,7 +3369,7 @@ class TourBook_ColumnFactory {
 
             if (tourLocation instanceof final Long value) {
 
-               return Long.toString((Long) tourLocation);
+               return Long.toString(value);
 
             } else {
 
@@ -3343,7 +3389,7 @@ class TourBook_ColumnFactory {
 
             if (tourLocation instanceof final Long value) {
 
-               cell.setText(Long.toString((Long) tourLocation));
+               cell.setText(Long.toString(value));
 
             } else {
 

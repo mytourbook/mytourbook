@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -517,14 +517,14 @@ public class WEB {
             final String appCmd = appCmdLines[cmdIndex];
 
             if (cmdIndex == 0) {
-               commands.add("\"" + appCmd + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+               commands.add(UI.SYMBOL_QUOTATION_MARK + appCmd + UI.SYMBOL_QUOTATION_MARK); 
             } else {
                // don't add apostrophes, this causes errors
                commands.add(appCmd);
             }
          }
 
-         commands.add("\"" + encodedUrl + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+         commands.add(UI.SYMBOL_QUOTATION_MARK + encodedUrl + UI.SYMBOL_QUOTATION_MARK); 
 
       } else if (UI.IS_OSX) {
 

@@ -63,6 +63,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
+import net.tourbook.tour.DialogCreateTourMarkers;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourId;
@@ -376,6 +377,7 @@ public class TourBookView extends ViewPart implements
    //
    private ActionCollapseAll                  _actionCollapseAll;
    private ActionCollapseOthers               _actionCollapseOthers;
+   private ActionCreateTourMarkers            _actionCreateTourMarkers;
    private ActionDuplicateTour                _actionDuplicateTour;
    private ActionEditQuick                    _actionEditQuick;
    private ActionExpandSelection              _actionExpandSelection;
@@ -436,6 +438,27 @@ public class TourBookView extends ViewPart implements
             super.run();
          }
          _isInCollapseAll = false;
+      }
+   }
+
+   private class ActionCreateTourMarkers extends Action {
+
+      public ActionCreateTourMarkers() {
+
+         super(Messages.Tour_Action_CreateTourMarkers, AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New_Disabled));
+      }
+
+      @Override
+      public void run() {
+
+         if (TourManager.isTourEditorModified()) {
+            return;
+         }
+
+         new DialogCreateTourMarkers(_parent.getShell(), getSelectedTourIDs()).open();
       }
    }
 
@@ -1571,6 +1594,7 @@ public class TourBookView extends ViewPart implements
 
       _actionCollapseAll               = new ActionCollapseAll_WithoutSelection(this);
       _actionCollapseOthers            = new ActionCollapseOthers(this);
+      _actionCreateTourMarkers         = new ActionCreateTourMarkers();
       _actionDuplicateTour             = new ActionDuplicateTour(this);
       _actionDeleteTourMenu            = new ActionDeleteTourMenu(this);
       _actionDeleteTourValues          = new ActionDeleteTourValues(this);
@@ -2319,21 +2343,22 @@ public class TourBookView extends ViewPart implements
 // SET_FORMATTING_OFF
 
       // re-import and tour values deletion can be run on all/selected/between dates tours
-      _actionReimport_Tours      .setEnabled(true);
-      _actionDeleteTourMenu      .setEnabled(true);
-      _actionDeleteTourValues    .setEnabled(true);
+      _actionReimport_Tours         .setEnabled(true);
+      _actionDeleteTourMenu         .setEnabled(true);
+      _actionDeleteTourValues       .setEnabled(true);
 
-      _actionEditQuick           .setEnabled(isOneTour);
-      _actionEditTour            .setEnabled(isOneTour);
-      _actionExportTour          .setEnabled(isTourSelected);
-      _actionExportViewCSV       .setEnabled(numSelectedItems > 0);
-      _actionGotoToday           .setEnabled(numAvailableItems > 0);
-      _actionJoinTours           .setEnabled(numTourItems > 1);
-      _actionOpenTour            .setEnabled(isOneTour);
-      _actionPrintTour           .setEnabled(isTourSelected);
-      _actionSetOtherPerson      .setEnabled(isTourSelected);
-      _actionSetStartEndLocation .setEnabled(isTourSelected);
-      _actionSetTourType         .setEnabled(isTourSelected && tourTypes.size() > 0);
+      _actionCreateTourMarkers      .setEnabled(isTourSelected);
+      _actionEditQuick              .setEnabled(isOneTour);
+      _actionEditTour               .setEnabled(isOneTour);
+      _actionExportTour             .setEnabled(isTourSelected);
+      _actionExportViewCSV          .setEnabled(numSelectedItems > 0);
+      _actionGotoToday              .setEnabled(numAvailableItems > 0);
+      _actionJoinTours              .setEnabled(numTourItems > 1);
+      _actionOpenTour               .setEnabled(isOneTour);
+      _actionPrintTour              .setEnabled(isTourSelected);
+      _actionSetOtherPerson         .setEnabled(isTourSelected);
+      _actionSetStartEndLocation    .setEnabled(isTourSelected);
+      _actionSetTourType            .setEnabled(isTourSelected && tourTypes.size() > 0);
 
 // SET_FORMATTING_ON
 
@@ -2423,6 +2448,7 @@ public class TourBookView extends ViewPart implements
       menuMgr.add(_actionSetStartEndLocation);
       menuMgr.add(_actionOpenTour);
       menuMgr.add(_actionDuplicateTour);
+      menuMgr.add(_actionCreateTourMarkers);
       menuMgr.add(_actionMergeTour);
       menuMgr.add(_actionJoinTours);
 
@@ -2641,7 +2667,7 @@ public class TourBookView extends ViewPart implements
    @Override
    public Set<Long> getSelectedTourIDs() {
 
-      final LinkedHashSet<Long> tourIds = new LinkedHashSet<>();
+      final LinkedHashSet<Long> allTourIds = new LinkedHashSet<>();
 
       IStructuredSelection selectedTours;
 
@@ -2657,7 +2683,7 @@ public class TourBookView extends ViewPart implements
          final List<TVITourBookTour> selectedTVITours = rowSelectionModel.getSelectedRowObjects();
 
          for (final TVITourBookTour tviTourBookTour : selectedTVITours) {
-            tourIds.add(tviTourBookTour.tourId);
+            allTourIds.add(tviTourBookTour.tourId);
          }
 
 //         if (tourIds.isEmpty() && _hoveredTourId != -1) {
@@ -2689,7 +2715,7 @@ public class TourBookView extends ViewPart implements
                   // loop: all months
                   for (final TreeViewerItem viewerItem : tviTourBookYear.getFetchedChildren()) {
                      if (viewerItem instanceof final TVITourBookYearCategorized tviTourBookYearCategorized) {
-                        getYearSubTourIDs(tviTourBookYearCategorized, tourIds);
+                        getYearSubTourIDs(tviTourBookYearCategorized, allTourIds);
                      }
                   }
                }
@@ -2699,19 +2725,19 @@ public class TourBookView extends ViewPart implements
                // one month/week is selected
 
                if (isSelectAllInHierarchy) {
-                  getYearSubTourIDs(tviTourBookYearCategorized, tourIds);
+                  getYearSubTourIDs(tviTourBookYearCategorized, allTourIds);
                }
 
             } else if (viewItem instanceof TVITourBookTour) {
 
                // one tour is selected
 
-               tourIds.add(((TVITourBookTour) viewItem).getTourId());
+               allTourIds.add(((TVITourBookTour) viewItem).getTourId());
             }
          }
       }
 
-      return tourIds;
+      return allTourIds;
    }
 
    @Override

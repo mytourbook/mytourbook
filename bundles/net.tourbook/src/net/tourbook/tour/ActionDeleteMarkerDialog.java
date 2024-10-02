@@ -70,7 +70,7 @@ public class ActionDeleteMarkerDialog extends Action {
             if (StringUtils.hasContent(markersNames.toString())) {
                markersNames.append(UI.COMMA_SPACE);
             }
-            markersNames.append("\"" + tourMarker.getLabel() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+            markersNames.append(UI.SYMBOL_QUOTATION_MARK + tourMarker.getLabel() + UI.SYMBOL_QUOTATION_MARK); //$NON-NLS-1$ //$NON-NLS-2$
          }
          dialogMessage = NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_markers_message, markersNames.toString());
       }

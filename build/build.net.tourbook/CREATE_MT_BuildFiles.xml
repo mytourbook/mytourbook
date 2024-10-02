@@ -131,8 +131,8 @@
 			</fileset>
 
 			<mapper>
-				<regexpmapper from="^(de\.byteholder[^\\]*)(.*)$$" to="\1\.nl\2" />
-				<regexpmapper from="^(net\.tourbook[^\\]*)(.*)$$" to="\1\.nl\2" />
+				<regexpmapper from="^(de\.byteholder[^\\]*)(.*)$$" to="\1.nl\2" />
+				<regexpmapper from="^(net\.tourbook[^\\]*)(.*)$$" to="\1.nl\2" />
 			</mapper>
 
 		</copy>

@@ -506,6 +506,17 @@ public class Messages extends NLS {
    public static String        Dialog_BeverageContainer_Title_Create;
    public static String        Dialog_BeverageContainer_Title_Edit;
 
+   public static String        Dialog_CreateTourMarkers_Button_CreateMarkers;
+   public static String        Dialog_CreateTourMarkers_Button_ValidateMarkers;
+   public static String        Dialog_CreateTourMarkers_Label_Title_MultipleTours;
+   public static String        Dialog_CreateTourMarkers_Label_Title_OneTour;
+   public static String        Dialog_CreateTourMarkers_Message_CreateMarkers;
+   public static String        Dialog_CreateTourMarkers_Message_NoNewMarkers;
+   public static String        Dialog_CreateTourMarkers_Radio_ByDistance;
+   public static String        Dialog_CreateTourMarkers_Radio_ByTime;
+   public static String        Dialog_CreateTourMarkers_Title;
+   public static String        Dialog_CreateTourMarkers_Tooltip;
+
    public static String        Dialog_CustomTourNutritionProduct_Label_BeverageQuantity;
    public static String        Dialog_CustomTourNutritionProduct_Label_Calories;
    public static String        Dialog_CustomTourNutritionProduct_Label_Carbohydrates;
@@ -2333,8 +2344,11 @@ public class Messages extends NLS {
 
    public static String        Slideout_Map_PhotoOptions_Checkbox_PreloadPhotoImages;
    public static String        Slideout_Map_PhotoOptions_Checkbox_PreloadPhotoImages_Tooltip;
+   public static String        Slideout_Map_PhotoOptions_Checkbox_ShowHqPhotoImages;
+   public static String        Slideout_Map_PhotoOptions_Checkbox_ShowHqPhotoImages_Tooltip;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoRating;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoTooltip;
+   public static String        Slideout_Map_PhotoOptions_Label_MemoryState;
    public static String        Slideout_Map_PhotoOptions_Label_SymbolColor;
    public static String        Slideout_Map_PhotoOptions_Label_SymbolColor_Tooltip;
    public static String        Slideout_Map_PhotoOptions_Label_Title;
@@ -2900,6 +2914,7 @@ public class Messages extends NLS {
    public static String        Tour_Action_ComputeCadenceZonesTimes_Title;
    public static String        Tour_Action_ComputeTourBreakTimes;
    public static String        Tour_Action_ComputeTourBreakTimes_Tooltip;
+   public static String        Tour_Action_CreateTourMarkers;
    public static String        Tour_Action_DuplicateTour;
    public static String        Tour_Action_EditChartPreferences;
    public static String        Tour_Action_EditSmoothingPreferences;

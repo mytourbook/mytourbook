@@ -211,6 +211,11 @@ public class SRTMMapProvider extends MPPlugin implements ITilePainter {
    }
 
    @Override
+   public float getHiDPI() {
+      return 1.0f;
+   }
+
+   @Override
    public String getId() {
       return FACTORY_ID;
    }

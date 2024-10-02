@@ -941,13 +941,13 @@ public class ColorChooser extends Composite {
       final int mouseX = event.x;
       final int mouseY = event.y;
 
-      final float chooserRadius_Scaled = _chooserRadius / UI.SCALING_4K;
+      final float chooserRadius_Scaled = _chooserRadius / UI.HIDPI_SCALING;
 
       int x = (int) (mouseX - chooserRadius_Scaled);
       int y = (int) (mouseY - chooserRadius_Scaled);
 
-      x = (int) (x * UI.SCALING_4K);
-      y = (int) (y * UI.SCALING_4K);
+      x = (int) (x * UI.HIDPI_SCALING);
+      y = (int) (y * UI.HIDPI_SCALING);
 
       return getRgbFromHexagon(x, y);
    }
@@ -1316,7 +1316,7 @@ public class ColorChooser extends Composite {
    private void setHexagonSize() {
 
       _chooserSize_Unscaled = 300;
-      _chooserSize = (int) (_chooserSize_Unscaled * UI.SCALING_4K);
+      _chooserSize = (int) (_chooserSize_Unscaled * UI.HIDPI_SCALING);
 
       _chooserRadius = _chooserSize / 2;
       _hexagonRadius = (int) (_chooserSize / 2.1);

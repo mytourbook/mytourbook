@@ -1,4 +1,4 @@
-24.next.0                                                 ?. August 2024
+24.next.0                                                 ?. September 2024
 
 
 TODO's
@@ -58,6 +58,9 @@ New
   - Select a product from a list of the most recent products used
   - Edit an existing custom nutrition product
 
+* Tour Book View
+  - Create tour markers by distance or time
+    https://github.com/mytourbook/mytourbook/issues/1319
 
 
 Improvements
@@ -66,11 +69,11 @@ Improvements
 * Tour Nutrition (Frederic):
   - Add duplicated products when they are contained in a beverage container
 
+* Tour Book View
+  - Added column for tour description, the displayed text has been shortened to 100 characters
 
 Changes
 =======
-
-* 
 
 
 

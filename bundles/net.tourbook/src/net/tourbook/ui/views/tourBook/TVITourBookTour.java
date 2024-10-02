@@ -57,6 +57,7 @@ public class TVITourBookTour extends TVITourBookItem implements Comparable<TVITo
     */
    private ArrayList<Long> _nutritionProductsIds;
 
+
    /**
     * @param view
     * @param parentItem

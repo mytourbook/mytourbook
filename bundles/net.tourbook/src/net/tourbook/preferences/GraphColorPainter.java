@@ -113,8 +113,8 @@ public class GraphColorPainter {
          final int imageWidth = (numHorizontalImages * iconSize) + ((numHorizontalImages - 1) * imageSpacing);
          final int imageHeight = iconSize;
 
-         final int imageWidthScaled = (int) (imageWidth * UI.SCALING_4K);
-         final int imageHeightScaled = (int) (imageHeight * UI.SCALING_4K);
+         final int imageWidthScaled = (int) (imageWidth * UI.HIDPI_SCALING);
+         final int imageHeightScaled = (int) (imageHeight * UI.HIDPI_SCALING);
 
          final BufferedImage awtImage = new BufferedImage(imageWidthScaled, imageHeightScaled, BufferedImage.TYPE_4BYTE_ABGR);
          final Graphics2D g2d = awtImage.createGraphics();
@@ -127,10 +127,10 @@ public class GraphColorPainter {
 
             for (int colorIndex = 0; colorIndex < graphColors.length; colorIndex++) {
 
-               final int colorX = (int) (colorIndex * (iconSize + imageSpacing) * UI.SCALING_4K);
+               final int colorX = (int) (colorIndex * (iconSize + imageSpacing) * UI.HIDPI_SCALING);
 
-               final int contentWidth = (int) (iconSize * UI.SCALING_4K);
-               final int contentHeight = (int) (iconSize * UI.SCALING_4K);
+               final int contentWidth = (int) (iconSize * UI.HIDPI_SCALING);
+               final int contentHeight = (int) (iconSize * UI.HIDPI_SCALING);
 
                final GraphColorItem graphColorItem = graphColors[colorIndex];
 
@@ -225,8 +225,8 @@ public class GraphColorPainter {
          final int imageWidth = (numHorizontalImages * imageSize) + ((numHorizontalImages - 1) * imageSpacing);
          final int imageHeight = imageSize;
 
-         final int imageWidthScaled = (int) (imageWidth * UI.SCALING_4K);
-         final int imageHeightScaled = (int) (imageHeight * UI.SCALING_4K);
+         final int imageWidthScaled = (int) (imageWidth * UI.HIDPI_SCALING);
+         final int imageHeightScaled = (int) (imageHeight * UI.HIDPI_SCALING);
 
          final BufferedImage awtImage = new BufferedImage(imageWidthScaled, imageHeightScaled, BufferedImage.TYPE_4BYTE_ABGR);
 

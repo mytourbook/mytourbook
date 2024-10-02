@@ -1049,7 +1049,11 @@ public class UI {
 
    public static void showMessageInfo(final String title, final String message) {
 
-      Display.getDefault().asyncExec(() -> MessageDialog.openInformation(Display.getDefault().getActiveShell(), title, message));
+      Display.getDefault().asyncExec(() -> MessageDialog.openInformation(
+
+            Display.getDefault().getActiveShell(),
+            title,
+            message));
    }
 
    public static void showSQLException(final SQLException ex) {

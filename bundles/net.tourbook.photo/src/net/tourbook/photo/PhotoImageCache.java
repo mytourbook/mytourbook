@@ -388,8 +388,14 @@ public class PhotoImageCache {
 
       if (isSet == false) {
 
+         isSet = setImageSize_IntoCacheWrapper(photo, imageWidth, imageHeight, ImageQuality.THUMB_HQ, _imageCache_ResizedImage);
+      }
+
+      if (isSet == false) {
+
          isSet = setImageSize_IntoCacheWrapper(photo, imageWidth, imageHeight, ImageQuality.HQ, _imageCache_ResizedImage);
       }
+
 
       if (isSet == false) {
 

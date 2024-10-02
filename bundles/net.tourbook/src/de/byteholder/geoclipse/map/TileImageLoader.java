@@ -287,7 +287,7 @@ public class TileImageLoader implements Runnable {
          if (parentTile != null) {
 
             /*
-             * the current tile is a child of a parent tile, create the parent image with this
+             * The current tile is a child of a parent tile, create the parent image with this
              * child image data
              */
 

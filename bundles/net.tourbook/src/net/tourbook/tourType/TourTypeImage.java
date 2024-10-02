@@ -66,7 +66,7 @@ public class TourTypeImage {
 
    private static Image createTourTypeImage_SWT_Create(final long typeId, final Image existingImageSWT) {
 
-      final int imageSize = (int) (TourType.TOUR_TYPE_IMAGE_SIZE * UI.SCALING_4K);
+      final int imageSize = (int) (TourType.TOUR_TYPE_IMAGE_SIZE * UI.HIDPI_SCALING);
 
       final BufferedImage awtImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_4BYTE_ABGR);
 
@@ -175,7 +175,7 @@ public class TourTypeImage {
 
       final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
 
-      final int imageSize = (int) (TourType.TOUR_TYPE_IMAGE_SIZE * UI.SCALING_4K * imageConfig.imageScaling / 100);
+      final int imageSize = (int) (TourType.TOUR_TYPE_IMAGE_SIZE * UI.HIDPI_SCALING * imageConfig.imageScaling / 100);
 
       final int borderWidth = imageConfig.borderWidth;
       final float borderWidth2 = borderWidth / 2f;

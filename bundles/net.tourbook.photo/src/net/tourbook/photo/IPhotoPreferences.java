@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,7 +49,6 @@ public interface IPhotoPreferences {
    public static final String PHOTO_VIEWER_HQ_IMAGE_SIZE                          = "PHOTO_VIEWER_HQ_IMAGE_SIZE";                          //$NON-NLS-1$
    public static final String PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE                    = "PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE";                    //$NON-NLS-1$
    public static final String PHOTO_VIEWER_IMAGE_BORDER_SIZE                      = "PHOTO_VIEWER_IMAGE_BORDER_SIZE";                      //$NON-NLS-1$
-   public static final String PHOTO_VIEWER_IMAGE_FRAMEWORK                        = "PHOTO_VIEWER_IMAGE_FRAMEWORK";                        //$NON-NLS-1$
 
    public static final String PHOTO_FULLSIZE_VIEWER_IS_SHOW_PREVIEW               = "PHOTO_FULLSIZE_VIEWER_IS_SHOW_PREVIEW";               //$NON-NLS-1$
    public static final String PHOTO_FULLSIZE_VIEWER_IS_SHOW_LOADING_MESSAGE       = "PHOTO_FULLSIZE_VIEWER_IS_SHOW_LOADING_MESSAGE";       //$NON-NLS-1$

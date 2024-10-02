@@ -1034,7 +1034,7 @@ public class PrefPageMap25_Map3_Color extends PreferencePage implements IWorkben
       if (isProfileImageValid(image) == false) {
 
          final int columnWidth = getImageColumnWidth();
-         final int columnWidth_Scaled = (int) (columnWidth * UI.SCALING_4K);
+         final int columnWidth_Scaled = (int) (columnWidth * UI.HIDPI_SCALING);
 
          final int imageWidth = columnWidth_Scaled;
          final int imageHeight = PROFILE_IMAGE_HEIGHT - 1;
@@ -1090,7 +1090,7 @@ public class PrefPageMap25_Map3_Color extends PreferencePage implements IWorkben
       }
 
       final int imageWidth = image.getBounds().width;
-      final int imageColumnWidth = (int) (getImageColumnWidth() * UI.SCALING_4K);
+      final int imageColumnWidth = (int) (getImageColumnWidth() * UI.HIDPI_SCALING);
 
       if (imageWidth != imageColumnWidth) {
 

@@ -195,8 +195,8 @@ Build Update Site
 
    !!! BEFORE !!!
    
-   1. Set version numbers like in this commit https://github.com/mytourbook/mytourbook/commit/4ad360673bea889647dfb54f7c754c8bb41984b0
-   2. Run "CREATE_MT_BuildFiles.xml" BEFORE the following commands
+      1. Set version numbers like in this commit https://github.com/mytourbook/mytourbook/commit/4ad360673bea889647dfb54f7c754c8bb41984b0
+      2. Run "CREATE_MT_BuildFiles.xml" BEFORE the following commands
 
    * WITH NL
    

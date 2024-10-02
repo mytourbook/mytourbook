@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,15 +19,12 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
-import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageGallery;
-import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoLoadManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -38,12 +35,10 @@ import org.eclipse.swt.widgets.Spinner;
 
 public class GalleryActionBar {
 
-   private static final IPreferenceStore _prefStore = PhotoActivator.getPrefStore();
+   private ImageGallery _imageGallery;
 
-   private ImageGallery                  _imageGallery;
-
-   private boolean                       _isShowThumbsize;
-   private boolean                       _isShowCustomActionBar;
+   private boolean      _isShowThumbsize;
+   private boolean      _isShowCustomActionBar;
 
    /*
     * UI controls
@@ -250,7 +245,8 @@ public class GalleryActionBar {
 
          _canvasImageSizeIndicator.setToolTipText(NLS.bind(
                Messages.Pic_Dir_ImageSizeIndicator_Tooltip,
-               _prefStore.getString(IPhotoPreferences.PHOTO_VIEWER_IMAGE_FRAMEWORK)));
+               "AWT" //$NON-NLS-1$
+         ));
       }
    }
 }
