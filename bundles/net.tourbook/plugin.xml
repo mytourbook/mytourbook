@@ -402,8 +402,8 @@
       />
          <page
             name        ="%Pref_Page_Tag_Groups"
-            id          ="net.tourbook.preferences.PrefPageTagsGroups"
-            class       ="net.tourbook.preferences.PrefPageTagsGroups"
+            id          ="net.tourbook.preferences.PrefPageTagGroups"
+            class       ="net.tourbook.preferences.PrefPageTagGroups"
             category    ="net.tourbook.preferences.PrefPageTags"
          />
 

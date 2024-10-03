@@ -320,7 +320,8 @@ public class PrefPageAppearanceColors extends PreferencePage implements
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(400, 650)
+//          .hint(400, 650) // no HiDPI ?, this was the old value
+            .hint(200, 400) // with HiDPI
             .applyTo(layoutContainer);
 
       final TreeColumnLayout treeLayout = new TreeColumnLayout();
