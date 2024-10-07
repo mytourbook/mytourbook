@@ -134,9 +134,8 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
 
    private ActionCollapseAllWithoutSelection _actionCollapseAll;
    private ActionExpandAll                   _actionExpandAll;
-   private ActionTag_LayoutFlat              _actionTag_LayoutFlat;
-   private ActionTag_LayoutHierarchical      _actionTag_LayoutHierarchical;
    private ActionTag_Filter                  _actionTag_Filter;
+   private ActionTag_Layout                  _actionTag_Layout;
 
    /*
     * UI controls
@@ -192,34 +191,19 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       }
    }
 
-   private class ActionTag_LayoutFlat extends Action {
+   private class ActionTag_Layout extends Action {
 
-      ActionTag_LayoutFlat() {
+      ActionTag_Layout() {
 
-         super(Messages.action_tagView_flat_layout, AS_RADIO_BUTTON);
+         super(Messages.Tour_Tags_Action_Layout_Flat_Tooltip, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Flat));
       }
 
       @Override
       public void run() {
-         onTag_Layout(false);
-      }
-   }
 
-   private class ActionTag_LayoutHierarchical extends Action {
-
-      ActionTag_LayoutHierarchical() {
-
-         super(Messages.action_tagView_flat_hierarchical, AS_RADIO_BUTTON);
-
-         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Hierarchical));
-         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Hierarchical_Disabled));
-      }
-
-      @Override
-      public void run() {
-         onTag_Layout(true);
+         onTag_Layout();
       }
    }
 
@@ -488,8 +472,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       _actionExpandAll = new ActionExpandAll(this);
       _actionCollapseAll = new ActionCollapseAllWithoutSelection(this);
       _actionTag_Filter = new ActionTag_Filter();
-      _actionTag_LayoutFlat = new ActionTag_LayoutFlat();
-      _actionTag_LayoutHierarchical = new ActionTag_LayoutHierarchical();
+      _actionTag_Layout = new ActionTag_Layout();
    }
 
    @Override
@@ -821,17 +804,18 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
 
       final boolean areTagsAvailable = TagGroupManager.getTagGroups().size() > 0;
       final boolean isGroupSelected = tagGroup != null;
+      final boolean isShowAllTags = _isShowOnlyCheckedTags == false;
 
 // SET_FORMATTING_OFF
-      
+
       _btnRename.setEnabled(isGroupSelected);
       _btnDelete.setEnabled(isGroupSelected);
 
       _actionCollapseAll            .setEnabled(_isHierarchicalLayout);
       _actionExpandAll              .setEnabled(_isHierarchicalLayout);
       _actionTag_Filter             .setEnabled(areTagsAvailable);
-      _actionTag_LayoutHierarchical .setEnabled(_isShowOnlyCheckedTags == false);
-      
+      _actionTag_Layout             .setEnabled(areTagsAvailable && isShowAllTags);
+
 // SET_FORMATTING_ON
 
       _tagViewer.getTree().setEnabled(isGroupSelected);
@@ -858,8 +842,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       final ToolBarManager tbmAllTags = new ToolBarManager(_toolBarAllTags);
 
       tbmAllTags.add(_actionTag_Filter);
-      tbmAllTags.add(_actionTag_LayoutFlat);
-      tbmAllTags.add(_actionTag_LayoutHierarchical);
+      tbmAllTags.add(_actionTag_Layout);
       tbmAllTags.add(_actionExpandAll);
       tbmAllTags.add(_actionCollapseAll);
 
@@ -1019,10 +1002,9 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
 
             // tag viewer must not display a tree -> show flat viewer
 
-            _actionTag_LayoutFlat.setChecked(true);
-            _actionTag_LayoutHierarchical.setChecked(false);
+            updateUI_TagLayoutAction();
 
-            onTag_Layout(false);
+            onTag_Layout();
 
          } else {
 
@@ -1036,18 +1018,13 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
    }
 
    /**
-    * @param isHierarchicalLayout
-    *           Is <code>true</code> when the layout is flat, otherwise it is hierarchical
     */
-   private void onTag_Layout(final boolean isHierarchicalLayout) {
+   private void onTag_Layout() {
 
-      // ignore layout when it is already set
-      if (_isHierarchicalLayout == isHierarchicalLayout) {
-         return;
-      }
+      // toggle layout
+      _isHierarchicalLayout = !_isHierarchicalLayout;
 
-      _isHierarchicalLayout = isHierarchicalLayout;
-
+      updateUI_TagLayoutAction();
       updateTagModel();
 
       // reselect tags
@@ -1319,14 +1296,8 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
    private void restoreState() {
 
       /*
-       * Set layout actions after the UI is created
+       * Tag filter
        */
-      if (_isHierarchicalLayout) {
-         _actionTag_LayoutHierarchical.setChecked(true);
-      } else {
-         _actionTag_LayoutFlat.setChecked(true);
-      }
-
       _actionTag_Filter.setChecked(_isShowOnlyCheckedTags);
 
       /*
@@ -1353,6 +1324,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       }
 
       updateUI_TagFilter();
+      updateUI_TagLayoutAction();
    }
 
    private void restoreStateBeforeUI() {
@@ -1407,6 +1379,28 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
          _actionTag_Filter.setToolTipText(Messages.Tour_Tags_Action_TagCheckFilter_OnlyTaggedTours_Tooltip);
 
          _tagViewer.setFilters();
+      }
+   }
+
+   private void updateUI_TagLayoutAction() {
+
+      if (_isHierarchicalLayout) {
+
+         // hierarchy is displayed -> show icon/tooltip for flat view
+
+         _actionTag_Layout.setToolTipText(Messages.Tour_Tags_Action_Layout_Flat_Tooltip);
+
+         _actionTag_Layout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Flat));
+         _actionTag_Layout.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Flat_Disabled));
+
+      } else {
+
+         // flat view is displayed -> show icon/tooltip for hierarchy view
+
+         _actionTag_Layout.setToolTipText(Messages.Tour_Tags_Action_Layout_Hierarchical_Tooltip);
+
+         _actionTag_Layout.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Hierarchical));
+         _actionTag_Layout.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagLayout_Hierarchical_Disabled));
       }
    }
 
