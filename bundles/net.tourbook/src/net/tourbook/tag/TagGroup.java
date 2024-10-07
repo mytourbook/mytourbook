@@ -15,9 +15,9 @@
  *******************************************************************************/
 package net.tourbook.tag;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.tourbook.common.UI;
@@ -29,11 +29,10 @@ public class TagGroup {
 
    private static final AtomicInteger _createCounter = new AtomicInteger();
 
+   private int                        _createId;
+
    public String                      name;
-
-   public List<TourTag>               tourTags       = new ArrayList<>();
-
-   private int          _createId;
+   public Set<TourTag>                tourTags       = new HashSet<>();
 
    public TagGroup() {
 
@@ -71,14 +70,14 @@ public class TagGroup {
 
       return UI.EMPTY_STRING
 
-            + "TagGroup" + NL
+            + "TagGroup" + NL //$NON-NLS-1$
 
-            + "[" + NL
+            + "[" + NL //$NON-NLS-1$
 
-            + " name     = " + name + NL
-            + " tourTags = " + tourTags + NL
+            + " name     = " + name + NL //$NON-NLS-1$
+            + " tourTags = " + tourTags + NL //$NON-NLS-1$
 
-            + "]";
+            + "]"; //$NON-NLS-1$
    }
 
 }

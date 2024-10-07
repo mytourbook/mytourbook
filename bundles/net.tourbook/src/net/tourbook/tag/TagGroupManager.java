@@ -20,7 +20,9 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -57,9 +59,8 @@ public class TagGroupManager {
    private static final String         TAG_ROOT            = "TagGroups";                            //$NON-NLS-1$
    private static final String         TAG_TAG_GROUP       = "TagGroup";                             //$NON-NLS-1$
    //
-   private static final String         ATTR_CREATED        = "created";                              //$NON-NLS-1$
    private static final String         ATTR_NAME           = "name";                                 //$NON-NLS-1$
-   private static final String         ATTR_TAGS           = "tags";                                 //$NON-NLS-1$
+   private static final String         ATTR_TAG_IDS        = "tagIDs";                               //$NON-NLS-1$
    //
    private static final List<TagGroup> _allTagGroups       = new ArrayList<>();
 
@@ -157,9 +158,9 @@ public class TagGroupManager {
 
       tagGroup.name = Util.getXmlString(xmlGroup, ATTR_NAME, null);
 
-      final long[] tagIds = Util.getXmlLongArray(xmlGroup, ATTR_TAGS);
+      final long[] tagIds = Util.getXmlLongArray(xmlGroup, ATTR_TAG_IDS);
 
-      final List<TourTag> allXmlTourTags = new ArrayList<>();
+      final Set<TourTag> allXmlTourTags = new HashSet<>();
       final HashMap<Long, TourTag> allDbTourTags = TourDatabase.getAllTourTags();
 
       for (final long tagID : tagIds) {
@@ -235,10 +236,9 @@ public class TagGroupManager {
          // <TagGroup>
          final IMemento xmlTagGroup = xmlRoot.createChild(TAG_TAG_GROUP);
          {
-
-            // collect all tag ID's
+            // get all tag ID's
             final LongArrayList allTagIDs = new LongArrayList();
-            final List<TourTag> allTags = tagGroup.tourTags;
+            final Set<TourTag> allTags = tagGroup.tourTags;
 
             if (allTags != null) {
 
@@ -248,17 +248,10 @@ public class TagGroupManager {
             }
 
             xmlTagGroup.putString(ATTR_NAME, tagGroup.name);
-            Util.setXmlLongArray(xmlTagGroup, ATTR_TAGS, allTagIDs.toArray());
+            Util.setXmlLongArray(xmlTagGroup, ATTR_TAG_IDS, allTagIDs.toArray());
          }
       }
    }
 
-   private static void saveValue(final IMemento xmlTagGroup, final String key, final String value) {
-
-      if (value != null && value.length() > 0) {
-
-         xmlTagGroup.putString(key, value);
-      }
-   }
 
 }
