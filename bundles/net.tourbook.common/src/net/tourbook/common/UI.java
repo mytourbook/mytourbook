@@ -3425,42 +3425,53 @@ public class UI {
    }
 
    /**
-    * copy from {@link CTabItem}
+    * Copy from {@link CTabItem}
     *
     * @param gc
     * @param text
     * @param width
-    * @param isUseEllipses
+    * @param isUseEllipsis
     *
     * @return
     */
-   public static String shortenText(final GC gc, final String text, final int width, final boolean isUseEllipses) {
-      return isUseEllipses ? //
-            shortenText(gc, text, width, ELLIPSIS) : shortenText(gc, text, width, EMPTY_STRING);
+   public static String shortenText(final GC gc, final String text, final int width, final boolean isUseEllipsis) {
+
+      return isUseEllipsis
+            ? shortenText(gc, text, width, ELLIPSIS)
+            : shortenText(gc, text, width, EMPTY_STRING);
    }
 
-   public static String shortenText(final GC gc, String text, final int width, final String ellipses) {
+   public static String shortenText(final GC gc, String text, final int width, final String ellipsis) {
 
       if (gc.textExtent(text, 0).x <= width) {
          return text;
       }
 
-      final int ellipseWidth = gc.textExtent(ellipses, 0).x;
+      final int ellipseWidth = gc.textExtent(ellipsis, 0).x;
       final int length = text.length();
+
       final TextLayout layout = new TextLayout(gc.getDevice());
       layout.setText(text);
 
       int end = layout.getPreviousOffset(length, SWT.MOVEMENT_CLUSTER);
+
       while (end > 0) {
+
          text = text.substring(0, end);
+
          final int l = gc.textExtent(text, 0).x;
          if (l + ellipseWidth <= width) {
             break;
          }
+
          end = layout.getPreviousOffset(end, SWT.MOVEMENT_CLUSTER);
       }
+
       layout.dispose();
-      return end == 0 ? text.substring(0, 1) : text + ellipses;
+
+      return end == 0
+            ? text.substring(0, 1)
+            : text + ellipsis;
    }
 
    /**

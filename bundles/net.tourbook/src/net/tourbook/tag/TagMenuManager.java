@@ -28,6 +28,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.ICommandIds;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.common.util.AdvancedMenuForActions;
 import net.tourbook.common.util.ToolTip;
@@ -36,6 +37,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageTagGroups;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -100,12 +102,13 @@ public class TagMenuManager {
    private boolean                        _isSaveTour;
    private ITourProvider                  _tourProvider;
 
-   private ActionTagGroups_SubMenu        _actionAddTagGroups;
-   private ActionContributionItem         _actionAddTagAdvanced;
    private Action_AddTourTag_SubMenu      _actionAddTag;
    private Action_RemoveTourTag_SubMenu   _actionRemoveTag;
    private Action_RemoveAllTags           _actionRemoveAllTags;
+   private ActionContributionItem         _actionAddTagAdvanced;
+   private ActionOpenPrefDialog           _actionTagGroupPreferences;
    private ActionShowTourTagsView         _actionSetTags;
+   private ActionTagGroups_SubMenu        _actionAddTagGroups;
 
    private AdvancedMenuForActions         _advancedMenuToAddTags;
 
@@ -237,8 +240,10 @@ public class TagMenuManager {
 
          __allTagGroupActions.clear();
 
+         final List<TagGroup> allTagGroups = TagGroupManager.getTagGroupsSorted();
+
          // create actions for each tag group
-         for (final TagGroup tagGroup : TagGroupManager.getTagGroupsSorted()) {
+         for (final TagGroup tagGroup : allTagGroups) {
 
             final Set<TourTag> tourTags = tagGroup.tourTags;
             final boolean hasTags = tourTags.size() > 0;
@@ -251,6 +256,13 @@ public class TagMenuManager {
 
             addActionToMenu(tagGroupAction);
          }
+
+         if (allTagGroups.size() > 0) {
+
+            addSeparatorToMenu();
+         }
+
+         addActionToMenu(_actionTagGroupPreferences);
       }
    }
 
@@ -506,13 +518,14 @@ public class TagMenuManager {
       _actionAddTagAdvanced = new ActionContributionItem(new Action_AddTourTag_SubMenu(this, null));
       _actionAddTagAdvanced.setId(ICommandIds.ACTION_ADD_TAG);
 
-      _actionAddTag           = new Action_AddTourTag_SubMenu(this);
-      _actionRemoveTag        = new Action_RemoveTourTag_SubMenu(this);
-      _actionRemoveAllTags    = new Action_RemoveAllTags();
-      _actionAddTagGroups     = new ActionTagGroups_SubMenu();
-      _actionSetTags          = new ActionShowTourTagsView();
+      _actionAddTag              = new Action_AddTourTag_SubMenu(this);
+      _actionRemoveTag           = new Action_RemoveTourTag_SubMenu(this);
+      _actionRemoveAllTags       = new Action_RemoveAllTags();
+      _actionTagGroupPreferences = new ActionOpenPrefDialog("Manage Tag &Groups...",PrefPageTagGroups.ID);
+      _actionAddTagGroups        = new ActionTagGroups_SubMenu();
+      _actionSetTags             = new ActionShowTourTagsView();
 
-      _advancedMenuToAddTags  = new AdvancedMenuForActions(_actionAddTagAdvanced);
+      _advancedMenuToAddTags     = new AdvancedMenuForActions(_actionAddTagAdvanced);
 
 // SET_FORMATTING_ON
    }
@@ -525,14 +538,11 @@ public class TagMenuManager {
 
       _currentInstance = this;
 
-      final boolean areTagGroupsAvailable = TagGroupManager.getTagGroups().size() > 0;
-
       final Action_AddTourTag_SubMenu actionAddTagAdvanced = (Action_AddTourTag_SubMenu) _actionAddTagAdvanced.getAction();
 
 // SET_FORMATTING_OFF
 
       _actionAddTag           .setEnabled(isAddTagEnabled);
-      _actionAddTagGroups     .setEnabled(areTagGroupsAvailable);
       actionAddTagAdvanced    .setEnabled(isAddTagEnabled);
 
       _actionRemoveTag        .setEnabled(isRemoveTagEnabled);
@@ -631,17 +641,19 @@ public class TagMenuManager {
       }
 
       // add all previous tags
-      if (_allPreviousTags.size() > 0) {
+      final int numPreviousTags = _allPreviousTags.size();
+      if (numPreviousTags > 0) {
 
          final Collection<TourTag> allPreviousTags = _allPreviousTags.values();
 
          // check if the first previous tag is the same as the first recent tag
-         if (_allPreviousTags.size() > 1 || allPreviousTags.iterator().next().equals(_recentTags.get(0)) == false) {
+         if (numPreviousTags > 1 || allPreviousTags.iterator().next().equals(_recentTags.get(0)) == false) {
 
             final StringBuilder sb = new StringBuilder();
             boolean isFirst = true;
 
             for (final TourTag recentTag : allPreviousTags) {
+
                if (isFirst) {
                   isFirst = false;
                } else {
@@ -650,14 +662,28 @@ public class TagMenuManager {
                sb.append(recentTag.getTagName());
             }
 
+            String tagText = sb.toString();
+
+            if (UI.IS_SCRAMBLE_DATA) {
+
+               tagText = UI.scrambleText(tagText);
+            }
+
+            final int maxTextWidth = 40;
+
+            if (tagText.length() > maxTextWidth) {
+
+               tagText = UI.shortenText(tagText, maxTextWidth, true);
+            }
+
             if (menu == null) {
 
-               _actionAllPreviousTags.setText(UI.SPACE4 + UI.MNEMONIC + 0 + UI.SPACE2 + sb.toString());
+               _actionAllPreviousTags.setText(UI.SPACE4 + UI.MNEMONIC + 0 + UI.SPACE2 + tagText);
                menuMgr.add(new ActionContributionItem(_actionAllPreviousTags));
 
             } else {
 
-               _actionAllPreviousTags.setText(UI.MNEMONIC + 0 + UI.SPACE2 + sb.toString());
+               _actionAllPreviousTags.setText(UI.MNEMONIC + 0 + UI.SPACE2 + tagText);
                new ActionContributionItem(_actionAllPreviousTags).fill(menu, -1);
             }
          }
@@ -676,11 +702,18 @@ public class TagMenuManager {
 
          final TourTag tag = _recentTags.get(tagIndex);
 
+         String tagText = tag.getTagName();
+
+         if (UI.IS_SCRAMBLE_DATA) {
+
+            tagText = UI.scrambleText(tagText);
+         }
+
          if (menu == null) {
 
             actionRecentTag.setupTagAction(
                   tag,
-                  (UI.SPACE4 + UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tag.getTagName()));
+                  (UI.SPACE4 + UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tagText));
 
             menuMgr.add(new ActionContributionItem(actionRecentTag));
 
@@ -688,7 +721,7 @@ public class TagMenuManager {
 
             actionRecentTag.setupTagAction(
                   tag,
-                  (UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tag.getTagName()));
+                  (UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tagText));
 
             new ActionContributionItem(actionRecentTag).fill(menu, -1);
          }

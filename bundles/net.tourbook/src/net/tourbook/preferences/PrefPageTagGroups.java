@@ -36,15 +36,20 @@ import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tag.TVIPrefTagRoot;
 import net.tourbook.tag.TagGroup;
 import net.tourbook.tag.TagGroupManager;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandAll;
 
 import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
@@ -109,6 +114,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
 // SET_FORMATTING_ON
 
    private IPropertyChangeListener           _prefChangeListener;
+   private ITourEventListener                _tourEventListener;
 
    private TableViewer                       _tagGroupViewer;
 
@@ -126,7 +132,6 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
    private boolean                           _isExpandingSelection;
    private boolean                           _isHierarchicalLayout;
    private boolean                           _isInCollapseAll;
-   private boolean                           _isLiveUpdate;
    private boolean                           _isModified;
    private boolean                           _isShowOnlyCheckedTags;
 
@@ -358,22 +363,44 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
 
    private void actionTagGroup_Delete() {
 
-      final TagGroup groupItem = (TagGroup) _tagGroupViewer.getStructuredSelection().getFirstElement();
+      final TagGroup tagGroup = (TagGroup) _tagGroupViewer.getStructuredSelection().getFirstElement();
 
-      if (groupItem == null) {
+      if (tagGroup == null) {
          return;
       }
 
+      if (new MessageDialog(
+
+            _parent.getShell(),
+
+            "Delete Tag Group",
+            null, // no title image
+
+            "Delete selected tag group \"%s\" ?".formatted(tagGroup.name),
+            MessageDialog.CONFIRM,
+
+            0, // default index
+
+            Messages.App_Action_Delete,
+            Messages.App_Action_Cancel
+
+      ).open() != IDialogConstants.OK_ID) {
+
+         return;
+      }
+
+      _isModified = true;
+
       // update model
-      TagGroupManager.removeTagGroup(groupItem);
+      TagGroupManager.removeTagGroup(tagGroup);
 
       // update UI
       final Table groupTable = _tagGroupViewer.getTable();
       final int selectionIndex = groupTable.getSelectionIndex();
 
-      _tagGroupViewer.remove(groupItem);
+      _tagGroupViewer.remove(tagGroup);
 
-      // select next filter item
+      // select next tag group
       final int nextIndex = Math.min(groupTable.getItemCount() - 1, selectionIndex);
 
       if (nextIndex >= 0) {
@@ -386,14 +413,12 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
 
          enableControls();
       }
-
-      _isModified = true;
    }
 
    private void actionTagGroup_New() {
 
       final InputDialog inputDialog = new InputDialog(getShell(),
-            "Tag Groups",
+            "New Tag Group",
             "Tag group name",
             UI.EMPTY_STRING,
             getNameValidator());
@@ -403,6 +428,8 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       if (inputDialog.getReturnCode() != Window.OK) {
          return;
       }
+
+      _isModified = true;
 
       // create new tag group
       final TagGroup tagGroup = new TagGroup();
@@ -417,9 +444,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       // select new group
       _tagGroupViewer.setSelection(new StructuredSelection(tagGroup), true);
 
-      _tagGroupViewer.getTable().setFocus();
-
-      _isModified = true;
+      _tagViewer.getTree().setFocus();
    }
 
    private void actionTagGroup_Rename() {
@@ -447,6 +472,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       _tagGroupViewer.refresh();
 
       _tagGroupViewer.setSelection(new StructuredSelection(_selectedTagGroup), true);
+      _tagGroupViewer.getTable().setFocus();
 
       // reselect group tags
       onTagGroup_Select();
@@ -458,13 +484,36 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
 
          if (propertyChangeEvent.getProperty().equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
-            updateViewers();
+            updateViewers_All();
 
             enableControls();
          }
       };
 
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+   }
+
+   private void addTourEventListener() {
+
+      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
+
+         if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+
+            // reload tag viewer
+
+            updateViewers_Tags();
+
+            // reselect tags
+            if (_selectedTagGroup != null) {
+
+               updateUI_TagViewer(_selectedTagGroup.tourTags);
+            }
+
+            enableControls();
+         }
+      };
+
+      TourManager.getInstance().addTourEventListener(_tourEventListener);
    }
 
    private void createActions() {
@@ -493,8 +542,9 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       updateUI_TopGridRowHeight();
 
       addPrefListener();
+      addTourEventListener();
 
-      updateViewers();
+      updateViewers_All();
 
       restoreState();
 
@@ -576,10 +626,10 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
             styledString.append(tagGroup.name, net.tourbook.ui.UI.CONTENT_CATEGORY_STYLER);
             styledString.append(UI.SPACE3 + tagGroup.tourTags.size(), net.tourbook.ui.UI.TOTAL_STYLER);
 
-            String text = styledString.getString();
+            final String text = styledString.getString();
 
             if (UI.IS_SCRAMBLE_DATA) {
-               text = UI.scrambleText(text);
+//               text = UI.scrambleText(text);
             }
 
             cell.setText(text);
@@ -784,7 +834,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
 
          // button: delete
          _btnDelete = new Button(container, SWT.NONE);
-         _btnDelete.setText(Messages.Pref_TourTypeFilter_button_remove);
+         _btnDelete.setText(Messages.App_Action_Delete_WithConfirm);
          _btnDelete.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> actionTagGroup_Delete()));
          setButtonLayoutData(_btnDelete);
       }
@@ -794,6 +844,8 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
    public void dispose() {
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+
+      TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       super.dispose();
    }
@@ -847,16 +899,6 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       tbmAllTags.add(_actionCollapseAll);
 
       tbmAllTags.update(true);
-   }
-
-   /**
-    * Fire modify event only when live update is selected
-    */
-   private void fireModifyEvent() {
-
-      if (_isLiveUpdate) {
-//         TourTagFilterManager.fireFilterModifyEvent();
-      }
    }
 
    /**
@@ -948,7 +990,10 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
    }
 
    @Override
-   public void init(final IWorkbench workbench) {}
+   public void init(final IWorkbench workbench) {
+
+      noDefaultAndApplyButton();
+   }
 
    private void initUI() {
 
@@ -982,6 +1027,14 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
             getTagItems(rootItems, tagItems, tagId);
          }
       }
+   }
+
+   @Override
+   public boolean okToLeave() {
+
+      saveChanges();
+
+      return true;
    }
 
    private void onDispose() {
@@ -1025,7 +1078,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       _isHierarchicalLayout = !_isHierarchicalLayout;
 
       updateUI_TagLayoutAction();
-      updateTagModel();
+      updateViewers_Tags();
 
       // reselect tags
       if (_selectedTagGroup != null) {
@@ -1275,6 +1328,14 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
    }
 
    @Override
+   public boolean performCancel() {
+
+      saveState();
+
+      return true;
+   }
+
+   @Override
    protected void performDefaults() {
 
       _isModified = true;
@@ -1288,7 +1349,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
    @Override
    public boolean performOk() {
 
-      saveState();
+      saveChanges();
 
       return true;
    }
@@ -1333,34 +1394,27 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       _isShowOnlyCheckedTags = Util.getStateBoolean(_state, STATE_IS_SHOW_ONLY_TAGS_WHICH_ARE_CHECKED, false);
    }
 
-   private void saveState() {
+   private void saveChanges() {
 
       if (_isModified) {
 
          _isModified = false;
 
          TagGroupManager.saveState();
-
-         // fire modify event
-         _prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
       }
 
+      saveState();
+   }
+
+   private void saveState() {
+
       _state.put(STATE_IS_HIERARCHICAL_LAYOUT, _isHierarchicalLayout);
+      _state.put(STATE_IS_SHOW_ONLY_TAGS_WHICH_ARE_CHECKED, _isShowOnlyCheckedTags);
 
       if (_selectedTagGroup != null) {
 
          _state.put(STATE_SELECTED_TAG_GROUP, _selectedTagGroup.name);
       }
-
-      _state.put(STATE_IS_SHOW_ONLY_TAGS_WHICH_ARE_CHECKED, _isShowOnlyCheckedTags);
-   }
-
-   private void updateTagModel() {
-
-      _tagViewerRootItem = new TVIPrefTagRoot(_tagViewer, _isHierarchicalLayout);
-      _tagViewer.setInput(this);
-
-      loadAllTagItems();
    }
 
    /**
@@ -1432,8 +1486,6 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       _isModified = true;
 
       enableControls();
-
-      fireModifyEvent();
    }
 
    private void updateUI_TagViewer(final Set<TourTag> allTourTags) {
@@ -1497,13 +1549,22 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       gd.heightHint = toolbarHeight;
    }
 
-   private void updateViewers() {
+   private void updateViewers_All() {
 
-      // show contents in the viewers
       _tagGroupViewer.setInput(new Object());
 
-      // load tag viewer
-      updateTagModel();
+      updateViewers_Tags();
+   }
+
+   /**
+    * Load tag viewer
+    */
+   private void updateViewers_Tags() {
+
+      _tagViewerRootItem = new TVIPrefTagRoot(_tagViewer, _isHierarchicalLayout);
+      _tagViewer.setInput(this);
+
+      loadAllTagItems();
    }
 
 }

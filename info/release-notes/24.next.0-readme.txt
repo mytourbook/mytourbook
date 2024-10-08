@@ -49,6 +49,11 @@ Experimental
 New
 ===
 
+* Tour Tag Groups
+  - Define a group with tags
+  - Set all tags from a group into a tour
+  https://github.com/mytourbook/mytourbook/issues/1358
+
 * Tour Book View
   - Create tour markers by distance or time
     https://github.com/mytourbook/mytourbook/issues/1319
@@ -75,6 +80,7 @@ Changes
 * Tag Preferences
   - Renamed pref page
 
+
 Changes that require Tour Re-import
 ===================================
 
@@ -85,10 +91,10 @@ Bugfix
 ======
   
 * 4k Display
-  Fixed: It was difficult to hover some tooltips when the mouse was moved not fast enough
+  Fixed: It was difficult to hover tooltips when the mouse was moved not fast enough
  
 
-See milestone 24.x https://github.com/mytourbook/mytourbook/milestone/16?closed=1
+See also milestone 24.x https://github.com/mytourbook/mytourbook/milestone/16?closed=1
  
 
 
