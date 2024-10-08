@@ -370,7 +370,14 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       final int devXParent = parentBounds.x;
       final int devYParent = parentBounds.y;
       final int itemWidth = parentBounds.width;
-      final int itemHeight = parentBounds.height;
+      int itemHeight = parentBounds.height;
+
+      if (UI.IS_4K_DISPLAY) {
+
+         // this adjustment is needed otherwise the tooltip is difficult to hover
+
+         itemHeight -= 1;
+      }
 
       // center horizontally
 

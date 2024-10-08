@@ -163,7 +163,14 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
 
          final Rectangle cellBounds = _hoveredBounds;
          final int cellWidth2 = cellBounds.width / 2;
-         final int cellHeight = cellBounds.height;
+         int cellHeight = cellBounds.height;
+
+         if (UI.IS_4K_DISPLAY) {
+
+            // this adjustment is needed otherwise the tooltip is difficult to hover
+
+            cellHeight -= 1;
+         }
 
          final int devXDefault = cellBounds.x + cellWidth2;// + cellBounds.width; //event.x;
          final int devY = cellBounds.y + cellHeight;

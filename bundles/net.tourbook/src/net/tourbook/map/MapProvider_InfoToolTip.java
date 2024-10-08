@@ -382,7 +382,14 @@ public class MapProvider_InfoToolTip extends ToolTip {
 
          final Rectangle cellBounds = cell.getBounds();
          final int cellWidth2 = (int) (cellBounds.width * 0.5);
-         final int cellHeight = cellBounds.height;
+         int cellHeight = cellBounds.height;
+
+         if (UI.IS_4K_DISPLAY) {
+
+            // this adjustment is needed otherwise the tooltip is difficult to hover
+
+            cellHeight -= 1;
+         }
 
          final int devXDefault = cellBounds.x + cellWidth2;// + cellBounds.width; //event.x;
          final int devY = cellBounds.y + cellHeight;

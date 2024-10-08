@@ -59,6 +59,7 @@ Improvements
 
 * Tour Book View
   - Added column for tour description, the displayed text has been shortened to 100 characters
+   
 
 
 Changes
@@ -79,6 +80,10 @@ Changes that require Tour Re-import
 
 Bugfix
 ======
+  
+* 4k Display
+  Fixed: It was difficult to hover some tooltips when the mouse was moved not fast enough
+ 
 
 See milestone 24.x https://github.com/mytourbook/mytourbook/milestone/16?closed=1
  

@@ -147,7 +147,14 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 
          final Rectangle cellBounds = cell.getBounds();
          final int cellWidth2 = cellBounds.width / 2;
-         final int cellHeight = cellBounds.height;
+         int cellHeight = cellBounds.height;
+
+         if (UI.IS_4K_DISPLAY) {
+
+            // this adjustment is needed otherwise the tooltip is difficult to hover
+
+            cellHeight -= 1;
+         }
 
          final int devXDefault = cellBounds.x + cellWidth2;// + cellBounds.width; //event.x;
          final int devY = cellBounds.y + cellHeight;
