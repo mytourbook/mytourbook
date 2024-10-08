@@ -1477,7 +1477,7 @@ public class TourInfoUI {
                   .indent(0, 10)
                   .applyTo(_lblWeather);
 
-            _txtWeather = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+            _txtWeather = new Text(_lowerPartContainer, SWT.MULTI | SWT.READ_ONLY);
             _txtWeather.setForeground(_fgColor);
             _txtWeather.setBackground(_bgColor);
             GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtWeather);
@@ -1497,6 +1497,7 @@ public class TourInfoUI {
 
             // text field
             int style = SWT.WRAP | SWT.MULTI | SWT.READ_ONLY;
+
             _descriptionLineCount = Util.countCharacter(_tourData.getTourDescription(), '\n');
             if (_descriptionLineCount > _descriptionScroll_Lines) {
                style |= SWT.V_SCROLL;
@@ -1951,8 +1952,8 @@ public class TourInfoUI {
 
       // set size from state
       switch (getSelectedUIWidthSizeIndex()) {
-      case 1 -> _uiWidth_Pixel = Util.getStateInt(_state, STATE_UI_WIDTH_MEDIUM, STATE_UI_WIDTH_MEDIUM_DEFAULT);
-      case 2 -> _uiWidth_Pixel = Util.getStateInt(_state, STATE_UI_WIDTH_LARGE, STATE_UI_WIDTH_LARGE_DEFAULT);
+      case 1  -> _uiWidth_Pixel = Util.getStateInt(_state, STATE_UI_WIDTH_MEDIUM, STATE_UI_WIDTH_MEDIUM_DEFAULT);
+      case 2  -> _uiWidth_Pixel = Util.getStateInt(_state, STATE_UI_WIDTH_LARGE, STATE_UI_WIDTH_LARGE_DEFAULT);
       default -> _uiWidth_Pixel = Util.getStateInt(_state, STATE_UI_WIDTH_SMALL, STATE_UI_WIDTH_SMALL_DEFAULT);
       }
 
@@ -1969,8 +1970,8 @@ public class TourInfoUI {
 
       // save state for the selected size
       switch (getSelectedUIWidthSizeIndex()) {
-      case 1 -> _state.put(STATE_UI_WIDTH_MEDIUM, _uiWidth_Pixel);
-      case 2 -> _state.put(STATE_UI_WIDTH_LARGE, _uiWidth_Pixel);
+      case 1  -> _state.put(STATE_UI_WIDTH_MEDIUM, _uiWidth_Pixel);
+      case 2  -> _state.put(STATE_UI_WIDTH_LARGE, _uiWidth_Pixel);
       default -> _state.put(STATE_UI_WIDTH_SMALL, _uiWidth_Pixel);
       }
 
@@ -2020,13 +2021,13 @@ public class TourInfoUI {
 
          switch (_uiWidth_SizeIndex) {
 
-         case 1 -> _uiWidth_Pixel = Util.getStateInt(_state,
+         case 1  -> _uiWidth_Pixel = Util.getStateInt(_state,
                STATE_UI_WIDTH_MEDIUM,
                STATE_UI_WIDTH_MEDIUM_DEFAULT,
                STATE_UI_WIDTH_MIN,
                STATE_UI_WIDTH_MAX);
 
-         case 2 -> _uiWidth_Pixel = Util.getStateInt(_state,
+         case 2  -> _uiWidth_Pixel = Util.getStateInt(_state,
                STATE_UI_WIDTH_LARGE,
                STATE_UI_WIDTH_LARGE_DEFAULT,
                STATE_UI_WIDTH_MIN,
