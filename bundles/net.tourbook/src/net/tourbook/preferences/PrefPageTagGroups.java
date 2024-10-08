@@ -365,7 +365,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       }
 
       // update model
-      TagGroupManager.getTagGroups().remove(groupItem);
+      TagGroupManager.removeTagGroup(groupItem);
 
       // update UI
       final Table groupTable = _tagGroupViewer.getTable();
@@ -409,7 +409,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       tagGroup.name = inputDialog.getValue().trim();
 
       // update model
-      TagGroupManager.getTagGroups().add(tagGroup);
+      TagGroupManager.addTagGroup(tagGroup);
 
       // update UI
       _tagGroupViewer.setInput(new Object());

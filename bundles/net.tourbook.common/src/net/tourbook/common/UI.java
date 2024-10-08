@@ -3015,12 +3015,14 @@ public class UI {
          return text;
       }
 
-      final int allLowerCharSize = ALL_SCRAMBLED_CHARS_LOWER.length();
-      final int allUpperCharSize = ALL_SCRAMBLED_CHARS_UPPER.length();
+      final int numCharacters = text.length();
+
+      final int numLowerChars = ALL_SCRAMBLED_CHARS_LOWER.length();
+      final int numUpperChars = ALL_SCRAMBLED_CHARS_UPPER.length();
 
       final char[] scrambledText = text.toCharArray();
 
-      for (int charIndex = 0; charIndex < text.length(); charIndex++) {
+      for (int charIndex = 0; charIndex < numCharacters; charIndex++) {
 
          final char c = text.charAt(charIndex);
 
@@ -3028,12 +3030,19 @@ public class UI {
 
             // scramble upper chars
 
-            scrambledText[charIndex] = ALL_SCRAMBLED_CHARS_UPPER.charAt(RANDOM_GENERATOR.nextInt(allUpperCharSize));
+            scrambledText[charIndex] = ALL_SCRAMBLED_CHARS_UPPER.charAt(RANDOM_GENERATOR.nextInt(numUpperChars));
+
+         } else if (c == 0x0a || c == '\u2022') {
+
+            // do not scamble: new lines, symbols
+
+            scrambledText[charIndex] = c;
 
          } else if (c != ' ') {
 
             // scramble other chars except spaces
-            scrambledText[charIndex] = ALL_SCRAMBLED_CHARS_LOWER.charAt(RANDOM_GENERATOR.nextInt(allLowerCharSize));
+
+            scrambledText[charIndex] = ALL_SCRAMBLED_CHARS_LOWER.charAt(RANDOM_GENERATOR.nextInt(numLowerChars));
          }
       }
 

@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -63,6 +64,7 @@ public class TagGroupManager {
    private static final String         ATTR_TAG_IDS        = "tagIDs";                               //$NON-NLS-1$
    //
    private static final List<TagGroup> _allTagGroups       = new ArrayList<>();
+   private static List<TagGroup>       _allTagGroupsSorted;
 
    static {
 
@@ -75,13 +77,7 @@ public class TagGroupManager {
       // update model
       _allTagGroups.add(tagGroup);
 
-      // update UI
-//      final IViewPart viewPart = Util.showView(CommonLocationView.ID, true);
-//
-//      if (viewPart instanceof final CommonLocationView locationView) {
-//
-//         locationView.updateUI(tourLocation);
-//      }
+      _allTagGroupsSorted = null;
    }
 
    private static XMLMemento create_Root() {
@@ -104,16 +100,33 @@ public class TagGroupManager {
       return xmlRoot;
    }
 
-   public static boolean deleteTagGroups(final List<TagGroup> mapTagGroups) {
-
-      _allTagGroups.removeAll(mapTagGroups);
-
-      return true;
-   }
-
+   /**
+    * @return Returns all {@link TagGroup}'s.
+    *         <p>
+    *         Do not modify this list, use {@link #addTagGroup(TagGroup)} or
+    *         {@link #removeTagGroups(List)} to modify this list
+    */
    public static List<TagGroup> getTagGroups() {
 
       return _allTagGroups;
+   }
+
+   /**
+    * @return Returns a copy of all {@link TagGroup}'s sorted by name.
+    */
+   public static List<TagGroup> getTagGroupsSorted() {
+
+      if (_allTagGroupsSorted != null) {
+         return _allTagGroupsSorted;
+      }
+
+      _allTagGroupsSorted = new ArrayList<>(_allTagGroups);
+
+      Collections.sort(
+            _allTagGroupsSorted,
+            (tagGroup1, tagGroup2) -> tagGroup1.name.compareTo(tagGroup2.name));
+
+      return _allTagGroupsSorted;
    }
 
    private static File getXmlFile() {
@@ -220,6 +233,14 @@ public class TagGroupManager {
       }
    }
 
+   public static void removeTagGroup(final TagGroup tagGroup) {
+
+      // update model
+      _allTagGroups.remove(tagGroup);
+
+      _allTagGroupsSorted = null;
+   }
+
    public static void saveState() {
 
       final XMLMemento xmlRoot = create_Root();
@@ -252,6 +273,5 @@ public class TagGroupManager {
          }
       }
    }
-
 
 }
