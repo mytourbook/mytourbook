@@ -361,123 +361,6 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       super(title, image);
    }
 
-   private void actionTagGroup_Delete() {
-
-      final TagGroup tagGroup = (TagGroup) _tagGroupViewer.getStructuredSelection().getFirstElement();
-
-      if (tagGroup == null) {
-         return;
-      }
-
-      if (new MessageDialog(
-
-            _parent.getShell(),
-
-            "Delete Tag Group",
-            null, // no title image
-
-            "Delete selected tag group \"%s\" ?".formatted(tagGroup.name),
-            MessageDialog.CONFIRM,
-
-            0, // default index
-
-            Messages.App_Action_Delete,
-            Messages.App_Action_Cancel
-
-      ).open() != IDialogConstants.OK_ID) {
-
-         return;
-      }
-
-      _isModified = true;
-
-      // update model
-      TagGroupManager.removeTagGroup(tagGroup);
-
-      // update UI
-      final Table groupTable = _tagGroupViewer.getTable();
-      final int selectionIndex = groupTable.getSelectionIndex();
-
-      _tagGroupViewer.remove(tagGroup);
-
-      // select next tag group
-      final int nextIndex = Math.min(groupTable.getItemCount() - 1, selectionIndex);
-
-      if (nextIndex >= 0) {
-
-         _tagGroupViewer.setSelection(new StructuredSelection(_tagGroupViewer.getElementAt(nextIndex)));
-
-      } else {
-
-         _selectedTagGroup = null;
-
-         enableControls();
-      }
-   }
-
-   private void actionTagGroup_New() {
-
-      final InputDialog inputDialog = new InputDialog(getShell(),
-            "New Tag Group",
-            "Tag group name",
-            UI.EMPTY_STRING,
-            getNameValidator());
-
-      inputDialog.open();
-
-      if (inputDialog.getReturnCode() != Window.OK) {
-         return;
-      }
-
-      _isModified = true;
-
-      // create new tag group
-      final TagGroup tagGroup = new TagGroup();
-      tagGroup.name = inputDialog.getValue().trim();
-
-      // update model
-      TagGroupManager.addTagGroup(tagGroup);
-
-      // update UI
-      _tagGroupViewer.setInput(new Object());
-
-      // select new group
-      _tagGroupViewer.setSelection(new StructuredSelection(tagGroup), true);
-
-      _tagViewer.getTree().setFocus();
-   }
-
-   private void actionTagGroup_Rename() {
-
-      final TagGroup tagGroup = (TagGroup) (_tagGroupViewer.getStructuredSelection()).getFirstElement();
-
-      final InputDialog inputDialog = new InputDialog(getShell(),
-            "Rename Tag Group",
-            "Name for the tag group",
-            tagGroup.name,
-            null);
-
-      inputDialog.open();
-
-      if (inputDialog.getReturnCode() != Window.OK) {
-         return;
-      }
-
-      _isModified = true;
-
-      // update model
-      tagGroup.name = inputDialog.getValue().trim();
-
-      // update UI
-      _tagGroupViewer.refresh();
-
-      _tagGroupViewer.setSelection(new StructuredSelection(_selectedTagGroup), true);
-      _tagGroupViewer.getTable().setFocus();
-
-      // reselect group tags
-      onTagGroup_Select();
-   }
-
    private void addPrefListener() {
 
       _prefChangeListener = propertyChangeEvent -> {
@@ -645,7 +528,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       _tagGroupViewer.setComparator(new TagGroupViewer_Comparator());
 
       _tagGroupViewer.addSelectionChangedListener(selectionChangedEvent -> onTagGroup_Select());
-      _tagGroupViewer.addDoubleClickListener(doubleClickEvent -> actionTagGroup_Rename());
+      _tagGroupViewer.addDoubleClickListener(doubleClickEvent -> onTagGroup_Rename());
    }
 
    private void createUI_20_AllTags(final Composite parent) {
@@ -823,19 +706,19 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
          // button: new
          _btnNew = new Button(container, SWT.NONE);
          _btnNew.setText(Messages.Pref_TourTypeFilter_button_new);
-         _btnNew.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> actionTagGroup_New()));
+         _btnNew.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onTagGroup_New()));
          setButtonLayoutData(_btnNew);
 
          // button: rename
          _btnRename = new Button(container, SWT.NONE);
          _btnRename.setText(Messages.Pref_TourTypeFilter_button_rename);
-         _btnRename.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> actionTagGroup_Rename()));
+         _btnRename.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onTagGroup_Rename()));
          setButtonLayoutData(_btnRename);
 
          // button: delete
          _btnDelete = new Button(container, SWT.NONE);
          _btnDelete.setText(Messages.App_Action_Delete_WithConfirm);
-         _btnDelete.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> actionTagGroup_Delete()));
+         _btnDelete.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onTagGroup_Delete()));
          setButtonLayoutData(_btnDelete);
       }
    }
@@ -1049,25 +932,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       // toggle tag filter
       _isShowOnlyCheckedTags = !_isShowOnlyCheckedTags;
 
-      _parent.setRedraw(false);
-      {
-         if (_isShowOnlyCheckedTags && _isHierarchicalLayout) {
-
-            // tag viewer must not display a tree -> show flat viewer
-
-            updateUI_TagLayoutAction();
-
-            onTag_Layout();
-
-         } else {
-
-            updateUI_TagFilter();
-
-            // tags in the tree hierarchy must be rechecked otherwise they are not checked
-            _parent.getDisplay().asyncExec(() -> updateUI_Tags_From_TagIds());
-         }
-      }
-      _parent.setRedraw(true);
+      updateUI_TagsAfterFiltering();
    }
 
    /**
@@ -1284,6 +1149,133 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       _isExpandingSelection = false;
    }
 
+   private void onTagGroup_Delete() {
+
+      final TagGroup tagGroup = (TagGroup) _tagGroupViewer.getStructuredSelection().getFirstElement();
+
+      if (tagGroup == null) {
+         return;
+      }
+
+      if (new MessageDialog(
+
+            _parent.getShell(),
+
+            "Delete Tag Group",
+            null, // no title image
+
+            "Delete selected tag group \"%s\" ?".formatted(tagGroup.name),
+            MessageDialog.CONFIRM,
+
+            0, // default index
+
+            Messages.App_Action_Delete,
+            Messages.App_Action_Cancel
+
+      ).open() != IDialogConstants.OK_ID) {
+
+         return;
+      }
+
+      _isModified = true;
+
+      // update model
+      TagGroupManager.removeTagGroup(tagGroup);
+
+      // update UI
+      final Table groupTable = _tagGroupViewer.getTable();
+      final int selectionIndex = groupTable.getSelectionIndex();
+
+      _tagGroupViewer.remove(tagGroup);
+
+      // select next tag group
+      final int nextIndex = Math.min(groupTable.getItemCount() - 1, selectionIndex);
+
+      if (nextIndex >= 0) {
+
+         _tagGroupViewer.setSelection(new StructuredSelection(_tagGroupViewer.getElementAt(nextIndex)));
+
+      } else {
+
+         // all groups are deleted
+
+         _selectedTagGroup = null;
+
+         // uncheck all tags
+         _tagViewer.setCheckedElements(new Object[0]);
+
+         // deselect tag filter
+         _isShowOnlyCheckedTags = false;
+
+         updateUI_TagsAfterFiltering();
+
+         enableControls();
+      }
+   }
+
+   private void onTagGroup_New() {
+
+      final InputDialog inputDialog = new InputDialog(getShell(),
+            "New Tag Group",
+            "Tag group name",
+            UI.EMPTY_STRING,
+            getNameValidator());
+
+      inputDialog.open();
+
+      if (inputDialog.getReturnCode() != Window.OK) {
+         return;
+      }
+
+      _isModified = true;
+
+      // create new tag group
+      final TagGroup tagGroup = new TagGroup();
+      tagGroup.name = inputDialog.getValue().trim();
+
+      // update model
+      TagGroupManager.addTagGroup(tagGroup);
+
+      // update UI
+      _tagGroupViewer.setInput(new Object());
+
+      // select new group
+      _tagGroupViewer.setSelection(new StructuredSelection(tagGroup), true);
+
+      _tagViewer.getTree().setFocus();
+   }
+
+   private void onTagGroup_Rename() {
+
+      final TagGroup tagGroup = (TagGroup) (_tagGroupViewer.getStructuredSelection()).getFirstElement();
+
+      final InputDialog inputDialog = new InputDialog(getShell(),
+            "Rename Tag Group",
+            "Name for the tag group",
+            tagGroup.name,
+            null);
+
+      inputDialog.open();
+
+      if (inputDialog.getReturnCode() != Window.OK) {
+         return;
+      }
+
+      _isModified = true;
+
+      // update model
+      tagGroup.name = inputDialog.getValue().trim();
+
+      // update UI
+      _tagGroupViewer.refresh();
+
+      _tagGroupViewer.setSelection(new StructuredSelection(_selectedTagGroup), true);
+      _tagGroupViewer.getTable().setFocus();
+
+      // reselect group tags
+      onTagGroup_Select();
+   }
+
    private void onTagGroup_Select() {
 
       final TagGroup tagGroup = (TagGroup) (_tagGroupViewer.getStructuredSelection()).getFirstElement();
@@ -1486,6 +1478,29 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       _isModified = true;
 
       enableControls();
+   }
+
+   private void updateUI_TagsAfterFiltering() {
+
+      _parent.setRedraw(false);
+      {
+         if (_isShowOnlyCheckedTags && _isHierarchicalLayout) {
+
+            // tag viewer must not display a tree -> show flat viewer
+
+            updateUI_TagLayoutAction();
+
+            onTag_Layout();
+
+         } else {
+
+            updateUI_TagFilter();
+
+            // tags in the tree hierarchy must be rechecked otherwise they are not checked
+            _parent.getDisplay().asyncExec(() -> updateUI_Tags_From_TagIds());
+         }
+      }
+      _parent.setRedraw(true);
    }
 
    private void updateUI_TagViewer(final Set<TourTag> allTourTags) {
