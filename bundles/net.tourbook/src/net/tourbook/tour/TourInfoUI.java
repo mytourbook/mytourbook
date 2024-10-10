@@ -206,10 +206,7 @@ public class TourInfoUI {
    /*
     * UI resources
     */
-   private Color _bgColor;
-   private Color _fgColor;
-
-   private Font  _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   private Font _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    /*
     * UI controls
@@ -432,39 +429,12 @@ public class TourInfoUI {
       _tourToolTipProvider = tourToolTipProvider;
       _tourProvider = tourProvider;
 
-      final Display display = parent.getDisplay();
-
-      _bgColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
-      _fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-
-      final Set<TourTag> tourTags = _tourData.getTourTags();
-      // date/time created/modified
-      _uiDtCreated = _tourData.getDateTimeCreated();
-      _uiDtModified = _tourData.getDateTimeModified();
-
-      final TourType tourType = _tourData.getTourType();
-      _uiTourTypeName = tourType == null
-            ? null
-            : TourDatabase.getTourTypeName(tourType.getTypeId());
-
-// SET_FORMATTING_OFF
-
-      _hasGears                     = _tourData.getFrontShiftCount() > 0 || _tourData.getRearShiftCount() > 0;
-      _hasRecordingDeviceBattery    = tourData.getBattery_Percentage_Start() != -1;
-      _hasRunDyn                    = _tourData.isRunDynAvailable();
-      _hasTags                      = tourTags != null && tourTags.size() > 0;
-      _hasTourType                  = tourType != null;
-      _hasSensorValues              = _tourData.getDeviceSensorValues().size() > 0;
-
-      _hasLocationEnd               = StringUtils.hasContent(_tourData.getTourEndPlace());
-      _hasLocationStart             = StringUtils.hasContent(_tourData.getTourStartPlace());
-      _hasTourDescription           = StringUtils.hasContent(_tourData.getTourDescription());
-      _hasWeatherDescription        = _tourData.getWeather().length() > 0;
-
-// SET_FORMATTING_ON
+      initValues(tourData);
 
       restoreState_BeforeUI(parent);
+
       initUI(parent);
+
       createActions();
 
       final Composite container = createUI(parent);
@@ -477,11 +447,14 @@ public class TourInfoUI {
 
       enableControls();
 
-      parent.getDisplay().asyncExec(() -> {
+      if (UI.IS_BRIGHT_THEME) {
 
-         // !!! MUST BE DONE VERY LATE, OTHERWISE THERE ARE ISSUES !!!  ?????????? need to be checked
-//         _toolbarManager_TourInfoOptions.update(true);
-      });
+         final Display display = parent.getDisplay();
+
+         UI.setColorForAllChildren(parent,
+               display.getSystemColor(SWT.COLOR_INFO_FOREGROUND),
+               display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+      }
 
       return container;
    }
@@ -496,13 +469,9 @@ public class TourInfoUI {
        * tooltip when the mouse is hovered, which is not as it should be.
        */
       final Composite shellContainer = new Composite(parent, SWT.NONE);
-      shellContainer.setForeground(_fgColor);
-      shellContainer.setBackground(_bgColor);
       GridLayoutFactory.fillDefaults().applyTo(shellContainer);
       {
          _ttContainer = new Composite(shellContainer, SWT.NONE);
-         _ttContainer.setForeground(_fgColor);
-         _ttContainer.setBackground(_bgColor);
          GridLayoutFactory.fillDefaults()
                .margins(SHELL_MARGIN, SHELL_MARGIN)
                .applyTo(_ttContainer);
@@ -511,7 +480,6 @@ public class TourInfoUI {
             createUI_10_UpperPart(_ttContainer);
 
             final Composite container = new Composite(_ttContainer, SWT.NONE);
-            container.setBackground(_bgColor);
             GridDataFactory.fillDefaults().applyTo(container);
 //            container.setBackground(UI.SYS_COLOR_CYAN);
 
@@ -550,8 +518,6 @@ public class TourInfoUI {
    private void createUI_10_UpperPart(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      container.setForeground(_fgColor);
-      container.setBackground(_bgColor);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
             .numColumns(3)
@@ -564,8 +530,6 @@ public class TourInfoUI {
             if (_uiTourTypeName != null) {
 
                _lblTourType_Image = new CLabel(container, SWT.NONE);
-               _lblTourType_Image.setForeground(_fgColor);
-               _lblTourType_Image.setBackground(_bgColor);
                GridDataFactory.swtDefaults()
                      .align(SWT.BEGINNING, SWT.BEGINNING)
                      .applyTo(_lblTourType_Image);
@@ -576,8 +540,6 @@ public class TourInfoUI {
              * Title
              */
             _lblTitle = new Label(container, SWT.LEAD | SWT.WRAP);
-            _lblTitle.setForeground(_fgColor);
-            _lblTitle.setBackground(_bgColor);
             GridDataFactory.fillDefaults()
                   .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
                   .grab(true, false)
@@ -617,8 +579,6 @@ public class TourInfoUI {
           * Create toolbar
           */
          final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
-         toolbar.setForeground(_fgColor);
-         toolbar.setBackground(_bgColor);
          GridDataFactory.fillDefaults().applyTo(toolbar);
 
          final ToolBarManager tbm = new ToolBarManager(toolbar);
@@ -655,8 +615,6 @@ public class TourInfoUI {
    private void createUI_30_Column_1(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      container.setForeground(_fgColor);
-      container.setBackground(_bgColor);
       GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).spacing(5, 0).applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_MAGENTA);
@@ -889,8 +847,6 @@ public class TourInfoUI {
    private void createUI_40_Column_2(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      container.setForeground(_fgColor);
-      container.setBackground(_bgColor);
       GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).spacing(5, 0).applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_BLUE);
@@ -1025,8 +981,6 @@ public class TourInfoUI {
       final GridDataFactory gd = GridDataFactory.fillDefaults().grab(true, false);
 
       final Composite speedContainer = new Composite(parent, SWT.NONE);
-      speedContainer.setForeground(_fgColor);
-      speedContainer.setBackground(_bgColor);
 //    speedContainer.setBackground(UI.SYS_COLOR_GREEN);
       GridDataFactory.fillDefaults().span(3, 1).applyTo(speedContainer);
       GridLayoutFactory.fillDefaults()
@@ -1171,8 +1125,6 @@ public class TourInfoUI {
 
       // Icon: clouds
       _lblClouds = new CLabel(parent, SWT.TRAIL);
-      _lblClouds.setForeground(_fgColor);
-      _lblClouds.setBackground(_bgColor);
       GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_lblClouds);
 
       // text: clouds
@@ -1235,8 +1187,6 @@ public class TourInfoUI {
    private void createUI_50_Column_3(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      container.setForeground(_fgColor);
-      container.setBackground(_bgColor);
       GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).spacing(5, 0).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
@@ -1431,8 +1381,6 @@ public class TourInfoUI {
       final int numColumns = 4;
 
       _lowerPartContainer = new Composite(parent, SWT.NONE);
-      _lowerPartContainer.setForeground(_fgColor);
-      _lowerPartContainer.setBackground(_bgColor);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_lowerPartContainer);
       GridLayoutFactory.fillDefaults().numColumns(numColumns).spacing(16, 0).applyTo(_lowerPartContainer);
 //      _lowerPartContainer.setBackground(UI.SYS_COLOR_CYAN);
@@ -1483,8 +1431,6 @@ public class TourInfoUI {
                   .applyTo(_lblWeather);
 
             _txtWeather = new Text(_lowerPartContainer, SWT.MULTI | SWT.READ_ONLY);
-            _txtWeather.setForeground(_fgColor);
-            _txtWeather.setBackground(_bgColor);
             GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtWeather);
          }
          {
@@ -1509,8 +1455,6 @@ public class TourInfoUI {
             }
 
             _txtDescription = new Text(_lowerPartContainer, style);
-            _txtDescription.setForeground(_fgColor);
-            _txtDescription.setBackground(_bgColor);
 
             GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtDescription);
             if (_descriptionLineCount > _descriptionScroll_Lines) {
@@ -1530,8 +1474,6 @@ public class TourInfoUI {
                   .applyTo(_lblLocationStart);
 
             _txtLocationStart = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
-            _txtLocationStart.setForeground(_fgColor);
-            _txtLocationStart.setBackground(_bgColor);
             GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtLocationStart);
          }
          {
@@ -1546,8 +1488,6 @@ public class TourInfoUI {
                   .applyTo(_lblLocationEnd);
 
             _txtLocationEnd = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
-            _txtLocationEnd.setForeground(_fgColor);
-            _txtLocationEnd.setBackground(_bgColor);
             GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtLocationEnd);
          }
       }
@@ -1604,8 +1544,6 @@ public class TourInfoUI {
    private void createUI_99_CreateModifyTime(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      container.setForeground(_fgColor);
-      container.setBackground(_bgColor);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
             .numColumns(3)
@@ -1618,8 +1556,6 @@ public class TourInfoUI {
              * Date/time created
              */
             final Composite containerCreated = new Composite(container, SWT.NONE);
-            containerCreated.setForeground(_fgColor);
-            containerCreated.setBackground(_bgColor);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.FILL, SWT.CENTER)
@@ -1637,8 +1573,6 @@ public class TourInfoUI {
              * Date/time modified
              */
             final Composite containerModified = new Composite(container, SWT.NONE);
-            containerModified.setForeground(_fgColor);
-            containerModified.setBackground(_bgColor);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.FILL, SWT.CENTER)
@@ -1677,8 +1611,6 @@ public class TourInfoUI {
    private Label createUI_Label(final Composite parent, final String labelText) {
 
       final Label label = new Label(parent, SWT.NONE);
-      label.setForeground(_fgColor);
-      label.setBackground(_bgColor);
 
       if (labelText != null) {
          label.setText(labelText);
@@ -1690,8 +1622,6 @@ public class TourInfoUI {
    private Label createUI_Label_Trailing(final Composite parent, final String labelText) {
 
       final Label label = new Label(parent, SWT.TRAIL);
-      label.setForeground(_fgColor);
-      label.setBackground(_bgColor);
 
       if (labelText != null) {
          label.setText(labelText);
@@ -1703,8 +1633,6 @@ public class TourInfoUI {
    private Label createUI_LabelValue(final Composite parent, final int style) {
 
       final Label label = new Label(parent, style);
-      label.setForeground(_fgColor);
-      label.setBackground(_bgColor);
       GridDataFactory.fillDefaults().applyTo(label);
 
       return label;
@@ -1714,8 +1642,6 @@ public class TourInfoUI {
 
       final Link link = new Link(parent, SWT.NONE);
       link.setText(UI.LINK_TAG_START + linkText + UI.LINK_TAG_END);
-      link.setForeground(_fgColor);
-      link.setBackground(_bgColor);
 
       return link;
    }
@@ -1827,6 +1753,36 @@ public class TourInfoUI {
             updateUI();
          }));
       }
+   }
+
+   private void initValues(final TourData tourData) {
+
+      // date/time created/modified
+      _uiDtCreated = _tourData.getDateTimeCreated();
+      _uiDtModified = _tourData.getDateTimeModified();
+
+      final TourType tourType = _tourData.getTourType();
+      _uiTourTypeName = tourType == null
+            ? null
+            : TourDatabase.getTourTypeName(tourType.getTypeId());
+
+      final Set<TourTag> tourTags = _tourData.getTourTags();
+
+// SET_FORMATTING_OFF
+
+      _hasGears                     = _tourData.getFrontShiftCount() > 0 || _tourData.getRearShiftCount() > 0;
+      _hasRecordingDeviceBattery    = tourData.getBattery_Percentage_Start() != -1;
+      _hasRunDyn                    = _tourData.isRunDynAvailable();
+      _hasTags                      = tourTags != null && tourTags.size() > 0;
+      _hasTourType                  = tourType != null;
+      _hasSensorValues              = _tourData.getDeviceSensorValues().size() > 0;
+
+      _hasLocationEnd               = StringUtils.hasContent(_tourData.getTourEndPlace());
+      _hasLocationStart             = StringUtils.hasContent(_tourData.getTourStartPlace());
+      _hasTourDescription           = StringUtils.hasContent(_tourData.getTourDescription());
+      _hasWeatherDescription        = _tourData.getWeather().length() > 0;
+
+// SET_FORMATTING_ON
    }
 
    private boolean isSimpleTour() {
