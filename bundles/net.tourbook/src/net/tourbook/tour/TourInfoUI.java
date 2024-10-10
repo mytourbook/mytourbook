@@ -34,6 +34,8 @@ import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
@@ -79,13 +81,11 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IWorkbenchPart;
@@ -94,33 +94,21 @@ import org.joda.time.PeriodType;
 
 public class TourInfoUI {
 
-   private static final String            ID                            = "net.tourbook.tour.TourInfoUI";       //$NON-NLS-1$
+   private static final String            ID                  = "net.tourbook.tour.TourInfoUI";       //$NON-NLS-1$
 
-   private static final String            STATE_UI_WIDTH_SIZE_INDEX     = "STATE_UI_WIDTH_SIZE_INDEX";          //$NON-NLS-1$
+   private static final int               SHELL_MARGIN        = 5;
+   private static final int               MAX_DATA_WIDTH      = 300;
 
-   private static final String            STATE_UI_WIDTH_SMALL          = "STATE_UI_WIDTH_SMALL";               //$NON-NLS-1$
-   private static final String            STATE_UI_WIDTH_MEDIUM         = "STATE_UI_WIDTH_MEDIUM";              //$NON-NLS-1$
-   private static final String            STATE_UI_WIDTH_LARGE          = "STATE_UI_WIDTH_LARGE";               //$NON-NLS-1$
-   private static final int               STATE_UI_WIDTH_SMALL_DEFAULT  = 600;
-   private static final int               STATE_UI_WIDTH_MEDIUM_DEFAULT = 800;
-   private static final int               STATE_UI_WIDTH_LARGE_DEFAULT  = 1000;
+   private static final String            BATTERY_FORMAT      = "... %d %%";                          //$NON-NLS-1$
+   private static final String            GEAR_SHIFT_FORMAT   = "%d / %d";                            //$NON-NLS-1$
 
-   private static final int               STATE_UI_WIDTH_MIN            = 100;
-   private static final int               STATE_UI_WIDTH_MAX            = 3000;
+   private static final IPreferenceStore  _prefStoreCommon    = CommonActivator.getPrefStore();
 
-   private static final int               SHELL_MARGIN                  = 5;
-   private static final int               MAX_DATA_WIDTH                = 300;
-
-   private static final String            BATTERY_FORMAT                = "... %d %%";                          //$NON-NLS-1$
-   private static final String            GEAR_SHIFT_FORMAT             = "%d / %d";                            //$NON-NLS-1$
-
-   private static final IPreferenceStore  _prefStoreCommon              = CommonActivator.getPrefStore();
-
-   private static final DateTimeFormatter _dtHistoryFormatter           = DateTimeFormatter.ofLocalizedDateTime(
+   private static final DateTimeFormatter _dtHistoryFormatter = DateTimeFormatter.ofLocalizedDateTime(
          FormatStyle.FULL,
          FormatStyle.MEDIUM);
 
-   private static PeriodType              _tourPeriodTemplate           = PeriodType.yearMonthDayTime()
+   private static PeriodType              _tourPeriodTemplate = PeriodType.yearMonthDayTime()
 
          // hide these components
          // .withMinutesRemoved()
@@ -130,13 +118,13 @@ public class TourInfoUI {
 //
    ;
 
-   private static final IPreferenceStore  _prefStore                    = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings   _state                        = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore  _prefStore          = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings   _state              = TourbookPlugin.getState(ID);
 
-   private final NumberFormat             _nf0                          = NumberFormat.getNumberInstance();
-   private final NumberFormat             _nf1                          = NumberFormat.getInstance();
-   private final NumberFormat             _nf2                          = NumberFormat.getInstance();
-   private final NumberFormat             _nf3                          = NumberFormat.getInstance();
+   private final NumberFormat             _nf0                = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf1                = NumberFormat.getInstance();
+   private final NumberFormat             _nf2                = NumberFormat.getInstance();
+   private final NumberFormat             _nf3                = NumberFormat.getInstance();
 
    {
       _nf0.setMinimumFractionDigits(0);
@@ -165,7 +153,6 @@ public class TourInfoUI {
    private boolean        _hasWeatherDescription;
 
    private int            _uiWidth_Pixel;
-   private int            _uiWidth_SizeIndex;
 
    private int            _descriptionLineCount;
    private int            _descriptionScroll_Lines = 15;
@@ -183,6 +170,9 @@ public class TourInfoUI {
    private ActionTourToolTip_EditTour     _actionEditTour;
    private ActionTourToolTip_EditQuick    _actionEditQuick;
    private Action_ToolTip_EditPreferences _actionPrefDialog;
+   private ActionSlideout_TourInfoOptions _actionTourInfoOptions;
+
+   private ToolBarManager                 _toolbarManager_TourInfoOptions;
 
    private boolean                        _isActionsVisible = false;
 
@@ -202,8 +192,6 @@ public class TourInfoUI {
    private String                         _noTourTooltip    = Messages.Tour_Tooltip_Label_NoTour;
 
    private PixelConverter                 _pc;
-
-//   private FocusListener                  _keepOpenListener;
 
    /*
     * Fields which are optionally displayed when they are not null
@@ -382,10 +370,6 @@ public class TourInfoUI {
    private ArrayList<Label> _allSensorValue_Status;
    private ArrayList<Label> _allSensorValue_Voltage;
 
-   private Combo            _comboUIWidth_Size;
-
-   private Spinner          _spinnerUIWidth_Pixel;
-
    private class ActionCloseTooltip extends Action {
 
       public ActionCloseTooltip() {
@@ -402,12 +386,32 @@ public class TourInfoUI {
       }
    }
 
+   private class ActionSlideout_TourInfoOptions extends ActionToolbarSlideout {
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         return new SlideoutTourInfoOptions(_parent, toolbar, TourInfoUI.this, _state);
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+//         closeOpenedDialogs(this);
+      }
+   }
+
    /**
     * Run tour action quick edit.
     */
    public void actionQuickEditTour() {
 
       _actionEditQuick.run();
+   }
+
+   private void createActions() {
+
+      _actionCloseTooltip = new ActionCloseTooltip();
+      _actionTourInfoOptions = new ActionSlideout_TourInfoOptions();
    }
 
    /**
@@ -461,22 +465,23 @@ public class TourInfoUI {
 
       restoreState_BeforeUI(parent);
       initUI(parent);
+      createActions();
 
       final Composite container = createUI(parent);
 
 // this do not help to remove flickering, first an empty tooltip window is displayed then also it's content
 //      _ttContainer.setRedraw(false);
 
-      fillUI();
-
-      restoreState();
-
       updateUI();
       updateUI_Layout();
 
       enableControls();
 
-//      _ttContainer.setRedraw(true);
+      parent.getDisplay().asyncExec(() -> {
+
+         // !!! MUST BE DONE VERY LATE, OTHERWISE THERE ARE ISSUES !!!  ?????????? need to be checked
+//         _toolbarManager_TourInfoOptions.update(true);
+      });
 
       return container;
    }
@@ -642,9 +647,7 @@ public class TourInfoUI {
           * The close action is ALWAYS visible, sometimes there is a bug that the tooltip do not
           * automatically close when hovering out.
           */
-         _actionCloseTooltip = new ActionCloseTooltip();
          tbm.add(_actionCloseTooltip);
-
          tbm.update(true);
       }
    }
@@ -1600,24 +1603,15 @@ public class TourInfoUI {
 
    private void createUI_99_CreateModifyTime(final Composite parent) {
 
-      final boolean hasDescription = _hasTourDescription || _hasWeatherDescription || _hasLocationStart || _hasLocationEnd;
-
-      final boolean isShowUIWidthControls = hasDescription
-
-            // hide when embedded
-            && _isUIEmbedded == false;
-
-      final int numColumns = isShowUIWidthControls ? 3 : 2;
-
       final Composite container = new Composite(parent, SWT.NONE);
       container.setForeground(_fgColor);
       container.setBackground(_bgColor);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
-            .numColumns(numColumns)
-            .spacing(20, 5)
+            .numColumns(3)
+//            .spacing(20, 5)
             .applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
          {
             /*
@@ -1663,43 +1657,19 @@ public class TourInfoUI {
                      .applyTo(_lblDateTimeModifiedValue);
             }
          }
+         {
+            /*
+             * Options slideout
+             */
+            final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(toolbar);
 
-         if (isShowUIWidthControls) {
-
-            final Composite containerTextWidth = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(containerTextWidth);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerTextWidth);
-            {
-               {
-                  // Combo: Mouse wheel incrementer
-                  _comboUIWidth_Size = new Combo(containerTextWidth, SWT.READ_ONLY | SWT.BORDER);
-                  _comboUIWidth_Size.setVisibleItemCount(10);
-                  _comboUIWidth_Size.setToolTipText(Messages.Tour_Tooltip_Combo_UIWidthSize_Tooltip);
-                  _comboUIWidth_Size.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_UIWidth_1_Size()));
-//                  _comboUIWidth_Size.addFocusListener(_keepOpenListener);
-
-                  GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboUIWidth_Size);
-               }
-               {
-                  /*
-                   * Text width in pixel
-                   */
-                  _spinnerUIWidth_Pixel = new Spinner(containerTextWidth, SWT.BORDER);
-                  _spinnerUIWidth_Pixel.setMinimum(STATE_UI_WIDTH_MIN);
-                  _spinnerUIWidth_Pixel.setMaximum(STATE_UI_WIDTH_MAX);
-                  _spinnerUIWidth_Pixel.setIncrement(10);
-                  _spinnerUIWidth_Pixel.setPageIncrement(50);
-                  _spinnerUIWidth_Pixel.setToolTipText(Messages.Tour_Tooltip_Spinner_TextWidth_Tooltip);
-                  _spinnerUIWidth_Pixel.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_UIWidth_2_Value()));
-                  _spinnerUIWidth_Pixel.addMouseWheelListener(mouseEvent -> {
-
-                     UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
-                     onSelect_UIWidth_2_Value();
-                  });
-
-                  GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerUIWidth_Pixel);
-               }
-            }
+            _toolbarManager_TourInfoOptions = new ToolBarManager(toolbar);
+            _toolbarManager_TourInfoOptions.add(_actionTourInfoOptions);
+            _toolbarManager_TourInfoOptions.update(true);
          }
       }
    }
@@ -1809,23 +1779,9 @@ public class TourInfoUI {
       _actionEditTour.setEnabled(true);
    }
 
-   private void fillUI() {
+   public int getUIWidth_Pixel() {
 
-      if (_comboUIWidth_Size != null && _comboUIWidth_Size.isDisposed() == false) {
-
-         _comboUIWidth_Size.add(OtherMessages.APP_SIZE_SMALL_SHORTCUT);
-         _comboUIWidth_Size.add(OtherMessages.APP_SIZE_MEDIUM_SHORTCUT);
-         _comboUIWidth_Size.add(OtherMessages.APP_SIZE_LARGE_SHORTCUT);
-      }
-   }
-
-   private int getSelectedUIWidthSizeIndex() {
-
-      final int selectionIndex = _comboUIWidth_Size.getSelectionIndex();
-
-      return selectionIndex < 0
-            ? 0
-            : selectionIndex;
+      return _uiWidth_Pixel;
    }
 
    private int getUIWidthFromParent(final Composite parent) {
@@ -1859,34 +1815,6 @@ public class TourInfoUI {
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
-
-// DISABLED because this UI is opened in different tooltips
-
-//      _keepOpenListener = new FocusListener() {
-//
-//         @Override
-//         public void focusGained(final FocusEvent e) {
-//
-//            /*
-//             * This will fix the problem that when the list of a combobox is displayed, then the
-//             * slideout will disappear :-(((
-//             */
-//
-////            final Shell shell = _parent.getShell();
-//
-////            if (shell instanceof AdvancedSlideoutShell) {
-////               final AdvancedSlideoutShell new_name = (AdvancedSlideoutShell) shell;
-////
-////            }
-//
-////            _tooltipShell.setIsAnotherDialogOpened(true);
-//         }
-//
-//         @Override
-//         public void focusLost(final FocusEvent e) {
-////            _tooltipShell.setIsAnotherDialogOpened(false);
-//         }
-//      };
 
       _descriptionScroll_Height = _pc.convertHeightInCharsToPixels(_descriptionScroll_Lines);
 
@@ -1945,72 +1873,6 @@ public class TourInfoUI {
       }
    }
 
-   private void onSelect_UIWidth_1_Size() {
-
-      final int selectedUIWidthSizeIndex = getSelectedUIWidthSizeIndex();
-
-      // save selected size
-      _state.put(STATE_UI_WIDTH_SIZE_INDEX, selectedUIWidthSizeIndex);
-
-      // set size from state
-      switch (getSelectedUIWidthSizeIndex()) {
-      case 1  -> _uiWidth_Pixel = Util.getStateInt(_state, STATE_UI_WIDTH_MEDIUM, STATE_UI_WIDTH_MEDIUM_DEFAULT);
-      case 2  -> _uiWidth_Pixel = Util.getStateInt(_state, STATE_UI_WIDTH_LARGE, STATE_UI_WIDTH_LARGE_DEFAULT);
-      default -> _uiWidth_Pixel = Util.getStateInt(_state, STATE_UI_WIDTH_SMALL, STATE_UI_WIDTH_SMALL_DEFAULT);
-      }
-
-      // update UI
-      _spinnerUIWidth_Pixel.setSelection(_uiWidth_Pixel);
-
-      onSelect_UIWidth_9_UpdateUI();
-   }
-
-   private void onSelect_UIWidth_2_Value() {
-
-      // get width
-      _uiWidth_Pixel = _spinnerUIWidth_Pixel.getSelection();
-
-      // save state for the selected size
-      switch (getSelectedUIWidthSizeIndex()) {
-      case 1  -> _state.put(STATE_UI_WIDTH_MEDIUM, _uiWidth_Pixel);
-      case 2  -> _state.put(STATE_UI_WIDTH_LARGE, _uiWidth_Pixel);
-      default -> _state.put(STATE_UI_WIDTH_SMALL, _uiWidth_Pixel);
-      }
-
-      // update UI
-      onSelect_UIWidth_9_UpdateUI();
-   }
-
-   private void onSelect_UIWidth_9_UpdateUI() {
-
-      updateUI();
-      updateUI_Layout();
-
-      final Shell parentShell = _parent.getShell();
-      final Shell appShell = TourbookPlugin.getAppShell();
-
-      if (parentShell == appShell) {
-
-         _parent.layout(true, true);
-
-      } else {
-
-         // tour info is within a tooltip
-
-         parentShell.pack(true);
-      }
-   }
-
-   private void restoreState() {
-
-      if (_spinnerUIWidth_Pixel != null && _spinnerUIWidth_Pixel.isDisposed() == false) {
-
-         _spinnerUIWidth_Pixel.setSelection(_uiWidth_Pixel);
-
-         _comboUIWidth_Size.select(_uiWidth_SizeIndex);
-      }
-   }
-
    private void restoreState_BeforeUI(final Composite parent) {
 
       if (_isUIEmbedded) {
@@ -2019,29 +1881,28 @@ public class TourInfoUI {
 
       } else {
 
-         _uiWidth_SizeIndex = Util.getStateInt(_state, STATE_UI_WIDTH_SIZE_INDEX, 0);
+         final int uiWidth_SizeIndex = Util.getStateInt(_state, SlideoutTourInfoOptions.STATE_UI_WIDTH_SIZE_INDEX, 0);
 
-         switch (_uiWidth_SizeIndex) {
+         switch (uiWidth_SizeIndex) {
 
          case 1  -> _uiWidth_Pixel = Util.getStateInt(_state,
-               STATE_UI_WIDTH_MEDIUM,
-               STATE_UI_WIDTH_MEDIUM_DEFAULT,
-               STATE_UI_WIDTH_MIN,
-               STATE_UI_WIDTH_MAX);
+               SlideoutTourInfoOptions.STATE_UI_WIDTH_MEDIUM,
+               SlideoutTourInfoOptions.STATE_UI_WIDTH_MEDIUM_DEFAULT,
+               SlideoutTourInfoOptions.STATE_UI_WIDTH_MIN,
+               SlideoutTourInfoOptions.STATE_UI_WIDTH_MAX);
 
          case 2  -> _uiWidth_Pixel = Util.getStateInt(_state,
-               STATE_UI_WIDTH_LARGE,
-               STATE_UI_WIDTH_LARGE_DEFAULT,
-               STATE_UI_WIDTH_MIN,
-               STATE_UI_WIDTH_MAX);
+               SlideoutTourInfoOptions.STATE_UI_WIDTH_LARGE,
+               SlideoutTourInfoOptions.STATE_UI_WIDTH_LARGE_DEFAULT,
+               SlideoutTourInfoOptions.STATE_UI_WIDTH_MIN,
+               SlideoutTourInfoOptions.STATE_UI_WIDTH_MAX);
 
          default -> _uiWidth_Pixel = Util.getStateInt(_state,
-               STATE_UI_WIDTH_SMALL,
-               STATE_UI_WIDTH_SMALL_DEFAULT,
-               STATE_UI_WIDTH_MIN,
-               STATE_UI_WIDTH_MAX);
+               SlideoutTourInfoOptions.STATE_UI_WIDTH_SMALL,
+               SlideoutTourInfoOptions.STATE_UI_WIDTH_SMALL_DEFAULT,
+               SlideoutTourInfoOptions.STATE_UI_WIDTH_MIN,
+               SlideoutTourInfoOptions.STATE_UI_WIDTH_MAX);
          }
-
       }
    }
 
@@ -2057,10 +1918,10 @@ public class TourInfoUI {
    /**
     * @param isUIEmbedded
     *           When <code>true</code> then the tour info is embedded in a view and do not need the
-    *           toolbar
-    *           to close the tooltip.
+    *           toolbar to close the tooltip.
     */
    public void setIsUIEmbedded(final boolean isUIEmbedded) {
+
       _isUIEmbedded = isUIEmbedded;
    }
 
@@ -2077,7 +1938,12 @@ public class TourInfoUI {
       _part = part;
    }
 
-   private void updateUI() {
+   public void setUIWidth_Pixel(final int uiWidth_Pixel) {
+
+      _uiWidth_Pixel = uiWidth_Pixel;
+   }
+
+   void updateUI() {
 
       /*
        * Upper/lower part
@@ -2680,7 +2546,7 @@ public class TourInfoUI {
       }
    }
 
-   private void updateUI_Layout() {
+   void updateUI_Layout() {
 
       // compute width for all controls and equalize column width for the different sections
 
@@ -2760,7 +2626,26 @@ public class TourInfoUI {
             lblVoltage.setText(batteryVoltage);
             lblVoltage.setToolTipText(Messages.Tour_Tooltip_Label_BatteryVoltage_Tooltip);
          }
+      }
+   }
 
+   void updateUI_UIWidth() {
+
+      updateUI();
+      updateUI_Layout();
+
+      final Shell parentShell = _parent.getShell();
+      final Shell appShell = TourbookPlugin.getAppShell();
+
+      if (parentShell == appShell) {
+
+         _parent.layout(true, true);
+
+      } else {
+
+         // tour info is within a tooltip
+
+         parentShell.pack(true);
       }
    }
 
