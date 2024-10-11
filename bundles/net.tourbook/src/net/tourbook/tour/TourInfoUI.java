@@ -48,14 +48,12 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
 import net.tourbook.statistic.StatisticView;
 import net.tourbook.tag.TagManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.action.ActionTourToolTip_EditQuick;
 import net.tourbook.ui.action.ActionTourToolTip_EditTour;
-import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
 import net.tourbook.ui.views.sensors.BatteryStatus;
 import net.tourbook.ui.views.sensors.SelectionRecordingDeviceBattery;
 import net.tourbook.ui.views.sensors.SelectionSensor;
@@ -97,7 +95,7 @@ public class TourInfoUI {
    private static final String            ID                  = "net.tourbook.tour.TourInfoUI";       //$NON-NLS-1$
 
    private static final int               SHELL_MARGIN        = 5;
-   private static final int               MAX_DATA_WIDTH      = 300;
+   private static final int               MAX_DATA_WIDTH      = 200;
 
    private static final String            BATTERY_FORMAT      = "... %d %%";                          //$NON-NLS-1$
    private static final String            GEAR_SHIFT_FORMAT   = "%d / %d";                            //$NON-NLS-1$
@@ -169,12 +167,17 @@ public class TourInfoUI {
    private ActionCloseTooltip             _actionCloseTooltip;
    private ActionTourToolTip_EditTour     _actionEditTour;
    private ActionTourToolTip_EditQuick    _actionEditQuick;
-   private Action_ToolTip_EditPreferences _actionPrefDialog;
    private ActionSlideout_TourInfoOptions _actionTourInfoOptions;
 
-   private ToolBarManager                 _toolbarManager_TourInfoOptions;
-
-   private boolean                        _isActionsVisible = false;
+   private boolean                        _areTourActionsVisible;
+   private boolean                        _isShowBodyValues;
+   private boolean                        _isShowHRZones;
+   private boolean                        _isShowRunDyn;
+   private boolean                        _isShowSensorValues;
+   private boolean                        _isShowStartEndLocation;
+   private boolean                        _isShowVerticalSpeed;
+   private boolean                        _isShowWeatherDescription;
+   private boolean                        _isShowWeatherValues;
 
    /**
     * When <code>true</code> then the tour info is embedded in a view and do not need the toolbar to
@@ -189,7 +192,7 @@ public class TourInfoUI {
 
    private ArrayList<DeviceSensorValue>   _allSensorValuesWithData;
 
-   private String                         _noTourTooltip    = Messages.Tour_Tooltip_Label_NoTour;
+   private String                         _noTourTooltip = Messages.Tour_Tooltip_Label_NoTour;
 
    private PixelConverter                 _pc;
 
@@ -212,8 +215,9 @@ public class TourInfoUI {
     * UI controls
     */
    private Composite        _parent;
-   private Composite        _ttContainer;
    private Composite        _lowerPartContainer;
+   private Composite        _shellContainer;
+   private Composite        _ttContainer;
 
    private Text             _txtDescription;
    private Text             _txtLocationEnd;
@@ -388,7 +392,7 @@ public class TourInfoUI {
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutTourInfoOptions(_parent, toolbar, TourInfoUI.this, _state);
+         return new SlideoutTourInfoOptions(_parent, toolbar, TourInfoUI.this, _tourToolTipProvider, _state);
       }
 
       @Override
@@ -408,6 +412,8 @@ public class TourInfoUI {
    private void createActions() {
 
       _actionCloseTooltip = new ActionCloseTooltip();
+      _actionEditTour = new ActionTourToolTip_EditTour(_tourToolTipProvider, _tourProvider);
+      _actionEditQuick = new ActionTourToolTip_EditQuick(_tourToolTipProvider, _tourProvider);
       _actionTourInfoOptions = new ActionSlideout_TourInfoOptions();
    }
 
@@ -433,86 +439,81 @@ public class TourInfoUI {
 
       restoreState_BeforeUI(parent);
 
-      initUI(parent);
+      initUI();
 
       createActions();
 
       final Composite container = createUI(parent);
-
-// this do not help to remove flickering, first an empty tooltip window is displayed then also it's content
-//      _ttContainer.setRedraw(false);
 
       updateUI();
       updateUI_Layout();
 
       enableControls();
 
-      if (UI.IS_BRIGHT_THEME) {
-
-         final Display display = parent.getDisplay();
-
-         UI.setColorForAllChildren(parent,
-               display.getSystemColor(SWT.COLOR_INFO_FOREGROUND),
-               display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-      }
+      updateUI_Background(parent);
 
       return container;
    }
 
    private Composite createUI(final Composite parent) {
 
+      /*
+       * The shell container is necessary because the margins of the inner container will hide the
+       * tooltip when the mouse is hovered, which is not as it should be.
+       */
+      _shellContainer = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(_shellContainer);
+      {
+         createUI_05_TooltipContainer(_shellContainer);
+      }
+
+      return _shellContainer;
+   }
+
+   private void createUI_05_TooltipContainer(final Composite parent) {
+
       final Point defaultSpacing = LayoutConstants.getSpacing();
       final int columnSpacing = defaultSpacing.x + 30;
 
-      /*
-       * shell container is necessary because the margins of the inner container will hide the
-       * tooltip when the mouse is hovered, which is not as it should be.
-       */
-      final Composite shellContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults().applyTo(shellContainer);
+      _ttContainer = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults()
+            .margins(SHELL_MARGIN, SHELL_MARGIN)
+            .applyTo(_ttContainer);
+//      _ttContainer.setBackground(UI.SYS_COLOR_GREEN);
       {
-         _ttContainer = new Composite(shellContainer, SWT.NONE);
-         GridLayoutFactory.fillDefaults()
-               .margins(SHELL_MARGIN, SHELL_MARGIN)
-               .applyTo(_ttContainer);
-//         _ttContainer.setBackground(UI.SYS_COLOR_GREEN);
-         {
-            createUI_10_UpperPart(_ttContainer);
+         createUI_10_UpperPart(_ttContainer);
 
-            final Composite container = new Composite(_ttContainer, SWT.NONE);
-            GridDataFactory.fillDefaults().applyTo(container);
-//            container.setBackground(UI.SYS_COLOR_CYAN);
+         final Composite container = new Composite(_ttContainer, SWT.NONE);
+         GridDataFactory.fillDefaults().applyTo(container);
+//         container.setBackground(UI.SYS_COLOR_CYAN);
 
-            if (_hasRunDyn) {
+         if (_isShowRunDyn && _hasRunDyn) {
 
-               GridLayoutFactory.fillDefaults()
-                     .numColumns(3)
-                     .spacing(columnSpacing, defaultSpacing.y)
-                     .applyTo(container);
-               {
-                  createUI_30_Column_1(container);
-                  createUI_40_Column_2(container);
-                  createUI_50_Column_3(container);
-               }
-
-            } else {
-
-               GridLayoutFactory.fillDefaults()
-                     .numColumns(2)
-                     .spacing(columnSpacing, defaultSpacing.y)
-                     .applyTo(container);
-               {
-                  createUI_30_Column_1(container);
-                  createUI_40_Column_2(container);
-               }
+            GridLayoutFactory.fillDefaults()
+                  .numColumns(3)
+                  .spacing(columnSpacing, defaultSpacing.y)
+                  .applyTo(container);
+            {
+               createUI_30_Column_1(container);
+               createUI_40_Column_2(container);
+               createUI_50_Column_3(container);
             }
 
-            createUI_90_LowerPart(_ttContainer);
-            createUI_99_CreateModifyTime(_ttContainer);
-         }
-      }
+         } else {
 
-      return shellContainer;
+            GridLayoutFactory.fillDefaults()
+                  .numColumns(2)
+                  .spacing(columnSpacing, defaultSpacing.y)
+                  .applyTo(container);
+            {
+               createUI_30_Column_1(container);
+               createUI_40_Column_2(container);
+            }
+         }
+
+         createUI_90_LowerPart(_ttContainer);
+         createUI_99_CreateModifyTime(_ttContainer);
+      }
    }
 
    private void createUI_10_UpperPart(final Composite parent) {
@@ -522,6 +523,7 @@ public class TourInfoUI {
       GridLayoutFactory.fillDefaults()
             .numColumns(3)
             .applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_CYAN);
       {
          {
             /*
@@ -568,48 +570,37 @@ public class TourInfoUI {
 
    private void createUI_12_Toolbar(final Composite container) {
 
+      final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+      GridDataFactory.fillDefaults().applyTo(toolbar);
+
+      final ToolBarManager tbm = new ToolBarManager(toolbar);
+
       if (_isUIEmbedded) {
 
-         // spacer
-         new Label(container, SWT.NONE);
+         tbm.add(_actionTourInfoOptions);
+         tbm.update(true);
 
       } else {
 
          /*
-          * Create toolbar
-          */
-         final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
-         GridDataFactory.fillDefaults().applyTo(toolbar);
-
-         final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-         /*
           * Fill toolbar
           */
-         if (_isActionsVisible) {
-
-            _actionEditTour = new ActionTourToolTip_EditTour(_tourToolTipProvider, _tourProvider);
-            _actionEditQuick = new ActionTourToolTip_EditQuick(_tourToolTipProvider, _tourProvider);
-
-            final Integer selectedTabFolder = Integer.valueOf(0);
-
-            _actionPrefDialog = new Action_ToolTip_EditPreferences(_tourToolTipProvider,
-                  Messages.Tour_Tooltip_Action_EditFormatPreferences,
-                  PrefPageAppearanceDisplayFormat.ID,
-                  selectedTabFolder);
+         if (_areTourActionsVisible) {
 
             tbm.add(_actionEditTour);
             tbm.add(_actionEditQuick);
-            tbm.add(_actionPrefDialog);
          }
+
+         tbm.add(_actionTourInfoOptions);
 
          /**
           * The close action is ALWAYS visible, sometimes there is a bug that the tooltip do not
           * automatically close when hovering out.
           */
          tbm.add(_actionCloseTooltip);
-         tbm.update(true);
       }
+
+      tbm.update(true);
    }
 
    private void createUI_30_Column_1(final Composite parent) {
@@ -621,12 +612,21 @@ public class TourInfoUI {
       {
          createUI_32_Time(container);
          createUI_34_DistanceElevation(container);
-         createUI_36_Misc(container);
-         createUI_37_HeartRateZones(container);
 
-         // gear data
-         _lblGear_Spacer = createUI_Spacer(container);
-         createUI_38_Gears(container);
+         if (_isShowBodyValues) {
+            createUI_36_Body(container);
+         }
+
+         if (_isShowHRZones) {
+            createUI_37_HeartRateZones(container);
+         }
+
+         if (_isShowSensorValues) {
+
+            // gear data
+            _lblGear_Spacer = createUI_Spacer(container);
+            createUI_38_Gears(container);
+         }
       }
    }
 
@@ -755,7 +755,7 @@ public class TourInfoUI {
       createUI_Spacer(container);
    }
 
-   private void createUI_36_Misc(final Composite container) {
+   private void createUI_36_Body(final Composite container) {
 
       {
          /*
@@ -792,11 +792,11 @@ public class TourInfoUI {
 
    private void createUI_37_HeartRateZones(final Composite container) {
 
-      createUI_Spacer(container);
-
       if (_tourData.getNumberOfHrZones() == 0) {
          return;
       }
+
+      createUI_Spacer(container);
 
       final List<TourPersonHRZone> tourPersonHrZones = _tourData.getDataPerson().getHrZonesSorted();
 
@@ -856,11 +856,15 @@ public class TourInfoUI {
          createUI_Spacer(container);
          createUI_43_Max(container);
 
-         createUI_Spacer(container);
-         createUI_44_HillSpeed(container);
+         if (_isShowVerticalSpeed) {
+            createUI_Spacer(container);
+            createUI_44_HillSpeed(container);
+         }
 
-         createUI_Spacer(container);
-         createUI_47_Weather(container);
+         if (_isShowWeatherValues) {
+            createUI_Spacer(container);
+            createUI_47_Weather(container);
+         }
 
          _lblBattery_Spacer = createUI_Spacer(container);
          createUI_48_Battery(container);
@@ -1386,7 +1390,9 @@ public class TourInfoUI {
 //      _lowerPartContainer.setBackground(UI.SYS_COLOR_CYAN);
       {
 
-         createUI_92_SensorValues(_lowerPartContainer);
+         if (_isShowSensorValues) {
+            createUI_92_SensorValues(_lowerPartContainer);
+         }
 
          {
             /*
@@ -1400,8 +1406,6 @@ public class TourInfoUI {
             _lblTourType_Value = createUI_LabelValue(_lowerPartContainer, SWT.LEAD | SWT.WRAP);
             GridDataFactory.fillDefaults()
                   .span(numColumns - 1, 1)
-//                  .grab(true, false)
-//                  .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
                   .indent(0, 5)
                   .applyTo(_lblTourType_Value);
          }
@@ -1415,11 +1419,11 @@ public class TourInfoUI {
             _lblTourTags_Value = createUI_LabelValue(_lowerPartContainer, SWT.LEAD | SWT.WRAP);
             GridDataFactory.fillDefaults()
                   .span(numColumns - 1, 1)
-//                  .grab(true, false)
-//                  .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
                   .applyTo(_lblTourTags_Value);
          }
-         {
+
+         if (_isShowWeatherDescription && _hasWeatherDescription) {
+
             /*
              * Weather
              */
@@ -1462,33 +1466,37 @@ public class TourInfoUI {
                gd.heightHint = _descriptionScroll_Height;
             }
          }
-         {
-            /*
-             * Start location
-             */
-            _lblLocationStart = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_TourLocation_Start);
-            _lblLocationStart.setFont(_boldFont);
-            GridDataFactory.fillDefaults()
-                  .span(numColumns, 1)
-                  .indent(0, 10)
-                  .applyTo(_lblLocationStart);
 
-            _txtLocationStart = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
-            GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtLocationStart);
-         }
-         {
-            /*
-             * End location
-             */
-            _lblLocationEnd = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_TourLocation_End);
-            _lblLocationEnd.setFont(_boldFont);
-            GridDataFactory.fillDefaults()
-                  .span(numColumns, 1)
-                  .indent(0, 10)
-                  .applyTo(_lblLocationEnd);
+         if (_isShowStartEndLocation && (_hasLocationStart || _hasLocationEnd)) {
 
-            _txtLocationEnd = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
-            GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtLocationEnd);
+            {
+               /*
+                * Start location
+                */
+               _lblLocationStart = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_TourLocation_Start);
+               _lblLocationStart.setFont(_boldFont);
+               GridDataFactory.fillDefaults()
+                     .span(numColumns, 1)
+                     .indent(0, 10)
+                     .applyTo(_lblLocationStart);
+
+               _txtLocationStart = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+               GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtLocationStart);
+            }
+            {
+               /*
+                * End location
+                */
+               _lblLocationEnd = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_TourLocation_End);
+               _lblLocationEnd.setFont(_boldFont);
+               GridDataFactory.fillDefaults()
+                     .span(numColumns, 1)
+                     .indent(0, 10)
+                     .applyTo(_lblLocationEnd);
+
+               _txtLocationEnd = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+               GridDataFactory.fillDefaults().span(numColumns, 1).applyTo(_txtLocationEnd);
+            }
          }
       }
    }
@@ -1546,10 +1554,10 @@ public class TourInfoUI {
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
-            .numColumns(3)
+            .numColumns(2)
 //            .spacing(20, 5)
             .applyTo(container);
-      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       {
          {
             /*
@@ -1590,20 +1598,6 @@ public class TourInfoUI {
                      .align(SWT.END, SWT.FILL)
                      .applyTo(_lblDateTimeModifiedValue);
             }
-         }
-         {
-            /*
-             * Options slideout
-             */
-            final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .align(SWT.END, SWT.FILL)
-                  .applyTo(toolbar);
-
-            _toolbarManager_TourInfoOptions = new ToolBarManager(toolbar);
-            _toolbarManager_TourInfoOptions.add(_actionTourInfoOptions);
-            _toolbarManager_TourInfoOptions.update(true);
          }
       }
    }
@@ -1695,7 +1689,7 @@ public class TourInfoUI {
 
    private void enableControls() {
 
-      if (_isActionsVisible == false) {
+      if (_areTourActionsVisible == false) {
          return;
       }
 
@@ -1714,8 +1708,12 @@ public class TourInfoUI {
 
       return parent.getBounds().width
 
-            // needs an offset otherwise it would grow endlessly
-            - (UI.IS_4K_DISPLAY ? 60 : 30);
+            /**
+             * !!! It needs an offset otherwise it would grow endlessly !!!
+             */
+            - (UI.IS_4K_DISPLAY ? 60 : 30)
+
+      ;
    }
 
    private int getWindSpeedTextIndex(final int speed) {
@@ -1738,20 +1736,15 @@ public class TourInfoUI {
       return speedValueIndex;
    }
 
-   private void initUI(final Composite parent) {
+   private void initUI() {
 
-      _pc = new PixelConverter(parent);
+      _pc = new PixelConverter(_parent);
 
       _descriptionScroll_Height = _pc.convertHeightInCharsToPixels(_descriptionScroll_Lines);
 
       if (_isUIEmbedded) {
 
-         parent.addControlListener(ControlListener.controlResizedAdapter(controlEvent -> {
-
-            _uiWidth_Pixel = getUIWidthFromParent(parent);
-
-            updateUI();
-         }));
+         _parent.addControlListener(ControlListener.controlResizedAdapter(controlEvent -> onResize(_parent)));
       }
    }
 
@@ -1793,6 +1786,17 @@ public class TourInfoUI {
       final boolean isSingleTour = !_tourData.isMultipleTours();
 
       return isShortTour || isSingleTour;
+   }
+
+   public boolean isUIEmbedded() {
+      return _isUIEmbedded;
+   }
+
+   private void onResize(final Composite parent) {
+
+      _uiWidth_Pixel = getUIWidthFromParent(parent);
+
+      updateUI();
    }
 
    /**
@@ -1860,15 +1864,52 @@ public class TourInfoUI {
                SlideoutTourInfoOptions.STATE_UI_WIDTH_MAX);
          }
       }
+
+      restoreState_UIOptions();
+   }
+
+   void restoreState_UIOptions() {
+
+      final boolean isShowCustomValues = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_CUSTOM_VALUES, true);
+
+// SET_FORMATTING_OFF
+
+      if (isShowCustomValues) {
+
+         _isShowBodyValues          = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_BODY_VALUES,         true);
+         _isShowHRZones             = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_HEART_RATE_ZONES,    true);
+         _isShowRunDyn              = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_RUNNING_DYNAMICS,    true);
+         _isShowSensorValues        = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_SENSOR_VALUES,       true);
+         _isShowStartEndLocation    = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_START_END_LOCATION,  true);
+         _isShowVerticalSpeed       = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_VERTICAL_SPEED,      true);
+         _isShowWeatherDescription  = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_WEATHER_DESCRIPTION, true);
+         _isShowWeatherValues       = Util.getStateBoolean(_state, SlideoutTourInfoOptions.STATE_IS_SHOW_WEATHER_VALUES,      true);
+
+      } else {
+
+         // show all values
+
+         _isShowBodyValues          = true;
+         _isShowHRZones             = true;
+         _isShowRunDyn              = true;
+         _isShowSensorValues        = true;
+         _isShowStartEndLocation    = true;
+         _isShowVerticalSpeed       = true;
+         _isShowWeatherDescription  = true;
+         _isShowWeatherValues       = true;
+      }
+
+// SET_FORMATTING_ON
    }
 
    /**
-    * Enable/disable tour edit actions, actions are disabled by default
+    * Enable/disable tour edit actions, these actions are disabled by default
     *
     * @param isEnabled
     */
    public void setActionsEnabled(final boolean isEnabled) {
-      _isActionsVisible = isEnabled;
+
+      _areTourActionsVisible = isEnabled;
    }
 
    /**
@@ -1936,11 +1977,14 @@ public class TourInfoUI {
       /*
        * Weather description
        */
-      if (_hasWeatherDescription) {
-         _txtWeather.setText(_tourData.getWeather());
+      if (_isShowWeatherDescription && _hasWeatherDescription) {
+
+         if (_hasWeatherDescription) {
+            _txtWeather.setText(_tourData.getWeather());
+         }
+         UI.showHideControl(_lblWeather, _hasWeatherDescription);
+         UI.showHideControl(_txtWeather, _hasWeatherDescription, _uiWidth_Pixel);
       }
-      UI.showHideControl(_lblWeather, _hasWeatherDescription);
-      UI.showHideControl(_txtWeather, _hasWeatherDescription, _uiWidth_Pixel);
 
       /*
        * Tour type
@@ -1964,7 +2008,11 @@ public class TourInfoUI {
        * Tour description
        */
       if (_hasTourDescription) {
-         _txtDescription.setText(_tourData.getTourDescription());
+         String tourDescription = _tourData.getTourDescription();
+         if (UI.IS_SCRAMBLE_DATA) {
+            tourDescription = UI.scrambleText(tourDescription);
+         }
+         _txtDescription.setText(tourDescription);
       }
       UI.showHideControl(_lblDescription, _hasTourDescription);
 
@@ -1979,17 +2027,20 @@ public class TourInfoUI {
       /*
        * Start/end location
        */
-      if (_hasLocationStart) {
-         _txtLocationStart.setText(_tourData.getTourStartPlace());
-      }
-      UI.showHideControl(_lblLocationStart, _hasLocationStart);
-      UI.showHideControl(_txtLocationStart, _hasLocationStart, _uiWidth_Pixel);
+      if (_isShowStartEndLocation && (_hasLocationStart || _hasLocationEnd)) {
 
-      if (_hasLocationEnd) {
-         _txtLocationEnd.setText(_tourData.getTourEndPlace());
+         if (_hasLocationStart) {
+            _txtLocationStart.setText(_tourData.getTourStartPlace());
+         }
+         UI.showHideControl(_lblLocationStart, _hasLocationStart);
+         UI.showHideControl(_txtLocationStart, _hasLocationStart, _uiWidth_Pixel);
+
+         if (_hasLocationEnd) {
+            _txtLocationEnd.setText(_tourData.getTourEndPlace());
+         }
+         UI.showHideControl(_lblLocationEnd, _hasLocationEnd);
+         UI.showHideControl(_txtLocationEnd, _hasLocationEnd, _uiWidth_Pixel);
       }
-      UI.showHideControl(_lblLocationEnd, _hasLocationEnd);
-      UI.showHideControl(_txtLocationEnd, _hasLocationEnd, _uiWidth_Pixel);
 
       /*
        * Column: Left
@@ -2081,124 +2132,127 @@ public class TourInfoUI {
       /*
        * Weather
        */
-      final int windSpeed = (int) (_tourData.getWeather_Wind_Speed() / UI.UNIT_VALUE_DISTANCE);
-      final int weatherWindDirectionDegree = _tourData.getWeather_Wind_Direction();
-      if (windSpeed > 0 && weatherWindDirectionDegree != -1) {
+      if (_isShowWeatherValues) {
 
-         // Wind speed
-         _lblWindSpeed.setText(Integer.toString(windSpeed));
-         _lblWindSpeedUnit.setText(
-               String.format(
-                     Messages.Tour_Tooltip_Format_WindSpeedUnit,
-                     UI.UNIT_LABEL_SPEED,
-                     IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
+         final int windSpeed = (int) (_tourData.getWeather_Wind_Speed() / UI.UNIT_VALUE_DISTANCE);
+         final int weatherWindDirectionDegree = _tourData.getWeather_Wind_Direction();
+         if (windSpeed > 0 && weatherWindDirectionDegree != -1) {
 
-         // Wind direction
-         _lblWindDirection.setText(Integer.toString(weatherWindDirectionDegree));
-         _lblWindDirectionUnit.setText(String.format(
-               Messages.Tour_Tooltip_Format_WindDirectionUnit,
-               UI.getCardinalDirectionText(weatherWindDirectionDegree)));
+            // Wind speed
+            _lblWindSpeed.setText(Integer.toString(windSpeed));
+            _lblWindSpeedUnit.setText(
+                  String.format(
+                        Messages.Tour_Tooltip_Format_WindSpeedUnit,
+                        UI.UNIT_LABEL_SPEED,
+                        IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
+
+            // Wind direction
+            _lblWindDirection.setText(Integer.toString(weatherWindDirectionDegree));
+            _lblWindDirectionUnit.setText(String.format(
+                  Messages.Tour_Tooltip_Format_WindDirectionUnit,
+                  UI.getCardinalDirectionText(weatherWindDirectionDegree)));
+         }
+
+         /*
+          * Air Quality
+          */
+         final int airQualityTextIndex = _tourData.getWeather_AirQuality_TextIndex();
+         if (airQualityTextIndex > 0) {
+
+            _lblAirQuality.setText(UI.SPACE + IWeather.AIR_QUALITY_TEXT[airQualityTextIndex] + UI.SPACE);
+
+            final int colorIndex = airQualityTextIndex * 2;
+
+            // run async otherwise in the dark mode the colors are not displayed
+            _parent.getDisplay().asyncExec(() -> {
+
+               if (_parent.isDisposed()) {
+                  return;
+               }
+
+               if (UI.IS_DARK_THEME) {
+
+                  _lblAirQuality.setForeground(IWeather.AIR_QUALITY_COLORS_DARK_THEME[colorIndex]);
+                  _lblAirQuality.setBackground(IWeather.AIR_QUALITY_COLORS_DARK_THEME[colorIndex + 1]);
+
+               } else {
+
+                  _lblAirQuality.setForeground(IWeather.AIR_QUALITY_COLORS_BRIGHT_THEME[colorIndex]);
+                  _lblAirQuality.setBackground(IWeather.AIR_QUALITY_COLORS_BRIGHT_THEME[colorIndex + 1]);
+               }
+            });
+         }
+
+         /*
+          * Average temperature
+          */
+         final float temperature_NoDevice = _tourData.getWeather_Temperature_Average();
+         final float temperature_FromDevice = _tourData.getWeather_Temperature_Average_Device();
+
+         final float convertedTemperature_NoDevice = UI.convertTemperatureFromMetric(temperature_NoDevice);
+         final float convertedTemperature_FromDevice = UI.convertTemperatureFromMetric(temperature_FromDevice);
+
+         final String formattedTemperature_NoDevice = _tourData.isMultipleTours()
+               ? FormatManager.formatTemperature_Summary(convertedTemperature_NoDevice)
+               : FormatManager.formatTemperature(convertedTemperature_NoDevice);
+
+         final String formattedTemperature_FromDevice = _tourData.isMultipleTours()
+               ? FormatManager.formatTemperature_Summary(convertedTemperature_FromDevice)
+               : FormatManager.formatTemperature(convertedTemperature_FromDevice);
+
+         final boolean isTemperature_NoDevice = temperature_NoDevice > 0 || _tourData.isWeatherDataFromProvider();
+         final boolean isTemperature_FromDevice = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0;
+
+         String part1Text = UI.EMPTY_STRING;
+         String part2Text = UI.EMPTY_STRING;
+         String part1Tooltip = UI.EMPTY_STRING;
+         String part2Tooltip = UI.EMPTY_STRING;
+
+         if (isTemperature_NoDevice && isTemperature_FromDevice) {
+
+            // both values are available
+
+            part1Text = formattedTemperature_NoDevice + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+            part2Text = formattedTemperature_FromDevice + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+
+            part1Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_NoDevice;
+            part2Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_FromDevice;
+
+         } else if (isTemperature_NoDevice) {
+
+            // values only from provider or manual
+
+            part1Text = formattedTemperature_NoDevice;
+            part2Text = UI.UNIT_LABEL_TEMPERATURE;
+
+            part1Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_NoDevice;
+            part2Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_NoDevice;
+
+         } else if (isTemperature_FromDevice) {
+
+            // values only from device
+
+            part1Text = formattedTemperature_FromDevice;
+            part2Text = UI.UNIT_LABEL_TEMPERATURE;
+
+            part1Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_FromDevice;
+            part2Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_FromDevice;
+         }
+
+         _lblTemperature_Part1.setText(part1Text);
+         _lblTemperature_Part1.setToolTipText(part1Tooltip);
+
+         _lblTemperature_Part2.setText(part2Text);
+         _lblTemperature_Part2.setToolTipText(part2Tooltip);
+
+         // weather clouds
+         final int weatherIndex = _tourData.getWeatherIndex();
+         final String cloudText = IWeather.CLOUD_TEXT[weatherIndex];
+         final String cloudImageName = IWeather.CLOUD_ICON[weatherIndex];
+
+         _lblClouds.setImage(UI.IMAGE_REGISTRY.get(cloudImageName));
+         _lblCloudsUnit.setText(cloudText.equals(IWeather.cloudIsNotDefined) ? UI.EMPTY_STRING : cloudText);
       }
-
-      /*
-       * Air Quality
-       */
-      final int airQualityTextIndex = _tourData.getWeather_AirQuality_TextIndex();
-      if (airQualityTextIndex > 0) {
-
-         _lblAirQuality.setText(UI.SPACE + IWeather.AIR_QUALITY_TEXT[airQualityTextIndex] + UI.SPACE);
-
-         final int colorIndex = airQualityTextIndex * 2;
-
-         // run async otherwise in the dark mode the colors are not displayed
-         _parent.getDisplay().asyncExec(() -> {
-
-            if (_parent.isDisposed()) {
-               return;
-            }
-
-            if (UI.IS_DARK_THEME) {
-
-               _lblAirQuality.setForeground(IWeather.AIR_QUALITY_COLORS_DARK_THEME[colorIndex]);
-               _lblAirQuality.setBackground(IWeather.AIR_QUALITY_COLORS_DARK_THEME[colorIndex + 1]);
-
-            } else {
-
-               _lblAirQuality.setForeground(IWeather.AIR_QUALITY_COLORS_BRIGHT_THEME[colorIndex]);
-               _lblAirQuality.setBackground(IWeather.AIR_QUALITY_COLORS_BRIGHT_THEME[colorIndex + 1]);
-            }
-         });
-      }
-
-      /*
-       * Average temperature
-       */
-      final float temperature_NoDevice = _tourData.getWeather_Temperature_Average();
-      final float temperature_FromDevice = _tourData.getWeather_Temperature_Average_Device();
-
-      final float convertedTemperature_NoDevice = UI.convertTemperatureFromMetric(temperature_NoDevice);
-      final float convertedTemperature_FromDevice = UI.convertTemperatureFromMetric(temperature_FromDevice);
-
-      final String formattedTemperature_NoDevice = _tourData.isMultipleTours()
-            ? FormatManager.formatTemperature_Summary(convertedTemperature_NoDevice)
-            : FormatManager.formatTemperature(convertedTemperature_NoDevice);
-
-      final String formattedTemperature_FromDevice = _tourData.isMultipleTours()
-            ? FormatManager.formatTemperature_Summary(convertedTemperature_FromDevice)
-            : FormatManager.formatTemperature(convertedTemperature_FromDevice);
-
-      final boolean isTemperature_NoDevice = temperature_NoDevice > 0 || _tourData.isWeatherDataFromProvider();
-      final boolean isTemperature_FromDevice = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0;
-
-      String part1Text = UI.EMPTY_STRING;
-      String part2Text = UI.EMPTY_STRING;
-      String part1Tooltip = UI.EMPTY_STRING;
-      String part2Tooltip = UI.EMPTY_STRING;
-
-      if (isTemperature_NoDevice && isTemperature_FromDevice) {
-
-         // both values are available
-
-         part1Text = formattedTemperature_NoDevice + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
-         part2Text = formattedTemperature_FromDevice + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
-
-         part1Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_NoDevice;
-         part2Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_FromDevice;
-
-      } else if (isTemperature_NoDevice) {
-
-         // values only from provider or manual
-
-         part1Text = formattedTemperature_NoDevice;
-         part2Text = UI.UNIT_LABEL_TEMPERATURE;
-
-         part1Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_NoDevice;
-         part2Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_NoDevice;
-
-      } else if (isTemperature_FromDevice) {
-
-         // values only from device
-
-         part1Text = formattedTemperature_FromDevice;
-         part2Text = UI.UNIT_LABEL_TEMPERATURE;
-
-         part1Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_FromDevice;
-         part2Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_FromDevice;
-      }
-
-      _lblTemperature_Part1.setText(part1Text);
-      _lblTemperature_Part1.setToolTipText(part1Tooltip);
-
-      _lblTemperature_Part2.setText(part2Text);
-      _lblTemperature_Part2.setToolTipText(part2Tooltip);
-
-      // weather clouds
-      final int weatherIndex = _tourData.getWeatherIndex();
-      final String cloudText = IWeather.CLOUD_TEXT[weatherIndex];
-      final String cloudImageName = IWeather.CLOUD_ICON[weatherIndex];
-
-      _lblClouds.setImage(UI.IMAGE_REGISTRY.get(cloudImageName));
-      _lblCloudsUnit.setText(cloudText.equals(IWeather.cloudIsNotDefined) ? UI.EMPTY_STRING : cloudText);
 
 // SET_FORMATTING_OFF
 
@@ -2220,108 +2274,109 @@ public class TourInfoUI {
       _lblAvgElevationChange     .setText(Integer.toString(averageElevationChange));
       _lblAvgElevationChange_Unit.setText(UI.UNIT_LABEL_ELEVATION + UI.SLASH + UI.UNIT_LABEL_DISTANCE);
 
-      // ensure that data are available
-      _tourData.computeVerticalSpeed();
+      if (_isShowVerticalSpeed) {
 
-      final int   vertSpeed_TimeFlat      = _tourData.verticalSpeed_Flat_Time;
-      final int   vertSpeed_TimeGain      = _tourData.verticalSpeed_Up_Time;
-      final int   vertSpeed_TimeLoss      = _tourData.verticalSpeed_Down_Time;
+         // ensure that data are available
+         _tourData.computeVerticalSpeed();
 
-      final float vertSpeed_DistanceFlat  = _tourData.verticalSpeed_Flat_Distance;
-      final float vertSpeed_DistanceGain  = _tourData.verticalSpeed_Up_Distance;
-      final float vertSpeed_DistanceLoss  = _tourData.verticalSpeed_Down_Distance;
+         final int   vertSpeed_TimeFlat      = _tourData.verticalSpeed_Flat_Time;
+         final int   vertSpeed_TimeGain      = _tourData.verticalSpeed_Up_Time;
+         final int   vertSpeed_TimeLoss      = _tourData.verticalSpeed_Down_Time;
 
-      final float vertSpeed_ElevationGain = _tourData.verticalSpeed_Up_Elevation;
-      final float vertSpeed_ElevationLoss = _tourData.verticalSpeed_Down_Elevation;
+         final float vertSpeed_DistanceFlat  = _tourData.verticalSpeed_Flat_Distance;
+         final float vertSpeed_DistanceGain  = _tourData.verticalSpeed_Up_Distance;
+         final float vertSpeed_DistanceLoss  = _tourData.verticalSpeed_Down_Distance;
 
-      final float verticalSpeed_Flat = vertSpeed_TimeFlat == 0 ? 0 : 3.6f * vertSpeed_DistanceFlat / vertSpeed_TimeFlat;
-      final float verticalSpeed_Gain = vertSpeed_TimeGain == 0 ? 0 : 3.6f * vertSpeed_DistanceGain / vertSpeed_TimeGain;
-      final float verticalSpeed_Loss = vertSpeed_TimeLoss == 0 ? 0 : 3.6f * vertSpeed_DistanceLoss / vertSpeed_TimeLoss;
+         final float vertSpeed_ElevationGain = _tourData.verticalSpeed_Up_Elevation;
+         final float vertSpeed_ElevationLoss = _tourData.verticalSpeed_Down_Elevation;
 
-      final float sumTime     = vertSpeed_TimeFlat       + vertSpeed_TimeGain       + vertSpeed_TimeLoss *1f;
-      final float sumDistance = vertSpeed_DistanceFlat   + vertSpeed_DistanceGain   + vertSpeed_DistanceLoss;
+         final float verticalSpeed_Flat = vertSpeed_TimeFlat == 0 ? 0 : 3.6f * vertSpeed_DistanceFlat / vertSpeed_TimeFlat;
+         final float verticalSpeed_Gain = vertSpeed_TimeGain == 0 ? 0 : 3.6f * vertSpeed_DistanceGain / vertSpeed_TimeGain;
+         final float verticalSpeed_Loss = vertSpeed_TimeLoss == 0 ? 0 : 3.6f * vertSpeed_DistanceLoss / vertSpeed_TimeLoss;
 
-      final float altimeter_Gain = vertSpeed_TimeGain == 0 ? 0 : vertSpeed_ElevationGain / vertSpeed_TimeGain * 3600;
-      final float altimeter_Loss = vertSpeed_TimeLoss == 0 ? 0 : vertSpeed_ElevationLoss / vertSpeed_TimeLoss * 3600;
+         final float sumTime     = vertSpeed_TimeFlat       + vertSpeed_TimeGain       + vertSpeed_TimeLoss *1f;
+         final float sumDistance = vertSpeed_DistanceFlat   + vertSpeed_DistanceGain   + vertSpeed_DistanceLoss;
 
-      final double timeRelativeFlat       = sumTime == 0 ? 0 : (double)vertSpeed_TimeFlat / sumTime * 100f;
-      final double timeRelative_Gain      = sumTime == 0 ? 0 : (double)vertSpeed_TimeGain / sumTime * 100f;
-      final double timeRelative_Loss      = sumTime == 0 ? 0 : (double)vertSpeed_TimeLoss / sumTime * 100f;
+         final float altimeter_Gain = vertSpeed_TimeGain == 0 ? 0 : vertSpeed_ElevationGain / vertSpeed_TimeGain * 3600;
+         final float altimeter_Loss = vertSpeed_TimeLoss == 0 ? 0 : vertSpeed_ElevationLoss / vertSpeed_TimeLoss * 3600;
 
-      final float distanceRelative_Flaat  = sumDistance == 0 ? 0 : vertSpeed_DistanceFlat / sumDistance * 100;
-      final float distanceRelative_Gain   = sumDistance == 0 ? 0 : vertSpeed_DistanceGain / sumDistance * 100;
-      final float distanceRelative_Loss   = sumDistance == 0 ? 0 : vertSpeed_DistanceLoss / sumDistance * 100;
+         final double timeRelativeFlat       = sumTime == 0 ? 0 : (double)vertSpeed_TimeFlat / sumTime * 100f;
+         final double timeRelative_Gain      = sumTime == 0 ? 0 : (double)vertSpeed_TimeGain / sumTime * 100f;
+         final double timeRelative_Loss      = sumTime == 0 ? 0 : (double)vertSpeed_TimeLoss / sumTime * 100f;
 
-      final float prefFlatGainLoss_DPTolerance  = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_DP_TOLERANCE);
-      final float prefFlatGainLoss_FlatGradient = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_FLAT_GRADIENT);
+         final float distanceRelative_Flaat  = sumDistance == 0 ? 0 : vertSpeed_DistanceFlat / sumDistance * 100;
+         final float distanceRelative_Gain   = sumDistance == 0 ? 0 : vertSpeed_DistanceGain / sumDistance * 100;
+         final float distanceRelative_Loss   = sumDistance == 0 ? 0 : vertSpeed_DistanceLoss / sumDistance * 100;
 
-      final String tooltip = Messages.Tour_Tooltip_FlatGainLoss_Tooltip.formatted(
-            _nf2.format(prefFlatGainLoss_DPTolerance),
-            _nf1.format(prefFlatGainLoss_FlatGradient));
+         final float prefFlatGainLoss_DPTolerance  = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_DP_TOLERANCE);
+         final float prefFlatGainLoss_FlatGradient = _prefStore.getFloat(ITourbookPreferences.FLAT_GAIN_LOSS_FLAT_GRADIENT);
 
-      _lblVerticalSpeed_Time_Header             .setText(UI.UNIT_LABEL_TIME);
-      _lblVerticalSpeed_Time_Flat               .setText(FormatManager.formatMovingTime(vertSpeed_TimeFlat, false, true));
-      _lblVerticalSpeed_Time_Gain               .setText(FormatManager.formatMovingTime(vertSpeed_TimeGain, false, true));
-      _lblVerticalSpeed_Time_Loss               .setText(FormatManager.formatMovingTime(vertSpeed_TimeLoss, false, true));
+         final String tooltip = Messages.Tour_Tooltip_FlatGainLoss_Tooltip.formatted(
+               _nf2.format(prefFlatGainLoss_DPTolerance),
+               _nf1.format(prefFlatGainLoss_FlatGradient));
 
-      _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative(timeRelativeFlat));
-      _lblVerticalSpeed_Time_Relative_Gain      .setText(FormatManager.formatRelative(timeRelative_Gain));
-      _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative(timeRelative_Loss));
+         _lblVerticalSpeed_Time_Header             .setText(UI.UNIT_LABEL_TIME);
+         _lblVerticalSpeed_Time_Flat               .setText(FormatManager.formatMovingTime(vertSpeed_TimeFlat, false, true));
+         _lblVerticalSpeed_Time_Gain               .setText(FormatManager.formatMovingTime(vertSpeed_TimeGain, false, true));
+         _lblVerticalSpeed_Time_Loss               .setText(FormatManager.formatMovingTime(vertSpeed_TimeLoss, false, true));
 
-      _lblVerticalSpeed_Distance_Header         .setText(UI.UNIT_LABEL_DISTANCE);
-      _lblVerticalSpeed_Distance_Flat           .setText(FormatManager.formatDistance(vertSpeed_DistanceFlat / 1000 / UI.UNIT_VALUE_DISTANCE));
-      _lblVerticalSpeed_Distance_Gain           .setText(FormatManager.formatDistance(vertSpeed_DistanceGain / 1000 / UI.UNIT_VALUE_DISTANCE));
-      _lblVerticalSpeed_Distance_Loss           .setText(FormatManager.formatDistance(vertSpeed_DistanceLoss / 1000 / UI.UNIT_VALUE_DISTANCE));
+         _lblVerticalSpeed_Time_Relative_Flat      .setText(FormatManager.formatRelative(timeRelativeFlat));
+         _lblVerticalSpeed_Time_Relative_Gain      .setText(FormatManager.formatRelative(timeRelative_Gain));
+         _lblVerticalSpeed_Time_Relative_Loss      .setText(FormatManager.formatRelative(timeRelative_Loss));
 
-      _lblVerticalSpeed_Distance_Relative_Flat  .setText(FormatManager.formatRelative(distanceRelative_Flaat));
-      _lblVerticalSpeed_Distance_Relative_Gain  .setText(FormatManager.formatRelative(distanceRelative_Gain));
-      _lblVerticalSpeed_Distance_Relative_Loss  .setText(FormatManager.formatRelative(distanceRelative_Loss));
+         _lblVerticalSpeed_Distance_Header         .setText(UI.UNIT_LABEL_DISTANCE);
+         _lblVerticalSpeed_Distance_Flat           .setText(FormatManager.formatDistance(vertSpeed_DistanceFlat / 1000 / UI.UNIT_VALUE_DISTANCE));
+         _lblVerticalSpeed_Distance_Gain           .setText(FormatManager.formatDistance(vertSpeed_DistanceGain / 1000 / UI.UNIT_VALUE_DISTANCE));
+         _lblVerticalSpeed_Distance_Loss           .setText(FormatManager.formatDistance(vertSpeed_DistanceLoss / 1000 / UI.UNIT_VALUE_DISTANCE));
 
-      _lblVerticalSpeed_Elevation_Header        .setText(UI.UNIT_LABEL_ELEVATION);
-      _lblVerticalSpeed_Elevation_Gain          .setText(FormatManager.formatElevation(vertSpeed_ElevationGain / UI.UNIT_VALUE_ELEVATION));
-      _lblVerticalSpeed_Elevation_Loss          .setText(FormatManager.formatElevation(-vertSpeed_ElevationLoss / UI.UNIT_VALUE_ELEVATION));
+         _lblVerticalSpeed_Distance_Relative_Flat  .setText(FormatManager.formatRelative(distanceRelative_Flaat));
+         _lblVerticalSpeed_Distance_Relative_Gain  .setText(FormatManager.formatRelative(distanceRelative_Gain));
+         _lblVerticalSpeed_Distance_Relative_Loss  .setText(FormatManager.formatRelative(distanceRelative_Loss));
 
-      _lblVerticalSpeed_Speed_Header            .setText(UI.UNIT_LABEL_SPEED);
-      _lblVerticalSpeed_Speed_Flat              .setText(FormatManager.formatSpeed(verticalSpeed_Flat / UI.UNIT_VALUE_DISTANCE));
-      _lblVerticalSpeed_Speed_Gain              .setText(FormatManager.formatSpeed(verticalSpeed_Gain / UI.UNIT_VALUE_DISTANCE));
-      _lblVerticalSpeed_Speed_Loss              .setText(FormatManager.formatSpeed(verticalSpeed_Loss / UI.UNIT_VALUE_DISTANCE));
+         _lblVerticalSpeed_Elevation_Header        .setText(UI.UNIT_LABEL_ELEVATION);
+         _lblVerticalSpeed_Elevation_Gain          .setText(FormatManager.formatElevation(vertSpeed_ElevationGain / UI.UNIT_VALUE_ELEVATION));
+         _lblVerticalSpeed_Elevation_Loss          .setText(FormatManager.formatElevation(-vertSpeed_ElevationLoss / UI.UNIT_VALUE_ELEVATION));
 
-      _lblVerticalSpeed_Time_Header             .setToolTipText(tooltip);
-      _lblVerticalSpeed_Time_Flat               .setToolTipText(tooltip);
-      _lblVerticalSpeed_Time_Gain               .setToolTipText(tooltip);
-      _lblVerticalSpeed_Time_Loss               .setToolTipText(tooltip);
+         _lblVerticalSpeed_Speed_Header            .setText(UI.UNIT_LABEL_SPEED);
+         _lblVerticalSpeed_Speed_Flat              .setText(FormatManager.formatSpeed(verticalSpeed_Flat / UI.UNIT_VALUE_DISTANCE));
+         _lblVerticalSpeed_Speed_Gain              .setText(FormatManager.formatSpeed(verticalSpeed_Gain / UI.UNIT_VALUE_DISTANCE));
+         _lblVerticalSpeed_Speed_Loss              .setText(FormatManager.formatSpeed(verticalSpeed_Loss / UI.UNIT_VALUE_DISTANCE));
 
-      _lblVerticalSpeed_Time_Relative_Flat      .setToolTipText(tooltip);
-      _lblVerticalSpeed_Time_Relative_Gain      .setToolTipText(tooltip);
-      _lblVerticalSpeed_Time_Relative_Loss      .setToolTipText(tooltip);
+         _lblVerticalSpeed_Time_Header             .setToolTipText(tooltip);
+         _lblVerticalSpeed_Time_Flat               .setToolTipText(tooltip);
+         _lblVerticalSpeed_Time_Gain               .setToolTipText(tooltip);
+         _lblVerticalSpeed_Time_Loss               .setToolTipText(tooltip);
 
-      _lblVerticalSpeed_Distance_Header         .setToolTipText(tooltip);
-      _lblVerticalSpeed_Distance_Flat           .setToolTipText(tooltip);
-      _lblVerticalSpeed_Distance_Gain           .setToolTipText(tooltip);
-      _lblVerticalSpeed_Distance_Loss           .setToolTipText(tooltip);
+         _lblVerticalSpeed_Time_Relative_Flat      .setToolTipText(tooltip);
+         _lblVerticalSpeed_Time_Relative_Gain      .setToolTipText(tooltip);
+         _lblVerticalSpeed_Time_Relative_Loss      .setToolTipText(tooltip);
 
-      _lblVerticalSpeed_Distance_Relative_Flat  .setToolTipText(tooltip);
-      _lblVerticalSpeed_Distance_Relative_Gain  .setToolTipText(tooltip);
-      _lblVerticalSpeed_Distance_Relative_Loss  .setToolTipText(tooltip);
+         _lblVerticalSpeed_Distance_Header         .setToolTipText(tooltip);
+         _lblVerticalSpeed_Distance_Flat           .setToolTipText(tooltip);
+         _lblVerticalSpeed_Distance_Gain           .setToolTipText(tooltip);
+         _lblVerticalSpeed_Distance_Loss           .setToolTipText(tooltip);
 
-      _lblVerticalSpeed_Elevation_Header        .setToolTipText(tooltip);
-      _lblVerticalSpeed_Elevation_Gain          .setToolTipText(tooltip);
-      _lblVerticalSpeed_Elevation_Loss          .setToolTipText(tooltip);
+         _lblVerticalSpeed_Distance_Relative_Flat  .setToolTipText(tooltip);
+         _lblVerticalSpeed_Distance_Relative_Gain  .setToolTipText(tooltip);
+         _lblVerticalSpeed_Distance_Relative_Loss  .setToolTipText(tooltip);
 
-      _lblVerticalSpeed_Speed_Header            .setToolTipText(tooltip);
-      _lblVerticalSpeed_Speed_Flat              .setToolTipText(tooltip);
-      _lblVerticalSpeed_Speed_Gain              .setToolTipText(tooltip);
-      _lblVerticalSpeed_Speed_Loss              .setToolTipText(tooltip);
+         _lblVerticalSpeed_Elevation_Header        .setToolTipText(tooltip);
+         _lblVerticalSpeed_Elevation_Gain          .setToolTipText(tooltip);
+         _lblVerticalSpeed_Elevation_Loss          .setToolTipText(tooltip);
 
-      _lblAltimeter_Up        .setText(Integer.toString((int) (altimeter_Gain + .5)));
-      _lblAltimeter_Down      .setText(Integer.toString((int) (altimeter_Loss + .5)));
+         _lblVerticalSpeed_Speed_Header            .setToolTipText(tooltip);
+         _lblVerticalSpeed_Speed_Flat              .setToolTipText(tooltip);
+         _lblVerticalSpeed_Speed_Gain              .setToolTipText(tooltip);
+         _lblVerticalSpeed_Speed_Loss              .setToolTipText(tooltip);
 
-      _lblAltimeter_Up_Unit   .setText(UI.UNIT_LABEL_ELEVATION + Messages.ColumnFactory_hour);
-      _lblAltimeter_Down_Unit .setText(UI.UNIT_LABEL_ELEVATION + Messages.ColumnFactory_hour);
+         _lblAltimeter_Up        .setText(Integer.toString((int) (altimeter_Gain + .5)));
+         _lblAltimeter_Down      .setText(Integer.toString((int) (altimeter_Loss + .5)));
+
+         _lblAltimeter_Up_Unit   .setText(UI.UNIT_LABEL_ELEVATION + Messages.ColumnFactory_hour);
+         _lblAltimeter_Down_Unit .setText(UI.UNIT_LABEL_ELEVATION + Messages.ColumnFactory_hour);
+      }
 
 // SET_FORMATTING_ON
-
-      // SET_FORMATTING_ON
 
       /*
        * Column: Right
@@ -2360,14 +2415,17 @@ public class TourInfoUI {
       _lblAvgElevation.setText(Integer.toString((int) avgElevation));
       _lblAvgElevationUnit.setText(UI.UNIT_LABEL_ELEVATION);
 
-      // calories
-      final double calories = _tourData.getCalories();
-      _lblCalories.setText(FormatManager.formatNumber_0(calories / 1000));
+      if (_isShowBodyValues) {
 
-      // body
-      final float bodyWeight = UI.convertBodyWeightFromMetric(_tourData.getBodyWeight());
-      _lblRestPulse.setText(Integer.toString(_tourData.getRestPulse()));
-      _lblBodyWeight.setText(_nf1.format(bodyWeight));
+         // calories
+         final double calories = _tourData.getCalories();
+         _lblCalories.setText(FormatManager.formatNumber_0(calories / 1000));
+
+         // body
+         final float bodyWeight = UI.convertBodyWeightFromMetric(_tourData.getBodyWeight());
+         _lblRestPulse.setText(Integer.toString(_tourData.getRestPulse()));
+         _lblBodyWeight.setText(_nf1.format(bodyWeight));
+      }
 
 // SET_FORMATTING_OFF
 
@@ -2389,17 +2447,20 @@ public class TourInfoUI {
       /*
        * Gears
        */
-      if (_hasGears) {
+      if (_isShowSensorValues) {
 
-         _lblGear_GearShifts.setText(String.format(GEAR_SHIFT_FORMAT,
-               _tourData.getFrontShiftCount(),
-               _tourData.getRearShiftCount()));
+         if (_hasGears) {
+
+            _lblGear_GearShifts.setText(String.format(GEAR_SHIFT_FORMAT,
+                  _tourData.getFrontShiftCount(),
+                  _tourData.getRearShiftCount()));
+         }
+
+         UI.showHideControl(_lblGear_Spacer,             _hasGears);
+         UI.showHideControl(_lblGear,                    _hasGears);
+         UI.showHideControl(_lblGear_GearShifts,         _hasGears);
+         UI.showHideControl(_lblGear_GearShifts_Spacer,  _hasGears);
       }
-
-      UI.showHideControl(_lblGear_Spacer,             _hasGears);
-      UI.showHideControl(_lblGear,                    _hasGears);
-      UI.showHideControl(_lblGear_GearShifts,         _hasGears);
-      UI.showHideControl(_lblGear_GearShifts_Spacer,  _hasGears);
 
       /*
        * Battery
@@ -2419,7 +2480,9 @@ public class TourInfoUI {
       /*
        * Sensor
        */
-      updateUI_SensorValues();
+      if (_isShowSensorValues) {
+         updateUI_SensorValues();
+      }
 
       /*
        * Date/time
@@ -2444,7 +2507,7 @@ public class TourInfoUI {
       /*
        * Running Dynamics
        */
-      if (_hasRunDyn) {
+      if (_isShowRunDyn && _hasRunDyn) {
 
          final float mmOrInch = UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
 
@@ -2499,6 +2562,46 @@ public class TourInfoUI {
          _lblRunDyn_VerticalRatio_Max_Unit.setText(UI.SYMBOL_PERCENTAGE);
          _lblRunDyn_VerticalRatio_Avg.setText(_nf1.format(_tourData.getRunDyn_VerticalRatio_Avg()));
          _lblRunDyn_VerticalRatio_Avg_Unit.setText(UI.SYMBOL_PERCENTAGE);
+      }
+   }
+
+   private void updateUI_Background(final Composite parent) {
+
+      if (UI.IS_BRIGHT_THEME) {
+
+         final Display display = parent.getDisplay();
+
+         UI.setColorForAllChildren(parent,
+               display.getSystemColor(SWT.COLOR_INFO_FOREGROUND),
+               display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+      }
+   }
+
+   void updateUI_FromUIOptions() {
+
+      _ttContainer.dispose();
+
+      createUI_05_TooltipContainer(_shellContainer);
+
+      updateUI();
+      updateUI_Layout();
+
+      final Shell parentShell = _parent.getShell();
+      final Shell appShell = TourbookPlugin.getAppShell();
+
+      if (parentShell == appShell) {
+
+         _parent.layout(true, true);
+
+         updateUI_Background(_parent);
+
+      } else {
+
+         // tour info is within a tooltip
+
+         parentShell.pack(true);
+
+         updateUI_Background(parentShell);
       }
    }
 
@@ -2582,26 +2685,6 @@ public class TourInfoUI {
             lblVoltage.setText(batteryVoltage);
             lblVoltage.setToolTipText(Messages.Tour_Tooltip_Label_BatteryVoltage_Tooltip);
          }
-      }
-   }
-
-   void updateUI_UIWidth() {
-
-      updateUI();
-      updateUI_Layout();
-
-      final Shell parentShell = _parent.getShell();
-      final Shell appShell = TourbookPlugin.getAppShell();
-
-      if (parentShell == appShell) {
-
-         _parent.layout(true, true);
-
-      } else {
-
-         // tour info is within a tooltip
-
-         parentShell.pack(true);
       }
    }
 

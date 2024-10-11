@@ -131,9 +131,10 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
 
             // tour data is available
 
-            container = _tourInfoUI.createContentArea(parent, _tourData, this, this);
-
+            // set BEFORE the UI is created
             _tourInfoUI.setActionsEnabled(true);
+
+            container = _tourInfoUI.createContentArea(parent, _tourData, this, this);
 
             // allow the actions to be selected
             setHideOnMouseDown(false);

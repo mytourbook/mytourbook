@@ -21,7 +21,11 @@ import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
+import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
+import net.tourbook.ui.Messages;
+import net.tourbook.ui.action.Action_ToolTip_EditPreferences;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -30,6 +34,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -38,46 +43,83 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * Slideout for the tour data editor options.
+ * Slideout for the tour info
  */
 public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
-   static final String            STATE_UI_WIDTH_SIZE_INDEX     = "STATE_UI_WIDTH_SIZE_INDEX"; //$NON-NLS-1$
+   static final String                    STATE_IS_SHOW_BODY_VALUES         = "STATE_IS_SHOW_BODY_VALUES";         //$NON-NLS-1$
+   static final String                    STATE_IS_SHOW_CUSTOM_VALUES       = "STATE_IS_SHOW_CUSTOM_VALUES";       //$NON-NLS-1$
+   static final String                    STATE_IS_SHOW_HEART_RATE_ZONES    = "STATE_IS_SHOW_HEART_RATE_ZONES";    //$NON-NLS-1$
+   static final String                    STATE_IS_SHOW_RUNNING_DYNAMICS    = "STATE_IS_SHOW_RUNNING_DYNAMICS";    //$NON-NLS-1$
+   static final String                    STATE_IS_SHOW_SENSOR_VALUES       = "STATE_IS_SHOW_SENSOR_VALUES";       //$NON-NLS-1$
+   static final String                    STATE_IS_SHOW_START_END_LOCATION  = "STATE_IS_SHOW_START_END_LOCATION";  //$NON-NLS-1$
+   static final String                    STATE_IS_SHOW_VERTICAL_SPEED      = "STATE_IS_SHOW_VERTICAL_SPEED";      //$NON-NLS-1$
+   static final String                    STATE_IS_SHOW_WEATHER_DESCRIPTION = "STATE_IS_SHOW_WEATHER_DESCRIPTION"; //$NON-NLS-1$
+   static final String                    STATE_IS_SHOW_WEATHER_VALUES      = "STATE_IS_SHOW_WEATHER_VALUES";      //$NON-NLS-1$
 
-   static final String            STATE_UI_WIDTH_SMALL          = "STATE_UI_WIDTH_SMALL";      //$NON-NLS-1$
-   static final String            STATE_UI_WIDTH_MEDIUM         = "STATE_UI_WIDTH_MEDIUM";     //$NON-NLS-1$
-   static final String            STATE_UI_WIDTH_LARGE          = "STATE_UI_WIDTH_LARGE";      //$NON-NLS-1$
-   static final int               STATE_UI_WIDTH_SMALL_DEFAULT  = 600;
-   static final int               STATE_UI_WIDTH_MEDIUM_DEFAULT = 800;
-   static final int               STATE_UI_WIDTH_LARGE_DEFAULT  = 1000;
+   static final String                    STATE_UI_WIDTH_SIZE_INDEX         = "STATE_UI_WIDTH_SIZE_INDEX";         //$NON-NLS-1$
+   static final String                    STATE_UI_WIDTH_SMALL              = "STATE_UI_WIDTH_SMALL";              //$NON-NLS-1$
+   static final String                    STATE_UI_WIDTH_MEDIUM             = "STATE_UI_WIDTH_MEDIUM";             //$NON-NLS-1$
+   static final String                    STATE_UI_WIDTH_LARGE              = "STATE_UI_WIDTH_LARGE";              //$NON-NLS-1$
+   static final int                       STATE_UI_WIDTH_SMALL_DEFAULT      = 600;
+   static final int                       STATE_UI_WIDTH_MEDIUM_DEFAULT     = 800;
+   static final int                       STATE_UI_WIDTH_LARGE_DEFAULT      = 1000;
 
-   static final int               STATE_UI_WIDTH_MIN            = 100;
-   static final int               STATE_UI_WIDTH_MAX            = 3000;
+   static final int                       STATE_UI_WIDTH_MIN                = 100;
+   static final int                       STATE_UI_WIDTH_MAX                = 3000;
 
-   private static IDialogSettings _state;
+   private static IDialogSettings         _state;
 
-   private TourInfoUI             _tourInfoUI;
+   private TourInfoUI                     _tourInfoUI;
 
-   private FocusListener          _keepOpenListener;
+   private SelectionListener              _defaultSelectionListener;
+   private FocusListener                  _keepOpenListener;
+
+   private Action_ToolTip_EditPreferences _actionPrefDialog;
+
+   private boolean                        _isInTooltip;
+   private boolean                        _isShowCustomValues;
 
    /*
     * UI controls
     */
-   private Composite _shellContainer;
+   private Composite        _shellContainer;
 
-   private Combo     _comboUIWidth_Size;
+   private Button           _chkShowBodyValues;
+   private Button           _chkShowHRZones;
+   private Button           _chkShowRunDyn;
+   private Button           _chkShowSensorValues;
+   private Button           _chkShowStartEndLocation;
+   private Button           _chkShowVerticalSpeed;
+   private Button           _chkShowWeatherDescription;
+   private Button           _chkShowWeatherValues;
 
-   private Spinner   _spinnerUIWidth_Pixel;
+   private Button           _rdoShowAllValues;
+   private Button           _rdoShowCustomValues;
+
+   private Combo            _comboUIWidth_Size;
+
+   private Label            _lblTooltipUIWidth;
+
+   private Spinner          _spinnerUIWidth_Pixel;
+   private IToolTipProvider _tourToolTipProvider;
 
    public SlideoutTourInfoOptions(final Control ownerControl,
                                   final ToolBar toolBar,
                                   final TourInfoUI tourInfoUI,
+                                  final IToolTipProvider tourToolTipProvider,
                                   final IDialogSettings state) {
 
       super(ownerControl, toolBar);
 
       _tourInfoUI = tourInfoUI;
+      _tourToolTipProvider = tourToolTipProvider;
+
       _state = state;
+
+      final boolean isUIEmbedded = _tourInfoUI.isUIEmbedded();
+      _isInTooltip = isUIEmbedded == false;
+
    }
 
    @Override
@@ -86,16 +128,29 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
       setIsAnotherDialogOpened(isDialogOpened);
    }
 
+   private void createActions() {
+
+      _actionPrefDialog = new Action_ToolTip_EditPreferences(_tourToolTipProvider,
+            Messages.Tour_Tooltip_Action_EditFormatPreferences,
+            PrefPageAppearanceDisplayFormat.ID,
+            Integer.valueOf(0) // selected tab folder
+      );
+   }
+
    @Override
    protected Composite createToolTipContentArea(final Composite parent) {
 
       initUI();
+
+      createActions();
 
       final Composite ui = createUI(parent);
 
       fillUI();
 
       restoreState();
+
+      enableControls();
 
       return ui;
    }
@@ -119,66 +174,207 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
 
    private void createUI_10_Title(final Composite parent) {
 
+      final int numSpanColumns = _isInTooltip
+
+            // show a 2nd column for the action
+            ? 1
+
+            : 2;
+
       /*
        * Label: Slideout title
        */
       final Label label = new Label(parent, SWT.NONE);
       label.setText("Tour Info Options");
-//      label.setFont(JFaceResources.getBannerFont());
-      GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
-
       MTFont.setBannerFont(label);
+      GridDataFactory.fillDefaults().span(numSpanColumns, 1).applyTo(label);
+
+      if (_isInTooltip) {
+
+         // Edit Value &Formats...
+         final ToolBar toolbar = UI.createToolbarAction(parent, _actionPrefDialog);
+
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .align(SWT.END, SWT.FILL)
+               .applyTo(toolbar);
+
+      }
    }
 
    private void createUI_20_Options(final Composite parent) {
 
+      final GridDataFactory gdSpan2 = GridDataFactory.fillDefaults().span(2, 1);
+
+      {
+         /*
+          * Show all values
+          */
+         _rdoShowAllValues = new Button(parent, SWT.RADIO);
+         _rdoShowAllValues.setText("Show &all values");
+         _rdoShowAllValues.addSelectionListener(_defaultSelectionListener);
+         gdSpan2.applyTo(_rdoShowAllValues);
+      }
+      {
+         /*
+          * Show custom values
+          */
+         _rdoShowCustomValues = new Button(parent, SWT.RADIO);
+         _rdoShowCustomValues.setText("&Customize values");
+         _rdoShowCustomValues.addSelectionListener(_defaultSelectionListener);
+         gdSpan2.applyTo(_rdoShowCustomValues);
+      }
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .span(2, 1)
+            .indent(16, 0)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         {
+            /*
+             * Show body values
+             */
+            _chkShowBodyValues = new Button(container, SWT.CHECK);
+            _chkShowBodyValues.setText("Show &body values");
+            _chkShowBodyValues.addSelectionListener(_defaultSelectionListener);
+            gdSpan2.applyTo(_chkShowBodyValues);
+         }
+         {
+            /*
+             * Show heartrate zones
+             */
+            _chkShowHRZones = new Button(container, SWT.CHECK);
+            _chkShowHRZones.setText("Show &heartrate zones");
+            _chkShowHRZones.addSelectionListener(_defaultSelectionListener);
+            gdSpan2.applyTo(_chkShowHRZones);
+         }
+         {
+            /*
+             * Show running dynamics
+             */
+            _chkShowRunDyn = new Button(container, SWT.CHECK);
+            _chkShowRunDyn.setText("Show &running dynamics");
+            _chkShowRunDyn.addSelectionListener(_defaultSelectionListener);
+            gdSpan2.applyTo(_chkShowRunDyn);
+         }
+         {
+            /*
+             * Show vertical speed
+             */
+            _chkShowVerticalSpeed = new Button(container, SWT.CHECK);
+            _chkShowVerticalSpeed.setText("Show &vertial speed");
+            _chkShowVerticalSpeed.addSelectionListener(_defaultSelectionListener);
+            gdSpan2.applyTo(_chkShowVerticalSpeed);
+         }
+         {
+            /*
+             * Show sensor values
+             */
+            _chkShowSensorValues = new Button(container, SWT.CHECK);
+            _chkShowSensorValues.setText("Show sens&or values");
+            _chkShowSensorValues.addSelectionListener(_defaultSelectionListener);
+            gdSpan2.applyTo(_chkShowSensorValues);
+         }
+         {
+            /*
+             * Show weather values
+             */
+            _chkShowWeatherValues = new Button(container, SWT.CHECK);
+            _chkShowWeatherValues.setText("Show wea&ther values");
+            _chkShowWeatherValues.addSelectionListener(_defaultSelectionListener);
+            gdSpan2.applyTo(_chkShowWeatherValues);
+         }
+         {
+            /*
+             * Show weather description
+             */
+            _chkShowWeatherDescription = new Button(container, SWT.CHECK);
+            _chkShowWeatherDescription.setText("Show w&eather description");
+            _chkShowWeatherDescription.addSelectionListener(_defaultSelectionListener);
+            gdSpan2.applyTo(_chkShowWeatherDescription);
+         }
+         {
+            /*
+             * Show start/end location
+             */
+            _chkShowStartEndLocation = new Button(container, SWT.CHECK);
+            _chkShowStartEndLocation.setText("Show &start/end location");
+            _chkShowStartEndLocation.addSelectionListener(_defaultSelectionListener);
+            gdSpan2.applyTo(_chkShowStartEndLocation);
+         }
+      }
       {
          /*
           * Tooltip UI width
           */
-         final Label label = new Label(parent, SWT.NONE);
-         label.setText("Tooltip &width");
-         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-      }
-      {
-         final Composite widthContainer = new Composite(parent, SWT.NONE);
-         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(widthContainer);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(widthContainer);
          {
+            _lblTooltipUIWidth = new Label(parent, SWT.NONE);
+            _lblTooltipUIWidth.setText("Tooltip &width");
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblTooltipUIWidth);
+         }
+         {
+            final Composite widthContainer = new Composite(parent, SWT.NONE);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(widthContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(widthContainer);
             {
-               // Combo: Mouse wheel incrementer
-               _comboUIWidth_Size = new Combo(widthContainer, SWT.READ_ONLY | SWT.BORDER);
-               _comboUIWidth_Size.setVisibleItemCount(10);
-               _comboUIWidth_Size.setToolTipText(net.tourbook.ui.Messages.Tour_Tooltip_Combo_UIWidthSize_Tooltip);
-               _comboUIWidth_Size.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_UIWidth_1_Size()));
-               _comboUIWidth_Size.addFocusListener(_keepOpenListener);
+               {
+                  /*
+                   * Text width in pixel
+                   */
+                  _spinnerUIWidth_Pixel = new Spinner(widthContainer, SWT.BORDER);
+                  _spinnerUIWidth_Pixel.setMinimum(STATE_UI_WIDTH_MIN);
+                  _spinnerUIWidth_Pixel.setMaximum(STATE_UI_WIDTH_MAX);
+                  _spinnerUIWidth_Pixel.setIncrement(10);
+                  _spinnerUIWidth_Pixel.setPageIncrement(50);
+                  _spinnerUIWidth_Pixel.setToolTipText(net.tourbook.ui.Messages.Tour_Tooltip_Spinner_TextWidth_Tooltip);
 
-               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboUIWidth_Size);
-            }
-            {
-               /*
-                * Text width in pixel
-                */
-               _spinnerUIWidth_Pixel = new Spinner(widthContainer, SWT.BORDER);
-               _spinnerUIWidth_Pixel.setMinimum(STATE_UI_WIDTH_MIN);
-               _spinnerUIWidth_Pixel.setMaximum(STATE_UI_WIDTH_MAX);
-               _spinnerUIWidth_Pixel.setIncrement(10);
-               _spinnerUIWidth_Pixel.setPageIncrement(50);
-               _spinnerUIWidth_Pixel.setToolTipText(net.tourbook.ui.Messages.Tour_Tooltip_Spinner_TextWidth_Tooltip);
+                  _spinnerUIWidth_Pixel.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                        selectionEvent -> onSelect_UIWidth_2_Value()));
 
-               _spinnerUIWidth_Pixel.addSelectionListener(SelectionListener.widgetSelectedAdapter(
-                     selectionEvent -> onSelect_UIWidth_2_Value()));
+                  _spinnerUIWidth_Pixel.addMouseWheelListener(mouseEvent -> {
 
-               _spinnerUIWidth_Pixel.addMouseWheelListener(mouseEvent -> {
+                     UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+                     onSelect_UIWidth_2_Value();
+                  });
 
-                  UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
-                  onSelect_UIWidth_2_Value();
-               });
+                  GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerUIWidth_Pixel);
+               }
+               {
+                  // Combo: Mouse wheel incrementer
+                  _comboUIWidth_Size = new Combo(widthContainer, SWT.READ_ONLY | SWT.BORDER);
+                  _comboUIWidth_Size.setVisibleItemCount(10);
+                  _comboUIWidth_Size.setToolTipText(net.tourbook.ui.Messages.Tour_Tooltip_Combo_UIWidthSize_Tooltip);
+                  _comboUIWidth_Size.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_UIWidth_1_Size()));
+                  _comboUIWidth_Size.addFocusListener(_keepOpenListener);
 
-               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerUIWidth_Pixel);
+                  GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_comboUIWidth_Size);
+               }
             }
          }
       }
+   }
+
+   private void enableControls() {
+
+// SET_FORMATTING_OFF
+
+      _chkShowBodyValues         .setEnabled(_isShowCustomValues);
+      _chkShowHRZones            .setEnabled(_isShowCustomValues);
+      _chkShowRunDyn             .setEnabled(_isShowCustomValues);
+      _chkShowSensorValues       .setEnabled(_isShowCustomValues);
+      _chkShowStartEndLocation   .setEnabled(_isShowCustomValues);
+      _chkShowVerticalSpeed      .setEnabled(_isShowCustomValues);
+      _chkShowWeatherDescription .setEnabled(_isShowCustomValues);
+      _chkShowWeatherValues      .setEnabled(_isShowCustomValues);
+
+      _lblTooltipUIWidth         .setEnabled(_isInTooltip);
+      _comboUIWidth_Size         .setEnabled(_isInTooltip);
+      _spinnerUIWidth_Pixel      .setEnabled(_isInTooltip);
+
+// SET_FORMATTING_ON
    }
 
    private void fillUI() {
@@ -202,6 +398,8 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
 
    private void initUI() {
 
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModified());
+
       _keepOpenListener = new FocusListener() {
 
          @Override
@@ -218,10 +416,16 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
       };
    }
 
-   @Override
-   protected boolean isCenterHorizontal() {
+   private void onModified() {
 
-      return true;
+      _isShowCustomValues = _rdoShowCustomValues.getSelection();
+
+      saveState();
+
+      enableControls();
+
+      _tourInfoUI.restoreState_UIOptions();
+      _tourInfoUI.updateUI_FromUIOptions();
    }
 
    private void onSelect_UIWidth_1_Size() {
@@ -246,7 +450,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
       // update UI
       _spinnerUIWidth_Pixel.setSelection(uiWidth_Pixel);
 
-      _tourInfoUI.updateUI_UIWidth();
+      _tourInfoUI.updateUI_FromUIOptions();
    }
 
    private void onSelect_UIWidth_2_Value() {
@@ -265,24 +469,65 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
       _tourInfoUI.setUIWidth_Pixel(uiWidth_Pixel);
 
       // update UI
-      _tourInfoUI.updateUI_UIWidth();
+      _tourInfoUI.updateUI_FromUIOptions();
    }
 
    @Override
-   public void resetToDefaults() {
-
-   }
+   public void resetToDefaults() {}
 
    private void restoreState() {
 
-      final int uiWidth_SizeIndex = Util.getStateInt(_state, SlideoutTourInfoOptions.STATE_UI_WIDTH_SIZE_INDEX, 0);
+// SET_FORMATTING_OFF
 
-      if (_spinnerUIWidth_Pixel != null && _spinnerUIWidth_Pixel.isDisposed() == false) {
+      _isShowCustomValues                    = Util.getStateBoolean(_state, STATE_IS_SHOW_CUSTOM_VALUES,          true);
 
-         _spinnerUIWidth_Pixel.setSelection(_tourInfoUI.getUIWidth_Pixel());
+      final boolean isShowBodyValues         = Util.getStateBoolean(_state, STATE_IS_SHOW_BODY_VALUES,            true);
+      final boolean isShowHRZones            = Util.getStateBoolean(_state, STATE_IS_SHOW_HEART_RATE_ZONES,       true);
+      final boolean isShowRunDyn             = Util.getStateBoolean(_state, STATE_IS_SHOW_RUNNING_DYNAMICS,       true);
+      final boolean isShowSensorValues       = Util.getStateBoolean(_state, STATE_IS_SHOW_SENSOR_VALUES,          true);
+      final boolean isShowStartEndLocation   = Util.getStateBoolean(_state, STATE_IS_SHOW_START_END_LOCATION,     true);
+      final boolean isShowVerticalSpeed      = Util.getStateBoolean(_state, STATE_IS_SHOW_VERTICAL_SPEED,         true);
+      final boolean isShowWeatherDescription = Util.getStateBoolean(_state, STATE_IS_SHOW_WEATHER_DESCRIPTION,    true);
+      final boolean isShowWeatherValues      = Util.getStateBoolean(_state, STATE_IS_SHOW_WEATHER_VALUES,         true);
 
-         _comboUIWidth_Size.select(uiWidth_SizeIndex);
-      }
+      final int uiWidth_SizeIndex            = Util.getStateInt(_state, SlideoutTourInfoOptions.STATE_UI_WIDTH_SIZE_INDEX, 0);
+
+      _chkShowBodyValues         .setSelection(isShowBodyValues);
+      _chkShowHRZones            .setSelection(isShowHRZones);
+      _chkShowRunDyn             .setSelection(isShowRunDyn);
+      _chkShowSensorValues       .setSelection(isShowSensorValues);
+      _chkShowStartEndLocation   .setSelection(isShowStartEndLocation);
+      _chkShowVerticalSpeed      .setSelection(isShowVerticalSpeed);
+      _chkShowWeatherDescription .setSelection(isShowWeatherDescription);
+      _chkShowWeatherValues      .setSelection(isShowWeatherValues);
+
+      _rdoShowAllValues          .setSelection(_isShowCustomValues == false);
+      _rdoShowCustomValues       .setSelection(_isShowCustomValues);
+
+      _spinnerUIWidth_Pixel      .setSelection(_tourInfoUI.getUIWidth_Pixel());
+
+      _comboUIWidth_Size         .select(uiWidth_SizeIndex);
+
+// SET_FORMATTING_ON
+
    }
 
+   private void saveState() {
+
+// SET_FORMATTING_OFF
+
+      _state.put(STATE_IS_SHOW_CUSTOM_VALUES,         _rdoShowCustomValues       .getSelection());
+
+      _state.put(STATE_IS_SHOW_BODY_VALUES,           _chkShowBodyValues         .getSelection());
+      _state.put(STATE_IS_SHOW_HEART_RATE_ZONES,      _chkShowHRZones            .getSelection());
+      _state.put(STATE_IS_SHOW_RUNNING_DYNAMICS,      _chkShowRunDyn             .getSelection());
+      _state.put(STATE_IS_SHOW_SENSOR_VALUES,         _chkShowSensorValues       .getSelection());
+      _state.put(STATE_IS_SHOW_START_END_LOCATION,    _chkShowStartEndLocation   .getSelection());
+      _state.put(STATE_IS_SHOW_VERTICAL_SPEED,        _chkShowVerticalSpeed      .getSelection());
+      _state.put(STATE_IS_SHOW_WEATHER_DESCRIPTION,   _chkShowWeatherDescription .getSelection());
+      _state.put(STATE_IS_SHOW_WEATHER_VALUES,        _chkShowWeatherValues      .getSelection());
+
+// SET_FORMATTING_ON
+
+   }
 }
