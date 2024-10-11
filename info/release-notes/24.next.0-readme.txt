@@ -49,6 +49,10 @@ Experimental
 New
 ===
 
+* Tour Info Tooltip
+  - Customize content
+    https://github.com/mytourbook/mytourbook/issues/1411
+
 * Tour Tag Groups
   - Define a group with tags
   - Set all tags from a group into a tour
