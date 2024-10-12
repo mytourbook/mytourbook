@@ -2000,6 +2000,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    @Override
    protected Point onResize(final int contentWidth, final int contentHeight) {
 
+      if (_tabContainer.isDisposed()) {
+         return null;
+      }
+
       final int newContentWidth = contentWidth;
       int newContentHeight = contentHeight;
 
