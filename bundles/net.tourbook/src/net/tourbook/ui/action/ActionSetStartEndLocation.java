@@ -32,6 +32,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
+import net.tourbook.tour.location.DialogStartEndLocation;
 import net.tourbook.tour.location.LocationPartID;
 import net.tourbook.tour.location.PartItem;
 import net.tourbook.tour.location.SlideoutStartEndLocationProfiles;
@@ -105,6 +106,7 @@ public class ActionSetStartEndLocation extends SubMenu {
    private Action                           _actionProfileTitle_All;
    private Action                           _actionProfileTitle_Start;
    private Action                           _actionProfileTitle_End;
+   private Action                           _actionSetLocation_WithoutGeoPosition;
    private ActionEditProfiles               _actionEditProfiles;
    private ActionLocationPart_Append_All    _actionLocationPart_Append_All;
    private ActionLocationPart_Append_Start  _actionLocationPart_Append_Start;
@@ -504,7 +506,7 @@ public class ActionSetStartEndLocation extends SubMenu {
       @Override
       public void run() {
 
-         actionSetTourLocation(_locationProfile, _isSetStartLocation, _isSetEndLocation);
+         actionSetLocation(_locationProfile, _isSetStartLocation, _isSetEndLocation);
       }
    }
 
@@ -555,6 +557,22 @@ public class ActionSetStartEndLocation extends SubMenu {
 
             fillMenu_AddAll_ProfileActions(menu, allProfiles, true, false);
          }
+      }
+   }
+
+   private class ActionSetLocation_WithoutGeoPosition extends Action {
+
+      public ActionSetLocation_WithoutGeoPosition() {
+
+         super("Set Location Name without &Geo Position", AS_PUSH_BUTTON);
+
+         setToolTipText("This will set only the tour location name and not a reference to a geo position");
+      }
+
+      @Override
+      public void run() {
+
+         new DialogStartEndLocation(_allSelectedTours).open();
       }
    }
 
@@ -725,9 +743,9 @@ public class ActionSetStartEndLocation extends SubMenu {
             isCompleteRemoval);
    }
 
-   private void actionSetTourLocation(final TourLocationProfile locationProfile,
-                                      final boolean isSetStartLocation,
-                                      final boolean isSetEndLocation) {
+   private void actionSetLocation(final TourLocationProfile locationProfile,
+                                  final boolean isSetStartLocation,
+                                  final boolean isSetEndLocation) {
 
       TourLocationManager.setTourLocations(
 
@@ -765,6 +783,7 @@ public class ActionSetStartEndLocation extends SubMenu {
       _actionRemoveLocation_End              = new ActionRemoveLocation_End(false);
       _actionSetLocation_Start               = new ActionSetLocation_Start();
       _actionSetLocation_End                 = new ActionSetLocation_End();
+      _actionSetLocation_WithoutGeoPosition  = new ActionSetLocation_WithoutGeoPosition();
 
       // create dummy actions for the part/profile title
       _actionPartTitle_Append_All            = new Action(Messages.Tour_Location_Action_PartTitle_Append_All) {};
@@ -810,6 +829,10 @@ public class ActionSetStartEndLocation extends SubMenu {
       addActionToMenu(_actionLocationPart_Append_Start);
       addActionToMenu(_actionLocationPart_Append_End);
       addActionToMenu(_actionLocationPart_Append_All);
+
+      addSeparatorToMenu();
+
+      addActionToMenu(_actionSetLocation_WithoutGeoPosition);
 
       addSeparatorToMenu();
 

@@ -2218,10 +2218,92 @@ public class TourLocationManager {
    }
 
    /**
+    * @param allRequestedTours
+    * @param startLocation
+    * @param endLocation
+    * @param isRemoveLocationAssoc_Start
+    * @param isRemoveLocationAssoc_End
+    */
+   public static void setTourLocations(final List<TourData> allRequestedTours,
+                                       final String startLocation,
+                                       final String endLocation,
+                                       final boolean isRemoveLocationAssoc_Start,
+                                       final boolean isRemoveLocationAssoc_End) {
+
+      // TODO Auto-generated method stub
+
+      final ArrayList<TourData> savedTours = new ArrayList<>();
+
+      try {
+
+         final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+
+            @Override
+            public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+               final int numTours = allRequestedTours.size();
+               int numWorked = 0;
+
+               monitor.beginTask("Setting and saving %d tour location names".formatted(numTours), numTours);
+
+               for (final TourData tourData : allRequestedTours) {
+
+                  if (monitor.isCanceled()) {
+                     break;
+                  }
+
+                  if (startLocation != null) {
+
+                     tourData.setTourStartPlace(startLocation);
+                  }
+
+                  if (endLocation != null) {
+
+                     tourData.setTourEndPlace(endLocation);
+                  }
+
+                  if (isRemoveLocationAssoc_Start) {
+
+                     tourData.setTourLocationStart(null);
+                  }
+
+                  if (isRemoveLocationAssoc_End) {
+
+                     tourData.setTourLocationEnd(null);
+                  }
+
+                  TourManager.saveModifiedTour(tourData, false);
+
+                  savedTours.add(tourData);
+
+                  monitor.worked(1);
+                  monitor.subTask(SUB_TASK_NTH_OF_ALL.formatted(++numWorked, numTours));
+               }
+            }
+         };
+
+         new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, runnable);
+
+      } catch (final InvocationTargetException | InterruptedException e) {
+
+         StatusUtil.showStatus(e);
+         Thread.currentThread().interrupt();
+      }
+
+      if (savedTours.size() > 0) {
+
+         final TourEvent tourEvent = new TourEvent(savedTours);
+
+         // this must be fired in the UI thread
+         TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent);
+      }
+   }
+
+   /**
     * Set tour locations for the requested tours, when not available, then download and save tour
     * locations
     *
-    * @param requestedTours
+    * @param allRequestedTours
     * @param locationProfile
     * @param isSetStartLocation
     * @param isSetEndLocation
@@ -2231,7 +2313,7 @@ public class TourLocationManager {
     * @param oneActionLocation
     * @param isLogLocation
     */
-   public static void setTourLocations(final List<TourData> requestedTours,
+   public static void setTourLocations(final List<TourData> allRequestedTours,
                                        final TourLocationProfile locationProfile,
 
                                        final boolean isSetStartLocation,
@@ -2254,7 +2336,7 @@ public class TourLocationManager {
             @Override
             public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-               final int numTours = requestedTours.size();
+               final int numTours = allRequestedTours.size();
                final int numRequests = numTours * (isSetStartLocation && isSetEndLocation ? 2 : 1);
                int numWorked = 0;
 
@@ -2264,7 +2346,7 @@ public class TourLocationManager {
 
                monitor.beginTask(taskMessage.formatted(numRequests), numRequests);
 
-               for (final TourData tourData : requestedTours) {
+               for (final TourData tourData : allRequestedTours) {
 
                   if (monitor.isCanceled()) {
                      break;

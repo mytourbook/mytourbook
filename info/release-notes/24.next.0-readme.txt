@@ -69,7 +69,9 @@ Improvements
 * Tour Book View
   - Added column for tour description, the displayed text has been shortened to 100 characters
    
-
+* Tour Location
+  - Set start/end location names which has no geo positions
+    https://github.com/mytourbook/mytourbook/issues/1413
 
 Changes
 =======
