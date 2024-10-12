@@ -177,6 +177,7 @@ public class TourLocationToolTip extends ToolTip {
       {
          _ttContainer = new Composite(shellContainer, SWT.NONE);
          GridLayoutFactory.fillDefaults().margins(SHELL_MARGIN, SHELL_MARGIN).applyTo(_ttContainer);
+//         _ttContainer.setBackground(UI.SYS_COLOR_YELLOW);
          {
             createUI_10_Info(_ttContainer);
          }
@@ -199,7 +200,7 @@ public class TourLocationToolTip extends ToolTip {
             .span(2, 1)
 
             // indent to the left that this text is aligned with the labels
-            .indent(-4, 0);
+            .indent(UI.IS_4K_DISPLAY ? -2 : -4, 0);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
