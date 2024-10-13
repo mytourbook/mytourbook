@@ -65,6 +65,8 @@ public class DialogStartEndLocation extends Dialog {
    private AutocompleteComboInput _autocomplete_Location_Start;
    private AutocompleteComboInput _autocomplete_Location_End;
 
+   private boolean                _isInRestore;
+
    /*
     * UI controls
     */
@@ -313,6 +315,10 @@ public class DialogStartEndLocation extends Dialog {
 
    private void onModify() {
 
+      if (_isInRestore) {
+         return;
+      }
+
       enableControls();
    }
 
@@ -332,6 +338,8 @@ public class DialogStartEndLocation extends Dialog {
       _autocomplete_Location_End    .restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END);
 
 // SET_FORMATTING_ON
+
+      setupLocationNames();
 
       // set focus to the first enabled field
       if (isLocationEnabeled_Start) {
@@ -357,5 +365,67 @@ public class DialogStartEndLocation extends Dialog {
       _autocomplete_Location_End    .saveState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END);
 
 // SET_FORMATTING_ON
+   }
+
+   /**
+    * Set location content
+    */
+   private void setupLocationNames() {
+
+      _isInRestore = true;
+
+      String commonTourStartPlace = null;
+      String commonTourEndPlace = null;
+
+      boolean isCommonStart = true;
+      boolean isCommonEnd = true;
+
+      for (final TourData tourData : _allSelectedTours) {
+
+         final String tourStartPlace = tourData.getTourStartPlace().trim();
+         final String tourEndPlace = tourData.getTourEndPlace().trim();
+
+         if (isCommonStart && tourStartPlace.length() > 0) {
+
+            if (commonTourStartPlace == null) {
+
+               commonTourStartPlace = tourStartPlace;
+
+            } else {
+
+               if (commonTourStartPlace.equals(tourStartPlace) == false) {
+
+                  isCommonStart = false;
+               }
+            }
+         }
+
+         if (isCommonEnd && tourEndPlace.length() > 0) {
+
+            if (commonTourEndPlace == null) {
+
+               commonTourEndPlace = tourEndPlace;
+
+            } else {
+
+               if (commonTourEndPlace.equals(tourEndPlace) == false) {
+
+                  isCommonEnd = false;
+               }
+            }
+         }
+      }
+
+      if (isCommonStart && commonTourStartPlace != null) {
+
+         _comboLocation_Start.setText(commonTourStartPlace);
+      }
+
+      if (isCommonEnd && commonTourEndPlace != null) {
+
+         _comboLocation_End.setText(commonTourEndPlace);
+      }
+
+      _isInRestore = false;
    }
 }
