@@ -35,7 +35,7 @@ public class TourBlogViewTests extends UITest {
    private void changeTagName(final String currentTagName, final String newTagName) {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("Tagging").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem("Tag").select(); //$NON-NLS-1$
 
       final SWTBotTreeItem existingTag = bot.tree(1).getTreeItem(currentTagName).select();
       assertNotNull(existingTag);
