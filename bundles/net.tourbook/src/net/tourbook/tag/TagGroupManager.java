@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -60,6 +61,7 @@ public class TagGroupManager {
    private static final String         TAG_ROOT            = "TagGroups";                            //$NON-NLS-1$
    private static final String         TAG_TAG_GROUP       = "TagGroup";                             //$NON-NLS-1$
    //
+   private static final String         ATTR_ID             = "ID";                                   //$NON-NLS-1$
    private static final String         ATTR_NAME           = "name";                                 //$NON-NLS-1$
    private static final String         ATTR_TAG_IDS        = "tagIDs";                               //$NON-NLS-1$
    //
@@ -112,11 +114,12 @@ public class TagGroupManager {
    }
 
    /**
-    * @return Returns a copy of all {@link TagGroup}'s sorted by name.
+    * @return Returns a copied list of all {@link TagGroup}'s sorted by name.
     */
    public static List<TagGroup> getTagGroupsSorted() {
 
       if (_allTagGroupsSorted != null) {
+
          return _allTagGroupsSorted;
       }
 
@@ -169,6 +172,7 @@ public class TagGroupManager {
 
       final TagGroup tagGroup = new TagGroup();
 
+      tagGroup.id = Util.getXmlString(xmlGroup, ATTR_ID, UUID.randomUUID().toString());
       tagGroup.name = Util.getXmlString(xmlGroup, ATTR_NAME, null);
 
       final long[] tagIds = Util.getXmlLongArray(xmlGroup, ATTR_TAG_IDS);
@@ -268,7 +272,9 @@ public class TagGroupManager {
                }
             }
 
+            xmlTagGroup.putString(ATTR_ID, tagGroup.id);
             xmlTagGroup.putString(ATTR_NAME, tagGroup.name);
+
             Util.setXmlLongArray(xmlTagGroup, ATTR_TAG_IDS, allTagIDs.toArray());
          }
       }

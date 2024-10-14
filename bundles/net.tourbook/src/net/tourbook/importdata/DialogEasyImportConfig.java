@@ -18,6 +18,7 @@ package net.tourbook.importdata;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -42,6 +43,8 @@ import net.tourbook.common.widgets.ComboEnumEntry;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.TagGroup;
+import net.tourbook.tag.TagGroupManager;
 import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.location.TourLocationManager;
@@ -245,6 +248,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Button               _chkIL_RetrieveWeatherData;
    private Button               _chkIL_SaveTour;
    private Button               _chkIL_SetLastMarker;
+   private Button               _chkIL_SetTourTagGroup;
    private Button               _chkIL_SetTourType;
    private Button               _chkIL_ShowInDashboard;
    //
@@ -269,6 +273,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Combo                _comboIC_DeviceType;
    private Combo                _comboIL_TourType;
    private Combo                _comboIL_TourLocationProfiles;
+   private Combo                _comboIL_TourTagGroups;
    private ComboViewerCadence   _comboIL_One_TourType_Cadence;
    private ComboViewerCadence[] _comboTT_Cadence;
    //
@@ -291,6 +296,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Label                _lblIL_TemperatureAdjustmentDuration;
    private Label                _lblIL_TemperatureAdjustmentDuration_Unit;
    private Label                _lblIL_TourLocationProfiles;
+   private Label                _lblIL_TourTagGroup;
    private Label[]              _lblTT_Speed_SpeedUnit;
    private Label[]              _lblTT_Speed_TourTypeIcon;
    //
@@ -1778,6 +1784,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          createUI_600_IL_05_AdjustTemperature(group);
          createUI_600_IL_06_AdjustElevation(group);
          createUI_600_IL_07_SetElevationFromSRTM(group);
+         createUI_600_IL_08_SetTourTagGroup(group);
          createUI_600_IL_50_RetrieveWeatherData(group);
          createUI_600_IL_51_RetrieveTourLocations(group);
          createUI_600_IL_99_Save(group);
@@ -2009,7 +2016,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _speedTourType_Container = createUI_568_IL_SpeedTourType_ScrolledContainer(_speedTourType_OuterContainer);
 
       /*
-       * fields
+       * Fields
        */
       _actionTTSpeed_Delete = new ActionSpeedTourType_Delete[speedTTSize];
       _lblTT_Speed_TourTypeIcon = new Label[speedTTSize];
@@ -2325,6 +2332,36 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             .span(2, 1)
             .indent(0, 5)
             .applyTo(_chkIL_ReplaceElevationFromSRTM);
+   }
+
+   private void createUI_600_IL_08_SetTourTagGroup(final Composite parent) {
+
+      {
+         _chkIL_SetTourTagGroup = new Button(parent, SWT.CHECK);
+         _chkIL_SetTourTagGroup.setText("8. Set tour tags from a &group");
+         _chkIL_SetTourTagGroup.setToolTipText("All tags in this group are set into the tour");
+         _chkIL_SetTourTagGroup.addSelectionListener(_defaultModify_Listener);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .indent(0, 5)
+               .applyTo(_chkIL_SetTourTagGroup);
+      }
+
+      {
+         _lblIL_TourTagGroup = new Label(parent, SWT.NONE);
+         _lblIL_TourTagGroup.setText("Tag grou&p");
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .indent(_leftPadding, 0)
+               .applyTo(_lblIL_TourTagGroup);
+
+         _comboIL_TourTagGroups = new Combo(parent, SWT.READ_ONLY);
+         _comboIL_TourTagGroups.addSelectionListener(_defaultModify_Listener);
+         GridDataFactory.fillDefaults()
+               .align(SWT.BEGINNING, SWT.FILL)
+               .hint(_pc.convertWidthInCharsToPixels(30), SWT.DEFAULT)
+               .applyTo(_comboIL_TourTagGroups);
+      }
    }
 
    private void createUI_600_IL_50_RetrieveWeatherData(final Composite parent) {
@@ -3106,6 +3143,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          showTourTypePage(null);
       }
 
+      final boolean hasTagGroups = TagGroupManager.getTagGroups().size() > 0;
+      final boolean isSetTourTagGroup = hasTagGroups && _chkIL_SetTourTagGroup.getSelection();
+
 // SET_FORMATTING_OFF
 
       _btnIL_Duplicate              .setEnabled(isILSelected);
@@ -3114,6 +3154,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _chkIL_SetLastMarker          .setEnabled(isILSelected);
       _chkIL_SaveTour               .setEnabled(isILSelected);
       _chkIL_ShowInDashboard        .setEnabled(isILSelected);
+      _chkIL_SetTourTagGroup        .setEnabled(isILSelected);
       _chkIL_SetTourType            .setEnabled(isILSelected);
 
       _comboIL_TourType             .setEnabled(isILSelected && isSetTourType);
@@ -3145,6 +3186,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       // set tour location
       _lblIL_TourLocationProfiles   .setEnabled(isSetTourLocation);
       _comboIL_TourLocationProfiles .setEnabled(isSetTourLocation);
+
+      // tag group
+      _chkIL_SetTourTagGroup        .setEnabled(isILSelected && hasTagGroups);
+      _comboIL_TourTagGroups        .setEnabled(isILSelected && isSetTourTagGroup);
+      _lblIL_TourTagGroup           .setEnabled(isILSelected && isSetTourTagGroup);
 
       _ilViewer.getTable()          .setEnabled(isLauncherAvailable);
 
@@ -3234,6 +3280,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       for (final TourLocationProfile profile : TourLocationManager.getProfiles()) {
          _comboIL_TourLocationProfiles.add(profile.getName());
       }
+
+      // tag groups
+      for (final TagGroup tagGroup : TagGroupManager.getTagGroupsSorted()) {
+         _comboIL_TourTagGroups.add(tagGroup.name);
+      }
    }
 
    @Override
@@ -3283,6 +3334,20 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       return TourLocationManager.getDefaultProfile();
    }
 
+   private String getSelectedTourTagGroup() {
+
+      final int selectedLocationIndex = _comboIL_TourTagGroups.getSelectionIndex();
+
+      if (selectedLocationIndex >= 0) {
+
+         final TagGroup tagGroup = TagGroupManager.getTagGroupsSorted().get(selectedLocationIndex);
+
+         return tagGroup.id;
+      }
+
+      return null;
+   }
+
    /**
     * @return Returns the selected tour type configuration or <code>null</code> when a tour type
     *         will not be set.
@@ -3306,6 +3371,22 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
 
       return null;
+   }
+
+   private int getTourTagGroupIndex(final String tourTagGroupID) {
+
+      final List<TagGroup> tagGroupsSorted = TagGroupManager.getTagGroupsSorted();
+
+      for (int groupIndex = 0; groupIndex < tagGroupsSorted.size(); groupIndex++) {
+
+         final TagGroup tagGroup = tagGroupsSorted.get(groupIndex);
+
+         if (tagGroup.id.equals(tourTagGroupID)) {
+            return groupIndex;
+         }
+      }
+
+      return -1;
    }
 
    private int getTourTypeConfigIndex(final Enum<TourTypeConfig> tourTypeConfig) {
@@ -3700,6 +3781,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _selectedIL.isAdjustTemperature                 = _chkIL_AdjustTemperature.getSelection();
       _selectedIL.temperatureAdjustmentDuration       = _spinnerIL_TemperatureAdjustmentDuration.getSelection();
       _selectedIL.tourAvgTemperature                  = UI.convertTemperatureToMetric(_spinnerIL_AvgTemperature.getSelection());
+
+      _selectedIL.isSetTourTagGroup                   = _chkIL_SetTourTagGroup.getSelection();
+      _selectedIL.tourTagGroupID                      = getSelectedTourTagGroup();
 
       _selectedIL.isReplaceFirstTimeSliceElevation    = _chkIL_ReplaceFirstTimeSliceElevation.getSelection();
       _selectedIL.isRetrieveTourLocation              = _chkIL_RetrieveTourLocation.getSelection();
@@ -4463,13 +4547,27 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _chkIL_RetrieveTourLocation.setSelection(_selectedIL.isRetrieveTourLocation);
          _comboIL_TourLocationProfiles.select(TourLocationManager.getProfileIndex(_selectedIL.tourLocationProfile));
 
+         // set tour type
          final Enum<TourTypeConfig> tourTypeConfig = _selectedIL.tourTypeConfig;
          final boolean isSetTourType = tourTypeConfig != null && _selectedIL.isSetTourType;
 
-         // Set tour type
          _chkIL_SetTourType.setSelection(isSetTourType);
          if (isSetTourType) {
             _comboIL_TourType.select(getTourTypeConfigIndex(tourTypeConfig));
+         }
+
+         // set tour tag group
+         final String tourTagGroupID = _selectedIL.tourTagGroupID;
+         final boolean isSetTourTagGroup = tourTagGroupID != null && _selectedIL.isSetTourTagGroup;
+         _chkIL_SetTourTagGroup.setSelection(isSetTourTagGroup);
+         if (isSetTourTagGroup) {
+
+            final int tourTagGroupIndex = getTourTagGroupIndex(tourTagGroupID);
+
+            if (tourTagGroupIndex != -1) {
+
+               _comboIL_TourTagGroups.select(tourTagGroupIndex);
+            }
          }
 
          /*

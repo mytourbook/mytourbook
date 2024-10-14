@@ -18,26 +18,21 @@ package net.tourbook.tag;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.UUID;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TourTag;
 
 public class TagGroup {
 
-   private static final char          NL             = UI.NEW_LINE;
+   private static final char NL       = UI.NEW_LINE;
 
-   private static final AtomicInteger _createCounter = new AtomicInteger();
+   public String             id       = UUID.randomUUID().toString();
 
-   private int                        _createId;
+   public String             name;
+   public Set<TourTag>       tourTags = new HashSet<>();
 
-   public String                      name;
-   public Set<TourTag>                tourTags       = new HashSet<>();
-
-   public TagGroup() {
-
-      _createId = _createCounter.incrementAndGet();
-   }
+   public TagGroup() {}
 
    @Override
    public boolean equals(final Object obj) {
@@ -56,13 +51,13 @@ public class TagGroup {
 
       final TagGroup other = (TagGroup) obj;
 
-      return _createId == other._createId;
+      return id == other.id;
    }
 
    @Override
    public int hashCode() {
 
-      return Objects.hash(_createId);
+      return Objects.hash(id);
    }
 
    @Override
@@ -70,14 +65,15 @@ public class TagGroup {
 
       return UI.EMPTY_STRING
 
-            + "TagGroup" + NL //$NON-NLS-1$
+            + "TagGroup" + NL //                   //$NON-NLS-1$
 
-            + "[" + NL //$NON-NLS-1$
+            + "[" + NL //                          //$NON-NLS-1$
 
-            + " name     = " + name + NL //$NON-NLS-1$
-            + " tourTags = " + tourTags + NL //$NON-NLS-1$
+            + " name     = " + name + NL //        //$NON-NLS-1$
+            + " tourTags = " + tourTags + NL //    //$NON-NLS-1$
 
-            + "]"; //$NON-NLS-1$
+            + "]" //                               //$NON-NLS-1$
+      ;
    }
 
 }
