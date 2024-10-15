@@ -102,6 +102,19 @@ public class TagGroupManager {
       return xmlRoot;
    }
 
+   public static TagGroup getTagGroup(final String tourTagGroupID) {
+
+      for (final TagGroup tagGroup : _allTagGroups) {
+
+         if (tagGroup.id.equals(tourTagGroupID)) {
+
+            return tagGroup;
+         }
+      }
+
+      return null;
+   }
+
    /**
     * @return Returns all {@link TagGroup}'s.
     *         <p>
@@ -130,6 +143,24 @@ public class TagGroupManager {
             (tagGroup1, tagGroup2) -> tagGroup1.name.compareTo(tagGroup2.name));
 
       return _allTagGroupsSorted;
+   }
+
+   /**
+    * @param tourTagGroupID
+    *
+    * @return Returns all tags from the {@link TagGroup} or <code>null</code> when not available
+    */
+   public static Set<TourTag> getTags(final String tourTagGroupID) {
+
+      for (final TagGroup tagGroup : _allTagGroups) {
+
+         if (tagGroup.id.equals(tourTagGroupID)) {
+
+            return tagGroup.tourTags;
+         }
+      }
+
+      return null;
    }
 
    private static File getXmlFile() {

@@ -69,6 +69,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -162,6 +163,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private SelectionListener            _ilSelectionListener;
    private SelectionListener            _liveUpdateListener;
    private MouseWheelListener           _liveUpdateMouseWheelListener;
+   private MouseWheelListener           _liveUpdateMouseWheelListener10;
    private SelectionListener            _speedTourTypeListener;
    //
    private ActionOpenPrefDialog         _actionOpenTourTypePrefs;
@@ -892,7 +894,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       final Table table = new Table(parent,
             SWT.H_SCROLL
                   | SWT.V_SCROLL
-                  | SWT.BORDER
                   | SWT.FULL_SELECTION);
       table.setHeaderVisible(true);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
@@ -1517,7 +1518,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       final Table table = new Table(parent,
             SWT.H_SCROLL
                   | SWT.V_SCROLL
-                  | SWT.BORDER
                   | SWT.FULL_SELECTION);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
@@ -1552,6 +1552,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _ilViewer.addSelectionChangedListener(selectionChangedEvent -> onSelect_IL(selectionChangedEvent.getSelection()));
 
       _ilViewer.addDoubleClickListener(doubleClickEvent -> onIL_DblClick());
+
+      /**
+       * !!! Very important to enable the viewer tooltips !!!
+       */
+      ColumnViewerToolTipSupport.enableFor(_ilViewer);
 
       createUI_513_IL_ContextMenu();
       createUI_514_IL_DragDrop();
@@ -2519,7 +2524,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _spinnerDash_TileSize.setMaximum(EasyConfig.TILE_SIZE_MAX);
          _spinnerDash_TileSize.setMinimum(EasyConfig.TILE_SIZE_MIN);
          _spinnerDash_TileSize.addSelectionListener(_liveUpdateListener);
-         _spinnerDash_TileSize.addMouseWheelListener(_liveUpdateMouseWheelListener);
+         _spinnerDash_TileSize.addMouseWheelListener(_liveUpdateMouseWheelListener10);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(_spinnerDash_TileSize);
@@ -3454,6 +3459,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _liveUpdateListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> doLiveUpdate());
       _liveUpdateMouseWheelListener = mouseEvent -> {
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         doLiveUpdate();
+      };
+      _liveUpdateMouseWheelListener10 = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
          doLiveUpdate();
       };
 

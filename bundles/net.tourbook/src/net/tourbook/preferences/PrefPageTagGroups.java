@@ -488,7 +488,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
             .hint(70, 100)
             .applyTo(tableLayouter);
 
-      final Table table = new Table(tableLayouter, (SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION));
+      final Table table = new Table(tableLayouter, (SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION));
       table.setHeaderVisible(false);
       table.setLinesVisible(false);
 

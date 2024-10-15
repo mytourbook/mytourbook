@@ -516,6 +516,7 @@ public class RawDataView extends ViewPart implements
    private String                        _imageUrl_State_MovedFiles;
    private String                        _imageUrl_State_SaveTour;
    private String                        _imageUrl_State_TourMarker;
+   private String                        _imageUrl_State_TourTags;
    //
    private PixelConverter                _pc;
    private List<TourbookCloudDownloader> _cloudDownloadersList       = CloudDownloaderManager.getCloudDownloaderList();
@@ -2197,14 +2198,14 @@ public class RawDataView extends ViewPart implements
        */
       final String href = HTTP_DUMMY + HREF_ACTION_DEVICE_IMPORT + HREF_TOKEN + importTile.getId();
 
-      final String htmlConfig = createHTML_86_Annotations(importTile);
+      final String htmlAnnotationImages = createHTML_86_AnnotationImages(importTile);
 
       final String html = UI.EMPTY_STRING
 
-            + "<a href='" + href + "' title='" + tooltip + "' class='import-tile'>" + NL //  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            + "   <div class='import-tile-image'>" + htmlImage + "</div>" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
-            + "   <div class='import-tile-config'>" + htmlConfig + "</div>" + NL //          //$NON-NLS-1$ //$NON-NLS-2$
-            + "</a>" + NL //                                                                 //$NON-NLS-1$
+            + "<a href='" + href + "' title='" + tooltip + "' class='import-tile'>" + NL //     //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + "   <div class='import-tile-image'>" + htmlImage + "</div>" + NL //               //$NON-NLS-1$ //$NON-NLS-2$
+            + "   <div class='import-tile-config'>" + htmlAnnotationImages + "</div>" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+            + "</a>" + NL //                                                                    //$NON-NLS-1$
       ;
 
       return html;
@@ -2212,85 +2213,54 @@ public class RawDataView extends ViewPart implements
 
    private String createHTML_84_TileTooltip(final ImportLauncher importLauncher) {
 
-      boolean isTextAdded = false;
-
       final StringBuilder sb = new StringBuilder();
 
       final String tileName = importLauncher.name.trim();
       final String tileDescription = importLauncher.description.trim();
+      final String tourTypeText = EasyLauncherUtils.getTourTypeText(importLauncher, tileName);
 
-      final StringBuilder ttText = new StringBuilder();
-      final Enum<TourTypeConfig> ttConfig = importLauncher.tourTypeConfig;
+      {
+         // tour type name
 
-      if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
+         if (tileName.length() > 0) {
 
-         final ArrayList<SpeedTourType> speedTourTypes = importLauncher.speedTourTypes;
-         boolean isSpeedAdded = false;
-
-         for (final SpeedTourType speedTT : speedTourTypes) {
-
-            if (isSpeedAdded) {
-               ttText.append(NL);
-            }
-
-            final long tourTypeId = speedTT.tourTypeId;
-            final double avgSpeed = (speedTT.avgSpeed / UI.UNIT_VALUE_DISTANCE) + 0.0001;
-
-            ttText.append((int) avgSpeed);
-            ttText.append(UI.SPACE);
-            ttText.append(UI.UNIT_LABEL_SPEED);
-            ttText.append(UI.DASH_WITH_DOUBLE_SPACE);
-            ttText.append(net.tourbook.ui.UI.getTourTypeLabel(tourTypeId));
-
-            isSpeedAdded = true;
-         }
-
-      } else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {
-
-         final TourType oneTourType = importLauncher.oneTourType;
-         if (oneTourType != null) {
-
-            final String ttName = oneTourType.getName();
-            final CadenceMultiplier ttCadence = importLauncher.oneTourTypeCadence;
-
-            // show this text only when the name is different
-            if (!tileName.equals(ttName)) {
-               ttText.append(String.format("%s (%s)", ttName, ttCadence.getNlsLabel()));//$NON-NLS-1$
-            }
+            sb.append(tileName);
+            sb.append(NL);
          }
       }
+      {
+         // tile description
 
-      // tour type name
-      if (tileName.length() > 0) {
+         if (tileDescription.length() > 0) {
 
-         sb.append(tileName);
-         isTextAdded = true;
-      }
-
-      // tour type description
-      if (tileDescription.length() > 0) {
-
-         if (isTextAdded) {
-            sb.append(UI.NEW_LINE2);
+            sb.append(NL);
+            sb.append(tileDescription);
+            sb.append(NL);
          }
-
-         sb.append(tileDescription);
-         isTextAdded = true;
       }
+      {
+         // tour type text
 
-      // tour type text
-      if (ttText.length() > 0) {
+         if (tourTypeText.length() > 0) {
 
-         if (isTextAdded) {
-            sb.append(UI.NEW_LINE2);
+            sb.append(NL);
+            sb.append(tourTypeText);
+            sb.append(NL);
          }
-
-         sb.append(ttText);
-         isTextAdded = true;
       }
+      {
+         // tag group tags
 
-      sb.append(UI.NEW_LINE2);
+         if (importLauncher.isSetTourTagGroup) {
 
+            EasyLauncherUtils.getTagGroupText(importLauncher, sb);
+
+         } else {
+
+            sb.append(NL);
+            sb.append("Set tour tags: NO".formatted());
+         }
+      }
       {
          // last marker
 
@@ -2298,7 +2268,8 @@ public class RawDataView extends ViewPart implements
 
          final String distanceValue = _nf1.format(distance) + UI.SPACE1 + UI.UNIT_LABEL_DISTANCE;
 
-         sb.append(importLauncher.isSetLastMarker //
+         sb.append(NL);
+         sb.append(importLauncher.isSetLastMarker
                ? NLS.bind(Messages.Import_Data_HTML_LastMarker_Yes, distanceValue, importLauncher.lastMarkerText)
                : Messages.Import_Data_HTML_LastMarker_No);
       }
@@ -2311,7 +2282,7 @@ public class RawDataView extends ViewPart implements
 
             final float temperature = UI.convertTemperatureFromMetric(importLauncher.tourAvgTemperature);
 
-            final String temperatureText = NLS.bind(Messages.Import_Data_HTML_AdjustTemperature_Yes, //
+            final String temperatureText = NLS.bind(Messages.Import_Data_HTML_AdjustTemperature_Yes,
                   new Object[] {
                         getDurationText(importLauncher),
                         _nf1.format(temperature),
@@ -2382,7 +2353,7 @@ public class RawDataView extends ViewPart implements
       return sb.toString();
    }
 
-   private String createHTML_86_Annotations(final ImportLauncher importTile) {
+   private String createHTML_86_AnnotationImages(final ImportLauncher importTile) {
 
       /*
        * Save tour
@@ -2440,6 +2411,17 @@ public class RawDataView extends ViewPart implements
       }
 
       /*
+       * Tags
+       */
+      String htmlTourTags = UI.EMPTY_STRING;
+      if (importTile.isSetTourTagGroup) {
+
+         final String stateImage = createHTML_BgImage(_imageUrl_State_TourTags);
+
+         htmlTourTags = createHTML_TileAnnotation(stateImage);
+      }
+
+      /*
        * Delete device files
        */
       String htmlDeleteFiles = UI.EMPTY_STRING;
@@ -2459,6 +2441,7 @@ public class RawDataView extends ViewPart implements
       sb.append(htmlRetrieveWeatherData);
       sb.append(htmlAdjustTemperature);
       sb.append(htmlLastMarker);
+      sb.append(htmlTourTags);
 
       sb.append("<div style='float:left;'>" + importTile.name + "</div>"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -2741,6 +2724,7 @@ public class RawDataView extends ViewPart implements
          _imageUrl_State_MovedFiles             = getIconUrl(Images.State_MovedTour);
          _imageUrl_State_SaveTour               = getIconUrl(Images.State_SaveTour);
          _imageUrl_State_TourMarker             = getIconUrl(Images.State_TourMarker);
+         _imageUrl_State_TourTags               = getIconUrl(Images.State_TourTags);
 
          _imageUrl_Device_TurnOff               = getIconUrl(Images.RawData_Device_TurnOff);
          _imageUrl_Device_TurnOn                = getIconUrl(Images.RawData_Device_TurnOn);
