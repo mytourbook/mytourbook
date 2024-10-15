@@ -16,7 +16,6 @@
 package net.tourbook.tour;
 
 import java.text.NumberFormat;
-import java.time.Period;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -90,7 +89,6 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IWorkbenchPart;
-import org.joda.time.PeriodType;
 
 public class TourInfoUI {
 
@@ -120,15 +118,16 @@ public class TourInfoUI {
          FormatStyle.FULL,
          FormatStyle.MEDIUM);
 
-   private static PeriodType              _tourPeriodTemplate           = PeriodType.yearMonthDayTime()
 
-         // hide these components
-         // .withMinutesRemoved()
-
-         .withSecondsRemoved()
-         .withMillisRemoved()
+//   private static org.joda.time.PeriodType _tourPeriodTemplate           = PeriodType.yearMonthDayTime()
 //
-   ;
+//         // hide these components
+//         // .withMinutesRemoved()
+//
+//         .withSecondsRemoved()
+//         .withMillisRemoved()
+////
+//   ;
 
    private static final IPreferenceStore  _prefStore                    = TourbookPlugin.getPrefStore();
    private static final IDialogSettings   _state                        = TourbookPlugin.getState(ID);
@@ -2264,20 +2263,20 @@ public class TourInfoUI {
          _lblMovingTime_Unit.setVisible(false);
          _lblBreakTime_Unit.setVisible(false);
 
-         final Period elapsedPeriod = new Period(
-               _tourData.getTourStartTimeMS(),
-               _tourData.getTourEndTimeMS(),
-               _tourPeriodTemplate);
-         final Period recordedPeriod = new Period(0, recordedTime * 1000, _tourPeriodTemplate);
-         final Period pausedPeriod = new Period(0, pausedTime * 1000, _tourPeriodTemplate);
-         final Period movingPeriod = new Period(0, movingTime * 1000, _tourPeriodTemplate);
-         final Period breakPeriod = new Period(0, breakTime * 1000, _tourPeriodTemplate);
-
-         _lblElapsedTime.setText(elapsedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
-         _lblRecordedTime.setText(recordedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
-         _lblPausedTime.setText(pausedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
-         _lblMovingTime.setText(movingPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
-         _lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+//         final Period elapsedPeriod = new Period(
+//               _tourData.getTourStartTimeMS(),
+//               _tourData.getTourEndTimeMS(),
+//               _tourPeriodTemplate);
+//         final Period recordedPeriod = new Period(0, recordedTime * 1000, _tourPeriodTemplate);
+//         final Period pausedPeriod = new Period(0, pausedTime * 1000, _tourPeriodTemplate);
+//         final Period movingPeriod = new Period(0, movingTime * 1000, _tourPeriodTemplate);
+//         final Period breakPeriod = new Period(0, breakTime * 1000, _tourPeriodTemplate);
+//
+//         _lblElapsedTime.setText(elapsedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+//         _lblRecordedTime.setText(recordedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+//         _lblPausedTime.setText(pausedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+//         _lblMovingTime.setText(movingPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+//         _lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
       }
 
       /*
