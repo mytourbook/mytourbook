@@ -24,11 +24,13 @@ import net.tourbook.common.UI;
 import net.tourbook.ui.views.IWeatherProvider;
 import net.tourbook.weather.TourWeatherRetriever;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 public class TourWeatherRetrieverTests {
 
    @Test
+   @Tag("ExternalConnection")
    void testCanRetrieveWeather() {
 
       // OpenWeatherMap
@@ -45,6 +47,7 @@ public class TourWeatherRetrieverTests {
    }
 
    @Test
+   @Tag("ExternalConnection")
    void testGetWeatherRetrievalFailureLogMessage() {
 
       // OpenWeatherMap

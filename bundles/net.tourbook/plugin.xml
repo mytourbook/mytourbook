@@ -396,26 +396,32 @@
       -->
 
       <page
-         name="%preference_page_tags"
-         id="net.tourbook.preferences.PrefPageTags"
-         class="net.tourbook.preferences.PrefPageTags"
+         name     ="%Pref_Page_Tag"
+         id       ="net.tourbook.preferences.PrefPageTags"
+         class    ="net.tourbook.preferences.PrefPageTags"
       />
+         <page
+            name        ="%Pref_Page_Tag_Groups"
+            id          ="net.tourbook.preferences.PrefPageTagGroups"
+            class       ="net.tourbook.preferences.PrefPageTagGroups"
+            category    ="net.tourbook.preferences.PrefPageTags"
+         />
 
 
       <!--
          Tour Type
       -->
-      
+               
       <page
-         class="net.tourbook.preferences.PrefPageTourTypeFilterList"
-         id="net.tourbook.preferences.PrefPageTourTypeFilter"
-         name="%preference_page_tour_type_root"
+         name        ="%Pref_Page_TourType_Layout"
+         id          ="net.tourbook.preferences.PrefPageTourTypeDefinition"
+         class       ="net.tourbook.preferences.PrefPageTourTypes"
       />
          <page
-            name        ="%Pref_Page_TourType_Colors"
-            id          ="net.tourbook.preferences.PrefPageTourTypeDefinition"
-            class       ="net.tourbook.preferences.PrefPageTourTypes"
-            category    ="net.tourbook.preferences.PrefPageTourTypeFilter"
+            name        ="%Pref_Page_TourType_Groups"
+            class       ="net.tourbook.preferences.PrefPageTourTypeFilterList"
+            id          ="net.tourbook.preferences.PrefPageTourTypeFilter"
+            category    ="net.tourbook.preferences.PrefPageTourTypeDefinition"
          />
 
 

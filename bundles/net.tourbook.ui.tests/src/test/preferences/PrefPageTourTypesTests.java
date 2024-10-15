@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,10 +27,10 @@ public class PrefPageTourTypesTests extends UITest {
    void openTourTypePages() {
 
       Utils.openPreferences(bot);
-      SWTBotTreeItem tourTypeFilterTreeItem = bot.tree().getTreeItem("Tour Type Filter").select(); //$NON-NLS-1$
+      SWTBotTreeItem tourTypeFilterTreeItem = bot.tree().getTreeItem("Tour Type").select(); //$NON-NLS-1$
 
       tourTypeFilterTreeItem = tourTypeFilterTreeItem.expand();
-      Utils.openVendorPage(tourTypeFilterTreeItem, "Color"); //$NON-NLS-1$
+      Utils.openVendorPage(tourTypeFilterTreeItem, "Groups"); //$NON-NLS-1$
 
       Utils.clickApplyAndCloseButton(bot);
    }

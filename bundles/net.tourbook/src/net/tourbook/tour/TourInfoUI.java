@@ -16,6 +16,7 @@
 package net.tourbook.tour;
 
 import java.text.NumberFormat;
+import java.time.Period;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -89,7 +90,6 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IWorkbenchPart;
-import org.joda.time.Period;
 import org.joda.time.PeriodType;
 
 public class TourInfoUI {

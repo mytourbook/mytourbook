@@ -3580,13 +3580,18 @@ class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final String colTourTitle = ((TVITourBookTour) element).colTourTitle;
+            String colTourTitle = ((TVITourBookTour) element).colTourTitle;
 
             if (colTourTitle == null) {
 // used for debugging
 //             return "<NULL>";
                return UI.EMPTY_STRING;
             } else {
+
+               if (UI.IS_SCRAMBLE_DATA) {
+                  colTourTitle = UI.scrambleText(colTourTitle);
+               }
+
                return colTourTitle;
             }
          }

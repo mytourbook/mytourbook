@@ -6140,7 +6140,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final FlatGainLoss flatGainLoss = computeAltitudeUpDown_20_Algorithm_DP(
             -1,
             -1,
-            altitudeSerieSmoothed,
+            getAltitudeSmoothedSerie(false),
             prefDPTolerance,
             prefFlatGradient);
 

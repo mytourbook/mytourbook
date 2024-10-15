@@ -662,7 +662,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
       _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       _viewerMenuManager.setRemoveAllWhenShown(true);
-      _viewerMenuManager.addMenuListener(this::fillContextMenu);
+      _viewerMenuManager.addMenuListener(menuManager -> fillContextMenu(menuManager));
    }
 
    @Override
@@ -1251,7 +1251,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
       _parent = parent;
       _pc = new PixelConverter(parent);
 
-      _columnSortListener = widgetSelectedAdapter(this::onSelect_SortColumn);
+      _columnSortListener = widgetSelectedAdapter(selectionEvent -> onSelect_SortColumn(selectionEvent));
    }
 
    /**
@@ -1302,7 +1302,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
             updateUI_TagFilter();
 
             // tags in the tree hierarchy must be rechecked otherwise they are not checked
-            _parent.getDisplay().asyncExec(this::updateUI_Tags_From_TagIds);
+            _parent.getDisplay().asyncExec(() -> updateUI_Tags_From_TagIds());
          }
       }
       _parent.setRedraw(true);
@@ -1326,11 +1326,10 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
          recreateViewer(_tagViewer);
 
          updateUI_TagFilter();
-
          updateUI_TagLayoutAction();
 
          // tags in the tree hierarchy must be rechecked otherwise they are not checked
-         _parent.getDisplay().asyncExec(this::updateUI_Tags_From_TagIds);
+         _parent.getDisplay().asyncExec(() -> updateUI_Tags_From_TagIds());
 
          enableControls();
       }

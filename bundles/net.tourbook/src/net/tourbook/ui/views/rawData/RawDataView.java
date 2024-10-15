@@ -81,6 +81,7 @@ import net.tourbook.common.util.ColumnProfile;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITourViewer3;
+import net.tourbook.common.util.NoAutoScalingImageDataProvider;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TableColumnDefinition;
@@ -195,8 +196,9 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -4491,19 +4493,12 @@ public class RawDataView extends ViewPart implements
 
    public Image getImportConfigImage(final ImportLauncher importConfig, final boolean isDarkTransparentColor) {
 
-      final int imageWidth = importConfig.imageWidth;
+      final int configImageWidth = (int) (importConfig.imageWidth * UI.HIDPI_SCALING);
+      final int ttImageSize = (int) (TourType.TOUR_TYPE_IMAGE_SIZE * UI.HIDPI_SCALING);
 
-      if (imageWidth == 0) {
+      if (configImageWidth == 0) {
          return null;
       }
-
-      /**
-       * Color which is transparent in the combined tour type images
-       */
-      final RGB TRANSPARENT_COLOR = isDarkTransparentColor
-
-            ? new RGB(67, 67, 67)
-            : new RGB(0xff, 0xfe, 0xff);
 
       final long configId = importConfig.getId();
       final String configImageId = Long.toString(configId) + UI.SPACE + Boolean.toString(isDarkTransparentColor);
@@ -4521,45 +4516,40 @@ public class RawDataView extends ViewPart implements
       if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
 
          final ArrayList<SpeedTourType> speedVertices = importConfig.speedTourTypes;
-         final int imageSize = TourType.TOUR_TYPE_IMAGE_SIZE;
 
-         final Image tempImage = new Image(display, imageWidth, imageSize);
+         final ImageData swtImageData = new ImageData(
+               configImageWidth,
+               ttImageSize,
+               24,
+               new PaletteData(0xFF0000, 0xFF00, 0xFF));
+
+         swtImageData.alphaData = new byte[configImageWidth * ttImageSize];
+
+         final Image tempImage = new Image(display, new NoAutoScalingImageDataProvider(swtImageData));
          {
-            final GC gcImage = new GC(tempImage);
-            final Color colorTransparent = new Color(display, TRANSPARENT_COLOR);
+            final GC gcTempImage = new GC(tempImage);
             {
-               // fill with transparent color
-               gcImage.setBackground(colorTransparent);
-               gcImage.fillRectangle(0, 0, imageWidth, imageSize);
+               for (int speedIndex = 0; speedIndex < speedVertices.size(); speedIndex++) {
 
-               for (int imageIndex = 0; imageIndex < speedVertices.size(); imageIndex++) {
-
-                  final SpeedTourType vertex = speedVertices.get(imageIndex);
+                  final SpeedTourType vertex = speedVertices.get(speedIndex);
 
                   final Image ttImage = TourTypeImage.getTourTypeImage(vertex.tourTypeId);
 
-                  gcImage.drawImage(ttImage,
-                        0,
-                        0,
-                        imageSize,
-                        imageSize,
+                  gcTempImage.drawImage(ttImage,
 
-                        imageSize * imageIndex,
-                        0,
-                        imageSize,
-                        imageSize);
+                        (int) ((ttImageSize * speedIndex)
+
+                              // fix autoscaling
+                              / UI.HIDPI_SCALING),
+                        0);
                }
             }
-            gcImage.dispose();
-            colorTransparent.dispose();
+            gcTempImage.dispose();
 
-            /*
-             * set transparency
-             */
-            final ImageData imageData = tempImage.getImageData();
-            imageData.transparentPixel = imageData.palette.getPixel(TRANSPARENT_COLOR);
+            // convert into image data, the trick is to use the device zoom otherwise it is not working !!!
+            final ImageData tempImageData = tempImage.getImageData(DPIUtil.getDeviceZoom());
 
-            configImage = new Image(display, imageData);
+            configImage = new Image(display, new NoAutoScalingImageDataProvider(tempImageData));
          }
          tempImage.dispose();
 
@@ -4569,30 +4559,31 @@ public class RawDataView extends ViewPart implements
 
          if (tourType != null) {
 
-            // create a copy because the copied image can be disposed
-            final Image tempImage = new Image(display, TourType.TOUR_TYPE_IMAGE_SIZE, TourType.TOUR_TYPE_IMAGE_SIZE);
+            final ImageData swtImageData = new ImageData(
+                  ttImageSize,
+                  ttImageSize,
+                  24,
+                  new PaletteData(0xFF0000, 0xFF00, 0xFF));
+
+            swtImageData.alphaData = new byte[ttImageSize * ttImageSize];
+
+            final Image tempImage = new Image(display, new NoAutoScalingImageDataProvider(swtImageData));
             {
-
-               final GC gcImage = new GC(tempImage);
-               final Color colorTransparent = new Color(display, TRANSPARENT_COLOR);
-               {
-                  // fill with transparent color
-                  gcImage.setBackground(colorTransparent);
-                  gcImage.fillRectangle(0, 0, TourType.TOUR_TYPE_IMAGE_SIZE, TourType.TOUR_TYPE_IMAGE_SIZE);
-
-                  final Image ttImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
-                  gcImage.drawImage(ttImage, 0, 0);
-               }
-               gcImage.dispose();
-               colorTransparent.dispose();
-
                /*
-                * set transparency
+                * Paint tour type image into the displayed image
                 */
-               final ImageData imageData = tempImage.getImageData();
-               imageData.transparentPixel = imageData.palette.getPixel(TRANSPARENT_COLOR);
 
-               configImage = new Image(display, imageData);
+               final GC gcTempImage = new GC(tempImage);
+               {
+                  final Image ttImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
+                  gcTempImage.drawImage(ttImage, 0, 0);
+               }
+               gcTempImage.dispose();
+
+               // convert into image data, the trick is to use the device zoom otherwise it is not working !!!
+               final ImageData tempImageData = tempImage.getImageData(DPIUtil.getDeviceZoom());
+
+               configImage = new Image(display, new NoAutoScalingImageDataProvider(tempImageData));
 
             }
             tempImage.dispose();
@@ -4601,7 +4592,6 @@ public class RawDataView extends ViewPart implements
       } else {
 
          // this is the default or TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED
-
       }
 
       // keep image in the cache
