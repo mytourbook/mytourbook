@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,11 +16,20 @@
 package net.tourbook.importdata;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.TableColumnDefinition;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
+import net.tourbook.tag.TagGroup;
+import net.tourbook.tag.TagGroupManager;
+import net.tourbook.tour.CadenceMultiplier;
 
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -28,6 +37,8 @@ import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 
 /**
  * Provides items for the easy (i)mport (l)auncher (IL)
@@ -36,15 +47,229 @@ public class EasyLauncherUtils {
 
    private static final String   COLUMN_ADJUST_TEMPERATURE = "{0} - {1} {2}";                 //$NON-NLS-1$
 
+   private static final char     NL                        = UI.NEW_LINE;
+
    private ColumnManager         _columnManager;
    private TableColumnDefinition _colDef_TourTypeImage;
 
    private PixelConverter        _pc;
 
+   private final PeriodType      _durationTemplate         = PeriodType
+
+         .yearMonthDayTime()
+
+         // hide these components
+         .withMillisRemoved();
+
    private final NumberFormat    _nf1                      = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
+   }
+
+   public static void getTagGroupText(final ImportLauncher importLauncher, final StringBuilder sb) {
+
+      final TagGroup tagGroup = TagGroupManager.getTagGroup(importLauncher.tourTagGroupID);
+      final Set<TourTag> allTags = TagGroupManager.getTags(importLauncher.tourTagGroupID);
+
+      if (tagGroup == null || allTags == null) {
+
+         return;
+      }
+
+      final List<TourTag> sortedTags = new ArrayList<>(allTags);
+      Collections.sort(sortedTags);
+
+      final StringBuilder sbTags = new StringBuilder();
+
+      for (final TourTag tourTag : sortedTags) {
+
+         sbTags.append(UI.SPACE3 + tourTag.getTagName() + NL);
+      }
+
+      sb.append(NL);
+      sb.append("Set tour tags: %s\n\n%s".formatted(tagGroup.name, sbTags.toString()));
+   }
+
+   public static String getTourTypeText(final ImportLauncher importLauncher, final String tileName) {
+
+      final StringBuilder ttText = new StringBuilder();
+      final Enum<TourTypeConfig> ttConfig = importLauncher.tourTypeConfig;
+
+      if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
+
+         final ArrayList<SpeedTourType> speedTourTypes = importLauncher.speedTourTypes;
+         boolean isSpeedAdded = false;
+
+         for (final SpeedTourType speedTT : speedTourTypes) {
+
+            if (isSpeedAdded) {
+               ttText.append(NL);
+            }
+
+            final long tourTypeId = speedTT.tourTypeId;
+            final double avgSpeed = (speedTT.avgSpeed / UI.UNIT_VALUE_DISTANCE) + 0.0001;
+
+            ttText.append(UI.SPACE3);
+            ttText.append((int) avgSpeed);
+            ttText.append(UI.SPACE);
+            ttText.append(UI.UNIT_LABEL_SPEED);
+            ttText.append(UI.DASH_WITH_DOUBLE_SPACE);
+            ttText.append(net.tourbook.ui.UI.getTourTypeLabel(tourTypeId));
+
+            isSpeedAdded = true;
+         }
+
+      } else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {
+
+         final TourType oneTourType = importLauncher.oneTourType;
+         if (oneTourType != null) {
+
+            final String ttName = oneTourType.getName();
+            final CadenceMultiplier ttCadence = importLauncher.oneTourTypeCadence;
+
+            // show this text only when the name is different
+            if (!tileName.equals(ttName)) {
+               ttText.append(String.format("%s (%s)", ttName, ttCadence.getNlsLabel()));//$NON-NLS-1$
+            }
+         }
+      }
+
+      return ttText.toString();
+   }
+
+   private String createLauncherTooltip(final ImportLauncher importLauncher) {
+
+      final StringBuilder sb = new StringBuilder();
+
+      final String tileName = importLauncher.name.trim();
+      final String tileDescription = importLauncher.description.trim();
+      final String tourTypeText = getTourTypeText(importLauncher, tileName);
+
+      {
+         // tour type name
+
+         if (tileName.length() > 0) {
+
+            sb.append(tileName);
+            sb.append(NL);
+         }
+      }
+      {
+         // tile description
+
+         if (tileDescription.length() > 0) {
+
+            sb.append(NL);
+            sb.append(tileDescription);
+            sb.append(NL);
+         }
+      }
+      {
+         // tour type text
+
+         if (tourTypeText.length() > 0) {
+
+            sb.append(NL);
+            sb.append(tourTypeText);
+            sb.append(NL);
+         }
+      }
+      {
+         // tag group tags
+
+         if (importLauncher.isSetTourTagGroup) {
+
+            getTagGroupText(importLauncher, sb);
+
+         } else {
+
+            sb.append(NL);
+            sb.append("Set tour tags: NO".formatted());
+         }
+      }
+      {
+         // last marker
+
+         final double distance = importLauncher.lastMarkerDistance / 1000.0 / UI.UNIT_VALUE_DISTANCE;
+
+         final String distanceValue = _nf1.format(distance) + UI.SPACE1 + UI.UNIT_LABEL_DISTANCE;
+
+         sb.append(NL);
+
+         sb.append(importLauncher.isSetLastMarker
+               ? NLS.bind(Messages.Import_Data_HTML_LastMarker_Yes, distanceValue, importLauncher.lastMarkerText)
+               : Messages.Import_Data_HTML_LastMarker_No);
+      }
+      {
+         // adjust temperature
+
+         sb.append(NL);
+
+         if (importLauncher.isAdjustTemperature) {
+
+            final float temperature = UI.convertTemperatureFromMetric(importLauncher.tourAvgTemperature);
+
+            final String temperatureText = NLS.bind(Messages.Import_Data_HTML_AdjustTemperature_Yes,
+                  new Object[] {
+                        getDurationText(importLauncher),
+                        _nf1.format(temperature),
+                        UI.UNIT_LABEL_TEMPERATURE });
+
+            sb.append(temperatureText);
+
+         } else {
+
+            sb.append(Messages.Import_Data_HTML_AdjustTemperature_No);
+         }
+      }
+      {
+         // adjust elevation
+
+         sb.append(NL);
+
+         sb.append(importLauncher.isReplaceFirstTimeSliceElevation
+               ? Messages.Import_Data_HTML_ReplaceFirstTimeSliceElevation_Yes
+               : Messages.Import_Data_HTML_ReplaceFirstTimeSliceElevation_No);
+      }
+      {
+         // set elevation from SRTM
+
+         sb.append(NL);
+
+         sb.append(importLauncher.isReplaceElevationFromSRTM
+               ? Messages.Import_Data_HTML_ReplaceElevationFromSRTM_Yes
+               : Messages.Import_Data_HTML_ReplaceElevationFromSRTM_No);
+      }
+      {
+         // retrieve weather data
+
+         sb.append(NL);
+
+         sb.append(importLauncher.isRetrieveWeatherData
+               ? Messages.Import_Data_HTML_RetrieveWeatherData_Yes
+               : Messages.Import_Data_HTML_RetrieveWeatherData_No);
+      }
+      {
+         // retrieve tour location
+
+         sb.append(NL);
+
+         sb.append(importLauncher.isRetrieveTourLocation
+               ? Messages.Import_Data_HTML_RetrieveTourLocation_Yes
+               : Messages.Import_Data_HTML_RetrieveTourLocation_No);
+      }
+      {
+         // save tour
+
+         sb.append(NL);
+
+         sb.append(importLauncher.isSaveTour
+               ? Messages.Import_Data_HTML_SaveTour_Yes
+               : Messages.Import_Data_HTML_SaveTour_No);
+      }
+
+      return sb.toString();
    }
 
    public void defineAllColumns(final ColumnManager columnManager, final PixelConverter pc) {
@@ -54,6 +279,7 @@ public class EasyLauncherUtils {
 
       defineColumn_10_LauncherName();
       defineColumn_50_03_TourTypeImage();
+      defineColumn_50_08_TourTags();
       defineColumn_50_04_LastMarkerDistance();
       defineColumn_50_05_AdjustTemperature();
       defineColumn_50_07_IsAdjustElevation();
@@ -81,8 +307,16 @@ public class EasyLauncherUtils {
       colDef.setCanModifyVisibility(false);
 
       colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public String getToolTipText(final Object element) {
+
+            return createLauncherTooltip((ImportLauncher) element);
+         }
+
          @Override
          public void update(final ViewerCell cell) {
+
             cell.setText(((ImportLauncher) cell.getElement()).name);
          }
       });
@@ -107,6 +341,12 @@ public class EasyLauncherUtils {
 
       colDef.setLabelProvider(new CellLabelProvider() {
 
+         @Override
+         public String getToolTipText(final Object element) {
+
+            return createLauncherTooltip((ImportLauncher) element);
+         }
+
          // !!! set dummy label provider, otherwise an error occurs !!!
          @Override
          public void update(final ViewerCell cell) {}
@@ -130,6 +370,13 @@ public class EasyLauncherUtils {
       colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public String getToolTipText(final Object element) {
+
+            return createLauncherTooltip((ImportLauncher) element);
+         }
+
          @Override
          public void update(final ViewerCell cell) {
 
@@ -169,6 +416,13 @@ public class EasyLauncherUtils {
       colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public String getToolTipText(final Object element) {
+
+            return createLauncherTooltip((ImportLauncher) element);
+         }
+
          @Override
          public void update(final ViewerCell cell) {
 
@@ -212,12 +466,58 @@ public class EasyLauncherUtils {
       colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public String getToolTipText(final Object element) {
+
+            return createLauncherTooltip((ImportLauncher) element);
+         }
+
          @Override
          public void update(final ViewerCell cell) {
 
             cell.setText(((ImportLauncher) cell.getElement()).isReplaceFirstTimeSliceElevation
                   ? Messages.App_Label_BooleanYes
                   : UI.EMPTY_STRING);
+         }
+      });
+   }
+
+   private void defineColumn_50_08_TourTags() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "tourTags", SWT.LEAD); //$NON-NLS-1$
+
+      colDef.setColumnLabel("Tour tags");
+      colDef.setColumnHeaderText("Tags");
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+      colDef.setColumnWeightData(new ColumnWeightData(7));
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public String getToolTipText(final Object element) {
+
+            return createLauncherTooltip((ImportLauncher) element);
+         }
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
+
+            if (importLauncher.isSetTourTagGroup) {
+
+               final TagGroup tagGroup = TagGroupManager.getTagGroup(importLauncher.tourTagGroupID);
+
+               cell.setText(tagGroup == null ? UI.EMPTY_STRING : tagGroup.name);
+
+            } else {
+
+               cell.setText(UI.EMPTY_STRING);
+            }
          }
       });
    }
@@ -239,6 +539,13 @@ public class EasyLauncherUtils {
       colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public String getToolTipText(final Object element) {
+
+            return createLauncherTooltip((ImportLauncher) element);
+         }
+
          @Override
          public void update(final ViewerCell cell) {
 
@@ -268,6 +575,13 @@ public class EasyLauncherUtils {
       colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public String getToolTipText(final Object element) {
+
+            return createLauncherTooltip((ImportLauncher) element);
+         }
+
          @Override
          public void update(final ViewerCell cell) {
 
@@ -297,6 +611,13 @@ public class EasyLauncherUtils {
       colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public String getToolTipText(final Object element) {
+
+            return createLauncherTooltip((ImportLauncher) element);
+         }
+
          @Override
          public void update(final ViewerCell cell) {
 
@@ -324,6 +645,13 @@ public class EasyLauncherUtils {
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public String getToolTipText(final Object element) {
+
+            return createLauncherTooltip((ImportLauncher) element);
+         }
+
          @Override
          public void update(final ViewerCell cell) {
 
@@ -350,6 +678,13 @@ public class EasyLauncherUtils {
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public String getToolTipText(final Object element) {
+
+            return createLauncherTooltip((ImportLauncher) element);
+         }
+
          @Override
          public void update(final ViewerCell cell) {
             cell.setText(((ImportLauncher) cell.getElement()).description);
@@ -359,6 +694,14 @@ public class EasyLauncherUtils {
 
    public TableColumnDefinition getColDef_TourTypeImage() {
       return _colDef_TourTypeImage;
+   }
+
+   private String getDurationText(final ImportLauncher importLauncher) {
+
+      final int duration = importLauncher.temperatureAdjustmentDuration;
+      final Period durationPeriod = new Period(0, duration * 1000L, _durationTemplate);
+
+      return durationPeriod.toString(UI.DEFAULT_DURATION_FORMATTER);
    }
 
    /**

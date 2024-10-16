@@ -543,6 +543,7 @@ public class TagMenuManager {
 // SET_FORMATTING_OFF
 
       _actionAddTag           .setEnabled(isAddTagEnabled);
+      _actionAddTagGroups     .setEnabled(isAddTagEnabled);
       actionAddTagAdvanced    .setEnabled(isAddTagEnabled);
 
       _actionRemoveTag        .setEnabled(isRemoveTagEnabled);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2019, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -58,21 +58,21 @@ import org.eclipse.swt.widgets.Text;
  */
 public class MapProvider_InfoToolTip extends ToolTip {
 
-   private static final int          SHELL_MARGIN = 5;
+   private static final int         SHELL_MARGIN = 5;
 
    private SlideoutMap2_MapProvider _slideout_Map2_MapProvider;
 
-   private MP                        _mp;
+   private MP                       _mp;
 
-   private Control                   _ttControl;
+   private Control                  _ttControl;
 
-   private ColumnViewer              _tableViewer;
-   private ViewerCell                _viewerCell;
+   private ColumnViewer             _tableViewer;
+   private ViewerCell               _viewerCell;
 
-   private boolean                   _hasDescription;
-   private boolean                   _hasOnlineMap;
-   private boolean                   _hasTileLayerInfo;
-   private String                    _tileLayerInfo;
+   private boolean                  _hasDescription;
+   private boolean                  _hasOnlineMap;
+   private boolean                  _hasTileLayerInfo;
+   private String                   _tileLayerInfo;
 
    /*
     * UI controls
@@ -91,7 +91,8 @@ public class MapProvider_InfoToolTip extends ToolTip {
 
    private Link      _linkOnlineMap;
 
-   public MapProvider_InfoToolTip(final SlideoutMap2_MapProvider slideout_Map2_MapProvider, final TableViewer tableViewer) {
+   public MapProvider_InfoToolTip(final SlideoutMap2_MapProvider slideout_Map2_MapProvider,
+                                  final TableViewer tableViewer) {
 
       super(tableViewer.getTable(), NO_RECREATE, false);
 

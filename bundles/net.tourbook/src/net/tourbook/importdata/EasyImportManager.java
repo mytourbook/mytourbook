@@ -123,10 +123,12 @@ public class EasyImportManager {
    private static final String      ATTR_IL_IS_SHOW_IN_DASHBOARD                       = "isShowInDashBoard";                                 //$NON-NLS-1$
    private static final String      ATTR_IL_IS_SET_LAST_MARKER                         = "isSetLastMarker";                                   //$NON-NLS-1$
    private static final String      ATTR_IL_IS_SET_TOUR_TYPE                           = "isSetTourType";                                     //$NON-NLS-1$
+   private static final String      ATTR_IL_IS_SET_TOUR_TAG_GROUP                      = "isSetTourTagGroup";                                 //$NON-NLS-1$
    private static final String      ATTR_IL_LAST_MARKER_TEXT                           = "lastMarkerText";                                    //$NON-NLS-1$
    private static final String      ATTR_IL_LAST_MARKER_DISTANCE                       = "lastMarkerDistance";                                //$NON-NLS-1$
    private static final String      ATTR_IL_TEMPERATURE_ADJUSTMENT_DURATION            = "temperatureAdjustmentDuration";                     //$NON-NLS-1$
    private static final String      ATTR_IL_TEMPERATURE_TOUR_AVG_TEMPERATURE           = "tourAverageTemperature";                            //$NON-NLS-1$
+   private static final String      ATTR_IL_TOUR_TAG_GROUP_ID                          = "tourTagGroupID";                                    //$NON-NLS-1$
    private static final String      ATTR_IL_TOUR_LOCATION_PROFILE_NAME                 = "tourLocationProfileName";                           //$NON-NLS-1$
    private static final String      ATTR_IL_TOUR_TYPE_CADENCE                          = "tourTypeCadence";                                   //$NON-NLS-1$
    //
@@ -141,6 +143,7 @@ public class EasyImportManager {
    public static final String       LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE             = Messages.Log_EasyImport_005_AdjustTemperatureValues;
    public static final String       LOG_EASY_IMPORT_006_ADJUST_ELEVATION               = Messages.Log_EasyImport_006_AdjustElevation;
    public static final String       LOG_EASY_IMPORT_007_REPLACE_ELEVATION_FROM_SRTM    = Messages.Log_EasyImport_006_ReplaceElevationFromSRTM;
+   public static final String       LOG_EASY_IMPORT_008_SET_TOUR_TAGS                  = Messages.Log_EasyImport_008_SetTourTags;
    public static final String       LOG_EASY_IMPORT_050_RETRIEVE_WEATHER_DATA          = Messages.Log_EasyImport_050_RetrieveWeatherData;
    public static final String       LOG_EASY_IMPORT_051_RETRIEVE_TOUR_LOCATION         = Messages.Log_EasyImport_051_RetrieveTourLocation;
    public static final String       LOG_EASY_IMPORT_099_SAVE_TOUR                      = Messages.Log_EasyImport_099_SaveTour;
@@ -828,6 +831,10 @@ public class EasyImportManager {
       importLauncher.isRetrieveTourLocation = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_RETRIEVE_TOUR_LOCATIONS, false);
       importLauncher.tourLocationProfile = TourLocationManager.getProfile(Util.getXmlString(xmlConfig, ATTR_IL_TOUR_LOCATION_PROFILE_NAME, null));
 
+      // set tour tag group
+      importLauncher.isSetTourTagGroup = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_SET_TOUR_TAG_GROUP, false);
+      importLauncher.tourTagGroupID = Util.getXmlString(xmlConfig, ATTR_IL_TOUR_TAG_GROUP_ID, null);
+
       // adjust elevation
       importLauncher.isReplaceFirstTimeSliceElevation = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_REPLACE_FIRST_TIME_SLICE_ELEVATION, false);
 
@@ -1238,6 +1245,10 @@ public class EasyImportManager {
          // retrieve tour locations
          xmlConfig.putBoolean(ATTR_IL_IS_RETRIEVE_TOUR_LOCATIONS,       importLauncher.isRetrieveTourLocation);
          xmlConfig.putString(ATTR_IL_TOUR_LOCATION_PROFILE_NAME,        importLauncher.tourLocationProfile.getName());
+
+         // retrieve tour tag group
+         xmlConfig.putBoolean(ATTR_IL_IS_SET_TOUR_TAG_GROUP,            importLauncher.isSetTourTagGroup);
+         xmlConfig.putString(ATTR_IL_TOUR_TAG_GROUP_ID,                 importLauncher.tourTagGroupID);
 
          // adjust elevation
          xmlConfig.putBoolean(ATTR_IL_IS_REPLACE_FIRST_TIME_SLICE_ELEVATION, importLauncher.isReplaceFirstTimeSliceElevation);

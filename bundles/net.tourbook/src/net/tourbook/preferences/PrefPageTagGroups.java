@@ -488,7 +488,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
             .hint(70, 100)
             .applyTo(tableLayouter);
 
-      final Table table = new Table(tableLayouter, (SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION));
+      final Table table = new Table(tableLayouter, (SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION));
       table.setHeaderVisible(false);
       table.setLinesVisible(false);
 
@@ -705,13 +705,13 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
 
          // button: new
          _btnNew = new Button(container, SWT.NONE);
-         _btnNew.setText(Messages.Pref_TourTypeFilter_button_new);
+         _btnNew.setText(Messages.App_Action_New);
          _btnNew.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onTagGroup_New()));
          setButtonLayoutData(_btnNew);
 
          // button: rename
          _btnRename = new Button(container, SWT.NONE);
-         _btnRename.setText(Messages.Pref_TourTypeFilter_button_rename);
+         _btnRename.setText(Messages.App_Action_Rename);
          _btnRename.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onTagGroup_Rename()));
          setButtonLayoutData(_btnRename);
 
@@ -1393,6 +1393,9 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
          _isModified = false;
 
          TagGroupManager.saveState();
+
+         // fire modify event
+         TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
       }
 
       saveState();

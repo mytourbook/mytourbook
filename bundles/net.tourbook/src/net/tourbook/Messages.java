@@ -1293,6 +1293,7 @@ public class Messages extends NLS {
    public static String        Log_EasyImport_005_AdjustTemperatureValues;
    public static String        Log_EasyImport_006_AdjustElevation;
    public static String        Log_EasyImport_006_ReplaceElevationFromSRTM;
+   public static String        Log_EasyImport_008_SetTourTags;
    public static String        Log_EasyImport_050_RetrieveWeatherData;
    public static String        Log_EasyImport_051_RetrieveTourLocation;
    public static String        Log_EasyImport_099_SaveTour;

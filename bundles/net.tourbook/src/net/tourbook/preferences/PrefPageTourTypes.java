@@ -367,7 +367,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
             layoutContainer,
             SWT.H_SCROLL
                   | SWT.V_SCROLL
-                  | SWT.BORDER
                   | SWT.MULTI
                   | SWT.FULL_SELECTION);
 

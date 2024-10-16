@@ -298,6 +298,7 @@ public class Images {
    public static final String State_SaveTour                             = "state-save-tour.png";                                 //$NON-NLS-1$
    public static final String State_SavedInTour                          = "state-saved-in-tour.png";                             //$NON-NLS-1$
    public static final String State_TourMarker                           = "state-tour-marker.png";                               //$NON-NLS-1$
+   public static final String State_TourTags                             = "state-tour-tags.png";                                 //$NON-NLS-1$
    public static final String Statistic                                  = "statistics.png";                                      //$NON-NLS-1$
    public static final String StatisticValues                            = "statistic-values.png";                                //$NON-NLS-1$
    public static final String SyncGeoGraph_ByScale                       = "synch-geo-graph-byScale.png";                         //$NON-NLS-1$
