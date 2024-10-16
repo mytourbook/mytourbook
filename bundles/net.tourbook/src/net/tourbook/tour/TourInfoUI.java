@@ -219,13 +219,13 @@ public class TourInfoUI {
    private Composite        _lowerPartContainer;
    private Composite        _shellContainer;
    private Composite        _ttContainer;
-   private Text             _txtDescription;
 
+   private Text             _txtDescription;
    private Text             _txtLocationEnd;
    private Text             _txtLocationStart;
    private Text             _txtWeather;
-   private CLabel           _lblClouds;
 
+   private CLabel           _lblClouds;
    private CLabel           _lblTourType_Image;
    private Label            _lblAirQuality;
 
@@ -367,10 +367,8 @@ public class TourInfoUI {
    private Label            _lblVerticalSpeed_Time_Relative_Gain;
    private Label            _lblVerticalSpeed_Time_Relative_Loss;
    private Link             _linkBattery;
-
    private ArrayList<Link>  _allSensorValue_Link;
    private ArrayList<Label> _allSensorValue_Level;
-
    private ArrayList<Label> _allSensorValue_Status;
    private ArrayList<Label> _allSensorValue_Voltage;
 
