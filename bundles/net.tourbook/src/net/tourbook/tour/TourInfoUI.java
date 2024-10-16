@@ -200,12 +200,12 @@ public class TourInfoUI {
     * Fields which are optionally displayed when they are not null
     */
    private ZonedDateTime    _uiDtCreated;
-
    private ZonedDateTime    _uiDtModified;
    private String           _uiTourTypeName;
-   private IToolTipProvider _tourToolTipProvider;
 
+   private IToolTipProvider _tourToolTipProvider;
    private ITourProvider    _tourProvider;
+
    /*
     * UI resources
     */
