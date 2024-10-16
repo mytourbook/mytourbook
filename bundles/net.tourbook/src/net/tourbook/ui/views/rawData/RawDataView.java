@@ -37,6 +37,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -115,6 +116,8 @@ import net.tourbook.importdata.TourTypeConfig;
 import net.tourbook.photo.ImageUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageImport;
+import net.tourbook.tag.TagGroup;
+import net.tourbook.tag.TagGroupManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -2740,6 +2743,41 @@ public class RawDataView extends ViewPart implements
       } catch (final IOException e) {
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
+   }
+
+   private String createTagGroupText(final ImportLauncher importLauncher) {
+
+      final StringBuilder sb = new StringBuilder();
+
+      final String tourTagGroupID = importLauncher.tourTagGroupID;
+
+      final TagGroup tagGroup = TagGroupManager.getTagGroup(tourTagGroupID);
+      final Set<TourTag> allTags = TagGroupManager.getTags(tourTagGroupID);
+
+      if (tagGroup == null || allTags == null) {
+
+         return UI.EMPTY_STRING;
+      }
+
+      final List<TourTag> sortedTags = new ArrayList<>(allTags);
+      Collections.sort(sortedTags);
+
+      final StringBuilder sbTags = new StringBuilder();
+
+      for (int tagIndex = 0; tagIndex < sortedTags.size(); tagIndex++) {
+
+         final TourTag tourTag = sortedTags.get(tagIndex);
+
+         if (tagIndex > 0) {
+            sbTags.append(UI.SPACE2 + UI.SYMBOL_BULLET + UI.SPACE2);
+         }
+
+         sbTags.append(tourTag.getTagName());
+      }
+
+      sb.append("\"%s\" : %s".formatted(tagGroup.name, sbTags.toString())); //$NON-NLS-1$
+
+      return sb.toString();
    }
 
    private void createUI(final Composite parent) {
@@ -5725,6 +5763,13 @@ public class RawDataView extends ViewPart implements
          }
 
          /*
+          * 8. Set tour tags from a group
+          */
+         if (importLauncher.isSetTourTagGroup) {
+            runEasyImport_008_SetTourTags(importLauncher, importedTours);
+         }
+
+         /*
           * 50. Retrieve weather data
           */
          if (importLauncher.isRetrieveWeatherData) {
@@ -5977,6 +6022,25 @@ public class RawDataView extends ViewPart implements
                   oldElevationDown,
                   elevationUpDown.elevationLoss));
          }
+      }
+   }
+
+   private void runEasyImport_008_SetTourTags(final ImportLauncher importLauncher,
+                                              final ArrayList<TourData> importedTours) {
+
+      final String tourTagGroupID = importLauncher.tourTagGroupID;
+      final TagGroup tagGroup = TagGroupManager.getTagGroup(tourTagGroupID);
+
+      if (tagGroup == null) {
+         return;
+      }
+
+      // "8. Set tour tags from the tag group %s"
+      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_008_SET_TOUR_TAGS.formatted(createTagGroupText(importLauncher)));
+
+      for (final TourData tourData : importedTours) {
+
+         tourData.setTourTags(tagGroup.tourTags);
       }
    }
 

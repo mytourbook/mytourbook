@@ -127,6 +127,30 @@ public class TagGroupManager {
    }
 
    /**
+    * @param tourTagGroupID
+    *
+    * @return Returns the tag group name <code>null</code> when not available, e.g. when a group was
+    *         deleted
+    */
+   public static String getTagGroupName(final String tourTagGroupID) {
+
+      if (tourTagGroupID == null) {
+
+         return null;
+      }
+
+      for (final TagGroup tagGroup : _allTagGroups) {
+
+         if (tourTagGroupID.equals(tagGroup.id)) {
+
+            return tagGroup.name;
+         }
+      }
+
+      return null;
+   }
+
+   /**
     * @return Returns all {@link TagGroup}'s.
     *         <p>
     *         Do not modify this list, use {@link #addTagGroup(TagGroup)} or

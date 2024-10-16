@@ -55,7 +55,9 @@ New
 
 * Tour Tag Groups
   - Define a group with tags
-  - Set all tags from a group into a tour
+  - Set all tags from a group 
+    - from all tour views
+    - with easy import
   https://github.com/mytourbook/mytourbook/issues/1358
 
 * Tour Book View

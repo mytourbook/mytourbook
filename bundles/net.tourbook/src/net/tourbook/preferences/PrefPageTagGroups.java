@@ -705,13 +705,13 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
 
          // button: new
          _btnNew = new Button(container, SWT.NONE);
-         _btnNew.setText(Messages.Pref_TourTypeFilter_button_new);
+         _btnNew.setText(Messages.App_Action_New);
          _btnNew.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onTagGroup_New()));
          setButtonLayoutData(_btnNew);
 
          // button: rename
          _btnRename = new Button(container, SWT.NONE);
-         _btnRename.setText(Messages.Pref_TourTypeFilter_button_rename);
+         _btnRename.setText(Messages.App_Action_Rename);
          _btnRename.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onTagGroup_Rename()));
          setButtonLayoutData(_btnRename);
 

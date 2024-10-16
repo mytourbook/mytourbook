@@ -40,6 +40,7 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEnumEntry;
+import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -3288,7 +3289,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       // tag groups
       _comboIL_TourTagGroups.add("< Select a tag group >");
       for (final TagGroup tagGroup : TagGroupManager.getTagGroupsSorted()) {
-         _comboIL_TourTagGroups.add(tagGroup.name);
+
+         _comboIL_TourTagGroups.add(tagGroup.name + UI.SPACE3 + tagGroup.tourTags.size());
       }
    }
 
@@ -3339,7 +3341,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       return TourLocationManager.getDefaultProfile();
    }
 
-   private String getSelectedTourTagGroup() {
+   private String getSelectedTourTagGroupID() {
 
       final int selectedLocationIndex = _comboIL_TourTagGroups.getSelectionIndex()
 
@@ -3781,6 +3783,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          return;
       }
 
+      final String selectedTourTagGroupID = getSelectedTourTagGroupID();
+
 // SET_FORMATTING_OFF
 
       // update model which is displayed in the IL viewer
@@ -3795,7 +3799,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _selectedIL.tourAvgTemperature                  = UI.convertTemperatureToMetric(_spinnerIL_AvgTemperature.getSelection());
 
       _selectedIL.isSetTourTagGroup                   = _chkIL_SetTourTagGroup.getSelection();
-      _selectedIL.tourTagGroupID                      = getSelectedTourTagGroup();
+      _selectedIL.tourTagGroupID                      = selectedTourTagGroupID;
 
       _selectedIL.isReplaceFirstTimeSliceElevation    = _chkIL_ReplaceFirstTimeSliceElevation.getSelection();
       _selectedIL.isRetrieveTourLocation              = _chkIL_RetrieveTourLocation.getSelection();
@@ -3809,6 +3813,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       // update UI
       _ilViewer.update(_selectedIL, null);
+
+      updateUI_TagGroupTooltip(TagGroupManager.getTagGroup(selectedTourTagGroupID));
    }
 
    private void onIL_Remove() {
@@ -4567,12 +4573,14 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          if (isSetTourType) {
             _comboIL_TourType.select(getTourTypeConfigIndex(tourTypeConfig));
          }
-
          // set tour tag group
          final String tagGroupID = _selectedIL.tourTagGroupID;
          final TagGroup tagGroup = TagGroupManager.getTagGroup(tagGroupID);
          final boolean isSetTourTagGroup = tagGroupID != null && tagGroup != null && _selectedIL.isSetTourTagGroup;
          _chkIL_SetTourTagGroup.setSelection(isSetTourTagGroup);
+
+         _comboIL_TourTagGroups.setToolTipText(null);
+
          if (isSetTourTagGroup) {
 
             final int tourTagGroupIndex = getTourTagGroupIndex(tagGroupID);
@@ -4583,11 +4591,14 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
             } else {
 
-               _comboIL_TourTagGroups.select(tourTagGroupIndex 
-                     
+               _comboIL_TourTagGroups.select(tourTagGroupIndex
+
                      // ignore first default item
                      + 1);
+
+               updateUI_TagGroupTooltip(tagGroup);
             }
+
          } else {
 
             _comboIL_TourTagGroups.select(0);
@@ -4722,6 +4733,43 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       update_Model_From_UI_OneTourType();
 
       redrawILViewer();
+   }
+
+   /**
+    * Create and set tag group tooltip text
+    *
+    * @param tagGroup
+    */
+   private void updateUI_TagGroupTooltip(final TagGroup tagGroup) {
+
+      if (tagGroup == null) {
+
+         _comboIL_TourTagGroups.setToolTipText(null);
+
+      } else {
+
+         final List<TourTag> sortedTags = new ArrayList<>(tagGroup.tourTags);
+         Collections.sort(sortedTags);
+
+         final StringBuilder sb = new StringBuilder();
+
+         sb.append(tagGroup.name);
+         sb.append(UI.NEW_LINE);
+         sb.append(UI.NEW_LINE);
+
+         for (int tagIndex = 0; tagIndex < sortedTags.size(); tagIndex++) {
+
+            final TourTag tourTag = sortedTags.get(tagIndex);
+
+            if (tagIndex > 0) {
+               sb.append(UI.NEW_LINE);
+            }
+
+            sb.append(UI.SYMBOL_BULLET + UI.SPACE + tourTag.getTagName());
+         }
+
+         _comboIL_TourTagGroups.setToolTipText(sb.toString());
+      }
    }
 
    private void updateUI_TemperatureAdjustmentDuration() {
