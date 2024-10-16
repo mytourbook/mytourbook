@@ -210,7 +210,6 @@ public class TourInfoUI {
     * UI resources
     */
    private Font             _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
-
    /*
     * UI controls
     */
@@ -368,6 +367,7 @@ public class TourInfoUI {
 
    private Link             _linkBattery;
    private ArrayList<Link>  _allSensorValue_Link;
+
    private ArrayList<Label> _allSensorValue_Level;
    private ArrayList<Label> _allSensorValue_Status;
    private ArrayList<Label> _allSensorValue_Voltage;
