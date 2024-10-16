@@ -119,15 +119,15 @@ public class TourInfoUI {
          FormatStyle.MEDIUM);
 
 
-//   private static org.joda.time.PeriodType _tourPeriodTemplate           = PeriodType.yearMonthDayTime()
+   private static org.joda.time.PeriodType _tourPeriodTemplate           = org.joda.time.PeriodType.yearMonthDayTime()
+
+         // hide these components
+         // .withMinutesRemoved()
+
+         .withSecondsRemoved()
+         .withMillisRemoved()
 //
-//         // hide these components
-//         // .withMinutesRemoved()
-//
-//         .withSecondsRemoved()
-//         .withMillisRemoved()
-////
-//   ;
+   ;
 
    private static final IPreferenceStore  _prefStore                    = TourbookPlugin.getPrefStore();
    private static final IDialogSettings   _state                        = TourbookPlugin.getState(ID);
@@ -2263,20 +2263,20 @@ public class TourInfoUI {
          _lblMovingTime_Unit.setVisible(false);
          _lblBreakTime_Unit.setVisible(false);
 
-//         final Period elapsedPeriod = new Period(
-//               _tourData.getTourStartTimeMS(),
-//               _tourData.getTourEndTimeMS(),
-//               _tourPeriodTemplate);
-//         final Period recordedPeriod = new Period(0, recordedTime * 1000, _tourPeriodTemplate);
-//         final Period pausedPeriod = new Period(0, pausedTime * 1000, _tourPeriodTemplate);
-//         final Period movingPeriod = new Period(0, movingTime * 1000, _tourPeriodTemplate);
-//         final Period breakPeriod = new Period(0, breakTime * 1000, _tourPeriodTemplate);
-//
-//         _lblElapsedTime.setText(elapsedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
-//         _lblRecordedTime.setText(recordedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
-//         _lblPausedTime.setText(pausedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
-//         _lblMovingTime.setText(movingPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
-//         _lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+         final org.joda.time.Period elapsedPeriod = new org.joda.time.Period(
+               _tourData.getTourStartTimeMS(),
+               _tourData.getTourEndTimeMS(),
+               _tourPeriodTemplate);
+         final org.joda.time.Period recordedPeriod = new org.joda.time.Period(0, recordedTime * 1000, _tourPeriodTemplate);
+         final org.joda.time.Period pausedPeriod = new org.joda.time.Period(0, pausedTime * 1000, _tourPeriodTemplate);
+         final org.joda.time.Period movingPeriod = new org.joda.time.Period(0, movingTime * 1000, _tourPeriodTemplate);
+         final org.joda.time.Period breakPeriod = new org.joda.time.Period(0, breakTime * 1000, _tourPeriodTemplate);
+
+         _lblElapsedTime.setText(elapsedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+         _lblRecordedTime.setText(recordedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+         _lblPausedTime.setText(pausedPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+         _lblMovingTime.setText(movingPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
+         _lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
       }
 
       /*
