@@ -215,7 +215,6 @@ public class TourInfoUI {
     * UI controls
     */
    private Composite        _parent;
-
    private Composite        _lowerPartContainer;
    private Composite        _shellContainer;
    private Composite        _ttContainer;
@@ -227,8 +226,8 @@ public class TourInfoUI {
 
    private CLabel           _lblClouds;
    private CLabel           _lblTourType_Image;
-   private Label            _lblAirQuality;
 
+   private Label            _lblAirQuality;
    private Label            _lblAltimeter_Up;
    private Label            _lblAltimeter_Up_Unit;
    private Label            _lblAltimeter_Down;
@@ -307,7 +306,6 @@ public class TourInfoUI {
    private Label            _lblWindDirection;
    private Label            _lblWindDirectionUnit;
    private Label            _lblRunDyn_StanceTime_Min;
-
    private Label            _lblRunDyn_StanceTime_Min_Unit;
    private Label            _lblRunDyn_StanceTime_Max;
    private Label            _lblRunDyn_StanceTime_Max_Unit;
@@ -366,7 +364,9 @@ public class TourInfoUI {
    private Label            _lblVerticalSpeed_Time_Relative_Flat;
    private Label            _lblVerticalSpeed_Time_Relative_Gain;
    private Label            _lblVerticalSpeed_Time_Relative_Loss;
+
    private Link             _linkBattery;
+
    private ArrayList<Link>  _allSensorValue_Link;
    private ArrayList<Label> _allSensorValue_Level;
    private ArrayList<Label> _allSensorValue_Status;
