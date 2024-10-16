@@ -305,6 +305,7 @@ public class TourInfoUI {
    private Label            _lblWindSpeedUnit;
    private Label            _lblWindDirection;
    private Label            _lblWindDirectionUnit;
+
    private Label            _lblRunDyn_StanceTime_Min;
    private Label            _lblRunDyn_StanceTime_Min_Unit;
    private Label            _lblRunDyn_StanceTime_Max;
@@ -366,7 +367,6 @@ public class TourInfoUI {
    private Label            _lblVerticalSpeed_Time_Relative_Loss;
 
    private Link             _linkBattery;
-
    private ArrayList<Link>  _allSensorValue_Link;
    private ArrayList<Label> _allSensorValue_Level;
    private ArrayList<Label> _allSensorValue_Status;
