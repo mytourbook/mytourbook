@@ -155,6 +155,7 @@ public class TourInfoUI {
    private int            _descriptionLineCount;
    private int            _descriptionScroll_Lines = 15;
    private int            _descriptionScroll_Height;
+
    /**
     * Part which fired an event
     */
@@ -164,12 +165,11 @@ public class TourInfoUI {
     * Actions
     */
    private ActionCloseTooltip             _actionCloseTooltip;
-
    private ActionTourToolTip_EditTour     _actionEditTour;
    private ActionTourToolTip_EditQuick    _actionEditQuick;
    private ActionSlideout_TourInfoOptions _actionTourInfoOptions;
-   private boolean                        _areTourActionsVisible;
 
+   private boolean                        _areTourActionsVisible;
    private boolean                        _isShowBodyValues;
    private boolean                        _isShowHRZones;
    private boolean                        _isShowRunDyn;
@@ -178,6 +178,7 @@ public class TourInfoUI {
    private boolean                        _isShowVerticalSpeed;
    private boolean                        _isShowWeatherDescription;
    private boolean                        _isShowWeatherValues;
+
    /**
     * When <code>true</code> then the tour info is embedded in a view and do not need the toolbar to
     * close the tooltip.
