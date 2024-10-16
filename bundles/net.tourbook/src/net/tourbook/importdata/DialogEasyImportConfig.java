@@ -3159,7 +3159,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _chkIL_SetLastMarker          .setEnabled(isILSelected);
       _chkIL_SaveTour               .setEnabled(isILSelected);
       _chkIL_ShowInDashboard        .setEnabled(isILSelected);
-      _chkIL_SetTourTagGroup        .setEnabled(isILSelected);
       _chkIL_SetTourType            .setEnabled(isILSelected);
 
       _comboIL_TourType             .setEnabled(isILSelected && isSetTourType);
@@ -3287,6 +3286,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
 
       // tag groups
+      _comboIL_TourTagGroups.add("< Select a tag group >");
       for (final TagGroup tagGroup : TagGroupManager.getTagGroupsSorted()) {
          _comboIL_TourTagGroups.add(tagGroup.name);
       }
@@ -3341,7 +3341,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    private String getSelectedTourTagGroup() {
 
-      final int selectedLocationIndex = _comboIL_TourTagGroups.getSelectionIndex();
+      final int selectedLocationIndex = _comboIL_TourTagGroups.getSelectionIndex()
+
+            // ignore first default item
+            - 1;
 
       if (selectedLocationIndex >= 0) {
 
@@ -4566,17 +4569,28 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          }
 
          // set tour tag group
-         final String tourTagGroupID = _selectedIL.tourTagGroupID;
-         final boolean isSetTourTagGroup = tourTagGroupID != null && _selectedIL.isSetTourTagGroup;
+         final String tagGroupID = _selectedIL.tourTagGroupID;
+         final TagGroup tagGroup = TagGroupManager.getTagGroup(tagGroupID);
+         final boolean isSetTourTagGroup = tagGroupID != null && tagGroup != null && _selectedIL.isSetTourTagGroup;
          _chkIL_SetTourTagGroup.setSelection(isSetTourTagGroup);
          if (isSetTourTagGroup) {
 
-            final int tourTagGroupIndex = getTourTagGroupIndex(tourTagGroupID);
+            final int tourTagGroupIndex = getTourTagGroupIndex(tagGroupID);
 
-            if (tourTagGroupIndex != -1) {
+            if (tourTagGroupIndex == -1) {
 
-               _comboIL_TourTagGroups.select(tourTagGroupIndex);
+               _comboIL_TourTagGroups.select(0);
+
+            } else {
+
+               _comboIL_TourTagGroups.select(tourTagGroupIndex 
+                     
+                     // ignore first default item
+                     + 1);
             }
+         } else {
+
+            _comboIL_TourTagGroups.select(0);
          }
 
          /*

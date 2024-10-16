@@ -102,7 +102,18 @@ public class TagGroupManager {
       return xmlRoot;
    }
 
+   /**
+    * @param tourTagGroupID
+    *
+    * @return Returns the tag group or <code>null</code> when not available, e.g. when a group was
+    *         deleted
+    */
    public static TagGroup getTagGroup(final String tourTagGroupID) {
+
+      if (tourTagGroupID == null) {
+
+         return null;
+      }
 
       for (final TagGroup tagGroup : _allTagGroups) {
 

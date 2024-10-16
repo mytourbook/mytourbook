@@ -1393,6 +1393,9 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
          _isModified = false;
 
          TagGroupManager.saveState();
+
+         // fire modify event
+         TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
       }
 
       saveState();

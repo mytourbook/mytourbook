@@ -27,6 +27,7 @@ import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
+import net.tourbook.tag.TagGroup;
 import net.tourbook.tag.TagGroupManager;
 import net.tourbook.tour.CadenceMultiplier;
 
@@ -68,9 +69,10 @@ public class EasyLauncherUtils {
 
    public static void getTagGroupText(final ImportLauncher importLauncher, final StringBuilder sb) {
 
+      final TagGroup tagGroup = TagGroupManager.getTagGroup(importLauncher.tourTagGroupID);
       final Set<TourTag> allTags = TagGroupManager.getTags(importLauncher.tourTagGroupID);
 
-      if (allTags == null) {
+      if (tagGroup == null || allTags == null) {
 
          return;
       }
@@ -86,9 +88,7 @@ public class EasyLauncherUtils {
       }
 
       sb.append(NL);
-      sb.append("Set tour tags: %s\n\n%s".formatted(
-            TagGroupManager.getTagGroup(importLauncher.tourTagGroupID).name,
-            sbTags.toString()));
+      sb.append("Set tour tags: %s\n\n%s".formatted(tagGroup.name, sbTags.toString()));
    }
 
    public static String getTourTypeText(final ImportLauncher importLauncher, final String tileName) {
@@ -508,9 +508,16 @@ public class EasyLauncherUtils {
 
             final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
 
-            cell.setText(importLauncher.isSetTourTagGroup
-                  ? TagGroupManager.getTagGroup(importLauncher.tourTagGroupID).name
-                  : UI.EMPTY_STRING);
+            if (importLauncher.isSetTourTagGroup) {
+
+               final TagGroup tagGroup = TagGroupManager.getTagGroup(importLauncher.tourTagGroupID);
+
+               cell.setText(tagGroup == null ? UI.EMPTY_STRING : tagGroup.name);
+
+            } else {
+
+               cell.setText(UI.EMPTY_STRING);
+            }
          }
       });
    }

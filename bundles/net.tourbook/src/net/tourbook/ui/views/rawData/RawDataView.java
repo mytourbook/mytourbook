@@ -2251,7 +2251,7 @@ public class RawDataView extends ViewPart implements
       {
          // tag group tags
 
-         if (importLauncher.isSetTourTagGroup) {
+         if (importLauncher.isSetTags()) {
 
             EasyLauncherUtils.getTagGroupText(importLauncher, sb);
 
@@ -2353,13 +2353,13 @@ public class RawDataView extends ViewPart implements
       return sb.toString();
    }
 
-   private String createHTML_86_AnnotationImages(final ImportLauncher importTile) {
+   private String createHTML_86_AnnotationImages(final ImportLauncher importLauncher) {
 
       /*
        * Save tour
        */
       String htmlSaveTour = UI.EMPTY_STRING;
-      if (importTile.isSaveTour) {
+      if (importLauncher.isSaveTour) {
 
          final String stateImage = createHTML_BgImage(_imageUrl_State_SaveTour);
 
@@ -2370,7 +2370,7 @@ public class RawDataView extends ViewPart implements
        * Adjust temperature
        */
       String htmlAdjustTemperature = UI.EMPTY_STRING;
-      if (importTile.isAdjustTemperature) {
+      if (importLauncher.isAdjustTemperature) {
 
          final String stateImage = createHTML_BgImage(_imageUrl_State_AdjustTemperature);
 
@@ -2381,7 +2381,7 @@ public class RawDataView extends ViewPart implements
        * Retrieve Weather Data
        */
       String htmlRetrieveWeatherData = UI.EMPTY_STRING;
-      if (importTile.isRetrieveWeatherData) {
+      if (importLauncher.isRetrieveWeatherData) {
 
          final String stateImage = createHTML_BgImage(_imageUrl_State_RetrieveWeatherData);
 
@@ -2392,7 +2392,7 @@ public class RawDataView extends ViewPart implements
        * Retrieve tour location
        */
       String htmlRetrieveTourLocation = UI.EMPTY_STRING;
-      if (importTile.isRetrieveTourLocation) {
+      if (importLauncher.isRetrieveTourLocation) {
 
          final String stateImage = createHTML_BgImage(_imageUrl_State_RetrieveTourLocation);
 
@@ -2403,7 +2403,7 @@ public class RawDataView extends ViewPart implements
        * Marker
        */
       String htmlLastMarker = UI.EMPTY_STRING;
-      if (importTile.isSetLastMarker) {
+      if (importLauncher.isSetLastMarker) {
 
          final String stateImage = createHTML_BgImage(_imageUrl_State_TourMarker);
 
@@ -2414,7 +2414,7 @@ public class RawDataView extends ViewPart implements
        * Tags
        */
       String htmlTourTags = UI.EMPTY_STRING;
-      if (importTile.isSetTourTagGroup) {
+      if (importLauncher.isSetTags()) {
 
          final String stateImage = createHTML_BgImage(_imageUrl_State_TourTags);
 
@@ -2443,7 +2443,7 @@ public class RawDataView extends ViewPart implements
       sb.append(htmlLastMarker);
       sb.append(htmlTourTags);
 
-      sb.append("<div style='float:left;'>" + importTile.name + "</div>"); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append("<div style='float:left;'>" + importLauncher.name + "</div>"); //$NON-NLS-1$ //$NON-NLS-2$
 
       return sb.toString();
    }
