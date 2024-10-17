@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,6 +45,7 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.web.WEB;
@@ -149,6 +150,8 @@ public class FTSearchManager {
    private static boolean                       _isSearch_Waypoint;
    private static boolean                       _isShow_TitleDescription;
    private static boolean                       _isSort_DateAscending            = false;                                // -> sort descending
+
+   private static Object                        _lastSearchText;
 
    private static final FieldType               fieldType_Int;
    private static final FieldType               fieldType_Long;
@@ -1206,7 +1209,7 @@ public class FTSearchManager {
          searchResult.totalHits = _topDocs.totalHits;
 
          /**
-          * Get doc id's only for the current page
+          * Get doc id's only for the current visible page
           * <p>
           * It is very cheap to query the doc id's but very expensive to retrieve the documents
           * <p>
@@ -1216,17 +1219,17 @@ public class FTSearchManager {
          int docEndIndex = searchToIndex;
 
          final ScoreDoc[] allScoreDocs = _topDocs.scoreDocs;
-         final int scoreSize = allScoreDocs.length;
+         final int numScoreDocs = allScoreDocs.length;
 
-         if (docEndIndex >= scoreSize) {
-            docEndIndex = scoreSize - 1;
+         if (docEndIndex >= numScoreDocs) {
+            docEndIndex = numScoreDocs - 1;
          }
 
-         final int numSearchResultItems = docEndIndex - docStartIndex + 1;
-         final int allDocIds[] = new int[numSearchResultItems];
+         final int numPageItems = docEndIndex - docStartIndex + 1;
+         final int allPageDocIds[] = new int[numPageItems];
 
-         for (int docIndex = 0; docIndex < numSearchResultItems; docIndex++) {
-            allDocIds[docIndex] = allScoreDocs[docStartIndex + docIndex].doc;
+         for (int docIndex = 0; docIndex < numPageItems; docIndex++) {
+            allPageDocIds[docIndex] = allScoreDocs[docStartIndex + docIndex].doc;
          }
 
          /**
@@ -1241,15 +1244,28 @@ public class FTSearchManager {
          final Map<String, String[]> highlightedSearchResults = highlighter.highlightFields(
                queryResult.allQueryFields,
                queryResult.query,
-               allDocIds,
+               allPageDocIds,
                createMaxPassages(queryResult.allQueryFields.length));
 
-         search_90_CreateResult(
+         search_80_CreateResult(
                highlightedSearchResults,
                _indexReader,
                searchResult,
-               allDocIds,
+               allPageDocIds,
                docStartIndex);
+
+         /*
+          * Sync with the tourbook view
+          */
+         boolean isSyncWithTourBookView = true;
+         isSyncWithTourBookView = true;
+
+         if (isSyncWithTourBookView && searchText.equals(_lastSearchText) == false) {
+
+            _lastSearchText = searchText;
+
+            search_90_CreateSyncResult(_indexReader, _topDocs);
+         }
 
       } catch (final Exception e) {
 
@@ -1426,7 +1442,7 @@ public class FTSearchManager {
     * Creating the result is complicated because the highlights are listed by field and not by hit,
     * therefor the structure must be inverted.
     *
-    * @param highlights
+    * @param highlightedSearchResults
     * @param indexReader
     * @param searchResult
     * @param docStartIndex
@@ -1434,17 +1450,17 @@ public class FTSearchManager {
     *
     * @throws IOException
     */
-   private static void search_90_CreateResult(final Map<String, String[]> highlights,
+   private static void search_80_CreateResult(final Map<String, String[]> highlightedSearchResults,
                                               final IndexReader indexReader,
                                               final SearchResult searchResult,
                                               final int[] docids,
                                               final int docStartIndex) throws IOException {
 
-      if (highlights.isEmpty()) {
+      if (highlightedSearchResults.isEmpty()) {
          return;
       }
 
-      final Set<Entry<String, String[]>> fields = highlights.entrySet();
+      final Set<Entry<String, String[]>> fields = highlightedSearchResults.entrySet();
       Entry<String, String[]> firstHit;
       try {
          firstHit = fields.iterator().next();
@@ -1455,14 +1471,11 @@ public class FTSearchManager {
       final int numHits = firstHit.getValue().length;
 
       // create result items
-//      final SearchResultItem[] resultItems = new SearchResultItem[numHits];
       final ArrayList<SearchResultItem> allSearchResultItems = searchResult.allItems;
 
       for (int hitIndex = 0; hitIndex < numHits; hitIndex++) {
 
          final SearchResultItem resultItem = new SearchResultItem();
-
-//         resultItems[hitIndex] = resultItem;
 
          allSearchResultItems.add(resultItem);
       }
@@ -1489,36 +1502,35 @@ public class FTSearchManager {
       for (final Entry<String, String[]> field : fields) {
 
          final String fieldName = field.getKey();
-         final String[] allSnippets = field.getValue();
+         final String[] allFieldValues = field.getValue();
 
-         for (int hitIndex = 0; hitIndex < allSnippets.length; hitIndex++) {
+         for (int hitIndex = 0; hitIndex < allFieldValues.length; hitIndex++) {
 
-//            final SearchResultItem resultItem = resultItems[hitIndex];
             final SearchResultItem resultItem = allSearchResultItems.get(hitIndex);
 
-            final String snippet = allSnippets[hitIndex];
-            if (snippet != null) {
+            final String fieldValue = allFieldValues[hitIndex];
+            if (fieldValue != null) {
 
                switch (fieldName) {
 
                case SEARCH_FIELD_DESCRIPTION:
-                  resultItem.description = snippet;
+                  resultItem.description = fieldValue;
                   break;
 
                case SEARCH_FIELD_TITLE:
-                  resultItem.title = snippet;
+                  resultItem.title = fieldValue;
                   break;
 
                case SEARCH_FIELD_TOUR_LOCATION_START:
-                  resultItem.locationStart = snippet;
+                  resultItem.locationStart = fieldValue;
                   break;
 
                case SEARCH_FIELD_TOUR_LOCATION_END:
-                  resultItem.locationEnd = snippet;
+                  resultItem.locationEnd = fieldValue;
                   break;
 
                case SEARCH_FIELD_TOUR_WEATHER:
-                  resultItem.weather = snippet;
+                  resultItem.weather = fieldValue;
                   break;
                }
             }
@@ -1584,6 +1596,36 @@ public class FTSearchManager {
          // get doc fields only once
          isDocRead = true;
       }
+   }
+
+   private static void search_90_CreateSyncResult(final IndexReader indexReader,
+                                                  final TopDocs topDocs) throws IOException {
+      // TODO Auto-generated method stub
+
+      final List<Long> allTourIDs = new ArrayList<>();
+
+      final Set<String> fieldsToLoadFromDocument = new HashSet<>();
+      fieldsToLoadFromDocument.add(SEARCH_FIELD_TOUR_ID);
+
+      final ScoreDoc[] allScoreDocs = topDocs.scoreDocs;
+
+      for (final ScoreDoc scoreDoc : allScoreDocs) {
+
+         final int docID = scoreDoc.doc;
+
+         final Document doc = indexReader.document(docID, fieldsToLoadFromDocument);
+
+         final IndexableField tourIDField = doc.getField(SEARCH_FIELD_TOUR_ID);
+
+         final String tourID = tourIDField.stringValue();
+
+         final long tourIDValue = Long.parseLong(tourID);
+
+         allTourIDs.add(tourIDValue);
+      }
+
+
+      TourManager.fireEventWithCustomData(TourEventId.FULLTEXT_SEARCH_TOURS, allTourIDs, null);
    }
 
    /**
