@@ -1158,6 +1158,7 @@ public class FTSearchManager {
     * @param searchText
     * @param searchFromIndex
     * @param searchToIndex
+    * @param isNewSearch
     * @param searchResult
     *
     * @return
@@ -1165,6 +1166,7 @@ public class FTSearchManager {
    private static void search(final String searchText,
                               final int searchFromIndex,
                               final int searchToIndex,
+                              final boolean isNewSearch,
                               final SearchResult searchResult) {
 
       try {
@@ -1255,16 +1257,22 @@ public class FTSearchManager {
                docStartIndex);
 
          /*
-          * Sync with the tourbook view
+          * Push into tourbook view
           */
-         boolean isSyncWithTourBookView = true;
-         isSyncWithTourBookView = true;
+         if (SearchManager.getSearchView() instanceof final SearchView searchView) {
 
-         if (isSyncWithTourBookView && searchText.equals(_lastSearchText) == false) {
+            if (searchView.isPushSearchResult()
 
-            _lastSearchText = searchText;
+                  // push only when the search text has changed or a new search has started
 
-            search_90_CreateSyncResult(_indexReader, _topDocs);
+                  && (searchText.equals(_lastSearchText) == false || isNewSearch)
+
+            ) {
+
+               _lastSearchText = searchText;
+
+               search_90_CreatePushResult(_indexReader, _topDocs);
+            }
          }
 
       } catch (final Exception e) {
@@ -1598,14 +1606,30 @@ public class FTSearchManager {
       }
    }
 
-   private static void search_90_CreateSyncResult(final IndexReader indexReader,
-                                                  final TopDocs topDocs) throws IOException {
-      // TODO Auto-generated method stub
+   private static void search_90_CreatePushResult(final IndexReader indexReader,
+                                                  final TopDocs topDocs) {
 
       final List<Long> allTourIDs = new ArrayList<>();
 
+      // retrieving many document fields can be slow
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
+
+         search_92_PushResult(indexReader, topDocs, allTourIDs);
+      });
+
+      TourManager.fireEventWithCustomData(TourEventId.FULLTEXT_SEARCH_TOURS, allTourIDs, null);
+   }
+
+   private static void search_92_PushResult(final IndexReader indexReader,
+                                            final TopDocs topDocs,
+                                            final List<Long> allTourIDs) {
+
       final Set<String> fieldsToLoadFromDocument = new HashSet<>();
       fieldsToLoadFromDocument.add(SEARCH_FIELD_TOUR_ID);
+
+// THIS DO NOT WORK OR I HAVE NOT UNDERSTOOD HOW IT WORKS
+//
+//      final DocumentStoredFieldVisitor docStoreVisitor = new DocumentStoredFieldVisitor(fieldsToLoadFromDocument);
 
       final ScoreDoc[] allScoreDocs = topDocs.scoreDocs;
 
@@ -1613,35 +1637,43 @@ public class FTSearchManager {
 
          final int docID = scoreDoc.doc;
 
-         final Document doc = indexReader.document(docID, fieldsToLoadFromDocument);
+         try {
 
-         final IndexableField tourIDField = doc.getField(SEARCH_FIELD_TOUR_ID);
+            final Document doc = indexReader.document(docID, fieldsToLoadFromDocument);
 
-         final String tourID = tourIDField.stringValue();
+//            indexReader.document(docID, docStoreVisitor);
+//            final Document doc = docStoreVisitor.getDocument();
 
-         final long tourIDValue = Long.parseLong(tourID);
+            final IndexableField tourIDField = doc.getField(SEARCH_FIELD_TOUR_ID);
 
-         allTourIDs.add(tourIDValue);
+            final String tourID = tourIDField.stringValue();
+            final long tourIDValue = Long.parseLong(tourID);
+
+            allTourIDs.add(tourIDValue);
+
+         } catch (final IOException e) {
+
+            StatusUtil.log(e);
+         }
       }
-
-
-      TourManager.fireEventWithCustomData(TourEventId.FULLTEXT_SEARCH_TOURS, allTourIDs, null);
    }
 
    /**
     * @param searchText
     * @param searchPosFrom
     * @param searchPosTo
+    * @param isNewSearch
     *
     * @return Returns {@link SearchResult}
     */
    public static SearchResult searchByPosition(final String searchText,
                                                final int searchPosFrom,
-                                               final int searchPosTo) {
+                                               final int searchPosTo,
+                                               final boolean isNewSearch) {
 
       final SearchResult searchResult = new SearchResult();
 
-      search(searchText, searchPosFrom, searchPosTo, searchResult);
+      search(searchText, searchPosFrom, searchPosTo, isNewSearch, searchResult);
 
       return searchResult;
    }

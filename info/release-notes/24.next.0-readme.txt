@@ -63,6 +63,10 @@ New
 * Tour Book View
   - Create tour markers by distance or time
     https://github.com/mytourbook/mytourbook/issues/1319
+    
+* Tour Search
+  - Push tours from the fulltext search result into the Tour Book view
+    https://github.com/mytourbook/mytourbook/issues/1379
 
 
 Improvements
@@ -74,6 +78,7 @@ Improvements
 * Tour Location
   - Set start/end location names which has no geo positions
     https://github.com/mytourbook/mytourbook/issues/1413
+
 
 Changes
 =======

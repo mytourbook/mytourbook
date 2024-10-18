@@ -3698,20 +3698,37 @@ public class TourBookView extends ViewPart implements
 
          final long tourId = selectionTourId.getTourId();
 
+         boolean isSelectTours = true;
+
          if (_isLayoutNatTable) {
 
-            if (part instanceof final SearchView searchView) {
+            if (_actionLinkWithOtherViews.getSelection()) {
 
-               if (searchView.isSyncSearchResult()) {
+               // linking is enabled
 
+               if (part instanceof final SearchView searchView) {
+
+                  if (searchView.isPushSearchResult()) {
+
+                     /*
+                      * Disable tour selection otherwise the pushed search result is overwritten
+                      */
+                     isSelectTours = false;
+
+                     /*
+                      * Disable link with other views, this do not work when push is enabled
+                      */
+                     _actionLinkWithOtherViews.setSelection(false);
+                  }
                }
 
-            } else {
+               if (isSelectTours) {
 
-               _selectedTourIds.clear();
-               _selectedTourIds.add(tourId);
+                  _selectedTourIds.clear();
+                  _selectedTourIds.add(tourId);
 
-               reselectTourViewer(false);
+                  reselectTourViewer(false);
+               }
             }
 
          } else {
@@ -4223,9 +4240,6 @@ public class TourBookView extends ViewPart implements
          return;
       }
 
-//      System.out.println(UI.timeStamp() + " TourBookView.selectTour(long)(): " + tourId);
-// TODO remove SYSTEM.OUT.PRINTLN
-
       // check if enabled
       if (_actionLinkWithOtherViews.getSelection() == false) {
 
@@ -4423,7 +4437,6 @@ public class TourBookView extends ViewPart implements
    }
 
    private void setCollectionFilterFromFulltextSearch(final ArrayList<Long> allTourIDs) {
-      // TODO Auto-generated method stub
 
       _tourCollectionFilter = TourCollectionFilter.COLLECTED_TOURS;
 
@@ -4432,6 +4445,9 @@ public class TourBookView extends ViewPart implements
 
       // run in UI thread
       _parent.getDisplay().asyncExec(() -> {
+
+         // disable sync action
+         _actionLinkWithOtherViews.setSelection(false);
 
          final boolean isFilterActive = _actionTourCollectionFilter.getSelection();
 
