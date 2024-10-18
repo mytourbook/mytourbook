@@ -828,9 +828,9 @@ public class Messages extends NLS {
    public static String        Tour_TooltipOptions_Checkbox_ShowWeatherDescription;
    public static String        Tour_TooltipOptions_Checkbox_ShowWeatherValues;
    public static String        Tour_TooltipOptions_Label_TooltipWidth;
-   public static String        Tour_TooltipOptions_Label_TourInfoOptions;
    public static String        Tour_TooltipOptions_Radio_CustomizeValues;
    public static String        Tour_TooltipOptions_Radio_ShowAllValues;
+   public static String        Tour_TooltipOptions_Titel_TourInfoOptions;
 
    public static String        TourType_Config_Border_Bottom;
    public static String        TourType_Config_Border_Circle;

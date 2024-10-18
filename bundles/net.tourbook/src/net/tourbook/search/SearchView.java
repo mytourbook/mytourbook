@@ -108,7 +108,7 @@ public class SearchView extends ViewPart implements ISearchView {
 
          super(null, AS_CHECK_BOX);
 
-         setToolTipText(Messages.Search_View_Action_PushSearchResults);
+         setToolTipText(Messages.Search_View_Action_PushSearchResults_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PushIntoViews));
       }

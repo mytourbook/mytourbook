@@ -185,7 +185,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
        * Label: Slideout title
        */
       final Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Tour_TooltipOptions_Label_TourInfoOptions);
+      label.setText(Messages.Tour_TooltipOptions_Titel_TourInfoOptions);
       MTFont.setBannerFont(label);
       GridDataFactory.fillDefaults().span(numSpanColumns, 1).applyTo(label);
 

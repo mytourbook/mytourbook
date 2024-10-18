@@ -617,13 +617,21 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
             label.setText(Messages.Pref_TourTypes_Label_ImageScaling);
             gridData_AlignVerticalCenter.applyTo(label);
 
-            // spinner
-            _spinnerImageScale = new Spinner(container, SWT.BORDER);
-            _spinnerImageScale.setMinimum(10);
-            _spinnerImageScale.setMaximum(200);
-            _spinnerImageScale.setPageIncrement(10);
-            _spinnerImageScale.addSelectionListener(selectionListener);
-            _spinnerImageScale.addMouseWheelListener(mouseWheelListener_Scaling);
+            final Composite containerScale = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerScale);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerScale);
+            {
+               // spinner
+               _spinnerImageScale = new Spinner(containerScale, SWT.BORDER);
+               _spinnerImageScale.setMinimum(10);
+               _spinnerImageScale.setMaximum(200);
+               _spinnerImageScale.setPageIncrement(10);
+               _spinnerImageScale.addSelectionListener(selectionListener);
+               _spinnerImageScale.addMouseWheelListener(mouseWheelListener_Scaling);
+
+               // %
+               UI.createLabel(containerScale, UI.SYMBOL_PERCENTAGE);
+            }
          }
          {
             /*
