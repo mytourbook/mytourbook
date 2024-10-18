@@ -614,7 +614,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText("Image s&caling");
+            label.setText(Messages.Pref_TourTypes_Label_ImageScaling);
             gridData_AlignVerticalCenter.applyTo(label);
 
             // spinner

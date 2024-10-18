@@ -30,6 +30,7 @@ import java.util.Set;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.IconRequestMgr;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -69,8 +70,6 @@ import org.json.JSONObject;
  */
 public class SearchManager implements XHRHandler {
 
-   private static final String          SEARCH_APP_ACTION_EDIT_MARKER               = tourbook.search.nls.Messages.Search_App_Action_EditMarker;
-   private static final String          SEARCH_APP_ACTION_EDIT_TOUR                 = tourbook.search.nls.Messages.Search_App_Action_EditTour;
 
    private static final String          NL                                          = UI.NEW_LINE1;
 
@@ -828,7 +827,7 @@ public class SearchManager implements XHRHandler {
                + HREF_PARAM_DOC_ID + docId;
 
          iconUrl = _iconUrl_Tour;
-         hoverMessage = SEARCH_APP_ACTION_EDIT_TOUR;
+         hoverMessage = OtherMessages.SEARCH_APP_ACTION_EDIT_TOUR;
 
       } else if (isMarker) {
 
@@ -844,7 +843,7 @@ public class SearchManager implements XHRHandler {
                + HREF_PARAM_DOC_ID + docId;
 
          iconUrl = _iconUrl_Marker;
-         hoverMessage = SEARCH_APP_ACTION_EDIT_MARKER;
+         hoverMessage = OtherMessages.SEARCH_APP_ACTION_EDIT_MARKER;
 
       } else if (isWayPoint) {
 
@@ -854,7 +853,7 @@ public class SearchManager implements XHRHandler {
          }
 
          iconUrl = _iconUrl_WayPoint;
-         hoverMessage = SEARCH_APP_ACTION_EDIT_MARKER;
+         hoverMessage = OtherMessages.SEARCH_APP_ACTION_EDIT_MARKER;
       }
 
       if (itemTitleText == null) {
@@ -1256,7 +1255,7 @@ public class SearchManager implements XHRHandler {
          searchPosFrom = Integer.valueOf(ranges[0]);
          searchPosTo = Integer.valueOf(ranges[1]);
 
-         isNewSearch = xhrRange.startsWith("items=0-");
+         isNewSearch = xhrRange.startsWith("items=0-"); //$NON-NLS-1$
       }
 
       SearchResult searchResult = null;

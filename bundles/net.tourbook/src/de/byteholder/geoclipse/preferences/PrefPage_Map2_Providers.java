@@ -46,6 +46,7 @@ import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -132,8 +133,6 @@ import org.geotools.ows.wms.WMSCapabilities;
 import org.geotools.ows.wms.WMSRequest;
 
 public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
-
-   private static final String           APP_TRUE   = net.tourbook.Messages.App__True;
 
    public static final String            ID         = "de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers"; //$NON-NLS-1$
 
@@ -1138,8 +1137,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText("&HiDPI");
-            label.setToolTipText("Tile size multiplier for HiDPI displays");
+            label.setText(Messages.Pref_Map_Label_HiDPI);
+            label.setToolTipText(Messages.Pref_Map_Label_HiDPI_Tooltip);
 
             // combo
             _comboHiDPI = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -1558,7 +1557,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             final MP mapProvider = (MP) cell.getElement();
 
-            cell.setText(mapProvider.isVisibleInUI() ? APP_TRUE : UI.EMPTY_STRING);
+            cell.setText(mapProvider.isVisibleInUI() ? OtherMessages.APP_TRUE : UI.EMPTY_STRING);
          }
       });
    }
@@ -1621,8 +1620,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_HIDPI, SWT.TRAIL);
 
-      colDef.setColumnName("HiDPI");
-      colDef.setColumnHeaderToolTipText("Tile size multiplier for HiDPI displays");
+      colDef.setColumnName(Messages.Pref_Map2_Viewer_Column_HiDPI);
+      colDef.setColumnHeaderToolTipText(Messages.Pref_Map_Label_HiDPI_Tooltip);
       colDef.setIsDefaultColumn();
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(6));
 
@@ -1659,7 +1658,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             final MP mapProvider = (MP) cell.getElement();
 
-            cell.setText(mapProvider.isIncludesHillshading() ? APP_TRUE : UI.EMPTY_STRING);
+            cell.setText(mapProvider.isIncludesHillshading() ? OtherMessages.APP_TRUE : UI.EMPTY_STRING);
          }
       });
    }
@@ -1684,7 +1683,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             final MP mapProvider = (MP) cell.getElement();
 
-            cell.setText(mapProvider.isTransparentLayer() ? APP_TRUE : UI.EMPTY_STRING);
+            cell.setText(mapProvider.isTransparentLayer() ? OtherMessages.APP_TRUE : UI.EMPTY_STRING);
          }
       });
    }

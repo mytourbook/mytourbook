@@ -105,7 +105,7 @@ public class DialogStartEndLocation extends Dialog {
       super.configureShell(shell);
 
       // set window title
-      shell.setText("Set Tour Start/End Location Name");
+      shell.setText(Messages.Dialog_StartEndLocation_Title);
    }
 
    @Override
@@ -163,7 +163,7 @@ public class DialogStartEndLocation extends Dialog {
       {
          {
             final Label label = new Label(container, SWT.NONE);
-            label.setText("Set tour location name for %d tours".formatted(_allSelectedTours.size()));
+            label.setText(Messages.Dialog_StartEndLocation_Label_SetLocationName.formatted(_allSelectedTours.size()));
             GridDataFactory.fillDefaults().applyTo(label);
          }
          {
@@ -171,7 +171,7 @@ public class DialogStartEndLocation extends Dialog {
              * Start location
              */
             _chkLocation_Start = new Button(container, SWT.CHECK);
-            _chkLocation_Start.setText("S&tart location name");
+            _chkLocation_Start.setText(Messages.Dialog_StartEndLocation_Checkbox_StartLocationName);
             _chkLocation_Start.addSelectionListener(selectionListener);
             GridDataFactory.fillDefaults()
 
@@ -192,9 +192,9 @@ public class DialogStartEndLocation extends Dialog {
             }
             {
                _chkRemoveLocationAssoc_Start = new Button(container, SWT.CHECK);
-               _chkRemoveLocationAssoc_Start.setText("Remove start location &association");
+               _chkRemoveLocationAssoc_Start.setText(Messages.Dialog_StartEndLocation_Checkbox_RemoveStartLocationAssociation);
                _chkRemoveLocationAssoc_Start.setToolTipText(
-                     "It may be possible that a tour contains a start location association, this will be removed when selected");
+                     Messages.Dialog_StartEndLocation_Checkbox_RemoveStartLocationAssociation_Tooltip);
                _chkRemoveLocationAssoc_Start.addSelectionListener(selectionListener);
                gdIndent.applyTo(_chkRemoveLocationAssoc_Start);
             }
@@ -204,7 +204,7 @@ public class DialogStartEndLocation extends Dialog {
              * End location
              */
             _chkLocation_End = new Button(container, SWT.CHECK);
-            _chkLocation_End.setText("&End location name");
+            _chkLocation_End.setText(Messages.Dialog_StartEndLocation_Checkbox_EndLocationName);
             _chkLocation_End.addSelectionListener(selectionListener);
             GridDataFactory.fillDefaults().indent(0, 15).applyTo(_chkLocation_End);
 
@@ -220,9 +220,9 @@ public class DialogStartEndLocation extends Dialog {
             }
             {
                _chkRemoveLocationAssoc_End = new Button(container, SWT.CHECK);
-               _chkRemoveLocationAssoc_End.setText("Remove end location asso&ciation");
+               _chkRemoveLocationAssoc_End.setText(Messages.Dialog_StartEndLocation_Checkbox_RemoveEndLocationAssociation);
                _chkRemoveLocationAssoc_End.setToolTipText(
-                     "It may be possible that a tour contains an end location association, this will be removed when selected");
+                     Messages.Dialog_StartEndLocation_Checkbox_RemoveEndLocationAssociation_Tooltip);
                _chkRemoveLocationAssoc_End.addSelectionListener(selectionListener);
                gdIndent.applyTo(_chkRemoveLocationAssoc_End);
             }

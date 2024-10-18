@@ -24,7 +24,7 @@ public class SWTvsAWT_FontsAndImages {
    private static int                  IMAGE_WIDTH;
    private static int                  IMAGE_HEIGHT;
 
-   private static final String         FONT_NAME            = "Segoe UI";
+   private static final String         FONT_NAME            = "Segoe UI"; //$NON-NLS-1$
    private static int[]                FONT_SIZE;
 
    private static final int            MARGIN               = 2;
@@ -48,12 +48,12 @@ public class SWTvsAWT_FontsAndImages {
 
    static {
 
-      AUTO_SCALE = "quarter";
-      AUTO_SCALE = "false";
+      AUTO_SCALE = "quarter"; //$NON-NLS-1$
+      AUTO_SCALE = "false"; //$NON-NLS-1$
 
-      AUTO_SCALE = "150";
-      AUTO_SCALE = "200";
-      AUTO_SCALE = "100";
+      AUTO_SCALE = "150"; //$NON-NLS-1$
+      AUTO_SCALE = "200"; //$NON-NLS-1$
+      AUTO_SCALE = "100"; //$NON-NLS-1$
 
       FONT_SIZE = new int[] { //
 
@@ -66,8 +66,8 @@ public class SWTvsAWT_FontsAndImages {
             36 //
       };
 
-      System.setProperty("swt.autoScale", AUTO_SCALE);
-      System.setProperty("swt.autoScale.updateOnRuntime", "true");
+      System.setProperty("swt.autoScale", AUTO_SCALE); //$NON-NLS-1$
+      System.setProperty("swt.autoScale.updateOnRuntime", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
       _swtDisplay = new Display();
 
@@ -161,7 +161,7 @@ public class SWTvsAWT_FontsAndImages {
             devY += textHeight;
 
             g2d.setColor(FOREGROUND_COLOR_AWT);
-            g2d.drawString(" AWT" + getTestText(fontIndex), MARGIN, devY);
+            g2d.drawString(" AWT" + getTestText(fontIndex), MARGIN, devY); //$NON-NLS-1$
          }
 
       } finally {
@@ -190,7 +190,7 @@ public class SWTvsAWT_FontsAndImages {
          for (int fontIndex = 0; fontIndex < FONT_SIZE.length; fontIndex++) {
 
             gc.setFont(_swtFont[fontIndex]);
-            gc.drawString(" SWT" + getTestText(fontIndex), MARGIN, devY, true);
+            gc.drawString(" SWT" + getTestText(fontIndex), MARGIN, devY, true); //$NON-NLS-1$
 
             devY += _swtFontHeight[fontIndex] + 10;
          }
@@ -202,7 +202,7 @@ public class SWTvsAWT_FontsAndImages {
 
    private static String getTestText(final int fontIndex) {
 
-      return "  autoScale=%s  FONT SIZE=%d".formatted(AUTO_SCALE, FONT_SIZE[fontIndex]);
+      return "  autoScale=%s  FONT SIZE=%d".formatted(AUTO_SCALE, FONT_SIZE[fontIndex]); //$NON-NLS-1$
    }
 
    public static void main(final String[] args) {
@@ -215,7 +215,7 @@ public class SWTvsAWT_FontsAndImages {
       final Image swtImageFromAwt = new Image(_swtDisplay, imageDataProvider);
 
       final Shell shell = new Shell(_swtDisplay);
-      shell.setText("SWT vs AWT scaling");
+      shell.setText("SWT vs AWT scaling"); //$NON-NLS-1$
       shell.setLocation(SHELL_X, SHELL_Y);
 
       shell.setSize(

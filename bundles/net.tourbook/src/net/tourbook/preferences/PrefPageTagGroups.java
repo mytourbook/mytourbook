@@ -467,7 +467,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
          GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_containerTagGroupHeader);
 //         _containerTagGroupHeader.setBackground(UI.SYS_COLOR_CYAN);
          {
-            final Label label = UI.createLabel(_containerTagGroupHeader, "Tag &Groups");
+            final Label label = UI.createLabel(_containerTagGroupHeader, Messages.Tour_Tags_Label_TagGroups);
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   .align(SWT.FILL, SWT.END)
@@ -554,7 +554,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
          {
             // Label: All Tags
             final Label label = new Label(container, SWT.NONE);
-            label.setText("Available &Tags");
+            label.setText(Messages.Tour_Tags_Label_AvailableTags);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.END)
                   .grab(true, true)
@@ -797,7 +797,7 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
             return null;
          }
 
-         return "Name must not be empty";
+         return Messages.Tour_Tags_Validation_NameIsEmpty;
       };
    }
 
@@ -1161,10 +1161,10 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
 
             _parent.getShell(),
 
-            "Delete Tag Group",
+            Messages.Tour_Tags_Dialog_DeleteTagGroup_Title,
             null, // no title image
 
-            "Delete selected tag group \"%s\" ?".formatted(tagGroup.name),
+            Messages.Tour_Tags_Dialog_DeleteTagGroup_Message.formatted(tagGroup.name),
             MessageDialog.CONFIRM,
 
             0, // default index
@@ -1216,8 +1216,8 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
    private void onTagGroup_New() {
 
       final InputDialog inputDialog = new InputDialog(getShell(),
-            "New Tag Group",
-            "Tag group name",
+            Messages.Tour_Tags_Dialog_NewTagGroup_Title,
+            Messages.Tour_Tags_Dialog_NewTagGroup_Message,
             UI.EMPTY_STRING,
             getNameValidator());
 
@@ -1250,8 +1250,8 @@ public class PrefPageTagGroups extends PreferencePage implements IWorkbenchPrefe
       final TagGroup tagGroup = (TagGroup) (_tagGroupViewer.getStructuredSelection()).getFirstElement();
 
       final InputDialog inputDialog = new InputDialog(getShell(),
-            "Rename Tag Group",
-            "Name for the tag group",
+            Messages.Tour_Tags_Dialog_RenameTagGroup_Title,
+            Messages.Tour_Tags_Dialog_RenameTagGroup_Message,
             tagGroup.name,
             null);
 

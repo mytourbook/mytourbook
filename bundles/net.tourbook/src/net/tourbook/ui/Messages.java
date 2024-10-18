@@ -692,6 +692,7 @@ public class Messages extends NLS {
    public static String        Tour_Location_Task_RetrieveAndSaveTourLocations;
    public static String        Tour_Location_Task_RetrievingTourLocations;
    public static String        Tour_Location_Task_RetrievingTourLocations_Subtask;
+   public static String        Tour_Location_Task_SetTourLocationNames;
    public static String        Tour_Location_Tooltip_Label_Usage;
    public static String        Tour_Location_Tooltip_Label_Usage_Tooltip;
    public static String        Tour_Location_Tooltip_Label_Zoomlevel;
@@ -817,6 +818,19 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_WindDirection;
    public static String        Tour_Tooltip_Label_WindSpeed;
    public static String        Tour_Tooltip_Spinner_TextWidth_Tooltip;
+
+   public static String        Tour_TooltipOptions_Checkbox_ShowBodyValues;
+   public static String        Tour_TooltipOptions_Checkbox_ShowHeartrateZones;
+   public static String        Tour_TooltipOptions_Checkbox_ShowRunningDynamics;
+   public static String        Tour_TooltipOptions_Checkbox_ShowSensorValues;
+   public static String        Tour_TooltipOptions_Checkbox_ShowStartEndLocation;
+   public static String        Tour_TooltipOptions_Checkbox_ShowVerticalSpeed;
+   public static String        Tour_TooltipOptions_Checkbox_ShowWeatherDescription;
+   public static String        Tour_TooltipOptions_Checkbox_ShowWeatherValues;
+   public static String        Tour_TooltipOptions_Label_TooltipWidth;
+   public static String        Tour_TooltipOptions_Label_TourInfoOptions;
+   public static String        Tour_TooltipOptions_Radio_CustomizeValues;
+   public static String        Tour_TooltipOptions_Radio_ShowAllValues;
 
    public static String        TourType_Config_Border_Bottom;
    public static String        TourType_Config_Border_Circle;

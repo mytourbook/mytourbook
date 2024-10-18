@@ -88,7 +88,7 @@ public class EasyLauncherUtils {
       }
 
       sb.append(NL);
-      sb.append("Set tour tags: %s\n\n%s".formatted(tagGroup.name, sbTags.toString()));
+      sb.append(Messages.Import_Data_HTML_TourTags_YES.formatted(tagGroup.name, sbTags.toString()));
    }
 
    public static String getTourTypeText(final ImportLauncher importLauncher, final String tileName) {
@@ -185,7 +185,7 @@ public class EasyLauncherUtils {
          } else {
 
             sb.append(NL);
-            sb.append("Set tour tags: NO".formatted());
+            sb.append(Messages.Import_Data_HTML_TourTags_No.formatted());
          }
       }
       {
@@ -487,8 +487,8 @@ public class EasyLauncherUtils {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "tourTags", SWT.LEAD); //$NON-NLS-1$
 
-      colDef.setColumnLabel("Tour tags");
-      colDef.setColumnHeaderText("Tags");
+      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_TourTags_Label);
+      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_TourTags_Header);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
       colDef.setColumnWeightData(new ColumnWeightData(7));

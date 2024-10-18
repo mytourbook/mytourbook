@@ -564,9 +564,9 @@ public class ActionSetStartEndLocation extends SubMenu {
 
       public ActionSetLocation_WithoutGeoPosition() {
 
-         super("Set Location Name without &Geo Position", AS_PUSH_BUTTON);
+         super(Messages.Tour_Location_Action_SetLocationName, AS_PUSH_BUTTON);
 
-         setToolTipText("This will set only the tour location name and not a reference to a geo position");
+         setToolTipText(Messages.Tour_Location_Action_SetLocationName_Tooltip);
       }
 
       @Override
