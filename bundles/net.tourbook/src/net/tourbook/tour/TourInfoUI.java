@@ -414,13 +414,6 @@ public class TourInfoUI {
       _actionEditQuick.run();
    }
 
-   public boolean canHideTooltip() {
-
-      // do not close this when the options dialog is open
-
-      return _isTourInfoOptionOpen == false;
-   }
-
    private void createActions() {
 
       if (_actionTourInfoOptions == null) {
@@ -1953,14 +1946,21 @@ public class TourInfoUI {
       _part = part;
    }
 
-   public void setTooltipCanBeClosed() {
-
-      _isTourInfoOptionOpen = false;
-   }
-
    public void setUIWidth_Pixel(final int uiWidth_Pixel) {
 
       _uiWidth_Pixel = uiWidth_Pixel;
+   }
+
+   public boolean tourInfoOptions_CanHideUI() {
+
+      // do not close this when the options dialog is open
+
+      return _isTourInfoOptionOpen == false;
+   }
+
+   public void tourInfoOptions_setUICanBeClosed() {
+
+      _isTourInfoOptionOpen = false;
    }
 
    void updateUI() {
