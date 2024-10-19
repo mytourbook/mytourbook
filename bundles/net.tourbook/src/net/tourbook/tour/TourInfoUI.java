@@ -404,6 +404,8 @@ public class TourInfoUI {
       }
    }
 
+   public TourInfoUI() {}
+
    /**
     * Run tour action quick edit.
     */
@@ -421,10 +423,15 @@ public class TourInfoUI {
 
    private void createActions() {
 
-      _actionCloseTooltip = new ActionCloseTooltip();
-      _actionEditTour = new ActionTourToolTip_EditTour(_tourToolTipProvider, _tourProvider);
-      _actionEditQuick = new ActionTourToolTip_EditQuick(_tourToolTipProvider, _tourProvider);
-      _actionTourInfoOptions = new ActionSlideout_TourInfoOptions();
+      if (_actionTourInfoOptions == null) {
+
+         // don't create multiple times, this happens on every hovered tour !!!
+
+         _actionCloseTooltip = new ActionCloseTooltip();
+         _actionEditTour = new ActionTourToolTip_EditTour(_tourToolTipProvider, _tourProvider);
+         _actionEditQuick = new ActionTourToolTip_EditQuick(_tourToolTipProvider, _tourProvider);
+         _actionTourInfoOptions = new ActionSlideout_TourInfoOptions();
+      }
    }
 
    /**
