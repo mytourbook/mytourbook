@@ -588,7 +588,6 @@ public class TourInfoUI {
       if (_isUIEmbedded) {
 
          tbm.add(_actionTourInfoOptions);
-         tbm.update(true);
 
       } else {
 
