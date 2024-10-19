@@ -1,0 +1,80 @@
+24.11.0                                                 ?. November 2024
+
+
+New
+===
+
+* Tour Info Tooltip
+  - Customize content
+    https://github.com/mytourbook/mytourbook/issues/1411
+
+* Tour Tag Groups
+  - Define a group with tags
+  - Set all tags from a group 
+    - from all tour views
+    - with easy import
+  https://github.com/mytourbook/mytourbook/issues/1358
+
+* Tour Book View
+  - Create tour markers by distance or time
+    https://github.com/mytourbook/mytourbook/issues/1319
+    
+* Tour Search
+  - Push tours from the fulltext search result into the Tour Book view
+    https://github.com/mytourbook/mytourbook/issues/1379
+
+
+Improvements
+============
+
+* Tour Book View
+  - Added column for tour description, the displayed text is truncated to 100 characters
+     
+* Tour Location
+  - Set start/end location names which has no geo positions
+    https://github.com/mytourbook/mytourbook/issues/1413
+
+
+Changes
+=======
+
+* Tour Info
+  - The weather text is not wrapped anymore, it is now truncated but the text can be selected and scrolled to see the whole text
+
+* Tour Type Preferences
+  - Renamed pref page
+  - Swapped pref page
+
+* Tag Preferences
+  - Renamed pref page
+
+
+Bugfix
+======
+  
+* 4k Display
+  Fixed: It was difficult to hover movabel tooltips when the mouse was moved not fast enough
+ 
+
+See also milestone 24.11 https://github.com/mytourbook/mytourbook/milestone/19?closed=1
+ 
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* MyTourbook Milestone 24.11  https://github.com/mytourbook/mytourbook/milestone/19?closed=1
+* Java 17                     https://adoptium.net/temurin/releases/?version=17
+* Eclipse 2024-03 (4.31)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.31-202402290520/
+* NatTable 2.20               https://www.eclipse.org/nattable/download.php
+* Nebula Widgets              https://download.eclipse.org/nebula/releases/latest
+* FIT SDK 21.141.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
