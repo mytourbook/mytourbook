@@ -88,7 +88,7 @@ public class EasyLauncherUtils {
       }
 
       sb.append(NL);
-      sb.append(Messages.Import_Data_HTML_TourTags_YES.formatted(tagGroup.name, sbTags.toString()));
+      sb.append(Messages.Import_Data_HTML_SetTourTags_YES.formatted(tagGroup.name, sbTags.toString()));
    }
 
    public static String getTourTypeText(final ImportLauncher importLauncher, final String tileName) {
@@ -185,7 +185,7 @@ public class EasyLauncherUtils {
          } else {
 
             sb.append(NL);
-            sb.append(Messages.Import_Data_HTML_TourTags_No.formatted());
+            sb.append(Messages.Import_Data_HTML_SetTourTags_NO.formatted());
          }
       }
       {
