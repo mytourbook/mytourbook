@@ -648,21 +648,6 @@ public abstract class ToolTip {
    }
 
    /**
-    * Set the shell size after the shell is created
-    *
-    * @param shell
-    *           Tooltip shell
-    *
-    * @return Returns the shell size
-    */
-   protected Point setupShellSize(final Shell shell) {
-
-      shell.pack();
-
-      return shell.getSize();
-   }
-
-   /**
     * Set the shift (from the mouse position triggered the event) used to display the tooltip.
     * <p>
     * By default the tooltip is shifted 3 pixels to the right.
@@ -675,6 +660,21 @@ public abstract class ToolTip {
 
       xShift = p.x;
       yShift = p.y;
+   }
+
+   /**
+    * Set the shell size after the shell is created
+    *
+    * @param shell
+    *           Tooltip shell
+    *
+    * @return Returns the shell size
+    */
+   protected Point setupShellSize(final Shell shell) {
+
+      shell.pack();
+
+      return shell.getSize();
    }
 
    /**
@@ -722,7 +722,7 @@ public abstract class ToolTip {
     *
     * @return <code>true</code> if the tooltip should be hidden
     */
-   private boolean shouldHideToolTip(final Event event) {
+   protected boolean shouldHideToolTip(final Event event) {
 
       final boolean isMouseMoveEvent = event != null && event.type == SWT.MouseMove;
       final boolean isNoReCreate = (_style & NO_RECREATE) != 0;

@@ -202,6 +202,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
    @Override
    public void hideDialog() {
+
       _toolbarSlideout.hideNow();
    }
 

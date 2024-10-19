@@ -161,6 +161,8 @@ public class TourInfoUI {
     */
    private IWorkbenchPart _part;
 
+   private boolean        _isTourInfoOptionOpen;
+
    /*
     * Actions
     */
@@ -192,7 +194,7 @@ public class TourInfoUI {
 
    private ArrayList<DeviceSensorValue>   _allSensorValuesWithData;
 
-   private String                         _noTourTooltip = Messages.Tour_Tooltip_Label_NoTour;
+   private String                         _noTourTooltipText = Messages.Tour_Tooltip_Label_NoTour;
 
    private PixelConverter                 _pc;
 
@@ -397,7 +399,8 @@ public class TourInfoUI {
 
       @Override
       protected void onBeforeOpenSlideout() {
-//         closeOpenedDialogs(this);
+
+         _isTourInfoOptionOpen = true;
       }
    }
 
@@ -407,6 +410,13 @@ public class TourInfoUI {
    public void actionQuickEditTour() {
 
       _actionEditQuick.run();
+   }
+
+   public boolean canHideTooltip() {
+
+      // do not close this when the options dialog is open
+
+      return _isTourInfoOptionOpen == false;
    }
 
    private void createActions() {
@@ -1665,7 +1675,7 @@ public class TourInfoUI {
                .applyTo(container);
          {
             final Label label = new Label(container, SWT.NONE);
-            label.setText(_noTourTooltip);
+            label.setText(_noTourTooltipText);
             label.setForeground(fgColor);
             label.setBackground(bgColor);
          }
@@ -1925,14 +1935,20 @@ public class TourInfoUI {
    /**
     * Set text for the tooltip which is displayed when a tour is not hovered.
     *
-    * @param noTourTooltip
+    * @param noTourTooltipText
     */
-   public void setNoTourTooltip(final String noTourTooltip) {
-      _noTourTooltip = noTourTooltip;
+   public void setNoTourTooltip(final String noTourTooltipText) {
+
+      _noTourTooltipText = noTourTooltipText;
    }
 
    public void setPart(final IWorkbenchPart part) {
       _part = part;
+   }
+
+   public void setTooltipCanBeClosed() {
+
+      _isTourInfoOptionOpen = false;
    }
 
    public void setUIWidth_Pixel(final int uiWidth_Pixel) {
