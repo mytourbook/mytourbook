@@ -35,6 +35,7 @@ import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ICanHideTooltip;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.StringUtils;
@@ -90,7 +91,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
 
-public class TourInfoUI {
+public class TourInfoUI implements ICanHideTooltip {
 
    private static final String            ID                  = "net.tourbook.tour.TourInfoUI";       //$NON-NLS-1$
 
@@ -412,6 +413,12 @@ public class TourInfoUI {
    public void actionQuickEditTour() {
 
       _actionEditQuick.run();
+   }
+
+   @Override
+   public boolean canHideTooltip() {
+
+      return _isTourInfoOptionOpen == false;
    }
 
    private void createActions() {
@@ -1945,21 +1952,14 @@ public class TourInfoUI {
       _part = part;
    }
 
+   public void setUICanBeClosed() {
+
+      _isTourInfoOptionOpen = false;
+   }
+
    public void setUIWidth_Pixel(final int uiWidth_Pixel) {
 
       _uiWidth_Pixel = uiWidth_Pixel;
-   }
-
-   public boolean tourInfoOptions_CanHideUI() {
-
-      // do not close this when the options dialog is open
-
-      return _isTourInfoOptionOpen == false;
-   }
-
-   public void tourInfoOptions_setUICanBeClosed() {
-
-      _isTourInfoOptionOpen = false;
    }
 
    void updateUI() {

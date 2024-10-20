@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -44,6 +44,7 @@ import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ICanHideTooltip;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ArrayListToArray;
 import net.tourbook.common.util.IToolTipProvider;
@@ -1762,9 +1763,14 @@ public class ReferenceTimelineView extends ViewPart implements IGeoCompareListen
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
 
          @Override
-         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
+         public ICanHideTooltip createToolTipUI(final IToolTipProvider toolTipProvider,
+                                                final Composite parent,
+                                                final int serieIndex,
+                                                final int valueIndex) {
 
             ReferenceTimelineView.this.createToolTipUI(toolTipProvider, parent, valueIndex);
+
+            return null;
          }
       });
 

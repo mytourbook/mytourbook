@@ -122,6 +122,7 @@ public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, I
 
       return container;
    }
+
    @Override
    public Point getLocation(final Point tipSize, final Event event) {
 
@@ -262,11 +263,11 @@ public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, I
 
       return true;
    }
- 
+
    @Override
    protected boolean shouldHideToolTip(final Event event) {
 
-      if (_tourInfoUI.tourInfoOptions_CanHideUI() == false) {
+      if (_tourInfoUI.canHideTooltip() == false) {
 
          /*
           * Prevent closing when a contained tooltip is open, otherwise the tooltip of this tour

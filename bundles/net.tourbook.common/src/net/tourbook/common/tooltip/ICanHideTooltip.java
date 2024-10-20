@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,29 +13,13 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.common.tooltip;
 
-import net.tourbook.common.tooltip.ICanHideTooltip;
-import net.tourbook.common.util.IToolTipProvider;
-
-import org.eclipse.swt.widgets.Composite;
-
-/**
- * Is used when information should be provided, e.g. when the mouse will hover a bar in the bar
- * chart
- */
-public interface IChartInfoProvider {
+public interface ICanHideTooltip {
 
    /**
-    * @param toolTipProvider
-    * @param parent
-    * @param serieIndex
-    * @param valueIndex
-    *
-    * @return Returns an interface if the tooltip could be closed or <code>null</code>
+    * @return Returns <code>true</code> when the tooltip can be set hidden or closed, otherwise it
+    *         should not be closed
     */
-   ICanHideTooltip createToolTipUI(IToolTipProvider toolTipProvider,
-                                   Composite parent,
-                                   int serieIndex,
-                                   int valueIndex);
+   public boolean canHideTooltip();
 }

@@ -386,7 +386,7 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
    @Override
    protected boolean shouldHideToolTip(final Event event) {
 
-      if (_tourInfoUI.tourInfoOptions_CanHideUI() == false) {
+      if (_tourInfoUI.canHideTooltip() == false) {
 
          /*
           * Prevent closing when a contained tooltip is open, otherwise the tooltip of this tour

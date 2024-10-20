@@ -127,7 +127,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
 
       // set state that this tooltip is now hidden
 
-      _tourInfoUI.tourInfoOptions_setUICanBeClosed();
+      _tourInfoUI.setUICanBeClosed();
    }
 
    @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,6 +30,7 @@ import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.tooltip.ICanHideTooltip;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
@@ -122,10 +123,10 @@ public abstract class StatisticYear extends TourbookStatistic {
     * @param hoveredBar_HorizontalIndex
     *           valueIndex
     */
-   private void createToolTipUI(final IToolTipProvider toolTipProvider,
-                                final Composite parent,
-                                final int hoveredBar_SerieIndex,
-                                final int hoveredBar_ValueIndex) {
+   private ICanHideTooltip createToolTipUI(final IToolTipProvider toolTipProvider,
+                                           final Composite parent,
+                                           final int hoveredBar_SerieIndex,
+                                           final int hoveredBar_ValueIndex) {
 
       /*
        * Create tooltip title
@@ -150,6 +151,8 @@ public abstract class StatisticYear extends TourbookStatistic {
             totalColumnHeaderTitel,
             isShowSummaryValues,
             isShowPercentageValues);
+
+      return null;
    }
 
    void createXData_Year(final ChartDataModel chartDataModel) {
@@ -456,8 +459,15 @@ public abstract class StatisticYear extends TourbookStatistic {
 
       // set tool tip info
       chartModel.setCustomData(
+
             ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER,
-            (IChartInfoProvider) StatisticYear.this::createToolTipUI);
+
+            (IChartInfoProvider) (toolTipProvider, parent, serieIndex, valueIndex) -> createToolTipUI(
+
+                  toolTipProvider,
+                  parent,
+                  serieIndex,
+                  valueIndex));
    }
 
    @Override
