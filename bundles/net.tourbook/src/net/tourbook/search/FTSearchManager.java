@@ -1611,11 +1611,7 @@ public class FTSearchManager {
 
       final List<Long> allTourIDs = new ArrayList<>();
 
-      // retrieving many document fields can be slow
-      BusyIndicator.showWhile(Display.getCurrent(), () -> {
-
-         search_92_PushResult(indexReader, topDocs, allTourIDs);
-      });
+      search_92_PushResult(indexReader, topDocs, allTourIDs);
 
       TourManager.fireEventWithCustomData(TourEventId.FULLTEXT_SEARCH_TOURS, allTourIDs, null);
    }
