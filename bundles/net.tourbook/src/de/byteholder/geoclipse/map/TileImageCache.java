@@ -621,16 +621,9 @@ public class TileImageCache {
          final ImageLoader imageLoader = new ImageLoader();
          imageLoader.data = new ImageData[] { tileImageData };
 
-         imageType = tileImageData.type;
-
-         final String fileExtension = MapProviderManager.getImageFileExtension(imageType);
-         final String extension;
-         if (fileExtension == null) {
-            extension = MapProviderManager.FILE_EXTENSION_PNG;
-            imageType = SWT.IMAGE_PNG;
-         } else {
-            extension = fileExtension;
-         }
+         // force png because jpg would loose further quality
+         final String extension = MapProviderManager.FILE_EXTENSION_PNG;
+         imageType = SWT.IMAGE_PNG;
 
          if (isChildError) {
 
@@ -638,8 +631,7 @@ public class TileImageCache {
              * create a part image which is an image where not all children are loaded
              */
 
-            final String fileName = tilePathWithoutExt.lastSegment()
-                  + MapProviderManager.PART_IMAGE_FILE_NAME_SUFFIX;
+            final String fileName = tilePathWithoutExt.lastSegment() + MapProviderManager.PART_IMAGE_FILE_NAME_SUFFIX;
 
             tilePathWithoutExt = tilePathWithoutExt.removeLastSegments(1).append(fileName);
          }
@@ -654,9 +646,9 @@ public class TileImageCache {
       } catch (final Exception e) {
 
          /*
-          * disabled because it happened to often
+          * Disabled because it happened to often
           */
-         StatusUtil.log("cannot save tile image:" + imageOSFilePath + " - image type:" + imageType, e);//$NON-NLS-1$ //$NON-NLS-2$
+         StatusUtil.log("Cannot save tile image:" + imageOSFilePath + " - image type:" + imageType, e);//$NON-NLS-1$ //$NON-NLS-2$
       }
    }
 
