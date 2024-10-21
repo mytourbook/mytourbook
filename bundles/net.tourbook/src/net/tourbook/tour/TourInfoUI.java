@@ -423,15 +423,24 @@ public class TourInfoUI implements ICanHideTooltip {
 
    private void createActions() {
 
-      if (_actionTourInfoOptions == null) {
-
-         // don't create multiple times, this happens on every hovered tour !!!
+      // don't create multiple times, this happens on every hovered tour !!!
+      if (_actionCloseTooltip == null) {
 
          _actionCloseTooltip = new ActionCloseTooltip();
          _actionEditTour = new ActionTourToolTip_EditTour(_tourToolTipProvider, _tourProvider);
          _actionEditQuick = new ActionTourToolTip_EditQuick(_tourToolTipProvider, _tourProvider);
-         _actionTourInfoOptions = new ActionSlideout_TourInfoOptions();
       }
+
+      /*
+       * Complicated: I changed the original code because this action was not added when a tooltip
+       * was not closed, e.g. when hovering from one bar in the statistics view to another bar but
+       * when the tooltip was closed then it worked as it should
+       */
+      if (_actionTourInfoOptions != null) {
+
+         _actionTourInfoOptions.dispose();
+      }
+      _actionTourInfoOptions = new ActionSlideout_TourInfoOptions();
    }
 
    /**
@@ -589,6 +598,7 @@ public class TourInfoUI implements ICanHideTooltip {
 
       final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
       GridDataFactory.fillDefaults().applyTo(toolbar);
+      toolbar.setBackground(UI.SYS_COLOR_GREEN);
 
       final ToolBarManager tbm = new ToolBarManager(toolbar);
 
