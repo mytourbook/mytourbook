@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2010, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,8 +25,13 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
@@ -43,13 +48,134 @@ import org.eclipse.swt.graphics.PaletteData;
  */
 public class TileImageLoader implements Runnable {
 
-   private static int _stackTraceCounter;
+   private static int                  _stackTraceCounter;
+
+   private static List<FairUseLimiter> _allFairUseLimiter = new ArrayList<>();
+
+   static {
+
+      /**
+       * Web Map Tile Service WMTS-BGDI
+       * <p>
+       * wmts.geo.admin.ch <br>
+       * 600 Requests / Minute <br>
+       * https://www.geo.admin.ch/de/allgemeine-nutzungsbedingungen-bgdi/#doc-1flo19d440<br>
+       */
+//    _allFairUseLimiter.add(new FairUseLimiter("wmts.geo.admin.ch", 600, 60));
+      _allFairUseLimiter.add(new FairUseLimiter("wmts.geo.admin.ch", 60, 6));
+   }
+
+   public static class FairUseLimiter {
+
+      String        mapProviderUrlPart;
+
+      int           numMaxRequestsPerTimeSlice;
+      int           timeSliceDurationInSec;
+
+      AtomicLong    firstRequestTime     = new AtomicLong();
+      AtomicInteger numTimeSliceRequests = new AtomicInteger();
+
+      /**
+       * @param mapProviderUrlPart
+       * @param numMaxRequestsPerTimeSlice
+       * @param timeSliceDurationInSec
+       *           Number of seconds for one time slice
+       */
+      public FairUseLimiter(final String mapProviderUrlPart,
+                            final int numMaxRequestsPerTimeSlice,
+                            final int timeSliceDurationInSec) {
+
+         this.mapProviderUrlPart = mapProviderUrlPart;
+
+         this.numMaxRequestsPerTimeSlice = numMaxRequestsPerTimeSlice;
+         this.timeSliceDurationInSec = timeSliceDurationInSec;
+      }
+   }
 
    /**
     * Loads a tile image from a map provider which is contained in the tile. Tiles are retrieved
     * from the tile waiting queue {@link MP#getTileWaitingQueue()}
     */
    public TileImageLoader() {}
+
+   /**
+    * Ensure fair use
+    *
+    * @param url
+    *
+    * @throws InterruptedException
+    */
+   private void ensureFairUse(final URL url) throws InterruptedException {
+
+      for (final FairUseLimiter fairUseLimiter : _allFairUseLimiter) {
+
+         final String mapProviderUrlPart = fairUseLimiter.mapProviderUrlPart;
+
+         if (url.toString().contains(mapProviderUrlPart)) {
+
+            // force fair use for this map provider
+
+// SET_FORMATTING_OFF
+
+            final long now_Sec = System.currentTimeMillis() / 1000;
+
+            final long firstRequestTime_Sec        = fairUseLimiter.firstRequestTime.get();
+            final int timeSliceDurationInSec       = fairUseLimiter.timeSliceDurationInSec;
+            final int numMaxRequestsPerTimeSlice   = fairUseLimiter.numMaxRequestsPerTimeSlice;
+            final int numTimeSliceRequests         = fairUseLimiter.numTimeSliceRequests.get();
+
+            final long newRequestTimeDiff = (now_Sec - firstRequestTime_Sec) % timeSliceDurationInSec;
+
+            final boolean isInCurrentTimeSlice     = now_Sec < firstRequestTime_Sec + timeSliceDurationInSec;
+            final boolean isAboveMaxRequests       = numTimeSliceRequests + 1 > numMaxRequestsPerTimeSlice;
+
+// SET_FORMATTING_ON
+
+            if (isInCurrentTimeSlice && isAboveMaxRequests) {
+
+               // wait until the next time slice
+
+               final long nextTimeSlice_Sec = firstRequestTime_Sec + timeSliceDurationInSec;
+               final long timeDiff_Sec = nextTimeSlice_Sec - now_Sec;
+
+               System.out.println(UI.timeStamp() + " - %s - Fair use is sleeping for %d sec".formatted( //$NON-NLS-1$
+                     mapProviderUrlPart,
+                     timeDiff_Sec));
+
+               Thread.sleep(timeDiff_Sec * 1000);
+
+               // reset fair use timer + counter
+               fairUseLimiter.firstRequestTime.set(System.currentTimeMillis() / 1000);
+               fairUseLimiter.numTimeSliceRequests.set(1);
+
+            } else if (isInCurrentTimeSlice == false) {
+
+               // we are out of the current time slice -> reset time slice counter
+
+               final long newRequestTime = now_Sec - newRequestTimeDiff;
+
+//             System.out.println(UI.timeStamp() + " - %s - Fair use is resetting timer -%d sec".formatted( //$NON-NLS-1$
+//                  mapProviderUrlPart,
+//                  newRequestTimeDiff));
+
+               fairUseLimiter.firstRequestTime.set(newRequestTime);
+               fairUseLimiter.numTimeSliceRequests.set(1);
+
+            } else {
+
+               // we are in the current time slice and not above the limit
+
+               fairUseLimiter.numTimeSliceRequests.incrementAndGet();
+
+//             System.out.println(UI.timeStamp() + " - Map image loader: Num requests %d - %d sec".formatted(numRequests, newRequestTimeDiff)); //$NON-NLS-1$
+            }
+         }
+
+         // there can be only one fair use limiter for a url
+
+         break;
+      }
+   }
 
    private void finalizeTile(final Tile tile, final boolean isNotifyObserver) {
 
@@ -76,6 +202,8 @@ public class TileImageLoader implements Runnable {
 
    /**
     * Get tile image from offline file, url or tile painter
+    *
+    * @param tile
     */
    private void getTileImage(final Tile tile) {
 
@@ -158,6 +286,8 @@ public class TileImageLoader implements Runnable {
                         throw e;
                      }
 
+                     ensureFairUse(url);
+
                      try {
 
                         final URLConnection connection = url.openConnection();
@@ -167,6 +297,8 @@ public class TileImageLoader implements Runnable {
                         final String userAgent = mp.getUserAgent();
 
                         if (StringUtils.hasContent(userAgent)) {
+
+                           // OSM needs that a user agent is set
                            connection.setRequestProperty(WEB.HTTP_HEADER_USER_AGENT, userAgent);
                         }
 
