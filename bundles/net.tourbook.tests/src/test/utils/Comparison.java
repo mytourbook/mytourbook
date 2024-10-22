@@ -81,9 +81,6 @@ public class Comparison {
          final String genericSoftwareVersion = "software_version,"; //$NON-NLS-1$
          final String genericApplicationVersion = "application_version,"; //$NON-NLS-1$
 
-         controlFileContentArray.replaceAll(line -> line = line.replace("software_version,\"24.1\"", genericSoftwareVersion)); //$NON-NLS-1$
-         controlFileContentArray.replaceAll(line -> line = line.replace("application_version,\"2410\"", genericApplicationVersion)); //$NON-NLS-1$
-
          testFileContentArray.replaceAll(line -> line.replaceFirst("software_version,\"\\d\\d\\.\\d\"", genericSoftwareVersion)); //$NON-NLS-1$
          testFileContentArray.replaceAll(line -> line.replaceFirst("application_version,\"\\d\\d\\d\\d\"", genericApplicationVersion)); //$NON-NLS-1$
 
