@@ -230,7 +230,7 @@ public class Comparison {
       try {
          jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tourData);
       } catch (final JsonProcessingException e) {
-         e.printStackTrace();
+         StatusUtil.log(e);
       }
       return jsonString;
    }
