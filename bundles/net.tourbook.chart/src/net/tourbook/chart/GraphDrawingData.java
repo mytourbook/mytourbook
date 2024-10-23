@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -109,7 +109,7 @@ public class GraphDrawingData {
    private int       _barPosition              = BAR_POS_LEFT;
 
    /**
-    * Width/height when a sympol is displayed
+    * Width/height when a symbol is displayed
     */
    private int       _symbolSize               = 8;
 
@@ -196,7 +196,7 @@ public class GraphDrawingData {
       return getDevYBottom()
             - devGraphHeight
             - _chartDrawingData.devSliderBarHeight
-            - _chartDrawingData.devXTitelBarHeight;
+            - _chartDrawingData.devXTitleBarHeight;
    }
 
    /**

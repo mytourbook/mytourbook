@@ -172,7 +172,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
             .getDisplayName(TextStyle.FULL, Locale.getDefault());
 
       final String toolTip_Title = String.format(TOOLTIP_TITLE_FORMAT, monthText, monthDate.getYear());
-      final String totalColumnHeaderTitel = monthText;
+      final String totalColumnHeaderTitle = monthText;
 
       final boolean isShowPercentageValues = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES);
       final boolean isShowSummaryValues = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_TOOLTIP_IS_SHOW_SUMMARY_VALUES);
@@ -185,7 +185,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
             valueIndex,
             toolTip_Title,
             null,
-            totalColumnHeaderTitel,
+            totalColumnHeaderTitle,
             isShowSummaryValues,
             isShowPercentageValues);
 
@@ -475,9 +475,9 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
       // set tool tip info
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER,
-            
+
             (IChartInfoProvider) (toolTipProvider, parent, serieIndex, valueIndex) -> createToolTipUI(
-                                                                                                      
+
                   toolTipProvider,
                   parent,
                   serieIndex,
