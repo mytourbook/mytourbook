@@ -135,7 +135,7 @@ public abstract class StatisticYear extends TourbookStatistic {
       final LocalDate yearDate = LocalDate.of(oldestYear, 1, 1).plusYears(hoveredBar_ValueIndex);
 
       final String toolTipTitle = Integer.toString(yearDate.getYear());
-      final String totalColumnHeaderTitel = toolTipTitle;
+      final String totalColumnHeaderTitle = toolTipTitle;
 
       final boolean isShowPercentageValues = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_PERCENTAGE_VALUES);
       final boolean isShowSummaryValues = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_TOOLTIP_IS_SHOW_SUMMARY_VALUES);
@@ -148,7 +148,7 @@ public abstract class StatisticYear extends TourbookStatistic {
             hoveredBar_ValueIndex,
             toolTipTitle,
             null,
-            totalColumnHeaderTitel,
+            totalColumnHeaderTitle,
             isShowSummaryValues,
             isShowPercentageValues);
 

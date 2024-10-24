@@ -188,7 +188,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
        * Create tooltip title
        */
       final String toolTip_Title = String.format(Messages.Statistic_Week_Tooltip_Title, weekOfYear, weekYear);
-      final String totalColumnHeaderTitel = String.format(Messages.Statistic_Week_Tooltip_ColumnHeaderTitle, weekOfYear);
+      final String totalColumnHeaderTitle = String.format(Messages.Statistic_Week_Tooltip_ColumnHeaderTitle, weekOfYear);
 
       String toolTip_SubTitle;
       if (isShowSummaryValues && isShowPercentageValues) {
@@ -207,7 +207,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
             weekIndex,
             toolTip_Title,
             toolTip_SubTitle,
-            totalColumnHeaderTitel,
+            totalColumnHeaderTitle,
             isShowSummaryValues,
             isShowPercentageValues);
 

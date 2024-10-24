@@ -81,10 +81,10 @@ public class Comparison {
          final String genericSoftwareVersion = "software_version,"; //$NON-NLS-1$
          final String genericApplicationVersion = "application_version,"; //$NON-NLS-1$
 
-         controlFileContentArray.replaceAll(line -> line = line.replace("software_version,\"24.1\"", genericSoftwareVersion)); //$NON-NLS-1$
-         controlFileContentArray.replaceAll(line -> line = line.replace("application_version,\"2410\"", genericApplicationVersion)); //$NON-NLS-1$
+         controlFileContentArray.replaceAll(line -> line = line.replace("software_version,\"24.11\"", genericSoftwareVersion)); //$NON-NLS-1$
+         controlFileContentArray.replaceAll(line -> line = line.replace("application_version,\"2411\"", genericApplicationVersion)); //$NON-NLS-1$
 
-         testFileContentArray.replaceAll(line -> line.replaceFirst("software_version,\"\\d\\d\\.\\d\"", genericSoftwareVersion)); //$NON-NLS-1$
+         testFileContentArray.replaceAll(line -> line.replaceFirst("software_version,\"\\d\\d\\.\\d\\d\"", genericSoftwareVersion)); //$NON-NLS-1$
          testFileContentArray.replaceAll(line -> line.replaceFirst("application_version,\"\\d\\d\\d\\d\"", genericApplicationVersion)); //$NON-NLS-1$
 
          // Modify the session/activity messages to remove/ignore their creation timestamps
@@ -230,7 +230,7 @@ public class Comparison {
       try {
          jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tourData);
       } catch (final JsonProcessingException e) {
-         e.printStackTrace();
+         StatusUtil.log(e);
       }
       return jsonString;
    }
