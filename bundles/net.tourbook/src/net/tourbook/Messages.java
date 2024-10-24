@@ -2236,9 +2236,7 @@ public class Messages extends NLS {
    public static String        Slideout_Map25Options_Label_MapOptions;
    public static String        Slideout_Map25Options_Link_KeyboardShortcuts;
 
-   public static String        Slideout_Map25PhotoOptions_Checkbox_Layer_Photo_Size;
    public static String        Slideout_Map25PhotoOptions_Checkbox_Photo_Title;
-   public static String        Slideout_Map25PhotoOptions_Spinner_Layer_Photo_Size;
 
    public static String        Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering;
    public static String        Slideout_Map25MarkerOptions_Checkbox_IsShowBookmarks;

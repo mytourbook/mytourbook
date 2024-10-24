@@ -172,6 +172,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private static boolean                       _isBackgroundFPS;
    private static int                           _backgroundFPS;
    //
+   public static int                            MAP_IMAGE_DEFAULT_SIZE_TINY                   = 40;
+   public static int                            MAP_IMAGE_DEFAULT_SIZE_SMALL                  = 100;
+   public static int                            MAP_IMAGE_DEFAULT_SIZE_MEDIUM                 = 200;
+   public static int                            MAP_IMAGE_DEFAULT_SIZE_LARGE                  = 300;
+   //
    private Map25Provider                        _selectedMapProvider;
    //
    private String                               _mapDefaultLanguage                           = Locale.getDefault().toString();
@@ -241,10 +246,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    //
    private long            _lastRenderTime;
    //
-   private float           _offline_TextScale = 0.75f;
-   private float           _offline_UserScale = 2.50f;
-   private float           _online_TextScale  = 0.50f;
-   private float           _online_UserScale  = 2.0f;
+   private float           _offline_TextScale  = 0.75f;
+   private float           _offline_UserScale  = 2.50f;
+   private float           _online_TextScale   = 0.50f;
+   private float           _online_UserScale   = 2.0f;
    //
    private OffOnline       _currentOffOnline;
    private TileSource      _currentOnline_TileSource;
@@ -253,24 +258,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private TileSource      _currentOffline_TileSource;
    private String          _currentOffline_TileSource_FilePath;
    //
+   private MarkerToolkit   _mapBookmarkToolkit = new MarkerToolkit(MarkerShape.STAR);
+   private MarkerMode      _tourMarkerMode     = MarkerMode.NORMAL;
    //
-   private MarkerToolkit _mapBookmarkToolkit = new MarkerToolkit(MarkerShape.STAR);
-   // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
-   private MarkerMode    _tourMarkerMode     = MarkerMode.NORMAL;
-   //
-   private boolean       _mapCenter_VerticalPosition_IsEnabled;
-   private int           _mapCenter_VerticalPosition;
-   //
+   private boolean         _mapCenter_VerticalPosition_IsEnabled;
+   private int             _mapCenter_VerticalPosition;
+
    /*
     * Photos
     */
-   private PhotoToolkit _photoToolkit     = new PhotoToolkit(this);
-   //
-   private boolean      _isShowPhoto      = true;
-   private boolean      _isShowPhotoTitle = true;
-   private boolean      _isPhotoScaled    = false;
-   //
-   private int          _photoSize;
+   private PhotoToolkit _photoToolkit = new PhotoToolkit(this, _state);
 
    /**
     * Is <code>true</code> when a tour marker is hit.
@@ -1209,10 +1206,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return _mapCenter_VerticalPosition_IsEnabled;
    }
 
-   public int getPhoto_Size() {
-      return _photoSize;
-   }
-
    public PhotoToolkit getPhotoToolkit() {
       return _photoToolkit;
    }
@@ -1256,18 +1249,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    @Override
    protected void initGLAdapter(final GLVersion arg0) {}
-
-   public boolean isPhoto_Scaled() {
-      return _isPhotoScaled;
-   }
-
-   public boolean isPhoto_ShowTitle() {
-      return _isShowPhotoTitle;
-   }
-
-   boolean isPhoto_Visible() {
-      return _isShowPhoto;
-   }
 
    private boolean isUpdateAll(final OffOnline isOffOnline) {
 
@@ -1901,22 +1882,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       }
    }
 
-   public void setPhoto_IsScaled(final boolean isPhotoScaled) {
-      _isPhotoScaled = isPhotoScaled;
-   }
-
-   public void setPhoto_IsShowTitle(final boolean isShowPhotoTitle) {
-      _isShowPhotoTitle = isShowPhotoTitle;
-   }
-
-   public void setPhoto_IsVisible(final boolean isShowPhoto) {
-      _isShowPhoto = isShowPhoto;
-   }
-
-   public void setPhoto_Size(final int layer_Photo_Size) {
-      _photoSize = layer_Photo_Size;
-   }
-
    private void setupMapLayers_SetTileLoadingLayer(final BitmapTileLayer tileLoadingLayer, final Layer tileLoading_AFTER) {
 
       final Layers allMapLayer = mMap.layers();
@@ -2165,7 +2130,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       final List<MarkerInterface> photoItems = _photoToolkit.createPhotoItems(_map25View.getFilteredPhotos());
 
       _layer_Photo_VARYING.addItems(photoItems);
-      _layer_Photo_VARYING.setEnabled(_isShowPhoto);
+      _layer_Photo_VARYING.setEnabled(_photoToolkit.isShowPhotos());
 
       //_phototoolkit._isMarkerClusteredLast = config.isPhotoClustered;
       // using settings from MapBookmarks must be changed later with own config

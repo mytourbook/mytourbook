@@ -27,6 +27,7 @@ import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
+import net.tourbook.map.MapImageSize;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
@@ -64,11 +65,11 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
    static final String             STATE_IS_SHOW_PHOTO_TOOLTIP           = "STATE_IS_SHOW_PHOTO_TOOLTIP";   //$NON-NLS-1$
    static final boolean            STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT   = true;
 
-   static final String             STATE_PHOTO_IMAGE_SIZE                = "STATE_PHOTO_IMAGE_SIZE";        //$NON-NLS-1$
-   static final String             STATE_PHOTO_IMAGE_SIZE_TINY           = "STATE_PHOTO_IMAGE_SIZE_TINY";   //$NON-NLS-1$
-   static final String             STATE_PHOTO_IMAGE_SIZE_SMALL          = "STATE_PHOTO_IMAGE_SIZE_SMALL";  //$NON-NLS-1$
-   static final String             STATE_PHOTO_IMAGE_SIZE_MEDIUM         = "STATE_PHOTO_IMAGE_SIZE_MEDIUM"; //$NON-NLS-1$
-   static final String             STATE_PHOTO_IMAGE_SIZE_LARGE          = "STATE_PHOTO_IMAGE_SIZE_LARGE";  //$NON-NLS-1$
+   public static final String      STATE_PHOTO_IMAGE_SIZE                = "STATE_PHOTO_IMAGE_SIZE";        //$NON-NLS-1$
+   public static final String      STATE_PHOTO_IMAGE_SIZE_TINY           = "STATE_PHOTO_IMAGE_SIZE_TINY";   //$NON-NLS-1$
+   public static final String      STATE_PHOTO_IMAGE_SIZE_SMALL          = "STATE_PHOTO_IMAGE_SIZE_SMALL";  //$NON-NLS-1$
+   public static final String      STATE_PHOTO_IMAGE_SIZE_MEDIUM         = "STATE_PHOTO_IMAGE_SIZE_MEDIUM"; //$NON-NLS-1$
+   public static final String      STATE_PHOTO_IMAGE_SIZE_LARGE          = "STATE_PHOTO_IMAGE_SIZE_LARGE";  //$NON-NLS-1$
 
    private static final int        MIN_IMAGE_SIZE                        = 3;
 
@@ -115,11 +116,6 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
    private ColorSelectorExtended _colorTourPauseLabel_Outline;
    private ColorSelectorExtended _colorTourPauseLabel_Fill;
-
-   enum ImageSize {
-
-      TINY, SMALL, MEDIUM, LARGE
-   }
 
    /**
     * @param ownerControl
@@ -546,7 +542,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       _chkShowHQImages     .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_SHOW_THUMB_HQ_IMAGES,   STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT));
       _chkShowPhotoRating  .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_SHOW_PHOTO_RATING,      STATE_IS_SHOW_PHOTO_RATING_DEFAULT));
 
-      final Enum<ImageSize> imageSize = Util.getStateEnum(_state_Map2, STATE_PHOTO_IMAGE_SIZE, ImageSize.MEDIUM);
+      final Enum<MapImageSize> imageSize = Util.getStateEnum(_state_Map2, STATE_PHOTO_IMAGE_SIZE, MapImageSize.MEDIUM);
 
       final int imageSizeLarge   = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_LARGE,  _map2.MAP_IMAGE_DEFAULT_SIZE_LARGE);
       final int imageSizeMedium  = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_MEDIUM, _map2.MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
@@ -560,17 +556,17 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
 // SET_FORMATTING_ON
 
-      if (imageSize.equals(ImageSize.LARGE)) {
+      if (imageSize.equals(MapImageSize.LARGE)) {
 
          _imageSize = imageSizeLarge;
          _radioImageSize_Large.setSelection(true);
 
-      } else if (imageSize.equals(ImageSize.MEDIUM)) {
+      } else if (imageSize.equals(MapImageSize.MEDIUM)) {
 
          _imageSize = imageSizeMedium;
          _radioImageSize_Medium.setSelection(true);
 
-      } else if (imageSize.equals(ImageSize.SMALL)) {
+      } else if (imageSize.equals(MapImageSize.SMALL)) {
 
          _imageSize = imageSizeSmall;
          _radioImageSize_Small.setSelection(true);
@@ -600,12 +596,12 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
 // SET_FORMATTING_OFF
 
-      final Enum<ImageSize> selectedSize =
+      final Enum<MapImageSize> selectedSize =
 
-      _radioImageSize_Large   .getSelection()   ? ImageSize.LARGE    :
-      _radioImageSize_Medium  .getSelection()   ? ImageSize.MEDIUM   :
-      _radioImageSize_Small   .getSelection()   ? ImageSize.SMALL    :
-                                                  ImageSize.TINY;
+      _radioImageSize_Large   .getSelection()   ? MapImageSize.LARGE    :
+      _radioImageSize_Medium  .getSelection()   ? MapImageSize.MEDIUM   :
+      _radioImageSize_Small   .getSelection()   ? MapImageSize.SMALL    :
+                                                  MapImageSize.TINY;
 
       _state_Map2.put(STATE_PHOTO_IMAGE_SIZE_LARGE,  _spinnerImageSize_Large .getSelection());
       _state_Map2.put(STATE_PHOTO_IMAGE_SIZE_MEDIUM, _spinnerImageSize_Medium.getSelection());

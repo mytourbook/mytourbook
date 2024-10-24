@@ -28,9 +28,12 @@ import java.util.UUID;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
+import net.tourbook.map.MapImageSize;
+import net.tourbook.map2.view.SlideoutMap2_PhotoOptions;
 import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
-import net.tourbook.map25.ui.SlideoutMap25_PhotoOptions;
+import net.tourbook.map25.Map25View;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
@@ -42,6 +45,7 @@ import net.tourbook.photo.PhotoImageMetadata;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -60,20 +64,23 @@ import org.oscim.layers.marker.MarkerSymbol;
 public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerInterface> {
 
    private static IPreferenceStore _prefStore = PhotoActivator.getPrefStore();
+   private IDialogSettings         _state;
 
    private Map25App                _mapApp;
 
    private Display                 _display;
 
+   private int                     _imageSize;
+
+   private boolean                 _isPhotoVisible;
+   private boolean                 _isTitleVisible;
+
    /**
     * This image is displayed when a photo is not yet loaded
     */
    private Bitmap                  _bitmapNotLoadedPhoto;
-// private Bitmap   _bitmapClusterPhoto;   // The Bitmap when markers are clustered
 
-// private boolean _isBillboard;
-
-   private MarkerSymbol _symbol; // marker symbol, circle or star
+   private MarkerSymbol            _symbol;                                   // marker symbol, circle or star
 
    private class ImageState {
 
@@ -112,11 +119,13 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       }
    }
 
-   public PhotoToolkit(final Map25App map25App) {
+   public PhotoToolkit(final Map25App map25App, final IDialogSettings state) {
 
       super(MarkerShape.CIRCLE);
 
       _mapApp = map25App;
+      _state = state;
+
       _display = Display.getDefault();
 
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
@@ -248,7 +257,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          bitmapImage = _bitmapNotLoadedPhoto;
       }
 
-      final MarkerSymbol bitmapPhoto = createAdvanceSymbol(item, bitmapImage, true, _mapApp.isPhoto_ShowTitle());
+      final MarkerSymbol bitmapPhoto = createAdvanceSymbol(item, bitmapImage, true, _isTitleVisible);
 
       item.setMarker(bitmapPhoto);
    }
@@ -268,22 +277,19 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
       Bitmap photoBitmap = null;
 
-      // ensure photo minimum size
-      final int scaledImageSize = Math.max(SlideoutMap25_PhotoOptions.IMAGE_SIZE_MINIMUM, _mapApp.getPhoto_Size());
-
       final ImageState imageState = createPhotoItems_30_GetScaledImage(
             item,
             photo,
-            scaledImageSize,
+            _imageSize,
             isImageLoaded);
 
-      final Image scaledImage = imageState._photoImage;
+      final Image photoImage = imageState._photoImage;
 
-      if (scaledImage != null) {
+      if (photoImage != null) {
 
          try {
 
-            final byte[] formattedImage = ImageUtils.formatImage(scaledImage, org.eclipse.swt.SWT.IMAGE_BMP);
+            final byte[] formattedImage = ImageUtils.formatImage(photoImage, org.eclipse.swt.SWT.IMAGE_BMP);
 
             photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(formattedImage));
 
@@ -292,7 +298,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          }
 
          if (imageState._isMustDisposeImage) {
-            scaledImage.dispose();
+            photoImage.dispose();
          }
       }
 
@@ -348,7 +354,9 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
          if (photoImage != null && photoImage.isDisposed() == false) {
 
-            if (_mapApp.isPhoto_Scaled() == false) {
+            boolean isScaled = false;
+            isScaled = false;
+            if (isScaled == false) {
                return new ImageState(photoImage, false);
             }
 
@@ -398,13 +406,13 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       return _symbol;
    }
 
+   public boolean isShowPhotos() {
+
+      return _isPhotoVisible;
+   }
+
    @Override
    public boolean onItemLongPress(final int index, final MarkerInterface mi) {
-
-//      final MarkerItem photoItem = (MarkerItem) mi;
-//
-//      debugPrint(" ??????????? PhotoToolkit *** onItemLongPress(int index, MarkerItem photoItem): " + _allPhotos.get( //$NON-NLS-1$
-//            index).imageFilePathName + " " + photoItem.getTitle()); //$NON-NLS-1$
 
       return false;
    }
@@ -412,14 +420,53 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    @Override
    public boolean onItemSingleTapUp(final int index, final MarkerInterface mi) {
 
-//      final MarkerItem photoItem = (MarkerItem) mi;
-//
-//      debugPrint(" ??????????? PhotoToolkit *** onItemSingleTapUp(int index, MarkerItem photoItem): " + _allPhotos //$NON-NLS-1$
-//            .get(index).imageFilePathName + " " + photoItem.getTitle()); //$NON-NLS-1$
-
-      //showPhoto(_allPhotos.get(index));
-
       return false;
+   }
+
+   public void restoreState() {
+
+      _isPhotoVisible = Util.getStateBoolean(_state, Map25View.STATE_IS_LAYER_PHOTO_VISIBLE, true);
+      _isTitleVisible = Util.getStateBoolean(_state, Map25View.STATE_IS_SHOW_PHOTO_TITLE, true);
+
+      final Enum<MapImageSize> imageSize = Util.getStateEnum(_state,
+            SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE,
+            MapImageSize.MEDIUM);
+
+      if (imageSize.equals(MapImageSize.LARGE)) {
+
+         _imageSize = Util.getStateInt(_state,
+               SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_LARGE,
+               Map25App.MAP_IMAGE_DEFAULT_SIZE_LARGE);
+
+      } else if (imageSize.equals(MapImageSize.MEDIUM)) {
+
+         _imageSize = Util.getStateInt(_state,
+               SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_MEDIUM,
+               Map25App.MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
+
+      } else if (imageSize.equals(MapImageSize.SMALL)) {
+
+         _imageSize = Util.getStateInt(_state,
+               SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_SMALL,
+               Map25App.MAP_IMAGE_DEFAULT_SIZE_SMALL);
+
+      } else {
+
+         _imageSize = Util.getStateInt(_state,
+               SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_TINY,
+               Map25App.MAP_IMAGE_DEFAULT_SIZE_TINY);
+      }
+   }
+
+   public void saveState() {
+
+      _state.put(Map25View.STATE_IS_LAYER_PHOTO_VISIBLE, _isPhotoVisible);
+
+   }
+
+   public void setPhotoIsVisible(final boolean isPhotoVisible) {
+
+      _isPhotoVisible = isPhotoVisible;
    }
 
 }

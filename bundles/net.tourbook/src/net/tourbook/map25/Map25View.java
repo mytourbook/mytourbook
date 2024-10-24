@@ -75,6 +75,7 @@ import net.tourbook.map25.action.ActionZoomIn;
 import net.tourbook.map25.action.ActionZoomOut;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerLayerMT;
+import net.tourbook.map25.layer.marker.PhotoToolkit;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig.LineColorMode;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
@@ -185,13 +186,23 @@ public class Map25View extends ViewPart implements
    private static final String           STATE_LAYER_HILLSHADING_OPACITY         = "STATE_LAYER_HILLSHADING_OPACITY";            //$NON-NLS-1$
    private static final String           STATE_MAP_SYNCHED_WITH                  = "STATE_MAP_SYNCHED_WITH";                     //$NON-NLS-1$
    // photo layer
-   private static final String           STATE_IS_LAYER_PHOTO_VISIBLE            = "STATE_IS_LAYER_PHOTO_VISIBLE";               //$NON-NLS-1$
-   private static final String           STATE_IS_LAYER_PHOTO_SCALED             = "STATE_IS_LAYER_PHOTO_SCALED";                //$NON-NLS-1$
-   private static final String           STATE_IS_LAYER_PHOTO_TITLE_VISIBLE      = "STATE_IS_LAYER_PHOTO_TITLE_VISIBLE";         //$NON-NLS-1$
+   public static final String            STATE_IS_LAYER_PHOTO_VISIBLE            = "STATE_IS_LAYER_PHOTO_VISIBLE";               //$NON-NLS-1$
    private static final String           STATE_IS_PHOTO_FILTER_ACTIVE            = "STATE_IS_PHOTO_FILTER_ACTIVE";               //$NON-NLS-1$
-   private static final String           STATE_LAYER_PHOTO_SIZE                  = "STATE_LAYER_PHOTO_SIZE";                     //$NON-NLS-1$
    private static final String           STATE_PHOTO_FILTER_RATING_STARS         = "STATE_PHOTO_FILTER_RATING_STARS";            //$NON-NLS-1$
    private static final String           STATE_PHOTO_FILTER_RATING_STAR_OPERATOR = "STATE_PHOTO_FILTER_RATING_STAR_OPERATOR";    //$NON-NLS-1$
+   //
+   public static final String            STATE_IS_SHOW_PHOTO_TITLE               = "STATE_IS_SHOW_PHOTO_TITLE";                  //$NON-NLS-1$
+   public static final boolean           STATE_IS_SHOW_PHOTO_TITLE_DEFAULT       = true;
+   public static final String            STATE_IS_SHOW_PHOTO_TOOLTIP             = "STATE_IS_SHOW_PHOTO_TOOLTIP";                //$NON-NLS-1$
+   public static final boolean           STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT     = true;
+   public static final String            STATE_IS_SHOW_THUMB_HQ_IMAGES           = "STATE_IS_SHOW_THUMB_HQ_IMAGES";              //$NON-NLS-1$
+   public static final boolean           STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT   = false;
+
+   public static final String            STATE_PHOTO_IMAGE_SIZE                  = "STATE_PHOTO_IMAGE_SIZE";                     //$NON-NLS-1$
+   public static final String            STATE_PHOTO_IMAGE_SIZE_TINY             = "STATE_PHOTO_IMAGE_SIZE_TINY";                //$NON-NLS-1$
+   public static final String            STATE_PHOTO_IMAGE_SIZE_SMALL            = "STATE_PHOTO_IMAGE_SIZE_SMALL";               //$NON-NLS-1$
+   public static final String            STATE_PHOTO_IMAGE_SIZE_MEDIUM           = "STATE_PHOTO_IMAGE_SIZE_MEDIUM";              //$NON-NLS-1$
+   public static final String            STATE_PHOTO_IMAGE_SIZE_LARGE            = "STATE_PHOTO_IMAGE_SIZE_LARGE";               //$NON-NLS-1$
    //
    public static final String            ID                                      = "net.tourbook.map25.Map25View";               //$NON-NLS-1$
    //
@@ -360,7 +371,8 @@ public class Map25View extends ViewPart implements
 
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-         return new SlideoutMap25_PhotoOptions(_parent, toolbar, Map25View.this);
+
+         return new SlideoutMap25_PhotoOptions(_parent, toolbar, _state, Map25View.this);
       }
 
       @Override
@@ -502,7 +514,7 @@ public class Map25View extends ViewPart implements
       final boolean isPhotoVisible = _actionShowPhotoOptions.getSelection();
 
       // update model
-      _map25App.setPhoto_IsVisible(isPhotoVisible);
+      _map25App.getPhotoToolkit().setPhotoIsVisible(isPhotoVisible);
 
       // update UI
       _map25App.getLayer_Photo().setEnabled(isPhotoVisible);
@@ -1829,7 +1841,7 @@ public class Map25View extends ViewPart implements
       /*
        * Photos
        */
-      if (_map25App.isPhoto_Visible()) {
+      if (_map25App.getPhotoToolkit().isShowPhotos()) {
 
          _map25App.updateLayer_Photos();
       }
@@ -1922,21 +1934,20 @@ public class Map25View extends ViewPart implements
       _actionShowMarkerOptions.setSelected(isMarkerVisible);
       _map25App.getLayer_TourMarker().setEnabled(isMarkerVisible);
 
-      // photo_layer
-      final boolean isPhotoVisible = Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_VISIBLE, true);
-      _map25App.setPhoto_IsShowTitle  (Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_TITLE_VISIBLE, true));
-      _map25App.setPhoto_IsScaled     (Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_SCALED, true));
-      _map25App.setPhoto_IsVisible    (isPhotoVisible);
-      _map25App.setPhoto_Size         (Util.getStateInt(_state, STATE_LAYER_PHOTO_SIZE, SlideoutMap25_PhotoOptions.IMAGE_SIZE_MINIMUM));
+      // photo layer
+      final PhotoToolkit photoToolkit = _map25App.getPhotoToolkit();
+      photoToolkit.restoreState();
+      final boolean isShowPhotos = photoToolkit.isShowPhotos();
 
-      _actionShowPhotoOptions.setSelection(isPhotoVisible);
-      _map25App.getLayer_Photo().setEnabled(isPhotoVisible);
+      _actionShowPhotoOptions.setSelection(isShowPhotos);
+      _map25App.getLayer_Photo().setEnabled(isShowPhotos);
 
       _isPhotoFilterActive             = Util.getStateBoolean(_state, STATE_IS_PHOTO_FILTER_ACTIVE, false);
       _photoFilter_RatingStars         = Util.getStateInt(_state, STATE_PHOTO_FILTER_RATING_STARS, 0);
       _photoFilter_RatingStar_Operator = Util.getStateEnum(_state, STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, PhotoRatingStarOperator.HAS_ANY);
       _actionMapPhotoFilter.setSelection(_isPhotoFilterActive);
       _actionMapPhotoFilter.getPhotoFilterSlideout().restoreState(_photoFilter_RatingStars, _photoFilter_RatingStar_Operator);
+
 
       // hillshading layer
       final int layerHillshadingOpacity         = Util.getStateInt(_state, STATE_LAYER_HILLSHADING_OPACITY, 255);
@@ -1958,7 +1969,7 @@ public class Map25View extends ViewPart implements
       _map25App.getLayer_ScaleBar()         .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SCALE_BAR_VISIBLE,     true));
       _map25App.getLayer_TileInfo()         .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_TILE_INFO_VISIBLE,     false));
 
-//      _map25App.getLayer_OpenGLTest()       .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE,  false));
+//    _map25App.getLayer_OpenGLTest()       .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE,  false));
 
       // map is synced with
       _mapSynchedWith = (MapSync) Util.getStateEnum(_state, STATE_MAP_SYNCHED_WITH, MapSync.NONE);
@@ -2077,23 +2088,20 @@ public class Map25View extends ViewPart implements
       _state.put(STATE_IS_LAYER_TILE_INFO_VISIBLE,    _map25App.getLayer_TileInfo().isEnabled());
       _state.put(STATE_IS_LAYER_TOUR_VISIBLE,         _map25App.getLayer_Tour().isEnabled());
 
-//      _state.put(STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE, _map25App.getLayer_OpenGLTest().isEnabled());
+//    _state.put(STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE, _map25App.getLayer_OpenGLTest().isEnabled());
 
       // photo layer
-      _state.put(STATE_IS_LAYER_PHOTO_VISIBLE,        _map25App.isPhoto_Visible());
-      _state.put(STATE_IS_LAYER_PHOTO_TITLE_VISIBLE,  _map25App.isPhoto_ShowTitle());
-      _state.put(STATE_IS_LAYER_PHOTO_SCALED,         _map25App.isPhoto_Scaled());
-      _state.put(STATE_LAYER_PHOTO_SIZE,              _map25App.getPhoto_Size());
-
-      // hillshading layer
-      _state.put(STATE_IS_LAYER_HILLSHADING_VISIBLE,  _map25App.getLayer_HillShading().isEnabled());
-      _state.put(STATE_LAYER_HILLSHADING_OPACITY,     _map25App.getLayer_HillShading_Opacity());
+      _map25App.getPhotoToolkit().saveState();
 
       // photo filter
       _state.put(STATE_IS_PHOTO_FILTER_ACTIVE,        _actionMapPhotoFilter.getSelection());
       _state.put(STATE_PHOTO_FILTER_RATING_STARS,     _photoFilter_RatingStars);
       Util.setStateEnum(_state, STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, _photoFilter_RatingStar_Operator);
       _actionMapPhotoFilter.getPhotoFilterSlideout().saveState();
+
+      // hillshading layer
+      _state.put(STATE_IS_LAYER_HILLSHADING_VISIBLE,  _map25App.getLayer_HillShading().isEnabled());
+      _state.put(STATE_LAYER_HILLSHADING_OPACITY,     _map25App.getLayer_HillShading_Opacity());
 
 // SET_FORMATTING_ON
 

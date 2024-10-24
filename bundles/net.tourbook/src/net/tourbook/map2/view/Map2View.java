@@ -76,6 +76,7 @@ import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map.Action_ExportMap_SubMenu;
 import net.tourbook.map.IMapSyncListener;
 import net.tourbook.map.IMapView;
+import net.tourbook.map.MapImageSize;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapInfoManager;
 import net.tourbook.map.MapManager;
@@ -121,7 +122,6 @@ import net.tourbook.map2.action.ActionZoomLevelAdjustment;
 import net.tourbook.map2.action.ActionZoomOut;
 import net.tourbook.map2.action.ActionZoomShowEntireMap;
 import net.tourbook.map2.action.ActionZoomShowEntireTour;
-import net.tourbook.map2.view.SlideoutMap2_PhotoOptions.ImageSize;
 import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.Photo;
@@ -5096,25 +5096,25 @@ public class Map2View extends ViewPart implements
 
    public void setMapImageSize() {
 
-      final Enum<ImageSize> imageSize = Util.getStateEnum(_state,
+      final Enum<MapImageSize> imageSize = Util.getStateEnum(_state,
             SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE,
-            ImageSize.MEDIUM);
+            MapImageSize.MEDIUM);
 
       int mapImageSize;
 
-      if (imageSize.equals(ImageSize.LARGE)) {
+      if (imageSize.equals(MapImageSize.LARGE)) {
 
          mapImageSize = Util.getStateInt(_state,
                SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_LARGE,
                _map.MAP_IMAGE_DEFAULT_SIZE_LARGE);
 
-      } else if (imageSize.equals(ImageSize.MEDIUM)) {
+      } else if (imageSize.equals(MapImageSize.MEDIUM)) {
 
          mapImageSize = Util.getStateInt(_state,
                SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_MEDIUM,
                _map.MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
 
-      } else if (imageSize.equals(ImageSize.SMALL)) {
+      } else if (imageSize.equals(MapImageSize.SMALL)) {
 
          mapImageSize = Util.getStateInt(_state,
                SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_SMALL,
