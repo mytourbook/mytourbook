@@ -414,26 +414,22 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
    private int getSelectedImageSize() {
 
-      int imageSize;
-
       if (_radioImageSize_Large.getSelection()) {
 
-         imageSize = _spinnerImageSize_Large.getSelection();
+         return _spinnerImageSize_Large.getSelection();
 
       } else if (_radioImageSize_Medium.getSelection()) {
 
-         imageSize = _spinnerImageSize_Medium.getSelection();
+         return _spinnerImageSize_Medium.getSelection();
 
       } else if (_radioImageSize_Small.getSelection()) {
 
-         imageSize = _spinnerImageSize_Small.getSelection();
+         return _spinnerImageSize_Small.getSelection();
 
       } else {
 
-         imageSize = _spinnerImageSize_Tiny.getSelection();
+         return _spinnerImageSize_Tiny.getSelection();
       }
-
-      return imageSize;
    }
 
    private void initUI() {
@@ -577,7 +573,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
          _radioImageSize_Tiny.setSelection(true);
       }
 
-      Photo.setMapImageRequestedSize(_imageSize);
+      Photo.setMap2ImageRequestedSize(_imageSize);
 
       updateUI_FromConfig();
    }
@@ -620,7 +616,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
    private void updateMap() {
 
-      Photo.setMapImageRequestedSize(_imageSize);
+      Photo.setMap2ImageRequestedSize(_imageSize);
 
       final Map2 map2 = _map2View.getMap();
 

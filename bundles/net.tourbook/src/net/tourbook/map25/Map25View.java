@@ -35,6 +35,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
@@ -502,7 +503,18 @@ public class Map25View extends ViewPart implements
 
       _swtContainer.getDisplay().asyncExec(() -> {
 
-         final Point screenPoint = _swtContainer.toDisplay(relativeX, relativeY);
+         int relativeXUnscaled = relativeX;
+         int relativeYUnscaled = relativeY;
+
+         if (UI.IS_4K_DISPLAY) {
+
+            // fix autoscaling
+
+            relativeXUnscaled = (int) (relativeX / UI.HIDPI_SCALING);
+            relativeYUnscaled = (int) (relativeY / UI.HIDPI_SCALING);
+         }
+
+         final Point screenPoint = _swtContainer.toDisplay(relativeXUnscaled, relativeYUnscaled);
 
          createContextMenu(screenPoint.x, screenPoint.y);
       });
@@ -2430,7 +2442,6 @@ public class Map25View extends ViewPart implements
 
       _map25App.updateLayer_Photos();
       _map25App.updateMap();
-
    }
 
    @Override

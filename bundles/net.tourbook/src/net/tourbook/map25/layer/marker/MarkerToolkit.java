@@ -190,7 +190,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
    /**
     * Creates a transparent symbol with text and description, for photos and markers
     *
-    * @param mItem
+    * @param markerItem
     *           -> the MarkerItem to process, containing title and description
     *           if description starts with a '#' the first line of the description is drawn.
     * @param poiBitmap
@@ -203,7 +203,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
     *
     * @return MarkerSymbol with title, description and symbol
     */
-   MarkerSymbol createMarkerSymbol(final MarkerItem mItem,
+   MarkerSymbol createMarkerSymbol(final MarkerItem markerItem,
                                    final Bitmap poiBitmap,
                                    final Boolean isPhoto,
                                    final boolean isShowPhotoTitle) {
@@ -232,8 +232,8 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       final int margin = 5;
       final int dist2symbol = 40;
 
-      final float titleWidth = textPainter.getTextWidth(mItem.title) + 2 * margin;
-      final float titleHeight = textPainter.getTextHeight(mItem.title) + 2 * margin;
+      final float titleWidth = textPainter.getTextWidth(markerItem.title) + 2 * margin;
+      final float titleHeight = textPainter.getTextHeight(markerItem.title) + 2 * margin;
 
       final int symbolWidth = poiBitmap.getWidth();
       final int symbolHeight = poiBitmap.getHeight();
@@ -243,9 +243,12 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       String subtitle = UI.EMPTY_STRING;
       boolean hasSubtitle = false;
-      if (mItem.description.length() > 1) {
-         if (mItem.description.startsWith("#")) { //$NON-NLS-1$
-            subtitle = mItem.description.substring(1); // not the first # char
+      final String description = markerItem.description;
+
+      if (description.length() > 1) {
+         if (description.startsWith("#")) { //$NON-NLS-1$
+
+            subtitle = description.substring(1); // not the first # char
             subtitle = subtitle.split("\\R", 2)[0]; // only first line //$NON-NLS-1$
             subtitleWidth = ((int) textPainter.getTextWidth(subtitle)) + 2 * margin;
             subtitleHeight = ((int) textPainter.getTextHeight(subtitle)) + 2 * margin;
@@ -281,10 +284,10 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       // draw an oversized transparent circle, so the canvas is completely filled with a transparent color
       // titleCanvas.fillRectangle() does not support transparency
       titleCanvas.drawCircle(0, 0, markerWidth * 2, fillPainter);
-//      titleCanvas.fillRectangle(0, 0, markerWidth, markerHeight, Color.CYAN);
+//    titleCanvas.fillRectangle(0, 0, markerWidth, markerHeight, Color.CYAN);
 
       // finetune text position otherwise it is too near to the border, it is still not perfect !!!
-      titleCanvas.drawText(mItem.title,
+      titleCanvas.drawText(markerItem.title,
             0.6f * margin,
             titleHeight - 1.3f * margin,
             textPainter);

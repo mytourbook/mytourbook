@@ -26,6 +26,7 @@ import net.tourbook.map.MapImageSize;
 import net.tourbook.map2.view.SlideoutMap2_PhotoOptions;
 import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25View;
+import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
 
@@ -35,6 +36,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -63,22 +65,24 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
    /*
     * UI controls
     */
-   private Button  _chkShowHQImages;
-   private Button  _chkShowPhotoTitle;
+   private Composite _parent;
 
-   private Button  _radioImageSize_Tiny;
-   private Button  _radioImageSize_Small;
-   private Button  _radioImageSize_Medium;
-   private Button  _radioImageSize_Large;
+   private Button    _chkShowHQImages;
+   private Button    _chkShowPhotoTitle;
 
-   private Label   _lblHeapSize;
+   private Button    _radioImageSize_Tiny;
+   private Button    _radioImageSize_Small;
+   private Button    _radioImageSize_Medium;
+   private Button    _radioImageSize_Large;
 
-   private Link    _linkDiscardImages;
+   private Label     _lblHeapSize;
 
-   private Spinner _spinnerImageSize_Tiny;
-   private Spinner _spinnerImageSize_Small;
-   private Spinner _spinnerImageSize_Medium;
-   private Spinner _spinnerImageSize_Large;
+   private Link      _linkDiscardImages;
+
+   private Spinner   _spinnerImageSize_Tiny;
+   private Spinner   _spinnerImageSize_Small;
+   private Spinner   _spinnerImageSize_Medium;
+   private Spinner   _spinnerImageSize_Large;
 
    /**
     * @param ownerControl
@@ -111,6 +115,8 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
       final Composite ui = createUI(parent);
 
       restoreState();
+
+      enableControls();
 
       updateUI_Memory();
 
@@ -286,41 +292,72 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
 
    }
 
-   private int getSelectedImageSize() {
+   private void enableControls() {
 
-      int imageSize;
+      _spinnerImageSize_Large.setEnabled(_radioImageSize_Large.getSelection());
+      _spinnerImageSize_Medium.setEnabled(_radioImageSize_Medium.getSelection());
+      _spinnerImageSize_Small.setEnabled(_radioImageSize_Small.getSelection());
+      _spinnerImageSize_Tiny.setEnabled(_radioImageSize_Tiny.getSelection());
+   }
+
+   private int getSelectedImageSize() {
 
       if (_radioImageSize_Large.getSelection()) {
 
-         imageSize = _spinnerImageSize_Large.getSelection();
+         return _spinnerImageSize_Large.getSelection();
 
       } else if (_radioImageSize_Medium.getSelection()) {
 
-         imageSize = _spinnerImageSize_Medium.getSelection();
+         return _spinnerImageSize_Medium.getSelection();
 
       } else if (_radioImageSize_Small.getSelection()) {
 
-         imageSize = _spinnerImageSize_Small.getSelection();
+         return _spinnerImageSize_Small.getSelection();
 
       } else {
 
-         imageSize = _spinnerImageSize_Tiny.getSelection();
+         return _spinnerImageSize_Tiny.getSelection();
       }
-
-      return imageSize;
    }
 
    private void initUI(final Composite parent) {
 
-      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI());
+      _parent = parent;
+
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> {
+
+         onChangeUI(selectionEvent);
+      });
 
       _defaultMouseWheelListener = mouseEvent -> {
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10, true);
-         onChangeUI();
+         onChangeUI(mouseEvent);
       };
    }
 
-   private void onChangeUI() {
+   private void onChangeUI(final TypedEvent selectionEvent) {
+
+      /**
+       * Very strange:
+       * <p>
+       * The radio buttons are fireing this event twice, first the unselected then the selected
+       * radio buttons
+       */
+      if (selectionEvent.widget instanceof final Button button) {
+
+         if (button == _radioImageSize_Large
+               || button == _radioImageSize_Medium
+               || button == _radioImageSize_Small
+               || button == _radioImageSize_Tiny) {
+
+            if (button.getSelection() == false) {
+
+               // skip the unselected event
+
+               return;
+            }
+         }
+      }
 
       _imageSize = getSelectedImageSize();
 
@@ -329,6 +366,8 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
 
       // update UI
       updateUI();
+
+      enableControls();
    }
 
    private void onDiscardImages() {
@@ -352,7 +391,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
          _chkShowHQImages     .setSelection(Util.getStateBoolean(_state, Map25View.STATE_IS_SHOW_THUMB_HQ_IMAGES, Map25View.STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT));
          _chkShowPhotoTitle   .setSelection(Util.getStateBoolean(_state, Map25View.STATE_IS_SHOW_PHOTO_TITLE,     Map25View.STATE_IS_SHOW_PHOTO_TITLE_DEFAULT));
 
-         final Enum<MapImageSize> imageSize = Util.getStateEnum(_state, Map25View.STATE_PHOTO_IMAGE_SIZE, MapImageSize.MEDIUM);
+         final Enum<MapImageSize> imageSizeCategory = Util.getStateEnum(_state, Map25View.STATE_PHOTO_IMAGE_SIZE, MapImageSize.MEDIUM);
 
          final int imageSizeLarge   = Util.getStateInt(_state, Map25View.STATE_PHOTO_IMAGE_SIZE_LARGE,  Map25App.MAP_IMAGE_DEFAULT_SIZE_LARGE);
          final int imageSizeMedium  = Util.getStateInt(_state, Map25View.STATE_PHOTO_IMAGE_SIZE_MEDIUM, Map25App.MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
@@ -366,17 +405,17 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
 
    // SET_FORMATTING_ON
 
-      if (imageSize.equals(MapImageSize.LARGE)) {
+      if (imageSizeCategory.equals(MapImageSize.LARGE)) {
 
          _imageSize = imageSizeLarge;
          _radioImageSize_Large.setSelection(true);
 
-      } else if (imageSize.equals(MapImageSize.MEDIUM)) {
+      } else if (imageSizeCategory.equals(MapImageSize.MEDIUM)) {
 
          _imageSize = imageSizeMedium;
          _radioImageSize_Medium.setSelection(true);
 
-      } else if (imageSize.equals(MapImageSize.SMALL)) {
+      } else if (imageSizeCategory.equals(MapImageSize.SMALL)) {
 
          _imageSize = imageSizeSmall;
          _radioImageSize_Small.setSelection(true);
@@ -386,6 +425,8 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
          _imageSize = imageSizeTiny;
          _radioImageSize_Tiny.setSelection(true);
       }
+
+      Photo.setMap25ImageRequestedSize(_imageSize);
    }
 
    private void saveState() {
@@ -416,10 +457,17 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
 
    private void updateUI() {
 
-      final Map25App mapApp = _map25View.getMapApp();
+      // run async that the slideout UI is updated immediately
 
-      mapApp.updateLayer_Photos();
-      mapApp.updateMap();
+      Photo.setMap25ImageRequestedSize(_imageSize);
+
+      _parent.getDisplay().asyncExec(() -> {
+
+         final Map25App mapApp = _map25View.getMapApp();
+
+         mapApp.updateLayer_Photos();
+         mapApp.updateMap();
+      });
    }
 
    private void updateUI_Memory() {

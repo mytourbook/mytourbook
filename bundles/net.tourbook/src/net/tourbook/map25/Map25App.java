@@ -2086,10 +2086,26 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    }
 
    /**
+    */
+   public void updateLayer_PhotoLayer() {
+
+      // update marker renderer
+      _layer_Photo_VARYING.update();
+   }
+
+   /**
     * Updates the photo layer, switchung between clustered to not clustered settings are from
     * MarkerConfig replacing the photo Items currently no GUI for selecting clustering
     */
    public void updateLayer_Photos() {
+
+      final boolean isShowPhotos = _photoToolkit.isShowPhotos();
+
+      _layer_Photo_VARYING.setEnabled(isShowPhotos);
+
+      if (isShowPhotos == false) {
+         return;
+      }
 
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
@@ -2127,7 +2143,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       final List<MarkerInterface> photoItems = _photoToolkit.createPhotoItems(filteredPhotos);
 
       _layer_Photo_VARYING.addItems(photoItems);
-      _layer_Photo_VARYING.setEnabled(_photoToolkit.isShowPhotos());
 
       //_phototoolkit._isMarkerClusteredLast = config.isPhotoClustered;
       // using settings from MapBookmarks must be changed later with own config

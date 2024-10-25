@@ -18,12 +18,16 @@
  *******************************************************************************/
 package net.tourbook.map25.layer.marker;
 
-import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import javax.imageio.ImageIO;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -35,23 +39,14 @@ import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.Map25View;
 import net.tourbook.photo.ILoadCallBack;
-import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
-import net.tourbook.photo.ImageUtils;
 import net.tourbook.photo.Photo;
-import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoImageMetadata;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
-import org.imgscalr.Scalr.Rotation;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Paint;
@@ -63,36 +58,20 @@ import org.oscim.layers.marker.MarkerSymbol;
 
 public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerInterface> {
 
-   private static IPreferenceStore _prefStore = PhotoActivator.getPrefStore();
-   private IDialogSettings         _state;
+   private IDialogSettings _state;
 
-   private Map25App                _mapApp;
+   private Map25App        _mapApp;
 
-   private Display                 _display;
-
-   private int                     _imageSize;
-
-   private boolean                 _isPhotoVisible;
-   private boolean                 _isTitleVisible;
+   private boolean         _isShowHQPhotoImages;
+   private boolean         _isShowPhotos;
+   private boolean         _isShowPhotoTitle;
 
    /**
     * This image is displayed when a photo is not yet loaded
     */
-   private Bitmap                  _bitmapNotLoadedPhoto;
+   private Bitmap          _bitmapNotLoadedPhoto;
 
-   private MarkerSymbol            _symbolNotLoadedPhoto;                     // marker symbol, circle or star
-
-   private class ImageState {
-
-      Image   _swtPhotoImage;
-      boolean _isMustDisposeImage;
-
-      private ImageState(final Image swtPhotoImage, final boolean isMustDisposeImage) {
-
-         _swtPhotoImage = swtPhotoImage;
-         _isMustDisposeImage = isMustDisposeImage;
-      }
-   }
+   private MarkerSymbol    _symbolNotLoadedPhoto; // marker symbol, circle or star
 
    private class LoadCallbackImage implements ILoadCallBack {
 
@@ -113,9 +92,13 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          }
 
          // create map bitmap from photo image
-         createPhotoItems_10_CreateBitmapFromPhoto(_markerItem, _photo, true);
+         createPhotoItems_10_CreateBitmapFromPhoto(_markerItem, _photo);
 
-         _mapApp.updateMap();
+         /**
+          * EXTREEMLY IMPORTANT otherwise the photo size is not updated, it took me a while to fix
+          * this issue !!!
+          */
+         _mapApp.updateLayer_PhotoLayer();
       }
    }
 
@@ -125,8 +108,6 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
       _mapApp = map25App;
       _state = state;
-
-      _display = Display.getDefault();
 
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
@@ -241,7 +222,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
                geoPoint);
 
          // the photo bitmap is set into the markerItem
-         createPhotoItems_10_CreateBitmapFromPhoto(markerItem, photo, false);
+         createPhotoItems_10_CreateBitmapFromPhoto(markerItem, photo);
 
          allPhotoItems.add(markerItem);
       }
@@ -250,158 +231,129 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    }
 
    private void createPhotoItems_10_CreateBitmapFromPhoto(final MarkerItem markerItem,
-                                                          final Photo photo,
-                                                          final boolean isImageLoaded) {
+                                                          final Photo photo) {
 
-      Bitmap bitmapImage = createPhotoItems_20_CreateBitmap(markerItem, photo, isImageLoaded);
+      Bitmap bitmapImage = createPhotoItems_20_CreateBitmap(markerItem, photo);
 
       if (bitmapImage == null) {
          bitmapImage = _bitmapNotLoadedPhoto;
       }
 
-      final MarkerSymbol bitmapPhoto = createMarkerSymbol(markerItem, bitmapImage, true, _isTitleVisible);
+      final MarkerSymbol bitmapPhoto = createMarkerSymbol(markerItem, bitmapImage, true, _isShowPhotoTitle);
 
       markerItem.setMarker(bitmapPhoto);
    }
 
    /**
-    * same as in TourMapPainter, but for 2.5D maps
-    *
-    * @param item
+    * @param markerItem
     * @param photo
-    * @param isImageLoaded
     *
-    * @return the bitmap
+    * @return OSCIM bitmap
     */
-   private Bitmap createPhotoItems_20_CreateBitmap(final MarkerItem item,
-                                                   final Photo photo,
-                                                   final boolean isImageLoaded) {
+   private Bitmap createPhotoItems_20_CreateBitmap(final MarkerItem markerItem,
+                                                   final Photo photo) {
 
-      Bitmap photoBitmap = null;
+      Bitmap oscimPhotoBitmap = null;
 
-      final ImageState imageState = createPhotoItems_30_GetScaledImage(
-            item,
-            photo,
-            _imageSize,
-            isImageLoaded);
+      final BufferedImage awtImage = createPhotoItems_30_GetImage(markerItem, photo);
 
-      final Image swtPhotoImage = imageState._swtPhotoImage;
+      if (awtImage != null) {
 
-      if (swtPhotoImage != null) {
+         try (final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
 
-         try {
+            ImageIO.write(awtImage, "png", output);
+            final InputStream is = new ByteArrayInputStream(output.toByteArray());
 
-            final byte[] formattedImage = ImageUtils.formatImage(swtPhotoImage, org.eclipse.swt.SWT.IMAGE_BMP);
-
-            photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(formattedImage));
+            oscimPhotoBitmap = CanvasAdapter.decodeBitmap(is);
 
          } catch (final IOException e) {
             StatusUtil.log(e);
          }
-
-         if (imageState._isMustDisposeImage) {
-            swtPhotoImage.dispose();
-         }
       }
 
-      return photoBitmap;
+      return oscimPhotoBitmap;
    }
 
    /**
-    * @param item
     * @param photo
-    * @param thumbSize
-    *           thumbnail size from slideout
-    * @param isImageLoaded
+    * @param map
+    * @param tile
     *
-    * @return
+    * @return Returns the photo image or <code>null</code> when image is not loaded.
     */
-   private ImageState createPhotoItems_30_GetScaledImage(final MarkerItem item,
-                                                         final Photo photo,
-                                                         final int thumbSize,
-                                                         final boolean isImageLoaded) {
+   private BufferedImage createPhotoItems_30_GetImage(final MarkerItem markerItem,
+                                                      final Photo photo) {
 
-      Image swtPhotoImage = null;
-      Image swtScaledImage = null;
+      BufferedImage awtThumbImage = null;
+      BufferedImage awtPhotoImageThumbHQ = null;
 
-      boolean isMustDisposeImage = false;
-
-//    final ImageQuality requestedImageQuality = ImageQuality.HQ;
-      final ImageQuality requestedImageQuality = ImageQuality.THUMB;
+      /*
+       * 1. The thumbs MUST be loaded firstly because they are also loading the image orientation
+       */
 
       // check if image has an loading error
-      final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
-      if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+      final PhotoLoadingState thumbPhotoLoadingState = photo.getLoadingState(ImageQuality.THUMB);
 
-         // image is not invalid
+      if (thumbPhotoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+
+         // image is not invalid and not yet loaded
 
          // check if image is in the cache
-         swtPhotoImage = PhotoImageCache.getImage_SWT(photo, requestedImageQuality);
+         awtThumbImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB);
 
-         // put photo image in loading queue
-         if ((swtPhotoImage == null || swtPhotoImage.isDisposed())
-
-               // photo image is not in loading queue
-               && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false
-
-               // prevent reloading image
-               && isImageLoaded == false) {
+         if (awtThumbImage == null
+               && thumbPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
 
             // the requested image is not available in the image cache -> image must be loaded
 
-            final ILoadCallBack imageLoadCallback = new LoadCallbackImage(item, photo);
+            PhotoLoadManager.putImageInLoadingQueueThumb_Map(
+                  photo,
+                  ImageQuality.THUMB,
+                  new LoadCallbackImage(markerItem, photo),
+                  true // is AWT image
+            );
 
-            PhotoLoadManager.putImageInLoadingQueueThumb_Map(photo, requestedImageQuality, imageLoadCallback, false);
-         }
-
-         if (swtPhotoImage != null && swtPhotoImage.isDisposed() == false) {
-
-            boolean isScaled = false;
-            isScaled = false;
-            if (isScaled == false) {
-               return new ImageState(swtPhotoImage, false);
-            }
-
-            // scale image
-
-            final Rectangle imageBounds = swtPhotoImage.getBounds();
-            final int originalImageWidth = imageBounds.width;
-            final int originalImageHeight = imageBounds.height;
-
-            final int imageWidth = originalImageWidth;
-            final int imageHeight = originalImageHeight;
-
-            //final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;//    PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT;
-            final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, thumbSize, thumbSize);
-
-            boolean isRotated = false;
-            final Rotation thumbRotation = null;
-            if (isRotated == false) {
-               isRotated = true;
-               //thumbRotation = getRotation();
-            }
-
-            final boolean isRotateImageAutomatically = _prefStore.getBoolean(IPhotoPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY);
-
-            swtScaledImage = net.tourbook.common.util.ImageUtils.resize(
-                  _display,
-                  swtPhotoImage,
-                  bestSize.x,
-                  bestSize.y,
-                  SWT.ON,
-                  SWT.LOW,
-                  thumbRotation,
-                  isRotateImageAutomatically);
-
-            isMustDisposeImage = true;
-
-         } else {
-
-            // wait until image is loaded
+            return null;
          }
       }
 
-      return new ImageState(swtScaledImage, isMustDisposeImage);
+      if (_isShowHQPhotoImages == false) {
+
+         return awtThumbImage;
+      }
+
+      /*
+       * 2. Display thumb HQ image
+       */
+
+      // check if image has an loading error
+      final PhotoLoadingState thumbHqPhotoLoadingState = photo.getLoadingState(ImageQuality.THUMB_HQ);
+
+      if (thumbHqPhotoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+
+         // image is not invalid and not yet loaded
+
+         // check if image is in the cache
+         awtPhotoImageThumbHQ = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB_HQ);
+
+         if (awtPhotoImageThumbHQ == null
+               && thumbHqPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+
+            // the requested image is not available in the image cache -> image must be loaded
+
+            PhotoLoadManager.putImageInLoadingQueueHQThumb_Map(
+                  photo,
+                  Photo.getMap25ImageRequestedSize(),
+                  new LoadCallbackImage(markerItem, photo));
+         }
+      }
+
+      if (awtPhotoImageThumbHQ != null) {
+
+         return awtPhotoImageThumbHQ;
+      }
+
+      return awtThumbImage;
    }
 
    public MarkerSymbol getSymbolNotLoadedPhoto() {
@@ -411,7 +363,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
    public boolean isShowPhotos() {
 
-      return _isPhotoVisible;
+      return _isShowPhotos;
    }
 
    @Override
@@ -428,48 +380,58 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
    public void restoreState() {
 
-      _isPhotoVisible = Util.getStateBoolean(_state, Map25View.STATE_IS_LAYER_PHOTO_VISIBLE, true);
-      _isTitleVisible = Util.getStateBoolean(_state, Map25View.STATE_IS_SHOW_PHOTO_TITLE, true);
+      _isShowPhotos = Util.getStateBoolean(_state, Map25View.STATE_IS_LAYER_PHOTO_VISIBLE, true);
+      _isShowPhotoTitle = Util.getStateBoolean(_state, Map25View.STATE_IS_SHOW_PHOTO_TITLE, true);
+      _isShowHQPhotoImages = Util.getStateBoolean(_state, Map25View.STATE_IS_SHOW_THUMB_HQ_IMAGES, false);
+
+      setMapImageSize();
+   }
+
+   public void saveState() {
+
+      _state.put(Map25View.STATE_IS_LAYER_PHOTO_VISIBLE, _isShowPhotos);
+
+   }
+
+   private void setMapImageSize() {
 
       final Enum<MapImageSize> imageSize = Util.getStateEnum(_state,
             SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE,
             MapImageSize.MEDIUM);
 
+      int requestedPhotoImageSize;
+
       if (imageSize.equals(MapImageSize.LARGE)) {
 
-         _imageSize = Util.getStateInt(_state,
+         requestedPhotoImageSize = Util.getStateInt(_state,
                SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_LARGE,
                Map25App.MAP_IMAGE_DEFAULT_SIZE_LARGE);
 
       } else if (imageSize.equals(MapImageSize.MEDIUM)) {
 
-         _imageSize = Util.getStateInt(_state,
+         requestedPhotoImageSize = Util.getStateInt(_state,
                SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_MEDIUM,
                Map25App.MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
 
       } else if (imageSize.equals(MapImageSize.SMALL)) {
 
-         _imageSize = Util.getStateInt(_state,
+         requestedPhotoImageSize = Util.getStateInt(_state,
                SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_SMALL,
                Map25App.MAP_IMAGE_DEFAULT_SIZE_SMALL);
 
       } else {
 
-         _imageSize = Util.getStateInt(_state,
+         requestedPhotoImageSize = Util.getStateInt(_state,
                SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE_TINY,
                Map25App.MAP_IMAGE_DEFAULT_SIZE_TINY);
       }
-   }
 
-   public void saveState() {
-
-      _state.put(Map25View.STATE_IS_LAYER_PHOTO_VISIBLE, _isPhotoVisible);
-
+      Photo.setMap2ImageRequestedSize(requestedPhotoImageSize);
    }
 
    public void setPhotoIsVisible(final boolean isPhotoVisible) {
 
-      _isPhotoVisible = isPhotoVisible;
+      _isShowPhotos = isPhotoVisible;
    }
 
 }

@@ -76,8 +76,8 @@ import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map.Action_ExportMap_SubMenu;
 import net.tourbook.map.IMapSyncListener;
 import net.tourbook.map.IMapView;
-import net.tourbook.map.MapImageSize;
 import net.tourbook.map.MapColorProvider;
+import net.tourbook.map.MapImageSize;
 import net.tourbook.map.MapInfoManager;
 import net.tourbook.map.MapManager;
 import net.tourbook.map.MapUtils;
@@ -3689,23 +3689,6 @@ public class Map2View extends ViewPart implements
 
          } else {
 
-            int a = 0;
-            a++;
-//            PhotoImageCache.disposeAll();
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
             final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
             paintToursAndPhotos(tourData, selection);
@@ -5094,7 +5077,7 @@ public class Map2View extends ViewPart implements
       _tourWeatherToolTipProvider.setIconPosition(devXTooltip, devYTooltip);
    }
 
-   public void setMapImageSize() {
+   private void setMapImageSize() {
 
       final Enum<MapImageSize> imageSize = Util.getStateEnum(_state,
             SlideoutMap2_PhotoOptions.STATE_PHOTO_IMAGE_SIZE,
@@ -5127,7 +5110,7 @@ public class Map2View extends ViewPart implements
                _map.MAP_IMAGE_DEFAULT_SIZE_TINY);
       }
 
-      Photo.setMapImageRequestedSize(mapImageSize);
+      Photo.setMap2ImageRequestedSize(mapImageSize);
    }
 
    /**
