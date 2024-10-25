@@ -2244,7 +2244,7 @@ public class TourLocationManager {
                final int numTours = allRequestedTours.size();
                int numWorked = 0;
 
-               monitor.beginTask("Setting and saving %d tour location names".formatted(numTours), numTours);
+               monitor.beginTask(Messages.Tour_Location_Task_SetTourLocationNames.formatted(numTours), numTours);
 
                for (final TourData tourData : allRequestedTours) {
 

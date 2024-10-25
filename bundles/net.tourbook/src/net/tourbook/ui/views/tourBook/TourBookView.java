@@ -60,6 +60,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.search.SearchView;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -220,6 +221,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -1500,7 +1502,7 @@ public class TourBookView extends ViewPart implements
             return;
          }
 
-         onSelectionChanged(selection);
+         onSelectionChanged(selection, workbenchPart);
       };
 
       // register selection listener in the page
@@ -1526,12 +1528,19 @@ public class TourBookView extends ViewPart implements
 
          } else if (tourEventId == TourEventId.TOUR_SELECTION && eventData instanceof final ISelection selection) {
 
-            onSelectionChanged(selection);
+            onSelectionChanged(selection, part);
 
          } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED
                || tourEventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
             reloadViewer();
+
+         } else if (tourEventId == TourEventId.FULLTEXT_SEARCH_TOURS) {
+
+            if (eventData instanceof final ArrayList allTourIDs) {
+
+               setCollectionFilterFromFulltextSearch(allTourIDs);
+            }
 
          } else if (tourEventId == TourEventId.TOUR_LOCATION_SELECTION) {
 
@@ -3678,7 +3687,7 @@ public class TourBookView extends ViewPart implements
       _isSelectedWithKeyboard = false;
    }
 
-   private void onSelectionChanged(final ISelection selection) {
+   private void onSelectionChanged(final ISelection selection, final IWorkbenchPart part) {
 
       if (_isInFireSelection) {
          return;
@@ -3689,12 +3698,38 @@ public class TourBookView extends ViewPart implements
 
          final long tourId = selectionTourId.getTourId();
 
+         boolean isSelectTours = true;
+
          if (_isLayoutNatTable) {
 
-            _selectedTourIds.clear();
-            _selectedTourIds.add(tourId);
+            if (_actionLinkWithOtherViews.getSelection()) {
 
-            reselectTourViewer(false);
+               // linking is enabled
+
+               if (part instanceof final SearchView searchView) {
+
+                  if (searchView.isPushSearchResult()) {
+
+                     /*
+                      * Disable tour selection otherwise the pushed search result is overwritten
+                      */
+                     isSelectTours = false;
+
+                     /*
+                      * Disable link with other views, this do not work when push is enabled
+                      */
+                     _actionLinkWithOtherViews.setSelection(false);
+                  }
+               }
+
+               if (isSelectTours) {
+
+                  _selectedTourIds.clear();
+                  _selectedTourIds.add(tourId);
+
+                  reselectTourViewer(false);
+               }
+            }
 
          } else {
 
@@ -4205,9 +4240,6 @@ public class TourBookView extends ViewPart implements
          return;
       }
 
-//      System.out.println(UI.timeStamp() + " TourBookView.selectTour(long)(): " + tourId);
-// TODO remove SYSTEM.OUT.PRINTLN
-
       // check if enabled
       if (_actionLinkWithOtherViews.getSelection() == false) {
 
@@ -4402,6 +4434,34 @@ public class TourBookView extends ViewPart implements
 
    public void setActiveYear(final int activeYear) {
       _selectedYear = activeYear;
+   }
+
+   private void setCollectionFilterFromFulltextSearch(final ArrayList<Long> allTourIDs) {
+
+      _tourCollectionFilter = TourCollectionFilter.COLLECTED_TOURS;
+
+      _selectedTourIds.clear();
+      _selectedTourIds.addAll(allTourIDs);
+
+      // run in UI thread
+      _parent.getDisplay().asyncExec(() -> {
+
+         // disable sync action
+         _actionLinkWithOtherViews.setSelection(false);
+
+         final boolean isFilterActive = _actionTourCollectionFilter.getSelection();
+
+         if (isFilterActive == false) {
+
+            // filter is not active -> activate it
+
+            _actionTourCollectionFilter.setSelection(true);
+         }
+
+         // update UI
+         updateUI_TourCollectionFilterIcons(_tourCollectionFilter);
+         updateUI_NatTable(_tourCollectionFilter);
+      });
    }
 
    @Override

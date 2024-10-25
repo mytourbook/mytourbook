@@ -40,7 +40,9 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -643,6 +645,30 @@ public class DialogCreateTourMarkers extends Dialog {
 
       _state.put(STATE_DISTANCE_VALUE, _spinnerByDistance.getSelection());
       _state.put(STATE_TIME_VALUE, _spinnerByTime.getSelection());
+   }
+
+   /**
+    * This is overwritten because the default width for the OK button is too small
+    *
+    * @param button
+    *           The button which layout data is to be set.
+    */
+   @Override
+   protected void setButtonLayoutData(final Button button) {
+
+      int okButtonWidth;
+
+      // get OK button width, the default is too small
+      final GC gc = new GC(button);
+      {
+         okButtonWidth = gc.textExtent(Messages.Dialog_CreateTourMarkers_Button_ValidateMarkers).x;
+      }
+      gc.dispose();
+
+      final GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+      data.widthHint = okButtonWidth;
+
+      button.setLayoutData(data);
    }
 
    private void updateUI_Distance() {

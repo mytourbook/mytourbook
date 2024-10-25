@@ -211,7 +211,7 @@ public class TagMenuManager {
 
       public ActionTagGroup(final TagGroup tagGroup) {
 
-         super("%s  %d".formatted(tagGroup.name, tagGroup.tourTags.size()), AS_PUSH_BUTTON);
+         super("%s  %d".formatted(tagGroup.name, tagGroup.tourTags.size()), AS_PUSH_BUTTON); //$NON-NLS-1$
 
          __tagGroup = tagGroup;
       }
@@ -229,7 +229,7 @@ public class TagMenuManager {
 
       public ActionTagGroups_SubMenu() {
 
-         super("Add &Grouped Tags", AS_DROP_DOWN_MENU);
+         super(Messages.Action_Tag_AddGroupedTags, AS_DROP_DOWN_MENU);
       }
 
       @Override
@@ -521,7 +521,7 @@ public class TagMenuManager {
       _actionAddTag              = new Action_AddTourTag_SubMenu(this);
       _actionRemoveTag           = new Action_RemoveTourTag_SubMenu(this);
       _actionRemoveAllTags       = new Action_RemoveAllTags();
-      _actionTagGroupPreferences = new ActionOpenPrefDialog("Manage Tag &Groups...",PrefPageTagGroups.ID);
+      _actionTagGroupPreferences = new ActionOpenPrefDialog(Messages.Action_Tag_ManageTagGroups,PrefPageTagGroups.ID);
       _actionAddTagGroups        = new ActionTagGroups_SubMenu();
       _actionSetTags             = new ActionShowTourTagsView();
 

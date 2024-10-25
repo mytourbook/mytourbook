@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
+import net.tourbook.common.tooltip.ICanHideTooltip;
 import net.tourbook.common.util.IToolTipProvider;
 
 import org.eclipse.swt.widgets.Composite;
@@ -25,5 +26,16 @@ import org.eclipse.swt.widgets.Composite;
  */
 public interface IChartInfoProvider {
 
-   void createToolTipUI(IToolTipProvider toolTipProvider, Composite parent, int serieIndex, int valueIndex);
+   /**
+    * @param toolTipProvider
+    * @param parent
+    * @param serieIndex
+    * @param valueIndex
+    *
+    * @return Returns an interface if the tooltip could be closed or <code>null</code>
+    */
+   ICanHideTooltip createToolTipUI(IToolTipProvider toolTipProvider,
+                                   Composite parent,
+                                   int serieIndex,
+                                   int valueIndex);
 }

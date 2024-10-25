@@ -344,7 +344,7 @@ public class ChartComponents extends Composite {
 
       // set values after they have been computed
       chartDrawingData.devMarginTop = _devMarginTop;
-      chartDrawingData.devXTitelBarHeight = _devXTitleBarHeight;
+      chartDrawingData.devXTitleBarHeight = _devXTitleBarHeight;
       chartDrawingData.devSliderBarHeight = devSliderBarHeight;
       chartDrawingData.devXAxisHeight = _devXAxisHeight;
       chartDrawingData.devVisibleChartWidth = getDevVisibleChartWidth();

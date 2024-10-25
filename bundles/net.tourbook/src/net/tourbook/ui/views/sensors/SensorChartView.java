@@ -35,6 +35,7 @@ import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ICanHideTooltip;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -290,11 +291,13 @@ public class SensorChartView extends ViewPart implements ITourProvider {
     *           serieIndex
     * @param hoveredBar_HorizontalIndex
     *           valueIndex
+    *
+    * @return
     */
-   private void createToolTipUI(final IToolTipProvider toolTipProvider,
-                                final Composite parent,
-                                final int serieIndex,
-                                final int valueIndex) {
+   private ICanHideTooltip createToolTipUI(final IToolTipProvider toolTipProvider,
+                                           final Composite parent,
+                                           final int serieIndex,
+                                           final int valueIndex) {
 
       final long tourId = _sensorData.allTourIds[valueIndex];
 
@@ -321,6 +324,8 @@ public class SensorChartView extends ViewPart implements ITourProvider {
       }
 
       parent.addDisposeListener(disposeEvent -> _tourInfoUI.dispose());
+
+      return _tourInfoUI;
    }
 
    private void createUI(final Composite parent) {

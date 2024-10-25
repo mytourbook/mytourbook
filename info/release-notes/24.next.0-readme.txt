@@ -58,21 +58,6 @@ New
   - Select a product from a list of the most recent products used
   - Edit an existing custom nutrition product
 
-* Tour Info Tooltip
-  - Customize content
-    https://github.com/mytourbook/mytourbook/issues/1411
-
-* Tour Tag Groups
-  - Define a group with tags
-  - Set all tags from a group 
-    - from all tour views
-    - with easy import
-  https://github.com/mytourbook/mytourbook/issues/1358
-
-* Tour Book View
-  - Create tour markers by distance or time
-    https://github.com/mytourbook/mytourbook/issues/1319
-
 
 Improvements
 ============
@@ -80,25 +65,11 @@ Improvements
 * Tour Nutrition (Frederic):
   - Add duplicated products when they are contained in a beverage container
 
-* Tour Book View
-  - Added column for tour description, the displayed text has been shortened to 100 characters
-   
-* Tour Location
-  - Set start/end location names which has no geo positions
-    https://github.com/mytourbook/mytourbook/issues/1413
 
 Changes
 =======
 
-* Tour Info
-  - The weather text is not wrapped anymore, it is now truncated but the text can be selected and scrolled to see the whole text
-
-* Tour Type Preferences
-  - Renamed pref page
-  - Swapped pref page
-
-* Tag Preferences
-  - Renamed pref page
+* 
 
 
 Changes that require Tour Re-import
@@ -110,8 +81,7 @@ Changes that require Tour Re-import
 Bugfix
 ======
   
-* 4k Display
-  Fixed: It was difficult to hover tooltips when the mouse was moved not fast enough
+* 
  
 
 See also milestone 24.x https://github.com/mytourbook/mytourbook/milestone/16?closed=1
@@ -130,7 +100,7 @@ Translation
 System   
 ======
 
-* MyTourbook Milestone 24.5   https://github.com/mytourbook/mytourbook/milestone/14?closed=1
+* MyTourbook Milestone 24.11  https://github.com/mytourbook/mytourbook/milestone/19?closed=1
 * Java 17                     https://adoptium.net/temurin/releases/?version=17
 * Eclipse 2024-03 (4.31)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.31-202402290520/
 * NatTable 2.20               https://www.eclipse.org/nattable/download.php

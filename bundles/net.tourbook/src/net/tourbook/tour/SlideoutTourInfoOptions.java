@@ -123,6 +123,14 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
    }
 
    @Override
+   protected void beforeHideToolTip() {
+
+      // set state that this tooltip is now hidden
+
+      _tourInfoUI.setUICanBeClosed();
+   }
+
+   @Override
    public void colorDialogOpened(final boolean isDialogOpened) {
 
       setIsAnotherDialogOpened(isDialogOpened);
@@ -185,7 +193,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
        * Label: Slideout title
        */
       final Label label = new Label(parent, SWT.NONE);
-      label.setText("Tour Info Options");
+      label.setText(Messages.Tour_TooltipOptions_Titel_TourInfoOptions);
       MTFont.setBannerFont(label);
       GridDataFactory.fillDefaults().span(numSpanColumns, 1).applyTo(label);
 
@@ -211,7 +219,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
           * Show all values
           */
          _rdoShowAllValues = new Button(parent, SWT.RADIO);
-         _rdoShowAllValues.setText("Show &all values");
+         _rdoShowAllValues.setText(Messages.Tour_TooltipOptions_Radio_ShowAllValues);
          _rdoShowAllValues.addSelectionListener(_defaultSelectionListener);
          gdSpan2.applyTo(_rdoShowAllValues);
       }
@@ -220,7 +228,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
           * Show custom values
           */
          _rdoShowCustomValues = new Button(parent, SWT.RADIO);
-         _rdoShowCustomValues.setText("&Customize values");
+         _rdoShowCustomValues.setText(Messages.Tour_TooltipOptions_Radio_CustomizeValues);
          _rdoShowCustomValues.addSelectionListener(_defaultSelectionListener);
          gdSpan2.applyTo(_rdoShowCustomValues);
       }
@@ -238,7 +246,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
              * Show body values
              */
             _chkShowBodyValues = new Button(container, SWT.CHECK);
-            _chkShowBodyValues.setText("Show &body values");
+            _chkShowBodyValues.setText(Messages.Tour_TooltipOptions_Checkbox_ShowBodyValues);
             _chkShowBodyValues.addSelectionListener(_defaultSelectionListener);
             gdSpan2.applyTo(_chkShowBodyValues);
          }
@@ -247,7 +255,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
              * Show heartrate zones
              */
             _chkShowHRZones = new Button(container, SWT.CHECK);
-            _chkShowHRZones.setText("Show &heartrate zones");
+            _chkShowHRZones.setText(Messages.Tour_TooltipOptions_Checkbox_ShowHeartrateZones);
             _chkShowHRZones.addSelectionListener(_defaultSelectionListener);
             gdSpan2.applyTo(_chkShowHRZones);
          }
@@ -256,7 +264,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
              * Show running dynamics
              */
             _chkShowRunDyn = new Button(container, SWT.CHECK);
-            _chkShowRunDyn.setText("Show &running dynamics");
+            _chkShowRunDyn.setText(Messages.Tour_TooltipOptions_Checkbox_ShowRunningDynamics);
             _chkShowRunDyn.addSelectionListener(_defaultSelectionListener);
             gdSpan2.applyTo(_chkShowRunDyn);
          }
@@ -265,7 +273,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
              * Show vertical speed
              */
             _chkShowVerticalSpeed = new Button(container, SWT.CHECK);
-            _chkShowVerticalSpeed.setText("Show &vertial speed");
+            _chkShowVerticalSpeed.setText(Messages.Tour_TooltipOptions_Checkbox_ShowVerticalSpeed);
             _chkShowVerticalSpeed.addSelectionListener(_defaultSelectionListener);
             gdSpan2.applyTo(_chkShowVerticalSpeed);
          }
@@ -274,7 +282,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
              * Show sensor values
              */
             _chkShowSensorValues = new Button(container, SWT.CHECK);
-            _chkShowSensorValues.setText("Show sens&or values");
+            _chkShowSensorValues.setText(Messages.Tour_TooltipOptions_Checkbox_ShowSensorValues);
             _chkShowSensorValues.addSelectionListener(_defaultSelectionListener);
             gdSpan2.applyTo(_chkShowSensorValues);
          }
@@ -283,7 +291,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
              * Show weather values
              */
             _chkShowWeatherValues = new Button(container, SWT.CHECK);
-            _chkShowWeatherValues.setText("Show wea&ther values");
+            _chkShowWeatherValues.setText(Messages.Tour_TooltipOptions_Checkbox_ShowWeatherValues);
             _chkShowWeatherValues.addSelectionListener(_defaultSelectionListener);
             gdSpan2.applyTo(_chkShowWeatherValues);
          }
@@ -292,7 +300,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
              * Show weather description
              */
             _chkShowWeatherDescription = new Button(container, SWT.CHECK);
-            _chkShowWeatherDescription.setText("Show w&eather description");
+            _chkShowWeatherDescription.setText(Messages.Tour_TooltipOptions_Checkbox_ShowWeatherDescription);
             _chkShowWeatherDescription.addSelectionListener(_defaultSelectionListener);
             gdSpan2.applyTo(_chkShowWeatherDescription);
          }
@@ -301,7 +309,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
              * Show start/end location
              */
             _chkShowStartEndLocation = new Button(container, SWT.CHECK);
-            _chkShowStartEndLocation.setText("Show &start/end location");
+            _chkShowStartEndLocation.setText(Messages.Tour_TooltipOptions_Checkbox_ShowStartEndLocation);
             _chkShowStartEndLocation.addSelectionListener(_defaultSelectionListener);
             gdSpan2.applyTo(_chkShowStartEndLocation);
          }
@@ -312,7 +320,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
           */
          {
             _lblTooltipUIWidth = new Label(parent, SWT.NONE);
-            _lblTooltipUIWidth.setText("Tooltip &width");
+            _lblTooltipUIWidth.setText(Messages.Tour_TooltipOptions_Label_TooltipWidth);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblTooltipUIWidth);
          }
          {
@@ -329,7 +337,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
                   _spinnerUIWidth_Pixel.setMaximum(STATE_UI_WIDTH_MAX);
                   _spinnerUIWidth_Pixel.setIncrement(10);
                   _spinnerUIWidth_Pixel.setPageIncrement(50);
-                  _spinnerUIWidth_Pixel.setToolTipText(net.tourbook.ui.Messages.Tour_Tooltip_Spinner_TextWidth_Tooltip);
+                  _spinnerUIWidth_Pixel.setToolTipText(Messages.Tour_Tooltip_Spinner_TextWidth_Tooltip);
 
                   _spinnerUIWidth_Pixel.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                         selectionEvent -> onSelect_UIWidth_2_Value()));
@@ -346,7 +354,7 @@ public class SlideoutTourInfoOptions extends ToolbarSlideout implements IColorSe
                   // Combo: Mouse wheel incrementer
                   _comboUIWidth_Size = new Combo(widthContainer, SWT.READ_ONLY | SWT.BORDER);
                   _comboUIWidth_Size.setVisibleItemCount(10);
-                  _comboUIWidth_Size.setToolTipText(net.tourbook.ui.Messages.Tour_Tooltip_Combo_UIWidthSize_Tooltip);
+                  _comboUIWidth_Size.setToolTipText(Messages.Tour_Tooltip_Combo_UIWidthSize_Tooltip);
                   _comboUIWidth_Size.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_UIWidth_1_Size()));
                   _comboUIWidth_Size.addFocusListener(_keepOpenListener);
 

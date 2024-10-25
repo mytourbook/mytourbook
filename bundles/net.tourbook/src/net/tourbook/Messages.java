@@ -60,12 +60,14 @@ public class Messages extends NLS {
    public static String        Action_Tag_Add_AutoOpen_ModifiedTags;
    public static String        Action_Tag_Add_AutoOpen_Title;
    public static String        Action_Tag_Add_RecentTags;
+   public static String        Action_Tag_AddGroupedTags;
    public static String        Action_Tag_AutoOpenCancel;
    public static String        Action_Tag_AutoOpenOK;
    public static String        Action_Tag_Delete;
    public static String        Action_Tag_DeleteCategory;
    public static String        Action_Tag_Edit;
    public static String        Action_Tag_Edit_Tooltip;
+   public static String        Action_Tag_ManageTagGroups;
    public static String        action_tag_open_tagging_structure;
    public static String        action_tag_remove;
    public static String        action_tag_remove_all;
@@ -694,6 +696,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_RetrieveWeatherData_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_SaveTour;
    public static String        Dialog_ImportConfig_Checkbox_SaveTour_Tooltip;
+   public static String        Dialog_ImportConfig_Checkbox_SetTourTags;
+   public static String        Dialog_ImportConfig_Checkbox_SetTourTags_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_ShowInDashboard;
    public static String        Dialog_ImportConfig_Checkbox_ShowInDashboard_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_ShowTile_CloudApps;
@@ -727,6 +731,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Column_Save_Label;
    public static String        Dialog_ImportConfig_Column_ShowInDash_Header;
    public static String        Dialog_ImportConfig_Column_ShowInDash_Label;
+   public static String        Dialog_ImportConfig_Column_TourTags_Header;
+   public static String        Dialog_ImportConfig_Column_TourTags_Label;
    public static String        Dialog_ImportConfig_Column_TourType;
    public static String        Dialog_ImportConfig_Column_TurnOFF_Header;
    public static String        Dialog_ImportConfig_Column_TurnOFF_Label;
@@ -747,6 +753,7 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Group_StateTooltip;
    public static String        Dialog_ImportConfig_Group_Tiles;
    public static String        Dialog_ImportConfig_Info_ConfigDragDrop;
+   public static String        Dialog_ImportConfig_Info_DefaultTourTag;
    public static String        Dialog_ImportConfig_Info_ImportActions;
    public static String        Dialog_ImportConfig_Info_MovedDeviceFiles;
    public static String        Dialog_ImportConfig_Info_NoDeviceName;
@@ -779,6 +786,7 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_StateTooltipWidth;
    public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath;
    public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath_Tooltip;
+   public static String        Dialog_ImportConfig_Label_TourTag;
    public static String        Dialog_ImportConfig_Link_FileSystem_Preferences;
    public static String        Dialog_ImportConfig_Link_OtherActions;
    public static String        Dialog_ImportConfig_Link_TourType;
@@ -973,6 +981,15 @@ public class Messages extends NLS {
    public static String        Dialog_SplitTour_Label_TourStartDateTime;
    public static String        Dialog_SplitTour_Label_TourTitle;
    public static String        Dialog_SplitTour_Label_TourTitle_Tooltip;
+
+   public static String        Dialog_StartEndLocation_Checkbox_EndLocationName;
+   public static String        Dialog_StartEndLocation_Checkbox_RemoveEndLocationAssociation;
+   public static String        Dialog_StartEndLocation_Checkbox_RemoveEndLocationAssociation_Tooltip;
+   public static String        Dialog_StartEndLocation_Checkbox_RemoveStartLocationAssociation;
+   public static String        Dialog_StartEndLocation_Checkbox_RemoveStartLocationAssociation_Tooltip;
+   public static String        Dialog_StartEndLocation_Checkbox_StartLocationName;
+   public static String        Dialog_StartEndLocation_Label_SetLocationName;
+   public static String        Dialog_StartEndLocation_Title;
 
    public static String        Dialog_TourTagCategory_EditCategory_Message;
    public static String        Dialog_TourTagCategory_EditCategory_Title;
@@ -1222,6 +1239,8 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_RetrieveWeatherData_Yes;
    public static String        Import_Data_HTML_SaveTour_No;
    public static String        Import_Data_HTML_SaveTour_Yes;
+   public static String        Import_Data_HTML_SetTourTags_NO;
+   public static String        Import_Data_HTML_SetTourTags_YES;
    public static String        Import_Data_HTML_Title_Backup;
    public static String        Import_Data_HTML_Title_Delete;
    public static String        Import_Data_HTML_Title_Device;
@@ -1885,6 +1904,7 @@ public class Messages extends NLS {
    public static String        Pref_TourTypes_Label_BorderLayout;
    public static String        Pref_TourTypes_Label_BorderWidth;
    public static String        Pref_TourTypes_Label_ImageLayout;
+   public static String        Pref_TourTypes_Label_ImageScaling;
    public static String        Pref_TourTypes_Label_TourIsDirty;
    public static String        Pref_TourTypes_root_title;
    public static String        Pref_TourTypes_Title;
@@ -2001,6 +2021,7 @@ public class Messages extends NLS {
 
    public static String        Search_View_Action_ExternalSearchUI;
    public static String        Search_View_Action_ExternalSearchUI_Tooltip;
+   public static String        Search_View_Action_PushSearchResults_Tooltip;
    public static String        Search_View_Link_ExternalBrowser;
    public static String        Search_View_Link_LinuxBrowser;
    public static String        Search_View_Link_SetupExternalBrowser;
@@ -3341,6 +3362,8 @@ public class Messages extends NLS {
    public static String        Tour_Location_Action_SetLocationIntoTour_Part;
    public static String        Tour_Location_Action_SetLocationIntoTour_Profile;
    public static String        Tour_Location_Action_SetLocationIntoTour_Tooltip;
+   public static String        Tour_Location_Action_SetLocationName;
+   public static String        Tour_Location_Action_SetLocationName_Tooltip;
    public static String        Tour_Location_Action_SetLocationPart;
    public static String        Tour_Location_Action_SetLocationPart_All;
    public static String        Tour_Location_Action_SetLocationPart_End;
@@ -3571,8 +3594,17 @@ public class Messages extends NLS {
    public static String        Tour_Tags_Action_TagCheckFilter_AllTags_Tooltip;
    public static String        Tour_Tags_Action_TagCheckFilter_OnlyTaggedTours_Tooltip;
    public static String        Tour_Tags_Action_ToggleTagFilter_Tooltip;
+   public static String        Tour_Tags_Dialog_DeleteTagGroup_Message;
+   public static String        Tour_Tags_Dialog_DeleteTagGroup_Title;
+   public static String        Tour_Tags_Dialog_NewTagGroup_Message;
+   public static String        Tour_Tags_Dialog_NewTagGroup_Title;
+   public static String        Tour_Tags_Dialog_RenameTagGroup_Message;
+   public static String        Tour_Tags_Dialog_RenameTagGroup_Title;
+   public static String        Tour_Tags_Label_AvailableTags;
+   public static String        Tour_Tags_Label_TagGroups;
    public static String        Tour_Tags_Title_MultipleTours;
    public static String        Tour_Tags_Title_OneTour;
+   public static String        Tour_Tags_Validation_NameIsEmpty;
    public static String        Tour_Tag_Filter_Action_Tooltip;
 
    public static String        Training_Action_EditHrZones;

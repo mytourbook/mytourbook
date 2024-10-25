@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,6 +30,7 @@ import java.util.Set;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.IconRequestMgr;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -69,8 +70,6 @@ import org.json.JSONObject;
  */
 public class SearchManager implements XHRHandler {
 
-   private static final String          SEARCH_APP_ACTION_EDIT_MARKER               = tourbook.search.nls.Messages.Search_App_Action_EditMarker;
-   private static final String          SEARCH_APP_ACTION_EDIT_TOUR                 = tourbook.search.nls.Messages.Search_App_Action_EditTour;
 
    private static final String          NL                                          = UI.NEW_LINE1;
 
@@ -311,7 +310,16 @@ public class SearchManager implements XHRHandler {
    }
 
    /**
+    * @return Returns the {@link SearchView} or <code>null</code> when not available
+    */
+   public static ISearchView getSearchView() {
+
+      return _searchView;
+   }
+
+   /**
     * @param location
+    *
     * @return Returns <code>true</code> when a action is performed.
     */
    private static boolean hrefAction(final String location) {
@@ -503,7 +511,7 @@ public class SearchManager implements XHRHandler {
 
       updateSelectionProvider(markerSelection);
 
-      TourManager.fireEventWithCustomData(//
+      TourManager.fireEventWithCustomData(
             TourEventId.MARKER_SELECTION,
             markerSelection,
             _searchView.getPart());
@@ -749,6 +757,7 @@ public class SearchManager implements XHRHandler {
     * @param allItems
     * @param searchPosFrom
     * @param searchResult
+    *
     * @return
     */
    private void createHTML_10_SearchResults(final JSONArray allItems, final int searchPosFrom, final SearchResult searchResult) {
@@ -818,7 +827,7 @@ public class SearchManager implements XHRHandler {
                + HREF_PARAM_DOC_ID + docId;
 
          iconUrl = _iconUrl_Tour;
-         hoverMessage = SEARCH_APP_ACTION_EDIT_TOUR;
+         hoverMessage = OtherMessages.SEARCH_APP_ACTION_EDIT_TOUR;
 
       } else if (isMarker) {
 
@@ -834,7 +843,7 @@ public class SearchManager implements XHRHandler {
                + HREF_PARAM_DOC_ID + docId;
 
          iconUrl = _iconUrl_Marker;
-         hoverMessage = SEARCH_APP_ACTION_EDIT_MARKER;
+         hoverMessage = OtherMessages.SEARCH_APP_ACTION_EDIT_MARKER;
 
       } else if (isWayPoint) {
 
@@ -844,7 +853,7 @@ public class SearchManager implements XHRHandler {
          }
 
          iconUrl = _iconUrl_WayPoint;
-         hoverMessage = SEARCH_APP_ACTION_EDIT_MARKER;
+         hoverMessage = OtherMessages.SEARCH_APP_ACTION_EDIT_MARKER;
       }
 
       if (itemTitleText == null) {
@@ -1222,7 +1231,10 @@ public class SearchManager implements XHRHandler {
       return response;
    }
 
-   private String xhr_Search(final Map<String, Object> params, final HttpExchange httpExchange, final StringBuilder log)
+   private String xhr_Search(final Map<String, Object> params,
+                             final HttpExchange httpExchange,
+                             final StringBuilder log)
+
          throws UnsupportedEncodingException {
 
       final long start = System.nanoTime();
@@ -1234,6 +1246,7 @@ public class SearchManager implements XHRHandler {
 
       int searchPosFrom = 0;
       int searchPosTo = 0;
+      boolean isNewSearch = false;
 
       if (xhrRange != null) {
 
@@ -1241,6 +1254,8 @@ public class SearchManager implements XHRHandler {
 
          searchPosFrom = Integer.valueOf(ranges[0]);
          searchPosTo = Integer.valueOf(ranges[1]);
+
+         isNewSearch = xhrRange.startsWith("items=0-"); //$NON-NLS-1$
       }
 
       SearchResult searchResult = null;
@@ -1270,7 +1285,7 @@ public class SearchManager implements XHRHandler {
             searchText += UI.SYMBOL_STAR;
          }
 
-         searchResult = FTSearchManager.searchByPosition(searchText, searchPosFrom, searchPosTo);
+         searchResult = FTSearchManager.searchByPosition(searchText, searchPosFrom, searchPosTo, isNewSearch);
 
          createHTML_10_SearchResults(allItems, searchPosFrom, searchResult);
       }
@@ -1408,7 +1423,9 @@ public class SearchManager implements XHRHandler {
     * Set search options from the web UI.
     *
     * @param params
+    *
     * @return
+    *
     * @throws UnsupportedEncodingException
     */
    private String xhr_SetSearchOptions(final Map<String, Object> params) throws UnsupportedEncodingException {

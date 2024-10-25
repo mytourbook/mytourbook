@@ -314,4 +314,20 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 
       return isShowTooltip;
    }
+
+   @Override
+   protected boolean shouldHideToolTip(final Event event) {
+
+      if (_tourInfoUI.canHideTooltip() == false) {
+
+         /*
+          * Prevent closing when a contained tooltip is open, otherwise the tooltip of this tour
+          * info UI would close on Linux
+          */
+
+         return false;
+      }
+
+      return super.shouldHideToolTip(event);
+   }
 }

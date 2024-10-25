@@ -31,6 +31,7 @@ import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.tooltip.ICanHideTooltip;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
@@ -676,8 +677,14 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       chartModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
 
          @Override
-         public void createToolTipUI(final IToolTipProvider toolTipProvider, final Composite parent, final int serieIndex, final int valueIndex) {
+         public ICanHideTooltip createToolTipUI(final IToolTipProvider toolTipProvider,
+                                                final Composite parent,
+                                                final int serieIndex,
+                                                final int valueIndex) {
+
             StatisticTraining.this.createToolTipUI(toolTipProvider, parent, serieIndex, valueIndex);
+
+            return _tourInfoUI;
          }
       });
 

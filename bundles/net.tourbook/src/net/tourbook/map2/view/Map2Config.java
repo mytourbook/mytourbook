@@ -285,7 +285,7 @@ public class Map2Config {
          logColor(sb, tourWayPointFill_ColorSWT,            "DEFAULT_TOUR_WAY_POINT_FILL_RGB");             //$NON-NLS-1$
          logColor(sb, tourWayPointOutline_ColorSWT,         "DEFAULT_TOUR_WAY_POINT_OUTLINE_RGB");          //$NON-NLS-1$
 
-         System.out.println("Map2Config hint: Replace these constants in Map2ConfigManager");
+         System.out.println("Map2Config hint: Replace these constants in Map2ConfigManager"); //$NON-NLS-1$
          System.out.println();
          System.out.println(sb.toString());
          System.out.println();

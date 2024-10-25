@@ -230,6 +230,7 @@ public class Images {
    public static final String PhotoTimeAdjustment_Disabled               = "photo-time-adjustment-disabled.png";                  //$NON-NLS-1$
    public static final String PulseZones                                 = "pulse-zones.png";                                     //$NON-NLS-1$
    public static final String PulseZones_Disabled                        = "pulse-zones-disabled.png";                            //$NON-NLS-1$
+   public static final String PushIntoViews                              = "push-into-views.png";                                 //$NON-NLS-1$
    public static final String RawData_DeviceFolder_Off                   = "device-folder-off.png";                               //$NON-NLS-1$
    public static final String RawData_DeviceFolder_OK                    = "device-folder-OK.png";                                //$NON-NLS-1$
    public static final String RawData_DeviceFolder_Error                 = "device-folder-error.png";                             //$NON-NLS-1$

@@ -2344,8 +2344,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       {
          _chkIL_SetTourTagGroup = new Button(parent, SWT.CHECK);
-         _chkIL_SetTourTagGroup.setText("8. Set tour tags from a &group");
-         _chkIL_SetTourTagGroup.setToolTipText("All tags in this group are set into the tour");
+         _chkIL_SetTourTagGroup.setText(Messages.Dialog_ImportConfig_Checkbox_SetTourTags);
+         _chkIL_SetTourTagGroup.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_SetTourTags_Tooltip);
          _chkIL_SetTourTagGroup.addSelectionListener(_defaultModify_Listener);
          GridDataFactory.fillDefaults()
                .span(2, 1)
@@ -2355,7 +2355,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       {
          _lblIL_TourTagGroup = new Label(parent, SWT.NONE);
-         _lblIL_TourTagGroup.setText("Tag grou&p");
+         _lblIL_TourTagGroup.setText(Messages.Dialog_ImportConfig_Label_TourTag);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .indent(_leftPadding, 0)
@@ -3287,7 +3287,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       }
 
       // tag groups
-      _comboIL_TourTagGroups.add("< Select a tag group >");
+      _comboIL_TourTagGroups.add(Messages.Dialog_ImportConfig_Info_DefaultTourTag);
       for (final TagGroup tagGroup : TagGroupManager.getTagGroupsSorted()) {
 
          _comboIL_TourTagGroups.add(tagGroup.name + UI.SPACE3 + tagGroup.tourTags.size());
