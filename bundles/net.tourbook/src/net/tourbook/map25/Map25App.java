@@ -58,6 +58,7 @@ import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
 import net.tourbook.map25.renderer.TourTrack_Shader;
+import net.tourbook.photo.Photo;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
@@ -718,9 +719,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             final long timeDiff = System.currentTimeMillis() - _map25View.getLastReceivedSyncEventTime();
             if (timeDiff > 2000) {
 
-//               System.out.println((System.currentTimeMillis() + " fire timeDiff:" + timeDiff));
-//               // TODO remove SYSTEM.OUT.PRINTLN
-
                _map25View.fireSyncMapEvent(mapPosition, null);
             }
          }
@@ -907,7 +905,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
        * Photos
        */
       _layer_Photo_Clustered = new ItemizedLayer(mMap, new ArrayList<>(), _photoToolkit.getMarkerRendererFactory(), _photoToolkit);
-      _layer_Photo_NotCluster = new ItemizedLayer(mMap, new ArrayList<>(), _photoToolkit.getSymbol(), _photoToolkit);
+      _layer_Photo_NotCluster = new ItemizedLayer(mMap, new ArrayList<>(), _photoToolkit.getSymbolNotLoadedPhoto(), _photoToolkit);
       if (markerConfig.isMarkerClustered) {
          //sharing same setting as MapBookmarks, later photolayer should get its own configuration
          _layer_Photo_VARYING = _layer_Photo_Clustered;
@@ -2088,16 +2086,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    }
 
    /**
-    * updates the photo layer, switchung between clustered to not clustered
-    * settings are from MarkerConfig
-    * replacing the photo Items
-    * currently no GUI for selecting clustering
+    * Updates the photo layer, switchung between clustered to not clustered settings are from
+    * MarkerConfig replacing the photo Items currently no GUI for selecting clustering
     */
    public void updateLayer_Photos() {
 
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-      // using settings from MapBookmarks must be changed later with own config
+      // TODO using settings from MapBookmarks must be changed later with own config
       if (config.isMarkerClustered != _photoToolkit.isMarkerClusteredLast()) {
 
          // only recreate PhotoLayer when changed in UI
@@ -2127,7 +2123,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          _layer_Photo_VARYING.removeAllItems();
       }
 
-      final List<MarkerInterface> photoItems = _photoToolkit.createPhotoItems(_map25View.getFilteredPhotos());
+      final List<Photo> filteredPhotos = _map25View.getFilteredPhotos();
+      final List<MarkerInterface> photoItems = _photoToolkit.createPhotoItems(filteredPhotos);
 
       _layer_Photo_VARYING.addItems(photoItems);
       _layer_Photo_VARYING.setEnabled(_photoToolkit.isShowPhotos());

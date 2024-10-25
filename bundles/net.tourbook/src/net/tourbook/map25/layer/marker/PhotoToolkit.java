@@ -80,16 +80,16 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
     */
    private Bitmap                  _bitmapNotLoadedPhoto;
 
-   private MarkerSymbol            _symbol;                                   // marker symbol, circle or star
+   private MarkerSymbol            _symbolNotLoadedPhoto;                     // marker symbol, circle or star
 
    private class ImageState {
 
-      Image   _photoImage;
+      Image   _swtPhotoImage;
       boolean _isMustDisposeImage;
 
-      private ImageState(final Image photoImage, final boolean isMustDisposeImage) {
+      private ImageState(final Image swtPhotoImage, final boolean isMustDisposeImage) {
 
-         _photoImage = photoImage;
+         _swtPhotoImage = swtPhotoImage;
          _isMustDisposeImage = isMustDisposeImage;
       }
    }
@@ -130,13 +130,13 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-      _fillPainter.setStyle(Paint.Style.FILL);
+      getFillPainter().setStyle(Paint.Style.FILL);
 
 //    _bitmapPhoto = createPhotoBitmap();
       _bitmapNotLoadedPhoto = createShapeBitmap(MarkerShape.CIRCLE);
 //    _bitmapClusterPhoto = createPoiBitmap(MarkerShape.CIRCLE); //must be replaced later, like MarkerToolkit
 
-      _symbol = new MarkerSymbol(_bitmapNotLoadedPhoto, MarkerSymbol.HotspotPlace.BOTTOM_CENTER, false);
+      _symbolNotLoadedPhoto = new MarkerSymbol(_bitmapNotLoadedPhoto, MarkerSymbol.HotspotPlace.BOTTOM_CENTER, false);
 
       setIsMarkerClusteredLast(config.isMarkerClustered);
       setMarkerRenderer();
@@ -171,8 +171,9 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
    private String createPhoto_Name(final Photo photo) {
 
-      final String photoStars = createPhoto_Stars(photo);
-      final String photoName = TimeTools.getZonedDateTime(photo.imageExifTime).format(TimeTools.Formatter_Time_S) + photoStars;
+      final String photoName = TimeTools.getZonedDateTime(photo.imageExifTime).format(TimeTools.Formatter_Time_S)
+            + UI.SPACE
+            + createPhoto_Stars(photo);
 
       return photoName;
    }
@@ -183,23 +184,23 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
       switch (photo.ratingStars) {
       case 1:
-         starText = " *"; //$NON-NLS-1$
+         starText = "*"; //$NON-NLS-1$
          break;
 
       case 2:
-         starText = " **"; //$NON-NLS-1$
+         starText = "**"; //$NON-NLS-1$
          break;
 
       case 3:
-         starText = " ***"; //$NON-NLS-1$
+         starText = "***"; //$NON-NLS-1$
          break;
 
       case 4:
-         starText = " ****"; //$NON-NLS-1$
+         starText = "****"; //$NON-NLS-1$
          break;
 
       case 5:
-         starText = " *****"; //$NON-NLS-1$
+         starText = "*****"; //$NON-NLS-1$
          break;
       }
 
@@ -209,28 +210,29 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    /**
     * Creates a LIST with tourphotos, which can directly added to the photoLayer via addItems
     *
-    * @param galleryPhotos
-    *           Arraylist of photos
-    * @param isShowPhotoTitle
-    *           boolean, show photo with title or not
-    * @param isPhotoScaled
+    * @param allPhotos
     *
     * @return
     */
-   public List<MarkerInterface> createPhotoItems(final List<Photo> galleryPhotos) {
+   public List<MarkerInterface> createPhotoItems(final List<Photo> allPhotos) {
 
       final List<MarkerInterface> allPhotoItems = new ArrayList<>();
 
-      if (galleryPhotos == null || galleryPhotos.isEmpty()) {
+      if (allPhotos == null || allPhotos.isEmpty()) {
+
          return allPhotoItems;
       }
 
-      for (final Photo photo : galleryPhotos) {
+      for (final Photo photo : allPhotos) {
 
-         final UUID photoKey = UUID.randomUUID();
-         final String photoName = createPhoto_Name(photo);
+// SET_FORMATTING_OFF
+
+         final UUID photoKey           = UUID.randomUUID();
+         final String photoName        = createPhoto_Name(photo);
          final String photoDescription = "Ratingstars: " + Integer.toString(photo.ratingStars); //$NON-NLS-1$
-         final GeoPoint geoPoint = createPhoto_Location(photo);
+         final GeoPoint geoPoint       = createPhoto_Location(photo);
+
+// SET_FORMATTING_ON
 
          final MarkerItem markerItem = new MarkerItem(
                photoKey,
@@ -247,19 +249,19 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       return allPhotoItems;
    }
 
-   private void createPhotoItems_10_CreateBitmapFromPhoto(final MarkerItem item,
+   private void createPhotoItems_10_CreateBitmapFromPhoto(final MarkerItem markerItem,
                                                           final Photo photo,
                                                           final boolean isImageLoaded) {
 
-      Bitmap bitmapImage = createPhotoItems_20_CreateBitmap(item, photo, isImageLoaded);
+      Bitmap bitmapImage = createPhotoItems_20_CreateBitmap(markerItem, photo, isImageLoaded);
 
       if (bitmapImage == null) {
          bitmapImage = _bitmapNotLoadedPhoto;
       }
 
-      final MarkerSymbol bitmapPhoto = createAdvanceSymbol(item, bitmapImage, true, _isTitleVisible);
+      final MarkerSymbol bitmapPhoto = createMarkerSymbol(markerItem, bitmapImage, true, _isTitleVisible);
 
-      item.setMarker(bitmapPhoto);
+      markerItem.setMarker(bitmapPhoto);
    }
 
    /**
@@ -283,13 +285,13 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
             _imageSize,
             isImageLoaded);
 
-      final Image photoImage = imageState._photoImage;
+      final Image swtPhotoImage = imageState._swtPhotoImage;
 
-      if (photoImage != null) {
+      if (swtPhotoImage != null) {
 
          try {
 
-            final byte[] formattedImage = ImageUtils.formatImage(photoImage, org.eclipse.swt.SWT.IMAGE_BMP);
+            final byte[] formattedImage = ImageUtils.formatImage(swtPhotoImage, org.eclipse.swt.SWT.IMAGE_BMP);
 
             photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(formattedImage));
 
@@ -298,7 +300,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          }
 
          if (imageState._isMustDisposeImage) {
-            photoImage.dispose();
+            swtPhotoImage.dispose();
          }
       }
 
@@ -319,8 +321,8 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
                                                          final int thumbSize,
                                                          final boolean isImageLoaded) {
 
-      Image photoImage = null;
-      Image scaledImage = null;
+      Image swtPhotoImage = null;
+      Image swtScaledImage = null;
 
       boolean isMustDisposeImage = false;
 
@@ -334,10 +336,10 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          // image is not invalid
 
          // check if image is in the cache
-         photoImage = PhotoImageCache.getImage_SWT(photo, requestedImageQuality);
+         swtPhotoImage = PhotoImageCache.getImage_SWT(photo, requestedImageQuality);
 
          // put photo image in loading queue
-         if ((photoImage == null || photoImage.isDisposed())
+         if ((swtPhotoImage == null || swtPhotoImage.isDisposed())
 
                // photo image is not in loading queue
                && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false
@@ -352,17 +354,17 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
             PhotoLoadManager.putImageInLoadingQueueThumb_Map(photo, requestedImageQuality, imageLoadCallback, false);
          }
 
-         if (photoImage != null && photoImage.isDisposed() == false) {
+         if (swtPhotoImage != null && swtPhotoImage.isDisposed() == false) {
 
             boolean isScaled = false;
             isScaled = false;
             if (isScaled == false) {
-               return new ImageState(photoImage, false);
+               return new ImageState(swtPhotoImage, false);
             }
 
             // scale image
 
-            final Rectangle imageBounds = photoImage.getBounds();
+            final Rectangle imageBounds = swtPhotoImage.getBounds();
             final int originalImageWidth = imageBounds.width;
             final int originalImageHeight = imageBounds.height;
 
@@ -381,9 +383,9 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
             final boolean isRotateImageAutomatically = _prefStore.getBoolean(IPhotoPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY);
 
-            scaledImage = net.tourbook.common.util.ImageUtils.resize(
+            swtScaledImage = net.tourbook.common.util.ImageUtils.resize(
                   _display,
-                  photoImage,
+                  swtPhotoImage,
                   bestSize.x,
                   bestSize.y,
                   SWT.ON,
@@ -399,11 +401,12 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          }
       }
 
-      return new ImageState(scaledImage, isMustDisposeImage);
+      return new ImageState(swtScaledImage, isMustDisposeImage);
    }
 
-   public MarkerSymbol getSymbol() {
-      return _symbol;
+   public MarkerSymbol getSymbolNotLoadedPhoto() {
+
+      return _symbolNotLoadedPhoto;
    }
 
    public boolean isShowPhotos() {
