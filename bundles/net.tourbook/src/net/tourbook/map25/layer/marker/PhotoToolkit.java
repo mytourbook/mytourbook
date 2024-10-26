@@ -426,7 +426,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
                Map25App.MAP_IMAGE_DEFAULT_SIZE_TINY);
       }
 
-      Photo.setMap2ImageRequestedSize(requestedPhotoImageSize);
+      Photo.setMap25ImageRequestedSize(requestedPhotoImageSize);
    }
 
    public void setPhotoIsVisible(final boolean isPhotoVisible) {

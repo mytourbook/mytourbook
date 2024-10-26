@@ -969,7 +969,7 @@ public class Photo implements Serializable {
          _map25ImageRequestedAndCheckedSize = _map25ImageRequestedSize;
       }
 
-      return _map2ImageRenderSize;
+      return _map25ImageRenderSize;
    }
 
    /**
