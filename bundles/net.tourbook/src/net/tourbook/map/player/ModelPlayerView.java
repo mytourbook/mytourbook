@@ -244,7 +244,13 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
          public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partClosed(final IWorkbenchPartReference partRef) {}
+         public void partClosed(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == ModelPlayerView.this) {
+
+               ModelPlayerManager.setIsPlayerRunning(false);
+            }
+         }
 
          @Override
          public void partDeactivated(final IWorkbenchPartReference partRef) {

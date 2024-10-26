@@ -50,7 +50,6 @@ public class ModelPlayerManager {
 
    private static final String          STATE_IS_MAP_MODEL_VISIBLE        = "STATE_IS_MAP_MODEL_VISIBLE";                                         //$NON-NLS-1$
    private static final String          STATE_IS_MAP_MODEL_CURSOR_VISIBLE = "STATE_IS_MAP_MODEL_CURSOR_VISIBLE";                                  //$NON-NLS-1$
-   private static final String          STATE_IS_PLAYER_RUNNING           = "STATE_IS_PLAYER_RUNNING";                                            //$NON-NLS-1$
    private static final String          STATE_IS_PLAYING_LOOP             = "STATE_IS_PLAYING_LOOP";                                              //$NON-NLS-1$
    private static final String          STATE_IS_RELIVE_PLAYING           = "STATE_IS_RELIVE_PLAYING";                                            //$NON-NLS-1$
    private static final String          STATE_JOG_WHEEL_SPEED             = "STATE_JOG_WHEEL_SPEED";                                              //$NON-NLS-1$
@@ -898,7 +897,6 @@ public class ModelPlayerManager {
 
       _isMapModelVisible         = Util.getStateBoolean( _state, STATE_IS_MAP_MODEL_VISIBLE,          true);
       _isMapModelCursorVisible   = Util.getStateBoolean( _state, STATE_IS_MAP_MODEL_CURSOR_VISIBLE,   true);
-      _isPlayerRunning           = Util.getStateBoolean( _state, STATE_IS_PLAYER_RUNNING,             true);
       _isPlayingLoop             = Util.getStateBoolean( _state, STATE_IS_PLAYING_LOOP,               false);
       _isReLivePlaying           = Util.getStateBoolean( _state, STATE_IS_RELIVE_PLAYING,             false);
       _jogWheelSpeed             = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED,               10);
@@ -929,7 +927,6 @@ public class ModelPlayerManager {
 
       _state.put(STATE_IS_MAP_MODEL_VISIBLE,          _isMapModelVisible);
       _state.put(STATE_IS_MAP_MODEL_CURSOR_VISIBLE,   _isMapModelCursorVisible);
-      _state.put(STATE_IS_PLAYER_RUNNING,             _isPlayerRunning);
       _state.put(STATE_IS_PLAYING_LOOP,               _isPlayingLoop);
       _state.put(STATE_IS_RELIVE_PLAYING,             _isReLivePlaying);
       _state.put(STATE_JOG_WHEEL_SPEED,               _jogWheelSpeed);
