@@ -193,7 +193,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
     * @param markerItem
     *           -> the MarkerItem to process, containing title and description
     *           if description starts with a '#' the first line of the description is drawn.
-    * @param poiBitmap
+    * @param symbolBitmap
     *           -> poi bitmap for the center
     * @param isPhoto
     *           -> called from PhotoToolkit yes/no
@@ -204,7 +204,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
     * @return MarkerSymbol with title, description and symbol
     */
    MarkerSymbol createMarkerSymbol(final MarkerItem markerItem,
-                                   final Bitmap poiBitmap,
+                                   final Bitmap symbolBitmap,
                                    final Boolean isPhoto,
                                    final boolean isShowPhotoTitle) {
 
@@ -220,14 +220,14 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       textPainter.setStyle(Paint.Style.STROKE);
       textPainter.setColor(markerForegroundColor);
 
+      final Paint fillPainter = CanvasAdapter.newPaint();
+      fillPainter.setStyle(Paint.Style.FILL);
+      fillPainter.setColor(markerBackgroundColor);
+
       // adjust font to 4k display, otherwise it is really small
       final float fontHeight = textPainter.getFontHeight();
       final float scaledFontHeight = DPIUtil.autoScaleUp(fontHeight);
       textPainter.setTextSize(scaledFontHeight);
-
-      final Paint fillPainter = CanvasAdapter.newPaint();
-      fillPainter.setStyle(Paint.Style.FILL);
-      fillPainter.setColor(markerBackgroundColor);
 
       final int margin = 5;
       final int dist2symbol = 40;
@@ -235,8 +235,8 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       final float titleWidth = textPainter.getTextWidth(markerItem.title) + 2 * margin;
       final float titleHeight = textPainter.getTextHeight(markerItem.title) + 2 * margin;
 
-      final int symbolWidth = poiBitmap.getWidth();
-      final int symbolHeight = poiBitmap.getHeight();
+      final int symbolWidth = symbolBitmap.getWidth();
+      final int symbolHeight = symbolBitmap.getHeight();
 
       int subtitleWidth = 0;
       int subtitleHeight = 0;
@@ -259,7 +259,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       // total size of all elements
       final float markerWidth = Math.max(Math.max(titleWidth, subtitleWidth), symbolWidth);
       final float markerHeight = titleHeight + symbolHeight + dist2symbol;
-      final float markerWidth_Half = markerWidth / 2;
+      final float markerWidth2 = markerWidth / 2;
 
       // markerCanvas, the drawing area for all: title, description and symbol
       final Bitmap markerBitmap = CanvasAdapter.newBitmap((int) markerWidth, (int) markerHeight, 0);
@@ -294,41 +294,69 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       // draw border
 // SET_FORMATTING_OFF
+
       titleCanvas.drawLine(         0,             0,          0, titleHeight, textPainter);
       titleCanvas.drawLine(         0,             0, titleWidth,           0, textPainter);
       titleCanvas.drawLine(         0,   titleHeight, titleWidth, titleHeight, textPainter);
       titleCanvas.drawLine(titleWidth,             0, titleWidth, titleHeight, textPainter);
+
 // SET_FORMATTING_ON
 
       if (hasSubtitle) {
 
          final Bitmap subtitleBitmap = CanvasAdapter.newBitmap(subtitleWidth + margin, subtitleHeight + margin, 0);
          final Canvas subtitleCanvas = CanvasAdapter.newCanvas();
+
          subtitleCanvas.setBitmap(subtitleBitmap);
+
          subtitleCanvas.drawCircle(0, 0, markerWidth * 2, fillPainter);
          subtitleCanvas.drawText(subtitle, margin, titleHeight - margin, textPainter);
-         markerCanvas.drawBitmap(subtitleBitmap, markerWidth_Half - (subtitleWidth / 2), markerHeight - (subtitleHeight + margin));
+
+         markerCanvas.drawBitmap(subtitleBitmap,
+               markerWidth2 - (subtitleWidth / 2),
+               markerHeight - (subtitleHeight + margin));
 
       } else if (isPhoto) {
 
-         final int lineLength = 20;
-         textPainter.setStrokeWidth(2);
-         final Bitmap subtitleBitmap = CanvasAdapter.newBitmap(lineLength, lineLength, 0); //heigth as title
-         final Canvas subtitleCanvas = CanvasAdapter.newCanvas();
-         subtitleCanvas.setBitmap(subtitleBitmap);
-         subtitleCanvas.drawLine(lineLength / 2, 0, lineLength / 2, lineLength, textPainter);
-         markerCanvas.drawBitmap(subtitleBitmap, markerWidth_Half - (lineLength / 2), markerHeight - lineLength);
+         // draw photo pole
+
+         final float poleLineWidth = 2;
+
+         final int poleHeight = (int) (dist2symbol * 0.8f);
+         final int poleWidth = (int) (3 * poleLineWidth);
+
+         textPainter.setStrokeWidth(poleLineWidth);
+
+         final float x0 = poleLineWidth;
+         final float x1 = poleLineWidth * 2;
+
+         final Bitmap poleBitmap = CanvasAdapter.newBitmap(poleWidth, poleHeight, 0);
+         final Canvas poleCanvas = CanvasAdapter.newCanvas();
+
+         poleCanvas.setBitmap(poleBitmap);
+
+         poleCanvas.drawLine(x0, 0, x0, poleHeight, textPainter);
+         poleCanvas.drawLine(x1, 0, x1, poleHeight, fillPainter);
+
+         markerCanvas.drawBitmap(poleBitmap,
+               markerWidth2 - poleWidth / 2,
+               markerHeight - poleHeight);
       }
 
       if (isPhoto) {
+
          if (isShowPhotoTitle) {
-            markerCanvas.drawBitmap(titleBitmap, markerWidth_Half - (titleWidth / 2), 0);
+            markerCanvas.drawBitmap(titleBitmap, markerWidth2 - (titleWidth / 2), 0);
          }
+
       } else {
-         markerCanvas.drawBitmap(titleBitmap, markerWidth_Half - (titleWidth / 2), 0);
+
+         markerCanvas.drawBitmap(titleBitmap, markerWidth2 - (titleWidth / 2), 0);
       }
 
-      markerCanvas.drawBitmap(poiBitmap, markerWidth_Half - (symbolWidth / 2), markerHeight / 2 - (symbolHeight / 2));
+      markerCanvas.drawBitmap(symbolBitmap,
+            markerWidth2 - (symbolWidth / 2),
+            markerHeight / 2 - (symbolHeight / 2));
 
       if (isPhoto) {
 
