@@ -6932,6 +6932,13 @@ public class Map2 extends Canvas {
 
    private void paint_MapPointImage_10_Runnable() {
 
+      if (_mapPointImageSize.width == 0 || _mapPointImageSize.height == 0) {
+
+         // this happend, the UI is propably not yet fully initialized
+
+         return;
+      }
+
       /*
        * Setup common values
        */
