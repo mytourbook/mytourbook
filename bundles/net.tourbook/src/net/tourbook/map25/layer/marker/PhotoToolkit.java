@@ -99,6 +99,8 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
           * this issue !!!
           */
          _mapApp.updateLayer_PhotoLayer();
+
+         _mapApp.updateMap();
       }
    }
 
