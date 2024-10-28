@@ -832,8 +832,7 @@ public class Messages extends NLS {
    public static String        Tour_TooltipOptions_Label_TooltipWidth;
    public static String        Tour_TooltipOptions_Radio_CustomizeValues;
    public static String        Tour_TooltipOptions_Radio_ShowAllValues;
-   //TODO rename to Tour_TooltipOptions_Title_TourInfoOptions
-   public static String        Tour_TooltipOptions_Titel_TourInfoOptions;
+   public static String        Tour_TooltipOptions_Title_TourInfoOptions;
 
    public static String        TourType_Config_Border_Bottom;
    public static String        TourType_Config_Border_Circle;

@@ -1375,7 +1375,7 @@ public class Map2 extends Canvas {
          final int devY = mapPoint.geoPointDevY;
 
          final Photo photo = mapPoint.photo;
-         final Point mapImageSize = photo.getMapImageSize();
+         final Point mapImageSize = photo.getMap2ImageSize();
 
          final PointFeature pointFeature = new PointFeature(
 
@@ -2916,7 +2916,7 @@ public class Map2 extends Canvas {
 
             PhotoLoadManager.putImageInLoadingQueueHQThumb_Map(
                   photo,
-                  Photo.getMapImageRequestedSize(),
+                  Photo.getMap2ImageRequestedSize(),
                   _photoImageLoaderCallback);
          }
       }
@@ -3965,15 +3965,6 @@ public class Map2 extends Canvas {
       }
 
       return isPauseVisible;
-   }
-
-   private String logImage(final BufferedImage image) {
-
-      if (image == null) {
-         return null;
-      }
-
-      return UI.EMPTY_STRING + image.getWidth();
    }
 
    /**
@@ -6941,6 +6932,13 @@ public class Map2 extends Canvas {
 
    private void paint_MapPointImage_10_Runnable() {
 
+      if (_mapPointImageSize.width == 0 || _mapPointImageSize.height == 0) {
+
+         // this happend, the UI is propably not yet fully initialized
+
+         return;
+      }
+
       /*
        * Setup common values
        */
@@ -8486,7 +8484,7 @@ public class Map2 extends Canvas {
          final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
          final Photo photo = mapPoint.photo;
-         final Point mapImageSize = photo.getMapImageSize();
+         final Point mapImageSize = photo.getMap2ImageSize();
 
          final int labelDevX = (int) distribLabel.labelBoxL;
          final int labelDevY = (int) distribLabel.labelBoxT;
@@ -8523,7 +8521,7 @@ public class Map2 extends Canvas {
 
             if (photoImageWidth == photoWidth && photoImageHeight == photoHeight) {
 
-               // do not resize the image which do not look very good
+               // do not resize the image would do not look very good
 
                g2d.drawImage(awtPhotoImage,
 

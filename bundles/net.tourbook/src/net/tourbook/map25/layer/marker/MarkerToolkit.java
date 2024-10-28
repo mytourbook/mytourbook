@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2019, 2024 Wolfgang Schramm and Contributors
  * Copyright 2016-2018 devemux86
  * Copyright 2017 nebular
  * Copyright 2019, 2021 Thomas Theussing
@@ -55,7 +55,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
    private Bitmap                _bitmapCircle;
    private Bitmap                _bitmapClusterSymbol;
 
-   protected Paint               _fillPainter     = CanvasAdapter.newPaint();
+   private Paint                 _fillPainter     = CanvasAdapter.newPaint();
    private Paint                 _linePainter     = CanvasAdapter.newPaint();
 
    private MarkerRendererFactory _markerRendererFactory;
@@ -87,6 +87,90 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       setMarkerRenderer();
    }
 
+   public List<MarkerInterface> createBookmarksAsMapMarker(final MarkerMode markerMode) {
+
+      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+
+      final int clusterSymbol_Size = config.clusterSymbol_Size;
+
+      final Bitmap bitmapPoi = createShapeBitmap(MarkerShape.STAR);
+
+      _bitmapClusterSymbol = drawStar(clusterSymbol_Size, _starColor, _starColorBorder);
+
+      final List<MarkerInterface> allMapMarker = new ArrayList<>();
+
+      for (final MapBookmark mapBookmark : MapBookmarkManager.getAllBookmarks()) {
+
+         final MarkerItem item = new MarkerItem(
+               mapBookmark.id,
+               mapBookmark.name,
+               UI.EMPTY_STRING,
+               new GeoPoint(mapBookmark.getLatitude(), mapBookmark.getLongitude()));
+
+         item.setMarker(createMarkerSymbol(item, bitmapPoi));
+
+         allMapMarker.add(item);
+      }
+
+      if (markerMode == MarkerMode.NORMAL) {
+         return allMapMarker;
+      }
+
+// This is for MarkerMode.DEMO
+// This is for MarkerMode.DEMO
+// This is for MarkerMode.DEMO
+
+      final int COUNT = 5;
+      final float STEP = 100f / 110000f; // roughly 100 meters
+      // Create some markers spaced STEP degrees
+      //Berlin: 52.513452, 13.363791
+      //Rapperswil  47.2266239, 8.8184374
+      final double demo_lat = 47.2266239;
+      final double demo_lon = 8.8184374;
+
+      for (int x = -COUNT; x < COUNT; x++) {
+         for (int y = -COUNT; y < COUNT; y++) {
+
+            final double random = STEP * Math.random() * 2;
+            final MarkerItem item = new MarkerItem(y + ", " + x, //$NON-NLS-1$
+                  "Title " + demo_lat + "/" + demo_lon, //$NON-NLS-1$//$NON-NLS-2$
+                  "Description " + x + "/" + y, //$NON-NLS-1$ //$NON-NLS-2$
+                  new GeoPoint(demo_lat + y * STEP + random, demo_lon + x * STEP + random));
+
+            item.setMarker(createMarkerSymbol(item, bitmapPoi));
+
+            allMapMarker.add(item);
+         }
+      }
+
+      return allMapMarker;
+   }
+
+   /**
+    * this creates the bitmap for clustering a draw the size as text in the middle
+    *
+    * @param size
+    *
+    * @return
+    */
+   public Bitmap createClusterBitmap(final int size) {
+
+      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+
+      final ScreenUtils.ClusterDrawable drawable = new ScreenUtils.ClusterDrawable(
+
+            config.clusterSymbol_Size,
+            ColorUtil.getARGB(config.clusterOutline_Color, config.clusterOutline_Opacity),
+            ColorUtil.getARGB(config.clusterFill_Color, config.clusterFill_Opacity),
+            Integer.toString(size),
+            config.clusterSymbol_Weight,
+            config.clusterOutline_Size);
+
+      final Bitmap paintedBitmap = drawable.getBitmap(_bitmapClusterSymbol);
+
+      return paintedBitmap;
+   }
+
    /**
     * creates a transparent symbol with text and description. for marker.
     * short version of createAdvanceSymbol(final MarkerItem mItem, final Bitmap poiBitmap, false,
@@ -94,31 +178,35 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
     *
     * @param mItem
     * @param poiBitmap
+    *
     * @return
     */
-   public MarkerSymbol createAdvanceSymbol(final MarkerItem mItem, final Bitmap poiBitmap) {
-      return createAdvanceSymbol(mItem, poiBitmap, false, false);
+   public MarkerSymbol createMarkerSymbol(final MarkerItem mItem,
+                                          final Bitmap poiBitmap) {
+
+      return createMarkerSymbol(mItem, poiBitmap, false, false);
    }
 
    /**
-    * Creates a transparent symbol with text and description. for photos and marker.
+    * Creates a transparent symbol with text and description, for photos and markers
     *
-    * @param mItem
+    * @param markerItem
     *           -> the MarkerItem to process, containing title and description
     *           if description starts with a '#' the first line of the description is drawn.
-    * @param poiBitmap
+    * @param symbolBitmap
     *           -> poi bitmap for the center
     * @param isPhoto
     *           -> called from PhotoToolkit yes/no
-    * @param showPhotoTitle
+    * @param isShowPhotoTitle
     *           -> when isPhoto = true show photo title on/off. when isPhoto = false, this param is
     *           ignored
+    *
     * @return MarkerSymbol with title, description and symbol
     */
-   MarkerSymbol createAdvanceSymbol(final MarkerItem mItem,
-                                    final Bitmap poiBitmap,
-                                    final Boolean isPhoto,
-                                    final boolean showPhotoTitle) {
+   MarkerSymbol createMarkerSymbol(final MarkerItem markerItem,
+                                   final Bitmap symbolBitmap,
+                                   final Boolean isPhoto,
+                                   final boolean isShowPhotoTitle) {
 
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
@@ -132,32 +220,35 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       textPainter.setStyle(Paint.Style.STROKE);
       textPainter.setColor(markerForegroundColor);
 
+      final Paint fillPainter = CanvasAdapter.newPaint();
+      fillPainter.setStyle(Paint.Style.FILL);
+      fillPainter.setColor(markerBackgroundColor);
+
       // adjust font to 4k display, otherwise it is really small
       final float fontHeight = textPainter.getFontHeight();
       final float scaledFontHeight = DPIUtil.autoScaleUp(fontHeight);
       textPainter.setTextSize(scaledFontHeight);
 
-      final Paint fillPainter = CanvasAdapter.newPaint();
-      fillPainter.setStyle(Paint.Style.FILL);
-      fillPainter.setColor(markerBackgroundColor);
-
       final int margin = 5;
       final int dist2symbol = 40;
 
-      final float titleWidth = textPainter.getTextWidth(mItem.title) + 2 * margin;
-      final float titleHeight = textPainter.getTextHeight(mItem.title) + 2 * margin;
+      final float titleWidth = textPainter.getTextWidth(markerItem.title) + 2 * margin;
+      final float titleHeight = textPainter.getTextHeight(markerItem.title) + 2 * margin;
 
-      final int symbolWidth = poiBitmap.getWidth();
-      final int symbolHeight = poiBitmap.getHeight();
+      final int symbolWidth = symbolBitmap.getWidth();
+      final int symbolHeight = symbolBitmap.getHeight();
 
       int subtitleWidth = 0;
       int subtitleHeight = 0;
 
       String subtitle = UI.EMPTY_STRING;
       boolean hasSubtitle = false;
-      if (mItem.description.length() > 1) {
-         if (mItem.description.startsWith("#")) { //$NON-NLS-1$
-            subtitle = mItem.description.substring(1); // not the first # char
+      final String description = markerItem.description;
+
+      if (description.length() > 1) {
+         if (description.startsWith("#")) { //$NON-NLS-1$
+
+            subtitle = description.substring(1); // not the first # char
             subtitle = subtitle.split("\\R", 2)[0]; // only first line //$NON-NLS-1$
             subtitleWidth = ((int) textPainter.getTextWidth(subtitle)) + 2 * margin;
             subtitleHeight = ((int) textPainter.getTextHeight(subtitle)) + 2 * margin;
@@ -168,7 +259,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       // total size of all elements
       final float markerWidth = Math.max(Math.max(titleWidth, subtitleWidth), symbolWidth);
       final float markerHeight = titleHeight + symbolHeight + dist2symbol;
-      final float markerWidth_Half = markerWidth / 2;
+      final float markerWidth2 = markerWidth / 2;
 
       // markerCanvas, the drawing area for all: title, description and symbol
       final Bitmap markerBitmap = CanvasAdapter.newBitmap((int) markerWidth, (int) markerHeight, 0);
@@ -193,51 +284,79 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       // draw an oversized transparent circle, so the canvas is completely filled with a transparent color
       // titleCanvas.fillRectangle() does not support transparency
       titleCanvas.drawCircle(0, 0, markerWidth * 2, fillPainter);
-//      titleCanvas.fillRectangle(0, 0, markerWidth, markerHeight, Color.CYAN);
+//    titleCanvas.fillRectangle(0, 0, markerWidth, markerHeight, Color.CYAN);
 
       // finetune text position otherwise it is too near to the border, it is still not perfect !!!
-      titleCanvas.drawText(mItem.title,
+      titleCanvas.drawText(markerItem.title,
             0.6f * margin,
             titleHeight - 1.3f * margin,
             textPainter);
 
       // draw border
 // SET_FORMATTING_OFF
+
       titleCanvas.drawLine(         0,             0,          0, titleHeight, textPainter);
       titleCanvas.drawLine(         0,             0, titleWidth,           0, textPainter);
       titleCanvas.drawLine(         0,   titleHeight, titleWidth, titleHeight, textPainter);
       titleCanvas.drawLine(titleWidth,             0, titleWidth, titleHeight, textPainter);
+
 // SET_FORMATTING_ON
 
       if (hasSubtitle) {
 
          final Bitmap subtitleBitmap = CanvasAdapter.newBitmap(subtitleWidth + margin, subtitleHeight + margin, 0);
          final Canvas subtitleCanvas = CanvasAdapter.newCanvas();
+
          subtitleCanvas.setBitmap(subtitleBitmap);
+
          subtitleCanvas.drawCircle(0, 0, markerWidth * 2, fillPainter);
          subtitleCanvas.drawText(subtitle, margin, titleHeight - margin, textPainter);
-         markerCanvas.drawBitmap(subtitleBitmap, markerWidth_Half - (subtitleWidth / 2), markerHeight - (subtitleHeight + margin));
+
+         markerCanvas.drawBitmap(subtitleBitmap,
+               markerWidth2 - (subtitleWidth / 2),
+               markerHeight - (subtitleHeight + margin));
 
       } else if (isPhoto) {
 
-         final int lineLength = 20;
-         textPainter.setStrokeWidth(2);
-         final Bitmap subtitleBitmap = CanvasAdapter.newBitmap(lineLength, lineLength, 0); //heigth as title
-         final Canvas subtitleCanvas = CanvasAdapter.newCanvas();
-         subtitleCanvas.setBitmap(subtitleBitmap);
-         subtitleCanvas.drawLine(lineLength / 2, 0, lineLength / 2, lineLength, textPainter);
-         markerCanvas.drawBitmap(subtitleBitmap, markerWidth_Half - (lineLength / 2), markerHeight - lineLength);
+         // draw photo pole
+
+         final float poleLineWidth = 2;
+
+         final int poleHeight = (int) (dist2symbol * 0.8f);
+         final int poleWidth = (int) (3 * poleLineWidth);
+
+         textPainter.setStrokeWidth(poleLineWidth);
+
+         final float x0 = poleLineWidth;
+         final float x1 = poleLineWidth * 2;
+
+         final Bitmap poleBitmap = CanvasAdapter.newBitmap(poleWidth, poleHeight, 0);
+         final Canvas poleCanvas = CanvasAdapter.newCanvas();
+
+         poleCanvas.setBitmap(poleBitmap);
+
+         poleCanvas.drawLine(x0, 0, x0, poleHeight, textPainter);
+         poleCanvas.drawLine(x1, 0, x1, poleHeight, fillPainter);
+
+         markerCanvas.drawBitmap(poleBitmap,
+               markerWidth2 - poleWidth / 2,
+               markerHeight - poleHeight);
       }
 
       if (isPhoto) {
-         if (showPhotoTitle) {
-            markerCanvas.drawBitmap(titleBitmap, markerWidth_Half - (titleWidth / 2), 0);
+
+         if (isShowPhotoTitle) {
+            markerCanvas.drawBitmap(titleBitmap, markerWidth2 - (titleWidth / 2), 0);
          }
+
       } else {
-         markerCanvas.drawBitmap(titleBitmap, markerWidth_Half - (titleWidth / 2), 0);
+
+         markerCanvas.drawBitmap(titleBitmap, markerWidth2 - (titleWidth / 2), 0);
       }
 
-      markerCanvas.drawBitmap(poiBitmap, markerWidth_Half - (symbolWidth / 2), markerHeight / 2 - (symbolHeight / 2));
+      markerCanvas.drawBitmap(symbolBitmap,
+            markerWidth2 - (symbolWidth / 2),
+            markerHeight / 2 - (symbolHeight / 2));
 
       if (isPhoto) {
 
@@ -247,85 +366,6 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
          return new MarkerSymbol(markerBitmap, HotspotPlace.CENTER, isBillboard);
       }
-   }
-
-   public List<MarkerInterface> createBookmarksAsMapMarker(final MarkerMode markerMode) {
-
-      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-
-      final int clusterSymbol_Size = config.clusterSymbol_Size;
-
-      final Bitmap bitmapPoi = createShapeBitmap(MarkerShape.STAR);
-
-      _bitmapClusterSymbol = drawStar(clusterSymbol_Size, _starColor, _starColorBorder);
-
-      final List<MarkerInterface> allMapMarker = new ArrayList<>();
-
-      for (final MapBookmark mapBookmark : MapBookmarkManager.getAllBookmarks()) {
-
-         final MarkerItem item = new MarkerItem(
-               mapBookmark.id,
-               mapBookmark.name,
-               UI.EMPTY_STRING,
-               new GeoPoint(mapBookmark.getLatitude(), mapBookmark.getLongitude()));
-
-         item.setMarker(createAdvanceSymbol(item, bitmapPoi));
-
-         allMapMarker.add(item);
-      }
-
-      if (markerMode == MarkerMode.NORMAL) {
-         return allMapMarker;
-      }
-
-      final int COUNT = 5;
-      final float STEP = 100f / 110000f; // roughly 100 meters
-      // Create some markers spaced STEP degrees
-      //Berlin: 52.513452, 13.363791
-      //Rapperswil  47.2266239, 8.8184374
-      final double demo_lat = 47.2266239;
-      final double demo_lon = 8.8184374;
-
-      for (int x = -COUNT; x < COUNT; x++) {
-         for (int y = -COUNT; y < COUNT; y++) {
-
-            final double random = STEP * Math.random() * 2;
-            final MarkerItem item = new MarkerItem(y + ", " + x, //$NON-NLS-1$
-                  "Title " + demo_lat + "/" + demo_lon, //$NON-NLS-1$//$NON-NLS-2$
-                  "Description " + x + "/" + y, //$NON-NLS-1$ //$NON-NLS-2$
-                  new GeoPoint(demo_lat + y * STEP + random, demo_lon + x * STEP + random));
-
-            item.setMarker(createAdvanceSymbol(item, bitmapPoi));
-
-            allMapMarker.add(item);
-         }
-      }
-
-      return allMapMarker;
-   }
-
-   /**
-    * this creates the bitmap for clustering a draw the size as text in the middle
-    *
-    * @param size
-    * @return
-    */
-   public Bitmap createClusterBitmap(final int size) {
-
-      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-
-      final ScreenUtils.ClusterDrawable drawable = new ScreenUtils.ClusterDrawable(
-
-            config.clusterSymbol_Size,
-            ColorUtil.getARGB(config.clusterOutline_Color, config.clusterOutline_Opacity),
-            ColorUtil.getARGB(config.clusterFill_Color, config.clusterFill_Opacity),
-            Integer.toString(size),
-            config.clusterSymbol_Weight,
-            config.clusterOutline_Size);
-
-      final Bitmap paintedBitmap = drawable.getBitmap(_bitmapClusterSymbol);
-
-      return paintedBitmap;
    }
 
    Bitmap createShapeBitmap(final MarkerShape shape) {
@@ -405,6 +445,10 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       return bitmapTrackArrow;
    }
 
+   public Paint getFillPainter() {
+      return _fillPainter;
+   }
+
    public MarkerRendererFactory getMarkerRendererFactory() {
       return _markerRendererFactory;
    }
@@ -423,6 +467,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
     *
     * @param index
     * @param MarkerItem
+    *
     * @return true, when clicked
     */
    @Override
@@ -463,6 +508,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
     *
     * @param index
     * @param MarkerItem
+    *
     * @return true, when clicked
     */
    @Override

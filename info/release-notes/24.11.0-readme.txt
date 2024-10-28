@@ -12,7 +12,12 @@ New
 * 2D Map 
   - Support fair use for map providers with a tile image request limiter  
     https://github.com/mytourbook/mytourbook/issues/1417
-     
+    
+2.5D Map
+  - Show high quality photo images    
+    Hint: Too many photo images can slowing down this map
+    https://github.com/mytourbook/mytourbook/issues/1419
+    
 * Tour Search
   - Push tours from the fulltext search result into the Tour Book view
     https://github.com/mytourbook/mytourbook/issues/1379
