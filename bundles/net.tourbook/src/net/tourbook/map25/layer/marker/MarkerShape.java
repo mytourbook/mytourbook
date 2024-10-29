@@ -17,6 +17,7 @@
 package net.tourbook.map25.layer.marker;
 
 import net.tourbook.map25.Map25App;
+import net.tourbook.map25.photo.PhotoToolkit;
 
 /**
  * Tile encoding format. {@link Map25App} and {@link MarkerToolkit} and {@link MarkerRendererMT} and

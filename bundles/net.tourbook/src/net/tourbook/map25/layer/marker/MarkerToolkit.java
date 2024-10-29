@@ -203,10 +203,10 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
     *
     * @return MarkerSymbol with title, description and symbol
     */
-   MarkerSymbol createMarkerSymbol(final MarkerItem markerItem,
-                                   final Bitmap symbolBitmap,
-                                   final Boolean isPhoto,
-                                   final boolean isShowPhotoTitle) {
+   protected MarkerSymbol createMarkerSymbol(final MarkerItem markerItem,
+                                             final Bitmap symbolBitmap,
+                                             final Boolean isPhoto,
+                                             final boolean isShowPhotoTitle) {
 
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
@@ -368,7 +368,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       }
    }
 
-   Bitmap createShapeBitmap(final MarkerShape shape) {
+   protected Bitmap createShapeBitmap(final MarkerShape shape) {
 
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 

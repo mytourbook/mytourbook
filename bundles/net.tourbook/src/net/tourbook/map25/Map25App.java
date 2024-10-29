@@ -53,10 +53,10 @@ import net.tourbook.map25.layer.marker.MarkerMode;
 import net.tourbook.map25.layer.marker.MarkerRendererMT;
 import net.tourbook.map25.layer.marker.MarkerShape;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
-import net.tourbook.map25.layer.marker.PhotoToolkit;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
+import net.tourbook.map25.photo.PhotoToolkit;
 import net.tourbook.map25.renderer.TourTrack_Shader;
 import net.tourbook.photo.Photo;
 

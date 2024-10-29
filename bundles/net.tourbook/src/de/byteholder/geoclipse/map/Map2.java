@@ -6848,7 +6848,7 @@ public class Map2 extends Canvas {
 
       if (_mapPointPainter_Task != null) {
 
-         // an overlay task is currently running
+         // a task is currently running
 
          final boolean isDone = _mapPointPainter_Task.isDone();
 
