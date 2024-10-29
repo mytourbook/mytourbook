@@ -202,6 +202,11 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
     */
    public List<MarkerInterface> createPhotoItems(final List<Photo> allPhotos) {
 
+      /**
+       * [2.5D Map] Stopped implementation because it would need a lot of time to implement it
+       * correctly. Currently it is working OK for a few images but not for too many images
+       */
+
       System.out.println(UI.timeStamp() + " createPhotoItems: ");
 // TODO remove SYSTEM.OUT.PRINTLN
 
