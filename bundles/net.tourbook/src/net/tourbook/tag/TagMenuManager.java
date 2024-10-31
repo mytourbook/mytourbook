@@ -213,6 +213,8 @@ public class TagMenuManager {
 
          super("%s  %d".formatted(tagGroup.name, tagGroup.tourTags.size()), AS_PUSH_BUTTON); //$NON-NLS-1$
 
+         setToolTipText(TagGroupManager.createTagGroupSortedList(tagGroup));
+
          __tagGroup = tagGroup;
       }
 

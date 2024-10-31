@@ -103,6 +103,41 @@ public class TagGroupManager {
    }
 
    /**
+    * @param tagGroup
+    *
+    * @return Returns a list with all tags in the {@link TagGroup} or <code>null</code> when not
+    *         available
+    */
+   public static String createTagGroupSortedList(final TagGroup tagGroup) {
+
+      if (tagGroup == null || tagGroup.tourTags.size() == 0) {
+         return null;
+      }
+
+      final List<TourTag> sortedTags = new ArrayList<>(tagGroup.tourTags);
+      Collections.sort(sortedTags);
+
+      final StringBuilder sb = new StringBuilder();
+
+      sb.append(tagGroup.name);
+      sb.append(UI.NEW_LINE);
+      sb.append(UI.NEW_LINE);
+
+      for (int tagIndex = 0; tagIndex < sortedTags.size(); tagIndex++) {
+
+         final TourTag tourTag = sortedTags.get(tagIndex);
+
+         if (tagIndex > 0) {
+            sb.append(UI.NEW_LINE);
+         }
+
+         sb.append(UI.SYMBOL_BULLET + UI.SPACE + tourTag.getTagName());
+      }
+
+      return sb.toString();
+   }
+
+   /**
     * @param tourTagGroupID
     *
     * @return Returns the tag group or <code>null</code> when not available, e.g. when a group was

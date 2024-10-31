@@ -55,7 +55,10 @@ New
 Improvements
 ============
 
-* 
+
+
+* Tag Group
+  - Show all tags in the tag group action tooltip
 
 
 Changes
@@ -73,7 +76,9 @@ Changes that require Tour Re-import
 Bugfix
 ======
   
-* 
+* 2D Map
+  - Fixed map sync issues
+    https://github.com/mytourbook/mytourbook/issues/1352
  
 
 See also milestone 24.x https://github.com/mytourbook/mytourbook/milestone/16?closed=1
