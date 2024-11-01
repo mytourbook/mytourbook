@@ -2394,7 +2394,12 @@ public class TourBookView extends ViewPart implements
 
             : Messages.Slideout_TourCollectionFilter_Action_Tooltip);
 
-      _tagMenuManager.enableTagActions(isTourSelected, isOneTour, firstTourItem == null ? null : firstTourItem.getTagIds());
+      _tagMenuManager.enableTagActions(
+            isTourSelected,
+            isOneTour,
+            firstTourItem == null
+                  ? null
+                  : firstTourItem.getTagIds());
 
       TourTypeMenuManager.enableRecentTourTypeActions(
             isTourSelected,

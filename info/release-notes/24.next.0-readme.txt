@@ -55,7 +55,9 @@ New
 Improvements
 ============
 
-
+* Tags
+  - Copy & paste tags
+    https://github.com/mytourbook/mytourbook/issues/1301
 
 * Tag Group
   - Show all tags in the tag group action tooltip
