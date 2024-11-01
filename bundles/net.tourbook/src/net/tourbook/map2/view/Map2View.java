@@ -1021,7 +1021,7 @@ public class Map2View extends ViewPart implements
                null);
       }
 
-      syncMap_ShowCurrentSyncModeImage();
+      syncMap_UpdateSyncSlideoutAction(_isMapSyncWith_Slider_One);
    }
 
    public void action_SyncWith_OtherMap(final boolean isSelected) {
@@ -1034,7 +1034,7 @@ public class Map2View extends ViewPart implements
          deactivateOtherSync(_actionSyncMapWith_OtherMap);
       }
 
-      syncMap_ShowCurrentSyncModeImage();
+      syncMap_UpdateSyncSlideoutAction(_isMapSyncWith_OtherMap);
    }
 
    /**
@@ -1054,7 +1054,7 @@ public class Map2View extends ViewPart implements
          _map.paint();
       }
 
-      syncMap_ShowCurrentSyncModeImage();
+      syncMap_UpdateSyncSlideoutAction(_isMapSyncWith_Photo);
 
       enableActions(true);
    }
@@ -1081,7 +1081,7 @@ public class Map2View extends ViewPart implements
          paintTours_20_One(_allTourData.get(0), true);
       }
 
-      syncMap_ShowCurrentSyncModeImage();
+      syncMap_UpdateSyncSlideoutAction(_isMapSyncWith_Tour);
    }
 
    public void action_SyncWith_TourLocation() {
@@ -1094,7 +1094,7 @@ public class Map2View extends ViewPart implements
          deactivateOtherSync(_actionSyncMapWith_TourLocation);
       }
 
-      syncMap_ShowCurrentSyncModeImage();
+      syncMap_UpdateSyncSlideoutAction(_isMapSyncWith_MapLocation);
    }
 
    public void action_SyncWith_ValuePoint() {
@@ -1123,7 +1123,7 @@ public class Map2View extends ViewPart implements
                null);
       }
 
-      syncMap_ShowCurrentSyncModeImage();
+      syncMap_UpdateSyncSlideoutAction(_isMapSyncWith_ValuePoint);
    }
 
    private void actionCopyLocationToClipboard() {
@@ -2420,7 +2420,7 @@ public class Map2View extends ViewPart implements
       _actionSyncMapWith_Tour             .setEnabled(isTourAvailable);
       _actionSyncMapWith_ValuePoint       .setEnabled(isTourAvailable);
 
-      syncMap_ShowCurrentSyncModeImage();
+      syncMap_UpdateSyncSlideoutAction(_isMapSyncActive);
 
       if (numTours == 0) {
 
@@ -3473,7 +3473,7 @@ public class Map2View extends ViewPart implements
 
       _map.setLocations_Common(allTourLocations);
 
-      if (_isMapSyncWith_MapLocation) {
+      if (_isMapSyncActive && _isMapSyncWith_MapLocation) {
 
          final GeoPosition geoPosition = getTourLocationCenter(allTourLocations);
 
@@ -3513,7 +3513,7 @@ public class Map2View extends ViewPart implements
 
          _map.setLocations_Tours(allTourLocations);
 
-         if (_isMapSyncWith_MapLocation) {
+         if (_isMapSyncActive && _isMapSyncWith_MapLocation) {
 
             final GeoPosition geoPosition = getTourLocationCenter(allTourLocations);
 
@@ -3605,7 +3605,7 @@ public class Map2View extends ViewPart implements
          }
       }
 
-      if (_isMapSyncWith_Tour || _isMapSyncWith_Slider_One) {
+      if (_isMapSyncActive && _isMapSyncWith_Slider_One) {
 
          if (isDrawSlider) {
 
@@ -3633,7 +3633,7 @@ public class Map2View extends ViewPart implements
 
       final int leftSliderValueIndex = pauseSelection.getSerieIndex();
 
-      if (_isMapSyncWith_Tour || _isMapSyncWith_Slider_One) {
+      if (_isMapSyncActive && _isMapSyncWith_Slider_One) {
 
          if (isDrawSlider) {
 
@@ -3694,7 +3694,7 @@ public class Map2View extends ViewPart implements
             paintToursAndPhotos(tourData, selection);
 
             // recenter map AFTER it was centered in the paint... method
-            if (_isMapSyncWith_MapLocation) {
+            if (_isMapSyncActive && _isMapSyncWith_MapLocation) {
 
                final GeoPosition hoveredTourLocation = tourIdSelection.getHoveredTourLocation();
 
@@ -4051,7 +4051,7 @@ public class Map2View extends ViewPart implements
 // DISABLED BECAUSE PHOTOS ARE NOT ALWAYS DISPLAYED
       final int allNewPhotoHash = allNewPhotos.hashCode();
       if (allNewPhotoHash == _hash_AllPhotos) {
-         return;
+//         return;
       }
 
       _allPhotos.clear();
@@ -4066,7 +4066,7 @@ public class Map2View extends ViewPart implements
        * <p>
        * To reactivate photo sync, first photos must be set visible.
        */
-      if (_isMapSyncWith_Photo) {
+      if (_isMapSyncActive && _isMapSyncWith_Photo) {
          centerPhotos(_filteredPhotos, false);
       }
 
@@ -4188,7 +4188,7 @@ public class Map2View extends ViewPart implements
          _map.disposeOverlayImageCache();
       }
 
-      if (_isMapSyncWith_Tour && !_map.isSearchTourByLocation()) {
+      if (_isMapSyncActive && _isMapSyncWith_Tour && _map.isSearchTourByLocation() == false) {
 
          // use default position for the tour
 
@@ -4326,67 +4326,70 @@ public class Map2View extends ViewPart implements
       /*
        * Set position and zoom level for the tour
        */
-      if (_isMapSyncWith_Tour && _map.isSearchTourByLocation() == false) {
+      if (_isMapSyncActive) {
 
-         if (((forceRedraw == false) && (_previousTourData != null)) || (tourData == _previousTourData)) {
+         if (_isMapSyncWith_Tour && _map.isSearchTourByLocation() == false) {
 
-            /*
-             * keep map area for the previous tour
+            if (((forceRedraw == false) && (_previousTourData != null)) || (tourData == _previousTourData)) {
+
+               /*
+                * keep map area for the previous tour
+                */
+               keepMapPosition(_previousTourData);
+            }
+
+            if (tourData.mapCenterPositionLatitude == Double.MIN_VALUE) {
+
+               // use default position for the tour
+
+               positionMapTo_MapPosition(tourBoundsSet, true);
+
+            } else {
+
+               // position tour to the previous position
+
+               _map.setZoom(tourData.mapZoomLevel);
+               _map.setMapCenter(new GeoPosition(
+                     tourData.mapCenterPositionLatitude,
+                     tourData.mapCenterPositionLongitude));
+            }
+
+         } else if (_isMapSyncWith_MapLocation) {
+
+            // center map to tour locations
+
+            final List<TourLocation> allTourLocations = new ArrayList<>();
+
+            final TourLocation tourLocationStart = tourData.getTourLocationStart();
+            final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
+
+            if (tourLocationStart != null) {
+               allTourLocations.add(tourLocationStart);
+            }
+
+            if (tourLocationEnd != null) {
+               allTourLocations.add(tourLocationEnd);
+            }
+
+            if (allTourLocations.size() > 0) {
+
+               final GeoPosition geoPosition = getTourLocationCenter(allTourLocations);
+
+               _map.setMapCenter(geoPosition);
+            }
+
+         } else if (isNewTour) {
+
+            /**
+             * !! Disabled !!
+             * <p>
+             * Because map is moved when any sync is disabled but there should be a
+             * possibility that the map is NOT moved when a new tour is selected
              */
-            keepMapPosition(_previousTourData);
+
+            // ensure that a new tour is visible
+            // positionMapTo_MapPosition(tourBoundsSet, true);
          }
-
-         if (tourData.mapCenterPositionLatitude == Double.MIN_VALUE) {
-
-            // use default position for the tour
-
-            positionMapTo_MapPosition(tourBoundsSet, true);
-
-         } else {
-
-            // position tour to the previous position
-
-            _map.setZoom(tourData.mapZoomLevel);
-            _map.setMapCenter(new GeoPosition(
-                  tourData.mapCenterPositionLatitude,
-                  tourData.mapCenterPositionLongitude));
-         }
-
-      } else if (_isMapSyncWith_MapLocation) {
-
-         // center map to tour locations
-
-         final List<TourLocation> allTourLocations = new ArrayList<>();
-
-         final TourLocation tourLocationStart = tourData.getTourLocationStart();
-         final TourLocation tourLocationEnd = tourData.getTourLocationEnd();
-
-         if (tourLocationStart != null) {
-            allTourLocations.add(tourLocationStart);
-         }
-
-         if (tourLocationEnd != null) {
-            allTourLocations.add(tourLocationEnd);
-         }
-
-         if (allTourLocations.size() > 0) {
-
-            final GeoPosition geoPosition = getTourLocationCenter(allTourLocations);
-
-            _map.setMapCenter(geoPosition);
-         }
-
-      } else if (isNewTour) {
-
-         /**
-          * !! Disabled !!
-          * <p>
-          * Because map is moved when any sync is disabled but there should be a
-          * possibility that the map is NOT moved when a new tour is selected
-          */
-
-         // ensure that a new tour is visible
-//       positionMapTo_MapPosition(tourBoundsSet, true);
       }
 
       // keep tour data
@@ -4558,7 +4561,7 @@ public class Map2View extends ViewPart implements
 
             _sliderPathPaintingData);
 
-      if (_isMapSyncWith_Slider_One) {
+      if (_isMapSyncActive && _isMapSyncWith_Slider_One) {
 
          if (geoPositions != null) {
 
@@ -5422,9 +5425,14 @@ public class Map2View extends ViewPart implements
    /**
     * Set sync map action selected when one of it's subactions are selected.
     *
+    * @param isSelected
+    *
     * @param isSelectSyncMap
     */
-   private void syncMap_ShowCurrentSyncModeImage() {
+   private void syncMap_UpdateSyncSlideoutAction(final boolean isSelected) {
+
+      _isMapSyncActive = isSelected;
+      _actionMap2Slideout_SyncMap.setSelection(isSelected);
 
 // SET_FORMATTING_OFF
 
@@ -5450,7 +5458,7 @@ public class Map2View extends ViewPart implements
                                    final ViewPart viewPart,
                                    final IMapSyncListener.SyncParameter syncParameter) {
 
-      if (_isMapSyncWith_OtherMap == false) {
+      if (_isMapSyncActive || _isMapSyncWith_OtherMap == false) {
 
          // sync feature is disabled
 
@@ -5717,7 +5725,7 @@ public class Map2View extends ViewPart implements
 
       _map.paint();
 
-      if (_isMapSyncWith_ValuePoint) {
+      if (_isMapSyncActive && _isMapSyncWith_ValuePoint) {
          positionMapTo_ValueIndex(hoveredTourData, hoveredSerieIndex);
       }
    }

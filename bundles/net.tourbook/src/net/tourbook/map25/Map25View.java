@@ -30,6 +30,7 @@ import java.util.Set;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -152,18 +153,7 @@ public class Map25View extends ViewPart implements
       IMapWithPhotos,
       IPhotoEventListener {
 
-   private static final String MAP_ACTION_SHOW_TOUR_IN_MAP            = net.tourbook.map2.Messages.map_action_show_tour_in_map;
-   private static final String MAP_ACTION_TOUR_COLOR_ALTITUDE_TOOLTIP = net.tourbook.map2.Messages.map_action_tour_color_altitude_tooltip;
-   private static final String MAP_ACTION_TOUR_COLOR_GRADIENT_TOOLTIP = net.tourbook.map2.Messages.map_action_tour_color_gradient_tooltip;
-   private static final String MAP_ACTION_TOUR_COLOR_PACE_TOOLTIP     = net.tourbook.map2.Messages.map_action_tour_color_pace_tooltip;
-   private static final String MAP_ACTION_TOUR_COLOR_PULSE_TOOLTIP    = net.tourbook.map2.Messages.map_action_tour_color_pulse_tooltip;
-   private static final String MAP_ACTION_TOUR_COLOR_SPEED_TOOLTIP    = net.tourbook.map2.Messages.map_action_tour_color_speed_tooltip;
-   private static final String TOUR_ACTION_SHOW_HR_ZONES_TOOLTIP      = net.tourbook.map2.Messages.Tour_Action_ShowHrZones_Tooltip;
-
 // SET_FORMATTING_OFF
-
-   private static final String            MAP_ACTION_SYNCH_WITH_SLIDER                 = net.tourbook.map2.Messages.map_action_synch_with_slider;
-   private static final String            MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED        = net.tourbook.map2.Messages.Map_Action_SynchWithSlider_Centered;
 
    private static final ImageDescriptor   _imageSyncWithSlider                         = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider);
    private static final ImageDescriptor   _imageSyncWithSlider_Disabled                = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Disabled);
@@ -398,7 +388,7 @@ public class Map25View extends ViewPart implements
                TourbookPlugin.getThemedImageDescriptor(Images.TourChart_Disabled));
 
          isToggleAction = true;
-         notSelectedTooltip = MAP_ACTION_SHOW_TOUR_IN_MAP;
+         notSelectedTooltip = OtherMessages.MAP_ACTION_SHOW_TOUR_IN_MAP;
       }
 
       @Override
@@ -463,7 +453,7 @@ public class Map25View extends ViewPart implements
 
          super(null, AS_CHECK_BOX);
 
-         setToolTipText(TOUR_ACTION_SHOW_HR_ZONES_TOOLTIP);
+         setToolTipText(OtherMessages.TOUR_ACTION_SHOW_HR_ZONES_TOOLTIP);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PulseZones));
          setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PulseZones_Disabled));
@@ -947,11 +937,11 @@ public class Map25View extends ViewPart implements
       _actionZoom_In                   = new ActionZoomIn(this);
       _actionZoom_Out                  = new ActionZoomOut(this);
 
-      _actionTrackColor_Altitude        = new ActionTrackColor(MapGraphId.Altitude,   MAP_ACTION_TOUR_COLOR_ALTITUDE_TOOLTIP);
-      _actionTrackColor_Gradient        = new ActionTrackColor(MapGraphId.Gradient,   MAP_ACTION_TOUR_COLOR_GRADIENT_TOOLTIP);
-      _actionTrackColor_Pace            = new ActionTrackColor(MapGraphId.Pace,       MAP_ACTION_TOUR_COLOR_PACE_TOOLTIP);
-      _actionTrackColor_Pulse           = new ActionTrackColor(MapGraphId.Pulse,      MAP_ACTION_TOUR_COLOR_PULSE_TOOLTIP);
-      _actionTrackColor_Speed           = new ActionTrackColor(MapGraphId.Speed,      MAP_ACTION_TOUR_COLOR_SPEED_TOOLTIP);
+      _actionTrackColor_Altitude        = new ActionTrackColor(MapGraphId.Altitude,   OtherMessages.MAP_ACTION_TOUR_COLOR_ALTITUDE_TOOLTIP);
+      _actionTrackColor_Gradient        = new ActionTrackColor(MapGraphId.Gradient,   OtherMessages.MAP_ACTION_TOUR_COLOR_GRADIENT_TOOLTIP);
+      _actionTrackColor_Pace            = new ActionTrackColor(MapGraphId.Pace,       OtherMessages.MAP_ACTION_TOUR_COLOR_PACE_TOOLTIP);
+      _actionTrackColor_Pulse           = new ActionTrackColor(MapGraphId.Pulse,      OtherMessages.MAP_ACTION_TOUR_COLOR_PULSE_TOOLTIP);
+      _actionTrackColor_Speed           = new ActionTrackColor(MapGraphId.Speed,      OtherMessages.MAP_ACTION_TOUR_COLOR_SPEED_TOOLTIP);
       _actionTrackColor_HrZone          = new ActionTrackColor_HrZone();
 
 // SET_FORMATTING_ON
@@ -2484,14 +2474,14 @@ public class Map25View extends ViewPart implements
 
       if (isCenter) {
 
-         toolTip = MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED;
+         toolTip = OtherMessages.MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED;
 
          imageDescriptor = _imageSyncWithSlider_Centered;
          imageDescriptorDisabled = _imageSyncWithSlider_Centered_Disabled;
 
       } else {
 
-         toolTip = MAP_ACTION_SYNCH_WITH_SLIDER;
+         toolTip = OtherMessages.MAP_ACTION_SYNCH_WITH_SLIDER;
 
          imageDescriptor = _imageSyncWithSlider;
          imageDescriptorDisabled = _imageSyncWithSlider_Disabled;

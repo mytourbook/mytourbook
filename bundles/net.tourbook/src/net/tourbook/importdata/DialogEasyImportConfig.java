@@ -40,7 +40,6 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEnumEntry;
-import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -4748,27 +4747,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       } else {
 
-         final List<TourTag> sortedTags = new ArrayList<>(tagGroup.tourTags);
-         Collections.sort(sortedTags);
-
-         final StringBuilder sb = new StringBuilder();
-
-         sb.append(tagGroup.name);
-         sb.append(UI.NEW_LINE);
-         sb.append(UI.NEW_LINE);
-
-         for (int tagIndex = 0; tagIndex < sortedTags.size(); tagIndex++) {
-
-            final TourTag tourTag = sortedTags.get(tagIndex);
-
-            if (tagIndex > 0) {
-               sb.append(UI.NEW_LINE);
-            }
-
-            sb.append(UI.SYMBOL_BULLET + UI.SPACE + tourTag.getTagName());
-         }
-
-         _comboIL_TourTagGroups.setToolTipText(sb.toString());
+         _comboIL_TourTagGroups.setToolTipText(TagGroupManager.createTagGroupSortedList(tagGroup));
       }
    }
 

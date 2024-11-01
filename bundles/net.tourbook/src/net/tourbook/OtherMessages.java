@@ -190,6 +190,20 @@ public class OtherMessages {
    public static final String WEATHER_CLOUDS_SUNNY                         = net.tourbook.common.Messages.Weather_Clouds_Sunny;
 
    //
+   // net.tourbook.map2.Messages
+   //
+
+   public static final String MAP_ACTION_SHOW_TOUR_IN_MAP                  = net.tourbook.map2.Messages.map_action_show_tour_in_map;
+   public static final String MAP_ACTION_TOUR_COLOR_ALTITUDE_TOOLTIP       = net.tourbook.map2.Messages.map_action_tour_color_altitude_tooltip;
+   public static final String MAP_ACTION_TOUR_COLOR_GRADIENT_TOOLTIP       = net.tourbook.map2.Messages.map_action_tour_color_gradient_tooltip;
+   public static final String MAP_ACTION_TOUR_COLOR_PACE_TOOLTIP           = net.tourbook.map2.Messages.map_action_tour_color_pace_tooltip;
+   public static final String MAP_ACTION_TOUR_COLOR_PULSE_TOOLTIP          = net.tourbook.map2.Messages.map_action_tour_color_pulse_tooltip;
+   public static final String MAP_ACTION_TOUR_COLOR_SPEED_TOOLTIP          = net.tourbook.map2.Messages.map_action_tour_color_speed_tooltip;
+   public static final String MAP_ACTION_SYNCH_WITH_SLIDER                 = net.tourbook.map2.Messages.Map_Action_SynchWith_TourPosition;
+   public static final String MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED        = net.tourbook.map2.Messages.Map_Action_SynchWithSlider_Centered;
+   public static final String TOUR_ACTION_SHOW_HR_ZONES_TOOLTIP            = net.tourbook.map2.Messages.Tour_Action_ShowHrZones_Tooltip;
+
+   //
    // net.tourbook.map3.Messages
    //
 
@@ -255,10 +269,10 @@ public class OtherMessages {
 
    public static final String APP_WEB_LABEL_DEFAULT_FONT_SIZE              = net.tourbook.web.Messages.App_Web_Label_ContentFontSize;
    public static final String APP_WEB_LABEL_DEFAULT_FONT_SIZE_TOOLTIP      = net.tourbook.web.Messages.App_Web_Label_ContentFontSize_Tooltip;
-   
-   //   
+
+   //
    // tourbook.search.nls.Messages
-   //   
+   //
 
    public static final String SEARCH_APP_ACTION_EDIT_MARKER                = tourbook.search.nls.Messages.Search_App_Action_EditMarker;
    public static final String SEARCH_APP_ACTION_EDIT_TOUR                  = tourbook.search.nls.Messages.Search_App_Action_EditTour;
