@@ -103,29 +103,29 @@ public class TagGroupManager {
    }
 
    /**
-    * @param tagGroup
+    * @param title
+    *           can be <code>null</code>
+    * @param allTags
     *
-    * @return Returns a list with all tags in the {@link TagGroup} or <code>null</code> when not
-    *         available
+    * @return
     */
-   public static String createTagGroupSortedList(final TagGroup tagGroup) {
+   public static String createTagSortedList(final String title, final List<TourTag> allTags) {
 
-      if (tagGroup == null || tagGroup.tourTags.size() == 0) {
-         return null;
-      }
-
-      final List<TourTag> sortedTags = new ArrayList<>(tagGroup.tourTags);
-      Collections.sort(sortedTags);
+      final ArrayList<TourTag> allSortedTags = new ArrayList<>(allTags);
+      Collections.sort(allSortedTags);
 
       final StringBuilder sb = new StringBuilder();
 
-      sb.append(tagGroup.name);
-      sb.append(UI.NEW_LINE);
-      sb.append(UI.NEW_LINE);
+      if (title != null) {
 
-      for (int tagIndex = 0; tagIndex < sortedTags.size(); tagIndex++) {
+         sb.append(title);
+         sb.append(UI.NEW_LINE);
+         sb.append(UI.NEW_LINE);
+      }
 
-         final TourTag tourTag = sortedTags.get(tagIndex);
+      for (int tagIndex = 0; tagIndex < allSortedTags.size(); tagIndex++) {
+
+         final TourTag tourTag = allTags.get(tagIndex);
 
          if (tagIndex > 0) {
             sb.append(UI.NEW_LINE);
@@ -135,6 +135,23 @@ public class TagGroupManager {
       }
 
       return sb.toString();
+   }
+
+   /**
+    * @param tagGroup
+    *
+    * @return Returns a list with all tags in the {@link TagGroup} or <code>null</code> when not
+    *         available
+    */
+   public static String createTagSortedList(final TagGroup tagGroup) {
+
+      if (tagGroup == null || tagGroup.tourTags.size() == 0) {
+         return null;
+      }
+
+      final List<TourTag> allTags = new ArrayList<>(tagGroup.tourTags);
+
+      return createTagSortedList(tagGroup.name, allTags);
    }
 
    /**

@@ -87,7 +87,7 @@ public class TagMenuManager {
 
    private static ActionRecentTag[]       _actionsRecentTags;
    private static ActionAllPreviousTags   _actionAllPreviousTags;
-   
+
    /**
     * Number of tags which are displayed in the context menu or saved in the dialog settings, it's
     * max number is 9 to have a unique accelerator key
@@ -265,7 +265,7 @@ public class TagMenuManager {
 
          super("%s  %d".formatted(tagGroup.name, tagGroup.tourTags.size()), AS_PUSH_BUTTON); //$NON-NLS-1$
 
-         setToolTipText(TagGroupManager.createTagGroupSortedList(tagGroup));
+         setToolTipText(TagGroupManager.createTagSortedList(tagGroup));
 
          __tagGroup = tagGroup;
       }
@@ -738,10 +738,14 @@ public class TagMenuManager {
 
       final Action_AddTourTag_SubMenu actionAddTagAdvanced = (Action_AddTourTag_SubMenu) _actionAddTagAdvanced.getAction();
 
-      final HashSet<?> allTagsInClipboard = getTagsFromClipboard();
+      final List<TourTag> allTagsInClipboard = getTagsFromClipboard();
       final int numTags = allTagsInClipboard != null ? allTagsInClipboard.size() : 0;
 
-      _actionClipboard_PasteTags.setToolTipText("Paste %d tags from the clipboard into the selected tours".formatted(numTags));
+      if (numTags > 0) {
+
+         _actionClipboard_PasteTags.setToolTipText("Paste tags from the clipboard into the selected tours\n\n%s"
+               .formatted(TagGroupManager.createTagSortedList(null, allTagsInClipboard)));
+      }
 
 // SET_FORMATTING_OFF
 
@@ -991,7 +995,7 @@ public class TagMenuManager {
       _isAdvMenu = false;
    }
 
-   private HashSet<?> getTagsFromClipboard() {
+   private List<TourTag> getTagsFromClipboard() {
 
       Object contents;
 
@@ -1003,7 +1007,22 @@ public class TagMenuManager {
 
       if (contents instanceof final HashSet allTagIDs) {
 
-         return allTagIDs;
+         // get all tags from the tag ID's
+
+         final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
+         final List<TourTag> allClipboardTags = new ArrayList<>();
+
+         for (final Object tagID : allTagIDs) {
+
+            final TourTag tourTag = allTourTags.get(tagID);
+
+            if (tourTag != null) {
+
+               allClipboardTags.add(tourTag);
+            }
+         }
+
+         return allClipboardTags;
       }
 
       return null;
