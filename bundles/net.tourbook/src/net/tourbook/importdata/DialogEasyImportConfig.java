@@ -4747,7 +4747,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       } else {
 
-         _comboIL_TourTagGroups.setToolTipText(TagGroupManager.createTagGroupSortedList(tagGroup));
+         _comboIL_TourTagGroups.setToolTipText(TagGroupManager.createTagSortedList(tagGroup));
       }
    }
 

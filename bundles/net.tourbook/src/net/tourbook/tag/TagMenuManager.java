@@ -15,12 +15,18 @@
  *******************************************************************************/
 package net.tourbook.tag;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.tourbook.Images;
@@ -31,6 +37,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.common.util.AdvancedMenuForActions;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -53,11 +60,16 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.dnd.ByteArrayTransfer;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.PlatformUI;
 
 public class TagMenuManager {
 
@@ -90,9 +102,15 @@ public class TagMenuManager {
    private static int                     _maxRecentActions            = -1;
 
    /**
-    * Contains tag id's for all selected tours
+    * Contains all tag id's when only one tour is selected
     */
-   private static HashSet<Long>           _allTourTagIds;
+   private static HashSet<Long>           _allTagIds_OneTour;
+
+   /**
+    * Contains all tag id's when multiple tours are selected
+    */
+   private static HashMap<Long, TourTag>  _allTagIds_AllTours;
+
    private static boolean                 _isEnableRecentTagActions;
 
    private static int                     _taggingAutoOpenDelay;
@@ -103,14 +121,18 @@ public class TagMenuManager {
    private ITourProvider                  _tourProvider;
 
    private Action_AddTourTag_SubMenu      _actionAddTag;
+   private ActionContributionItem         _actionAddTagAdvanced;
+   private ActionTagGroups_SubMenu        _actionAddTagGroups;
+   private ActionClipboard_CopyTags       _actionClipboard_CopyTags;
+   private ActionClipboard_PasteTags      _actionClipboard_PasteTags;
    private Action_RemoveTourTag_SubMenu   _actionRemoveTag;
    private Action_RemoveAllTags           _actionRemoveAllTags;
-   private ActionContributionItem         _actionAddTagAdvanced;
-   private ActionOpenPrefDialog           _actionTagGroupPreferences;
    private ActionShowTourTagsView         _actionSetTags;
-   private ActionTagGroups_SubMenu        _actionAddTagGroups;
+   private ActionOpenPrefDialog           _actionTagGroupPreferences;
 
    private AdvancedMenuForActions         _advancedMenuToAddTags;
+
+   private TagTransfer                    _tagTransfer                 = new TagTransfer();
 
    /**
     * Removes all tags
@@ -151,6 +173,36 @@ public class TagMenuManager {
 
             _currentInstance.saveTourTags(_allPreviousTags, isChecked());
          }
+      }
+   }
+
+   private class ActionClipboard_CopyTags extends Action {
+
+      public ActionClipboard_CopyTags() {
+
+         super("&Copy Tags", AS_PUSH_BUTTON);
+
+         setToolTipText("Copy tags into the clipboard");
+      }
+
+      @Override
+      public void run() {
+
+         clipboard_CopyTags();
+      }
+   }
+
+   private class ActionClipboard_PasteTags extends Action {
+
+      public ActionClipboard_PasteTags() {
+
+         super("&Paste Tags", AS_PUSH_BUTTON);
+      }
+
+      @Override
+      public void run() {
+
+         clipboard_PasteTags();
       }
    }
 
@@ -213,7 +265,7 @@ public class TagMenuManager {
 
          super("%s  %d".formatted(tagGroup.name, tagGroup.tourTags.size()), AS_PUSH_BUTTON); //$NON-NLS-1$
 
-         setToolTipText(TagGroupManager.createTagGroupSortedList(tagGroup));
+         setToolTipText(TagGroupManager.createTagSortedList(tagGroup));
 
          __tagGroup = tagGroup;
       }
@@ -265,6 +317,90 @@ public class TagMenuManager {
          }
 
          addActionToMenu(_actionTagGroupPreferences);
+      }
+   }
+
+   private class TagTransfer extends ByteArrayTransfer {
+
+      private final String TYPE_NAME = "net.tourbook.tag.TagMenuManager.TagTransfer"; //$NON-NLS-1$
+      private final int    TYPE_ID   = registerType(TYPE_NAME);
+
+      private TagTransfer() {}
+
+      @Override
+      protected int[] getTypeIds() {
+         return new int[] { TYPE_ID };
+      }
+
+      @Override
+      protected String[] getTypeNames() {
+         return new String[] { TYPE_NAME };
+      }
+
+      @Override
+      protected void javaToNative(final Object data, final TransferData transferData) {
+
+         try (final ByteArrayOutputStream out = new ByteArrayOutputStream();
+               final DataOutputStream dataOut = new DataOutputStream(out)) {
+
+            if (_allTagIds_AllTours != null) {
+
+               // write number of tags
+               dataOut.writeInt(_allTagIds_AllTours.size());
+
+               // write all tag ID's
+               for (final Entry<Long, TourTag> entry : _allTagIds_AllTours.entrySet()) {
+                  dataOut.writeLong(entry.getKey());
+               }
+
+            } else {
+
+               // write number of tags
+               dataOut.writeInt(_allTagIds_OneTour.size());
+
+               // write all tag ID's
+               for (final Long tagID : _allTagIds_OneTour) {
+                  dataOut.writeLong(tagID);
+               }
+            }
+
+            super.javaToNative(out.toByteArray(), transferData);
+
+         } catch (final IOException e) {
+
+            StatusUtil.log(e);
+         }
+      }
+
+      @Override
+      protected Object nativeToJava(final TransferData transferData) {
+
+         final byte[] bytes = (byte[]) super.nativeToJava(transferData);
+
+         try (final ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+               final DataInputStream dataIn = new DataInputStream(in)) {
+
+            final HashSet<Long> allTagIDs = new HashSet<>();
+
+            // read number of tags
+            final int numTags = dataIn.readInt();
+
+            for (int tagIndex = 0; tagIndex < numTags; tagIndex++) {
+
+               // read tag ID
+               final long tagID = dataIn.readLong();
+
+               allTagIDs.add(tagID);
+            }
+
+            return allTagIDs;
+
+         } catch (final IOException e) {
+
+            StatusUtil.log(e);
+         }
+
+         return null;
       }
    }
 
@@ -324,7 +460,7 @@ public class TagMenuManager {
          return;
       }
 
-      final boolean isExistingTagIds = _allTourTagIds != null && _allTourTagIds.size() > 0;
+      final boolean isExistingTagIds = _allTagIds_OneTour != null && _allTagIds_OneTour.size() > 0;
       for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
 
          final TourTag actionTag = actionRecentTag._tag;
@@ -343,7 +479,7 @@ public class TagMenuManager {
 
             boolean isExistTagId = false;
 
-            for (final long existingTagId : _allTourTagIds) {
+            for (final long existingTagId : _allTagIds_OneTour) {
                if (recentTagId == existingTagId) {
                   isExistTagId = true;
                   break;
@@ -371,7 +507,7 @@ public class TagMenuManager {
          boolean isTagChecked = true;
 
          for (final TourTag previousTag : _allPreviousTags.values()) {
-            if (_allTourTagIds.contains(previousTag.getTagId()) == false) {
+            if (_allTagIds_OneTour.contains(previousTag.getTagId()) == false) {
                isTagChecked = false;
                break;
             }
@@ -513,6 +649,64 @@ public class TagMenuManager {
       }
    }
 
+   private void clipboard_CopyTags() {
+
+      final Clipboard clipboard = new Clipboard(PlatformUI.getWorkbench().getDisplay());
+      {
+         clipboard.setContents(
+
+               new Object[] { new Object() },
+               new Transfer[] { _tagTransfer });
+      }
+      clipboard.dispose();
+
+      int numTags;
+      if (_allTagIds_AllTours != null) {
+
+         numTags = _allTagIds_AllTours.size();
+
+      } else {
+
+         numTags = _allTagIds_OneTour.size();
+      }
+
+      UI.showStatusLineMessage("%d tags are copied to the clipboard".formatted(numTags));
+   }
+
+   private void clipboard_PasteTags() {
+
+      Object contents;
+
+      final Clipboard clipboard = new Clipboard(PlatformUI.getWorkbench().getDisplay());
+      {
+         contents = clipboard.getContents(_tagTransfer);
+      }
+      clipboard.dispose();
+
+      if (contents instanceof final HashSet allTagIDs) {
+
+         // get all tags from the tag ID's
+
+         final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
+         final HashMap<Long, TourTag> allClipboardTags = new HashMap<>();
+
+         for (final Object tagID : allTagIDs) {
+
+            final TourTag tourTag = allTourTags.get(tagID);
+
+            if (tourTag != null) {
+
+               allClipboardTags.put(tourTag.getTagId(), tourTag);
+            }
+         }
+
+         if (allClipboardTags.size() > 0) {
+
+            saveTourTags(allClipboardTags, true);
+         }
+      }
+   }
+
    private void createActions() {
 
 // SET_FORMATTING_OFF
@@ -521,11 +715,13 @@ public class TagMenuManager {
       _actionAddTagAdvanced.setId(ICommandIds.ACTION_ADD_TAG);
 
       _actionAddTag              = new Action_AddTourTag_SubMenu(this);
+      _actionAddTagGroups        = new ActionTagGroups_SubMenu();
+      _actionClipboard_CopyTags  = new ActionClipboard_CopyTags();
+      _actionClipboard_PasteTags = new ActionClipboard_PasteTags();
       _actionRemoveTag           = new Action_RemoveTourTag_SubMenu(this);
       _actionRemoveAllTags       = new Action_RemoveAllTags();
-      _actionTagGroupPreferences = new ActionOpenPrefDialog(Messages.Action_Tag_ManageTagGroups,PrefPageTagGroups.ID);
-      _actionAddTagGroups        = new ActionTagGroups_SubMenu();
       _actionSetTags             = new ActionShowTourTagsView();
+      _actionTagGroupPreferences = new ActionOpenPrefDialog(Messages.Action_Tag_ManageTagGroups,PrefPageTagGroups.ID);
 
       _advancedMenuToAddTags     = new AdvancedMenuForActions(_actionAddTagAdvanced);
 
@@ -542,19 +738,31 @@ public class TagMenuManager {
 
       final Action_AddTourTag_SubMenu actionAddTagAdvanced = (Action_AddTourTag_SubMenu) _actionAddTagAdvanced.getAction();
 
+      final List<TourTag> allTagsInClipboard = getTagsFromClipboard();
+      final int numTags = allTagsInClipboard != null ? allTagsInClipboard.size() : 0;
+
+      if (numTags > 0) {
+
+         _actionClipboard_PasteTags.setToolTipText("Paste tags from the clipboard into the selected tours\n\n%s"
+               .formatted(TagGroupManager.createTagSortedList(null, allTagsInClipboard)));
+      }
+
 // SET_FORMATTING_OFF
 
-      _actionAddTag           .setEnabled(isAddTagEnabled);
-      _actionAddTagGroups     .setEnabled(isAddTagEnabled);
-      actionAddTagAdvanced    .setEnabled(isAddTagEnabled);
+      _actionAddTag              .setEnabled(isAddTagEnabled);
+      _actionAddTagGroups        .setEnabled(isAddTagEnabled);
+      actionAddTagAdvanced       .setEnabled(isAddTagEnabled);
 
-      _actionRemoveTag        .setEnabled(isRemoveTagEnabled);
-      _actionRemoveAllTags    .setEnabled(isRemoveTagEnabled);
-      _actionSetTags          .setEnabled(isAddTagEnabled || isRemoveTagEnabled);
+      _actionRemoveTag           .setEnabled(isRemoveTagEnabled);
+      _actionRemoveAllTags       .setEnabled(isRemoveTagEnabled);
+      _actionSetTags             .setEnabled(isAddTagEnabled || isRemoveTagEnabled);
+
+      _actionClipboard_CopyTags  .setEnabled(isRemoveTagEnabled);
+      _actionClipboard_PasteTags .setEnabled(isAddTagEnabled && numTags > 0);
 
 // SET_FORMATTING_ON
 
-      enableRecentTagActions(isAddTagEnabled, _allTourTagIds);
+      enableRecentTagActions(isAddTagEnabled, _allTagIds_OneTour);
    }
 
    /**
@@ -565,7 +773,8 @@ public class TagMenuManager {
     * @param isOneTour
     *           Is <code>true</code> when one single tour is selected
     * @param oneTourTagIds
-    *           Contains {@link TourTag} ids when one tour is selected
+    *           Contains {@link TourTag} ids when one tour is selected, is <code>null</code> when
+    *           multiple tours are selected
     */
    public void enableTagActions(final boolean isTourSelected,
                                 final boolean isOneTour,
@@ -573,7 +782,9 @@ public class TagMenuManager {
 
       final boolean isAddTagEnabled = isTourSelected;
       final boolean isRemoveTagEnabled;
+
       final HashSet<Long> allTourTagIds = new HashSet<>();
+      _allTagIds_AllTours = null;
 
       if (isOneTour) {
 
@@ -597,15 +808,38 @@ public class TagMenuManager {
 
             isRemoveTagEnabled = false;
          }
+
       } else {
 
          // multiple tours are selected
 
          isRemoveTagEnabled = isTourSelected;
+
+         final ArrayList<TourData> allSelectedTours = _tourProvider.getSelectedTours();
+
+         if (allSelectedTours != null && allSelectedTours.isEmpty() == false) {
+
+            final HashMap<Long, TourTag> allTags = new HashMap<>();
+
+            // get all tag's from all tours
+            for (final TourData tourData : allSelectedTours) {
+
+               final Set<TourTag> tourTags = tourData.getTourTags();
+
+               for (final TourTag tourTag : tourTags) {
+                  allTags.put(tourTag.getTagId(), tourTag);
+               }
+            }
+
+            if (allTags.size() > 0) {
+
+               _allTagIds_AllTours = allTags;
+            }
+         }
       }
 
       _isEnableRecentTagActions = isAddTagEnabled;
-      _allTourTagIds = allTourTagIds;
+      _allTagIds_OneTour = allTourTagIds;
 
       enableTagActions(isAddTagEnabled, isRemoveTagEnabled);
    }
@@ -628,7 +862,7 @@ public class TagMenuManager {
       }
 
       _isEnableRecentTagActions = isAddTagEnabled;
-      _allTourTagIds = allExistingTagIds;
+      _allTagIds_OneTour = allExistingTagIds;
 
       enableTagActions(isAddTagEnabled, isRemoveTagEnabled);
    }
@@ -753,9 +987,45 @@ public class TagMenuManager {
 
          menuMgr.add(_actionRemoveTag);
          menuMgr.add(_actionRemoveAllTags);
+
+         menuMgr.add(_actionClipboard_CopyTags);
+         menuMgr.add(_actionClipboard_PasteTags);
       }
 
       _isAdvMenu = false;
+   }
+
+   private List<TourTag> getTagsFromClipboard() {
+
+      Object contents;
+
+      final Clipboard clipboard = new Clipboard(PlatformUI.getWorkbench().getDisplay());
+      {
+         contents = clipboard.getContents(_tagTransfer);
+      }
+      clipboard.dispose();
+
+      if (contents instanceof final HashSet allTagIDs) {
+
+         // get all tags from the tag ID's
+
+         final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
+         final List<TourTag> allClipboardTags = new ArrayList<>();
+
+         for (final Object tagID : allTagIDs) {
+
+            final TourTag tourTag = allTourTags.get(tagID);
+
+            if (tourTag != null) {
+
+               allClipboardTags.add(tourTag);
+            }
+         }
+
+         return allClipboardTags;
+      }
+
+      return null;
    }
 
    ITourProvider getTourProvider() {
