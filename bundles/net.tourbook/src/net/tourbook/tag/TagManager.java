@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tag;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -28,10 +29,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.ImageUtils;
+import net.tourbook.common.util.NoAutoScalingImageDataProvider;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -69,6 +73,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.PlatformUI;
+import org.imgscalr.Scalr;
+import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Rotation;
 
 public class TagManager {
@@ -197,6 +204,85 @@ public class TagManager {
 
       // fire modify event
       TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
+   }
+
+   /**
+    * Creates a tag image which must be disposed when not needed any more
+    *
+    * @param imageFilePath
+    *
+    * @return
+    */
+   public static Image createTagImage(final String imageFilePath) {
+
+      if (StringUtils.isNullOrEmpty(imageFilePath)
+            || new File(imageFilePath).exists() == false) {
+
+         return null;
+      }
+
+      /*
+       * Load tag image
+       */
+      BufferedImage awtImage;
+
+      try {
+
+         awtImage = ImageIO.read(new File(imageFilePath));
+
+      } catch (final Exception e) {
+
+         StatusUtil.logError("Tag image cannot be loaded: \"%s\"".formatted(imageFilePath)); //$NON-NLS-1$
+
+         return null;
+      }
+
+      final int originalImageWidth = awtImage.getWidth();
+      final int originalImageHeight = awtImage.getHeight();
+
+      if (originalImageWidth >= _tagImageSize || originalImageHeight >= _tagImageSize) {
+
+         // the original image is larger than the required image -> resize it
+
+         final org.eclipse.swt.graphics.Point bestSize = ImageUtils.getBestSize(
+               originalImageWidth,
+               originalImageHeight,
+               _tagImageSize,
+               _tagImageSize);
+
+         final int scaleWidth = bestSize.x;
+         final int scaledHeight = bestSize.y;
+
+         final int maxSize = Math.max(scaleWidth, scaledHeight);
+         final BufferedImage scaledHQImage = Scalr.resize(awtImage, Method.QUALITY, maxSize);
+
+         awtImage.flush();
+
+         awtImage = scaledHQImage;
+      }
+
+      /*
+       * Rotate image
+       */
+      final Rotation rotation = getImageRotation(imageFilePath);
+
+      if (rotation != null) {
+
+         // rotate image according to the EXIF flag
+
+         final BufferedImage rotatedImage = Scalr.rotate(awtImage, rotation);
+
+         awtImage.flush();
+
+         awtImage = rotatedImage;
+      }
+
+      final Image swtImage = new Image(PlatformUI.getWorkbench().getDisplay(),
+            new NoAutoScalingImageDataProvider(awtImage));
+
+      awtImage.flush();
+
+      return swtImage;
    }
 
    /**
@@ -531,6 +617,42 @@ public class TagManager {
       return tourTagsAccumulatedValues;
    }
 
+   private static Rotation getImageRotation(final String imageFilePath) {
+
+      Rotation rotation = null;
+
+      try {
+
+         // load metadata
+         final ImageMetadata imageMetadata = Imaging.getMetadata(new File(imageFilePath), null);
+         if (imageMetadata instanceof JpegImageMetadata) {
+
+            final JpegImageMetadata jpegMetadata = (JpegImageMetadata) imageMetadata;
+            final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_ORIENTATION);
+
+            if (field != null) {
+
+               final int orientation = field.getIntValue();
+
+// SET_FORMATTING_OFF
+
+               if (       orientation == 6) {   rotation = Rotation.CW_90;
+               } else if (orientation == 3) {   rotation = Rotation.CW_180;
+               } else if (orientation == 8) {   rotation = Rotation.CW_270;
+               }
+
+// SET_FORMATTING_ON
+            }
+         }
+
+      } catch (ImageReadException | IOException e) {
+
+         StatusUtil.log(e);
+      }
+
+      return rotation;
+   }
+
    private static long getNumberOfItems(final Connection conn, final String sql) {
 
       long numItems = 0;
@@ -656,7 +778,7 @@ public class TagManager {
 
       if (tagImage == null) {
 
-         tagImage = prepareTagImage(imageFilePath);
+         tagImage = createTagImage(imageFilePath);
 
          if (tagImage != null) {
             _tagImagesCache.put(imageFilePath, tagImage);
@@ -669,90 +791,6 @@ public class TagManager {
    public static int getTagImageSize() {
 
       return _tagImageSize;
-   }
-
-   public static Image prepareTagImage(final String imageFilePath) {
-
-      if (StringUtils.isNullOrEmpty(imageFilePath)
-            || new File(imageFilePath).exists() == false) {
-
-         return null;
-      }
-
-      final Image image = new Image(Display.getDefault(), imageFilePath);
-
-      Rotation rotation = null;
-      try {
-
-         final ImageMetadata imageMetadata = Imaging.getMetadata(new File(imageFilePath), null);
-         if (imageMetadata instanceof JpegImageMetadata) {
-
-            final JpegImageMetadata jpegMetadata = (JpegImageMetadata) imageMetadata;
-            final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_ORIENTATION);
-
-            if (field != null) {
-
-               final int orientation = field.getIntValue();
-
-               if (orientation == 6) {
-
-                  rotation = Rotation.CW_90;
-
-               } else if (orientation == 3) {
-
-                  rotation = Rotation.CW_180;
-
-               } else if (orientation == 8) {
-
-                  rotation = Rotation.CW_270;
-               }
-            }
-         }
-      } catch (ImageReadException | IOException e) {
-         StatusUtil.log(e);
-      }
-
-      final int imageWidth = image.getBounds().width;
-      final int imageHeight = image.getBounds().height;
-
-      int newimageWidth = _tagImageSize;
-      int newimageHeight = _tagImageSize;
-
-      if (UI.IS_4K_DISPLAY) {
-
-         // increase image size for 4k displays
-
-         newimageWidth *= 2.0f;
-         newimageHeight *= 2.0f;
-      }
-
-      if (imageWidth > imageHeight) {
-
-         /**
-          * math floor or - 0.5f is necessary that the resized image is not smaller than the image
-          * canvas which could result in a vertical 1 pixel white line
-          * <p>
-          * https://github.com/mytourbook/mytourbook/issues/1001
-          */
-         newimageHeight = (int) Math.floor(newimageWidth * imageHeight / (imageWidth * 1f));
-
-      } else if (imageWidth < imageHeight) {
-
-         newimageWidth = (int) Math.floor(newimageHeight * imageWidth / (imageHeight * 1f));
-      }
-
-      final Image resizedImage = ImageUtils.resize(Display.getDefault(),
-            image,
-            newimageWidth,
-            newimageHeight,
-            SWT.ON,
-            SWT.HIGH,
-            rotation,
-            false);
-
-      net.tourbook.common.UI.disposeResource(image);
-
-      return resizedImage;
    }
 
    private static void restoreTagContentValues() {
