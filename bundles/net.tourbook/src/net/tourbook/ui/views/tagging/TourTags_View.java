@@ -386,7 +386,23 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
                break;
 
             case COLUMN_IMAGEFILEPATH:
-               rc = tourTag1.getImageFilePath().compareTo(tourTag2.getImageFilePath());
+
+               final String imageFilePath1 = tourTag1.getImageFilePath();
+               final String imageFilePath2 = tourTag2.getImageFilePath();
+
+               if (imageFilePath1 != null && imageFilePath2 != null) {
+
+                  rc = imageFilePath1.compareTo(imageFilePath2);
+
+               } else if (imageFilePath1 != null) {
+
+                  rc = 1;
+
+               } else if (imageFilePath2 != null) {
+
+                  rc = -1;
+               }
+
                break;
 
             case COLUMN_TAGS:
