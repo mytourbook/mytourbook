@@ -2991,9 +2991,12 @@ public class GeoCompareView extends ViewPart implements ITourViewer, IGeoCompare
 
             if (image != null) {
 
-               final int alignment = _colDef_TourTypeImage.getColumnStyle();
-
-               UI.paintImage(event, image, _columnWidth_TourTypeImage, alignment);
+               UI.paintImage(
+                     event,
+                     image,
+                     _columnWidth_TourTypeImage,
+                     _colDef_TourTypeImage.getColumnStyle(), // horizontal alignment
+                     TourTypeImage.getHorizontalOffset());
             }
          }
       }

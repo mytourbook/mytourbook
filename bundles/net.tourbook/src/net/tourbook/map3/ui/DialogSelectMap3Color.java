@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map3.ui;
 
-import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
-import static org.eclipse.swt.events.MouseTrackListener.mouseExitAdapter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,6 +65,8 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -222,7 +221,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
    private void addListener(final ToolBar toolBar) {
 
       // prevent to open the tooltip
-      toolBar.addMouseTrackListener(mouseExitAdapter(mouseEvent -> _canOpenToolTip = false));
+      toolBar.addMouseTrackListener(MouseTrackListener.mouseExitAdapter(mouseEvent -> _canOpenToolTip = false));
 
 //		ownerControl.addDisposeListener(new DisposeListener() {
 //			@Override
@@ -584,7 +583,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
       _tableColumn_ProfileImage = tc;
       _columnIndexProfileImage = _colorViewer.getTable().getColumnCount() - 1;
 
-      tc.addControlListener(controlResizedAdapter(controlEvent -> onResizeImageColumn()));
+      tc.addControlListener(ControlListener.controlResizedAdapter(controlEvent -> onResizeImageColumn()));
 
       tvc.setLabelProvider(new CellLabelProvider() {
 

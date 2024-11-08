@@ -1382,7 +1382,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
          final int alignment = _colDef_IsBeverage.getColumnStyle();
 
-         UI.paintImage(event, image, _columnWidth_ForColumn_IsBeverage, alignment);
+         UI.paintImage(event, image, _columnWidth_ForColumn_IsBeverage, alignment, 0);
       }
    }
 

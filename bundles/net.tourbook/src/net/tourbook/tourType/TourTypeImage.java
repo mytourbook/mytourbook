@@ -404,6 +404,17 @@ public class TourTypeImage {
       }
    }
 
+   public static int getHorizontalOffset() {
+
+      final int horizontalOffset = UI.IS_WIN
+
+            // W$ has a horizontal indent which prevents to be exactly centered
+            ? 2
+            : 0;
+
+      return horizontalOffset;
+   }
+
    /**
     * @param graphColor
     *

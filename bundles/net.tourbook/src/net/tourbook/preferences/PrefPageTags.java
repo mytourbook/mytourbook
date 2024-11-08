@@ -101,7 +101,6 @@ import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -1465,6 +1464,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
    private void onPaintViewer(final Event event) {
 
+      // skip other columns
       if (event.index != _columnIndexTagImage) {
          return;
       }
@@ -1472,6 +1472,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       final TreeItem item = (TreeItem) event.item;
       final Object itemData = item.getData();
 
+      // skip other tree items
       if (itemData instanceof final TVIPrefTag prefTag) {
 
          /*
@@ -1481,22 +1482,16 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          final TourTag tourTag = prefTag.getTourTag();
          final Image tagImage = TagManager.getTagImage(tourTag);
 
-         if (tagImage != null && !tagImage.isDisposed()) {
+         if (tagImage != null && tagImage.isDisposed() == false) {
 
-            final Rectangle rect = tagImage.getBounds();
             final int rowHeight = event.height;
-            final int imageHeight = rect.height;
+            final int imageHeight = tagImage.getBounds().height;
 
-            switch (event.type) {
-            case SWT.PaintItem:
+            final int yOffset = (rowHeight - imageHeight) / 2;
 
-               final int x = event.x + event.width;
-               final int yOffset = (rowHeight - imageHeight) / 2;
-
-               event.gc.drawImage(tagImage, x, event.y + yOffset);
-
-               break;
-            }
+            event.gc.drawImage(tagImage,
+                  event.x + event.width,
+                  event.y + yOffset);
          }
       }
    }

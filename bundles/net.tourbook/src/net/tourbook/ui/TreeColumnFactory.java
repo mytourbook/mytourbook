@@ -141,6 +141,8 @@ public abstract class TreeColumnFactory {
    public static final String            TOUR_TAG_AND_CATEGORY_NOTES_ID   = "TOUR_TAG_AND_CATEGORY_NOTES";      //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_TAG_AND_TAGS;
    public static final TreeColumnFactory TOUR_TAG_ID;
+   public static final TreeColumnFactory TOUR_TAG_IMAGE;
+   public static final String            TOUR_TAG_IMAGE_ID                = "TOUR_TAG_IMAGE";                   //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_TAG_IMAGE_FILE_PATH;
    public static final String            TOUR_TAG_IMAGE_FILE_PATH_ID      = "TOUR_TAG_IMAGE_FILE_PATH";         //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_TAGS;
@@ -2302,6 +2304,27 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TagID_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+
+            return colDef;
+         }
+      };
+
+      TOUR_TAG_IMAGE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(
+                  columnManager,
+                  TOUR_TAG_IMAGE_ID,
+                  SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
+
+            colDef.setColumnLabel(              "Image");
+            colDef.setColumnHeaderText(         "Image");
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
 
             return colDef;
          }

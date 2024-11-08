@@ -1694,6 +1694,7 @@ public class ElevationCompareResultView extends ViewPart implements
     * @param parentItem
     * @param requestedItem
     * @param viewerTreePaths
+    *
     * @return
     */
    private void getComparedTour(final TreeViewerItem parentItem,
@@ -2028,9 +2029,13 @@ public class ElevationCompareResultView extends ViewPart implements
             final Image image = TourTypeImage.getTourTypeImage(tourType.getTypeId());
             if (image != null) {
 
-               final int alignment = _colDef_TourTypeImage.getColumnStyle();
+               UI.paintImage(
 
-               UI.paintImage(event, image, _columnWidth_TourTypeImage, alignment);
+                     event,
+                     image,
+                     _columnWidth_TourTypeImage,
+                     _colDef_TourTypeImage.getColumnStyle(), // horizontal alignment
+                     TourTypeImage.getHorizontalOffset());
             }
          }
       }

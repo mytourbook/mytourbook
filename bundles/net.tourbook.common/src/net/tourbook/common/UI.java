@@ -2758,49 +2758,90 @@ public class UI {
     * @param event
     * @param image
     * @param availableWidth
-    * @param alignment
+    * @param horizontalAlignment
     *           SWT.* alignment values
+    * @param horizontalOffset
+    *           Horizontal offset when image is centered
     */
    public static void paintImage(final Event event,
                                  final Image image,
                                  final int availableWidth,
-                                 final int alignment) {
+                                 final int horizontalAlignment,
+                                 final int horizontalOffset) {
+
+      paintImage(
+
+            event,
+            image,
+            availableWidth,
+            horizontalAlignment,
+            SWT.TOP,
+            horizontalOffset);
+   }
+
+   /**
+    * @param event
+    * @param image
+    * @param availableWidth
+    * @param horizontalAlignment
+    *           SWT.* alignment values
+    * @param verticalAlignment
+    *           SWT.* alignment values
+    * @param horizontalOffset
+    *           Horizontal offset when image is centered
+    */
+   public static void paintImage(final Event event,
+                                 final Image image,
+                                 final int availableWidth,
+                                 final int horizontalAlignment,
+                                 final int verticalAlignment,
+                                 final int horizontalOffset) {
 
       final Rectangle imageRect = image.getBounds();
 
       final int imageWidth = imageRect.width;
-      final int imageWidth2 = imageWidth / 2;
 
       /*
        * Horizontal alignment
        */
       int xOffset = 0;
-      final int horizontalOSOffset = UI.IS_WIN
 
-            // W$ has a horizontal indent which prevents to be exactly centered
-            ? 4
-            : 0;
+      switch (horizontalAlignment) {
 
-      switch (alignment) {
-
-      case SWT.CENTER -> xOffset = ((availableWidth - imageWidth2) / 2) - horizontalOSOffset;
+      case SWT.CENTER -> xOffset = ((availableWidth - imageWidth) / 2) + horizontalOffset;
       case SWT.RIGHT  -> xOffset = availableWidth - imageWidth;
-      default         -> xOffset = 2; // == left alignment
+
+      // == left alignment
+      default -> xOffset = 2;
 
       }
 
       /*
-       * Vertical alignment: centered
+       * Vertical alignment
        */
-      final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
+      final int cellHeight = event.height;
+      final int imageHeight = imageRect.height;
 
+      int yOffset;
+      
+      switch (verticalAlignment) {
+
+      case SWT.CENTER -> yOffset = (cellHeight - imageHeight) / 2;
+      case SWT.BOTTOM -> yOffset = cellHeight - imageHeight;
+      default         -> yOffset = 0; // == top alignment
+
+      }
+
+      /*
+       * Paint image
+       */
       final int devX = event.x + xOffset;
       final int devY = event.y + yOffset;
 
       final GC gc = event.gc;
 
-//    gc.setBackground(UI.SYS_COLOR_YELLOW);
-//    gc.fillRectangle(event.x, devY, availableWidth, imageRect.height);
+//      gc.setBackground(UI.SYS_COLOR_YELLOW);
+//      gc.fillRectangle(event.x, event.y, availableWidth, imageRect.height);
 
       gc.drawImage(image, devX, devY);
    }

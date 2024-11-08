@@ -1815,9 +1815,13 @@ public class ReferenceTourView extends ViewPart implements
          final Image image = TourTypeImage.getTourTypeImage(tourTypeId);
          if (image != null) {
 
-            final int alignment = _colDef_TourTypeImage.getColumnStyle();
+            UI.paintImage(
 
-            UI.paintImage(event, image, _columnWidth_TourTypeImage, alignment);
+                  event,
+                  image,
+                  _columnWidth_TourTypeImage,
+                  _colDef_TourTypeImage.getColumnStyle(), // horizontal alignment
+                  TourTypeImage.getHorizontalOffset());
          }
       }
    }
