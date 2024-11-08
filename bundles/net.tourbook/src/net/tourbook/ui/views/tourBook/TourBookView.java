@@ -3240,9 +3240,11 @@ public class TourBookView extends ViewPart implements
          final Image image = TourTypeImage.getTourTypeImage(tourTypeId);
          if (image != null) {
 
-            final int alignment = _colDef_TourTypeImage_Tree.getColumnStyle();
-
-            UI.paintImage(event, image, _columnWidth_TourTypeImage, alignment);
+            UI.paintImage(event,
+                  image,
+                  _columnWidth_TourTypeImage,
+                  _colDef_TourTypeImage_Tree.getColumnStyle(), // horizontal alignment
+                  TourTypeImage.getHorizontalOffset());
          }
       }
    }
@@ -3275,7 +3277,7 @@ public class TourBookView extends ViewPart implements
 
                final int alignment = _colDef_WeatherClouds_Tree.getColumnStyle();
 
-               UI.paintImage(event, image, _columnWidth_WeatherClouds, alignment);
+               UI.paintImage(event, image, _columnWidth_WeatherClouds, alignment, 0);
             }
          }
       }

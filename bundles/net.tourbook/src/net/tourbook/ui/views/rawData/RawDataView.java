@@ -4985,9 +4985,13 @@ public class RawDataView extends ViewPart implements
 
             if (image != null) {
 
-               final int alignment = _colDef_TourTypeImage.getColumnStyle();
+               UI.paintImage(
 
-               UI.paintImage(event, image, _columnWidth_TourTypeImage, alignment);
+                     event,
+                     image,
+                     _columnWidth_TourTypeImage,
+                     _colDef_TourTypeImage.getColumnStyle(), // horizontal alignment
+                     TourTypeImage.getHorizontalOffset());
             }
          }
       }
@@ -5020,7 +5024,7 @@ public class RawDataView extends ViewPart implements
 
                final int alignment = _colDef_WeatherClouds.getColumnStyle();
 
-               UI.paintImage(event, image, _columnWidth_WeatherClouds, alignment);
+               UI.paintImage(event, image, _columnWidth_WeatherClouds, alignment, 0);
             }
          }
       }

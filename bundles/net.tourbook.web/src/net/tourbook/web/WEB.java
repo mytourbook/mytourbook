@@ -156,8 +156,12 @@ public class WEB {
    public static final boolean          STATE_USE_EXTERNAL_WEB_BROWSER_DEFAULT    = false;
 
    /**
-    * Common html body size for all web pages (when applied)
+    * Common html body font/size for all web pages (when applied)
     */
+   public static final String           STATE_BODY_FONT                           = "STATE_BODY_FONT";                         //$NON-NLS-1$
+   public static final String           STATE_BODY_FONT_CSS_REPLACEMENT_TAG       = "$BODY_FONT$";                             //$NON-NLS-1$
+   public static final String           STATE_BODY_FONT_DEFAULT                   = "courier";                                 //$NON-NLS-1$
+
    public static final String           STATE_BODY_FONT_SIZE                      = "STATE_BODY_FONT_SIZE";                    //$NON-NLS-1$
    public static final String           STATE_BODY_FONT_SIZE_CSS_REPLACEMENT_TAG  = "$BODY_FONT_SIZE$";                        //$NON-NLS-1$
    public static final int              STATE_BODY_FONT_SIZE_DEFAULT              = 13;
@@ -517,14 +521,14 @@ public class WEB {
             final String appCmd = appCmdLines[cmdIndex];
 
             if (cmdIndex == 0) {
-               commands.add(UI.SYMBOL_QUOTATION_MARK + appCmd + UI.SYMBOL_QUOTATION_MARK); 
+               commands.add(UI.SYMBOL_QUOTATION_MARK + appCmd + UI.SYMBOL_QUOTATION_MARK);
             } else {
                // don't add apostrophes, this causes errors
                commands.add(appCmd);
             }
          }
 
-         commands.add(UI.SYMBOL_QUOTATION_MARK + encodedUrl + UI.SYMBOL_QUOTATION_MARK); 
+         commands.add(UI.SYMBOL_QUOTATION_MARK + encodedUrl + UI.SYMBOL_QUOTATION_MARK);
 
       } else if (UI.IS_OSX) {
 

@@ -220,6 +220,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Category_Surfing;
    public static String        ColumnFactory_Category_Swimming;
    public static String        ColumnFactory_Category_Time;
+   public static String        ColumnFactory_Category_Tag;
    public static String        ColumnFactory_Category_Tour;
    public static String        ColumnFactory_Category_Training;
    public static String        ColumnFactory_Category_Waypoint;
@@ -491,8 +492,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_TagID_Header;
    public static String        ColumnFactory_TagID_Label;
    public static String        ColumnFactory_TagID_Tooltip;
-
-   public static String        ColumnFactory_TagImageFilePath_Header;
+   public static String        ColumnFactory_TagImageFile_Header;
+   public static String        ColumnFactory_TagImageFilePath_Header2;
    public static String        ColumnFactory_TagImageFilePath_Label;
    public static String        ColumnFactory_TagImageFilePath_Tooltip;
 

@@ -17,6 +17,11 @@ package net.tourbook.ui.views;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
 import net.tourbook.common.action.ActionResetToDefaults;
@@ -32,11 +37,16 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
@@ -55,8 +65,11 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 
    private MouseWheelListener           _defaultMouseWheelListener;
    private SelectionListener            _defaultSelectionListener;
+   private FocusListener                _keepOpenListener;
 
    private GridDataFactory              _firstColumnLayoutData;
+
+   private List<String>                 _allSortedFontNames;
 
    private PixelConverter               _pc;
 
@@ -70,6 +83,8 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
    private Button  _chkShowTourSummary;
    private Button  _chkShowTourTags;
    private Button  _chkShowTourWeather;
+
+   private Combo   _comboFonts;
 
    private Spinner _spinnerFontSize;
 
@@ -103,6 +118,8 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
       createActions();
 
       final Composite ui = createUI(parent);
+
+      fillUI();
 
       restoreState();
 
@@ -241,6 +258,21 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
          }
          {
             /*
+             * Font
+             */
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText("&Font");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
+
+            _comboFonts = new Combo(container, SWT.READ_ONLY);
+            _comboFonts.addSelectionListener(_defaultSelectionListener);
+            _comboFonts.addFocusListener(_keepOpenListener);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_comboFonts);
+         }
+         {
+            /*
              * Font size
              */
 
@@ -275,6 +307,69 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
       _chkShowHiddenMarker.setEnabled(isShowTourMarkers);
    }
 
+   private void fillUI() {
+
+      final FontData[] allScalabelFonts = Display.getDefault().getFontList(null, true);
+      final FontData[] allFixedFonts = Display.getDefault().getFontList(null, false);
+
+      final Set<String> allFontNames = new HashSet<>();
+
+      for (final FontData fontData : allFixedFonts) {
+         allFontNames.add(fontData.getName() + " (fixed)");
+      }
+
+      for (final FontData fontData : allScalabelFonts) {
+         allFontNames.add(fontData.getName());
+      }
+
+      _allSortedFontNames = new ArrayList<>(allFontNames);
+      java.util.Collections.sort(_allSortedFontNames);
+
+      for (final String fontName : _allSortedFontNames) {
+
+         _comboFonts.add(fontName);
+      }
+   }
+
+   private int getFontIndex(final String fontName) {
+
+      for (int fontIndex = 0; fontIndex < _allSortedFontNames.size(); fontIndex++) {
+
+         final String availableFontName = _allSortedFontNames.get(fontIndex);
+
+         if (availableFontName.equalsIgnoreCase(fontName)) {
+
+            return fontIndex;
+         }
+      }
+
+      final String defaultFontName = WEB.STATE_BODY_FONT_DEFAULT;
+
+      for (int fontIndex = 0; fontIndex < _allSortedFontNames.size(); fontIndex++) {
+
+         final String availableFontName = _allSortedFontNames.get(fontIndex);
+
+         if (availableFontName.equalsIgnoreCase(defaultFontName)) {
+
+            return fontIndex;
+         }
+      }
+
+      return 0;
+   }
+
+   private String getSelectedFont() {
+
+      final int selectionIndex = _comboFonts.getSelectionIndex();
+
+      if (selectionIndex >= 0) {
+
+         return _allSortedFontNames.get(selectionIndex);
+      }
+
+      return WEB.STATE_BODY_FONT_DEFAULT;
+   }
+
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
@@ -284,6 +379,21 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
       _defaultMouseWheelListener = mouseEvent -> {
          net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
          onChangeUI();
+      };
+
+      _keepOpenListener = new FocusListener() {
+
+         @Override
+         public void focusGained(final FocusEvent e) {
+
+            setIsAnotherDialogOpened(true);
+         }
+
+         @Override
+         public void focusLost(final FocusEvent e) {
+
+            setIsAnotherDialogOpened(false);
+         }
       };
 
       final int firstColumnIndent = _pc.convertWidthInCharsToPixels(3);
@@ -307,15 +417,16 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 
 // SET_FORMATTING_OFF
 
-      _chkDrawMarkerWithDefaultColor.setSelection(    TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT);
-      _chkShowHiddenMarker.setSelection(              TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT);
-      _chkShowTourMarkers.setSelection(               TourBlogView.STATE_IS_SHOW_TOUR_MARKERS_DEFAULT);
-      _chkShowTourNutrition.setSelection(             TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION_DEFAULT);
-      _chkShowTourSummary.setSelection(               TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY_DEFAULT);
-      _chkShowTourTags.setSelection(                  TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT);
-      _chkShowTourWeather.setSelection(               TourBlogView.STATE_IS_SHOW_TOUR_WEATHER_DEFAULT);
+      _chkDrawMarkerWithDefaultColor   .setSelection(TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT);
+      _chkShowHiddenMarker             .setSelection(TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT);
+      _chkShowTourMarkers              .setSelection(TourBlogView.STATE_IS_SHOW_TOUR_MARKERS_DEFAULT);
+      _chkShowTourNutrition            .setSelection(TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION_DEFAULT);
+      _chkShowTourSummary              .setSelection(TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY_DEFAULT);
+      _chkShowTourTags                 .setSelection(TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT);
+      _chkShowTourWeather              .setSelection(TourBlogView.STATE_IS_SHOW_TOUR_WEATHER_DEFAULT);
 
-      _spinnerFontSize.setSelection(                  WEB.STATE_BODY_FONT_SIZE_DEFAULT);
+      _comboFonts                      .select(getFontIndex(WEB.STATE_BODY_FONT_DEFAULT));
+      _spinnerFontSize                 .setSelection(WEB.STATE_BODY_FONT_SIZE_DEFAULT);
 
 // SET_FORMATTING_ON
 
@@ -328,15 +439,16 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 
 // SET_FORMATTING_OFF
 
-      _chkDrawMarkerWithDefaultColor.setSelection(    Util.getStateBoolean(_state, TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT));
-      _chkShowHiddenMarker.setSelection(              Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,              TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT));
-      _chkShowTourMarkers.setSelection(               Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_MARKERS,               TourBlogView.STATE_IS_SHOW_TOUR_MARKERS_DEFAULT));
-      _chkShowTourNutrition.setSelection(             Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION,             TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION_DEFAULT));
-      _chkShowTourSummary.setSelection(               Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY,               TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY_DEFAULT));
-      _chkShowTourTags.setSelection(                  Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_TAGS,                  TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT));
-      _chkShowTourWeather.setSelection(               Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_WEATHER,               TourBlogView.STATE_IS_SHOW_TOUR_WEATHER_DEFAULT));
+      _chkDrawMarkerWithDefaultColor   .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR_DEFAULT));
+      _chkShowHiddenMarker             .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,              TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER_DEFAULT));
+      _chkShowTourMarkers              .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_MARKERS,               TourBlogView.STATE_IS_SHOW_TOUR_MARKERS_DEFAULT));
+      _chkShowTourNutrition            .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION,             TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION_DEFAULT));
+      _chkShowTourSummary              .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY,               TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY_DEFAULT));
+      _chkShowTourTags                 .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_TAGS,                  TourBlogView.STATE_IS_SHOW_TOUR_TAGS_DEFAULT));
+      _chkShowTourWeather              .setSelection(Util.getStateBoolean(_state, TourBlogView.STATE_IS_SHOW_TOUR_WEATHER,               TourBlogView.STATE_IS_SHOW_TOUR_WEATHER_DEFAULT));
 
-      _spinnerFontSize.setSelection(                  Util.getStateInt(_state_WEB, WEB.STATE_BODY_FONT_SIZE, WEB.STATE_BODY_FONT_SIZE_DEFAULT));
+      _comboFonts                      .select(getFontIndex(Util.getStateString  (_state_WEB, WEB.STATE_BODY_FONT,       WEB.STATE_BODY_FONT_DEFAULT)));
+      _spinnerFontSize                 .setSelection(Util.getStateInt            (_state_WEB, WEB.STATE_BODY_FONT_SIZE,  WEB.STATE_BODY_FONT_SIZE_DEFAULT));
 
 // SET_FORMATTING_ON
 
@@ -347,15 +459,16 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 
 // SET_FORMATTING_OFF
 
-      _state.put(TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  _chkDrawMarkerWithDefaultColor.getSelection());
-      _state.put(TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,              _chkShowHiddenMarker.getSelection());
-      _state.put(TourBlogView.STATE_IS_SHOW_TOUR_MARKERS,               _chkShowTourMarkers.getSelection());
-      _state.put(TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION,             _chkShowTourNutrition.getSelection());
-      _state.put(TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY,               _chkShowTourSummary.getSelection());
-      _state.put(TourBlogView.STATE_IS_SHOW_TOUR_TAGS,                  _chkShowTourTags.getSelection());
-      _state.put(TourBlogView.STATE_IS_SHOW_TOUR_WEATHER,               _chkShowTourWeather.getSelection());
+      _state.put(TourBlogView.STATE_IS_DRAW_MARKER_WITH_DEFAULT_COLOR,  _chkDrawMarkerWithDefaultColor   .getSelection());
+      _state.put(TourBlogView.STATE_IS_SHOW_HIDDEN_MARKER,              _chkShowHiddenMarker             .getSelection());
+      _state.put(TourBlogView.STATE_IS_SHOW_TOUR_MARKERS,               _chkShowTourMarkers              .getSelection());
+      _state.put(TourBlogView.STATE_IS_SHOW_TOUR_NUTRITION,             _chkShowTourNutrition            .getSelection());
+      _state.put(TourBlogView.STATE_IS_SHOW_TOUR_SUMMARY,               _chkShowTourSummary              .getSelection());
+      _state.put(TourBlogView.STATE_IS_SHOW_TOUR_TAGS,                  _chkShowTourTags                 .getSelection());
+      _state.put(TourBlogView.STATE_IS_SHOW_TOUR_WEATHER,               _chkShowTourWeather              .getSelection());
 
-      _state_WEB.put(WEB.STATE_BODY_FONT_SIZE,                          _spinnerFontSize.getSelection());
+      _state_WEB.put(WEB.STATE_BODY_FONT,                               getSelectedFont());
+      _state_WEB.put(WEB.STATE_BODY_FONT_SIZE,                          _spinnerFontSize                 .getSelection());
 
 // SET_FORMATTING_ON
    }

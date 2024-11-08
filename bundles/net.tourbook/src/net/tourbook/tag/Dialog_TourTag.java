@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,8 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tag;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -36,7 +34,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -74,12 +74,15 @@ public class Dialog_TourTag extends TitleAreaDialog {
    /*
     * UI controls
     */
-   private Button _btnDeleteImage;
+   private Button    _btnDeleteImage;
 
-   private Label  _canvasTagImage;
+   private Label     _canvasTagImage;
+   private Label     _lblImageFile;
 
-   private Text   _txtNotes;
-   private Text   _txtName;
+   private Text      _txtNotes;
+   private Text      _txtName;
+
+   private Composite _container;
 
    public Dialog_TourTag(final Shell parentShell,
                          final String dlgMessage,
@@ -150,67 +153,79 @@ public class Dialog_TourTag extends TitleAreaDialog {
     */
    private void createUI(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.swtDefaults().numColumns(4).applyTo(container);
-//    container.setBackground(UI.SYS_COLOR_CYAN);
+      _container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_container);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_container);
+//      _container.setBackground(UI.SYS_COLOR_CYAN);
       {
          {
             /*
              * Text: Name
              */
 
-            final Label label = new Label(container, SWT.NONE);
+            final Label label = new Label(_container, SWT.NONE);
             label.setText(Messages.Dialog_TourTag_Label_TagName);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
-            _txtName = new Text(container, SWT.BORDER);
-            GridDataFactory.fillDefaults().span(3, 1).grab(true, false).applyTo(_txtName);
+            _txtName = new Text(_container, SWT.BORDER);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtName);
          }
          {
             /*
-             * Label: Tag image
+             * Label: Image
              */
-            final int tagImageSize = TagManager.getTagImageSize();
 
-            final Label label = UI.createLabel(container, UI.EMPTY_STRING);
+            final Label label = UI.createLabel(_container, UI.EMPTY_STRING);
             label.setText(Messages.Dialog_TourTag_Label_Image);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
-            _canvasTagImage = new Label(container, SWT.NONE);
+            final Composite imageContainer = new Composite(_container, SWT.NONE);
             GridDataFactory.fillDefaults()
-                  .hint(tagImageSize, tagImageSize)
-                  .applyTo(_canvasTagImage);
-
-            final Composite imageContainer = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults()
-                  .span(2, 1)
-                  .align(SWT.RIGHT, SWT.TOP)
+                  .grab(true, false)
                   .applyTo(imageContainer);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(imageContainer);
+            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(imageContainer);
+//            imageContainer.setBackground(UI.SYS_COLOR_YELLOW);
             {
+               _lblImageFile = UI.createLabel(imageContainer, UI.EMPTY_STRING);
+               _lblImageFile.setText(Messages.Dialog_TourTag_Label_Image);
+               GridDataFactory.fillDefaults()
+                     .grab(true, false)
+                     .align(SWT.FILL, SWT.CENTER)
+                     .applyTo(_lblImageFile);
+
                final Button btnSelectImage = new Button(imageContainer, SWT.PUSH);
                btnSelectImage.setText(Messages.app_btn_browse);
-               btnSelectImage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectImage()));
-               GridDataFactory.fillDefaults().applyTo(btnSelectImage);
+               btnSelectImage.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelectImage()));
 
                _btnDeleteImage = new Button(imageContainer, SWT.PUSH);
                _btnDeleteImage.setImage(_imageTrash);
-               _btnDeleteImage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onDeleteImage()));
-               GridDataFactory.fillDefaults().applyTo(_btnDeleteImage);
+               _btnDeleteImage.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onDeleteImage()));
+
+            }
+            {
+               /*
+                * Tag image
+                */
+
+               UI.createSpacer_Horizontal(_container);
+
+               final int tagImageSize = TagManager.getTagImageSize();
+               _canvasTagImage = new Label(_container, SWT.NONE);
+               GridDataFactory.fillDefaults()
+                     .hint(tagImageSize, tagImageSize)
+                     .applyTo(_canvasTagImage);
             }
          }
          {
             /*
              * Text: Notes
              */
-            final Label label = new Label(container, SWT.NONE);
+            final Label label = new Label(_container, SWT.NONE);
             label.setText(Messages.Dialog_TourTag_Label_Notes);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 
-            _txtNotes = new Text(container, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
+            _txtNotes = new Text(_container, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
             GridDataFactory.fillDefaults()
-                  .span(3, 1)
                   .grab(true, true)
                   .hint(convertWidthInCharsToPixels(100), convertHeightInCharsToPixels(20))
                   .applyTo(_txtNotes);
@@ -230,8 +245,10 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       if (_canvasTagImage == null ||
             _canvasTagImage.getImage() == _imageCamera) {
+
          return;
       }
+
       UI.disposeResource(_canvasTagImage.getImage());
    }
 
@@ -291,6 +308,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
          return;
       }
 
+      _lblImageFile.setText(imageFilePath);
       setTagImage(imageFilePath);
 
       final String filePathFolder = Paths.get(imageFilePath).getParent().toString();
@@ -303,9 +321,12 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
    private void restoreState() {
 
+      _imageFilePath = _tourTag_Clone.getImageFilePath();
+
+      _lblImageFile.setText(_imageFilePath == null ? UI.EMPTY_STRING : _imageFilePath);
+
       _txtName.setText(_tourTag_Clone.getTagName());
       _txtNotes.setText(_tourTag_Clone.getNotes());
-      _imageFilePath = _tourTag_Clone.getImageFilePath();
 
       setTagImage(_imageFilePath);
    }
@@ -325,24 +346,28 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       if (StringUtils.hasContent(imageFilePath)) {
 
-         if (!Files.exists(Paths.get(imageFilePath))) {
+         if (Files.exists(Paths.get(imageFilePath)) == false) {
 
-            setErrorMessage(NLS.bind(
-                  Messages.Dialog_TourTag_Label_ImageNotFound,
-                  imageFilePath));
+            setErrorMessage(NLS.bind(Messages.Dialog_TourTag_Label_ImageNotFound, imageFilePath));
 
          } else {
 
             _imageFilePath = imageFilePath;
 
             BusyIndicator.showWhile(Display.getCurrent(),
-                  () -> image[0] = TagManager.prepareTagImage(_imageFilePath));
+                  () -> image[0] = TagManager.createTagImage(_imageFilePath));
          }
       }
 
-      //Before setting a new image, we make sure that the previous one was disposed
+      // Before setting a new image, we make sure that the previous one was disposed
       disposeCanvasTagImage();
 
       _canvasTagImage.setImage(image[0]);
+
+      // update layout
+      final GridData gd = (GridData) _canvasTagImage.getLayoutData();
+      gd.heightHint = image[0].getBounds().height;
+      _container.layout(true, true);
+
    }
 }

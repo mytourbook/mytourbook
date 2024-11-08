@@ -43,7 +43,7 @@ public class UITests {
             () -> assertEquals(256, originalImage.getBounds().height),
             () -> assertEquals(256, originalImage.getBounds().width));
 
-      final Image resizedImage = TagManager.prepareTagImage(imageFilePath);
+      final Image resizedImage = TagManager.createTagImage(imageFilePath);
 
       assertAll(
             () -> assertNotNull(resizedImage),

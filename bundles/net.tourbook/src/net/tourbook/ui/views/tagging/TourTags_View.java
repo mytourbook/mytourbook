@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ColumnProfile;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITreeViewer;
@@ -45,6 +46,7 @@ import net.tourbook.preferences.PrefPageTags;
 import net.tourbook.tag.TVIPrefTag;
 import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tag.TVIPrefTagRoot;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
@@ -88,6 +90,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionEvent;
@@ -96,6 +99,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
@@ -121,6 +125,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
    private static final String                 STATE_SORT_COLUMN_ID                      = "STATE_SORT_COLUMN_ID";                        //$NON-NLS-1$
 
    private static final String                 COLUMN_ID                                 = "id";                                          //$NON-NLS-1$
+   private static final String                 COLUMN_IMAGE                              = "image";                                       //$NON-NLS-1$
    private static final String                 COLUMN_IMAGEFILEPATH                      = "imageFilePath";                               //$NON-NLS-1$
    private static final String                 COLUMN_NOTES                              = "notes";                                       //$NON-NLS-1$
    private static final String                 COLUMN_TAGS                               = "tags";                                        //$NON-NLS-1$
@@ -137,6 +142,9 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
    private TagViewerComparator                 _tagViewerComparator                      = new TagViewerComparator();
    private TagFilter                           _tagFilter                                = new TagFilter();
    private ColumnManager                       _columnManager;
+   private TreeColumnDefinition                _colDef_TagImage;
+   private int                                 _columnIndex_TagImage;
+   private int                                 _columnWidth_TagImage;
    private TVIPrefTagRoot                      _rootItem;
 
    private HashSet<Long>                       _allCheckedTagIds                         = new HashSet<>();
@@ -385,8 +393,25 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
                rc = tourTag1.getTagId() - tourTag2.getTagId();
                break;
 
+            case COLUMN_IMAGE:
             case COLUMN_IMAGEFILEPATH:
-               rc = tourTag1.getImageFilePath().compareTo(tourTag2.getImageFilePath());
+
+               final String imageFilePath1 = tourTag1.getImageFilePath();
+               final String imageFilePath2 = tourTag2.getImageFilePath();
+
+               if (imageFilePath1 != null && imageFilePath2 != null) {
+
+                  rc = imageFilePath1.compareTo(imageFilePath2);
+
+               } else if (imageFilePath1 != null) {
+
+                  rc = 1;
+
+               } else if (imageFilePath2 != null) {
+
+                  rc = -1;
+               }
+
                break;
 
             case COLUMN_TAGS:
@@ -528,7 +553,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
          disposeContextMenu();
 
-         _treeContextMenu = createUI_84_CreateViewerContextMenu();
+         _treeContextMenu = createUI_86_CreateViewerContextMenu();
 
          return _treeContextMenu;
       }
@@ -613,7 +638,9 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
             clearView();
 
-         } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+         } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED
+               || tourEventId == TourEventId.TAG_CONTENT_CHANGED // tag image size is modified
+         ) {
 
             recreateViewer(_tagViewer);
 
@@ -722,7 +749,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
       {
          {
             /*
@@ -835,15 +862,42 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
       _tagViewer.addSelectionChangedListener(this::onTagViewer_Select);
 
-      createUI_82_ContextMenu();
+      createUI_82_ColumnImages(tree);
+      createUI_84_ContextMenu();
+   }
+
+   private void createUI_82_ColumnImages(final Tree tree) {
+
+      // update column index which is needed for repainting
+      final ColumnProfile activeProfile = _columnManager.getActiveProfile();
+      _columnIndex_TagImage = activeProfile.getColumnIndex(_colDef_TagImage.getColumnId());
+
+      final int numColumns = tree.getColumns().length;
+
+      // add column listeners
+      if (_columnIndex_TagImage >= 0 && _columnIndex_TagImage < numColumns) {
+
+         // column is visible
+
+         final ControlListener controlResizedAdapter = ControlListener.controlResizedAdapter(controlEvent -> onResize_SetWidthForImageColumn());
+
+         tree.getColumn(_columnIndex_TagImage).addControlListener(controlResizedAdapter);
+         tree.addControlListener(controlResizedAdapter);
+
+         /*
+          * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
+          * critical for performance that these methods be as efficient as possible.
+          */
+         tree.addListener(SWT.PaintItem, event -> onPaintViewer(event));
+      }
    }
 
    /**
     * Setup the viewer context menu
     */
-   private void createUI_82_ContextMenu() {
+   private void createUI_84_ContextMenu() {
 
-      _treeContextMenu = createUI_84_CreateViewerContextMenu();
+      _treeContextMenu = createUI_86_CreateViewerContextMenu();
 
       final Tree tree = (Tree) _tagViewer.getControl();
 
@@ -855,7 +909,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
     *
     * @return
     */
-   private Menu createUI_84_CreateViewerContextMenu() {
+   private Menu createUI_86_CreateViewerContextMenu() {
 
       final Tree tree = _tagViewer.getTree();
 
@@ -881,7 +935,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
       defineColumn_10_Tags();
       defineColumn_20_Notes();
-      defineColumn_30_ImageFilePath();
+      defineColumn_30_Image();
+      defineColumn_40_ImageFilePath();
       defineColumn_99_ID();
    }
 
@@ -996,10 +1051,29 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
       });
    }
 
-   private void defineColumn_30_ImageFilePath() {
+   /**
+    * Column: Image
+    */
+   private void defineColumn_30_Image() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAG_IMAGE_FILE_PATH
-            .createColumn(_columnManager, _pc);
+      _colDef_TagImage = TreeColumnFactory.TOUR_TAG_IMAGE.createColumn(_columnManager, _pc);
+
+      _colDef_TagImage.setColumnId(COLUMN_IMAGE);
+      _colDef_TagImage.setColumnSelectionListener(_columnSortListener);
+
+      _colDef_TagImage.setLabelProvider(new CellLabelProvider() {
+
+         // !!! set dummy label provider, otherwise an error occurs !!!
+         // the image is painted in onPaintViewer()
+
+         @Override
+         public void update(final ViewerCell cell) {}
+      });
+   }
+
+   private void defineColumn_40_ImageFilePath() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAG_IMAGE_FILE_PATH.createColumn(_columnManager, _pc);
 
       colDef.setColumnId(COLUMN_IMAGEFILEPATH);
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -1347,6 +1421,56 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 //      _tagViewer.refresh();
 
       enableControls();
+   }
+
+   private void onPaintViewer(final Event event) {
+
+      // skip other columns
+      if (event.index != _columnIndex_TagImage) {
+         return;
+      }
+
+      final TreeItem item = (TreeItem) event.item;
+      final Object itemData = item.getData();
+
+      // skip other tree items
+      if (itemData instanceof final TVIPrefTag prefTag) {
+
+         /*
+          * Paint tag image
+          */
+
+         final TourTag tourTag = prefTag.getTourTag();
+         final Image tagImage = TagManager.getTagImage(tourTag);
+
+         if (tagImage != null && tagImage.isDisposed() == false) {
+
+            UI.paintImage(
+
+                  event,
+                  tagImage,
+                  _columnWidth_TagImage,
+
+                  _colDef_TagImage.getColumnStyle(), //  horizontal alignment
+                  SWT.CENTER, //                         vertical alignment
+
+                  0 //                                   horizontal offset
+            );
+         }
+      }
+   }
+
+   private void onResize_SetWidthForImageColumn() {
+
+      if (_colDef_TagImage != null) {
+
+         final TreeColumn treeColumn = _colDef_TagImage.getTreeColumn();
+
+         if (treeColumn != null && treeColumn.isDisposed() == false) {
+
+            _columnWidth_TagImage = treeColumn.getWidth();
+         }
+      }
    }
 
    private void onSelect_SortColumn(final SelectionEvent e) {

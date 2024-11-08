@@ -34,6 +34,7 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ColumnProfile;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITreeViewer;
@@ -112,6 +113,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Color;
@@ -122,6 +124,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.part.ViewPart;
@@ -197,6 +200,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private TreeViewer                          _tagViewer;
    private TVITaggingView_Root                 _rootItem;
    private ColumnManager                       _columnManager;
+   private TreeColumnDefinition                _colDef_TagImage;
+   private int                                 _columnIndex_TagImage;
+   private int                                 _columnWidth_TagImage;
 
    private ISelectionListener                  _postSelectionListener;
    private PostSelectionProvider               _postSelectionProvider;
@@ -643,6 +649,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
 
          } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED
+               || tourEventId == TourEventId.TAG_CONTENT_CHANGED // tag image size is modified
                || tourEventId == TourEventId.UPDATE_UI) {
 
             reloadViewer();
@@ -813,6 +820,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
        * belongs to the old viewer
        */
       createUI_20_ContextMenu();
+      createUI_30_ColumnImages(tree);
 
       fillToolBar();
 
@@ -860,6 +868,32 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       return treeContextMenu;
    }
 
+   private void createUI_30_ColumnImages(final Tree tree) {
+
+      // update column index which is needed for repainting
+      final ColumnProfile activeProfile = _columnManager.getActiveProfile();
+      _columnIndex_TagImage = activeProfile.getColumnIndex(_colDef_TagImage.getColumnId());
+
+      final int numColumns = tree.getColumns().length;
+
+      // add listeners
+      if (_columnIndex_TagImage >= 0 && _columnIndex_TagImage < numColumns) {
+
+         // column is visible
+
+         final ControlListener controlResizedAdapter = ControlListener.controlResizedAdapter(controlEvent -> onResize_SetWidthForImageColumn());
+
+         tree.getColumn(_columnIndex_TagImage).addControlListener(controlResizedAdapter);
+         tree.addControlListener(controlResizedAdapter);
+
+         /*
+          * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
+          * critical for performance that these methods be as efficient as possible.
+          */
+         tree.addListener(SWT.PaintItem, event -> onPaintViewer(event));
+      }
+   }
+
    /**
     * Defines all columns for the table viewer in the column manager
     */
@@ -875,6 +909,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       defineColumn_Tour_Tags();
       defineColumn_Tour_TagAndCategoryNotes();
       defineColumn_Tour_TagID();
+      defineColumn_Tour_TagImage();
       defineColumn_Tour_TagImageFilePath();
 
       defineColumn_Motion_Distance();
@@ -899,7 +934,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
     */
    private void defineColumn_1stColumn() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAG_AND_TAGS.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAG_AND_CATEGORY.createColumn(_columnManager, _pc);
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
       colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
@@ -1446,10 +1481,26 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       });
    }
 
+   /**
+    * Column: Image
+    */
+   private void defineColumn_Tour_TagImage() {
+
+      _colDef_TagImage = TreeColumnFactory.TOUR_TAG_IMAGE.createColumn(_columnManager, _pc);
+
+      _colDef_TagImage.setLabelProvider(new CellLabelProvider() {
+
+         // !!! set dummy label provider, otherwise an error occurs !!!
+         // the image is painted in onPaintViewer()
+
+         @Override
+         public void update(final ViewerCell cell) {}
+      });
+   }
+
    private void defineColumn_Tour_TagImageFilePath() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAG_IMAGE_FILE_PATH
-            .createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAG_IMAGE_FILE_PATH.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
 
@@ -1578,7 +1629,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                return;
             }
 
-            final double temperature = net.tourbook.common.UI.convertTemperatureFromMetric(//
+            final double temperature = net.tourbook.common.UI.convertTemperatureFromMetric(
                   ((TVITaggingView_Item) element).colAvgTemperature_Device);
 
             colDef.printDoubleValue(cell, temperature, element instanceof TVITaggingView_Tour);
@@ -1993,7 +2044,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       for (final TreeViewerItem childItem : allFetchedChildren) {
 
-         if (childItem instanceof final TVITaggingView_Tour tourItem) {
+         if (childItem instanceof TVITaggingView_Tour) {
 
             numTours_InTourItems++;
 
@@ -2195,6 +2246,56 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       updateUI_TagLayoutAction();
 
       reloadViewer();
+   }
+
+   private void onPaintViewer(final Event event) {
+
+      // skip other columns
+      if (event.index != _columnIndex_TagImage) {
+         return;
+      }
+
+      final TreeItem item = (TreeItem) event.item;
+      final Object itemData = item.getData();
+
+      // skip other tree items
+      if (itemData instanceof final TVITaggingView_Tag prefTag) {
+
+         /*
+          * Paint tag image
+          */
+
+         final TourTag tourTag = prefTag.getTourTag();
+         final Image tagImage = TagManager.getTagImage(tourTag);
+
+         if (tagImage != null && tagImage.isDisposed() == false) {
+
+            UI.paintImage(
+
+                  event,
+                  tagImage,
+                  _columnWidth_TagImage,
+
+                  _colDef_TagImage.getColumnStyle(), //  horizontal alignment
+                  SWT.CENTER, //                         vertical alignment
+
+                  0 //                                   horizontal offset
+            );
+         }
+      }
+   }
+
+   private void onResize_SetWidthForImageColumn() {
+
+      if (_colDef_TagImage != null) {
+
+         final TreeColumn treeColumn = _colDef_TagImage.getTreeColumn();
+
+         if (treeColumn != null && treeColumn.isDisposed() == false) {
+
+            _columnWidth_TagImage = treeColumn.getWidth();
+         }
+      }
    }
 
    private void onSelect_CategoryItem(final TreeSelection treeSelection) {
