@@ -638,7 +638,9 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
             clearView();
 
-         } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+         } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED
+               || tourEventId == TourEventId.TAG_CONTENT_CHANGED // tag image size is modified
+         ) {
 
             recreateViewer(_tagViewer);
 

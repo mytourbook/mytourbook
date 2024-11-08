@@ -323,7 +323,8 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       _imageFilePath = _tourTag_Clone.getImageFilePath();
 
-      _lblImageFile.setText(_imageFilePath);
+      _lblImageFile.setText(_imageFilePath == null ? UI.EMPTY_STRING : _imageFilePath);
+
       _txtName.setText(_tourTag_Clone.getTagName());
       _txtNotes.setText(_tourTag_Clone.getNotes());
 
@@ -345,11 +346,9 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       if (StringUtils.hasContent(imageFilePath)) {
 
-         if (!Files.exists(Paths.get(imageFilePath))) {
+         if (Files.exists(Paths.get(imageFilePath)) == false) {
 
-            setErrorMessage(NLS.bind(
-                  Messages.Dialog_TourTag_Label_ImageNotFound,
-                  imageFilePath));
+            setErrorMessage(NLS.bind(Messages.Dialog_TourTag_Label_ImageNotFound, imageFilePath));
 
          } else {
 
