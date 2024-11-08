@@ -2321,8 +2321,8 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
 
-            colDef.setColumnLabel(              "Image");
-            colDef.setColumnHeaderText(         "Image");
+            colDef.setColumnLabel(              Messages.ColumnFactory_TagImageFile_Header);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_TagImageFile_Header);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(15));
 
@@ -2343,7 +2343,7 @@ public abstract class TreeColumnFactory {
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_TagImageFilePath_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_TagImageFilePath_Header);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_TagImageFilePath_Header2);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TagImageFilePath_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(25));

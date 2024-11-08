@@ -1993,7 +1993,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       for (final TreeViewerItem childItem : allFetchedChildren) {
 
-         if (childItem instanceof final TVITaggingView_Tour tourItem) {
+         if (childItem instanceof TVITaggingView_Tour) {
 
             numTours_InTourItems++;
 
