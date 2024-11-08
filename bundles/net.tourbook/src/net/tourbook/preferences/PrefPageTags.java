@@ -108,7 +108,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
@@ -615,15 +614,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
        * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is critical
        * for performance that these methods be as efficient as possible.
        */
-      final Listener paintListener = event -> {
-
-         if (event.type == SWT.PaintItem) {
-
-            onPaintViewer(event);
-         }
-      };
-      tree.addListener(SWT.MeasureItem, paintListener);
-      tree.addListener(SWT.PaintItem, paintListener);
+      tree.addListener(SWT.PaintItem, event -> onPaintViewer(event));
 
       _tagViewer = new TreeViewer(tree);
 
