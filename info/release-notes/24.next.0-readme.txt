@@ -50,7 +50,7 @@ New
 ===
 
 * Tour Info Tooltip (Frederic):
-  - New fields: elapsed time at night and during the day
+  - New fields: elapsed time at night and during the day for tours that also happen during the night
 
 * Tour Nutrition (Frederic):
   - Support for the carbohydrates
