@@ -28,10 +28,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.autocomplete.AutoComplete_ComboInputMT;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
@@ -201,47 +201,47 @@ public class DialogExportTour extends TitleAreaDialog {
    /*
     * UI controls
     */
-   private Button                 _btnSelectFile;
+   private Button                    _btnSelectFile;
 
-   private Button                 _chkCamouflageSpeed;
-   private Button                 _chkExportTourRange;
-   private Button                 _chkMergeAllTours;
-   private Button                 _chkOverwriteFiles;
+   private Button                    _chkCamouflageSpeed;
+   private Button                    _chkExportTourRange;
+   private Button                    _chkMergeAllTours;
+   private Button                    _chkOverwriteFiles;
 
-   private Button                 _chkGPX_Description;
-   private Button                 _rdoGPX_DistanceAbsolute;
-   private Button                 _rdoGPX_DistanceRelative;
-   private Button                 _chkGPX_Markers;
-   private Button                 _chkGPX_NoneGPXFields;
-   private Button                 _chkGPX_SurfingWaves;
-   private Button                 _chkGPX_WithBarometer;
+   private Button                    _chkGPX_Description;
+   private Button                    _rdoGPX_DistanceAbsolute;
+   private Button                    _rdoGPX_DistanceRelative;
+   private Button                    _chkGPX_Markers;
+   private Button                    _chkGPX_NoneGPXFields;
+   private Button                    _chkGPX_SurfingWaves;
+   private Button                    _chkGPX_WithBarometer;
 
-   private Button                 _chkTCX_Description;
-   private Button                 _rdoTCX_Activities;
-   private Button                 _rdoTCX_Courses;
-   private Button                 _rdoTCX_NameFromField;
-   private Button                 _rdoTCX_NameFromTour;
+   private Button                    _chkTCX_Description;
+   private Button                    _rdoTCX_Activities;
+   private Button                    _rdoTCX_Courses;
+   private Button                    _rdoTCX_NameFromField;
+   private Button                    _rdoTCX_NameFromTour;
 
-   private Combo                  _comboFile;
-   private Combo                  _comboPath;
-   private Combo                  _comboTcxActivityTypes;
-   private Combo                  _comboTcxCourseName;
+   private Combo                     _comboFile;
+   private Combo                     _comboPath;
+   private Combo                     _comboTcxActivityTypes;
+   private Combo                     _comboTcxCourseName;
 
-   private ImageDescriptor        _imageDescriptor;
+   private ImageDescriptor           _imageDescriptor;
 
-   private Composite              _dlgContainer;
-   private Composite              _inputContainer;
+   private Composite                 _dlgContainer;
+   private Composite                 _inputContainer;
 
-   private Label                  _lblCamouflageSpeedUnit;
-   private Label                  _lblTcxActivityType;
-   private Label                  _lblTcxCourseName;
-   private Label                  _lblTcxNameFrom;
+   private Label                     _lblCamouflageSpeedUnit;
+   private Label                     _lblTcxActivityType;
+   private Label                     _lblTcxCourseName;
+   private Label                     _lblTcxNameFrom;
 
-   private Spinner                _spinnerCamouflageSpeed;
+   private Spinner                   _spinnerCamouflageSpeed;
 
-   private Text                   _txtFilePath;
+   private Text                      _txtFilePath;
 
-   private AutocompleteComboInput _autocompleteTcxActivity;
+   private AutoComplete_ComboInputMT _autocompleteTcxActivity;
 
    /**
     * @param parentShell
@@ -1400,7 +1400,7 @@ public class DialogExportTour extends TitleAreaDialog {
             _comboTcxActivityTypes.select(_comboTcxActivityTypes.indexOf(lastSelected_ActivityType));
          }
 
-         _autocompleteTcxActivity = new AutocompleteComboInput(_comboTcxActivityTypes);
+         _autocompleteTcxActivity = new AutoComplete_ComboInputMT(_comboTcxActivityTypes);
          _autocompleteTcxActivity.restoreState(_state, STATE_AUTOCOMPLETE_POPUP_HEIGHT_TCX_ACTIVITY);
 
          updateUI_CourseName();

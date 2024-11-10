@@ -19,7 +19,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -137,8 +136,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
    private Text                      _txtWeatherDescription;
    private Text                      _txtWeather_Temperature_Average_Device;
 
-   private AutocompleteComboInput    _autoComplete_Location_End;
-   private AutocompleteComboInput    _autoComplete_Location_Start;
+   private AutoComplete_ComboInputMT _autoComplete_Location_End;
+   private AutoComplete_ComboInputMT _autoComplete_Location_Start;
    private AutoComplete_ComboInputMT _autoComplete_Title;
 
    private Boolean                   _tourLocation_HoverState;
@@ -434,7 +433,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
                   }
                }
 
-               _autoComplete_Location_Start = new AutocompleteComboInput(_comboLocation_Start);
+               _autoComplete_Location_Start = new AutoComplete_ComboInputMT(_comboLocation_Start);
             }
          }
       }
@@ -489,7 +488,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
                }
             }
 
-            _autoComplete_Location_End = new AutocompleteComboInput(_comboLocation_End);
+            _autoComplete_Location_End = new AutoComplete_ComboInputMT(_comboLocation_End);
          }
       }
    }

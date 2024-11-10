@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.autocomplete.AutoComplete_ComboInputMT;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnDefinitionFor1stVisibleAlignmentColumn;
 import net.tourbook.common.util.ColumnManager;
@@ -128,7 +128,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
    private IPropertyChangeListener   _prefChangeListener;
    private SelectionListener         _columnSortListener;
 
-   private AutocompleteComboInput    _autocompleteProductSearchHistory;
+   private AutoComplete_ComboInputMT _autocompleteProductSearchHistory;
 
    private ControlDecoration         _decorator_InvalidBarCode;
 
@@ -773,7 +773,7 @@ public class DialogSearchProduct extends TitleAreaDialog implements ITourViewer,
       _comboSearchType.add(Messages.Dialog_SearchProduct_Combo_SearchType_ByCode);
       _comboSearchType.select(0);
 
-      _autocompleteProductSearchHistory = new AutocompleteComboInput(_comboSearchQuery);
+      _autocompleteProductSearchHistory = new AutoComplete_ComboInputMT(_comboSearchQuery);
    }
 
    @Override

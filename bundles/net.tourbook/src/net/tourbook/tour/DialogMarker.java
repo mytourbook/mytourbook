@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -35,6 +34,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
+import net.tourbook.common.autocomplete.AutoComplete_ComboInputMT;
 import net.tourbook.common.form.SashBottomFixedForm;
 import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -194,7 +194,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    private Text                   _txtUrlAddress;
    private Text                   _txtUrlText;
 
-   private AutocompleteComboInput _autocompleteMarkerName;
+   private AutoComplete_ComboInputMT _autocompleteMarkerName;
 
    {
       _nf3.setMinimumFractionDigits(3);
@@ -1353,7 +1353,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _comboMarkerName.add(title);
       }
 
-      _autocompleteMarkerName = new AutocompleteComboInput(_comboMarkerName);
+      _autocompleteMarkerName = new AutoComplete_ComboInputMT(_comboMarkerName);
    }
 
    /**
