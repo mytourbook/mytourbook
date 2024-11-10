@@ -72,8 +72,8 @@ public abstract class AutoComplete_ComboMT extends AutoComplete_WidgetMT {
          adapter = new ContentProposalAdapter(combo,
                new ComboContentAdapter(),
                provider,
-               getActivationKeystroke(),
-               getAutoactivationChars());
+               null,
+               null);
 
          adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
       }

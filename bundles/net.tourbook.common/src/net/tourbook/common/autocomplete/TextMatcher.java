@@ -8,8 +8,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *******************************************************************************/
-/* Original package: package org.eclipse.ui.internal.misc;*/
 package net.tourbook.common.autocomplete;
+
+// Source: package org.eclipse.ui.internal.misc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +18,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
+
+import net.tourbook.common.UI;
 
 import org.eclipse.core.text.StringMatcher;
 
@@ -65,7 +68,11 @@ public final class TextMatcher {
     *            if {@code pattern == null}
     */
    public TextMatcher(final String pattern, final boolean ignoreCase, final boolean ignoreWildCards) {
-      full = new StringMatcher(pattern.trim(), ignoreCase, ignoreWildCards);
+
+      full = new StringMatcher(UI.SYMBOL_STAR + pattern.trim() + UI.SYMBOL_STAR,
+            ignoreCase,
+            ignoreWildCards);
+
       parts = splitPattern(pattern, ignoreCase, ignoreWildCards);
    }
 
@@ -128,30 +135,37 @@ public final class TextMatcher {
     *            if {@code text == null}
     */
    public boolean match(final String text, int start, int end) {
+
       if (text == null) {
          throw new IllegalArgumentException();
       }
+
       if (start > end) {
          return false;
       }
+
       final int tlen = text.length();
       start = Math.max(0, start);
       end = Math.min(end, tlen);
       if (full.match(text, start, end)) {
          return true;
       }
+
       final String[] words = getWords(text.substring(start, end));
       if (match(full, words)) {
          return true;
       }
+
       if (parts.isEmpty()) {
          return false;
       }
+
       for (final StringMatcher subMatcher : parts) {
          if (!subMatcher.match(text, start, end) && !match(subMatcher, words)) {
             return false;
          }
       }
+
       return true;
    }
 
@@ -162,24 +176,38 @@ public final class TextMatcher {
    private List<StringMatcher> splitPattern(final String pattern,
                                             final boolean ignoreCase,
                                             final boolean ignoreWildCards) {
-      final String pat = pattern.trim();
-      if (pat.isEmpty()) {
+
+      final String patternTrimmed = pattern.trim();
+      if (patternTrimmed.isEmpty()) {
          return Collections.emptyList();
       }
-      final String[] subPatterns = pat.split("\\s+"); //$NON-NLS-1$
-      if (subPatterns.length <= 1) {
+
+      final String[] allSubPatterns = patternTrimmed.split("\\s+"); //$NON-NLS-1$
+
+      if (allSubPatterns.length <= 1) {
          return Collections.emptyList();
       }
-      final List<StringMatcher> matchers = new ArrayList<>();
-      for (final String s : subPatterns) {
-         if (s == null || s.isEmpty()) {
+
+      final List<StringMatcher> allMatchers = new ArrayList<>();
+
+      for (final String subPattern : allSubPatterns) {
+
+         if (subPattern == null || subPattern.isEmpty()) {
             continue;
          }
-         final StringMatcher m = new StringMatcher(s, ignoreCase, ignoreWildCards);
-         m.usePrefixMatch();
-         matchers.add(m);
+
+         final String matcherString = UI.SYMBOL_STAR + subPattern + UI.SYMBOL_STAR;
+
+         final StringMatcher subPatternMatcher = new StringMatcher(matcherString,
+               ignoreCase,
+               ignoreWildCards);
+
+         subPatternMatcher.usePrefixMatch();
+
+         allMatchers.add(subPatternMatcher);
       }
-      return matchers;
+
+      return allMatchers;
    }
 
    @Override
