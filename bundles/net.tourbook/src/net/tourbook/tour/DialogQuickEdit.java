@@ -25,7 +25,7 @@ import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.autocomplete.AutocompleteComboInputMT;
+import net.tourbook.common.autocomplete.AutoComplete_ComboInputMT;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
@@ -110,38 +110,38 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
    /*
     * UI controls
     */
-   private Composite                _parent;
-   private Composite                _tourContainer;
+   private Composite                 _parent;
+   private Composite                 _tourContainer;
 
-   private FormToolkit              _tk;
-   private Form                     _formContainer;
+   private FormToolkit               _tk;
+   private Form                      _formContainer;
 
-   private CLabel                   _lblWeather_CloudIcon;
+   private CLabel                    _lblWeather_CloudIcon;
 
-   private Combo                    _comboLocation_Start;
-   private Combo                    _comboLocation_End;
-   private Combo                    _comboTitle;
-   private Combo                    _comboWeather_Clouds;
-   private Combo                    _comboWeather_Wind_DirectionText;
-   private Combo                    _comboWeather_Wind_SpeedText;
+   private Combo                     _comboLocation_Start;
+   private Combo                     _comboLocation_End;
+   private Combo                     _comboTitle;
+   private Combo                     _comboWeather_Clouds;
+   private Combo                     _comboWeather_Wind_DirectionText;
+   private Combo                     _comboWeather_Wind_SpeedText;
 
-   private Spinner                  _spinBodyWeight;
-   private Spinner                  _spinFTP;
-   private Spinner                  _spinRestPulse;
-   private Spinner                  _spinCalories;
-   private Spinner                  _spinWeather_Temperature_Average;
-   private Spinner                  _spinWeather_Wind_DirectionValue;
-   private Spinner                  _spinWeather_Wind_SpeedValue;
+   private Spinner                   _spinBodyWeight;
+   private Spinner                   _spinFTP;
+   private Spinner                   _spinRestPulse;
+   private Spinner                   _spinCalories;
+   private Spinner                   _spinWeather_Temperature_Average;
+   private Spinner                   _spinWeather_Wind_DirectionValue;
+   private Spinner                   _spinWeather_Wind_SpeedValue;
 
-   private Text                     _txtTourDescription;
-   private Text                     _txtWeatherDescription;
-   private Text                     _txtWeather_Temperature_Average_Device;
+   private Text                      _txtTourDescription;
+   private Text                      _txtWeatherDescription;
+   private Text                      _txtWeather_Temperature_Average_Device;
 
-   private AutocompleteComboInput   _autocomplete_Location_End;
-   private AutocompleteComboInput   _autocomplete_Location_Start;
-   private AutocompleteComboInputMT _autocomplete_Title;
+   private AutocompleteComboInput    _autoComplete_Location_End;
+   private AutocompleteComboInput    _autoComplete_Location_Start;
+   private AutoComplete_ComboInputMT _autoComplete_Title;
 
-   private Boolean                  _tourLocation_HoverState;
+   private Boolean                   _tourLocation_HoverState;
 
    private class ActionSlideout_WeatherOptions extends ActionToolbarSlideout {
 
@@ -357,7 +357,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
             _comboTitle.add(title);
          }
 
-         _autocomplete_Title = new AutocompleteComboInputMT(_comboTitle);
+         _autoComplete_Title = new AutoComplete_ComboInputMT(_comboTitle);
       }
       {
          /*
@@ -434,7 +434,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
                   }
                }
 
-               _autocomplete_Location_Start = new AutocompleteComboInput(_comboLocation_Start);
+               _autoComplete_Location_Start = new AutocompleteComboInput(_comboLocation_Start);
             }
          }
       }
@@ -489,7 +489,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
                }
             }
 
-            _autocomplete_Location_End = new AutocompleteComboInput(_comboLocation_End);
+            _autoComplete_Location_End = new AutocompleteComboInput(_comboLocation_End);
          }
       }
    }
@@ -1152,9 +1152,9 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
 
 // SET_FORMATTING_OFF
 
-      _autocomplete_Title           .saveState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE);
-      _autocomplete_Location_Start  .saveState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START);
-      _autocomplete_Location_End    .saveState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END);
+      _autoComplete_Title           .saveState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE);
+      _autoComplete_Location_Start  .saveState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START);
+      _autoComplete_Location_End    .saveState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END);
 
 // SET_FORMATTING_ON
 
@@ -1201,9 +1201,9 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
 
 // SET_FORMATTING_OFF
 
-      _autocomplete_Title           .restoreState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE);
-      _autocomplete_Location_Start  .restoreState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START);
-      _autocomplete_Location_End    .restoreState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END);
+      _autoComplete_Title           .restoreState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_TITLE);
+      _autoComplete_Location_Start  .restoreState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START);
+      _autoComplete_Location_End    .restoreState(state, TourDataEditorView.STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END);
 
 // SET_FORMATTING_ON
    }

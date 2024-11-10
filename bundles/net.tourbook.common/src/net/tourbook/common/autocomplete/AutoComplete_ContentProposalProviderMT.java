@@ -6,7 +6,7 @@ import java.util.List;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 
-public class AutocompleteContentProposalProviderMT implements IContentProposalProvider {
+public class AutoComplete_ContentProposalProviderMT implements IContentProposalProvider {
 
 	/*
 	 * The proposals provided.
@@ -21,7 +21,7 @@ public class AutocompleteContentProposalProviderMT implements IContentProposalPr
 	 *            the array of Strings to be returned whenever proposals are
 	 *            requested.
 	 */
-	public AutocompleteContentProposalProviderMT(String[] proposals) {
+	public AutoComplete_ContentProposalProviderMT(String[] proposals) {
 		super();
 		this.proposals = proposals;
 	}

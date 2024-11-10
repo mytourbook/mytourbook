@@ -4,10 +4,10 @@ import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.swt.SWT;
 
-public abstract class AutocompleteWidgetMT {
+public abstract class AutoComplete_WidgetMT {
 
-   protected AutocompleteInputContentProposalProviderMT provider = null;
-   protected ContentProposalAdapter                     adapter  = null;
+   protected AutoComplete_ContentProposalProviderMT provider = null;
+   protected ContentProposalAdapter                 adapter  = null;
 
    /**
     * Returns KeyStroke object which when pressed will fire the
@@ -49,6 +49,6 @@ public abstract class AutocompleteWidgetMT {
       return allChars.toCharArray();
    }
 
-   protected abstract AutocompleteInputContentProposalProviderMT getContentProposalProvider(String[] proposals);
+   protected abstract AutoComplete_ContentProposalProviderMT getContentProposalProvider(String[] proposals);
 
 }

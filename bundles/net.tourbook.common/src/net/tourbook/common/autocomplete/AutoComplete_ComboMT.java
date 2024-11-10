@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-public abstract class AutocompleteComboMT extends AutocompleteWidgetMT {
+public abstract class AutoComplete_ComboMT extends AutoComplete_WidgetMT {
 
    private static final int NUMBER_OF_DEFAULT_ROWS = 20;
 
@@ -58,7 +58,7 @@ public abstract class AutocompleteComboMT extends AutocompleteWidgetMT {
       }
    }
 
-   public AutocompleteComboMT(final Combo providedCombo) {
+   public AutoComplete_ComboMT(final Combo providedCombo) {
 
       combo = providedCombo;
 
