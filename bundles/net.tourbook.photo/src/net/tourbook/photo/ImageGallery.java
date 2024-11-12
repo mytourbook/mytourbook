@@ -96,9 +96,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -727,35 +725,21 @@ public abstract class ImageGallery implements
       _galleryMT20 = new GalleryImplementation(parent, _galleryStyle, _state);
 
       _galleryMT20.setHigherQualityDelay(200);
-//      _gallery.setAntialias(SWT.OFF);
-//      _gallery.setInterpolation(SWT.LOW);
       _galleryMT20.setAntialias(SWT.ON);
       _galleryMT20.setInterpolation(SWT.HIGH);
       _galleryMT20.setItemMinMaxSize(MIN_GALLERY_ITEM_WIDTH, MAX_GALLERY_ITEM_WIDTH);
 
-      _galleryMT20.addListener(SWT.Modify, new Listener() {
+      _galleryMT20.addListener(SWT.Modify, event -> {
 
          // a modify event is fired when gallery is zoomed in/out
 
-         @Override
-         public void handleEvent(final Event event) {
+         PhotoLoadManager.stopImageLoading(false);
 
-            PhotoLoadManager.stopImageLoading(false);
-
-            updateUI_AfterZoomInOut(event.width);
-         }
+         updateUI_AfterZoomInOut(event.width);
       });
 
-      _galleryMT20.addListener(SWT.Selection, new Listener() {
-
-         // a gallery item is selected/deselected
-
-         @Override
-         public void handleEvent(final Event event) {
-
-            onSelectPhoto();
-         }
-      });
+      // a gallery item is selected/deselected
+      _galleryMT20.addListener(SWT.Selection, event -> onSelectPhoto());
 
       _galleryMT20.setContextMenuProvider(this);
 

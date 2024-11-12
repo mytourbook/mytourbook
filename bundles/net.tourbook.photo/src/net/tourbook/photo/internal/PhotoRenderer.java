@@ -61,6 +61,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.imgscalr.Scalr.Rotation;
@@ -359,8 +360,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
       _photoWidth = galleryItemWidth - _gridBorderSize;
       _photoHeight = galleryItemHeight - _gridBorderSize;
 
-      int itemImageWidth = _photoWidth;
-      int itemImageHeight = _photoHeight;
+      int canvasWidth = _photoWidth;
+      int canvasHeight = _photoHeight;
 
       // center ratings stars in the middle of the image
       _ratingStarsLeftBorder = _photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
@@ -369,17 +370,20 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
       final int border2 = border / 2;
 
       // ignore border for small images
-      final boolean isBorder = itemImageWidth - border >= _textMinThumbSize;
+      final boolean isBorder = canvasWidth - border >= _textMinThumbSize;
 
-      itemImageWidth -= isBorder ? border : 0;
-      itemImageHeight -= isBorder ? border : 0;
-      _paintedDest_Width = itemImageWidth;
-      _paintedDest_Height = itemImageHeight;
+      canvasWidth -= isBorder ? border : 0;
+      canvasHeight -= isBorder ? border : 0;
+      _paintedDest_Width = canvasWidth;
+      _paintedDest_Height = canvasHeight;
 
       final int itemImageX = galleryItem.paintedX_Photo + (isBorder ? border2 : 0);
       final int itemImageY = galleryItem.paintedY_Photo + (isBorder ? border2 : 0);
 
-      final ImageQuality requestedImageQuality = itemImageWidth <= PhotoLoadManager.IMAGE_SIZE_THUMBNAIL
+      final float scaledCanvasWidth = DPIUtil.autoScaleUp(canvasWidth);
+      final boolean isThumbImage = scaledCanvasWidth <= PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
+
+      final ImageQuality requestedImageQuality = isThumbImage
             ? ImageQuality.THUMB
             : ImageQuality.HQ;
 
@@ -447,8 +451,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
          try {
 
             final Rectangle imageBounds = paintedImage.getBounds();
+            
             _paintedImageWidth = imageBounds.width;
             _paintedImageHeight = imageBounds.height;
+            
          } catch (final Exception e1) {
             StatusUtil.log(e1);
          }
@@ -460,8 +466,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
                itemImageX,
                itemImageY,
-               itemImageWidth,
-               itemImageHeight,
+               canvasWidth,
+               canvasHeight,
 
                isRequestedQuality,
                isSelected);
@@ -483,11 +489,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
          _paintedDest_DevY = itemImageY;
 
          draw_StatusText(gc,
-               galleryItem, //
+               galleryItem,
                itemImageX,
                itemImageY,
-               itemImageWidth,
-               itemImageHeight,
+               canvasWidth,
+               canvasHeight,
                requestedImageQuality,
                _isAttributesPainted && _isShowPhotoName,
                isSelected,
@@ -500,11 +506,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
       // draw name & date & annotations
       if (_isAttributesPainted && isDrawPhotoDateName) {
          draw_Attributes(gc,
-               photo, //
+               photo,
                itemImageX,
                itemImageY,
-               itemImageWidth,
-               itemImageHeight);
+               canvasWidth,
+               canvasHeight);
       }
 
       // annotations are drawn in the bottom right corner of the image
@@ -527,11 +533,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
          draw_InvalidImage(gc,
                galleryItem,
-               photo, //
+               photo,
                itemImageX,
                itemImageY,
-               itemImageWidth,
-               itemImageHeight);
+               canvasWidth,
+               canvasHeight);
       }
 
 //      // debug box for the whole gallery item area
@@ -766,7 +772,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
                      _paintedDest_DevY);
 
             } else {
-               
+
                // resize image to the canvas size
 
                final Point bestSize = RendererHelper.getBestSize(
