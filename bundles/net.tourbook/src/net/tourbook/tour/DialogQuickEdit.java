@@ -959,7 +959,9 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
             _comboWeather_Clouds.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> displayCloudIcon()));
 
             _tk.adapt(_comboWeather_Clouds, true, false);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_comboWeather_Clouds);
+            GridDataFactory.fillDefaults().span(2, 1)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_comboWeather_Clouds);
 
             // fill combobox
             for (final String cloudText : IWeather.CLOUD_TEXT) {
