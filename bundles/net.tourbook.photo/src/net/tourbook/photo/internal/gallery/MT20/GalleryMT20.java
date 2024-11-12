@@ -408,7 +408,7 @@ public abstract class GalleryMT20 extends Canvas {
     */
    private void addMouseListeners() {
 
-      addMouseWheelListener(this::onMouseWheel);
+      addMouseWheelListener(event -> onMouseWheel(event));
 
       addMouseListener(new MouseListener() {
 
@@ -429,11 +429,11 @@ public abstract class GalleryMT20 extends Canvas {
 
       });
 
-      addMouseTrackListener(mouseExitAdapter(this::onMouseExit));
+      addMouseTrackListener(mouseExitAdapter(event -> onMouseExit(event)));
 
-      addMouseMoveListener(this::onMouseMove);
+      addMouseMoveListener(event -> onMouseMove(event));
 
-      addMenuDetectListener(this::onMouseContextMenu);
+      addMenuDetectListener(event -> onMouseContextMenu(event));
    }
 
    /**
@@ -484,7 +484,7 @@ public abstract class GalleryMT20 extends Canvas {
       final ScrollBar verticalBar = getVerticalBar();
       if (verticalBar != null) {
 
-         verticalBar.addSelectionListener(widgetSelectedAdapter(this::onScrollVertical));
+         verticalBar.addSelectionListener(widgetSelectedAdapter(event -> onScrollVertical(event)));
       }
 
       // Horizontal bar
@@ -574,7 +574,7 @@ public abstract class GalleryMT20 extends Canvas {
 
       _contextMenuMgr.setRemoveAllWhenShown(true);
 
-      _contextMenuMgr.addMenuListener(this::fillContextMenu);
+      _contextMenuMgr.addMenuListener(menuManager -> fillContextMenu(menuManager));
 
       setMenu(_contextMenuMgr.createContextMenu(this));
    }

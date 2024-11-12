@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,6 +38,7 @@ import net.tourbook.photo.internal.RatingStarBehaviour;
 import net.tourbook.photo.internal.manager.GallerySorting;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -50,6 +51,7 @@ public class PhotoGallery extends ImageGallery {
    private static final String        STATE_GALLERY_TYPE                  = "STATE_GALLERY_TYPE";                  //$NON-NLS-1$
    private static final String        STATE_PHOTO_FILTER_GPS              = "STATE_PHOTO_FILTER_GPS";              //$NON-NLS-1$
    private static final String        STATE_PHOTO_FILTER_TOUR             = "STATE_PHOTO_FILTER_TOUR";             //$NON-NLS-1$
+   private static final String        STATE_IS_ENLARGE_SMALL_IMAGES       = "STATE_IS_ENLARGE_SMALL_IMAGES";       //$NON-NLS-1$
    private static final String        STATE_IS_SHOW_PHOTO_GPS_ANNOTATION  = "STATE_IS_SHOW_PHOTO_GPS_ANNOTATION";  //$NON-NLS-1$
    private static final String        STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY = "STATE_IS_SHOW_PHOTO_NAME_IN_GALLERY"; //$NON-NLS-1$
    private static final String        STATE_IS_SHOW_PHOTO_TOOLTIP         = "STATE_IS_SHOW_PHOTO_TOOLTIP";         //$NON-NLS-1$
@@ -59,9 +61,14 @@ public class PhotoGallery extends ImageGallery {
    private IDialogSettings            _state;
    private PhotoDateInfo              _photoDateInfo;
 
+   /**
+    * <code>true</code> is the old default
+    */
+   private boolean                    _isEnlargeSmallImages               = true;
    private boolean                    _isShowActionFiltering              = true;
    private boolean                    _isShowActionSorting                = true;
 
+   private ActionEnlargeSmallImages   _actionEnlargeSmallImages;
    private ActionPhotoFilterGPS       _actionPhotoFilterGPS;
    private ActionPhotoFilterNoGPS     _actionPhotoFilterNoGPS;
    private ActionPhotoFilterTour      _actionPhotoFilterTour;
@@ -83,11 +90,36 @@ public class PhotoGallery extends ImageGallery {
 
    private RatingStarBehaviour        _ratingStarBehaviour;
 
+   private class ActionEnlargeSmallImages extends Action {
+
+      public ActionEnlargeSmallImages() {
+
+         super("&Enlarge smaller Photos", AS_CHECK_BOX);
+
+         setToolTipText("Photos are enlarged when they are smaller than the canvas");
+
+         setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoEnlargeSmallPhotos));
+      }
+
+      @Override
+      public void run() {
+
+         actionEnlargeSmallImages();
+      }
+   }
+
    public PhotoGallery(final IDialogSettings state) {
 
       super(state);
 
       _state = state;
+   }
+
+   private void actionEnlargeSmallImages() {
+
+      _isEnlargeSmallImages = _actionEnlargeSmallImages.isChecked();
+
+      getGallery().redraw();
    }
 
    public void actionImageFilterGPS(final Action filterAction) {
@@ -255,22 +287,28 @@ public class PhotoGallery extends ImageGallery {
 
    private void createActions() {
 
-      _actionPhotoGalleryType = new ActionPhotoGalleryType(this);
+// SET_FORMATTING_OFF
 
-      _actionPhotoFilterGPS = new ActionPhotoFilterGPS(this);
-      _actionPhotoFilterNoGPS = new ActionPhotoFilterNoGPS(this);
-      _actionPhotoFilterTour = new ActionPhotoFilterTour(this);
-      _actionPhotoFilterNoTour = new ActionPhotoFilterNoTour(this);
+      _actionEnlargeSmallImages     = new ActionEnlargeSmallImages();
 
-      _actionShowGPSAnnotation = new ActionShowAnnotations(this);
+      _actionPhotoGalleryType       = new ActionPhotoGalleryType(this);
 
-      _actionShowPhotoName = new ActionShowPhotoName(this);
-      _actionShowPhotoDate = new ActionShowPhotoDate(this);
-      _actionShowPhotoRatingStars = new ActionShowPhotoRatingStars(this);
-      _actionShowPhotoTooltip = new ActionShowPhotoTooltip(this);
+      _actionPhotoFilterGPS         = new ActionPhotoFilterGPS(this);
+      _actionPhotoFilterNoGPS       = new ActionPhotoFilterNoGPS(this);
+      _actionPhotoFilterTour        = new ActionPhotoFilterTour(this);
+      _actionPhotoFilterNoTour      = new ActionPhotoFilterNoTour(this);
 
-      _actionSortByFileName = new ActionSortByFileName(this);
-      _actionSortFileByDate = new ActionSortByFileDate(this);
+      _actionShowGPSAnnotation      = new ActionShowAnnotations(this);
+
+      _actionShowPhotoName          = new ActionShowPhotoName(this);
+      _actionShowPhotoDate          = new ActionShowPhotoDate(this);
+      _actionShowPhotoRatingStars   = new ActionShowPhotoRatingStars(this);
+      _actionShowPhotoTooltip       = new ActionShowPhotoTooltip(this);
+
+      _actionSortByFileName         = new ActionSortByFileName(this);
+      _actionSortFileByDate         = new ActionSortByFileDate(this);
+
+// SET_FORMATTING_ON
    }
 
    public void createPhotoGallery(final Composite parent,
@@ -347,6 +385,14 @@ public class PhotoGallery extends ImageGallery {
       }
    }
 
+   @Override
+   public void fillContextMenu(final IMenuManager menuMgr) {
+
+      menuMgr.add(_actionEnlargeSmallImages);
+
+      super.fillContextMenu(menuMgr);
+   }
+
    public void hideActionFiltering() {
       _isShowActionFiltering = false;
    }
@@ -355,8 +401,19 @@ public class PhotoGallery extends ImageGallery {
       _isShowActionSorting = false;
    }
 
+   public boolean isEnlargeSmallImages() {
+
+      return _isEnlargeSmallImages;
+   }
+
    @Override
    public void restoreState() {
+
+      /*
+       * Enlarge small photos
+       */
+      _isEnlargeSmallImages = Util.getStateBoolean(_state, STATE_IS_ENLARGE_SMALL_IMAGES, true);
+      _actionEnlargeSmallImages.setChecked(_isEnlargeSmallImages);
 
       /*
        * photo filter: gps
@@ -462,6 +519,8 @@ public class PhotoGallery extends ImageGallery {
 
    @Override
    public void saveState() {
+
+      _state.put(STATE_IS_ENLARGE_SMALL_IMAGES, _isEnlargeSmallImages);
 
       _state.put(STATE_GALLERY_SORTING,
             _actionSortFileByDate.isChecked()
