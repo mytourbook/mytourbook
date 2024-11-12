@@ -56,7 +56,9 @@ public record Current(float temp,
          return UI.EMPTY_STRING;
       }
 
-      return OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds(weather().get(0).icon());
+      final Weather weatherRecord = weather().get(0);
+
+      return OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds(weatherRecord.icon(), weatherRecord.id());
    }
 
    public String getWeatherDescription() {

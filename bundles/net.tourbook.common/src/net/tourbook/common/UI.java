@@ -2823,7 +2823,7 @@ public class UI {
       final int imageHeight = imageRect.height;
 
       int yOffset;
-      
+
       switch (verticalAlignment) {
 
       case SWT.CENTER -> yOffset = (cellHeight - imageHeight) / 2;
@@ -3406,6 +3406,7 @@ public class UI {
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_CLEAR,                  CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Sunny));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_PART_CLOUDS,            CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Cloudy));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_OVERCAST,               CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Clouds));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_FOG,                    CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Fog));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_LIGHTNING,              CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Lightning));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_RAIN,                   CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Rain));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_DRIZZLE,                CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Drizzle));

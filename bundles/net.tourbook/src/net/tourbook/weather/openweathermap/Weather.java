@@ -18,4 +18,4 @@ package net.tourbook.weather.openweathermap;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record Weather(String description, String icon) {}
+public record Weather(String id, String description, String icon) {}

@@ -82,8 +82,11 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       case "122": //$NON-NLS-1$
       case "119": //$NON-NLS-1$
       case "143": //$NON-NLS-1$
-      case "248": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_OVERCAST;
+         break;
+
+      case "248": //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_FOG;
          break;
 
       case "113": //$NON-NLS-1$
