@@ -55,22 +55,7 @@ New
 Improvements
 ============
 
-* Tags
-  - Copy & paste tags
-    https://github.com/mytourbook/mytourbook/issues/1301
-  - Display tag image in tag view
-    https://github.com/mytourbook/mytourbook/issues/1422
-  - Edit tag image size in the tag preferences
-  - Display tag image filepath in the tag edit dialog
-
-* Tag Group
-  - Show all tags in the tag group action tooltip
-  
-* Autocomplete Fields
-  - Improve autocomplete fields 
-    https://github.com/mytourbook/mytourbook/issues/1424
-    - The autocomplete fields: Title, start- and end-location
-    - Search for all characters and not only for numbers and alphabetical characters
+* 
 
 
 Changes
@@ -88,10 +73,7 @@ Changes that require Tour Re-import
 Bugfix
 ======
   
-* 2D Map
-  - Fixed map sync issues
-    https://github.com/mytourbook/mytourbook/issues/1352
- 
+* 
 
 See also milestone 24.x https://github.com/mytourbook/mytourbook/milestone/16?closed=1
  

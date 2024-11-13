@@ -4,7 +4,7 @@
 <product 
 
    name              ="MyTourbook Product" 
-   version           ="24.11.0.qualifier" 
+   version           ="24.11.1.qualifier" 
 
    id                ="net.tourbook.productWithoutJRE" 
    uid               ="net.tourbook.productWithoutJRE" 
