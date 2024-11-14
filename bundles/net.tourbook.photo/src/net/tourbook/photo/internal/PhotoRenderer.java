@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,6 +33,7 @@ import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoCache;
 import net.tourbook.photo.PhotoEventId;
+import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoImageMetadata;
 import net.tourbook.photo.PhotoLoadManager;
@@ -60,6 +61,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.imgscalr.Scalr.Rotation;
@@ -310,6 +312,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
    }
 
    public PhotoRenderer(final GalleryMT20 galleryMT20, final ImageGallery imageGallery) {
+
       _galleryMT = galleryMT20;
       _imageGallery = imageGallery;
    }
@@ -357,8 +360,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
       _photoWidth = galleryItemWidth - _gridBorderSize;
       _photoHeight = galleryItemHeight - _gridBorderSize;
 
-      int itemImageWidth = _photoWidth;
-      int itemImageHeight = _photoHeight;
+      int canvasWidth = _photoWidth;
+      int canvasHeight = _photoHeight;
 
       // center ratings stars in the middle of the image
       _ratingStarsLeftBorder = _photoWidth / 2 - MAX_RATING_STARS_WIDTH / 2;
@@ -367,17 +370,20 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
       final int border2 = border / 2;
 
       // ignore border for small images
-      final boolean isBorder = itemImageWidth - border >= _textMinThumbSize;
+      final boolean isBorder = canvasWidth - border >= _textMinThumbSize;
 
-      itemImageWidth -= isBorder ? border : 0;
-      itemImageHeight -= isBorder ? border : 0;
-      _paintedDest_Width = itemImageWidth;
-      _paintedDest_Height = itemImageHeight;
+      canvasWidth -= isBorder ? border : 0;
+      canvasHeight -= isBorder ? border : 0;
+      _paintedDest_Width = canvasWidth;
+      _paintedDest_Height = canvasHeight;
 
       final int itemImageX = galleryItem.paintedX_Photo + (isBorder ? border2 : 0);
       final int itemImageY = galleryItem.paintedY_Photo + (isBorder ? border2 : 0);
 
-      final ImageQuality requestedImageQuality = itemImageWidth <= PhotoLoadManager.IMAGE_SIZE_THUMBNAIL
+      final float scaledCanvasWidth = DPIUtil.autoScaleUp(canvasWidth);
+      final boolean isThumbImage = scaledCanvasWidth <= PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
+
+      final ImageQuality requestedImageQuality = isThumbImage
             ? ImageQuality.THUMB
             : ImageQuality.HQ;
 
@@ -445,8 +451,10 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
          try {
 
             final Rectangle imageBounds = paintedImage.getBounds();
+            
             _paintedImageWidth = imageBounds.width;
             _paintedImageHeight = imageBounds.height;
+            
          } catch (final Exception e1) {
             StatusUtil.log(e1);
          }
@@ -454,11 +462,13 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
          final boolean isPainted = draw_Image(gc,
                photo,
                paintedImage,
-               galleryItem, //
+               galleryItem,
+
                itemImageX,
                itemImageY,
-               itemImageWidth,
-               itemImageHeight,
+               canvasWidth,
+               canvasHeight,
+
                isRequestedQuality,
                isSelected);
 
@@ -479,11 +489,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
          _paintedDest_DevY = itemImageY;
 
          draw_StatusText(gc,
-               galleryItem, //
+               galleryItem,
                itemImageX,
                itemImageY,
-               itemImageWidth,
-               itemImageHeight,
+               canvasWidth,
+               canvasHeight,
                requestedImageQuality,
                _isAttributesPainted && _isShowPhotoName,
                isSelected,
@@ -496,11 +506,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
       // draw name & date & annotations
       if (_isAttributesPainted && isDrawPhotoDateName) {
          draw_Attributes(gc,
-               photo, //
+               photo,
                itemImageX,
                itemImageY,
-               itemImageWidth,
-               itemImageHeight);
+               canvasWidth,
+               canvasHeight);
       }
 
       // annotations are drawn in the bottom right corner of the image
@@ -523,11 +533,11 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
          draw_InvalidImage(gc,
                galleryItem,
-               photo, //
+               photo,
                itemImageX,
                itemImageY,
-               itemImageWidth,
-               itemImageHeight);
+               canvasWidth,
+               canvasHeight);
       }
 
 //      // debug box for the whole gallery item area
@@ -720,7 +730,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
     * @param imageCanvasHeight
     * @param isRequestedQuality
     * @param isSelected
-    * @param isFullsizeImage
+    *
     * @return
     */
    private boolean draw_Image(final GC gc,
@@ -734,37 +744,72 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
                               final boolean isRequestedQuality,
                               final boolean isSelected) {
 
-      final Point bestSize = RendererHelper.getBestSize(
-            photo,
-            _paintedImageWidth,
-            _paintedImageHeight,
-            imageCanvasWidth,
-            imageCanvasHeight);
-
-      _paintedDest_Width = bestSize.x;
-      _paintedDest_Height = bestSize.y;
-
-      // get center offset
-      final int centerOffsetX = (imageCanvasWidth - _paintedDest_Width) / 2;
-      final int centerOffsetY = (imageCanvasHeight - _paintedDest_Height) / 2;
-
-      _paintedDest_DevX = photoPosX + centerOffsetX;
-      _paintedDest_DevY = photoPosY + centerOffsetY;
-
       try {
 
          try {
 
-            gc.drawImage(photoImage, //
-                  0,
-                  0,
-                  _paintedImageWidth,
-                  _paintedImageHeight,
-                  //
-                  _paintedDest_DevX,
-                  _paintedDest_DevY,
-                  _paintedDest_Width,
-                  _paintedDest_Height);
+            boolean isEnlargeSmallImages = true; // true is the old default
+
+            if (_imageGallery instanceof final PhotoGallery photoGallery) {
+               isEnlargeSmallImages = photoGallery.isEnlargeSmallImages();
+            }
+
+            if (isEnlargeSmallImages == false
+                  && _paintedImageWidth <= imageCanvasWidth
+                  && _paintedImageHeight <= imageCanvasHeight) {
+
+               // image is smaller than the canvas -> do not enlarge it
+
+               // get center offset
+               final int centerOffsetX = imageCanvasWidth / 2 - _paintedImageWidth / 2;
+               final int centerOffsetY = imageCanvasHeight / 2 - _paintedImageHeight / 2;
+
+               _paintedDest_DevX = photoPosX + centerOffsetX;
+               _paintedDest_DevY = photoPosY + centerOffsetY;
+
+               gc.drawImage(photoImage,
+                     _paintedDest_DevX,
+                     _paintedDest_DevY);
+
+            } else {
+
+               // resize image to the canvas size
+
+               final Point bestSize = RendererHelper.getBestSize(
+                     photo,
+                     _paintedImageWidth,
+                     _paintedImageHeight,
+                     imageCanvasWidth,
+                     imageCanvasHeight);
+
+               _paintedDest_Width = bestSize.x;
+               _paintedDest_Height = bestSize.y;
+
+               // get center offset
+               final int centerOffsetX = (imageCanvasWidth - _paintedDest_Width) / 2;
+               final int centerOffsetY = (imageCanvasHeight - _paintedDest_Height) / 2;
+
+               _paintedDest_DevX = photoPosX + centerOffsetX;
+               _paintedDest_DevY = photoPosY + centerOffsetY;
+
+               gc.drawImage(photoImage,
+                     0,
+                     0,
+                     _paintedImageWidth,
+                     _paintedImageHeight,
+
+                     _paintedDest_DevX,
+                     _paintedDest_DevY,
+                     _paintedDest_Width,
+                     _paintedDest_Height);
+            }
+
+//            gc.setForeground(UI.SYS_COLOR_YELLOW);
+//            gc.drawRectangle(
+//                  photoPosX,
+//                  photoPosY,
+//                  imageCanvasWidth - 1,
+//                  imageCanvasHeight - 1);
 
             galleryItem.imagePaintedWidth = _paintedDest_Width;
             galleryItem.imagePaintedHeight = _paintedDest_Height;
@@ -776,7 +821,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
                   + " it's potentially this bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845"); //$NON-NLS-1$
 
             // ensure image is valid after reloading
-//            photoImage.dispose();
+//             photoImage.dispose();
 
             PhotoImageCache.disposeAll();
 
@@ -784,7 +829,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
          }
 
          /*
-          * draw selection
+          * Draw selection
           */
          if (isSelected) {
 
@@ -794,7 +839,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
          }
 
          /*
-          * draw HQ marker
+          * Draw HQ marker
           */
          if (isRequestedQuality == false) {
 
@@ -1527,6 +1572,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
     * @param hoveredItem
     * @param itemMouseX
     * @param itemMouseY
+    *
     * @return
     */
    public boolean isItemHovered(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
@@ -1561,6 +1607,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
     * @param hoveredItem
     * @param itemMouseX
     * @param itemMouseY
+    *
     * @return Returns <code>true</code> when the hovered state has changed.
     */
    private boolean isItemHovered_Annotation(final GalleryMT20Item hoveredItem,
@@ -1588,6 +1635,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
     * @param hoveredItem
     * @param itemMouseX
     * @param itemMouseY
+    *
     * @return Returns <code>true</code> when the hovered state has changed.
     */
    private boolean isItemHovered_InvalidImage(final GalleryMT20Item hoveredItem,
@@ -1625,6 +1673,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
     * @param hoveredItem
     * @param itemMouseX
     * @param itemMouseY
+    *
     * @return Returns <code>true</code> when the hovered state or the selection has changed.
     */
    private boolean isItemHovered_Stars(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
@@ -1689,6 +1738,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
     * @param galleryItem
     * @param itemMouseX
     * @param itemMouseY
+    *
     * @return Returns <code>true</code> when the mouse down event is handled and no further actions
     *         should be done in the gallery (e.g. no select item).
     */
@@ -1725,6 +1775,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
    /**
     * @param itemMouseX
     * @param itemMouseY
+    *
     * @return Returns <code>true</code> when the rating star area in a gallery item is hovered.
     */
    private boolean isRatingStarsHovered(final int itemMouseX, final int itemMouseY) {
@@ -1892,6 +1943,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
     *
     * @param dateInfo
     * @param isShowPhotoName
+    *
     * @see DefaultGalleryMT20ItemRenderer#isShowLabels()
     */
    public void setPhotoInfo(final boolean isShowPhotoName,

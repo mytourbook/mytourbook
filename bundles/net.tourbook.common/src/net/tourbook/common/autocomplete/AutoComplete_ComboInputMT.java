@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2024 Frédéric Bard
+ * Copyright (C) 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,9 +13,22 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.weather.openweathermap;
+package net.tourbook.common.autocomplete;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+// Original: net.sf.swtaddons.autocomplete
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public record Weather(String id, String description, String icon) {}
+import org.eclipse.swt.widgets.Combo;
+
+public class AutoComplete_ComboInputMT extends AutoComplete_ComboMT {
+
+	public AutoComplete_ComboInputMT(final Combo combo) {
+		super(combo);
+	}
+
+	@Override
+   protected AutoComplete_ContentProposalProviderMT getContentProposalProvider(final String[] proposals) {
+
+      return new AutoComplete_ContentProposalProviderMT(proposals);
+	}
+
+}

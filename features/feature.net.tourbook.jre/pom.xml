@@ -10,7 +10,7 @@
 
    <parent>
       <artifactId>mytourbook-app</artifactId>                  <groupId>net.tourbook</groupId>
-                                                               <version>24.11.0-SNAPSHOT</version>
+                                                               <version>24.11.1-SNAPSHOT</version>
       <relativePath>../..</relativePath>
    </parent>
 

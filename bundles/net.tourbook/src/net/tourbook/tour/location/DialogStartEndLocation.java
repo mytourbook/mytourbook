@@ -18,11 +18,11 @@ package net.tourbook.tour.location;
 import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.autocomplete.AutoComplete_ComboInputMT;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
@@ -49,23 +49,23 @@ import org.eclipse.ui.PlatformUI;
  */
 public class DialogStartEndLocation extends Dialog {
 
-   private static final String    ID                                             = "net.tourbook.tour.location.DialogStartEndLocation"; //$NON-NLS-1$
+   private static final String       ID                                             = "net.tourbook.tour.location.DialogStartEndLocation"; //$NON-NLS-1$
 
-   private static final String    STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START";    //$NON-NLS-1$
-   private static final String    STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END   = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END";      //$NON-NLS-1$
-   private static final String    STATE_IS_LOCATION_ENABELED_START               = "STATE_IS_LOCATION_ENABELED_START";                  //$NON-NLS-1$
-   private static final String    STATE_IS_LOCATION_ENABELED_END                 = "STATE_IS_LOCATION_ENABELED_END";                    //$NON-NLS-1$
-   private static final String    STATE_IS_REMOVE_LOCATION_ASSOCIATION_START     = "STATE_IS_REMOVE_LOCATION_ASSOCIATION_START";        //$NON-NLS-1$
-   private static final String    STATE_IS_REMOVE_LOCATION_ASSOCIATION_END       = "STATE_IS_REMOVE_LOCATION_ASSOCIATION_END";          //$NON-NLS-1$
+   private static final String       STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_START";    //$NON-NLS-1$
+   private static final String       STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END   = "STATE_AUTOCOMPLETE_POPUP_HEIGHT_LOCATION_END";      //$NON-NLS-1$
+   private static final String       STATE_IS_LOCATION_ENABELED_START               = "STATE_IS_LOCATION_ENABELED_START";                  //$NON-NLS-1$
+   private static final String       STATE_IS_LOCATION_ENABELED_END                 = "STATE_IS_LOCATION_ENABELED_END";                    //$NON-NLS-1$
+   private static final String       STATE_IS_REMOVE_LOCATION_ASSOCIATION_START     = "STATE_IS_REMOVE_LOCATION_ASSOCIATION_START";        //$NON-NLS-1$
+   private static final String       STATE_IS_REMOVE_LOCATION_ASSOCIATION_END       = "STATE_IS_REMOVE_LOCATION_ASSOCIATION_END";          //$NON-NLS-1$
 
-   private final IDialogSettings  _state                                         = TourbookPlugin.getState(ID);
+   private final IDialogSettings     _state                                         = TourbookPlugin.getState(ID);
 
-   private List<TourData>         _allSelectedTours;
+   private List<TourData>            _allSelectedTours;
 
-   private AutocompleteComboInput _autocomplete_Location_Start;
-   private AutocompleteComboInput _autocomplete_Location_End;
+   private AutoComplete_ComboInputMT _autocomplete_Location_Start;
+   private AutoComplete_ComboInputMT _autocomplete_Location_End;
 
-   private boolean                _isInRestore;
+   private boolean                   _isInRestore;
 
    /*
     * UI controls
@@ -188,7 +188,7 @@ public class DialogStartEndLocation extends Dialog {
                _comboLocation_Start.addModifyListener(modifyEvent -> onModify());
                gdText.applyTo(_comboLocation_Start);
 
-               _autocomplete_Location_Start = new AutocompleteComboInput(_comboLocation_Start);
+               _autocomplete_Location_Start = new AutoComplete_ComboInputMT(_comboLocation_Start);
             }
             {
                _chkRemoveLocationAssoc_Start = new Button(container, SWT.CHECK);
@@ -216,7 +216,7 @@ public class DialogStartEndLocation extends Dialog {
                _comboLocation_End.addModifyListener(modifyEvent -> onModify());
                gdText.applyTo(_comboLocation_End);
 
-               _autocomplete_Location_End = new AutocompleteComboInput(_comboLocation_End);
+               _autocomplete_Location_End = new AutoComplete_ComboInputMT(_comboLocation_End);
             }
             {
                _chkRemoveLocationAssoc_End = new Button(container, SWT.CHECK);

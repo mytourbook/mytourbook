@@ -1214,17 +1214,17 @@
       <menuContribution locationURI="popup:menu.net.tourbook.photo.PhotoGallery?before=separator.net.tourbook.photo.refresh" >
                   
          <command
-            commandId="command.net.tourbook.photo.LinkPhotoWithTourInGalleryAll"
-            icon="icons/photo-link-photo-with-tour.png"
-            label="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll"
-            mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll_Mnemonic"/>
+            commandId   ="command.net.tourbook.photo.LinkPhotoWithTourInGalleryAll"
+            icon        ="icons/photo-link-photo-with-tour.png"
+            label       ="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll"
+            mnemonic    ="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll_Mnemonic"/>
 
          <command
-            commandId="command.net.tourbook.photo.LinkPhotoWithTourInGallerySelected"
-            icon="icons/photo-link-photo-with-tour.png"
-            label="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
-            mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected_Mnemonic"/>
-
+            commandId   ="command.net.tourbook.photo.LinkPhotoWithTourInGallerySelected"
+            icon        ="icons/photo-link-photo-with-tour.png"
+            label       ="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
+            mnemonic    ="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected_Mnemonic"/>
+            
          <!--
          <command
             commandId="command.net.tourbook.sign.ImportTourSigns"
@@ -1232,7 +1232,7 @@
             label="%Action_TourSign_ImportTourSigns"
             mnemonic="%Action_TourSign_ImportTourSigns_Mnemonic"/>
          -->
-         
+
       </menuContribution>
 
    </extension>
@@ -1526,8 +1526,8 @@
          id             ="command.net.tourbook.photo.LinkPhotoWithTourInGalleryAll"
          name           ="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll"
          defaultHandler ="net.tourbook.tour.photo.ActionHandler_LinkPhotoWithTourInGalleryAll"/>
-      
-      <command
+         
+      <command 
          id             ="command.net.tourbook.photo.TourPhotosView"
          name           ="%View_Name_PhotoTourPhotos"
          defaultHandler ="net.tourbook.tour.photo.ActionHandler_OpenView_TourPhotos"/>
@@ -1538,8 +1538,8 @@
          defaultHandler ="net.tourbook.tour.photo.ActionHandler_SyncPhotoWithTour">   
 
          <state
-            id       ="org.eclipse.ui.commands.toggleState"
-            class    ="org.eclipse.ui.handlers.RegistryToggleState"
+            id          ="org.eclipse.ui.commands.toggleState"
+            class       ="org.eclipse.ui.handlers.RegistryToggleState"
          />
 
       </command>

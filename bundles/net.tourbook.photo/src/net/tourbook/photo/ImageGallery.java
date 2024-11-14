@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -96,9 +96,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -115,7 +113,12 @@ import org.eclipse.ui.progress.UIJob;
  * org.apache.commons.sanselan
  * </pre>
  */
-public abstract class ImageGallery implements IItemListener, IGalleryContextMenuProvider, IPhotoProvider, ITourViewer,
+public abstract class ImageGallery implements
+
+      IItemListener,
+      IGalleryContextMenuProvider,
+      IPhotoProvider,
+      ITourViewer,
       IPhotoEvictionListener {
 
    /**
@@ -126,18 +129,18 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
    private static final String    MENU_ID_PHOTO_GALLERY        = "menu.net.tourbook.photo.PhotoGallery"; //$NON-NLS-1$
 
    private static final int       DELAY_JOB_SUBSEQUENT_FILTER  = 500;                                    // ms
+
    private static final long      DELAY_JOB_UI_FILTER          = 200;                                    // ms
    private static final long      DELAY_JOB_UI_LOADING         = 200;                                    // ms
-
    public static final int        MIN_GALLERY_ITEM_WIDTH       = 10;                                     // pixel
    public static final int        MAX_GALLERY_ITEM_WIDTH       = 2000;                                   // pixel
 
    public static final String     STATE_THUMB_IMAGE_SIZE       = "STATE_THUMB_IMAGE_SIZE";               //$NON-NLS-1$
+
    private static final String    STATE_GALLERY_POSITION_KEY   = "STATE_GALLERY_POSITION_KEY";           //$NON-NLS-1$
    private static final String    STATE_GALLERY_POSITION_VALUE = "STATE_GALLERY_POSITION_VALUE";         //$NON-NLS-1$
    private static final String    STATE_IMAGE_SORTING          = "STATE_IMAGE_SORTING";                  //$NON-NLS-1$
    private static final String    STATE_SELECTED_ITEMS         = "STATE_SELECTED_ITEMS";                 //$NON-NLS-1$
-
    private static final String    DEFAULT_GALLERY_FONT         = "arial,sans-serif";                     //$NON-NLS-1$
 
    private IDialogSettings        _state;
@@ -187,7 +190,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
    private final Runnable   _workerRunnable;
 
    /*
-    * image loading/filtering
+    * Image loading/filtering
     */
    private PhotoFilterGPS          _imageFilterGPS;
    private PhotoFilterTour         _imageFilterTour;
@@ -202,14 +205,14 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
    private int                     _jobFilterDirtyCounter;
 
    private UIJob                   _jobUIFilter;
+
    private AtomicBoolean           _jobUIFilterJobIsScheduled      = new AtomicBoolean();
    private int                     _jobUIFilterDirtyCounter;
    private Photo[]                 _jobUIFilterPhoto;
-
    private Job                     _jobUILoading;
+
    private AtomicBoolean           _jobUILoadingIsScheduled        = new AtomicBoolean();
    private int                     _jobUILoadingDirtyCounter;
-
    private int                     _currentExifRunId;
 
    /**
@@ -268,7 +271,6 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
     * Photo image size without border
     */
    private int                     _photoImageSize;
-
    private int                     _photoBorderSize;
 
    private boolean                 _isShowTooltip;
@@ -282,9 +284,9 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
    private String                  _newGalleryPositionKey;
 
    private String                  _currentGalleryPositionKey;
+
    private String                  _defaultStatusMessage           = UI.EMPTY_STRING;
    private int[]                   _restoredSelection;
-
    private GalleryType             _galleryType;
 
    private TableViewer             _photoViewer;
@@ -304,11 +306,11 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
    private boolean                 _isLinkPhotoDisplayed;
 
    private final NumberFormat      _nf1                            = NumberFormat.getNumberInstance();
+
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
    }
-
    /*
     * UI resources
     */
@@ -325,10 +327,10 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
    private GalleryActionBar _galleryActionBar;
 
    private PageBook         _pageBook;
+
    private Composite        _pageDefault;
    private Composite        _pageGalleryInfo;
    private Composite        _pageDetails;
-
    private Label            _lblDefaultPage;
    private Label            _lblGalleryInfo;
 
@@ -534,6 +536,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
    }
 
    public void closePhotoTooltip() {
+
       _photoGalleryTooltip.close();
    }
 
@@ -633,6 +636,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
    /**
     * @param isAllImages
+    *
     * @return
     */
    private PhotosWithExifSelection createPhotoSelectionWithExif(final boolean isAllImages) {
@@ -721,35 +725,21 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
       _galleryMT20 = new GalleryImplementation(parent, _galleryStyle, _state);
 
       _galleryMT20.setHigherQualityDelay(200);
-//      _gallery.setAntialias(SWT.OFF);
-//      _gallery.setInterpolation(SWT.LOW);
       _galleryMT20.setAntialias(SWT.ON);
       _galleryMT20.setInterpolation(SWT.HIGH);
       _galleryMT20.setItemMinMaxSize(MIN_GALLERY_ITEM_WIDTH, MAX_GALLERY_ITEM_WIDTH);
 
-      _galleryMT20.addListener(SWT.Modify, new Listener() {
+      _galleryMT20.addListener(SWT.Modify, event -> {
 
          // a modify event is fired when gallery is zoomed in/out
 
-         @Override
-         public void handleEvent(final Event event) {
+         PhotoLoadManager.stopImageLoading(false);
 
-            PhotoLoadManager.stopImageLoading(false);
-
-            updateUI_AfterZoomInOut(event.width);
-         }
+         updateUI_AfterZoomInOut(event.width);
       });
 
-      _galleryMT20.addListener(SWT.Selection, new Listener() {
-
-         // a gallery item is selected/deselected
-
-         @Override
-         public void handleEvent(final Event event) {
-
-            onSelectPhoto();
-         }
-      });
+      // a gallery item is selected/deselected
+      _galleryMT20.addListener(SWT.Selection, event -> onSelectPhoto());
 
       _galleryMT20.setContextMenuProvider(this);
 
@@ -1273,6 +1263,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
    /**
     * @param selectedFolder
     * @param isGetAllImages
+    *
     * @return Returns photo data for the images in the requested folder, sorted by date/time or
     *         <code>null</code> when loading was canceled by the user.
     */
@@ -1341,6 +1332,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
     * Creates a {@link PhotosWithExifSelection}
     *
     * @param isAllImages
+    *
     * @return Returns a {@link ISelection} for selected or all images or <code>null</code> null
     *         when loading EXIF data was canceled by the user.
     */
@@ -1419,6 +1411,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
    }
 
    public boolean isDisposed() {
+
       return _galleryMT20.isDisposed();
    }
 
@@ -2365,7 +2358,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
       updateUI_FromPrefStore(false);
 
       /**
-       * !!! very important !!!
+       * !!! Very important !!!
        * <p>
        * show gallery to initialize client area, otherwise the width is 0 until the page is
        * displayed in a later step
@@ -2377,7 +2370,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
       showPageBookPage(_pageDefault, false);
 
       /*
-       * set thumbnail size after gallery client area is set
+       * Set thumbnail size after gallery client area is set
        */
       final int stateThumbSize = Util.getStateInt(
             _state,
@@ -2394,7 +2387,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
       setThumbnailSizeRestore(stateThumbSize);
 
       /*
-       * gallery folder/tour image positions
+       * Gallery folder/tour image positions
        */
       final String[] positionKeys = _state.getArray(STATE_GALLERY_POSITION_KEY);
       final String[] positionValues = _state.getArray(STATE_GALLERY_POSITION_VALUE);

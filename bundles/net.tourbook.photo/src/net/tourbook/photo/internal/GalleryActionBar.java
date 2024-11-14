@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.photo.internal;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.ImageGallery;
@@ -27,7 +25,9 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -126,7 +126,7 @@ public class GalleryActionBar {
             ? Messages.Pic_Dir_Spinner_ThumbnailSize_Tooltip_OSX
             : Messages.Pic_Dir_Spinner_ThumbnailSize_Tooltip);
 
-      _spinnerThumbSize.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+      _spinnerThumbSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
          _imageGallery.setThumbnailSize(_spinnerThumbSize.getSelection());
       }));
 
@@ -154,10 +154,6 @@ public class GalleryActionBar {
 
    public Composite getCustomContainer() {
       return _containerCustomActionBar;
-   }
-
-   public int getThumbnailSize() {
-      return _spinnerThumbSize.getSelection();
    }
 
    public void restoreState(final IDialogSettings state, final int stateThumbSize) {
@@ -233,7 +229,8 @@ public class GalleryActionBar {
 
          _spinnerThumbSize.setSelection(imageSize);
 
-         final boolean isHqImage = imageSize > PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
+         final float scaledCanvasWidth = DPIUtil.autoScaleUp(imageSize);
+         final boolean isHqImage = scaledCanvasWidth > PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
 
          _canvasImageSizeIndicator.setIndicator(isHqImage);
       }
