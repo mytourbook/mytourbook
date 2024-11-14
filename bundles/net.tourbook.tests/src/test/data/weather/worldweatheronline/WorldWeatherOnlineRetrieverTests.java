@@ -154,18 +154,25 @@ public class WorldWeatherOnlineRetrieverTests {
       assertAll(
             () -> assertEquals(UI.EMPTY_STRING,
                   WorldWeatherOnlineRetriever.convertWeatherCodeToMTWeatherClouds("-1")), //$NON-NLS-1$
+
             () -> assertEquals(IWeather.WEATHER_ID_OVERCAST,
-                  WorldWeatherOnlineRetriever.convertWeatherCodeToMTWeatherClouds("248")), //$NON-NLS-1$
+                  WorldWeatherOnlineRetriever.convertWeatherCodeToMTWeatherClouds("122")), //$NON-NLS-1$
+
             () -> assertEquals(IWeather.WEATHER_ID_CLEAR,
                   WorldWeatherOnlineRetriever.convertWeatherCodeToMTWeatherClouds("113")), //$NON-NLS-1$
+
             () -> assertEquals(IWeather.WEATHER_ID_PART_CLOUDS,
                   WorldWeatherOnlineRetriever.convertWeatherCodeToMTWeatherClouds("260")), //$NON-NLS-1$
+
             () -> assertEquals(IWeather.WEATHER_ID_RAIN,
                   WorldWeatherOnlineRetriever.convertWeatherCodeToMTWeatherClouds("377")), //$NON-NLS-1$
+
             () -> assertEquals(IWeather.WEATHER_ID_SNOW,
                   WorldWeatherOnlineRetriever.convertWeatherCodeToMTWeatherClouds("392")), //$NON-NLS-1$
+
             () -> assertEquals(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,
                   WorldWeatherOnlineRetriever.convertWeatherCodeToMTWeatherClouds("200"))); //$NON-NLS-1$
+
    }
 
    @Test
