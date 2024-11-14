@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -93,6 +94,8 @@ import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.ActionSetStartEndLocation;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.action.TourAction;
+import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.NatTableViewer_TourInfo_ToolTip;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.geoCompare.GeoComparedTour;
@@ -113,6 +116,7 @@ import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -376,6 +380,8 @@ public class TourBookView extends ViewPart implements
    private IContextMenuProvider               _viewerContextMenuProvider_Tree     = new ContextMenuProvider_Tree();
    //
    private SubMenu_AdjustTourValues           _subMenu_AdjustTourValues;
+   //
+   private HashMap<String, Object>            _allTourActions;
    //
    private ActionCollapseAll                  _actionCollapseAll;
    private ActionCollapseOthers               _actionCollapseOthers;
@@ -1596,6 +1602,8 @@ public class TourBookView extends ViewPart implements
 
    private void createActions() {
 
+      _allTourActions = new HashMap<>();
+
 // SET_FORMATTING_OFF
 
       _subMenu_AdjustTourValues        = new SubMenu_AdjustTourValues(this, this);
@@ -1632,6 +1640,17 @@ public class TourBookView extends ViewPart implements
 
       _actionContext_OnMouseSelect_ExpandCollapse  = new ActionOnMouseSelect_ExpandCollapse();
       _actionContext_SingleExpand_CollapseOthers   = new ActionSingleExpand_CollapseOthers();
+
+      _allTourActions.put(_actionEditQuick                  .getClass().getName(), _actionEditQuick);
+      _allTourActions.put(_actionEditTour                   .getClass().getName(), _actionEditTour);
+      _allTourActions.put(_actionOpenMarkerDialog           .getClass().getName(), _actionOpenMarkerDialog);
+      _allTourActions.put(_actionOpenAdjustAltitudeDialog   .getClass().getName(), _actionOpenAdjustAltitudeDialog);
+      _allTourActions.put(_actionSetStartEndLocation        .getClass().getName(), _actionSetStartEndLocation);
+      _allTourActions.put(_actionOpenTour                   .getClass().getName(), _actionOpenTour);
+      _allTourActions.put(_actionDuplicateTour              .getClass().getName(), _actionDuplicateTour);
+      _allTourActions.put(_actionCreateTourMarkers          .getClass().getName(), _actionCreateTourMarkers);
+      _allTourActions.put(_actionMergeTour                  .getClass().getName(), _actionMergeTour);
+      _allTourActions.put(_actionJoinTours                  .getClass().getName(), _actionJoinTours);
 
 // SET_FORMATTING_ON
 
@@ -2455,16 +2474,29 @@ public class TourBookView extends ViewPart implements
     */
    private void fillContextMenu(final IMenuManager menuMgr, final boolean isTree) {
 
-      menuMgr.add(_actionEditQuick);
-      menuMgr.add(_actionEditTour);
-      menuMgr.add(_actionOpenMarkerDialog);
-      menuMgr.add(_actionOpenAdjustAltitudeDialog);
-      menuMgr.add(_actionSetStartEndLocation);
-      menuMgr.add(_actionOpenTour);
-      menuMgr.add(_actionDuplicateTour);
-      menuMgr.add(_actionCreateTourMarkers);
-      menuMgr.add(_actionMergeTour);
-      menuMgr.add(_actionJoinTours);
+      for (final TourAction checkedTourAction : TourActionManager.getCheckedActions()) {
+
+         if (checkedTourAction.actionClass instanceof final Class clazz) {
+
+            final Object tourAction = _allTourActions.get(clazz.getName());
+
+            if (tourAction instanceof final IAction action) {
+
+               menuMgr.add(action);
+            }
+         }
+      }
+
+//      menuMgr.add(_actionEditQuick);
+//      menuMgr.add(_actionEditTour);
+//      menuMgr.add(_actionOpenMarkerDialog);
+//      menuMgr.add(_actionOpenAdjustAltitudeDialog);
+//      menuMgr.add(_actionSetStartEndLocation);
+//      menuMgr.add(_actionOpenTour);
+//      menuMgr.add(_actionDuplicateTour);
+//      menuMgr.add(_actionCreateTourMarkers);
+//      menuMgr.add(_actionMergeTour);
+//      menuMgr.add(_actionJoinTours);
 
       _tagMenuManager.fillTagMenu(menuMgr, true);
 

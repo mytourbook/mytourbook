@@ -310,6 +310,13 @@
             category    ="net.tourbook.preferences.PrefPageAppearance"
          />
 
+         <page
+            name        ="%Pref_Page_TourActions"
+            id          ="net.tourbook.preferences.PrefPageAppearance_TourActions"
+            class       ="net.tourbook.preferences.PrefPageAppearance_TourActions"
+            category    ="net.tourbook.preferences.PrefPageAppearance"
+         />
+
 
       <!--
          Import
