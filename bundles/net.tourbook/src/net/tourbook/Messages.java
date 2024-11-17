@@ -126,6 +126,7 @@ public class Messages extends NLS {
    public static String        app_action_button_down;
    public static String        app_action_button_up;
    public static String        App_Action_Cancel;
+   public static String        App_Action_CheckAll;
    public static String        App_Action_Close;
    public static String        App_Action_Close_ToolTip;
    public static String        App_Action_CollapseAll;
@@ -134,6 +135,7 @@ public class Messages extends NLS {
    public static String        App_Action_Copy;
    public static String        App_Action_CopyDataIntoClipboard_Tooltip;
    public static String        App_Action_CopyDataIntoClipboard_CopyIsDone;
+   public static String        App_Action_CustomizeContextMenu;
    public static String        App_Action_Delete;
    public static String        App_Action_DeleteProfile;
    public static String        App_Action_DeleteProperty;

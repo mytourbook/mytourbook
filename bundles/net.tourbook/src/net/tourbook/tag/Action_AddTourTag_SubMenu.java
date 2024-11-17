@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -52,7 +52,7 @@ import org.eclipse.swt.widgets.MenuItem;
 /**
  * Add tag(s) from the selected tours
  */
-class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvancedMenuForActions {
+public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvancedMenuForActions {
 
    private static final String    SPACE_PRE_TAG     = "   ";          //$NON-NLS-1$
 

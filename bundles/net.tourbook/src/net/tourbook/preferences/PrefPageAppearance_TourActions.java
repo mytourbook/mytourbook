@@ -19,14 +19,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.Messages;
+import net.tourbook.common.util.TableLayoutComposite;
 import net.tourbook.ui.action.TourAction;
 import net.tourbook.ui.action.TourActionManager;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
@@ -44,27 +47,36 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageAppearance_TourActions extends PreferencePage implements IWorkbenchPreferencePage {
 
+   public static final String  ID                = "net.tourbook.preferences.PrefPageAppearance_TourActions"; //$NON-NLS-1$
+
    private List<TourAction>    _allSortedActions = new ArrayList<>();
 
    private CheckboxTableViewer _tourActionViewer;
 
+   private SelectionListener   _defaultSelectionListener;
+
+   private PixelConverter      _pc;
+
    /*
     * UI controls
     */
-   private Button _btnDown;
+   private Button _btnCheckAll;
+   private Button _btnUncheckAll;
    private Button _btnUp;
+   private Button _btnDown;
+   private Button _rdoShowAllActions;
+   private Button _rdoShowCustomActions;
 
    @Override
    protected Control createContents(final Composite parent) {
 
-      initUI();
+      initUI(parent);
 
       final Control ui = createUI(parent);
 
       restoreState();
 
-      enableActions();
-      enableUpDownActions();
+      enableControls();
 
       return ui;
    }
@@ -74,16 +86,43 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
          /*
-          * label: select info
+          * Info
           */
          final Label label = new Label(container, SWT.WRAP);
-         label.setText("???");
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+         label.setText("Customize the tour contextual menu actions, some actions are not available in all context menus.");
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+               .applyTo(label);
 
+         {
+            /*
+             * Show all values
+             */
+            _rdoShowAllActions = new Button(container, SWT.RADIO);
+            _rdoShowAllActions.setText("Show &all actions");
+            _rdoShowAllActions.addSelectionListener(_defaultSelectionListener);
+         }
+         {
+            /*
+             * Show custom values
+             */
+            _rdoShowCustomActions = new Button(container, SWT.RADIO);
+            _rdoShowCustomActions.setText("&Customize actions");
+            _rdoShowCustomActions.addSelectionListener(_defaultSelectionListener);
+         }
+
+         /*
+          * Viewer & Actions
+          */
          final Composite viewerContainer = new Composite(container, SWT.NONE);
-         GridDataFactory.fillDefaults().indent(0, 10).applyTo(viewerContainer);
+         GridDataFactory.fillDefaults()
+               .indent(8, 0)
+               .grab(true, true)
+               .applyTo(viewerContainer);
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(viewerContainer);
 //         viewerContainer.setBackground(UI.SYS_COLOR_BLUE);
          {
@@ -97,7 +136,24 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
    private void createUI_10_ActionViewer(final Composite parent) {
 
-      _tourActionViewer = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE | SWT.TOP);
+      final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+            .grab(true, true)
+            .hint(50, 100)
+            .applyTo(layouter);
+
+      final Table table = new Table(
+            layouter,
+            (SWT.CHECK | SWT.SINGLE
+//                  | SWT.H_SCROLL
+                  | SWT.V_SCROLL | SWT.FULL_SELECTION));
+
+      table.setHeaderVisible(false);
+      table.setLinesVisible(false);
+
+      _tourActionViewer = new CheckboxTableViewer(table);
+
+//      _tourActionViewer = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE | SWT.TOP);
 //      _tourActionViewer.getTable().setBackground(UI.SYS_COLOR_RED);
 
       _tourActionViewer.setContentProvider(new IStructuredContentProvider() {
@@ -117,29 +173,76 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
          @Override
          public Image getImage(final Object element) {
 
-            return ((TourAction) element).getImage();
+            final boolean isCustomizeActions = _rdoShowCustomActions.getSelection();
+
+            if (isCustomizeActions) {
+
+               return ((TourAction) element).getImage();
+
+            } else {
+
+               return ((TourAction) element).getImageDisabled();
+            }
          }
 
          @Override
          public String getText(final Object element) {
 
-            return ((TourAction) element).actionText;
+            final TourAction tourAction = (TourAction) element;
+
+            if (tourAction.isCategory) {
+
+               return tourAction.actionText;
+
+            } else {
+
+               return "       " + tourAction.actionText;
+            }
+
          }
       });
 
-      _tourActionViewer.addCheckStateListener(checkStateChangedEvent -> {
+      _tourActionViewer.addSelectionChangedListener(event -> enableControls());
+
+      _tourActionViewer.addCheckStateListener(event -> {
 
          // keep the checked status
-         final TourAction item = (TourAction) checkStateChangedEvent.getElement();
-         item.isChecked = checkStateChangedEvent.getChecked();
+         final TourAction item = (TourAction) event.getElement();
+         item.isChecked = event.getChecked();
 
          // select the checked item
          _tourActionViewer.setSelection(new StructuredSelection(item));
       });
 
-      _tourActionViewer.addSelectionChangedListener(selectionChangedEvent -> {
-         enableUpDownActions();
-      });
+//      _tourActionViewer.addCheckStateListener(event -> {
+//
+//         // If the checkEvent is on a locked update element, uncheck it and select it.
+//
+//         if (event.getElement() instanceof AvailableUpdateElement) {
+//
+//            final AvailableUpdateElement checkedElement = (AvailableUpdateElement) event.getElement();
+//
+//            if (checkedElement.isLockedForUpdate()) {
+//
+//               event.getCheckable().setChecked(checkedElement, false);
+//
+//               // Select the element so that the locked description is displayed
+//               final CheckboxTableViewer viewer = ((CheckboxTableViewer) event.getSource());
+//               final int itemCount = viewer.getTable().getItemCount();
+//
+//               for (int i = 0; i < itemCount; i++) {
+//
+//                  if (viewer.getElementAt(i).equals(checkedElement)) {
+//                     viewer.getTable().deselectAll();
+//                     viewer.getTable().select(i);
+//                     setDetailText(resolvedOperation);
+//                     break;
+//                  }
+//               }
+//            }
+//         }
+//         updateSelection();
+//      });
 
 //    final Table table = _tourActionViewer.getTable();
 //    table.setBackground(UI.SYS_COLOR_GREEN);
@@ -151,43 +254,83 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
-         /*
-          * Button: Up
-          */
-         _btnUp = new Button(container, SWT.NONE);
-         _btnUp.setText(Messages.Pref_Graphs_Button_up);
-         _btnUp.setEnabled(false);
-         _btnUp.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
+         {
+            /*
+             * Button: Up
+             */
+            _btnUp = new Button(container, SWT.NONE);
+            _btnUp.setText(Messages.Pref_Graphs_Button_up);
+            _btnUp.setEnabled(false);
+            _btnUp.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
 
-            moveSelection_Up();
-            enableUpDownActions();
-         }));
+               moveSelection_Up();
+               enableUpDownActions();
+            }));
 
-         setButtonLayoutData(_btnUp);
+            setButtonLayoutData(_btnUp);
+         }
+         {
+            /*
+             * Button: Down
+             */
+            _btnDown = new Button(container, SWT.NONE);
+            _btnDown.setText(Messages.Pref_Graphs_Button_down);
+            _btnDown.setEnabled(false);
+            _btnDown.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
 
-         /*
-          * Button: Down
-          */
-         _btnDown = new Button(container, SWT.NONE);
-         _btnDown.setText(Messages.Pref_Graphs_Button_down);
-         _btnDown.setEnabled(false);
-         _btnDown.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
+               moveSelection_Down();
+               enableUpDownActions();
 
-            moveSelection_Down();
-            enableUpDownActions();
+            }));
 
-         }));
-
-         setButtonLayoutData(_btnDown);
+            setButtonLayoutData(_btnDown);
+         }
+         {
+            /*
+             * Button: Check all
+             */
+            _btnCheckAll = new Button(container, SWT.PUSH);
+            _btnCheckAll.setText(Messages.App_Action_CheckAll);
+            _btnCheckAll.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onCheckAll(true)));
+            setButtonLayoutData(_btnCheckAll);
+         }
+         {
+            /*
+             * Button: Uncheck all
+             */
+            _btnUncheckAll = new Button(container, SWT.PUSH);
+            _btnUncheckAll.setText(Messages.App_Action_UncheckAll);
+            _btnUncheckAll.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onCheckAll(false)));
+            setButtonLayoutData(_btnUncheckAll);
+         }
       }
-   }
-
-   private void enableActions() {
-
    }
 
    private void enableControls() {
 
+      final boolean isCustomizeActions = _rdoShowCustomActions.getSelection();
+
+      final IStructuredSelection structuredSelection = _tourActionViewer.getStructuredSelection();
+      final TourAction selectedAction = (TourAction) structuredSelection.getFirstElement();
+      final boolean isActionCategory = selectedAction != null && selectedAction.isCategory;
+
+      // update icons
+      _tourActionViewer.refresh();
+
+      _tourActionViewer.getTable().setEnabled(isCustomizeActions);
+
+      _btnCheckAll.setEnabled(isCustomizeActions);
+      _btnUncheckAll.setEnabled(isCustomizeActions);
+
+      if (isCustomizeActions && isActionCategory == false) {
+
+         enableUpDownActions();
+
+      } else {
+
+         _btnUp.setEnabled(false);
+         _btnDown.setEnabled(false);
+      }
    }
 
    /**
@@ -199,26 +342,31 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       final Table table = _tourActionViewer.getTable();
       final TableItem[] items = table.getSelection();
 
-      final boolean validSelection = items != null && items.length > 0;
-      boolean enableUp = validSelection;
-      boolean enableDown = validSelection;
+      final boolean isValidSelection = items.length > 0;
+      boolean isEnableUp = isValidSelection;
+      boolean isEnableDown = isValidSelection;
 
-      if (validSelection) {
+      if (isValidSelection) {
+
          final int[] indices = table.getSelectionIndices();
          final int max = table.getItemCount();
-         enableUp = indices[0] != 0;
-         enableDown = indices[indices.length - 1] < max - 1;
+
+         isEnableUp = indices[0] != 0;
+         isEnableDown = indices[indices.length - 1] < max - 1;
       }
 
-      _btnUp.setEnabled(enableUp);
-      _btnDown.setEnabled(enableDown);
+      _btnUp.setEnabled(isEnableUp);
+      _btnDown.setEnabled(isEnableDown);
    }
 
    @Override
    public void init(final IWorkbench workbench) {}
 
-   private void initUI() {
+   private void initUI(final Control parent) {
 
+      _pc = new PixelConverter(parent);
+
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModified());
    }
 
    /**
@@ -278,15 +426,20 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       table.setSelection(newSelection);
    }
 
-   @Override
-   public boolean okToLeave() {
+   private void onCheckAll(final boolean isChecked) {
 
-      return super.okToLeave();
+      if (isChecked) {
+
+         _tourActionViewer.setCheckedElements(TourActionManager.getSortedActions().toArray());
+
+      } else {
+
+         _tourActionViewer.setCheckedElements(new Object[] {});
+      }
    }
 
-   private void onSelection() {
+   private void onModified() {
 
-      enableActions();
       enableControls();
    }
 
@@ -307,7 +460,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       // load viewer
       _tourActionViewer.setInput(this);
 
-      onSelection();
+      enableControls();
    }
 
    @Override
@@ -320,6 +473,11 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
    private void restoreState() {
 
+      final boolean isCustomizeActions = TourActionManager.isCustomizeActions();
+
+      _rdoShowAllActions.setSelection(isCustomizeActions == false);
+      _rdoShowCustomActions.setSelection(isCustomizeActions);
+
       // get viewer content
       _allSortedActions.clear();
       _allSortedActions.addAll(TourActionManager.getSortedActions());
@@ -327,8 +485,8 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       // load viewer
       _tourActionViewer.setInput(this);
 
-      // check actions
-      _tourActionViewer.setCheckedElements(TourActionManager.getCheckedActions().toArray());
+      // check only the visible actions
+      _tourActionViewer.setCheckedElements(TourActionManager.getVisibleActions().toArray());
    }
 
    private void saveState() {
@@ -344,11 +502,19 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
          final TourAction tourAction = (TourAction) tableItems[actionIndex].getData();
 
-         final Object actionClass = tourAction.actionClass;
+         if (tourAction.isCategory) {
 
-         if (actionClass instanceof final Class clazz) {
+            stateAllSortedActions[actionIndex] = tourAction.getCategoryClassName();
 
-            stateAllSortedActions[actionIndex] = clazz.getName();
+         } else {
+
+            final Object actionClass = tourAction.actionClass;
+
+            if (actionClass instanceof final Class clazz) {
+
+               stateAllSortedActions[actionIndex] = clazz.getName();
+
+            }
          }
       }
 
@@ -370,7 +536,12 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
          }
       }
 
-      TourActionManager.saveActions(stateAllSortedActions, stateAllCheckedActions);
+      TourActionManager.saveActions(
+
+            _rdoShowCustomActions.getSelection(),
+
+            stateAllSortedActions,
+            stateAllCheckedActions);
    }
 
 }

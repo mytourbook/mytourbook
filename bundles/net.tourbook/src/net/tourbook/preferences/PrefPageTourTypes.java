@@ -354,7 +354,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(200, 300)
+            .hint(200, 200)
             .applyTo(layoutContainer);
 
       final TreeColumnLayout treeLayout = new TreeColumnLayout();

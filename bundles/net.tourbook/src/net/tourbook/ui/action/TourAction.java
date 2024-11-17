@@ -22,22 +22,56 @@ import org.eclipse.swt.graphics.Image;
 
 public class TourAction {
 
-   public Object           actionClass;
-   public String           actionText;
+   public Object             actionClass;
+   public String             actionText;
 
-   private Image           _image;
-   private ImageDescriptor _imageDescriptor;
+   public TourActionCategory actionCategory;
 
-   public boolean          isChecked;
+   private Image             _image;
+   private Image             _image_Disabled;
+   private ImageDescriptor   _imageDescriptor;
+   private ImageDescriptor   _imageDescriptor_Disabled;
 
-   public TourAction(final Object actionObject, final String text, final ImageDescriptor imageDescriptor) {
+   public boolean            isChecked;
+   public boolean            isCategory;
+
+   public TourAction(final Object actionObject,
+                     final String text,
+                     final ImageDescriptor imageDescriptor,
+                     final ImageDescriptor imageDescriptor_Disabled,
+                     final TourActionCategory category) {
 
       actionClass = actionObject;
+      actionCategory = category;
+
       _imageDescriptor = imageDescriptor;
+      _imageDescriptor_Disabled = imageDescriptor_Disabled;
 
       final String unescapedText = text.replaceAll(UI.SYMBOL_AMPERSAND, UI.EMPTY_STRING);
 
       actionText = unescapedText;
+   }
+
+   /**
+    * This is an action separator
+    *
+    * @param text
+    * @param category
+    */
+   public TourAction(final String text,
+                     final TourActionCategory category) {
+
+      actionText = text;
+      actionCategory = category;
+
+      isCategory = true;
+   }
+
+   public String getCategoryClassName() {
+
+      return actionCategory.getClass().getCanonicalName()
+            + '#'
+            + actionCategory.name();
    }
 
    public Image getImage() {
@@ -48,5 +82,24 @@ public class TourAction {
       }
 
       return _image;
+   }
+
+   public Image getImageDisabled() {
+
+      if (_imageDescriptor_Disabled != null && _image_Disabled == null) {
+
+         _image_Disabled = _imageDescriptor_Disabled.createImage();
+      }
+
+      return _image_Disabled;
+   }
+
+   @Override
+   public String toString() {
+
+      return "TourAction" + "\n"
+            + " actionText     = " + actionText + "\n"
+            + " actionCategory = " + actionCategory + "\n"
+            + "\n";
    }
 }

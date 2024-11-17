@@ -33,7 +33,7 @@ public class ActionDeleteTourMenu extends SubMenu {
    public ActionDeleteTourMenu(final TourBookView tourBookView) {
 
       super(Messages.Tour_Book_Action_delete_selected_tours_menu, AS_DROP_DOWN_MENU);
-      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.State_Delete));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.State_Delete));
 
       _actionDeleteTourMenu2 = new ActionDeleteTourMenu2(tourBookView);
    }

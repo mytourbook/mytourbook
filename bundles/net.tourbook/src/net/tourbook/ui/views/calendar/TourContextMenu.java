@@ -76,25 +76,29 @@ public class TourContextMenu {
 
    private void createActions(final ITourProvider tourProvider) {
 
-      _actionDuplicateTour = new ActionDuplicateTour(tourProvider);
-      _actionEditQuick = new ActionEditQuick(tourProvider);
-      _actionEditTour = new ActionEditTour(tourProvider);
-      _actionOpenTour = new ActionOpenTour(tourProvider);
+// SET_FORMATTING_OFF
+
+      _actionDuplicateTour       = new ActionDuplicateTour(tourProvider);
+      _actionEditQuick           = new ActionEditQuick(tourProvider);
+      _actionEditTour            = new ActionEditTour(tourProvider);
+      _actionOpenTour            = new ActionOpenTour(tourProvider);
       // _actionDeleteTour = new ActionDeleteTourMenu(tourProvider);
 
-      _actionOpenMarkerDialog = new ActionOpenMarkerDialog(tourProvider, true);
-      _actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(tourProvider);
-      _actionMergeTour = new ActionMergeTour(tourProvider);
-      _actionJoinTours = new ActionJoinTours(tourProvider);
+      _actionOpenMarkerDialog          = new ActionOpenMarkerDialog(tourProvider, true);
+      _actionOpenAdjustAltitudeDialog  = new ActionOpenAdjustAltitudeDialog(tourProvider);
+      _actionMergeTour                 = new ActionMergeTour(tourProvider);
+      _actionJoinTours                 = new ActionJoinTours(tourProvider);
       _actionComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(tourProvider);
-      _actionSetElevationFromSRTM = new ActionSetElevationValuesFromSRTM(tourProvider);
-      _actionSetOtherPerson = new ActionSetPerson(tourProvider);
+      _actionSetElevationFromSRTM      = new ActionSetElevationValuesFromSRTM(tourProvider);
+      _actionSetOtherPerson            = new ActionSetPerson(tourProvider);
 
-      _actionSetTourType = new ActionSetTourTypeMenu(tourProvider);
+      _actionSetTourType         = new ActionSetTourTypeMenu(tourProvider);
 
-      _actionExportTour = new ActionExport(tourProvider);
-      _actionPrintTour = new ActionPrint(tourProvider);
-      _actionUploadTour = new ActionUpload(tourProvider);
+      _actionExportTour          = new ActionExport(tourProvider);
+      _actionPrintTour           = new ActionPrint(tourProvider);
+      _actionUploadTour          = new ActionUpload(tourProvider);
+
+// SET_FORMATTING_ON      
 
       _tagMenuMgr = new TagMenuManager(tourProvider, true);
 

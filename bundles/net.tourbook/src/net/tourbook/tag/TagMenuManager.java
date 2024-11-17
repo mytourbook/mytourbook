@@ -50,6 +50,9 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
+import net.tourbook.ui.action.TourAction;
+import net.tourbook.ui.action.TourActionCategory;
+import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.tagging.TourTags_View;
 
 import org.eclipse.jface.action.Action;
@@ -116,9 +119,11 @@ public class TagMenuManager {
    private static int                     _taggingAutoOpenDelay;
    private static boolean                 _isTaggingAutoOpen;
    private static boolean                 _isTaggingAnimation;
-
    private boolean                        _isSaveTour;
+
    private ITourProvider                  _tourProvider;
+
+   private HashMap<String, Object>        _allTourActions_Tags;
 
    private Action_AddTourTag_SubMenu      _actionAddTag;
    private ActionContributionItem         _actionAddTagAdvanced;
@@ -130,14 +135,28 @@ public class TagMenuManager {
    private ActionShowTourTagsView         _actionSetTags;
    private ActionOpenPrefDialog           _actionTagGroupPreferences;
 
-   private AdvancedMenuForActions         _advancedMenuToAddTags;
+//   menuMgr.add(_actionSetTags);
+//
+//   menuMgr.add(_actionAddTagAdvanced);
+//   menuMgr.add(_actionAddTagGroups);
+//   menuMgr.add(_actionAddTag);
+//
+//   fillMenuWithRecentTags(menuMgr, null);
+//
+//   menuMgr.add(_actionRemoveTag);
+//   menuMgr.add(_actionRemoveAllTags);
+//
+//   menuMgr.add(_actionClipboard_CopyTags);
+//   menuMgr.add(_actionClipboard_PasteTags);
 
-   private TagTransfer                    _tagTransfer                 = new TagTransfer();
+   private AdvancedMenuForActions _advancedMenuToAddTags;
+
+   private TagTransfer            _tagTransfer = new TagTransfer();
 
    /**
     * Removes all tags
     */
-   private class Action_RemoveAllTags extends Action {
+   public class Action_RemoveAllTags extends Action {
 
       public Action_RemoveAllTags() {
 
@@ -176,7 +195,7 @@ public class TagMenuManager {
       }
    }
 
-   private class ActionClipboard_CopyTags extends Action {
+   public class ActionClipboard_CopyTags extends Action {
 
       public ActionClipboard_CopyTags() {
 
@@ -192,7 +211,7 @@ public class TagMenuManager {
       }
    }
 
-   private class ActionClipboard_PasteTags extends Action {
+   public class ActionClipboard_PasteTags extends Action {
 
       public ActionClipboard_PasteTags() {
 
@@ -241,7 +260,7 @@ public class TagMenuManager {
 
    }
 
-   private class ActionShowTourTagsView extends Action {
+   public class ActionShowTourTagsView extends Action {
 
       public ActionShowTourTagsView() {
 
@@ -277,7 +296,7 @@ public class TagMenuManager {
       }
    }
 
-   private class ActionTagGroups_SubMenu extends SubMenu {
+   public class ActionTagGroups_SubMenu extends SubMenu {
 
       List<ActionTagGroup> __allTagGroupActions = new ArrayList<>();
 
@@ -725,6 +744,19 @@ public class TagMenuManager {
 
       _advancedMenuToAddTags     = new AdvancedMenuForActions(_actionAddTagAdvanced);
 
+      _allTourActions_Tags  = new HashMap<>();
+
+      _allTourActions_Tags.put(_actionAddTag                .getClass().getName(),  _actionAddTag);
+      _allTourActions_Tags.put(_actionAddTagAdvanced        .getClass().getName(),  _actionAddTagAdvanced);
+      _allTourActions_Tags.put(_actionAddTagGroups          .getClass().getName(),  _actionAddTagGroups);
+      _allTourActions_Tags.put(_actionClipboard_CopyTags    .getClass().getName(),  _actionClipboard_CopyTags);
+      _allTourActions_Tags.put(_actionClipboard_PasteTags   .getClass().getName(),  _actionClipboard_PasteTags);
+      _allTourActions_Tags.put(_actionRemoveAllTags         .getClass().getName(),  _actionRemoveAllTags);
+      _allTourActions_Tags.put(_actionRemoveTag             .getClass().getName(),  _actionRemoveTag);
+      _allTourActions_Tags.put(_actionSetTags               .getClass().getName(),  _actionSetTags);
+
+//      fillMenuWithRecentTags(menuMgr, null);
+
 // SET_FORMATTING_ON
    }
 
@@ -867,6 +899,8 @@ public class TagMenuManager {
       enableTagActions(isAddTagEnabled, isRemoveTagEnabled);
    }
 
+
+
    void fillMenuWithRecentTags(final IMenuManager menuMgr, final Menu menu) {
 
       if (_recentTags.isEmpty()) {
@@ -991,6 +1025,34 @@ public class TagMenuManager {
          menuMgr.add(_actionClipboard_CopyTags);
          menuMgr.add(_actionClipboard_PasteTags);
       }
+
+      _isAdvMenu = false;
+   }
+
+   public void fillTagMenu(final IMenuManager menuMgr, final List<TourAction> allActiveActions) {
+      // TODO Auto-generated method stub
+
+      menuMgr.add(new Separator());
+
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.TAG, _allTourActions_Tags, allActiveActions);
+
+      fillMenuWithRecentTags(menuMgr, null);
+
+//      {
+//         menuMgr.add(_actionSetTags);
+//
+//         menuMgr.add(_actionAddTagAdvanced);
+//         menuMgr.add(_actionAddTagGroups);
+//         menuMgr.add(_actionAddTag);
+//
+//         fillMenuWithRecentTags(menuMgr, null);
+//
+//         menuMgr.add(_actionRemoveTag);
+//         menuMgr.add(_actionRemoveAllTags);
+//
+//         menuMgr.add(_actionClipboard_CopyTags);
+//         menuMgr.add(_actionClipboard_PasteTags);
+//      }
 
       _isAdvMenu = false;
    }
