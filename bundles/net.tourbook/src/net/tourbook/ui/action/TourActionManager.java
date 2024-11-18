@@ -26,7 +26,8 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
-import net.tourbook.tag.Action_AddTourTag_SubMenu;
+import net.tourbook.tag.ActionAddRecentTags;
+import net.tourbook.tag.ActionAddTourTag_SubMenu;
 import net.tourbook.tag.Action_RemoveTourTag_SubMenu;
 import net.tourbook.tag.TagMenuManager.ActionClipboard_CopyTags;
 import net.tourbook.tag.TagMenuManager.ActionClipboard_PasteTags;
@@ -43,11 +44,14 @@ import net.tourbook.ui.views.rawData.SubMenu_AdjustTourValues;
 import net.tourbook.ui.views.tourBook.ActionDeleteTourMenu;
 import net.tourbook.ui.views.tourBook.ActionExportViewCSV;
 
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 
 public class TourActionManager {
+
+   public static final String             AUTO_OPEN                       = "#AutoOpen";                                //$NON-NLS-1$
 
    private static final String            ID                              = "net.tourbook.ui.action.TourActionManager"; //$NON-NLS-1$
 
@@ -64,7 +68,7 @@ public class TourActionManager {
    private static Boolean                 _isCustomizeActions;
 
    /**
-    * Key is the action class name
+    * Key is the action class name or in special cases a modified class name
     */
    private static Map<String, TourAction> _allActionsMap;
 
@@ -73,22 +77,28 @@ public class TourActionManager {
       createActions();
    }
 
+   /**
+    * The sequence of the actions/categories in _allDefinedActions is VERY important, this is the
+    * default sorting.
+    */
    private static void createActions() {
 
       // create a map with all available actions
-
       _allActionsMap = new HashMap<>();
       _allDefinedActions = new ArrayList<>();
 
+      createActions_10_Edit();
+      createActions_20_Tags();
+      createActions_30_Export();
+      createActions_40_Adjust();
+   }
+
+   /**
+    * EDIT ACTIONS
+    */
+   private static void createActions_10_Edit() {
+
 // SET_FORMATTING_OFF
-
-      /**
-       * The sequence of the actions/categories is VERY important
-       */
-
-      /*
-       * EDIT ACTIONS
-       */
 
       final TourAction categoryAction_Edit               = new TourAction(
             "EDIT TOUR",
@@ -96,207 +106,69 @@ public class TourActionManager {
             );
 
       final TourAction actionEditQuick                   = new TourAction(
-            ActionEditQuick.class,
+            ActionEditQuick.class.getName(),
             Messages.app_action_quick_edit,
             TourbookPlugin.getThemedImageDescriptor(Images.App_Edit),
             TourbookPlugin.getThemedImageDescriptor(Images.App_Edit_Disabled),
             TourActionCategory.EDIT);
 
       final TourAction actionEditTour                    = new TourAction(
-            ActionEditTour.class,
+            ActionEditTour.class.getName(),
             Messages.App_Action_edit_tour,
             TourbookPlugin.getThemedImageDescriptor(Images.EditTour),
             TourbookPlugin.getImageDescriptor(Images.EditTour_Disabled),
             TourActionCategory.EDIT);
 
       final TourAction actionOpenMarkerDialog            = new TourAction(
-            ActionOpenMarkerDialog.class,
+            ActionOpenMarkerDialog.class.getName(),
             Messages.app_action_edit_tour_marker,
             TourbookPlugin.getThemedImageDescriptor(Images.TourMarker),
             TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_Disabled),
             TourActionCategory.EDIT);
 
       final TourAction actionOpenAdjustAltitudeDialog    = new TourAction(
-            ActionOpenAdjustAltitudeDialog.class,
+            ActionOpenAdjustAltitudeDialog.class.getName(),
             Messages.app_action_edit_adjust_altitude,
             TourbookPlugin.getThemedImageDescriptor(Images.AdjustElevation),
             TourbookPlugin.getThemedImageDescriptor(Images.AdjustElevation_Disabled),
             TourActionCategory.EDIT);
 
       final TourAction actionSetStartEndLocation         = new TourAction(
-            ActionSetStartEndLocation.class,
+            ActionSetStartEndLocation.class.getName(),
             Messages.Tour_Location_Action_ManageStartEndLocation,
             TourbookPlugin.getThemedImageDescriptor(Images.Tour_StartEnd),
             null,
             TourActionCategory.EDIT);
 
       final TourAction actionOpenTour                    = new TourAction(
-            ActionOpenTour.class,
+            ActionOpenTour.class.getName(),
             Messages.app_action_open_tour,
             TourbookPlugin.getThemedImageDescriptor(Images.TourViewer),
             null,
             TourActionCategory.EDIT);
 
       final TourAction actionDuplicateTour               = new TourAction(
-            ActionDuplicateTour.class,
+            ActionDuplicateTour.class.getName(),
             Messages.Tour_Action_DuplicateTour,
             TourbookPlugin.getImageDescriptor(Images.Tour_Duplicate),
             TourbookPlugin.getImageDescriptor(Images.Tour_Duplicate_Disabled),
             TourActionCategory.EDIT);
 
       final TourAction actionMergeTour                   = new TourAction(
-            ActionMergeTour.class,
+            ActionMergeTour.class.getName(),
             Messages.app_action_merge_tour,
             TourbookPlugin.getImageDescriptor(Images.MergeTours),
             null,
             TourActionCategory.EDIT);
 
       final TourAction actionJoinTours                   = new TourAction(
-            ActionJoinTours.class,
+            ActionJoinTours.class.getName(),
             Messages.App_Action_JoinTours,
             null,
             null,
             TourActionCategory.EDIT);
 
-      /*
-       * TAG ACTIONS
-       */
-      final TourAction categoryAction_Tag             = new TourAction(
-            "TAGS",
-            TourActionCategory.TAG);
 
-      final TourAction actionAddTourTag               = new TourAction(
-            Action_AddTourTag_SubMenu.class,
-            Messages.action_tag_add,
-            null,
-            null,
-            TourActionCategory.TAG);
-
-      final TourAction actionAddTagGroups             = new TourAction(
-            ActionTagGroups_SubMenu.class,
-            Messages.Action_Tag_AddGroupedTags,
-            null,
-            null,
-            TourActionCategory.TAG);
-
-      final TourAction actionClipboard_CopyTags       = new TourAction(
-            ActionClipboard_CopyTags.class,
-            "&Copy Tags",
-            null,
-            null,
-            TourActionCategory.TAG);
-
-      final TourAction actionClipboard_PasteTags      = new TourAction(
-            ActionClipboard_PasteTags.class,
-            "&Paste Tags",
-            null,
-            null,
-            TourActionCategory.TAG);
-
-      final TourAction actionRemoveTourTag            = new TourAction(
-            Action_RemoveTourTag_SubMenu.class,
-            Messages.action_tag_remove,
-            null,
-            null,
-            TourActionCategory.TAG);
-
-      final TourAction actionRemoveAllTags            = new TourAction(
-            Action_RemoveAllTags.class,
-            Messages.action_tag_remove_all,
-            null,
-            null,
-            TourActionCategory.TAG);
-
-      final TourAction actionShowTourTagsView         = new TourAction(
-            ActionShowTourTagsView.class,
-            Messages.Action_Tag_SetTags,
-            TourbookPlugin.getImageDescriptor(Images.TourTags),
-            null,
-            TourActionCategory.TAG);
-
-//      private ActionContributionItem         _actionAddTagAdvanced;
-
-      /*
-       * EXPORT ACTIONS
-       */
-
-      final TourAction categoryAction_Export             = new TourAction(
-            "EXPORT TOUR",
-            TourActionCategory.EXPORT);
-
-      final TourAction actionUploadTour                  = new TourAction(
-            ActionUpload.class,
-            Messages.App_Action_Upload_Tour,
-            null,
-            null,
-            TourActionCategory.EXPORT);
-
-      final TourAction actionExportTour                  = new TourAction(
-            ActionExport.class,
-            Messages.action_export_tour,
-            null,
-            null,
-            TourActionCategory.EXPORT);
-
-      final TourAction actionExportTourCSV               = new TourAction(
-            ActionExportViewCSV.class,
-            Messages.App_Action_ExportViewCSV,
-            TourbookPlugin.getImageDescriptor(Images.CSVFormat),
-            TourbookPlugin.getImageDescriptor(Images.CSVFormat_Disabled),
-            TourActionCategory.EXPORT);
-
-      final TourAction actionPrintTour                  = new TourAction(
-            ActionPrint.class,
-            Messages.action_print_tour,
-            null,
-            null,
-            TourActionCategory.EXPORT);
-
-      /*
-       * ADJUST ACTIONS
-       */
-
-      final TourAction categoryAction_Adjust             = new TourAction(
-            "ADJUST TOUR",
-            TourActionCategory.ADJUST);
-
-      final TourAction actionAdjustTourValues            = new TourAction(
-            SubMenu_AdjustTourValues.class,
-            Messages.Tour_Action_AdjustTourValues,
-            null,
-            null,
-            TourActionCategory.ADJUST);
-
-      final TourAction actionDeletTourValues             = new TourAction(
-            ActionDeleteTourValues.class,
-            Messages.Dialog_DeleteTourValues_Action_OpenDialog,
-            null,
-            null,
-            TourActionCategory.ADJUST);
-
-      final TourAction actionReimportTours               = new TourAction(
-            ActionReimportTours.class,
-            Messages.Dialog_ReimportTours_Action_OpenDialog,
-            null,
-            null,
-            TourActionCategory.ADJUST);
-
-      final TourAction actionSetOtherPersion             = new TourAction(
-            ActionSetPerson.class,
-            Messages.App_Action_SetPerson,
-            null,
-            null,
-            TourActionCategory.ADJUST);
-
-      final TourAction actionDeleteTourMenu              = new TourAction(
-            ActionDeleteTourMenu.class,
-            Messages.Tour_Book_Action_delete_selected_tours_menu,
-            TourbookPlugin.getImageDescriptor(Images.State_Delete),
-            null,
-            TourActionCategory.ADJUST);
-
-
-      // edit actions
       _allDefinedActions.add(categoryAction_Edit);
 
       _allDefinedActions.add(actionEditQuick);
@@ -321,28 +193,148 @@ public class TourActionManager {
       _allActionsMap.put(ActionMergeTour                 .class.getName(),          actionMergeTour);
       _allActionsMap.put(ActionJoinTours                 .class.getName(),          actionJoinTours);
 
-      // tag actions
+// SET_FORMATTING_ON
+   }
+
+   private static void createActions_20_Tags() {
+
+// SET_FORMATTING_OFF
+
+      /**
+       * TAG ACTIONS
+       */
+      final TourAction categoryAction_Tag             = new TourAction(
+            "TAGS",
+            TourActionCategory.TAG);
+
+      final TourAction actionSetTags                  = new TourAction(
+            ActionShowTourTagsView.class.getName(),
+            Messages.Action_Tag_SetTags,
+            TourbookPlugin.getImageDescriptor(Images.TourTags),
+            null,
+            TourActionCategory.TAG);
+
+      final TourAction actionAddTag_AutoOpen          = new TourAction(
+            ActionAddTourTag_SubMenu.class.getName() + AUTO_OPEN,
+            Messages.Action_Tag_Add_AutoOpen,
+            null,
+            null,
+            TourActionCategory.TAG);
+
+      final TourAction actionAddTag                   = new TourAction(
+            ActionAddTourTag_SubMenu.class.getName(),
+            Messages.action_tag_add,
+            null,
+            null,
+            TourActionCategory.TAG);
+
+      final TourAction actionAddRecentTags            = new TourAction(
+            ActionAddRecentTags.class.getName(),
+            "Add Recent Tags",
+            null,
+            null,
+            TourActionCategory.TAG);
+
+      final TourAction actionAddTagGroups             = new TourAction(
+            ActionTagGroups_SubMenu.class.getName(),
+            Messages.Action_Tag_AddGroupedTags,
+            null,
+            null,
+            TourActionCategory.TAG);
+
+      final TourAction actionClipboard_CopyTags       = new TourAction(
+            ActionClipboard_CopyTags.class.getName(),
+            "&Copy Tags",
+            null,
+            null,
+            TourActionCategory.TAG);
+
+      final TourAction actionClipboard_PasteTags      = new TourAction(
+            ActionClipboard_PasteTags.class.getName(),
+            "&Paste Tags",
+            null,
+            null,
+            TourActionCategory.TAG);
+
+      final TourAction actionRemoveTourTag            = new TourAction(
+            Action_RemoveTourTag_SubMenu.class.getName(),
+            Messages.action_tag_remove,
+            null,
+            null,
+            TourActionCategory.TAG);
+
+      final TourAction actionRemoveAllTags            = new TourAction(
+            Action_RemoveAllTags.class.getName(),
+            Messages.action_tag_remove_all,
+            null,
+            null,
+            TourActionCategory.TAG);
+
       _allDefinedActions.add(categoryAction_Tag);
 
-      _allDefinedActions.add(actionShowTourTagsView);
-      _allDefinedActions.add(actionAddTourTag);
+      _allDefinedActions.add(actionSetTags);
+      _allDefinedActions.add(actionAddTag_AutoOpen);
       _allDefinedActions.add(actionAddTagGroups);
-      _allDefinedActions.add(actionClipboard_CopyTags);
-      _allDefinedActions.add(actionClipboard_PasteTags);
+      _allDefinedActions.add(actionAddTag);
+      _allDefinedActions.add(actionAddRecentTags);
       _allDefinedActions.add(actionRemoveTourTag);
       _allDefinedActions.add(actionRemoveAllTags);
+      _allDefinedActions.add(actionClipboard_CopyTags);
+      _allDefinedActions.add(actionClipboard_PasteTags);
 
-      _allActionsMap.put(categoryAction_Tag              .getCategoryClassName(),   categoryAction_Tag);
+      _allActionsMap.put(categoryAction_Tag              .getCategoryClassName(),      categoryAction_Tag);
 
-      _allActionsMap.put(Action_AddTourTag_SubMenu       .class.getName(),          actionAddTourTag);
-      _allActionsMap.put(ActionTagGroups_SubMenu         .class.getName(),          actionAddTagGroups);
-      _allActionsMap.put(ActionClipboard_CopyTags        .class.getName(),          actionClipboard_CopyTags);
-      _allActionsMap.put(ActionClipboard_PasteTags       .class.getName(),          actionClipboard_PasteTags);
-      _allActionsMap.put(Action_RemoveTourTag_SubMenu    .class.getName(),          actionRemoveTourTag);
-      _allActionsMap.put(Action_RemoveAllTags            .class.getName(),          actionRemoveAllTags);
-      _allActionsMap.put(ActionShowTourTagsView          .class.getName(),          actionShowTourTagsView);
+      _allActionsMap.put(ActionShowTourTagsView          .class.getName(),             actionSetTags);
+      _allActionsMap.put(ActionAddTourTag_SubMenu        .class.getName() + AUTO_OPEN, actionAddTag_AutoOpen);
+      _allActionsMap.put(ActionTagGroups_SubMenu         .class.getName(),             actionAddTagGroups);
+      _allActionsMap.put(ActionAddTourTag_SubMenu        .class.getName(),             actionAddTag);
+      _allActionsMap.put(ActionAddRecentTags             .class.getName(),             actionAddRecentTags);
+      _allActionsMap.put(ActionClipboard_CopyTags        .class.getName(),             actionClipboard_CopyTags);
+      _allActionsMap.put(ActionClipboard_PasteTags       .class.getName(),             actionClipboard_PasteTags);
+      _allActionsMap.put(Action_RemoveTourTag_SubMenu    .class.getName(),             actionRemoveTourTag);
+      _allActionsMap.put(Action_RemoveAllTags            .class.getName(),             actionRemoveAllTags);
 
-      // export actions
+// SET_FORMATTING_ON
+
+   }
+
+   private static void createActions_30_Export() {
+
+// SET_FORMATTING_OFF
+
+      final TourAction categoryAction_Export             = new TourAction(
+            "EXPORT TOUR",
+            TourActionCategory.EXPORT);
+
+      final TourAction actionUploadTour                  = new TourAction(
+            ActionUpload.class.getName(),
+            Messages.App_Action_Upload_Tour,
+            null,
+            null,
+            TourActionCategory.EXPORT);
+
+      final TourAction actionExportTour                  = new TourAction(
+            ActionExport.class.getName(),
+            Messages.action_export_tour,
+            null,
+            null,
+            TourActionCategory.EXPORT);
+
+      final TourAction actionExportTourCSV               = new TourAction(
+            ActionExportViewCSV.class.getName(),
+            Messages.App_Action_ExportViewCSV,
+            TourbookPlugin.getImageDescriptor(Images.CSVFormat),
+            TourbookPlugin.getThemedImageDescriptor(Images.CSVFormat_Disabled),
+            TourActionCategory.EXPORT);
+
+      final TourAction actionPrintTour                  = new TourAction(
+            ActionPrint.class.getName(),
+            Messages.action_print_tour,
+            null,
+            null,
+            TourActionCategory.EXPORT);
+
+
       _allDefinedActions.add(categoryAction_Export);
 
       _allDefinedActions.add(actionUploadTour);
@@ -357,7 +349,53 @@ public class TourActionManager {
       _allActionsMap.put(ActionExportViewCSV             .class.getName(),          actionExportTourCSV);
       _allActionsMap.put(ActionPrint                     .class.getName(),          actionPrintTour);
 
-      // adjust actions
+// SET_FORMATTING_ON
+   }
+
+   private static void createActions_40_Adjust() {
+
+// SET_FORMATTING_OFF
+
+      final TourAction categoryAction_Adjust             = new TourAction(
+            "ADJUST TOUR",
+            TourActionCategory.ADJUST);
+
+      final TourAction actionAdjustTourValues            = new TourAction(
+            SubMenu_AdjustTourValues.class.getName(),
+            Messages.Tour_Action_AdjustTourValues,
+            null,
+            null,
+            TourActionCategory.ADJUST);
+
+      final TourAction actionDeletTourValues             = new TourAction(
+            ActionDeleteTourValues.class.getName(),
+            Messages.Dialog_DeleteTourValues_Action_OpenDialog,
+            null,
+            null,
+            TourActionCategory.ADJUST);
+
+      final TourAction actionReimportTours               = new TourAction(
+            ActionReimportTours.class.getName(),
+            Messages.Dialog_ReimportTours_Action_OpenDialog,
+            null,
+            null,
+            TourActionCategory.ADJUST);
+
+      final TourAction actionSetOtherPersion             = new TourAction(
+            ActionSetPerson.class.getName(),
+            Messages.App_Action_SetPerson,
+            null,
+            null,
+            TourActionCategory.ADJUST);
+
+      final TourAction actionDeleteTourMenu              = new TourAction(
+            ActionDeleteTourMenu.class.getName(),
+            Messages.Tour_Book_Action_delete_selected_tours_menu,
+            TourbookPlugin.getImageDescriptor(Images.State_Delete),
+            null,
+            TourActionCategory.ADJUST);
+
+
       _allDefinedActions.add(categoryAction_Adjust);
 
       _allDefinedActions.add(actionAdjustTourValues);
@@ -397,7 +435,7 @@ public class TourActionManager {
          }
       }
 
-      // make sure that all available actions are in the viewer
+      // make sure that all available actions are displayed
       for (final TourAction tourAction : _allDefinedActions) {
 
          if (allSortedActions.contains(tourAction) == false) {
@@ -405,6 +443,8 @@ public class TourActionManager {
             allSortedActions.add(tourAction);
          }
       }
+
+      ensureActionCategoryPositions(allSortedActions);
    }
 
    private static void createVisibleActions(final List<TourAction> allVisibleActions) {
@@ -429,10 +469,71 @@ public class TourActionManager {
    }
 
    /**
+    * Ensure that all actions are within its category
+    *
+    * @param allSortedActions
+    */
+   @SuppressWarnings("unchecked")
+   private static void ensureActionCategoryPositions(final List<TourAction> allSortedActions) {
+
+      /*
+       * Get all categories and actions
+       */
+      final TourActionCategory[] allCategories = TourActionCategory.values();
+      final int numCategories = allCategories.length;
+
+      final TourAction[] allCategoryActions = new TourAction[numCategories];
+      final List<TourAction>[] allCategoryTourActions = new ArrayList[numCategories];
+
+      for (final TourAction tourAction : allSortedActions) {
+
+         final int categoryOrdinal = tourAction.actionCategory.ordinal();
+
+         if (tourAction.isCategory) {
+
+            allCategoryActions[categoryOrdinal] = tourAction;
+
+         } else {
+
+            List<TourAction> allCatTourActions = allCategoryTourActions[categoryOrdinal];
+
+            if (allCatTourActions == null) {
+               allCatTourActions = allCategoryTourActions[categoryOrdinal] = new ArrayList<>();
+            }
+
+            allCatTourActions.add(tourAction);
+         }
+      }
+
+      /*
+       * Resort categories and actions
+       */
+      allSortedActions.clear();
+
+      for (final TourAction categoryAction : allCategoryActions) {
+
+         if (categoryAction == null) {
+            continue;
+         }
+
+         // add category
+         allSortedActions.add(categoryAction);
+
+         // add actions
+         final List<TourAction> allCatTourActions = allCategoryTourActions[categoryAction.actionCategory.ordinal()];
+
+         for (final TourAction tourAction : allCatTourActions) {
+            allSortedActions.add(tourAction);
+         }
+      }
+   }
+
+   /**
     * @param menuMgr
     * @param actionCategory
+    *           Only actions with this category will be filled into the context menu
     * @param allCategoryActions
-    *           Contains all actions with the actionCategory {@link TourActionCategory}
+    *           Contains all actions with the same actionCategory {@link TourActionCategory}
     * @param allActiveActions
     */
    public static void fillContextMenu(final IMenuManager menuMgr,
@@ -442,16 +543,28 @@ public class TourActionManager {
 
       for (final TourAction activeTourAction : allActiveActions) {
 
-         if (activeTourAction.actionCategory == actionCategory) {
+         if (activeTourAction.actionCategory != actionCategory) {
 
-            if (activeTourAction.actionClass instanceof final Class clazz) {
+            // skip other categories
 
-               final Object tourAction = allCategoryActions.get(clazz.getName());
+            continue;
+         }
 
-               if (tourAction instanceof final IAction action) {
-                  menuMgr.add(action);
-               }
-            }
+         final String actionClassName = activeTourAction.actionClassName;
+
+         final Object tourAction = allCategoryActions.get(actionClassName);
+
+         if (tourAction instanceof final IActionProvider actionProvider) {
+
+            actionProvider.fillActions(menuMgr);
+
+         } else if (tourAction instanceof final IAction action) {
+
+            menuMgr.add(action);
+
+         } else if (tourAction instanceof final ActionContributionItem action) {
+
+            menuMgr.add(action);
          }
       }
    }
@@ -478,12 +591,12 @@ public class TourActionManager {
     */
    public static List<TourAction> getSortedActions() {
 
-//      if (_allSortedActions == null) {
+      if (_allSortedActions == null) {
 
-      _allSortedActions = new ArrayList<>();
+         _allSortedActions = new ArrayList<>();
 
-      createSortedActions(_allSortedActions);
-//      }
+         createSortedActions(_allSortedActions);
+      }
 
       return _allSortedActions;
    }

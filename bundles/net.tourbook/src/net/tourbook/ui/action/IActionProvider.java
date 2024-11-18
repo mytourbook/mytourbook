@@ -15,14 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-public enum TourActionCategory {
+import org.eclipse.jface.action.IMenuManager;
 
-   /**
-    * !!! The category actions are ordered in the sort order of the enums !!!
-    */
+public interface IActionProvider {
 
-   EDIT, //
-   TAG, //
-   EXPORT, //
-   ADJUST, //
+   public void fillActions(final IMenuManager menuMgr);
 }

@@ -13,16 +13,27 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.action;
+package net.tourbook.tag;
 
-public enum TourActionCategory {
+import net.tourbook.ui.action.IActionProvider;
 
-   /**
-    * !!! The category actions are ordered in the sort order of the enums !!!
-    */
+import org.eclipse.jface.action.IMenuManager;
 
-   EDIT, //
-   TAG, //
-   EXPORT, //
-   ADJUST, //
+/**
+ * This is just a placeholder for recent tag actions
+ */
+public class ActionAddRecentTags implements IActionProvider {
+
+   public IActionProvider actionProvider;
+
+   public ActionAddRecentTags(final IActionProvider actionProvider) {
+
+      this.actionProvider = actionProvider;
+   }
+
+   @Override
+   public void fillActions(final IMenuManager menuMgr) {
+
+      actionProvider.fillActions(menuMgr);
+   }
 }

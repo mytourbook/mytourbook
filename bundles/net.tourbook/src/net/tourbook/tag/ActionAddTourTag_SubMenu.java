@@ -52,7 +52,7 @@ import org.eclipse.swt.widgets.MenuItem;
 /**
  * Add tag(s) from the selected tours
  */
-public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvancedMenuForActions {
+public class ActionAddTourTag_SubMenu extends Action implements IMenuCreator, IAdvancedMenuForActions {
 
    private static final String    SPACE_PRE_TAG     = "   ";          //$NON-NLS-1$
 
@@ -184,12 +184,12 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
     */
    private class ActionTourTagCategory extends Action implements IMenuCreator {
 
-      private Menu                            __categoryMenu;
+      private Menu                           __categoryMenu;
 
-      private final Action_AddTourTag_SubMenu __actionAddTourTag;
-      private final TourTagCategory           __tagCategory;
+      private final ActionAddTourTag_SubMenu __actionAddTourTag;
+      private final TourTagCategory          __tagCategory;
 
-      public ActionTourTagCategory(final Action_AddTourTag_SubMenu actionAddTourTag, final TourTagCategory tagCategory) {
+      public ActionTourTagCategory(final ActionAddTourTag_SubMenu actionAddTourTag, final TourTagCategory tagCategory) {
 
          super(tagCategory.getCategoryName(), AS_DROP_DOWN_MENU);
 
@@ -245,7 +245,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
    /**
     * @param tagMenuManager
     */
-   Action_AddTourTag_SubMenu(final TagMenuManager tagMenuManager) {
+   ActionAddTourTag_SubMenu(final TagMenuManager tagMenuManager) {
 
       super(Messages.action_tag_add, AS_DROP_DOWN_MENU);
 
@@ -262,7 +262,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
     *           This parameter is ignored but it indicates that the menu auto open behavior is
     *           used.
     */
-   Action_AddTourTag_SubMenu(final TagMenuManager tagMenuMgr, final Object isAutoOpen) {
+   ActionAddTourTag_SubMenu(final TagMenuManager tagMenuMgr, final Object isAutoOpen) {
 
       super(Messages.Action_Tag_Add_AutoOpen, AS_PUSH_BUTTON);
 
@@ -486,7 +486,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
          (new Separator()).fill(menu, -1);
          {
             addActionToMenu(menu, _actionRecentTagsTitle);
-            _tagMenuMgr.fillMenuWithRecentTags(null, menu);
+            _tagMenuMgr.fillTagMenu_WithRecentTags(null, menu);
          }
       }
    }

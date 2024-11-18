@@ -22,10 +22,11 @@ import org.eclipse.swt.graphics.Image;
 
 public class TourAction {
 
-   public Object             actionClass;
+   public String             actionClassName;
    public String             actionText;
 
    public TourActionCategory actionCategory;
+   public IActionProvider    actionProvider;
 
    private Image             _image;
    private Image             _image_Disabled;
@@ -35,13 +36,13 @@ public class TourAction {
    public boolean            isChecked;
    public boolean            isCategory;
 
-   public TourAction(final Object actionObject,
+   public TourAction(final String className,
                      final String text,
                      final ImageDescriptor imageDescriptor,
                      final ImageDescriptor imageDescriptor_Disabled,
                      final TourActionCategory category) {
 
-      actionClass = actionObject;
+      actionClassName = className;
       actionCategory = category;
 
       _imageDescriptor = imageDescriptor;

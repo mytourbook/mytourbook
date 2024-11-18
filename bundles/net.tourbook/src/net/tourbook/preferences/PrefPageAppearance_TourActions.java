@@ -15,10 +15,14 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.TableLayoutComposite;
 import net.tourbook.ui.action.TourAction;
 import net.tourbook.ui.action.TourActionManager;
@@ -40,10 +44,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class PrefPageAppearance_TourActions extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -66,6 +72,9 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
    private Button _btnDown;
    private Button _rdoShowAllActions;
    private Button _rdoShowCustomActions;
+
+   private Link   _linkTagOptions;
+   private Link   _linkTourTypeOptions;
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -128,6 +137,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
          {
             createUI_10_ActionViewer(viewerContainer);
             createUI_20_ViewerActions(viewerContainer);
+            createUI_30_Options(viewerContainer);
          }
       }
 
@@ -144,9 +154,11 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
       final Table table = new Table(
             layouter,
-            (SWT.CHECK | SWT.SINGLE
-//                  | SWT.H_SCROLL
-                  | SWT.V_SCROLL | SWT.FULL_SELECTION));
+            (SWT.CHECK
+                  | SWT.SINGLE
+//                | SWT.H_SCROLL
+//                | SWT.V_SCROLL
+                  | SWT.FULL_SELECTION));
 
       table.setHeaderVisible(false);
       table.setLinesVisible(false);
@@ -306,6 +318,47 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       }
    }
 
+   private void createUI_30_Options(final Composite parent) {
+
+      final GridDataFactory gd = GridDataFactory.fillDefaults()
+            .span(2, 1)
+            .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+            .grab(true, false);
+
+      {
+         /*
+          * Link to tag options
+          */
+         _linkTagOptions = new Link(parent, SWT.WRAP);
+         _linkTagOptions.setText(Messages.Pref_TourTag_Link_AppearanceOptions);
+         _linkTagOptions.addSelectionListener(widgetSelectedAdapter(selectionEvent ->
+
+         PreferencesUtil.createPreferenceDialogOn(getShell(),
+               PrefPageAppearance.ID,
+               null,
+               null)));
+
+         gd.applyTo(_linkTagOptions);
+      }
+      {
+         /*
+          * Link to tour type options
+          */
+         _linkTourTypeOptions = new Link(parent, SWT.WRAP);
+         _linkTourTypeOptions.setText("Further tour type options are available in the page <a>Tour Type / Groups</a>");
+         _linkTourTypeOptions.addSelectionListener(widgetSelectedAdapter(selectionEvent ->
+
+         PreferencesUtil.createPreferenceDialogOn(getShell(),
+               PrefPageTourTypeFilterList.ID,
+               null,
+               null)));
+
+         gd.applyTo(_linkTourTypeOptions);
+      }
+
+      UI.createSpacer_Horizontal(parent, 2);
+   }
+
    private void enableControls() {
 
       final boolean isCustomizeActions = _rdoShowCustomActions.getSelection();
@@ -321,6 +374,9 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
       _btnCheckAll.setEnabled(isCustomizeActions);
       _btnUncheckAll.setEnabled(isCustomizeActions);
+
+      _linkTagOptions.setEnabled(isCustomizeActions);
+      _linkTourTypeOptions.setEnabled(isCustomizeActions);
 
       if (isCustomizeActions && isActionCategory == false) {
 
@@ -343,16 +399,17 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       final TableItem[] items = table.getSelection();
 
       final boolean isValidSelection = items.length > 0;
+
       boolean isEnableUp = isValidSelection;
       boolean isEnableDown = isValidSelection;
 
       if (isValidSelection) {
 
-         final int[] indices = table.getSelectionIndices();
-         final int max = table.getItemCount();
+         final int[] allIndices = table.getSelectionIndices();
+         final int numItems = table.getItemCount();
 
-         isEnableUp = indices[0] != 0;
-         isEnableDown = indices[indices.length - 1] < max - 1;
+         isEnableUp = allIndices[0] != 0;
+         isEnableDown = allIndices[allIndices.length - 1] < numItems - 1;
       }
 
       _btnUp.setEnabled(isEnableUp);
@@ -370,41 +427,20 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
    }
 
    /**
-    * Moves an entry in the table to the given index.
-    */
-   private void move(final TableItem item, final int index) {
-
-      this.setValid(true);
-
-      final TourAction action = (TourAction) item.getData();
-      item.dispose();
-
-      _tourActionViewer.insert(action, index);
-      _tourActionViewer.setChecked(action, action.isChecked);
-   }
-
-   /**
     * Move the current selection in the build list down
     */
    private void moveSelection_Down() {
 
       final Table table = _tourActionViewer.getTable();
-      final int[] indices = table.getSelectionIndices();
-      if (indices.length < 1) {
-         return;
-      }
+      final int[] allSelectedIndices = table.getSelectionIndices();
 
-      final int[] newSelection = new int[indices.length];
-      final int max = table.getItemCount() - 1;
+      if (allSelectedIndices.length > 0) {
 
-      for (int i = indices.length - 1; i >= 0; i--) {
-         final int index = indices[i];
-         if (index < max) {
-            move(table.getItem(index), index + 1);
-            newSelection[i] = index + 1;
-         }
+         final int selectedIndex = allSelectedIndices[0];
+         Collections.swap(_allSortedActions, selectedIndex, selectedIndex + 1);
+
+         _tourActionViewer.refresh();
       }
-      table.setSelection(newSelection);
    }
 
    /**
@@ -413,17 +449,16 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
    private void moveSelection_Up() {
 
       final Table table = _tourActionViewer.getTable();
-      final int[] indices = table.getSelectionIndices();
-      final int[] newSelection = new int[indices.length];
+      final int[] allSelectedIndices = table.getSelectionIndices();
 
-      for (int i = 0; i < indices.length; i++) {
-         final int index = indices[i];
-         if (index > 0) {
-            move(table.getItem(index), index - 1);
-            newSelection[i] = index - 1;
-         }
+      if (allSelectedIndices.length > 0) {
+
+         final int selectedIndex = allSelectedIndices[0];
+
+         Collections.swap(_allSortedActions, selectedIndex, selectedIndex - 1);
+
+         _tourActionViewer.refresh();
       }
-      table.setSelection(newSelection);
    }
 
    private void onCheckAll(final boolean isChecked) {
@@ -508,13 +543,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
          } else {
 
-            final Object actionClass = tourAction.actionClass;
-
-            if (actionClass instanceof final Class clazz) {
-
-               stateAllSortedActions[actionIndex] = clazz.getName();
-
-            }
+            stateAllSortedActions[actionIndex] = tourAction.actionClassName;
          }
       }
 
@@ -528,12 +557,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
          final TourAction tourAction = (TourAction) allCheckedActions[actionIndex];
 
-         final Object actionClass = tourAction.actionClass;
-
-         if (actionClass instanceof final Class clazz) {
-
-            stateAllCheckedActions[actionIndex] = clazz.getName();
-         }
+         stateAllCheckedActions[actionIndex] = tourAction.actionClassName;
       }
 
       TourActionManager.saveActions(

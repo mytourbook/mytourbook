@@ -1644,7 +1644,7 @@ public class TourBookView extends ViewPart implements
       _actionTourCollectionFilter      = new ActionTourCollectionFilter();
       _actionUploadTour                = new ActionUpload(this);
 
-      _actionCustomizeTourActions = new ActionOpenPrefDialog(Messages.App_Action_CustomizeContextMenu, PrefPageAppearance_TourActions.ID);
+      _actionCustomizeTourActions      = new ActionOpenPrefDialog(Messages.App_Action_CustomizeContextMenu, PrefPageAppearance_TourActions.ID);
 
       _actionContext_OnMouseSelect_ExpandCollapse  = new ActionOnMouseSelect_ExpandCollapse();
       _actionContext_SingleExpand_CollapseOthers   = new ActionSingleExpand_CollapseOthers();
@@ -2500,7 +2500,6 @@ public class TourBookView extends ViewPart implements
 
       // tag actions
       _tagMenuManager.fillTagMenu(menuMgr, allActiveActions);
-
 
       // tour type actions
       menuMgr.add(new Separator());
