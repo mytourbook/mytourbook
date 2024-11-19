@@ -240,8 +240,6 @@ public class TourTypeMenuManager {
             } else {
 
                // set tour type image
-//					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
-//					actionRecentTourType.setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
 
                actionRecentTourType.setImageDescriptor(TourTypeImage.getTourTypeImageDescriptor(tourTypeId));
             }

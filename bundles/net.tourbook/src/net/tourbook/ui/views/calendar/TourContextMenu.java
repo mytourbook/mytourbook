@@ -140,34 +140,7 @@ public class TourContextMenu {
          }
       });
 
-      menuMgr.add(_actionEditQuick);
-      menuMgr.add(_actionEditTour);
-      menuMgr.add(_actionOpenMarkerDialog);
-      menuMgr.add(_actionOpenAdjustAltitudeDialog);
-      menuMgr.add(_actionOpenTour);
-      menuMgr.add(_actionDuplicateTour);
-      menuMgr.add(_actionMergeTour);
-      // menuMgr.add(_actionJoinTours); // until now we only allow single tour selection
-      menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
-      menuMgr.add(_actionSetElevationFromSRTM);
-
-      tagMenuMgr.fillTagMenu(menuMgr, true);
-
-      // tour type actions
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionSetTourType);
-      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr);
-
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionUploadTour);
-      menuMgr.add(_actionExportTour);
-      menuMgr.add(_actionPrintTour);
-
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionSetOtherPerson);
-
       return contextMenu;
-
    }
 
    private void enableActions(final ITourProvider tourProvider) {
@@ -273,7 +246,7 @@ public class TourContextMenu {
       menuMgr.add(_actionOpenTour);
       menuMgr.add(_actionDuplicateTour);
       menuMgr.add(_actionMergeTour);
-      menuMgr.add(_actionJoinTours);
+      // menuMgr.add(_actionJoinTours); // until now we only allow single tour selection
       menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
       menuMgr.add(_actionSetElevationFromSRTM);
 
@@ -295,5 +268,4 @@ public class TourContextMenu {
 
       enableActions(tourProvider);
    }
-
 }
