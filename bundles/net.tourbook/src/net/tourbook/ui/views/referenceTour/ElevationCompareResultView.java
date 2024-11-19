@@ -1651,7 +1651,7 @@ public class ElevationCompareResultView extends ViewPart implements
       // tour type actions
       menuMgr.add(new Separator());
       menuMgr.add(_actionContext_SetTourType);
-      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, true);
+      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr);
 
       enableActions_ContextMenu();
    }

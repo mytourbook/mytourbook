@@ -150,10 +150,9 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
        */
       menuMgr.add(new Separator());
 
-      menuMgr.add(
-            new ActionOpenPrefDialog(
-                  Messages.action_tourType_modify_tourTypes,
-                  ITourbookPreferences.PREF_PAGE_TOUR_TYPE));
+      menuMgr.add(new ActionOpenPrefDialog(
+            Messages.action_tourType_modify_tourTypes,
+            ITourbookPreferences.PREF_PAGE_TOUR_TYPE));
    }
 
    private void addActionToMenu(final Action action, final Menu menu) {

@@ -70,9 +70,12 @@ public class TourTypeMenuManager {
 
    private static IPropertyChangeListener _prefChangeListener;
 
-   private ITourProvider                  _tourProvider;
+   /**
+    * This must be static otherwise it do not always work !!!
+    */
+   private static boolean                 _isSaveTour;
 
-   private boolean                        _isSaveTour;
+   private ITourProvider                  _tourProvider;
 
    private class RecentTourTypeAction extends Action {
 
@@ -262,8 +265,7 @@ public class TourTypeMenuManager {
     * @param tourProvider
     * @param isSaveTour
     */
-   public void fillMenuWithRecentTourTypes(final IMenuManager menuMgr,
-                                           final boolean isSaveTour) {
+   public void fillMenuWithRecentTourTypes(final IMenuManager menuMgr) {
 
       if (_recentTourTypes.isEmpty()) {
          return;
@@ -273,10 +275,7 @@ public class TourTypeMenuManager {
          return;
       }
 
-      System.out.println(UI.timeStamp() + " isSaveTour: " + isSaveTour);
-// TODO remove SYSTEM.OUT.PRINTLN
-
-      _isSaveTour = isSaveTour;
+      _isSaveTour = true;
 
       // add tour types
       int tourTypeIndex = 0;
@@ -302,6 +301,10 @@ public class TourTypeMenuManager {
 
    public void setTourTypeIntoTour(final TourType tourType,
                                    final boolean isSaveTour) {
+
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
 
       final Runnable runnable = new Runnable() {
          @Override

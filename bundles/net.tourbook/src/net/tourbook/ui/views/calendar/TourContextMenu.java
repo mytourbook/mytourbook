@@ -156,7 +156,7 @@ public class TourContextMenu {
       // tour type actions
       menuMgr.add(new Separator());
       menuMgr.add(_actionSetTourType);
-      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, true);
+      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionUploadTour);
@@ -232,22 +232,22 @@ public class TourContextMenu {
 
       Long tourTypeId = Long.valueOf(-1); // TODO -> NOTOUR
       if (null != firstSavedTour) {
-         
+
          final ArrayList<Long> tagIds = new ArrayList<>();
          for (final TourTag tag : firstSavedTour.getTourTags()) {
             tagIds.add(tag.getTagId());
          }
-         
+
          _tagMenuManager.enableTagActions(isTourSelected, isOneTour, tagIds);
-         
+
          if (isOneTour && null != firstSavedTour.getTourType()) {
             tourTypeId = firstSavedTour.getTourType().getTypeId();
          }
-         
+
          _tourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, tourTypeId);
-         
+
       } else {
-         
+
          _tagMenuManager.enableTagActions(isTourSelected, isOneTour, new ArrayList<>());
          _tourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, tourTypeId);
       }
@@ -282,7 +282,7 @@ public class TourContextMenu {
       // tour type actions
       menuMgr.add(new Separator());
       menuMgr.add(_actionSetTourType);
-      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, true);
+      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionUploadTour);

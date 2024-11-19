@@ -1881,7 +1881,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       // tour type actions
       menuMgr.add(new Separator());
       menuMgr.add(_actionSetTourType);
-      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, true);
+      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionCollapseOthers);

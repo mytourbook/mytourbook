@@ -85,7 +85,7 @@ public class SensorChartContextProvider implements IChartContextProvider, ITourP
       // tour type actions
       menuMgr.add(new Separator());
       menuMgr.add(_actionSetTourType);
-      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, true);
+      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr);
 
       enableActions(hoveredBarSerieIndex != -1);
    }

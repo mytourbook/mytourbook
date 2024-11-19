@@ -4365,7 +4365,7 @@ public class RawDataView extends ViewPart implements
       // tour type actions
       menuMgr.add(new Separator());
       menuMgr.add(_actionSetTourType);
-      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, true);
+      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr);
 
       // tour tag actions
       _tagMenuManager.fillTagMenu(menuMgr, true);
