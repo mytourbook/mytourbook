@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,16 +45,15 @@ import org.eclipse.swt.widgets.Display;
  */
 public class TourTypeMenuManager {
 
-   private static final String            STATE_ID           = "TourTypeManager.RecentTourTypes";               //$NON-NLS-1$
-   private static final String            STATE_TOUR_TYPE_ID = "TourTypeId";                                    //$NON-NLS-1$
+   private static final String            STATE_ID           = "TourTypeManager.RecentTourTypes";                             //$NON-NLS-1$
+   private static final String            STATE_TOUR_TYPE_ID = "TourTypeId";                                                  //$NON-NLS-1$
 
    private static final IPreferenceStore  _prefStore         = TourbookPlugin.getDefault().getPreferenceStore();
 
    /**
     * Tour type manager state is saved in {@link #STATE_ID}
     */
-   private static IDialogSettings         _state             = TourbookPlugin.getDefault()                      //
-         .getDialogSettingsSection(STATE_ID);
+   private static IDialogSettings         _state             = TourbookPlugin.getDefault().getDialogSettingsSection(STATE_ID);
 
    /**
     * number of tour types which are displayed in the context menu or saved in the dialog settings,
@@ -69,38 +68,111 @@ public class TourTypeMenuManager {
 
    private static int                     _maxTourTypes      = -1;
 
-   private static ITourProvider           _tourProvider;
-
    private static IPropertyChangeListener _prefChangeListener;
 
-   private static boolean                 _isInitialized     = false;
-   private static boolean                 _isSaveTour;
+   private ITourProvider                  _tourProvider;
 
-   private static class RecentTourTypeAction extends Action {
+   private boolean                        _isSaveTour;
+
+   private class RecentTourTypeAction extends Action {
 
       private TourType __tourType;
 
       @Override
       public void run() {
-         setTourTypeIntoTour(__tourType, _tourProvider, _isSaveTour);
+
+         setTourTypeIntoTour(__tourType, _isSaveTour);
       }
 
       private void setTourType(final TourType tourType) {
+
          __tourType = tourType;
       }
    }
 
-   private static void addPrefChangeListener() {
-      // create pref listener
+   public TourTypeMenuManager(final ITourProvider tourProvider) {
+
+      _tourProvider = tourProvider;
+
+      synchronized (_prefStore) {
+
+         if (_prefChangeListener == null) {
+
+            addPrefChangeListener();
+
+            setupActions();
+         }
+      }
+   }
+
+   public static void restoreState() {
+
+      final String[] allStateTourTypeIds = _state.getArray(STATE_TOUR_TYPE_ID);
+      if (allStateTourTypeIds == null) {
+         return;
+      }
+
+      /*
+       * get all tour types from the database which are saved in the state
+       */
+      final ArrayList<TourType> dbTourTypes = TourDatabase.getAllTourTypes();
+
+      for (final String stateTourTypeIdItem : allStateTourTypeIds) {
+         try {
+
+            final long stateTourTypeId = Long.parseLong(stateTourTypeIdItem);
+
+            for (final TourType dbTourType : dbTourTypes) {
+
+               if (dbTourType.getTypeId() == stateTourTypeId) {
+                  _recentTourTypes.add(dbTourType);
+                  break;
+               }
+            }
+
+         } catch (final NumberFormatException e) {
+            // ignore
+         }
+      }
+   }
+
+   public static void saveState() {
+
+      if (_maxTourTypes < 1) {
+         // tour types are not initialized or not visible, do nothing
+         return;
+      }
+
+      final String[] stateTourTypeIds = new String[Math.min(_maxTourTypes, _recentTourTypes.size())];
+      int tourTypeIndex = 0;
+
+      for (final TourType recentTourType : _recentTourTypes) {
+         stateTourTypeIds[tourTypeIndex++] = Long.toString(recentTourType.getTypeId());
+
+         if (tourTypeIndex == _maxTourTypes) {
+            break;
+         }
+      }
+
+      _state.put(STATE_TOUR_TYPE_ID, stateTourTypeIds);
+   }
+
+   private void addPrefChangeListener() {
+
       _prefChangeListener = new IPropertyChangeListener() {
+
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
+
             final String property = event.getProperty();
 
             // check if the number of recent tour types has changed
             if (property.equals(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES)) {
-               setActions();
+
+               setupActions();
+
             } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+
                updateTourTypes();
             }
          }
@@ -115,7 +187,8 @@ public class TourTypeMenuManager {
     *
     * @param tourType
     */
-   private static void addRecentTourType(final TourType tourType) {
+   private void addRecentTourType(final TourType tourType) {
+
       _recentTourTypes.remove(tourType);
       _recentTourTypes.addFirst(tourType);
    }
@@ -124,11 +197,7 @@ public class TourTypeMenuManager {
     * @param isEnabled
     * @param existingTourTypeId
     */
-   public static void enableRecentTourTypeActions(final boolean isEnabled, final long existingTourTypeId) {
-
-      if (_isInitialized == false) {
-         initTourTypeManager();
-      }
+   public void enableRecentTourTypeActions(final boolean isEnabled, final long existingTourTypeId) {
 
       for (final RecentTourTypeAction actionRecentTourType : _actionsRecentTourTypes) {
 
@@ -193,13 +262,8 @@ public class TourTypeMenuManager {
     * @param tourProvider
     * @param isSaveTour
     */
-   public static void fillMenuWithRecentTourTypes(final IMenuManager menuMgr,
-                                                  final ITourProvider tourProvider,
-                                                  final boolean isSaveTour) {
-
-      if (_isInitialized == false) {
-         initTourTypeManager();
-      }
+   public void fillMenuWithRecentTourTypes(final IMenuManager menuMgr,
+                                           final boolean isSaveTour) {
 
       if (_recentTourTypes.isEmpty()) {
          return;
@@ -209,7 +273,9 @@ public class TourTypeMenuManager {
          return;
       }
 
-      _tourProvider = tourProvider;
+      System.out.println(UI.timeStamp() + " isSaveTour: " + isSaveTour);
+// TODO remove SYSTEM.OUT.PRINTLN
+
       _isSaveTour = isSaveTour;
 
       // add tour types
@@ -225,6 +291,7 @@ public class TourTypeMenuManager {
             menuMgr.add(actionRecentTourType);
 
          } catch (final IndexOutOfBoundsException e) {
+
             // there are no more recent tour types
             break;
          }
@@ -233,90 +300,14 @@ public class TourTypeMenuManager {
       }
    }
 
-   private static synchronized void initTourTypeManager() {
-
-      setActions();
-
-      addPrefChangeListener();
-
-      _isInitialized = true;
-   }
-
-   public static void restoreState() {
-
-      final String[] allStateTourTypeIds = _state.getArray(STATE_TOUR_TYPE_ID);
-      if (allStateTourTypeIds == null) {
-         return;
-      }
-
-      /*
-       * get all tour types from the database which are saved in the state
-       */
-      final ArrayList<TourType> dbTourTypes = TourDatabase.getAllTourTypes();
-      for (final String stateTourTypeIdItem : allStateTourTypeIds) {
-         try {
-
-            final long stateTourTypeId = Long.parseLong(stateTourTypeIdItem);
-
-            for (final TourType dbTourType : dbTourTypes) {
-               if (dbTourType.getTypeId() == stateTourTypeId) {
-                  _recentTourTypes.add(dbTourType);
-                  break;
-               }
-            }
-         } catch (final NumberFormatException e) {
-            // ignore
-         }
-      }
-   }
-
-   public static void saveState() {
-
-      if (_maxTourTypes < 1) {
-         // tour types are not initialized or not visible, do nothing
-         return;
-      }
-
-      final String[] stateTourTypeIds = new String[Math.min(_maxTourTypes, _recentTourTypes.size())];
-      int tourTypeIndex = 0;
-
-      for (final TourType recentTourType : _recentTourTypes) {
-         stateTourTypeIds[tourTypeIndex++] = Long.toString(recentTourType.getTypeId());
-
-         if (tourTypeIndex == _maxTourTypes) {
-            break;
-         }
-      }
-
-      _state.put(STATE_TOUR_TYPE_ID, stateTourTypeIds);
-   }
-
-   /**
-    * create actions for recenct tour types
-    */
-   private static void setActions() {
-
-      _maxTourTypes = TourbookPlugin
-            .getDefault()
-            .getPreferenceStore()
-            .getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES);
-
-      _actionsRecentTourTypes = new RecentTourTypeAction[_maxTourTypes];
-
-      for (int actionIndex = 0; actionIndex < _actionsRecentTourTypes.length; actionIndex++) {
-         _actionsRecentTourTypes[actionIndex] = new RecentTourTypeAction();
-      }
-   }
-
-   public static void setTourTypeIntoTour(final TourType tourType,
-                                          final ITourProvider tourProvider,
-                                          final boolean isSaveTour) {
+   public void setTourTypeIntoTour(final TourType tourType,
+                                   final boolean isSaveTour) {
 
       final Runnable runnable = new Runnable() {
          @Override
          public void run() {
 
-            final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+            final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
             if (selectedTours == null || selectedTours.isEmpty()) {
                return;
             }
@@ -338,9 +329,12 @@ public class TourTypeMenuManager {
 
                // tours are not saved but the tour provider must be notified
 
-               if (tourProvider instanceof ITourProvider2) {
-                  ((ITourProvider2) tourProvider).toursAreModified(selectedTours);
+               if (_tourProvider instanceof final ITourProvider2 tourProvider2) {
+
+                  tourProvider2.toursAreModified(selectedTours);
+
                } else {
+
                   TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
                }
             }
@@ -351,9 +345,26 @@ public class TourTypeMenuManager {
    }
 
    /**
+    * create actions for recenct tour types
+    */
+   private void setupActions() {
+
+      _maxTourTypes = TourbookPlugin
+            .getDefault()
+            .getPreferenceStore()
+            .getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES);
+
+      _actionsRecentTourTypes = new RecentTourTypeAction[_maxTourTypes];
+
+      for (int actionIndex = 0; actionIndex < _actionsRecentTourTypes.length; actionIndex++) {
+         _actionsRecentTourTypes[actionIndex] = new RecentTourTypeAction();
+      }
+   }
+
+   /**
     * Tour types has changed
     */
-   private static void updateTourTypes() {
+   private void updateTourTypes() {
 
       final ArrayList<TourType> dbTourTypes = TourDatabase.getAllTourTypes();
       final LinkedList<TourType> validTourTypes = new LinkedList<>();

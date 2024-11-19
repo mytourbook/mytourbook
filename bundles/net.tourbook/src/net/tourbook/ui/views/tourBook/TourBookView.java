@@ -376,6 +376,7 @@ public class TourBookView extends ViewPart implements
    private TourLocationToolTip                _tourLocationTooltip_Tree;
    //
    private TagMenuManager                     _tagMenuManager;
+   private TourTypeMenuManager                _tourTypeMenuManager;
    private MenuManager                        _viewerMenuManager_NatTable;
    private MenuManager                        _viewerMenuManager_Tree;
    private IContextMenuProvider               _viewerContextMenuProvider_NatTable = new ContextMenuProvider_NatTable();
@@ -1679,6 +1680,7 @@ public class TourBookView extends ViewPart implements
    private void createMenuManager() {
 
       _tagMenuManager = new TagMenuManager(this, true);
+      _tourTypeMenuManager = new TourTypeMenuManager(this);
 
       _viewerMenuManager_NatTable = new MenuManager();
       _viewerMenuManager_NatTable.setRemoveAllWhenShown(true);
@@ -2439,7 +2441,7 @@ public class TourBookView extends ViewPart implements
                   ? null
                   : firstTourItem.getTagIds());
 
-      TourTypeMenuManager.enableRecentTourTypeActions(
+      _tourTypeMenuManager.enableRecentTourTypeActions(
             isTourSelected,
             isOneTour
                   ? firstTourItem.getTourTypeId()
@@ -2504,7 +2506,7 @@ public class TourBookView extends ViewPart implements
       // tour type actions
       menuMgr.add(new Separator());
       menuMgr.add(_actionSetTourType);
-      TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
+      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, true);
 
       // tree only actions
       if (isTree) {

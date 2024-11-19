@@ -54,7 +54,8 @@ import org.eclipse.swt.widgets.Menu;
 
 public class TourContextMenu {
 
-   private TagMenuManager                             _tagMenuMgr;
+   private TagMenuManager                             _tagMenuManager;
+   private TourTypeMenuManager                        _tourTypeMenuManager;
 
    private ActionComputeDistanceValuesFromGeoposition _actionComputeDistanceValuesFromGeoposition;
    private ActionDuplicateTour                        _actionDuplicateTour;
@@ -78,6 +79,9 @@ public class TourContextMenu {
 
 // SET_FORMATTING_OFF
 
+      _tagMenuManager            = new TagMenuManager(tourProvider, true);
+      _tourTypeMenuManager       = new TourTypeMenuManager(tourProvider);
+
       _actionDuplicateTour       = new ActionDuplicateTour(tourProvider);
       _actionEditQuick           = new ActionEditQuick(tourProvider);
       _actionEditTour            = new ActionEditTour(tourProvider);
@@ -98,9 +102,7 @@ public class TourContextMenu {
       _actionPrintTour           = new ActionPrint(tourProvider);
       _actionUploadTour          = new ActionUpload(tourProvider);
 
-// SET_FORMATTING_ON      
-
-      _tagMenuMgr = new TagMenuManager(tourProvider, true);
+// SET_FORMATTING_ON
 
    }
 
@@ -154,7 +156,7 @@ public class TourContextMenu {
       // tour type actions
       menuMgr.add(new Separator());
       menuMgr.add(_actionSetTourType);
-      TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, calendarView, true);
+      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, true);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionUploadTour);
@@ -230,18 +232,24 @@ public class TourContextMenu {
 
       Long tourTypeId = Long.valueOf(-1); // TODO -> NOTOUR
       if (null != firstSavedTour) {
+         
          final ArrayList<Long> tagIds = new ArrayList<>();
          for (final TourTag tag : firstSavedTour.getTourTags()) {
             tagIds.add(tag.getTagId());
          }
-         _tagMenuMgr.enableTagActions(isTourSelected, isOneTour, tagIds);
+         
+         _tagMenuManager.enableTagActions(isTourSelected, isOneTour, tagIds);
+         
          if (isOneTour && null != firstSavedTour.getTourType()) {
             tourTypeId = firstSavedTour.getTourType().getTypeId();
          }
-         TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, tourTypeId);
+         
+         _tourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, tourTypeId);
+         
       } else {
-         _tagMenuMgr.enableTagActions(isTourSelected, isOneTour, new ArrayList<>());
-         TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, tourTypeId);
+         
+         _tagMenuManager.enableTagActions(isTourSelected, isOneTour, new ArrayList<>());
+         _tourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, tourTypeId);
       }
    }
 
@@ -269,12 +277,12 @@ public class TourContextMenu {
       menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
       menuMgr.add(_actionSetElevationFromSRTM);
 
-      _tagMenuMgr.fillTagMenu(menuMgr, true);
+      _tagMenuManager.fillTagMenu(menuMgr, true);
 
       // tour type actions
       menuMgr.add(new Separator());
       menuMgr.add(_actionSetTourType);
-      TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, tourProvider, true);
+      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, true);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionUploadTour);
