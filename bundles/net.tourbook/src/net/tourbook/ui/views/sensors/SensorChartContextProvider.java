@@ -70,7 +70,7 @@ public class SensorChartContextProvider implements IChartContextProvider, ITourP
       _actionOpenTour.setEnabled(isTourHovered);
 
       _actionSetTourType.setEnabled(isTourHovered);
-      _tourTypeMenuManager.enableRecentTourTypeActions(isTourHovered, TourDatabase.ENTITY_IS_NOT_SAVED);
+      _tourTypeMenuManager.enableTourTypeActions(isTourHovered, TourDatabase.ENTITY_IS_NOT_SAVED);
    }
 
    @Override

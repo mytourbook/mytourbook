@@ -20,7 +20,8 @@ import net.tourbook.ui.action.IActionProvider;
 import org.eclipse.jface.action.IMenuManager;
 
 /**
- * This is just a placeholder for recent tag actions
+ * This is just a placeholder for recent tag actions which are provided from an
+ * {@link IActionProvider}
  */
 public class ActionAddRecentTags implements IActionProvider {
 

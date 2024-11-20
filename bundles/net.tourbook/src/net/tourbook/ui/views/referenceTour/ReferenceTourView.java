@@ -1402,7 +1402,7 @@ public class ReferenceTourView extends ViewPart implements
 
 // SET_FORMATTING_ON
 
-      _tourTypeMenuManager.enableRecentTourTypeActions(
+      _tourTypeMenuManager.enableTourTypeActions(
             isTourSelected,
             isOneTour
                   ? firstTourItem.tourTypeId

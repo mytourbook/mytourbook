@@ -57,7 +57,6 @@ import net.tourbook.common.util.TreeColumnDefinition;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
@@ -95,7 +94,6 @@ import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.ActionSetStartEndLocation;
-import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.action.TourAction;
 import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
@@ -409,7 +407,6 @@ public class TourBookView extends ViewPart implements
    private ActionRefreshView                  _actionRefreshView;
    private ActionReimportTours                _actionReimport_Tours;
    private ActionSelectAllTours               _actionSelectAllTours;
-   private ActionSetTourTypeMenu              _actionSetTourType;
    private ActionSetPerson                    _actionSetOtherPerson;
    private ActionSetStartEndLocation          _actionSetStartEndLocation;
    private ActionToggleViewLayout             _actionToggleViewLayout;
@@ -1639,7 +1636,6 @@ public class TourBookView extends ViewPart implements
       _actionSelectAllTours            = new ActionSelectAllTours(this);
       _actionSetOtherPerson            = new ActionSetPerson(this);
       _actionSetStartEndLocation       = new ActionSetStartEndLocation(this, _parent);
-      _actionSetTourType               = new ActionSetTourTypeMenu(this);
       _actionToggleViewLayout          = new ActionToggleViewLayout(this);
       _actionTourBookOptions           = new ActionTourBookOptions();
       _actionTourCollectionFilter      = new ActionTourCollectionFilter();
@@ -2337,8 +2333,6 @@ public class TourBookView extends ViewPart implements
             ? _natTable_DataLoader.getNumberOfToursWithoutCollectionFilter()
             : _rootItem_Tree.getChildren().size();
 
-      final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-
       // set initial state to false until data are loaded, actions are enabled only for a single tour -> multiple tour is always false
       _actionDuplicateTour.setEnabled(false);
       _actionMergeTour.setEnabled(false);
@@ -2407,7 +2401,6 @@ public class TourBookView extends ViewPart implements
       _actionPrintTour              .setEnabled(isTourSelected);
       _actionSetOtherPerson         .setEnabled(isTourSelected);
       _actionSetStartEndLocation    .setEnabled(isTourSelected);
-      _actionSetTourType            .setEnabled(isTourSelected && tourTypes.size() > 0);
 
 // SET_FORMATTING_ON
 
@@ -2441,11 +2434,11 @@ public class TourBookView extends ViewPart implements
                   ? null
                   : firstTourItem.getTagIds());
 
-      _tourTypeMenuManager.enableRecentTourTypeActions(
-            isTourSelected,
-            isOneTour
-                  ? firstTourItem.getTourTypeId()
-                  : TourDatabase.ENTITY_IS_NOT_SAVED);
+      final long tourTypeID = isOneTour
+            ? firstTourItem.getTourTypeId()
+            : TourDatabase.ENTITY_IS_NOT_SAVED;
+
+      _tourTypeMenuManager.enableTourTypeActions(isTourSelected, tourTypeID);
    }
 
    private void expandCollapseItem(final TreeViewerItem treeItem) {
@@ -2504,9 +2497,7 @@ public class TourBookView extends ViewPart implements
       _tagMenuManager.fillTagMenu(menuMgr, allActiveActions);
 
       // tour type actions
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionSetTourType);
-      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr);
+      _tourTypeMenuManager.fillContextMenu(menuMgr, allActiveActions);
 
       // tree only actions
       if (isTree) {
@@ -4346,7 +4337,7 @@ public class TourBookView extends ViewPart implements
 
                   /**
                    * <code>
-
+                  
                      Caused by: java.lang.NullPointerException
                      at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                      at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -4364,13 +4355,13 @@ public class TourBookView extends ViewPart implements
                      at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-
+                  
                      at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-
+                  
                      at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                      at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                      ... 22 more
-
+                  
                    * </code>
                    */
 

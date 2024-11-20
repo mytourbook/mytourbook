@@ -23,6 +23,7 @@ import org.eclipse.swt.graphics.Image;
 public class TourAction {
 
    public String             actionClassName;
+
    public String             actionText;
 
    public TourActionCategory actionCategory;
@@ -51,6 +52,20 @@ public class TourAction {
       final String unescapedText = text.replaceAll(UI.SYMBOL_AMPERSAND, UI.EMPTY_STRING);
 
       actionText = unescapedText;
+   }
+
+   public TourAction(final String className,
+                     final String text,
+                     final TourActionCategory category) {
+
+      this(className,
+
+            text,
+
+            null,
+            null,
+
+            category);
    }
 
    /**

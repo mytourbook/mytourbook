@@ -1619,7 +1619,7 @@ public class ElevationCompareResultView extends ViewPart implements
       }
       _tagMenuManager.enableTagActions(isTourSelected, isOneTour, allExistingTags);
 
-      _tourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, existingTourTypeId);
+      _tourTypeMenuManager.enableTourTypeActions(isTourSelected, existingTourTypeId);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {

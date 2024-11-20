@@ -126,7 +126,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
             isDataAvailable && tourTags.size() > 0,
             tourTags);
 
-      _tourTypeMenuManager.enableRecentTourTypeActions(isDataAvailable, existingTourTypeId);
+      _tourTypeMenuManager.enableTourTypeActions(isDataAvailable, existingTourTypeId);
    }
 
    @Override

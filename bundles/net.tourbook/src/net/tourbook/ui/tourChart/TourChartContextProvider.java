@@ -237,7 +237,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
             tourTags);
 
       _actionSetTourType.setEnabled(isTourSaved);
-      _tourTypeMenuManager.enableRecentTourTypeActions(isTourSaved, existingTourTypeId);
+      _tourTypeMenuManager.enableTourTypeActions(isTourSaved, existingTourTypeId);
    }
 
    private void fillContextMenu_TourMarker(final IMenuManager menuMgr,

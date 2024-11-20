@@ -1773,7 +1773,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       _tagMenuManager.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.tagIds);
 
-      _tourTypeMenuManager.enableRecentTourTypeActions(isTourSelected,
+      _tourTypeMenuManager.enableTourTypeActions(isTourSelected,
             isOneTour
                   ? firstTour.tourTypeId
                   : TourDatabase.ENTITY_IS_NOT_SAVED);

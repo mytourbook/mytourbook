@@ -217,12 +217,12 @@ public class TourContextMenu {
             tourTypeId = firstSavedTour.getTourType().getTypeId();
          }
 
-         _tourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, tourTypeId);
+         _tourTypeMenuManager.enableTourTypeActions(isTourSelected, tourTypeId);
 
       } else {
 
          _tagMenuManager.enableTagActions(isTourSelected, isOneTour, new ArrayList<>());
-         _tourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, tourTypeId);
+         _tourTypeMenuManager.enableTourTypeActions(isTourSelected, tourTypeId);
       }
    }
 

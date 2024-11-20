@@ -4223,7 +4223,7 @@ public class RawDataView extends ViewPart implements
       // actions for tags/tour types
       _actionSetTourType.setEnabled(isSavedTourSelected && (allTourTypes.size() > 0));
       _tagMenuManager.enableTagActions(isSavedTourSelected, isOneTourSelected, allUsedTagIds);
-      _tourTypeMenuManager.enableRecentTourTypeActions(isSavedTourSelected, existingTourTypeId);
+      _tourTypeMenuManager.enableTourTypeActions(isSavedTourSelected, existingTourTypeId);
 
       // set double click state
       _tourDoubleClickState.canEditTour         = isOneSavedAndNotDeleteTour;

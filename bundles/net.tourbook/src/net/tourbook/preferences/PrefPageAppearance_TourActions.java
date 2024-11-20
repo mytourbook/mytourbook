@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +29,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -38,6 +37,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
@@ -53,9 +53,16 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class PrefPageAppearance_TourActions extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String  ID                = "net.tourbook.preferences.PrefPageAppearance_TourActions"; //$NON-NLS-1$
 
-   private List<TourAction>    _allSortedActions = new ArrayList<>();
+   public static final String  ID                 = "net.tourbook.preferences.PrefPageAppearance_TourActions"; //$NON-NLS-1$
+
+   private static final String LINK_ID_TAGS       = "tags";                                                    //$NON-NLS-1$
+   private static final String LINK_ID_TOUR_TYPES = "tourTypes";                                               //$NON-NLS-1$
+
+   private static final String CHECK_STATE_MARKER    = "    \u25c6   ";                                           //$NON-NLS-1$
+   private static final String CHECK_STATE_NO_MARKER = "          ";                                              //$NON-NLS-1$
+
+   private List<TourAction>    _allSortedActions  = new ArrayList<>();
 
    private CheckboxTableViewer _tourActionViewer;
 
@@ -73,8 +80,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
    private Button _rdoShowAllActions;
    private Button _rdoShowCustomActions;
 
-   private Link   _linkTagOptions;
-   private Link   _linkTourTypeOptions;
+   private Link   _linkOptions;
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -165,9 +171,6 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
       _tourActionViewer = new CheckboxTableViewer(table);
 
-//      _tourActionViewer = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE | SWT.TOP);
-//      _tourActionViewer.getTable().setBackground(UI.SYS_COLOR_RED);
-
       _tourActionViewer.setContentProvider(new IStructuredContentProvider() {
          @Override
          public void dispose() {}
@@ -208,56 +211,23 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
             } else {
 
-               return "       " + tourAction.actionText;
+               String checkStateMarker = UI.EMPTY_STRING;
+
+               if (tourAction.isChecked) {
+                  checkStateMarker = CHECK_STATE_MARKER;
+               } else {
+
+                  checkStateMarker = CHECK_STATE_NO_MARKER;
+               }
+
+               return checkStateMarker + tourAction.actionText;
             }
 
          }
       });
 
       _tourActionViewer.addSelectionChangedListener(event -> enableControls());
-
-      _tourActionViewer.addCheckStateListener(event -> {
-
-         // keep the checked status
-         final TourAction item = (TourAction) event.getElement();
-         item.isChecked = event.getChecked();
-
-         // select the checked item
-         _tourActionViewer.setSelection(new StructuredSelection(item));
-      });
-
-//      _tourActionViewer.addCheckStateListener(event -> {
-//
-//         // If the checkEvent is on a locked update element, uncheck it and select it.
-//
-//         if (event.getElement() instanceof AvailableUpdateElement) {
-//
-//            final AvailableUpdateElement checkedElement = (AvailableUpdateElement) event.getElement();
-//
-//            if (checkedElement.isLockedForUpdate()) {
-//
-//               event.getCheckable().setChecked(checkedElement, false);
-//
-//               // Select the element so that the locked description is displayed
-//               final CheckboxTableViewer viewer = ((CheckboxTableViewer) event.getSource());
-//               final int itemCount = viewer.getTable().getItemCount();
-//
-//               for (int i = 0; i < itemCount; i++) {
-//
-//                  if (viewer.getElementAt(i).equals(checkedElement)) {
-//                     viewer.getTable().deselectAll();
-//                     viewer.getTable().select(i);
-//                     setDetailText(resolvedOperation);
-//                     break;
-//                  }
-//               }
-//            }
-//         }
-//         updateSelection();
-//      });
-
-//    final Table table = _tourActionViewer.getTable();
-//    table.setBackground(UI.SYS_COLOR_GREEN);
+      _tourActionViewer.addCheckStateListener(event -> onCheckAction(event));
    }
 
    private void createUI_20_ViewerActions(final Composite parent) {
@@ -320,42 +290,23 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
    private void createUI_30_Options(final Composite parent) {
 
-      final GridDataFactory gd = GridDataFactory.fillDefaults()
-            .span(2, 1)
-            .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
-            .grab(true, false);
-
       {
          /*
-          * Link to tag options
+          * Link to tag and tour type options
           */
-         _linkTagOptions = new Link(parent, SWT.WRAP);
-         _linkTagOptions.setText(Messages.Pref_TourTag_Link_AppearanceOptions);
-         _linkTagOptions.addSelectionListener(widgetSelectedAdapter(selectionEvent ->
+         _linkOptions = new Link(parent, SWT.WRAP);
+         _linkOptions.setText("&Options for\n  \u2022 <a href=\"%s\">Tags</a>\n  \u2022 <a href=\"%s\">Tour Types</a>"
+               .formatted(LINK_ID_TAGS, LINK_ID_TOUR_TYPES));
+         _linkOptions.addSelectionListener(SelectionListener.widgetSelectedAdapter(event -> onSelectOptions(event)));
 
-         PreferencesUtil.createPreferenceDialogOn(getShell(),
-               PrefPageAppearance.ID,
-               null,
-               null)));
-
-         gd.applyTo(_linkTagOptions);
-      }
-      {
-         /*
-          * Link to tour type options
-          */
-         _linkTourTypeOptions = new Link(parent, SWT.WRAP);
-         _linkTourTypeOptions.setText("Further tour type options are available in the page <a>Tour Type / Groups</a>");
-         _linkTourTypeOptions.addSelectionListener(widgetSelectedAdapter(selectionEvent ->
-
-         PreferencesUtil.createPreferenceDialogOn(getShell(),
-               PrefPageTourTypeFilterList.ID,
-               null,
-               null)));
-
-         gd.applyTo(_linkTourTypeOptions);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+               .grab(true, false)
+               .applyTo(_linkOptions);
       }
 
+      // add vertical space
       UI.createSpacer_Horizontal(parent, 2);
    }
 
@@ -375,8 +326,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       _btnCheckAll.setEnabled(isCustomizeActions);
       _btnUncheckAll.setEnabled(isCustomizeActions);
 
-      _linkTagOptions.setEnabled(isCustomizeActions);
-      _linkTourTypeOptions.setEnabled(isCustomizeActions);
+      _linkOptions.setEnabled(isCustomizeActions);
 
       if (isCustomizeActions && isActionCategory == false) {
 
@@ -461,21 +411,64 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       }
    }
 
+   private void onCheckAction(final CheckStateChangedEvent event) {
+
+      // keep the checked status
+      final TourAction tourAction = (TourAction) event.getElement();
+      tourAction.isChecked = event.getChecked();
+
+      // select the checked item
+      _tourActionViewer.setSelection(new StructuredSelection(tourAction));
+
+      // update UI
+      _tourActionViewer.update(tourAction, null);
+   }
+
    private void onCheckAll(final boolean isChecked) {
+
+      final List<TourAction> allActions = TourActionManager.getSortedActions();
+
+      // update model
+      for (final TourAction tourAction : allActions) {
+         tourAction.isChecked = isChecked;
+      }
+
+      // update UI
+      final Object[] allActionsArray = allActions.toArray();
 
       if (isChecked) {
 
-         _tourActionViewer.setCheckedElements(TourActionManager.getSortedActions().toArray());
+         _tourActionViewer.setCheckedElements(allActionsArray);
 
       } else {
 
          _tourActionViewer.setCheckedElements(new Object[] {});
       }
+
+      _tourActionViewer.refresh();
    }
 
    private void onModified() {
 
       enableControls();
+   }
+
+   private void onSelectOptions(final SelectionEvent selectionEvent) {
+
+      if (LINK_ID_TAGS.equals(selectionEvent.text)) {
+
+         PreferencesUtil.createPreferenceDialogOn(getShell(),
+               PrefPageAppearance.ID,
+               null,
+               null);
+
+      } else if (LINK_ID_TOUR_TYPES.equals(selectionEvent.text)) {
+
+         PreferencesUtil.createPreferenceDialogOn(getShell(),
+               PrefPageTourTypeFilterList.ID,
+               null,
+               null);
+      }
    }
 
    @Override
