@@ -53,16 +53,15 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class PrefPageAppearance_TourActions extends PreferencePage implements IWorkbenchPreferencePage {
 
+   public static final String  ID                    = "net.tourbook.preferences.PrefPageAppearance_TourActions"; //$NON-NLS-1$
 
-   public static final String  ID                 = "net.tourbook.preferences.PrefPageAppearance_TourActions"; //$NON-NLS-1$
-
-   private static final String LINK_ID_TAGS       = "tags";                                                    //$NON-NLS-1$
-   private static final String LINK_ID_TOUR_TYPES = "tourTypes";                                               //$NON-NLS-1$
+   private static final String LINK_ID_TAGS          = "tags";                                                    //$NON-NLS-1$
+   private static final String LINK_ID_TOUR_TYPES    = "tourTypes";                                               //$NON-NLS-1$
 
    private static final String CHECK_STATE_MARKER    = "    \u25c6   ";                                           //$NON-NLS-1$
    private static final String CHECK_STATE_NO_MARKER = "          ";                                              //$NON-NLS-1$
 
-   private List<TourAction>    _allSortedActions  = new ArrayList<>();
+   private List<TourAction>    _allSortedActions     = new ArrayList<>();
 
    private CheckboxTableViewer _tourActionViewer;
 
@@ -79,6 +78,8 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
    private Button _btnDown;
    private Button _rdoShowAllActions;
    private Button _rdoShowCustomActions;
+
+   private Label  _lblOptions;
 
    private Link   _linkOptions;
 
@@ -290,20 +291,32 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
    private void createUI_30_Options(final Composite parent) {
 
-      {
-         /*
-          * Link to tag and tour type options
-          */
-         _linkOptions = new Link(parent, SWT.WRAP);
-         _linkOptions.setText("&Options for\n  \u2022 <a href=\"%s\">Tags</a>\n  \u2022 <a href=\"%s\">Tour Types</a>"
-               .formatted(LINK_ID_TAGS, LINK_ID_TOUR_TYPES));
-         _linkOptions.addSelectionListener(SelectionListener.widgetSelectedAdapter(event -> onSelectOptions(event)));
+      final String tooltipText = "e.g. the number of recent tags or tour types can be adjusted";
 
-         GridDataFactory.fillDefaults()
-               .span(2, 1)
-               .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
-               .grab(true, false)
-               .applyTo(_linkOptions);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            _lblOptions = new Label(container, SWT.WRAP);
+            _lblOptions.setText("&Options for");
+            _lblOptions.setToolTipText(tooltipText);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.BEGINNING)
+                  .applyTo(_lblOptions);
+         }
+         {
+            /*
+             * Link to tag and tour type options
+             */
+            _linkOptions = new Link(container, SWT.WRAP);
+            _linkOptions.setText("<a href=\"%s\">Tags</a>\n<a href=\"%s\">Tour Types</a>".formatted(LINK_ID_TAGS, LINK_ID_TOUR_TYPES));
+            _linkOptions.setToolTipText(tooltipText);
+            _linkOptions.addSelectionListener(SelectionListener.widgetSelectedAdapter(event -> onSelectOptions(event)));
+            GridDataFactory.fillDefaults()
+                  .indent(6, 0)
+                  .applyTo(_linkOptions);
+         }
       }
 
       // add vertical space
@@ -326,6 +339,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       _btnCheckAll.setEnabled(isCustomizeActions);
       _btnUncheckAll.setEnabled(isCustomizeActions);
 
+      _lblOptions.setEnabled(isCustomizeActions);
       _linkOptions.setEnabled(isCustomizeActions);
 
       if (isCustomizeActions && isActionCategory == false) {
