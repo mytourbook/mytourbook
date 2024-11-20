@@ -51,6 +51,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -219,6 +220,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
    private Spinner   _spinnerNewMaxAlti;
    private Spinner   _spinnerNewEndAlti;
 
+   private Image     _imageDialog = TourbookPlugin.getThemedImageDescriptor(Images.AdjustElevation).createImage();
+
    private static class AdjustmentType {
 
       int    __id;
@@ -242,7 +245,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       _isCreateDummyElevation = isCreateDummyAltitude;
 
       // set icon for the window
-      setDefaultImage(TourbookPlugin.getThemedImageDescriptor(Images.AdjustElevation).createImage());
+      setDefaultImage(_imageDialog);
 
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
@@ -298,6 +301,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
          _tourData.setSRTMValues(_backup_SrtmSerie, _backup_SrtmSerieImperial, _backup_IsSRTM1Values);
       }
+
+      UI.disposeResource(_imageDialog);
 
       return super.close();
    }

@@ -106,6 +106,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
 
    private GridDataFactory               _gridData_GrabHorizontal_CenterVertical;
 
+   private Boolean                       _tourLocation_HoverState;
+
    /*
     * UI controls
     */
@@ -140,7 +142,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
    private AutoComplete_ComboInputMT _autoComplete_Location_Start;
    private AutoComplete_ComboInputMT _autoComplete_Title;
 
-   private Boolean                   _tourLocation_HoverState;
+   private Image                     _imageDialog = TourbookPlugin.getImageDescriptor(Images.App_Edit).createImage();
 
    private class ActionSlideout_WeatherOptions extends ActionToolbarSlideout {
 
@@ -163,7 +165,7 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.App_Edit).createImage());
+      setDefaultImage(_imageDialog);
 
       _tourData = tourData;
 
@@ -1165,6 +1167,8 @@ public class DialogQuickEdit extends TitleAreaDialog implements ITourLocationCon
 
       _firstColumnControls.clear();
       _secondColumnControls.clear();
+
+      UI.disposeResource(_imageDialog);
    }
 
    private void onSelect_WindSpeed_Text() {

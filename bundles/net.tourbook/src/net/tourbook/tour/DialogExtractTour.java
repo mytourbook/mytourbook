@@ -57,6 +57,7 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
@@ -218,6 +219,8 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
    private Text                             _txtTourTitle;
 
+   private Image                            _imageDialog = TourbookPlugin.getImageDescriptor(Images.MyTourbook16).createImage();
+
    /**
     * Split or extract a tour
     *
@@ -245,12 +248,20 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       _tourDataEditor = tourDataEditor;
       _tourDataSource = tourData;
 
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.MyTourbook16).createImage());
+      setDefaultImage(_imageDialog);
 
       _canRemoveTimeSlices = _tourDataEditor.getTourData().isContainReferenceTour() == false;
 
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
+   }
+
+   @Override
+   public boolean close() {
+
+      UI.disposeResource(_imageDialog);
+
+      return super.close();
    }
 
    @Override
