@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1305,32 +1305,36 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       _allTourChartActions = new HashMap<>();
 
+// SET_FORMATTING_OFF
+
       /*
-       * graph actions
+       * Graph actions
        */
       createActions_10_GraphActions();
 
-      _actionTourChartGraphs = new Action_AllGraphs();
+      _actionTourChartGraphs           = new Action_AllGraphs();
       _action_GraphBackground_Slideout = new Action_GraphBackground_Slideout();
 
       /*
-       * other actions
+       * Other actions
        */
-      _actionGeoCompare = new ActionGeoCompare();
-      _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
-      _actionTourChartOptions = new Action_TourChart_Options();
-      _actionTourChartSmoothing = new Action_TourChart_Smoothing();
-      _actionGraphMinMax = new ActionGraphMinMax();
-      _actionTourInfo = new Action_TourChart_Info(this, _parent);
-      _actionTourMarker = new ActionTourChartMarker(this, _parent);
-      _actionTourChartPauses = new ActionTourChartPauses(this, _parent, _state);
+      _actionGeoCompare          = new ActionGeoCompare();
+      _actionOpenMarkerDialog    = new ActionOpenMarkerDialog(this, true);
+      _actionTourChartOptions    = new Action_TourChart_Options();
+      _actionTourChartSmoothing  = new Action_TourChart_Smoothing();
+      _actionGraphMinMax         = new ActionGraphMinMax();
+      _actionTourInfo            = new Action_TourChart_Info(this, _parent);
+      _actionTourMarker          = new ActionTourChartMarker(this, _parent);
+      _actionTourChartPauses     = new ActionTourChartPauses(this, _parent, _state);
 
-      _allTourChartActions.put(ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER, new ActionCanAutoZoomToSlider(this));
-      _allTourChartActions.put(ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED, new ActionCanMoveSlidersWhenZoomed(this));
-      _allTourChartActions.put(ACTION_ID_IS_SHOW_TOUR_PHOTOS, new ActionTourPhotos(this));
-      _allTourChartActions.put(ACTION_ID_IS_GRAPH_OVERLAPPED, new ActionGraphOverlapped(this));
-      _allTourChartActions.put(ACTION_ID_X_AXIS_DISTANCE, new ActionXAxisDistance(this));
-      _allTourChartActions.put(ACTION_ID_X_AXIS_TIME, new ActionXAxisTime(this));
+      _allTourChartActions.put(ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER,       new ActionCanAutoZoomToSlider(this));
+      _allTourChartActions.put(ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED,  new ActionCanMoveSlidersWhenZoomed(this));
+      _allTourChartActions.put(ACTION_ID_IS_SHOW_TOUR_PHOTOS,           new ActionTourPhotos(this));
+      _allTourChartActions.put(ACTION_ID_IS_GRAPH_OVERLAPPED,           new ActionGraphOverlapped(this));
+      _allTourChartActions.put(ACTION_ID_X_AXIS_DISTANCE,               new ActionXAxisDistance(this));
+      _allTourChartActions.put(ACTION_ID_X_AXIS_TIME,                   new ActionXAxisTime(this));
+
+// SET_FORMATTING_ON
 
       _allTourChartActions.put(ACTION_ID_EDIT_CHART_PREFERENCES,
             new ActionOpenPrefDialog(
