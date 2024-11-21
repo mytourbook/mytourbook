@@ -451,7 +451,7 @@ public class DialogMapExportViewImage extends TitleAreaDialog {
    @Override
    protected void okPressed() {
 
-      BusyIndicator.showWhile(Display.getCurrent(), this::doExport);
+      BusyIndicator.showWhile(Display.getCurrent(), () -> doExport());
 
       if (_exportState_FileCollisionBehavior.value == FileCollisionBehavior.DIALOG_IS_CANCELED) {
          getButton(IDialogConstants.OK_ID).setEnabled(true);

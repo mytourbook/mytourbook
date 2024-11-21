@@ -390,7 +390,7 @@ class MT_StAXHandler {
 
       _tourData = new TourData();
 
-      startElement_Parent.getAttributes().forEachRemaining(this::setValues_Tour_Attributes);
+      startElement_Parent.getAttributes().forEachRemaining(event -> setValues_Tour_Attributes(event));
 
       /**
        * !!! VERY IMPORTANT !!!

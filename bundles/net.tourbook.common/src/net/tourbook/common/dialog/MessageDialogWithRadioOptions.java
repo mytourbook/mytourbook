@@ -130,7 +130,7 @@ public class MessageDialogWithRadioOptions extends MessageDialog {
 
                optionControl.setText(_allOptionLabels[optionIndex]);
                optionControl.setData(Integer.valueOf(optionIndex));
-               optionControl.addSelectionListener(widgetSelectedAdapter(this::onSelectOption));
+               optionControl.addSelectionListener(widgetSelectedAdapter(event -> onSelectOption(event)));
 
                _allRadioOptions[optionIndex] = optionControl;
             }

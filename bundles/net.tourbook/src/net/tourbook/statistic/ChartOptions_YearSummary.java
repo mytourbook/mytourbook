@@ -294,7 +294,7 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
 
       enableControls();
 
-      Display.getCurrent().asyncExec(this::saveState);
+      Display.getCurrent().asyncExec(() -> saveState());
    }
 
    @Override

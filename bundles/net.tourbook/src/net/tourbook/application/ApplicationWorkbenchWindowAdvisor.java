@@ -603,7 +603,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             .getActiveWorkbenchWindow()
             .getSelectionService();
 
-      selectionService.addPostSelectionListener(this::onPostSelectionChanged);
+      selectionService.addPostSelectionListener((part, selection) -> onPostSelectionChanged(part, selection));
    }
 
    /**

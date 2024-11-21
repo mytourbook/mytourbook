@@ -493,7 +493,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
 
       // update chart async (which is done when a pref store value is modified) that the UI is updated immediately
 
-      Display.getCurrent().asyncExec(this::saveState);
+      Display.getCurrent().asyncExec(() -> saveState());
    }
 
    @Override

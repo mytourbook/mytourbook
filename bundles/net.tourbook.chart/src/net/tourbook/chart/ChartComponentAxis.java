@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -105,14 +105,14 @@ public class ChartComponentAxis extends Canvas {
       addMouseListener(MouseListener.mouseDoubleClickAdapter(mouseEvent -> _componentGraph.onMouseDoubleClick(mouseEvent)));
       addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> onMouseDown()));
 
-      addMouseMoveListener(this::onMouseMove);
+      addMouseMoveListener(event -> onMouseMove(event));
 
-      addMouseTrackListener(MouseTrackListener.mouseEnterAdapter(this::onMouseEnter));
-      addMouseTrackListener(MouseTrackListener.mouseExitAdapter(this::onMouseExit));
+      addMouseTrackListener(MouseTrackListener.mouseEnterAdapter(event -> onMouseEnter(event)));
+      addMouseTrackListener(MouseTrackListener.mouseExitAdapter(event -> onMouseExit(event)));
 
       addControlListener(controlResizedAdapter(controlEvent -> _clientArea = getClientArea()));
 
-      addListener(SWT.MouseWheel, this::onMouseWheel);
+      addListener(SWT.MouseWheel, event -> onMouseWheel(event));
    }
 
    public void afterHideToolTip() {

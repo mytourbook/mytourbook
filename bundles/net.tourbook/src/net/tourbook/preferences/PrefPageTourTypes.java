@@ -506,7 +506,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
              * Color selector
              */
             _colorSelector = new ColorSelectorExtended(container);
-            _colorSelector.addListener(this::onTourType_Modify);
+            _colorSelector.addListener(event -> onTourType_Modify(event));
             setButtonLayoutData(_colorSelector.getButton());
          }
          {

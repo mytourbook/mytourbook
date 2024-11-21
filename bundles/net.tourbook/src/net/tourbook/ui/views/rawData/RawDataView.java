@@ -4763,7 +4763,7 @@ public class RawDataView extends ViewPart implements
       createResources_Web();
 
       _tourViewer_Comparator = new TourViewer_Comparator();
-      _columnSortListener = widgetSelectedAdapter(this::onSelect_SortColumn);
+      _columnSortListener = widgetSelectedAdapter(event -> onSelect_SortColumn(event));
    }
 
    /**
@@ -6629,7 +6629,7 @@ public class RawDataView extends ViewPart implements
       if (_postSelectionProvider.getSelection() == null) {
 
          // fire a selected tour when the selection provider was cleared sometime before
-         Display.getCurrent().asyncExec(this::fireSelectedTour);
+         Display.getCurrent().asyncExec(() -> fireSelectedTour());
       }
    }
 
