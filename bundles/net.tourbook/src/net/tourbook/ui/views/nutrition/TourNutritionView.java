@@ -20,7 +20,6 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -50,7 +49,6 @@ import net.tourbook.nutrition.DialogCustomTourNutritionProduct;
 import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.nutrition.QuantityType;
 import net.tourbook.nutrition.TourNutritionProductMenuManager;
-import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -1582,37 +1580,37 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       TourLogManager.showLogView(AutoOpenEvent.TOUR_ADJUSTMENTS);
 
-      final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
-      final Set<TourNutritionProduct> updatedTourNutritionProducts = new HashSet<>();
-      for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
-
-         if (net.tourbook.common.util.StringUtils.isNullOrEmpty(tourNutritionProduct.getProductCode())) {
-            continue;
-         }
-
-         //get the product from the api
-
-         final Product updatedProduct = searchProductResults.get(0);
-         final TourNutritionProduct updatedTourNutritionProduct = new TourNutritionProduct(_tourData, updatedProduct);
-         // if carbohydrates or calories are different, then we update the product
-
-         boolean isUpdateProduct = false;
-         if (updatedTourNutritionProduct.getCarbohydrates_Serving() != tourNutritionProduct.getCarbohydrates_Serving() ||
-               updatedTourNutritionProduct.getCalories_Serving() != tourNutritionProduct.getCalories_Serving()) {
-            isUpdateProduct = true;
-         }
-
-         updatedTourNutritionProducts.add(updatedTourNutritionProduct);
-      }
-
-      if (!updatedTourNutritionProducts.isEmpty()) {
-
-         _tourData.setTourNutritionProducts(updatedTourNutritionProducts);
-         _tourData = TourManager.saveModifiedTour(_tourData);
-         _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
-
-         // todo display the changes in the log view
-      }
+//      final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
+//      final Set<TourNutritionProduct> updatedTourNutritionProducts = new HashSet<>();
+//      for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
+//
+//         if (net.tourbook.common.util.StringUtils.isNullOrEmpty(tourNutritionProduct.getProductCode())) {
+//            continue;
+//         }
+//
+//         //get the product from the api
+//
+//         final Product updatedProduct = searchProductResults.get(0);
+//         final TourNutritionProduct updatedTourNutritionProduct = new TourNutritionProduct(_tourData, updatedProduct);
+//         // if carbohydrates or calories are different, then we update the product
+//
+//         boolean isUpdateProduct = false;
+//         if (updatedTourNutritionProduct.getCarbohydrates_Serving() != tourNutritionProduct.getCarbohydrates_Serving() ||
+//               updatedTourNutritionProduct.getCalories_Serving() != tourNutritionProduct.getCalories_Serving()) {
+//            isUpdateProduct = true;
+//         }
+//
+//         updatedTourNutritionProducts.add(updatedTourNutritionProduct);
+//      }
+//
+//      if (!updatedTourNutritionProducts.isEmpty()) {
+//
+//         _tourData.setTourNutritionProducts(updatedTourNutritionProducts);
+//         _tourData = TourManager.saveModifiedTour(_tourData);
+//         _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
+//
+//         // todo display the changes in the log view
+//      }
    }
 
    @Override
