@@ -319,9 +319,6 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
                   .applyTo(_linkOptions);
          }
       }
-
-      // add vertical space
-      UI.createSpacer_Horizontal(parent, 2);
    }
 
    private void enableControls() {

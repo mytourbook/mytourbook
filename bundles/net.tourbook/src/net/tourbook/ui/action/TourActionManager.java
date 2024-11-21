@@ -23,9 +23,11 @@ import java.util.Map;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.Util;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
+import net.tourbook.preferences.PrefPageAppearance_TourActions;
 import net.tourbook.tag.ActionAddRecentTags;
 import net.tourbook.tag.ActionAddRecentTourTypes;
 import net.tourbook.tag.ActionAddTourTag_SubMenu;
@@ -48,6 +50,7 @@ import net.tourbook.ui.views.tourBook.ActionExportViewCSV;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 
 public class TourActionManager {
@@ -65,6 +68,8 @@ public class TourActionManager {
    private static List<TourAction>        _allDefinedActions;
    private static List<TourAction>        _allSortedActions;
    private static List<TourAction>        _allVisibleActions;
+
+   private static ActionOpenPrefDialog    _actionCustomizeTourActions;
 
    private static Boolean                 _isCustomizeActions;
 
@@ -93,6 +98,8 @@ public class TourActionManager {
       createActions_30_TourTypes();
       createActions_40_Export();
       createActions_50_Adjust();
+
+      _actionCustomizeTourActions = new ActionOpenPrefDialog(Messages.App_Action_CustomizeContextMenu, PrefPageAppearance_TourActions.ID);
    }
 
    /**
@@ -537,17 +544,21 @@ public class TourActionManager {
    }
 
    /**
+    * A separator is added before the actions
+    *
     * @param menuMgr
     * @param actionCategory
     *           Only actions with this category will be filled into the context menu
     * @param allCategoryActions
     *           Contains all actions with the same actionCategory {@link TourActionCategory}
-    * @param allActiveActions
     */
    public static void fillContextMenu(final IMenuManager menuMgr,
                                       final TourActionCategory actionCategory,
-                                      final HashMap<String, Object> allCategoryActions,
-                                      final List<TourAction> allActiveActions) {
+                                      final HashMap<String, Object> allCategoryActions) {
+
+      final List<TourAction> allActiveActions = getActiveActions();
+
+      menuMgr.add(new Separator());
 
       for (final TourAction activeTourAction : allActiveActions) {
 
@@ -577,15 +588,26 @@ public class TourActionManager {
       }
    }
 
+   public static void fillContextMenu_CustomizeAction(final IMenuManager menuMgr) {
+
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionCustomizeTourActions);
+
+      _actionCustomizeTourActions.setToolTipText(isCustomizeActions()
+
+            ? "Tour actions are currently customized"
+            : "Tour actions are currently NOT customized");
+   }
+
    public static List<TourAction> getActiveActions() {
 
       if (isCustomizeActions()) {
 
-         return TourActionManager.getVisibleActions();
+         return getVisibleActions();
 
       } else {
 
-         return TourActionManager.getSortedActions();
+         return getSortedActions();
       }
    }
 

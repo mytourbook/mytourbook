@@ -32,7 +32,6 @@ import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
-import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.preferences.ICommonPreferences;
@@ -61,7 +60,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageAppearance_TourActions;
 import net.tourbook.search.SearchView;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
@@ -94,7 +92,6 @@ import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.ActionSetStartEndLocation;
-import net.tourbook.ui.action.TourAction;
 import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.NatTableViewer_TourInfo_ToolTip;
@@ -410,7 +407,6 @@ public class TourBookView extends ViewPart implements
    private ActionSetPerson                    _actionSetOtherPerson;
    private ActionSetStartEndLocation          _actionSetStartEndLocation;
    private ActionToggleViewLayout             _actionToggleViewLayout;
-   private ActionOpenPrefDialog               _actionCustomizeTourActions;
    private ActionTourBookOptions              _actionTourBookOptions;
    private ActionTourCollectionFilter         _actionTourCollectionFilter;
    private ActionUpload                       _actionUploadTour;
@@ -1641,8 +1637,6 @@ public class TourBookView extends ViewPart implements
       _actionTourCollectionFilter      = new ActionTourCollectionFilter();
       _actionUploadTour                = new ActionUpload(this);
 
-      _actionCustomizeTourActions      = new ActionOpenPrefDialog(Messages.App_Action_CustomizeContextMenu, PrefPageAppearance_TourActions.ID);
-
       _actionContext_OnMouseSelect_ExpandCollapse  = new ActionOnMouseSelect_ExpandCollapse();
       _actionContext_SingleExpand_CollapseOthers   = new ActionSingleExpand_CollapseOthers();
 
@@ -2488,16 +2482,14 @@ public class TourBookView extends ViewPart implements
     */
    private void fillContextMenu(final IMenuManager menuMgr, final boolean isTree) {
 
-      final List<TourAction> allActiveActions = TourActionManager.getActiveActions();
-
       // edit actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, allActiveActions);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit);
 
       // tag actions
-      _tagMenuManager.fillTagMenu(menuMgr, allActiveActions);
+      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr);
 
       // tour type actions
-      _tourTypeMenuManager.fillContextMenu(menuMgr, allActiveActions);
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr);
 
       // tree only actions
       if (isTree) {
@@ -2511,15 +2503,13 @@ public class TourBookView extends ViewPart implements
       }
 
       // export actions
-      menuMgr.add(new Separator());
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export, allActiveActions);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export);
 
       // adjust actions
-      menuMgr.add(new Separator());
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.ADJUST, _allTourActions_Adjust, allActiveActions);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.ADJUST, _allTourActions_Adjust);
 
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionCustomizeTourActions);
+      // customize this context menu
+      TourActionManager.fillContextMenu_CustomizeAction(menuMgr);
 
       ActionEditQuick.setTourLocationFocus(getTourLocation_HoverState());
 

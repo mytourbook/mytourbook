@@ -51,7 +51,6 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.action.IActionProvider;
-import net.tourbook.ui.action.TourAction;
 import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.tagging.TourTags_View;
@@ -929,11 +928,11 @@ public class TagMenuManager implements IActionProvider {
       _isAdvMenu = false;
    }
 
-   public void fillTagMenu(final IMenuManager menuMgr, final List<TourAction> allActiveActions) {
+   public void fillTagMenu_WithActiveActions(final IMenuManager menuMgr) {
 
       menuMgr.add(new Separator());
 
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.TAG, _allTagActions, allActiveActions);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.TAG, _allTagActions);
 
       _isAdvMenu = false;
    }
