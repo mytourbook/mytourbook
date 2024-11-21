@@ -628,7 +628,7 @@ public class TourActionManager {
 
       if (_isCustomizeActions == null) {
 
-         _isCustomizeActions = Util.getStateBoolean(_state, STATE_IS_CUSTOMIZE_TOUR_ACTIONS, true);
+         _isCustomizeActions = Util.getStateBoolean(_state, STATE_IS_CUSTOMIZE_TOUR_ACTIONS, false);
       }
 
       return _isCustomizeActions;

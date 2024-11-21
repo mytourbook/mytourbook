@@ -34,6 +34,7 @@ import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -227,8 +228,8 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
          }
       });
 
-      _tourActionViewer.addSelectionChangedListener(event -> enableControls());
-      _tourActionViewer.addCheckStateListener(event -> onCheckAction(event));
+      _tourActionViewer.addCheckStateListener(event -> onAction_Check(event));
+      _tourActionViewer.addSelectionChangedListener(event -> onAction_Select(event));
    }
 
    private void createUI_20_ViewerActions(final Composite parent) {
@@ -425,7 +426,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       }
    }
 
-   private void onCheckAction(final CheckStateChangedEvent event) {
+   private void onAction_Check(final CheckStateChangedEvent event) {
 
       // keep the checked status
       final TourAction tourAction = (TourAction) event.getElement();
@@ -436,6 +437,11 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
       // update UI
       _tourActionViewer.update(tourAction, null);
+   }
+
+   private void onAction_Select(final SelectionChangedEvent event) {
+
+      enableControls();
    }
 
    private void onCheckAll(final boolean isChecked) {
