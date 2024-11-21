@@ -92,7 +92,7 @@ public class DialogCreateTourMarkers extends Dialog {
    private Spinner _spinnerByDistance;
    private Spinner _spinnerByTime;
 
-   private Image   _imageDialog;
+   private Image   _imageDialog = TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New).createImage();
 
    public DialogCreateTourMarkers(final Shell parentShell, final Set<Long> allSelectedTourIDs) {
 
@@ -100,7 +100,6 @@ public class DialogCreateTourMarkers extends Dialog {
 
       _allSelectedTourIDs = allSelectedTourIDs;
 
-      _imageDialog = TourbookPlugin.getThemedImageDescriptor(Images.TourMarker_New).createImage();
       setDefaultImage(_imageDialog);
    }
 
@@ -108,6 +107,8 @@ public class DialogCreateTourMarkers extends Dialog {
    public boolean close() {
 
       saveState();
+
+      UI.disposeResource(_imageDialog);
 
       return super.close();
    }
@@ -134,7 +135,6 @@ public class DialogCreateTourMarkers extends Dialog {
    protected Control createDialogArea(final Composite parent) {
 
       initUI(parent);
-      parent.addDisposeListener(disposeEvent -> UI.disposeResource(_imageDialog));
 
       final Composite ui = (Composite) super.createDialogArea(parent);
 

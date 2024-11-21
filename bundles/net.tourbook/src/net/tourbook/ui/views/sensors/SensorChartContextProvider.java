@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,6 +42,8 @@ public class SensorChartContextProvider implements IChartContextProvider, ITourP
    private final Chart                 _chart;
    private final ITourProvider         _tourProvider;
 
+   private TourTypeMenuManager         _tourTypeMenuManager;
+
    private final ActionEditQuick       _actionEditQuick;
    private final ActionEditTour        _actionEditTour;
    private final ActionOpenTour        _actionOpenTour;
@@ -57,6 +59,8 @@ public class SensorChartContextProvider implements IChartContextProvider, ITourP
       _actionOpenTour = new ActionOpenTour(this);
 
       _actionSetTourType = new ActionSetTourTypeMenu(this);
+
+      _tourTypeMenuManager = new TourTypeMenuManager(this);
    }
 
    private void enableActions(final boolean isTourHovered) {
@@ -66,7 +70,7 @@ public class SensorChartContextProvider implements IChartContextProvider, ITourP
       _actionOpenTour.setEnabled(isTourHovered);
 
       _actionSetTourType.setEnabled(isTourHovered);
-      TourTypeMenuManager.enableRecentTourTypeActions(isTourHovered, TourDatabase.ENTITY_IS_NOT_SAVED);
+      _tourTypeMenuManager.enableTourTypeActions(isTourHovered, TourDatabase.ENTITY_IS_NOT_SAVED);
    }
 
    @Override
@@ -81,7 +85,7 @@ public class SensorChartContextProvider implements IChartContextProvider, ITourP
       // tour type actions
       menuMgr.add(new Separator());
       menuMgr.add(_actionSetTourType);
-      TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
+      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr);
 
       enableActions(hoveredBarSerieIndex != -1);
    }

@@ -3491,7 +3491,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _segmentViewer.setComparator(_segmentComparator);
       _segmentViewer.setFilters(new SegmenterFilter());
 
-      _segmentViewer.addSelectionChangedListener(this::onSelect_Segment);
+      _segmentViewer.addSelectionChangedListener(event -> onSelect_Segment(event));
 
       sort_UpdateUI_SetSortDirection(
             _segmentComparator.__sortColumnId,

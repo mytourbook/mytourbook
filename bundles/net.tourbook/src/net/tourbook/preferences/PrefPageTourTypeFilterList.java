@@ -180,7 +180,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
       final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(200, 500)
+            .hint(100, 200)
             .applyTo(layouter);
 
       final Table table = new Table(layouter, (SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION));
@@ -392,7 +392,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
       final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(200, 500)
+            .hint(100, 200)
             .applyTo(layouter);
 
       final Table table = new Table(

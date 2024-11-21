@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,7 +57,7 @@ public class DialogSensor extends TitleAreaDialog {
    private Text  _txtDescription;
    private Text  _txtName;
 
-   private Image _imageDialog;
+   private Image _imageDialog = TourbookPlugin.getThemedImageDescriptor(Images.Sensor).createImage();
 
    public DialogSensor(final Shell parentShell, final DeviceSensor sensor) {
 
@@ -69,7 +69,6 @@ public class DialogSensor extends TitleAreaDialog {
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      _imageDialog = TourbookPlugin.getThemedImageDescriptor(Images.Sensor).createImage();
       setDefaultImage(_imageDialog);
    }
 

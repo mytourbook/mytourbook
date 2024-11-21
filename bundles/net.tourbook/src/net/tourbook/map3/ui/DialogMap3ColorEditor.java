@@ -428,7 +428,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtProfileName);
 
             // do live update
-            _txtProfileName.addTraverseListener(this::onModifyProfileName);
+            _txtProfileName.addTraverseListener(event -> onModifyProfileName(event));
          }
       }
    }
@@ -519,7 +519,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
          onFieldSelectValue(mouseEvent.widget);
       };
 
-      final SelectionListener prontoListener = SelectionListener.widgetSelectedAdapter(this::onFieldSelectPronto);
+      final SelectionListener prontoListener = SelectionListener.widgetSelectedAdapter(event -> onFieldSelectPronto(event));
 
       /*
        * fields

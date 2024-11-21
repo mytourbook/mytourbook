@@ -354,7 +354,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(200, 300)
+            .hint(200, 200)
             .applyTo(layoutContainer);
 
       final TreeColumnLayout treeLayout = new TreeColumnLayout();
@@ -506,7 +506,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
              * Color selector
              */
             _colorSelector = new ColorSelectorExtended(container);
-            _colorSelector.addListener(this::onTourType_Modify);
+            _colorSelector.addListener(event -> onTourType_Modify(event));
             setButtonLayoutData(_colorSelector.getButton());
          }
          {

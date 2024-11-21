@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,11 +18,13 @@ package net.tourbook.ui.views.tagging;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
@@ -36,16 +38,28 @@ public class Dialog_SaveTags extends WizardDialog {
    public static final int SAVE_TAG_ACTION_REPLACE_TAGS         = 10;
    public static final int SAVE_TAG_ACTION_REMOVE_SELECTED_TAGS = 50;
    public static final int SAVE_TAG_ACTION_REMOVE_ALL_TAGS      = 60;
-
    //
-
+   //
    private static final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.ui.views.tagging.Dialog_SaveTags"); //$NON-NLS-1$
+
+   /*
+    * UI resources
+    */
+   private Image _imageDialog = TourbookPlugin.getImageDescriptor(Images.SaveTags).createImage();
 
    public Dialog_SaveTags(final Shell parentShell, final IWizard wizard) {
 
       super(parentShell, wizard);
 
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.SaveTags).createImage());
+      setDefaultImage(_imageDialog);
+   }
+
+   @Override
+   public boolean close() {
+
+      UI.disposeResource(_imageDialog);
+
+      return super.close();
    }
 
    @Override

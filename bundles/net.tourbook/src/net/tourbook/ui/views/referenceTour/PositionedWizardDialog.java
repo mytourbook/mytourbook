@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.ui.views.referenceTour;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -24,6 +25,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
@@ -33,15 +35,17 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class PositionedWizardDialog extends WizardDialog {
 
-   private static final String STATE_WIZARD_X      = "STATE_WIZARD_X";      //$NON-NLS-1$
-   private static final String STATE_WIZARD_Y      = "STATE_WIZARD_Y";      //$NON-NLS-1$
-   private static final String STATE_WIZARD_WIDTH  = "STATE_WIZARD_WIDTH";  //$NON-NLS-1$
-   private static final String STATE_WIZARD_HEIGHT = "STATE_WIZARD_HEIGHT"; //$NON-NLS-1$
+   private static final String STATE_WIZARD_X      = "STATE_WIZARD_X";                                                                         //$NON-NLS-1$
+   private static final String STATE_WIZARD_Y      = "STATE_WIZARD_Y";                                                                         //$NON-NLS-1$
+   private static final String STATE_WIZARD_WIDTH  = "STATE_WIZARD_WIDTH";                                                                     //$NON-NLS-1$
+   private static final String STATE_WIZARD_HEIGHT = "STATE_WIZARD_HEIGHT";                                                                    //$NON-NLS-1$
 
    private IDialogSettings     _state;
 
    private int                 _defaultWidth;
    private int                 _defaultHeight;
+
+   private Image               _imageDialog        = TourbookPlugin.getImageDescriptor(Images.TourCompare_ElevationCompare_Tool).createImage();
 
    /**
     * @param parent
@@ -69,6 +73,8 @@ public class PositionedWizardDialog extends WizardDialog {
 
       saveBounds();
 
+      UI.disposeResource(_imageDialog);
+
       return super.close();
    }
 
@@ -76,7 +82,7 @@ public class PositionedWizardDialog extends WizardDialog {
    protected void configureShell(final Shell shell) {
 
       // set icon for the window
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.TourCompare_ElevationCompare_Tool).createImage());
+      setDefaultImage(_imageDialog);
 
       super.configureShell(shell);
 

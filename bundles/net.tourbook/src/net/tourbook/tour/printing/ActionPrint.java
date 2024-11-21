@@ -118,7 +118,7 @@ public class ActionPrint extends SubMenu {
    @Override
    public void fillMenu(final Menu menu) {
 
-      _printTourActions.forEach(this::addActionToMenu);
+      _printTourActions.forEach(action -> addActionToMenu(action));
    }
 
    /**

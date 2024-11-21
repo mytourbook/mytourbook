@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,8 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tour;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -53,6 +51,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -221,6 +220,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
    private Spinner   _spinnerNewMaxAlti;
    private Spinner   _spinnerNewEndAlti;
 
+   private Image     _imageDialog = TourbookPlugin.getThemedImageDescriptor(Images.AdjustElevation).createImage();
+
    private static class AdjustmentType {
 
       int    __id;
@@ -244,7 +245,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       _isCreateDummyElevation = isCreateDummyAltitude;
 
       // set icon for the window
-      setDefaultImage(TourbookPlugin.getThemedImageDescriptor(Images.AdjustElevation).createImage());
+      setDefaultImage(_imageDialog);
 
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
@@ -300,6 +301,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
          _tourData.setSRTMValues(_backup_SrtmSerie, _backup_SrtmSerieImperial, _backup_IsSRTM1Values);
       }
+
+      UI.disposeResource(_imageDialog);
 
       return super.close();
    }
@@ -660,6 +663,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       setMessage(NLS.bind(Messages.adjust_altitude_dlg_dialog_message, TourManager.getTourTitle(_tourData)));
 
       updateTourChart();
+
+      /*
+       * Delay selected adjustment type that the sliders are positioned correctly
+       */
+      Display.getCurrent().timerExec(300, () -> onSelectAdjustmentType());
    }
 
    @Override
@@ -679,6 +687,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
     * Create altitude spinner field
     *
     * @param startContainer
+    *
     * @return Returns the field
     */
    private Spinner createAltiField(final Composite startContainer) {
@@ -869,7 +878,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          // combo: adjustment type
          _comboAdjustmentType = new Combo(typeContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
          _comboAdjustmentType.setVisibleItemCount(20);
-         _comboAdjustmentType.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectAdjustmentType()));
+         _comboAdjustmentType.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelectAdjustmentType()));
 
          // label: adjustment type info
          _lblAdjustmentTypeInfo = new Label(typeContainer, SWT.NONE);
@@ -1003,7 +1012,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          final Button btnUpdateAltitude = new Button(container, SWT.NONE);
          btnUpdateAltitude.setText(Messages.adjust_altitude_btn_update_altitude);
          btnUpdateAltitude.setToolTipText(Messages.adjust_altitude_btn_update_altitude_tooltip);
-         btnUpdateAltitude.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onUpdate_ElevationSRTM()));
+         btnUpdateAltitude.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onUpdate_ElevationSRTM()));
          setButtonLayoutData(btnUpdateAltitude);
 
          /*
@@ -1012,7 +1021,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          final Button btnResetAltitude = new Button(container, SWT.NONE);
          btnResetAltitude.setText(Messages.adjust_altitude_btn_reset_altitude);
          btnResetAltitude.setToolTipText(Messages.adjust_altitude_btn_reset_altitude_tooltip);
-         btnResetAltitude.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onReset_Elevation_SRTM()));
+         btnResetAltitude.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onReset_Elevation_SRTM()));
          setButtonLayoutData(btnResetAltitude);
       }
 
@@ -1196,7 +1205,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
             _linkSRTM_AdjustEndToStart = new Link(container, SWT.NONE);
             _linkSRTM_AdjustEndToStart.setText(Messages.Dialog_AdjustAltitude_Link_SetLastPointToSRTM);
             _linkSRTM_AdjustEndToStart.setToolTipText(Messages.Dialog_AdjustAltitude_Link_SetLastPointToSRTM_Tooltip);
-            _linkSRTM_AdjustEndToStart.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSpline_SetEndElevationToSRTM()));
+            _linkSRTM_AdjustEndToStart.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> onSpline_SetEndElevationToSRTM()));
             GridDataFactory.swtDefaults().span(6, 1).applyTo(_linkSRTM_AdjustEndToStart);
          }
          {
@@ -1205,7 +1215,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
              */
             _linkSRTM_SelectWholeTour = new Link(container, SWT.NONE);
             _linkSRTM_SelectWholeTour.setText(Messages.Dialog_AdjustAltitude_Link_ApproachWholeTour);
-            _linkSRTM_SelectWholeTour.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSpline_SelectWholeTour()));
+            _linkSRTM_SelectWholeTour.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> onSpline_SelectWholeTour()));
             GridDataFactory.swtDefaults().span(6, 1).applyTo(_linkSRTM_SelectWholeTour);
          }
       }
@@ -1227,7 +1238,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          final Button btnUpdateAltitude = new Button(container, SWT.NONE);
          btnUpdateAltitude.setText(Messages.adjust_altitude_btn_update_altitude);
          btnUpdateAltitude.setToolTipText(Messages.adjust_altitude_btn_update_altitude_tooltip);
-         btnUpdateAltitude.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onUpdate_ElevationSRTMSpline()));
+         btnUpdateAltitude.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onUpdate_ElevationSRTMSpline()));
          setButtonLayoutData(btnUpdateAltitude);
 
          /*
@@ -1236,7 +1247,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          final Button btnResetAltitude = new Button(container, SWT.NONE);
          btnResetAltitude.setText(Messages.adjust_altitude_btn_reset_altitude_and_points);
          btnResetAltitude.setToolTipText(Messages.adjust_altitude_btn_reset_altitude_and_points_tooltip);
-         btnResetAltitude.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onReset_Elevation_SRTMSpline()));
+         btnResetAltitude.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onReset_Elevation_SRTMSpline()));
          setButtonLayoutData(btnResetAltitude);
 
          /*
@@ -1245,7 +1256,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          _btnSRTMRemoveAllPoints = new Button(container, SWT.NONE);
          _btnSRTMRemoveAllPoints.setText(Messages.adjust_altitude_btn_srtm_remove_all_points);
          _btnSRTMRemoveAllPoints.setToolTipText(Messages.adjust_altitude_btn_srtm_remove_all_points_tooltip);
-         _btnSRTMRemoveAllPoints.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+         _btnSRTMRemoveAllPoints.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
             spline_CreateDefaultSplineData();
             onSelectAdjustmentType();
          }));
@@ -1338,7 +1349,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          GridLayoutFactory.swtDefaults().applyTo(groupKeep);
          groupKeep.setText(Messages.Dlg_AdjustAltitude_Group_options);
          {
-            final SelectionListener keepButtonSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeAltitude());
+            final SelectionListener keepButtonSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeAltitude());
 
             _rdoKeepBottom = new Button(groupKeep, SWT.RADIO);
             _rdoKeepBottom.setText(Messages.Dlg_AdjustAltitude_Radio_keep_bottom_altitude);
@@ -1368,7 +1379,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          _btnResetAltitude = new Button(container, SWT.NONE);
          _btnResetAltitude.setText(Messages.adjust_altitude_btn_reset_altitude);
          _btnResetAltitude.setToolTipText(Messages.adjust_altitude_btn_reset_altitude_tooltip);
-         _btnResetAltitude.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onReset_Elevation()));
+         _btnResetAltitude.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onReset_Elevation()));
          setButtonLayoutData(_btnResetAltitude);
 
          /*
@@ -1377,7 +1388,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          _btnUpdateAltitude = new Button(container, SWT.NONE);
          _btnUpdateAltitude.setText(Messages.adjust_altitude_btn_update_altitude);
          _btnUpdateAltitude.setToolTipText(Messages.adjust_altitude_btn_update_altitude_tooltip);
-         _btnUpdateAltitude.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onUpdate_Elevation()));
+         _btnUpdateAltitude.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onUpdate_Elevation()));
          setButtonLayoutData(_btnUpdateAltitude);
       }
    }
@@ -1414,7 +1425,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          _scaleSlicePos.setMaximum(MAX_ADJUST_GEO_POS_SLICES * 2);
          _scaleSlicePos.setPageIncrement(5);
          _scaleSlicePos.addListener(SWT.MouseDoubleClick, event -> onDoubleClickGeoPos(event.widget));
-         _scaleSlicePos.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectSlicePosition()));
+         _scaleSlicePos.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelectSlicePosition()));
          GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleSlicePos);
       }
 
@@ -1931,10 +1942,12 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
    private void onSpline_SelectWholeTour() {
 
-      _tourChart.setXSliderPosition(new SelectionChartXSliderPosition(
+      final SelectionChartXSliderPosition sliderPosition = new SelectionChartXSliderPosition(
             _tourChart,
             SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER,
-            SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER));
+            SelectionChartXSliderPosition.SLIDER_POSITION_AT_CHART_BORDER);
+
+      _tourChart.setXSliderPosition(sliderPosition);
    }
 
    private void onSpline_SetEndElevationToSRTM() {
@@ -2020,11 +2033,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          scaleGeoPos = MAX_ADJUST_GEO_POS_SLICES;
       }
       _scaleSlicePos.setSelection(scaleGeoPos);
-
-      /*
-       * Delay selected adjustment type that the slider are positioned correctly
-       */
-      Display.getCurrent().timerExec(100, this::onSelectAdjustmentType);
    }
 
    private void saveState() {
@@ -2146,6 +2154,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
     *
     * @param altiDiff
     * @param sliderDistance
+    *
     * @return
     */
    private void spline_CreateDefaultSplineData() {
@@ -2447,6 +2456,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
    /**
     * @param mouseDownDevPositionX
     * @param mouseDownDevPositionY
+    *
     * @return
     */
    private boolean splinePoint_NewPoint(final int mouseDownDevPositionX,

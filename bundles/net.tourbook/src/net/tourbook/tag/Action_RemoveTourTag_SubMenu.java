@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.MenuItem;
 /**
  * Removes a tag from the selected tours
  */
-class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator {
+public class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator {
 
    private TagMenuManager      _tagMenuMgr;
    private Menu                _menu;

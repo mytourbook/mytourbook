@@ -173,6 +173,7 @@ public class ElevationCompareResultView extends ViewPart implements
    private SelectionRemovedComparedTours       _oldRemoveSelection        = null;
 
    private TagMenuManager                      _tagMenuManager;
+   private TourTypeMenuManager                 _tourTypeMenuManager;
    private MenuManager                         _viewerMenuManager;
    private IContextMenuProvider                _viewerContextMenuProvider = new TreeContextMenuProvider();
 
@@ -700,6 +701,7 @@ public class ElevationCompareResultView extends ViewPart implements
    private void createMenuManager() {
 
       _tagMenuManager = new TagMenuManager(this, true);
+      _tourTypeMenuManager = new TourTypeMenuManager(this);
 
       _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       _viewerMenuManager.setRemoveAllWhenShown(true);
@@ -1617,7 +1619,7 @@ public class ElevationCompareResultView extends ViewPart implements
       }
       _tagMenuManager.enableTagActions(isTourSelected, isOneTour, allExistingTags);
 
-      TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, existingTourTypeId);
+      _tourTypeMenuManager.enableTourTypeActions(isTourSelected, existingTourTypeId);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
@@ -1649,7 +1651,7 @@ public class ElevationCompareResultView extends ViewPart implements
       // tour type actions
       menuMgr.add(new Separator());
       menuMgr.add(_actionContext_SetTourType);
-      TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
+      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr);
 
       enableActions_ContextMenu();
    }

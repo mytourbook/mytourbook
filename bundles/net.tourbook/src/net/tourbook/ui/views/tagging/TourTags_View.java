@@ -815,7 +815,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
       tree.setHeaderVisible(true);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
 
-      tree.addSelectionListener(widgetSelectedAdapter(this::onTagTree_Selection));
+      tree.addSelectionListener(widgetSelectedAdapter(event -> onTagTree_Selection(event)));
 
       tree.addKeyListener(keyPressedAdapter(keyEvent -> _tagViewerItem_IsKeyPressed = true));
 
@@ -860,7 +860,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
          }
       });
 
-      _tagViewer.addSelectionChangedListener(this::onTagViewer_Select);
+      _tagViewer.addSelectionChangedListener(event -> onTagViewer_Select(event));
 
       createUI_82_ColumnImages(tree);
       createUI_84_ContextMenu();

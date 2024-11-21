@@ -412,6 +412,7 @@ public class RawDataView extends ViewPart implements
    private ITourEventListener               _tourEventListener;
    //
    private TagMenuManager                   _tagMenuManager;
+   private TourTypeMenuManager              _tourTypeMenuManager;
    private MenuManager                      _tourViewer_MenuManager;
    private IContextMenuProvider             _tourViewer_ContextMenuProvider = new TourViewer_ContextMenuProvider();
    //
@@ -2568,6 +2569,7 @@ public class RawDataView extends ViewPart implements
    private void createMenuManager() {
 
       _tagMenuManager = new TagMenuManager(this, true);
+      _tourTypeMenuManager = new TourTypeMenuManager(this);
 
       _tourViewer_MenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       _tourViewer_MenuManager.setRemoveAllWhenShown(true);
@@ -4221,7 +4223,7 @@ public class RawDataView extends ViewPart implements
       // actions for tags/tour types
       _actionSetTourType.setEnabled(isSavedTourSelected && (allTourTypes.size() > 0));
       _tagMenuManager.enableTagActions(isSavedTourSelected, isOneTourSelected, allUsedTagIds);
-      TourTypeMenuManager.enableRecentTourTypeActions(isSavedTourSelected, existingTourTypeId);
+      _tourTypeMenuManager.enableTourTypeActions(isSavedTourSelected, existingTourTypeId);
 
       // set double click state
       _tourDoubleClickState.canEditTour         = isOneSavedAndNotDeleteTour;
@@ -4363,7 +4365,7 @@ public class RawDataView extends ViewPart implements
       // tour type actions
       menuMgr.add(new Separator());
       menuMgr.add(_actionSetTourType);
-      TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
+      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr);
 
       // tour tag actions
       _tagMenuManager.fillTagMenu(menuMgr, true);
@@ -4761,7 +4763,7 @@ public class RawDataView extends ViewPart implements
       createResources_Web();
 
       _tourViewer_Comparator = new TourViewer_Comparator();
-      _columnSortListener = widgetSelectedAdapter(this::onSelect_SortColumn);
+      _columnSortListener = widgetSelectedAdapter(event -> onSelect_SortColumn(event));
    }
 
    /**
@@ -6627,7 +6629,7 @@ public class RawDataView extends ViewPart implements
       if (_postSelectionProvider.getSelection() == null) {
 
          // fire a selected tour when the selection provider was cleared sometime before
-         Display.getCurrent().asyncExec(this::fireSelectedTour);
+         Display.getCurrent().asyncExec(() -> fireSelectedTour());
       }
    }
 

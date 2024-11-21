@@ -505,9 +505,9 @@ public class TourChartView extends ViewPart implements
 
       _tourChartConfig.canUseGeoCompareTool = true;
 
-      _tourChart.addHoveredValueListener(this::chartListener_HoveredValue);
-      _tourChart.addSliderMoveListener(this::chartListener_SliderMoved);
-      _tourChart.addTourModifyListener(this::chartListener_TourIsModified);
+      _tourChart.addHoveredValueListener(hoveredValuePointIndex -> chartListener_HoveredValue(hoveredValuePointIndex));
+      _tourChart.addSliderMoveListener(chartInfo -> chartListener_SliderMoved(chartInfo));
+      _tourChart.addTourModifyListener(tourData -> chartListener_TourIsModified(tourData));
    }
 
    @Override

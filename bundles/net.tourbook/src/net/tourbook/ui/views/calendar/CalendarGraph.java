@@ -799,11 +799,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
          }
       });
 
-      addMouseMoveListener(this::onMouse_Move);
+      addMouseMoveListener(event -> onMouse_Move(event));
 
       addMouseTrackListener(MouseTrackListener.mouseExitAdapter(mouseEvent -> onMouse_Exit()));
 
-      addListener(SWT.MouseVerticalWheel, this::onMouse_Wheel);
+      addListener(SWT.MouseVerticalWheel, event -> onMouse_Wheel(event));
 
       _parent.getVerticalBar().addSelectionListener(widgetSelectedAdapter(selectionEvent -> scrollBar_onScroll()));
    }
@@ -1386,7 +1386,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
          // graph is dirty again, this can occur when data are loaded -> reschedule a new update
 
-         getDisplay().timerExec(5, this::redraw);
+         getDisplay().timerExec(5, () -> redraw());
       }
    }
 

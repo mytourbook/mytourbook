@@ -587,7 +587,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       tree.setHeaderVisible(true);
       tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-      tree.addListener(SWT.MouseDoubleClick, this::onTagTree_DoubleClick);
+      tree.addListener(SWT.MouseDoubleClick, event -> onTagTree_DoubleClick(event));
 
       tree.addKeyListener(keyPressedAdapter(keyEvent -> {
          _isSelectedWithKeyboard = true;

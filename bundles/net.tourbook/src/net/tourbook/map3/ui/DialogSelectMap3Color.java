@@ -453,7 +453,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
          }
       });
 
-      _colorViewer.addCheckStateListener(this::onViewerCheckStateChange);
+      _colorViewer.addCheckStateListener(event -> onViewerCheckStateChange(event));
 
       _colorViewer.addSelectionChangedListener(selectionChangedEvent -> onViewerSelectColor());
 

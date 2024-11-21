@@ -855,7 +855,7 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
          keyEvent.doit = false;
 
          // fire selection
-         _scaleSpeedJogWheel.getDisplay().asyncExec(this::onSpeedJogWheel_Selection);
+         _scaleSpeedJogWheel.getDisplay().asyncExec(() -> onSpeedJogWheel_Selection());
       }
 
    }

@@ -244,7 +244,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
             .applyTo(_shellContainer);
 //      _shellContainer.setForeground(_fgColor);
 //      _shellContainer.setBackground(_bgColor);
-      _shellContainer.addPaintListener(this::onPaintShellContainer);
+      _shellContainer.addPaintListener(event -> onPaintShellContainer(event));
       {
          _ttContainer = new Composite(_shellContainer, SWT.NONE);
          GridLayoutFactory.fillDefaults()

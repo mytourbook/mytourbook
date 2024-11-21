@@ -182,7 +182,7 @@ public class PicDirImages implements IPhotoGalleryProvider {
 
    void actionRemoveInvalidFolders() {
 
-      BusyIndicator.showWhile(_display, this::removeInvalidFolders);
+      BusyIndicator.showWhile(_display, () -> removeInvalidFolders());
    }
 
    void actionShowNavigationHistory() {

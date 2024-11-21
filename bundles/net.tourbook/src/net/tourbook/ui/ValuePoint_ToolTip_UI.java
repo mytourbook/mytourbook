@@ -425,7 +425,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
        * tooltip when the mouse is hovered, which is not as it should be.
        */
       _shellContainer = new Composite(parent, SWT.NONE);
-      _shellContainer.addPaintListener(this::onPaintShellContainer);
+      _shellContainer.addPaintListener(event -> onPaintShellContainer(event));
 //      _shellContainer.setBackground(UI.SYS_COLOR_GREEN);
       {
          if (_isHorizontalOrientation) {

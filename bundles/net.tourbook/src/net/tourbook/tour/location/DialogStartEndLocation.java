@@ -70,7 +70,7 @@ public class DialogStartEndLocation extends Dialog {
    /*
     * UI controls
     */
-   private Image  _imageDialog;
+   private Image  _imageDialog = TourbookPlugin.getThemedImageDescriptor(Images.Tour_StartEnd).createImage();
 
    private Button _chkLocation_Start;
    private Button _chkLocation_End;
@@ -87,7 +87,6 @@ public class DialogStartEndLocation extends Dialog {
       _allSelectedTours = allSelectedTours;
 
       // dialog image
-      _imageDialog = TourbookPlugin.getThemedImageDescriptor(Images.Tour_StartEnd).createImage();
       setDefaultImage(_imageDialog);
    }
 

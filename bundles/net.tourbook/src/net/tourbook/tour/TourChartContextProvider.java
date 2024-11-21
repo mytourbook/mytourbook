@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,18 +48,18 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 
    private TourEditor                     _tourEditor;
 
-   private ActionEditQuick                _actionQuickEdit;
-   private ActionEditTour                 _actionEditTour;
-   private ActionOpenMarkerDialog         _actionOpenMarkerDialog;
-   private ActionOpenAdjustAltitudeDialog _actionAdjustAltitude;
+   private TagMenuManager                 _tagMenuMgr;
+   private TourTypeMenuManager            _tourTypeMenuManager;
 
+   private ActionOpenAdjustAltitudeDialog _actionAdjustAltitude;
    private ActionCreateRefTour            _actionCreateRefTour;
    private ActionCreateMarkerFromSlider   _actionCreateMarker;
    private ActionCreateMarkerFromSlider   _actionCreateMarkerLeft;
    private ActionCreateMarkerFromSlider   _actionCreateMarkerRight;
-
+   private ActionEditTour                 _actionEditTour;
+   private ActionEditQuick                _actionQuickEdit;
+   private ActionOpenMarkerDialog         _actionOpenMarkerDialog;
    private ActionSetTourTypeMenu          _actionSetTourType;
-   private TagMenuManager                 _tagMenuMgr;
 
    private ChartXSlider                   _leftSlider;
    private ChartXSlider                   _rightSlider;
@@ -100,6 +100,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionSetTourType = new ActionSetTourTypeMenu(this);
 
       _tagMenuMgr = new TagMenuManager(this, true);
+      _tourTypeMenuManager = new TourTypeMenuManager(this);
    }
 
    /**
@@ -120,12 +121,12 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionQuickEdit.setEnabled(isDataAvailable);
       _actionEditTour.setEnabled(isDataAvailable);
 
-      _tagMenuMgr.enableTagActions(//
+      _tagMenuMgr.enableTagActions(
             isDataAvailable,
             isDataAvailable && tourTags.size() > 0,
             tourTags);
 
-      TourTypeMenuManager.enableRecentTourTypeActions(isDataAvailable, existingTourTypeId);
+      _tourTypeMenuManager.enableTourTypeActions(isDataAvailable, existingTourTypeId);
    }
 
    @Override
@@ -150,7 +151,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       // tour type actions
       menuMgr.add(new Separator());
       menuMgr.add(_actionSetTourType);
-      TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
+      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr);
 
       enableActions();
    }

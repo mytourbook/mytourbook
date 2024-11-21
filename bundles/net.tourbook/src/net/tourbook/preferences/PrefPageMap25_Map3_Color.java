@@ -554,7 +554,7 @@ public class PrefPageMap25_Map3_Color extends PreferencePage implements IWorkben
          }
       });
 
-      _colorProfileViewer.addCheckStateListener(this::onViewerCheckStateChange);
+      _colorProfileViewer.addCheckStateListener(event -> onViewerCheckStateChange(event));
 
       createUI_24_ContextMenu();
 

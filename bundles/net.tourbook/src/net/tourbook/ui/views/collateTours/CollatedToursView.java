@@ -190,6 +190,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    private TreeViewerTourInfoToolTip                  _tourInfoToolTip;
    //
    private TagMenuManager                             _tagMenuManager;
+   private TourTypeMenuManager                        _tourTypeMenuManager;
    private MenuManager                                _viewerMenuManager;
    private IContextMenuProvider                       _viewerContextMenuProvider = new TreeContextMenuProvider();
    //
@@ -461,6 +462,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    private void createMenuManager() {
 
       _tagMenuManager = new TagMenuManager(this, true);
+      _tourTypeMenuManager = new TourTypeMenuManager(this);
 
       _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       _viewerMenuManager.setRemoveAllWhenShown(true);
@@ -1879,7 +1881,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       // tour type actions
       menuMgr.add(new Separator());
       menuMgr.add(_actionSetTourType);
-      TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
+      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionCollapseOthers);
@@ -2033,8 +2035,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          final Image image = TourTypeImage.getTourTypeImage(tourTypeId);
 
          if (image != null) {
-
-            final int alignment = _colDef_TourTypeImage.getColumnStyle();
 
             UI.paintImage(
 

@@ -205,6 +205,7 @@ public class ReferenceTourView extends ViewPart implements
    private TourDoubleClickState                _tourDoubleClickState                    = new TourDoubleClickState();
 
    private TagMenuManager                      _tagMenuManager;
+   private TourTypeMenuManager                 _tourTypeMenuManager;
    private MenuManager                         _viewerMenuManager;
    private IContextMenuProvider                _viewerContextMenuProvider               = new TreeContextMenuProvider();
 
@@ -728,6 +729,7 @@ public class ReferenceTourView extends ViewPart implements
    private void createMenuManager() {
 
       _tagMenuManager = new TagMenuManager(this, true);
+      _tourTypeMenuManager = new TourTypeMenuManager(this);
 
       _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       _viewerMenuManager.setRemoveAllWhenShown(true);
@@ -1400,7 +1402,7 @@ public class ReferenceTourView extends ViewPart implements
 
 // SET_FORMATTING_ON
 
-      TourTypeMenuManager.enableRecentTourTypeActions(
+      _tourTypeMenuManager.enableTourTypeActions(
             isTourSelected,
             isOneTour
                   ? firstTourItem.tourTypeId
@@ -1473,7 +1475,7 @@ public class ReferenceTourView extends ViewPart implements
       // tour type actions
       menuMgr.add(new Separator());
       menuMgr.add(_actionContext_SetTourType);
-      TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
+      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionContext_RemoveComparedTours);
