@@ -663,6 +663,11 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       setMessage(NLS.bind(Messages.adjust_altitude_dlg_dialog_message, TourManager.getTourTitle(_tourData)));
 
       updateTourChart();
+
+      /*
+       * Delay selected adjustment type that the sliders are positioned correctly
+       */
+      Display.getCurrent().timerExec(300, () -> onSelectAdjustmentType());
    }
 
    @Override
@@ -2028,11 +2033,6 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
          scaleGeoPos = MAX_ADJUST_GEO_POS_SLICES;
       }
       _scaleSlicePos.setSelection(scaleGeoPos);
-
-      /*
-       * Delay selected adjustment type that the sliders are positioned correctly
-       */
-      Display.getCurrent().timerExec(200, () -> onSelectAdjustmentType());
    }
 
    private void saveState() {
