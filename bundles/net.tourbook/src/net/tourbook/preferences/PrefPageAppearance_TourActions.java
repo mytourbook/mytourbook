@@ -243,7 +243,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
                _chkShowOnlyAvailableActions.setToolTipText(
                      "When this preferences dialog is opened from a view context menu, then the available actions within this context menu can be filtered.");
                _chkShowOnlyAvailableActions.addSelectionListener(SelectionListener.widgetSelectedAdapter(
-                     selectionEvent -> onShowOnlyAvailableActions()));
+                     selectionEvent -> updateUI_ActionViewerFilter()));
 
                GridDataFactory.fillDefaults()
                      .grab(true, false)
@@ -394,62 +394,11 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
    private void defineAllColumn(final TableLayoutComposite tableLayouter) {
 
-      defineColumn_ActionName(tableLayouter);
-//    defineColumn_ActionID(tableLayouter);
+      defineColumn_10_ActionName(tableLayouter);
+//    defineColumn_20_ActionID(tableLayouter);
    }
 
-   @SuppressWarnings("unused")
-   private void defineColumn_ActionID(final TableLayoutComposite tableLayouter) {
-
-      TableViewerColumn tvc;
-
-      tvc = new TableViewerColumn(_tourActionViewer, SWT.NONE);
-
-      tvc.setLabelProvider(new StyledCellLabelProvider() {
-
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final TourAction tourAction = ((TourAction) cell.getElement());
-
-            if (tourAction.isCategory) {
-
-               cell.setText(UI.EMPTY_STRING);
-
-            } else {
-
-               final String actionText = tourAction.actionClassName;
-
-               final StyledString styledString = new StyledString();
-
-               if (_allViewActionIDs != null && _allViewActionIDs.contains(tourAction.actionClassName)) {
-
-                  // action is available in the related view
-
-                  if (tourAction.isChecked) {
-
-                     styledString.append(actionText, net.tourbook.ui.UI.TOTAL_STYLER);
-
-                  } else {
-
-                     styledString.append(actionText);
-                  }
-
-               } else {
-
-                  styledString.append(actionText, net.tourbook.ui.UI.DISABLED_STYLER);
-               }
-
-               cell.setText(styledString.getString());
-               cell.setStyleRanges(styledString.getStyleRanges());
-            }
-         }
-      });
-
-      tableLayouter.addColumnData(new ColumnWeightData(20));
-   }
-
-   private void defineColumn_ActionName(final TableLayoutComposite tableLayouter) {
+   private void defineColumn_10_ActionName(final TableLayoutComposite tableLayouter) {
 
       TableViewerColumn tvc;
 
@@ -503,6 +452,57 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
                   cell.setImage(tourAction.getImageDisabled());
                }
+            }
+         }
+      });
+
+      tableLayouter.addColumnData(new ColumnWeightData(20));
+   }
+
+   @SuppressWarnings("unused")
+   private void defineColumn_20_ActionID(final TableLayoutComposite tableLayouter) {
+
+      TableViewerColumn tvc;
+
+      tvc = new TableViewerColumn(_tourActionViewer, SWT.NONE);
+
+      tvc.setLabelProvider(new StyledCellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourAction tourAction = ((TourAction) cell.getElement());
+
+            if (tourAction.isCategory) {
+
+               cell.setText(UI.EMPTY_STRING);
+
+            } else {
+
+               final String actionText = tourAction.actionClassName;
+
+               final StyledString styledString = new StyledString();
+
+               if (_allViewActionIDs != null && _allViewActionIDs.contains(tourAction.actionClassName)) {
+
+                  // action is available in the related view
+
+                  if (tourAction.isChecked) {
+
+                     styledString.append(actionText, net.tourbook.ui.UI.TOTAL_STYLER);
+
+                  } else {
+
+                     styledString.append(actionText);
+                  }
+
+               } else {
+
+                  styledString.append(actionText, net.tourbook.ui.UI.DISABLED_STYLER);
+               }
+
+               cell.setText(styledString.getString());
+               cell.setStyleRanges(styledString.getStyleRanges());
             }
          }
       });
@@ -707,18 +707,6 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       }
    }
 
-   private void onShowOnlyAvailableActions() {
-
-      if (_chkShowOnlyAvailableActions.getSelection()) {
-
-         _tourActionViewer.setFilters(_actionFilter);
-
-      } else {
-
-         _tourActionViewer.setFilters();
-      }
-   }
-
    @Override
    public boolean performCancel() {
 
@@ -754,6 +742,8 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       _rdoShowAllActions.setSelection(isCustomizeActions == false);
       _rdoShowCustomActions.setSelection(isCustomizeActions);
 
+      _chkShowOnlyAvailableActions.setSelection(TourActionManager.isShowOnlyAvailableActions());
+
       // get viewer content
       _allSortedActions.clear();
       _allSortedActions.addAll(TourActionManager.getSortedActions());
@@ -763,6 +753,8 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
       // check only the visible actions
       _tourActionViewer.setCheckedElements(TourActionManager.getVisibleActions().toArray());
+
+      updateUI_ActionViewerFilter();
    }
 
    private void saveState() {
@@ -804,9 +796,22 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       TourActionManager.saveActions(
 
             _rdoShowCustomActions.getSelection(),
+            _chkShowOnlyAvailableActions.getSelection(),
 
             stateAllSortedActions,
             stateAllCheckedActions);
+   }
+
+   private void updateUI_ActionViewerFilter() {
+
+      if (_chkShowOnlyAvailableActions.getSelection()) {
+
+         _tourActionViewer.setFilters(_actionFilter);
+
+      } else {
+
+         _tourActionViewer.setFilters();
+      }
    }
 
 }

@@ -57,15 +57,16 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 
 public class TourActionManager {
 
-   public static final String              AUTO_OPEN                       = "#AutoOpen";                                //$NON-NLS-1$
+   public static final String              AUTO_OPEN                            = "#AutoOpen";                                //$NON-NLS-1$
 
-   private static final String             ID                              = "net.tourbook.ui.action.TourActionManager"; //$NON-NLS-1$
+   private static final String             ID                                   = "net.tourbook.ui.action.TourActionManager"; //$NON-NLS-1$
 
-   private static final String             STATE_ALL_SORTED_TOUR_ACTIONS   = "STATE_ALL_SORTED_TOUR_ACTIONS";            //$NON-NLS-1$
-   private static final String             STATE_ALL_VISIBLE_TOUR_ACTIONS  = "STATE_ALL_VISIBLE_TOUR_ACTIONS";           //$NON-NLS-1$
-   private static final String             STATE_IS_CUSTOMIZE_TOUR_ACTIONS = "STATE_IS_CUSTOMIZE_TOUR_ACTIONS";          //$NON-NLS-1$
+   private static final String             STATE_ALL_SORTED_TOUR_ACTIONS        = "STATE_ALL_SORTED_TOUR_ACTIONS";            //$NON-NLS-1$
+   private static final String             STATE_ALL_VISIBLE_TOUR_ACTIONS       = "STATE_ALL_VISIBLE_TOUR_ACTIONS";           //$NON-NLS-1$
+   private static final String             STATE_IS_CUSTOMIZE_TOUR_ACTIONS      = "STATE_IS_CUSTOMIZE_TOUR_ACTIONS";          //$NON-NLS-1$
+   private static final String             STATE_IS_SHOW_ONLY_AVAILABLE_ACTIONS = "STATE_IS_SHOW_ONLY_AVAILABLE_ACTIONS";     //$NON-NLS-1$
 
-   private static final IDialogSettings    _state                          = TourbookPlugin.getState(ID);
+   private static final IDialogSettings    _state                               = TourbookPlugin.getState(ID);
 
    private static List<TourAction>         _allDefinedActions;
    private static List<TourAction>         _allSortedActions;
@@ -83,7 +84,7 @@ public class TourActionManager {
    /**
     * Contains all tour action ID's from all views, key is the view ID
     */
-   private static Map<String, Set<String>> _allViewActions                 = new HashMap<>();
+   private static Map<String, Set<String>> _allViewActions                      = new HashMap<>();
 
    static {
 
@@ -680,11 +681,18 @@ public class TourActionManager {
       return _isCustomizeActions;
    }
 
+   public static boolean isShowOnlyAvailableActions() {
+
+      return Util.getStateBoolean(_state, STATE_IS_SHOW_ONLY_AVAILABLE_ACTIONS, false);
+   }
+
    public static void saveActions(final boolean isCustomizeActions,
+                                  final boolean isShowOnlyAvailableActions,
                                   final String[] allSortedActions,
                                   final String[] allCheckedActions) {
 
       _state.put(STATE_IS_CUSTOMIZE_TOUR_ACTIONS, isCustomizeActions);
+      _state.put(STATE_IS_SHOW_ONLY_AVAILABLE_ACTIONS, isShowOnlyAvailableActions);
       _state.put(STATE_ALL_SORTED_TOUR_ACTIONS, allSortedActions);
       _state.put(STATE_ALL_VISIBLE_TOUR_ACTIONS, allCheckedActions);
 
