@@ -1373,8 +1373,6 @@ public class RawDataView extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-      _actionEditImportPreferences        = new ActionOpenPrefDialog(Messages.Import_Data_Action_EditImportPreferences, PrefPageImport.ID);
-
       _actionClearView                    = new ActionClearView(this);
       _actionDeleteTourFile               = new ActionDeleteTourFiles(this);
       _actionEditTour                     = new ActionEditTour(this);
@@ -1439,6 +1437,18 @@ public class RawDataView extends ViewPart implements
 //    _allTourActions_Adjust.put(_actionDeleteTourMenu            .getClass().getName(),  _actionDeleteTourMenu);
 
 // SET_FORMATTING_ON
+
+      TourActionManager.setAllViewActions(ID,
+            _allTourActions_Edit.keySet(),
+            _allTourActions_Export.keySet(),
+            _tagMenuManager.getAllTagActions().keySet(),
+            _tourTypeMenuManager.getAllTourTypeActions().keySet());
+
+      _actionEditImportPreferences = new ActionOpenPrefDialog(
+            Messages.Import_Data_Action_EditImportPreferences,
+            PrefPageImport.ID,
+            // set custom data
+            ID);
    }
 
    /**
@@ -4410,7 +4420,10 @@ public class RawDataView extends ViewPart implements
       menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
       // customize this context menu
-      TourActionManager.fillContextMenu_CustomizeAction(menuMgr);
+      TourActionManager.fillContextMenu_CustomizeAction(menuMgr)
+
+            // set pref page custom data that actions from this view can be identified
+            .setPrefData(ID);
 
       enableActions();
    }

@@ -135,7 +135,7 @@ public class Messages extends NLS {
    public static String        App_Action_Copy;
    public static String        App_Action_CopyDataIntoClipboard_Tooltip;
    public static String        App_Action_CopyDataIntoClipboard_CopyIsDone;
-   public static String        App_Action_CustomizeContextMenu;
+   public static String        App_Action_ContextMenu_Customize;
    public static String        App_Action_Delete;
    public static String        App_Action_DeleteProfile;
    public static String        App_Action_DeleteProperty;
@@ -1939,6 +1939,7 @@ public class Messages extends NLS {
    public static String        pref_view_layout_label_sub;
    public static String        pref_view_layout_label_sub_sub;
    public static String        pref_view_layout_label_title;
+   public static String        Pref_View_Layout_Label_Disabled;
    public static String        Pref_View_Layout_Label_Total;
    public static String        Pref_View_Layout_Label_Tour;
 

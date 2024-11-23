@@ -122,6 +122,11 @@ public class UI {
     * Date subcategory, e.g. month
     */
    public static final String            VIEW_COLOR_DATE_SUB_CATEGORY    = "VIEW_COLOR_DATE_SUB_CATEGORY";    //$NON-NLS-1$
+   
+   /**
+    * Color for disabled items
+    */
+   public static final String            VIEW_COLOR_DISABLED             = "VIEW_COLOR_DISABLED";             //$NON-NLS-1$
 
    /**
     * Color for normal, not categorized tour values
@@ -152,6 +157,7 @@ public class UI {
    public static Styler                  CONTENT_SUB_CATEGORY_STYLER;
    public static Styler                  CONTENT_CATEGORY_STYLER;
    public static Styler                  DATE_CATEGORY_STYLER;
+   public static Styler                  DISABLED_STYLER;
    public static Styler                  TOUR_STYLER;
    public static Styler                  TOTAL_STYLER;
 
@@ -199,6 +205,7 @@ public class UI {
       CONTENT_CATEGORY_STYLER       = StyledString.createColorRegistryStyler(VIEW_COLOR_CONTENT_CATEGORY,      null);
       CONTENT_SUB_CATEGORY_STYLER   = StyledString.createColorRegistryStyler(VIEW_COLOR_CONTENT_SUB_CATEGORY,  null);
       DATE_CATEGORY_STYLER          = StyledString.createColorRegistryStyler(VIEW_COLOR_DATE_CATEGORY,         null);
+      DISABLED_STYLER               = StyledString.createColorRegistryStyler(VIEW_COLOR_DISABLED,              null);
       TOUR_STYLER                   = StyledString.createColorRegistryStyler(VIEW_COLOR_TOUR,                  null);
       TOTAL_STYLER                  = StyledString.createColorRegistryStyler(VIEW_COLOR_TOTAL,                 null);
 
@@ -1036,6 +1043,19 @@ public class UI {
                   : Util.getStateRGB(state,
                         PrefPageViewColors.STATE_VIEW_COLOR_TOTAL_DARK,
                         PrefPageViewColors.STATE_VIEW_COLOR_TOTAL_DEFAULT_DARK));
+
+      // disabled
+      colorRegistry.put(VIEW_COLOR_DISABLED,
+
+            isBrightTheme
+
+                  ? Util.getStateRGB(state,
+                        PrefPageViewColors.STATE_VIEW_COLOR_DISABLED_BRIGHT,
+                        PrefPageViewColors.STATE_VIEW_COLOR_DISABLED_DEFAULT_BRIGHT)
+
+                  : Util.getStateRGB(state,
+                        PrefPageViewColors.STATE_VIEW_COLOR_DISABLED_DARK,
+                        PrefPageViewColors.STATE_VIEW_COLOR_DISABLED_DEFAULT_DARK));
    }
 
    public static GridData setWidth(final Control control, final int width) {

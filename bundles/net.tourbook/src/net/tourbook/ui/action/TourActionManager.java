@@ -17,8 +17,10 @@ package net.tourbook.ui.action;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -55,28 +57,33 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 
 public class TourActionManager {
 
-   public static final String             AUTO_OPEN                       = "#AutoOpen";                                //$NON-NLS-1$
+   public static final String              AUTO_OPEN                       = "#AutoOpen";                                //$NON-NLS-1$
 
-   private static final String            ID                              = "net.tourbook.ui.action.TourActionManager"; //$NON-NLS-1$
+   private static final String             ID                              = "net.tourbook.ui.action.TourActionManager"; //$NON-NLS-1$
 
-   private static final String            STATE_ALL_SORTED_TOUR_ACTIONS   = "STATE_ALL_SORTED_TOUR_ACTIONS";            //$NON-NLS-1$
-   private static final String            STATE_ALL_VISIBLE_TOUR_ACTIONS  = "STATE_ALL_VISIBLE_TOUR_ACTIONS";           //$NON-NLS-1$
-   private static final String            STATE_IS_CUSTOMIZE_TOUR_ACTIONS = "STATE_IS_CUSTOMIZE_TOUR_ACTIONS";          //$NON-NLS-1$
+   private static final String             STATE_ALL_SORTED_TOUR_ACTIONS   = "STATE_ALL_SORTED_TOUR_ACTIONS";            //$NON-NLS-1$
+   private static final String             STATE_ALL_VISIBLE_TOUR_ACTIONS  = "STATE_ALL_VISIBLE_TOUR_ACTIONS";           //$NON-NLS-1$
+   private static final String             STATE_IS_CUSTOMIZE_TOUR_ACTIONS = "STATE_IS_CUSTOMIZE_TOUR_ACTIONS";          //$NON-NLS-1$
 
-   private static final IDialogSettings   _state                          = TourbookPlugin.getState(ID);
+   private static final IDialogSettings    _state                          = TourbookPlugin.getState(ID);
 
-   private static List<TourAction>        _allDefinedActions;
-   private static List<TourAction>        _allSortedActions;
-   private static List<TourAction>        _allVisibleActions;
+   private static List<TourAction>         _allDefinedActions;
+   private static List<TourAction>         _allSortedActions;
+   private static List<TourAction>         _allVisibleActions;
 
-   private static ActionOpenPrefDialog    _actionCustomizeTourActions;
+   private static ActionOpenPrefDialog     _actionCustomizeTourActions;
 
-   private static Boolean                 _isCustomizeActions;
+   private static Boolean                  _isCustomizeActions;
 
    /**
     * Key is the action class name or in special cases a modified class name
     */
-   private static Map<String, TourAction> _allActionsMap;
+   private static Map<String, TourAction>  _allActionsMap;
+
+   /**
+    * Contains all tour action ID's from all views, key is the view ID
+    */
+   private static Map<String, Set<String>> _allViewActions                 = new HashMap<>();
 
    static {
 
@@ -99,7 +106,9 @@ public class TourActionManager {
       createActions_40_Export();
       createActions_50_Adjust();
 
-      _actionCustomizeTourActions = new ActionOpenPrefDialog(Messages.App_Action_CustomizeContextMenu, PrefPageAppearance_TourActions.ID);
+      _actionCustomizeTourActions = new ActionOpenPrefDialog(
+            Messages.App_Action_ContextMenu_Customize,
+            PrefPageAppearance_TourActions.ID);
    }
 
    /**
@@ -588,15 +597,20 @@ public class TourActionManager {
       }
    }
 
-   public static void fillContextMenu_CustomizeAction(final IMenuManager menuMgr) {
+   public static ActionOpenPrefDialog fillContextMenu_CustomizeAction(final IMenuManager menuMgr) {
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionCustomizeTourActions);
 
-      _actionCustomizeTourActions.setToolTipText(isCustomizeActions()
+      _actionCustomizeTourActions.setText(isCustomizeActions()
 
-            ? "Tour actions are currently customized"
-            : "Tour actions are currently NOT customized");
+            // Modify Customized Conte&xt Menu...
+            ? "Modify Customized Conte&xt Menu..."
+
+            // Customize Conte&xt Menu...
+            : Messages.App_Action_ContextMenu_Customize);
+
+      return _actionCustomizeTourActions;
    }
 
    public static List<TourAction> getActiveActions() {
@@ -609,6 +623,16 @@ public class TourActionManager {
 
          return getSortedActions();
       }
+   }
+
+   /**
+    * Contains all tour action ID's from all views, key is the view ID
+    *
+    * @return
+    */
+   public static Map<String, Set<String>> getAllViewActions() {
+
+      return _allViewActions;
    }
 
    public static List<TourAction> getDefinedActions() {
@@ -672,4 +696,24 @@ public class TourActionManager {
       createSortedActions(_allSortedActions);
       createVisibleActions(_allVisibleActions);
    }
+
+   /**
+    * Set all view actions to make the actions more visible which are contained in a view
+    *
+    * @param contextID
+    * @param allViewsActions
+    */
+   @SafeVarargs
+   public static void setAllViewActions(final String contextID,
+                                        final Set<String>... allViewsActions) {
+
+      final Set<String> allCollectedActions = new HashSet<>();
+
+      for (final Set<String> allActions : allViewsActions) {
+         allCollectedActions.addAll(allActions);
+      }
+
+      _allViewActions.put(contextID, allCollectedActions);
+   }
+
 }

@@ -350,6 +350,10 @@ public class TourTypeMenuManager implements IActionProvider {
       }
    }
 
+   public HashMap<String, Object> getAllTourTypeActions() {
+      return _allTourTypeActions;
+   }
+
    public void setTourTypeIntoTour(final TourType tourType,
                                    final boolean isSaveTour) {
 

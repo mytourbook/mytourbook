@@ -1005,6 +1005,10 @@ public class TagMenuManager implements IActionProvider {
       }
    }
 
+   public HashMap<String, Object> getAllTagActions() {
+      return _allTagActions;
+   }
+
    private Map<Long, TourTag> getSelectedTourTags() {
 
       final Map<Long, TourTag> allTags = new HashMap<>();

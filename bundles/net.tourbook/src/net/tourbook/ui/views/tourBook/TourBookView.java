@@ -1603,10 +1603,6 @@ public class TourBookView extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-      _allTourActions_Adjust  = new HashMap<>();
-      _allTourActions_Edit    = new HashMap<>();
-      _allTourActions_Export  = new HashMap<>();
-
       _actionAdjustTourValues          = new SubMenu_AdjustTourValues(this, this);
       _actionCollapseAll               = new ActionCollapseAll_WithoutSelection(this);
       _actionCreateTourMarkers         = new ActionCreateTourMarkers();
@@ -1640,6 +1636,10 @@ public class TourBookView extends ViewPart implements
       _actionContext_OnMouseSelect_ExpandCollapse  = new ActionOnMouseSelect_ExpandCollapse();
       _actionContext_SingleExpand_CollapseOthers   = new ActionSingleExpand_CollapseOthers();
 
+      _allTourActions_Adjust  = new HashMap<>();
+      _allTourActions_Edit    = new HashMap<>();
+      _allTourActions_Export  = new HashMap<>();
+
       _allTourActions_Edit.put(_actionEditQuick                   .getClass().getName(),  _actionEditQuick);
       _allTourActions_Edit.put(_actionEditTour                    .getClass().getName(),  _actionEditTour);
       _allTourActions_Edit.put(_actionOpenMarkerDialog            .getClass().getName(),  _actionOpenMarkerDialog);
@@ -1663,6 +1663,13 @@ public class TourBookView extends ViewPart implements
       _allTourActions_Adjust.put(_actionDeleteTourMenu            .getClass().getName(),  _actionDeleteTourMenu);
 
 // SET_FORMATTING_ON
+
+      TourActionManager.setAllViewActions(ID,
+            _allTourActions_Edit.keySet(),
+            _allTourActions_Export.keySet(),
+            _allTourActions_Adjust.keySet(),
+            _tagMenuManager.getAllTagActions().keySet(),
+            _tourTypeMenuManager.getAllTourTypeActions().keySet());
 
       fillActionBars();
    }
@@ -2509,7 +2516,10 @@ public class TourBookView extends ViewPart implements
       TourActionManager.fillContextMenu(menuMgr, TourActionCategory.ADJUST, _allTourActions_Adjust);
 
       // customize this context menu
-      TourActionManager.fillContextMenu_CustomizeAction(menuMgr);
+      TourActionManager.fillContextMenu_CustomizeAction(menuMgr)
+
+            // set pref page custom data that actions from this view can be identified
+            .setPrefData(ID);
 
       ActionEditQuick.setTourLocationFocus(getTourLocation_HoverState());
 
@@ -4327,7 +4337,7 @@ public class TourBookView extends ViewPart implements
 
                   /**
                    * <code>
-                  
+
                      Caused by: java.lang.NullPointerException
                      at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                      at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -4345,13 +4355,13 @@ public class TourBookView extends ViewPart implements
                      at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-                  
+
                      at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-                  
+
                      at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                      at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                      ... 22 more
-                  
+
                    * </code>
                    */
 
