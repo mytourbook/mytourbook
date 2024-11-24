@@ -108,7 +108,7 @@ public class TourActionManager {
       createActions_50_Adjust();
 
       _actionCustomizeTourActions = new ActionOpenPrefDialog(
-            Messages.App_Action_ContextMenu_Customize,
+            Messages.Tour_Action_ContextMenu_Customize,
             PrefPageAppearance_TourActions.ID);
    }
 
@@ -606,10 +606,10 @@ public class TourActionManager {
       _actionCustomizeTourActions.setText(isCustomizeActions()
 
             // Modify Customized Conte&xt Menu...
-            ? "Modify Customized Conte&xt Menu..."
+            ? Messages.Tour_Action_ContextMenu_Modify
 
             // Customize Conte&xt Menu...
-            : Messages.App_Action_ContextMenu_Customize);
+            : Messages.Tour_Action_ContextMenu_Customize);
 
       return _actionCustomizeTourActions;
    }
