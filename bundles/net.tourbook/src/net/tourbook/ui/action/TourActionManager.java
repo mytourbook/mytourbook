@@ -71,15 +71,15 @@ public class TourActionManager {
    private static List<TourAction>         _allDefinedActions;
    private static List<TourAction>         _allSortedActions;
    private static List<TourAction>         _allVisibleActions;
+   
+   /**
+    * Key is the action class name or in special cases a modified class name
+    */
+   private static Map<String, TourAction>  _allDefinedActionsMap;
 
    private static ActionOpenPrefDialog     _actionCustomizeTourActions;
 
    private static Boolean                  _isCustomizeActions;
-
-   /**
-    * Key is the action class name or in special cases a modified class name
-    */
-   private static Map<String, TourAction>  _allActionsMap;
 
    /**
     * Contains all tour action ID's from all views, key is the view ID
@@ -98,8 +98,8 @@ public class TourActionManager {
    private static void createActions() {
 
       // create a map with all available actions
-      _allActionsMap = new HashMap<>();
       _allDefinedActions = new ArrayList<>();
+      _allDefinedActionsMap = new HashMap<>();
 
       createActions_10_Edit();
       createActions_20_Tags();
@@ -198,17 +198,17 @@ public class TourActionManager {
       _allDefinedActions.add(actionMergeTour);
       _allDefinedActions.add(actionJoinTours);
 
-      _allActionsMap.put(categoryAction_Edit             .getCategoryClassName(),   categoryAction_Edit);
+      _allDefinedActionsMap.put(categoryAction_Edit             .getCategoryClassName(),   categoryAction_Edit);
 
-      _allActionsMap.put(ActionEditQuick                 .class.getName(),          actionEditQuick);
-      _allActionsMap.put(ActionEditTour                  .class.getName(),          actionEditTour);
-      _allActionsMap.put(ActionOpenMarkerDialog          .class.getName(),          actionOpenMarkerDialog);
-      _allActionsMap.put(ActionOpenAdjustAltitudeDialog  .class.getName(),          actionOpenAdjustAltitudeDialog);
-      _allActionsMap.put(ActionSetStartEndLocation       .class.getName(),          actionSetStartEndLocation);
-      _allActionsMap.put(ActionOpenTour                  .class.getName(),          actionOpenTour);
-      _allActionsMap.put(ActionDuplicateTour             .class.getName(),          actionDuplicateTour);
-      _allActionsMap.put(ActionMergeTour                 .class.getName(),          actionMergeTour);
-      _allActionsMap.put(ActionJoinTours                 .class.getName(),          actionJoinTours);
+      _allDefinedActionsMap.put(ActionEditQuick                 .class.getName(),          actionEditQuick);
+      _allDefinedActionsMap.put(ActionEditTour                  .class.getName(),          actionEditTour);
+      _allDefinedActionsMap.put(ActionOpenMarkerDialog          .class.getName(),          actionOpenMarkerDialog);
+      _allDefinedActionsMap.put(ActionOpenAdjustAltitudeDialog  .class.getName(),          actionOpenAdjustAltitudeDialog);
+      _allDefinedActionsMap.put(ActionSetStartEndLocation       .class.getName(),          actionSetStartEndLocation);
+      _allDefinedActionsMap.put(ActionOpenTour                  .class.getName(),          actionOpenTour);
+      _allDefinedActionsMap.put(ActionDuplicateTour             .class.getName(),          actionDuplicateTour);
+      _allDefinedActionsMap.put(ActionMergeTour                 .class.getName(),          actionMergeTour);
+      _allDefinedActionsMap.put(ActionJoinTours                 .class.getName(),          actionJoinTours);
 
 // SET_FORMATTING_ON
    }
@@ -283,17 +283,17 @@ public class TourActionManager {
       _allDefinedActions.add(actionClipboard_CopyTags);
       _allDefinedActions.add(actionClipboard_PasteTags);
 
-      _allActionsMap.put(categoryAction_Tag              .getCategoryClassName(),      categoryAction_Tag);
+      _allDefinedActionsMap.put(categoryAction_Tag              .getCategoryClassName(),      categoryAction_Tag);
 
-      _allActionsMap.put(ActionShowTourTagsView          .class.getName(),             actionSetTags);
-      _allActionsMap.put(ActionAddTourTag_SubMenu        .class.getName() + AUTO_OPEN, actionAddTag_AutoOpen);
-      _allActionsMap.put(ActionTagGroups_SubMenu         .class.getName(),             actionAddTagGroups);
-      _allActionsMap.put(ActionAddTourTag_SubMenu        .class.getName(),             actionAddTag);
-      _allActionsMap.put(ActionAddRecentTags             .class.getName(),             actionAddRecentTags);
-      _allActionsMap.put(ActionClipboard_CopyTags        .class.getName(),             actionClipboard_CopyTags);
-      _allActionsMap.put(ActionClipboard_PasteTags       .class.getName(),             actionClipboard_PasteTags);
-      _allActionsMap.put(Action_RemoveTourTag_SubMenu    .class.getName(),             actionRemoveTourTag);
-      _allActionsMap.put(Action_RemoveAllTags            .class.getName(),             actionRemoveAllTags);
+      _allDefinedActionsMap.put(ActionShowTourTagsView          .class.getName(),             actionSetTags);
+      _allDefinedActionsMap.put(ActionAddTourTag_SubMenu        .class.getName() + AUTO_OPEN, actionAddTag_AutoOpen);
+      _allDefinedActionsMap.put(ActionTagGroups_SubMenu         .class.getName(),             actionAddTagGroups);
+      _allDefinedActionsMap.put(ActionAddTourTag_SubMenu        .class.getName(),             actionAddTag);
+      _allDefinedActionsMap.put(ActionAddRecentTags             .class.getName(),             actionAddRecentTags);
+      _allDefinedActionsMap.put(ActionClipboard_CopyTags        .class.getName(),             actionClipboard_CopyTags);
+      _allDefinedActionsMap.put(ActionClipboard_PasteTags       .class.getName(),             actionClipboard_PasteTags);
+      _allDefinedActionsMap.put(Action_RemoveTourTag_SubMenu    .class.getName(),             actionRemoveTourTag);
+      _allDefinedActionsMap.put(Action_RemoveAllTags            .class.getName(),             actionRemoveAllTags);
 
 // SET_FORMATTING_ON
 
@@ -328,10 +328,10 @@ public class TourActionManager {
       _allDefinedActions.add(actionAddRecentTourTypes);
 
 
-      _allActionsMap.put(categoryAction_TourType         .getCategoryClassName(),      categoryAction_TourType);
+      _allDefinedActionsMap.put(categoryAction_TourType         .getCategoryClassName(),      categoryAction_TourType);
 
-      _allActionsMap.put(ActionSetTourTypeMenu           .class.getName(),             actionSetTourType);
-      _allActionsMap.put(ActionAddRecentTourTypes        .class.getName(),             actionAddRecentTourTypes);
+      _allDefinedActionsMap.put(ActionSetTourTypeMenu           .class.getName(),             actionSetTourType);
+      _allDefinedActionsMap.put(ActionAddRecentTourTypes        .class.getName(),             actionAddRecentTourTypes);
 
 // SET_FORMATTING_ON
 
@@ -375,12 +375,12 @@ public class TourActionManager {
       _allDefinedActions.add(actionExportTourCSV);
       _allDefinedActions.add(actionPrintTour);
 
-      _allActionsMap.put(categoryAction_Export           .getCategoryClassName(),   categoryAction_Export);
+      _allDefinedActionsMap.put(categoryAction_Export           .getCategoryClassName(),   categoryAction_Export);
 
-      _allActionsMap.put(ActionUpload                    .class.getName(),          actionUploadTour);
-      _allActionsMap.put(ActionExport                    .class.getName(),          actionExportTour);
-      _allActionsMap.put(ActionExportViewCSV             .class.getName(),          actionExportTourCSV);
-      _allActionsMap.put(ActionPrint                     .class.getName(),          actionPrintTour);
+      _allDefinedActionsMap.put(ActionUpload                    .class.getName(),          actionUploadTour);
+      _allDefinedActionsMap.put(ActionExport                    .class.getName(),          actionExportTour);
+      _allDefinedActionsMap.put(ActionExportViewCSV             .class.getName(),          actionExportTourCSV);
+      _allDefinedActionsMap.put(ActionPrint                     .class.getName(),          actionPrintTour);
 
 // SET_FORMATTING_ON
    }
@@ -429,13 +429,13 @@ public class TourActionManager {
       _allDefinedActions.add(actionSetOtherPersion);
       _allDefinedActions.add(actionDeleteTourMenu);
 
-      _allActionsMap.put(categoryAction_Adjust           .getCategoryClassName(),   categoryAction_Adjust);
+      _allDefinedActionsMap.put(categoryAction_Adjust           .getCategoryClassName(),   categoryAction_Adjust);
 
-      _allActionsMap.put(SubMenu_AdjustTourValues        .class.getName(),          actionAdjustTourValues);
-      _allActionsMap.put(ActionDeleteTourValues          .class.getName(),          actionDeletTourValues);
-      _allActionsMap.put(ActionReimportTours             .class.getName(),          actionReimportTours);
-      _allActionsMap.put(ActionSetPerson                 .class.getName(),          actionSetOtherPersion);
-      _allActionsMap.put(ActionDeleteTourMenu            .class.getName(),          actionDeleteTourMenu);
+      _allDefinedActionsMap.put(SubMenu_AdjustTourValues        .class.getName(),          actionAdjustTourValues);
+      _allDefinedActionsMap.put(ActionDeleteTourValues          .class.getName(),          actionDeletTourValues);
+      _allDefinedActionsMap.put(ActionReimportTours             .class.getName(),          actionReimportTours);
+      _allDefinedActionsMap.put(ActionSetPerson                 .class.getName(),          actionSetOtherPersion);
+      _allDefinedActionsMap.put(ActionDeleteTourMenu            .class.getName(),          actionDeleteTourMenu);
 
 // SET_FORMATTING_ON
 
@@ -451,7 +451,7 @@ public class TourActionManager {
 
          for (final String actionName : stateAllSortedActions) {
 
-            final TourAction tourAction = _allActionsMap.get(actionName);
+            final TourAction tourAction = _allDefinedActionsMap.get(actionName);
 
             if (tourAction != null) {
 
@@ -482,7 +482,7 @@ public class TourActionManager {
 
       for (final String actionClassName : stateAllCheckedActions) {
 
-         final TourAction tourAction = _allActionsMap.get(actionClassName);
+         final TourAction tourAction = _allDefinedActionsMap.get(actionClassName);
 
          if (tourAction != null) {
 

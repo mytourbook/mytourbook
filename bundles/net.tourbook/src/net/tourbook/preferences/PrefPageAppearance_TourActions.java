@@ -84,20 +84,22 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
    /*
     * UI controls
     */
-   private Button _btnCheckAll;
-   private Button _btnUncheckAll;
-   private Button _btnUp;
-   private Button _btnDown;
+   private Control _parent;
 
-   private Button _chkShowOnlyAvailableActions;
+   private Button  _btnCheckAll;
+   private Button  _btnUncheckAll;
+   private Button  _btnUp;
+   private Button  _btnDown;
 
-   private Button _rdoShowAllActions;
-   private Button _rdoShowCustomActions;
+   private Button  _chkShowOnlyAvailableActions;
 
-   private Label  _lblOptions;
+   private Button  _rdoShowAllActions;
+   private Button  _rdoShowCustomActions;
 
-   private Link   _linkOptions_Tags;
-   private Link   _linkOptions_TourTypes;
+   private Label   _lblOptions;
+
+   private Link    _linkOptions_Tags;
+   private Link    _linkOptions_TourTypes;
 
    private class ActionFilter extends ViewerFilter {
 
@@ -106,10 +108,23 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
          if (element instanceof final TourAction tourAction) {
 
-            if (tourAction.isCategory
+            if (_rdoShowCustomActions.getSelection()) {
 
-                  // show only available actions
-                  || _allViewActionIDs != null && _allViewActionIDs.contains(tourAction.actionClassName)) {
+               // customize actions
+
+               final boolean isShowOnlyAvailableActions = _chkShowOnlyAvailableActions.getSelection();
+               final boolean isActionInView = _allViewActionIDs != null && _allViewActionIDs.contains(tourAction.actionClassName);
+
+               if (tourAction.isCategory
+                     || isShowOnlyAvailableActions == false
+                     || isShowOnlyAvailableActions && isActionInView) {
+
+                  return true;
+               }
+
+            } else {
+
+               // all actions are displayed
 
                return true;
             }
@@ -242,8 +257,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
                _chkShowOnlyAvailableActions.setText("Show only a&vailable actions");
                _chkShowOnlyAvailableActions.setToolTipText(
                      "When this preferences dialog is opened from a view context menu, then the available actions within this context menu can be filtered.");
-               _chkShowOnlyAvailableActions.addSelectionListener(SelectionListener.widgetSelectedAdapter(
-                     selectionEvent -> updateUI_ActionViewerFilter()));
+               _chkShowOnlyAvailableActions.addSelectionListener(_defaultSelectionListener);
 
                GridDataFactory.fillDefaults()
                      .grab(true, false)
@@ -411,15 +425,15 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
             final TourAction tourAction = ((TourAction) cell.getElement());
 
+            final StyledString styledString = new StyledString();
+
             if (tourAction.isCategory) {
 
-               cell.setText(tourAction.actionText);
+               styledString.append(tourAction.actionText, net.tourbook.ui.UI.DISABLED_STYLER);
 
             } else {
 
-               final String actionText = UI.SPACE4 + tourAction.actionText;
-
-               final StyledString styledString = new StyledString();
+               final String actionText = UI.SPACE6 + tourAction.actionText;
 
                if (_allViewActionIDs != null && _allViewActionIDs.contains(tourAction.actionClassName)) {
 
@@ -427,7 +441,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
                   if (tourAction.isChecked) {
 
-                     styledString.append(actionText, net.tourbook.ui.UI.TOTAL_STYLER);
+                     styledString.append(actionText, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
 
                   } else {
 
@@ -438,9 +452,6 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
                   styledString.append(actionText, net.tourbook.ui.UI.DISABLED_STYLER);
                }
-
-               cell.setText(styledString.getString());
-               cell.setStyleRanges(styledString.getStyleRanges());
 
                if (_rdoShowCustomActions.getSelection()) {
 
@@ -453,6 +464,9 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
                   cell.setImage(tourAction.getImageDisabled());
                }
             }
+
+            cell.setText(styledString.getString());
+            cell.setStyleRanges(styledString.getStyleRanges());
          }
       });
 
@@ -588,6 +602,8 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
    private void initUI(final Control parent) {
 
+      _parent = parent;
+
       _pc = new PixelConverter(parent);
 
       _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModified());
@@ -670,21 +686,17 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       }
 
       // update UI
-      final Object[] allActionsArray = allActions.toArray();
+      _tourActionViewer.setAllChecked(isChecked);
 
-      if (isChecked) {
-
-         _tourActionViewer.setCheckedElements(allActionsArray);
-
-      } else {
-
-         _tourActionViewer.setCheckedElements(new Object[] {});
-      }
-
+      // this is needed that the styler is applied !!!
       _tourActionViewer.refresh();
    }
 
    private void onModified() {
+
+      saveState();
+
+      updateUI_ActionFilter();
 
       enableControls();
    }
@@ -751,10 +763,16 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       // load viewer
       _tourActionViewer.setInput(this);
 
-      // check only the visible actions
-      _tourActionViewer.setCheckedElements(TourActionManager.getVisibleActions().toArray());
+      updateUI_ActionFilter();
 
-      updateUI_ActionViewerFilter();
+      // !!! VERY IMPORTANT:  Checking the actions must be async otherwise it is NOT working !!!
+      _parent.getDisplay().asyncExec(() -> {
+
+         final List<TourAction> allVisibleActions = TourActionManager.getVisibleActions();
+
+         // check only the visible actions
+         _tourActionViewer.setCheckedElements(allVisibleActions.toArray());
+      });
    }
 
    private void saveState() {
@@ -802,9 +820,9 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
             stateAllCheckedActions);
    }
 
-   private void updateUI_ActionViewerFilter() {
+   private void updateUI_ActionFilter() {
 
-      if (_chkShowOnlyAvailableActions.getSelection()) {
+      if (_rdoShowCustomActions.getSelection()) {
 
          _tourActionViewer.setFilters(_actionFilter);
 
