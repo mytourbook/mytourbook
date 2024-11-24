@@ -150,6 +150,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private static final String       STATE_EXPANDED_ITEMS                   = "STATE_EXPANDED_ITEMS";                   //$NON-NLS-1$
    private static final String       STATE_IS_ON_SELECT_EXPAND_COLLAPSE     = "STATE_IS_ON_SELECT_EXPAND_COLLAPSE";     //$NON-NLS-1$
    private static final String       STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS = "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS"; //$NON-NLS-1$
+   private static final String       STATE_TAG_FILTER                       = "STATE_TAG_FILTER";                       //$NON-NLS-1$
 
    private static final int          STATE_ITEM_TYPE_SEPARATOR              = -1;
 
@@ -516,7 +517,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       @Override
       public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
 
-         return isInTagItemFilter(element);
+         return isInTagFilter(element);
       }
    }
 
@@ -1999,9 +2000,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    /**
     * @param item
     *
-    * @return Returns <code>true</code> when the item is in the current tag filter visible
+    * @return Returns <code>true</code> when the item is visible in the current tag filter
     */
-   private boolean isInTagItemFilter(final Object item) {
+   private boolean isInTagFilter(final Object item) {
 
       if (_tagFilterType == TagFilterType.ALL_IS_DISPLAYED) {
 
@@ -2247,25 +2248,25 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       if (_tagFilterType == TagFilterType.ALL_IS_DISPLAYED) {
 
          if (isForwards) {
-            toggleTagFilter_WithTours();
+            setTagFilter_WithTours();
          } else {
-            toggleTagFilter_NoTours();
+            setTagFilter_NoTours();
          }
 
       } else if (_tagFilterType == TagFilterType.TAGS_WITH_TOURS) {
 
          if (isForwards) {
-            toggleTagFilter_NoTours();
+            setTagFilter_NoTours();
          } else {
-            toggleTagFilter_ShowAll();
+            setTagFilter_ShowAll();
          }
 
       } else {
 
          if (isForwards) {
-            toggleTagFilter_ShowAll();
+            setTagFilter_ShowAll();
          } else {
-            toggleTagFilter_WithTours();
+            setTagFilter_WithTours();
          }
       }
 
@@ -2707,6 +2708,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _isBehaviour_SingleExpand_CollapseOthers = Util.getStateBoolean(_state, STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, true);
       _actionSingleExpand_CollapseOthers.setChecked(_isBehaviour_SingleExpand_CollapseOthers);
 
+      _tagFilterType = (TagFilterType) Util.getStateEnum(_state, STATE_TAG_FILTER, TagFilterType.ALL_IS_DISPLAYED);
+
+      updateUI_TagFilter();
       updateUI_TagLayoutAction();
       updateToolTipState();
    }
@@ -2900,11 +2904,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       _columnManager.saveState(_state);
 
-      // save view layout
       _state.put(MEMENTO_TAG_VIEW_LAYOUT, _tagViewLayout);
 
       _state.put(STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, _actionSingleExpand_CollapseOthers.isChecked());
       _state.put(STATE_IS_ON_SELECT_EXPAND_COLLAPSE, _actionOnMouseSelect_ExpandCollapse.isChecked());
+
+      Util.setStateEnum(_state, STATE_TAG_FILTER, _tagFilterType);
 
       saveState_ExpandedItems();
    }
@@ -2995,6 +3000,30 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _tagViewer.getTree().setFocus();
    }
 
+   private void setTagFilter_NoTours() {
+
+      _tagFilterType = TagFilterType.TAGS_WITHOUT_TOURS;
+
+      _action_ToggleTagFilter.setChecked(true);
+      _action_ToggleTagFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagFilter_NoTours));
+   }
+
+   private void setTagFilter_ShowAll() {
+
+      _tagFilterType = TagFilterType.ALL_IS_DISPLAYED;
+
+      _action_ToggleTagFilter.setChecked(false);
+      _action_ToggleTagFilter.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
+   }
+
+   private void setTagFilter_WithTours() {
+
+      _tagFilterType = TagFilterType.TAGS_WITH_TOURS;
+
+      _action_ToggleTagFilter.setChecked(true);
+      _action_ToggleTagFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourTagFilter));
+   }
+
    private void setTagViewTitle(final Object newInput) {
 
       String description = UI.EMPTY_STRING;
@@ -3009,30 +3038,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       }
 
       setContentDescription(description);
-   }
-
-   private void toggleTagFilter_NoTours() {
-
-      _tagFilterType = TagFilterType.TAGS_WITHOUT_TOURS;
-
-      _action_ToggleTagFilter.setChecked(true);
-      _action_ToggleTagFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TagFilter_NoTours));
-   }
-
-   private void toggleTagFilter_ShowAll() {
-
-      _tagFilterType = TagFilterType.ALL_IS_DISPLAYED;
-
-      _action_ToggleTagFilter.setChecked(false);
-      _action_ToggleTagFilter.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
-   }
-
-   private void toggleTagFilter_WithTours() {
-
-      _tagFilterType = TagFilterType.TAGS_WITH_TOURS;
-
-      _action_ToggleTagFilter.setChecked(true);
-      _action_ToggleTagFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourTagFilter));
    }
 
    private void updateColors() {
@@ -3058,6 +3063,22 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _isToolTipInTag = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TAG);
       _isToolTipInTitle = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TITLE);
       _isToolTipInTags = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TAGS);
+   }
+
+   private void updateUI_TagFilter() {
+
+      if (_tagFilterType == TagFilterType.ALL_IS_DISPLAYED) {
+
+         setTagFilter_ShowAll();
+
+      } else if (_tagFilterType == TagFilterType.TAGS_WITH_TOURS) {
+
+         setTagFilter_WithTours();
+
+      } else {
+
+         setTagFilter_NoTours();
+      }
    }
 
    private void updateUI_TagLayoutAction() {
