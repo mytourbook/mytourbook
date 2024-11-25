@@ -242,6 +242,9 @@ public class TourTypeMenuManager implements IActionProvider {
 
       _actionSetTourType.setEnabled(isEnabled);
 
+      /*
+       * Enable/disable recent actions
+       */
       for (final RecentTourTypeAction actionRecentTourType : _allRecentTourTypeActions) {
 
          final TourType tourType = actionRecentTourType.__tourType;
