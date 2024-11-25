@@ -421,14 +421,14 @@
                
       <page
          name        ="%Pref_Page_TourType_Layout"
-         id          ="net.tourbook.preferences.PrefPageTourTypeDefinition"
-         class       ="net.tourbook.preferences.PrefPageTourTypes"
+         id          ="net.tourbook.preferences.PrefPageTourType_Definitions"
+         class       ="net.tourbook.preferences.PrefPageTourType_Definitions"
       />
          <page
             name        ="%Pref_Page_TourType_Groups"
-            class       ="net.tourbook.preferences.PrefPageTourTypeFilterList"
-            id          ="net.tourbook.preferences.PrefPageTourTypeFilter"
-            category    ="net.tourbook.preferences.PrefPageTourTypeDefinition"
+            class       ="net.tourbook.preferences.PrefPageTourType_Groups"
+            id          ="net.tourbook.preferences.PrefPageTourType_Groups"
+            category    ="net.tourbook.preferences.PrefPageTourType_Definitions"
          />
 
 

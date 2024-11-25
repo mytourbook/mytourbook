@@ -22,7 +22,7 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageTourType_Definitions;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tourType.TourTypeImage;
@@ -152,7 +152,7 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 
       menuMgr.add(new ActionOpenPrefDialog(
             Messages.action_tourType_modify_tourTypes,
-            ITourbookPreferences.PREF_PAGE_TOUR_TYPE));
+            PrefPageTourType_Definitions.ID));
    }
 
    private void addActionToMenu(final Action action, final Menu menu) {
@@ -204,7 +204,7 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
       addActionToMenu(
             new ActionOpenPrefDialog(
                   Messages.action_tourType_modify_tourTypes,
-                  ITourbookPreferences.PREF_PAGE_TOUR_TYPE),
+                  PrefPageTourType_Definitions.ID),
             menu);
 
    }

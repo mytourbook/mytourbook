@@ -712,7 +712,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       } else if (LINK_ID_TOUR_TYPES.equals(selectionEvent.text)) {
 
          PreferencesUtil.createPreferenceDialogOn(getShell(),
-               PrefPageTourTypeFilterList.ID,
+               PrefPageTourType_Groups.ID,
                null,
                null);
       }

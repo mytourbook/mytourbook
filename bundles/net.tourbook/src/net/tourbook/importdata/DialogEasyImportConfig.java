@@ -43,6 +43,7 @@ import net.tourbook.common.widgets.ComboEnumEntry;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageTourType_Definitions;
 import net.tourbook.tag.TagGroup;
 import net.tourbook.tag.TagGroupManager;
 import net.tourbook.tour.CadenceMultiplier;
@@ -748,7 +749,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
       _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
             Messages.action_tourType_modify_tourTypes,
-            ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
+            PrefPageTourType_Definitions.ID);
 
       _actionRestoreDefaults = new ActionResetToDefaults(this);
    }

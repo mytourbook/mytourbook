@@ -72,11 +72,11 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageTourType_Groups extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String        ID         = "net.tourbook.preferences.PrefPageTourTypeFilter"; //$NON-NLS-1$
+   public static final String        ID         = "net.tourbook.preferences.PrefPageTourType_Groups"; //$NON-NLS-1$
 
-   private final IPreferenceStore    _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+   private final IPreferenceStore    _prefStore = TourbookPlugin.getPrefStore();
 
    private SelectionListener         _defaultSelectionListener;
    private MouseWheelListener        _defaultMouseWheelListener;
@@ -108,13 +108,13 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
    private Spinner             _spinnerRecentTourTypes;
 
-   public PrefPageTourTypeFilterList() {}
+   public PrefPageTourType_Groups() {}
 
-   public PrefPageTourTypeFilterList(final String title) {
+   public PrefPageTourType_Groups(final String title) {
       super(title);
    }
 
-   public PrefPageTourTypeFilterList(final String title, final ImageDescriptor image) {
+   public PrefPageTourType_Groups(final String title, final ImageDescriptor image) {
       super(title, image);
    }
 
