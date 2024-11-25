@@ -69,7 +69,8 @@ import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionExpandSelection;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
-import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.action.TourActionCategory;
+import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
@@ -209,25 +210,26 @@ public class ReferenceTourView extends ViewPart implements
    private MenuManager                         _viewerMenuManager;
    private IContextMenuProvider                _viewerContextMenuProvider               = new TreeContextMenuProvider();
 
+   private HashMap<String, Object>             _allTourActions_Edit;
+
    private ActionAppTourFilter                 _action_AppTourFilter;
    private ActionLinkTour                      _action_LinkTour;
    private ActionRefreshView                   _action_RefreshView;
    private Action_ViewLayout                   _action_ToggleRefTourLayout;
 
-   private ActionCollapseAll_WithoutSelection  _actionContext_CollapseAll;
-   private ActionCollapseOthers                _actionContext_CollapseOthers;
-   private ActionCompareByElevation_AllTours   _actionContext_Compare_AllTours;
-   private ActionCompareByElevation_WithWizard _actionContext_Compare_WithWizard;
-   private ActionEditQuick                     _actionContext_EditQuick;
-   private ActionEditTour                      _actionContext_EditTour;
-   private ActionExpandSelection               _actionContext_ExpandSelection;
-   private ActionGeoCompare                    _actionContext_GeoCompare;
-   private ActionOnMouseSelect_ExpandCollapse  _actionContext_OnMouseSelect_ExpandCollapse;
-   private ActionOpenTour                      _actionContext_OpenTour;
-   private ActionRemoveComparedTours           _actionContext_RemoveComparedTours;
-   private ActionRenameRefTour                 _actionContext_RenameRefTour;
-   private ActionSetTourTypeMenu               _actionContext_SetTourType;
-   private ActionSingleExpand_CollapseOthers   _actionContext_SingleExpand_CollapseOthers;
+   private ActionCollapseAll_WithoutSelection  _actionCollapseAll;
+   private ActionCollapseOthers                _actionCollapseOthers;
+   private ActionCompareByElevation_AllTours   _actionCompare_AllTours;
+   private ActionCompareByElevation_WithWizard _actionCompare_WithWizard;
+   private ActionEditQuick                     _actionEditQuick;
+   private ActionEditTour                      _actionEditTour;
+   private ActionExpandSelection               _actionExpandSelection;
+   private ActionGeoCompare                    _actionGeoCompare;
+   private ActionOnMouseSelect_ExpandCollapse  _actionOnMouseSelect_ExpandCollapse;
+   private ActionOpenTour                      _actionOpenTour;
+   private ActionRemoveComparedTours           _actionRemoveComparedTours;
+   private ActionRenameRefTour                 _actionRenameRefTour;
+   private ActionSingleExpand_CollapseOthers   _actionSingleExpand_CollapseOthers;
 
    private PixelConverter                      _pc;
 
@@ -313,7 +315,7 @@ public class ReferenceTourView extends ViewPart implements
       @Override
       public void run() {
 
-         _isBehaviour_OnSelect_ExpandCollapse = _actionContext_OnMouseSelect_ExpandCollapse.isChecked();
+         _isBehaviour_OnSelect_ExpandCollapse = _actionOnMouseSelect_ExpandCollapse.isChecked();
       }
    }
 
@@ -327,7 +329,7 @@ public class ReferenceTourView extends ViewPart implements
       @Override
       public void run() {
 
-         _isBehaviour_SingleExpand_CollapseOthers = _actionContext_SingleExpand_CollapseOthers.isChecked();
+         _isBehaviour_SingleExpand_CollapseOthers = _actionSingleExpand_CollapseOthers.isChecked();
       }
    }
 
@@ -703,27 +705,55 @@ public class ReferenceTourView extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-      _action_AppTourFilter                        = new ActionAppTourFilter();
-      _action_LinkTour                             = new ActionLinkTour(this);
-      _action_RefreshView                          = new ActionRefreshView(this);
-      _action_ToggleRefTourLayout                  = new Action_ViewLayout();
+      _action_AppTourFilter               = new ActionAppTourFilter();
+      _action_LinkTour                    = new ActionLinkTour(this);
+      _action_RefreshView                 = new ActionRefreshView(this);
+      _action_ToggleRefTourLayout         = new Action_ViewLayout();
 
-      _actionContext_CollapseAll                   = new ActionCollapseAll_WithoutSelection(this);
-      _actionContext_CollapseOthers                = new ActionCollapseOthers(this);
-      _actionContext_Compare_AllTours              = new ActionCompareByElevation_AllTours(this);
-      _actionContext_Compare_WithWizard            = new ActionCompareByElevation_WithWizard(this);
-      _actionContext_EditQuick                     = new ActionEditQuick(this);
-      _actionContext_EditTour                      = new ActionEditTour(this);
-      _actionContext_ExpandSelection               = new ActionExpandSelection(this);
-      _actionContext_GeoCompare                    = new ActionGeoCompare();
-      _actionContext_OnMouseSelect_ExpandCollapse  = new ActionOnMouseSelect_ExpandCollapse();
-      _actionContext_OpenTour                      = new ActionOpenTour(this);
-      _actionContext_RemoveComparedTours           = new ActionRemoveComparedTours(this);
-      _actionContext_RenameRefTour                 = new ActionRenameRefTour(this);
-      _actionContext_SetTourType                   = new ActionSetTourTypeMenu(this);
-      _actionContext_SingleExpand_CollapseOthers   = new ActionSingleExpand_CollapseOthers();
+      _actionCollapseAll                  = new ActionCollapseAll_WithoutSelection(this);
+      _actionCollapseOthers               = new ActionCollapseOthers(this);
+      _actionCompare_AllTours             = new ActionCompareByElevation_AllTours(this);
+      _actionCompare_WithWizard           = new ActionCompareByElevation_WithWizard(this);
+      _actionEditQuick                    = new ActionEditQuick(this);
+      _actionEditTour                     = new ActionEditTour(this);
+      _actionExpandSelection              = new ActionExpandSelection(this);
+      _actionGeoCompare                   = new ActionGeoCompare();
+      _actionOnMouseSelect_ExpandCollapse = new ActionOnMouseSelect_ExpandCollapse();
+      _actionOpenTour                     = new ActionOpenTour(this);
+      _actionRemoveComparedTours          = new ActionRemoveComparedTours(this);
+      _actionRenameRefTour                = new ActionRenameRefTour(this);
+      _actionSingleExpand_CollapseOthers  = new ActionSingleExpand_CollapseOthers();
+
+      _allTourActions_Edit                = new HashMap<>();
+
+      _allTourActions_Edit.put(_actionEditQuick                   .getClass().getName(),  _actionEditQuick);
+      _allTourActions_Edit.put(_actionEditTour                    .getClass().getName(),  _actionEditTour);
+//    _allTourActions_Edit.put(_actionOpenMarkerDialog            .getClass().getName(),  _actionOpenMarkerDialog);
+//    _allTourActions_Edit.put(_actionOpenAdjustAltitudeDialog    .getClass().getName(),  _actionOpenAdjustAltitudeDialog);
+//    _allTourActions_Edit.put(_actionSetStartEndLocation         .getClass().getName(),  _actionSetStartEndLocation);
+      _allTourActions_Edit.put(_actionOpenTour                    .getClass().getName(),  _actionOpenTour);
+//    _allTourActions_Edit.put(_actionDuplicateTour               .getClass().getName(),  _actionDuplicateTour);
+//    _allTourActions_Edit.put(_actionCreateTourMarkers           .getClass().getName(),  _actionCreateTourMarkers);
+//    _allTourActions_Edit.put(_actionMergeTour                   .getClass().getName(),  _actionMergeTour);
+//    _allTourActions_Edit.put(_actionJoinTours                   .getClass().getName(),  _actionJoinTours);
+
+//    _allTourActions_Export.put(_actionUploadTour                .getClass().getName(),  _actionUploadTour);
+//    _allTourActions_Export.put(_actionExportTour                .getClass().getName(),  _actionExportTour);
+//    _allTourActions_Export.put(_actionExportViewCSV             .getClass().getName(),  _actionExportViewCSV);
+//    _allTourActions_Export.put(_actionPrintTour                 .getClass().getName(),  _actionPrintTour);
+//
+//    _allTourActions_Adjust.put(_actionAdjustTourValues          .getClass().getName(),  _actionAdjustTourValues);
+//    _allTourActions_Adjust.put(_actionDeleteTourValues          .getClass().getName(),  _actionDeleteTourValues);
+//    _allTourActions_Adjust.put(_actionReimport_Tours            .getClass().getName(),  _actionReimport_Tours);
+//    _allTourActions_Adjust.put(_actionSetOtherPerson            .getClass().getName(),  _actionSetOtherPerson);
+//    _allTourActions_Adjust.put(_actionDeleteTourMenu            .getClass().getName(),  _actionDeleteTourMenu);
 
 // SET_FORMATTING_ON
+
+      TourActionManager.setAllViewActions(ID,
+            _allTourActions_Edit.keySet(),
+            _tagMenuManager.getAllTagActions().keySet(),
+            _tourTypeMenuManager.getAllTourTypeActions().keySet());
    }
 
    private void createMenuManager() {
@@ -1350,8 +1380,6 @@ public class ReferenceTourView extends ViewPart implements
          }
       }
 
-      final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-
       final boolean isTourSelected = numTourItems > 0;
       final boolean isRefItemSelected = numRefItems > 0;
       final boolean isOneTour = numTourItems == 1 && numRefItems == 0 && numYearItems == 0;
@@ -1382,21 +1410,19 @@ public class ReferenceTourView extends ViewPart implements
       _tourDoubleClickState.canEditMarker       = isEditableTour;
       _tourDoubleClickState.canAdjustAltitude   = isEditableTour;
 
-      _actionContext_GeoCompare           .setEnabled(isOneRefTour);
-      _actionContext_Compare_AllTours     .setEnabled(isRefItemSelected);
-      _actionContext_Compare_WithWizard   .setEnabled(isRefItemSelected);
+      _actionGeoCompare           .setEnabled(isOneRefTour);
+      _actionCompare_AllTours     .setEnabled(isRefItemSelected);
+      _actionCompare_WithWizard   .setEnabled(isRefItemSelected);
 
-      _actionContext_RemoveComparedTours  .setEnabled(canRemoveTours);
-      _actionContext_RenameRefTour        .setEnabled(isOneRefTour);
+      _actionRemoveComparedTours  .setEnabled(canRemoveTours);
+      _actionRenameRefTour        .setEnabled(isOneRefTour);
 
-      _actionContext_EditQuick            .setEnabled(isEditableTour);
-      _actionContext_EditTour             .setEnabled(isEditableTour);
-      _actionContext_OpenTour             .setEnabled(isEditableTour);
+      _actionEditQuick            .setEnabled(isEditableTour);
+      _actionEditTour             .setEnabled(isEditableTour);
+      _actionOpenTour             .setEnabled(isEditableTour);
 
-      _actionContext_SetTourType          .setEnabled(isTourSelected && tourTypes.size() > 0);
-
-      _actionContext_CollapseOthers       .setEnabled(isOnly1SelectedItem && firstElementHasChildren);
-      _actionContext_ExpandSelection      .setEnabled(canExpandSelection);
+      _actionCollapseOthers       .setEnabled(isOnly1SelectedItem && firstElementHasChildren);
+      _actionExpandSelection      .setEnabled(canExpandSelection);
 
       _tagMenuManager.enableTagActions(isTourSelected, isOneTour, firstTourItem == null ? null : firstTourItem.tagIds);
 
@@ -1430,8 +1456,8 @@ public class ReferenceTourView extends ViewPart implements
             ? Messages.Elevation_Compare_Action_IsUsingAppFilter_Tooltip
             : Messages.Elevation_Compare_Action_IsNotUsingAppFilter_Tooltip;
 
-      _actionContext_Compare_AllTours.setToolTipText(compareTooltip);
-      _actionContext_Compare_WithWizard.setToolTipText(compareTooltip);
+      _actionCompare_AllTours.setToolTipText(compareTooltip);
+      _actionCompare_WithWizard.setToolTipText(compareTooltip);
 
       /*
        * Set remove action text according to the selected items
@@ -1441,44 +1467,46 @@ public class ReferenceTourView extends ViewPart implements
       if (firstItem instanceof TVIRefTour_RefTourItem) {
 
          // remove the reference tours and it's children
-         _actionContext_RemoveComparedTours.setText(Messages.Elevation_Compare_Action_RemoveReferenceTours);
+         _actionRemoveComparedTours.setText(Messages.Elevation_Compare_Action_RemoveReferenceTours);
 
       } else {
 
          // remove compared tours - &Remove Compared Tours...
-         _actionContext_RemoveComparedTours.setText(Messages.RefTour_Action_DeleteTours);
+         _actionRemoveComparedTours.setText(Messages.RefTour_Action_DeleteTours);
       }
 
       /*
        * Fill context menu
        */
-      menuMgr.add(_actionContext_CollapseOthers);
-      menuMgr.add(_actionContext_ExpandSelection);
-      menuMgr.add(_actionContext_CollapseAll);
-      menuMgr.add(_actionContext_OnMouseSelect_ExpandCollapse);
-      menuMgr.add(_actionContext_SingleExpand_CollapseOthers);
+      menuMgr.add(_actionCollapseOthers);
+      menuMgr.add(_actionExpandSelection);
+      menuMgr.add(_actionCollapseAll);
+      menuMgr.add(_actionOnMouseSelect_ExpandCollapse);
+      menuMgr.add(_actionSingleExpand_CollapseOthers);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionContext_GeoCompare);
-      menuMgr.add(_actionContext_Compare_WithWizard);
-      menuMgr.add(_actionContext_Compare_AllTours);
-      menuMgr.add(_actionContext_RenameRefTour);
+      menuMgr.add(_actionGeoCompare);
+      menuMgr.add(_actionCompare_WithWizard);
+      menuMgr.add(_actionCompare_AllTours);
+      menuMgr.add(_actionRenameRefTour);
 
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionContext_EditQuick);
-      menuMgr.add(_actionContext_EditTour);
-      menuMgr.add(_actionContext_OpenTour);
+      // edit actions
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit);
 
-      // tour tag actions
-      _tagMenuManager.fillTagMenu(menuMgr, true);
+      // tag actions
+      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr);
 
       // tour type actions
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionContext_SetTourType);
-      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr);
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionContext_RemoveComparedTours);
+      menuMgr.add(_actionRemoveComparedTours);
+
+      // customize this context menu
+      TourActionManager.fillContextMenu_CustomizeAction(menuMgr)
+
+            // set pref page custom data that actions from this view can be identified
+            .setPrefData(ID);
 
       enableActions();
    }
@@ -1496,7 +1524,7 @@ public class ReferenceTourView extends ViewPart implements
 
       tbm.add(_action_AppTourFilter);
       tbm.add(_action_LinkTour);
-      tbm.add(_actionContext_CollapseAll);
+      tbm.add(_actionCollapseAll);
       tbm.add(_action_ToggleRefTourLayout);
       tbm.add(_action_RefreshView);
 
@@ -2118,11 +2146,11 @@ public class ReferenceTourView extends ViewPart implements
 
       // on mouse select -> expand/collapse
       _isBehaviour_OnSelect_ExpandCollapse = Util.getStateBoolean(_state, STATE_IS_ON_SELECT_EXPAND_COLLAPSE, true);
-      _actionContext_OnMouseSelect_ExpandCollapse.setChecked(_isBehaviour_OnSelect_ExpandCollapse);
+      _actionOnMouseSelect_ExpandCollapse.setChecked(_isBehaviour_OnSelect_ExpandCollapse);
 
       // single expand -> collapse others
       _isBehaviour_SingleExpand_CollapseOthers = Util.getStateBoolean(_state, STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, true);
-      _actionContext_SingleExpand_CollapseOthers.setChecked(_isBehaviour_SingleExpand_CollapseOthers);
+      _actionSingleExpand_CollapseOthers.setChecked(_isBehaviour_SingleExpand_CollapseOthers);
 
       updateToolTipState();
 
@@ -2142,8 +2170,8 @@ public class ReferenceTourView extends ViewPart implements
       _state.put(MEMENTO_TOUR_CATALOG_ACTIVE_REF_ID, Long.toString(_activeRefId));
       _state.put(MEMENTO_TOUR_CATALOG_LINK_TOUR, _action_LinkTour.isChecked());
 
-      _state.put(STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, _actionContext_SingleExpand_CollapseOthers.isChecked());
-      _state.put(STATE_IS_ON_SELECT_EXPAND_COLLAPSE, _actionContext_OnMouseSelect_ExpandCollapse.isChecked());
+      _state.put(STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, _actionSingleExpand_CollapseOthers.isChecked());
+      _state.put(STATE_IS_ON_SELECT_EXPAND_COLLAPSE, _actionOnMouseSelect_ExpandCollapse.isChecked());
       _state.put(STATE_IS_USE_FAST_APP_TOUR_FILTER, _action_AppTourFilter.isChecked());
 
       _columnManager.saveState(_state);

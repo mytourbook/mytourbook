@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -54,6 +54,8 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
    public static final String            STATE_VIEW_COLOR_DATE_CATEGORY_DARK                  = "STATE_VIEW_COLOR_DATE_CATEGORY_DARK";          //$NON-NLS-1$
    public static final String            STATE_VIEW_COLOR_DATE_SUB_CATEGORY_BRIGHT            = "STATE_VIEW_COLOR_DATE_SUB_CATEGORY_BRIGHT";    //$NON-NLS-1$
    public static final String            STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DARK              = "STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DARK";      //$NON-NLS-1$
+   public static final String            STATE_VIEW_COLOR_DISABLED_BRIGHT                     = "STATE_VIEW_COLOR_DISABLED_BRIGHT";             //$NON-NLS-1$
+   public static final String            STATE_VIEW_COLOR_DISABLED_DARK                       = "STATE_VIEW_COLOR_DISABLED_DARK";               //$NON-NLS-1$
    public static final String            STATE_VIEW_COLOR_TOUR_BRIGHT                         = "STATE_VIEW_COLOR_TOUR_BRIGHT";                 //$NON-NLS-1$
    public static final String            STATE_VIEW_COLOR_TOUR_DARK                           = "STATE_VIEW_COLOR_TOUR_DARK";                   //$NON-NLS-1$
    public static final String            STATE_VIEW_COLOR_TOTAL_BRIGHT                        = "STATE_VIEW_COLOR_TOTAL_BRIGHT";                //$NON-NLS-1$
@@ -77,6 +79,9 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
    public static final RGB               STATE_VIEW_COLOR_TOUR_DEFAULT_DARK                   = new RGB(0xf0, 0xf0, 0xf0);
    public static final RGB               STATE_VIEW_COLOR_TOTAL_DEFAULT_DARK                  = new RGB(0xff, 0xf0, 0x6c);
 
+   public static final RGB               STATE_VIEW_COLOR_DISABLED_DEFAULT_BRIGHT             = new RGB(0x96, 0x96, 0x96);
+   public static final RGB               STATE_VIEW_COLOR_DISABLED_DEFAULT_DARK               = new RGB(0x80, 0x80, 0x80);
+
    private boolean                       _isUIModified;
 
    /*
@@ -93,6 +98,8 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
    private ColorSelectorExtended _colorSelector_Date_Category_Dark;
    private ColorSelectorExtended _colorSelector_Date_SubCategory_Bright;
    private ColorSelectorExtended _colorSelector_Date_SubCategory_Dark;
+   private ColorSelectorExtended _colorSelector_Disabled_Bright;
+   private ColorSelectorExtended _colorSelector_Disabled_Dark;
    private ColorSelectorExtended _colorSelector_Tour_Bright;
    private ColorSelectorExtended _colorSelector_Tour_Dark;
    private ColorSelectorExtended _colorSelector_Total_Bright;
@@ -244,6 +251,22 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
             _colorSelector_Total_Dark.addListener(event -> onModify(_colorSelector_Total_Dark));
             setButtonLayoutData(_colorSelector_Total_Dark.getButton());
          }
+         {
+            /*
+             * Color: Disabled
+             */
+            final Label label = new Label(group, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(label);
+            label.setText(Messages.Pref_View_Layout_Label_Disabled);
+
+            _colorSelector_Disabled_Bright = new ColorSelectorExtended(group);
+            _colorSelector_Disabled_Bright.addListener(event -> onModify(_colorSelector_Disabled_Bright));
+            setButtonLayoutData(_colorSelector_Disabled_Bright.getButton());
+
+            _colorSelector_Disabled_Dark = new ColorSelectorExtended(group);
+            _colorSelector_Disabled_Dark.addListener(event -> onModify(_colorSelector_Disabled_Dark));
+            setButtonLayoutData(_colorSelector_Disabled_Dark.getButton());
+         }
       }
    }
 
@@ -373,6 +396,8 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
       _colorSelector_Date_SubCategory_Bright     .setColorValue(STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_BRIGHT);
       _colorSelector_Date_SubCategory_Dark       .setColorValue(STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_DARK);
 
+      _colorSelector_Disabled_Bright            .setColorValue(STATE_VIEW_COLOR_DISABLED_DEFAULT_BRIGHT);
+      _colorSelector_Disabled_Dark              .setColorValue(STATE_VIEW_COLOR_DISABLED_DEFAULT_DARK);
       _colorSelector_Tour_Bright                .setColorValue(STATE_VIEW_COLOR_TOUR_DEFAULT_BRIGHT);
       _colorSelector_Tour_Dark                  .setColorValue(STATE_VIEW_COLOR_TOUR_DEFAULT_DARK);
       _colorSelector_Total_Bright               .setColorValue(STATE_VIEW_COLOR_TOTAL_DEFAULT_BRIGHT);
@@ -418,6 +443,14 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
             STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DARK,
             STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DEFAULT_DARK));
 
+      _colorSelector_Disabled_Bright                     .setColorValue(Util.getStateRGB(_state,
+            STATE_VIEW_COLOR_DISABLED_BRIGHT,
+            STATE_VIEW_COLOR_DISABLED_DEFAULT_BRIGHT));
+
+      _colorSelector_Disabled_Dark                       .setColorValue(Util.getStateRGB(_state,
+            STATE_VIEW_COLOR_DISABLED_DARK,
+            STATE_VIEW_COLOR_DISABLED_DEFAULT_DARK));
+
       _colorSelector_Tour_Bright                         .setColorValue(Util.getStateRGB(_state,
             STATE_VIEW_COLOR_TOUR_BRIGHT,
             STATE_VIEW_COLOR_TOUR_DEFAULT_BRIGHT));
@@ -450,6 +483,8 @@ public class PrefPageViewColors extends PreferencePage implements IWorkbenchPref
       Util.setState(_state, STATE_VIEW_COLOR_DATE_SUB_CATEGORY_BRIGHT,     _colorSelector_Date_SubCategory_Bright    .getColorValue());
       Util.setState(_state, STATE_VIEW_COLOR_DATE_SUB_CATEGORY_DARK,       _colorSelector_Date_SubCategory_Dark      .getColorValue());
 
+      Util.setState(_state, STATE_VIEW_COLOR_DISABLED_BRIGHT,              _colorSelector_Disabled_Bright            .getColorValue());
+      Util.setState(_state, STATE_VIEW_COLOR_DISABLED_DARK,                _colorSelector_Disabled_Dark              .getColorValue());
       Util.setState(_state, STATE_VIEW_COLOR_TOUR_BRIGHT,                  _colorSelector_Tour_Bright                .getColorValue());
       Util.setState(_state, STATE_VIEW_COLOR_TOUR_DARK,                    _colorSelector_Tour_Dark                  .getColorValue());
       Util.setState(_state, STATE_VIEW_COLOR_TOTAL_BRIGHT,                 _colorSelector_Total_Bright               .getColorValue());

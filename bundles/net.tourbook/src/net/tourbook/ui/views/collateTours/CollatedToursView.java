@@ -20,6 +20,7 @@ import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -79,7 +80,8 @@ import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetElevationValuesFromSRTM;
 import net.tourbook.ui.action.ActionSetPerson;
-import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.action.TourActionCategory;
+import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
@@ -201,9 +203,13 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    private int                                        _columnWidth_TourTypeImage;
    private int                                        _columnWidth_WeatherClouds;
    //
+   private HashMap<String, Object>                    _allTourActions_Adjust;
+   private HashMap<String, Object>                    _allTourActions_Edit;
+   private HashMap<String, Object>                    _allTourActions_Export;
+   //
    private ActionCollapseAll                          _actionCollapseAll;
    private ActionCollapseOthers                       _actionCollapseOthers;
-   private ActionComputeDistanceValuesFromGeoposition _actionComputeDistanceValuesFromGeoposition;
+   private ActionComputeDistanceValuesFromGeoposition _actionComputeDistanceValuesFromGeoPosition;
    private ActionComputeElevationGain                 _actionComputeElevationGain;
    private ActionEditQuick                            _actionEditQuick;
    private ActionExpandSelection                      _actionExpandSelection;
@@ -218,7 +224,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    private ActionRefreshView                          _actionRefreshView;
    private ActionReimportTours                        _actionReimport_Tours;
    private ActionSetElevationValuesFromSRTM           _actionSetElevationFromSRTM;
-   private ActionSetTourTypeMenu                      _actionSetTourType;
    private ActionSetPerson                            _actionSetOtherPerson;
 
    private CollateTourContributionItem                _contribItem_CollatedTours;
@@ -435,26 +440,62 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
    private void createActions() {
 
-      _actionCollapseAll = new ActionCollapseAll(this);
-      _actionCollapseOthers = new ActionCollapseOthers(this);
-      _contribItem_CollatedTours = new CollateTourContributionItem(this);
-      _actionComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(this);
-      _actionComputeElevationGain = new ActionComputeElevationGain(this);
-      _actionEditQuick = new ActionEditQuick(this);
-      _actionEditTour = new ActionEditTour(this);
-      _actionExpandSelection = new ActionExpandSelection(this);
-      _actionExportTour = new ActionExport(this);
-      _actionJoinTours = new ActionJoinTours(this);
-      _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
-      _actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
-      _actionMergeTour = new ActionMergeTour(this);
-      _actionOpenTour = new ActionOpenTour(this);
-      _actionPrintTour = new ActionPrint(this);
-      _actionRefreshView = new ActionRefreshView(this);
-      _actionReimport_Tours = new ActionReimportTours(this);
-      _actionSetElevationFromSRTM = new ActionSetElevationValuesFromSRTM(this);
-      _actionSetOtherPerson = new ActionSetPerson(this);
-      _actionSetTourType = new ActionSetTourTypeMenu(this);
+// SET_FORMATTING_OFF
+
+      _actionCollapseAll                           = new ActionCollapseAll(this);
+      _actionCollapseOthers                        = new ActionCollapseOthers(this);
+      _contribItem_CollatedTours                   = new CollateTourContributionItem(this);
+      _actionComputeDistanceValuesFromGeoPosition  = new ActionComputeDistanceValuesFromGeoposition(this);
+      _actionComputeElevationGain                  = new ActionComputeElevationGain(this);
+      _actionEditQuick                             = new ActionEditQuick(this);
+      _actionEditTour                              = new ActionEditTour(this);
+      _actionExpandSelection                       = new ActionExpandSelection(this);
+      _actionExportTour                            = new ActionExport(this);
+      _actionJoinTours                             = new ActionJoinTours(this);
+      _actionOpenMarkerDialog                      = new ActionOpenMarkerDialog(this, true);
+      _actionOpenAdjustAltitudeDialog              = new ActionOpenAdjustAltitudeDialog(this);
+      _actionMergeTour                             = new ActionMergeTour(this);
+      _actionOpenTour                              = new ActionOpenTour(this);
+      _actionPrintTour                             = new ActionPrint(this);
+      _actionRefreshView                           = new ActionRefreshView(this);
+      _actionReimport_Tours                        = new ActionReimportTours(this);
+      _actionSetElevationFromSRTM                  = new ActionSetElevationValuesFromSRTM(this);
+      _actionSetOtherPerson                        = new ActionSetPerson(this);
+
+      _allTourActions_Adjust  = new HashMap<>();
+      _allTourActions_Edit    = new HashMap<>();
+      _allTourActions_Export  = new HashMap<>();
+
+      _allTourActions_Edit.put(_actionEditQuick                   .getClass().getName(),  _actionEditQuick);
+      _allTourActions_Edit.put(_actionEditTour                    .getClass().getName(),  _actionEditTour);
+      _allTourActions_Edit.put(_actionOpenMarkerDialog            .getClass().getName(),  _actionOpenMarkerDialog);
+      _allTourActions_Edit.put(_actionOpenAdjustAltitudeDialog    .getClass().getName(),  _actionOpenAdjustAltitudeDialog);
+//    _allTourActions_Edit.put(_actionSetStartEndLocation         .getClass().getName(),  _actionSetStartEndLocation);
+      _allTourActions_Edit.put(_actionOpenTour                    .getClass().getName(),  _actionOpenTour);
+//    _allTourActions_Edit.put(_actionDuplicateTour               .getClass().getName(),  _actionDuplicateTour);
+//    _allTourActions_Edit.put(_actionCreateTourMarkers           .getClass().getName(),  _actionCreateTourMarkers);
+      _allTourActions_Edit.put(_actionMergeTour                   .getClass().getName(),  _actionMergeTour);
+      _allTourActions_Edit.put(_actionJoinTours                   .getClass().getName(),  _actionJoinTours);
+
+//    _allTourActions_Export.put(_actionUploadTour                .getClass().getName(),  _actionUploadTour);
+      _allTourActions_Export.put(_actionExportTour                .getClass().getName(),  _actionExportTour);
+//    _allTourActions_Export.put(_actionExportViewCSV             .getClass().getName(),  _actionExportViewCSV);
+      _allTourActions_Export.put(_actionPrintTour                 .getClass().getName(),  _actionPrintTour);
+
+//    _allTourActions_Adjust.put(_actionAdjustTourValues          .getClass().getName(),  _actionAdjustTourValues);
+//    _allTourActions_Adjust.put(_actionDeleteTourValues          .getClass().getName(),  _actionDeleteTourValues);
+      _allTourActions_Adjust.put(_actionReimport_Tours            .getClass().getName(),  _actionReimport_Tours);
+      _allTourActions_Adjust.put(_actionSetOtherPerson            .getClass().getName(),  _actionSetOtherPerson);
+//    _allTourActions_Adjust.put(_actionDeleteTourMenu            .getClass().getName(),  _actionDeleteTourMenu);
+
+// SET_FORMATTING_ON
+
+      TourActionManager.setAllViewActions(ID,
+            _allTourActions_Edit.keySet(),
+            _allTourActions_Export.keySet(),
+            _allTourActions_Adjust.keySet(),
+            _tagMenuManager.getAllTagActions().keySet(),
+            _tourTypeMenuManager.getAllTourTypeActions().keySet());
 
       fillActionBars();
    }
@@ -1754,11 +1795,11 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       final ITreeSelection selection = (ITreeSelection) _tourViewer.getSelection();
 
       /*
-       * count number of selected items
+       * Count number of selected items
        */
-      int tourItems = 0;
+      int numTourItems = 0;
 
-      TVICollatedTour firstTour = null;
+      TVICollatedTour firstTourItem = null;
 
       for (final Object treeItem : selection) {
 
@@ -1774,16 +1815,17 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
                }
             }
 
-            if (firstTour == null && !isDummyTour) {
-               firstTour = tviCollatedTour;
+            if (firstTourItem == null && !isDummyTour) {
+               firstTourItem = tviCollatedTour;
             }
-            tourItems++;
+
+            numTourItems++;
          }
       }
 
       final int selectedItems = selection.size();
-      final boolean isTourSelected = tourItems > 0;
-      final boolean isOneTour = tourItems == 1;
+      final boolean isTourSelected = numTourItems > 0;
+      final boolean isOneTour = numTourItems == 1;
       boolean isDeviceTour = false;
 
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
@@ -1792,49 +1834,55 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
       TourData firstSavedTour = null;
 
-      if (isOneTour && firstTour != null) {
-         firstSavedTour = TourManager.getInstance().getTourData(firstTour.getTourId());
+      if (isOneTour && firstTourItem != null) {
+         firstSavedTour = TourManager.getInstance().getTourData(firstTourItem.getTourId());
          isDeviceTour = firstSavedTour.isManualTour() == false;
       }
 
       /*
-       * enable actions
+       * Enable actions
        */
-      _tourDoubleClickState.canEditTour = isOneTour;
-      _tourDoubleClickState.canOpenTour = isOneTour;
-      _tourDoubleClickState.canQuickEditTour = isOneTour;
-      _tourDoubleClickState.canEditMarker = isOneTour;
-      _tourDoubleClickState.canAdjustAltitude = isOneTour;
+// SET_FORMATTING_OFF
 
-      _actionComputeDistanceValuesFromGeoposition.setEnabled(isTourSelected);
-      _actionComputeElevationGain.setEnabled(true);
-      _actionEditQuick.setEnabled(isOneTour);
-      _actionEditTour.setEnabled(isOneTour);
-      _actionExportTour.setEnabled(isTourSelected);
-      _actionJoinTours.setEnabled(tourItems > 1);
-      _actionMergeTour.setEnabled(isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null);
-      _actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
-      _actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
-      _actionOpenTour.setEnabled(isOneTour);
-      _actionPrintTour.setEnabled(isTourSelected);
-      _actionReimport_Tours.setEnabled(isTourSelected);
-      _actionSetElevationFromSRTM.setEnabled(isTourSelected);
-      _actionSetOtherPerson.setEnabled(isTourSelected);
-      _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
+      _tourDoubleClickState.canEditTour            = isOneTour;
+      _tourDoubleClickState.canOpenTour            = isOneTour;
+      _tourDoubleClickState.canQuickEditTour       = isOneTour;
+      _tourDoubleClickState.canEditMarker          = isOneTour;
+      _tourDoubleClickState.canAdjustAltitude      = isOneTour;
+
+      _actionComputeDistanceValuesFromGeoPosition  .setEnabled(isTourSelected);
+      _actionComputeElevationGain                  .setEnabled(true);
+      _actionEditQuick                             .setEnabled(isOneTour);
+      _actionEditTour                              .setEnabled(isOneTour);
+      _actionExportTour                            .setEnabled(isTourSelected);
+      _actionJoinTours                             .setEnabled(numTourItems > 1);
+      _actionMergeTour                             .setEnabled(isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null);
+      _actionOpenAdjustAltitudeDialog              .setEnabled(isOneTour && isDeviceTour);
+      _actionOpenMarkerDialog                      .setEnabled(isOneTour && isDeviceTour);
+      _actionOpenTour                              .setEnabled(isOneTour);
+      _actionPrintTour                             .setEnabled(isTourSelected);
+      _actionReimport_Tours                        .setEnabled(isTourSelected);
+      _actionSetElevationFromSRTM                  .setEnabled(isTourSelected);
+      _actionSetOtherPerson                        .setEnabled(isTourSelected);
+
+// SET_FORMATTING_ON
 
       _actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
       _actionExpandSelection.setEnabled(
-            firstElement == null //
+            firstElement == null
                   ? false
-                  : selectedItems == 1 //
+                  : selectedItems == 1
                         ? firstElementHasChildren
                         : true);
 
-      _tagMenuManager.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.getTagIds());
+      _tagMenuManager.enableTagActions(
+            isTourSelected,
+            isOneTour,
+            firstTourItem == null
+                  ? null
+                  : firstTourItem.getTagIds());
 
-//      TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, isOneTour
-//            ? firstTour.getTourTypeId()
-//            : TourDatabase.ENTITY_IS_NOT_SAVED);
+      _tourTypeMenuManager.enableTourTypeActions(isTourSelected, TourDatabase.ENTITY_IS_NOT_SAVED);
    }
 
    private void fillActionBars() {
@@ -1863,38 +1911,36 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
-      menuMgr.add(_actionEditQuick);
-      menuMgr.add(_actionEditTour);
-      menuMgr.add(_actionOpenMarkerDialog);
-      menuMgr.add(_actionOpenAdjustAltitudeDialog);
-      menuMgr.add(_actionOpenTour);
-      menuMgr.add(_actionMergeTour);
-      menuMgr.add(_actionJoinTours);
+      // edit actions
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit);
+
+      // tag actions
+      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr);
+
+      // tour type actions
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionComputeElevationGain);
-      menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
+      menuMgr.add(_actionComputeDistanceValuesFromGeoPosition);
       menuMgr.add(_actionSetElevationFromSRTM);
-
-      _tagMenuManager.fillTagMenu(menuMgr, true);
-
-      // tour type actions
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionSetTourType);
-      _tourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionCollapseOthers);
       menuMgr.add(_actionExpandSelection);
       menuMgr.add(_actionCollapseAll);
 
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionExportTour);
-      menuMgr.add(_actionReimport_Tours);
-      menuMgr.add(_actionPrintTour);
+      // export actions
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export);
 
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionSetOtherPerson);
+      // adjust actions
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.ADJUST, _allTourActions_Adjust);
+
+      // customize this context menu
+      TourActionManager.fillContextMenu_CustomizeAction(menuMgr)
+
+            // set pref page custom data that actions from this view can be identified
+            .setPrefData(ID);
 
       enableActions();
    }

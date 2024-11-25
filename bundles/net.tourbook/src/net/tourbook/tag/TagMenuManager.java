@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -51,7 +52,6 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.action.IActionProvider;
-import net.tourbook.ui.action.TourAction;
 import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.tagging.TourTags_View;
@@ -110,10 +110,7 @@ public class TagMenuManager implements IActionProvider {
     */
    private static HashSet<Long>           _allTagIds_OneTour;
 
-   /**
-    * Contains all tag id's when multiple tours are selected
-    */
-   private static HashMap<Long, TourTag>  _allTagIds_AllTours;
+   private static Map<Long, TourTag>      _allTags_WhenCopied;
 
    private static boolean                 _isEnableRecentTagActions;
 
@@ -350,24 +347,14 @@ public class TagMenuManager implements IActionProvider {
          try (final ByteArrayOutputStream out = new ByteArrayOutputStream();
                final DataOutputStream dataOut = new DataOutputStream(out)) {
 
-            if (_allTagIds_AllTours != null) {
+            if (_allTags_WhenCopied != null) {
 
                // write number of tags
-               dataOut.writeInt(_allTagIds_AllTours.size());
+               dataOut.writeInt(_allTags_WhenCopied.size());
 
                // write all tag ID's
-               for (final Entry<Long, TourTag> entry : _allTagIds_AllTours.entrySet()) {
+               for (final Entry<Long, TourTag> entry : _allTags_WhenCopied.entrySet()) {
                   dataOut.writeLong(entry.getKey());
-               }
-
-            } else {
-
-               // write number of tags
-               dataOut.writeInt(_allTagIds_OneTour.size());
-
-               // write all tag ID's
-               for (final Long tagID : _allTagIds_OneTour) {
-                  dataOut.writeLong(tagID);
                }
             }
 
@@ -468,9 +455,11 @@ public class TagMenuManager implements IActionProvider {
       }
 
       final boolean isExistingTagIds = _allTagIds_OneTour != null && _allTagIds_OneTour.size() > 0;
+
       for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
 
          final TourTag actionTag = actionRecentTag._tag;
+
          if (actionTag == null) {
             actionRecentTag.setEnabled(false);
             continue;
@@ -658,6 +647,8 @@ public class TagMenuManager implements IActionProvider {
 
    private void clipboard_CopyTags() {
 
+      _allTags_WhenCopied = getSelectedTourTags();
+
       final Clipboard clipboard = new Clipboard(PlatformUI.getWorkbench().getDisplay());
       {
          clipboard.setContents(
@@ -667,17 +658,7 @@ public class TagMenuManager implements IActionProvider {
       }
       clipboard.dispose();
 
-      int numTags;
-      if (_allTagIds_AllTours != null) {
-
-         numTags = _allTagIds_AllTours.size();
-
-      } else {
-
-         numTags = _allTagIds_OneTour.size();
-      }
-
-      UI.showStatusLineMessage("%d tags are copied to the clipboard".formatted(numTags));
+      UI.showStatusLineMessage("%d tags are copied to the clipboard".formatted(_allTags_WhenCopied.size()));
    }
 
    private void clipboard_PasteTags() {
@@ -812,7 +793,6 @@ public class TagMenuManager implements IActionProvider {
       final boolean isRemoveTagEnabled;
 
       final HashSet<Long> allTourTagIds = new HashSet<>();
-      _allTagIds_AllTours = null;
 
       if (isOneTour) {
 
@@ -825,6 +805,7 @@ public class TagMenuManager implements IActionProvider {
             isRemoveTagEnabled = true;
 
             if (oneTourTagIds != null) {
+
                for (final Long tagId : oneTourTagIds) {
                   allTourTagIds.add(tagId);
                }
@@ -842,28 +823,6 @@ public class TagMenuManager implements IActionProvider {
          // multiple tours are selected
 
          isRemoveTagEnabled = isTourSelected;
-
-         final ArrayList<TourData> allSelectedTours = _tourProvider.getSelectedTours();
-
-         if (allSelectedTours != null && allSelectedTours.isEmpty() == false) {
-
-            final HashMap<Long, TourTag> allTags = new HashMap<>();
-
-            // get all tag's from all tours
-            for (final TourData tourData : allSelectedTours) {
-
-               final Set<TourTag> tourTags = tourData.getTourTags();
-
-               for (final TourTag tourTag : tourTags) {
-                  allTags.put(tourTag.getTagId(), tourTag);
-               }
-            }
-
-            if (allTags.size() > 0) {
-
-               _allTagIds_AllTours = allTags;
-            }
-         }
       }
 
       _isEnableRecentTagActions = isAddTagEnabled;
@@ -929,11 +888,11 @@ public class TagMenuManager implements IActionProvider {
       _isAdvMenu = false;
    }
 
-   public void fillTagMenu(final IMenuManager menuMgr, final List<TourAction> allActiveActions) {
+   public void fillTagMenu_WithActiveActions(final IMenuManager menuMgr) {
 
       menuMgr.add(new Separator());
 
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.TAG, _allTagActions, allActiveActions);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.TAG, _allTagActions);
 
       _isAdvMenu = false;
    }
@@ -1044,6 +1003,33 @@ public class TagMenuManager implements IActionProvider {
 
          tagIndex++;
       }
+   }
+
+   public HashMap<String, Object> getAllTagActions() {
+      return _allTagActions;
+   }
+
+   private Map<Long, TourTag> getSelectedTourTags() {
+
+      final Map<Long, TourTag> allTags = new HashMap<>();
+
+      final List<TourData> allSelectedTours = _tourProvider.getSelectedTours();
+
+      if (allSelectedTours != null) {
+
+         // get all tag's from all tours
+         for (final TourData tourData : allSelectedTours) {
+
+            final Set<TourTag> tourTags = tourData.getTourTags();
+
+            for (final TourTag tourTag : tourTags) {
+
+               allTags.put(tourTag.getTagId(), tourTag);
+            }
+         }
+      }
+
+      return allTags;
    }
 
    private List<TourTag> getTagsFromClipboard() {

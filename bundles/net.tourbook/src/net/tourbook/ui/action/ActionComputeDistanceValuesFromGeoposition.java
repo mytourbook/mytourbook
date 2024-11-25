@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,26 +26,26 @@ import org.eclipse.jface.action.Action;
 
 public class ActionComputeDistanceValuesFromGeoposition extends Action {
 
-	private final ITourProvider	_tourProvider;
+   private final ITourProvider _tourProvider;
 
-	public ActionComputeDistanceValuesFromGeoposition(final ITourProvider tourDataEditor) {
+   public ActionComputeDistanceValuesFromGeoposition(final ITourProvider tourDataEditor) {
 
-		super(null, AS_PUSH_BUTTON);
+      super(null, AS_PUSH_BUTTON);
 
-		_tourProvider = tourDataEditor;
+      _tourProvider = tourDataEditor;
 
-		setText(Messages.TourEditor_Action_ComputeDistanceValuesFromGeoPosition);
-	}
+      setText(Messages.TourEditor_Action_ComputeDistanceValuesFromGeoPosition);
+   }
 
-	@Override
-	public void run() {
+   @Override
+   public void run() {
 
-		final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
-		if (TourManager.computeDistanceValuesFromGeoPosition(selectedTours)) {
+      if (TourManager.computeDistanceValuesFromGeoPosition(selectedTours)) {
 
-			// save all modified tours
-			TourManager.saveModifiedTours(selectedTours);
-		}
-	}
+         // save all modified tours
+         TourManager.saveModifiedTours(selectedTours);
+      }
+   }
 }

@@ -18,7 +18,6 @@ package net.tourbook.tour;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -32,7 +31,6 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.action.IActionProvider;
-import net.tourbook.ui.action.TourAction;
 import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
 
@@ -304,11 +302,11 @@ public class TourTypeMenuManager implements IActionProvider {
       fillMenuWithRecentTourTypes(menuMgr);
    }
 
-   public void fillContextMenu(final IMenuManager menuMgr, final List<TourAction> allActiveActions) {
+   public void fillContextMenu_WithActiveActions(final IMenuManager menuMgr) {
 
       menuMgr.add(new Separator());
 
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.TOUR_TYPE, _allTourTypeActions, allActiveActions);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.TOUR_TYPE, _allTourTypeActions);
    }
 
    /**
@@ -350,6 +348,10 @@ public class TourTypeMenuManager implements IActionProvider {
 
          tourTypeIndex++;
       }
+   }
+
+   public HashMap<String, Object> getAllTourTypeActions() {
+      return _allTourTypeActions;
    }
 
    public void setTourTypeIntoTour(final TourType tourType,

@@ -92,6 +92,12 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
    @Override
    public void applyData(final Object data) {
 
+      if (_prefContainer == null) {
+         
+         // this happend during debugging
+         return;
+      }
+
       // run async otherwise the button do not have the focus !!!
       _prefContainer.getDisplay().asyncExec(() -> {
 
