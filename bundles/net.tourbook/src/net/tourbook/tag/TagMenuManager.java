@@ -863,15 +863,11 @@ public class TagMenuManager implements IActionProvider {
    /**
     * @param menuMgr
     */
-   public void fillTagMenu(final IMenuManager menuMgr, final boolean isShow_SetTags) {
+   public void fillTagMenu(final IMenuManager menuMgr) {
 
       // all all tour tag actions
       menuMgr.add(new Separator());
       {
-         if (isShow_SetTags) {
-            menuMgr.add(_actionSetTags);
-         }
-
          menuMgr.add(_actionAddTag_AutoOpen);
          menuMgr.add(_actionAddTagGroups);
          menuMgr.add(_actionAddTag);

@@ -3441,7 +3441,7 @@ public class TourDataEditorView extends ViewPart implements
          final Set<TourTag> tourTags = _tourData.getTourTags();
          final boolean isTagInTour = tourTags.size() > 0;
 
-         _tagMenuMgr.fillTagMenu(menuManager, false);
+         _tagMenuMgr.fillTagMenu(menuManager);
          _tagMenuMgr.enableTagActions(true, isTagInTour, tourTags);
       });
 

@@ -379,7 +379,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
          final Set<TourTag> targetTourTags = _tourDataTarget.getTourTags();
          final boolean isTagInTour = targetTourTags != null && targetTourTags.size() > 0;
 
-         _tagMenuMgr.fillTagMenu(menuManager, false);
+         _tagMenuMgr.fillTagMenu(menuManager);
          _tagMenuMgr.enableTagActions(true, isTagInTour, targetTourTags);
       });
 
