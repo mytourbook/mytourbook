@@ -263,7 +263,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
          try (final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
 
-            ImageIO.write(awtImage, "png", output);
+            ImageIO.write(awtImage, "png", output); //$NON-NLS-1$
             final InputStream is = new ByteArrayInputStream(output.toByteArray());
 
             oscimPhotoBitmap = CanvasAdapter.decodeBitmap(is);

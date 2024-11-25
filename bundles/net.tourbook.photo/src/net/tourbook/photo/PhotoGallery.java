@@ -94,9 +94,9 @@ public class PhotoGallery extends ImageGallery {
 
       public ActionEnlargeSmallImages() {
 
-         super("&Enlarge smaller Photos", AS_CHECK_BOX);
+         super(Messages.Photo_Gallery_Action_EnlargeSmallerPhotos, AS_CHECK_BOX);
 
-         setToolTipText("Photos are enlarged when they are smaller than the canvas");
+         setToolTipText(Messages.Photo_Gallery_Action_EnlargeSmallerPhotos_Tooltip);
 
          setImageDescriptor(PhotoActivator.getThemedImageDescriptor(PhotoImages.PhotoEnlargeSmallPhotos));
       }

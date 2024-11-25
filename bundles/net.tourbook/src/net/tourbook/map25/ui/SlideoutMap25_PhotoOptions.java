@@ -148,7 +148,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
        * Label: Slideout title
        */
       final Label label = new Label(parent, SWT.NONE);
-      label.setText("Photo Options");
+      label.setText(Messages.Slideout_Map_PhotoOptions_Title);
       MTFont.setBannerFont(label);
       GridDataFactory.fillDefaults()
             .align(SWT.BEGINNING, SWT.CENTER)

@@ -215,7 +215,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
           * Info
           */
          final Label label = new Label(container, SWT.WRAP);
-         label.setText("Customize the tour contextual menu actions, some actions are not available in all context menus.");
+         label.setText(Messages.Pref_TourActions_Label_Info);
          GridDataFactory.fillDefaults()
                .grab(true, false)
                .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
@@ -226,7 +226,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
              * Show all values
              */
             _rdoShowAllActions = new Button(container, SWT.RADIO);
-            _rdoShowAllActions.setText("Show &all actions");
+            _rdoShowAllActions.setText(Messages.Pref_TourActions_Radio_ShowAllActions);
             _rdoShowAllActions.addSelectionListener(_defaultSelectionListener);
          }
          {
@@ -234,7 +234,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
              * Show custom values
              */
             _rdoShowCustomActions = new Button(container, SWT.RADIO);
-            _rdoShowCustomActions.setText("&Customize actions");
+            _rdoShowCustomActions.setText(Messages.Pref_TourActions_Radio_ShowCustomizedActions);
             _rdoShowCustomActions.addSelectionListener(_defaultSelectionListener);
          }
 
@@ -254,9 +254,8 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
                 * Checkbox: Show only available actions
                 */
                _chkShowOnlyAvailableActions = new Button(viewerContainer, SWT.CHECK);
-               _chkShowOnlyAvailableActions.setText("Show only a&vailable actions");
-               _chkShowOnlyAvailableActions.setToolTipText(
-                     "When this preferences dialog is opened from a view context menu, then the available actions within this context menu can be filtered.");
+               _chkShowOnlyAvailableActions.setText(Messages.Pref_TourActions_Check_ShowOnlyAvailableActions);
+               _chkShowOnlyAvailableActions.setToolTipText(Messages.Pref_TourActions_Check_ShowOnlyAvailableActions_Tooltip);
                _chkShowOnlyAvailableActions.addSelectionListener(_defaultSelectionListener);
 
                GridDataFactory.fillDefaults()
@@ -362,7 +361,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
    private void createUI_30_Options(final Composite parent) {
 
-      final String tooltipText = "e.g. the number of recent tags or tour types can be adjusted";
+      final String tooltipText = Messages.Pref_TourActions_Label_Options_Tooltip;
 
       final GridDataFactory gdLink = GridDataFactory.fillDefaults().indent(6, 0);
       final SelectionListener selectionListener = SelectionListener.widgetSelectedAdapter(event -> onSelectOptions(event));
@@ -376,7 +375,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       {
          {
             _lblOptions = new Label(container, SWT.WRAP);
-            _lblOptions.setText("&Options for");
+            _lblOptions.setText(Messages.Pref_TourActions_Label_Options);
             _lblOptions.setToolTipText(tooltipText);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.BEGINNING)
@@ -387,7 +386,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
              * Link to tag and tour type options
              */
             _linkOptions_Tags = new Link(container, SWT.WRAP);
-            _linkOptions_Tags.setText("<a href=\"%s\">Tags</a>".formatted(LINK_ID_TAGS));
+            _linkOptions_Tags.setText(Messages.Pref_TourActions_Link_Option_Tags.formatted(LINK_ID_TAGS));
             _linkOptions_Tags.setToolTipText(tooltipText);
             _linkOptions_Tags.addSelectionListener(selectionListener);
             gdLink.applyTo(_linkOptions_Tags);
@@ -398,7 +397,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
              * Link to tag and tour type options
              */
             _linkOptions_TourTypes = new Link(container, SWT.WRAP);
-            _linkOptions_TourTypes.setText("<a href=\"%s\">Tour Types</a>".formatted(LINK_ID_TOUR_TYPES));
+            _linkOptions_TourTypes.setText(Messages.Pref_TourActions_Link_Option_TourTypes.formatted(LINK_ID_TOUR_TYPES));
             _linkOptions_TourTypes.setToolTipText(tooltipText);
             _linkOptions_TourTypes.addSelectionListener(selectionListener);
             gdLink.applyTo(_linkOptions_TourTypes);

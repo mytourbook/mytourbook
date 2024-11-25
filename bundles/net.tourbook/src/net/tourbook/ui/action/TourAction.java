@@ -113,9 +113,9 @@ public class TourAction {
    @Override
    public String toString() {
 
-      return "TourAction" + "\n"
-            + " actionText     = " + actionText + "\n"
-            + " actionCategory = " + actionCategory + "\n"
-            + "\n";
+      return "TourAction" + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + " actionText     = " + actionText + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + " actionCategory = " + actionCategory + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "\n"; //$NON-NLS-1$
    }
 }

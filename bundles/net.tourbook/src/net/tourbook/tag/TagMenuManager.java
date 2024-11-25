@@ -184,9 +184,9 @@ public class TagMenuManager implements IActionProvider {
 
       public ActionClipboard_CopyTags() {
 
-         super("&Copy Tags", AS_PUSH_BUTTON);
+         super(Messages.Action_Tag_CopyTags, AS_PUSH_BUTTON);
 
-         setToolTipText("Copy tags into the clipboard");
+         setToolTipText(Messages.Action_Tag_CopyTags_Tooltip);
       }
 
       @Override
@@ -200,7 +200,7 @@ public class TagMenuManager implements IActionProvider {
 
       public ActionClipboard_PasteTags() {
 
-         super("&Paste Tags", AS_PUSH_BUTTON);
+         super(Messages.Action_Tag_PasteTags, AS_PUSH_BUTTON);
       }
 
       @Override
@@ -658,7 +658,7 @@ public class TagMenuManager implements IActionProvider {
       }
       clipboard.dispose();
 
-      UI.showStatusLineMessage("%d tags are copied to the clipboard".formatted(_allTags_WhenCopied.size()));
+      UI.showStatusLineMessage(Messages.Action_Tag_StatusLine_PasteInfo.formatted(_allTags_WhenCopied.size()));
    }
 
    private void clipboard_PasteTags() {
@@ -751,9 +751,8 @@ public class TagMenuManager implements IActionProvider {
 
       if (numTags > 0) {
 
-         _actionClipboard_PasteTags
-               .setToolTipText("Paste tags from the clipboard into the selected tours\n\n%s"
-                     .formatted(TagGroupManager.createTagSortedList(null, allTagsInClipboard)));
+         _actionClipboard_PasteTags.setToolTipText(Messages.Action_Tag_PasteTags_Tooltip
+               .formatted(TagGroupManager.createTagSortedList(null, allTagsInClipboard)));
       }
 
 // SET_FORMATTING_OFF

@@ -62,7 +62,7 @@ public class TileImageLoader implements Runnable {
        * https://www.geo.admin.ch/de/allgemeine-nutzungsbedingungen-bgdi/#doc-1flo19d440<br>
        */
 //    _allFairUseLimiter.add(new FairUseLimiter("wmts.geo.admin.ch", 600, 60));
-      _allFairUseLimiter.add(new FairUseLimiter("wmts.geo.admin.ch", 60, 6));
+      _allFairUseLimiter.add(new FairUseLimiter("wmts.geo.admin.ch", 60, 6)); //$NON-NLS-1$
    }
 
    public static class FairUseLimiter {
