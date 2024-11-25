@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -26,6 +24,7 @@ import net.tourbook.common.util.TableLayoutComposite;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourTypeFilterManager;
+import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
@@ -461,23 +460,20 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
          // button: new
          _btnNew = new Button(container, SWT.NONE);
          _btnNew.setText(Messages.Pref_TourTypeFilter_button_new);
+         _btnNew.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onNewFilterSet()));
          setButtonLayoutData(_btnNew);
-         _btnNew.addSelectionListener(widgetSelectedAdapter(
-               selectionEvent -> onNewFilterSet()));
 
          // button: rename
          _btnRename = new Button(container, SWT.NONE);
          _btnRename.setText(Messages.Pref_TourTypeFilter_button_rename);
+         _btnRename.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onRenameFilterSet()));
          setButtonLayoutData(_btnRename);
-         _btnRename.addSelectionListener(widgetSelectedAdapter(
-               selectionEvent -> onRenameFilterSet()));
 
          // button: delete
          _btnRemove = new Button(container, SWT.NONE);
          _btnRemove.setText(Messages.Pref_TourTypeFilter_button_remove);
+         _btnRemove.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onDeleteFilterSet()));
          setButtonLayoutData(_btnRemove);
-         _btnRemove.addSelectionListener(widgetSelectedAdapter(
-               selectionEvent -> onDeleteFilterSet()));
 
          // spacer
          new Label(container, SWT.NONE);
@@ -485,14 +481,14 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
          // button: up
          _btnUp = new Button(container, SWT.NONE);
          _btnUp.setText(Messages.PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up);
+         _btnUp.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onMoveUp()));
          setButtonLayoutData(_btnUp);
-         _btnUp.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onMoveUp()));
 
          // button: down
          _btnDown = new Button(container, SWT.NONE);
          _btnDown.setText(Messages.PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down);
+         _btnDown.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onMoveDown()));
          setButtonLayoutData(_btnDown);
-         _btnDown.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onMoveDown()));
       }
    }
 
@@ -500,25 +496,25 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
          {
             /*
-             * show tour type context menu on mouse over
+             * Show tour type context menu on mouse hover
              */
             _chkTourTypeContextMenu = new Button(container, SWT.CHECK | SWT.WRAP);
             _chkTourTypeContextMenu.setText(Messages.Pref_Appearance_ShowTourTypeContextMenu);
             _chkTourTypeContextMenu.setToolTipText(Messages.Pref_Appearance_ShowTourTypeContextMenu_Tooltip);
-            _chkTourTypeContextMenu.addSelectionListener(widgetSelectedAdapter(
+            _chkTourTypeContextMenu.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> _isModified = true));
             GridDataFactory.fillDefaults()
-                  .span(2, 1)
+                  .span(3, 1)
                   .indent(0, 10)
                   .applyTo(_chkTourTypeContextMenu);
          }
          {
             /*
-             * number of recent tour types
+             * Number of recent tour types
              */
             final Label label = new Label(container, NONE);
             label.setText(Messages.Pref_Appearance_NumberOfRecent_TourTypes);
@@ -534,6 +530,13 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinnerRecentTourTypes);
+
+            // button: Reset recent tags
+            final Button btnRemoveRecentTags = new Button(container, SWT.PUSH);
+            btnRemoveRecentTags.setText("Remo&ve Recent Tour Types");
+            btnRemoveRecentTags.setToolTipText("All recent tour types will be removed from the recent tour type list");
+            btnRemoveRecentTags.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+                  selectionEvent -> TourTypeMenuManager.clearRecentTourTypes()));
          }
       }
    }
@@ -567,8 +570,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 
    private void initUI() {
 
-      _defaultSelectionListener = widgetSelectedAdapter(
-            selectionEvent -> onChangeProperty());
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeProperty());
 
       _defaultMouseWheelListener = mouseEvent -> {
          net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(mouseEvent);

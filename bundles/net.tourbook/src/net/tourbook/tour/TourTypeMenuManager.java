@@ -119,6 +119,11 @@ public class TourTypeMenuManager implements IActionProvider {
       }
    }
 
+   public static void clearRecentTourTypes() {
+
+      _allRecentTourTypes.clear();
+   }
+
    public static void restoreState() {
 
       final String[] allStateTourTypeIds = _state.getArray(STATE_TOUR_TYPE_ID);
@@ -404,7 +409,6 @@ public class TourTypeMenuManager implements IActionProvider {
       };
       BusyIndicator.showWhile(Display.getCurrent(), runnable);
    }
-
    /**
     * Tour types has changed
     */

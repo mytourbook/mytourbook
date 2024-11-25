@@ -442,7 +442,7 @@ public class TagMenuManager implements IActionProvider {
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
-   static void clearRecentTags() {
+   public static void clearRecentTags() {
 
       _allPreviousTags.clear();
       _recentTags.clear();
