@@ -20,7 +20,7 @@ import net.tourbook.common.UI;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 
-public class TourAction {
+public class TourAction implements Cloneable {
 
    public String             actionClassName;
 
@@ -81,6 +81,23 @@ public class TourAction {
       actionCategory = category;
 
       isCategory = true;
+   }
+
+   @Override
+   public TourAction clone() {
+
+      TourAction newTourAction = null;
+
+      try {
+
+         newTourAction = (TourAction) super.clone();
+
+      } catch (final CloneNotSupportedException e) {
+
+         e.printStackTrace();
+      }
+
+      return newTourAction;
    }
 
    public String getCategoryClassName() {

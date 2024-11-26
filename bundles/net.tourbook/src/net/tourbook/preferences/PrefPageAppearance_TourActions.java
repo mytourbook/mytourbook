@@ -16,6 +16,7 @@
 package net.tourbook.preferences;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -256,55 +257,58 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(viewerContainer);
 //         viewerContainer.setBackground(UI.SYS_COLOR_BLUE);
          {
-            {
-               final Composite contextContainer = new Composite(viewerContainer, SWT.NONE);
-               GridDataFactory.fillDefaults().span(2, 1).applyTo(contextContainer);
-               GridLayoutFactory.fillDefaults().numColumns(2).applyTo(contextContainer);
-               {
-                  {
-                     /*
-                      * Label: Viewer context
-                      */
-                     _lblViewerContext = new Label(contextContainer, SWT.WRAP);
-                     _lblViewerContext.setText("Context:");
-                     GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblViewerContext);
-                  }
-                  {
-                     /*
-                      * Label: Context View
-                      */
-                     _lblContextView = new Label(contextContainer, SWT.WRAP);
-                     _lblContextView.setText("This preferences dialog was not opened from a tour context menu");
-                     GridDataFactory.fillDefaults()
-                           .grab(true, false)
-                           .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
-                           .applyTo(_lblContextView);
-                  }
-               }
-               /*
-                * Checkbox: Show only available actions
-                */
-               _chkShowOnlyAvailableActions = new Button(viewerContainer, SWT.CHECK);
-               _chkShowOnlyAvailableActions.setText(Messages.Pref_TourActions_Check_ShowOnlyAvailableActions);
-               _chkShowOnlyAvailableActions.setToolTipText(Messages.Pref_TourActions_Check_ShowOnlyAvailableActions_Tooltip);
-               _chkShowOnlyAvailableActions.addSelectionListener(_defaultSelectionListener);
-
-               GridDataFactory.fillDefaults()
-                     .grab(true, false)
-                     .span(2, 1)
-                     .applyTo(_chkShowOnlyAvailableActions);
-            }
-
-            createUI_10_ActionViewer(viewerContainer);
-            createUI_20_ViewerActions(viewerContainer);
-            createUI_30_Options(viewerContainer);
+            createUI_10_ViewerContext(viewerContainer);
+            createUI_20_ActionViewer(viewerContainer);
+            createUI_30_ViewerActions(viewerContainer);
+            createUI_50_Options(viewerContainer);
          }
       }
 
       return container;
    }
 
-   private void createUI_10_ActionViewer(final Composite parent) {
+   private void createUI_10_ViewerContext(final Composite parent) {
+
+      final Composite contextContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().span(2, 1).applyTo(contextContainer);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(contextContainer);
+      {
+         {
+            /*
+             * Label: Viewer context
+             */
+            _lblViewerContext = new Label(contextContainer, SWT.WRAP);
+            _lblViewerContext.setText("Context:");
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblViewerContext);
+         }
+         {
+            /*
+             * Label: Context View
+             */
+            _lblContextView = new Label(contextContainer, SWT.WRAP);
+            _lblContextView.setText("This preferences dialog was not opened from a tour context menu");
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                  .applyTo(_lblContextView);
+         }
+      }
+      {
+         /*
+          * Checkbox: Show only available actions
+          */
+         _chkShowOnlyAvailableActions = new Button(parent, SWT.CHECK);
+         _chkShowOnlyAvailableActions.setText(Messages.Pref_TourActions_Check_ShowOnlyAvailableActions);
+         _chkShowOnlyAvailableActions.setToolTipText(Messages.Pref_TourActions_Check_ShowOnlyAvailableActions_Tooltip);
+         _chkShowOnlyAvailableActions.addSelectionListener(_defaultSelectionListener);
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .span(2, 1)
+               .applyTo(_chkShowOnlyAvailableActions);
+      }
+   }
+
+   private void createUI_20_ActionViewer(final Composite parent) {
 
       final TableLayoutComposite tableLayouter = new TableLayoutComposite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -332,7 +336,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       defineAllColumn(tableLayouter);
    }
 
-   private void createUI_20_ViewerActions(final Composite parent) {
+   private void createUI_30_ViewerActions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
@@ -390,7 +394,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       }
    }
 
-   private void createUI_30_Options(final Composite parent) {
+   private void createUI_50_Options(final Composite parent) {
 
       final String tooltipText = Messages.Pref_TourActions_Label_Options_Tooltip;
 
@@ -636,6 +640,17 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
       _btnUp.setEnabled(isEnableUp);
       _btnDown.setEnabled(isEnableDown);
+   }
+
+   private Collection<? extends TourAction> getClonedActions(final List<TourAction> allActions) {
+
+      final List<TourAction> allClonedActions = new ArrayList<>();
+
+      for (final TourAction tourAction : allActions) {
+         allClonedActions.add(tourAction.clone());
+      }
+
+      return allClonedActions;
    }
 
    @Override
