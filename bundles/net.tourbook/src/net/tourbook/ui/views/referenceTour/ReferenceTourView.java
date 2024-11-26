@@ -51,6 +51,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.ViewContext;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourDoubleClickState;
@@ -74,6 +75,7 @@ import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
+import net.tourbook.ui.views.ViewNames;
 import net.tourbook.ui.views.geoCompare.GeoCompareManager;
 import net.tourbook.ui.views.geoCompare.GeoCompareView;
 
@@ -1506,7 +1508,7 @@ public class ReferenceTourView extends ViewPart implements
       TourActionManager.fillContextMenu_CustomizeAction(menuMgr)
 
             // set pref page custom data that actions from this view can be identified
-            .setPrefData(ID);
+            .setPrefData(new ViewContext(ID, ViewNames.VIEW_NAME_REFERENCE_TOURS));
 
       enableActions();
    }

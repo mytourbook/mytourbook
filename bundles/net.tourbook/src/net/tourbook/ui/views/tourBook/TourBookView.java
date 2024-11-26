@@ -60,6 +60,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.ViewContext;
 import net.tourbook.search.SearchView;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
@@ -96,6 +97,7 @@ import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.NatTableViewer_TourInfo_ToolTip;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
+import net.tourbook.ui.views.ViewNames;
 import net.tourbook.ui.views.geoCompare.GeoComparedTour;
 import net.tourbook.ui.views.rawData.ActionDeleteTourValues;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
@@ -2519,7 +2521,7 @@ public class TourBookView extends ViewPart implements
       TourActionManager.fillContextMenu_CustomizeAction(menuMgr)
 
             // set pref page custom data that actions from this view can be identified
-            .setPrefData(ID);
+            .setPrefData(new ViewContext(ID, ViewNames.VIEW_NAME_TOUR_BOOK));
 
       ActionEditQuick.setTourLocationFocus(getTourLocation_HoverState());
 

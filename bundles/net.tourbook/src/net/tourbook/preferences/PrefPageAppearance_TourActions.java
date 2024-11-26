@@ -87,18 +87,21 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
    private Control _parent;
 
    private Button  _btnCheckAll;
+
    private Button  _btnUncheckAll;
    private Button  _btnUp;
    private Button  _btnDown;
-
    private Button  _chkShowOnlyAvailableActions;
 
    private Button  _rdoShowAllActions;
+
    private Button  _rdoShowCustomActions;
+   private Label   _lblContextView;
+   private Label   _lblViewerContext;
 
    private Label   _lblOptions;
-
    private Link    _linkOptions_Tags;
+
    private Link    _linkOptions_TourTypes;
 
    private class ActionFilter extends ViewerFilter {
@@ -174,12 +177,15 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
    @Override
    public void applyData(final Object data) {
 
-      if (data instanceof final String viewID) {
+      if (data instanceof final ViewContext viewContext) {
+
+         _lblContextView.setText(viewContext.viewName);
+         _lblContextView.getParent().layout(true, true);
 
          /*
           * Make actions more visible which are available in a view
           */
-         _allViewActionIDs = TourActionManager.getAllViewActions().get(viewID);
+         _allViewActionIDs = TourActionManager.getAllViewActions().get(viewContext.viewID);
 
          if (_allViewActionIDs != null) {
 
@@ -211,16 +217,17 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
-         /*
-          * Info
-          */
-         final Label label = new Label(container, SWT.WRAP);
-         label.setText(Messages.Pref_TourActions_Label_Info);
-         GridDataFactory.fillDefaults()
-               .grab(true, false)
-               .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
-               .applyTo(label);
-
+         {
+            /*
+             * Info
+             */
+            final Label label = new Label(container, SWT.WRAP);
+            label.setText(Messages.Pref_TourActions_Label_Info);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                  .applyTo(label);
+         }
          {
             /*
              * Show all values
@@ -250,6 +257,30 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 //         viewerContainer.setBackground(UI.SYS_COLOR_BLUE);
          {
             {
+               final Composite contextContainer = new Composite(viewerContainer, SWT.NONE);
+               GridDataFactory.fillDefaults().span(2, 1).applyTo(contextContainer);
+               GridLayoutFactory.fillDefaults().numColumns(2).applyTo(contextContainer);
+               {
+                  {
+                     /*
+                      * Label: Viewer context
+                      */
+                     _lblViewerContext = new Label(contextContainer, SWT.WRAP);
+                     _lblViewerContext.setText("Context:");
+                     GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblViewerContext);
+                  }
+                  {
+                     /*
+                      * Label: Context View
+                      */
+                     _lblContextView = new Label(contextContainer, SWT.WRAP);
+                     _lblContextView.setText("This preferences dialog was not opened from a tour context menu");
+                     GridDataFactory.fillDefaults()
+                           .grab(true, false)
+                           .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                           .applyTo(_lblContextView);
+                  }
+               }
                /*
                 * Checkbox: Show only available actions
                 */
@@ -434,17 +465,26 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
                final String actionText = UI.SPACE6 + tourAction.actionText;
 
-               if (_allViewActionIDs != null && _allViewActionIDs.contains(tourAction.actionClassName)) {
+               final boolean isShowCustomActions = _rdoShowCustomActions.getSelection();
 
-                  // action is available in the related view
+               if (isShowCustomActions) {
 
-                  if (tourAction.isChecked) {
+                  if (_allViewActionIDs != null && _allViewActionIDs.contains(tourAction.actionClassName)) {
 
-                     styledString.append(actionText, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
+                     // action is available in the related view
+
+                     if (tourAction.isChecked) {
+
+                        styledString.append(actionText, net.tourbook.ui.UI.CONTENT_SUB_CATEGORY_STYLER);
+
+                     } else {
+
+                        styledString.append(actionText);
+                     }
 
                   } else {
 
-                     styledString.append(actionText);
+                     styledString.append(actionText, net.tourbook.ui.UI.DISABLED_STYLER);
                   }
 
                } else {
@@ -452,7 +492,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
                   styledString.append(actionText, net.tourbook.ui.UI.DISABLED_STYLER);
                }
 
-               if (_rdoShowCustomActions.getSelection()) {
+               if (isShowCustomActions) {
 
                   // actions are customized -> display enabled image
 
@@ -551,7 +591,9 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
       _chkShowOnlyAvailableActions  .setEnabled(isCustomizeActions);
 
+      _lblContextView               .setEnabled(isCustomizeActions);
       _lblOptions                   .setEnabled(isCustomizeActions);
+      _lblViewerContext             .setEnabled(isCustomizeActions);
 
       _linkOptions_Tags             .setEnabled(isCustomizeActions);
       _linkOptions_TourTypes        .setEnabled(isCustomizeActions);
@@ -693,8 +735,6 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
    private void onModified() {
 
-      saveState();
-
       updateUI_ActionFilter();
 
       enableControls();
@@ -765,13 +805,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
       updateUI_ActionFilter();
 
       // !!! VERY IMPORTANT:  Checking the actions must be async otherwise it is NOT working !!!
-      _parent.getDisplay().asyncExec(() -> {
-
-         final List<TourAction> allVisibleActions = TourActionManager.getVisibleActions();
-
-         // check only the visible actions
-         _tourActionViewer.setCheckedElements(allVisibleActions.toArray());
-      });
+      _parent.getDisplay().asyncExec(() -> updateUI_CheckedActions());
    }
 
    private void saveState() {
@@ -829,6 +863,16 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
          _tourActionViewer.setFilters();
       }
+
+      updateUI_CheckedActions();
+   }
+
+   private void updateUI_CheckedActions() {
+
+      final List<TourAction> allVisibleActions = TourActionManager.getVisibleActions();
+
+      // check only the visible actions
+      _tourActionViewer.setCheckedElements(allVisibleActions.toArray());
    }
 
 }

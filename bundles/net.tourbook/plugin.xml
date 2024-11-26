@@ -426,8 +426,8 @@
       />
          <page
             name        ="%Pref_Page_TourType_Groups"
-            class       ="net.tourbook.preferences.PrefPageTourType_Groups"
             id          ="net.tourbook.preferences.PrefPageTourType_Groups"
+            class       ="net.tourbook.preferences.PrefPageTourType_Groups"
             category    ="net.tourbook.preferences.PrefPageTourType_Definitions"
          />
 

@@ -50,6 +50,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageTags;
+import net.tourbook.preferences.ViewContext;
 import net.tourbook.tag.ActionSetTagStructure;
 import net.tourbook.tag.ActionSetTagStructure_All;
 import net.tourbook.tag.ChangedTags;
@@ -81,6 +82,7 @@ import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
+import net.tourbook.ui.views.ViewNames;
 
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.e4.ui.di.PersistState;
@@ -1866,7 +1868,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       TourActionManager.fillContextMenu_CustomizeAction(menuMgr)
 
             // set pref page custom data that actions from this view can be identified
-            .setPrefData(ID);
+            .setPrefData(new ViewContext(ID, ViewNames.VIEW_NAME_TAGGED_TOURS));
 
       enableActions(true);
 

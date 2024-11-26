@@ -53,6 +53,7 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.ViewContext;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourEvent;
@@ -71,6 +72,7 @@ import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.TourInfoToolTip_CustomSelection_CellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
+import net.tourbook.ui.views.ViewNames;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
@@ -1684,7 +1686,7 @@ public class ElevationCompareResultView extends ViewPart implements
       TourActionManager.fillContextMenu_CustomizeAction(menuMgr)
 
             // set pref page custom data that actions from this view can be identified
-            .setPrefData(ID);
+            .setPrefData(new ViewContext(ID, ViewNames.VIEW_NAME_COMPARE_BY_ELEVATION));
 
       enableActions_ContextMenu();
    }
