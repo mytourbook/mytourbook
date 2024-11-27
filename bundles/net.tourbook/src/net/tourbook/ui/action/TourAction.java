@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import java.util.Objects;
+
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -23,7 +25,6 @@ import org.eclipse.swt.graphics.Image;
 public class TourAction implements Cloneable {
 
    public String             actionClassName;
-
    public String             actionText;
 
    public TourActionCategory actionCategory;
@@ -31,6 +32,7 @@ public class TourAction implements Cloneable {
 
    private Image             _image;
    private Image             _image_Disabled;
+
    private ImageDescriptor   _imageDescriptor;
    private ImageDescriptor   _imageDescriptor_Disabled;
 
@@ -100,6 +102,27 @@ public class TourAction implements Cloneable {
       return newTourAction;
    }
 
+   @Override
+   public boolean equals(final Object obj) {
+
+      if (this == obj) {
+         return true;
+      }
+
+      if (obj == null) {
+         return false;
+      }
+
+      if (getClass() != obj.getClass()) {
+         return false;
+      }
+
+      final TourAction other = (TourAction) obj;
+
+      return actionCategory == other.actionCategory
+            && Objects.equals(actionClassName, other.actionClassName);
+   }
+
    public String getCategoryClassName() {
 
       return actionCategory.getClass().getCanonicalName()
@@ -125,6 +148,12 @@ public class TourAction implements Cloneable {
       }
 
       return _image_Disabled;
+   }
+
+   @Override
+   public int hashCode() {
+
+      return Objects.hash(actionCategory, actionClassName);
    }
 
    @Override
