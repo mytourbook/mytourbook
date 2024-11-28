@@ -219,8 +219,8 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
             // button: Remove recent tags
             final Button btnRemoveRecentTags = new Button(group, SWT.PUSH);
-            btnRemoveRecentTags.setText("Remo&ve Recent Tags");
-            btnRemoveRecentTags.setToolTipText("All recent tags will be removed from the recent tag list");
+            btnRemoveRecentTags.setText(Messages.Pref_Appearance_Button_RemoveRecentTags);
+            btnRemoveRecentTags.setToolTipText(Messages.Pref_Appearance_Button_RemoveRecentTags_Tooltip);
             btnRemoveRecentTags.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> TagMenuManager.clearRecentTags()));
          }

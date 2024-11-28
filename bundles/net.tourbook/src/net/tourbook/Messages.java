@@ -1607,6 +1607,8 @@ public class Messages extends NLS {
    public static String        PrefPage_ViewTooltip_Label_TourBook;
    public static String        PrefPage_ViewTooltip_Label_WeekDay;
 
+   public static String        Pref_Appearance_Button_RemoveRecentTags;
+   public static String        Pref_Appearance_Button_RemoveRecentTags_Tooltip;
    public static String        Pref_Appearance_Button_ResetAllToggleDialogs;
    public static String        Pref_Appearance_Button_ResetAllToggleDialogs_Tooltip;
    public static String        Pref_Appearance_Check_AutoOpenTagging;
@@ -1893,6 +1895,8 @@ public class Messages extends NLS {
 
    public static String        Pref_TourTypeFilter_button_new;
    public static String        Pref_TourTypeFilter_button_remove;
+   public static String        Pref_TourTypeFilter_Button_RemoveRecentTourTypes;
+   public static String        Pref_TourTypeFilter_Button_RemoveRecentTourTypes_Tooltip;
    public static String        Pref_TourTypeFilter_button_rename;
    public static String        Pref_TourTypeFilter_dlg_new_message;
    public static String        Pref_TourTypeFilter_dlg_new_title;
@@ -1934,9 +1938,11 @@ public class Messages extends NLS {
 
    public static String        Pref_TourActions_Check_ShowOnlyAvailableActions;
    public static String        Pref_TourActions_Check_ShowOnlyAvailableActions_Tooltip;
+   public static String        Pref_TourActions_Label_ContextView;
    public static String        Pref_TourActions_Label_Info;
    public static String        Pref_TourActions_Label_Options;
    public static String        Pref_TourActions_Label_Options_Tooltip;
+   public static String        Pref_TourActions_Label_ViewerContext;
    public static String        Pref_TourActions_Link_Option_Tags;
    public static String        Pref_TourActions_Link_Option_TourTypes;
    public static String        Pref_TourActions_Radio_ShowAllActions;

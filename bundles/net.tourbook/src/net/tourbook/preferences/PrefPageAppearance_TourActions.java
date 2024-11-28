@@ -278,7 +278,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
              * Label: Viewer context
              */
             _lblViewerContext = new Label(contextContainer, SWT.WRAP);
-            _lblViewerContext.setText("Context:");
+            _lblViewerContext.setText(Messages.Pref_TourActions_Label_ViewerContext);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblViewerContext);
          }
          {
@@ -286,7 +286,7 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
              * Label: Context View
              */
             _lblContextView = new Label(contextContainer, SWT.WRAP);
-            _lblContextView.setText("This preferences dialog was not opened from a tour context menu");
+            _lblContextView.setText(Messages.Pref_TourActions_Label_ContextView);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)

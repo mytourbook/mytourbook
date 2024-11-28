@@ -533,8 +533,8 @@ public class PrefPageTourType_Groups extends PreferencePage implements IWorkbenc
 
             // button: Reset recent tags
             final Button btnRemoveRecentTags = new Button(container, SWT.PUSH);
-            btnRemoveRecentTags.setText("Remo&ve Recent Tour Types");
-            btnRemoveRecentTags.setToolTipText("All recent tour types will be removed from the recent tour type list");
+            btnRemoveRecentTags.setText(Messages.Pref_TourTypeFilter_Button_RemoveRecentTourTypes);
+            btnRemoveRecentTags.setToolTipText(Messages.Pref_TourTypeFilter_Button_RemoveRecentTourTypes_Tooltip);
             btnRemoveRecentTags.addSelectionListener(SelectionListener.widgetSelectedAdapter(
                   selectionEvent -> TourTypeMenuManager.clearRecentTourTypes()));
          }
