@@ -722,6 +722,13 @@ public class TourActionManager {
 
    public static void saveState() {
 
+      if (_allSortedAndCheckedActions == null) {
+
+         // tour actions are not yet used -> ignore
+
+         return;
+      }
+
       final String[] stateAllSortedActions = new String[_allSortedAndCheckedActions.size()];
       final List<String> allCheckedActions = new ArrayList<>();
 
