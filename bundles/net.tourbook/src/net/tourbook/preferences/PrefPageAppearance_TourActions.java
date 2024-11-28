@@ -25,6 +25,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.TableLayoutComposite;
 import net.tourbook.ui.action.TourAction;
+import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -603,7 +604,12 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
 // SET_FORMATTING_ON
 
-      if (isCustomizeActions && isActionCategory == false) {
+      if (isCustomizeActions && isActionCategory == false
+
+      /*
+       * When actions are filtered then it gets complicated with up/down actions -> disabled
+       */
+            && _chkShowOnlyAvailableActions.getSelection() == false) {
 
          enableUpDownActions();
 
@@ -615,26 +621,56 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
    }
 
    /**
-    * check if the up/down button are enabled
+    * Check selected action if it can be moved up/down
+    *
+    * @param selectedAction
     */
-
    private void enableUpDownActions() {
 
       final Table table = _tourActionViewer.getTable();
-      final TableItem[] items = table.getSelection();
+      final int selectionIndex = table.getSelectionIndex();
 
-      final boolean isValidSelection = items.length > 0;
+      boolean isEnableUp = false;
+      boolean isEnableDown = false;
 
-      boolean isEnableUp = isValidSelection;
-      boolean isEnableDown = isValidSelection;
+      final IStructuredSelection structuredSelection = _tourActionViewer.getStructuredSelection();
+      final TourAction selectedAction = (TourAction) structuredSelection.getFirstElement();
 
-      if (isValidSelection) {
+      final int numActions = _allClonedActions.size();
 
-         final int[] allIndices = table.getSelectionIndices();
-         final int numItems = table.getItemCount();
+      if (selectionIndex <= 1) {
 
-         isEnableUp = allIndices[0] != 0;
-         isEnableDown = allIndices[allIndices.length - 1] < numItems - 1;
+         // check top
+
+         isEnableDown = true;
+
+      } else if (selectionIndex >= numActions - 1) {
+
+         // check bottom
+
+         isEnableUp = true;
+
+      } else {
+
+         // check within a category
+
+         final TourActionCategory selectedCategory = selectedAction.actionCategory;
+
+         final TourAction previousAction = _allClonedActions.get(selectionIndex - 1);
+         final TourAction nextAction = _allClonedActions.get(selectionIndex + 1);
+
+         final TourActionCategory previousCategory = previousAction.actionCategory;
+         final TourActionCategory nextCategory = nextAction.actionCategory;
+
+         if (previousAction.isCategory == false && previousCategory == selectedCategory) {
+
+            isEnableUp = true;
+         }
+
+         if (nextAction.isCategory == false && nextCategory == selectedCategory) {
+
+            isEnableDown = true;
+         }
       }
 
       _btnUp.setEnabled(isEnableUp);
@@ -774,7 +810,6 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
    public boolean performCancel() {
 
       safePrefState();
-
 
       return super.performCancel();
    }
