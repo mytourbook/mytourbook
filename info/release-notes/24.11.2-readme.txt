@@ -1,0 +1,25 @@
+24.11.2                                                 ?. December 2024
+
+
+Improvements
+============
+
+* Tour Context Menu
+  - Customize the tour contextual menu actions 
+    https://github.com/mytourbook/mytourbook/issues/1302
+
+* Tour Tags and Tour Types
+  - Remove recent tour tags and tour types
+    https://github.com/mytourbook/mytourbook/issues/1366
+
+
+Bugfix
+======
+
+* Tour Book
+  - Fixed "Copy Tags" doesn't copy to the clipboard
+    https://github.com/mytourbook/mytourbook/issues/1431
+  
+
+Milestone 24.11.2 https://github.com/mytourbook/mytourbook/milestone/21?closed=1
+ 

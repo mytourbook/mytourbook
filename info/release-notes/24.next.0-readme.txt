@@ -55,13 +55,8 @@ New
 Improvements
 ============
 
-* Tour Context Menu
-  - Customize the tour contextual menu actions 
-    https://github.com/mytourbook/mytourbook/issues/1302
+* 
 
-* Tour Tags and Tour Types
-  - Remove recent tour tags and tour types
-    https://github.com/mytourbook/mytourbook/issues/1366
 
 Changes
 =======
