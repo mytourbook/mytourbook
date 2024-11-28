@@ -572,6 +572,12 @@ public class PrefPageAppearance_TourActions extends PreferencePage implements IW
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
 
+      for (final TourAction tourAction : _allClonedActions) {
+
+         UI.disposeResource(tourAction.getImage());
+         UI.disposeResource(tourAction.getImageDisabled());
+      }
+
       super.dispose();
    }
 
