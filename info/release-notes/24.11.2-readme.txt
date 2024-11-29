@@ -11,15 +11,21 @@ Improvements
 * Tour Tags and Tour Types
   - Remove recent tour tags and tour types
     https://github.com/mytourbook/mytourbook/issues/1366
+    
+* 4k Display
+  - Improved icons for the print, export and upload actions
 
 
 Bugfix
 ======
 
 * Tour Book
-  - Fixed "Copy Tags" doesn't copy to the clipboard
+  - Fixed: "Copy Tags" doesn't copy to the clipboard
     https://github.com/mytourbook/mytourbook/issues/1431
   
 
-Milestone 24.11.2 https://github.com/mytourbook/mytourbook/milestone/21?closed=1
+System
+======
+
+* Milestone 24.11.2 https://github.com/mytourbook/mytourbook/milestone/21?closed=1
  

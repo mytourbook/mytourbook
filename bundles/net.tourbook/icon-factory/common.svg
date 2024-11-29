@@ -3350,9 +3350,9 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="1068.7279"
-     inkscape:cx="182.02297"
-     inkscape:zoom="11.32"
+     inkscape:cy="1083.1476"
+     inkscape:cx="235.24417"
+     inkscape:zoom="16.008898"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -18350,4 +18350,36 @@
    id="use4-5" />
 		</clipPath>
 	</g>
-</g></g></svg>
+</g><rect
+       inkscape:export-ydpi="192.00018"
+       inkscape:export-xdpi="192.00018"
+       inkscape:export-filename="..\..\net.tourbook.cloud\icons\suunto-logo.png"
+       y="1059"
+       x="225"
+       height="15.999983"
+       width="15.99999"
+       id="rect4471-8-4-0-6-1-4-8-6-5-4-7-4-9"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:0.0511628;stroke:#3a9ff7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" /><path
+       fill="#f03241"
+       d="m 232.37259,1062.6634 -6.34,9.0533 a 0.18,0.18 0 0 0 0.148,0.2833 h 12.67867 a 0.18,0.18 0 0 0 0.14801,-0.2833 l -6.34134,-9.0533 a 0.18,0.18 0 0 0 -0.29466,0"
+       id="path1-4"
+       style="fill-rule:evenodd;stroke-width:0.666667" /><g
+       id="g8-4"
+       inkscape:export-filename="..\..\net.tourbook.cloud\icons\suunto-logo@2x.png"
+       inkscape:export-xdpi="384"
+       inkscape:export-ydpi="384"
+       style="display:inline"
+       transform="translate(25,1.7166138e-5)"><rect
+         inkscape:export-ydpi="384"
+         inkscape:export-xdpi="384"
+         inkscape:export-filename="..\..\net.tourbook.export\icons\garmin-logo@2x.png"
+         y="1059"
+         x="225"
+         height="15.999983"
+         width="15.99999"
+         id="rect4471-8-4-0-6-1-4-8-6-5-4-7-4-9-0"
+         style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;fill-opacity:0.0511628;stroke:#3a9ff7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" /><path
+         fill="#f03241"
+         d="m 232.37259,1062.6634 -6.34,9.0533 a 0.18,0.18 0 0 0 0.148,0.2833 h 12.67867 a 0.18,0.18 0 0 0 0.14801,-0.2833 l -6.34134,-9.0533 a 0.18,0.18 0 0 0 -0.29466,0"
+         id="path1-4-9"
+         style="fill-rule:evenodd;stroke-width:0.666667" /></g></g></svg>
