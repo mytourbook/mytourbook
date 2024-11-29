@@ -18,6 +18,7 @@ package net.tourbook.map2.view;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.PaintedMapPoint;
 
+import java.awt.geom.Point2D;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 
@@ -50,15 +51,24 @@ import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -69,7 +79,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.part.PageBook;
 
 /**
- * Slideout for all 2D map locations and marker
+ * Slideout for the 2D map photo tooltip
  */
 public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActionResetToDefault {
 
@@ -90,6 +100,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
    private final static IDialogSettings _state                            = TourbookPlugin.getState(ID);
 
    private static final String          STATE_IS_TOOLTIP_EXPANDED         = "STATE_IS_TOOLTIP_EXPANDED";                    //$NON-NLS-1$
+   private static final String          STATE_IS_TRIM_PHOTO               = "STATE_IS_TRIM_PHOTO";                          //$NON-NLS-1$
 
    private Map2                         _map2;
 
@@ -106,9 +117,11 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private FocusListener         _keepOpenListener;
 
-   private boolean               _isTooltipExpanded;
-   private boolean               _isExpandCollapseModified;
    private boolean               _isAutoResizeTooltip;
+   private boolean               _isExpandCollapseModified;
+   private boolean               _isMouseDown;
+   private boolean               _isTooltipExpanded;
+   private boolean               _isTrimPhoto;
 
    private ToolBarManager        _toolbarManagerExpandCollapseSlideout;
 
@@ -120,10 +133,25 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private int[]                 _selectedTooltipSize;
 
+   /** Photo position and size of the photo image within the photo canvas */
+   private Rectangle             _photoImageBounds;
+   private Point                 _devTrimArea_Start;
+   private Point                 _devTrimArea_End;
+   private Point2D.Float         _relTrimArea_Start;
+   private Point2D.Float         _relTrimArea_End;
+
+   private MouseMoveListener     _photoMouseMoveListener;
+   private MouseListener         _photoMouseDownListener;
+   private MouseListener         _photoMouseUpListener;
+   private MouseTrackListener    _photoMouseExitListener;
+   private ControlListener       _photoResizeListener;
+
    /*
     * UI controls
     */
    private PageBook         _pageBook;
+
+   private Button           _chkTrimPhoto;
 
    private Composite        _containerPhotoOptions;
    private Composite        _containerHeader_1;
@@ -136,6 +164,9 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
    private Label            _labelMessage;
 
    private PhotoImageCanvas _photoImageCanvas;
+
+   private Cursor           _photoCursor_Cross;
+   private Cursor           _photoCursor_SizeAll;
 
    private class ActionExpandSlideout extends Action {
 
@@ -162,6 +193,14 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       public boolean drawInvalidImage(final GC gc, final Rectangle clientArea) {
 
          return updateUI_ShowLoadingImage(gc, clientArea);
+      }
+
+      @Override
+      public void paintControl(final PaintEvent event) {
+
+         super.paintControl(event);
+
+         onPhoto_Paint(event);
       }
    }
 
@@ -314,24 +353,16 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
             .numColumns(1)
             .spacing(0, 0)
             .applyTo(container);
-      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+      container.setBackground(UI.SYS_COLOR_GREEN);
       {
-         createUI_30_PhotoOptions(container);
-         createUI_20_PhotoImage(container);
+         createUI_20_PhotoOptions(container);
+         createUI_50_PhotoImage(container);
       }
 
       return container;
    }
 
-   private void createUI_20_PhotoImage(final Composite parent) {
-
-      _photoImageCanvas = new PhotoImageCanvas(parent, SWT.DOUBLE_BUFFERED);
-      _photoImageCanvas.setIsSmoothImages(true);
-      _photoImageCanvas.setStyle(SWT.CENTER);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_photoImageCanvas);
-   }
-
-   private void createUI_30_PhotoOptions(final Composite parent) {
+   private void createUI_20_PhotoOptions(final Composite parent) {
 
       _containerPhotoOptions = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -339,10 +370,20 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
             .applyTo(_containerPhotoOptions);
       GridLayoutFactory.fillDefaults().numColumns(1)
             .extendedMargins(0, 0, 0, 5)
-            .numColumns(2)
+            .numColumns(3)
             .applyTo(_containerPhotoOptions);
+      _containerPhotoOptions.setBackground(UI.SYS_COLOR_YELLOW);
       {
+         {
+            /*
+             * Trim photo
+             */
+            _chkTrimPhoto = new Button(_containerPhotoOptions, SWT.CHECK);
+            _chkTrimPhoto.setText("&Trim photo image");
+            _chkTrimPhoto.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyTrimPhoto()));
+            GridDataFactory.fillDefaults().applyTo(_chkTrimPhoto);
 
+         }
          {
             final Link link = new Link(_containerPhotoOptions, SWT.NONE);
             link.setText(UI.createLinkText(Messages.Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip));
@@ -360,6 +401,14 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
             UI.createToolbarAction(_containerPhotoOptions, _actionRestoreDefaults);
          }
       }
+   }
+
+   private void createUI_50_PhotoImage(final Composite parent) {
+
+      _photoImageCanvas = new PhotoImageCanvas(parent, SWT.DOUBLE_BUFFERED);
+      _photoImageCanvas.setIsSmoothImages(true);
+      _photoImageCanvas.setStyle(SWT.CENTER);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_photoImageCanvas);
    }
 
    private Composite createUI_90_NoPhoto(final Composite parent) {
@@ -528,6 +577,20 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       return photoImage;
    }
 
+   private Point2D.Float getRelativeMousePhotoPosition(final int devMouseX, final int devMouseY) {
+
+      final int devPhotoX = _photoImageBounds.x;
+      final int devPhotoY = _photoImageBounds.y;
+
+      final float devPhotoWidth = _photoImageBounds.width;
+      final float devPhotoHeight = _photoImageBounds.height;
+
+      final float relTrimX = (devMouseX - devPhotoX) / devPhotoWidth;
+      final float relTrimY = (devMouseY - devPhotoY) / devPhotoHeight;
+
+      return new Point2D.Float(relTrimX, relTrimY);
+   }
+
    private int getSelectedTooltipSizeIndex() {
 
       final int selectionIndex = _comboTooltipSize.getSelectionIndex();
@@ -592,12 +655,23 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private void initUI(final Composite parent) {
 
+      final Display display = parent.getDisplay();
+
 // SET_FORMATTING_OFF
 
       _imageDescriptor_SlideoutCollapse   = CommonActivator.getThemedImageDescriptor_Dark(CommonImages.Slideout_Collapse);
       _imageDescriptor_SlideoutExpand     = CommonActivator.getThemedImageDescriptor_Dark(CommonImages.Slideout_Expand);
 
+      _photoMouseMoveListener    = event -> onPhoto_Mouse_Move(            event);
+      _photoMouseUpListener      = MouseListener.mouseUpAdapter(           event -> onPhoto_Mouse_UpDown_2_Up(event));
+      _photoMouseDownListener    = MouseListener.mouseDownAdapter(         event -> onPhoto_Mouse_UpDown_1_Down(event));
+      _photoMouseExitListener    = MouseTrackListener.mouseExitAdapter(    event -> onPhoto_Mouse_Exit());
+      _photoResizeListener       = ControlListener.controlResizedAdapter(  event -> onPhoto_Resize(event));
+
 // SET_FORMATTING_ON
+
+      _photoCursor_Cross = display.getSystemCursor(SWT.CURSOR_CROSS);
+      _photoCursor_SizeAll = display.getSystemCursor(SWT.CURSOR_SIZEALL);
 
       _keepOpenListener = new FocusListener() {
 
@@ -616,6 +690,13 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
             setIsAnotherDialogOpened(false);
          }
       };
+
+   }
+
+   @Override
+   protected void onDispose() {
+
+      super.onDispose();
    }
 
    @Override
@@ -643,6 +724,194 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
             updateUI_SetUIPage(_previousHoveredMapPoint);
          }
       });
+   }
+
+   private void onModifyTrimPhoto() {
+
+      _isTrimPhoto = _chkTrimPhoto.getSelection();
+
+      setupPhotoCanvasListener();
+   }
+
+   private void onPhoto_Mouse_Exit() {
+
+      _photoImageCanvas.setCursor(null);
+   }
+
+   private void onPhoto_Mouse_Move(final MouseEvent mouseEvent) {
+
+      final int devMouseX = mouseEvent.x;
+      final int devMouseY = mouseEvent.y;
+
+      final Point devMousePosition = new Point(devMouseX, devMouseY);
+
+      final boolean isMouseWithinPhoto = _photoImageBounds.contains(devMousePosition);
+
+      if (isMouseWithinPhoto) {
+
+         if (_isMouseDown) {
+
+            _devTrimArea_End = devMousePosition;
+            _relTrimArea_End = getRelativeMousePhotoPosition(devMouseX, devMouseY);
+
+            _photoImageCanvas.redraw();
+
+            _photoImageCanvas.setCursor(_photoCursor_SizeAll);
+
+         } else {
+
+            _photoImageCanvas.setCursor(_photoCursor_Cross);
+         }
+
+      } else {
+
+         _photoImageCanvas.setCursor(null);
+      }
+   }
+
+   private void onPhoto_Mouse_UpDown_1_Down(final MouseEvent mouseEvent) {
+
+      final int devMouseX = mouseEvent.x;
+      final int devMouseY = mouseEvent.y;
+
+      final Point devMousePosition = new Point(devMouseX, devMouseY);
+
+      final boolean isMouseWithinPhoto = _photoImageBounds.contains(devMousePosition);
+
+      if (isMouseWithinPhoto) {
+
+         _isMouseDown = true;
+
+         _devTrimArea_Start = devMousePosition;
+         _devTrimArea_End = null;
+
+         // keep trim area relative to the photo
+         _relTrimArea_Start = getRelativeMousePhotoPosition(devMouseX, devMouseY);
+         _relTrimArea_End = null;
+
+         _photoImageCanvas.redraw();
+
+      } else {
+
+         _isMouseDown = false;
+
+         _devTrimArea_Start = null;
+         _devTrimArea_End = null;
+
+         _relTrimArea_Start = null;
+         _relTrimArea_End = null;
+      }
+   }
+
+   private void onPhoto_Mouse_UpDown_2_Up(final MouseEvent mouseEvent) {
+
+      final int devMouseX = mouseEvent.x;
+      final int devMouseY = mouseEvent.y;
+
+      final Point devMousePosition = new Point(devMouseX, devMouseY);
+
+      final boolean isMouseWithinPhoto = _photoImageBounds.contains(devMousePosition);
+
+      _isMouseDown = false;
+
+      _devTrimArea_End = devMousePosition;
+      _relTrimArea_End = getRelativeMousePhotoPosition(devMouseX, devMouseY);
+
+      _photoImageCanvas.redraw();
+   }
+
+   private void onPhoto_Paint(final PaintEvent mouseEvent) {
+
+      // keep photo image position after the photo is painted in the parent class
+      _photoImageBounds = _photoImageCanvas.getImageBounds();
+
+      System.out.println(UI.timeStamp() + " onPhoto_Paint:  " + _photoImageBounds);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+      if (_devTrimArea_Start == null || _devTrimArea_End == null) {
+
+         return;
+      }
+
+      final GC gc = mouseEvent.gc;
+
+      gc.setForeground(UI.SYS_COLOR_YELLOW);
+
+      final int devXStart = _devTrimArea_Start.x;
+      final int devYStart = _devTrimArea_Start.y;
+
+      final int devXEnd = _devTrimArea_End.x;
+      final int devYEnd = _devTrimArea_End.y;
+
+      int devXTopLeft;
+      int devYTopLeft;
+      int devWidth;
+      int devHeight;
+
+      if (devXStart < devXEnd) {
+
+         devXTopLeft = devXStart;
+         devWidth = devXEnd - devXStart;
+
+      } else {
+
+         devXTopLeft = devXEnd;
+         devWidth = devXStart - devXEnd;
+      }
+
+      if (devYStart < devYEnd) {
+
+         devYTopLeft = devYStart;
+         devHeight = devYEnd - devYStart;
+
+      } else {
+
+         devYTopLeft = devYEnd;
+         devHeight = devYStart - devYEnd;
+      }
+
+      gc.drawRectangle(
+
+            devXTopLeft,
+            devYTopLeft,
+
+            devWidth,
+            devHeight);
+   }
+
+   private void onPhoto_Resize(final ControlEvent event) {
+
+      System.out.println(UI.timeStamp() + " onPhoto_Resize: " + _photoImageBounds);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+      if (_relTrimArea_Start == null || _relTrimArea_End == null) {
+
+         return;
+      }
+
+      /*
+       * Create absolute positions from relative positions
+       */
+      final float relTrimStartX = _relTrimArea_Start.x;
+      final float relTrimStartY = _relTrimArea_Start.y;
+
+      final float relTrimEndX = _relTrimArea_End.x;
+      final float relTrimEndY = _relTrimArea_End.y;
+
+      final int devPhotoX = _photoImageBounds.x;
+      final int devPhotoY = _photoImageBounds.y;
+
+      final float devPhotoWidth = _photoImageBounds.width;
+      final float devPhotoHeight = _photoImageBounds.height;
+
+      final int devTrimStartX = (int) (devPhotoX + relTrimStartX * devPhotoWidth);
+      final int devTrimStartY = (int) (devPhotoY + relTrimStartY * devPhotoHeight);
+
+      final int devTrimEndX = (int) (devPhotoX + relTrimEndX * devPhotoWidth);
+      final int devTrimEndY = (int) (devPhotoY + relTrimEndY * devPhotoHeight);
+
+      _devTrimArea_Start = new Point(devTrimStartX, devTrimStartY);
+      _devTrimArea_End = new Point(devTrimEndX, devTrimEndY);
    }
 
    @Override
@@ -720,20 +989,20 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private void onResize_AutoResize(final Point tooltipSize) {
 
-      final Point imageSize = _photoImageCanvas.getResizedImageSize();
+      final Rectangle imageBounds = _photoImageCanvas.getImageBounds();
 
-      if (imageSize == null) {
+      if (imageBounds == null) {
          return;
       }
 
       final int tooltipWidth = tooltipSize.x;
       final int tooltipHeight = tooltipSize.y;
 
-      final int photoWidth = imageSize.x;
-      final int photoHeight = imageSize.y;
+      final int photoWidth = imageBounds.width;
+      final int photoHeight = imageBounds.height;
 
-      final Rectangle imageCanvasBounds = _photoImageCanvas.getBounds();
-      final int imageCanvasHeight = imageCanvasBounds.height;
+      final Rectangle canvasBounds = _photoImageCanvas.getBounds();
+      final int canvasHeight = canvasBounds.height;
 
       final Point optionsSize = _containerPhotoOptions.getSize();
 
@@ -741,7 +1010,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       final int optionsHeight = optionsSize.y;
 
       final int contentWidth = optionsWidth;
-      final int contentHeight = optionsHeight + imageCanvasHeight;
+      final int contentHeight = optionsHeight + canvasHeight;
 
       final int trimWidth = tooltipWidth - contentWidth;
       final int trimHeight = tooltipHeight - contentHeight;
@@ -790,10 +1059,18 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private void restoreState() {
 
-      _isTooltipExpanded = Util.getStateBoolean(_state, STATE_IS_TOOLTIP_EXPANDED, false);
+// SET_FORMATTING_OFF
 
-      _comboTooltipSize.select(Util.getStateInt(_state, STATE_TOOLTIP_SIZE_INDEX, 0));
+      final int tooltipSizeIndex = Util.getStateInt(_state, STATE_TOOLTIP_SIZE_INDEX, 0);
+      _isTooltipExpanded         = Util.getStateBoolean(_state, STATE_IS_TOOLTIP_EXPANDED, false);
+      _isTrimPhoto               = Util.getStateBoolean(_state, STATE_IS_TRIM_PHOTO, false);
 
+// SET_FORMATTING_ON
+
+      _chkTrimPhoto.setSelection(_isTrimPhoto);
+      _comboTooltipSize.select(tooltipSizeIndex);
+
+      setupPhotoCanvasListener();
       setTooltipSize();
    }
 
@@ -801,6 +1078,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
    protected void saveState() {
 
       _state.put(STATE_IS_TOOLTIP_EXPANDED, _isTooltipExpanded);
+      _state.put(STATE_IS_TRIM_PHOTO, _isTrimPhoto);
 
       super.saveState();
    }
@@ -875,6 +1153,28 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       showShell();
 
       updateUI_SetUIPage(hoveredMapPoint);
+   }
+
+   private void setupPhotoCanvasListener() {
+
+      if (_isTrimPhoto) {
+
+         _photoImageCanvas.addMouseMoveListener(_photoMouseMoveListener);
+         _photoImageCanvas.addMouseListener(_photoMouseDownListener);
+         _photoImageCanvas.addMouseListener(_photoMouseUpListener);
+         _photoImageCanvas.addMouseTrackListener(_photoMouseExitListener);
+
+         _photoImageCanvas.addControlListener(_photoResizeListener);
+
+      } else {
+
+         _photoImageCanvas.removeMouseMoveListener(_photoMouseMoveListener);
+         _photoImageCanvas.removeMouseListener(_photoMouseDownListener);
+         _photoImageCanvas.removeMouseListener(_photoMouseUpListener);
+         _photoImageCanvas.removeMouseTrackListener(_photoMouseExitListener);
+
+         _photoImageCanvas.removeControlListener(_photoResizeListener);
+      }
    }
 
    private void updateUI_ExpandedCollapsed_Action() {
