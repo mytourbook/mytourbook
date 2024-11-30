@@ -135,6 +135,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    /** Photo position and size of the photo image within the photo canvas */
    private Rectangle             _photoImageBounds;
+   private Rectangle             _photoImageBounds_OnResize;
    private Point                 _devTrimArea_Start;
    private Point                 _devTrimArea_End;
    private Point2D.Float         _relTrimArea_Start;
@@ -825,12 +826,15 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       // keep photo image position after the photo is painted in the parent class
       _photoImageBounds = _photoImageCanvas.getImageBounds();
 
-      System.out.println(UI.timeStamp() + " onPhoto_Paint:  " + _photoImageBounds);
-// TODO remove SYSTEM.OUT.PRINTLN
-
       if (_devTrimArea_Start == null || _devTrimArea_End == null) {
 
          return;
+      }
+
+      // fix bounds when window was resized
+      if (_photoImageBounds.equals(_photoImageBounds_OnResize) == false) {
+
+         setTrimArea(_photoImageBounds);
       }
 
       final GC gc = mouseEvent.gc;
@@ -881,37 +885,14 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private void onPhoto_Resize(final ControlEvent event) {
 
-      System.out.println(UI.timeStamp() + " onPhoto_Resize: " + _photoImageBounds);
-// TODO remove SYSTEM.OUT.PRINTLN
-
       if (_relTrimArea_Start == null || _relTrimArea_End == null) {
 
          return;
       }
 
-      /*
-       * Create absolute positions from relative positions
-       */
-      final float relTrimStartX = _relTrimArea_Start.x;
-      final float relTrimStartY = _relTrimArea_Start.y;
+      _photoImageBounds_OnResize = _photoImageBounds;
 
-      final float relTrimEndX = _relTrimArea_End.x;
-      final float relTrimEndY = _relTrimArea_End.y;
-
-      final int devPhotoX = _photoImageBounds.x;
-      final int devPhotoY = _photoImageBounds.y;
-
-      final float devPhotoWidth = _photoImageBounds.width;
-      final float devPhotoHeight = _photoImageBounds.height;
-
-      final int devTrimStartX = (int) (devPhotoX + relTrimStartX * devPhotoWidth);
-      final int devTrimStartY = (int) (devPhotoY + relTrimStartY * devPhotoHeight);
-
-      final int devTrimEndX = (int) (devPhotoX + relTrimEndX * devPhotoWidth);
-      final int devTrimEndY = (int) (devPhotoY + relTrimEndY * devPhotoHeight);
-
-      _devTrimArea_Start = new Point(devTrimStartX, devTrimStartY);
-      _devTrimArea_End = new Point(devTrimEndX, devTrimEndY);
+      setTrimArea(_photoImageBounds_OnResize);
    }
 
    @Override
@@ -1107,6 +1088,35 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       case 3 -> _selectedTooltipSize = Util.getStateIntArray(_state, STATE_TOOLTIP_SIZE_LARGE, STATE_TOOLTIP_SIZE_LARGE_DEFAULT);
 
       }
+   }
+
+   /**
+    * Create absolute positions from relative positions
+    *
+    * @param photoImageBounds
+    */
+   private void setTrimArea(final Rectangle photoImageBounds) {
+
+      final float relTrimStartX = _relTrimArea_Start.x;
+      final float relTrimStartY = _relTrimArea_Start.y;
+
+      final float relTrimEndX = _relTrimArea_End.x;
+      final float relTrimEndY = _relTrimArea_End.y;
+
+      final int devPhotoX = photoImageBounds.x;
+      final int devPhotoY = photoImageBounds.y;
+
+      final float devPhotoWidth = photoImageBounds.width;
+      final float devPhotoHeight = photoImageBounds.height;
+
+      final int devTrimStartX = (int) (devPhotoX + relTrimStartX * devPhotoWidth);
+      final int devTrimStartY = (int) (devPhotoY + relTrimStartY * devPhotoHeight);
+
+      final int devTrimEndX = (int) (devPhotoX + relTrimEndX * devPhotoWidth);
+      final int devTrimEndY = (int) (devPhotoY + relTrimEndY * devPhotoHeight);
+
+      _devTrimArea_Start = new Point(devTrimStartX, devTrimStartY);
+      _devTrimArea_End = new Point(devTrimEndX, devTrimEndY);
    }
 
    public void setupPhoto(final PaintedMapPoint hoveredMapPoint) {
