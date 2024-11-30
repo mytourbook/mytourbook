@@ -21,6 +21,8 @@ import de.byteholder.geoclipse.map.PaintedMapPoint;
 import java.awt.geom.Point2D;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
+import java.util.Collection;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -34,6 +36,8 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ImageCanvas;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
@@ -41,6 +45,8 @@ import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
+import net.tourbook.photo.TourPhotoReference;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -382,7 +388,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
             _chkTrimPhoto = new Button(_containerPhotoOptions, SWT.CHECK);
             _chkTrimPhoto.setText("&Trim photo image");
             _chkTrimPhoto.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyTrimPhoto()));
-            GridDataFactory.fillDefaults().applyTo(_chkTrimPhoto);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_chkTrimPhoto);
 
          }
          {
@@ -732,6 +738,8 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       _isTrimPhoto = _chkTrimPhoto.getSelection();
 
       setupPhotoCanvasListener();
+
+      _photoImageCanvas.redraw();
    }
 
    private void onPhoto_Mouse_Exit() {
@@ -740,6 +748,10 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
    }
 
    private void onPhoto_Mouse_Move(final MouseEvent mouseEvent) {
+
+      if (_photoImageBounds == null) {
+         return;
+      }
 
       final int devMouseX = mouseEvent.x;
       final int devMouseY = mouseEvent.y;
@@ -811,17 +823,44 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       final Point devMousePosition = new Point(devMouseX, devMouseY);
 
-      final boolean isMouseWithinPhoto = _photoImageBounds.contains(devMousePosition);
-
       _isMouseDown = false;
 
       _devTrimArea_End = devMousePosition;
       _relTrimArea_End = getRelativeMousePhotoPosition(devMouseX, devMouseY);
 
+      /*
+       * Set trim area into the tour photo
+       */
+      final Collection<TourPhotoReference> allPhotoRefs = _photo.getTourPhotoReferences().values();
+
+      PhotoRefs: for (final TourPhotoReference photoRef : allPhotoRefs) {
+
+         final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
+         final Set<TourPhoto> tourPhotos = tourData.getTourPhotos();
+
+         for (final TourPhoto tourPhoto : tourPhotos) {
+
+            if (tourPhoto.getPhotoId() == photoRef.photoId) {
+
+               tourPhoto.trimAreaX1 = _relTrimArea_Start.x;
+               tourPhoto.trimAreaY1 = _relTrimArea_Start.y;
+
+               tourPhoto.trimAreaX2 = _relTrimArea_End.x;
+               tourPhoto.trimAreaY2 = _relTrimArea_End.y;
+
+               break PhotoRefs;
+            }
+         }
+      }
+
       _photoImageCanvas.redraw();
    }
 
    private void onPhoto_Paint(final PaintEvent mouseEvent) {
+
+      if (_isTrimPhoto == false) {
+         return;
+      }
 
       // keep photo image position after the photo is painted in the parent class
       _photoImageBounds = _photoImageCanvas.getImageBounds();
@@ -838,8 +877,6 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       }
 
       final GC gc = mouseEvent.gc;
-
-      gc.setForeground(UI.SYS_COLOR_YELLOW);
 
       final int devXStart = _devTrimArea_Start.x;
       final int devYStart = _devTrimArea_Start.y;
@@ -874,6 +911,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          devHeight = devYStart - devYEnd;
       }
 
+      gc.setForeground(UI.SYS_COLOR_BLACK);
       gc.drawRectangle(
 
             devXTopLeft,
@@ -881,6 +919,15 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
             devWidth,
             devHeight);
+
+      gc.setForeground(UI.SYS_COLOR_WHITE);
+      gc.drawRectangle(
+
+            devXTopLeft - 1,
+            devYTopLeft - 1,
+
+            devWidth + 2,
+            devHeight + 2);
    }
 
    private void onPhoto_Resize(final ControlEvent event) {
@@ -1097,6 +1144,13 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
     */
    private void setTrimArea(final Rectangle photoImageBounds) {
 
+      if (photoImageBounds == null
+            || _relTrimArea_Start == null
+            || _relTrimArea_End == null) {
+
+         return;
+      }
+
       final float relTrimStartX = _relTrimArea_Start.x;
       final float relTrimStartY = _relTrimArea_Start.y;
 
@@ -1264,6 +1318,44 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
                adjustedTime_Tour_WithZone.format(TimeTools.Formatter_DateTime_M));
 
          updateTitleText(photoDateTime);
+      }
+
+      /*
+       * Get trim area from tour photo
+       */
+
+      _devTrimArea_Start = null;
+      _devTrimArea_End = null;
+      _relTrimArea_Start = null;
+      _relTrimArea_End = null;
+
+      final Collection<TourPhotoReference> allPhotoRefs = _photo.getTourPhotoReferences().values();
+
+      PhotoRefs: for (final TourPhotoReference photoRef : allPhotoRefs) {
+
+         final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
+         final Set<TourPhoto> tourPhotos = tourData.getTourPhotos();
+
+         for (final TourPhoto tourPhoto : tourPhotos) {
+
+            if (tourPhoto.getPhotoId() == photoRef.photoId) {
+
+               final float trimAreaX1 = tourPhoto.trimAreaX1;
+               final float trimAreaY1 = tourPhoto.trimAreaY1;
+               final float trimAreaX2 = tourPhoto.trimAreaX2;
+               final float trimAreaY2 = tourPhoto.trimAreaY2;
+
+               if (trimAreaX1 != 0 || trimAreaY1 != 0 || trimAreaX2 != 0 || trimAreaY2 != 0) {
+
+                  _relTrimArea_Start = new Point2D.Float(trimAreaX1, trimAreaY1);
+                  _relTrimArea_End = new Point2D.Float(trimAreaX2, trimAreaY2);
+               }
+
+               setTrimArea(_photoImageBounds);
+
+               break PhotoRefs;
+            }
+         }
       }
 
       final Image photoImage = getPhotoImage(_photo);
