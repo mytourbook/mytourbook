@@ -1063,12 +1063,40 @@ public class PhotoImageLoader {
          }
       }
 
+      int originalImageWidth = awtOriginalImage.getWidth();
+      int originalImageHeight = awtOriginalImage.getHeight();
+
+      /*
+       * Crop image
+       */
+      final float trimAreaX1 = _photo.cropAreaX1;
+      final float trimAreaY1 = _photo.cropAreaY1;
+      final float trimAreaX2 = _photo.cropAreaX2;
+      final float trimAreaY2 = _photo.cropAreaY2;
+
+      if (trimAreaX1 != 0 || trimAreaY1 != 0 || trimAreaX2 != 0 || trimAreaY2 != 0) {
+
+         final int cropX1 = (int) (originalImageWidth * trimAreaX1);
+         final int cropY1 = (int) (originalImageHeight * trimAreaY1);
+         final int cropX2 = (int) (originalImageWidth * trimAreaX2);
+         final int cropY2 = (int) (originalImageHeight * trimAreaY2);
+
+         final int cropWidth = cropX2 - cropX1;
+         final int cropHeight = cropY2 - cropY1;
+
+         final BufferedImage croppedImage = Scalr.crop(awtOriginalImage, cropX1, cropY1, cropWidth, cropHeight);
+
+         awtOriginalImage.flush();
+
+         awtOriginalImage = croppedImage;
+
+         originalImageWidth = awtOriginalImage.getWidth();
+         originalImageHeight = awtOriginalImage.getHeight();
+      }
+
       /*
        * Create HQ thumb image from original image
        */
-
-      final int originalImageWidth = awtOriginalImage.getWidth();
-      final int originalImageHeight = awtOriginalImage.getHeight();
 
       // update dimension
       updatePhotoImageSize(originalImageWidth, originalImageHeight, true);

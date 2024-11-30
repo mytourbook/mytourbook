@@ -21,8 +21,6 @@ import de.byteholder.geoclipse.map.PaintedMapPoint;
 import java.awt.geom.Point2D;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
-import java.util.Collection;
-import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -36,8 +34,6 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ImageCanvas;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourPhoto;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
@@ -45,8 +41,6 @@ import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
-import net.tourbook.photo.TourPhotoReference;
-import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -737,6 +731,17 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       _isTrimPhoto = _chkTrimPhoto.getSelection();
 
+      if (_isTrimPhoto == false) {
+
+         // reset cropping
+
+         _photo.cropAreaX1 = 0;
+         _photo.cropAreaY1 = 0;
+
+         _photo.cropAreaX2 = 0;
+         _photo.cropAreaY2 = 0;
+      }
+
       setupPhotoCanvasListener();
 
       _photoImageCanvas.redraw();
@@ -831,27 +836,11 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       /*
        * Set trim area into the tour photo
        */
-      final Collection<TourPhotoReference> allPhotoRefs = _photo.getTourPhotoReferences().values();
+      _photo.cropAreaX1 = _relTrimArea_Start.x;
+      _photo.cropAreaY1 = _relTrimArea_Start.y;
 
-      PhotoRefs: for (final TourPhotoReference photoRef : allPhotoRefs) {
-
-         final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
-         final Set<TourPhoto> tourPhotos = tourData.getTourPhotos();
-
-         for (final TourPhoto tourPhoto : tourPhotos) {
-
-            if (tourPhoto.getPhotoId() == photoRef.photoId) {
-
-               tourPhoto.trimAreaX1 = _relTrimArea_Start.x;
-               tourPhoto.trimAreaY1 = _relTrimArea_Start.y;
-
-               tourPhoto.trimAreaX2 = _relTrimArea_End.x;
-               tourPhoto.trimAreaY2 = _relTrimArea_End.y;
-
-               break PhotoRefs;
-            }
-         }
-      }
+      _photo.cropAreaX2 = _relTrimArea_End.x;
+      _photo.cropAreaY2 = _relTrimArea_End.y;
 
       _photoImageCanvas.redraw();
    }
@@ -1329,34 +1318,18 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       _relTrimArea_Start = null;
       _relTrimArea_End = null;
 
-      final Collection<TourPhotoReference> allPhotoRefs = _photo.getTourPhotoReferences().values();
+      final float trimAreaX1 = _photo.cropAreaX1;
+      final float trimAreaY1 = _photo.cropAreaY1;
+      final float trimAreaX2 = _photo.cropAreaX2;
+      final float trimAreaY2 = _photo.cropAreaY2;
 
-      PhotoRefs: for (final TourPhotoReference photoRef : allPhotoRefs) {
+      if (trimAreaX1 != 0 || trimAreaY1 != 0 || trimAreaX2 != 0 || trimAreaY2 != 0) {
 
-         final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
-         final Set<TourPhoto> tourPhotos = tourData.getTourPhotos();
-
-         for (final TourPhoto tourPhoto : tourPhotos) {
-
-            if (tourPhoto.getPhotoId() == photoRef.photoId) {
-
-               final float trimAreaX1 = tourPhoto.trimAreaX1;
-               final float trimAreaY1 = tourPhoto.trimAreaY1;
-               final float trimAreaX2 = tourPhoto.trimAreaX2;
-               final float trimAreaY2 = tourPhoto.trimAreaY2;
-
-               if (trimAreaX1 != 0 || trimAreaY1 != 0 || trimAreaX2 != 0 || trimAreaY2 != 0) {
-
-                  _relTrimArea_Start = new Point2D.Float(trimAreaX1, trimAreaY1);
-                  _relTrimArea_End = new Point2D.Float(trimAreaX2, trimAreaY2);
-               }
-
-               setTrimArea(_photoImageBounds);
-
-               break PhotoRefs;
-            }
-         }
+         _relTrimArea_Start = new Point2D.Float(trimAreaX1, trimAreaY1);
+         _relTrimArea_End = new Point2D.Float(trimAreaX2, trimAreaY2);
       }
+
+      setTrimArea(_photoImageBounds);
 
       final Image photoImage = getPhotoImage(_photo);
 

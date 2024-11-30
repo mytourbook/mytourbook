@@ -311,6 +311,11 @@ public class Photo implements Serializable {
     */
    private long                                    _photoLinkTourId;
 
+   public float                                    cropAreaX1;
+   public float                                    cropAreaY1;
+   public float                                    cropAreaX2;
+   public float                                    cropAreaY2;
+
    /**
     */
    public Photo(final File photoImageFile) {

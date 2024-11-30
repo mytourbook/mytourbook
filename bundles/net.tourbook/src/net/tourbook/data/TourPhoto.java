@@ -125,14 +125,14 @@ public class TourPhoto implements Serializable {
    @Transient
    private long                       _createId           = 0;
 
-   @Transient
-   public float                       trimAreaX1;
-   @Transient
-   public float                       trimAreaY1;
-   @Transient
-   public float                       trimAreaX2;
-   @Transient
-   public float                       trimAreaY2;
+//   @Transient
+//   public float                       trimAreaX1;
+//   @Transient
+//   public float                       trimAreaY1;
+//   @Transient
+//   public float                       trimAreaX2;
+//   @Transient
+//   public float                       trimAreaY2;
 
    // constructor is required for hibernate
    public TourPhoto() {}
