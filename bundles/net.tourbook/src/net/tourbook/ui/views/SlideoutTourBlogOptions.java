@@ -24,6 +24,7 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
+import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
@@ -263,7 +264,7 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
 
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText("&Font");
+            label.setText(Messages.Slideout_TourBlogOptions_Label_Font);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
 
             _comboFonts = new Combo(container, SWT.READ_ONLY);
@@ -315,7 +316,7 @@ class SlideoutTourBlogOptions extends ToolbarSlideout implements IActionResetToD
       final Set<String> allFontNames = new HashSet<>();
 
       for (final FontData fontData : allFixedFonts) {
-         allFontNames.add(fontData.getName() + " (fixed)");
+         allFontNames.add(fontData.getName() + UI.SPACE + Messages.Slideout_TourBlogOptions_Info_FontFixed);
       }
 
       for (final FontData fontData : allScalabelFonts) {

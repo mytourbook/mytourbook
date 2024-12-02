@@ -21,7 +21,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.data.TourType;
-import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageTourType_Groups;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
 
@@ -121,7 +121,7 @@ class CollateTourContributionItem extends ControlContribution {
 
       _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
             Messages.Action_TourType_ModifyTourTypeFilter,
-            ITourbookPreferences.PREF_PAGE_TOUR_TYPE_FILTER);
+            PrefPageTourType_Groups.ID);
 
       _actionOpenTourTypePrefs.setShell(_collatedToursView.getShell());
    }

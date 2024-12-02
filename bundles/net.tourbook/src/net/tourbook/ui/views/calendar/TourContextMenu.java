@@ -23,6 +23,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.extension.upload.ActionUpload;
+import net.tourbook.preferences.ViewContext;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -39,6 +40,7 @@ import net.tourbook.ui.action.ActionSetElevationValuesFromSRTM;
 import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
+import net.tourbook.ui.views.ViewNames;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 
 import org.eclipse.jface.action.Action;
@@ -284,7 +286,7 @@ public class TourContextMenu {
       TourActionManager.fillContextMenu_CustomizeAction(menuMgr)
 
             // set pref page custom data that actions from this view can be identified
-            .setPrefData(CONTEXT_ID);
+            .setPrefData(new ViewContext(CONTEXT_ID, ViewNames.VIEW_NAME_CALENDAR));
 
       enableActions(tourProvider);
    }

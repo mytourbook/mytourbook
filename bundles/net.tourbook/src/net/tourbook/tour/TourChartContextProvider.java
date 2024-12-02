@@ -146,7 +146,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       menuMgr.add(_actionAdjustAltitude);
 
       // tour tag actions
-      _tagMenuMgr.fillTagMenu(menuMgr, false);
+      _tagMenuMgr.fillTagMenu(menuMgr);
 
       // tour type actions
       menuMgr.add(new Separator());

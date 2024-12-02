@@ -68,18 +68,19 @@ public class TourActionManager {
 
    private static final IDialogSettings    _state                               = TourbookPlugin.getState(ID);
 
+   /** Contains all defined actions */
    private static List<TourAction>         _allDefinedActions;
-   private static List<TourAction>         _allSortedActions;
-   private static List<TourAction>         _allVisibleActions;
-   
-   /**
-    * Key is the action class name or in special cases a modified class name
-    */
+
+   /** Key is the action class name or in special cases a modified class name */
    private static Map<String, TourAction>  _allDefinedActionsMap;
+
+   /** Contains all sorted and checked actions */
+   private static List<TourAction>         _allSortedAndCheckedActions;
 
    private static ActionOpenPrefDialog     _actionCustomizeTourActions;
 
-   private static Boolean                  _isCustomizeActions;
+   private static boolean                  _isCustomizeActions;
+   private static boolean                  _isShowOnlyAvailableActions;
 
    /**
     * Contains all tour action ID's from all views, key is the view ID
@@ -120,7 +121,7 @@ public class TourActionManager {
 // SET_FORMATTING_OFF
 
       final TourAction categoryAction_Edit               = new TourAction(
-            "EDIT TOUR",
+            Messages.Tour_Action_Category_EditTour,
             TourActionCategory.EDIT
             );
 
@@ -221,7 +222,7 @@ public class TourActionManager {
 // SET_FORMATTING_OFF
 
       final TourAction categoryAction_Tag             = new TourAction(
-            "TAGS",
+            Messages.Tour_Action_Category_Tags,
             TourActionCategory.TAG);
 
       final TourAction actionSetTags                  = new TourAction(
@@ -243,7 +244,7 @@ public class TourActionManager {
 
       final TourAction actionAddRecentTags            = new TourAction(
             ActionAddRecentTags.class.getName(),
-            "Add Recent Tags",
+            Messages.Action_Tag_AddRecentTgs,
             TourActionCategory.TAG);
 
       final TourAction actionAddTagGroups             = new TourAction(
@@ -253,12 +254,12 @@ public class TourActionManager {
 
       final TourAction actionClipboard_CopyTags       = new TourAction(
             ActionClipboard_CopyTags.class.getName(),
-            "&Copy Tags",
+            Messages.Action_Tag_CopyTags,
             TourActionCategory.TAG);
 
       final TourAction actionClipboard_PasteTags      = new TourAction(
             ActionClipboard_PasteTags.class.getName(),
-            "&Paste Tags",
+            Messages.Action_Tag_PasteTags,
             TourActionCategory.TAG);
 
       final TourAction actionRemoveTourTag            = new TourAction(
@@ -307,7 +308,7 @@ public class TourActionManager {
 // SET_FORMATTING_OFF
 
       final TourAction categoryAction_TourType           = new TourAction(
-            "TOUR TYPES",
+            Messages.Tour_Action_Category_TourTypes,
             TourActionCategory.TOUR_TYPE);
 
       final TourAction actionSetTourType                 = new TourAction(
@@ -318,7 +319,7 @@ public class TourActionManager {
 
       final TourAction actionAddRecentTourTypes          = new TourAction(
             ActionAddRecentTourTypes.class.getName(),
-            "Recent Tour Types",
+            Messages.Action_TourType_AddRecentTourTypes,
             TourActionCategory.TOUR_TYPE);
 
 
@@ -342,7 +343,7 @@ public class TourActionManager {
 // SET_FORMATTING_OFF
 
       final TourAction categoryAction_Export             = new TourAction(
-            "EXPORT TOUR",
+            Messages.Tour_Action_Category_ExportTour,
             TourActionCategory.EXPORT);
 
       final TourAction actionUploadTour                  = new TourAction(
@@ -390,7 +391,7 @@ public class TourActionManager {
 // SET_FORMATTING_OFF
 
       final TourAction categoryAction_Adjust             = new TourAction(
-            "ADJUST TOUR",
+            Messages.Tour_Action_Category_AdjustTour,
             TourActionCategory.ADJUST);
 
       final TourAction actionAdjustTourValues            = new TourAction(
@@ -438,12 +439,14 @@ public class TourActionManager {
       _allDefinedActionsMap.put(ActionDeleteTourMenu            .class.getName(),          actionDeleteTourMenu);
 
 // SET_FORMATTING_ON
-
    }
 
-   private static void createSortedActions(final List<TourAction> allSortedActions) {
+   private static void createSortedAndCheckedActions() {
+
+      _allSortedAndCheckedActions = new ArrayList<>();
 
       final String[] stateAllSortedActions = Util.getStateStringArray(_state, STATE_ALL_SORTED_TOUR_ACTIONS, null);
+      final String[] stateAllCheckedActions = Util.getStateStringArray(_state, STATE_ALL_VISIBLE_TOUR_ACTIONS, null);
 
       if (stateAllSortedActions != null) {
 
@@ -455,40 +458,36 @@ public class TourActionManager {
 
             if (tourAction != null) {
 
-               allSortedActions.add(tourAction);
+               _allSortedAndCheckedActions.add(tourAction);
             }
          }
       }
 
-      // make sure that all available actions are displayed
+      // make sure that all available actions are in the list
       for (final TourAction tourAction : _allDefinedActions) {
 
-         if (allSortedActions.contains(tourAction) == false) {
+         if (_allSortedAndCheckedActions.contains(tourAction) == false) {
 
-            allSortedActions.add(tourAction);
+            _allSortedAndCheckedActions.add(tourAction);
          }
       }
 
-      ensureActionCategoryPositions(allSortedActions);
-   }
+      ensureActionCategoryPositions(_allSortedAndCheckedActions);
 
-   private static void createVisibleActions(final List<TourAction> allVisibleActions) {
+      /*
+       * Check actions
+       */
 
-      final String[] stateAllCheckedActions = Util.getStateStringArray(_state, STATE_ALL_VISIBLE_TOUR_ACTIONS, null);
+      if (stateAllCheckedActions != null) {
 
-      if (stateAllCheckedActions == null) {
-         return;
-      }
+         for (final String actionClassName : stateAllCheckedActions) {
 
-      for (final String actionClassName : stateAllCheckedActions) {
+            final TourAction tourAction = _allDefinedActionsMap.get(actionClassName);
 
-         final TourAction tourAction = _allDefinedActionsMap.get(actionClassName);
+            if (tourAction != null) {
 
-         if (tourAction != null) {
-
-            tourAction.isChecked = true;
-
-            allVisibleActions.add(tourAction);
+               tourAction.isChecked = true;
+            }
          }
       }
    }
@@ -614,6 +613,11 @@ public class TourActionManager {
       return _actionCustomizeTourActions;
    }
 
+   public static Map<String, TourAction> getActionsMap() {
+
+      return _allDefinedActionsMap;
+   }
+
    public static List<TourAction> getActiveActions() {
 
       if (isCustomizeActions()) {
@@ -622,8 +626,21 @@ public class TourActionManager {
 
       } else {
 
-         return getSortedActions();
+         return getAllActions();
       }
+   }
+
+   /**
+    * @return Returns all actions which are defined, they are sorted and checked
+    */
+   public static List<TourAction> getAllActions() {
+
+      if (_allSortedAndCheckedActions == null) {
+
+         createSortedAndCheckedActions();
+      }
+
+      return _allSortedAndCheckedActions;
    }
 
    /**
@@ -641,68 +658,100 @@ public class TourActionManager {
       return _allDefinedActions;
    }
 
-   /**
-    * @return Returns all actions which are defined and sorted
-    */
-   public static List<TourAction> getSortedActions() {
-
-      if (_allSortedActions == null) {
-
-         _allSortedActions = new ArrayList<>();
-
-         createSortedActions(_allSortedActions);
-      }
-
-      return _allSortedActions;
-   }
-
-   /**
-    * @return Returns all actions which should be displayed in the tour context menu
-    */
    public static List<TourAction> getVisibleActions() {
 
-      if (_allVisibleActions == null) {
+      final List<TourAction> allVisibleActions = new ArrayList<>();
 
-         _allVisibleActions = new ArrayList<>();
+      for (final TourAction tourAction : getAllActions()) {
 
-         createVisibleActions(_allVisibleActions);
+         if (tourAction.isChecked) {
+            allVisibleActions.add(tourAction);
+         }
       }
 
-      return _allVisibleActions;
+      return allVisibleActions;
    }
 
    public static boolean isCustomizeActions() {
-
-      if (_isCustomizeActions == null) {
-
-         _isCustomizeActions = Util.getStateBoolean(_state, STATE_IS_CUSTOMIZE_TOUR_ACTIONS, false);
-      }
 
       return _isCustomizeActions;
    }
 
    public static boolean isShowOnlyAvailableActions() {
 
-      return Util.getStateBoolean(_state, STATE_IS_SHOW_ONLY_AVAILABLE_ACTIONS, false);
+      return _isShowOnlyAvailableActions;
+   }
+
+   public static void restoreState() {
+
+      _isShowOnlyAvailableActions = Util.getStateBoolean(_state, STATE_IS_SHOW_ONLY_AVAILABLE_ACTIONS, false);
+      _isCustomizeActions = Util.getStateBoolean(_state, STATE_IS_CUSTOMIZE_TOUR_ACTIONS, false);
    }
 
    public static void saveActions(final boolean isCustomizeActions,
-                                  final boolean isShowOnlyAvailableActions,
-                                  final String[] allSortedActions,
-                                  final String[] allCheckedActions) {
-
-      _state.put(STATE_IS_CUSTOMIZE_TOUR_ACTIONS, isCustomizeActions);
-      _state.put(STATE_IS_SHOW_ONLY_AVAILABLE_ACTIONS, isShowOnlyAvailableActions);
-      _state.put(STATE_ALL_SORTED_TOUR_ACTIONS, allSortedActions);
-      _state.put(STATE_ALL_VISIBLE_TOUR_ACTIONS, allCheckedActions);
+                                  final List<TourAction> allClonedAndSortedActions) {
 
       _isCustomizeActions = isCustomizeActions;
 
-      _allSortedActions.clear();
-      _allVisibleActions.clear();
+      /*
+       * Resort and check actions
+       */
+      _allSortedAndCheckedActions.clear();
 
-      createSortedActions(_allSortedActions);
-      createVisibleActions(_allVisibleActions);
+      for (final TourAction clonedAction : allClonedAndSortedActions) {
+
+         if (clonedAction.isCategory) {
+
+            _allSortedAndCheckedActions.add(clonedAction);
+
+         } else {
+
+            final TourAction tourAction = _allDefinedActionsMap.get(clonedAction.actionClassName);
+
+            tourAction.isChecked = clonedAction.isChecked;
+
+            _allSortedAndCheckedActions.add(tourAction);
+         }
+      }
+   }
+
+   public static void savePrefState(final boolean isShowOnlyAvailableActions) {
+
+      _isShowOnlyAvailableActions = isShowOnlyAvailableActions;
+   }
+
+   public static void saveState() {
+
+      if (_allSortedAndCheckedActions == null) {
+
+         // tour actions are not yet used -> ignore
+
+         return;
+      }
+
+      final String[] stateAllSortedActions = new String[_allSortedAndCheckedActions.size()];
+      final List<String> allCheckedActions = new ArrayList<>();
+
+      for (int tourIndex = 0; tourIndex < _allSortedAndCheckedActions.size(); tourIndex++) {
+
+         final TourAction tourAction = _allSortedAndCheckedActions.get(tourIndex);
+
+         stateAllSortedActions[tourIndex] = tourAction.actionClassName;
+
+         final boolean isChecked = tourAction.isChecked;
+
+         if (isChecked) {
+
+            allCheckedActions.add(tourAction.actionClassName);
+         }
+      }
+
+      final String[] stateAllCheckedActions = allCheckedActions.toArray(new String[allCheckedActions.size()]);
+
+      _state.put(STATE_IS_CUSTOMIZE_TOUR_ACTIONS, _isCustomizeActions);
+      _state.put(STATE_IS_SHOW_ONLY_AVAILABLE_ACTIONS, _isShowOnlyAvailableActions);
+      _state.put(STATE_ALL_SORTED_TOUR_ACTIONS, stateAllSortedActions);
+      _state.put(STATE_ALL_VISIBLE_TOUR_ACTIONS, stateAllCheckedActions);
    }
 
    /**

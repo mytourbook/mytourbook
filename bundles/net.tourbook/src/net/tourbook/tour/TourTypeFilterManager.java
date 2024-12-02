@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,6 +35,7 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageTourType_Groups;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
 
@@ -99,7 +100,7 @@ public class TourTypeFilterManager {
 
       _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
             Messages.Action_TourType_ModifyTourTypeFilter,
-            ITourbookPreferences.PREF_PAGE_TOUR_TYPE_FILTER);
+            PrefPageTourType_Groups.ID);
    }
 
    private static class ActionTTFilter extends Action {

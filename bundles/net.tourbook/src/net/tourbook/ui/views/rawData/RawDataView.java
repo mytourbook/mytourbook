@@ -116,6 +116,7 @@ import net.tourbook.importdata.TourTypeConfig;
 import net.tourbook.photo.ImageUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageImport;
+import net.tourbook.preferences.ViewContext;
 import net.tourbook.tag.TagGroup;
 import net.tourbook.tag.TagGroupManager;
 import net.tourbook.tag.TagMenuManager;
@@ -150,6 +151,7 @@ import net.tourbook.ui.action.TourActionCategory;
 import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.TableViewerTourInfoToolTip;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
+import net.tourbook.ui.views.ViewNames;
 import net.tourbook.web.WEB;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -4423,7 +4425,7 @@ public class RawDataView extends ViewPart implements
       TourActionManager.fillContextMenu_CustomizeAction(menuMgr)
 
             // set pref page custom data that actions from this view can be identified
-            .setPrefData(ID);
+            .setPrefData(new ViewContext(ID, ViewNames.VIEW_NAME_TOUR_IMPORT));
 
       enableActions();
    }

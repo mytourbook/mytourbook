@@ -61,6 +61,7 @@ import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.photo.TourPhotoManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.tourType.TourTypeManager;
+import net.tourbook.ui.action.TourActionManager;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.referenceTour.ElevationCompareManager;
 import net.tourbook.web.WebContentServer;
@@ -464,6 +465,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       TourGeoFilter_Manager.restoreState();
       TourTagFilterManager.restoreState();
       TourLocationManager.restoreState();
+      TourActionManager.restoreState();
    }
 
    @Override
@@ -556,6 +558,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       ModelPlayerManager.saveState();
       SwimStrokeManager.saveState();
       TourLocationManager.saveState();
+      TourActionManager.saveState();
 
       FTSearchManager.closeIndexReaderSuggester();
       WebContentServer.stop();

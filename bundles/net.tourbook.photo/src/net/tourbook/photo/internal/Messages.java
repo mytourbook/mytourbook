@@ -34,6 +34,8 @@ public class Messages extends NLS {
    public static String        FullScreen_ImageViewer_Spinner_ResizeImage_Tooltip_OSX;
    public static String        FullScreenImageViewer_KeyCharacter_ShowPhotoGallery;
 
+   public static String        Photo_Gallery_Action_EnlargeSmallerPhotos;
+   public static String        Photo_Gallery_Action_EnlargeSmallerPhotos_Tooltip;
    public static String        Photo_Gallery_Action_PhotoFilter_GPS;
    public static String        Photo_Gallery_Action_PhotoFilter_GPS_Tooltip;
    public static String        Photo_Gallery_Action_PhotoFilter_NoGPS;

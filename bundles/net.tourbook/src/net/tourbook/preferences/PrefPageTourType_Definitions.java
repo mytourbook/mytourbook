@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -95,9 +95,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 
-public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
+public class PrefPageTourType_Definitions extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
-   private static final String                ID                     = "net.tourbook.preferences.PrefPageTourTypes";               //$NON-NLS-1$
+   public static final String                 ID                     = "net.tourbook.preferences.PrefPageTourType_Definitions";    //$NON-NLS-1$
 
    private static final String                COLOR_UNIQUE_ID_PREFIX = "crId";                                                     //$NON-NLS-1$
 
@@ -263,7 +263,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
             final long typeId = tourType.getTypeId();
 
             // create a unique name for each tour type
-            final Object colorId = typeId == TourDatabase.ENTITY_IS_NOT_SAVED //
+            final Object colorId = typeId == TourDatabase.ENTITY_IS_NOT_SAVED
                   ? COLOR_UNIQUE_ID_PREFIX + tourType.getCreateId()
                   : typeId;
 

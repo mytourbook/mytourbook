@@ -463,13 +463,7 @@ public interface ITourbookPreferences {
    public static final String GEO_COMPARE_REF_TOUR_RGB           = "GEO_COMPARE_REF_TOUR_RGB";           //$NON-NLS-1$
 
    /*
-    * id's for preference pages
-    */
-   public static final String PREF_PAGE_TOUR_TYPE        = "net.tourbook.preferences.PrefPageTourTypeDefinition"; //$NON-NLS-1$
-   public static final String PREF_PAGE_TOUR_TYPE_FILTER = "net.tourbook.preferences.PrefPageTourTypeFilter";     //$NON-NLS-1$
-
-   /*
-    * tour data editor
+    * Tour data editor
     */
    public static final String TOURDATA_EDITOR_CONFIRMATION_REVERT_TOUR = "tourdata.editor.confirmation.revert-tour"; //$NON-NLS-1$
 
