@@ -1,4 +1,4 @@
-package net.tourbook.model.other;
+package net.tourbook.model.extended;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
