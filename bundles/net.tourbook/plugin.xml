@@ -12,6 +12,7 @@
    <extension-point id="fileSystem"                   name="File System"                  schema="schema/fileSystem.exsd"/>
    <extension-point id="cloudUploader"                name="Cloud Uploader"               schema="schema/cloudUploader.exsd"/>
    <extension-point id="cloudDownloader"              name="Cloud Downloader"             schema="schema/cloudDownloader.exsd"/>
+   <extension-point id="map25Model"                   name="2.5D Map Models"              schema="schema/map25Model.exsd"/>
 
    <extension        point="org.eclipse.core.runtime.applications"   id="net.tourbook.appWithoutJRE">
       <application>
@@ -1604,13 +1605,6 @@
       </context>
    </extension>
 
-   <extension  point="net.tourbook.tilefactory">
-      <tilefactory
-            class="net.tourbook.srtm.tilefactory.SRTMMapProvider"
-            name="SRTM Map Provider"/>
-   </extension>
-
-
    <extension   point="org.eclipse.ui.views">
 
       <!-- 1. Tour Directories -->
@@ -2586,6 +2580,19 @@
          class       ="net.tourbook.commands.PropertyTester_IsLinuxOrOSX"
       />
       
+   </extension>
+
+
+   <!--
+   
+      net.tourbook EXTENSIONS
+   
+   -->
+
+   <extension  point="net.tourbook.tilefactory">
+      <tilefactory
+            class="net.tourbook.srtm.tilefactory.SRTMMapProvider"
+            name="SRTM Map Provider"/>
    </extension>
 
 </plugin>
