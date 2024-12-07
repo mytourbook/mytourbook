@@ -19,6 +19,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +51,6 @@ import org.osgi.framework.Version;
 public class MapModelManager {
 
    private static final String            USER_CONFIG_FILE_NAME            = "map-models.xml";                       //$NON-NLS-1$
-   private static final String            DEFAULT_CONFIG_FILE_NAME_PATH    = "/map-models/default-map-models.xml";   //$NON-NLS-1$
 
    /**
     * Version number is not yet used
@@ -239,6 +241,109 @@ public class MapModelManager {
       return xmlFile;
    }
 
+   public static boolean importMapModel(final String xmlConfigFile) {
+
+      if (xmlConfigFile == null) {
+         return false;
+      }
+
+      boolean isImported = false;
+      InputStreamReader reader = null;
+
+      try {
+
+         XMLMemento xmlRoot = null;
+
+         // try to get map models from saved xml file
+         final File inputFile = new File(xmlConfigFile);
+
+         if (inputFile.exists()) {
+
+            try {
+
+               reader = new InputStreamReader(new FileInputStream(inputFile), UI.UTF_8);
+               xmlRoot = XMLMemento.createReadRoot(reader);
+
+            } catch (final Exception e) {
+               // ignore
+            }
+         }
+
+         if (xmlRoot == null) {
+            return false;
+         }
+
+         // get the folder path from the file path
+         final Path xmlConfigPath = Paths.get(xmlConfigFile).getParent();
+
+         // parse xml
+         isImported = importMapModel_10_ParseMapModels(xmlRoot, xmlConfigPath);
+
+      } catch (final Exception e) {
+         StatusUtil.log(e);
+      } finally {
+         Util.close(reader);
+      }
+
+      return isImported;
+   }
+
+   private static boolean importMapModel_10_ParseMapModels(final XMLMemento xmlRoot, final Path xmlConfigPath) {
+
+      boolean returnValue = false;
+
+      for (final IMemento mementoModel : xmlRoot.getChildren()) {
+
+         final XMLMemento xmlModel = (XMLMemento) mementoModel;
+
+         try {
+
+            final String xmlConfigType = xmlModel.getType();
+
+            if (xmlConfigType.equals(TAG_MAP_MODELS)) {
+
+               // <MapModel>
+
+               // the provided path is relative to the configuration file -> create absolute file path
+               final String modelPath = Util.getXmlString(xmlModel, ATTR_FILE_PATH, UI.EMPTY_STRING);
+               final Path modelFile = xmlConfigPath.resolve(modelPath);
+
+               if (Files.exists(modelFile) == false) {
+
+                  StatusUtil.log(new Throwable("Model file %s is not available".formatted(modelFile.toAbsolutePath())));
+
+                  continue;
+               }
+
+               final String modelFilePath = modelFile.toString();
+
+               final MapModel model = new MapModel();
+
+// SET_FORMATTING_OFF
+
+               model.description          = Util.getXmlString( xmlModel,   ATTR_DESCRIPTION,          UI.EMPTY_STRING);
+               model.filepath             = modelFilePath;
+               model.id                   = Util.getXmlString( xmlModel,   ATTR_ID,                   Long.toString(System.nanoTime()));
+               model.name                 = Util.getXmlString( xmlModel,   ATTR_NAME,                 UI.EMPTY_STRING);
+
+               model.forwardAngle         = Util.getXmlInteger(xmlModel,   ATTR_FORWARD_ANGLE,        0);
+               model.headPositionFactor   = Util.getXmlFloat(  xmlModel,   ATTR_HEAD_POSITION_FACTOR, 1f);
+
+// SET_FORMATTING_ON
+
+               _allMapModels.add(model);
+
+               returnValue = true;
+            }
+
+         } catch (final Exception e) {
+            StatusUtil.log(Util.dumpMemento(xmlModel), e);
+         }
+      }
+
+      return returnValue;
+   }
+
    private static void restoreState() {
 
       _allMapModelExtensionPoints = getExtensionPoints();
@@ -358,14 +463,14 @@ public class MapModelManager {
 
 // SET_FORMATTING_OFF
 
-               model.description          = Util.getXmlString(xmlModel,  ATTR_DESCRIPTION,            UI.EMPTY_STRING);
+               model.description          = Util.getXmlString( xmlModel,   ATTR_DESCRIPTION,          UI.EMPTY_STRING);
                model.filepath             = modelFilePath;
-               model.id                   = Util.getXmlString(xmlModel,  ATTR_ID,                     Long.toString(System.nanoTime()));
+               model.id                   = Util.getXmlString( xmlModel,   ATTR_ID,                   Long.toString(System.nanoTime()));
                model.isDefaultModel       = isDefaultModel;
-               model.name                 = Util.getXmlString(xmlModel,  ATTR_NAME,                   UI.EMPTY_STRING);
+               model.name                 = Util.getXmlString( xmlModel,   ATTR_NAME,                 UI.EMPTY_STRING);
 
-               model.forwardAngle         = Util.getXmlInteger(xmlModel, ATTR_FORWARD_ANGLE,          0);
-               model.headPositionFactor   = Util.getXmlFloat(  xmlModel, ATTR_HEAD_POSITION_FACTOR,   1f);
+               model.forwardAngle         = Util.getXmlInteger(xmlModel,   ATTR_FORWARD_ANGLE,        0);
+               model.headPositionFactor   = Util.getXmlFloat(  xmlModel,   ATTR_HEAD_POSITION_FACTOR, 1f);
 
 // SET_FORMATTING_ON
 
