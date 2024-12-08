@@ -55,7 +55,10 @@ New
 Improvements
 ============
 
-* 
+* Tour Database
+  - Display the number of records for each table
+    https://github.com/mytourbook/mytourbook/issues/1435
+
 
 
 Changes
