@@ -116,10 +116,9 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-//   private static final int TOURBOOK_DB_VERSION = 56;
+   private static final int TOURBOOK_DB_VERSION = 56;
 
-   private static final int TOURBOOK_DB_VERSION = 55; // 24.x ??????
-
+//   private static final int TOURBOOK_DB_VERSION = 55; // 24.5
 //   private static final int TOURBOOK_DB_VERSION = 54; // 24.1 fixed db data update bug 47 -> 48
 //   private static final int TOURBOOK_DB_VERSION = 53; // 24.1 added new fields
 //   private static final int TOURBOOK_DB_VERSION = 52; // 24.1
@@ -5140,6 +5139,16 @@ public class TourDatabase {
 
             // version 23 end
 
+            // version 56 start
+
+            + "   cropAreaX1                  FLOAT DEFAULT 0                          " + NL //$NON-NLS-1$
+            + "   cropAreaY1                  FLOAT DEFAULT 0                          " + NL //$NON-NLS-1$
+
+            + "   cropAreaX2                  FLOAT DEFAULT 0                          " + NL //$NON-NLS-1$
+            + "   cropAreaY2                  FLOAT DEFAULT 0                          " + NL //$NON-NLS-1$
+
+            // version 56 end
+
             + ")" //                                                                          //$NON-NLS-1$
       );
 
@@ -6675,15 +6684,15 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_053_To_054(splashManager);
          }
 
-// 54 -> 55 > 24.XX
+         // 54 -> 55    24.5
          if (currentDbVersion == 54) {
             currentDbVersion = _dbDesignVersion_New = updateDb_054_To_055(conn, splashManager);
          }
 
 //// 55 -> 56    24.XX
-//         if (currentDbVersion == 55) {
-//            currentDbVersion = _dbDesignVersion_New = updateDb_055_To_056(conn, splashManager);
-//         }
+         if (currentDbVersion == 55) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_055_To_056(conn, splashManager);
+         }
 
          // update db design version number
          updateVersionNumber_10_AfterDesignUpdate(conn, _dbDesignVersion_New);
@@ -10749,26 +10758,31 @@ public class TourDatabase {
       return newDbVersion;
    }
 
-//   private int updateDb_055_To_056(final Connection conn, final SplashManager splashManager) throws SQLException {
-//
-//      final int newDbVersion = 56;
-//
-//      logDbUpdate_Start(newDbVersion);
-//      updateMonitor(splashManager, newDbVersion);
-//
-//      final Statement stmt = conn.createStatement();
-//      {
-//         // double check if db already exists
-//         if (isTableAvailable(conn, TABLE_TOUR_LOCATION_POINT) == false) {
-//            createTable_TourLocationPoint(stmt);
-//         }
-//      }
-//      stmt.close();
-//
-//      logDbUpdate_End(newDbVersion);
-//
-//      return newDbVersion;
-//   }
+   private int updateDb_055_To_056(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 56;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+// SET_FORMATTING_OFF
+
+         // Add new columns
+         SQL.AddColumn_Float (stmt, TABLE_TOUR_PHOTO, "cropAreaX1",  DEFAULT_0); //$NON-NLS-1$
+         SQL.AddColumn_Float (stmt, TABLE_TOUR_PHOTO, "cropAreaY1",  DEFAULT_0); //$NON-NLS-1$
+         SQL.AddColumn_Float (stmt, TABLE_TOUR_PHOTO, "cropAreaX2",  DEFAULT_0); //$NON-NLS-1$
+         SQL.AddColumn_Float (stmt, TABLE_TOUR_PHOTO, "cropAreaY2",  DEFAULT_0); //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+      }
+      stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
 
    private void updateMonitor(final SplashManager splashManager, final int newDbVersion) {
 

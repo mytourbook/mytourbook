@@ -115,6 +115,12 @@ public class TourPhoto implements Serializable {
 
    private double                     longitude;
 
+   private float                      cropAreaX1;
+   private float                      cropAreaY1;
+
+   private float                      cropAreaX2;
+   private float                      cropAreaY2;
+
    @ManyToOne(optional = false)
    private TourData                   tourData;
 
@@ -124,15 +130,6 @@ public class TourPhoto implements Serializable {
     */
    @Transient
    private long                       _createId           = 0;
-
-//   @Transient
-//   public float                       trimAreaX1;
-//   @Transient
-//   public float                       trimAreaY1;
-//   @Transient
-//   public float                       trimAreaX2;
-//   @Transient
-//   public float                       trimAreaY2;
 
    // constructor is required for hibernate
    public TourPhoto() {}
@@ -217,6 +214,22 @@ public class TourPhoto implements Serializable {
 
    public long getAdjustedTime() {
       return adjustedTime;
+   }
+
+   public float getCropAreaX1() {
+      return cropAreaX1;
+   }
+
+   public float getCropAreaX2() {
+      return cropAreaX2;
+   }
+
+   public float getCropAreaY1() {
+      return cropAreaY1;
+   }
+
+   public float getCropAreaY2() {
+      return cropAreaY2;
    }
 
    /**
@@ -305,6 +318,22 @@ public class TourPhoto implements Serializable {
 
    public void setAdjustedTime(final long adjustedTime) {
       this.adjustedTime = adjustedTime;
+   }
+
+   public void setCropAreaX1(final float cropAreaX1) {
+      this.cropAreaX1 = cropAreaX1;
+   }
+
+   public void setCropAreaX2(final float cropAreaX2) {
+      this.cropAreaX2 = cropAreaX2;
+   }
+
+   public void setCropAreaY1(final float cropAreaY1) {
+      this.cropAreaY1 = cropAreaY1;
+   }
+
+   public void setCropAreaY2(final float cropAreaY2) {
+      this.cropAreaY2 = cropAreaY2;
    }
 
    public void setFilePathName(final String filePathName) {

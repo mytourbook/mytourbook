@@ -19,8 +19,14 @@ import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.PaintedMapPoint;
 
 import java.awt.geom.Point2D;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -34,13 +40,20 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ImageCanvas;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourPhoto;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
+import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.TourPhotoReference;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -84,6 +97,8 @@ import org.eclipse.ui.part.PageBook;
 public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActionResetToDefault {
 
    private static final String          ID                                = "net.tourbook.map2.view.MapPointToolTip_Photo"; //$NON-NLS-1$
+
+   private static final char            NL                                = UI.NEW_LINE;
 
    private static final String          STATE_TOOLTIP_SIZE_INDEX          = "STATE_TOOLTIP_SIZE_INDEX";                     //$NON-NLS-1$
 
@@ -380,8 +395,8 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
              * Trim photo
              */
             _chkTrimPhoto = new Button(_containerPhotoOptions, SWT.CHECK);
-            _chkTrimPhoto.setText("&Trim photo image");
-            _chkTrimPhoto.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyTrimPhoto()));
+            _chkTrimPhoto.setText("&Crop photo image");
+            _chkTrimPhoto.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onCropPhoto()));
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_chkTrimPhoto);
 
          }
@@ -694,6 +709,26 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    }
 
+   private void onCropPhoto() {
+
+      _isTrimPhoto = _chkTrimPhoto.getSelection();
+
+      if (_isTrimPhoto == false) {
+
+         // reset cropping
+
+         _photo.cropAreaX1 = 0;
+         _photo.cropAreaY1 = 0;
+
+         _photo.cropAreaX2 = 0;
+         _photo.cropAreaY2 = 0;
+      }
+
+      setupPhotoCanvasListener();
+
+      _photoImageCanvas.redraw();
+   }
+
    @Override
    protected void onDispose() {
 
@@ -725,26 +760,6 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
             updateUI_SetUIPage(_previousHoveredMapPoint);
          }
       });
-   }
-
-   private void onModifyTrimPhoto() {
-
-      _isTrimPhoto = _chkTrimPhoto.getSelection();
-
-      if (_isTrimPhoto == false) {
-
-         // reset cropping
-
-         _photo.cropAreaX1 = 0;
-         _photo.cropAreaY1 = 0;
-
-         _photo.cropAreaX2 = 0;
-         _photo.cropAreaY2 = 0;
-      }
-
-      setupPhotoCanvasListener();
-
-      _photoImageCanvas.redraw();
    }
 
    private void onPhoto_Mouse_Exit() {
@@ -834,13 +849,15 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       _relTrimArea_End = getRelativeMousePhotoPosition(devMouseX, devMouseY);
 
       /*
-       * Set trim area into the tour photo
+       * Set trim area into the photo/tour photo
        */
       _photo.cropAreaX1 = _relTrimArea_Start.x;
       _photo.cropAreaY1 = _relTrimArea_Start.y;
 
       _photo.cropAreaX2 = _relTrimArea_End.x;
       _photo.cropAreaY2 = _relTrimArea_End.y;
+
+      updateTourPhoto(_photo);
 
       _photoImageCanvas.redraw();
    }
@@ -1227,6 +1244,86 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          _photoImageCanvas.removeMouseTrackListener(_photoMouseExitListener);
 
          _photoImageCanvas.removeControlListener(_photoResizeListener);
+      }
+   }
+
+   private void updateTourPhoto(final Photo photo) {
+
+      final TourManager tourManager = TourManager.getInstance();
+
+      final String sql = UI.EMPTY_STRING
+
+            + "UPDATE " + TourDatabase.TABLE_TOUR_PHOTO + NL //$NON-NLS-1$
+
+            + " SET" + NL //                          //$NON-NLS-1$
+
+            + " cropAreaX1 = ?," + NL //              //$NON-NLS-1$
+            + " cropAreaY1 = ?," + NL //              //$NON-NLS-1$
+
+            + " cropAreaX2 = ?," + NL //              //$NON-NLS-1$
+            + " cropAreaY2 = ?" + NL //               //$NON-NLS-1$
+
+            + " WHERE photoId=?" + NL //              //$NON-NLS-1$
+      ;
+
+      try (final Connection conn = TourDatabase.getInstance().getConnection();
+            final PreparedStatement sqlUpdate = conn.prepareStatement(sql)) {
+
+         final ArrayList<Photo> updatedPhotos = new ArrayList<>();
+
+         final int ratingStars = photo.ratingStars;
+         final Collection<TourPhotoReference> photoRefs = photo.getTourPhotoReferences().values();
+
+         if (photoRefs.size() > 0) {
+
+            for (final TourPhotoReference photoRef : photoRefs) {
+
+               /*
+                * Update db
+                */
+               sqlUpdate.setFloat(1, photo.cropAreaX1);
+               sqlUpdate.setFloat(2, photo.cropAreaY1);
+
+               sqlUpdate.setFloat(3, photo.cropAreaX2);
+               sqlUpdate.setFloat(4, photo.cropAreaY2);
+
+               sqlUpdate.setLong(5, photoRef.photoId);
+
+               sqlUpdate.executeUpdate();
+
+               /*
+                * Update tour photo
+                */
+               final TourData tourData = tourManager.getTourData(photoRef.tourId);
+               final Set<TourPhoto> allTourPhotos = tourData.getTourPhotos();
+
+               for (final TourPhoto tourPhoto : allTourPhotos) {
+
+                  if (tourPhoto.getPhotoId() == photoRef.photoId) {
+
+                     tourPhoto.setCropAreaX1(photo.cropAreaX1);
+                     tourPhoto.setCropAreaY1(photo.cropAreaY1);
+
+                     tourPhoto.setCropAreaX2(photo.cropAreaX2);
+                     tourPhoto.setCropAreaY2(photo.cropAreaY2);
+
+                     break;
+                  }
+               }
+            }
+
+            updatedPhotos.add(photo);
+         }
+
+         if (updatedPhotos.size() > 0) {
+
+            // fire notification to update all galleries with the modified crop size
+
+            PhotoManager.firePhotoEvent(null, PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED, updatedPhotos);
+         }
+
+      } catch (final SQLException e) {
+         net.tourbook.ui.UI.showSQLException(e);
       }
    }
 

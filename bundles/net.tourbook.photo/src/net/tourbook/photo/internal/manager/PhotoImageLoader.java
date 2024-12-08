@@ -1069,17 +1069,17 @@ public class PhotoImageLoader {
       /*
        * Crop image
        */
-      final float trimAreaX1 = _photo.cropAreaX1;
-      final float trimAreaY1 = _photo.cropAreaY1;
-      final float trimAreaX2 = _photo.cropAreaX2;
-      final float trimAreaY2 = _photo.cropAreaY2;
+      final float cropAreaX1 = _photo.cropAreaX1;
+      final float cropAreaY1 = _photo.cropAreaY1;
+      final float cropAreaX2 = _photo.cropAreaX2;
+      final float cropAreaY2 = _photo.cropAreaY2;
 
-      if (trimAreaX1 != 0 || trimAreaY1 != 0 || trimAreaX2 != 0 || trimAreaY2 != 0) {
+      if (cropAreaX1 != 0 || cropAreaY1 != 0 || cropAreaX2 != 0 || cropAreaY2 != 0) {
 
-         final int cropX1 = (int) (originalImageWidth * trimAreaX1);
-         final int cropY1 = (int) (originalImageHeight * trimAreaY1);
-         final int cropX2 = (int) (originalImageWidth * trimAreaX2);
-         final int cropY2 = (int) (originalImageHeight * trimAreaY2);
+         final int cropX1 = (int) (originalImageWidth * cropAreaX1);
+         final int cropY1 = (int) (originalImageHeight * cropAreaY1);
+         final int cropX2 = (int) (originalImageWidth * cropAreaX2);
+         final int cropY2 = (int) (originalImageHeight * cropAreaY2);
 
          final int cropWidth = cropX2 - cropX1;
          final int cropHeight = cropY2 - cropY1;
