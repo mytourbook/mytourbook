@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -87,6 +88,7 @@ public class DialogCompressDatabase extends Dialog {
 
    private Shell                        _dialogShell;
 
+   private List<Integer>                _allNumberOfRecords;
    private List<String>                 _allTableNames;
    private List<String>                 _allConglomerateNames;
 
@@ -203,7 +205,9 @@ public class DialogCompressDatabase extends Dialog {
                                              final LongArrayList allAllocatedPages,
                                              final LongArrayList allFreePages,
                                              final LongArrayList allUnfilledPages,
-                                             final LongArrayList allPageSize) {
+                                             final LongArrayList allPageSize,
+                                             final List<Integer> allNumberOfRows) {
+
       // get width of the largest table/index name
       int maxWidth_Name = 0;
       for (final String name : allNames) {
@@ -225,6 +229,7 @@ public class DialogCompressDatabase extends Dialog {
                + UI.SPACE                          // empty column
 
                + "%-"   + maxWidth_Name      + "s" // CONGLOMERATENAME     //$NON-NLS-1$ //$NON-NLS-2$
+               + "  %"  + maxValueWidth      + "s" // NUM_ROWS             //$NON-NLS-1$ //$NON-NLS-2$
                + "  %"  + maxWidth_Used      + "s" // USEDSPACE            //$NON-NLS-1$ //$NON-NLS-2$
                + "  %"  + maxWidth_NotUsed   + "s" // ESTIMSPACESAVING     //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -239,25 +244,33 @@ public class DialogCompressDatabase extends Dialog {
 
   // SET_FORMATTING_ON
 
-//   ISINDEX|CONGLOMERATENAME               |USEDSPACE|ESTIMSPACESAVING|NUMALLOCATEDPAGES|NUMFREEPAGES|NUMUNFILLEDPAGES|PAGESIZE|
-//   -------|-------------------------------|---------|----------------|-----------------|------------|----------------|--------|
-//         0|DBVERSION                      |     4096|               0|                1|           0|               0|    4096|
-//         0|TOURBIKE                       |     4096|               0|                1|           0|               0|    4096|
-//         0|TOURCOMPARED                   |   491520|               0|              120|           0|               0|    4096|
-//         0|TOURDATA                       |667615232|        99418112|            17340|        3034|            2089|   32768|
-//         0|TOURDATA_TOURTAG               |   376832|               0|               92|           0|               0|    4096|
-//         0|TOURGEOPARTS                   |  7966720|               0|             1945|           0|               1|    4096|
-//         0|TOURMARKER                     |  3649536|               0|              891|           0|               1|    4096|
-//         0|TOURPERSON                     |    16384|               0|                4|           0|               0|    4096|
-//         0|TOURPERSONHRZONE               |    32768|               0|                1|           0|               1|   32768|
-//         0|TOURPHOTO                      |  2424832|               0|              592|           0|               0|    4096|
-//         0|TOURREFERENCE                  |   102400|           77824|                6|          19|               1|    4096|
-//         0|TOURTAG                        |    57344|               0|               14|           0|               0|    4096|
-//         0|TOURTAGCATEGORY                |     4096|               0|                1|           0|               1|    4096|
-//         0|TOURTAGCATEGORY_TOURTAG        |     4096|               0|                1|           0|               1|    4096|
-//         0|TOURTAGCATEGORY_TOURTAGCATEGORY|     4096|               0|                1|           0|               1|    4096|
-//         0|TOURTYPE                       |   118784|           40960|               19|          10|               2|    4096|
-//         0|TOURWAYPOINT                   |    32768|               0|                1|           0|               1|   32768|
+
+//                                        Records      Used  Not Used  ALLOCATED    FREE   UNFILLED      PAGE
+//   Table                                            kByte     kByte      PAGES   PAGES      PAGES      SIZE
+//
+//   DBVERSION                                  1         8         0          2       0          1     4,096
+//   DB_VERSION_DATA                            1         8         0          2       0          1     4,096
+//   DEVICESENSOR                              23        64         0          2       0          1    32,768
+//   DEVICESENSORVALUE                      8,229       976         0        244       0          1     4,096
+//   TOURBEVERAGECONTAINER                      0         8         0          2       0          1     4,096
+//   TOURBIKE                                   2         8         0          2       0          1     4,096
+//   TOURCOMPARED                           1,735       252         0         63       0          1     4,096
+//   TOURDATA                               5,166   880,640         0     27,520       0         12    32,768
+//   TOURDATA_TOURTAG                         673        32         0          8       0          1     4,096
+//   TOURGEOPARTS                         276,852     8,796         0      2,199       0          1     4,096
+//   TOURLOCATION                             218       160         0          5       0          1    32,768
+//   TOURMARKER                             8,375     1,788         0        447       0          1     4,096
+//   TOURNUTRITIONPRODUCT                       1        64         0          2       0          1    32,768
+//   TOURPERSON                                 5         8         0          2       0          1     4,096
+//   TOURPERSONHRZONE                           5        64         0          2       0          1    32,768
+//   TOURPHOTO                             11,075     2,500         0        625       0          1     4,096
+//   TOURREFERENCE                             51        12         0          3       0          1     4,096
+//   TOURTAG                                   58         8         0          2       0          1     4,096
+//   TOURTAGCATEGORY                           10         8         0          2       0          1     4,096
+//   TOURTAGCATEGORY_TOURTAG                   49         8         0          2       0          1     4,096
+//   TOURTAGCATEGORY_TOURTAGCATEGORY            0         8         0          2       0          1     4,096
+//   TOURTYPE                                  27         8         0          2       0          1     4,096
+//   TOURWAYPOINT                              15        64         0          2       0          1    32,768
 
       final StringBuilder sb = new StringBuilder();
 
@@ -265,6 +278,9 @@ public class DialogCompressDatabase extends Dialog {
       sb.append(String.format(lineFormat,
 
             UI.EMPTY_STRING,
+
+            "Records",
+
             Messages.App_Db_Compress_LogLabel_Used,
             Messages.App_Db_Compress_LogLabel_NotUsed,
 
@@ -279,6 +295,9 @@ public class DialogCompressDatabase extends Dialog {
       sb.append(String.format(lineFormat,
 
             Messages.App_Db_Compress_LogLabel_Table,
+
+            UI.EMPTY_STRING, // number of records
+
             UI.UNIT_KBYTE,
             UI.UNIT_KBYTE,
 
@@ -302,6 +321,7 @@ public class DialogCompressDatabase extends Dialog {
          final String name = allNames.get(rowIndex);
          final long usedSpace = allUsedSpaces.get(rowIndex);
          final long spaceSavings = allSpaceSavings.get(rowIndex);
+         final Integer numRows = allNumberOfRows == null ? -1 : allNumberOfRows.get(rowIndex);
 
          sumUsedSpaces += usedSpace;
          sumSpaceSavings += spaceSavings;
@@ -325,6 +345,8 @@ public class DialogCompressDatabase extends Dialog {
 
                name,
 
+               numRows == -1 ? UI.EMPTY_STRING : _nf0.format(numRows),
+
                _nf0.format(usedSpace / 1024),
                _nf0.format(spaceSavings / 1024),
 
@@ -346,6 +368,8 @@ public class DialogCompressDatabase extends Dialog {
       sb.append(String.format(lineFormat,
 
             Messages.App_Db_Compress_LogLabel_Totals,
+
+            UI.EMPTY_STRING, // number of records
 
             _nf0.format(sumUsedSpaces / 1024),
             _nf0.format(sumSpaceSavings / 1024),
@@ -507,6 +531,7 @@ public class DialogCompressDatabase extends Dialog {
 
    private String getDatabaseSize(final List<String> allConglomerateNames,
                                   final List<String> allTableNames,
+                                  final List<Integer> allNumberOfRecords,
                                   final LongArrayList allUsedSpaces) {
 
       final String[] returnData = new String[1];
@@ -561,16 +586,21 @@ public class DialogCompressDatabase extends Dialog {
 
                while (result.next()) {
 
-                  final String name = result.getString(1);
+// SET_FORMATTING_OFF
+                  final String name =     result.getString(1);
                   allNames.add(name);
 
-                  allUsedSpaces.add(result.getLong(2));
-                  allSpaceSavings.add(result.getLong(3));
+                  allUsedSpaces.add(      result.getLong(2));
+                  allSpaceSavings.add(    result.getLong(3));
                   final int dbIndexFlag = result.getInt(4);
-                  allAllocatedPages.add(result.getLong(5));
-                  allFreePages.add(result.getLong(6));
-                  allUnfilledPages.add(result.getLong(7));
-                  allPageSize.add(result.getLong(8));
+                  allAllocatedPages.add(  result.getLong(5));
+                  allFreePages.add(       result.getLong(6));
+                  allUnfilledPages.add(   result.getLong(7));
+                  allPageSize.add(        result.getLong(8));
+
+// SET_FORMATTING_ON
+
+                  final boolean isTable = dbIndexFlag != 1;
 
                   // keep state if it is a table or index
                   if (isSetIndexFlag[0]) {
@@ -583,8 +613,36 @@ public class DialogCompressDatabase extends Dialog {
                   }
 
                   // keep table names separately
-                  if (allTableNames != null && dbIndexFlag != 1) {
+                  if (allTableNames != null && isTable) {
                      allTableNames.add(name);
+                  }
+
+                  // get number of record for each table
+                  if (allNumberOfRecords != null) {
+
+                     if (isTable) {
+
+                        try (final PreparedStatement stmtNumRows = conn.prepareStatement("SELECT COUNT(*) FROM " + name);) {
+
+                           final ResultSet resultNumRows = stmtNumRows.executeQuery();
+
+                           if (resultNumRows.next()) {
+
+                              allNumberOfRecords.add(resultNumRows.getInt(1));
+
+                           } else {
+
+                              allNumberOfRecords.add(-1);
+                           }
+
+                        } catch (final SQLException e) {
+                           SQL.showException(e);
+                        }
+
+                     } else {
+
+                        allNumberOfRecords.add(-1);
+                     }
                   }
                }
 
@@ -594,9 +652,11 @@ public class DialogCompressDatabase extends Dialog {
                      allAllocatedPages,
                      allFreePages,
                      allUnfilledPages,
-                     allPageSize);
+                     allPageSize,
+                     allNumberOfRecords);
 
             } catch (final SQLException e) {
+
                SQL.showException(e);
             }
          }
@@ -731,7 +791,7 @@ public class DialogCompressDatabase extends Dialog {
                      _allUsedSpaces_AfterCompress = new LongArrayList();
 
                      appendLogText(Messages.App_Db_Compress_LogHeader_After);
-                     appendLogText(getDatabaseSize(null, null, _allUsedSpaces_AfterCompress));
+                     appendLogText(getDatabaseSize(null, null, _allNumberOfRecords, _allUsedSpaces_AfterCompress));
 
                      appendLogText(Messages.App_Db_Compress_LogHeader_Difference);
                      appendLogText(createLog_DiffSize());
@@ -760,11 +820,16 @@ public class DialogCompressDatabase extends Dialog {
       // setup return values
       _allConglomerateNames = new ArrayList<>();
       _allTableNames = new ArrayList<>();
+      _allNumberOfRecords = new ArrayList<>();
 
       _allUsedSpaces_BeforeCompress = new LongArrayList();
 
       appendLogText(Messages.App_Db_Compress_LogHeader_Before);
-      appendLogText(getDatabaseSize(_allConglomerateNames, _allTableNames, _allUsedSpaces_BeforeCompress));
+      appendLogText(getDatabaseSize(
+            _allConglomerateNames,
+            _allTableNames,
+            _allNumberOfRecords,
+            _allUsedSpaces_BeforeCompress));
 
       // MUST be run async otherwise it has the wrong location
       _dialogShell.getDisplay().asyncExec(() -> {

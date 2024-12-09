@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -29,8 +33,11 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.animation.GLTFModel_Renderer;
-import net.tourbook.model.ModelActivator;
 
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IContributor;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IMemento;
@@ -43,53 +50,53 @@ import org.osgi.framework.Version;
  */
 public class MapModelManager {
 
-   private static final String        USER_CONFIG_FILE_NAME            = "map-models.xml";                       //$NON-NLS-1$
-   private static final String        DEFAULT_CONFIG_FILE_NAME_PATH    = "/map-models/default-map-models.xml";   //$NON-NLS-1$
+   private static final String            USER_CONFIG_FILE_NAME            = "map-models.xml";                       //$NON-NLS-1$
 
    /**
     * Version number is not yet used
     */
-   private static final int           CONFIG_VERSION                   = 1;
+   private static final int               CONFIG_VERSION                   = 1;
 
-   private static final String        TAG_ROOT                         = "MapModels";                            //$NON-NLS-1$
-   private static final String        ATTR_CONFIG_VERSION              = "configVersion";                        //$NON-NLS-1$
+   private static final String            TAG_ROOT                         = "MapModels";                            //$NON-NLS-1$
+   private static final String            ATTR_CONFIG_VERSION              = "configVersion";                        //$NON-NLS-1$
 
-   private static final String        TAG_ALL_MAP_MODELS               = "AllMapModels";                         //$NON-NLS-1$
-   private static final String        TAG_MAP_MODELS                   = "MapModel";                             //$NON-NLS-1$
+   private static final String            TAG_ALL_MAP_MODELS               = "AllMapModels";                         //$NON-NLS-1$
+   private static final String            TAG_MAP_MODELS                   = "MapModel";                             //$NON-NLS-1$
 
-   private static final String        ATTR_DESCRIPTION                 = "description";                          //$NON-NLS-1$
-   private static final String        ATTR_FILE_PATH                   = "filePath";                             //$NON-NLS-1$
-   private static final String        ATTR_FORWARD_ANGLE               = "forwardAngle";                         //$NON-NLS-1$
-   private static final String        ATTR_HEAD_POSITION_FACTOR        = "headPositionFactor";                   //$NON-NLS-1$
-   private static final String        ATTR_ID                          = "id";                                   //$NON-NLS-1$
-   private static final String        ATTR_IS_DEFAULT_MODEL            = "isDefaultModel";                       //$NON-NLS-1$
-   private static final String        ATTR_NAME                        = "name";                                 //$NON-NLS-1$
+   private static final String            ATTR_DESCRIPTION                 = "description";                          //$NON-NLS-1$
+   private static final String            ATTR_FILE_PATH                   = "filePath";                             //$NON-NLS-1$
+   private static final String            ATTR_FORWARD_ANGLE               = "forwardAngle";                         //$NON-NLS-1$
+   private static final String            ATTR_HEAD_POSITION_FACTOR        = "headPositionFactor";                   //$NON-NLS-1$
+   private static final String            ATTR_ID                          = "id";                                   //$NON-NLS-1$
+   private static final String            ATTR_IS_DEFAULT_MODEL            = "isDefaultModel";                       //$NON-NLS-1$
+   private static final String            ATTR_NAME                        = "name";                                 //$NON-NLS-1$
 
-   private static final String        TAG_OPTIONS                      = "Options";                              //$NON-NLS-1$
-   private static final String        ATTR_SELECTED_MODEL_ID           = "selectedModelId";                      //$NON-NLS-1$
+   private static final String            TAG_OPTIONS                      = "Options";                              //$NON-NLS-1$
+   private static final String            ATTR_SELECTED_MODEL_ID           = "selectedModelId";                      //$NON-NLS-1$
 
-   public static final String         MAP_MODEL_FILE_EXTENTION         = "gltf";                                 //$NON-NLS-1$
+   public static final String             MAP_MODEL_FILE_EXTENTION         = "gltf";                                 //$NON-NLS-1$
 
-   private static final String        DEFAULT_MODEL_SKATEBOARD_ID      = "35417da1-d92a-4c33-8d0f-41e2d81d94bd"; //$NON-NLS-1$
-   private static final String        DEFAULT_MODEL_HIGH_WHEELER_ID    = "76f66cbb-d3ca-447a-9874-643c9ec42399"; //$NON-NLS-1$
-   private static final String        DEFAULT_MODEL_PAINTED_BICYCLE_ID = "1af34a28-157d-4a31-8065-3bb94fb81094"; //$NON-NLS-1$
+   private static final String            DEFAULT_MODEL_SKATEBOARD_ID      = "35417da1-d92a-4c33-8d0f-41e2d81d94bd"; //$NON-NLS-1$
+   private static final String            DEFAULT_MODEL_HIGH_WHEELER_ID    = "76f66cbb-d3ca-447a-9874-643c9ec42399"; //$NON-NLS-1$
+   private static final String            DEFAULT_MODEL_PAINTED_BICYCLE_ID = "1af34a28-157d-4a31-8065-3bb94fb81094"; //$NON-NLS-1$
 
    /**
     * Model ID for the skateboard model
     */
-   private static final String        DEFAULT_DEFAULT_MODEL_ID         = DEFAULT_MODEL_SKATEBOARD_ID;
+   private static final String            DEFAULT_DEFAULT_MODEL_ID         = DEFAULT_MODEL_SKATEBOARD_ID;
 
-   private static final Bundle        _bundle                          = TourbookPlugin.getDefault().getBundle();
-   private static final IPath         _stateLocation                   = Platform.getStateLocation(_bundle);
+   private static final Bundle            _bundle                          = TourbookPlugin.getDefault().getBundle();
+   private static final IPath             _stateLocation                   = Platform.getStateLocation(_bundle);
 
    /**
     * Contains all map models which are loaded from a xml file
     */
-   private static ArrayList<MapModel> _allMapModels                    = new ArrayList<>();
+   private static ArrayList<MapModel>     _allMapModels                    = new ArrayList<>();
+   private static List<MapModelExtension> _allMapModelExtensionPoints;
 
-   private static MapModel            _selectedModel;
+   private static MapModel                _selectedModel;
 
-   private static GLTFModel_Renderer  _gltfModelRenderer;
+   private static GLTFModel_Renderer      _gltfModelRenderer;
 
    private static XMLMemento create_Root() {
 
@@ -118,16 +125,20 @@ public class MapModelManager {
 
    /**
     * @param bundleRelativeFilePathname
+    *
     * @return Returns the absolute filepath name for a bundle relative name
     */
-   private static File getAbsoluteFilePath(final String bundleRelativeFilePathname) {
+   private static File getAbsoluteFilePath(final Bundle bundle, final String bundleRelativeFilePathname) {
 
       try {
 
-         final URL bundleUrl = ModelActivator.getDefault().getBundle().getEntry(bundleRelativeFilePathname);
+         final URL bundleUrl = bundle.getEntry(bundleRelativeFilePathname);
 
          if (bundleUrl == null) {
-            throw new Exception("Default map model file is not in bundle: " + bundleRelativeFilePathname); //$NON-NLS-1$
+
+            throw new Exception("Map model config file %s is not in bundle %s".formatted( //$NON-NLS-1$
+                  bundleRelativeFilePathname,
+                  bundle));
          }
 
          final String fileURL = NIO.getAbsolutePathFromBundleUrl(bundleUrl);
@@ -152,15 +163,64 @@ public class MapModelManager {
 
    public static MapModel getDefaultDefaultModel() {
 
-      for (final MapModel mapModel : getAllModels()) {
+      final ArrayList<MapModel> allModels = getAllModels();
+
+      for (final MapModel mapModel : allModels) {
 
          if (mapModel.id.equals(DEFAULT_DEFAULT_MODEL_ID)) {
+
             return mapModel;
          }
       }
 
       // this should not happen
       throw new RuntimeException("The default default model is not available"); //$NON-NLS-1$
+   }
+
+   /**
+    * Reads all {@link TourbookPlugin#EXT_POINT_MAP25_MODEL} extension points
+    */
+   private static List<MapModelExtension> getExtensionPoints() {
+
+      if (_allMapModelExtensionPoints != null) {
+         return _allMapModelExtensionPoints;
+      }
+
+      final List<MapModelExtension> allExtensionPoints = new ArrayList<>();
+
+      final IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(
+            TourbookPlugin.PLUGIN_ID,
+            TourbookPlugin.EXT_POINT_MAP25_MODEL);
+
+      if (extPoint == null) {
+         return allExtensionPoints;
+      }
+
+      for (final IExtension extension : extPoint.getExtensions()) {
+
+         final IContributor extensionContributor = extension.getContributor();
+
+         final String pluginID = extensionContributor.getName();
+         final Bundle modelBundle = Platform.getBundle(pluginID);
+
+         for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
+
+            if (configElement.getName().equalsIgnoreCase("map25Model") == false) { //$NON-NLS-1$
+               continue;
+            }
+
+            final String xmlConfigFile = configElement.getAttribute("xmlConfigFile"); //$NON-NLS-1$
+
+            final MapModelExtension mapModelExtension = new MapModelExtension();
+
+            mapModelExtension.bundle = modelBundle;
+            mapModelExtension.modelConfigFile = getAbsoluteFilePath(modelBundle, xmlConfigFile);
+
+            allExtensionPoints.add(mapModelExtension);
+         }
+      }
+
+      return allExtensionPoints;
    }
 
    public static MapModel getSelectedModel() {
@@ -181,10 +241,119 @@ public class MapModelManager {
       return xmlFile;
    }
 
+   public static boolean importMapModel(final String xmlConfigFile) {
+
+      if (xmlConfigFile == null) {
+         return false;
+      }
+
+      boolean isImported = false;
+      InputStreamReader reader = null;
+
+      try {
+
+         XMLMemento xmlRoot = null;
+
+         // try to get map models from saved xml file
+         final File inputFile = new File(xmlConfigFile);
+
+         if (inputFile.exists()) {
+
+            try {
+
+               reader = new InputStreamReader(new FileInputStream(inputFile), UI.UTF_8);
+               xmlRoot = XMLMemento.createReadRoot(reader);
+
+            } catch (final Exception e) {
+               // ignore
+            }
+         }
+
+         if (xmlRoot == null) {
+            return false;
+         }
+
+         // get the folder path from the file path
+         final Path xmlConfigPath = Paths.get(xmlConfigFile).getParent();
+
+         // parse xml
+         isImported = importMapModel_10_ParseMapModels(xmlRoot, xmlConfigPath);
+
+      } catch (final Exception e) {
+         StatusUtil.log(e);
+      } finally {
+         Util.close(reader);
+      }
+
+      return isImported;
+   }
+
+   private static boolean importMapModel_10_ParseMapModels(final XMLMemento xmlRoot, final Path xmlConfigPath) {
+
+      boolean returnValue = false;
+
+      for (final IMemento mementoModel : xmlRoot.getChildren()) {
+
+         final XMLMemento xmlModel = (XMLMemento) mementoModel;
+
+         try {
+
+            final String xmlConfigType = xmlModel.getType();
+
+            if (xmlConfigType.equals(TAG_MAP_MODELS)) {
+
+               // <MapModel>
+
+               // the provided path is relative to the configuration file -> create absolute file path
+               final String modelPath = Util.getXmlString(xmlModel, ATTR_FILE_PATH, UI.EMPTY_STRING);
+               final Path modelFile = xmlConfigPath.resolve(modelPath);
+
+               if (Files.exists(modelFile) == false) {
+
+                  StatusUtil.log(new Throwable("Model file %s is not available".formatted(modelFile.toAbsolutePath())));
+
+                  continue;
+               }
+
+               final String modelFilePath = modelFile.toString();
+
+               final MapModel model = new MapModel();
+
+// SET_FORMATTING_OFF
+
+               model.description          = Util.getXmlString( xmlModel,   ATTR_DESCRIPTION,          UI.EMPTY_STRING);
+               model.filepath             = modelFilePath;
+               model.id                   = Util.getXmlString( xmlModel,   ATTR_ID,                   Long.toString(System.nanoTime()));
+               model.name                 = Util.getXmlString( xmlModel,   ATTR_NAME,                 UI.EMPTY_STRING);
+
+               model.forwardAngle         = Util.getXmlInteger(xmlModel,   ATTR_FORWARD_ANGLE,        0);
+               model.headPositionFactor   = Util.getXmlFloat(  xmlModel,   ATTR_HEAD_POSITION_FACTOR, 1f);
+
+// SET_FORMATTING_ON
+
+               _allMapModels.add(model);
+
+               returnValue = true;
+            }
+
+         } catch (final Exception e) {
+            StatusUtil.log(Util.dumpMemento(xmlModel), e);
+         }
+      }
+
+      return returnValue;
+   }
+
    private static void restoreState() {
 
-      restoreState_10_ReadXmlFile(getAbsoluteFilePath(DEFAULT_CONFIG_FILE_NAME_PATH));
-      restoreState_10_ReadXmlFile(getUserConfigFile());
+      _allMapModelExtensionPoints = getExtensionPoints();
+
+      for (final MapModelExtension mapModelExtension : _allMapModelExtensionPoints) {
+
+         restoreState_10_ReadXmlFile(mapModelExtension.bundle, mapModelExtension.modelConfigFile);
+      }
+
+      restoreState_10_ReadXmlFile(_bundle, getUserConfigFile());
 
       /*
        * Translate default model names
@@ -210,9 +379,9 @@ public class MapModelManager {
       }
    }
 
-   private static void restoreState_10_ReadXmlFile(final File xmlFile) {
+   private static void restoreState_10_ReadXmlFile(final Bundle bundle, final File xmlConfigFile) {
 
-      if (xmlFile == null) {
+      if (xmlConfigFile == null) {
          return;
       }
 
@@ -223,7 +392,7 @@ public class MapModelManager {
          XMLMemento xmlRoot = null;
 
          // try to get map models from saved xml file
-         final String absoluteFilePath = xmlFile.getAbsolutePath();
+         final String absoluteFilePath = xmlConfigFile.getAbsolutePath();
          final File inputFile = new File(absoluteFilePath);
 
          if (inputFile.exists()) {
@@ -243,7 +412,7 @@ public class MapModelManager {
          }
 
          // parse xml
-         restoreState_50_ParseMapModels(xmlRoot);
+         restoreState_50_ParseMapModels(bundle, xmlRoot);
          restoreState_60_ParseOptions(xmlRoot);
 
       } catch (final Exception e) {
@@ -254,10 +423,11 @@ public class MapModelManager {
    }
 
    /**
+    * @param bundle
     * @param xmlRoot
     *           Can be <code>null</code> when not available
     */
-   private static void restoreState_50_ParseMapModels(final XMLMemento xmlRoot) {
+   private static void restoreState_50_ParseMapModels(final Bundle bundle, final XMLMemento xmlRoot) {
 
       final XMLMemento xmlAllModels = (XMLMemento) xmlRoot.getChild(TAG_ALL_MAP_MODELS);
 
@@ -284,7 +454,7 @@ public class MapModelManager {
 
                   // modelFilePath is relative to the bundle for default models
 
-                  final File defaultFile = getAbsoluteFilePath(modelFilePath);
+                  final File defaultFile = getAbsoluteFilePath(bundle, modelFilePath);
 
                   modelFilePath = defaultFile.getAbsolutePath();
                }
@@ -293,14 +463,14 @@ public class MapModelManager {
 
 // SET_FORMATTING_OFF
 
-               model.description          = Util.getXmlString(xmlModel,  ATTR_DESCRIPTION,            UI.EMPTY_STRING);
+               model.description          = Util.getXmlString( xmlModel,   ATTR_DESCRIPTION,          UI.EMPTY_STRING);
                model.filepath             = modelFilePath;
-               model.id                   = Util.getXmlString(xmlModel,  ATTR_ID,                     Long.toString(System.nanoTime()));
+               model.id                   = Util.getXmlString( xmlModel,   ATTR_ID,                   Long.toString(System.nanoTime()));
                model.isDefaultModel       = isDefaultModel;
-               model.name                 = Util.getXmlString(xmlModel,  ATTR_NAME,                   UI.EMPTY_STRING);
+               model.name                 = Util.getXmlString( xmlModel,   ATTR_NAME,                 UI.EMPTY_STRING);
 
-               model.forwardAngle         = Util.getXmlInteger(xmlModel, ATTR_FORWARD_ANGLE,          0);
-               model.headPositionFactor   = Util.getXmlFloat(  xmlModel, ATTR_HEAD_POSITION_FACTOR,   1f);
+               model.forwardAngle         = Util.getXmlInteger(xmlModel,   ATTR_FORWARD_ANGLE,        0);
+               model.headPositionFactor   = Util.getXmlFloat(  xmlModel,   ATTR_HEAD_POSITION_FACTOR, 1f);
 
 // SET_FORMATTING_ON
 
