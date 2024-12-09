@@ -452,9 +452,8 @@ public class PhotoLoadManager {
 
    public static void putImageInLoadingQueueHQThumb_Map(final Photo photo,
                                                         final int thumbImageSize,
+                                                        final ImageQuality imageQuality,
                                                         final ILoadCallBack imageLoaderCallback) {
-
-      final ImageQuality imageQuality = ImageQuality.THUMB_HQ;
 
       // set state
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
@@ -488,7 +487,7 @@ public class PhotoLoadManager {
 
             } else {
 
-               imageLoader.loadImageHQThumb(_waitingQueueThumb, _waitingQueueExif);
+               imageLoader.loadImageHQThumb(_waitingQueueThumb, _waitingQueueExif, photo, imageQuality);
             }
 
             checkLoadingState(photo, imageQuality);

@@ -150,6 +150,38 @@ public class PhotoImageLoader {
       return swtImage;
    }
 
+   /**
+    * @param notCroppedImage
+    *
+    * @return
+    */
+   private BufferedImage cropImage(final BufferedImage notCroppedImage) {
+
+      final int imageWidth = notCroppedImage.getWidth();
+      final int ImageHeight = notCroppedImage.getHeight();
+
+      final float cropAreaX1 = _photo.cropAreaX1;
+      final float cropAreaY1 = _photo.cropAreaY1;
+      final float cropAreaX2 = _photo.cropAreaX2;
+      final float cropAreaY2 = _photo.cropAreaY2;
+
+      final int cropX1 = (int) (imageWidth * cropAreaX1);
+      final int cropY1 = (int) (ImageHeight * cropAreaY1);
+      final int cropX2 = (int) (imageWidth * cropAreaX2);
+      final int cropY2 = (int) (ImageHeight * cropAreaY2);
+
+      final int cropWidth = cropX2 - cropX1;
+      final int cropHeight = cropY2 - cropY1;
+
+      final BufferedImage croppedImage = Scalr.crop(notCroppedImage, cropX1, cropY1, cropWidth, cropHeight);
+
+      final String imageKey = _photo.getImageKey(ImageQuality.THUMB_HQ_CROPPED);
+
+      PhotoImageCache.putImage_AWT(imageKey, croppedImage, _photo.imageFilePathName);
+
+      return croppedImage;
+   }
+
    private void disposeTrackedImages() {
 
       for (final BufferedImage awtImage : _trackedAWTImages) {
@@ -493,7 +525,7 @@ public class PhotoImageLoader {
 
             System.out.println(UI.timeStampNano() + NLS.bind(message, imageStoreFilePath));
 
-            PhotoImageCache.disposeThumbs(null);
+            PhotoImageCache.disposeResizedImage(null);
 
             /*
              * try loading again
@@ -950,10 +982,13 @@ public class PhotoImageLoader {
     * @param thumbImageWaitingQueue
     *           waiting queue for small images
     * @param exifWaitingQueue
-    * @param isAWTImage
+    * @param photo
+    * @param imageQuality
     */
    public void loadImageHQThumb(final LinkedBlockingDeque<PhotoImageLoader> thumbImageWaitingQueue,
-                                final LinkedBlockingDeque<PhotoExifLoader> exifWaitingQueue) {
+                                final LinkedBlockingDeque<PhotoExifLoader> exifWaitingQueue,
+                                final Photo photo,
+                                final ImageQuality imageQuality) {
 
       /*
        * Wait until exif data and small images are loaded
@@ -976,7 +1011,20 @@ public class PhotoImageLoader {
 
          // load original image and create thumbs
 
-         hqThumbImage = loadImageHQThumb_10();
+         if (imageQuality == ImageQuality.THUMB_HQ_CROPPED) {
+
+            // it is possible that the not cropped image is already loaded -> only crop it
+
+            final BufferedImage notCroppedImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.HQ);
+
+            if (notCroppedImage != null) {
+               hqThumbImage = cropImage(notCroppedImage);
+            }
+         }
+
+         if (hqThumbImage == null) {
+            hqThumbImage = loadImageHQThumb_10(imageQuality);
+         }
 
       } catch (final Exception e) {
 
@@ -1017,7 +1065,7 @@ public class PhotoImageLoader {
       }
    }
 
-   private BufferedImage loadImageHQThumb_10() throws Exception {
+   private BufferedImage loadImageHQThumb_10(final ImageQuality imageQuality) throws Exception {
 
       // prevent recursive calls
       if (_recursiveCounter[0]++ > 2) {
@@ -1063,39 +1111,8 @@ public class PhotoImageLoader {
          }
       }
 
-      int originalImageWidth = awtOriginalImage.getWidth();
-      int originalImageHeight = awtOriginalImage.getHeight();
-
-      /*
-       * Crop image
-       */
-      if (_photo.isCropped) {
-
-         final float cropAreaX1 = _photo.cropAreaX1;
-         final float cropAreaY1 = _photo.cropAreaY1;
-         final float cropAreaX2 = _photo.cropAreaX2;
-         final float cropAreaY2 = _photo.cropAreaY2;
-
-         if (cropAreaX1 != 0 || cropAreaY1 != 0 || cropAreaX2 != 0 || cropAreaY2 != 0) {
-
-            final int cropX1 = (int) (originalImageWidth * cropAreaX1);
-            final int cropY1 = (int) (originalImageHeight * cropAreaY1);
-            final int cropX2 = (int) (originalImageWidth * cropAreaX2);
-            final int cropY2 = (int) (originalImageHeight * cropAreaY2);
-
-            final int cropWidth = cropX2 - cropX1;
-            final int cropHeight = cropY2 - cropY1;
-
-            final BufferedImage croppedImage = Scalr.crop(awtOriginalImage, cropX1, cropY1, cropWidth, cropHeight);
-
-            awtOriginalImage.flush();
-
-            awtOriginalImage = croppedImage;
-
-            originalImageWidth = awtOriginalImage.getWidth();
-            originalImageHeight = awtOriginalImage.getHeight();
-         }
-      }
+      final int originalImageWidth = awtOriginalImage.getWidth();
+      final int originalImageHeight = awtOriginalImage.getHeight();
 
       /*
        * Create HQ thumb image from original image
@@ -1117,29 +1134,7 @@ public class PhotoImageLoader {
             final int scaledHeight = bestSize.y;
 
             final int maxSize = Math.max(scaleWidth, scaledHeight);
-//            scaledHQImage = Scalr.resize(awtOriginalImage, Method.ULTRA_QUALITY, maxSize);
             scaledHQImage = Scalr.resize(awtOriginalImage, Method.QUALITY, maxSize);
-
-//
-//            !!! THIS QUALITY IS NOT VERY GOOD !!!
-//
-//            scaledHQImage = new BufferedImage(
-//                  scaleWidth,
-//                  scaledHeight,
-//                  BufferedImage.TYPE_INT_ARGB);
-//
-//            final Graphics2D g2d = scaledHQImage.createGraphics();
-//            try {
-//
-//               g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-////               g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-////               g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-//
-//               g2d.drawImage(awtOriginalImage, 0, 0, scaleWidth, scaledHeight, null);
-//
-//            } finally {
-//               g2d.dispose();
-//            }
 
             _trackedAWTImages.add(scaledHQImage);
 
@@ -1178,26 +1173,31 @@ public class PhotoImageLoader {
          awtHQImage = awtOriginalImage;
       }
 
-      final long duration = System.currentTimeMillis() - start;
+      /*
+       * Crop image
+       */
+//      if (_photo.isCropped && imageQuality == ImageQuality.THUMB_HQ_CROPPED) {
+//
+//         final float cropAreaX1 = _photo.cropAreaX1;
+//         final float cropAreaY1 = _photo.cropAreaY1;
+//         final float cropAreaX2 = _photo.cropAreaX2;
+//         final float cropAreaY2 = _photo.cropAreaY2;
+//
+//         if (cropAreaX1 != 0 || cropAreaY1 != 0 || cropAreaX2 != 0 || cropAreaY2 != 0) {
+//
+//            final int cropX1 = (int) (originalImageWidth * cropAreaX1);
+//            final int cropY1 = (int) (originalImageHeight * cropAreaY1);
+//            final int cropX2 = (int) (originalImageWidth * cropAreaX2);
+//            final int cropY2 = (int) (originalImageHeight * cropAreaY2);
+//
+//            final int cropWidth = cropX2 - cropX1;
+//            final int cropHeight = cropY2 - cropY1;
+//
+//            final BufferedImage croppedImage = Scalr.crop(awtOriginalImage, cropX1, cropY1, cropWidth, cropHeight);
+//         }
+//      }
 
-      final String text = " AWT: " //$NON-NLS-1$
-            + "%-15s " //$NON-NLS-1$
-            + "%-15s  " //$NON-NLS-1$
-            + "total: %5d  " //$NON-NLS-1$
-            + "load: %5d  " //$NON-NLS-1$
-            + "resizeHQThumb: %3d  " //$NON-NLS-1$
-            + "saveHQThumb: %4d  " //$NON-NLS-1$
-      ;
-
-      System.out.println(UI.timeStampNano() + text.formatted(
-
-            Thread.currentThread().getName(),
-            _photo.imageFileName,
-
-            duration,
-            endHqLoad,
-            endResizeHQ,
-            endSaveHQ));
+      logImageLoading(start, endHqLoad, endResizeHQ, endSaveHQ);
 
       return awtHQImage;
    }
@@ -1273,7 +1273,7 @@ public class PhotoImageLoader {
                 */
 
                PhotoImageCache.disposeOriginal(null);
-               PhotoImageCache.disposeThumbs(null);
+               PhotoImageCache.disposeResizedImage(null);
 
                try {
 
@@ -1744,6 +1744,33 @@ public class PhotoImageLoader {
       }
 
       return isHQRequired;
+   }
+
+   private void logImageLoading(final long start, final long endHqLoad, final long endResizeHQ, final long endSaveHQ) {
+
+      final long duration = System.currentTimeMillis() - start;
+
+      final String text = "" //$NON-NLS-1$
+
+            + " AWT: " //$NON-NLS-1$
+            + "%-15s " //$NON-NLS-1$
+            + "%-15s  " //$NON-NLS-1$
+
+            + "total: %5d  " //$NON-NLS-1$
+            + "load: %5d  " //$NON-NLS-1$
+            + "resizeHQThumb: %3d  " //$NON-NLS-1$
+            + "saveHQThumb: %4d  " //$NON-NLS-1$
+      ;
+
+      System.out.println(UI.timeStampNano() + text.formatted(
+
+            Thread.currentThread().getName(),
+            _photo.imageFileName,
+
+            duration,
+            endHqLoad,
+            endResizeHQ,
+            endSaveHQ));
    }
 
    private void setState_LoadingError() {

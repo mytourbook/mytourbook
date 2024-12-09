@@ -346,6 +346,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
             PhotoLoadManager.putImageInLoadingQueueHQThumb_Map(
                   photo,
                   Photo.getMap25ImageRequestedSize(),
+                  ImageQuality.THUMB_HQ,
                   new LoadCallbackImage(markerItem, photo));
          }
       }

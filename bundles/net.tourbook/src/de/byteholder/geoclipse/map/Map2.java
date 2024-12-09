@@ -2906,8 +2906,12 @@ public class Map2 extends Canvas {
 
          // image is not invalid and not yet loaded
 
+         final ImageQuality imageQuality = photo.isCropped
+               ? ImageQuality.THUMB_HQ_CROPPED
+               : ImageQuality.THUMB_HQ;
+
          // check if image is in the cache
-         awtPhotoImageThumbHQ = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB_HQ);
+         awtPhotoImageThumbHQ = PhotoImageCache.getImage_AWT(photo, imageQuality);
 
          if (awtPhotoImageThumbHQ == null
                && thumbHqPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
@@ -2917,6 +2921,7 @@ public class Map2 extends Canvas {
             PhotoLoadManager.putImageInLoadingQueueHQThumb_Map(
                   photo,
                   Photo.getMap2ImageRequestedSize(),
+                  imageQuality,
                   _photoImageLoaderCallback);
          }
       }

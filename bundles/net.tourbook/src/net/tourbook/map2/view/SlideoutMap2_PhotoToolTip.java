@@ -742,11 +742,19 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private void onPhoto_Crop() {
 
-      _photo.isCropped = _chkCropPhoto.getSelection();
+      final boolean isCropped = _chkCropPhoto.getSelection();
 
-      updateTourPhoto(_photo);
+      _photo.isCropped = isCropped;
+
+      updateTourPhotoInDB(_photo);
 
       setupPhotoCanvasListener();
+
+      if (isCropped) {
+
+         // discard current cropped image that it is recreated
+         PhotoImageCache.disposeResizedImageKey(_photo.getImageKey(ImageQuality.THUMB_HQ_CROPPED));
+      }
 
       _photoImageCanvas.redraw();
    }
@@ -846,7 +854,10 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       _photo.cropAreaX2 = _relCropArea_End.x;
       _photo.cropAreaY2 = _relCropArea_End.y;
 
-      updateTourPhoto(_photo);
+      updateTourPhotoInDB(_photo);
+
+      // discard current cropped image
+      PhotoImageCache.disposeResizedImageKey(_photo.getImageKey(ImageQuality.THUMB_HQ_CROPPED));
 
       _photoImageCanvas.redraw();
    }
@@ -1234,11 +1245,11 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
    }
 
    /**
-    * Update tour photo in the db
+    * Update tour photo in the db and fire an modify event
     *
     * @param photo
     */
-   private void updateTourPhoto(final Photo photo) {
+   private void updateTourPhotoInDB(final Photo photo) {
 
       final String sql = UI.EMPTY_STRING
 

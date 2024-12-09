@@ -272,7 +272,8 @@ public class Photo implements Serializable {
     * cache
     */
    private String                                  _imageKey_Thumb;
-   private String                                  _imageKey_ThumbQH;
+   private String                                  _imageKey_ThumbHQ;
+   private String                                  _imageKey_ThumbHQ_Cropped;
    private String                                  _imageKey_HQ;
    private String                                  _imageKey_Original;
 
@@ -337,6 +338,11 @@ public class Photo implements Serializable {
    public static String getImageKey_ThumbHQ(final String imageFilePathName) {
 
       return Util.computeMD5(imageFilePathName) + "_KeyThumbHQ";//$NON-NLS-1$
+   }
+
+   public static String getImageKey_ThumbHQ_Cropped(final String imageFilePathName) {
+
+      return Util.computeMD5(imageFilePathName) + "_KeyThumbHQ_Cropped";//$NON-NLS-1$
    }
 
    public static int getMap25ImageRequestedSize() {
@@ -819,7 +825,11 @@ public class Photo implements Serializable {
 
       } else if (imageQuality == ImageQuality.THUMB_HQ) {
 
-         return _imageKey_ThumbQH;
+         return _imageKey_ThumbHQ;
+
+      } else if (imageQuality == ImageQuality.THUMB_HQ_CROPPED) {
+
+         return _imageKey_ThumbHQ_Cropped;
 
       } else if (imageQuality == ImageQuality.ORIGINAL) {
 
@@ -1431,34 +1441,38 @@ public class Photo implements Serializable {
 
       _uniqueId = photoImageFilePathName;
 
+// SET_FORMATTING_OFF
+
       /*
-       * initialize image keys and loading states
+       * Initialize image keys and loading states
        */
-      _imageKey_Thumb = getImageKey_Thumb(photoImageFilePathName);
-      _imageKey_ThumbQH = getImageKey_ThumbHQ(photoImageFilePathName);
-      _imageKey_HQ = getImageKey_HQ(photoImageFilePathName);
-      _imageKey_Original = Util.computeMD5(photoImageFilePathName) + "_KeyOriginal";//$NON-NLS-1$
+      _imageKey_Thumb            = getImageKey_Thumb           (photoImageFilePathName);
+      _imageKey_ThumbHQ          = getImageKey_ThumbHQ         (photoImageFilePathName);
+      _imageKey_ThumbHQ_Cropped  = getImageKey_ThumbHQ_Cropped (photoImageFilePathName);
+      _imageKey_HQ               = getImageKey_HQ              (photoImageFilePathName);
+      _imageKey_Original         = Util.computeMD5             (photoImageFilePathName) + "_KeyOriginal";//$NON-NLS-1$
 
       _isImageFileAvailable = photoImageFile.exists();
 
       if (_isImageFileAvailable) {
 
-         _photoLoadingStateThumb = PhotoLoadingState.UNDEFINED;
-         _photoLoadingStateThumbHQ = PhotoLoadingState.UNDEFINED;
-         _photoLoadingStateHQ = PhotoLoadingState.UNDEFINED;
+         _photoLoadingStateThumb    = PhotoLoadingState.UNDEFINED;
+         _photoLoadingStateThumbHQ  = PhotoLoadingState.UNDEFINED;
+         _photoLoadingStateHQ       = PhotoLoadingState.UNDEFINED;
          _photoLoadingStateOriginal = PhotoLoadingState.UNDEFINED;
 
          _isLoadingError = false;
 
       } else {
 
-         _photoLoadingStateThumb = PhotoLoadingState.IMAGE_IS_INVALID;
-         _photoLoadingStateThumbHQ = PhotoLoadingState.IMAGE_IS_INVALID;
-         _photoLoadingStateHQ = PhotoLoadingState.IMAGE_IS_INVALID;
+         _photoLoadingStateThumb    = PhotoLoadingState.IMAGE_IS_INVALID;
+         _photoLoadingStateThumbHQ  = PhotoLoadingState.IMAGE_IS_INVALID;
+         _photoLoadingStateHQ       = PhotoLoadingState.IMAGE_IS_INVALID;
          _photoLoadingStateOriginal = PhotoLoadingState.IMAGE_IS_INVALID;
 
          _isLoadingError = true;
       }
+// SET_FORMATTING_ON
    }
 
    @Override

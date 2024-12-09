@@ -141,7 +141,7 @@ public class PhotoImageCache {
 
    public static void disposeAll() {
 
-      disposeThumbs(null);
+      disposeResizedImage(null);
       disposeOriginal(null);
    }
 
@@ -150,6 +150,7 @@ public class PhotoImageCache {
       UI.disposeResource(cacheWrapper.swtImage);
 
       final BufferedImage awtImage = cacheWrapper.awtImage;
+
       if (awtImage != null) {
          awtImage.flush();
       }
@@ -172,7 +173,7 @@ public class PhotoImageCache {
     */
    public static void disposePath(final String folderPath) {
 
-      disposeThumbs(folderPath);
+      disposeResizedImage(folderPath);
       disposeOriginal(folderPath);
    }
 
@@ -181,9 +182,32 @@ public class PhotoImageCache {
     *
     * @param folderPath
     */
-   public static void disposeThumbs(final String folderPath) {
+   public static void disposeResizedImage(final String folderPath) {
 
       dispose(_imageCache_ResizedImage, folderPath);
+   }
+
+   /**
+    * @param imageKey
+    */
+   public static synchronized void disposeResizedImageKey(final String imageKey) {
+
+      final Collection<ImageCacheWrapper> allWrappers = _imageCache_ResizedImage.asMap().values();
+
+      for (final ImageCacheWrapper cacheWrapper : allWrappers) {
+
+         if (cacheWrapper != null) {
+
+            // dispose images from a specific folder
+
+            if (cacheWrapper.imageKey.equals(imageKey)) {
+
+               _imageCache_ResizedImage.invalidate(cacheWrapper.imageKey);
+
+               disposeImage(cacheWrapper);
+            }
+         }
+      }
    }
 
    public static BufferedImage getImage_AWT(final Photo photo, final ImageQuality imageQuality) {
@@ -426,12 +450,14 @@ public class PhotoImageCache {
    }
 
    public static void setOriginalImageCacheSize(final int newCacheSize) {
+
       _imageCache_OriginalImage.policy().eviction().ifPresent(eviction -> {
          eviction.setMaximum(newCacheSize);
       });
    }
 
    public static void setThumbCacheSize(final int newCacheSize) {
+
       _imageCache_ResizedImage.policy().eviction().ifPresent(eviction -> {
          eviction.setMaximum(newCacheSize);
       });
