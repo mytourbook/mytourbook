@@ -114,7 +114,12 @@ public class TourPhoto implements Serializable {
    private double                     latitude;
 
    private double                     longitude;
+   
+   private boolean                    isPhotoCropped;
 
+   /**
+    * Relative position 0...1 of the crop area top left x position
+    */
    private float                      cropAreaX1;
    private float                      cropAreaY1;
 
@@ -316,6 +321,10 @@ public class TourPhoto implements Serializable {
       return isGeoFromPhoto == 0;
    }
 
+   public boolean isPhotoCropped() {
+      return isPhotoCropped;
+   }
+
    public void setAdjustedTime(final long adjustedTime) {
       this.adjustedTime = adjustedTime;
    }
@@ -404,6 +413,10 @@ public class TourPhoto implements Serializable {
     */
    public void setLongitude(final double longitude) {
       this.longitude = longitude;
+   }
+
+   public void setPhotoCropped(final boolean isPhotoCropped) {
+      this.isPhotoCropped = isPhotoCropped;
    }
 
    public void setRatingStars(final int ratingStars) {

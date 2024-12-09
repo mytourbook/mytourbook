@@ -311,6 +311,7 @@ public class Photo implements Serializable {
     */
    private long                                    _photoLinkTourId;
 
+   public boolean                                  isCropped;
    public float                                    cropAreaX1;
    public float                                    cropAreaY1;
    public float                                    cropAreaX2;

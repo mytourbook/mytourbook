@@ -5141,11 +5141,13 @@ public class TourDatabase {
 
             // version 56 start
 
-            + "   cropAreaX1                  FLOAT DEFAULT 0                          " + NL //$NON-NLS-1$
-            + "   cropAreaY1                  FLOAT DEFAULT 0                          " + NL //$NON-NLS-1$
+            + "   isPhotoCropped             BOOLEAN  DEFAULT FALSE,                   " + NL //$NON-NLS-1$
 
-            + "   cropAreaX2                  FLOAT DEFAULT 0                          " + NL //$NON-NLS-1$
-            + "   cropAreaY2                  FLOAT DEFAULT 0                          " + NL //$NON-NLS-1$
+            + "   cropAreaX1                 FLOAT DEFAULT 0                           " + NL //$NON-NLS-1$
+            + "   cropAreaY1                 FLOAT DEFAULT 0                           " + NL //$NON-NLS-1$
+
+            + "   cropAreaX2                 FLOAT DEFAULT 0                           " + NL //$NON-NLS-1$
+            + "   cropAreaY2                 FLOAT DEFAULT 0                           " + NL //$NON-NLS-1$
 
             // version 56 end
 
@@ -10765,19 +10767,19 @@ public class TourDatabase {
       logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
-      final Statement stmt = conn.createStatement();
-      {
+      try (final Statement stmt = conn.createStatement()) {
+
 // SET_FORMATTING_OFF
 
          // Add new columns
-         SQL.AddColumn_Float (stmt, TABLE_TOUR_PHOTO, "cropAreaX1",  DEFAULT_0); //$NON-NLS-1$
-         SQL.AddColumn_Float (stmt, TABLE_TOUR_PHOTO, "cropAreaY1",  DEFAULT_0); //$NON-NLS-1$
-         SQL.AddColumn_Float (stmt, TABLE_TOUR_PHOTO, "cropAreaX2",  DEFAULT_0); //$NON-NLS-1$
-         SQL.AddColumn_Float (stmt, TABLE_TOUR_PHOTO, "cropAreaY2",  DEFAULT_0); //$NON-NLS-1$
+         SQL.AddColumn_Boolean(stmt, TABLE_TOUR_PHOTO, "isPhotoCropped",   DEFAULT_FALSE);      //$NON-NLS-1$
+         SQL.AddColumn_Float  (stmt, TABLE_TOUR_PHOTO, "cropAreaX1",       DEFAULT_0);          //$NON-NLS-1$
+         SQL.AddColumn_Float  (stmt, TABLE_TOUR_PHOTO, "cropAreaY1",       DEFAULT_0);          //$NON-NLS-1$
+         SQL.AddColumn_Float  (stmt, TABLE_TOUR_PHOTO, "cropAreaX2",       DEFAULT_0);          //$NON-NLS-1$
+         SQL.AddColumn_Float  (stmt, TABLE_TOUR_PHOTO, "cropAreaY2",       DEFAULT_0);          //$NON-NLS-1$
 
 // SET_FORMATTING_ON
       }
-      stmt.close();
 
       logDbUpdate_End(newDbVersion);
 

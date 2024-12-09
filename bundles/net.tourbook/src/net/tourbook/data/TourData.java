@@ -6487,6 +6487,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          galleryPhoto.adjustedTime_Tour = tourPhoto.getAdjustedTime();
          galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
 
+         galleryPhoto.isCropped = tourPhoto.isPhotoCropped();
+         galleryPhoto.cropAreaX1 = tourPhoto.getCropAreaX1();
+         galleryPhoto.cropAreaY1 = tourPhoto.getCropAreaY1();
+         galleryPhoto.cropAreaX2 = tourPhoto.getCropAreaX2();
+         galleryPhoto.cropAreaY2 = tourPhoto.getCropAreaY2();
+
          /*
           * Set adjusted time with time zone
           */

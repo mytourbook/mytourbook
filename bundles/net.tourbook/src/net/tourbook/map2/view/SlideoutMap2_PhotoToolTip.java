@@ -115,7 +115,6 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
    private final static IDialogSettings _state                            = TourbookPlugin.getState(ID);
 
    private static final String          STATE_IS_TOOLTIP_EXPANDED         = "STATE_IS_TOOLTIP_EXPANDED";                    //$NON-NLS-1$
-   private static final String          STATE_IS_TRIM_PHOTO               = "STATE_IS_TRIM_PHOTO";                          //$NON-NLS-1$
 
    private Map2                         _map2;
 
@@ -136,7 +135,6 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
    private boolean               _isExpandCollapseModified;
    private boolean               _isMouseDown;
    private boolean               _isTooltipExpanded;
-   private boolean               _isTrimPhoto;
 
    private ToolBarManager        _toolbarManagerExpandCollapseSlideout;
 
@@ -151,10 +149,10 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
    /** Photo position and size of the photo image within the photo canvas */
    private Rectangle             _photoImageBounds;
    private Rectangle             _photoImageBounds_OnResize;
-   private Point                 _devTrimArea_Start;
-   private Point                 _devTrimArea_End;
-   private Point2D.Float         _relTrimArea_Start;
-   private Point2D.Float         _relTrimArea_End;
+   private Point                 _devCropArea_Start;
+   private Point                 _devCropArea_End;
+   private Point2D.Float         _relCropArea_Start;
+   private Point2D.Float         _relCropArea_End;
 
    private MouseMoveListener     _photoMouseMoveListener;
    private MouseListener         _photoMouseDownListener;
@@ -167,7 +165,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
     */
    private PageBook         _pageBook;
 
-   private Button           _chkTrimPhoto;
+   private Button           _chkCropPhoto;
 
    private Composite        _containerPhotoOptions;
    private Composite        _containerHeader_1;
@@ -216,7 +214,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          super.paintControl(event);
 
-         onPhoto_Paint(event);
+         onPhoto_PaintCropping(event);
       }
    }
 
@@ -394,10 +392,10 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
             /*
              * Trim photo
              */
-            _chkTrimPhoto = new Button(_containerPhotoOptions, SWT.CHECK);
-            _chkTrimPhoto.setText("&Crop photo image");
-            _chkTrimPhoto.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onCropPhoto()));
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_chkTrimPhoto);
+            _chkCropPhoto = new Button(_containerPhotoOptions, SWT.CHECK);
+            _chkCropPhoto.setText("&Crop photo image");
+            _chkCropPhoto.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onPhoto_Crop()));
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_chkCropPhoto);
 
          }
          {
@@ -709,26 +707,6 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    }
 
-   private void onCropPhoto() {
-
-      _isTrimPhoto = _chkTrimPhoto.getSelection();
-
-      if (_isTrimPhoto == false) {
-
-         // reset cropping
-
-         _photo.cropAreaX1 = 0;
-         _photo.cropAreaY1 = 0;
-
-         _photo.cropAreaX2 = 0;
-         _photo.cropAreaY2 = 0;
-      }
-
-      setupPhotoCanvasListener();
-
-      _photoImageCanvas.redraw();
-   }
-
    @Override
    protected void onDispose() {
 
@@ -762,6 +740,17 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       });
    }
 
+   private void onPhoto_Crop() {
+
+      _photo.isCropped = _chkCropPhoto.getSelection();
+
+      updateTourPhoto(_photo);
+
+      setupPhotoCanvasListener();
+
+      _photoImageCanvas.redraw();
+   }
+
    private void onPhoto_Mouse_Exit() {
 
       _photoImageCanvas.setCursor(null);
@@ -780,12 +769,12 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       final boolean isMouseWithinPhoto = _photoImageBounds.contains(devMousePosition);
 
-      if (isMouseWithinPhoto) {
+      if (_photo.isCropped && isMouseWithinPhoto) {
 
          if (_isMouseDown) {
 
-            _devTrimArea_End = devMousePosition;
-            _relTrimArea_End = getRelativeMousePhotoPosition(devMouseX, devMouseY);
+            _devCropArea_End = devMousePosition;
+            _relCropArea_End = getRelativeMousePhotoPosition(devMouseX, devMouseY);
 
             _photoImageCanvas.redraw();
 
@@ -815,12 +804,12 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          _isMouseDown = true;
 
-         _devTrimArea_Start = devMousePosition;
-         _devTrimArea_End = null;
+         _devCropArea_Start = devMousePosition;
+         _devCropArea_End = null;
 
          // keep trim area relative to the photo
-         _relTrimArea_Start = getRelativeMousePhotoPosition(devMouseX, devMouseY);
-         _relTrimArea_End = null;
+         _relCropArea_Start = getRelativeMousePhotoPosition(devMouseX, devMouseY);
+         _relCropArea_End = null;
 
          _photoImageCanvas.redraw();
 
@@ -828,11 +817,11 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          _isMouseDown = false;
 
-         _devTrimArea_Start = null;
-         _devTrimArea_End = null;
+         _devCropArea_Start = null;
+         _devCropArea_End = null;
 
-         _relTrimArea_Start = null;
-         _relTrimArea_End = null;
+         _relCropArea_Start = null;
+         _relCropArea_End = null;
       }
    }
 
@@ -845,33 +834,33 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       _isMouseDown = false;
 
-      _devTrimArea_End = devMousePosition;
-      _relTrimArea_End = getRelativeMousePhotoPosition(devMouseX, devMouseY);
+      _devCropArea_End = devMousePosition;
+      _relCropArea_End = getRelativeMousePhotoPosition(devMouseX, devMouseY);
 
       /*
-       * Set trim area into the photo/tour photo
+       * Set crop area into the photo/tour photo
        */
-      _photo.cropAreaX1 = _relTrimArea_Start.x;
-      _photo.cropAreaY1 = _relTrimArea_Start.y;
+      _photo.cropAreaX1 = _relCropArea_Start.x;
+      _photo.cropAreaY1 = _relCropArea_Start.y;
 
-      _photo.cropAreaX2 = _relTrimArea_End.x;
-      _photo.cropAreaY2 = _relTrimArea_End.y;
+      _photo.cropAreaX2 = _relCropArea_End.x;
+      _photo.cropAreaY2 = _relCropArea_End.y;
 
       updateTourPhoto(_photo);
 
       _photoImageCanvas.redraw();
    }
 
-   private void onPhoto_Paint(final PaintEvent mouseEvent) {
+   private void onPhoto_PaintCropping(final PaintEvent mouseEvent) {
 
-      if (_isTrimPhoto == false) {
+      if (_photo.isCropped == false) {
          return;
       }
 
       // keep photo image position after the photo is painted in the parent class
       _photoImageBounds = _photoImageCanvas.getImageBounds();
 
-      if (_devTrimArea_Start == null || _devTrimArea_End == null) {
+      if (_devCropArea_Start == null || _devCropArea_End == null) {
 
          return;
       }
@@ -879,16 +868,16 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       // fix bounds when window was resized
       if (_photoImageBounds.equals(_photoImageBounds_OnResize) == false) {
 
-         setTrimArea(_photoImageBounds);
+         setCropArea(_photoImageBounds);
       }
 
       final GC gc = mouseEvent.gc;
 
-      final int devXStart = _devTrimArea_Start.x;
-      final int devYStart = _devTrimArea_Start.y;
+      final int devXStart = _devCropArea_Start.x;
+      final int devYStart = _devCropArea_Start.y;
 
-      final int devXEnd = _devTrimArea_End.x;
-      final int devYEnd = _devTrimArea_End.y;
+      final int devXEnd = _devCropArea_End.x;
+      final int devYEnd = _devCropArea_End.y;
 
       int devXTopLeft;
       int devYTopLeft;
@@ -938,14 +927,14 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private void onPhoto_Resize(final ControlEvent event) {
 
-      if (_relTrimArea_Start == null || _relTrimArea_End == null) {
+      if (_relCropArea_Start == null || _relCropArea_End == null) {
 
          return;
       }
 
       _photoImageBounds_OnResize = _photoImageBounds;
 
-      setTrimArea(_photoImageBounds_OnResize);
+      setCropArea(_photoImageBounds_OnResize);
    }
 
    @Override
@@ -1097,11 +1086,9 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       final int tooltipSizeIndex = Util.getStateInt(_state, STATE_TOOLTIP_SIZE_INDEX, 0);
       _isTooltipExpanded         = Util.getStateBoolean(_state, STATE_IS_TOOLTIP_EXPANDED, false);
-      _isTrimPhoto               = Util.getStateBoolean(_state, STATE_IS_TRIM_PHOTO, false);
 
 // SET_FORMATTING_ON
 
-      _chkTrimPhoto.setSelection(_isTrimPhoto);
       _comboTooltipSize.select(tooltipSizeIndex);
 
       setupPhotoCanvasListener();
@@ -1112,7 +1099,6 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
    protected void saveState() {
 
       _state.put(STATE_IS_TOOLTIP_EXPANDED, _isTooltipExpanded);
-      _state.put(STATE_IS_TRIM_PHOTO, _isTrimPhoto);
 
       super.saveState();
    }
@@ -1131,37 +1117,25 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       }
    }
 
-   private void setTooltipSize() {
-
-      switch (getSelectedTooltipSizeIndex()) {
-
-      case 0 -> _selectedTooltipSize = Util.getStateIntArray(_state, STATE_TOOLTIP_SIZE_TINY, STATE_TOOLTIP_SIZE_TINY_DEFAULT);
-      case 1 -> _selectedTooltipSize = Util.getStateIntArray(_state, STATE_TOOLTIP_SIZE_SMALL, STATE_TOOLTIP_SIZE_SMALL_DEFAULT);
-      case 2 -> _selectedTooltipSize = Util.getStateIntArray(_state, STATE_TOOLTIP_SIZE_MEDIUM, STATE_TOOLTIP_SIZE_MEDIUM_DEFAULT);
-      case 3 -> _selectedTooltipSize = Util.getStateIntArray(_state, STATE_TOOLTIP_SIZE_LARGE, STATE_TOOLTIP_SIZE_LARGE_DEFAULT);
-
-      }
-   }
-
    /**
     * Create absolute positions from relative positions
     *
     * @param photoImageBounds
     */
-   private void setTrimArea(final Rectangle photoImageBounds) {
+   private void setCropArea(final Rectangle photoImageBounds) {
 
       if (photoImageBounds == null
-            || _relTrimArea_Start == null
-            || _relTrimArea_End == null) {
+            || _relCropArea_Start == null
+            || _relCropArea_End == null) {
 
          return;
       }
 
-      final float relTrimStartX = _relTrimArea_Start.x;
-      final float relTrimStartY = _relTrimArea_Start.y;
+      final float relTrimStartX = _relCropArea_Start.x;
+      final float relTrimStartY = _relCropArea_Start.y;
 
-      final float relTrimEndX = _relTrimArea_End.x;
-      final float relTrimEndY = _relTrimArea_End.y;
+      final float relTrimEndX = _relCropArea_End.x;
+      final float relTrimEndY = _relCropArea_End.y;
 
       final int devPhotoX = photoImageBounds.x;
       final int devPhotoY = photoImageBounds.y;
@@ -1175,8 +1149,20 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       final int devTrimEndX = (int) (devPhotoX + relTrimEndX * devPhotoWidth);
       final int devTrimEndY = (int) (devPhotoY + relTrimEndY * devPhotoHeight);
 
-      _devTrimArea_Start = new Point(devTrimStartX, devTrimStartY);
-      _devTrimArea_End = new Point(devTrimEndX, devTrimEndY);
+      _devCropArea_Start = new Point(devTrimStartX, devTrimStartY);
+      _devCropArea_End = new Point(devTrimEndX, devTrimEndY);
+   }
+
+   private void setTooltipSize() {
+
+      switch (getSelectedTooltipSizeIndex()) {
+
+      case 0 -> _selectedTooltipSize = Util.getStateIntArray(_state, STATE_TOOLTIP_SIZE_TINY, STATE_TOOLTIP_SIZE_TINY_DEFAULT);
+      case 1 -> _selectedTooltipSize = Util.getStateIntArray(_state, STATE_TOOLTIP_SIZE_SMALL, STATE_TOOLTIP_SIZE_SMALL_DEFAULT);
+      case 2 -> _selectedTooltipSize = Util.getStateIntArray(_state, STATE_TOOLTIP_SIZE_MEDIUM, STATE_TOOLTIP_SIZE_MEDIUM_DEFAULT);
+      case 3 -> _selectedTooltipSize = Util.getStateIntArray(_state, STATE_TOOLTIP_SIZE_LARGE, STATE_TOOLTIP_SIZE_LARGE_DEFAULT);
+
+      }
    }
 
    public void setupPhoto(final PaintedMapPoint hoveredMapPoint) {
@@ -1227,7 +1213,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private void setupPhotoCanvasListener() {
 
-      if (_isTrimPhoto) {
+      if (_photo.isCropped) {
 
          _photoImageCanvas.addMouseMoveListener(_photoMouseMoveListener);
          _photoImageCanvas.addMouseListener(_photoMouseDownListener);
@@ -1247,23 +1233,28 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       }
    }
 
+   /**
+    * Update tour photo in the db
+    *
+    * @param photo
+    */
    private void updateTourPhoto(final Photo photo) {
-
-      final TourManager tourManager = TourManager.getInstance();
 
       final String sql = UI.EMPTY_STRING
 
             + "UPDATE " + TourDatabase.TABLE_TOUR_PHOTO + NL //$NON-NLS-1$
 
-            + " SET" + NL //                          //$NON-NLS-1$
+            + " SET" + NL //                                //$NON-NLS-1$
 
-            + " cropAreaX1 = ?," + NL //              //$NON-NLS-1$
-            + " cropAreaY1 = ?," + NL //              //$NON-NLS-1$
+            + " isPhotoCropped = ?,    " + NL //            //$NON-NLS-1$
 
-            + " cropAreaX2 = ?," + NL //              //$NON-NLS-1$
-            + " cropAreaY2 = ?" + NL //               //$NON-NLS-1$
+            + " cropAreaX1 = ?,        " + NL //            //$NON-NLS-1$
+            + " cropAreaY1 = ?,        " + NL //            //$NON-NLS-1$
 
-            + " WHERE photoId=?" + NL //              //$NON-NLS-1$
+            + " cropAreaX2 = ?,        " + NL //            //$NON-NLS-1$
+            + " cropAreaY2 = ?         " + NL //            //$NON-NLS-1$
+
+            + " WHERE photoId = ?      " + NL //            //$NON-NLS-1$
       ;
 
       try (final Connection conn = TourDatabase.getInstance().getConnection();
@@ -1271,7 +1262,6 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          final ArrayList<Photo> updatedPhotos = new ArrayList<>();
 
-         final int ratingStars = photo.ratingStars;
          final Collection<TourPhotoReference> photoRefs = photo.getTourPhotoReferences().values();
 
          if (photoRefs.size() > 0) {
@@ -1281,25 +1271,29 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
                /*
                 * Update db
                 */
-               sqlUpdate.setFloat(1, photo.cropAreaX1);
-               sqlUpdate.setFloat(2, photo.cropAreaY1);
+               sqlUpdate.setBoolean(1, photo.isCropped);
 
-               sqlUpdate.setFloat(3, photo.cropAreaX2);
-               sqlUpdate.setFloat(4, photo.cropAreaY2);
+               sqlUpdate.setFloat(2, photo.cropAreaX1);
+               sqlUpdate.setFloat(3, photo.cropAreaY1);
 
-               sqlUpdate.setLong(5, photoRef.photoId);
+               sqlUpdate.setFloat(4, photo.cropAreaX2);
+               sqlUpdate.setFloat(5, photo.cropAreaY2);
+
+               sqlUpdate.setLong(6, photoRef.photoId);
 
                sqlUpdate.executeUpdate();
 
                /*
                 * Update tour photo
                 */
-               final TourData tourData = tourManager.getTourData(photoRef.tourId);
+               final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
                final Set<TourPhoto> allTourPhotos = tourData.getTourPhotos();
 
                for (final TourPhoto tourPhoto : allTourPhotos) {
 
                   if (tourPhoto.getPhotoId() == photoRef.photoId) {
+
+                     tourPhoto.setPhotoCropped(photo.isCropped);
 
                      tourPhoto.setCropAreaX1(photo.cropAreaX1);
                      tourPhoto.setCropAreaY1(photo.cropAreaY1);
@@ -1406,27 +1400,25 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          updateTitleText(photoDateTime);
       }
 
+      final boolean isPhotoCropped = _photo.isCropped;
+
+      _chkCropPhoto.setSelection(isPhotoCropped);
+
       /*
-       * Get trim area from tour photo
+       * Get crop area from the tour photo
        */
+      _devCropArea_Start = null;
+      _devCropArea_End = null;
+      _relCropArea_Start = null;
+      _relCropArea_End = null;
 
-      _devTrimArea_Start = null;
-      _devTrimArea_End = null;
-      _relTrimArea_Start = null;
-      _relTrimArea_End = null;
+      if (isPhotoCropped) {
 
-      final float trimAreaX1 = _photo.cropAreaX1;
-      final float trimAreaY1 = _photo.cropAreaY1;
-      final float trimAreaX2 = _photo.cropAreaX2;
-      final float trimAreaY2 = _photo.cropAreaY2;
+         _relCropArea_Start = new Point2D.Float(_photo.cropAreaX1, _photo.cropAreaY1);
+         _relCropArea_End = new Point2D.Float(_photo.cropAreaX2, _photo.cropAreaY2);
 
-      if (trimAreaX1 != 0 || trimAreaY1 != 0 || trimAreaX2 != 0 || trimAreaY2 != 0) {
-
-         _relTrimArea_Start = new Point2D.Float(trimAreaX1, trimAreaY1);
-         _relTrimArea_End = new Point2D.Float(trimAreaX2, trimAreaY2);
+         setCropArea(_photoImageBounds);
       }
-
-      setTrimArea(_photoImageBounds);
 
       final Image photoImage = getPhotoImage(_photo);
 

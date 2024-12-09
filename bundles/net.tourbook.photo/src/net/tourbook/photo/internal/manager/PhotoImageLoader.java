@@ -1069,29 +1069,32 @@ public class PhotoImageLoader {
       /*
        * Crop image
        */
-      final float cropAreaX1 = _photo.cropAreaX1;
-      final float cropAreaY1 = _photo.cropAreaY1;
-      final float cropAreaX2 = _photo.cropAreaX2;
-      final float cropAreaY2 = _photo.cropAreaY2;
+      if (_photo.isCropped) {
 
-      if (cropAreaX1 != 0 || cropAreaY1 != 0 || cropAreaX2 != 0 || cropAreaY2 != 0) {
+         final float cropAreaX1 = _photo.cropAreaX1;
+         final float cropAreaY1 = _photo.cropAreaY1;
+         final float cropAreaX2 = _photo.cropAreaX2;
+         final float cropAreaY2 = _photo.cropAreaY2;
 
-         final int cropX1 = (int) (originalImageWidth * cropAreaX1);
-         final int cropY1 = (int) (originalImageHeight * cropAreaY1);
-         final int cropX2 = (int) (originalImageWidth * cropAreaX2);
-         final int cropY2 = (int) (originalImageHeight * cropAreaY2);
+         if (cropAreaX1 != 0 || cropAreaY1 != 0 || cropAreaX2 != 0 || cropAreaY2 != 0) {
 
-         final int cropWidth = cropX2 - cropX1;
-         final int cropHeight = cropY2 - cropY1;
+            final int cropX1 = (int) (originalImageWidth * cropAreaX1);
+            final int cropY1 = (int) (originalImageHeight * cropAreaY1);
+            final int cropX2 = (int) (originalImageWidth * cropAreaX2);
+            final int cropY2 = (int) (originalImageHeight * cropAreaY2);
 
-         final BufferedImage croppedImage = Scalr.crop(awtOriginalImage, cropX1, cropY1, cropWidth, cropHeight);
+            final int cropWidth = cropX2 - cropX1;
+            final int cropHeight = cropY2 - cropY1;
 
-         awtOriginalImage.flush();
+            final BufferedImage croppedImage = Scalr.crop(awtOriginalImage, cropX1, cropY1, cropWidth, cropHeight);
 
-         awtOriginalImage = croppedImage;
+            awtOriginalImage.flush();
 
-         originalImageWidth = awtOriginalImage.getWidth();
-         originalImageHeight = awtOriginalImage.getHeight();
+            awtOriginalImage = croppedImage;
+
+            originalImageWidth = awtOriginalImage.getWidth();
+            originalImageHeight = awtOriginalImage.getHeight();
+         }
       }
 
       /*
