@@ -170,8 +170,16 @@ public class PhotoImageLoader {
       final int cropX2 = (int) (imageWidth * cropAreaX2);
       final int cropY2 = (int) (ImageHeight * cropAreaY2);
 
-      final int cropWidth = cropX2 - cropX1;
-      final int cropHeight = cropY2 - cropY1;
+      int cropWidth = cropX2 - cropX1;
+      int cropHeight = cropY2 - cropY1;
+
+      // fix invalid image size, this would cause an invalid image
+      if (cropWidth == 0) {
+         cropWidth = 1;
+      }
+      if (cropHeight == 0) {
+         cropHeight = 1;
+      }
 
       final BufferedImage croppedImage = Scalr.crop(notCroppedImage, cropX1, cropY1, cropWidth, cropHeight);
 
