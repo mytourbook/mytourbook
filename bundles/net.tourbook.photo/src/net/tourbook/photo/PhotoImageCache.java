@@ -187,29 +187,6 @@ public class PhotoImageCache {
       dispose(_imageCache_ResizedImage, folderPath);
    }
 
-   /**
-    * @param imageKey
-    */
-   public static synchronized void disposeResizedImageKey(final String imageKey) {
-
-      final Collection<ImageCacheWrapper> allWrappers = _imageCache_ResizedImage.asMap().values();
-
-      for (final ImageCacheWrapper cacheWrapper : allWrappers) {
-
-         if (cacheWrapper != null) {
-
-            // dispose images from a specific folder
-
-            if (cacheWrapper.imageKey.equals(imageKey)) {
-
-               _imageCache_ResizedImage.invalidate(cacheWrapper.imageKey);
-
-               disposeImage(cacheWrapper);
-            }
-         }
-      }
-   }
-
    public static BufferedImage getImage_AWT(final Photo photo, final ImageQuality imageQuality) {
 
       final String imageKey = photo.getImageKey(imageQuality);

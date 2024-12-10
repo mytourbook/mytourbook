@@ -459,14 +459,12 @@ public class PhotoLoadManager {
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
       // put image loading item into the waiting queue
-      final PhotoImageLoader photoImageLoader = new PhotoImageLoader(
+      _waitingQueueHQ.add(new PhotoImageLoader(
             _display,
             photo,
             imageQuality,
             thumbImageSize,
-            imageLoaderCallback);
-
-      _waitingQueueHQ.add(photoImageLoader);
+            imageLoaderCallback));
 
       final Runnable executorTask = new Runnable() {
          @Override

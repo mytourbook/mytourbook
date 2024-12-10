@@ -173,19 +173,41 @@ public class PhotoImageLoader {
       int cropWidth = cropX2 - cropX1;
       int cropHeight = cropY2 - cropY1;
 
-      // fix invalid image size, this would cause an invalid image
+      // fix image size, otherwise it would cause an invalid image
       if (cropWidth == 0) {
          cropWidth = 1;
+      }
+      if (cropWidth < 0) {
+         cropWidth = -cropWidth;
       }
       if (cropHeight == 0) {
          cropHeight = 1;
       }
+      if (cropHeight < 0) {
+         cropHeight = -cropHeight;
+      }
 
-      final BufferedImage croppedImage = Scalr.crop(notCroppedImage, cropX1, cropY1, cropWidth, cropHeight);
+      if (cropX1 + cropWidth > imageWidth) {
+         cropWidth = imageWidth - cropX1;
+      }
 
-      final String imageKey = _photo.getImageKey(ImageQuality.THUMB_HQ_CROPPED);
+      if (cropAreaY1 + cropHeight > ImageHeight) {
+         cropHeight = ImageHeight - cropY1;
+      }
 
-      PhotoImageCache.putImage_AWT(imageKey, croppedImage, _photo.imageFilePathName);
+      BufferedImage croppedImage = null;
+      try {
+
+         croppedImage = Scalr.crop(notCroppedImage, cropX1, cropY1, cropWidth, cropHeight);
+
+         final String imageKey = _photo.getImageKey(ImageQuality.THUMB_HQ_CROPPED);
+
+         PhotoImageCache.putImage_AWT(imageKey, croppedImage, _photo.imageFilePathName);
+
+      } catch (final Exception e) {
+
+         StatusUtil.log(e);
+      }
 
       return croppedImage;
    }
@@ -1015,6 +1037,9 @@ public class PhotoImageLoader {
       boolean isLoadingError = false;
       BufferedImage hqThumbImage = null;
 
+      // reset crop state
+      photo.isCropModified = false;
+
       try {
 
          // load original image and create thumbs
@@ -1184,27 +1209,17 @@ public class PhotoImageLoader {
       /*
        * Crop image NOW, to prevent flickering when cropping is done later
        */
+      if (imageQuality == ImageQuality.THUMB_HQ_CROPPED) {
 
-//      if (_photo.isCropped && imageQuality == ImageQuality.THUMB_HQ_CROPPED) {
-//
-//         final float cropAreaX1 = _photo.cropAreaX1;
-//         final float cropAreaY1 = _photo.cropAreaY1;
-//         final float cropAreaX2 = _photo.cropAreaX2;
-//         final float cropAreaY2 = _photo.cropAreaY2;
-//
-//         if (cropAreaX1 != 0 || cropAreaY1 != 0 || cropAreaX2 != 0 || cropAreaY2 != 0) {
-//
-//            final int cropX1 = (int) (originalImageWidth * cropAreaX1);
-//            final int cropY1 = (int) (originalImageHeight * cropAreaY1);
-//            final int cropX2 = (int) (originalImageWidth * cropAreaX2);
-//            final int cropY2 = (int) (originalImageHeight * cropAreaY2);
-//
-//            final int cropWidth = cropX2 - cropX1;
-//            final int cropHeight = cropY2 - cropY1;
-//
-//            final BufferedImage croppedImage = Scalr.crop(awtOriginalImage, cropX1, cropY1, cropWidth, cropHeight);
-//         }
-//      }
+         final BufferedImage awtHQImageCropped = cropImage(awtHQImage);
+
+         if (awtHQImageCropped != null) {
+
+            awtHQImage.flush();
+
+            awtHQImage = awtHQImageCropped;
+         }
+      }
 
       logImageLoading(start, endHqLoad, endResizeHQ, endSaveHQ);
 

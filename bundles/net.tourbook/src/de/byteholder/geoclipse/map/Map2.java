@@ -2913,10 +2913,14 @@ public class Map2 extends Canvas {
          // check if image is in the cache
          awtPhotoImageThumbHQ = PhotoImageCache.getImage_AWT(photo, imageQuality);
 
-         if (awtPhotoImageThumbHQ == null
-               && thumbHqPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+         final boolean isImageNotInLoadingQueue = thumbHqPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false;
 
-            // the requested image is not available in the image cache -> image must be loaded
+         final boolean isPhotoCropped = photo.isCropModified && isImageNotInLoadingQueue;
+         final boolean isPhotoNotLoaded = awtPhotoImageThumbHQ == null && isImageNotInLoadingQueue;
+
+         if (isPhotoCropped || isPhotoNotLoaded) {
+
+            // the requested image is not available in the image cache or is modified -> image must be loaded
 
             PhotoLoadManager.putImageInLoadingQueueHQThumb_Map(
                   photo,

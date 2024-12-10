@@ -180,7 +180,8 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
    private PhotoImageCanvas _photoImageCanvas;
 
    private Cursor           _photoCursor_Cross;
-   private Cursor           _photoCursor_SizeAll;
+   private Cursor           _photoCursor_Size_ESE;
+   private Cursor           _photoCursor_Size_NESW;
 
    private class ActionExpandSlideout extends Action {
 
@@ -251,6 +252,19 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       _isExpandCollapseModified = true;
       onTTShellResize(null);
+   }
+
+   private float checkBounds(final float relCropAreaValue) {
+
+      if (relCropAreaValue < 0) {
+         return 0;
+      }
+
+      if (relCropAreaValue > 1) {
+         return 1;
+      }
+
+      return relCropAreaValue;
    }
 
    @Override
@@ -390,7 +404,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       {
          {
             /*
-             * Trim photo
+             * Crop photo
              */
             _chkCropPhoto = new Button(_containerPhotoOptions, SWT.CHECK);
             _chkCropPhoto.setText("&Crop photo image");
@@ -599,10 +613,10 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       final float devPhotoWidth = _photoImageBounds.width;
       final float devPhotoHeight = _photoImageBounds.height;
 
-      final float relTrimX = (devMouseX - devPhotoX) / devPhotoWidth;
-      final float relTrimY = (devMouseY - devPhotoY) / devPhotoHeight;
+      final float relCropX = (devMouseX - devPhotoX) / devPhotoWidth;
+      final float relCropY = (devMouseY - devPhotoY) / devPhotoHeight;
 
-      return new Point2D.Float(relTrimX, relTrimY);
+      return new Point2D.Float(relCropX, relCropY);
    }
 
    private int getSelectedTooltipSizeIndex() {
@@ -682,10 +696,11 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       _photoMouseExitListener    = MouseTrackListener.mouseExitAdapter(    event -> onPhoto_Mouse_Exit());
       _photoResizeListener       = ControlListener.controlResizedAdapter(  event -> onPhoto_Resize(event));
 
-// SET_FORMATTING_ON
+      _photoCursor_Cross         = display.getSystemCursor(SWT.CURSOR_CROSS);
+      _photoCursor_Size_ESE      = display.getSystemCursor(SWT.CURSOR_SIZESE);
+      _photoCursor_Size_NESW     = display.getSystemCursor(SWT.CURSOR_SIZENESW);
 
-      _photoCursor_Cross = display.getSystemCursor(SWT.CURSOR_CROSS);
-      _photoCursor_SizeAll = display.getSystemCursor(SWT.CURSOR_SIZEALL);
+// SET_FORMATTING_ON
 
       _keepOpenListener = new FocusListener() {
 
@@ -746,15 +761,13 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       _photo.isCropped = isCropped;
 
+      if (isCropped) {
+         _photo.isCropModified = true;
+      }
+
       updateTourPhotoInDB(_photo);
 
       setupPhotoCanvasListener();
-
-      if (isCropped) {
-
-         // discard current cropped image that it is recreated
-         PhotoImageCache.disposeResizedImageKey(_photo.getImageKey(ImageQuality.THUMB_HQ_CROPPED));
-      }
 
       _photoImageCanvas.redraw();
    }
@@ -786,7 +799,37 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
             _photoImageCanvas.redraw();
 
-            _photoImageCanvas.setCursor(_photoCursor_SizeAll);
+            /*
+             * Set cursor direction according to the mouse moving, with try and error I found the
+             * correct cursor :-)
+             */
+            final int startX = _devCropArea_Start.x;
+            final int startY = _devCropArea_Start.y;
+            final int endX = _devCropArea_End.x;
+            final int endY = _devCropArea_End.y;
+
+            if (endX > startX) {
+
+               if (endY > startY) {
+
+                  _photoImageCanvas.setCursor(_photoCursor_Size_ESE);
+
+               } else {
+
+                  _photoImageCanvas.setCursor(_photoCursor_Size_NESW);
+               }
+
+            } else {
+
+               if (endY > startY) {
+
+                  _photoImageCanvas.setCursor(_photoCursor_Size_NESW);
+
+               } else {
+
+                  _photoImageCanvas.setCursor(_photoCursor_Size_ESE);
+               }
+            }
 
          } else {
 
@@ -815,7 +858,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          _devCropArea_Start = devMousePosition;
          _devCropArea_End = null;
 
-         // keep trim area relative to the photo
+         // keep crop area relative to the photo
          _relCropArea_Start = getRelativeMousePhotoPosition(devMouseX, devMouseY);
          _relCropArea_End = null;
 
@@ -848,16 +891,42 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       /*
        * Set crop area into the photo/tour photo
        */
-      _photo.cropAreaX1 = _relCropArea_Start.x;
-      _photo.cropAreaY1 = _relCropArea_Start.y;
+      float cropAreaX1 = _relCropArea_Start.x;
+      float cropAreaY1 = _relCropArea_Start.y;
+      float cropAreaX2 = _relCropArea_End.x;
+      float cropAreaY2 = _relCropArea_End.y;
 
-      _photo.cropAreaX2 = _relCropArea_End.x;
-      _photo.cropAreaY2 = _relCropArea_End.y;
+      // check bounds
+      cropAreaX1 = checkBounds(cropAreaX1);
+      cropAreaY1 = checkBounds(cropAreaY1);
+      cropAreaX2 = checkBounds(cropAreaX2);
+      cropAreaY2 = checkBounds(cropAreaY2);
+
+      // swap values that x/y 2 is larger than x/y 1
+      if (cropAreaX1 > cropAreaX2) {
+
+         final float tmpCropArea = cropAreaX1;
+
+         cropAreaX1 = cropAreaX2;
+         cropAreaX2 = tmpCropArea;
+      }
+
+      if (cropAreaY1 > cropAreaY2) {
+
+         final float tmpCropArea = cropAreaY1;
+
+         cropAreaY1 = cropAreaY2;
+         cropAreaY2 = tmpCropArea;
+      }
+
+      _photo.isCropModified = true;
+      _photo.cropAreaX1 = cropAreaX1;
+      _photo.cropAreaY1 = cropAreaY1;
+
+      _photo.cropAreaX2 = cropAreaX2;
+      _photo.cropAreaY2 = cropAreaY2;
 
       updateTourPhotoInDB(_photo);
-
-      // discard current cropped image
-      PhotoImageCache.disposeResizedImageKey(_photo.getImageKey(ImageQuality.THUMB_HQ_CROPPED));
 
       _photoImageCanvas.redraw();
    }
@@ -873,7 +942,9 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       if (_devCropArea_Start == null || _devCropArea_End == null) {
 
-         return;
+         // this happens when the dialog is opened
+
+         setCropArea(_photoImageBounds);
       }
 
       // fix bounds when window was resized
@@ -1142,11 +1213,11 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          return;
       }
 
-      final float relTrimStartX = _relCropArea_Start.x;
-      final float relTrimStartY = _relCropArea_Start.y;
+      final float relCropStartX = _relCropArea_Start.x;
+      final float relCropStartY = _relCropArea_Start.y;
 
-      final float relTrimEndX = _relCropArea_End.x;
-      final float relTrimEndY = _relCropArea_End.y;
+      final float relCropEndX = _relCropArea_End.x;
+      final float relCropEndY = _relCropArea_End.y;
 
       final int devPhotoX = photoImageBounds.x;
       final int devPhotoY = photoImageBounds.y;
@@ -1154,14 +1225,14 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       final float devPhotoWidth = photoImageBounds.width;
       final float devPhotoHeight = photoImageBounds.height;
 
-      final int devTrimStartX = (int) (devPhotoX + relTrimStartX * devPhotoWidth);
-      final int devTrimStartY = (int) (devPhotoY + relTrimStartY * devPhotoHeight);
+      final int devCropStartX = (int) (devPhotoX + relCropStartX * devPhotoWidth);
+      final int devCropStartY = (int) (devPhotoY + relCropStartY * devPhotoHeight);
 
-      final int devTrimEndX = (int) (devPhotoX + relTrimEndX * devPhotoWidth);
-      final int devTrimEndY = (int) (devPhotoY + relTrimEndY * devPhotoHeight);
+      final int devCropEndX = (int) (devPhotoX + relCropEndX * devPhotoWidth);
+      final int devCropEndY = (int) (devPhotoY + relCropEndY * devPhotoHeight);
 
-      _devCropArea_Start = new Point(devTrimStartX, devTrimStartY);
-      _devCropArea_End = new Point(devTrimEndX, devTrimEndY);
+      _devCropArea_Start = new Point(devCropStartX, devCropStartY);
+      _devCropArea_End = new Point(devCropEndX, devCropEndY);
    }
 
    private void setTooltipSize() {
