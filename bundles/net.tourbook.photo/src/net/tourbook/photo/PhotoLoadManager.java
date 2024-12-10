@@ -487,7 +487,7 @@ public class PhotoLoadManager {
 
             } else {
 
-               imageLoader.loadImageHQThumb(_waitingQueueThumb, _waitingQueueExif, photo, imageQuality);
+               imageLoader.loadImageHQThumb_Map(_waitingQueueThumb, _waitingQueueExif, photo, imageQuality);
             }
 
             checkLoadingState(photo, imageQuality);

@@ -959,7 +959,8 @@ public class Photo implements Serializable {
 
          return _photoLoadingStateHQ;
 
-      } else if (imageQuality == ImageQuality.THUMB_HQ) {
+      } else if (imageQuality == ImageQuality.THUMB_HQ
+            || imageQuality == ImageQuality.THUMB_HQ_CROPPED) {
 
          return _photoLoadingStateThumbHQ;
 
@@ -1314,7 +1315,8 @@ public class Photo implements Serializable {
 
          _photoLoadingStateHQ = photoLoadingState;
 
-      } else if (imageQuality == ImageQuality.THUMB_HQ) {
+      } else if (imageQuality == ImageQuality.THUMB_HQ
+            || imageQuality == ImageQuality.THUMB_HQ_CROPPED) {
 
          _photoLoadingStateThumbHQ = photoLoadingState;
 

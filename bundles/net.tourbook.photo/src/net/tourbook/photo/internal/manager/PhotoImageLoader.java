@@ -985,10 +985,10 @@ public class PhotoImageLoader {
     * @param photo
     * @param imageQuality
     */
-   public void loadImageHQThumb(final LinkedBlockingDeque<PhotoImageLoader> thumbImageWaitingQueue,
-                                final LinkedBlockingDeque<PhotoExifLoader> exifWaitingQueue,
-                                final Photo photo,
-                                final ImageQuality imageQuality) {
+   public void loadImageHQThumb_Map(final LinkedBlockingDeque<PhotoImageLoader> thumbImageWaitingQueue,
+                                    final LinkedBlockingDeque<PhotoExifLoader> exifWaitingQueue,
+                                    final Photo photo,
+                                    final ImageQuality imageQuality) {
 
       /*
        * Wait until exif data and small images are loaded
@@ -1015,7 +1015,7 @@ public class PhotoImageLoader {
 
             // it is possible that the not cropped image is already loaded -> only crop it
 
-            final BufferedImage notCroppedImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.HQ);
+            final BufferedImage notCroppedImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB_HQ);
 
             if (notCroppedImage != null) {
                hqThumbImage = cropImage(notCroppedImage);
@@ -1023,7 +1023,7 @@ public class PhotoImageLoader {
          }
 
          if (hqThumbImage == null) {
-            hqThumbImage = loadImageHQThumb_10(imageQuality);
+            hqThumbImage = loadImageHQThumb_Map_10(imageQuality);
          }
 
       } catch (final Exception e) {
@@ -1065,7 +1065,7 @@ public class PhotoImageLoader {
       }
    }
 
-   private BufferedImage loadImageHQThumb_10(final ImageQuality imageQuality) throws Exception {
+   private BufferedImage loadImageHQThumb_Map_10(final ImageQuality imageQuality) throws Exception {
 
       // prevent recursive calls
       if (_recursiveCounter[0]++ > 2) {
@@ -1174,8 +1174,9 @@ public class PhotoImageLoader {
       }
 
       /*
-       * Crop image
+       * Crop image NOW, to prevent flickering when cropping is done later
        */
+
 //      if (_photo.isCropped && imageQuality == ImageQuality.THUMB_HQ_CROPPED) {
 //
 //         final float cropAreaX1 = _photo.cropAreaX1;

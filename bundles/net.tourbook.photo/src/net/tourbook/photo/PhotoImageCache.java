@@ -298,17 +298,11 @@ public class PhotoImageCache {
       return swtImage;
    }
 
-   public static Image getImageOriginal(final Photo photo) {
+   public static Image getImageOriginal_SWT(final Photo photo) {
 
       final String imageKey = photo.getImageKey(ImageQuality.ORIGINAL);
 
       return getImageFromCache_SWT(_imageCache_OriginalImage, photo, imageKey);
-
-//		if (_imageCacheOriginal.size() > 1) {
-//
-//		}
-//
-//		return null;
    }
 
    /**
@@ -393,6 +387,7 @@ public class PhotoImageCache {
    public static void putImageOriginal(final String imageKey, final Image image, final String originalImagePathName) {
 
       if (_imageCache_OriginalImage.asMap().size() > 1) {}
+
       putImageInCache_SWT(_imageCache_OriginalImage, imageKey, image, originalImagePathName);
    }
 
