@@ -75,6 +75,7 @@ import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -133,7 +134,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private boolean               _isAutoResizeTooltip;
    private boolean               _isExpandCollapseModified;
-   private boolean               _isMouseDown;
+   private boolean               _isMouseDown_InPhoto;
    private boolean               _isTooltipExpanded;
 
    private ToolBarManager        _toolbarManagerExpandCollapseSlideout;
@@ -149,10 +150,23 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
    /** Photo position and size of the photo image within the photo canvas */
    private Rectangle             _photoImageBounds;
    private Rectangle             _photoImageBounds_OnResize;
+   private Rectangle             _devCropArea_Top;
+   private Rectangle             _devCropArea_Bottom;
+   private Rectangle             _devCropArea_Left;
+   private Rectangle             _devCropArea_Right;
    private Point                 _devCropArea_Start;
    private Point                 _devCropArea_End;
    private Point2D.Float         _relCropArea_Start;
    private Point2D.Float         _relCropArea_End;
+   private boolean               _isMouse_InCropArea_All;
+   private boolean               _isMouse_InCropArea_Top;
+   private boolean               _isMouse_InCropArea_Bottom;
+   private boolean               _isMouse_InCropArea_Left;
+   private boolean               _isMouse_InCropArea_Right;
+   private boolean               _isMouseDown_InCropArea_Top;
+   private boolean               _isMouseDown_InCropArea_Bottom;
+   private boolean               _isMouseDown_InCropArea_Left;
+   private boolean               _isMouseDown_InCropArea_Right;
 
    private MouseMoveListener     _photoMouseMoveListener;
    private MouseListener         _photoMouseDownListener;
@@ -179,9 +193,14 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private PhotoImageCanvas _photoImageCanvas;
 
+   private Cursor           _currentCursor;
+   private Cursor           _photoCursor_Arrow;
    private Cursor           _photoCursor_Cross;
+   private Cursor           _photoCursor_Size_All;
    private Cursor           _photoCursor_Size_ESE;
    private Cursor           _photoCursor_Size_NESW;
+   private Cursor           _photoCursor_Size_NS;
+   private Cursor           _photoCursor_Size_WE;
 
    private class ActionExpandSlideout extends Action {
 
@@ -696,9 +715,14 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       _photoMouseExitListener    = MouseTrackListener.mouseExitAdapter(    event -> onPhoto_Mouse_Exit());
       _photoResizeListener       = ControlListener.controlResizedAdapter(  event -> onPhoto_Resize(event));
 
+      _photoCursor_Arrow         = display.getSystemCursor(SWT.CURSOR_ARROW);
       _photoCursor_Cross         = display.getSystemCursor(SWT.CURSOR_CROSS);
+      _photoCursor_Size_All      = display.getSystemCursor(SWT.CURSOR_SIZEALL);
       _photoCursor_Size_ESE      = display.getSystemCursor(SWT.CURSOR_SIZESE);
       _photoCursor_Size_NESW     = display.getSystemCursor(SWT.CURSOR_SIZENESW);
+      _photoCursor_Size_NS       = display.getSystemCursor(SWT.CURSOR_SIZENS);
+      _photoCursor_Size_WE       = display.getSystemCursor(SWT.CURSOR_SIZEWE);
+
 
 // SET_FORMATTING_ON
 
@@ -776,7 +800,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private void onPhoto_Mouse_Exit() {
 
-      _photoImageCanvas.setCursor(null);
+      updateCursor(null);
    }
 
    private void onPhoto_Mouse_Move(final MouseEvent mouseEvent) {
@@ -785,16 +809,35 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          return;
       }
 
+      if (_photo.isCropped == false) {
+
+         updateCursor(_photoCursor_Arrow);
+
+         return;
+      }
+
+      // reset states
+      _isMouse_InCropArea_All = false;
+      _isMouse_InCropArea_Top = false;
+      _isMouse_InCropArea_Bottom = false;
+      _isMouse_InCropArea_Left = false;
+      _isMouse_InCropArea_Right = false;
+
       final int devMouseX = mouseEvent.x;
       final int devMouseY = mouseEvent.y;
-
       final Point devMousePosition = new Point(devMouseX, devMouseY);
 
       final boolean isMouseWithinPhoto = _photoImageBounds.contains(devMousePosition);
 
-      if (_photo.isCropped && isMouseWithinPhoto) {
+      Cursor hoveredCursor = _photoCursor_Arrow;
 
-         if (_isMouseDown) {
+      if (isMouseWithinPhoto) {
+
+         hoveredCursor = _photoCursor_Cross;
+
+         if (_isMouseDown_InPhoto) {
+
+            // crop area is currently resized
 
             _devCropArea_End = devMousePosition;
             _relCropArea_End = getRelativeMousePhotoPosition(devMouseX, devMouseY);
@@ -805,43 +848,85 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
              * Set cursor direction according to the mouse moving, with try and error I found the
              * correct cursor :-)
              */
-            final int startX = _devCropArea_Start.x;
-            final int startY = _devCropArea_Start.y;
-            final int endX = _devCropArea_End.x;
-            final int endY = _devCropArea_End.y;
+            final int devStartX = _devCropArea_Start.x;
+            final int devStartY = _devCropArea_Start.y;
+            final int devEndX = _devCropArea_End.x;
+            final int devEndY = _devCropArea_End.y;
 
-            if (endX > startX) {
+            if (devEndX > devStartX) {
 
-               if (endY > startY) {
+               if (devEndY > devStartY) {
 
-                  _photoImageCanvas.setCursor(_photoCursor_Size_ESE);
+                  hoveredCursor = _photoCursor_Size_ESE;
 
                } else {
 
-                  _photoImageCanvas.setCursor(_photoCursor_Size_NESW);
+                  hoveredCursor = _photoCursor_Size_NESW;
                }
 
             } else {
 
-               if (endY > startY) {
+               if (devEndY > devStartY) {
 
-                  _photoImageCanvas.setCursor(_photoCursor_Size_NESW);
+                  hoveredCursor = _photoCursor_Size_NESW;
 
                } else {
 
-                  _photoImageCanvas.setCursor(_photoCursor_Size_ESE);
+                  hoveredCursor = _photoCursor_Size_ESE;
                }
             }
 
          } else {
 
-            _photoImageCanvas.setCursor(_photoCursor_Cross);
+            if (_devCropArea_Start != null && _devCropArea_End != null) {
+
+               final int devStartX = _devCropArea_Start.x;
+               final int devStartY = _devCropArea_Start.y;
+               final int devEndX = _devCropArea_End.x;
+               final int devEndY = _devCropArea_End.y;
+
+               final int devWidth = devEndX - devStartX;
+               final int devHeight = devEndY - devStartY;
+
+               final Rectangle devCropRectangle = new Rectangle(devStartX, devStartY, devWidth, devHeight);
+
+               if (_devCropArea_Top.contains(devMousePosition)) {
+
+                  _isMouse_InCropArea_Top = true;
+
+                  hoveredCursor = _photoCursor_Size_NS;
+
+               } else if (_devCropArea_Bottom.contains(devMousePosition)) {
+
+                  _isMouse_InCropArea_Bottom = true;
+
+                  hoveredCursor = _photoCursor_Size_NS;
+
+               } else if (_devCropArea_Left.contains(devMousePosition)) {
+
+                  _isMouse_InCropArea_Left = true;
+
+                  hoveredCursor = _photoCursor_Size_WE;
+
+               } else if (_devCropArea_Right.contains(devMousePosition)) {
+
+                  _isMouse_InCropArea_Right = true;
+
+                  hoveredCursor = _photoCursor_Size_WE;
+
+               } else if (devCropRectangle.contains(devMousePosition)) {
+
+                  _isMouse_InCropArea_All = true;
+
+                  hoveredCursor = _photoCursor_Size_All;
+               }
+
+               _photoImageCanvas.redraw();
+            }
          }
-
-      } else {
-
-         _photoImageCanvas.setCursor(null);
       }
+
+      updateCursor(hoveredCursor);
    }
 
    private void onPhoto_Mouse_UpDown_1_Down(final MouseEvent mouseEvent) {
@@ -851,31 +936,55 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       final Point devMousePosition = new Point(devMouseX, devMouseY);
 
-      final boolean isMouseWithinPhoto = _photoImageBounds.contains(devMousePosition);
+      _isMouseDown_InCropArea_Top = false;
+      _isMouseDown_InCropArea_Bottom = false;
+      _isMouseDown_InCropArea_Left = false;
+      _isMouseDown_InCropArea_Right = false;
 
-      if (isMouseWithinPhoto) {
+      if (_isMouse_InCropArea_Top) {
 
-         _isMouseDown = true;
+         _isMouseDown_InCropArea_Top = true;
 
-         _devCropArea_Start = devMousePosition;
-         _devCropArea_End = null;
+      } else if (_isMouse_InCropArea_Bottom) {
 
-         // keep crop area relative to the photo
-         _relCropArea_Start = getRelativeMousePhotoPosition(devMouseX, devMouseY);
-         _relCropArea_End = null;
+         _isMouseDown_InCropArea_Bottom = true;
 
-         _photoImageCanvas.redraw();
+      } else if (_isMouse_InCropArea_Left) {
+
+         _isMouseDown_InCropArea_Left = true;
+
+      } else if (_isMouse_InCropArea_Right) {
+
+         _isMouseDown_InCropArea_Right = true;
 
       } else {
 
-         _isMouseDown = false;
+         final boolean isMouseWithinPhoto = _photoImageBounds.contains(devMousePosition);
 
-         _devCropArea_Start = null;
-         _devCropArea_End = null;
+         if (isMouseWithinPhoto) {
 
-         _relCropArea_Start = null;
-         _relCropArea_End = null;
+            _isMouseDown_InPhoto = true;
+
+            _devCropArea_Start = devMousePosition;
+            _devCropArea_End = null;
+
+            // keep crop area relative to the photo
+            _relCropArea_Start = getRelativeMousePhotoPosition(devMouseX, devMouseY);
+            _relCropArea_End = null;
+
+         } else {
+
+            _isMouseDown_InPhoto = false;
+
+            _devCropArea_Start = null;
+            _devCropArea_End = null;
+
+            _relCropArea_Start = null;
+            _relCropArea_End = null;
+         }
       }
+
+      _photoImageCanvas.redraw();
    }
 
    private void onPhoto_Mouse_UpDown_2_Up(final MouseEvent mouseEvent) {
@@ -885,53 +994,73 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       final Point devMousePosition = new Point(devMouseX, devMouseY);
 
-      _isMouseDown = false;
+      if (_isMouseDown_InCropArea_Top) {
 
-      _devCropArea_End = devMousePosition;
-      _relCropArea_End = getRelativeMousePhotoPosition(devMouseX, devMouseY);
+      } else if (_isMouseDown_InCropArea_Bottom) {
 
-      /*
-       * Set crop area into the photo/tour photo
-       */
-      float cropAreaX1 = _relCropArea_Start.x;
-      float cropAreaY1 = _relCropArea_Start.y;
-      float cropAreaX2 = _relCropArea_End.x;
-      float cropAreaY2 = _relCropArea_End.y;
+      } else if (_isMouseDown_InCropArea_Left) {
 
-      // check/fix bounds
-      cropAreaX1 = fixCropBounds(cropAreaX1);
-      cropAreaY1 = fixCropBounds(cropAreaY1);
-      cropAreaX2 = fixCropBounds(cropAreaX2);
-      cropAreaY2 = fixCropBounds(cropAreaY2);
+      } else if (_isMouseDown_InCropArea_Right) {
 
-      // swap values that x/y 2 is larger than x/y 1
-      if (cropAreaX1 > cropAreaX2) {
+      } else {
 
-         final float tmpCropArea = cropAreaX1;
+         _isMouseDown_InPhoto = false;
 
-         cropAreaX1 = cropAreaX2;
-         cropAreaX2 = tmpCropArea;
+         _devCropArea_End = devMousePosition;
+         _relCropArea_End = getRelativeMousePhotoPosition(devMouseX, devMouseY);
+
+//         swapCropStartEnd();
+
+         updateCropArea_TopBottomLeftRight();
+
+         /*
+          * Set cropping area into the photo/tour photo
+          */
+         float relCropAreaX1 = _relCropArea_Start.x;
+         float relCropAreaY1 = _relCropArea_Start.y;
+         float relCropAreaX2 = _relCropArea_End.x;
+         float relCropAreaY2 = _relCropArea_End.y;
+
+         // check/fix bounds
+         relCropAreaX1 = fixCropBounds(relCropAreaX1);
+         relCropAreaY1 = fixCropBounds(relCropAreaY1);
+         relCropAreaX2 = fixCropBounds(relCropAreaX2);
+         relCropAreaY2 = fixCropBounds(relCropAreaY2);
+
+         // swap values that x/y 2 is larger than x/y 1
+         if (relCropAreaX1 > relCropAreaX2) {
+
+            final float tmpCropArea = relCropAreaX1;
+
+            relCropAreaX1 = relCropAreaX2;
+            relCropAreaX2 = tmpCropArea;
+         }
+
+         if (relCropAreaY1 > relCropAreaY2) {
+
+            final float tmpCropArea = relCropAreaY1;
+
+            relCropAreaY1 = relCropAreaY2;
+            relCropAreaY2 = tmpCropArea;
+         }
+
+         _photo.isCropModified = true;
+
+         _photo.cropAreaX1 = relCropAreaX1;
+         _photo.cropAreaY1 = relCropAreaY1;
+
+         _photo.cropAreaX2 = relCropAreaX2;
+         _photo.cropAreaY2 = relCropAreaY2;
+
+         _photo.updateMapImageRenderSize();
+
+         updateTourPhotoInDB(_photo);
       }
 
-      if (cropAreaY1 > cropAreaY2) {
-
-         final float tmpCropArea = cropAreaY1;
-
-         cropAreaY1 = cropAreaY2;
-         cropAreaY2 = tmpCropArea;
-      }
-
-      _photo.isCropModified = true;
-
-      _photo.cropAreaX1 = cropAreaX1;
-      _photo.cropAreaY1 = cropAreaY1;
-
-      _photo.cropAreaX2 = cropAreaX2;
-      _photo.cropAreaY2 = cropAreaY2;
-
-      _photo.updateMapImageRenderSize();
-
-      updateTourPhotoInDB(_photo);
+      _isMouseDown_InCropArea_Top = false;
+      _isMouseDown_InCropArea_Bottom = false;
+      _isMouseDown_InCropArea_Left = false;
+      _isMouseDown_InCropArea_Right = false;
 
       _photoImageCanvas.redraw();
    }
@@ -997,6 +1126,11 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          devHeight = devYStart - devYEnd;
       }
 
+      gc.setLineWidth(1);
+
+      /*
+       * Paint crop rectangle
+       */
       gc.setForeground(UI.SYS_COLOR_BLACK);
       gc.drawRectangle(
 
@@ -1014,6 +1148,61 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
             devWidth + 2,
             devHeight + 2);
+
+      /*
+       * Paint hovered borders
+       */
+      final Color mouseDownColor = UI.SYS_COLOR_YELLOW;
+      final Color mouseHoverColor = UI.SYS_COLOR_MAGENTA;
+
+      if (_isMouse_InCropArea_Top) {
+
+         gc.setForeground(_isMouseDown_InCropArea_Top ? mouseDownColor : mouseHoverColor);
+
+         gc.drawLine(
+
+               devXTopLeft - 1,
+               devYTopLeft - 1,
+
+               devXTopLeft + devWidth + 2,
+               devYTopLeft - 1);
+
+      } else if (_isMouse_InCropArea_Bottom) {
+
+         gc.setForeground(_isMouseDown_InCropArea_Bottom ? mouseDownColor : mouseHoverColor);
+
+         gc.drawLine(
+
+               devXTopLeft - 1,
+               devYTopLeft + devHeight + 1,
+
+               devXTopLeft + devWidth + 2,
+               devYTopLeft + devHeight + 1);
+
+      } else if (_isMouse_InCropArea_Left) {
+
+         gc.setForeground(_isMouseDown_InCropArea_Left ? mouseDownColor : mouseHoverColor);
+
+         gc.drawLine(
+
+               devXTopLeft - 1,
+               devYTopLeft - 1,
+
+               devXTopLeft - 1,
+               devYTopLeft + devHeight + 1);
+
+      } else if (_isMouse_InCropArea_Right) {
+
+         gc.setForeground(_isMouseDown_InCropArea_Right ? mouseDownColor : mouseHoverColor);
+
+         gc.drawLine(
+
+               devXTopLeft + devWidth + 1,
+               devYTopLeft - 1,
+
+               devXTopLeft + devWidth + 1,
+               devYTopLeft + devHeight + 1);
+      }
    }
 
    private void onPhoto_Resize(final ControlEvent event) {
@@ -1242,6 +1431,8 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       _devCropArea_Start = new Point(devCropStartX, devCropStartY);
       _devCropArea_End = new Point(devCropEndX, devCropEndY);
+
+      updateCropArea_TopBottomLeftRight();
    }
 
    private void setTooltipSize() {
@@ -1321,6 +1512,130 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          _photoImageCanvas.removeMouseTrackListener(_photoMouseExitListener);
 
          _photoImageCanvas.removeControlListener(_photoResizeListener);
+      }
+   }
+
+   private void swapCropStartEnd() {
+      // TODO Auto-generated method stub
+
+      final int devCropAreaX1 = _devCropArea_Start.x;
+      final int devCropAreaY1 = _devCropArea_Start.y;
+      final int devCropAreaX2 = _devCropArea_End.x;
+      final int devCropAreaY2 = _devCropArea_End.y;
+
+      // swap values that x/y 2 is larger than x/y 1
+      if (devCropAreaX1 > devCropAreaX2) {
+
+         final Point devTemp = _devCropArea_Start;
+
+         _devCropArea_Start = _devCropArea_End;
+         _devCropArea_End = devTemp;
+
+         System.out.println(UI.timeStamp() + " swapped 1");
+// TODO remove SYSTEM.OUT.PRINTLN
+
+      } else if (devCropAreaY1 > devCropAreaY2) {
+
+         final Point devTemp = _devCropArea_Start;
+
+         _devCropArea_Start = _devCropArea_End;
+         _devCropArea_End = devTemp;
+
+         System.out.println(UI.timeStamp() + " swapped 2");
+// TODO remove SYSTEM.OUT.PRINTLN
+      }
+   }
+
+   private void updateCropArea_TopBottomLeftRight() {
+
+      int devCropAreaX1 = _devCropArea_Start.x;
+      int devCropAreaY1 = _devCropArea_Start.y;
+      int devCropAreaX2 = _devCropArea_End.x;
+      int devCropAreaY2 = _devCropArea_End.y;
+
+      // swap values that x/y 2 is larger than x/y 1
+      if (devCropAreaX1 > devCropAreaX2) {
+
+         final int tmpCropArea = devCropAreaX1;
+
+         devCropAreaX1 = devCropAreaX2;
+         devCropAreaX2 = tmpCropArea;
+      }
+
+      if (devCropAreaY1 > devCropAreaY2) {
+
+         final int tmpCropArea = devCropAreaY1;
+
+         devCropAreaY1 = devCropAreaY2;
+         devCropAreaY2 = tmpCropArea;
+      }
+
+      final int devPhotoX = _photoImageBounds.x;
+      final int devPhotoY = _photoImageBounds.y;
+
+      final int devPhotoWidth = _photoImageBounds.width;
+      final int devPhotoHeight = _photoImageBounds.height;
+
+      // check/fix bounds
+      if (devCropAreaX1 < devPhotoX) {
+         devCropAreaX1 = devPhotoX;
+      }
+
+      if (devCropAreaY1 < devPhotoY) {
+         devCropAreaY1 = devPhotoY;
+      }
+
+      if (devCropAreaX2 > devPhotoX + devPhotoWidth) {
+         devCropAreaX2 = devPhotoX + devPhotoWidth;
+      }
+
+      if (devCropAreaY2 > devPhotoY + devPhotoHeight) {
+         devCropAreaY2 = devPhotoY + devPhotoHeight;
+      }
+
+      final int devCropAreaWidth = devCropAreaX2 - devCropAreaX1;
+      final int devCropAreaHeight = devCropAreaY2 - devCropAreaY1;
+
+      final int hoverMargin = 5;
+      final int hoverMargin2 = 2 * hoverMargin;
+
+      _devCropArea_Top = new Rectangle(
+            devCropAreaX1,
+            devCropAreaY1 - hoverMargin,
+            devCropAreaWidth,
+            hoverMargin2);
+
+      _devCropArea_Bottom = new Rectangle(
+            devCropAreaX1,
+            devCropAreaY1 + devCropAreaHeight - hoverMargin,
+            devCropAreaWidth,
+            hoverMargin2);
+
+      _devCropArea_Left = new Rectangle(
+            devCropAreaX1 - hoverMargin,
+            devCropAreaY1,
+            hoverMargin2,
+            devCropAreaHeight);
+
+      _devCropArea_Right = new Rectangle(
+            devCropAreaX1 + devCropAreaWidth - hoverMargin,
+            devCropAreaY1,
+            hoverMargin2,
+            devCropAreaHeight);
+   }
+
+   /**
+    * Update cursor only when it was modified
+    *
+    * @param cursor
+    */
+   private void updateCursor(final Cursor cursor) {
+
+      if (_currentCursor != cursor) {
+
+         _currentCursor = cursor;
+
+         _photoImageCanvas.setCursor(cursor);
       }
    }
 
