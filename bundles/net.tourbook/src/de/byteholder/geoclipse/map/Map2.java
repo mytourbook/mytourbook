@@ -8498,14 +8498,14 @@ public class Map2 extends Canvas {
          final int labelDevX = (int) distribLabel.labelBoxL;
          final int labelDevY = (int) distribLabel.labelBoxT;
 
-         final int photoWidth = mapImageSize.x;
-         final int photoHeight = mapImageSize.y;
+         final int mapImageWidth = mapImageSize.x;
+         final int mapImageHeight = mapImageSize.y;
 
          final Rectangle photoRectangle = new Rectangle(
                labelDevX,
                labelDevY,
-               photoWidth,
-               photoHeight);
+               mapImageWidth,
+               mapImageHeight);
 
          final BufferedImage awtPhotoImage = getPhotoImage(photo);
 
@@ -8528,7 +8528,7 @@ public class Map2 extends Canvas {
             final int photoImageWidth = awtPhotoImage.getWidth();
             final int photoImageHeight = awtPhotoImage.getHeight();
 
-            if (photoImageWidth == photoWidth && photoImageHeight == photoHeight) {
+            if (photoImageWidth == mapImageWidth && photoImageHeight == mapImageHeight) {
 
                // do not resize the image would do not look very good
 

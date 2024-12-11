@@ -234,66 +234,69 @@ public class Photo implements Serializable {
     */
 //   private static boolean                        _isGetExifGeo               = false;
 
-   private int                                     _photoImageWidth         = Integer.MIN_VALUE;
-   private int                                     _photoImageHeight        = Integer.MIN_VALUE;
+   /**
+    * Photo image width, it is {@link Integer#MIN_VALUE} when not yet set
+    */
+   private int                           _photoImageWidth     = Integer.MIN_VALUE;
+   private int                           _photoImageHeight    = Integer.MIN_VALUE;
 
-   private int                                     _thumbImageWidth         = Integer.MIN_VALUE;
-   private int                                     _thumbImageHeight        = Integer.MIN_VALUE;
+   private int                           _thumbImageWidth     = Integer.MIN_VALUE;
+   private int                           _thumbImageHeight    = Integer.MIN_VALUE;
 
    /**
     * Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the value when the
     * value is not set !!!
     */
-   private double                                  _exifLatitude            = 0;
-   private double                                  _exifLongitude           = 0;
+   private double                        _exifLatitude;
+   private double                        _exifLongitude;
 
-   private double                                  _tourLatitude            = 0;
-   private double                                  _tourLongitude           = 0;
+   private double                        _tourLatitude;
+   private double                        _tourLongitude;
 
-   private double                                  _linkLatitude            = 0;
-   private double                                  _linkLongitude           = 0;
+   private double                        _linkLatitude;
+   private double                        _linkLongitude;
 
-   private String                                  _gpsAreaInfo;
+   private String                        _gpsAreaInfo;
 
-   private double                                  _imageDirection          = Double.MIN_VALUE;
+   private double                        _imageDirection      = Double.MIN_VALUE;
 
-   private double                                  _altitude                = Double.MIN_VALUE;
+   private double                        _altitude            = Double.MIN_VALUE;
 
    /**
     * Caches the world positions for the photo lat/long values for each zoom level
     * <p>
     * key: projection id + zoom level
     */
-   private final HashMap<Integer, Point>           _tourWorldPosition       = new HashMap<>();
-   private final HashMap<Integer, Point>           _linkWorldPosition       = new HashMap<>();
+   private final HashMap<Integer, Point> _tourWorldPosition   = new HashMap<>();
+   private final HashMap<Integer, Point> _linkWorldPosition   = new HashMap<>();
 
    /**
     * Contains image keys for each image quality which can be used to get images from an image
     * cache
     */
-   private String                                  _imageKey_Thumb;
-   private String                                  _imageKey_ThumbHQ;
-   private String                                  _imageKey_ThumbHQ_Cropped;
-   private String                                  _imageKey_HQ;
-   private String                                  _imageKey_Original;
+   private String                        _imageKey_Thumb;
+   private String                        _imageKey_ThumbHQ;
+   private String                        _imageKey_ThumbHQ_Cropped;
+   private String                        _imageKey_HQ;
+   private String                        _imageKey_Original;
 
    /**
     * This array keeps track of the loading state for the photo images and for different qualities
     */
-   private PhotoLoadingState                       _photoLoadingStateThumb;
-   private PhotoLoadingState                       _photoLoadingStateThumbHQ;
-   private PhotoLoadingState                       _photoLoadingStateHQ;
-   private PhotoLoadingState                       _photoLoadingStateOriginal;
+   private PhotoLoadingState             _photoLoadingStateThumb;
+   private PhotoLoadingState             _photoLoadingStateThumbHQ;
+   private PhotoLoadingState             _photoLoadingStateHQ;
+   private PhotoLoadingState             _photoLoadingStateOriginal;
 
    /**
     * Is <code>true</code> when loading the image causes an error.
     */
-   private boolean                                 _isLoadingError;
+   private boolean                       _isLoadingError;
 
    /**
     * Is <code>true</code> when the image file is available in the file system.
     */
-   private boolean                                 _isImageFileAvailable;
+   private boolean                       _isImageFileAvailable;
 
    /**
     * Exif thumb state
@@ -305,20 +308,23 @@ public class Photo implements Serializable {
     * -1 exif thumb has not yet been retrieved
     * </pre>
     */
-   private int                                     _exifThumbImageState     = -1;
+   private int                           _exifThumbImageState = -1;
 
    /**
     * Temporarily tour id from a {@link TourPhotoLink}
     */
-   private long                                    _photoLinkTourId;
+   private long                          _photoLinkTourId;
 
-   public boolean                                  isCropped;
-   public boolean                                  isCropModified;
+   public boolean                        isCropped;
+   public boolean                        isCropModified;
 
-   public float                                    cropAreaX1;
-   public float                                    cropAreaY1;
-   public float                                    cropAreaX2;
-   public float                                    cropAreaY2;
+   /**
+    * Relative position for the top left x position of the cropping area
+    */
+   public float                          cropAreaX1;
+   public float                          cropAreaY1;
+   public float                          cropAreaX2;
+   public float                          cropAreaY2;
 
    /**
     */
@@ -1335,10 +1341,6 @@ public class Photo implements Serializable {
       if (photoLoadingState == PhotoLoadingState.IMAGE_IS_INVALID) {
          _isLoadingError = true;
       }
-//
-//      System.out
-//            .println("set state\t" + imageQuality + "\t" + photoLoadingState + "\t" + imageFileName);
-//      // TODO remove SYSTEM.OUT.PRINTLN
    }
 
    private void setMap25ImageRenderSize(final int mapImageRequestedSize) {
@@ -1365,8 +1367,25 @@ public class Photo implements Serializable {
       final int imageCanvasWidth = mapImageRequestedSize;
       final int imageCanvasHeight = mapImageRequestedSize;
 
-      final int imageWidth = _photoImageWidth != Integer.MIN_VALUE ? _photoImageWidth : _thumbImageWidth;
-      final int imageHeight = _photoImageHeight != Integer.MIN_VALUE ? _photoImageHeight : _thumbImageHeight;
+      int imageWidth = _photoImageWidth != Integer.MIN_VALUE ? _photoImageWidth : _thumbImageWidth;
+      int imageHeight = _photoImageHeight != Integer.MIN_VALUE ? _photoImageHeight : _thumbImageHeight;
+
+      if (isCropped && imageWidth != Integer.MIN_VALUE) {
+
+         // adjust to cropping area
+
+         imageWidth = (int) ((cropAreaX2 - cropAreaX1) * imageWidth);
+         imageHeight = (int) ((cropAreaY2 - cropAreaY1) * imageHeight);
+
+         // fix 0, this happenes when the mouse is clicked but not moved
+         if (imageWidth == 0) {
+            imageWidth = 5;
+         }
+
+         if (imageHeight == 0) {
+            imageHeight = 5;
+         }
+      }
 
       final org.eclipse.swt.graphics.Point renderSize = RendererHelper.getBestSize(this,
 
@@ -1393,8 +1412,7 @@ public class Photo implements Serializable {
          _photoImageHeight = height;
       }
 
-      setMap2ImageRenderSize(_map2ImageRequestedSize);
-      setMap25ImageRenderSize(_map25ImageRequestedSize);
+      updateMapImageRenderSize();
    }
 
    public void setStateExifThumb(final int exifThumbState) {
@@ -1407,8 +1425,7 @@ public class Photo implements Serializable {
       _thumbImageWidth = width;
       _thumbImageHeight = height;
 
-      setMap2ImageRenderSize(_map2ImageRequestedSize);
-      setMap25ImageRenderSize(_map25ImageRequestedSize);
+      updateMapImageRenderSize();
    }
 
    public void setTourGeoPosition(final double latitude, final double longitude) {
@@ -1546,8 +1563,7 @@ public class Photo implements Serializable {
          }
       }
 
-      setMap2ImageRenderSize(_map2ImageRequestedSize);
-      setMap25ImageRenderSize(_map25ImageRequestedSize);
+      updateMapImageRenderSize();
 
       isExifLoaded = true;
 
@@ -1569,4 +1585,11 @@ public class Photo implements Serializable {
          imageExifTime = exifUTCMills;
       }
    }
+
+   public void updateMapImageRenderSize() {
+
+      setMap2ImageRenderSize(_map2ImageRequestedSize);
+      setMap25ImageRenderSize(_map25ImageRequestedSize);
+   }
+
 }

@@ -254,19 +254,6 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       onTTShellResize(null);
    }
 
-   private float checkBounds(final float relCropAreaValue) {
-
-      if (relCropAreaValue < 0) {
-         return 0;
-      }
-
-      if (relCropAreaValue > 1) {
-         return 1;
-      }
-
-      return relCropAreaValue;
-   }
-
    @Override
    public void close() {
 
@@ -461,6 +448,19 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       _comboTooltipSize.add(OtherMessages.APP_SIZE_SMALL_TEXT);
       _comboTooltipSize.add(OtherMessages.APP_SIZE_MEDIUM_TEXT);
       _comboTooltipSize.add(OtherMessages.APP_SIZE_LARGE_TEXT);
+   }
+
+   private float fixCropBounds(final float relCropAreaValue) {
+
+      if (relCropAreaValue < 0) {
+         return 0;
+      }
+
+      if (relCropAreaValue > 1) {
+         return 1;
+      }
+
+      return relCropAreaValue;
    }
 
    private Point fixupDisplayBounds(final Point ttSize_Unscaled, final Point ttPos_Scaled) {
@@ -765,6 +765,8 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          _photo.isCropModified = true;
       }
 
+      _photo.updateMapImageRenderSize();
+
       updateTourPhotoInDB(_photo);
 
       setupPhotoCanvasListener();
@@ -896,11 +898,11 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       float cropAreaX2 = _relCropArea_End.x;
       float cropAreaY2 = _relCropArea_End.y;
 
-      // check bounds
-      cropAreaX1 = checkBounds(cropAreaX1);
-      cropAreaY1 = checkBounds(cropAreaY1);
-      cropAreaX2 = checkBounds(cropAreaX2);
-      cropAreaY2 = checkBounds(cropAreaY2);
+      // check/fix bounds
+      cropAreaX1 = fixCropBounds(cropAreaX1);
+      cropAreaY1 = fixCropBounds(cropAreaY1);
+      cropAreaX2 = fixCropBounds(cropAreaX2);
+      cropAreaY2 = fixCropBounds(cropAreaY2);
 
       // swap values that x/y 2 is larger than x/y 1
       if (cropAreaX1 > cropAreaX2) {
@@ -920,11 +922,14 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       }
 
       _photo.isCropModified = true;
+
       _photo.cropAreaX1 = cropAreaX1;
       _photo.cropAreaY1 = cropAreaY1;
 
       _photo.cropAreaX2 = cropAreaX2;
       _photo.cropAreaY2 = cropAreaY2;
+
+      _photo.updateMapImageRenderSize();
 
       updateTourPhotoInDB(_photo);
 
@@ -945,6 +950,10 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          // this happens when the dialog is opened
 
          setCropArea(_photoImageBounds);
+
+         if (_devCropArea_Start == null || _devCropArea_End == null) {
+            return;
+         }
       }
 
       // fix bounds when window was resized
