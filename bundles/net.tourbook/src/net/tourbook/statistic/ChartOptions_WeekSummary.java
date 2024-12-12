@@ -285,7 +285,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
 
       enableControls();
 
-      Display.getCurrent().asyncExec(this::saveState);
+      Display.getCurrent().asyncExec(() -> saveState());
    }
 
    @Override

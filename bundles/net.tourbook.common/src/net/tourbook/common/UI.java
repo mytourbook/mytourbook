@@ -167,6 +167,7 @@ public class UI {
    public static final String       SPACE2                               = "  ";                                        //$NON-NLS-1$
    public static final String       SPACE3                               = "   ";                                       //$NON-NLS-1$
    public static final String       SPACE4                               = "    ";                                      //$NON-NLS-1$
+   public static final String       SPACE6                               = "      ";                                    //$NON-NLS-1$
    public static final String       SPACE8                               = "        ";                                  //$NON-NLS-1$
    public static final String       TAB1                                 = "\t";                                        //$NON-NLS-1$
    public static final String       ZERO                                 = "0";                                         //$NON-NLS-1$
@@ -175,7 +176,7 @@ public class UI {
    private static final String      JS_APOSTROPHE_REPLACEMENT            = "\\'";                                       //$NON-NLS-1$
 
    /**
-    * Suddenly JS_QUOTA_MARK causes this Eclipse exception when opening the string externalization
+    * Suddenly SYMBOL_QUOTA causes this Eclipse exception when opening the string externalization
     * dialog
     *
     * <pre>
@@ -196,8 +197,9 @@ public class UI {
     *          at org.eclipse.jdt.ui.actions.SelectionDispatchAction.dispatchRun(SelectionDispatchAction.java:278)
     * </pre>
     */
-// private static final String      JS_QUOTA_MARK                        = "\"";                                        //$NON-NLS-1$
-   private static String            JS_QUOTA_MARK                        = new StringBuilder().append('"').toString();
+// public static final String       SYMBOL_QUOTA                         = "\"";
+   public static final String       SYMBOL_QUOTATION_MARK                = new StringBuilder().append('"').toString();
+   //
    private static final String      JS_QUOTA_MARK_REPLACEMENT            = "\\\"";                                      //$NON-NLS-1$
    private static final String      JS_BACKSLASH_REPLACEMENT             = "\\\\";                                      //$NON-NLS-1$
    private static final String      HTML_NEW_LINE                        = "\\n";                                       //$NON-NLS-1$
@@ -270,6 +272,7 @@ public class UI {
    public static final String       SYMBOL_TEMPERATURE_FAHRENHEIT        = "\u00b0F";                                   //$NON-NLS-1$
    public static final String       SYMBOL_UNDERSCORE                    = "_";                                         //$NON-NLS-1$
    public static final String       SYMBOL_WIND_WITH_SPACE               = "W ";                                        //$NON-NLS-1$
+   public static final String       SYMBOL_ZERO                          = "0";                                         //$NON-NLS-1$
 
    public static final CharSequence SYMBOL_HTML_BACKSLASH                = "&#92;";                                     //$NON-NLS-1$
 
@@ -341,8 +344,9 @@ public class UI {
     */
    public static boolean       IS_4K_DISPLAY;
 
-   public static float         SCALING_4K;
-   public static String        NAME_SUFFIX_4k                 = "@2x";                       //$NON-NLS-1$
+   public static float         HIDPI_SCALING;
+   public static String        HIDPI_NAME_15x                 = "@1.5x";                     //$NON-NLS-1$
+   public static String        HIDPI_NAME_2x                  = "@2x";                       //$NON-NLS-1$
 
    /**
     * On Linux an async selection event is fired since e4
@@ -565,6 +569,7 @@ public class UI {
     * Contains the unit label in the current measurement system for the distance values
     */
    public static String       UNIT_LABEL_ALTIMETER;
+   /** km or mile */
    public static String       UNIT_LABEL_DISTANCE;
    public static String       UNIT_LABEL_DISTANCE_M_OR_YD;
    public static String       UNIT_LABEL_DISTANCE_MM_OR_INCH;
@@ -625,6 +630,14 @@ public class UI {
    public static final String          UNIT_WEIGHT_LBS            = "lbs";                      //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_MG             = "mg";                       //$NON-NLS-1$
 
+   private static final String         DISTANCE_MILES_1_8         = "1/8";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_1_4         = "1/4";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_3_8         = "3/8";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_1_2         = "1/2";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_5_8         = "5/8";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_3_4         = "3/4";                      //$NON-NLS-1$
+   private static final String         DISTANCE_MILES_7_8         = "7/8";                      //$NON-NLS-1$
+   //
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER;
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER_SHORT;
 
@@ -764,7 +777,7 @@ public class UI {
       final int deviceZoom = DPIUtil.getDeviceZoom();
 
       IS_4K_DISPLAY = deviceZoom >= 140;
-      SCALING_4K = deviceZoom / 100f;
+      HIDPI_SCALING = deviceZoom / 100f;
 
       setupUI_FontMetrics();
       setupUI_AWTFonts();
@@ -1076,6 +1089,7 @@ public class UI {
     * @param defaultAccelerator
     *           Could be 10 to increase e.g. image size by 10 without pressing an accelerator key
     * @param isSmallValueAdjustment
+    *           When <code>true</code> then small values have another accelerator than bigger values
     */
    public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event,
                                                       final int defaultAccelerator,
@@ -1299,6 +1313,85 @@ public class UI {
       }
 
       return convertHorizontalDLUsToPixels(_dialogFont_Metrics, dlus);
+   }
+
+   /**
+    * Create distance for imperials which shows the fraction with 1/8, 1/4, 3/8 ...
+    *
+    * @param distanceMeter
+    *
+    * @return
+    */
+   public static String convertKmIntoMiles(final float distanceMeter) {
+
+      final float distanceKm = distanceMeter / 1000;
+
+      int distanceKmInt = (int) distanceKm;
+      float distanceKmFract = distanceKm - distanceKmInt;
+
+      // fix rounding
+      if (distanceKmFract >= 0.9999) {
+
+         distanceKmInt++;
+         distanceKmFract = 0;
+      }
+
+      final StringBuilder sb = new StringBuilder();
+
+      // set whole mile
+      if (distanceKmInt > 0) {
+
+         sb.append(Integer.toString(distanceKmInt));
+         sb.append(SPACE);
+      }
+
+      // set partial mile
+      if (Math.abs(distanceKmFract - 0.125f) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_1_8);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.25f) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_1_4);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.375) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_3_8);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.5f) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_1_2);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.625) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_5_8);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.75f) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_3_4);
+         sb.append(SPACE);
+
+      } else if (Math.abs(distanceKmFract - 0.875) <= 0.01) {
+
+         sb.append(DISTANCE_MILES_7_8);
+         sb.append(SPACE);
+      }
+
+      // ensure a value is displayed
+      if (sb.isEmpty()) {
+
+         sb.append(SYMBOL_ZERO);
+         sb.append(SPACE);
+      }
+
+      sb.append(UNIT_LABEL_DISTANCE);
+
+      return sb.toString();
    }
 
    /**
@@ -2157,11 +2250,11 @@ public class UI {
 
       final float fontSize = //
 
-            UI.SCALING_4K <= 1.5 ? defaultFontSize * 1.5f
+            UI.HIDPI_SCALING <= 1.5 ? defaultFontSize * 1.5f
 
-                  : UI.SCALING_4K <= 2 ? defaultFontSize * 1.7f
+                  : UI.HIDPI_SCALING <= 2 ? defaultFontSize * 1.7f
 
-                        : UI.SCALING_4K <= 3 ? defaultFontSize * 1.8f
+                        : UI.HIDPI_SCALING <= 3 ? defaultFontSize * 1.8f
 
                               : defaultFontSize * 1.8f;
 
@@ -2666,49 +2759,90 @@ public class UI {
     * @param event
     * @param image
     * @param availableWidth
-    * @param alignment
+    * @param horizontalAlignment
     *           SWT.* alignment values
+    * @param horizontalOffset
+    *           Horizontal offset when image is centered
     */
    public static void paintImage(final Event event,
                                  final Image image,
                                  final int availableWidth,
-                                 final int alignment) {
+                                 final int horizontalAlignment,
+                                 final int horizontalOffset) {
+
+      paintImage(
+
+            event,
+            image,
+            availableWidth,
+            horizontalAlignment,
+            SWT.TOP,
+            horizontalOffset);
+   }
+
+   /**
+    * @param event
+    * @param image
+    * @param availableWidth
+    * @param horizontalAlignment
+    *           SWT.* alignment values
+    * @param verticalAlignment
+    *           SWT.* alignment values
+    * @param horizontalOffset
+    *           Horizontal offset when image is centered
+    */
+   public static void paintImage(final Event event,
+                                 final Image image,
+                                 final int availableWidth,
+                                 final int horizontalAlignment,
+                                 final int verticalAlignment,
+                                 final int horizontalOffset) {
 
       final Rectangle imageRect = image.getBounds();
 
       final int imageWidth = imageRect.width;
-      final int imageWidth2 = imageWidth / 2;
 
       /*
        * Horizontal alignment
        */
       int xOffset = 0;
-      final int horizontalOSOffset = UI.IS_WIN
 
-            // W$ has a horizontal indent which prevents to be exactly centered
-            ? 4
-            : 0;
+      switch (horizontalAlignment) {
 
-      switch (alignment) {
-
-      case SWT.CENTER -> xOffset = ((availableWidth - imageWidth2) / 2) - horizontalOSOffset;
+      case SWT.CENTER -> xOffset = ((availableWidth - imageWidth) / 2) + horizontalOffset;
       case SWT.RIGHT  -> xOffset = availableWidth - imageWidth;
-      default         -> xOffset = 2; // == left alignment
+
+      // == left alignment
+      default -> xOffset = 2;
 
       }
 
       /*
-       * Vertical alignment: centered
+       * Vertical alignment
        */
-      final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
+      final int cellHeight = event.height;
+      final int imageHeight = imageRect.height;
 
+      int yOffset;
+
+      switch (verticalAlignment) {
+
+      case SWT.CENTER -> yOffset = (cellHeight - imageHeight) / 2;
+      case SWT.BOTTOM -> yOffset = cellHeight - imageHeight;
+      default         -> yOffset = 0; // == top alignment
+
+      }
+
+      /*
+       * Paint image
+       */
       final int devX = event.x + xOffset;
       final int devY = event.y + yOffset;
 
       final GC gc = event.gc;
 
-//    gc.setBackground(UI.SYS_COLOR_YELLOW);
-//    gc.fillRectangle(event.x, devY, availableWidth, imageRect.height);
+//      gc.setBackground(UI.SYS_COLOR_YELLOW);
+//      gc.fillRectangle(event.x, event.y, availableWidth, imageRect.height);
 
       gc.drawImage(image, devX, devY);
    }
@@ -2739,7 +2873,7 @@ public class UI {
 
    public static String replaceJS_QuotaMark(final String js) {
 
-      return js.replace(JS_QUOTA_MARK, JS_QUOTA_MARK_REPLACEMENT);
+      return js.replace(SYMBOL_QUOTATION_MARK, JS_QUOTA_MARK_REPLACEMENT);
    }
 
    public static void resetInitialLocation(final IDialogSettings _state, final String statePrefix) {
@@ -2923,12 +3057,14 @@ public class UI {
          return text;
       }
 
-      final int allLowerCharSize = ALL_SCRAMBLED_CHARS_LOWER.length();
-      final int allUpperCharSize = ALL_SCRAMBLED_CHARS_UPPER.length();
+      final int numCharacters = text.length();
+
+      final int numLowerChars = ALL_SCRAMBLED_CHARS_LOWER.length();
+      final int numUpperChars = ALL_SCRAMBLED_CHARS_UPPER.length();
 
       final char[] scrambledText = text.toCharArray();
 
-      for (int charIndex = 0; charIndex < text.length(); charIndex++) {
+      for (int charIndex = 0; charIndex < numCharacters; charIndex++) {
 
          final char c = text.charAt(charIndex);
 
@@ -2936,12 +3072,19 @@ public class UI {
 
             // scramble upper chars
 
-            scrambledText[charIndex] = ALL_SCRAMBLED_CHARS_UPPER.charAt(RANDOM_GENERATOR.nextInt(allUpperCharSize));
+            scrambledText[charIndex] = ALL_SCRAMBLED_CHARS_UPPER.charAt(RANDOM_GENERATOR.nextInt(numUpperChars));
+
+         } else if (c == 0x0a || c == '\u2022') {
+
+            // do not scamble: new lines, symbols
+
+            scrambledText[charIndex] = c;
 
          } else if (c != ' ') {
 
             // scramble other chars except spaces
-            scrambledText[charIndex] = ALL_SCRAMBLED_CHARS_LOWER.charAt(RANDOM_GENERATOR.nextInt(allLowerCharSize));
+
+            scrambledText[charIndex] = ALL_SCRAMBLED_CHARS_LOWER.charAt(RANDOM_GENERATOR.nextInt(numLowerChars));
          }
       }
 
@@ -3264,6 +3407,7 @@ public class UI {
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_CLEAR,                  CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Sunny));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_PART_CLOUDS,            CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Cloudy));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_OVERCAST,               CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Clouds));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_FOG,                    CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Fog));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_LIGHTNING,              CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Lightning));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_RAIN,                   CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Rain));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_DRIZZLE,                CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Drizzle));
@@ -3324,42 +3468,53 @@ public class UI {
    }
 
    /**
-    * copy from {@link CTabItem}
+    * Copy from {@link CTabItem}
     *
     * @param gc
     * @param text
     * @param width
-    * @param isUseEllipses
+    * @param isUseEllipsis
     *
     * @return
     */
-   public static String shortenText(final GC gc, final String text, final int width, final boolean isUseEllipses) {
-      return isUseEllipses ? //
-            shortenText(gc, text, width, ELLIPSIS) : shortenText(gc, text, width, EMPTY_STRING);
+   public static String shortenText(final GC gc, final String text, final int width, final boolean isUseEllipsis) {
+
+      return isUseEllipsis
+            ? shortenText(gc, text, width, ELLIPSIS)
+            : shortenText(gc, text, width, EMPTY_STRING);
    }
 
-   public static String shortenText(final GC gc, String text, final int width, final String ellipses) {
+   public static String shortenText(final GC gc, String text, final int width, final String ellipsis) {
 
       if (gc.textExtent(text, 0).x <= width) {
          return text;
       }
 
-      final int ellipseWidth = gc.textExtent(ellipses, 0).x;
+      final int ellipseWidth = gc.textExtent(ellipsis, 0).x;
       final int length = text.length();
+
       final TextLayout layout = new TextLayout(gc.getDevice());
       layout.setText(text);
 
       int end = layout.getPreviousOffset(length, SWT.MOVEMENT_CLUSTER);
+
       while (end > 0) {
+
          text = text.substring(0, end);
+
          final int l = gc.textExtent(text, 0).x;
          if (l + ellipseWidth <= width) {
             break;
          }
+
          end = layout.getPreviousOffset(end, SWT.MOVEMENT_CLUSTER);
       }
+
       layout.dispose();
-      return end == 0 ? text.substring(0, 1) : text + ellipses;
+
+      return end == 0
+            ? text.substring(0, 1)
+            : text + ellipsis;
    }
 
    /**

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Application_Name
 Bundle-SymbolicName: net.tourbook;singleton:=true
-Bundle-Version: 24.9.0.qualifier
+Bundle-Version: 24.11.2.qualifier
 Bundle-Activator: net.tourbook.application.TourbookPlugin
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-17
@@ -87,6 +87,7 @@ Import-Package: com.fasterxml.jackson.core.type,
  net.tourbook.chart.preferences,
  net.tourbook.common,
  net.tourbook.common.action,
+ net.tourbook.common.autocomplete,
  net.tourbook.common.color,
  net.tourbook.common.dialog,
  net.tourbook.common.e4,
@@ -104,7 +105,6 @@ Import-Package: com.fasterxml.jackson.core.type,
  net.tourbook.common.util,
  net.tourbook.common.weather,
  net.tourbook.common.widgets,
- net.tourbook.model,
  net.tourbook.photo,
  net.tourbook.photo.internal.gallery.MT20,
  net.tourbook.weather,

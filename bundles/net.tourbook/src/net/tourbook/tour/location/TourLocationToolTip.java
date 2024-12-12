@@ -177,6 +177,7 @@ public class TourLocationToolTip extends ToolTip {
       {
          _ttContainer = new Composite(shellContainer, SWT.NONE);
          GridLayoutFactory.fillDefaults().margins(SHELL_MARGIN, SHELL_MARGIN).applyTo(_ttContainer);
+//         _ttContainer.setBackground(UI.SYS_COLOR_YELLOW);
          {
             createUI_10_Info(_ttContainer);
          }
@@ -199,7 +200,7 @@ public class TourLocationToolTip extends ToolTip {
             .span(2, 1)
 
             // indent to the left that this text is aligned with the labels
-            .indent(-4, 0);
+            .indent(UI.IS_4K_DISPLAY ? -2 : -4, 0);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -214,10 +215,10 @@ public class TourLocationToolTip extends ToolTip {
             String locationTitle;
 
             switch (_locationType) {
-            case Common    -> locationTitle = Messages.Tour_Location_Label_CommonLocation; 
-            case TourStart -> locationTitle = Messages.Tour_Tooltip_Label_TourLocation_Start; 
-            case TourEnd   -> locationTitle = Messages.Tour_Tooltip_Label_TourLocation_End; 
-            default        -> locationTitle = Messages.Tour_Location_Tooltip_Title; 
+            case Common    -> locationTitle = Messages.Tour_Location_Label_CommonLocation;
+            case TourStart -> locationTitle = Messages.Tour_Tooltip_Label_TourLocation_Start;
+            case TourEnd   -> locationTitle = Messages.Tour_Tooltip_Label_TourLocation_End;
+            default        -> locationTitle = Messages.Tour_Location_Tooltip_Title;
             }
 
             // using text control that & is not displayed as mnemonic
@@ -350,7 +351,14 @@ public class TourLocationToolTip extends ToolTip {
    private Point getLocation_10(final Point tipSize, final int mouseX, final Rectangle cellBounds) {
 
       final int cellWidth2 = (int) (cellBounds.width * 0.5);
-      final int cellHeight = cellBounds.height;
+      int cellHeight = cellBounds.height;
+
+      if (UI.IS_4K_DISPLAY) {
+
+         // this adjustment is needed otherwise the tooltip is difficult to hover
+
+         cellHeight -= 1;
+      }
 
       final int devXDefault = cellBounds.x + cellWidth2;
       final int devY = cellBounds.y + cellHeight;

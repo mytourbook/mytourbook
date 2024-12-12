@@ -36,14 +36,13 @@ public class OtherMessages {
    public static final String THEME_FONT_LOGGING                           = de.byteholder.geoclipse.preferences.Messages.Theme_Font_Logging;
 
 
-
    //
    // net.tourbook.Messages
    //
    public static final String ACTION_PHOTOS_AND_TOURS_REMOVE_PHOTO         = net.tourbook.Messages.Action_PhotosAndTours_RemovePhoto;
 
    public static final String APP_BTN_BROWSE                               = net.tourbook.Messages.app_btn_browse;
-
+   public static final String APP_TRUE                                     = net.tourbook.Messages.App__True;
    public static final String APP_UNIT_HHMMSS                              = net.tourbook.Messages.App_Unit_HHMMSS;
    public static final String APP_UNIT_SECONDS_SMALL                       = net.tourbook.Messages.App_Unit_Seconds_Small;
 
@@ -68,6 +67,9 @@ public class OtherMessages {
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_DESCENT  = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Descent;
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_ASCENT   = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Ascent;
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_FLAT     = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Flat;
+
+   public static final String SLIDEOUT_MAP_PHOTO_OPTIONS_CHECKBOX_SHOW_PHOTO_RATING    = net.tourbook.Messages.Slideout_Map_PhotoOptions_Checkbox_ShowPhotoRating;
+   public static final String SLIDEOUT_MAP_PHOTO_OPTIONS_CHECKBOX_SHOW_PHOTO_TOOLTIP   = net.tourbook.Messages.Slideout_Map_PhotoOptions_Checkbox_ShowPhotoTooltip;
 
    //
    // net.tourbook.common.Messages
@@ -188,6 +190,20 @@ public class OtherMessages {
    public static final String WEATHER_CLOUDS_SUNNY                         = net.tourbook.common.Messages.Weather_Clouds_Sunny;
 
    //
+   // net.tourbook.map2.Messages
+   //
+
+   public static final String MAP_ACTION_SHOW_TOUR_IN_MAP                  = net.tourbook.map2.Messages.map_action_show_tour_in_map;
+   public static final String MAP_ACTION_TOUR_COLOR_ALTITUDE_TOOLTIP       = net.tourbook.map2.Messages.map_action_tour_color_altitude_tooltip;
+   public static final String MAP_ACTION_TOUR_COLOR_GRADIENT_TOOLTIP       = net.tourbook.map2.Messages.map_action_tour_color_gradient_tooltip;
+   public static final String MAP_ACTION_TOUR_COLOR_PACE_TOOLTIP           = net.tourbook.map2.Messages.map_action_tour_color_pace_tooltip;
+   public static final String MAP_ACTION_TOUR_COLOR_PULSE_TOOLTIP          = net.tourbook.map2.Messages.map_action_tour_color_pulse_tooltip;
+   public static final String MAP_ACTION_TOUR_COLOR_SPEED_TOOLTIP          = net.tourbook.map2.Messages.map_action_tour_color_speed_tooltip;
+   public static final String MAP_ACTION_SYNCH_WITH_SLIDER                 = net.tourbook.map2.Messages.Map_Action_SynchWith_TourPosition;
+   public static final String MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED        = net.tourbook.map2.Messages.Map_Action_SynchWithSlider_Centered;
+   public static final String TOUR_ACTION_SHOW_HR_ZONES_TOOLTIP            = net.tourbook.map2.Messages.Tour_Action_ShowHrZones_Tooltip;
+
+   //
    // net.tourbook.map3.Messages
    //
 
@@ -253,6 +269,13 @@ public class OtherMessages {
 
    public static final String APP_WEB_LABEL_DEFAULT_FONT_SIZE              = net.tourbook.web.Messages.App_Web_Label_ContentFontSize;
    public static final String APP_WEB_LABEL_DEFAULT_FONT_SIZE_TOOLTIP      = net.tourbook.web.Messages.App_Web_Label_ContentFontSize_Tooltip;
+
+   //
+   // tourbook.search.nls.Messages
+   //
+
+   public static final String SEARCH_APP_ACTION_EDIT_MARKER                = tourbook.search.nls.Messages.Search_App_Action_EditMarker;
+   public static final String SEARCH_APP_ACTION_EDIT_TOUR                  = tourbook.search.nls.Messages.Search_App_Action_EditTour;
 
 // SET_FORMATTING_ON
 }

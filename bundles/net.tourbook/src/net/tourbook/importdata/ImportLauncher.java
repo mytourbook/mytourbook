@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourType;
+import net.tourbook.tag.TagGroup;
+import net.tourbook.tag.TagGroupManager;
 import net.tourbook.tour.CadenceMultiplier;
 import net.tourbook.tour.location.TourLocationProfile;
 
@@ -120,6 +122,16 @@ public class ImportLauncher implements Cloneable {
     */
    public TourLocationProfile      tourLocationProfile;
 
+   /**
+    * When <code>true</code> then all tags in a groups are set into the tour
+    */
+   public boolean                  isSetTourTagGroup;
+
+   /**
+    * ID of the {@link TagGroup}
+    */
+   public String                   tourTagGroupID;
+
    public ImportLauncher() {
 
       _id = ++_idCreator;
@@ -180,6 +192,21 @@ public class ImportLauncher implements Cloneable {
       int result = 1;
       result = prime * result + (int) (_id ^ (_id >>> 32));
       return result;
+   }
+
+   /**
+    * @return Returns <code>true</code> when tags are set into the tour
+    */
+   public boolean isSetTags() {
+
+      final TagGroup tagGroup = TagGroupManager.getTagGroup(tourTagGroupID);
+
+      if (tagGroup != null && isSetTourTagGroup) {
+
+         return tagGroup.tourTags.size() > 0;
+      }
+
+      return false;
    }
 
    /**

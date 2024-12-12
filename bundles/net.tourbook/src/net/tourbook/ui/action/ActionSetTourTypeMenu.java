@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,7 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageTourType_Definitions;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tourType.TourTypeImage;
@@ -88,7 +88,10 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 
       @Override
       public void run() {
-         TourTypeMenuManager.setTourTypeIntoTour(_tourType, _tourProvider, _isSaveTour);
+
+         final TourTypeMenuManager tourTypeMenuManager = new TourTypeMenuManager(_tourProvider);
+
+         tourTypeMenuManager.setTourTypeIntoTour(_tourType, _isSaveTour);
       }
    }
 
@@ -147,10 +150,9 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
        */
       menuMgr.add(new Separator());
 
-      menuMgr.add(
-            new ActionOpenPrefDialog(
-                  Messages.action_tourType_modify_tourTypes,
-                  ITourbookPreferences.PREF_PAGE_TOUR_TYPE));
+      menuMgr.add(new ActionOpenPrefDialog(
+            Messages.action_tourType_modify_tourTypes,
+            PrefPageTourType_Definitions.ID));
    }
 
    private void addActionToMenu(final Action action, final Menu menu) {
@@ -202,7 +204,7 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
       addActionToMenu(
             new ActionOpenPrefDialog(
                   Messages.action_tourType_modify_tourTypes,
-                  ITourbookPreferences.PREF_PAGE_TOUR_TYPE),
+                  PrefPageTourType_Definitions.ID),
             menu);
 
    }

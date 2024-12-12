@@ -18,6 +18,7 @@ package preferences;
 import net.tourbook.cloud.Messages;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -26,6 +27,7 @@ import utils.Utils;
 public class PrefPageCloudTests extends UITest {
 
    @Test
+   @Tag("ExternalConnection")
    void openCloudPages() {
 
       Utils.openPreferences(bot);

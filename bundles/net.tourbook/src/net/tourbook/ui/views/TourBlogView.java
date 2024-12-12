@@ -644,15 +644,19 @@ public class TourBlogView extends ViewPart {
 
    private String create_10_HTMLHead() {
 
-      // set body size
-      final int bodyFontSize = Util.getStateInt(_state_WEB, WEB.STATE_BODY_FONT_SIZE, WEB.STATE_BODY_FONT_SIZE_DEFAULT);
-      String htmlCss = _htmlCss.replace(WEB.STATE_BODY_FONT_SIZE_CSS_REPLACEMENT_TAG, Integer.toString(bodyFontSize));
-
       /*
-       * Replace theme tags
+       * Replace css custom tags
        */
 
+      String htmlCss = _htmlCss;
+
 // SET_FORMATTING_OFF
+
+      final String   bodyFont       = Util.getStateString(_state_WEB, WEB.STATE_BODY_FONT,      WEB.STATE_BODY_FONT_DEFAULT);
+      final int      bodyFontSize   = Util.getStateInt(   _state_WEB, WEB.STATE_BODY_FONT_SIZE, WEB.STATE_BODY_FONT_SIZE_DEFAULT);
+
+      htmlCss = htmlCss.replace(WEB.STATE_BODY_FONT_CSS_REPLACEMENT_TAG,         bodyFont);
+      htmlCss = htmlCss.replace(WEB.STATE_BODY_FONT_SIZE_CSS_REPLACEMENT_TAG,    Integer.toString(bodyFontSize));
 
       htmlCss = htmlCss.replace(WEB.CSS_TAG__BODY__COLOR,                        UI.IS_DARK_THEME ? "ddd" : "333");        //$NON-NLS-1$ //$NON-NLS-2$
       htmlCss = htmlCss.replace(WEB.CSS_TAG__BODY__BACKGROUND_COLOR,             UI.IS_DARK_THEME ? "333" : "fff");        //$NON-NLS-1$ //$NON-NLS-2$

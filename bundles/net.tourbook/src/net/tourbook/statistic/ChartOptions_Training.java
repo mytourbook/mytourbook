@@ -275,7 +275,7 @@ public class ChartOptions_Training implements IStatisticOptions {
 
       enableControls();
 
-      Display.getCurrent().asyncExec(this::saveState);
+      Display.getCurrent().asyncExec(() -> saveState());
    }
 
    @Override

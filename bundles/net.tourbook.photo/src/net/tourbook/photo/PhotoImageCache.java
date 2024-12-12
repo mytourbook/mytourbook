@@ -250,6 +250,8 @@ public class PhotoImageCache {
                // image could be converted
 
                swtImage = new Image(Display.getDefault(), new NoAutoScalingImageDataProvider(swtImageData));
+
+               cacheWrapper.swtImage = swtImage;
             }
          }
 
@@ -268,6 +270,7 @@ public class PhotoImageCache {
             photo.setPhotoSize(imageSize.width, imageSize.height);
          }
       }
+
       return swtImage;
    }
 
@@ -384,6 +387,11 @@ public class PhotoImageCache {
       if (isSet == false) {
 
          isSet = setImageSize_IntoCacheWrapper(photo, imageWidth, imageHeight, ImageQuality.THUMB, _imageCache_ResizedImage);
+      }
+
+      if (isSet == false) {
+
+         isSet = setImageSize_IntoCacheWrapper(photo, imageWidth, imageHeight, ImageQuality.THUMB_HQ, _imageCache_ResizedImage);
       }
 
       if (isSet == false) {

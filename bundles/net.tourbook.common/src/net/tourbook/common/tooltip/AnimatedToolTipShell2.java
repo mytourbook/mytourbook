@@ -628,9 +628,16 @@ public abstract class AnimatedToolTipShell2 {
    }
 
    /**
-    * Is called before the tooltip shell is set hidden.
+    * Is called before the tooltip shell is set hidden/closed.
+    *
+    * @return Returns an object
     */
    protected abstract void beforeHideToolTip();
+
+   /**
+    *
+    */
+   protected abstract ICanHideTooltip canHideToolTip();
 
    /**
     * Is called before the tooltip is displayed.
@@ -934,6 +941,7 @@ public abstract class AnimatedToolTipShell2 {
     *
     * @param shell
     *           the parent of the content area
+    *
     * @return the content area created
     */
    protected abstract void createToolTipContentArea(Composite shell);
@@ -1039,6 +1047,7 @@ public abstract class AnimatedToolTipShell2 {
     *
     * @param size
     *           Tooltip size
+    *
     * @return Returns location relative to the device.
     */
    protected abstract Point getToolTipLocation(Point size);
@@ -1076,6 +1085,7 @@ public abstract class AnimatedToolTipShell2 {
 
    /**
     * @param displayCursorLocation
+    *
     * @return Returns <code>true</code> when the tooltip should not be closed.
     */
    protected boolean isInNoHideArea(final Point displayCursorLocation) {
@@ -1395,6 +1405,14 @@ public abstract class AnimatedToolTipShell2 {
 
       // hide tooltip
 
+      // prevent closing when activated
+      if (canHideToolTip() != null && canHideToolTip().canHideTooltip() == false) {
+
+         // hiding the tooltip is disabled
+
+         return;
+      }
+
       beforeHideToolTip();
 
       _currentShell.dispose();
@@ -1410,7 +1428,6 @@ public abstract class AnimatedToolTipShell2 {
 
          close();
       }
-
    }
 
    private void setShellVisible() {
@@ -1448,6 +1465,14 @@ public abstract class AnimatedToolTipShell2 {
 //      // TODO remove SYSTEM.OUT.PRINTLN
 
       if (isShellHidden()) {
+         return;
+      }
+
+      // prevent closing when activated
+      if (canHideToolTip() != null && canHideToolTip().canHideTooltip() == false) {
+
+         // hiding the tooltip is disabled
+
          return;
       }
 

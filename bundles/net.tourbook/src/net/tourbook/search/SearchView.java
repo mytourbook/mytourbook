@@ -19,6 +19,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -35,6 +36,7 @@ import net.tourbook.web.WebContentServer;
 import net.tourbook.web.preferences.PrefPageWebBrowser;
 
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -75,17 +77,19 @@ public class SearchView extends ViewPart implements ISearchView {
       }
    }
 
-   private static final String    STATE_USE_EXTERNAL_WEB_BROWSER = "STATE_USE_EXTERNAL_WEB_BROWSER"; //$NON-NLS-1$
+   private static final String      STATE_IS_PUSH_INTO_OTHER_VIEW  = "STATE_IS_PUSH_INTO_OTHER_VIEW";  //$NON-NLS-1$
+   private static final String      STATE_USE_EXTERNAL_WEB_BROWSER = "STATE_USE_EXTERNAL_WEB_BROWSER"; //$NON-NLS-1$
 
-   private final IDialogSettings  _state                         = TourbookPlugin.getState(ID);
+   private final IDialogSettings    _state                         = TourbookPlugin.getState(ID);
 
-   private PostSelectionProvider  _postSelectionProvider;
-   private IPartListener2         _partListener;
-   private ITourEventListener     _tourEventListener;
+   private PostSelectionProvider    _postSelectionProvider;
+   private IPartListener2           _partListener;
+   private ITourEventListener       _tourEventListener;
 
-   private boolean                _isWinInternalLoaded           = false;
+   private boolean                  _isWinInternalLoaded           = false;
 
-   private ActionExternalSearchUI _actionExternalSearchUI;
+   private ActionExternalSearchUI   _actionExternalSearchUI;
+   private ActionPushIntoOtherViews _actionPushIntoOtherViews;
 
    /*
     * UI controls
@@ -97,6 +101,18 @@ public class SearchView extends ViewPart implements ISearchView {
    private Composite _pageLinux;
    private Composite _pageWinExternalBrowser;
    private Composite _pageWinInternalBrowser;
+
+   private class ActionPushIntoOtherViews extends Action {
+
+      public ActionPushIntoOtherViews() {
+
+         super(null, AS_CHECK_BOX);
+
+         setToolTipText(Messages.Search_View_Action_PushSearchResults_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PushIntoViews));
+      }
+   }
 
    void actionSearchUI() {
       showUIPage();
@@ -183,6 +199,7 @@ public class SearchView extends ViewPart implements ISearchView {
    private void createActions() {
 
       _actionExternalSearchUI = new ActionExternalSearchUI(this);
+      _actionPushIntoOtherViews = new ActionPushIntoOtherViews();
 
       fillActionBars();
    }
@@ -347,10 +364,11 @@ public class SearchView extends ViewPart implements ISearchView {
    private void fillActionBars() {
 
       /*
-       * fill view toolbar
+       * Fill view toolbar
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
+      tbm.add(_actionPushIntoOtherViews);
       tbm.add(_actionExternalSearchUI);
    }
 
@@ -364,8 +382,14 @@ public class SearchView extends ViewPart implements ISearchView {
       return _postSelectionProvider;
    }
 
+   public boolean isPushSearchResult() {
+
+      return _actionPushIntoOtherViews.isChecked();
+   }
+
    private void restoreState() {
 
+      _actionPushIntoOtherViews.setChecked(Util.getStateBoolean(_state, STATE_IS_PUSH_INTO_OTHER_VIEW, false));
       _actionExternalSearchUI.setChecked(Util.getStateBoolean(_state, STATE_USE_EXTERNAL_WEB_BROWSER, false));
 
       enableActions();
@@ -374,6 +398,7 @@ public class SearchView extends ViewPart implements ISearchView {
    @PersistState
    private void saveState() {
 
+      _state.put(STATE_IS_PUSH_INTO_OTHER_VIEW, _actionPushIntoOtherViews.isChecked());
       _state.put(STATE_USE_EXTERNAL_WEB_BROWSER, _actionExternalSearchUI.isChecked());
    }
 

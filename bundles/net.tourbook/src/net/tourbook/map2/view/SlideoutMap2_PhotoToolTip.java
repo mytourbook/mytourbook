@@ -81,6 +81,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
    private static final String          STATE_TOOLTIP_SIZE_MEDIUM         = "STATE_TOOLTIP_SIZE_MEDIUM";                    //$NON-NLS-1$
    private static final String          STATE_TOOLTIP_SIZE_SMALL          = "STATE_TOOLTIP_SIZE_SMALL";                     //$NON-NLS-1$
    private static final String          STATE_TOOLTIP_SIZE_TINY           = "STATE_TOOLTIP_SIZE_TINY";                      //$NON-NLS-1$
+
    private static final int[]           STATE_TOOLTIP_SIZE_TINY_DEFAULT   = new int[] { 250, 250 };
    private static final int[]           STATE_TOOLTIP_SIZE_SMALL_DEFAULT  = new int[] { 500, 500 };
    private static final int[]           STATE_TOOLTIP_SIZE_MEDIUM_DEFAULT = new int[] { 800, 800 };
@@ -520,10 +521,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
             PhotoLoadManager.putImageInLoadingQueueHQ_Map(photo,
                   requestedImageQuality,
-                  imageLoadCallback,
-
-                  false // get SWT image
-            );
+                  imageLoadCallback);
          }
       }
 

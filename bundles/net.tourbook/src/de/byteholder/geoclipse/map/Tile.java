@@ -82,7 +82,7 @@ public class Tile {
    /**
     * Map image for this tile
     */
-   private Image                           _mapImage                    = null;
+   private Image                           _mapImage;
 
    /**
     * Image for the overlay tile, NOT the surrounding part tiles
@@ -106,14 +106,14 @@ public class Tile {
 
    private Future<?>                       _future;
 
-   private boolean                         _isLoading                   = false;
+   private boolean                         _isLoading;
 
-   private boolean                         _isOfflineError              = false;
+   private boolean                         _isOfflineError;
 
    /**
     * contains the error message when loading of the image fails
     */
-   private String                          _loadingError                = null;
+   private String                          _loadingError;
 
    /**
     * url which is used to load the tile
@@ -377,8 +377,11 @@ public class Tile {
       final Tile parentTile = _parentTile;
 
       if (parentTile == null) {
-         // this happens often -> disabled log
-//         StatusUtil.log(NLS.bind(Messages.DBG057_MapProfile_NoParentTile, getTileKey()), new Exception());
+
+// this happens too often -> disabled log
+//
+//       StatusUtil.log(NLS.bind(Messages.DBG057_MapProfile_NoParentTile, getTileKey()), new Exception());
+
          return null;
       }
 
@@ -392,10 +395,11 @@ public class Tile {
 
                // check if the parent is already created
                final Image parentImage = parentTile._mapImage;
+
                if ((parentImage != null) && !parentImage.isDisposed()) {
+
                   // parent image is already created
                   return new ParentImageStatus(null, false, false, false);
-
                }
 
                // check if all children are loaded
@@ -405,8 +409,7 @@ public class Tile {
                   final MP parentMp = parentTile._mp;
                   if (parentMp instanceof ITileChildrenCreator) {
 
-                     final ParentImageStatus parentImageStatus = ((ITileChildrenCreator) parentMp)
-                           .getParentImage(parentTile);
+                     final ParentImageStatus parentImageStatus = ((ITileChildrenCreator) parentMp).getParentImage(parentTile);
 
                      // prevent memory leaks: remove image data in the chilren tiles
                      for (final Tile childTile : tileChildren) {
@@ -762,6 +765,11 @@ public class Tile {
       }
 
       _childrenWithErrors.put(childTile.getTileKey(), childTile);
+   }
+
+   public void setChildTileImageData(final ImageData childTileImageData) {
+
+      _childTileImageData = childTileImageData;
    }
 
    /**

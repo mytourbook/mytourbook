@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.chart;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AnimatedToolTipShell2;
+import net.tourbook.common.tooltip.ICanHideTooltip;
 import net.tourbook.common.util.IToolTipProvider;
 
 import org.eclipse.swt.graphics.Point;
@@ -25,10 +26,12 @@ import org.eclipse.swt.widgets.Composite;
 
 public class ChartBarToolTip extends AnimatedToolTipShell2 implements IToolTipProvider {
 
-   private Rectangle _barRectangle;
+   private Rectangle       _barRectangle;
 
-   private int       _hoveredBar_Serie_VerticalIndex;
-   private int       _hoveredBar_Value_HorizontalIndex = -1;
+   private int             _hoveredBar_Serie_VerticalIndex;
+   private int             _hoveredBar_Value_HorizontalIndex = -1;
+
+   private ICanHideTooltip _canHideTooltip;
 
    /*
     * UI controls
@@ -58,7 +61,12 @@ public class ChartBarToolTip extends AnimatedToolTipShell2 implements IToolTipPr
        * not when nothing is hovered. This ensures that the tooltip has a valid state.
        */
       _hoveredBar_Value_HorizontalIndex = -1;
+   }
 
+   @Override
+   protected ICanHideTooltip canHideToolTip() {
+
+      return _canHideTooltip;
    }
 
    @Override
@@ -82,7 +90,13 @@ public class ChartBarToolTip extends AnimatedToolTipShell2 implements IToolTipPr
          return;
       }
 
-      toolTipInfoProvider.createToolTipUI(this, shell, _hoveredBar_Serie_VerticalIndex, _hoveredBar_Value_HorizontalIndex);
+      _canHideTooltip = toolTipInfoProvider.createToolTipUI(
+
+            this,
+            shell,
+            _hoveredBar_Serie_VerticalIndex,
+            _hoveredBar_Value_HorizontalIndex);
+
    }
 
    private IChartInfoProvider getChartInfoProvider() {

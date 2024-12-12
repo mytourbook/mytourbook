@@ -46,6 +46,7 @@ import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -109,6 +110,7 @@ import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -131,8 +133,6 @@ import org.geotools.ows.wms.WMSCapabilities;
 import org.geotools.ows.wms.WMSRequest;
 
 public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
-
-   private static final String           APP_TRUE   = net.tourbook.Messages.App__True;
 
    public static final String            ID         = "de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers"; //$NON-NLS-1$
 
@@ -158,6 +158,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private static final String       COLUMN_CATEGORY                = "Category";                      //$NON-NLS-1$
    private static final String       COLUMN_DESCRIPTION             = "Description";                   //$NON-NLS-1$
+   private static final String       COLUMN_HIDPI                   = "HiDPI";                         //$NON-NLS-1$
    private static final String       COLUMN_IS_CONTAINS_HILLSHADING = "ContainsHillshading";           //$NON-NLS-1$
    private static final String       COLUMN_IS_TRANSPARENT_LAYER    = "IsTransparentLayer";            //$NON-NLS-1$
    private static final String       COLUMN_IS_VISIBLE              = "IsVisible";                     //$NON-NLS-1$
@@ -171,12 +172,38 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private static final String       COLUMN_ONLINE_MAP_URL          = "OnlineMapUrl";                  //$NON-NLS-1$
    private static final String       COLUMN_TILE_URL                = "TileUrl";                       //$NON-NLS-1$
 
-   private static final NumberFormat _nf                            = NumberFormat.getNumberInstance();
+   private static final NumberFormat _nf1                           = NumberFormat.getNumberInstance();
+   private static final NumberFormat _nf2                           = NumberFormat.getNumberInstance();
+
    static {
-      _nf.setMinimumFractionDigits(2);
-      _nf.setMaximumFractionDigits(2);
-      _nf.setMinimumIntegerDigits(1);
+
+      _nf1.setMinimumFractionDigits(1);
+      _nf1.setMaximumFractionDigits(1);
+
+      _nf2.setMinimumFractionDigits(2);
+      _nf2.setMaximumFractionDigits(2);
+      _nf2.setMinimumIntegerDigits(1);
    }
+
+   /**
+    * MUST be in sync with {@link #_allHiDPI_Label}
+    */
+   private static float[]                      _allHiDPI_Values        = {
+
+         1.0f,
+//       1.5f, this needs more testing, have not yet found a usable map provider
+         2.0f,
+   };
+   //
+   /**
+    * MUST be in sync with {@link #_allHiDPI_Values}
+    */
+   private static String[]                     _allHiDPI_Label         = {
+
+         "1x",                                                                                            //$NON-NLS-1$
+//       "1.5x",
+         "2x",                                                                                            //$NON-NLS-1$
+   };
 
    private TableViewer                         _mpViewer;
    private MapProviderComparator               _mpComparator           = new MapProviderComparator();
@@ -256,6 +283,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private Button     _chkIsIncludesHillshading;
    private Button     _chkIsTransparentLayer;
 
+   private Combo      _comboHiDPI;
+
    private Label      _lblDescription;
    private Label      _lblDropTarget;
    private Label      _lblMpDropTarget;
@@ -315,6 +344,11 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
          case COLUMN_DESCRIPTION:
             rc = mp1.getDescription().compareTo(mp2.getDescription());
+            break;
+
+         case COLUMN_HIDPI:
+
+            rc = (long) (mp1.getHiDPI() * 10 - mp2.getHiDPI() * 10);
             break;
 
          case COLUMN_IS_CONTAINS_HILLSHADING:
@@ -702,7 +736,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       _columnManager = new ColumnManager(this, _state);
       defineAllColumns();
 
-      final Composite container = createUI(parent);
+      final Composite ui = createUI(parent);
+      fillUI();
 
       // load viewer
       _mpViewer.setInput(new Object());
@@ -713,7 +748,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       _mpViewer.getTable().setFocus();
 
-      return container;
+      return ui;
    }
 
 //   private String checkBaseUrl(final String baseUrl) {
@@ -754,7 +789,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          createUI_40_ReadTileSize(container);
          new Label(container, SWT.NONE);
 
-         createUI_50_Details(container);
+         createUI_50_MapProvider(container);
       }
 
       // spacer
@@ -809,8 +844,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
        * Create table
        */
       final Table table = new Table(parent, SWT.FULL_SELECTION);
-      GridDataFactory.fillDefaults()//
-            .hint(600, _pc.convertHeightInCharsToPixels(10))
+      GridDataFactory.fillDefaults()
+            .hint(300, _pc.convertHeightInCharsToPixels(5))
             .grab(true, true)
             .applyTo(table);
 
@@ -1052,19 +1087,19 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       _txtOfflineInfoTotal.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
    }
 
-   private void createUI_50_Details(final Composite parent) {
+   private void createUI_50_MapProvider(final Composite parent) {
 
       _groupDetails = new Group(parent, SWT.NONE);
+      _groupDetails.setText(Messages.Pref_Map_Group_Detail_SelectedMapProvider);
       GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).span(2, 1).applyTo(_groupDetails);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(_groupDetails);
-      _groupDetails.setText(Messages.Pref_Map_Group_Detail_SelectedMapProvider);
       {
-         createUI_52_Details_Details(_groupDetails);
-         createUI_54_Details_Buttons(_groupDetails);
+         createUI_52_MapProvider_Options(_groupDetails);
+         createUI_54_MapProvider_Actions(_groupDetails);
       }
    }
 
-   private void createUI_52_Details_Details(final Group parent) {
+   private void createUI_52_MapProvider_Options(final Group parent) {
 
       final VerifyListener verifyListener = verifyEvent -> verifyEvent.text = MapUtils.createIdFromName(verifyEvent.text, MAX_ID_LENGTH);
 
@@ -1094,6 +1129,32 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
                setMapProviderModified();
             });
             GridDataFactory.fillDefaults().span(3, 1).applyTo(_txtMapProviderName);
+         }
+         {
+            /*
+             * HiDPI
+             */
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Pref_Map_Label_HiDPI);
+            label.setToolTipText(Messages.Pref_Map_Label_HiDPI_Tooltip);
+
+            // combo
+            _comboHiDPI = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboHiDPI.setVisibleItemCount(20);
+            _comboHiDPI.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
+
+               if (_isInUIUpdate) {
+                  return;
+               }
+               setMapProviderModified();
+            }));
+            GridDataFactory.fillDefaults()
+                  .hint(_pc.convertWidthInCharsToPixels(4), SWT.DEFAULT)
+                  .applyTo(_comboHiDPI);
+
+            UI.createSpacer_Horizontal(container, 2);
          }
          {
             /*
@@ -1293,7 +1354,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       }
    }
 
-   private void createUI_54_Details_Buttons(final Group parent) {
+   private void createUI_54_MapProvider_Actions(final Group parent) {
 
       final Composite btnContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().indent(10, 0).applyTo(btnContainer);
@@ -1463,6 +1524,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       defineColumn_00_IsVisible();
       defineColumn_10_MapProviderName();
       defineColumn_12_Category();
+      defineColumn_20_HiDPI();
       defineColumn_22_Hillshading();
       defineColumn_24_TransparentLayer();
       defineColumn_30_MPType();
@@ -1495,7 +1557,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             final MP mapProvider = (MP) cell.getElement();
 
-            cell.setText(mapProvider.isVisibleInUI() ? APP_TRUE : UI.EMPTY_STRING);
+            cell.setText(mapProvider.isVisibleInUI() ? OtherMessages.APP_TRUE : UI.EMPTY_STRING);
          }
       });
    }
@@ -1554,6 +1616,28 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       });
    }
 
+   private void defineColumn_20_HiDPI() {
+
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_HIDPI, SWT.TRAIL);
+
+      colDef.setColumnName(Messages.Pref_Map2_Viewer_Column_HiDPI);
+      colDef.setColumnHeaderToolTipText(Messages.Pref_Map_Label_HiDPI_Tooltip);
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(6));
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            cell.setText(_nf1.format(mapProvider.getHiDPI()));
+         }
+      });
+   }
+
    /**
     * Column: Includes hillshading
     */
@@ -1574,7 +1658,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             final MP mapProvider = (MP) cell.getElement();
 
-            cell.setText(mapProvider.isIncludesHillshading() ? APP_TRUE : UI.EMPTY_STRING);
+            cell.setText(mapProvider.isIncludesHillshading() ? OtherMessages.APP_TRUE : UI.EMPTY_STRING);
          }
       });
    }
@@ -1599,7 +1683,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             final MP mapProvider = (MP) cell.getElement();
 
-            cell.setText(mapProvider.isTransparentLayer() ? APP_TRUE : UI.EMPTY_STRING);
+            cell.setText(mapProvider.isTransparentLayer() ? OtherMessages.APP_TRUE : UI.EMPTY_STRING);
          }
       });
    }
@@ -1813,7 +1897,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             if (offlineTileSize == MP.OFFLINE_INFO_NOT_READ) {
                cell.setText(Messages.pref_map_label_NA);
             } else if (offlineTileSize > 0) {
-               cell.setText(_nf.format((float) offlineTileSize / 1024 / 1024));
+               cell.setText(_nf2.format((float) offlineTileSize / 1024 / 1024));
             } else {
                cell.setText(UI.DASH_WITH_SPACE);
             }
@@ -2006,38 +2090,43 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       final boolean isNoProfileMapProvider = isCustomMapProvider || isWmsMapProvider;
       final boolean canEditFields = _isNewMapProvider || isNonePluginMapProvider;
 
-      _mpViewer.getTable().setEnabled(isExistingMapProvider);
+// SET_FORMATTING_OFF
 
-      _chkIsIncludesHillshading.setEnabled(canEditFields);
-      _chkIsTransparentLayer.setEnabled(canEditFields && isNoProfileMapProvider);
-      _txtCategory.setEnabled(canEditFields);
-      _txtDescription.setEnabled(canEditFields);
-      _txtMapProviderId.setEnabled(canEditFields);
-      _txtMapProviderName.setEnabled(canEditFields);
-      _txtOfflineFolder.setEnabled(canEditFields);
-      _txtOnlineMapUrl.setEnabled(canEditFields);
+      _mpViewer.getTable().         setEnabled(isExistingMapProvider);
+
+      _chkIsIncludesHillshading     .setEnabled(canEditFields);
+      _chkIsTransparentLayer        .setEnabled(canEditFields && isNoProfileMapProvider);
+      _comboHiDPI                   .setEnabled(canEditFields);
+      _txtCategory                  .setEnabled(canEditFields);
+      _txtDescription               .setEnabled(canEditFields);
+      _txtMapProviderId             .setEnabled(canEditFields);
+      _txtMapProviderName           .setEnabled(canEditFields);
+      _txtOfflineFolder             .setEnabled(canEditFields);
+      _txtOnlineMapUrl              .setEnabled(canEditFields);
 
       // map provider list actions
-      _btnAddMapProviderCustom.setEnabled(isExistingMapProvider);
-      _btnAddMapProviderWms.setEnabled(isExistingMapProvider);
-      _btnAddMapProviderMapProfile.setEnabled(isExistingMapProvider);
-      _btnEdit.setEnabled(isExistingMapProvider && isNonePluginMapProvider);
-      _btnDeleteMapProvider.setEnabled(isExistingMapProvider && isNonePluginMapProvider);
-      _btnDeleteOfflineMap.setEnabled(isExistingMapProvider && canDeleteOfflineMap);
-      _btnImport.setEnabled(isExistingMapProvider);
-      _btnExport.setEnabled(isExistingMapProvider && isNonePluginMapProvider);
+      _btnAddMapProviderCustom      .setEnabled(isExistingMapProvider);
+      _btnAddMapProviderWms         .setEnabled(isExistingMapProvider);
+      _btnAddMapProviderMapProfile  .setEnabled(isExistingMapProvider);
+      _btnEdit                      .setEnabled(isExistingMapProvider && isNonePluginMapProvider);
+      _btnDeleteMapProvider         .setEnabled(isExistingMapProvider && isNonePluginMapProvider);
+      _btnDeleteOfflineMap          .setEnabled(isExistingMapProvider && canDeleteOfflineMap);
+      _btnImport                    .setEnabled(isExistingMapProvider);
+      _btnExport                    .setEnabled(isExistingMapProvider && isNonePluginMapProvider);
 
-      _lblDropTarget.setEnabled((_isModifiedMapProvider == false) && (_isNewMapProvider == false));
-      _lblMpDropTarget.setEnabled((_isModifiedMapProvider == false) && (_isNewMapProvider == false));
+      _lblDropTarget                .setEnabled((_isModifiedMapProvider == false) && (_isNewMapProvider == false));
+      _lblMpDropTarget              .setEnabled((_isModifiedMapProvider == false) && (_isNewMapProvider == false));
 
       // map provider detail actions
-      _btnUpdate.setEnabled(_isValid && _isModifiedMapProvider);
-      _btnCancel.setEnabled(_isNewMapProvider || _isModifiedMapProvider);
+      _btnUpdate                    .setEnabled(_isValid && _isModifiedMapProvider);
+      _btnCancel                    .setEnabled(_isNewMapProvider || _isModifiedMapProvider);
 
-      _actionRefreshAll.setEnabled(isOfflinePath && isOfflineJobStopped);
-      _actionRefreshSelected.setEnabled(isOfflinePath && isOfflineJobStopped);
-      _actionRefreshNotAssessed.setEnabled(isOfflinePath && isOfflineJobStopped);
-      _actionCancelRefresh.setEnabled(isOfflinePath && !isOfflineJobStopped);
+      _actionRefreshAll             .setEnabled(isOfflinePath && isOfflineJobStopped);
+      _actionRefreshSelected        .setEnabled(isOfflinePath && isOfflineJobStopped);
+      _actionRefreshNotAssessed     .setEnabled(isOfflinePath && isOfflineJobStopped);
+      _actionCancelRefresh          .setEnabled(isOfflinePath && !isOfflineJobStopped);
+
+// SET_FORMATTING_ON
 
       if (_isNewMapProvider) {
          _groupDetails.setText(Messages.Pref_Map_Group_Detail_NewMapProvider);
@@ -2051,6 +2140,13 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       if (focusControl != null) {
          focusControl.setFocus();
+      }
+   }
+
+   private void fillUI() {
+
+      for (final String label : _allHiDPI_Label) {
+         _comboHiDPI.add(label);
       }
    }
 
@@ -2095,6 +2191,23 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             }
          }
       }
+   }
+
+   private int getHiDPIIndex(final float requestedHiDPI) {
+
+      int selectionIndex = 0;
+
+      for (int operatorIndex = 0; operatorIndex < _allHiDPI_Values.length; operatorIndex++) {
+
+         final float hiDPIValue = _allHiDPI_Values[operatorIndex];
+
+         if (hiDPIValue == requestedHiDPI) {
+            selectionIndex = operatorIndex;
+            break;
+         }
+      }
+
+      return selectionIndex;
    }
 
    /**
@@ -2196,6 +2309,20 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       table.setSelection(table.getSelectionIndex());
 
       return new MapProviderNavigator(prevMapProvider, isNextNext == 1);
+   }
+
+   private float getSelectedHiDPIValue() {
+
+      final int selectedIndex = _comboHiDPI.getSelectionIndex();
+
+      if (selectedIndex >= 0) {
+
+         return _allHiDPI_Values[selectedIndex];
+
+      } else {
+
+         return 1.0f;
+      }
    }
 
    /**
@@ -2495,7 +2622,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
          _selectedMapProvider = mapProvider;
 
-         updateUI_MapProviderInfo(mapProvider);
+         updateUI_MapProviderData(mapProvider);
 
          // show selected map provider also in the map
          final Map2View map2View = MapProviderManager.getMap2View();
@@ -3265,6 +3392,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       mapProvider.setName(mpName);
       mapProvider.setOfflineFolder(offlineFolder);
       mapProvider.setOnlineMapUrl(_txtOnlineMapUrl.getText());
+      mapProvider.setHiDPI(getSelectedHiDPIValue());
 
       if (_isNewMapProvider) {
 
@@ -3300,7 +3428,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       return true;
    }
 
-   private void updateUI_MapProviderInfo(final MP mapProvider) {
+   private void updateUI_MapProviderData(final MP mapProvider) {
 
       _isInUIUpdate = true;
       {
@@ -3309,6 +3437,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          // common fields
          _chkIsIncludesHillshading.setSelection(mapProvider.isIncludesHillshading());
          _chkIsTransparentLayer.setSelection(mapProvider.isTransparentLayer());
+         _comboHiDPI.select(getHiDPIIndex(mapProvider.getHiDPI()));
          _linkOnlineMap.setText(net.tourbook.common.UI.getLinkFromText(onlineMapUrl));
          _linkOnlineMap.setToolTipText(mapProvider.getName());
          _txtCategory.setText(mapProvider.getCategory());
@@ -3399,7 +3528,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          sb.append(UI.SPACE);
          sb.append(Messages.Pref_Map_Label_Files);
          sb.append(UI.DASH_WITH_SPACE);
-         sb.append(_nf.format((float) offlineTileSize / 1024 / 1024));
+         sb.append(_nf2.format((float) offlineTileSize / 1024 / 1024));
          sb.append(UI.SPACE);
          sb.append(UI.UNIT_MBYTE);
 
@@ -3453,7 +3582,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             sbTotal.append(UI.SPACE);
             sbTotal.append(Messages.Pref_Map_Label_Files);
             sbTotal.append(UI.DASH_WITH_SPACE);
-            sbTotal.append(_nf.format((float) tileSize / 1024 / 1024));
+            sbTotal.append(_nf2.format((float) tileSize / 1024 / 1024));
             sbTotal.append(UI.SPACE);
             sbTotal.append(UI.UNIT_MBYTE);
          }

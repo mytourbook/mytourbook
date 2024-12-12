@@ -123,7 +123,7 @@ public class ActionUpload extends SubMenu {
    @Override
    public void fillMenu(final Menu menu) {
 
-      _uploadTourActions.forEach(this::addActionToMenu);
+      _uploadTourActions.forEach(action -> addActionToMenu(action));
    }
 
    /**

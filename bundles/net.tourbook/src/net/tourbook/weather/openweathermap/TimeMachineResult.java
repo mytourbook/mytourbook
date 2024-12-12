@@ -241,7 +241,7 @@ class TimeMachineResult {
          return weatherType;
       }
 
-      return OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds(middleWeather.icon());
+      return OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds(middleWeather.icon(), middleWeather.id());
    }
 
    public String getWeatherDescription() {

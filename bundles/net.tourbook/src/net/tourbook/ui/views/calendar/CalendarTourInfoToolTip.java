@@ -17,6 +17,7 @@ package net.tourbook.ui.views.calendar;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.common.util.TourToolTip;
@@ -131,7 +132,14 @@ public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, I
 
          final Rectangle cellBounds = hoveredItem.itemRectangle;
          final int cellWidth2 = cellBounds.width / 2;
-         final int cellHeight = cellBounds.height;
+         int cellHeight = cellBounds.height;
+
+         if (UI.IS_4K_DISPLAY) {
+
+            // this adjustment is needed otherwise the tooltip is difficult to hover
+
+            cellHeight -= 1;
+         }
 
          final int devXDefault = cellBounds.x + cellWidth2;// + cellBounds.width; //event.x;
          final int devY = cellBounds.y + cellHeight;
@@ -254,5 +262,21 @@ public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, I
       _tourId = _hoveredItem.id;
 
       return true;
+   }
+
+   @Override
+   protected boolean shouldHideToolTip(final Event event) {
+
+      if (_tourInfoUI.canHideTooltip() == false) {
+
+         /*
+          * Prevent closing when a contained tooltip is open, otherwise the tooltip of this tour
+          * info UI would close on Linux
+          */
+
+         return false;
+      }
+
+      return super.shouldHideToolTip(event);
    }
 }

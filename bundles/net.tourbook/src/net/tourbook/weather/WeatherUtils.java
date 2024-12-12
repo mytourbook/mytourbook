@@ -452,13 +452,15 @@ public class WeatherUtils {
 
       switch (IWeather.CLOUD_ICON[weatherIndex]) {
 
-      case IWeather.WEATHER_ID_CLEAR:
-         //https://emojipedia.org/sun/
+      case IWeather.WEATHER_ID_CLEAR: //              // https://emojipedia.org/sun/
          weatherIcon = "\u2600"; //$NON-NLS-1$
          break;
 
-      case IWeather.WEATHER_ID_PART_CLOUDS:
-         //https://emojipedia.org/sun-behind-cloud/
+      case IWeather.WEATHER_ID_FOG: //                // https://www.compart.com/en/unicode/U+1F32B
+         weatherIcon = "\uD83C\uDF2B"; //$NON-NLS-1$
+         break;
+
+      case IWeather.WEATHER_ID_PART_CLOUDS: //        // https://emojipedia.org/sun-behind-cloud/
          weatherIcon = "\u26C5"; //$NON-NLS-1$
          break;
 
@@ -467,24 +469,20 @@ public class WeatherUtils {
          break;
 
       case IWeather.WEATHER_ID_SCATTERED_SHOWERS:
-      case IWeather.WEATHER_ID_DRIZZLE:
-         //https://emojipedia.org/sun-behind-rain-cloud/
+      case IWeather.WEATHER_ID_DRIZZLE: //            // https://emojipedia.org/sun-behind-rain-cloud/
          weatherIcon = "\ud83c\udf26"; //$NON-NLS-1$
          break;
 
-      case IWeather.WEATHER_ID_RAIN:
-         //https://emojipedia.org/cloud-with-rain/
+      case IWeather.WEATHER_ID_RAIN: //               // https://emojipedia.org/cloud-with-rain/
          weatherIcon = "\ud83c\udf27"; //$NON-NLS-1$
          break;
 
-      case IWeather.WEATHER_ID_LIGHTNING:
-         //https://emojipedia.org/cloud-with-lightning/
+      case IWeather.WEATHER_ID_LIGHTNING: //          // https://emojipedia.org/cloud-with-lightning/
          weatherIcon = "\ud83c\udf29"; //$NON-NLS-1$
          break;
 
-      case IWeather.WEATHER_ID_SNOW:
+      case IWeather.WEATHER_ID_SNOW: //               // https://emojipedia.org/snowflake/
 
-         //https://emojipedia.org/snowflake/
          weatherIcon = "\u2744"; //$NON-NLS-1$
 
          //Below is the official "Cloud with snow" icon but because it looks too
@@ -493,8 +491,7 @@ public class WeatherUtils {
          //https://emojipedia.org/cloud-with-snow/
          break;
 
-      case IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT:
-         //https://emojipedia.org/warning/
+      case IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT: //https://emojipedia.org/warning/
          weatherIcon = "\u26A0"; //$NON-NLS-1$
          break;
 
@@ -511,9 +508,13 @@ public class WeatherUtils {
       int weatherCloudsIndex = -1;
 
       if (StringUtils.hasContent(weatherClouds)) {
+
          // binary search cannot be done because it requires sorting which we cannot...
+
          for (int cloudIndex = 0; cloudIndex < IWeather.CLOUD_ICON.length; ++cloudIndex) {
+
             if (IWeather.CLOUD_ICON[cloudIndex].equalsIgnoreCase(weatherClouds)) {
+
                weatherCloudsIndex = cloudIndex;
                break;
             }
@@ -548,8 +549,9 @@ public class WeatherUtils {
                                                    final long tourStartTime,
                                                    final long tourEndTime) {
 
-      if (weatherDataStartTime > tourStartTime ||
-            weatherDataEndTime + WeatherUtils.SECONDS_PER_THIRTY_MINUTE < tourEndTime) {
+      if (weatherDataStartTime > tourStartTime
+            || weatherDataEndTime + WeatherUtils.SECONDS_PER_THIRTY_MINUTE < tourEndTime) {
+
          return false;
       }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,6 +32,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageTourType_Definitions;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -177,10 +178,11 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
    private ActionOpenPrefDialog          _actionOpenTourTypePrefs;
 
-   private final NumberFormat            _nf          = NumberFormat.getNumberInstance();
+   private final NumberFormat            _nf              = NumberFormat.getNumberInstance();
 
-   private final Image                   _iconPlaceholder;
-   private final HashMap<Integer, Image> _graphImages = new HashMap<>();
+   private final Image                   _iconPlaceholder = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
+   private final Image                   _imageDialog     = TourbookPlugin.getImageDescriptor(Images.MergeTours).createImage();
+   private final HashMap<Integer, Image> _graphImages     = new HashMap<>();
 
    private final int                     _tourStartTimeSynchOffset;
    private int                           _tourTimeOffsetBackup;
@@ -205,9 +207,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
       setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 
       // set icon for the window
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.MergeTours).createImage());
-
-      _iconPlaceholder = TourbookPlugin.getImageDescriptor(Images.App_EmptyIcon_Placeholder).createImage();
+      setDefaultImage(_imageDialog);
 
       _sourceTour = mergeSourceTour;
       _targetTour = mergeTargetTour;
@@ -564,7 +564,7 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
       _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
             Messages.action_tourType_modify_tourTypes,
-            ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
+            PrefPageTourType_Definitions.ID);
    }
 
    @Override
@@ -1370,7 +1370,8 @@ public class DialogMergeTours extends TitleAreaDialog implements ITourProvider2,
 
    private void onDispose() {
 
-      _iconPlaceholder.dispose();
+      UI.disposeResource(_iconPlaceholder);
+      UI.disposeResource(_imageDialog);
 
       _graphImages.values().forEach(Image::dispose);
 

@@ -12,6 +12,7 @@
    <extension-point id="fileSystem"                   name="File System"                  schema="schema/fileSystem.exsd"/>
    <extension-point id="cloudUploader"                name="Cloud Uploader"               schema="schema/cloudUploader.exsd"/>
    <extension-point id="cloudDownloader"              name="Cloud Downloader"             schema="schema/cloudDownloader.exsd"/>
+   <extension-point id="map25Model"                   name="2.5D Map Models"              schema="schema/map25Model.exsd"/>
 
    <extension        point="org.eclipse.core.runtime.applications"   id="net.tourbook.appWithoutJRE">
       <application>
@@ -310,6 +311,13 @@
             category    ="net.tourbook.preferences.PrefPageAppearance"
          />
 
+         <page
+            name        ="%Pref_Page_TourActions"
+            id          ="net.tourbook.preferences.PrefPageAppearance_TourActions"
+            class       ="net.tourbook.preferences.PrefPageAppearance_TourActions"
+            category    ="net.tourbook.preferences.PrefPageAppearance"
+         />
+
 
       <!--
          Import
@@ -396,26 +404,32 @@
       -->
 
       <page
-         name="%preference_page_tags"
-         id="net.tourbook.preferences.PrefPageTags"
-         class="net.tourbook.preferences.PrefPageTags"
+         name     ="%Pref_Page_Tag"
+         id       ="net.tourbook.preferences.PrefPageTags"
+         class    ="net.tourbook.preferences.PrefPageTags"
       />
+         <page
+            name        ="%Pref_Page_Tag_Groups"
+            id          ="net.tourbook.preferences.PrefPageTagGroups"
+            class       ="net.tourbook.preferences.PrefPageTagGroups"
+            category    ="net.tourbook.preferences.PrefPageTags"
+         />
 
 
       <!--
          Tour Type
       -->
-      
+               
       <page
-         class="net.tourbook.preferences.PrefPageTourTypeFilterList"
-         id="net.tourbook.preferences.PrefPageTourTypeFilter"
-         name="%preference_page_tour_type_root"
+         name        ="%Pref_Page_TourType_Layout"
+         id          ="net.tourbook.preferences.PrefPageTourType_Definitions"
+         class       ="net.tourbook.preferences.PrefPageTourType_Definitions"
       />
          <page
-            name        ="%Pref_Page_TourType_Colors"
-            id          ="net.tourbook.preferences.PrefPageTourTypeDefinition"
-            class       ="net.tourbook.preferences.PrefPageTourTypes"
-            category    ="net.tourbook.preferences.PrefPageTourTypeFilter"
+            name        ="%Pref_Page_TourType_Groups"
+            id          ="net.tourbook.preferences.PrefPageTourType_Groups"
+            class       ="net.tourbook.preferences.PrefPageTourType_Groups"
+            category    ="net.tourbook.preferences.PrefPageTourType_Definitions"
          />
 
 
@@ -1208,17 +1222,17 @@
       <menuContribution locationURI="popup:menu.net.tourbook.photo.PhotoGallery?before=separator.net.tourbook.photo.refresh" >
                   
          <command
-            commandId="command.net.tourbook.photo.LinkPhotoWithTourInGalleryAll"
-            icon="icons/photo-link-photo-with-tour.png"
-            label="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll"
-            mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll_Mnemonic"/>
+            commandId   ="command.net.tourbook.photo.LinkPhotoWithTourInGalleryAll"
+            icon        ="icons/photo-link-photo-with-tour.png"
+            label       ="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll"
+            mnemonic    ="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll_Mnemonic"/>
 
          <command
-            commandId="command.net.tourbook.photo.LinkPhotoWithTourInGallerySelected"
-            icon="icons/photo-link-photo-with-tour.png"
-            label="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
-            mnemonic="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected_Mnemonic"/>
-
+            commandId   ="command.net.tourbook.photo.LinkPhotoWithTourInGallerySelected"
+            icon        ="icons/photo-link-photo-with-tour.png"
+            label       ="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
+            mnemonic    ="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected_Mnemonic"/>
+            
          <!--
          <command
             commandId="command.net.tourbook.sign.ImportTourSigns"
@@ -1226,7 +1240,7 @@
             label="%Action_TourSign_ImportTourSigns"
             mnemonic="%Action_TourSign_ImportTourSigns_Mnemonic"/>
          -->
-         
+
       </menuContribution>
 
    </extension>
@@ -1520,8 +1534,8 @@
          id             ="command.net.tourbook.photo.LinkPhotoWithTourInGalleryAll"
          name           ="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll"
          defaultHandler ="net.tourbook.tour.photo.ActionHandler_LinkPhotoWithTourInGalleryAll"/>
-      
-      <command
+         
+      <command 
          id             ="command.net.tourbook.photo.TourPhotosView"
          name           ="%View_Name_PhotoTourPhotos"
          defaultHandler ="net.tourbook.tour.photo.ActionHandler_OpenView_TourPhotos"/>
@@ -1532,8 +1546,8 @@
          defaultHandler ="net.tourbook.tour.photo.ActionHandler_SyncPhotoWithTour">   
 
          <state
-            id       ="org.eclipse.ui.commands.toggleState"
-            class    ="org.eclipse.ui.handlers.RegistryToggleState"
+            id          ="org.eclipse.ui.commands.toggleState"
+            class       ="org.eclipse.ui.handlers.RegistryToggleState"
          />
 
       </command>
@@ -1590,13 +1604,6 @@
             name="net.tourbook.chart.context.isTourChart">
       </context>
    </extension>
-
-   <extension  point="net.tourbook.tilefactory">
-      <tilefactory
-            class="net.tourbook.srtm.tilefactory.SRTMMapProvider"
-            name="SRTM Map Provider"/>
-   </extension>
-
 
    <extension   point="org.eclipse.ui.views">
 
@@ -2573,6 +2580,19 @@
          class       ="net.tourbook.commands.PropertyTester_IsLinuxOrOSX"
       />
       
+   </extension>
+
+
+   <!--
+   
+      net.tourbook EXTENSIONS
+   
+   -->
+
+   <extension  point="net.tourbook.tilefactory">
+      <tilefactory
+            class="net.tourbook.srtm.tilefactory.SRTMMapProvider"
+            name="SRTM Map Provider"/>
    </extension>
 
 </plugin>

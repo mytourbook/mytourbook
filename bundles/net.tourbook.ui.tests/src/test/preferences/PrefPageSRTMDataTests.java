@@ -17,6 +17,7 @@ package preferences;
 
 import net.tourbook.srtm.Messages;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -40,6 +41,7 @@ public class PrefPageSRTMDataTests extends UITest {
    }
 
    @Test
+   @Tag("ExternalConnection")
    void validateSRTMConnection() {
 
       Utils.openPreferences(bot);

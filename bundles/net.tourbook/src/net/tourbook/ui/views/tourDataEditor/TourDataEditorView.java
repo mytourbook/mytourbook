@@ -39,7 +39,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -52,6 +51,7 @@ import net.tourbook.commands.AppCommands;
 import net.tourbook.commands.ISaveAndRestorePart;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.autocomplete.AutoComplete_ComboInputMT;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.swimming.StrokeStyle;
@@ -666,97 +666,97 @@ public class TourDataEditorView extends ViewPart implements
    /*
     * Tab: Tour
     */
-   private Composite              _containerTags_Content;
-   private ScrolledComposite      _containerTags_Scrolled;
-   private PageBook               _pageBook_Tags;
+   private Composite                 _containerTags_Content;
+   private ScrolledComposite         _containerTags_Scrolled;
+   private PageBook                  _pageBook_Tags;
    //
-   private ComboViewerCadence     _comboCadence;
+   private ComboViewerCadence        _comboCadence;
    //
-   private CLabel                 _lblTourType;
+   private CLabel                    _lblTourType;
    //
-   private ControlDecoration      _decoTimeZone;
+   private ControlDecoration         _decoTimeZone;
    //
-   private Combo                  _comboTitle;
-   private Combo                  _comboLocation_Start;
-   private Combo                  _comboLocation_End;
-   private Combo                  _comboTimeZone;
-   private Combo                  _comboWeather_Clouds;
-   private Combo                  _comboWeather_Wind_DirectionText;
-   private Combo                  _comboWeather_WindSpeedText;
+   private Combo                     _comboTitle;
+   private Combo                     _comboLocation_Start;
+   private Combo                     _comboLocation_End;
+   private Combo                     _comboTimeZone;
+   private Combo                     _comboWeather_Clouds;
+   private Combo                     _comboWeather_Wind_DirectionText;
+   private Combo                     _comboWeather_WindSpeedText;
    //
-   private DateTime               _dtStartTime;
-   private DateTime               _dtTourDate;
+   private DateTime                  _dtStartTime;
+   private DateTime                  _dtTourDate;
    //
-   private Label                  _lblAltitudeUpUnit;
-   private Label                  _lblAltitudeDownUnit;
-   private Label                  _lblCloudIcon;
-   private Label                  _lblDistanceUnit;
-   private Label                  _lblNoTags;
-   private Label                  _lblPerson_BodyWeightUnit;
-   private Label                  _lblPerson_BodyFatUnit;
-   private Label                  _lblSpeedUnit;
-   private Label                  _lblStartTime;
-   private Label                  _lblTags;
-   private Label                  _lblTimeZone;
-   private Label                  _lblWeather_PrecipitationUnit;
-   private Label                  _lblWeather_PressureUnit;
-   private Label                  _lblWeather_SnowfallUnit;
-   private Label                  _lblWeather_TemperatureUnit_Avg;
-   private Label                  _lblWeather_TemperatureUnit_Avg_Device;
-   private Label                  _lblWeather_TemperatureUnit_Max;
-   private Label                  _lblWeather_TemperatureUnit_Max_Device;
-   private Label                  _lblWeather_TemperatureUnit_Min;
-   private Label                  _lblWeather_TemperatureUnit_Min_Device;
-   private Label                  _lblWeather_TemperatureUnit_WindChill;
+   private Label                     _lblAltitudeUpUnit;
+   private Label                     _lblAltitudeDownUnit;
+   private Label                     _lblCloudIcon;
+   private Label                     _lblDistanceUnit;
+   private Label                     _lblNoTags;
+   private Label                     _lblPerson_BodyWeightUnit;
+   private Label                     _lblPerson_BodyFatUnit;
+   private Label                     _lblSpeedUnit;
+   private Label                     _lblStartTime;
+   private Label                     _lblTags;
+   private Label                     _lblTimeZone;
+   private Label                     _lblWeather_PrecipitationUnit;
+   private Label                     _lblWeather_PressureUnit;
+   private Label                     _lblWeather_SnowfallUnit;
+   private Label                     _lblWeather_TemperatureUnit_Avg;
+   private Label                     _lblWeather_TemperatureUnit_Avg_Device;
+   private Label                     _lblWeather_TemperatureUnit_Max;
+   private Label                     _lblWeather_TemperatureUnit_Max_Device;
+   private Label                     _lblWeather_TemperatureUnit_Min;
+   private Label                     _lblWeather_TemperatureUnit_Min_Device;
+   private Label                     _lblWeather_TemperatureUnit_WindChill;
    //
-   private Link                   _linkDefaultTimeZone;
-   private Link                   _linkGeoTimeZone;
-   private Link                   _linkRemoveTimeZone;
-   private Link                   _linkTag;
-   private Link                   _linkTourType;
-   private Link                   _linkWeather;
+   private Link                      _linkDefaultTimeZone;
+   private Link                      _linkGeoTimeZone;
+   private Link                      _linkRemoveTimeZone;
+   private Link                      _linkTag;
+   private Link                      _linkTourType;
+   private Link                      _linkWeather;
    //
-   private Spinner                _spinPerson_BodyFat;
-   private Spinner                _spinPerson_BodyWeight;
-   private Spinner                _spinPerson_Calories;
-   private Spinner                _spinPerson_FTP;
-   private Spinner                _spinPerson_RestPulse;
-   private Spinner                _spinWeather_Humidity;
-   private Spinner                _spinWeather_PrecipitationValue;
-   private Spinner                _spinWeather_PressureValue;
-   private Spinner                _spinWeather_SnowfallValue;
-   private Spinner                _spinWeather_Temperature_Average;
-   private Spinner                _spinWeather_Temperature_Min;
-   private Spinner                _spinWeather_Temperature_Max;
-   private Spinner                _spinWeather_Temperature_WindChill;
-   private Spinner                _spinWeather_Wind_DirectionValue;
-   private Spinner                _spinWeather_Wind_SpeedValue;
+   private Spinner                   _spinPerson_BodyFat;
+   private Spinner                   _spinPerson_BodyWeight;
+   private Spinner                   _spinPerson_Calories;
+   private Spinner                   _spinPerson_FTP;
+   private Spinner                   _spinPerson_RestPulse;
+   private Spinner                   _spinWeather_Humidity;
+   private Spinner                   _spinWeather_PrecipitationValue;
+   private Spinner                   _spinWeather_PressureValue;
+   private Spinner                   _spinWeather_SnowfallValue;
+   private Spinner                   _spinWeather_Temperature_Average;
+   private Spinner                   _spinWeather_Temperature_Min;
+   private Spinner                   _spinWeather_Temperature_Max;
+   private Spinner                   _spinWeather_Temperature_WindChill;
+   private Spinner                   _spinWeather_Wind_DirectionValue;
+   private Spinner                   _spinWeather_Wind_SpeedValue;
    //
-   private TableCombo             _tableComboWeather_AirQuality;
+   private TableCombo                _tableComboWeather_AirQuality;
    //
-   private Text                   _txtAltitudeDown;
-   private Text                   _txtAltitudeUp;
-   private Text                   _txtDescription;
-   private Text                   _txtDistance;
-   private Text                   _txtWeather;
-   private Text                   _txtWeather_Temperature_Average_Device;
-   private Text                   _txtWeather_Temperature_Min_Device;
-   private Text                   _txtWeather_Temperature_Max_Device;
+   private Text                      _txtAltitudeDown;
+   private Text                      _txtAltitudeUp;
+   private Text                      _txtDescription;
+   private Text                      _txtDistance;
+   private Text                      _txtWeather;
+   private Text                      _txtWeather_Temperature_Average_Device;
+   private Text                      _txtWeather_Temperature_Min_Device;
+   private Text                      _txtWeather_Temperature_Max_Device;
    //
-   private TimeDuration           _deviceTime_Elapsed;                   // Total time of the activity
-   private TimeDuration           _deviceTime_Recorded;                  // Time recorded by the device = Total time - paused times
-   private TimeDuration           _deviceTime_Paused;                    // Time where the user deliberately paused the device
-   private TimeDuration           _computedTime_Moving;                  // Computed time moving
-   private TimeDuration           _computedTime_Break;                   // Computed time stopped
+   private TimeDuration              _deviceTime_Elapsed;                   // Total time of the activity
+   private TimeDuration              _deviceTime_Recorded;                  // Time recorded by the device = Total time - paused times
+   private TimeDuration              _deviceTime_Paused;                    // Time where the user deliberately paused the device
+   private TimeDuration              _computedTime_Moving;                  // Computed time moving
+   private TimeDuration              _computedTime_Break;                   // Computed time stopped
    //
-   private Menu                   _swimViewer_ContextMenu;
-   private Menu                   _timeViewer_ContextMenu;
+   private Menu                      _swimViewer_ContextMenu;
+   private Menu                      _timeViewer_ContextMenu;
    //
-   private AutocompleteComboInput _autocomplete_Location_End;
-   private AutocompleteComboInput _autocomplete_Location_Start;
-   private AutocompleteComboInput _autocomplete_Title;
+   private AutoComplete_ComboInputMT _autocomplete_Location_End;
+   private AutoComplete_ComboInputMT _autocomplete_Location_Start;
+   private AutoComplete_ComboInputMT _autocomplete_Title;
 
-   private Widget                 _focusField;
+   private Widget                    _focusField;
 
    private class Action_RemoveSwimStyle extends Action {
 
@@ -3441,7 +3441,7 @@ public class TourDataEditorView extends ViewPart implements
          final Set<TourTag> tourTags = _tourData.getTourTags();
          final boolean isTagInTour = tourTags.size() > 0;
 
-         _tagMenuMgr.fillTagMenu(menuManager, false);
+         _tagMenuMgr.fillTagMenu(menuManager);
          _tagMenuMgr.enableTagActions(true, isTagInTour, tourTags);
       });
 
@@ -3660,7 +3660,7 @@ public class TourDataEditorView extends ViewPart implements
                allTourTitles.forEach(tourTitle -> _comboTitle.add(tourTitle));
             }
 
-            _autocomplete_Title = new AutocompleteComboInput(_comboTitle);
+            _autocomplete_Title = new AutoComplete_ComboInputMT(_comboTitle);
          }
          {
             /*
@@ -3753,7 +3753,7 @@ public class TourDataEditorView extends ViewPart implements
                      }
                   }
 
-                  _autocomplete_Location_Start = new AutocompleteComboInput(_comboLocation_Start);
+                  _autocomplete_Location_Start = new AutoComplete_ComboInputMT(_comboLocation_Start);
                }
             }
          }
@@ -3818,7 +3818,7 @@ public class TourDataEditorView extends ViewPart implements
                      }
                   }
 
-                  _autocomplete_Location_End = new AutocompleteComboInput(_comboLocation_End);
+                  _autocomplete_Location_End = new AutoComplete_ComboInputMT(_comboLocation_End);
                }
             }
          }

@@ -2355,7 +2355,7 @@ public class ColumnManager {
 //      System.out.println();
 //
 //      for (final ColumnDefinition colDefLog : _allDefinedColumnDefinitions) {
-//         System.out.println("  \"" + colDefLog.getColumnId() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+//         System.out.println("  \"" + colDefLog.getColumnId() + UI.SYMBOL_QUOTATION_MARK); //$NON-NLS-1$ //$NON-NLS-2$
 //      }
 //
 //      System.out.println();

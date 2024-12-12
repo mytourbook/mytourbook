@@ -220,6 +220,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Category_Surfing;
    public static String        ColumnFactory_Category_Swimming;
    public static String        ColumnFactory_Category_Time;
+   public static String        ColumnFactory_Category_Tag;
    public static String        ColumnFactory_Category_Tour;
    public static String        ColumnFactory_Category_Training;
    public static String        ColumnFactory_Category_Waypoint;
@@ -491,8 +492,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_TagID_Header;
    public static String        ColumnFactory_TagID_Label;
    public static String        ColumnFactory_TagID_Tooltip;
-
-   public static String        ColumnFactory_TagImageFilePath_Header;
+   public static String        ColumnFactory_TagImageFile_Header;
+   public static String        ColumnFactory_TagImageFilePath_Header2;
    public static String        ColumnFactory_TagImageFilePath_Label;
    public static String        ColumnFactory_TagImageFilePath_Tooltip;
 
@@ -536,6 +537,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Tour_WeekDay_Header;
    public static String        ColumnFactory_Tour_WeekDay_Label;
    public static String        ColumnFactory_Tour_WeekDay_Tooltip;
+   public static String        ColumnFactory_TourDescription_Label;
+   public static String        ColumnFactory_TourDescription_Tooltip;
    public static String        ColumnFactory_TourDistanceDiff_Label;
    public static String        ColumnFactory_TourDistanceDiff_Tooltip;
    public static String        ColumnFactory_TourDurationTime_Header;
@@ -690,6 +693,7 @@ public class Messages extends NLS {
    public static String        Tour_Location_Task_RetrieveAndSaveTourLocations;
    public static String        Tour_Location_Task_RetrievingTourLocations;
    public static String        Tour_Location_Task_RetrievingTourLocations_Subtask;
+   public static String        Tour_Location_Task_SetTourLocationNames;
    public static String        Tour_Location_Tooltip_Label_Usage;
    public static String        Tour_Location_Tooltip_Label_Usage_Tooltip;
    public static String        Tour_Location_Tooltip_Label_Zoomlevel;
@@ -815,6 +819,19 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_WindDirection;
    public static String        Tour_Tooltip_Label_WindSpeed;
    public static String        Tour_Tooltip_Spinner_TextWidth_Tooltip;
+
+   public static String        Tour_TooltipOptions_Checkbox_ShowBodyValues;
+   public static String        Tour_TooltipOptions_Checkbox_ShowHeartrateZones;
+   public static String        Tour_TooltipOptions_Checkbox_ShowRunningDynamics;
+   public static String        Tour_TooltipOptions_Checkbox_ShowSensorValues;
+   public static String        Tour_TooltipOptions_Checkbox_ShowStartEndLocation;
+   public static String        Tour_TooltipOptions_Checkbox_ShowVerticalSpeed;
+   public static String        Tour_TooltipOptions_Checkbox_ShowWeatherDescription;
+   public static String        Tour_TooltipOptions_Checkbox_ShowWeatherValues;
+   public static String        Tour_TooltipOptions_Label_TooltipWidth;
+   public static String        Tour_TooltipOptions_Radio_CustomizeValues;
+   public static String        Tour_TooltipOptions_Radio_ShowAllValues;
+   public static String        Tour_TooltipOptions_Title_TourInfoOptions;
 
    public static String        TourType_Config_Border_Bottom;
    public static String        TourType_Config_Border_Circle;

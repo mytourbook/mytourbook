@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,8 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.map.model;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
@@ -48,10 +46,12 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.ToolItem;
@@ -78,6 +78,7 @@ public class SlideoutMapModel extends AdvancedSlideout {
    private Button    _btnAdd;
    private Button    _btnDelete;
    private Button    _btnEdit;
+   private Button    _btnImport;
 
    private class ModelComparator extends ViewerComparator {
 
@@ -263,7 +264,7 @@ public class SlideoutMapModel extends AdvancedSlideout {
             .grab(true, false)
             .align(SWT.END, SWT.FILL)
             .applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
       {
          {
             /*
@@ -271,10 +272,21 @@ public class SlideoutMapModel extends AdvancedSlideout {
              */
             _btnAdd = new Button(container, SWT.PUSH);
             _btnAdd.setText(Messages.App_Action_Add);
-            _btnAdd.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModel_Add()));
+            _btnAdd.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onModel_Add()));
 
             // set button default width
             UI.setButtonLayoutData(_btnAdd);
+         }
+         {
+            /*
+             * Button: Import
+             */
+            _btnImport = new Button(container, SWT.PUSH);
+            _btnImport.setText("&Import");
+            _btnImport.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onModel_Import()));
+
+            // set button default width
+            UI.setButtonLayoutData(_btnImport);
          }
          {
             /*
@@ -282,7 +294,7 @@ public class SlideoutMapModel extends AdvancedSlideout {
              */
             _btnEdit = new Button(container, SWT.PUSH);
             _btnEdit.setText(Messages.App_Action_Edit);
-            _btnEdit.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModel_Edit(false)));
+            _btnEdit.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onModel_Edit(false)));
 
             // set button default width
             UI.setButtonLayoutData(_btnEdit);
@@ -293,7 +305,7 @@ public class SlideoutMapModel extends AdvancedSlideout {
              */
             _btnDelete = new Button(container, SWT.PUSH);
             _btnDelete.setText(Messages.App_Action_Delete);
-            _btnDelete.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModel_Delete()));
+            _btnDelete.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onModel_Delete()));
 
             // set button default width
             UI.setButtonLayoutData(_btnDelete);
@@ -312,6 +324,7 @@ public class SlideoutMapModel extends AdvancedSlideout {
       _btnAdd.setEnabled(true);
       _btnDelete.setEnabled(isModelSelected && isUserModel);
       _btnEdit.setEnabled(isModelSelected);
+      _btnImport.setEnabled(true);
    }
 
    @Override
@@ -457,6 +470,26 @@ public class SlideoutMapModel extends AdvancedSlideout {
       }
 
       updateUI_ModelViewer(selectedModel);
+   }
+
+   private void onModel_Import() {
+
+      final FileDialog dialog = new FileDialog(_parent.getShell(), SWT.SAVE);
+
+      dialog.setText("Select 2.5D map model configuration file");
+
+      String selectedFilepath;
+
+      setIsAnotherDialogOpened(true);
+      {
+         selectedFilepath = dialog.open();
+      }
+      setIsAnotherDialogOpened(false);
+
+      if (MapModelManager.importMapModel(selectedFilepath)) {
+
+         _modelViewer.refresh();
+      }
    }
 
    private void onModel_Selected() {

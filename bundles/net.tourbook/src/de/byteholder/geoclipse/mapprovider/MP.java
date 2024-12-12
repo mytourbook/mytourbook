@@ -286,6 +286,11 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    private String        _category                        = UI.EMPTY_STRING;
 
    /**
+    * Tile size multiplier
+    */
+   private float         _hiDPI;
+
+   /**
     */
    protected MP() {
 
@@ -686,6 +691,14 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    public int getFavoriteZoom() {
       return _favoriteZoom;
+   }
+
+   /**
+    * @return Returns the tile size multiplier
+    */
+   public float getHiDPI() {
+
+      return _hiDPI;
    }
 
    /**
@@ -1434,6 +1447,11 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    public void setFavoriteZoom(final int favoriteZoom) {
       _favoriteZoom = favoriteZoom;
+   }
+
+   public void setHiDPI(final float hiDPI) {
+
+      _hiDPI = hiDPI;
    }
 
    public void setId(final String mapProviderId) {

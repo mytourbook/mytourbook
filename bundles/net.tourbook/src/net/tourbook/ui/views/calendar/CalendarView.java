@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011, 2023 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2024 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -93,9 +93,8 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    private IPropertyChangeListener _prefChangeListener_Common;
    private ITourEventListener      _tourEventListener;
 
-   private ActionCalendarOptions   _actionCalendarOptions;
-
    private Action                  _actionBack;
+   private ActionCalendarOptions   _actionCalendarOptions;
    private Action                  _actionForward;
    private Action                  _actionSetLinked;
    private Action                  _actionGotoToday;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
@@ -35,6 +34,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
+import net.tourbook.common.autocomplete.AutoComplete_ComboInputMT;
 import net.tourbook.common.form.SashBottomFixedForm;
 import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -155,46 +155,47 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    /*
     * UI controls
     */
-   private Sash                   _sashInner;
-   private SashLeftFixedForm      _sashOuterForm;
-   private SashBottomFixedForm    _sashInnerForm;
-   private Composite              _sashOuterFixedPart;
-   private Composite              _sashInnerFixedPart;
+   private Sash                      _sashInner;
+   private SashLeftFixedForm         _sashOuterForm;
+   private SashBottomFixedForm       _sashInnerForm;
+   private Composite                 _sashOuterFixedPart;
+   private Composite                 _sashInnerFixedPart;
 
-   private TableViewer            _markerViewer;
+   private TableViewer               _markerViewer;
 
-   private Button                 _btnDelete;
-   private Button                 _btnHideAll;
-   private Button                 _btnPasteText;
-   private Button                 _btnPasteUrl;
-   private Button                 _btnShowAll;
-   private Button                 _btnUndo;
-   private Button                 _chkVisibility;
+   private Button                    _btnDelete;
+   private Button                    _btnHideAll;
+   private Button                    _btnPasteText;
+   private Button                    _btnPasteUrl;
+   private Button                    _btnShowAll;
+   private Button                    _btnUndo;
+   private Button                    _chkVisibility;
 
-   private Combo                  _comboLabelPosition;
-   private Combo                  _comboMarkerName;
+   private Combo                     _comboLabelPosition;
+   private Combo                     _comboMarkerName;
 
-   private Group                  _groupText;
-   private Group                  _groupUrl;
+   private Group                     _groupText;
+   private Group                     _groupUrl;
 
-   private Image                  _imagePaste;
+   private Image                     _imageDialog = TourbookPlugin.getImageDescriptor(Images.TourMarker).createImage();
+   private Image                     _imagePaste  = CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy).createImage();
 
-   private Label                  _lblDescription;
-   private Label                  _lblLabel;
-   private Label                  _lblLabelOffsetX;
-   private Label                  _lblLabelOffsetY;
-   private Label                  _lblLabelPosition;
-   private Label                  _lblLinkText;
-   private Label                  _lblLinkUrl;
+   private Label                     _lblDescription;
+   private Label                     _lblLabel;
+   private Label                     _lblLabelOffsetX;
+   private Label                     _lblLabelOffsetY;
+   private Label                     _lblLabelPosition;
+   private Label                     _lblLinkText;
+   private Label                     _lblLinkUrl;
 
-   private Spinner                _spinLabelOffsetX;
-   private Spinner                _spinLabelOffsetY;
+   private Spinner                   _spinLabelOffsetX;
+   private Spinner                   _spinLabelOffsetY;
 
-   private Text                   _txtDescription;
-   private Text                   _txtUrlAddress;
-   private Text                   _txtUrlText;
+   private Text                      _txtDescription;
+   private Text                      _txtUrlAddress;
+   private Text                      _txtUrlText;
 
-   private AutocompleteComboInput _autocompleteMarkerName;
+   private AutoComplete_ComboInputMT _autocompleteMarkerName;
 
    {
       _nf3.setMinimumFractionDigits(3);
@@ -306,7 +307,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 
       // set icon for the window
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.TourMarker).createImage());
+      setDefaultImage(_imageDialog);
 
       _tourData = tourData;
 
@@ -1291,6 +1292,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       _firstColumnControls.clear();
 
+      UI.disposeResource(_imageDialog);
       UI.disposeResource(_imagePaste);
    }
 
@@ -1353,7 +1355,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _comboMarkerName.add(title);
       }
 
-      _autocompleteMarkerName = new AutocompleteComboInput(_comboMarkerName);
+      _autocompleteMarkerName = new AutoComplete_ComboInputMT(_comboMarkerName);
    }
 
    /**
@@ -1382,8 +1384,6 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       _pc = new PixelConverter(parent);
 
       _contentWidthHint = _pc.convertWidthInCharsToPixels(20);
-
-      _imagePaste = CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy).createImage();
 
       restoreState_Viewer();
    }

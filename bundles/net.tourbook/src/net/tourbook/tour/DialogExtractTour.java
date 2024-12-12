@@ -39,7 +39,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageTourType_Definitions;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.ui.ITourProvider2;
@@ -57,6 +57,7 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
@@ -218,6 +219,8 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
    private Text                             _txtTourTitle;
 
+   private Image                            _imageDialog = TourbookPlugin.getImageDescriptor(Images.MyTourbook16).createImage();
+
    /**
     * Split or extract a tour
     *
@@ -245,12 +248,20 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       _tourDataEditor = tourDataEditor;
       _tourDataSource = tourData;
 
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.MyTourbook16).createImage());
+      setDefaultImage(_imageDialog);
 
       _canRemoveTimeSlices = _tourDataEditor.getTourData().isContainReferenceTour() == false;
 
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
+   }
+
+   @Override
+   public boolean close() {
+
+      UI.disposeResource(_imageDialog);
+
+      return super.close();
    }
 
    @Override
@@ -309,7 +320,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
       _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
             Messages.action_tourType_modify_tourTypes,
-            ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
+            PrefPageTourType_Definitions.ID);
    }
 
    @Override
@@ -368,7 +379,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
          final Set<TourTag> targetTourTags = _tourDataTarget.getTourTags();
          final boolean isTagInTour = targetTourTags != null && targetTourTags.size() > 0;
 
-         _tagMenuMgr.fillTagMenu(menuManager, false);
+         _tagMenuMgr.fillTagMenu(menuManager);
          _tagMenuMgr.enableTagActions(true, isTagInTour, targetTourTags);
       });
 

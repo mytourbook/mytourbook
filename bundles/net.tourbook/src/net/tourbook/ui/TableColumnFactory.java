@@ -474,6 +474,8 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory TIME_WEEKYEAR;
    public static final String             TIME_WEEKYEAR_ID                                   = "TIME_WEEKYEAR";                                   //$NON-NLS-1$
 
+   public static final TableColumnFactory TOUR_DESCRIPTION;
+   public static final String             TOUR_DESCRIPTION_ID                                = "TOUR_DESCRIPTION";                                //$NON-NLS-1$
    public static final TableColumnFactory TOUR_MARKER;
    public static final TableColumnFactory TOUR_LOCATION_START;
    public static final String             TOUR_LOCATION_START_ID                             = "TOUR_LOCATION_START";                             //$NON-NLS-1$
@@ -4606,6 +4608,26 @@ public abstract class TableColumnFactory {
       /*
        * Tour
        */
+
+      TOUR_DESCRIPTION = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TOUR_DESCRIPTION_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_TourDescription_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_TourDescription_Label);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TourDescription_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+            return colDef;
+         }
+      };
 
       TOUR_MARKER = new TableColumnFactory() {
 

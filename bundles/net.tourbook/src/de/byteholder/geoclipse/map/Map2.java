@@ -465,6 +465,7 @@ public class Map2 extends Canvas {
    private MapPointToolTip                 _mapPointTooltip;
    private SlideoutMap2_PhotoToolTip       _mapPointTooltip_Photo;
    private boolean                         _isPreloadHQImages;
+   private boolean                         _isShowHQPhotoImages;
    private final ILoadCallBack             _photoImageLoaderCallback        = new PhotoImageLoaderCallback();
 
    /** Number of created map points */
@@ -788,10 +789,10 @@ public class Map2 extends Canvas {
    private final int           MAX_RATING_STARS              = 5;
    public int                  MAX_RATING_STARS_WIDTH;
 
-   public int                  MAP_IMAGE_DEFAULT_SIZE_TINY   = 20;
-   public int                  MAP_IMAGE_DEFAULT_SIZE_SMALL  = 60;
-   public int                  MAP_IMAGE_DEFAULT_SIZE_MEDIUM = 120;
-   public int                  MAP_IMAGE_DEFAULT_SIZE_LARGE  = 200;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_TINY   = 40;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_SMALL  = 100;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_MEDIUM = 200;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_LARGE  = 300;
 
    {
       final int deviceZoom = DPIUtil.getDeviceZoom();
@@ -1374,7 +1375,7 @@ public class Map2 extends Canvas {
          final int devY = mapPoint.geoPointDevY;
 
          final Photo photo = mapPoint.photo;
-         final Point mapImageSize = photo.getMapImageSize();
+         final Point mapImageSize = photo.getMap2ImageSize();
 
          final PointFeature pointFeature = new PointFeature(
 
@@ -2807,6 +2808,7 @@ public class Map2 extends Canvas {
     * @return Returns the current map provider
     */
    public MP getMapProvider() {
+
       return _mp;
    }
 
@@ -2814,10 +2816,12 @@ public class Map2 extends Canvas {
     * @return
     */
    public GeoPosition getMouseDown_GeoPosition() {
+
       return _mouseDown_ContextMenu_GeoPosition;
    }
 
    public GeoPosition getMouseMove_GeoPosition() {
+
       return _mouseMove_GeoPosition;
    }
 
@@ -2827,6 +2831,7 @@ public class Map2 extends Canvas {
     * @return Returns the key to identify overlay images in the image cache
     */
    private String getOverlayKey(final Tile tile) {
+
       return _overlayKey + tile.getTileKey();
    }
 
@@ -2839,6 +2844,7 @@ public class Map2 extends Canvas {
     * @return
     */
    private String getOverlayKey(final Tile tile, final int xOffset, final int yOffset, final String projectionId) {
+
       return _overlayKey + tile.getTileKey(xOffset, yOffset, projectionId);
    }
 
@@ -2852,100 +2858,75 @@ public class Map2 extends Canvas {
    private BufferedImage getPhotoImage(final Photo photo) {
 
       BufferedImage awtThumbImage = null;
-      BufferedImage awtPhotoImageHQ = null;
+      BufferedImage awtPhotoImageThumbHQ = null;
 
-      boolean isShowHQImages = false;
-      isShowHQImages = false;
+      /*
+       * 1. The thumbs MUST be loaded firstly because they are also loading the image orientation
+       */
 
-      try {
+      // check if image has an loading error
+      final PhotoLoadingState thumbPhotoLoadingState = photo.getLoadingState(ImageQuality.THUMB);
 
-         /*
-          * 1. The thumbs MUST be loaded firstly because they are also loading the image orientation
-          */
+      if (thumbPhotoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
 
-         // check if image has an loading error
-         final PhotoLoadingState thumbPhotoLoadingState = photo.getLoadingState(ImageQuality.THUMB);
+         // image is not invalid and not yet loaded
 
-         if (thumbPhotoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+         // check if image is in the cache
+         awtThumbImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB);
 
-            // image is not invalid and not yet loaded
+         if (awtThumbImage == null
+               && thumbPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
 
-            // check if image is in the cache
-            awtThumbImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB);
+            // the requested image is not available in the image cache -> image must be loaded
 
-            if (awtThumbImage == null
-                  && thumbPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+            PhotoLoadManager.putImageInLoadingQueueThumb_Map(
+                  photo,
+                  ImageQuality.THUMB,
+                  _photoImageLoaderCallback,
+                  true // is AWT image
+            );
 
-               // the requested image is not available in the image cache -> image must be loaded
-
-               PhotoLoadManager.putImageInLoadingQueueThumb_Map(
-                     photo,
-                     ImageQuality.THUMB,
-                     _photoImageLoaderCallback,
-                     true // is AWT image
-               );
-
-               return null;
-            }
+            return null;
          }
-
-         if (isShowHQImages == false) {
-
-            return awtThumbImage;
-         }
-
-         /*
-          * 2. Display HQ image
-          */
-
-         // check if image has an loading error
-         final PhotoLoadingState hqPhotoLoadingState = photo.getLoadingState(ImageQuality.HQ);
-
-         if (hqPhotoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
-
-            // image is not invalid and not yet loaded
-
-            // check if image is in the cache
-            awtPhotoImageHQ = PhotoImageCache.getImage_AWT(photo, ImageQuality.HQ);
-
-            if (awtPhotoImageHQ == null
-                  && hqPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
-
-               // the requested image is not available in the image cache -> image must be loaded
-
-               PhotoLoadManager.putImageInLoadingQueueHQ_Map(
-                     photo,
-                     ImageQuality.HQ,
-                     _photoImageLoaderCallback,
-                     true // is AWT image
-               );
-            }
-         }
-
-      } finally {
-
-//         System.out.println(UI.timeStamp()
-//
-//               + " Thumb: " + dumpPhoto(awtThumbImage)
-//               + " - HQ: " + dumpPhoto(awtPhotoImageHQ)
-//
-//         );
-// TODO remove SYSTEM.OUT.PRINTLN
-
       }
 
-      if (awtPhotoImageHQ != null) {
-
-         return awtPhotoImageHQ;
-
-      } else if (awtThumbImage != null) {
+      if (_isShowHQPhotoImages == false) {
 
          return awtThumbImage;
-
-      } else {
-
-         return null;
       }
+
+      /*
+       * 2. Display thumb HQ image
+       */
+
+      // check if image has an loading error
+      final PhotoLoadingState thumbHqPhotoLoadingState = photo.getLoadingState(ImageQuality.THUMB_HQ);
+
+      if (thumbHqPhotoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+
+         // image is not invalid and not yet loaded
+
+         // check if image is in the cache
+         awtPhotoImageThumbHQ = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB_HQ);
+
+         if (awtPhotoImageThumbHQ == null
+               && thumbHqPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+
+            // the requested image is not available in the image cache -> image must be loaded
+
+            PhotoLoadManager.putImageInLoadingQueueHQThumb_Map(
+                  photo,
+                  Photo.getMap2ImageRequestedSize(),
+                  _photoImageLoaderCallback);
+         }
+      }
+
+      if (awtPhotoImageThumbHQ != null) {
+
+         return awtPhotoImageThumbHQ;
+      }
+
+      return awtThumbImage;
    }
 
    private PoiToolTip getPoiTooltip() {
@@ -3618,6 +3599,11 @@ public class Map2 extends Canvas {
       return gridGeoPos;
    }
 
+   public void hidePhotoTooltip() {
+
+      _mapPointTooltip_Photo.hideNow();
+   }
+
    private void hideTourTooltipHoveredArea() {
 
       if (_tourTooltip == null) {
@@ -3979,15 +3965,6 @@ public class Map2 extends Canvas {
       }
 
       return isPauseVisible;
-   }
-
-   private String logImage(final BufferedImage image) {
-
-      if (image == null) {
-         return null;
-      }
-
-      return UI.EMPTY_STRING + image.getWidth();
    }
 
    /**
@@ -6955,6 +6932,13 @@ public class Map2 extends Canvas {
 
    private void paint_MapPointImage_10_Runnable() {
 
+      if (_mapPointImageSize.width == 0 || _mapPointImageSize.height == 0) {
+
+         // this happend, the UI is propably not yet fully initialized
+
+         return;
+      }
+
       /*
        * Setup common values
        */
@@ -7127,10 +7111,7 @@ public class Map2 extends Canvas {
                      PhotoLoadManager.putImageInLoadingQueueHQ_Map(
                            photo,
                            requestedImageQuality,
-                           _photoImageLoaderCallback,
-
-                           false // is SWT image
-                     );
+                           _photoImageLoaderCallback);
                   }
                }
             }
@@ -8503,7 +8484,7 @@ public class Map2 extends Canvas {
          final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
          final Photo photo = mapPoint.photo;
-         final Point mapImageSize = photo.getMapImageSize();
+         final Point mapImageSize = photo.getMap2ImageSize();
 
          final int labelDevX = (int) distribLabel.labelBoxL;
          final int labelDevY = (int) distribLabel.labelBoxT;
@@ -8535,14 +8516,31 @@ public class Map2 extends Canvas {
 
             // paint photo image
 
-            g2d.drawImage(awtPhotoImage,
+            final int photoImageWidth = awtPhotoImage.getWidth();
+            final int photoImageHeight = awtPhotoImage.getHeight();
 
-                  photoRectangle.x,
-                  photoRectangle.y,
-                  photoRectangle.width,
-                  photoRectangle.height,
+            if (photoImageWidth == photoWidth && photoImageHeight == photoHeight) {
 
-                  null);
+               // do not resize the image would do not look very good
+
+               g2d.drawImage(awtPhotoImage,
+
+                     photoRectangle.x,
+                     photoRectangle.y,
+
+                     null);
+
+            } else {
+
+               g2d.drawImage(awtPhotoImage,
+
+                     photoRectangle.x,
+                     photoRectangle.y,
+                     photoRectangle.width,
+                     photoRectangle.height,
+
+                     null);
+            }
 
             // draw border
 
@@ -9607,7 +9605,7 @@ public class Map2 extends Canvas {
       if (_isShowDebug_TileBorder) {
 
          // draw tile border
-         gc.setForeground(_display.getSystemColor(SWT.COLOR_YELLOW));
+         gc.setForeground(_isMapBackgroundDark ? UI.SYS_COLOR_YELLOW : UI.SYS_COLOR_RED);
          gc.drawRectangle(devTileViewport.x, devTileViewport.y, _tilePixelSize, _tilePixelSize);
       }
 
@@ -11356,6 +11354,10 @@ public class Map2 extends Canvas {
    }
 
    public void updatePhotoOptions() {
+
+      _isShowHQPhotoImages = Util.getStateBoolean(_state_Map2,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_THUMB_HQ_IMAGES,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT);
 
       _isPreloadHQImages = Util.getStateBoolean(_state_Map2,
             SlideoutMap2_PhotoOptions.STATE_IS_PRELOAD_HQ_IMAGES,

@@ -431,7 +431,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
          }
       });
 
-      _colorViewer.addCheckStateListener(this::onViewerCheckStateChange);
+      _colorViewer.addCheckStateListener(event -> onViewerCheckStateChange(event));
       _colorViewer.addSelectionChangedListener(selectionChangedEvent -> onViewerSelectColor());
       _colorViewer.addDoubleClickListener(doubleClickEvent -> actionEditSelectedColor());
    }

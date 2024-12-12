@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,18 +17,23 @@ package net.tourbook.photo;
 
 public enum ImageQuality {
 
-	/**
+   /**
     * Image is in EXIF thumb size/quality
     */
-	THUMB,
+   THUMB,
 
-	/**
-	 * Image is in HQ (high quality) size
-	 */
-	HQ,
+   /**
+    * Image is in HQ (high quality) size
+    */
+   HQ,
 
-	/**
-	 * Image in original size
-	 */
-	ORIGINAL,
+   /**
+    * Thumb image is in HQ (high quality) size which is used in e.g. 2D map
+    */
+   THUMB_HQ,
+
+   /**
+    * Image in original size
+    */
+   ORIGINAL,
 }

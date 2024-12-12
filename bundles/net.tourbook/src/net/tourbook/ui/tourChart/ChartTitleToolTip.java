@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2015, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import net.tourbook.chart.ChartComponentGraph;
 import net.tourbook.chart.ChartTitleSegment;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.AnimatedToolTipShell2;
+import net.tourbook.common.tooltip.ICanHideTooltip;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.data.TourData;
@@ -36,7 +37,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * created: 13.07.2015
+ * Created: 13.07.2015
  */
 public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourProvider, IToolTipProvider, IOpeningDialog {
 
@@ -45,12 +46,12 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
    private TourChart         _tourChart;
    private ChartTitleSegment _hoveredTitleSegment;
 
+   private Long              _hoveredTourId;
+
    /*
     * UI resources
     */
    private final TourInfoUI _tourInfoUI = new TourInfoUI();
-
-   private Long             _hoveredTourId;
 
    public ChartTitleToolTip(final TourChart tourChart) {
 
@@ -80,6 +81,12 @@ public class ChartTitleToolTip extends AnimatedToolTipShell2 implements ITourPro
        */
       _hoveredTitleSegment = null;
 
+   }
+
+   @Override
+   protected ICanHideTooltip canHideToolTip() {
+
+      return _tourInfoUI;
    }
 
    @Override

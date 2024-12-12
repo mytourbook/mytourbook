@@ -1584,7 +1584,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                final int heightFeet = (int) Math.floor(heightFeetRaw);
                final int heightInch = (int) (heightInchRaw % 12);
 
-               final String heightString = UI.EMPTY_STRING + heightFeet + "'" + heightInch + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+               final String heightString = UI.EMPTY_STRING + heightFeet + "'" + heightInch + UI.SYMBOL_QUOTATION_MARK; //$NON-NLS-1$ //$NON-NLS-2$
 
                cell.setText(heightString);
             }

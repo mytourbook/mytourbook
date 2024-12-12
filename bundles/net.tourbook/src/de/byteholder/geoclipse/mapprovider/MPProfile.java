@@ -55,6 +55,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
    public MPProfile() {}
 
    public MPProfile(final ArrayList<MPWrapper> mpWrappers) {
+
       _mpWrappers = mpWrappers;
    }
 
@@ -175,6 +176,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
     * Creates tile children for all mp wrapper which are displayed in one tile
     *
     * @param parentTile
+    *
     * @return Returns a list with children which are not yet available in the tile cache or error
     *         cache, children are skipped when they already exist and have loading errord
     */
@@ -277,6 +279,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
     * Create a wrapper from a map provider
     *
     * @param mp
+    *
     * @return
     */
    private MPWrapper createWrapper(final MP mp) {
@@ -328,7 +331,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
    }
 
    /**
-    * this method is synchronized because when live View is checked in the map profile dialog
+    * This method is synchronized because when live View is checked in the map profile dialog
     * and the brightness is changed, many ConcurrentModificationException occured
     *
     * <pre>
@@ -349,9 +352,13 @@ public class MPProfile extends MP implements ITileChildrenCreator {
          return null;
       }
 
-      final ProfileTileImage parentImage = new ProfileTileImage();
+      final ProfileTileImage parentImage = new ProfileTileImage(parentTile);
 
       parentImage.setBackgroundColor(_backgroundColor);
+
+      final ImageData parentImageData = parentImage.getImageData();
+      final int parentImageWidth = parentImageData.width;
+      final int parentImageHeight = parentImageData.height;
 
       boolean isFinal = true;
 
@@ -373,7 +380,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
             continue;
          }
 
-         final ImageData childImageData = childTile.getChildImageData();
+         ImageData childImageData = childTile.getChildImageData();
 
          if (childImageData == null) {
 
@@ -381,6 +388,20 @@ public class MPProfile extends MP implements ITileChildrenCreator {
             isFinal = false;
 
             continue;
+         }
+
+         final int childImageWidth = childImageData.width;
+         final int childImageHeight = childImageData.height;
+
+         if (parentImageWidth != childImageWidth || parentImageHeight != childImageHeight) {
+
+            /*
+             * Images do not have the same size, rescale it
+             */
+
+            childImageData = childImageData.scaledTo(parentImageWidth, parentImageHeight);
+
+            childTile.setChildTileImageData(childImageData);
          }
 
          if (childTile.getMP().isProfileBrightnessForNextMp()) {
@@ -400,8 +421,8 @@ public class MPProfile extends MP implements ITileChildrenCreator {
          brightnessImageData = null;
       }
 
-      return new ParentImageStatus(//
-            parentImage.getImageData(),
+      return new ParentImageStatus(
+            parentImageData,
             isFinal,
             _isSaveImage,
             isChildError);
@@ -410,26 +431,43 @@ public class MPProfile extends MP implements ITileChildrenCreator {
    @Override
    public IPath getTileOSPath(final String fullPath, final Tile tile) {
 
-      final IPath filePath = new Path(fullPath)//
+      final float highDPIScaling = getHiDPI();
+
+      final String nameSuffix =
+
+            highDPIScaling == 2.0 ? UI.HIDPI_NAME_2x
+
+                  : highDPIScaling == 1.50 ? UI.HIDPI_NAME_15x
+
+                        : UI.EMPTY_STRING;
+
+      final IPath filePath = new Path(fullPath)
+
             .append(getOfflineFolder())
+
             .append(Integer.toString(tile.getZoom()))
             .append(Integer.toString(tile.getX()))
-            .append(Integer.toString(tile.getY()))
+            .append(Integer.toString(tile.getY()) + nameSuffix)
+
             .addFileExtension(MapProviderManager.getImageFileExtension(getImageFormat()));
 
       return filePath;
    }
 
    public void setBackgroundColor(final int backgroundColor) {
+
       _backgroundColor = backgroundColor;
    }
 
    public void setBackgroundColor(final RGB rgb) {
+
       _backgroundColor = ((rgb.red & 0xFF) << 0) | ((rgb.green & 0xFF) << 8) | ((rgb.blue & 0xFF) << 16);
    }
 
    public void setIsSaveImage(final boolean isSaveImage) {
+
       _isSaveImage = isSaveImage;
+
       setUseOfflineImage(isSaveImage);
    }
 
@@ -438,6 +476,7 @@ public class MPProfile extends MP implements ITileChildrenCreator {
     *
     * @param mpWrapper
     * @param validMapProvider
+    *
     * @return Returns <code>false</code> when the synchronization fails
     */
    private boolean synchMpWrapper(final MPWrapper mpWrapper, final MP validMapProvider) {

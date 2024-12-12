@@ -280,7 +280,7 @@ public class ChartOptions_MonthSummary implements IStatisticOptions {
 
       enableControls();
 
-      Display.getCurrent().asyncExec(this::saveState);
+      Display.getCurrent().asyncExec(() -> saveState());
    }
 
    @Override

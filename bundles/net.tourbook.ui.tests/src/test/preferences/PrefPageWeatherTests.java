@@ -23,6 +23,7 @@ import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -47,6 +48,7 @@ public class PrefPageWeatherTests extends UITest {
    }
 
    @Test
+   @Tag("ExternalConnection")
    void testVendorConnections() {
 
       Utils.openPreferences(bot);

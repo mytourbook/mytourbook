@@ -311,7 +311,7 @@ public class Map3LayerUI {
             }
          });
 
-         _layerViewer.addCheckStateListener(this::onChangeCheckState);
+         _layerViewer.addCheckStateListener(event -> onChangeCheckState(event));
       }
 
       defineAllColumn(treeLayout);

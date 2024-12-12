@@ -1,102 +1,102 @@
 html 
 {
-	overflow-y: 			scroll;
+   overflow-y:          scroll;
 }
 
 body 
 {
-	font-size:				12px;
-	color:					#fff;
-	background-color:		#444;
-	padding-left:			5px;
+   font-size:           12px;
+   color:               #fff;
+   background-color:    #444;
+   padding-left:        5px;
 }
 
 html, body 
 {
-	margin:					0px;
+   margin:              0px;
 }
 
 p,td,ul 
 {
-	line-height:			130%;
+   line-height:         130%;
 }
 
 p 
 {
-	margin:					0px;
+   margin:              0px;
 }
 
 img 
 {
-	border: 				0;
+   border:              0;
 }
 
 table
 {
-	border-collapse:		collapse;
+   border-collapse:     collapse;
 }
 
 
 body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input 
 {
-	font-family: 			Segoe UI, helvetica, arial, sans-serif;
+   font-family:         Segoe UI, helvetica, arial, sans-serif;
 }
 
 a:LINK,
 a:VISITED 
 {
-	color:					#fff;
-	text-decoration:		none;
+   color:               #fff;
+   text-decoration:     none;
 }
 
 
 .title
 {
-	padding-left:			5px;
-	font-size:				22px;
-	xfont-family:			NothingYouCouldDo, sans-serif;
-	font-family:			Nunito-Bold, sans-serif;
-	font-weight:			bold;
+   padding-left:        5px;
+   font-size:           22px;
+   xfont-family:        NothingYouCouldDo, sans-serif;
+   font-family:         Nunito-Bold, sans-serif;
+   font-weight:         bold;
 }
 
 .import-container
 {
-	position:				relative;
-	height:					100vh;
+   position:            relative;
+   height:              100vh;
 }
 
 .import-background
 {
-	position:				absolute;
-	top: 					0;
-	left: 					0;
-	height: 				100%;
-	width: 					100%;
-	
-	/* background is inline embedded */
+   position:            absolute;
+   top:                 0;
+   left:                0;
+   height:              100%;
+   width:               100%;
+   
+   /* background is inline embedded */
 }
 
 .import-content
 {
-	/* VERY IMPORTANT: otherwise links, pointer, hovers and propably others do not work !!! */
-	position:				absolute;
+   /* VERY IMPORTANT: otherwise links, pointer, hovers and propably others do not work !!! */
+   position:            absolute;
 }
 
 
 .auto-import-header
 {
-	padding-top: 			10px;
+   padding-top:         10px;
 }
 
 .get-tours-title
 {
-	
-	padding-top: 			30px;
+   
+   padding-top:         30px;
 }
 
 .get-tours-items
 {
-	padding-top: 			0px;
+   padding-top:         0px;
 }
 
 /*
@@ -106,115 +106,115 @@ a:VISITED
 */
 a.import-tile
 {
-	position:				relative;
-	z-index: 				10;
+   position:            relative;
+   z-index:             10;
 
-	background-color: 		#434343;
-	xbackground-color: 		#777;
-	
-	display: 				block;
-	margin:					5px;
-	xpadding:				3px;
-	bottom:					0px;
-	min-height: 			7em;
-	max-height: 			7em;
-	min-width: 				7em;
-	max-width: 				7em;
-	
-	cursor:					pointer;
-	overflow:	 			hidden;
+   background-color:    #434343;
+   xbackground-color:    #777;
+   
+   display:             block;
+   margin:              5px;
+   xpadding:            3px;
+   bottom:              0px;
+   min-height:          7em;
+   max-height:          7em;
+   min-width:           7em;
+   max-width:           7em;
+   
+   cursor:              pointer;
+   overflow:            hidden;
 
-	border:					1px #555 solid;
-	
-	xbackground-color: 		yellow;
+   border:              1px #555 solid;
+   
+   xbackground-color:   yellow;
 }
 
 a.import-tile:HOVER
 {
-	z-index: 				0;
-	border:					1px solid transparent;
-	background:				#555;
-}	
+   z-index:             0;
+   border:              1px solid transparent;
+   background:          #555;
+}   
 
 a.import-tile:HOVER .import-tile-name
 {
-	color:					#fff;
+   color:               #fff;
 }
 
 a.import-tile:FOCUS
 {
-	border:					1px solid transparent;
-	
-	background:				#666;
+   border:              1px solid transparent;
+   
+   background:          #666;
 }
 
 a.import-tile:FOCUS .import-tile-name
 {
-	color:			 		#fff;
+   color:               #fff;
 }
 
 
 .import-tile-image
 {
-	position:				absolute;
-	top:					5px;
-	text-align:				center;
-	width:					100%;
-	
-	xbackground-color: 		#008;
+   position:            absolute;
+   top:                 5px;
+   text-align:          center;
+   width:               100%;
+   
+   xbackground-color:   #008;
 }
 
 .import-tile-config
 {
-	position:				absolute;
-	bottom:					3px;
-	xtext-align: 			center;
-	width: 					calc(100% - 6px);
-	padding-left:			3px;
+   position:            absolute;
+   bottom:              3px;
+   xtext-align:         center;
+   width:               calc(100% - 6px);
+   padding-left:        3px;
 
-	white-space: 			nowrap;
-	overflow:				hidden;
-	xtext-overflow:			"...";		/* this is not working */
-	
-	color:					#bbb;
-	xbackground-color: 		green;
+   white-space:         nowrap;
+   overflow:            hidden;
+   xtext-overflow:      "...";      /* this is not working */
+   
+   color:               #bbb;
+   xbackground-color:   green;
 }
 
 .action-button-16
 {
-	width: 					16px; 
-	height: 				16px; 
+   width:               16px; 
+   height:              16px; 
 
-	background-repeat:		no-repeat;
-	background-position:	center;
+   background-repeat:   no-repeat;
+   background-position: center;
 }
 
 .action-button-25
 {
-	width: 					25px; 
-	height: 				25px; 
+   width:               25px; 
+   height:              25px; 
 
-	background-repeat:		no-repeat;
-	background-position:	center;
+   background-repeat:   no-repeat;
+   background-position: center;
 }
 
 .action-button
 {
-	width: 					100%; 
-	height: 				16px; 
+   width:               100%; 
+   height:              16px; 
 
-	background-repeat:		no-repeat;
-	background-position:	center;
+   background-repeat:   no-repeat;
+   background-position: center;
 }
 
 
 a.action-button:LINK,
 a.action-button:VISITED 
 {
-	cursor: 				pointer; 
-	display:				block;
+   cursor:              pointer; 
+   display:             block;
 
-	text-decoration:		none;
+   text-decoration:     none;
 }
 
 /*
@@ -222,102 +222,102 @@ a.action-button:VISITED
 */
 .importState
 {
-	display: 				block;	
-	cursor:					pointer;
-	
-	width:					32px;
-	height:					25px;
-	xbackground-color: 		#800;
+   display:             block;   
+   cursor:              pointer;
+   
+   width:               32px;
+   height:              25px;
+   xbackground-color:   #800;
 }
 
 .stateIcon
 {
-	position:				relative;
+   position:            relative;
 
-	width: 					100%; 
-	height: 				100%; 
+   width:               100%; 
+   height:              100%; 
 
-	background-repeat:		no-repeat;
+   background-repeat:   no-repeat;
 
-	/* this IS VERY TRICKY to have a bottom padding that hovering shows the tooltip and that the bg image is correctly displayed */
-    padding-bottom:			10px;
-    xbackground-position-y:	0px;  /* this do not work in firefox */
+   /* this IS VERY TRICKY to have a bottom padding that hovering shows the tooltip and that the bg image is correctly displayed */
+    padding-bottom:           10px;
+    xbackground-position-y:   0px;  /* this do not work in firefox */
 }
 
 .stateIconValue
 {
-	position:				absolute;
-	bottom:					13px;
-	width: 					100%; 
-	text-align: 			center;
+   position:            absolute;
+   bottom:              13px;
+   width:               100%; 
+   text-align:          center;
 }
 
 .stateTooltip
 {
-	display:				none; 
-	z-index:				2000;
-	
-	padding:				5px;
+   display:             none; 
+   z-index:             2000;
+   
+   padding:             5px;
 
-	left:					6px;
-	width:					500px;
-	max-height:				80vh;
-	
-	xoverflow: 				scroll;
+   left:                6px;
+   width:               500px;
+   max-height:          80vh;
+   
+   xoverflow:           scroll;
 }
 
 .stateTooltipMessage /* overwrite obove css */
 {
-	left:					auto;
-	min-width:				0;
+   left:                auto;
+   min-width:           0;
 }
-	
-.importState:HOVER	.stateTooltip,
-.importState:FOCUS	.stateTooltip
+   
+.importState:HOVER   .stateTooltip,
+.importState:FOCUS   .stateTooltip
 {
-	display:				inline; 
-	position:				absolute; 
-	
-	color:					#fff;
-	background:				#555;
-	border:					1px solid #777; 
+   display:             inline; 
+   position:            absolute; 
+   
+   color:               #fff;
+   background:          #555;
+   border:              1px solid #777; 
 }
 
 
 /*
-	Select import config
+   Select import config
 */
 .selectConfigContainer 
 { 
-	margin-left:			20px;
+   margin-left:         20px;
 }
 
 .selectConfig
 {
-	xposition:				relative;
-	xtop:					-2px;
-    xpadding:				2px;
-    xmargin:					0;
-	border:					0; 
-	
-	margin:					1px solid #666;
-	color:					#bbb; 
-	background:				transparent;
-	font-size:				16px; 
-    cursor:					pointer;
+   xposition:           relative;
+   xtop:                -2px;
+    xpadding:            2px;
+    xmargin:            0;
+   border:              0; 
+   
+   margin:              1px solid #666;
+   color:               #bbb; 
+   background:          transparent;
+   font-size:           16px; 
+    cursor:             pointer;
 }
 
 .selectConfig:HOVER
 {
-	margin:					1px solid transparent;
+   margin:              1px solid transparent;
 }
 
 .selectOption
 {
-	color:					#bbb; 
-	background:				#444;
-	xfont-size:				20px;
-	font-weight: 			lighter;
+   color:               #bbb; 
+   background:          #444;
+   xfont-size:          20px;
+   font-weight:         lighter;
 }
 
 /* Hide drop-down arrow for IE 11 */
@@ -328,95 +328,95 @@ select::-ms-expand {
 
 .importConfigTitle
 {
-	font-size: 				20px;
-	font-weight: 			bold;
-	padding-bottom:			20px;
+   font-size:           20px;
+   font-weight:         bold;
+   padding-bottom:      20px;
 }
 
 /*
-	Folder
+   Folder
 */
 .folderTitle
 {
-	font-size: 				16px;
-	vertical-align: 		top;
+   font-size:           16px;
+   vertical-align:      top;
 }
 
 .folderInfo
 {
-	padding-left:			20px;
+   padding-left:        20px;
 }
 
 .folderLocation
 {
-	padding-left:			20px;
+   padding-left:        20px;
 }
 
 .folderError
 {
-	color:					#ff2d2b;
+   color:               #ff2d2b;
 }
 
 .deviceList
 {
-	width:					100%;
-	margin-top:				10px;
-	border-collapse:		collapse;
-	xborder-spacing: 		5px 0px;
+   width:               100%;
+   margin-top:          10px;
+   border-collapse:     collapse;
+   xborder-spacing:     5px 0px;
 }
-	
+   
 .deviceList td
 {
-	xborder:					1px solid #ddd;
-	xfont-weight: 			lighter;
+   xborder:             1px solid #ddd;
+   xfont-weight:        lighter;
 }
 
 .deviceList .right
 {
-	text-align:				right;
+   text-align:          right;
 }
 
 .deviceList .column
 {
-	padding-right: 			10px;
+   padding-right:       10px;
 }
 
 .deviceList .content
 {
-	white-space: 			nowrap;
+   white-space:         nowrap;
 }
 
 
 /*
-	Device On/Off
+   Device On/Off
 */
 .onOffIcon
 {
-	display: 				block;
-	margin-left:			5px;
-	margin-right:			5px;
-	
-	cursor:					pointer;
-	
-	width:					25px;
-	height:					25px;
-	xbackground-color: 		#800;
+   display:             block;
+   margin-left:         5px;
+   margin-right:        5px;
+   
+   cursor:              pointer;
+   
+   width:               25px;
+   height:              25px;
+   xbackground-color:   #800;
 }
 
 .deviceOn,
 .deviceOnAnimated
 {
-	opacity:				1.0;
+   opacity:             1.0;
 }
 
 .deviceOff,
 .deviceOffAnimated
-{	
-	opacity:				0.1;	
+{   
+   opacity:             0.1;   
 }
 
 .deleteState
 {
-	color:					#abfe11;
+   color:               #abfe11;
 }
 

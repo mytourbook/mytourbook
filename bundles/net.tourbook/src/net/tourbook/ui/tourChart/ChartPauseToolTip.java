@@ -149,7 +149,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
       GridLayoutFactory.fillDefaults()
             .extendedMargins(1, 1, 1, 1)
             .applyTo(_shellContainer);
-      _shellContainer.addPaintListener(this::onPaintShellContainer);
+      _shellContainer.addPaintListener(event -> onPaintShellContainer(event));
       {
          _tooltipContainer = new Composite(_shellContainer, SWT.NONE);
          GridLayoutFactory.fillDefaults()

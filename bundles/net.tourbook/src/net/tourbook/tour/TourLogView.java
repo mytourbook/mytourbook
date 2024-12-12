@@ -706,7 +706,7 @@ public class TourLogView extends ViewPart {
          _txtNoBrowser = new Text(container, SWT.MULTI | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL);
          _txtNoBrowser.setFont(net.tourbook.ui.UI.getLogFont());
          _txtNoBrowser.setBackground(bgColor);
-         _txtNoBrowser.addMouseWheelListener(this::onMouseWheel);
+         _txtNoBrowser.addMouseWheelListener(event -> onMouseWheel(event));
          GridDataFactory.fillDefaults()
                .grab(true, true)
                .align(SWT.FILL, SWT.FILL)

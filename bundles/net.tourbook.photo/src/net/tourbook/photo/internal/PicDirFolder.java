@@ -389,8 +389,8 @@ public class PicDirFolder {
       String commands[] = null;
       if (UI.IS_WIN) {
 
-         final String[] commandsWin = { "\"" + extApp + "\"", //$NON-NLS-1$ //$NON-NLS-2$
-               "\"" + folder + "\"" }; //$NON-NLS-1$ //$NON-NLS-2$
+         final String[] commandsWin = { UI.SYMBOL_QUOTATION_MARK + extApp + UI.SYMBOL_QUOTATION_MARK, //$NON-NLS-1$ //$NON-NLS-2$
+               UI.SYMBOL_QUOTATION_MARK + folder + UI.SYMBOL_QUOTATION_MARK }; //$NON-NLS-1$ //$NON-NLS-2$
 
          commands = commandsWin;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Frédéric Bard and Contributors
+ * Copyright (C) 2023, 2024 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,6 +40,7 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -130,6 +131,8 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
    private Spinner        _spinner_PulseValue;
    private Spinner        _spinner_TemperatureValue;
 
+   private Image          _imageDialog = TourbookPlugin.getImageDescriptor(Images.App_Edit).createImage();
+
    public DialogEditTimeSlicesValues(final Shell parentShell, final TourData tourData) {
 
       super(parentShell);
@@ -137,7 +140,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Images.App_Edit).createImage());
+      setDefaultImage(_imageDialog);
 
       _tourData = tourData;
 
@@ -173,6 +176,8 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
    public boolean close() {
 
       saveState();
+
+      UI.disposeResource(_imageDialog);
 
       return super.close();
    }

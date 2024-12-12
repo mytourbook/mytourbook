@@ -2596,6 +2596,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
+    * Complete tour marker with data series values
+    *
+    * @param tourMarker
+    * @param serieIndex
+    */
+   public void completeTourMarkerWithDataSeriesData(final TourMarker tourMarker, final int serieIndex) {
+
+      final int relativeTourTime = timeSerie[serieIndex];
+
+      tourMarker.setSerieIndex(serieIndex);
+      tourMarker.setTime(relativeTourTime, tourStartTime + (relativeTourTime * 1000));
+
+      if (distanceSerie != null) {
+         tourMarker.setDistance(distanceSerie[serieIndex]);
+      }
+
+      completeTourMarker(tourMarker, serieIndex);
+   }
+
+   /**
     * Complete all tour marker after all data are imported.
     * <p>
     * Relative tour time must be available that the absolute time can be set.
@@ -6120,7 +6140,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final FlatGainLoss flatGainLoss = computeAltitudeUpDown_20_Algorithm_DP(
             -1,
             -1,
-            altitudeSerieSmoothed,
+            getAltitudeSmoothedSerie(false),
             prefDPTolerance,
             prefFlatGradient);
 
@@ -10863,7 +10883,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * @return Returns {@link TourMarker}'s sorted by serie index.
+    * @return Returns a copy of {@link TourMarker}'s sorted by serie index.
     */
    public ArrayList<TourMarker> getTourMarkersSorted() {
 

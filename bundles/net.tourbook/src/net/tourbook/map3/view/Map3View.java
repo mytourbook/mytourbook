@@ -938,7 +938,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
              * run async that the context state and tour info reset is done after the context menu
              * actions has done they tasks
              */
-            Display.getCurrent().asyncExec(Map3View.this::hideTourInfo);
+            Display.getCurrent().asyncExec(() -> hideTourInfo());
          }
 
          @Override

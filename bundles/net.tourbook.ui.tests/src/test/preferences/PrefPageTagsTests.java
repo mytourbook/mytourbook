@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2022, 2024 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,7 +32,7 @@ public class PrefPageTagsTests extends UITest {
    void prefPageTags_TagsList_CreateAndDeleteTag() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("Tagging").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem("Tag").select(); //$NON-NLS-1$
 
       //assert that there are 2 tags
       assertEquals(2, bot.tree(1).rowCount());
@@ -62,7 +62,7 @@ public class PrefPageTagsTests extends UITest {
    void prefPageTags_TagsList_EditTag() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("Tagging").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem("Tag").select(); //$NON-NLS-1$
 
       bot.tree(1).getTreeItem("Shoes 2").select(); //$NON-NLS-1$
       bot.button(Messages.Action_Tag_Edit).click();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,23 +24,23 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSyncMapWithChartSlider extends Action {
 
-	private Map3View	_map3View;
+   private Map3View _map3View;
 
-	public ActionSyncMapWithChartSlider(final Map3View mapView) {
+   public ActionSyncMapWithChartSlider(final Map3View mapView) {
 
-		super(null, AS_CHECK_BOX);
+      super(null, AS_CHECK_BOX);
 
-		_map3View = mapView;
+      _map3View = mapView;
 
-		setToolTipText(Messages.map_action_synch_with_slider);
+      setToolTipText(Messages.Map_Action_SynchWith_TourPosition);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider));
       setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Disabled));
-	}
+   }
 
-	@Override
-	public void run() {
-		_map3View.actionSynch_WithChartSlider();
-	}
+   @Override
+   public void run() {
+      _map3View.actionSynch_WithChartSlider();
+   }
 
 }

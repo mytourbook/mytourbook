@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,11 +48,12 @@ public class TourbookPlugin extends AbstractUIPlugin {
 
    public static final String PLUGIN_ID                             = "net.tourbook";             //$NON-NLS-1$
 
-   public static final String EXT_POINT_STATISTIC_YEAR              = "statisticYear";            //$NON-NLS-1$
-   public static final String EXT_POINT_EXPORT_TOUR                 = "exportTour";               //$NON-NLS-1$
-   public static final String EXT_POINT_PRINT_TOUR                  = "printTour";                //$NON-NLS-1$
    public static final String EXT_POINT_DEVICE_DATA_READER          = "deviceDataReader";         //$NON-NLS-1$
+   public static final String EXT_POINT_EXPORT_TOUR                 = "exportTour";               //$NON-NLS-1$
    public static final String EXT_POINT_EXTERNAL_DEVICE_DATA_READER = "externalDeviceDataReader"; //$NON-NLS-1$
+   public static final String EXT_POINT_MAP25_MODEL                 = "map25Model";               //$NON-NLS-1$
+   public static final String EXT_POINT_PRINT_TOUR                  = "printTour";                //$NON-NLS-1$
+   public static final String EXT_POINT_STATISTIC_YEAR              = "statisticYear";            //$NON-NLS-1$
 
    // The shared instance.
    private static TourbookPlugin _instance;
@@ -127,6 +128,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
     *
     * @param path
     *           the path
+    *
     * @return the axisImage descriptor
     */
    public static ImageDescriptor getImageDescriptor(final String path) {
@@ -179,6 +181,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
     * This is a shortcut for {@link getDefault().getDialogSettingsSection(String)}
     *
     * @param stateSectionName
+    *
     * @return
     */
    public static IDialogSettings getState(final String stateSectionName) {
@@ -188,6 +191,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 
    /**
     * @param imageName
+    *
     * @return Returns the themed image descriptor from {@link TourbookPlugin} plugin images
     */
    public static ImageDescriptor getThemedImageDescriptor(final String imageName) {
@@ -214,6 +218,7 @@ public class TourbookPlugin extends AbstractUIPlugin {
 
    /**
     * @param sectionName
+    *
     * @return Returns the dialog setting section for the sectionName, a section is always returned
     *         even when it's empty
     */

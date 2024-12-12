@@ -71,10 +71,11 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
     * Codes : https://openweathermap.org/weather-conditions#Icon-list
     *
     * @param weatherIcon
+    * @param weatherID
     *
     * @return
     */
-   public static String convertWeatherIconToMTWeatherClouds(final String weatherIcon) {
+   public static String convertWeatherIconToMTWeatherClouds(final String weatherIcon, final String weatherID) {
 
       String weatherType = UI.EMPTY_STRING;
 
@@ -82,24 +83,22 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          return weatherType;
       }
 
-      if (weatherIcon.startsWith("01")) { //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_CLEAR;
-      } else if (weatherIcon.startsWith("02") || //$NON-NLS-1$
-            weatherIcon.startsWith("03")) { //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
-      } else if (weatherIcon.startsWith("04")) { //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_OVERCAST;
-      } else if (weatherIcon.startsWith("09")) { //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
-      } else if (weatherIcon.startsWith("10")) { //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_RAIN;
-      } else if (weatherIcon.startsWith("11")) { //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_LIGHTNING;
-      } else if (weatherIcon.startsWith("13")) { //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_SNOW;
-      } else if (weatherIcon.startsWith("50")) { //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_DRIZZLE;
+// SET_FORMATTING_OFF
+
+      if ("741".equals(weatherID)) {               weatherType = IWeather.WEATHER_ID_FOG;                   //$NON-NLS-1$
+
+      } else if (weatherIcon.startsWith("01")) {   weatherType = IWeather.WEATHER_ID_CLEAR;                 //$NON-NLS-1$
+      } else if (weatherIcon.startsWith("02")                                                               //$NON-NLS-1$
+              || weatherIcon.startsWith("03")) {   weatherType = IWeather.WEATHER_ID_PART_CLOUDS;           //$NON-NLS-1$
+      } else if (weatherIcon.startsWith("04")) {   weatherType = IWeather.WEATHER_ID_OVERCAST;              //$NON-NLS-1$
+      } else if (weatherIcon.startsWith("09")) {   weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;     //$NON-NLS-1$
+      } else if (weatherIcon.startsWith("10")) {   weatherType = IWeather.WEATHER_ID_RAIN;                  //$NON-NLS-1$
+      } else if (weatherIcon.startsWith("11")) {   weatherType = IWeather.WEATHER_ID_LIGHTNING;             //$NON-NLS-1$
+      } else if (weatherIcon.startsWith("13")) {   weatherType = IWeather.WEATHER_ID_SNOW;                  //$NON-NLS-1$
+      } else if (weatherIcon.startsWith("50")) {   weatherType = IWeather.WEATHER_ID_DRIZZLE;               //$NON-NLS-1$
       }
+
+// SET_FORMATTING_ON
 
       return weatherType;
    }
@@ -152,15 +151,18 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                   .orElse(null);
 
             final int airQualityIndex = currentAirPollutionResult == null
-                  ? 0 : currentAirPollutionResult.main().aqi();
+                  ? 0
+                  : currentAirPollutionResult.main().aqi();
 
             final boolean isDisplayEmptyValues = !isCompressed;
+
+            final Weather firstWeatherHour = hourly.weather().get(0);
+            final String weatherClouds = convertWeatherIconToMTWeatherClouds(firstWeatherHour.icon(), firstWeatherHour.id());
+            final String weatherIcon = WeatherUtils.getWeatherIcon(WeatherUtils.getWeatherIndex(weatherClouds));
+
             String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                   (float) hourly.temp(),
-                  WeatherUtils.getWeatherIcon(
-                        WeatherUtils.getWeatherIndex(
-                              convertWeatherIconToMTWeatherClouds(
-                                    hourly.weather().get(0).icon()))),
+                  weatherIcon,
                   hourly.weather().get(0).description(),
                   (float) hourly.feels_like(),
                   (float) hourly.getWind_speedKmph(),
@@ -483,6 +485,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       final String weatherRequestWithParameters = buildWeatherApiRequest(requestedTime, BASE_TIME_MACHINE_API_URL);
 
       final String rawWeatherData = sendWeatherApiRequest(weatherRequestWithParameters);
+
       if (StringUtils.isNullOrEmpty(rawWeatherData)) {
          return null;
       }

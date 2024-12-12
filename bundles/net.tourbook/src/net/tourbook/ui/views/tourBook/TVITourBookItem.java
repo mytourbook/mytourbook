@@ -100,7 +100,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "weather_Clouds, " //                               26    //$NON-NLS-1$
             //
             + "restPulse, " //                                    27    //$NON-NLS-1$
-            + "TourData.calories, " //                                     28    //$NON-NLS-1$
+            + "TourData.calories, " //                            28    //$NON-NLS-1$
             //
             + "tourPerson_personId, " //                          29    //$NON-NLS-1$
             //
@@ -217,8 +217,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "tourLocationStart_LocationID, " //                 95    //$NON-NLS-1$
             + "tourLocationEnd_LocationID, " //                   96    //$NON-NLS-1$
 
-            + "hasGeoData" //                                     97    //$NON-NLS-1$
+            + "hasGeoData, " //                                   97    //$NON-NLS-1$
 
+            // this shortened field needs an alias otherwise the flat tour book view do not work !!!
+            + "SUBSTR(TourDescription, 1, 100) AS TourDescription" //   98    //$NON-NLS-1$
       ;
 
       //////////////////////////////////////////////////////////////////////////////////////////
@@ -230,7 +232,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       //
       //////////////////////////////////////////////////////////////////////////////////////////
 
-      SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 98;
+      SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 99;
 
       /////////////////////////////////////////////////////////////////////////
       // -------- JOINT TABLES, they are added at the end --------------
@@ -359,6 +361,11 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    String       colTimeZoneId;
    //
    String       colTourTitle;
+
+   /**
+    * Tour description which is truncated to 100 characters
+    */
+   String       colTourDescription;
    //
    // ----------- TOUR LOCATION ---------
    //
@@ -680,6 +687,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       // -------- GEO DATA -----------
 
       tourItem.colHasGeoData                          = result.getBoolean(97);
+
+      // -------- TOUR -----------
+
+      tourItem.colTourDescription                     = result.getString(98);
 
 
       // -----------------------------------------------
