@@ -297,7 +297,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       fillUI();
 
-      updateUI_SetUIPage(_hoveredMapPoint);
+      setupPhoto_UI(_hoveredMapPoint);
 
       restoreState();
 
@@ -777,7 +777,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          if (_hoveredMapPoint != null) {
 
-            updateUI_SetUIPage(hoveredMapPoint);
+            setupPhoto_UI(hoveredMapPoint);
 
          } else if (_previousHoveredMapPoint != null) {
 
@@ -786,7 +786,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
              * loaded image
              */
 
-            updateUI_SetUIPage(_previousHoveredMapPoint);
+            setupPhoto_UI(_previousHoveredMapPoint);
          }
       });
    }
@@ -1487,7 +1487,64 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          doNotStopAnimation();
          showShell();
 
-         updateUI_SetUIPage(hoveredMapPoint);
+         setupPhoto_UI(hoveredMapPoint);
+      }
+   }
+
+   private void setupPhoto_UI(final PaintedMapPoint hoveredMapPoint) {
+
+      if (hoveredMapPoint == null || _photoImageCanvas.isDisposed()) {
+
+         _pageBook.showPage(_pageNoPhoto);
+
+         return;
+      }
+
+      _photo = hoveredMapPoint.mapPoint.photo;
+
+      setupPhotoCanvasListener();
+
+      final ZonedDateTime adjustedTime_Tour_WithZone = _photo.adjustedTime_Tour_WithZone;
+      if (adjustedTime_Tour_WithZone != null) {
+
+         final String photoDateTime = "%s  %s".formatted( //$NON-NLS-1$
+               adjustedTime_Tour_WithZone.format(TimeTools.Formatter_Weekday),
+               adjustedTime_Tour_WithZone.format(TimeTools.Formatter_DateTime_M));
+
+         updateTitleText(photoDateTime);
+      }
+
+      final boolean isPhotoCropped = _photo.isCropped;
+
+      _chkCropPhoto.setSelection(isPhotoCropped);
+
+      /*
+       * Get crop area from the tour photo
+       */
+      _devCanvas_CropArea_Start = null;
+      _devCanvas_CropArea_End = null;
+      _relPhoto_CropArea_Start = null;
+      _relPhoto_CropArea_End = null;
+
+      if (isPhotoCropped) {
+
+         _relPhoto_CropArea_Start = new Point2D.Float(_photo.cropAreaX1, _photo.cropAreaY1);
+         _relPhoto_CropArea_End = new Point2D.Float(_photo.cropAreaX2, _photo.cropAreaY2);
+
+         setCropArea(_photoImageBounds);
+      }
+
+      final Image photoImage = getPhotoImage(_photo);
+
+      _photoImageCanvas.setImage(photoImage, false);
+
+      if (photoImage == null || photoImage.isDisposed()) {
+
+         updateUI_LoadingMessage();
+
+      } else {
+
+         _pageBook.showPage(_pagePhoto);
       }
    }
 
@@ -1774,63 +1831,6 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       }
 
       _pageBook.showPage(_pageNoPhoto);
-   }
-
-   private void updateUI_SetUIPage(final PaintedMapPoint hoveredMapPoint) {
-
-      if (hoveredMapPoint == null || _photoImageCanvas.isDisposed()) {
-
-         _pageBook.showPage(_pageNoPhoto);
-
-         return;
-      }
-
-      _photo = hoveredMapPoint.mapPoint.photo;
-
-      setupPhotoCanvasListener();
-
-      final ZonedDateTime adjustedTime_Tour_WithZone = _photo.adjustedTime_Tour_WithZone;
-      if (adjustedTime_Tour_WithZone != null) {
-
-         final String photoDateTime = "%s  %s".formatted( //$NON-NLS-1$
-               adjustedTime_Tour_WithZone.format(TimeTools.Formatter_Weekday),
-               adjustedTime_Tour_WithZone.format(TimeTools.Formatter_DateTime_M));
-
-         updateTitleText(photoDateTime);
-      }
-
-      final boolean isPhotoCropped = _photo.isCropped;
-
-      _chkCropPhoto.setSelection(isPhotoCropped);
-
-      /*
-       * Get crop area from the tour photo
-       */
-      _devCanvas_CropArea_Start = null;
-      _devCanvas_CropArea_End = null;
-      _relPhoto_CropArea_Start = null;
-      _relPhoto_CropArea_End = null;
-
-      if (isPhotoCropped) {
-
-         _relPhoto_CropArea_Start = new Point2D.Float(_photo.cropAreaX1, _photo.cropAreaY1);
-         _relPhoto_CropArea_End = new Point2D.Float(_photo.cropAreaX2, _photo.cropAreaY2);
-
-         setCropArea(_photoImageBounds);
-      }
-
-      final Image photoImage = getPhotoImage(_photo);
-
-      _photoImageCanvas.setImage(photoImage, false);
-
-      if (photoImage == null || photoImage.isDisposed()) {
-
-         updateUI_LoadingMessage();
-
-      } else {
-
-         _pageBook.showPage(_pagePhoto);
-      }
    }
 
    private boolean updateUI_ShowLoadingImage(final GC gc, final Rectangle rectangle) {
