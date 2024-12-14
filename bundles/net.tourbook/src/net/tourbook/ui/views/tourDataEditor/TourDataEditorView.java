@@ -3419,13 +3419,24 @@ public class TourDataEditorView extends ViewPart implements
       MenuManager menuMgr;
 
       /*
-       * tour type menu
+       * Tour type menu
        */
       menuMgr = new MenuManager();
 
       menuMgr.setRemoveAllWhenShown(true);
+      
       // set menu items
-      menuMgr.addMenuListener(menuManager -> ActionSetTourTypeMenu.fillMenu(menuManager, TourDataEditorView.this, false));
+      menuMgr.addMenuListener(menuManager -> {
+
+         ActionSetTourTypeMenu.fillMenu(
+
+               menuManager,
+               TourDataEditorView.this,
+
+               false, // isSaveTour
+               false // isCheckTourEditor
+         );
+      });
 
       // set menu for the tour type link
       _linkTourType.setMenu(menuMgr.createContextMenu(_linkTourType));
