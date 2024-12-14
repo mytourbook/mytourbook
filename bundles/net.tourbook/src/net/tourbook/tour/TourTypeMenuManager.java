@@ -92,7 +92,13 @@ public class TourTypeMenuManager implements IActionProvider {
       @Override
       public void run() {
 
-         setTourTypeIntoTour(__tourType, _isSaveTour);
+         setTourTypeIntoTour(
+
+               __tourType,
+               _isSaveTour,
+
+               true // isCheckTourEditor - When true then the tour editor is check if it is dirty
+         );
       }
 
       private void setTourType(final TourType tourType) {
@@ -362,11 +368,22 @@ public class TourTypeMenuManager implements IActionProvider {
       return _allTourTypeActions;
    }
 
+   /**
+    * @param tourType
+    * @param isSaveTour
+    * @param isCheckTourEditor
+    *           When <code>true</code> then the tour editor is check if it is dirty
+    */
    public void setTourTypeIntoTour(final TourType tourType,
-                                   final boolean isSaveTour) {
+                                   final boolean isSaveTour,
+                                   final boolean isCheckTourEditor) {
 
-      if (TourManager.isTourEditorModified()) {
-         return;
+      // fix https://github.com/mytourbook/mytourbook/issues/1437
+      if (isCheckTourEditor) {
+
+         if (TourManager.isTourEditorModified()) {
+            return;
+         }
       }
 
       final Runnable runnable = new Runnable() {
@@ -409,6 +426,7 @@ public class TourTypeMenuManager implements IActionProvider {
       };
       BusyIndicator.showWhile(Display.getCurrent(), runnable);
    }
+
    /**
     * Tour types has changed
     */

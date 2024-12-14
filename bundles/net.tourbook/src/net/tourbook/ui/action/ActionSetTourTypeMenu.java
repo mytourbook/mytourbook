@@ -54,6 +54,7 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
       private ITourProvider _tourProvider;
 
       private boolean       _isSaveTour;
+      private boolean       _isCheckTourEditor;
 
       /**
        * @param tourType
@@ -62,28 +63,32 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
        *           when <code>true</code> the tour will be saved and a
        *           {@link TourManager#TOUR_CHANGED} event is fired, otherwise the
        *           {@link TourData} from the tour provider is only updated
-       * @param isChecked
+       * @param isActionChecked
+       * @param isCheckTourEditor
+       *           When <code>true</code> then the tour editor is check if it is dirty
        */
       public Action_SetTourType(final TourType tourType,
                                 final ITourProvider tourProvider,
                                 final boolean isSaveTour,
-                                final boolean isChecked) {
+                                final boolean isActionChecked,
+                                final boolean isCheckTourEditor) {
 
          super(tourType.getName(), AS_CHECK_BOX);
 
-         if (isChecked == false) {
+         if (isActionChecked == false) {
 
             // show image when tour type can be selected, disabled images look ugly on win
             final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
             setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
          }
 
-         setChecked(isChecked);
-         setEnabled(isChecked == false);
+         setChecked(isActionChecked);
+         setEnabled(isActionChecked == false);
 
          _tourType = tourType;
          _tourProvider = tourProvider;
          _isSaveTour = isSaveTour;
+         _isCheckTourEditor = isCheckTourEditor;
       }
 
       @Override
@@ -91,7 +96,7 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 
          final TourTypeMenuManager tourTypeMenuManager = new TourTypeMenuManager(_tourProvider);
 
-         tourTypeMenuManager.setTourTypeIntoTour(_tourType, _isSaveTour);
+         tourTypeMenuManager.setTourTypeIntoTour(_tourType, _isSaveTour, _isCheckTourEditor);
       }
    }
 
@@ -118,6 +123,26 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
                                final ITourProvider tourProvider,
                                final boolean isSaveTour) {
 
+      fillMenu(menuMgr, tourProvider, isSaveTour, true);
+   }
+
+   /**
+    * Adds all tour types to the menu manager
+    *
+    * @param menuMgr
+    * @param tourProvider
+    * @param isSaveTour
+    *           When <code>true</code> the tour will be saved and a
+    *           {@link TourManager#TOUR_CHANGED} event is fired, otherwise {@link TourData} from
+    *           the tour provider is only modified
+    * @param isCheckTourEditor
+    *           When <code>true</code> then the tour editor is check if it is dirty
+    */
+   public static void fillMenu(final IMenuManager menuMgr,
+                               final ITourProvider tourProvider,
+                               final boolean isSaveTour,
+                               final boolean isCheckTourEditor) {
+
       // get tours which tour type should be changed
       final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
       if (selectedTours == null) {
@@ -135,14 +160,23 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 
       for (final TourType tourType : tourTypes) {
 
-         boolean isChecked = false;
+         boolean isActionChecked = false;
+
+         // check action when the tour type is set in the tour
          if (checkedTourType != null && checkedTourType.getTypeId() == tourType.getTypeId()) {
-            isChecked = true;
+            isActionChecked = true;
          }
 
-         final Action_SetTourType action = new Action_SetTourType(tourType, tourProvider, isSaveTour, isChecked);
+         final Action_SetTourType tourTypeAction = new Action_SetTourType(
 
-         menuMgr.add(action);
+               tourType,
+               tourProvider,
+
+               isSaveTour,
+               isActionChecked,
+               isCheckTourEditor);
+
+         menuMgr.add(tourTypeAction);
       }
 
       /*
@@ -188,12 +222,24 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 
       for (final TourType tourType : tourTypes) {
 
-         boolean isChecked = false;
+         boolean isActionChecked = false;
+
+         // check action when the tour type is set in the tour
          if (checkedTourType != null && checkedTourType.getTypeId() == tourType.getTypeId()) {
-            isChecked = true;
+            isActionChecked = true;
          }
 
-         addActionToMenu(new Action_SetTourType(tourType, _tourProvider, true, isChecked), menu);
+         final Action_SetTourType tourTypeAction = new Action_SetTourType(
+
+               tourType,
+               _tourProvider,
+
+               true, //             isSaveTour
+               isActionChecked, //  isActionChecked
+               true //              isCheckTourEditor
+         );
+
+         addActionToMenu(tourTypeAction, menu);
       }
 
       /*
