@@ -177,7 +177,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
    private Point2D.Float         _relPhoto_SetCropArea_End;
 
    private boolean               _isCanvasListenerSet;
-   private boolean               _isSetCropArea;
+   private boolean               _isSettingCropArea;
    private boolean               _isMouse_InCropArea_All;
    private boolean               _isMouse_InCropArea_Top;
    private boolean               _isMouse_InCropArea_Bottom;
@@ -859,7 +859,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          // start new croping area -> reset all states
 
-         _isSetCropArea = false;
+         _isSettingCropArea = false;
 
          _devCanvas_SetCropArea_Start = null;
          _devCanvas_SetCropArea_End = null;
@@ -871,14 +871,12 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
             // mouse is within the photo
 
-            _isSetCropArea = true;
+            _isSettingCropArea = true;
 
             _devCanvas_SetCropArea_Start = devMousePosition;
             _relPhoto_SetCropArea_Start = getRelativeMousePhotoPosition(devMouseX, devMouseY);
          }
       }
-
-      _photoImageCanvas.redraw();
    }
 
    private void onPhoto_Mouse_2_Up(final MouseEvent mouseEvent) {
@@ -896,9 +894,9 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       } else if (_isMouseDown_InCropArea_Right) {
 
-      } else if (_isSetCropArea) {
+      } else if (_isSettingCropArea) {
 
-         _isSetCropArea = false;
+         _isSettingCropArea = false;
 
          _devCanvas_SetCropArea_End = devMousePosition;
          _relPhoto_SetCropArea_End = getRelativeMousePhotoPosition(devMouseX, devMouseY);
@@ -963,7 +961,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          hoveredCursor = _photoCursor_Cross;
 
-         if (_isSetCropArea) {
+         if (_isSettingCropArea) {
 
             // the cropping area is currently created
 
