@@ -886,15 +886,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       final Point devMousePosition = new Point(devMouseX, devMouseY);
 
-      if (_isMouseDown_InCropArea_Top) {
-
-      } else if (_isMouseDown_InCropArea_Bottom) {
-
-      } else if (_isMouseDown_InCropArea_Left) {
-
-      } else if (_isMouseDown_InCropArea_Right) {
-
-      } else if (_isSettingCropArea) {
+      if (_isSettingCropArea) {
 
          _isSettingCropArea = false;
 
@@ -903,21 +895,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          updateCropArea_FromStartEnd();
 
-         /*
-          * Set cropping area into the photo/tour photo
-          */
-
-         _photo.isCropModified = true;
-
-         _photo.cropAreaX1 = _relPhoto_CropArea.x;
-         _photo.cropAreaY1 = _relPhoto_CropArea.y;
-
-         _photo.cropAreaX2 = _relPhoto_CropArea.width;
-         _photo.cropAreaY2 = _relPhoto_CropArea.height;
-
-         _photo.updateMapImageRenderSize();
-
-         updateTourPhotoInDB(_photo);
+         updateCropArea_InPhoto();
       }
 
       _isMouseDown_InCropArea_Top = false;
@@ -954,123 +932,158 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       final boolean isMouseWithinPhoto = _photoImageBounds.contains(devMousePosition);
 
+      if (isMouseWithinPhoto == false) {
+
+         updateCursor(_photoCursor_Arrow);
+
+         return;
+      }
+
+      /*
+       * Mouse is within the photo
+       */
+
+      int devStartX = _devCanvas_CropArea.x;
+      int devStartY = _devCanvas_CropArea.y;
+      int devEndX = _devCanvas_CropArea.width;
+      int devEndY = _devCanvas_CropArea.height;
+
       boolean isRedraw = false;
-      Cursor hoveredCursor = _photoCursor_Arrow;
 
-      if (isMouseWithinPhoto) {
+      Cursor hoveredCursor = _photoCursor_Cross;
 
-         hoveredCursor = _photoCursor_Cross;
+      if (_isMouseDown_InCropArea_Top
+            || _isMouseDown_InCropArea_Bottom
+            || _isMouseDown_InCropArea_Left
+            || _isMouseDown_InCropArea_Right) {
 
-         if (_isSettingCropArea) {
+         final Point2D.Float relMouse = getRelativeMousePhotoPosition(devMouseX, devMouseY);
 
-            // the cropping area is currently created
+         if (_isMouseDown_InCropArea_Top) {
 
-            _devCanvas_SetCropArea_End = devMousePosition;
-            _relPhoto_SetCropArea_End = getRelativeMousePhotoPosition(devMouseX, devMouseY);
+            _devCanvas_CropArea.y = devMouseY;
+            _relPhoto_CropArea.y = relMouse.y;
 
-            updateCropArea_FromStartEnd();
+         } else if (_isMouseDown_InCropArea_Bottom) {
 
-            /*
-             * Set cursor direction according to the mouse moving, with try and error I found the
-             * correct cursor :-)
-             */
-            final int devStartX = _devCanvas_CropArea.x;
-            final int devStartY = _devCanvas_CropArea.y;
-            final int devEndX = _devCanvas_CropArea.width;
-            final int devEndY = _devCanvas_CropArea.height;
+            _devCanvas_CropArea.height = devMouseY;
+            _relPhoto_CropArea.height = relMouse.y;
 
-            if (devEndX > devStartX) {
+         } else if (_isMouseDown_InCropArea_Left) {
 
-               if (devEndY > devStartY) {
+            _devCanvas_CropArea.x = devMouseX;
+            _relPhoto_CropArea.x = relMouse.x;
 
-                  hoveredCursor = _photoCursor_Size_ESE;
+         } else if (_isMouseDown_InCropArea_Right) {
 
-               } else {
+            _devCanvas_CropArea.width = devMouseX;
+            _relPhoto_CropArea.width = relMouse.x;
+         }
 
-                  hoveredCursor = _photoCursor_Size_NESW;
-               }
+         updateCropArea_TopBottomLeftRight();
+         updateCropArea_InPhoto();
+
+         isRedraw = true;
+
+      } else if (_isSettingCropArea) {
+
+         // the cropping area is currently created
+
+         _devCanvas_SetCropArea_End = devMousePosition;
+         _relPhoto_SetCropArea_End = getRelativeMousePhotoPosition(devMouseX, devMouseY);
+
+         updateCropArea_FromStartEnd();
+
+         devStartX = _devCanvas_CropArea.x;
+         devStartY = _devCanvas_CropArea.y;
+         devEndX = _devCanvas_CropArea.width;
+         devEndY = _devCanvas_CropArea.height;
+
+         isRedraw = true;
+
+         /*
+          * Set cursor direction according to the mouse moving, with try and error I found the
+          * correct cursor :-)
+          */
+         if (devEndX > devStartX) {
+
+            if (devEndY > devStartY) {
+
+               hoveredCursor = _photoCursor_Size_ESE;
 
             } else {
 
-               if (devEndY > devStartY) {
-
-                  hoveredCursor = _photoCursor_Size_NESW;
-
-               } else {
-
-                  hoveredCursor = _photoCursor_Size_ESE;
-               }
+               hoveredCursor = _photoCursor_Size_NESW;
             }
-
-            isRedraw = true;
 
          } else {
 
-            if (_devCanvas_CropArea != null) {
+            if (devEndY > devStartY) {
 
-               if (_devCanvas_CropArea_Top.contains(devMousePosition)) {
+               hoveredCursor = _photoCursor_Size_NESW;
 
-                  _isMouse_InCropArea_Top = true;
+            } else {
 
-                  hoveredCursor = _photoCursor_Size_NS;
-
-               } else if (_devCanvas_CropArea_Bottom.contains(devMousePosition)) {
-
-                  _isMouse_InCropArea_Bottom = true;
-
-                  hoveredCursor = _photoCursor_Size_NS;
-
-               } else if (_devCanvas_CropArea_Left.contains(devMousePosition)) {
-
-                  _isMouse_InCropArea_Left = true;
-
-                  hoveredCursor = _photoCursor_Size_WE;
-
-               } else if (_devCanvas_CropArea_Right.contains(devMousePosition)) {
-
-                  _isMouse_InCropArea_Right = true;
-
-                  hoveredCursor = _photoCursor_Size_WE;
-
-               } else {
-
-                  final int devStartX = _devCanvas_CropArea.x;
-                  final int devStartY = _devCanvas_CropArea.y;
-                  final int devEndX = _devCanvas_CropArea.width;
-                  final int devEndY = _devCanvas_CropArea.height;
-
-                  final int devWidth = devEndX - devStartX;
-                  final int devHeight = devEndY - devStartY;
-
-                  final Rectangle devCropRectangle = new Rectangle(devStartX, devStartY, devWidth, devHeight);
-
-                  if (devCropRectangle.contains(devMousePosition)) {
-
-                     _isMouse_InCropArea_All = true;
-
-                     hoveredCursor = _photoCursor_Size_All;
-                  }
-               }
-
-               // optimize redrawing
-               if (isMouse_InCropArea_Top != _isMouse_InCropArea_Top
-                     || isMouse_InCropArea_Bottom != _isMouse_InCropArea_Bottom
-                     || isMouse_InCropArea_Left != _isMouse_InCropArea_Left
-                     || isMouse_InCropArea_Right != _isMouse_InCropArea_Right
-                     || isMouse_InCropArea_All != _isMouse_InCropArea_All
-
-               ) {
-
-                  isRedraw = true;
-               }
+               hoveredCursor = _photoCursor_Size_ESE;
             }
          }
       }
 
+      if (_devCanvas_CropArea_Top.contains(devMousePosition)) {
+
+         _isMouse_InCropArea_Top = true;
+
+         hoveredCursor = _photoCursor_Size_NS;
+
+      } else if (_devCanvas_CropArea_Bottom.contains(devMousePosition)) {
+
+         _isMouse_InCropArea_Bottom = true;
+
+         hoveredCursor = _photoCursor_Size_NS;
+
+      } else if (_devCanvas_CropArea_Left.contains(devMousePosition)) {
+
+         _isMouse_InCropArea_Left = true;
+
+         hoveredCursor = _photoCursor_Size_WE;
+
+      } else if (_devCanvas_CropArea_Right.contains(devMousePosition)) {
+
+         _isMouse_InCropArea_Right = true;
+
+         hoveredCursor = _photoCursor_Size_WE;
+
+      } else {
+
+         final int devWidth = devEndX - devStartX;
+         final int devHeight = devEndY - devStartY;
+
+         final Rectangle devCropRectangle = new Rectangle(devStartX, devStartY, devWidth, devHeight);
+
+         if (devCropRectangle.contains(devMousePosition)) {
+
+            _isMouse_InCropArea_All = true;
+
+            hoveredCursor = _photoCursor_Size_All;
+         }
+      }
+
+      // optimize redrawing
+      if (isMouse_InCropArea_Top != _isMouse_InCropArea_Top
+            || isMouse_InCropArea_Bottom != _isMouse_InCropArea_Bottom
+            || isMouse_InCropArea_Left != _isMouse_InCropArea_Left
+            || isMouse_InCropArea_Right != _isMouse_InCropArea_Right
+            || isMouse_InCropArea_All != _isMouse_InCropArea_All
+
+      ) {
+
+         isRedraw = true;
+      }
+
       if (isRedraw) {
          _photoImageCanvas.redraw();
-
       }
+
       updateCursor(hoveredCursor);
    }
 
@@ -1718,6 +1731,24 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
             relCropAreaY1,
             relCropAreaX2,
             relCropAreaY2);
+   }
+
+   /**
+    * Set cropping area into the photo/tour photo
+    */
+   private void updateCropArea_InPhoto() {
+
+      _photo.isCropModified = true;
+
+      _photo.cropAreaX1 = _relPhoto_CropArea.x;
+      _photo.cropAreaY1 = _relPhoto_CropArea.y;
+
+      _photo.cropAreaX2 = _relPhoto_CropArea.width;
+      _photo.cropAreaY2 = _relPhoto_CropArea.height;
+
+      _photo.updateMapImageRenderSize();
+
+      updateTourPhotoInDB(_photo);
    }
 
    private void updateCropArea_TopBottomLeftRight() {
