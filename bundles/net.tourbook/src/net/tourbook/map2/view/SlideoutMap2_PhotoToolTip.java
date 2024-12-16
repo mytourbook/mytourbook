@@ -159,7 +159,11 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
     */
    private Rectangle             _devCanvas_CropArea;
    private Rectangle             _devCanvas_CropArea_Top;
+   private Rectangle             _devCanvas_CropArea_TopLeft;
+   private Rectangle             _devCanvas_CropArea_TopRight;
    private Rectangle             _devCanvas_CropArea_Bottom;
+   private Rectangle             _devCanvas_CropArea_BottomLeft;
+   private Rectangle             _devCanvas_CropArea_BottomRight;
    private Rectangle             _devCanvas_CropArea_Left;
    private Rectangle             _devCanvas_CropArea_Right;
 
@@ -171,20 +175,33 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
     */
    private Rectangle2D.Float     _relPhoto_CropArea;
 
+   private Point                 _devCanvas_Offset;
    private Point                 _devCanvas_SetCropArea_Start;
    private Point                 _devCanvas_SetCropArea_End;
+   private Point2D.Float         _relPhoto_Offset;
    private Point2D.Float         _relPhoto_SetCropArea_Start;
    private Point2D.Float         _relPhoto_SetCropArea_End;
 
    private boolean               _isCanvasListenerSet;
    private boolean               _isSettingCropArea;
+
    private boolean               _isMouse_InCropArea_All;
    private boolean               _isMouse_InCropArea_Top;
+   private boolean               _isMouse_InCropArea_TopLeft;
+   private boolean               _isMouse_InCropArea_TopRight;
    private boolean               _isMouse_InCropArea_Bottom;
+   private boolean               _isMouse_InCropArea_BottomLeft;
+   private boolean               _isMouse_InCropArea_BottomRight;
    private boolean               _isMouse_InCropArea_Left;
    private boolean               _isMouse_InCropArea_Right;
+
+   private boolean               _isMouseDown_InCropArea_All;
    private boolean               _isMouseDown_InCropArea_Top;
+   private boolean               _isMouseDown_InCropArea_TopLeft;
+   private boolean               _isMouseDown_InCropArea_TopRight;
    private boolean               _isMouseDown_InCropArea_Bottom;
+   private boolean               _isMouseDown_InCropArea_BottomLeft;
+   private boolean               _isMouseDown_InCropArea_BottomRight;
    private boolean               _isMouseDown_InCropArea_Left;
    private boolean               _isMouseDown_InCropArea_Right;
 
@@ -834,26 +851,49 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       final Point devMousePosition = new Point(devMouseX, devMouseY);
 
-      _isMouseDown_InCropArea_Top = false;
-      _isMouseDown_InCropArea_Bottom = false;
-      _isMouseDown_InCropArea_Left = false;
-      _isMouseDown_InCropArea_Right = false;
+// SET_FORMATTING_OFF
 
-      if (_isMouse_InCropArea_Top) {
+      _isMouseDown_InCropArea_All         = false;
 
-         _isMouseDown_InCropArea_Top = true;
+      _isMouseDown_InCropArea_Top         = false;
+      _isMouseDown_InCropArea_Bottom      = false;
+      _isMouseDown_InCropArea_Left        = false;
+      _isMouseDown_InCropArea_Right       = false;
 
-      } else if (_isMouse_InCropArea_Bottom) {
+      _isMouseDown_InCropArea_TopLeft     = false;
+      _isMouseDown_InCropArea_TopRight    = false;
+      _isMouseDown_InCropArea_BottomLeft  = false;
+      _isMouseDown_InCropArea_BottomRight = false;
 
-         _isMouseDown_InCropArea_Bottom = true;
 
-      } else if (_isMouse_InCropArea_Left) {
+      if        (_isMouse_InCropArea_Top) {           _isMouseDown_InCropArea_Top         = true;
+      } else if (_isMouse_InCropArea_Bottom) {        _isMouseDown_InCropArea_Bottom      = true;
+      } else if (_isMouse_InCropArea_Left) {          _isMouseDown_InCropArea_Left        = true;
+      } else if (_isMouse_InCropArea_Right) {         _isMouseDown_InCropArea_Right       = true;
 
-         _isMouseDown_InCropArea_Left = true;
+      } else if (_isMouse_InCropArea_TopLeft) {       _isMouseDown_InCropArea_TopLeft     = true;
+      } else if (_isMouse_InCropArea_TopRight) {      _isMouseDown_InCropArea_TopRight    = true;
+      } else if (_isMouse_InCropArea_BottomLeft) {    _isMouseDown_InCropArea_BottomLeft  = true;
+      } else if (_isMouse_InCropArea_BottomRight) {   _isMouseDown_InCropArea_BottomRight = true;
 
-      } else if (_isMouse_InCropArea_Right) {
+// SET_FORMATTING_ON
 
-         _isMouseDown_InCropArea_Right = true;
+      } else if (_isMouse_InCropArea_All) {
+
+         _isMouseDown_InCropArea_All = true;
+
+         final Point2D.Float relMouse = getRelativeMousePhotoPosition(devMouseX, devMouseY);
+
+         final float relMouseX = relMouse.x;
+         final float relMouseY = relMouse.y;
+
+         _devCanvas_Offset = new Point(
+               _devCanvas_CropArea.x - devMouseX,
+               _devCanvas_CropArea.y - devMouseY);
+
+         _relPhoto_Offset = new Point2D.Float(
+               _relPhoto_CropArea.x - relMouseX,
+               _relPhoto_CropArea.y - relMouseY);
 
       } else {
 
@@ -877,6 +917,8 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
             _relPhoto_SetCropArea_Start = getRelativeMousePhotoPosition(devMouseX, devMouseY);
          }
       }
+
+      _photoImageCanvas.redraw();
    }
 
    private void onPhoto_Mouse_2_Up(final MouseEvent mouseEvent) {
@@ -898,10 +940,17 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          updateCropArea_InPhoto();
       }
 
+      _isMouseDown_InCropArea_All = false;
+
       _isMouseDown_InCropArea_Top = false;
       _isMouseDown_InCropArea_Bottom = false;
       _isMouseDown_InCropArea_Left = false;
       _isMouseDown_InCropArea_Right = false;
+
+      _isMouseDown_InCropArea_TopLeft = false;
+      _isMouseDown_InCropArea_TopRight = false;
+      _isMouseDown_InCropArea_BottomLeft = false;
+      _isMouseDown_InCropArea_BottomRight = false;
 
       _photoImageCanvas.redraw();
    }
@@ -915,14 +964,22 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       // keep states
       final boolean isMouse_InCropArea_All = _isMouse_InCropArea_All;
       final boolean isMouse_InCropArea_Top = _isMouse_InCropArea_Top;
+      final boolean isMouse_InCropArea_TopLeft = _isMouse_InCropArea_TopLeft;
+      final boolean isMouse_InCropArea_TopRight = _isMouse_InCropArea_TopRight;
       final boolean isMouse_InCropArea_Bottom = _isMouse_InCropArea_Bottom;
+      final boolean isMouse_InCropArea_BottomLeft = _isMouse_InCropArea_BottomLeft;
+      final boolean isMouse_InCropArea_BottomRight = _isMouse_InCropArea_BottomRight;
       final boolean isMouse_InCropArea_Left = _isMouse_InCropArea_Left;
       final boolean isMouse_InCropArea_Right = _isMouse_InCropArea_Right;
 
       // reset states
       _isMouse_InCropArea_All = false;
       _isMouse_InCropArea_Top = false;
+      _isMouse_InCropArea_TopLeft = false;
+      _isMouse_InCropArea_TopRight = false;
       _isMouse_InCropArea_Bottom = false;
+      _isMouse_InCropArea_BottomLeft = false;
+      _isMouse_InCropArea_BottomRight = false;
       _isMouse_InCropArea_Left = false;
       _isMouse_InCropArea_Right = false;
 
@@ -952,32 +1009,107 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       Cursor hoveredCursor = _photoCursor_Cross;
 
-      if (_isMouseDown_InCropArea_Top
+      if (false
+
+            || _isMouseDown_InCropArea_All
+
+            || _isMouseDown_InCropArea_Top
             || _isMouseDown_InCropArea_Bottom
             || _isMouseDown_InCropArea_Left
-            || _isMouseDown_InCropArea_Right) {
+            || _isMouseDown_InCropArea_Right
+
+            || _isMouseDown_InCropArea_TopLeft
+            || _isMouseDown_InCropArea_TopRight
+            || _isMouseDown_InCropArea_BottomLeft
+            || _isMouseDown_InCropArea_BottomRight
+
+      ) {
 
          final Point2D.Float relMouse = getRelativeMousePhotoPosition(devMouseX, devMouseY);
+
+         final float relMouseX = relMouse.x;
+         final float relMouseY = relMouse.y;
 
          if (_isMouseDown_InCropArea_Top) {
 
             _devCanvas_CropArea.y = devMouseY;
-            _relPhoto_CropArea.y = relMouse.y;
+            _relPhoto_CropArea.y = relMouseY;
 
          } else if (_isMouseDown_InCropArea_Bottom) {
 
             _devCanvas_CropArea.height = devMouseY;
-            _relPhoto_CropArea.height = relMouse.y;
+            _relPhoto_CropArea.height = relMouseY;
 
-         } else if (_isMouseDown_InCropArea_Left) {
+         } else {
 
-            _devCanvas_CropArea.x = devMouseX;
-            _relPhoto_CropArea.x = relMouse.x;
+            if (_isMouseDown_InCropArea_Left) {
 
-         } else if (_isMouseDown_InCropArea_Right) {
+               _devCanvas_CropArea.x = devMouseX;
+               _relPhoto_CropArea.x = relMouseX;
 
-            _devCanvas_CropArea.width = devMouseX;
-            _relPhoto_CropArea.width = relMouse.x;
+            } else if (_isMouseDown_InCropArea_Right) {
+
+               _devCanvas_CropArea.width = devMouseX;
+               _relPhoto_CropArea.width = relMouseX;
+
+            } else if (_isMouseDown_InCropArea_TopLeft) {
+
+               _devCanvas_CropArea.x = devMouseX;
+               _devCanvas_CropArea.y = devMouseY;
+
+               _relPhoto_CropArea.x = relMouseX;
+               _relPhoto_CropArea.y = relMouseY;
+
+            } else if (_isMouseDown_InCropArea_TopRight) {
+
+               _devCanvas_CropArea.y = devMouseY;
+               _devCanvas_CropArea.width = devMouseX;
+
+               _relPhoto_CropArea.y = relMouseY;
+               _relPhoto_CropArea.width = relMouseX;
+
+            } else if (_isMouseDown_InCropArea_BottomLeft) {
+
+               _devCanvas_CropArea.x = devMouseX;
+               _devCanvas_CropArea.height = devMouseY;
+
+               _relPhoto_CropArea.x = relMouseX;
+               _relPhoto_CropArea.height = relMouseY;
+
+            } else if (_isMouseDown_InCropArea_BottomRight) {
+
+               _devCanvas_CropArea.width = devMouseX;
+               _devCanvas_CropArea.height = devMouseY;
+
+               _relPhoto_CropArea.width = relMouseX;
+               _relPhoto_CropArea.height = relMouseY;
+
+            } else if (_isMouseDown_InCropArea_All) {
+
+               final int devWidth = _devCanvas_CropArea.width - _devCanvas_CropArea.x;
+               final int devHeight = _devCanvas_CropArea.height - _devCanvas_CropArea.y;
+
+               final float relWidth = _relPhoto_CropArea.width - _relPhoto_CropArea.x;
+               final float relHeight = _relPhoto_CropArea.height - _relPhoto_CropArea.y;
+
+               final int devX = devMouseX + _devCanvas_Offset.x;
+               final int devY = devMouseY + _devCanvas_Offset.y;
+
+               final float relX = relMouseX + _relPhoto_Offset.x;
+               final float relY = relMouseY + _relPhoto_Offset.y;
+
+               _devCanvas_CropArea.x = devX;
+               _devCanvas_CropArea.y = devY;
+
+               _devCanvas_CropArea.width = devX + devWidth;
+               _devCanvas_CropArea.height = devY + devHeight;
+
+               _relPhoto_CropArea.x = relX;
+               _relPhoto_CropArea.y = relY;
+
+               _relPhoto_CropArea.width = relX + relWidth;
+               _relPhoto_CropArea.height = relY + relHeight;
+            }
          }
 
          updateCropArea_TopBottomLeftRight();
@@ -1029,7 +1161,31 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          }
       }
 
-      if (_devCanvas_CropArea_Top.contains(devMousePosition)) {
+      if (_devCanvas_CropArea_TopLeft.contains(devMousePosition)) {
+
+         _isMouse_InCropArea_TopLeft = true;
+
+         hoveredCursor = _photoCursor_Size_ESE;
+
+      } else if (_devCanvas_CropArea_TopRight.contains(devMousePosition)) {
+
+         _isMouse_InCropArea_TopRight = true;
+
+         hoveredCursor = _photoCursor_Size_NESW;
+
+      } else if (_devCanvas_CropArea_BottomLeft.contains(devMousePosition)) {
+
+         _isMouse_InCropArea_BottomLeft = true;
+
+         hoveredCursor = _photoCursor_Size_NESW;
+
+      } else if (_devCanvas_CropArea_BottomRight.contains(devMousePosition)) {
+
+         _isMouse_InCropArea_BottomRight = true;
+
+         hoveredCursor = _photoCursor_Size_ESE;
+
+      } else if (_devCanvas_CropArea_Top.contains(devMousePosition)) {
 
          _isMouse_InCropArea_Top = true;
 
@@ -1069,11 +1225,19 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       }
 
       // optimize redrawing
-      if (isMouse_InCropArea_Top != _isMouse_InCropArea_Top
+      if (false
+
+            || isMouse_InCropArea_All != _isMouse_InCropArea_All
+
+            || isMouse_InCropArea_Top != _isMouse_InCropArea_Top
             || isMouse_InCropArea_Bottom != _isMouse_InCropArea_Bottom
             || isMouse_InCropArea_Left != _isMouse_InCropArea_Left
             || isMouse_InCropArea_Right != _isMouse_InCropArea_Right
-            || isMouse_InCropArea_All != _isMouse_InCropArea_All
+
+            || isMouse_InCropArea_TopLeft != _isMouse_InCropArea_TopLeft
+            || isMouse_InCropArea_TopRight != _isMouse_InCropArea_TopRight
+            || isMouse_InCropArea_BottomLeft != _isMouse_InCropArea_BottomLeft
+            || isMouse_InCropArea_BottomRight != _isMouse_InCropArea_BottomRight
 
       ) {
 
@@ -1185,9 +1349,14 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       final Color mouseDownColor = UI.SYS_COLOR_YELLOW;
       final Color mouseHoverColor = UI.SYS_COLOR_MAGENTA;
 
-      if (_isMouse_InCropArea_Top) {
+      if (_isMouse_InCropArea_All || _isMouse_InCropArea_Top || _isMouse_InCropArea_TopLeft || _isMouse_InCropArea_TopRight) {
 
-         gc.setForeground(_isMouseDown_InCropArea_Top ? mouseDownColor : mouseHoverColor);
+         final boolean isMouseDown = _isMouseDown_InCropArea_All
+               || _isMouseDown_InCropArea_Top
+               || _isMouseDown_InCropArea_TopLeft
+               || _isMouseDown_InCropArea_TopRight;
+
+         gc.setForeground(isMouseDown ? mouseDownColor : mouseHoverColor);
 
          gc.drawLine(
 
@@ -1197,9 +1366,16 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
                devXTopLeft + devWidth + 2,
                devYTopLeft - 1);
 
-      } else if (_isMouse_InCropArea_Bottom) {
+      }
 
-         gc.setForeground(_isMouseDown_InCropArea_Bottom ? mouseDownColor : mouseHoverColor);
+      if (_isMouse_InCropArea_All || _isMouse_InCropArea_Bottom || _isMouse_InCropArea_BottomLeft || _isMouse_InCropArea_BottomRight) {
+
+         final boolean isMouseDown = _isMouseDown_InCropArea_All
+               || _isMouseDown_InCropArea_Bottom
+               || _isMouseDown_InCropArea_BottomLeft
+               || _isMouseDown_InCropArea_BottomRight;
+
+         gc.setForeground(isMouseDown ? mouseDownColor : mouseHoverColor);
 
          gc.drawLine(
 
@@ -1209,9 +1385,16 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
                devXTopLeft + devWidth + 2,
                devYTopLeft + devHeight + 1);
 
-      } else if (_isMouse_InCropArea_Left) {
+      }
 
-         gc.setForeground(_isMouseDown_InCropArea_Left ? mouseDownColor : mouseHoverColor);
+      if (_isMouse_InCropArea_All || _isMouse_InCropArea_Left || _isMouse_InCropArea_TopLeft || _isMouse_InCropArea_BottomLeft) {
+
+         final boolean isMouseDown = _isMouseDown_InCropArea_All
+               || _isMouseDown_InCropArea_Left
+               || _isMouseDown_InCropArea_TopLeft
+               || _isMouseDown_InCropArea_BottomLeft;
+
+         gc.setForeground(isMouseDown ? mouseDownColor : mouseHoverColor);
 
          gc.drawLine(
 
@@ -1221,9 +1404,16 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
                devXTopLeft - 1,
                devYTopLeft + devHeight + 1);
 
-      } else if (_isMouse_InCropArea_Right) {
+      }
 
-         gc.setForeground(_isMouseDown_InCropArea_Right ? mouseDownColor : mouseHoverColor);
+      if (_isMouse_InCropArea_All || _isMouse_InCropArea_Right || _isMouse_InCropArea_TopRight || _isMouse_InCropArea_BottomRight) {
+
+         final boolean isMouseDown = _isMouseDown_InCropArea_All
+               || _isMouseDown_InCropArea_Right
+               || _isMouseDown_InCropArea_TopRight
+               || _isMouseDown_InCropArea_BottomRight;
+
+         gc.setForeground(isMouseDown ? mouseDownColor : mouseHoverColor);
 
          gc.drawLine(
 
@@ -1764,16 +1954,19 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       final int hoverMargin = 5;
       final int hoverMargin2 = 2 * hoverMargin;
 
+      /*
+       * Sides
+       */
       _devCanvas_CropArea_Top = new Rectangle(
             devCropAreaX1,
             devCropAreaY1 - hoverMargin,
             devCropAreaWidth,
             hoverMargin2);
 
-      _devCanvas_CropArea_Bottom = new Rectangle(
-            devCropAreaX1,
-            devCropAreaY1 + devCropAreaHeight - hoverMargin,
-            devCropAreaWidth,
+      _devCanvas_CropArea_TopLeft = new Rectangle(
+            devCropAreaX1 - hoverMargin,
+            devCropAreaY1 - hoverMargin,
+            hoverMargin2,
             hoverMargin2);
 
       _devCanvas_CropArea_Left = new Rectangle(
@@ -1787,6 +1980,34 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
             devCropAreaY1,
             hoverMargin2,
             devCropAreaHeight);
+
+      /*
+       * Corners
+       */
+
+      _devCanvas_CropArea_TopRight = new Rectangle(
+            devCropAreaX1 + devCropAreaWidth - hoverMargin,
+            devCropAreaY1 - hoverMargin,
+            hoverMargin2,
+            hoverMargin2);
+
+      _devCanvas_CropArea_Bottom = new Rectangle(
+            devCropAreaX1,
+            devCropAreaY1 + devCropAreaHeight - hoverMargin,
+            devCropAreaWidth,
+            hoverMargin2);
+
+      _devCanvas_CropArea_BottomLeft = new Rectangle(
+            devCropAreaX1 - hoverMargin,
+            devCropAreaY1 + devCropAreaHeight - hoverMargin,
+            hoverMargin2,
+            hoverMargin2);
+
+      _devCanvas_CropArea_BottomRight = new Rectangle(
+            devCropAreaX1 + devCropAreaWidth - hoverMargin,
+            devCropAreaY1 + devCropAreaHeight - hoverMargin,
+            hoverMargin2,
+            hoverMargin2);
    }
 
    /**
