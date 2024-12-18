@@ -2892,6 +2892,8 @@ public class Map2 extends Canvas {
 
       if (_isShowHQPhotoImages == false) {
 
+         // HQ image is not requested
+
          return awtThumbImage;
       }
 
@@ -2915,18 +2917,21 @@ public class Map2 extends Canvas {
 
          final boolean isImageNotInLoadingQueue = thumbHqPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false;
 
-         final boolean isPhotoCropped = photo.isCropModified && isImageNotInLoadingQueue;
-         final boolean isPhotoNotLoaded = awtPhotoImageThumbHQ == null && isImageNotInLoadingQueue;
+         if (isImageNotInLoadingQueue) {
 
-         if (isPhotoCropped || isPhotoNotLoaded) {
+            final boolean isPhotoModified = photo.isCropModified;
+            final boolean isPhotoNotLoaded = awtPhotoImageThumbHQ == null;
 
-            // the requested image is not available in the image cache or is modified -> image must be loaded
+            if (isPhotoModified || isPhotoNotLoaded) {
 
-            PhotoLoadManager.putImageInLoadingQueueHQThumb_Map(
-                  photo,
-                  Photo.getMap2ImageRequestedSize(),
-                  imageQuality,
-                  _photoImageLoaderCallback);
+               // the requested image is not available in the image cache or is modified -> image must be loaded
+
+               PhotoLoadManager.putImageInLoadingQueueHQ_Map_Thumb(
+                     photo,
+                     Photo.getMap2ImageRequestedSize(),
+                     imageQuality,
+                     _photoImageLoaderCallback);
+            }
          }
       }
 
@@ -8530,7 +8535,7 @@ public class Map2 extends Canvas {
 
             if (photoImageWidth == mapImageWidth && photoImageHeight == mapImageHeight) {
 
-               // do not resize the image would do not look very good
+               // do NOT resize the image, it would not look very good
 
                g2d.drawImage(awtPhotoImage,
 
@@ -8540,6 +8545,8 @@ public class Map2 extends Canvas {
                      null);
 
             } else {
+
+               // resize image
 
                g2d.drawImage(awtPhotoImage,
 

@@ -450,7 +450,7 @@ public class PhotoLoadManager {
       _executorHQ.submit(executorTask);
    }
 
-   public static void putImageInLoadingQueueHQThumb_Map(final Photo photo,
+   public static void putImageInLoadingQueueHQ_Map_Thumb(final Photo photo,
                                                         final int thumbImageSize,
                                                         final ImageQuality imageQuality,
                                                         final ILoadCallBack imageLoaderCallback) {
