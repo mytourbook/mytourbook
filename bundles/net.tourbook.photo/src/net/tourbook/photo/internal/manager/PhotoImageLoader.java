@@ -1217,7 +1217,7 @@ public class PhotoImageLoader {
        */
       if (imageQuality == ImageQuality.THUMB_HQ_CROPPED) {
 
-         final BufferedImage awtHQImageCropped = cropImage(awtHQImage);
+         final BufferedImage awtHQImageCropped = cropImage(awtOriginalImage);
 
          if (awtHQImageCropped != null) {
 
