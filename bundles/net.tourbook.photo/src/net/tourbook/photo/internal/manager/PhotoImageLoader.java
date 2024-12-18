@@ -1152,7 +1152,13 @@ public class PhotoImageLoader {
        */
 
       // update dimension
-      updatePhotoImageSize(originalImageWidth, originalImageHeight, true);
+      updatePhotoImageSize(
+
+            originalImageWidth,
+            originalImageHeight,
+
+            true // isOriginalSize
+      );
 
       if (originalImageWidth >= _hqImageSize || originalImageHeight >= _hqImageSize) {
 

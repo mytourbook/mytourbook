@@ -1758,19 +1758,34 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       /*
        * Get crop area from the tour photo
        */
-      _relPhoto_CropArea = null;
+      float cropAreaX1 = _photo.cropAreaX1;
+      float cropAreaY1 = _photo.cropAreaY1;
+      float cropAreaX2 = _photo.cropAreaX2;
+      float cropAreaY2 = _photo.cropAreaY2;
 
-      if (isPhotoCropped) {
+      if (cropAreaX1 == 0 && cropAreaX2 == 0
+            || cropAreaY1 == 0 && cropAreaY2 == 0) {
 
-         _relPhoto_CropArea = new Rectangle2D.Float(
+         // set initial and valid crop areas
 
-               _photo.cropAreaX1,
-               _photo.cropAreaY1,
-               _photo.cropAreaX2,
-               _photo.cropAreaY2);
+         final float defaultCrop = 0.35f;
+         final float defaultCrop2 = 1 - defaultCrop;
 
-         updateCropArea_FromRelative(_photoImageBounds);
+         _photo.cropAreaX1 = cropAreaX1 = defaultCrop;
+         _photo.cropAreaY1 = cropAreaY1 = defaultCrop;
+
+         _photo.cropAreaX2 = cropAreaX2 = defaultCrop2;
+         _photo.cropAreaY2 = cropAreaY2 = defaultCrop2;
       }
+
+      _relPhoto_CropArea = new Rectangle2D.Float(
+
+            cropAreaX1,
+            cropAreaY1,
+            cropAreaX2,
+            cropAreaY2);
+
+      updateCropArea_FromRelative(_photoImageBounds);
 
       final Image photoImage = getPhotoImage(_photo);
 
