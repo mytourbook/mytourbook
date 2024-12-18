@@ -1048,7 +1048,7 @@ public class PhotoImageLoader {
 
             // it is possible that the not cropped image is already loaded -> only crop it
 
-            final BufferedImage notCroppedImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB_HQ);
+            final BufferedImage notCroppedImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.HQ);
 
             if (notCroppedImage != null) {
                hqThumbImage = cropImage(notCroppedImage);

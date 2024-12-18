@@ -1466,10 +1466,6 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
                devXTopLeft + devWidth + 1,
                devYTopLeft + devHeight + 1);
       }
-
-      System.out.println(UI.timeStamp() + " onPhoto_PaintCropping ");
-// TODO remove SYSTEM.OUT.PRINTLN
-
    }
 
    private void onPhoto_Resize(final ControlEvent event) {

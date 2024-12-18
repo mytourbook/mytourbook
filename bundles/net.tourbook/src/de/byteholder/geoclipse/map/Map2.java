@@ -8506,7 +8506,7 @@ public class Map2 extends Canvas {
          final int mapImageWidth = mapImageSize.x;
          final int mapImageHeight = mapImageSize.y;
 
-         final Rectangle photoRectangle = new Rectangle(
+         Rectangle photoRectangle = new Rectangle(
                labelDevX,
                labelDevY,
                mapImageWidth,
@@ -8536,6 +8536,23 @@ public class Map2 extends Canvas {
             if (photoImageWidth == mapImageWidth && photoImageHeight == mapImageHeight) {
 
                // do NOT resize the image, it would not look very good
+
+               g2d.drawImage(awtPhotoImage,
+
+                     photoRectangle.x,
+                     photoRectangle.y,
+
+                     null);
+
+            } else if (photoImageWidth < mapImageWidth && photoImageHeight < mapImageHeight) {
+
+               // photo image is smaller than the requested map image
+
+               photoRectangle = new Rectangle(
+                     labelDevX,
+                     labelDevY,
+                     photoImageWidth,
+                     photoImageHeight);
 
                g2d.drawImage(awtPhotoImage,
 
