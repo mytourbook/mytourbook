@@ -465,7 +465,9 @@ public class Map2 extends Canvas {
    private MapPointToolTip                 _mapPointTooltip;
    private SlideoutMap2_PhotoToolTip       _mapPointTooltip_Photo;
    private boolean                         _isPreloadHQImages;
+   private boolean                         _isEnlargeSmallImages;
    private boolean                         _isShowHQPhotoImages;
+   private boolean                         _isShowPhotoAdjustments;
    private final ILoadCallBack             _photoImageLoaderCallback        = new PhotoImageLoaderCallback();
 
    /** Number of created map points */
@@ -2908,7 +2910,7 @@ public class Map2 extends Canvas {
 
          // image is not invalid and not yet loaded
 
-         final ImageQuality imageQuality = photo.isCropped
+         final ImageQuality imageQuality = _isShowPhotoAdjustments && photo.isCropped
                ? ImageQuality.THUMB_HQ_CROPPED
                : ImageQuality.THUMB_HQ;
 
@@ -2919,7 +2921,7 @@ public class Map2 extends Canvas {
 
          if (isImageNotInLoadingQueue) {
 
-            final boolean isPhotoModified = photo.isCropModified;
+            final boolean isPhotoModified = _isShowPhotoAdjustments && photo.isCropModified;
             final boolean isPhotoNotLoaded = awtPhotoImageThumbHQ == null;
 
             if (isPhotoModified || isPhotoNotLoaded) {
@@ -8544,9 +8546,10 @@ public class Map2 extends Canvas {
 
                      null);
 
-            } else if (photoImageWidth < mapImageWidth && photoImageHeight < mapImageHeight) {
+            } else if (_isEnlargeSmallImages == false
+                  && photoImageWidth < mapImageWidth && photoImageHeight < mapImageHeight) {
 
-               // photo image is smaller than the requested map image
+               // photo image is smaller than the requested map image -> do not enlarge it
 
                photoRectangle = new Rectangle(
                      labelDevX,
@@ -8563,7 +8566,7 @@ public class Map2 extends Canvas {
 
             } else {
 
-               // resize image
+               // resize image, this will also enlarge small images
 
                g2d.drawImage(awtPhotoImage,
 
@@ -11388,9 +11391,17 @@ public class Map2 extends Canvas {
 
    public void updatePhotoOptions() {
 
+      _isEnlargeSmallImages = Util.getStateBoolean(_state_Map2,
+            SlideoutMap2_PhotoOptions.STATE_IS_ENLARGE_SMALL_IMAGES,
+            SlideoutMap2_PhotoOptions.STATE_IS_ENLARGE_SMALL_IMAGES_DEFAULT);
+
       _isShowHQPhotoImages = Util.getStateBoolean(_state_Map2,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_THUMB_HQ_IMAGES,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT);
+
+      _isShowPhotoAdjustments = Util.getStateBoolean(_state_Map2,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_ADJUSTMENTS,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_ADJUSTMENTS_DEFAULT);
 
       _isPreloadHQImages = Util.getStateBoolean(_state_Map2,
             SlideoutMap2_PhotoOptions.STATE_IS_PRELOAD_HQ_IMAGES,

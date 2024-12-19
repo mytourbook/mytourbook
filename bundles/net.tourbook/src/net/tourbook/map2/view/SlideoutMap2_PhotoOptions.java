@@ -56,27 +56,31 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       IActionResetToDefault,
       IColorSelectorListener {
 
-   public static final String      STATE_IS_PRELOAD_HQ_IMAGES            = "STATE_IS_PRELOAD_HQ_IMAGES";    //$NON-NLS-1$
-   public static final boolean     STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT    = false;
-   public static final String      STATE_IS_SHOW_THUMB_HQ_IMAGES         = "STATE_IS_SHOW_THUMB_HQ_IMAGES"; //$NON-NLS-1$
-   public static final boolean     STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT = false;
-   static final String             STATE_IS_SHOW_PHOTO_RATING            = "STATE_IS_SHOW_PHOTO_RATING";    //$NON-NLS-1$
-   static final boolean            STATE_IS_SHOW_PHOTO_RATING_DEFAULT    = true;
-   static final String             STATE_IS_SHOW_PHOTO_TOOLTIP           = "STATE_IS_SHOW_PHOTO_TOOLTIP";   //$NON-NLS-1$
-   static final boolean            STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT   = true;
+   public static final String      STATE_IS_ENLARGE_SMALL_IMAGES           = "STATE_IS_ENLARGE_SMALL_IMAGES";   //$NON-NLS-1$
+   public static final boolean     STATE_IS_ENLARGE_SMALL_IMAGES_DEFAULT   = false;
+   public static final String      STATE_IS_PRELOAD_HQ_IMAGES              = "STATE_IS_PRELOAD_HQ_IMAGES";      //$NON-NLS-1$
+   public static final boolean     STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT      = false;
+   public static final String      STATE_IS_SHOW_THUMB_HQ_IMAGES           = "STATE_IS_SHOW_THUMB_HQ_IMAGES";   //$NON-NLS-1$
+   public static final boolean     STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT   = false;
+   public static final String      STATE_IS_SHOW_PHOTO_ADJUSTMENTS         = "STATE_IS_SHOW_PHOTO_ADJUSTMENTS"; //$NON-NLS-1$
+   public static final boolean     STATE_IS_SHOW_PHOTO_ADJUSTMENTS_DEFAULT = false;
+   static final String             STATE_IS_SHOW_PHOTO_RATING              = "STATE_IS_SHOW_PHOTO_RATING";      //$NON-NLS-1$
+   static final boolean            STATE_IS_SHOW_PHOTO_RATING_DEFAULT      = true;
+   static final String             STATE_IS_SHOW_PHOTO_TOOLTIP             = "STATE_IS_SHOW_PHOTO_TOOLTIP";     //$NON-NLS-1$
+   static final boolean            STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT     = true;
 
-   public static final String      STATE_PHOTO_IMAGE_SIZE                = "STATE_PHOTO_IMAGE_SIZE";        //$NON-NLS-1$
-   public static final String      STATE_PHOTO_IMAGE_SIZE_TINY           = "STATE_PHOTO_IMAGE_SIZE_TINY";   //$NON-NLS-1$
-   public static final String      STATE_PHOTO_IMAGE_SIZE_SMALL          = "STATE_PHOTO_IMAGE_SIZE_SMALL";  //$NON-NLS-1$
-   public static final String      STATE_PHOTO_IMAGE_SIZE_MEDIUM         = "STATE_PHOTO_IMAGE_SIZE_MEDIUM"; //$NON-NLS-1$
-   public static final String      STATE_PHOTO_IMAGE_SIZE_LARGE          = "STATE_PHOTO_IMAGE_SIZE_LARGE";  //$NON-NLS-1$
+   public static final String      STATE_PHOTO_IMAGE_SIZE                  = "STATE_PHOTO_IMAGE_SIZE";          //$NON-NLS-1$
+   public static final String      STATE_PHOTO_IMAGE_SIZE_TINY             = "STATE_PHOTO_IMAGE_SIZE_TINY";     //$NON-NLS-1$
+   public static final String      STATE_PHOTO_IMAGE_SIZE_SMALL            = "STATE_PHOTO_IMAGE_SIZE_SMALL";    //$NON-NLS-1$
+   public static final String      STATE_PHOTO_IMAGE_SIZE_MEDIUM           = "STATE_PHOTO_IMAGE_SIZE_MEDIUM";   //$NON-NLS-1$
+   public static final String      STATE_PHOTO_IMAGE_SIZE_LARGE            = "STATE_PHOTO_IMAGE_SIZE_LARGE";    //$NON-NLS-1$
 
-   private static final int        MIN_IMAGE_SIZE                        = 3;
+   private static final int        MIN_IMAGE_SIZE                          = 3;
 
    /**
     * This value is small because a map do not yet load large images !!!
     */
-   private static final int        MAX_IMAGE_SIZE                        = 2000;
+   private static final int        MAX_IMAGE_SIZE                          = 2000;
 
    private IDialogSettings         _state_Map2;
 
@@ -96,8 +100,10 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
     */
    private Button                _btnSwapTourPauseLabel_Color;
 
+   private Button                _chkEnlargeSmallImages;
    private Button                _chkPreloadHQImages;
    private Button                _chkShowHQImages;
+   private Button                _chkShowPhotoAdjustments;
    private Button                _chkShowPhotoRating;
 
    private Button                _radioImageSize_Tiny;
@@ -369,12 +375,35 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       }
       {
          /*
+          * Enlarge small images
+          */
+         _chkEnlargeSmallImages = new Button(parent, SWT.CHECK);
+         _chkEnlargeSmallImages.setText("&Enlarge small photos");
+         _chkEnlargeSmallImages.setToolTipText(
+               "When selected and the photo is smaller than the requested \"Image size\",\nthen it will be enlarged to the requested \"Image size\"");
+         _chkEnlargeSmallImages.addSelectionListener(_defaultSelectedListener);
+      }
+      {
+         /*
           * Show HQ photos
           */
          _chkShowHQImages = new Button(parent, SWT.CHECK);
          _chkShowHQImages.setText(Messages.Slideout_Map_PhotoOptions_Checkbox_ShowHqPhotoImages);
          _chkShowHQImages.setToolTipText(Messages.Slideout_Map_PhotoOptions_Checkbox_ShowHqPhotoImages_Tooltip);
          _chkShowHQImages.addSelectionListener(_defaultSelectedListener);
+      }
+      {
+         /*
+          * Show photos adjustments, e.g. cropping
+          */
+         _chkShowPhotoAdjustments = new Button(parent, SWT.CHECK);
+         _chkShowPhotoAdjustments.setText("Show photo adjustment");
+         _chkShowPhotoAdjustments.setToolTipText("e.g. cropping");
+         _chkShowPhotoAdjustments.addSelectionListener(_defaultSelectedListener);
+         GridDataFactory.fillDefaults()
+               .indent(16, 0)
+               .applyTo(_chkShowPhotoAdjustments);
+
       }
       {
          /*
@@ -406,10 +435,18 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
    private void enableControls() {
 
-      _spinnerImageSize_Large.setEnabled(_radioImageSize_Large.getSelection());
-      _spinnerImageSize_Medium.setEnabled(_radioImageSize_Medium.getSelection());
-      _spinnerImageSize_Small.setEnabled(_radioImageSize_Small.getSelection());
-      _spinnerImageSize_Tiny.setEnabled(_radioImageSize_Tiny.getSelection());
+      final boolean isShowHQImages = _chkShowHQImages.getSelection();
+
+// SET_FORMATTING_OFF
+
+      _chkShowPhotoAdjustments   .setEnabled(isShowHQImages);
+
+      _spinnerImageSize_Large    .setEnabled(_radioImageSize_Large.getSelection());
+      _spinnerImageSize_Medium   .setEnabled(_radioImageSize_Medium.getSelection());
+      _spinnerImageSize_Small    .setEnabled(_radioImageSize_Small.getSelection());
+      _spinnerImageSize_Tiny     .setEnabled(_radioImageSize_Tiny.getSelection());
+
+// SET_FORMATTING_ON
    }
 
    private int getSelectedImageSize() {
@@ -498,19 +535,25 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
       _imageSize = _map2.MAP_IMAGE_DEFAULT_SIZE_MEDIUM;
 
-      _radioImageSize_Large.setSelection(false);
-      _radioImageSize_Medium.setSelection(true);
-      _radioImageSize_Small.setSelection(false);
-      _radioImageSize_Tiny.setSelection(false);
+// SET_FORMATTING_OFF
 
-      _spinnerImageSize_Large.setSelection(_map2.MAP_IMAGE_DEFAULT_SIZE_LARGE);
+      _radioImageSize_Large   .setSelection(false);
+      _radioImageSize_Medium  .setSelection(true);
+      _radioImageSize_Small   .setSelection(false);
+      _radioImageSize_Tiny    .setSelection(false);
+
+      _spinnerImageSize_Large .setSelection(_map2.MAP_IMAGE_DEFAULT_SIZE_LARGE);
       _spinnerImageSize_Medium.setSelection(_map2.MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
-      _spinnerImageSize_Small.setSelection(_map2.MAP_IMAGE_DEFAULT_SIZE_SMALL);
-      _spinnerImageSize_Tiny.setSelection(_map2.MAP_IMAGE_DEFAULT_SIZE_TINY);
+      _spinnerImageSize_Small .setSelection(_map2.MAP_IMAGE_DEFAULT_SIZE_SMALL);
+      _spinnerImageSize_Tiny  .setSelection(_map2.MAP_IMAGE_DEFAULT_SIZE_TINY);
 
-      _chkPreloadHQImages.setSelection(STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT);
-      _chkShowHQImages.setSelection(STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT);
-      _chkShowPhotoRating.setSelection(STATE_IS_SHOW_PHOTO_RATING_DEFAULT);
+      _chkEnlargeSmallImages  .setSelection(STATE_IS_ENLARGE_SMALL_IMAGES_DEFAULT);
+      _chkPreloadHQImages     .setSelection(STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT);
+      _chkShowHQImages        .setSelection(STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT);
+      _chkShowPhotoAdjustments.setSelection(STATE_IS_SHOW_PHOTO_ADJUSTMENTS_DEFAULT);
+      _chkShowPhotoRating     .setSelection(STATE_IS_SHOW_PHOTO_RATING_DEFAULT);
+
+// SET_FORMATTING_ON
 
       /*
        * Update config
@@ -534,9 +577,11 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
 // SET_FORMATTING_OFF
 
-      _chkPreloadHQImages  .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_PRELOAD_HQ_IMAGES,      STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT));
-      _chkShowHQImages     .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_SHOW_THUMB_HQ_IMAGES,   STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT));
-      _chkShowPhotoRating  .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_SHOW_PHOTO_RATING,      STATE_IS_SHOW_PHOTO_RATING_DEFAULT));
+      _chkEnlargeSmallImages  .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_ENLARGE_SMALL_IMAGES,   STATE_IS_ENLARGE_SMALL_IMAGES_DEFAULT));
+      _chkPreloadHQImages     .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_PRELOAD_HQ_IMAGES,      STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT));
+      _chkShowHQImages        .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_SHOW_THUMB_HQ_IMAGES,   STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT));
+      _chkShowPhotoAdjustments.setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_SHOW_PHOTO_ADJUSTMENTS, STATE_IS_SHOW_PHOTO_ADJUSTMENTS_DEFAULT));
+      _chkShowPhotoRating     .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_SHOW_PHOTO_RATING,      STATE_IS_SHOW_PHOTO_RATING_DEFAULT));
 
       final Enum<MapImageSize> imageSize = Util.getStateEnum(_state_Map2, STATE_PHOTO_IMAGE_SIZE, MapImageSize.MEDIUM);
 
@@ -584,13 +629,15 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
       final boolean isShowPhotoRating = _chkShowPhotoRating.getSelection();
 
-      _state_Map2.put(STATE_IS_PRELOAD_HQ_IMAGES, _chkPreloadHQImages.getSelection());
-      _state_Map2.put(STATE_IS_SHOW_THUMB_HQ_IMAGES, _chkShowHQImages.getSelection());
-      _state_Map2.put(STATE_IS_SHOW_PHOTO_RATING, isShowPhotoRating);
+// SET_FORMATTING_OFF
+
+      _state_Map2.put(STATE_IS_ENLARGE_SMALL_IMAGES,  _chkEnlargeSmallImages.getSelection());
+      _state_Map2.put(STATE_IS_PRELOAD_HQ_IMAGES,     _chkPreloadHQImages.getSelection());
+      _state_Map2.put(STATE_IS_SHOW_PHOTO_ADJUSTMENTS,_chkShowPhotoAdjustments.getSelection());
+      _state_Map2.put(STATE_IS_SHOW_THUMB_HQ_IMAGES,  _chkShowHQImages.getSelection());
+      _state_Map2.put(STATE_IS_SHOW_PHOTO_RATING,     isShowPhotoRating);
 
       Map2PainterConfig.isShowPhotoRating = isShowPhotoRating;
-
-// SET_FORMATTING_OFF
 
       final Enum<MapImageSize> selectedSize =
 
