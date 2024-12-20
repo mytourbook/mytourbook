@@ -1038,7 +1038,7 @@ public class PhotoImageLoader {
       BufferedImage hqThumbImage = null;
 
       // reset crop state
-      photo.isCropModified = false;
+      photo.isAdjustmentModified = false;
 
       try {
 

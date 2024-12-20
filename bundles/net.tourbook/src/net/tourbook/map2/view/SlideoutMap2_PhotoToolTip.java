@@ -832,7 +832,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       _photo.isCropped = isCropped;
 
       if (isCropped) {
-         _photo.isCropModified = true;
+         _photo.isAdjustmentModified = true;
       }
 
       _photo.updateMapImageRenderSize();
@@ -1982,7 +1982,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
     */
    private void updateCropArea_InPhoto() {
 
-      _photo.isCropModified = true;
+      _photo.isAdjustmentModified = true;
 
       _photo.cropAreaX1 = _relPhoto_CropArea.x;
       _photo.cropAreaY1 = _relPhoto_CropArea.y;

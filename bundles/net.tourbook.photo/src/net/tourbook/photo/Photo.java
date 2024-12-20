@@ -83,13 +83,11 @@ public class Photo implements Serializable {
    private static int                              _map2ImageRequestedSize  = MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
    private static int                              _map25ImageRequestedSize = MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
 
-   private int                                     _map2ImageRequestedAndCheckedSize;
    private int                                     _map25ImageRequestedAndCheckedSize;
 
    /**
     * Image size which is painted in the map
     */
-   private org.eclipse.swt.graphics.Point          _map2ImageRenderSize     = MAP_IMAGE_DEFAULT_SIZE;
    private org.eclipse.swt.graphics.Point          _map25ImageRenderSize    = MAP_IMAGE_DEFAULT_SIZE;
 
    private String                                  _uniqueId;
@@ -316,7 +314,7 @@ public class Photo implements Serializable {
    private long                          _photoLinkTourId;
 
    public boolean                        isCropped;
-   public boolean                        isCropModified;
+   public boolean                        isAdjustmentModified;
 
    /**
     * Relative position for the top left x position of the cropping area
@@ -998,18 +996,48 @@ public class Photo implements Serializable {
    }
 
    /**
+    * @param isShowHQPhotoImages
+    *           When <code>false</code> then only the thumb images are displayed
+    * @param isShowPhotoAdjustments
+    *           Is <code>true</code> when e.g. the photo is cropped
+    *
     * @return Returns size when image is painted on the map
     */
-   public org.eclipse.swt.graphics.Point getMap2ImageSize() {
+   public org.eclipse.swt.graphics.Point getMap2ImageSize(final boolean isShowHQPhotoImages,
+                                                          final boolean isShowPhotoAdjustments) {
 
-      if (_map2ImageRequestedSize != _map2ImageRequestedAndCheckedSize) {
+      final int imageCanvasWidth = _map2ImageRequestedSize;
+      final int imageCanvasHeight = _map2ImageRequestedSize;
 
-         setMap2ImageRenderSize(_map2ImageRequestedSize);
+      int imageWidth = _photoImageWidth != Integer.MIN_VALUE ? _photoImageWidth : _thumbImageWidth;
+      int imageHeight = _photoImageHeight != Integer.MIN_VALUE ? _photoImageHeight : _thumbImageHeight;
 
-         _map2ImageRequestedAndCheckedSize = _map2ImageRequestedSize;
+      if (isShowHQPhotoImages && isShowPhotoAdjustments && isCropped && imageWidth != Integer.MIN_VALUE) {
+
+         // adjust to cropping area
+
+         imageWidth = (int) ((cropAreaX2 - cropAreaX1) * imageWidth);
+         imageHeight = (int) ((cropAreaY2 - cropAreaY1) * imageHeight);
+
+         // fix 0, this happenes when the mouse is clicked but not moved
+         if (imageWidth == 0) {
+            imageWidth = 20;
+         }
+
+         if (imageHeight == 0) {
+            imageHeight = 20;
+         }
       }
 
-      return _map2ImageRenderSize;
+      final org.eclipse.swt.graphics.Point renderSize = RendererHelper.getBestSize(this,
+
+            imageWidth,
+            imageHeight,
+
+            imageCanvasWidth,
+            imageCanvasHeight);
+
+      return renderSize;
    }
 
    /**
@@ -1363,42 +1391,6 @@ public class Photo implements Serializable {
       _map25ImageRenderSize = renderSize;
    }
 
-   private void setMap2ImageRenderSize(final int mapImageRequestedSize) {
-
-      final int imageCanvasWidth = mapImageRequestedSize;
-      final int imageCanvasHeight = mapImageRequestedSize;
-
-      int imageWidth = _photoImageWidth != Integer.MIN_VALUE ? _photoImageWidth : _thumbImageWidth;
-      int imageHeight = _photoImageHeight != Integer.MIN_VALUE ? _photoImageHeight : _thumbImageHeight;
-
-      if (isCropped && imageWidth != Integer.MIN_VALUE) {
-
-         // adjust to cropping area
-
-         imageWidth = (int) ((cropAreaX2 - cropAreaX1) * imageWidth);
-         imageHeight = (int) ((cropAreaY2 - cropAreaY1) * imageHeight);
-
-         // fix 0, this happenes when the mouse is clicked but not moved
-         if (imageWidth == 0) {
-            imageWidth = 5;
-         }
-
-         if (imageHeight == 0) {
-            imageHeight = 5;
-         }
-      }
-
-      final org.eclipse.swt.graphics.Point renderSize = RendererHelper.getBestSize(this,
-
-            imageWidth,
-            imageHeight,
-
-            imageCanvasWidth,
-            imageCanvasHeight);
-
-      _map2ImageRenderSize = renderSize;
-   }
-
    public void setPhotoSize(final int width, final int height) {
 
       if (width == _photoImageHeight && height == _photoImageWidth) {
@@ -1589,7 +1581,6 @@ public class Photo implements Serializable {
 
    public void updateMapImageRenderSize() {
 
-      setMap2ImageRenderSize(_map2ImageRequestedSize);
       setMap25ImageRenderSize(_map25ImageRequestedSize);
    }
 
