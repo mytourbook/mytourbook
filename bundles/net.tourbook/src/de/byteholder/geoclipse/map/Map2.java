@@ -1377,7 +1377,11 @@ public class Map2 extends Canvas {
          final int devY = mapPoint.geoPointDevY;
 
          final Photo photo = mapPoint.photo;
-         final Point mapImageSize = photo.getMap2ImageSize(_isShowHQPhotoImages, _isShowPhotoAdjustments);
+         final Point mapImageSize = photo.getMap2ImageSize(
+
+               _isShowHQPhotoImages,
+               _isShowPhotoAdjustments,
+               _isEnlargeSmallImages);
 
          final PointFeature pointFeature = new PointFeature(
 
@@ -8500,7 +8504,11 @@ public class Map2 extends Canvas {
          final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
          final Photo photo = mapPoint.photo;
-         final Point mapImageSize = photo.getMap2ImageSize(_isShowHQPhotoImages, _isShowPhotoAdjustments);
+         final Point mapImageSize = photo.getMap2ImageSize(
+
+               _isShowHQPhotoImages,
+               _isShowPhotoAdjustments,
+               _isEnlargeSmallImages);
 
          final int labelDevX = (int) distribLabel.labelBoxL;
          final int labelDevY = (int) distribLabel.labelBoxT;

@@ -1000,17 +1000,32 @@ public class Photo implements Serializable {
     *           When <code>false</code> then only the thumb images are displayed
     * @param isShowPhotoAdjustments
     *           Is <code>true</code> when e.g. the photo is cropped
+    * @param isEnlargeSmallImages
     *
     * @return Returns size when image is painted on the map
     */
    public org.eclipse.swt.graphics.Point getMap2ImageSize(final boolean isShowHQPhotoImages,
-                                                          final boolean isShowPhotoAdjustments) {
+                                                          final boolean isShowPhotoAdjustments,
+                                                          final boolean isEnlargeSmallImages) {
 
-      final int imageCanvasWidth = _map2ImageRequestedSize;
-      final int imageCanvasHeight = _map2ImageRequestedSize;
+      int imageWidth;
+      int imageHeight;
 
-      int imageWidth = _photoImageWidth != Integer.MIN_VALUE ? _photoImageWidth : _thumbImageWidth;
-      int imageHeight = _photoImageHeight != Integer.MIN_VALUE ? _photoImageHeight : _thumbImageHeight;
+      if (isShowHQPhotoImages) {
+
+         imageWidth = _photoImageWidth != Integer.MIN_VALUE ? _photoImageWidth : _thumbImageWidth;
+         imageHeight = _photoImageHeight != Integer.MIN_VALUE ? _photoImageHeight : _thumbImageHeight;
+
+      } else {
+
+         // a thumb image is displayed
+
+         imageWidth = _thumbImageWidth;
+         imageHeight = _thumbImageHeight;
+      }
+
+      imageWidth = imageWidth == Integer.MIN_VALUE ? MAP_IMAGE_DEFAULT_WIDTH_HEIGHT : imageWidth;
+      imageHeight = imageHeight == Integer.MIN_VALUE ? MAP_IMAGE_DEFAULT_WIDTH_HEIGHT : imageHeight;
 
       if (isShowHQPhotoImages && isShowPhotoAdjustments && isCropped && imageWidth != Integer.MIN_VALUE) {
 
@@ -1029,13 +1044,26 @@ public class Photo implements Serializable {
          }
       }
 
-      final org.eclipse.swt.graphics.Point renderSize = RendererHelper.getBestSize(this,
+      final int imageCanvasWidth = _map2ImageRequestedSize;
+      final int imageCanvasHeight = _map2ImageRequestedSize;
 
-            imageWidth,
-            imageHeight,
+      org.eclipse.swt.graphics.Point renderSize;
 
-            imageCanvasWidth,
-            imageCanvasHeight);
+      if (isEnlargeSmallImages == false
+            && imageWidth < imageCanvasWidth && imageHeight < imageCanvasHeight) {
+
+         renderSize = new org.eclipse.swt.graphics.Point(imageWidth, imageHeight);
+
+      } else {
+
+         renderSize = RendererHelper.getBestSize(this,
+
+               imageWidth,
+               imageHeight,
+
+               imageCanvasWidth,
+               imageCanvasHeight);
+      }
 
       return renderSize;
    }

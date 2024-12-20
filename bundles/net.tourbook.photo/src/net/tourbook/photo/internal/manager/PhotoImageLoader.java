@@ -1518,6 +1518,9 @@ public class PhotoImageLoader {
 
                imageKey = _photo.getImageKey(ImageQuality.THUMB);
                loadedExifImage = awtExifThumbnail;
+
+               // update photo thumb image size
+               _photo.setThumbSize(awtExifThumbnail.getWidth(), awtExifThumbnail.getHeight());
             }
          }
 
