@@ -1329,6 +1329,9 @@ public class RawDataView extends ViewPart implements
                // update viewer
                _tourViewer.update(modifiedTours.toArray(), null);
 
+               // fix refresh after a tour type is modified
+               _tourViewer.getTable().redraw();
+
                // remove old selection, old selection can have the same tour but with old data
                _postSelectionProvider.clearSelection();
             }
