@@ -94,9 +94,12 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
       @Override
       public void run() {
 
-         final TourTypeMenuManager tourTypeMenuManager = new TourTypeMenuManager(_tourProvider);
+         TourTypeMenuManager.setTourTypeIntoTour(
 
-         tourTypeMenuManager.setTourTypeIntoTour(_tourType, _isSaveTour, _isCheckTourEditor);
+               _tourType,
+               _tourProvider,
+               _isSaveTour,
+               _isCheckTourEditor);
       }
    }
 
