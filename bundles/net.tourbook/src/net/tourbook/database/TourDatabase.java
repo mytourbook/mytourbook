@@ -1370,15 +1370,6 @@ public class TourDatabase {
       cs.close();
    }
 
-   private static void dropFunction(final Statement stmt, final String functionName) {
-
-      try {
-
-         exec(stmt, "DROP FUNCTION " + functionName); //$NON-NLS-1$
-
-      } catch (final Exception e) {}
-   }
-
    /**
     * Get runtime statistics by putting this statement before the query is executed
     *
@@ -5634,14 +5625,9 @@ public class TourDatabase {
       try (Connection conn = getInstance().getConnection();
             Statement stmt = conn.createStatement()) {
 
-         /*
-          * Found not a better and simple solution to check and then drop these functions because
-          * they are kept in the db even when the server is shutdown !!!
-          */
+         // with hints from https://stackoverflow.com/questions/38369703/regex-in-apache-derby
 
-         dropFunction(stmt, "avgSpeed"); //$NON-NLS-1$
-         dropFunction(stmt, "avgPace"); //$NON-NLS-1$
-
+         exec(stmt, "DROP FUNCTION avgSpeed"); //                                                                 //$NON-NLS-1$
          exec(stmt,
 
                UI.EMPTY_STRING
@@ -5649,10 +5635,12 @@ public class TourDatabase {
                      + "CREATE FUNCTION avgSpeed (tourTime BIGINT, tourDistance BIGINT)" + NL //                  //$NON-NLS-1$
                      + "RETURNS REAL" + NL //                                                                     //$NON-NLS-1$
                      + "PARAMETER STYLE JAVA" + NL //                                                             //$NON-NLS-1$
-                     + "NO SQL LANGUAGE JAVA" + NL //                                                             //$NON-NLS-1$
+                     + "NO SQL" + NL //                                                             //$NON-NLS-1$
+                     + "LANGUAGE JAVA" + NL //                                                             //$NON-NLS-1$
                      + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgSpeed'" + NL //     //$NON-NLS-1$
          );
 
+         exec(stmt, "DROP FUNCTION avgPace"); //                                                                  //$NON-NLS-1$
          exec(stmt,
 
                UI.EMPTY_STRING
@@ -5660,7 +5648,8 @@ public class TourDatabase {
                      + "CREATE FUNCTION avgPace (tourTime BIGINT, tourDistance BIGINT)" + NL //                   //$NON-NLS-1$
                      + "RETURNS REAL" + NL //                                                                     //$NON-NLS-1$
                      + "PARAMETER STYLE JAVA" + NL //                                                             //$NON-NLS-1$
-                     + "NO SQL LANGUAGE JAVA" + NL //                                                             //$NON-NLS-1$
+                     + "NO SQL" + NL //                                                             //$NON-NLS-1$
+                     + "LANGUAGE JAVA" + NL //                                                             //$NON-NLS-1$
                      + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgPace'" + NL //      //$NON-NLS-1$
          );
 
