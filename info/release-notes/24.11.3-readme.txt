@@ -20,8 +20,13 @@ Changes
 Bugfix
 ======
   
-* Tour type could be set into the wrong tour(s)
-  https://github.com/mytourbook/mytourbook/issues/1444
+* Tour Type
+  - A tour type could be set into the wrong tour(s)
+    https://github.com/mytourbook/mytourbook/issues/1444
+  
+* Tour Book View
+  - Sorting by average speed/pace could cause a SQL error
+    https://github.com/mytourbook/mytourbook/issues/1441
 
 See also milestone 24.11.3 https://github.com/mytourbook/mytourbook/milestone/22?closed=1
  
