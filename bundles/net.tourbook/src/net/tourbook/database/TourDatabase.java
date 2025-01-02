@@ -19,8 +19,10 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.skedgo.converter.TimezoneMapper;
 
 import java.beans.PropertyVetoException;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
+import java.net.URL;
 import java.nio.file.Path;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -104,6 +106,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.PlatformUI;
+import org.osgi.framework.Bundle;
 
 public class TourDatabase {
 
@@ -1369,15 +1372,6 @@ public class TourDatabase {
       cs.close();
    }
 
-   private static void dropFunction(final Statement stmt, final String functionName) {
-
-      try {
-
-         exec(stmt, "DROP FUNCTION " + functionName); //$NON-NLS-1$
-
-      } catch (final Exception e) {}
-   }
-
    /**
     * Get runtime statistics by putting this statement before the query is executed
     *
@@ -1400,7 +1394,7 @@ public class TourDatabase {
 
    private static void exec(final Statement stmt, final String sql) throws SQLException {
 
-      System.out.println(sql);
+      System.out.println("exec: " + sql); //$NON-NLS-1$
 
       stmt.execute(sql);
    }
@@ -1412,9 +1406,23 @@ public class TourDatabase {
       }
    }
 
+   private static void exec_IgnoreException(final Statement stmt, final String sql) {
+
+      System.out.println("exec_IgnoreException: " + sql); //$NON-NLS-1$
+
+      try {
+
+         stmt.execute(sql);
+
+      } catch (final SQLException e) {
+
+         StatusUtil.logError(e.getMessage());
+      }
+   }
+
    private static void execUpdate(final Statement stmt, final String sql) throws SQLException {
 
-      System.out.println(sql);
+      System.out.println("execUpdate: " + sql); //$NON-NLS-1$
 
       stmt.executeUpdate(sql);
    }
@@ -5645,14 +5653,26 @@ public class TourDatabase {
       try (Connection conn = getInstance().getConnection();
             Statement stmt = conn.createStatement()) {
 
+         final Bundle derbyBundle = Platform.getBundle("net.tourbook.ext.apache"); //$NON-NLS-1$
+
+         // bundleentry://26.fwk1091632842/mytourbook-derby-functions.jar
+         final URL bundleUrl = derbyBundle.getEntry("/mytourbook-derby-functions.jar"); //$NON-NLS-1$
+
+         // C:/E/e-431/eclipse/../../../DAT/MT/mytourbook/bundles/net.tourbook.ext.apache/mytourbook-derby-functions.jar
+         final String sqlCustomJarFilePath = NIO.getAbsolutePathFromBundleUrl(bundleUrl);
+
          /*
-          * Found not a better and simple solution to check and then drop these functions because
-          * they are kept in the db even when the server is shutdown !!!
+          * Install (replace) jar file, hints are from
+          * https://stackoverflow.com/questions/38369703/regex-in-apache-derby#answer-38369704
           */
+         exec_IgnoreException(stmt, "CALL SQLJ.REMOVE_JAR('App.StoredProcedures', 0)"); //$NON-NLS-1$
+         exec(stmt, "CALL SQLJ.INSTALL_JAR('%s', 'App.StoredProcedures', 0)".formatted(sqlCustomJarFilePath)); //$NON-NLS-1$
+         exec(stmt, "CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('derby.database.classpath', 'App.StoredProcedures')"); //$NON-NLS-1$
 
-         dropFunction(stmt, "avgSpeed"); //$NON-NLS-1$
-         dropFunction(stmt, "avgPace"); //$NON-NLS-1$
-
+         /*
+          * Replace functions
+          */
+         exec_IgnoreException(stmt, "DROP FUNCTION avgSpeed"); //$NON-NLS-1$
          exec(stmt,
 
                UI.EMPTY_STRING
@@ -5660,10 +5680,12 @@ public class TourDatabase {
                      + "CREATE FUNCTION avgSpeed (tourTime BIGINT, tourDistance BIGINT)" + NL //                  //$NON-NLS-1$
                      + "RETURNS REAL" + NL //                                                                     //$NON-NLS-1$
                      + "PARAMETER STYLE JAVA" + NL //                                                             //$NON-NLS-1$
-                     + "NO SQL LANGUAGE JAVA" + NL //                                                             //$NON-NLS-1$
+                     + "NO SQL" + NL //                                                                           //$NON-NLS-1$
+                     + "LANGUAGE JAVA" + NL //                                                                    //$NON-NLS-1$
                      + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgSpeed'" + NL //     //$NON-NLS-1$
          );
 
+         exec_IgnoreException(stmt, "DROP FUNCTION avgPace"); //$NON-NLS-1$
          exec(stmt,
 
                UI.EMPTY_STRING
@@ -5671,7 +5693,8 @@ public class TourDatabase {
                      + "CREATE FUNCTION avgPace (tourTime BIGINT, tourDistance BIGINT)" + NL //                   //$NON-NLS-1$
                      + "RETURNS REAL" + NL //                                                                     //$NON-NLS-1$
                      + "PARAMETER STYLE JAVA" + NL //                                                             //$NON-NLS-1$
-                     + "NO SQL LANGUAGE JAVA" + NL //                                                             //$NON-NLS-1$
+                     + "NO SQL" + NL //                                                                           //$NON-NLS-1$
+                     + "LANGUAGE JAVA" + NL //                                                                    //$NON-NLS-1$
                      + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgPace'" + NL //      //$NON-NLS-1$
          );
 
@@ -5679,6 +5702,9 @@ public class TourDatabase {
 
       } catch (final SQLException e) {
          UI.showSQLException(e);
+
+      } catch (final IOException e) {
+         StatusUtil.log(e);
       }
    }
 

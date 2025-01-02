@@ -15,9 +15,12 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import net.tourbook.ui.ITourProvider;
+
 import org.eclipse.jface.action.IMenuManager;
 
 public interface IActionProvider {
 
-   public void fillActions(final IMenuManager menuMgr);
+   public void fillActions(final IMenuManager menuMgr,
+                           final ITourProvider tourProvider);
 }

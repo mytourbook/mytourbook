@@ -42,6 +42,7 @@ import net.tourbook.tag.TagMenuManager.Action_RemoveAllTags;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.printing.ActionPrint;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.views.rawData.ActionDeleteTourValues;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.ui.views.rawData.ActionReimportTours;
@@ -560,10 +561,12 @@ public class TourActionManager {
     *           Only actions with this category will be filled into the context menu
     * @param allCategoryActions
     *           Contains all actions with the same actionCategory {@link TourActionCategory}
+    * @param tourProvider
     */
    public static void fillContextMenu(final IMenuManager menuMgr,
                                       final TourActionCategory actionCategory,
-                                      final HashMap<String, Object> allCategoryActions) {
+                                      final HashMap<String, Object> allCategoryActions,
+                                      final ITourProvider tourProvider) {
 
       final List<TourAction> allActiveActions = getActiveActions();
 
@@ -584,7 +587,7 @@ public class TourActionManager {
 
          if (tourAction instanceof final IActionProvider actionProvider) {
 
-            actionProvider.fillActions(menuMgr);
+            actionProvider.fillActions(menuMgr, tourProvider);
 
          } else if (tourAction instanceof final IAction action) {
 

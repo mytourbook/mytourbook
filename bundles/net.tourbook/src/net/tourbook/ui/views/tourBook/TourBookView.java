@@ -2492,13 +2492,13 @@ public class TourBookView extends ViewPart implements
    private void fillContextMenu(final IMenuManager menuMgr, final boolean isTree) {
 
       // edit actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, this);
 
       // tag actions
-      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr);
+      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
 
       // tour type actions
-      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr);
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
 
       // tree only actions
       if (isTree) {
@@ -2512,10 +2512,10 @@ public class TourBookView extends ViewPart implements
       }
 
       // export actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export, this);
 
       // adjust actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.ADJUST, _allTourActions_Adjust);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.ADJUST, _allTourActions_Adjust, this);
 
       // customize this context menu
       TourActionManager.fillContextMenu_CustomizeAction(menuMgr)

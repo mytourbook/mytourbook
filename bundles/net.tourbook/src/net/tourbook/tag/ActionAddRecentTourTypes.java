@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tag;
 
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.IActionProvider;
 
 import org.eclipse.jface.action.IMenuManager;
@@ -25,16 +26,17 @@ import org.eclipse.jface.action.IMenuManager;
  */
 public class ActionAddRecentTourTypes implements IActionProvider {
 
-   public IActionProvider actionProvider;
+   private IActionProvider _actionProvider;
 
    public ActionAddRecentTourTypes(final IActionProvider actionProvider) {
 
-      this.actionProvider = actionProvider;
+      this._actionProvider = actionProvider;
    }
 
    @Override
-   public void fillActions(final IMenuManager menuMgr) {
+   public void fillActions(final IMenuManager menuMgr,
+                           final ITourProvider tourProvider) {
 
-      actionProvider.fillActions(menuMgr);
+      _actionProvider.fillActions(menuMgr, tourProvider);
    }
 }

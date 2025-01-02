@@ -78,14 +78,14 @@ public class TourTypeMenuManager implements IActionProvider {
     */
    private static boolean                 _isSaveTour;
 
-   private HashMap<String, Object>        _allTourTypeActions;
+   private static ITourProvider           _tourProvider;
 
-   private ITourProvider                  _tourProvider;
+   private HashMap<String, Object>        _allTourTypeActions;
 
    private ActionAddRecentTourTypes       _actionAddRecentTourTypes;
    private ActionSetTourTypeMenu          _actionSetTourType;
 
-   private class RecentTourTypeAction extends Action {
+   private static class RecentTourTypeAction extends Action {
 
       private TourType __tourType;
 
@@ -95,6 +95,8 @@ public class TourTypeMenuManager implements IActionProvider {
          setTourTypeIntoTour(
 
                __tourType,
+               _tourProvider,
+
                _isSaveTour,
 
                true // isCheckTourEditor - When true then the tour editor is check if it is dirty
@@ -123,6 +125,17 @@ public class TourTypeMenuManager implements IActionProvider {
             createRecentActions();
          }
       }
+   }
+
+   /**
+    * Adds the {@link TourType} to the list of the recently used tour types
+    *
+    * @param tourType
+    */
+   private static void addRecentTourType(final TourType tourType) {
+
+      _allRecentTourTypes.remove(tourType);
+      _allRecentTourTypes.addFirst(tourType);
    }
 
    public static void clearRecentTourTypes() {
@@ -182,6 +195,67 @@ public class TourTypeMenuManager implements IActionProvider {
       _state.put(STATE_TOUR_TYPE_ID, stateTourTypeIds);
    }
 
+   /**
+    * @param tourType
+    * @param tourProvider
+    * @param isSaveTour
+    * @param isCheckTourEditor
+    *           When <code>true</code> then the tour editor is check if it is dirty
+    */
+   public static void setTourTypeIntoTour(final TourType tourType,
+                                          final ITourProvider tourProvider,
+                                          final boolean isSaveTour,
+                                          final boolean isCheckTourEditor) {
+
+      // fix https://github.com/mytourbook/mytourbook/issues/1437
+      if (isCheckTourEditor) {
+
+         if (TourManager.isTourEditorModified()) {
+            return;
+         }
+      }
+
+      final Runnable runnable = new Runnable() {
+         @Override
+         public void run() {
+
+            final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
+            if (selectedTours == null || selectedTours.isEmpty()) {
+               return;
+            }
+
+            // set tour type in all tours (without tours which are opened in an editor)
+            for (final TourData tourData : selectedTours) {
+               tourData.setTourType(tourType);
+            }
+
+            // keep tour type for the recent menu
+            addRecentTourType(tourType);
+
+            if (isSaveTour) {
+
+               // save all tours with the modified tour type
+               TourManager.saveModifiedTours(selectedTours);
+
+            } else {
+
+               // tours are not saved but the tour provider must be notified
+
+               if (tourProvider instanceof final ITourProvider2 tourProvider2) {
+
+                  tourProvider2.toursAreModified(selectedTours);
+
+               } else {
+
+                  TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
+               }
+            }
+
+         }
+      };
+      BusyIndicator.showWhile(Display.getCurrent(), runnable);
+   }
+
    private void addPrefChangeListener() {
 
       _prefChangeListener = new IPropertyChangeListener() {
@@ -205,17 +279,6 @@ public class TourTypeMenuManager implements IActionProvider {
 
       // add pref listener
       _prefStore.addPropertyChangeListener(_prefChangeListener);
-   }
-
-   /**
-    * Adds the {@link TourType} to the list of the recently used tour types
-    *
-    * @param tourType
-    */
-   private void addRecentTourType(final TourType tourType) {
-
-      _allRecentTourTypes.remove(tourType);
-      _allRecentTourTypes.addFirst(tourType);
    }
 
    private void createActions() {
@@ -311,16 +374,18 @@ public class TourTypeMenuManager implements IActionProvider {
    }
 
    @Override
-   public void fillActions(final IMenuManager menuMgr) {
+   public void fillActions(final IMenuManager menuMgr,
+                           final ITourProvider tourProvider) {
 
-      fillMenuWithRecentTourTypes(menuMgr);
+      fillMenuWithRecentTourTypes(menuMgr, tourProvider);
    }
 
-   public void fillContextMenu_WithActiveActions(final IMenuManager menuMgr) {
+   public void fillContextMenu_WithActiveActions(final IMenuManager menuMgr,
+                                                 final ITourProvider tourProvider) {
 
       menuMgr.add(new Separator());
 
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.TOUR_TYPE, _allTourTypeActions);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.TOUR_TYPE, _allTourTypeActions, tourProvider);
    }
 
    /**
@@ -328,9 +393,9 @@ public class TourTypeMenuManager implements IActionProvider {
     *
     * @param menuMgr
     * @param tourProvider
-    * @param isSaveTour
     */
-   public void fillMenuWithRecentTourTypes(final IMenuManager menuMgr) {
+   public void fillMenuWithRecentTourTypes(final IMenuManager menuMgr,
+                                           final ITourProvider tourProvider) {
 
       if (_allRecentTourTypes.isEmpty()) {
          return;
@@ -340,6 +405,7 @@ public class TourTypeMenuManager implements IActionProvider {
          return;
       }
 
+      _tourProvider = tourProvider;
       _isSaveTour = true;
 
       // add tour types
@@ -366,65 +432,6 @@ public class TourTypeMenuManager implements IActionProvider {
 
    public HashMap<String, Object> getAllTourTypeActions() {
       return _allTourTypeActions;
-   }
-
-   /**
-    * @param tourType
-    * @param isSaveTour
-    * @param isCheckTourEditor
-    *           When <code>true</code> then the tour editor is check if it is dirty
-    */
-   public void setTourTypeIntoTour(final TourType tourType,
-                                   final boolean isSaveTour,
-                                   final boolean isCheckTourEditor) {
-
-      // fix https://github.com/mytourbook/mytourbook/issues/1437
-      if (isCheckTourEditor) {
-
-         if (TourManager.isTourEditorModified()) {
-            return;
-         }
-      }
-
-      final Runnable runnable = new Runnable() {
-         @Override
-         public void run() {
-
-            final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
-            if (selectedTours == null || selectedTours.isEmpty()) {
-               return;
-            }
-
-            // set tour type in all tours (without tours which are opened in an editor)
-            for (final TourData tourData : selectedTours) {
-               tourData.setTourType(tourType);
-            }
-
-            // keep tour type for the recent menu
-            addRecentTourType(tourType);
-
-            if (isSaveTour) {
-
-               // save all tours with the modified tour type
-               TourManager.saveModifiedTours(selectedTours);
-
-            } else {
-
-               // tours are not saved but the tour provider must be notified
-
-               if (_tourProvider instanceof final ITourProvider2 tourProvider2) {
-
-                  tourProvider2.toursAreModified(selectedTours);
-
-               } else {
-
-                  TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(selectedTours));
-               }
-            }
-
-         }
-      };
-      BusyIndicator.showWhile(Display.getCurrent(), runnable);
    }
 
    /**

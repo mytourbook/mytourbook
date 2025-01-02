@@ -45,7 +45,6 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.TreeColumnDefinition;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourType;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
@@ -1830,8 +1829,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       final boolean isOneTour = numTourItems == 1;
       boolean isDeviceTour = false;
 
-      final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-
       final TVICollatedTour firstElement = (TVICollatedTour) selection.getFirstElement();
       final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
       TourData firstSavedTour = null;
@@ -1914,13 +1911,13 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    private void fillContextMenu(final IMenuManager menuMgr) {
 
       // edit actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, this);
 
       // tag actions
-      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr);
+      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
 
       // tour type actions
-      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr);
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionComputeElevationGain);
@@ -1933,10 +1930,10 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       menuMgr.add(_actionCollapseAll);
 
       // export actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export, this);
 
       // adjust actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.ADJUST, _allTourActions_Adjust);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.ADJUST, _allTourActions_Adjust, this);
 
       // customize this context menu
       TourActionManager.fillContextMenu_CustomizeAction(menuMgr)
