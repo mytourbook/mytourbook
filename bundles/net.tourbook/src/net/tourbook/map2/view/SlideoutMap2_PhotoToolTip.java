@@ -44,8 +44,8 @@ import net.tourbook.common.widgets.ImageCanvas;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.photo.Histogram;
 import net.tourbook.photo.ILoadCallBack;
-import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoEventId;
@@ -228,6 +228,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private Label            _labelMessage;
 
+   private Histogram        _histogram;
    private PhotoImageCanvas _photoImageCanvas;
 
    private Cursor           _currentCursor;
@@ -342,9 +343,9 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       // show dialog with dark colors, this looks better for photos with the bright theme
       final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-      UI.setChildColors(parent.getShell(),
-            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND),
-            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
+//      UI.setChildColors(parent.getShell(),
+//            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND),
+//            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
    }
 
    @Override
@@ -443,7 +444,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
             .extendedMargins(0, 0, 0, 5)
             .numColumns(3)
             .applyTo(_containerPhotoOptions);
-      _containerPhotoOptions.setBackground(UI.SYS_COLOR_YELLOW);
+//      _containerPhotoOptions.setBackground(UI.SYS_COLOR_YELLOW);
       {
          {
             /*
@@ -470,6 +471,15 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
              * Expand/collapse slideout
              */
             UI.createToolbarAction(_containerPhotoOptions, _actionRestoreDefaults);
+         }
+         {
+            _histogram = new Histogram(_containerPhotoOptions);
+            GridDataFactory.fillDefaults()
+                  .grab(true, true)
+                  .span(3, 1)
+                  .hint(SWT.DEFAULT, 100)
+                  .applyTo(_histogram);
+
          }
       }
    }
@@ -600,6 +610,11 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       return new Point(
             (int) (ttDevX / deviceScaling),
             (int) (ttDevY / deviceScaling));
+   }
+
+   private Rectangle getHistogramCropArea() {
+
+      return _photo.isCropped ? _devCanvas_CropArea : null;
    }
 
    @Override
@@ -842,6 +857,8 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       setupPhotoCanvasListener();
 
       _photoImageCanvas.redraw();
+
+      _histogram.updateCropArea(getHistogramCropArea());
    }
 
    private void onPhoto_Mouse_10_Down(final MouseEvent mouseEvent) {
@@ -1029,6 +1046,8 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          updateCropArea_TopBottomLeftRight();
          updateCropArea_InPhoto();
+
+         _histogram.updateCropArea(getHistogramCropArea());
 
          isRedraw = true;
 
@@ -1790,6 +1809,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       final Image photoImage = getPhotoImage(_photo);
 
       _photoImageCanvas.setImage(photoImage, false);
+      _histogram.setImage(photoImage, getHistogramCropArea());
 
       if (photoImage == null || photoImage.isDisposed()) {
 
@@ -1878,6 +1898,8 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       _devCanvas_CropArea = new Rectangle(devCropStartX, devCropStartY, devCropEndX, devCropEndY);
 
       updateCropArea_TopBottomLeftRight();
+
+      _histogram.updateCropArea(getHistogramCropArea());
    }
 
    /**
@@ -1943,6 +1965,8 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
             devCropAreaY2);
 
       updateCropArea_TopBottomLeftRight();
+
+      _histogram.updateCropArea(getHistogramCropArea());
    }
 
    private void updateCropArea_FromStartEnd_Rel() {
