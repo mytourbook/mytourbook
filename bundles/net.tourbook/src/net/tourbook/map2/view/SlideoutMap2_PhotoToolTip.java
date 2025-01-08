@@ -614,7 +614,37 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private Rectangle getHistogramCropArea() {
 
-      return _photo.isCropped ? _devCanvas_CropArea : null;
+      if (_photo.isCropped == false || _photoImageBounds == null) {
+
+         return null;
+      }
+
+      final int photoX1 = _photoImageBounds.x;
+      final int photoX2 = _photoImageBounds.width;
+      final int photoY1 = _photoImageBounds.y;
+      final int photoY2 = _photoImageBounds.height;
+
+      final int cropX1 = _devCanvas_CropArea.x;
+      final int cropX2 = _devCanvas_CropArea.width;
+      final int cropY1 = _devCanvas_CropArea.y;
+      final int cropY2 = _devCanvas_CropArea.height;
+
+      final int histX1 = cropX1 - photoX1;
+      final int histY1 = cropY1 - photoY1;
+
+      final int histX2 = cropX2 - photoX1;
+      final int histY2 = cropY2 - photoY1;
+
+      final Rectangle histCropRect = new Rectangle(
+
+            histX1,
+            histY1,
+            histX2,
+            histY2
+
+      );
+
+      return histCropRect;
    }
 
    @Override

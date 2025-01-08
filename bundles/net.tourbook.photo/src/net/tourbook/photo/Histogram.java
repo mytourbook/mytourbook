@@ -152,6 +152,16 @@ public class Histogram extends Canvas implements PaintListener {
 
          yStart = cropY1;
          yEnd = cropY2;
+
+         if (UI.IS_4K_DISPLAY) {
+
+            // fix autoscaling
+
+            xStart = (int) (xStart * UI.HIDPI_SCALING);
+            yStart = (int) (yStart * UI.HIDPI_SCALING);
+            xEnd = (int) (xEnd * UI.HIDPI_SCALING);
+            yEnd = (int) (yEnd * UI.HIDPI_SCALING);
+         }
       }
 
       for (int dstY = yStart; dstY < yEnd; dstY++) {
@@ -171,16 +181,21 @@ public class Histogram extends Canvas implements PaintListener {
 
             } else {
 
-               blue = dstData[dataIndex + 0] & 0xFF;
+               red = dstData[dataIndex + 0] & 0xFF;
                green = dstData[dataIndex + 1] & 0xFF;
-               red = dstData[dataIndex + 2] & 0xFF;
+               blue = dstData[dataIndex + 2] & 0xFF;
             }
 
             if (alpha > 0) {
 
-               final int lumimance = (int) ((299 * red + 587 * green + 114 * blue) / 1000.0);
+               final int lumimance = (int) ((
 
-//               final int lumimance = red;
+               0
+                     + 299 * red
+                     + 587 * green
+                     + 114 * blue
+
+               ) / 1000.0);
 
                _allLuminances[lumimance]++;
             }
@@ -252,8 +267,10 @@ public class Histogram extends Canvas implements PaintListener {
 
          final int luminance = _allLuminances[lumIndex];
 
+         final int maxLuminance = _maxLuminance == 0 ? 1 : _maxLuminance;
+
          final int devX = graphWidth * lumIndex / 256;
-         final int devY = graphHeight * luminance / _maxLuminance;
+         final int devY = graphHeight * luminance / maxLuminance;
 
          gc.drawLine(
 
