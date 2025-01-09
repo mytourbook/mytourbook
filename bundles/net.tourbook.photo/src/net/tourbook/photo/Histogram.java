@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
 import net.tourbook.common.UI;
@@ -34,8 +33,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-
-import pixelitor.utils.ImageUtils;
 
 /**
  * Displays a histogram of a photo
@@ -83,33 +80,6 @@ public class Histogram extends Canvas implements PaintListener {
             onMouseExit(e);
          }
       });
-   }
-
-   private void calcBaseArrays(final BufferedImage image) {
-
-      if (_allLuminances == null) {
-         _allLuminances = new int[NUM_BINS];
-      } else {
-         Arrays.fill(_allLuminances, 0);
-      }
-
-      final int[] pixels = ImageUtils.getPixelArray(image);
-
-      for (final int rgb : pixels) {
-
-         final int a = (rgb >>> 24) & 0xFF;
-
-         if (a > 0) {
-
-            final int r = (rgb >>> 16) & 0xFF;
-            final int g = (rgb >>> 8) & 0xFF;
-            final int b = rgb & 0xFF;
-
-            final int lum = (int) (0.299 * r + 0.587 * g + 0.114 * b);
-
-            _allLuminances[lum]++;
-         }
-      }
    }
 
    /**

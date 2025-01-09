@@ -620,9 +620,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       }
 
       final int photoX1 = _photoImageBounds.x;
-      final int photoX2 = _photoImageBounds.width;
       final int photoY1 = _photoImageBounds.y;
-      final int photoY2 = _photoImageBounds.height;
 
       final int cropX1 = _devCanvas_CropArea.x;
       final int cropX2 = _devCanvas_CropArea.width;
@@ -1036,25 +1034,18 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       final boolean isMouseWithinPhoto = _photoImageBounds.contains(devMousePosition);
 
-      if (isMouseWithinPhoto == false) {
-
-         updateCursor(_photoCursor_Arrow);
-
-         return;
-      }
-
       /*
        * Mouse is within the photo
        */
 
-      int devStartX = _devCanvas_CropArea.x;
-      int devStartY = _devCanvas_CropArea.y;
-      int devEndX = _devCanvas_CropArea.width;
-      int devEndY = _devCanvas_CropArea.height;
+      int devCrop_StartX = _devCanvas_CropArea.x;
+      int devCrop_StartY = _devCanvas_CropArea.y;
+      int devCrop_EndX = _devCanvas_CropArea.width;
+      int devCrop_EndY = _devCanvas_CropArea.height;
 
       boolean isRedraw = false;
 
-      Cursor hoveredCursor = _photoCursor_Cross;
+      Cursor hoveredCursor = isMouseWithinPhoto ? _photoCursor_Cross : _photoCursor_Arrow;
 
       if (false
 
@@ -1090,10 +1081,10 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          updateCropArea_FromStartEnd();
 
-         devStartX = _devCanvas_CropArea.x;
-         devStartY = _devCanvas_CropArea.y;
-         devEndX = _devCanvas_CropArea.width;
-         devEndY = _devCanvas_CropArea.height;
+         devCrop_StartX = _devCanvas_CropArea.x;
+         devCrop_StartY = _devCanvas_CropArea.y;
+         devCrop_EndX = _devCanvas_CropArea.width;
+         devCrop_EndY = _devCanvas_CropArea.height;
 
          isRedraw = true;
 
@@ -1101,9 +1092,9 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
           * Set cursor direction according to the mouse moving, with try and error I found the
           * correct cursor :-)
           */
-         if (devEndX > devStartX) {
+         if (devCrop_EndX > devCrop_StartX) {
 
-            if (devEndY > devStartY) {
+            if (devCrop_EndY > devCrop_StartY) {
 
                hoveredCursor = _photoCursor_Size_ESE;
 
@@ -1114,7 +1105,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          } else {
 
-            if (devEndY > devStartY) {
+            if (devCrop_EndY > devCrop_StartY) {
 
                hoveredCursor = _photoCursor_Size_NESW;
 
@@ -1175,10 +1166,10 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       } else {
 
-         final int devWidth = devEndX - devStartX;
-         final int devHeight = devEndY - devStartY;
+         final int devWidth = devCrop_EndX - devCrop_StartX;
+         final int devHeight = devCrop_EndY - devCrop_StartY;
 
-         final Rectangle devCropRectangle = new Rectangle(devStartX, devStartY, devWidth, devHeight);
+         final Rectangle devCropRectangle = new Rectangle(devCrop_StartX, devCrop_StartY, devWidth, devHeight);
 
          if (devCropRectangle.contains(devMousePosition)) {
 
@@ -1222,11 +1213,33 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       final float relMouseX = relMouse.x;
       final float relMouseY = relMouse.y;
 
+      int devMouseXChecked = devMouseX;
+      int devMouseYChecked = devMouseY;
+
+      final int devPhotoX1 = _photoImageBounds.x;
+      final int devPhotoY1 = _photoImageBounds.y;
+
+      final int devPhotoX2 = devPhotoX1 + _photoImageBounds.width;
+      final int devPhotoY2 = devPhotoY1 + _photoImageBounds.height;
+
+      if (devMouseX < devPhotoX1) {
+         devMouseXChecked = devPhotoX1;
+      }
+      if (devMouseY < devPhotoY1) {
+         devMouseYChecked = devPhotoY1;
+      }
+      if (devMouseX > devPhotoX2) {
+         devMouseXChecked = devPhotoX2;
+      }
+      if (devMouseY > devPhotoY2) {
+         devMouseYChecked = devPhotoY2;
+      }
+
       if (_isMouseDown_InCropArea_Top) {
 
          if (relMouseY < _relPhoto_CropArea.height) {
 
-            _devCanvas_CropArea.y = devMouseY;
+            _devCanvas_CropArea.y = devMouseYChecked;
             _relPhoto_CropArea.y = relMouseY;
          }
 
@@ -1234,7 +1247,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          if (relMouseY > _relPhoto_CropArea.y) {
 
-            _devCanvas_CropArea.height = devMouseY;
+            _devCanvas_CropArea.height = devMouseYChecked;
             _relPhoto_CropArea.height = relMouseY;
          }
 
@@ -1242,7 +1255,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          if (relMouseX < _relPhoto_CropArea.width) {
 
-            _devCanvas_CropArea.x = devMouseX;
+            _devCanvas_CropArea.x = devMouseXChecked;
             _relPhoto_CropArea.x = relMouseX;
          }
 
@@ -1250,7 +1263,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          if (relMouseX > _relPhoto_CropArea.x) {
 
-            _devCanvas_CropArea.width = devMouseX;
+            _devCanvas_CropArea.width = devMouseXChecked;
             _relPhoto_CropArea.width = relMouseX;
          }
 
@@ -1258,8 +1271,8 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          if (relMouseY < _relPhoto_CropArea.height && relMouseX < _relPhoto_CropArea.width) {
 
-            _devCanvas_CropArea.x = devMouseX;
-            _devCanvas_CropArea.y = devMouseY;
+            _devCanvas_CropArea.x = devMouseXChecked;
+            _devCanvas_CropArea.y = devMouseYChecked;
 
             _relPhoto_CropArea.x = relMouseX;
             _relPhoto_CropArea.y = relMouseY;
@@ -1269,8 +1282,8 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          if (relMouseX > _relPhoto_CropArea.x && relMouseY < _relPhoto_CropArea.height) {
 
-            _devCanvas_CropArea.y = devMouseY;
-            _devCanvas_CropArea.width = devMouseX;
+            _devCanvas_CropArea.y = devMouseYChecked;
+            _devCanvas_CropArea.width = devMouseXChecked;
 
             _relPhoto_CropArea.y = relMouseY;
             _relPhoto_CropArea.width = relMouseX;
@@ -1280,8 +1293,8 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          if (relMouseX < _relPhoto_CropArea.width && relMouseY > _relPhoto_CropArea.y) {
 
-            _devCanvas_CropArea.x = devMouseX;
-            _devCanvas_CropArea.height = devMouseY;
+            _devCanvas_CropArea.x = devMouseXChecked;
+            _devCanvas_CropArea.height = devMouseYChecked;
 
             _relPhoto_CropArea.x = relMouseX;
             _relPhoto_CropArea.height = relMouseY;
@@ -1291,8 +1304,8 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
          if (relMouseX > _relPhoto_CropArea.x && relMouseY > _relPhoto_CropArea.y) {
 
-            _devCanvas_CropArea.width = devMouseX;
-            _devCanvas_CropArea.height = devMouseY;
+            _devCanvas_CropArea.width = devMouseXChecked;
+            _devCanvas_CropArea.height = devMouseYChecked;
 
             _relPhoto_CropArea.width = relMouseX;
             _relPhoto_CropArea.height = relMouseY;
@@ -1322,8 +1335,8 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
             final int devWidth = _devCanvas_CropArea.width - _devCanvas_CropArea.x;
             final int devHeight = _devCanvas_CropArea.height - _devCanvas_CropArea.y;
 
-            final int devX1 = devMouseX + _devCanvas_Offset.x;
-            final int devY1 = devMouseY + _devCanvas_Offset.y;
+            final int devX1 = devMouseXChecked + _devCanvas_Offset.x;
+            final int devY1 = devMouseYChecked + _devCanvas_Offset.y;
 
             final int devX2 = devX1 + devWidth;
             final int devY2 = devY1 + devHeight;
