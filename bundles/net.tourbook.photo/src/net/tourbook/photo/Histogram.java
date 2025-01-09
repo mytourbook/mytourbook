@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 
 import net.tourbook.common.UI;
@@ -29,7 +30,6 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -84,13 +84,13 @@ public class Histogram extends Canvas implements PaintListener {
 
    /**
     * @param imageData
-    * @param devCropArea
+    * @param relCropArea
     *           x = X1<br>
     *           y = Y1<br>
     *           width = X2<br>
     *           height = Y2
     */
-   private void computeLuminance(final ImageData imageData, final Rectangle devCropArea) {
+   private void computeLuminance(final ImageData imageData, final Rectangle2D.Float relCropArea) {
 
       Arrays.fill(_allLuminances, 0);
 
@@ -110,28 +110,24 @@ public class Histogram extends Canvas implements PaintListener {
       int yStart = 0;
       int yEnd = dstHeight;
 
-      if (devCropArea != null) {
+      if (relCropArea != null) {
 
-         final int cropX1 = devCropArea.x;
-         final int cropY1 = devCropArea.y;
-         final int cropX2 = devCropArea.width;
-         final int cropY2 = devCropArea.height;
+         final float relCropX1 = relCropArea.x;
+         final float relCropY1 = relCropArea.y;
 
-         xStart = cropX1;
-         xEnd = cropX2;
+         final float relCropX2 = relCropArea.width;
+         final float relCropY2 = relCropArea.height;
 
-         yStart = cropY1;
-         yEnd = cropY2;
+         final int devCropX1 = (int) (relCropX1 * dstWidth);
+         final int devCropY1 = (int) (relCropY1 * dstHeight);
+         final int devCropX2 = (int) (relCropX2 * dstWidth);
+         final int devCropY2 = (int) (relCropY2 * dstHeight);
 
-         if (UI.IS_4K_DISPLAY) {
+         xStart = devCropX1;
+         xEnd = devCropX2;
 
-            // fix autoscaling
-
-            xStart = (int) (xStart * UI.HIDPI_SCALING);
-            yStart = (int) (yStart * UI.HIDPI_SCALING);
-            xEnd = (int) (xEnd * UI.HIDPI_SCALING);
-            yEnd = (int) (yEnd * UI.HIDPI_SCALING);
-         }
+         yStart = devCropY1;
+         yEnd = devCropY2;
       }
 
       for (int dstY = yStart; dstY < yEnd; dstY++) {
@@ -182,21 +178,6 @@ public class Histogram extends Canvas implements PaintListener {
       }
 
       _maxLuminance = maxLuminance;
-   }
-
-   @Override
-   public Point computeSize(final int wHint, final int hHint, final boolean changed) {
-
-      checkWidget();
-
-//      final int width = MAX_RATING_STARS_WIDTH;
-//      final int height = _ratingStarImageHeight;
-//
-//      final Point e = new Point(width, height);
-
-      final Point e = new Point(wHint, hHint);
-
-      return e;
    }
 
    private void onMouseDown(final MouseEvent e) {
@@ -251,7 +232,7 @@ public class Histogram extends Canvas implements PaintListener {
       }
    }
 
-   public void setImage(final Image image, final Rectangle devCropArea) {
+   public void setImage(final Image image, final Rectangle2D.Float relCropArea) {
 
       if (image == null || image.isDisposed()) {
 
@@ -263,18 +244,18 @@ public class Histogram extends Canvas implements PaintListener {
 
       _imageData = image.getImageData();
 
-      computeLuminance(_imageData, devCropArea);
+      computeLuminance(_imageData, relCropArea);
 
       redraw();
    }
 
-   public void updateCropArea(final Rectangle devCropArea) {
+   public void updateCropArea(final Rectangle2D.Float relCropArea) {
 
       if (_imageData == null) {
          return;
       }
 
-      computeLuminance(_imageData, devCropArea);
+      computeLuminance(_imageData, relCropArea);
 
       redraw();
    }

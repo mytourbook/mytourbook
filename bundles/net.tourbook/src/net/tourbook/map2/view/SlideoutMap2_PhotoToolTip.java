@@ -612,7 +612,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
             (int) (ttDevY / deviceScaling));
    }
 
-   private Rectangle getHistogramCropArea() {
+   private Rectangle2D.Float getHistogramCropArea() {
 
       if (_photo.isCropped == false || _photoImageBounds == null) {
 
@@ -642,7 +642,9 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       );
 
-      return histCropRect;
+      return _relPhoto_CropArea;
+
+//      return histCropRect;
    }
 
    @Override
@@ -1920,11 +1922,11 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          return;
       }
 
-      final float relCropStartX = _relPhoto_CropArea.x;
-      final float relCropStartY = _relPhoto_CropArea.y;
+      final float relCropX1 = _relPhoto_CropArea.x;
+      final float relCropY1 = _relPhoto_CropArea.y;
 
-      final float relCropEndX = _relPhoto_CropArea.width;
-      final float relCropEndY = _relPhoto_CropArea.height;
+      final float relCropX2 = _relPhoto_CropArea.width;
+      final float relCropY2 = _relPhoto_CropArea.height;
 
       final int devPhotoX = photoImageBounds.x;
       final int devPhotoY = photoImageBounds.y;
@@ -1932,11 +1934,11 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       final float devPhotoWidth = photoImageBounds.width;
       final float devPhotoHeight = photoImageBounds.height;
 
-      final int devCropStartX = (int) (devPhotoX + relCropStartX * devPhotoWidth);
-      final int devCropStartY = (int) (devPhotoY + relCropStartY * devPhotoHeight);
+      final int devCropStartX = (int) (devPhotoX + relCropX1 * devPhotoWidth);
+      final int devCropStartY = (int) (devPhotoY + relCropY1 * devPhotoHeight);
 
-      final int devCropEndX = (int) (devPhotoX + relCropEndX * devPhotoWidth);
-      final int devCropEndY = (int) (devPhotoY + relCropEndY * devPhotoHeight);
+      final int devCropEndX = (int) (devPhotoX + relCropX2 * devPhotoWidth);
+      final int devCropEndY = (int) (devPhotoY + relCropY2 * devPhotoHeight);
 
       _devCanvas_CropArea = new Rectangle(devCropStartX, devCropStartY, devCropEndX, devCropEndY);
 
