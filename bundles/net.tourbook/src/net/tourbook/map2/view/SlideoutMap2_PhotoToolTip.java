@@ -1321,22 +1321,26 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          int devX2 = devX1 + devCropWidth;
          int devY2 = devY1 + devCropHeight;
 
-// SET_FORMATTING_OFF
-
          // fix photo bounds
-         if (relMouseX1 < 0) { relMouseX1 = 0;  }
-         if (relMouseX1 > 1) { relMouseX1 = 1;  }
+         if (relMouseX1 < 0) {
+            relMouseX1 = 0;
+            relMouseX2 = relCropWidth;
+         }
 
-         if (relMouseY1 < 0) { relMouseY1 = 0;  }
-         if (relMouseY1 > 1) { relMouseY1 = 1;  }
+         if (relMouseY1 < 0) {
+            relMouseY1 = 0;
+            relMouseY2 = relCropHeight;
+         }
 
-         if (relMouseX2 < 0) { relMouseX2 = 0;  }
-         if (relMouseX2 > 1) { relMouseX2 = 1;  }
+         if (relMouseX2 > 1) {
+            relMouseX1 = 1 - relCropWidth;
+            relMouseX2 = 1;
+         }
 
-         if (relMouseY2 < 0) { relMouseY2 = 0;  }
-         if (relMouseY2 > 1) { relMouseY2 = 1;  }
-
-// SET_FORMATTING_ON
+         if (relMouseY2 > 1) {
+            relMouseY1 = 1 - relCropHeight;
+            relMouseY2 = 1;
+         }
 
          if (devX1 < devPhotoX1) {
             devX1 = devPhotoX1;
