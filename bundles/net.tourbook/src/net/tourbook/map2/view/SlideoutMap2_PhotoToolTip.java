@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,8 +46,10 @@ import net.tourbook.data.TourPhoto;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.Histogram;
 import net.tourbook.photo.ILoadCallBack;
+import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoAdjustments;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
@@ -346,9 +348,9 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       // show dialog with dark colors, this looks better for photos with the bright theme
       final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-//      UI.setChildColors(parent.getShell(),
-//            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND),
-//            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
+      UI.setChildColors(parent.getShell(),
+            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND),
+            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
    }
 
    @Override
@@ -2175,17 +2177,11 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
             + "UPDATE " + TourDatabase.TABLE_TOUR_PHOTO + NL //$NON-NLS-1$
 
-            + " SET" + NL //                                //$NON-NLS-1$
+            + " SET" + NL //                                   //$NON-NLS-1$
 
-            + " isPhotoCropped = ?,    " + NL //            //$NON-NLS-1$
+            + " photoAdjustmentsJSON = ?  " + NL //            //$NON-NLS-1$
 
-            + " cropAreaX1 = ?,        " + NL //            //$NON-NLS-1$
-            + " cropAreaY1 = ?,        " + NL //            //$NON-NLS-1$
-
-            + " cropAreaX2 = ?,        " + NL //            //$NON-NLS-1$
-            + " cropAreaY2 = ?         " + NL //            //$NON-NLS-1$
-
-            + " WHERE photoId = ?      " + NL //            //$NON-NLS-1$
+            + " WHERE photoId = ?         " + NL //            //$NON-NLS-1$
       ;
 
       try (final Connection conn = TourDatabase.getInstance().getConnection();
@@ -2199,20 +2195,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
             for (final TourPhotoReference photoRef : photoRefs) {
 
-               /*
-                * Update db
-                */
-               sqlUpdate.setBoolean(1, photo.isCropped);
-
-               sqlUpdate.setFloat(2, photo.cropAreaX1);
-               sqlUpdate.setFloat(3, photo.cropAreaY1);
-
-               sqlUpdate.setFloat(4, photo.cropAreaX2);
-               sqlUpdate.setFloat(5, photo.cropAreaY2);
-
-               sqlUpdate.setLong(6, photoRef.photoId);
-
-               sqlUpdate.executeUpdate();
+               TourPhoto dbTourPhoto = null;
 
                /*
                 * Update tour photo
@@ -2224,16 +2207,36 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
                   if (tourPhoto.getPhotoId() == photoRef.photoId) {
 
-                     tourPhoto.setPhotoCropped(photo.isCropped);
+                     dbTourPhoto = tourPhoto;
 
-                     tourPhoto.setCropAreaX1(photo.cropAreaX1);
-                     tourPhoto.setCropAreaY1(photo.cropAreaY1);
+                     final PhotoAdjustments photoAdjustments = tourPhoto.getPhotoAdjustments(true);
 
-                     tourPhoto.setCropAreaX2(photo.cropAreaX2);
-                     tourPhoto.setCropAreaY2(photo.cropAreaY2);
+                     photoAdjustments.isPhotoCropped = photo.isCropped;
+
+                     photoAdjustments.cropAreaX1 = photo.cropAreaX1;
+                     photoAdjustments.cropAreaY1 = photo.cropAreaY1;
+
+                     photoAdjustments.cropAreaX2 = photo.cropAreaX2;
+                     photoAdjustments.cropAreaY2 = photo.cropAreaY2;
 
                      break;
                   }
+               }
+
+               /*
+                * Update db
+                */
+               if (dbTourPhoto != null) {
+
+                  // update json
+                  dbTourPhoto.updatePhotoAdjustments();
+
+                  final String photoAdjustmentsJSON = dbTourPhoto.getPhotoAdjustmentsJSON();
+
+                  sqlUpdate.setString(1, photoAdjustmentsJSON);
+                  sqlUpdate.setLong(2, photoRef.photoId);
+
+                  sqlUpdate.executeUpdate();
                }
             }
 

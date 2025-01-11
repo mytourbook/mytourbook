@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -178,6 +178,7 @@ public class TourDatabase {
    private static final char   NL                                         = UI.NEW_LINE;
 
    private static final int    MAX_TRIES_TO_PING_SERVER                   = 10;
+   public static final int     VARCHAR_MAX_LENGTH                         = 32_672;
 
    private static final String NUMBER_FORMAT_1F                           = "%.1f";                                                  //$NON-NLS-1$
 
@@ -5143,19 +5144,13 @@ public class TourDatabase {
             + "   ratingStars                INT DEFAULT 0,                            " + NL //$NON-NLS-1$
             + "   isGeoFromPhoto             INT DEFAULT 0,                            " + NL //$NON-NLS-1$
             + "   latitude                   DOUBLE DEFAULT 0,                         " + NL //$NON-NLS-1$
-            + "   longitude                  DOUBLE DEFAULT 0                          " + NL //$NON-NLS-1$
+            + "   longitude                  DOUBLE DEFAULT 0,                         " + NL //$NON-NLS-1$
 
             // version 23 end
 
             // version 56 start
 
-            + "   isPhotoCropped             BOOLEAN  DEFAULT FALSE,                   " + NL //$NON-NLS-1$
-
-            + "   cropAreaX1                 FLOAT DEFAULT 0                           " + NL //$NON-NLS-1$
-            + "   cropAreaY1                 FLOAT DEFAULT 0                           " + NL //$NON-NLS-1$
-
-            + "   cropAreaX2                 FLOAT DEFAULT 0                           " + NL //$NON-NLS-1$
-            + "   cropAreaY2                 FLOAT DEFAULT 0                           " + NL //$NON-NLS-1$
+            + "   photoAdjustmentsJSON       VARCHAR(" + VARCHAR_MAX_LENGTH + ")       " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 56 end
 
@@ -10795,16 +10790,7 @@ public class TourDatabase {
 
       try (final Statement stmt = conn.createStatement()) {
 
-// SET_FORMATTING_OFF
-
-         // Add new columns
-         SQL.AddColumn_Boolean(stmt, TABLE_TOUR_PHOTO, "isPhotoCropped",   DEFAULT_FALSE);      //$NON-NLS-1$
-         SQL.AddColumn_Float  (stmt, TABLE_TOUR_PHOTO, "cropAreaX1",       DEFAULT_0);          //$NON-NLS-1$
-         SQL.AddColumn_Float  (stmt, TABLE_TOUR_PHOTO, "cropAreaY1",       DEFAULT_0);          //$NON-NLS-1$
-         SQL.AddColumn_Float  (stmt, TABLE_TOUR_PHOTO, "cropAreaX2",       DEFAULT_0);          //$NON-NLS-1$
-         SQL.AddColumn_Float  (stmt, TABLE_TOUR_PHOTO, "cropAreaY2",       DEFAULT_0);          //$NON-NLS-1$
-
-// SET_FORMATTING_ON
+         SQL.AddColumn_VarCar(stmt, TABLE_TOUR_PHOTO, "photoAdjustmentsJSON", VARCHAR_MAX_LENGTH); //$NON-NLS-1$
       }
 
       logDbUpdate_End(newDbVersion);

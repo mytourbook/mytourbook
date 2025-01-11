@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -90,6 +90,7 @@ import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.math.Smooth;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoAdjustments;
 import net.tourbook.photo.PhotoCache;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.srtm.ElevationSRTM1;
@@ -6487,11 +6488,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          galleryPhoto.adjustedTime_Tour = tourPhoto.getAdjustedTime();
          galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
 
-         galleryPhoto.isCropped = tourPhoto.isPhotoCropped();
-         galleryPhoto.cropAreaX1 = tourPhoto.getCropAreaX1();
-         galleryPhoto.cropAreaY1 = tourPhoto.getCropAreaY1();
-         galleryPhoto.cropAreaX2 = tourPhoto.getCropAreaX2();
-         galleryPhoto.cropAreaY2 = tourPhoto.getCropAreaY2();
+         final PhotoAdjustments photoAdjustments = tourPhoto.getPhotoAdjustments(false);
+
+         if (photoAdjustments != null) {
+
+            galleryPhoto.isCropped = photoAdjustments.isPhotoCropped;
+
+            galleryPhoto.cropAreaX1 = photoAdjustments.cropAreaX1;
+            galleryPhoto.cropAreaY1 = photoAdjustments.cropAreaY1;
+            galleryPhoto.cropAreaX2 = photoAdjustments.cropAreaX2;
+            galleryPhoto.cropAreaY2 = photoAdjustments.cropAreaY2;
+         }
 
          /*
           * Set adjusted time with time zone
