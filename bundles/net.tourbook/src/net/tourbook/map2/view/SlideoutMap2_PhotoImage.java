@@ -44,8 +44,6 @@ import net.tourbook.common.widgets.ImageCanvas;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.photo.Histogram;
-import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
@@ -98,7 +96,7 @@ import org.eclipse.ui.part.PageBook;
 /**
  * Slideout for the 2D map photo tooltip
  */
-public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActionResetToDefault {
+public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IActionResetToDefault {
 
    private static final String          ID                                = "net.tourbook.map2.view.MapPointToolTip_Photo"; //$NON-NLS-1$
 
@@ -233,7 +231,6 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    private Label            _labelMessage;
 
-   private Histogram        _histogram;
    private PhotoImageCanvas _photoImageCanvas;
 
    private Cursor           _currentCursor;
@@ -281,18 +278,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       }
    }
 
-   private class PhotoImageLoaderCallback implements ILoadCallBack {
-
-      @Override
-      public void callBackImageIsLoaded(final boolean isUpdateUI) {
-
-         if (isUpdateUI) {
-            onImageIsLoaded();
-         }
-      }
-   }
-
-   public SlideoutMap2_PhotoToolTip(final Map2 map2) {
+   public SlideoutMap2_PhotoImage(final Map2 map2) {
 
       super(map2, _state, null);
 
@@ -477,15 +463,6 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
              */
             UI.createToolbarAction(_containerPhotoOptions, _actionRestoreDefaults);
          }
-         {
-            _histogram = new Histogram(_containerPhotoOptions);
-            GridDataFactory.fillDefaults()
-                  .grab(true, true)
-                  .span(3, 1)
-                  .hint(SWT.DEFAULT, 100)
-                  .applyTo(_histogram);
-
-         }
       }
    }
 
@@ -664,11 +641,11 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
             // the requested image is not available in the image cache -> image must be loaded
 
-            final ILoadCallBack imageLoadCallback = new PhotoImageLoaderCallback();
+            PhotoLoadManager.putImageInLoadingQueueHQ_Map(
 
-            PhotoLoadManager.putImageInLoadingQueueHQ_Map(photo,
+                  photo,
                   requestedImageQuality,
-                  imageLoadCallback);
+                  _map2.getPhotoTooltipImageLoaderCallback());
          }
       }
 
@@ -830,7 +807,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
    }
 
-   private void onImageIsLoaded() {
+   public void onImageIsLoaded() {
 
       final PaintedMapPoint hoveredMapPoint = _hoveredMapPoint;
 
@@ -870,7 +847,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       _photoImageCanvas.redraw();
 
-      _histogram.updateCropArea(getHistogramCropArea());
+      _map2.updateHistogramCropArea(getHistogramCropArea());
    }
 
    private void onPhoto_Mouse_10_Down(final MouseEvent mouseEvent) {
@@ -1052,7 +1029,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
          updateCropArea_TopBottomLeftRight();
          updateCropArea_InPhoto();
 
-         _histogram.updateCropArea(getHistogramCropArea());
+         _map2.updateHistogramCropArea(getHistogramCropArea());
 
          isRedraw = true;
 
@@ -1872,7 +1849,6 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
       final Image photoImage = getPhotoImage(_photo);
 
       _photoImageCanvas.setImage(photoImage, false);
-      _histogram.setImage(photoImage, getHistogramCropArea());
 
       if (photoImage == null || photoImage.isDisposed()) {
 
@@ -1962,7 +1938,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       updateCropArea_TopBottomLeftRight();
 
-      _histogram.updateCropArea(getHistogramCropArea());
+      _map2.updateHistogramCropArea(getHistogramCropArea());
    }
 
    /**
@@ -2029,7 +2005,7 @@ public class SlideoutMap2_PhotoToolTip extends AdvancedSlideout implements IActi
 
       updateCropArea_TopBottomLeftRight();
 
-      _histogram.updateCropArea(getHistogramCropArea());
+      _map2.updateHistogramCropArea(getHistogramCropArea());
    }
 
    private void updateCropArea_FromStartEnd_Rel() {

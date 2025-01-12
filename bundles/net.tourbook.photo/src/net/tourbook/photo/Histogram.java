@@ -251,7 +251,8 @@ public class Histogram extends Canvas implements PaintListener {
 
    public void updateCropArea(final Rectangle2D.Float relCropArea) {
 
-      if (_imageData == null) {
+
+      if (_imageData == null || isDisposed()) {
          return;
       }
 

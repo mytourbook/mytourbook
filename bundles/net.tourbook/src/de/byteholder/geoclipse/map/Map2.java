@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -62,6 +62,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -122,8 +123,9 @@ import net.tourbook.map2.view.MapPointStatistics;
 import net.tourbook.map2.view.MapPointToolTip;
 import net.tourbook.map2.view.MapPointType;
 import net.tourbook.map2.view.SelectionMapSelection;
+import net.tourbook.map2.view.SlideoutMap2_PhotoHistogram;
+import net.tourbook.map2.view.SlideoutMap2_PhotoImage;
 import net.tourbook.map2.view.SlideoutMap2_PhotoOptions;
-import net.tourbook.map2.view.SlideoutMap2_PhotoToolTip;
 import net.tourbook.map2.view.TourMapPainter;
 import net.tourbook.map25.layer.marker.ScreenUtils;
 import net.tourbook.map25.layer.marker.algorithm.distance.Cluster;
@@ -463,12 +465,14 @@ public class Map2 extends Canvas {
    private boolean                         _isInHoveredRatingStar;
    private boolean                         _isMarkerClusterSelected;
    private MapPointToolTip                 _mapPointTooltip;
-   private SlideoutMap2_PhotoToolTip       _mapPointTooltip_Photo;
+   private SlideoutMap2_PhotoImage         _mapPointTooltip_PhotoImage;
+   private SlideoutMap2_PhotoHistogram     _mapPointTooltip_PhotoHistogram;
    private boolean                         _isPreloadHQImages;
    private boolean                         _isEnlargeSmallImages;
    private boolean                         _isShowHQPhotoImages;
    private boolean                         _isShowPhotoAdjustments;
    private final ILoadCallBack             _photoImageLoaderCallback        = new PhotoImageLoaderCallback();
+   private final ILoadCallBack             _photoTooltipImageLoaderCallback = new PhotoTooltipImageLoaderCallback();
 
    /** Number of created map points */
    private int                             _numStatistics_AllCommonLocations;
@@ -838,6 +842,19 @@ public class Map2 extends Canvas {
       }
    }
 
+   private class PhotoTooltipImageLoaderCallback implements ILoadCallBack {
+
+      @Override
+      public void callBackImageIsLoaded(final boolean isUpdateUI) {
+
+         if (isUpdateUI) {
+
+            _mapPointTooltip_PhotoImage.onImageIsLoaded();
+            _mapPointTooltip_PhotoHistogram.onImageIsLoaded();
+         }
+      }
+   }
+
    /**
     * This callback is called when a tile image was loaded and is set into the tile
     */
@@ -905,11 +922,12 @@ public class Map2 extends Canvas {
 
       _imageMapLocationBounds          = new Point(_imageMapLocation_Hovered.getWidth(), _imageMapLocation_Hovered.getHeight());
 
+      _mapLocation_Tooltip             = new MapLocationToolTip(this);
+      _mapPointTooltip                 = new MapPointToolTip(this);
+      _mapPointTooltip_PhotoImage      = new SlideoutMap2_PhotoImage(this);
+      _mapPointTooltip_PhotoHistogram  = new SlideoutMap2_PhotoHistogram(this);
+      
 // SET_FORMATTING_ON
-
-      _mapLocation_Tooltip = new MapLocationToolTip(this);
-      _mapPointTooltip = new MapPointToolTip(this);
-      _mapPointTooltip_Photo = new SlideoutMap2_PhotoToolTip(this);
 
       _poiImage = TourbookPlugin.getImageDescriptor(Images.POI_InMap).createImage();
       _poiImageBounds = _poiImage.getBounds();
@@ -2949,6 +2967,11 @@ public class Map2 extends Canvas {
       return awtThumbImage;
    }
 
+   public ILoadCallBack getPhotoTooltipImageLoaderCallback() {
+
+      return _photoTooltipImageLoaderCallback;
+   }
+
    private PoiToolTip getPoiTooltip() {
 
       if (_poi_Tooltip == null) {
@@ -3621,7 +3644,8 @@ public class Map2 extends Canvas {
 
    public void hidePhotoTooltip() {
 
-      _mapPointTooltip_Photo.hideNow();
+      _mapPointTooltip_PhotoImage.hideNow();
+      _mapPointTooltip_PhotoHistogram.hideNow();
    }
 
    private void hideTourTooltipHoveredArea() {
@@ -4871,11 +4895,13 @@ public class Map2 extends Canvas {
 
             // a photo is hovered -> show photo tooltip
 
-            _mapPointTooltip_Photo.setupPhoto(_hoveredMapPoint);
+            _mapPointTooltip_PhotoImage.setupPhoto(_hoveredMapPoint);
+            _mapPointTooltip_PhotoHistogram.setupPhoto(_hoveredMapPoint);
 
          } else {
 
-            _mapPointTooltip_Photo.setupPhoto(null);
+            _mapPointTooltip_PhotoImage.setupPhoto(null);
+            _mapPointTooltip_PhotoHistogram.setupPhoto(null);
          }
       }
 
@@ -10238,7 +10264,8 @@ public class Map2 extends Canvas {
       _hoveredMapPoint = null;
 
       _mapPointTooltip.hide();
-      _mapPointTooltip_Photo.hide();
+      _mapPointTooltip_PhotoImage.hide();
+      _mapPointTooltip_PhotoHistogram.hide();
    }
 
    public void resetMapPoints() {
@@ -11383,6 +11410,11 @@ public class Map2 extends Canvas {
 
             // no opacity
             : 0xff;
+   }
+
+   public void updateHistogramCropArea(final Rectangle2D.Float histogramCropArea) {
+
+      _mapPointTooltip_PhotoHistogram.updateCropArea(histogramCropArea);
    }
 
    public void updateMapOptions() {

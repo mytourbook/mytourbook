@@ -1,0 +1,751 @@
+/*******************************************************************************
+ * Copyright (C) 2025 Wolfgang Schramm and Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
+package net.tourbook.map2.view;
+
+import de.byteholder.geoclipse.map.Map2;
+import de.byteholder.geoclipse.map.PaintedMapPoint;
+
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.Rectangle2D.Float;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.action.IActionResetToDefault;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.tooltip.AdvancedSlideout;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourPhoto;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.photo.Histogram;
+import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.ImageQuality;
+import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoAdjustments;
+import net.tourbook.photo.PhotoEventId;
+import net.tourbook.photo.PhotoImageCache;
+import net.tourbook.photo.PhotoLoadManager;
+import net.tourbook.photo.PhotoLoadingState;
+import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.TourPhotoReference;
+import net.tourbook.tour.TourManager;
+
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.part.PageBook;
+
+/**
+ * Slideout for the 2D map photo tooltip
+ */
+public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IActionResetToDefault {
+
+   private static final String          ID     = "net.tourbook.map2.view.SlideoutMap2_PhotoHistogram"; //$NON-NLS-1$
+
+   private static final char            NL     = UI.NEW_LINE;
+
+   private final static IDialogSettings _state = TourbookPlugin.getState(ID);
+
+   private Map2                         _map2;
+
+   private PaintedMapPoint              _hoveredMapPoint;
+   private PaintedMapPoint              _previousHoveredMapPoint;
+   private Photo                        _photo;
+
+   private Float                        _relPhoto_CropArea;
+
+   /*
+    * UI controls
+    */
+   private PageBook  _pageBook;
+
+   private Composite _pageNoPhoto;
+   private Composite _pagePhoto;
+
+   private Button    _chkAdjustCurves;
+
+   private Label     _labelMessage;
+
+   private Histogram _histogram;
+
+   public SlideoutMap2_PhotoHistogram(final Map2 map2) {
+
+      super(map2, _state, null);
+
+      _map2 = map2;
+
+      // prevent that the opened slideout is partly hidden
+      setIsForceBoundsToBeInsideOfViewport(true);
+
+      // ensure the tooltip header actions are displayed with the dark theme icons
+      setDarkThemeForToolbarActions();
+   }
+
+   @Override
+   public void close() {
+
+      Map2PointManager.setMapLocationSlideout(null);
+
+      super.close();
+   }
+
+   private void createActions() {
+
+   }
+
+   @Override
+   protected void createSlideoutContent(final Composite parent) {
+
+      initUI(parent);
+      createActions();
+
+      createUI_00_Tooltip(parent);
+
+      setupPhoto_UI(_hoveredMapPoint);
+
+      restoreState();
+
+      // show dialog with dark colors, this looks better for photos with the bright theme
+      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+      UI.setChildColors(parent.getShell(),
+            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND),
+            colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
+   }
+
+   private void createUI_00_Tooltip(final Composite parent) {
+
+      _pageBook = new PageBook(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
+
+      _pagePhoto = createUI_10_Histogram(_pageBook);
+      _pageNoPhoto = createUI_90_NoPhoto(_pageBook);
+
+      _pageBook.showPage(_pageNoPhoto);
+   }
+
+   private Composite createUI_10_Histogram(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults()
+            .numColumns(1)
+            .spacing(0, 0)
+            .applyTo(container);
+      container.setBackground(UI.SYS_COLOR_GREEN);
+      {
+         createUI_20_PhotoOptions(container);
+      }
+
+      return container;
+   }
+
+   private void createUI_20_PhotoOptions(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+            .grab(true, true)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1)
+            .extendedMargins(0, 0, 0, 5)
+            .numColumns(1)
+            .applyTo(container);
+//      _containerPhotoOptions.setBackground(UI.SYS_COLOR_YELLOW);
+      {
+         {
+            /*
+             * Adjust curves
+             */
+            _chkAdjustCurves = new Button(container, SWT.CHECK);
+            _chkAdjustCurves.setText("&Adjust curves");
+            _chkAdjustCurves.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onPhoto_AdjustCurves()));
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_chkAdjustCurves);
+
+         }
+         {
+            _histogram = new Histogram(container);
+            GridDataFactory.fillDefaults()
+                  .grab(true, true)
+                  .hint(SWT.DEFAULT, 100)
+                  .applyTo(_histogram);
+
+         }
+      }
+   }
+
+   private Composite createUI_90_NoPhoto(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         _labelMessage = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults()
+               .align(SWT.CENTER, SWT.CENTER)
+               .grab(true, true)
+               .applyTo(_labelMessage);
+      }
+
+      return container;
+   }
+
+   private Point fixupDisplayBounds(final Point ttSize_Unscaled, final Point ttPos_Scaled) {
+
+      final float deviceScaling = _map2.getDeviceScaling();
+
+      final Rectangle mapBounds = _map2.getBounds();
+      final Point mapDisplayPosition = _map2.toDisplay(mapBounds.x, mapBounds.y);
+
+      final int mapDisplayPosX_Scaled = (int) (mapDisplayPosition.x * deviceScaling);
+
+      final Point ttPosn_Unscaled = new Point(
+            (int) (ttPos_Scaled.x / deviceScaling),
+            (int) (ttPos_Scaled.y / deviceScaling));
+
+      final Rectangle displayBounds = UI.getDisplayBounds(_map2, ttPosn_Unscaled);
+
+      final Rectangle displayBounds_Scaled = new Rectangle(
+            (int) (displayBounds.x * deviceScaling),
+            (int) (displayBounds.y * deviceScaling),
+            (int) (displayBounds.width * deviceScaling),
+            (int) (displayBounds.height * deviceScaling));
+
+      final int ttWidth = (int) (ttSize_Unscaled.x * deviceScaling);
+      final int ttHeight = (int) (ttSize_Unscaled.y * deviceScaling);
+      final Point ttBottomRight = new Point(ttPos_Scaled.x + ttWidth, ttPos_Scaled.y + ttHeight);
+
+      final boolean isTooltipInDisplay = displayBounds_Scaled.contains(ttPos_Scaled);
+      final boolean isTTBottomRightInDisplay = displayBounds_Scaled.contains(ttBottomRight);
+
+      final int displayWidth_Scaled = displayBounds_Scaled.width;
+      final int displayHeight_Scaled = displayBounds_Scaled.height;
+      final int displayX_Scaled = displayBounds_Scaled.x;
+      final int displayY_Scaled = displayBounds_Scaled.y;
+
+      final Rectangle photoBounds_Scaled = _hoveredMapPoint.labelRectangle;
+
+      final int photoWidth = photoBounds_Scaled.width;
+      final int photoHeight = photoBounds_Scaled.height;
+
+      final int photoLeft = photoBounds_Scaled.x;
+      final int photoRight = photoLeft + photoWidth;
+      final int photoTop = photoBounds_Scaled.y;
+
+      final Map2Point mapPoint = _hoveredMapPoint.mapPoint;
+      final int mapPointDevY = mapPoint.geoPointDevY;
+
+      int ttDevX = ttPos_Scaled.x;
+      int ttDevY = ttPos_Scaled.y;
+
+      if ((isTooltipInDisplay && isTTBottomRightInDisplay) == false) {
+
+         if (ttBottomRight.x > displayX_Scaled + displayWidth_Scaled) {
+
+            ttDevX -= ttBottomRight.x - (displayX_Scaled + displayWidth_Scaled);
+
+            // do not overlap the photo with the tooltip
+            if (photoTop > mapPointDevY) {
+
+               ttDevY += photoHeight;
+
+            } else {
+
+               ttDevY -= photoHeight;
+            }
+         }
+
+         if (ttBottomRight.y > displayY_Scaled + displayHeight_Scaled - photoHeight) {
+
+            ttDevY -= ttBottomRight.y - (displayY_Scaled + displayHeight_Scaled);
+
+            ttDevX = displayX_Scaled + mapDisplayPosX_Scaled + photoLeft - ttWidth;
+         }
+
+         if (ttDevX < displayX_Scaled) {
+
+            ttDevX = displayX_Scaled + mapDisplayPosX_Scaled + photoRight;
+         }
+
+         if (ttDevY < displayY_Scaled) {
+
+            ttDevY = displayY_Scaled;
+
+            ttDevX = displayX_Scaled + mapDisplayPosX_Scaled + photoLeft - ttWidth;
+         }
+
+         if (ttDevX < displayX_Scaled) {
+
+            ttDevX = displayX_Scaled + mapDisplayPosX_Scaled + photoRight;
+         }
+      }
+
+      // return unscaled position
+      return new Point(
+            (int) (ttDevX / deviceScaling),
+            (int) (ttDevY / deviceScaling));
+   }
+
+   private Rectangle2D.Float getHistogramCropArea() {
+
+      if (_photo.isCropped == false) {
+
+         return null;
+
+      } else {
+
+         return _relPhoto_CropArea;
+      }
+   }
+
+   @Override
+   protected Rectangle getParentBounds() {
+
+      // ignore, is overwritten with getToolTipLocation()
+      return null;
+   }
+
+   /**
+    * @param photo
+    * @param map
+    * @param tile
+    *
+    * @return Returns the photo image or <code>null</code> when image is not loaded.
+    */
+   private Image getPhotoImage(final Photo photo) {
+
+      Image photoImage = null;
+
+      final ImageQuality requestedImageQuality = ImageQuality.HQ;
+
+      // check if image has an loading error
+      final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
+
+      if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+
+         // image is not yet loaded
+
+         // check if image is in the cache
+         photoImage = PhotoImageCache.getImage_SWT(photo, requestedImageQuality);
+
+         if ((photoImage == null || photoImage.isDisposed())
+               && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+
+            // the requested image is not available in the image cache -> image must be loaded
+
+            PhotoLoadManager.putImageInLoadingQueueHQ_Map(
+
+                  photo,
+                  requestedImageQuality,
+                  _map2.getPhotoTooltipImageLoaderCallback());
+         }
+      }
+
+      return photoImage;
+   }
+
+   @Override
+   public Point getToolTipLocation(final Point ttSize_Unscaled) {
+
+      if (_hoveredMapPoint == null) {
+         return null;
+      }
+
+      final float deviceScaling = _map2.getDeviceScaling();
+
+      final Rectangle photoBounds = _hoveredMapPoint.labelRectangle;
+      final Map2Point mapPoint = _hoveredMapPoint.mapPoint;
+
+      final int tooltipWidth = (int) (ttSize_Unscaled.x * deviceScaling);
+      final int tooltipHeight = (int) (ttSize_Unscaled.y * deviceScaling);
+
+      final int photoWidth = photoBounds.width;
+      final int photoHeight = photoBounds.height;
+
+      final int photoLeft = photoBounds.x;
+      final int photoRight = photoLeft + photoWidth;
+      final int photoTop = photoBounds.y;
+      final int photoBottom = photoTop + photoHeight;
+
+      final int mapPointDevX = mapPoint.geoPointDevX;
+      final int mapPointDevY = mapPoint.geoPointDevY;
+
+      // set photo bottom/left as default position
+      int ttPosX = photoLeft - tooltipWidth;
+      int ttPosY = photoBottom - tooltipHeight;
+
+      // adjust x/y to not overlap the map point position
+      if (photoLeft > mapPointDevX) {
+         ttPosX = photoRight;
+      }
+
+      if (photoTop > mapPointDevY) {
+         ttPosY = photoTop;
+      }
+
+      // adjust to display position
+      final Rectangle mapBounds = _map2.getBounds();
+      final Point mapDisplayPosition = _map2.toDisplay(mapBounds.x, mapBounds.y);
+
+      ttPosX += mapDisplayPosition.x * deviceScaling;
+      ttPosY += mapDisplayPosition.y * deviceScaling;
+
+      final Point ttPos_Scaled = new Point(ttPosX, ttPosY);
+
+      final Point fixedDisplayBounds = fixupDisplayBounds(ttSize_Unscaled, ttPos_Scaled);
+
+      return fixedDisplayBounds;
+   }
+
+   private void initUI(final Composite parent) {
+
+      final Display display = parent.getDisplay();
+
+   }
+
+   @Override
+   protected void onDispose() {
+
+      super.onDispose();
+   }
+
+   @Override
+   protected void onFocus() {
+
+   }
+
+   public void onImageIsLoaded() {
+
+      final PaintedMapPoint hoveredMapPoint = _hoveredMapPoint;
+
+      Display.getDefault().asyncExec(() -> {
+
+         if (_hoveredMapPoint != null) {
+
+            setupPhoto_UI(hoveredMapPoint);
+
+         } else if (_previousHoveredMapPoint != null) {
+
+            /*
+             * This happens when an image is loading and the mouse has exited the tooltip -> paint
+             * loaded image
+             */
+
+            setupPhoto_UI(_previousHoveredMapPoint);
+         }
+      });
+   }
+
+   private void onPhoto_AdjustCurves() {
+      // TODO Auto-generated method stub
+
+   }
+
+   @Override
+   public void resetToDefaults() {
+
+   }
+
+   private void restoreState() {
+
+   }
+
+   @Override
+   protected void saveState() {
+
+      super.saveState();
+   }
+
+   /**
+    * Display a photo
+    *
+    * @param hoveredMapPoint
+    *           Can be <code>null</code> to hide the tooltip but currently this works only when the
+    *           tooltip is not pinned !!!
+    */
+   public void setupPhoto(final PaintedMapPoint hoveredMapPoint) {
+
+      if (Map2PainterConfig.isShowPhotoTooltip == false) {
+
+         // photo tooltip is not displayed
+
+         return;
+      }
+
+      final boolean isVisible = isVisible();
+
+      if (hoveredMapPoint == null) {
+
+         if (isVisible) {
+
+            if (_hoveredMapPoint != null) {
+               _previousHoveredMapPoint = _hoveredMapPoint;
+            }
+
+            _hoveredMapPoint = null;
+
+            hide();
+         }
+
+         return;
+      }
+
+      final boolean isOtherPhoto = _hoveredMapPoint != hoveredMapPoint;
+
+      if (isOtherPhoto && isVisible) {
+
+         hide();
+      }
+
+      if (_hoveredMapPoint != null) {
+         _previousHoveredMapPoint = _hoveredMapPoint;
+      }
+
+      if (isOtherPhoto) {
+
+         _hoveredMapPoint = hoveredMapPoint;
+
+         doNotStopAnimation();
+         showShell();
+
+         setupPhoto_UI(hoveredMapPoint);
+      }
+   }
+
+   private void setupPhoto_UI(final PaintedMapPoint hoveredMapPoint) {
+
+      if (hoveredMapPoint == null || _histogram.isDisposed()) {
+
+         _pageBook.showPage(_pageNoPhoto);
+
+         return;
+      }
+
+      _photo = hoveredMapPoint.mapPoint.photo;
+
+//      setupPhotoCanvasListener();
+
+      final ZonedDateTime adjustedTime_Tour_WithZone = _photo.adjustedTime_Tour_WithZone;
+      if (adjustedTime_Tour_WithZone != null) {
+
+         final String photoDateTime = "%s  %s".formatted( //$NON-NLS-1$
+               adjustedTime_Tour_WithZone.format(TimeTools.Formatter_Weekday),
+               adjustedTime_Tour_WithZone.format(TimeTools.Formatter_DateTime_M));
+
+         updateTitleText(photoDateTime);
+      }
+
+      final boolean isPhotoCropped = _photo.isCropped;
+
+      _chkAdjustCurves.setSelection(isPhotoCropped);
+
+      /*
+       * Get crop area from the tour photo
+       */
+      float cropAreaX1 = _photo.cropAreaX1;
+      float cropAreaY1 = _photo.cropAreaY1;
+      float cropAreaX2 = _photo.cropAreaX2;
+      float cropAreaY2 = _photo.cropAreaY2;
+
+      if (cropAreaX1 == 0 && cropAreaX2 == 0
+            || cropAreaY1 == 0 && cropAreaY2 == 0) {
+
+         // set initial and valid crop areas
+
+         final float defaultCrop = 0.35f;
+         final float defaultCrop2 = 1 - defaultCrop;
+
+         _photo.cropAreaX1 = cropAreaX1 = defaultCrop;
+         _photo.cropAreaY1 = cropAreaY1 = defaultCrop;
+
+         _photo.cropAreaX2 = cropAreaX2 = defaultCrop2;
+         _photo.cropAreaY2 = cropAreaY2 = defaultCrop2;
+      }
+
+      _relPhoto_CropArea = new Rectangle2D.Float(
+
+            cropAreaX1,
+            cropAreaY1,
+            cropAreaX2,
+            cropAreaY2);
+
+      final Image photoImage = getPhotoImage(_photo);
+
+      _histogram.setImage(photoImage, getHistogramCropArea());
+
+      if (photoImage == null || photoImage.isDisposed()) {
+
+         updateUI_LoadingMessage();
+
+      } else {
+
+         _pageBook.showPage(_pagePhoto);
+      }
+   }
+
+   public void updateCropArea(final Rectangle2D.Float histogramCropArea) {
+
+      _histogram.updateCropArea(histogramCropArea);
+   }
+
+   /**
+    * Update cursor only when it was modified
+    *
+    * @param cursor
+    */
+   private void updateCursor(final Cursor cursor) {
+
+//      if (_currentCursor != cursor) {
+//
+//         _currentCursor = cursor;
+//
+//         _photoImageCanvas.setCursor(cursor);
+//      }
+   }
+
+   /**
+    * Update tour photo in the db and fire an modify event
+    *
+    * @param photo
+    */
+   private void updateTourPhotoInDB(final Photo photo) {
+
+      final String sql = UI.EMPTY_STRING
+
+            + "UPDATE " + TourDatabase.TABLE_TOUR_PHOTO + NL //$NON-NLS-1$
+
+            + " SET" + NL //                                   //$NON-NLS-1$
+
+            + " photoAdjustmentsJSON = ?  " + NL //            //$NON-NLS-1$
+
+            + " WHERE photoId = ?         " + NL //            //$NON-NLS-1$
+      ;
+
+      try (final Connection conn = TourDatabase.getInstance().getConnection();
+            final PreparedStatement sqlUpdate = conn.prepareStatement(sql)) {
+
+         final ArrayList<Photo> updatedPhotos = new ArrayList<>();
+
+         final Collection<TourPhotoReference> photoRefs = photo.getTourPhotoReferences().values();
+
+         if (photoRefs.size() > 0) {
+
+            for (final TourPhotoReference photoRef : photoRefs) {
+
+               TourPhoto dbTourPhoto = null;
+
+               /*
+                * Update tour photo
+                */
+               final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
+               final Set<TourPhoto> allTourPhotos = tourData.getTourPhotos();
+
+               for (final TourPhoto tourPhoto : allTourPhotos) {
+
+                  if (tourPhoto.getPhotoId() == photoRef.photoId) {
+
+                     dbTourPhoto = tourPhoto;
+
+                     final PhotoAdjustments photoAdjustments = tourPhoto.getPhotoAdjustments(true);
+
+                     photoAdjustments.isPhotoCropped = photo.isCropped;
+
+                     photoAdjustments.cropAreaX1 = photo.cropAreaX1;
+                     photoAdjustments.cropAreaY1 = photo.cropAreaY1;
+
+                     photoAdjustments.cropAreaX2 = photo.cropAreaX2;
+                     photoAdjustments.cropAreaY2 = photo.cropAreaY2;
+
+                     break;
+                  }
+               }
+
+               /*
+                * Update db
+                */
+               if (dbTourPhoto != null) {
+
+                  // update json
+                  dbTourPhoto.updatePhotoAdjustments();
+
+                  final String photoAdjustmentsJSON = dbTourPhoto.getPhotoAdjustmentsJSON();
+
+                  sqlUpdate.setString(1, photoAdjustmentsJSON);
+                  sqlUpdate.setLong(2, photoRef.photoId);
+
+                  sqlUpdate.executeUpdate();
+               }
+            }
+
+            updatedPhotos.add(photo);
+         }
+
+         if (updatedPhotos.size() > 0) {
+
+            // fire notification to update all galleries with the modified crop size
+
+            PhotoManager.firePhotoEvent(null, PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED, updatedPhotos);
+         }
+
+      } catch (final SQLException e) {
+         net.tourbook.ui.UI.showSQLException(e);
+      }
+   }
+
+   private void updateUI_LoadingMessage() {
+
+      if (_hoveredMapPoint == null) {
+
+         _labelMessage.setText(UI.EMPTY_STRING);
+
+      } else {
+
+         final Photo photo = _hoveredMapPoint.mapPoint.photo;
+
+         final String photoText = Messages.Slideout_MapPoint_PhotoToolTip_Label_LoadingMessage + UI.SPACE + photo.imageFilePathName;
+
+         _labelMessage.setText(photoText);
+      }
+
+      _pageBook.showPage(_pageNoPhoto);
+   }
+
+   private boolean updateUI_ShowLoadingImage(final GC gc, final Rectangle rectangle) {
+
+      updateUI_LoadingMessage();
+
+      return true;
+   }
+
+}
