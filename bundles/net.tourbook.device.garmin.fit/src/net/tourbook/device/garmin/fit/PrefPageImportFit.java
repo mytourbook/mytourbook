@@ -435,7 +435,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
             // radio: Session Message: SportProfileName
             _rdoTourTypeFrom_SessionSportProfileName = new Button(containerTourTypeMode, SWT.RADIO);
-            _rdoTourTypeFrom_SessionSportProfileName.setText("Sport profile name from the session");
+            _rdoTourTypeFrom_SessionSportProfileName.setText("Sport profile name from the s&ession");
             _rdoTourTypeFrom_SessionSportProfileName.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFrom_SessionSportProfileName);
          }
@@ -460,7 +460,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
    private void enableControls() {
 
 // SET_FORMATTING_OFF
-      
+
       final boolean isSplitTour              = _chkRemoveExceededDuration.getSelection();
       final boolean isIgnoreSpeed            = _chkIgnoreSpeedValues.getSelection();
       final boolean isIgnorLastMarker        = _chkIgnoreLastMarker.getSelection();
@@ -484,7 +484,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       _rdoTourTypeFrom_SessionSportProfileName  .setEnabled(isFitImportTourType);
 
 // SET_FORMATTING_ON
-      
+
       updateUI_SplitTour();
    }
 
