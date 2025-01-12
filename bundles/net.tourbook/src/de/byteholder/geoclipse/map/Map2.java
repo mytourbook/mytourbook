@@ -926,7 +926,7 @@ public class Map2 extends Canvas {
       _mapPointTooltip                 = new MapPointToolTip(this);
       _mapPointTooltip_PhotoImage      = new SlideoutMap2_PhotoImage(this);
       _mapPointTooltip_PhotoHistogram  = new SlideoutMap2_PhotoHistogram(this);
-      
+
 // SET_FORMATTING_ON
 
       _poiImage = TourbookPlugin.getImageDescriptor(Images.POI_InMap).createImage();
@@ -3642,10 +3642,14 @@ public class Map2 extends Canvas {
       return gridGeoPos;
    }
 
+   public void hidePhotoHistogram() {
+
+      _mapPointTooltip_PhotoHistogram.hideNow();
+   }
+
    public void hidePhotoTooltip() {
 
       _mapPointTooltip_PhotoImage.hideNow();
-      _mapPointTooltip_PhotoHistogram.hideNow();
    }
 
    private void hideTourTooltipHoveredArea() {

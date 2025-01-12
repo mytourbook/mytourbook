@@ -154,14 +154,13 @@ public class Histogram extends Canvas implements PaintListener {
 
             if (alpha > 0) {
 
-               final int lumimance = (int) ((
+               final int lumimance = (0
 
-               0
                      + 299 * red
                      + 587 * green
                      + 114 * blue
 
-               ) / 1000.0);
+               ) / 1000;
 
                _allLuminances[lumimance]++;
             }
@@ -250,7 +249,6 @@ public class Histogram extends Canvas implements PaintListener {
    }
 
    public void updateCropArea(final Rectangle2D.Float relCropArea) {
-
 
       if (_imageData == null || isDisposed()) {
          return;

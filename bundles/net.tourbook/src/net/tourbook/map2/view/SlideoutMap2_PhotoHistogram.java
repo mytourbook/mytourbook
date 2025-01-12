@@ -95,7 +95,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
    private Composite _pageNoPhoto;
    private Composite _pagePhoto;
 
-   private Button    _chkAdjustCurves;
+   private Button    _chkAdjustTonality;
 
    private Label     _labelMessage;
 
@@ -188,10 +188,10 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
             /*
              * Adjust curves
              */
-            _chkAdjustCurves = new Button(container, SWT.CHECK);
-            _chkAdjustCurves.setText("&Adjust curves");
-            _chkAdjustCurves.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onPhoto_AdjustCurves()));
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_chkAdjustCurves);
+            _chkAdjustTonality = new Button(container, SWT.CHECK);
+            _chkAdjustTonality.setText("&Adjust tonality");
+            _chkAdjustTonality.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onPhoto_AdjustTonality()));
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_chkAdjustTonality);
 
          }
          {
@@ -467,7 +467,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       });
    }
 
-   private void onPhoto_AdjustCurves() {
+   private void onPhoto_AdjustTonality() {
       // TODO Auto-generated method stub
 
    }
@@ -496,7 +496,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
     */
    public void setupPhoto(final PaintedMapPoint hoveredMapPoint) {
 
-      if (Map2PainterConfig.isShowPhotoTooltip == false) {
+      if (Map2PainterConfig.isShowPhotoHistogram == false) {
 
          // photo tooltip is not displayed
 
@@ -568,7 +568,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
 
       final boolean isPhotoCropped = _photo.isCropped;
 
-      _chkAdjustCurves.setSelection(isPhotoCropped);
+      _chkAdjustTonality.setSelection(isPhotoCropped);
 
       /*
        * Get crop area from the tour photo
