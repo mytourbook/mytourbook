@@ -55,7 +55,8 @@ New
 Improvements
 ============
 
-* 
+* FIT Import
+  Set tour type from the session field sport_profile_name
 
 
 Changes

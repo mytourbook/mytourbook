@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -91,10 +91,11 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
    private Label      _lblSplitTour_Info;
    private Label      _lblPowerDataSource;
 
-   private Button     _rdoTourTypeFromSport;
-   private Button     _rdoTourTypeFromProfile;
-   private Button     _rdoTourTypeFromProfileElseSport;
-   private Button     _rdoTourTypeFromSportAndProfile;
+   private Button     _rdoTourTypeFrom_Profile;
+   private Button     _rdoTourTypeFrom_ProfileElseSport;
+   private Button     _rdoTourTypeFrom_SessionSportProfileName;
+   private Button     _rdoTourTypeFrom_Sport;
+   private Button     _rdoTourTypeFrom_SportAndProfile;
 
    private Spinner    _spinnerIgnorLastMarker_TimeSlices;
    private Spinner    _spinnerExceededDuration;
@@ -121,8 +122,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       {
 
          _tabFolder = new CTabFolder(parent, SWT.TOP);
-         GridDataFactory
-               .fillDefaults()//
+         GridDataFactory.fillDefaults()
                .grab(true, true)
                .applyTo(_tabFolder);
          {
@@ -160,8 +160,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(1)
             .extendedMargins(5, 5, 15, 5)
             .spacing(20, 5)
@@ -190,8 +189,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(3)
             .extendedMargins(5, 5, 15, 5)
             .spacing(20, 5)
@@ -211,15 +209,14 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
          // spinner: temperature adjustment
          {
             _spinnerTemperatureAdjustment = new Spinner(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults() //
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(_spinnerTemperatureAdjustment);
             _spinnerTemperatureAdjustment.setDigits(1);
             _spinnerTemperatureAdjustment.setPageIncrement(10);
             _spinnerTemperatureAdjustment.setMinimum(-100); // - 10.0 �C
             _spinnerTemperatureAdjustment.setMaximum(100); // +10.0 �C
             _spinnerTemperatureAdjustment.addMouseWheelListener(mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent));
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(_spinnerTemperatureAdjustment);
          }
 
          // label: �C
@@ -254,37 +251,37 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
           * Marker
           */
 
-         // checkbox: ignore last marker
          {
+            // checkbox: ignore last marker
+
             _chkIgnoreLastMarker = new Button(container, SWT.CHECK);
-            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkIgnoreLastMarker);
             _chkIgnoreLastMarker.setText(Messages.PrefPage_Fit_Checkbox_IgnoreLastMarker);
             _chkIgnoreLastMarker.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkIgnoreLastMarker);
          }
-
-         // label: info
          {
+            // label: info
+
             _lblIgnorLastMarker_Info = createUI_InfoLabel(container, 3);
             _lblIgnorLastMarker_Info.setText(Messages.PrefPage_Fit_Label_IgnoreLastMarker_Info);
          }
-
-         // label: ignore time slices
          {
+            // label: ignore time slices
+
             _lblIgnorLastMarker_TimeSlices = new Label(container, SWT.NONE);
             _lblIgnorLastMarker_TimeSlices.setText(Messages.PrefPage_Fit_Label_IgnoreLastMarker_TimeSlices);
          }
-
-         // spinner
          {
+            // spinner
+
             _spinnerIgnorLastMarker_TimeSlices = new Spinner(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults() //
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(_spinnerIgnorLastMarker_TimeSlices);
             _spinnerIgnorLastMarker_TimeSlices.setMinimum(0);
             _spinnerIgnorLastMarker_TimeSlices.setMaximum(1000);
             _spinnerIgnorLastMarker_TimeSlices.setPageIncrement(10);
             _spinnerIgnorLastMarker_TimeSlices.addMouseWheelListener(mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent));
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(_spinnerIgnorLastMarker_TimeSlices);
          }
       }
 
@@ -295,8 +292,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(3)
             .extendedMargins(5, 5, 15, 5)
             .spacing(20, 5)
@@ -325,10 +321,6 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
          // spinner
          {
             _spinnerExceededDuration = new Spinner(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults() //
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(_spinnerExceededDuration);
             _spinnerExceededDuration.setMinimum(0);
             _spinnerExceededDuration.setMaximum(Integer.MAX_VALUE);
             _spinnerExceededDuration.setPageIncrement(3600); // 60*60 = 1 hour
@@ -337,13 +329,15 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
                updateUI_SplitTour();
             });
             _spinnerExceededDuration.addSelectionListener(widgetSelectedAdapter(selectionEvent -> updateUI_SplitTour()));
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(_spinnerExceededDuration);
          }
 
          // label: duration in year/months/days/...
          {
             _lblSplitTour_DurationUnit = new Label(container, SWT.NONE);
-            GridDataFactory
-                  .fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(_lblSplitTour_DurationUnit);
@@ -357,8 +351,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(3)
             .extendedMargins(5, 5, 15, 5)
             .spacing(20, 5)
@@ -388,8 +381,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(1)
             .extendedMargins(5, 5, 15, 5)
             .spacing(20, 5)
@@ -418,28 +410,34 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerTourTypeMode);
          {
             // radio: from sport name
-            _rdoTourTypeFromSport = new Button(containerTourTypeMode, SWT.RADIO);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFromSport);
-            _rdoTourTypeFromSport.setText(Messages.PrefPage_Fit_Radio_TourTypeFromSport);
-            _rdoTourTypeFromSport.addSelectionListener(_defaultSelectionListener);
+            _rdoTourTypeFrom_Sport = new Button(containerTourTypeMode, SWT.RADIO);
+            _rdoTourTypeFrom_Sport.setText(Messages.PrefPage_Fit_Radio_TourTypeFromSport);
+            _rdoTourTypeFrom_Sport.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFrom_Sport);
 
             // radio: from profile name
-            _rdoTourTypeFromProfile = new Button(containerTourTypeMode, SWT.RADIO);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFromProfile);
-            _rdoTourTypeFromProfile.setText(Messages.PrefPage_Fit_Radio_TourTypeFromProfile);
-            _rdoTourTypeFromProfile.addSelectionListener(_defaultSelectionListener);
+            _rdoTourTypeFrom_Profile = new Button(containerTourTypeMode, SWT.RADIO);
+            _rdoTourTypeFrom_Profile.setText(Messages.PrefPage_Fit_Radio_TourTypeFromProfile);
+            _rdoTourTypeFrom_Profile.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFrom_Profile);
 
             // radio: profile name if possible, otherwise sport name
-            _rdoTourTypeFromProfileElseSport = new Button(containerTourTypeMode, SWT.RADIO);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFromProfileElseSport);
-            _rdoTourTypeFromProfileElseSport.setText(Messages.PrefPage_Fit_Radio_TourTypeFromProfileElseSport);
-            _rdoTourTypeFromProfileElseSport.addSelectionListener(_defaultSelectionListener);
+            _rdoTourTypeFrom_ProfileElseSport = new Button(containerTourTypeMode, SWT.RADIO);
+            _rdoTourTypeFrom_ProfileElseSport.setText(Messages.PrefPage_Fit_Radio_TourTypeFromProfileElseSport);
+            _rdoTourTypeFrom_ProfileElseSport.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFrom_ProfileElseSport);
 
             // radio: sport name and profile name
-            _rdoTourTypeFromSportAndProfile = new Button(containerTourTypeMode, SWT.RADIO);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFromSportAndProfile);
-            _rdoTourTypeFromSportAndProfile.setText(Messages.PrefPage_Fit_Radio_TourTypeFromSportAndProfile);
-            _rdoTourTypeFromSportAndProfile.addSelectionListener(_defaultSelectionListener);
+            _rdoTourTypeFrom_SportAndProfile = new Button(containerTourTypeMode, SWT.RADIO);
+            _rdoTourTypeFrom_SportAndProfile.setText(Messages.PrefPage_Fit_Radio_TourTypeFromSportAndProfile);
+            _rdoTourTypeFrom_SportAndProfile.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFrom_SportAndProfile);
+
+            // radio: Session Message: SportProfileName
+            _rdoTourTypeFrom_SessionSportProfileName = new Button(containerTourTypeMode, SWT.RADIO);
+            _rdoTourTypeFrom_SessionSportProfileName.setText("Sport profile name from the s&ession");
+            _rdoTourTypeFrom_SessionSportProfileName.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFrom_SessionSportProfileName);
          }
       }
 
@@ -449,8 +447,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
    private Label createUI_InfoLabel(final Composite parent, final int horizontalSpan) {
 
       final Label lblInfo = new Label(parent, SWT.WRAP);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .span(horizontalSpan, 1)
             .grab(true, false)
             .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
@@ -462,26 +459,31 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
    private void enableControls() {
 
-      final boolean isSplitTour = _chkRemoveExceededDuration.getSelection();
-      final boolean isIgnoreSpeed = _chkIgnoreSpeedValues.getSelection();
-      final boolean isIgnorLastMarker = _chkIgnoreLastMarker.getSelection();
-      final boolean isFitImportTourType = _chkFitImportTourType.getSelection();
+// SET_FORMATTING_OFF
 
-      _lblIgnorSpeedValues_Info.setEnabled(isIgnoreSpeed);
+      final boolean isSplitTour              = _chkRemoveExceededDuration.getSelection();
+      final boolean isIgnoreSpeed            = _chkIgnoreSpeedValues.getSelection();
+      final boolean isIgnorLastMarker        = _chkIgnoreLastMarker.getSelection();
+      final boolean isFitImportTourType      = _chkFitImportTourType.getSelection();
 
-      _lblIgnorLastMarker_Info.setEnabled(isIgnorLastMarker);
-      _lblIgnorLastMarker_TimeSlices.setEnabled(isIgnorLastMarker);
-      _spinnerIgnorLastMarker_TimeSlices.setEnabled(isIgnorLastMarker);
+      _lblIgnorSpeedValues_Info              .setEnabled(isIgnoreSpeed);
 
-      _lblSplitTour_DurationUnit.setEnabled(isSplitTour);
-      _lblSplitTour_Duration.setEnabled(isSplitTour);
-      _lblSplitTour_Info.setEnabled(isSplitTour);
-      _spinnerExceededDuration.setEnabled(isSplitTour);
+      _lblIgnorLastMarker_Info               .setEnabled(isIgnorLastMarker);
+      _lblIgnorLastMarker_TimeSlices         .setEnabled(isIgnorLastMarker);
+      _spinnerIgnorLastMarker_TimeSlices     .setEnabled(isIgnorLastMarker);
 
-      _rdoTourTypeFromSport.setEnabled(isFitImportTourType);
-      _rdoTourTypeFromProfile.setEnabled(isFitImportTourType);
-      _rdoTourTypeFromProfileElseSport.setEnabled(isFitImportTourType);
-      _rdoTourTypeFromSportAndProfile.setEnabled(isFitImportTourType);
+      _lblSplitTour_DurationUnit             .setEnabled(isSplitTour);
+      _lblSplitTour_Duration                 .setEnabled(isSplitTour);
+      _lblSplitTour_Info                     .setEnabled(isSplitTour);
+      _spinnerExceededDuration               .setEnabled(isSplitTour);
+
+      _rdoTourTypeFrom_Sport                    .setEnabled(isFitImportTourType);
+      _rdoTourTypeFrom_Profile                  .setEnabled(isFitImportTourType);
+      _rdoTourTypeFrom_ProfileElseSport         .setEnabled(isFitImportTourType);
+      _rdoTourTypeFrom_SportAndProfile          .setEnabled(isFitImportTourType);
+      _rdoTourTypeFrom_SessionSportProfileName  .setEnabled(isFitImportTourType);
+
+// SET_FORMATTING_ON
 
       updateUI_SplitTour();
    }
@@ -542,17 +544,20 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       } else if (selectedTab == TAB_FOLDER_TOURTYPE) {
 
+// SET_FORMATTING_OFF
+
          // Set Tour Type during FIT import
-         _chkFitImportTourType.setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE));
+         _chkFitImportTourType                     .setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE));
 
          // Mode for Tour Type during FIT import
          final String tourTypeMode = _prefStore.getDefaultString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
-         _rdoTourTypeFromSport.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT));
-         _rdoTourTypeFromProfile.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE));
-         _rdoTourTypeFromProfileElseSport.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE));
-         _rdoTourTypeFromSportAndProfile.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE));
-
+         _rdoTourTypeFrom_Sport                    .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT));
+         _rdoTourTypeFrom_Profile                  .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE));
+         _rdoTourTypeFrom_ProfileElseSport         .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRY_PROFILE));
+         _rdoTourTypeFrom_SportAndProfile          .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_PROFILE));
+         _rdoTourTypeFrom_SessionSportProfileName  .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SESSION_SPORT_PROFILE_NAME));
       }
+// SET_FORMATTING_ON
 
       enableControls();
 
@@ -597,12 +602,17 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       // Set Tour Type during FIT import
       _chkFitImportTourType.setSelection(_prefStore.getBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE));
 
+// SET_FORMATTING_OFF
+
       // Mode for Tour Type during FIT import
       final String tourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
-      _rdoTourTypeFromSport.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT));
-      _rdoTourTypeFromProfile.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE));
-      _rdoTourTypeFromProfileElseSport.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE));
-      _rdoTourTypeFromSportAndProfile.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE));
+      _rdoTourTypeFrom_Sport                    .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT));
+      _rdoTourTypeFrom_Profile                  .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE));
+      _rdoTourTypeFrom_ProfileElseSport         .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRY_PROFILE));
+      _rdoTourTypeFrom_SportAndProfile          .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_PROFILE));
+      _rdoTourTypeFrom_SessionSportProfileName  .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SESSION_SPORT_PROFILE_NAME));
+
+// SET_FORMATTING_ON
 
       enableControls();
    }
@@ -633,17 +643,20 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       // Mode for Tour Type during FIT import
       String tourTypeMode = _prefStore.getDefaultString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
 
-      if (_rdoTourTypeFromSport.getSelection()) {
+      if (_rdoTourTypeFrom_Sport.getSelection()) {
          tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT;
 
-      } else if (_rdoTourTypeFromProfile.getSelection()) {
+      } else if (_rdoTourTypeFrom_Profile.getSelection()) {
          tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE;
 
-      } else if (_rdoTourTypeFromProfileElseSport.getSelection()) {
-         tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE;
+      } else if (_rdoTourTypeFrom_ProfileElseSport.getSelection()) {
+         tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRY_PROFILE;
 
-      } else if (_rdoTourTypeFromSportAndProfile.getSelection()) {
-         tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE;
+      } else if (_rdoTourTypeFrom_SportAndProfile.getSelection()) {
+         tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_PROFILE;
+
+      } else if (_rdoTourTypeFrom_SessionSportProfileName.getSelection()) {
+         tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SESSION_SPORT_PROFILE_NAME;
       }
 
       _prefStore.setValue(IPreferences.FIT_IMPORT_TOURTYPE_MODE, tourTypeMode);
