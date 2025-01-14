@@ -27,6 +27,7 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -48,8 +49,11 @@ public class Histogram extends Canvas implements PaintListener {
 
    private ImageData       _imageData;
 
+   private boolean         _isSetTonality;
+   private CurveType       _curveType;
+
    private int             _threePoint_Dark;
-   private int             _threePoint_Middle;
+   private float           _threePoint_Middle;
    private int             _threePoint_Bright;
 
    public Histogram(final Composite parent) {
@@ -213,10 +217,10 @@ public class Histogram extends Canvas implements PaintListener {
       gc.setBackground(UI.SYS_COLOR_GRAY);
       gc.fillRectangle(0, 0, graphWidth - 0, graphHeight - 0);
 
-      final int lineWidth = graphWidth / 256;
+      final float lineWidth = graphWidth / 255f;
 
       gc.setForeground(UI.SYS_COLOR_DARK_GRAY);
-      gc.setLineWidth(lineWidth + 1);
+      gc.setLineWidth((int) (lineWidth + 1));
 
       for (int lumIndex = 0; lumIndex < _allLuminances.length; lumIndex++) {
 
@@ -229,11 +233,47 @@ public class Histogram extends Canvas implements PaintListener {
 
          gc.drawLine(
 
-               devX + lineWidth,
+               (int) (devX + lineWidth),
                graphHeight,
-               devX + lineWidth,
+               (int) (devX + lineWidth),
                graphHeight - devY);
       }
+
+      if (_isSetTonality) {
+
+         final int devXDark = (int) (_threePoint_Dark * lineWidth);
+         final int devXMiddle = (int) (_threePoint_Middle * lineWidth);
+         final int devXBright = (int) (_threePoint_Bright * lineWidth);
+
+         final int devY = graphHeight + 2;
+
+         paintMarker(gc, devXDark, devY, UI.SYS_COLOR_BLACK);
+         paintMarker(gc, devXMiddle, devY, UI.SYS_COLOR_DARK_GRAY);
+         paintMarker(gc, devXBright, devY, UI.SYS_COLOR_WHITE);
+      }
+   }
+
+   private void paintMarker(final GC gc,
+                            final int devX,
+                            final int devYBottom,
+                            final Color bgColor) {
+
+      final int markerWidth = 16;
+      final int markerWidth2 = markerWidth / 2;
+
+      final int devMarkerXPos = devX - markerWidth2;
+
+      final int[] marker = new int[] {
+            devMarkerXPos,
+            devYBottom + 1 + markerWidth2,
+            devMarkerXPos + markerWidth2,
+            devYBottom + 1,
+            devMarkerXPos + markerWidth,
+            devYBottom + 1 + markerWidth2 };
+
+      // draw background
+      gc.setBackground(bgColor);
+      gc.fillPolygon(marker);
    }
 
    public void setImage(final Image image, final Rectangle2D.Float relCropArea) {
@@ -255,9 +295,21 @@ public class Histogram extends Canvas implements PaintListener {
 
    public void update3Points(final Photo photo) {
 
-      _threePoint_Dark = photo.threePoint_Dark;
-      _threePoint_Middle = photo.threePoint_Middle;
-      _threePoint_Bright = photo.threePoint_Bright;
+      _isSetTonality = photo.isSetTonality;
+      _curveType = photo.curveType;
+
+      final int dark = photo.threePoint_Dark;
+      final int bright = photo.threePoint_Bright;
+      final float middlePercent = photo.threePoint_Middle;
+
+      final float diffAbsolute = bright - dark;
+      final float middleDiffAbsolute = diffAbsolute / 100 * middlePercent;
+
+      final float middleAbsolute = dark + middleDiffAbsolute;
+
+      _threePoint_Dark = dark;
+      _threePoint_Middle = middleAbsolute;
+      _threePoint_Bright = bright;
 
       redraw();
    }

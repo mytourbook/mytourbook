@@ -34,8 +34,13 @@ public class PhotoAdjustments {
    public boolean   isSetTonality;
 
    public CurveType curveType         = CurveType.THREE_POINTS;
+
    public int       threePoint_Dark   = 0;
-   public int       threePoint_Middle = 127;
    public int       threePoint_Bright = 255;
+
+   /**
+    * Middle is the relative position between dark and bright, it is between 0...100
+    */
+   public float     threePoint_Middle = 50.0f;
 
 }
