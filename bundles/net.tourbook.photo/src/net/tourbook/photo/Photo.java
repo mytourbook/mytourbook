@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,8 @@
 package net.tourbook.photo;
 
 import java.awt.Point;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.Rectangle2D.Float;
 import java.io.File;
 import java.io.Serializable;
 import java.time.Instant;
@@ -313,16 +315,21 @@ public class Photo implements Serializable {
     */
    private long                          _photoLinkTourId;
 
-   public boolean                        isCropped;
    public boolean                        isAdjustmentModified;
 
-   /**
-    * Relative position for the top left x position of the cropping area
-    */
+   public boolean                        isCropped;
+
+   /** Relative position for the top left x position of the cropping area */
    public float                          cropAreaX1;
    public float                          cropAreaY1;
    public float                          cropAreaX2;
    public float                          cropAreaY2;
+
+   public boolean                        isSetTonality;
+   public CurveType                      curveType;
+   public int                            threePoint_Dark;
+   public int                            threePoint_Middle;
+   public int                            threePoint_Bright;
 
    /**
     */
@@ -1210,6 +1217,34 @@ public class Photo implements Serializable {
 
    public String getUniqueId() {
       return imageFilePathName;
+   }
+
+   /**
+    * @return Returns a validate relative crop area
+    */
+   public Float getValidCropArea() {
+
+      if (cropAreaX1 == 0 && cropAreaX2 == 0
+            || cropAreaY1 == 0 && cropAreaY2 == 0) {
+
+         // set initial and valid crop areas
+
+         final float defaultCrop = 0.35f;
+         final float defaultCrop2 = 1 - defaultCrop;
+
+         cropAreaX1 = defaultCrop;
+         cropAreaY1 = defaultCrop;
+
+         cropAreaX2 = defaultCrop2;
+         cropAreaY2 = defaultCrop2;
+      }
+
+      return new Rectangle2D.Float(
+
+            cropAreaX1,
+            cropAreaY1,
+            cropAreaX2,
+            cropAreaY2);
    }
 
    /**

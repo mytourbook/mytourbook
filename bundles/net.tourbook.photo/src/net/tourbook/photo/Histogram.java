@@ -48,6 +48,10 @@ public class Histogram extends Canvas implements PaintListener {
 
    private ImageData       _imageData;
 
+   private int             _threePoint_Dark;
+   private int             _threePoint_Middle;
+   private int             _threePoint_Bright;
+
    public Histogram(final Composite parent) {
 
       super(parent, SWT.DOUBLE_BUFFERED | SWT.NO_FOCUS);
@@ -201,16 +205,17 @@ public class Histogram extends Canvas implements PaintListener {
       final int canvasWidth = canvasBounds.width;
       final int canvasHeight = canvasBounds.height;
 
-      gc.setForeground(UI.SYS_COLOR_BLACK);
-      gc.drawRectangle(0, 0, canvasWidth - 1, canvasHeight - 1);
-
-      gc.setForeground(UI.SYS_COLOR_DARK_GRAY);
+      final int sliderbarHeight = 20;
 
       final int graphWidth = canvasWidth - 2;
-      final int graphHeight = canvasHeight - 2;
+      final int graphHeight = canvasHeight - sliderbarHeight;
+
+      gc.setBackground(UI.SYS_COLOR_GRAY);
+      gc.fillRectangle(0, 0, graphWidth - 0, graphHeight - 0);
 
       final int lineWidth = graphWidth / 256;
 
+      gc.setForeground(UI.SYS_COLOR_DARK_GRAY);
       gc.setLineWidth(lineWidth + 1);
 
       for (int lumIndex = 0; lumIndex < _allLuminances.length; lumIndex++) {
@@ -244,6 +249,15 @@ public class Histogram extends Canvas implements PaintListener {
       _imageData = image.getImageData();
 
       computeLuminance(_imageData, relCropArea);
+
+      redraw();
+   }
+
+   public void update3Points(final Photo photo) {
+
+      _threePoint_Dark = photo.threePoint_Dark;
+      _threePoint_Middle = photo.threePoint_Middle;
+      _threePoint_Bright = photo.threePoint_Bright;
 
       redraw();
    }

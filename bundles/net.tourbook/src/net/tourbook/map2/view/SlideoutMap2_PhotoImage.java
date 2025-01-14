@@ -266,7 +266,9 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
       @Override
       public boolean drawInvalidImage(final GC gc, final Rectangle clientArea) {
 
-         return updateUI_ShowLoadingImage(gc, clientArea);
+         updateUI_LoadingMessage();
+
+         return true;
       }
 
       @Override
@@ -1814,36 +1816,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
       _chkCropPhoto.setSelection(isPhotoCropped);
 
-      /*
-       * Get crop area from the tour photo
-       */
-      float cropAreaX1 = _photo.cropAreaX1;
-      float cropAreaY1 = _photo.cropAreaY1;
-      float cropAreaX2 = _photo.cropAreaX2;
-      float cropAreaY2 = _photo.cropAreaY2;
-
-      if (cropAreaX1 == 0 && cropAreaX2 == 0
-            || cropAreaY1 == 0 && cropAreaY2 == 0) {
-
-         // set initial and valid crop areas
-
-         final float defaultCrop = 0.35f;
-         final float defaultCrop2 = 1 - defaultCrop;
-
-         _photo.cropAreaX1 = cropAreaX1 = defaultCrop;
-         _photo.cropAreaY1 = cropAreaY1 = defaultCrop;
-
-         _photo.cropAreaX2 = cropAreaX2 = defaultCrop2;
-         _photo.cropAreaY2 = cropAreaY2 = defaultCrop2;
-      }
-
-      _relPhoto_CropArea = new Rectangle2D.Float(
-
-            cropAreaX1,
-            cropAreaY1,
-            cropAreaX2,
-            cropAreaY2);
-
+      _relPhoto_CropArea = _photo.getValidCropArea();
       updateCropArea_FromRelative(_photoImageBounds);
 
       final Image photoImage = getPhotoImage(_photo);
@@ -1902,6 +1875,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
 // SET_FORMATTING_ON
    }
+
 
    /**
     * Create absolute position {@link #_devCanvas_CropArea} from relative position
@@ -2205,7 +2179,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
                if (dbTourPhoto != null) {
 
                   // update json
-                  dbTourPhoto.updatePhotoAdjustments();
+                  dbTourPhoto.updateAllPhotoAdjustments();
 
                   final String photoAdjustmentsJSON = dbTourPhoto.getPhotoAdjustmentsJSON();
 
@@ -2284,13 +2258,6 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
       }
 
       _pageBook.showPage(_pageNoPhoto);
-   }
-
-   private boolean updateUI_ShowLoadingImage(final GC gc, final Rectangle rectangle) {
-
-      updateUI_LoadingMessage();
-
-      return true;
    }
 
    private void updateUI_Toolbar() {

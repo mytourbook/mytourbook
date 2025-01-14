@@ -15,27 +15,9 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-/**
- * Adjustments for a photo, e.g. cropping, tonality...
- */
-public class PhotoAdjustments {
+public enum CurveType {
 
-   public boolean   isPhotoCropped;
-
-   /**
-    * Relative position 0...1 of the crop area top left x position
-    */
-   public float     cropAreaX1;
-   public float     cropAreaY1;
-
-   public float     cropAreaX2;
-   public float     cropAreaY2;
-
-   public boolean   isSetTonality;
-
-   public CurveType curveType         = CurveType.THREE_POINTS;
-   public int       threePoint_Dark   = 0;
-   public int       threePoint_Middle = 127;
-   public int       threePoint_Bright = 255;
+   THREE_POINTS, //
+   MULTIPLE_POINTS, //
 
 }

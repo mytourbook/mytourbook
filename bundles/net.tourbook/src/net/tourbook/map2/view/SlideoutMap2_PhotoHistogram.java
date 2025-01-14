@@ -37,6 +37,7 @@ import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.photo.CurveType;
 import net.tourbook.photo.Histogram;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
@@ -50,22 +51,30 @@ import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.TourPhotoReference;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Cursor;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.part.PageBook;
 
 /**
@@ -73,19 +82,50 @@ import org.eclipse.ui.part.PageBook;
  */
 public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IActionResetToDefault {
 
-   private static final String          ID     = "net.tourbook.map2.view.SlideoutMap2_PhotoHistogram"; //$NON-NLS-1$
+   private static final String          ID                         = "net.tourbook.map2.view.SlideoutMap2_PhotoHistogram"; //$NON-NLS-1$
 
-   private static final char            NL     = UI.NEW_LINE;
+   private static final int             THREE_POINT_DEFAULT_MIN    = 0;
+   private static final int             THREE_POINT_DEFAULT_MAX    = 255;
 
-   private final static IDialogSettings _state = TourbookPlugin.getState(ID);
+   private static final int             THREE_POINT_DEFAULT_DARK   = 0;
+   private static final int             THREE_POINT_DEFAULT_MIDDLE = 127;
+   private static final int             THREE_POINT_DEFAULT_BRIGHT = 255;
+
+   private static final char            NL                         = UI.NEW_LINE;
+
+   private final static IDialogSettings _state                     = TourbookPlugin.getState(ID);
+
+   /**
+    * Filter operator MUST be in sync with filter labels
+    */
+   private static CurveType[]           _allCurveTypes_Value       = {
+
+         CurveType.THREE_POINTS,
+         CurveType.MULTIPLE_POINTS,
+   };
+
+   /**
+    * Filter labels MUST be in sync with filter operator
+    */
+   private static String[]              _allCurveTypes_Label       = {
+
+         "3 Points",
+         "Multiple Points",
+   };
 
    private Map2                         _map2;
+
+   private FocusListener                _keepOpenListener;
+   private MouseWheelListener           _defaultMouseWheelListener;
+   private SelectionListener            _defaultSelectedListener;
 
    private PaintedMapPoint              _hoveredMapPoint;
    private PaintedMapPoint              _previousHoveredMapPoint;
    private Photo                        _photo;
 
-   private Float                        _relPhoto_CropArea;
+   private ActionReset3Point            _actionReset3Point_Bright;
+   private ActionReset3Point            _actionReset3Point_Dark;
+   private ActionReset3Point            _actionReset3Point_Middle;
 
    /*
     * UI controls
@@ -95,11 +135,42 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
    private Composite _pageNoPhoto;
    private Composite _pagePhoto;
 
+   private Composite _container3Points;
+
    private Button    _chkAdjustTonality;
 
+   private Combo     _comboCurveType;
+
+   private Label     _lblCurveType;
    private Label     _labelMessage;
 
+   private Spinner   _spinnerLevel_Bright;
+   private Spinner   _spinnerLevel_Dark;
+   private Spinner   _spinnerLevel_Middle;
+
    private Histogram _histogram;
+
+   private ToolBar   _toolbarReset3Point_Bright;
+   private ToolBar   _toolbarReset3Point_Dark;
+   private ToolBar   _toolbarReset3Point_Middle;
+
+   private class ActionReset3Point extends Action {
+
+      private int _pointLocation;
+
+      public ActionReset3Point(final int pointLocation) {
+
+         super("X", AS_PUSH_BUTTON);
+
+         _pointLocation = pointLocation;
+      }
+
+      @Override
+      public void runWithEvent(final Event event) {
+
+         onReset3Points(_pointLocation);
+      }
+   }
 
    public SlideoutMap2_PhotoHistogram(final Map2 map2) {
 
@@ -124,6 +195,9 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
 
    private void createActions() {
 
+      _actionReset3Point_Dark = new ActionReset3Point(1);
+      _actionReset3Point_Middle = new ActionReset3Point(2);
+      _actionReset3Point_Bright = new ActionReset3Point(3);
    }
 
    @Override
@@ -133,6 +207,8 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       createActions();
 
       createUI_00_Tooltip(parent);
+
+      fillUI();
 
       setupPhoto_UI(_hoveredMapPoint);
 
@@ -150,13 +226,13 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       _pageBook = new PageBook(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
-      _pagePhoto = createUI_10_Histogram(_pageBook);
+      _pagePhoto = createUI_10_WithPhoto(_pageBook);
       _pageNoPhoto = createUI_90_NoPhoto(_pageBook);
 
       _pageBook.showPage(_pageNoPhoto);
    }
 
-   private Composite createUI_10_Histogram(final Composite parent) {
+   private Composite createUI_10_WithPhoto(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -166,13 +242,14 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
             .applyTo(container);
       container.setBackground(UI.SYS_COLOR_GREEN);
       {
-         createUI_20_PhotoOptions(container);
+         createUI_20_Histogram(container);
+         createUI_30_HistogramControls(container);
       }
 
       return container;
    }
 
-   private void createUI_20_PhotoOptions(final Composite parent) {
+   private void createUI_20_Histogram(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -180,7 +257,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1)
             .extendedMargins(0, 0, 0, 5)
-            .numColumns(1)
+            .numColumns(2)
             .applyTo(container);
 //      _containerPhotoOptions.setBackground(UI.SYS_COLOR_YELLOW);
       {
@@ -191,16 +268,92 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
             _chkAdjustTonality = new Button(container, SWT.CHECK);
             _chkAdjustTonality.setText("&Adjust tonality");
             _chkAdjustTonality.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onPhoto_AdjustTonality()));
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_chkAdjustTonality);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.BEGINNING)
+                  .span(2, 1)
+                  .applyTo(_chkAdjustTonality);
 
+         }
+         {
+            /*
+             * Curve type
+             */
+            _lblCurveType = new Label(container, SWT.NONE);
+            _lblCurveType.setText("Curve &type");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblCurveType);
+
+            _comboCurveType = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+            _comboCurveType.setVisibleItemCount(10);
+            _comboCurveType.setToolTipText("");
+            _comboCurveType.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_CurveType(selectionEvent)));
+            _comboCurveType.addFocusListener(_keepOpenListener);
+
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(_comboCurveType);
          }
          {
             _histogram = new Histogram(container);
             GridDataFactory.fillDefaults()
                   .grab(true, true)
+                  .span(2, 1)
                   .hint(SWT.DEFAULT, 100)
                   .applyTo(_histogram);
+         }
 
+      }
+   }
+
+   private void createUI_30_HistogramControls(final Composite parent) {
+
+      _container3Points = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(_container3Points);
+      GridLayoutFactory.fillDefaults().numColumns(6).applyTo(_container3Points);
+      {
+         {
+            _spinnerLevel_Dark = new Spinner(_container3Points, SWT.BORDER);
+            _spinnerLevel_Dark.setMinimum(THREE_POINT_DEFAULT_MIN);
+            _spinnerLevel_Dark.setMaximum(THREE_POINT_DEFAULT_MAX);
+            _spinnerLevel_Dark.setIncrement(1);
+            _spinnerLevel_Dark.setPageIncrement(10);
+            _spinnerLevel_Dark.addSelectionListener(_defaultSelectedListener);
+            _spinnerLevel_Dark.addMouseWheelListener(_defaultMouseWheelListener);
+         }
+         {
+            _toolbarReset3Point_Dark = UI.createToolbarAction(_container3Points, _actionReset3Point_Dark);
+         }
+         {
+            _spinnerLevel_Middle = new Spinner(_container3Points, SWT.BORDER);
+            _spinnerLevel_Middle.setMinimum(THREE_POINT_DEFAULT_MIN);
+            _spinnerLevel_Middle.setMaximum(THREE_POINT_DEFAULT_MAX);
+            _spinnerLevel_Middle.setIncrement(1);
+            _spinnerLevel_Middle.setPageIncrement(10);
+            _spinnerLevel_Middle.addSelectionListener(_defaultSelectedListener);
+            _spinnerLevel_Middle.addMouseWheelListener(_defaultMouseWheelListener);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .align(SWT.END, SWT.CENTER)
+                  .applyTo(_spinnerLevel_Middle);
+         }
+         {
+            _toolbarReset3Point_Middle = UI.createToolbarAction(_container3Points, _actionReset3Point_Middle);
+         }
+         {
+            _spinnerLevel_Bright = new Spinner(_container3Points, SWT.BORDER);
+            _spinnerLevel_Bright.setMinimum(THREE_POINT_DEFAULT_MIN);
+            _spinnerLevel_Bright.setMaximum(THREE_POINT_DEFAULT_MAX);
+            _spinnerLevel_Bright.setIncrement(1);
+            _spinnerLevel_Bright.setPageIncrement(10);
+            _spinnerLevel_Bright.addSelectionListener(_defaultSelectedListener);
+            _spinnerLevel_Bright.addMouseWheelListener(_defaultMouseWheelListener);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_spinnerLevel_Bright);
+
+         }
+         {
+            _toolbarReset3Point_Bright = UI.createToolbarAction(_container3Points, _actionReset3Point_Bright);
          }
       }
    }
@@ -219,6 +372,32 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       }
 
       return container;
+   }
+
+   private void enableControls() {
+
+// SET_FORMATTING_OFF
+
+      final boolean isAdjustTonality = _chkAdjustTonality.getSelection();
+
+      _actionReset3Point_Bright  .setEnabled(isAdjustTonality);
+      _actionReset3Point_Dark    .setEnabled(isAdjustTonality);
+      _actionReset3Point_Middle  .setEnabled(isAdjustTonality);
+      _comboCurveType            .setEnabled(isAdjustTonality);
+      _lblCurveType              .setEnabled(isAdjustTonality);
+      _spinnerLevel_Bright       .setEnabled(isAdjustTonality);
+      _spinnerLevel_Dark         .setEnabled(isAdjustTonality);
+      _spinnerLevel_Middle       .setEnabled(isAdjustTonality);
+
+// SET_FORMATTING_ON
+   }
+
+   private void fillUI() {
+
+      for (final String curveTypeLabel : _allCurveTypes_Label) {
+
+         _comboCurveType.add(curveTypeLabel);
+      }
    }
 
    private Point fixupDisplayBounds(final Point ttSize_Unscaled, final Point ttPos_Scaled) {
@@ -317,18 +496,6 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
             (int) (ttDevY / deviceScaling));
    }
 
-   private Rectangle2D.Float getHistogramCropArea() {
-
-      if (_photo.isCropped == false) {
-
-         return null;
-
-      } else {
-
-         return _relPhoto_CropArea;
-      }
-   }
-
    @Override
    protected Rectangle getParentBounds() {
 
@@ -373,6 +540,20 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       }
 
       return photoImage;
+   }
+
+   private CurveType getSelectedCurveType() {
+
+      final int selectedIndex = _comboCurveType.getSelectionIndex();
+
+      if (selectedIndex >= 0) {
+
+         return _allCurveTypes_Value[selectedIndex];
+
+      } else {
+
+         return CurveType.THREE_POINTS;
+      }
    }
 
    @Override
@@ -430,8 +611,45 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
 
    private void initUI(final Composite parent) {
 
-      final Display display = parent.getDisplay();
+      _defaultSelectedListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onChangeUI());
 
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeUI();
+      };
+
+      _keepOpenListener = new FocusListener() {
+
+         @Override
+         public void focusGained(final FocusEvent e) {
+
+            /*
+             * This will fix the problem that when the list of a combobox is displayed, then the
+             * slideout will disappear :-(((
+             */
+            setIsAnotherDialogOpened(true);
+         }
+
+         @Override
+         public void focusLost(final FocusEvent e) {
+            setIsAnotherDialogOpened(false);
+         }
+      };
+   }
+
+   private void onChangeUI() {
+
+      validateUpdateModelAndUI_3PointValues();
+
+      _toolbarReset3Point_Dark.setVisible(_photo.threePoint_Dark != THREE_POINT_DEFAULT_DARK);
+      _toolbarReset3Point_Middle.setVisible(_photo.threePoint_Middle != THREE_POINT_DEFAULT_MIDDLE);
+      _toolbarReset3Point_Bright.setVisible(_photo.threePoint_Bright != THREE_POINT_DEFAULT_BRIGHT);
+
+      _histogram.update3Points(_photo);
+
+      updateUI_3PointActions();
+
+      updateModelAndUI();
    }
 
    @Override
@@ -468,8 +686,53 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
    }
 
    private void onPhoto_AdjustTonality() {
-      // TODO Auto-generated method stub
 
+      final boolean isAdjustTonality = _chkAdjustTonality.getSelection();
+
+      _photo.isSetTonality = isAdjustTonality;
+
+      if (isAdjustTonality) {
+         _photo.isAdjustmentModified = true;
+      }
+
+      enableControls();
+
+      updateModelAndUI();
+   }
+
+   private void onReset3Points(final int pointLocation) {
+
+      if (pointLocation == 1) {
+
+         _photo.threePoint_Dark = THREE_POINT_DEFAULT_DARK;
+
+         _spinnerLevel_Dark.setSelection(_photo.threePoint_Dark);
+
+      } else if (pointLocation == 2) {
+
+         _photo.threePoint_Middle = THREE_POINT_DEFAULT_MIDDLE;
+
+         _spinnerLevel_Middle.setSelection(_photo.threePoint_Middle);
+
+      } else if (pointLocation == 3) {
+
+         _photo.threePoint_Bright = THREE_POINT_DEFAULT_BRIGHT;
+
+         _spinnerLevel_Bright.setSelection(_photo.threePoint_Bright);
+      }
+
+      validateUpdateModelAndUI_3PointValues();
+
+      _histogram.update3Points(_photo);
+
+      updateModelAndUI();
+   }
+
+   private void onSelect_CurveType(final SelectionEvent selectionEvent) {
+
+      _photo.curveType = getSelectedCurveType();
+
+      updateModelAndUI();
    }
 
    @Override
@@ -485,6 +748,23 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
    protected void saveState() {
 
       super.saveState();
+   }
+
+   private void selectCurveType(final Enum<CurveType> requestedCurveType) {
+
+      int selectionIndex = 0;
+
+      for (int operatorIndex = 0; operatorIndex < _allCurveTypes_Value.length; operatorIndex++) {
+
+         final CurveType curveType = _allCurveTypes_Value[operatorIndex];
+
+         if (curveType.equals(requestedCurveType)) {
+            selectionIndex = operatorIndex;
+            break;
+         }
+      }
+
+      _comboCurveType.select(selectionIndex);
    }
 
    /**
@@ -554,8 +834,11 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
 
       _photo = hoveredMapPoint.mapPoint.photo;
 
-//      setupPhotoCanvasListener();
+      /*
+       * Update UI from model
+       */
 
+      // update title
       final ZonedDateTime adjustedTime_Tour_WithZone = _photo.adjustedTime_Tour_WithZone;
       if (adjustedTime_Tour_WithZone != null) {
 
@@ -566,43 +849,18 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
          updateTitleText(photoDateTime);
       }
 
-      final boolean isPhotoCropped = _photo.isCropped;
-
-      _chkAdjustTonality.setSelection(isPhotoCropped);
-
-      /*
-       * Get crop area from the tour photo
-       */
-      float cropAreaX1 = _photo.cropAreaX1;
-      float cropAreaY1 = _photo.cropAreaY1;
-      float cropAreaX2 = _photo.cropAreaX2;
-      float cropAreaY2 = _photo.cropAreaY2;
-
-      if (cropAreaX1 == 0 && cropAreaX2 == 0
-            || cropAreaY1 == 0 && cropAreaY2 == 0) {
-
-         // set initial and valid crop areas
-
-         final float defaultCrop = 0.35f;
-         final float defaultCrop2 = 1 - defaultCrop;
-
-         _photo.cropAreaX1 = cropAreaX1 = defaultCrop;
-         _photo.cropAreaY1 = cropAreaY1 = defaultCrop;
-
-         _photo.cropAreaX2 = cropAreaX2 = defaultCrop2;
-         _photo.cropAreaY2 = cropAreaY2 = defaultCrop2;
-      }
-
-      _relPhoto_CropArea = new Rectangle2D.Float(
-
-            cropAreaX1,
-            cropAreaY1,
-            cropAreaX2,
-            cropAreaY2);
+      // update tonality
+      _chkAdjustTonality.setSelection(_photo.isSetTonality);
+      _spinnerLevel_Dark.setSelection(_photo.threePoint_Dark);
+      _spinnerLevel_Middle.setSelection(_photo.threePoint_Middle);
+      _spinnerLevel_Bright.setSelection(_photo.threePoint_Bright);
+      selectCurveType(_photo.curveType);
+      updateUI_3PointActions();
 
       final Image photoImage = getPhotoImage(_photo);
+      final Float relCropArea = _photo.getValidCropArea();
 
-      _histogram.setImage(photoImage, getHistogramCropArea());
+      _histogram.setImage(photoImage, _photo.isCropped ? relCropArea : null);
 
       if (photoImage == null || photoImage.isDisposed()) {
 
@@ -612,6 +870,8 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
 
          _pageBook.showPage(_pagePhoto);
       }
+
+      enableControls();
    }
 
    public void updateCropArea(final Rectangle2D.Float histogramCropArea) {
@@ -632,6 +892,13 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
 //
 //         _photoImageCanvas.setCursor(cursor);
 //      }
+   }
+
+   private void updateModelAndUI() {
+
+      updateTourPhotoInDB(_photo);
+
+      _histogram.redraw();
    }
 
    /**
@@ -677,15 +944,17 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
 
                      dbTourPhoto = tourPhoto;
 
+                     /*
+                      * Set photo adjustments from the photo into the tour photo
+                      */
+
                      final PhotoAdjustments photoAdjustments = tourPhoto.getPhotoAdjustments(true);
 
-                     photoAdjustments.isPhotoCropped = photo.isCropped;
-
-                     photoAdjustments.cropAreaX1 = photo.cropAreaX1;
-                     photoAdjustments.cropAreaY1 = photo.cropAreaY1;
-
-                     photoAdjustments.cropAreaX2 = photo.cropAreaX2;
-                     photoAdjustments.cropAreaY2 = photo.cropAreaY2;
+                     photoAdjustments.isSetTonality = photo.isSetTonality;
+                     photoAdjustments.curveType = photo.curveType;
+                     photoAdjustments.threePoint_Dark = photo.threePoint_Dark;
+                     photoAdjustments.threePoint_Middle = photo.threePoint_Middle;
+                     photoAdjustments.threePoint_Bright = photo.threePoint_Bright;
 
                      break;
                   }
@@ -697,7 +966,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
                if (dbTourPhoto != null) {
 
                   // update json
-                  dbTourPhoto.updatePhotoAdjustments();
+                  dbTourPhoto.updateAllPhotoAdjustments();
 
                   final String photoAdjustmentsJSON = dbTourPhoto.getPhotoAdjustmentsJSON();
 
@@ -723,6 +992,17 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       }
    }
 
+   private void updateUI_3PointActions() {
+
+      final boolean isDarkDefaultValue = _photo.threePoint_Dark == THREE_POINT_DEFAULT_DARK;
+      final boolean isMiddleDefaultValue = _photo.threePoint_Middle == THREE_POINT_DEFAULT_MIDDLE;
+      final boolean isBrightDefaultValue = _photo.threePoint_Bright == THREE_POINT_DEFAULT_BRIGHT;
+
+      _toolbarReset3Point_Dark.setVisible(isDarkDefaultValue == false);
+      _toolbarReset3Point_Middle.setVisible(isMiddleDefaultValue == false);
+      _toolbarReset3Point_Bright.setVisible(isBrightDefaultValue == false);
+   }
+
    private void updateUI_LoadingMessage() {
 
       if (_hoveredMapPoint == null) {
@@ -741,11 +1021,37 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       _pageBook.showPage(_pageNoPhoto);
    }
 
-   private boolean updateUI_ShowLoadingImage(final GC gc, final Rectangle rectangle) {
+   private void validateUpdateModelAndUI_3PointValues() {
 
-      updateUI_LoadingMessage();
+      int dark = _spinnerLevel_Dark.getSelection();
+      int middle = _spinnerLevel_Middle.getSelection();
+      int bright = _spinnerLevel_Bright.getSelection();
 
-      return true;
+      if (dark > 253) {
+
+         dark = 253;
+
+         _spinnerLevel_Dark.setSelection(dark);
+      }
+
+      if (middle <= dark) {
+
+         middle = dark + 1;
+
+         _spinnerLevel_Middle.setSelection(middle);
+      }
+
+      if (bright <= middle) {
+
+         bright = middle + 1;
+
+         _spinnerLevel_Bright.setSelection(bright);
+      }
+
+      _photo.threePoint_Dark = dark;
+      _photo.threePoint_Middle = middle;
+      _photo.threePoint_Bright = bright;
+
    }
 
 }

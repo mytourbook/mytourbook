@@ -2614,8 +2614,8 @@ public class Map2View extends ViewPart implements
 
             menuMgr.add(new Separator());
             menuMgr.add(_actionMapPoint_Photo_ShowTooltip);
-            menuMgr.add(_actionMapPoint_Photo_ShowRating);
             menuMgr.add(_actionMapPoint_Photo_ShowHistogram);
+            menuMgr.add(_actionMapPoint_Photo_ShowRating);
             menuMgr.add(_actionMapPoint_Photo_Remove);
          }
 

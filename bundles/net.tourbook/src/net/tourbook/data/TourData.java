@@ -6493,11 +6493,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          if (photoAdjustments != null) {
 
             galleryPhoto.isCropped = photoAdjustments.isPhotoCropped;
-
             galleryPhoto.cropAreaX1 = photoAdjustments.cropAreaX1;
             galleryPhoto.cropAreaY1 = photoAdjustments.cropAreaY1;
             galleryPhoto.cropAreaX2 = photoAdjustments.cropAreaX2;
             galleryPhoto.cropAreaY2 = photoAdjustments.cropAreaY2;
+
+            galleryPhoto.isSetTonality = photoAdjustments.isSetTonality;
+            galleryPhoto.curveType = photoAdjustments.curveType;
+            galleryPhoto.threePoint_Dark = photoAdjustments.threePoint_Dark;
+            galleryPhoto.threePoint_Middle = photoAdjustments.threePoint_Middle;
+            galleryPhoto.threePoint_Bright = photoAdjustments.threePoint_Bright;
          }
 
          /*

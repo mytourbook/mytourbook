@@ -479,9 +479,9 @@ public class TourPhoto implements Serializable {
    }
 
    /**
-    * Update photo adjustments JSON data
+    * Update all photo adjustments in the JSON data
     */
-   public void updatePhotoAdjustments() {
+   public void updateAllPhotoAdjustments() {
 
       if (_photoAdjustments == null) {
          return;

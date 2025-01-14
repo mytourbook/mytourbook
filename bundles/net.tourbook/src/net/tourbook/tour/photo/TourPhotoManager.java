@@ -1838,26 +1838,22 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
          final String sql = UI.EMPTY_STRING
 
-               + "SELECT" + NL //                                             //$NON-NLS-1$
+               + "SELECT" + NL //                                                //$NON-NLS-1$
 
-               + " photoId," + NL //                                       1  //$NON-NLS-1$
-               + " " + TourDatabase.TABLE_TOUR_DATA + "_tourId, " + NL //  2  //$NON-NLS-1$ //$NON-NLS-2$
-               + " adjustedTime,       " + NL //                           3  //$NON-NLS-1$
-               + " imageExifTime,      " + NL //                           4  //$NON-NLS-1$
-               + " latitude,           " + NL //                           5  //$NON-NLS-1$
-               + " longitude,          " + NL //                           6  //$NON-NLS-1$
-               + " isGeoFromPhoto,     " + NL //                           7  //$NON-NLS-1$
-               + " ratingStars,        " + NL //                           8  //$NON-NLS-1$
+               + " photoId," + NL //                                          1  //$NON-NLS-1$
+               + " " + TourDatabase.TABLE_TOUR_DATA + "_tourId, " + NL //     2  //$NON-NLS-1$ //$NON-NLS-2$
+               + " adjustedTime,          " + NL //                           3  //$NON-NLS-1$
+               + " imageExifTime,         " + NL //                           4  //$NON-NLS-1$
+               + " latitude,              " + NL //                           5  //$NON-NLS-1$
+               + " longitude,             " + NL //                           6  //$NON-NLS-1$
+               + " isGeoFromPhoto,        " + NL //                           7  //$NON-NLS-1$
+               + " ratingStars,           " + NL //                           8  //$NON-NLS-1$
 
-               + " isPhotoCropped,     " + NL //                           9  //$NON-NLS-1$
-               + " cropAreaX1,         " + NL //                          10  //$NON-NLS-1$
-               + " cropAreaY1,         " + NL //                          11  //$NON-NLS-1$
-               + " cropAreaX2,         " + NL //                          12  //$NON-NLS-1$
-               + " cropAreaY2          " + NL //                          13  //$NON-NLS-1$
+               + " photoAdjustmentsJSON   " + NL //                           9  //$NON-NLS-1$
 
-               + "FROM " + TourDatabase.TABLE_TOUR_PHOTO + NL //              //$NON-NLS-1$
+               + "FROM " + TourDatabase.TABLE_TOUR_PHOTO + NL //                 //$NON-NLS-1$
 
-               + "WHERE imageFilePathName=?" + NL //                          //$NON-NLS-1$
+               + "WHERE imageFilePathName=?" + NL //                             //$NON-NLS-1$
          ;
 
          try (final PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -1870,15 +1866,16 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 // SET_FORMATTING_OFF
 
-               final long dbPhotoId          = result.getLong(1);
-               final long dbTourId           = result.getLong(2);
+               final long dbPhotoId                = result.getLong(1);
+               final long dbTourId                 = result.getLong(2);
 
-               final long dbAdjustedTime     = result.getLong(3);
-               final long dbImageExifTime    = result.getLong(4);
-               final double dbLatitude       = result.getDouble(5);
-               final double dbLongitude      = result.getDouble(6);
-               final int dbIsGeoFromExif     = result.getInt(7);
-               final int dbRatingStars       = result.getInt(8);
+               final long dbAdjustedTime           = result.getLong(3);
+               final long dbImageExifTime          = result.getLong(4);
+               final double dbLatitude             = result.getDouble(5);
+               final double dbLongitude            = result.getDouble(6);
+               final int dbIsGeoFromExif           = result.getInt(7);
+               final int dbRatingStars             = result.getInt(8);
+               final String photoAdjustmentsJSON   = result.getString(9);
 
                photo.addTour(dbTourId, dbPhotoId);
 
@@ -1888,7 +1885,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
                 */
 
                photo.isSavedInTour        = true;
-                                          
+
                photo.adjustedTime_Tour    = dbAdjustedTime;
                photo.imageExifTime        = dbImageExifTime;
 
@@ -1896,12 +1893,6 @@ public class TourPhotoManager implements IPhotoServiceProvider {
                photo.isTourPhotoWithGps   = dbLatitude != 0;
 
                photo.ratingStars          = dbRatingStars;
-                                          
-               photo.isCropped            = result.getBoolean(9);
-               photo.cropAreaX1           = result.getFloat( 10);
-               photo.cropAreaY1           = result.getFloat( 11);
-               photo.cropAreaX2           = result.getFloat( 12);
-               photo.cropAreaY2           = result.getFloat( 13);
 
 // SET_FORMATTING_ON
 
