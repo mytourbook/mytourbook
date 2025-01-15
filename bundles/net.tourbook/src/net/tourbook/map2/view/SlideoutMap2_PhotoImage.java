@@ -762,7 +762,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
       _imageDescriptor_SlideoutCollapse   = CommonActivator.getThemedImageDescriptor_Dark(CommonImages.Slideout_Collapse);
       _imageDescriptor_SlideoutExpand     = CommonActivator.getThemedImageDescriptor_Dark(CommonImages.Slideout_Expand);
 
-      _photoMouseMoveListener    = event -> onPhoto_Mouse_30_Move(          event);
+      _photoMouseMoveListener    = event -> onPhoto_Mouse_30_Move(         event);
       _photoMouseUpListener      = MouseListener.mouseUpAdapter(           event -> onPhoto_Mouse_20_Up(event));
       _photoMouseDownListener    = MouseListener.mouseDownAdapter(         event -> onPhoto_Mouse_10_Down(event));
       _photoMouseExitListener    = MouseTrackListener.mouseExitAdapter(    event -> onPhoto_Mouse_Exit());
@@ -996,10 +996,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
       final Point devMousePosition = new Point(devMouseX, devMouseY);
 
       final boolean isMouseWithinPhoto = _photoImageBounds.contains(devMousePosition);
-
-      /*
-       * Mouse is within the photo
-       */
+      Cursor hoveredCursor = isMouseWithinPhoto ? _photoCursor_Cross : _photoCursor_Arrow;
 
       int devCrop_StartX = _devCanvas_CropArea.x;
       int devCrop_StartY = _devCanvas_CropArea.y;
@@ -1007,8 +1004,6 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
       int devCrop_EndY = _devCanvas_CropArea.height;
 
       boolean isRedraw = false;
-
-      Cursor hoveredCursor = isMouseWithinPhoto ? _photoCursor_Cross : _photoCursor_Arrow;
 
       if (false
 
@@ -1875,7 +1870,6 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
 // SET_FORMATTING_ON
    }
-
 
    /**
     * Create absolute position {@link #_devCanvas_CropArea} from relative position

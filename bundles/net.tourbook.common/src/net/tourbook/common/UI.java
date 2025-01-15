@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.time.ZoneOffset;
@@ -1889,6 +1890,13 @@ public class UI {
       }
 
       return pageNoData;
+   }
+
+   public static void disposeResource(final BufferedImage awtImage) {
+
+      if (awtImage != null) {
+         awtImage.flush();
+      }
    }
 
    public static Cursor disposeResource(final Cursor resource) {

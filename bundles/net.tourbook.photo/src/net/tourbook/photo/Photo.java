@@ -315,6 +315,10 @@ public class Photo implements Serializable {
     */
    private long                          _photoLinkTourId;
 
+   /**
+    * When <code>true</code> then the photo adjustments are computed. This is the MAIN flag to
+    * recomputed photo adjustments.
+    */
    public boolean                        isAdjustmentModified;
 
    public boolean                        isCropped;

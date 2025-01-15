@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -98,6 +98,103 @@ public class PhotoImageLoader {
       _requestedImageKey = photo.getImageKey(_requestedImageQuality);
    }
 
+   /**
+    * @param notAdjustedImage
+    *
+    * @return
+    */
+   private BufferedImage adjustImage(final BufferedImage notAdjustedImage) {
+
+      BufferedImage adjustedImage = null;
+
+      if (_photo.isCropped) {
+
+         adjustedImage = adjustImage_Crop(notAdjustedImage);
+      }
+
+      if (_photo.isSetTonality) {
+
+         final BufferedImage srcImage = adjustedImage != null ? adjustedImage : notAdjustedImage;
+
+         final BufferedImage tonalityImage = adjustImage_Tonality(srcImage);
+
+         if (tonalityImage != null) {
+
+            UI.disposeResource(adjustedImage);
+
+            adjustedImage = tonalityImage;
+         }
+      }
+
+      if (adjustedImage != null) {
+
+         final String imageKey = _photo.getImageKey(ImageQuality.THUMB_HQ_CROPPED);
+
+         PhotoImageCache.putImage_AWT(imageKey, adjustedImage, _photo.imageFilePathName);
+      }
+
+      return adjustedImage;
+   }
+
+   private BufferedImage adjustImage_Crop(final BufferedImage notAdjustedImage) {
+
+      final int imageWidth = notAdjustedImage.getWidth();
+      final int ImageHeight = notAdjustedImage.getHeight();
+
+      final float cropAreaX1 = _photo.cropAreaX1;
+      final float cropAreaY1 = _photo.cropAreaY1;
+      final float cropAreaX2 = _photo.cropAreaX2;
+      final float cropAreaY2 = _photo.cropAreaY2;
+
+      final int cropX1 = (int) (imageWidth * cropAreaX1);
+      final int cropY1 = (int) (ImageHeight * cropAreaY1);
+      final int cropX2 = (int) (imageWidth * cropAreaX2);
+      final int cropY2 = (int) (ImageHeight * cropAreaY2);
+
+      int cropWidth = cropX2 - cropX1;
+      int cropHeight = cropY2 - cropY1;
+
+      // fix image size, otherwise it would cause an invalid image
+      if (cropWidth == 0) {
+         cropWidth = 1;
+      }
+      if (cropWidth < 0) {
+         cropWidth = -cropWidth;
+      }
+      if (cropHeight == 0) {
+         cropHeight = 1;
+      }
+      if (cropHeight < 0) {
+         cropHeight = -cropHeight;
+      }
+
+      if (cropX1 + cropWidth > imageWidth) {
+         cropWidth = imageWidth - cropX1;
+      }
+
+      if (cropAreaY1 + cropHeight > ImageHeight) {
+         cropHeight = ImageHeight - cropY1;
+      }
+
+      BufferedImage croppedImage = null;
+      try {
+
+         croppedImage = Scalr.crop(notAdjustedImage, cropX1, cropY1, cropWidth, cropHeight);
+
+      } catch (final Exception e) {
+
+         StatusUtil.log(e);
+      }
+
+      return croppedImage;
+   }
+
+   private BufferedImage adjustImage_Tonality(final BufferedImage srcImage) {
+      // TODO Auto-generated method stub
+
+      return null;
+   }
+
    private Image createSWTimageFromAWTimage(final BufferedImage awtBufferedImage, final String imageFilePath) {
 
       final ImageData swtImageData = SWT2Dutil.convertToSWT(awtBufferedImage, imageFilePath);
@@ -148,68 +245,6 @@ public class PhotoImageLoader {
       }
 
       return swtImage;
-   }
-
-   /**
-    * @param notCroppedImage
-    *
-    * @return
-    */
-   private BufferedImage cropImage(final BufferedImage notCroppedImage) {
-
-      final int imageWidth = notCroppedImage.getWidth();
-      final int ImageHeight = notCroppedImage.getHeight();
-
-      final float cropAreaX1 = _photo.cropAreaX1;
-      final float cropAreaY1 = _photo.cropAreaY1;
-      final float cropAreaX2 = _photo.cropAreaX2;
-      final float cropAreaY2 = _photo.cropAreaY2;
-
-      final int cropX1 = (int) (imageWidth * cropAreaX1);
-      final int cropY1 = (int) (ImageHeight * cropAreaY1);
-      final int cropX2 = (int) (imageWidth * cropAreaX2);
-      final int cropY2 = (int) (ImageHeight * cropAreaY2);
-
-      int cropWidth = cropX2 - cropX1;
-      int cropHeight = cropY2 - cropY1;
-
-      // fix image size, otherwise it would cause an invalid image
-      if (cropWidth == 0) {
-         cropWidth = 1;
-      }
-      if (cropWidth < 0) {
-         cropWidth = -cropWidth;
-      }
-      if (cropHeight == 0) {
-         cropHeight = 1;
-      }
-      if (cropHeight < 0) {
-         cropHeight = -cropHeight;
-      }
-
-      if (cropX1 + cropWidth > imageWidth) {
-         cropWidth = imageWidth - cropX1;
-      }
-
-      if (cropAreaY1 + cropHeight > ImageHeight) {
-         cropHeight = ImageHeight - cropY1;
-      }
-
-      BufferedImage croppedImage = null;
-      try {
-
-         croppedImage = Scalr.crop(notCroppedImage, cropX1, cropY1, cropWidth, cropHeight);
-
-         final String imageKey = _photo.getImageKey(ImageQuality.THUMB_HQ_CROPPED);
-
-         PhotoImageCache.putImage_AWT(imageKey, croppedImage, _photo.imageFilePathName);
-
-      } catch (final Exception e) {
-
-         StatusUtil.log(e);
-      }
-
-      return croppedImage;
    }
 
    private void disposeTrackedImages() {
@@ -1037,7 +1072,7 @@ public class PhotoImageLoader {
       boolean isLoadingError = false;
       BufferedImage hqThumbImage = null;
 
-      // reset crop state
+      // reset adjustment state that it is not reloaded again
       photo.isAdjustmentModified = false;
 
       try {
@@ -1048,10 +1083,10 @@ public class PhotoImageLoader {
 
             // it is possible that the not cropped image is already loaded -> only crop it
 
-            final BufferedImage notCroppedImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.HQ);
+            final BufferedImage notAdjustedImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.HQ);
 
-            if (notCroppedImage != null) {
-               hqThumbImage = cropImage(notCroppedImage);
+            if (notAdjustedImage != null) {
+               hqThumbImage = adjustImage(notAdjustedImage);
             }
          }
 
@@ -1217,7 +1252,7 @@ public class PhotoImageLoader {
        */
       if (imageQuality == ImageQuality.THUMB_HQ_CROPPED) {
 
-         final BufferedImage awtHQImageCropped = cropImage(awtOriginalImage);
+         final BufferedImage awtHQImageCropped = adjustImage(awtOriginalImage);
 
          if (awtHQImageCropped != null) {
 
