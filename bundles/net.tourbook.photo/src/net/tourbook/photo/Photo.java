@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import com.jhlabs.image.CurvesFilter;
+
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Float;
@@ -331,6 +333,7 @@ public class Photo implements Serializable {
 
    public boolean                        isSetTonality;
    public CurveType                      curveType;
+   public CurvesFilter                   curvesFilter;
    public int                            threePoint_Dark;
    public float                          threePoint_Middle;
    public int                            threePoint_Bright;

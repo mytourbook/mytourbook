@@ -142,6 +142,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
 
    private Combo     _comboCurveType;
 
+   private Label     _lblDark;
    private Label     _lblCurveType;
    private Label     _labelMessage;
 
@@ -308,8 +309,16 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
 
       _container3Points = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_container3Points);
-      GridLayoutFactory.fillDefaults().numColumns(6).applyTo(_container3Points);
+      GridLayoutFactory.fillDefaults().numColumns(7).applyTo(_container3Points);
       {
+         {
+            /*
+             * Create a label for keyboard access
+             */
+            _lblDark = new Label(_container3Points, SWT.NONE);
+            _lblDark.setText("&Dark");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblDark);
+         }
          {
             _spinnerLevel_Dark = new Spinner(_container3Points, SWT.BORDER);
             _spinnerLevel_Dark.setMinimum(THREE_POINT_DEFAULT_MIN);
@@ -386,6 +395,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       _actionReset3Point_Middle  .setEnabled(isAdjustTonality);
       _comboCurveType            .setEnabled(isAdjustTonality);
       _lblCurveType              .setEnabled(isAdjustTonality);
+      _lblDark                   .setEnabled(isAdjustTonality);
       _spinnerLevel_Bright       .setEnabled(isAdjustTonality);
       _spinnerLevel_Dark         .setEnabled(isAdjustTonality);
       _spinnerLevel_Middle       .setEnabled(isAdjustTonality);
@@ -644,13 +654,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
 
       validate3Points(widget);
 
-      _toolbarReset3Point_Dark.setVisible(_photo.threePoint_Dark != THREE_POINT_DEFAULT_DARK);
-      _toolbarReset3Point_Middle.setVisible(_photo.threePoint_Middle != THREE_POINT_DEFAULT_MIDDLE);
-      _toolbarReset3Point_Bright.setVisible(_photo.threePoint_Bright != THREE_POINT_DEFAULT_BRIGHT);
-
       _histogram.update3Points(_photo);
-
-      updateUI_3PointActions();
 
       updateModelAndUI();
    }
@@ -661,18 +665,21 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
 
          _photo.threePoint_Dark = THREE_POINT_DEFAULT_DARK;
 
+         _spinnerLevel_Dark.setFocus();
          _spinnerLevel_Dark.setSelection(_photo.threePoint_Dark);
 
       } else if (spinner == _spinnerLevel_Middle) {
 
          _photo.threePoint_Middle = THREE_POINT_DEFAULT_MIDDLE;
 
+         _spinnerLevel_Middle.setFocus();
          _spinnerLevel_Middle.setSelection((int) (_photo.threePoint_Middle * 10));
 
       } else if (spinner == _spinnerLevel_Bright) {
 
          _photo.threePoint_Bright = THREE_POINT_DEFAULT_BRIGHT;
 
+         _spinnerLevel_Bright.setFocus();
          _spinnerLevel_Bright.setSelection(_photo.threePoint_Bright);
       }
 
@@ -688,10 +695,6 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       final boolean isAdjustTonality = _chkAdjustTonality.getSelection();
 
       _photo.isSetTonality = isAdjustTonality;
-
-      if (isAdjustTonality) {
-         _photo.isAdjustmentModified = true;
-      }
 
       enableControls();
 
@@ -865,6 +868,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
 
       _histogram.setImage(photoImage, _photo.isCropped ? relCropArea : null);
       _histogram.update3Points(_photo);
+      _histogram.updateCurvesFilter(_photo);
 
       if (photoImage == null || photoImage.isDisposed()) {
 
@@ -880,6 +884,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
 
    private void updateActions() {
 
+      // set spinner which should be reset
       _actionReset3Point_Dark.spinner = _spinnerLevel_Dark;
       _actionReset3Point_Middle.spinner = _spinnerLevel_Middle;
       _actionReset3Point_Bright.spinner = _spinnerLevel_Bright;
@@ -905,9 +910,19 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
 //      }
    }
 
+   public void updateCurves() {
+
+      _histogram.updateCurvesFilter(_photo);
+   }
+
    private void updateModelAndUI() {
 
+      _photo.isAdjustmentModified = true;
+
       updateTourPhotoInDB(_photo);
+
+      // show/hide reset buttons
+      updateUI_3PointActions();
 
       _histogram.redraw();
    }

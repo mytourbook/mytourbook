@@ -16,6 +16,7 @@
 package net.tourbook.photo.internal.manager;
 
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,9 +59,21 @@ import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Rotation;
 
+import pixelitor.filters.curves.ToneCurve;
+import pixelitor.filters.curves.ToneCurves;
+import pixelitor.filters.curves.ToneCurvesFilter;
+import pixelitor.gui.GUIMessageHandler;
+import pixelitor.utils.Messages;
+
 public class PhotoImageLoader {
 
-   private static IPreferenceStore  _prefStore        = PhotoActivator.getPrefStore();
+   private static IPreferenceStore _prefStore = PhotoActivator.getPrefStore();
+
+   static {
+
+      Messages.setHandler(new GUIMessageHandler());
+
+   }
 
    private Photo                    _photo;
    private ImageQuality             _requestedImageQuality;
@@ -118,10 +131,9 @@ public class PhotoImageLoader {
 
          final BufferedImage tonalityImage = adjustImage_Tonality(srcImage);
 
+         // replace adjusted image
          if (tonalityImage != null) {
-
             UI.disposeResource(adjustedImage);
-
             adjustedImage = tonalityImage;
          }
       }
@@ -190,9 +202,39 @@ public class PhotoImageLoader {
    }
 
    private BufferedImage adjustImage_Tonality(final BufferedImage srcImage) {
-      // TODO Auto-generated method stub
 
-      return null;
+      BufferedImage tonalityImage = null;
+
+      try {
+
+         final ToneCurvesFilter toneCurvesFilter = new ToneCurvesFilter();
+
+         final ToneCurves toneCurves = toneCurvesFilter.getCurves();
+         final ToneCurve toneCurve = toneCurves.getActiveCurve();
+
+         final float dark = _photo.threePoint_Dark / 255f;
+         final float bright = _photo.threePoint_Bright / 255f;
+
+         final float middle = _photo.threePoint_Middle;
+         final float diffBrightDark = bright - dark;
+         final float diffMiddleDiff = diffBrightDark * middle / 100;
+         final float diffMiddle = dark + diffMiddleDiff;
+
+         toneCurve.setKnotPosition(0, new Point2D.Float(dark, 0));
+         toneCurve.setKnotPosition(1, new Point2D.Float(bright, 1));
+         toneCurve.addKnot(new Point2D.Float(diffMiddle, 0.5f), false);
+
+         tonalityImage = toneCurvesFilter.transformImage(srcImage);
+
+         // update curves graph
+         _photo.curvesFilter = toneCurvesFilter.getCurvesFilter();
+
+      } catch (final Exception e) {
+
+         StatusUtil.log(e);
+      }
+
+      return tonalityImage;
    }
 
    private Image createSWTimageFromAWTimage(final BufferedImage awtBufferedImage, final String imageFilePath) {

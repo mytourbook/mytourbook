@@ -837,6 +837,10 @@ public class Map2 extends Canvas {
       public void callBackImageIsLoaded(final boolean isUpdateUI) {
 
          if (isUpdateUI) {
+
+            // curves must be update after the image is loading which is computing the curves
+            _mapPointTooltip_PhotoHistogram.updateCurves();
+
             paint();
          }
       }

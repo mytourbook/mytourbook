@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import com.jhlabs.image.CurvesFilter;
+
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
 
@@ -55,6 +57,7 @@ public class Histogram extends Canvas implements PaintListener {
    private int             _threePoint_Dark;
    private float           _threePoint_Middle;
    private int             _threePoint_Bright;
+   private CurvesFilter    _curvesFilter;
 
    public Histogram(final Composite parent) {
 
@@ -245,11 +248,38 @@ public class Histogram extends Canvas implements PaintListener {
          final int devXMiddle = (int) (_threePoint_Middle * lineWidth);
          final int devXBright = (int) (_threePoint_Bright * lineWidth);
 
-         final int devY = graphHeight + 2;
+         final int devYMarker = graphHeight + 2;
 
-         paintMarker(gc, devXDark, devY, UI.SYS_COLOR_BLACK);
-         paintMarker(gc, devXMiddle, devY, UI.SYS_COLOR_DARK_GRAY);
-         paintMarker(gc, devXBright, devY, UI.SYS_COLOR_WHITE);
+         paintMarker(gc, devXDark, devYMarker, UI.SYS_COLOR_BLACK);
+         paintMarker(gc, devXMiddle, devYMarker, UI.SYS_COLOR_DARK_GRAY);
+         paintMarker(gc, devXBright, devYMarker, UI.SYS_COLOR_WHITE);
+
+         /*
+          * Draw curve line
+          */
+         if (_curvesFilter != null) {
+
+            final int[] curveValues = _curvesFilter.getRedTable();
+
+            final int[] allCurvePointValues = new int[2 * 256];
+
+            for (int valueIndex = 0; valueIndex < curveValues.length; valueIndex++) {
+
+               final int curveIndex = valueIndex * 2;
+               final int curveValueY = curveValues[valueIndex];
+
+               final int devX = (int) (graphWidth * valueIndex / 255f);
+               final int devY = graphHeight - (int) (graphHeight * curveValueY / 255f);
+
+               allCurvePointValues[curveIndex] = devX;
+               allCurvePointValues[curveIndex + 1] = devY;
+            }
+
+            gc.setLineWidth(1);
+            gc.setAntialias(SWT.ON);
+            gc.setForeground(new Color(99, 99, 99));
+            gc.drawPolyline(allCurvePointValues);
+         }
       }
    }
 
@@ -323,5 +353,13 @@ public class Histogram extends Canvas implements PaintListener {
       computeLuminance(_imageData, relCropArea);
 
       redraw();
+   }
+
+   public void updateCurvesFilter(final Photo photo) {
+
+      _curvesFilter = photo.curvesFilter;
+
+      // update in UI thread
+      getDisplay().asyncExec(() -> redraw());
    }
 }
