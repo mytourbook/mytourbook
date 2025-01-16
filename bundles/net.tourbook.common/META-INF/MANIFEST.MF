@@ -5,8 +5,7 @@ Bundle-SymbolicName: net.tourbook.common;singleton:=true
 Bundle-Version: 24.11.3.qualifier
 Bundle-Activator: net.tourbook.common.CommonActivator
 Bundle-Vendor: MyTourbook
-Export-Package: com.jhlabs.image,
- cop.swt.widgets.viewers.table.celleditors,
+Export-Package: cop.swt.widgets.viewers.table.celleditors,
  net.sf.swtaddons.autocomplete,
  net.sf.swtaddons.autocomplete.combo,
  net.sf.swtaddons.autocomplete.text,
@@ -32,15 +31,7 @@ Export-Package: com.jhlabs.image,
  net.tourbook.common.widgets,
  net.tourbook.opengl,
  org.eclipse.nebula.widgets.opal.duallist.mt,
- particlelabeling,
- pixelitor,
- pixelitor.filters,
- pixelitor.filters.curves,
- pixelitor.filters.levels,
- pixelitor.filters.lookup,
- pixelitor.gui,
- pixelitor.utils,
- pixelitor.utils.debug
+ particlelabeling
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.e4.core.contexts,

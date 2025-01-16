@@ -275,8 +275,19 @@ public class Histogram extends Canvas implements PaintListener {
                allCurvePointValues[curveIndex + 1] = devY;
             }
 
-            gc.setLineWidth(1);
             gc.setAntialias(SWT.ON);
+            gc.setLineWidth(1);
+
+            // draw default line
+            gc.setForeground(new Color(155, 155, 155));
+            gc.drawLine(
+
+                  0,
+                  graphHeight,
+                  graphWidth,
+                  0);
+
+            // draw curve graph
             gc.setForeground(new Color(99, 99, 99));
             gc.drawPolyline(allCurvePointValues);
          }
