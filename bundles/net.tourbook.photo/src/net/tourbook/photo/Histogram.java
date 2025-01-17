@@ -55,8 +55,9 @@ public class Histogram extends Canvas implements PaintListener {
    private CurveType       _curveType;
 
    private int             _threePoint_Dark;
-   private float           _threePoint_Middle;
    private int             _threePoint_Bright;
+   private float           _threePoint_MiddleX;
+   private float           _threePoint_MiddleY;
    private CurvesFilter    _curvesFilter;
 
    public Histogram(final Composite parent) {
@@ -214,16 +215,17 @@ public class Histogram extends Canvas implements PaintListener {
 
       final int sliderbarHeight = 20;
 
-      final int graphWidth = canvasWidth - 2;
+      final int graphWidth = canvasWidth;
       final int graphHeight = canvasHeight - sliderbarHeight;
 
       gc.setBackground(UI.SYS_COLOR_GRAY);
       gc.fillRectangle(0, 0, graphWidth - 0, graphHeight - 0);
 
-      final float lineWidth = graphWidth / 255f;
+      final float xUnitWidth = graphWidth / 255f;
+      final float yUnitWidth = graphHeight / 255f;
 
       gc.setForeground(UI.SYS_COLOR_DARK_GRAY);
-      gc.setLineWidth((int) (lineWidth + 1));
+      gc.setLineWidth((int) (xUnitWidth + 1));
 
       for (int lumIndex = 0; lumIndex < _allLuminances.length; lumIndex++) {
 
@@ -236,17 +238,18 @@ public class Histogram extends Canvas implements PaintListener {
 
          gc.drawLine(
 
-               (int) (devX + lineWidth),
+               (int) (devX + xUnitWidth),
                graphHeight,
-               (int) (devX + lineWidth),
+               (int) (devX + xUnitWidth),
                graphHeight - devY);
       }
 
       if (_isSetTonality) {
 
-         final int devXDark = (int) (_threePoint_Dark * lineWidth);
-         final int devXMiddle = (int) (_threePoint_Middle * lineWidth);
-         final int devXBright = (int) (_threePoint_Bright * lineWidth);
+         final int devXDark = (int) (_threePoint_Dark * xUnitWidth);
+         final int devXBright = (int) (_threePoint_Bright * xUnitWidth);
+         final int devXMiddle = (int) (_threePoint_MiddleX * xUnitWidth);
+//         final int devYMiddle = (int) (_threePoint_MiddleY * yUnitWidth);
 
          final int devYMarker = graphHeight + 2;
 
@@ -259,14 +262,13 @@ public class Histogram extends Canvas implements PaintListener {
           */
          if (_curvesFilter != null) {
 
-            final int[] curveValues = _curvesFilter.getRedTable();
-
+            final int[] allCurveValues = _curvesFilter.getRedTable();
             final int[] allCurvePointValues = new int[2 * 256];
 
-            for (int valueIndex = 0; valueIndex < curveValues.length; valueIndex++) {
+            for (int valueIndex = 0; valueIndex < allCurveValues.length; valueIndex++) {
 
                final int curveIndex = valueIndex * 2;
-               final int curveValueY = curveValues[valueIndex];
+               final int curveValueY = allCurveValues[valueIndex];
 
                final int devX = (int) (graphWidth * valueIndex / 255f);
                final int devY = graphHeight - (int) (graphHeight * curveValueY / 255f);
@@ -289,7 +291,29 @@ public class Histogram extends Canvas implements PaintListener {
 
             // draw curve graph
             gc.setForeground(new Color(99, 99, 99));
+            gc.setForeground(UI.SYS_COLOR_YELLOW);
             gc.drawPolyline(allCurvePointValues);
+
+            // draw marker vertical positions
+            final int middleValue = allCurveValues[(int) _threePoint_MiddleX];
+            final int devYMiddle = (int) (graphHeight - (graphHeight * middleValue / 255f));
+
+            final int pointRadius = 12;
+            final int pointRadius2 = pointRadius / 2;
+
+            gc.setForeground(UI.SYS_COLOR_RED);
+            gc.drawArc(
+
+                  devXMiddle - pointRadius2,
+                  devYMiddle - pointRadius2,
+
+                  pointRadius,
+                  pointRadius,
+
+                  0,
+                  360
+
+            );
          }
       }
    }
@@ -341,16 +365,18 @@ public class Histogram extends Canvas implements PaintListener {
 
       final int dark = photo.threePoint_Dark;
       final int bright = photo.threePoint_Bright;
-      final float middlePercent = photo.threePoint_Middle;
+      final float middleXPercent = photo.threePoint_MiddleX;
+      final float middleYPercent = photo.threePoint_MiddleY;
 
       final float diffAbsolute = bright - dark;
-      final float middleDiffAbsolute = diffAbsolute / 100 * middlePercent;
+      final float middleDiffAbsolute = diffAbsolute / 100 * middleXPercent;
 
       final float middleAbsolute = dark + middleDiffAbsolute;
 
       _threePoint_Dark = dark;
-      _threePoint_Middle = middleAbsolute;
       _threePoint_Bright = bright;
+      _threePoint_MiddleX = middleAbsolute;
+      _threePoint_MiddleY = middleAbsolute;
 
       redraw();
    }
@@ -368,7 +394,7 @@ public class Histogram extends Canvas implements PaintListener {
 
    public void updateCurvesFilter(final Photo photo) {
 
-      _curvesFilter = photo.curvesFilter;
+      _curvesFilter = photo.getToneCurvesFilter().getCurvesFilter();
 
       // update in UI thread
       getDisplay().asyncExec(() -> redraw());

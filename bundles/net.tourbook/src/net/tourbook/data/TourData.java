@@ -6501,8 +6501,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             galleryPhoto.isSetTonality = photoAdjustments.isSetTonality;
             galleryPhoto.curveType = photoAdjustments.curveType;
             galleryPhoto.threePoint_Dark = photoAdjustments.threePoint_Dark;
-            galleryPhoto.threePoint_Middle = photoAdjustments.threePoint_Middle;
             galleryPhoto.threePoint_Bright = photoAdjustments.threePoint_Bright;
+            galleryPhoto.threePoint_MiddleX = photoAdjustments.threePoint_MiddleX;
+            galleryPhoto.threePoint_MiddleY = photoAdjustments.threePoint_MiddleY;
          }
 
          /*

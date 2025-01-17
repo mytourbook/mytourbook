@@ -207,27 +207,27 @@ public class PhotoImageLoader {
 
       try {
 
-         final ToneCurvesFilter toneCurvesFilter = new ToneCurvesFilter();
+         final ToneCurvesFilter toneCurvesFilter = _photo.getToneCurvesFilter();
 
          final ToneCurves toneCurves = toneCurvesFilter.getCurves();
          final ToneCurve toneCurve = toneCurves.getActiveCurve();
 
-         final float dark = _photo.threePoint_Dark / 255f;
-         final float bright = _photo.threePoint_Bright / 255f;
+         final float darkRel = _photo.threePoint_Dark / 255f;
+         final float brightRel = _photo.threePoint_Bright / 255f;
+         final float middleX100 = _photo.threePoint_MiddleX;
+         final float middleY100 = _photo.threePoint_MiddleY;
 
-         final float middle = _photo.threePoint_Middle;
-         final float diffBrightDark = bright - dark;
-         final float diffMiddleDiff = diffBrightDark * middle / 100;
-         final float diffMiddle = dark + diffMiddleDiff;
+         final float diffBrightDarkRel = brightRel - darkRel;
+         final float diffMiddleXRel = diffBrightDarkRel * middleX100 / 100;
+         final float middleXRel = darkRel + diffMiddleXRel;
+         final float middleYRel = middleY100 / 100;
 
-         toneCurve.setKnotPosition(0, new Point2D.Float(dark, 0));
-         toneCurve.setKnotPosition(1, new Point2D.Float(bright, 1));
-         toneCurve.addKnot(new Point2D.Float(diffMiddle, 0.5f), false);
+         toneCurve.reset();
+         toneCurve.setKnotPosition(0, new Point2D.Float(darkRel, 0));
+         toneCurve.setKnotPosition(1, new Point2D.Float(brightRel, 1));
+         toneCurve.addKnot(new Point2D.Float(middleXRel, middleYRel), false);
 
          tonalityImage = toneCurvesFilter.transformImage(srcImage);
-
-         // update curves graph
-         _photo.curvesFilter = toneCurvesFilter.getCurvesFilter();
 
       } catch (final Exception e) {
 

@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import com.jhlabs.image.CurvesFilter;
-
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Float;
@@ -58,6 +56,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Rectangle;
+
+import pixelitor.filters.curves.ToneCurvesFilter;
 
 public class Photo implements Serializable {
 
@@ -331,12 +331,13 @@ public class Photo implements Serializable {
    public float                          cropAreaX2;
    public float                          cropAreaY2;
 
-   public boolean                        isSetTonality;
    public CurveType                      curveType;
-   public CurvesFilter                   curvesFilter;
+   public boolean                        isSetTonality;
+   private ToneCurvesFilter              _toneCurvesFilter;
    public int                            threePoint_Dark;
-   public float                          threePoint_Middle;
    public int                            threePoint_Bright;
+   public float                          threePoint_MiddleX;
+   public float                          threePoint_MiddleY;
 
    /**
     */
@@ -1192,6 +1193,15 @@ public class Photo implements Serializable {
       }
 
       return null;
+   }
+
+   public ToneCurvesFilter getToneCurvesFilter() {
+
+      if (_toneCurvesFilter == null) {
+         _toneCurvesFilter = new ToneCurvesFilter();
+      }
+
+      return _toneCurvesFilter;
    }
 
    /**

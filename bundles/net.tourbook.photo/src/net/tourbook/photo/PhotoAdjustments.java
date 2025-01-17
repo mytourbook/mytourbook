@@ -41,6 +41,7 @@ public class PhotoAdjustments {
    /**
     * Middle is the relative position between dark and bright, it is between 0...100
     */
-   public float     threePoint_Middle = 50.0f;
+   public float     threePoint_MiddleX = 50.0f;
+   public float     threePoint_MiddleY = 50.0f;
 
 }
