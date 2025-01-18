@@ -17,21 +17,21 @@ package com.jhlabs.image;
 
 public class CurvesFilter extends TransferFilter {
 
-   private Curve[] curves;
+   private CurveValues[] curves;
 
    public CurvesFilter(final String filterName) {
 
       super(filterName);
 
-      curves = new Curve[1];
+      curves = new CurveValues[1];
 
-      curves[0] = new Curve();
-//      curves[1] = new Curve();
-//      curves[2] = new Curve();
-//      curves[3] = new Curve();
+      curves[0] = new CurveValues();
+//    curves[1] = new Curve();
+//    curves[2] = new Curve();
+//    curves[3] = new Curve();
    }
 
-   public Curve[] getCurves() {
+   public CurveValues[] getCurves() {
       return curves;
    }
 
@@ -57,27 +57,17 @@ public class CurvesFilter extends TransferFilter {
 
          for (int x = 0; x <= 255; x++) {
 
-            getRedTable()[x] = ImageMath.clamp(r[rgb[x]], 0, 255);
+            rTable[x] = ImageMath.clamp(r[rgb[x]], 0, 255);
             gTable[x] = ImageMath.clamp(g[rgb[x]], 0, 255);
             bTable[x] = ImageMath.clamp(b[rgb[x]], 0, 255);
          }
       }
    }
 
-   public void setCurve(final Curve curve) {
+   public void setCurve(final CurveValues curve) {
 
-      curves = new Curve[] { curve };
+      curves = new CurveValues[] { curve };
       initialized = false;
-   }
-
-   public void setCurves(final Curve rgb, final Curve r, final Curve g, final Curve b) {
-
-      initialized = false;
-
-      curves[0] = r;
-      curves[1] = g;
-      curves[2] = b;
-      curves[3] = rgb;
    }
 
    @Override

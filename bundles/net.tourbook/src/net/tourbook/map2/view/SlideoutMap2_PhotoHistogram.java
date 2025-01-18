@@ -732,7 +732,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
 
    private void on3Points_Change(final Widget widget) {
 
-      validate3Points(widget);
+      setPointValues(widget);
 
       _histogram.update3Points(_photo);
 
@@ -770,7 +770,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
          _spinnerLevel_Bright.setSelection(_photo.threePoint_Bright);
       }
 
-      validate3Points(spinner);
+      setPointValues(spinner);
 
       _histogram.update3Points(_photo);
 
@@ -858,6 +858,39 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       }
 
       _comboCurveType.select(selectionIndex);
+   }
+
+   private void setPointValues(final Widget widget) {
+
+      int dark = _spinnerLevel_Dark.getSelection();
+      int bright = _spinnerLevel_Bright.getSelection();
+      final int middleX = _spinnerLevel_MiddleX.getSelection();
+      final int middleY = _spinnerLevel_MiddleY.getSelection();
+
+      if (widget == _spinnerLevel_Dark) {
+
+         if (dark >= bright) {
+
+            dark = bright - 1;
+
+            _spinnerLevel_Dark.setSelection(dark);
+         }
+      }
+
+      if (widget == _spinnerLevel_Bright) {
+
+         if (bright <= dark) {
+
+            bright = dark + 1;
+
+            _spinnerLevel_Bright.setSelection(bright);
+         }
+      }
+
+      _photo.threePoint_Dark = dark;
+      _photo.threePoint_Bright = bright;
+      _photo.threePoint_MiddleX = middleX / 10f;
+      _photo.threePoint_MiddleY = middleY / 10f;
    }
 
    /**
@@ -1137,39 +1170,6 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       }
 
       _pageBook.showPage(_pageNoPhoto);
-   }
-
-   private void validate3Points(final Widget widget) {
-
-      int dark = _spinnerLevel_Dark.getSelection();
-      int bright = _spinnerLevel_Bright.getSelection();
-      final int middleX = _spinnerLevel_MiddleX.getSelection();
-      final int middleY = _spinnerLevel_MiddleY.getSelection();
-
-      if (widget == _spinnerLevel_Dark) {
-
-         if (dark >= bright) {
-
-            dark = bright - 1;
-
-            _spinnerLevel_Dark.setSelection(dark);
-         }
-      }
-
-      if (widget == _spinnerLevel_Bright) {
-
-         if (bright <= dark) {
-
-            bright = dark + 1;
-
-            _spinnerLevel_Bright.setSelection(bright);
-         }
-      }
-
-      _photo.threePoint_Dark = dark;
-      _photo.threePoint_Bright = bright;
-      _photo.threePoint_MiddleX = middleX / 10f;
-      _photo.threePoint_MiddleY = middleY / 10f;
    }
 
 }

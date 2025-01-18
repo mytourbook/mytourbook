@@ -16,7 +16,7 @@
  */
 package pixelitor.filters.curves;
 
-import com.jhlabs.image.Curve;
+import com.jhlabs.image.CurveValues;
 import com.jhlabs.image.CurvesFilter;
 
 import java.awt.image.BufferedImage;
@@ -63,9 +63,9 @@ public class ToneCurvesFilter extends Filter /* extends FilterWithGUI */ {
       }
 
       final ToneCurve toneCurve = _toneCurves.getCurve(Channel.RGB);
-      final Curve curveData = toneCurve.curveData;
+      final CurveValues curveValues = toneCurve.curveValues;
 
-      _curvesFilter.setCurve(curveData);
+      _curvesFilter.setCurve(curveValues);
 
       return _curvesFilter.filter(src, dest);
    }
