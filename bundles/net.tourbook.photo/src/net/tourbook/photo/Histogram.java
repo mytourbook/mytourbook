@@ -395,9 +395,9 @@ public class Histogram extends Canvas implements PaintListener {
          gc.setForeground(new Color(155, 155, 155));
          gc.drawLine(
 
-               0,
+               devXDark,
                _graphHeight,
-               _graphWidth,
+               devXBright,
                0);
 
          // draw curve graph
