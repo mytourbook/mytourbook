@@ -16,6 +16,7 @@
 package net.tourbook.photo;
 
 import com.jhlabs.image.CurvesFilter;
+import com.jhlabs.image.ImageMath;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import java.util.Arrays;
 
 import net.tourbook.common.UI;
 
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -30,9 +32,11 @@ import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -44,36 +48,51 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class Histogram extends Canvas implements PaintListener {
 
-   private static final int     POINT_RADIUS           = 12;
+   private static final int                       POINT_RADIUS           = 12;
 
-   public static final int      NUM_BINS               = 256;
+   public static final int                        NUM_BINS               = 256;
 
-   private int                  _maxLuminance;
-   private int[]                _allLuminances         = new int[NUM_BINS];
+   private int                                    _maxLuminance;
+   private int[]                                  _allLuminances         = new int[NUM_BINS];
 
-   private ImageData            _imageData;
+   private ImageData                              _imageData;
 
-   private boolean              _isSetTonality;
-   private CurveType            _curveType;
+   private boolean                                _isSetTonality;
+   private CurveType                              _curveType;
 
-   private int                  _threePoint_DevDark;
-   private int                  _threePoint_DevBright;
-   private float                _threePoint_DevMiddleX;
-   private CurvesFilter         _curvesFilter;
+   private int                                    _threePoint_DevDark;
+   private int                                    _threePoint_DevBright;
+   private float                                  _threePoint_DevMiddleX;
+   private CurvesFilter                           _curvesFilter;
 
-   private ArrayList<Rectangle> _allPaintedCurvePoints = new ArrayList<>();
-   private int                  _hoveredPointIndex     = -1;
-   private boolean              _isPointDragged;
+   private ArrayList<Rectangle>                   _allPaintedCurvePoints = new ArrayList<>();
+   private int                                    _hoveredPointIndex     = -1;
+   private boolean                                _isPointDragged;
 
-   private int                  _graphWidth;
-   private int                  _graphHeight;
-   private float                _xUnitWidth;
+   private int                                    _graphWidth;
+   private int                                    _graphHeight;
+   private float                                  _xUnitWidth;
+
+   private final ListenerList<IHistogramListener> _allHistogramListener  = new ListenerList<>(ListenerList.IDENTITY);
+
+   /*
+    * UI controls
+    */
+   private Cursor _currentCursor;
+   private Cursor _cursor_Size_All;
 
    public Histogram(final Composite parent) {
 
       super(parent, SWT.DOUBLE_BUFFERED | SWT.NO_FOCUS);
 
       addListener();
+
+      initUI();
+   }
+
+   public void addHistogramListener(final IHistogramListener listener) {
+
+      _allHistogramListener.add(listener);
    }
 
    private void addListener() {
@@ -183,6 +202,26 @@ public class Histogram extends Canvas implements PaintListener {
       _maxLuminance = maxLuminance;
    }
 
+   /**
+    * @param yValueRel
+    * @param xValueRel
+    * @param yValueRel2
+    * @param isZoomed
+    *           Is <code>true</code> when the event is fired by zooming
+    */
+   private void fireEvent_OnPointMove(final int pointIndex, final float xValueRel, final float yValueRel) {
+
+      // ensure 0...1
+      final float xRel = ImageMath.clamp01(xValueRel);
+      final float yRel = ImageMath.clamp01(yValueRel);
+
+      final Object[] listeners = _allHistogramListener.getListeners();
+
+      for (final Object listener : listeners) {
+         ((IHistogramListener) listener).onPointMove(pointIndex, xRel, yRel);
+      }
+   }
+
    private int getHoveredPointIndex(final MouseEvent mouseEvent) {
 
       for (int pointIndex = 0; pointIndex < _allPaintedCurvePoints.size(); pointIndex++) {
@@ -196,6 +235,11 @@ public class Histogram extends Canvas implements PaintListener {
       }
 
       return -1;
+   }
+
+   private void initUI() {
+
+      _cursor_Size_All = getDisplay().getSystemCursor(SWT.CURSOR_SIZEALL);
    }
 
    private void onMouseDown(final MouseEvent mouseEvent) {
@@ -218,19 +262,25 @@ public class Histogram extends Canvas implements PaintListener {
 
       if (_isPointDragged) {
 
-         if (_hoveredPointIndex == 1) {
+         if (_hoveredPointIndex != -1) {
 
-            // middle point is dragged
+            // point is dragged
 
-            final int mouseX = mouseEvent.x;
-            final int mouseY = mouseEvent.y;
+            final float mouseX = mouseEvent.x;
+            final float mouseY = mouseEvent.y;
 
+            final float xValueRel = mouseX / _graphWidth;
+            final float YValueRel = 1 - (mouseY / _graphHeight);
+
+            fireEvent_OnPointMove(_hoveredPointIndex, xValueRel, YValueRel);
          }
 
       } else {
 
          _hoveredPointIndex = getHoveredPointIndex(mouseEvent);
       }
+
+      updateCursor(_hoveredPointIndex == -1 ? null : _cursor_Size_All);
 
       // check if a redraw is necessary
       if (oldHoveredPointIndex != _hoveredPointIndex) {
@@ -244,6 +294,8 @@ public class Histogram extends Canvas implements PaintListener {
 
       // update hovered point, the mouse could be outside of the hovered point
       _hoveredPointIndex = getHoveredPointIndex(mouseEvent);
+
+      updateCursor(_hoveredPointIndex == -1 ? null : _cursor_Size_All);
 
       redraw();
    }
@@ -301,7 +353,6 @@ public class Histogram extends Canvas implements PaintListener {
       final int devXDark = (int) (_threePoint_DevDark * _xUnitWidth);
       final int devXBright = (int) (_threePoint_DevBright * _xUnitWidth);
       final int devXMiddle = (int) (_threePoint_DevMiddleX * _xUnitWidth);
-//    final int devYMiddle = (int) (_threePoint_MiddleY * yUnitWidth);
 
       final int devYMarker = _graphHeight + 2;
 
@@ -317,18 +368,24 @@ public class Histogram extends Canvas implements PaintListener {
       if (_curvesFilter != null) {
 
          final int[] allCurveValues = _curvesFilter.getRedTable();
-         final int[] allCurvePointValues = new int[2 * 256];
+
+         final Path curvePath = new Path(getDisplay());
 
          for (int valueIndex = 0; valueIndex < allCurveValues.length; valueIndex++) {
 
-            final int curveIndex = valueIndex * 2;
             final int curveValueY = allCurveValues[valueIndex];
 
-            final int devX = (int) (_graphWidth * valueIndex / 255f);
-            final int devY = _graphHeight - (int) (_graphHeight * curveValueY / 255f);
+            final float devX = _graphWidth * valueIndex / 255f;
+            final float devY = _graphHeight - (_graphHeight * curveValueY / 255f);
 
-            allCurvePointValues[curveIndex] = devX;
-            allCurvePointValues[curveIndex + 1] = devY;
+            if (valueIndex == 0) {
+
+               curvePath.moveTo(devX, devY);
+
+            } else {
+
+               curvePath.lineTo(devX, devY);
+            }
          }
 
          gc.setAntialias(SWT.ON);
@@ -344,9 +401,10 @@ public class Histogram extends Canvas implements PaintListener {
                0);
 
          // draw curve graph
-         gc.setForeground(new Color(99, 99, 99));
          gc.setForeground(UI.SYS_COLOR_YELLOW);
-         gc.drawPolyline(allCurvePointValues);
+         gc.drawPath(curvePath);
+
+         curvePath.dispose();
 
          // draw vertical positions
          paint_30_TonePoint(gc, devXDark, allCurveValues[_threePoint_DevDark], _graphHeight);
@@ -357,17 +415,38 @@ public class Histogram extends Canvas implements PaintListener {
 
             final Rectangle hoveredRectangle = _allPaintedCurvePoints.get(_hoveredPointIndex);
 
-            gc.setForeground(_isPointDragged ? UI.SYS_COLOR_MAGENTA : UI.SYS_COLOR_GREEN);
-            gc.drawArc(
+            if (_isPointDragged) {
 
-                  hoveredRectangle.x,
-                  hoveredRectangle.y,
+               // paint dragged point
 
-                  hoveredRectangle.width,
-                  hoveredRectangle.height,
+               gc.setBackground(UI.SYS_COLOR_YELLOW);
+               gc.fillArc(
 
-                  0,
-                  360);
+                     hoveredRectangle.x,
+                     hoveredRectangle.y,
+
+                     hoveredRectangle.width,
+                     hoveredRectangle.height,
+
+                     0,
+                     360);
+
+            } else {
+
+               // paint hovered point
+
+               gc.setForeground(UI.SYS_COLOR_MAGENTA);
+               gc.drawArc(
+
+                     hoveredRectangle.x,
+                     hoveredRectangle.y,
+
+                     hoveredRectangle.width,
+                     hoveredRectangle.height,
+
+                     0,
+                     360);
+            }
          }
       }
    }
@@ -482,6 +561,21 @@ public class Histogram extends Canvas implements PaintListener {
       computeLuminance(_imageData, relCropArea);
 
       redraw();
+   }
+
+   /**
+    * Update cursor only when it was modified
+    *
+    * @param cursor
+    */
+   private void updateCursor(final Cursor cursor) {
+
+      if (_currentCursor != cursor) {
+
+         _currentCursor = cursor;
+
+         setCursor(cursor);
+      }
    }
 
    public void updateCurvesFilter(final Photo photo) {

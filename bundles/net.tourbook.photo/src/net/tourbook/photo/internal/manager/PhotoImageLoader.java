@@ -207,11 +207,6 @@ public class PhotoImageLoader {
 
       try {
 
-         final ToneCurvesFilter toneCurvesFilter = _photo.getToneCurvesFilter();
-
-         final ToneCurves toneCurves = toneCurvesFilter.getCurves();
-         final ToneCurve toneCurve = toneCurves.getActiveCurve();
-
          final float darkRel = _photo.threePoint_Dark / 255f;
          final float brightRel = _photo.threePoint_Bright / 255f;
          final float middleX100 = _photo.threePoint_MiddleX;
@@ -221,6 +216,10 @@ public class PhotoImageLoader {
          final float diffMiddleXRel = diffBrightDarkRel * middleX100 / 100;
          final float middleXRel = darkRel + diffMiddleXRel;
          final float middleYRel = middleY100 / 100;
+
+         final ToneCurvesFilter toneCurvesFilter = _photo.getToneCurvesFilter();
+         final ToneCurves toneCurves = toneCurvesFilter.getCurves();
+         final ToneCurve toneCurve = toneCurves.getActiveCurve();
 
          toneCurve.reset();
          toneCurve.setKnotPosition(0, new Point2D.Float(darkRel, 0));

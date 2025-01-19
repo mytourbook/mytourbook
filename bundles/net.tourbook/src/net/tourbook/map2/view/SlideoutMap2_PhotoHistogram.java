@@ -39,6 +39,7 @@ import net.tourbook.data.TourPhoto;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.CurveType;
 import net.tourbook.photo.Histogram;
+import net.tourbook.photo.IHistogramListener;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
@@ -63,7 +64,6 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -81,7 +81,10 @@ import org.eclipse.ui.part.PageBook;
 /**
  * Slideout for the 2D map photo tooltip
  */
-public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IActionResetToDefault {
+public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
+
+      IActionResetToDefault,
+      IHistogramListener {
 
    private static final String          ID                         = "net.tourbook.map2.view.SlideoutMap2_PhotoHistogram"; //$NON-NLS-1$
 
@@ -174,7 +177,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       @Override
       public void runWithEvent(final Event event) {
 
-         on3Points_Reset(spinner);
+         on3Points_Reset(event, spinner);
       }
    }
 
@@ -302,6 +305,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
          }
          {
             _histogram = new Histogram(container);
+            _histogram.addHistogramListener(this);
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   .span(2, 1)
@@ -739,35 +743,54 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       updateModelAndUI();
    }
 
-   private void on3Points_Reset(final Spinner spinner) {
+   private void on3Points_Reset(final Event event, final Spinner spinner) {
 
-      if (spinner == _spinnerLevel_Dark) {
+      if (UI.isCtrlKey(event)) {
+
+         // reset all
 
          _photo.threePoint_Dark = THREE_POINT_DEFAULT_DARK;
-
-         _spinnerLevel_Dark.setFocus();
-         _spinnerLevel_Dark.setSelection(_photo.threePoint_Dark);
-
-      } else if (spinner == _spinnerLevel_MiddleX) {
-
          _photo.threePoint_MiddleX = THREE_POINT_DEFAULT_MIDDLE;
-
-         _spinnerLevel_MiddleX.setFocus();
-         _spinnerLevel_MiddleX.setSelection((int) (_photo.threePoint_MiddleX * 10));
-
-      } else if (spinner == _spinnerLevel_MiddleY) {
-
          _photo.threePoint_MiddleY = THREE_POINT_DEFAULT_MIDDLE;
-
-         _spinnerLevel_MiddleY.setFocus();
-         _spinnerLevel_MiddleY.setSelection((int) (_photo.threePoint_MiddleY * 10));
-
-      } else if (spinner == _spinnerLevel_Bright) {
-
          _photo.threePoint_Bright = THREE_POINT_DEFAULT_BRIGHT;
 
-         _spinnerLevel_Bright.setFocus();
+         _spinnerLevel_Dark.setSelection(_photo.threePoint_Dark);
          _spinnerLevel_Bright.setSelection(_photo.threePoint_Bright);
+         _spinnerLevel_MiddleX.setSelection((int) (_photo.threePoint_MiddleX * 10));
+         _spinnerLevel_MiddleY.setSelection((int) (_photo.threePoint_MiddleY * 10));
+
+         spinner.setFocus();
+
+      } else {
+
+         if (spinner == _spinnerLevel_Dark) {
+
+            _photo.threePoint_Dark = THREE_POINT_DEFAULT_DARK;
+
+            _spinnerLevel_Dark.setFocus();
+            _spinnerLevel_Dark.setSelection(_photo.threePoint_Dark);
+
+         } else if (spinner == _spinnerLevel_MiddleX) {
+
+            _photo.threePoint_MiddleX = THREE_POINT_DEFAULT_MIDDLE;
+
+            _spinnerLevel_MiddleX.setFocus();
+            _spinnerLevel_MiddleX.setSelection((int) (_photo.threePoint_MiddleX * 10));
+
+         } else if (spinner == _spinnerLevel_MiddleY) {
+
+            _photo.threePoint_MiddleY = THREE_POINT_DEFAULT_MIDDLE;
+
+            _spinnerLevel_MiddleY.setFocus();
+            _spinnerLevel_MiddleY.setSelection((int) (_photo.threePoint_MiddleY * 10));
+
+         } else if (spinner == _spinnerLevel_Bright) {
+
+            _photo.threePoint_Bright = THREE_POINT_DEFAULT_BRIGHT;
+
+            _spinnerLevel_Bright.setFocus();
+            _spinnerLevel_Bright.setSelection(_photo.threePoint_Bright);
+         }
       }
 
       setPointValues(spinner);
@@ -821,6 +844,78 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       });
    }
 
+   @Override
+   public void onPointMove(final int pointIndex,
+                           final float xValueRel,
+                           final float yValueRel) {
+
+      final int devX = (int) (xValueRel * 255);
+
+      if (pointIndex == 0) {
+
+         // dark point
+
+         _photo.threePoint_Dark = devX;
+         _spinnerLevel_Dark.setSelection(devX);
+
+      } else if (pointIndex == 2) {
+
+         // bright point
+
+         _photo.threePoint_Bright = devX;
+         _spinnerLevel_Bright.setSelection(devX);
+
+      } else if (pointIndex == 1) {
+
+         // middle point
+
+         final int devDark = _photo.threePoint_Dark;
+         final int devBright = _photo.threePoint_Bright;
+         final float devDiff = devBright - devDark;
+
+         final float devMouse = xValueRel * 255;
+         final float devMouseInDiff = devMouse - devDark;
+
+         float relMouseXInDiff = devMouseInDiff / devDiff;
+
+         // force bounds
+         if (relMouseXInDiff < 0) {
+            relMouseXInDiff = 0;
+         }
+
+         if (relMouseXInDiff > 1) {
+            relMouseXInDiff = 1;
+         }
+
+         final float newMiddleYRel = yValueRel;
+
+         _photo.threePoint_MiddleX = relMouseXInDiff * 100;
+         _photo.threePoint_MiddleY = newMiddleYRel * 100;
+
+         _spinnerLevel_MiddleX.setSelection((int) (relMouseXInDiff * 1000));
+         _spinnerLevel_MiddleY.setSelection((int) (newMiddleYRel * 1000));
+      }
+
+      _histogram.update3Points(_photo);
+
+      updateModelAndUI();
+
+//      final float diffBrightDarkRel = brightRel - darkRel;
+//      final float diffMiddleXRel = diffBrightDarkRel * middleX100 / 100;
+//      final float middleXRel = darkRel + diffMiddleXRel;
+//      final float middleYRel = middleY100 / 100;
+
+//      final ToneCurvesFilter toneCurvesFilter = _photo.getToneCurvesFilter();
+//      final ToneCurves toneCurves = toneCurvesFilter.getCurves();
+//      final ToneCurve toneCurve = toneCurves.getActiveCurve();
+//
+//      toneCurve.reset();
+//      toneCurve.setKnotPosition(0, new Point2D.Float(darkRel, 0));
+//      toneCurve.setKnotPosition(1, new Point2D.Float(brightRel, 1));
+//      toneCurve.addKnot(new Point2D.Float(middleXRel, middleYRel), false);
+
+   }
+
    private void onSelectCurveType(final SelectionEvent selectionEvent) {
 
       _photo.curveType = getSelectedCurveType();
@@ -862,35 +957,35 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
 
    private void setPointValues(final Widget widget) {
 
-      int dark = _spinnerLevel_Dark.getSelection();
-      int bright = _spinnerLevel_Bright.getSelection();
-      final int middleX = _spinnerLevel_MiddleX.getSelection();
-      final int middleY = _spinnerLevel_MiddleY.getSelection();
+      int devDark = _spinnerLevel_Dark.getSelection();
+      int devBright = _spinnerLevel_Bright.getSelection();
+      final int middleX100 = _spinnerLevel_MiddleX.getSelection();
+      final int middleY100 = _spinnerLevel_MiddleY.getSelection();
 
       if (widget == _spinnerLevel_Dark) {
 
-         if (dark >= bright) {
+         if (devDark >= devBright) {
 
-            dark = bright - 1;
+            devDark = devBright - 1;
 
-            _spinnerLevel_Dark.setSelection(dark);
+            _spinnerLevel_Dark.setSelection(devDark);
          }
       }
 
       if (widget == _spinnerLevel_Bright) {
 
-         if (bright <= dark) {
+         if (devBright <= devDark) {
 
-            bright = dark + 1;
+            devBright = devDark + 1;
 
-            _spinnerLevel_Bright.setSelection(bright);
+            _spinnerLevel_Bright.setSelection(devBright);
          }
       }
 
-      _photo.threePoint_Dark = dark;
-      _photo.threePoint_Bright = bright;
-      _photo.threePoint_MiddleX = middleX / 10f;
-      _photo.threePoint_MiddleY = middleY / 10f;
+      _photo.threePoint_Dark = devDark;
+      _photo.threePoint_Bright = devBright;
+      _photo.threePoint_MiddleX = middleX100 / 10f;
+      _photo.threePoint_MiddleY = middleY100 / 10f;
    }
 
    /**
@@ -982,7 +1077,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       _spinnerLevel_MiddleX.setSelection((int) (_photo.threePoint_MiddleX * 10));
       _spinnerLevel_MiddleY.setSelection((int) (_photo.threePoint_MiddleY * 10));
       selectCurveType(_photo.curveType);
-      updateUI_3PointActions();
+      updateUI_ShowHide3PointActions();
 
       final Image photoImage = getPhotoImage(_photo);
       final Float relCropArea = _photo.getValidCropArea();
@@ -1017,34 +1112,23 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       _histogram.updateCropArea(histogramCropArea);
    }
 
-   /**
-    * Update cursor only when it was modified
-    *
-    * @param cursor
-    */
-   private void updateCursor(final Cursor cursor) {
-
-//      if (_currentCursor != cursor) {
-//
-//         _currentCursor = cursor;
-//
-//         _photoImageCanvas.setCursor(cursor);
-//      }
-   }
-
    public void updateCurves() {
+
+      if (_histogram == null) {
+         return;
+      }
 
       _histogram.updateCurvesFilter(_photo);
    }
 
    private void updateModelAndUI() {
 
+      // set flag that the map photo is recomputed
       _photo.isAdjustmentModified = true;
 
       updateTourPhotoInDB(_photo);
 
-      // show/hide reset buttons
-      updateUI_3PointActions();
+      updateUI_ShowHide3PointActions();
 
       _histogram.redraw();
    }
@@ -1141,19 +1225,6 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       }
    }
 
-   private void updateUI_3PointActions() {
-
-      final boolean isDarkDefaultValue = _photo.threePoint_Dark == THREE_POINT_DEFAULT_DARK;
-      final boolean isBrightDefaultValue = _photo.threePoint_Bright == THREE_POINT_DEFAULT_BRIGHT;
-      final boolean isMiddleXDefaultValue = _photo.threePoint_MiddleX == THREE_POINT_DEFAULT_MIDDLE;
-      final boolean isMiddleYDefaultValue = _photo.threePoint_MiddleY == THREE_POINT_DEFAULT_MIDDLE;
-
-      _toolbarReset3Point_Dark.setVisible(isDarkDefaultValue == false);
-      _toolbarReset3Point_Bright.setVisible(isBrightDefaultValue == false);
-      _toolbarReset3Point_MiddleX.setVisible(isMiddleXDefaultValue == false);
-      _toolbarReset3Point_MiddleY.setVisible(isMiddleYDefaultValue == false);
-   }
-
    private void updateUI_LoadingMessage() {
 
       if (_hoveredMapPoint == null) {
@@ -1170,6 +1241,19 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements IAc
       }
 
       _pageBook.showPage(_pageNoPhoto);
+   }
+
+   private void updateUI_ShowHide3PointActions() {
+
+      final boolean isDarkDefaultValue = _photo.threePoint_Dark == THREE_POINT_DEFAULT_DARK;
+      final boolean isBrightDefaultValue = _photo.threePoint_Bright == THREE_POINT_DEFAULT_BRIGHT;
+      final boolean isMiddleXDefaultValue = _photo.threePoint_MiddleX == THREE_POINT_DEFAULT_MIDDLE;
+      final boolean isMiddleYDefaultValue = _photo.threePoint_MiddleY == THREE_POINT_DEFAULT_MIDDLE;
+
+      _toolbarReset3Point_Dark.setVisible(isDarkDefaultValue == false);
+      _toolbarReset3Point_Bright.setVisible(isBrightDefaultValue == false);
+      _toolbarReset3Point_MiddleX.setVisible(isMiddleXDefaultValue == false);
+      _toolbarReset3Point_MiddleY.setVisible(isMiddleYDefaultValue == false);
    }
 
 }

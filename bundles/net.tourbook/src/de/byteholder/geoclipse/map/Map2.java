@@ -836,12 +836,18 @@ public class Map2 extends Canvas {
       @Override
       public void callBackImageIsLoaded(final boolean isUpdateUI) {
 
-         if (isUpdateUI) {
+         try {
 
-            // curves must be update after the image is loading which is computing the curves
-            _mapPointTooltip_PhotoHistogram.updateCurves();
+            if (isUpdateUI) {
 
-            paint();
+               // curves must be update after the image is loading which is computing the curves
+               _mapPointTooltip_PhotoHistogram.updateCurves();
+
+               paint();
+            }
+
+         } catch (final Exception e) {
+            StatusUtil.log(e);
          }
       }
    }
@@ -851,10 +857,16 @@ public class Map2 extends Canvas {
       @Override
       public void callBackImageIsLoaded(final boolean isUpdateUI) {
 
-         if (isUpdateUI) {
+         try {
 
-            _mapPointTooltip_PhotoImage.onImageIsLoaded();
-            _mapPointTooltip_PhotoHistogram.onImageIsLoaded();
+            if (isUpdateUI) {
+
+               _mapPointTooltip_PhotoImage.onImageIsLoaded();
+               _mapPointTooltip_PhotoHistogram.onImageIsLoaded();
+            }
+
+         } catch (final Exception e) {
+            StatusUtil.log(e);
          }
       }
    }
