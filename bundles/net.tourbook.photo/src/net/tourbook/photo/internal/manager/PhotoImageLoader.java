@@ -16,7 +16,6 @@
 package net.tourbook.photo.internal.manager;
 
 import java.awt.Point;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -59,8 +58,6 @@ import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Rotation;
 
-import pixelitor.filters.curves.ToneCurve;
-import pixelitor.filters.curves.ToneCurves;
 import pixelitor.filters.curves.ToneCurvesFilter;
 import pixelitor.gui.GUIMessageHandler;
 import pixelitor.utils.Messages;
@@ -207,24 +204,7 @@ public class PhotoImageLoader {
 
       try {
 
-         final float darkRel = _photo.threePoint_Dark / 255f;
-         final float brightRel = _photo.threePoint_Bright / 255f;
-         final float middleX100 = _photo.threePoint_MiddleX;
-         final float middleY100 = _photo.threePoint_MiddleY;
-
-         final float diffBrightDarkRel = brightRel - darkRel;
-         final float diffMiddleXRel = diffBrightDarkRel * middleX100 / 100;
-         final float middleXRel = darkRel + diffMiddleXRel;
-         final float middleYRel = middleY100 / 100;
-
          final ToneCurvesFilter toneCurvesFilter = _photo.getToneCurvesFilter();
-         final ToneCurves toneCurves = toneCurvesFilter.getCurves();
-         final ToneCurve toneCurve = toneCurves.getActiveCurve();
-
-         toneCurve.reset();
-         toneCurve.setKnotPosition(0, new Point2D.Float(darkRel, 0));
-         toneCurve.setKnotPosition(1, new Point2D.Float(brightRel, 1));
-         toneCurve.addKnot(new Point2D.Float(middleXRel, middleYRel), false);
 
          tonalityImage = toneCurvesFilter.transformImage(srcImage);
 

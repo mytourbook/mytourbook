@@ -17,13 +17,6 @@ package net.tourbook.photo;
 
 public interface IHistogramListener {
 
-   /**
-    * @param pointIndex
-    * @param xValueRel
-    *           Relative x value 0...1
-    * @param yValueRel
-    *           Relative y value 0...1
-    */
-   public void onPointMove(int pointIndex, float xValueRel, float yValueRel);
+   public void onPointIsModified();
 
 }

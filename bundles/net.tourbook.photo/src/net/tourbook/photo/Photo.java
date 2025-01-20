@@ -334,10 +334,6 @@ public class Photo implements Serializable {
    public CurveType                      curveType;
    public boolean                        isSetTonality;
    private ToneCurvesFilter              _toneCurvesFilter;
-   public int                            threePoint_Dark;
-   public int                            threePoint_Bright;
-   public float                          threePoint_MiddleX;
-   public float                          threePoint_MiddleY;
 
    /**
     */

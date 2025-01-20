@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import com.jhlabs.image.CurvesFilter;
+import com.jhlabs.image.CurveValues;
 import com.jhlabs.image.ImageMath;
 
 import java.awt.geom.Rectangle2D;
@@ -41,6 +41,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
+import pixelitor.filters.curves.ToneCurvesFilter;
+
 /**
  * Displays a histogram of a photo
  * <p>
@@ -60,10 +62,7 @@ public class Histogram extends Canvas implements PaintListener {
    private boolean                                _isSetTonality;
    private CurveType                              _curveType;
 
-   private int                                    _threePoint_DevDark;
-   private int                                    _threePoint_DevBright;
-   private float                                  _threePoint_DevMiddleX;
-   private CurvesFilter                           _curvesFilter;
+   private ToneCurvesFilter                       _toneCurvesFilter;
 
    private ArrayList<Rectangle>                   _allPaintedCurvePoints = new ArrayList<>();
    private int                                    _hoveredPointIndex     = -1;
@@ -100,6 +99,7 @@ public class Histogram extends Canvas implements PaintListener {
       addPaintListener(this);
 
       addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> onMouseDown(mouseEvent)));
+      addMouseListener(MouseListener.mouseDoubleClickAdapter(mouseEvent -> onMouseDoubleClick(mouseEvent)));
       addMouseListener(MouseListener.mouseUpAdapter(mouseEvent -> onMouseUp(mouseEvent)));
       addMouseMoveListener(event -> onMouseMove(event));
       addMouseTrackListener(MouseTrackListener.mouseExitAdapter(mouseEvent -> onMouseExit(mouseEvent)));
@@ -209,16 +209,12 @@ public class Histogram extends Canvas implements PaintListener {
     * @param isZoomed
     *           Is <code>true</code> when the event is fired by zooming
     */
-   private void fireEvent_OnPointMove(final int pointIndex, final float xValueRel, final float yValueRel) {
-
-      // ensure 0...1
-      final float xRel = ImageMath.clamp01(xValueRel);
-      final float yRel = ImageMath.clamp01(yValueRel);
+   private void fireEvent_OnPointIsModified() {
 
       final Object[] listeners = _allHistogramListener.getListeners();
 
       for (final Object listener : listeners) {
-         ((IHistogramListener) listener).onPointMove(pointIndex, xRel, yRel);
+         ((IHistogramListener) listener).onPointIsModified();
       }
    }
 
@@ -242,11 +238,56 @@ public class Histogram extends Canvas implements PaintListener {
       _cursor_Size_All = getDisplay().getSystemCursor(SWT.CURSOR_SIZEALL);
    }
 
+   private void onMouseDoubleClick(final MouseEvent mouseEvent) {
+
+      if (_hoveredPointIndex != -1) {
+
+         // remove point
+
+         final CurveValues curveValues = _toneCurvesFilter.getCurves().getActiveCurve().curveValues;
+
+         final float[] allValuesX = curveValues.allValuesX;
+
+         final int numValues = allValuesX.length;
+         final int lastPointIndex = numValues - 1;
+
+         if (_hoveredPointIndex != 0 && _hoveredPointIndex != lastPointIndex) {
+
+            curveValues.removeKnot(_hoveredPointIndex);
+
+            fireEvent_OnPointIsModified();
+         }
+      }
+   }
+
    private void onMouseDown(final MouseEvent mouseEvent) {
 
       if (_hoveredPointIndex != -1) {
 
          _isPointDragged = true;
+
+         redraw();
+
+      } else {
+
+         // add new point
+
+         final float mouseX = mouseEvent.x;
+         final float mouseY = mouseEvent.y;
+
+         final float xValueRel = mouseX / _graphWidth;
+         final float yValueRel = 1 - (mouseY / _graphHeight);
+
+         // ensure 0...1
+         final float xRel = ImageMath.clamp01(xValueRel);
+         final float yRel = ImageMath.clamp01(yValueRel);
+
+         final CurveValues curveValues = _toneCurvesFilter.getCurves().getActiveCurve().curveValues;
+
+         _hoveredPointIndex = curveValues.addKnot(xRel, yRel);
+         _isPointDragged = true;
+
+         fireEvent_OnPointIsModified();
 
          redraw();
       }
@@ -270,9 +311,18 @@ public class Histogram extends Canvas implements PaintListener {
             final float mouseY = mouseEvent.y;
 
             final float xValueRel = mouseX / _graphWidth;
-            final float YValueRel = 1 - (mouseY / _graphHeight);
+            final float yValueRel = 1 - (mouseY / _graphHeight);
 
-            fireEvent_OnPointMove(_hoveredPointIndex, xValueRel, YValueRel);
+            // ensure 0...1
+            final float xRel = ImageMath.clamp01(xValueRel);
+            final float yRel = ImageMath.clamp01(yValueRel);
+
+            final CurveValues curveValues = _toneCurvesFilter.getCurves().getActiveCurve().curveValues;
+
+            curveValues.allValuesX[_hoveredPointIndex] = xRel;
+            curveValues.allValuesY[_hoveredPointIndex] = yRel;
+
+            fireEvent_OnPointIsModified();
          }
 
       } else {
@@ -315,6 +365,8 @@ public class Histogram extends Canvas implements PaintListener {
       _graphHeight = canvasHeight - sliderbarHeight;
       _xUnitWidth = _graphWidth / 255f;
 
+      _allPaintedCurvePoints.clear();
+
       paint_10_Histogram(gc);
 
       if (_isSetTonality) {
@@ -350,116 +402,121 @@ public class Histogram extends Canvas implements PaintListener {
 
    private void paint_20_ToneCurve(final GC gc) {
 
-      final int devXDark = (int) (_threePoint_DevDark * _xUnitWidth);
-      final int devXBright = (int) (_threePoint_DevBright * _xUnitWidth);
-      final int devXMiddle = (int) (_threePoint_DevMiddleX * _xUnitWidth);
+      if (_toneCurvesFilter == null || _toneCurvesFilter.getCurvesFilter() == null) {
+         return;
+      }
 
-      final int devYMarker = _graphHeight + 2;
+      final CurveValues curveValues = _toneCurvesFilter.getCurves().getActiveCurve().curveValues;
+      final int[] allCurveValues = _toneCurvesFilter.getCurvesFilter().getRedTable();
 
-      paint_50_ToneMarker(gc, devXDark, devYMarker, UI.SYS_COLOR_BLACK);
-      paint_50_ToneMarker(gc, devXMiddle, devYMarker, UI.SYS_COLOR_DARK_GRAY);
-      paint_50_ToneMarker(gc, devXBright, devYMarker, UI.SYS_COLOR_WHITE);
+      final float[] allPointValuesX = curveValues.allValuesX;
+      final float[] allPointValuesY = curveValues.allValuesY;
 
-      /*
-       * Draw curve line
-       */
-      _allPaintedCurvePoints.clear();
+      final int numValues = allPointValuesX.length;
 
-      if (_curvesFilter != null) {
+      final int[] allDevX = new int[numValues];
+      final int[] allDevY = new int[numValues];
 
-         final int[] allCurveValues = _curvesFilter.getRedTable();
+      for (int valueIndex = 0; valueIndex < numValues; valueIndex++) {
 
-         final Path curvePath = new Path(getDisplay());
+         final float valueX = allPointValuesX[valueIndex];
+         final float valueY = allPointValuesY[valueIndex];
 
-         for (int valueIndex = 0; valueIndex < allCurveValues.length; valueIndex++) {
+         final int devXPoint = (int) (_graphWidth * valueX);
+         final int devYPoint = (int) (_graphHeight - (_graphHeight * valueY));
 
-            final int curveValueY = allCurveValues[valueIndex];
+         allDevX[valueIndex] = devXPoint;
+         allDevY[valueIndex] = devYPoint;
+      }
 
-            final float devX = _graphWidth * valueIndex / 255f;
-            final float devY = _graphHeight - (_graphHeight * curveValueY / 255f);
+      final Path curvePath = new Path(getDisplay());
 
-            if (valueIndex == 0) {
+      for (int valueIndex = 0; valueIndex < allCurveValues.length; valueIndex++) {
 
-               curvePath.moveTo(devX, devY);
+         final int curveValueY = allCurveValues[valueIndex];
 
-            } else {
+         final float devX = _graphWidth * valueIndex / 255f;
+         final float devY = _graphHeight - (_graphHeight * curveValueY / 255f);
 
-               curvePath.lineTo(devX, devY);
-            }
+         if (valueIndex == 0) {
+
+            curvePath.moveTo(devX, devY);
+
+         } else {
+
+            curvePath.lineTo(devX, devY);
          }
+      }
 
-         gc.setAntialias(SWT.ON);
-         gc.setLineWidth(1);
+      gc.setAntialias(SWT.ON);
+      gc.setLineWidth(1);
 
-         // draw default line
-         gc.setForeground(new Color(155, 155, 155));
-         gc.drawLine(
+      // draw default line
+      gc.setForeground(new Color(155, 155, 155));
+      gc.drawLine(
 
-               devXDark,
-               _graphHeight,
-               devXBright,
-               0);
+            allDevX[0],
+            _graphHeight,
+            allDevX[numValues - 1],
+            0);
 
-         // draw curve graph
-         gc.setForeground(UI.SYS_COLOR_YELLOW);
-         gc.drawPath(curvePath);
+      // draw curve graph
+      gc.setForeground(UI.SYS_COLOR_YELLOW);
+      gc.drawPath(curvePath);
 
-         curvePath.dispose();
+      curvePath.dispose();
 
-         // draw vertical positions
-         paint_30_TonePoint(gc, devXDark, allCurveValues[_threePoint_DevDark], _graphHeight);
-         paint_30_TonePoint(gc, devXMiddle, allCurveValues[(int) _threePoint_DevMiddleX], _graphHeight);
-         paint_30_TonePoint(gc, devXBright, allCurveValues[_threePoint_DevBright], _graphHeight);
+      // draw point values
+      for (int valueIndex = 0; valueIndex < numValues; valueIndex++) {
 
-         if (_hoveredPointIndex != -1) {
+         paint_30_TonePoint(gc, allDevX[valueIndex], allDevY[valueIndex]);
+      }
 
-            final Rectangle hoveredRectangle = _allPaintedCurvePoints.get(_hoveredPointIndex);
+      if (_hoveredPointIndex != -1) {
 
-            if (_isPointDragged) {
+         final Rectangle hoveredRectangle = _allPaintedCurvePoints.get(_hoveredPointIndex);
 
-               // paint dragged point
+         if (_isPointDragged) {
 
-               gc.setBackground(UI.SYS_COLOR_YELLOW);
-               gc.fillArc(
+            // paint dragged point
 
-                     hoveredRectangle.x,
-                     hoveredRectangle.y,
+            gc.setBackground(UI.SYS_COLOR_YELLOW);
+            gc.fillArc(
 
-                     hoveredRectangle.width,
-                     hoveredRectangle.height,
+                  hoveredRectangle.x,
+                  hoveredRectangle.y,
 
-                     0,
-                     360);
+                  hoveredRectangle.width,
+                  hoveredRectangle.height,
 
-            } else {
+                  0,
+                  360);
 
-               // paint hovered point
+         } else {
 
-               gc.setForeground(UI.SYS_COLOR_MAGENTA);
-               gc.drawArc(
+            // paint hovered point
 
-                     hoveredRectangle.x,
-                     hoveredRectangle.y,
+            gc.setForeground(UI.SYS_COLOR_MAGENTA);
+            gc.drawArc(
 
-                     hoveredRectangle.width,
-                     hoveredRectangle.height,
+                  hoveredRectangle.x,
+                  hoveredRectangle.y,
 
-                     0,
-                     360);
-            }
+                  hoveredRectangle.width,
+                  hoveredRectangle.height,
+
+                  0,
+                  360);
          }
       }
    }
 
    private void paint_30_TonePoint(final GC gc,
                                    final int devXPoint,
-                                   final int pointValue,
-                                   final int graphHeight) {
+                                   final int devYPoint) {
 
       final int pointRadius = POINT_RADIUS;
       final int pointRadius2 = pointRadius / 2;
-
-      final int devYPoint = (int) (graphHeight - (graphHeight * pointValue / 255f));
 
       final int devX = devXPoint - pointRadius2;
       final int devY = devYPoint - pointRadius2;
@@ -485,29 +542,6 @@ public class Histogram extends Canvas implements PaintListener {
             pointRadius));
    }
 
-   private void paint_50_ToneMarker(final GC gc,
-                                    final int devX,
-                                    final int devYBottom,
-                                    final Color bgColor) {
-
-      final int markerWidth = 16;
-      final int markerWidth2 = markerWidth / 2;
-
-      final int devMarkerXPos = devX - markerWidth2;
-
-      final int[] marker = new int[] {
-            devMarkerXPos,
-            devYBottom + 1 + markerWidth2,
-            devMarkerXPos + markerWidth2,
-            devYBottom + 1,
-            devMarkerXPos + markerWidth,
-            devYBottom + 1 + markerWidth2 };
-
-      // draw background
-      gc.setBackground(bgColor);
-      gc.fillPolygon(marker);
-   }
-
    @Override
    public void paintControl(final PaintEvent paintEvent) {
 
@@ -527,27 +561,6 @@ public class Histogram extends Canvas implements PaintListener {
       _imageData = image.getImageData();
 
       computeLuminance(_imageData, relCropArea);
-
-      redraw();
-   }
-
-   public void update3Points(final Photo photo) {
-
-      _isSetTonality = photo.isSetTonality;
-      _curveType = photo.curveType;
-
-      final int devDark = photo.threePoint_Dark;
-      final int devBright = photo.threePoint_Bright;
-      final float middleX100 = photo.threePoint_MiddleX;
-
-      final float devDiff = devBright - devDark;
-      final float devMiddleDiff = devDiff / 100 * middleX100;
-
-      final float devMiddleX = devDark + devMiddleDiff;
-
-      _threePoint_DevDark = devDark;
-      _threePoint_DevBright = devBright;
-      _threePoint_DevMiddleX = devMiddleX;
 
       redraw();
    }
@@ -580,7 +593,9 @@ public class Histogram extends Canvas implements PaintListener {
 
    public void updateCurvesFilter(final Photo photo) {
 
-      _curvesFilter = photo.getToneCurvesFilter().getCurvesFilter();
+      _isSetTonality = photo.isSetTonality;
+      _curveType = photo.curveType;
+      _toneCurvesFilter = photo.getToneCurvesFilter();
 
       // update in UI thread
       getDisplay().asyncExec(() -> redraw());

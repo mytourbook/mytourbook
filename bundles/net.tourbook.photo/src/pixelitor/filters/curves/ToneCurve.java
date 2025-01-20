@@ -48,20 +48,20 @@ public class ToneCurve {
    private static final float KNOT_DETECTION_RADIUS = 0.08F;
 
    // Stroke styles for drawing the curve and points
-   private static final BasicStroke CURVE_STROKE = new BasicStroke(1);
-   private static final BasicStroke POINT_STROKE = new BasicStroke(2);
+   private static final BasicStroke CURVE_STROKE    = new BasicStroke(1);
+   private static final BasicStroke POINT_STROKE    = new BasicStroke(2);
 
-   public final CurveValues         curveValues  = new CurveValues();
+   public final CurveValues         curveValues     = new CurveValues();
 
    private final Channel            channel;
 
-   private int                      width        = 255;
-   private int                      height       = 255;
+   private int                      width           = 255;
+   private int                      height          = 255;
 
    private int[]                    curvePlotData;
 
-   private boolean                  curveUpdated = true;
-   private boolean                  active       = false;
+   private boolean                  _isCurveUpdated = true;
+   private boolean                  active          = false;
 
    public ToneCurve(final Channel channel) {
 
@@ -109,7 +109,7 @@ public class ToneCurve {
       // clamp to boundaries [0,1]
       clampToBoundary(p);
 
-      final int lastIndex = curveValues.allXValues.length - 1;
+      final int lastIndex = curveValues.allValuesX.length - 1;
       final int index = curveValues.findKnotPos(p.x);
 
       // Prevent adding knots at the edges
@@ -120,37 +120,38 @@ public class ToneCurve {
       // If allowReplace is true, replace a nearby knot if is's too close
       if (allowReplace) {
          final int prevIndex = index - 1;
-         if (isClose(p, new Point2D.Float(curveValues.allXValues[prevIndex], curveValues.allYValues[prevIndex]))) {
+         if (isClose(p, new Point2D.Float(curveValues.allValuesX[prevIndex], curveValues.allValuesY[prevIndex]))) {
             setKnotPosition(prevIndex, p);
             return prevIndex;
-         } else if (isClose(p, new Point2D.Float(curveValues.allXValues[index], curveValues.allYValues[index]))) {
+         } else if (isClose(p, new Point2D.Float(curveValues.allValuesX[index], curveValues.allValuesY[index]))) {
             setKnotPosition(index, p);
             return index;
          }
       }
 
-      if (curveValues.allXValues.length >= MAX_CONTROL_POINTS) {
+      if (curveValues.allValuesX.length >= MAX_CONTROL_POINTS) {
          return -1; // can't add because the limit is reached
       }
 
-      curveUpdated = true;
+      _isCurveUpdated = true;
       return curveValues.addKnot(p.x, p.y); // adds the new knot
    }
+
 
    /**
     * Deletes a knot at the given index if within bounds.
     */
    public void deleteKnot(final int index) {
 
-      if (index < 0 || index > curveValues.allXValues.length - 1) {
+      if (index < 0 || index > curveValues.allValuesX.length - 1) {
          return;
       }
 
-      if (curveValues.allXValues.length <= 2) {
+      if (curveValues.allValuesX.length <= 2) {
          return;
       }
 
-      curveUpdated = true;
+      _isCurveUpdated = true;
       curveValues.removeKnot(index);
    }
 
@@ -192,10 +193,10 @@ public class ToneCurve {
       g.setColor(darkTheme ? Color.WHITE : Color.BLACK);
       g.setStroke(POINT_STROKE);
       final int knotDiameter = 2 * KNOT_RADIUS_PIXELS;
-      for (int i = 0; i < curveValues.allXValues.length; i++) {
+      for (int i = 0; i < curveValues.allValuesX.length; i++) {
          g.drawOval(
-               (int) (curveValues.allXValues[i] * width) - KNOT_RADIUS_PIXELS,
-               (int) (curveValues.allYValues[i] * height) - KNOT_RADIUS_PIXELS,
+               (int) (curveValues.allValuesX[i] * width) - KNOT_RADIUS_PIXELS,
+               (int) (curveValues.allValuesY[i] * height) - KNOT_RADIUS_PIXELS,
                knotDiameter,
                knotDiameter);
       }
@@ -203,8 +204,8 @@ public class ToneCurve {
 
    public int getKnotIndexAt(final Point2D.Float p) {
 
-      for (int i = 0; i < curveValues.allXValues.length; i++) {
-         if (isOver(p, new Point2D.Float(curveValues.allXValues[i], curveValues.allYValues[i]))) {
+      for (int i = 0; i < curveValues.allValuesX.length; i++) {
+         if (isOver(p, new Point2D.Float(curveValues.allValuesX[i], curveValues.allValuesY[i]))) {
             return i;
          }
       }
@@ -224,11 +225,11 @@ public class ToneCurve {
     */
    public boolean isDraggedIn(final int index, final Point2D.Float point) {
 
-      if (index <= 0 || index > curveValues.allXValues.length - 1) {
+      if (index <= 0 || index > curveValues.allValuesX.length - 1) {
          return false;
       }
 
-      return point.x < curveValues.allXValues[index] && point.x > curveValues.allXValues[index - 1];
+      return point.x < curveValues.allValuesX[index] && point.x > curveValues.allValuesX[index - 1];
    }
 
    /**
@@ -243,18 +244,18 @@ public class ToneCurve {
     */
    public boolean isDraggedOutOfRange(final int index, final Point2D.Float point) {
 
-      if (index <= 0 || index >= curveValues.allXValues.length - 1) {
+      if (index <= 0 || index >= curveValues.allValuesX.length - 1) {
          return false;
       }
 
-      return point.x > curveValues.allXValues[index + 1] + 0.02f || point.x < curveValues.allXValues[index - 1] - 0.02f;
+      return point.x > curveValues.allValuesX[index + 1] + 0.02f || point.x < curveValues.allValuesX[index - 1] - 0.02f;
    }
 
    public boolean isOverKnot(final int index) {
 
-      final var p = new Point2D.Float(curveValues.allXValues[index], curveValues.allYValues[index]);
-      for (int i = 0; i < curveValues.allXValues.length; i++) {
-         if (i != index && isOver(p, new Point2D.Float(curveValues.allXValues[i], curveValues.allYValues[i]))) {
+      final var p = new Point2D.Float(curveValues.allValuesX[index], curveValues.allValuesY[index]);
+      for (int i = 0; i < curveValues.allValuesX.length; i++) {
+         if (i != index && isOver(p, new Point2D.Float(curveValues.allValuesX[i], curveValues.allValuesY[i]))) {
             return true;
          }
       }
@@ -271,9 +272,10 @@ public class ToneCurve {
     */
    public void reset() {
 
-      curveValues.allXValues = new float[] { 0, 1 };
-      curveValues.allYValues = new float[] { 0, 1 };
-      curveUpdated = true;
+      curveValues.allValuesX = new float[] { 0, 1 };
+      curveValues.allValuesY = new float[] { 0, 1 };
+
+      _isCurveUpdated = true;
    }
 
    public void setActive(final boolean active) {
@@ -290,22 +292,23 @@ public class ToneCurve {
     */
    public void setKnotPosition(final int index, final Point2D.Float point) {
 
-      final int lastIndex = curveValues.allXValues.length - 1;
+      final int lastIndex = curveValues.allValuesX.length - 1;
 
       if (index < 0 || index > lastIndex) {
          return;
       }
 
       // check prev/next index - knots can't change their index
-      if (index > 0 && point.x < curveValues.allXValues[index - 1]) {
-         point.x = curveValues.allXValues[index - 1];
-      } else if (index < lastIndex && point.x > curveValues.allXValues[index + 1]) {
-         point.x = curveValues.allXValues[index + 1];
+      if (index > 0 && point.x < curveValues.allValuesX[index - 1]) {
+         point.x = curveValues.allValuesX[index - 1];
+      } else if (index < lastIndex && point.x > curveValues.allValuesX[index + 1]) {
+         point.x = curveValues.allValuesX[index + 1];
       }
 
-      curveValues.allXValues[index] = ImageMath.clamp01(point.x);
-      curveValues.allYValues[index] = ImageMath.clamp01(point.y);
-      curveUpdated = true;
+      curveValues.allValuesX[index] = ImageMath.clamp01(point.x);
+      curveValues.allValuesY[index] = ImageMath.clamp01(point.y);
+
+      _isCurveUpdated = true;
    }
 
    public void setSize(final int width, final int height) {
@@ -321,17 +324,17 @@ public class ToneCurve {
 
       final String[] xyPairs = savedValue.split("#");
       final int numPoints = xyPairs.length;
-      curveValues.allXValues = new float[numPoints];
-      curveValues.allYValues = new float[numPoints];
+      curveValues.allValuesX = new float[numPoints];
+      curveValues.allValuesY = new float[numPoints];
       for (int i = 0; i < numPoints; i++) {
          final String pair = xyPairs[i];
          final int commaIndex = pair.indexOf(',');
          final String pairX = pair.substring(0, commaIndex);
          final String pairY = pair.substring(commaIndex + 1);
-         curveValues.allXValues[i] = Float.parseFloat(pairX);
-         curveValues.allYValues[i] = Float.parseFloat(pairY);
+         curveValues.allValuesX[i] = Float.parseFloat(pairX);
+         curveValues.allValuesY[i] = Float.parseFloat(pairY);
       }
-      curveUpdated = true;
+      _isCurveUpdated = true;
    }
 
    /**
@@ -339,12 +342,12 @@ public class ToneCurve {
     */
    public String toSaveString() {
 
-      final int numPoints = curveValues.allXValues.length;
+      final int numPoints = curveValues.allValuesX.length;
       final StringBuilder sb = new StringBuilder();
       for (int i = 0; i < numPoints; i++) {
-         sb.append(curveValues.allXValues[i]);
+         sb.append(curveValues.allValuesX[i]);
          sb.append(",");
-         sb.append(curveValues.allYValues[i]);
+         sb.append(curveValues.allValuesY[i]);
          if (i != numPoints - 1) {
             sb.append("#");
          }
@@ -358,8 +361,8 @@ public class ToneCurve {
     */
    private void updateCurvePlotData() {
 
-      if (curveUpdated) {
-         curveUpdated = false;
+      if (_isCurveUpdated) {
+         _isCurveUpdated = false;
          curvePlotData = curveValues.makeTable();
       }
    }

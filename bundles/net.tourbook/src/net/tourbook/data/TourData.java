@@ -27,6 +27,7 @@ import de.byteholder.geoclipse.map.TourPause;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.PrintStream;
 import java.io.Serializable;
@@ -123,6 +124,9 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
+
+import pixelitor.filters.curves.ToneCurve;
+import pixelitor.filters.curves.ToneCurvesFilter;
 
 /**
  * Tour data contains all data for one tour, an entity is saved in the database
@@ -6500,10 +6504,46 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
             galleryPhoto.isSetTonality = photoAdjustments.isSetTonality;
             galleryPhoto.curveType = photoAdjustments.curveType;
-            galleryPhoto.threePoint_Dark = photoAdjustments.threePoint_Dark;
-            galleryPhoto.threePoint_Bright = photoAdjustments.threePoint_Bright;
-            galleryPhoto.threePoint_MiddleX = photoAdjustments.threePoint_MiddleX;
-            galleryPhoto.threePoint_MiddleY = photoAdjustments.threePoint_MiddleY;
+
+            /*
+             * Create curve knots
+             */
+            final ToneCurvesFilter toneCurvesFilter = galleryPhoto.getToneCurvesFilter();
+            final ToneCurve toneCurve = toneCurvesFilter.getCurves().getActiveCurve();
+
+            final float[] curveXValues = photoAdjustments.curveValuesX;
+            final float[] curveYValues = photoAdjustments.curveValuesY;
+
+            toneCurve.reset();
+
+            if (curveXValues != null && curveXValues.length >= 2) {
+
+               final int lastIndex = curveXValues.length - 1;
+
+               // set first/last points
+               float xValue = curveXValues[0];
+               float yValue = curveYValues[0];
+               toneCurve.setKnotPosition(0, new Point2D.Float(xValue, yValue));
+
+               xValue = curveXValues[lastIndex];
+               yValue = curveYValues[lastIndex];
+               toneCurve.setKnotPosition(1, new Point2D.Float(xValue, yValue));
+
+               // set other points
+               for (int valueIndex = 1; valueIndex < lastIndex; valueIndex++) {
+
+                  xValue = curveXValues[valueIndex];
+                  yValue = curveYValues[valueIndex];
+
+                  toneCurve.addKnot(new Point2D.Float(xValue, yValue), false);
+               }
+
+            } else {
+
+               // create default curve with middle point
+
+               toneCurve.addKnot(new Point2D.Float(0.5f, 0.5f), false);
+            }
          }
 
          /*

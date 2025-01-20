@@ -15,9 +15,13 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Adjustments for a photo, e.g. cropping, tonality...
  */
+// ignore fields which are not defined, this is helpful when field names are changed to prevent exceptions
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PhotoAdjustments {
 
    public boolean   isPhotoCropped;
@@ -33,15 +37,16 @@ public class PhotoAdjustments {
 
    public boolean   isSetTonality;
 
-   public CurveType curveType         = CurveType.THREE_POINTS;
-
-   public int       threePoint_Dark   = 0;
-   public int       threePoint_Bright = 255;
+   public CurveType curveType = CurveType.THREE_POINTS;
 
    /**
-    * Middle is the relative position between dark and bright, it is between 0...100
+    * X values 0...1
     */
-   public float     threePoint_MiddleX = 50.0f;
-   public float     threePoint_MiddleY = 50.0f;
+   public float     curveValuesX[];
+
+   /**
+    * Y values 0...1
+    */
+   public float     curveValuesY[];
 
 }

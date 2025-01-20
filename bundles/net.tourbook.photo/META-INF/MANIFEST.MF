@@ -13,9 +13,18 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.e4.ui.di
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
-Export-Package: net.tourbook.photo,
+Export-Package: com.jhlabs.image,
+ net.tourbook.photo,
  net.tourbook.photo.internal,
- net.tourbook.photo.internal.gallery.MT20
+ net.tourbook.photo.internal.gallery.MT20,
+ pixelitor,
+ pixelitor.filters,
+ pixelitor.filters.curves,
+ pixelitor.filters.levels,
+ pixelitor.filters.lookup,
+ pixelitor.gui,
+ pixelitor.utils,
+ pixelitor.utils.debug
 Import-Package: net.tourbook.common,
  net.tourbook.common.action,
  net.tourbook.common.form,

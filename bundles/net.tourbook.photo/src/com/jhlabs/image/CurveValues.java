@@ -23,29 +23,29 @@ public class CurveValues {
    /**
     * 0...1
     */
-   public float[] allXValues;
+   public float[] allValuesX;
 
    /**
     * 0...1
     */
-   public float[] allYValues;
+   public float[] allValuesY;
 
    public CurveValues() {
 
-      allXValues = new float[] { 0, 1 };
-      allYValues = new float[] { 0, 1 };
+      allValuesX = new float[] { 0, 1 };
+      allValuesY = new float[] { 0, 1 };
    }
 
    public CurveValues(final CurveValues curve) {
 
-      allXValues = curve.allXValues.clone();
-      allYValues = curve.allYValues.clone();
+      allValuesX = curve.allValuesX.clone();
+      allValuesY = curve.allValuesY.clone();
    }
 
    public int addKnot(final float kx, final float ky) {
 
       int pos = -1;
-      final int numKnots = allXValues.length;
+      final int numKnots = allValuesX.length;
 
       final float[] nx = new float[numKnots + 1];
       final float[] ny = new float[numKnots + 1];
@@ -54,7 +54,7 @@ public class CurveValues {
 
       for (int i = 0; i < numKnots; i++) {
 
-         if (pos == -1 && allXValues[i] > kx) {
+         if (pos == -1 && allValuesX[i] > kx) {
 
             pos = j;
 
@@ -64,8 +64,8 @@ public class CurveValues {
             j++;
          }
 
-         nx[j] = allXValues[i];
-         ny[j] = allYValues[i];
+         nx[j] = allValuesX[i];
+         ny[j] = allValuesY[i];
 
          j++;
       }
@@ -77,19 +77,19 @@ public class CurveValues {
          ny[j] = ky;
       }
 
-      allXValues = nx;
-      allYValues = ny;
+      allValuesX = nx;
+      allValuesY = ny;
 
       return pos;
    }
 
    public int findKnotPos(final float kx) {
 
-      final int numKnots = allXValues.length;
+      final int numKnots = allValuesX.length;
 
       for (int i = 0; i < numKnots; i++) {
 
-         if (allXValues[i] > kx) {
+         if (allValuesX[i] > kx) {
             return i;
          }
       }
@@ -104,13 +104,13 @@ public class CurveValues {
     */
    public int[] makeTable() {
 
-      final int numKnots = allXValues.length;
+      final int numKnots = allValuesX.length;
 
       final float[] nx = new float[numKnots + 2];
       final float[] ny = new float[numKnots + 2];
 
-      System.arraycopy(allXValues, 0, nx, 1, numKnots);
-      System.arraycopy(allYValues, 0, ny, 1, numKnots);
+      System.arraycopy(allValuesX, 0, nx, 1, numKnots);
+      System.arraycopy(allValuesY, 0, ny, 1, numKnots);
 
       nx[0] = nx[1];
       ny[0] = ny[1];
@@ -173,32 +173,32 @@ public class CurveValues {
 //        }
 //    }
 
-   public void removeKnot(final int n) {
+   public void removeKnot(final int deleteIndex) {
 
-      final int numKnots = allXValues.length;
+      final int numKnots = allValuesX.length;
 
       if (numKnots <= 2) {
          return;
       }
 
-      final float[] nx = new float[numKnots - 1];
-      final float[] ny = new float[numKnots - 1];
+      final float[] newValuesX = new float[numKnots - 1];
+      final float[] newValuesY = new float[numKnots - 1];
 
-      int j = 0;
+      int oldIndex = 0;
 
-      for (int i = 0; i < numKnots - 1; i++) {
+      for (int newIndex = 0; newIndex < numKnots - 1; newIndex++) {
 
-         if (i == n) {
-            j++;
+         if (newIndex == deleteIndex) {
+            oldIndex++;
          }
 
-         nx[i] = allXValues[j];
-         ny[i] = allYValues[j];
+         newValuesX[newIndex] = allValuesX[oldIndex];
+         newValuesY[newIndex] = allValuesY[oldIndex];
 
-         j++;
+         oldIndex++;
       }
 
-      allXValues = nx;
-      allYValues = ny;
+      allValuesX = newValuesX;
+      allValuesY = newValuesY;
    }
 }
