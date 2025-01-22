@@ -652,7 +652,7 @@ public abstract class AdvancedSlideoutShell {
    }
 
    /**
-    * Close the slideout, any possible flags to keep it open are ignored, the shell will be also
+    * Close the slideout, any possible flags to keep it open are ignored, the shell will also be
     * disposed.
     */
    public void close() {

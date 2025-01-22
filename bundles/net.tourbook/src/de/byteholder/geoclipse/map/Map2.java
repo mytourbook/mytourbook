@@ -3661,14 +3661,14 @@ public class Map2 extends Canvas {
       return gridGeoPos;
    }
 
-   public void hidePhotoHistogram() {
+   public void closePhotoHistogram() {
 
-      _mapPointTooltip_PhotoHistogram.hideNow();
+      _mapPointTooltip_PhotoHistogram.close();
    }
 
-   public void hidePhotoTooltip() {
+   public void closePhotoTooltip() {
 
-      _mapPointTooltip_PhotoImage.hideNow();
+      _mapPointTooltip_PhotoImage.close();
    }
 
    private void hideTourTooltipHoveredArea() {

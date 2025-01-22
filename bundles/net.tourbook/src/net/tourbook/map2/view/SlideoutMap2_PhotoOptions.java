@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,8 +24,7 @@ import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
-import net.tourbook.common.font.MTFont;
-import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.map.MapImageSize;
 import net.tourbook.photo.Photo;
@@ -40,19 +39,22 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 
 /**
  * Slideout for 2D map photo options
  */
-public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
+public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
+
       IActionResetToDefault,
       IColorSelectorListener {
 
@@ -84,7 +86,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
     */
    private static final int        MAX_IMAGE_SIZE                          = 2000;
 
-   private IDialogSettings         _state_Map2;
+   private IDialogSettings         _state_Map2View;
 
    private Map2View                _map2View;
    private Map2                    _map2;
@@ -100,6 +102,8 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
    /*
     * UI controls
     */
+   private Composite             _shellContainer;
+
    private Button                _btnSwapTourPauseLabel_Color;
 
    private Button                _chkEnlargeSmallImages;
@@ -125,22 +129,31 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
    private ColorSelectorExtended _colorTourPauseLabel_Outline;
    private ColorSelectorExtended _colorTourPauseLabel_Fill;
 
+   private ToolItem              _toolItem;
+
    /**
     * @param ownerControl
     * @param toolBar
     * @param map2View
     * @param map2State
     */
-   public SlideoutMap2_PhotoOptions(final Control ownerControl,
-                                    final ToolBar toolBar,
-                                    final Map2View map2View,
-                                    final IDialogSettings map2State) {
+   public SlideoutMap2_PhotoOptions(final ToolItem toolItem,
+                                    final IDialogSettings map2State,
+                                    final IDialogSettings slideoutState,
+                                    final Map2View map2View) {
 
-      super(ownerControl, toolBar);
+      super(toolItem.getParent(), slideoutState, new int[] { 325, 400, 325, 400 });
 
       _map2View = map2View;
       _map2 = map2View.getMap();
-      _state_Map2 = map2State;
+      _state_Map2View = map2State;
+
+      _toolItem = toolItem;
+
+      setTitleText(Messages.Slideout_Map_PhotoOptions_Label_Title);
+
+      // prevent that the opened slideout is partly hidden
+      setIsForceBoundsToBeInsideOfViewport(true);
    }
 
    public static String formatSize(final long value) {
@@ -160,70 +173,48 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
    }
 
    @Override
-   protected Composite createToolTipContentArea(final Composite parent) {
+   protected void createSlideoutContent(final Composite parent) {
 
-      initUI();
-
-      createActions();
-
-      final Composite ui = createUI(parent);
+      createUI(parent);
 
       restoreState();
 
       enableControls();
 
       updateUI_Memory();
-
-      return ui;
    }
 
-   private Composite createUI(final Composite parent) {
+   @Override
+   protected void createTitleBarControls(final Composite parent) {
 
-      final Composite shellContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.swtDefaults().applyTo(shellContainer);
+      // this method is called 1st !!!
+
+      initUI();
+      createActions();
+
       {
-         createUI_10_Header(shellContainer);
-         createUI_30_ImageSize(shellContainer);
-         createUI_40_Options(shellContainer);
+         /*
+          * Actionbar
+          */
+         final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .align(SWT.END, SWT.BEGINNING)
+               .applyTo(toolbar);
+
+         final ToolBarManager tbm = new ToolBarManager(toolbar);
+         tbm.add(_actionRestoreDefaults);
+         tbm.update(true);
       }
-
-      return shellContainer;
    }
 
-   private void createUI_10_Header(final Composite parent) {
+   private void createUI(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+      _shellContainer = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(_shellContainer);
       {
-         {
-            /*
-             * Slideout title
-             */
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Slideout_Map_PhotoOptions_Label_Title);
-            MTFont.setBannerFont(label);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(label);
-         }
-         {
-            /*
-             * Actionbar
-             */
-            final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .align(SWT.END, SWT.BEGINNING)
-                  .applyTo(toolbar);
-
-            final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-            tbm.add(_actionRestoreDefaults);
-
-            tbm.update(true);
-         }
+         createUI_30_ImageSize(_shellContainer);
+         createUI_40_Options(_shellContainer);
       }
    }
 
@@ -451,6 +442,18 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 // SET_FORMATTING_ON
    }
 
+   @Override
+   protected Rectangle getParentBounds() {
+
+      final Rectangle itemBounds = _toolItem.getBounds();
+      final Point itemDisplayPosition = _toolItem.getParent().toDisplay(itemBounds.x, itemBounds.y);
+
+      itemBounds.x = itemDisplayPosition.x;
+      itemBounds.y = itemDisplayPosition.y;
+
+      return itemBounds;
+   }
+
    private int getSelectedImageSize() {
 
       if (_radioImageSize_Large.getSelection()) {
@@ -487,7 +490,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
       _imageSize = getSelectedImageSize();
 
-      saveState();
+      saveConfig();
 
       updateMap();
 
@@ -508,6 +511,20 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       System.gc();
 
       updateUI_Memory();
+   }
+
+   @Override
+   protected void onFocus() {
+
+   }
+
+   @Override
+   protected Point onResize(final int newContentWidth, final int newContentHeight) {
+
+      // there is no need to resize this dialog
+      final Point defaultSize = _shellContainer.getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
+
+      return defaultSize;
    }
 
    private void onSwapPhotoColor() {
@@ -569,7 +586,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
       updateUI_FromConfig();
 
-      saveState();
+      saveConfig();
 
       enableControls();
       updateMap();
@@ -579,18 +596,18 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
 // SET_FORMATTING_OFF
 
-      _chkEnlargeSmallImages  .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_ENLARGE_SMALL_IMAGES,   STATE_IS_ENLARGE_SMALL_IMAGES_DEFAULT));
-      _chkPreloadHQImages     .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_PRELOAD_HQ_IMAGES,      STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT));
-      _chkShowHQImages        .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_SHOW_THUMB_HQ_IMAGES,   STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT));
-      _chkShowPhotoAdjustments.setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_SHOW_PHOTO_ADJUSTMENTS, STATE_IS_SHOW_PHOTO_ADJUSTMENTS_DEFAULT));
-      _chkShowPhotoRating     .setSelection(Util.getStateBoolean(_state_Map2, STATE_IS_SHOW_PHOTO_RATING,      STATE_IS_SHOW_PHOTO_RATING_DEFAULT));
+      _chkEnlargeSmallImages  .setSelection(Util.getStateBoolean(_state_Map2View, STATE_IS_ENLARGE_SMALL_IMAGES,   STATE_IS_ENLARGE_SMALL_IMAGES_DEFAULT));
+      _chkPreloadHQImages     .setSelection(Util.getStateBoolean(_state_Map2View, STATE_IS_PRELOAD_HQ_IMAGES,      STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT));
+      _chkShowHQImages        .setSelection(Util.getStateBoolean(_state_Map2View, STATE_IS_SHOW_THUMB_HQ_IMAGES,   STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT));
+      _chkShowPhotoAdjustments.setSelection(Util.getStateBoolean(_state_Map2View, STATE_IS_SHOW_PHOTO_ADJUSTMENTS, STATE_IS_SHOW_PHOTO_ADJUSTMENTS_DEFAULT));
+      _chkShowPhotoRating     .setSelection(Util.getStateBoolean(_state_Map2View, STATE_IS_SHOW_PHOTO_RATING,      STATE_IS_SHOW_PHOTO_RATING_DEFAULT));
 
-      final Enum<MapImageSize> imageSize = Util.getStateEnum(_state_Map2, STATE_PHOTO_IMAGE_SIZE, MapImageSize.MEDIUM);
+      final Enum<MapImageSize> imageSize = Util.getStateEnum(_state_Map2View, STATE_PHOTO_IMAGE_SIZE, MapImageSize.MEDIUM);
 
-      final int imageSizeLarge   = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_LARGE,  _map2.MAP_IMAGE_DEFAULT_SIZE_LARGE);
-      final int imageSizeMedium  = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_MEDIUM, _map2.MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
-      final int imageSizeSmall   = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_SMALL,  _map2.MAP_IMAGE_DEFAULT_SIZE_SMALL);
-      final int imageSizeTiny    = Util.getStateInt(_state_Map2, STATE_PHOTO_IMAGE_SIZE_TINY,   _map2.MAP_IMAGE_DEFAULT_SIZE_TINY);
+      final int imageSizeLarge   = Util.getStateInt(_state_Map2View, STATE_PHOTO_IMAGE_SIZE_LARGE,  _map2.MAP_IMAGE_DEFAULT_SIZE_LARGE);
+      final int imageSizeMedium  = Util.getStateInt(_state_Map2View, STATE_PHOTO_IMAGE_SIZE_MEDIUM, _map2.MAP_IMAGE_DEFAULT_SIZE_MEDIUM);
+      final int imageSizeSmall   = Util.getStateInt(_state_Map2View, STATE_PHOTO_IMAGE_SIZE_SMALL,  _map2.MAP_IMAGE_DEFAULT_SIZE_SMALL);
+      final int imageSizeTiny    = Util.getStateInt(_state_Map2View, STATE_PHOTO_IMAGE_SIZE_TINY,   _map2.MAP_IMAGE_DEFAULT_SIZE_TINY);
 
       _spinnerImageSize_Large .setSelection(imageSizeLarge);
       _spinnerImageSize_Medium.setSelection(imageSizeMedium);
@@ -625,7 +642,7 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
       updateUI_FromConfig();
    }
 
-   private void saveState() {
+   private void saveConfig() {
 
       final Map2Config config = Map2ConfigManager.getActiveConfig();
 
@@ -633,27 +650,27 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 
 // SET_FORMATTING_OFF
 
-      _state_Map2.put(STATE_IS_ENLARGE_SMALL_IMAGES,  _chkEnlargeSmallImages.getSelection());
-      _state_Map2.put(STATE_IS_PRELOAD_HQ_IMAGES,     _chkPreloadHQImages.getSelection());
-      _state_Map2.put(STATE_IS_SHOW_PHOTO_ADJUSTMENTS,_chkShowPhotoAdjustments.getSelection());
-      _state_Map2.put(STATE_IS_SHOW_THUMB_HQ_IMAGES,  _chkShowHQImages.getSelection());
-      _state_Map2.put(STATE_IS_SHOW_PHOTO_RATING,     isShowPhotoRating);
+      _state_Map2View.put(STATE_IS_ENLARGE_SMALL_IMAGES,  _chkEnlargeSmallImages.getSelection());
+      _state_Map2View.put(STATE_IS_PRELOAD_HQ_IMAGES,     _chkPreloadHQImages.getSelection());
+      _state_Map2View.put(STATE_IS_SHOW_PHOTO_ADJUSTMENTS,_chkShowPhotoAdjustments.getSelection());
+      _state_Map2View.put(STATE_IS_SHOW_THUMB_HQ_IMAGES,  _chkShowHQImages.getSelection());
+      _state_Map2View.put(STATE_IS_SHOW_PHOTO_RATING,     isShowPhotoRating);
 
       Map2PainterConfig.isShowPhotoRating = isShowPhotoRating;
 
       final Enum<MapImageSize> selectedSize =
 
-      _radioImageSize_Large   .getSelection()   ? MapImageSize.LARGE    :
-      _radioImageSize_Medium  .getSelection()   ? MapImageSize.MEDIUM   :
-      _radioImageSize_Small   .getSelection()   ? MapImageSize.SMALL    :
-                                                  MapImageSize.TINY;
+            _radioImageSize_Large   .getSelection()   ? MapImageSize.LARGE    :
+               _radioImageSize_Medium  .getSelection()   ? MapImageSize.MEDIUM   :
+                  _radioImageSize_Small   .getSelection()   ? MapImageSize.SMALL    :
+                     MapImageSize.TINY;
 
-      _state_Map2.put(STATE_PHOTO_IMAGE_SIZE_LARGE,  _spinnerImageSize_Large .getSelection());
-      _state_Map2.put(STATE_PHOTO_IMAGE_SIZE_MEDIUM, _spinnerImageSize_Medium.getSelection());
-      _state_Map2.put(STATE_PHOTO_IMAGE_SIZE_SMALL,  _spinnerImageSize_Small .getSelection());
-      _state_Map2.put(STATE_PHOTO_IMAGE_SIZE_TINY,   _spinnerImageSize_Tiny  .getSelection());
+      _state_Map2View.put(STATE_PHOTO_IMAGE_SIZE_LARGE,  _spinnerImageSize_Large .getSelection());
+      _state_Map2View.put(STATE_PHOTO_IMAGE_SIZE_MEDIUM, _spinnerImageSize_Medium.getSelection());
+      _state_Map2View.put(STATE_PHOTO_IMAGE_SIZE_SMALL,  _spinnerImageSize_Small .getSelection());
+      _state_Map2View.put(STATE_PHOTO_IMAGE_SIZE_TINY,   _spinnerImageSize_Tiny  .getSelection());
 
-      Util.setStateEnum(_state_Map2, STATE_PHOTO_IMAGE_SIZE, selectedSize);
+      Util.setStateEnum(_state_Map2View, STATE_PHOTO_IMAGE_SIZE, selectedSize);
 
       config.photoFill_RGB       = _colorTourPauseLabel_Fill      .getColorValue();
       config.photoOutline_RGB    = _colorTourPauseLabel_Outline   .getColorValue();
@@ -661,6 +678,8 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements
 // SET_FORMATTING_ON
 
       config.setupColors();
+
+      super.saveState();
    }
 
    private void updateMap() {

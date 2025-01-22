@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -387,11 +387,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    public abstract class TooltipLabelProvider extends CellLabelProvider {}
 
    /**
+    * @param toolItem
     * @param map2State
+    * @param slideoutState
     * @param map2View
-    * @param map2View
-    * @param ownerControl
-    * @param toolBar
     */
    public SlideoutMap2_MapPoints(final ToolItem toolItem,
                                  final IDialogSettings map2State,
@@ -523,9 +522,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
       _toolbarManagerExpandCollapseSlideout = new ToolBarManager(toolbar);
-
       _toolbarManagerExpandCollapseSlideout.add(_actionExpandCollapseSlideout);
-
       _toolbarManagerExpandCollapseSlideout.update(true);
    }
 

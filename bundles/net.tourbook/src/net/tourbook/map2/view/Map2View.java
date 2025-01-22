@@ -357,9 +357,10 @@ public class Map2View extends ViewPart implements
    private static final IPreferenceStore _prefStore             = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common      = CommonActivator.getPrefStore();
    private static final IDialogSettings  _state                 = TourbookPlugin.getState(ID);
-   private static final IDialogSettings  _state_MapLocation     = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapLocation"); //$NON-NLS-1$
-   private static final IDialogSettings  _state_MapProvider     = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapProvider"); //$NON-NLS-1$
-   private static final IDialogSettings  _state_PhotoFilter     = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.PhotoFilter"); //$NON-NLS-1$
+   private static final IDialogSettings  _state_MapLocation     = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapLocation");  //$NON-NLS-1$
+   private static final IDialogSettings  _state_MapProvider     = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapProvider");  //$NON-NLS-1$
+   private static final IDialogSettings  _state_PhotoFilter     = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.PhotoFilter");  //$NON-NLS-1$
+   private static final IDialogSettings  _state_PhotoOptions    = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.PhotoOptions"); //$NON-NLS-1$
    //
    public static final int               TOUR_INFO_TOOLTIP_X    = 3;
    public static final int               TOUR_INFO_TOOLTIP_Y    = 23;
@@ -406,11 +407,11 @@ public class Map2View extends ViewPart implements
    private int                               _photoFilter_RatingStars;
    private Enum<PhotoRatingStarOperator>     _photoFilter_RatingStar_Operator;
    //
-   private boolean                           _isShowMapPoints;
-   private boolean                           _isShowTour;
-   private boolean                           _isShowPhoto;
-   private boolean                           _isShowLegend;
    private boolean                           _isInSelectBookmark;
+   private boolean                           _isShowLegend;
+   private boolean                           _isShowMapPoints;
+   private boolean                           _isShowPhoto;
+   private boolean                           _isShowTour;
    //
    private int                               _defaultZoom;
    private GeoPosition                       _defaultPosition;
@@ -500,6 +501,7 @@ public class Map2View extends ViewPart implements
    private ActionMap2_MapProvider             _actionMap2Slideout_MapProvider;
    private ActionMap2_Options                 _actionMap2Slideout_Options;
    private ActionMap2_PhotoFilter             _actionMap2Slideout_PhotoFilter;
+   private ActionMap2_PhotoOptions            _actionMap2Slideout_PhotoOptions;
    private ActionMap2_Graphs                  _actionMap2Slideout_TourColors;
    private ActionMapPoint_CenterMap           _actionMapPoint_CenterMap;
    private ActionMapPoint_EditTourMarker      _actionMapPoint_EditTourMarker;
@@ -515,7 +517,6 @@ public class Map2View extends ViewPart implements
    private ActionSetDefaultPosition           _actionSetDefaultPosition;
    private ActionShowAllFilteredPhotos        _actionShowAllFilteredPhotos;
    private ActionShowLegendInMap              _actionShowLegendInMap;
-   private ActionShowPhotos                   _actionShowPhotos;
    private ActionShowPOI                      _actionShowPOI;
    private ActionShowScaleInMap               _actionShowScaleInMap;
    private ActionShowSliderInMap              _actionShowSliderInMap;
@@ -548,13 +549,13 @@ public class Map2View extends ViewPart implements
    private GeoFilter_LoaderData               _geoFilter_PreviousGeoLoaderItem;
    private AtomicInteger                      _geoFilter_RunningId  = new AtomicInteger();
    //
-   private SlideoutMap2_MapPoints             _slideoutMapPoint;
-   //
    /*
     * UI controls
     */
-   private Composite _parent;
-   private Map2      _map;
+   private Composite                _parent;
+   private Map2                     _map;
+
+   public SlideoutMap2_PhotoOptions _slideoutPhotoOptions;
 
    private class ActionCopyLocation extends Action {
 
@@ -624,10 +625,10 @@ public class Map2View extends ViewPart implements
       @Override
       protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-         _slideoutMapPoint = new SlideoutMap2_MapPoints(toolItem, _state, _state_MapLocation, Map2View.this);
-         _slideoutMapPoint.setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
+         final SlideoutMap2_MapPoints slideoutMapPoint = new SlideoutMap2_MapPoints(toolItem, _state, _state_MapLocation, Map2View.this);
+         slideoutMapPoint.setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
 
-         return _slideoutMapPoint;
+         return slideoutMapPoint;
       }
 
       @Override
@@ -664,6 +665,41 @@ public class Map2View extends ViewPart implements
       @Override
       protected void onBeforeOpenSlideout() {
          closeOpenedDialogs(this);
+      }
+   }
+
+   private class ActionMap2_PhotoOptions extends ActionToolbarSlideoutAdv {
+
+      public ActionMap2_PhotoOptions() {
+
+         super(TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap),
+               TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap_Disabled));
+
+         isToggleAction = true;
+         notSelectedTooltip = Messages.Map_Action_ShowPhotos_Tooltip;
+      }
+
+      @Override
+      protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
+
+         _slideoutPhotoOptions = new SlideoutMap2_PhotoOptions(toolItem, _state, _state_PhotoOptions, Map2View.this);
+         _slideoutPhotoOptions.setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
+
+         return _slideoutPhotoOptions;
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+
+      @Override
+      protected void onSelect(final SelectionEvent selectionEvent) {
+
+         // show/hide slideout
+         super.onSelect(selectionEvent);
+
+         actionShowPhotos(getSelection());
       }
    }
 
@@ -754,7 +790,6 @@ public class Map2View extends ViewPart implements
 
          actionPhoto_ShowTooltip();
       }
-
    }
 
    private class ActionMapPoint_ShowOnlyThisTour extends Action {
@@ -797,36 +832,6 @@ public class Map2View extends ViewPart implements
       public void runWithEvent(final Event event) {
 
          _map.actionSearchTourByLocation(event);
-      }
-   }
-
-   private class ActionShowPhotos extends ActionToolbarSlideout {
-
-      public ActionShowPhotos() {
-
-         super(TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap),
-               TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap_Disabled));
-
-         isToggleAction = true;
-         notSelectedTooltip = Messages.Map_Action_ShowPhotos_Tooltip;
-      }
-
-      @Override
-      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-         return new SlideoutMap2_PhotoOptions(_parent, toolbar, Map2View.this, _state);
-      }
-
-      @Override
-      protected void onBeforeOpenSlideout() {
-         closeOpenedDialogs(this);
-      }
-
-      @Override
-      protected void onSelect() {
-
-         super.onSelect();
-
-         actionShowPhotos(getSelection());
       }
    }
 
@@ -1291,7 +1296,7 @@ public class Map2View extends ViewPart implements
 
          // hide photo histogram
 
-         _map.hidePhotoHistogram();
+         _map.closePhotoHistogram();
       }
    }
 
@@ -1322,7 +1327,7 @@ public class Map2View extends ViewPart implements
 
          // hide photo tooltip
 
-         _map.hidePhotoTooltip();
+         _map.closePhotoTooltip();
       }
    }
 
@@ -1525,9 +1530,13 @@ public class Map2View extends ViewPart implements
 
       _map.paint();
 
-      // hide photo filter when photos are hidden
+      // hide all photo slideouts when photos are hidden
       if (isPhotoVisible == false) {
+
          _actionMap2Slideout_PhotoFilter.getPhotoFilterSlideout().close();
+         _slideoutPhotoOptions.close();
+         _map.closePhotoTooltip();
+         _map.closePhotoHistogram();
       }
    }
 
@@ -2099,7 +2108,7 @@ public class Map2View extends ViewPart implements
       _actionSetDefaultPosition           = new ActionSetDefaultPosition(this);
       _actionShowAllFilteredPhotos        = new ActionShowAllFilteredPhotos(this);
       _actionShowLegendInMap              = new ActionShowLegendInMap(this);
-      _actionShowPhotos                   = new ActionShowPhotos();
+      _actionMap2Slideout_PhotoOptions    = new ActionMap2_PhotoOptions();
       _actionShowScaleInMap               = new ActionShowScaleInMap(this);
       _actionShowSliderInMap              = new ActionShowSliderInMap(this);
       _actionShowSliderInLegend           = new ActionShowSliderInLegend(this);
@@ -2421,7 +2430,7 @@ public class Map2View extends ViewPart implements
 
       _actionMap2Slideout_PhotoFilter     .setEnabled(isAllPhotoAvailable && _isShowPhoto);
       _actionShowAllFilteredPhotos        .setEnabled(canShowFilteredPhoto);
-      _actionShowPhotos                   .setEnabled(isAllPhotoAvailable);
+      _actionMap2Slideout_PhotoOptions    .setEnabled(isAllPhotoAvailable);
       _actionSyncMapWith_Photo            .setEnabled(canShowFilteredPhoto);
 
       /*
@@ -2560,7 +2569,7 @@ public class Map2View extends ViewPart implements
 
       tbm.add(new Separator());
 
-      tbm.add(_actionShowPhotos);
+      tbm.add(_actionMap2Slideout_PhotoOptions);
       tbm.add(_actionMap2Slideout_PhotoFilter);
       tbm.add(_actionShowAllFilteredPhotos);
 
@@ -4720,9 +4729,9 @@ public class Map2View extends ViewPart implements
       _actionMap2Slideout_MapPoints.setSelection(_isShowMapPoints);
       _map.setShowMapPoint(_isShowMapPoints);
 
-      // photo states
+      // photo options
       _isShowPhoto = Util.getStateBoolean(_state, STATE_IS_SHOW_PHOTO_IN_MAP, true);
-      _actionShowPhotos.setSelection(_isShowPhoto);
+      _actionMap2Slideout_PhotoOptions.setSelection(_isShowPhoto);
 
       _isPhotoFilterActive = Util.getStateBoolean(_state, STATE_IS_PHOTO_FILTER_ACTIVE, false);
       _actionMap2Slideout_PhotoFilter.setSelection(_isPhotoFilterActive);
