@@ -60,7 +60,7 @@ public class Histogram extends Canvas implements PaintListener {
    private ImageData                              _imageData;
 
    private boolean                                _isSetTonality;
-   private CurveType                              _curveType;
+//   private CurveType                              _curveType;
 
    private ToneCurvesFilter                       _toneCurvesFilter;
 
@@ -209,12 +209,12 @@ public class Histogram extends Canvas implements PaintListener {
     * @param isZoomed
     *           Is <code>true</code> when the event is fired by zooming
     */
-   private void fireEvent_OnPointIsModified() {
+   private void fireEvent_PointIsModified() {
 
       final Object[] listeners = _allHistogramListener.getListeners();
 
       for (final Object listener : listeners) {
-         ((IHistogramListener) listener).onPointIsModified();
+         ((IHistogramListener) listener).pointIsModified();
       }
    }
 
@@ -255,7 +255,7 @@ public class Histogram extends Canvas implements PaintListener {
 
             curveValues.removeKnot(_hoveredPointIndex);
 
-            fireEvent_OnPointIsModified();
+            fireEvent_PointIsModified();
          }
       }
    }
@@ -287,7 +287,7 @@ public class Histogram extends Canvas implements PaintListener {
          _hoveredPointIndex = curveValues.addKnot(xRel, yRel);
          _isPointDragged = true;
 
-         fireEvent_OnPointIsModified();
+         fireEvent_PointIsModified();
 
          redraw();
       }
@@ -322,7 +322,7 @@ public class Histogram extends Canvas implements PaintListener {
             curveValues.allValuesX[_hoveredPointIndex] = xRel;
             curveValues.allValuesY[_hoveredPointIndex] = yRel;
 
-            fireEvent_OnPointIsModified();
+            fireEvent_PointIsModified();
          }
 
       } else {
@@ -359,7 +359,7 @@ public class Histogram extends Canvas implements PaintListener {
       final int canvasWidth = canvasBounds.width;
       final int canvasHeight = canvasBounds.height;
 
-      final int sliderbarHeight = 20;
+      final int sliderbarHeight = 0; //20;
 
       _graphWidth = canvasWidth;
       _graphHeight = canvasHeight - sliderbarHeight;
@@ -594,7 +594,7 @@ public class Histogram extends Canvas implements PaintListener {
    public void updateCurvesFilter(final Photo photo) {
 
       _isSetTonality = photo.isSetTonality;
-      _curveType = photo.curveType;
+//      _curveType = photo.curveType;
       _toneCurvesFilter = photo.getToneCurvesFilter();
 
       // update in UI thread

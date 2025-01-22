@@ -124,12 +124,22 @@ public class PhotoImageLoader {
 
       if (_photo.isSetTonality) {
 
+         if (adjustedImage == null) {
+
+            /*
+             * Complicated: create a valid image which can be adjusted, there is a bug that a not
+             * cropped image is not adjusted with tonality
+             */
+            adjustedImage = Scalr.crop(notAdjustedImage, 0, 0, notAdjustedImage.getWidth(), notAdjustedImage.getHeight());
+         }
+
          final BufferedImage srcImage = adjustedImage != null ? adjustedImage : notAdjustedImage;
 
          final BufferedImage tonalityImage = adjustImage_Tonality(srcImage);
 
          // replace adjusted image
          if (tonalityImage != null) {
+
             UI.disposeResource(adjustedImage);
             adjustedImage = tonalityImage;
          }
@@ -137,7 +147,7 @@ public class PhotoImageLoader {
 
       if (adjustedImage != null) {
 
-         final String imageKey = _photo.getImageKey(ImageQuality.THUMB_HQ_CROPPED);
+         final String imageKey = _photo.getImageKey(ImageQuality.THUMB_HQ_ADJUSTED);
 
          PhotoImageCache.putImage_AWT(imageKey, adjustedImage, _photo.imageFilePathName);
       }
@@ -1100,7 +1110,7 @@ public class PhotoImageLoader {
 
          // load original image and create thumbs
 
-         if (imageQuality == ImageQuality.THUMB_HQ_CROPPED) {
+         if (imageQuality == ImageQuality.THUMB_HQ_ADJUSTED || _photo.isSetTonality) {
 
             // it is possible that the not cropped image is already loaded -> only crop it
 
@@ -1271,7 +1281,7 @@ public class PhotoImageLoader {
       /*
        * Crop image NOW, to prevent flickering when cropping is done later
        */
-      if (imageQuality == ImageQuality.THUMB_HQ_CROPPED) {
+      if (imageQuality == ImageQuality.THUMB_HQ_ADJUSTED || _photo.isSetTonality) {
 
          final BufferedImage awtHQImageCropped = adjustImage(awtOriginalImage);
 

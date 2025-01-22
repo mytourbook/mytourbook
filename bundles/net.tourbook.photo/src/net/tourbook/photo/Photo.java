@@ -278,7 +278,7 @@ public class Photo implements Serializable {
     */
    private String                        _imageKey_Thumb;
    private String                        _imageKey_ThumbHQ;
-   private String                        _imageKey_ThumbHQ_Cropped;
+   private String                        _imageKey_ThumbHQ_Adjusted;
    private String                        _imageKey_HQ;
    private String                        _imageKey_Original;
 
@@ -357,9 +357,9 @@ public class Photo implements Serializable {
       return Util.computeMD5(imageFilePathName) + "_KeyThumbHQ";//$NON-NLS-1$
    }
 
-   public static String getImageKey_ThumbHQ_Cropped(final String imageFilePathName) {
+   public static String getImageKey_ThumbHQ_Adjusted(final String imageFilePathName) {
 
-      return Util.computeMD5(imageFilePathName) + "_KeyThumbHQ_Cropped";//$NON-NLS-1$
+      return Util.computeMD5(imageFilePathName) + "_KeyThumbHQ_Adjusted";//$NON-NLS-1$
    }
 
    public static int getMap25ImageRequestedSize() {
@@ -844,9 +844,9 @@ public class Photo implements Serializable {
 
          return _imageKey_ThumbHQ;
 
-      } else if (imageQuality == ImageQuality.THUMB_HQ_CROPPED) {
+      } else if (imageQuality == ImageQuality.THUMB_HQ_ADJUSTED) {
 
-         return _imageKey_ThumbHQ_Cropped;
+         return _imageKey_ThumbHQ_Adjusted;
 
       } else if (imageQuality == ImageQuality.ORIGINAL) {
 
@@ -977,7 +977,7 @@ public class Photo implements Serializable {
          return _photoLoadingStateHQ;
 
       } else if (imageQuality == ImageQuality.THUMB_HQ
-            || imageQuality == ImageQuality.THUMB_HQ_CROPPED) {
+            || imageQuality == ImageQuality.THUMB_HQ_ADJUSTED) {
 
          return _photoLoadingStateThumbHQ;
 
@@ -1428,7 +1428,7 @@ public class Photo implements Serializable {
          _photoLoadingStateHQ = photoLoadingState;
 
       } else if (imageQuality == ImageQuality.THUMB_HQ
-            || imageQuality == ImageQuality.THUMB_HQ_CROPPED) {
+            || imageQuality == ImageQuality.THUMB_HQ_ADJUSTED) {
 
          _photoLoadingStateThumbHQ = photoLoadingState;
 
@@ -1536,11 +1536,11 @@ public class Photo implements Serializable {
       /*
        * Initialize image keys and loading states
        */
-      _imageKey_Thumb            = getImageKey_Thumb           (photoImageFilePathName);
-      _imageKey_ThumbHQ          = getImageKey_ThumbHQ         (photoImageFilePathName);
-      _imageKey_ThumbHQ_Cropped  = getImageKey_ThumbHQ_Cropped (photoImageFilePathName);
-      _imageKey_HQ               = getImageKey_HQ              (photoImageFilePathName);
-      _imageKey_Original         = Util.computeMD5             (photoImageFilePathName) + "_KeyOriginal";//$NON-NLS-1$
+      _imageKey_Thumb            = getImageKey_Thumb              (photoImageFilePathName);
+      _imageKey_ThumbHQ          = getImageKey_ThumbHQ            (photoImageFilePathName);
+      _imageKey_ThumbHQ_Adjusted = getImageKey_ThumbHQ_Adjusted   (photoImageFilePathName);
+      _imageKey_HQ               = getImageKey_HQ                 (photoImageFilePathName);
+      _imageKey_Original         = Util.computeMD5                (photoImageFilePathName) + "_KeyOriginal"; //$NON-NLS-1$
 
       _isImageFileAvailable = photoImageFile.exists();
 

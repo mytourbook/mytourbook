@@ -15,20 +15,26 @@ limitations under the License.
 */
 package com.jhlabs.image;
 
+import java.util.Arrays;
+
+import net.tourbook.common.UI;
+
 /**
  * Curve x/y values 0...1
  */
 public class CurveValues {
 
-   /**
-    * 0...1
-    */
-   public float[] allValuesX;
+   private static final char NL = UI.NEW_LINE;
 
    /**
     * 0...1
     */
-   public float[] allValuesY;
+   public float[]            allValuesX;
+
+   /**
+    * 0...1
+    */
+   public float[]            allValuesY;
 
    public CurveValues() {
 
@@ -157,22 +163,6 @@ public class CurveValues {
       return table;
    }
 
-//    private void sortKnots() {
-//        int numKnots = x.length;
-//        for (int i = 1; i < numKnots - 1; i++) {
-//            for (int j = 1; j < i; j++) {
-//                if (x[i] < x[j]) {
-//                    float t = x[i];
-//                    x[i] = x[j];
-//                    x[j] = t;
-//                    t = y[i];
-//                    y[i] = y[j];
-//                    y[j] = t;
-//                }
-//            }
-//        }
-//    }
-
    public void removeKnot(final int deleteIndex) {
 
       final int numKnots = allValuesX.length;
@@ -200,5 +190,41 @@ public class CurveValues {
 
       allValuesX = newValuesX;
       allValuesY = newValuesY;
+   }
+
+//    private void sortKnots() {
+//        int numKnots = x.length;
+//        for (int i = 1; i < numKnots - 1; i++) {
+//            for (int j = 1; j < i; j++) {
+//                if (x[i] < x[j]) {
+//                    float t = x[i];
+//                    x[i] = x[j];
+//                    x[j] = t;
+//                    t = y[i];
+//                    y[i] = y[j];
+//                    y[j] = t;
+//                }
+//            }
+//        }
+//    }
+
+   @Override
+   public String toString() {
+
+      final int maxLen = 5;
+
+      return UI.EMPTY_STRING
+
+            + "CurveValues" + NL //$NON-NLS-1$
+
+            + " allValuesX = " + (allValuesX != null //$NON-NLS-1$
+                  ? Arrays.toString(Arrays.copyOf(allValuesX, Math.min(allValuesX.length, maxLen)))
+                  : null) + NL
+
+            + " allValuesY = " + (allValuesY != null //$NON-NLS-1$
+                  ? Arrays.toString(Arrays.copyOf(allValuesY, Math.min(allValuesY.length, maxLen)))
+                  : null)
+
+      ;
    }
 }

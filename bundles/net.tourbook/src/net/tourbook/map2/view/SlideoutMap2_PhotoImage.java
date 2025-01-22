@@ -836,10 +836,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
       final boolean isCropped = _chkCropPhoto.getSelection();
 
       _photo.isCropped = isCropped;
-
-      if (isCropped) {
-         _photo.isAdjustmentModified = true;
-      }
+      _photo.isAdjustmentModified = true;
 
       _photo.updateMapImageRenderSize();
 

@@ -706,17 +706,41 @@ public class ImageUtils {
     * Returns the pixel array behind the given BufferedImage.
     * If the array data is modified, the image itself is modified.
     */
-   public static int[] getPixelArray(final BufferedImage src) {
+   public static int[] getPixelArray(final BufferedImage srcFinal) {
+
+      final BufferedImage src = srcFinal;
+
       assert src != null;
 
+//      final int type = src.getType();
+//      if (type == BufferedImage.TYPE_3BYTE_BGR || type == BufferedImage.TYPE_CUSTOM) {
+//
+//         // create new image with right format
+//         final int imageType = src.getTransparency() == Transparency.OPAQUE
+//               ? BufferedImage.TYPE_INT_RGB
+//               : BufferedImage.TYPE_INT_ARGB;
+//
+//         final BufferedImage tempImage = new BufferedImage(src.getWidth(), src.getHeight(), imageType);
+//         final Graphics2D g = tempImage.createGraphics();
+//         {
+//            g.drawImage(src, 0, 0, null);
+//            src = tempImage;
+//         }
+//         g.dispose();
+//      }
+
       int[] pixels;
+
       if (hasPackedIntArray(src)) {
+
          assert src.getRaster().getTransferType() == TYPE_INT;
          assert src.getRaster().getNumDataElements() == 1;
 
          final DataBufferInt srcDataBuffer = (DataBufferInt) src.getRaster().getDataBuffer();
          pixels = srcDataBuffer.getData();
+
       } else {
+
          // If the image's pixels are not stored in an int array,
          // a correct int array could still be retrieved with
          // src.getRGB(0, 0, width, height, null, 0, width);

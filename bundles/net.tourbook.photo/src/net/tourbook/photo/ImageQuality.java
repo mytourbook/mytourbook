@@ -33,9 +33,10 @@ public enum ImageQuality {
    THUMB_HQ,
 
    /**
-    * Thumb image is in HQ (high quality) size and cropped, it is used in e.g. 2D map
+    * Thumb image is in HQ (high quality) size and adjusted, e.g. cropped or tonality modified, it
+    * is used in e.g. 2D map
     */
-   THUMB_HQ_CROPPED,
+   THUMB_HQ_ADJUSTED,
 
    /**
     * Image in original size

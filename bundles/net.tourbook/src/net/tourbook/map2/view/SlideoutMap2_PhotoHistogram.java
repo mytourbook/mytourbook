@@ -60,20 +60,15 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.part.PageBook;
 
 /**
@@ -84,42 +79,33 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       IActionResetToDefault,
       IHistogramListener {
 
-   private static final String ID                      = "net.tourbook.map2.view.SlideoutMap2_PhotoHistogram"; //$NON-NLS-1$
-
-   private static final int    THREE_POINT_DEFAULT_MIN = 0;
-   private static final int    THREE_POINT_DEFAULT_MAX = 255;
-
-//   private static final int             THREE_POINT_DEFAULT_DARK   = 0;
-//   private static final int             THREE_POINT_DEFAULT_BRIGHT = 255;
-//   private static final int             THREE_POINT_DEFAULT_MIDDLE = 50;                                                   // %
+   private static final String          ID                   = "net.tourbook.map2.view.SlideoutMap2_PhotoHistogram"; //$NON-NLS-1$
 
    private static final char            NL                   = UI.NEW_LINE;
 
    private final static IDialogSettings _state               = TourbookPlugin.getState(ID);
 
-   /**
-    * Filter operator MUST be in sync with filter labels
-    */
-   private static CurveType[]           _allCurveTypes_Value = {
-
-         CurveType.THREE_POINTS,
-         CurveType.MULTIPLE_POINTS,
-   };
-
-   /**
-    * Filter labels MUST be in sync with filter operator
-    */
-   private static String[]              _allCurveTypes_Label = {
-
-         "3 Points",
-         "Multiple Points",
-   };
+//   /**
+//    * Filter operator MUST be in sync with filter labels
+//    */
+//   private static CurveType[]           _allCurveTypes_Value = {
+//
+//         CurveType.THREE_POINTS,
+//         CurveType.MULTIPLE_POINTS,
+//   };
+//
+//   /**
+//    * Filter labels MUST be in sync with filter operator
+//    */
+//   private static String[]              _allCurveTypes_Label = {
+//
+//         "3 Points",
+//         "Multiple Points",
+//   };
 
    private Map2                         _map2;
 
-   private FocusListener                _keepOpenListener;
-   private MouseWheelListener           _mouseWheelListener3Points;
-   private SelectionListener            _selectedListener3Points;
+//   private FocusListener                _keepOpenListener;
 
    private PaintedMapPoint              _hoveredMapPoint;
    private PaintedMapPoint              _previousHoveredMapPoint;
@@ -133,13 +119,11 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
    private Composite _pageNoPhoto;
    private Composite _pagePhoto;
 
-   private Composite _container3Points;
-
    private Button    _chkAdjustTonality;
 
-   private Combo     _comboCurveType;
+//   private Combo     _comboCurveType;
 
-   private Label     _lblCurveType;
+//   private Label     _lblCurveType;
    private Label     _labelMessage;
 
    private Histogram _histogram;
@@ -225,10 +209,10 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
             .grab(true, true)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1)
-            .extendedMargins(0, 0, 0, 5)
+//            .extendedMargins(0, 0, 0, 5)
             .numColumns(2)
             .applyTo(container);
-//      _containerPhotoOptions.setBackground(UI.SYS_COLOR_YELLOW);
+//      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
          {
             /*
@@ -243,24 +227,24 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
                   .applyTo(_chkAdjustTonality);
 
          }
-         {
-            /*
-             * Curve type
-             */
-            _lblCurveType = new Label(container, SWT.NONE);
-            _lblCurveType.setText("Curve &type");
-            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblCurveType);
-
-            _comboCurveType = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-            _comboCurveType.setVisibleItemCount(10);
-            _comboCurveType.setToolTipText("");
-            _comboCurveType.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelectCurveType(selectionEvent)));
-            _comboCurveType.addFocusListener(_keepOpenListener);
-
-            GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(_comboCurveType);
-         }
+//         {
+//            /*
+//             * Curve type
+//             */
+//            _lblCurveType = new Label(container, SWT.NONE);
+//            _lblCurveType.setText("Curve &type");
+//            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblCurveType);
+//
+//            _comboCurveType = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+//            _comboCurveType.setVisibleItemCount(10);
+//            _comboCurveType.setToolTipText("");
+//            _comboCurveType.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelectCurveType(selectionEvent)));
+//            _comboCurveType.addFocusListener(_keepOpenListener);
+//
+//            GridDataFactory.fillDefaults()
+//                  .align(SWT.FILL, SWT.CENTER)
+//                  .applyTo(_comboCurveType);
+//         }
          {
             _histogram = new Histogram(container);
             _histogram.addHistogramListener(this);
@@ -294,20 +278,20 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
 // SET_FORMATTING_OFF
 
-      final boolean isAdjustTonality = _chkAdjustTonality.getSelection();
+//      final boolean isAdjustTonality = _chkAdjustTonality.getSelection();
 
-      _comboCurveType            .setEnabled(isAdjustTonality);
-      _lblCurveType              .setEnabled(isAdjustTonality);
+//      _comboCurveType            .setEnabled(isAdjustTonality);
+//      _lblCurveType              .setEnabled(isAdjustTonality);
 
 // SET_FORMATTING_ON
    }
 
    private void fillUI() {
 
-      for (final String curveTypeLabel : _allCurveTypes_Label) {
-
-         _comboCurveType.add(curveTypeLabel);
-      }
+//      for (final String curveTypeLabel : _allCurveTypes_Label) {
+//
+//         _comboCurveType.add(curveTypeLabel);
+//      }
    }
 
    private Point fixupDisplayBounds(final Point ttSize_Unscaled, final Point ttPos_Scaled) {
@@ -454,16 +438,16 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
    private CurveType getSelectedCurveType() {
 
-      final int selectedIndex = _comboCurveType.getSelectionIndex();
-
-      if (selectedIndex >= 0) {
-
-         return _allCurveTypes_Value[selectedIndex];
-
-      } else {
-
+//      final int selectedIndex = _comboCurveType.getSelectionIndex();
+//
+//      if (selectedIndex >= 0) {
+//
+//         return _allCurveTypes_Value[selectedIndex];
+//
+//      } else {
+//
          return CurveType.THREE_POINTS;
-      }
+//      }
    }
 
    @Override
@@ -521,41 +505,23 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
    private void initUI(final Composite parent) {
 
-      _selectedListener3Points = SelectionListener.widgetSelectedAdapter(selectionEvent -> {
-         on3Points_Change(selectionEvent.widget);
-      });
-
-      _mouseWheelListener3Points = mouseEvent -> {
-         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
-         on3Points_Change(mouseEvent.widget);
-      };
-
-      _keepOpenListener = new FocusListener() {
-
-         @Override
-         public void focusGained(final FocusEvent e) {
-
-            /*
-             * This will fix the problem that when the list of a combobox is displayed, then the
-             * slideout will disappear :-(((
-             */
-            setIsAnotherDialogOpened(true);
-         }
-
-         @Override
-         public void focusLost(final FocusEvent e) {
-            setIsAnotherDialogOpened(false);
-         }
-      };
-   }
-
-   private void on3Points_Change(final Widget widget) {
-
-      setPointValues(widget);
-
-      _histogram.updateCurvesFilter(_photo);
-
-      updateModelAndUI();
+//      _keepOpenListener = new FocusListener() {
+//
+//         @Override
+//         public void focusGained(final FocusEvent e) {
+//
+//            /*
+//             * This will fix the problem that when the list of a combobox is displayed, then the
+//             * slideout will disappear :-(((
+//             */
+//            setIsAnotherDialogOpened(true);
+//         }
+//
+//         @Override
+//         public void focusLost(final FocusEvent e) {
+//            setIsAnotherDialogOpened(false);
+//         }
+//      };
    }
 
    private void onAdjustTonality() {
@@ -604,15 +570,16 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       });
    }
 
-   @Override
-   public void onPointIsModified() {
+   @SuppressWarnings("unused")
+   private void onSelectCurveType(final SelectionEvent selectionEvent) {
+
+      _photo.curveType = getSelectedCurveType();
 
       updateModelAndUI();
    }
 
-   private void onSelectCurveType(final SelectionEvent selectionEvent) {
-
-      _photo.curveType = getSelectedCurveType();
+   @Override
+   public void pointIsModified() {
 
       updateModelAndUI();
    }
@@ -634,52 +601,19 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
    private void selectCurveType(final Enum<CurveType> requestedCurveType) {
 
-      int selectionIndex = 0;
-
-      for (int operatorIndex = 0; operatorIndex < _allCurveTypes_Value.length; operatorIndex++) {
-
-         final CurveType curveType = _allCurveTypes_Value[operatorIndex];
-
-         if (curveType.equals(requestedCurveType)) {
-            selectionIndex = operatorIndex;
-            break;
-         }
-      }
-
-      _comboCurveType.select(selectionIndex);
-   }
-
-   private void setPointValues(final Widget widget) {
-
-//      int devDark = _spinnerLevel_Dark.getSelection();
-//      int devBright = _spinnerLevel_Bright.getSelection();
-//      final int middleX100 = _spinnerLevel_MiddleX.getSelection();
-//      final int middleY100 = _spinnerLevel_MiddleY.getSelection();
+//      int selectionIndex = 0;
 //
-//      if (widget == _spinnerLevel_Dark) {
+//      for (int operatorIndex = 0; operatorIndex < _allCurveTypes_Value.length; operatorIndex++) {
 //
-//         if (devDark >= devBright) {
+//         final CurveType curveType = _allCurveTypes_Value[operatorIndex];
 //
-//            devDark = devBright - 1;
-//
-//            _spinnerLevel_Dark.setSelection(devDark);
+//         if (curveType.equals(requestedCurveType)) {
+//            selectionIndex = operatorIndex;
+//            break;
 //         }
 //      }
 //
-//      if (widget == _spinnerLevel_Bright) {
-//
-//         if (devBright <= devDark) {
-//
-//            devBright = devDark + 1;
-//
-//            _spinnerLevel_Bright.setSelection(devBright);
-//         }
-//      }
-
-//      _photo.threePoint_Dark = devDark;
-//      _photo.threePoint_Bright = devBright;
-//      _photo.threePoint_MiddleX = middleX100 / 10f;
-//      _photo.threePoint_MiddleY = middleY100 / 10f;
+//      _comboCurveType.select(selectionIndex);
    }
 
    /**

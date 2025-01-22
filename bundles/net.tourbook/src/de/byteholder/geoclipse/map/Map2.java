@@ -2948,14 +2948,17 @@ public class Map2 extends Canvas {
 
          // image is not invalid and not yet loaded
 
-         final ImageQuality imageQuality = _isShowPhotoAdjustments && photo.isCropped
-               ? ImageQuality.THUMB_HQ_CROPPED
+         final boolean isPhotoAdjusted = photo.isCropped || photo.isSetTonality;
+
+         final ImageQuality imageQuality = _isShowPhotoAdjustments && isPhotoAdjusted
+               ? ImageQuality.THUMB_HQ_ADJUSTED
                : ImageQuality.THUMB_HQ;
 
          // check if image is in the cache
          awtPhotoImageThumbHQ = PhotoImageCache.getImage_AWT(photo, imageQuality);
 
-         final boolean isImageNotInLoadingQueue = thumbHqPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false;
+         final boolean isImageInLoadingQueue = thumbHqPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE;
+         final boolean isImageNotInLoadingQueue = isImageInLoadingQueue == false;
 
          if (isImageNotInLoadingQueue) {
 

@@ -17,6 +17,6 @@ package net.tourbook.photo;
 
 public interface IHistogramListener {
 
-   public void onPointIsModified();
+   public void pointIsModified();
 
 }
