@@ -97,25 +97,9 @@ public class CurveValues {
 
    private int[] createLUT() {
 
-      int[] table = null;
-
-//      table = createLUT_NEW();
-      table = createLUT_NEW_WithLine();
-//      table = createLUT_OLD();
-
-      return table;
-   }
-
-   /**
-    * Creates 0...255 values from the 0...1 knot values
-    *
-    * @return
-    */
-   private int[] createLUT_NEW() {
-
       final ArrayList<Coordinate> coordinates = new ArrayList<>();
 
-      // add an additional point to ensure that at least 3 points are set !!!
+      // add an additional point to ensure that at least 3 points are set, otherwise there is a NPE !!!
       coordinates.add(new Coordinate(0, 0));
 
       for (int valueIndex = 0; valueIndex < allValuesX.length; valueIndex++) {
@@ -126,95 +110,8 @@ public class CurveValues {
          coordinates.add(new Coordinate(xValue, yValue));
       }
 
-      final Coordinate[] coor = coordinates.toArray(new Coordinate[coordinates.size()]);
-
-      final Geometry geom = new GeometryFactory().createLineString(coor);
-
-      final double alpha = 1;
-      final double skew = 0;
-
-      final Geometry bezierCurve = CubicBezierCurve.bezierCurve(geom, alpha, skew);
-      final Coordinate[] allBezierPointsRaw = bezierCurve.getCoordinates();
-
-      // get all none NaN points
-      final ArrayList<Coordinate> allBezierPoints = new ArrayList<>();
-      for (final Coordinate coordinate : allBezierPointsRaw) {
-         if (Double.isNaN(coordinate.x) == false) {
-            allBezierPoints.add(coordinate);
-         }
-      }
-
-      final int numPoints = allBezierPoints.size();
-      final int numLUT = 256;
-
-      final int[] lut = new int[numLUT];
-
-      int pointIndex = 0;
-      Coordinate bezPoint = allBezierPoints.get(0);
-      Coordinate prevBezPoint = bezPoint;
-
-      for (int lutX = 0; lutX < numLUT; lutX++) {
-
-         while (pointIndex < numPoints) {
-
-            final double bezPointX = bezPoint.x;
-            final double bezPointY = bezPoint.y;
-            final double prevBezPointX = prevBezPoint.x;
-            final double prevBezPointY = prevBezPoint.y;
-
-            final double diffX = (bezPointX - prevBezPointX) * 255;
-            final double diffY = (bezPointY - prevBezPointY) * 255;
-
-//            System.out.println(UI.timeStamp() + "%4d %5.2f  %5.2f".formatted(lutX, diffX, diffY));
-//// TODO remove SYSTEM.OUT.PRINTLN
-
-            final double nextBezPointIndex = bezPointX * 255;
-
-            if (nextBezPointIndex >= lutX) {
-               break;
-            }
-
-            pointIndex++;
-
-            if (pointIndex < numPoints) {
-
-               prevBezPoint = bezPoint;
-               bezPoint = allBezierPoints.get(pointIndex);
-            }
-         }
-
-         final int lutY = (int) (bezPoint.y * 255);
-
-         lut[lutX] = ImageMath.clamp(lutY, 0, 255);
-
-         if (lutX < 20) {
-            System.out.println(UI.timeStamp() + " %4d  %4d ".formatted(lutX, lutY));
-// TODO remove SYSTEM.OUT.PRINTLN
-         }
-      }
-
-      System.out.println();
-      System.out.println();
-      System.out.println();
-// TODO remove SYSTEM.OUT.PRINTLN
-
-      return lut;
-   }
-
-   private int[] createLUT_NEW_WithLine() {
-
-      final ArrayList<Coordinate> coordinates = new ArrayList<>();
-
-      // add an additional point to ensure that at least 3 points are set !!!
-      coordinates.add(new Coordinate(0, 0));
-
-      for (int valueIndex = 0; valueIndex < allValuesX.length; valueIndex++) {
-
-         final float xValue = allValuesX[valueIndex];
-         final float yValue = allValuesY[valueIndex];
-
-         coordinates.add(new Coordinate(xValue, yValue));
-      }
+      // ensure that the last point(s) a
+//      coordinates.add(new Coordinate(1, 1));
 
       final Coordinate[] coor = coordinates.toArray(new Coordinate[coordinates.size()]);
 
@@ -243,86 +140,32 @@ public class CurveValues {
 
          Coordinate bezPoint = allBezierPoints.get(0);
 
-         int bezPointX0 = (int) (bezPoint.x * 255);
-         int bezPointY0 = (int) (bezPoint.y * 255);
+         int bezPointX0;
+         int bezPointY0;
 
-         int bezPointX1;
-         int bezPointY1;
+         int bezPointX1 = (int) (bezPoint.x * 255);
+         int bezPointY1 = (int) (bezPoint.y * 255);
 
          for (int pointIndex = 1; pointIndex < numPoints; pointIndex++) {
 
-            bezPointX1 = bezPointX0;
-            bezPointY1 = bezPointY0;
+            bezPointX0 = bezPointX1;
+            bezPointY0 = bezPointY1;
 
             bezPoint = allBezierPoints.get(pointIndex);
 
-            bezPointX0 = (int) (bezPoint.x * 255);
-            bezPointY0 = (int) (bezPoint.y * 255);
+            bezPointX1 = (int) (bezPoint.x * 255);
+            bezPointY1 = (int) (bezPoint.y * 255);
+
+            bezPointX1 = ImageMath.clamp(bezPointX1, 0, 255);
+            bezPointY1 = ImageMath.clamp(bezPointY1, 0, 255);
 
             plotLine(lut, bezPointX0, bezPointY0, bezPointX1, bezPointY1);
          }
-      }
 
-      return lut;
-   }
-
-   /**
-    * Creates 0...255 values from the 0...1 knot values
-    *
-    * @return
-    */
-   private int[] createLUT_OLD() {
-
-      final int numKnots = allValuesX.length;
-
-      final float[] allRenderKnotsX = new float[numKnots + 2];
-      final float[] allRenderKnotsY = new float[numKnots + 2];
-
-      System.arraycopy(allValuesX, 0, allRenderKnotsX, 1, numKnots);
-      System.arraycopy(allValuesY, 0, allRenderKnotsY, 1, numKnots);
-
-      allRenderKnotsX[0] = allRenderKnotsX[1];
-      allRenderKnotsY[0] = allRenderKnotsY[1];
-      allRenderKnotsX[numKnots + 1] = allRenderKnotsX[numKnots];
-      allRenderKnotsY[numKnots + 1] = allRenderKnotsY[numKnots];
-
-      final int[] lut = new int[256];
-
-      // if first knot is > 0 fill the table with y position
-      if (allRenderKnotsX[0] > 0) {
-
-         final int renderStartX = (int) (allRenderKnotsX[0] * 255);
-         final int renderStartY = (int) (allRenderKnotsY[0] * 255);
-
-         for (int renderIndexX = 0; renderIndexX <= renderStartX; renderIndexX++) {
-            lut[renderIndexX] = renderStartY;
+         // set lut until the end
+         for (int xIndex = bezPointX1; xIndex < numLUT; xIndex++) {
+            lut[xIndex] = bezPointY1;
          }
-      }
-
-      // if last knot is < 1 fill the table with y position
-      if (allRenderKnotsX[numKnots] < 1) {
-
-         final int renderEndX = (int) (allRenderKnotsX[numKnots] * 255);
-         final int renderEndY = (int) (allRenderKnotsY[numKnots] * 255);
-
-         for (int i = renderEndX; i <= 255; i++) {
-            lut[i] = renderEndY;
-         }
-      }
-
-      final int numRenderKnots = allRenderKnotsX.length;
-
-      for (int renderIndex = 0; renderIndex < 2048; renderIndex++) {
-
-         final float f = renderIndex / 2048.0f;
-
-         int lutX = (int) (255 * ImageMath.splineClamped(f, numRenderKnots, allRenderKnotsX) + 0.5f);
-         int lutY = (int) (255 * ImageMath.spline(f, numRenderKnots, allRenderKnotsY) + 0.5f);
-
-         lutX = ImageMath.clamp(lutX, 0, 255);
-         lutY = ImageMath.clamp(lutY, 0, 255);
-
-         lut[lutX] = lutY;
       }
 
       return lut;
