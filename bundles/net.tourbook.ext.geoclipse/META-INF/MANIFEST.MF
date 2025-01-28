@@ -13,7 +13,8 @@ Bundle-ClassPath: lib/gt-main-28-RC.jar,
  lib/gt-referencing-28-RC.jar,
  lib/jts-core-1.19.0.jar,
  lib/gt-http-28-RC.jar,
- lib/gt-opengis-28-RC.jar
+ lib/gt-opengis-28-RC.jar,
+ lib/jts-core-1.20.0.jar
 Export-Package: org.geotools.data.ows,
  org.geotools.ows;uses:="org.xml.sax",
  org.geotools.ows.wms;
@@ -28,6 +29,8 @@ Export-Package: org.geotools.data.ows,
  org.geotools.ows.wms.request;uses:="org.geotools.ows.wms",
  org.geotools.ows.wms.response;uses:="org.geotools.ows.wms",
  org.geotools.util.logging,
+ org.locationtech.jts.geom,
+ org.locationtech.jts.shape,
  org.opengis.geometry;
   uses:="org.opengis.geometry.coordinate,
    org.opengis.geometry.complex,

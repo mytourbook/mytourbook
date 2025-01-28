@@ -50,16 +50,16 @@ import pixelitor.filters.curves.ToneCurvesFilter;
  */
 public class Histogram extends Canvas implements PaintListener {
 
-   private static final int                       POINT_RADIUS           = 12;
+   private static final int POINT_RADIUS   = 12;
 
-   public static final int                        NUM_BINS               = 256;
+   public static final int  NUM_BINS       = 256;
 
-   private int                                    _maxLuminance;
-   private int[]                                  _allLuminances         = new int[NUM_BINS];
+   private int              _maxLuminance;
+   private int[]            _allLuminances = new int[NUM_BINS];
 
-   private ImageData                              _imageData;
+   private ImageData        _imageData;
 
-   private boolean                                _isSetTonality;
+   private boolean          _isSetTonality;
 //   private CurveType                              _curveType;
 
    private ToneCurvesFilter                       _toneCurvesFilter;
@@ -242,8 +242,6 @@ public class Histogram extends Canvas implements PaintListener {
 
       if (_hoveredPointIndex != -1) {
 
-         // remove point
-
          final CurveValues curveValues = _toneCurvesFilter.getCurves().getActiveCurve().curveValues;
 
          final float[] allValuesX = curveValues.allValuesX;
@@ -251,11 +249,24 @@ public class Histogram extends Canvas implements PaintListener {
          final int numValues = allValuesX.length;
          final int lastPointIndex = numValues - 1;
 
-         if (_hoveredPointIndex != 0 && _hoveredPointIndex != lastPointIndex) {
+         // remove point
 
-            curveValues.removeKnot(_hoveredPointIndex);
+         if (UI.isCtrlKey(mouseEvent)) {
 
-            fireEvent_PointIsModified();
+            // remove all inner points
+
+//            curveValues.removeKnot(_hoveredPointIndex);
+//
+//            fireEvent_PointIsModified();
+
+         } else {
+
+            if (_hoveredPointIndex != 0 && _hoveredPointIndex != lastPointIndex) {
+
+               curveValues.removeKnot(_hoveredPointIndex);
+
+               fireEvent_PointIsModified();
+            }
          }
       }
    }
@@ -402,7 +413,10 @@ public class Histogram extends Canvas implements PaintListener {
 
    private void paint_20_ToneCurve(final GC gc) {
 
-      if (_toneCurvesFilter == null || _toneCurvesFilter.getCurvesFilter() == null) {
+      if (_toneCurvesFilter == null
+            || _toneCurvesFilter.getCurvesFilter() == null
+            || _toneCurvesFilter.getCurvesFilter().getRedTable() == null) {
+
          return;
       }
 
