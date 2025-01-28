@@ -130,7 +130,11 @@ public class PhotoImageLoader {
              * Complicated: create a valid image which can be adjusted, there is a bug that a not
              * cropped image is not adjusted with tonality
              */
-            adjustedImage = Scalr.crop(notAdjustedImage, 0, 0, notAdjustedImage.getWidth(), notAdjustedImage.getHeight());
+            adjustedImage = Scalr.crop(notAdjustedImage,
+                  0,
+                  0,
+                  notAdjustedImage.getWidth(),
+                  notAdjustedImage.getHeight());
          }
 
          final BufferedImage srcImage = adjustedImage != null ? adjustedImage : notAdjustedImage;

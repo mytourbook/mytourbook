@@ -840,7 +840,7 @@ public class Map2 extends Canvas {
 
             if (isUpdateUI) {
 
-               // curves must be update after the image is loading which is computing the curves
+               // curves must be updated after the image is loading which is computing the curves
                _mapPointTooltip_PhotoHistogram.updateCurves();
 
                paint();
@@ -1262,6 +1262,16 @@ public class Map2 extends Canvas {
       }
 
       return new Point2D.Double(newCenterX, newCenterY);
+   }
+
+   public void closePhotoHistogram() {
+
+      _mapPointTooltip_PhotoHistogram.close();
+   }
+
+   public void closePhotoTooltip() {
+
+      _mapPointTooltip_PhotoImage.close();
    }
 
    @Override
@@ -3659,16 +3669,6 @@ public class Map2 extends Canvas {
             worldPosition.y - _worldPixel_TopLeft_Viewport.y);
 
       return gridGeoPos;
-   }
-
-   public void closePhotoHistogram() {
-
-      _mapPointTooltip_PhotoHistogram.close();
-   }
-
-   public void closePhotoTooltip() {
-
-      _mapPointTooltip_PhotoImage.close();
    }
 
    private void hideTourTooltipHoveredArea() {

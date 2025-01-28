@@ -24,29 +24,27 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PhotoAdjustments {
 
-   public boolean   isPhotoCropped;
+   public boolean isPhotoCropped;
 
    /**
     * Relative position 0...1 of the crop area top left x position
     */
-   public float     cropAreaX1;
-   public float     cropAreaY1;
+   public float   cropAreaX1;
+   public float   cropAreaY1;
 
-   public float     cropAreaX2;
-   public float     cropAreaY2;
+   public float   cropAreaX2;
+   public float   cropAreaY2;
 
-   public boolean   isSetTonality;
-
-   public CurveType curveType = CurveType.THREE_POINTS;
+   public boolean isSetTonality;
 
    /**
     * X values 0...1
     */
-   public float     curveValuesX[];
+   public float   curveValuesX[];
 
    /**
     * Y values 0...1
     */
-   public float     curveValuesY[];
+   public float   curveValuesY[];
 
 }

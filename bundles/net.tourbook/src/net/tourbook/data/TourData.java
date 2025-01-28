@@ -6503,7 +6503,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
             galleryPhoto.cropAreaY2 = photoAdjustments.cropAreaY2;
 
             galleryPhoto.isSetTonality = photoAdjustments.isSetTonality;
-            galleryPhoto.curveType = photoAdjustments.curveType;
 
             /*
              * Create curve knots

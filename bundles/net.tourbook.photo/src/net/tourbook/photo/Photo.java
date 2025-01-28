@@ -331,7 +331,6 @@ public class Photo implements Serializable {
    public float                          cropAreaX2;
    public float                          cropAreaY2;
 
-   public CurveType                      curveType;
    public boolean                        isSetTonality;
    private ToneCurvesFilter              _toneCurvesFilter;
 

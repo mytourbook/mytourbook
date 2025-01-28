@@ -39,7 +39,6 @@ import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.photo.CurveType;
 import net.tourbook.photo.Histogram;
 import net.tourbook.photo.IHistogramListener;
 import net.tourbook.photo.IPhotoPreferences;
@@ -60,7 +59,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -79,11 +77,11 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       IActionResetToDefault,
       IHistogramListener {
 
-   private static final String          ID                   = "net.tourbook.map2.view.SlideoutMap2_PhotoHistogram"; //$NON-NLS-1$
+   private static final String          ID     = "net.tourbook.map2.view.SlideoutMap2_PhotoHistogram"; //$NON-NLS-1$
 
-   private static final char            NL                   = UI.NEW_LINE;
+   private static final char            NL     = UI.NEW_LINE;
 
-   private final static IDialogSettings _state               = TourbookPlugin.getState(ID);
+   private final static IDialogSettings _state = TourbookPlugin.getState(ID);
 
 //   /**
 //    * Filter operator MUST be in sync with filter labels
@@ -103,13 +101,13 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 //         "Multiple Points",
 //   };
 
-   private Map2                         _map2;
+   private Map2 _map2;
 
 //   private FocusListener                _keepOpenListener;
 
-   private PaintedMapPoint              _hoveredMapPoint;
-   private PaintedMapPoint              _previousHoveredMapPoint;
-   private Photo                        _photo;
+   private PaintedMapPoint _hoveredMapPoint;
+   private PaintedMapPoint _previousHoveredMapPoint;
+   private Photo           _photo;
 
    /*
     * UI controls
@@ -436,20 +434,6 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       return photoImage;
    }
 
-   private CurveType getSelectedCurveType() {
-
-//      final int selectedIndex = _comboCurveType.getSelectionIndex();
-//
-//      if (selectedIndex >= 0) {
-//
-//         return _allCurveTypes_Value[selectedIndex];
-//
-//      } else {
-//
-         return CurveType.THREE_POINTS;
-//      }
-   }
-
    @Override
    public Point getToolTipLocation(final Point ttSize_Unscaled) {
 
@@ -570,14 +554,6 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       });
    }
 
-   @SuppressWarnings("unused")
-   private void onSelectCurveType(final SelectionEvent selectionEvent) {
-
-      _photo.curveType = getSelectedCurveType();
-
-      updateModelAndUI();
-   }
-
    @Override
    public void pointIsModified() {
 
@@ -597,23 +573,6 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
    protected void saveState() {
 
       super.saveState();
-   }
-
-   private void selectCurveType(final Enum<CurveType> requestedCurveType) {
-
-//      int selectionIndex = 0;
-//
-//      for (int operatorIndex = 0; operatorIndex < _allCurveTypes_Value.length; operatorIndex++) {
-//
-//         final CurveType curveType = _allCurveTypes_Value[operatorIndex];
-//
-//         if (curveType.equals(requestedCurveType)) {
-//            selectionIndex = operatorIndex;
-//            break;
-//         }
-//      }
-//
-//      _comboCurveType.select(selectionIndex);
    }
 
    /**
@@ -700,7 +659,6 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
       // update tonality
       _chkAdjustTonality.setSelection(_photo.isSetTonality);
-      selectCurveType(_photo.curveType);
       updateUI_ShowHide3PointActions();
 
       final Image photoImage = getPhotoImage(_photo);
@@ -803,7 +761,6 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
                      final PhotoAdjustments photoAdjustments = tourPhoto.getPhotoAdjustments(true);
 
                      photoAdjustments.isSetTonality = photo.isSetTonality;
-                     photoAdjustments.curveType = photo.curveType;
 
                      photoAdjustments.curveValuesX = curveValues.allValuesX;
                      photoAdjustments.curveValuesY = curveValues.allValuesY;
