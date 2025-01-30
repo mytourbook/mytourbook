@@ -1296,7 +1296,7 @@ public class Map2View extends ViewPart implements
 
          // hide photo histogram
 
-         _map.closePhotoHistogram();
+         _map.photoHistogram_Close();
       }
    }
 
@@ -1536,7 +1536,7 @@ public class Map2View extends ViewPart implements
          _actionMap2Slideout_PhotoFilter.getPhotoFilterSlideout().close();
          _slideoutPhotoOptions.close();
          _map.closePhotoTooltip();
-         _map.closePhotoHistogram();
+         _map.photoHistogram_Close();
       }
    }
 

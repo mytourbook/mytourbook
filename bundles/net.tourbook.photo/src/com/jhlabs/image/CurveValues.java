@@ -110,9 +110,6 @@ public class CurveValues {
          coordinates.add(new Coordinate(xValue, yValue));
       }
 
-      // ensure that the last point(s) a
-//      coordinates.add(new Coordinate(1, 1));
-
       final Coordinate[] coor = coordinates.toArray(new Coordinate[coordinates.size()]);
 
       final Geometry geom = new GeometryFactory().createLineString(coor);

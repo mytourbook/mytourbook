@@ -846,7 +846,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
       _photoImageCanvas.redraw();
 
-      _map2.updateHistogramCropArea(getHistogramCropArea());
+      _map2.photoHistogram_UpdateCropArea(getHistogramCropArea());
    }
 
    private void onPhoto_Mouse_10_Down(final MouseEvent mouseEvent) {
@@ -1023,7 +1023,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
          updateCropArea_TopBottomLeftRight();
          updateCropArea_InPhoto();
 
-         _map2.updateHistogramCropArea(getHistogramCropArea());
+         _map2.photoHistogram_UpdateCropArea(getHistogramCropArea());
 
          isRedraw = true;
 
@@ -1903,7 +1903,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
       updateCropArea_TopBottomLeftRight();
 
-      _map2.updateHistogramCropArea(getHistogramCropArea());
+      _map2.photoHistogram_UpdateCropArea(getHistogramCropArea());
    }
 
    /**
@@ -1970,7 +1970,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
       updateCropArea_TopBottomLeftRight();
 
-      _map2.updateHistogramCropArea(getHistogramCropArea());
+      _map2.photoHistogram_UpdateCropArea(getHistogramCropArea());
    }
 
    private void updateCropArea_FromStartEnd_Rel() {

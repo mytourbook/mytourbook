@@ -19,6 +19,8 @@ import com.jhlabs.image.CurveValues;
 import com.jhlabs.image.ImageMath;
 
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Rectangle2D.Float;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -50,17 +52,20 @@ import pixelitor.filters.curves.ToneCurvesFilter;
  */
 public class Histogram extends Canvas implements PaintListener {
 
-   private static final int POINT_RADIUS   = 12;
+   private static final int                       POINT_RADIUS           = 12;
 
-   public static final int  NUM_BINS       = 256;
+   public static final int                        NUM_BINS               = 256;
 
-   private int              _maxLuminance;
-   private int[]            _allLuminances = new int[NUM_BINS];
+   private Color                                  _adjustedColor         = new Color(0x0, 0xff, 0xff);
 
-   private ImageData        _imageData;
+   private int                                    _maxLuminance_Default;
+   private int                                    _maxLuminanceAdjusted;
+   private int[]                                  _luminancesDefault     = new int[NUM_BINS];
+   private int[]                                  _luminancesAdjusted    = new int[NUM_BINS];
 
-   private boolean          _isSetTonality;
-//   private CurveType                              _curveType;
+   private ImageData                              _defaultImageData;
+
+   private boolean                                _isSetTonality;
 
    private ToneCurvesFilter                       _toneCurvesFilter;
 
@@ -79,6 +84,8 @@ public class Histogram extends Canvas implements PaintListener {
     */
    private Cursor _currentCursor;
    private Cursor _cursor_Size_All;
+
+   private Float  _relCropArea;
 
    public Histogram(final Composite parent) {
 
@@ -105,6 +112,65 @@ public class Histogram extends Canvas implements PaintListener {
       addMouseTrackListener(MouseTrackListener.mouseExitAdapter(mouseEvent -> onMouseExit(mouseEvent)));
    }
 
+   private int computeLuminance_Adjusted(final BufferedImage image,
+                                         final int[] allLuminancValues) {
+
+      Arrays.fill(allLuminancValues, 0);
+
+      if (image == null) {
+         return 0;
+      }
+
+      final int imageWidth = image.getWidth();
+      final int imageHeight = image.getHeight();
+
+      final int[] allPixelValues = pixelitor.utils.ImageUtils.getPixelArray(image);
+      final int imageType = image.getType();
+
+      int red = 0;
+      int green = 0;
+      int blue = 0;
+
+      for (int imageY = 0; imageY < imageHeight; imageY++) {
+
+         final int intPerLine = imageY * imageWidth;
+
+         for (int imageX = 0; imageX < imageWidth; imageX++) {
+
+            final int pixelIndex = intPerLine + imageX;
+
+            final int rgb = allPixelValues[pixelIndex];
+
+            if (imageType == BufferedImage.TYPE_INT_RGB) {
+
+               red = (rgb >> 16) & 0xFF;
+               green = (rgb >> 8) & 0xFF;
+               blue = (rgb) & 0xFF;
+            }
+
+            final int lumimance = (0
+
+                  + 299 * red
+                  + 587 * green
+                  + 114 * blue
+
+            ) / 1000;
+
+            allLuminancValues[lumimance]++;
+         }
+      }
+
+      // get max value
+      int maxLuminance = 0;
+      for (final int luminance : allLuminancValues) {
+         if (luminance > maxLuminance) {
+            maxLuminance = luminance;
+         }
+      }
+
+      return maxLuminance;
+   }
+
    /**
     * @param imageData
     * @param relCropArea
@@ -112,10 +178,14 @@ public class Histogram extends Canvas implements PaintListener {
     *           y = Y1<br>
     *           width = X2<br>
     *           height = Y2
+    * @param imageLuminances
+    *
+    * @return
     */
-   private void computeLuminance(final ImageData imageData, final Rectangle2D.Float relCropArea) {
+   private int computeLuminance_Default(final ImageData imageData,
+                                        final int[] imageLuminances) {
 
-      Arrays.fill(_allLuminances, 0);
+      Arrays.fill(imageLuminances, 0);
 
       int alpha = 1;
       int blue;
@@ -133,13 +203,13 @@ public class Histogram extends Canvas implements PaintListener {
       int yStart = 0;
       int yEnd = dstHeight;
 
-      if (relCropArea != null) {
+      if (_relCropArea != null) {
 
-         final float relCropX1 = relCropArea.x;
-         final float relCropY1 = relCropArea.y;
+         final float relCropX1 = _relCropArea.x;
+         final float relCropY1 = _relCropArea.y;
 
-         final float relCropX2 = relCropArea.width;
-         final float relCropY2 = relCropArea.height;
+         final float relCropX2 = _relCropArea.width;
+         final float relCropY2 = _relCropArea.height;
 
          final int devCropX1 = (int) (relCropX1 * dstWidth);
          final int devCropY1 = (int) (relCropY1 * dstHeight);
@@ -185,21 +255,21 @@ public class Histogram extends Canvas implements PaintListener {
 
                ) / 1000;
 
-               _allLuminances[lumimance]++;
+               imageLuminances[lumimance]++;
             }
          }
       }
 
       int maxLuminance = 0;
 
-      for (final int luminance : _allLuminances) {
+      for (final int luminance : imageLuminances) {
 
          if (luminance > maxLuminance) {
             maxLuminance = luminance;
          }
       }
 
-      _maxLuminance = maxLuminance;
+      return maxLuminance;
    }
 
    /**
@@ -370,13 +440,13 @@ public class Histogram extends Canvas implements PaintListener {
       final int canvasWidth = canvasBounds.width;
       final int canvasHeight = canvasBounds.height;
 
-      final int sliderbarHeight = 0; //20;
-
       _graphWidth = canvasWidth;
-      _graphHeight = canvasHeight - sliderbarHeight;
-      _xUnitWidth = _graphWidth / 255f;
+      _graphHeight = canvasHeight;
+      _xUnitWidth = _graphWidth / 256f;
 
       _allPaintedCurvePoints.clear();
+
+      _adjustedColor = new Color(0xff, 0xff, 0x0);
 
       paint_10_Histogram(gc);
 
@@ -388,26 +458,65 @@ public class Histogram extends Canvas implements PaintListener {
    private void paint_10_Histogram(final GC gc) {
 
       gc.setBackground(UI.SYS_COLOR_GRAY);
-      gc.fillRectangle(0, 0, _graphWidth - 0, _graphHeight - 0);
+      gc.fillRectangle(0, 0, _graphWidth, _graphHeight);
 
-      gc.setForeground(UI.SYS_COLOR_DARK_GRAY);
-      gc.setLineWidth((int) (_xUnitWidth + 1));
+      if (_isSetTonality) {
+         gc.setAlpha(0x60);
+      }
 
-      for (int lumIndex = 0; lumIndex < _allLuminances.length; lumIndex++) {
+      float devXLine = 0;
+      final int barWidth = 1;
 
-         final int luminance = _allLuminances[lumIndex];
+      final int darkGrey = 0x66;
+      gc.setBackground(new Color(darkGrey, darkGrey, darkGrey));
 
-         final int maxLuminance = _maxLuminance == 0 ? 1 : _maxLuminance;
 
-         final int devX = _graphWidth * lumIndex / 256;
-         final int devY = _graphHeight * luminance / maxLuminance;
+      for (final int luminance : _luminancesDefault) {
 
-         gc.drawLine(
+         final int maxLuminance = _maxLuminance_Default == 0 ? 1 : _maxLuminance_Default;
 
-               (int) (devX + _xUnitWidth),
-               _graphHeight,
-               (int) (devX + _xUnitWidth),
-               _graphHeight - devY);
+         final int barHeight = _graphHeight * luminance / maxLuminance;
+
+         devXLine += _xUnitWidth;
+
+         final int devX = (int) (devXLine + 0.5);
+         final int devY = _graphHeight - barHeight;
+
+         gc.fillRectangle(
+
+               devX,
+               devY,
+
+               barWidth,
+               barHeight);
+      }
+
+      if (_isSetTonality) {
+
+         gc.setAlpha(0xb0);
+         gc.setBackground(_adjustedColor);
+
+         devXLine = 0;
+
+         for (final int luminance : _luminancesAdjusted) {
+
+            final int maxLuminance = _maxLuminanceAdjusted == 0 ? 1 : _maxLuminanceAdjusted;
+
+            final int barHeight = _graphHeight * luminance / maxLuminance;
+
+            devXLine += _xUnitWidth;
+
+            final int devX = (int) (devXLine + 0.5);
+            final int devY = _graphHeight - barHeight;
+
+            gc.fillRectangle(
+
+                  devX,
+                  devY,
+
+                  barWidth,
+                  barHeight);
+         }
       }
    }
 
@@ -463,10 +572,11 @@ public class Histogram extends Canvas implements PaintListener {
       }
 
       gc.setAntialias(SWT.ON);
-      gc.setLineWidth(1);
 
       // draw default line
-      gc.setForeground(new Color(155, 155, 155));
+      final int darkGrey = 0x40;
+      gc.setLineWidth(1);
+      gc.setForeground(new Color(darkGrey, darkGrey, darkGrey));
       gc.drawLine(
 
             allDevX[0],
@@ -475,26 +585,27 @@ public class Histogram extends Canvas implements PaintListener {
             0);
 
       // draw curve graph
-      gc.setForeground(UI.SYS_COLOR_YELLOW);
+      gc.setLineWidth(2);
+      gc.setForeground(_adjustedColor);
       gc.drawPath(curvePath);
 
       curvePath.dispose();
 
       // draw point values
       for (int valueIndex = 0; valueIndex < numValues; valueIndex++) {
-
          paint_30_TonePoint(gc, allDevX[valueIndex], allDevY[valueIndex]);
       }
 
       if (_hoveredPointIndex != -1) {
 
+         gc.setLineWidth(2);
          final Rectangle hoveredRectangle = _allPaintedCurvePoints.get(_hoveredPointIndex);
 
          if (_isPointDragged) {
 
             // paint dragged point
 
-            gc.setBackground(UI.SYS_COLOR_YELLOW);
+            gc.setBackground(_adjustedColor);
             gc.fillArc(
 
                   hoveredRectangle.x,
@@ -510,7 +621,7 @@ public class Histogram extends Canvas implements PaintListener {
 
             // paint hovered point
 
-            gc.setForeground(UI.SYS_COLOR_MAGENTA);
+            gc.setForeground(new Color(0x0, 0xff, 0x0));
             gc.drawArc(
 
                   hoveredRectangle.x,
@@ -535,7 +646,7 @@ public class Histogram extends Canvas implements PaintListener {
       final int devX = devXPoint - pointRadius2;
       final int devY = devYPoint - pointRadius2;
 
-      gc.setForeground(UI.SYS_COLOR_BLUE);
+      gc.setForeground(new Color(0x0, 0x0, 0x0));
       gc.drawArc(
 
             devX,
@@ -562,32 +673,41 @@ public class Histogram extends Canvas implements PaintListener {
       paint(paintEvent);
    }
 
+   public void setAdjustedImage(final BufferedImage adjustedImage) {
+
+      _maxLuminanceAdjusted = computeLuminance_Adjusted(adjustedImage, _luminancesAdjusted);
+   }
+
    public void setImage(final Image image, final Rectangle2D.Float relCropArea) {
+
+      _hoveredPointIndex = -1;
 
       if (image == null || image.isDisposed()) {
 
          // reset image
-         _imageData = null;
+         _defaultImageData = null;
 
          return;
       }
 
-      _imageData = image.getImageData();
+      _defaultImageData = image.getImageData();
+      _relCropArea = relCropArea;
 
-      computeLuminance(_imageData, relCropArea);
+      _maxLuminance_Default = computeLuminance_Default(_defaultImageData, _luminancesDefault);
+
 
       redraw();
    }
 
    public void updateCropArea(final Rectangle2D.Float relCropArea) {
 
-      if (_imageData == null || isDisposed()) {
+      if (_defaultImageData == null || isDisposed()) {
          return;
       }
 
-      computeLuminance(_imageData, relCropArea);
+      _relCropArea = relCropArea;
 
-      redraw();
+      _maxLuminance_Default = computeLuminance_Default(_defaultImageData, _luminancesDefault);
    }
 
    /**
@@ -608,7 +728,6 @@ public class Histogram extends Canvas implements PaintListener {
    public void updateCurvesFilter(final Photo photo) {
 
       _isSetTonality = photo.isSetTonality;
-//      _curveType = photo.curveType;
       _toneCurvesFilter = photo.getToneCurvesFilter();
 
       // update in UI thread

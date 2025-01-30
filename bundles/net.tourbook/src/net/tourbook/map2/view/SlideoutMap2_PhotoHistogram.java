@@ -22,6 +22,7 @@ import de.byteholder.geoclipse.map.PaintedMapPoint;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Float;
+import java.awt.image.BufferedImage;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -83,31 +84,11 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
    private final static IDialogSettings _state = TourbookPlugin.getState(ID);
 
-//   /**
-//    * Filter operator MUST be in sync with filter labels
-//    */
-//   private static CurveType[]           _allCurveTypes_Value = {
-//
-//         CurveType.THREE_POINTS,
-//         CurveType.MULTIPLE_POINTS,
-//   };
-//
-//   /**
-//    * Filter labels MUST be in sync with filter operator
-//    */
-//   private static String[]              _allCurveTypes_Label = {
-//
-//         "3 Points",
-//         "Multiple Points",
-//   };
+   private Map2                         _map2;
 
-   private Map2 _map2;
-
-//   private FocusListener                _keepOpenListener;
-
-   private PaintedMapPoint _hoveredMapPoint;
-   private PaintedMapPoint _previousHoveredMapPoint;
-   private Photo           _photo;
+   private PaintedMapPoint              _hoveredMapPoint;
+   private PaintedMapPoint              _previousHoveredMapPoint;
+   private Photo                        _photo;
 
    /*
     * UI controls
@@ -225,24 +206,6 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
                   .applyTo(_chkAdjustTonality);
 
          }
-//         {
-//            /*
-//             * Curve type
-//             */
-//            _lblCurveType = new Label(container, SWT.NONE);
-//            _lblCurveType.setText("Curve &type");
-//            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblCurveType);
-//
-//            _comboCurveType = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-//            _comboCurveType.setVisibleItemCount(10);
-//            _comboCurveType.setToolTipText("");
-//            _comboCurveType.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelectCurveType(selectionEvent)));
-//            _comboCurveType.addFocusListener(_keepOpenListener);
-//
-//            GridDataFactory.fillDefaults()
-//                  .align(SWT.FILL, SWT.CENTER)
-//                  .applyTo(_comboCurveType);
-//         }
          {
             _histogram = new Histogram(container);
             _histogram.addHistogramListener(this);
@@ -586,18 +549,21 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
       if (Map2PainterConfig.isShowPhotoHistogram == false) {
 
-         // photo tooltip is not displayed
+         // photo tooltip should not be displayed
 
          return;
       }
 
-      final boolean isVisible = isVisible();
+      final boolean isHistogramVisible = isVisible();
 
       if (hoveredMapPoint == null) {
 
-         if (isVisible) {
+         if (isHistogramVisible) {
 
             if (_hoveredMapPoint != null) {
+
+               // keep previous map point
+
                _previousHoveredMapPoint = _hoveredMapPoint;
             }
 
@@ -611,7 +577,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
       final boolean isOtherPhoto = _hoveredMapPoint != hoveredMapPoint;
 
-      if (isOtherPhoto && isVisible) {
+      if (isOtherPhoto && isHistogramVisible) {
 
          hide();
       }
@@ -662,10 +628,13 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       updateUI_ShowHide3PointActions();
 
       final Image photoImage = getPhotoImage(_photo);
-      final Float relCropArea = _photo.getValidCropArea();
+      final Float relCropArea = _photo.isCropped ? _photo.getValidCropArea() : null;
 
-      _histogram.setImage(photoImage, _photo.isCropped ? relCropArea : null);
+      _histogram.setImage(photoImage, relCropArea);
       _histogram.updateCurvesFilter(_photo);
+
+      updateAdjustedImage();
+      _histogram.redraw();
 
       if (photoImage == null || photoImage.isDisposed()) {
 
@@ -683,6 +652,18 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
    }
 
+   private void updateAdjustedImage() {
+
+      // update histogram with the adjusted image
+      BufferedImage adjustedImage = null;
+
+      if (_photo.isSetTonality) {
+         adjustedImage = PhotoImageCache.getImage_AWT(_photo, ImageQuality.THUMB_HQ_ADJUSTED);
+      }
+
+      _histogram.setAdjustedImage(adjustedImage);
+   }
+
    public void updateCropArea(final Rectangle2D.Float histogramCropArea) {
 
       _histogram.updateCropArea(histogramCropArea);
@@ -693,6 +674,8 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
       if (_histogram == null) {
          return;
       }
+
+      updateAdjustedImage();
 
       _histogram.updateCurvesFilter(_photo);
    }

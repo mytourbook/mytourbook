@@ -1264,11 +1264,6 @@ public class Map2 extends Canvas {
       return new Point2D.Double(newCenterX, newCenterY);
    }
 
-   public void closePhotoHistogram() {
-
-      _mapPointTooltip_PhotoHistogram.close();
-   }
-
    public void closePhotoTooltip() {
 
       _mapPointTooltip_PhotoImage.close();
@@ -10216,6 +10211,16 @@ public class Map2 extends Canvas {
       return false;
    }
 
+   public void photoHistogram_Close() {
+
+      _mapPointTooltip_PhotoHistogram.close();
+   }
+
+   public void photoHistogram_UpdateCropArea(final Rectangle2D.Float histogramCropArea) {
+
+      _mapPointTooltip_PhotoHistogram.updateCropArea(histogramCropArea);
+   }
+
    /**
     * Set tile in the overlay painting queue
     *
@@ -11433,11 +11438,6 @@ public class Map2 extends Canvas {
 
             // no opacity
             : 0xff;
-   }
-
-   public void updateHistogramCropArea(final Rectangle2D.Float histogramCropArea) {
-
-      _mapPointTooltip_PhotoHistogram.updateCropArea(histogramCropArea);
    }
 
    public void updateMapOptions() {
