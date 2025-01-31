@@ -464,49 +464,48 @@ public class Histogram extends Canvas implements PaintListener {
          gc.setAlpha(0x60);
       }
 
-      float devXLine = 0;
-      final int barWidth = 1;
+      float devX0 = 0;
+      float devX1 = _xUnitWidth;
+      int barWidth;
 
       final int darkGrey = 0x66;
       gc.setBackground(new Color(darkGrey, darkGrey, darkGrey));
 
+      int maxLuminance = _maxLuminance_Default == 0 ? 1 : _maxLuminance_Default;
 
       for (final int luminance : _luminancesDefault) {
 
-         final int maxLuminance = _maxLuminance_Default == 0 ? 1 : _maxLuminance_Default;
-
          final int barHeight = _graphHeight * luminance / maxLuminance;
 
-         devXLine += _xUnitWidth;
+         final float diffX = devX1 - devX0;
+         barWidth = (int) (diffX + 0.5);
 
-         final int devX = (int) (devXLine + 0.5);
+         final int devX = (int) (devX0);
          final int devY = _graphHeight - barHeight;
 
-         gc.fillRectangle(
+         gc.fillRectangle(devX, devY, barWidth, barHeight);
 
-               devX,
-               devY,
-
-               barWidth,
-               barHeight);
+         devX0 = devX + barWidth;
+         devX1 += _xUnitWidth;
       }
 
       if (_isSetTonality) {
 
-         gc.setAlpha(0xb0);
+         gc.setAlpha(0x80);
          gc.setBackground(_adjustedColor);
 
-         devXLine = 0;
+         devX0 = 0;
+         devX1 = _xUnitWidth;
+
+         maxLuminance = _maxLuminanceAdjusted == 0 ? 1 : _maxLuminanceAdjusted;
 
          for (final int luminance : _luminancesAdjusted) {
 
-            final int maxLuminance = _maxLuminanceAdjusted == 0 ? 1 : _maxLuminanceAdjusted;
-
             final int barHeight = _graphHeight * luminance / maxLuminance;
+            final float diffX = devX1 - devX0;
+            barWidth = (int) (diffX);
 
-            devXLine += _xUnitWidth;
-
-            final int devX = (int) (devXLine + 0.5);
+            final int devX = (int) (devX0);
             final int devY = _graphHeight - barHeight;
 
             gc.fillRectangle(
@@ -516,6 +515,9 @@ public class Histogram extends Canvas implements PaintListener {
 
                   barWidth,
                   barHeight);
+
+            devX0 = devX + barWidth;
+            devX1 += _xUnitWidth;
          }
       }
    }
@@ -694,7 +696,6 @@ public class Histogram extends Canvas implements PaintListener {
       _relCropArea = relCropArea;
 
       _maxLuminance_Default = computeLuminance_Default(_defaultImageData, _luminancesDefault);
-
 
       redraw();
    }
