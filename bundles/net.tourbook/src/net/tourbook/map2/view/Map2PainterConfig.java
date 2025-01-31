@@ -46,6 +46,7 @@ public class Map2PainterConfig {
    static boolean                           isBackgroundDark;
 
    public static boolean                    isShowPhotos;
+   public static boolean                    isShowPhotoAnnotations;
    public static boolean                    isShowPhotoHistogram;
    public static boolean                    isShowPhotoRating;
    public static boolean                    isShowPhotoTooltip;

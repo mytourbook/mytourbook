@@ -4731,6 +4731,9 @@ public class Map2 extends Canvas {
       _geoGrid_IsGridAutoScroll = false;
       _geoGrid_Label_IsHovered = false;
 
+      // hide link to the hovered point
+      _hoveredMapPoint = null;
+
       if (_isShowHoveredOrSelectedTour) {
 
          _tourBreadcrumb.onMouseExit();
@@ -4742,6 +4745,8 @@ public class Map2 extends Canvas {
       }
 
       setCursorOptimized(_cursorDefault);
+
+      redraw();
    }
 
    private void onMouse_Move(final MouseEvent mouseEvent) {
@@ -8594,7 +8599,8 @@ public class Map2 extends Canvas {
             final int photoImageWidth = awtPhotoImage.getWidth();
             final int photoImageHeight = awtPhotoImage.getHeight();
 
-            if (photoImageWidth == mapImageWidth && photoImageHeight == mapImageHeight) {
+            if (photoImageWidth == mapImageWidth
+                  && photoImageHeight == mapImageHeight) {
 
                // do NOT resize the image, it would not look very good
 
@@ -8606,7 +8612,8 @@ public class Map2 extends Canvas {
                      null);
 
             } else if (_isEnlargeSmallImages == false
-                  && photoImageWidth < mapImageWidth && photoImageHeight < mapImageHeight) {
+                  && photoImageWidth < mapImageWidth
+                  && photoImageHeight < mapImageHeight) {
 
                // photo image is smaller than the requested map image -> do not enlarge it
 
@@ -8650,6 +8657,11 @@ public class Map2 extends Canvas {
 
             if (Map2PainterConfig.isShowPhotoRating) {
                paint_MpImage_RatingStars(g2d, photo);
+            }
+
+            // draw annotations
+            if (Map2PainterConfig.isShowPhotoAnnotations) {
+               paint_MpImage_Annotations(g2d, photo);
             }
          }
 
@@ -8821,6 +8833,17 @@ public class Map2 extends Canvas {
 
       // keep position
       allPaintedMapPoints.add(new PaintedMapPoint(mapPoint, labelRectangle));
+   }
+
+   private void paint_MpImage_Annotations(final Graphics2D g2d, final Photo photo) {
+      // TODO Auto-generated method stub
+
+//    annotationImage = photo.isGeoFromExif ? _imageAnnotationGpsExif : _imageAnnotationGpsTour;
+//
+//    gc.drawImage(
+//          annotationImage,
+//          devXAnnotation - devXAnnotationOffset,
+//          devYAnnotation);
    }
 
    private void paint_MpImage_RatingStars(final Graphics2D g2d, final Photo photo) {
