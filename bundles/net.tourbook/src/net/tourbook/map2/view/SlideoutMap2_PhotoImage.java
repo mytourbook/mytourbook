@@ -185,6 +185,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
    private Point2D.Float         _relPhoto_SetCropArea_Start;
    private Point2D.Float         _relPhoto_SetCropArea_End;
 
+   private boolean               _isAdjustmentEnabled;
    private boolean               _isCanvasListenerSet;
    private boolean               _isSettingCropArea;
 
@@ -218,6 +219,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
     * UI controls
     */
    private PageBook         _pageBook;
+   private PageBook         _pageBookAdjustment;
 
    private Button           _chkCropPhoto;
 
@@ -230,6 +232,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
    private Combo            _comboTooltipSize;
 
    private Label            _labelMessage;
+   private Label            _labelWarning;
 
    private PhotoImageCanvas _photoImageCanvas;
 
@@ -440,22 +443,35 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 //      _containerPhotoOptions.setBackground(UI.SYS_COLOR_YELLOW);
       {
          {
-            /*
-             * Crop photo
-             */
-            _chkCropPhoto = new Button(_containerPhotoOptions, SWT.CHECK);
-            _chkCropPhoto.setText("&Crop photo image");
-            _chkCropPhoto.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onPhoto_Crop()));
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_chkCropPhoto);
+            _pageBookAdjustment = new PageBook(_containerPhotoOptions, SWT.NONE);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .applyTo(_pageBookAdjustment);
+            {
+               /*
+                * Crop photo
+                */
+               _chkCropPhoto = new Button(_pageBookAdjustment, SWT.CHECK);
+               _chkCropPhoto.setText("&Crop photo image");
+               _chkCropPhoto.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onPhoto_Crop()));
 
+            }
+            {
+               /*
+                * Warning
+                */
+               _labelWarning = new Label(_pageBookAdjustment, SWT.WRAP);
+               _labelWarning.setText("Photo adjustment is disabled");
+               _labelWarning.setToolTipText("The photo adjustment is disabled in the map");
+            }
          }
          {
             final Link link = new Link(_containerPhotoOptions, SWT.NONE);
-            link.setText(UI.createLinkText(Messages.Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip));
-            link.setToolTipText(Messages.Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip_Tooltip);
+            link.setText(UI.createLinkText(Messages.Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip2));
+            link.setToolTipText(Messages.Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip2_Tooltip);
             link.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_TooltipResize()));
             GridDataFactory.fillDefaults()
-                  .grab(true, false)
+//                  .grab(true, false)
                   .align(SWT.END, SWT.CENTER)
                   .applyTo(link);
          }
@@ -851,6 +867,10 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
    private void onPhoto_Mouse_10_Down(final MouseEvent mouseEvent) {
 
+      if (_isAdjustmentEnabled == false) {
+         return;
+      }
+
       final int devMouseX = mouseEvent.x;
       final int devMouseY = mouseEvent.y;
 
@@ -928,6 +948,10 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
    private void onPhoto_Mouse_20_Up(final MouseEvent mouseEvent) {
 
+      if (_isAdjustmentEnabled == false) {
+         return;
+      }
+
       final int devMouseX = mouseEvent.x;
       final int devMouseY = mouseEvent.y;
 
@@ -961,6 +985,10 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
    }
 
    private void onPhoto_Mouse_30_Move(final MouseEvent mouseEvent) {
+
+      if (_isAdjustmentEnabled == false) {
+         return;
+      }
 
       if (_photoImageBounds == null) {
          return;
@@ -1354,6 +1382,10 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
    private void onPhoto_PaintCropping(final PaintEvent mouseEvent) {
 
+      if (_isAdjustmentEnabled == false) {
+         return;
+      }
+
       if (_photo.isCropped == false) {
          return;
       }
@@ -1689,6 +1721,8 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
       setupPhotoCanvasListener();
       setTooltipSize();
+
+      setShowPhotoAdjustements(_map2.isShowPhotoAdjustments());
    }
 
    @Override
@@ -1710,6 +1744,27 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
       case 2 -> Util.setState(_state, STATE_TOOLTIP_SIZE_MEDIUM, tooltipSize);
       case 3 -> Util.setState(_state, STATE_TOOLTIP_SIZE_LARGE, tooltipSize);
 
+      }
+   }
+
+   public void setShowPhotoAdjustements(final boolean isShowPhotoAdjustments) {
+
+      if (_chkCropPhoto != null) {
+
+         _pageBookAdjustment.showPage(isShowPhotoAdjustments
+
+               // display checkbox
+               ? _chkCropPhoto
+
+               // display warning
+               : _labelWarning);
+      }
+
+      _isAdjustmentEnabled = isShowPhotoAdjustments;
+
+      if (_photoImageCanvas != null) {
+
+         _photoImageCanvas.redraw();
       }
    }
 

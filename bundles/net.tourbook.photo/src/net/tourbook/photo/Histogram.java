@@ -65,6 +65,7 @@ public class Histogram extends Canvas implements PaintListener {
 
    private ImageData                              _defaultImageData;
 
+   private boolean                                _isEnabled;
    private boolean                                _isSetTonality;
 
    private ToneCurvesFilter                       _toneCurvesFilter;
@@ -310,6 +311,10 @@ public class Histogram extends Canvas implements PaintListener {
 
    private void onMouseDoubleClick(final MouseEvent mouseEvent) {
 
+      if (_isEnabled == false) {
+         return;
+      }
+
       if (_hoveredPointIndex != -1) {
 
          final CurveValues curveValues = _toneCurvesFilter.getCurves().getActiveCurve().curveValues;
@@ -342,6 +347,10 @@ public class Histogram extends Canvas implements PaintListener {
    }
 
    private void onMouseDown(final MouseEvent mouseEvent) {
+
+      if (_isEnabled == false) {
+         return;
+      }
 
       if (_hoveredPointIndex != -1) {
 
@@ -379,6 +388,10 @@ public class Histogram extends Canvas implements PaintListener {
    }
 
    private void onMouseMove(final MouseEvent mouseEvent) {
+
+      if (_isEnabled == false) {
+         return;
+      }
 
       final int oldHoveredPointIndex = _hoveredPointIndex;
 
@@ -421,6 +434,10 @@ public class Histogram extends Canvas implements PaintListener {
 
    private void onMouseUp(final MouseEvent mouseEvent) {
 
+      if (_isEnabled == false) {
+         return;
+      }
+
       _isPointDragged = false;
 
       // update hovered point, the mouse could be outside of the hovered point
@@ -450,7 +467,7 @@ public class Histogram extends Canvas implements PaintListener {
 
       paint_10_Histogram(gc);
 
-      if (_isSetTonality) {
+      if (_isSetTonality && _isEnabled) {
          paint_20_ToneCurve(gc);
       }
    }
@@ -460,7 +477,7 @@ public class Histogram extends Canvas implements PaintListener {
       gc.setBackground(UI.SYS_COLOR_GRAY);
       gc.fillRectangle(0, 0, _graphWidth, _graphHeight);
 
-      if (_isSetTonality) {
+      if (_isSetTonality && _isEnabled) {
          gc.setAlpha(0x60);
       }
 
@@ -489,7 +506,7 @@ public class Histogram extends Canvas implements PaintListener {
          devX1 += _xUnitWidth;
       }
 
-      if (_isSetTonality) {
+      if (_isSetTonality && _isEnabled) {
 
          gc.setAlpha(0x80);
          gc.setBackground(_adjustedColor);
@@ -680,6 +697,14 @@ public class Histogram extends Canvas implements PaintListener {
       _maxLuminanceAdjusted = computeLuminance_Adjusted(adjustedImage, _luminancesAdjusted);
    }
 
+   @Override
+   public void setEnabled(final boolean isEnabled) {
+
+      _isEnabled = isEnabled;
+
+      redraw();
+   }
+
    public void setImage(final Image image, final Rectangle2D.Float relCropArea) {
 
       _hoveredPointIndex = -1;
@@ -732,6 +757,13 @@ public class Histogram extends Canvas implements PaintListener {
       _toneCurvesFilter = photo.getToneCurvesFilter();
 
       // update in UI thread
-      getDisplay().asyncExec(() -> redraw());
+      getDisplay().asyncExec(() -> {
+
+         if (isDisposed()) {
+            return;
+         }
+
+         redraw();
+      });
    }
 }

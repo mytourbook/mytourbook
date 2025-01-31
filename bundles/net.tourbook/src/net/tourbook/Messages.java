@@ -2410,8 +2410,8 @@ public class Messages extends NLS {
 
    public static String        Slideout_MapPoint_PhotoToolTip_Combo_TooltipSize_Tooltip;
    public static String        Slideout_MapPoint_PhotoToolTip_Label_LoadingMessage;
-   public static String        Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip;
-   public static String        Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip_Tooltip;
+   public static String        Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip2;
+   public static String        Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip2_Tooltip;
 
    public static String        Slideout_MapPoints_Action_CommonLocations_Tooltip;
    public static String        Slideout_MapPoints_Action_TourLocations_Tooltip;

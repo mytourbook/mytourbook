@@ -943,6 +943,8 @@ public class Map2 extends Canvas {
       _mapPointTooltip_PhotoImage      = new SlideoutMap2_PhotoImage(this);
       _mapPointTooltip_PhotoHistogram  = new SlideoutMap2_PhotoHistogram(this);
 
+      updateTooltips();
+
 // SET_FORMATTING_ON
 
       _poiImage = TourbookPlugin.getImageDescriptor(Images.POI_InMap).createImage();
@@ -3715,6 +3717,11 @@ public class Map2 extends Canvas {
 
       return _geoGrid_Data_Hovered != null || _geoGrid_IsGridAutoScroll == true;
 
+   }
+
+   public boolean isShowPhotoAdjustments() {
+
+      return _isShowPhotoAdjustments;
    }
 
    /**
@@ -11555,6 +11562,14 @@ public class Map2 extends Canvas {
       }
 
       setPoiVisible(isVisible);
+   }
+
+   public void updateTooltips() {
+
+      final boolean isShowPhotoAdjustments = _isShowPhotoAdjustments && _isShowHQPhotoImages;
+
+      _mapPointTooltip_PhotoImage.setShowPhotoAdjustements(isShowPhotoAdjustments);
+      _mapPointTooltip_PhotoHistogram.setShowPhotoAdjustements(isShowPhotoAdjustments);
    }
 
    /**

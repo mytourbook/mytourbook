@@ -94,16 +94,15 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
     * UI controls
     */
    private PageBook  _pageBook;
+   private PageBook  _pageBookAdjustment;
 
    private Composite _pageNoPhoto;
    private Composite _pagePhoto;
 
    private Button    _chkAdjustTonality;
 
-//   private Combo     _comboCurveType;
-
-//   private Label     _lblCurveType;
    private Label     _labelMessage;
+   private Label     _labelWarning;
 
    private Histogram _histogram;
 
@@ -188,34 +187,44 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
             .grab(true, true)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1)
-//            .extendedMargins(0, 0, 0, 5)
-            .numColumns(2)
+            .numColumns(1)
             .applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
          {
-            /*
-             * Adjust curves
-             */
-            _chkAdjustTonality = new Button(container, SWT.CHECK);
-            _chkAdjustTonality.setText("&Adjust tonality");
-            _chkAdjustTonality.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onAdjustTonality()));
+            _pageBookAdjustment = new PageBook(container, SWT.NONE);
             GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.BEGINNING)
-                  .span(2, 1)
-                  .applyTo(_chkAdjustTonality);
+                  .grab(true, false)
+                  .applyTo(_pageBookAdjustment);
+            {
+               /*
+                * Adjust curves
+                */
+               _chkAdjustTonality = new Button(_pageBookAdjustment, SWT.CHECK);
+               _chkAdjustTonality.setText("&Adjust tonality");
+               _chkAdjustTonality.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onAdjustTonality()));
+               GridDataFactory.fillDefaults()
+                     .align(SWT.FILL, SWT.BEGINNING)
+                     .applyTo(_chkAdjustTonality);
 
+            }
+            {
+               /*
+                * Warning
+                */
+               _labelWarning = new Label(_pageBookAdjustment, SWT.WRAP);
+               _labelWarning.setText("Photo adjustment is disabled");
+               _labelWarning.setToolTipText("The photo adjustment is disabled in the map");
+            }
          }
          {
             _histogram = new Histogram(container);
             _histogram.addHistogramListener(this);
             GridDataFactory.fillDefaults()
                   .grab(true, true)
-                  .span(2, 1)
                   .hint(SWT.DEFAULT, 100)
                   .applyTo(_histogram);
          }
-
       }
    }
 
@@ -239,20 +248,12 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
 // SET_FORMATTING_OFF
 
-//      final boolean isAdjustTonality = _chkAdjustTonality.getSelection();
-
-//      _comboCurveType            .setEnabled(isAdjustTonality);
-//      _lblCurveType              .setEnabled(isAdjustTonality);
 
 // SET_FORMATTING_ON
    }
 
    private void fillUI() {
 
-//      for (final String curveTypeLabel : _allCurveTypes_Label) {
-//
-//         _comboCurveType.add(curveTypeLabel);
-//      }
    }
 
    private Point fixupDisplayBounds(final Point ttSize_Unscaled, final Point ttPos_Scaled) {
@@ -530,12 +531,29 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
    private void restoreState() {
 
+      setShowPhotoAdjustements(_map2.isShowPhotoAdjustments());
    }
 
    @Override
    protected void saveState() {
 
       super.saveState();
+   }
+
+   public void setShowPhotoAdjustements(final boolean isShowPhotoAdjustments) {
+
+      if (_chkAdjustTonality != null) {
+
+         _pageBookAdjustment.showPage(isShowPhotoAdjustments
+
+               // display checkbox
+               ? _chkAdjustTonality
+
+               // display warning
+               : _labelWarning);
+
+         _histogram.setEnabled(isShowPhotoAdjustments);
+      }
    }
 
    /**
@@ -665,6 +683,10 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
    }
 
    public void updateCropArea(final Rectangle2D.Float histogramCropArea) {
+
+      if (_histogram == null) {
+         return;
+      }
 
       _histogram.updateCropArea(histogramCropArea);
    }

@@ -689,6 +689,7 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
       final Map2 map2 = _map2View.getMap();
 
       map2.updatePhotoOptions();
+      map2.updateTooltips();
 
       map2.paint();
    }
