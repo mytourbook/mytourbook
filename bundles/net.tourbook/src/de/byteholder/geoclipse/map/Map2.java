@@ -8660,7 +8660,7 @@ public class Map2 extends Canvas {
             }
 
             // draw annotations
-            if (Map2PainterConfig.isShowPhotoAnnotations) {
+            if (_isShowPhotoAdjustments && _isShowHQPhotoImages && Map2PainterConfig.isShowPhotoAnnotations) {
                paint_MpImage_Annotations(g2d, photo);
             }
          }

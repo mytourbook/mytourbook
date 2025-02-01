@@ -371,14 +371,6 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
       }
       {
          /*
-          * Show photo annotations
-          */
-         _chkShowPhotoAnnotations = new Button(parent, SWT.CHECK);
-         _chkShowPhotoAnnotations.setText(Messages.Slideout_Map_PhotoOptions_Checkbox_ShowPhotoAnnotations);
-         _chkShowPhotoAnnotations.addSelectionListener(_defaultSelectedListener);
-      }
-      {
-         /*
           * Enlarge small images
           */
          _chkEnlargeSmallImages = new Button(parent, SWT.CHECK);
@@ -397,17 +389,30 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
          _chkShowHQImages.addSelectionListener(_defaultSelectedListener);
       }
       {
-         /*
-          * Show photos adjustments, e.g. cropping
-          */
-         _chkShowPhotoAdjustments = new Button(parent, SWT.CHECK);
-         _chkShowPhotoAdjustments.setText("Show photo adjustment");
-         _chkShowPhotoAdjustments.setToolTipText("e.g. cropping");
-         _chkShowPhotoAdjustments.addSelectionListener(_defaultSelectedListener);
-         GridDataFactory.fillDefaults()
-               .indent(16, 0)
-               .applyTo(_chkShowPhotoAdjustments);
+         {
+            /*
+             * Show photos adjustments, e.g. cropping
+             */
+            _chkShowPhotoAdjustments = new Button(parent, SWT.CHECK);
+            _chkShowPhotoAdjustments.setText("Show photo adjustment");
+            _chkShowPhotoAdjustments.setToolTipText("e.g. cropping");
+            _chkShowPhotoAdjustments.addSelectionListener(_defaultSelectedListener);
+            GridDataFactory.fillDefaults()
+                  .indent(16, 0)
+                  .applyTo(_chkShowPhotoAdjustments);
 
+         }
+         {
+            /*
+             * Show photo annotations
+             */
+            _chkShowPhotoAnnotations = new Button(parent, SWT.CHECK);
+            _chkShowPhotoAnnotations.setText(Messages.Slideout_Map_PhotoOptions_Checkbox_ShowPhotoAnnotations);
+            _chkShowPhotoAnnotations.addSelectionListener(_defaultSelectedListener);
+            GridDataFactory.fillDefaults()
+                  .indent(16, 0)
+                  .applyTo(_chkShowPhotoAnnotations);
+         }
       }
       {
          /*
@@ -439,11 +444,13 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
 
    private void enableControls() {
 
-      final boolean isShowHQImages = _chkShowHQImages.getSelection();
-
 // SET_FORMATTING_OFF
 
+      final boolean isShowHQImages     = _chkShowHQImages.getSelection();
+      final boolean isShowAdjustments  = _chkShowPhotoAdjustments.getSelection();
+
       _chkShowPhotoAdjustments   .setEnabled(isShowHQImages);
+      _chkShowPhotoAnnotations   .setEnabled(isShowHQImages && isShowAdjustments);
 
       _spinnerImageSize_Large    .setEnabled(_radioImageSize_Large.getSelection());
       _spinnerImageSize_Medium   .setEnabled(_radioImageSize_Medium.getSelection());
@@ -716,6 +723,18 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
 
       _colorTourPauseLabel_Fill.setColorValue(config.photoFill_RGB);
       _colorTourPauseLabel_Outline.setColorValue(config.photoOutline_RGB);
+   }
+
+   public void updateUI_FromState() {
+
+// SET_FORMATTING_OFF
+
+      _chkShowPhotoAnnotations.setSelection(Util.getStateBoolean(_state_Map2View, STATE_IS_SHOW_PHOTO_ANNOTATIONS, STATE_IS_SHOW_PHOTO_ANNOTATIONS_DEFAULT));
+      _chkShowPhotoRating     .setSelection(Util.getStateBoolean(_state_Map2View, STATE_IS_SHOW_PHOTO_RATING,      STATE_IS_SHOW_PHOTO_RATING_DEFAULT));
+
+// SET_FORMATTING_ON
+
+      enableControls();
    }
 
    private void updateUI_Memory() {

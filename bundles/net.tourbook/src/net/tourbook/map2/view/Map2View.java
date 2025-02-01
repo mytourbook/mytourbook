@@ -1306,6 +1306,8 @@ public class Map2View extends ViewPart implements
 
       Map2PainterConfig.isShowPhotoAnnotations = isShowAnnotations;
 
+      _slideoutPhotoOptions.updateUI_FromState();
+
       // update UI
       _map.paint();
    }
@@ -1336,6 +1338,8 @@ public class Map2View extends ViewPart implements
       _state.put(SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_RATING, isShowPhotoRating);
 
       Map2PainterConfig.isShowPhotoRating = isShowPhotoRating;
+
+      _slideoutPhotoOptions.updateUI_FromState();
 
       // update UI
       _map.paint();
@@ -2583,10 +2587,20 @@ public class Map2View extends ViewPart implements
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_TOOLTIP,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT);
 
+      final boolean isShowHQPhotoImages = Util.getStateBoolean(_state,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_THUMB_HQ_IMAGES,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT);
+
+      final boolean isShowPhotoAdjustments = Util.getStateBoolean(_state,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_ADJUSTMENTS,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_ADJUSTMENTS_DEFAULT);
+
       _actionMapPoint_Photo_ShowAnnotations.setChecked(isShowPhotoAnnotations);
       _actionMapPoint_Photo_ShowHistogram.setChecked(isShowPhotoHistogram);
       _actionMapPoint_Photo_ShowRating.setChecked(isShowPhotoRating);
       _actionMapPoint_Photo_ShowTooltip.setChecked(isShowPhotoTooltip);
+
+      _actionMapPoint_Photo_ShowAnnotations.setEnabled(isShowHQPhotoImages && isShowPhotoAdjustments);
    }
 
    private void fillActionBars() {
