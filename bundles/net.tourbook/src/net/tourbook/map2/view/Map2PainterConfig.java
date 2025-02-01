@@ -67,6 +67,10 @@ public class Map2PainterConfig {
 
       final IDialogSettings state = Map2View.getState();
 
+      isShowPhotoAnnotations = Util.getStateBoolean(state,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_ANNOTATIONS,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_ANNOTATIONS_DEFAULT);
+
       isShowPhotoHistogram = Util.getStateBoolean(state,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_HISTOGRAM,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_HISTOGRAM_DEFAULT);

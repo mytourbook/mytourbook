@@ -567,7 +567,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
       if (Map2PainterConfig.isShowPhotoHistogram == false) {
 
-         // photo tooltip should not be displayed
+         // photo histogram should not be displayed
 
          return;
       }

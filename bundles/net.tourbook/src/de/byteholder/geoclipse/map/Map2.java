@@ -161,7 +161,6 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
@@ -787,6 +786,8 @@ public class Map2 extends Canvas {
 
    private Point               _imageMapLocationBounds;
 
+   private BufferedImage       _imageAnnotationCropped;
+   private BufferedImage       _imageAnnotationTonality;
    private BufferedImage       _imageRatingStar;
 
    private int                 _ratingStarImageSize;
@@ -804,19 +805,18 @@ public class Map2 extends Canvas {
       final int deviceZoom = DPIUtil.getDeviceZoom();
       final float deviceScale = deviceZoom / 100f;
 
-      MAP_IMAGE_DEFAULT_SIZE_TINY = (int) (MAP_IMAGE_DEFAULT_SIZE_TINY * deviceScale);
-      MAP_IMAGE_DEFAULT_SIZE_SMALL = (int) (MAP_IMAGE_DEFAULT_SIZE_SMALL * deviceScale);
+// SET_FORMATTING_OFF
+
+      MAP_IMAGE_DEFAULT_SIZE_TINY   = (int) (MAP_IMAGE_DEFAULT_SIZE_TINY * deviceScale);
+      MAP_IMAGE_DEFAULT_SIZE_SMALL  = (int) (MAP_IMAGE_DEFAULT_SIZE_SMALL * deviceScale);
       MAP_IMAGE_DEFAULT_SIZE_MEDIUM = (int) (MAP_IMAGE_DEFAULT_SIZE_MEDIUM * deviceScale);
-      MAP_IMAGE_DEFAULT_SIZE_LARGE = (int) (MAP_IMAGE_DEFAULT_SIZE_LARGE * deviceScale);
+      MAP_IMAGE_DEFAULT_SIZE_LARGE  = (int) (MAP_IMAGE_DEFAULT_SIZE_LARGE * deviceScale);
 
-      final ImageDescriptor imageDescriptor = PhotoActivator.getImageDescriptor(PhotoImages.PhotoRatingStar);
-      final ImageData imageData = imageDescriptor.getImageData(deviceZoom);
+      _imageAnnotationCropped    = ImageConverter.convertIntoAWT(PhotoActivator.getImageDescriptor(PhotoImages.PhotoAnnotation_Cropped), deviceZoom);
+      _imageAnnotationTonality   = ImageConverter.convertIntoAWT(PhotoActivator.getImageDescriptor(PhotoImages.PhotoAnnotation_Tonality), deviceZoom);
+      _imageRatingStar           = ImageConverter.convertIntoAWT(PhotoActivator.getImageDescriptor(PhotoImages.PhotoRatingStar), deviceZoom);
 
-      final Image swtImage = new Image(getDisplay(), new NoAutoScalingImageDataProvider(imageData));
-      {
-         _imageRatingStar = ImageConverter.convertIntoAWT(swtImage);
-      }
-      swtImage.dispose();
+// SET_FORMATTING_ON
 
       // rating star width and height are the same
       _ratingStarImageSize = _imageRatingStar.getWidth();
@@ -8836,23 +8836,51 @@ public class Map2 extends Canvas {
    }
 
    private void paint_MpImage_Annotations(final Graphics2D g2d, final Photo photo) {
-      // TODO Auto-generated method stub
 
-//    annotationImage = photo.isGeoFromExif ? _imageAnnotationGpsExif : _imageAnnotationGpsTour;
-//
-//    gc.drawImage(
-//          annotationImage,
-//          devXAnnotation - devXAnnotationOffset,
-//          devYAnnotation);
+      final boolean isCropped = photo.isCropped;
+      final boolean isSetTonality = photo.isSetTonality;
+
+      if (isCropped == false && isSetTonality == false) {
+         return;
+      }
+
+      final Rectangle paintedPhoto = photo.paintedPhoto;
+
+      final int photoDevX = paintedPhoto.x;
+      final int photoDevY = paintedPhoto.y;
+      final int photoWidth = paintedPhoto.width;
+      final int photoHeight = paintedPhoto.height;
+
+      final int annotationWidth = _imageAnnotationCropped.getWidth();
+      final int annotationHeight = _imageAnnotationCropped.getHeight();
+
+      int devX = photoDevX + photoWidth - 2;
+      final int devY = photoDevY + photoHeight - annotationHeight - 2;
+
+      if (isCropped) {
+
+         devX -= annotationWidth;
+
+         g2d.drawImage(_imageAnnotationCropped, devX, devY, null);
+
+         devX -= 3;
+      }
+
+      if (isSetTonality) {
+
+         devX -= annotationWidth;
+
+         g2d.drawImage(_imageAnnotationTonality, devX, devY, null);
+      }
    }
 
    private void paint_MpImage_RatingStars(final Graphics2D g2d, final Photo photo) {
 
-      final int ratingStarImageSize = _ratingStarImageSize;
+      final Rectangle paintedPhoto = photo.paintedPhoto;
 
-      final int photoDevX = photo.paintedPhoto.x;
-      final int photoDevY = photo.paintedPhoto.y;
-      final int photoWidth = (photo.paintedPhoto.width);
+      final int photoDevX = paintedPhoto.x;
+      final int photoDevY = paintedPhoto.y;
+      final int photoWidth = paintedPhoto.width;
       final int numRatingStars = photo.ratingStars;
 
       final boolean isSmallRatingStar = photoWidth / _deviceScaling < 70;
@@ -8873,6 +8901,8 @@ public class Map2 extends Canvas {
       final int leftBorderRatingStars = isSmallRatingStar
             ? photoDevX + photoWidth / 2 - maxSmallRatingStarsWidth / 2
             : leftBorderWithVisibleStars;
+
+      final int ratingStarImageSize = _ratingStarImageSize;
 
       photo.paintedRatingStars = new Rectangle(
 

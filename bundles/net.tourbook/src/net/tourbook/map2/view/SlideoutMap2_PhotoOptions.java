@@ -66,6 +66,8 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
    public static final boolean     STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT   = false;
    public static final String      STATE_IS_SHOW_PHOTO_ADJUSTMENTS         = "STATE_IS_SHOW_PHOTO_ADJUSTMENTS"; //$NON-NLS-1$
    public static final boolean     STATE_IS_SHOW_PHOTO_ADJUSTMENTS_DEFAULT = false;
+   static final String             STATE_IS_SHOW_PHOTO_ANNOTATIONS         = "STATE_IS_SHOW_PHOTO_ANNOTATIONS"; //$NON-NLS-1$
+   static final boolean            STATE_IS_SHOW_PHOTO_ANNOTATIONS_DEFAULT = true;
    static final String             STATE_IS_SHOW_PHOTO_HISTOGRAM           = "STATE_IS_SHOW_PHOTO_HISTOGRAM";   //$NON-NLS-1$
    static final boolean            STATE_IS_SHOW_PHOTO_HISTOGRAM_DEFAULT   = true;
    static final String             STATE_IS_SHOW_PHOTO_RATING              = "STATE_IS_SHOW_PHOTO_RATING";      //$NON-NLS-1$
@@ -110,6 +112,7 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
    private Button                _chkPreloadHQImages;
    private Button                _chkShowHQImages;
    private Button                _chkShowPhotoAdjustments;
+   private Button                _chkShowPhotoAnnotations;
    private Button                _chkShowPhotoRating;
 
    private Button                _radioImageSize_Tiny;
@@ -368,6 +371,14 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
       }
       {
          /*
+          * Show photo annotations
+          */
+         _chkShowPhotoAnnotations = new Button(parent, SWT.CHECK);
+         _chkShowPhotoAnnotations.setText(Messages.Slideout_Map_PhotoOptions_Checkbox_ShowPhotoAnnotations);
+         _chkShowPhotoAnnotations.addSelectionListener(_defaultSelectedListener);
+      }
+      {
+         /*
           * Enlarge small images
           */
          _chkEnlargeSmallImages = new Button(parent, SWT.CHECK);
@@ -570,6 +581,7 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
       _chkPreloadHQImages     .setSelection(STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT);
       _chkShowHQImages        .setSelection(STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT);
       _chkShowPhotoAdjustments.setSelection(STATE_IS_SHOW_PHOTO_ADJUSTMENTS_DEFAULT);
+      _chkShowPhotoAnnotations.setSelection(STATE_IS_SHOW_PHOTO_ANNOTATIONS_DEFAULT);
       _chkShowPhotoRating     .setSelection(STATE_IS_SHOW_PHOTO_RATING_DEFAULT);
 
 // SET_FORMATTING_ON
@@ -600,6 +612,7 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
       _chkPreloadHQImages     .setSelection(Util.getStateBoolean(_state_Map2View, STATE_IS_PRELOAD_HQ_IMAGES,      STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT));
       _chkShowHQImages        .setSelection(Util.getStateBoolean(_state_Map2View, STATE_IS_SHOW_THUMB_HQ_IMAGES,   STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT));
       _chkShowPhotoAdjustments.setSelection(Util.getStateBoolean(_state_Map2View, STATE_IS_SHOW_PHOTO_ADJUSTMENTS, STATE_IS_SHOW_PHOTO_ADJUSTMENTS_DEFAULT));
+      _chkShowPhotoAnnotations.setSelection(Util.getStateBoolean(_state_Map2View, STATE_IS_SHOW_PHOTO_ANNOTATIONS, STATE_IS_SHOW_PHOTO_ANNOTATIONS_DEFAULT));
       _chkShowPhotoRating     .setSelection(Util.getStateBoolean(_state_Map2View, STATE_IS_SHOW_PHOTO_RATING,      STATE_IS_SHOW_PHOTO_RATING_DEFAULT));
 
       final Enum<MapImageSize> imageSize = Util.getStateEnum(_state_Map2View, STATE_PHOTO_IMAGE_SIZE, MapImageSize.MEDIUM);
@@ -646,17 +659,20 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
 
       final Map2Config config = Map2ConfigManager.getActiveConfig();
 
-      final boolean isShowPhotoRating = _chkShowPhotoRating.getSelection();
-
 // SET_FORMATTING_OFF
 
-      _state_Map2View.put(STATE_IS_ENLARGE_SMALL_IMAGES,  _chkEnlargeSmallImages.getSelection());
-      _state_Map2View.put(STATE_IS_PRELOAD_HQ_IMAGES,     _chkPreloadHQImages.getSelection());
-      _state_Map2View.put(STATE_IS_SHOW_PHOTO_ADJUSTMENTS,_chkShowPhotoAdjustments.getSelection());
-      _state_Map2View.put(STATE_IS_SHOW_THUMB_HQ_IMAGES,  _chkShowHQImages.getSelection());
-      _state_Map2View.put(STATE_IS_SHOW_PHOTO_RATING,     isShowPhotoRating);
+      final boolean isShowPhotoAnnotations = _chkShowPhotoAnnotations.getSelection();
+      final boolean isShowPhotoRating      = _chkShowPhotoRating.getSelection();
 
-      Map2PainterConfig.isShowPhotoRating = isShowPhotoRating;
+      _state_Map2View.put(STATE_IS_ENLARGE_SMALL_IMAGES,    _chkEnlargeSmallImages.getSelection());
+      _state_Map2View.put(STATE_IS_PRELOAD_HQ_IMAGES,       _chkPreloadHQImages.getSelection());
+      _state_Map2View.put(STATE_IS_SHOW_PHOTO_ADJUSTMENTS,  _chkShowPhotoAdjustments.getSelection());
+      _state_Map2View.put(STATE_IS_SHOW_PHOTO_ANNOTATIONS,  isShowPhotoAnnotations);
+      _state_Map2View.put(STATE_IS_SHOW_PHOTO_RATING,       isShowPhotoRating);
+      _state_Map2View.put(STATE_IS_SHOW_THUMB_HQ_IMAGES,    _chkShowHQImages.getSelection());
+
+      Map2PainterConfig.isShowPhotoAnnotations  = isShowPhotoAnnotations;
+      Map2PainterConfig.isShowPhotoRating       = isShowPhotoRating;
 
       final Enum<MapImageSize> selectedSize =
 
