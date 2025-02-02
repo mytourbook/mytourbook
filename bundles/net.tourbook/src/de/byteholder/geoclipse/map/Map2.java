@@ -2928,7 +2928,7 @@ public class Map2 extends Canvas {
                   true // is AWT image
             );
 
-            System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 1 " + null);
+//            System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 1 " + null);
 // TODO remove SYSTEM.OUT.PRINTLN
 
             return null;
@@ -2939,7 +2939,7 @@ public class Map2 extends Canvas {
 
          // HQ image is not requested
 
-         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 2 " + awtThumbImage);
+//         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 2 " + awtThumbImage.getWidth() + " / " + awtThumbImage.getHeight());
 // TODO remove SYSTEM.OUT.PRINTLN
 
          return awtThumbImage;
@@ -2988,14 +2988,14 @@ public class Map2 extends Canvas {
 
       if (awtPhotoImageThumbHQ != null) {
 
-         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 3 " + awtPhotoImageThumbHQ.getWidth() + " / " + awtPhotoImageThumbHQ.getHeight());
+//         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 3 " + awtPhotoImageThumbHQ.getWidth() + " / " + awtPhotoImageThumbHQ.getHeight());
 // TODO remove SYSTEM.OUT.PRINTLN
 
          return awtPhotoImageThumbHQ;
       }
 
       if (awtThumbImage != null) {
-         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 4 " + awtThumbImage.getWidth() + " / " + awtThumbImage.getHeight());
+//         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 4 " + awtThumbImage.getWidth() + " / " + awtThumbImage.getHeight());
 // TODO remove SYSTEM.OUT.PRINTLN
       }
 

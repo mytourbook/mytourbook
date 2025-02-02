@@ -1114,7 +1114,7 @@ public class PhotoImageLoader {
 
          // load original image and create thumbs
 
-         if (imageQuality == ImageQuality.THUMB_HQ_ADJUSTED || _photo.isSetTonality) {
+         if (imageQuality == ImageQuality.THUMB_HQ_ADJUSTED) {
 
             // it is possible that the not cropped image is already loaded -> only crop it
 
@@ -1259,7 +1259,7 @@ public class PhotoImageLoader {
          PhotoImageCache.putImage_AWT(imageKey, awtHQImage, originalImagePathName);
 
          /*
-          * Save scaled HQ image in store
+          * Save scaled thumb HQ image in store
           */
          final long startSaveHQ = System.currentTimeMillis();
          {
@@ -1278,18 +1278,18 @@ public class PhotoImageLoader {
       /*
        * Crop image NOW, to prevent flickering when cropping is done later
        */
-      if (imageQuality == ImageQuality.THUMB_HQ_ADJUSTED || _photo.isSetTonality) {
+      if (imageQuality == ImageQuality.THUMB_HQ_ADJUSTED) {
 
-         final BufferedImage awtHQImageCropped = adjustImage(awtOriginalImage);
+         // rotate image according to the EXIF flag
+         final BufferedImage awtRotatedImage = transformImageRotate(awtOriginalImage);
 
-         if (awtHQImageCropped != null) {
+         final BufferedImage awtAdjustedImage = adjustImage(awtRotatedImage);
+
+         if (awtAdjustedImage != null) {
 
             awtHQImage.flush();
 
-            awtHQImage = awtHQImageCropped;
-
-            // rotate image according to the EXIF flag
-            awtHQImage = transformImageRotate(awtHQImage);
+            awtHQImage = awtAdjustedImage;
 
             final String imageKey = _photo.getImageKey(ImageQuality.THUMB_HQ_ADJUSTED);
 
@@ -2005,13 +2005,13 @@ public class PhotoImageLoader {
    }
 
    /**
-    * @param scaledImage
+    * @param providedImage
     *
     * @return Returns rotated image when orientations is not default
     */
-   private BufferedImage transformImageRotate(final BufferedImage scaledImage) {
+   private BufferedImage transformImageRotate(final BufferedImage providedImage) {
 
-      BufferedImage rotatedImage = scaledImage;
+      BufferedImage rotatedImage = providedImage;
 
       final int orientation = _photo.getOrientation();
 
@@ -2030,7 +2030,7 @@ public class PhotoImageLoader {
 
 // SET_FORMATTING_ON
 
-         rotatedImage = Scalr.rotate(scaledImage, correction);
+         rotatedImage = Scalr.rotate(providedImage, correction);
 
          _trackedAWTImages.add(rotatedImage);
       }

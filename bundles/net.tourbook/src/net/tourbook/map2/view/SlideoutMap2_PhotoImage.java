@@ -2299,6 +2299,10 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
    private void updateUI_LoadingMessage() {
 
+      if (_labelMessage == null || _labelMessage.isDisposed()) {
+         return;
+      }
+
       if (_hoveredMapPoint == null) {
 
          _labelMessage.setText("A photo is not hovered");
