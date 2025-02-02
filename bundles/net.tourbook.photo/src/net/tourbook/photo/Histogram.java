@@ -700,6 +700,10 @@ public class Histogram extends Canvas implements PaintListener {
    @Override
    public void setEnabled(final boolean isEnabled) {
 
+      if (isDisposed()) {
+         return;
+      }
+
       _isEnabled = isEnabled;
 
       redraw();
@@ -753,15 +757,15 @@ public class Histogram extends Canvas implements PaintListener {
 
    public void updateCurvesFilter(final Photo photo) {
 
+      if (isDisposed()) {
+         return;
+      }
+
       _isSetTonality = photo.isSetTonality;
       _toneCurvesFilter = photo.getToneCurvesFilter();
 
       // update in UI thread
       getDisplay().asyncExec(() -> {
-
-         if (isDisposed()) {
-            return;
-         }
 
          redraw();
       });

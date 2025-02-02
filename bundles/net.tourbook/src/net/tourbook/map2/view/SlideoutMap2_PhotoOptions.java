@@ -223,7 +223,7 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
 
    private void createUI_30_ImageSize(final Composite parent) {
 
-      final GridDataFactory gdIndent = GridDataFactory.fillDefaults().indent(16, 0);
+      final GridDataFactory gdIndent = GridDataFactory.fillDefaults().indent(8, 0);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -523,6 +523,8 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
       PhotoLoadManager.removeInvalidImageFiles();
 
       PhotoImageCache.disposeAll();
+
+      _map2View.getMap().photoTooltip_OnDiscardImages();
 
       repaintMap();
 

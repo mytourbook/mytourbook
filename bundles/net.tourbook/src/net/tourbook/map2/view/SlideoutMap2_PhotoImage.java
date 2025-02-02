@@ -497,6 +497,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
          _labelMessage = new Label(container, SWT.NONE);
          GridDataFactory.fillDefaults()
@@ -812,6 +813,14 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
          }
       };
 
+   }
+
+   public void onDiscardImages() {
+
+      _hoveredMapPoint = null;
+
+      // hide image and force rehovering
+      updateUI_LoadingMessage();
    }
 
    @Override
@@ -1762,7 +1771,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
       _isAdjustmentEnabled = isShowPhotoAdjustments;
 
-      if (_photoImageCanvas != null) {
+      if (_photoImageCanvas != null && _photoImageCanvas.isDisposed() == false) {
 
          _photoImageCanvas.redraw();
       }
@@ -2292,16 +2301,17 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
       if (_hoveredMapPoint == null) {
 
-         _labelMessage.setText(UI.EMPTY_STRING);
+         _labelMessage.setText("A photo is not hovered");
 
       } else {
 
          final Photo photo = _hoveredMapPoint.mapPoint.photo;
-
          final String photoText = Messages.Slideout_MapPoint_PhotoToolTip_Label_LoadingMessage + UI.SPACE + photo.imageFilePathName;
 
          _labelMessage.setText(photoText);
       }
+
+      _labelMessage.getParent().layout(true, true);
 
       _pageBook.showPage(_pageNoPhoto);
    }

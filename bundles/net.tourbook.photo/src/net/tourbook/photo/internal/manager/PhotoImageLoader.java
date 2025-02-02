@@ -1180,9 +1180,6 @@ public class PhotoImageLoader {
       long endResizeHQ = 0;
       long endSaveHQ = 0;
 
-      // images are rotated only ONCE (the first one)
-      boolean isRotated = false;
-
       BufferedImage awtOriginalImage = null;
       BufferedImage awtHQImage = null;
 
@@ -1248,11 +1245,7 @@ public class PhotoImageLoader {
             _trackedAWTImages.add(scaledHQImage);
 
             // rotate image according to the EXIF flag
-            if (isRotated == false) {
-               isRotated = true;
-
-               scaledHQImage = transformImageRotate(scaledHQImage);
-            }
+            scaledHQImage = transformImageRotate(scaledHQImage);
 
             awtHQImage = scaledHQImage;
          }
@@ -1294,6 +1287,13 @@ public class PhotoImageLoader {
             awtHQImage.flush();
 
             awtHQImage = awtHQImageCropped;
+
+            // rotate image according to the EXIF flag
+            awtHQImage = transformImageRotate(awtHQImage);
+
+            final String imageKey = _photo.getImageKey(ImageQuality.THUMB_HQ_ADJUSTED);
+
+            PhotoImageCache.putImage_AWT(imageKey, awtHQImage, originalImagePathName);
          }
       }
 
@@ -2020,13 +2020,15 @@ public class PhotoImageLoader {
          // see here http://www.impulseadventure.com/photo/exif-orientation.html
 
          Rotation correction = null;
-         if (orientation == 8) {
-            correction = Rotation.CW_270;
-         } else if (orientation == 3) {
-            correction = Rotation.CW_180;
-         } else if (orientation == 6) {
-            correction = Rotation.CW_90;
+
+// SET_FORMATTING_OFF
+
+         if (       orientation == 8) {   correction = Rotation.CW_270;
+         } else if (orientation == 3) {   correction = Rotation.CW_180;
+         } else if (orientation == 6) {   correction = Rotation.CW_90;
          }
+
+// SET_FORMATTING_ON
 
          rotatedImage = Scalr.rotate(scaledImage, correction);
 

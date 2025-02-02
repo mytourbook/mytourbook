@@ -1266,11 +1266,6 @@ public class Map2 extends Canvas {
       return new Point2D.Double(newCenterX, newCenterY);
    }
 
-   public void closePhotoTooltip() {
-
-      _mapPointTooltip_PhotoImage.close();
-   }
-
    @Override
    public org.eclipse.swt.graphics.Point computeSize(final int wHint, final int hHint, final boolean changed) {
       return getParent().getSize();
@@ -2933,6 +2928,9 @@ public class Map2 extends Canvas {
                   true // is AWT image
             );
 
+            System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 1 " + null);
+// TODO remove SYSTEM.OUT.PRINTLN
+
             return null;
          }
       }
@@ -2940,6 +2938,9 @@ public class Map2 extends Canvas {
       if (_isShowHQPhotoImages == false) {
 
          // HQ image is not requested
+
+         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 2 " + awtThumbImage);
+// TODO remove SYSTEM.OUT.PRINTLN
 
          return awtThumbImage;
       }
@@ -2987,7 +2988,15 @@ public class Map2 extends Canvas {
 
       if (awtPhotoImageThumbHQ != null) {
 
+         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 3 " + awtPhotoImageThumbHQ.getWidth() + " / " + awtPhotoImageThumbHQ.getHeight());
+// TODO remove SYSTEM.OUT.PRINTLN
+
          return awtPhotoImageThumbHQ;
+      }
+
+      if (awtThumbImage != null) {
+         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 4 " + awtThumbImage.getWidth() + " / " + awtThumbImage.getHeight());
+// TODO remove SYSTEM.OUT.PRINTLN
       }
 
       return awtThumbImage;
@@ -10279,6 +10288,16 @@ public class Map2 extends Canvas {
    public void photoHistogram_UpdateCropArea(final Rectangle2D.Float histogramCropArea) {
 
       _mapPointTooltip_PhotoHistogram.updateCropArea(histogramCropArea);
+   }
+
+   public void photoTooltip_Close() {
+
+      _mapPointTooltip_PhotoImage.close();
+   }
+
+   public void photoTooltip_OnDiscardImages() {
+
+      _mapPointTooltip_PhotoImage.onDiscardImages();
    }
 
    /**
