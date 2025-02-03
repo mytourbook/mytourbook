@@ -122,8 +122,6 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
    @Override
    public void close() {
 
-      Map2PointManager.setMapLocationSlideout(null);
-
       super.close();
    }
 

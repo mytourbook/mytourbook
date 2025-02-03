@@ -310,8 +310,6 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
    @Override
    public void close() {
 
-      Map2PointManager.setMapLocationSlideout(null);
-
       super.close();
    }
 

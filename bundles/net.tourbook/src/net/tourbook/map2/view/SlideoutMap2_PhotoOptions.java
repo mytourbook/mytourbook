@@ -729,6 +729,10 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
 
    public void updateUI_FromState() {
 
+      if (_chkShowPhotoAnnotations.isDisposed()) {
+         return;
+      }
+
 // SET_FORMATTING_OFF
 
       _chkShowPhotoAnnotations.setSelection(Util.getStateBoolean(_state_Map2View, STATE_IS_SHOW_PHOTO_ANNOTATIONS, STATE_IS_SHOW_PHOTO_ANNOTATIONS_DEFAULT));
