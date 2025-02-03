@@ -550,6 +550,8 @@ public class Map2View extends ViewPart implements
    private GeoFilter_LoaderData                 _geoFilter_PreviousGeoLoaderItem;
    private AtomicInteger                        _geoFilter_RunningId  = new AtomicInteger();
    //
+   private PaintedMapPoint                      _contextMenu_HoveredMapPoint;
+   //
    /*
     * UI controls
     */
@@ -746,7 +748,7 @@ public class Map2View extends ViewPart implements
       @Override
       public void run() {
 
-         TourManager.tourPhoto_Remove(_map.getHoveredMapPoint());
+         TourManager.tourPhoto_Remove(_contextMenu_HoveredMapPoint);
       }
    }
 
@@ -1215,7 +1217,7 @@ public class Map2View extends ViewPart implements
 
    private void actionMapMarker_CenterMap() {
 
-      final PaintedMapPoint hoveredMapPoint = _map.getHoveredMapPoint();
+      final PaintedMapPoint hoveredMapPoint = _contextMenu_HoveredMapPoint;
 
       final GeoPoint geoPoint = hoveredMapPoint.mapPoint.geoPoint;
       final GeoPosition geoPosition = new GeoPosition(geoPoint.getLatitude(), geoPoint.getLongitude());
@@ -1225,7 +1227,7 @@ public class Map2View extends ViewPart implements
 
    private void actionMapMarker_Edit() {
 
-      final PaintedMapPoint hoveredMapPoint = _map.getHoveredMapPoint();
+      final PaintedMapPoint hoveredMapPoint = _contextMenu_HoveredMapPoint;
 
       final TourMarker tourMarker = hoveredMapPoint.mapPoint.tourMarker;
 
@@ -1247,7 +1249,7 @@ public class Map2View extends ViewPart implements
 
    private void actionMapMarker_ShowOnlyThisTour() {
 
-      final PaintedMapPoint hoveredMapPoint = _map.getHoveredMapPoint();
+      final PaintedMapPoint hoveredMapPoint = _contextMenu_HoveredMapPoint;
 
       final Map2Point mapPoint = hoveredMapPoint.mapPoint;
       final MapPointType pointType = mapPoint.pointType;
@@ -1280,7 +1282,7 @@ public class Map2View extends ViewPart implements
 
    private void actionMapMarker_ZoomIn() {
 
-      final PaintedMapPoint hoveredMapPoint = _map.getHoveredMapPoint();
+      final PaintedMapPoint hoveredMapPoint = _contextMenu_HoveredMapPoint;
 
       final GeoPoint geoPoint = hoveredMapPoint.mapPoint.geoPoint;
 
@@ -2648,16 +2650,16 @@ public class Map2View extends ViewPart implements
    public void fillContextMenu(final IMenuManager menuMgr,
                                final ActionManageOfflineImages actionManageOfflineImages) {
 
-      final PaintedMapPoint hoveredMapPoint = _map.getHoveredMapPoint();
+      _contextMenu_HoveredMapPoint = _map.getHoveredMapPoint();
 
-      if (hoveredMapPoint != null) {
+      if (_contextMenu_HoveredMapPoint != null) {
 
          // open context menu for a map marker
 
-         final Map2Point mapPoint = hoveredMapPoint.mapPoint;
+         final Map2Point mapPoint = _contextMenu_HoveredMapPoint.mapPoint;
          final boolean isPhotoAvailable = mapPoint.photo != null;
 
-         enableActions_MapPoint(hoveredMapPoint);
+         enableActions_MapPoint(_contextMenu_HoveredMapPoint);
 
          menuMgr.add(_actionMapPoint_ZoomIn);
          menuMgr.add(_actionMapPoint_CenterMap);
