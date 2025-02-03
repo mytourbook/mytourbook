@@ -5214,6 +5214,13 @@ public class Map2View extends ViewPart implements
       Photo.setMap2ImageRequestedSize(mapImageSize);
    }
 
+   void setShowPhotos(final boolean isShowPhotos) {
+
+      _actionMap2Slideout_PhotoOptions.setSelection(isShowPhotos);
+
+      actionShowPhotos(isShowPhotos);
+   }
+
    /**
     * Set tour data for the map, this is THE central point to set new tours into the map.
     *

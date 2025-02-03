@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024,2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -562,6 +562,8 @@ public class Map2ConfigManager {
 
       config.tourPauseDuration                     = Util.getXmlLong(xmlConfig, ATTR_DURATION_FILTER_SUMMARIZED,        0L);
       config.tourPauseDurationFilter_Operator      = (TourFilterFieldOperator) Util.getXmlEnum(xmlConfig, ATTR_DURATION_OPERATOR,                 DURATION_OPERATOR_DEFAULT);
+
+      config.isShowTourWayPoint                    = Util.getXmlBoolean(xmlConfig,  ATTR_IS_SHOW_TOUR_WAY_POINT,        true);
 
 // SET_FORMATTING_ON
 

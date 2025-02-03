@@ -2418,6 +2418,7 @@ public class Messages extends NLS {
    public static String        Slideout_MapPoints_Action_TourLocations_Tooltip;
    public static String        Slideout_MapPoints_Action_TourMarkers_Tooltip;
    public static String        Slideout_MapPoints_Action_TourPauses_Tooltip;
+   public static String        Slideout_MapPoints_Action_TourPhotos_Tooltip;
    public static String        Slideout_MapPoints_Action_TourWayPoints_Tooltip;
    public static String        Slideout_MapPoints_Checkbox_AntialiasLabel;
    public static String        Slideout_MapPoints_Checkbox_ClusterTourMarkers;
@@ -2455,6 +2456,7 @@ public class Messages extends NLS {
    public static String        Slideout_MapPoints_Label_Stats_TourLocations;
    public static String        Slideout_MapPoints_Label_Stats_TourMarkers;
    public static String        Slideout_MapPoints_Label_Stats_TourPauses;
+   public static String        Slideout_MapPoints_Label_Stats_TourPhotos;
    public static String        Slideout_MapPoints_Label_Title2;
    public static String        Slideout_MapPoints_Label_TourLocationColor;
    public static String        Slideout_MapPoints_Label_TourLocation_StartColor;
