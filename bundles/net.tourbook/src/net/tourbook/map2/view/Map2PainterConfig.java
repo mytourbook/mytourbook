@@ -45,6 +45,7 @@ public class Map2PainterConfig {
 
    static boolean                           isBackgroundDark;
 
+   public static boolean                    isPhotoAutoSelect;
    public static boolean                    isShowPhotos;
    public static boolean                    isShowPhotoAnnotations;
    public static boolean                    isShowPhotoHistogram;
@@ -66,6 +67,10 @@ public class Map2PainterConfig {
       // restore states
 
       final IDialogSettings state = Map2View.getState();
+
+      isPhotoAutoSelect = Util.getStateBoolean(state,
+            SlideoutMap2_PhotoOptions.STATE_IS_PHOTO_AUTO_SELECT,
+            SlideoutMap2_PhotoOptions.STATE_IS_PHOTO_AUTO_SELECT_DEFAULT);
 
       isShowPhotoAnnotations = Util.getStateBoolean(state,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_ANNOTATIONS,

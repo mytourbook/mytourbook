@@ -505,6 +505,7 @@ public class Map2View extends ViewPart implements
    private ActionMap2_Graphs                    _actionMap2Slideout_TourColors;
    private ActionMapPoint_CenterMap             _actionMapPoint_CenterMap;
    private ActionMapPoint_EditTourMarker        _actionMapPoint_EditTourMarker;
+   private ActionMapPoint_Photo_AutoSelect      _actionMapPoint_Photo_AutoSelect;
    private ActionMapPoint_Photo_Remove          _actionMapPoint_Photo_Remove;
    private ActionMapPoint_Photo_ShowAnnotations _actionMapPoint_Photo_ShowAnnotations;
    private ActionMapPoint_Photo_ShowHistogram   _actionMapPoint_Photo_ShowHistogram;
@@ -734,6 +735,20 @@ public class Map2View extends ViewPart implements
          actionMapMarker_Edit();
       }
 
+   }
+
+   private class ActionMapPoint_Photo_AutoSelect extends Action {
+
+      public ActionMapPoint_Photo_AutoSelect() {
+
+         super(OtherMessages.SLIDEOUT_MAP_PHOTO_OPTIONS_CHECKBOX_AUTO_SELECT, Action.AS_CHECK_BOX);
+      }
+
+      @Override
+      public void run() {
+
+         actionPhoto_AutoSelect();
+      }
    }
 
    private class ActionMapPoint_Photo_Remove extends Action {
@@ -1297,6 +1312,16 @@ public class Map2View extends ViewPart implements
          // hide hovered marker
          _map.resetHoveredMapPoint();
       });
+   }
+
+   private void actionPhoto_AutoSelect() {
+
+      final boolean isAutoSelect = _actionMapPoint_Photo_AutoSelect.isChecked();
+
+      // update model
+      _state.put(SlideoutMap2_PhotoOptions.STATE_IS_PHOTO_AUTO_SELECT, isAutoSelect);
+
+      Map2PainterConfig.isPhotoAutoSelect = isAutoSelect;
    }
 
    private void actionPhoto_ShowAnnotations() {
@@ -2129,6 +2154,7 @@ public class Map2View extends ViewPart implements
       _actionManageMapProvider               = new ActionManageMapProviders(this);
       _actionMapPoint_CenterMap              = new ActionMapPoint_CenterMap();
       _actionMapPoint_EditTourMarker         = new ActionMapPoint_EditTourMarker();
+      _actionMapPoint_Photo_AutoSelect       = new ActionMapPoint_Photo_AutoSelect();
       _actionMapPoint_Photo_Remove           = new ActionMapPoint_Photo_Remove();
       _actionMapPoint_Photo_ShowAnnotations  = new ActionMapPoint_Photo_ShowAnnotations();
       _actionMapPoint_Photo_ShowHistogram    = new ActionMapPoint_Photo_ShowHistogram();
@@ -2661,6 +2687,18 @@ public class Map2View extends ViewPart implements
 
          enableActions_MapPoint(_contextMenu_HoveredMapPoint);
 
+         if (isPhotoAvailable) {
+
+            menuMgr.add(_actionMapPoint_Photo_ShowRating);
+            menuMgr.add(_actionMapPoint_Photo_AutoSelect);
+            menuMgr.add(_actionMapPoint_Photo_ShowTooltip);
+            menuMgr.add(_actionMapPoint_Photo_ShowHistogram);
+            menuMgr.add(_actionMapPoint_Photo_ShowAnnotations);
+            menuMgr.add(_actionMapPoint_Photo_Remove);
+
+            menuMgr.add(new Separator());
+         }
+
          menuMgr.add(_actionMapPoint_ZoomIn);
          menuMgr.add(_actionMapPoint_CenterMap);
 
@@ -2668,16 +2706,6 @@ public class Map2View extends ViewPart implements
 
          menuMgr.add(_actionMapPoint_ShowOnlyThisTour);
          menuMgr.add(_actionMapPoint_EditTourMarker);
-
-         if (isPhotoAvailable) {
-
-            menuMgr.add(new Separator());
-            menuMgr.add(_actionMapPoint_Photo_ShowTooltip);
-            menuMgr.add(_actionMapPoint_Photo_ShowHistogram);
-            menuMgr.add(_actionMapPoint_Photo_ShowAnnotations);
-            menuMgr.add(_actionMapPoint_Photo_ShowRating);
-            menuMgr.add(_actionMapPoint_Photo_Remove);
-         }
 
       } else {
 

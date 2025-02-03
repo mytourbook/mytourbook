@@ -371,8 +371,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
          gc.setLineWidth(1);
          gc.drawRectangle(
-               labelDevX_Scaled + 0,
-               labelDevY_Scaled + 0,
+               labelDevX_Scaled,
+               labelDevY_Scaled,
                labelWidth_Scaled,
                labelHeight_Scaled);
 

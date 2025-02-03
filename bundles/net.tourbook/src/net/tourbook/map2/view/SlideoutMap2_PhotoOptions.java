@@ -60,6 +60,8 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
 
    public static final String      STATE_IS_ENLARGE_SMALL_IMAGES           = "STATE_IS_ENLARGE_SMALL_IMAGES";   //$NON-NLS-1$
    public static final boolean     STATE_IS_ENLARGE_SMALL_IMAGES_DEFAULT   = false;
+   static final String             STATE_IS_PHOTO_AUTO_SELECT              = "STATE_IS_PHOTO_AUTO_SELECT";      //$NON-NLS-1$
+   static final boolean            STATE_IS_PHOTO_AUTO_SELECT_DEFAULT      = false;
    public static final String      STATE_IS_PRELOAD_HQ_IMAGES              = "STATE_IS_PRELOAD_HQ_IMAGES";      //$NON-NLS-1$
    public static final boolean     STATE_IS_PRELOAD_HQ_IMAGES_DEFAULT      = false;
    public static final String      STATE_IS_SHOW_THUMB_HQ_IMAGES           = "STATE_IS_SHOW_THUMB_HQ_IMAGES";   //$NON-NLS-1$
@@ -729,7 +731,7 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
 
    public void updateUI_FromState() {
 
-      if (_chkShowPhotoAnnotations.isDisposed()) {
+      if (_chkShowPhotoAnnotations == null || _chkShowPhotoAnnotations.isDisposed()) {
          return;
       }
 

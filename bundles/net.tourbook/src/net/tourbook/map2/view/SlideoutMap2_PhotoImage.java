@@ -817,26 +817,22 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
       _hoveredMapPoint = null;
 
-      // hide image and force rehovering
-      updateUI_LoadingMessage();
+      _containerPhotoOptions.getDisplay().asyncExec(() -> {
+
+         final PaintedMapPoint selectedPhotoMapPoint = _map2.getSelectedPhotoMapPoint();
+
+         setupPhoto(selectedPhotoMapPoint);
+      });
    }
 
    @Override
-   protected void onDispose() {
-
-      super.onDispose();
-   }
-
-   @Override
-   protected void onFocus() {
-
-   }
+   protected void onFocus() {}
 
    public void onImageIsLoaded() {
 
       final PaintedMapPoint hoveredMapPoint = _hoveredMapPoint;
 
-      Display.getDefault().asyncExec(() -> {
+      _containerPhotoOptions.getDisplay().asyncExec(() -> {
 
          if (_hoveredMapPoint != null) {
 
@@ -2303,7 +2299,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
       if (_hoveredMapPoint == null) {
 
-         _labelMessage.setText("A photo is not hovered");
+         _labelMessage.setText("A photo is not selected");
 
       } else {
 

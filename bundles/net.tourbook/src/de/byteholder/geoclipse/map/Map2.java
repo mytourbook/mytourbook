@@ -461,6 +461,8 @@ public class Map2 extends Canvas {
    private PaintedMarkerCluster            _hoveredMarkerCluster;
    private PaintedMapPoint                 _hoveredMapPoint;
    private PaintedMapPoint                 _hoveredMapPoint_Previous;
+   private Photo                           _selectedPhoto;
+   private PaintedMapPoint                 _selectedPhotoMapPoint;
    private boolean                         _isInHoveredRatingStar;
    private boolean                         _isMarkerClusterSelected;
    private MapPointToolTip                 _mapPointTooltip;
@@ -3089,6 +3091,11 @@ public class Map2 extends Canvas {
       return devXY;
    }
 
+   public PaintedMapPoint getSelectedPhotoMapPoint() {
+
+      return _selectedPhotoMapPoint;
+   }
+
    /**
     * Returns the bounds of the viewport in pixels. This can be used to transform points into the
     * world bitmap coordinate space. The viewport is the part of the map, that you can currently see
@@ -4436,7 +4443,8 @@ public class Map2 extends Canvas {
 
       _isMouseDown = true;
 
-      final boolean isShift = (mouseEvent.stateMask & SWT.SHIFT) != 0;
+      final boolean isShiftKey = UI.isShiftKey(mouseEvent);
+      final boolean isCtrlKey = UI.isCtrlKey(mouseEvent);
 
       hideTourTooltipHoveredArea();
       setPoiVisible(false);
@@ -4470,6 +4478,8 @@ public class Map2 extends Canvas {
 
          paint();
       }
+
+      boolean isCanPanMap = false;
 
       if (_offline_IsSelectingOfflineArea) {
 
@@ -4542,16 +4552,48 @@ public class Map2 extends Canvas {
             fireEvent_TourSelection(new SelectionTourIds(crumbTourIds));
          }
 
-      } else if (_hoveredMapPoint != null && _isInHoveredRatingStar) {
+      } else if (_hoveredMapPoint != null) {
 
          final Photo photo = _hoveredMapPoint.mapPoint.photo;
 
          if (photo != null) {
 
-            saveRatingStars(photo);
+            if (_isInHoveredRatingStar) {
 
-            // when a rating star is removed, then the photo may be filtered out -> hide hovered mappoint/photo
-            _hoveredMapPoint = null;
+               saveRatingStars(photo);
+
+               // when a rating star is removed, then the photo may be filtered out -> hide hovered mappoint/photo
+               _hoveredMapPoint = null;
+
+            } else {
+
+               // a photo is selected
+
+               if (isCtrlKey) {
+
+                  // deselect photo
+
+                  _selectedPhoto = null;
+                  _selectedPhotoMapPoint = null;
+
+                  _mapPointTooltip_PhotoImage.setupPhoto(null);
+                  _mapPointTooltip_PhotoHistogram.setupPhoto(null);
+
+               } else {
+
+                  // a photo is hovered -> show photo tooltip
+
+                  _selectedPhoto = photo;
+                  _selectedPhotoMapPoint = _hoveredMapPoint;
+
+                  _mapPointTooltip_PhotoImage.setupPhoto(_hoveredMapPoint);
+                  _mapPointTooltip_PhotoHistogram.setupPhoto(_hoveredMapPoint);
+               }
+
+               paint();
+
+               isCanPanMap = true;
+            }
          }
 
       } else if (_geoGrid_Label_IsHovered) {
@@ -4588,9 +4630,14 @@ public class Map2 extends Canvas {
 
       } else if (_allHoveredTourIds.size() > 0) {
 
-         onMouse_Down_HoveredTour(isShift);
+         onMouse_Down_HoveredTour(isShiftKey);
 
       } else {
+
+         isCanPanMap = true;
+      }
+
+      if (isCanPanMap) {
 
          // when the left mousebutton is clicked remember this point (for panning)
          _canPanMap = true;
@@ -4930,17 +4977,23 @@ public class Map2 extends Canvas {
 
          onMouse_Move_CheckMapPoints(allPaintedPhotos, mouseMoveDevX, mouseMoveDevY);
 
-         if (_hoveredMapPoint != null) {
+         if (_hoveredMapPoint != null && Map2PainterConfig.isPhotoAutoSelect) {
 
-            // a photo is hovered -> show photo tooltip
+            // a photo is hovered -> select photo
 
-            _mapPointTooltip_PhotoImage.setupPhoto(_hoveredMapPoint);
-            _mapPointTooltip_PhotoHistogram.setupPhoto(_hoveredMapPoint);
+            final Photo photo = _hoveredMapPoint.mapPoint.photo;
 
-         } else {
+            // select photo only when it is not yet selected
+            if (_selectedPhoto != photo) {
 
-            _mapPointTooltip_PhotoImage.setupPhoto(null);
-            _mapPointTooltip_PhotoHistogram.setupPhoto(null);
+               _selectedPhoto = photo;
+               _selectedPhotoMapPoint = _hoveredMapPoint;
+
+               _mapPointTooltip_PhotoImage.setupPhoto(_hoveredMapPoint);
+               _mapPointTooltip_PhotoHistogram.setupPhoto(_hoveredMapPoint);
+
+               paint();
+            }
          }
       }
 
@@ -8552,6 +8605,8 @@ public class Map2 extends Canvas {
 
       final int numPhotosItems = allPhotoItems.size();
 
+      Rectangle selectedPhotoRectangle = null;
+
       g2d.setStroke(new BasicStroke(1));
 
       /*
@@ -8655,12 +8710,12 @@ public class Map2 extends Canvas {
 
             // draw border
 
-//            g2d.setColor(_mapConfig.photoOutline_ColorAWT);
-//            g2d.drawRect(
-//                  photoRectangle.x - MAP_POINT_BORDER,
-//                  photoRectangle.y,
-//                  photoRectangle.width + 2 * MAP_POINT_BORDER,
-//                  photoRectangle.height);
+//          g2d.setColor(_mapConfig.photoOutline_ColorAWT);
+//          g2d.drawRect(
+//               photoRectangle.x - MAP_POINT_BORDER,
+//               photoRectangle.y,
+//               photoRectangle.width + 2 * MAP_POINT_BORDER,
+//               photoRectangle.height);
 
             photo.paintedPhoto = photoRectangle;
 
@@ -8672,10 +8727,35 @@ public class Map2 extends Canvas {
             if (_isShowPhotoAdjustments && _isShowHQPhotoImages && Map2PainterConfig.isShowPhotoAnnotations) {
                paint_MpImage_Annotations(g2d, photo);
             }
+
+            if (_selectedPhoto == photo) {
+               selectedPhotoRectangle = photoRectangle;
+            }
          }
 
          // keep position
-         allPaintedPhotos.add(new PaintedMapPoint(mapPoint, photoRectangle));
+         final PaintedMapPoint paintedMapPoint = new PaintedMapPoint(mapPoint, photoRectangle);
+
+         allPaintedPhotos.add(paintedMapPoint);
+      }
+
+      /*
+       * Draw selected photo marker
+       */
+      if (selectedPhotoRectangle != null) {
+
+         final int border = 4;
+         final int border2 = border / 2;
+
+         g2d.setStroke(new BasicStroke(border));
+         g2d.setColor(java.awt.Color.yellow);
+
+         g2d.drawRect(
+
+               selectedPhotoRectangle.x - border2,
+               selectedPhotoRectangle.y - border2,
+               selectedPhotoRectangle.width + border,
+               selectedPhotoRectangle.height + border);
       }
 
       /*
