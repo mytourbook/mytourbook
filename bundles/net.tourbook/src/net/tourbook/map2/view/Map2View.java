@@ -554,13 +554,13 @@ public class Map2View extends ViewPart implements
    //
    private PaintedMapPoint                      _contextMenu_HoveredMapPoint;
    //
+   private SlideoutMap2_PhotoOptions            _slideoutPhotoOptions;
+   //
    /*
     * UI controls
     */
-   private Composite                _parent;
-   private Map2                     _map;
-
-   public SlideoutMap2_PhotoOptions _slideoutPhotoOptions;
+   private Composite _parent;
+   private Map2      _map;
 
    private class ActionCopyLocation extends Action {
 
