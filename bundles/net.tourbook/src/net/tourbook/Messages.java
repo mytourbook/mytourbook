@@ -2388,6 +2388,8 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Tab_Selection;
    public static String        Slideout_Map_Options_Tab_Slider;
 
+   public static String        Slideout_Map_PhotoOptions_Action_DeselectPhoto;
+   public static String        Slideout_Map_PhotoOptions_Action_DeselectPhoto_Tooltip;
    public static String        Slideout_Map_PhotoOptions_Checkbox_AutoSelect;
    public static String        Slideout_Map_PhotoOptions_Checkbox_PreloadPhotoImages;
    public static String        Slideout_Map_PhotoOptions_Checkbox_PreloadPhotoImages_Tooltip;

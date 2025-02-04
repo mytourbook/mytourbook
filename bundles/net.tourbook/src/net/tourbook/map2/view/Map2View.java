@@ -506,6 +506,7 @@ public class Map2View extends ViewPart implements
    private ActionMapPoint_CenterMap             _actionMapPoint_CenterMap;
    private ActionMapPoint_EditTourMarker        _actionMapPoint_EditTourMarker;
    private ActionMapPoint_Photo_AutoSelect      _actionMapPoint_Photo_AutoSelect;
+   private ActionMapPoint_Photo_Deselect        _actionMapPoint_Photo_Deselect;
    private ActionMapPoint_Photo_Remove          _actionMapPoint_Photo_Remove;
    private ActionMapPoint_Photo_ShowAnnotations _actionMapPoint_Photo_ShowAnnotations;
    private ActionMapPoint_Photo_ShowHistogram   _actionMapPoint_Photo_ShowHistogram;
@@ -716,6 +717,7 @@ public class Map2View extends ViewPart implements
 
       @Override
       public void run() {
+
          actionMapMarker_CenterMap();
       }
    }
@@ -732,9 +734,9 @@ public class Map2View extends ViewPart implements
 
       @Override
       public void run() {
+
          actionMapMarker_Edit();
       }
-
    }
 
    private class ActionMapPoint_Photo_AutoSelect extends Action {
@@ -748,6 +750,22 @@ public class Map2View extends ViewPart implements
       public void run() {
 
          actionPhoto_AutoSelect();
+      }
+   }
+
+   private class ActionMapPoint_Photo_Deselect extends Action {
+
+      public ActionMapPoint_Photo_Deselect() {
+
+         super(OtherMessages.SLIDEOUT_MAP_PHOTO_OPTIONS_ACTION_DESELECT_PHOTO, Action.AS_PUSH_BUTTON);
+
+         setToolTipText(OtherMessages.SLIDEOUT_MAP_PHOTO_OPTIONS_ACTION_DESELECT_PHOTO_TOOLTIP);
+      }
+
+      @Override
+      public void run() {
+
+         _map.selectPhoto(null, null);
       }
    }
 
@@ -2155,6 +2173,7 @@ public class Map2View extends ViewPart implements
       _actionMapPoint_CenterMap              = new ActionMapPoint_CenterMap();
       _actionMapPoint_EditTourMarker         = new ActionMapPoint_EditTourMarker();
       _actionMapPoint_Photo_AutoSelect       = new ActionMapPoint_Photo_AutoSelect();
+      _actionMapPoint_Photo_Deselect         = new ActionMapPoint_Photo_Deselect();
       _actionMapPoint_Photo_Remove           = new ActionMapPoint_Photo_Remove();
       _actionMapPoint_Photo_ShowAnnotations  = new ActionMapPoint_Photo_ShowAnnotations();
       _actionMapPoint_Photo_ShowHistogram    = new ActionMapPoint_Photo_ShowHistogram();
@@ -2691,6 +2710,7 @@ public class Map2View extends ViewPart implements
 
             menuMgr.add(_actionMapPoint_Photo_ShowRating);
             menuMgr.add(_actionMapPoint_Photo_AutoSelect);
+            menuMgr.add(_actionMapPoint_Photo_Deselect);
             menuMgr.add(_actionMapPoint_Photo_ShowTooltip);
             menuMgr.add(_actionMapPoint_Photo_ShowHistogram);
             menuMgr.add(_actionMapPoint_Photo_ShowAnnotations);

@@ -4573,24 +4573,15 @@ public class Map2 extends Canvas {
 
                   // deselect photo
 
-                  _selectedPhoto = null;
-                  _selectedPhotoMapPoint = null;
-
-                  _mapPointTooltip_PhotoImage.setupPhoto(null);
-                  _mapPointTooltip_PhotoHistogram.setupPhoto(null);
+                  selectPhoto(null, null);
 
                } else {
 
                   // a photo is hovered -> show photo tooltip
 
-                  _selectedPhoto = photo;
-                  _selectedPhotoMapPoint = _hoveredMapPoint;
-
-                  _mapPointTooltip_PhotoImage.setupPhoto(_hoveredMapPoint);
-                  _mapPointTooltip_PhotoHistogram.setupPhoto(_hoveredMapPoint);
+                  selectPhoto(photo, _hoveredMapPoint);
                }
 
-               paint();
 
                isCanPanMap = true;
             }
@@ -4986,13 +4977,7 @@ public class Map2 extends Canvas {
             // select photo only when it is not yet selected
             if (_selectedPhoto != photo) {
 
-               _selectedPhoto = photo;
-               _selectedPhotoMapPoint = _hoveredMapPoint;
-
-               _mapPointTooltip_PhotoImage.setupPhoto(_hoveredMapPoint);
-               _mapPointTooltip_PhotoHistogram.setupPhoto(_hoveredMapPoint);
-
-               paint();
+               selectPhoto(photo, _hoveredMapPoint);
             }
          }
       }
@@ -10538,6 +10523,24 @@ public class Map2 extends Canvas {
       photos.add(photo);
 
       photoServiceProvider.saveStarRating(photos);
+   }
+
+   /**
+    * Select or deselect a hovered photo
+    *
+    * @param photo
+    * @param hoveredMapPoint
+    */
+   public void selectPhoto(final Photo photo, final PaintedMapPoint hoveredMapPoint) {
+
+      _selectedPhoto = photo;
+      _selectedPhotoMapPoint = hoveredMapPoint;
+
+      _mapPointTooltip_PhotoImage.setupPhoto(hoveredMapPoint);
+      _mapPointTooltip_PhotoHistogram.setupPhoto(hoveredMapPoint);
+
+      // a photo selections border is painted with the photos in the background
+      paint();
    }
 
    public void setCenterMapBy(final CenterMapBy centerMapBy) {
