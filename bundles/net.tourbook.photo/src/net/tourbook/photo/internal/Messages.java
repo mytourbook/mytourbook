@@ -183,17 +183,11 @@ public class Messages extends NLS {
    public static String        PrefPage_Photo_Viewer_Label_HQImageSize_Tooltip;
    public static String        PrefPage_Photo_Viewer_Label_HQThumbnailSize;
    public static String        PrefPage_Photo_Viewer_Label_HQThumbnailSize_Tooltip;
-   public static String        PrefPage_Photo_Viewer_Label_ImageFramework;
-   public static String        PrefPage_Photo_Viewer_Label_ImageFramework_Tooltip;
    public static String        PrefPage_Photo_Viewer_Label_MinSizeBorder;
    public static String        PrefPage_Photo_Viewer_Label_MinSizeBorder_Tooltip;
    public static String        PrefPage_Photo_Viewer_Label_MinSizeText;
    public static String        PrefPage_Photo_Viewer_Label_MinSizeText_Tooltip;
    public static String        PrefPage_Photo_Viewer_Label_SelectionForegroundColor;
-   public static String        PrefPage_Photo_Viewer_Radio_ImageFramework_AWT;
-   public static String        PrefPage_Photo_Viewer_Radio_ImageFramework_AWT_Tooltip;
-   public static String        PrefPage_Photo_Viewer_Radio_ImageFramework_SWT;
-   public static String        PrefPage_Photo_Viewer_Radio_ImageFramework_SWT_Tooltip;
 
    public static String        PrefPage_Theme_Dark_Label_SelectionBackgroundColor;
 
