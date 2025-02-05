@@ -1671,6 +1671,8 @@ public class Messages extends NLS {
 
    public static String        Pref_General_Button_ComputeCalendarWeek;
    public static String        Pref_General_CalendarWeek;
+   public static String        Pref_General_Checkbox_AutoCompletePrefix;
+   public static String        Pref_General_Checkbox_AutoCompletePrefix_Info;
    public static String        Pref_General_Checkbox_SetTimeZone;
    public static String        Pref_General_Dialog_CalendarWeekIsModified_Message;
    public static String        Pref_General_Dialog_CalendarWeekIsModified_Title;
@@ -1684,6 +1686,7 @@ public class Messages extends NLS {
    public static String        Pref_General_Label_MinimalDaysInFirstWeek;
    public static String        Pref_General_Label_MinimalDaysInFirstWeek_Tooltip;
    public static String        Pref_General_Label_SetAnotherTimeZone;
+   public static String        Pref_General_Miscellaneous;
    public static String        Pref_General_Notes;
    public static String        Pref_General_Notes_Tooltip;
    public static String        pref_general_restart_app_message;
