@@ -376,9 +376,8 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
           * Enlarge small images
           */
          _chkEnlargeSmallImages = new Button(parent, SWT.CHECK);
-         _chkEnlargeSmallImages.setText("&Enlarge small photos");
-         _chkEnlargeSmallImages.setToolTipText(
-               "When selected and the photo is smaller than the requested \"Image size\",\nthen it will be enlarged to the requested \"Image size\"");
+         _chkEnlargeSmallImages.setText(Messages.Slideout_Map_PhotoOptions_Checkbox_EnlargeSmallImages);
+         _chkEnlargeSmallImages.setToolTipText(Messages.Slideout_Map_PhotoOptions_Checkbox_EnlargeSmallImages_Tooltip);
          _chkEnlargeSmallImages.addSelectionListener(_defaultSelectedListener);
       }
       {
@@ -396,8 +395,8 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
              * Show photos adjustments, e.g. cropping
              */
             _chkShowPhotoAdjustments = new Button(parent, SWT.CHECK);
-            _chkShowPhotoAdjustments.setText("Show photo adjustment");
-            _chkShowPhotoAdjustments.setToolTipText("e.g. cropping");
+            _chkShowPhotoAdjustments.setText(Messages.Slideout_Map_PhotoOptions_Checkbox_ShowPhotoAdjustments);
+            _chkShowPhotoAdjustments.setToolTipText(Messages.Slideout_Map_PhotoOptions_Checkbox_ShowPhotoAdjustments_Tooltip);
             _chkShowPhotoAdjustments.addSelectionListener(_defaultSelectedListener);
             GridDataFactory.fillDefaults()
                   .indent(16, 0)

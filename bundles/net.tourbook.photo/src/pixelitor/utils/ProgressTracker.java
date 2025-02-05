@@ -43,7 +43,7 @@ public interface ProgressTracker {
     static ProgressTracker createSafeTracker(final int numWorkUnits) {
 
         if (numWorkUnits > 0) {
-           return new StatusBarProgressTracker("AddNoise.NAME", numWorkUnits);
+           return new StatusBarProgressTracker("AddNoise.NAME", numWorkUnits); //$NON-NLS-1$
         }
 
         return NULL_TRACKER;

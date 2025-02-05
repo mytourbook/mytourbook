@@ -2394,10 +2394,14 @@ public class Messages extends NLS {
    public static String        Slideout_Map_PhotoOptions_Action_DeselectPhoto;
    public static String        Slideout_Map_PhotoOptions_Action_DeselectPhoto_Tooltip;
    public static String        Slideout_Map_PhotoOptions_Checkbox_AutoSelect;
+   public static String        Slideout_Map_PhotoOptions_Checkbox_EnlargeSmallImages;
+   public static String        Slideout_Map_PhotoOptions_Checkbox_EnlargeSmallImages_Tooltip;
    public static String        Slideout_Map_PhotoOptions_Checkbox_PreloadPhotoImages;
    public static String        Slideout_Map_PhotoOptions_Checkbox_PreloadPhotoImages_Tooltip;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowHqPhotoImages;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowHqPhotoImages_Tooltip;
+   public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoAdjustments;
+   public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoAdjustments_Tooltip;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoAnnotations;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoHistogram;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoRating;
@@ -2415,8 +2419,12 @@ public class Messages extends NLS {
    public static String        Slideout_Map_TrackOptions_Label_Title;
    public static String        Slideout_Map_TrackOptions_Label_Title_Tooltip;
 
+   public static String        Slideout_MapPoint_PhotoToolTip_Checkbox_CropPhoto;
    public static String        Slideout_MapPoint_PhotoToolTip_Combo_TooltipSize_Tooltip;
+   public static String        Slideout_MapPoint_PhotoToolTip_Label_AdjustmentIsDisabled;
+   public static String        Slideout_MapPoint_PhotoToolTip_Label_AdjustmentIsDisabled_Tooltip;
    public static String        Slideout_MapPoint_PhotoToolTip_Label_LoadingMessage;
+   public static String        Slideout_MapPoint_PhotoToolTip_Label_PhotoIsNotSelected;
    public static String        Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip2;
    public static String        Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip2_Tooltip;
 
@@ -2486,9 +2494,11 @@ public class Messages extends NLS {
    public static String        Slideout_MapPoints_Tab_TourPauses_Tooltip;
    public static String        Slideout_MapPoints_Tab_TourWayPoints_Tooltip;
 
+   public static String        Slideout_MapModel_Button_Import;
    public static String        Slideout_MapModel_Column_Name;
    public static String        Slideout_MapModel_Dialog_DeleteModel_Message;
    public static String        Slideout_MapModel_Dialog_DeleteModel_Title;
+   public static String        Slideout_MapModel_ImportDialog_Title;
    public static String        Slideout_MapModel_Label_Title;
 
    public static String        Slideout_RefTour_Checkbox_Altimeter_Avg;
@@ -2800,6 +2810,8 @@ public class Messages extends NLS {
    public static String        Slideout_TourTagFilter_Radio_TagOperator_OR_Tooltip;
 
    public static String        Slideout_TrainingOptions_Label_Title;
+
+   public static String        Slideout_PhotoHistogram_Checkbox_AdjustTonality;
 
    public static String        SRTM_Download_Dialog_SRTMDownloadValidation_Title;
    public static String        SRTM_Download_Info_NoDownloadValidation;

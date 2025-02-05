@@ -88,7 +88,7 @@ public class ImageUtils {
 
    public static BufferedImage applyTransform(final BufferedImage src, final AffineTransform at, final int targetWidth, final int targetHeight) {
 
-      assert targetWidth > 0 && targetHeight > 0 : "target = " + targetWidth + "x" + targetHeight;
+      assert targetWidth > 0 && targetHeight > 0 : "target = " + targetWidth + "x" + targetHeight; //$NON-NLS-1$ //$NON-NLS-2$
       final BufferedImage newImage = new BufferedImage(targetWidth, targetHeight, TYPE_INT_ARGB);
       final Graphics2D g = newImage.createGraphics();
       g.setTransform(at);
@@ -258,10 +258,10 @@ public class ImageUtils {
             bounds);
 
       if (intersection.width <= 0 || intersection.height <= 0) {
-         throw new IllegalStateException("empty intersection: bounds = " + bounds
-               + ", src width = " + src.getWidth()
-               + ", src height = " + src.getHeight()
-               + ", intersection = " + intersection);
+         throw new IllegalStateException("empty intersection: bounds = " + bounds //$NON-NLS-1$
+               + ", src width = " + src.getWidth() //$NON-NLS-1$
+               + ", src height = " + src.getHeight() //$NON-NLS-1$
+               + ", intersection = " + intersection); //$NON-NLS-1$
       }
 
       final Raster copyRaster = src.getData(intersection); // a copy
@@ -341,7 +341,7 @@ public class ImageUtils {
 
    public static BufferedImage createRandomPointsTemplateBrush(final int diameter, final float density) {
       if (density < 0.0 && density > 1.0) {
-         throw new IllegalArgumentException("density is " + density);
+         throw new IllegalArgumentException("density is " + density); //$NON-NLS-1$
       }
 
       final BufferedImage brushImage = new BufferedImage(diameter, diameter, TYPE_INT_ARGB);
@@ -429,10 +429,10 @@ public class ImageUtils {
       assert input != null;
 
       if (width <= 0) {
-         throw new IllegalArgumentException("width = " + width);
+         throw new IllegalArgumentException("width = " + width); //$NON-NLS-1$
       }
       if (height <= 0) {
-         throw new IllegalArgumentException("height = " + height);
+         throw new IllegalArgumentException("height = " + height); //$NON-NLS-1$
       }
 
       final BufferedImage output = createImageWithSameCM(input, width, height);
@@ -510,10 +510,10 @@ public class ImageUtils {
    public static URL findImageURL(final String fileName) {
       assert fileName != null;
 
-      final String path = "/images/" + fileName;
+      final String path = "/images/" + fileName; //$NON-NLS-1$
       final URL imgURL = ImageUtils.class.getResource(path);
       if (imgURL == null) {
-         Messages.showError("Error", path + " not found");
+         Messages.showError("Error", path + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
       }
 
       return imgURL;
@@ -745,7 +745,7 @@ public class ImageUtils {
          // a correct int array could still be retrieved with
          // src.getRGB(0, 0, width, height, null, 0, width);
          // but modifying that array wouldn't have any effect on the image.
-         throw new UnsupportedOperationException("type is " + Debug.bufferedImageTypeToString(src.getType()));
+         throw new UnsupportedOperationException("type is " + Debug.bufferedImageTypeToString(src.getType())); //$NON-NLS-1$
       }
 
       return pixels;
@@ -886,7 +886,7 @@ public class ImageUtils {
                                       final int maxX,
                                       final int maxY) {
       if (brickHeight < 1) {
-         throw new IllegalArgumentException("brickHeight = " + brickHeight);
+         throw new IllegalArgumentException("brickHeight = " + brickHeight); //$NON-NLS-1$
       }
 
       g.setColor(color);
@@ -918,16 +918,16 @@ public class ImageUtils {
                                  final int verLineThickness,
                                  final int verSpacing) {
       if (horLineThickness < 0) {
-         throw new IllegalArgumentException("horLineThickness = " + horLineThickness);
+         throw new IllegalArgumentException("horLineThickness = " + horLineThickness); //$NON-NLS-1$
       }
       if (verLineThickness < 0) {
-         throw new IllegalArgumentException("verLineThickness = " + verLineThickness);
+         throw new IllegalArgumentException("verLineThickness = " + verLineThickness); //$NON-NLS-1$
       }
       if (horSpacing <= 0) {
-         throw new IllegalArgumentException("horSpacing = " + horSpacing);
+         throw new IllegalArgumentException("horSpacing = " + horSpacing); //$NON-NLS-1$
       }
       if (verSpacing <= 0) {
-         throw new IllegalArgumentException("verSpacing = " + verSpacing);
+         throw new IllegalArgumentException("verSpacing = " + verSpacing); //$NON-NLS-1$
       }
 
       g.setColor(color);

@@ -450,7 +450,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
                 * Crop photo
                 */
                _chkCropPhoto = new Button(_pageBookAdjustment, SWT.CHECK);
-               _chkCropPhoto.setText("&Crop photo image");
+               _chkCropPhoto.setText(Messages.Slideout_MapPoint_PhotoToolTip_Checkbox_CropPhoto);
                _chkCropPhoto.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onPhoto_Crop()));
 
             }
@@ -459,8 +459,8 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
                 * Warning
                 */
                _labelWarning = new Label(_pageBookAdjustment, SWT.WRAP);
-               _labelWarning.setText("Photo adjustment is disabled");
-               _labelWarning.setToolTipText("The photo adjustment is disabled in the map");
+               _labelWarning.setText(Messages.Slideout_MapPoint_PhotoToolTip_Label_AdjustmentIsDisabled);
+               _labelWarning.setToolTipText(Messages.Slideout_MapPoint_PhotoToolTip_Label_AdjustmentIsDisabled_Tooltip);
             }
          }
          {
@@ -2299,7 +2299,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
       if (_hoveredMapPoint == null) {
 
-         _labelMessage.setText("A photo is not selected");
+         _labelMessage.setText(Messages.Slideout_MapPoint_PhotoToolTip_Label_PhotoIsNotSelected);
 
       } else {
 

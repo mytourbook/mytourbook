@@ -199,7 +199,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
                 * Adjust curves
                 */
                _chkAdjustTonality = new Button(_pageBookAdjustment, SWT.CHECK);
-               _chkAdjustTonality.setText("&Adjust tonality");
+               _chkAdjustTonality.setText(Messages.Slideout_PhotoHistogram_Checkbox_AdjustTonality);
                _chkAdjustTonality.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onAdjustTonality()));
                GridDataFactory.fillDefaults()
                      .align(SWT.FILL, SWT.BEGINNING)
@@ -211,8 +211,8 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
                 * Warning
                 */
                _labelWarning = new Label(_pageBookAdjustment, SWT.WRAP);
-               _labelWarning.setText("Photo adjustment is disabled");
-               _labelWarning.setToolTipText("The photo adjustment is disabled in the map");
+               _labelWarning.setText(Messages.Slideout_MapPoint_PhotoToolTip_Label_AdjustmentIsDisabled);
+               _labelWarning.setToolTipText(Messages.Slideout_MapPoint_PhotoToolTip_Label_AdjustmentIsDisabled_Tooltip);
             }
          }
          {

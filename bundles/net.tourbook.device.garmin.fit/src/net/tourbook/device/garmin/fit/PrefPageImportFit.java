@@ -435,7 +435,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
             // radio: Session Message: SportProfileName
             _rdoTourTypeFrom_SessionSportProfileName = new Button(containerTourTypeMode, SWT.RADIO);
-            _rdoTourTypeFrom_SessionSportProfileName.setText("Sport profile name from the s&ession");
+            _rdoTourTypeFrom_SessionSportProfileName.setText(Messages.PrefPage_Fit_Radio_ProfileNameFromSession);
             _rdoTourTypeFrom_SessionSportProfileName.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFrom_SessionSportProfileName);
          }

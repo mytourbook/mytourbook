@@ -34,7 +34,7 @@ public class Messages {
    }
 
    public static void clearStatusBar() {
-      showPlainStatusMessage("");
+      showPlainStatusMessage(""); //$NON-NLS-1$
    }
 
    // Must be set before any other methods are used.
@@ -44,7 +44,7 @@ public class Messages {
 
    public static void showBulkSaveMessage(final int numFiles, final File dir) {
       assert dir.isDirectory();
-      showStatusMessage(numFiles + " files saved to <b>" + dir.getAbsolutePath() + "</b>");
+      showStatusMessage(numFiles + " files saved to <b>" + dir.getAbsolutePath() + "</b>"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    public static void showError(final String title, final String message) {
@@ -71,7 +71,7 @@ public class Messages {
    }
 
    public static void showFileSavedMessage(final File file) {
-      showStatusMessage("<b>" + file.getAbsolutePath() + "</b> was saved.");
+      showStatusMessage("<b>" + file.getAbsolutePath() + "</b> was saved."); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    public static void showInfo(final String title, final String message) {
@@ -86,10 +86,10 @@ public class Messages {
    public static void showPerformanceMessage(final String filterName, final long timeMillis) {
       String msg;
       if (timeMillis < 1000) {
-         msg = filterName + " took " + timeMillis + " ms";
+         msg = filterName + " took " + timeMillis + " ms"; //$NON-NLS-1$ //$NON-NLS-2$
       } else {
          final float seconds = timeMillis / 1000.0f;
-         msg = format("%s took %.1f s", filterName, seconds);
+         msg = format("%s took %.1f s", filterName, seconds); //$NON-NLS-1$
       }
       showPlainStatusMessage(msg);
    }
@@ -98,21 +98,21 @@ public class Messages {
     * Shows a non-HTML text message in the status bar.
     */
    public static void showPlainStatusMessage(final String msg) {
-      assert !msg.startsWith("<html>");
+      assert !msg.startsWith("<html>"); //$NON-NLS-1$
       msgHandler.showInStatusBar(msg);
    }
 
    public static boolean showReloadFileQuestion(final File file) {
-      final String title = "Reload " + file.getName() + "?";
-      final String msg = "<html>The file <b>" + file.getAbsolutePath()
-            + "</b><br> has been modified by another program." +
-            "<br><br>Do you want to reload it?";
+      final String title = "Reload " + file.getName() + "?"; //$NON-NLS-1$ //$NON-NLS-2$
+      final String msg = "<html>The file <b>" + file.getAbsolutePath() //$NON-NLS-1$
+            + "</b><br> has been modified by another program." + //$NON-NLS-1$
+            "<br><br>Do you want to reload it?"; //$NON-NLS-1$
       return showYesNoQuestion(title, msg);
    }
 
    public static void showSmartObjectUnsupportedWarning(final String what) {
-      msgHandler.showInfo("Feature Not Supported",
-            what + " isn't yet supported if one of the layers is a smart object.",
+      msgHandler.showInfo("Feature Not Supported", //$NON-NLS-1$
+            what + " isn't yet supported if one of the layers is a smart object.", //$NON-NLS-1$
             null);
    }
 
@@ -120,8 +120,8 @@ public class Messages {
     * Shows an HTML text message in the status bar.
     */
    public static void showStatusMessage(final String msg) {
-      assert !msg.startsWith("<html>");
-      msgHandler.showInStatusBar("<html>" + msg);
+      assert !msg.startsWith("<html>"); //$NON-NLS-1$
+      msgHandler.showInStatusBar("<html>" + msg); //$NON-NLS-1$
    }
 
    public static void showWarning(final String title, final String message) {

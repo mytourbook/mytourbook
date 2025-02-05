@@ -279,7 +279,7 @@ public class DialogCompressDatabase extends Dialog {
 
             UI.EMPTY_STRING,
 
-            "Records",
+            "Records", //$NON-NLS-1$
 
             Messages.App_Db_Compress_LogLabel_Used,
             Messages.App_Db_Compress_LogLabel_NotUsed,
@@ -622,7 +622,7 @@ public class DialogCompressDatabase extends Dialog {
 
                      if (isTable) {
 
-                        try (final PreparedStatement stmtNumRows = conn.prepareStatement("SELECT COUNT(*) FROM " + name);) {
+                        try (final PreparedStatement stmtNumRows = conn.prepareStatement("SELECT COUNT(*) FROM " + name);) { //$NON-NLS-1$
 
                            final ResultSet resultNumRows = stmtNumRows.executeQuery();
 

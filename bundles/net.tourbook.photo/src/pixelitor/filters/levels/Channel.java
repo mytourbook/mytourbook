@@ -28,7 +28,7 @@ import pixelitor.filters.lookup.LuminanceLookup;
  */
 public enum Channel {
 
-   RGB("RGB", "rgb", BLACK) {
+   RGB("RGB", "rgb", BLACK) { //$NON-NLS-1$ //$NON-NLS-2$
 
       @Override
       public Color getDarkColor() {
@@ -55,7 +55,7 @@ public enum Channel {
       }
    },
 
-   RED(("red"), "red", Color.RED) {
+   RED(("red"), "red", Color.RED) { //$NON-NLS-1$ //$NON-NLS-2$
 
       @Override
       public Color getDarkColor() {
@@ -73,7 +73,7 @@ public enum Channel {
       }
    },
 
-   GREEN(("green"), "green", Color.GREEN) {
+   GREEN(("green"), "green", Color.GREEN) { //$NON-NLS-1$ //$NON-NLS-2$
 
       @Override
       public Color getDarkColor() {
@@ -91,7 +91,7 @@ public enum Channel {
       }
    },
 
-   BLUE(("blue"), "blue", Color.BLUE) {
+   BLUE(("blue"), "blue", Color.BLUE) { //$NON-NLS-1$ //$NON-NLS-2$
 
       @Override
       public Color getDarkColor() {

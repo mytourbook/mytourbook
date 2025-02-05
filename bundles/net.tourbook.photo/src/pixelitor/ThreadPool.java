@@ -49,7 +49,7 @@ public class ThreadPool {
                                                            @Override
                                                            public Thread newThread(final Runnable r) {
 
-                                                              final Thread thread = new Thread(r, "ImageProcessor-" + threadCount.getAndIncrement());
+                                                              final Thread thread = new Thread(r, "ImageProcessor-" + threadCount.getAndIncrement()); //$NON-NLS-1$
                                                               thread.setDaemon(true);
 
                                                               return thread;
@@ -57,7 +57,7 @@ public class ThreadPool {
                                                         });
 
    private ThreadPool() {
-      throw new AssertionError("utility class");
+      throw new AssertionError("utility class"); //$NON-NLS-1$
    }
 
    public static Executor getExecutor() {

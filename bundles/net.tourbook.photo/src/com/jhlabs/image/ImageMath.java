@@ -275,7 +275,7 @@ public class ImageMath {
       float c0, c1, c2, c3;
 
       if (numSpans < 1) {
-         throw new IllegalArgumentException("Too few knots in spline");
+         throw new IllegalArgumentException("Too few knots in spline"); //$NON-NLS-1$
       }
 
       x = clamp01(x) * numSpans;
@@ -331,7 +331,7 @@ public class ImageMath {
       float c0, c1, c2, c3;
 
       if (numSpans < 1) {
-         throw new IllegalArgumentException("Too few knots in spline");
+         throw new IllegalArgumentException("Too few knots in spline"); //$NON-NLS-1$
       }
 
       for (span = 0; span < numSpans; span++) {
@@ -838,7 +838,7 @@ public class ImageMath {
       float c0, c1, c2, c3;
 
       if (numSpans < 1) {
-         throw new IllegalArgumentException("Too few knots in spline");
+         throw new IllegalArgumentException("Too few knots in spline"); //$NON-NLS-1$
       }
 
       x = clamp01(x) * numSpans;
@@ -882,7 +882,7 @@ public class ImageMath {
       float c0, c1, c2, c3;
 
       if (numSpans < 1) {
-         throw new IllegalArgumentException("Too few knots in spline");
+         throw new IllegalArgumentException("Too few knots in spline"); //$NON-NLS-1$
       }
 
       for (span = 0; span < numSpans; span++) {
@@ -932,7 +932,7 @@ public class ImageMath {
       float c0, c1, c2, c3;
 
       if (numSpans < 1) {
-         throw new IllegalArgumentException("Too few knots in spline");
+         throw new IllegalArgumentException("Too few knots in spline"); //$NON-NLS-1$
       }
 
       x = clamp01(x) * numSpans;

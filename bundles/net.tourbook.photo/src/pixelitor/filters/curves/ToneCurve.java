@@ -322,7 +322,7 @@ public class ToneCurve {
     */
    public void setStateFrom(final String savedValue) {
 
-      final String[] xyPairs = savedValue.split("#");
+      final String[] xyPairs = savedValue.split("#"); //$NON-NLS-1$
       final int numPoints = xyPairs.length;
       curveValues.allValuesX = new float[numPoints];
       curveValues.allValuesY = new float[numPoints];
@@ -346,10 +346,10 @@ public class ToneCurve {
       final StringBuilder sb = new StringBuilder();
       for (int i = 0; i < numPoints; i++) {
          sb.append(curveValues.allValuesX[i]);
-         sb.append(",");
+         sb.append(","); //$NON-NLS-1$
          sb.append(curveValues.allValuesY[i]);
          if (i != numPoints - 1) {
-            sb.append("#");
+            sb.append("#"); //$NON-NLS-1$
          }
       }
       return sb.toString();

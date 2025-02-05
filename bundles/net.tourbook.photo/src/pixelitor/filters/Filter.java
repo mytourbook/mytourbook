@@ -72,7 +72,7 @@ public abstract class Filter /* implements Serializable, PresetOwner, Debuggable
     * Returns a string representation of the filter's current parameters.
     */
    public String paramsAsString() {
-      return "";
+      return ""; //$NON-NLS-1$
    }
 
    public void setName(final String name) {
@@ -114,7 +114,7 @@ public abstract class Filter /* implements Serializable, PresetOwner, Debuggable
 
       dest = transform(src, dest);
 
-      assert dest.getType() != BufferedImage.TYPE_CUSTOM : "filter = " + getName();
+      assert dest.getType() != BufferedImage.TYPE_CUSTOM : "filter = " + getName(); //$NON-NLS-1$
 
       if (grayConversion) { // convert the result back
          dest = ImageUtils.convertToGrayscaleImage(dest);
@@ -122,7 +122,7 @@ public abstract class Filter /* implements Serializable, PresetOwner, Debuggable
 
       executionCount++;
 
-      assert dest != null : getName() + " returned null image";
+      assert dest != null : getName() + " returned null image"; //$NON-NLS-1$
 
       return dest;
    }

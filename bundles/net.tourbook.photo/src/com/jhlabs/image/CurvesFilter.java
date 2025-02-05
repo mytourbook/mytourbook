@@ -72,6 +72,6 @@ public class CurvesFilter extends TransferFilter {
 
    @Override
    public String toString() {
-      return "Colors/Curves...";
+      return "Colors/Curves..."; //$NON-NLS-1$
    }
 }

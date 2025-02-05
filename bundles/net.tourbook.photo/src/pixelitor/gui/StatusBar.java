@@ -36,7 +36,7 @@ import pixelitor.utils.ProgressHandler;
  */
 public class StatusBar extends JPanel {
 
-    private static final String INITIAL_MESSAGE = "Pixelitor started";
+    private static final String INITIAL_MESSAGE = "Pixelitor started"; //$NON-NLS-1$
     private static final StatusBar INSTANCE = new StatusBar();
 
     private static int activeProgressBarCount = 0;
@@ -68,7 +68,7 @@ public class StatusBar extends JPanel {
                 progressBar = new JProgressBar(0, 100);
                 progressBar.setIndeterminate(true);
             }
-            msgLabel = new JLabel(msg + ":");
+            msgLabel = new JLabel(msg + ":"); //$NON-NLS-1$
 
             container.add(msgLabel);
             container.add(progressBar);
@@ -136,7 +136,7 @@ public class StatusBar extends JPanel {
         assert msg != null;
 
         // each progress handler will add its own label
-        messageLabel.setText("");
+        messageLabel.setText(""); //$NON-NLS-1$
 
         activeProgressBarCount++;
         return new StatusBarProgressHandler(progressContainer, msg, max);

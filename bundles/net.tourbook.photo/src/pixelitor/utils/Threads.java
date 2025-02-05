@@ -52,10 +52,10 @@ public class Threads {
 
       final Thread thread = Thread.currentThread();
 
-      System.out.printf("Threads::dumpStack: called on ('%s', %d)%n",
+      System.out.printf("Threads::dumpStack: called on ('%s', %d)%n", //$NON-NLS-1$
 
             thread.getName(),
-            "thread ID"
+            "thread ID" //$NON-NLS-1$
 //          thread.threadId()
 
             );
@@ -64,7 +64,7 @@ public class Threads {
    }
 
    public static String threadInfo() {
-      return "Called on " + threadName();
+      return "Called on " + threadName(); //$NON-NLS-1$
    }
 
    public static String threadName() {

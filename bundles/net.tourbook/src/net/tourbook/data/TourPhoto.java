@@ -497,7 +497,7 @@ public class TourPhoto implements Serializable {
 
             photoAdjustmentsJSON = null;
 
-            StatusUtil.logError("Cannot save photoAdjustmentsJSON because it is > %d".formatted(TourDatabase.VARCHAR_MAX_LENGTH));
+            StatusUtil.logError("Cannot save photoAdjustmentsJSON because it is > %d".formatted(TourDatabase.VARCHAR_MAX_LENGTH)); //$NON-NLS-1$
          }
 
       } catch (final JsonProcessingException e) {

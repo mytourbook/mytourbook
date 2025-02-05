@@ -54,7 +54,7 @@ public class ToneCurvesFilter extends Filter /* extends FilterWithGUI */ {
 
       if (_curvesFilter == null) {
 
-         _curvesFilter = new CurvesFilter("filtername");
+         _curvesFilter = new CurvesFilter("filtername"); //$NON-NLS-1$
       }
 
       if (_toneCurves == null) {
