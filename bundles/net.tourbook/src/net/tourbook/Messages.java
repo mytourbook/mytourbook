@@ -2419,15 +2419,6 @@ public class Messages extends NLS {
    public static String        Slideout_Map_TrackOptions_Label_Title;
    public static String        Slideout_Map_TrackOptions_Label_Title_Tooltip;
 
-   public static String        Slideout_MapPoint_PhotoToolTip_Checkbox_CropPhoto;
-   public static String        Slideout_MapPoint_PhotoToolTip_Combo_TooltipSize_Tooltip;
-   public static String        Slideout_MapPoint_PhotoToolTip_Label_AdjustmentIsDisabled;
-   public static String        Slideout_MapPoint_PhotoToolTip_Label_AdjustmentIsDisabled_Tooltip;
-   public static String        Slideout_MapPoint_PhotoToolTip_Label_LoadingMessage;
-   public static String        Slideout_MapPoint_PhotoToolTip_Label_PhotoIsNotSelected;
-   public static String        Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip2;
-   public static String        Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip2_Tooltip;
-
    public static String        Slideout_MapPoints_Action_CommonLocations_Tooltip;
    public static String        Slideout_MapPoints_Action_TourLocations_Tooltip;
    public static String        Slideout_MapPoints_Action_TourMarkers_Tooltip;
@@ -2500,6 +2491,15 @@ public class Messages extends NLS {
    public static String        Slideout_MapModel_Dialog_DeleteModel_Title;
    public static String        Slideout_MapModel_ImportDialog_Title;
    public static String        Slideout_MapModel_Label_Title;
+
+   public static String        Slideout_PhotoImage_Checkbox_CropPhoto;
+   public static String        Slideout_PhotoImage_Combo_TooltipSize_Tooltip;
+   public static String        Slideout_PhotoImage_Label_AdjustmentIsDisabled;
+   public static String        Slideout_PhotoImage_Label_AdjustmentIsDisabled_Tooltip;
+   public static String        Slideout_PhotoImage_Label_LoadingMessage;
+   public static String        Slideout_PhotoImage_Label_PhotoIsNotSelected;
+   public static String        Slideout_PhotoImage_Link_ResizeTooltip2;
+   public static String        Slideout_PhotoImage_Link_ResizeTooltip2_Tooltip;
 
    public static String        Slideout_RefTour_Checkbox_Altimeter_Avg;
    public static String        Slideout_RefTour_Checkbox_Pace_Avg;

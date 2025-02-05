@@ -362,7 +362,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
              */
             _comboTooltipSize = new Combo(_containerHeader_1, SWT.READ_ONLY | SWT.BORDER);
             _comboTooltipSize.setVisibleItemCount(10);
-            _comboTooltipSize.setToolTipText(Messages.Slideout_MapPoint_PhotoToolTip_Combo_TooltipSize_Tooltip);
+            _comboTooltipSize.setToolTipText(Messages.Slideout_PhotoImage_Combo_TooltipSize_Tooltip);
             _comboTooltipSize.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_TooltipSize(selectionEvent)));
             _comboTooltipSize.addFocusListener(_keepOpenListener);
 
@@ -450,7 +450,7 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
                 * Crop photo
                 */
                _chkCropPhoto = new Button(_pageBookAdjustment, SWT.CHECK);
-               _chkCropPhoto.setText(Messages.Slideout_MapPoint_PhotoToolTip_Checkbox_CropPhoto);
+               _chkCropPhoto.setText(Messages.Slideout_PhotoImage_Checkbox_CropPhoto);
                _chkCropPhoto.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onPhoto_Crop()));
 
             }
@@ -459,14 +459,14 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
                 * Warning
                 */
                _labelWarning = new Label(_pageBookAdjustment, SWT.WRAP);
-               _labelWarning.setText(Messages.Slideout_MapPoint_PhotoToolTip_Label_AdjustmentIsDisabled);
-               _labelWarning.setToolTipText(Messages.Slideout_MapPoint_PhotoToolTip_Label_AdjustmentIsDisabled_Tooltip);
+               _labelWarning.setText(Messages.Slideout_PhotoImage_Label_AdjustmentIsDisabled);
+               _labelWarning.setToolTipText(Messages.Slideout_PhotoImage_Label_AdjustmentIsDisabled_Tooltip);
             }
          }
          {
             final Link link = new Link(_containerPhotoOptions, SWT.NONE);
-            link.setText(UI.createLinkText(Messages.Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip2));
-            link.setToolTipText(Messages.Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip2_Tooltip);
+            link.setText(UI.createLinkText(Messages.Slideout_PhotoImage_Link_ResizeTooltip2));
+            link.setToolTipText(Messages.Slideout_PhotoImage_Link_ResizeTooltip2_Tooltip);
             link.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onSelect_TooltipResize()));
             GridDataFactory.fillDefaults()
 //                  .grab(true, false)
@@ -2299,12 +2299,12 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
       if (_hoveredMapPoint == null) {
 
-         _labelMessage.setText(Messages.Slideout_MapPoint_PhotoToolTip_Label_PhotoIsNotSelected);
+         _labelMessage.setText(Messages.Slideout_PhotoImage_Label_PhotoIsNotSelected);
 
       } else {
 
          final Photo photo = _hoveredMapPoint.mapPoint.photo;
-         final String photoText = Messages.Slideout_MapPoint_PhotoToolTip_Label_LoadingMessage + UI.SPACE + photo.imageFilePathName;
+         final String photoText = Messages.Slideout_PhotoImage_Label_LoadingMessage + UI.SPACE + photo.imageFilePathName;
 
          _labelMessage.setText(photoText);
       }

@@ -211,8 +211,8 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
                 * Warning
                 */
                _labelWarning = new Label(_pageBookAdjustment, SWT.WRAP);
-               _labelWarning.setText(Messages.Slideout_MapPoint_PhotoToolTip_Label_AdjustmentIsDisabled);
-               _labelWarning.setToolTipText(Messages.Slideout_MapPoint_PhotoToolTip_Label_AdjustmentIsDisabled_Tooltip);
+               _labelWarning.setText(Messages.Slideout_PhotoImage_Label_AdjustmentIsDisabled);
+               _labelWarning.setToolTipText(Messages.Slideout_PhotoImage_Label_AdjustmentIsDisabled_Tooltip);
             }
          }
          {
@@ -814,7 +814,7 @@ public class SlideoutMap2_PhotoHistogram extends AdvancedSlideout implements
 
          final Photo photo = _hoveredMapPoint.mapPoint.photo;
 
-         final String photoText = Messages.Slideout_MapPoint_PhotoToolTip_Label_LoadingMessage + UI.SPACE + photo.imageFilePathName;
+         final String photoText = Messages.Slideout_PhotoImage_Label_LoadingMessage + UI.SPACE + photo.imageFilePathName;
 
          _labelMessage.setText(photoText);
       }
