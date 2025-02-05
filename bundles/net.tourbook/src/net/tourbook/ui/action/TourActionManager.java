@@ -245,7 +245,7 @@ public class TourActionManager {
 
       final TourAction actionAddRecentTags            = new TourAction(
             ActionAddRecentTags.class.getName(),
-            Messages.Action_Tag_AddRecentTgs,
+            Messages.Action_Tag_AddRecentTags,
             TourActionCategory.TAG);
 
       final TourAction actionAddTagGroups             = new TourAction(
