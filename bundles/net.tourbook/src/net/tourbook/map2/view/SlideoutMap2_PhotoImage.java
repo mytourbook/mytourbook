@@ -815,6 +815,10 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
    public void onDiscardImages() {
 
+      if (_containerPhotoOptions == null) {
+         return;
+      }
+
       _hoveredMapPoint = null;
 
       _containerPhotoOptions.getDisplay().asyncExec(() -> {
