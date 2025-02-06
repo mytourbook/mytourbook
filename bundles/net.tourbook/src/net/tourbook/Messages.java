@@ -2408,7 +2408,6 @@ public class Messages extends NLS {
    public static String        Slideout_Map_PhotoOptions_Label_Title;
    public static String        Slideout_Map_PhotoOptions_Link_DiscardCachedImages;
    public static String        Slideout_Map_PhotoOptions_Link_DiscardCachedImages_Tooltip;
-   public static String        Slideout_Map_PhotoOptions_Title;
    public static String        Slideout_Map_SyncMap_Label_Title;
    public static String        Slideout_Map_TourColors_Checkbox_ShowInChartToolbar_Tooltip;
    public static String        Slideout_Map_TourColors_Label_Title;
