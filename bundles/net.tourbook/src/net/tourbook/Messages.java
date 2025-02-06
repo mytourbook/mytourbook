@@ -2391,9 +2391,6 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Tab_Selection;
    public static String        Slideout_Map_Options_Tab_Slider;
 
-   public static String        Slideout_Map_PhotoOptions_Action_DeselectPhoto;
-   public static String        Slideout_Map_PhotoOptions_Action_DeselectPhoto_Tooltip;
-   public static String        Slideout_Map_PhotoOptions_Checkbox_AutoSelect;
    public static String        Slideout_Map_PhotoOptions_Checkbox_EnlargeSmallImages;
    public static String        Slideout_Map_PhotoOptions_Checkbox_EnlargeSmallImages_Tooltip;
    public static String        Slideout_Map_PhotoOptions_Checkbox_PreloadPhotoImages;
@@ -2403,7 +2400,6 @@ public class Messages extends NLS {
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoAdjustments;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoAdjustments_Tooltip;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoAnnotations;
-   public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoHistogram;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoRating;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoTooltip;
    public static String        Slideout_Map_PhotoOptions_Label_MemoryState;

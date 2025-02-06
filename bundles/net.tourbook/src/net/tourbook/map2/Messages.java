@@ -66,9 +66,12 @@ public class Messages extends NLS {
    public static String map_action_save_default_position;
    public static String map_action_set_default_position;
 
+   public static String Map_Action_AutoSelectPhoto;
    public static String Map_Action_CenterMapToMapPointPosition;
    public static String Map_Action_CopyLocation;
    public static String Map_Action_CreateTourMarkerFromMap;
+   public static String Map_Action_DeselectPhoto;
+   public static String Map_Action_DeselectPhoto_Tooltip;
    public static String Map_Action_EditTourMarker;
    public static String Map_Action_Export_Map_Clipboard_Copied_Info;
    public static String Map_Action_Export_Map_View;
@@ -88,6 +91,10 @@ public class Messages extends NLS {
    public static String Map_Action_ShowMapPoints_Tooltip;
    public static String Map_Action_ShowOnlyThisTour;
    public static String Map_Action_ShowPhotos_Tooltip;
+   public static String Map_Action_ShowPhotoAnnotations;
+   public static String Map_Action_ShowPhotoHistogram;
+   public static String Map_Action_ShowPhotoImage;
+   public static String Map_Action_ShowPhotoRating;
    public static String Map_Action_ShowTourInfoInMap;
    public static String Map_Action_ShowTourWeatherInMap;
    public static String Map_Action_ShowValuePoint;

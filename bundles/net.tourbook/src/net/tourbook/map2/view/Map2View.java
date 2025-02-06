@@ -743,7 +743,7 @@ public class Map2View extends ViewPart implements
 
       public ActionMapPoint_Photo_AutoSelect() {
 
-         super(OtherMessages.SLIDEOUT_MAP_PHOTO_OPTIONS_CHECKBOX_AUTO_SELECT, Action.AS_CHECK_BOX);
+         super(Messages.Map_Action_AutoSelectPhoto, Action.AS_CHECK_BOX);
       }
 
       @Override
@@ -757,9 +757,9 @@ public class Map2View extends ViewPart implements
 
       public ActionMapPoint_Photo_Deselect() {
 
-         super(OtherMessages.SLIDEOUT_MAP_PHOTO_OPTIONS_ACTION_DESELECT_PHOTO, Action.AS_PUSH_BUTTON);
+         super(Messages.Map_Action_DeselectPhoto, Action.AS_PUSH_BUTTON);
 
-         setToolTipText(OtherMessages.SLIDEOUT_MAP_PHOTO_OPTIONS_ACTION_DESELECT_PHOTO_TOOLTIP);
+         setToolTipText(Messages.Map_Action_DeselectPhoto_Tooltip);
       }
 
       @Override
@@ -789,7 +789,7 @@ public class Map2View extends ViewPart implements
 
       public ActionMapPoint_Photo_ShowAnnotations() {
 
-         super(OtherMessages.SLIDEOUT_MAP_PHOTO_OPTIONS_CHECKBOX_SHOW_PHOTO_ANNOTATIONS, Action.AS_CHECK_BOX);
+         super(Messages.Map_Action_ShowPhotoAnnotations, Action.AS_CHECK_BOX);
       }
 
       @Override
@@ -803,7 +803,7 @@ public class Map2View extends ViewPart implements
 
       public ActionMapPoint_Photo_ShowHistogram() {
 
-         super(OtherMessages.SLIDEOUT_MAP_PHOTO_OPTIONS_CHECKBOX_SHOW_PHOTO_HISTOGRAM, Action.AS_CHECK_BOX);
+         super(Messages.Map_Action_ShowPhotoHistogram, Action.AS_CHECK_BOX);
       }
 
       @Override
@@ -817,7 +817,7 @@ public class Map2View extends ViewPart implements
 
       public ActionMapPoint_Photo_ShowRating() {
 
-         super(OtherMessages.SLIDEOUT_MAP_PHOTO_OPTIONS_CHECKBOX_SHOW_PHOTO_RATING, Action.AS_CHECK_BOX);
+         super(Messages.Map_Action_ShowPhotoRating, Action.AS_CHECK_BOX);
       }
 
       @Override
@@ -832,7 +832,7 @@ public class Map2View extends ViewPart implements
 
       public ActionMapPoint_Photo_ShowTooltip() {
 
-         super(OtherMessages.SLIDEOUT_MAP_PHOTO_OPTIONS_CHECKBOX_SHOW_PHOTO_TOOLTIP, Action.AS_CHECK_BOX);
+         super(Messages.Map_Action_ShowPhotoImage, Action.AS_CHECK_BOX);
       }
 
       @Override
