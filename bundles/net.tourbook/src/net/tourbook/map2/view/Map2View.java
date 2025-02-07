@@ -65,6 +65,7 @@ import net.tourbook.common.tooltip.IPinned_Tooltip_Owner;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.SlideoutLocation;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -124,11 +125,14 @@ import net.tourbook.map2.action.ActionZoomShowEntireMap;
 import net.tourbook.map2.action.ActionZoomShowEntireTour;
 import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.photo.IPhotoEventListener;
+import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoRatingStarOperator;
 import net.tourbook.photo.PhotoSelection;
+import net.tourbook.photo.internal.preferences.PrefPagePhotoExternalApp;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.srtm.IPreferences;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -166,6 +170,7 @@ import net.tourbook.ui.views.referenceTour.TVIRefTour_RefTourItem;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -197,6 +202,7 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
@@ -220,10 +226,12 @@ public class Map2View extends ViewPart implements
 
    public static final String    ID                                                    = "net.tourbook.map2.view.Map2ViewId";                   //$NON-NLS-1$
 
+   private static final String   EXTERNAL_APP_ACTION                                   = "&%d   %s";                                              //$NON-NLS-1$
+
    static final String           STATE_TRACK_OPTIONS_SELECTED_TAB                      = "STATE_TRACK_OPTIONS_SELECTED_TAB";                    //$NON-NLS-1$
 
    private static final String   STATE_IS_SHOW_LEGEND_IN_MAP                           = "STATE_IS_SHOW_LEGEND_IN_MAP";                         //$NON-NLS-1$
-   private static final String   STATE_IS_SHOW_MAP_POINTS                              = "STATE_IS_SHOW_MAP_POINTS";                           //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_MAP_POINTS                              = "STATE_IS_SHOW_MAP_POINTS";                            //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_PHOTO_IN_MAP                            = "STATE_IS_SHOW_PHOTO_IN_MAP";                          //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_IN_MAP                             = "STATE_IS_SHOW_TOUR_IN_MAP";                           //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_SCALE_IN_MAP                            = "STATE_IS_SHOW_SCALE_IN_MAP";                          //$NON-NLS-1$
@@ -232,7 +240,7 @@ public class Map2View extends ViewPart implements
    private static final String   STATE_IS_SHOW_SLIDER_IN_LEGEND                        = "STATE_IS_SHOW_SLIDER_IN_LEGEND";                      //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_START_END_IN_MAP                        = "STATE_IS_SHOW_START_END_IN_MAP";                      //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_TOUR_INFO_IN_MAP                        = "STATE_IS_SHOW_TOUR_INFO_IN_MAP";                      //$NON-NLS-1$
-   private static final String   STATE_IS_SHOW_TOUR_WEATHER_IN_MAP                     = "STATE_IS_SHOW_TOUR_WEATHER_IN_MAP";                //$NON-NLS-1$
+   private static final String   STATE_IS_SHOW_TOUR_WEATHER_IN_MAP                     = "STATE_IS_SHOW_TOUR_WEATHER_IN_MAP";                   //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_VALUE_POINT                             = "STATE_IS_SHOW_VALUE_POINT";                           //$NON-NLS-1$
    private static final boolean  STATE_IS_SHOW_VALUE_POINT_DEFAULT                     = true;
    static final String           STATE_IS_TOGGLE_KEYBOARD_PANNING                      = "STATE_IS_TOGGLE_KEYBOARD_PANNING";                    //$NON-NLS-1$
@@ -356,6 +364,7 @@ public class Map2View extends ViewPart implements
    //
    private static final IPreferenceStore _prefStore             = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common      = CommonActivator.getPrefStore();
+   private static final IPreferenceStore _prefStore_Photo       = PhotoActivator.getPrefStore();
    private static final IDialogSettings  _state                 = TourbookPlugin.getState(ID);
    private static final IDialogSettings  _state_MapLocation     = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapLocation");  //$NON-NLS-1$
    private static final IDialogSettings  _state_MapProvider     = TourbookPlugin.getState("net.tourbook.map2.view.Map2View.MapProvider");  //$NON-NLS-1$
@@ -515,6 +524,11 @@ public class Map2View extends ViewPart implements
    private ActionMapPoint_ShowOnlyThisTour      _actionMapPoint_ShowOnlyThisTour;
    private ActionMapPoint_ZoomIn                _actionMapPoint_ZoomIn;
    private ActionReloadFailedMapImages          _actionReloadFailedMapImages;
+   private ActionRunExternalApp                 _actionRunExternalApp1;
+   private ActionRunExternalApp                 _actionRunExternalApp2;
+   private ActionRunExternalApp                 _actionRunExternalApp3;
+   private ActionRunExternalAppPrefPage         _actionRunExternalAppPrefPage;
+   private ActionRunExternalAppTitle            _actionRunExternalAppTitle;
    private ActionSaveDefaultPosition            _actionSaveDefaultPosition;
    private ActionSearchTourByLocation           _actionSearchTourByLocation;
    private ActionSetDefaultPosition             _actionSetDefaultPosition;
@@ -868,6 +882,44 @@ public class Map2View extends ViewPart implements
       }
    }
 
+   public class ActionRunExternalApp extends Action {
+
+      public ActionRunExternalApp() {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+      }
+
+      @Override
+      public void run() {
+
+         actionExternalApp_Run(this);
+      }
+   }
+
+   public class ActionRunExternalAppPrefPage extends Action {
+
+      public ActionRunExternalAppPrefPage() {
+
+         super("&Define external applications...", AS_PUSH_BUTTON);
+      }
+
+      @Override
+      public void run() {
+
+         actionExternalApp_PrefPage();
+      }
+   }
+
+   private class ActionRunExternalAppTitle extends Action {
+
+      public ActionRunExternalAppTitle() {
+
+         super("» Open Photo Image with an External Application «", AS_PUSH_BUTTON);
+
+         setEnabled(false);
+      }
+   }
+
    private class ActionSearchTourByLocation extends Action {
 
       public ActionSearchTourByLocation() {
@@ -1209,6 +1261,83 @@ public class Map2View extends ViewPart implements
             mouseDown_GeoPosition.longitude);
 
       UI.copyTextIntoClipboard(geoPosition, statusMessage);
+   }
+
+   private void actionExternalApp_PrefPage() {
+
+      PreferencesUtil.createPreferenceDialogOn(
+            Display.getCurrent().getActiveShell(),
+            PrefPagePhotoExternalApp.ID,
+            null,
+            null)
+            .open();
+   }
+
+   private void actionExternalApp_Run(final ActionRunExternalApp actionRunExternalApp) {
+
+      if (_contextMenu_HoveredMapPoint == null) {
+         return;
+      }
+
+      String extApp = null;
+
+      if (actionRunExternalApp == _actionRunExternalApp1) {
+         extApp = _prefStore_Photo.getString(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_1).trim();
+      } else if (actionRunExternalApp == _actionRunExternalApp2) {
+         extApp = _prefStore_Photo.getString(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_2).trim();
+      } else if (actionRunExternalApp == _actionRunExternalApp3) {
+         extApp = _prefStore_Photo.getString(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_3).trim();
+      }
+
+      final Photo photo = _contextMenu_HoveredMapPoint.mapPoint.photo;
+
+      final String imageFilePath = photo.imageFilePathName;
+
+      String commands[] = null;
+      if (UI.IS_WIN) {
+
+         final String[] commandsWin = {
+
+               UI.SYMBOL_QUOTATION_MARK + extApp + UI.SYMBOL_QUOTATION_MARK,
+               UI.SYMBOL_QUOTATION_MARK + imageFilePath + UI.SYMBOL_QUOTATION_MARK
+         };
+
+         commands = commandsWin;
+
+      } else if (UI.IS_OSX) {
+
+         final String[] commandsOSX = { "/usr/bin/open", "-a", // //$NON-NLS-1$ //$NON-NLS-2$
+               extApp,
+               imageFilePath };
+
+         commands = commandsOSX;
+
+      } else if (UI.IS_LINUX) {
+
+         final String[] commandsLinux = { extApp, imageFilePath };
+
+         commands = commandsLinux;
+      }
+
+      if (commands != null) {
+
+         try {
+
+            // log command
+            final StringBuilder sb = new StringBuilder();
+            for (final String cmd : commands) {
+               sb.append(cmd + UI.SPACE1);
+            }
+
+            StatusUtil.logInfo(sb.toString());
+
+            Runtime.getRuntime().exec(commands);
+
+         } catch (final Exception e) {
+
+            StatusUtil.showStatus(e);
+         }
+      }
    }
 
    private void actionGotoLocation() {
@@ -2165,6 +2294,12 @@ public class Map2View extends ViewPart implements
       _actionZoom_ShowEntireMap              = new ActionZoomShowEntireMap(this);
       _actionZoom_ShowEntireTour             = new ActionZoomShowEntireTour(this);
 
+      _actionRunExternalAppTitle             = new ActionRunExternalAppTitle();
+      _actionRunExternalAppPrefPage          = new ActionRunExternalAppPrefPage();
+      _actionRunExternalApp1                 = new ActionRunExternalApp();
+      _actionRunExternalApp2                 = new ActionRunExternalApp();
+      _actionRunExternalApp3                 = new ActionRunExternalApp();
+
       _actionCopyLocation                    = new ActionCopyLocation();
       _actionCreateTourMarkerFromMap         = new ActionCreateTourMarkerFromMap(this);
       _actionGotoLocation                    = new ActionGotoLocation();
@@ -2717,6 +2852,10 @@ public class Map2View extends ViewPart implements
             menuMgr.add(_actionMapPoint_Photo_Remove);
 
             menuMgr.add(new Separator());
+
+            fillExternalApp(menuMgr);
+
+            menuMgr.add(new Separator());
          }
 
          menuMgr.add(_actionMapPoint_ZoomIn);
@@ -2778,6 +2917,32 @@ public class Map2View extends ViewPart implements
          menuMgr.add(actionManageOfflineImages);
          menuMgr.add(_actionReloadFailedMapImages);
          menuMgr.add(_actionManageMapProvider);
+      }
+   }
+
+   private void fillExternalApp(final IMenuManager menuMgr) {
+
+      menuMgr.add(_actionRunExternalAppTitle);
+
+      fillExternalApp_One(1, _actionRunExternalApp1, menuMgr, IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_1);
+      fillExternalApp_One(2, _actionRunExternalApp2, menuMgr, IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_2);
+      fillExternalApp_One(3, _actionRunExternalApp3, menuMgr, IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_3);
+
+      menuMgr.add(_actionRunExternalAppPrefPage);
+   }
+
+   private void fillExternalApp_One(final int appIndex,
+                                    final ActionRunExternalApp appAction,
+                                    final IMenuManager menuMgr,
+                                    final String prefStoreName) {
+
+      final String extAppFilePath = _prefStore_Photo.getString(prefStoreName).trim();
+
+      if (extAppFilePath.length() > 0) {
+
+         appAction.setText(EXTERNAL_APP_ACTION.formatted(appIndex, new Path(extAppFilePath).lastSegment()));
+
+         menuMgr.add(appAction);
       }
    }
 
