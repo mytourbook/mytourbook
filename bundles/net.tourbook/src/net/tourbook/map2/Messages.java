@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -78,6 +78,8 @@ public class Messages extends NLS {
    public static String Map_Action_Export_Map_View_Clipboard;
    public static String Map_Action_Export_Map_View_Image;
    public static String Map_Action_Export_Map_View_Image_Tooltip;
+   public static String Map_Action_ExternalApp_OpenPhotoImage;
+   public static String Map_Action_ExternalApp_Setup;
    public static String Map_Action_GotoLocation;
    public static String Map_Action_LookupCommonLocation;
    public static String Map_Action_ManageMapProviders;

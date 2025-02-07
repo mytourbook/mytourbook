@@ -32,6 +32,8 @@ New
    https://github.com/mytourbook/mytourbook/issues/1433
  - Adjust tonality curve
    https://github.com/mytourbook/mytourbook/issues/1447
+ - Open photo image with an external app
+   https://github.com/mytourbook/mytourbook/issues/1456   
 
 
 Improvements

@@ -900,7 +900,7 @@ public class Map2View extends ViewPart implements
 
       public ActionRunExternalAppPrefPage() {
 
-         super("&Define external applications...", AS_PUSH_BUTTON);
+         super(Messages.Map_Action_ExternalApp_Setup, AS_PUSH_BUTTON);
       }
 
       @Override
@@ -914,7 +914,7 @@ public class Map2View extends ViewPart implements
 
       public ActionRunExternalAppTitle() {
 
-         super("» Open Photo Image with an External Application «", AS_PUSH_BUTTON);
+         super(Messages.Map_Action_ExternalApp_OpenPhotoImage, AS_PUSH_BUTTON);
 
          setEnabled(false);
       }
@@ -1270,14 +1270,11 @@ public class Map2View extends ViewPart implements
             PrefPagePhotoExternalApp.ID,
             null,
             null)
+
             .open();
    }
 
    private void actionExternalApp_Run(final ActionRunExternalApp actionRunExternalApp) {
-
-      if (_contextMenu_HoveredMapPoint == null) {
-         return;
-      }
 
       String extApp = null;
 
@@ -2921,6 +2918,12 @@ public class Map2View extends ViewPart implements
    }
 
    private void fillExternalApp(final IMenuManager menuMgr) {
+
+      final Photo photo = _contextMenu_HoveredMapPoint.mapPoint.photo;
+
+      // set image file name into the external app title/tooltip
+      _actionRunExternalAppTitle.setText(Messages.Map_Action_ExternalApp_OpenPhotoImage.formatted(photo.imageFileName));
+      _actionRunExternalAppTitle.setToolTipText(photo.imageFilePathName);
 
       menuMgr.add(_actionRunExternalAppTitle);
 
