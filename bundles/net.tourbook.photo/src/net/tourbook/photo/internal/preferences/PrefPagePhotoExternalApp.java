@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,8 +16,8 @@
 package net.tourbook.photo.internal.preferences;
 
 import net.tourbook.common.UI;
-import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.internal.Messages;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -28,7 +28,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -38,157 +37,152 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPagePhotoExternalApp extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String			ID			= "net.tourbook.preferences.PrefPagePhotoExternalAppID";	//$NON-NLS-1$
+   public static final String     ID         = "net.tourbook.preferences.PrefPagePhotoExternalAppID"; //$NON-NLS-1$
 
-	private final IPreferenceStore		_prefStore	= PhotoActivator.getPrefStore();
+   private final IPreferenceStore _prefStore = PhotoActivator.getPrefStore();
 
-	/*
-	 * UI controls
-	 */
-	private FileFieldEditorNoValidation	_editorExternalPhotoViewer1;
-	private FileFieldEditorNoValidation	_editorExternalPhotoViewer2;
-	private FileFieldEditorNoValidation	_editorExternalPhotoViewer3;
+   /*
+    * UI controls
+    */
 
-	public class FileFieldEditorNoValidation extends FileFieldEditor {
+   public class FileFieldEditorNoValidation extends FileFieldEditor {
 
-		public FileFieldEditorNoValidation(final String name, final String labelText, final Composite parent) {
-			super(name, labelText, parent);
-		}
+      public FileFieldEditorNoValidation(final String name, final String labelText, final Composite parent) {
+         super(name, labelText, parent);
+      }
 
-		@Override
-		protected boolean checkState() {
-			return true;
-		}
-	}
+      @Override
+      protected boolean checkState() {
+         return true;
+      }
+   }
 
-	public PrefPagePhotoExternalApp() {
+   public PrefPagePhotoExternalApp() {
 //		noDefaultAndApplyButton();
-	}
+   }
 
-	@Override
-	protected void createFieldEditors() {
-		createUI();
-	}
+   @Override
+   protected void createFieldEditors() {
+      createUI();
+   }
 
-	private void createUI() {
+   private void createUI() {
 
-		final Composite parent = getFieldEditorParent();
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(parent);
-		GridLayoutFactory.fillDefaults().applyTo(parent);
+      final Composite parent = getFieldEditorParent();
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(parent);
+      GridLayoutFactory.fillDefaults().applyTo(parent);
 //		parent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			createUI_10_ExternalPhotoViewer(parent);
-		}
-	}
+      {
+         createUI_10_ExternalPhotoViewer(parent);
+      }
+   }
 
-	/**
-	 * field: path to save raw tour data
-	 */
-	private void createUI_10_ExternalPhotoViewer(final Composite parent) {
+   /**
+    * field: path to save raw tour data
+    */
+   private void createUI_10_ExternalPhotoViewer(final Composite parent) {
 
-		final Group group = new Group(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.applyTo(group);
-		group.setText(Messages.PrefPage_Photo_ExtViewer_Group_ExternalApplication);
-		{
-			/*
-			 * label: info
-			 */
-			Label label = new Label(group, SWT.WRAP);
-			GridDataFactory.fillDefaults()//
-					.span(3, 1)
-					.indent(0, 5)
-					.hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
-					.applyTo(label);
-			label.setText(Messages.PrefPage_Photo_ExtViewer_Label_Info);
+      FileFieldEditorNoValidation externalFolderViewer1;
+      FileFieldEditorNoValidation externalFolderViewer2;
+      FileFieldEditorNoValidation externalFolderViewer3;
 
-			// spacer
-			final Canvas spacer = new Canvas(group, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.span(3, 1)
-					.indent(0, 10)
-					.hint(1, 1)
-					.applyTo(spacer);
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.PrefPage_Photo_ExtViewer_Group_ExternalApplication);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .applyTo(group);
+      {
+         {
+            /*
+             * Label: info
+             */
+            final Label label = new Label(group, SWT.WRAP);
+            label.setText(Messages.PrefPage_Photo_ExtViewer_Label_Info);
+            GridDataFactory.fillDefaults()
+                  .span(3, 1)
+                  .indent(0, 5)
+                  .hint(UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+                  .applyTo(label);
+         }
 
-			// App 1
-			{
-				/*
-				 * editor: external file browser
-				 */
-				_editorExternalPhotoViewer1 = new FileFieldEditorNoValidation(
-						IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_1,
-						Messages.PrefPage_Photo_ExtViewer_Label_ExternalApplication1,
-						group);
-				_editorExternalPhotoViewer1.setEmptyStringAllowed(true);
-				_editorExternalPhotoViewer1.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
+         UI.createSpacer_Vertical(group, 10, 3);
 
-				label = _editorExternalPhotoViewer1.getLabelControl(group);
-				label.setToolTipText(Messages.PrefPage_Photo_ExtViewer_Label_ExternalApplication_Tooltip);
+         {
+            /*
+             * External photo folder viewer 1
+             */
+            externalFolderViewer1 = folderViewer(
+                  group,
+                  Messages.PrefPage_Photo_ExtViewer_Label_ExternalApplication1,
+                  Messages.PrefPage_Photo_ExtViewer_Label_ExternalApplication_Tooltip,
+                  IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FOLDER_VIEWER_1);
+         }
+         {
+            /*
+             * External photo folder viewer 2
+             */
+            externalFolderViewer2 = folderViewer(
+                  group,
+                  Messages.PrefPage_Photo_ExtViewer_Label_ExternalApplication2,
+                  Messages.PrefPage_Photo_ExtViewer_Label_ExternalApplication_Tooltip,
+                  IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FOLDER_VIEWER_2);
+         }
+         {
+            /*
+             * External photo folder viewer 3
+             */
+            externalFolderViewer3 = folderViewer(
+                  group,
+                  Messages.PrefPage_Photo_ExtViewer_Label_ExternalApplication3,
+                  Messages.PrefPage_Photo_ExtViewer_Label_ExternalApplication_Tooltip,
+                  IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FOLDER_VIEWER_3);
+         }
+      }
 
-				addField(_editorExternalPhotoViewer1);
-			}
+      // set layout after the fields are created
+      GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 0, 0).applyTo(group);
 
-			// App 2
-			{
-				/*
-				 * editor: external file browser
-				 */
-				_editorExternalPhotoViewer2 = new FileFieldEditorNoValidation(
-						IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_2,
-						Messages.PrefPage_Photo_ExtViewer_Label_ExternalApplication2,
-						group);
-				_editorExternalPhotoViewer2.setEmptyStringAllowed(true);
-				_editorExternalPhotoViewer2.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
+      /*
+       * Set width for the text control that the pref dialog is not as wide as the full path
+       */
+      final int pathWidth = 200;
 
-				label = _editorExternalPhotoViewer2.getLabelControl(group);
-				label.setToolTipText(Messages.PrefPage_Photo_ExtViewer_Label_ExternalApplication_Tooltip);
+      GridData gd;
 
-				addField(_editorExternalPhotoViewer2);
-			}
+      Text rawPathControl = externalFolderViewer1.getTextControl(group);
+      gd = (GridData) rawPathControl.getLayoutData();
+      gd.widthHint = pathWidth;
 
-			// App 3
-			{
-				/*
-				 * editor: external file browser
-				 */
-				_editorExternalPhotoViewer3 = new FileFieldEditorNoValidation(
-						IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_3,
-						Messages.PrefPage_Photo_ExtViewer_Label_ExternalApplication3,
-						group);
-				_editorExternalPhotoViewer3.setEmptyStringAllowed(true);
-				_editorExternalPhotoViewer3.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
+      rawPathControl = externalFolderViewer2.getTextControl(group);
+      gd = (GridData) rawPathControl.getLayoutData();
+      gd.widthHint = pathWidth;
 
-				label = _editorExternalPhotoViewer3.getLabelControl(group);
-				label.setToolTipText(Messages.PrefPage_Photo_ExtViewer_Label_ExternalApplication_Tooltip);
+      rawPathControl = externalFolderViewer3.getTextControl(group);
+      gd = (GridData) rawPathControl.getLayoutData();
+      gd.widthHint = pathWidth;
+   }
 
-				addField(_editorExternalPhotoViewer3);
-			}
-		}
+   private FileFieldEditorNoValidation folderViewer(final Group parent,
+                                                    final String label,
+                                                    final String tooltip,
+                                                    final String prefKey) {
 
-		// set layout after the fields are created
-		GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 0, 0).applyTo(group);
+      final FileFieldEditorNoValidation field = new FileFieldEditorNoValidation(prefKey, label, parent);
 
-		/*
-		 * set width for the text control that the pref dialog is not as wide as the full path
-		 */
-		final int pathWidth = 200;
+      field.setEmptyStringAllowed(true);
+      field.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
 
-		Text rawPathControl = _editorExternalPhotoViewer1.getTextControl(group);
-		GridData gd = (GridData) rawPathControl.getLayoutData();
-		gd.widthHint = pathWidth;
+      final Label fieldLabel = field.getLabelControl(parent);
+      fieldLabel.setToolTipText(tooltip);
 
-		rawPathControl = _editorExternalPhotoViewer2.getTextControl(group);
-		gd = (GridData) rawPathControl.getLayoutData();
-		gd.widthHint = pathWidth;
+      addField(field);
 
-		rawPathControl = _editorExternalPhotoViewer3.getTextControl(group);
-		gd = (GridData) rawPathControl.getLayoutData();
-		gd.widthHint = pathWidth;
-	}
+      return field;
+   }
 
-	@Override
-	public void init(final IWorkbench workbench) {
-		setPreferenceStore(_prefStore);
-	}
+   @Override
+   public void init(final IWorkbench workbench) {
+
+      setPreferenceStore(_prefStore);
+   }
 }
