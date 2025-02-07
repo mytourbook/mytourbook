@@ -45,6 +45,9 @@ Improvements
   Customize how the text in autocomplete fields is searched
   https://github.com/mytourbook/mytourbook/issues/1451
 
+* Preferences
+  Reopen the last preference page after an app restart
+  https://github.com/mytourbook/mytourbook/issues/1455
 
 
 Bugfix
