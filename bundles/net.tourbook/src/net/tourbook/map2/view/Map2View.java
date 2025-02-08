@@ -1276,6 +1276,21 @@ public class Map2View extends ViewPart implements
 
    private void actionExternalApp_Run(final ActionRunExternalApp actionRunExternalApp) {
 
+      /*
+       * Hide all opened slideouts
+       */
+      _slideoutPhotoOptions.close();
+      _map.photoHistogram_Close();
+      _map.photoTooltip_Close();
+
+      final SlideoutMap2_MapPoints mapPointSlideout = Map2PointManager.getMapPointSlideout(false);
+      if (mapPointSlideout != null) {
+         mapPointSlideout.close();
+      }
+
+      /*
+       * Run external app
+       */
       String extApp = null;
 
       if (actionRunExternalApp == _actionRunExternalApp1) {
