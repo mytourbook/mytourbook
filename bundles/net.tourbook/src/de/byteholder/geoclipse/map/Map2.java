@@ -798,7 +798,7 @@ public class Map2 extends Canvas {
    private final int           MAX_RATING_STARS              = 5;
    public int                  MAX_RATING_STARS_WIDTH;
 
-   public int                  MAP_IMAGE_DEFAULT_SIZE_TINY   = 40;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_TINY   = 50;
    public int                  MAP_IMAGE_DEFAULT_SIZE_SMALL  = 100;
    public int                  MAP_IMAGE_DEFAULT_SIZE_MEDIUM = 200;
    public int                  MAP_IMAGE_DEFAULT_SIZE_LARGE  = 300;
