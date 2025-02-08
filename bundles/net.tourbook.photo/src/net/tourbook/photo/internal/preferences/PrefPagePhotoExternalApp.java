@@ -125,7 +125,7 @@ public class PrefPagePhotoExternalApp extends FieldEditorPreferencePage implemen
                   .applyTo(label);
          }
 
-         UI.createSpacer_Vertical(group, 10, 3);
+         UI.createSpacer_Vertical(group, 5, 3);
 
          {
             /*
@@ -192,7 +192,7 @@ public class PrefPagePhotoExternalApp extends FieldEditorPreferencePage implemen
                   .applyTo(label);
          }
 
-         UI.createSpacer_Vertical(group, 10, 3);
+         UI.createSpacer_Vertical(group, 5, 3);
 
          {
             /*

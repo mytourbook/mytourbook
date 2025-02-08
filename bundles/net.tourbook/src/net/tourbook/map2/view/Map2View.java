@@ -2944,6 +2944,7 @@ public class Map2View extends ViewPart implements
       if (extAppFilePath.length() > 0) {
 
          appAction.setText(EXTERNAL_APP_ACTION.formatted(appIndex, new Path(extAppFilePath).lastSegment()));
+         appAction.setToolTipText(extAppFilePath);
 
          menuMgr.add(appAction);
       }
