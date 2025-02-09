@@ -21,5 +21,7 @@ public enum MapTourMarkerTime {
 
    DATE, //
 
+   TIME, //
+
    DATE_TIME, //
 }

@@ -115,6 +115,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
          MapTourMarkerTime.NONE,
          MapTourMarkerTime.DATE,
+         MapTourMarkerTime.TIME,
          MapTourMarkerTime.DATE_TIME,
    };
    //
@@ -125,6 +126,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
          Messages.Map_Points_LabelTime_None,
          Messages.Map_Points_LabelTime_Date,
+         Messages.Map_Points_LabelTime_Time,
          Messages.Map_Points_LabelTime_DateTime,
    };
    //
