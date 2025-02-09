@@ -834,6 +834,10 @@ public class SlideoutMap2_PhotoImage extends AdvancedSlideout implements IAction
 
    public void onImageIsLoaded() {
 
+      if (_containerPhotoOptions.isDisposed()) {
+         return;
+      }
+
       final PaintedMapPoint hoveredMapPoint = _hoveredMapPoint;
 
       _containerPhotoOptions.getDisplay().asyncExec(() -> {

@@ -33,6 +33,8 @@ New
  - Adjust tonality curve
    https://github.com/mytourbook/mytourbook/issues/1447
  - Open photo image with an external app
+   - Select the action from the photo context menu
+   - When double clicking a photo then the first external app is run
    https://github.com/mytourbook/mytourbook/issues/1456   
 
 

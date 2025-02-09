@@ -40,6 +40,7 @@ package de.byteholder.geoclipse.map;
 
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.event.IBreadcrumbListener;
+import de.byteholder.geoclipse.map.event.IExternalAppListener;
 import de.byteholder.geoclipse.map.event.IGeoPositionListener;
 import de.byteholder.geoclipse.map.event.IHoveredTourListener;
 import de.byteholder.geoclipse.map.event.IMapGridListener;
@@ -614,6 +615,7 @@ public class Map2 extends Canvas {
    private final ListenerList<IMapPositionListener>   _allMapPositionListener    = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IMapSelectionListener>  _allMapSelectionListener   = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IGeoPositionListener>   _allMousePositionListeners = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IExternalAppListener>   _allExternalAppListeners   = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IPOIListener>           _allPOIListeners           = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<ITourSelectionListener> _allTourSelectionListener  = new ListenerList<>(ListenerList.IDENTITY);
 
@@ -1147,6 +1149,10 @@ public class Map2 extends Canvas {
             _display.asyncExec(() -> onDropRunnable(event));
          }
       });
+   }
+
+   public void addExternalAppListener(final IExternalAppListener mapListener) {
+      _allExternalAppListeners.add(mapListener);
    }
 
    public void addHoveredTourListener(final IHoveredTourListener hoveredTourListener) {
@@ -2608,6 +2614,15 @@ public class Map2 extends Canvas {
       final Object[] listeners = _allPOIListeners.getListeners();
       for (final Object listener : listeners) {
          ((IPOIListener) listener).setPOI(event);
+      }
+   }
+
+   private void fireEvent_RunExternalApp(final int numberOfExternalApp, final Photo photo) {
+
+      final Object[] listeners = _allExternalAppListeners.getListeners();
+
+      for (final Object listener : listeners) {
+         ((IExternalAppListener) listener).runExternalApp(numberOfExternalApp, photo);
       }
    }
 
@@ -4394,10 +4409,23 @@ public class Map2 extends Canvas {
 
    private void onMouse_DoubleClick(final MouseEvent mouseEvent) {
 
-      if (mouseEvent.button == 1) {
+      if (mouseEvent.button != 1) {
+         return;
+      }
+
+      if (_hoveredMapPoint != null && _hoveredMapPoint.mapPoint.photo != null) {
+
+         // run external app 1
+
+         // prevent map panning, this is happening
+         _canPanMap = false;
+
+         fireEvent_RunExternalApp(1, _hoveredMapPoint.mapPoint.photo);
+
+      } else {
 
          /*
-          * set new map center
+          * Set new map center
           */
          final double x = _worldPixel_TopLeft_Viewport.x + mouseEvent.x;
          final double y = _worldPixel_TopLeft_Viewport.y + mouseEvent.y;
@@ -4581,7 +4609,6 @@ public class Map2 extends Canvas {
 
                   selectPhoto(photo, _hoveredMapPoint);
                }
-
 
                isCanPanMap = true;
             }

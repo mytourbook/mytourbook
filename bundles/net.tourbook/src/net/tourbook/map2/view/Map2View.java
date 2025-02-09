@@ -892,7 +892,7 @@ public class Map2View extends ViewPart implements
       @Override
       public void run() {
 
-         actionExternalApp_Run(this);
+         actionExternalApp_Run(this, null);
       }
    }
 
@@ -1274,7 +1274,7 @@ public class Map2View extends ViewPart implements
             .open();
    }
 
-   private void actionExternalApp_Run(final ActionRunExternalApp actionRunExternalApp) {
+   private void actionExternalApp_Run(final ActionRunExternalApp actionRunExternalApp, Photo photo) {
 
       /*
        * Hide all opened slideouts
@@ -1301,7 +1301,9 @@ public class Map2View extends ViewPart implements
          extApp = _prefStore_Photo.getString(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_3).trim();
       }
 
-      final Photo photo = _contextMenu_HoveredMapPoint.mapPoint.photo;
+      if (photo == null) {
+         photo = _contextMenu_HoveredMapPoint.mapPoint.photo;
+      }
 
       final String imageFilePath = photo.imageFilePathName;
 
@@ -1845,13 +1847,14 @@ public class Map2View extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-      _map.addBreadcrumbListener    (()                        -> mapListener_Breadcrumb());
-      _map.addHoveredTourListener   (mapHoveredTourEvent       -> mapListener_HoveredTour(mapHoveredTourEvent));
-      _map.addMapInfoListener       ((mapCenter, mapZoomLevel) -> mapListener_MapInfo(mapCenter, mapZoomLevel));
-      _map.addMapSelectionListener  (selection                 -> mapListener_MapSelection(selection));
-      _map.addMousePositionListener (mapGeoPositionEvent       -> mapListener_MousePosition(mapGeoPositionEvent));
-      _map.addPOIListener           (mapPOIEvent               -> mapListener_POI(mapPOIEvent));
-      _map.addTourSelectionListener (selection                 -> mapListener_InsideMap(selection));
+      _map.addBreadcrumbListener    (()                           -> mapListener_Breadcrumb());
+      _map.addHoveredTourListener   (mapHoveredTourEvent          -> mapListener_HoveredTour(mapHoveredTourEvent));
+      _map.addMapInfoListener       ((mapCenter, mapZoomLevel)    -> mapListener_MapInfo(mapCenter, mapZoomLevel));
+      _map.addMapSelectionListener  (selection                    -> mapListener_MapSelection(selection));
+      _map.addMousePositionListener (mapGeoPositionEvent          -> mapListener_MousePosition(mapGeoPositionEvent));
+      _map.addPOIListener           (mapPOIEvent                  -> mapListener_POI(mapPOIEvent));
+      _map.addTourSelectionListener (selection                    -> mapListener_InsideMap(selection));
+      _map.addExternalAppListener   ((numberOfExternalApp, photo) -> mapListener_RunExternalApp(numberOfExternalApp, photo));
 
       _map.addMapGridBoxListener    ((mapZoomLevel, mapGeoCenter, isGridSelected, mapGridData)  -> mapListener_MapGridBox(mapZoomLevel, mapGeoCenter, isGridSelected, mapGridData));
       _map.addMapPositionListener   ((mapCenter, mapZoomLevel, isZoomed)                        -> mapListener_MapPosition(mapCenter, mapZoomLevel, isZoomed));
@@ -2959,7 +2962,16 @@ public class Map2View extends ViewPart implements
       if (extAppFilePath.length() > 0) {
 
          appAction.setText(EXTERNAL_APP_ACTION.formatted(appIndex, new Path(extAppFilePath).lastSegment()));
-         appAction.setToolTipText(extAppFilePath);
+
+         // set tooltip text
+         if (appIndex == 1) {
+
+            appAction.setToolTipText(Messages.Map_Action_ExternalApp_DoubleClickStart.formatted(extAppFilePath));
+
+         } else {
+
+            appAction.setToolTipText(extAppFilePath);
+         }
 
          menuMgr.add(appAction);
       }
@@ -3776,6 +3788,21 @@ public class Map2View extends ViewPart implements
 
       _actionShowPOI.setEnabled(true);
       _actionShowPOI.setChecked(true);
+   }
+
+   private void mapListener_RunExternalApp(final int numberOfExternalApp, final Photo photo) {
+
+// SET_FORMATTING_OFF
+
+      switch (numberOfExternalApp) {
+      case 1:  actionExternalApp_Run(_actionRunExternalApp1, photo);  break;
+      case 2:  actionExternalApp_Run(_actionRunExternalApp2, photo);  break;
+      case 3:  actionExternalApp_Run(_actionRunExternalApp3, photo);  break;
+      default: break;
+      }
+
+// SET_FORMATTING_ON
+
    }
 
    @SuppressWarnings("unchecked")

@@ -78,6 +78,7 @@ public class Messages extends NLS {
    public static String Map_Action_Export_Map_View_Clipboard;
    public static String Map_Action_Export_Map_View_Image;
    public static String Map_Action_Export_Map_View_Image_Tooltip;
+   public static String Map_Action_ExternalApp_DoubleClickStart;
    public static String Map_Action_ExternalApp_OpenPhotoImage;
    public static String Map_Action_ExternalApp_Setup;
    public static String Map_Action_GotoLocation;
