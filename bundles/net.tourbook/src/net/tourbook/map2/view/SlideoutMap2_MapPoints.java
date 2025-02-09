@@ -80,34 +80,52 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       IActionResetToDefault {
 
    //
-   private static final String     STATE_EXPANDED_HEIGHT       = "STATE_EXPANDED_HEIGHT";      //$NON-NLS-1$
-   private static final String     STATE_IS_SLIDEOUT_EXPANDED  = "STATE_IS_SLIDEOUT_EXPANDED"; //$NON-NLS-1$
-   private static final String     STATE_SELECTED_TAB          = "STATE_SELECTED_TAB";         //$NON-NLS-1$
+   private static final String        STATE_EXPANDED_HEIGHT          = "STATE_EXPANDED_HEIGHT";      //$NON-NLS-1$
+   private static final String        STATE_IS_SLIDEOUT_EXPANDED     = "STATE_IS_SLIDEOUT_EXPANDED"; //$NON-NLS-1$
+   private static final String        STATE_SELECTED_TAB             = "STATE_SELECTED_TAB";         //$NON-NLS-1$
    //
    /**
     * MUST be in sync with {@link #_allMarkerLabelLayout_Label}
     */
-   private static MapLabelLayout[] _allMarkerLabelLayout_Value = {
+   private static MapLabelLayout[]    _allMarkerLabelLayout_Value    = {
 
          MapLabelLayout.RECTANGLE_BOX,
          MapLabelLayout.BORDER_2_PIXEL,
          MapLabelLayout.BORDER_1_PIXEL,
          MapLabelLayout.SHADOW,
          MapLabelLayout.NONE,
-
    };
    //
    /**
     * MUST be in sync with {@link #_allMarkerLabelLayout_Value}
     */
-   private static String[]         _allMarkerLabelLayout_Label = {
+   private static String[]            _allMarkerLabelLayout_Label    = {
 
          Messages.Map_Points_LabelBackground_RectangleBox,
          Messages.Map_Points_LabelBackground_Border2,
          Messages.Map_Points_LabelBackground_Border1,
          Messages.Map_Points_LabelBackground_Shadow,
          Messages.Map_Points_LabelBackground_None,
+   };
+   //
+   /**
+    * MUST be in sync with {@link #_allMarkerLabelTime_Label}
+    */
+   private static MapTourMarkerTime[] _allMarkerLabelTimeStamp_Value = {
 
+         MapTourMarkerTime.NONE,
+         MapTourMarkerTime.DATE,
+         MapTourMarkerTime.DATE_TIME,
+   };
+   //
+   /**
+    * MUST be in sync with {@link #_allMarkerLabelTimeStamp_Value}
+    */
+   private static String[]            _allMarkerLabelTime_Label      = {
+
+         Messages.Map_Points_LabelTime_None,
+         Messages.Map_Points_LabelTime_Date,
+         Messages.Map_Points_LabelTime_DateTime,
    };
    //
    //
@@ -207,6 +225,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    //
    private Combo                 _comboLabelFont;
    private Combo                 _comboLabelLayout;
+   private Combo                 _comboTourMarkerTime;
    //
    private Label                 _lblClusterGrid_Size;
    private Label                 _lblClusterSymbol;
@@ -233,6 +252,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Label                 _lblTourLocation_StartLabel_Color;
    private Label                 _lblTourLocation_EndLabel_Color;
    private Label                 _lblTourMarkerLabel_Color;
+   private Label                 _lblTourMarkerTime;
    private Label                 _lblTourPauseLabel_Color;
    private Label                 _lblVisibleLabels;
    private Label                 _lblTourWayPointLabel_Color;
@@ -502,6 +522,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    public void close() {
 
       Map2PointManager.setMapLocationSlideout(null);
+
+      onDisposeResources();
 
       super.close();
    }
@@ -933,7 +955,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
    private void createUI_220_TourMarker_Label(final Composite parent) {
 
-      final GridDataFactory labelGridData = GridDataFactory.fillDefaults()
+      final GridDataFactory gd = GridDataFactory.fillDefaults()
             .align(SWT.FILL, SWT.CENTER)
             .indent(UI.FORM_FIRST_COLUMN_INDENT, 0);
 
@@ -946,7 +968,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _lblTourMarkerLabel_Color = new Label(parent, SWT.NONE);
             _lblTourMarkerLabel_Color.setText(Messages.Slideout_MapPoints_Label_MarkerColor);
             _lblTourMarkerLabel_Color.setToolTipText(Messages.Slideout_MapPoints_Label_MarkerColor_Tooltip);
-            labelGridData.applyTo(_lblTourMarkerLabel_Color);
+            gd.applyTo(_lblTourMarkerLabel_Color);
          }
          {
             final Composite container = new Composite(parent, SWT.NONE);
@@ -968,9 +990,27 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             _btnSwapTourMarkerLabel_Color = new Button(container, SWT.PUSH);
             _btnSwapTourMarkerLabel_Color.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
             _btnSwapTourMarkerLabel_Color.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
-            _btnSwapTourMarkerLabel_Color.addSelectionListener(SelectionListener.widgetSelectedAdapter(
-                  selectionEvent -> onSwapMarkerColor()));
+            _btnSwapTourMarkerLabel_Color.addSelectionListener(
+                  SelectionListener.widgetSelectedAdapter(selectionEvent -> onSwapMarkerColor()));
          }
+      }
+      {
+         /*
+          * Marker time
+          */
+
+         // label
+         _lblTourMarkerTime = new Label(parent, SWT.NONE);
+         _lblTourMarkerTime.setText(Messages.Slideout_MapPoints_Label_MarkerTime);
+         _lblTourMarkerTime.setToolTipText(Messages.Slideout_MapPoints_Label_MarkerTime_Tooltip);
+         gd.applyTo(_lblTourMarkerTime);
+
+         // combo
+         _comboTourMarkerTime = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+         _comboTourMarkerTime.setToolTipText(Messages.Slideout_MapPoints_Label_MarkerTime_Tooltip);
+         _comboTourMarkerTime.setVisibleItemCount(20);
+         _comboTourMarkerTime.addSelectionListener(_mapPointSelectionListener);
+         _comboTourMarkerTime.addFocusListener(_keepOpenListener);
       }
    }
 
@@ -1709,9 +1749,11 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _chkIsTruncateLabel                    .setEnabled(isShowLabels);
       _comboLabelFont                        .setEnabled(isShowLabels);
       _comboLabelLayout                      .setEnabled(isShowLabels);
+      _comboTourMarkerTime                   .setEnabled(isShowLabels);
       _lblFontName                           .setEnabled(isShowLabels);
       _lblLabelBackground                    .setEnabled(isShowLabels);
       _lblLabelSize                          .setEnabled(isShowLabels || isShowTourPhotos);
+      _lblTourMarkerTime                     .setEnabled(isShowLabels);
       _lblVisibleLabels                      .setEnabled(isShowLabels || isShowTourPhotos);
       _spinnerLabelFontSize                  .setEnabled(isShowLabels);
       _spinnerLabelTruncateLength            .setEnabled(isShowLabels && isTruncateLabel);
@@ -1806,6 +1848,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       for (final String label : _allFontNames) {
          _comboLabelFont.add(label);
       }
+
+      for (final String label : _allMarkerLabelTime_Label) {
+         _comboTourMarkerTime.add(label);
+      }
    }
 
    @Override
@@ -1839,6 +1885,17 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          return _allMarkerLabelLayout_Value[selectedIndex];
       } else {
          return Map2ConfigManager.LABEL_LAYOUT_DEFAULT;
+      }
+   }
+
+   private MapTourMarkerTime getSelectedMarkerTimeStamp() {
+
+      final int selectedIndex = _comboTourMarkerTime.getSelectionIndex();
+
+      if (selectedIndex >= 0) {
+         return _allMarkerLabelTimeStamp_Value[selectedIndex];
+      } else {
+         return Map2ConfigManager.TOUR_MARKER_TIME_STAMP_DEFAULT;
       }
    }
 
@@ -1934,6 +1991,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          _prefStore.removePropertyChangeListener(_prefChangeListener);
       }
 
+      onDisposeResources();
+
+      super.onDispose();
+   }
+
+   private void onDisposeResources() {
+
       UI.disposeResource(_imageMapLocation_BoundingBox);
       UI.disposeResource(_imageMapLocation_Common);
       UI.disposeResource(_imageMapLocation_Tour);
@@ -1941,8 +2005,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       UI.disposeResource(_imageTourMarker_Cluster);
       UI.disposeResource(_imageTourMarker_Group);
       UI.disposeResource(_imageTourWayPoint);
-
-      super.onDispose();
+      UI.disposeResource(_imageTourPauses);
    }
 
    @Override
@@ -2343,6 +2406,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       selectLabelFont(config.labelFontName);
       selectLabelLayout(config.labelLayout);
+      selectMarkerTimeStamp(config.tourMarkerDateTimeFormat);
 
       updateUI_TabLabel();
       updateUI_ExpandCollapse();
@@ -2390,6 +2454,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       config.labelFontName                = getSelectedLabelFont();
       config.labelLayout                  = getSelectedLabelLayout();
+      config.tourMarkerDateTimeFormat     = getSelectedMarkerTimeStamp();
 
       config.commonLocationFill_RGB             = _colorCommonLocationLabel_Fill             .getColorValue();
       config.commonLocationOutline_RGB          = _colorCommonLocationLabel_Outline          .getColorValue();
@@ -2469,6 +2534,23 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       }
 
       _comboLabelLayout.select(selectionIndex);
+   }
+
+   private void selectMarkerTimeStamp(final Enum<MapTourMarkerTime> markerTimestamp) {
+
+      int selectionIndex = 0;
+
+      for (int valueIndex = 0; valueIndex < _allMarkerLabelTimeStamp_Value.length; valueIndex++) {
+
+         final MapTourMarkerTime timeStamp = _allMarkerLabelTimeStamp_Value[valueIndex];
+
+         if (timeStamp.equals(markerTimestamp)) {
+            selectionIndex = valueIndex;
+            break;
+         }
+      }
+
+      _comboTourMarkerTime.select(selectionIndex);
    }
 
    private void selectTab(final CTabItem tabItem, final Event event) {

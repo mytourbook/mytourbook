@@ -111,6 +111,7 @@ public class Map2ConfigManager {
    private static final String ATTR_IS_GROUP_DUPLICATED_MARKERS      = "isGroupDuplicatedMarkers";            //$NON-NLS-1$
    private static final String ATTR_GROUPED_MARKERS                  = "groupedLabels";                       //$NON-NLS-1$
    private static final String ATTR_GROUP_GRID_SIZE                  = "groupGridSize";                       //$NON-NLS-1$
+   private static final String ATTR_TOUR_MARKER_DATE_TIME_FORMAT     = "tourMarkerDateTimeFormat";            //$NON-NLS-1$
    //
    private static final String TAG_TOUR_MARKER_FILL_COLOR            = "TourMarkerFillColor";                 //$NON-NLS-1$
    private static final String TAG_TOUR_MARKER_OUTLINE_COLOR         = "TourMarkerOutlineColor";              //$NON-NLS-1$
@@ -204,6 +205,8 @@ public class Map2ConfigManager {
    public static final RGB                     DEFAULT_TOUR_PAUSE_OUTLINE_RGB          = new RGB(0, 0, 0);
    public static final RGB                     DEFAULT_TOUR_WAY_POINT_FILL_RGB         = new RGB(215, 170, 255);
    public static final RGB                     DEFAULT_TOUR_WAY_POINT_OUTLINE_RGB      = new RGB(0, 0, 0);
+   //
+   static final MapTourMarkerTime              TOUR_MARKER_TIME_STAMP_DEFAULT          = MapTourMarkerTime.NONE;
    //
    public static final boolean                 IS_FILTER_TOUR_PAUSES_DEFAULT           = false;
    public static final boolean                 IS_FILTER_PAUSE_DURATION_DEFAULT        = false;
@@ -372,6 +375,8 @@ public class Map2ConfigManager {
          xmlConfig.putString(       ATTR_GROUPED_MARKERS,                  config.groupedMarkers);
          xmlConfig.putInteger(      ATTR_GROUP_GRID_SIZE,                  config.groupGridSize);
 
+         Util.setXmlEnum(xmlConfig, ATTR_TOUR_MARKER_DATE_TIME_FORMAT,     config.tourMarkerDateTimeFormat);
+
          Util.setXmlRgb(xmlConfig,  TAG_TOUR_MARKER_FILL_COLOR,            config.tourMarkerFill_RGB);
          Util.setXmlRgb(xmlConfig,  TAG_TOUR_MARKER_OUTLINE_COLOR,         config.tourMarkerOutline_RGB);
 
@@ -517,7 +522,6 @@ public class Map2ConfigManager {
       config.id                           = Util.getXmlString (xmlConfig,     ATTR_ID,                            Long.toString(System.nanoTime()));
       config.name                         = Util.getXmlString (xmlConfig,     ATTR_CONFIG_NAME,                   UI.EMPTY_STRING);
 
-
       config.isLabelAntialiased           = Util.getXmlBoolean(xmlConfig,     ATTR_IS_LABEL_ANTIALIASED,          true);
 
       config.isShowCommonLocation         = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_COMMON_LOCATION,       true);
@@ -544,7 +548,8 @@ public class Map2ConfigManager {
       config.labelTruncateLength          = Util.getXmlInteger(xmlConfig,     ATTR_LABEL_TRUNCATE_LENGTH,         LABEL_TRUNCATE_LENGTH_DEFAULT,         LABEL_TRUNCATE_LENGTH_MIN,          LABEL_TRUNCATE_LENGTH_MAX);
       config.locationSymbolSize           = Util.getXmlInteger(xmlConfig,     ATTR_LOCATION_SYMBOL_SIZE,          LOCATION_SYMBOL_SIZE_DEFAULT,          LOCATION_SYMBOL_SIZE_MIN,           LOCATION_SYMBOL_SIZE_MAX);
 
-      config.labelLayout = (MapLabelLayout) Util.getXmlEnum(   xmlConfig,     ATTR_LABEL_LAYOUT,                  LABEL_LAYOUT_DEFAULT);
+      config.labelLayout                  = (MapLabelLayout)      Util.getXmlEnum(xmlConfig,     ATTR_LABEL_LAYOUT,                 LABEL_LAYOUT_DEFAULT);
+      config.tourMarkerDateTimeFormat     = (MapTourMarkerTime)   Util.getXmlEnum(xmlConfig,     ATTR_TOUR_MARKER_DATE_TIME_FORMAT, TOUR_MARKER_TIME_STAMP_DEFAULT);
 
       config.isShowTourPauses                      = Util.getXmlBoolean(xmlConfig,  ATTR_IS_SHOW_TOUR_PAUSES,           false);
       config.isFilterTourPauses                    = Util.getXmlBoolean(xmlConfig,  ATTR_IS_FILTER_TOUR_PAUSES,         IS_FILTER_TOUR_PAUSES_DEFAULT);

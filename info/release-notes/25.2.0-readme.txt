@@ -37,6 +37,9 @@ New
    - When double clicking a photo then the first external app is run
    https://github.com/mytourbook/mytourbook/issues/1456   
 
+* 2D Map Marker
+ - Display marker time with the marker label
+
 
 Improvements
 ============

@@ -123,6 +123,7 @@ import net.tourbook.map2.view.MapLabelLayout;
 import net.tourbook.map2.view.MapPointStatistics;
 import net.tourbook.map2.view.MapPointToolTip;
 import net.tourbook.map2.view.MapPointType;
+import net.tourbook.map2.view.MapTourMarkerTime;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.map2.view.SlideoutMap2_PhotoHistogram;
 import net.tourbook.map2.view.SlideoutMap2_PhotoImage;
@@ -1983,7 +1984,7 @@ public class Map2 extends Canvas {
          final int devX = markerWorldPixelX - worldPixel_Viewport.x;
          final int devY = markerWorldPixelY - worldPixel_Viewport.y;
 
-         String markerLabel = tourMarker.getMarkerMapLabel();
+         String markerText = tourMarker.getMarkerMapLabel();
          String groupKey = null;
 
          /*
@@ -1991,14 +1992,14 @@ public class Map2 extends Canvas {
           */
          if (isGroupDuplicatedMarkers && _allMapMarkerSkipLabels.size() > 0) {
 
-            if (_allMapMarkerSkipLabels.contains(markerLabel)) {
+            if (_allMapMarkerSkipLabels.contains(markerText)) {
 
                // this label is marked to be grouped
 
                final int groupX = devX / skipLabelGridSize;
                final int groupY = devY / skipLabelGridSize;
 
-               groupKey = markerLabel + UI.DASH + groupX + UI.DASH + groupY;
+               groupKey = markerText + UI.DASH + groupX + UI.DASH + groupY;
 
                final Map2Point groupedMarker = _allMapMarkerWithGroupedLabels.get(groupKey);
 
@@ -2014,24 +2015,51 @@ public class Map2 extends Canvas {
          }
 
          // create formatted label
-         if (isTruncateLabel && markerLabel.length() > labelTruncateLength) {
+         if (isTruncateLabel && markerText.length() > labelTruncateLength) {
 
             // keep star at the end
-            final String endSymbol = markerLabel.endsWith(UI.SYMBOL_STAR)
+            final String endSymbol = markerText.endsWith(UI.SYMBOL_STAR)
                   ? UI.SYMBOL_STAR
                   : UI.EMPTY_STRING;
 
             if (labelTruncateLength == 0) {
 
-               markerLabel = UI.SYMBOL_DOT + endSymbol;
+               markerText = UI.SYMBOL_DOT + endSymbol;
 
             } else {
 
-               markerLabel = markerLabel.substring(0, labelTruncateLength)
+               markerText = markerText.substring(0, labelTruncateLength)
 
                      + UI.SYMBOL_ELLIPSIS
 
                      + endSymbol;
+            }
+         }
+
+         final MapTourMarkerTime tourMarkerDateTimeFormat = _mapConfig.tourMarkerDateTimeFormat;
+         if (tourMarkerDateTimeFormat.equals(MapTourMarkerTime.NONE) == false) {
+
+            // append time stamp
+
+            final TourData tourData = tourMarker.getTourData();
+            final ZonedDateTime tourStartTime = tourData.getTourStartTime();
+            final ZonedDateTime markerStartTime = TimeTools.getZonedDateTime(
+                  tourMarker.getTourTime(),
+                  tourStartTime.getZone());
+
+            switch (tourMarkerDateTimeFormat) {
+            case DATE:
+
+               markerText += UI.SPACE + TimeTools.Formatter_Date_S.format(markerStartTime);
+               break;
+
+            case DATE_TIME:
+
+               markerText += UI.SPACE + TimeTools.Formatter_DateTime_S.format(markerStartTime);
+               break;
+
+            case NONE:
+            default:
             }
          }
 
@@ -2047,7 +2075,7 @@ public class Map2 extends Canvas {
 
          mapPoint.geoPointDevX = (int) (devX * _deviceScaling);
          mapPoint.geoPointDevY = (int) (devY * _deviceScaling);
-         mapPoint.setFormattedLabel(markerLabel);
+         mapPoint.setFormattedLabel(markerText);
 
          if (groupKey != null) {
 
