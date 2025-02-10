@@ -118,6 +118,7 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TIME_TIME_ZONE;
    public static final TreeColumnFactory TIME_TIME_ZONE_DIFFERENCE;
    public static final TreeColumnFactory TIME_TOUR_START_TIME;
+   public static final TreeColumnFactory TIME_TOUR_END_TIME;
    public static final TreeColumnFactory TIME_WEEK_DAY;
    public static final TreeColumnFactory TIME_WEEK_NO;
    public static final TreeColumnFactory TIME_WEEKYEAR;
@@ -1990,6 +1991,31 @@ public abstract class TreeColumnFactory {
             colDef.setColumnLabel(              Messages.ColumnFactory_time_label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_time);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_time_tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+
+            colDef.setValueFormats(
+                  ValueFormatSet.Time_mmss,
+                  ValueFormat.TIME_HH_MM,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
+      TIME_TOUR_END_TIME = new TreeColumnFactory() {
+
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_TOUR_END_TIME", SWT.TRAIL); //$NON-NLS-1$
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_TourEndTime_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_TourEndTime_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TourEndTime_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 

@@ -1036,6 +1036,7 @@ public class NatTable_DataLoader {
       case TableColumnFactory.TIME_TIME_ZONE_ID:                     return "TimeZoneId";                      //$NON-NLS-1$
       case TableColumnFactory.TIME_TIME_ZONE_DIFFERENCE_ID:          return FIELD_WITHOUT_SORTING;
 //    case TableColumnFactory.TIME_TOUR_START_TIME_ID:               // see indexed fields
+      case TableColumnFactory.TIME_TOUR_END_TIME_ID:                 return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TIME_WEEK_DAY_ID:                      return FIELD_WITHOUT_SORTING;
 //    case TableColumnFactory.TIME_WEEK_NO_ID:                       // see indexed fields
 //    case TableColumnFactory.TIME_WEEKYEAR_ID:                      // see indexed fields

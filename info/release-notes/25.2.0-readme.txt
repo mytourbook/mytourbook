@@ -28,36 +28,40 @@ New
 ===
 
 * 2D Map Photo
- - Crop photo image
-   https://github.com/mytourbook/mytourbook/issues/1433
- - Adjust tonality curve
-   https://github.com/mytourbook/mytourbook/issues/1447
- - Open photo image with an external app
-   - Select the action from the photo context menu
-   - When double clicking a photo then the first external app is run
-   https://github.com/mytourbook/mytourbook/issues/1456   
+  - Crop photo image
+    https://github.com/mytourbook/mytourbook/issues/1433
+  - Adjust tonality curve
+    https://github.com/mytourbook/mytourbook/issues/1447
+  - Open photo image with an external app
+    - Select the action from the photo context menu
+    - When double clicking a photo then the first external app is run
+    https://github.com/mytourbook/mytourbook/issues/1456   
 
 * 2D Map Marker
- - Display marker time with the marker label
+  - Display marker time with the marker label
 
 
 Improvements
 ============
 
 * FIT Import
-  Set tour type from the session field sport_profile_name
-  https://github.com/mytourbook/mytourbook/issues/1450
+  - Set tour type from the session field sport_profile_name
+    https://github.com/mytourbook/mytourbook/issues/1450
 
 * Autocomplete fields
-  Customize how the text in autocomplete fields is searched
-  https://github.com/mytourbook/mytourbook/issues/1451
+  - Customize how the text in autocomplete fields is searched
+    https://github.com/mytourbook/mytourbook/issues/1451
 
 * Preferences
-  Reopen the last preference page after an app restart
-  https://github.com/mytourbook/mytourbook/issues/1455
+  - Reopen the last preference page after an app restart
+    https://github.com/mytourbook/mytourbook/issues/1455
 
+* Tour Book View
+  - New column: Tour end time
+    This can be helpful when manually tours are created that tours do not overlap
+  
 * Tour Editor
-  Display also the tour end time in the editor title
+  - Display additionally the tour end time in the editor title
 
 Bugfix
 ======
