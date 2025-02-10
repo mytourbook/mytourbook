@@ -572,6 +572,13 @@ public class ActionSetStartEndLocation extends SubMenu {
       @Override
       public void run() {
 
+         if (_allSelectedTours.size() == 0) {
+
+            // this can happen when tours in the (flat) view are not correctly selected
+
+            return;
+         }
+
          new DialogStartEndLocation(_allSelectedTours).open();
       }
    }

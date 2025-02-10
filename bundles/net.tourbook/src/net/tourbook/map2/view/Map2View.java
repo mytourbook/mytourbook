@@ -403,6 +403,7 @@ public class Map2View extends ViewPart implements
     * Contains all tours which are displayed in the map.
     */
    private final ArrayList<TourData>         _allTourData                = new ArrayList<>();
+   private TourData                          _lastTourWithoutLatLon;
    private TourData                          _previousTourData;
    private Long                              _lastSelectedTourInsideMap;
    //
@@ -532,6 +533,7 @@ public class Map2View extends ViewPart implements
    private ActionSaveDefaultPosition            _actionSaveDefaultPosition;
    private ActionSearchTourByLocation           _actionSearchTourByLocation;
    private ActionSetDefaultPosition             _actionSetDefaultPosition;
+   private ActionSetTourGeoPositions            _actionCreateGeoPositions;
    private ActionShowAllFilteredPhotos          _actionShowAllFilteredPhotos;
    private ActionShowLegendInMap                _actionShowLegendInMap;
    private ActionShowPOI                        _actionShowPOI;
@@ -937,6 +939,22 @@ public class Map2View extends ViewPart implements
       }
    }
 
+   private class ActionSetTourGeoPositions extends Action {
+
+      public ActionSetTourGeoPositions() {
+
+         setText("Set Geo&positions");
+         setToolTipText(
+               "Set geo positions from the current mouse position into the selected tour\n\nThis feature is only available when a tour do not contain any geo positions or max 2 geo positions");
+      }
+
+      @Override
+      public void run() {
+
+         actionCreateGeoPositions();
+      }
+   }
+
    private class ActionShowTour extends ActionToolbarSlideout {
 
       public ActionShowTour() {
@@ -1261,6 +1279,21 @@ public class Map2View extends ViewPart implements
             mouseDown_GeoPosition.longitude);
 
       UI.copyTextIntoClipboard(geoPosition, statusMessage);
+   }
+
+   private void actionCreateGeoPositions() {
+
+      // make sure the tour editor does not contain a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
+      new DialogSetTourGeoPositions(
+
+            _lastTourWithoutLatLon,
+            _map.getMouseMove_GeoPosition())
+
+                  .open();
    }
 
    private void actionExternalApp_PrefPage() {
@@ -2316,6 +2349,7 @@ public class Map2View extends ViewPart implements
       _actionRunExternalApp3                 = new ActionRunExternalApp();
 
       _actionCopyLocation                    = new ActionCopyLocation();
+      _actionCreateGeoPositions              = new ActionSetTourGeoPositions();
       _actionCreateTourMarkerFromMap         = new ActionCreateTourMarkerFromMap(this);
       _actionGotoLocation                    = new ActionGotoLocation();
       _actionLookupTourLocation              = new ActionLookupCommonLocation(this);
@@ -2642,6 +2676,23 @@ public class Map2View extends ViewPart implements
       _actionCreateTourMarkerFromMap.setCurrentHoveredTourId(hoveredTourId);
       _actionLookupTourLocation.setCurrentHoveredTourId(hoveredTourId);
 
+      /*
+       * Set geo positions
+       */
+      String actionGeoPositionLabel = "Set Geo&positions";
+      boolean canCreateGeoPositions = false;
+
+      final TourData tourData = getTourDataWhereGeoPositionsCanBeSet();
+
+      if (tourData != null) {
+
+         canCreateGeoPositions = true;
+         actionGeoPositionLabel = ("Set Geo&positions into \"%s\"...".formatted(TourManager.getTourTitle(tourData)));
+      }
+
+      _actionCreateGeoPositions.setText(actionGeoPositionLabel);
+      _actionCreateGeoPositions.setEnabled(canCreateGeoPositions);
+
 // SET_FORMATTING_OFF
 
       /*
@@ -2657,10 +2708,9 @@ public class Map2View extends ViewPart implements
 //      final boolean isPhotoSynced = canShowFilteredPhoto && _isMapSynchedWithPhoto;
 //      final boolean canSyncTour = isPhotoSynced == false;
 
-
       _actionMap2Slideout_PhotoFilter     .setEnabled(isAllPhotoAvailable && _isShowPhoto);
-      _actionShowAllFilteredPhotos        .setEnabled(canShowFilteredPhoto);
       _actionMap2Slideout_PhotoOptions    .setEnabled(isAllPhotoAvailable);
+      _actionShowAllFilteredPhotos        .setEnabled(canShowFilteredPhoto);
       _actionSyncMapWith_Photo            .setEnabled(canShowFilteredPhoto);
 
       /*
@@ -2890,6 +2940,7 @@ public class Map2View extends ViewPart implements
          menuMgr.add(_actionSearchTourByLocation);
          menuMgr.add(_actionCreateTourMarkerFromMap);
          menuMgr.add(_actionLookupTourLocation);
+         menuMgr.add(_actionCreateGeoPositions);
 
          /*
           * Show tour features
@@ -3402,6 +3453,32 @@ public class Map2View extends ViewPart implements
 
          return mapPositions;
       }
+   }
+
+   /**
+    * @return Returns {@link TourData} where the geo position can be set, otherwise
+    *         <code>null</code>
+    */
+   private TourData getTourDataWhereGeoPositionsCanBeSet() {
+
+      if (_lastTourWithoutLatLon != null) {
+
+         return _lastTourWithoutLatLon;
+      }
+
+      if (_allTourData.size() == 1) {
+
+         final TourData tourData = _allTourData.get(0);
+
+         final double[] latitudeSerie = tourData.latitudeSerie;
+
+         if (latitudeSerie == null || latitudeSerie.length <= 2) {
+
+            return tourData;
+         }
+      }
+
+      return null;
    }
 
    /**
@@ -4023,8 +4100,11 @@ public class Map2View extends ViewPart implements
             // keep only selected tours
             _selectionWhenHidden = selection;
          }
+
          return;
       }
+
+      _lastTourWithoutLatLon = null;
 
       if (selection instanceof final SelectionTourData selectionTourData) {
 
@@ -4604,6 +4684,8 @@ public class Map2View extends ViewPart implements
       _isTourPainted = true;
 
       if (TourManager.isLatLonAvailable(tourData) == false) {
+
+         _lastTourWithoutLatLon = tourData;
 
          showDefaultMap(false);
 
