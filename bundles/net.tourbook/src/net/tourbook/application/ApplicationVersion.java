@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,7 @@ public class ApplicationVersion {
    /**
     * Copyright year which is displayed in the splash screen.
     */
-   static final String SPLASH_COPYRIGHT_YEAR = "2024"; //$NON-NLS-1$
+   static final String SPLASH_COPYRIGHT_YEAR = "2025"; //$NON-NLS-1$
 
 // X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
    private static final String DEVELOPMENT_VERSION_TEXT = "DEV";          //$NON-NLS-1$
