@@ -3287,6 +3287,7 @@ public class TourDataEditorView extends ViewPart implements
          setTourDirty();
 
          updateUI_Time(selectionEvent.widget);
+         updateUI_Title();
       });
 
       _verifyFloatValue = modifyEvent -> {
@@ -3424,7 +3425,7 @@ public class TourDataEditorView extends ViewPart implements
       menuMgr = new MenuManager();
 
       menuMgr.setRemoveAllWhenShown(true);
-      
+
       // set menu items
       menuMgr.addMenuListener(menuManager -> {
 
@@ -7697,9 +7698,10 @@ public class TourDataEditorView extends ViewPart implements
 
       } else {
 
-         final ZonedDateTime tourDate = _tourData.getTourStartTime();
+         final ZonedDateTime tourDateStart = _tourData.getTourStartTime();
+         final ZonedDateTime tourDateEnd = _tourData.getTourEndTime();
 
-         return TourManager.getTourTitle(tourDate);
+         return TourManager.getTourTitle(tourDateStart, tourDateEnd);
       }
    }
 
@@ -10360,7 +10362,9 @@ public class TourDataEditorView extends ViewPart implements
             0,
             zoneId);
 
-      final String tourTitle = TourManager.getTourTitle(tourStartTime);
+      final ZonedDateTime tourEndTime = tourStartTime.plusSeconds(_deviceTime_Elapsed.getTime());
+
+      final String tourTitle = TourManager.getTourTitle(tourStartTime, tourEndTime);
 
       updateUI_Title_Async(tourTitle);
    }

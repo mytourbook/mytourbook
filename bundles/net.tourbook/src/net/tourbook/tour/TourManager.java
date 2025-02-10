@@ -1837,6 +1837,22 @@ public class TourManager {
             + getTourTimeShort(tourDateTime);
    }
 
+   public static String getTourTitle(final ZonedDateTime tourDateTimeStart, final ZonedDateTime tourDateTimeEnd) {
+
+      final String weekDay = tourDateTimeStart.format(TimeTools.Formatter_Weekday_L);
+
+      return UI.EMPTY_STRING
+
+            + weekDay
+            + UI.COMMA_SPACE
+            + getTourDateLong(tourDateTimeStart)
+
+            + UI.DASH_WITH_SPACE
+            + getTourTimeShort(tourDateTimeStart)
+            + UI.DASH
+            + getTourTimeShort(tourDateTimeEnd);
+   }
+
    /**
     * @return returns the detailed title of this tour which contains:<br>
     *         date + time + title as it is displayed in the tour chart

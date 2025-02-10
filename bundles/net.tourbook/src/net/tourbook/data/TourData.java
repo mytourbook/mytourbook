@@ -1659,10 +1659,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private ZonedDateTime      _dateTimeModified;
 
    /**
-    * Tour start time with a time zone.
+    * Tour start time with a time zone
     */
    @Transient
    private ZonedDateTime      _zonedStartTime;
+
+   /**
+    * Tour end time with a time zone
+    */
+   @Transient
+   private ZonedDateTime      _zonedEndTime;
 
    /**
     * Tour markers which are sorted by serie index
@@ -10910,6 +10916,45 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
+    * @return Returns the tour end date time with the tour time zone, when not available with the
+    *         default time zone.
+    */
+   public ZonedDateTime getTourEndTime() {
+
+      if (_zonedEndTime == null) {
+
+         final Instant tourStartMills = Instant.ofEpochMilli(tourEndTime);
+         final ZoneId tourStartTimeZoneId = getTimeZoneIdWithDefault();
+
+         final ZonedDateTime zonedStartTime = ZonedDateTime.ofInstant(tourStartMills, tourStartTimeZoneId);
+
+         if (timeZoneId == null) {
+
+            /*
+             * Tour has no time zone but this can be changed in the preferences, so this value is
+             * not cached
+             */
+
+            setCalendarWeek(zonedStartTime);
+
+            return zonedStartTime;
+
+         } else {
+
+            /*
+             * Cache this values until the tour zone is modified
+             */
+
+            _zonedEndTime = zonedStartTime;
+
+            setCalendarWeek(_zonedEndTime);
+         }
+      }
+
+      return _zonedEndTime;
+   }
+
+   /**
     * @return Returns tour end time in ms, this value should be {@link #tourStartTime} +
     *         {@link #tourDeviceTime_Elapsed}
     */
@@ -12831,6 +12876,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       // reset cached date time with time zone to recognize the new time zone
       _zonedStartTime = null;
+      _zonedEndTime = null;
    }
 
    public void setTourAltDown(final float tourAltDown) {
@@ -13086,6 +13132,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       // cache zoned date time
       _zonedStartTime = zonedStartTime;
+      _zonedEndTime = null;
    }
 
    public void setTourStartTime(final ZonedDateTime zonedStartTime) {
@@ -13111,6 +13158,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       // cache zoned date time
       _zonedStartTime = zonedStartTime;
+      _zonedEndTime = null;
    }
 
    /**
