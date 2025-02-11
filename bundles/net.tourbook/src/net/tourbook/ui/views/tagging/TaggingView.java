@@ -1844,16 +1844,16 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       menuMgr.add(_actionSingleExpand_CollapseOthers);
 
       // edit actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, this);
 
       // add/remove ... tags in the tours
-      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr);
+      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
 
       // tour type actions
-      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr);
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
 
       // export actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export, this);
 
       // customize tags in the view
       menuMgr.add(new Separator());

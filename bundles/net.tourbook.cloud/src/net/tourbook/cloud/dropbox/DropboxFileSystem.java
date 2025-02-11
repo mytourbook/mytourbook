@@ -54,6 +54,10 @@ public class DropboxFileSystem extends TourbookFileSystem {
 
       super("Dropbox"); //$NON-NLS-1$
 
+      if (isEnabled() == false) {
+         return;
+      }
+
       createDropboxFileSystem();
 
       _prefChangeListenerCommon = event -> {

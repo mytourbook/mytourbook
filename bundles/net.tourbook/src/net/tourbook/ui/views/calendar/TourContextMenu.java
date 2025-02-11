@@ -69,7 +69,7 @@ public class TourContextMenu {
    private ActionEditQuick                            _actionEditQuick;
    private ActionEditTour                             _actionEditTour;
    private ActionExport                               _actionExportTour;
-//   private ActionJoinTours                            _actionJoinTours;
+// private ActionJoinTours                            _actionJoinTours;
    private ActionOpenTour                             _actionOpenTour;
    private ActionOpenAdjustAltitudeDialog             _actionOpenAdjustAltitudeDialog;
    private ActionOpenMarkerDialog                     _actionOpenMarkerDialog;
@@ -264,23 +264,23 @@ public class TourContextMenu {
       }
 
       // edit actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, tourProvider);
 
       // tag actions
-      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr);
+      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, tourProvider);
 
       // tour type actions
-      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr);
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, tourProvider);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
       menuMgr.add(_actionSetElevationFromSRTM);
 
       // export actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export, tourProvider);
 
       // adjust actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.ADJUST, _allTourActions_Adjust);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.ADJUST, _allTourActions_Adjust, tourProvider);
 
       // customize this context menu
       TourActionManager.fillContextMenu_CustomizeAction(menuMgr)

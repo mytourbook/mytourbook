@@ -652,7 +652,7 @@ public abstract class AdvancedSlideoutShell {
    }
 
    /**
-    * Close the slideout, any possible flags to keep it open are ignored, the shell will be also
+    * Close the slideout, any possible flags to keep it open are ignored, the shell will also be
     * disposed.
     */
    public void close() {
@@ -1414,6 +1414,9 @@ public abstract class AdvancedSlideoutShell {
          }
          _isInShellResize = false;
       }
+
+      // there is sometimes an issue that a tooltip is moved, try to keep the current position
+      saveState();
    }
 
    /**
@@ -1628,18 +1631,22 @@ public abstract class AdvancedSlideoutShell {
     */
    protected void saveState() {
 
-      _state.put(STATE_HORIZ_SLIDEOUT_WIDTH, _horizContentWidth);
-      _state.put(STATE_HORIZ_SLIDEOUT_HEIGHT, _horizContentHeight);
-      _state.put(STATE_VERT_SLIDEOUT_WIDTH, _vertContentWidth);
-      _state.put(STATE_VERT_SLIDEOUT_HEIGHT, _vertContentHeight);
+// SET_FORMATTING_OFF
 
-      _state.put(STATE_IS_SLIDEOUT_PINNED, _isSlideoutPinned);
-      _state.put(STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X, _horizPinLocationX);
-      _state.put(STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y, _horizPinLocationY);
-      _state.put(STATE_VERT_SLIDEOUT_PIN_LOCATION_X, _vertPinLocationX);
-      _state.put(STATE_VERT_SLIDEOUT_PIN_LOCATION_Y, _vertPinLocationY);
+      _state.put(STATE_HORIZ_SLIDEOUT_WIDTH,             _horizContentWidth);
+      _state.put(STATE_HORIZ_SLIDEOUT_HEIGHT,            _horizContentHeight);
+      _state.put(STATE_VERT_SLIDEOUT_WIDTH,              _vertContentWidth);
+      _state.put(STATE_VERT_SLIDEOUT_HEIGHT,             _vertContentHeight);
 
-      _state.put(STATE_IS_KEEP_SLIDEOUT_OPEN, _isKeepSlideoutOpen);
+      _state.put(STATE_IS_SLIDEOUT_PINNED,               _isSlideoutPinned);
+      _state.put(STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X,    _horizPinLocationX);
+      _state.put(STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y,    _horizPinLocationY);
+      _state.put(STATE_VERT_SLIDEOUT_PIN_LOCATION_X,     _vertPinLocationX);
+      _state.put(STATE_VERT_SLIDEOUT_PIN_LOCATION_Y,     _vertPinLocationY);
+
+      _state.put(STATE_IS_KEEP_SLIDEOUT_OPEN,            _isKeepSlideoutOpen);
+
+// SET_FORMATTING_ON
    }
 
    /**

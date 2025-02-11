@@ -13,6 +13,7 @@ package net.tourbook.common.util;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
@@ -81,6 +82,20 @@ public class ImageConverter {
       }
 
       return image;
+   }
+
+   public static BufferedImage convertIntoAWT(final ImageDescriptor imageDescriptor, final int deviceZoom) {
+
+      final ImageData imageData = imageDescriptor.getImageData(deviceZoom);
+
+      BufferedImage awtImage;
+      final Image swtImage = new Image(Display.getDefault(), new NoAutoScalingImageDataProvider(imageData));
+      {
+         awtImage = convertIntoAWT(swtImage);
+      }
+      swtImage.dispose();
+
+      return awtImage;
    }
 
    /**

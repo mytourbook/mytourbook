@@ -282,7 +282,7 @@ public class SlideoutMapModel extends AdvancedSlideout {
              * Button: Import
              */
             _btnImport = new Button(container, SWT.PUSH);
-            _btnImport.setText("&Import");
+            _btnImport.setText(Messages.Slideout_MapModel_Button_Import);
             _btnImport.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onModel_Import()));
 
             // set button default width
@@ -476,7 +476,7 @@ public class SlideoutMapModel extends AdvancedSlideout {
 
       final FileDialog dialog = new FileDialog(_parent.getShell(), SWT.SAVE);
 
-      dialog.setText("Select 2.5D map model configuration file");
+      dialog.setText(Messages.Slideout_MapModel_ImportDialog_Title);
 
       String selectedFilepath;
 

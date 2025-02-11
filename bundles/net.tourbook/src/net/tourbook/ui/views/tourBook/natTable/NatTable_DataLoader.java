@@ -894,6 +894,9 @@ public class NatTable_DataLoader {
 
 // SET_FORMATTING_OFF
 
+      /*
+       * These functions are stored procedures from net.tourbook.ext.apache.custom.DerbyCustomFunctions
+       */
       final String sortByAvgSpeed = "avgSpeed(" + timeField + ", tourDistance)"; //$NON-NLS-1$ //$NON-NLS-2$
       final String sortByPace     = "avgPace("  + timeField + ", tourDistance)"; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -1033,6 +1036,7 @@ public class NatTable_DataLoader {
       case TableColumnFactory.TIME_TIME_ZONE_ID:                     return "TimeZoneId";                      //$NON-NLS-1$
       case TableColumnFactory.TIME_TIME_ZONE_DIFFERENCE_ID:          return FIELD_WITHOUT_SORTING;
 //    case TableColumnFactory.TIME_TOUR_START_TIME_ID:               // see indexed fields
+      case TableColumnFactory.TIME_TOUR_END_TIME_ID:                 return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TIME_WEEK_DAY_ID:                      return FIELD_WITHOUT_SORTING;
 //    case TableColumnFactory.TIME_WEEK_NO_ID:                       // see indexed fields
 //    case TableColumnFactory.TIME_WEEKYEAR_ID:                      // see indexed fields
@@ -1091,7 +1095,7 @@ public class NatTable_DataLoader {
          // ensure a valid field is returned, this case should not happen but it helps during development
 
          System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] getSqlField_OrderBy()" //$NON-NLS-1$ //$NON-NLS-2$
-               + "\tsortColumnId: \"" + sortColumnId + UI.SYMBOL_QUOTATION_MARK //$NON-NLS-1$ //$NON-NLS-2$
+               + "\tsortColumnId: \"" + sortColumnId + UI.SYMBOL_QUOTATION_MARK //$NON-NLS-1$
                + " has not a valid sql field" //$NON-NLS-1$
                );
 

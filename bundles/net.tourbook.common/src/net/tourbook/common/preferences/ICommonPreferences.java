@@ -97,4 +97,9 @@ public interface ICommonPreferences {
     */
    public static final String TRANSFORM_VALUE_OPACITY_MAX = "TRANSFORM_VALUE_OPACITY_MAX"; //$NON-NLS-1$
 
+   /*
+    * Autocomplete
+    */
+   public static final String AUTO_COMPLETE_PREFIX  = "AUTO_COMPLETE_PREFIX";  //$NON-NLS-1$
+
 }

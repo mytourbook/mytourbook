@@ -465,6 +465,7 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory TIME_TOUR_START_TIME;
    public static final String             TIME_TOUR_START_TIME_ID                            = "TIME_TOUR_START_TIME";                            //$NON-NLS-1$
    public static final TableColumnFactory TIME_TOUR_END_TIME;
+   public static final String             TIME_TOUR_END_TIME_ID                              = "TIME_TOUR_END_TIME";                              //$NON-NLS-1$
    public static final TableColumnFactory TIME_TOUR_START_DATE;
    public static final TableColumnFactory TIME_TOUR_END_DATE;
    public static final TableColumnFactory TIME_WEEK_DAY;
@@ -4505,6 +4506,11 @@ public abstract class TableColumnFactory {
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TourEndTime_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(14));
+
+            colDef.setValueFormats(
+                  ValueFormatSet.Time_mmss,
+                  ValueFormat.TIME_HH_MM,
+                  columnManager);
 
             return colDef;
          }

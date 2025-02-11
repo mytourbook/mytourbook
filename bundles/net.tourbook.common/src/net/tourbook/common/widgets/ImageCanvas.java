@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2010, 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -61,7 +61,7 @@ public class ImageCanvas extends Canvas implements PaintListener {
    private boolean                               _isFocusGained;
    private boolean                               _isSmoothImages;
 
-   private Point                                 _imageSize;
+   private Rectangle                             _imageBounds;
 
    /**
     * @param parent
@@ -195,10 +195,11 @@ public class ImageCanvas extends Canvas implements PaintListener {
    }
 
    /**
-    * @return Returns the size of the currently resized image
+    * @return Returns the position within the canvas and the size of the painted image
     */
-   public Point getResizedImageSize() {
-      return _imageSize;
+   public Rectangle getImageBounds() {
+
+      return _imageBounds;
    }
 
    @Override
@@ -299,7 +300,12 @@ public class ImageCanvas extends Canvas implements PaintListener {
                bestSizeHeight);
       }
 
-      _imageSize = new Point(bestSizeWidth, bestSizeHeight);
+      _imageBounds = new Rectangle(
+
+            offsetX,
+            offsetY,
+            bestSizeWidth,
+            bestSizeHeight);
    }
 
    public void removeSelectionListener(final SelectionListener listener) {

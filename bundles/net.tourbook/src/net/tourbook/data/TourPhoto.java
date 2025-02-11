@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,8 +30,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoAdjustments;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -115,6 +120,11 @@ public class TourPhoto implements Serializable {
 
    private double                     longitude;
 
+   /**
+    * Photo adjustments are stored in json format
+    */
+   private String                     photoAdjustmentsJSON;
+
    @ManyToOne(optional = false)
    private TourData                   tourData;
 
@@ -124,6 +134,9 @@ public class TourPhoto implements Serializable {
     */
    @Transient
    private long                       _createId           = 0;
+
+   @Transient
+   private PhotoAdjustments           _photoAdjustments;
 
    // constructor is required for hibernate
    public TourPhoto() {}
@@ -261,6 +274,32 @@ public class TourPhoto implements Serializable {
       return longitude;
    }
 
+   /**
+    * @param isCreate
+    *           When <code>true</code> then an instance is created when it is not available
+    *
+    * @return Returns {@link PhotoAdjustments} or <code>null</code> when not available
+    */
+   public PhotoAdjustments getPhotoAdjustments(final boolean isCreate) {
+
+      if (_photoAdjustments == null) {
+
+         _photoAdjustments = parsePhotoAdjustments();
+
+         if (_photoAdjustments == null && isCreate) {
+
+            _photoAdjustments = new PhotoAdjustments();
+         }
+      }
+
+      return _photoAdjustments;
+   }
+
+   public String getPhotoAdjustmentsJSON() {
+
+      return photoAdjustmentsJSON;
+   }
+
    public long getPhotoId() {
       return photoId;
    }
@@ -292,6 +331,31 @@ public class TourPhoto implements Serializable {
 
    public boolean isGeoFromTour() {
       return isGeoFromPhoto == 0;
+   }
+
+   /**
+    *
+    * @return Returns {@link PhotoAdjustments} when its values are stored in the DB in JSON format.
+    */
+   private PhotoAdjustments parsePhotoAdjustments() {
+
+      if (photoAdjustmentsJSON != null) {
+
+         try {
+
+            final ObjectMapper mapper = new ObjectMapper();
+
+            final PhotoAdjustments photoAdjustments = mapper.readValue(photoAdjustmentsJSON, PhotoAdjustments.class);
+
+            return photoAdjustments;
+
+         } catch (final JsonProcessingException e) {
+
+            StatusUtil.log(e);
+         }
+      }
+
+      return null;
    }
 
    public void setAdjustedTime(final long adjustedTime) {
@@ -412,6 +476,34 @@ public class TourPhoto implements Serializable {
 
             + "]" + NL //                                                     //$NON-NLS-1$
       ;
+   }
+
+   /**
+    * Update all photo adjustments in the JSON data
+    */
+   public void updateAllPhotoAdjustments() {
+
+      if (_photoAdjustments == null) {
+         return;
+      }
+
+      try {
+
+         final ObjectMapper mapper = new ObjectMapper();
+
+         photoAdjustmentsJSON = mapper.writeValueAsString(_photoAdjustments);
+
+         if (photoAdjustmentsJSON.length() >= TourDatabase.VARCHAR_MAX_LENGTH) {
+
+            photoAdjustmentsJSON = null;
+
+            StatusUtil.logError("Cannot save photoAdjustmentsJSON because it is > %d".formatted(TourDatabase.VARCHAR_MAX_LENGTH)); //$NON-NLS-1$
+         }
+
+      } catch (final JsonProcessingException e) {
+
+         StatusUtil.log(e);
+      }
    }
 
 }

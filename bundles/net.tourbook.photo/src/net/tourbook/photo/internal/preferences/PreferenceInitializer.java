@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -100,19 +100,19 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(IPhotoPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY, false);
 
       /*
-       * external photo viewer
+       * External photo folder viewer
        */
       if (UI.IS_WIN) {
 
-         store.setDefault(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_1, "explorer.exe"); //$NON-NLS-1$
+         store.setDefault(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FOLDER_VIEWER_1, "explorer.exe"); //$NON-NLS-1$
 
       } else if (UI.IS_OSX) {
 
-         store.setDefault(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_1, "Preview.app"); //$NON-NLS-1$
-         store.setDefault(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_2, "Finder.app"); //$NON-NLS-1$
+         store.setDefault(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FOLDER_VIEWER_1, "Preview.app"); //$NON-NLS-1$
+         store.setDefault(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FOLDER_VIEWER_2, "Finder.app"); //$NON-NLS-1$
 
       } else if (UI.IS_LINUX) {
-         store.setDefault(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_VIEWER_1, "nautilus"); //$NON-NLS-1$
+         store.setDefault(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FOLDER_VIEWER_1, "nautilus"); //$NON-NLS-1$
       }
 
    }

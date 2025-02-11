@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,7 @@ import de.byteholder.geoclipse.map.TourPause;
 import de.byteholder.geoclipse.mapprovider.MP;
 
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.PrintStream;
 import java.io.Serializable;
@@ -90,6 +91,7 @@ import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.math.Smooth;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoAdjustments;
 import net.tourbook.photo.PhotoCache;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.srtm.ElevationSRTM1;
@@ -122,6 +124,9 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
+
+import pixelitor.filters.curves.ToneCurve;
+import pixelitor.filters.curves.ToneCurvesFilter;
 
 /**
  * Tour data contains all data for one tour, an entity is saved in the database
@@ -1654,10 +1659,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private ZonedDateTime      _dateTimeModified;
 
    /**
-    * Tour start time with a time zone.
+    * Tour start time with a time zone
     */
    @Transient
    private ZonedDateTime      _zonedStartTime;
+
+   /**
+    * Tour end time with a time zone
+    */
+   @Transient
+   private ZonedDateTime      _zonedEndTime;
 
    /**
     * Tour markers which are sorted by serie index
@@ -6487,6 +6498,59 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          galleryPhoto.adjustedTime_Tour = tourPhoto.getAdjustedTime();
          galleryPhoto.imageExifTime = tourPhoto.getImageExifTime();
 
+         final PhotoAdjustments photoAdjustments = tourPhoto.getPhotoAdjustments(false);
+
+         if (photoAdjustments != null) {
+
+            galleryPhoto.isCropped = photoAdjustments.isPhotoCropped;
+            galleryPhoto.cropAreaX1 = photoAdjustments.cropAreaX1;
+            galleryPhoto.cropAreaY1 = photoAdjustments.cropAreaY1;
+            galleryPhoto.cropAreaX2 = photoAdjustments.cropAreaX2;
+            galleryPhoto.cropAreaY2 = photoAdjustments.cropAreaY2;
+
+            galleryPhoto.isSetTonality = photoAdjustments.isSetTonality;
+
+            /*
+             * Create curve knots
+             */
+            final ToneCurvesFilter toneCurvesFilter = galleryPhoto.getToneCurvesFilter();
+            final ToneCurve toneCurve = toneCurvesFilter.getCurves().getActiveCurve();
+
+            final float[] curveXValues = photoAdjustments.curveValuesX;
+            final float[] curveYValues = photoAdjustments.curveValuesY;
+
+            toneCurve.reset();
+
+            if (curveXValues != null && curveXValues.length >= 2) {
+
+               final int lastIndex = curveXValues.length - 1;
+
+               // set first/last points
+               float xValue = curveXValues[0];
+               float yValue = curveYValues[0];
+               toneCurve.setKnotPosition(0, new Point2D.Float(xValue, yValue));
+
+               xValue = curveXValues[lastIndex];
+               yValue = curveYValues[lastIndex];
+               toneCurve.setKnotPosition(1, new Point2D.Float(xValue, yValue));
+
+               // set other points
+               for (int valueIndex = 1; valueIndex < lastIndex; valueIndex++) {
+
+                  xValue = curveXValues[valueIndex];
+                  yValue = curveYValues[valueIndex];
+
+                  toneCurve.addKnot(new Point2D.Float(xValue, yValue), false);
+               }
+
+            } else {
+
+               // create default curve with middle point
+
+               toneCurve.addKnot(new Point2D.Float(0.5f, 0.5f), false);
+            }
+         }
+
          /*
           * Set adjusted time with time zone
           */
@@ -10886,6 +10950,45 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
+    * @return Returns the tour end date time with the tour time zone, when not available with the
+    *         default time zone.
+    */
+   public ZonedDateTime getTourEndTime() {
+
+      if (_zonedEndTime == null) {
+
+         final Instant tourStartMills = Instant.ofEpochMilli(tourEndTime);
+         final ZoneId tourStartTimeZoneId = getTimeZoneIdWithDefault();
+
+         final ZonedDateTime zonedStartTime = ZonedDateTime.ofInstant(tourStartMills, tourStartTimeZoneId);
+
+         if (timeZoneId == null) {
+
+            /*
+             * Tour has no time zone but this can be changed in the preferences, so this value is
+             * not cached
+             */
+
+            setCalendarWeek(zonedStartTime);
+
+            return zonedStartTime;
+
+         } else {
+
+            /*
+             * Cache this values until the tour zone is modified
+             */
+
+            _zonedEndTime = zonedStartTime;
+
+            setCalendarWeek(_zonedEndTime);
+         }
+      }
+
+      return _zonedEndTime;
+   }
+
+   /**
     * @return Returns tour end time in ms, this value should be {@link #tourStartTime} +
     *         {@link #tourDeviceTime_Elapsed}
     */
@@ -12807,6 +12910,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       // reset cached date time with time zone to recognize the new time zone
       _zonedStartTime = null;
+      _zonedEndTime = null;
    }
 
    public void setTourAltDown(final float tourAltDown) {
@@ -13062,6 +13166,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       // cache zoned date time
       _zonedStartTime = zonedStartTime;
+      _zonedEndTime = null;
    }
 
    public void setTourStartTime(final ZonedDateTime zonedStartTime) {
@@ -13087,6 +13192,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       // cache zoned date time
       _zonedStartTime = zonedStartTime;
+      _zonedEndTime = null;
    }
 
    /**

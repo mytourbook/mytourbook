@@ -450,24 +450,21 @@ public class PhotoLoadManager {
       _executorHQ.submit(executorTask);
    }
 
-   public static void putImageInLoadingQueueHQThumb_Map(final Photo photo,
+   public static void putImageInLoadingQueueHQ_Map_Thumb(final Photo photo,
                                                         final int thumbImageSize,
+                                                        final ImageQuality imageQuality,
                                                         final ILoadCallBack imageLoaderCallback) {
-
-      final ImageQuality imageQuality = ImageQuality.THUMB_HQ;
 
       // set state
       photo.setLoadingState(PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE, imageQuality);
 
       // put image loading item into the waiting queue
-      final PhotoImageLoader photoImageLoader = new PhotoImageLoader(
+      _waitingQueueHQ.add(new PhotoImageLoader(
             _display,
             photo,
             imageQuality,
             thumbImageSize,
-            imageLoaderCallback);
-
-      _waitingQueueHQ.add(photoImageLoader);
+            imageLoaderCallback));
 
       final Runnable executorTask = new Runnable() {
          @Override
@@ -488,7 +485,7 @@ public class PhotoLoadManager {
 
             } else {
 
-               imageLoader.loadImageHQThumb(_waitingQueueThumb, _waitingQueueExif);
+               imageLoader.loadImageHQThumb_Map(_waitingQueueThumb, _waitingQueueExif, photo, imageQuality);
             }
 
             checkLoadingState(photo, imageQuality);

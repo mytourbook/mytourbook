@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -382,7 +382,7 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
       }
    }
 
-   private Composite createUI(final Composite parent) {
+   private void createUI(final Composite parent) {
 
       final Composite shellContainer = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(shellContainer);
@@ -418,10 +418,7 @@ class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfi
             tabWeekSummary.setControl(createUI_800_Tab_WeekSummary(_tabFolder));
             tabWeekSummary.setText(Messages.Slideout_CalendarOptions_Tab_WeekSummary);
          }
-
       }
-
-      return shellContainer;
    }
 
    private Control createUI_100_Tab_Profile(final Composite parent) {

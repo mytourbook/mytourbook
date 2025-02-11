@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -61,7 +61,7 @@ public class Messages extends NLS {
    public static String        Action_Tag_Add_AutoOpen_Title;
    public static String        Action_Tag_Add_RecentTags;
    public static String        Action_Tag_AddGroupedTags;
-   public static String        Action_Tag_AddRecentTgs;
+   public static String        Action_Tag_AddRecentTags;
    public static String        Action_Tag_AutoOpenCancel;
    public static String        Action_Tag_AutoOpenOK;
    public static String        Action_Tag_CopyTags;
@@ -1453,6 +1453,10 @@ public class Messages extends NLS {
    public static String        Map_Points_LabelBackground_None;
    public static String        Map_Points_LabelBackground_RectangleBox;
    public static String        Map_Points_LabelBackground_Shadow;
+   public static String        Map_Points_LabelTime_Date;
+   public static String        Map_Points_LabelTime_DateTime;
+   public static String        Map_Points_LabelTime_None;
+   public static String        Map_Points_LabelTime_Time;
 
    public static String        Model_Player_Button_MapModel_Tooltip;
    public static String        Model_Player_Button_MapModelCursor_Tooltip;
@@ -1672,6 +1676,8 @@ public class Messages extends NLS {
 
    public static String        Pref_General_Button_ComputeCalendarWeek;
    public static String        Pref_General_CalendarWeek;
+   public static String        Pref_General_Checkbox_AutoCompletePrefix;
+   public static String        Pref_General_Checkbox_AutoCompletePrefix_Info;
    public static String        Pref_General_Checkbox_SetTimeZone;
    public static String        Pref_General_Dialog_CalendarWeekIsModified_Message;
    public static String        Pref_General_Dialog_CalendarWeekIsModified_Title;
@@ -1685,6 +1691,7 @@ public class Messages extends NLS {
    public static String        Pref_General_Label_MinimalDaysInFirstWeek;
    public static String        Pref_General_Label_MinimalDaysInFirstWeek_Tooltip;
    public static String        Pref_General_Label_SetAnotherTimeZone;
+   public static String        Pref_General_Miscellaneous;
    public static String        Pref_General_Notes;
    public static String        Pref_General_Notes_Tooltip;
    public static String        pref_general_restart_app_message;
@@ -2389,10 +2396,15 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Tab_Selection;
    public static String        Slideout_Map_Options_Tab_Slider;
 
+   public static String        Slideout_Map_PhotoOptions_Checkbox_EnlargeSmallImages;
+   public static String        Slideout_Map_PhotoOptions_Checkbox_EnlargeSmallImages_Tooltip;
    public static String        Slideout_Map_PhotoOptions_Checkbox_PreloadPhotoImages;
    public static String        Slideout_Map_PhotoOptions_Checkbox_PreloadPhotoImages_Tooltip;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowHqPhotoImages;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowHqPhotoImages_Tooltip;
+   public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoAdjustments;
+   public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoAdjustments_Tooltip;
+   public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoAnnotations;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoRating;
    public static String        Slideout_Map_PhotoOptions_Checkbox_ShowPhotoTooltip;
    public static String        Slideout_Map_PhotoOptions_Label_MemoryState;
@@ -2401,22 +2413,17 @@ public class Messages extends NLS {
    public static String        Slideout_Map_PhotoOptions_Label_Title;
    public static String        Slideout_Map_PhotoOptions_Link_DiscardCachedImages;
    public static String        Slideout_Map_PhotoOptions_Link_DiscardCachedImages_Tooltip;
-   public static String        Slideout_Map_PhotoOptions_Title;
    public static String        Slideout_Map_SyncMap_Label_Title;
    public static String        Slideout_Map_TourColors_Checkbox_ShowInChartToolbar_Tooltip;
    public static String        Slideout_Map_TourColors_Label_Title;
    public static String        Slideout_Map_TrackOptions_Label_Title;
    public static String        Slideout_Map_TrackOptions_Label_Title_Tooltip;
 
-   public static String        Slideout_MapPoint_PhotoToolTip_Combo_TooltipSize_Tooltip;
-   public static String        Slideout_MapPoint_PhotoToolTip_Label_LoadingMessage;
-   public static String        Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip;
-   public static String        Slideout_MapPoint_PhotoToolTip_Link_ResizeTooltip_Tooltip;
-
    public static String        Slideout_MapPoints_Action_CommonLocations_Tooltip;
    public static String        Slideout_MapPoints_Action_TourLocations_Tooltip;
    public static String        Slideout_MapPoints_Action_TourMarkers_Tooltip;
    public static String        Slideout_MapPoints_Action_TourPauses_Tooltip;
+   public static String        Slideout_MapPoints_Action_TourPhotos_Tooltip;
    public static String        Slideout_MapPoints_Action_TourWayPoints_Tooltip;
    public static String        Slideout_MapPoints_Checkbox_AntialiasLabel;
    public static String        Slideout_MapPoints_Checkbox_ClusterTourMarkers;
@@ -2450,10 +2457,16 @@ public class Messages extends NLS {
    public static String        Slideout_MapPoints_Label_MapTransparencyColor_Tooltip;
    public static String        Slideout_MapPoints_Label_MarkerColor;
    public static String        Slideout_MapPoints_Label_MarkerColor_Tooltip;
+
+   public static String        Slideout_MapPoints_Label_MarkerTime;
+
+   public static String        Slideout_MapPoints_Label_MarkerTime_Tooltip;
+
    public static String        Slideout_MapPoints_Label_Stats_CommonLocations;
    public static String        Slideout_MapPoints_Label_Stats_TourLocations;
    public static String        Slideout_MapPoints_Label_Stats_TourMarkers;
    public static String        Slideout_MapPoints_Label_Stats_TourPauses;
+   public static String        Slideout_MapPoints_Label_Stats_TourPhotos;
    public static String        Slideout_MapPoints_Label_Title2;
    public static String        Slideout_MapPoints_Label_TourLocationColor;
    public static String        Slideout_MapPoints_Label_TourLocation_StartColor;
@@ -2477,10 +2490,21 @@ public class Messages extends NLS {
    public static String        Slideout_MapPoints_Tab_TourPauses_Tooltip;
    public static String        Slideout_MapPoints_Tab_TourWayPoints_Tooltip;
 
+   public static String        Slideout_MapModel_Button_Import;
    public static String        Slideout_MapModel_Column_Name;
    public static String        Slideout_MapModel_Dialog_DeleteModel_Message;
    public static String        Slideout_MapModel_Dialog_DeleteModel_Title;
+   public static String        Slideout_MapModel_ImportDialog_Title;
    public static String        Slideout_MapModel_Label_Title;
+
+   public static String        Slideout_PhotoImage_Checkbox_CropPhoto;
+   public static String        Slideout_PhotoImage_Combo_TooltipSize_Tooltip;
+   public static String        Slideout_PhotoImage_Label_AdjustmentIsDisabled;
+   public static String        Slideout_PhotoImage_Label_AdjustmentIsDisabled_Tooltip;
+   public static String        Slideout_PhotoImage_Label_LoadingMessage;
+   public static String        Slideout_PhotoImage_Label_PhotoIsNotSelected;
+   public static String        Slideout_PhotoImage_Link_ResizeTooltip2;
+   public static String        Slideout_PhotoImage_Link_ResizeTooltip2_Tooltip;
 
    public static String        Slideout_RefTour_Checkbox_Altimeter_Avg;
    public static String        Slideout_RefTour_Checkbox_Pace_Avg;
@@ -2791,6 +2815,8 @@ public class Messages extends NLS {
    public static String        Slideout_TourTagFilter_Radio_TagOperator_OR_Tooltip;
 
    public static String        Slideout_TrainingOptions_Label_Title;
+
+   public static String        Slideout_PhotoHistogram_Checkbox_AdjustTonality;
 
    public static String        SRTM_Download_Dialog_SRTMDownloadValidation_Title;
    public static String        SRTM_Download_Info_NoDownloadValidation;

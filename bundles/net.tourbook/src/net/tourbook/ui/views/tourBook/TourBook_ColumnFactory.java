@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -127,6 +127,7 @@ class TourBook_ColumnFactory {
       defineColumn_1_Date();
       defineColumn_Time_WeekDay();
       defineColumn_Time_TourStartTime();
+      defineColumn_Time_TourEndTime();
       defineColumn_Time_TimeZoneDifference();
       defineColumn_Time_TimeZone();
       defineColumn_Time_ElapsedTime();
@@ -2881,6 +2882,102 @@ class TourBook_ColumnFactory {
                final TourDateTime tourDateTime = tourItem.colTourDateTime;
 
                cell.setText(tourDateTime.timeZoneOffsetLabel);
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Time - Tour end time
+    */
+   private void defineColumn_Time_TourEndTime() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_TOUR_END_TIME.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setIsDefaultColumn();
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider_WithTourTooltip() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final TVITourBookTour tourItem = (TVITourBookTour) element;
+
+            final TourDateTime tourDateTime = tourItem.colTourDateTime;
+            final long elapsedTime = tourItem.colTourDeviceTime_Elapsed;
+
+            final ZonedDateTime tourStartDateTime = tourDateTime.tourZonedDateTime;
+            final ZonedDateTime tourEndDateTime = tourStartDateTime.plusSeconds(elapsedTime);
+
+            final ValueFormat valueFormatter = colDef_NatTable.getValueFormat_Detail();
+
+            String tourEndTime;
+
+            if (valueFormatter.equals(ValueFormat.TIME_HH_MM_SS)) {
+               tourEndTime = tourEndDateTime.format(TimeTools.Formatter_Time_M);
+            } else {
+               tourEndTime = tourEndDateTime.format(TimeTools.Formatter_Time_S);
+            }
+
+            if (UI.IS_SCRAMBLE_DATA) {
+               tourEndTime = UI.scrambleText(tourEndTime);
+            }
+
+            return tourEndTime;
+         }
+
+         @Override
+         public boolean isShowTooltip() {
+            return _isShowToolTipIn_Time;
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_TOUR_END_TIME.createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setIsDefaultColumn();
+      colDef_Tree.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
+
+         @Override
+         public Long getTourId(final ViewerCell cell) {
+
+            if (_isShowToolTipIn_Time == false) {
+               return null;
+            }
+
+            final Object element = cell.getElement();
+            if ((element instanceof final TVITourBookTour tourItem)) {
+               return tourItem.getTourId();
+            }
+
+            return null;
+         }
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof final TVITourBookTour tourItem) {
+
+               final TourDateTime tourDateTime = tourItem.colTourDateTime;
+               final long elapsedTime = tourItem.colTourDeviceTime_Elapsed;
+
+               final ZonedDateTime tourStartDateTime = tourDateTime.tourZonedDateTime;
+               final ZonedDateTime tourEndDateTime = tourStartDateTime.plusSeconds(elapsedTime);
+
+               final ValueFormat valueFormatter = colDef_Tree.getValueFormat_Detail();
+
+               String tourEndTime;
+
+               if (valueFormatter.equals(ValueFormat.TIME_HH_MM_SS)) {
+                  tourEndTime = tourEndDateTime.format(TimeTools.Formatter_Time_M);
+               } else {
+                  tourEndTime = tourEndDateTime.format(TimeTools.Formatter_Time_S);
+               }
+
+               if (UI.IS_SCRAMBLE_DATA) {
+                  tourEndTime = UI.scrambleText(tourEndTime);
+               }
+
+               cell.setText(tourEndTime);
 
                setCellColor(cell, element);
             }

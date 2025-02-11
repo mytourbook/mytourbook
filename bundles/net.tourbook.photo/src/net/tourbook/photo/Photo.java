@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,8 @@
 package net.tourbook.photo;
 
 import java.awt.Point;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.Rectangle2D.Float;
 import java.io.File;
 import java.io.Serializable;
 import java.time.Instant;
@@ -55,6 +57,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Rectangle;
 
+import pixelitor.filters.curves.ToneCurvesFilter;
+
 public class Photo implements Serializable {
 
    private static final long                           serialVersionUID               = 1L;
@@ -83,13 +87,11 @@ public class Photo implements Serializable {
    private static int                              _map2ImageRequestedSize  = MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
    private static int                              _map25ImageRequestedSize = MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
 
-   private int                                     _map2ImageRequestedAndCheckedSize;
    private int                                     _map25ImageRequestedAndCheckedSize;
 
    /**
     * Image size which is painted in the map
     */
-   private org.eclipse.swt.graphics.Point          _map2ImageRenderSize     = MAP_IMAGE_DEFAULT_SIZE;
    private org.eclipse.swt.graphics.Point          _map25ImageRenderSize    = MAP_IMAGE_DEFAULT_SIZE;
 
    private String                                  _uniqueId;
@@ -234,65 +236,69 @@ public class Photo implements Serializable {
     */
 //   private static boolean                        _isGetExifGeo               = false;
 
-   private int                                     _photoImageWidth         = Integer.MIN_VALUE;
-   private int                                     _photoImageHeight        = Integer.MIN_VALUE;
+   /**
+    * Photo image width, it is {@link Integer#MIN_VALUE} when not yet set
+    */
+   private int                           _photoImageWidth     = Integer.MIN_VALUE;
+   private int                           _photoImageHeight    = Integer.MIN_VALUE;
 
-   private int                                     _thumbImageWidth         = Integer.MIN_VALUE;
-   private int                                     _thumbImageHeight        = Integer.MIN_VALUE;
+   private int                           _thumbImageWidth     = Integer.MIN_VALUE;
+   private int                           _thumbImageHeight    = Integer.MIN_VALUE;
 
    /**
     * Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the value when the
     * value is not set !!!
     */
-   private double                                  _exifLatitude            = 0;
-   private double                                  _exifLongitude           = 0;
+   private double                        _exifLatitude;
+   private double                        _exifLongitude;
 
-   private double                                  _tourLatitude            = 0;
-   private double                                  _tourLongitude           = 0;
+   private double                        _tourLatitude;
+   private double                        _tourLongitude;
 
-   private double                                  _linkLatitude            = 0;
-   private double                                  _linkLongitude           = 0;
+   private double                        _linkLatitude;
+   private double                        _linkLongitude;
 
-   private String                                  _gpsAreaInfo;
+   private String                        _gpsAreaInfo;
 
-   private double                                  _imageDirection          = Double.MIN_VALUE;
+   private double                        _imageDirection      = Double.MIN_VALUE;
 
-   private double                                  _altitude                = Double.MIN_VALUE;
+   private double                        _altitude            = Double.MIN_VALUE;
 
    /**
     * Caches the world positions for the photo lat/long values for each zoom level
     * <p>
     * key: projection id + zoom level
     */
-   private final HashMap<Integer, Point>           _tourWorldPosition       = new HashMap<>();
-   private final HashMap<Integer, Point>           _linkWorldPosition       = new HashMap<>();
+   private final HashMap<Integer, Point> _tourWorldPosition   = new HashMap<>();
+   private final HashMap<Integer, Point> _linkWorldPosition   = new HashMap<>();
 
    /**
     * Contains image keys for each image quality which can be used to get images from an image
     * cache
     */
-   private String                                  _imageKey_Thumb;
-   private String                                  _imageKey_ThumbQH;
-   private String                                  _imageKey_HQ;
-   private String                                  _imageKey_Original;
+   private String                        _imageKey_Thumb;
+   private String                        _imageKey_ThumbHQ;
+   private String                        _imageKey_ThumbHQ_Adjusted;
+   private String                        _imageKey_HQ;
+   private String                        _imageKey_Original;
 
    /**
     * This array keeps track of the loading state for the photo images and for different qualities
     */
-   private PhotoLoadingState                       _photoLoadingStateThumb;
-   private PhotoLoadingState                       _photoLoadingStateThumbHQ;
-   private PhotoLoadingState                       _photoLoadingStateHQ;
-   private PhotoLoadingState                       _photoLoadingStateOriginal;
+   private PhotoLoadingState             _photoLoadingStateThumb;
+   private PhotoLoadingState             _photoLoadingStateThumbHQ;
+   private PhotoLoadingState             _photoLoadingStateHQ;
+   private PhotoLoadingState             _photoLoadingStateOriginal;
 
    /**
     * Is <code>true</code> when loading the image causes an error.
     */
-   private boolean                                 _isLoadingError;
+   private boolean                       _isLoadingError;
 
    /**
     * Is <code>true</code> when the image file is available in the file system.
     */
-   private boolean                                 _isImageFileAvailable;
+   private boolean                       _isImageFileAvailable;
 
    /**
     * Exif thumb state
@@ -304,12 +310,29 @@ public class Photo implements Serializable {
     * -1 exif thumb has not yet been retrieved
     * </pre>
     */
-   private int                                     _exifThumbImageState     = -1;
+   private int                           _exifThumbImageState = -1;
 
    /**
     * Temporarily tour id from a {@link TourPhotoLink}
     */
-   private long                                    _photoLinkTourId;
+   private long                          _photoLinkTourId;
+
+   /**
+    * When <code>true</code> then the photo adjustments are computed. This is the MAIN flag to
+    * recomputed photo adjustments.
+    */
+   public boolean                        isAdjustmentModified;
+
+   public boolean                        isCropped;
+
+   /** Relative position for the top left x position of the cropping area */
+   public float                          cropAreaX1;
+   public float                          cropAreaY1;
+   public float                          cropAreaX2;
+   public float                          cropAreaY2;
+
+   public boolean                        isSetTonality;
+   private ToneCurvesFilter              _toneCurvesFilter;
 
    /**
     */
@@ -331,6 +354,11 @@ public class Photo implements Serializable {
    public static String getImageKey_ThumbHQ(final String imageFilePathName) {
 
       return Util.computeMD5(imageFilePathName) + "_KeyThumbHQ";//$NON-NLS-1$
+   }
+
+   public static String getImageKey_ThumbHQ_Adjusted(final String imageFilePathName) {
+
+      return Util.computeMD5(imageFilePathName) + "_KeyThumbHQ_Adjusted";//$NON-NLS-1$
    }
 
    public static int getMap25ImageRequestedSize() {
@@ -813,7 +841,11 @@ public class Photo implements Serializable {
 
       } else if (imageQuality == ImageQuality.THUMB_HQ) {
 
-         return _imageKey_ThumbQH;
+         return _imageKey_ThumbHQ;
+
+      } else if (imageQuality == ImageQuality.THUMB_HQ_ADJUSTED) {
+
+         return _imageKey_ThumbHQ_Adjusted;
 
       } else if (imageQuality == ImageQuality.ORIGINAL) {
 
@@ -943,7 +975,8 @@ public class Photo implements Serializable {
 
          return _photoLoadingStateHQ;
 
-      } else if (imageQuality == ImageQuality.THUMB_HQ) {
+      } else if (imageQuality == ImageQuality.THUMB_HQ
+            || imageQuality == ImageQuality.THUMB_HQ_ADJUSTED) {
 
          return _photoLoadingStateThumbHQ;
 
@@ -973,18 +1006,76 @@ public class Photo implements Serializable {
    }
 
    /**
+    * @param isShowHQPhotoImages
+    *           When <code>false</code> then only the thumb images are displayed
+    * @param isShowPhotoAdjustments
+    *           Is <code>true</code> when e.g. the photo is cropped
+    * @param isEnlargeSmallImages
+    *
     * @return Returns size when image is painted on the map
     */
-   public org.eclipse.swt.graphics.Point getMap2ImageSize() {
+   public org.eclipse.swt.graphics.Point getMap2ImageSize(final boolean isShowHQPhotoImages,
+                                                          final boolean isShowPhotoAdjustments,
+                                                          final boolean isEnlargeSmallImages) {
 
-      if (_map2ImageRequestedSize != _map2ImageRequestedAndCheckedSize) {
+      int imageWidth;
+      int imageHeight;
 
-         setMap2ImageRenderSize(_map2ImageRequestedSize);
+      if (isShowHQPhotoImages) {
 
-         _map2ImageRequestedAndCheckedSize = _map2ImageRequestedSize;
+         imageWidth = _photoImageWidth != Integer.MIN_VALUE ? _photoImageWidth : _thumbImageWidth;
+         imageHeight = _photoImageHeight != Integer.MIN_VALUE ? _photoImageHeight : _thumbImageHeight;
+
+      } else {
+
+         // a thumb image is displayed
+
+         imageWidth = _thumbImageWidth;
+         imageHeight = _thumbImageHeight;
       }
 
-      return _map2ImageRenderSize;
+      imageWidth = imageWidth == Integer.MIN_VALUE ? MAP_IMAGE_DEFAULT_WIDTH_HEIGHT : imageWidth;
+      imageHeight = imageHeight == Integer.MIN_VALUE ? MAP_IMAGE_DEFAULT_WIDTH_HEIGHT : imageHeight;
+
+      if (isShowHQPhotoImages && isShowPhotoAdjustments && isCropped && imageWidth != Integer.MIN_VALUE) {
+
+         // adjust to cropping area
+
+         imageWidth = (int) ((cropAreaX2 - cropAreaX1) * imageWidth);
+         imageHeight = (int) ((cropAreaY2 - cropAreaY1) * imageHeight);
+
+         // fix 0, this happenes when the mouse is clicked but not moved
+         if (imageWidth == 0) {
+            imageWidth = 20;
+         }
+
+         if (imageHeight == 0) {
+            imageHeight = 20;
+         }
+      }
+
+      final int imageCanvasWidth = _map2ImageRequestedSize;
+      final int imageCanvasHeight = _map2ImageRequestedSize;
+
+      org.eclipse.swt.graphics.Point renderSize;
+
+      if (isEnlargeSmallImages == false
+            && imageWidth < imageCanvasWidth && imageHeight < imageCanvasHeight) {
+
+         renderSize = new org.eclipse.swt.graphics.Point(imageWidth, imageHeight);
+
+      } else {
+
+         renderSize = RendererHelper.getBestSize(this,
+
+               imageWidth,
+               imageHeight,
+
+               imageCanvasWidth,
+               imageCanvasHeight);
+      }
+
+      return renderSize;
    }
 
    /**
@@ -1099,6 +1190,15 @@ public class Photo implements Serializable {
       return null;
    }
 
+   public ToneCurvesFilter getToneCurvesFilter() {
+
+      if (_toneCurvesFilter == null) {
+         _toneCurvesFilter = new ToneCurvesFilter();
+      }
+
+      return _toneCurvesFilter;
+   }
+
    /**
     * @return Returns latitude.
     *         <p>
@@ -1129,6 +1229,34 @@ public class Photo implements Serializable {
 
    public String getUniqueId() {
       return imageFilePathName;
+   }
+
+   /**
+    * @return Returns a validate relative crop area
+    */
+   public Float getValidCropArea() {
+
+      if (cropAreaX1 == 0 && cropAreaX2 == 0
+            || cropAreaY1 == 0 && cropAreaY2 == 0) {
+
+         // set initial and valid crop areas
+
+         final float defaultCrop = 0.35f;
+         final float defaultCrop2 = 1 - defaultCrop;
+
+         cropAreaX1 = defaultCrop;
+         cropAreaY1 = defaultCrop;
+
+         cropAreaX2 = defaultCrop2;
+         cropAreaY2 = defaultCrop2;
+      }
+
+      return new Rectangle2D.Float(
+
+            cropAreaX1,
+            cropAreaY1,
+            cropAreaX2,
+            cropAreaY2);
    }
 
    /**
@@ -1298,7 +1426,8 @@ public class Photo implements Serializable {
 
          _photoLoadingStateHQ = photoLoadingState;
 
-      } else if (imageQuality == ImageQuality.THUMB_HQ) {
+      } else if (imageQuality == ImageQuality.THUMB_HQ
+            || imageQuality == ImageQuality.THUMB_HQ_ADJUSTED) {
 
          _photoLoadingStateThumbHQ = photoLoadingState;
 
@@ -1313,12 +1442,9 @@ public class Photo implements Serializable {
 
       // set overall loading error
       if (photoLoadingState == PhotoLoadingState.IMAGE_IS_INVALID) {
+
          _isLoadingError = true;
       }
-//
-//      System.out
-//            .println("set state\t" + imageQuality + "\t" + photoLoadingState + "\t" + imageFileName);
-//      // TODO remove SYSTEM.OUT.PRINTLN
    }
 
    private void setMap25ImageRenderSize(final int mapImageRequestedSize) {
@@ -1340,25 +1466,6 @@ public class Photo implements Serializable {
       _map25ImageRenderSize = renderSize;
    }
 
-   private void setMap2ImageRenderSize(final int mapImageRequestedSize) {
-
-      final int imageCanvasWidth = mapImageRequestedSize;
-      final int imageCanvasHeight = mapImageRequestedSize;
-
-      final int imageWidth = _photoImageWidth != Integer.MIN_VALUE ? _photoImageWidth : _thumbImageWidth;
-      final int imageHeight = _photoImageHeight != Integer.MIN_VALUE ? _photoImageHeight : _thumbImageHeight;
-
-      final org.eclipse.swt.graphics.Point renderSize = RendererHelper.getBestSize(this,
-
-            imageWidth,
-            imageHeight,
-
-            imageCanvasWidth,
-            imageCanvasHeight);
-
-      _map2ImageRenderSize = renderSize;
-   }
-
    public void setPhotoSize(final int width, final int height) {
 
       if (width == _photoImageHeight && height == _photoImageWidth) {
@@ -1373,8 +1480,7 @@ public class Photo implements Serializable {
          _photoImageHeight = height;
       }
 
-      setMap2ImageRenderSize(_map2ImageRequestedSize);
-      setMap25ImageRenderSize(_map25ImageRequestedSize);
+      updateMapImageRenderSize();
    }
 
    public void setStateExifThumb(final int exifThumbState) {
@@ -1387,8 +1493,7 @@ public class Photo implements Serializable {
       _thumbImageWidth = width;
       _thumbImageHeight = height;
 
-      setMap2ImageRenderSize(_map2ImageRequestedSize);
-      setMap25ImageRenderSize(_map25ImageRequestedSize);
+      updateMapImageRenderSize();
    }
 
    public void setTourGeoPosition(final double latitude, final double longitude) {
@@ -1425,34 +1530,38 @@ public class Photo implements Serializable {
 
       _uniqueId = photoImageFilePathName;
 
+// SET_FORMATTING_OFF
+
       /*
-       * initialize image keys and loading states
+       * Initialize image keys and loading states
        */
-      _imageKey_Thumb = getImageKey_Thumb(photoImageFilePathName);
-      _imageKey_ThumbQH = getImageKey_ThumbHQ(photoImageFilePathName);
-      _imageKey_HQ = getImageKey_HQ(photoImageFilePathName);
-      _imageKey_Original = Util.computeMD5(photoImageFilePathName) + "_KeyOriginal";//$NON-NLS-1$
+      _imageKey_Thumb            = getImageKey_Thumb              (photoImageFilePathName);
+      _imageKey_ThumbHQ          = getImageKey_ThumbHQ            (photoImageFilePathName);
+      _imageKey_ThumbHQ_Adjusted = getImageKey_ThumbHQ_Adjusted   (photoImageFilePathName);
+      _imageKey_HQ               = getImageKey_HQ                 (photoImageFilePathName);
+      _imageKey_Original         = Util.computeMD5                (photoImageFilePathName) + "_KeyOriginal"; //$NON-NLS-1$
 
       _isImageFileAvailable = photoImageFile.exists();
 
       if (_isImageFileAvailable) {
 
-         _photoLoadingStateThumb = PhotoLoadingState.UNDEFINED;
-         _photoLoadingStateThumbHQ = PhotoLoadingState.UNDEFINED;
-         _photoLoadingStateHQ = PhotoLoadingState.UNDEFINED;
+         _photoLoadingStateThumb    = PhotoLoadingState.UNDEFINED;
+         _photoLoadingStateThumbHQ  = PhotoLoadingState.UNDEFINED;
+         _photoLoadingStateHQ       = PhotoLoadingState.UNDEFINED;
          _photoLoadingStateOriginal = PhotoLoadingState.UNDEFINED;
 
          _isLoadingError = false;
 
       } else {
 
-         _photoLoadingStateThumb = PhotoLoadingState.IMAGE_IS_INVALID;
-         _photoLoadingStateThumbHQ = PhotoLoadingState.IMAGE_IS_INVALID;
-         _photoLoadingStateHQ = PhotoLoadingState.IMAGE_IS_INVALID;
+         _photoLoadingStateThumb    = PhotoLoadingState.IMAGE_IS_INVALID;
+         _photoLoadingStateThumbHQ  = PhotoLoadingState.IMAGE_IS_INVALID;
+         _photoLoadingStateHQ       = PhotoLoadingState.IMAGE_IS_INVALID;
          _photoLoadingStateOriginal = PhotoLoadingState.IMAGE_IS_INVALID;
 
          _isLoadingError = true;
       }
+// SET_FORMATTING_ON
    }
 
    @Override
@@ -1522,8 +1631,7 @@ public class Photo implements Serializable {
          }
       }
 
-      setMap2ImageRenderSize(_map2ImageRequestedSize);
-      setMap25ImageRenderSize(_map25ImageRequestedSize);
+      updateMapImageRenderSize();
 
       isExifLoaded = true;
 
@@ -1545,4 +1653,10 @@ public class Photo implements Serializable {
          imageExifTime = exifUTCMills;
       }
    }
+
+   public void updateMapImageRenderSize() {
+
+      setMap25ImageRenderSize(_map25ImageRequestedSize);
+   }
+
 }

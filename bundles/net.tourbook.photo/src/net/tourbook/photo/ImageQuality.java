@@ -18,7 +18,7 @@ package net.tourbook.photo;
 public enum ImageQuality {
 
    /**
-    * Image is in EXIF thumb size/quality
+    * This image has EXIF thumb size/quality
     */
    THUMB,
 
@@ -28,9 +28,15 @@ public enum ImageQuality {
    HQ,
 
    /**
-    * Thumb image is in HQ (high quality) size which is used in e.g. 2D map
+    * Thumb image is in HQ (high quality) size, it is used in e.g. 2D map
     */
    THUMB_HQ,
+
+   /**
+    * Thumb image is in HQ (high quality) size and adjusted, e.g. cropped or tonality modified, it
+    * is used in e.g. 2D map
+    */
+   THUMB_HQ_ADJUSTED,
 
    /**
     * Image in original size

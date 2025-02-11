@@ -310,7 +310,7 @@ public class MapModelManager {
 
                if (Files.exists(modelFile) == false) {
 
-                  StatusUtil.log(new Throwable("Model file %s is not available".formatted(modelFile.toAbsolutePath())));
+                  StatusUtil.log(new Throwable("Model file %s is not available".formatted(modelFile.toAbsolutePath()))); //$NON-NLS-1$
 
                   continue;
                }

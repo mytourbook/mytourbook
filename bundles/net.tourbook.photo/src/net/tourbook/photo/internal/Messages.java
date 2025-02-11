@@ -136,13 +136,18 @@ public class Messages extends NLS {
    public static String        PrefPage_Photo_Cache_Label_NumberOfOriginalImages;
    public static String        PrefPage_Photo_Cache_Label_OriginalCacheSizeInfo;
    public static String        PrefPage_Photo_Cache_Label_ThumbnailCacheSizeInfo;
-   public static String        PrefPage_Photo_ExtViewer_Group_ExternalApplication;
+   public static String        PrefPage_Photo_ExtViewer_Group_ExternalFileApplication;
+   public static String        PrefPage_Photo_ExtViewer_Group_ExternalFolderApplication;
    public static String        PrefPage_Photo_ExtViewer_Group_ImageQuality;
    public static String        PrefPage_Photo_ExtViewer_Label_ExternalApplication_Tooltip;
-   public static String        PrefPage_Photo_ExtViewer_Label_ExternalApplication1;
-   public static String        PrefPage_Photo_ExtViewer_Label_ExternalApplication2;
-   public static String        PrefPage_Photo_ExtViewer_Label_ExternalApplication3;
+   public static String        PrefPage_Photo_ExtViewer_Label_FileInfo;
+   public static String        PrefPage_Photo_ExtViewer_Label_FolderApplication1;
+   public static String        PrefPage_Photo_ExtViewer_Label_FolderApplication2;
+   public static String        PrefPage_Photo_ExtViewer_Label_FolderApplication3;
    public static String        PrefPage_Photo_ExtViewer_Label_Info;
+   public static String        PrefPage_Photo_ExtViewer_Label_PhotoImageApplication1;
+   public static String        PrefPage_Photo_ExtViewer_Label_PhotoImageApplication2;
+   public static String        PrefPage_Photo_ExtViewer_Label_PhotoImageApplication3;
    public static String        PrefPage_Photo_FullsizeViewer_Checkbox_HQImage;
    public static String        PrefPage_Photo_FullsizeViewer_Checkbox_HQImage_Tooltip;
    public static String        PrefPage_Photo_FullsizeViewer_Checkbox_Preview;
@@ -183,17 +188,11 @@ public class Messages extends NLS {
    public static String        PrefPage_Photo_Viewer_Label_HQImageSize_Tooltip;
    public static String        PrefPage_Photo_Viewer_Label_HQThumbnailSize;
    public static String        PrefPage_Photo_Viewer_Label_HQThumbnailSize_Tooltip;
-   public static String        PrefPage_Photo_Viewer_Label_ImageFramework;
-   public static String        PrefPage_Photo_Viewer_Label_ImageFramework_Tooltip;
    public static String        PrefPage_Photo_Viewer_Label_MinSizeBorder;
    public static String        PrefPage_Photo_Viewer_Label_MinSizeBorder_Tooltip;
    public static String        PrefPage_Photo_Viewer_Label_MinSizeText;
    public static String        PrefPage_Photo_Viewer_Label_MinSizeText_Tooltip;
    public static String        PrefPage_Photo_Viewer_Label_SelectionForegroundColor;
-   public static String        PrefPage_Photo_Viewer_Radio_ImageFramework_AWT;
-   public static String        PrefPage_Photo_Viewer_Radio_ImageFramework_AWT_Tooltip;
-   public static String        PrefPage_Photo_Viewer_Radio_ImageFramework_SWT;
-   public static String        PrefPage_Photo_Viewer_Radio_ImageFramework_SWT_Tooltip;
 
    public static String        PrefPage_Theme_Dark_Label_SelectionBackgroundColor;
 

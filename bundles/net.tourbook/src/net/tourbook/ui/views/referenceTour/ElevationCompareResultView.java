@@ -1674,13 +1674,13 @@ public class ElevationCompareResultView extends ViewPart implements
       menuMgr.add(_actionCompare_AllTours);
 
       // edit actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, this);
 
       // tag actions
-      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr);
+      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
 
       // tour type actions
-      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr);
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
 
       // customize this context menu
       TourActionManager.fillContextMenu_CustomizeAction(menuMgr)

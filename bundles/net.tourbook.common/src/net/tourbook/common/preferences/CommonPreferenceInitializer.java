@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -125,7 +125,7 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_3,                     defaultId);
 
       /*
-       * calendar week
+       * Calendar week
        */
       store.setDefault(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK,           DayOfWeek.MONDAY.getValue());
       store.setDefault(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK,      4);
@@ -134,6 +134,11 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
        * Transform values
        */
       store.setDefault(ICommonPreferences.TRANSFORM_VALUE_OPACITY_MAX,               10);
+
+      /*
+       * Miscellaneous
+       */
+      store.setDefault(ICommonPreferences.AUTO_COMPLETE_PREFIX,                     true);
 
       /*
        * Appearance

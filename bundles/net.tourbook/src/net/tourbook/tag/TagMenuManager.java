@@ -854,7 +854,8 @@ public class TagMenuManager implements IActionProvider {
    }
 
    @Override
-   public void fillActions(final IMenuManager menuMgr) {
+   public void fillActions(final IMenuManager menuMgr,
+                           final ITourProvider tourProvider) {
 
       fillTagMenu_WithRecentTags(menuMgr, null);
    }
@@ -883,11 +884,12 @@ public class TagMenuManager implements IActionProvider {
       _isAdvMenu = false;
    }
 
-   public void fillTagMenu_WithActiveActions(final IMenuManager menuMgr) {
+   public void fillTagMenu_WithActiveActions(final IMenuManager menuMgr,
+                                             final ITourProvider tourProvider) {
 
       menuMgr.add(new Separator());
 
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.TAG, _allTagActions);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.TAG, _allTagActions, tourProvider);
 
       _isAdvMenu = false;
    }

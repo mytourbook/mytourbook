@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,6 +40,7 @@ package de.byteholder.geoclipse.map;
 
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.event.IBreadcrumbListener;
+import de.byteholder.geoclipse.map.event.IExternalAppListener;
 import de.byteholder.geoclipse.map.event.IGeoPositionListener;
 import de.byteholder.geoclipse.map.event.IHoveredTourListener;
 import de.byteholder.geoclipse.map.event.IMapGridListener;
@@ -62,6 +63,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -121,9 +123,11 @@ import net.tourbook.map2.view.MapLabelLayout;
 import net.tourbook.map2.view.MapPointStatistics;
 import net.tourbook.map2.view.MapPointToolTip;
 import net.tourbook.map2.view.MapPointType;
+import net.tourbook.map2.view.MapTourMarkerTime;
 import net.tourbook.map2.view.SelectionMapSelection;
+import net.tourbook.map2.view.SlideoutMap2_PhotoHistogram;
+import net.tourbook.map2.view.SlideoutMap2_PhotoImage;
 import net.tourbook.map2.view.SlideoutMap2_PhotoOptions;
-import net.tourbook.map2.view.SlideoutMap2_PhotoToolTip;
 import net.tourbook.map2.view.TourMapPainter;
 import net.tourbook.map25.layer.marker.ScreenUtils;
 import net.tourbook.map25.layer.marker.algorithm.distance.Cluster;
@@ -159,7 +163,6 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
@@ -460,13 +463,19 @@ public class Map2 extends Canvas {
    private PaintedMarkerCluster            _hoveredMarkerCluster;
    private PaintedMapPoint                 _hoveredMapPoint;
    private PaintedMapPoint                 _hoveredMapPoint_Previous;
+   private Photo                           _selectedPhoto;
+   private PaintedMapPoint                 _selectedPhotoMapPoint;
    private boolean                         _isInHoveredRatingStar;
    private boolean                         _isMarkerClusterSelected;
    private MapPointToolTip                 _mapPointTooltip;
-   private SlideoutMap2_PhotoToolTip       _mapPointTooltip_Photo;
+   private SlideoutMap2_PhotoImage         _mapPointTooltip_PhotoImage;
+   private SlideoutMap2_PhotoHistogram     _mapPointTooltip_PhotoHistogram;
    private boolean                         _isPreloadHQImages;
+   private boolean                         _isEnlargeSmallImages;
    private boolean                         _isShowHQPhotoImages;
+   private boolean                         _isShowPhotoAdjustments;
    private final ILoadCallBack             _photoImageLoaderCallback        = new PhotoImageLoaderCallback();
+   private final ILoadCallBack             _photoTooltipImageLoaderCallback = new PhotoTooltipImageLoaderCallback();
 
    /** Number of created map points */
    private int                             _numStatistics_AllCommonLocations;
@@ -607,6 +616,7 @@ public class Map2 extends Canvas {
    private final ListenerList<IMapPositionListener>   _allMapPositionListener    = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IMapSelectionListener>  _allMapSelectionListener   = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IGeoPositionListener>   _allMousePositionListeners = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IExternalAppListener>   _allExternalAppListeners   = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<IPOIListener>           _allPOIListeners           = new ListenerList<>(ListenerList.IDENTITY);
    private final ListenerList<ITourSelectionListener> _allTourSelectionListener  = new ListenerList<>(ListenerList.IDENTITY);
 
@@ -781,6 +791,8 @@ public class Map2 extends Canvas {
 
    private Point               _imageMapLocationBounds;
 
+   private BufferedImage       _imageAnnotationCropped;
+   private BufferedImage       _imageAnnotationTonality;
    private BufferedImage       _imageRatingStar;
 
    private int                 _ratingStarImageSize;
@@ -789,7 +801,7 @@ public class Map2 extends Canvas {
    private final int           MAX_RATING_STARS              = 5;
    public int                  MAX_RATING_STARS_WIDTH;
 
-   public int                  MAP_IMAGE_DEFAULT_SIZE_TINY   = 40;
+   public int                  MAP_IMAGE_DEFAULT_SIZE_TINY   = 50;
    public int                  MAP_IMAGE_DEFAULT_SIZE_SMALL  = 100;
    public int                  MAP_IMAGE_DEFAULT_SIZE_MEDIUM = 200;
    public int                  MAP_IMAGE_DEFAULT_SIZE_LARGE  = 300;
@@ -798,19 +810,18 @@ public class Map2 extends Canvas {
       final int deviceZoom = DPIUtil.getDeviceZoom();
       final float deviceScale = deviceZoom / 100f;
 
-      MAP_IMAGE_DEFAULT_SIZE_TINY = (int) (MAP_IMAGE_DEFAULT_SIZE_TINY * deviceScale);
-      MAP_IMAGE_DEFAULT_SIZE_SMALL = (int) (MAP_IMAGE_DEFAULT_SIZE_SMALL * deviceScale);
+// SET_FORMATTING_OFF
+
+      MAP_IMAGE_DEFAULT_SIZE_TINY   = (int) (MAP_IMAGE_DEFAULT_SIZE_TINY * deviceScale);
+      MAP_IMAGE_DEFAULT_SIZE_SMALL  = (int) (MAP_IMAGE_DEFAULT_SIZE_SMALL * deviceScale);
       MAP_IMAGE_DEFAULT_SIZE_MEDIUM = (int) (MAP_IMAGE_DEFAULT_SIZE_MEDIUM * deviceScale);
-      MAP_IMAGE_DEFAULT_SIZE_LARGE = (int) (MAP_IMAGE_DEFAULT_SIZE_LARGE * deviceScale);
+      MAP_IMAGE_DEFAULT_SIZE_LARGE  = (int) (MAP_IMAGE_DEFAULT_SIZE_LARGE * deviceScale);
 
-      final ImageDescriptor imageDescriptor = PhotoActivator.getImageDescriptor(PhotoImages.PhotoRatingStar);
-      final ImageData imageData = imageDescriptor.getImageData(deviceZoom);
+      _imageAnnotationCropped    = ImageConverter.convertIntoAWT(PhotoActivator.getImageDescriptor(PhotoImages.PhotoAnnotation_Cropped), deviceZoom);
+      _imageAnnotationTonality   = ImageConverter.convertIntoAWT(PhotoActivator.getImageDescriptor(PhotoImages.PhotoAnnotation_Tonality), deviceZoom);
+      _imageRatingStar           = ImageConverter.convertIntoAWT(PhotoActivator.getImageDescriptor(PhotoImages.PhotoRatingStar), deviceZoom);
 
-      final Image swtImage = new Image(getDisplay(), new NoAutoScalingImageDataProvider(imageData));
-      {
-         _imageRatingStar = ImageConverter.convertIntoAWT(swtImage);
-      }
-      swtImage.dispose();
+// SET_FORMATTING_ON
 
       // rating star width and height are the same
       _ratingStarImageSize = _imageRatingStar.getWidth();
@@ -830,8 +841,37 @@ public class Map2 extends Canvas {
       @Override
       public void callBackImageIsLoaded(final boolean isUpdateUI) {
 
-         if (isUpdateUI) {
-            paint();
+         try {
+
+            if (isUpdateUI) {
+
+               // curves must be updated after the image is loading which is computing the curves
+               _mapPointTooltip_PhotoHistogram.updateCurves();
+
+               paint();
+            }
+
+         } catch (final Exception e) {
+            StatusUtil.log(e);
+         }
+      }
+   }
+
+   private class PhotoTooltipImageLoaderCallback implements ILoadCallBack {
+
+      @Override
+      public void callBackImageIsLoaded(final boolean isUpdateUI) {
+
+         try {
+
+            if (isUpdateUI) {
+
+               _mapPointTooltip_PhotoImage.onImageIsLoaded();
+               _mapPointTooltip_PhotoHistogram.onImageIsLoaded();
+            }
+
+         } catch (final Exception e) {
+            StatusUtil.log(e);
          }
       }
    }
@@ -903,11 +943,14 @@ public class Map2 extends Canvas {
 
       _imageMapLocationBounds          = new Point(_imageMapLocation_Hovered.getWidth(), _imageMapLocation_Hovered.getHeight());
 
-// SET_FORMATTING_ON
+      _mapLocation_Tooltip             = new MapLocationToolTip(this);
+      _mapPointTooltip                 = new MapPointToolTip(this);
+      _mapPointTooltip_PhotoImage      = new SlideoutMap2_PhotoImage(this);
+      _mapPointTooltip_PhotoHistogram  = new SlideoutMap2_PhotoHistogram(this);
 
-      _mapLocation_Tooltip = new MapLocationToolTip(this);
-      _mapPointTooltip = new MapPointToolTip(this);
-      _mapPointTooltip_Photo = new SlideoutMap2_PhotoToolTip(this);
+      updateTooltips();
+
+// SET_FORMATTING_ON
 
       _poiImage = TourbookPlugin.getImageDescriptor(Images.POI_InMap).createImage();
       _poiImageBounds = _poiImage.getBounds();
@@ -1107,6 +1150,10 @@ public class Map2 extends Canvas {
             _display.asyncExec(() -> onDropRunnable(event));
          }
       });
+   }
+
+   public void addExternalAppListener(final IExternalAppListener mapListener) {
+      _allExternalAppListeners.add(mapListener);
    }
 
    public void addHoveredTourListener(final IHoveredTourListener hoveredTourListener) {
@@ -1375,7 +1422,11 @@ public class Map2 extends Canvas {
          final int devY = mapPoint.geoPointDevY;
 
          final Photo photo = mapPoint.photo;
-         final Point mapImageSize = photo.getMap2ImageSize();
+         final Point mapImageSize = photo.getMap2ImageSize(
+
+               _isShowHQPhotoImages,
+               _isShowPhotoAdjustments,
+               _isEnlargeSmallImages);
 
          final PointFeature pointFeature = new PointFeature(
 
@@ -1933,7 +1984,7 @@ public class Map2 extends Canvas {
          final int devX = markerWorldPixelX - worldPixel_Viewport.x;
          final int devY = markerWorldPixelY - worldPixel_Viewport.y;
 
-         String markerLabel = tourMarker.getMarkerMapLabel();
+         String markerText = tourMarker.getMarkerMapLabel();
          String groupKey = null;
 
          /*
@@ -1941,14 +1992,14 @@ public class Map2 extends Canvas {
           */
          if (isGroupDuplicatedMarkers && _allMapMarkerSkipLabels.size() > 0) {
 
-            if (_allMapMarkerSkipLabels.contains(markerLabel)) {
+            if (_allMapMarkerSkipLabels.contains(markerText)) {
 
                // this label is marked to be grouped
 
                final int groupX = devX / skipLabelGridSize;
                final int groupY = devY / skipLabelGridSize;
 
-               groupKey = markerLabel + UI.DASH + groupX + UI.DASH + groupY;
+               groupKey = markerText + UI.DASH + groupX + UI.DASH + groupY;
 
                final Map2Point groupedMarker = _allMapMarkerWithGroupedLabels.get(groupKey);
 
@@ -1964,25 +2015,48 @@ public class Map2 extends Canvas {
          }
 
          // create formatted label
-         if (isTruncateLabel && markerLabel.length() > labelTruncateLength) {
+         if (isTruncateLabel && markerText.length() > labelTruncateLength) {
 
             // keep star at the end
-            final String endSymbol = markerLabel.endsWith(UI.SYMBOL_STAR)
+            final String endSymbol = markerText.endsWith(UI.SYMBOL_STAR)
                   ? UI.SYMBOL_STAR
                   : UI.EMPTY_STRING;
 
             if (labelTruncateLength == 0) {
 
-               markerLabel = UI.SYMBOL_DOT + endSymbol;
+               markerText = UI.SYMBOL_DOT + endSymbol;
 
             } else {
 
-               markerLabel = markerLabel.substring(0, labelTruncateLength)
+               markerText = markerText.substring(0, labelTruncateLength)
 
                      + UI.SYMBOL_ELLIPSIS
 
                      + endSymbol;
             }
+         }
+
+         final MapTourMarkerTime tourMarkerDateTimeFormat = _mapConfig.tourMarkerDateTimeFormat;
+         if (tourMarkerDateTimeFormat.equals(MapTourMarkerTime.NONE) == false) {
+
+            // append time stamp
+
+            final TourData tourData = tourMarker.getTourData();
+            final ZonedDateTime tourStartTime = tourData.getTourStartTime();
+            final ZonedDateTime markerStartTime = TimeTools.getZonedDateTime(
+                  tourMarker.getTourTime(),
+                  tourStartTime.getZone());
+
+// SET_FORMATTING_OFF
+
+            switch (tourMarkerDateTimeFormat) {
+            case DATE:        markerText += UI.SPACE + TimeTools.Formatter_Date_S.format(markerStartTime);     break;
+            case TIME:        markerText += UI.SPACE + TimeTools.Formatter_Time_S.format(markerStartTime);     break;
+            case DATE_TIME:   markerText += UI.SPACE + TimeTools.Formatter_DateTime_S.format(markerStartTime); break;
+            case NONE:
+            default:
+            }
+// SET_FORMATTING_ON
          }
 
          /*
@@ -1997,7 +2071,7 @@ public class Map2 extends Canvas {
 
          mapPoint.geoPointDevX = (int) (devX * _deviceScaling);
          mapPoint.geoPointDevY = (int) (devY * _deviceScaling);
-         mapPoint.setFormattedLabel(markerLabel);
+         mapPoint.setFormattedLabel(markerText);
 
          if (groupKey != null) {
 
@@ -2567,6 +2641,15 @@ public class Map2 extends Canvas {
       }
    }
 
+   private void fireEvent_RunExternalApp(final int numberOfExternalApp, final Photo photo) {
+
+      final Object[] listeners = _allExternalAppListeners.getListeners();
+
+      for (final Object listener : listeners) {
+         ((IExternalAppListener) listener).runExternalApp(numberOfExternalApp, photo);
+      }
+   }
+
    private void fireEvent_TourBreadcrumb() {
 
       for (final Object selectionListener : _allBreadcrumbListener.getListeners()) {
@@ -2886,11 +2969,19 @@ public class Map2 extends Canvas {
                   true // is AWT image
             );
 
+//            System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 1 " + null);
+// TODO remove SYSTEM.OUT.PRINTLN
+
             return null;
          }
       }
 
       if (_isShowHQPhotoImages == false) {
+
+         // HQ image is not requested
+
+//         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 2 " + awtThumbImage.getWidth() + " / " + awtThumbImage.getHeight());
+// TODO remove SYSTEM.OUT.PRINTLN
 
          return awtThumbImage;
       }
@@ -2906,27 +2997,55 @@ public class Map2 extends Canvas {
 
          // image is not invalid and not yet loaded
 
+         final boolean isPhotoAdjusted = photo.isCropped || photo.isSetTonality;
+
+         final ImageQuality imageQuality = _isShowPhotoAdjustments && isPhotoAdjusted
+               ? ImageQuality.THUMB_HQ_ADJUSTED
+               : ImageQuality.THUMB_HQ;
+
          // check if image is in the cache
-         awtPhotoImageThumbHQ = PhotoImageCache.getImage_AWT(photo, ImageQuality.THUMB_HQ);
+         awtPhotoImageThumbHQ = PhotoImageCache.getImage_AWT(photo, imageQuality);
 
-         if (awtPhotoImageThumbHQ == null
-               && thumbHqPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+         final boolean isImageInLoadingQueue = thumbHqPhotoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE;
+         final boolean isImageNotInLoadingQueue = isImageInLoadingQueue == false;
 
-            // the requested image is not available in the image cache -> image must be loaded
+         if (isImageNotInLoadingQueue) {
 
-            PhotoLoadManager.putImageInLoadingQueueHQThumb_Map(
-                  photo,
-                  Photo.getMap2ImageRequestedSize(),
-                  _photoImageLoaderCallback);
+            final boolean isPhotoModified = _isShowPhotoAdjustments && photo.isAdjustmentModified;
+            final boolean isPhotoNotLoaded = awtPhotoImageThumbHQ == null;
+
+            if (isPhotoModified || isPhotoNotLoaded) {
+
+               // the requested image is not available in the image cache or is modified -> image must be loaded
+
+               PhotoLoadManager.putImageInLoadingQueueHQ_Map_Thumb(
+                     photo,
+                     Photo.getMap2ImageRequestedSize(),
+                     imageQuality,
+                     _photoImageLoaderCallback);
+            }
          }
       }
 
       if (awtPhotoImageThumbHQ != null) {
 
+//         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 3 " + awtPhotoImageThumbHQ.getWidth() + " / " + awtPhotoImageThumbHQ.getHeight());
+// TODO remove SYSTEM.OUT.PRINTLN
+
          return awtPhotoImageThumbHQ;
       }
 
+      if (awtThumbImage != null) {
+//         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 4 " + awtThumbImage.getWidth() + " / " + awtThumbImage.getHeight());
+// TODO remove SYSTEM.OUT.PRINTLN
+      }
+
       return awtThumbImage;
+   }
+
+   public ILoadCallBack getPhotoTooltipImageLoaderCallback() {
+
+      return _photoTooltipImageLoaderCallback;
    }
 
    private PoiToolTip getPoiTooltip() {
@@ -3009,6 +3128,11 @@ public class Map2 extends Canvas {
       }
 
       return devXY;
+   }
+
+   public PaintedMapPoint getSelectedPhotoMapPoint() {
+
+      return _selectedPhotoMapPoint;
    }
 
    /**
@@ -3599,11 +3723,6 @@ public class Map2 extends Canvas {
       return gridGeoPos;
    }
 
-   public void hidePhotoTooltip() {
-
-      _mapPointTooltip_Photo.hideNow();
-   }
-
    private void hideTourTooltipHoveredArea() {
 
       if (_tourTooltip == null) {
@@ -3653,6 +3772,11 @@ public class Map2 extends Canvas {
 
       return _geoGrid_Data_Hovered != null || _geoGrid_IsGridAutoScroll == true;
 
+   }
+
+   public boolean isShowPhotoAdjustments() {
+
+      return _isShowPhotoAdjustments;
    }
 
    /**
@@ -4309,10 +4433,23 @@ public class Map2 extends Canvas {
 
    private void onMouse_DoubleClick(final MouseEvent mouseEvent) {
 
-      if (mouseEvent.button == 1) {
+      if (mouseEvent.button != 1) {
+         return;
+      }
+
+      if (_hoveredMapPoint != null && _hoveredMapPoint.mapPoint.photo != null) {
+
+         // run external app 1
+
+         // prevent map panning, this is happening
+         _canPanMap = false;
+
+         fireEvent_RunExternalApp(1, _hoveredMapPoint.mapPoint.photo);
+
+      } else {
 
          /*
-          * set new map center
+          * Set new map center
           */
          final double x = _worldPixel_TopLeft_Viewport.x + mouseEvent.x;
          final double y = _worldPixel_TopLeft_Viewport.y + mouseEvent.y;
@@ -4358,7 +4495,8 @@ public class Map2 extends Canvas {
 
       _isMouseDown = true;
 
-      final boolean isShift = (mouseEvent.stateMask & SWT.SHIFT) != 0;
+      final boolean isShiftKey = UI.isShiftKey(mouseEvent);
+      final boolean isCtrlKey = UI.isCtrlKey(mouseEvent);
 
       hideTourTooltipHoveredArea();
       setPoiVisible(false);
@@ -4392,6 +4530,8 @@ public class Map2 extends Canvas {
 
          paint();
       }
+
+      boolean isCanPanMap = false;
 
       if (_offline_IsSelectingOfflineArea) {
 
@@ -4464,16 +4604,38 @@ public class Map2 extends Canvas {
             fireEvent_TourSelection(new SelectionTourIds(crumbTourIds));
          }
 
-      } else if (_hoveredMapPoint != null && _isInHoveredRatingStar) {
+      } else if (_hoveredMapPoint != null) {
 
          final Photo photo = _hoveredMapPoint.mapPoint.photo;
 
          if (photo != null) {
 
-            saveRatingStars(photo);
+            if (_isInHoveredRatingStar) {
 
-            // when a rating star is removed, then the photo may be filtered out -> hide hovered mappoint/photo
-            _hoveredMapPoint = null;
+               saveRatingStars(photo);
+
+               // when a rating star is removed, then the photo may be filtered out -> hide hovered mappoint/photo
+               _hoveredMapPoint = null;
+
+            } else {
+
+               // a photo is selected
+
+               if (isCtrlKey) {
+
+                  // deselect photo
+
+                  selectPhoto(null, null);
+
+               } else {
+
+                  // a photo is hovered -> show photo tooltip
+
+                  selectPhoto(photo, _hoveredMapPoint);
+               }
+
+               isCanPanMap = true;
+            }
          }
 
       } else if (_geoGrid_Label_IsHovered) {
@@ -4510,9 +4672,14 @@ public class Map2 extends Canvas {
 
       } else if (_allHoveredTourIds.size() > 0) {
 
-         onMouse_Down_HoveredTour(isShift);
+         onMouse_Down_HoveredTour(isShiftKey);
 
       } else {
+
+         isCanPanMap = true;
+      }
+
+      if (isCanPanMap) {
 
          // when the left mousebutton is clicked remember this point (for panning)
          _canPanMap = true;
@@ -4662,6 +4829,9 @@ public class Map2 extends Canvas {
       _geoGrid_IsGridAutoScroll = false;
       _geoGrid_Label_IsHovered = false;
 
+      // hide link to the hovered point
+      _hoveredMapPoint = null;
+
       if (_isShowHoveredOrSelectedTour) {
 
          _tourBreadcrumb.onMouseExit();
@@ -4673,6 +4843,8 @@ public class Map2 extends Canvas {
       }
 
       setCursorOptimized(_cursorDefault);
+
+      redraw();
    }
 
    private void onMouse_Move(final MouseEvent mouseEvent) {
@@ -4847,15 +5019,17 @@ public class Map2 extends Canvas {
 
          onMouse_Move_CheckMapPoints(allPaintedPhotos, mouseMoveDevX, mouseMoveDevY);
 
-         if (_hoveredMapPoint != null) {
+         if (_hoveredMapPoint != null && Map2PainterConfig.isPhotoAutoSelect) {
 
-            // a photo is hovered -> show photo tooltip
+            // a photo is hovered -> select photo
 
-            _mapPointTooltip_Photo.setupPhoto(_hoveredMapPoint);
+            final Photo photo = _hoveredMapPoint.mapPoint.photo;
 
-         } else {
+            // select photo only when it is not yet selected
+            if (_selectedPhoto != photo) {
 
-            _mapPointTooltip_Photo.setupPhoto(null);
+               selectPhoto(photo, _hoveredMapPoint);
+            }
          }
       }
 
@@ -8467,6 +8641,8 @@ public class Map2 extends Canvas {
 
       final int numPhotosItems = allPhotoItems.size();
 
+      Rectangle selectedPhotoRectangle = null;
+
       g2d.setStroke(new BasicStroke(1));
 
       /*
@@ -8484,19 +8660,23 @@ public class Map2 extends Canvas {
          final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
          final Photo photo = mapPoint.photo;
-         final Point mapImageSize = photo.getMap2ImageSize();
+         final Point mapImageSize = photo.getMap2ImageSize(
+
+               _isShowHQPhotoImages,
+               _isShowPhotoAdjustments,
+               _isEnlargeSmallImages);
 
          final int labelDevX = (int) distribLabel.labelBoxL;
          final int labelDevY = (int) distribLabel.labelBoxT;
 
-         final int photoWidth = mapImageSize.x;
-         final int photoHeight = mapImageSize.y;
+         final int mapImageWidth = mapImageSize.x;
+         final int mapImageHeight = mapImageSize.y;
 
-         final Rectangle photoRectangle = new Rectangle(
+         Rectangle photoRectangle = new Rectangle(
                labelDevX,
                labelDevY,
-               photoWidth,
-               photoHeight);
+               mapImageWidth,
+               mapImageHeight);
 
          final BufferedImage awtPhotoImage = getPhotoImage(photo);
 
@@ -8519,9 +8699,29 @@ public class Map2 extends Canvas {
             final int photoImageWidth = awtPhotoImage.getWidth();
             final int photoImageHeight = awtPhotoImage.getHeight();
 
-            if (photoImageWidth == photoWidth && photoImageHeight == photoHeight) {
+            if (photoImageWidth == mapImageWidth
+                  && photoImageHeight == mapImageHeight) {
 
-               // do not resize the image would do not look very good
+               // do NOT resize the image, it would not look very good
+
+               g2d.drawImage(awtPhotoImage,
+
+                     photoRectangle.x,
+                     photoRectangle.y,
+
+                     null);
+
+            } else if (_isEnlargeSmallImages == false
+                  && photoImageWidth < mapImageWidth
+                  && photoImageHeight < mapImageHeight) {
+
+               // photo image is smaller than the requested map image -> do not enlarge it
+
+               photoRectangle = new Rectangle(
+                     labelDevX,
+                     labelDevY,
+                     photoImageWidth,
+                     photoImageHeight);
 
                g2d.drawImage(awtPhotoImage,
 
@@ -8531,6 +8731,8 @@ public class Map2 extends Canvas {
                      null);
 
             } else {
+
+               // resize image, this will also enlarge small images
 
                g2d.drawImage(awtPhotoImage,
 
@@ -8544,22 +8746,52 @@ public class Map2 extends Canvas {
 
             // draw border
 
-//            g2d.setColor(_mapConfig.photoOutline_ColorAWT);
-//            g2d.drawRect(
-//                  photoRectangle.x - MAP_POINT_BORDER,
-//                  photoRectangle.y,
-//                  photoRectangle.width + 2 * MAP_POINT_BORDER,
-//                  photoRectangle.height);
+//          g2d.setColor(_mapConfig.photoOutline_ColorAWT);
+//          g2d.drawRect(
+//               photoRectangle.x - MAP_POINT_BORDER,
+//               photoRectangle.y,
+//               photoRectangle.width + 2 * MAP_POINT_BORDER,
+//               photoRectangle.height);
 
             photo.paintedPhoto = photoRectangle;
 
             if (Map2PainterConfig.isShowPhotoRating) {
                paint_MpImage_RatingStars(g2d, photo);
             }
+
+            // draw annotations
+            if (_isShowPhotoAdjustments && _isShowHQPhotoImages && Map2PainterConfig.isShowPhotoAnnotations) {
+               paint_MpImage_Annotations(g2d, photo);
+            }
+
+            if (_selectedPhoto == photo) {
+               selectedPhotoRectangle = photoRectangle;
+            }
          }
 
          // keep position
-         allPaintedPhotos.add(new PaintedMapPoint(mapPoint, photoRectangle));
+         final PaintedMapPoint paintedMapPoint = new PaintedMapPoint(mapPoint, photoRectangle);
+
+         allPaintedPhotos.add(paintedMapPoint);
+      }
+
+      /*
+       * Draw selected photo marker
+       */
+      if (selectedPhotoRectangle != null) {
+
+         final int border = 4;
+         final int border2 = border / 2;
+
+         g2d.setStroke(new BasicStroke(border));
+         g2d.setColor(java.awt.Color.yellow);
+
+         g2d.drawRect(
+
+               selectedPhotoRectangle.x - border2,
+               selectedPhotoRectangle.y - border2,
+               selectedPhotoRectangle.width + border,
+               selectedPhotoRectangle.height + border);
       }
 
       /*
@@ -8728,13 +8960,52 @@ public class Map2 extends Canvas {
       allPaintedMapPoints.add(new PaintedMapPoint(mapPoint, labelRectangle));
    }
 
+   private void paint_MpImage_Annotations(final Graphics2D g2d, final Photo photo) {
+
+      final boolean isCropped = photo.isCropped;
+      final boolean isSetTonality = photo.isSetTonality;
+
+      if (isCropped == false && isSetTonality == false) {
+         return;
+      }
+
+      final Rectangle paintedPhoto = photo.paintedPhoto;
+
+      final int photoDevX = paintedPhoto.x;
+      final int photoDevY = paintedPhoto.y;
+      final int photoWidth = paintedPhoto.width;
+      final int photoHeight = paintedPhoto.height;
+
+      final int annotationWidth = _imageAnnotationCropped.getWidth();
+      final int annotationHeight = _imageAnnotationCropped.getHeight();
+
+      int devX = photoDevX + photoWidth - 2;
+      final int devY = photoDevY + photoHeight - annotationHeight - 2;
+
+      if (isCropped) {
+
+         devX -= annotationWidth;
+
+         g2d.drawImage(_imageAnnotationCropped, devX, devY, null);
+
+         devX -= 3;
+      }
+
+      if (isSetTonality) {
+
+         devX -= annotationWidth;
+
+         g2d.drawImage(_imageAnnotationTonality, devX, devY, null);
+      }
+   }
+
    private void paint_MpImage_RatingStars(final Graphics2D g2d, final Photo photo) {
 
-      final int ratingStarImageSize = _ratingStarImageSize;
+      final Rectangle paintedPhoto = photo.paintedPhoto;
 
-      final int photoDevX = photo.paintedPhoto.x;
-      final int photoDevY = photo.paintedPhoto.y;
-      final int photoWidth = (photo.paintedPhoto.width);
+      final int photoDevX = paintedPhoto.x;
+      final int photoDevY = paintedPhoto.y;
+      final int photoWidth = paintedPhoto.width;
       final int numRatingStars = photo.ratingStars;
 
       final boolean isSmallRatingStar = photoWidth / _deviceScaling < 70;
@@ -8755,6 +9026,8 @@ public class Map2 extends Canvas {
       final int leftBorderRatingStars = isSmallRatingStar
             ? photoDevX + photoWidth / 2 - maxSmallRatingStarsWidth / 2
             : leftBorderWithVisibleStars;
+
+      final int ratingStarImageSize = _ratingStarImageSize;
 
       photo.paintedRatingStars = new Rectangle(
 
@@ -10123,6 +10396,26 @@ public class Map2 extends Canvas {
       return false;
    }
 
+   public void photoHistogram_Close() {
+
+      _mapPointTooltip_PhotoHistogram.close();
+   }
+
+   public void photoHistogram_UpdateCropArea(final Rectangle2D.Float histogramCropArea) {
+
+      _mapPointTooltip_PhotoHistogram.updateCropArea(histogramCropArea);
+   }
+
+   public void photoTooltip_Close() {
+
+      _mapPointTooltip_PhotoImage.close();
+   }
+
+   public void photoTooltip_OnDiscardImages() {
+
+      _mapPointTooltip_PhotoImage.onDiscardImages();
+   }
+
    /**
     * Set tile in the overlay painting queue
     *
@@ -10194,7 +10487,8 @@ public class Map2 extends Canvas {
       _hoveredMapPoint = null;
 
       _mapPointTooltip.hide();
-      _mapPointTooltip_Photo.hide();
+      _mapPointTooltip_PhotoImage.hide();
+      _mapPointTooltip_PhotoHistogram.hide();
    }
 
    public void resetMapPoints() {
@@ -10280,6 +10574,24 @@ public class Map2 extends Canvas {
       photos.add(photo);
 
       photoServiceProvider.saveStarRating(photos);
+   }
+
+   /**
+    * Select or deselect a hovered photo
+    *
+    * @param photo
+    * @param hoveredMapPoint
+    */
+   public void selectPhoto(final Photo photo, final PaintedMapPoint hoveredMapPoint) {
+
+      _selectedPhoto = photo;
+      _selectedPhotoMapPoint = hoveredMapPoint;
+
+      _mapPointTooltip_PhotoImage.setupPhoto(hoveredMapPoint);
+      _mapPointTooltip_PhotoHistogram.setupPhoto(hoveredMapPoint);
+
+      // a photo selections border is painted with the photos in the background
+      paint();
    }
 
    public void setCenterMapBy(final CenterMapBy centerMapBy) {
@@ -11355,9 +11667,17 @@ public class Map2 extends Canvas {
 
    public void updatePhotoOptions() {
 
+      _isEnlargeSmallImages = Util.getStateBoolean(_state_Map2,
+            SlideoutMap2_PhotoOptions.STATE_IS_ENLARGE_SMALL_IMAGES,
+            SlideoutMap2_PhotoOptions.STATE_IS_ENLARGE_SMALL_IMAGES_DEFAULT);
+
       _isShowHQPhotoImages = Util.getStateBoolean(_state_Map2,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_THUMB_HQ_IMAGES,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_THUMB_HQ_IMAGES_DEFAULT);
+
+      _isShowPhotoAdjustments = Util.getStateBoolean(_state_Map2,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_ADJUSTMENTS,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_ADJUSTMENTS_DEFAULT);
 
       _isPreloadHQImages = Util.getStateBoolean(_state_Map2,
             SlideoutMap2_PhotoOptions.STATE_IS_PRELOAD_HQ_IMAGES,
@@ -11448,6 +11768,14 @@ public class Map2 extends Canvas {
       }
 
       setPoiVisible(isVisible);
+   }
+
+   public void updateTooltips() {
+
+      final boolean isShowPhotoAdjustments = _isShowPhotoAdjustments && _isShowHQPhotoImages;
+
+      _mapPointTooltip_PhotoImage.setShowPhotoAdjustements(isShowPhotoAdjustments);
+      _mapPointTooltip_PhotoHistogram.setShowPhotoAdjustements(isShowPhotoAdjustments);
    }
 
    /**

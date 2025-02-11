@@ -1838,63 +1838,71 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
          final String sql = UI.EMPTY_STRING
 
-               + "SELECT " + NL //                                         //$NON-NLS-1$
+               + "SELECT" + NL //                                                //$NON-NLS-1$
 
-               + "photoId, " + NL //                                    1  //$NON-NLS-1$
-               + TourDatabase.TABLE_TOUR_DATA + "_tourId, " + NL //     2  //$NON-NLS-1$
-               + "adjustedTime, " + NL //                               3  //$NON-NLS-1$
-               + "imageExifTime, " + NL //                              4  //$NON-NLS-1$
-               + "latitude, " + NL //                                   5  //$NON-NLS-1$
-               + "longitude, " + NL //                                  6  //$NON-NLS-1$
-               + "isGeoFromPhoto, " + NL //                             7  //$NON-NLS-1$
-               + "ratingStars " + NL //                                 8  //$NON-NLS-1$
+               + " photoId," + NL //                                          1  //$NON-NLS-1$
+               + " " + TourDatabase.TABLE_TOUR_DATA + "_tourId, " + NL //     2  //$NON-NLS-1$ //$NON-NLS-2$
+               + " adjustedTime,          " + NL //                           3  //$NON-NLS-1$
+               + " imageExifTime,         " + NL //                           4  //$NON-NLS-1$
+               + " latitude,              " + NL //                           5  //$NON-NLS-1$
+               + " longitude,             " + NL //                           6  //$NON-NLS-1$
+               + " isGeoFromPhoto,        " + NL //                           7  //$NON-NLS-1$
+               + " ratingStars,           " + NL //                           8  //$NON-NLS-1$
 
-               + "FROM " + TourDatabase.TABLE_TOUR_PHOTO + NL //$NON-NLS-1$
+               + " photoAdjustmentsJSON   " + NL //                           9  //$NON-NLS-1$
 
-               + "WHERE imageFilePathName=?" + NL //                       //$NON-NLS-1$
+               + "FROM " + TourDatabase.TABLE_TOUR_PHOTO + NL //                 //$NON-NLS-1$
+
+               + "WHERE imageFilePathName=?" + NL //                             //$NON-NLS-1$
          ;
 
-         final PreparedStatement stmt = conn.prepareStatement(sql);
+         try (final PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-         stmt.setString(1, photo.imageFilePathName);
+            stmt.setString(1, photo.imageFilePathName);
 
-         final ResultSet result = stmt.executeQuery();
+            final ResultSet result = stmt.executeQuery();
 
-         while (result.next()) {
+            while (result.next()) {
 
-            final long dbPhotoId = result.getLong(1);
-            final long dbTourId = result.getLong(2);
+// SET_FORMATTING_OFF
 
-            final long dbAdjustedTime = result.getLong(3);
-            final long dbImageExifTime = result.getLong(4);
-            final double dbLatitude = result.getDouble(5);
-            final double dbLongitude = result.getDouble(6);
-            final int dbIsGeoFromExif = result.getInt(7);
-            final int dbRatingStars = result.getInt(8);
+               final long dbPhotoId                = result.getLong(1);
+               final long dbTourId                 = result.getLong(2);
 
-            photo.addTour(dbTourId, dbPhotoId);
+               final long dbAdjustedTime           = result.getLong(3);
+               final long dbImageExifTime          = result.getLong(4);
+               final double dbLatitude             = result.getDouble(5);
+               final double dbLongitude            = result.getDouble(6);
+               final int dbIsGeoFromExif           = result.getInt(7);
+               final int dbRatingStars             = result.getInt(8);
+               final String photoAdjustmentsJSON   = result.getString(9);
 
-            /*
-             * when a photo is in the photo cache it is possible that the tour is from the file
-             * system, update tour relevant fields
-             */
+               photo.addTour(dbTourId, dbPhotoId);
 
-            photo.isSavedInTour = true;
+               /*
+                * When a photo is in the photo cache it is possible that the tour is from the file
+                * system, update tour relevant fields
+                */
 
-            photo.adjustedTime_Tour = dbAdjustedTime;
-            photo.imageExifTime = dbImageExifTime;
+               photo.isSavedInTour        = true;
 
-            photo.isGeoFromExif = dbIsGeoFromExif == 1;
-            photo.isTourPhotoWithGps = dbLatitude != 0;
+               photo.adjustedTime_Tour    = dbAdjustedTime;
+               photo.imageExifTime        = dbImageExifTime;
 
-            photo.ratingStars = dbRatingStars;
+               photo.isGeoFromExif        = dbIsGeoFromExif == 1;
+               photo.isTourPhotoWithGps   = dbLatitude != 0;
 
-            if (photo.getTourLatitude() == 0 && dbLatitude != 0) {
-               photo.setTourGeoPosition(dbLatitude, dbLongitude);
+               photo.ratingStars          = dbRatingStars;
+
+// SET_FORMATTING_ON
+
+               if (photo.getTourLatitude() == 0 && dbLatitude != 0) {
+                  photo.setTourGeoPosition(dbLatitude, dbLongitude);
+               }
+
+               PhotoCache.setPhoto(photo);
             }
-
-            PhotoCache.setPhoto(photo);
-         }
+         } finally {}
 
       } catch (final SQLException e) {
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,10 @@
  *******************************************************************************/
 package net.tourbook.ext.apache.custom;
 
+/**
+ * These funktions are used when sorting the flat tourbook view in
+ * net.tourbook.ui.views.tourBook.natTable.NatTable_DataLoader.getSqlField_OrderBy
+ */
 public class DerbyCustomFunctions {
 
    public static float avgPace(final long tourTime, final long tourDistance) {
