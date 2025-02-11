@@ -426,6 +426,17 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
       }
    }
 
+   @Override
+   public void close() {
+
+      UI.disposeResource(_imageYes);
+      UI.disposeResource(_imageNo);
+
+      MapProviderManager.getInstance().removeMapProviderListener(this);
+
+      super.close();
+   }
+
    private void createActions() {
 
       {
@@ -1267,17 +1278,6 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
       // -> UI is disposed as when the pref page opens to modify map provider's then this slideout is closed
       // _mpViewer.refresh();
 //      selectMapProvider(_selectedMP == null ? null : _selectedMP.getId());
-   }
-
-   @Override
-   protected void onDispose() {
-
-      UI.disposeResource(_imageYes);
-      UI.disposeResource(_imageNo);
-
-      MapProviderManager.getInstance().removeMapProviderListener(this);
-
-      super.onDispose();
    }
 
    @Override
