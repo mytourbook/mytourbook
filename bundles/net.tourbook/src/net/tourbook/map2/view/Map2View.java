@@ -100,6 +100,7 @@ import net.tourbook.map2.action.ActionMap2_PhotoFilter;
 import net.tourbook.map2.action.ActionReloadFailedMapImages;
 import net.tourbook.map2.action.ActionSaveDefaultPosition;
 import net.tourbook.map2.action.ActionSetDefaultPosition;
+import net.tourbook.map2.action.ActionSetGeoPosition;
 import net.tourbook.map2.action.ActionShowAllFilteredPhotos;
 import net.tourbook.map2.action.ActionShowLegendInMap;
 import net.tourbook.map2.action.ActionShowPOI;
@@ -533,7 +534,7 @@ public class Map2View extends ViewPart implements
    private ActionSaveDefaultPosition            _actionSaveDefaultPosition;
    private ActionSearchTourByLocation           _actionSearchTourByLocation;
    private ActionSetDefaultPosition             _actionSetDefaultPosition;
-   private ActionSetTourGeoPositions            _actionCreateGeoPositions;
+   private ActionSetGeoPosition                 _actionSetGeoPositions;
    private ActionShowAllFilteredPhotos          _actionShowAllFilteredPhotos;
    private ActionShowLegendInMap                _actionShowLegendInMap;
    private ActionShowPOI                        _actionShowPOI;
@@ -939,22 +940,6 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   private class ActionSetTourGeoPositions extends Action {
-
-      public ActionSetTourGeoPositions() {
-
-         setText("Set Geo&positions");
-         setToolTipText(
-               "Set geo positions from the current mouse position into the selected tour\n\nThis feature is only available when a tour do not contain any geo positions or max 2 geo positions");
-      }
-
-      @Override
-      public void run() {
-
-         actionCreateGeoPositions();
-      }
-   }
-
    private class ActionShowTour extends ActionToolbarSlideout {
 
       public ActionShowTour() {
@@ -1279,21 +1264,6 @@ public class Map2View extends ViewPart implements
             mouseDown_GeoPosition.longitude);
 
       UI.copyTextIntoClipboard(geoPosition, statusMessage);
-   }
-
-   private void actionCreateGeoPositions() {
-
-      // make sure the tour editor does not contain a modified tour
-      if (TourManager.isTourEditorModified()) {
-         return;
-      }
-
-      new DialogSetTourGeoPositions(
-
-            _lastTourWithoutLatLon,
-            _map.getMouseMove_GeoPosition())
-
-                  .open();
    }
 
    private void actionExternalApp_PrefPage() {
@@ -2349,7 +2319,7 @@ public class Map2View extends ViewPart implements
       _actionRunExternalApp3                 = new ActionRunExternalApp();
 
       _actionCopyLocation                    = new ActionCopyLocation();
-      _actionCreateGeoPositions              = new ActionSetTourGeoPositions();
+      _actionSetGeoPositions                 = new ActionSetGeoPosition();
       _actionCreateTourMarkerFromMap         = new ActionCreateTourMarkerFromMap(this);
       _actionGotoLocation                    = new ActionGotoLocation();
       _actionLookupTourLocation              = new ActionLookupCommonLocation(this);
@@ -2688,10 +2658,14 @@ public class Map2View extends ViewPart implements
 
          canCreateGeoPositions = true;
          actionGeoPositionLabel = ("Set Geo&positions into \"%s\"...".formatted(TourManager.getTourTitle(tourData)));
+
+         final GeoPosition geoPosition = _map.getMouseMove_GeoPosition();
+
+         _actionSetGeoPositions.setData(tourData, geoPosition);
       }
 
-      _actionCreateGeoPositions.setText(actionGeoPositionLabel);
-      _actionCreateGeoPositions.setEnabled(canCreateGeoPositions);
+      _actionSetGeoPositions.setEnabled(canCreateGeoPositions);
+      _actionSetGeoPositions.setText(actionGeoPositionLabel);
 
 // SET_FORMATTING_OFF
 
@@ -2940,7 +2914,7 @@ public class Map2View extends ViewPart implements
          menuMgr.add(_actionSearchTourByLocation);
          menuMgr.add(_actionCreateTourMarkerFromMap);
          menuMgr.add(_actionLookupTourLocation);
-         menuMgr.add(_actionCreateGeoPositions);
+         menuMgr.add(_actionSetGeoPositions);
 
          /*
           * Show tour features
