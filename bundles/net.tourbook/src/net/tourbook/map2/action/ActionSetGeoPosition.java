@@ -21,6 +21,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourData;
+import net.tourbook.map2.Messages;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
@@ -41,7 +42,7 @@ public class ActionSetGeoPosition extends SubMenu {
 
       public SubAction_DeletePositions() {
 
-         super("&Delete start and end positions", AS_PUSH_BUTTON);
+         super(Messages.Map_Action_GeoPositions_Delete, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
       }
@@ -55,7 +56,7 @@ public class ActionSetGeoPosition extends SubMenu {
    private class SubAction_SetEndPosition extends Action {
 
       public SubAction_SetEndPosition() {
-         super("Set &end position", AS_PUSH_BUTTON);
+         super(Messages.Map_Action_GeoPositions_Set_End, AS_PUSH_BUTTON);
       }
 
       @Override
@@ -67,7 +68,7 @@ public class ActionSetGeoPosition extends SubMenu {
    private class SubAction_SetStartEndPosition extends Action {
 
       public SubAction_SetStartEndPosition() {
-         super("Set start &and end positions", AS_PUSH_BUTTON);
+         super(Messages.Map_Action_GeoPositions_Set_StartAndEnd, AS_PUSH_BUTTON);
       }
 
       @Override
@@ -79,7 +80,7 @@ public class ActionSetGeoPosition extends SubMenu {
    private class SubAction_SetStartPosition extends Action {
 
       public SubAction_SetStartPosition() {
-         super("Set &start position", AS_PUSH_BUTTON);
+         super(Messages.Map_Action_GeoPositions_Set_Start, AS_PUSH_BUTTON);
       }
 
       @Override
@@ -93,7 +94,7 @@ public class ActionSetGeoPosition extends SubMenu {
       super(UI.EMPTY_STRING, AS_DROP_DOWN_MENU);
 
       setToolTipText(
-            "Set geo positions from the current mouse position into the selected tour\n\nThis feature is only available when a tour do not contain any geo positions or max 2 geo positions");
+            Messages.Map_Action_GeoPositions_Tooltip);
 
       _actionSetStartPosition = new SubAction_SetStartPosition();
       _actionSetEndPosition = new SubAction_SetEndPosition();

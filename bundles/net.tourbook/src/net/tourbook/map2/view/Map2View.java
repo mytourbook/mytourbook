@@ -2649,7 +2649,7 @@ public class Map2View extends ViewPart implements
       /*
        * Set geo positions
        */
-      String actionGeoPositionLabel = "Set Geo&positions";
+      String actionGeoPositionLabel = Messages.Map_Action_GeoPositions_Set;
       boolean canCreateGeoPositions = false;
 
       final TourData tourData = getTourDataWhereGeoPositionsCanBeSet();
@@ -2657,7 +2657,7 @@ public class Map2View extends ViewPart implements
       if (tourData != null) {
 
          canCreateGeoPositions = true;
-         actionGeoPositionLabel = ("Set Geo&positions into \"%s\"...".formatted(TourManager.getTourTitle(tourData)));
+         actionGeoPositionLabel = (Messages.Map_Action_GeoPositions_SetInto.formatted(TourManager.getTourTitle(tourData)));
 
          final GeoPosition geoPosition = _map.getMouseMove_GeoPosition();
 
