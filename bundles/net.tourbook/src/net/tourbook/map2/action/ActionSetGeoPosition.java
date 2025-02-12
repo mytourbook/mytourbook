@@ -108,9 +108,9 @@ public class ActionSetGeoPosition extends SubMenu {
    @Override
    public void fillMenu(final Menu menu) {
 
+      new ActionContributionItem(_actionSetStartAndEndPositions).fill(menu, -1);
       new ActionContributionItem(_actionSetStartPosition).fill(menu, -1);
       new ActionContributionItem(_actionSetEndPosition).fill(menu, -1);
-      new ActionContributionItem(_actionSetStartAndEndPositions).fill(menu, -1);
       new ActionContributionItem(_actionDeleteStartAndEndPositions).fill(menu, -1);
    }
 
