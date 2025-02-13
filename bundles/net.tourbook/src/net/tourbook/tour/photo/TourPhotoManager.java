@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -121,7 +121,9 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
             final long diff = photo1.adjustedTime_Camera - photo2.adjustedTime_Camera;
 
-            return diff < 0 ? -1 : diff > 0 ? 1 : 0;
+            return diff < 0 ? -1
+                  : diff > 0 ? 1
+                        : 0;
          }
       };
 
@@ -132,7 +134,9 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
             final long diff = photo1.adjustedTime_Tour - photo2.adjustedTime_Tour;
 
-            return diff < 0 ? -1 : diff > 0 ? 1 : 0;
+            return diff < 0 ? -1
+                  : diff > 0 ? 1
+                        : 0;
          }
       };
    }

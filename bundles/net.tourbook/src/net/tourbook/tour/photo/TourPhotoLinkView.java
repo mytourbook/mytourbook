@@ -18,6 +18,8 @@ package net.tourbook.tour.photo;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -777,16 +779,16 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
    }
 
    private void createActions() {
-      
+
 // SET_FORMATTING_OFF
-      
+
       _actionCreatePhotoTour              = new ActionCreatePhotoTour();
       _actionFilterOneHistory             = new ActionFilterOneHistoryTour(this);
       _actionFilterTourWithoutSavedPhotos = new ActionFilterTourWithoutSavedPhotos(this);
       _actionFilterTourWithPhotos         = new ActionFilterTourWithPhotos(this);
       _actionSavePhotoInTour              = new ActionSavePhotosInTour(this);
       _actionSetToSavedAdjustment         = new ActionSetToSavedAdjustment();
-      
+
 // SET_FORMATTING_ON
    }
 
@@ -1431,6 +1433,62 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       super.dispose();
    }
 
+   private void dumpPhotos() {
+
+      System.out.println();
+      System.out.println();
+      System.out.println();
+
+      for (final Photo photo : _allPhotos) {
+
+//         final LocalDateTime exifDateTime = photo.getExifDateTime();
+         final LocalDateTime exifDateTime = photo.getOriginalDateTime();
+
+         final long imageExifTime = photo.imageExifTime;
+
+         final long adjustedTime_Camera = photo.adjustedTime_Camera;
+
+         final ZonedDateTime zonedAdjustedTime = TimeTools.getZonedDateTime(adjustedTime_Camera);
+         final ZonedDateTime zonedImageExif = TimeTools.getZonedDateTime(imageExifTime);
+
+         final int month = exifDateTime.getMonthValue();
+         final int day = exifDateTime.getDayOfMonth();
+         final int hour = exifDateTime.getHour();
+
+         if (true
+
+               && month == 9
+               && day == 27
+               && hour < 12
+
+         ) {
+
+            System.out.println("%s   %4d.%2d.%2d   %2d:%2d:%2d    %d   %s   %d   %s".formatted(
+
+                  photo.imageFileName,
+
+                  exifDateTime.getYear(),
+                  month,
+                  day,
+
+                  hour,
+                  exifDateTime.getMinute(),
+                  exifDateTime.getSecond(),
+
+                  adjustedTime_Camera,
+                  TimeTools.Formatter_Time_M.format(zonedAdjustedTime),
+
+                  imageExifTime,
+                  TimeTools.Formatter_Time_M.format(zonedImageExif)
+
+            ));
+         }
+
+// TODO remove SYSTEM.OUT.PRINTLN
+
+      }
+   }
+
    private void enableControls() {
 
 // SET_FORMATTING_OFF
@@ -2002,6 +2060,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       }
 
       Collections.sort(_allPhotos, TourPhotoManager.AdjustTimeComparatorLink);
+
+//    dumpPhotos();
    }
 
    /**
