@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2007, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -82,6 +82,9 @@ import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map2.view.SelectionMapPosition;
 import net.tourbook.map2.view.SelectionMapSelection;
+import net.tourbook.photo.IPhotoEventListener;
+import net.tourbook.photo.PhotoEventId;
+import net.tourbook.photo.PhotoManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageWeather;
 import net.tourbook.tag.TagContentLayout;
@@ -108,6 +111,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.location.ITourLocationConsumer;
 import net.tourbook.tour.location.TourLocationData;
 import net.tourbook.tour.location.TourLocationManager;
+import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ComboViewerCadence;
 import net.tourbook.ui.ITourProvider2;
@@ -212,6 +216,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -239,7 +244,8 @@ public class TourDataEditorView extends ViewPart implements
       ISaveablePart,
       ISaveAndRestorePart,
       ITourProvider2,
-      ITourLocationConsumer {
+      ITourLocationConsumer,
+      IPhotoEventListener {
 
    public static final String            ID                                               = "net.tourbook.views.TourDataEditorView";          //$NON-NLS-1$
    //
@@ -2053,16 +2059,20 @@ public class TourDataEditorView extends ViewPart implements
     * Creates a new manually created tour, editor must not be dirty before this action is called
     */
    public void actionCreateTour() {
-      actionCreateTour(null);
+
+      actionCreateTour(null, null);
    }
 
    /**
     * Creates a new manually created tour, editor must not be dirty before this action is called
     *
     * @param copyFromOtherTour
-    *           When not <code>null</code> then the new tour is partly copied from this tour.
+    *           When not <code>null</code> then the new tour is partly copied from this tour
+    * @param newTourContext
+    *           When not <code>null</code> then the context values are set into the new tour
     */
-   public void actionCreateTour(final TourData copyFromOtherTour) {
+   public void actionCreateTour(final TourData copyFromOtherTour,
+                                final NewTourContext newTourContext) {
 
       final Display currentDisplay = Display.getCurrent();
       final Shell activeShell = currentDisplay.getActiveShell();
@@ -2128,14 +2138,30 @@ public class TourDataEditorView extends ViewPart implements
 
          newTourData = new TourData();
 
-         // set tour start date/time
-         newTourData.setTourStartTime(TimeTools.now());
-
          // tour id must be created after the tour date/time is set
          newTourData.createTourId();
 
          newTourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
          newTourData.setTourPerson(activePerson);
+
+         if (newTourContext != null) {
+
+            // set values from the provided tour context
+
+            // set tour start/end date/time
+            final long tourStartTime = newTourContext.tourStartTime;
+            final long tourEndTime = newTourContext.tourEndTime;
+            final long elapsedTime = tourEndTime - tourStartTime;
+
+            newTourData.setTourTitle(newTourContext.title);
+            newTourData.setTourStartTime(TimeTools.getZonedDateTime(tourStartTime));
+            newTourData.setTourDeviceTime_Elapsed(elapsedTime / 1000);
+
+         } else {
+
+            // set tour start date/time
+            newTourData.setTourStartTime(TimeTools.now());
+         }
       }
 
       // ensure that the time zone is saved in the tour
@@ -3514,6 +3540,8 @@ public class TourDataEditorView extends ViewPart implements
       addPrefListener();
       addTourEventListener();
       addTourSaveListener();
+
+      PhotoManager.addPhotoEventListener(this);
 
       // this part is a selection provider
       getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
@@ -6613,6 +6641,7 @@ public class TourDataEditorView extends ViewPart implements
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
       TourManager.getInstance().removeTourSaveListener(_tourSaveListener);
+      PhotoManager.removePhotoEventListener(this);
 
       if (_tk != null) {
          _tk.dispose();
@@ -8531,6 +8560,23 @@ public class TourDataEditorView extends ViewPart implements
       final int startPauseIndex = Math.max(0, leftSliderValueIndex - 1);
 
       selectTimeSlice_InViewer(startPauseIndex, startPauseIndex);
+   }
+
+   @Override
+   public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
+
+      if (photoEventId == PhotoEventId.PHOTO_SELECTION) {
+
+         if (data instanceof final TourPhotoLinkSelection linkSelection) {
+
+            if (_isPartVisible) {
+
+               // TourPhotoLinkSelection extends SelectionTourIds
+
+               onSelectionChanged(linkSelection);
+            }
+         }
+      }
    }
 
    private void recreateViewer() {
