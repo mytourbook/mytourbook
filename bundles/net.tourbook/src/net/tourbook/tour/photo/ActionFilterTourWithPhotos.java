@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,7 +39,7 @@ public class ActionFilterTourWithPhotos extends Action {
 
    @Override
    public void run() {
-      _photosAndToursView.actionFilterPhotos();
+      _photosAndToursView.actionFilter_Photos();
    }
 
 }

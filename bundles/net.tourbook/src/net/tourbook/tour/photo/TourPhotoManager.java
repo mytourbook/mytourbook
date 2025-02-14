@@ -254,24 +254,25 @@ public class TourPhotoManager implements IPhotoServiceProvider {
    public static void saveState() {
 
       /*
-       * camera time adjustment
+       * Camera time adjustment
        */
-      final int size = _allAvailableCameras.size();
+      final int numCameras = _allAvailableCameras.size();
 
-      final String[] cameras = new String[size];
-      final long[] adjustment = new long[size];
+      final String[] allCameras = new String[numCameras];
+      final long[] allCameraAdjustments = new long[numCameras];
 
       int index = 0;
       for (final Camera camera : _allAvailableCameras.values()) {
-         cameras[index] = camera.cameraName;
-         adjustment[index] = camera.getTimeAdjustment();
+
+         allCameras[index] = camera.cameraName;
+         allCameraAdjustments[index] = camera.getTimeAdjustment();
          index++;
       }
-      _state.put(STATE_CAMERA_ADJUSTMENT_NAME, cameras);
-      Util.setState(_state, STATE_CAMERA_ADJUSTMENT_TIME, adjustment);
+      _state.put(STATE_CAMERA_ADJUSTMENT_NAME, allCameras);
+      Util.setState(_state, STATE_CAMERA_ADJUSTMENT_TIME, allCameraAdjustments);
 
       /*
-       * replace image folder
+       * Replace image folder
        */
       if (_replaceImageFolder != null) {
          _state.put(STATE_REPLACE_IMAGE_FOLDER, _replaceImageFolder);
@@ -800,6 +801,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
       default:
       case NO_AJUSTMENT:
+
          return photo.imageExifTime;
       }
    }
