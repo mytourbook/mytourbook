@@ -1279,9 +1279,27 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
             final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
             final long historyTime = photoLink.historyEndTime;
 
-            cell.setText(historyTime == Long.MIN_VALUE
-                  ? TimeTools.getZonedDateTime(photoLink.tourEndTime).format(TimeTools.Formatter_Date_S)
-                  : TimeTools.getZonedDateTime(historyTime).format(TimeTools.Formatter_Date_S));
+            ZonedDateTime zonedDateTime;
+
+            if (historyTime != Long.MIN_VALUE) {
+
+               // this is a history tour
+
+               zonedDateTime = TimeTools.getZonedDateTime(historyTime);
+
+            } else {
+
+               // this is a real tour
+
+               final ZonedDateTime tourEndDateTime_WithZoneID = photoLink.getTourEndDateTime_WithZoneID();
+
+               zonedDateTime = tourEndDateTime_WithZoneID != null
+
+                     ? tourEndDateTime_WithZoneID
+                     : TimeTools.getZonedDateTime(photoLink.tourEndTime);
+            }
+
+            cell.setText(zonedDateTime.format(TimeTools.Formatter_Date_S));
 
             setBgColor(cell, photoLink);
          }
@@ -1301,9 +1319,27 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
             final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
             final long historyTime = photoLink.historyEndTime;
 
-            cell.setText(historyTime == Long.MIN_VALUE
-                  ? TimeTools.getZonedDateTime(photoLink.tourEndTime).format(TimeTools.Formatter_Time_M)
-                  : TimeTools.getZonedDateTime(historyTime).format(TimeTools.Formatter_Time_M));
+            ZonedDateTime zonedDateTime;
+
+            if (historyTime != Long.MIN_VALUE) {
+
+               // this is a history tour
+
+               zonedDateTime = TimeTools.getZonedDateTime(historyTime);
+
+            } else {
+
+               // this is a real tour
+
+               final ZonedDateTime tourEndDateTime_WithZoneID = photoLink.getTourEndDateTime_WithZoneID();
+
+               zonedDateTime = tourEndDateTime_WithZoneID != null
+
+                     ? tourEndDateTime_WithZoneID
+                     : TimeTools.getZonedDateTime(photoLink.tourEndTime);
+            }
+
+            cell.setText(zonedDateTime.format(TimeTools.Formatter_Time_M));
 
             setBgColor(cell, photoLink);
          }
@@ -1325,9 +1361,27 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
             final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
             final long historyTime = photoLink.historyStartTime;
 
-            cell.setText(historyTime == Long.MIN_VALUE
-                  ? TimeTools.getZonedDateTime(photoLink.tourStartTime).format(TimeTools.Formatter_Date_S)
-                  : TimeTools.getZonedDateTime(historyTime).format(TimeTools.Formatter_Date_S));
+            ZonedDateTime zonedDateTime;
+
+            if (historyTime != Long.MIN_VALUE) {
+
+               // this is a history tour
+
+               zonedDateTime = TimeTools.getZonedDateTime(historyTime);
+
+            } else {
+
+               // this is a real tour
+
+               final ZonedDateTime tourStartDateTime_WithZoneID = photoLink.getTourStartDateTime_WithZoneID();
+
+               zonedDateTime = tourStartDateTime_WithZoneID != null
+
+                     ? tourStartDateTime_WithZoneID
+                     : TimeTools.getZonedDateTime(photoLink.tourStartTime);
+            }
+
+            cell.setText(zonedDateTime.format(TimeTools.Formatter_Date_S));
 
             setBgColor(cell, photoLink);
          }
@@ -1347,9 +1401,27 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
             final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
             final long historyTime = photoLink.historyStartTime;
 
-            cell.setText(historyTime == Long.MIN_VALUE
-                  ? TimeTools.getZonedDateTime(photoLink.tourStartTime).format(TimeTools.Formatter_Time_M)
-                  : TimeTools.getZonedDateTime(historyTime).format(TimeTools.Formatter_Time_M));
+            ZonedDateTime zonedDateTime;
+
+            if (historyTime != Long.MIN_VALUE) {
+
+               // this is a history tour
+
+               zonedDateTime = TimeTools.getZonedDateTime(historyTime);
+
+            } else {
+
+               // this is a real tour
+
+               final ZonedDateTime tourStartDateTime_WithZoneID = photoLink.getTourStartDateTime_WithZoneID();
+
+               zonedDateTime = tourStartDateTime_WithZoneID != null
+
+                     ? tourStartDateTime_WithZoneID
+                     : TimeTools.getZonedDateTime(photoLink.tourStartTime);
+            }
+
+            cell.setText(zonedDateTime.format(TimeTools.Formatter_Time_M));
 
             setBgColor(cell, photoLink);
          }
@@ -1497,10 +1569,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
             ));
          }
-
-// TODO remove SYSTEM.OUT.PRINTLN
-
       }
+// TODO remove SYSTEM.OUT.PRINTLN
    }
 
    private void enableControls() {

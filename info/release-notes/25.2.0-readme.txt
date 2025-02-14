@@ -47,6 +47,7 @@ New
 * Photos + Tours
   - Create a "Photo Tour" from a history tour
   - Edit selected tour
+  - Display tour start/end time with the correct timezone
 
 Improvements
 ============

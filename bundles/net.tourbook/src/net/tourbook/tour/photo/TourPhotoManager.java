@@ -593,7 +593,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
          // set tour end time
 
-         photoLink.setTourEndTime(Long.MAX_VALUE);
+         photoLink.setTourEndTime(Long.MAX_VALUE, null);
       }
 
       setTourCameras(tourCameras, photoLink);
@@ -685,7 +685,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
             // this is a real tour, finalize previous history tour
 
-            prevHistoryTour.setTourEndTime(Long.MAX_VALUE);
+            prevHistoryTour.setTourEndTime(Long.MAX_VALUE, null);
             mergedLinks.add(prevHistoryTour);
          }
 
@@ -699,7 +699,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
       if (prevHistoryTour != null) {
 
          // finalize previous history tour
-         prevHistoryTour.setTourEndTime(Long.MAX_VALUE);
+         prevHistoryTour.setTourEndTime(Long.MAX_VALUE, null);
          mergedLinks.add(prevHistoryTour);
       }
 
@@ -737,7 +737,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
       setTourCameras(tourCameras, historyTour);
 
       // finalize history tour
-      historyTour.setTourEndTime(Long.MAX_VALUE);
+      historyTour.setTourEndTime(Long.MAX_VALUE, null);
 
       visibleTourPhotoLinks.add(historyTour);
    }
@@ -956,16 +956,17 @@ public class TourPhotoManager implements IPhotoServiceProvider {
                   + " TourId," + NL //                               1  //$NON-NLS-1$
                   + " TourStartTime," + NL //                        2  //$NON-NLS-1$
                   + " TourEndTime," + NL //                          3  //$NON-NLS-1$
-                  + " TourType_TypeId," + NL //                      4  //$NON-NLS-1$
-                  + " NumberOfPhotos," + NL //                       5  //$NON-NLS-1$
-                  + " PhotoTimeAdjustment," + NL //                  6  //$NON-NLS-1$
+                  + " TimeZoneId," + NL //                           4  //$NON-NLS-1$
+                  + " TourType_TypeId," + NL //                      5  //$NON-NLS-1$
+                  + " NumberOfPhotos," + NL //                       6  //$NON-NLS-1$
+                  + " PhotoTimeAdjustment," + NL //                  7  //$NON-NLS-1$
 
-                  + " TblPhoto.ImageFilePath" + NL //                7  //$NON-NLS-1$
+                  + " TblPhoto.ImageFilePath" + NL //                8  //$NON-NLS-1$
 
                   + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //      //$NON-NLS-1$
 
                   // get marker id's
-                  + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_PHOTO + " TblPhoto" //     //$NON-NLS-1$ //$NON-NLS-2$
+                  + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_PHOTO + " TblPhoto" //      //$NON-NLS-1$ //$NON-NLS-2$
                   + " ON TourData.TourId = TblPhoto.TourData_TourId" + NL //                 //$NON-NLS-1$
 
                   + "WHERE" + NL //                                     //$NON-NLS-1$
@@ -1002,17 +1003,23 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
                // first result set for a new tour
 
-               final long dbTourStart = result.getLong(2);
-               final long dbTourEnd = result.getLong(3);
-               final Object dbTourTypeId = result.getObject(4);
-               final int dbNumberOfPhotos = result.getInt(5);
-               final int dbPhotoTimeAdjustment = result.getInt(6);
-               final Object dbPhotoImageFilePath = result.getObject(7);
+// SET_FORMATTING_OFF
+
+               final long dbTourStart              = result.getLong(2);
+               final long dbTourEnd                = result.getLong(3);
+               final Object dbTimeZoneID           = result.getObject(4);
+               final Object dbTourTypeId           = result.getObject(5);
+               final int dbNumberOfPhotos          = result.getInt(6);
+               final int dbPhotoTimeAdjustment     = result.getInt(7);
+               final Object dbPhotoImageFilePath   = result.getObject(8);
+
+// SET_FORMATTING_ON
 
                final TourPhotoLink dbPhotoLink = new TourPhotoLink(
                      dbTourId,
                      dbTourStart,
                      dbTourEnd,
+                     dbTimeZoneID,
                      dbNumberOfPhotos,
                      dbPhotoTimeAdjustment);
 
@@ -1881,7 +1888,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
                final double dbLongitude            = result.getDouble(6);
                final int dbIsGeoFromExif           = result.getInt(7);
                final int dbRatingStars             = result.getInt(8);
-               final String photoAdjustmentsJSON   = result.getString(9);
+//             final String photoAdjustmentsJSON   = result.getString(9);
 
                photo.addTour(dbTourId, dbPhotoId);
 
