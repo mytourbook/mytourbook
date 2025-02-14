@@ -59,6 +59,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.views.tourDataEditor.NewTourContext;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
@@ -194,11 +195,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
    private ISelectionListener                 _postSelectionListener;
    private ITourEventListener                 _tourEventListener;
    //
-   private ActionFilterTourWithoutSavedPhotos _actionFilterTourWithoutSavedPhotos;
-   private ActionFilterTourWithPhotos         _actionFilterTourWithPhotos;
-   private ActionFilterOneHistoryTour         _actionFilterOneHistory;
-   private ActionSavePhotosInTour             _actionSavePhotoInTour;
    private ActionCreatePhotoTour              _actionCreatePhotoTour;
+   private ActionEditTour                     _actionEditTour;
+   private ActionFilterOneHistoryTour         _actionFilterOneHistory;
+   private ActionFilterTourWithPhotos         _actionFilterTourWithPhotos;
+   private ActionFilterTourWithoutSavedPhotos _actionFilterTourWithoutSavedPhotos;
+   private ActionSavePhotosInTour             _actionSavePhotoInTour;
    private ActionSetToSavedAdjustment         _actionSetToSavedAdjustment;
    //
    private final PeriodFormatter              _durationFormatter;
@@ -783,6 +785,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 // SET_FORMATTING_OFF
 
       _actionCreatePhotoTour              = new ActionCreatePhotoTour();
+      _actionEditTour                     = new ActionEditTour(this);
       _actionFilterOneHistory             = new ActionFilterOneHistoryTour(this);
       _actionFilterTourWithoutSavedPhotos = new ActionFilterTourWithoutSavedPhotos(this);
       _actionFilterTourWithPhotos         = new ActionFilterTourWithPhotos(this);
@@ -1513,6 +1516,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       _spinnerSeconds                     .setEnabled(isPhotoWithRealTour && canSelectTime);
 
       _actionCreatePhotoTour              .setEnabled(isSelectedOneHistoryTour);
+      _actionEditTour                     .setEnabled(isPhotoWithRealTour && isSelectedOneRealTour);
       _actionFilterTourWithPhotos         .setEnabled(isPhotoWithRealTour && _isShowToursWithoutSavedPhotos == false);
       _actionFilterTourWithoutSavedPhotos .setEnabled(isPhotoWithRealTour);
       _actionFilterOneHistory             .setEnabled(isPhotoAvailable);
@@ -1525,6 +1529,10 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
    private void fillContextMenu(final IMenuManager menuMgr) {
 
       menuMgr.add(_actionSavePhotoInTour);
+
+      menuMgr.add(new Separator());
+
+      menuMgr.add(_actionEditTour);
       menuMgr.add(_actionCreatePhotoTour);
    }
 
@@ -1582,7 +1590,21 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    @Override
    public ArrayList<TourData> getSelectedTours() {
-      return new ArrayList<>();
+
+      final ArrayList<TourData> allSelectedTours = new ArrayList<>();
+
+      final boolean isOneLinkSelected = _selectedPhotoLinks.size() == 1;
+      final boolean isSelectedOneRealTour = isOneLinkSelected && _selectedPhotoLinks.get(0).isHistoryTour() == false;
+
+      if (isSelectedOneRealTour) {
+
+         final long tourId = _selectedPhotoLinks.get(0).tourId;
+         final TourData tourData = TourManager.getInstance().getTourData(tourId);
+
+         allSelectedTours.add(tourData);
+      }
+
+      return allSelectedTours;
    }
 
    private int getTimeAdjustmentTypeIndex(final Enum<TimeAdjustmentType> timeAdjustmentType) {

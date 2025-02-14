@@ -38,10 +38,15 @@ New
     https://github.com/mytourbook/mytourbook/issues/1456
   - Display photos in the map where a tour with geo positions was not recorded 
     https://github.com/mytourbook/mytourbook/issues/1457
+  - Set geo positions into a "Photo Tour"
 
 * 2D Map Marker
   - Display marker time with the marker label
 
+
+* Photos + Tours
+  - Create a "Photo Tour" from a history tour
+  - Edit selected tour
 
 Improvements
 ============
