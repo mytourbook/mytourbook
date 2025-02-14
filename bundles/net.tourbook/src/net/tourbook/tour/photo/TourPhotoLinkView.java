@@ -1156,7 +1156,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
-            final int numberOfNoGPSPhotos = photoLink.numbNoGPSPhotos;
+            final int numberOfNoGPSPhotos = photoLink.numNoGPSPhotos;
 
             cell.setText(numberOfNoGPSPhotos == 0 ? UI.EMPTY_STRING : Long.toString(numberOfNoGPSPhotos));
 

@@ -478,7 +478,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
          // set number of GPS/No GPS photos
          final double latitude = photo.getLinkLatitude();
          if (latitude == 0) {
-            currentTourPhotoLink.numbNoGPSPhotos++;
+            currentTourPhotoLink.numNoGPSPhotos++;
          } else {
             currentTourPhotoLink.numGPSPhotos++;
          }
@@ -676,7 +676,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
             prevHistoryTour.linkPhotos.addAll(tourPhotoLink.linkPhotos);
             prevHistoryTour.numGPSPhotos += tourPhotoLink.numGPSPhotos;
-            prevHistoryTour.numbNoGPSPhotos += tourPhotoLink.numbNoGPSPhotos;
+            prevHistoryTour.numNoGPSPhotos += tourPhotoLink.numNoGPSPhotos;
 
             continue;
          }
@@ -728,7 +728,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
          // set number of GPS/No GPS photos
          final double latitude = photo.getLinkLatitude();
          if (latitude == 0) {
-            historyTour.numbNoGPSPhotos++;
+            historyTour.numNoGPSPhotos++;
          } else {
             historyTour.numGPSPhotos++;
          }
@@ -929,7 +929,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
          tourPhotoLink.linkPhotos.clear();
 
          tourPhotoLink.numGPSPhotos = 0;
-         tourPhotoLink.numbNoGPSPhotos = 0;
+         tourPhotoLink.numNoGPSPhotos = 0;
 
          tourPhotoLink.tourCameras = UI.EMPTY_STRING;
 
@@ -1677,14 +1677,14 @@ public class TourPhotoManager implements IPhotoServiceProvider {
           * update number of photos
           */
          tourPhotoLink.numGPSPhotos = 0;
-         tourPhotoLink.numbNoGPSPhotos = 0;
+         tourPhotoLink.numNoGPSPhotos = 0;
 
          for (final Photo photo : tourPhotoLink.linkPhotos) {
 
             // set number of GPS/No GPS photos
             final double latitude = photo.getLinkLatitude();
             if (latitude == 0) {
-               tourPhotoLink.numbNoGPSPhotos++;
+               tourPhotoLink.numNoGPSPhotos++;
             } else {
                tourPhotoLink.numGPSPhotos++;
             }

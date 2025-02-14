@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import net.tourbook.common.UI;
+
 public class Camera implements Comparable<Camera> {
 
    public String cameraName;
@@ -90,7 +92,7 @@ public class Camera implements Comparable<Camera> {
 
    @Override
    public String toString() {
-      return "Camera [cameraName=" + cameraName + "{)}, timeAdjustment=" + _timeAdjustment + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      return "Camera [cameraName=" + cameraName + "{)}, timeAdjustment=" + _timeAdjustment + "]" + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
    }
 
 }

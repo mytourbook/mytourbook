@@ -78,7 +78,7 @@ public class TourPhotoLink {
    Period                          tourPeriod;
 
    int                             numGPSPhotos;
-   int                             numbNoGPSPhotos;
+   int                             numNoGPSPhotos;
 
    /**
     * Number of photos which are saved in a real tour.
