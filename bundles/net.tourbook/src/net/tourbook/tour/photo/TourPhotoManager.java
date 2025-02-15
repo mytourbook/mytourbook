@@ -144,8 +144,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
    private Connection               _sqlConnection;
    private PreparedStatement        _sqlStatement;
 
-   private ArrayList<TourPhotoLink> _allDbTourPhotoLinks = new ArrayList<>();
-   private ArrayList<TourPhotoLink> _dbTourPhotoLinks    = new ArrayList<>();
+   private ArrayList<TourPhotoLink> _allDBTourPhotoLinks = new ArrayList<>();
 
    private TourPhotoManager() {
 
@@ -342,7 +341,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
    }
 
    /**
-    * Create pseudo tours for photos which are not contained in a tour and remove all tours which
+    * Create dummy tours for photos which are not contained in a tour and remove all tours which
     * do not contain any photos
     *
     * @param allGalleryPhotos
@@ -359,14 +358,17 @@ public class TourPhotoManager implements IPhotoServiceProvider {
                              final boolean isShowToursWithoutSavedPhotos,
                              final TimeAdjustmentType adjustTimeType) {
 
+      System.out.println(UI.timeStamp() + " createTourPhotoLinks()");
+// TODO remove SYSTEM.OUT.PRINTLN
+
       loadToursFromDb(allGalleryPhotos, true);
 
       TourPhotoLink currentTourPhotoLink = createTourPhotoLinks_10_GetFirstTour(allGalleryPhotos);
 
       final HashMap<String, String> tourCameras = new HashMap<>();
 
-      final int numRealTours = _dbTourPhotoLinks.size();
-      long nextDbTourStartTime = numRealTours > 0 ? _dbTourPhotoLinks.get(0).tourStartTime : Long.MIN_VALUE;
+      final int numRealTours = _allDBTourPhotoLinks.size();
+      long nextDbTourStartTime = numRealTours > 0 ? _allDBTourPhotoLinks.get(0).tourStartTime : Long.MIN_VALUE;
 
       int tourIndex = 0;
       long photoTime = 0;
@@ -419,7 +421,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
                for (; tourIndex < numRealTours; tourIndex++) {
 
-                  final TourPhotoLink dbTourPhotoLink = _dbTourPhotoLinks.get(tourIndex);
+                  final TourPhotoLink dbTourPhotoLink = _allDBTourPhotoLinks.get(tourIndex);
 
                   final long dbTourStart = dbTourPhotoLink.tourStartTime;
                   final long dbTourEnd = dbTourPhotoLink.tourEndTime;
@@ -453,7 +455,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
                   // get start time for the next tour
                   if (tourIndex + 1 < numRealTours) {
-                     nextDbTourStartTime = _dbTourPhotoLinks.get(tourIndex + 1).tourStartTime;
+                     nextDbTourStartTime = _allDBTourPhotoLinks.get(tourIndex + 1).tourStartTime;
                   } else {
                      nextDbTourStartTime = Long.MAX_VALUE;
                   }
@@ -518,11 +520,11 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
       TourPhotoLink currentTourPhotoLink = null;
 
-      if (_dbTourPhotoLinks.size() > 0) {
+      if (_allDBTourPhotoLinks.size() > 0) {
 
          // real tours are available
 
-         final TourPhotoLink firstTour = _dbTourPhotoLinks.get(0);
+         final TourPhotoLink firstTour = _allDBTourPhotoLinks.get(0);
          final Photo firstPhoto = allPhotos.get(0);
 
          if (firstPhoto.adjustedTime_Camera < firstTour.tourStartTime) {
@@ -873,8 +875,11 @@ public class TourPhotoManager implements IPhotoServiceProvider {
          final long imageTime = photo.adjustedTime_Camera;
 
          if (imageTime < firstPhotoTime) {
+
             firstPhotoTime = imageTime;
+
          } else if (imageTime > lastPhotoTime) {
+
             lastPhotoTime = imageTime;
          }
 
@@ -890,18 +895,19 @@ public class TourPhotoManager implements IPhotoServiceProvider {
       // adjust by 5 days that time adjustments are covered
       final long tourStartDate = firstPhotoTime - 5 * UI.DAY_IN_SECONDS * 1000;
       final long tourEndDate = lastPhotoTime + 5 * UI.DAY_IN_SECONDS * 1000;
+      final ArrayList<TourPhotoLink> allTourPhotoLinks_FromDB = new ArrayList<>();
 
       BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
          @Override
          public void run() {
-            loadToursFromDb_Runnable(tourStartDate, tourEndDate);
+            loadToursFromDB_Runnable(tourStartDate, tourEndDate, allTourPhotoLinks_FromDB);
          }
       });
 
-      _dbTourPhotoLinks.clear();
+      _allDBTourPhotoLinks.clear();
       boolean isFirstTour = true;
 
-      for (final TourPhotoLink tourPhotoLink : _allDbTourPhotoLinks) {
+      for (final TourPhotoLink tourPhotoLink : allTourPhotoLinks_FromDB) {
 
          final long tourStart = tourPhotoLink.tourStartTime;
          final long tourEnd = tourPhotoLink.tourEndTime;
@@ -911,7 +917,9 @@ public class TourPhotoManager implements IPhotoServiceProvider {
             // check if this is the first tour
 
             if (firstPhotoTime > tourEnd) {
+
                continue;
+
             } else {
                // first tour is found
                isFirstTour = false;
@@ -926,22 +934,15 @@ public class TourPhotoManager implements IPhotoServiceProvider {
             }
          }
 
-         tourPhotoLink.linkPhotos.clear();
-
-         tourPhotoLink.numGPSPhotos = 0;
-         tourPhotoLink.numNoGPSPhotos = 0;
-
-         tourPhotoLink.tourCameras = UI.EMPTY_STRING;
-
-         _dbTourPhotoLinks.add(tourPhotoLink);
+         _allDBTourPhotoLinks.add(tourPhotoLink);
       }
 
       return;
    }
 
-   private void loadToursFromDb_Runnable(final long dbStartDate, final long dbEndDate) {
-
-      _allDbTourPhotoLinks.clear();
+   private void loadToursFromDB_Runnable(final long dbStartDate,
+                                         final long dbEndDate,
+                                         final ArrayList<TourPhotoLink> allTourPhotoLinks) {
 
       try {
 
@@ -1031,7 +1032,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
                      ? (String) dbPhotoImageFilePath
                      : null;
 
-               _allDbTourPhotoLinks.add(dbPhotoLink);
+               allTourPhotoLinks.add(dbPhotoLink);
             }
 
             prevTourId = dbTourId;

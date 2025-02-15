@@ -1585,7 +1585,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       final boolean isSelectedOneRealTour       = isOneLinkSelected && _allSelectedPhotoLinks.get(0).isHistoryTour() == false;
       final boolean isSelectedOneHistoryTour    = isOneLinkSelected && _allSelectedPhotoLinks.get(0).isHistoryTour() ;
 
-      final boolean canSelectTime         = getSelectedTimeAdjustmentType().equals(TimeAdjustmentType.SELECT_AJUSTMENT);
+      boolean canSelectTime               = getSelectedTimeAdjustmentType().equals(TimeAdjustmentType.SELECT_AJUSTMENT);
+
+//      canSelectTime=true;
 
       _comboAdjustTime                    .setEnabled(isPhotoWithRealTour);
       _comboCamera                        .setEnabled(isPhotoWithRealTour && canSelectTime);

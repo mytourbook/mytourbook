@@ -91,16 +91,16 @@ public class TourPhotoLink {
    int                             photoTimeAdjustment;
 
    /**
-    * Contains all photos for this tour.
+    * Contains all photos for this tour
     */
    public ArrayList<Photo>         linkPhotos          = new ArrayList<>();
 
    private TourData                _historyTourData;
 
    /**
-    * Contains names for all cameras which are used to take pictures for the current tour.
+    * Contains names for all cameras which are used to take pictures for the current tour
     */
-   String                          tourCameras;
+   String                          tourCameras         = UI.EMPTY_STRING;
 
    /**
     * Photo file path from the first photo, other photos are currently ignored -> is simplified
