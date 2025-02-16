@@ -1570,7 +1570,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
             ));
          }
       }
-// TODO remove SYSTEM.OUT.PRINTLN
    }
 
    private void enableControls() {
@@ -1587,7 +1586,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       boolean canSelectTime               = getSelectedTimeAdjustmentType().equals(TimeAdjustmentType.SELECT_AJUSTMENT);
 
-//    canSelectTime = true;
+      canSelectTime = true;
 
       _comboAdjustTime                    .setEnabled(isPhotoWithRealTour);
       _comboCamera                        .setEnabled(isPhotoWithRealTour && canSelectTime);
