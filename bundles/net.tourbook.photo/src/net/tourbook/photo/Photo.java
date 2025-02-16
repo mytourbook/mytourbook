@@ -549,7 +549,8 @@ public class Photo implements Serializable {
    void dumpTourReferences() {
 
       for (final TourPhotoReference ref : _tourPhotoRef.values()) {
-         System.out.println(UI.timeStampNano() + " \t\tphotoId=" + ref.photoId); //$NON-NLS-1$
+
+         System.out.println(UI.timeStampNano() + "   photoId=" + ref.photoId); //$NON-NLS-1$
          // TODO remove SYSTEM.OUT.PRINTLN
       }
    }
@@ -1575,6 +1576,7 @@ public class Photo implements Serializable {
 
             + "Photo" //
             + " " + imageFileName
+            + " adjustedTime_Tour " + adjustedTime_Tour //$NON-NLS-1$
             + " _exifDateTime " + _exifDateTime //$NON-NLS-1$
 
 //            + (_exifDateTime == null ? "-no date-" : "\t" + _exifDateTime)
@@ -1584,8 +1586,11 @@ public class Photo implements Serializable {
 //            + ("\tEXIF GPS: " + _exifLatitude + " - " + _exifLongitude) //$NON-NLS-1$ //$NON-NLS-2$
 //            + ("\tLink GPS: " + _linkLatitude + " - " + _linkLongitude) //$NON-NLS-1$ //$NON-NLS-2$
 //            + ("\tTour GPS: " + _tourLatitude + " - " + _tourLongitude) //$NON-NLS-1$ //$NON-NLS-2$
-            //
-            + UI.NEW_LINE;
+      //
+
+//            + UI.NEW_LINE
+
+      ;
    }
 
    void updateImageMetadata(final PhotoImageMetadata photoImageMetadata) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,7 +43,7 @@ public class PhotoCache {
 
    static {
 
-      final RemovalListener<String, Photo> removalListener = new RemovalListener<String, Photo>() {
+      final RemovalListener<String, Photo> removalListener = new RemovalListener<>() {
 
          final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -81,7 +81,7 @@ public class PhotoCache {
 
       for (final Photo photo : _cache.asMap().values()) {
 
-         System.out.println(UI.timeStampNano() + " \t" + photo.imageFilePathName + ("\t")); //$NON-NLS-1$ //$NON-NLS-2$
+         System.out.println(UI.timeStampNano() + "  " + photo.imageFilePathName + ("  ")); //$NON-NLS-1$ //$NON-NLS-2$
 
          photo.dumpTourReferences();
       }

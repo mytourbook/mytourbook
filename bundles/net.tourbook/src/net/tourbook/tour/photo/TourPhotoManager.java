@@ -358,9 +358,6 @@ public class TourPhotoManager implements IPhotoServiceProvider {
                              final boolean isShowToursWithoutSavedPhotos,
                              final TimeAdjustmentType adjustTimeType) {
 
-      System.out.println(UI.timeStamp() + " createTourPhotoLinks()");
-// TODO remove SYSTEM.OUT.PRINTLN
-
       loadToursFromDb(allGalleryPhotos, true);
 
       TourPhotoLink currentTourPhotoLink = createTourPhotoLinks_10_GetFirstTour(allGalleryPhotos);
@@ -790,12 +787,20 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
       case SAVED_AJUSTMENT:
 
-         return photo.adjustedTime_Tour == Long.MIN_VALUE
+         final boolean isAdjustedTimeSet = photo.adjustedTime_Tour != Long.MIN_VALUE;
+
+         if (isAdjustedTimeSet == false) {
+
+//          System.out.println(UI.timeStamp() + " getPhotoTime() Adj. time is NOT set: " + photo);
+// TODO remove SYSTEM.OUT.PRINTLN
+         }
+
+         return isAdjustedTimeSet
+
+               ? photo.adjustedTime_Tour
 
                // photo is not yet saved
-               ? photo.adjustedTime_Camera
-
-               : photo.adjustedTime_Tour;
+               : photo.adjustedTime_Camera;
 
       case SELECT_AJUSTMENT:
 
