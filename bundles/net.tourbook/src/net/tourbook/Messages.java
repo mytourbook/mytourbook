@@ -1490,6 +1490,8 @@ public class Messages extends NLS {
 
    public static String        NT001_DialogExtractTour_InvalidTourData;
 
+   public static String        Photos_AndTours_Action_CreatePhotoTour;
+   public static String        Photos_AndTours_Action_CreatePhotoTour_Tooltip;
    public static String        Photos_AndTours_Action_SetToSavedAdjustment_Tooltip;
    public static String        Photos_AndTours_AdjustmentType_NoAdjustment;
    public static String        Photos_AndTours_AdjustmentType_SavedAdjustment;
@@ -1513,6 +1515,7 @@ public class Messages extends NLS {
    public static String        Photos_AndTours_Spinner_AdjustHours_Tooltip;
    public static String        Photos_AndTours_Spinner_AdjustMinutes_Tooltip;
    public static String        Photos_AndTours_Spinner_AdjustSeconds_Tooltip;
+   public static String        Photos_AndTours_TourTitle_PhotoTour;
 
    public static String        Photo_Filter_Label_NumberOfAllPhotos_Tooltip;
    public static String        Photo_Filter_Label_NumberOfFilteredPhotos_Tooltip;

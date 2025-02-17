@@ -1680,16 +1680,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * Contains seconds from all hr zones: {@link #hrZone0} ... {@link #hrZone9}
     */
    @Transient
-   private int[]              _hrZones;
+   private int[]                 _hrZones;
 
    @Transient
-   private HrZoneContext      _hrZoneContext;
+   private HrZoneContext         _hrZoneContext;
 
    /**
     * Copy of {@link #timeSerie} with double type, this is used for the chart x-axis to support history tours
     */
    @Transient
-   private double[]           timeSerieDouble;
+   private double[]              timeSerieDouble;
 
    /**
     * Contains photo data from a {@link TourPhotoLink}.
@@ -1698,13 +1698,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * {@link #tourPhotos} are displayed.
     */
    @Transient
-   public TourPhotoLink       tourPhotoLink;
+   public TourPhotoLink          tourPhotoLink;
 
    /**
     * Contains photos which are displayed in photo galleries.
     */
    @Transient
-   private ArrayList<Photo>   _galleryPhotos                           = new ArrayList<>();
+   private ArrayList<Photo>      _galleryPhotos                      = new ArrayList<>();
+
+   @Transient
+   private Map<Long, Integer>    _allPhotoTimeAdjustments;
 
    /**
     *
@@ -5223,12 +5226,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    private void computePhotoTimeAdjustment() {
 
+      _allPhotoTimeAdjustments = new HashMap<>();
+
       long allPhotoTimeAdjustment = 0;
       int numPhotos = 0;
 
       for (final TourPhoto tourPhoto : tourPhotos) {
 
-         allPhotoTimeAdjustment += (tourPhoto.getAdjustedTime() - tourPhoto.getImageExifTime()) / 1000;
+         final long timeDiff = (tourPhoto.getAdjustedTime() - tourPhoto.getImageExifTime()) / 1000;
+
+         Integer timeAdjustment = _allPhotoTimeAdjustments.get(timeDiff);
+
+         if (timeAdjustment == null) {
+            timeAdjustment = 1;
+         } else {
+            timeAdjustment++;
+         }
+
+         _allPhotoTimeAdjustments.put(timeDiff, timeAdjustment);
+
+         allPhotoTimeAdjustment += timeDiff;
 
          numPhotos++;
       }
@@ -9589,7 +9606,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * @return Returns time adjustment in seconds, this is an average value for all photos.
     */
    public int getPhotoTimeAdjustment() {
+
       return photoTimeAdjustment;
+   }
+
+   public Map<Long, Integer> getPhotoTimeAdjustment_All() {
+
+      if (_allPhotoTimeAdjustments == null) {
+         computePhotoTimeAdjustment();
+      }
+
+      return _allPhotoTimeAdjustments;
    }
 
    public float getPower_Avg() {
@@ -12574,7 +12601,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * Used for MT import/export
     */
    public void setPhotoTimeAdjustment(final int photoTimeAdjustment) {
+
       this.photoTimeAdjustment = photoTimeAdjustment;
+
+      _allPhotoTimeAdjustments = null;
    }
 
    public void setPower_Avg(final float avgPower) {

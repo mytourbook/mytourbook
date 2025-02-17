@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.tourbook.Images;
@@ -125,6 +127,8 @@ import org.joda.time.format.PeriodFormatterBuilder;
 public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourViewer {
 
    public static final String               ID                                  = "net.tourbook.photo.PhotosAndToursView.ID"; //$NON-NLS-1$
+
+   private static final String              ITEM_SEPARATOR                      = " | ";                                      //$NON-NLS-1$
 
    private static final String              STATE_FILTER_NOT_SAVED_PHOTOS       = "STATE_FILTER_NOT_SAVED_PHOTOS";            //$NON-NLS-1$
    private static final String              STATE_FILTER_TOUR_WITH_PHOTOS       = "STATE_FILTER_TOUR_WITH_PHOTOS";            //$NON-NLS-1$
@@ -268,9 +272,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       public ActionCreatePhotoTour() {
 
-         super("Create &photo tour");
+         super(Messages.Photos_AndTours_Action_CreatePhotoTour);
 
-         setToolTipText("Creates a tour which contains a timerange of all photos");
+         setToolTipText(Messages.Photos_AndTours_Action_CreatePhotoTour_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourNew));
       }
@@ -405,7 +409,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
          final NewTourContext newTourContext = new NewTourContext();
 
-         newTourContext.title = "Photo Tour";
+         newTourContext.title = Messages.Photos_AndTours_TourTitle_PhotoTour;
          newTourContext.tourStartTime = selectedPhotoLink.historyStartTime - 1000;
          newTourContext.tourEndTime = selectedPhotoLink.historyEndTime + 1000;
 
@@ -590,8 +594,10 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          final TourData tourData = tourManager.getTourData(photoLink.tourId);
 
          if (tourData != null) {
+
             photoLink.numTourPhotos = tourData.getTourPhotos().size();
             photoLink.photoTimeAdjustment = tourData.getPhotoTimeAdjustment();
+            photoLink.updateAllTimeAdjustments();
          }
       }
 
@@ -1084,6 +1090,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       defineColumn_Tour_TypeImage();
       defineColumn_Photo_NumberOfTourPhotos();
       defineColumn_Photo_TimeAdjustment();
+      defineColumn_Photo_TimeAdjustment_All();
       defineColumn_Photo_NumberOfGPSPhotos();
       defineColumn_Photo_NumberOfNoGPSPhotos();
 
@@ -1187,7 +1194,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
    }
 
    /**
-    * column: number of photos which are saved in the tour
+    * Column: Time difference between time in photo (EXIF time) and displayed time. This is an
+    * average value for all photos.
     */
    private void defineColumn_Photo_TimeAdjustment() {
 
@@ -1204,6 +1212,49 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
             cell.setText(numTourPhotos == 0
                   ? UI.EMPTY_STRING
                   : UI.formatHhMmSs(timeAdjustment));
+
+            setBgColor(cell, photoLink);
+         }
+      });
+   }
+
+   /**
+    * Column: Time difference between time in photo (EXIF time) and displayed time
+    */
+   private void defineColumn_Photo_TimeAdjustment_All() {
+
+      final ColumnDefinition colDef = TableColumnFactory.PHOTO_TIME_ADJUSTMENT_ALL.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourPhotoLink photoLink = (TourPhotoLink) cell.getElement();
+            final int numTourPhotos = photoLink.numTourPhotos;
+
+            if (numTourPhotos == 0) {
+
+               cell.setText(UI.EMPTY_STRING);
+
+            } else {
+
+               final Map<Long, Integer> allTimeAdjustments = photoLink.getAllPhotoTimeAdjustments();
+
+               final StringBuilder sb = new StringBuilder();
+               int numEntries = 0;
+
+               for (final Entry<Long, Integer> entrySet : allTimeAdjustments.entrySet()) {
+
+                  // append spacer
+                  if (numEntries++ > 0) {
+                     sb.append(ITEM_SEPARATOR);
+                  }
+
+                  sb.append(entrySet.getValue() + UI.COLON_SPACE + UI.formatHhMmSs(entrySet.getKey()));
+               }
+
+               cell.setText(sb.toString());
+            }
 
             setBgColor(cell, photoLink);
          }
@@ -1549,7 +1600,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
          ) {
 
-            System.out.println("%s   %4d.%2d.%2d   %2d:%2d:%2d    %d   %s   %d   %s".formatted(
+            System.out.println("%s   %4d.%2d.%2d   %2d:%2d:%2d    %d   %s   %d   %s".formatted( //$NON-NLS-1$
 
                   photo.imageFileName,
 

@@ -18,12 +18,14 @@ package net.tourbook.tour.photo;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Map;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.HistoryData;
 import net.tourbook.data.TourData;
 import net.tourbook.photo.Photo;
+import net.tourbook.tour.TourManager;
 
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
@@ -90,6 +92,8 @@ public class TourPhotoLink {
     */
    int                             photoTimeAdjustment;
 
+   private Map<Long, Integer>      _allPhotoTimeAdjustments;
+
    /**
     * Contains all photos for this tour
     */
@@ -108,7 +112,7 @@ public class TourPhotoLink {
    String                          photoFilePath;
 
    /**
-    * Constructor for a history tour.
+    * Constructor for a history tour
     *
     * @param notUsed
     */
@@ -125,7 +129,7 @@ public class TourPhotoLink {
    }
 
    /**
-    * Constructor for a real tour.
+    * Constructor for a real tour
     *
     * @param tourEndTime
     * @param tourStartTime
@@ -267,6 +271,16 @@ public class TourPhotoLink {
       _historyTourData.createHistoryTimeSerie(historySlices);
    }
 
+   public Map<Long, Integer> getAllPhotoTimeAdjustments() {
+
+      if (_allPhotoTimeAdjustments == null) {
+
+         updateAllTimeAdjustments();
+      }
+
+      return _allPhotoTimeAdjustments;
+   }
+
    public TourData getHistoryTourData() {
       return _historyTourData;
    }
@@ -373,6 +387,16 @@ public class TourPhotoLink {
             + " historyStartTime =" + historyStart + NL //        //$NON-NLS-1$
             + " linkId           =" + linkId + NL //              //$NON-NLS-1$
       ;
+   }
+
+   void updateAllTimeAdjustments() {
+
+      final TourData tourData = TourManager.getInstance().getTourData(tourId);
+
+      if (tourData != null) {
+
+         _allPhotoTimeAdjustments = tourData.getPhotoTimeAdjustment_All();
+      }
    }
 
 }

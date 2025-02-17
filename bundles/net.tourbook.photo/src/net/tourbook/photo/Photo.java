@@ -1574,8 +1574,8 @@ public class Photo implements Serializable {
 
       return UI.EMPTY_STRING
 
-            + "Photo" //
-            + " " + imageFileName
+            + "Photo" // //$NON-NLS-1$
+            + " " + imageFileName //$NON-NLS-1$
             + " adjustedTime_Tour " + adjustedTime_Tour //$NON-NLS-1$
             + " _exifDateTime " + _exifDateTime //$NON-NLS-1$
 
