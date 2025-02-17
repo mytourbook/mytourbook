@@ -190,6 +190,9 @@ public class OtherMessages {
    // net.tourbook.map2.Messages
    //
 
+   public static final String MAP_ACTION_EXTERNAL_APP_DOUBLE_CLICK_START   = net.tourbook.map2.Messages.Map_Action_ExternalApp_DoubleClickStart;
+   public static final String MAP_ACTION_EXTERNAL_APP_OPEN_PHOTO_IMAGE     = net.tourbook.map2.Messages.Map_Action_ExternalApp_OpenPhotoImage;
+   public static final String MAP_ACTION_EXTERNAL_APP_SETUP                = net.tourbook.map2.Messages.Map_Action_ExternalApp_Setup;
    public static final String MAP_ACTION_SHOW_TOUR_IN_MAP                  = net.tourbook.map2.Messages.map_action_show_tour_in_map;
    public static final String MAP_ACTION_TOUR_COLOR_ALTITUDE_TOOLTIP       = net.tourbook.map2.Messages.map_action_tour_color_altitude_tooltip;
    public static final String MAP_ACTION_TOUR_COLOR_GRADIENT_TOOLTIP       = net.tourbook.map2.Messages.map_action_tour_color_gradient_tooltip;

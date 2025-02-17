@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,24 +18,29 @@ package net.tourbook.tour.photo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.IPhotoGalleryProvider;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoActivator;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
+import net.tourbook.photo.internal.preferences.PrefPagePhotoExternalApp;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
@@ -45,12 +50,14 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -73,6 +80,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.part.ViewPart;
 
 public class TourPhotosView extends ViewPart implements IPhotoEventListener {
@@ -81,8 +89,11 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
    private static final String            STATE_PHOTO_GALLERY_IS_VERTICAL = "STATE_PHOTO_GALLERY_IS_VERTICAL";      //$NON-NLS-1$
 
+   private static final String            EXTERNAL_APP_ACTION             = "&%d   %s";                             //$NON-NLS-1$
+
    private static final IDialogSettings   _state                          = TourbookPlugin.getState(ID);
-   private final IPreferenceStore         _prefStore                      = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore  _prefStore_Photo                = PhotoActivator.getPrefStore();
 
    private PostSelectionProvider          _postSelectionProvider;
 
@@ -96,6 +107,11 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
    private ActionAddPhoto                 _actionAddPhoto;
    private ActionRemovePhoto              _actionRemovePhoto;
    private ActionToggleGalleryOrientation _actionToggleGalleryOrientation;
+   private ActionRunExternalApp           _actionRunExternalApp1;
+   private ActionRunExternalApp           _actionRunExternalApp2;
+   private ActionRunExternalApp           _actionRunExternalApp3;
+   private ActionRunExternalAppPrefPage   _actionRunExternalAppPrefPage;
+   private ActionRunExternalAppTitle      _actionRunExternalAppTitle;
 
    /**
     * Contains selection which was set when the part is hidden
@@ -119,6 +135,44 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
     */
    private ToolBar _rightToolbar;
    private Label   _labelTitle;
+
+   public class ActionRunExternalApp extends Action {
+
+      public ActionRunExternalApp() {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+      }
+
+      @Override
+      public void run() {
+
+         actionExternalApp_Run(this);
+      }
+   }
+
+   public class ActionRunExternalAppPrefPage extends Action {
+
+      public ActionRunExternalAppPrefPage() {
+
+         super(OtherMessages.MAP_ACTION_EXTERNAL_APP_SETUP, AS_PUSH_BUTTON);
+      }
+
+      @Override
+      public void run() {
+
+         actionExternalApp_PrefPage();
+      }
+   }
+
+   private class ActionRunExternalAppTitle extends Action {
+
+      public ActionRunExternalAppTitle() {
+
+         super(OtherMessages.MAP_ACTION_EXTERNAL_APP_OPEN_PHOTO_IMAGE, AS_PUSH_BUTTON);
+
+         setEnabled(false);
+      }
+   }
 
    private class ActionToggleGalleryOrientation extends Action {
 
@@ -179,6 +233,86 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
    public TourPhotosView() {
       super();
+   }
+
+   private void actionExternalApp_PrefPage() {
+
+      PreferencesUtil.createPreferenceDialogOn(
+            Display.getCurrent().getActiveShell(),
+            PrefPagePhotoExternalApp.ID,
+            null,
+            null)
+
+            .open();
+   }
+
+   private void actionExternalApp_Run(final ActionRunExternalApp actionRunExternalApp) {
+
+      final Photo photo = getSelectedPhoto();
+      if (photo == null) {
+         return;
+      }
+
+      /*
+       * Run external app
+       */
+      String extApp = null;
+
+      if (actionRunExternalApp == _actionRunExternalApp1) {
+         extApp = _prefStore_Photo.getString(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_1).trim();
+      } else if (actionRunExternalApp == _actionRunExternalApp2) {
+         extApp = _prefStore_Photo.getString(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_2).trim();
+      } else if (actionRunExternalApp == _actionRunExternalApp3) {
+         extApp = _prefStore_Photo.getString(IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_3).trim();
+      }
+
+      final String imageFilePath = photo.imageFilePathName;
+
+      String commands[] = null;
+      if (UI.IS_WIN) {
+
+         final String[] commandsWin = {
+
+               UI.SYMBOL_QUOTATION_MARK + extApp + UI.SYMBOL_QUOTATION_MARK,
+               UI.SYMBOL_QUOTATION_MARK + imageFilePath + UI.SYMBOL_QUOTATION_MARK
+         };
+
+         commands = commandsWin;
+
+      } else if (UI.IS_OSX) {
+
+         final String[] commandsOSX = { "/usr/bin/open", "-a", // //$NON-NLS-1$ //$NON-NLS-2$
+               extApp,
+               imageFilePath };
+
+         commands = commandsOSX;
+
+      } else if (UI.IS_LINUX) {
+
+         final String[] commandsLinux = { extApp, imageFilePath };
+
+         commands = commandsLinux;
+      }
+
+      if (commands != null) {
+
+         try {
+
+            // log command
+            final StringBuilder sb = new StringBuilder();
+            for (final String cmd : commands) {
+               sb.append(cmd + UI.SPACE1);
+            }
+
+            StatusUtil.logInfo(sb.toString());
+
+            Runtime.getRuntime().exec(commands);
+
+         } catch (final Exception e) {
+
+            StatusUtil.showStatus(e);
+         }
+      }
    }
 
    private void actionToggleVerticalHorizontal() {
@@ -332,6 +466,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
     *
     * @param allPhotos
     * @param tourData
+    *
     * @return
     */
    private int addTourPhotos(final ArrayList<Photo> allPhotos, final TourData tourData) {
@@ -375,10 +510,19 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
    private void createActions() {
 
-      _actionToggleGalleryOrientation = new ActionToggleGalleryOrientation();
+// SET_FORMATTING_OFF
 
-      _actionAddPhoto = new ActionAddPhoto(_photoGallery);
-      _actionRemovePhoto = new ActionRemovePhoto(_photoGallery);
+      _actionAddPhoto                  = new ActionAddPhoto(_photoGallery);
+      _actionRemovePhoto               = new ActionRemovePhoto(_photoGallery);
+      _actionToggleGalleryOrientation  = new ActionToggleGalleryOrientation();
+
+      _actionRunExternalAppTitle       = new ActionRunExternalAppTitle();
+      _actionRunExternalAppPrefPage    = new ActionRunExternalAppPrefPage();
+      _actionRunExternalApp1           = new ActionRunExternalApp();
+      _actionRunExternalApp2           = new ActionRunExternalApp();
+      _actionRunExternalApp3           = new ActionRunExternalApp();
+
+// SET_FORMATTING_ON
    }
 
    @Override
@@ -482,10 +626,16 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
       final Collection<GalleryMT20Item> selectedPhotos = _photoGallery.getGallerySelection();
 
-      final boolean isPhotoSelected = selectedPhotos.size() > 0;
+// SET_FORMATTING_OFF
 
-      _actionRemovePhoto.setEnabled(isPhotoSelected);
-      _actionAddPhoto.setEnabled(isPhotoSelected && _isLinkPhotoDisplayed);
+      final int numSelectedPhotos = selectedPhotos.size();
+      final boolean isPhotoSelected = numSelectedPhotos > 0;
+
+      _actionRemovePhoto            .setEnabled(isPhotoSelected);
+      _actionAddPhoto               .setEnabled(isPhotoSelected && _isLinkPhotoDisplayed);
+      _actionRunExternalAppTitle    .setEnabled(false);
+
+// SET_FORMATTING_ON
    }
 
    private void fillActionBar() {
@@ -508,7 +658,70 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
       menuMgr.add(_actionRemovePhoto);
 
+      menuMgr.add(new Separator());
+
+      fillExternalApp(menuMgr);
+
       enableActions();
+   }
+
+   private void fillExternalApp(final IMenuManager menuMgr) {
+
+      final Photo photo = getSelectedPhoto();
+
+      if (photo == null) {
+         return;
+      }
+
+      // set image file name into the external app title/tooltip
+      _actionRunExternalAppTitle.setText(OtherMessages.MAP_ACTION_EXTERNAL_APP_OPEN_PHOTO_IMAGE.formatted(photo.imageFileName));
+      _actionRunExternalAppTitle.setToolTipText(photo.imageFilePathName);
+
+      menuMgr.add(_actionRunExternalAppTitle);
+
+      fillExternalApp_One(1, _actionRunExternalApp1, menuMgr, IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_1);
+      fillExternalApp_One(2, _actionRunExternalApp2, menuMgr, IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_2);
+      fillExternalApp_One(3, _actionRunExternalApp3, menuMgr, IPhotoPreferences.PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_3);
+
+      menuMgr.add(_actionRunExternalAppPrefPage);
+   }
+
+   private void fillExternalApp_One(final int appIndex,
+                                    final ActionRunExternalApp appAction,
+                                    final IMenuManager menuMgr,
+                                    final String prefStoreName) {
+
+      final String extAppFilePath = _prefStore_Photo.getString(prefStoreName).trim();
+
+      if (extAppFilePath.length() > 0) {
+
+         appAction.setText(EXTERNAL_APP_ACTION.formatted(appIndex, new Path(extAppFilePath).lastSegment()));
+
+         // set tooltip text
+         if (appIndex == 1) {
+
+            appAction.setToolTipText(OtherMessages.MAP_ACTION_EXTERNAL_APP_DOUBLE_CLICK_START.formatted(extAppFilePath));
+
+         } else {
+
+            appAction.setToolTipText(extAppFilePath);
+         }
+
+         menuMgr.add(appAction);
+      }
+   }
+
+   private Photo getSelectedPhoto() {
+
+      final Collection<GalleryMT20Item> selectedPhotos = _photoGallery.getGallerySelection();
+      final Optional<GalleryMT20Item> galleryItem = selectedPhotos.stream().findFirst();
+
+      if (galleryItem.isPresent()) {
+
+         return galleryItem.get().photo;
+      }
+
+      return null;
    }
 
    private void onSelectionChanged(final ISelection selection) {
