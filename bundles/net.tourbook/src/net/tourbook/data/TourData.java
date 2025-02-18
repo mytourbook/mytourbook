@@ -222,6 +222,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public static final String            DEVICE_ID_FOR_MANUAL_TOUR         = "manual";                                //$NON-NLS-1$
 
+   public static final String            DEVICE_ID_FOR_PHOTO_TOUR          = "photoTour";                             //$NON-NLS-1$
+
    /**
     * Device id for csv files which behave like manually created tours, marker and timeslices are
     * disabled because they are not available, tour duration can be edited<br>
@@ -11452,6 +11454,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    public boolean isMultipleTours() {
       return isMultipleTours;
+   }
+
+   /**
+    * @return Returns <code>true</code> when the tour is a photo tour
+    */
+   public boolean isPhotoTour() {
+
+      if (devicePluginId == null) {
+         return false;
+      }
+
+      return devicePluginId.equals(DEVICE_ID_FOR_PHOTO_TOUR);
    }
 
    /**

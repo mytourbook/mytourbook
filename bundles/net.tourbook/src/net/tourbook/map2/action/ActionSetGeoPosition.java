@@ -143,9 +143,11 @@ public class ActionSetGeoPosition extends SubMenu {
          latSerie = _tourData.latitudeSerie;
          lonSerie = _tourData.longitudeSerie;
 
+         final int numGeoPositions = 3;
+
          if (timeSerie == null) {
 
-            timeSerie = new int[2];
+            timeSerie = new int[numGeoPositions];
 
          } else if (timeSerie.length == 1) {
 
@@ -153,15 +155,15 @@ public class ActionSetGeoPosition extends SubMenu {
 
             final int timeValue_0 = timeSerie[0];
 
-            timeSerie = new int[2];
+            timeSerie = new int[numGeoPositions];
 
             timeSerie[0] = timeValue_0;
          }
 
          if (latSerie == null) {
 
-            latSerie = new double[2];
-            lonSerie = new double[2];
+            latSerie = new double[numGeoPositions];
+            lonSerie = new double[numGeoPositions];
 
          } else if (latSerie.length == 1) {
 
@@ -169,8 +171,8 @@ public class ActionSetGeoPosition extends SubMenu {
             final double latValue_0 = latSerie[0];
             final double lonValue_0 = lonSerie[0];
 
-            latSerie = new double[2];
-            lonSerie = new double[2];
+            latSerie = new double[numGeoPositions];
+            lonSerie = new double[numGeoPositions];
 
             latSerie[0] = latValue_0;
             lonSerie[0] = lonValue_0;
@@ -183,13 +185,16 @@ public class ActionSetGeoPosition extends SubMenu {
          if (isSetStartPosition && isSetEndPosition) {
 
             timeSerie[0] = 0;
-            timeSerie[1] = tourElapsedTime;
+            timeSerie[1] = tourElapsedTime / 2;
+            timeSerie[2] = tourElapsedTime;
 
             latSerie[0] = latitude;
             latSerie[1] = latitude;
+            latSerie[2] = latitude;
 
             lonSerie[0] = longitude;
             lonSerie[1] = longitude;
+            lonSerie[2] = longitude;
 
          } else if (isSetStartPosition) {
 
@@ -200,23 +205,25 @@ public class ActionSetGeoPosition extends SubMenu {
 
          } else if (isSetEndPosition) {
 
-            timeSerie[1] = tourElapsedTime;
+            timeSerie[2] = tourElapsedTime;
 
-            latSerie[1] = latitude;
-            lonSerie[1] = longitude;
+            latSerie[2] = latitude;
+            lonSerie[2] = longitude;
          }
 
 // SET_FORMATTING_OFF
 
          // prevent 0 values
 
-         if (timeSerie[1] == 0)  { timeSerie[1] = tourElapsedTime; }
+         if (timeSerie[2] == 0)  { timeSerie[2] = tourElapsedTime; }
 
          if (latSerie[0] == 0)   { latSerie[0]  = latitude; }
          if (latSerie[1] == 0)   { latSerie[1]  = latitude; }
+         if (latSerie[2] == 0)   { latSerie[2]  = latitude; }
 
          if (lonSerie[0] == 0)   { lonSerie[0]  = longitude; }
          if (lonSerie[1] == 0)   { lonSerie[1]  = longitude; }
+         if (lonSerie[2] == 0)   { lonSerie[2]  = longitude; }
 
 // SET_FORMATTING_ON
       }

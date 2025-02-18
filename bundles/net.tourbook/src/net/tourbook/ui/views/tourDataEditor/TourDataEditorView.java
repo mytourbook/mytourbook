@@ -536,6 +536,7 @@ public class TourDataEditorView extends ViewPart implements
     * When <code>true</code> the tour is created with the tour editor
     */
    private boolean                            _isManualTour;
+   private boolean                            _isPhotoTour;
    private boolean                            _isTitleModified;
    private boolean                            _isAltitudeManuallyModified;
    private boolean                            _isDistManuallyModified;
@@ -2138,12 +2139,6 @@ public class TourDataEditorView extends ViewPart implements
 
          newTourData = new TourData();
 
-         // tour id must be created after the tour date/time is set
-         newTourData.createTourId();
-
-         newTourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
-         newTourData.setTourPerson(activePerson);
-
          if (newTourContext != null) {
 
             // set values from the provided tour context
@@ -2153,15 +2148,34 @@ public class TourDataEditorView extends ViewPart implements
             final long tourEndTime = newTourContext.tourEndTime;
             final long elapsedTime = tourEndTime - tourStartTime;
 
+            final long elapsedTimeSeconds = elapsedTime / 1000;
+
+            newTourData.timeSerie = new int[] {
+
+                  0,
+                  (int) (elapsedTimeSeconds / 2),
+                  (int) elapsedTimeSeconds,
+            };
+
             newTourData.setTourTitle(newTourContext.title);
             newTourData.setTourStartTime(TimeTools.getZonedDateTime(tourStartTime));
-            newTourData.setTourDeviceTime_Elapsed(elapsedTime / 1000);
+            newTourData.setTourDeviceTime_Elapsed(elapsedTimeSeconds);
+
+            // prevent that this is a manual tour
+            newTourData.setDeviceId(TourData.DEVICE_ID_FOR_PHOTO_TOUR);
 
          } else {
 
             // set tour start date/time
             newTourData.setTourStartTime(TimeTools.now());
+
+            newTourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
          }
+
+         // tour id must be created after the tour date/time is set
+         newTourData.createTourId();
+
+         newTourData.setTourPerson(activePerson);
       }
 
       // ensure that the time zone is saved in the tour
@@ -6929,8 +6943,9 @@ public class TourDataEditorView extends ViewPart implements
 
       final boolean isTourInDb = isTourInDb();
       final boolean isTourValid = isTourValid() && isTourInDb;
-      final boolean isNotManualTour = _isManualTour == false;
+
       final boolean canEdit = _isEditMode && isTourInDb;
+      final boolean canEditDistance = _isManualTour == false;
 
       // all actions are disabled when a cell editor is activated
       final boolean isCellEditorInactive = _isCellEditorActive == false;
@@ -6965,9 +6980,9 @@ public class TourDataEditorView extends ViewPart implements
                   && (_isManualTour == false));
       _actionToggleReadEditMode.setEnabled(isCellEditorInactive && isTourInDb);
 
-      _actionSetStartDistanceTo_0.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isDistanceLargerThan0);
-      _actionDeleteDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isDistanceAvailable);
-      _actionComputeDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && hasGeoData);
+      _actionSetStartDistanceTo_0.setEnabled(isCellEditorInactive && canEditDistance && canEdit && isDistanceLargerThan0);
+      _actionDeleteDistanceValues.setEnabled(isCellEditorInactive && canEditDistance && canEdit && isDistanceAvailable);
+      _actionComputeDistanceValues.setEnabled(isCellEditorInactive && canEditDistance && canEdit && hasGeoData);
 
       _actionEditTimeSlicesValues.setEnabled(isCellEditorInactive && canEdit);
 
@@ -7120,73 +7135,77 @@ public class TourDataEditorView extends ViewPart implements
          return;
       }
 
-      final boolean canEdit = _isEditMode && isTourInDb();
-      final boolean isManualAndEdit = _isManualTour && canEdit;
-      final boolean isDeviceTour = _isManualTour == false;
+// SET_FORMATTING_OFF
 
-      final float[] serieDistance = _tourData == null ? null : _tourData.distanceSerie;
-      final boolean isDistanceSerie = serieDistance != null && serieDistance.length > 0;
-      final boolean isGeoAvailable = _tourData != null
+      final boolean canEdit            = _isEditMode && isTourInDb();
+      final boolean isManualAndEdit    = canEdit && (_isManualTour || _isPhotoTour);
+      final boolean isDeviceTour       = _isManualTour == false;
+
+      final float[] serieDistance      = _tourData == null ? null : _tourData.distanceSerie;
+      final boolean isDistanceSerie    = serieDistance != null && serieDistance.length > 0;
+      final boolean isGeoAvailable     = _tourData != null
             && _tourData.latitudeSerie != null
             && _tourData.latitudeSerie.length > 0;
 
       final boolean isWeatherRetrievalActivated = TourManager.isWeatherRetrievalActivated();
       final boolean isWindDirectionAvailable = _comboWeather_Wind_DirectionText.getSelectionIndex() > 0;
 
-      _comboTitle.setEnabled(canEdit);
-      _txtDescription.setEnabled(canEdit);
-      _comboLocation_Start.setEnabled(canEdit);
-      _comboLocation_End.setEnabled(canEdit);
+      _comboTitle                         .setEnabled(canEdit);
+      _txtDescription                     .setEnabled(canEdit);
+      _comboLocation_Start                .setEnabled(canEdit);
+      _comboLocation_End                  .setEnabled(canEdit);
 
       //Weather
-      _linkWeather.setEnabled(canEdit && isWeatherRetrievalActivated);
-      _tableComboWeather_AirQuality.setEnabled(canEdit);
-      _comboWeather_Clouds.setEnabled(canEdit);
-      _comboWeather_Wind_DirectionText.setEnabled(canEdit);
-      _comboWeather_WindSpeedText.setEnabled(canEdit);
-      _spinWeather_Humidity.setEnabled(canEdit);
-      _spinWeather_PrecipitationValue.setEnabled(canEdit);
-      _spinWeather_PressureValue.setEnabled(canEdit);
-      _spinWeather_SnowfallValue.setEnabled(canEdit);
-      _spinWeather_Wind_DirectionValue.setEnabled(canEdit && isWindDirectionAvailable);
-      _spinWeather_Wind_SpeedValue.setEnabled(canEdit);
-      _txtWeather.setEnabled(canEdit);
-      _spinWeather_Temperature_Average.setEnabled(canEdit);
-      _spinWeather_Temperature_Max.setEnabled(canEdit);
-      _spinWeather_Temperature_Min.setEnabled(canEdit);
-      _spinWeather_Temperature_WindChill.setEnabled(canEdit);
+      _linkWeather                        .setEnabled(canEdit && isWeatherRetrievalActivated);
+      _tableComboWeather_AirQuality       .setEnabled(canEdit);
+      _comboWeather_Clouds                .setEnabled(canEdit);
+      _comboWeather_Wind_DirectionText    .setEnabled(canEdit);
+      _comboWeather_WindSpeedText         .setEnabled(canEdit);
+      _spinWeather_Humidity               .setEnabled(canEdit);
+      _spinWeather_PrecipitationValue     .setEnabled(canEdit);
+      _spinWeather_PressureValue          .setEnabled(canEdit);
+      _spinWeather_SnowfallValue          .setEnabled(canEdit);
+      _spinWeather_Wind_DirectionValue    .setEnabled(canEdit && isWindDirectionAvailable);
+      _spinWeather_Wind_SpeedValue        .setEnabled(canEdit);
+      _txtWeather                         .setEnabled(canEdit);
+      _spinWeather_Temperature_Average    .setEnabled(canEdit);
+      _spinWeather_Temperature_Max        .setEnabled(canEdit);
+      _spinWeather_Temperature_Min        .setEnabled(canEdit);
+      _spinWeather_Temperature_WindChill  .setEnabled(canEdit);
 
-      _comboCadence.getCombo().setEnabled(canEdit);
+      _comboCadence.getCombo()            .setEnabled(canEdit);
 
-      _dtTourDate.setEnabled(canEdit);
-      _dtStartTime.setEnabled(canEdit);
-      _comboTimeZone.setEnabled(canEdit);
-      _linkDefaultTimeZone.setEnabled(canEdit);
-      _linkRemoveTimeZone.setEnabled(canEdit);
-      _linkGeoTimeZone.setEnabled(canEdit && isGeoAvailable);
+      _dtTourDate                         .setEnabled(canEdit);
+      _dtStartTime                        .setEnabled(canEdit);
+      _comboTimeZone                      .setEnabled(canEdit);
+      _linkDefaultTimeZone                .setEnabled(canEdit);
+      _linkRemoveTimeZone                 .setEnabled(canEdit);
+      _linkGeoTimeZone                    .setEnabled(canEdit && isGeoAvailable);
 
-      _deviceTime_Elapsed.setEditMode(isManualAndEdit);
-      _deviceTime_Recorded.setEditMode(isManualAndEdit);
-      _deviceTime_Paused.setEditMode(isManualAndEdit);
-      _computedTime_Moving.setEditMode(isManualAndEdit);
-      _computedTime_Break.setEditMode(isManualAndEdit);
+      _deviceTime_Elapsed                 .setEditMode(isManualAndEdit);
+      _deviceTime_Recorded                .setEditMode(isManualAndEdit);
+      _deviceTime_Paused                  .setEditMode(isManualAndEdit);
+      _computedTime_Moving                .setEditMode(isManualAndEdit);
+      _computedTime_Break                 .setEditMode(isManualAndEdit);
 
       // distance can be edited when no distance time slices are available
-      _txtDistance.setEnabled(canEdit && isDistanceSerie == false);
-      _txtAltitudeUp.setEnabled(isManualAndEdit);
-      _txtAltitudeDown.setEnabled(isManualAndEdit);
+      _txtDistance                        .setEnabled(canEdit && isDistanceSerie == false);
+      _txtAltitudeUp                      .setEnabled(isManualAndEdit);
+      _txtAltitudeDown                    .setEnabled(isManualAndEdit);
 
       // Personal
-      _spinPerson_BodyWeight.setEnabled(canEdit);
-      _spinPerson_BodyFat.setEnabled(canEdit);
-      _spinPerson_FTP.setEnabled(canEdit);
-      _spinPerson_RestPulse.setEnabled(canEdit);
-      _spinPerson_Calories.setEnabled(canEdit);
+      _spinPerson_BodyWeight              .setEnabled(canEdit);
+      _spinPerson_BodyFat                 .setEnabled(canEdit);
+      _spinPerson_FTP                     .setEnabled(canEdit);
+      _spinPerson_RestPulse               .setEnabled(canEdit);
+      _spinPerson_Calories                .setEnabled(canEdit);
 
-      _linkTag.setEnabled(canEdit);
-      _linkTourType.setEnabled(canEdit);
+      _linkTag                            .setEnabled(canEdit);
+      _linkTourType                       .setEnabled(canEdit);
 
-      timeSliceTable.setEnabled(isDeviceTour);
+      timeSliceTable                      .setEnabled(isDeviceTour);
+
+// SET_FORMATTING_ON
    }
 
    private void fillAirQualityCombo() {
@@ -9490,13 +9509,30 @@ public class TourDataEditorView extends ViewPart implements
             _tourData.setTourAltDown((int) altitudeDownValue);
          }
 
-         // manual tour
-         if (_isManualTour) {
+         // manual/photo tour
+         if (_isManualTour || _isPhotoTour) {
 
-            _tourData.setTourDeviceTime_Elapsed(_deviceTime_Elapsed.getTime());
-            _tourData.setTourDeviceTime_Recorded(_deviceTime_Recorded.getTime());
-            _tourData.setTourDeviceTime_Paused(_deviceTime_Paused.getTime());
-            _tourData.setTourComputedTime_Moving(_computedTime_Moving.getTime());
+// SET_FORMATTING_OFF
+            
+            _tourData.setTourDeviceTime_Elapsed    (_deviceTime_Elapsed.getTime());
+            _tourData.setTourDeviceTime_Recorded   (_deviceTime_Recorded.getTime());
+            _tourData.setTourDeviceTime_Paused     (_deviceTime_Paused.getTime());
+            _tourData.setTourComputedTime_Moving   (_computedTime_Moving.getTime());
+            
+// SET_FORMATTING_ON
+         }
+
+         if (_isPhotoTour) {
+            
+            // create a time serie
+
+            final long elapsedTime = _tourData.getTourDeviceTime_Elapsed();
+
+            _tourData.timeSerie = new int[] {
+                  0,
+                  (int) (elapsedTime / 2),
+                  (int) (elapsedTime),
+            };
          }
 
       } catch (final IllegalArgumentException e) {
@@ -9680,6 +9716,7 @@ public class TourDataEditorView extends ViewPart implements
 
       // get manual/device mode
       _isManualTour = tourData.isManualTour();
+      _isPhotoTour = tourData.isPhotoTour();
 
       updateMarkerMap();
 
@@ -9691,7 +9728,7 @@ public class TourDataEditorView extends ViewPart implements
          public void run() {
 
             /*
-             * update the UI
+             * Update the UI
              */
 
             // check if this is the last runnable

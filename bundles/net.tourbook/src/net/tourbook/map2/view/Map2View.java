@@ -3446,7 +3446,7 @@ public class Map2View extends ViewPart implements
 
          final double[] latitudeSerie = tourData.latitudeSerie;
 
-         if (latitudeSerie == null || latitudeSerie.length <= 2) {
+         if (latitudeSerie == null || latitudeSerie.length <= 3) {
 
             return tourData;
          }
