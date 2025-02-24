@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -49,6 +50,7 @@ import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProviderByID;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.ui.di.PersistState;
@@ -83,7 +85,9 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourPhotosView extends ViewPart implements IPhotoEventListener {
+public class TourPhotosView extends ViewPart implements
+      IPhotoEventListener,
+      ITourProviderByID {
 
    public static final String             ID                              = "net.tourbook.photo.TourPhotosView.ID"; //$NON-NLS-1$
 
@@ -129,6 +133,8 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
    private long                           _photoEndTime;
 
    private boolean                        _isLinkPhotoDisplayed;
+
+   private Long                           _oneTourID;
 
    /*
     * UI controls
@@ -513,7 +519,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 // SET_FORMATTING_OFF
 
       _actionAddPhoto                  = new ActionAddPhoto(_photoGallery);
-      _actionRemovePhoto               = new ActionRemovePhoto(_photoGallery);
+      _actionRemovePhoto               = new ActionRemovePhoto(_photoGallery, this);
       _actionToggleGalleryOrientation  = new ActionToggleGalleryOrientation();
 
       _actionRunExternalAppTitle       = new ActionRunExternalAppTitle();
@@ -724,6 +730,18 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
       return null;
    }
 
+   @Override
+   public Set<Long> getSelectedTourIDs() {
+
+      final Set<Long> allTourIDs = new HashSet<>();
+
+      if (_oneTourID != null) {
+         allTourIDs.add(_oneTourID);
+      }
+
+      return allTourIDs;
+   }
+
    private void onSelectionChanged(final ISelection selection) {
 
       if (_actionAddPhoto.isInModifyTour() || _actionRemovePhoto.isInModifyTour()) {
@@ -738,6 +756,7 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
       final ArrayList<Photo> allPhotos = new ArrayList<>();
 
+      _oneTourID = null;
       _galleryPositionKey = 0;
       _photoStartTime = Long.MAX_VALUE;
       _photoEndTime = Long.MIN_VALUE;
@@ -821,6 +840,8 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
          addTourPhotos(allPhotos, tourData);
 
+         _oneTourID = tourData.getTourId();
+
          showTourPhotos_FromCurrentSelection(allPhotos, 1);
 
       } else if (selection instanceof SelectionTourData) {
@@ -828,6 +849,8 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
          final TourData tourData = ((SelectionTourData) selection).getTourData();
 
          addTourPhotos(allPhotos, tourData);
+
+         _oneTourID = tourData.getTourId();
 
          showTourPhotos_FromCurrentSelection(allPhotos, 1);
 
@@ -837,6 +860,8 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
          final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
          addTourPhotos(allPhotos, tourData);
+
+         _oneTourID = tourData.getTourId();
 
          showTourPhotos_FromCurrentSelection(allPhotos, 1);
 
@@ -923,7 +948,8 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
    }
 
-   private void showTourPhotos_FromCurrentSelection(final ArrayList<Photo> allPhotos, final int numTours) {
+   private void showTourPhotos_FromCurrentSelection(final ArrayList<Photo> allPhotos,
+                                                    final int numTours) {
 
       /*
        * Update photo gallery

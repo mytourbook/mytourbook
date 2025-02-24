@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,6 +32,7 @@ import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.photo.internal.gallery.MT20.GalleryMT20Item;
+import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.tourChart.ChartPhoto;
 
 import org.eclipse.jface.action.Action;
@@ -70,7 +71,7 @@ import org.eclipse.swt.widgets.ToolBar;
  * @author Wolfgang Schramm, created 3.8.2012
  */
 
-public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
+public abstract class PhotoToolTipUI extends AdvancedSlideoutShell implements ITourProviderByID {
 
    private static final String            STATE_PHOTO_GALLERY_IS_VERTICAL = "STATE_PHOTO_GALLERY_IS_VERTICAL"; //$NON-NLS-1$
    private static final String            STATE_TOOL_TIP_LOCATION         = "STATE_TOOL_TIP_LOCATION";         //$NON-NLS-1$
@@ -362,7 +363,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
    private void createActions_WithUI() {
 
       _actionAddPhoto = new ActionAddPhoto(_photoGallery);
-      _actionRemovePhoto = new ActionRemovePhoto(_photoGallery);
+      _actionRemovePhoto = new ActionRemovePhoto(_photoGallery, this);
    }
 
    @Override
