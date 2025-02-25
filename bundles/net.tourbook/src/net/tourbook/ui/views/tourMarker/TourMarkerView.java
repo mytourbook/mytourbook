@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.ui.views.tourMarker;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 
 import java.text.NumberFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
@@ -557,7 +559,10 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
       defineColumn_Marker_IsVisible();
 
-      defineColumn_Time_Time();
+      defineColumn_Time_MarkerDate();
+      defineColumn_Time_MarkerTime();
+
+      defineColumn_Time_RelativeTime();
       defineColumn_Time_TimeDelta();
 
       defineColumn_Motion_Distance();
@@ -863,9 +868,59 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    }
 
    /**
-    * Column: Time
+    * Column: Marker date
     */
-   private void defineColumn_Time_Time() {
+   private void defineColumn_Time_MarkerDate() {
+
+      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_DATE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourMarker tourMarker = (TourMarker) cell.getElement();
+
+            final TourData tourData = tourMarker.getTourData();
+            final ZonedDateTime tourStartTime = tourData.getTourStartTime();
+            final ZonedDateTime markerTime = TimeTools.getZonedDateTime(
+                  tourMarker.getTourTime(),
+                  tourStartTime.getZone());
+
+            cell.setText(TimeTools.Formatter_Date_S.format(markerTime));
+         }
+      });
+   }
+
+   /**
+    * Column: Marker time
+    */
+   private void defineColumn_Time_MarkerTime() {
+
+      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourMarker tourMarker = (TourMarker) cell.getElement();
+
+            final TourData tourData = tourMarker.getTourData();
+            final ZonedDateTime tourStartTime = tourData.getTourStartTime();
+            final ZonedDateTime markerTime = TimeTools.getZonedDateTime(
+                  tourMarker.getTourTime(),
+                  tourStartTime.getZone());
+
+            cell.setText(TimeTools.Formatter_Time_S.format(markerTime));
+         }
+      });
+   }
+
+   /**
+    * Column: Relative time
+    */
+   private void defineColumn_Time_RelativeTime() {
 
       final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_HH_MM_SS.createColumn(_columnManager, _pc);
 

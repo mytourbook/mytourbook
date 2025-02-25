@@ -68,6 +68,9 @@ Improvements
 * Tour Book View
   - New column: Tour end time
     This can be helpful when manually tours are created that tours do not overlap
+    
+* Tour Markers View
+  - New Columns: Tour date/time
   
 * Tour Editor
   - Display additionally the tour end time in the editor title
