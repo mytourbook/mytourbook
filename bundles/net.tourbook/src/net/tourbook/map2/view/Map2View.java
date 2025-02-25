@@ -3176,6 +3176,19 @@ public class Map2View extends ViewPart implements
       return _allTourColor_Actions.get(graphId);
    }
 
+   /**
+    * @param tourData
+    *
+    * @return Returns a list with all multiple tour ID's
+    */
+   private List<Long> getAllTourIDsFromMultipleTours(final TourData tourData) {
+
+      List<Long> tourIds = new ArrayList<>();
+      tourIds = Arrays.asList(tourData.multipleTourIds);
+
+      return tourIds;
+   }
+
    private IMapColorProvider getColorProvider(final MapGraphId colorId) {
 
 //      final ColorDefinition colorDefinition = GraphColorManager.getInstance().getColorDefinition(colorId);
@@ -3198,14 +3211,6 @@ public class Map2View extends ViewPart implements
    public Long getHoveredTourId() {
 
       return _map.getHoveredTourId();
-   }
-
-   private List<Long> getManyToursFromMultipleTours(final TourData tourData) {
-
-      List<Long> tourIds = new ArrayList<>();
-      tourIds = Arrays.asList(tourData.multipleTourIds);
-
-      return tourIds;
    }
 
    public Map2 getMap() {
@@ -3979,8 +3984,9 @@ public class Map2View extends ViewPart implements
    private void onSelection_TourMarker(final SelectionTourMarker markerSelection, final boolean isDrawSlider) {
 
       final TourData tourData = markerSelection.getTourData();
+      final ArrayList<TourMarker> allSelectedTourMarkers = markerSelection.getSelectedTourMarker();
 
-      updateUI_ShowTour(tourData);
+      updateUI_ShowTour(tourData, allSelectedTourMarkers);
 
       final ArrayList<TourMarker> allTourMarker = markerSelection.getSelectedTourMarker();
       final int numberOfTourMarkers = allTourMarker.size();
@@ -4039,7 +4045,7 @@ public class Map2View extends ViewPart implements
 
       final TourData tourData = pauseSelection.getTourData();
 
-      updateUI_ShowTour(tourData);
+      updateUI_ShowTour(tourData, null);
 
       final int leftSliderValueIndex = pauseSelection.getSerieIndex();
 
@@ -4880,9 +4886,9 @@ public class Map2View extends ViewPart implements
           * Convert one multiple tour with it's sub-tours into many tours, this makes some
           * processings much easier
           */
-         final List<Long> manyTours = getManyToursFromMultipleTours(tourData);
+         final List<Long> manyTourIDs = getAllTourIDsFromMultipleTours(tourData);
 
-         paintTours(manyTours);
+         paintTours(manyTourIDs);
 
       } else {
 
@@ -6163,20 +6169,46 @@ public class Map2View extends ViewPart implements
    }
 
    /**
-    * Show tour when it is not yet displayed.
+    * Show tour when it is not yet displayed
     *
     * @param tourData
+    * @param allSelectedTourMarkers
     */
-   private void updateUI_ShowTour(final TourData tourData) {
+   private void updateUI_ShowTour(final TourData tourData, final ArrayList<TourMarker> allSelectedTourMarkers) {
 
-      // check if the marker tour is displayed
-      final long markerTourId = tourData.getTourId().longValue();
       boolean isTourVisible = false;
 
-      for (final TourData mapTourData : _allTourData) {
-         if (mapTourData.getTourId().longValue() == markerTourId) {
-            isTourVisible = true;
-            break;
+      // check if the marker's tour is displayed
+
+      if (tourData.isMultipleTours()
+            && allSelectedTourMarkers != null
+            && allSelectedTourMarkers.size() == 1) {
+
+         final long selectedMarkerTourId = allSelectedTourMarkers.get(0).getTourData().getTourId().longValue();
+
+         final List<Long> allMultipleTourIDs = getAllTourIDsFromMultipleTours(tourData);
+
+         for (final Long tourID : allMultipleTourIDs) {
+
+            if (tourID.longValue() == selectedMarkerTourId) {
+
+               isTourVisible = true;
+               break;
+            }
+         }
+
+      } else {
+
+         // single tour
+
+         final long markerTourId = tourData.getTourId().longValue();
+
+         for (final TourData mapTourData : _allTourData) {
+            if (mapTourData.getTourId().longValue() == markerTourId) {
+
+               isTourVisible = true;
+               break;
+            }
          }
       }
 
