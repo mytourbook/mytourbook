@@ -49,6 +49,7 @@ New
   - Edit selected tour
   - Display tour start/end time with the correct timezone
 
+
 Improvements
 ============
 
@@ -74,7 +75,7 @@ Improvements
 Bugfix
 ======
 
-See milestone 25.2 https://github.com/mytourbook/mytourbook/milestone/23?closed=1
+See milestone 25.3 https://github.com/mytourbook/mytourbook/milestone/23?closed=1
  
 
 
@@ -90,7 +91,7 @@ Translation
 System   
 ======
 
-* MyTourbook Milestone 25.2   https://github.com/mytourbook/mytourbook/milestone/23?closed=1
+* MyTourbook Milestone 25.3   https://github.com/mytourbook/mytourbook/milestone/23?closed=1
 * Java 17                     https://adoptium.net/temurin/releases/?version=17
 * Eclipse 2024-03 (4.31)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.31-202402290520/
 * NatTable 2.20               https://www.eclipse.org/nattable/download.php
