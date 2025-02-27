@@ -1501,6 +1501,8 @@ public class Messages extends NLS {
    public static String        Photos_AndTours_Dialog_CannotSaveHistoryTour_Title;
    public static String        Photos_AndTours_Dialog_RemovePhotos_Message;
    public static String        Photos_AndTours_Dialog_RemovePhotos_Title;
+   public static String        Photos_AndTours_Dialog_SavePhotos_Message;
+   public static String        Photos_AndTours_Dialog_SavePhotos_Title;
    public static String        Photos_AndTours_Label_AdjustTime;
    public static String        Photos_AndTours_Label_AdjustTime_Tooltip;
    public static String        Photos_AndTours_Label_DurationLess1Hour;

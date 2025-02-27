@@ -75,7 +75,9 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -486,13 +488,13 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       final Object[] allSelectedPhotoLinks = ((IStructuredSelection) _tourViewer.getSelection()).toArray();
 
-      int historyTours = 0;
+      int numHistoryTours = 0;
+      int numRealTours = 0;
 
       for (final Object selectedItem : allSelectedPhotoLinks) {
 
-         if (selectedItem instanceof TourPhotoLink) {
+         if (selectedItem instanceof final TourPhotoLink photoLink) {
 
-            final TourPhotoLink photoLink = (TourPhotoLink) selectedItem;
             final boolean isRealTour = photoLink.tourId != Long.MIN_VALUE;
 
             if (isRealTour) {
@@ -504,6 +506,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
                   final TourData tourData = tourManager.getTourData(photoLink.tourId);
 
                   if (tourData != null) {
+
+                     numRealTours++;
 
                      final HashMap<String, TourPhoto> allOldTourPhotos = new HashMap<>();
                      final Set<TourPhoto> tourPhotosSet = tourData.getTourPhotos();
@@ -552,13 +556,40 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
             } else {
 
-               historyTours++;
+               numHistoryTours++;
             }
          }
       }
 
+      /*
+       * It happened accidentally that the adjusted time was saved for all links :-((( -> a warning
+       * is now displayed
+       */
+      if (numRealTours > 1) {
+
+         if (new MessageDialog(
+
+               Display.getCurrent().getActiveShell(),
+
+               Messages.Photos_AndTours_Dialog_SavePhotos_Title,
+               null, // no title image
+
+               Messages.Photos_AndTours_Dialog_SavePhotos_Message.formatted(numRealTours),
+               MessageDialog.CONFIRM,
+
+               1, // default index
+
+               Messages.App_Action_Save,
+               Messages.App_Action_Cancel
+
+         ).open() != IDialogConstants.OK_ID) {
+
+            return;
+         }
+      }
+
       // show message that photos can be saved only in real tours
-      if (historyTours > 0) {
+      if (numHistoryTours > 0) {
 
          if (_prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_SHOW_HISTORY_TOUR_SAVE_WARNING) == false) {
 
