@@ -5128,6 +5128,10 @@ public class Map2View extends ViewPart implements
       _isMapSyncActive = _state.getBoolean(STATE_MAP_SYNC_MODE_IS_ACTIVE);
       _actionMap2Slideout_SyncMap.setSelection(_isMapSyncActive);
       syncMap_OnSelectSyncAction();
+      if (_isMapSyncWith_Slider_One) {
+         // enable sync tour also, sync tour is not reset when sync one slider is selected
+         _isMapSyncWith_Tour = true;
+      }
 
       // zoom level adjustment
       _actionZoomLevelAdjustment.setZoomLevel(Util.getStateInt(_state, STATE_ZOOM_LEVEL_ADJUSTMENT, 0));
