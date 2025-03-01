@@ -1,4 +1,4 @@
-25.2.0                                                 ?. February 2025
+25.3.0                                                 ?. March 2025
 
 
 TODO's
@@ -35,10 +35,19 @@ New
   - Open photo image with an external app
     - Select the action from the photo context menu
     - When double clicking a photo then the first external app is run
-    https://github.com/mytourbook/mytourbook/issues/1456   
+    https://github.com/mytourbook/mytourbook/issues/1456
+  - Display photos in the map where a tour with geo positions was not recorded 
+    https://github.com/mytourbook/mytourbook/issues/1457
+  - Set geo positions into a "Photo Tour"
 
 * 2D Map Marker
   - Display marker time with the marker label
+
+
+* Photos + Tours
+  - Create a "Photo Tour" from a history tour
+  - Edit selected tour
+  - Display tour start/end time with the correct timezone
 
 
 Improvements
@@ -59,6 +68,9 @@ Improvements
 * Tour Book View
   - New column: Tour end time
     This can be helpful when manually tours are created that tours do not overlap
+    
+* Tour Markers View
+  - New Columns: Tour date/time
   
 * Tour Editor
   - Display additionally the tour end time in the editor title
@@ -66,7 +78,7 @@ Improvements
 Bugfix
 ======
 
-See milestone 25.2 https://github.com/mytourbook/mytourbook/milestone/23?closed=1
+See milestone 25.3 https://github.com/mytourbook/mytourbook/milestone/23?closed=1
  
 
 
@@ -82,7 +94,7 @@ Translation
 System   
 ======
 
-* MyTourbook Milestone 25.2   https://github.com/mytourbook/mytourbook/milestone/23?closed=1
+* MyTourbook Milestone 25.3   https://github.com/mytourbook/mytourbook/milestone/23?closed=1
 * Java 17                     https://adoptium.net/temurin/releases/?version=17
 * Eclipse 2024-03 (4.31)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.31-202402290520/
 * NatTable 2.20               https://www.eclipse.org/nattable/download.php

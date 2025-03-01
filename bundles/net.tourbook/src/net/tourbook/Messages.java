@@ -1491,6 +1491,8 @@ public class Messages extends NLS {
 
    public static String        NT001_DialogExtractTour_InvalidTourData;
 
+   public static String        Photos_AndTours_Action_CreatePhotoTour;
+   public static String        Photos_AndTours_Action_CreatePhotoTour_Tooltip;
    public static String        Photos_AndTours_Action_SetToSavedAdjustment_Tooltip;
    public static String        Photos_AndTours_AdjustmentType_NoAdjustment;
    public static String        Photos_AndTours_AdjustmentType_SavedAdjustment;
@@ -1500,6 +1502,8 @@ public class Messages extends NLS {
    public static String        Photos_AndTours_Dialog_CannotSaveHistoryTour_Title;
    public static String        Photos_AndTours_Dialog_RemovePhotos_Message;
    public static String        Photos_AndTours_Dialog_RemovePhotos_Title;
+   public static String        Photos_AndTours_Dialog_SavePhotos_Message;
+   public static String        Photos_AndTours_Dialog_SavePhotos_Title;
    public static String        Photos_AndTours_Label_AdjustTime;
    public static String        Photos_AndTours_Label_AdjustTime_Tooltip;
    public static String        Photos_AndTours_Label_DurationLess1Hour;
@@ -1514,6 +1518,7 @@ public class Messages extends NLS {
    public static String        Photos_AndTours_Spinner_AdjustHours_Tooltip;
    public static String        Photos_AndTours_Spinner_AdjustMinutes_Tooltip;
    public static String        Photos_AndTours_Spinner_AdjustSeconds_Tooltip;
+   public static String        Photos_AndTours_TourTitle_PhotoTour;
 
    public static String        Photo_Filter_Label_NumberOfAllPhotos_Tooltip;
    public static String        Photo_Filter_Label_NumberOfFilteredPhotos_Tooltip;
@@ -1523,6 +1528,10 @@ public class Messages extends NLS {
    public static String        Photo_Filter_Operator_IsEqual_Tooltip;
    public static String        Photo_Filter_Operator_IsLess;
    public static String        Photo_Filter_Operator_IsLess_Tooltip;
+   public static String        Photo_Filter_Operator_IsLessOrEqual;
+   public static String        Photo_Filter_Operator_IsLessOrEqual_Tooltip;
+   public static String        Photo_Filter_Operator_IsMoreOrEqual;
+   public static String        Photo_Filter_Operator_IsMoreOrEqual_Tooltip;
    public static String        Photo_Filter_Operator_IsMore;
    public static String        Photo_Filter_Operator_IsMore_Tooltip;
    public static String        Photo_Filter_Operator_IsMoreOrNone;

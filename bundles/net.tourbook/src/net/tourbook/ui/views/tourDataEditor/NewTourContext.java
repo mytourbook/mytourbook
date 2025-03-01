@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,19 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.ui.views.tourDataEditor;
 
-public enum PhotoRatingStarOperator {
+public class NewTourContext {
 
-   HAS_ANY, //
+   public String title;
 
-   IS_EQUAL, //
-
-   IS_MORE, //
-   IS_MORE_OR_EQUAL, //
-   IS_MORE_OR_EQUAL_OR_NONE, //
-
-   IS_LESS, //
-   IS_LESS_OR_EQUAL, //
-
+   public long   tourStartTime;
+   public long   tourEndTime;
 }

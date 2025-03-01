@@ -2021,11 +2021,13 @@ public class Map25View extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
-         final boolean isNoStar     = _photoFilter_RatingStars == 0;
-         final boolean isEqual      = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_EQUAL;
-         final boolean isMore       = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_MORE_OR_EQUAL;
-         final boolean isMoreOrNone = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_MORE_OR_EQUAL_OR_NONE;
-         final boolean isLess       = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_LESS_OR_EQUAL;
+         final boolean isNoStar        = _photoFilter_RatingStars == 0;
+         final boolean isEqual         = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_EQUAL;
+         final boolean isMore          = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_MORE;
+         final boolean isMoreOrEqual   = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_MORE_OR_EQUAL;
+         final boolean isMoreOrNone    = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_MORE_OR_EQUAL_OR_NONE;
+         final boolean isLess          = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_LESS;
+         final boolean isLessOrEqual   = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_LESS_OR_EQUAL;
 
 // SET_FORMATTING_ON
 
@@ -2043,14 +2045,23 @@ public class Map25View extends ViewPart implements
 
                _filteredPhotos.add(photo);
 
-            } else if (isMore && ratingStars >= _photoFilter_RatingStars) {
+            } else if (isMore && ratingStars > _photoFilter_RatingStars) {
+
+               _filteredPhotos.add(photo);
+
+            } else if (isMoreOrEqual && ratingStars >= _photoFilter_RatingStars) {
 
                _filteredPhotos.add(photo);
 
             } else if (isMoreOrNone && (ratingStars >= _photoFilter_RatingStars || ratingStars == 0)) {
+
                _filteredPhotos.add(photo);
 
-            } else if (isLess && ratingStars <= _photoFilter_RatingStars) {
+            } else if (isLess && ratingStars < _photoFilter_RatingStars) {
+
+               _filteredPhotos.add(photo);
+
+            } else if (isLessOrEqual && ratingStars <= _photoFilter_RatingStars) {
 
                _filteredPhotos.add(photo);
             }

@@ -81,6 +81,13 @@ public class Messages extends NLS {
    public static String Map_Action_ExternalApp_DoubleClickStart;
    public static String Map_Action_ExternalApp_OpenPhotoImage;
    public static String Map_Action_ExternalApp_Setup;
+   public static String Map_Action_GeoPositions_Delete;
+   public static String Map_Action_GeoPositions_Set;
+   public static String Map_Action_GeoPositions_SetInto;
+   public static String Map_Action_GeoPositions_Set_End;
+   public static String Map_Action_GeoPositions_Set_Start;
+   public static String Map_Action_GeoPositions_Set_StartAndEnd;
+   public static String Map_Action_GeoPositions_Tooltip;
    public static String Map_Action_GotoLocation;
    public static String Map_Action_LookupCommonLocation;
    public static String Map_Action_ManageMapProviders;
@@ -89,6 +96,7 @@ public class Messages extends NLS {
    public static String Map_Action_POI_Tooltip;
    public static String Map_Action_SearchTourByLocation;
    public static String Map_Action_SearchTourByLocation_Tooltip;
+
    public static String Map_Action_ShowAllFilteredPhotos_Tooltip;
    public static String Map_Action_ShowEarthMap;
    public static String Map_Action_ShowMapPoints_Tooltip;

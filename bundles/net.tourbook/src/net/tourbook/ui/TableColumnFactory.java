@@ -309,6 +309,7 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory PHOTO_NUMBER_OF_NO_GPS_PHOTOS;
    public static final TableColumnFactory PHOTO_NUMBER_OF_PHOTOS;
    public static final TableColumnFactory PHOTO_TIME_ADJUSTMENT;
+   public static final TableColumnFactory PHOTO_TIME_ADJUSTMENT_ALL;
    public static final TableColumnFactory PHOTO_TOUR_CAMERA;
 
    public static final TableColumnFactory POWER_AVG;
@@ -2551,6 +2552,26 @@ public abstract class TableColumnFactory {
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Photo_TimeAdjustment_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11)); // 9 ... 54
+
+            return colDef;
+         }
+      };
+
+      PHOTO_TIME_ADJUSTMENT_ALL = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "PHOTO_TIME_ADJUSTMENT_ALL", SWT.TRAIL); //$NON-NLS-1$
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Photo);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Photo_TimeAdjustmentAll_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Photo_TimeAdjustmentAll_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Photo_TimeAdjustmentAll_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
             return colDef;
          }

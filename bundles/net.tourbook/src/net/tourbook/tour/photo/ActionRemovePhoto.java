@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,19 +20,24 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProviderByID;
 
 import org.eclipse.jface.action.Action;
 
 class ActionRemovePhoto extends Action {
 
    private final PhotoGallery _photoGallery;
+   private ITourProviderByID  _tourProvider;
+
    private boolean            _isInModifyTour;
 
-   public ActionRemovePhoto(final PhotoGallery photoGallery) {
+   public ActionRemovePhoto(final PhotoGallery photoGallery,
+                            final ITourProviderByID tourProvider) {
 
       super(Messages.Action_PhotosAndTours_RemovePhoto, Action.AS_PUSH_BUTTON);
 
       _photoGallery = photoGallery;
+      _tourProvider = tourProvider;
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Delete));
    }
@@ -46,7 +51,7 @@ class ActionRemovePhoto extends Action {
 
       _isInModifyTour = true;
       {
-         TourManager.tourPhoto_Remove(_photoGallery);
+         TourManager.tourPhoto_Remove(_photoGallery, _tourProvider);
       }
       _isInModifyTour = false;
    }

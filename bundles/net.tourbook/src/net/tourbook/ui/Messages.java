@@ -340,6 +340,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Photo_TimeAdjustment_Header;
    public static String        ColumnFactory_Photo_TimeAdjustment_Label;
    public static String        ColumnFactory_Photo_TimeAdjustment_Tooltip;
+   public static String        ColumnFactory_Photo_TimeAdjustmentAll_Header;
+   public static String        ColumnFactory_Photo_TimeAdjustmentAll_Label;
+   public static String        ColumnFactory_Photo_TimeAdjustmentAll_Tooltip;
    public static String        ColumnFactory_Photo_NumberOfGPSPhotos_Header;
    public static String        ColumnFactory_Photo_NumberOfGPSPhotos_Label;
    public static String        ColumnFactory_Photo_NumberOfGPSPhotos_Tooltip;
