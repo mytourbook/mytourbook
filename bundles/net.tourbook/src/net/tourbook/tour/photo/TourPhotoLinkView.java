@@ -453,7 +453,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          links = _selectionBackupBeforeOneHistory;
       }
 
-      updateUI(null, links);
+      updateUI(null, links, false);
 
       enableControls();
 
@@ -785,7 +785,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
                // a tour date/time could be changed -> recomputed view
 
-               showPhotosAndTours(_allPrevPhotos);
+               showPhotosAndTours(_allPrevPhotos, false);
 
             } else {
 
@@ -1835,7 +1835,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          final ISelection originalSelection = ((SyncSelection) selection).getSelection();
 
          if (originalSelection instanceof PhotoSelection) {
-            showPhotosAndTours(((PhotoSelection) originalSelection).galleryPhotos);
+            showPhotosAndTours(((PhotoSelection) originalSelection).galleryPhotos, false);
          }
 
       } else if (selection instanceof PhotoSelection && part instanceof PicDirView) {
@@ -1852,7 +1852,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          final boolean isSync = (Boolean) state.getValue();
 
          if (isSync) {
-            showPhotosAndTours(photoSelection.galleryPhotos);
+            showPhotosAndTours(photoSelection.galleryPhotos, false);
          }
 
       } else if (selection instanceof SelectionDeletedTours) {
@@ -2255,8 +2255,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
     * Entry point in this view to show tours for the provided photos
     *
     * @param allPhotos
+    * @param isFromAll
     */
-   void showPhotosAndTours(final ArrayList<Photo> allPhotos) {
+   void showPhotosAndTours(final ArrayList<Photo> allPhotos, final boolean isFromAll) {
 
       _allPrevPhotos = allPhotos;
 
@@ -2288,13 +2289,13 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          BusyIndicator.showWhile(_pageBook.getDisplay(), new Runnable() {
             @Override
             public void run() {
-               updateUI(null, _allVisibleTourPhotoLinks);
+               updateUI(null, _allVisibleTourPhotoLinks, isFromAll);
             }
          });
 
       } else {
 
-         updateUI(null, _allVisibleTourPhotoLinks);
+         updateUI(null, _allVisibleTourPhotoLinks, isFromAll);
       }
    }
 
@@ -2306,11 +2307,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
     */
    private void updateUI() {
 
-      updateUI(_allSelectedPhotoLinks, null);
+      updateUI(_allSelectedPhotoLinks, null, false);
    }
 
    private void updateUI(final ArrayList<TourPhotoLink> tourPhotoLinksWhichShouldBeSelected,
-                         final ArrayList<TourPhotoLink> allLinksWhichShouldBeSelected) {
+                         final ArrayList<TourPhotoLink> allLinksWhichShouldBeSelected,
+                         final boolean isFromAll) {
 
       if (_allPhotos.isEmpty()) {
 
@@ -2367,13 +2369,22 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
          // update annotations in PicDirView
          PhotoManager.updatePicDirGallery();
 
-         if (allLinksWhichShouldBeSelected != null && allLinksWhichShouldBeSelected.size() > 0) {
+         if (isFromAll == false) {
 
-            _tourViewer.setSelection(new StructuredSelection(allLinksWhichShouldBeSelected), true);
+            /*
+             * Prevent that all tour photo links are selected -> this can cause performance and
+             * other issues when the user thinks that not all tour photo links are selected, in the
+             * dark theme mode this selection is not easy visible
+             */
 
-         } else {
+            if (allLinksWhichShouldBeSelected != null && allLinksWhichShouldBeSelected.size() > 0) {
 
-            selectTour(prevTourPhotoLink[0]);
+               _tourViewer.setSelection(new StructuredSelection(allLinksWhichShouldBeSelected), true);
+
+            } else {
+
+               selectTour(prevTourPhotoLink[0]);
+            }
          }
       });
    }
