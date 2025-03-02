@@ -5,10 +5,6 @@ TODO's
 ======               
 
 
-* Update fulltext url https://lucene.apache.org/core/7_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Wildcard_Searches
-  in https://mytourbook.sourceforge.io/mytourbook/index.php/documentation/show-tours/search
-
-
 * Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
                     Released: 23.3
 
@@ -18,11 +14,7 @@ TODO's
 
                   - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
                     mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
-
-				      - Do the data backup with a zip file which contains all db files
 				      
-				      - Fix link to DOK video
-
 
 New
 ===

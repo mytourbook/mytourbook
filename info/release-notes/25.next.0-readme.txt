@@ -2,9 +2,7 @@
 
 
 TODO's
-======               
-
-* 
+======
 
 * [Tour Location] Automatically create tour locations for longer pauses in a tour 
    https://github.com/mytourbook/mytourbook/issues/1306 
@@ -14,11 +12,6 @@ TODO's
 
 * Support first column alignment in all views
  
-
-* Update fulltext url https://lucene.apache.org/core/7_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Wildcard_Searches
-  in https://mytourbook.sourceforge.io/mytourbook/index.php/documentation/show-tours/search
-
-
 * Maybe replace "Display.getDefault()" with "PlatformUI.getWorkbench().getDisplay()"
   "Code should always ask the workbench for the display rather than rely on Display.getDefault()"
   http://help.eclipse.org/helios/topic/org.eclipse.platform.doc.isv/reference/api/org/eclipse/ui/IWorkbench.html#getDisplay%28%29
@@ -27,13 +20,12 @@ TODO's
                     Released: 23.3
 
 
-* Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
+* Website         - IDE pref page: Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
                     Need to check how to apply it to all projects, must maybe be done with the already existing ant script
 
                   - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
                     mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
 
-				      - Do the data backup with a zip file which contains all db files
 Issues
 ======
 
