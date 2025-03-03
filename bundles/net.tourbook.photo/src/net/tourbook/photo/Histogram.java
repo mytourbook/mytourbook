@@ -767,6 +767,10 @@ public class Histogram extends Canvas implements PaintListener {
       // update in UI thread
       getDisplay().asyncExec(() -> {
 
+         if (isDisposed()) {
+            return;
+         }
+
          redraw();
       });
    }
