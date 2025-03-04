@@ -14,7 +14,7 @@ Bundle-ClassPath:
  imgscalr-lib-4.2.jar,
  commons-imaging-1.0-alpha2.jar,
  commons-lang3-3.17.0.jar,
- commons-suncalc-3.4.jar,
+ commons-suncalc-3.11.jar,
  commons-text-1.13.0.jar,
  json-20250107.jar,
  lat-lon-timezone-converter-2019-04-30.jar,
