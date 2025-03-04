@@ -8,7 +8,7 @@ Bundle-Vendor: MyTourbook
 Bundle-ClassPath: 
  jakarta.inject-api-2.0.1.jar,
  joda-time-2.12.5.jar,
- c3p0-0.10.1.jar,
+ c3p0-0.11.0-pre2.jar,
  mchange-commons-java-0.3.0.jar,
  caffeine-3.1.8.jar,
  imgscalr-lib-4.2.jar,

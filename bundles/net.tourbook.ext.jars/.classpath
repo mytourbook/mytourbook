@@ -4,7 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
    <classpathentry exported="true" kind="lib" path="jakarta.inject-api-2.0.1.jar"/>       <!-- https://mvnrepository.com/artifact/jakarta.inject/jakarta.inject-api -->
-   <classpathentry exported="true" kind="lib" path="c3p0-0.10.1.jar"/>                    <!-- https://mvnrepository.com/artifact/com.mchange/c3p0 -->
+   <classpathentry exported="true" kind="lib" path="c3p0-0.11.0-pre2.jar"/>                    <!-- https://mvnrepository.com/artifact/com.mchange/c3p0 -->
    <classpathentry exported="true" kind="lib" path="mchange-commons-java-0.3.0.jar"/>     <!-- https://mvnrepository.com/artifact/com.mchange/mchange-commons-java -->
    <classpathentry exported="true" kind="lib" path="caffeine-3.1.8.jar"                   sourcepath="jar-sources/caffeine-3.1.8-sources.jar"/>                <!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
    <classpathentry exported="true" kind="lib" path="commons-imaging-1.0-alpha1.jar"       sourcepath="jar-sources/commons-imaging-1.0-alpha2-sources.jar"/>    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-imaging -->
