@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1025,7 +1025,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          _prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS, TourManager.X_AXIS_DISTANCE);
       }
 
-
       // check if the distance axis button was pressed
       if (isChecked && !_tcc.isShowTimeOnXAxis) {
          return;
@@ -1134,8 +1133,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       control.addListener(SWT.MouseExit, _ttControlListener);
       control.addListener(SWT.MouseEnter, _ttControlListener);
 
-      if (control instanceof Composite) {
-         final Control[] children = ((Composite) control).getChildren();
+      if (control instanceof final Composite composite) {
+         final Control[] children = composite.getChildren();
          for (final Control child : children) {
             addControlListener(child);
          }
@@ -1946,6 +1945,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * @param xAxisSerie
     * @param xAxisSerieIndex
     * @param labelPosition
+    *
     * @return
     */
    private ChartLabelMarker createLayer_Marker_ChartLabel(final TourMarker tourMarker,
@@ -2062,14 +2062,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * @param tourStartTime
     *           The tour start time with a time zone
     * @param currentTourSerieIndex
-    *           Used when dealing with multiple tours: Gives the given tour's index start in the
-    *           time serie
+    *           Used when dealing with multiple tours: Gives the given tour's
+    *           index start in the * time serie
     * @param timeSerieLength
     *           The length of the given tour's time serie
     * @param timeOffset
-    *           Used when dealing with multiple tours: Gives the previous tour elapsed time in order
-    *           to compute
-    *           each time slice time for the given tour
+    *           Used when dealing with multiple tours: Gives the previous tour
+    *           elapsed time in order to compute each time slice time for the given tour
     */
    private void createLayer_NightSections_Chart(final double[] xAxisSerie,
                                                 final ChartNightConfig chartNightConfig,
@@ -2101,7 +2100,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
          }
          final long currentTime = currentZonedDateTime.toEpochSecond();
 
-         if (isTimeSliceAtNight(sunsetTimes, sunriseTimes, currentTime)) {
+         if (TimeTools.isTimeSliceAtNight(sunsetTimes, sunriseTimes, currentTime)) {
 
             if (!isNightTime) {
 
@@ -2111,7 +2110,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             if (index == timeSerieLength - 1) {
 
                //The last time slice is in the night,
-               //we need to create the night section it before exiting the for loop
+               //we need to create the night section before exiting the for loop
 
                createLayer_NightSections_ChartLabel(
                      chartNightConfig,
@@ -3303,6 +3302,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * Converts the graph Id into an action Id
     *
     * @param graphId
+    *
     * @return
     */
    private String getGraphActionId(final int graphId) {
@@ -3356,6 +3356,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
    /**
     * @param mouseEvent
+    *
     * @return Returns the hovered title or <code>null</code> when a title is not hovered.
     */
    private ChartTitleSegment getHoveredTitleSegment(final ChartMouseEvent mouseEvent) {
@@ -3393,8 +3394,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final ChartLabel hoveredMarkerLabel = getHoveredMarkerLabel();
 
-      if (hoveredMarkerLabel != null && hoveredMarkerLabel.data instanceof TourMarker) {
-         tourMarker = (TourMarker) hoveredMarkerLabel.data;
+      if (hoveredMarkerLabel != null && hoveredMarkerLabel.data instanceof final TourMarker hoveredTourMarker) {
+         tourMarker = hoveredTourMarker;
       }
 
       _lastHoveredTourMarker = tourMarker;
@@ -3439,6 +3440,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * Copied from {@link org.eclipse.ui.internal.e4.compatibility.ActionBars}
     *
     * @param control
+    *
     * @return
     */
    @SuppressWarnings("restriction")
@@ -3447,8 +3449,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       Composite parent = control.getParent();
 
       while (parent != null) {
-         if (parent instanceof CTabFolder) {
-            final Control topRight = ((CTabFolder) parent).getTopRight();
+         if (parent instanceof final CTabFolder cTabFolder) {
+            final Control topRight = cTabFolder.getTopRight();
             if (topRight != null) {
                return topRight;
             }
@@ -3509,8 +3511,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       final IViewPart viewPart = Util.getView(TourSegmenterView.ID);
 
-      if (viewPart instanceof TourSegmenterView) {
-         return ((TourSegmenterView) viewPart).getTourSegments();
+      if (viewPart instanceof final TourSegmenterView tourSegmenterView) {
+         return (tourSegmenterView).getTourSegments();
       }
 
       return null;
@@ -3620,18 +3622,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _tourPauseTooltip.hideNow();
    }
 
-   private boolean isTimeSliceAtNight(final ZonedDateTime sunsetTimes,
-                                      final ZonedDateTime sunriseTimes,
-                                      final long time) {
-
-      return time >= sunsetTimes.toEpochSecond() || time <= sunriseTimes.toEpochSecond();
-   }
-
    /**
     * @param isPauseAnAutoPause
     *           When <code>true</code> an auto-pause happened otherwise it is an user pause
     * @param pauseDuration
     *           Pause duration in seconds
+    *
     * @return
     */
    private boolean isTourPauseVisible(final boolean isPauseAnAutoPause, final long pauseDuration) {
@@ -4736,9 +4732,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       setXSliderPosition(xSliderPosition);
 
       final Object customData = xSliderPosition.getCustomData();
-      if (customData instanceof SelectedTourSegmenterSegments) {
-
-         final SelectedTourSegmenterSegments selectedSegments = (SelectedTourSegmenterSegments) customData;
+      if (customData instanceof final SelectedTourSegmenterSegments selectedSegments) {
 
          // select segments
 
@@ -4927,6 +4921,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * @param maxAdjustment
     *           Is disabled when set to {@link Double#MIN_VALUE}.
     * @param isMinMaxEnabled
+    *
     * @return
     */
    private boolean setMaxDefaultValue(final String property,
@@ -5008,6 +5003,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * @param minAdjustment
     *           Is disabled when set to {@link Double#MIN_VALUE}.
     * @param isMinMaxEnabled
+    *
     * @return
     */
    private boolean setMinDefaultValue(final String property,
@@ -6125,9 +6121,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       // get all graph ids which can be displayed
       for (final ChartDataSerie xyDataIterator : getChartDataModel().getXyData()) {
 
-         if (xyDataIterator instanceof ChartDataYSerie) {
+         if (xyDataIterator instanceof final ChartDataYSerie yData) {
 
-            final ChartDataYSerie yData = (ChartDataYSerie) xyDataIterator;
             final Integer graphId = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_GRAPH_ID);
 
             enabledGraphIds.add(graphId);
@@ -6145,7 +6140,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       /*
-       * Tour infos
+       * Tour info
        */
       _actionTourInfo.setSelected(_tcc.isTourInfoVisible);
       _actionTourInfo.setEnabled(true);
