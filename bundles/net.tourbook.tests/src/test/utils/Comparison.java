@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2024 Frédéric Bard
+ * Copyright (C) 2020, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,6 +37,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
@@ -84,7 +86,17 @@ public class Comparison {
          controlFileContentArray.replaceAll(line -> line = line.replace("software_version,\"24.11\"", genericSoftwareVersion)); //$NON-NLS-1$
          controlFileContentArray.replaceAll(line -> line = line.replace("application_version,\"2411\"", genericApplicationVersion)); //$NON-NLS-1$
 
-         testFileContentArray.replaceAll(line -> line.replaceFirst("software_version,\"\\d\\d\\.\\d\\d\"", genericSoftwareVersion)); //$NON-NLS-1$
+         // Regular expression to match the version pattern
+         String regex = "(software_version,)\\" + "\"\\d+\\.\\d+\\" + "\"";
+         Pattern pattern = Pattern.compile(regex);
+
+         for (int index = 0; index < testFileContentArray.size(); index++) {
+
+            String line = testFileContentArray.get(index);
+            Matcher matcher = pattern.matcher(line);
+            String result = matcher.replaceAll("$1");
+            testFileContentArray.set(index, result);
+         }
          testFileContentArray.replaceAll(line -> line.replaceFirst("application_version,\"\\d\\d\\d\\d\"", genericApplicationVersion)); //$NON-NLS-1$
 
          // Modify the session/activity messages to remove/ignore their creation timestamps
