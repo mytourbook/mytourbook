@@ -205,7 +205,7 @@ public class TourDatabase {
    public static final String  TABLE_TOUR_NUTRITION_PRODUCT               = "TOURNUTRITIONPRODUCT";                                  //$NON-NLS-1$
    public static final String  TABLE_TOUR_GEO_PARTS                       = "TourGeoParts";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_LOCATION                        = "TourLocation";                                          //$NON-NLS-1$
-   public static final String  TABLE_TOUR_LOCATION_POINT                  = "TourLocationPoint";                                     //$NON-NLS-1$
+//   public static final String  TABLE_TOUR_LOCATION_POINT                  = "TourLocationPoint";                                     //$NON-NLS-1$
    public static final String  TABLE_TOUR_MARKER                          = "TOURMARKER";                                            //$NON-NLS-1$
    public static final String  TABLE_TOUR_PERSON                          = "TOURPERSON";                                            //$NON-NLS-1$
    public static final String  TABLE_TOUR_PERSON_HRZONE                   = "TOURPERSONHRZONE";                                      //$NON-NLS-1$
@@ -10793,14 +10793,10 @@ public class TourDatabase {
       logDbUpdate_Start(newDbVersion);
       updateMonitor(splashManager, newDbVersion);
 
-      final Statement stmt = conn.createStatement();
-      {
-         // double check if db already exists
-         if (isTableAvailable(conn, TABLE_TOUR_LOCATION_POINT) == false) {
-            //createTable_TourLocationPoint(stmt);
-         }
+      try (final Statement stmt = conn.createStatement()) {
+
+         SQL.addColumn_VarCar(stmt, TABLE_TOUR_PHOTO, "photoAdjustmentsJSON", VARCHAR_MAX_LENGTH); //$NON-NLS-1$
       }
-      stmt.close();
 
       logDbUpdate_End(newDbVersion);
 
