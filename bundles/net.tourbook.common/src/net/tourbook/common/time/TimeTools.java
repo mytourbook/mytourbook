@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -734,8 +734,8 @@ public class TimeTools {
    }
 
    public static boolean isTimeSliceAtNight(final ZonedDateTime sunsetTimes,
-                                      final ZonedDateTime sunriseTimes,
-                                      final long time) {
+                                            final ZonedDateTime sunriseTimes,
+                                            final long time) {
 
       return time >= sunsetTimes.toEpochSecond() || time <= sunriseTimes.toEpochSecond();
    }

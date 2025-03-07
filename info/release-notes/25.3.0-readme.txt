@@ -5,10 +5,6 @@ TODO's
 ======               
 
 
-* Update fulltext url https://lucene.apache.org/core/7_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Wildcard_Searches
-  in https://mytourbook.sourceforge.io/mytourbook/index.php/documentation/show-tours/search
-
-
 * Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
                     Released: 23.3
 
@@ -18,11 +14,7 @@ TODO's
 
                   - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
                     mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
-
-				      - Do the data backup with a zip file which contains all db files
 				      
-				      - Fix link to DOK video
-
 
 New
 ===
@@ -99,5 +91,5 @@ System
 * Eclipse 2024-03 (4.31)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.31-202402290520/
 * NatTable 2.20               https://www.eclipse.org/nattable/download.php
 * Nebula Widgets              https://download.eclipse.org/nebula/releases/latest
-* FIT SDK 21.141.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* FIT SDK 21.158.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
 * WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

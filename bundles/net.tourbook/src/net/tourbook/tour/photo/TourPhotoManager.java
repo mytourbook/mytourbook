@@ -848,12 +848,13 @@ public class TourPhotoManager implements IPhotoServiceProvider {
       return tourPhotoImages;
    }
 
-   void linkPhotosWithTours(final PhotosWithExifSelection selectedPhotosWithExif) {
+   void linkPhotosWithTours(final PhotosWithExifSelection selectedPhotosWithExif, final boolean isFromAll) {
 
       final TourPhotoLinkView linkView = openLinkView();
 
       if (linkView != null) {
-         linkView.showPhotosAndTours(selectedPhotosWithExif.photos);
+
+         linkView.showPhotosAndTours(selectedPhotosWithExif.photos, isFromAll);
       }
    }
 
