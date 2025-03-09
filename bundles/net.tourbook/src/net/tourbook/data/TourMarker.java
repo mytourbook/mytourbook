@@ -586,6 +586,11 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
       return markerTime;
    }
 
+   public long getMarkerType() {
+
+      return markerType;
+   }
+
    public int getMultiTourSerieIndex() {
       return _multiTourSerieIndex;
    }
@@ -626,6 +631,9 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
       return tourTime;
    }
 
+   /**
+    * @return Returns the device type
+    */
    public int getType() {
       return type;
    }

@@ -337,7 +337,7 @@ public class PrefPageMap25_Provider extends PreferencePage implements IWorkbench
       layoutContainer.setLayout(tableLayout);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(700, convertHeightInCharsToPixels(20))
+            .hint(300, convertHeightInCharsToPixels(20))
             .applyTo(layoutContainer);
 
       /*

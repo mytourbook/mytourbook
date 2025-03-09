@@ -577,6 +577,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       defineColumn_Body_AvgPulse();
 
       defineColumn_Waypoint_Name();
+      defineColumn_Marker_Type();
       defineColumn_Waypoint_Description();
       defineColumn_Marker_Url();
 
@@ -713,6 +714,28 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
             cell.setText(tourMarker.isMarkerVisible()
                   ? Messages.App_Label_BooleanYes
                   : Messages.App_Label_BooleanNo);
+         }
+      });
+   }
+
+   /**
+    * Column: Marker type
+    */
+   private void defineColumn_Marker_Type() {
+
+      final ColumnDefinition colDef = TableColumnFactory.MARKER_TYPE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourMarker marker = (TourMarker) cell.getElement();
+
+            final long markerType = marker.getMarkerType();
+
+            cell.setText(Long.toString(markerType));
          }
       });
    }

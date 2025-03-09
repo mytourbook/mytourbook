@@ -121,6 +121,7 @@ public class TourDatabase {
     */
    private static final int TOURBOOK_DB_VERSION = 56;
 
+//   private static final int TOURBOOK_DB_VERSION = 56; // 25.3
 //   private static final int TOURBOOK_DB_VERSION = 55; // 24.5
 //   private static final int TOURBOOK_DB_VERSION = 54; // 24.1 fixed db data update bug 47 -> 48
 //   private static final int TOURBOOK_DB_VERSION = 53; // 24.1 added new fields
