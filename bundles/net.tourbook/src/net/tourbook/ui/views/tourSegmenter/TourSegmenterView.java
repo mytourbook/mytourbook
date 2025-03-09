@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -6573,7 +6573,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          if (selectedSegmenter.segmenterType == SegmenterType.ByElevationWithMarker) {
 
-            _elevationLoss = _tourData.segmentSerieTotal_Elevation_Loss;
+            _elevationLoss = -_tourData.segmentSerieTotal_Elevation_Loss;
             _elevationGain = _tourData.segmentSerieTotal_Elevation_Gain;
 
          } else {
