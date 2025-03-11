@@ -19,6 +19,11 @@
                                                                         <version>5.9.3</version>
          <scope>test</scope>
       </dependency>
+      <dependency>
+         <artifactId>junit-platform-runner</artifactId>                  <groupId>org.junit.platform</groupId>
+                                                                        <version>1.12.0</version>
+         <scope>test</scope>
+      </dependency>
    </dependencies>	
 
    <properties>
