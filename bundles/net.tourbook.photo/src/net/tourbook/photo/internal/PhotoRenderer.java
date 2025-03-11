@@ -1442,7 +1442,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
          // image is not yet loaded
 
          // check if fullsize image is in the cache
-         _fullsizePaintedImage = PhotoImageCache.getImageOriginal(photo);
+         _fullsizePaintedImage = PhotoImageCache.getImageOriginal_SWT(photo);
 
          _isFullsizeImageAvailable = _fullsizePaintedImage != null && _fullsizePaintedImage.isDisposed() == false;
 

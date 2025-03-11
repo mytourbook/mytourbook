@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,7 +47,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.widgets.Display;
 
 public class DirectMappingPainter implements IDirectPainter {
@@ -113,12 +112,10 @@ public class DirectMappingPainter implements IDirectPainter {
 
       _map2 = map2;
 
-      final int deviceZoom = DPIUtil.getDeviceZoom();
-
       // get unscaled image
       final ImageDescriptor imageDescriptor = TourbookPlugin.getImageDescriptor(Images.MapLocationMarker_Hovered);
 
-// THIS NEEDS TO BE USED WHEN THE LOCATION ICON IS UNSCALES      
+// THIS NEEDS TO BE USED WHEN THE LOCATION ICON IS UNSCALES
 //      final ImageData imageData = imageDescriptor.getImageData(deviceZoom);
 
       final ImageData imageData = imageDescriptor.getImageData(100);
@@ -246,31 +243,56 @@ public class DirectMappingPainter implements IDirectPainter {
        * Draw a line from the marker label to the marker location.
        * Ensure that the line is not crossing the label
        */
-      int lineFromDevX = labelDevX_Scaled;
-      int lineFromDevY = labelDevY_Scaled;
-      final int lineToDevX = (int) (mapPointDevX / deviceScaling);
-      final int lineToDevY = (int) (mapPointDevY / deviceScaling);
+      int devX_LineFrom = labelDevX_Scaled;
+      int devY_LineFrom = labelDevY_Scaled;
+      final int devX_LineTo = (int) (mapPointDevX / deviceScaling);
+      final int devY_LineTo = (int) (mapPointDevY / deviceScaling);
 
-      if (lineToDevX > lineFromDevX + labelWidth_Scaled) {
-         lineFromDevX += labelWidth_Scaled;
-      } else if (lineToDevX > lineFromDevX && lineToDevX < lineFromDevX + labelWidth_Scaled) {
-         lineFromDevX = lineToDevX;
+      if (devX_LineTo > devX_LineFrom + labelWidth_Scaled) {
+         devX_LineFrom += labelWidth_Scaled;
+      } else if (devX_LineTo > devX_LineFrom && devX_LineTo < devX_LineFrom + labelWidth_Scaled) {
+         devX_LineFrom = devX_LineTo;
       }
 
-      if (lineToDevY > lineFromDevY + labelHeight_Scaled) {
-         lineFromDevY += labelHeight_Scaled;
-      } else if (lineToDevY > lineFromDevY && lineToDevY < lineFromDevY + labelHeight_Scaled) {
-         lineFromDevY = lineToDevY;
+      if (devY_LineTo > devY_LineFrom + labelHeight_Scaled) {
+         devY_LineFrom += labelHeight_Scaled;
+      } else if (devY_LineTo > devY_LineFrom && devY_LineTo < devY_LineFrom + labelHeight_Scaled) {
+         devY_LineFrom = devY_LineTo;
       }
-
-      gc.setForeground(lineColor);
 
       gc.setLineWidth(1);
+      gc.setForeground(UI.SYS_COLOR_BLACK);
       gc.drawLine(
-            lineFromDevX,
-            lineFromDevY,
-            lineToDevX,
-            lineToDevY);
+            devX_LineFrom,
+            devY_LineFrom,
+
+            devX_LineTo,
+            devY_LineTo);
+
+      gc.setForeground(UI.SYS_COLOR_WHITE);
+
+      int devX_LineFrom2 = devX_LineFrom;
+      int devY_LineFrom2 = devY_LineFrom;
+
+      int devX_LineTo2 = devX_LineTo;
+      int devY_LineTo2 = devY_LineTo;
+
+      if (devX_LineFrom != devX_LineTo2) {
+         devY_LineFrom2 += 1;
+         devY_LineTo2 += 1;
+      }
+
+      if (devY_LineFrom2 != devY_LineTo2) {
+         devX_LineFrom2 += 1;
+         devX_LineTo2 += 1;
+      }
+
+      gc.drawLine(
+            devX_LineFrom2,
+            devY_LineFrom2,
+
+            devX_LineTo2,
+            devY_LineTo2);
 
       gc.setForeground(mapPoint.getOutlineColorSWT());
 
@@ -349,8 +371,8 @@ public class DirectMappingPainter implements IDirectPainter {
 
          gc.setLineWidth(1);
          gc.drawRectangle(
-               labelDevX_Scaled + 0,
-               labelDevY_Scaled + 0,
+               labelDevX_Scaled,
+               labelDevY_Scaled,
                labelWidth_Scaled,
                labelHeight_Scaled);
 

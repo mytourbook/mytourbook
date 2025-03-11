@@ -3,5 +3,8 @@
    <feature id="feature.net.tourbook.app">
       <category name="MyTourbook"/>
    </feature>
+   <feature id="feature.net.tourbook.ext.derby">
+      <category name="MyTourbook"/>
+   </feature>
    <category-def name="MyTourbook" label="MyTourbook"/>
 </site>

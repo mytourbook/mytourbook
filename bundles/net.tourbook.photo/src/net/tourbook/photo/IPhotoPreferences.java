@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,9 +29,12 @@ public interface IPhotoPreferences {
 
    public static final String PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE                    = "PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE";                    //$NON-NLS-1$
 
-   public static final String PHOTO_EXTERNAL_PHOTO_VIEWER_1                       = "PHOTO_EXTERNAL_PHOTO_VIEWER_1";                       //$NON-NLS-1$
-   public static final String PHOTO_EXTERNAL_PHOTO_VIEWER_2                       = "PHOTO_EXTERNAL_PHOTO_VIEWER_2";                       //$NON-NLS-1$
-   public static final String PHOTO_EXTERNAL_PHOTO_VIEWER_3                       = "PHOTO_EXTERNAL_PHOTO_VIEWER_3";                       //$NON-NLS-1$
+   public static final String PHOTO_EXTERNAL_PHOTO_FOLDER_VIEWER_1                = "PHOTO_EXTERNAL_PHOTO_VIEWER_1";                       //$NON-NLS-1$
+   public static final String PHOTO_EXTERNAL_PHOTO_FOLDER_VIEWER_2                = "PHOTO_EXTERNAL_PHOTO_VIEWER_2";                       //$NON-NLS-1$
+   public static final String PHOTO_EXTERNAL_PHOTO_FOLDER_VIEWER_3                = "PHOTO_EXTERNAL_PHOTO_VIEWER_3";                       //$NON-NLS-1$
+   public static final String PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_1                  = "PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_1";                  //$NON-NLS-1$
+   public static final String PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_2                  = "PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_2";                  //$NON-NLS-1$
+   public static final String PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_3                  = "PHOTO_EXTERNAL_PHOTO_FILE_VIEWER_3";                  //$NON-NLS-1$
 
    public static final String PHOTO_VIEWER_PREF_EVENT_IMAGE_QUALITY_IS_MODIFIED   = "PHOTO_VIEWER_PREF_EVENT_IMAGE_QUALITY_IS_MODIFIED";   //$NON-NLS-1$
    public static final String PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED = "PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED"; //$NON-NLS-1$

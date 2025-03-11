@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="lib/gt-main-28-RC.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-main -->
-	<classpathentry exported="true" kind="lib" path="lib/gt-wms-28-RC.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-wms -->
-	<classpathentry exported="true" kind="lib" path="lib/gt-metadata-28-RC.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-metadata -->
-	<classpathentry exported="true" kind="lib" path="lib/jdom2-2.0.6.1.jar"/> <!-- https://mvnrepository.com/artifact/org.jdom/jdom2 -->
-	<classpathentry exported="true" kind="lib" path="lib/gt-xml-28-RC.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-xml -->
-	<classpathentry exported="true" kind="lib" path="lib/gt-referencing-28-RC.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-referencing -->
-	<classpathentry exported="true" kind="lib" path="lib/jts-core-1.19.0.jar"/> <!-- https://mvnrepository.com/artifact/org.locationtech.jts/jts-core -->
-	<classpathentry exported="true" kind="lib" path="lib/gt-http-28-RC.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-http -->
-	<classpathentry exported="true" kind="lib" path="lib/gt-opengis-28-RC.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-opengis -->
-	<classpathentry kind="output" path="bin"/>
+   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17"/>
+   <classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+   <classpathentry exported="true" kind="lib" path="lib/gt-main-28-RC.jar"/>              <!-- https://mvnrepository.com/artifact/org.geotools/gt-main -->
+   <classpathentry exported="true" kind="lib" path="lib/gt-wms-28-RC.jar"/>               <!-- https://mvnrepository.com/artifact/org.geotools/gt-wms -->
+   <classpathentry exported="true" kind="lib" path="lib/gt-metadata-28-RC.jar"/>          <!-- https://mvnrepository.com/artifact/org.geotools/gt-metadata -->
+   <classpathentry exported="true" kind="lib" path="lib/jdom2-2.0.6.1.jar"/>              <!-- https://mvnrepository.com/artifact/org.jdom/jdom2 -->
+   <classpathentry exported="true" kind="lib" path="lib/gt-xml-28-RC.jar"/>               <!-- https://mvnrepository.com/artifact/org.geotools/gt-xml -->
+   <classpathentry exported="true" kind="lib" path="lib/gt-referencing-28-RC.jar"/>       <!-- https://mvnrepository.com/artifact/org.geotools/gt-referencing -->
+   <classpathentry exported="true" kind="lib" path="lib/jts-core-1.20.0.jar"           sourcepath="jar-sources/jts-core-1.20.0-sources.jar"/>          <!-- https://mvnrepository.com/artifact/org.locationtech.jts/jts-core -->
+   <classpathentry exported="true" kind="lib" path="lib/gt-http-28-RC.jar"/>              <!-- https://mvnrepository.com/artifact/org.geotools/gt-http -->
+   <classpathentry exported="true" kind="lib" path="lib/gt-opengis-28-RC.jar"/>           <!-- https://mvnrepository.com/artifact/org.geotools/gt-opengis -->
+   <classpathentry kind="output" path="bin"/>
 </classpath>

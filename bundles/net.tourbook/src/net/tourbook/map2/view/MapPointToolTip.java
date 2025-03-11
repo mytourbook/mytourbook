@@ -123,6 +123,10 @@ public class MapPointToolTip extends ToolTip {
 
    private void createUI(final Composite parent) {
 
+      if (_hoveredMapPoint == null) {
+         return;
+      }
+
       final Map2Point mapPoint = _hoveredMapPoint.mapPoint;
 
 // SET_FORMATTING_OFF

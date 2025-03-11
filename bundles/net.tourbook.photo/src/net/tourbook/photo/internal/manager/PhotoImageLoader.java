@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -58,9 +58,19 @@ import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Rotation;
 
+import pixelitor.filters.curves.ToneCurvesFilter;
+import pixelitor.gui.GUIMessageHandler;
+import pixelitor.utils.Messages;
+
 public class PhotoImageLoader {
 
-   private static IPreferenceStore  _prefStore        = PhotoActivator.getPrefStore();
+   private static IPreferenceStore _prefStore = PhotoActivator.getPrefStore();
+
+   static {
+
+      Messages.setHandler(new GUIMessageHandler());
+
+   }
 
    private Photo                    _photo;
    private ImageQuality             _requestedImageQuality;
@@ -96,6 +106,128 @@ public class PhotoImageLoader {
       _loadCallBack = loadCallBack;
 
       _requestedImageKey = photo.getImageKey(_requestedImageQuality);
+   }
+
+   /**
+    * @param notAdjustedImage
+    *
+    * @return
+    */
+   private BufferedImage adjustImage(final BufferedImage notAdjustedImage) {
+
+      BufferedImage adjustedImage = null;
+
+      if (_photo.isCropped) {
+
+         adjustedImage = adjustImage_Crop(notAdjustedImage);
+      }
+
+      if (_photo.isSetTonality) {
+
+         if (adjustedImage == null) {
+
+            /*
+             * Complicated: create a valid image which can be adjusted, there is a bug that a not
+             * cropped image is not adjusted with tonality
+             */
+            adjustedImage = Scalr.crop(notAdjustedImage,
+                  0,
+                  0,
+                  notAdjustedImage.getWidth(),
+                  notAdjustedImage.getHeight());
+         }
+
+         final BufferedImage srcImage = adjustedImage != null ? adjustedImage : notAdjustedImage;
+
+         final BufferedImage tonalityImage = adjustImage_Tonality(srcImage);
+
+         // replace adjusted image
+         if (tonalityImage != null) {
+
+            UI.disposeResource(adjustedImage);
+            adjustedImage = tonalityImage;
+         }
+      }
+
+      if (adjustedImage != null) {
+
+         final String imageKey = _photo.getImageKey(ImageQuality.THUMB_HQ_ADJUSTED);
+
+         PhotoImageCache.putImage_AWT(imageKey, adjustedImage, _photo.imageFilePathName);
+      }
+
+      return adjustedImage;
+   }
+
+   private BufferedImage adjustImage_Crop(final BufferedImage notAdjustedImage) {
+
+      final int imageWidth = notAdjustedImage.getWidth();
+      final int ImageHeight = notAdjustedImage.getHeight();
+
+      final float cropAreaX1 = _photo.cropAreaX1;
+      final float cropAreaY1 = _photo.cropAreaY1;
+      final float cropAreaX2 = _photo.cropAreaX2;
+      final float cropAreaY2 = _photo.cropAreaY2;
+
+      final int cropX1 = (int) (imageWidth * cropAreaX1);
+      final int cropY1 = (int) (ImageHeight * cropAreaY1);
+      final int cropX2 = (int) (imageWidth * cropAreaX2);
+      final int cropY2 = (int) (ImageHeight * cropAreaY2);
+
+      int cropWidth = cropX2 - cropX1;
+      int cropHeight = cropY2 - cropY1;
+
+      // fix image size, otherwise it would cause an invalid image
+      if (cropWidth == 0) {
+         cropWidth = 1;
+      }
+      if (cropWidth < 0) {
+         cropWidth = -cropWidth;
+      }
+      if (cropHeight == 0) {
+         cropHeight = 1;
+      }
+      if (cropHeight < 0) {
+         cropHeight = -cropHeight;
+      }
+
+      if (cropX1 + cropWidth > imageWidth) {
+         cropWidth = imageWidth - cropX1;
+      }
+
+      if (cropAreaY1 + cropHeight > ImageHeight) {
+         cropHeight = ImageHeight - cropY1;
+      }
+
+      BufferedImage croppedImage = null;
+      try {
+
+         croppedImage = Scalr.crop(notAdjustedImage, cropX1, cropY1, cropWidth, cropHeight);
+
+      } catch (final Exception e) {
+
+         StatusUtil.log(e);
+      }
+
+      return croppedImage;
+   }
+
+   private BufferedImage adjustImage_Tonality(final BufferedImage srcImage) {
+
+      BufferedImage tonalityImage = null;
+
+      try {
+
+         final ToneCurvesFilter toneCurvesFilter = _photo.getToneCurvesFilter();
+
+         tonalityImage = toneCurvesFilter.transformImage(srcImage);
+
+      } catch (final Exception e) {
+
+         StatusUtil.log(e);
+      }
+
+      return tonalityImage;
    }
 
    private Image createSWTimageFromAWTimage(final BufferedImage awtBufferedImage, final String imageFilePath) {
@@ -493,7 +625,7 @@ public class PhotoImageLoader {
 
             System.out.println(UI.timeStampNano() + NLS.bind(message, imageStoreFilePath));
 
-            PhotoImageCache.disposeThumbs(null);
+            PhotoImageCache.disposeResizedImage(null);
 
             /*
              * try loading again
@@ -950,10 +1082,13 @@ public class PhotoImageLoader {
     * @param thumbImageWaitingQueue
     *           waiting queue for small images
     * @param exifWaitingQueue
-    * @param isAWTImage
+    * @param photo
+    * @param imageQuality
     */
-   public void loadImageHQThumb(final LinkedBlockingDeque<PhotoImageLoader> thumbImageWaitingQueue,
-                                final LinkedBlockingDeque<PhotoExifLoader> exifWaitingQueue) {
+   public void loadImageHQThumb_Map(final LinkedBlockingDeque<PhotoImageLoader> thumbImageWaitingQueue,
+                                    final LinkedBlockingDeque<PhotoExifLoader> exifWaitingQueue,
+                                    final Photo photo,
+                                    final ImageQuality imageQuality) {
 
       /*
        * Wait until exif data and small images are loaded
@@ -972,11 +1107,27 @@ public class PhotoImageLoader {
       boolean isLoadingError = false;
       BufferedImage hqThumbImage = null;
 
+      // reset adjustment state that it is not reloaded again
+      photo.isAdjustmentModified = false;
+
       try {
 
          // load original image and create thumbs
 
-         hqThumbImage = loadImageHQThumb_10();
+         if (imageQuality == ImageQuality.THUMB_HQ_ADJUSTED) {
+
+            // it is possible that the not cropped image is already loaded -> only crop it
+
+            final BufferedImage notAdjustedImage = PhotoImageCache.getImage_AWT(photo, ImageQuality.HQ);
+
+            if (notAdjustedImage != null) {
+               hqThumbImage = adjustImage(notAdjustedImage);
+            }
+         }
+
+         if (hqThumbImage == null) {
+            hqThumbImage = loadImageHQThumb_Map_10(imageQuality);
+         }
 
       } catch (final Exception e) {
 
@@ -1017,7 +1168,7 @@ public class PhotoImageLoader {
       }
    }
 
-   private BufferedImage loadImageHQThumb_10() throws Exception {
+   private BufferedImage loadImageHQThumb_Map_10(final ImageQuality imageQuality) throws Exception {
 
       // prevent recursive calls
       if (_recursiveCounter[0]++ > 2) {
@@ -1028,9 +1179,6 @@ public class PhotoImageLoader {
       long endHqLoad = 0;
       long endResizeHQ = 0;
       long endSaveHQ = 0;
-
-      // images are rotated only ONCE (the first one)
-      boolean isRotated = false;
 
       BufferedImage awtOriginalImage = null;
       BufferedImage awtHQImage = null;
@@ -1063,15 +1211,21 @@ public class PhotoImageLoader {
          }
       }
 
+      final int originalImageWidth = awtOriginalImage.getWidth();
+      final int originalImageHeight = awtOriginalImage.getHeight();
+
       /*
        * Create HQ thumb image from original image
        */
 
-      final int originalImageWidth = awtOriginalImage.getWidth();
-      final int originalImageHeight = awtOriginalImage.getHeight();
-
       // update dimension
-      updatePhotoImageSize(originalImageWidth, originalImageHeight, true);
+      updatePhotoImageSize(
+
+            originalImageWidth,
+            originalImageHeight,
+
+            true // isOriginalSize
+      );
 
       if (originalImageWidth >= _hqImageSize || originalImageHeight >= _hqImageSize) {
 
@@ -1086,38 +1240,12 @@ public class PhotoImageLoader {
             final int scaledHeight = bestSize.y;
 
             final int maxSize = Math.max(scaleWidth, scaledHeight);
-//            scaledHQImage = Scalr.resize(awtOriginalImage, Method.ULTRA_QUALITY, maxSize);
             scaledHQImage = Scalr.resize(awtOriginalImage, Method.QUALITY, maxSize);
-
-//
-//            !!! THIS QUALITY IS NOT VERY GOOD !!!
-//
-//            scaledHQImage = new BufferedImage(
-//                  scaleWidth,
-//                  scaledHeight,
-//                  BufferedImage.TYPE_INT_ARGB);
-//
-//            final Graphics2D g2d = scaledHQImage.createGraphics();
-//            try {
-//
-//               g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-////               g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-////               g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-//
-//               g2d.drawImage(awtOriginalImage, 0, 0, scaleWidth, scaledHeight, null);
-//
-//            } finally {
-//               g2d.dispose();
-//            }
 
             _trackedAWTImages.add(scaledHQImage);
 
             // rotate image according to the EXIF flag
-            if (isRotated == false) {
-               isRotated = true;
-
-               scaledHQImage = transformImageRotate(scaledHQImage);
-            }
+            scaledHQImage = transformImageRotate(scaledHQImage);
 
             awtHQImage = scaledHQImage;
          }
@@ -1131,7 +1259,7 @@ public class PhotoImageLoader {
          PhotoImageCache.putImage_AWT(imageKey, awtHQImage, originalImagePathName);
 
          /*
-          * Save scaled HQ image in store
+          * Save scaled thumb HQ image in store
           */
          final long startSaveHQ = System.currentTimeMillis();
          {
@@ -1147,26 +1275,29 @@ public class PhotoImageLoader {
          awtHQImage = awtOriginalImage;
       }
 
-      final long duration = System.currentTimeMillis() - start;
+      /*
+       * Crop image NOW, to prevent flickering when cropping is done later
+       */
+      if (imageQuality == ImageQuality.THUMB_HQ_ADJUSTED) {
 
-      final String text = " AWT: " //$NON-NLS-1$
-            + "%-15s " //$NON-NLS-1$
-            + "%-15s  " //$NON-NLS-1$
-            + "total: %5d  " //$NON-NLS-1$
-            + "load: %5d  " //$NON-NLS-1$
-            + "resizeHQThumb: %3d  " //$NON-NLS-1$
-            + "saveHQThumb: %4d  " //$NON-NLS-1$
-      ;
+         // rotate image according to the EXIF flag
+         final BufferedImage awtRotatedImage = transformImageRotate(awtOriginalImage);
 
-      System.out.println(UI.timeStampNano() + text.formatted(
+         final BufferedImage awtAdjustedImage = adjustImage(awtRotatedImage);
 
-            Thread.currentThread().getName(),
-            _photo.imageFileName,
+         if (awtAdjustedImage != null) {
 
-            duration,
-            endHqLoad,
-            endResizeHQ,
-            endSaveHQ));
+            awtHQImage.flush();
+
+            awtHQImage = awtAdjustedImage;
+
+            final String imageKey = _photo.getImageKey(ImageQuality.THUMB_HQ_ADJUSTED);
+
+            PhotoImageCache.putImage_AWT(imageKey, awtHQImage, originalImagePathName);
+         }
+      }
+
+      logImageLoading(start, endHqLoad, endResizeHQ, endSaveHQ);
 
       return awtHQImage;
    }
@@ -1242,7 +1373,7 @@ public class PhotoImageLoader {
                 */
 
                PhotoImageCache.disposeOriginal(null);
-               PhotoImageCache.disposeThumbs(null);
+               PhotoImageCache.disposeResizedImage(null);
 
                try {
 
@@ -1457,6 +1588,9 @@ public class PhotoImageLoader {
 
                imageKey = _photo.getImageKey(ImageQuality.THUMB);
                loadedExifImage = awtExifThumbnail;
+
+               // update photo thumb image size
+               _photo.setThumbSize(awtExifThumbnail.getWidth(), awtExifThumbnail.getHeight());
             }
          }
 
@@ -1715,6 +1849,33 @@ public class PhotoImageLoader {
       return isHQRequired;
    }
 
+   private void logImageLoading(final long start, final long endHqLoad, final long endResizeHQ, final long endSaveHQ) {
+
+      final long duration = System.currentTimeMillis() - start;
+
+      final String text = "" //$NON-NLS-1$
+
+            + " AWT: " //$NON-NLS-1$
+            + "%-15s " //$NON-NLS-1$
+            + "%-15s  " //$NON-NLS-1$
+
+            + "total: %5d  " //$NON-NLS-1$
+            + "load: %5d  " //$NON-NLS-1$
+            + "resizeHQThumb: %3d  " //$NON-NLS-1$
+            + "saveHQThumb: %4d  " //$NON-NLS-1$
+      ;
+
+      System.out.println(UI.timeStampNano() + text.formatted(
+
+            Thread.currentThread().getName(),
+            _photo.imageFileName,
+
+            duration,
+            endHqLoad,
+            endResizeHQ,
+            endSaveHQ));
+   }
+
    private void setState_LoadingError() {
 
       // prevent loading the image again
@@ -1844,13 +2005,13 @@ public class PhotoImageLoader {
    }
 
    /**
-    * @param scaledImage
+    * @param providedImage
     *
     * @return Returns rotated image when orientations is not default
     */
-   private BufferedImage transformImageRotate(final BufferedImage scaledImage) {
+   private BufferedImage transformImageRotate(final BufferedImage providedImage) {
 
-      BufferedImage rotatedImage = scaledImage;
+      BufferedImage rotatedImage = providedImage;
 
       final int orientation = _photo.getOrientation();
 
@@ -1859,15 +2020,17 @@ public class PhotoImageLoader {
          // see here http://www.impulseadventure.com/photo/exif-orientation.html
 
          Rotation correction = null;
-         if (orientation == 8) {
-            correction = Rotation.CW_270;
-         } else if (orientation == 3) {
-            correction = Rotation.CW_180;
-         } else if (orientation == 6) {
-            correction = Rotation.CW_90;
+
+// SET_FORMATTING_OFF
+
+         if (       orientation == 8) {   correction = Rotation.CW_270;
+         } else if (orientation == 3) {   correction = Rotation.CW_180;
+         } else if (orientation == 6) {   correction = Rotation.CW_90;
          }
 
-         rotatedImage = Scalr.rotate(scaledImage, correction);
+// SET_FORMATTING_ON
+
+         rotatedImage = Scalr.rotate(providedImage, correction);
 
          _trackedAWTImages.add(rotatedImage);
       }

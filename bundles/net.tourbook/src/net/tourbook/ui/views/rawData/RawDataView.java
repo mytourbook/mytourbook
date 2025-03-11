@@ -1329,6 +1329,9 @@ public class RawDataView extends ViewPart implements
                // update viewer
                _tourViewer.update(modifiedTours.toArray(), null);
 
+               // fix refresh after a tour type is modified
+               _tourViewer.getTable().redraw();
+
                // remove old selection, old selection can have the same tour but with old data
                _postSelectionProvider.clearSelection();
             }
@@ -4402,7 +4405,7 @@ public class RawDataView extends ViewPart implements
 
       // export actions
       menuMgr.add(new Separator());
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EXPORT, _allTourActions_Export, this);
 
       menuMgr.add(_actionReimportTours);
       menuMgr.add(_actionEditImportPreferences);
@@ -4410,13 +4413,13 @@ public class RawDataView extends ViewPart implements
       menuMgr.add(_actionDeleteTourFile);
 
       // edit actions
-      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit);
+      TourActionManager.fillContextMenu(menuMgr, TourActionCategory.EDIT, _allTourActions_Edit, this);
 
       // tour type actions
-      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr);
+      _tourTypeMenuManager.fillContextMenu_WithActiveActions(menuMgr, this);
 
       // tour tag actions
-      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr);
+      _tagMenuManager.fillTagMenu_WithActiveActions(menuMgr, this);
 
       // add standard group which allows other plug-ins to contribute here
       menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));

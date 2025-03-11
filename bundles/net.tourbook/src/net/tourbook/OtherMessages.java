@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -67,9 +67,6 @@ public class OtherMessages {
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_DESCENT  = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Descent;
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_ASCENT   = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Ascent;
    public static final String TOUR_SEGMENTER_LABEL_VERTICAL_SPEED_FLAT     = net.tourbook.Messages.Tour_Segmenter_Label_VerticalSpeed_Flat;
-
-   public static final String SLIDEOUT_MAP_PHOTO_OPTIONS_CHECKBOX_SHOW_PHOTO_RATING    = net.tourbook.Messages.Slideout_Map_PhotoOptions_Checkbox_ShowPhotoRating;
-   public static final String SLIDEOUT_MAP_PHOTO_OPTIONS_CHECKBOX_SHOW_PHOTO_TOOLTIP   = net.tourbook.Messages.Slideout_Map_PhotoOptions_Checkbox_ShowPhotoTooltip;
 
    //
    // net.tourbook.common.Messages
@@ -193,6 +190,9 @@ public class OtherMessages {
    // net.tourbook.map2.Messages
    //
 
+   public static final String MAP_ACTION_EXTERNAL_APP_DOUBLE_CLICK_START   = net.tourbook.map2.Messages.Map_Action_ExternalApp_DoubleClickStart;
+   public static final String MAP_ACTION_EXTERNAL_APP_OPEN_PHOTO_IMAGE     = net.tourbook.map2.Messages.Map_Action_ExternalApp_OpenPhotoImage;
+   public static final String MAP_ACTION_EXTERNAL_APP_SETUP                = net.tourbook.map2.Messages.Map_Action_ExternalApp_Setup;
    public static final String MAP_ACTION_SHOW_TOUR_IN_MAP                  = net.tourbook.map2.Messages.map_action_show_tour_in_map;
    public static final String MAP_ACTION_TOUR_COLOR_ALTITUDE_TOOLTIP       = net.tourbook.map2.Messages.map_action_tour_color_altitude_tooltip;
    public static final String MAP_ACTION_TOUR_COLOR_GRADIENT_TOOLTIP       = net.tourbook.map2.Messages.map_action_tour_color_gradient_tooltip;

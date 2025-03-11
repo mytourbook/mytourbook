@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Application_Name
 Bundle-SymbolicName: net.tourbook;singleton:=true
-Bundle-Version: 24.11.2.qualifier
+Bundle-Version: 25.3.0.qualifier
 Bundle-Activator: net.tourbook.application.TourbookPlugin
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-17
@@ -79,6 +79,7 @@ Export-Package: de.byteholder.geoclipse,
 Import-Package: com.fasterxml.jackson.core.type,
  com.fasterxml.jackson.databind,
  com.javadocmd.simplelatlng,
+ com.jhlabs.image,
  cop.swt.widgets.viewers.table.celleditors,
  net.sf.swtaddons.autocomplete,
  net.sf.swtaddons.autocomplete.combo,
@@ -122,4 +123,12 @@ Import-Package: com.fasterxml.jackson.core.type,
  org.opengis.geometry,
  org.osgi.service.event,
  particlelabeling,
+ pixelitor,
+ pixelitor.filters,
+ pixelitor.filters.curves,
+ pixelitor.filters.levels,
+ pixelitor.filters.lookup,
+ pixelitor.gui,
+ pixelitor.utils,
+ pixelitor.utils.debug,
  tourbook.search.nls

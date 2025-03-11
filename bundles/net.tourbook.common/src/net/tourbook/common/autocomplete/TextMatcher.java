@@ -19,9 +19,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.preferences.ICommonPreferences;
 
 import org.eclipse.core.text.StringMatcher;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * Similar to {@link StringMatcher}, this {@code TextMatcher} matches a pattern
@@ -47,33 +50,42 @@ import org.eclipse.core.text.StringMatcher;
  */
 public final class TextMatcher {
 
-   private static final Pattern      NON_WORD = Pattern.compile("\\W+", Pattern.UNICODE_CHARACTER_CLASS); //$NON-NLS-1$
+   private static final Pattern          NON_WORD          = Pattern.compile("\\W+", Pattern.UNICODE_CHARACTER_CLASS); //$NON-NLS-1$
 
-   private final StringMatcher       full;
+   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
 
-   private final List<StringMatcher> parts;
+   private final StringMatcher           _full;
+   private final List<StringMatcher>     _parts;
 
    /**
     * Creates a new {@link TextMatcher}.
     *
     * @param pattern
     *           to match
-    * @param ignoreCase
+    * @param isIgnoreCase
     *           whether to do case-insensitive matching
-    * @param ignoreWildCards
+    * @param isIgnoreWildCards
     *           whether to treat '?' and '*' as normal characters, not
     *           as wildcards
     *
     * @throws IllegalArgumentException
     *            if {@code pattern == null}
     */
-   public TextMatcher(final String pattern, final boolean ignoreCase, final boolean ignoreWildCards) {
+   public TextMatcher(final String pattern, final boolean isIgnoreCase, final boolean isIgnoreWildCards) {
 
-      full = new StringMatcher(UI.SYMBOL_STAR + pattern.trim() + UI.SYMBOL_STAR,
-            ignoreCase,
-            ignoreWildCards);
+      final String patternPrefix = _prefStore_Common.getBoolean(ICommonPreferences.AUTO_COMPLETE_PREFIX)
+            ? UI.SYMBOL_STAR
+            : UI.EMPTY_STRING;
 
-      parts = splitPattern(pattern, ignoreCase, ignoreWildCards);
+
+      _full = new StringMatcher(
+
+            patternPrefix + pattern.trim() + UI.SYMBOL_STAR,
+
+            isIgnoreCase,
+            isIgnoreWildCards);
+
+      _parts = splitPattern(pattern, isIgnoreCase, isIgnoreWildCards);
    }
 
    /**
@@ -147,20 +159,20 @@ public final class TextMatcher {
       final int tlen = text.length();
       start = Math.max(0, start);
       end = Math.min(end, tlen);
-      if (full.match(text, start, end)) {
+      if (_full.match(text, start, end)) {
          return true;
       }
 
       final String[] words = getWords(text.substring(start, end));
-      if (match(full, words)) {
+      if (match(_full, words)) {
          return true;
       }
 
-      if (parts.isEmpty()) {
+      if (_parts.isEmpty()) {
          return false;
       }
 
-      for (final StringMatcher subMatcher : parts) {
+      for (final StringMatcher subMatcher : _parts) {
          if (!subMatcher.match(text, start, end) && !match(subMatcher, words)) {
             return false;
          }
@@ -212,6 +224,6 @@ public final class TextMatcher {
 
    @Override
    public String toString() {
-      return '[' + full.toString() + ',' + parts + ']';
+      return '[' + _full.toString() + ',' + _parts + ']';
    }
 }

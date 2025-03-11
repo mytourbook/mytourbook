@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,8 +19,10 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.skedgo.converter.TimezoneMapper;
 
 import java.beans.PropertyVetoException;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
+import java.net.URL;
 import java.nio.file.Path;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -104,6 +106,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.PlatformUI;
+import org.osgi.framework.Bundle;
 
 public class TourDatabase {
 
@@ -116,10 +119,9 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-//   private static final int TOURBOOK_DB_VERSION = 56;
+   private static final int TOURBOOK_DB_VERSION = 56;
 
-   private static final int TOURBOOK_DB_VERSION = 55; // 24.x ??????
-
+//   private static final int TOURBOOK_DB_VERSION = 55; // 24.5
 //   private static final int TOURBOOK_DB_VERSION = 54; // 24.1 fixed db data update bug 47 -> 48
 //   private static final int TOURBOOK_DB_VERSION = 53; // 24.1 added new fields
 //   private static final int TOURBOOK_DB_VERSION = 52; // 24.1
@@ -176,6 +178,7 @@ public class TourDatabase {
    private static final char   NL                                         = UI.NEW_LINE;
 
    private static final int    MAX_TRIES_TO_PING_SERVER                   = 10;
+   public static final int     VARCHAR_MAX_LENGTH                         = 32_672;
 
    private static final String NUMBER_FORMAT_1F                           = "%.1f";                                                  //$NON-NLS-1$
 
@@ -1370,15 +1373,6 @@ public class TourDatabase {
       cs.close();
    }
 
-   private static void dropFunction(final Statement stmt, final String functionName) {
-
-      try {
-
-         exec(stmt, "DROP FUNCTION " + functionName); //$NON-NLS-1$
-
-      } catch (final Exception e) {}
-   }
-
    /**
     * Get runtime statistics by putting this statement before the query is executed
     *
@@ -1401,7 +1395,7 @@ public class TourDatabase {
 
    private static void exec(final Statement stmt, final String sql) throws SQLException {
 
-      System.out.println(sql);
+      System.out.println("exec: " + sql); //$NON-NLS-1$
 
       stmt.execute(sql);
    }
@@ -1413,9 +1407,23 @@ public class TourDatabase {
       }
    }
 
+   private static void exec_IgnoreException(final Statement stmt, final String sql) {
+
+      System.out.println("exec_IgnoreException: " + sql); //$NON-NLS-1$
+
+      try {
+
+         stmt.execute(sql);
+
+      } catch (final SQLException e) {
+
+         StatusUtil.logError(e.getMessage());
+      }
+   }
+
    private static void execUpdate(final Statement stmt, final String sql) throws SQLException {
 
-      System.out.println(sql);
+      System.out.println("execUpdate: " + sql); //$NON-NLS-1$
 
       stmt.executeUpdate(sql);
    }
@@ -5136,9 +5144,15 @@ public class TourDatabase {
             + "   ratingStars                INT DEFAULT 0,                            " + NL //$NON-NLS-1$
             + "   isGeoFromPhoto             INT DEFAULT 0,                            " + NL //$NON-NLS-1$
             + "   latitude                   DOUBLE DEFAULT 0,                         " + NL //$NON-NLS-1$
-            + "   longitude                  DOUBLE DEFAULT 0                          " + NL //$NON-NLS-1$
+            + "   longitude                  DOUBLE DEFAULT 0,                         " + NL //$NON-NLS-1$
 
             // version 23 end
+
+            // version 56 start
+
+            + "   photoAdjustmentsJSON       VARCHAR(" + VARCHAR_MAX_LENGTH + ")       " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            // version 56 end
 
             + ")" //                                                                          //$NON-NLS-1$
       );
@@ -5634,14 +5648,26 @@ public class TourDatabase {
       try (Connection conn = getInstance().getConnection();
             Statement stmt = conn.createStatement()) {
 
+         final Bundle derbyBundle = Platform.getBundle("net.tourbook.ext.apache"); //$NON-NLS-1$
+
+         // bundleentry://26.fwk1091632842/mytourbook-derby-functions.jar
+         final URL bundleUrl = derbyBundle.getEntry("/mytourbook-derby-functions.jar"); //$NON-NLS-1$
+
+         // C:/E/e-431/eclipse/../../../DAT/MT/mytourbook/bundles/net.tourbook.ext.apache/mytourbook-derby-functions.jar
+         final String sqlCustomJarFilePath = NIO.getAbsolutePathFromBundleUrl(bundleUrl);
+
          /*
-          * Found not a better and simple solution to check and then drop these functions because
-          * they are kept in the db even when the server is shutdown !!!
+          * Install (replace) jar file, hints are from
+          * https://stackoverflow.com/questions/38369703/regex-in-apache-derby#answer-38369704
           */
+         exec_IgnoreException(stmt, "CALL SQLJ.REMOVE_JAR('App.StoredProcedures', 0)"); //$NON-NLS-1$
+         exec(stmt, "CALL SQLJ.INSTALL_JAR('%s', 'App.StoredProcedures', 0)".formatted(sqlCustomJarFilePath)); //$NON-NLS-1$
+         exec(stmt, "CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('derby.database.classpath', 'App.StoredProcedures')"); //$NON-NLS-1$
 
-         dropFunction(stmt, "avgSpeed"); //$NON-NLS-1$
-         dropFunction(stmt, "avgPace"); //$NON-NLS-1$
-
+         /*
+          * Replace functions
+          */
+         exec_IgnoreException(stmt, "DROP FUNCTION avgSpeed"); //$NON-NLS-1$
          exec(stmt,
 
                UI.EMPTY_STRING
@@ -5649,10 +5675,12 @@ public class TourDatabase {
                      + "CREATE FUNCTION avgSpeed (tourTime BIGINT, tourDistance BIGINT)" + NL //                  //$NON-NLS-1$
                      + "RETURNS REAL" + NL //                                                                     //$NON-NLS-1$
                      + "PARAMETER STYLE JAVA" + NL //                                                             //$NON-NLS-1$
-                     + "NO SQL LANGUAGE JAVA" + NL //                                                             //$NON-NLS-1$
+                     + "NO SQL" + NL //                                                                           //$NON-NLS-1$
+                     + "LANGUAGE JAVA" + NL //                                                                    //$NON-NLS-1$
                      + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgSpeed'" + NL //     //$NON-NLS-1$
          );
 
+         exec_IgnoreException(stmt, "DROP FUNCTION avgPace"); //$NON-NLS-1$
          exec(stmt,
 
                UI.EMPTY_STRING
@@ -5660,7 +5688,8 @@ public class TourDatabase {
                      + "CREATE FUNCTION avgPace (tourTime BIGINT, tourDistance BIGINT)" + NL //                   //$NON-NLS-1$
                      + "RETURNS REAL" + NL //                                                                     //$NON-NLS-1$
                      + "PARAMETER STYLE JAVA" + NL //                                                             //$NON-NLS-1$
-                     + "NO SQL LANGUAGE JAVA" + NL //                                                             //$NON-NLS-1$
+                     + "NO SQL" + NL //                                                                           //$NON-NLS-1$
+                     + "LANGUAGE JAVA" + NL //                                                                    //$NON-NLS-1$
                      + "EXTERNAL NAME 'net.tourbook.ext.apache.custom.DerbyCustomFunctions.avgPace'" + NL //      //$NON-NLS-1$
          );
 
@@ -5668,6 +5697,9 @@ public class TourDatabase {
 
       } catch (final SQLException e) {
          UI.showSQLException(e);
+
+      } catch (final IOException e) {
+         StatusUtil.log(e);
       }
    }
 
@@ -6675,15 +6707,15 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_053_To_054(splashManager);
          }
 
-// 54 -> 55 > 24.XX
+         // 54 -> 55    24.5
          if (currentDbVersion == 54) {
             currentDbVersion = _dbDesignVersion_New = updateDb_054_To_055(conn, splashManager);
          }
 
 //// 55 -> 56    24.XX
-//         if (currentDbVersion == 55) {
-//            currentDbVersion = _dbDesignVersion_New = updateDb_055_To_056(conn, splashManager);
-//         }
+         if (currentDbVersion == 55) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_055_To_056(conn, splashManager);
+         }
 
          // update db design version number
          updateVersionNumber_10_AfterDesignUpdate(conn, _dbDesignVersion_New);
@@ -10749,26 +10781,22 @@ public class TourDatabase {
       return newDbVersion;
    }
 
-//   private int updateDb_055_To_056(final Connection conn, final SplashManager splashManager) throws SQLException {
-//
-//      final int newDbVersion = 56;
-//
-//      logDbUpdate_Start(newDbVersion);
-//      updateMonitor(splashManager, newDbVersion);
-//
-//      final Statement stmt = conn.createStatement();
-//      {
-//         // double check if db already exists
-//         if (isTableAvailable(conn, TABLE_TOUR_LOCATION_POINT) == false) {
-//            createTable_TourLocationPoint(stmt);
-//         }
-//      }
-//      stmt.close();
-//
-//      logDbUpdate_End(newDbVersion);
-//
-//      return newDbVersion;
-//   }
+   private int updateDb_055_To_056(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 56;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      try (final Statement stmt = conn.createStatement()) {
+
+         SQL.AddColumn_VarCar(stmt, TABLE_TOUR_PHOTO, "photoAdjustmentsJSON", VARCHAR_MAX_LENGTH); //$NON-NLS-1$
+      }
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
 
    private void updateMonitor(final SplashManager splashManager, final int newDbVersion) {
 

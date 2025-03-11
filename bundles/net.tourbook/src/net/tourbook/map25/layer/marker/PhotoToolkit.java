@@ -343,9 +343,10 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
             // the requested image is not available in the image cache -> image must be loaded
 
-            PhotoLoadManager.putImageInLoadingQueueHQThumb_Map(
+            PhotoLoadManager.putImageInLoadingQueueHQ_Map_Thumb(
                   photo,
                   Photo.getMap25ImageRequestedSize(),
+                  ImageQuality.THUMB_HQ,
                   new LoadCallbackImage(markerItem, photo));
          }
       }

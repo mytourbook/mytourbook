@@ -141,7 +141,7 @@ public class PhotoImageCache {
 
    public static void disposeAll() {
 
-      disposeThumbs(null);
+      disposeResizedImage(null);
       disposeOriginal(null);
    }
 
@@ -150,6 +150,7 @@ public class PhotoImageCache {
       UI.disposeResource(cacheWrapper.swtImage);
 
       final BufferedImage awtImage = cacheWrapper.awtImage;
+
       if (awtImage != null) {
          awtImage.flush();
       }
@@ -172,7 +173,7 @@ public class PhotoImageCache {
     */
    public static void disposePath(final String folderPath) {
 
-      disposeThumbs(folderPath);
+      disposeResizedImage(folderPath);
       disposeOriginal(folderPath);
    }
 
@@ -181,7 +182,7 @@ public class PhotoImageCache {
     *
     * @param folderPath
     */
-   public static void disposeThumbs(final String folderPath) {
+   public static void disposeResizedImage(final String folderPath) {
 
       dispose(_imageCache_ResizedImage, folderPath);
    }
@@ -274,17 +275,11 @@ public class PhotoImageCache {
       return swtImage;
    }
 
-   public static Image getImageOriginal(final Photo photo) {
+   public static Image getImageOriginal_SWT(final Photo photo) {
 
       final String imageKey = photo.getImageKey(ImageQuality.ORIGINAL);
 
       return getImageFromCache_SWT(_imageCache_OriginalImage, photo, imageKey);
-
-//		if (_imageCacheOriginal.size() > 1) {
-//
-//		}
-//
-//		return null;
    }
 
    /**
@@ -369,6 +364,7 @@ public class PhotoImageCache {
    public static void putImageOriginal(final String imageKey, final Image image, final String originalImagePathName) {
 
       if (_imageCache_OriginalImage.asMap().size() > 1) {}
+
       putImageInCache_SWT(_imageCache_OriginalImage, imageKey, image, originalImagePathName);
    }
 
@@ -426,12 +422,14 @@ public class PhotoImageCache {
    }
 
    public static void setOriginalImageCacheSize(final int newCacheSize) {
+
       _imageCache_OriginalImage.policy().eviction().ifPresent(eviction -> {
          eviction.setMaximum(newCacheSize);
       });
    }
 
    public static void setThumbCacheSize(final int newCacheSize) {
+
       _imageCache_ResizedImage.policy().eviction().ifPresent(eviction -> {
          eviction.setMaximum(newCacheSize);
       });

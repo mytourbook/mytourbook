@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,9 +26,11 @@ public interface ITourbookPreferences {
    /*
     * Dummy field used by field editors so they don't assert
     */
-   public static final String DUMMY_FIELD   = UI.EMPTY_STRING;
+   public static final String DUMMY_FIELD                          = UI.EMPTY_STRING;
 
-   public static final String GENERAL_NOTES = "GENERAL_NOTES"; //$NON-NLS-1$
+   public static final String APP_LAST_SELECTED_PREFERENCE_PAGE_ID = "APP_LAST_SELECTED_PREFERENCE_PAGE_ID"; //$NON-NLS-1$
+
+   public static final String GENERAL_NOTES                        = "GENERAL_NOTES";                        //$NON-NLS-1$
 
    /*
     * System

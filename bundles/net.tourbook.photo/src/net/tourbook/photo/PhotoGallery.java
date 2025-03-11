@@ -388,9 +388,9 @@ public class PhotoGallery extends ImageGallery {
    @Override
    public void fillContextMenu(final IMenuManager menuMgr) {
 
-      menuMgr.add(_actionEnlargeSmallImages);
-
       super.fillContextMenu(menuMgr);
+
+      menuMgr.add(_actionEnlargeSmallImages);
    }
 
    public void hideActionFiltering() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,7 +45,10 @@ public class Map2PainterConfig {
 
    static boolean                           isBackgroundDark;
 
+   public static boolean                    isPhotoAutoSelect;
    public static boolean                    isShowPhotos;
+   public static boolean                    isShowPhotoAnnotations;
+   public static boolean                    isShowPhotoHistogram;
    public static boolean                    isShowPhotoRating;
    public static boolean                    isShowPhotoTooltip;
    static boolean                           isShowTours;
@@ -65,6 +68,18 @@ public class Map2PainterConfig {
 
       final IDialogSettings state = Map2View.getState();
 
+      isPhotoAutoSelect = Util.getStateBoolean(state,
+            SlideoutMap2_PhotoOptions.STATE_IS_PHOTO_AUTO_SELECT,
+            SlideoutMap2_PhotoOptions.STATE_IS_PHOTO_AUTO_SELECT_DEFAULT);
+
+      isShowPhotoAnnotations = Util.getStateBoolean(state,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_ANNOTATIONS,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_ANNOTATIONS_DEFAULT);
+
+      isShowPhotoHistogram = Util.getStateBoolean(state,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_HISTOGRAM,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_HISTOGRAM_DEFAULT);
+
       isShowPhotoRating = (Util.getStateBoolean(state,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_RATING,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_RATING_DEFAULT));
@@ -72,7 +87,6 @@ public class Map2PainterConfig {
       isShowPhotoTooltip = Util.getStateBoolean(state,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_TOOLTIP,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_TOOLTIP_DEFAULT);
-
    }
 
    private Map2PainterConfig() {}

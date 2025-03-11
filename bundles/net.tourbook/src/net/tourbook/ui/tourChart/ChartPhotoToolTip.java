@@ -16,8 +16,11 @@
 package net.tourbook.ui.tourChart;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.tourbook.common.PointLong;
+import net.tourbook.data.TourData;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoSelection;
@@ -46,6 +49,22 @@ public class ChartPhotoToolTip extends PhotoToolTipUI {
       super(tourChart, state);
 
       _tourChart = tourChart;
+   }
+
+   @Override
+   public Set<Long> getSelectedTourIDs() {
+
+      final TourData tourData = _tourChart.getTourData();
+
+      if (tourData != null) {
+
+         final Set<Long> allTourIDs = new HashSet<>();
+         allTourIDs.add(tourData.getTourId());
+
+         return allTourIDs;
+      }
+
+      return null;
    }
 
    Shell getShell() {

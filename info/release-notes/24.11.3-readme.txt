@@ -1,0 +1,32 @@
+24.11.3                                               ?. January 2025
+
+
+Improvements
+============
+
+* Tour Database
+  - Display the number of records for each table
+    https://github.com/mytourbook/mytourbook/issues/1435
+
+
+Changes
+=======
+
+* 2.5D Map
+  - The animated models "High Wheeler" and "Bicycle" are not included any more in the default installation, this saves 63 MByte in each installation file. 
+    You can find more info in https://github.com/mytourbook/mytourbook/issues/1434
+
+
+Bugfix
+======
+  
+* Tour Type
+  - A tour type could be set into the wrong tour(s)
+    https://github.com/mytourbook/mytourbook/issues/1444
+  
+* Tour Book View
+  - Sorting by average speed/pace could cause a SQL error
+    https://github.com/mytourbook/mytourbook/issues/1441
+
+See also milestone 24.11.3 https://github.com/mytourbook/mytourbook/milestone/22?closed=1
+ 

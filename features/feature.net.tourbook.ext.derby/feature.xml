@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.derby"
       label="Derby database + Lucene fulltext search"
-      version="1.0.0.v10_14__7_5"
+      version="1.1.0.v10_14__7_5"
       plugin="net.tourbook.branding">
 
    <description url="http://www.example.com/description">
@@ -23,8 +23,6 @@
 
    <plugin
          id="net.tourbook.ext.apache"
-         download-size="0"
-         install-size="0"
          version="0.0.0"/>
 
 </feature>

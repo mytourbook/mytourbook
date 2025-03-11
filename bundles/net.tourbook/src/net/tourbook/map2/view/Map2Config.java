@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -94,15 +94,17 @@ public class Map2Config {
    /*
     * Tour markers
     */
-   public boolean                        isShowTourMarker      = true;
+   public boolean                        isShowTourMarker         = true;
 
    /** When <code>true</code> then markers with the same label are grouped together */
    public boolean                        isGroupDuplicatedMarkers;
-   public String                         groupedMarkers        = UI.EMPTY_STRING;
-   public int                            groupGridSize         = Map2ConfigManager.LABEL_GROUP_GRID_SIZE_DEFAULT;
+   public String                         groupedMarkers           = UI.EMPTY_STRING;
+   public int                            groupGridSize            = Map2ConfigManager.LABEL_GROUP_GRID_SIZE_DEFAULT;
 
-   public RGB                            tourMarkerFill_RGB    = Map2ConfigManager.DEFAULT_TOUR_MARKER_FILL_RGB;
-   public RGB                            tourMarkerOutline_RGB = Map2ConfigManager.DEFAULT_TOUR_MARKER_OUTLINE_RGB;
+   public MapTourMarkerTime              tourMarkerDateTimeFormat = MapTourMarkerTime.NONE;
+
+   public RGB                            tourMarkerFill_RGB       = Map2ConfigManager.DEFAULT_TOUR_MARKER_FILL_RGB;
+   public RGB                            tourMarkerOutline_RGB    = Map2ConfigManager.DEFAULT_TOUR_MARKER_OUTLINE_RGB;
 
    public Color                          tourMarkerFill_ColorAWT;
    public Color                          tourMarkerOutline_ColorAWT;
