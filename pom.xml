@@ -22,11 +22,7 @@
    </dependencies>	
 
    <properties>
-<<<<<<< HEAD
-      <tycho.version>4.0.10</tycho.version>
-=======
-      <tycho.version>3.0.5</tycho.version>
->>>>>>> refs/remotes/Wolfgang/main
+      <tycho.version>4.0.12</tycho.version>
       <surefire.version>3.5.2</surefire.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
