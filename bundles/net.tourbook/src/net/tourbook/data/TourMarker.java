@@ -144,16 +144,16 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    @JsonProperty
-   private long     markerId        = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long           markerId        = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    @ManyToOne(optional = false)
-   private TourData tourData;
+   private TourData       tourData;
 
    /**
     * Contains the marker type which is defined in {@link ChartLabel} like
     * {@link ChartLabel#MARKER_TYPE_DEVICE}
     */
-   private int      type;
+   private int            type;
 
    /**
     * Time in seconds relative to the tour start. When value is not available it is set to
@@ -161,7 +161,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     */
    @XmlElement
    @JsonProperty
-   private int      time            = -1;
+   private int            time            = -1;
 
    /**
     * Absolute time of the tour marker in milliseconds since 1970-01-01T00:00:00Z.
@@ -169,13 +169,13 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * @since Db version 25
     */
    @JsonProperty
-   private long     tourTime        = Long.MIN_VALUE;
+   private long           tourTime        = Long.MIN_VALUE;
 
    /**
     * Distance field before db version 20, this field is required for data conversion AND <b>to load
     * entities</b> !!!
     */
-   private int      distance        = -1;
+   private int            distance        = -1;
 
    /**
     * Distance in meters in the metric system or <code>-1</code> when the distance is not available.
@@ -184,81 +184,90 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     */
    @XmlElement
    @JsonProperty
-   private float    distance20      = -1;
+   private float          distance20      = -1;
 
    /**
     * Contains the marker label visual position which is defined in {@link ChartLabel} like
     * {@link ChartLabel#LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED}.
     */
-   private int      visualPosition  = TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED;
+   private int            visualPosition  = TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED;
 
-   private int      labelXOffset;
+   private int            labelXOffset;
 
-   private int      labelYOffset;
+   private int            labelYOffset;
 
    /**
     * Contains the type of the marker, this can be: crossing, hotel, view point.
     * <p>
     * THIS IS NOT USED.
     */
-   private long     markerType;
+   private long           markerType;
 
    /**
     * position of this marker in the data serie
     */
    @XmlAttribute
    @JsonProperty
-   private int      serieIndex;
+   private int            serieIndex;
 
    @XmlElement
-   private String   label           = UI.EMPTY_STRING;
+   private String         label           = UI.EMPTY_STRING;
 
    /**
     * This field is disabled since db version 24 because a {@link TourSign} can be categorized.
     */
    @SuppressWarnings("unused")
-   private String   category        = UI.EMPTY_STRING;
+   private String         category        = UI.EMPTY_STRING;
 
    /**
     * Can be <code>null</code>
     *
     * @since db version 24
     */
-   private String   description;
+   private String         description;
 
    /**
     * Can be <code>null</code>
     *
     * @since DB version 24
     */
-   private String   urlText;
+   private String         urlText;
 
    /**
     * Can be <code>null</code>
     *
     * @since DB version 24
     */
-   private String   urlAddress;
+   private String         urlAddress;
 
    /**
     * @since Db version 25
     */
    @JsonProperty
-   private float    altitude        = TourDatabase.DEFAULT_FLOAT;
+   private float          altitude        = TourDatabase.DEFAULT_FLOAT;
 
    /**
     * @since Db version 25
     */
    @JsonProperty
-   private double   latitude        = TourDatabase.DEFAULT_DOUBLE;
+   private double         latitude        = TourDatabase.DEFAULT_DOUBLE;
 
    /**
     * @since Db version 25
     */
    @JsonProperty
-   private double   longitude       = TourDatabase.DEFAULT_DOUBLE;
+   private double         longitude       = TourDatabase.DEFAULT_DOUBLE;
 
-   private int      isMarkerVisible = 1;
+   private int            isMarkerVisible = 1;
+
+   /**
+    * Type of the tour marker, e.g. hotel, tourism
+    *
+    * @since Db version 57
+    */
+   @ManyToOne
+   @JsonProperty
+   private TourMarkerType tourMarkerType;
 
    // NO ENTITY FIELDS
 

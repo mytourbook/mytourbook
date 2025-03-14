@@ -256,7 +256,7 @@ public class TourDatabase {
    public static final String  ENTITY_ID_TAG                 = "TagID";                                     //$NON-NLS-1$
    public static final String  ENTITY_ID_TAG_CATEGORY        = "TagCategoryID";                             //$NON-NLS-1$
    private static final String ENTITY_ID_TOUR                = "TourID";                                    //$NON-NLS-1$
-   private static final String ENTITY_ID_TYPE                = "TypeID";                                    //$NON-NLS-1$
+   private static final String ENTITY_ID_TOUR_TYPE           = "TypeID";                                    //$NON-NLS-1$
    public static final String  ENTITY_ID_WAY_POINT           = "WayPointID";                                //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
@@ -264,12 +264,13 @@ public class TourDatabase {
    public  static final String KEY_BEVERAGE_CONTAINER       = TABLE_TOUR_BEVERAGE_CONTAINER  + "_" + ENTITY_ID_BEVERAGECONTAINER;   //$NON-NLS-1$
    private static final String KEY_BIKE                     = TABLE_TOUR_BIKE                + "_" + ENTITY_ID_BIKE;                //$NON-NLS-1$
    private static final String KEY_DEVICE_SENSOR            = TABLE_DEVICE_SENSOR            + "_" + ENTITY_ID_DEVICE_SENSOR;       //$NON-NLS-1$
+   private static final String KEY_MARKER_TYPE              = TABLE_TOUR_MARKER_TYPE         + "_" + ENTITY_ID_MARKER_TYPE;                //$NON-NLS-1$
    private static final String KEY_PERSON                   = TABLE_TOUR_PERSON              + "_" + ENTITY_ID_PERSON;              //$NON-NLS-1$
    public static final String  KEY_TAG                      = TABLE_TOUR_TAG                 + "_" + ENTITY_ID_TAG;                 //$NON-NLS-1$
    private static final String KEY_TAG_CATEGORY             = TABLE_TOUR_TAG_CATEGORY        + "_" + ENTITY_ID_TAG_CATEGORY;        //$NON-NLS-1$
    public static final String  KEY_TOUR                     = TABLE_TOUR_DATA                + "_" + ENTITY_ID_TOUR;                //$NON-NLS-1$
    public static final String  KEY_TOUR_LOCATION            = TABLE_TOUR_LOCATION            + "_" + ENTITY_ID_LOCATION;            //$NON-NLS-1$
-   private static final String KEY_TYPE                     = TABLE_TOUR_TYPE                + "_" + ENTITY_ID_TYPE;                //$NON-NLS-1$
+   private static final String KEY_TOUR_TYPE                = TABLE_TOUR_TYPE                + "_" + ENTITY_ID_TOUR_TYPE;                //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
@@ -915,6 +916,23 @@ public class TourDatabase {
 
          _allDbDeviceSensors_BySensorID.clear();
          _allDbDeviceSensors_BySensorID = null;
+      }
+   }
+
+   /**
+    * Remove all tour marker types
+    */
+   public static synchronized void clearTourMarkerTypes() {
+
+      if (_allDbTourMarkerTypes != null) {
+
+         _allDbTourMarkerTypes.clear();
+         _allDbTourMarkerTypes_ByName.clear();
+         _allDbTourMarkerTypes_ById.clear();
+
+         _allDbTourMarkerTypes = null;
+         _allDbTourMarkerTypes_ByName = null;
+         _allDbTourMarkerTypes_ById = null;
       }
    }
 
@@ -2952,7 +2970,7 @@ public class TourDatabase {
 
          MessageDialog.openError(Display.getDefault().getActiveShell(),
                "Error", //$NON-NLS-1$
-               "Error occurred when saving an entity"); //$NON-NLS-1$
+               "Error occurred when saving entity: " + entity); //$NON-NLS-1$
       }
 
       return savedEntity;
@@ -4055,7 +4073,7 @@ public class TourDatabase {
       /*
        * CREATE INDEX TourType
        */
-      sql = "CREATE INDEX TourType ON " + TABLE_TOUR_DATA + " (" + KEY_TYPE + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      sql = "CREATE INDEX TourType ON " + TABLE_TOUR_DATA + " (" + KEY_TOUR_TYPE + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       exec(stmt, sql);
 
       /*
@@ -4499,7 +4517,7 @@ public class TourDatabase {
 
             // version 4 end
 
-            + "   " + KEY_TYPE + "                       BIGINT,                       " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TOUR_TYPE + "                  BIGINT,                       " + NL //$NON-NLS-1$ //$NON-NLS-2$
             + "   " + KEY_PERSON + "                     BIGINT,                       " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 6 start
@@ -4996,6 +5014,12 @@ public class TourDatabase {
 
             + "   " + KEY_TOUR + "           BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
+            // Version 57 - begin
+
+            + "   " + KEY_MARKER_TYPE + "    BIGINT,                                   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            // Version 57 - end
+
             + "   time                       INTEGER NOT NULL,                         " + NL //$NON-NLS-1$
 
             // before version 20
@@ -5082,6 +5106,8 @@ public class TourDatabase {
                   + "   backgroundColor   INTEGER DEFAULT 0                            " + NL //$NON-NLS-1$
 
                   + ")"); //$NON-NLS-1$
+
+      SQL.CreateIndex_Combined(stmt, TABLE_TOUR_MARKER, KEY_MARKER_TYPE);
    }
 
    /**
@@ -5471,7 +5497,7 @@ public class TourDatabase {
 
       //
 
-            + SQL.CreateField_EntityId(ENTITY_ID_TYPE, true)
+            + SQL.CreateField_EntityId(ENTITY_ID_TOUR_TYPE, true)
 
             + "   name                       VARCHAR(" + TourType.DB_LENGTH_NAME + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -10908,6 +10934,8 @@ public class TourDatabase {
       updateMonitor(splashManager, newDbVersion);
 
       try (final Statement stmt = conn.createStatement()) {
+
+         SQL.AddColumn_BigInt(stmt, TABLE_TOUR_MARKER, KEY_MARKER_TYPE, null);
 
          createTable_TourMarkerType(stmt);
       }
