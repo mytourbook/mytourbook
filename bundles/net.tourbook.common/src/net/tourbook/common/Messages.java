@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.common.messages";               //$NON-NLS-1$
 
+   public static String        App_Action_Add_WithConfirm;
    public static String        App_Action_ApplyAndClose;
    public static String        App_Action_Close_Tooltip;
    public static String        App_Action_New_WithConfirm;

@@ -71,6 +71,7 @@ import net.tourbook.data.TourBike;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourMarkerType;
 import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
@@ -119,9 +120,9 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 56;
+   private static final int TOURBOOK_DB_VERSION = 57;
 
-//   private static final int TOURBOOK_DB_VERSION = 56; // 25.3
+//   private static final int TOURBOOK_DB_VERSION = 56; // 24.11.3
 //   private static final int TOURBOOK_DB_VERSION = 55; // 24.5
 //   private static final int TOURBOOK_DB_VERSION = 54; // 24.1 fixed db data update bug 47 -> 48
 //   private static final int TOURBOOK_DB_VERSION = 53; // 24.1 added new fields
@@ -206,8 +207,8 @@ public class TourDatabase {
    public static final String  TABLE_TOUR_NUTRITION_PRODUCT               = "TOURNUTRITIONPRODUCT";                                  //$NON-NLS-1$
    public static final String  TABLE_TOUR_GEO_PARTS                       = "TourGeoParts";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_LOCATION                        = "TourLocation";                                          //$NON-NLS-1$
-//   public static final String  TABLE_TOUR_LOCATION_POINT                  = "TourLocationPoint";                                     //$NON-NLS-1$
    public static final String  TABLE_TOUR_MARKER                          = "TOURMARKER";                                            //$NON-NLS-1$
+   public static final String  TABLE_TOUR_MARKER_TYPE                     = "TourMarkerType";                                        //$NON-NLS-1$
    public static final String  TABLE_TOUR_PERSON                          = "TOURPERSON";                                            //$NON-NLS-1$
    public static final String  TABLE_TOUR_PERSON_HRZONE                   = "TOURPERSONHRZONE";                                      //$NON-NLS-1$
    public static final String  TABLE_TOUR_PHOTO                           = "TOURPHOTO";                                             //$NON-NLS-1$
@@ -246,8 +247,8 @@ public class TourDatabase {
    private static final String ENTITY_ID_DEVICE_SENSOR_VALUE = "SensorValueId";                             //$NON-NLS-1$
    private static final String ENTITY_ID_HR_ZONE             = "HrZoneID";                                  //$NON-NLS-1$
    private static final String ENTITY_ID_LOCATION            = "LocationID";                                //$NON-NLS-1$
-//   private static final String ENTITY_ID_LOCATION_POINT      = "LocationPointID";                           //$NON-NLS-1$
    private static final String ENTITY_ID_MARKER              = "MarkerID";                                  //$NON-NLS-1$
+   private static final String ENTITY_ID_MARKER_TYPE         = "MarkerTypeID";                              //$NON-NLS-1$
    private static final String ENTITY_ID_NUTRITIONPRODUCT    = "ProductID";                                 //$NON-NLS-1$
    private static final String ENTITY_ID_PERSON              = "PersonID";                                  //$NON-NLS-1$
    private static final String ENTITY_ID_PHOTO               = "PhotoID";                                   //$NON-NLS-1$
@@ -370,6 +371,18 @@ public class TourDatabase {
     * Key is the serial number in UPPERCASE
     */
    private static volatile Map<String, DeviceSensor>      _allDbDeviceSensors_BySerialNum;
+
+   private static volatile List<TourMarkerType>           _allDbTourMarkerTypes;
+
+   /**
+    * Key is tour marker type ID
+    */
+   private static Map<Long, TourMarkerType>               _allDbTourMarkerTypes_ById;
+
+   /**
+    * Key is the UPPERCASE tour marker type name
+    */
+   private static Map<String, TourMarkerType>             _allDbTourMarkerTypes_ByName;
 
    /*
     * Cached distinct fields
@@ -1584,6 +1597,20 @@ public class TourDatabase {
    }
 
    /**
+    * @return Returns the backend of all tour types which are stored in the database sorted by name.
+    */
+   public static List<TourMarkerType> getAllTourMarkerTypes() {
+
+      if (_allDbTourMarkerTypes != null) {
+         return _allDbTourMarkerTypes;
+      }
+
+      loadAllTourMarkerTypes();
+
+      return _allDbTourMarkerTypes;
+   }
+
+   /**
     * This method is synchronized to conform to FindBugs
     *
     * @return Returns all tour tags which are stored in the database, the hash key is the tag id
@@ -2717,6 +2744,47 @@ public class TourDatabase {
 
          _allDbDeviceSensors_BySensorID = allDbDeviceSensors_BySensorID;
          _allDbDeviceSensors_BySerialNum = allDbDeviceSensors_BySerialNo;
+      }
+   }
+
+   @SuppressWarnings("unchecked")
+   private static void loadAllTourMarkerTypes() {
+
+      synchronized (DB_LOCK) {
+
+         // check again, field must be volatile to work correctly
+         if (_allDbTourMarkerTypes != null) {
+            return;
+         }
+
+         List<TourMarkerType> allDbTourMarkerTypes = new ArrayList<>();
+         final Map<Long, TourMarkerType> allDbTourMarkerTypes_ById = new HashMap<>();
+         final Map<String, TourMarkerType> allDbTourMarkerTypes_ByName = new HashMap<>();
+
+         final EntityManager em = TourDatabase.getInstance().getEntityManager();
+         if (em != null) {
+
+            final Query emQuery = em.createQuery(UI.EMPTY_STRING
+
+                  + "SELECT TourMarkerType" + NL //                     //$NON-NLS-1$
+                  + " FROM TourMarkerType AS TourMarkerType" + NL //    //$NON-NLS-1$
+                  + " ORDER  BY TourMarkerType.name" + NL //            //$NON-NLS-1$
+            );
+
+            allDbTourMarkerTypes = emQuery.getResultList();
+
+            for (final TourMarkerType tourMarkerType : allDbTourMarkerTypes) {
+
+               allDbTourMarkerTypes_ById.put(tourMarkerType.getId(), tourMarkerType);
+               allDbTourMarkerTypes_ByName.put(tourMarkerType.getName().toUpperCase(), tourMarkerType);
+            }
+
+            em.close();
+         }
+
+         _allDbTourMarkerTypes = allDbTourMarkerTypes;
+         _allDbTourMarkerTypes_ById = allDbTourMarkerTypes_ById;
+         _allDbTourMarkerTypes_ByName = allDbTourMarkerTypes_ByName;
       }
    }
 
@@ -4989,6 +5057,34 @@ public class TourDatabase {
    }
 
    /**
+    * Create table {@link #TABLE_TOUR_MARKER_TYPE}
+    *
+    * @param stmt
+    *
+    * @throws SQLException
+    */
+   private void createTable_TourMarkerType(final Statement stmt) throws SQLException {
+
+      /*
+       * CREATE TABLE TourMarkerType
+       */
+
+      exec(stmt,
+
+            "CREATE TABLE " + TABLE_TOUR_MARKER_TYPE + "   (                           " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+                  + SQL.CreateField_EntityId(ENTITY_ID_MARKER_TYPE, true)
+
+                  + "   name              VARCHAR(" + TourMarkerType.DB_LENGTH_NAME + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   description       VARCHAR(" + TourMarkerType.DB_LENGTH_DESCRIPTION + "),   " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+                  + "   foregroundColor   INTEGER DEFAULT 0,                           " + NL //$NON-NLS-1$
+                  + "   backgroundColor   INTEGER DEFAULT 0                            " + NL //$NON-NLS-1$
+
+                  + ")"); //$NON-NLS-1$
+   }
+
+   /**
     * Create table {@link #TABLE_TOUR_NUTRITION_PRODUCT} for {@link TourNutritionProduct}.
     *
     * @param stmt
@@ -6080,6 +6176,7 @@ public class TourDatabase {
             createTable_TourBeverageContainer(stmt);
             createTable_TourNutritionProduct(stmt);
             createTable_TourMarker(stmt);
+            createTable_TourMarkerType(stmt);
             createTable_TourPhoto(stmt);
             createTable_TourReference(stmt);
             createTable_TourCompared(stmt);
@@ -6088,7 +6185,6 @@ public class TourDatabase {
             createTable_DeviceSensor(stmt);
             createTable_DeviceSensorValues(stmt);
             createTable_TourLocation(stmt);
-//            createTable_TourLocationPoint(stmt);
 
             createTable_DbVersion_Design(stmt);
             createTable_DbVersion_Data(stmt, TOURBOOK_DB_VERSION);
@@ -6713,9 +6809,14 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_054_To_055(conn, splashManager);
          }
 
-//// 55 -> 56    24.XX
+         // 55 -> 56    24.11.3
          if (currentDbVersion == 55) {
             currentDbVersion = _dbDesignVersion_New = updateDb_055_To_056(conn, splashManager);
+         }
+
+         // 56 -> 57    25.?
+         if (currentDbVersion == 56) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_056_To_057(conn, splashManager);
          }
 
          // update db design version number
@@ -10792,6 +10893,23 @@ public class TourDatabase {
       try (final Statement stmt = conn.createStatement()) {
 
          SQL.AddColumn_VarCar(stmt, TABLE_TOUR_PHOTO, "photoAdjustmentsJSON", VARCHAR_MAX_LENGTH); //$NON-NLS-1$
+      }
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDb_056_To_057(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 57;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      try (final Statement stmt = conn.createStatement()) {
+
+         createTable_TourMarkerType(stmt);
       }
 
       logDbUpdate_End(newDbVersion);

@@ -15,22 +15,18 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
-import net.tourbook.tourMarker.TourMarkerType;
-import net.tourbook.tourMarker.TourMarkerTypeManager;
+import net.tourbook.data.TourMarkerType;
+import net.tourbook.database.TourDatabase;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TableColumnLayout;
@@ -45,10 +41,10 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -98,6 +94,8 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
    private Button    _btnMarkerType_Delete;
    private Button    _btnMarkerType_Update;
    private Button    _btnMarkerTypeDetail_Cancel;
+   private Button    _btnSavePerson;
+   private Button    _btnCancel;
    //
    private Label     _lblDescription;
    private Label     _lblName;
@@ -106,9 +104,9 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
    private Text _txtDescription;
    private Text _txtName;
 
-   private class MapProvider_ContentProvider implements IStructuredContentProvider {
+   private class ContentProvider implements IStructuredContentProvider {
 
-      public MapProvider_ContentProvider() {}
+      public ContentProvider() {}
 
       @Override
       public void dispose() {}
@@ -140,43 +138,18 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
       initUI(parent);
 
-      final Composite container = createUI(parent);
+      final Composite ui = createUI(parent);
 
       // update viewer
-      _allMarkerTypes = createMapProviderClone();
+      _allMarkerTypes = TourDatabase.getAllTourMarkerTypes();
       _markerTypeViewer.setInput(new Object());
 
-      // reselect previous map provider
+      // reselect previous marker type
       restoreState();
 
       enableControls();
 
-      return container;
-   }
-
-   private List<TourMarkerType> createMapProviderClone() {
-
-      /*
-       * Clone original data
-       */
-      final List<TourMarkerType> allClonedMarkerTypes = new ArrayList<>();
-
-      for (final TourMarkerType markerType : TourMarkerTypeManager.getAllTourMarkerTypes()) {
-         allClonedMarkerTypes.add(markerType.clone());
-      }
-
-      /*
-       * Sort by name
-       */
-      Collections.sort(allClonedMarkerTypes, new Comparator<TourMarkerType>() {
-
-         @Override
-         public int compare(final TourMarkerType mp1, final TourMarkerType mp2) {
-            return mp1.name.compareTo(mp2.name);
-         }
-      });
-
-      return allClonedMarkerTypes;
+      return ui;
    }
 
    private Composite createUI(final Composite parent) {
@@ -187,7 +160,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       {
 
          final Label label = new Label(container, SWT.WRAP);
-         label.setText("Tour marker type defines the layout of tour markers.");
+         label.setText("Tour &marker type defines the layout of tour markers");
 
          _uiInnerContainer = new Composite(container, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_uiInnerContainer);
@@ -245,18 +218,18 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       defineAllColumns(tableLayout);
 
       _markerTypeViewer.setUseHashlookup(true);
-      _markerTypeViewer.setContentProvider(new MapProvider_ContentProvider());
+      _markerTypeViewer.setContentProvider(new ContentProvider());
 
       _markerTypeViewer.setComparator(new ViewerComparator() {
          @Override
          public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
-            // compare by name
+            // compare/sort by name
 
             final TourMarkerType p1 = (TourMarkerType) e1;
             final TourMarkerType p2 = (TourMarkerType) e2;
 
-            return p1.name.compareTo(p2.name);
+            return p1.getName().compareTo(p2.getName());
          }
       });
 
@@ -279,30 +252,42 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       {
          {
             /*
-             * Button: Add
+             * Button: Add...
              */
             _btnMarkerType_Add = new Button(container, SWT.NONE);
-            _btnMarkerType_Add.setText(Messages.App_Action_Add);
-            _btnMarkerType_Add.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onProvider_Add(new TourMarkerType())));
+            _btnMarkerType_Add.setText(OtherMessages.APP_ACTION_ADD_WITH_CONFIRM);
+            _btnMarkerType_Add.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onMarkerType_New()));
             setButtonLayoutData(_btnMarkerType_Add);
          }
          {
             /*
-             * Button: Delete
+             * Button: Delete...
              */
             _btnMarkerType_Delete = new Button(container, SWT.NONE);
-            _btnMarkerType_Delete.setText(Messages.App_Action_Delete);
-            _btnMarkerType_Delete.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onProvider_Delete()));
+            _btnMarkerType_Delete.setText(Messages.App_Action_Delete_WithConfirm);
+            _btnMarkerType_Delete.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onMarkerType_Delete()));
             setButtonLayoutData(_btnMarkerType_Delete);
          }
          {
             /*
-             * Button: Copy
+             * Button: Save
              */
-            _btnMarkerType_Copy = new Button(container, SWT.NONE);
-            _btnMarkerType_Copy.setText(Messages.App_Action_Copy);
-            _btnMarkerType_Copy.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onProvider_Copy()));
-            setButtonLayoutData(_btnMarkerType_Copy);
+            _btnSavePerson = new Button(container, SWT.NONE);
+            _btnSavePerson.setText(Messages.App_Action_Save);
+            _btnSavePerson.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onMarkerType_Save()));
+            setButtonLayoutData(_btnSavePerson);
+            final GridData gd = (GridData) _btnSavePerson.getLayoutData();
+            gd.verticalAlignment = SWT.BOTTOM;
+            gd.grabExcessVerticalSpace = true;
+         }
+         {
+            /*
+             * Button: Cancel
+             */
+            _btnCancel = new Button(container, SWT.NONE);
+            _btnCancel.setText(Messages.App_Action_Cancel);
+            _btnCancel.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onMarkerType_Cancel()));
+            setButtonLayoutData(_btnCancel);
          }
       }
    }
@@ -319,7 +304,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
              * Field: Marker type name
              */
             _lblName = new Label(container, SWT.NONE);
-            _lblName.setText("&Name");
+            _lblName.setText("Na&me");
             _firstColumnControls.add(_lblName);
 
             _txtName = new Text(container, SWT.BORDER);
@@ -333,7 +318,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
              * Field: Marker type description
              */
             _lblDescription = new Label(container, SWT.NONE);
-            _lblDescription.setText("Description");
+            _lblDescription.setText("Descri&ption");
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblDescription);
             _firstColumnControls.add(_lblDescription);
 
@@ -362,7 +347,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
             _btnMarkerType_Update = new Button(container, SWT.NONE);
             // !!! set initially the longest text that the layout is properly !!!
             _btnMarkerType_Update.setText(Messages.App_Action_UpdateNew);
-            _btnMarkerType_Update.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onProviderDetail_Update()));
+            _btnMarkerType_Update.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onMarkerTypeDetail_Update()));
             setButtonLayoutData(_btnMarkerType_Update);
          }
          {
@@ -371,7 +356,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
              */
             _btnMarkerTypeDetail_Cancel = new Button(container, SWT.NONE);
             _btnMarkerTypeDetail_Cancel.setText(Messages.App_Action_Cancel);
-            _btnMarkerTypeDetail_Cancel.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onProviderDetail_Cancel()));
+            _btnMarkerTypeDetail_Cancel.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onMarkerTypeDetail_Cancel()));
             setButtonLayoutData(_btnMarkerTypeDetail_Cancel);
          }
       }
@@ -394,7 +379,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
-               cell.setText(((TourMarkerType) cell.getElement()).name);
+               cell.setText(((TourMarkerType) cell.getElement()).getName());
             }
          });
          tableLayout.setColumnData(tc, new ColumnWeightData(5, minWidth));
@@ -417,111 +402,17 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
    public void init(final IWorkbench workbench) {
 
       noDefaultAndApplyButton();
-
-      _defaultModifyListener = modifyEvent -> onProvider_Modify(modifyEvent.widget);
-      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onProvider_Modify(selectionEvent.item));
    }
 
    private void initUI(final Composite parent) {
 
+      _defaultModifyListener = modifyEvent -> onMarkerType_Modify(modifyEvent.widget);
+      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onMarkerType_Modify(selectionEvent.item));
    }
 
    private boolean isDataValid() {
-
-//      if (getSelectedEncoding().__isOffline) {
-//
-//         // validate offline map
-//
-//         final String mapFilePathname = _txtOffline_MapFilepath.getText().trim();
-//         final String themeFilePathname = _txtOffline_ThemeFilepath.getText().trim();
-//
-//         final Path mapFilePath = NIO.getPath(mapFilePathname);
-//         final Path themeFilePath = NIO.getPath(themeFilePathname);
-//
-//         if (StringUtils.isNullOrEmpty(mapFilePathname)) {
-//
-//            setErrorMessage(Messages.Pref_Map25_Provider_Error_MapFilename_IsRequired);
-//            return false;
-//
-//         } else if (mapFilePath == null || Files.exists(mapFilePath) == false) {
-//
-//            final String fileErrorText = mapFilePath == null ? UI.NULL : mapFilePath.toString();
-//
-//            setErrorMessage(Messages.Pref_Map25_Provider_Error_MapFilename_IsNotValid + UI.SPACE + fileErrorText);
-//            return false;
-//
-//         } else if (StringUtils.isNullOrEmpty(themeFilePathname)) {
-//
-//            setErrorMessage(Messages.Pref_Map25_Provider_Error_ThemeFilename_IsRequired);
-//            return false;
-//
-//         } else if (themeFilePath == null || Files.exists(themeFilePath) == false) {
-//
-//            final String fileErrorText = themeFilePath == null ? UI.NULL : themeFilePath.toString();
-//
-//            setErrorMessage(Messages.Pref_Map25_Provider_Error_ThemeFilename_IsNotValid + UI.SPACE + fileErrorText);
-//            return false;
-//         }
-//
-//      } else {
-//
-//         // validate online map
-//
-//         if (StringUtils.isNullOrEmpty(_txtProviderName.getText().trim())) {
-//
-//            setErrorMessage(Messages.Pref_Map25_Provider_Error_ProviderNameIsRequired);
-//            return false;
-//
-//         } else if (StringUtils.isNullOrEmpty(_txtOnline_Url.getText().trim())) {
-//
-//            setErrorMessage(Messages.Pref_Map25_Provider_Error_UrlIsRequired);
-//            return false;
-//
-//         } else if (StringUtils.isNullOrEmpty(_txtOnline_TilePath.getText().trim())) {
-//
-//            setErrorMessage(Messages.Pref_Map25_Provider_Error_TilePathIsRequired);
-//            return false;
-//         }
-//      }
-//
-//      /*
-//       * Check that at least 1 map provider is enabled
-//       */
-//      final boolean isCurrentEnabled = _chkIsMapProviderEnabled.getSelection();
-//      int numEnabledOtherMapProviders = 0;
-//
-//      for (final Map25Provider map25Provider : _allMapProvider) {
-//
-//         if (map25Provider.isEnabled && map25Provider != _selectedMapProvider) {
-//            numEnabledOtherMapProviders++;
-//         }
-//      }
-//
-//      if (isCurrentEnabled || numEnabledOtherMapProviders > 0) {
-//
-//         // one map provider is enabled
-//
-//         setErrorMessage(null);
-//         return true;
-//
-//      } else {
-//
-//         setErrorMessage(Messages.Pref_Map25_Provider_Error_EnableMapProvider);
-//         return false;
-//      }
-
-      return true;
-   }
-
-   private boolean isSaveMapProvider() {
-
-      return (MessageDialog.openQuestion(getShell(),
-            Messages.Pref_Map25_Provider_Dialog_SaveModifiedProvider_Title,
-            NLS.bind(
-                  Messages.Pref_Map25_Provider_Dialog_SaveModifiedProvider_Message,
-
-                  // use name from the ui because it could be modified
-                  _txtName.getText())) == false);
+      // TODO Auto-generated method stub
+      return false;
    }
 
    @Override
@@ -530,7 +421,6 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       if (_isMarkerTypeModified && validateData()) {
 
          updateModelAndUI(true);
-         saveMapProviders(true);
       }
 
       saveState();
@@ -538,86 +428,16 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       return super.okToLeave();
    }
 
-   private void onProvider_Add(final TourMarkerType markerType) {
-
-      _newMarkerType = markerType;
-
-//      _newProvider.isEnabled = true;
-
-      _isModified = true;
-      _isMarkerTypeModified = true;
-
-      updateUI_FromMarkerType(_newMarkerType);
-      enableControls();
-
-      // edit name
-      _txtName.setFocus();
+   private void onMarkerType_Cancel() {
+      // TODO Auto-generated method stub
    }
 
-   private void onProvider_Copy() {
-
-      final TourMarkerType clonedMapProvider = _selectedMarkerType.clone();
-
-//      // make the clone unique
-//      clonedMapProvider.setUUID();
-//
-//      // set a unique name
-//      clonedMapProvider.name = clonedMapProvider.getId().substring(0, 4) + UI.DASH_WITH_DOUBLE_SPACE + _selectedMapProvider.name;
-
-      onProvider_Add(clonedMapProvider);
-   }
-
-   private void onProvider_Delete() {
-
-//    Title:     Delete Map Provider
-//    Message:   Are you sure to delete the map provider "{0}" and all it's offline images?
-
-//      if (MessageDialog.openConfirm(
-//            getShell(),
-//            Messages.Pref_Map25_Provider_Dialog_ConfirmDeleteMapProvider_Title,
-//            NLS.bind(
-//                  Messages.Pref_Map25_Provider_Dialog_ConfirmDeleteMapProvider_Message,
-//                  _selectedMapProvider.name)) == false) {
-//         return;
-//      }
-//
-//      _isModified = true;
-//      _isMarkerTypeModified = false;
-//
-//      // get map provider which will be selected when the current will be removed
-//      final int selectionIndex = _mapProviderViewer.getTable().getSelectionIndex();
-//      Object nextSelectedMapProvider = _mapProviderViewer.getElementAt(selectionIndex + 1);
-//      if (nextSelectedMapProvider == null) {
-//         nextSelectedMapProvider = _mapProviderViewer.getElementAt(selectionIndex - 1);
-//      }
-//
-//      // delete offline files
-//      deleteOfflineMapFiles(_selectedMapProvider);
-//
-//      // remove from model
-//      _allMarkerTypes.remove(_selectedMapProvider);
-//
-//      // remove from viewer
-//      _mapProviderViewer.remove(_selectedMapProvider);
-//
-//      if (nextSelectedMapProvider == null) {
-//
-//         _selectedMapProvider = null;
-//
-//         updateUI_FromProvider(_selectedMapProvider);
-//
-//      } else {
-//
-//         // select another map provider at the same position
-//
-//         _mapProviderViewer.setSelection(new StructuredSelection(nextSelectedMapProvider));
-//         _mapProviderViewer.getTable().setFocus();
-//      }
+   private void onMarkerType_Delete() {
 
       enableControls();
    }
 
-   private void onProvider_Modify(final Widget widget) {
+   private void onMarkerType_Modify(final Widget widget) {
 
       if (_isInUpdateUI) {
          return;
@@ -633,7 +453,25 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       enableControls();
    }
 
-   private void onProviderDetail_Cancel() {
+   private void onMarkerType_New() {
+
+      _newMarkerType = markerType;
+
+      _isModified = true;
+      _isMarkerTypeModified = true;
+
+      updateUI_FromMarkerType(_newMarkerType);
+      enableControls();
+
+      // edit name
+      _txtName.setFocus();
+   }
+
+   private void onMarkerType_Save() {
+      // TODO Auto-generated method stub
+   }
+
+   private void onMarkerTypeDetail_Cancel() {
 
       _newMarkerType = null;
       _isMarkerTypeModified = false;
@@ -644,7 +482,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       _markerTypeViewer.getTable().setFocus();
    }
 
-   private void onProviderDetail_Update() {
+   private void onMarkerTypeDetail_Update() {
 
       final boolean isValid = validateData();
 
@@ -674,11 +512,12 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
          updateUI_FromMarkerType(_selectedMarkerType);
 
       } else {
+
          // irgnore, this can happen when a refresh() of the table viewer is done
       }
 
       // show error message when selected map provider is not valid
-//      isDataValid();
+      isDataValid();
 
       enableControls();
    }
@@ -695,7 +534,6 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
    public boolean performOk() {
 
       updateModelAndUI(false);
-      saveMapProviders(false);
 
       saveState();
 
@@ -712,40 +550,19 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       selectMarkerType(lastMarkerType);
    }
 
-   /**
-    * @param isAskToSave
-    *
-    * @return Returns <code>false</code> when map provider is not saved.
-    */
-   private void saveMapProviders(final boolean isAskToSave) {
+   private TourMarkerType saveMarkerType(final TourMarkerType tourMarkerType) {
 
-      if (_isModified == false) {
-
-         // nothing is to save
-         return;
-      }
-
-      boolean isSaveIt = true;
-
-      if (isAskToSave) {
-         isSaveIt = isSaveMapProvider();
-      }
-
-      if (isSaveIt) {
-
-//         Map25ProviderManager.saveMapProvider_WithNewModel(_allMarkerTypes);
-//
-//         checkMapProvider();
-
-         _isModified = false;
-      }
+      return TourDatabase.saveEntity(
+            tourMarkerType,
+            tourMarkerType.getId(),
+            TourMarkerType.class);
    }
 
    private void saveState() {
 
       if (_selectedMarkerType != null) {
 
-         _state.put(STATE_LAST_SELECTED_MARKER_TYPE, _selectedMarkerType.id);
+         _state.put(STATE_LAST_SELECTED_MARKER_TYPE, _selectedMarkerType.getId());
       }
    }
 
@@ -755,7 +572,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
       for (final TourMarkerType mapProvider : _allMarkerTypes) {
 
-         if (mapProvider.id == lastMarkerTypeId) {
+         if (mapProvider.getId() == lastMarkerTypeId) {
 
             lastMarkerType = mapProvider;
             break;
@@ -763,14 +580,21 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       }
 
       if (lastMarkerType != null) {
+
          _markerTypeViewer.setSelection(new StructuredSelection(lastMarkerType));
+
       } else if (_allMarkerTypes.size() > 0) {
+
+         // select first marker type
+
          _markerTypeViewer.setSelection(new StructuredSelection(_allMarkerTypes.get(0)));
+
       } else {
+
          // nothing can be selected
       }
 
-      // set focus to selected map provider
+      // set focus to selected marker type
       final Table table = _markerTypeViewer.getTable();
       table.setSelection(table.getSelectionIndex());
    }
@@ -815,8 +639,8 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
     */
    private void updateModelData(final TourMarkerType markerType) {
 
-      markerType.name = _txtName.getText();
-      markerType.description = _txtDescription.getText();
+      markerType.setName(_txtName.getText());
+      markerType.setDescription(_txtDescription.getText());
 
    }
 
@@ -831,8 +655,8 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
          } else {
 
-            _txtDescription.setText(markerType.description);
-            _txtName.setText(markerType.name);
+            _txtDescription.setText(markerType.getDescription());
+            _txtName.setText(markerType.getName());
 
          }
       }

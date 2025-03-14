@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<persistence xmlns="http://java.sun.com/xml/ns/persistence"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
-             version="1.0">
+<persistence xmlns               ="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi           ="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation  ="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+             version             ="1.0">
 
    <persistence-unit name="tourdatabase" transaction-type="RESOURCE_LOCAL">
 
@@ -16,6 +16,7 @@
       <class>net.tourbook.data.TourData</class>
       <class>net.tourbook.data.TourLocation</class>
       <class>net.tourbook.data.TourMarker</class>
+      <class>net.tourbook.data.TourMarkerType</class>
       <class>net.tourbook.data.TourNutritionProduct</class>
       <class>net.tourbook.data.TourPerson</class>
       <class>net.tourbook.data.TourPersonHRZone</class>
@@ -27,14 +28,14 @@
       <class>net.tourbook.data.TourWayPoint</class>
 
       <properties>
-         <property name="hibernate.connection.url" value="jdbc:derby://localhost:1527/tourbook;create=true"/>
-         <property name="hibernate.dialect" value="org.hibernate.dialect.DerbyDialect"/>
+         <property name="hibernate.connection.url"          value="jdbc:derby://localhost:1527/tourbook;create=true"/>
+         <property name="hibernate.dialect"                 value="org.hibernate.dialect.DerbyDialect"/>
          <property name="hibernate.connection.driver_class" value="org.apache.derby.jdbc.ClientDriver"/>
 
-         <property name="hibernate.connection.password" value="adsf"/>
-         <property name="hibernate.connection.username" value="User"/>
+         <property name="hibernate.connection.password"     value="adsf"/>
+         <property name="hibernate.connection.username"     value="User"/>
 
-         <property name="hibernate.archive.autodetection" value="none"/>
+         <property name="hibernate.archive.autodetection"   value="none"/>
 
       </properties>
 
