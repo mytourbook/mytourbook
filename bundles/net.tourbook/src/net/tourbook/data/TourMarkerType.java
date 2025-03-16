@@ -31,6 +31,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.database.TourDatabase;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
 @Entity
@@ -59,8 +60,15 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
 
    private String                     description;
 
-   private int                        foregroundColor;
-   private int                        backgroundColor;
+   /**
+    * Foreground color value
+    */
+   private int                        foregroundColor       = 0x0;
+
+   /**
+    * Background color value
+    */
+   private int                        backgroundColor       = 0xffffff;
 
    /**
     * Unique id for manually created tour marker types because the {@link #markerTypeID} is -1 when
@@ -70,10 +78,16 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
    private long                       _createId             = 0;
 
    @Transient
-   private RGB                        _rgbForeground;
+   private RGB                        _foregroundRGB;
 
    @Transient
-   private RGB                        _rgbBackground;
+   private RGB                        _backgroundRGB;
+
+   @Transient
+   private Color                      _foregroundColor;
+
+   @Transient
+   private Color                      _backgroundColor;
 
    /**
     * Default constructor used in ejb
@@ -136,17 +150,28 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
       return true;
    }
 
-   public RGB getBackgroundColor() {
+   public Color getBackgroundColor() {
 
-      if (_rgbBackground == null) {
+      if (_backgroundColor == null) {
 
-         _rgbBackground = ColorUtil.createRGB(backgroundColor);
+         _backgroundColor = ColorUtil.getColor(backgroundColor);
       }
 
-      return _rgbBackground;
+      return _backgroundColor;
+   }
+
+   public RGB getBackgroundRGB() {
+
+      if (_backgroundRGB == null) {
+
+         _backgroundRGB = ColorUtil.createRGB(backgroundColor);
+      }
+
+      return _backgroundRGB;
    }
 
    public long getCreateId() {
+
       return _createId;
    }
 
@@ -155,14 +180,24 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
       return description == null ? UI.EMPTY_STRING : description;
    }
 
-   public RGB getForegroundColor() {
+   public Color getForegroundColor() {
 
-      if (_rgbForeground == null) {
+      if (_foregroundColor == null) {
 
-         _rgbForeground = ColorUtil.createRGB(foregroundColor);
+         _foregroundColor = ColorUtil.getColor(foregroundColor);
       }
 
-      return _rgbForeground;
+      return _foregroundColor;
+   }
+
+   public RGB getForegroundRGB() {
+
+      if (_foregroundRGB == null) {
+
+         _foregroundRGB = ColorUtil.createRGB(foregroundColor);
+      }
+
+      return _foregroundRGB;
    }
 
    /**
@@ -170,6 +205,7 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
     *         {@link TourDatabase#ENTITY_IS_NOT_SAVED}
     */
    public long getId() {
+
       return markerTypeID;
    }
 
@@ -183,15 +219,35 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
 
    @Override
    public int hashCode() {
+
       final int prime = 31;
       int result = 1;
+
       result = prime * result + (int) (_createId ^ (_createId >>> 32));
       result = prime * result + (int) (markerTypeID ^ (markerTypeID >>> 32));
+
       return result;
    }
 
+   public void setBackgroundColor(final RGB colorRGB) {
+
+      backgroundColor = ColorUtil.getColorValue(colorRGB);
+
+      _backgroundRGB = colorRGB;
+      _backgroundColor = new Color(colorRGB);
+   }
+
    public void setDescription(final String description) {
+
       this.description = description;
+   }
+
+   public void setForegroundColor(final RGB colorRGB) {
+
+      foregroundColor = ColorUtil.getColorValue(colorRGB);
+
+      _foregroundRGB = colorRGB;
+      _foregroundColor = new Color(colorRGB);
    }
 
    public void setName(final String name) {
@@ -206,7 +262,7 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
             + "TourMarkerType" + NL //                   //$NON-NLS-1$
             + " markerTypeID = " + markerTypeID + NL //  //$NON-NLS-1$
             + " name         = " + name + NL //          //$NON-NLS-1$
-            + NL
+
 
       ;
    }

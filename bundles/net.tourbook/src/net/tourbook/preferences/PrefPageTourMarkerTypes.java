@@ -17,22 +17,18 @@ package net.tourbook.preferences;
 
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
-
 import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarkerType;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tourMarker.TourMarkerTypeManager;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -83,8 +79,8 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
    private List<TourMarkerType>          _allMarkerTypes;
    //
    private ModifyListener                _defaultModifyListener;
-   private SelectionListener             _defaultSelectionListener;
    private IPropertyChangeListener       _prefChangeListener;
+   private IPropertyChangeListener       _colorModifyListener;
    //
    private TourMarkerType                _newMarkerType;
    private TourMarkerType                _selectedMarkerType;
@@ -104,21 +100,20 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
     * UI Controls
     */
    //
+   private Button                _btnMarkerType_Add;
+   private Button                _btnMarkerType_Delete;
+   private Button                _btnMarkerType_Save;
+   private Button                _btnMarkerType_Cancel;
    //
-   private Button _btnMarkerType_Add;
-   private Button _btnMarkerType_Copy;
-   private Button _btnMarkerType_Delete;
-   private Button _btnMarkerType_Update;
-   private Button _btnMarkerTypeDetail_Cancel;
-   private Button _btnMarkerType_Save;
-   private Button _btnMarkerType_Cancel;
+   private Label                 _lblColoredName;
+   private Label                 _lblDescription;
+   private Label                 _lblName;
    //
-   private Label  _lblDescription;
-   private Label  _lblName;
-
+   private Text                  _txtDescription;
+   private Text                  _txtName;
    //
-   private Text _txtDescription;
-   private Text _txtName;
+   private ColorSelectorExtended _colorSelector_Foreground;
+   private ColorSelectorExtended _colorSelector_Background;
 
    private class ContentProvider implements IStructuredContentProvider {
 
@@ -134,25 +129,6 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
       @Override
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
-   }
-
-   private void addPrefListener() {
-
-      _prefChangeListener = propertyChangeEvent -> {
-
-         final String property = propertyChangeEvent.getProperty();
-
-         /*
-          * set a new chart configuration when the preferences has changed
-          */
-//         if (property.equals(ITourbookPreferences.HR_ZONES_ARE_MODIFIED)) {
-//
-//            onEditHrZonesIsOK(getCurrentPerson());
-//            performOK10();
-//         }
-      };
-
-      _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
    @Override
@@ -189,7 +165,6 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       restoreState();
 
       enableControls();
-      addPrefListener();
 
       return container;
    }
@@ -202,7 +177,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       {
 
          final Label label = new Label(prefPageContainer, SWT.WRAP);
-         label.setText("The tour &marker type defines the layout of tour markers");
+         label.setText("The tour marker t&ype defines the layout of tour markers");
 
          final Composite innerContainer = new Composite(prefPageContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, true).applyTo(innerContainer);
@@ -278,11 +253,11 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
       _markerTypeViewer.addSelectionChangedListener(selectionChangedEvent -> onSelectMarkerType());
 
-//      _markerTypeViewer.addDoubleClickListener(doubleClickEvent -> {
-//         _tabFolderPerson.setSelection(0);
-//         _txtFirstName.setFocus();
-//         _txtFirstName.selectAll();
-//      });
+      _markerTypeViewer.addDoubleClickListener(doubleClickEvent -> {
+
+         _txtName.setFocus();
+         _txtName.selectAll();
+      });
 
    }
 
@@ -338,13 +313,15 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
    private void createUI_30_MarkerType_Details(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.swtDefaults().numColumns(2).extendedMargins(0, 0, 7, 0).applyTo(container);
+      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
+      GridLayoutFactory.swtDefaults()
+            .numColumns(2)
+            .applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_GREEN);
       {
          {
             /*
-             * Field: Marker type name
+             * Marker type name
              */
             _lblName = new Label(container, SWT.NONE);
             _lblName.setText("Na&me");
@@ -357,7 +334,35 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
          }
          {
             /*
-             * Field: Marker type description
+             * Color
+             */
+            final Label label = new Label(container, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(label);
+            label.setText("C&olor");
+
+            final Composite colorContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(colorContainer);
+            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(colorContainer);
+            {
+
+               _colorSelector_Foreground = new ColorSelectorExtended(colorContainer);
+               _colorSelector_Foreground.addListener(_colorModifyListener);
+               setButtonLayoutData(_colorSelector_Foreground.getButton());
+
+               _colorSelector_Background = new ColorSelectorExtended(colorContainer);
+               _colorSelector_Background.addListener(_colorModifyListener);
+               setButtonLayoutData(_colorSelector_Background.getButton());
+
+               _lblColoredName = new Label(colorContainer, SWT.None);
+               GridDataFactory.fillDefaults()
+                     .grab(true, false)
+                     .align(SWT.FILL, SWT.CENTER)
+                     .applyTo(_lblColoredName);
+            }
+         }
+         {
+            /*
+             * Marker type description
              */
             _lblDescription = new Label(container, SWT.NONE);
             _lblDescription.setText("Descri&ption");
@@ -366,7 +371,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
             _txtDescription = new Text(container, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
             _txtDescription.addModifyListener(_defaultModifyListener);
             GridDataFactory.fillDefaults()
-                  .hint(convertWidthInCharsToPixels(20), convertHeightInCharsToPixels(4))
+                  .hint(convertWidthInCharsToPixels(20), convertHeightInCharsToPixels(6))
                   .grab(true, false)
                   .applyTo(_txtDescription);
          }
@@ -377,8 +382,8 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
       final int minWidth = convertWidthInCharsToPixels(5);
 
-      TableViewerColumn tvc;
       TableColumn tc;
+      TableViewerColumn tvc;
 
       {
          /*
@@ -393,110 +398,28 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
                cell.setText(((TourMarkerType) cell.getElement()).getName());
             }
          });
-         tableLayout.setColumnData(tc, new ColumnWeightData(5, minWidth));
+         tableLayout.setColumnData(tc, new ColumnWeightData(10, minWidth));
       }
-   }
+      {
+         /*
+          * Column: Color
+          */
+         tvc = new TableViewerColumn(_markerTypeViewer, SWT.LEAD);
+         tc = tvc.getColumn();
+         tc.setText("Color");
+         tvc.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
 
-   private boolean deleteTourMarkerType(final TourMarkerType selectedMarkerType) {
+               final TourMarkerType markerType = (TourMarkerType) cell.getElement();
 
-      if (deleteTourMarkerType_10_FromAllTourMarkers(selectedMarkerType)) {
-
-         if (deleteTourMarkerType_20_FromDB(selectedMarkerType)) {
-            return true;
-         }
-      }
-
-      return false;
-   }
-
-   private boolean deleteTourMarkerType_10_FromAllTourMarkers(final TourMarkerType selectedMarkerType) {
-
-      boolean returnResult = false;
-
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-      if (em != null) {
-
-         final Query query = em.createQuery(UI.EMPTY_STRING
-
-               + "SELECT TourMarker" //$NON-NLS-1$
-               + " FROM  TourMarker AS TourMarker" //$NON-NLS-1$
-               + " WHERE TourMarker.tourMarkerType.markerTypeID = " + selectedMarkerType.getId()); //$NON-NLS-1$
-
-         final List<?> allTourMarker = query.getResultList();
-         if (allTourMarker.size() > 0) {
-
-            final EntityTransaction ts = em.getTransaction();
-
-            try {
-
-               ts.begin();
-
-               // remove tour marker type from all tour markers
-               for (final Object listItem : allTourMarker) {
-
-                  if (listItem instanceof TourData) {
-
-                     final TourData tourData = (TourData) listItem;
-
-                     tourData.setTourType(null);
-                     em.merge(tourData);
-                  }
-               }
-
-               ts.commit();
-
-            } catch (final Exception e) {
-
-               StatusUtil.showStatus(e);
-
-            } finally {
-
-               if (ts.isActive()) {
-                  ts.rollback();
-               }
+               cell.setForeground(markerType.getForegroundColor());
+               cell.setBackground(markerType.getBackgroundColor());
+               cell.setText(markerType.getName());
             }
-         }
-
-         returnResult = true;
-         em.close();
+         });
+         tableLayout.setColumnData(tc, new ColumnWeightData(10, minWidth));
       }
-
-      return returnResult;
-   }
-
-   private boolean deleteTourMarkerType_20_FromDB(final TourMarkerType markerType) {
-
-      boolean returnResult = false;
-
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
-      final EntityTransaction ts = em.getTransaction();
-
-      try {
-
-         final TourMarkerType tourTypeEntity = em.find(TourMarkerType.class, markerType.getId());
-
-         if (tourTypeEntity != null) {
-
-            ts.begin();
-
-            em.remove(tourTypeEntity);
-
-            ts.commit();
-         }
-
-      } catch (final Exception e) {
-         StatusUtil.showStatus(e);
-      } finally {
-         if (ts.isActive()) {
-            ts.rollback();
-         } else {
-            returnResult = true;
-         }
-         em.close();
-      }
-
-      return returnResult;
    }
 
    @Override
@@ -569,9 +492,8 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
       initializeDialogUnits(parent);
 
-      _defaultSelectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> onModifyPerson());
-
-      _defaultModifyListener = modifyEvent -> onModifyPerson();
+      _defaultModifyListener = modifyEvent -> onMarkerType_Modify();
+      _colorModifyListener = propertyChangeEvent -> onMarkerType_Modify();
    }
 
    /**
@@ -648,6 +570,8 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
    private void onMarkerType_Delete() {
 
+      final int numTourMarkers = TourMarkerTypeManager.countTourMarkers(_selectedMarkerType.getId());
+
       // confirm deletion
       final MessageDialog dialog = new MessageDialog(
 
@@ -656,8 +580,9 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
             "Delete Tour Marker Types",
             null,
 
-            "Are you sure you want to delete the tour marker type \"%s\" and reset the tour marker type in ALL related tour markers?".formatted(
-                  _selectedMarkerType.getName()),
+            "Are you sure you want to delete the tour marker type \"%s\" and remove it in %d tour markers?".formatted(
+                  _selectedMarkerType.getName(),
+                  numTourMarkers),
 
             MessageDialog.QUESTION,
 
@@ -673,7 +598,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       BusyIndicator.showWhile(getShell().getDisplay(), () -> {
 
          // remove entity from the db
-         if (deleteTourMarkerType(_selectedMarkerType)) {
+         if (TourMarkerTypeManager.deleteTourMarkerType(_selectedMarkerType)) {
 
             reloadMarkerTypes();
 
@@ -689,6 +614,24 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
    }
 
+   /**
+    * set person modified and enable actions accordingly
+    */
+   private void onMarkerType_Modify() {
+
+      if (_isInUpdateUI) {
+         return;
+      }
+
+      _isModified = true;
+
+      updateUI_ColoredName();
+
+      _lblColoredName.getParent().layout(true, true);
+
+      enableControls();
+   }
+
    private void onMarkerType_Save() {
 
       if (isMarkerTypeValid() == false) {
@@ -699,20 +642,6 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       enableControls();
 
       setFocusToViewer();
-   }
-
-   /**
-    * set person modified and enable actions accordingly
-    */
-   private void onModifyPerson() {
-
-      if (_isInUpdateUI) {
-         return;
-      }
-
-      _isModified = true;
-
-      enableControls();
    }
 
    private void onSelectMarkerType() {
@@ -788,6 +717,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
    private void reloadMarkerTypes() {
 
       TourDatabase.clearTourMarkerTypes();
+      TourManager.getInstance().clearTourDataCache();
 
       _allMarkerTypes = TourDatabase.getAllTourMarkerTypes();
 
@@ -802,6 +732,9 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       final int lastMarkerType = Util.getStateInt(_state, STATE_LAST_SELECTED_MARKER_TYPE, -1);
 
       selectMarkerType(lastMarkerType);
+
+      // reupdate otherwise the colors are not set when the pre dialog is opened
+      _lblColoredName.getDisplay().asyncExec(() -> updateUI_ColoredName());
    }
 
    /**
@@ -917,6 +850,16 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
       markerType.setName(_txtName.getText());
       markerType.setDescription(_txtDescription.getText());
+      markerType.setForegroundColor(_colorSelector_Foreground.getColorValue());
+      markerType.setBackgroundColor(_colorSelector_Background.getColorValue());
+   }
+
+   private void updateUI_ColoredName() {
+
+      _lblColoredName.setForeground(_colorSelector_Foreground.getColor());
+      _lblColoredName.setBackground(_colorSelector_Background.getColor());
+
+      _lblColoredName.setText(UI.SPACE1 + _txtName.getText());
    }
 
    private void updateUIFromModel(final TourMarkerType markerType) {
@@ -929,6 +872,11 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       {
          _txtDescription.setText(markerType.getDescription());
          _txtName.setText(markerType.getName());
+
+         _colorSelector_Foreground.setColorValue(markerType.getForegroundRGB());
+         _colorSelector_Background.setColorValue(markerType.getBackgroundRGB());
+
+         updateUI_ColoredName();
       }
       _isInUpdateUI = false;
    }

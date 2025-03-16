@@ -264,7 +264,7 @@ public class TourDatabase {
    public  static final String KEY_BEVERAGE_CONTAINER       = TABLE_TOUR_BEVERAGE_CONTAINER  + "_" + ENTITY_ID_BEVERAGECONTAINER;   //$NON-NLS-1$
    private static final String KEY_BIKE                     = TABLE_TOUR_BIKE                + "_" + ENTITY_ID_BIKE;                //$NON-NLS-1$
    private static final String KEY_DEVICE_SENSOR            = TABLE_DEVICE_SENSOR            + "_" + ENTITY_ID_DEVICE_SENSOR;       //$NON-NLS-1$
-   private static final String KEY_MARKER_TYPE              = TABLE_TOUR_MARKER_TYPE         + "_" + ENTITY_ID_MARKER_TYPE;                //$NON-NLS-1$
+   public static final String  KEY_MARKER_TYPE              = TABLE_TOUR_MARKER_TYPE         + "_" + ENTITY_ID_MARKER_TYPE;                //$NON-NLS-1$
    private static final String KEY_PERSON                   = TABLE_TOUR_PERSON              + "_" + ENTITY_ID_PERSON;              //$NON-NLS-1$
    public static final String  KEY_TAG                      = TABLE_TOUR_TAG                 + "_" + ENTITY_ID_TAG;                 //$NON-NLS-1$
    private static final String KEY_TAG_CATEGORY             = TABLE_TOUR_TAG_CATEGORY        + "_" + ENTITY_ID_TAG_CATEGORY;        //$NON-NLS-1$
@@ -2785,7 +2785,10 @@ public class TourDatabase {
             final Query emQuery = em.createQuery(UI.EMPTY_STRING
 
                   + "SELECT TourMarkerType" + NL //                     //$NON-NLS-1$
+
                   + " FROM TourMarkerType AS TourMarkerType" + NL //    //$NON-NLS-1$
+
+                  // sort by name
                   + " ORDER  BY TourMarkerType.name" + NL //            //$NON-NLS-1$
             );
 

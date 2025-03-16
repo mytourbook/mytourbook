@@ -38,6 +38,7 @@ import net.tourbook.common.util.StreamUtils;
 import net.tourbook.data.FlatGainLoss;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourMarkerType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ActionDeleteMarkerDialog;
@@ -732,10 +733,18 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
          public void update(final ViewerCell cell) {
 
             final TourMarker marker = (TourMarker) cell.getElement();
+            final TourMarkerType markerType = marker.getTourMarkerType();
 
-            final long markerType = marker.getMarkerType();
+            if (markerType == null) {
 
-            cell.setText(Long.toString(markerType));
+               cell.setText(UI.EMPTY_STRING);
+
+            } else {
+
+               cell.setForeground(markerType.getForegroundColor());
+               cell.setBackground(markerType.getBackgroundColor());
+               cell.setText(markerType.getName());
+            }
          }
       });
    }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -632,6 +632,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
       return tourData;
    }
 
+   public TourMarkerType getTourMarkerType() {
+      return tourMarkerType;
+   }
+
    /**
     * @return Returns the absolute time in ms since 1970-01-01T00:00:00Z or {@link Long#MIN_VALUE}
     *         when value is not set.
@@ -1008,6 +1012,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
       this.tourData = newTourData;
    }
 
+   public void setTourMarkerType(final TourMarkerType tourMarkerType) {
+      this.tourMarkerType = tourMarkerType;
+   }
+
    /**
     * Used for MT import/export
     *
@@ -1070,37 +1078,39 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
             + "TourMarker" + NL //                                //$NON-NLS-1$
             + "[" + NL //                                         //$NON-NLS-1$
 
-            + "   markerId          =" + markerId + NL //         //$NON-NLS-1$
+            + "   markerId          = " + markerId + NL //        //$NON-NLS-1$
 
-            + "   label             =" + label + NL //            //$NON-NLS-1$
-            + "   altitude          =" + altitude + NL //         //$NON-NLS-1$
-            + "   distance20        =" + distance20 + NL //       //$NON-NLS-1$
+            + "   label             = " + label + NL //           //$NON-NLS-1$
+            + "   altitude          = " + altitude + NL //        //$NON-NLS-1$
+            + "   distance20        = " + distance20 + NL //      //$NON-NLS-1$
 
-            + "   latitude          =" + latitude + NL //         //$NON-NLS-1$
-            + "   longitude         =" + longitude + NL //        //$NON-NLS-1$
+            + "   latitude          = " + latitude + NL //        //$NON-NLS-1$
+            + "   longitude         = " + longitude + NL //       //$NON-NLS-1$
 
-            + "   labelXOffset      =" + labelXOffset + NL //     //$NON-NLS-1$
-            + "   labelYOffset      =" + labelYOffset + NL //     //$NON-NLS-1$
-            + "   serieIndex        =" + serieIndex + NL //       //$NON-NLS-1$
-            + "   time              =" + time + NL //             //$NON-NLS-1$
-            + "   tourTime          =" + tourTime + NL //         //$NON-NLS-1$
+            + "   labelXOffset      = " + labelXOffset + NL //    //$NON-NLS-1$
+            + "   labelYOffset      = " + labelYOffset + NL //    //$NON-NLS-1$
+            + "   serieIndex        = " + serieIndex + NL //      //$NON-NLS-1$
+            + "   time              = " + time + NL //            //$NON-NLS-1$
+            + "   tourTime          = " + tourTime + NL //        //$NON-NLS-1$
 
-            + "   type              =" + type + NL //$NON-NLS-1$
-            + "   visualPosition    =" + visualPosition + NL //   //$NON-NLS-1$
-            + "   isMarkerVisible   =" + isMarkerVisible + NL //  //$NON-NLS-1$
+            + "   type              = " + type + NL //            //$NON-NLS-1$
+            + "   visualPosition    = " + visualPosition + NL //  //$NON-NLS-1$
+            + "   isMarkerVisible   = " + isMarkerVisible + NL // //$NON-NLS-1$
 
-            + "   urlAddress        =" + urlAddress + NL //       //$NON-NLS-1$
-            + "   urlText           =" + urlText + NL //          //$NON-NLS-1$
-            + "   description       =" + description + NL //      //$NON-NLS-1$
+            + "   urlAddress        = " + urlAddress + NL //      //$NON-NLS-1$
+            + "   urlText           = " + urlText + NL //         //$NON-NLS-1$
+            + "   description       = " + description + NL //     //$NON-NLS-1$
 
-            + "   _createId         =" + _createId + NL //        //$NON-NLS-1$
+            + "   _createId         = " + _createId + NL //       //$NON-NLS-1$
 
-//          + "   tourData          =" + tourData + NL
-//          + "   markerType        =" + markerType + NL
-//          + "   distance          =" + distance + NL
-//          + "   category          =" + category + NL
-//          + "   _visibleType      =" + _visibleType + NL
-//          + "   _markerBounds     =" + _markerBounds + NL
+//          + "   tourData          = " + tourData + NL
+//          + "   markerType        = " + markerType + NL
+//          + "   distance          = " + distance + NL
+//          + "   category          = " + category + NL
+//          + "   _visibleType      = " + _visibleType + NL
+//          + "   _markerBounds     = " + _markerBounds + NL
+
+            + "   tourMarkerType    = " + tourMarkerType + NL //  //$NON-NLS-1$
 
             + "]" + NL; //                                        //$NON-NLS-1$
    }
