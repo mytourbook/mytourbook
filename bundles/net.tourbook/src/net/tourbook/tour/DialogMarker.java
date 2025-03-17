@@ -1231,9 +1231,9 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
             } else {
 
-               cell.setForeground(markerType.getForegroundColor());
-               cell.setBackground(markerType.getBackgroundColor());
-               cell.setText(markerType.getName());
+               cell.setForeground(markerType.getForegroundColorSWT());
+               cell.setBackground(markerType.getBackgroundColorSWT());
+               cell.setText(markerType.getTypeName());
             }
          }
       });
@@ -1444,10 +1444,10 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          tableItem = new TableItem(table, SWT.READ_ONLY);
 
          // set the column text
-         tableItem.setText(markerType.getName());
+         tableItem.setText(markerType.getTypeName());
 
-         tableItem.setBackground(markerType.getBackgroundColor());
-         tableItem.setForeground(markerType.getForegroundColor());
+         tableItem.setBackground(markerType.getBackgroundColorSWT());
+         tableItem.setForeground(markerType.getForegroundColorSWT());
       }
    }
 

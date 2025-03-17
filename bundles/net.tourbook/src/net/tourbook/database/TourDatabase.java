@@ -2786,10 +2786,10 @@ public class TourDatabase {
 
                   + "SELECT TourMarkerType" + NL //                     //$NON-NLS-1$
 
-                  + " FROM TourMarkerType AS TourMarkerType" + NL //    //$NON-NLS-1$
+                  + " FROM " + TourMarkerType.class.getSimpleName() + " AS tourMarkerType" + NL //    //$NON-NLS-1$
 
                   // sort by name
-                  + " ORDER  BY TourMarkerType.name" + NL //            //$NON-NLS-1$
+                  + " ORDER  BY tourMarkerType.name" + NL //            //$NON-NLS-1$
             );
 
             allDbTourMarkerTypes = emQuery.getResultList();
@@ -2797,7 +2797,7 @@ public class TourDatabase {
             for (final TourMarkerType tourMarkerType : allDbTourMarkerTypes) {
 
                allDbTourMarkerTypes_ById.put(tourMarkerType.getId(), tourMarkerType);
-               allDbTourMarkerTypes_ByName.put(tourMarkerType.getName().toUpperCase(), tourMarkerType);
+               allDbTourMarkerTypes_ByName.put(tourMarkerType.getTypeName().toUpperCase(), tourMarkerType);
             }
 
             em.close();

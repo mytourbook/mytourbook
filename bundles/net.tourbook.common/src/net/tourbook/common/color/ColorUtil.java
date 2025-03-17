@@ -66,13 +66,22 @@ public class ColorUtil {
       return graphColor;
    }
 
-   public static org.eclipse.swt.graphics.Color getColor(final int rgbValue) {
+   public static org.eclipse.swt.graphics.Color getColorSWT(final int rgbValue) {
 
       final int red = (rgbValue & 0xFF0000) >> 16;
       final int green = (rgbValue & 0xFF00) >> 8;
       final int blue = (rgbValue & 0xFF) >> 0;
 
       return new org.eclipse.swt.graphics.Color(red, green, blue);
+   }
+
+   public static Color getColorAWT(final int rgbValue) {
+
+      final int red = (rgbValue & 0xFF0000) >> 16;
+      final int green = (rgbValue & 0xFF00) >> 8;
+      final int blue = (rgbValue & 0xFF) >> 0;
+
+      return new Color(red, green, blue);
    }
 
    /**

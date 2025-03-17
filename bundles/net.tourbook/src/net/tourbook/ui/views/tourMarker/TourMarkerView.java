@@ -246,11 +246,16 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
             _markerViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
             _markerViewer.refresh();
 
-         } else if (property.equals(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME) ||
-               property.equals(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME) ||
-               property.equals(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME)) {
+         } else if (property.equals(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME)
+               || property.equals(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME)
+               || property.equals(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME)) {
 
             refreshView();
+
+         } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+
+            // ensure that the tour is reloaded when tour marker types are modified, e.g. renamed
+            clearView();
          }
       };
 
@@ -516,8 +521,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       _markerViewer.setContentProvider(new MarkerViewerContentProvider());
       _markerViewer.setComparator(new MarkerViewerProfileComparator());
 
-      _markerViewer.addSelectionChangedListener(selectionChangedEvent -> onSelect_TourMarker((StructuredSelection) selectionChangedEvent
-            .getSelection()));
+      _markerViewer.addSelectionChangedListener(
+            selectionChangedEvent -> onSelect_TourMarker((StructuredSelection) selectionChangedEvent.getSelection()));
 
       _markerViewer.addDoubleClickListener(doubleClickEvent -> {
 
@@ -737,13 +742,15 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             if (markerType == null) {
 
+               cell.setForeground(null);
+               cell.setBackground(null);
                cell.setText(UI.EMPTY_STRING);
 
             } else {
 
-               cell.setForeground(markerType.getForegroundColor());
-               cell.setBackground(markerType.getBackgroundColor());
-               cell.setText(markerType.getName());
+               cell.setForeground(markerType.getForegroundColorSWT());
+               cell.setBackground(markerType.getBackgroundColorSWT());
+               cell.setText(markerType.getTypeName());
             }
          }
       });

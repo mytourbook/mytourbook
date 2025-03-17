@@ -84,10 +84,16 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
    private RGB                        _backgroundRGB;
 
    @Transient
-   private Color                      _foregroundColor;
+   private Color                      _foregroundColorSWT;
 
    @Transient
-   private Color                      _backgroundColor;
+   private Color                      _backgroundColorSWT;
+
+   @Transient
+   private java.awt.Color             _foregroundColorAWT;
+
+   @Transient
+   private java.awt.Color             _backgroundColorAWT;
 
    /**
     * Default constructor used in ejb
@@ -110,7 +116,7 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
 
          final TourMarkerType otherTourMarkerType = (TourMarkerType) other;
 
-         return name.compareTo(otherTourMarkerType.getName());
+         return name.compareTo(otherTourMarkerType.getTypeName());
       }
 
       return 0;
@@ -150,14 +156,24 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
       return true;
    }
 
-   public Color getBackgroundColor() {
+   public java.awt.Color getBackgroundColorAWT() {
 
-      if (_backgroundColor == null) {
+      if (_backgroundColorAWT == null) {
 
-         _backgroundColor = ColorUtil.getColor(backgroundColor);
+         _backgroundColorAWT = ColorUtil.getColorAWT(backgroundColor);
       }
 
-      return _backgroundColor;
+      return _backgroundColorAWT;
+   }
+
+   public Color getBackgroundColorSWT() {
+
+      if (_backgroundColorSWT == null) {
+
+         _backgroundColorSWT = ColorUtil.getColorSWT(backgroundColor);
+      }
+
+      return _backgroundColorSWT;
    }
 
    public RGB getBackgroundRGB() {
@@ -180,14 +196,24 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
       return description == null ? UI.EMPTY_STRING : description;
    }
 
-   public Color getForegroundColor() {
+   public java.awt.Color getForegroundColorAWT() {
 
-      if (_foregroundColor == null) {
+      if (_foregroundColorAWT == null) {
 
-         _foregroundColor = ColorUtil.getColor(foregroundColor);
+         _foregroundColorAWT = ColorUtil.getColorAWT(foregroundColor);
       }
 
-      return _foregroundColor;
+      return _foregroundColorAWT;
+   }
+
+   public Color getForegroundColorSWT() {
+
+      if (_foregroundColorSWT == null) {
+
+         _foregroundColorSWT = ColorUtil.getColorSWT(foregroundColor);
+      }
+
+      return _foregroundColorSWT;
    }
 
    public RGB getForegroundRGB() {
@@ -212,7 +238,7 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
    /**
     * @return Returns the name for the tour marker type
     */
-   public String getName() {
+   public String getTypeName() {
 
       return name == null ? UI.EMPTY_STRING : name;
    }
@@ -234,7 +260,7 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
       backgroundColor = ColorUtil.getColorValue(colorRGB);
 
       _backgroundRGB = colorRGB;
-      _backgroundColor = new Color(colorRGB);
+      _backgroundColorSWT = new Color(colorRGB);
    }
 
    public void setDescription(final String description) {
@@ -247,7 +273,7 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
       foregroundColor = ColorUtil.getColorValue(colorRGB);
 
       _foregroundRGB = colorRGB;
-      _foregroundColor = new Color(colorRGB);
+      _foregroundColorSWT = new Color(colorRGB);
    }
 
    public void setName(final String name) {
@@ -262,7 +288,6 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
             + "TourMarkerType" + NL //                   //$NON-NLS-1$
             + " markerTypeID = " + markerTypeID + NL //  //$NON-NLS-1$
             + " name         = " + name + NL //          //$NON-NLS-1$
-
 
       ;
    }

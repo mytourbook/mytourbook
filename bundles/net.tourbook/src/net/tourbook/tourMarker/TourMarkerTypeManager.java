@@ -19,7 +19,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -28,7 +27,6 @@ import javax.persistence.Query;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourMarkerType;
 import net.tourbook.database.TourDatabase;
@@ -48,15 +46,11 @@ public class TourMarkerTypeManager {
     */
    public static int countTourMarkers(final long requestedMarkerTypeID) {
 
-      final List<Long> allTourIds = new ArrayList<>();
-
       final String sql = UI.EMPTY_STRING
 
-            + " SELECT COUNT(*)" + NL //                                         //$NON-NLS-1$
-
+            + " SELECT COUNT(*)" + NL //                                   //$NON-NLS-1$
             + " FROM TourMarker" + NL //                                   //$NON-NLS-1$
-
-            + " WHERE " + TourDatabase.KEY_MARKER_TYPE + " = ?" + NL //  //$NON-NLS-1$ //$NON-NLS-2$
+            + " WHERE " + TourDatabase.KEY_MARKER_TYPE + " = ?" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
       ;
 
       int numMarkers = 0;
@@ -100,15 +94,19 @@ public class TourMarkerTypeManager {
 
       boolean returnResult = false;
 
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      try {
 
-      if (em != null) {
+         final long markerTypeID = selectedMarkerType.getId();
+
+         final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
          final Query query = em.createQuery(UI.EMPTY_STRING
 
                + "SELECT TourMarker" //$NON-NLS-1$
-               + " FROM  TourMarker AS TourMarker" //$NON-NLS-1$
-               + " WHERE TourMarker.tourMarkerType.markerTypeID = " + selectedMarkerType.getId()); //$NON-NLS-1$
+               + " FROM " + TourMarker.class.getSimpleName() + " AS tourMarker" //$NON-NLS-1$
+               + " WHERE tourMarker.tourMarkerType IS NOT NULL AND tourMarker.tourMarkerType.markerTypeID = ?"); //$NON-NLS-1$
+
+         query.setParameter(1, markerTypeID);
 
          final List<?> allTourMarker = query.getResultList();
          if (allTourMarker.size() > 0) {
@@ -122,12 +120,11 @@ public class TourMarkerTypeManager {
                // remove tour marker type from all tour markers
                for (final Object listItem : allTourMarker) {
 
-                  if (listItem instanceof TourData) {
+                  if (listItem instanceof TourMarker tourMarker) {
 
-                     final TourData tourData = (TourData) listItem;
+                     tourMarker.setTourMarkerType(null);
 
-                     tourData.setTourType(null);
-                     em.merge(tourData);
+                     em.merge(tourMarker);
                   }
                }
 
@@ -147,6 +144,10 @@ public class TourMarkerTypeManager {
 
          returnResult = true;
          em.close();
+
+      } catch (final Exception e) {
+
+         StatusUtil.log(e);
       }
 
       return returnResult;
@@ -156,31 +157,42 @@ public class TourMarkerTypeManager {
 
       boolean returnResult = false;
 
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
-      final EntityTransaction ts = em.getTransaction();
-
       try {
 
-         final TourMarkerType tourTypeEntity = em.find(TourMarkerType.class, markerType.getId());
+         final EntityManager em = TourDatabase.getInstance().getEntityManager();
+         final EntityTransaction ts = em.getTransaction();
 
-         if (tourTypeEntity != null) {
+         try {
 
-            ts.begin();
+            final TourMarkerType tourTypeEntity = em.find(TourMarkerType.class, markerType.getId());
 
-            em.remove(tourTypeEntity);
+            if (tourTypeEntity != null) {
 
-            ts.commit();
+               ts.begin();
+
+               em.remove(tourTypeEntity);
+
+               ts.commit();
+            }
+
+         } catch (final Exception e) {
+
+            StatusUtil.showStatus(e);
+
+         } finally {
+
+            if (ts.isActive()) {
+               ts.rollback();
+            } else {
+               returnResult = true;
+            }
+
+            em.close();
          }
 
       } catch (final Exception e) {
-         StatusUtil.showStatus(e);
-      } finally {
-         if (ts.isActive()) {
-            ts.rollback();
-         } else {
-            returnResult = true;
-         }
-         em.close();
+
+         StatusUtil.log(e);
       }
 
       return returnResult;
