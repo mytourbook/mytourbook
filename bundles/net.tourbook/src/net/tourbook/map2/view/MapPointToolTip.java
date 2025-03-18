@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,6 +30,7 @@ import net.tourbook.common.util.ToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourMarkerType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map.location.LocationType;
 import net.tourbook.tour.location.TourLocationUI;
@@ -275,22 +276,44 @@ public class MapPointToolTip extends ToolTip {
          }
          {
             /*
+             * Marker Type
+             */
+
+            createUI_TourMarker_10_Type(container, tourMarker);
+         }
+         {
+            /*
              * Marker date/time
              */
 
             final Label label = new Label(container, SWT.TRAIL);
             label.setText(TimeTools.Formatter_DateTime_FL.format(markerStartTime));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
-
          }
          {
             /*
              * Link
              */
 
-            createUI_TourMarker_10_Link(container, tourMarker);
+            createUI_TourMarker_20_Link(container, tourMarker);
          }
       }
+   }
+
+   private void createUI_TourMarker_10_Type(final Composite parent, final TourMarker tourMarker) {
+
+      final TourMarkerType tourMarkerType = tourMarker.getTourMarkerType();
+
+      if (tourMarkerType == null) {
+         return;
+      }
+
+      final Label label = new Label(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(label);
+
+      label.setForeground(tourMarkerType.getForegroundColorSWT());
+      label.setBackground(tourMarkerType.getBackgroundColorSWT());
+      label.setText(tourMarkerType.getTypeName());
    }
 
    /**
@@ -299,7 +322,7 @@ public class MapPointToolTip extends ToolTip {
     * @param parent
     * @param tourMarker
     */
-   private void createUI_TourMarker_10_Link(final Composite parent, final TourMarker tourMarker) {
+   private void createUI_TourMarker_20_Link(final Composite parent, final TourMarker tourMarker) {
 
       final String urlText = tourMarker.getUrlText();
       final String urlAddress = tourMarker.getUrlAddress();
@@ -307,32 +330,33 @@ public class MapPointToolTip extends ToolTip {
       final boolean isText = urlText.length() > 0;
       final boolean isAddress = urlAddress.length() > 0;
 
-      if (isText || isAddress) {
-
-         String linkText;
-
-         if (isAddress == false) {
-
-            // only text is in the link -> this is not a internet address but create a link of it
-
-            linkText = UI.createLinkText(urlText, urlText);
-
-         } else if (isText == false) {
-
-            linkText = UI.createLinkText(urlAddress, urlAddress);
-
-         } else {
-
-            linkText = UI.createLinkText(urlAddress, urlText);
-         }
-
-         final Link linkUrl = new Link(parent, SWT.NONE);
-         linkUrl.addListener(SWT.Selection, event -> onSelectUrl(event.text));
-         linkUrl.setText(linkText);
-
-         GridDataFactory.fillDefaults().applyTo(linkUrl);
-         setLinkWidth(linkUrl);
+      if (isText == false && isAddress == false) {
+         return;
       }
+
+      String linkText;
+
+      if (isAddress == false) {
+
+         // only text is in the link -> this is not a internet address but create a link of it
+
+         linkText = UI.createLinkText(urlText, urlText);
+
+      } else if (isText == false) {
+
+         linkText = UI.createLinkText(urlAddress, urlAddress);
+
+      } else {
+
+         linkText = UI.createLinkText(urlAddress, urlText);
+      }
+
+      final Link linkUrl = new Link(parent, SWT.NONE);
+      linkUrl.addListener(SWT.Selection, event -> onSelectUrl(event.text));
+      linkUrl.setText(linkText);
+
+      GridDataFactory.fillDefaults().applyTo(linkUrl);
+      setLinkWidth(linkUrl);
    }
 
    private void createUI_TourPause(final Composite parent, final Map2Point mapPoint) {
