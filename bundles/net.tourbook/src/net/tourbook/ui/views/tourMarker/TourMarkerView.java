@@ -54,6 +54,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.action.SubMenu_SetTourMarkerType;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.views.referenceTour.SelectionReferenceTourView;
 import net.tourbook.ui.views.referenceTour.TVIElevationCompareResult_ComparedTour;
@@ -96,39 +97,40 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourMarkerView extends ViewPart implements ITourProvider, ITourViewer {
 
-   public static final String       ID                              = "net.tourbook.views.TourMarkerView";       //$NON-NLS-1$
+   public static final String        ID                              = "net.tourbook.views.TourMarkerView";       //$NON-NLS-1$
 
-   private final IPreferenceStore   _prefStore                      = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore   _prefStore_Common               = CommonActivator.getPrefStore();
-   private final IDialogSettings    _state                          = TourbookPlugin.getState("TourMarkerView"); //$NON-NLS-1$
+   private final IPreferenceStore    _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore    _prefStore_Common               = CommonActivator.getPrefStore();
+   private final IDialogSettings     _state                          = TourbookPlugin.getState("TourMarkerView"); //$NON-NLS-1$
 
-   private TourData                 _tourData;
+   private TourData                  _tourData;
 
-   private PostSelectionProvider    _postSelectionProvider;
-   private ISelectionListener       _postSelectionListener;
-   private IPropertyChangeListener  _prefChangeListener;
-   private IPropertyChangeListener  _prefChangeListener_Common;
-   private ITourEventListener       _tourEventListener;
+   private PostSelectionProvider     _postSelectionProvider;
+   private ISelectionListener        _postSelectionListener;
+   private IPropertyChangeListener   _prefChangeListener;
+   private IPropertyChangeListener   _prefChangeListener_Common;
+   private ITourEventListener        _tourEventListener;
 
-   private MenuManager              _viewerMenuManager;
-   private IContextMenuProvider     _tableViewerContextMenuProvider = new TableContextMenuProvider();
+   private MenuManager               _viewerMenuManager;
+   private IContextMenuProvider      _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
-   private ActionOpenMarkerDialog   _actionEditTourMarkers;
-   private ActionDeleteMarkerDialog _actionDeleteTourMarkers;
-   private ActionToolbarSlideout    _actionTourMarkerOptions;
+   private ActionOpenMarkerDialog    _actionEditTourMarkers;
+   private ActionDeleteMarkerDialog  _actionDeleteTourMarkers;
+   private ActionToolbarSlideout     _actionTourMarkerOptions;
+   private SubMenu_SetTourMarkerType _actionSubMenu_SetTourMarkerType;
 
-   private PixelConverter           _pc;
+   private PixelConverter            _pc;
 
-   private TableViewer              _markerViewer;
-   private ColumnManager            _columnManager;
+   private TableViewer               _markerViewer;
+   private ColumnManager             _columnManager;
 
-   private boolean                  _isInUpdate;
-   private boolean                  _isMultipleTours;
+   private boolean                   _isInUpdate;
+   private boolean                   _isMultipleTours;
 
-   private ColumnDefinition         _colDefName;
-   private ColumnDefinition         _colDefVisibility;
+   private ColumnDefinition          _colDefName;
+   private ColumnDefinition          _colDefVisibility;
 
-   private final NumberFormat       _nf3                            = NumberFormat.getNumberInstance();
+   private final NumberFormat        _nf3                            = NumberFormat.getNumberInstance();
    {
       _nf3.setMinimumFractionDigits(3);
       _nf3.setMaximumFractionDigits(3);
@@ -167,10 +169,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
                tourMarkers = _tourData.getTourMarkers().toArray();
             }
-
-//            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//                  + ("\n\t_tourData: " + _tourData));
-//            // TODO remove SYSTEM.OUT.PRINTLN
 
             return tourMarkers;
          }
@@ -418,6 +416,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       _actionTourMarkerOptions = new ActionTourMarkerOptions(_pageBook);
       _actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
       _actionDeleteTourMarkers = new ActionDeleteMarkerDialog(this);
+      _actionSubMenu_SetTourMarkerType = new SubMenu_SetTourMarkerType();
    }
 
    private void createMenuManager() {
@@ -526,7 +525,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
       _markerViewer.addDoubleClickListener(doubleClickEvent -> {
 
-         if (isTourSavedInDb() == false) {
+         if (isTourSavedInDB() == false) {
             return;
          }
 
@@ -1099,29 +1098,40 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    }
 
    /**
-    * enable actions
+    * Enable actions
     */
    private void enableActions() {
 
-      final boolean isTourInDb = isTourSavedInDb();
+      final boolean isTourSaved = isTourSavedInDB();
       final boolean isSingleTour = _tourData != null && _tourData.isMultipleTours() == false;
 
-      _actionEditTourMarkers.setEnabled(isTourInDb && isSingleTour);
-      _actionDeleteTourMarkers.setEnabled(isTourInDb && isSingleTour);
+      final boolean isSingleSaveTour = isTourSaved && isSingleTour;
+
+      _actionEditTourMarkers.setEnabled(isSingleSaveTour);
+      _actionDeleteTourMarkers.setEnabled(isSingleSaveTour);
+      _actionSubMenu_SetTourMarkerType.setEnabled(isSingleSaveTour);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
+      // set the marker which should be selected in the marker dialog
+      final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
+      final TourMarker firstMarker = (TourMarker) selection.getFirstElement();
+
+      final Object[] allTourMarker = selection.toArray();
+
+      _actionDeleteTourMarkers.setTourMarkers(allTourMarker);
+      _actionEditTourMarkers.setTourMarker(firstMarker);
+      _actionSubMenu_SetTourMarkerType.setTourMarker(allTourMarker);
+
       menuMgr.add(_actionEditTourMarkers);
+      menuMgr.add(_actionSubMenu_SetTourMarkerType);
+
+      menuMgr.add(new Separator());
       menuMgr.add(_actionDeleteTourMarkers);
 
       // add standard group which allows other plug-ins to contribute here
       menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
-      // set the marker which should be selected in the marker dialog
-      final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
-      _actionEditTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
-      _actionDeleteTourMarkers.setTourMarkers(selection.toArray());
 
       enableActions();
    }
@@ -1237,7 +1247,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    /**
     * @return Returns <code>true</code> when the tour is saved in the database.
     */
-   private boolean isTourSavedInDb() {
+   private boolean isTourSavedInDB() {
 
       if ((_tourData != null) && (_tourData.getTourPerson() != null)) {
          return true;
@@ -1269,10 +1279,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       if (_isInUpdate || selection == null) {
          return;
       }
-
-//      System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//            + ("\tonSelectionChanged: " + selection));
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
       long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
       TourData tourData = null;
@@ -1436,10 +1442,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    }
 
    @Override
-   public void updateColumnHeader(final ColumnDefinition colDef) {
-      // TODO Auto-generated method stub
-
-   }
+   public void updateColumnHeader(final ColumnDefinition colDef) {}
 
    private void updateUI_MarkerViewer() {
 

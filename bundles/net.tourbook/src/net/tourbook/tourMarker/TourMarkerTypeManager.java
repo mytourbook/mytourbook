@@ -120,7 +120,7 @@ public class TourMarkerTypeManager {
                // remove tour marker type from all tour markers
                for (final Object listItem : allTourMarker) {
 
-                  if (listItem instanceof TourMarker tourMarker) {
+                  if (listItem instanceof final TourMarker tourMarker) {
 
                      tourMarker.setTourMarkerType(null);
 

@@ -15,22 +15,30 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourMarkerType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.PrefPageTourMarkerTypes;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.widgets.Menu;
 
 /**
  */
 public class SubMenu_SetTourMarkerType extends SubMenu {
 
-   private TourMarker _tourMarker;
+   private List<TourMarker>     _allTourMarker;
+
+   private ActionOpenPrefDialog _actionOpenTourTypePrefs;
 
    private class ActionSetMarkerType extends Action {
 
@@ -46,13 +54,26 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
       @Override
       public void run() {
 
-         setTourMarkerType(_markerType);
+         if (TourManager.isTourEditorModified()) {
+            return;
+         }
+
+         for (final TourMarker tourMarker : _allTourMarker) {
+
+            tourMarker.setTourMarkerType(_markerType);
+         }
+
+         TourManager.saveModifiedTour(_allTourMarker.get(0).getTourData());
       }
    }
 
    public SubMenu_SetTourMarkerType() {
 
       super("Set Tour Marker T&ype", AS_DROP_DOWN_MENU);
+
+      _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
+            "Modify Tour Marker T&ype...",
+            PrefPageTourMarkerTypes.ID);
    }
 
    @Override
@@ -61,7 +82,9 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
    @Override
    public void fillMenu(final Menu menu) {
 
-      final TourMarkerType currentMarkerType = _tourMarker.getTourMarkerType();
+      final TourMarkerType currentMarkerType = _allTourMarker.size() == 1
+            ? _allTourMarker.get(0).getTourMarkerType()
+            : null;
 
       final List<TourMarkerType> allTourMarkerTypes = TourDatabase.getAllTourMarkerTypes();
 
@@ -69,7 +92,7 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
 
          final ActionSetMarkerType actionSetMarkerType = new ActionSetMarkerType(markerType);
 
-         // check current marker type
+         // setup current marker type
          if (currentMarkerType != null && markerType.getId() == currentMarkerType.getId()) {
 
             actionSetMarkerType.setChecked(true);
@@ -78,16 +101,25 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
 
          new ActionContributionItem(actionSetMarkerType).fill(menu, -1);
       }
+
+      new Separator().fill(menu, -1);
+      new ActionContributionItem(_actionOpenTourTypePrefs).fill(menu, -1);
+   }
+
+   public void setTourMarker(final Object[] allTourMarker) {
+
+      _allTourMarker = new ArrayList<>();
+
+      Arrays.stream(allTourMarker).forEach(tourMarker -> _allTourMarker.add((TourMarker) tourMarker));
+
    }
 
    public void setTourMarker(final TourMarker tourMarker) {
 
-      _tourMarker = tourMarker;
-   }
+      final List<TourMarker> arrayList = new ArrayList<>();
+      arrayList.add(tourMarker);
 
-   private void setTourMarkerType(final TourMarkerType markerType) {
-      // TODO Auto-generated method stub
-
+      _allTourMarker = arrayList;
    }
 
 }

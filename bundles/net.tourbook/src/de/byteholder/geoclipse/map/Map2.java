@@ -8393,6 +8393,14 @@ public class Map2 extends Canvas {
 
          final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
+         if (_isMarkerClusterSelected == false) {
+            
+            // use map point color
+
+            fillColor = mapPoint.getFillColorAWT();
+            outlineColor = mapPoint.getOutlineColorAWT();
+         }
+
          final int mapPointDevX = mapPoint.geoPointDevX;
          final int mapPointDevY = mapPoint.geoPointDevY;
 
