@@ -17,10 +17,13 @@ package net.tourbook.ui.action;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.ui.SubMenu;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourMarkerType;
 import net.tourbook.database.TourDatabase;
@@ -58,12 +61,22 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
             return;
          }
 
+         final Map<Long, TourData> allModifiedToursByID = new HashMap<>();
+
          for (final TourMarker tourMarker : _allTourMarker) {
 
+            // set marker type
             tourMarker.setTourMarkerType(_markerType);
+
+            // keep the markers tour
+            final TourData tourData = tourMarker.getTourData();
+
+            allModifiedToursByID.put(tourData.getTourId(), tourData);
          }
 
-         TourManager.saveModifiedTour(_allTourMarker.get(0).getTourData());
+         final ArrayList<TourData> allModifiedTours = new ArrayList<>(allModifiedToursByID.values());
+
+         TourManager.saveModifiedTours(allModifiedTours);
       }
    }
 

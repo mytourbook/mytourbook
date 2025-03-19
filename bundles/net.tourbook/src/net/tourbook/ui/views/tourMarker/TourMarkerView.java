@@ -1103,13 +1103,14 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    private void enableActions() {
 
       final boolean isTourSaved = isTourSavedInDB();
-      final boolean isSingleTour = _tourData != null && _tourData.isMultipleTours() == false;
+      final boolean isTour = _tourData != null;
+      final boolean isSingleTour = isTour && _tourData.isMultipleTours() == false;
 
       final boolean isSingleSaveTour = isTourSaved && isSingleTour;
 
       _actionEditTourMarkers.setEnabled(isSingleSaveTour);
       _actionDeleteTourMarkers.setEnabled(isSingleSaveTour);
-      _actionSubMenu_SetTourMarkerType.setEnabled(isSingleSaveTour);
+      _actionSubMenu_SetTourMarkerType.setEnabled(isTour);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
