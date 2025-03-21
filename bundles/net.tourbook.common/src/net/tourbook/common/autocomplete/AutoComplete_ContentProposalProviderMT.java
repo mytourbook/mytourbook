@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,10 +20,16 @@ package net.tourbook.common.autocomplete;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.preferences.ICommonPreferences;
+
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 public class AutoComplete_ContentProposalProviderMT implements IContentProposalProvider {
+
+   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
 
    /*
     * The proposals provided.
@@ -125,15 +131,32 @@ public class AutoComplete_ContentProposalProviderMT implements IContentProposalP
     */
    private String[] matches(final String[] allTexts, final String searchText) {
 
-      final TextMatcher textMatcher = new TextMatcher(searchText.trim(), true, false);
-
       final List<String> allMatches = new ArrayList<>();
 
-      for (final String text : allTexts) {
+      final boolean isWithPrefix = _prefStore_Common.getBoolean(ICommonPreferences.AUTO_COMPLETE_PREFIX);
 
-         if (textMatcher.match(text)) {
+      if (isWithPrefix) {
 
-            allMatches.add(text);
+         final TextMatcher textMatcher = new TextMatcher(searchText.trim(), true, false);
+
+         for (final String text : allTexts) {
+
+            if (textMatcher.match(text)) {
+
+               allMatches.add(text);
+            }
+         }
+
+      } else {
+
+         final String searchTextLowerCase = searchText.toLowerCase();
+
+         for (final String text : allTexts) {
+
+            if (text.toLowerCase().startsWith(searchTextLowerCase)) {
+
+               allMatches.add(text);
+            }
          }
       }
 
