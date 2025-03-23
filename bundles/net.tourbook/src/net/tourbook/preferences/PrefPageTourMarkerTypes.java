@@ -25,7 +25,6 @@ import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourMarkerType;
-import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tourMarker.TourMarkerTypeManager;
@@ -611,7 +610,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
             "Delete Tour Marker Types",
             null,
 
-            "Are you sure you want to delete the tour marker type \"%s\" and remove it in %d tour markers?".formatted(
+            "Are you sure you want to delete the tour marker type \"%s\" and remove it from %d tour markers?".formatted(
                   _selectedMarkerType.getTypeName(),
                   numTourMarkers),
 
@@ -829,7 +828,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       _selectedMarkerType = null;
 
       // save model
-      TourDatabase.saveEntity(markerType, markerType.getId(), TourType.class);
+      TourDatabase.saveEntity(markerType, markerType.getId(), TourMarkerType.class);
 
       reloadMarkerTypes();
 
