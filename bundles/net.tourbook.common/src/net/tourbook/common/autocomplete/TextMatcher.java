@@ -19,12 +19,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
-import net.tourbook.common.preferences.ICommonPreferences;
 
 import org.eclipse.core.text.StringMatcher;
-import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * Similar to {@link StringMatcher}, this {@code TextMatcher} matches a pattern
@@ -50,12 +47,10 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public final class TextMatcher {
 
-   private static final Pattern          NON_WORD          = Pattern.compile("\\W+", Pattern.UNICODE_CHARACTER_CLASS); //$NON-NLS-1$
+   private static final Pattern      NON_WORD = Pattern.compile("\\W+", Pattern.UNICODE_CHARACTER_CLASS); //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore_Common = CommonActivator.getPrefStore();
-
-   private final StringMatcher           _full;
-   private final List<StringMatcher>     _parts;
+   private final StringMatcher       _full;
+   private final List<StringMatcher> _parts;
 
    /**
     * Creates a new {@link TextMatcher}.
@@ -73,15 +68,7 @@ public final class TextMatcher {
     */
    public TextMatcher(final String pattern, final boolean isIgnoreCase, final boolean isIgnoreWildCards) {
 
-      final String patternPrefix = _prefStore_Common.getBoolean(ICommonPreferences.AUTO_COMPLETE_PREFIX)
-            ? UI.SYMBOL_STAR
-            : UI.EMPTY_STRING;
-
-
-      _full = new StringMatcher(
-
-            patternPrefix + pattern.trim() + UI.SYMBOL_STAR,
-
+      _full = new StringMatcher(UI.SYMBOL_STAR + pattern.trim() + UI.SYMBOL_STAR,
             isIgnoreCase,
             isIgnoreWildCards);
 
