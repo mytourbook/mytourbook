@@ -25,6 +25,7 @@ import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourMarkerType;
+import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tourMarker.TourMarkerTypeManager;
@@ -162,7 +163,6 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       _allMarkerTypes = TourDatabase.getAllTourMarkerTypes();
       _markerTypeViewer.setInput(new Object());
 
-      // reselect previous person and tabfolder
       restoreState();
 
       enableControls();
@@ -313,6 +313,8 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
    private void createUI_30_MarkerType_Details(final Composite parent) {
 
+      final int defaultTextWidth = convertWidthInCharsToPixels(20);
+
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
       GridLayoutFactory.swtDefaults()
@@ -331,6 +333,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
             _txtName.addModifyListener(_defaultModifyListener);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
+                  .hint(defaultTextWidth, SWT.DEFAULT)
                   .applyTo(_txtName);
          }
          {
@@ -365,6 +368,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
                GridDataFactory.fillDefaults()
                      .grab(true, false)
                      .align(SWT.FILL, SWT.CENTER)
+                     .hint((int) (defaultTextWidth * 0.2), SWT.DEFAULT)
                      .applyTo(_lblColoredName);
             }
          }
@@ -379,7 +383,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
             _txtDescription = new Text(container, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
             _txtDescription.addModifyListener(_defaultModifyListener);
             GridDataFactory.fillDefaults()
-                  .hint(convertWidthInCharsToPixels(20), convertHeightInCharsToPixels(6))
+                  .hint(defaultTextWidth, convertHeightInCharsToPixels(6))
                   .grab(true, false)
                   .applyTo(_txtDescription);
          }
@@ -475,6 +479,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       final boolean isValid               = isValidateFields ? isMarkerTypeValid() : true;
 
       final boolean isMarkerTypeSelected  = _selectedMarkerType != null;
+      final boolean isNotModified         = _isMarkerTypeModified == false;
       final boolean isNewMarkerType       = _newMarkerType != null;
       final boolean canEditFields         = isMarkerTypeSelected || isNewMarkerType;
 
@@ -484,12 +489,12 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       _txtDescription         .setEnabled(canEditFields);
       _txtName                .setEnabled(canEditFields);
 
-      _btnMarkerType_Add      .setEnabled(_isMarkerTypeModified == false && isValid);
+      _btnMarkerType_Add      .setEnabled(isNotModified && isValid);
       _btnMarkerType_Cancel   .setEnabled(_isMarkerTypeModified);
-      _btnMarkerType_Delete   .setEnabled(isMarkerTypeSelected && isNewMarkerType == false);
+      _btnMarkerType_Delete   .setEnabled(isNotModified && isMarkerTypeSelected && isNewMarkerType == false);
       _btnMarkerType_Save     .setEnabled(_isMarkerTypeModified && isValid);
 
-      _markerTypeViewer.getTable().setEnabled(_isMarkerTypeModified == false && isValid);
+      _markerTypeViewer.getTable().setEnabled(isNotModified && isValid);
 
 // SET_FORMATTING_ON
    }
@@ -505,6 +510,16 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
          // fire modify event
          _prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
       }
+   }
+
+   private TourMarkerType getActiveMarkerType() {
+
+      final boolean isNewMarkerType = _newMarkerType != null;
+
+      final TourMarkerType markerType = isNewMarkerType
+            ? _newMarkerType
+            : _selectedMarkerType;
+      return markerType;
    }
 
    @Override
@@ -542,7 +557,57 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
          return false;
       }
 
+      isValidForSave();
+
       setErrorMessage(null);
+
+      return true;
+   }
+
+   /**
+    * Checks if VARCHAR fields have the correct length
+    *
+    * @return Returns <code>true</code> when the data are valid and can be saved
+    */
+   private boolean isValidForSave() {
+
+      /*
+       * Check: Label
+       */
+      final String name = _txtName.getText();
+
+      FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(
+            name,
+            TourMarkerType.DB_LENGTH_NAME,
+            Messages.Db_Field_TourMarkerType_Name);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+
+         return false;
+
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+
+         _txtName.setText(name.substring(0, TourMarkerType.DB_LENGTH_NAME));
+      }
+
+      /*
+       * Check: Description
+       */
+      final String description = _txtDescription.getText();
+
+      fieldValidation = TourDatabase.isFieldValidForSave(
+            description,
+            TourMarkerType.DB_LENGTH_DESCRIPTION,
+            Messages.Db_Field_TourMarkerType_Description);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+
+         return false;
+
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+
+         _txtDescription.setText(description.substring(0, TourMarkerType.DB_LENGTH_DESCRIPTION));
+      }
 
       return true;
    }
@@ -785,11 +850,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
     */
    private void saveMarkerType(final boolean isAskToSave, final boolean isRevert) {
 
-      final boolean isNewMarkerType = _newMarkerType != null;
-
-      final TourMarkerType markerType = isNewMarkerType
-            ? _newMarkerType
-            : _selectedMarkerType;
+      final TourMarkerType activeMarkerType = getActiveMarkerType();
 
       _newMarkerType = null;
 
@@ -802,13 +863,13 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
          if (MessageDialog.openQuestion(
                Display.getCurrent().getActiveShell(),
-               Messages.Pref_People_Dialog_SaveModifiedPerson_Title,
-               NLS.bind(Messages.Pref_People_Dialog_SaveModifiedPerson_Message,
+               "Save Marker Type",
+               NLS.bind("Marker type \"{0}\" is modified, save changes?",
 
                      // use name from the ui because it could be modified
                      _txtName.getText())) == false) {
 
-            // revert person
+            // revert marker type
 
             if (isRevert) {
 
@@ -823,12 +884,12 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
          }
       }
 
-      updateModelFromUI(markerType);
+      updateModelFromUI(activeMarkerType);
 
       _selectedMarkerType = null;
 
       // save model
-      TourDatabase.saveEntity(markerType, markerType.getId(), TourMarkerType.class);
+      TourDatabase.saveEntity(activeMarkerType, activeMarkerType.getId(), TourMarkerType.class);
 
       reloadMarkerTypes();
 
@@ -837,7 +898,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       _isMarkerTypeModified = false;
 
       // select marker type
-      _markerTypeViewer.setSelection(new StructuredSelection(markerType), true);
+      _markerTypeViewer.setSelection(new StructuredSelection(activeMarkerType), true);
    }
 
    private void saveState() {
