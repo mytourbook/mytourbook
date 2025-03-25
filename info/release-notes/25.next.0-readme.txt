@@ -66,7 +66,10 @@ Changes that require Tour Re-import
 Bugfix
 ======
   
-* 
+* Autocomplete
+  Fixed the fix for autocomplete
+  https://github.com/mytourbook/mytourbook/issues/1451
+
 
 See also milestone 24.x https://github.com/mytourbook/mytourbook/milestone/16?closed=1
  
