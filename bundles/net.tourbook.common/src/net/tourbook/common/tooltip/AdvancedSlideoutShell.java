@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,7 @@ import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -692,7 +693,13 @@ public abstract class AdvancedSlideoutShell {
       _rrShellWithResize = new RRShell(_ownerControl.getShell(), styleWithResize, getShellTitle_WithResize(), true);
 
       final Shell shellWithResize = _rrShellWithResize.getShell();
-      shellWithResize.addControlListener(new ControlAdapter() {
+      shellWithResize.addControlListener(new ControlListener() {
+
+         @Override
+         public void controlMoved(final ControlEvent e) {
+            onTTShellMoved(e);
+         }
+
          @Override
          public void controlResized(final ControlEvent e) {
             onTTShellResize(e);
@@ -1312,6 +1319,8 @@ public abstract class AdvancedSlideoutShell {
       }
 
    }
+
+   protected void onTTShellMoved(final ControlEvent event) {}
 
    protected void onTTShellResize(final ControlEvent event) {
 
