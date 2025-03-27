@@ -112,6 +112,11 @@ public class Map2Config {
    public org.eclipse.swt.graphics.Color tourMarkerOutline_ColorSWT;
 
    /*
+    * Tour marker filter
+    */
+   public boolean isFilterTourMarkers;
+
+   /*
     * Tour marker cluster
     */
    public boolean                        isTourMarkerClustered;

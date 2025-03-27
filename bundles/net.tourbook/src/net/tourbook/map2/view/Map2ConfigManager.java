@@ -108,6 +108,7 @@ public class Map2ConfigManager {
    private static final String TAG_TOUR_LOCATION_END_OUTLINE_COLOR   = "TourLocation_EndOutlineColor";        //$NON-NLS-1$
    // tour marker
    private static final String ATTR_IS_SHOW_TOUR_MARKER              = "isShowTourMarker";                    //$NON-NLS-1$
+   private static final String ATTR_IS_FILTER_TOUR_MARKERS           = "isFilterTourMarkers";                 //$NON-NLS-1$
    private static final String ATTR_IS_GROUP_DUPLICATED_MARKERS      = "isGroupDuplicatedMarkers";            //$NON-NLS-1$
    private static final String ATTR_GROUPED_MARKERS                  = "groupedLabels";                       //$NON-NLS-1$
    private static final String ATTR_GROUP_GRID_SIZE                  = "groupGridSize";                       //$NON-NLS-1$
@@ -370,6 +371,7 @@ public class Map2ConfigManager {
           * Tour marker
           */
          xmlConfig.putBoolean(      ATTR_IS_SHOW_TOUR_MARKER,              config.isShowTourMarker);
+         xmlConfig.putBoolean(      ATTR_IS_FILTER_TOUR_MARKERS,           config.isFilterTourMarkers);
 
          xmlConfig.putBoolean(      ATTR_IS_GROUP_DUPLICATED_MARKERS,      config.isGroupDuplicatedMarkers);
          xmlConfig.putString(       ATTR_GROUPED_MARKERS,                  config.groupedMarkers);
@@ -528,6 +530,7 @@ public class Map2ConfigManager {
       config.isShowLocationBoundingBox    = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_LOCATION_BOUNDING_BOX, false);
       config.isShowTourLocation           = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_LOCATION,         true);
       config.isShowTourMarker             = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_MARKER,           true);
+      config.isFilterTourMarkers          = Util.getXmlBoolean(xmlConfig,     ATTR_IS_FILTER_TOUR_MARKERS,        false);
 
       config.isGroupDuplicatedMarkers     = Util.getXmlBoolean(xmlConfig,     ATTR_IS_GROUP_DUPLICATED_MARKERS,   false);
       config.groupedMarkers               = Util.getXmlString (xmlConfig,     ATTR_GROUPED_MARKERS,               UI.EMPTY_STRING);
