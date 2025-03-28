@@ -15,21 +15,33 @@
  *******************************************************************************/
 package org.eclipse.nebula.widgets.nattable.widget.mt;
 
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
+import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.IStyle;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.LetterOrDigitKeyEventMatcher;
 import org.eclipse.nebula.widgets.nattable.widget.NatCombo;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 
 /**
  *
@@ -154,6 +166,155 @@ public class NatComboMT extends NatCombo {
       for (final int itemIndex : allCheckedIndices) {
          allItems[itemIndex].setChecked(true);
       }
+   }
+
+   /**
+    * Creates the Text control of this NatCombo, adding styles, look&amp;feel
+    * and needed listeners for the control only.
+    *
+    * @param style
+    *           The style for the Text Control to construct. Uses this style
+    *           adding internal styles via ConfigRegistry.
+    */
+   @Override
+   protected void createTextControl(final int style) {
+
+      final int textStyle = style | HorizontalAlignmentEnum.getSWTStyle(this.cellStyle);
+      this.text = new Text(this, textStyle);
+      this.text.setBackground(this.cellStyle.getAttributeValue(CellStyleAttributes.BACKGROUND_COLOR));
+      this.text.setForeground(this.cellStyle.getAttributeValue(CellStyleAttributes.FOREGROUND_COLOR));
+      this.text.setFont(this.cellStyle.getAttributeValue(CellStyleAttributes.FONT));
+
+      final GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+      this.text.setLayoutData(gridData);
+
+      this.text.addKeyListener(new KeyAdapter() {
+         @Override
+         public void keyPressed(final KeyEvent event) {
+            if (event.keyCode == SWT.ARROW_DOWN
+                  || event.keyCode == SWT.ARROW_UP) {
+               showDropdownControl();
+
+               final int selectionIndex = getDropdownTable().getSelectionIndex();
+               if (selectionIndex < 0) {
+                  select(0);
+               } else {
+                  // only visualize the selection in the dropdown, do not
+                  // perform a selection
+                  getDropdownTable().select(selectionIndex);
+               }
+
+               // ensure the arrow key events do not have any further
+               // effect
+               event.doit = false;
+            } else if (!LetterOrDigitKeyEventMatcher.isLetterOrDigit(event.character)) {
+               if (freeEdit) {
+                  // simply clear the selection in dropdownlist so the
+                  // free value in text control will be used
+                  if (!getDropdownTable().isDisposed()) {
+                     getDropdownTable().deselectAll();
+                     for (final Map.Entry<String, Boolean> entry : selectionStateMap.entrySet()) {
+                        entry.setValue(Boolean.FALSE);
+                     }
+                  }
+               } else {
+                  showDropdownControl();
+               }
+            }
+         }
+      });
+
+      this.text.addMouseListener(new MouseAdapter() {
+
+         @Override
+         public void mouseDown(final MouseEvent e) {
+            if (!freeEdit) {
+               if (getDropdownTable().isDisposed()
+                     || !getDropdownTable().isVisible()) {
+                  showDropdownControl();
+               } else {
+                  // if there is no free edit enabled, set the focus back
+                  // to the dropdownlist so it handles key strokes itself
+                  getDropdownTable().forceFocus();
+               }
+            }
+         }
+      });
+
+      this.text.addControlListener(new ControlListener() {
+         @Override
+         public void controlMoved(final ControlEvent e) {
+            calculateBounds();
+         }
+
+         @Override
+         public void controlResized(final ControlEvent e) {
+            calculateBounds();
+         }
+      });
+
+      this.text.addFocusListener(new FocusListenerWrapper());
+
+      /**
+       * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       *
+       * The iconCanvas is hidden, because it cannot be disabled
+       *
+       * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       */
+
+//      final Canvas iconCanvas = new Canvas(this, SWT.NONE) {
+//
+//         @Override
+//         public Point computeSize(final int wHint, final int hHint, final boolean changed) {
+//            final Rectangle iconImageBounds = iconImage.getBounds();
+//            return new Point(iconImageBounds.width + 2, iconImageBounds.height + 2);
+//         }
+//
+//      };
+//
+//      gridData = new GridData(GridData.BEGINNING, SWT.FILL, false, true);
+//      iconCanvas.setLayoutData(gridData);
+//
+//      iconCanvas.addPaintListener(event -> {
+//         final GC gc = event.gc;
+//
+//         final Rectangle iconCanvasBounds = iconCanvas.getBounds();
+//         final Rectangle iconImageBounds = iconImage.getBounds();
+//         final int horizontalAlignmentPadding =
+//               CellStyleUtil.getHorizontalAlignmentPadding(
+//                     HorizontalAlignmentEnum.CENTER,
+//                     iconCanvasBounds,
+//                     iconImageBounds.width);
+//         final int verticalAlignmentPadding =
+//               CellStyleUtil.getVerticalAlignmentPadding(
+//                     VerticalAlignmentEnum.MIDDLE,
+//                     iconCanvasBounds,
+//                     iconImageBounds.height);
+//         gc.drawImage(iconImage, horizontalAlignmentPadding, verticalAlignmentPadding);
+//
+//         final Color originalFg = gc.getForeground();
+//         gc.setForeground(GUIHelper.COLOR_WIDGET_BORDER);
+//         gc.drawRectangle(0, 0, iconCanvasBounds.width - 1, iconCanvasBounds.height - 1);
+//         gc.setForeground(originalFg);
+//      });
+//
+//      iconCanvas.addMouseListener(new MouseAdapter() {
+//
+//         @Override
+//         public void mouseDown(final MouseEvent e) {
+//            if (dropdownShell != null && !dropdownShell.isDisposed()) {
+//               if (dropdownShell.isVisible()) {
+//                  text.forceFocus();
+//                  hideDropdownControl();
+//               } else {
+//                  showDropdownControl();
+//               }
+//            } else {
+//               showDropdownControl();
+//            }
+//         }
+//      });
    }
 
    private void fireSelectionAllListener() {

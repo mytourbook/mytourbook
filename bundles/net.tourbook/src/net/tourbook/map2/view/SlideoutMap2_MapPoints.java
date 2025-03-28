@@ -1128,7 +1128,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          }
       }
       {
-         // checkbox combo
+         /**
+          * NatCombo was the best which I could find as a checkbox dropdown BUT it needed special
+          * hacking, that it worked how I expected it :-(((
+          */
          final Style comboStyle = new Style();
 
          _comboTourMarkerFilter = new NatComboMT(
