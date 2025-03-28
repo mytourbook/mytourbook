@@ -318,6 +318,10 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Location_TourUsage_StartLocations;
    public static String        ColumnFactory_Location_TourUsage_StartLocations_Tooltip;
 
+   public static String        ColumnFactory_MarkerType_Header;
+   public static String        ColumnFactory_MarkerType_Label;
+   public static String        ColumnFactory_MarkerType_Tooltip;
+
    public static String        ColumnFactory_Motion_Altimeter;
    public static String        ColumnFactory_Motion_Altimeter_Tooltip;
 

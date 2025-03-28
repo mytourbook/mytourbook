@@ -7689,6 +7689,9 @@ public class Map2 extends Canvas {
       int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
       int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
 
+      devX = (int) (devX * _deviceScaling);
+      devY = (int) (devY * _deviceScaling);
+
       final FontMetrics fontMetrics = g2d.getFontMetrics();
 
       final int textWidth = fontMetrics.stringWidth(clusterLabel);
@@ -8392,6 +8395,14 @@ public class Map2 extends Canvas {
          }
 
          final Map2Point mapPoint = (Map2Point) distribLabel.data;
+
+         if (_isMarkerClusterSelected == false) {
+
+            // use map point color
+
+            fillColor = mapPoint.getFillColorAWT();
+            outlineColor = mapPoint.getOutlineColorAWT();
+         }
 
          final int mapPointDevX = mapPoint.geoPointDevX;
          final int mapPointDevY = mapPoint.geoPointDevY;

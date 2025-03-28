@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -84,7 +84,9 @@ public class ColorSelectorExtended extends EventManager {
 
    private static final IDialogSettings _state                  = CommonActivator.getState("net.tourbook.common.color.ColorSelectorExtended"); //$NON-NLS-1$
 
-   private RGB                          _colorValue;
+   private Color                        _color;
+   private RGB                          _colorRGB;
+
    private Point                        _selectorImageSize;
 
    /*
@@ -225,9 +227,19 @@ public class ColorSelectorExtended extends EventManager {
     *
     * @return <code>RGB</code>
     */
+   public Color getColor() {
+
+      return _color;
+   }
+
+   /**
+    * Return the currently displayed color.
+    *
+    * @return <code>RGB</code>
+    */
    public RGB getColorValue() {
 
-      return _colorValue;
+      return _colorRGB;
    }
 
    /**
@@ -240,7 +252,7 @@ public class ColorSelectorExtended extends EventManager {
     */
    public RGBA getRGBA(final int opacity) {
 
-      return new RGBA(_colorValue.red, _colorValue.green, _colorValue.blue, opacity);
+      return new RGBA(_colorRGB.red, _colorRGB.green, _colorRGB.blue, opacity);
    }
 
    public void open() {
@@ -266,7 +278,7 @@ public class ColorSelectorExtended extends EventManager {
 
       final ColorDialog colorDialog = new ColorDialog(_btnColorSelector.getShell());
 
-      colorDialog.setRGB(_colorValue);
+      colorDialog.setRGB(_colorRGB);
 
       if (UI.IS_LINUX == false) {
 
@@ -286,8 +298,11 @@ public class ColorSelectorExtended extends EventManager {
 
          // color dialog is NOT canceled
 
-         final RGB oldValue = _colorValue;
-         _colorValue = newColor;
+         final RGB oldValue = _colorRGB;
+
+         _colorRGB = newColor;
+         _color = new Color(_colorRGB.red, _colorRGB.green, _colorRGB.blue);
+
          final Object[] finalListeners = getListeners();
 
          if (finalListeners.length > 0) {
@@ -406,7 +421,8 @@ public class ColorSelectorExtended extends EventManager {
     */
    public void setColorValue(final RGB rgb) {
 
-      _colorValue = rgb;
+      _colorRGB = rgb;
+      _color = new Color(_colorRGB.red, _colorRGB.green, _colorRGB.blue);
 
       updateColorImage();
    }
@@ -445,7 +461,7 @@ public class ColorSelectorExtended extends EventManager {
 
       final GC gc = new GC(_buttonImage);
       {
-         final Color color = new Color(_colorValue);
+         final Color color = new Color(_colorRGB);
          gc.setBackground(color);
 
          gc.fillRectangle(

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -71,7 +71,7 @@ public class TourTypeMenuManager implements IActionProvider {
     */
    private static RecentTourTypeAction[]  _allRecentTourTypeActions;
 
-   private static int                     _maxTourTypes       = -1;
+   private static int                     _maxRecentTourTypes = -1;
 
    /**
     * This must be static otherwise it do not always work !!!
@@ -176,18 +176,18 @@ public class TourTypeMenuManager implements IActionProvider {
 
    public static void saveState() {
 
-      if (_maxTourTypes < 1) {
+      if (_maxRecentTourTypes < 1) {
          // tour types are not initialized or not visible, do nothing
          return;
       }
 
-      final String[] stateTourTypeIds = new String[Math.min(_maxTourTypes, _allRecentTourTypes.size())];
+      final String[] stateTourTypeIds = new String[Math.min(_maxRecentTourTypes, _allRecentTourTypes.size())];
       int tourTypeIndex = 0;
 
       for (final TourType recentTourType : _allRecentTourTypes) {
          stateTourTypeIds[tourTypeIndex++] = Long.toString(recentTourType.getTypeId());
 
-         if (tourTypeIndex == _maxTourTypes) {
+         if (tourTypeIndex == _maxRecentTourTypes) {
             break;
          }
       }
@@ -299,9 +299,9 @@ public class TourTypeMenuManager implements IActionProvider {
 
    private void createRecentActions() {
 
-      _maxTourTypes = _prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES);
+      _maxRecentTourTypes = _prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TOUR_TYPES);
 
-      _allRecentTourTypeActions = new RecentTourTypeAction[_maxTourTypes];
+      _allRecentTourTypeActions = new RecentTourTypeAction[_maxRecentTourTypes];
 
       for (int actionIndex = 0; actionIndex < _allRecentTourTypeActions.length; actionIndex++) {
          _allRecentTourTypeActions[actionIndex] = new RecentTourTypeAction();
@@ -401,7 +401,7 @@ public class TourTypeMenuManager implements IActionProvider {
          return;
       }
 
-      if (_maxTourTypes < 1) {
+      if (_maxRecentTourTypes < 1) {
          return;
       }
 

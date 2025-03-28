@@ -160,6 +160,7 @@ import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ValuePoint_ToolTip_UI;
+import net.tourbook.ui.action.SubMenu_SetTourMarkerType;
 import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.geoCompare.GeoComparedTour;
@@ -547,6 +548,8 @@ public class Map2View extends ViewPart implements
    private ActionShowTourWeatherInMap           _actionShowTourWeatherInMap;
    private ActionShowValuePoint                 _actionShowValuePoint;
    private ActionZoomLevelAdjustment            _actionZoomLevelAdjustment;
+   //
+   private SubMenu_SetTourMarkerType            _actionSubMenu_SetTourMarkerType;
    //
    private ActionSyncMap                        _actionMap2Slideout_SyncMap;
    private ActionSyncMapWith_Photo              _actionSyncMapWith_Photo;
@@ -2352,6 +2355,7 @@ public class Map2View extends ViewPart implements
       _actionShowTour                        = new ActionShowTour();
       _actionShowTourInfoInMap               = new ActionShowTourInfoInMap(this);
       _actionShowTourWeatherInMap            = new ActionShowTourWeatherInMap(this);
+      _actionSubMenu_SetTourMarkerType       = new SubMenu_SetTourMarkerType();
       _actionZoomLevelAdjustment             = new ActionZoomLevelAdjustment();
 
       // map sync actions
@@ -2880,6 +2884,8 @@ public class Map2View extends ViewPart implements
 
          enableActions_MapPoint(_contextMenu_HoveredMapPoint);
 
+         _actionSubMenu_SetTourMarkerType.setTourMarker(mapPoint.tourMarker);
+
          if (isPhotoAvailable) {
 
             menuMgr.add(_actionMapPoint_Photo_ShowRating);
@@ -2904,6 +2910,7 @@ public class Map2View extends ViewPart implements
 
          menuMgr.add(_actionMapPoint_ShowOnlyThisTour);
          menuMgr.add(_actionMapPoint_EditTourMarker);
+         menuMgr.add(_actionSubMenu_SetTourMarkerType);
 
       } else {
 

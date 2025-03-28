@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.net.URI;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -41,6 +42,7 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourMarkerType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.tourChart.ITourMarkerSelectionListener;
@@ -71,6 +73,7 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.nebula.widgets.tablecombo.TableCombo;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
@@ -92,6 +95,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectionListener, ITourMarkerModifyListener {
@@ -185,6 +189,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    private Label                     _lblLabelOffsetX;
    private Label                     _lblLabelOffsetY;
    private Label                     _lblLabelPosition;
+   private Label                     _lblMarkerType;
    private Label                     _lblLinkText;
    private Label                     _lblLinkUrl;
 
@@ -196,6 +201,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    private Text                      _txtUrlText;
 
    private AutoComplete_ComboInputMT _autocompleteMarkerName;
+   private TableCombo                _tableMarkerType;
 
    {
       _nf3.setMinimumFractionDigits(3);
@@ -666,14 +672,15 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       /*
        * create columns
        */
-      defineColumn_1stHidden(tableLayout);//				// 0
-      defineColumn_Distance(tableLayout);//				// 1
-      defineColumn_IsVisible(tableLayout);//				// 2
-      defineColumn_Marker(tableLayout);//					// 4
-      defineColumn_Description(tableLayout);//			// 5
-      defineColumn_Url(tableLayout);//					// 6
-      defineColumn_OffsetX(tableLayout);//				// 7
-      defineColumn_OffsetY(tableLayout);//				// 8
+      defineColumn_1stHidden(tableLayout);
+      defineColumn_Distance(tableLayout);
+      defineColumn_IsVisible(tableLayout);
+      defineColumn_Marker(tableLayout);
+      defineColumn_Marker_Type(tableLayout);
+      defineColumn_Description(tableLayout);
+      defineColumn_Url(tableLayout);
+      defineColumn_OffsetX(tableLayout);
+      defineColumn_OffsetY(tableLayout);
 
       /*
        * create table viewer
@@ -723,7 +730,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          {
             createUI_52_Label(_groupText);
             createUI_54_Description(_groupText);
-            createUI_56_Label_Position(_groupText);
+            createUI_56_LabelPosition(_groupText);
+            createUI_58_MarkerType(_groupText);
          }
 
          /*
@@ -796,7 +804,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       }
    }
 
-   private void createUI_56_Label_Position(final Composite parent) {
+   private void createUI_56_LabelPosition(final Composite parent) {
 
       /*
        * Position
@@ -876,6 +884,30 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
                }
             }
          }
+      }
+   }
+
+   private void createUI_58_MarkerType(final Composite parent) {
+
+      {
+         // label
+         _lblMarkerType = new Label(parent, SWT.NONE);
+         _lblMarkerType.setText("T&ype");
+         _lblMarkerType.setToolTipText("");
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_lblMarkerType);
+
+         /*
+          * Combo: Marker type
+          */
+         _tableMarkerType = new TableCombo(parent, SWT.READ_ONLY | SWT.BORDER);
+         _tableMarkerType.setToolTipText("");
+         _tableMarkerType.setShowTableHeader(false);
+         _tableMarkerType.defineColumns(1);
+         _tableMarkerType.addSelectionListener(_defaultSelectionListener);
+
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_tableMarkerType);
       }
    }
 
@@ -1156,7 +1188,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    }
 
    /**
-    * column: marker
+    * Column: Marker
     */
    private void defineColumn_Marker(final TableColumnLayout tableLayout) {
 
@@ -1173,7 +1205,40 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
             cell.setText(tourMarker.getLabel());
          }
       });
-      tableLayout.setColumnData(tc, new ColumnWeightData(1, true));
+      tableLayout.setColumnData(tc, new ColumnWeightData(10, true));
+   }
+
+   /**
+    * Column: Marker type
+    */
+   private void defineColumn_Marker_Type(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_markerViewer, SWT.LEAD);
+      final TableColumn tc = tvc.getColumn();
+
+      tc.setText("Type");
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourMarker marker = (TourMarker) cell.getElement();
+            final TourMarkerType markerType = marker.getTourMarkerType();
+
+            if (markerType == null) {
+
+               cell.setText(UI.EMPTY_STRING);
+
+            } else {
+
+               cell.setForeground(markerType.getForegroundColorSWT());
+               cell.setBackground(markerType.getBackgroundColorSWT());
+               cell.setText(markerType.getTypeName());
+            }
+         }
+      });
+
+      tableLayout.setColumnData(tc, new ColumnWeightData(3, true));
    }
 
    /**
@@ -1307,41 +1372,47 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _btnUndo.setEnabled(false);
       }
 
-      _chkVisibility.setEnabled(isMarkerSelected);
+// SET_FORMATTING_OFF
 
-      _btnDelete.setEnabled(isMarkerSelected);
-      _btnShowAll.setEnabled(isMarkerEnabled);
-      _btnHideAll.setEnabled(isMarkerEnabled);
-      _btnPasteText.setEnabled(isMarkerEnabled);
-      _btnPasteUrl.setEnabled(isMarkerEnabled);
+      _chkVisibility       .setEnabled(isMarkerSelected);
 
-      _comboLabelPosition.setEnabled(isMarkerEnabled);
-      _comboMarkerName.setEnabled(isMarkerEnabled);
+      _btnDelete           .setEnabled(isMarkerSelected);
+      _btnShowAll          .setEnabled(isMarkerEnabled);
+      _btnHideAll          .setEnabled(isMarkerEnabled);
+      _btnPasteText        .setEnabled(isMarkerEnabled);
+      _btnPasteUrl         .setEnabled(isMarkerEnabled);
+
+      _comboLabelPosition  .setEnabled(isMarkerEnabled);
+      _comboMarkerName     .setEnabled(isMarkerEnabled);
+      _tableMarkerType     .setEnabled(isMarkerEnabled);
 
       // this do not work on win
-      _groupText.setEnabled(isMarkerEnabled);
-      _groupUrl.setEnabled(isMarkerEnabled);
+      _groupText           .setEnabled(isMarkerEnabled);
+      _groupUrl            .setEnabled(isMarkerEnabled);
 
-      _lblDescription.setEnabled(isMarkerEnabled);
-      _lblLabel.setEnabled(isMarkerEnabled);
-      _lblLabelOffsetX.setEnabled(isMarkerEnabled);
-      _lblLabelOffsetY.setEnabled(isMarkerEnabled);
-      _lblLabelPosition.setEnabled(isMarkerEnabled);
-      _lblLinkText.setEnabled(isMarkerEnabled);
-      _lblLinkUrl.setEnabled(isMarkerEnabled);
+      _lblDescription      .setEnabled(isMarkerEnabled);
+      _lblLabel            .setEnabled(isMarkerEnabled);
+      _lblLabelOffsetX     .setEnabled(isMarkerEnabled);
+      _lblLabelOffsetY     .setEnabled(isMarkerEnabled);
+      _lblLabelPosition    .setEnabled(isMarkerEnabled);
+      _lblLinkText         .setEnabled(isMarkerEnabled);
+      _lblLinkUrl          .setEnabled(isMarkerEnabled);
+      _lblMarkerType       .setEnabled(isMarkerEnabled);
 
-      _spinLabelOffsetX.setEnabled(isMarkerEnabled);
-      _spinLabelOffsetY.setEnabled(isMarkerEnabled);
+      _spinLabelOffsetX    .setEnabled(isMarkerEnabled);
+      _spinLabelOffsetY    .setEnabled(isMarkerEnabled);
 
-      _txtDescription.setEnabled(isMarkerEnabled);
-      _txtUrlAddress.setEnabled(isMarkerEnabled);
-      _txtUrlText.setEnabled(isMarkerEnabled);
+      _txtDescription      .setEnabled(isMarkerEnabled);
+      _txtUrlAddress       .setEnabled(isMarkerEnabled);
+      _txtUrlText          .setEnabled(isMarkerEnabled);
+
+// SET_FORMATTING_ON
    }
 
    private void fillUI() {
 
       /*
-       * Fill position combos
+       * Fill position combo
        */
       for (final String position : TourMarker.LABEL_POSITIONS) {
          _comboLabelPosition.add(position);
@@ -1356,6 +1427,28 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       }
 
       _autocompleteMarkerName = new AutoComplete_ComboInputMT(_comboMarkerName);
+
+      /*
+       * Marker types combo
+       */
+      final Table table = _tableMarkerType.getTable();
+
+      // add "Not Selected" item
+      TableItem tableItem = new TableItem(table, SWT.READ_ONLY);
+      tableItem.setText("<Not Selected>");
+
+      final List<TourMarkerType> allMarkerTypes = TourDatabase.getAllTourMarkerTypes();
+
+      for (final TourMarkerType markerType : allMarkerTypes) {
+
+         tableItem = new TableItem(table, SWT.READ_ONLY);
+
+         // set the column text
+         tableItem.setText(markerType.getTypeName());
+
+         tableItem.setBackground(markerType.getBackgroundColorSWT());
+         tableItem.setForeground(markerType.getForegroundColorSWT());
+      }
    }
 
    /**
@@ -1372,7 +1465,62 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    protected IDialogSettings getDialogBoundsSettings() {
 
       return _state;
-//      return null;
+
+// used for debugging
+//    return null;
+   }
+
+   private int getMarkerTypeIndex(final TourMarker selectedTourMarker) {
+
+      final TourMarkerType selectedMarkerType = selectedTourMarker.getTourMarkerType();
+
+      if (selectedMarkerType == null) {
+
+         // select "Not Selected" item
+
+         return 0;
+      }
+
+      final long selectedMarkerTypeID = selectedMarkerType.getId();
+      final List<TourMarkerType> allMarkerTypes = TourDatabase.getAllTourMarkerTypes();
+
+      for (int markerTypeIndex = 0; markerTypeIndex < allMarkerTypes.size(); markerTypeIndex++) {
+
+         final TourMarkerType markerType = allMarkerTypes.get(markerTypeIndex);
+
+         if (markerType.getId() == selectedMarkerTypeID) {
+
+            return markerTypeIndex
+
+                  // adjust first item
+                  + 1;
+         }
+      }
+
+      // select "Not Selected" item
+      return 0;
+   }
+
+   private TourMarkerType getSelectedTourMarkerType() {
+
+      final int selectionIndex = _tableMarkerType.getSelectionIndex();
+
+      if (selectionIndex == 0) {
+
+         // the first item is selected -> ignore it
+
+         return null;
+
+      } else if (selectionIndex > 0) {
+
+         final List<TourMarkerType> allMarkerTypes = TourDatabase.getAllTourMarkerTypes();
+
+         return allMarkerTypes.get(selectionIndex - 1);
+      }
+
+      // nothing is selected
+
+      return null;
    }
 
    TourChart getTourChart() {
@@ -1578,6 +1726,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       tourMarker.setDescription(_txtDescription.getText());
       tourMarker.setUrlAddress(_txtUrlAddress.getText());
       tourMarker.setUrlText(_txtUrlText.getText());
+
+      tourMarker.setTourMarkerType(getSelectedTourMarkerType());
    }
 
    /**
@@ -1606,6 +1756,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          _txtDescription.setText(isTourMarker ? _selectedTourMarker.getDescription() : UI.EMPTY_STRING);
          _txtUrlAddress.setText(isTourMarker ? _selectedTourMarker.getUrlAddress() : UI.EMPTY_STRING);
          _txtUrlText.setText(isTourMarker ? _selectedTourMarker.getUrlText() : UI.EMPTY_STRING);
+
+         _tableMarkerType.select(getMarkerTypeIndex(_selectedTourMarker));
       }
       _isUpdateUI = false;
    }

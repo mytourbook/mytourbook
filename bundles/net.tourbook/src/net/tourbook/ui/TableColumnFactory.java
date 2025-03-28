@@ -279,6 +279,9 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory MARKER_SERIE_INDEX;
    public static final TableColumnFactory MARKER_TIME_DELTA;
    public static final TableColumnFactory MARKER_URL;
+   public static final String             MARKER_URL_ID                                      = "MARKER_URL_ID";                                   //$NON-NLS-1$
+   public static final TableColumnFactory MARKER_TYPE;
+   public static final String             MARKER_TYPE_ID                                     = "MARKER_TYPE_ID";                                  //$NON-NLS-1$
 
    public static final TableColumnFactory MOTION_ALTIMETER;
    public static final String             MOTION_ALTIMETER_ID                                = "MOTION_ALTIMETER";                                //$NON-NLS-1$
@@ -2075,13 +2078,33 @@ public abstract class TableColumnFactory {
          }
       };
 
+      MARKER_TYPE = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, MARKER_TYPE_ID, SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Marker);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_MarkerType_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_MarkerType_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_MarkerType_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(25));
+
+            return colDef;
+         }
+      };
+
       MARKER_URL = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "MARKER_URL", SWT.LEAD); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, MARKER_URL_ID, SWT.LEAD);
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Marker);
 

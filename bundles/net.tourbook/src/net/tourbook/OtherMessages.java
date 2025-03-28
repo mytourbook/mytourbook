@@ -72,6 +72,7 @@ public class OtherMessages {
    // net.tourbook.common.Messages
    //
 
+   public static final String APP_ACTION_ADD_WITH_CONFIRM                  = net.tourbook.common.Messages.App_Action_Add_WithConfirm;
    public static final String APP_ACTION_APPLY_AND_CLOSE                   = net.tourbook.common.Messages.App_Action_ApplyAndClose;
    public static final String APP_ACTION_CLOSE_TOOLTIP                     = net.tourbook.common.Messages.App_Action_Close_Tooltip;
    public static final String APP_ACTION_RESTORE_DEFAULT                   = net.tourbook.common.Messages.App_Action_RestoreDefault;
