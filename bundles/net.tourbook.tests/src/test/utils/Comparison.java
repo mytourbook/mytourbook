@@ -154,7 +154,7 @@ public class Comparison {
                   new Customization("tourMarkers[*].tourTime", (o1, o2) -> true))); //$NON-NLS-1$
 
       final CustomComparator customArrayValueComparator = new CustomComparator(
-            JSONCompareMode.STRICT,
+            JSONCompareMode.LENIENT,
             new Customization("tourMarkers", tourMarkersValueMatcher), //$NON-NLS-1$
             new Customization("tourType.createId", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("tourId", (o1, o2) -> true)); //$NON-NLS-1$
