@@ -1615,7 +1615,8 @@ public class TourDatabase {
    }
 
    /**
-    * @return Returns the backend of all tour types which are stored in the database sorted by name.
+    * @return Returns the backend of all tour marker types which are stored in the database sorted
+    *         by name.
     */
    public static List<TourMarkerType> getAllTourMarkerTypes() {
 

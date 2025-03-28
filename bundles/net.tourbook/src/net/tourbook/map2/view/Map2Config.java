@@ -115,6 +115,7 @@ public class Map2Config {
     * Tour marker filter
     */
    public boolean isFilterTourMarkers;
+   public long[]  tourMarkerFilter;
 
    /*
     * Tour marker cluster

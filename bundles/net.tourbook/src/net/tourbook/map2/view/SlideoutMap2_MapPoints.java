@@ -41,6 +41,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.location.CommonLocationView;
 import net.tourbook.tour.location.TourLocationView;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -176,6 +177,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private int                            _expandingCounter;
    private int                            _expandedHeight = -1;
    //
+   private boolean                        _isInUpdateUI;
    private TourPauseUI                    _tourPausesUI;
    //
    private final NumberFormat             _nf3            = NumberFormat.getNumberInstance();
@@ -1141,6 +1143,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
                true //                    linkItemAndCheckbox
          );
 
+         _comboTourMarkerFilter.addSelectionListener(_mapPointSelectionListener);
+         _comboTourMarkerFilter.addSelectionAllListener(_mapPointSelectionListener);
+
          _comboTourMarkerFilter.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(final FocusEvent e) {
@@ -2060,6 +2065,27 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       }
    }
 
+   /**
+    * @return Returns the ID's of the seleted marker types
+    */
+   private long[] getSelectedMarkerFilter() {
+
+      final int[] allSelectionIndices = _comboTourMarkerFilter.getSelectionIndices();
+      final List<TourMarkerType> allMarkerTypes = TourDatabase.getAllTourMarkerTypes();
+
+      final long[] allSelectedMarkerTypeIDs = new long[allSelectionIndices.length];
+      int idIndex = 0;
+
+      for (final int selectionIndex : allSelectionIndices) {
+
+         final TourMarkerType markerType = allMarkerTypes.get(selectionIndex);
+
+         allSelectedMarkerTypeIDs[idIndex++] = markerType.getId();
+      }
+
+      return allSelectedMarkerTypeIDs;
+   }
+
    private MapTourMarkerTime getSelectedMarkerTimeStamp() {
 
       final int selectedIndex = _comboTourMarkerTime.getSelectionIndex();
@@ -2257,6 +2283,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    }
 
    private void onModifyConfig(final Widget widget) {
+
+      if (_isInUpdateUI) {
+         return;
+      }
 
       onModifyConfig(false, widget);
    }
@@ -2498,6 +2528,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
    private void restoreState() {
 
+      _isInUpdateUI = true;
+
       final Map2Config config = Map2ConfigManager.getActiveConfig();
 
 // SET_FORMATTING_OFF
@@ -2581,16 +2613,19 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _actionStatistic_TourPause       .setChecked(config.isShowTourPauses);
       _actionStatistic_TourWayPoint    .setChecked(config.isShowTourWayPoint);
 
-// SET_FORMATTING_ON
-
       _tourPausesUI.restoreState();
 
-      selectLabelFont(config.labelFontName);
-      selectLabelLayout(config.labelLayout);
-      selectMarkerTimeStamp(config.tourMarkerDateTimeFormat);
+      selectLabelFont(        config.labelFontName);
+      selectLabelLayout(      config.labelLayout);
+      selectMarkerTimeStamp(  config.tourMarkerDateTimeFormat);
+      selectMarkerFilter(     config.tourMarkerFilter);
+
+// SET_FORMATTING_ON
 
       updateUI_TabLabel();
       updateUI_ExpandCollapse();
+
+      _isInUpdateUI = false;
    }
 
    private void restoreTabFolder() {
@@ -2637,6 +2672,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       config.labelFontName                = getSelectedLabelFont();
       config.labelLayout                  = getSelectedLabelLayout();
       config.tourMarkerDateTimeFormat     = getSelectedMarkerTimeStamp();
+      config.tourMarkerFilter             = getSelectedMarkerFilter();
 
       config.commonLocationFill_RGB             = _colorCommonLocationLabel_Fill             .getColorValue();
       config.commonLocationOutline_RGB          = _colorCommonLocationLabel_Outline          .getColorValue();
@@ -2716,6 +2752,47 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       }
 
       _comboLabelLayout.select(selectionIndex);
+   }
+
+   /**
+    * @param allRequestedMarkerTypeIDs
+    */
+   private void selectMarkerFilter(final long[] allRequestedMarkerTypeIDs) {
+
+      // combo is sorted by name
+      final List<TourMarkerType> allMarkerTypes = TourDatabase.getAllTourMarkerTypes();
+
+      final IntArrayList allSelectionIndices = new IntArrayList();
+
+      if (allRequestedMarkerTypeIDs != null) {
+
+         for (int comboIndex = 0; comboIndex < allMarkerTypes.size(); comboIndex++) {
+
+            final TourMarkerType comboMarkerType = allMarkerTypes.get(comboIndex);
+
+            final long comboID = comboMarkerType.getId();
+
+            for (final long requestedID : allRequestedMarkerTypeIDs) {
+
+               if (requestedID == comboID) {
+
+                  allSelectionIndices.add(comboIndex);
+
+                  break;
+               }
+            }
+         }
+      }
+
+      /**
+       * This code is very hacky because the NatCombo do not check the selected items or deselect
+       * thems :-(((
+       */
+      final int[] allSelectedIndices = allSelectionIndices.toArray();
+
+      _comboTourMarkerFilter.selectAll(false); // deselect all
+      _comboTourMarkerFilter.select(allSelectedIndices);
+      _comboTourMarkerFilter.check(allSelectedIndices);
    }
 
    private void selectMarkerTimeStamp(final Enum<MapTourMarkerTime> markerTimestamp) {

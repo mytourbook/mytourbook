@@ -17,19 +17,31 @@ package org.eclipse.nebula.widgets.nattable.widget.mt;
 
 import java.util.Map.Entry;
 
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.nebula.widgets.nattable.style.IStyle;
 import org.eclipse.nebula.widgets.nattable.widget.NatCombo;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
  *
  */
 public class NatComboMT extends NatCombo {
+
+   /**
+    * List of SelectionListener that should be added to the dropdown table once
+    * it is created. Kept locally because the table creation is deferred to the
+    * first access.
+    */
+   private final ListenerList<SelectionListener> selectionAllListener = new ListenerList<>(ListenerList.IDENTITY);
 
    public NatComboMT(final Composite parent,
                      final IStyle cellStyle,
@@ -39,6 +51,13 @@ public class NatComboMT extends NatCombo {
                      final boolean linkItemAndCheckbox) {
 
       super(parent, cellStyle, maxVisibleItems, style, showDropdownFilter, linkItemAndCheckbox);
+   }
+
+   public void addSelectionAllListener(final SelectionListener listener) {
+
+      if (listener != null) {
+         selectionAllListener.add(listener);
+      }
    }
 
    /**
@@ -123,6 +142,37 @@ public class NatComboMT extends NatCombo {
       }
    }
 
+   public void check(final int[] allCheckedIndices) {
+
+      final Table table = getDropdownTable();
+
+      // deselect all
+      table.deselectAll();
+
+      final TableItem[] allItems = table.getItems();
+
+      for (final int itemIndex : allCheckedIndices) {
+         allItems[itemIndex].setChecked(true);
+      }
+   }
+
+   private void fireSelectionAllListener() {
+
+      final Event event = new Event();
+      event.widget = text;
+
+      final SelectionEvent selectionEvent = new SelectionEvent(event);
+
+      for (final SelectionListener listeners : selectionAllListener) {
+         listeners.widgetSelected(selectionEvent);
+      }
+   }
+
+   public void removeSelectionAllListener(final SelectionListener listener) {
+
+      selectionAllListener.remove(listener);
+   }
+
    /**
     * Select or deselect all items
     *
@@ -136,26 +186,32 @@ public class NatComboMT extends NatCombo {
       }
 
       // update UI
-      if (dropdownTable != null) {
-
-         final TableItem[] allItems = dropdownTable.getItems();
-
-         for (final TableItem item : allItems) {
-            item.setChecked(isSelected);
-         }
+      final TableItem[] allItems = getDropdownTable().getItems();
+      for (final TableItem item : allItems) {
+         item.setChecked(isSelected);
       }
 
       updateTextControl(false);
+
+      // fire selection
+      fireSelectionAllListener();
    }
 
    @Override
    public void setEnabled(final boolean isEnabled) {
 
-//      super.setEnabled(isEnabled);
-
       if (text != null) {
 
          text.setEnabled(isEnabled);
       }
+   }
+
+   @Override
+   public void setItems(final String[] items) {
+
+      // ensure that the table is create that items can be populated !!!
+      getDropdownTable();
+
+      super.setItems(items);
    }
 }
