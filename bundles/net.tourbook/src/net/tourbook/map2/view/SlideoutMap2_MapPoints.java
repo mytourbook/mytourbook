@@ -27,6 +27,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.ColorSelectorExtended;
@@ -38,6 +39,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourMarkerType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageTourMarkerTypes;
 import net.tourbook.tour.location.CommonLocationView;
 import net.tourbook.tour.location.TourLocationView;
 
@@ -161,6 +163,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private IPropertyChangeListener        _prefChangeListener;
    //
    private ActionExpandSlideout           _actionExpandCollapseSlideout;
+   private ActionOpenPrefDialog           _actionMarkerType_Prefs;
    private ActionMarkerType_SelectAll     _actionMarkerType_SelectAll;
    private ActionMarkerType_SelectInverse _actionMarkerType_SelectInverse;
    private ActionMarkerType_SelectNone    _actionMarkerType_SelectNone;
@@ -637,6 +640,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       _actionExpandCollapseSlideout    = new ActionExpandSlideout();
       _actionRestoreDefaults           = new ActionResetToDefaults(this);
+
+      _actionMarkerType_Prefs          = new ActionOpenPrefDialog("Setup tour marker types",
+                                                                  PrefPageTourMarkerTypes.ID);
 
       _actionMarkerType_SelectAll      = new ActionMarkerType_SelectAll();
       _actionMarkerType_SelectInverse  = new ActionMarkerType_SelectInverse();
@@ -1145,6 +1151,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             tbm.add(_actionMarkerType_SelectAll);
             tbm.add(_actionMarkerType_SelectNone);
             tbm.add(_actionMarkerType_SelectInverse);
+            tbm.add(_actionMarkerType_Prefs);
 
             tbm.update(true);
          }
@@ -1944,6 +1951,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _btnSwapClusterSymbolColor             .setEnabled(isShowClusteredMarker);
       _btnSwapTourMarkerLabel_Color          .setEnabled(isShowTourMarker);
 
+      _actionMarkerType_Prefs                .setEnabled(isFilterMarkerType);
       _actionMarkerType_SelectAll            .setEnabled(isFilterMarkerType);
       _actionMarkerType_SelectInverse        .setEnabled(isFilterMarkerType);
       _actionMarkerType_SelectNone           .setEnabled(isFilterMarkerType);

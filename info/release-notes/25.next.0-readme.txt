@@ -41,7 +41,13 @@ Experimental
 New
 ===
 
-* 
+* Tour Marker Types
+  https://github.com/mytourbook/mytourbook/issues/1470
+  - Setup tour marker types in the preferences
+  - Apply tour marker types to tour markers
+  - 2D Map
+    - Display tour markers with different colors
+    - Filter tour markers  
 
 
 Improvements

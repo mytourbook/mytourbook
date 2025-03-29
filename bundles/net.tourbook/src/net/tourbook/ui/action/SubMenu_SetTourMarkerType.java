@@ -41,7 +41,7 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
 
    private List<TourMarker>     _allTourMarker;
 
-   private ActionOpenPrefDialog _actionOpenTourTypePrefs;
+   private ActionOpenPrefDialog _actionOpenTourMarkerTypePrefs;
 
    private class ActionSetMarkerType extends Action {
 
@@ -84,7 +84,7 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
 
       super("Set Tour Marker T&ype", AS_DROP_DOWN_MENU);
 
-      _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
+      _actionOpenTourMarkerTypePrefs = new ActionOpenPrefDialog(
             "Modify Tour Marker T&ype...",
             PrefPageTourMarkerTypes.ID);
    }
@@ -116,7 +116,7 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
       }
 
       new Separator().fill(menu, -1);
-      new ActionContributionItem(_actionOpenTourTypePrefs).fill(menu, -1);
+      new ActionContributionItem(_actionOpenTourMarkerTypePrefs).fill(menu, -1);
    }
 
    public void setTourMarker(final Object[] allTourMarker) {
