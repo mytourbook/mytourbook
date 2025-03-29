@@ -2070,7 +2070,20 @@ public class Map2View extends ViewPart implements
             final ArrayList<TourData> modifiedTours = tourEvent.getModifiedTours();
             if (CollectionUtils.isNotEmpty(modifiedTours)) {
 
-               setTourData(modifiedTours);
+               final List<Long> oldTourIDs = tourEvent.oldTourIDs;
+
+               if (oldTourIDs != null) {
+
+                  // tour is saved but use the old tours to update the UI
+
+                  final List<TourData> allTourData = TourManager.getInstance().getTourData(oldTourIDs);
+
+                  setTourData(allTourData);
+
+               } else {
+
+                  setTourData(modifiedTours);
+               }
 
                resetMap();
             }
@@ -2885,6 +2898,7 @@ public class Map2View extends ViewPart implements
          enableActions_MapPoint(_contextMenu_HoveredMapPoint);
 
          _actionSubMenu_SetTourMarkerType.setTourMarker(mapPoint.tourMarker);
+         _actionSubMenu_SetTourMarkerType.setOldTourIDs(getAllTourIDs());
 
          if (isPhotoAvailable) {
 
@@ -3181,6 +3195,17 @@ public class Map2View extends ViewPart implements
    IAction getAction_TourColor(final MapGraphId graphId) {
 
       return _allTourColor_Actions.get(graphId);
+   }
+
+   private List<Long> getAllTourIDs() {
+
+      final List<Long> allTourIDs = new ArrayList<>();
+
+      for (final TourData tourData : _allTourData) {
+         allTourIDs.add(tourData.getTourId());
+      }
+
+      return allTourIDs;
    }
 
    /**
@@ -5570,7 +5595,7 @@ public class Map2View extends ViewPart implements
     *
     * @param allTourData
     */
-   private void setTourData(final ArrayList<TourData> allTourData) {
+   private void setTourData(final List<TourData> allTourData) {
 
       _allTourData.clear();
       _allTourData.addAll(allTourData);
@@ -5606,12 +5631,12 @@ public class Map2View extends ViewPart implements
     */
    private void setTourData(final TourData tourData) {
 
-      final Long tourId = tourData.getTourId();
-
       _allTourData.clear();
       _allTourData.add(tourData);
 
       setVisibleDataPoints(tourData);
+
+      final Long tourId = tourData.getTourId();
 
       _map.tourBreadcrumb().addBreadcrumTour(tourId);
 

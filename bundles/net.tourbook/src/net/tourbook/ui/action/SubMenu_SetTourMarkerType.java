@@ -41,6 +41,8 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
 
    private List<TourMarker>     _allTourMarker;
 
+   private List<Long>           _allOldTourIDs;
+
    private ActionOpenPrefDialog _actionOpenTourMarkerTypePrefs;
 
    private class ActionSetMarkerType extends Action {
@@ -57,26 +59,7 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
       @Override
       public void run() {
 
-         if (TourManager.isTourEditorModified()) {
-            return;
-         }
-
-         final Map<Long, TourData> allModifiedToursByID = new HashMap<>();
-
-         for (final TourMarker tourMarker : _allTourMarker) {
-
-            // set marker type
-            tourMarker.setTourMarkerType(_markerType);
-
-            // keep the markers tour
-            final TourData tourData = tourMarker.getTourData();
-
-            allModifiedToursByID.put(tourData.getTourId(), tourData);
-         }
-
-         final ArrayList<TourData> allModifiedTours = new ArrayList<>(allModifiedToursByID.values());
-
-         TourManager.saveModifiedTours(allModifiedTours);
+         setTourMarkerType(_markerType);
       }
    }
 
@@ -119,6 +102,11 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
       new ActionContributionItem(_actionOpenTourMarkerTypePrefs).fill(menu, -1);
    }
 
+   public void setOldTourIDs(final List<Long> allOldTourIDs) {
+
+      _allOldTourIDs = allOldTourIDs;
+   }
+
    public void setTourMarker(final Object[] allTourMarker) {
 
       _allTourMarker = new ArrayList<>();
@@ -133,6 +121,36 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
       arrayList.add(tourMarker);
 
       _allTourMarker = arrayList;
+   }
+
+   private void setTourMarkerType(final TourMarkerType markerType) {
+
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
+      final Map<Long, TourData> allModifiedToursByID = new HashMap<>();
+
+      for (final TourMarker tourMarker : _allTourMarker) {
+
+         // set marker type
+         tourMarker.setTourMarkerType(markerType);
+
+         // keep the markers tour
+         final TourData tourData = tourMarker.getTourData();
+
+         allModifiedToursByID.put(tourData.getTourId(), tourData);
+      }
+
+      final ArrayList<TourData> allModifiedTours = new ArrayList<>(allModifiedToursByID.values());
+
+      TourManager.saveModifiedTours(allModifiedTours,
+
+            /*
+             * This trick is used to update/display not only the saved tour but also the previously
+             * displayed tour
+             */
+            _allOldTourIDs);
    }
 
 }
