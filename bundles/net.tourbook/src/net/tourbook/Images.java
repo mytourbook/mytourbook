@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -88,6 +88,8 @@ public class Images {
    public static final String Camera                                     = "camera.png";                                          //$NON-NLS-1$
    public static final String Checkbox_Checked                           = "checkbox-checked.png";                                //$NON-NLS-1$
    public static final String Checkbox_Checked_Disabled                  = "checkbox-checked-disabled.png";                       //$NON-NLS-1$
+   public static final String Checkbox_Inverse                           = "checkbox-inverse.png";                                //$NON-NLS-1$
+   public static final String Checkbox_Inverse_Disabled                  = "checkbox-inverse-disabled.png";                       //$NON-NLS-1$
    public static final String Checkbox_Uncheck                           = "checkbox-unchecked.png";                              //$NON-NLS-1$
    public static final String Checkbox_Uncheck_Disabled                  = "checkbox-unchecked-disabled.png";                     //$NON-NLS-1$
    public static final String ConconiChart                               = "conconi-chart.png";                                   //$NON-NLS-1$

@@ -162,6 +162,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    //
    private ActionExpandSlideout           _actionExpandCollapseSlideout;
    private ActionMarkerType_SelectAll     _actionMarkerType_SelectAll;
+   private ActionMarkerType_SelectInverse _actionMarkerType_SelectInverse;
    private ActionMarkerType_SelectNone    _actionMarkerType_SelectNone;
    private ActionResetToDefaults          _actionRestoreDefaults;
    private ActionStatistic_CommonLocation _actionStatistic_CommonLocation;
@@ -361,6 +362,25 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       }
    }
 
+   private class ActionMarkerType_SelectInverse extends Action {
+
+      public ActionMarkerType_SelectInverse() {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setToolTipText("Inverse selection of the marker types");
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Inverse));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Inverse_Disabled));
+      }
+
+      @Override
+      public void runWithEvent(final Event event) {
+
+         actionMarkerType_Select(null);
+      }
+   }
+
    private class ActionMarkerType_SelectNone extends Action {
 
       public ActionMarkerType_SelectNone() {
@@ -518,7 +538,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       onTTShellResize(null);
    }
 
-   private void actionMarkerType_Select(final boolean isSelectAll) {
+   private void actionMarkerType_Select(final Boolean isSelectAll) {
 
       _comboTourMarkerFilter.selectAll(isSelectAll);
    }
@@ -619,6 +639,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _actionRestoreDefaults           = new ActionResetToDefaults(this);
 
       _actionMarkerType_SelectAll      = new ActionMarkerType_SelectAll();
+      _actionMarkerType_SelectInverse  = new ActionMarkerType_SelectInverse();
       _actionMarkerType_SelectNone     = new ActionMarkerType_SelectNone();
 
       _actionStatistic_CommonLocation  = new ActionStatistic_CommonLocation();
@@ -1123,6 +1144,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
             tbm.add(_actionMarkerType_SelectAll);
             tbm.add(_actionMarkerType_SelectNone);
+            tbm.add(_actionMarkerType_SelectInverse);
 
             tbm.update(true);
          }
@@ -1923,6 +1945,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _btnSwapTourMarkerLabel_Color          .setEnabled(isShowTourMarker);
 
       _actionMarkerType_SelectAll            .setEnabled(isFilterMarkerType);
+      _actionMarkerType_SelectInverse        .setEnabled(isFilterMarkerType);
       _actionMarkerType_SelectNone           .setEnabled(isFilterMarkerType);
 
       _chkIsFillClusterSymbol                .setEnabled(isShowClusteredMarker);

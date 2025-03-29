@@ -341,15 +341,39 @@ public class NatComboMT extends NatCombo {
     */
    public void selectAll(final Boolean isSelected) {
 
-      // update model
-      for (final Entry<String, Boolean> entrySet : selectionStateMap.entrySet()) {
-         entrySet.setValue(isSelected);
-      }
+      if (isSelected == null) {
 
-      // update UI
-      final TableItem[] allItems = getDropdownTable().getItems();
-      for (final TableItem item : allItems) {
-         item.setChecked(isSelected);
+         // invert selection
+
+         // update model
+         for (final Entry<String, Boolean> entrySet : selectionStateMap.entrySet()) {
+
+            final Boolean inverseValue = !entrySet.getValue();
+
+            entrySet.setValue(inverseValue);
+         }
+
+         // update UI
+         final TableItem[] allItems = getDropdownTable().getItems();
+         for (final TableItem item : allItems) {
+
+            final boolean inverseChecked = !item.getChecked();
+
+            item.setChecked(inverseChecked);
+         }
+
+      } else {
+
+         // update model
+         for (final Entry<String, Boolean> entrySet : selectionStateMap.entrySet()) {
+            entrySet.setValue(isSelected);
+         }
+
+         // update UI
+         final TableItem[] allItems = getDropdownTable().getItems();
+         for (final TableItem item : allItems) {
+            item.setChecked(isSelected);
+         }
       }
 
       updateTextControl(false);

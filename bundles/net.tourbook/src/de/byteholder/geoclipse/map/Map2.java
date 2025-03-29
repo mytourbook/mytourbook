@@ -110,6 +110,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourMarkerType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map.location.LocationType;
 import net.tourbook.map.location.MapLocationToolTip;
@@ -158,6 +159,7 @@ import net.tourbook.ui.MTRectangle;
 
 import org.apache.commons.text.WordUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -1882,6 +1884,18 @@ public class Map2 extends Canvas {
 
       _allMapMarkerWithGroupedLabels.clear();
 
+      LongHashSet markerFilter_typeIDMap = null;
+      final boolean isFilterTourMarkers = _mapConfig.isFilterTourMarkers;
+      if (isFilterTourMarkers) {
+
+         final long[] tourMarkerFilter = _mapConfig.tourMarkerFilter;
+
+         if (tourMarkerFilter != null) {
+
+            markerFilter_typeIDMap = new LongHashSet(tourMarkerFilter);
+         }
+      }
+
       final Rectangle worldPixel_Viewport = _mapPointPainter_Viewport_DuringPainting;
 
       final List<TourMarker> allFilteredMakerList = new ArrayList<>();
@@ -1907,6 +1921,22 @@ public class Map2 extends Canvas {
             // skip marker when hidden or not set
             if (tourMarker.isMarkerVisible() == false || tourMarker.getLabel().length() == 0) {
                continue;
+            }
+
+            // skip marker when filtered out
+            if (isFilterTourMarkers) {
+
+               // tour markers are filtered by marker type
+
+               final TourMarkerType tourMarkerType = tourMarker.getTourMarkerType();
+
+               if (tourMarkerType != null) {
+
+                  if (markerFilter_typeIDMap.contains(tourMarkerType.getId()) == false) {
+
+                     continue;
+                  }
+               }
             }
 
             /*
@@ -2970,7 +3000,6 @@ public class Map2 extends Canvas {
             );
 
 //            System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 1 " + null);
-// TODO remove SYSTEM.OUT.PRINTLN
 
             return null;
          }
@@ -2981,7 +3010,6 @@ public class Map2 extends Canvas {
          // HQ image is not requested
 
 //         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 2 " + awtThumbImage.getWidth() + " / " + awtThumbImage.getHeight());
-// TODO remove SYSTEM.OUT.PRINTLN
 
          return awtThumbImage;
       }
@@ -3030,14 +3058,12 @@ public class Map2 extends Canvas {
       if (awtPhotoImageThumbHQ != null) {
 
 //         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 3 " + awtPhotoImageThumbHQ.getWidth() + " / " + awtPhotoImageThumbHQ.getHeight());
-// TODO remove SYSTEM.OUT.PRINTLN
 
          return awtPhotoImageThumbHQ;
       }
 
       if (awtThumbImage != null) {
 //         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 4 " + awtThumbImage.getWidth() + " / " + awtThumbImage.getHeight());
-// TODO remove SYSTEM.OUT.PRINTLN
       }
 
       return awtThumbImage;
