@@ -892,8 +892,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       {
          // label
          _lblMarkerType = new Label(parent, SWT.NONE);
-         _lblMarkerType.setText("T&ype");
-         _lblMarkerType.setToolTipText("");
+         _lblMarkerType.setText(Messages.Dlg_TourMarker_Label_MarkerType);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(_lblMarkerType);
@@ -902,9 +901,9 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
           * Combo: Marker type
           */
          _tableMarkerType = new TableCombo(parent, SWT.READ_ONLY | SWT.BORDER);
-         _tableMarkerType.setToolTipText("");
          _tableMarkerType.setShowTableHeader(false);
          _tableMarkerType.defineColumns(1);
+         _tableMarkerType.setVisibleItemCount(22);
          _tableMarkerType.addSelectionListener(_defaultSelectionListener);
 
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_tableMarkerType);
@@ -1216,7 +1215,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       final TableViewerColumn tvc = new TableViewerColumn(_markerViewer, SWT.LEAD);
       final TableColumn tc = tvc.getColumn();
 
-      tc.setText("Type");
+      tc.setText(Messages.Dlg_TourMarker_Column_MarkerType);
 
       tvc.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -1435,7 +1434,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       // add "Not Selected" item
       TableItem tableItem = new TableItem(table, SWT.READ_ONLY);
-      tableItem.setText("<Not Selected>");
+      tableItem.setText(Messages.Dlg_TourMarker_Item_TourMarker_NotSelected);
 
       final List<TourMarkerType> allMarkerTypes = TourDatabase.getAllTourMarkerTypes();
 

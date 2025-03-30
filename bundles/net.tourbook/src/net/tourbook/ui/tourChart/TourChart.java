@@ -2776,8 +2776,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
                MessageDialog.openError(
                      getShell(),
-                     "Delete Tour Marker",
-                     "Deleting a tour marker failed.\n\nA workaround is to restart the app or delete a tour marker in the \"Tour Markers\" view.");
+                     Messages.Tour_Chart_Action_Dialog_DeleteTourMarkerError_Title,
+                     Messages.Tour_Chart_Action_Dialog_DeleteTourMarkerError_Message);
             }
 
             Assert.isTrue(isRemoved);

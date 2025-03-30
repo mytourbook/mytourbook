@@ -354,7 +354,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
-         setToolTipText("Select all marker types");
+         setToolTipText(Messages.Slideout_MapPoints_Action_MarkerTypes_SelectAll_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Checked));
          setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Checked_Disabled));
@@ -373,7 +373,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
-         setToolTipText("Inverse selection of the marker types");
+         setToolTipText(Messages.Slideout_MapPoints_Action_MarkerTypes_InverteSelection_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Inverse));
          setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Inverse_Disabled));
@@ -392,7 +392,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
-         setToolTipText("Deselect all marker types");
+         setToolTipText(Messages.Slideout_MapPoints_Action_MarkerTypes_DeselectAll_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Uncheck));
          setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Uncheck_Disabled));
@@ -643,7 +643,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _actionExpandCollapseSlideout    = new ActionExpandSlideout();
       _actionRestoreDefaults           = new ActionResetToDefaults(this);
 
-      _actionMarkerType_Prefs          = new ActionOpenPrefDialog("Setup tour marker types",
+      _actionMarkerType_Prefs          = new ActionOpenPrefDialog(Messages.Slideout_MapPoints_Action_MarkerTypes_Setup_Tooltip,
                                                                   PrefPageTourMarkerTypes.ID);
 
       _actionMarkerType_SelectAll      = new ActionMarkerType_SelectAll();
@@ -1138,7 +1138,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       {
          {
             _chkIsFilterTourMarkers = new Button(container, SWT.CHECK);
-            _chkIsFilterTourMarkers.setText("Filter by marker t&ype");
+            _chkIsFilterTourMarkers.setText(Messages.Slideout_MapPoints_Checkbox_MarkerTypes_Filter);
             _chkIsFilterTourMarkers.addSelectionListener(_mapPointSelectionListener);
          }
          {

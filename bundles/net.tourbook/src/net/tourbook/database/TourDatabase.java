@@ -2787,7 +2787,7 @@ public class TourDatabase {
 
                   + "SELECT TourMarkerType" + NL //                     //$NON-NLS-1$
 
-                  + " FROM " + TourMarkerType.class.getSimpleName() + " AS tourMarkerType" + NL //    //$NON-NLS-1$
+                  + " FROM " + TourMarkerType.class.getSimpleName() + " AS tourMarkerType" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
 
                   // sort by name
                   + " ORDER  BY tourMarkerType.name" + NL //            //$NON-NLS-1$

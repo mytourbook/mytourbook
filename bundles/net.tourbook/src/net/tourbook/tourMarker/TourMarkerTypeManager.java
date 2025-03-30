@@ -155,7 +155,7 @@ public class TourMarkerTypeManager {
          final Query query = em.createQuery(UI.EMPTY_STRING
 
                + "SELECT TourMarker" //$NON-NLS-1$
-               + " FROM " + TourMarker.class.getSimpleName() + " AS tourMarker" //$NON-NLS-1$
+               + " FROM " + TourMarker.class.getSimpleName() + " AS tourMarker" //$NON-NLS-1$ //$NON-NLS-2$
                + " WHERE tourMarker.tourMarkerType IS NOT NULL AND tourMarker.tourMarkerType.markerTypeID = ?"); //$NON-NLS-1$
 
          query.setParameter(1, markerTypeID);

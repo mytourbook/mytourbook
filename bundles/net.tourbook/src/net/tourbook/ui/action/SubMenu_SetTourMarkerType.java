@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.tourbook.Messages;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourData;
@@ -66,10 +67,10 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
 
    public SubMenu_SetTourMarkerType() {
 
-      super("Set Tour Marker T&ype", AS_DROP_DOWN_MENU);
+      super(Messages.Tour_MarkerType_Action_SetTourMarkerType, AS_DROP_DOWN_MENU);
 
       _actionOpenTourMarkerTypePrefs = new ActionOpenPrefDialog(
-            "Modify Tour Marker T&ype...",
+            Messages.Tour_MarkerType_Action_SetupTourMarkerTypes,
             PrefPageTourMarkerTypes.ID);
    }
 
