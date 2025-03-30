@@ -2080,9 +2080,10 @@ public class Map2 extends Canvas {
 // SET_FORMATTING_OFF
 
             switch (tourMarkerDateTimeFormat) {
-            case DATE:        markerText += UI.SPACE + TimeTools.Formatter_Date_S.format(markerStartTime);     break;
-            case TIME:        markerText += UI.SPACE + TimeTools.Formatter_Time_S.format(markerStartTime);     break;
-            case DATE_TIME:   markerText += UI.SPACE + TimeTools.Formatter_DateTime_S.format(markerStartTime); break;
+            case DATE:           markerText += UI.SPACE + TimeTools.Formatter_Date_S      .format(markerStartTime);  break;
+            case DATE_NO_YEAR:   markerText += UI.SPACE + TimeTools.Formatter_Date_NoYear .format(markerStartTime);  break;
+            case TIME:           markerText += UI.SPACE + TimeTools.Formatter_Time_S      .format(markerStartTime);  break;
+            case DATE_TIME:      markerText += UI.SPACE + TimeTools.Formatter_DateTime_S  .format(markerStartTime);  break;
             case NONE:
             default:
             }

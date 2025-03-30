@@ -125,6 +125,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private static MapTourMarkerTime[] _allMarkerLabelTimeStamp_Value = {
 
          MapTourMarkerTime.NONE,
+         MapTourMarkerTime.DATE_NO_YEAR,
          MapTourMarkerTime.DATE,
          MapTourMarkerTime.TIME,
          MapTourMarkerTime.DATE_TIME,
@@ -136,6 +137,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private static String[]            _allMarkerLabelTime_Label      = {
 
          Messages.Map_Points_LabelTime_None,
+         Messages.Map_Points_LabelTime_Date_NoYear,
          Messages.Map_Points_LabelTime_Date,
          Messages.Map_Points_LabelTime_Time,
          Messages.Map_Points_LabelTime_DateTime,

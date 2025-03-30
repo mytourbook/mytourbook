@@ -1455,6 +1455,7 @@ public class Messages extends NLS {
    public static String        Map_Points_LabelBackground_RectangleBox;
    public static String        Map_Points_LabelBackground_Shadow;
    public static String        Map_Points_LabelTime_Date;
+   public static String        Map_Points_LabelTime_Date_NoYear;
    public static String        Map_Points_LabelTime_DateTime;
    public static String        Map_Points_LabelTime_None;
    public static String        Map_Points_LabelTime_Time;
