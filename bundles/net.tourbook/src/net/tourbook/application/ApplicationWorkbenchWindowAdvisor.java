@@ -58,6 +58,7 @@ import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 import net.tourbook.tour.location.CommonLocationManager;
 import net.tourbook.tour.location.TourLocationManager;
 import net.tourbook.tour.photo.TourPhotoManager;
+import net.tourbook.tourMarker.TourMarkerTypeManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.tourType.TourTypeManager;
 import net.tourbook.ui.action.TourActionManager;
@@ -437,6 +438,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       // do last cleanup, this dispose causes NPE in e4 when run in dispose() method
 
       TagManager.disposeTagImages();
+      TourMarkerTypeManager.dispose();
       TourTypeImage.dispose();
    }
 

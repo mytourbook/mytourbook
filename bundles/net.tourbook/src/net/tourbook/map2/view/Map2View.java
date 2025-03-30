@@ -2917,6 +2917,10 @@ public class Map2View extends ViewPart implements
             menuMgr.add(new Separator());
          }
 
+         menuMgr.add(_actionSubMenu_SetTourMarkerType);
+
+         menuMgr.add(new Separator());
+
          menuMgr.add(_actionMapPoint_ZoomIn);
          menuMgr.add(_actionMapPoint_CenterMap);
 
@@ -2924,7 +2928,6 @@ public class Map2View extends ViewPart implements
 
          menuMgr.add(_actionMapPoint_ShowOnlyThisTour);
          menuMgr.add(_actionMapPoint_EditTourMarker);
-         menuMgr.add(_actionSubMenu_SetTourMarkerType);
 
       } else {
 

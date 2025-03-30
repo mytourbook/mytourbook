@@ -134,17 +134,6 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
    }
 
    @Override
-   public void applyData(final Object data) {
-
-//      if (data instanceof TourMarkerType) {
-//
-//         final TourMarkerType mapProvider = (TourMarkerType) data;
-//
-//         selectMapProvider(mapProvider.getId());
-//      }
-   }
-
-   @Override
    protected Control createContents(final Composite parent) {
 
       // check: if a tour is modified in the tour editor
@@ -888,10 +877,15 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
       _selectedMarkerType = null;
 
+      final long markerTypeID = activeMarkerType.getId();
+
       // save model
-      TourDatabase.saveEntity(activeMarkerType, activeMarkerType.getId(), TourMarkerType.class);
+      TourDatabase.saveEntity(activeMarkerType, markerTypeID, TourMarkerType.class);
 
       reloadMarkerTypes();
+
+      // force the image to be recreated
+      TourMarkerTypeManager.dispose(markerTypeID);
 
       // update states
       _isFireModifyEvent = true;

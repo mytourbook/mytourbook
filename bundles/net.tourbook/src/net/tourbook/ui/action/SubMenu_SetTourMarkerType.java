@@ -29,6 +29,7 @@ import net.tourbook.data.TourMarkerType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.PrefPageTourMarkerTypes;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tourMarker.TourMarkerTypeManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -87,6 +88,8 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
       for (final TourMarkerType markerType : allTourMarkerTypes) {
 
          final ActionSetMarkerType actionSetMarkerType = new ActionSetMarkerType(markerType);
+
+         actionSetMarkerType.setImageDescriptor(TourMarkerTypeManager.getMarkerTypeImageDescriptor(markerType.getId()));
 
          // setup current marker type
          if (currentMarkerType != null && markerType.getId() == currentMarkerType.getId()) {

@@ -2055,6 +2055,11 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
     */
    private void fillUI_MarkerTypes() {
 
+      // fix NPE
+      if (_comboTourMarkerFilter == null) {
+         return;
+      }
+
       final List<TourMarkerType> allMarkerTypes = TourDatabase.getAllTourMarkerTypes();
 
       final String[] allItems = new String[allMarkerTypes.size()];
