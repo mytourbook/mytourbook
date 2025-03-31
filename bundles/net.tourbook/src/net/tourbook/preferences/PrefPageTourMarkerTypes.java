@@ -134,17 +134,6 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
    }
 
    @Override
-   public void applyData(final Object data) {
-
-//      if (data instanceof TourMarkerType) {
-//
-//         final TourMarkerType mapProvider = (TourMarkerType) data;
-//
-//         selectMapProvider(mapProvider.getId());
-//      }
-   }
-
-   @Override
    protected Control createContents(final Composite parent) {
 
       // check: if a tour is modified in the tour editor
@@ -178,7 +167,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
       {
 
          final Label label = new Label(prefPageContainer, SWT.WRAP);
-         label.setText("The tour marker t&ype defines the layout of tour markers");
+         label.setText(Messages.Pref_MarkerTypes_Label_Title);
 
          final Composite innerContainer = new Composite(prefPageContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, true).applyTo(innerContainer);
@@ -327,7 +316,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
              * Marker type name
              */
             _lblName = new Label(container, SWT.NONE);
-            _lblName.setText("Na&me");
+            _lblName.setText(Messages.Pref_MarkerTypes_Label_Name);
 
             _txtName = new Text(container, SWT.BORDER);
             _txtName.addModifyListener(_defaultModifyListener);
@@ -342,7 +331,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
              */
             final Label label = new Label(container, SWT.NONE);
             GridDataFactory.fillDefaults().applyTo(label);
-            label.setText("C&olor");
+            label.setText(Messages.Pref_MarkerTypes_Label_Color);
 
             final Composite colorContainer = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(colorContainer);
@@ -360,7 +349,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
                // button: swap color
                _btnMarkerType_SwapColors = new Button(colorContainer, SWT.PUSH);
                _btnMarkerType_SwapColors.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
-               _btnMarkerType_SwapColors.setToolTipText("Swap colors");
+               _btnMarkerType_SwapColors.setToolTipText(Messages.Pref_MarkerTypes_Button_SwapColors);
                _btnMarkerType_SwapColors.addSelectionListener(
                      SelectionListener.widgetSelectedAdapter(selectionEvent -> onMarkerType_SwapColors()));
 
@@ -377,7 +366,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
              * Marker type description
              */
             _lblDescription = new Label(container, SWT.NONE);
-            _lblDescription.setText("Descri&ption");
+            _lblDescription.setText(Messages.Pref_MarkerTypes_Label_Description);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblDescription);
 
             _txtDescription = new Text(container, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
@@ -403,7 +392,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
           */
          tvc = new TableViewerColumn(_markerTypeViewer, SWT.LEAD);
          tc = tvc.getColumn();
-         tc.setText("Name");
+         tc.setText(Messages.Pref_MarkerTypes_Column_Name);
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
@@ -418,7 +407,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
           */
          tvc = new TableViewerColumn(_markerTypeViewer, SWT.LEAD);
          tc = tvc.getColumn();
-         tc.setText("Color");
+         tc.setText(Messages.Pref_MarkerTypes_Column_Color);
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
@@ -438,7 +427,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
           */
          tvc = new TableViewerColumn(_markerTypeViewer, SWT.LEAD);
          tc = tvc.getColumn();
-         tc.setText("ID");
+         tc.setText(Messages.Pref_MarkerTypes_Column_ID);
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
@@ -549,7 +538,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
       if (StringUtils.isNullOrEmpty(_txtName.getText())) {
 
-         setErrorMessage("Name is required");
+         setErrorMessage(Messages.Pref_MarkerTypes_Message_NameIsRequired);
 
          // don't set focus because another field could be edited
 //       _txtName.setFocus();
@@ -672,10 +661,10 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
             getShell(),
 
-            "Delete Tour Marker Types",
+            Messages.Pref_MarkerTypes_Dialog_DeleteMarkerType_Title,
             null,
 
-            "Are you sure you want to delete the tour marker type \"%s\" and remove it from %d tour markers?".formatted(
+            Messages.Pref_MarkerTypes_Dialog_DeleteMarkerType_Message.formatted(
                   _selectedMarkerType.getTypeName(),
                   numTourMarkers),
 
@@ -863,8 +852,8 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
          if (MessageDialog.openQuestion(
                Display.getCurrent().getActiveShell(),
-               "Save Marker Type",
-               NLS.bind("Marker type \"{0}\" is modified, save changes?",
+               Messages.Pref_MarkerTypes_Dialog_SaveMarkerType_Title,
+               NLS.bind(Messages.Pref_MarkerTypes_Dialog_SaveMarkerType_Message,
 
                      // use name from the ui because it could be modified
                      _txtName.getText())) == false) {
@@ -888,10 +877,15 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
 
       _selectedMarkerType = null;
 
+      final long markerTypeID = activeMarkerType.getId();
+
       // save model
-      TourDatabase.saveEntity(activeMarkerType, activeMarkerType.getId(), TourMarkerType.class);
+      TourDatabase.saveEntity(activeMarkerType, markerTypeID, TourMarkerType.class);
 
       reloadMarkerTypes();
+
+      // force the image to be recreated
+      TourMarkerTypeManager.dispose(markerTypeID);
 
       // update states
       _isFireModifyEvent = true;

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.tourbook.Messages;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.ui.SubMenu;
 import net.tourbook.data.TourData;
@@ -29,6 +30,7 @@ import net.tourbook.data.TourMarkerType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.PrefPageTourMarkerTypes;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tourMarker.TourMarkerTypeManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -41,7 +43,9 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
 
    private List<TourMarker>     _allTourMarker;
 
-   private ActionOpenPrefDialog _actionOpenTourTypePrefs;
+   private List<Long>           _allOldTourIDs;
+
+   private ActionOpenPrefDialog _actionOpenTourMarkerTypePrefs;
 
    private class ActionSetMarkerType extends Action {
 
@@ -57,35 +61,16 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
       @Override
       public void run() {
 
-         if (TourManager.isTourEditorModified()) {
-            return;
-         }
-
-         final Map<Long, TourData> allModifiedToursByID = new HashMap<>();
-
-         for (final TourMarker tourMarker : _allTourMarker) {
-
-            // set marker type
-            tourMarker.setTourMarkerType(_markerType);
-
-            // keep the markers tour
-            final TourData tourData = tourMarker.getTourData();
-
-            allModifiedToursByID.put(tourData.getTourId(), tourData);
-         }
-
-         final ArrayList<TourData> allModifiedTours = new ArrayList<>(allModifiedToursByID.values());
-
-         TourManager.saveModifiedTours(allModifiedTours);
+         setTourMarkerType(_markerType);
       }
    }
 
    public SubMenu_SetTourMarkerType() {
 
-      super("Set Tour Marker T&ype", AS_DROP_DOWN_MENU);
+      super(Messages.Tour_MarkerType_Action_SetTourMarkerType, AS_DROP_DOWN_MENU);
 
-      _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
-            "Modify Tour Marker T&ype...",
+      _actionOpenTourMarkerTypePrefs = new ActionOpenPrefDialog(
+            Messages.Tour_MarkerType_Action_SetupTourMarkerTypes,
             PrefPageTourMarkerTypes.ID);
    }
 
@@ -105,6 +90,8 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
 
          final ActionSetMarkerType actionSetMarkerType = new ActionSetMarkerType(markerType);
 
+         actionSetMarkerType.setImageDescriptor(TourMarkerTypeManager.getMarkerTypeImageDescriptor(markerType.getId()));
+
          // setup current marker type
          if (currentMarkerType != null && markerType.getId() == currentMarkerType.getId()) {
 
@@ -116,7 +103,12 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
       }
 
       new Separator().fill(menu, -1);
-      new ActionContributionItem(_actionOpenTourTypePrefs).fill(menu, -1);
+      new ActionContributionItem(_actionOpenTourMarkerTypePrefs).fill(menu, -1);
+   }
+
+   public void setOldTourIDs(final List<Long> allOldTourIDs) {
+
+      _allOldTourIDs = allOldTourIDs;
    }
 
    public void setTourMarker(final Object[] allTourMarker) {
@@ -133,6 +125,36 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
       arrayList.add(tourMarker);
 
       _allTourMarker = arrayList;
+   }
+
+   private void setTourMarkerType(final TourMarkerType markerType) {
+
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
+      final Map<Long, TourData> allModifiedToursByID = new HashMap<>();
+
+      for (final TourMarker tourMarker : _allTourMarker) {
+
+         // set marker type
+         tourMarker.setTourMarkerType(markerType);
+
+         // keep the markers tour
+         final TourData tourData = tourMarker.getTourData();
+
+         allModifiedToursByID.put(tourData.getTourId(), tourData);
+      }
+
+      final ArrayList<TourData> allModifiedTours = new ArrayList<>(allModifiedToursByID.values());
+
+      TourManager.saveModifiedTours(allModifiedTours,
+
+            /*
+             * This trick is used to update/display not only the saved tour but also the previously
+             * displayed tour
+             */
+            _allOldTourIDs);
    }
 
 }

@@ -37,14 +37,17 @@ import org.eclipse.swt.graphics.RGB;
 @Entity
 public class TourMarkerType implements Comparable<Object>, Serializable {
 
-   private static final long          serialVersionUID      = 1L;
+   private static final long          serialVersionUID       = 1L;
 
-   private static final char          NL                    = UI.NEW_LINE;
+   private static final char          NL                     = UI.NEW_LINE;
 
-   public static final int            DB_LENGTH_NAME        = 1000;
-   public static final int            DB_LENGTH_DESCRIPTION = 10000;
+   public static final int            DB_LENGTH_NAME         = 1000;
+   public static final int            DB_LENGTH_DESCRIPTION  = 10000;
 
-   private static final AtomicInteger _createCounter        = new AtomicInteger();
+   private static final AtomicInteger _createCounter         = new AtomicInteger();
+
+   /** Width/height of the marker type image */
+   public static final int            MARKER_TYPE_IMAGE_SIZE = 16;
 
    /**
     * Contains the entity id
@@ -52,7 +55,7 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    @JsonProperty
-   private long                       markerTypeID          = TourDatabase.ENTITY_IS_NOT_SAVED;
+   private long                       markerTypeID           = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    @Basic(optional = false)
    @JsonProperty
@@ -63,19 +66,19 @@ public class TourMarkerType implements Comparable<Object>, Serializable {
    /**
     * Foreground color value
     */
-   private int                        foregroundColor       = 0x0;
+   private int                        foregroundColor        = 0x0;
 
    /**
     * Background color value
     */
-   private int                        backgroundColor       = 0xffffff;
+   private int                        backgroundColor        = 0xffffff;
 
    /**
     * Unique id for manually created tour marker types because the {@link #markerTypeID} is -1 when
     * it's not persisted
     */
    @Transient
-   private long                       _createId             = 0;
+   private long                       _createId              = 0;
 
    @Transient
    private RGB                        _foregroundRGB;

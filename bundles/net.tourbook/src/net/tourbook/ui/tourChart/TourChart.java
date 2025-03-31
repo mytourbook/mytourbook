@@ -2765,6 +2765,21 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
             // remove tourmarker from the model
             final boolean isRemoved = _tourData.getTourMarkers().remove(tourMarker);
+
+            /**
+             * isRemoved == false -> this happens when a tour is imported and a marker should be
+             * deleted in the tour chart :?(
+             * <p>
+             * A workaround is to delete the marker in the marker view or restart the app
+             */
+            if (isRemoved == false) {
+
+               MessageDialog.openError(
+                     getShell(),
+                     Messages.Tour_Chart_Action_Dialog_DeleteTourMarkerError_Title,
+                     Messages.Tour_Chart_Action_Dialog_DeleteTourMarkerError_Message);
+            }
+
             Assert.isTrue(isRemoved);
 
             // tour will be saved and the chart will also be updated

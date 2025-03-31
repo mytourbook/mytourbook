@@ -11987,9 +11987,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * Reset sorted markers that they are sorted again.
+    * Reset sorted markers that they are sorted again
     */
-   private void resetSortedMarkers() {
+   public void resetSortedMarkers() {
 
       if (_sortedMarkers != null) {
          _sortedMarkers.clear();

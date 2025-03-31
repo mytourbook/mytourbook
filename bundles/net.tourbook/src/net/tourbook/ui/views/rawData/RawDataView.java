@@ -2324,6 +2324,14 @@ public class RawDataView extends ViewPart implements
          }
       }
       {
+         // 2nd last time slice marker
+
+         sb.append(NL);
+         sb.append(importLauncher.isRemove2ndLastTimeSliceMarker
+               ? Messages.Import_Data_HTML_Remove2dLastTimeSliceMarker_Yes
+               : Messages.Import_Data_HTML_Remove2dLastTimeSliceMarker_No);
+      }
+      {
          // last marker
 
          final double distance = importLauncher.lastMarkerDistance / 1000.0 / UI.UNIT_VALUE_DISTANCE;
@@ -5798,10 +5806,17 @@ public class RawDataView extends ViewPart implements
          }
 
          /*
-          * 4. Set last marker text
+          * 4.1 Remove 2nd last time slice marker
+          */
+         if (importLauncher.isRemove2ndLastTimeSliceMarker) {
+            runEasyImport_0041_Remove2ndLastTimesliceMarker(importLauncher, importedTours);
+         }
+
+         /*
+          * 4.2 Set last marker text
           */
          if (importLauncher.isSetLastMarker) {
-            runEasyImport_004_SetLastMarker(importLauncher, importedTours);
+            runEasyImport_0042_SetLastMarker(importLauncher, importedTours);
          }
 
          /*
@@ -5912,8 +5927,47 @@ public class RawDataView extends ViewPart implements
       }
    }
 
-   private void runEasyImport_004_SetLastMarker(final ImportLauncher importLauncher,
-                                                final ArrayList<TourData> importedTours) {
+   private void runEasyImport_0041_Remove2ndLastTimesliceMarker(final ImportLauncher importLauncher,
+                                                                final ArrayList<TourData> allImportedTours) {
+
+      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_0041_REMOVE_2ND_LAST_TIMESLICE_MARKER);
+
+      for (final TourData tourData : allImportedTours) {
+
+         final Set<TourMarker> allTourMarkers = tourData.getTourMarkers();
+         final int numMarkers = allTourMarkers.size();
+
+         // check if markers are available
+         if (numMarkers == 0) {
+            continue;
+         }
+
+         final int numTimeSlices = tourData.timeSerie.length;
+
+         final int timeSerie2ndLastIndex = numTimeSlices - 2;
+         final int timeSerie3rdLastIndex = numTimeSlices - 3;
+
+         for (final TourMarker tourMarker : allTourMarkers) {
+
+            final int markerSerieIndex = tourMarker.getSerieIndex();
+
+            if (markerSerieIndex == timeSerie2ndLastIndex
+                  || markerSerieIndex == timeSerie3rdLastIndex) {
+
+               allTourMarkers.remove(tourMarker);
+
+               tourData.resetSortedMarkers();
+
+               TourLogManager.subLog_DEFAULT(TourManager.getTourDateTimeShort(tourData));
+
+               break;
+            }
+         }
+      }
+   }
+
+   private void runEasyImport_0042_SetLastMarker(final ImportLauncher importLauncher,
+                                                 final ArrayList<TourData> importedTours) {
 
       final String lastMarkerText = importLauncher.lastMarkerText;
       if (lastMarkerText == null || lastMarkerText.trim().length() == 0) {
@@ -5921,7 +5975,7 @@ public class RawDataView extends ViewPart implements
          return;
       }
 
-      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_004_SET_LAST_MARKER);
+      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_0042_SET_LAST_MARKER);
 
       final int ilLastMarkerDistance = importLauncher.lastMarkerDistance;
 

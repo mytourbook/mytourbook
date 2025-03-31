@@ -697,6 +697,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_LastMarker_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_LiveUpdate;
    public static String        Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip;
+   public static String        Dialog_ImportConfig_Checkbox_Remove2ndLastTimeSliceMarker;
+   public static String        Dialog_ImportConfig_Checkbox_Remove2ndLastTimeSliceMarker_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_ReplaceElevationFromSRTM;
    public static String        Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation;
    public static String        Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation_Tooltip;
@@ -733,6 +735,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Column_LastMarker_Label;
    public static String        Dialog_ImportConfig_Column_LastMarker_Tooltip;
    public static String        Dialog_ImportConfig_Column_Name;
+   public static String        Dialog_ImportConfig_Column_Remove2ndLastTimeSliceMarker_Header;
+   public static String        Dialog_ImportConfig_Column_Remove2ndLastTimeSliceMarker_Label;
    public static String        Dialog_ImportConfig_Column_RetrieveTourLocation_Header;
    public static String        Dialog_ImportConfig_Column_RetrieveTourLocation_Label;
    public static String        Dialog_ImportConfig_Column_RetrieveWeatherData_Header;
@@ -1038,10 +1042,12 @@ public class Messages extends NLS {
    public static String        Dlg_TourMarker_Button_undo;
    public static String        Dlg_TourMarker_Button_undo_tooltip;
    public static String        Dlg_TourMarker_Checkbox_MarkerVisibility;
+   public static String        Dlg_TourMarker_Column_MarkerType;
    public static String        Dlg_TourMarker_Dlg_Message;
    public static String        Dlg_TourMarker_Dlg_title;
    public static String        Dlg_TourMarker_Group_Label;
    public static String        Dlg_TourMarker_Group_Url;
+   public static String        Dlg_TourMarker_Item_TourMarker_NotSelected;
    public static String        Dlg_TourMarker_Label_Description;
    public static String        Dlg_TourMarker_Label_Label;
    public static String        Dlg_TourMarker_Label_LinkText;
@@ -1049,6 +1055,7 @@ public class Messages extends NLS {
    public static String        Dlg_TourMarker_Label_LinkUrl;
    public static String        Dlg_TourMarker_Label_LinkUrl_Tooltip;
    public static String        Dlg_TourMarker_Label_markers;
+   public static String        Dlg_TourMarker_Label_MarkerType;
    public static String        Dlg_TourMarker_Label_OffsetHorizontal;
    public static String        Dlg_TourMarker_Label_OffsetVertical;
    public static String        Dlg_TourMarker_Label_position;
@@ -1239,6 +1246,8 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink;
    public static String        Import_Data_HTML_ReceiveFromSerialPort_DirectlyAction;
    public static String        Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink;
+   public static String        Import_Data_HTML_Remove2dLastTimeSliceMarker_No;
+   public static String        Import_Data_HTML_Remove2dLastTimeSliceMarker_Yes;
    public static String        Import_Data_HTML_ReplaceElevationFromSRTM_No;
    public static String        Import_Data_HTML_ReplaceElevationFromSRTM_Yes;
    public static String        Import_Data_HTML_ReplaceFirstTimeSliceElevation_No;
@@ -1318,7 +1327,8 @@ public class Messages extends NLS {
    public static String        Log_EasyImport_002_TourFilesStart;
    public static String        Log_EasyImport_003_TourType;
    public static String        Log_EasyImport_003_TourType_Item;
-   public static String        Log_EasyImport_004_SetLastMarker;
+   public static String        Log_EasyImport_0041_Remove2ndLastTimeSliceMarker;
+   public static String        Log_EasyImport_0042_SetLastMarker;
    public static String        Log_EasyImport_005_AdjustTemperatureValues;
    public static String        Log_EasyImport_006_AdjustElevation;
    public static String        Log_EasyImport_006_ReplaceElevationFromSRTM;
@@ -1456,6 +1466,7 @@ public class Messages extends NLS {
    public static String        Map_Points_LabelBackground_RectangleBox;
    public static String        Map_Points_LabelBackground_Shadow;
    public static String        Map_Points_LabelTime_Date;
+   public static String        Map_Points_LabelTime_Date_NoYear;
    public static String        Map_Points_LabelTime_DateTime;
    public static String        Map_Points_LabelTime_None;
    public static String        Map_Points_LabelTime_Time;
@@ -1829,6 +1840,20 @@ public class Messages extends NLS {
    public static String        Pref_MapLayout_Checkbox_BorderColor_Color;
    public static String        Pref_MapLayout_Checkbox_BorderColor_Darker;
    public static String        Pref_MapLayout_Label_BorderColor;
+
+   public static String        Pref_MarkerTypes_Button_SwapColors;
+   public static String        Pref_MarkerTypes_Column_Color;
+   public static String        Pref_MarkerTypes_Column_ID;
+   public static String        Pref_MarkerTypes_Column_Name;
+   public static String        Pref_MarkerTypes_Dialog_DeleteMarkerType_Message;
+   public static String        Pref_MarkerTypes_Dialog_DeleteMarkerType_Title;
+   public static String        Pref_MarkerTypes_Dialog_SaveMarkerType_Message;
+   public static String        Pref_MarkerTypes_Dialog_SaveMarkerType_Title;
+   public static String        Pref_MarkerTypes_Label_Color;
+   public static String        Pref_MarkerTypes_Label_Description;
+   public static String        Pref_MarkerTypes_Label_Name;
+   public static String        Pref_MarkerTypes_Label_Title;
+   public static String        Pref_MarkerTypes_Message_NameIsRequired;
 
    public static String        pref_map_layout_BorderWidth;
    public static String        pref_map_layout_PaintBorder;
@@ -2431,6 +2456,10 @@ public class Messages extends NLS {
    public static String        Slideout_Map_TrackOptions_Label_Title_Tooltip;
 
    public static String        Slideout_MapPoints_Action_CommonLocations_Tooltip;
+   public static String        Slideout_MapPoints_Action_MarkerTypes_DeselectAll_Tooltip;
+   public static String        Slideout_MapPoints_Action_MarkerTypes_InverteSelection_Tooltip;
+   public static String        Slideout_MapPoints_Action_MarkerTypes_SelectAll_Tooltip;
+   public static String        Slideout_MapPoints_Action_MarkerTypes_Setup_Tooltip;
    public static String        Slideout_MapPoints_Action_TourLocations_Tooltip;
    public static String        Slideout_MapPoints_Action_TourMarkers_Tooltip;
    public static String        Slideout_MapPoints_Action_TourPauses_Tooltip;
@@ -2443,6 +2472,7 @@ public class Messages extends NLS {
    public static String        Slideout_MapPoints_Checkbox_GroupTourMarkers;
    public static String        Slideout_MapPoints_Checkbox_GroupTourMarkers_Extended;
    public static String        Slideout_MapPoints_Checkbox_GroupTourMarkers_Tooltip;
+   public static String        Slideout_MapPoints_Checkbox_MarkerTypes_Filter;
    public static String        Slideout_MapPoints_Checkbox_ShowCommonLocations;
    public static String        Slideout_MapPoints_Checkbox_ShowCommonLocations_Tooltip;
    public static String        Slideout_MapPoints_Checkbox_ShowLocationBoundingBox;
@@ -3110,6 +3140,8 @@ public class Messages extends NLS {
    public static String        Tour_Book_Monitor_CollateTask;
    public static String        Tour_Book_SortColumnTooltip;
 
+   public static String        Tour_Chart_Action_Dialog_DeleteTourMarkerError_Message;
+   public static String        Tour_Chart_Action_Dialog_DeleteTourMarkerError_Title;
    public static String        Tour_Chart_Label_ValuePoint_Title;
 
    public static String        Tour_Compare_ViewName_ElevationComparedTour;
@@ -3486,6 +3518,9 @@ public class Messages extends NLS {
    public static String        Tour_Marker_Position_vertical_chart_top;
    public static String        Tour_Marker_Position_Vertical_MarkerPoint_Above;
    public static String        Tour_Marker_Position_Vertical_MarkerPoint_Below;
+
+   public static String        Tour_MarkerType_Action_SetTourMarkerType;
+   public static String        Tour_MarkerType_Action_SetupTourMarkerTypes;
 
    public static String        tour_merger_btn_reset_adjustment;
    public static String        tour_merger_btn_reset_adjustment_tooltip;
