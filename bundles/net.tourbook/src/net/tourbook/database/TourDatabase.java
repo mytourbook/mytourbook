@@ -380,7 +380,6 @@ public class TourDatabase {
     */
    private static Map<Long, TourMarkerType>               _allDbTourMarkerTypes_ById;
 
-
    /*
     * Cached distinct fields
     */
@@ -5253,6 +5252,12 @@ public class TourDatabase {
             + "   photoAdjustmentsJSON       VARCHAR(" + VARCHAR_MAX_LENGTH + ")       " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 56 end
+
+            // version 57 start
+
+            + "   photoLabel                 VARCHAR(" + VARCHAR_MAX_LENGTH + ")       " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            // version 57 end
 
             + ")" //                                                                          //$NON-NLS-1$
       );
@@ -10915,6 +10920,8 @@ public class TourDatabase {
          SQL.AddColumn_BigInt(stmt, TABLE_TOUR_MARKER, KEY_MARKER_TYPE, null);
 
          createTable_TourMarkerType(stmt);
+
+         SQL.AddColumn_VarCar(stmt, TABLE_TOUR_PHOTO, "photoLabel", VARCHAR_MAX_LENGTH); //$NON-NLS-1$
       }
 
       logDbUpdate_End(newDbVersion);

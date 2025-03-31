@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
+ * Copyright (C) 2012, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,7 +39,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 /**
- * Contains a photo for a tour.
+ * Contains a photo for a tour
  *
  * @since 12.12
  */
@@ -64,6 +64,11 @@ public class TourPhoto implements Serializable {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private long                       photoId             = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+   /**
+    * A photo label can be displayed in the 2D map
+    */
+   private String                     photoLabel;
 
    /**
     * Image filename WITH extension.
@@ -304,6 +309,10 @@ public class TourPhoto implements Serializable {
       return photoId;
    }
 
+   public String getPhotoLabel() {
+      return photoLabel;
+   }
+
    public int getRatingStars() {
       return ratingStars;
    }
@@ -430,6 +439,10 @@ public class TourPhoto implements Serializable {
     */
    public void setLongitude(final double longitude) {
       this.longitude = longitude;
+   }
+
+   public void setPhotoLabel(final String photoLabel) {
+      this.photoLabel = photoLabel;
    }
 
    public void setRatingStars(final int ratingStars) {

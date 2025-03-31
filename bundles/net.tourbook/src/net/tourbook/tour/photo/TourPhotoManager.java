@@ -814,6 +814,41 @@ public class TourPhotoManager implements IPhotoServiceProvider {
    }
 
    /**
+    * @param photo
+    *
+    * @return Returns all {@link TourPhoto}'s which are referenced in a photo
+    */
+   public List<TourPhoto> getTourPhotos(final Photo photo) {
+
+      final ArrayList<TourPhoto> allPhotoTourPhotos = new ArrayList<>();
+
+      final Collection<TourPhotoReference> photoRefs = photo.getTourPhotoReferences().values();
+
+      if (photoRefs.size() > 0) {
+
+         for (final TourPhotoReference photoRef : photoRefs) {
+
+            final long photoID = photoRef.photoId;
+
+            final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
+            final Set<TourPhoto> allTourPhotos = tourData.getTourPhotos();
+
+            for (final TourPhoto tourPhoto : allTourPhotos) {
+
+               if (tourPhoto.getPhotoId() == photoID) {
+
+                  allPhotoTourPhotos.add(tourPhoto);
+
+                  break;
+               }
+            }
+         }
+      }
+
+      return allPhotoTourPhotos;
+   }
+
+   /**
     * @param imageFolder
     *
     * @return Returns number of photos which set in {@link TourPhoto}s for a given folder.
