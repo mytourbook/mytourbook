@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -245,6 +245,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Button               _chkIC_TurnOffWatching;
    //
    private Button               _chkIL_AdjustTemperature;
+   private Button               _chkIL_Remove2ndLastTimeSliceMarker;
    private Button               _chkIL_ReplaceElevationFromSRTM;
    private Button               _chkIL_ReplaceFirstTimeSliceElevation;
    private Button               _chkIL_RetrieveTourLocation;
@@ -1786,7 +1787,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       {
          createUI_542_IL_Name(group);
          createUI_550_IL_03_TourType(group);
-         createUI_600_IL_04_LastMarker(group);
+         createUI_600_IL_041_Remove2ndLastTimeSliceMarker(group);
+         createUI_600_IL_042_SetLastMarker(group);
          createUI_600_IL_05_AdjustTemperature(group);
          createUI_600_IL_06_AdjustElevation(group);
          createUI_600_IL_07_SetElevationFromSRTM(group);
@@ -2145,7 +2147,24 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       return speedTTContainer;
    }
 
-   private void createUI_600_IL_04_LastMarker(final Composite parent) {
+   private void createUI_600_IL_041_Remove2ndLastTimeSliceMarker(final Composite parent) {
+
+      {
+         /*
+          * Checkbox: 2nd last time slice marker
+          */
+         _chkIL_Remove2ndLastTimeSliceMarker = new Button(parent, SWT.CHECK);
+         _chkIL_Remove2ndLastTimeSliceMarker.setText(Messages.Dialog_ImportConfig_Checkbox_Remove2ndLastTimeSliceMarker);
+         _chkIL_Remove2ndLastTimeSliceMarker.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_Remove2ndLastTimeSliceMarker_Tooltip);
+         _chkIL_Remove2ndLastTimeSliceMarker.addSelectionListener(_defaultModify_Listener);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .indent(0, 5)
+               .applyTo(_chkIL_Remove2ndLastTimeSliceMarker);
+      }
+   }
+
+   private void createUI_600_IL_042_SetLastMarker(final Composite parent) {
 
       {
          /*
@@ -3154,28 +3173,29 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
 // SET_FORMATTING_OFF
 
-      _btnIL_Duplicate              .setEnabled(isILSelected);
-      _btnIL_Remove                 .setEnabled(isILSelected && numLaunchers > 1);
+      _btnIL_Duplicate                          .setEnabled(isILSelected);
+      _btnIL_Remove                             .setEnabled(isILSelected && numLaunchers > 1);
 
-      _chkIL_SetLastMarker          .setEnabled(isILSelected);
-      _chkIL_SaveTour               .setEnabled(isILSelected);
-      _chkIL_ShowInDashboard        .setEnabled(isILSelected);
-      _chkIL_SetTourType            .setEnabled(isILSelected);
+      _chkIL_Remove2ndLastTimeSliceMarker       .setEnabled(isILSelected);
+      _chkIL_SetLastMarker                      .setEnabled(isILSelected);
+      _chkIL_SaveTour                           .setEnabled(isILSelected);
+      _chkIL_ShowInDashboard                    .setEnabled(isILSelected);
+      _chkIL_SetTourType                        .setEnabled(isILSelected);
 
-      _comboIL_TourType             .setEnabled(isILSelected && isSetTourType);
+      _comboIL_TourType                         .setEnabled(isILSelected && isSetTourType);
 
-      _lblIL_ConfigName             .setEnabled(isILSelected);
-      _lblIL_ConfigDescription      .setEnabled(isILSelected);
+      _lblIL_ConfigName                         .setEnabled(isILSelected);
+      _lblIL_ConfigDescription                  .setEnabled(isILSelected);
 
-      _txtIL_ConfigName             .setEnabled(isILSelected);
-      _txtIL_ConfigDescription      .setEnabled(isILSelected);
+      _txtIL_ConfigName                         .setEnabled(isILSelected);
+      _txtIL_ConfigDescription                  .setEnabled(isILSelected);
 
       // last marker
-      _lblIL_LastMarker             .setEnabled(isLastMarkerSelected);
-      _lblIL_LastMarkerDistanceUnit .setEnabled(isLastMarkerSelected);
-      _lblIL_LastMarkerText         .setEnabled(isLastMarkerSelected);
-      _spinnerIL_LastMarkerDistance .setEnabled(isLastMarkerSelected);
-      _txtIL_LastMarker             .setEnabled(isLastMarkerSelected);
+      _lblIL_LastMarker                         .setEnabled(isLastMarkerSelected);
+      _lblIL_LastMarkerDistanceUnit             .setEnabled(isLastMarkerSelected);
+      _lblIL_LastMarkerText                     .setEnabled(isLastMarkerSelected);
+      _spinnerIL_LastMarkerDistance             .setEnabled(isLastMarkerSelected);
+      _txtIL_LastMarker                         .setEnabled(isLastMarkerSelected);
 
       // adjust temperature
       _lblIL_AvgTemperature                     .setEnabled(isAdjustTemperature);
@@ -3791,6 +3811,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _selectedIL.name                                = _txtIL_ConfigName.getText();
       _selectedIL.description                         = _txtIL_ConfigDescription.getText();
 
+      _selectedIL.isRemove2ndLastTimeSliceMarker      = _chkIL_Remove2ndLastTimeSliceMarker.getSelection();
       _selectedIL.isSetLastMarker                     = _chkIL_SetLastMarker.getSelection();
       _selectedIL.lastMarkerDistance                  = getSelectedLastMarkerDistance();
 
@@ -4346,26 +4367,28 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          return;
       }
 
+      final Enum<TourTypeConfig> selectedTourTypeConfig = getSelectedTourTypeConfig();
+
 // SET_FORMATTING_OFF
 
-      _selectedIL.name                 = _txtIL_ConfigName.getText();
-      _selectedIL.description          = _txtIL_ConfigDescription.getText();
-      _selectedIL.isSaveTour           = _chkIL_SaveTour.getSelection();
-      _selectedIL.isShowInDashboard    = _chkIL_ShowInDashboard.getSelection();
+      _selectedIL.name                             = _txtIL_ConfigName.getText();
+      _selectedIL.description                      = _txtIL_ConfigDescription.getText();
+      _selectedIL.isSaveTour                       = _chkIL_SaveTour.getSelection();
+      _selectedIL.isShowInDashboard                = _chkIL_ShowInDashboard.getSelection();
 
       // last marker
-      _selectedIL.isSetLastMarker      = _chkIL_SetLastMarker.getSelection();
-      _selectedIL.lastMarkerDistance   = getSelectedLastMarkerDistance();
-      _selectedIL.lastMarkerText       = _txtIL_LastMarker.getText();
+      _selectedIL.isRemove2ndLastTimeSliceMarker   = _chkIL_Remove2ndLastTimeSliceMarker.getSelection();
+      _selectedIL.isSetLastMarker                  = _chkIL_SetLastMarker.getSelection();
+      _selectedIL.lastMarkerDistance               = getSelectedLastMarkerDistance();
+      _selectedIL.lastMarkerText                   = _txtIL_LastMarker.getText();
 
       // tour type
-      final Enum<TourTypeConfig> selectedTourTypeConfig = getSelectedTourTypeConfig();
-      _selectedIL.tourTypeConfig       = selectedTourTypeConfig;
-      _selectedIL.isSetTourType        = _chkIL_SetTourType.getSelection();
+      _selectedIL.tourTypeConfig                   = selectedTourTypeConfig;
+      _selectedIL.isSetTourType                    = _chkIL_SetTourType.getSelection();
 
       // tour location
-      _selectedIL.isRetrieveTourLocation    = _chkIL_RetrieveTourLocation.getSelection();
-      _selectedIL.tourLocationProfile  = getSelectedTourLocation();
+      _selectedIL.isRetrieveTourLocation           = _chkIL_RetrieveTourLocation.getSelection();
+      _selectedIL.tourLocationProfile              = getSelectedTourLocation();
 
 // SET_FORMATTING_ON
 
@@ -4539,6 +4562,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _txtIL_ConfigDescription.setText(_selectedIL.description);
          _chkIL_SaveTour.setSelection(_selectedIL.isSaveTour);
          _chkIL_ShowInDashboard.setSelection(_selectedIL.isShowInDashboard);
+
+         // 2nd last time slice index marker
+         _chkIL_Remove2ndLastTimeSliceMarker.setSelection(_selectedIL.isRemove2ndLastTimeSliceMarker);
 
          // last marker
          _chkIL_SetLastMarker.setSelection(_selectedIL.isSetLastMarker);

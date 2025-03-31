@@ -53,7 +53,10 @@ New
 Improvements
 ============
 
-*
+* Easy Import
+  - New Option "4.1 Remove 2nd last timeslice marker"
+   Sometimes (in my case very often) a marker is automatically set by the device at the 2nd or 3rd last time slice. When selected, then this marker will be removed.
+
 
 
 Changes

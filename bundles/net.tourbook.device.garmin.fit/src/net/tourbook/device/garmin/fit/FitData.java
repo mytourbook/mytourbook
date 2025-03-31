@@ -414,7 +414,7 @@ public class FitData {
          return;
       }
 
-      final int serieSize = timeSerie.length;
+      final int numTimeslices = timeSerie.length;
 
       final long absoluteTourStartTime = tourData.getTourStartTimeMS();
       final long absoluteTourEndTime = tourData.getTourEndTimeMS();
@@ -436,7 +436,7 @@ public class FitData {
 
          boolean isSetMarker = false;
 
-         for (; serieIndex < serieSize; serieIndex++) {
+         for (; serieIndex < numTimeslices; serieIndex++) {
 
             int relativeTourTimeS = timeSerie[serieIndex];
             long absoluteTourTime = absoluteTourStartTime + relativeTourTimeS * 1000;
@@ -450,7 +450,7 @@ public class FitData {
                   // there are still markers available which are not set in the tour, set a last marker into the last time slice
 
                   // set values for the last time slice
-                  serieIndex = serieSize - 1;
+                  serieIndex = numTimeslices - 1;
                   relativeTourTimeS = timeSerie[serieIndex];
                   absoluteTourTime = absoluteTourStartTime + relativeTourTimeS * 1000;
 
@@ -475,7 +475,7 @@ public class FitData {
                 * the last tour marker
                 */
                final boolean canSetLastMarker = _isIgnoreLastMarker
-                     && serieIndex < serieSize - _lastMarkerTimeSlices;
+                     && serieIndex < numTimeslices - _lastMarkerTimeSlices;
 
                if (_isSetLastMarker || canSetLastMarker) {
 

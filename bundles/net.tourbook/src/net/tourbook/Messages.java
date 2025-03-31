@@ -696,6 +696,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_LastMarker_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_LiveUpdate;
    public static String        Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip;
+   public static String        Dialog_ImportConfig_Checkbox_Remove2ndLastTimeSliceMarker;
+   public static String        Dialog_ImportConfig_Checkbox_Remove2ndLastTimeSliceMarker_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_ReplaceElevationFromSRTM;
    public static String        Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation;
    public static String        Dialog_ImportConfig_Checkbox_ReplaceFirstTimeSliceElevation_Tooltip;
@@ -732,6 +734,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Column_LastMarker_Label;
    public static String        Dialog_ImportConfig_Column_LastMarker_Tooltip;
    public static String        Dialog_ImportConfig_Column_Name;
+   public static String        Dialog_ImportConfig_Column_Remove2ndLastTimeSliceMarker_Header;
+   public static String        Dialog_ImportConfig_Column_Remove2ndLastTimeSliceMarker_Label;
    public static String        Dialog_ImportConfig_Column_RetrieveTourLocation_Header;
    public static String        Dialog_ImportConfig_Column_RetrieveTourLocation_Label;
    public static String        Dialog_ImportConfig_Column_RetrieveWeatherData_Header;
@@ -1241,6 +1245,8 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink;
    public static String        Import_Data_HTML_ReceiveFromSerialPort_DirectlyAction;
    public static String        Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink;
+   public static String        Import_Data_HTML_Remove2dLastTimeSliceMarker_No;
+   public static String        Import_Data_HTML_Remove2dLastTimeSliceMarker_Yes;
    public static String        Import_Data_HTML_ReplaceElevationFromSRTM_No;
    public static String        Import_Data_HTML_ReplaceElevationFromSRTM_Yes;
    public static String        Import_Data_HTML_ReplaceFirstTimeSliceElevation_No;
@@ -1320,7 +1326,8 @@ public class Messages extends NLS {
    public static String        Log_EasyImport_002_TourFilesStart;
    public static String        Log_EasyImport_003_TourType;
    public static String        Log_EasyImport_003_TourType_Item;
-   public static String        Log_EasyImport_004_SetLastMarker;
+   public static String        Log_EasyImport_0041_Remove2ndLastTimeSliceMarker;
+   public static String        Log_EasyImport_0042_SetLastMarker;
    public static String        Log_EasyImport_005_AdjustTemperatureValues;
    public static String        Log_EasyImport_006_AdjustElevation;
    public static String        Log_EasyImport_006_ReplaceElevationFromSRTM;
