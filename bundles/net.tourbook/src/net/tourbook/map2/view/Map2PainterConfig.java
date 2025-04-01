@@ -49,6 +49,7 @@ public class Map2PainterConfig {
    public static boolean                    isShowPhotos;
    public static boolean                    isShowPhotoAnnotations;
    public static boolean                    isShowPhotoHistogram;
+   public static boolean                    isShowPhotoLabel;
    public static boolean                    isShowPhotoRating;
    public static boolean                    isShowPhotoTooltip;
    static boolean                           isShowTours;
@@ -79,6 +80,10 @@ public class Map2PainterConfig {
       isShowPhotoHistogram = Util.getStateBoolean(state,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_HISTOGRAM,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_HISTOGRAM_DEFAULT);
+
+      isShowPhotoLabel = Util.getStateBoolean(state,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_LABEL,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_LABEL_DEFAULT);
 
       isShowPhotoRating = (Util.getStateBoolean(state,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_RATING,
