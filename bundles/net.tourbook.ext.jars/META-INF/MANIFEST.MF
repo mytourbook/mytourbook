@@ -7,7 +7,7 @@ Eclipse-BuddyPolicy: registered
 Bundle-Vendor: MyTourbook
 Bundle-ClassPath: 
  jakarta.inject-api-2.0.1.jar,
- joda-time-2.13.1.jar,
+ joda-time-2.14.0.jar,
  c3p0-0.11.0-pre2.jar,
  mchange-commons-java-0.3.2.jar,
  caffeine-3.2.0.jar,
