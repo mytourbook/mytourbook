@@ -71,6 +71,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
@@ -158,6 +159,7 @@ import net.tourbook.tour.location.TourLocationExtended;
 import net.tourbook.tour.photo.IMapWithPhotos;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
+import net.tourbook.tour.photo.TourPhotoManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ValuePoint_ToolTip_UI;
 import net.tourbook.ui.action.SubMenu_SetTourMarkerType;
@@ -179,7 +181,10 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -194,10 +199,12 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IPartListener2;
@@ -519,9 +526,11 @@ public class Map2View extends ViewPart implements
    private ActionMapPoint_EditTourMarker        _actionMapPoint_EditTourMarker;
    private ActionMapPoint_Photo_AutoSelect      _actionMapPoint_Photo_AutoSelect;
    private ActionMapPoint_Photo_Deselect        _actionMapPoint_Photo_Deselect;
+   private ActionMapPoint_Photo_EditLabel       _actionMapPoint_Photo_EditLabel;
    private ActionMapPoint_Photo_Remove          _actionMapPoint_Photo_Remove;
    private ActionMapPoint_Photo_ShowAnnotations _actionMapPoint_Photo_ShowAnnotations;
    private ActionMapPoint_Photo_ShowHistogram   _actionMapPoint_Photo_ShowHistogram;
+   private ActionMapPoint_Photo_ShowLabel       _actionMapPoint_Photo_ShowLabel;
    private ActionMapPoint_Photo_ShowRating      _actionMapPoint_Photo_ShowRating;
    private ActionMapPoint_Photo_ShowTooltip     _actionMapPoint_Photo_ShowTooltip;
    private ActionMapPoint_ShowOnlyThisTour      _actionMapPoint_ShowOnlyThisTour;
@@ -789,6 +798,23 @@ public class Map2View extends ViewPart implements
       }
    }
 
+   private class ActionMapPoint_Photo_EditLabel extends Action {
+
+      public ActionMapPoint_Photo_EditLabel() {
+
+         super("&Edit photo label...", Action.AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit_Disabled));
+      }
+
+      @Override
+      public void run() {
+
+         actionPhoto_EditPhotoLabel();
+      }
+   }
+
    private class ActionMapPoint_Photo_Remove extends Action {
 
       public ActionMapPoint_Photo_Remove() {
@@ -830,6 +856,20 @@ public class Map2View extends ViewPart implements
       public void run() {
 
          actionPhoto_ShowHistogram();
+      }
+   }
+
+   private class ActionMapPoint_Photo_ShowLabel extends Action {
+
+      public ActionMapPoint_Photo_ShowLabel() {
+
+         super("Show photo &label", Action.AS_CHECK_BOX);
+      }
+
+      @Override
+      public void run() {
+
+         actionPhoto_ShowLabel();
       }
    }
 
@@ -1049,6 +1089,48 @@ public class Map2View extends ViewPart implements
       public void run() {
          action_SyncWith_TourLocation();
       }
+   }
+
+   private static class DialogEditPhotoLabel extends InputDialog {
+
+      public DialogEditPhotoLabel(final Shell parentShell,
+                                  final String dialogTitle,
+                                  final String dialogMessage,
+                                  final String initialValue,
+                                  final IInputValidator validator) {
+
+         super(parentShell, dialogTitle, dialogMessage, initialValue, validator);
+      }
+
+      @Override
+      protected void createButtonsForButtonBar(final Composite parent) {
+
+         super.createButtonsForButtonBar(parent);
+
+         // set text for the OK button
+         final Button okButton = getButton(IDialogConstants.OK_ID);
+         okButton.setText(OtherMessages.APP_ACTION_SAVE);
+      }
+
+      @Override
+      protected org.eclipse.swt.graphics.Point getInitialLocation(final org.eclipse.swt.graphics.Point initialSize) {
+
+         try {
+
+            final org.eclipse.swt.graphics.Point cursorLocation = Display.getCurrent().getCursorLocation();
+
+            // center below cursor location
+            cursorLocation.x -= initialSize.x / 2;
+            cursorLocation.y += 10;
+
+            return cursorLocation;
+
+         } catch (final NumberFormatException ex) {
+
+            return super.getInitialLocation(initialSize);
+         }
+      }
+
    }
 
    private enum MapSyncMode {
@@ -1491,6 +1573,61 @@ public class Map2View extends ViewPart implements
       Map2PainterConfig.isPhotoAutoSelect = isAutoSelect;
    }
 
+   private void actionPhoto_EditPhotoLabel() {
+
+      final Map2Point mapPoint = _contextMenu_HoveredMapPoint.mapPoint;
+      final Photo hoveredPhoto = mapPoint.photo;
+
+      final List<TourPhoto> allTourPhotos = TourPhotoManager.getInstance().getTourPhotos(hoveredPhoto);
+
+      if (allTourPhotos.size() < 1) {
+         return;
+      }
+
+      final String oldLabel = allTourPhotos.get(0).getPhotoLabel();
+
+      final DialogEditPhotoLabel labelDialog = new DialogEditPhotoLabel(
+
+            Display.getDefault().getActiveShell(),
+
+            "Edit Photo Lable",
+            "Photo label",
+
+            oldLabel,
+            null);
+
+      labelDialog.open();
+
+      if (labelDialog.getReturnCode() != Window.OK) {
+         return;
+      }
+
+      final String newPhotoLabel = labelDialog.getValue();
+
+      final Set<Long> allUpdatedTours = new HashSet<>();
+
+      for (final TourPhoto tourPhoto : allTourPhotos) {
+
+         tourPhoto.setPhotoLabel(newPhotoLabel);
+
+         allUpdatedTours.add(tourPhoto.getTourId());
+      }
+
+      if (allUpdatedTours.size() > 0) {
+
+         final List<TourData> allUpdatedTourData = new ArrayList<>();
+
+         for (final Long tourID : allUpdatedTours) {
+            allUpdatedTourData.add(TourManager.getTour(tourID));
+         }
+
+         TourManager.saveModifiedTours(allUpdatedTourData, getAllTourIDs());
+
+         // update UI
+         _map.paint();
+      }
+   }
+
    private void actionPhoto_ShowAnnotations() {
 
       final boolean isShowAnnotations = _actionMapPoint_Photo_ShowAnnotations.isChecked();
@@ -1522,6 +1659,19 @@ public class Map2View extends ViewPart implements
 
          _map.photoHistogram_Close();
       }
+   }
+
+   private void actionPhoto_ShowLabel() {
+
+      final boolean isShowPhotoLabel = _actionMapPoint_Photo_ShowLabel.isChecked();
+
+      // update model
+      _state.put(SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_LABEL, isShowPhotoLabel);
+
+      Map2PainterConfig.isShowPhotoLabel = isShowPhotoLabel;
+
+      // update UI
+      _map.paint();
    }
 
    private void actionPhoto_ShowRating() {
@@ -2344,9 +2494,11 @@ public class Map2View extends ViewPart implements
       _actionMapPoint_EditTourMarker         = new ActionMapPoint_EditTourMarker();
       _actionMapPoint_Photo_AutoSelect       = new ActionMapPoint_Photo_AutoSelect();
       _actionMapPoint_Photo_Deselect         = new ActionMapPoint_Photo_Deselect();
+      _actionMapPoint_Photo_EditLabel        = new ActionMapPoint_Photo_EditLabel();
       _actionMapPoint_Photo_Remove           = new ActionMapPoint_Photo_Remove();
       _actionMapPoint_Photo_ShowAnnotations  = new ActionMapPoint_Photo_ShowAnnotations();
       _actionMapPoint_Photo_ShowHistogram    = new ActionMapPoint_Photo_ShowHistogram();
+      _actionMapPoint_Photo_ShowLabel        = new ActionMapPoint_Photo_ShowLabel();
       _actionMapPoint_Photo_ShowRating       = new ActionMapPoint_Photo_ShowRating();
       _actionMapPoint_Photo_ShowTooltip      = new ActionMapPoint_Photo_ShowTooltip();
       _actionMapPoint_ShowOnlyThisTour       = new ActionMapPoint_ShowOnlyThisTour();
@@ -2817,6 +2969,10 @@ public class Map2View extends ViewPart implements
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_HISTOGRAM,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_HISTOGRAM_DEFAULT);
 
+      final boolean isShowPhotoLabel = Util.getStateBoolean(_state,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_LABEL,
+            SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_LABEL_DEFAULT);
+
       final boolean isShowPhotoRating = Util.getStateBoolean(_state,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_RATING,
             SlideoutMap2_PhotoOptions.STATE_IS_SHOW_PHOTO_RATING_DEFAULT);
@@ -2835,6 +2991,7 @@ public class Map2View extends ViewPart implements
 
       _actionMapPoint_Photo_ShowAnnotations.setChecked(isShowPhotoAnnotations);
       _actionMapPoint_Photo_ShowHistogram.setChecked(isShowPhotoHistogram);
+      _actionMapPoint_Photo_ShowLabel.setChecked(isShowPhotoLabel);
       _actionMapPoint_Photo_ShowRating.setChecked(isShowPhotoRating);
       _actionMapPoint_Photo_ShowTooltip.setChecked(isShowPhotoTooltip);
 
@@ -2908,16 +3065,21 @@ public class Map2View extends ViewPart implements
             menuMgr.add(_actionMapPoint_Photo_ShowTooltip);
             menuMgr.add(_actionMapPoint_Photo_ShowHistogram);
             menuMgr.add(_actionMapPoint_Photo_ShowAnnotations);
-            menuMgr.add(_actionMapPoint_Photo_Remove);
+
+            menuMgr.add(new Separator());
+
+            menuMgr.add(_actionMapPoint_Photo_ShowLabel);
+            menuMgr.add(_actionMapPoint_Photo_EditLabel);
+            menuMgr.add(_actionSubMenu_SetTourMarkerType);
 
             menuMgr.add(new Separator());
 
             fillExternalApp(menuMgr);
 
             menuMgr.add(new Separator());
-         }
 
-         menuMgr.add(_actionSubMenu_SetTourMarkerType);
+            menuMgr.add(_actionMapPoint_Photo_Remove);
+         }
 
          menuMgr.add(new Separator());
 
@@ -3200,6 +3362,9 @@ public class Map2View extends ViewPart implements
       return _allTourColor_Actions.get(graphId);
    }
 
+   /**
+    * @return Returns a list with all tour ID's which are currently displayed
+    */
    private List<Long> getAllTourIDs() {
 
       final List<Long> allTourIDs = new ArrayList<>();

@@ -111,6 +111,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourMarkerType;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map.location.LocationType;
 import net.tourbook.map.location.MapLocationToolTip;
@@ -153,6 +154,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.filter.TourFilterFieldOperator;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
+import net.tourbook.tour.photo.TourPhotoManager;
 import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.ui.MTRectangle;
@@ -8797,6 +8799,11 @@ public class Map2 extends Canvas {
                paint_MpImage_RatingStars(g2d, photo);
             }
 
+            // photo label
+            if (Map2PainterConfig.isShowPhotoLabel) {
+               paint_MpImage_PhotoLabel(g2d, photo, mapPoint);
+            }
+
             // draw annotations
             if (_isShowPhotoAdjustments && _isShowHQPhotoImages && Map2PainterConfig.isShowPhotoAnnotations) {
                paint_MpImage_Annotations(g2d, photo);
@@ -9035,6 +9042,60 @@ public class Map2 extends Canvas {
 
          g2d.drawImage(_imageAnnotationTonality, devX, devY, null);
       }
+   }
+
+   private void paint_MpImage_PhotoLabel(final Graphics2D g2d, final Photo photo, final Map2Point mapPoint) {
+
+      final List<TourPhoto> allTourPhotos = TourPhotoManager.getInstance().getTourPhotos(photo);
+      if (allTourPhotos.size() < 1) {
+         return;
+      }
+
+      final TourPhoto tourPhoto = allTourPhotos.get(0);
+      final String photoLabel = tourPhoto.getPhotoLabel();
+
+      if (photoLabel == null) {
+         return;
+      }
+
+      final Rectangle paintedPhoto = photo.paintedPhoto;
+      final int devY = paintedPhoto.y + paintedPhoto.height;
+      final int devX = paintedPhoto.x + 0;
+
+      final FontMetrics fontMetrics = g2d.getFontMetrics();
+
+      final int textHeight = fontMetrics.getHeight();
+      final int fontAscent = fontMetrics.getAscent();
+
+      final int textWidth = fontMetrics.stringWidth(photoLabel);
+      final int spaceWidth = fontMetrics.stringWidth(UI.SPACE1);
+      final int spaceWidth2 = spaceWidth * 2;
+
+      final int backgroundWidth = Math.min(textWidth + spaceWidth2, paintedPhoto.width);
+
+      final java.awt.Rectangle labelRect = new java.awt.Rectangle(
+            devX,
+            devY - textHeight,
+            backgroundWidth,
+            textHeight);
+
+      // background
+      g2d.setColor(mapPoint.getFillColorAWT());
+      g2d.fillRect(
+            labelRect.x,
+            labelRect.y,
+            labelRect.width,
+            labelRect.height);
+
+      // label
+      g2d.setClip(labelRect);
+      g2d.setColor(mapPoint.getOutlineColorAWT());
+      g2d.drawString(photoLabel,
+            devX + spaceWidth,
+            devY - textHeight + fontAscent);
+
+      // clear clipping
+      g2d.setClip(null);
    }
 
    private void paint_MpImage_RatingStars(final Graphics2D g2d, final Photo photo) {

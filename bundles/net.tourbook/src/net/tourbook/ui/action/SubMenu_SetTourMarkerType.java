@@ -121,10 +121,14 @@ public class SubMenu_SetTourMarkerType extends SubMenu {
 
    public void setTourMarker(final TourMarker tourMarker) {
 
-      final List<TourMarker> arrayList = new ArrayList<>();
-      arrayList.add(tourMarker);
+      final List<TourMarker> allTourMarker = new ArrayList<>();
 
-      _allTourMarker = arrayList;
+      if (tourMarker != null) {
+
+         allTourMarker.add(tourMarker);
+      }
+
+      _allTourMarker = allTourMarker;
    }
 
    private void setTourMarkerType(final TourMarkerType markerType) {
