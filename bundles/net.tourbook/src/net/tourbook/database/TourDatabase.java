@@ -10926,7 +10926,7 @@ public class TourDatabase {
 
          createTable_TourMarkerType(stmt);
 
-         SQL.AddColumn_VarCar(stmt, TABLE_TOUR_PHOTO, "photoLabel", VARCHAR_MAX_LENGTH); //$NON-NLS-1$
+         SQL.addColumn_VarCar(stmt, TABLE_TOUR_PHOTO, "photoLabel", VARCHAR_MAX_LENGTH); //$NON-NLS-1$
       }
 
       logDbUpdate_End(newDbVersion);
