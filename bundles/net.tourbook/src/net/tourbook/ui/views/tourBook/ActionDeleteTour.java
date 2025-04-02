@@ -277,10 +277,13 @@ public class ActionDeleteTour extends Action {
 
                .thenAccept(allRowPositions -> {
 
-                  // keep row position for the first deleted tour
-                  final int firstRowPosition = allRowPositions[0];
+                  if (allRowPositions.length > 0) {
 
-                  firstDeletePosition[0] = firstRowPosition;
+                     // keep row position for the first deleted tour
+                     final int firstRowPosition = allRowPositions[0];
+
+                     firstDeletePosition[0] = firstRowPosition;
+                  }
                });
 
          // wait until row index is set

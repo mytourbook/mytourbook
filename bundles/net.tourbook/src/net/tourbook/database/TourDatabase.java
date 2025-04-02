@@ -5514,9 +5514,16 @@ public class TourDatabase {
             + "   Color_Line_DarkTheme       INTEGER DEFAULT 0,                        " + NL //$NON-NLS-1$
 
             + "   Color_Text_LightTheme      INTEGER DEFAULT 0,                        " + NL //$NON-NLS-1$
-            + "   Color_Text_DarkTheme       INTEGER DEFAULT 0                         " + NL //$NON-NLS-1$
+            + "   Color_Text_DarkTheme       INTEGER DEFAULT 0,                        " + NL //$NON-NLS-1$
 
             // version 44 end ---------
+
+            // version 57 start
+
+            + "   importCategory             VARCHAR(" + VARCHAR_MAX_LENGTH + "),      " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   importSubCategory          VARCHAR(" + VARCHAR_MAX_LENGTH + ")       " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            // version 57 end
 
             + ")"); //$NON-NLS-1$
    }
@@ -10917,11 +10924,14 @@ public class TourDatabase {
 
       try (final Statement stmt = conn.createStatement()) {
 
+         // VERY IMPORTANG: This column MUST be created BEFORE the tour marker type column is created !!!
          SQL.AddColumn_BigInt(stmt, TABLE_TOUR_MARKER, KEY_MARKER_TYPE, null);
-
          createTable_TourMarkerType(stmt);
 
          SQL.AddColumn_VarCar(stmt, TABLE_TOUR_PHOTO, "photoLabel", VARCHAR_MAX_LENGTH); //$NON-NLS-1$
+
+         SQL.AddColumn_VarCar(stmt, TABLE_TOUR_TYPE, "importCategory", VARCHAR_MAX_LENGTH); //$NON-NLS-1$
+         SQL.AddColumn_VarCar(stmt, TABLE_TOUR_TYPE, "importSubCategory", VARCHAR_MAX_LENGTH); //$NON-NLS-1$
       }
 
       logDbUpdate_End(newDbVersion);

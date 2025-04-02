@@ -74,9 +74,10 @@ public class FitData {
    private String                        _sessionIndex;
    private ZonedDateTime                 _sessionStartTime;
 
+   private String                        _profileName             = UI.EMPTY_STRING;
    private String                        _sessionSportProfileName = UI.EMPTY_STRING;
    private String                        _sportName               = UI.EMPTY_STRING;
-   private String                        _profileName             = UI.EMPTY_STRING;
+   private String                        _subSportName            = UI.EMPTY_STRING;
 
    private final List<TimeData>          _allTimeData             = new ArrayList<>();
    private final List<Long>              _pausedTime_Start        = new ArrayList<>();
@@ -116,6 +117,26 @@ public class FitData {
       _lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
       _isFitImportTourType = _prefStore.getBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE);
       _fitImportTourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
+   }
+
+   private void applyTour_Type(final TourData tourData) {
+      // TODO Auto-generated method stub
+
+//      _sportName
+//      _subSportName
+//      _sessionSportProfileName
+//      _profileName
+
+      System.out.println(UI.timeStamp()
+
+            + " 1: %-10s".formatted(_sportName)
+            + " 2: %-10s".formatted(_subSportName)
+            + " 3: %-10s".formatted(_profileName)
+            + " 4: %-10s".formatted(_sessionSportProfileName)
+
+      );
+// TODO remove SYSTEM.OUT.PRINTLN
+
    }
 
    /**
@@ -565,6 +586,13 @@ public class FitData {
          case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SESSION_SPORT_PROFILE_NAME:
 
             applyTour_Type(tourData, _sessionSportProfileName);
+
+            break;
+
+         case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_SUB_SPORT:
+
+            applyTour_Type(tourData);
+
             break;
 
          }
@@ -808,6 +836,7 @@ public class FitData {
    }
 
    public void setSportname(final String sportName) {
+
       _sportName = sportName;
    }
 
@@ -818,6 +847,11 @@ public class FitData {
 
    public void setStrideSensorPresent(final boolean isStrideSensorPresent) {
       _tourData.setIsStrideSensorPresent(isStrideSensorPresent);
+   }
+
+   public void setSubSport(final String subSportName) {
+
+      _subSportName = subSportName;
    }
 
    public void setTimeDiffMS(final long timeDiffMS) {
