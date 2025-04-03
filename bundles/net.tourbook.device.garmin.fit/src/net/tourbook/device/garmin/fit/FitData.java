@@ -115,27 +115,22 @@ public class FitData {
       _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
       _isSetLastMarker = _isIgnoreLastMarker == false;
       _lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
-      _isFitImportTourType = _prefStore.getBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE);
+      _isFitImportTourType = _prefStore.getBoolean(IPreferences.FIT_IS_SET_TOURTYPE_DURING_IMPORT);
       _fitImportTourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
    }
 
    private void applyTour_Type(final TourData tourData) {
       // TODO Auto-generated method stub
 
-//      _sportName
-//      _subSportName
-//      _sessionSportProfileName
-//      _profileName
 
-      System.out.println(UI.timeStamp()
+      TourLogManager.subLog_INFO(UI.EMPTY_STRING
 
-            + " 1: %-10s".formatted(_sportName)
-            + " 2: %-10s".formatted(_subSportName)
-            + " 3: %-10s".formatted(_profileName)
-            + " 4: %-10s".formatted(_sessionSportProfileName)
+            + " --- "
+            + " sport: %-10s".formatted(_sportName)
+            + " sub-sport: %-10s".formatted(_subSportName)
+            + " profile: %-10s".formatted(_profileName)
+            + " session profile: %-10s".formatted(_sessionSportProfileName));
 
-      );
-// TODO remove SYSTEM.OUT.PRINTLN
 
    }
 
@@ -589,7 +584,7 @@ public class FitData {
 
             break;
 
-         case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_SUB_SPORT:
+         case IPreferences.FIT_IMPORT_TOURTYPE_MODE_LOOKUP_SPORT_AND_SUB_SPORT:
 
             applyTour_Type(tourData);
 

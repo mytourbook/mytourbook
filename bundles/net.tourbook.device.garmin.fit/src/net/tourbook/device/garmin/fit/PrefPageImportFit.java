@@ -559,7 +559,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 // SET_FORMATTING_OFF
 
          // Set Tour Type during FIT import
-         _chkFitImportTourType                     .setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE));
+         _chkFitImportTourType                     .setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_IS_SET_TOURTYPE_DURING_IMPORT));
 
          // Mode for Tour Type during FIT import
          final String tourTypeMode = _prefStore.getDefaultString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
@@ -568,7 +568,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
          _rdoTourTypeFrom_SessionSportProfileName  .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SESSION_SPORT_PROFILE_NAME));
          _rdoTourTypeFrom_Sport                    .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT));
          _rdoTourTypeFrom_SportAndProfile          .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_PROFILE));
-         _rdoTourTypeFrom_SportAndSubSport         .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_SUB_SPORT));
+         _rdoTourTypeFrom_SportAndSubSport         .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_LOOKUP_SPORT_AND_SUB_SPORT));
       }
 // SET_FORMATTING_ON
 
@@ -613,7 +613,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       _comboPowerDataSource.select(_prefStore.getInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE));
 
       // Set Tour Type during FIT import
-      _chkFitImportTourType.setSelection(_prefStore.getBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE));
+      _chkFitImportTourType.setSelection(_prefStore.getBoolean(IPreferences.FIT_IS_SET_TOURTYPE_DURING_IMPORT));
 
 // SET_FORMATTING_OFF
 
@@ -624,7 +624,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       _rdoTourTypeFrom_SessionSportProfileName  .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SESSION_SPORT_PROFILE_NAME));
       _rdoTourTypeFrom_Sport                    .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT));
       _rdoTourTypeFrom_SportAndProfile          .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_PROFILE));
-      _rdoTourTypeFrom_SportAndSubSport         .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_SUB_SPORT));
+      _rdoTourTypeFrom_SportAndSubSport         .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_LOOKUP_SPORT_AND_SUB_SPORT));
 
 // SET_FORMATTING_ON
 
@@ -652,7 +652,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       _prefStore.setValue(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE, _comboPowerDataSource.getSelectionIndex());
 
       // Set Tour Type during FIT import
-      _prefStore.setValue(IPreferences.FIT_IS_IMPORT_TOURTYPE, _chkFitImportTourType.getSelection());
+      _prefStore.setValue(IPreferences.FIT_IS_SET_TOURTYPE_DURING_IMPORT, _chkFitImportTourType.getSelection());
 
       // Mode for Tour Type during FIT import
       String tourTypeMode = _prefStore.getDefaultString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
@@ -673,7 +673,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
          tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SESSION_SPORT_PROFILE_NAME;
 
       } else if (_rdoTourTypeFrom_SportAndSubSport.getSelection()) {
-         tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_SUB_SPORT;
+         tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_LOOKUP_SPORT_AND_SUB_SPORT;
       }
 
       _prefStore.setValue(IPreferences.FIT_IMPORT_TOURTYPE_MODE, tourTypeMode);

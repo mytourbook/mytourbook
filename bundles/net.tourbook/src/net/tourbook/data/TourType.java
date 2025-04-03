@@ -122,8 +122,8 @@ public class TourType implements Comparable<Object>, Serializable {
 
       // default sorting for tour types is by name
 
-      if (other instanceof TourType) {
-         final TourType otherTourType = (TourType) other;
+      if (other instanceof final TourType otherTourType) {
+
          return name.compareTo(otherTourType.getName());
       }
 

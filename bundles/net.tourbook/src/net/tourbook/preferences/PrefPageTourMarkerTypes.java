@@ -278,7 +278,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
          }
          {
             /*
-             * Button: Update
+             * Button: Save/update
              */
             _btnMarkerType_Save = new Button(container, SWT.NONE);
             _btnMarkerType_Save.setText(Messages.App_Action_Save);
