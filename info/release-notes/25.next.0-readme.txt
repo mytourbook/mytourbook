@@ -53,12 +53,16 @@ New
 Improvements
 ============
 
-* 2D Map
-  - Display a label in a displayed photo
+* Import
+  - Set a default tour type into all imported tours
+    https://github.com/mytourbook/mytourbook/issues/1442
 
 * Easy Import
   - New Option "4.1 Remove 2nd last timeslice marker"
    Sometimes (in my case very often) a marker is automatically set by the device at the 2nd or 3rd last time slice. When selected, then this marker will be removed.
+
+* 2D Map
+  - Display a label in a displayed photo
 
 
 

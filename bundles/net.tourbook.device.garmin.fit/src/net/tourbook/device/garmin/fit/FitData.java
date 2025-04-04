@@ -129,11 +129,11 @@ public class FitData {
 
             + " . . . FIT fields: "
 
-            + " 'sport'  %-10s".formatted(_sportName)
-            + " - 'sub-sport' %-10s".formatted(_subSportName)
+            + " 'sport'  '%-10s'".formatted(_sportName)
+            + " - 'sub-sport' '%-10s'".formatted(_subSportName)
 
-            + " - 'profile' %-10s".formatted(_profileName)
-            + " - 'session profile' %-10s".formatted(_sessionSportProfileName));
+            + " - 'profile' '%-10s'".formatted(_profileName)
+            + " - 'session profile' '%-10s'".formatted(_sessionSportProfileName));
 
       RawDataManager.setTourType(tourData, _sportName, _subSportName);
    }
