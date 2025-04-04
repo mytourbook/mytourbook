@@ -1245,6 +1245,94 @@ public class RawDataManager {
       );
    }
 
+   /**
+    * Set tour type by looking up the sport and/or sub-sport naame
+    *
+    * @param tourData
+    * @param importCategory
+    *           This could be e.g. sport name
+    * @param importSubCategory
+    *           This could be e.g. sub sport name
+    */
+   public static void setTourType(final TourData tourData,
+                                  final String importCategory,
+                                  final String importSubCategory) {
+
+      if (tourData == null || importCategory == null && importSubCategory == null) {
+
+         return;
+      }
+
+      TourType applyTourType = null;
+
+      final List<TourType> allTourTypes = TourDatabase.getAllTourTypes();
+
+      for (final TourType tourType : allTourTypes) {
+
+         boolean isCategoryOK = false;
+         boolean isSubCategoryOK = false;
+
+         final String ttCategory = tourType.getImportCategory();
+         final String ttSubCategory = tourType.getImportSubCategory();
+
+         final boolean hasCategory = importCategory != null && ttCategory != null;
+         final boolean hasSubCategory = importSubCategory != null && ttSubCategory != null;
+
+         if (hasCategory && importCategory.equals(ttCategory)) {
+            isCategoryOK = true;
+         }
+
+         if (hasSubCategory && importSubCategory.equals(ttSubCategory)) {
+            isSubCategoryOK = true;
+         }
+
+         if (hasCategory && hasSubCategory && isCategoryOK && isSubCategoryOK) {
+
+            applyTourType = tourType;
+            break;
+
+         } else if (hasCategory && isCategoryOK && hasSubCategory == false) {
+
+            // only the category is checked
+
+            applyTourType = tourType;
+            break;
+
+         } else if (hasSubCategory && isSubCategoryOK && hasCategory == false) {
+
+            // only the sub category is checked
+
+            applyTourType = tourType;
+            break;
+         }
+      }
+
+      if (applyTourType == null) {
+
+         // get default tour type
+
+         final long prefTourTypeDefaultID = _prefStore.getLong(ITourbookPreferences.TOUR_TYPE_IMPORT_DEFAUL_ID);
+
+         if (prefTourTypeDefaultID >= 0) {
+
+            for (final TourType tourType : allTourTypes) {
+
+               if (tourType.getTypeId() == prefTourTypeDefaultID) {
+
+                  applyTourType = tourType;
+
+                  break;
+               }
+            }
+         }
+      }
+
+      if (applyTourType != null) {
+
+         tourData.setTourType(applyTourType);
+      }
+   }
+
    public void actionImportFromDevice() {
 
       final DataTransferWizardDialog dialog = new DataTransferWizardDialog(

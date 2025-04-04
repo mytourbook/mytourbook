@@ -106,32 +106,36 @@ public class FitData {
                   final Map<Long, TourData> newlyImportedTours,
                   final ImportState_Process importState_Process) {
 
-      _fitDataReader = fitDataReader;
-      _importFilePathName = importFilePath;
-      _alreadyImportedTours = alreadyImportedTours;
-      _newlyImportedTours = newlyImportedTours;
-      _importState_Process = importState_Process;
+// SET_FORMATTING_OFF
 
-      _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
-      _isSetLastMarker = _isIgnoreLastMarker == false;
-      _lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
-      _isFitImportTourType = _prefStore.getBoolean(IPreferences.FIT_IS_SET_TOURTYPE_DURING_IMPORT);
-      _fitImportTourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
+      _fitDataReader          = fitDataReader;
+      _importFilePathName     = importFilePath;
+      _alreadyImportedTours   = alreadyImportedTours;
+      _newlyImportedTours     = newlyImportedTours;
+      _importState_Process    = importState_Process;
+
+      _isIgnoreLastMarker     = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
+      _isSetLastMarker        = _isIgnoreLastMarker == false;
+      _lastMarkerTimeSlices   = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
+      _isFitImportTourType    = _prefStore.getBoolean(IPreferences.FIT_IS_SET_TOURTYPE_DURING_IMPORT);
+      _fitImportTourTypeMode  = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
+
+// SET_FORMATTING_ON
    }
 
    private void applyTour_Type(final TourData tourData) {
-      // TODO Auto-generated method stub
-
 
       TourLogManager.subLog_INFO(UI.EMPTY_STRING
 
-            + " --- "
-            + " sport: %-10s".formatted(_sportName)
-            + " sub-sport: %-10s".formatted(_subSportName)
-            + " profile: %-10s".formatted(_profileName)
-            + " session profile: %-10s".formatted(_sessionSportProfileName));
+            + " . . . FIT fields: "
 
+            + " 'sport'  %-10s".formatted(_sportName)
+            + " - 'sub-sport' %-10s".formatted(_subSportName)
 
+            + " - 'profile' %-10s".formatted(_profileName)
+            + " - 'session profile' %-10s".formatted(_sessionSportProfileName));
+
+      RawDataManager.setTourType(tourData, _sportName, _subSportName);
    }
 
    /**

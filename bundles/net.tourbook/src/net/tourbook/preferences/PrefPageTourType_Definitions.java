@@ -130,6 +130,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
    private boolean                            _isInUpdateUI;
    private boolean                            _isTourTypeModified;
    private boolean                            _canModifyAnything     = true;
+   private boolean                            _isDefaultTourType;
 
    /*
     * UI controls
@@ -1499,7 +1500,6 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
    }
 
    private void onTourTypeOptions_Save() {
-      // TODO Auto-generated method stub
 
       final TourTypeColorDefinition tourTypeColorDef = _selectedTourTypeColorDef;
       final TourType modifiedTourType = tourTypeColorDef.getTourType();
@@ -1525,11 +1525,21 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
          _allDbTourTypes.add(savedTourType);
          Collections.sort(_allDbTourTypes);
 
-         final boolean isDefaultTourType = _chkIsDefaultTourType.getSelection();
-
+         // set default tour type
+         final boolean isDefaultTourType_Modified = _chkIsDefaultTourType.getSelection();
          final long tourTypeID = savedTourType.getTypeId();
-         final long defaultID = isDefaultTourType ? tourTypeID : -1;
-         _prefStore.setValue(ITourbookPreferences.TOUR_TYPE_IMPORT_DEFAUL_ID, defaultID);
+         final boolean isTourTypeSaved = tourTypeID != TourDatabase.ENTITY_IS_NOT_SAVED;
+
+         // allow to set or remove the default tour type
+
+         if (isDefaultTourType_Modified && isTourTypeSaved) {
+
+            _prefStore.setValue(ITourbookPreferences.TOUR_TYPE_IMPORT_DEFAUL_ID, tourTypeID);
+
+         } else if (_isDefaultTourType && isDefaultTourType_Modified == false) {
+
+            _prefStore.setValue(ITourbookPreferences.TOUR_TYPE_IMPORT_DEFAUL_ID, -1);
+         }
 
          // update viewer, resort types when necessary
          _tourTypeViewer.update(tourTypeColorDef, SORT_PROPERTY);
@@ -1780,14 +1790,15 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       final String importCategory = tourType.getImportCategory();
       final String importSubCategory = tourType.getImportSubCategory();
 
-      boolean isDefaultTourType = false;
+      _isDefaultTourType = false;
+      
       final long tourTypeID = tourType.getTypeId();
 
       if (tourTypeID != TourDatabase.ENTITY_IS_NOT_SAVED) {
 
          final long prefDefaultID = _prefStore.getLong(ITourbookPreferences.TOUR_TYPE_IMPORT_DEFAUL_ID);
 
-         isDefaultTourType = prefDefaultID == tourTypeID;
+         _isDefaultTourType = prefDefaultID == tourTypeID;
       }
 
       _isInUpdateUI = true;
@@ -1798,7 +1809,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       _txtImportCategory      .setText(importCategory    == null ? UI.EMPTY_STRING : importCategory);
       _txtImportSubCategory   .setText(importSubCategory == null ? UI.EMPTY_STRING : importSubCategory);
 
-      _chkIsDefaultTourType   .setSelection(isDefaultTourType);
+      _chkIsDefaultTourType   .setSelection(_isDefaultTourType);
 
 // SET_FORMATTING_ON
 
