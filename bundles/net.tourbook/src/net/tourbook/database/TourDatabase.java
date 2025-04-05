@@ -5249,7 +5249,7 @@ public class TourDatabase {
 
             // version 56 start
 
-            + "   photoAdjustmentsJSON       VARCHAR(" + VARCHAR_MAX_LENGTH + ")       " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   photoAdjustmentsJSON       VARCHAR(" + VARCHAR_MAX_LENGTH + "),      " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 56 end
 
