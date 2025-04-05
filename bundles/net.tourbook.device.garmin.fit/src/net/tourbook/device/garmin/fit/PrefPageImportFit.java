@@ -444,9 +444,8 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
             // radio: from sport name + sub sport name
             _rdoTourTypeFrom_SportAndSubSport = new Button(containerTourTypeMode, SWT.RADIO);
-            _rdoTourTypeFrom_SportAndSubSport.setText("Lookup tour type with sport and s&ub-sport names");
-            _rdoTourTypeFrom_SportAndSubSport.setToolTipText(
-                  "The sport name and sub-sport name are looked up in the tour types, the found tour type will be applied");
+            _rdoTourTypeFrom_SportAndSubSport.setText(Messages.PrefPage_Fit_Radio_TourType_From_SportAndSubSport);
+            _rdoTourTypeFrom_SportAndSubSport.setToolTipText(Messages.PrefPage_Fit_Radio_TourType_From_SportAndSubSport_Tooltip);
             _rdoTourTypeFrom_SportAndSubSport.addSelectionListener(_defaultSelectionListener);
             gd.applyTo(_rdoTourTypeFrom_SportAndSubSport);
          }

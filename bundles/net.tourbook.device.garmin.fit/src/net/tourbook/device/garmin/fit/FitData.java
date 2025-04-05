@@ -123,21 +123,6 @@ public class FitData {
 // SET_FORMATTING_ON
    }
 
-   private void applyTour_Type(final TourData tourData) {
-
-      TourLogManager.subLog_INFO(UI.EMPTY_STRING
-
-            + " . . . FIT fields: "
-
-            + " 'sport'  '%-10s'".formatted(_sportName)
-            + " - 'sub-sport' '%-10s'".formatted(_subSportName)
-
-            + " - 'profile' '%-10s'".formatted(_profileName)
-            + " - 'session profile' '%-10s'".formatted(_sessionSportProfileName));
-
-      RawDataManager.setTourType(tourData, _sportName, _subSportName);
-   }
-
    /**
     * Creates a tour type when it do not yet exist for the provided label
     *
@@ -549,6 +534,16 @@ public class FitData {
       // If enabled, set Tour Type using FIT file data
       if (_isFitImportTourType) {
 
+         TourLogManager.subLog_INFO(UI.EMPTY_STRING
+
+               + " . . . Set tour type from '%s'".formatted(_fitImportTourTypeMode) //$NON-NLS-1$
+
+               + " - 'sport'  '%-10s'".formatted(_sportName) //$NON-NLS-1$
+               + " - 'sub-sport' '%-10s'".formatted(_subSportName) //$NON-NLS-1$
+
+               + " - 'profile' '%-10s'".formatted(_profileName) //$NON-NLS-1$
+               + " - 'session profile' '%-10s'".formatted(_sessionSportProfileName)); //$NON-NLS-1$
+
          switch (_fitImportTourTypeMode) {
 
          case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT:
@@ -590,10 +585,9 @@ public class FitData {
 
          case IPreferences.FIT_IMPORT_TOURTYPE_MODE_LOOKUP_SPORT_AND_SUB_SPORT:
 
-            applyTour_Type(tourData);
+            RawDataManager.setTourType(tourData, _sportName, _subSportName);
 
             break;
-
          }
       }
    }

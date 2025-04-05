@@ -630,7 +630,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
             _lblImportSubCategory.setToolTipText(tooltipSubCategory);
 
             _txtImportSubCategory = new Text(group, SWT.BORDER);
-            _txtImportCategory.setToolTipText(tooltipSubCategory);
+            _txtImportSubCategory.setToolTipText(tooltipSubCategory);
             _txtImportSubCategory.addModifyListener(modifyListener);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtImportSubCategory);
          }
@@ -859,7 +859,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
    private void defineColumn_30_ColorDefinition(final TreeColumnLayout treeLayout, final Tree tree) {
 
       final int numHorizontalImages = 6;
-      final int trailingOffset = 10;
+      final int trailingOffset = 0;//10;
 
       final int itemHeight = tree.getItemHeight();
       final int oneColorWidth = itemHeight + GraphColorPainter.GRAPH_COLOR_SPACING;
@@ -937,7 +937,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
             }
          }
       });
-      treeLayout.setColumnData(tc, new ColumnWeightData(5, true));
+      treeLayout.setColumnData(tc, new ColumnPixelData(convertWidthInCharsToPixels(10), true));
    }
 
    private void defineColumn_40_Category(final TreeColumnLayout treeLayout) {
@@ -966,7 +966,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
             }
          }
       });
-      treeLayout.setColumnData(tc, new ColumnWeightData(5, true));
+      treeLayout.setColumnData(tc, new ColumnPixelData(convertWidthInCharsToPixels(16), true));
    }
 
    private void defineColumn_50_SubCategory(final TreeColumnLayout treeLayout) {
@@ -995,7 +995,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
             }
          }
       });
-      treeLayout.setColumnData(tc, new ColumnWeightData(5, true));
+      treeLayout.setColumnData(tc, new ColumnPixelData(convertWidthInCharsToPixels(16), true));
    }
 
    @Override
@@ -1791,7 +1791,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       final String importSubCategory = tourType.getImportSubCategory();
 
       _isDefaultTourType = false;
-      
+
       final long tourTypeID = tourType.getTypeId();
 
       if (tourTypeID != TourDatabase.ENTITY_IS_NOT_SAVED) {
