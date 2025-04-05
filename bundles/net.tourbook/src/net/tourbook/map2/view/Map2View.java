@@ -802,7 +802,7 @@ public class Map2View extends ViewPart implements
 
       public ActionMapPoint_Photo_EditLabel() {
 
-         super("&Edit photo label...", Action.AS_PUSH_BUTTON);
+         super(Messages.Map_Action_EditPhotoLabel, Action.AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit));
          setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.App_Edit_Disabled));
@@ -863,7 +863,7 @@ public class Map2View extends ViewPart implements
 
       public ActionMapPoint_Photo_ShowLabel() {
 
-         super("Show photo &label", Action.AS_CHECK_BOX);
+         super(Messages.Map_Action_ShowPhotoLabel, Action.AS_CHECK_BOX);
       }
 
       @Override
@@ -1130,7 +1130,6 @@ public class Map2View extends ViewPart implements
             return super.getInitialLocation(initialSize);
          }
       }
-
    }
 
    private enum MapSyncMode {
@@ -1590,8 +1589,8 @@ public class Map2View extends ViewPart implements
 
             Display.getDefault().getActiveShell(),
 
-            "Edit Photo Lable",
-            "Photo label",
+            Messages.Map_Action_EditPhotoLabel_Dialog_Title,
+            Messages.Map_Action_EditPhotoLabel_Dialog_Message,
 
             oldLabel,
             null);

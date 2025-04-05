@@ -73,7 +73,7 @@ public class DialogDatabaseTests extends UITest {
             "✓" + UI.SPACE2 + "USER.TOURLOCATION" + NL + //$NON-NLS-1$ //$NON-NLS-2$
             "✓" + UI.SPACE2 + "USER.TOURBEVERAGECONTAINER" + NL + //$NON-NLS-1$ //$NON-NLS-2$
             "✓" + UI.SPACE2 + "USER.TOURNUTRITIONPRODUCT" + NL + //$NON-NLS-1$ //$NON-NLS-2$
-            "✓" + UI.SPACE2 + "USER.TOURMARKERTYPE" + NL;
+            "✓" + UI.SPACE2 + "USER.TOURMARKERTYPE" + NL; //$NON-NLS-1$ //$NON-NLS-2$
 
       final String text = shell.bot().label(message).getText();
 
