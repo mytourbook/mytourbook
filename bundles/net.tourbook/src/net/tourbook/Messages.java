@@ -1840,7 +1840,7 @@ public class Messages extends NLS {
    public static String        Pref_MapLayout_Checkbox_BorderColor_Darker;
    public static String        Pref_MapLayout_Label_BorderColor;
 
-   public static String        Pref_MarkerTypes_Button_SwapColors;
+   public static String        Pref_MarkerTypes_Button_SwapColors_Tooltip;
    public static String        Pref_MarkerTypes_Column_Color;
    public static String        Pref_MarkerTypes_Column_ID;
    public static String        Pref_MarkerTypes_Column_Name;

@@ -349,7 +349,7 @@ public class PrefPageTourMarkerTypes extends PreferencePage implements IWorkbenc
                // button: swap color
                _btnMarkerType_SwapColors = new Button(colorContainer, SWT.PUSH);
                _btnMarkerType_SwapColors.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
-               _btnMarkerType_SwapColors.setToolTipText(Messages.Pref_MarkerTypes_Button_SwapColors);
+               _btnMarkerType_SwapColors.setToolTipText(Messages.Pref_MarkerTypes_Button_SwapColors_Tooltip);
                _btnMarkerType_SwapColors.addSelectionListener(
                      SelectionListener.widgetSelectedAdapter(selectionEvent -> onMarkerType_SwapColors()));
 
