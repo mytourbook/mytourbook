@@ -52,7 +52,7 @@ Translation
 System   
 ======
 
-* MyTourbook Milestone 24.11  https://github.com/mytourbook/mytourbook/milestone/19?closed=1
+* MyTourbook Milestone 25.4   https://github.com/mytourbook/mytourbook/milestone/24?closed=1
 * Java 17                     https://adoptium.net/temurin/releases/?version=17
 * Eclipse 2024-03 (4.31)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.31-202402290520/
 * NatTable 2.5.0              https://eclipse.dev/nattable/download
