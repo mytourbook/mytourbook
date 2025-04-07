@@ -26,6 +26,7 @@ Improvements
 
 * 2D Map
   - Display a label in a displayed photo
+    https://github.com/mytourbook/mytourbook/issues/1471
 
 
 Bugfix
