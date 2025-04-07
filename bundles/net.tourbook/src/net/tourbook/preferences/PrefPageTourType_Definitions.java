@@ -859,12 +859,11 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
    private void defineColumn_30_ColorDefinition(final TreeColumnLayout treeLayout, final Tree tree) {
 
       final int numHorizontalImages = 6;
-      final int trailingOffset = 0;//10;
 
       final int itemHeight = tree.getItemHeight();
       final int oneColorWidth = itemHeight + GraphColorPainter.GRAPH_COLOR_SPACING;
 
-      final int colorImageWidth = (oneColorWidth * numHorizontalImages) + trailingOffset;
+      final int colorImageWidth = (oneColorWidth * numHorizontalImages) - 10;
 
       final TreeViewerColumn tvc = new TreeViewerColumn(_tourTypeViewer, SWT.TRAIL);
       final TreeColumn tc = tvc.getColumn();
@@ -937,7 +936,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
             }
          }
       });
-      treeLayout.setColumnData(tc, new ColumnPixelData(convertWidthInCharsToPixels(10), true));
+      treeLayout.setColumnData(tc, new ColumnPixelData(convertWidthInCharsToPixels(8), true));
    }
 
    private void defineColumn_40_Category(final TreeColumnLayout treeLayout) {
@@ -966,7 +965,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
             }
          }
       });
-      treeLayout.setColumnData(tc, new ColumnPixelData(convertWidthInCharsToPixels(16), true));
+      treeLayout.setColumnData(tc, new ColumnWeightData(10, true));
    }
 
    private void defineColumn_50_SubCategory(final TreeColumnLayout treeLayout) {
@@ -995,7 +994,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
             }
          }
       });
-      treeLayout.setColumnData(tc, new ColumnPixelData(convertWidthInCharsToPixels(16), true));
+      treeLayout.setColumnData(tc, new ColumnWeightData(10, true));
    }
 
    @Override
