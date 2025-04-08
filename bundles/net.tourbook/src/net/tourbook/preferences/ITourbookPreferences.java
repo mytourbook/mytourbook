@@ -369,8 +369,10 @@ public interface ITourbookPreferences {
    public static final String CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES = "CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES";    //$NON-NLS-1$
    public static final String CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES   = "CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES";      //$NON-NLS-1$
 
-   public static final String DEFAULT_IMPORT_TOUR_TYPE_ID             = "tourtype.import.default";                    //$NON-NLS-1$
-
+   /**
+    * Tour type
+    */
+   public static final String TOUR_TYPE_IMPORT_DEFAUL_ID              = "TourType_ImportDefaultID";                   //$NON-NLS-1$
    public static final String TOUR_TYPE_LIST_IS_MODIFIED              = "tourtype.list.is-modified";                  //$NON-NLS-1$
    public static final String TOUR_TYPE_FILTER_LIST                   = "tourtype.filter.list";                       //$NON-NLS-1$
 

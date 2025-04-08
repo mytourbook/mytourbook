@@ -29,12 +29,14 @@ public interface IPreferences {
 
    String FIT_PREFERRED_POWER_DATA_SOURCE                     = "FIT_POWER_DATA_SOURCE";                               //$NON-NLS-1$
 
-   String FIT_IS_IMPORT_TOURTYPE                              = "FIT_IS_IMPORT_TOURTYPE";                              //$NON-NLS-1$
+   String FIT_IS_SET_TOURTYPE_DURING_IMPORT                   = "FIT_IS_IMPORT_TOURTYPE";                              //$NON-NLS-1$
    String FIT_IMPORT_TOURTYPE_MODE                            = "FIT_IMPORT_TOURTYPE_MODE";                            //$NON-NLS-1$
 
-   String FIT_IMPORT_TOURTYPE_MODE_SPORT                      = "FIT_IMPORT_TOURTYPE_MODE_SPORT";                      //$NON-NLS-1$
    String FIT_IMPORT_TOURTYPE_MODE_PROFILE                    = "FIT_IMPORT_TOURTYPE_MODE_PROFILE";                    //$NON-NLS-1$
-   String FIT_IMPORT_TOURTYPE_MODE_TRY_PROFILE                = "FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE";                 //$NON-NLS-1$
+   String FIT_IMPORT_TOURTYPE_MODE_SPORT                      = "FIT_IMPORT_TOURTYPE_MODE_SPORT";                      //$NON-NLS-1$
    String FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_PROFILE          = "FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE";            //$NON-NLS-1$
    String FIT_IMPORT_TOURTYPE_MODE_SESSION_SPORT_PROFILE_NAME = "FIT_IMPORT_TOURTYPE_MODE_SESSION_SPORT_PROFILE_NAME"; //$NON-NLS-1$
+   String FIT_IMPORT_TOURTYPE_MODE_TRY_PROFILE                = "FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE";                 //$NON-NLS-1$
+
+   String FIT_IMPORT_TOURTYPE_MODE_LOOKUP_SPORT_AND_SUB_SPORT = "FIT_IMPORT_TOURTYPE_MODE_LOOKUP_SPORT_AND_SUB_SPORT"; //$NON-NLS-1$
 }

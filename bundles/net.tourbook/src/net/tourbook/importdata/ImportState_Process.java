@@ -151,7 +151,7 @@ public class ImportState_Process {
     * OUT state:
     * <p>
     * When set to <code>true</code> then {@link #runPostProcess()} should be run AFTER all
-    * isimported.
+    * is imported.
     *
     * @return
     */

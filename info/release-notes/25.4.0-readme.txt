@@ -1,0 +1,62 @@
+25.4.0                                                 ?. April 2025
+
+
+New
+===
+
+* Tour Marker Types
+  https://github.com/mytourbook/mytourbook/issues/1470
+  - Setup tour marker types in the preferences
+  - Apply tour marker types to tour markers
+  - 2D Map
+    - Display tour markers with different colors
+    - Filter tour markers  
+
+
+Improvements
+============
+
+* Import
+  - Set a default tour type into all imported tours
+    https://github.com/mytourbook/mytourbook/issues/1442
+
+* Easy Import
+  - New Option "4.1 Remove 2nd last timeslice marker"
+   Sometimes (in my case very often) a marker is automatically set by the device at the 2nd or 3rd last time slice. When selected, then this marker will be removed.
+
+* 2D Map
+  - Display a label in a displayed photo
+    https://github.com/mytourbook/mytourbook/issues/1471
+
+
+Bugfix
+======
+  
+* Autocomplete
+  Fixed the fix for autocomplete
+  https://github.com/mytourbook/mytourbook/issues/1451
+
+
+See also milestone 25.4 https://github.com/mytourbook/mytourbook/milestone/24?closed=1
+ 
+
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* MyTourbook Milestone 25.4   https://github.com/mytourbook/mytourbook/milestone/24?closed=1
+* Java 17                     https://adoptium.net/temurin/releases/?version=17
+* Eclipse 2024-03 (4.31)      https://download.eclipse.org/eclipse/downloads/drops4/R-4.31-202402290520/
+* NatTable 2.5.0              https://eclipse.dev/nattable/download
+* Nebula Widgets              https://download.eclipse.org/nebula/releases/latest
+* FIT SDK 21.158.0            https://forums.garmin.com/developer/fit-sdk/b/news-announcements
+* WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

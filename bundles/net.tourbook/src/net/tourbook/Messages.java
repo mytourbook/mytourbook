@@ -1841,7 +1841,7 @@ public class Messages extends NLS {
    public static String        Pref_MapLayout_Checkbox_BorderColor_Darker;
    public static String        Pref_MapLayout_Label_BorderColor;
 
-   public static String        Pref_MarkerTypes_Button_SwapColors;
+   public static String        Pref_MarkerTypes_Button_SwapColors_Tooltip;
    public static String        Pref_MarkerTypes_Column_Color;
    public static String        Pref_MarkerTypes_Column_ID;
    public static String        Pref_MarkerTypes_Column_Name;
@@ -1948,20 +1948,32 @@ public class Messages extends NLS {
    public static String        Pref_TourTypeFilter_dlg_rename_title;
    public static String        Pref_TourTypes_Button_add;
    public static String        Pref_TourTypes_Button_delete;
-   public static String        Pref_TourTypes_Button_rename;
+
+   public static String        Pref_TourTypes_Checkbox_DefaultTourType;
+   public static String        Pref_TourTypes_Checkbox_DefaultTourType_Tooltip;
+   public static String        Pref_TourTypes_Column_Category;
+   public static String        Pref_TourTypes_Column_Default;
+   public static String        Pref_TourTypes_Column_Default_Tooltip;
+   public static String        Pref_TourTypes_Column_SubCategory;
+   public static String        Pref_TourTypes_Column_TourType;
    public static String        Pref_TourTypes_Dialog_Restart_Message_2;
    public static String        Pref_TourTypes_Dialog_Restart_Title;
    public static String        Pref_TourTypes_Dlg_delete_tour_type_msg;
    public static String        Pref_TourTypes_Dlg_delete_tour_type_title;
    public static String        Pref_TourTypes_Dlg_new_tour_type_msg;
    public static String        Pref_TourTypes_Dlg_new_tour_type_title;
-   public static String        Pref_TourTypes_Dlg_rename_tour_type_msg;
-   public static String        Pref_TourTypes_Dlg_rename_tour_type_title;
    public static String        Pref_TourTypes_dnd_hint;
+   public static String        Pref_TourTypes_Group_CommonLayout;
+   public static String        Pref_TourTypes_Group_SelectedTourType;
    public static String        Pref_TourTypes_Label_BorderLayout;
    public static String        Pref_TourTypes_Label_BorderWidth;
    public static String        Pref_TourTypes_Label_ImageLayout;
    public static String        Pref_TourTypes_Label_ImageScaling;
+   public static String        Pref_TourTypes_Label_ImportCategory;
+   public static String        Pref_TourTypes_Label_ImportCategory_Tooltip;
+   public static String        Pref_TourTypes_Label_ImportSubCategory;
+   public static String        Pref_TourTypes_Label_ImportSubCategory_Tooltip;
+   public static String        Pref_TourTypes_Label_Name;
    public static String        Pref_TourTypes_Label_TourIsDirty;
    public static String        Pref_TourTypes_root_title;
    public static String        Pref_TourTypes_Title;
