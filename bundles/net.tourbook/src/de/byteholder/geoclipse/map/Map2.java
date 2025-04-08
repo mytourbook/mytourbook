@@ -110,6 +110,8 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourMarkerType;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map.location.LocationType;
 import net.tourbook.map.location.MapLocationToolTip;
@@ -152,12 +154,14 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.filter.TourFilterFieldOperator;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
+import net.tourbook.tour.photo.TourPhotoManager;
 import net.tourbook.ui.IInfoToolTipProvider;
 import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.ui.MTRectangle;
 
 import org.apache.commons.text.WordUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -1882,6 +1886,18 @@ public class Map2 extends Canvas {
 
       _allMapMarkerWithGroupedLabels.clear();
 
+      LongHashSet markerFilter_typeIDMap = null;
+      final boolean isFilterTourMarkers = _mapConfig.isFilterTourMarkers;
+      if (isFilterTourMarkers) {
+
+         final long[] tourMarkerFilter = _mapConfig.tourMarkerFilter;
+
+         if (tourMarkerFilter != null) {
+
+            markerFilter_typeIDMap = new LongHashSet(tourMarkerFilter);
+         }
+      }
+
       final Rectangle worldPixel_Viewport = _mapPointPainter_Viewport_DuringPainting;
 
       final List<TourMarker> allFilteredMakerList = new ArrayList<>();
@@ -1907,6 +1923,22 @@ public class Map2 extends Canvas {
             // skip marker when hidden or not set
             if (tourMarker.isMarkerVisible() == false || tourMarker.getLabel().length() == 0) {
                continue;
+            }
+
+            // skip marker when filtered out
+            if (isFilterTourMarkers) {
+
+               // tour markers are filtered by marker type
+
+               final TourMarkerType tourMarkerType = tourMarker.getTourMarkerType();
+
+               if (tourMarkerType != null) {
+
+                  if (markerFilter_typeIDMap.contains(tourMarkerType.getId()) == false) {
+
+                     continue;
+                  }
+               }
             }
 
             /*
@@ -2050,9 +2082,10 @@ public class Map2 extends Canvas {
 // SET_FORMATTING_OFF
 
             switch (tourMarkerDateTimeFormat) {
-            case DATE:        markerText += UI.SPACE + TimeTools.Formatter_Date_S.format(markerStartTime);     break;
-            case TIME:        markerText += UI.SPACE + TimeTools.Formatter_Time_S.format(markerStartTime);     break;
-            case DATE_TIME:   markerText += UI.SPACE + TimeTools.Formatter_DateTime_S.format(markerStartTime); break;
+            case DATE:           markerText += UI.SPACE + TimeTools.Formatter_Date_S      .format(markerStartTime);  break;
+            case DATE_NO_YEAR:   markerText += UI.SPACE + TimeTools.Formatter_Date_NoYear .format(markerStartTime);  break;
+            case TIME:           markerText += UI.SPACE + TimeTools.Formatter_Time_S      .format(markerStartTime);  break;
+            case DATE_TIME:      markerText += UI.SPACE + TimeTools.Formatter_DateTime_S  .format(markerStartTime);  break;
             case NONE:
             default:
             }
@@ -2970,7 +3003,6 @@ public class Map2 extends Canvas {
             );
 
 //            System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 1 " + null);
-// TODO remove SYSTEM.OUT.PRINTLN
 
             return null;
          }
@@ -2981,7 +3013,6 @@ public class Map2 extends Canvas {
          // HQ image is not requested
 
 //         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 2 " + awtThumbImage.getWidth() + " / " + awtThumbImage.getHeight());
-// TODO remove SYSTEM.OUT.PRINTLN
 
          return awtThumbImage;
       }
@@ -3030,14 +3061,12 @@ public class Map2 extends Canvas {
       if (awtPhotoImageThumbHQ != null) {
 
 //         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 3 " + awtPhotoImageThumbHQ.getWidth() + " / " + awtPhotoImageThumbHQ.getHeight());
-// TODO remove SYSTEM.OUT.PRINTLN
 
          return awtPhotoImageThumbHQ;
       }
 
       if (awtThumbImage != null) {
 //         System.out.println(UI.timeStamp() + " Map2.getPhotoImage() 4 " + awtThumbImage.getWidth() + " / " + awtThumbImage.getHeight());
-// TODO remove SYSTEM.OUT.PRINTLN
       }
 
       return awtThumbImage;
@@ -7689,6 +7718,9 @@ public class Map2 extends Canvas {
       int devX = worldPixel_MarkerPosX - worldPixel_Viewport.x;
       int devY = worldPixel_MarkerPosY - worldPixel_Viewport.y;
 
+      devX = (int) (devX * _deviceScaling);
+      devY = (int) (devY * _deviceScaling);
+
       final FontMetrics fontMetrics = g2d.getFontMetrics();
 
       final int textWidth = fontMetrics.stringWidth(clusterLabel);
@@ -8393,6 +8425,14 @@ public class Map2 extends Canvas {
 
          final Map2Point mapPoint = (Map2Point) distribLabel.data;
 
+         if (_isMarkerClusterSelected == false) {
+
+            // use map point color
+
+            fillColor = mapPoint.getFillColorAWT();
+            outlineColor = mapPoint.getOutlineColorAWT();
+         }
+
          final int mapPointDevX = mapPoint.geoPointDevX;
          final int mapPointDevY = mapPoint.geoPointDevY;
 
@@ -8759,6 +8799,11 @@ public class Map2 extends Canvas {
                paint_MpImage_RatingStars(g2d, photo);
             }
 
+            // photo label
+            if (Map2PainterConfig.isShowPhotoLabel) {
+               paint_MpImage_PhotoLabel(g2d, photo, mapPoint);
+            }
+
             // draw annotations
             if (_isShowPhotoAdjustments && _isShowHQPhotoImages && Map2PainterConfig.isShowPhotoAnnotations) {
                paint_MpImage_Annotations(g2d, photo);
@@ -8997,6 +9042,60 @@ public class Map2 extends Canvas {
 
          g2d.drawImage(_imageAnnotationTonality, devX, devY, null);
       }
+   }
+
+   private void paint_MpImage_PhotoLabel(final Graphics2D g2d, final Photo photo, final Map2Point mapPoint) {
+
+      final List<TourPhoto> allTourPhotos = TourPhotoManager.getInstance().getTourPhotos(photo);
+      if (allTourPhotos.size() < 1) {
+         return;
+      }
+
+      final TourPhoto tourPhoto = allTourPhotos.get(0);
+      final String photoLabel = tourPhoto.getPhotoLabel();
+
+      if (photoLabel == null) {
+         return;
+      }
+
+      final Rectangle paintedPhoto = photo.paintedPhoto;
+      final int devY = paintedPhoto.y + paintedPhoto.height;
+      final int devX = paintedPhoto.x + 0;
+
+      final FontMetrics fontMetrics = g2d.getFontMetrics();
+
+      final int textHeight = fontMetrics.getHeight();
+      final int fontAscent = fontMetrics.getAscent();
+
+      final int textWidth = fontMetrics.stringWidth(photoLabel);
+      final int spaceWidth = fontMetrics.stringWidth(UI.SPACE1);
+      final int spaceWidth2 = spaceWidth * 2;
+
+      final int backgroundWidth = Math.min(textWidth + spaceWidth2, paintedPhoto.width);
+
+      final java.awt.Rectangle labelRect = new java.awt.Rectangle(
+            devX,
+            devY - textHeight,
+            backgroundWidth,
+            textHeight);
+
+      // background
+      g2d.setColor(mapPoint.getFillColorAWT());
+      g2d.fillRect(
+            labelRect.x,
+            labelRect.y,
+            labelRect.width,
+            labelRect.height);
+
+      // label
+      g2d.setClip(labelRect);
+      g2d.setColor(mapPoint.getOutlineColorAWT());
+      g2d.drawString(photoLabel,
+            devX + spaceWidth,
+            devY - textHeight + fontAscent);
+
+      // clear clipping
+      g2d.setClip(null);
    }
 
    private void paint_MpImage_RatingStars(final Graphics2D g2d, final Photo photo) {

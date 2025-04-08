@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2015, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -66,6 +66,12 @@ public class ImportLauncher implements Cloneable {
     * When <code>true</code> then the text of the last marker is set.
     */
    public boolean                  isSetLastMarker;
+
+   /**
+    * When <code>true</code> then a marker will be removed when it is located at the 2nd last time
+    * slice
+    */
+   public boolean                  isRemove2ndLastTimeSliceMarker;
 
    /**
     * Last marker distance in meters.

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -280,7 +280,8 @@ public class EasyLauncherUtils {
       defineColumn_10_LauncherName();
       defineColumn_50_03_TourTypeImage();
       defineColumn_50_08_TourTags();
-      defineColumn_50_04_LastMarkerDistance();
+      defineColumn_50_041_Remove2ndLastTimeSliceMarker();
+      defineColumn_50_042_LastMarkerDistance();
       defineColumn_50_05_AdjustTemperature();
       defineColumn_50_07_IsAdjustElevation();
       defineColumn_50_50_RetrieveWeatherData();
@@ -353,10 +354,43 @@ public class EasyLauncherUtils {
       });
    }
 
+   private void defineColumn_50_041_Remove2ndLastTimeSliceMarker() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "isRemove2ndLastTimeSliceMarker", SWT.CENTER); //$NON-NLS-1$
+
+      colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Remove2ndLastTimeSliceMarker_Label);
+      colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Remove2ndLastTimeSliceMarker_Header);
+      colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Column_Remove2ndLastTimeSliceMarker_Label);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
+      colDef.setColumnWeightData(new ColumnWeightData(7));
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public String getToolTipText(final Object element) {
+
+            return createLauncherTooltip((ImportLauncher) element);
+         }
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
+
+            cell.setText(importLauncher.isRemove2ndLastTimeSliceMarker
+                  ? Messages.App_Label_BooleanYes
+                  : UI.EMPTY_STRING);
+         }
+      });
+   }
+
    /**
     * Column: Set last marker
     */
-   private void defineColumn_50_04_LastMarkerDistance() {
+   private void defineColumn_50_042_LastMarkerDistance() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "isSetLastMarker", SWT.TRAIL); //$NON-NLS-1$
 

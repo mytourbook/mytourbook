@@ -16,6 +16,7 @@
       <class>net.tourbook.data.TourData</class>
       <class>net.tourbook.data.TourLocation</class>
       <class>net.tourbook.data.TourMarker</class>
+      <class>net.tourbook.data.TourMarkerType</class>
       <class>net.tourbook.data.TourNutritionProduct</class>
       <class>net.tourbook.data.TourPerson</class>
       <class>net.tourbook.data.TourPersonHRZone</class>

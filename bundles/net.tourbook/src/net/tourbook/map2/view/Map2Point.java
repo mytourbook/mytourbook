@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2024, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.awt.Rectangle;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourLocation;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourMarkerType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map.location.LocationType;
 import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
@@ -128,8 +129,18 @@ public class Map2Point implements ClusterItem {
       case TOUR_WAY_POINT:    return mapConfig.tourWayPointFill_ColorAWT;
 
       default:
-      case TOUR_MARKER:       return mapConfig.tourMarkerFill_ColorAWT;
+      case TOUR_MARKER:
 
+         final TourMarkerType markerType = tourMarker.getTourMarkerType();
+
+         if (markerType != null) {
+
+            return markerType.getBackgroundColorAWT();
+
+         } else {
+
+            return mapConfig.tourMarkerFill_ColorAWT;
+         }
       }
 
 // SET_FORMATTING_ON
@@ -165,8 +176,18 @@ public class Map2Point implements ClusterItem {
       case TOUR_WAY_POINT:    return mapConfig.tourWayPointFill_ColorSWT;
 
       default:
-      case TOUR_MARKER:       return mapConfig.tourMarkerFill_ColorSWT;
+      case TOUR_MARKER:
 
+         final TourMarkerType markerType = tourMarker.getTourMarkerType();
+
+         if (markerType != null) {
+
+            return markerType.getBackgroundColorSWT();
+
+         } else {
+
+            return mapConfig.tourMarkerFill_ColorSWT;
+         }
       }
 
 // SET_FORMATTING_ON
@@ -226,8 +247,18 @@ public class Map2Point implements ClusterItem {
       case TOUR_WAY_POINT:    return mapConfig.tourWayPointOutline_ColorAWT;
 
       default:
-      case TOUR_MARKER:       return mapConfig.tourMarkerOutline_ColorAWT;
+      case TOUR_MARKER:
 
+         final TourMarkerType markerType = tourMarker.getTourMarkerType();
+
+         if (markerType != null) {
+
+            return markerType.getForegroundColorAWT();
+
+         } else {
+
+            return mapConfig.tourMarkerOutline_ColorAWT;
+         }
       }
 
 // SET_FORMATTING_ON
@@ -262,8 +293,18 @@ public class Map2Point implements ClusterItem {
       case TOUR_WAY_POINT:    return mapConfig.tourWayPointOutline_ColorSWT;
 
       default:
-      case TOUR_MARKER:       return mapConfig.tourMarkerOutline_ColorSWT;
+      case TOUR_MARKER:
 
+         final TourMarkerType markerType = tourMarker.getTourMarkerType();
+
+         if (markerType != null) {
+
+            return markerType.getForegroundColorSWT();
+
+         } else {
+
+            return mapConfig.tourMarkerOutline_ColorSWT;
+         }
       }
 
 // SET_FORMATTING_ON

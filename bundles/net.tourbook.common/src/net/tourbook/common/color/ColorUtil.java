@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2013, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -64,6 +64,24 @@ public class ColorUtil {
             | ((alpha) << 24);
 
       return graphColor;
+   }
+
+   public static org.eclipse.swt.graphics.Color getColorSWT(final int rgbValue) {
+
+      final int red = (rgbValue & 0xFF0000) >> 16;
+      final int green = (rgbValue & 0xFF00) >> 8;
+      final int blue = (rgbValue & 0xFF) >> 0;
+
+      return new org.eclipse.swt.graphics.Color(red, green, blue);
+   }
+
+   public static Color getColorAWT(final int rgbValue) {
+
+      final int red = (rgbValue & 0xFF0000) >> 16;
+      final int green = (rgbValue & 0xFF00) >> 8;
+      final int blue = (rgbValue & 0xFF) >> 0;
+
+      return new Color(red, green, blue);
    }
 
    /**

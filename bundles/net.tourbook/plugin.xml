@@ -434,6 +434,17 @@
 
 
       <!--
+         Tour Marker Types
+      -->
+               
+      <page
+         name        ="%Pref_Page_TourMarkerTypes"
+         id          ="net.tourbook.preferences.PrefPageTourMarkerTypes"
+         class       ="net.tourbook.preferences.PrefPageTourMarkerTypes"
+      />
+
+
+      <!--
          Statistics
       -->
 

@@ -75,6 +75,8 @@ public class SlideoutMap2_PhotoOptions extends AdvancedSlideout implements
    static final boolean                STATE_IS_SHOW_PHOTO_ANNOTATIONS_DEFAULT = true;
    static final String                 STATE_IS_SHOW_PHOTO_HISTOGRAM           = "STATE_IS_SHOW_PHOTO_HISTOGRAM";   //$NON-NLS-1$
    static final boolean                STATE_IS_SHOW_PHOTO_HISTOGRAM_DEFAULT   = true;
+   public static final String          STATE_IS_SHOW_PHOTO_LABEL               = "STATE_IS_SHOW_PHOTO_LABEL";       //$NON-NLS-1$
+   public static final boolean         STATE_IS_SHOW_PHOTO_LABEL_DEFAULT       = false;
    static final String                 STATE_IS_SHOW_PHOTO_RATING              = "STATE_IS_SHOW_PHOTO_RATING";      //$NON-NLS-1$
    static final boolean                STATE_IS_SHOW_PHOTO_RATING_DEFAULT      = true;
    static final String                 STATE_IS_SHOW_PHOTO_TOOLTIP             = "STATE_IS_SHOW_PHOTO_TOOLTIP";     //$NON-NLS-1$

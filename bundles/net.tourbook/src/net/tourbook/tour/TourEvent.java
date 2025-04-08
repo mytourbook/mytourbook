@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.tour;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
@@ -49,6 +50,8 @@ public class TourEvent {
     * Contains the {@link TourData} which is edited in the {@link TourDataEditorView}
     */
    public TourData             tourDataEditorSavedTour;
+
+   public List<Long>           oldTourIDs;
 
    @SuppressWarnings("unused")
    private TourEvent() {}

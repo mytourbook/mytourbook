@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,9 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
-
-import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,11 +56,12 @@ import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.IElementComparer;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
@@ -77,18 +75,23 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
@@ -109,13 +112,14 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
 
    private ColorDefinition                    _expandedItem;
 
+   private TourTypeColorDefinition            _selectedTourTypeColorDef;
    private GraphColorItem                     _selectedGraphColor;
-   private ArrayList<TourType>                _dbTourTypes;
+   private List<TourType>                     _allDbTourTypes;
 
    /**
     * This is the model of the tour type viewer.
     */
-   private ArrayList<TourTypeColorDefinition> _colorDefinitions;
+   private ArrayList<TourTypeColorDefinition> _allTourTypeColorDefinitions;
 
    private boolean                            _isModified;
    private boolean                            _isLayoutModified;
@@ -123,7 +127,10 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
    private boolean                            _isRecreateTourTypeImages;
    private boolean                            _isNavigationKeyPressed;
 
-   private boolean                            _canModifyTourType     = true;
+   private boolean                            _isInUpdateUI;
+   private boolean                            _isTourTypeModified;
+   private boolean                            _canModifyAnything     = true;
+   private boolean                            _isDefaultTourType;
 
    /*
     * UI controls
@@ -132,7 +139,10 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
 
    private Button                _btnAdd;
    private Button                _btnDelete;
-   private Button                _btnRename;
+   private Button                _btnTourType_Save;
+   private Button                _btnTourType_Cancel;
+
+   private Button                _chkIsDefaultTourType;
 
    private ColorSelectorExtended _colorSelector;
 
@@ -142,8 +152,16 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
    private Combo                 _comboBorderColor;
    private Combo                 _comboBorderLayout;
 
+   private Label                 _lblImportCategory;
+   private Label                 _lblImportSubCategory;
+   private Label                 _lblName;
+
    private Spinner               _spinnerBorder;
    private Spinner               _spinnerImageScale;
+
+   private Text                  _txtImportCategory;
+   private Text                  _txtImportSubCategory;
+   private Text                  _txtName;
 
    private class ColorDefinitionContentProvider implements ITreeContentProvider {
 
@@ -163,7 +181,8 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
 
       @Override
       public Object[] getElements(final Object inputElement) {
-         return _colorDefinitions.toArray(new Object[_colorDefinitions.size()]);
+
+         return _allTourTypeColorDefinitions.toArray(new Object[_allTourTypeColorDefinitions.size()]);
       }
 
       @Override
@@ -189,12 +208,10 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       @Override
       public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
-         if (e1 instanceof TourTypeColorDefinition && e2 instanceof TourTypeColorDefinition) {
+         if (e1 instanceof final TourTypeColorDefinition ttc1
+               && e2 instanceof final TourTypeColorDefinition ttc2) {
 
-            final TourTypeColorDefinition ttcDef1 = (TourTypeColorDefinition) e1;
-            final TourTypeColorDefinition ttcDef2 = (TourTypeColorDefinition) e2;
-
-            return ttcDef1.compareTo(ttcDef2);
+            return ttc1.compareTo(ttc2);
          }
 
          return 0;
@@ -203,7 +220,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       @Override
       public boolean isSorterProperty(final Object element, final String property) {
 
-         // sort when the name has changed
+         // force sorting when the name has changed
          return true;
       }
    }
@@ -233,7 +250,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
        * Ensure that a tour is NOT modified because changing the tour type needs an app restart
        * because the tour type images are DISPOSED
        */
-      if (_canModifyTourType == false) {
+      if (_canModifyAnything == false) {
 
          final Label label = new Label(parent, SWT.WRAP);
          label.setText(Messages.Pref_TourTypes_Label_TourIsDirty);
@@ -249,16 +266,16 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       fillUI();
 
       // read tour types from the database
-      _dbTourTypes = TourDatabase.getAllTourTypes();
+      _allDbTourTypes = TourDatabase.getAllTourTypes();
 
       /*
        * create color definitions for all tour types
        */
-      _colorDefinitions = new ArrayList<>();
+      _allTourTypeColorDefinitions = new ArrayList<>();
 
-      if (_dbTourTypes != null) {
+      if (_allDbTourTypes != null) {
 
-         for (final TourType tourType : _dbTourTypes) {
+         for (final TourType tourType : _allDbTourTypes) {
 
             final long typeId = tourType.getTypeId();
 
@@ -282,19 +299,24 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
 
             );
 
-            _colorDefinitions.add(colorDefinition);
+            _allTourTypeColorDefinitions.add(colorDefinition);
 
             createGraphColorItems(colorDefinition);
          }
       }
 
       restoreState();
-      enableActions();
+      enableControls();
 
       /*
        * MUST be run async otherwise the background color is NOT themed !!!
        */
-      parent.getDisplay().asyncExec(() -> _tourTypeViewer.setInput(this));
+      parent.getDisplay().asyncExec(() -> {
+
+         _tourTypeViewer.setInput(this);
+
+         setFocusToViewer();
+      });
 
       return ui;
    }
@@ -335,7 +357,8 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       {
          createUI_10_ColorViewer(container);
          createUI_20_Actions(container);
-         createUI_30_ImageLayout(container);
+         createUI_30_SelectedTourType(container);
+         createUI_50_ImageLayout(container);
       }
 
       // must be set after the viewer is created
@@ -354,7 +377,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(200, 200)
+            .hint(150, 100)
             .applyTo(layoutContainer);
 
       final TreeColumnLayout treeLayout = new TreeColumnLayout();
@@ -370,7 +393,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
                   | SWT.MULTI
                   | SWT.FULL_SELECTION);
 
-      tree.setHeaderVisible(false);
+      tree.setHeaderVisible(true);
       tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
       _tourTypeViewer = new TreeViewer(tree);
@@ -383,7 +406,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
 
       _tourTypeViewer.setUseHashlookup(true);
 
-      _tourTypeViewer.getTree().addKeyListener(keyPressedAdapter(keyEvent -> {
+      _tourTypeViewer.getTree().addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> {
 
          _isNavigationKeyPressed = false;
 
@@ -401,20 +424,10 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
             }
 
             break;
-
-         case SWT.F2:
-
-            if (_btnRename.isEnabled()) {
-               onTourType_Rename();
-            }
-
-            break;
          }
       }));
 
       _tourTypeViewer.addSelectionChangedListener(selectionChangedEvent -> {
-
-         final Object selection = ((IStructuredSelection) _tourTypeViewer.getSelection()).getFirstElement();
 
          final boolean isNavigationKeyPressed = _isNavigationKeyPressed;
 
@@ -428,16 +441,17 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
 
             // expand/collapse tree item
 
-            if (selection instanceof ColorDefinition) {
+            final Object selectedItem = _tourTypeViewer.getStructuredSelection().getFirstElement();
+
+            if (selectedItem instanceof final ColorDefinition colorDefinition) {
 
                // expand/collapse current item
-               final ColorDefinition treeItem = (ColorDefinition) selection;
 
-               if (_tourTypeViewer.getExpandedState(treeItem)) {
+               if (_tourTypeViewer.getExpandedState(colorDefinition)) {
 
                   // item is expanded -> collapse
 
-                  _tourTypeViewer.collapseToLevel(treeItem, 1);
+                  _tourTypeViewer.collapseToLevel(colorDefinition, 1);
 
                } else {
 
@@ -446,8 +460,8 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
                   if (_expandedItem != null) {
                      _tourTypeViewer.collapseToLevel(_expandedItem, 1);
                   }
-                  _tourTypeViewer.expandToLevel(treeItem, 1);
-                  _expandedItem = treeItem;
+                  _tourTypeViewer.expandToLevel(colorDefinition, 1);
+                  _expandedItem = colorDefinition;
 
                   // expanding the triangle, the layout is correctly done but not with double click
                   layoutContainer.layout(true, true);
@@ -455,8 +469,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
             }
          }
 
-         onSelectColorInColorViewer(isNavigationKeyPressed);
-         enableActions();
+         onTourTypeViewer_Selection(isNavigationKeyPressed);
       });
 
       _tourTypeViewer.addTreeListener(new ITreeViewerListener() {
@@ -506,7 +519,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
              * Color selector
              */
             _colorSelector = new ColorSelectorExtended(container);
-            _colorSelector.addListener(event -> onTourType_Modify(event));
+            _colorSelector.addListener(event -> onTourType_ModifyColor(event));
             setButtonLayoutData(_colorSelector.getButton());
          }
          {
@@ -515,22 +528,11 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
              */
             _btnAdd = new Button(container, SWT.NONE);
             _btnAdd.setText(Messages.Pref_TourTypes_Button_add);
-            _btnAdd.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            _btnAdd.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
                onTourType_Add();
-               enableActions();
+               enableControls();
             }));
             setButtonLayoutData(_btnAdd);
-         }
-         {
-            /*
-             * Rename
-             */
-            _btnRename = new Button(container, SWT.NONE);
-            _btnRename.setText(Messages.Pref_TourTypes_Button_rename);
-            _btnRename.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-               onTourType_Rename();
-            }));
-            setButtonLayoutData(_btnRename);
          }
          {
             /*
@@ -538,18 +540,106 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
              */
             _btnDelete = new Button(container, SWT.NONE);
             _btnDelete.setText(Messages.Pref_TourTypes_Button_delete);
-            _btnDelete.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            _btnDelete.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> {
                onTourType_Delete();
-               enableActions();
+               enableControls();
             }));
             setButtonLayoutData(_btnDelete);
+         }
+         {
+            /*
+             * Button: Save/update
+             */
+            _btnTourType_Save = new Button(container, SWT.NONE);
+            _btnTourType_Save.setText(Messages.App_Action_Save);
+            _btnTourType_Save.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onTourTypeOptions_Save()));
+
+            setButtonLayoutData(_btnTourType_Save);
+
+            // align at the bottom
+            final GridData gd = (GridData) _btnTourType_Save.getLayoutData();
+            gd.verticalAlignment = SWT.BOTTOM;
+            gd.grabExcessVerticalSpace = true;
+         }
+         {
+            /*
+             * Button: Cancel
+             */
+            _btnTourType_Cancel = new Button(container, SWT.NONE);
+            _btnTourType_Cancel.setText(Messages.App_Action_Cancel);
+            _btnTourType_Cancel.addSelectionListener(SelectionListener.widgetSelectedAdapter(selectionEvent -> onTourTypeOptions_Cancel()));
+            setButtonLayoutData(_btnTourType_Cancel);
          }
       }
    }
 
-   private void createUI_30_ImageLayout(final Composite parent) {
+   private void createUI_30_SelectedTourType(final Composite parent) {
 
-      final SelectionListener selectionListener = widgetSelectedAdapter(selectionEvent -> {
+      final ModifyListener modifyListener = modifyEvent -> onTourType_Modify();
+      final SelectionListener widgetSelectedAdapter = SelectionListener.widgetSelectedAdapter(selectionEvent -> onTourType_Modify());
+
+      final String tooltipCategory = Messages.Pref_TourTypes_Label_ImportCategory_Tooltip;
+      final String tooltipSubCategory = Messages.Pref_TourTypes_Label_ImportSubCategory_Tooltip;
+
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.Pref_TourTypes_Group_SelectedTourType);
+      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
+      GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 5).applyTo(group);
+      {
+         {
+            /*
+             * Import category
+             */
+            _lblName = new Label(group, SWT.NONE);
+            _lblName.setText(Messages.Pref_TourTypes_Label_Name);
+
+            _txtName = new Text(group, SWT.BORDER);
+            _txtName.addModifyListener(modifyListener);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtName);
+         }
+         {
+            /*
+             * Default tour type
+             */
+            _chkIsDefaultTourType = new Button(group, SWT.CHECK);
+            _chkIsDefaultTourType.setText(Messages.Pref_TourTypes_Checkbox_DefaultTourType);
+            _chkIsDefaultTourType.setToolTipText(Messages.Pref_TourTypes_Checkbox_DefaultTourType_Tooltip);
+            _chkIsDefaultTourType.addSelectionListener(widgetSelectedAdapter);
+            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_chkIsDefaultTourType);
+
+         }
+         {
+            /*
+             * Import category
+             */
+            _lblImportCategory = new Label(group, SWT.NONE);
+            _lblImportCategory.setText(Messages.Pref_TourTypes_Label_ImportCategory);
+            _lblImportCategory.setToolTipText(tooltipCategory);
+
+            _txtImportCategory = new Text(group, SWT.BORDER);
+            _txtImportCategory.setToolTipText(tooltipCategory);
+            _txtImportCategory.addModifyListener(modifyListener);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtImportCategory);
+         }
+         {
+            /*
+             * Import sub category
+             */
+            _lblImportSubCategory = new Label(group, SWT.NONE);
+            _lblImportSubCategory.setText(Messages.Pref_TourTypes_Label_ImportSubCategory);
+            _lblImportSubCategory.setToolTipText(tooltipSubCategory);
+
+            _txtImportSubCategory = new Text(group, SWT.BORDER);
+            _txtImportSubCategory.setToolTipText(tooltipSubCategory);
+            _txtImportSubCategory.addModifyListener(modifyListener);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtImportSubCategory);
+         }
+      }
+   }
+
+   private void createUI_50_ImageLayout(final Composite parent) {
+
+      final SelectionListener selectionListener = SelectionListener.widgetSelectedAdapter(selectionEvent -> {
          onSelectImageLayout();
       });
 
@@ -570,9 +660,10 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       final GridDataFactory gridData_AlignVerticalCenter = GridDataFactory.fillDefaults()
             .align(SWT.FILL, SWT.CENTER);
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.Pref_TourTypes_Group_CommonLayout);
+      GridDataFactory.fillDefaults().grab(true, false).indent(0, 20).span(2, 1).applyTo(group);
+      GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 5).applyTo(group);
       {
          {
             /*
@@ -580,11 +671,11 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
              */
 
             // label
-            final Label label = new Label(container, SWT.NONE);
+            final Label label = new Label(group, SWT.NONE);
             label.setText(Messages.Pref_TourTypes_Label_ImageLayout);
             gridData_AlignVerticalCenter.applyTo(label);
 
-            final Composite containerImage = new Composite(container, SWT.NONE);
+            final Composite containerImage = new Composite(group, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(containerImage);
             GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerImage);
             {
@@ -613,11 +704,11 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
              */
 
             // label
-            final Label label = new Label(container, SWT.NONE);
+            final Label label = new Label(group, SWT.NONE);
             label.setText(Messages.Pref_TourTypes_Label_ImageScaling);
             gridData_AlignVerticalCenter.applyTo(label);
 
-            final Composite containerScale = new Composite(container, SWT.NONE);
+            final Composite containerScale = new Composite(group, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(containerScale);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerScale);
             {
@@ -639,11 +730,11 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
              */
 
             // label
-            final Label label = new Label(container, SWT.NONE);
+            final Label label = new Label(group, SWT.NONE);
             label.setText(Messages.Pref_TourTypes_Label_BorderLayout);
             gridData_AlignVerticalCenter.applyTo(label);
 
-            final Composite containerBorder = new Composite(container, SWT.NONE);
+            final Composite containerBorder = new Composite(group, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(containerBorder);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerBorder);
             {
@@ -666,12 +757,12 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
              */
 
             // label
-            final Label label = new Label(container, SWT.NONE);
+            final Label label = new Label(group, SWT.NONE);
             label.setText(Messages.Pref_TourTypes_Label_BorderWidth);
             gridData_AlignVerticalCenter.applyTo(label);
 
             // spinner
-            _spinnerBorder = new Spinner(container, SWT.BORDER);
+            _spinnerBorder = new Spinner(group, SWT.BORDER);
             _spinnerBorder.setMinimum(0);
             _spinnerBorder.setMaximum(10);
             _spinnerBorder.addSelectionListener(selectionListener);
@@ -689,12 +780,19 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       defineColumn_10_TourTypeImage(treeLayout);
       defineColumn_20_UpdatedTourTypeImage(treeLayout);
       defineColumn_30_ColorDefinition(treeLayout, tree);
+
+      defineColumn_39_DefaultTourType(treeLayout);
+      defineColumn_40_Category(treeLayout);
+      defineColumn_50_SubCategory(treeLayout);
    }
 
    private void defineColumn_10_TourTypeImage(final TreeColumnLayout treeLayout) {
 
       final TreeViewerColumn tvc = new TreeViewerColumn(_tourTypeViewer, SWT.LEAD);
+
       final TreeColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_TourTypes_Column_TourType);
+
       tvc.setLabelProvider(new StyledCellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -723,7 +821,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
          }
       });
 
-      treeLayout.setColumnData(tc, new ColumnWeightData(15, true));
+      treeLayout.setColumnData(tc, new ColumnWeightData(20, true));
    }
 
    /**
@@ -752,7 +850,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
             }
          }
       });
-      treeLayout.setColumnData(tc, new ColumnWeightData(3, true));
+      treeLayout.setColumnData(tc, new ColumnPixelData(convertHorizontalDLUsToPixels(16), true));
    }
 
    /**
@@ -761,12 +859,11 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
    private void defineColumn_30_ColorDefinition(final TreeColumnLayout treeLayout, final Tree tree) {
 
       final int numHorizontalImages = 6;
-      final int trailingOffset = 10;
 
       final int itemHeight = tree.getItemHeight();
       final int oneColorWidth = itemHeight + GraphColorPainter.GRAPH_COLOR_SPACING;
 
-      final int colorImageWidth = (oneColorWidth * numHorizontalImages) + trailingOffset;
+      final int colorImageWidth = (oneColorWidth * numHorizontalImages) - 10;
 
       final TreeViewerColumn tvc = new TreeViewerColumn(_tourTypeViewer, SWT.TRAIL);
       final TreeColumn tc = tvc.getColumn();
@@ -808,101 +905,96 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       treeLayout.setColumnData(tc, new ColumnPixelData(colorImageWidth, true));
    }
 
-   private boolean deleteTourType(final TourType tourType) {
+   private void defineColumn_39_DefaultTourType(final TreeColumnLayout treeLayout) {
 
-      if (deleteTourType_10_FromTourData(tourType)) {
-         if (deleteTourType_20_FromDb(tourType)) {
-            return true;
-         }
-      }
+      final TreeViewerColumn tvc = new TreeViewerColumn(_tourTypeViewer, SWT.CENTER);
 
-      return false;
-   }
+      final TreeColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_TourTypes_Column_Default);
+      tc.setToolTipText(Messages.Pref_TourTypes_Column_Default_Tooltip);
 
-   private boolean deleteTourType_10_FromTourData(final TourType tourType) {
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-      boolean returnResult = false;
+            final Object element = cell.getElement();
 
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+            if (element instanceof TourTypeColorDefinition) {
 
-      if (em != null) {
+               final TourType tourType = ((TourTypeColorDefinition) element).getTourType();
 
-         final Query query = em.createQuery(UI.EMPTY_STRING
+               final long tourTypeID = tourType.getTypeId();
+               final long prefTourTypeDefaultID = _prefStore.getLong(ITourbookPreferences.TOUR_TYPE_IMPORT_DEFAUL_ID);
 
-               + "SELECT tourData" //$NON-NLS-1$
-               + " FROM TourData AS tourData" //$NON-NLS-1$
-               + " WHERE tourData.tourType.typeId=" + tourType.getTypeId()); //$NON-NLS-1$
+               final boolean isDefaultTourType = prefTourTypeDefaultID == tourTypeID;
 
-         final List<?> tourDataList = query.getResultList();
-         if (tourDataList.size() > 0) {
+               cell.setText(isDefaultTourType ? UI.SYMBOL_HEAVY_CHECK_MARK : UI.EMPTY_STRING);
 
-            final EntityTransaction ts = em.getTransaction();
+            } else {
 
-            try {
-
-               ts.begin();
-
-               // remove tour type from all tour data
-               for (final Object listItem : tourDataList) {
-
-                  if (listItem instanceof TourData) {
-
-                     final TourData tourData = (TourData) listItem;
-
-                     tourData.setTourType(null);
-                     em.merge(tourData);
-                  }
-               }
-
-               ts.commit();
-
-            } catch (final Exception e) {
-               StatusUtil.showStatus(e);
-            } finally {
-               if (ts.isActive()) {
-                  ts.rollback();
-               }
+               cell.setText(UI.EMPTY_STRING);
             }
          }
-
-         returnResult = true;
-         em.close();
-      }
-
-      return returnResult;
+      });
+      treeLayout.setColumnData(tc, new ColumnPixelData(convertWidthInCharsToPixels(8), true));
    }
 
-   private boolean deleteTourType_20_FromDb(final TourType tourType) {
+   private void defineColumn_40_Category(final TreeColumnLayout treeLayout) {
 
-      boolean returnResult = false;
+      final TreeViewerColumn tvc = new TreeViewerColumn(_tourTypeViewer, SWT.LEAD);
 
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
-      final EntityTransaction ts = em.getTransaction();
+      final TreeColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_TourTypes_Column_Category);
 
-      try {
-         final TourType tourTypeEntity = em.find(TourType.class, tourType.getTypeId());
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-         if (tourTypeEntity != null) {
+            final Object element = cell.getElement();
 
-            ts.begin();
+            if (element instanceof TourTypeColorDefinition) {
 
-            em.remove(tourTypeEntity);
+               final TourType tourType = ((TourTypeColorDefinition) element).getTourType();
+               final String importCategory = tourType.getImportCategory();
 
-            ts.commit();
+               cell.setText(importCategory != null ? importCategory : UI.EMPTY_STRING);
+
+            } else {
+
+               cell.setText(UI.EMPTY_STRING);
+            }
          }
+      });
+      treeLayout.setColumnData(tc, new ColumnWeightData(10, true));
+   }
 
-      } catch (final Exception e) {
-         StatusUtil.showStatus(e);
-      } finally {
-         if (ts.isActive()) {
-            ts.rollback();
-         } else {
-            returnResult = true;
+   private void defineColumn_50_SubCategory(final TreeColumnLayout treeLayout) {
+
+      final TreeViewerColumn tvc = new TreeViewerColumn(_tourTypeViewer, SWT.LEAD);
+
+      final TreeColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_TourTypes_Column_SubCategory);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof TourTypeColorDefinition) {
+
+               final TourType tourType = ((TourTypeColorDefinition) element).getTourType();
+               final String importSubCategory = tourType.getImportSubCategory();
+
+               cell.setText(importSubCategory != null ? importSubCategory : UI.EMPTY_STRING);
+
+            } else {
+
+               cell.setText(UI.EMPTY_STRING);
+            }
          }
-         em.close();
-      }
-
-      return returnResult;
+      });
+      treeLayout.setColumnData(tc, new ColumnWeightData(10, true));
    }
 
    @Override
@@ -917,29 +1009,57 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       super.dispose();
    }
 
-   private void enableActions() {
+   private void enableControls() {
 
-      final StructuredSelection selectedItems = (StructuredSelection) _tourTypeViewer.getSelection();
-      final Object firstSelectedItem = selectedItems.getFirstElement();
-      final int numSelectedItems = selectedItems.size();
+      final Object selectedItem = _tourTypeViewer.getStructuredSelection().getFirstElement();
 
       boolean canDeleteColor = false;
+      boolean canEditTourType = false;
       boolean isGraphSelected = false;
+      final boolean isModified = _isTourTypeModified;
+      final boolean isNotModified = isModified == false;
 
-      if (firstSelectedItem instanceof GraphColorItem) {
+      boolean canEditDefault = false;
+
+      if (selectedItem instanceof GraphColorItem) {
 
          isGraphSelected = true;
          canDeleteColor = true;
 
-      } else if (firstSelectedItem instanceof TourTypeColorDefinition) {
+      } else if (selectedItem instanceof final TourTypeColorDefinition tourTypeColorDef) {
 
+         canEditTourType = true;
          canDeleteColor = true;
+
+         if (tourTypeColorDef.getTourType().getTypeId() != TourDatabase.ENTITY_IS_NOT_SAVED) {
+
+            // only a saved tour type can be set as default
+            canEditDefault = true;
+         }
       }
 
-      _btnDelete.setEnabled(canDeleteColor);
-      _btnRename.setEnabled(numSelectedItems == 1);
+// SET_FORMATTING_OFF
 
-      _colorSelector.setEnabled(isGraphSelected);
+      _btnAdd                    .setEnabled(isNotModified);
+      _btnDelete                 .setEnabled(isNotModified && canDeleteColor);
+      _btnTourType_Cancel        .setEnabled(isModified);
+      _btnTourType_Save          .setEnabled(isModified);
+
+      _chkIsDefaultTourType      .setEnabled(canEditDefault);
+
+      _lblImportCategory         .setEnabled(canEditTourType);
+      _lblImportSubCategory      .setEnabled(canEditTourType);
+      _lblName                   .setEnabled(canEditTourType);
+
+      _txtImportCategory         .setEnabled(canEditTourType);
+      _txtImportSubCategory      .setEnabled(canEditTourType);
+      _txtName                   .setEnabled(canEditTourType);
+
+      _tourTypeViewer.getTree()  .setEnabled(isNotModified);
+
+      _colorSelector             .setEnabled(isNotModified && isGraphSelected);
+
+// SET_FORMATTING_ON
    }
 
    private void enableLayoutControls() {
@@ -1010,29 +1130,6 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       }
    }
 
-   /**
-    * @return Returns the first selected color definition in the color viewer
-    */
-   private TourTypeColorDefinition getFirstSelectedColorDefinition() {
-
-      TourTypeColorDefinition selectedColorDefinition = null;
-
-      final Object selectedItem = ((IStructuredSelection) _tourTypeViewer.getSelection()).getFirstElement();
-
-      if (selectedItem instanceof GraphColorItem) {
-
-         final GraphColorItem graphColor = (GraphColorItem) selectedItem;
-
-         selectedColorDefinition = (TourTypeColorDefinition) graphColor.getColorDefinition();
-
-      } else if (selectedItem instanceof TourTypeColorDefinition) {
-
-         selectedColorDefinition = (TourTypeColorDefinition) selectedItem;
-      }
-
-      return selectedColorDefinition;
-   }
-
    @Override
    public IGradientColorProvider getMapLegendColorProvider() {
       return null;
@@ -1045,19 +1142,22 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
 
       final List<TourTypeColorDefinition> allSelectedColorDefinitions = new ArrayList<>();
 
-      final StructuredSelection allSelectedItems = (StructuredSelection) _tourTypeViewer.getSelection();
+      final ITreeSelection allSelectedItems = _tourTypeViewer.getStructuredSelection();
 
       for (final Object selectedItem : allSelectedItems) {
 
-         if (selectedItem instanceof GraphColorItem) {
+         if (selectedItem instanceof final GraphColorItem graphColor) {
 
-            final GraphColorItem graphColor = (GraphColorItem) selectedItem;
+            final ColorDefinition colorDef = graphColor.getColorDefinition();
 
-            allSelectedColorDefinitions.add((TourTypeColorDefinition) graphColor.getColorDefinition());
+            if (colorDef instanceof final TourTypeColorDefinition tourTypeColorDef) {
 
-         } else if (selectedItem instanceof TourTypeColorDefinition) {
+               allSelectedColorDefinitions.add(tourTypeColorDef);
+            }
 
-            allSelectedColorDefinitions.add((TourTypeColorDefinition) selectedItem);
+         } else if (selectedItem instanceof final TourTypeColorDefinition tourTypeColorDef) {
+
+            allSelectedColorDefinitions.add(tourTypeColorDef);
          }
       }
 
@@ -1126,7 +1226,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
        */
       if (TourManager.isTourEditorModified(false)) {
 
-         _canModifyTourType = false;
+         _canModifyAnything = false;
 
          noDefaultAndApplyButton();
       }
@@ -1140,51 +1240,12 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
    @Override
    public boolean okToLeave() {
 
-      if (_canModifyTourType) {
+      if (_canModifyAnything) {
 
          fireModifyEvent();
       }
 
       return super.okToLeave();
-   }
-
-   /**
-    * Is called when a color in the color viewer is selected.
-    *
-    * @param isNavigationKeyPressed
-    */
-   private void onSelectColorInColorViewer(final boolean isNavigationKeyPressed) {
-
-      _selectedGraphColor = null;
-
-      final Object firstElement = _tourTypeViewer.getStructuredSelection().getFirstElement();
-
-      if (firstElement instanceof GraphColorItem) {
-
-         final GraphColorItem graphColor = (GraphColorItem) firstElement;
-
-         _selectedGraphColor = graphColor;
-
-         _colorSelector.setColorValue(graphColor.getRGB());
-
-         if (isNavigationKeyPressed == false) {
-
-            // open color dialog only when not navigated with the keyboard
-
-            /*
-             * Run async that the UI do display the selected color in the color button when the
-             * color dialog is opened
-             */
-            _tourTypeViewer.getTree().getDisplay().asyncExec(() -> {
-
-               // open color selection dialog
-
-               _colorSelector.open();
-            });
-         }
-      }
-
-      setFocusToViewer();
    }
 
    private void onSelectImageLayout() {
@@ -1253,7 +1314,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       newTourType.setColor_Text(dummyColorDef.getTextColor_Default_Light(), dummyColorDef.getTextColor_Default_Dark());
 
       // add new entity to db
-      final TourType savedTourType = saveTourType(newTourType);
+      final TourType savedTourType = tourType_Save(newTourType);
 
       if (savedTourType != null) {
 
@@ -1274,11 +1335,11 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
          createGraphColorItems(newColorDefinition);
 
          // update model
-         _colorDefinitions.add(newColorDefinition);
+         _allTourTypeColorDefinitions.add(newColorDefinition);
 
          // update internal tour type list
-         _dbTourTypes.add(savedTourType);
-         Collections.sort(_dbTourTypes);
+         _allDbTourTypes.add(savedTourType);
+         Collections.sort(_allDbTourTypes);
 
          // update UI
          _tourTypeViewer.add(this, newColorDefinition);
@@ -1333,11 +1394,11 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
             final TourType selectedTourType = selectedColorDefinition.getTourType();
 
             // remove entity from the db
-            if (deleteTourType(selectedTourType)) {
+            if (tourType_Delete(selectedTourType)) {
 
                // update model
-               _dbTourTypes.remove(selectedTourType);
-               _colorDefinitions.remove(selectedColorDefinition);
+               _allDbTourTypes.remove(selectedTourType);
+               _allTourTypeColorDefinitions.remove(selectedColorDefinition);
 
                // update UI
                _tourTypeViewer.remove(selectedColorDefinition);
@@ -1353,12 +1414,23 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       setFocusToViewer();
    }
 
+   private void onTourType_Modify() {
+
+      if (_isInUpdateUI) {
+         return;
+      }
+
+      _isTourTypeModified = true;
+
+      enableControls();
+   }
+
    /**
     * This is called when the color in the color selector is modified
     *
     * @param event
     */
-   private void onTourType_Modify(final PropertyChangeEvent event) {
+   private void onTourType_ModifyColor(final PropertyChangeEvent event) {
 
       final RGB oldRGB = (RGB) event.getOldValue();
       final RGB newRGB = (RGB) event.getNewValue();
@@ -1385,14 +1457,14 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       oldTourType.setColor_Line(selectedColorDef.getLineColor_New_Light(), selectedColorDef.getLineColor_New_Dark());
       oldTourType.setColor_Text(selectedColorDef.getTextColor_New_Light(), selectedColorDef.getTextColor_New_Dark());
 
-      final TourType savedTourType = saveTourType(oldTourType);
+      final TourType savedTourType = tourType_Save(oldTourType);
 
       selectedColorDef.setTourType(savedTourType);
 
       // replace tour type with new one
-      _dbTourTypes.remove(oldTourType);
-      _dbTourTypes.add(savedTourType);
-      Collections.sort(_dbTourTypes);
+      _allDbTourTypes.remove(oldTourType);
+      _allDbTourTypes.add(savedTourType);
+      Collections.sort(_allDbTourTypes);
 
       /*
        * Update UI
@@ -1417,52 +1489,118 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       _isModified = true;
    }
 
-   private void onTourType_Rename() {
+   private void onTourTypeOptions_Cancel() {
 
-      final TourTypeColorDefinition selectedColorDefinition = getFirstSelectedColorDefinition();
-      if (selectedColorDefinition == null) {
-         return;
-      }
+      _isTourTypeModified = false;
 
-      final TourType selectedTourType = selectedColorDefinition.getTourType();
+      updateUIFromModel();
 
-      // ask for the tour type name
-      final InputDialog dialog = new InputDialog(
-            getShell(),
-            Messages.Pref_TourTypes_Dlg_rename_tour_type_title,
-            NLS.bind(Messages.Pref_TourTypes_Dlg_rename_tour_type_msg, selectedTourType.getName()),
-            selectedTourType.getName(),
-            null);
+      enableControls();
+   }
 
-      if (dialog.open() != Window.OK) {
-         setFocusToViewer();
-         return;
-      }
+   private void onTourTypeOptions_Save() {
 
-      // update tour type name
-      final String newTourTypeName = dialog.getValue();
+      final TourTypeColorDefinition tourTypeColorDef = _selectedTourTypeColorDef;
+      final TourType modifiedTourType = tourTypeColorDef.getTourType();
 
-      selectedTourType.setName(newTourTypeName);
-      selectedColorDefinition.setVisibleName(newTourTypeName);
+      final String tourTypeName = _txtName.getText().trim();
+
+      modifiedTourType.setName(tourTypeName);
+      modifiedTourType.setImportCategory(_txtImportCategory.getText());
+      modifiedTourType.setImportSubCategory(_txtImportSubCategory.getText());
+
+      tourTypeColorDef.setVisibleName(tourTypeName);
 
       // update entity in the db
-      final TourType savedTourType = saveTourType(selectedTourType);
+      final TourType savedTourType = tourType_Save(modifiedTourType);
 
       if (savedTourType != null) {
 
          // update model
-         selectedColorDefinition.setTourType(savedTourType);
+         tourTypeColorDef.setTourType(savedTourType);
 
          // replace tour type with new one
-         _dbTourTypes.remove(selectedTourType);
-         _dbTourTypes.add(savedTourType);
-         Collections.sort(_dbTourTypes);
+         _allDbTourTypes.remove(modifiedTourType);
+         _allDbTourTypes.add(savedTourType);
+         Collections.sort(_allDbTourTypes);
+
+         // set default tour type
+         final boolean isDefaultTourType_Modified = _chkIsDefaultTourType.getSelection();
+         final long tourTypeID = savedTourType.getTypeId();
+         final boolean isTourTypeSaved = tourTypeID != TourDatabase.ENTITY_IS_NOT_SAVED;
+
+         // allow to set or remove the default tour type
+
+         if (isDefaultTourType_Modified && isTourTypeSaved) {
+
+            _prefStore.setValue(ITourbookPreferences.TOUR_TYPE_IMPORT_DEFAUL_ID, tourTypeID);
+
+         } else if (_isDefaultTourType && isDefaultTourType_Modified == false) {
+
+            _prefStore.setValue(ITourbookPreferences.TOUR_TYPE_IMPORT_DEFAUL_ID, -1);
+         }
 
          // update viewer, resort types when necessary
-         _tourTypeViewer.update(selectedColorDefinition, SORT_PROPERTY);
+         _tourTypeViewer.update(tourTypeColorDef, SORT_PROPERTY);
 
          _isModified = true;
       }
+
+      _isTourTypeModified = false;
+
+      enableControls();
+
+      setFocusToViewer();
+   }
+
+   /**
+    * Is called when a color in the color viewer is selected.
+    *
+    * @param isNavigationKeyPressed
+    */
+   private void onTourTypeViewer_Selection(final boolean isNavigationKeyPressed) {
+
+      _selectedTourTypeColorDef = null;
+      _selectedGraphColor = null;
+
+      final Object selectedItem = _tourTypeViewer.getStructuredSelection().getFirstElement();
+
+      if (selectedItem instanceof final GraphColorItem graphColor) {
+
+         _selectedGraphColor = graphColor;
+
+         _colorSelector.setColorValue(graphColor.getRGB());
+
+         if (isNavigationKeyPressed == false) {
+
+            // open color dialog only when not navigated with the keyboard
+
+            /*
+             * Run async that the UI do display the selected color in the color button when the
+             * color dialog is opened
+             */
+            _tourTypeViewer.getTree().getDisplay().asyncExec(() -> {
+
+               // open color selection dialog
+
+               _colorSelector.open();
+            });
+         }
+
+         final ColorDefinition graphColorDefinition = graphColor.getColorDefinition();
+
+         if (graphColorDefinition instanceof final TourTypeColorDefinition tourTypeColorDef) {
+
+            _selectedTourTypeColorDef = tourTypeColorDef;
+         }
+
+      } else if (selectedItem instanceof final TourTypeColorDefinition tourTypeColorDef) {
+
+         _selectedTourTypeColorDef = tourTypeColorDef;
+      }
+
+      updateUIFromModel();
+      enableControls();
 
       setFocusToViewer();
    }
@@ -1470,7 +1608,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
    @Override
    public boolean performCancel() {
 
-      if (_canModifyTourType) {
+      if (_canModifyAnything) {
 
          fireModifyEvent();
       }
@@ -1481,7 +1619,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
    @Override
    protected void performDefaults() {
 
-      if (_canModifyTourType) {
+      if (_canModifyAnything) {
 
          _spinnerImageScale.setSelection(TourTypeManager.DEFAULT_IMAGE_SCALING);
 
@@ -1502,7 +1640,7 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
    @Override
    public boolean performOk() {
 
-      if (_canModifyTourType) {
+      if (_canModifyAnything) {
 
          fireModifyEvent();
       }
@@ -1527,7 +1665,110 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
       enableLayoutControls();
    }
 
-   private TourType saveTourType(final TourType tourType) {
+   private void setFocusToViewer() {
+
+      // set focus back to the tree
+      _tourTypeViewer.getTree().setFocus();
+   }
+
+   private boolean tourType_Delete(final TourType tourType) {
+
+      if (tourType_Delete_10_FromTourData(tourType)) {
+         if (tourType_Delete_20_FromDb(tourType)) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   private boolean tourType_Delete_10_FromTourData(final TourType tourType) {
+
+      boolean returnResult = false;
+
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+      if (em != null) {
+
+         final Query query = em.createQuery(UI.EMPTY_STRING
+
+               + "SELECT tourData" //$NON-NLS-1$
+               + " FROM TourData AS tourData" //$NON-NLS-1$
+               + " WHERE tourData.tourType.typeId=" + tourType.getTypeId()); //$NON-NLS-1$
+
+         final List<?> tourDataList = query.getResultList();
+         if (tourDataList.size() > 0) {
+
+            final EntityTransaction ts = em.getTransaction();
+
+            try {
+
+               ts.begin();
+
+               // remove tour type from all tour data
+               for (final Object listItem : tourDataList) {
+
+                  if (listItem instanceof TourData) {
+
+                     final TourData tourData = (TourData) listItem;
+
+                     tourData.setTourType(null);
+                     em.merge(tourData);
+                  }
+               }
+
+               ts.commit();
+
+            } catch (final Exception e) {
+               StatusUtil.showStatus(e);
+            } finally {
+               if (ts.isActive()) {
+                  ts.rollback();
+               }
+            }
+         }
+
+         returnResult = true;
+         em.close();
+      }
+
+      return returnResult;
+   }
+
+   private boolean tourType_Delete_20_FromDb(final TourType tourType) {
+
+      boolean returnResult = false;
+
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      final EntityTransaction ts = em.getTransaction();
+
+      try {
+         final TourType tourTypeEntity = em.find(TourType.class, tourType.getTypeId());
+
+         if (tourTypeEntity != null) {
+
+            ts.begin();
+
+            em.remove(tourTypeEntity);
+
+            ts.commit();
+         }
+
+      } catch (final Exception e) {
+         StatusUtil.showStatus(e);
+      } finally {
+         if (ts.isActive()) {
+            ts.rollback();
+         } else {
+            returnResult = true;
+         }
+         em.close();
+      }
+
+      return returnResult;
+   }
+
+   private TourType tourType_Save(final TourType tourType) {
 
       return TourDatabase.saveEntity(
             tourType,
@@ -1535,9 +1776,42 @@ public class PrefPageTourType_Definitions extends PreferencePage implements IWor
             TourType.class);
    }
 
-   private void setFocusToViewer() {
+   private void updateUIFromModel() {
 
-      // set focus back to the tree
-      _tourTypeViewer.getTree().setFocus();
+      final TourTypeColorDefinition tourTypeColorDef = _selectedTourTypeColorDef;
+
+      if (tourTypeColorDef == null) {
+         return;
+      }
+
+      final TourType tourType = tourTypeColorDef.getTourType();
+
+      final String importCategory = tourType.getImportCategory();
+      final String importSubCategory = tourType.getImportSubCategory();
+
+      _isDefaultTourType = false;
+
+      final long tourTypeID = tourType.getTypeId();
+
+      if (tourTypeID != TourDatabase.ENTITY_IS_NOT_SAVED) {
+
+         final long prefDefaultID = _prefStore.getLong(ITourbookPreferences.TOUR_TYPE_IMPORT_DEFAUL_ID);
+
+         _isDefaultTourType = prefDefaultID == tourTypeID;
+      }
+
+      _isInUpdateUI = true;
+
+// SET_FORMATTING_OFF
+
+      _txtName                .setText(tourType.getName());
+      _txtImportCategory      .setText(importCategory    == null ? UI.EMPTY_STRING : importCategory);
+      _txtImportSubCategory   .setText(importSubCategory == null ? UI.EMPTY_STRING : importSubCategory);
+
+      _chkIsDefaultTourType   .setSelection(_isDefaultTourType);
+
+// SET_FORMATTING_ON
+
+      _isInUpdateUI = false;
    }
 }

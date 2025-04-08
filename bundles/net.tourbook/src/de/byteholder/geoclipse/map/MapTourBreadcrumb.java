@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -127,7 +127,7 @@ public class MapTourBreadcrumb {
     *
     * @param allTourData
     */
-   public void addBreadcrumTours(final ArrayList<TourData> allTourData) {
+   public void addBreadcrumTours(final List<TourData> allTourData) {
 
       // keep only tour id's, allTourData list is reused outside !!!
 

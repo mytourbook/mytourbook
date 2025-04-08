@@ -96,6 +96,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
    private Button     _rdoTourTypeFrom_SessionSportProfileName;
    private Button     _rdoTourTypeFrom_Sport;
    private Button     _rdoTourTypeFrom_SportAndProfile;
+   private Button     _rdoTourTypeFrom_SportAndSubSport;
 
    private Spinner    _spinnerIgnorLastMarker_TimeSlices;
    private Spinner    _spinnerExceededDuration;
@@ -379,6 +380,8 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
    private Composite createUI_90_TourType(final Composite parent) {
 
+      final GridDataFactory gd = GridDataFactory.fillDefaults().span(2, 1);
+
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
@@ -413,31 +416,38 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
             _rdoTourTypeFrom_Sport = new Button(containerTourTypeMode, SWT.RADIO);
             _rdoTourTypeFrom_Sport.setText(Messages.PrefPage_Fit_Radio_TourTypeFromSport);
             _rdoTourTypeFrom_Sport.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFrom_Sport);
+            gd.applyTo(_rdoTourTypeFrom_Sport);
 
             // radio: from profile name
             _rdoTourTypeFrom_Profile = new Button(containerTourTypeMode, SWT.RADIO);
             _rdoTourTypeFrom_Profile.setText(Messages.PrefPage_Fit_Radio_TourTypeFromProfile);
             _rdoTourTypeFrom_Profile.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFrom_Profile);
+            gd.applyTo(_rdoTourTypeFrom_Profile);
 
             // radio: profile name if possible, otherwise sport name
             _rdoTourTypeFrom_ProfileElseSport = new Button(containerTourTypeMode, SWT.RADIO);
             _rdoTourTypeFrom_ProfileElseSport.setText(Messages.PrefPage_Fit_Radio_TourTypeFromProfileElseSport);
             _rdoTourTypeFrom_ProfileElseSport.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFrom_ProfileElseSport);
+            gd.applyTo(_rdoTourTypeFrom_ProfileElseSport);
 
             // radio: sport name and profile name
             _rdoTourTypeFrom_SportAndProfile = new Button(containerTourTypeMode, SWT.RADIO);
             _rdoTourTypeFrom_SportAndProfile.setText(Messages.PrefPage_Fit_Radio_TourTypeFromSportAndProfile);
             _rdoTourTypeFrom_SportAndProfile.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFrom_SportAndProfile);
+            gd.applyTo(_rdoTourTypeFrom_SportAndProfile);
 
             // radio: Session Message: SportProfileName
             _rdoTourTypeFrom_SessionSportProfileName = new Button(containerTourTypeMode, SWT.RADIO);
             _rdoTourTypeFrom_SessionSportProfileName.setText(Messages.PrefPage_Fit_Radio_ProfileNameFromSession);
             _rdoTourTypeFrom_SessionSportProfileName.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFrom_SessionSportProfileName);
+            gd.applyTo(_rdoTourTypeFrom_SessionSportProfileName);
+
+            // radio: from sport name + sub sport name
+            _rdoTourTypeFrom_SportAndSubSport = new Button(containerTourTypeMode, SWT.RADIO);
+            _rdoTourTypeFrom_SportAndSubSport.setText(Messages.PrefPage_Fit_Radio_TourType_From_SportAndSubSport);
+            _rdoTourTypeFrom_SportAndSubSport.setToolTipText(Messages.PrefPage_Fit_Radio_TourType_From_SportAndSubSport_Tooltip);
+            _rdoTourTypeFrom_SportAndSubSport.addSelectionListener(_defaultSelectionListener);
+            gd.applyTo(_rdoTourTypeFrom_SportAndSubSport);
          }
       }
 
@@ -477,11 +487,12 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       _lblSplitTour_Info                     .setEnabled(isSplitTour);
       _spinnerExceededDuration               .setEnabled(isSplitTour);
 
-      _rdoTourTypeFrom_Sport                    .setEnabled(isFitImportTourType);
       _rdoTourTypeFrom_Profile                  .setEnabled(isFitImportTourType);
       _rdoTourTypeFrom_ProfileElseSport         .setEnabled(isFitImportTourType);
-      _rdoTourTypeFrom_SportAndProfile          .setEnabled(isFitImportTourType);
       _rdoTourTypeFrom_SessionSportProfileName  .setEnabled(isFitImportTourType);
+      _rdoTourTypeFrom_Sport                    .setEnabled(isFitImportTourType);
+      _rdoTourTypeFrom_SportAndProfile          .setEnabled(isFitImportTourType);
+      _rdoTourTypeFrom_SportAndSubSport         .setEnabled(isFitImportTourType);
 
 // SET_FORMATTING_ON
 
@@ -547,15 +558,16 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 // SET_FORMATTING_OFF
 
          // Set Tour Type during FIT import
-         _chkFitImportTourType                     .setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE));
+         _chkFitImportTourType                     .setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_IS_SET_TOURTYPE_DURING_IMPORT));
 
          // Mode for Tour Type during FIT import
          final String tourTypeMode = _prefStore.getDefaultString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
-         _rdoTourTypeFrom_Sport                    .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT));
          _rdoTourTypeFrom_Profile                  .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE));
          _rdoTourTypeFrom_ProfileElseSport         .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRY_PROFILE));
-         _rdoTourTypeFrom_SportAndProfile          .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_PROFILE));
          _rdoTourTypeFrom_SessionSportProfileName  .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SESSION_SPORT_PROFILE_NAME));
+         _rdoTourTypeFrom_Sport                    .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT));
+         _rdoTourTypeFrom_SportAndProfile          .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_PROFILE));
+         _rdoTourTypeFrom_SportAndSubSport         .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_LOOKUP_SPORT_AND_SUB_SPORT));
       }
 // SET_FORMATTING_ON
 
@@ -600,17 +612,18 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       _comboPowerDataSource.select(_prefStore.getInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE));
 
       // Set Tour Type during FIT import
-      _chkFitImportTourType.setSelection(_prefStore.getBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE));
+      _chkFitImportTourType.setSelection(_prefStore.getBoolean(IPreferences.FIT_IS_SET_TOURTYPE_DURING_IMPORT));
 
 // SET_FORMATTING_OFF
 
       // Mode for Tour Type during FIT import
       final String tourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
-      _rdoTourTypeFrom_Sport                    .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT));
       _rdoTourTypeFrom_Profile                  .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE));
       _rdoTourTypeFrom_ProfileElseSport         .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRY_PROFILE));
-      _rdoTourTypeFrom_SportAndProfile          .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_PROFILE));
       _rdoTourTypeFrom_SessionSportProfileName  .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SESSION_SPORT_PROFILE_NAME));
+      _rdoTourTypeFrom_Sport                    .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT));
+      _rdoTourTypeFrom_SportAndProfile          .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT_AND_PROFILE));
+      _rdoTourTypeFrom_SportAndSubSport         .setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_LOOKUP_SPORT_AND_SUB_SPORT));
 
 // SET_FORMATTING_ON
 
@@ -638,7 +651,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       _prefStore.setValue(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE, _comboPowerDataSource.getSelectionIndex());
 
       // Set Tour Type during FIT import
-      _prefStore.setValue(IPreferences.FIT_IS_IMPORT_TOURTYPE, _chkFitImportTourType.getSelection());
+      _prefStore.setValue(IPreferences.FIT_IS_SET_TOURTYPE_DURING_IMPORT, _chkFitImportTourType.getSelection());
 
       // Mode for Tour Type during FIT import
       String tourTypeMode = _prefStore.getDefaultString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
@@ -657,6 +670,9 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       } else if (_rdoTourTypeFrom_SessionSportProfileName.getSelection()) {
          tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SESSION_SPORT_PROFILE_NAME;
+
+      } else if (_rdoTourTypeFrom_SportAndSubSport.getSelection()) {
+         tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_LOOKUP_SPORT_AND_SUB_SPORT;
       }
 
       _prefStore.setValue(IPreferences.FIT_IMPORT_TOURTYPE_MODE, tourTypeMode);

@@ -19,6 +19,7 @@ import de.byteholder.geoclipse.map.Map2;
 
 import java.awt.GraphicsEnvironment;
 import java.text.NumberFormat;
+import java.util.List;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -26,6 +27,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.ColorSelectorExtended;
@@ -34,9 +36,14 @@ import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.ui.IChangeUIListener;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.TourMarkerType;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageTourMarkerTypes;
 import net.tourbook.tour.location.CommonLocationView;
 import net.tourbook.tour.location.TourLocationView;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -47,9 +54,13 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.nebula.widgets.nattable.style.Style;
+import org.eclipse.nebula.widgets.nattable.widget.mt.NatComboMT;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -114,6 +125,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private static MapTourMarkerTime[] _allMarkerLabelTimeStamp_Value = {
 
          MapTourMarkerTime.NONE,
+         MapTourMarkerTime.DATE_NO_YEAR,
          MapTourMarkerTime.DATE,
          MapTourMarkerTime.TIME,
          MapTourMarkerTime.DATE_TIME,
@@ -125,6 +137,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private static String[]            _allMarkerLabelTime_Label      = {
 
          Messages.Map_Points_LabelTime_None,
+         Messages.Map_Points_LabelTime_Date_NoYear,
          Messages.Map_Points_LabelTime_Date,
          Messages.Map_Points_LabelTime_Time,
          Messages.Map_Points_LabelTime_DateTime,
@@ -152,6 +165,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private IPropertyChangeListener        _prefChangeListener;
    //
    private ActionExpandSlideout           _actionExpandCollapseSlideout;
+   private ActionOpenPrefDialog           _actionMarkerType_Prefs;
+   private ActionMarkerType_SelectAll     _actionMarkerType_SelectAll;
+   private ActionMarkerType_SelectInverse _actionMarkerType_SelectInverse;
+   private ActionMarkerType_SelectNone    _actionMarkerType_SelectNone;
    private ActionResetToDefaults          _actionRestoreDefaults;
    private ActionStatistic_CommonLocation _actionStatistic_CommonLocation;
    private ActionStatistic_TourLocation   _actionStatistic_TourLocation;
@@ -166,6 +183,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private int                            _expandingCounter;
    private int                            _expandedHeight = -1;
    //
+   private boolean                        _isInUpdateUI;
    private TourPauseUI                    _tourPausesUI;
    //
    private final NumberFormat             _nf3            = NumberFormat.getNumberInstance();
@@ -206,6 +224,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Button                _chkIsLabelAntialiased;
    private Button                _chkIsDimMap;
    private Button                _chkIsFillClusterSymbol;
+   private Button                _chkIsFilterTourMarkers;
    private Button                _chkIsGroupMarkers;
    private Button                _chkIsGroupMarkers_All;
    private Button                _chkIsMarkerClustered;
@@ -312,6 +331,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    private Image                 _imageTourPauses;
    private Image                 _imageTourWayPoint;
 
+   private NatComboMT            _comboTourMarkerFilter;
+
    private class ActionExpandSlideout extends Action {
 
       public ActionExpandSlideout() {
@@ -324,6 +345,63 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       public void run() {
 
          actionExpandCollapseSlideout();
+      }
+   }
+
+   private class ActionMarkerType_SelectAll extends Action {
+
+      public ActionMarkerType_SelectAll() {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Slideout_MapPoints_Action_MarkerTypes_SelectAll_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Checked));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Checked_Disabled));
+      }
+
+      @Override
+      public void runWithEvent(final Event event) {
+
+         actionMarkerType_Select(true);
+      }
+   }
+
+   private class ActionMarkerType_SelectInverse extends Action {
+
+      public ActionMarkerType_SelectInverse() {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Slideout_MapPoints_Action_MarkerTypes_InverteSelection_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Inverse));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Inverse_Disabled));
+      }
+
+      @Override
+      public void runWithEvent(final Event event) {
+
+         actionMarkerType_Select(null);
+      }
+   }
+
+   private class ActionMarkerType_SelectNone extends Action {
+
+      public ActionMarkerType_SelectNone() {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Slideout_MapPoints_Action_MarkerTypes_DeselectAll_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Uncheck));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Checkbox_Uncheck_Disabled));
+      }
+
+      @Override
+      public void runWithEvent(final Event event) {
+
+         actionMarkerType_Select(false);
       }
    }
 
@@ -451,6 +529,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       // prevent that the opened slideout is partly hidden
       setIsForceBoundsToBeInsideOfViewport(true);
+
+      addPrefListener();
    }
 
    private void actionExpandCollapseSlideout() {
@@ -461,6 +541,11 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       updateUI_ExpandCollapse();
 
       onTTShellResize(null);
+   }
+
+   private void actionMarkerType_Select(final Boolean isSelectAll) {
+
+      _comboTourMarkerFilter.selectAll(isSelectAll);
    }
 
    private void actionStatistic_CommonLocation(final Event event) {
@@ -520,6 +605,21 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       selectTab(_tabTourWayPoints, event);
    }
 
+   private void addPrefListener() {
+
+      _prefChangeListener = propertyChangeEvent -> {
+
+         final String property = propertyChangeEvent.getProperty();
+
+         if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+
+            fillUI_MarkerTypes();
+         }
+      };
+
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+   }
+
    @Override
    public void close() {
 
@@ -538,15 +638,26 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
    private void createActions() {
 
-      _actionExpandCollapseSlideout = new ActionExpandSlideout();
-      _actionRestoreDefaults = new ActionResetToDefaults(this);
+// SET_FORMATTING_OFF
 
-      _actionStatistic_CommonLocation = new ActionStatistic_CommonLocation();
-      _actionStatistic_TourMarker = new ActionStatistic_TourMarker();
-      _actionStatistic_TourPause = new ActionStatistic_TourPause();
-      _actionStatistic_TourLocation = new ActionStatistic_TourLocation();
-      _actionStatistic_TourPhotos = new ActionStatistic_TourPhotos();
-      _actionStatistic_TourWayPoint = new ActionStatistic_TourWayPoint();
+      _actionExpandCollapseSlideout    = new ActionExpandSlideout();
+      _actionRestoreDefaults           = new ActionResetToDefaults(this);
+
+      _actionMarkerType_Prefs          = new ActionOpenPrefDialog(Messages.Slideout_MapPoints_Action_MarkerTypes_Setup_Tooltip,
+                                                                  PrefPageTourMarkerTypes.ID);
+
+      _actionMarkerType_SelectAll      = new ActionMarkerType_SelectAll();
+      _actionMarkerType_SelectInverse  = new ActionMarkerType_SelectInverse();
+      _actionMarkerType_SelectNone     = new ActionMarkerType_SelectNone();
+
+      _actionStatistic_CommonLocation  = new ActionStatistic_CommonLocation();
+      _actionStatistic_TourMarker      = new ActionStatistic_TourMarker();
+      _actionStatistic_TourPause       = new ActionStatistic_TourPause();
+      _actionStatistic_TourLocation    = new ActionStatistic_TourLocation();
+      _actionStatistic_TourPhotos      = new ActionStatistic_TourPhotos();
+      _actionStatistic_TourWayPoint    = new ActionStatistic_TourWayPoint();
+
+// SET_FORMATTING_ON
    }
 
    @Override
@@ -934,6 +1045,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       final Composite tabContainer = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults().margins(5, 5).numColumns(1).applyTo(tabContainer);
+//      tabContainer.setBackground(UI.SYS_COLOR_YELLOW);
       {
          {
             /*
@@ -945,10 +1057,12 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
          }
 
          final Composite container = new Composite(tabContainer, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
          {
             createUI_220_TourMarker_Label(container);
-            createUI_230_TourMarker_Cluster(container);
+            createUI_230_TourMarker_Filter(container);
+            createUI_250_TourMarker_Cluster(container);
          }
       }
 
@@ -1016,7 +1130,76 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       }
    }
 
-   private void createUI_230_TourMarker_Cluster(final Composite parent) {
+   private void createUI_230_TourMarker_Filter(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            _chkIsFilterTourMarkers = new Button(container, SWT.CHECK);
+            _chkIsFilterTourMarkers.setText(Messages.Slideout_MapPoints_Checkbox_MarkerTypes_Filter);
+            _chkIsFilterTourMarkers.addSelectionListener(_mapPointSelectionListener);
+         }
+         {
+            final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .align(SWT.END, SWT.CENTER)
+                  .applyTo(toolbar);
+
+            final ToolBarManager tbm = new ToolBarManager(toolbar);
+
+            tbm.add(_actionMarkerType_SelectAll);
+            tbm.add(_actionMarkerType_SelectNone);
+            tbm.add(_actionMarkerType_SelectInverse);
+            tbm.add(_actionMarkerType_Prefs);
+
+            tbm.update(true);
+         }
+      }
+      {
+         /**
+          * NatCombo was the best which I could find as a checkbox dropdown BUT it needed special
+          * hacking, that it worked how I expected it :-(((
+          */
+         final Style comboStyle = new Style();
+
+         _comboTourMarkerFilter = new NatComboMT(
+               parent,
+               comboStyle,
+               33, //                     maxVisibleItems
+               SWT.CHECK
+                     | SWT.MULTI
+                     | SWT.BORDER
+                     | SWT.READ_ONLY, //  style,
+               false, //                  showDropdownFilter,
+               true //                    linkItemAndCheckbox
+         );
+
+         _comboTourMarkerFilter.addSelectionListener(_mapPointSelectionListener);
+         _comboTourMarkerFilter.addSelectionAllListener(_mapPointSelectionListener);
+
+         _comboTourMarkerFilter.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(final FocusEvent e) {
+               _comboTourMarkerFilter.hideDropdownControl();
+            }
+         });
+
+         // hide brackets
+         _comboTourMarkerFilter.setMultiselectTextBracket(UI.EMPTY_STRING, UI.EMPTY_STRING);
+
+         GridDataFactory.fillDefaults()
+               .align(SWT.FILL, SWT.CENTER)
+               .grab(true, false)
+               .span(2, 1)
+               .indent(UI.FORM_FIRST_COLUMN_INDENT + 0, 0)
+               .applyTo(_comboTourMarkerFilter);
+      }
+   }
+
+   private void createUI_250_TourMarker_Cluster(final Composite parent) {
 
       final int firstColumnIndent = UI.FORM_FIRST_COLUMN_INDENT;
 
@@ -1714,6 +1897,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
 // SET_FORMATTING_OFF
 
+      final boolean isFilterTourMarkers      = _chkIsFilterTourMarkers        .getSelection();
       final boolean isGroupDuplicatedMarkers = _chkIsGroupMarkers             .getSelection();
       final boolean isMarkerClustered        = _chkIsMarkerClustered          .getSelection();
       final boolean isShowTourMarker         = _chkIsShowTourMarkers          .getSelection();
@@ -1728,6 +1912,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
       final boolean isShowTourPhotos         = Map2PainterConfig.isShowPhotos;
 
+      final boolean isFilterMarkerType       = isShowTourMarker && isFilterTourMarkers;
       final boolean isGroupMarkers           = isShowTourMarker && isGroupDuplicatedMarkers;
       final boolean isShowClusteredMarker    = isShowTourMarker && isMarkerClustered;
       final boolean isShowLabels             = isShowTourMarker || isShowTourLocations || isShowTourPauses || isShowCommonLocations;
@@ -1764,14 +1949,23 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _spinnerLabelDistributorMaxLabels      .setEnabled(isShowLabels || isShowTourPhotos);
       _spinnerLabelDistributorRadius         .setEnabled(isShowLabels || isShowTourPhotos);
 
+      // markers
       _btnSwapClusterSymbolColor             .setEnabled(isShowClusteredMarker);
       _btnSwapTourMarkerLabel_Color          .setEnabled(isShowTourMarker);
 
+      _actionMarkerType_Prefs                .setEnabled(isFilterMarkerType);
+      _actionMarkerType_SelectAll            .setEnabled(isFilterMarkerType);
+      _actionMarkerType_SelectInverse        .setEnabled(isFilterMarkerType);
+      _actionMarkerType_SelectNone           .setEnabled(isFilterMarkerType);
+
       _chkIsFillClusterSymbol                .setEnabled(isShowClusteredMarker);
+      _chkIsFilterTourMarkers                .setEnabled(isShowTourMarker);
       _chkIsGroupMarkers                     .setEnabled(isShowTourMarker);
       _chkIsGroupMarkers_All                 .setEnabled(isShowTourMarker);
       _chkIsMarkerClustered                  .setEnabled(isShowTourMarker);
       _chkIsMarkerClustered_All              .setEnabled(isShowTourMarker);
+
+      _comboTourMarkerFilter                 .setEnabled(isFilterMarkerType);
 
       _lblClusterGrid_Size                   .setEnabled(isShowClusteredMarker);
       _lblClusterSymbol                      .setEnabled(isShowClusteredMarker);
@@ -1854,6 +2048,28 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       for (final String label : _allMarkerLabelTime_Label) {
          _comboTourMarkerTime.add(label);
       }
+
+      fillUI_MarkerTypes();
+   }
+
+   /**
+    * Marker types
+    */
+   private void fillUI_MarkerTypes() {
+
+      // fix NPE
+      if (_comboTourMarkerFilter == null) {
+         return;
+      }
+
+      final List<TourMarkerType> allMarkerTypes = TourDatabase.getAllTourMarkerTypes();
+
+      final String[] allItems = new String[allMarkerTypes.size()];
+      for (int itemIndex = 0; itemIndex < allMarkerTypes.size(); itemIndex++) {
+         allItems[itemIndex] = allMarkerTypes.get(itemIndex).getTypeName();
+      }
+
+      _comboTourMarkerFilter.setItems(allItems);
    }
 
    @Override
@@ -1888,6 +2104,27 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       } else {
          return Map2ConfigManager.LABEL_LAYOUT_DEFAULT;
       }
+   }
+
+   /**
+    * @return Returns the ID's of the seleted marker types
+    */
+   private long[] getSelectedMarkerFilter() {
+
+      final int[] allSelectionIndices = _comboTourMarkerFilter.getSelectionIndices();
+      final List<TourMarkerType> allMarkerTypes = TourDatabase.getAllTourMarkerTypes();
+
+      final long[] allSelectedMarkerTypeIDs = new long[allSelectionIndices.length];
+      int idIndex = 0;
+
+      for (final int selectionIndex : allSelectionIndices) {
+
+         final TourMarkerType markerType = allMarkerTypes.get(selectionIndex);
+
+         allSelectedMarkerTypeIDs[idIndex++] = markerType.getId();
+      }
+
+      return allSelectedMarkerTypeIDs;
    }
 
    private MapTourMarkerTime getSelectedMarkerTimeStamp() {
@@ -1975,6 +2212,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
             setIsAnotherDialogOpened(false);
          }
       };
+
    }
 
    @Override
@@ -2086,6 +2324,10 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
    }
 
    private void onModifyConfig(final Widget widget) {
+
+      if (_isInUpdateUI) {
+         return;
+      }
 
       onModifyConfig(false, widget);
    }
@@ -2297,6 +2539,13 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       repaintMap();
    }
 
+   @Override
+   protected void onTTShellMoved(final ControlEvent event) {
+
+      // hide the dropdown which is a separate shell, it would keep open and is not moved
+      _comboTourMarkerFilter.hideDropdownControl();
+   }
+
    private void repaintMap() {
 
       final Map2 map2 = _map2View.getMap();
@@ -2320,6 +2569,8 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
 
    private void restoreState() {
 
+      _isInUpdateUI = true;
+
       final Map2Config config = Map2ConfigManager.getActiveConfig();
 
 // SET_FORMATTING_OFF
@@ -2333,6 +2584,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _chkIsShowTourMarkers_All              .setSelection( config.isShowTourMarker);
       _chkIsShowTourPauses                   .setSelection( config.isShowTourPauses);
       _chkIsShowTourPauses_All               .setSelection( config.isShowTourPauses);
+      _chkIsFilterTourMarkers                .setSelection( config.isFilterTourMarkers);
       _chkIsGroupMarkers                     .setSelection( config.isGroupDuplicatedMarkers);
       _chkIsGroupMarkers_All                 .setSelection( config.isGroupDuplicatedMarkers);
       _chkIsLabelAntialiased                 .setSelection( config.isLabelAntialiased);
@@ -2402,16 +2654,19 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       _actionStatistic_TourPause       .setChecked(config.isShowTourPauses);
       _actionStatistic_TourWayPoint    .setChecked(config.isShowTourWayPoint);
 
-// SET_FORMATTING_ON
-
       _tourPausesUI.restoreState();
 
-      selectLabelFont(config.labelFontName);
-      selectLabelLayout(config.labelLayout);
-      selectMarkerTimeStamp(config.tourMarkerDateTimeFormat);
+      selectLabelFont(        config.labelFontName);
+      selectLabelLayout(      config.labelLayout);
+      selectMarkerTimeStamp(  config.tourMarkerDateTimeFormat);
+      selectMarkerFilter(     config.tourMarkerFilter);
+
+// SET_FORMATTING_ON
 
       updateUI_TabLabel();
       updateUI_ExpandCollapse();
+
+      _isInUpdateUI = false;
    }
 
    private void restoreTabFolder() {
@@ -2436,8 +2691,9 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       config.groupGridSize                = _spinnerLabelGroupGridSize           .getSelection();
       config.groupedMarkers               = _txtGroupDuplicatedMarkers           .getText();
 
-      config.isLabelAntialiased           = _chkIsLabelAntialiased               .getSelection();
       config.isFillClusterSymbol          = _chkIsFillClusterSymbol              .getSelection();
+      config.isFilterTourMarkers          = _chkIsFilterTourMarkers              .getSelection();
+      config.isLabelAntialiased           = _chkIsLabelAntialiased               .getSelection();
       config.isTourMarkerClustered        = _chkIsMarkerClustered                .getSelection();
 
       config.clusterGridSize              = _spinnerClusterGrid_Size             .getSelection();
@@ -2457,6 +2713,7 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       config.labelFontName                = getSelectedLabelFont();
       config.labelLayout                  = getSelectedLabelLayout();
       config.tourMarkerDateTimeFormat     = getSelectedMarkerTimeStamp();
+      config.tourMarkerFilter             = getSelectedMarkerFilter();
 
       config.commonLocationFill_RGB             = _colorCommonLocationLabel_Fill             .getColorValue();
       config.commonLocationOutline_RGB          = _colorCommonLocationLabel_Outline          .getColorValue();
@@ -2536,6 +2793,47 @@ public class SlideoutMap2_MapPoints extends AdvancedSlideout implements
       }
 
       _comboLabelLayout.select(selectionIndex);
+   }
+
+   /**
+    * @param allRequestedMarkerTypeIDs
+    */
+   private void selectMarkerFilter(final long[] allRequestedMarkerTypeIDs) {
+
+      // combo is sorted by name
+      final List<TourMarkerType> allMarkerTypes = TourDatabase.getAllTourMarkerTypes();
+
+      final IntArrayList allSelectionIndices = new IntArrayList();
+
+      if (allRequestedMarkerTypeIDs != null) {
+
+         for (int comboIndex = 0; comboIndex < allMarkerTypes.size(); comboIndex++) {
+
+            final TourMarkerType comboMarkerType = allMarkerTypes.get(comboIndex);
+
+            final long comboID = comboMarkerType.getId();
+
+            for (final long requestedID : allRequestedMarkerTypeIDs) {
+
+               if (requestedID == comboID) {
+
+                  allSelectionIndices.add(comboIndex);
+
+                  break;
+               }
+            }
+         }
+      }
+
+      /**
+       * This code is very hacky because the NatCombo do not check the selected items or deselect
+       * thems :-(((
+       */
+      final int[] allSelectedIndices = allSelectionIndices.toArray();
+
+      _comboTourMarkerFilter.selectAll(false); // deselect all
+      _comboTourMarkerFilter.select(allSelectedIndices);
+      _comboTourMarkerFilter.check(allSelectedIndices);
    }
 
    private void selectMarkerTimeStamp(final Enum<MapTourMarkerTime> markerTimestamp) {

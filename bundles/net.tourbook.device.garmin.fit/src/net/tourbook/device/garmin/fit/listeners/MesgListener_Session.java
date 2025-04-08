@@ -19,6 +19,7 @@ import com.garmin.fit.DateTime;
 import com.garmin.fit.SessionMesg;
 import com.garmin.fit.SessionMesgListener;
 import com.garmin.fit.Sport;
+import com.garmin.fit.SubSport;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -64,6 +65,11 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
          final String sportName = sport.name().trim();
          tourData.setDeviceModeName(sportName);
          fitData.setSportname(sportName);
+      }
+
+      final SubSport subSport = mesg.getSubSport();
+      if (subSport != null) {
+         fitData.setSubSport(subSport.name().trim());
       }
 
       final String sportProfileName = mesg.getSportProfileName();

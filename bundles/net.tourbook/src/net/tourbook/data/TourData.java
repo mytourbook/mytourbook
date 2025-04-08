@@ -1008,7 +1008,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 //   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
 //   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
 //   @JsonProperty
-//   private Set<TourLocationPoint>      tourLocationPoints                  = new HashSet<>();
+//   private Set<TourLocationPoint>      tourLocationPoints                = new HashSet<>();
 
    /**
     * Contains the tour way points
@@ -1024,7 +1024,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    @JsonProperty
-   private Set<TourNutritionProduct>             tourNutritionProducts                         = new HashSet<>();
+   private Set<TourNutritionProduct>             tourNutritionProducts     = new HashSet<>();
 
    /**
     * Reference tours
@@ -11953,9 +11953,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    }
 
    /**
-    * Reset sorted markers that they are sorted again.
+    * Reset sorted markers that they are sorted again
     */
-   private void resetSortedMarkers() {
+   public void resetSortedMarkers() {
 
       if (_sortedMarkers != null) {
          _sortedMarkers.clear();

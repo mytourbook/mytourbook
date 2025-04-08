@@ -39,7 +39,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
       store.setDefault(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE, 0);
 
-      store.setDefault(IPreferences.FIT_IS_IMPORT_TOURTYPE, false);
+      store.setDefault(IPreferences.FIT_IS_SET_TOURTYPE_DURING_IMPORT, false);
 
       store.setDefault(IPreferences.FIT_IMPORT_TOURTYPE_MODE, IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT);
    }
