@@ -63,7 +63,7 @@ jobs:
           path: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
           retention-days: 5
       - name: Test Report
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2
         if: success() || failure()
         with:
           name: Tests Report
