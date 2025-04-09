@@ -23,7 +23,7 @@
 
    <properties>
       <tycho.version>3.0.5</tycho.version>
-      <surefire.version>3.5.2</surefire.version>
+      <surefire.version>3.5.3</surefire.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
 
@@ -212,7 +212,7 @@
       
       <plugin>
          <artifactId>jacoco-maven-plugin</artifactId>          <groupId>org.jacoco</groupId>
-                                                               <version>0.8.12</version>
+                                                               <version>0.8.13</version>
          <executions>
          
             <execution>
