@@ -212,7 +212,7 @@
       
       <plugin>
          <artifactId>jacoco-maven-plugin</artifactId>          <groupId>org.jacoco</groupId>
-                                                               <version>0.8.12</version>
+                                                               <version>0.8.13</version>
          <executions>
          
             <execution>
