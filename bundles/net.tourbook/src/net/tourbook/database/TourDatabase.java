@@ -5120,9 +5120,16 @@ public class TourDatabase {
             + "   isCustomProduct          BOOLEAN DEFAULT FALSE,                                " + NL //$NON-NLS-1$
             + "   beverageQuantity         INTEGER,                                              " + NL //$NON-NLS-1$
             + "   beverageQuantity_Serving INTEGER,                                              " + NL //$NON-NLS-1$
-            + "   containersConsumed       FLOAT                                                 " + NL //$NON-NLS-1$
+            + "   containersConsumed       FLOAT,                                                " + NL //$NON-NLS-1$
 
             // Version 55 - end
+
+            // Version 58 - begin
+
+            + "   carbohydrates            INTEGER,                                              " + NL //$NON-NLS-1$
+            + "   carbohydrates_Serving    INTEGER                                               " + NL //$NON-NLS-1$
+
+            // Version 58 - end
 
             + ")"); //$NON-NLS-1$
    }
