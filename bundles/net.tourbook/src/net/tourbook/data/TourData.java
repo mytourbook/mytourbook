@@ -46,7 +46,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14036,31 +14035,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       onPrePersist();
    }
 
-   private void updateNewProductInfo(final TourNutritionProduct updatedProduct, final TourNutritionProduct existingProduct) {
-
-      if (!existingProduct.getName().equals(updatedProduct.getName())) {
-         existingProduct.setName(updatedProduct.getName());
-      }
-      if (existingProduct.getCalories() != updatedProduct.getCalories()) {
-         existingProduct.setCalories(updatedProduct.getCalories());
-      }
-      if (existingProduct.getCalories_Serving() != updatedProduct.getCalories_Serving()) {
-         existingProduct.setCalories_Serving(updatedProduct.getCalories_Serving());
-      }
-      if (existingProduct.getCarbohydrates() != updatedProduct.getCarbohydrates()) {
-         existingProduct.setCarbohydrates(updatedProduct.getCarbohydrates());
-      }
-      if (existingProduct.getCarbohydrates_Serving() != updatedProduct.getCarbohydrates_Serving()) {
-         existingProduct.setCarbohydrates_Serving(updatedProduct.getCarbohydrates_Serving());
-      }
-      if (!Objects.equals(existingProduct.getSodium(), updatedProduct.getSodium())) {
-         existingProduct.setSodium(updatedProduct.getSodium());
-      }
-      if (!Objects.equals(existingProduct.getSodium_Serving(), updatedProduct.getSodium_Serving())) {
-         existingProduct.setSodium_Serving(updatedProduct.getSodium_Serving());
-      }
-   }
-
    /**
     * Adjust paused times when tour start has changed.
     *
@@ -14096,7 +14070,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          if (existingProduct != null) {
 
             // Update only the properties that are different
-            updateNewProductInfo(updatedProduct, existingProduct);
+            existingProduct.updateNewProductInfo(updatedProduct);
 
          } else {
 
