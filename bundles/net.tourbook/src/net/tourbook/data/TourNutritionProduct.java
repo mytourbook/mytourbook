@@ -510,6 +510,12 @@ public class TourNutritionProduct {
       }
       for (int index = 0; index < previousData.size(); ++index) {
 
+         //todo fb
+         //it should look like this
+         // Updating the following Tour Nutrition Products:
+         // PRODUCTNAME → Previous data: PRODUCTNAME 504.0kcal XXg..... - Current data: NEWNAME 504.0kcal YYg....
+         // PRODUCTNAME2 → Previous data: PRODUCTNAME 504.0kcal XXg..... - Current data: NEWNAME 504.0kcal YYg....
+         //Updated in 0.347 s
          TourLogManager.subLog_INFO(NLS.bind(
                Messages.Log_ModifiedTour_Old_Data_Vs_New_Data,
                previousData.get(index),
