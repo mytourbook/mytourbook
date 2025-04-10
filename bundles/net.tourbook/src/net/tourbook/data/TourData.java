@@ -2090,6 +2090,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    @Transient
    private List<TourPause>    _allTourPauses;
 
+   /**
+    * When a value is <code>true</code> then this value is interpolated
+    */
+   @Transient
+   public boolean[]            interpolatedValueSerie;
+
 
 // SET_FORMATTING_ON
 
@@ -7719,8 +7725,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       createTimeSeries_12_RemoveInvalidDistanceValues();
       createTimeSeries_14_RemoveInvalidDistanceValues();
 
-      createTimeSeries_20_data_completing(latitudeSerie, timeSerie);
-      createTimeSeries_20_data_completing(longitudeSerie, timeSerie);
+      createTimeSeries_20_data_completing(latitudeSerie, timeSerie, true);
+      createTimeSeries_20_data_completing(longitudeSerie, timeSerie, false);
 
       createTimeSeries_30_data_completing(altitudeSerie, timeSerie);
       createTimeSeries_30_data_completing(distanceSerie, timeSerie);
@@ -7797,43 +7803,50 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
    }
 
-   private void createTimeSeries_20_data_completing(final double[] field, final int[] time) {
+   private void createTimeSeries_20_data_completing(final double[] allTourValues,
+                                                    final int[] time,
+                                                    final boolean isLogInterpolatedValues) {
 
-      if (field == null) {
+      if (allTourValues == null) {
          return;
       }
 
-      final int size = time.length;
+      final int numTimeSlices = time.length;
 
-      for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+      if (isLogInterpolatedValues) {
+         interpolatedValueSerie = new boolean[numTimeSlices];
+      }
 
-         if (field[serieIndex] == Double.MIN_VALUE) {
+
+      for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
+
+         if (allTourValues[serieIndex] == Double.MIN_VALUE) {
 
             // search forward to the next valid data
             int invalidIndex = serieIndex;
-            while (field[invalidIndex] == Double.MIN_VALUE && invalidIndex < size - 1) {
+            while (allTourValues[invalidIndex] == Double.MIN_VALUE && invalidIndex < numTimeSlices - 1) {
                invalidIndex++;
             }
 
             final int nextValidIndex = invalidIndex;
 
-            if (field[nextValidIndex] == Double.MIN_VALUE) {
+            if (allTourValues[nextValidIndex] == Double.MIN_VALUE) {
 
                double lastValidValue;
                if (serieIndex - 1 < 0) {
                   // ??????????????????
                   lastValidValue = 0;
                } else {
-                  lastValidValue = field[serieIndex - 1];
+                  lastValidValue = allTourValues[serieIndex - 1];
                }
 
-               field[nextValidIndex] = lastValidValue;
+               allTourValues[nextValidIndex] = lastValidValue;
             }
 
             final int time1 = time[serieIndex - 1];
             final int time2 = time[nextValidIndex];
-            final double val1 = field[serieIndex - 1];
-            final double val2 = field[nextValidIndex];
+            final double val1 = allTourValues[serieIndex - 1];
+            final double val2 = allTourValues[nextValidIndex];
 
             for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
 
@@ -7844,7 +7857,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                      val2,
                      time[interpolationIndex]);
 
-               field[interpolationIndex] = interpolationValue;
+               allTourValues[interpolationIndex] = interpolationValue;
+
+               if (isLogInterpolatedValues) {
+                  interpolatedValueSerie[interpolationIndex] = true;
+               }
             }
 
             serieIndex = nextValidIndex - 1;

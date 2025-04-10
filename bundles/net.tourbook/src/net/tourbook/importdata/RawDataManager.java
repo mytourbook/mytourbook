@@ -3430,7 +3430,13 @@ public class RawDataManager {
                 */
                final TourData savedTourData = TourDatabase.saveTour_Concurrent(updatedTourData, true);
 
+               // keep transient values
+               final boolean[] interpolatedValueSerie = updatedTourData.interpolatedValueSerie;
+
                updatedTourData = savedTourData;
+
+               // set transient values
+               updatedTourData.interpolatedValueSerie = interpolatedValueSerie;
             }
 
             if (importState_Process.isLog_OK()) {

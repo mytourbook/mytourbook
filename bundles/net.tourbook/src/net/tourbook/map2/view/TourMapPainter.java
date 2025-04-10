@@ -1624,9 +1624,20 @@ public class TourMapPainter extends Map2Painter {
       long colorValue = 0;
       if (_legendProvider instanceof IGradientColorProvider) {
 
-         colorValue = ((IGradientColorProvider) _legendProvider).getRGBValue(
-               ColorProviderConfig.MAP2,
-               _dataSerie[serieIndex]);
+         if (tourData.interpolatedValueSerie != null) {
+            
+            // interpolated values are forced when available
+
+            final boolean isInterpolated = tourData.interpolatedValueSerie[serieIndex];
+
+            colorValue = isInterpolated ? 0xffffff : 0x000080ff;
+
+         } else {
+
+            colorValue = ((IGradientColorProvider) _legendProvider).getRGBValue(
+                  ColorProviderConfig.MAP2,
+                  _dataSerie[serieIndex]);
+         }
 
       } else if (_legendProvider instanceof IDiscreteColorProvider) {
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,22 +17,25 @@ package net.tourbook.ui.tourChart;
 
 public class GraphBgSourceType {
 
-	GraphBackgroundSource	graphBgSource;
-	String			label;
+   GraphBackgroundSource graphBgSource;
+   
+   String                label;
 
-	public GraphBgSourceType(final GraphBackgroundSource graphBgSource, final String label) {
+   public GraphBgSourceType(final GraphBackgroundSource graphBgSource, final String label) {
 
-		this.graphBgSource = graphBgSource;
-		this.label = label;
-	}
+      this.graphBgSource = graphBgSource;
 
-	@Override
-	public String toString() {
-		return "GraphBgSourceType [" //$NON-NLS-1$
+      this.label = label;
+   }
 
-				+ "graphBgSource=" + graphBgSource + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				+ "label=" + label //$NON-NLS-1$
+   @Override
+   public String toString() {
 
-				+ "]"; //$NON-NLS-1$
-	}
+      return "GraphBgSourceType [" //$NON-NLS-1$
+
+            + "graphBgSource=" + graphBgSource + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "label=" + label //$NON-NLS-1$
+
+            + "]"; //$NON-NLS-1$
+   }
 }
