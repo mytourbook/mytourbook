@@ -110,6 +110,9 @@ public class TourNutritionViewTests extends UITest {
       // Make sure that the table now contains 4 products
       assertEquals(initialTableRowCount + 4, productsTable.rowCount());
 
+      // Act - Update all the products
+      bot.button(Messages.Tour_Nutrition_Button_UpdateProducts).click();
+
       // Act - Add a manual product
       bot.button(Messages.Tour_Nutrition_Button_AddCustomProduct).click();
       // Name
@@ -130,9 +133,6 @@ public class TourNutritionViewTests extends UITest {
       // Sort the products by name
       productsTable.header(Messages.Tour_Nutrition_Column_Name).click();
       productsTable.header(Messages.Tour_Nutrition_Column_Name).click();
-
-      // Act - Update all the products
-      bot.button(Messages.Tour_Nutrition_Button_UpdateProducts).click();
 
       // Act - Delete all the products
       for (int index = 0; index < 5; ++index) {
