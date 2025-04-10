@@ -46,7 +46,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -14049,5 +14051,52 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
          pausedTime_Start[index] += startTimeOffset;
          pausedTime_End[index] += startTimeOffset;
       }
+   }
+
+   public void updateTourNutritionProducts(final Set<TourNutritionProduct> updatedTourNutritionProducts) {
+
+      if (tourNutritionProducts == null || updatedTourNutritionProducts == null) {
+         return;
+      }
+
+      // Map existing products by their unique identifier (barcode)
+      final Map<String, TourNutritionProduct> existingProductsMap = tourNutritionProducts.stream()
+            .collect(Collectors.toMap(TourNutritionProduct::getProductCode, product -> product));
+
+      // Iterate through the updated products
+      for (final TourNutritionProduct updatedProduct : updatedTourNutritionProducts) {
+
+         final TourNutritionProduct existingProduct = existingProductsMap.get(updatedProduct.getProductCode());
+
+         if (existingProduct != null) {
+
+            // Update only the properties that are different
+            if (!existingProduct.getName().equals(updatedProduct.getName())) {
+               existingProduct.setName(updatedProduct.getName());
+            }
+            if (existingProduct.getCalories() != updatedProduct.getCalories()) {
+               existingProduct.setCalories(updatedProduct.getCalories());
+            }
+            if (existingProduct.getCalories_Serving() != updatedProduct.getCalories_Serving()) {
+               existingProduct.setCalories_Serving(updatedProduct.getCalories_Serving());
+            }
+            if (existingProduct.getCarbohydrates() != updatedProduct.getCarbohydrates()) {
+               existingProduct.setCarbohydrates(updatedProduct.getCarbohydrates());
+            }
+            if (existingProduct.getCarbohydrates_Serving() != updatedProduct.getCarbohydrates_Serving()) {
+               existingProduct.setCarbohydrates_Serving(updatedProduct.getCarbohydrates_Serving());
+            }
+            if (!Objects.equals(existingProduct.getSodium(), updatedProduct.getSodium())) {
+               existingProduct.setSodium(updatedProduct.getSodium());
+            }
+            if (!Objects.equals(existingProduct.getSodium_Serving(), updatedProduct.getSodium_Serving())) {
+               existingProduct.setSodium_Serving(updatedProduct.getSodium_Serving());
+            }
+         } else {
+            // If the product does not exist, add it to the set
+            tourNutritionProducts.add(updatedProduct);
+         }
+      }
+
    }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2024 Frédéric Bard
+ * Copyright (C) 2024, 2025 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -47,8 +48,10 @@ import net.tourbook.data.TourNutritionProduct;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.nutrition.DialogCustomTourNutritionProduct;
 import net.tourbook.nutrition.NutritionUtils;
+import net.tourbook.nutrition.ProductSearchType;
 import net.tourbook.nutrition.QuantityType;
 import net.tourbook.nutrition.TourNutritionProductMenuManager;
+import net.tourbook.nutrition.openfoodfacts.Product;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -120,6 +123,10 @@ import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
 public class TourNutritionView extends ViewPart implements ITourViewer {
 
    // todo fb
+
+   //when 2 identical products are present, the modificaiton of its beverage can't be done
+   // if the other identical product doesn't have a beverage container
+
    // slideout with ignore 1h
    // add group with 2 radio buttons "Use the last most added items", "Use the most used items for all the tours"
    // in that group, add a spinner for the number of items to show 1 to 15
@@ -127,7 +134,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
    //add the ability to insert 2 similar items if they are beverages (cf. example 08/03/2024)
 
    public static final String            ID                             = "net.tourbook.ui.views.nutrition.TourNutritionView"; //$NON-NLS-1$
-
 
    private static final String           STATE_PRODUCT_SEARCHES_HISTORY = "products.searchesHistory";                          //$NON-NLS-1$
    private static final String           STATE_SECTION_PRODUCTS_LIST    = "STATE_SECTION_PRODUCTS_LIST";                       //$NON-NLS-1$
@@ -621,8 +627,6 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _actionDeleteProducts = new ActionDeleteProducts();
       _actionOpenProductsWebsite = new ActionOpenProductsWebsite();
-
-
 
    }
 
@@ -1323,9 +1327,12 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       final int numberOfProducts = _productsViewer.getTable().getItemCount();
 
-      //todo fb only enable when the number of products FROM the OFF database is greater than 0
+      final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
+      //Ensure that at least 1 product is not a custom product
+      final boolean containsProductFromDatabase = tourNutritionProducts.stream().anyMatch(
+            tourNutritionProduct -> !tourNutritionProduct.isCustomProduct());
 
-      _btnUpdateProducts.setEnabled(numberOfProducts > 0);
+      _btnUpdateProducts.setEnabled(numberOfProducts > 0 && containsProductFromDatabase);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
@@ -1580,37 +1587,44 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       TourLogManager.showLogView(AutoOpenEvent.TOUR_ADJUSTMENTS);
 
-//      final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
-//      final Set<TourNutritionProduct> updatedTourNutritionProducts = new HashSet<>();
-//      for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
-//
-//         if (net.tourbook.common.util.StringUtils.isNullOrEmpty(tourNutritionProduct.getProductCode())) {
-//            continue;
-//         }
-//
-//         //get the product from the api
-//
-//         final Product updatedProduct = searchProductResults.get(0);
-//         final TourNutritionProduct updatedTourNutritionProduct = new TourNutritionProduct(_tourData, updatedProduct);
-//         // if carbohydrates or calories are different, then we update the product
-//
-//         boolean isUpdateProduct = false;
-//         if (updatedTourNutritionProduct.getCarbohydrates_Serving() != tourNutritionProduct.getCarbohydrates_Serving() ||
-//               updatedTourNutritionProduct.getCalories_Serving() != tourNutritionProduct.getCalories_Serving()) {
-//            isUpdateProduct = true;
-//         }
-//
-//         updatedTourNutritionProducts.add(updatedTourNutritionProduct);
-//      }
-//
-//      if (!updatedTourNutritionProducts.isEmpty()) {
-//
-//         _tourData.setTourNutritionProducts(updatedTourNutritionProducts);
-//         _tourData = TourManager.saveModifiedTour(_tourData);
-//         _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
-//
-//         // todo display the changes in the log view
-//      }
+      final Set<TourNutritionProduct> tourNutritionProducts = _tourData.getTourNutritionProducts();
+      final Set<TourNutritionProduct> updatedTourNutritionProducts = new HashSet<>();
+      for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
+
+         if (net.tourbook.common.util.StringUtils.isNullOrEmpty(tourNutritionProduct.getProductCode())) {
+            continue;
+         }
+
+         //get the product from the api
+
+         final Product updatedProduct = NutritionUtils.searchProduct(
+               tourNutritionProduct.getProductCode(),
+               ProductSearchType.ByCode).get(0);
+
+         final TourNutritionProduct updatedTourNutritionProduct = new TourNutritionProduct(_tourData, updatedProduct);
+         // if carbohydrates or calories are different, then we update the product
+
+         boolean isUpdateProduct = false;
+         if (updatedTourNutritionProduct.getCarbohydrates_Serving() != tourNutritionProduct.getCarbohydrates_Serving() ||
+               updatedTourNutritionProduct.getCalories_Serving() != tourNutritionProduct.getCalories_Serving()) {
+
+            isUpdateProduct = true;
+         }
+
+         if (isUpdateProduct) {
+
+            updatedTourNutritionProducts.add(updatedTourNutritionProduct);
+         }
+      }
+
+      if (!updatedTourNutritionProducts.isEmpty()) {
+
+         _tourData.updateTourNutritionProducts(updatedTourNutritionProducts);
+         _tourData = TourManager.saveModifiedTour(_tourData);
+         // ??? _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
+
+         // todo display the changes in the log view
+      }
    }
 
    @Override
