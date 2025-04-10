@@ -15,15 +15,10 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
-import net.tourbook.importdata.ImportState_File;
-import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
@@ -53,38 +48,10 @@ public class ActionInterpolatedValues_ReImport extends Action {
 
       final TourData providerTourData = selectedTours.get(0);
 
-      final String osFilePath = providerTourData.getImportFilePathName();
+      final TourData importedTourData = RawDataManager.getInstance().reimportTour(providerTourData);
 
-      if (osFilePath == null) {
+      if (importedTourData == null) {
          return;
-      }
-
-      final File importFile = new File(osFilePath);
-
-      final Map<Long, TourData> allImportedToursFromOneFile = new HashMap<>();
-      final ImportState_Process importState_Process = new ImportState_Process();
-
-      final ImportState_File importState_File = RawDataManager.getInstance().importTours_FromOneFile(
-
-            importFile, //                   importFile
-            null, //                         destinationPath
-            null, //                         fileCollision
-            false, //                        isBuildNewFileNames
-            false, //                        isTourDisplayedInImportView
-            allImportedToursFromOneFile,
-            importState_Process //
-      );
-
-      if (importState_File.isFileImportedWithValidData == false) {
-         return;
-      }
-
-      TourData importedTourData = null;
-
-      for (final TourData importedTtourDataValue : allImportedToursFromOneFile.values()) {
-
-         importedTourData = importedTtourDataValue;
-         break;
       }
 
       // set interpolated values
@@ -100,4 +67,5 @@ public class ActionInterpolatedValues_ReImport extends Action {
 
       TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent, null);
    }
+
 }

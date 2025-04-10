@@ -7850,7 +7850,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
             for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
 
-               final double interpolationValue = createTimeSeries_40_linear_interpolation(
+               final double interpolationValue = createTimeSeries_40_LinearInterpolation(
                      time1,
                      time2,
                      val1,
@@ -7911,7 +7911,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
             for (int interpolationIndex = serieIndex; interpolationIndex < nextValidIndex; interpolationIndex++) {
 
-               final double linearInterpolation = createTimeSeries_40_linear_interpolation(
+               final double linearInterpolation = createTimeSeries_40_LinearInterpolation(
                      time1,
                      time2,
                      val1,
@@ -7926,14 +7926,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
    }
 
-   private double createTimeSeries_40_linear_interpolation(final double time1,
+   private double createTimeSeries_40_LinearInterpolation(final double time1,
                                                            final double time2,
                                                            final double val1,
                                                            final double val2,
                                                            final double time) {
       if (time2 == time1) {
+
          return ((val1 + val2) / 2.);
+
       } else {
+
          return (val1 + (val2 - val1) / (time2 - time1) * (time - time1));
       }
    }

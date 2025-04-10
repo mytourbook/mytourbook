@@ -38,7 +38,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 
 /**
- * Draws background color into the graph, e.g. HR zone, swim style
+ * Draws background color into the graph, e.g. HR zone, swim style, interpolated values
  */
 public class GraphBackgroundPainter implements IFillPainter {
 

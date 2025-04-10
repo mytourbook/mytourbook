@@ -93,8 +93,7 @@ public class ActionSetGeoPosition extends SubMenu {
 
       super(UI.EMPTY_STRING, AS_DROP_DOWN_MENU);
 
-      setToolTipText(
-            Messages.Map_Action_GeoPositions_Tooltip);
+      setToolTipText(Messages.Map_Action_GeoPositions_Tooltip);
 
       _actionSetStartPosition = new SubAction_SetStartPosition();
       _actionSetEndPosition = new SubAction_SetEndPosition();
