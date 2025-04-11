@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2024 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2025 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1577,7 +1577,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
        */
       _joinedTourData.setSpeedSerie(null);
 
-      _joinedTourData.cleanupDataSeries();
+      _joinedTourData.cleanupDataSeries(null);
 
       // set joined speed again otherwise it was killed 2 lines above, highly complicated
       if (isJoinSpeed) {

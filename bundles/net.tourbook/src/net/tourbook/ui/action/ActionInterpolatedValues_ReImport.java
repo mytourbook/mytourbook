@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
@@ -47,8 +48,9 @@ public class ActionInterpolatedValues_ReImport extends Action {
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
       final TourData providerTourData = selectedTours.get(0);
+      final ImportState_Process importState_Process = new ImportState_Process();
 
-      final TourData importedTourData = RawDataManager.getInstance().reimportTour(providerTourData);
+      final TourData importedTourData = RawDataManager.getInstance().reimportTour(providerTourData, importState_Process);
 
       if (importedTourData == null) {
          return;

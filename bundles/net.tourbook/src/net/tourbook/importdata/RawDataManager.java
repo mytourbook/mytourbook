@@ -3029,7 +3029,8 @@ public class RawDataManager {
                   : 0;
    }
 
-   public TourData reimportTour(final TourData oldTourData) {
+   public TourData reimportTour(final TourData oldTourData,
+                                final ImportState_Process importState_Process) {
 
       final String osFilePath = oldTourData.getImportFilePathName();
 
@@ -3040,7 +3041,6 @@ public class RawDataManager {
       final File importFile = new File(osFilePath);
 
       final Map<Long, TourData> allImportedToursFromOneFile = new HashMap<>();
-      final ImportState_Process importState_Process = new ImportState_Process();
 
       final ImportState_File importState_File = RawDataManager.getInstance().importTours_FromOneFile(
 

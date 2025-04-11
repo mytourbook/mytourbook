@@ -74,6 +74,7 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourWayPoint;
+import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map.Action_ExportMap_SubMenu;
 import net.tourbook.map.IMapSyncListener;
@@ -1784,12 +1785,35 @@ public class Map2View extends ViewPart implements
 
       final TourData tourData = tourGeoMarker.getTourData();
 
-      final TourData reimportedTourData = RawDataManager.getInstance().reimportTour(tourData);
+      final ImportState_Process importState_Process = new ImportState_Process();
 
-      final int markerSerieIndex = tourGeoMarker.getSerieIndex();
+      // do not interpolate geo positions during the reimport
+      importState_Process.setIsSkipGeoInterpolation(true);
 
-      int a = 0;
-      a++;
+      final TourData reimportedTourData = RawDataManager.getInstance().reimportTour(tourData, importState_Process);
+
+      final int[] timeSerie = tourData.timeSerie;
+      final double[] reimportedLatitudeSerie = reimportedTourData.latitudeSerie;
+      final double[] reimportedlongitudeSerie = reimportedTourData.longitudeSerie;
+
+      final int geoMarkerSerieIndex = tourGeoMarker.getSerieIndex();
+
+      // insert geo marker position
+      reimportedLatitudeSerie[geoMarkerSerieIndex] = currentMouseGeoPosition.latitude;
+      reimportedlongitudeSerie[geoMarkerSerieIndex] = currentMouseGeoPosition.longitude;
+
+      // interpolate lat/lon
+      tourData.createTimeSeries_20_InterpolateMissingValues(reimportedLatitudeSerie, timeSerie, false);
+      tourData.createTimeSeries_20_InterpolateMissingValues(reimportedlongitudeSerie, timeSerie, false);
+
+      // adjust distance/speed values
+      TourManager.computeDistanceValuesFromGeoPosition(reimportedTourData);
+
+      tourData.latitudeSerie = reimportedLatitudeSerie;
+      tourData.longitudeSerie = reimportedlongitudeSerie;
+      tourData.distanceSerie = reimportedTourData.distanceSerie;
+
+      TourManager.saveModifiedTour(tourData);
    }
 
    public void actionSetShowScaleInMap() {
