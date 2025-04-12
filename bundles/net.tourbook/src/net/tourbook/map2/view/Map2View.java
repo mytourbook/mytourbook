@@ -74,7 +74,6 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourWayPoint;
-import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map.Action_ExportMap_SubMenu;
 import net.tourbook.map.IMapSyncListener;
@@ -163,6 +162,7 @@ import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.tour.photo.TourPhotoManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ValuePoint_ToolTip_UI;
+import net.tourbook.ui.action.SubMenu_SetGeoPosition;
 import net.tourbook.ui.action.SubMenu_SetTourMarkerType;
 import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.tourChart.TourChart;
@@ -463,7 +463,7 @@ public class Map2View extends ViewPart implements
    //
    private long                                 _previousOverlayKey;
    //
-   private int                                  _selectedProfileKey    = 0;
+   private int                                  _selectedProfileKey   = 0;
    //
    private MapGraphId                           _tourColorId;
    //
@@ -472,7 +472,7 @@ public class Map2View extends ViewPart implements
    private long                                 _hash_TourOverlayKey;
    private int                                  _hash_AllPhotos;
    //
-   private final AtomicInteger                  _asyncCounter          = new AtomicInteger();
+   private final AtomicInteger                  _asyncCounter         = new AtomicInteger();
    //
    /**
     * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
@@ -481,12 +481,12 @@ public class Map2View extends ViewPart implements
    private boolean                              _isLinkPhotoDisplayed;
    //
    private SliderPathPaintingData               _sliderPathPaintingData;
-   private OpenDialogManager                    _openDlgMgr            = new OpenDialogManager();
+   private OpenDialogManager                    _openDlgMgr           = new OpenDialogManager();
    //
    /**
     * Keep map sync mode when map sync action get's unchecked
     */
-   private MapSyncMode                          _currentMapSyncMode    = MapSyncMode.IsSyncWith_Tour;
+   private MapSyncMode                          _currentMapSyncMode   = MapSyncMode.IsSyncWith_Tour;
    private boolean                              _isMapSyncActive;
    private boolean                              _isInMapSync;
    private long                                 _lastFiredMapSyncEventTime;
@@ -499,7 +499,7 @@ public class Map2View extends ViewPart implements
    private boolean                              _isMapSyncWith_Tour;
    private boolean                              _isMapSyncWith_ValuePoint;
    //
-   private EnumMap<MapGraphId, Action>          _allTourColor_Actions  = new EnumMap<>(MapGraphId.class);
+   private EnumMap<MapGraphId, Action>          _allTourColor_Actions = new EnumMap<>(MapGraphId.class);
    private ActionTourColor                      _actionTourColor_Elevation;
    private ActionTourColor                      _actionTourColor_Gradient;
    private ActionTourColor                      _actionTourColor_Power;
@@ -546,7 +546,6 @@ public class Map2View extends ViewPart implements
    private ActionSearchTourByLocation           _actionSearchTourByLocation;
    private ActionSetDefaultPosition             _actionSetDefaultPosition;
    private ActionSetGeoPosition                 _actionSetGeoPositions;
-   private ActionSetGeoPositionIntoGeoMarker    _actionSetGeoPositionIntoGeoMarker;
    private ActionShowAllFilteredPhotos          _actionShowAllFilteredPhotos;
    private ActionShowLegendInMap                _actionShowLegendInMap;
    private ActionShowPOI                        _actionShowPOI;
@@ -560,6 +559,7 @@ public class Map2View extends ViewPart implements
    private ActionShowValuePoint                 _actionShowValuePoint;
    private ActionZoomLevelAdjustment            _actionZoomLevelAdjustment;
    //
+   private SubMenu_SetGeoPosition               _actionSubMenu_SetGeoPosition;
    private SubMenu_SetTourMarkerType            _actionSubMenu_SetTourMarkerType;
    //
    private ActionSyncMap                        _actionMap2Slideout_SyncMap;
@@ -570,7 +570,7 @@ public class Map2View extends ViewPart implements
    private ActionSyncMapWith_Tour               _actionSyncMapWith_Tour;
    private ActionSyncMapWith_TourLocation       _actionSyncMapWith_TourLocation;
    private ActionSyncMapWith_ValuePoint         _actionSyncMapWith_ValuePoint;
-   private EnumMap<MapSyncId, Action>           _allSyncMapActions     = new EnumMap<>(MapSyncId.class);
+   private EnumMap<MapSyncId, Action>           _allSyncMapActions    = new EnumMap<>(MapSyncId.class);
    //
    private ActionZoomIn                         _actionZoom_In;
    private ActionZoomOut                        _actionZoom_Out;
@@ -581,13 +581,11 @@ public class Map2View extends ViewPart implements
    private org.eclipse.swt.graphics.Point       _geoFilter_Loaded_TopLeft_E2;
    private org.eclipse.swt.graphics.Point       _geoFilter_Loaded_BottomRight_E2;
    private GeoFilter_LoaderData                 _geoFilter_PreviousGeoLoaderItem;
-   private AtomicInteger                        _geoFilter_RunningId   = new AtomicInteger();
+   private AtomicInteger                        _geoFilter_RunningId  = new AtomicInteger();
    //
    private PaintedMapPoint                      _contextMenu_HoveredMapPoint;
    //
    private SlideoutMap2_PhotoOptions            _slideoutPhotoOptions;
-   //
-   private String                               _tourGeoPositionMarker = "#TourGeoMarker";
    //
    /*
     * UI controls
@@ -984,31 +982,6 @@ public class Map2View extends ViewPart implements
       public void runWithEvent(final Event event) {
 
          _map.actionSearchTourByLocation(event);
-      }
-   }
-
-   private class ActionSetGeoPositionIntoGeoMarker extends Action {
-
-      private TourMarker  _tourGeoMarker;
-      private GeoPosition _currentMouseGeoPosition;
-
-      public ActionSetGeoPositionIntoGeoMarker() {
-
-         setText("Set Geoposition into \"%s\" Tour Marker".formatted(_tourGeoPositionMarker));
-         setToolTipText("Set geoposition from the current mouse position into the tour geo marker \"%s\" and re-import the geo positions".formatted(
-               _tourGeoPositionMarker));
-      }
-
-      @Override
-      public void run() {
-
-         actionSetGeoPositionIntoGeoMarker(_tourGeoMarker, _currentMouseGeoPosition);
-      }
-
-      public void setData(final TourMarker tourGeoMarker, final GeoPosition currentMouseGeoPosition) {
-
-         _tourGeoMarker = tourGeoMarker;
-         _currentMouseGeoPosition = currentMouseGeoPosition;
       }
    }
 
@@ -1774,48 +1747,6 @@ public class Map2View extends ViewPart implements
       _map.paint();
    }
 
-   private void actionSetGeoPositionIntoGeoMarker(final TourMarker tourGeoMarker,
-                                                  final GeoPosition currentMouseGeoPosition) {
-      // TODO Auto-generated method stub
-
-      // make sure the tour editor does not contain a modified tour
-      if (TourManager.isTourEditorModified()) {
-         return;
-      }
-
-      final TourData tourData = tourGeoMarker.getTourData();
-
-      final ImportState_Process importState_Process = new ImportState_Process();
-
-      // do not interpolate geo positions during the reimport
-      importState_Process.setIsSkipGeoInterpolation(true);
-
-      final TourData reimportedTourData = RawDataManager.getInstance().reimportTour(tourData, importState_Process);
-
-      final int[] timeSerie = tourData.timeSerie;
-      final double[] reimportedLatitudeSerie = reimportedTourData.latitudeSerie;
-      final double[] reimportedlongitudeSerie = reimportedTourData.longitudeSerie;
-
-      final int geoMarkerSerieIndex = tourGeoMarker.getSerieIndex();
-
-      // insert geo marker position
-      reimportedLatitudeSerie[geoMarkerSerieIndex] = currentMouseGeoPosition.latitude;
-      reimportedlongitudeSerie[geoMarkerSerieIndex] = currentMouseGeoPosition.longitude;
-
-      // interpolate lat/lon
-      tourData.createTimeSeries_20_InterpolateMissingValues(reimportedLatitudeSerie, timeSerie, false);
-      tourData.createTimeSeries_20_InterpolateMissingValues(reimportedlongitudeSerie, timeSerie, false);
-
-      // adjust distance/speed values
-      TourManager.computeDistanceValuesFromGeoPosition(reimportedTourData);
-
-      tourData.latitudeSerie = reimportedLatitudeSerie;
-      tourData.longitudeSerie = reimportedlongitudeSerie;
-      tourData.distanceSerie = reimportedTourData.distanceSerie;
-
-      TourManager.saveModifiedTour(tourData);
-   }
-
    public void actionSetShowScaleInMap() {
 
       final boolean isScaleVisible = _actionShowScaleInMap.isChecked();
@@ -2555,8 +2486,6 @@ public class Map2View extends ViewPart implements
       _actionRunExternalApp3                 = new ActionRunExternalApp();
 
       _actionCopyLocation                    = new ActionCopyLocation();
-      _actionSetGeoPositions                 = new ActionSetGeoPosition();
-      _actionSetGeoPositionIntoGeoMarker     = new ActionSetGeoPositionIntoGeoMarker();
       _actionCreateTourMarkerFromMap         = new ActionCreateTourMarkerFromMap(this);
       _actionGotoLocation                    = new ActionGotoLocation();
       _actionLookupTourLocation              = new ActionLookupCommonLocation(this);
@@ -2582,6 +2511,7 @@ public class Map2View extends ViewPart implements
       _actionShowAllFilteredPhotos           = new ActionShowAllFilteredPhotos(this);
       _actionShowLegendInMap                 = new ActionShowLegendInMap(this);
       _actionMap2Slideout_PhotoOptions       = new ActionMap2_PhotoOptions();
+      _actionSetGeoPositions                 = new ActionSetGeoPosition();
       _actionShowScaleInMap                  = new ActionShowScaleInMap(this);
       _actionShowSliderInMap                 = new ActionShowSliderInMap(this);
       _actionShowSliderInLegend              = new ActionShowSliderInLegend(this);
@@ -2591,6 +2521,7 @@ public class Map2View extends ViewPart implements
       _actionShowTour                        = new ActionShowTour();
       _actionShowTourInfoInMap               = new ActionShowTourInfoInMap(this);
       _actionShowTourWeatherInMap            = new ActionShowTourWeatherInMap(this);
+      _actionSubMenu_SetGeoPosition          = new SubMenu_SetGeoPosition();
       _actionSubMenu_SetTourMarkerType       = new SubMenu_SetTourMarkerType();
       _actionZoomLevelAdjustment             = new ActionZoomLevelAdjustment();
 
@@ -2910,10 +2841,10 @@ public class Map2View extends ViewPart implements
       /*
        * Set geo positions into tour geo marker
        */
-      final TourMarker tourGeoMarker = getTourMarkerWhereGeoPositionsCanBeSet();
+      final List<TourMarker> allGeoMarker = getTourMarkersWhereGeoPositionsCanBeSet();
 
-      _actionSetGeoPositionIntoGeoMarker.setData(tourGeoMarker, currentMouseGeoPosition);
-      _actionSetGeoPositionIntoGeoMarker.setEnabled(tourGeoMarker != null);
+      _actionSubMenu_SetGeoPosition.setContextData(allGeoMarker, currentMouseGeoPosition);
+      _actionSubMenu_SetGeoPosition.setEnabled(allGeoMarker != null && allGeoMarker.size() > 0);
 
 // SET_FORMATTING_OFF
 
@@ -3180,7 +3111,7 @@ public class Map2View extends ViewPart implements
          menuMgr.add(_actionCreateTourMarkerFromMap);
          menuMgr.add(_actionLookupTourLocation);
          menuMgr.add(_actionSetGeoPositions);
-         menuMgr.add(_actionSetGeoPositionIntoGeoMarker);
+         menuMgr.add(_actionSubMenu_SetGeoPosition);
 
          /*
           * Show tour features
@@ -3786,7 +3717,7 @@ public class Map2View extends ViewPart implements
     * @return Returns {@link TourData} where the geo position can be set, otherwise
     *         <code>null</code>
     */
-   private TourMarker getTourMarkerWhereGeoPositionsCanBeSet() {
+   private List<TourMarker> getTourMarkersWhereGeoPositionsCanBeSet() {
 
       if (_allTourData.size() != 1) {
 
@@ -3802,18 +3733,21 @@ public class Map2View extends ViewPart implements
          return null;
       }
 
+      final String geoMarkerPrefix = SubMenu_SetGeoPosition.GEO_MARKER_PREFIX.toLowerCase();
+      final List<TourMarker> allGeoMarker = new ArrayList<>();
+
       final Set<TourMarker> allTourMarkers = tourData.getTourMarkers();
       for (final TourMarker tourMarker : allTourMarkers) {
 
          final String label = tourMarker.getLabel();
 
-         if (label.trim().equalsIgnoreCase(_tourGeoPositionMarker)) {
+         if (label.trim().toLowerCase().startsWith(geoMarkerPrefix)) {
 
-            return tourMarker;
+            allGeoMarker.add(tourMarker);
          }
       }
 
-      return null;
+      return allGeoMarker;
    }
 
    private Set<GeoPosition> getXSliderGeoPositions(final TourData tourData,
