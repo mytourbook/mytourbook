@@ -450,17 +450,13 @@ public class TourNutritionProduct {
 
       if (!this.getName().equals(updatedProduct.getName())) {
 
-         previousData.add(UI.EMPTY_STRING
-
-               + this.getName() + UI.UNIT_VOLT + UI.SPACE
-               + updatedProduct.getName() + UI.UNIT_VOLT);
-
-         newData.add(UI.EMPTY_STRING
-
-               + this.getName() + UI.UNIT_VOLT + UI.SPACE
-               + updatedProduct.getName() + UI.UNIT_VOLT);
-
          this.setName(updatedProduct.getName());
+         buildProductInfoDifference(
+               updatedProduct.getName(),
+               this.getName(),
+               previousData,
+               newData,
+               UI.EMPTY_STRING);
       }
       if (this.getCalories() != updatedProduct.getCalories()) {
 

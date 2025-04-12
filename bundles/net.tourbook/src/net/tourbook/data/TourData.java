@@ -14066,16 +14066,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
          final TourNutritionProduct existingProduct = existingProductsMap.get(updatedProduct.getProductCode());
 
-         if (existingProduct != null) {
-
             // Update only the properties that are different
             existingProduct.updateNewProductInfo(updatedProduct);
 
-         } else {
-
-            // If the product does not exist, add it to the set
-            tourNutritionProducts.add(updatedProduct);
-         }
       }
 
    }

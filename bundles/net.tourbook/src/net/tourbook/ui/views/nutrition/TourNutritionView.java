@@ -1591,40 +1591,40 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
       final Set<TourNutritionProduct> updatedTourNutritionProducts = new HashSet<>();
       for (final TourNutritionProduct tourNutritionProduct : tourNutritionProducts) {
 
+         // We skip the custom products
          if (net.tourbook.common.util.StringUtils.isNullOrEmpty(tourNutritionProduct.getProductCode())) {
             continue;
          }
 
-         //get the product from the api
-
+         //get the most up-to-date product info from the api
          final Product updatedProduct = NutritionUtils.searchProduct(
                tourNutritionProduct.getProductCode(),
                ProductSearchType.ByCode).get(0);
 
-         final TourNutritionProduct updatedTourNutritionProduct = new TourNutritionProduct(_tourData, updatedProduct);
-         // if carbohydrates or calories are different, then we update the product
-
-         boolean isUpdateProduct = false;
-         if (updatedTourNutritionProduct.getCarbohydrates_Serving() != tourNutritionProduct.getCarbohydrates_Serving() ||
-               updatedTourNutritionProduct.getCalories_Serving() != tourNutritionProduct.getCalories_Serving()) {
-
-            isUpdateProduct = true;
-         }
-
-         if (isUpdateProduct) {
+         final TourNutritionProduct updatedTourNutritionProduct = new TourNutritionProduct(
+               _tourData,
+               updatedProduct);
+//         // if carbohydrates or calories are different, then we update the product
+//
+//         boolean isUpdateProduct = false;
+//         if (updatedTourNutritionProduct.getCarbohydrates_Serving() != tourNutritionProduct.getCarbohydrates_Serving() ||
+//               updatedTourNutritionProduct.getCalories_Serving() != tourNutritionProduct.getCalories_Serving()) {
+//
+//            isUpdateProduct = true;
+//         }
+//
+//         if (isUpdateProduct) {
 
             updatedTourNutritionProducts.add(updatedTourNutritionProduct);
          }
-      }
+         //  }
 
-      if (!updatedTourNutritionProducts.isEmpty()) {
 
          _tourData.updateTourNutritionProducts(updatedTourNutritionProducts);
          _tourData = TourManager.saveModifiedTour(_tourData);
          // ??? _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
 
          // todo display the changes in the log view
-      }
    }
 
    @Override
