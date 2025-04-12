@@ -14062,7 +14062,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       final Map<String, TourNutritionProduct> existingProductsMap = tourNutritionProducts.stream()
             .collect(Collectors.toMap(TourNutritionProduct::getProductCode, product -> product));
 
-      // Iterate through the updated products
       for (final TourNutritionProduct updatedProduct : updatedTourNutritionProducts) {
 
          final TourNutritionProduct existingProduct = existingProductsMap.get(updatedProduct.getProductCode());
