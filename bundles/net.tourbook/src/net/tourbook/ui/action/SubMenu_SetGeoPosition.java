@@ -51,6 +51,8 @@ public class SubMenu_SetGeoPosition extends SubMenu {
       public ActionRemoveAllGeoPositions() {
 
          super(Messages.Map_Action_GeoMarkerPosition_RemoveAll, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Map_Action_GeoMarkerPosition_RemoveAll_Tooltip);
       }
 
       @Override
@@ -181,17 +183,17 @@ public class SubMenu_SetGeoPosition extends SubMenu {
       TourManager.saveModifiedTour(tourData);
    }
 
-   private void createOtherGeoPositions(final TourMarker geoMarker,
+   private void createOtherGeoPositions(final TourMarker currentGeoMarker,
                                         final TourData tourData,
-                                        final double[] reimportedLatitudeSerie,
-                                        final double[] reimportedlongitudeSerie) {
+                                        final double[] latitudeSerie,
+                                        final double[] longitudeSerie) {
 
       final String geoPrefix = GEO_MARKER_PREFIX.toLowerCase();
 
       for (final TourMarker tourMarker : tourData.getTourMarkers()) {
 
          // skip current geo marker
-         if (tourMarker.equals(geoMarker)) {
+         if (tourMarker.equals(currentGeoMarker)) {
             continue;
          }
 
@@ -216,8 +218,8 @@ public class SubMenu_SetGeoPosition extends SubMenu {
 
                      final int serieIndex = tourMarker.getSerieIndex();
 
-                     reimportedLatitudeSerie[serieIndex] = markerGeoPos.latitude;
-                     reimportedlongitudeSerie[serieIndex] = markerGeoPos.longitude;
+                     latitudeSerie[serieIndex] = markerGeoPos.latitude;
+                     longitudeSerie[serieIndex] = markerGeoPos.longitude;
                   }
 
                } catch (final JsonProcessingException e) {
