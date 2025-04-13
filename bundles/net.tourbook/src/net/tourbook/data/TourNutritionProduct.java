@@ -444,24 +444,24 @@ public class TourNutritionProduct {
       tourData = tourDataFromClone;
    }
 
-   void updateNewProductInfo(final TourNutritionProduct updatedProduct) {
+   void updateProductInfo(final TourNutritionProduct updatedProduct) {
 
       final List<String> previousData = new ArrayList<>();
       final List<String> newData = new ArrayList<>();
 
       if (!this.getName().equals(updatedProduct.getName())) {
 
-         this.setName(updatedProduct.getName());
          buildProductInfoDifference(
                updatedProduct.getName(),
                this.getName(),
                previousData,
                newData,
                UI.EMPTY_STRING);
-      }
-      if (this.getCalories() != updatedProduct.getCalories()) {
 
-         this.setCalories(updatedProduct.getCalories());
+         this.setName(updatedProduct.getName());
+      }
+
+      if (this.getCalories() != updatedProduct.getCalories()) {
 
          buildProductInfoDifference(
                String.valueOf(updatedProduct.getCalories()),
@@ -469,17 +469,11 @@ public class TourNutritionProduct {
                previousData,
                newData,
                OtherMessages.VALUE_UNIT_K_CALORIES);
-      }
-      if (this.getCalories_Serving() != updatedProduct.getCalories_Serving()) {
-         this.setCalories_Serving(updatedProduct.getCalories_Serving());
 
-         buildProductInfoDifference(
-               String.valueOf(updatedProduct.getCalories_Serving()),
-               String.valueOf(this.getCalories_Serving()),
-               previousData,
-               newData,
-               OtherMessages.VALUE_UNIT_K_CALORIES);
+         this.setCalories(updatedProduct.getCalories());
+         this.setCalories_Serving(updatedProduct.getCalories_Serving());
       }
+
       if (this.getCarbohydrates() != updatedProduct.getCarbohydrates()) {
 
          buildProductInfoDifference(
@@ -488,14 +482,21 @@ public class TourNutritionProduct {
                previousData,
                newData,
                UI.UNIT_WEIGHT_G);
-      }
-      if (this.getCarbohydrates_Serving() != updatedProduct.getCarbohydrates_Serving()) {
+
+         this.setCarbohydrates(updatedProduct.getCarbohydrates());
          this.setCarbohydrates_Serving(updatedProduct.getCarbohydrates_Serving());
       }
+
       if (!Objects.equals(this.getSodium(), updatedProduct.getSodium())) {
+
+         buildProductInfoDifference(
+               String.valueOf(updatedProduct.getSodium()),
+               String.valueOf(this.getSodium()),
+               previousData,
+               newData,
+               UI.UNIT_WEIGHT_MG);
+
          this.setSodium(updatedProduct.getSodium());
-      }
-      if (!Objects.equals(this.getSodium_Serving(), updatedProduct.getSodium_Serving())) {
          this.setSodium_Serving(updatedProduct.getSodium_Serving());
       }
 
@@ -515,13 +516,5 @@ public class TourNutritionProduct {
                         Messages.Log_ModifiedTour_Old_Data_Vs_New_Data,
                         previousDataJoined,
                         newDataJoined));
-
-      //todo fb
-      //it should look like this
-      // Updating the following Tour Nutrition Products:
-      // PRODUCTNAME → Previous data: PRODUCTNAME 504.0kcal XXg..... - Current data: NEWNAME 504.0kcal YYg....
-      // PRODUCTNAME2 → Previous data: PRODUCTNAME 504.0kcal XXg..... - Current data: NEWNAME 504.0kcal YYg....
-      //Updated in 0.347 s
-
    }
 }

@@ -1652,9 +1652,7 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
 
       _tourData.updateTourNutritionProducts(updatedTourNutritionProducts);
       _tourData = TourManager.saveModifiedTour(_tourData);
-      // ??? _tourData.setTourNutritionProducts(_tourData.getTourNutritionProducts());
-
-      // todo display the changes in the log view
+      //TODO FB the tour data fire event is not fired
 
    }
 
