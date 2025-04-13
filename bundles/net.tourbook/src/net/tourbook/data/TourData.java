@@ -14059,17 +14059,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
 
       // Map existing products by their unique identifier (barcode)
-      //todo fb exclude the products with a product code of empty string, otherwise it crashes
-
       final Map<String, TourNutritionProduct> existingProductsMap = tourNutritionProducts.stream()
+            .filter(product -> StringUtils.hasContent(product.getProductCode()))
             .collect(Collectors.toMap(TourNutritionProduct::getProductCode, product -> product));
 
       for (final TourNutritionProduct updatedProduct : updatedTourNutritionProducts) {
 
          final TourNutritionProduct existingProduct = existingProductsMap.get(updatedProduct.getProductCode());
 
-            // Update only the properties that are different
-            existingProduct.updateProductInfo(updatedProduct);
+         existingProduct.updateProductInfo(updatedProduct);
       }
    }
 }

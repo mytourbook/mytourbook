@@ -444,6 +444,15 @@ public class TourNutritionProduct {
       tourData = tourDataFromClone;
    }
 
+   /**
+    * Updates the product information with the new values.
+    * <p>
+    * The method compares the existing product information with the updated product information
+    * and updates the fields accordingly. It also logs the changes made to the product information.
+    *
+    * @param updatedProduct
+    *           The updated product information.
+    */
    void updateProductInfo(final TourNutritionProduct updatedProduct) {
 
       final List<String> previousData = new ArrayList<>();
