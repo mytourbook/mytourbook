@@ -1827,6 +1827,8 @@ public class TourNutritionView extends ViewPart implements ITourViewer {
                   ? null
                   : _tourBeverageContainers.get(beverageContainerIndex - 1);
 
+            //todo fb Here, if the user wants to set the beverage to null, we
+            // need to check if the same product is not already set to something empty
             final TourNutritionProduct tourNutritionProduct = (TourNutritionProduct) element;
             tourNutritionProduct.setTourBeverageContainer(selectedTourBeverageContainer);
             tourNutritionProduct.setContainersConsumed(1);
